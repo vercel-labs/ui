@@ -12,7 +12,10 @@ function Example() {
   return (
     <div data-slot="row">
       <code>{command}</code>
-      <Tooltip closeOnPress={false} onOpenChangeComplete={(open) => !open && setCopied(false)}>
+      <Tooltip
+        closeOnPress={false}
+        onOpenChangeComplete={(open) => !open && setCopied(false)}
+      >
         <TooltipTrigger
           aria-label={copied ? "Copied" : "Copy"}
           onClick={() => {
@@ -20,7 +23,11 @@ function Example() {
             setCopied(true)
           }}
         >
-          {copied ? <CheckIcon aria-hidden="true" /> : <CopyIcon aria-hidden="true" />}
+          {copied ? (
+            <CheckIcon aria-hidden="true" />
+          ) : (
+            <CopyIcon aria-hidden="true" />
+          )}
         </TooltipTrigger>
         <TooltipContent>{copied ? "Copied" : "Copy"}</TooltipContent>
       </Tooltip>

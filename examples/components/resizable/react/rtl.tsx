@@ -1,6 +1,10 @@
 "use client"
 
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 
 function Example() {
   return (

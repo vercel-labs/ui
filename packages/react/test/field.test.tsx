@@ -30,7 +30,9 @@ test("each error's own `match` decides whether it replaces the browser's message
           <FieldLabel>Email</FieldLabel>
           <FieldControl type="email" required />
           <FieldError match="valueMissing">Enter an email.</FieldError>
-          {second && <FieldError match={second}>Enter a valid email.</FieldError>}
+          {second && (
+            <FieldError match={second}>Enter a valid email.</FieldError>
+          )}
         </Field>
       </form>
     )

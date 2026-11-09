@@ -39,9 +39,11 @@ function mount(root: HTMLElement) {
       </ui-date-picker-content>
     </ui-date-picker>
   `
-  root.querySelector("ui-date-picker")!.addEventListener("valuechange", (event) => {
-    log(root, `${event.detail.value ?? "No date"} (${event.detail.reason})`)
-  })
+  root
+    .querySelector("ui-date-picker")!
+    .addEventListener("valuechange", (event) => {
+      log(root, `${event.detail.value ?? "No date"} (${event.detail.reason})`)
+    })
 }
 
 export { mount }

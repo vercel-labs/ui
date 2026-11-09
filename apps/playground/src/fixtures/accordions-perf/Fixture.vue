@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui-sdk/vue"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "@ui-sdk/vue"
 import { perfSize } from "tests/fixtures/perf.ts"
 
 // An accordion of N items, like a long FAQ.
@@ -13,11 +19,20 @@ const found = new URLSearchParams(location.search).has("found")
   <div class="fixture" style="flex-direction: column; align-items: start">
     <button>Before</button>
     <Accordion class="accordion" :hidden-until-found="found">
-      <AccordionItem v-for="index in items" :key="index" class="accordion-item" :value="`item-${index}`">
+      <AccordionItem
+        v-for="index in items"
+        :key="index"
+        class="accordion-item"
+        :value="`item-${index}`"
+      >
         <AccordionHeader class="accordion-header">
-          <AccordionTrigger class="accordion-trigger">Question {{ index + 1 }}</AccordionTrigger>
+          <AccordionTrigger class="accordion-trigger"
+            >Question {{ index + 1 }}</AccordionTrigger
+          >
         </AccordionHeader>
-        <AccordionPanel class="accordion-panel">Answer {{ index + 1 }}</AccordionPanel>
+        <AccordionPanel class="accordion-panel"
+          >Answer {{ index + 1 }}</AccordionPanel
+        >
       </AccordionItem>
     </Accordion>
     <button>After</button>

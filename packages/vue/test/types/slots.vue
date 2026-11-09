@@ -16,7 +16,9 @@ import { Toggle } from "../../src/toggle"
 
 <template>
   <Field>
-    <FieldDescription v-slot="{ state }">{{ state.invalid ? "Check this" : "" }}</FieldDescription>
+    <FieldDescription v-slot="{ state }">{{
+      state.invalid ? "Check this" : ""
+    }}</FieldDescription>
   </Field>
   <FieldSet>
     <FieldDescription v-slot="{ state }">
@@ -37,14 +39,20 @@ import { Toggle } from "../../src/toggle"
     </SelectValue>
   </Select>
   <Calendar>
-    <CalendarNext v-slot="{ state }">{{ state.disabled ? "" : "›" }}</CalendarNext>
+    <CalendarNext v-slot="{ state }">{{
+      state.disabled ? "" : "›"
+    }}</CalendarNext>
     <CalendarNext v-slot="{ state }">
       <!-- @vue-expect-error CalendarNext's state has no `nonexistent`. -->
       {{ state.nonexistent }}
     </CalendarNext>
     <CalendarGrid>
-      <CalendarWeekdays v-slot="{ index }"><CalendarWeekday :index="index" /></CalendarWeekdays>
-      <CalendarWeeks v-slot="{ cell }"><CalendarDay :value="cell.date" /></CalendarWeeks>
+      <CalendarWeekdays v-slot="{ index }"
+        ><CalendarWeekday :index="index"
+      /></CalendarWeekdays>
+      <CalendarWeeks v-slot="{ cell }"
+        ><CalendarDay :value="cell.date"
+      /></CalendarWeeks>
       <CalendarWeeks v-slot="{ cell }">
         <!-- @vue-expect-error A week's cell has no `nonexistent`. -->
         {{ cell.nonexistent }}

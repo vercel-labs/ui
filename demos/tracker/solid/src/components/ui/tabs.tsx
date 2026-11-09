@@ -1,20 +1,27 @@
-import { TabsIndicator, TabsList as TabsListPrimitive, TabsTab as TabsTabPrimitive } from "@ui-sdk/solid/tabs"
+import {
+  TabsIndicator,
+  TabsList as TabsListPrimitive,
+  TabsTab as TabsTabPrimitive,
+} from "@ui-sdk/solid/tabs"
 import { cn } from "cn"
 import { omit, type ComponentProps } from "solid-js"
 import type { JSX } from "@solidjs/web"
 
 function TabsList(
-  props: Omit<ComponentProps<typeof TabsListPrimitive>, "class" | "children"> & {
+  props: Omit<
+    ComponentProps<typeof TabsListPrimitive>,
+    "class" | "children"
+  > & {
     class?: string
     children?: JSX.Element
-  },
+  }
 ) {
   const rest = omit(props, "class", "children")
   return (
     <TabsListPrimitive
       class={cn(
         "relative inline-flex h-8 w-fit items-center rounded-2xl bg-muted p-[3px] text-muted-foreground",
-        props.class,
+        props.class
       )}
       {...rest}
     >
@@ -24,13 +31,17 @@ function TabsList(
   )
 }
 
-function TabsTab(props: Omit<ComponentProps<typeof TabsTabPrimitive>, "class"> & { class?: string }) {
+function TabsTab(
+  props: Omit<ComponentProps<typeof TabsTabPrimitive>, "class"> & {
+    class?: string
+  }
+) {
   const rest = omit(props, "class")
   return (
     <TabsTabPrimitive
       class={cn(
         "relative z-10 inline-flex h-6.5 cursor-default items-center justify-center gap-1.5 rounded-2xl px-2.5 text-sm font-medium whitespace-nowrap text-foreground/60 outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30 data-selected:text-foreground",
-        props.class,
+        props.class
       )}
       {...rest}
     />

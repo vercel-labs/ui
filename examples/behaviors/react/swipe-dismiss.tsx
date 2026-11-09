@@ -11,7 +11,13 @@ const initial = [
 
 type Toast = (typeof initial)[number]
 
-function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
+function SwipeToast({
+  toast,
+  onDismiss,
+}: {
+  toast: Toast
+  onDismiss: () => void
+}) {
   const [offset, setOffset] = React.useState(0)
   const [dragging, setDragging] = React.useState(false)
   const [dismissing, setDismissing] = React.useState(false)
@@ -24,9 +30,16 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
   }
 
   const pointerdown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0 || (event.target as Element).closest("button")) return
+    if (event.button !== 0 || (event.target as Element).closest("button")) {
+      return
+    }
     const width = event.currentTarget.offsetWidth
-    const keeps = { min: -width, max: width, step: 1, snap: { points: [0], threshold: width * 0.3 } }
+    const keeps = {
+      min: -width,
+      max: width,
+      step: 1,
+      snap: { points: [0], threshold: width * 0.3 },
+    }
     const startX = event.clientX
     let moved = 0
     stop.current?.()
@@ -43,8 +56,11 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
         stop.current = undefined
         setDragging(false)
         setDismissing(false)
-        if (!canceled && scrubTo(moved, keeps).point === undefined) dismiss(Math.sign(moved), width)
-        else setOffset(0)
+        if (!canceled && scrubTo(moved, keeps).point === undefined) {
+          dismiss(Math.sign(moved), width)
+        } else {
+          setOffset(0)
+        }
       },
     })
   }
@@ -75,7 +91,9 @@ function SwipeToast({ toast, onDismiss }: { toast: Toast; onDismiss: () => void 
           data-variant="ghost"
           data-size="sm"
           aria-label={`Dismiss ${toast.title}`}
-          onClick={(event) => dismiss(1, event.currentTarget.parentElement!.offsetWidth)}
+          onClick={(event) =>
+            dismiss(1, event.currentTarget.parentElement!.offsetWidth)
+          }
         >
           <XIcon aria-hidden="true" />
         </button>
@@ -89,7 +107,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <button type="button" onClick={() => setToasts(initial)} disabled={toasts.length === initial.length}>
+        <button
+          type="button"
+          onClick={() => setToasts(initial)}
+          disabled={toasts.length === initial.length}
+        >
           Show All
         </button>
       </div>
@@ -98,7 +120,11 @@ function Example() {
           <SwipeToast
             key={toast.id}
             toast={toast}
-            onDismiss={() => setToasts((current) => current.filter((candidate) => candidate.id !== toast.id))}
+            onDismiss={() =>
+              setToasts((current) =>
+                current.filter((candidate) => candidate.id !== toast.id)
+              )
+            }
           />
         ))}
       </ul>

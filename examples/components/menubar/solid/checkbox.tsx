@@ -1,4 +1,10 @@
-import { Menu, MenuCheckboxItem, MenuContent, MenuItemIndicator, MenuTrigger } from "@ui-sdk/solid/menu"
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuItemIndicator,
+  MenuTrigger,
+} from "@ui-sdk/solid/menu"
 import { Menubar } from "@ui-sdk/solid/menubar"
 import { createSignal } from "solid-js"
 
@@ -10,7 +16,11 @@ export function Example() {
         <Menu>
           <MenuTrigger>View</MenuTrigger>
           <MenuContent>
-            <MenuCheckboxItem value="status-bar" checked={statusBar()} onCheckedChange={setStatusBar}>
+            <MenuCheckboxItem
+              value="status-bar"
+              checked={statusBar()}
+              onCheckedChange={setStatusBar}
+            >
               <MenuItemIndicator>
                 <svg
                   viewBox="0 0 24 24"
@@ -82,7 +92,9 @@ export function Example() {
           </MenuContent>
         </Menu>
       </Menubar>
-      <output data-slot="output">Status bar {statusBar() ? "shown" : "hidden"}</output>
+      <output data-slot="output">
+        Status bar {statusBar() ? "shown" : "hidden"}
+      </output>
     </div>
   )
 }

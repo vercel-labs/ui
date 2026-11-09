@@ -1,11 +1,18 @@
 // TriggerMenu's parts and the attributes they carry.
 import { popupContentAttrs } from "../../foundation/popups/popup"
 import { registerPopupElement } from "../../foundation/popups/popup-elements"
-import { contentAnchor, placementOptions } from "../../foundation/popups/popup-features"
+import {
+  contentAnchor,
+  placementOptions,
+} from "../../foundation/popups/popup-features"
 import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
 import { position } from "../../foundation/platform/position"
 import { textFieldAdapter } from "../../foundation/text/caret"
-import { groupLabelledBy, groupLabelPart, stashContent } from "../../foundation/lists/listbox-parts"
+import {
+  groupLabelledBy,
+  groupLabelPart,
+  stashContent,
+} from "../../foundation/lists/listbox-parts"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { itemIconPart, optionIcon } from "../../foundation/lists/item-icon"
 import { idPart, openAttrs } from "../../foundation/kernel/attrs"
@@ -43,14 +50,19 @@ type TextProps = {
 
 const noItems: TriggerMenuData<unknown> = []
 
-function contentState(state: TriggerMenuState, { api }: { api: TriggerMenuApi }) {
+function contentState(
+  state: TriggerMenuState,
+  { api }: { api: TriggerMenuApi }
+) {
   return {
     open: state.open,
     trigger: state.trigger,
     query: state.query,
     argument: state.argument,
     status: api.internal.options().status ?? state.loading,
-    items: (api.internal.listbox.visibleData()?.list as TriggerMenuData<unknown>) ?? noItems,
+    items:
+      (api.internal.listbox.visibleData()?.list as TriggerMenuData<unknown>) ??
+      noItems,
   }
 }
 
@@ -80,9 +92,14 @@ const unreadByItems = {
   described: [],
   modal: [],
   presentation: [],
-} satisfies Record<Exclude<keyof TriggerMenuState, "highlighted" | "listing">, readonly never[]>
+} satisfies Record<
+  Exclude<keyof TriggerMenuState, "highlighted" | "listing">,
+  readonly never[]
+>
 
-const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) => ({
+const triggerMenuSlots = (
+  slot: SlotFactory<TriggerMenuState, TriggerMenuApi>
+) => ({
   // A <textarea> by default, or an <input> through custom rendering.
   input: slot<{}, TriggerMenuInputState>({
     role: (state) => (state.field === "input" ? "combobox" : undefined),
@@ -116,14 +133,21 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
         "aria-controls": controls,
         "aria-activedescendant": active,
       } = api.internal.fieldAttrs(state, state.field)
-      return { "aria-expanded": expanded, "aria-controls": controls, "aria-activedescendant": active }
+      return {
+        "aria-expanded": expanded,
+        "aria-controls": controls,
+        "aria-activedescendant": active,
+      }
     }),
     on: {
       keydown: (event, { api }) => api.internal.onKeyDown(event),
     },
     bind(el, { api }) {
       const field = el as HTMLInputElement | HTMLTextAreaElement
-      api.internal.setOwnEditor(textFieldAdapter(field), field.localName === "input" ? "input" : "multiline")
+      api.internal.setOwnEditor(
+        textFieldAdapter(field),
+        field.localName === "input" ? "input" : "multiline"
+      )
       return () => api.internal.setOwnEditor(undefined)
     },
   }),
@@ -144,13 +168,16 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
     // A list inside it is the listbox instead.
     role: (state) => (state.listed ? "presentation" : "listbox"),
     roles: ["presentation", "listbox"],
-    keys: { none: "The editor handles them, and keeps focus while they move the highlight." },
+    keys: {
+      none: "The editor handles them, and keeps focus while they move the highlight.",
+    },
     state: contentState,
     present: (state, { props }) => state.mounted || !!props.keepMounted,
     attrs: (state, { id, api }) => ({
       ...popupContentAttrs(state, id),
       ...(state.listed ? {} : api.internal.listLabel()),
-      "aria-busy": !state.listed && state.loading === "loading" ? "true" : undefined,
+      "aria-busy":
+        !state.listed && state.loading === "loading" ? "true" : undefined,
       "data-trigger": state.trigger ?? undefined,
     }),
     // Pressing the list keeps focus, the caret and the on-screen keyboard in the editor.
@@ -161,7 +188,9 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
       let active = true
       // Items bind in the same commit. A microtask later, an empty list is really empty.
       queueMicrotask(() => {
-        if (!active) return
+        if (!active) {
+          return
+        }
         store.set({ settled: true })
         internal.settle()
       })
@@ -172,8 +201,14 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
         getBoundingClientRect: () => (last = internal.anchorRect() ?? last),
       }
       const unbind = internal.popup.bind(el, {
-        anchor: () => contentAnchor(el, internal.contentProps(key).anchor, () => textAnchor),
-        position: () => placementOptions(internal.contentProps(key), { align: "start" }),
+        anchor: () =>
+          contentAnchor(
+            el,
+            internal.contentProps(key).anchor,
+            () => textAnchor
+          ),
+        position: () =>
+          placementOptions(internal.contentProps(key), { align: "start" }),
         rendered: (listener) => onProps(part, listener),
         // Focus stays in the editor.
         initialFocus: () => undefined,
@@ -188,7 +223,9 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
 
   list: slot<{}, TriggerMenuContentState>({
     role: "listbox",
-    keys: { none: "The editor handles them, and keeps focus while they move the highlight." },
+    keys: {
+      none: "The editor handles them, and keeps focus while they move the highlight.",
+    },
     state: contentState,
     attrs: (state, { id, api }) => ({
       id: `${id}-list`,
@@ -209,7 +246,11 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
       // Internal: passed by renderers, from the group it's inside.
       group: { kind: "string", from: "group.id" },
     },
-    selects: selects({ highlighted: ({ key }) => [key], listing: ({ key }) => [key], ...unreadByItems }),
+    selects: selects({
+      highlighted: ({ key }) => [key],
+      listing: ({ key }) => [key],
+      ...unreadByItems,
+    }),
     role: "option",
     focus: "active-descendant",
     state: (state, { key, props }) => ({
@@ -233,8 +274,12 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
     on: {
       ...pressKeepsFocus,
       pointermove(event, { api, key, store }) {
-        if (event.pointerType === "touch" || !store.get().open) return
-        if (store.get().highlighted !== key) api.internal.listbox.highlight(key, { event })
+        if (event.pointerType === "touch" || !store.get().open) {
+          return
+        }
+        if (store.get().highlighted !== key) {
+          api.internal.listbox.highlight(key, { event })
+        }
       },
     },
     press: ({ api, key }, event) => api.internal.choose(key, event),
@@ -255,7 +300,10 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
 
   // An icon inside a suggestion.
   "item-icon": slot(
-    itemIconPart<TriggerMenuState, TriggerMenuApi>({ component: "trigger-menu", ...optionIcon }),
+    itemIconPart<TriggerMenuState, TriggerMenuApi>({
+      component: "trigger-menu",
+      ...optionIcon,
+    })
   ),
 
   group: slot({
@@ -296,8 +344,16 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
       "data-loading": state.loading === "loading" ? "" : undefined,
     }),
     bind(el, { api, store, props }) {
-      if (!store.get().hasEmpty) queueMicrotask(api.internal.markEmptyPart)
-      if (props.stash) return stashContent(el, () => api.internal.isEmpty(store.get()), store.subscribe)
+      if (!store.get().hasEmpty) {
+        queueMicrotask(api.internal.markEmptyPart)
+      }
+      if (props.stash) {
+        return stashContent(
+          el,
+          () => api.internal.isEmpty(store.get()),
+          store.subscribe
+        )
+      }
     },
   }),
 
@@ -327,10 +383,14 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
     attrs: () => ({ "aria-hidden": "true" }),
     bind(el, { api, props, store }) {
       const computed = getComputedStyle(el)
-      if (computed.position === "static") el.style.position = "fixed"
+      if (computed.position === "static") {
+        el.style.position = "fixed"
+      }
       el.style.pointerEvents = "none"
       const write = () => {
-        if (props.text && el.textContent !== store.get().hint) el.textContent = store.get().hint
+        if (props.text && el.textContent !== store.get().hint) {
+          el.textContent = store.get().hint
+        }
       }
       write()
       let last = { x: 0, y: 0, width: 0, height: 0 }
@@ -338,9 +398,12 @@ const triggerMenuSlots = (slot: SlotFactory<TriggerMenuState, TriggerMenuApi>) =
       // After the caret, which is its left in right-to-left text.
       const side = computed.direction === "rtl" ? "left" : "right"
       const stop = position(
-        () => ({ getBoundingClientRect: () => (last = api.internal.caretRect() ?? last) }),
+        () => ({
+          getBoundingClientRect: () =>
+            (last = api.internal.caretRect() ?? last),
+        }),
         el,
-        { side, align: "center", sideOffset: 2, collisionPadding: 0 },
+        { side, align: "center", sideOffset: 2, collisionPadding: 0 }
       )
       return () => {
         unsubscribe()

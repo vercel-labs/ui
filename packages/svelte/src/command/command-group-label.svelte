@@ -15,8 +15,13 @@ A group's heading, which names it.
 
   const command = useHandle(commandPrimitive)
   const group = getContext<string | undefined>(GroupKey)
-  if (!group) throw new Error("<CommandGroupLabel> must be used inside <CommandGroup>.")
-  const label = useHandlePart(command, "group-label", () => ({ id: group, group }))
+  if (!group) {
+    throw new Error("<CommandGroupLabel> must be used inside <CommandGroup>.")
+  }
+  const label = useHandlePart(command, "group-label", () => ({
+    id: group,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={label} {props} />

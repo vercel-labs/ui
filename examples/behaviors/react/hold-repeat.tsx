@@ -19,7 +19,15 @@ function ZoomButton({
   const button = React.useRef<HTMLButtonElement>(null)
   const step = React.useEffectEvent(onStep)
 
-  React.useEffect(() => bindHold(button.current!, { delay: 400, repeat: 80, onHold: () => step() }), [])
+  React.useEffect(
+    () =>
+      bindHold(button.current!, {
+        delay: 400,
+        repeat: 80,
+        onHold: () => step(),
+      }),
+    []
+  )
 
   return (
     <button
@@ -46,13 +54,21 @@ export function Example() {
 
   return (
     <div data-slot="row">
-      <ZoomButton label="Zoom Out" disabled={zoom === min} onStep={() => zoomBy(-5)}>
+      <ZoomButton
+        label="Zoom Out"
+        disabled={zoom === min}
+        onStep={() => zoomBy(-5)}
+      >
         <MinusIcon aria-hidden />
       </ZoomButton>
       <output aria-live="polite" data-slot="hold-zoom">
         {zoom}%
       </output>
-      <ZoomButton label="Zoom In" disabled={zoom === max} onStep={() => zoomBy(5)}>
+      <ZoomButton
+        label="Zoom In"
+        disabled={zoom === max}
+        onStep={() => zoomBy(5)}
+      >
         <PlusIcon aria-hidden />
       </ZoomButton>
     </div>

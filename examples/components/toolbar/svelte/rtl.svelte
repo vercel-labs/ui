@@ -1,7 +1,11 @@
 <script lang="ts">
   import { BoldIcon, ItalicIcon, LinkIcon } from "@lucide/svelte"
   import { Toggle, ToggleIcon } from "@ui-sdk/svelte/toggle"
-  import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import {
+    Toolbar,
+    ToolbarButton,
+    ToolbarSeparator,
+  } from "@ui-sdk/svelte/toolbar"
 </script>
 
 <div dir="rtl">

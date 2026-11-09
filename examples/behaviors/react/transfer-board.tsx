@@ -12,9 +12,17 @@ import {
 import { createParts } from "@ui-sdk/react/primitive"
 import { CheckIcon } from "lucide-react"
 
-type BoardState = { lists: TransferLists; focused: string | null; moving: TransferDraft | null }
+type BoardState = {
+  lists: TransferLists
+  focused: string | null
+  moving: TransferDraft | null
+}
 
-const columns: Record<string, string> = { todo: "To do", doing: "Doing", done: "Done" }
+const columns: Record<string, string> = {
+  todo: "To do",
+  doing: "Doing",
+  done: "Done",
+}
 const blocked = "Billing"
 const tags: Record<string, string> = {
   Search: "Feature",
@@ -27,7 +35,11 @@ const tags: Record<string, string> = {
 const board = definePrimitive({
   name: "board",
   state: (): BoardState => ({
-    lists: { done: ["Icons"], todo: ["Search", "Billing", "Login"], doing: ["Docs"] },
+    lists: {
+      done: ["Icons"],
+      todo: ["Search", "Billing", "Login"],
+      doing: ["Docs"],
+    },
     focused: null,
     moving: null,
   }),
@@ -45,12 +57,16 @@ const board = definePrimitive({
         set: (value, details) => change("lists", value, details),
         order: () => ["todo", "doing", "done"],
         accepts: (key, list) =>
-          list !== "doing" || context.store.get().lists.doing.filter((card) => card !== key).length < 2,
+          list !== "doing" ||
+          context.store.get().lists.doing.filter((card) => card !== key)
+            .length < 2,
         disabled: (key) => key === blocked,
         label: (key) => key,
         listLabel: (list) => columns[list],
         message: (message) =>
-          message.type === "drop" ? `${message.label} is in ${message.list} now.` : transferMessage(message),
+          message.type === "drop"
+            ? `${message.label} is in ${message.list} now.`
+            : transferMessage(message),
         createAutoScroll: false,
       }),
     }
@@ -71,29 +87,44 @@ const board = definePrimitive({
         "aria-selected": String(part.api.transfer.moving(state, part.key)),
         "aria-disabled": part.key === blocked ? "true" : undefined,
         tabindex: part.api.roving.tabIndex(state, part),
-        "data-dragging": part.api.transfer.dragging(state, part.key) ? "" : undefined,
+        "data-dragging": part.api.transfer.dragging(state, part.key)
+          ? ""
+          : undefined,
         style: "touch-action:none;user-select:none",
       }),
       on: {
         keydown: (event, { el, api, key }) =>
           api.transfer.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.transfer.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.transfer.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.transfer.bindItem(el, part.key)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.transfer.bindItem(el, part.key),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
     finish: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (_state, part) => ({ type: "button", tabindex: "-1", "aria-label": `Move ${part.key} to Done` }),
+      attrs: (_state, part) => ({
+        type: "button",
+        tabindex: "-1",
+        "aria-label": `Move ${part.key} to Done`,
+      }),
       on: { pointerdown: (event) => event.preventDefault() },
       press: ({ api, key }) => api.transfer.move(key, "done", 0),
     }),
   }),
 })
 
-const parts = createParts(board, { root: "div", column: "div", card: "div", finish: "button" })
+const parts = createParts(board, {
+  root: "div",
+  column: "div",
+  card: "div",
+  finish: "button",
+})
 
 const Board = parts.Root
 

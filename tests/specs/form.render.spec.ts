@@ -7,8 +7,12 @@ test.describe("custom rendering", () => {
     await open("form-render")
   })
 
-  test("a legend rendered as another element still names its field set", async ({ page }) => {
-    await expect(page.getByRole("group", { name: "Legend as a div" })).toBeVisible()
+  test("a legend rendered as another element still names its field set", async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole("group", { name: "Legend as a div" })
+    ).toBeVisible()
   })
 
   test("a render function receives the input's state", async ({ page }) => {
@@ -21,7 +25,7 @@ test.describe("custom rendering", () => {
   test("class names follow the part's state", async ({ page, framework }) => {
     test.skip(
       !framework.startsWith("react") && !framework.startsWith("solid"),
-      "Class functions are React and Solid only. Vue uses slot state.",
+      "Class functions are React and Solid only. Vue uses slot state."
     )
     const box = page.getByRole("textbox", { name: "Class from state" })
     await expect(box).toHaveClass(/is-empty/)
@@ -35,9 +39,13 @@ test.describe("custom rendering", () => {
     await expect(page.getByRole("textbox", { name: "Search" })).toHaveValue("")
   })
 
-  test("a field keeps its text when its parts render again", async ({ page }) => {
+  test("a field keeps its text when its parts render again", async ({
+    page,
+  }) => {
     await page.getByRole("textbox", { name: "Search" }).fill("shoes")
     await page.getByRole("button", { name: /Render again/ }).click()
-    await expect(page.getByRole("textbox", { name: "Search" })).toHaveValue("shoes")
+    await expect(page.getByRole("textbox", { name: "Search" })).toHaveValue(
+      "shoes"
+    )
   })
 })

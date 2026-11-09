@@ -24,14 +24,21 @@ type CheckTreeItemState = { checked: boolean | "indeterminate"; level: number }
 const checkTree = definePrimitive({
   name: "check-tree",
   options: { items: "value", strategy: "string", onCheckedChange: "callback" },
-  state: (options: CheckTreeOptions): CheckTreeState => ({ checked: [], strategy: options.strategy }),
+  state: (options: CheckTreeOptions): CheckTreeState => ({
+    checked: [],
+    strategy: options.strategy,
+  }),
   sync: (options) => ({ strategy: options.strategy }),
   api: (context) => {
     const { store } = context
-    let cache: { items: TreeItemData[]; tree: ReturnType<typeof createTreeCollection> } | undefined
+    let cache:
+      | { items: TreeItemData[]; tree: ReturnType<typeof createTreeCollection> }
+      | undefined
     const tree = () => {
       const { items } = context.options()
-      if (cache?.items !== items) cache = { items, tree: createTreeCollection(treeDataNodes(items)) }
+      if (cache?.items !== items) {
+        cache = { items, tree: createTreeCollection(treeDataNodes(items)) }
+      }
       return cache.tree
     }
     let states: {
@@ -40,8 +47,15 @@ const checkTree = definePrimitive({
       read: (key: string) => boolean | "indeterminate"
     }
     const stateOf = (state: CheckTreeState, key: string) => {
-      if (states?.checked !== state.checked || states.strategy !== state.strategy)
-        states = { ...state, read: treeCheckedStates(tree(), state.checked, state.strategy) }
+      if (
+        states?.checked !== state.checked ||
+        states.strategy !== state.strategy
+      ) {
+        states = {
+          ...state,
+          read: treeCheckedStates(tree(), state.checked, state.strategy),
+        }
+      }
       return states.read(key)
     }
     return {
@@ -59,13 +73,17 @@ const checkTree = definePrimitive({
     root: slot({ attrs: () => ({ role: "group" }) }),
     item: slot<{ value: string }, CheckTreeItemState>({
       props: { value: "string" },
-      state: (state, { api, key }) => ({ checked: api.stateOf(state, key), level: api.tree().level(key) }),
+      state: (state, { api, key }) => ({
+        checked: api.stateOf(state, key),
+        level: api.tree().level(key),
+      }),
       attrs: (state, { api, key }) => {
         const checked = api.stateOf(state, key)
         return {
           type: "button",
           role: "checkbox",
-          "aria-checked": checked === "indeterminate" ? "mixed" : String(checked),
+          "aria-checked":
+            checked === "indeterminate" ? "mixed" : String(checked),
           "data-checked": checked === true ? "" : undefined,
           "data-indeterminate": checked === "indeterminate" ? "" : undefined,
           style: `padding-inline-start:${(api.tree().level(key) - 1) * 20}px`,
@@ -103,7 +121,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <div role="radiogroup" aria-label="Strategy" data-slot="check-tree-strategy">
+        <div
+          role="radiogroup"
+          aria-label="Strategy"
+          data-slot="check-tree-strategy"
+        >
           {(["leaf", "trunk"] as const).map((option) => (
             <button
               key={option}
@@ -122,10 +144,16 @@ function Example() {
         items={items}
         strategy={strategy}
         aria-label="Files"
-        onCheckedChange={(checked: string[]) => log(`Value: ${checked.join(", ") || "none"}`)}
+        onCheckedChange={(checked: string[]) =>
+          log(`Value: ${checked.join(", ") || "none"}`)
+        }
       >
         {flat(items).map((item) => (
-          <CheckTreeItem key={item.value} value={item.value} aria-label={item.label}>
+          <CheckTreeItem
+            key={item.value}
+            value={item.value}
+            aria-label={item.label}
+          >
             <span data-slot="check-tree-box">
               <span data-show="checked">✓</span>
               <span data-show="indeterminate">–</span>

@@ -15,7 +15,10 @@ const value = ref<string | null>("2026-11-02")
     </div>
     <Field>
       <FieldLabel>Due date</FieldLabel>
-      <DateInput v-model:value="value" @value-change="(next) => log(`Due date ${next ?? 'empty'}`)" />
+      <DateInput
+        v-model:value="value"
+        @value-change="(next) => log(`Due date ${next ?? 'empty'}`)"
+      />
     </Field>
   </div>
 </template>

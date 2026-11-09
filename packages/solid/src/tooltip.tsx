@@ -9,7 +9,14 @@ import {
   type TooltipTriggerState,
 } from "@ui-sdk/core/tooltip"
 import type { JSX } from "@solidjs/web"
-import { createContext, createUniqueId, merge, omit, Show, useContext } from "solid-js"
+import {
+  createContext,
+  createUniqueId,
+  merge,
+  omit,
+  Show,
+  useContext,
+} from "solid-js"
 import {
   renderPopup,
   useControllerEntry,
@@ -37,11 +44,15 @@ const TooltipContext = createContext<TooltipContextValue | null>(null)
 const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 // The tooltip of the trigger a TooltipShortcut sits in. A trigger connected through a
 // controller sits outside the tooltip, so its tooltip comes from here.
-const TriggerContext = createContext<{ tooltip: () => TooltipContextValue | undefined } | null>(null)
+const TriggerContext = createContext<{
+  tooltip: () => TooltipContextValue | undefined
+} | null>(null)
 
 function useTooltip() {
   const context = useContext(TooltipContext)
-  if (!context) throw new Error("Tooltip parts must be used inside <Tooltip>.")
+  if (!context) {
+    throw new Error("Tooltip parts must be used inside <Tooltip>.")
+  }
   return context
 }
 
@@ -61,7 +72,9 @@ function Tooltip(props: TooltipProps) {
   useControllerEntry(() => props.controller, tooltip)
   return providePrimitive(tooltip, () => (
     <TooltipContext value={tooltip}>
-      <ContainerContext value={() => props.container}>{props.children}</ContainerContext>
+      <ContainerContext value={() => props.container}>
+        {props.children}
+      </ContainerContext>
     </TooltipContext>
   ))
 }
@@ -77,7 +90,10 @@ type TriggerPartProps = Omit<
  * @stable
  */
 function TooltipTrigger(props: TriggerPartProps) {
-  const tooltip = useControllerTarget(() => props.controller, useContext(TooltipContext))
+  const tooltip = useControllerTarget(
+    () => props.controller,
+    useContext(TooltipContext)
+  )
   const rest = omit(props, "payload", "controller")
   return (
     <TriggerContext value={{ tooltip }}>
@@ -88,12 +104,18 @@ function TooltipTrigger(props: TriggerPartProps) {
         fallback={renderStatic(
           "button",
           () => ({ attrs: {}, state: { open: false } }),
-          merge(rest, { type: "button" }),
+          merge(rest, { type: "button" })
         )}
       >
         {(tooltip) => {
           const id = createUniqueId()
-          return usePart(tooltip, "trigger", () => ({ id, payload: props.payload }), rest, "button")
+          return usePart(
+            tooltip,
+            "trigger",
+            () => ({ id, payload: props.payload }),
+            rest,
+            "button"
+          )
         }}
       </Show>
     </TriggerContext>
@@ -105,7 +127,7 @@ function TooltipTrigger(props: TriggerPartProps) {
  * @stable
  */
 function TooltipContent<Payload = unknown>(
-  props: PartProps<"div", TooltipContentState<Payload>> & TooltipContentProps,
+  props: PartProps<"div", TooltipContentState<Payload>> & TooltipContentProps
 ) {
   const tooltip = useTooltip()
   const fromRoot = useContext(ContainerContext)
@@ -128,9 +150,12 @@ function TooltipContent<Payload = unknown>(
     "collisionPadding",
     "arrowPadding",
     "anchor",
-    "container",
+    "container"
   )
-  return renderPopup(() => usePart(tooltip, "content", content, rest, "div"), target)
+  return renderPopup(
+    () => usePart(tooltip, "content", content, rest, "div"),
+    target
+  )
 }
 
 /**
@@ -143,10 +168,14 @@ const TooltipArrow = parts.Arrow
  * Shows the tooltip's shortcut, like `⌘S`, formatted for the platform.
  * @stable
  */
-function TooltipShortcut(props: PartProps<"span", TooltipShortcutState> & TooltipShortcutProps) {
+function TooltipShortcut(
+  props: PartProps<"span", TooltipShortcutState> & TooltipShortcutProps
+) {
   const trigger = useContext(TriggerContext)
   const context = useContext(TooltipContext)
-  if (!context && !trigger) throw new Error("Tooltip parts must be used inside <Tooltip>.")
+  if (!context && !trigger) {
+    throw new Error("Tooltip parts must be used inside <Tooltip>.")
+  }
   // Inside a trigger whose tooltip hasn't mounted yet, there's no shortcut to show.
   const tooltip = () => context ?? trigger?.tooltip()
   const shortcut = () => ({ shortcut: props.shortcut })
@@ -179,4 +208,11 @@ export type {
   TooltipTriggerState,
 } from "@ui-sdk/core/tooltip"
 
-export { Tooltip, TooltipArrow, TooltipContent, type TooltipProps, TooltipShortcut, TooltipTrigger }
+export {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  type TooltipProps,
+  TooltipShortcut,
+  TooltipTrigger,
+}

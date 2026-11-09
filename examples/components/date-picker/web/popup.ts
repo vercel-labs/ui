@@ -47,10 +47,15 @@ function mount(root: HTMLElement) {
   `
   const picker = root.querySelector("ui-date-picker")!
   picker.addEventListener("openchange", (event) => {
-    log(root, `${event.detail.value ? "Opened" : "Closed"} (${event.detail.reason})`)
+    log(
+      root,
+      `${event.detail.value ? "Opened" : "Closed"} (${event.detail.reason})`
+    )
   })
   picker.addEventListener("openchangecomplete", (event) => {
-    if (!event.detail.value) log(root, "Finished closing")
+    if (!event.detail.value) {
+      log(root, "Finished closing")
+    }
   })
   picker.addEventListener("monthchange", (event) => {
     log(root, `Showing ${event.detail.value} (${event.detail.reason})`)

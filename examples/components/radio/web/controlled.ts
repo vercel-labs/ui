@@ -26,7 +26,7 @@ function mount(root: HTMLElement) {
                   </ui-radio>
                   ${plan.label}
                 </label>
-              `,
+              `
             )
             .join("")}
         </ui-radio-group>
@@ -39,7 +39,10 @@ function mount(root: HTMLElement) {
     .addEventListener("click", () => group.api.setValue("team"))
   group.addEventListener("valuechange", (event) => {
     const { value, reason } = event.detail
-    log(root, `${plans.find((plan) => plan.value === value)?.label ?? "None"} (${reason})`)
+    log(
+      root,
+      `${plans.find((plan) => plan.value === value)?.label ?? "None"} (${reason})`
+    )
   })
 }
 

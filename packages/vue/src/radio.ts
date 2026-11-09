@@ -4,7 +4,14 @@ import {
   type RadioGroupController,
   type RadioGroupValueChangeReason,
 } from "@ui-sdk/core/radio"
-import { defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
+import {
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { withElement } from "./create-parts"
 import { type FieldContext, FieldKey, useFieldControl } from "./field-context"
 import {
@@ -19,7 +26,8 @@ import {
 import { readOnlyOf } from "./text-control"
 
 // The field the group joined, so a radio joins only a field of its own.
-const GroupFieldKey: InjectionKey<FieldContext | null> = Symbol("radio-group-field")
+const GroupFieldKey: InjectionKey<FieldContext | null> =
+  Symbol("radio-group-field")
 
 /**
  * Radios that share one value, with one tab stop and arrow keys between them.
@@ -32,8 +40,14 @@ const RadioGroup = withElement(
     inheritAttrs: false,
     props: {
       value: { type: String as PropType<string | null>, default: undefined },
-      modelValue: { type: String as PropType<string | null>, default: undefined },
-      defaultValue: { type: String as PropType<string | null>, default: undefined },
+      modelValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
+      defaultValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
       required: optionalBoolean,
@@ -46,7 +60,10 @@ const RadioGroup = withElement(
     emits: {
       "update:value": (_value: string | null) => true,
       "update:modelValue": (_value: string | null) => true,
-      valueChange: (_value: string | null, _details: ChangeDetails<RadioGroupValueChangeReason>) => true,
+      valueChange: (
+        _value: string | null,
+        _details: ChangeDetails<RadioGroupValueChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof radioGroupPrimitive, "group">,
     setup(props, { attrs, emit }) {
@@ -63,17 +80,25 @@ const RadioGroup = withElement(
         loop: props.loop,
         controller: props.controller,
         debug: props.debug,
-        onValueChange: (value: string | null, details: ChangeDetails<RadioGroupValueChangeReason>) => {
+        onValueChange: (
+          value: string | null,
+          details: ChangeDetails<RadioGroupValueChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
       }))
-      return usePart(group, "group", undefined, undefined, { tag: "div", extend: field?.props })
+      return usePart(group, "group", undefined, undefined, {
+        tag: "div",
+        extend: field?.props,
+      })
     },
-  }),
+  })
 )
 
 /**
@@ -85,20 +110,34 @@ const Radio = withElement(
   defineComponent({
     name: "Radio",
     inheritAttrs: false,
-    props: { value: { type: String, required: true }, disabled: optionalBoolean },
+    props: {
+      value: { type: String, required: true },
+      disabled: optionalBoolean,
+    },
     slots: Object as PartSlots<typeof radioGroupPrimitive, "root">,
     setup(props) {
       const group = useScope(radioGroupPrimitive)?.handle
-      if (!group) throw new Error("Radio group parts must be used inside <RadioGroup>.")
+      if (!group) {
+        throw new Error("Radio group parts must be used inside <RadioGroup>.")
+      }
       // A radio in a field of its own is that field's control. In the group's field, the group is.
       const nearest = inject(FieldKey, null)
-      const field = nearest && nearest !== inject(GroupFieldKey, null) ? useFieldControl() : null
-      const item = () => ({ value: props.value, disabled: props.disabled || field?.disabled() })
+      const field =
+        nearest && nearest !== inject(GroupFieldKey, null)
+          ? useFieldControl()
+          : null
+      const item = () => ({
+        value: props.value,
+        disabled: props.disabled || field?.disabled(),
+      })
       provideProps(radioGroupPrimitive, "root", item)
-      const radio = usePart(group, "root", item, undefined, { tag: "button", extend: field?.props })
+      const radio = usePart(group, "root", item, undefined, {
+        tag: "button",
+        extend: field?.props,
+      })
       return () => [radio(), h("input", group.slot("input", item()))]
     },
-  }),
+  })
 )
 
 /**
@@ -114,11 +153,22 @@ const RadioIndicator = withElement(
     slots: Object as PartSlots<typeof radioGroupPrimitive, "indicator">,
     setup(props) {
       const radio = useScope(radioGroupPrimitive)?.around.root
-      if (!radio) throw new Error("RadioIndicator must be used inside <Radio>.")
-      const indicator = () => ({ value: String(radio().value), keepMounted: props.keepMounted })
-      return usePart(radioGroupPrimitive, "indicator", indicator, undefined, "span")
+      if (!radio) {
+        throw new Error("RadioIndicator must be used inside <Radio>.")
+      }
+      const indicator = () => ({
+        value: String(radio().value),
+        keepMounted: props.keepMounted,
+      })
+      return usePart(
+        radioGroupPrimitive,
+        "indicator",
+        indicator,
+        undefined,
+        "span"
+      )
     },
-  }),
+  })
 )
 
 export { createRadioGroupController } from "@ui-sdk/core/radio"

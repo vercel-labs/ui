@@ -62,9 +62,13 @@ Import the parts and put them together:
 <ui-navigation-menu aria-label="Main">
   <ui-navigation-menu-list>
     <ui-navigation-menu-item value="guides">
-      <ui-navigation-menu-trigger><button>Guides</button></ui-navigation-menu-trigger>
+      <ui-navigation-menu-trigger
+        ><button>Guides</button></ui-navigation-menu-trigger
+      >
       <ui-navigation-menu-content>
-        <ui-navigation-menu-link><a href="/docs">Introduction</a></ui-navigation-menu-link>
+        <ui-navigation-menu-link
+          ><a href="/docs">Introduction</a></ui-navigation-menu-link
+        >
       </ui-navigation-menu-content>
     </ui-navigation-menu-item>
   </ui-navigation-menu-list>
@@ -138,7 +142,9 @@ The menu waits for whatever animations run, and only those. Turn them off for pe
 `delay` is how long the pointer rests on a trigger before its panel opens, and `closeDelay` how long the panel stays once the pointer leaves the trigger and the panel: 50 milliseconds each by default. The pointer can cross the gap between a trigger and its panel without closing it. Once a panel is open, moving to another trigger switches at once, unless the pointer is only passing over it on the way into the open panel. Coming back right after closing skips the delay.
 
 ```html
-<ui-navigation-menu aria-label="Main" delay="400" close-delay="600"> ... </ui-navigation-menu>
+<ui-navigation-menu aria-label="Main" delay="400" close-delay="600">
+  ...
+</ui-navigation-menu>
 ```
 
 ## Indicator
@@ -196,7 +202,9 @@ Leave the viewport out and each content is its own popup, placed against its tri
 <ui-navigation-menu aria-label="Main">
   <ui-navigation-menu-list>
     <ui-navigation-menu-item value="guides">
-      <ui-navigation-menu-trigger><button>Guides</button></ui-navigation-menu-trigger>
+      <ui-navigation-menu-trigger
+        ><button>Guides</button></ui-navigation-menu-trigger
+      >
       <ui-navigation-menu-content side="bottom" align="start" side-offset="8">
         ...
       </ui-navigation-menu-content>
@@ -231,7 +239,9 @@ The element's `api` property is its [controller](#controller): it opens, closes 
 
 <script type="module">
   const { api: menu } = document.querySelector("ui-navigation-menu")
-  document.querySelector("button").addEventListener("click", () => menu.setValue("components"))
+  document
+    .querySelector("button")
+    .addEventListener("click", () => menu.setValue("components"))
 </script>
 ```
 
@@ -263,7 +273,9 @@ Pressing a link closes the menu by default, like after a route change. With `clo
 Panels render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the viewport, or each content without one, somewhere else, named by a CSS selector, for iframes, shadow roots or a specific stacking context. Set it on the menu, or on the viewport or a content.
 
 ```html
-<ui-navigation-menu aria-label="Main" container="#menu-host"> ... </ui-navigation-menu>
+<ui-navigation-menu aria-label="Main" container="#menu-host">
+  ...
+</ui-navigation-menu>
 ```
 
 ## Custom Rendering
@@ -324,13 +336,21 @@ In plain CSS:
   translate: -48px 0;
 }
 
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="from-end"][data-starting-style],
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="to-end"][data-ending-style] {
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="from-end"][data-starting-style],
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="to-end"][data-ending-style] {
   translate: -48px 0;
 }
 
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="from-start"][data-starting-style],
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="to-start"][data-ending-style] {
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="from-start"][data-starting-style],
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="to-start"][data-ending-style] {
   translate: 48px 0;
 }
 

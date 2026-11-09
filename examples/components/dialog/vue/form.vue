@@ -13,8 +13,17 @@ import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
 
-function onOpenChange(open: boolean, details: { reason: string; returnValue?: string }) {
-  if (!open) log(details.returnValue ? `Saved as ${details.returnValue}` : `Closed (${details.reason})`)
+function onOpenChange(
+  open: boolean,
+  details: { reason: string; returnValue?: string }
+) {
+  if (!open) {
+    log(
+      details.returnValue
+        ? `Saved as ${details.returnValue}`
+        : `Closed (${details.reason})`
+    )
+  }
 }
 </script>
 
@@ -25,7 +34,9 @@ function onOpenChange(open: boolean, details: { reason: string; returnValue?: st
     <DialogContent>
       <div data-slot="stack">
         <DialogTitle>New article</DialogTitle>
-        <DialogDescription>Save it as a draft or publish it now.</DialogDescription>
+        <DialogDescription
+          >Save it as a draft or publish it now.</DialogDescription
+        >
       </div>
       <form data-slot="stack" method="dialog">
         <Field>
@@ -34,7 +45,9 @@ function onOpenChange(open: boolean, details: { reason: string; returnValue?: st
         </Field>
         <div data-slot="row">
           <button type="submit" value="draft">Save Draft</button>
-          <button data-variant="solid" type="submit" value="published">Publish</button>
+          <button data-variant="solid" type="submit" value="published">
+            Publish
+          </button>
         </div>
       </form>
     </DialogContent>

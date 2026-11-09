@@ -1,7 +1,14 @@
 import { cn } from "cn"
 import { html, nothing, type TemplateResult } from "lit-html"
 import { ref, type Ref } from "lit-html/directives/ref.js"
-import { labelOf, personOf, priorityOf, statusOf, type Priority, type Status } from "tracker-data"
+import {
+  labelOf,
+  personOf,
+  priorityOf,
+  statusOf,
+  type Priority,
+  type Status,
+} from "tracker-data"
 import { icon, type IconName } from "./icons"
 
 const variants = {
@@ -29,7 +36,7 @@ function button({
   return cn(
     "inline-flex shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap outline-none select-none transition-[color,background-color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50 motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
     variants[variant],
-    sizes[size],
+    sizes[size]
   )
 }
 
@@ -41,34 +48,36 @@ const styles = {
     "fixed inset-0 bg-black/30 transition-opacity duration-100 supports-backdrop-filter:backdrop-blur-sm data-starting-style:opacity-0 data-ending-style:opacity-0",
   dialog: cn(
     "fixed top-1/2 left-1/2 grid w-full max-w-[calc(100%-2rem)] -translate-1/2 gap-6 rounded-[min(var(--radius-4xl),24px)] bg-popover p-6 text-sm text-popover-foreground shadow-xl ring-1 ring-foreground/5 outline-none sm:max-w-md dark:ring-foreground/10",
-    popupMotion,
+    popupMotion
   ),
   dialogTitle: "block text-base leading-none font-medium",
   menu: cn(
     "max-h-(--available-height) min-w-44 overflow-y-auto rounded-2xl bg-popover p-1 text-sm text-popover-foreground shadow-xl ring-1 ring-foreground/5 outline-none dark:ring-foreground/10",
-    popupMotion,
+    popupMotion
   ),
   menuItem:
     "group relative flex min-h-7 cursor-default items-center gap-2 rounded-xl px-2 py-1.5 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4",
-  menuItemIcon: "flex text-muted-foreground group-data-highlighted:text-current",
+  menuItemIcon:
+    "flex text-muted-foreground group-data-highlighted:text-current",
   menuGroupLabel: "block px-2 py-1.5 text-xs font-medium text-muted-foreground",
   menuSeparator: "-mx-1 my-1 block h-px bg-border/50",
-  menuDestructive: "text-destructive data-highlighted:bg-destructive/10 data-highlighted:text-destructive",
+  menuDestructive:
+    "text-destructive data-highlighted:bg-destructive/10 data-highlighted:text-destructive",
   popover: cn(
     "flex w-72 flex-col gap-3 rounded-3xl bg-popover p-4 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none dark:ring-foreground/10",
-    popupMotion,
+    popupMotion
   ),
   hoverCard: cn(
     "flex w-64 flex-col gap-3 rounded-3xl bg-popover p-4 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none dark:ring-foreground/10",
-    popupMotion,
+    popupMotion
   ),
   tooltip: cn(
     "inline-flex w-fit max-w-xs items-center gap-1.5 rounded-xl bg-foreground px-3 py-1.5 text-xs text-background data-instant:transition-none",
-    popupMotion,
+    popupMotion
   ),
   list: cn(
     "max-h-[min(18rem,var(--available-height))] min-w-(--anchor-width) scroll-py-1 overflow-x-hidden overflow-y-auto rounded-2xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground/5 outline-none dark:ring-foreground/10",
-    popupMotion,
+    popupMotion
   ),
   option:
     "group relative flex min-h-7 w-full cursor-default items-center gap-2 rounded-xl py-1.5 ps-2 pe-8 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0",
@@ -116,7 +125,7 @@ function avatar(
   { size = "default", decorative = false } = {} as {
     size?: keyof typeof avatarSizes
     decorative?: boolean
-  },
+  }
 ) {
   return html`<ui-avatar
     aria-hidden=${decorative ? "true" : nothing}
@@ -133,7 +142,9 @@ function avatar(
 
 function assignee(id: string | null) {
   const person = personOf(id)
-  return person ? avatar(person.name) : html`<span class="size-7 shrink-0"></span>`
+  return person
+    ? avatar(person.name)
+    : html`<span class="size-7 shrink-0"></span>`
 }
 
 const statusIcons: Record<Status, IconName> = {
@@ -158,17 +169,20 @@ function statusIcon(status: Status, { label = false } = {}) {
     cn(
       "size-4 shrink-0 text-muted-foreground",
       status === "in-progress" && "text-amber-500",
-      status === "done" && "text-emerald-600 dark:text-emerald-400",
+      status === "done" && "text-emerald-600 dark:text-emerald-400"
     ),
-    label ? statusOf(status).label : undefined,
+    label ? statusOf(status).label : undefined
   )
 }
 
 function priorityIcon(priority: Priority, { label = false } = {}) {
   return icon(
     priorityIcons[priority],
-    cn("size-4 shrink-0 text-muted-foreground", priority === "urgent" && "text-destructive"),
-    label ? priorityOf(priority).label : undefined,
+    cn(
+      "size-4 shrink-0 text-muted-foreground",
+      priority === "urgent" && "text-destructive"
+    ),
+    label ? priorityOf(priority).label : undefined
   )
 }
 
@@ -181,7 +195,10 @@ function issueLabels(labels: string[], className: string) {
             <span
               class="inline-flex h-5 shrink-0 items-center gap-1.5 rounded-2xl border border-border px-2 text-xs font-medium whitespace-nowrap"
             >
-              <span class="size-2 rounded-full" style="background: ${label.color}"></span>
+              <span
+                class="size-2 rounded-full"
+                style="background: ${label.color}"
+              ></span>
               ${label.name}
             </span>
           </li>`
@@ -224,26 +241,43 @@ function selectTrigger({
   label,
 }: { icon?: boolean; className?: string; label?: string } = {}) {
   return html`<ui-select-trigger>
-    <button aria-label=${label ?? nothing} class=${cn(styles.selectTrigger, className)}>
+    <button
+      aria-label=${label ?? nothing}
+      class=${cn(styles.selectTrigger, className)}
+    >
       ${withIcon ? html`<ui-select-value-icon class="flex text-muted-foreground"></ui-select-value-icon>` : nothing}
-      <ui-select-value class="min-w-0 flex-1 truncate text-start"></ui-select-value>
+      <ui-select-value
+        class="min-w-0 flex-1 truncate text-start"
+      ></ui-select-value>
       ${icon("chevron-down", "text-muted-foreground")}
     </button>
   </ui-select-trigger>`
 }
 
-function selectItem(value: string, content: unknown, itemIcon?: TemplateResult) {
+function selectItem(
+  value: string,
+  content: unknown,
+  itemIcon?: TemplateResult
+) {
   return html`<ui-select-item value=${value} class=${styles.option}>
     ${itemIcon ? html`<ui-select-item-icon class=${styles.menuItemIcon}>${itemIcon}</ui-select-item-icon>` : nothing}
     ${content}
-    <ui-select-item-indicator class=${styles.indicator}>${icon("check")}</ui-select-item-indicator>
+    <ui-select-item-indicator class=${styles.indicator}
+      >${icon("check")}</ui-select-item-indicator
+    >
   </ui-select-item>`
 }
 
 function comboboxItem(value: string, label: string, content: unknown) {
-  return html`<ui-combobox-item value=${value} label=${label} class=${styles.option}>
+  return html`<ui-combobox-item
+    value=${value}
+    label=${label}
+    class=${styles.option}
+  >
     ${content}
-    <ui-combobox-item-indicator class=${styles.indicator}>${icon("check")}</ui-combobox-item-indicator>
+    <ui-combobox-item-indicator class=${styles.indicator}
+      >${icon("check")}</ui-combobox-item-indicator
+    >
   </ui-combobox-item>`
 }
 
@@ -258,11 +292,15 @@ function comboboxTrigger(label: string) {
 function tooltip(
   trigger: TemplateResult,
   content: unknown,
-  { shortcut, side }: { shortcut?: string; side?: string } = {},
+  { shortcut, side }: { shortcut?: string; side?: string } = {}
 ) {
   return html`<ui-tooltip shortcut=${shortcut ?? nothing}>
     <ui-tooltip-trigger>${trigger}</ui-tooltip-trigger>
-    <ui-tooltip-content side=${side ?? nothing} side-offset="6" class=${styles.tooltip}>
+    <ui-tooltip-content
+      side=${side ?? nothing}
+      side-offset="6"
+      class=${styles.tooltip}
+    >
       ${content}
       ${shortcut ? html`<ui-tooltip-shortcut class="text-background/60"></ui-tooltip-shortcut>` : nothing}
     </ui-tooltip-content>

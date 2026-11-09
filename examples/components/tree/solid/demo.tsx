@@ -1,4 +1,10 @@
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/solid/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/solid/tree"
 import type { JSX } from "@solidjs/web"
 import { For, Show } from "solid-js"
 
@@ -102,7 +108,11 @@ function Items(props: { items: Node[] }) {
 
 function Example() {
   return (
-    <Tree aria-label="Files" defaultExpanded={["app"]} defaultValue="app/page.tsx">
+    <Tree
+      aria-label="Files"
+      defaultExpanded={["app"]}
+      defaultValue="app/page.tsx"
+    >
       <Items items={files} />
     </Tree>
   )

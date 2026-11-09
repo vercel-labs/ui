@@ -16,7 +16,8 @@ import { omit } from "solid-js"
 import { rating, type RatingOptions } from "./rating"
 
 function RatingRoot(
-  props: RatingOptions & Omit<PartProps<"div", StateOf<typeof rating, "root">>, "defaultValue">,
+  props: RatingOptions &
+    Omit<PartProps<"div", StateOf<typeof rating, "root">>, "defaultValue">
 ) {
   const handle = usePrimitive(rating, () => ({
     value: props.value,
@@ -43,8 +44,16 @@ import { usePart, type PartProps } from "@ui-sdk/solid/primitive"
 import { omit } from "solid-js"
 import { rating } from "./rating"
 
-function RatingStar(props: { value: string } & Omit<PartProps<"button">, "value">) {
-  return usePart(rating, "star", () => ({ value: props.value }), omit(props, "value"), "button")
+function RatingStar(
+  props: { value: string } & Omit<PartProps<"button">, "value">
+) {
+  return usePart(
+    rating,
+    "star",
+    () => ({ value: props.value }),
+    omit(props, "value"),
+    "button"
+  )
 }
 
 export { RatingStar }

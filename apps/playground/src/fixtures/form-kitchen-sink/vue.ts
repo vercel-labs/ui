@@ -30,8 +30,13 @@ const Card = defineComponent({
       const change = {
         ...(variant.controlled && { value: value.value }),
         controller: variant.controller === "input" ? input : undefined,
-        onValueChange: (next: string, details: { reason: string; cancel: () => void }) => {
-          if (variant.digitsCanceled && /\d/.test(next)) return details.cancel()
+        onValueChange: (
+          next: string,
+          details: { reason: string; cancel: () => void }
+        ) => {
+          if (variant.digitsCanceled && /\d/.test(next)) {
+            return details.cancel()
+          }
           value.value = next
           props.log(`${JSON.stringify(next)} (${details.reason})`)
         },
@@ -41,7 +46,7 @@ const Card = defineComponent({
           h(
             FieldLegend,
             { class: c.legend },
-            renderAs(variant.legendAsDiv ? "div" : undefined, () => "Address"),
+            renderAs(variant.legendAsDiv ? "div" : undefined, () => "Address")
           ),
           h(FieldDescription, { class: "text-xs" }, () => "Where we send it."),
           h(Field, { name: "value", class: c.field }, () => [
@@ -56,7 +61,11 @@ const Card = defineComponent({
             ? h(InputGroup, { class: c.group }, () => [
                 variant.prefix ? h("span", variant.prefix) : null,
                 h(Input, { class: c.groupInput, ...options, ...change }),
-                h(InputClear, { class: c.clear, "aria-label": "Clear" }, () => "×"),
+                h(
+                  InputClear,
+                  { class: c.clear, "aria-label": "Clear" },
+                  () => "×"
+                ),
               ])
             : h(Input, {
                 class: c.input,
@@ -70,11 +79,23 @@ const Card = defineComponent({
             ? h("fieldset", { disabled: true }, [set()])
             : set()
           : variant.field
-            ? h(Field, { name: "value", class: c.field, invalid: variant.invalid ? true : undefined }, () => [
-                h(FieldLabel, { class: c.label }, () => "Value"),
-                control(),
-                h(FieldError, { class: c.error }, variant.invalid ? () => variant.invalid : undefined),
-              ])
+            ? h(
+                Field,
+                {
+                  name: "value",
+                  class: c.field,
+                  invalid: variant.invalid ? true : undefined,
+                },
+                () => [
+                  h(FieldLabel, { class: c.label }, () => "Value"),
+                  control(),
+                  h(
+                    FieldError,
+                    { class: c.error },
+                    variant.invalid ? () => variant.invalid : undefined
+                  ),
+                ]
+              )
             : control()
       const card = h(
         "form",
@@ -83,7 +104,9 @@ const Card = defineComponent({
           onSubmit: (event: SubmitEvent) => {
             event.preventDefault()
             const data = new FormData(event.currentTarget as HTMLFormElement)
-            props.log(`submitted ${new URLSearchParams(data as unknown as Record<string, string>)}`)
+            props.log(
+              `submitted ${new URLSearchParams(data as unknown as Record<string, string>)}`
+            )
           },
         },
         [
@@ -92,26 +115,42 @@ const Card = defineComponent({
             ? h("div", { class: c.row }, [
                 h(
                   "button",
-                  { type: "button", class: c.button, onClick: () => input.setValue("Grace") },
-                  "Set",
+                  {
+                    type: "button",
+                    class: c.button,
+                    onClick: () => input.setValue("Grace"),
+                  },
+                  "Set"
                 ),
-                h("button", { type: "button", class: c.button, onClick: () => input.clear() }, "Clear value"),
+                h(
+                  "button",
+                  {
+                    type: "button",
+                    class: c.button,
+                    onClick: () => input.clear(),
+                  },
+                  "Clear value"
+                ),
               ])
             : null,
           h("div", { class: c.row }, [
             h("button", { type: "submit", class: c.button }, "Submit"),
             h("button", { type: "reset", class: c.button }, "Reset"),
           ]),
-        ],
+        ]
       )
-      if (variant.place === "rtl") return h("div", { dir: "rtl" }, [card])
+      if (variant.place === "rtl") {
+        return h("div", { dir: "rtl" }, [card])
+      }
       return card
     }
   },
 })
 
 function mount(root: HTMLElement) {
-  renderShell(root, (slot, variant, log) => createApp(Card, { variant, log }).mount(slot))
+  renderShell(root, (slot, variant, log) =>
+    createApp(Card, { variant, log }).mount(slot)
+  )
 }
 
 export { mount }

@@ -32,7 +32,11 @@ const paragraphs = [
         <DrawerDescription>Everything new in the drawer.</DrawerDescription>
       </div>
       <div data-slot="scroll">
-        <p data-slot="hint" v-for="(paragraph, index) in [...paragraphs, ...paragraphs]" :key="index">
+        <p
+          data-slot="hint"
+          v-for="(paragraph, index) in [...paragraphs, ...paragraphs]"
+          :key="index"
+        >
           {{ paragraph }}
         </p>
       </div>

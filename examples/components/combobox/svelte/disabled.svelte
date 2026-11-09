@@ -32,7 +32,8 @@
     { value: "ch", label: "Switzerland" },
   ]
 
-  const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+  const countryLabel = (value: string) =>
+    countries.find((country) => country.value === value)?.label ?? value
 
   const variants = ["disabled", "readOnly", "item"] as const
 </script>
@@ -47,7 +48,11 @@
     >
       <div data-slot="stack">
         <ComboboxLabel>
-          {variant === "disabled" ? "Billing country" : variant === "readOnly" ? "Shipping from" : "Shipping to"}
+          {variant === "disabled"
+            ? "Billing country"
+            : variant === "readOnly"
+              ? "Shipping from"
+              : "Shipping to"}
         </ComboboxLabel>
         <div data-slot="row">
           <ComboboxInput placeholder="Search countries…" />
@@ -60,7 +65,11 @@
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>
           {#each countries as country (country.value)}
-            <ComboboxItem value={country.value} label={country.label} disabled={country.value === "dk"}>
+            <ComboboxItem
+              value={country.value}
+              label={country.label}
+              disabled={country.value === "dk"}
+            >
               {country.label}
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />

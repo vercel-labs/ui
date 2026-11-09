@@ -5,7 +5,11 @@ import { For } from "solid-js"
 // components' item text parts.
 function markSegments(segments: MatchSegment[]) {
   return (
-    <For each={segments}>{(segment) => (segment.match ? <mark>{segment.text}</mark> : segment.text)}</For>
+    <For each={segments}>
+      {(segment) =>
+        segment.match ? <mark>{segment.text}</mark> : segment.text
+      }
+    </For>
   )
 }
 

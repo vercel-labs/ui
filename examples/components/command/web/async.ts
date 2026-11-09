@@ -18,7 +18,10 @@ function searchIssues(query: string, { signal }: { signal: AbortSignal }) {
       resolve(
         issues
           .filter((issue) => issue.toLowerCase().includes(needle))
-          .map((issue) => ({ value: issue.toLowerCase().replaceAll(" ", "-"), label: issue })),
+          .map((issue) => ({
+            value: issue.toLowerCase().replaceAll(" ", "-"),
+            label: issue,
+          }))
       )
     }, 400)
     signal.addEventListener("abort", () => {
@@ -46,13 +49,18 @@ function mount(root: HTMLElement) {
   const command = root.querySelector("ui-command")!
   const status = root.querySelector("ui-command-status")!
   const query = root.querySelector("ui-command-empty span")!
-  const issues = createAsyncOptions(searchIssues, { debounce: 250, immediate: true })
+  const issues = createAsyncOptions(searchIssues, {
+    debounce: 250,
+    immediate: true,
+  })
   const update = () => {
     const { items, status: loading } = issues.getState()
     command.items = items
     command.setAttribute("status", loading)
     status.textContent =
-      loading === "loading" ? "Searching…" : `${items.length} ${items.length === 1 ? "issue" : "issues"}`
+      loading === "loading"
+        ? "Searching…"
+        : `${items.length} ${items.length === 1 ? "issue" : "issues"}`
   }
   issues.subscribe(update)
   update()

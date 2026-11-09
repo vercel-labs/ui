@@ -1,6 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { Input } from "@ui-sdk/solid/input"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/solid/password-input"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
@@ -14,7 +18,9 @@ function Example() {
           event.preventDefault()
           const data = new FormData(event.currentTarget)
           const length = String(data.get("password")).length
-          log(`Signed in as ${data.get("email")}, with a password of ${length} characters`)
+          log(
+            `Signed in as ${data.get("email")}, with a password of ${length} characters`
+          )
         }}
       >
         <Field name="email">

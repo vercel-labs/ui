@@ -15,7 +15,7 @@ async function mount(root: HTMLElement) {
           ${slides
             .map(
               (_, index) =>
-                `<ui-carousel-indicator><a href="#photo-${index + 1}" aria-label="Photo ${index + 1}">${index + 1}</a></ui-carousel-indicator>`,
+                `<ui-carousel-indicator><a href="#photo-${index + 1}" aria-label="Photo ${index + 1}">${index + 1}</a></ui-carousel-indicator>`
             )
             .join("")}
         </ui-carousel-indicator-group>
@@ -29,10 +29,10 @@ async function mount(root: HTMLElement) {
     "pagechange",
     (event) => {
       root.querySelector("output")!.textContent = String(
-        (event as CustomEvent<{ value: number }>).detail.value,
+        (event as CustomEvent<{ value: number }>).detail.value
       )
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

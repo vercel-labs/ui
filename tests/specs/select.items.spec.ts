@@ -10,11 +10,14 @@ import { changedItems } from "../fixtures/select"
 
 const trigger = (page: Page) => page.getByRole("combobox", { name: "Fruit" })
 const listbox = (page: Page) => page.getByRole("listbox")
-const option = (page: Page, name: string) => page.getByRole("option", { name, exact: true })
+const option = (page: Page, name: string) =>
+  page.getByRole("option", { name, exact: true })
 
 // The options in the order the page shows them. An item's text may end with its check.
 async function expectOrder(page: Page, labels: string[]) {
-  await expect(page.getByRole("option")).toHaveText(labels.map((label) => new RegExp(`^✓?${label}`)))
+  await expect(page.getByRole("option")).toHaveText(
+    labels.map((label) => new RegExp(`^✓?${label}`))
+  )
 }
 
 async function openOnSelected(page: Page) {
@@ -38,17 +41,20 @@ test.describe("items that change while open", () => {
       await changeItems(page, "reversed")
       await expectOrder(
         page,
-        changedItems.reversed.map((item) => item.label),
+        changedItems.reversed.map((item) => item.label)
       )
       await expect(listbox(page)).toBeVisible()
       await expect(option(page, "Blueberry")).toBeFocused()
-      await expect(option(page, "Banana")).toHaveAttribute("aria-selected", "true")
+      await expect(option(page, "Banana")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      )
       await page.keyboard.press("ArrowDown")
       await expect(option(page, "Banana")).toBeFocused()
       await page.keyboard.press("ArrowUp")
       await page.keyboard.press("ArrowUp")
       await expect(option(page, "Cherry")).toBeFocused()
-    },
+    }
   )
 
   test(
@@ -62,11 +68,14 @@ test.describe("items that change while open", () => {
       await changeItems(page, "replaced")
       await expectOrder(
         page,
-        changedItems.replaced.map((item) => item.label),
+        changedItems.replaced.map((item) => item.label)
       )
       await expect(listbox(page)).toBeVisible()
       await expect(option(page, "Cherry")).toBeFocused()
-      await expect(option(page, "Banana")).toHaveAttribute("aria-selected", "true")
+      await expect(option(page, "Banana")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      )
       await page.keyboard.press("ArrowDown")
       await expect(option(page, "Kiwi")).toBeFocused()
       await page.keyboard.press("ArrowDown")
@@ -77,7 +86,7 @@ test.describe("items that change while open", () => {
       await page.keyboard.press("k")
       await expect(option(page, "Kiwi")).toBeFocused()
       await expect(trigger(page)).toContainText("Banana")
-    },
+    }
   )
 
   test(
@@ -90,7 +99,7 @@ test.describe("items that change while open", () => {
       await changeItems(page, "replaced")
       await expectOrder(
         page,
-        changedItems.replaced.map((item) => item.label),
+        changedItems.replaced.map((item) => item.label)
       )
       await expect(listbox(page)).toBeVisible()
       await page.keyboard.press("ArrowDown")
@@ -99,10 +108,12 @@ test.describe("items that change while open", () => {
       await expect(listbox(page)).toBeHidden()
       await expect(trigger(page)).toBeFocused()
       await expect(trigger(page)).toContainText("Banana")
-    },
+    }
   )
 
-  test("the new order stays after the list closes and opens again", async ({ page }) => {
+  test("the new order stays after the list closes and opens again", async ({
+    page,
+  }) => {
     await openOnSelected(page)
     await changeItems(page, "reversed")
     await page.keyboard.press("Escape")
@@ -110,14 +121,16 @@ test.describe("items that change while open", () => {
     await openOnSelected(page)
     await expectOrder(
       page,
-      changedItems.reversed.map((item) => item.label),
+      changedItems.reversed.map((item) => item.label)
     )
     await expect(option(page, "Banana")).toBeFocused()
     await page.keyboard.press("ArrowDown")
     await expect(option(page, "Apple")).toBeFocused()
   })
 
-  test("choosing an item after a reorder chooses that item", async ({ page }) => {
+  test("choosing an item after a reorder chooses that item", async ({
+    page,
+  }) => {
     await openOnSelected(page)
     await changeItems(page, "reversed")
     await option(page, "Mango").click()

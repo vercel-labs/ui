@@ -11,7 +11,12 @@ const sizes = [
 
 function Example() {
   return (
-    <Listbox orientation="horizontal" loop={false} defaultValue="m" aria-label="Size">
+    <Listbox
+      orientation="horizontal"
+      loop={false}
+      defaultValue="m"
+      aria-label="Size"
+    >
       <For each={sizes}>
         {(size) => (
           <ListboxItem value={size.value} disabled={size.disabled}>

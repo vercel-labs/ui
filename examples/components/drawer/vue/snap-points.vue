@@ -26,14 +26,20 @@ const places = [
 </script>
 
 <template>
-  <Drawer :snap-points="[0.25, 0.5, 1]" :default-snap-point="0.5" expand-on-scroll>
+  <Drawer
+    :snap-points="[0.25, 0.5, 1]"
+    :default-snap-point="0.5"
+    expand-on-scroll
+  >
     <DrawerTrigger>Find a Place</DrawerTrigger>
     <DrawerBackdrop />
     <DrawerContent>
       <DrawerHandle aria-label="Resize" />
       <div data-slot="stack">
         <DrawerTitle>Places nearby</DrawerTitle>
-        <DrawerDescription>Drag the drawer, or press the handle, to see more.</DrawerDescription>
+        <DrawerDescription
+          >Drag the drawer, or press the handle, to see more.</DrawerDescription
+        >
       </div>
       <div data-slot="scroll">
         <ul data-slot="list">

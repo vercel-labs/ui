@@ -20,7 +20,10 @@ A day. Shows the day of the month unless it has content; arrow keys move between
 
   const calendar = useCalendar("CalendarDay")
   const grid = useOptionalGrid()
-  const day = useHandlePart(calendar, "day", () => ({ value, offset: grid?.offset ?? 0 }))
+  const day = useHandlePart(calendar, "day", () => ({
+    value,
+    offset: grid?.offset ?? 0,
+  }))
 </script>
 
 {#snippet fallback(state: CalendarDayState)}{state.label}{/snippet}

@@ -1,4 +1,8 @@
-import { NumberInput, NumberInputIncrement, NumberInputControl } from "@ui-sdk/react/number-input"
+import {
+  NumberInput,
+  NumberInputIncrement,
+  NumberInputControl,
+} from "@ui-sdk/react/number-input"
 import {
   Slider,
   SliderControl,
@@ -17,16 +21,29 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Slider defaultValue={40} onValueChange={(value) => setAction(`brightness:${value}`)}>
-        <SliderValue className="slider-value">{(state) => `Brightness ${state.text}`}</SliderValue>
+      <Slider
+        defaultValue={40}
+        onValueChange={(value) => setAction(`brightness:${value}`)}
+      >
+        <SliderValue className="slider-value">
+          {(state) => `Brightness ${state.text}`}
+        </SliderValue>
         <SliderControl className="slider-control">
           <SliderTrack className="slider-track">
             <SliderIndicator
-              className={(state) => `slider-indicator ${state.dragging ? "is-dragging" : "is-idle"}`}
+              className={(state) =>
+                `slider-indicator ${state.dragging ? "is-dragging" : "is-idle"}`
+              }
               style={(state) => ({ opacity: state.dragging ? 0.5 : 1 })}
             />
-            <SliderThumb className="slider-thumb" aria-label="Brightness" render={<span />}>
-              {(state) => <span className="thumb-label">{state.thumbValue}</span>}
+            <SliderThumb
+              className="slider-thumb"
+              aria-label="Brightness"
+              render={<span />}
+            >
+              {(state) => (
+                <span className="thumb-label">{state.thumbValue}</span>
+              )}
             </SliderThumb>
           </SliderTrack>
         </SliderControl>
@@ -49,7 +66,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

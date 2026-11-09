@@ -15,9 +15,13 @@ function Example() {
   let reset: HTMLButtonElement | undefined
 
   async function remove(name: string, button: HTMLButtonElement) {
-    if (!(await confirm({ name }))) return
+    if (!(await confirm({ name }))) {
+      return
+    }
     const row = button.closest("li")
-    const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+    const next = (
+      row?.nextElementSibling ?? row?.previousElementSibling
+    )?.querySelector("button")
     const target = next ?? reset
     target?.focus()
     setProjects((list) => list.filter((project) => project !== name))
@@ -35,7 +39,10 @@ function Example() {
         </button>
       </div>
       <ul data-slot="list" aria-label="Projects">
-        <For each={projects()} fallback={<li data-slot="row">All projects deleted.</li>}>
+        <For
+          each={projects()}
+          fallback={<li data-slot="row">All projects deleted.</li>}
+        >
           {(name) => (
             <li data-slot="row">
               {name}
@@ -59,9 +66,12 @@ function Example() {
           {(state) => (
             <>
               <div data-slot="stack">
-                <AlertDialogTitle>Delete {state.payload?.name}?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  Delete {state.payload?.name}?
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  The project and its files will be deleted for everyone on your team.
+                  The project and its files will be deleted for everyone on your
+                  team.
                 </AlertDialogDescription>
               </div>
               <div data-slot="row">

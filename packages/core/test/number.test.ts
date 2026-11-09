@@ -1,7 +1,16 @@
 import { describe, expect, test } from "vitest"
 import { displayOptions, formatNumber } from "../src/foundation/number/format"
-import { isPartialNumber, parseNumber, parseRange } from "../src/foundation/number/parse"
-import { decimalsOf, maxOnGrid, snapToStep, stepValue } from "../src/foundation/number/steps"
+import {
+  isPartialNumber,
+  parseNumber,
+  parseRange,
+} from "../src/foundation/number/parse"
+import {
+  decimalsOf,
+  maxOnGrid,
+  snapToStep,
+  stepValue,
+} from "../src/foundation/number/steps"
 import {
   formatNumberRange,
   formatNumberToParts,
@@ -23,7 +32,9 @@ describe("steps", () => {
   })
 
   test("snaps to the grid from min, without floating point noise", () => {
-    expect(snapToStep(0.30000000000000004, { min: 0, max: 1, step: 0.1 })).toBe(0.3)
+    expect(snapToStep(0.30000000000000004, { min: 0, max: 1, step: 0.1 })).toBe(
+      0.3
+    )
     expect(snapToStep(7, { min: 1, max: 100, step: 5 })).toBe(6)
     expect(snapToStep(-3.4, { min: -10, max: 10, step: 0.5 })).toBe(-3.5)
   })
@@ -35,8 +46,12 @@ describe("steps", () => {
   })
 
   test("starts the grid at 0 without a min", () => {
-    expect(snapToStep(12.37, { min: -Infinity, max: Infinity, step: 1 })).toBe(12)
-    expect(snapToStep(12.37, { min: -Infinity, max: Infinity, step: 0.25 })).toBe(12.25)
+    expect(snapToStep(12.37, { min: -Infinity, max: Infinity, step: 1 })).toBe(
+      12
+    )
+    expect(
+      snapToStep(12.37, { min: -Infinity, max: Infinity, step: 0.25 })
+    ).toBe(12.25)
   })
 
   test("steps off-grid values onto the grid first, like stepUp()", () => {
@@ -49,7 +64,9 @@ describe("steps", () => {
 
   test("adds tiny steps exactly", () => {
     let value = 0
-    for (let index = 0; index < 3; index++) value = stepValue(value, 1, { min: 0, max: 1, step: 0.1 })
+    for (let index = 0; index < 3; index++) {
+      value = stepValue(value, 1, { min: 0, max: 1, step: 0.1 })
+    }
     expect(value).toBe(0.3)
     expect(stepValue(0, 1, { min: 0, max: 1, step: 1e-7 })).toBe(1e-7)
   })
@@ -65,23 +82,37 @@ describe("formatting", () => {
   test("formats in the locale, or with a function", () => {
     expect(formatNumber(1234.5, "en-US")).toBe("1,234.5")
     expect(formatNumber(1234.5, "de-DE")).toBe("1.234,5")
-    expect(formatNumber(3, "en-US", (value) => `${value} items`)).toBe("3 items")
+    expect(formatNumber(3, "en-US", (value) => `${value} items`)).toBe(
+      "3 items"
+    )
     expect(formatNumber(null)).toBe("")
   })
 
   test("shows at least as many decimals as the step", () => {
-    expect(formatNumber(0.0001, "en-US", displayOptions(undefined, 0.0001))).toBe("0.0001")
-    expect(formatNumber(1.23456, "en-US", displayOptions(undefined, 1))).toBe("1.235")
-    expect(formatNumber(0.125, "en-US", displayOptions({ style: "percent" }, 0.001))).toBe("12.5%")
+    expect(
+      formatNumber(0.0001, "en-US", displayOptions(undefined, 0.0001))
+    ).toBe("0.0001")
+    expect(formatNumber(1.23456, "en-US", displayOptions(undefined, 1))).toBe(
+      "1.235"
+    )
+    expect(
+      formatNumber(0.125, "en-US", displayOptions({ style: "percent" }, 0.001))
+    ).toBe("12.5%")
   })
 
   test("shows a currency's own decimals unless the step needs more", () => {
     const usd = { style: "currency", currency: "USD" } as const
     expect(formatNumber(1.2345, "en-US", displayOptions(usd, 1))).toBe("$1.23")
-    expect(formatNumber(1234.5, "en-US", displayOptions({ style: "currency", currency: "JPY" }, 1))).toBe(
-      "¥1,235",
+    expect(
+      formatNumber(
+        1234.5,
+        "en-US",
+        displayOptions({ style: "currency", currency: "JPY" }, 1)
+      )
+    ).toBe("¥1,235")
+    expect(formatNumber(1.2345, "en-US", displayOptions(usd, 0.001))).toBe(
+      "$1.235"
     )
-    expect(formatNumber(1.2345, "en-US", displayOptions(usd, 0.001))).toBe("$1.235")
   })
 })
 
@@ -109,7 +140,11 @@ describe("parsing", () => {
   })
 
   test("reads accounting negatives in parentheses", () => {
-    const accounting = { style: "currency", currency: "USD", currencySign: "accounting" } as const
+    const accounting = {
+      style: "currency",
+      currency: "USD",
+      currencySign: "accounting",
+    } as const
     expect(parseNumber("($1,234.56)", "en-US", accounting)).toBe(-1234.56)
     expect(isPartialNumber("($1", "en-US", accounting)).toBe(true)
   })
@@ -128,18 +163,26 @@ describe("parsing", () => {
     const usd = { style: "currency", currency: "USD" } as const
     expect(parseNumber("$1,234.50", "en-US", usd)).toBe(1234.5)
     expect(parseNumber("-$5", "en-US", usd)).toBe(-5)
-    expect(parseNumber("1.234,50 €", "de-DE", { style: "currency", currency: "EUR" })).toBe(1234.5)
+    expect(
+      parseNumber("1.234,50 €", "de-DE", { style: "currency", currency: "EUR" })
+    ).toBe(1234.5)
     expect(parseNumber("50%", "en-US", { style: "percent" })).toBe(0.5)
     expect(parseNumber("12.5", "en-US", { style: "percent" })).toBe(0.125)
-    expect(parseNumber("5 km", "en-US", { style: "unit", unit: "kilometer" })).toBe(5)
+    expect(
+      parseNumber("5 km", "en-US", { style: "unit", unit: "kilometer" })
+    ).toBe(5)
   })
 
   test("accepts what could still become a number", () => {
     expect(isPartialNumber("-", "en-US", undefined)).toBe(true)
     expect(isPartialNumber("1.", "en-US", undefined)).toBe(true)
-    expect(isPartialNumber("$1,2", "en-US", { style: "currency", currency: "USD" })).toBe(true)
+    expect(
+      isPartialNumber("$1,2", "en-US", { style: "currency", currency: "USD" })
+    ).toBe(true)
     expect(isPartialNumber("1a", "en-US", undefined)).toBe(false)
-    expect(isPartialNumber("-1", "en-US", undefined, { allowNegative: false })).toBe(false)
+    expect(
+      isPartialNumber("-1", "en-US", undefined, { allowNegative: false })
+    ).toBe(false)
   })
 })
 
@@ -170,8 +213,12 @@ describe("@ui-sdk/core/number", () => {
     expect(stepBy(4, { bound: "min" }, range)).toBe(0)
     expect(stepBy(4, { bound: "max" }, { min: 0, max: 10, step: 3 })).toBe(9)
     // Without a large step, it's ten steps; without a small one, the step.
-    expect(stepBy(0, { direction: 1, size: "large" }, { min: 0, max: 100, step: 1 })).toBe(10)
-    expect(stepBy(0, { direction: 1, size: "small" }, { min: 0, max: 100, step: 1 })).toBe(1)
+    expect(
+      stepBy(0, { direction: 1, size: "large" }, { min: 0, max: 100, step: 1 })
+    ).toBe(10)
+    expect(
+      stepBy(0, { direction: 1, size: "small" }, { min: 0, max: 100, step: 1 })
+    ).toBe(1)
   })
 
   test("fractionOf and valueAt map between values and positions, evenly or along a scale", () => {
@@ -184,7 +231,9 @@ describe("@ui-sdk/core/number", () => {
     // A log scale puts each tenfold at the same distance, as a frequency or volume control does.
     expect(fractionOf(200, { min: 2, max: 2000 }, "log")).toBeCloseTo(2 / 3)
     expect(valueAt(0.5, range, "log")).toBeCloseTo(Math.sqrt(20 * 20000))
-    expect(valueAt(fractionOf(1234, range, "log"), range, "log")).toBeCloseTo(1234)
+    expect(valueAt(fractionOf(1234, range, "log"), range, "log")).toBeCloseTo(
+      1234
+    )
     const squared = {
       to: (value: number) => Math.sqrt(value),
       from: (position: number) => position * position,
@@ -195,14 +244,23 @@ describe("@ui-sdk/core/number", () => {
 
   test("formatNumberRange writes what both ends share once, and a format function joins its texts", () => {
     expect(
-      formatNumberRange(5, 10, "en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }),
+      formatNumberRange(5, 10, "en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      })
     ).toMatch(/^\$5\s?[–-]\s?\$?10$/)
-    expect(formatNumberRange(1, 3, "en-US", (value) => `${value} km`)).toBe("1 km – 3 km")
+    expect(formatNumberRange(1, 3, "en-US", (value) => `${value} km`)).toBe(
+      "1 km – 3 km"
+    )
     expect(formatNumberRange(1, Number.NaN, "en-US")).toBe("")
   })
 
   test("formatNumberToParts splits a value into its digits and symbols", () => {
-    const parts = formatNumberToParts(1234.5, "en-US", { style: "currency", currency: "USD" })
+    const parts = formatNumberToParts(1234.5, "en-US", {
+      style: "currency",
+      currency: "USD",
+    })
     expect(parts.map((part) => part.type)).toEqual([
       "currency",
       "integer",
@@ -221,35 +279,77 @@ describe("@ui-sdk/core/number", () => {
   test("stepFromKey leaves keys an input method is composing with alone, Safari's last one too", () => {
     expect(stepFromKey({ key: "ArrowDown", isComposing: true })).toBe(null)
     expect(stepFromKey({ key: "ArrowDown", keyCode: 229 })).toBe(null)
-    expect(stepFromKey({ key: "ArrowDown", nativeEvent: { isComposing: true } })).toBe(null)
-    expect(stepFromKey({ key: "ArrowDown", nativeEvent: { isComposing: false, keyCode: 40 } })).toEqual({
+    expect(
+      stepFromKey({ key: "ArrowDown", nativeEvent: { isComposing: true } })
+    ).toBe(null)
+    expect(
+      stepFromKey({
+        key: "ArrowDown",
+        nativeEvent: { isComposing: false, keyCode: 40 },
+      })
+    ).toEqual({
       direction: -1,
       size: "step",
     })
   })
 
   test("stepFromKey reads the APG keys into a move", () => {
-    expect(stepFromKey({ key: "ArrowUp" })).toEqual({ direction: 1, size: "step" })
-    expect(stepFromKey({ key: "ArrowRight" })).toEqual({ direction: 1, size: "step" })
-    expect(stepFromKey({ key: "ArrowLeft", shiftKey: true })).toEqual({ direction: -1, size: "large" })
-    expect(stepFromKey({ key: "ArrowDown", altKey: true })).toEqual({ direction: -1, size: "small" })
-    expect(stepFromKey({ key: "PageUp" })).toEqual({ direction: 1, size: "large" })
-    expect(stepFromKey({ key: "PageDown" })).toEqual({ direction: -1, size: "large" })
+    expect(stepFromKey({ key: "ArrowUp" })).toEqual({
+      direction: 1,
+      size: "step",
+    })
+    expect(stepFromKey({ key: "ArrowRight" })).toEqual({
+      direction: 1,
+      size: "step",
+    })
+    expect(stepFromKey({ key: "ArrowLeft", shiftKey: true })).toEqual({
+      direction: -1,
+      size: "large",
+    })
+    expect(stepFromKey({ key: "ArrowDown", altKey: true })).toEqual({
+      direction: -1,
+      size: "small",
+    })
+    expect(stepFromKey({ key: "PageUp" })).toEqual({
+      direction: 1,
+      size: "large",
+    })
+    expect(stepFromKey({ key: "PageDown" })).toEqual({
+      direction: -1,
+      size: "large",
+    })
     expect(stepFromKey({ key: "Home" })).toEqual({ bound: "min" })
     expect(stepFromKey({ key: "End" })).toEqual({ bound: "max" })
     expect(stepFromKey({ key: "a" })).toBeNull()
   })
 
   test("right to left flips Left and Right only on a horizontal control, and a field leaves them to the caret", () => {
-    expect(stepFromKey({ key: "ArrowRight" }, { dir: "rtl" })).toEqual({ direction: -1, size: "step" })
-    expect(stepFromKey({ key: "ArrowLeft" }, { dir: "rtl" })).toEqual({ direction: 1, size: "step" })
-    expect(stepFromKey({ key: "ArrowRight" }, { dir: "rtl", orientation: "vertical" })).toEqual({
+    expect(stepFromKey({ key: "ArrowRight" }, { dir: "rtl" })).toEqual({
+      direction: -1,
+      size: "step",
+    })
+    expect(stepFromKey({ key: "ArrowLeft" }, { dir: "rtl" })).toEqual({
       direction: 1,
       size: "step",
     })
-    expect(stepFromKey({ key: "ArrowUp" }, { dir: "rtl" })).toEqual({ direction: 1, size: "step" })
+    expect(
+      stepFromKey(
+        { key: "ArrowRight" },
+        { dir: "rtl", orientation: "vertical" }
+      )
+    ).toEqual({
+      direction: 1,
+      size: "step",
+    })
+    expect(stepFromKey({ key: "ArrowUp" }, { dir: "rtl" })).toEqual({
+      direction: 1,
+      size: "step",
+    })
     expect(stepFromKey({ key: "ArrowLeft" }, { arrows: "vertical" })).toBeNull()
-    expect(stepFromKey({ key: "ArrowUp" }, { arrows: "vertical" })).toEqual({ direction: 1, size: "step" })
+    expect(stepFromKey({ key: "ArrowUp" }, { arrows: "vertical" })).toEqual({
+      direction: 1,
+      size: "step",
+    })
   })
 
   test("a key's move applied with stepBy is what a slider does", () => {
@@ -266,12 +366,18 @@ describe("@ui-sdk/core/number", () => {
 
   test("arrows: horizontal leaves Up and Down to the page", () => {
     expect(stepFromKey({ key: "ArrowUp" }, { arrows: "horizontal" })).toBeNull()
-    expect(stepFromKey({ key: "ArrowDown" }, { arrows: "horizontal" })).toBeNull()
-    expect(stepFromKey({ key: "ArrowRight" }, { arrows: "horizontal" })).toEqual({
+    expect(
+      stepFromKey({ key: "ArrowDown" }, { arrows: "horizontal" })
+    ).toBeNull()
+    expect(
+      stepFromKey({ key: "ArrowRight" }, { arrows: "horizontal" })
+    ).toEqual({
       direction: 1,
       size: "step",
     })
-    expect(stepFromKey({ key: "ArrowRight" }, { arrows: "horizontal", dir: "rtl" })).toEqual({
+    expect(
+      stepFromKey({ key: "ArrowRight" }, { arrows: "horizontal", dir: "rtl" })
+    ).toEqual({
       direction: -1,
       size: "step",
     })
@@ -296,25 +402,63 @@ describe("scrubbing", () => {
     expect(scrubTo(23, timeline, { snap: false }).value).toBe(23)
     // Without the points it still lands on the grid; a step of 0 keeps the value exactly, within the bounds.
     expect(scrubTo(23.456, timeline, { snap: false }).value).toBe(23.5)
-    expect(scrubTo(23.456, { ...timeline, step: 0 }, { snap: false }).value).toBe(23.456)
-    expect(scrubTo(70, { ...timeline, step: 0 }, { snap: false }).value).toBe(60)
-    expect(scrubTo(23, { ...timeline, snap: { points: [22, 23.5], threshold: 2 } }).value).toBe(23.5)
-    expect(scrubTo(1, { min: 0, max: 10, step: 1, snap: { points: [-1], threshold: 3 } }).value).toBe(0)
+    expect(
+      scrubTo(23.456, { ...timeline, step: 0 }, { snap: false }).value
+    ).toBe(23.456)
+    expect(scrubTo(70, { ...timeline, step: 0 }, { snap: false }).value).toBe(
+      60
+    )
+    expect(
+      scrubTo(23, { ...timeline, snap: { points: [22, 23.5], threshold: 2 } })
+        .value
+    ).toBe(23.5)
+    expect(
+      scrubTo(1, {
+        min: 0,
+        max: 10,
+        step: 1,
+        snap: { points: [-1], threshold: 3 },
+      }).value
+    ).toBe(0)
     expect(scrubTo(23, timeline)).toEqual({ value: 24, point: 24 })
     expect(scrubTo(30, timeline)).toEqual({ value: 30, point: undefined })
   })
 
   test("eases toward a point: unchanged at the threshold, faster as it closes in, and onto the point", () => {
-    expect(scrubTo(22.5, timeline, { ease: true })).toEqual({ value: 22.5, point: 24 })
-    expect(scrubTo(23.25, timeline, { ease: true })).toEqual({ value: 23.625, point: 24 })
-    expect(scrubTo(24, timeline, { ease: true })).toEqual({ value: 24, point: 24 })
-    expect(scrubTo(23.25, timeline, { ease: (t) => t * t }).value).toBeCloseTo(23.4375)
+    expect(scrubTo(22.5, timeline, { ease: true })).toEqual({
+      value: 22.5,
+      point: 24,
+    })
+    expect(scrubTo(23.25, timeline, { ease: true })).toEqual({
+      value: 23.625,
+      point: 24,
+    })
+    expect(scrubTo(24, timeline, { ease: true })).toEqual({
+      value: 24,
+      point: 24,
+    })
+    expect(scrubTo(23.25, timeline, { ease: (t) => t * t }).value).toBeCloseTo(
+      23.4375
+    )
     // Two points a threshold apart on each side meet without a jump.
-    const collapse = { min: 0, max: 160, step: 1, snap: { points: [0, 160], threshold: 80 } }
-    const shown = [79.9, 80, 80.1].map((pointer) => scrubTo(pointer, collapse, { ease: true }).value)
+    const collapse = {
+      min: 0,
+      max: 160,
+      step: 1,
+      snap: { points: [0, 160], threshold: 80 },
+    }
+    const shown = [79.9, 80, 80.1].map(
+      (pointer) => scrubTo(pointer, collapse, { ease: true }).value
+    )
     expect(shown[1]).toBe(80)
     expect(Math.abs(shown[2] - shown[0])).toBeLessThan(0.5)
-    expect(scrubTo(5, { ...collapse, snap: { points: [0], threshold: 0 } }, { ease: true })).toEqual({
+    expect(
+      scrubTo(
+        5,
+        { ...collapse, snap: { points: [0], threshold: 0 } },
+        { ease: true }
+      )
+    ).toEqual({
       value: 5,
       point: undefined,
     })

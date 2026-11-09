@@ -17,8 +17,12 @@ async function mount(root: HTMLElement) {
   root.innerHTML = markup
   await import("@ui-sdk/web/toolbar")
   root.addEventListener("click", (event) => {
-    const action = (event.target as HTMLElement).closest("[data-action]")?.getAttribute("data-action")
-    if (action) root.querySelector("output")!.textContent = action
+    const action = (event.target as HTMLElement)
+      .closest("[data-action]")
+      ?.getAttribute("data-action")
+    if (action) {
+      root.querySelector("output")!.textContent = action
+    }
   })
 }
 

@@ -4,12 +4,9 @@
 </script>
 
 <div data-slot="row" dir="rtl">
-  <Button
-  >
+  <Button>
     متابعة
     <ChevronRightIcon />
   </Button>
-  <Button
-    >إلغاء</Button
-  >
+  <Button>إلغاء</Button>
 </div>

@@ -21,7 +21,11 @@ type BoardState = {
   moving: MoveDraft | null
 }
 
-const titles: Record<string, string> = { plan: "Plan", draft: "Draft", ship: "Ship" }
+const titles: Record<string, string> = {
+  plan: "Plan",
+  draft: "Draft",
+  ship: "Ship",
+}
 
 const board = definePrimitive({
   name: "notes",
@@ -43,13 +47,16 @@ const board = definePrimitive({
       key: "positions",
       draft: "moving",
       set: (value, details) => change("positions", value, details),
-      group: (key) => (store.get().selected.includes(key) ? store.get().selected : [key]),
+      group: (key) =>
+        store.get().selected.includes(key) ? store.get().selected : [key],
       step: () => 20,
       bounds: () => ({ minX: 0, minY: 0, maxX: 180, maxY: 140 }),
       disabled: (key) => key === "ship",
       label: (key) => titles[key],
       message: ({ keys, label, at }) =>
-        keys.length > 1 ? `Moved ${keys.length} notes.` : `${label} is at ${at.x}, ${at.y}.`,
+        keys.length > 1
+          ? `Moved ${keys.length} notes.`
+          : `${label} is at ${at.x}, ${at.y}.`,
     })
     return {
       roving: createRovingFocus<BoardState, { value: string }>(context, {
@@ -60,11 +67,15 @@ const board = definePrimitive({
       move,
       select(key: string, add: boolean) {
         const { selected } = store.get()
-        if (add)
+        if (add) {
           store.set({
-            selected: selected.includes(key) ? selected.filter((other) => other !== key) : [...selected, key],
+            selected: selected.includes(key)
+              ? selected.filter((other) => other !== key)
+              : [...selected, key],
           })
-        else if (!selected.includes(key)) store.set({ selected: [key] })
+        } else if (!selected.includes(key)) {
+          store.set({ selected: [key] })
+        }
       },
       clear: () => store.set({ selected: [] }),
     }
@@ -90,7 +101,12 @@ const board = definePrimitive({
           "aria-selected": String(state.selected.includes(part.key)),
           "aria-disabled": part.key === "ship" ? "true" : undefined,
           tabindex: part.api.roving.tabIndex(state, part),
-          style: css({ position: "absolute", left: `${at.x}px`, top: `${at.y}px`, "touch-action": "none" }),
+          style: css({
+            position: "absolute",
+            left: `${at.x}px`,
+            top: `${at.y}px`,
+            "touch-action": "none",
+          }),
         }
       },
       live: live<BoardState, any, { value: string }>((state, { api, key }) => ({
@@ -135,7 +151,9 @@ function Example() {
       onPositionsChange={(next) => {
         for (const [key, at] of Object.entries(next)) {
           const was = positions.current[key]
-          if (was.x !== at.x || was.y !== at.y) log(`${titles[key]} moved to ${at.x}, ${at.y}`)
+          if (was.x !== at.x || was.y !== at.y) {
+            log(`${titles[key]} moved to ${at.x}, ${at.y}`)
+          }
         }
         positions.current = next
       }}

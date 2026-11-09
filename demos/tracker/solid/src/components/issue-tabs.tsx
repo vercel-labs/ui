@@ -13,13 +13,19 @@ function IssueTabs(props: { query: Query; counts: Record<Tab, number> }) {
               render={(attributes) => (
                 <a
                   {...attributes}
-                  href={href(props.query, { tab: tab.value, page: 1, issue: null })}
+                  href={href(props.query, {
+                    tab: tab.value,
+                    page: 1,
+                    issue: null,
+                  })}
                   aria-current="false"
                 />
               )}
             >
               {tab.label}
-              <span class="text-xs text-muted-foreground tabular-nums">{props.counts[tab.value]}</span>
+              <span class="text-xs text-muted-foreground tabular-nums">
+                {props.counts[tab.value]}
+              </span>
             </TabsTab>
           )}
         </For>

@@ -29,7 +29,11 @@
 
 <div class="fixture">
   <button>Before</button>
-  <form class="form" aria-label="Rendering" onsubmit={(event) => event.preventDefault()}>
+  <form
+    class="form"
+    aria-label="Rendering"
+    onsubmit={(event) => event.preventDefault()}
+  >
     <label>
       <Checkbox class="checkbox" onCheckedChange={onSpan}>
         {#snippet render({ props })}

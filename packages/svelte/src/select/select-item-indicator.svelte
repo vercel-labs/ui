@@ -18,12 +18,19 @@ The check inside a selected item. Rendered while it's selected, or always with `
   let {
     keepMounted,
     ...rest
-  }: PartProps<"span", SelectItemIndicatorState> & SelectItemIndicatorProps = $props()
+  }: PartProps<"span", SelectItemIndicatorState> & SelectItemIndicatorProps =
+    $props()
 
   const select = useHandle(selectPrimitive)
   const item = getContext<ItemContext | undefined>(ItemKey)
-  if (!item) throw new Error("<SelectItemIndicator> must be used inside <SelectItem>.")
-  const indicator = useHandlePart(select, "item-indicator", () => ({ id: item().key, item: item().key, keepMounted }))
+  if (!item) {
+    throw new Error("<SelectItemIndicator> must be used inside <SelectItem>.")
+  }
+  const indicator = useHandlePart(select, "item-indicator", () => ({
+    id: item().key,
+    item: item().key,
+    keepMounted,
+  }))
 </script>
 
 {#if indicator.present}

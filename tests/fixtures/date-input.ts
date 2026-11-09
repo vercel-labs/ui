@@ -26,7 +26,8 @@ function dateInputOptions() {
     date: {
       defaultValue: params.get("date") ?? undefined,
       locale: params.get("locale") ?? "en-US",
-      granularity: (params.get("granularity") ?? undefined) as "day" | "minute" | undefined,
+      granularity: (params.get("granularity") ?? undefined) as
+        "day" | "minute" | undefined,
       hourCycle: hourCycle ? (Number(hourCycle) as 12 | 24) : undefined,
       min: params.get("min") ?? undefined,
       max: params.get("max") ?? undefined,

@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 
@@ -8,7 +12,9 @@ function Fixture() {
     <div className="fixture">
       <button>Before</button>
       <Collapsible
-        className={(state) => `collapsible ${state.open ? "is-open" : "is-closed"}`}
+        className={(state) =>
+          `collapsible ${state.open ? "is-open" : "is-closed"}`
+        }
         onOpenChange={(open) => setAction(open ? "open" : "closed")}
       >
         <CollapsibleTrigger

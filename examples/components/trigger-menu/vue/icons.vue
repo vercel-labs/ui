@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { ClockIcon, ReplyIcon, SearchIcon, ShareIcon, TrashIcon } from "@lucide/vue"
+import {
+  ClockIcon,
+  ReplyIcon,
+  SearchIcon,
+  ShareIcon,
+  TrashIcon,
+} from "@lucide/vue"
 import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
 import {
   TriggerMenu,
@@ -31,7 +37,11 @@ const commands = [
     </Field>
     <TriggerMenuContent>
       <TriggerMenuList>
-        <TriggerMenuItem v-for="command in commands" :key="command.value" :value="command.value">
+        <TriggerMenuItem
+          v-for="command in commands"
+          :key="command.value"
+          :value="command.value"
+        >
           <TriggerMenuItemIcon :mirror="command.mirror">
             <component :is="command.icon" />
           </TriggerMenuItemIcon>

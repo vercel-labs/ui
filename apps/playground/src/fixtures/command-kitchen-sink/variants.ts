@@ -35,18 +35,24 @@ type Variant = {
   dialog?: boolean
 }
 
-type List = "default" | "flat" | "strings" | "disabled" | "many" | "long" | "empty"
+type List =
+  "default" | "flat" | "strings" | "disabled" | "many" | "long" | "empty"
 
 // The commands most variants show. "Change theme…" opens a page, which opens another.
 function commands(shortcuts?: string) {
-  const key = (letter: string) => (shortcuts ? `${shortcuts}+${letter}` : undefined)
+  const key = (letter: string) =>
+    shortcuts ? `${shortcuts}+${letter}` : undefined
   const items: CommandData = [
     {
       type: "group",
       label: "Suggestions",
       items: [
         { value: "calendar", label: "Calendar" },
-        { value: "emoji", label: "Search Emoji", keywords: ["smiley", "emoticon"] },
+        {
+          value: "emoji",
+          label: "Search Emoji",
+          keywords: ["smiley", "emoticon"],
+        },
         { value: "calculator", label: "Calculator", disabled: true },
       ],
     },
@@ -75,7 +81,12 @@ function commands(shortcuts?: string) {
             },
           ],
         },
-        { value: "settings", label: "Settings", shortcut: key("s"), keywords: ["preferences"] },
+        {
+          value: "settings",
+          label: "Settings",
+          shortcut: key("s"),
+          keywords: ["preferences"],
+        },
       ],
     },
   ]
@@ -91,7 +102,14 @@ const flat: CommandData = [
   { value: "reload", label: "Reload Window" },
 ]
 
-const strings: CommandData = ["Copy", "Cut", "Paste", "Select All", "Undo", "Redo"]
+const strings: CommandData = [
+  "Copy",
+  "Cut",
+  "Paste",
+  "Select All",
+  "Undo",
+  "Redo",
+]
 
 const disabled: CommandData = [
   { value: "rename", label: "Rename" },
@@ -135,10 +153,18 @@ function pagesOf(list: CommandData) {
   const pages: { value: string; items: CommandData }[] = []
   const walk = (entries: CommandData) => {
     for (const entry of entries) {
-      if (typeof entry === "string" || ("type" in entry && entry.type === "separator")) continue
-      if ("type" in entry && entry.type === "group") walk(entry.items)
-      else if ((entry as CommandDataItem).items) {
-        const { value, items } = entry as Required<Pick<CommandDataItem, "value" | "items">>
+      if (
+        typeof entry === "string" ||
+        ("type" in entry && entry.type === "separator")
+      ) {
+        continue
+      }
+      if ("type" in entry && entry.type === "group") {
+        walk(entry.items)
+      } else if ((entry as CommandDataItem).items) {
+        const { value, items } = entry as Required<
+          Pick<CommandDataItem, "value" | "items">
+        >
         pages.push({ value, items })
         walk(items)
       }
@@ -151,11 +177,22 @@ function pagesOf(list: CommandData) {
 // Ranks commands: the start of the label first, then the start of a word, then anywhere, keywords too. 0 hides.
 function score(item: { label: string; keywords?: string[] }, query: string) {
   const needle = query.trim().toLowerCase()
-  if (!needle) return 1
+  if (!needle) {
+    return 1
+  }
   const label = item.label.toLowerCase()
-  if (label.startsWith(needle)) return 3
-  if (label.split(/\s+/).some((word) => word.startsWith(needle))) return 2
-  if (label.includes(needle) || item.keywords?.some((keyword) => keyword.includes(needle))) return 1
+  if (label.startsWith(needle)) {
+    return 3
+  }
+  if (label.split(/\s+/).some((word) => word.startsWith(needle))) {
+    return 2
+  }
+  if (
+    label.includes(needle) ||
+    item.keywords?.some((keyword) => keyword.includes(needle))
+  ) {
+    return 1
+  }
   return 0
 }
 
@@ -175,10 +212,16 @@ const wait = (ms: number, signal?: AbortSignal) =>
   })
 
 // What a command does when it runs. It logs, and an async kind waits 1.2s first, so `data-pending` shows. Reject fails.
-function runner(kind: "async" | "reject" | undefined, log: (message: string) => void, name: string) {
+function runner(
+  kind: "async" | "reject" | undefined,
+  log: (message: string) => void,
+  name: string
+) {
   return (value: string) => {
     log(`${name} ${value}`)
-    if (!kind) return
+    if (!kind) {
+      return
+    }
     return wait(1200).then(() => {
       if (kind === "reject") {
         log(`${name} ${value} failed`)
@@ -193,7 +236,9 @@ function runner(kind: "async" | "reject" | undefined, log: (message: string) => 
 function search(kind: "ok" | "error") {
   return async (query: string, { signal }: { signal: AbortSignal }) => {
     await wait(600, signal)
-    if (kind === "error") throw new Error("The server is down.")
+    if (kind === "error") {
+      throw new Error("The server is down.")
+    }
     const needle = query.trim().toLowerCase()
     const pool = [...flat, ...disabled] as CommandDataItem[]
     return pool.filter((entry) => entry.label.toLowerCase().includes(needle))
@@ -322,7 +367,13 @@ const variants: Variant[] = [
     title: "defaultQuery",
     options: { defaultQuery: "set" },
   },
-  { id: "rtl", section: "Behavior", title: "Right to left", rtl: true, shortcuts: "alt+shift" },
+  {
+    id: "rtl",
+    section: "Behavior",
+    title: "Right to left",
+    rtl: true,
+    shortcuts: "alt+shift",
+  },
   {
     id: "debug",
     section: "Behavior",
@@ -405,7 +456,12 @@ const variants: Variant[] = [
     mode: "data",
     options: { defaultPages: ["theme"] },
   },
-  { id: "controlled-pages", section: "Pages", title: "Controlled pages", controlled: "pages" },
+  {
+    id: "controlled-pages",
+    section: "Pages",
+    title: "Controlled pages",
+    controlled: "pages",
+  },
 
   {
     id: "action-async",
@@ -435,8 +491,18 @@ const variants: Variant[] = [
     select: "reject",
   },
 
-  { id: "controlled-value", section: "Controlled", title: "Controlled value", controlled: "value" },
-  { id: "controlled-query", section: "Controlled", title: "Controlled query", controlled: "query" },
+  {
+    id: "controlled-value",
+    section: "Controlled",
+    title: "Controlled value",
+    controlled: "value",
+  },
+  {
+    id: "controlled-query",
+    section: "Controlled",
+    title: "Controlled query",
+    controlled: "query",
+  },
   {
     id: "controller",
     section: "Controlled",
@@ -446,4 +512,15 @@ const variants: Variant[] = [
   },
 ]
 
-export { commands, filterOf, type List, listOf, pagesOf, runner, score, search, type Variant, variants }
+export {
+  commands,
+  filterOf,
+  type List,
+  listOf,
+  pagesOf,
+  runner,
+  score,
+  search,
+  type Variant,
+  variants,
+}

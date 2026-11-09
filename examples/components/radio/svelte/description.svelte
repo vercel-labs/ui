@@ -3,9 +3,21 @@
   import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/svelte/radio"
 
   const frequencies = [
-    { value: "instant", label: "Instantly", description: "An email right away." },
-    { value: "daily", label: "Daily digest", description: "One email each morning." },
-    { value: "weekly", label: "Weekly digest", description: "A summary every Monday." },
+    {
+      value: "instant",
+      label: "Instantly",
+      description: "An email right away.",
+    },
+    {
+      value: "daily",
+      label: "Daily digest",
+      description: "One email each morning.",
+    },
+    {
+      value: "weekly",
+      label: "Weekly digest",
+      description: "A summary every Monday.",
+    },
   ]
 </script>
 

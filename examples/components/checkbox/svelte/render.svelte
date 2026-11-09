@@ -14,7 +14,11 @@
   <legend>Topics you follow</legend>
   <div data-slot="row">
     {#each topics as topic (topic.value)}
-      <Checkbox name="topics" value={topic.value} defaultChecked={topic.checked}>
+      <Checkbox
+        name="topics"
+        value={topic.value}
+        defaultChecked={topic.checked}
+      >
         {#snippet render({ props, state })}
           <button {...props}>
             {#if state.checked}

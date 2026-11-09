@@ -17,7 +17,10 @@ async function test() {
     await button.keys("Enter")
     expect("Enter confirms, and disarms it", !button.state.armed)
     expect("From the keyboard", button.changes.at(-1)?.source === "keyboard")
-    expect("The button is a button", button.part("root")!.getAttribute("type") === "button")
+    expect(
+      "The button is a button",
+      button.part("root")!.getAttribute("type") === "button"
+    )
   } finally {
     button.unmount()
   }
@@ -28,7 +31,11 @@ function Example() {
   const [checks, setChecks] = React.useState<Check[] | null>(null)
   return (
     <div data-slot="stack">
-      <button type="button" data-variant="solid" onClick={async () => setChecks(await test())}>
+      <button
+        type="button"
+        data-variant="solid"
+        onClick={async () => setChecks(await test())}
+      >
         Run the Test
       </button>
       {checks && (

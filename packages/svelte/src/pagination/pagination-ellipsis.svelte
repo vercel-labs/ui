@@ -11,9 +11,16 @@ say which pages there are. Shows "…" unless it has content.
 
   let { children, ...rest }: PartProps<"span", {}> = $props()
 
-  const ellipsis = useHandlePart(usePagination("PaginationEllipsis"), "ellipsis")
+  const ellipsis = useHandlePart(
+    usePagination("PaginationEllipsis"),
+    "ellipsis"
+  )
 </script>
 
 {#snippet fallback()}…{/snippet}
 
-<Part tag="span" part={ellipsis} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="span"
+  part={ellipsis}
+  props={{ ...rest, children: children ?? fallback }}
+/>

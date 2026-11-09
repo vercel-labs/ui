@@ -37,7 +37,12 @@ test("the indicator stops watching tabs that left the page", async () => {
     els.set(value, el)
     unbind.set(value, bind(instance.part("tab", { value }), el)!)
   }
-  cleanups.push(bind(instance.part("indicator", {}), list.appendChild(document.createElement("span")))!)
+  cleanups.push(
+    bind(
+      instance.part("indicator", {}),
+      list.appendChild(document.createElement("span"))
+    )!
+  )
   await tick()
   expect(observed.has(els.get("c")!)).toBe(true)
   els.get("c")!.remove()
@@ -49,5 +54,7 @@ test("the indicator stops watching tabs that left the page", async () => {
   unbind.set("c", bind(instance.part("tab", { value: "c" }), els.get("c")!)!)
   await tick()
   expect(observed.has(els.get("c")!)).toBe(true)
-  for (const value of ["a", "b", "c"]) unbind.get(value)!()
+  for (const value of ["a", "b", "c"]) {
+    unbind.get(value)!()
+  }
 })

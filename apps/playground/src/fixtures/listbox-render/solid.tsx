@@ -25,17 +25,29 @@ function Fixture() {
         onValueChange={(value) => setAction(listboxAction(value))}
         render={(props) => <ul {...props} />}
       >
-        <ListboxItem class="item" value="docs" render={(props) => <a {...props} href="#docs" />}>
+        <ListboxItem
+          class="item"
+          value="docs"
+          render={(props) => <a {...props} href="#docs" />}
+        >
           Docs
         </ListboxItem>
         <ListboxItem
           value="star"
-          class={(state) => `item ${state.selected ? "is-selected" : "is-unselected"}`}
-          render={(props, state) => <li {...props}>{state.selected ? "★" : "☆"} Star</li>}
+          class={(state) =>
+            `item ${state.selected ? "is-selected" : "is-unselected"}`
+          }
+          render={(props, state) => (
+            <li {...props}>{state.selected ? "★" : "☆"} Star</li>
+          )}
         />
         <For each={f.items.slice(0, 3)}>
           {(item) => (
-            <ListboxItem class="item" value={item.value} render={(props) => <li {...props} />}>
+            <ListboxItem
+              class="item"
+              value={item.value}
+              render={(props) => <li {...props} />}
+            >
               {counted(item.label)}
             </ListboxItem>
           )}

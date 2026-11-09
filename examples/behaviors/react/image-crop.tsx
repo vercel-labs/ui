@@ -26,13 +26,16 @@ function Example() {
   const [result, setResult] = React.useState<{ url: string; file: File }>()
 
   React.useEffect(() => paint(source.current!), [])
-  React.useEffect(() => () => result && URL.revokeObjectURL(result.url), [result])
+  React.useEffect(
+    () => () => result && URL.revokeObjectURL(result.url),
+    [result]
+  )
 
   async function crop() {
     const file = await cropImage(
       source.current!,
       { x: 0, y: 0, width: 150, height: 150, rotation, flipX },
-      { width: 96, shape: circle ? "circle" : "rectangle" },
+      { width: 96, shape: circle ? "circle" : "rectangle" }
     )
     setResult({ url: URL.createObjectURL(file), file })
     log(`${file.name}, ${file.type}, ${file.size} bytes`)
@@ -44,7 +47,9 @@ function Example() {
         <select
           aria-label="Rotation"
           value={rotation}
-          onChange={(event) => setRotation(Number(event.target.value) as ImageRotation)}
+          onChange={(event) =>
+            setRotation(Number(event.target.value) as ImageRotation)
+          }
         >
           {[0, 90, 180, 270].map((degrees) => (
             <option key={degrees} value={degrees}>
@@ -53,11 +58,19 @@ function Example() {
           ))}
         </select>
         <label data-slot="label">
-          <input type="checkbox" checked={flipX} onChange={(event) => setFlipX(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={flipX}
+            onChange={(event) => setFlipX(event.target.checked)}
+          />
           Flip
         </label>
         <label data-slot="label">
-          <input type="checkbox" checked={circle} onChange={(event) => setCircle(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={circle}
+            onChange={(event) => setCircle(event.target.checked)}
+          />
           Circle
         </label>
       </div>
@@ -68,14 +81,22 @@ function Example() {
           height={300}
           aria-label="Four colored quarters"
           role="img"
-          style={{ transform: `scale(${flipX ? -1 : 1}, 1) rotate(${rotation}deg)` }}
+          style={{
+            transform: `scale(${flipX ? -1 : 1}, 1) rotate(${rotation}deg)`,
+          }}
         />
       </div>
       <div data-slot="image-crop-output">
         <button type="button" data-variant="solid" onClick={crop}>
           Crop
         </button>
-        {result && <img data-slot="image-crop-result" src={result.url} alt="The cropped image" />}
+        {result && (
+          <img
+            data-slot="image-crop-result"
+            src={result.url}
+            alt="The cropped image"
+          />
+        )}
       </div>
     </div>
   )

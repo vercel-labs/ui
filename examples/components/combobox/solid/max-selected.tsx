@@ -13,7 +13,15 @@ import {
 } from "@ui-sdk/solid/combobox"
 import { For, Show } from "solid-js"
 
-const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const labels = [
+  "Bug",
+  "Feature",
+  "Documentation",
+  "Design",
+  "Performance",
+  "Security",
+  "Testing",
+]
 
 function Example() {
   return (

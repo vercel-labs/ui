@@ -2,22 +2,36 @@ import { expect, type Locator } from "@playwright/test"
 import { testExamples, type Check } from "./docs-helpers"
 
 // A day by its full date, a gridcell in every framework.
-const day = (preview: Locator, name: string) => preview.getByRole("gridcell", { name, exact: true })
+const day = (preview: Locator, name: string) =>
+  preview.getByRole("gridcell", { name, exact: true })
 
 const step = (preview: Locator, name: "Previous month" | "Next month") =>
   preview.getByRole("button", { name, exact: true })
 
 async function expectSelected(preview: Locator, name: string, selected = true) {
-  await expect(day(preview, name), `${name} is ${selected ? "" : "not "}selected`).toHaveAttribute(
-    "aria-selected",
-    String(selected),
-  )
+  await expect(
+    day(preview, name),
+    `${name} is ${selected ? "" : "not "}selected`
+  ).toHaveAttribute("aria-selected", String(selected))
 }
 
-async function expectUnavailable(preview: Locator, name: string, unavailable = true) {
+async function expectUnavailable(
+  preview: Locator,
+  name: string,
+  unavailable = true
+) {
   const cell = day(preview, name)
-  if (unavailable) await expect(cell, `${name} can't be picked`).toHaveAttribute("aria-disabled", "true")
-  else await expect(cell, `${name} can be picked`).not.toHaveAttribute("aria-disabled", "true")
+  if (unavailable) {
+    await expect(cell, `${name} can't be picked`).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+  } else {
+    await expect(cell, `${name} can be picked`).not.toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+  }
 }
 
 // Presses a day and checks it took the selection.
@@ -36,7 +50,9 @@ async function showMonth(preview: Locator, month: string) {
   for (let turns = 0; turns < 240; turns++) {
     const shown = (await heading.textContent()) ?? ""
     const time = Date.parse(shown.replace(" ", " 1, "))
-    if (time === target) return
+    if (time === target) {
+      return
+    }
     await step(preview, time < target ? "Next month" : "Previous month").click()
     await expect(heading).not.toHaveText(shown)
   }
@@ -47,7 +63,10 @@ async function showMonth(preview: Locator, month: string) {
 const tabStops = (preview: Locator) =>
   preview
     .getByRole("gridcell")
-    .evaluateAll((cells) => cells.filter((cell) => (cell as HTMLElement).tabIndex >= 0).length)
+    .evaluateAll(
+      (cells) =>
+        cells.filter((cell) => (cell as HTMLElement).tabIndex >= 0).length
+    )
 const checks: Record<string, Check> = {
   basic: async (preview) => {
     await pick(preview, "Friday, October 16, 2026", "Tuesday, October 20, 2026")
@@ -106,14 +125,25 @@ const checks: Record<string, Check> = {
     await day(preview, "Tuesday, October 20, 2026").click()
     await expectSelected(preview, "Friday, October 16, 2026")
     await expectSelected(preview, "Tuesday, October 20, 2026", false)
-    await expect(preview.getByRole("grid")).toHaveAttribute("aria-readonly", "true")
+    await expect(preview.getByRole("grid")).toHaveAttribute(
+      "aria-readonly",
+      "true"
+    )
   },
   "two-months": async (preview) => {
-    await expect(preview.getByRole("grid", { name: "October 2026" })).toBeVisible()
-    await expect(preview.getByRole("grid", { name: "November 2026" })).toBeVisible()
+    await expect(
+      preview.getByRole("grid", { name: "October 2026" })
+    ).toBeVisible()
+    await expect(
+      preview.getByRole("grid", { name: "November 2026" })
+    ).toBeVisible()
     await step(preview, "Next month").click()
-    await expect(preview.getByRole("grid", { name: "December 2026" })).toBeVisible()
-    await expect(preview.getByRole("grid", { name: "January 2027" })).toBeVisible()
+    await expect(
+      preview.getByRole("grid", { name: "December 2026" })
+    ).toBeVisible()
+    await expect(
+      preview.getByRole("grid", { name: "January 2027" })
+    ).toBeVisible()
   },
   "fixed-weeks": async (preview) => {
     // February 2026 fills four weeks, but there are always six, after the weekdays' row.
@@ -128,11 +158,16 @@ const checks: Record<string, Check> = {
   "month-year-select": async (preview) => {
     await expect(preview.getByRole("heading")).toHaveText("June 1990")
     await preview.getByRole("combobox", { name: "Year" }).selectOption("1962")
-    await preview.getByRole("combobox", { name: "Month" }).selectOption({ label: "March" })
+    await preview
+      .getByRole("combobox", { name: "Month" })
+      .selectOption({ label: "March" })
     await expect(preview.getByRole("heading")).toHaveText("March 1962")
-    await expect(preview.getByRole("combobox", { name: "Year" }).getByRole("option").first()).toHaveText(
-      "1920",
-    )
+    await expect(
+      preview
+        .getByRole("combobox", { name: "Year" })
+        .getByRole("option")
+        .first()
+    ).toHaveText("1920")
     await day(preview, "Friday, March 16, 1962").click()
     await expectSelected(preview, "Friday, March 16, 1962")
   },
@@ -145,19 +180,27 @@ const checks: Record<string, Check> = {
     await expect(preview.getByRole("heading")).toHaveText("Oktober 2026")
     await expect(
       preview.getByRole("columnheader").first(),
-      "the week starts on Monday, and headers read their full names",
+      "the week starts on Monday, and headers read their full names"
     ).toHaveAccessibleName("Montag")
-    await pick(preview, "Freitag, 16. Oktober 2026", "Dienstag, 20. Oktober 2026")
+    await pick(
+      preview,
+      "Freitag, 16. Oktober 2026",
+      "Dienstag, 20. Oktober 2026"
+    )
   },
   formats: async (preview) => {
-    await expect(preview.locator('[data-slot="calendar-heading"]')).toHaveText(/^Oct . Nov 2026$/)
+    await expect(preview.locator('[data-slot="calendar-heading"]')).toHaveText(
+      /^Oct . Nov 2026$/
+    )
     await expect(preview.getByRole("columnheader").first()).toHaveText("S")
   },
   "custom-day": async (preview) => {
-    await expect(day(preview, "Friday, October 16, 2026").getByText("$100")).toBeVisible()
+    await expect(
+      day(preview, "Friday, October 16, 2026").getByText("$100")
+    ).toBeVisible()
     await expect(
       day(preview, "Sunday, September 27, 2026").getByText("$"),
-      "days of the months around it show no price",
+      "days of the months around it show no price"
     ).toBeHidden()
     await pick(preview, "Friday, October 16, 2026", "Tuesday, October 20, 2026")
   },
@@ -175,14 +218,14 @@ const checks: Record<string, Check> = {
     await day(preview, "Friday, October 16, 2026").click({ force: true })
     await expect(
       day(preview, "Thursday, October 15, 2026"),
-      "a press that would make a stay too short keeps its start",
+      "a press that would make a stay too short keeps its start"
     ).toHaveAttribute("aria-selected", "true")
     await expectSelected(preview, "Friday, October 16, 2026", false)
     await day(preview, "Tuesday, October 20, 2026").click()
     await expectSelected(preview, "Thursday, October 15, 2026")
     await expect(
       day(preview, "Sunday, October 18, 2026"),
-      "the stay may span the booked weekend",
+      "the stay may span the booked weekend"
     ).toHaveAttribute("aria-selected", "true")
     await expectSelected(preview, "Tuesday, October 20, 2026")
   },
@@ -192,7 +235,9 @@ const checks: Record<string, Check> = {
       .locator('section[aria-label="Console"] li:not([aria-hidden])')
     await showMonth(preview, "October 2026")
     await day(preview, "Monday, October 12, 2026").click()
-    await expect(lines.filter({ hasText: "Started on 2026-10-12" })).toHaveCount(1)
+    await expect(
+      lines.filter({ hasText: "Started on 2026-10-12" })
+    ).toHaveCount(1)
     await preview.page().keyboard.press("ArrowRight")
     await expect(lines.last()).toHaveText("Focus on 2026-10-13")
     await preview.page().keyboard.press("Enter")
@@ -205,7 +250,7 @@ const checks: Record<string, Check> = {
       preview
         .locator("xpath=ancestor::figure[1]")
         .locator('section[aria-label="Console"] li:not([aria-hidden])')
-        .last(),
+        .last()
     ).toHaveText(/^Selected 2026-10-20/)
   },
   "time-zone": async (preview) => {

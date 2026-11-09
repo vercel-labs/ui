@@ -7,7 +7,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("the carousel hydrates without mismatches", async ({ page, open }) => {
   await open("carousel")
@@ -18,7 +21,10 @@ test("the carousel hydrates without mismatches", async ({ page, open }) => {
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("a carousel that starts on another page hydrates there", async ({ page, open }) => {
+test("a carousel that starts on another page hydrates there", async ({
+  page,
+  open,
+}) => {
   await open("carousel", { "default-page": "3" })
   await expectShown(page, 2)
   await expect(indicator(page, 3)).toHaveAttribute("aria-selected", "true")
@@ -36,8 +42,13 @@ test("a carousel with several slides to a view hydrates and hides the extra indi
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("a rotating carousel hydrates without mismatches", async ({ page, open }) => {
+test("a rotating carousel hydrates without mismatches", async ({
+  page,
+  open,
+}) => {
   await open("carousel", { playing: "", interval: "5000" })
-  await expect(page.getByRole("button", { name: "Stop slide rotation" })).toBeVisible()
+  await expect(
+    page.getByRole("button", { name: "Stop slide rotation" })
+  ).toBeVisible()
   expect(await hydrationErrors(page)).toEqual([])
 })

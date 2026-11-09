@@ -1,5 +1,11 @@
 import { createTabsController } from "@ui-sdk/core/tabs"
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/solid/tabs"
 import { createSignal } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -29,9 +35,15 @@ function Example() {
           <TabsTab value="sent">Sent</TabsTab>
           <TabsIndicator />
         </TabsList>
-        <TabsPanel value="inbox">3 unread messages from Hollis Grant and Inès Moreau.</TabsPanel>
-        <TabsPanel value="drafts">2 drafts, the last one edited yesterday at 4:12 PM.</TabsPanel>
-        <TabsPanel value="sent">12 messages sent this week, all delivered.</TabsPanel>
+        <TabsPanel value="inbox">
+          3 unread messages from Hollis Grant and Inès Moreau.
+        </TabsPanel>
+        <TabsPanel value="drafts">
+          2 drafts, the last one edited yesterday at 4:12 PM.
+        </TabsPanel>
+        <TabsPanel value="sent">
+          12 messages sent this week, all delivered.
+        </TabsPanel>
       </Tabs>
     </div>
   )

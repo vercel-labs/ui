@@ -14,7 +14,8 @@ async function until(done: () => boolean) {
   }
 }
 // A select keeps its list in the page hidden once it closes, so typing on the trigger finds its items.
-const shownContent = () => document.querySelectorAll('[data-slot$="-content"]:not([hidden])').length
+const shownContent = () =>
+  document.querySelectorAll('[data-slot$="-content"]:not([hidden])').length
 
 let target: HTMLElement
 let app: ReturnType<typeof mount> & { setOpen: (open: boolean) => void }
@@ -24,14 +25,18 @@ afterEach(() => {
 })
 
 // The setup fails any of these that writes state while the options are handed over.
-for (const kind of ["autocomplete", "combobox", "menu", "popover", "select"])
-  for (const bound of [true, false])
+for (const kind of ["autocomplete", "combobox", "menu", "popover", "select"]) {
+  for (const bound of [true, false]) {
     test(`${kind} closed by its parent through ${bound ? "bind:open" : "open"} leaves the page and reports it`, async () => {
       const completed: boolean[] = []
       target = document.body.appendChild(document.createElement("div"))
       app = mount(App, {
         target,
-        props: { kind, bound, onOpenChangeComplete: (open: boolean) => completed.push(open) },
+        props: {
+          kind,
+          bound,
+          onOpenChangeComplete: (open: boolean) => completed.push(open),
+        },
       })
       flushSync()
       app.setOpen(true)
@@ -45,3 +50,5 @@ for (const kind of ["autocomplete", "combobox", "menu", "popover", "select"])
         completed: [true, false],
       })
     })
+  }
+}

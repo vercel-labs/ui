@@ -6,7 +6,10 @@ test.beforeEach(async ({ open }) => {
   await open("tabs", { dir: "rtl" })
 })
 
-test("ArrowLeft moves to the next tab and ArrowRight to the previous one", async ({ page, tab }) => {
+test("ArrowLeft moves to the next tab and ArrowRight to the previous one", async ({
+  page,
+  tab,
+}) => {
   await page.getByRole("button", { name: "Before" }).focus()
   await tab()
   await expect(tabNamed(page, "Account")).toBeFocused()
@@ -24,5 +27,8 @@ test("the indicator covers the selected tab", async ({ page }) => {
 
 test("the activation direction follows the screen", async ({ page }) => {
   await tabNamed(page, "Notifications").click()
-  await expect(page.getByRole("tablist")).toHaveAttribute("data-activation-direction", "left")
+  await expect(page.getByRole("tablist")).toHaveAttribute(
+    "data-activation-direction",
+    "left"
+  )
 })

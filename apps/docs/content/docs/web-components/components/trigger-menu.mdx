@@ -54,12 +54,19 @@ Import the parts and put them together:
 
 <ui-trigger-menu>
   <ui-trigger-menu-input>
-    <textarea aria-label="Message" placeholder="Type @ to mention someone…"></textarea>
+    <textarea
+      aria-label="Message"
+      placeholder="Type @ to mention someone…"
+    ></textarea>
   </ui-trigger-menu-input>
   <ui-trigger-menu-content>
     <ui-trigger-menu-list>
-      <ui-trigger-menu-item value="hollis" label="Hollis Grant">Hollis Grant</ui-trigger-menu-item>
-      <ui-trigger-menu-item value="ines" label="Inès Moreau">Inès Moreau</ui-trigger-menu-item>
+      <ui-trigger-menu-item value="hollis" label="Hollis Grant"
+        >Hollis Grant</ui-trigger-menu-item
+      >
+      <ui-trigger-menu-item value="ines" label="Inès Moreau"
+        >Inès Moreau</ui-trigger-menu-item
+      >
     </ui-trigger-menu-list>
   </ui-trigger-menu-content>
 </ui-trigger-menu>
@@ -169,7 +176,10 @@ Set the `editor` property to connect the menu to a field you render yourself, or
 
 An adapter for another editor reads its text and selection, measures a rectangle at an offset, replaces a range as one undo step, and reports changes. Report changes that weren't the user's with `user: false`, like a collaborator's, and the menu never opens for them.
 
-<TypeTable path="../../packages/core/src/foundation/text/text-editor.ts" name="TextEditorAdapter" />
+<TypeTable
+  path="../../packages/core/src/foundation/text/text-editor.ts"
+  name="TextEditorAdapter"
+/>
 
 ## Undo
 
@@ -219,11 +229,17 @@ Props are attributes in kebab case, like `auto-highlight` and `side-offset`. `tr
 
 ### TriggerMenu
 
-<TypeTable path="../../packages/core/src/components/trigger-menu/trigger-menu.ts" name="TriggerMenuOptions" />
+<TypeTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuOptions"
+/>
 
 ### Triggers
 
-<TypeTable path="../../packages/core/src/components/trigger-menu/trigger-menu.ts" name="TriggerDefinition" />
+<TypeTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerDefinition"
+/>
 
 ### Items as Data
 
@@ -234,7 +250,10 @@ Props are attributes in kebab case, like `auto-highlight` and `side-offset`. `tr
 
 ### Arguments
 
-<TypeTable path="../../packages/core/src/components/trigger-menu/trigger-menu.ts" name="TriggerArgument" />
+<TypeTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerArgument"
+/>
 
 ### TriggerMenuInput
 

@@ -41,7 +41,12 @@ function Example() {
         <Field>
           <FieldLabel>Note</FieldLabel>
           <FieldControl
-            render={<textarea ref={field} placeholder="Call the printer about the proofs." />}
+            render={
+              <textarea
+                ref={field}
+                placeholder="Call the printer about the proofs."
+              />
+            }
             value={note}
             onChange={(event) => setNote(event.currentTarget.value)}
           />

@@ -14,7 +14,10 @@ import type { HourCycle } from "./date-input-model"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * The smallest unit a time input shows.
@@ -43,7 +46,10 @@ function createTimeInputController() {
     /** The value, or `null` while empty or partly filled. */
     getValue: () => string | null
     /** Sets the value. Returns false when it isn't a time, or when canceled. */
-    setValue: (value: string | null, options?: TimeInputChangeOptions) => boolean
+    setValue: (
+      value: string | null,
+      options?: TimeInputChangeOptions
+    ) => boolean
     /** Empties every segment. */
     clear: (options?: TimeInputChangeOptions) => boolean
     /** Focuses a segment, like `"minute"`, or the first one. */
@@ -70,7 +76,10 @@ type TimeInputOptions = {
    * Runs when the value wants to change: once every segment holds something,
    * and again with `null` when one is emptied. `details.cancel()` keeps the value.
    */
-  onValueChange?: (value: string | null, details: ChangeDetails<TimeInputValueChangeReason>) => void
+  onValueChange?: (
+    value: string | null,
+    details: ChangeDetails<TimeInputValueChangeReason>
+  ) => void
   /**
    * The smallest unit it shows.
    * @defaultValue "minute"

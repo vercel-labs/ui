@@ -18,20 +18,28 @@ import { attrs as partAttrs } from "@ui-sdk/core/renderer"
 const coreSrc = path.join(import.meta.dirname, "../../core/src")
 
 // The primitives, found by what each core module exports.
-const modules = import.meta.glob("../../core/src/**/*.ts", { eager: true }) as Record<
-  string,
-  Record<string, unknown>
->
+const modules = import.meta.glob("../../core/src/**/*.ts", {
+  eager: true,
+}) as Record<string, Record<string, unknown>>
 const primitives = Object.entries(modules).flatMap(([file, module]) =>
   Object.entries(module)
-    .filter(([, value]) => typeof value === "function" && isPrimitive(value as Primitive))
-    .map(([name, value]) => ({ name: `${path.basename(file, ".ts")}.${name}`, create: value as Primitive })),
+    .filter(
+      ([, value]) =>
+        typeof value === "function" && isPrimitive(value as Primitive)
+    )
+    .map(([name, value]) => ({
+      name: `${path.basename(file, ".ts")}.${name}`,
+      create: value as Primitive,
+    }))
 )
 
 // Whether a core export is what `definePrimitive` returns: a factory that
 // carries its options' schema, so no other export runs by mistake.
 function isPrimitive(candidate: Primitive) {
-  return candidate.length === 1 && typeof (candidate as { options?: unknown }).options === "object"
+  return (
+    candidate.length === 1 &&
+    typeof (candidate as { options?: unknown }).options === "object"
+  )
 }
 
 // Slot names, read from every `name: slot(` in the core, since instances
@@ -42,9 +50,11 @@ const slotNames = [
       .filter((file) => file.endsWith(".ts"))
       .flatMap((file) =>
         [
-          ...readFileSync(path.join(coreSrc, file), "utf8").matchAll(/^\s+("?)([\w-]+)\1\s*:\s*slot[<(]/gm),
-        ].map((match) => match[2]),
-      ),
+          ...readFileSync(path.join(coreSrc, file), "utf8").matchAll(
+            /^\s+("?)([\w-]+)\1\s*:\s*slot[<(]/gm
+          ),
+        ].map((match) => match[2])
+      )
   ),
 ]
 
@@ -63,16 +73,21 @@ const states: Record<string, unknown>[] = [
 ]
 
 // Props a keyed slot may need.
-const slotProps: Record<string, unknown>[] = [{}, { id: "a", value: "a", item: "a" }]
+const slotProps: Record<string, unknown>[] = [
+  {},
+  { id: "a", value: "a", item: "a" },
+]
 
 // What a slot's element shows: its attributes, plus the live checkedness and
 // value of an input, which Solid and the DOM keep as properties.
 function shown(el: HTMLElement) {
   const attrs = Object.fromEntries(
     [...el.attributes]
-      .filter(({ name }) => name !== "checked" && name !== "value" && name !== "style")
+      .filter(
+        ({ name }) => name !== "checked" && name !== "value" && name !== "style"
+      )
       .map(({ name, value }) => [name, value])
-      .sort(([a], [b]) => a.localeCompare(b)),
+      .sort(([a], [b]) => a.localeCompare(b))
   )
   const style = el
     .getAttribute("style")
@@ -83,7 +98,9 @@ function shown(el: HTMLElement) {
   return {
     ...attrs,
     style,
-    ...(el instanceof HTMLInputElement ? { checked: el.checked, value: el.value } : {}),
+    ...(el instanceof HTMLInputElement
+      ? { checked: el.checked, value: el.value }
+      : {}),
   }
 }
 
@@ -125,7 +142,7 @@ describe("attribute parity with applyAttrs", () => {
             const dispose = render(() => {
               const handle = usePrimitive(
                 () => instance,
-                () => options,
+                () => options
               )
               const part = handle.slot(slot as never, () => props as never)
               const Tag = dynamic(() => tag)
@@ -133,9 +150,10 @@ describe("attribute parity with applyAttrs", () => {
             }, host)
             flush()
             const actual = host.firstElementChild as HTMLElement
-            expect(shown(actual), `${slot} ${JSON.stringify(props)} with ${JSON.stringify(options)}`).toEqual(
-              shown(expected),
-            )
+            expect(
+              shown(actual),
+              `${slot} ${JSON.stringify(props)} with ${JSON.stringify(options)}`
+            ).toEqual(shown(expected))
             dispose()
           }
         }

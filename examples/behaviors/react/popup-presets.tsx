@@ -25,9 +25,14 @@ type PanelOptions = {
 const popupWith = (name: string, preset: PopupPreset) =>
   definePrimitive({
     name,
-    options: { open: "boolean", defaultOpen: "boolean", onOpenChange: "callback" },
+    options: {
+      open: "boolean",
+      defaultOpen: "boolean",
+      onOpenChange: "callback",
+    },
     state: (options: PanelOptions) => popupState(options),
-    sync: (options) => (options.open === undefined ? {} : { open: options.open }),
+    sync: (options) =>
+      options.open === undefined ? {} : { open: options.open },
     api: (context) => createPopup(context, { preset }),
     slots: (slot) => ({
       trigger: popupTrigger(slot),
@@ -37,7 +42,12 @@ const popupWith = (name: string, preset: PopupPreset) =>
     }),
   })
 
-const tags = { trigger: "button", content: "div", title: "h2", close: "button" } as const
+const tags = {
+  trigger: "button",
+  content: "div",
+  title: "h2",
+  close: "button",
+} as const
 
 const filters = createParts(popupWith("filters", popoverPreset), tags)
 const rename = createParts(popupWith("rename", dialogPreset), tags)

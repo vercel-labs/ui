@@ -2,7 +2,8 @@ import "@ui-sdk/web/switch"
 import { createElement, LoaderCircle } from "lucide"
 import { log } from "../../../shared/web/log"
 
-const save = (_checked: boolean) => new Promise((resolve) => setTimeout(resolve, 800))
+const save = (_checked: boolean) =>
+  new Promise((resolve) => setTimeout(resolve, 800))
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -19,12 +20,21 @@ function mount(root: HTMLElement) {
 
   backups.addEventListener("checkedchange", (event) => {
     const { value, reason } = event.detail
-    if (reason === "imperative") return
+    if (reason === "imperative") {
+      return
+    }
     event.preventDefault()
-    if (saving) return
+    if (saving) {
+      return
+    }
     saving = true
     backups.setAttribute("aria-busy", "true")
-    thumb.replaceChildren(createElement(LoaderCircle, { "data-slot": "spinner", "aria-hidden": "true" }))
+    thumb.replaceChildren(
+      createElement(LoaderCircle, {
+        "data-slot": "spinner",
+        "aria-hidden": "true",
+      })
+    )
     log(root, "Saving…")
     save(value).then(() => {
       saving = false

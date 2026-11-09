@@ -1,4 +1,7 @@
-import { createSelectController, type SelectController } from "@ui-sdk/core/select"
+import {
+  createSelectController,
+  type SelectController,
+} from "@ui-sdk/core/select"
 import * as classes from "./classes"
 import "./styles.css"
 import type { Variant } from "./variants"
@@ -15,7 +18,11 @@ type Env = {
 
 type Framework = "react" | "vue" | "web"
 
-const frameworks: Record<Framework, string> = { react: "React", vue: "Vue", web: "Web Components" }
+const frameworks: Record<Framework, string> = {
+  react: "React",
+  vue: "Vue",
+  web: "Web Components",
+}
 
 // A short, readable form of a value for the log: strings, lists and country objects.
 function show(value: unknown) {
@@ -30,10 +37,11 @@ function show(value: unknown) {
 function kitchenSink(
   root: HTMLElement,
   framework: Framework,
-  mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
+  mount: (slot: HTMLElement, variant: Variant, env: Env) => void
 ) {
   document.title = `Select kitchen sink · ${frameworks[framework]}`
-  root.className = "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
+  root.className =
+    "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
   root.innerHTML = `
     <header class="sticky top-0 z-10 flex flex-wrap items-center gap-4 border-b border-neutral-200 bg-white/90 px-6 py-3 backdrop-blur">
       <h1 class="text-sm font-semibold">Select kitchen sink</h1>
@@ -42,8 +50,10 @@ function kitchenSink(
           .map(
             ([id, label]) =>
               `<a href="?fixture=select-kitchen-sink&framework=${id}" class="rounded-md px-2.5 py-1 ${
-                id === framework ? "bg-neutral-950 text-white" : "text-neutral-600 hover:bg-neutral-100"
-              }">${label}</a>`,
+                id === framework
+                  ? "bg-neutral-950 text-white"
+                  : "text-neutral-600 hover:bg-neutral-100"
+              }">${label}</a>`
           )
           .join("")}
       </nav>
@@ -60,7 +70,9 @@ function kitchenSink(
   `
   const main = root.querySelector("main")!
   const logList = root.querySelector<HTMLOListElement>("[data-log]")!
-  root.querySelector("[data-clear]")!.addEventListener("click", () => logList.replaceChildren())
+  root
+    .querySelector("[data-clear]")!
+    .addEventListener("click", () => logList.replaceChildren())
 
   const sections = new Map<string, HTMLElement>()
   for (const variant of variants) {
@@ -69,7 +81,8 @@ function kitchenSink(
       const section = document.createElement("section")
       section.innerHTML = `<h2 class="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">${variant.section}</h2>`
       grid = document.createElement("div")
-      grid.className = "grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3"
+      grid.className =
+        "grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-3"
       section.append(grid)
       main.append(section)
       sections.set(variant.section, grid)
@@ -85,7 +98,9 @@ function chips(variant: Variant) {
     ...variant.content,
     ...(variant.triggerDisabled && { "SelectTrigger.disabled": true }),
     ...(variant.clear && { SelectClear: variant.clear }),
-    ...(variant.indicatorKeepMounted && { "SelectItemIndicator.keepMounted": true }),
+    ...(variant.indicatorKeepMounted && {
+      "SelectItemIndicator.keepMounted": true,
+    }),
     ...(variant.arrow && { SelectArrow: true }),
     ...(variant.portal && { container: "#portal" }),
     ...(variant.controlled && { controlled: variant.controlled }),
@@ -93,13 +108,16 @@ function chips(variant: Variant) {
   return Object.entries(props)
     .map(
       ([key, value]) =>
-        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`,
+        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`
     )
     .join("")
 }
 
 // Where pinned triggers sit. Several in one corner stack away from the edge.
-const corners: Record<string, { x: string; y: "top" | "bottom"; start: number }> = {
+const corners: Record<
+  string,
+  { x: string; y: "top" | "bottom"; start: number }
+> = {
   "top-left": { x: "left: 16px", y: "top", start: 64 },
   "top-right": { x: "right: 16px", y: "top", start: 64 },
   "bottom-left": { x: "left: 16px", y: "bottom", start: 16 },
@@ -120,10 +138,11 @@ function card(
   variant: Variant,
   framework: Framework,
   mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
-  logList: HTMLOListElement,
+  logList: HTMLOListElement
 ) {
   const el = document.createElement("article")
-  el.className = "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
+  el.className =
+    "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
   el.dataset.variant = variant.id
   el.innerHTML = `
     <div>
@@ -161,7 +180,9 @@ function card(
     form.append(slot, buttons)
     form.addEventListener("submit", (event) => {
       event.preventDefault()
-      const entries = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
+      const entries = [...new FormData(form)].map(
+        ([name, value]) => `${name}=${value}`
+      )
       env.log(`submit ${entries.join("&") || "(nothing)"}`)
     })
     form.addEventListener("reset", () => env.log("reset"))
@@ -188,7 +209,8 @@ function card(
     }
     case "scroll": {
       const box = document.createElement("div")
-      box.className = "h-32 w-full overflow-y-auto rounded-md border border-dashed border-neutral-300 p-3"
+      box.className =
+        "h-32 w-full overflow-y-auto rounded-md border border-dashed border-neutral-300 p-3"
       box.innerHTML = `<div class="h-12 text-xs text-neutral-400">Scroll ↓</div>`
       const inner = document.createElement("div")
       inner.className = "pb-32"
@@ -199,7 +221,8 @@ function card(
     }
     case "clip": {
       const box = document.createElement("div")
-      box.className = "h-12 w-full overflow-hidden rounded-md border border-dashed border-neutral-300 p-2"
+      box.className =
+        "h-12 w-full overflow-hidden rounded-md border border-dashed border-neutral-300 p-2"
       box.append(target)
       stage.append(box)
       break
@@ -248,13 +271,21 @@ function card(
     const buttons = document.createElement("div")
     buttons.className = "flex flex-wrap gap-1.5"
     buttons.append(
-      button("Open", () => controller.open().then((result) => env.log(`open() resolved (${result.reason})`))),
+      button("Open", () =>
+        controller
+          .open()
+          .then((result) => env.log(`open() resolved (${result.reason})`))
+      ),
       button("Close", () => controller.close()),
       button("Toggle", () => controller.toggle()),
       button("Set", () => controller.setValue(sampleValue(variant))),
       button("Clear", () => controller.clear()),
-      button("Get", () => env.log(`getValue ${show(controller.getValue())} · isOpen ${controller.isOpen()}`)),
-      button("Focus", () => controller.focus()),
+      button("Get", () =>
+        env.log(
+          `getValue ${show(controller.getValue())} · isOpen ${controller.isOpen()}`
+        )
+      ),
+      button("Focus", () => controller.focus())
     )
     stage.after(buttons)
   }

@@ -29,14 +29,16 @@ function mount(root: HTMLElement) {
                     ${createElement(command.icon, { "aria-hidden": "true" }).outerHTML}
                   </ui-trigger-menu-item-icon>
                   ${command.value}
-                </ui-trigger-menu-item>`,
+                </ui-trigger-menu-item>`
             )
             .join("")}
         </ui-trigger-menu-list>
       </ui-trigger-menu-content>
     </ui-trigger-menu>
   `
-  root.querySelector("ui-trigger-menu")!.triggers = [{ char: "/", boundary: "start", type: "command" }]
+  root.querySelector("ui-trigger-menu")!.triggers = [
+    { char: "/", boundary: "start", type: "command" },
+  ]
 }
 
 export { mount }

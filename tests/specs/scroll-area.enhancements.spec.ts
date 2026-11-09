@@ -27,7 +27,8 @@ const distanceToEnd = async (page: Page, name: string) => {
   return scroll.maxTop - scroll.top
 }
 
-const press = (page: Page, name: string) => page.getByRole("button", { name, exact: true }).click()
+const press = (page: Page, name: string) =>
+  page.getByRole("button", { name, exact: true }).click()
 
 // Runs in the page.
 const clickButton = (name: string) =>
@@ -40,9 +41,14 @@ test.describe("track", { tag: "@enhancement" }, () => {
     await open("scroll-area")
   })
 
-  test("pressing the track pages by most of a viewport, like a native scrollbar", async ({ page }) => {
+  test("pressing the track pages by most of a viewport, like a native scrollbar", async ({
+    page,
+  }) => {
     const track = await trackBox(page, tags.label)
-    await page.mouse.click(track.x + track.width / 2, track.y + track.height - 4)
+    await page.mouse.click(
+      track.x + track.width / 2,
+      track.y + track.height - 4
+    )
     const scroll = await scrollOf(viewport(page, tags.label))
     await expect
       .poll(async () => (await scrollOf(viewport(page, tags.label))).top)
@@ -52,7 +58,9 @@ test.describe("track", { tag: "@enhancement" }, () => {
   test("Escape during a thumb drag puts the content back", async ({ page }) => {
     await dragBy(page, thumb(page, tags.label), 0, 60)
     // Pointer moves are applied once per frame.
-    await expect.poll(async () => (await scrollOf(viewport(page, tags.label))).top).toBeGreaterThan(0)
+    await expect
+      .poll(async () => (await scrollOf(viewport(page, tags.label))).top)
+      .toBeGreaterThan(0)
     await page.keyboard.press("Escape")
     await page.mouse.up()
     expect((await scrollOf(viewport(page, tags.label))).top).toBe(0)
@@ -64,26 +72,42 @@ test.describe("keyboard", { tag: "@enhancement" }, () => {
     await open("scroll-area")
   })
 
-  test("a viewport with focusable content is no tab stop: Tab goes to the content", async ({ page }) => {
+  test("a viewport with focusable content is no tab stop: Tab goes to the content", async ({
+    page,
+  }) => {
     await expect(viewport(page, gallery.label)).not.toHaveAttribute("tabindex")
   })
 })
 
 test.describe("native scrollbars", { tag: "@enhancement" }, () => {
-  test("without custom scrollbars, the native ones stay", async ({ page, open, browserName }) => {
-    test.skip(browserName === "firefox", "Playwright's Firefox hides every scrollbar itself.")
+  test("without custom scrollbars, the native ones stay", async ({
+    page,
+    open,
+    browserName,
+  }) => {
+    test.skip(
+      browserName === "firefox",
+      "Playwright's Firefox hides every scrollbar itself."
+    )
     await open("scroll-area", { native: "" })
     await expect
-      .poll(() => viewport(page, tags.label).evaluate((el) => getComputedStyle(el).scrollbarWidth))
+      .poll(() =>
+        viewport(page, tags.label).evaluate(
+          (el) => getComputedStyle(el).scrollbarWidth
+        )
+      )
       .toBe("auto")
   })
 
-  test("hiding native scrollbars injects no style element", async ({ page, open }) => {
+  test("hiding native scrollbars injects no style element", async ({
+    page,
+    open,
+  }) => {
     await open("scroll-area")
     const injected = await page.evaluate(() =>
       Array.from(document.querySelectorAll("style")).some((style) =>
-        style.textContent?.includes("scrollbar-width"),
-      ),
+        style.textContent?.includes("scrollbar-width")
+      )
     )
     expect(injected).toBe(false)
   })
@@ -94,7 +118,9 @@ test.describe("state", { tag: "@enhancement" }, () => {
     await open("scroll-area")
   })
 
-  test("the root says which axes overflow and which edges the view is at", async ({ page }) => {
+  test("the root says which axes overflow and which edges the view is at", async ({
+    page,
+  }) => {
     const root = area(page, tags.label)
     await expect(root).toHaveAttribute("data-overflow-y", "")
     await expect(root).not.toHaveAttribute("data-overflow-x")
@@ -106,7 +132,9 @@ test.describe("state", { tag: "@enhancement" }, () => {
     await expect(root).not.toHaveAttribute("data-at-start")
   })
 
-  test("CSS variables say how far the content reaches past each edge, and the progress", async ({ page }) => {
+  test("CSS variables say how far the content reaches past each edge, and the progress", async ({
+    page,
+  }) => {
     await setScroll(viewport(page, tags.label), { top: 100 })
     await settle(page)
     const { maxTop } = await scrollOf(viewport(page, tags.label))
@@ -120,12 +148,16 @@ test.describe("state", { tag: "@enhancement" }, () => {
     expect(Number(variables.progress)).toBeCloseTo(100 / maxTop, 3)
   })
 
-  test("the variables don't inherit, and a child of the root takes them with inherit", async ({ page }) => {
+  test("the variables don't inherit, and a child of the root takes them with inherit", async ({
+    page,
+  }) => {
     await setScroll(viewport(page, tags.label), { top: 100 })
     await settle(page)
     const seen = await area(page, tags.label).evaluate((el) => {
       const read = (target: Element) =>
-        getComputedStyle(target).getPropertyValue("--scroll-area-overflow-y-start").trim()
+        getComputedStyle(target)
+          .getPropertyValue("--scroll-area-overflow-y-start")
+          .trim()
       const probe = document.createElement("div")
       probe.style.setProperty("--scroll-area-overflow-y-start", "inherit")
       el.append(probe)
@@ -146,48 +178,92 @@ test.describe("scrollbar types", { tag: "@enhancement" }, () => {
     open,
   }) => {
     await open("scroll-area", { type: "hover", delay: "200" })
-    await expect(scrollbar(page, tags.label)).not.toHaveAttribute("data-visible")
+    await expect(scrollbar(page, tags.label)).not.toHaveAttribute(
+      "data-visible"
+    )
     await viewport(page, tags.label).hover()
-    await expect(scrollbar(page, tags.label)).toHaveAttribute("data-visible", "")
+    await expect(scrollbar(page, tags.label)).toHaveAttribute(
+      "data-visible",
+      ""
+    )
     await page.getByRole("button", { name: "Before" }).hover()
-    await expect(scrollbar(page, tags.label)).toHaveAttribute("data-visible", "")
-    await expect(scrollbar(page, tags.label)).not.toHaveAttribute("data-visible")
+    await expect(scrollbar(page, tags.label)).toHaveAttribute(
+      "data-visible",
+      ""
+    )
+    await expect(scrollbar(page, tags.label)).not.toHaveAttribute(
+      "data-visible"
+    )
   })
 
-  test("scroll shows the scrollbar only while scrolling, not on hover", async ({ page, open }) => {
+  test("scroll shows the scrollbar only while scrolling, not on hover", async ({
+    page,
+    open,
+  }) => {
     await open("scroll-area", { type: "scroll", delay: "100" })
     await viewport(page, tags.label).hover()
     await page.waitForTimeout(50)
-    await expect(scrollbar(page, tags.label)).not.toHaveAttribute("data-visible")
+    await expect(scrollbar(page, tags.label)).not.toHaveAttribute(
+      "data-visible"
+    )
     await page.mouse.wheel(0, 100)
-    await expect(scrollbar(page, tags.label)).toHaveAttribute("data-visible", "")
-    await expect(scrollbar(page, tags.label)).not.toHaveAttribute("data-visible")
+    await expect(scrollbar(page, tags.label)).toHaveAttribute(
+      "data-visible",
+      ""
+    )
+    await expect(scrollbar(page, tags.label)).not.toHaveAttribute(
+      "data-visible"
+    )
   })
 
-  test("scroll shows only the scrollbar of the axis that scrolls", async ({ page, open }) => {
+  test("scroll shows only the scrollbar of the axis that scrolls", async ({
+    page,
+    open,
+  }) => {
     await open("scroll-area", { type: "scroll" })
     await setScroll(viewport(page, gallery.label), { top: 100 })
-    await expect(scrollbar(page, gallery.label)).toHaveAttribute("data-visible", "")
-    await expect(scrollbar(page, gallery.label, "horizontal")).not.toHaveAttribute("data-visible")
+    await expect(scrollbar(page, gallery.label)).toHaveAttribute(
+      "data-visible",
+      ""
+    )
+    await expect(
+      scrollbar(page, gallery.label, "horizontal")
+    ).not.toHaveAttribute("data-visible")
   })
 
-  test("auto shows the scrollbar whenever the content overflows", async ({ page, open }) => {
+  test("auto shows the scrollbar whenever the content overflows", async ({
+    page,
+    open,
+  }) => {
     await open("scroll-area", { type: "auto" })
-    await expect(scrollbar(page, tags.label)).toHaveAttribute("data-visible", "")
+    await expect(scrollbar(page, tags.label)).toHaveAttribute(
+      "data-visible",
+      ""
+    )
   })
 
-  test("always shows the scrollbar even when the content fits", async ({ page, open }) => {
+  test("always shows the scrollbar even when the content fits", async ({
+    page,
+    open,
+  }) => {
     await open("scroll-area", { type: "always" })
     await expect(scrollbar(page, scrollAreaFixture.short.label)).toBeVisible()
-    await expect(scrollbar(page, scrollAreaFixture.short.label)).toHaveAttribute("data-visible", "")
+    await expect(
+      scrollbar(page, scrollAreaFixture.short.label)
+    ).toHaveAttribute("data-visible", "")
   })
 
-  test("a hidden scrollbar lets presses through to the content under it", async ({ page, open }) => {
+  test("a hidden scrollbar lets presses through to the content under it", async ({
+    page,
+    open,
+  }) => {
     await open("scroll-area", { type: "scroll" })
     const hidden = await box(scrollbar(page, gallery.label))
     const hit = await page.evaluate(
-      ({ x, y }) => document.elementFromPoint(x, y)?.closest(".scroll-area-scrollbar") ?? null,
-      { x: hidden.x + hidden.width / 2, y: hidden.y + 20 },
+      ({ x, y }) =>
+        document.elementFromPoint(x, y)?.closest(".scroll-area-scrollbar") ??
+        null,
+      { x: hidden.x + hidden.width / 2, y: hidden.y + 20 }
     )
     expect(hit).toBeNull()
   })
@@ -203,7 +279,9 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
     await expect(area(page, chat.label)).toHaveAttribute("data-sticking", "")
   })
 
-  test("new messages, streamed words and late images keep the end in view", async ({ page }) => {
+  test("new messages, streamed words and late images keep the end in view", async ({
+    page,
+  }) => {
     await press(page, "Add message")
     await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
     await press(page, "Stream")
@@ -214,7 +292,9 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
     await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
   })
 
-  test("a wheel toward the start lets go, and growth no longer moves the view", async ({ page }) => {
+  test("a wheel toward the start lets go, and growth no longer moves the view", async ({
+    page,
+  }) => {
     await viewport(page, chat.label).hover()
     await page.mouse.wheel(0, -120)
     await expect(area(page, chat.label)).not.toHaveAttribute("data-sticking")
@@ -251,20 +331,27 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
     await expect(area(page, chat.label)).not.toHaveAttribute("data-sticking")
   })
 
-  test("a wheel toward the start inside a scroller in the content keeps following", async ({ page }) => {
+  test("a wheel toward the start inside a scroller in the content keeps following", async ({
+    page,
+  }) => {
     // A code block in a message, scrolled partway, scrolls itself.
     await viewport(page, chat.label).evaluate((el) => {
       const block = document.createElement("pre")
       block.setAttribute("data-testid", "nested")
       block.style.cssText = "height:40px;overflow:auto;margin:0"
-      block.textContent = Array.from({ length: 12 }, (_, line) => `line ${line + 1}`).join("\n")
+      block.textContent = Array.from(
+        { length: 12 },
+        (_, line) => `line ${line + 1}`
+      ).join("\n")
       el.firstElementChild!.append(block)
       block.scrollTop = 60
     })
     await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
     await page.getByTestId("nested").hover()
     await page.mouse.wheel(0, -20)
-    await expect.poll(() => page.getByTestId("nested").evaluate((el) => el.scrollTop)).toBeLessThan(60)
+    await expect
+      .poll(() => page.getByTestId("nested").evaluate((el) => el.scrollTop))
+      .toBeLessThan(60)
     await expect(area(page, chat.label)).toHaveAttribute("data-sticking", "")
   })
 
@@ -283,7 +370,10 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
     await expect(area(page, chat.label)).toHaveAttribute("data-sticking", "")
   })
 
-  test("the controller reads where the view is from a scroll listener", async ({ page, framework }) => {
+  test("the controller reads where the view is from a scroll listener", async ({
+    page,
+    framework,
+  }) => {
     test.skip(framework !== "web", "The element's api is the controller.")
     const result = await area(page, chat.label).evaluate((el) => {
       type Api = {
@@ -294,14 +384,20 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
       const api = (el as HTMLElement & { api: Api }).api
       const view = el.querySelector('[aria-label="Messages"]')!
       return new Promise<boolean[]>((resolve) => {
-        view.addEventListener("scroll", () => resolve([api.isAtStart(), api.isAtEnd()]), { once: true })
+        view.addEventListener(
+          "scroll",
+          () => resolve([api.isAtStart(), api.isAtEnd()]),
+          { once: true }
+        )
         api.scrollToStart({ behavior: "instant" })
       })
     })
     expect(result).toEqual([true, false])
   })
 
-  test("a scroll toward the start from the app or find in page lets go too", async ({ page }) => {
+  test("a scroll toward the start from the app or find in page lets go too", async ({
+    page,
+  }) => {
     await setScroll(viewport(page, chat.label), { top: 0 })
     await expect(area(page, chat.label)).not.toHaveAttribute("data-sticking")
     await press(page, "Add message")
@@ -316,13 +412,19 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
     // Firefox scrolls a few hundred pixels at most per wheel event.
     await expect(async () => {
       await page.mouse.wheel(0, 400)
-      await expect(area(page, chat.label)).toHaveAttribute("data-sticking", "", { timeout: 300 })
+      await expect(area(page, chat.label)).toHaveAttribute(
+        "data-sticking",
+        "",
+        { timeout: 300 }
+      )
     }).toPass()
     await press(page, "Add message")
     await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
   })
 
-  test("dragging the thumb toward the start lets go, and back to the end follows", async ({ page }) => {
+  test("dragging the thumb toward the start lets go, and back to the end follows", async ({
+    page,
+  }) => {
     await dragBy(page, thumb(page, chat.label), 0, -60)
     await page.mouse.up()
     await expect(area(page, chat.label)).not.toHaveAttribute("data-sticking")
@@ -334,20 +436,31 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
   test("keeping the end in view never scrolls the page", async ({ page }) => {
     await page.evaluate(() => scrollTo(0, 40))
     // Clicked from the page, since Playwright's own click may scroll to the button.
-    for (let index = 0; index < 3; index++) await page.evaluate(clickButton, "Add message")
+    for (let index = 0; index < 3; index++) {
+      await page.evaluate(clickButton, "Add message")
+    }
     await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
     expect(await page.evaluate(() => scrollY)).toBe(40)
   })
 
-  test("keeping the end in view doesn't flash the scrollbars as scrolling", async ({ page }) => {
+  test("keeping the end in view doesn't flash the scrollbars as scrolling", async ({
+    page,
+  }) => {
     await settle(page)
     const flashes = await page.evaluate(async () => {
-      const root = document.querySelector('[aria-label="Messages"]')!.parentElement!
+      const root = document.querySelector(
+        '[aria-label="Messages"]'
+      )!.parentElement!
       let seen = 0
-      const observer = new MutationObserver(() => root.hasAttribute("data-scrolling") && seen++)
-      observer.observe(root, { attributes: true, attributeFilter: ["data-scrolling"] })
+      const observer = new MutationObserver(
+        () => root.hasAttribute("data-scrolling") && seen++
+      )
+      observer.observe(root, {
+        attributes: true,
+        attributeFilter: ["data-scrolling"],
+      })
       const stream = Array.from(document.querySelectorAll("button")).find(
-        (button) => button.textContent === "Stream",
+        (button) => button.textContent === "Stream"
       )!
       for (let index = 0; index < 5; index++) {
         stream.click()
@@ -360,19 +473,29 @@ test.describe("sticking to the end", { tag: "@enhancement" }, () => {
     expect(flashes).toBe(0)
   })
 
-  test("a smooth scroll-behavior doesn't slow down keeping the end in view", async ({ page }) => {
-    await viewport(page, chat.label).evaluate((el) => (el.style.scrollBehavior = "smooth"))
+  test("a smooth scroll-behavior doesn't slow down keeping the end in view", async ({
+    page,
+  }) => {
+    await viewport(page, chat.label).evaluate(
+      (el) => (el.style.scrollBehavior = "smooth")
+    )
     await press(page, "Add message")
     await settle(page)
     expect(await distanceToEnd(page, chat.label)).toBeLessThan(1)
   })
 
-  test("text selection in progress isn't pulled away by growth", async ({ page }) => {
-    const message = viewport(page, chat.label).getByText("Message 19", { exact: true })
+  test("text selection in progress isn't pulled away by growth", async ({
+    page,
+  }) => {
+    const message = viewport(page, chat.label).getByText("Message 19", {
+      exact: true,
+    })
     const start = await box(message)
     await page.mouse.move(start.x + 2, start.y + start.height / 2)
     await page.mouse.down()
-    await page.mouse.move(start.x + 40, start.y + start.height / 2, { steps: 3 })
+    await page.mouse.move(start.x + 40, start.y + start.height / 2, {
+      steps: 3,
+    })
     const top = (await scrollOf(viewport(page, chat.label))).top
     await page.evaluate(clickButton, "Add message")
     await settle(page)
@@ -389,7 +512,9 @@ test.describe("jump to latest", { tag: "@enhancement" }, () => {
 
   const jump = (page: Page) => page.getByRole("button", { name: chat.jump })
 
-  test("it's out of reach at the end, and shows once the view moves away", async ({ page }) => {
+  test("it's out of reach at the end, and shows once the view moves away", async ({
+    page,
+  }) => {
     await expect(jump(page)).toHaveAttribute("inert", "")
     await expect(jump(page)).not.toHaveAttribute("data-visible")
     await setScroll(viewport(page, chat.label), { top: 0 })
@@ -397,7 +522,9 @@ test.describe("jump to latest", { tag: "@enhancement" }, () => {
     await expect(jump(page)).not.toHaveAttribute("inert")
   })
 
-  test("it scrolls to the end, follows the end again, and hides at once", async ({ page }) => {
+  test("it scrolls to the end, follows the end again, and hides at once", async ({
+    page,
+  }) => {
     await setScroll(viewport(page, chat.label), { top: 0 })
     await jump(page).click()
     await expect(jump(page)).not.toHaveAttribute("data-visible")
@@ -407,7 +534,9 @@ test.describe("jump to latest", { tag: "@enhancement" }, () => {
     await expect.poll(() => distanceToEnd(page, chat.label)).toBeLessThan(1)
   })
 
-  test("from the keyboard, focus moves to the viewport instead of the page", async ({ page }) => {
+  test("from the keyboard, focus moves to the viewport instead of the page", async ({
+    page,
+  }) => {
     await setScroll(viewport(page, chat.label), { top: 0 })
     await expect(jump(page)).not.toHaveAttribute("inert")
     await jump(page).focus()
@@ -424,10 +553,16 @@ test.describe("jump to latest", { tag: "@enhancement" }, () => {
 })
 
 test.describe("hidden scrollbars", { tag: "@enhancement" }, () => {
-  test("a scrollbar shows its thumb as soon as it's hovered", async ({ page, open }) => {
+  test("a scrollbar shows its thumb as soon as it's hovered", async ({
+    page,
+    open,
+  }) => {
     await open("scroll-area", { type: "hover" })
     await pointAt(page, scrollbar(page, tags.label))
-    await expect(scrollbar(page, tags.label)).toHaveAttribute("data-visible", "")
+    await expect(scrollbar(page, tags.label)).toHaveAttribute(
+      "data-visible",
+      ""
+    )
   })
 })
 
@@ -453,9 +588,15 @@ test("a scroll area in another document times its scrollbars with that document'
     const area = document.querySelector("ui-scroll-area")!
     frame.contentDocument!.body.append(area)
     await new Promise((resolve) => setTimeout(resolve, 50))
-    const viewport = area.querySelector<HTMLElement>("[data-slot='scroll-area-viewport']")!
+    const viewport = area.querySelector<HTMLElement>(
+      "[data-slot='scroll-area-viewport']"
+    )!
     // The iframe has none of the page's styles.
-    Object.assign(viewport.style, { display: "block", height: "40px", overflow: "auto" })
+    Object.assign(viewport.style, {
+      display: "block",
+      height: "40px",
+      overflow: "auto",
+    })
     await new Promise((resolve) => setTimeout(resolve, 50))
     viewport.scrollTop = 40
     await new Promise((resolve) => setTimeout(resolve, 100))

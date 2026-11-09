@@ -33,13 +33,23 @@
 </script>
 
 {#if data}
-  <Combobox items={countries} name="country" {defaultValue} {multiple} {presentation} {defaultOpen}>
+  <Combobox
+    items={countries}
+    name="country"
+    {defaultValue}
+    {multiple}
+    {presentation}
+    {defaultOpen}
+  >
     {#if multiple}
       <ComboboxChips>
         <ComboboxValue>
           {#snippet children(state)}
             {#each state.value as string[] as item (item)}
-              <ComboboxChip value={item}><ComboboxChipRemove aria-label="Remove">×</ComboboxChipRemove></ComboboxChip>
+              <ComboboxChip value={item}
+                ><ComboboxChipRemove aria-label="Remove">×</ComboboxChipRemove
+                ></ComboboxChip
+              >
             {/each}
           {/snippet}
         </ComboboxValue>
@@ -50,12 +60,21 @@
     {/if}
   </Combobox>
 {:else}
-  <Combobox name="country" {defaultValue} {multiple} {itemToLabel} {presentation} {defaultOpen}>
+  <Combobox
+    name="country"
+    {defaultValue}
+    {multiple}
+    {itemToLabel}
+    {presentation}
+    {defaultOpen}
+  >
     <ComboboxInput aria-label="Country" />
     <ComboboxContent>
       <ComboboxList>
         {#each countries as country (country.value)}
-          <ComboboxItem value={country.value} label={country.label}>{country.label}</ComboboxItem>
+          <ComboboxItem value={country.value} label={country.label}
+            >{country.label}</ComboboxItem
+          >
         {/each}
       </ComboboxList>
     </ComboboxContent>

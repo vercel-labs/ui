@@ -50,7 +50,9 @@ const start: Record<string, ResizeBox> = {
 function clock(minutes: number, twelve: boolean) {
   const h = Math.floor(minutes / 60)
   const m = String(minutes % 60).padStart(2, "0")
-  if (!twelve) return `${h}:${m}`
+  if (!twelve) {
+    return `${h}:${m}`
+  }
   return `${h % 12 || 12}${m === "00" ? "" : `:${m}`}${h < 12 ? "am" : "pm"}`
 }
 
@@ -59,7 +61,10 @@ function range(box: ResizeBox, twelve: boolean) {
   return `${clock(from, twelve)}–${clock(from + (box.height / hour) * 60, twelve)}`
 }
 
-function snap(previous: Record<string, ResizeBox>, next: Record<string, ResizeBox>) {
+function snap(
+  previous: Record<string, ResizeBox>,
+  next: Record<string, ResizeBox>
+) {
   const result: Record<string, ResizeBox> = {}
   for (const key of Object.keys(next)) {
     const box = next[key]
@@ -67,8 +72,12 @@ function snap(previous: Record<string, ResizeBox>, next: Record<string, ResizeBo
     let x = before.x
     if (box.x !== before.x) {
       const moved = box.x - before.x
-      const columns = Math.abs(moved) <= 10 ? 1 : Math.round(Math.abs(moved) / day)
-      x = Math.min(Math.max(before.x + Math.sign(moved) * columns * day, 0), width - day)
+      const columns =
+        Math.abs(moved) <= 10 ? 1 : Math.round(Math.abs(moved) / day)
+      x = Math.min(
+        Math.max(before.x + Math.sign(moved) * columns * day, 0),
+        width - day
+      )
     }
     result[key] = { ...box, x, width: day }
   }
@@ -97,7 +106,7 @@ const Event = React.memo(function Event({
       aria-label={`${name}, ${range(box, twelve)}, ${days[Math.round(box.x / day)]}. Arrow keys move it.`}
       className={cn(
         "group/box cursor-move p-[3px] outline-none focus-visible:z-20 data-dragging:z-20 focus-visible:[&>div]:outline-2 focus-visible:[&>div]:outline-solid focus-visible:[&>div]:outline-offset-1 focus-visible:[&>div]:outline-[#006bff]",
-        active && "z-20",
+        active && "z-20"
       )}
     >
       <div
@@ -107,14 +116,14 @@ const Event = React.memo(function Event({
           kind === "meeting" && "border border-foreground bg-background",
           kind === "focus" && "bg-foreground text-background",
           kind === "away" &&
-            "border border-foreground bg-[repeating-linear-gradient(135deg,color-mix(in_oklab,var(--foreground)_14%,transparent)_0_1px,transparent_1px_7px)] bg-background",
+            "border border-foreground bg-[repeating-linear-gradient(135deg,color-mix(in_oklab,var(--foreground)_14%,transparent)_0_1px,transparent_1px_7px)] bg-background"
         )}
       >
         <span
           className={cn(
             "leading-tight font-medium tracking-[-0.01em]",
             small ? "text-base" : "text-[13px]",
-            box.height >= 90 ? "line-clamp-2 shrink-0" : "truncate",
+            box.height >= 90 ? "line-clamp-2 shrink-0" : "truncate"
           )}
         >
           {name}
@@ -123,7 +132,7 @@ const Event = React.memo(function Event({
           <span
             className={cn(
               "shrink-0 font-mono text-[10px] tabular-nums",
-              kind === "focus" ? "text-background/70" : "text-muted-foreground",
+              kind === "focus" ? "text-background/70" : "text-muted-foreground"
             )}
           >
             {range(box, twelve)}
@@ -147,32 +156,50 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
   const [twelve, setTwelve] = React.useState(false)
   const reveal = React.useCallback(
     (column: number) =>
-      setOffset((current) => Math.min(Math.max(current, column - count + 1), column, days.length - count)),
-    [count],
+      setOffset((current) =>
+        Math.min(
+          Math.max(current, column - count + 1),
+          column,
+          days.length - count
+        )
+      ),
+    [count]
   )
   React.useEffect(() => {
     const next = scale * count * day < 360 ? 3 : 5
-    if (next !== count) setCount(next)
+    if (next !== count) {
+      setCount(next)
+    }
     setOffset((current) => Math.min(current, days.length - next))
   }, [scale, count])
   const onBoxesChange = React.useCallback(
     (next: Record<string, ResizeBox>) =>
       setBoxes((previous) => {
         const result = snap(previous, next)
-        const moved = Object.keys(result).find((key) => result[key].x !== previous[key].x)
-        if (moved) reveal(result[moved].x / day)
+        const moved = Object.keys(result).find(
+          (key) => result[key].x !== previous[key].x
+        )
+        if (moved) {
+          reveal(result[moved].x / day)
+        }
         return result
       }),
-    [reveal],
+    [reveal]
   )
   const onFocus = (event: React.FocusEvent) => {
-    const column = (event.target as HTMLElement).closest<HTMLElement>("[data-day]")?.dataset.day
-    if (column !== undefined) reveal(Number(column))
+    const column = (event.target as HTMLElement).closest<HTMLElement>(
+      "[data-day]"
+    )?.dataset.day
+    if (column !== undefined) {
+      reveal(Number(column))
+    }
   }
   return (
     <Poster
       fig={fig}
-      head={"PLAN YOUR WEEK\nDRAG A MEETING TO ANOTHER DAY\nPULL THE BOTTOM TO MAKE IT LONGER"}
+      head={
+        "PLAN YOUR WEEK\nDRAG A MEETING TO ANOTHER DAY\nPULL THE BOTTOM TO MAKE IT LONGER"
+      }
       tone="white"
       pattern="grid"
       body="justify-between gap-8"
@@ -199,13 +226,17 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
                 <Numeral className="-ms-[0.06em] text-[length:clamp(2rem,6cqi,3.5rem)]">
                   {booked.toFixed(1)}
                 </Numeral>
-                <span className={cn(label, "text-muted-foreground")}>hours booked</span>
+                <span className={cn(label, "text-muted-foreground")}>
+                  hours booked
+                </span>
               </div>
               <div className="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-2">
                 <span />
                 <div
                   className="grid border-b border-foreground pb-2"
-                  style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}
+                  style={{
+                    gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))`,
+                  }}
                 >
                   {days.slice(offset, offset + count).map((name) => (
                     <span key={name} className={cn(label, "ps-1")}>
@@ -220,7 +251,9 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
                       className="absolute end-0 -translate-y-1/2 font-mono text-[10px] text-muted-foreground tabular-nums"
                       style={{ top: index * hour * scale }}
                     >
-                      {twelve ? `${(9 + index) % 12 || 12}${9 + index < 12 ? "a" : "p"}` : `${9 + index}:00`}
+                      {twelve
+                        ? `${(9 + index) % 12 || 12}${9 + index < 12 ? "a" : "p"}`
+                        : `${9 + index}:00`}
                     </span>
                   ))}
                 </div>
@@ -270,12 +303,14 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
                 key={name}
                 type="button"
                 aria-label={name}
-                disabled={offset + step < 0 || offset + step > days.length - count}
+                disabled={
+                  offset + step < 0 || offset + step > days.length - count
+                }
                 onClick={() => setOffset(offset + step)}
                 className={cn(
                   "relative flex size-[30px] items-center justify-center bg-background transition-colors hover:bg-foreground/[0.06] disabled:opacity-30 after:absolute after:-inset-2",
                   ink,
-                  ring,
+                  ring
                 )}
               >
                 <Icon aria-hidden="true" className="size-4" />
@@ -296,7 +331,7 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
               value={value}
               className={cn(
                 "relative h-7 px-3 font-mono text-[11px] text-muted-foreground transition-colors data-checked:text-background",
-                ring,
+                ring
               )}
             >
               {value}
@@ -305,7 +340,10 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
         </SegmentedControl>
         <div
           aria-hidden="true"
-          className={cn(label, "flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground")}
+          className={cn(
+            label,
+            "flex flex-wrap items-center gap-x-4 gap-y-2 text-muted-foreground"
+          )}
         >
           <span className="flex items-center gap-1.5">
             <span className={cn("size-3 bg-background", ink)} />
@@ -319,7 +357,7 @@ function WeekTile({ className, fig }: { className?: string; fig?: string }) {
             <span
               className={cn(
                 "size-3 bg-[repeating-linear-gradient(135deg,var(--foreground)_0_1px,transparent_1px_4px)]",
-                ink,
+                ink
               )}
             />
             Away

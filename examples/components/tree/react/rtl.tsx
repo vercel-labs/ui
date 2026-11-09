@@ -1,6 +1,12 @@
 "use client"
 
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/react/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/react/tree"
 import { ChevronRightIcon } from "lucide-react"
 
 type Node = { value: string; label: string; children?: Node[] }

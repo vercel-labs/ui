@@ -17,7 +17,10 @@
   const question = $derived((entry.payload ?? {}) as Partial<ConfirmOptions>)
 </script>
 
-<AlertDialog controller={entry.controller} onOpenChangeComplete={(open) => !open && entry.done()}>
+<AlertDialog
+  controller={entry.controller}
+  onOpenChangeComplete={(open) => !open && entry.done()}
+>
   <AlertDialogContent>
     <AlertDialogTitle>{question.title}</AlertDialogTitle>
     {#if question.description}

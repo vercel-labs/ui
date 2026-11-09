@@ -9,7 +9,9 @@ import type { UiPreferencesElement } from "./events"
 // as its first child: it puts every saved value on its attribute as the page
 // loads, before this element is defined.
 function definePreferencesElements() {
-  if (!claimTag("ui-preferences")) return
+  if (!claimTag("ui-preferences")) {
+    return
+  }
   customElements.define(
     "ui-preferences",
     class extends HTMLElement {
@@ -22,7 +24,9 @@ function definePreferencesElements() {
 
       set preferences(list: readonly PreferenceLike[]) {
         this.#preferences = list
-        if (this.isConnected) this.#start()
+        if (this.isConnected) {
+          this.#start()
+        }
       }
 
       connectedCallback() {
@@ -30,7 +34,9 @@ function definePreferencesElements() {
         upgradeProperties(this, ["preferences"])
         this.style.display ||= "contents"
         // Moved in one go, it keeps following.
-        if (!this.#stop) this.#start()
+        if (!this.#stop) {
+          this.#start()
+        }
       }
 
       disconnectedCallback() {
@@ -41,11 +47,12 @@ function definePreferencesElements() {
         this.#teardown()
         const list = this.#preferences
         const write = () => {
-          for (const preference of list)
-            (preference.global ? document.documentElement : this).setAttribute(
+          for (const preference of list) {
+            ;(preference.global ? document.documentElement : this).setAttribute(
               preference.attribute,
-              preference.get().value,
+              preference.get().value
             )
+          }
         }
         // Subscribing first reads back what was saved.
         const stops = list.map((preference) => preference.subscribe(write))
@@ -57,7 +64,7 @@ function definePreferencesElements() {
         this.#stop?.()
         this.#stop = undefined
       }
-    } satisfies CustomElementConstructor & { new (): UiPreferencesElement },
+    } satisfies CustomElementConstructor & { new (): UiPreferencesElement }
   )
 }
 

@@ -1,10 +1,24 @@
 import "@ui-sdk/web/command"
-import { Calculator, Calendar, createElement, CreditCard, Search, Settings, Smile, User } from "lucide"
+import {
+  Calculator,
+  Calendar,
+  createElement,
+  CreditCard,
+  Search,
+  Settings,
+  Smile,
+  User,
+} from "lucide"
 
 const commands = [
   { value: "calendar", label: "Calendar", icon: Calendar },
   { value: "emoji", label: "Search Emoji", icon: Smile },
-  { value: "calculator", label: "Calculator", icon: Calculator, disabled: true },
+  {
+    value: "calculator",
+    label: "Calculator",
+    icon: Calculator,
+    disabled: true,
+  },
   { value: "profile", label: "Profile", icon: User },
   { value: "billing", label: "Billing", icon: CreditCard },
   { value: "settings", label: "Settings", icon: Settings },
@@ -28,7 +42,7 @@ function mount(root: HTMLElement) {
                 <ui-command-item-icon>${createElement(item.icon, { "aria-hidden": "true" }).outerHTML}</ui-command-item-icon>
                 <ui-command-item-text>${item.label}</ui-command-item-text>
               </ui-command-item>
-            `,
+            `
           )
           .join("")}
       </ui-command-list>

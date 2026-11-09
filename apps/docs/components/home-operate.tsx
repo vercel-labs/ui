@@ -1,6 +1,10 @@
 "use client"
 
-import { createAgent, type AgentComponent, type AgentStep } from "@ui-sdk/react/agent"
+import {
+  createAgent,
+  type AgentComponent,
+  type AgentStep,
+} from "@ui-sdk/react/agent"
 import {
   NumberInput,
   NumberInputControl,
@@ -70,7 +74,9 @@ type Entry =
   | { type: "note"; text: string }
 
 function stateOf(component: AgentComponent) {
-  if ("checked" in component) return String(component.checked)
+  if ("checked" in component) {
+    return String(component.checked)
+  }
   return JSON.stringify(component.value)
 }
 
@@ -94,7 +100,7 @@ function Field({
           ? "outline-2 outline-solid outline-[#006bff]"
           : changed
             ? "outline-1 outline-dashed outline-[#006bff]"
-            : "outline-1 outline-dashed outline-transparent",
+            : "outline-1 outline-dashed outline-transparent"
       )}
     >
       {children}
@@ -102,23 +108,40 @@ function Field({
   )
 }
 
-function Settings({ changed, active }: { changed: string[]; active: string | null }) {
+function Settings({
+  changed,
+  active,
+}: {
+  changed: string[]
+  active: string | null
+}) {
   return (
     <div
-      className={cn("flex w-full max-w-md flex-col gap-4 bg-background p-4 @[36rem]:gap-6 @[36rem]:p-8", ink)}
+      className={cn(
+        "flex w-full max-w-md flex-col gap-4 bg-background p-4 @[36rem]:gap-6 @[36rem]:p-8",
+        ink
+      )}
     >
       <div className="flex items-baseline justify-between gap-4">
-        <span className="text-lg font-medium tracking-[-0.02em]">Project settings</span>
+        <span className="text-lg font-medium tracking-[-0.02em]">
+          Project settings
+        </span>
         <span className={cn(label, "text-muted-foreground")}>acme/web</span>
       </div>
-      <Field name="Region" changed={changed.includes("Region")} active={active === "Region"}>
+      <Field
+        name="Region"
+        changed={changed.includes("Region")}
+        active={active === "Region"}
+      >
         <Select defaultValue="europe" items={regions}>
-          <SelectLabel className={cn(label, "text-muted-foreground")}>Region</SelectLabel>
+          <SelectLabel className={cn(label, "text-muted-foreground")}>
+            Region
+          </SelectLabel>
           <SelectTrigger
             className={cn(
               "flex h-11 w-full items-center justify-between gap-3 bg-background px-3 text-[15px]",
               ink,
-              ring,
+              ring
             )}
           >
             <SelectValue />
@@ -140,7 +163,11 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
           </SelectContent>
         </Select>
       </Field>
-      <Field name="Plan" changed={changed.includes("Plan")} active={active === "Plan"}>
+      <Field
+        name="Plan"
+        changed={changed.includes("Plan")}
+        active={active === "Plan"}
+      >
         <span aria-hidden="true" className={cn(label, "text-muted-foreground")}>
           Plan
         </span>
@@ -156,7 +183,7 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
               value={plan.toLowerCase()}
               className={cn(
                 "relative h-10 text-[14px] text-muted-foreground transition-colors data-checked:text-background",
-                ring,
+                ring
               )}
             >
               {plan}
@@ -164,7 +191,11 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
           ))}
         </SegmentedControl>
       </Field>
-      <Field name="Instances" changed={changed.includes("Instances")} active={active === "Instances"}>
+      <Field
+        name="Instances"
+        changed={changed.includes("Instances")}
+        active={active === "Instances"}
+      >
         <span aria-hidden="true" className={cn(label, "text-muted-foreground")}>
           Instances
         </span>
@@ -174,7 +205,7 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
             className={cn(
               "flex h-11 w-full items-center bg-background",
               ink,
-              "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]",
+              "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]"
             )}
           >
             <NumberInputDecrement
@@ -213,7 +244,7 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
             className={cn(
               "group/switch inline-flex h-5 w-9 shrink-0 items-center bg-background p-[3px] transition-colors data-checked:bg-foreground",
               ink,
-              ring,
+              ring
             )}
           >
             <SwitchThumb className="size-3 bg-foreground transition-transform group-data-checked/switch:translate-x-4 group-data-checked/switch:bg-background rtl:group-data-checked/switch:-translate-x-4" />
@@ -224,7 +255,13 @@ function Settings({ changed, active }: { changed: string[]; active: string | nul
   )
 }
 
-function Prompt({ active, changed }: { active: string | null; changed: string[] }) {
+function Prompt({
+  active,
+  changed,
+}: {
+  active: string | null
+  changed: string[]
+}) {
   return prompt.map((part, index) => (
     <span
       key={index}
@@ -234,7 +271,7 @@ function Prompt({ active, changed }: { active: string | null; changed: string[] 
         part.ref &&
           changed.includes(part.ref) &&
           active !== part.ref &&
-          "underline decoration-[#006bff] decoration-dashed underline-offset-4",
+          "underline decoration-[#006bff] decoration-dashed underline-offset-4"
       )}
     >
       {part.text}
@@ -253,7 +290,9 @@ function OperatePoster({ fig }: { fig?: string }) {
   React.useEffect(() => () => timers.current.forEach(clearTimeout), [])
   React.useEffect(() => {
     const element = log.current
-    if (element) element.scrollTop = element.scrollHeight
+    if (element) {
+      element.scrollTop = element.scrollHeight
+    }
   }, [entries])
   const wait = (ms: number) =>
     new Promise<void>((resolve) => {
@@ -271,17 +310,24 @@ function OperatePoster({ fig }: { fig?: string }) {
           ? `agent.act(${last.ref})`
           : "Done. Four settings changed"
   const send = async () => {
-    if (!agent || running || sent) return
+    if (!agent || running || sent) {
+      return
+    }
     setRunning(true)
     setEntries([{ type: "user" }])
     await wait(600)
-    const seen = agent.snapshot().filter((component) => fields.includes(component.label ?? ""))
+    const seen = agent
+      .snapshot()
+      .filter((component) => fields.includes(component.label ?? ""))
     setEntries((current) => [
       ...current,
       {
         type: "call",
         code: "snapshot()",
-        lines: seen.map((component) => `${component.component} "${component.label}" ${stateOf(component)}`),
+        lines: seen.map(
+          (component) =>
+            `${component.component} "${component.label}" ${stateOf(component)}`
+        ),
       },
     ])
     await wait(900)
@@ -299,13 +345,21 @@ function OperatePoster({ fig }: { fig?: string }) {
       await wait(650)
       const result = await agent.act({ steps: [step] })
       const changes = result.steps.flatMap((entry) => entry.changes ?? [])
-      setChanged((current) => [...current, ...changes.map((change) => change.label ?? "")])
+      setChanged((current) => [
+        ...current,
+        ...changes.map((change) => change.label ?? ""),
+      ])
       setEntries((current) =>
         current.map((entry) =>
           entry.type === "act" && entry.ref === step.ref
-            ? { ...entry, lines: changes.map((change) => `${change.key} → ${JSON.stringify(change.value)}`) }
-            : entry,
-        ),
+            ? {
+                ...entry,
+                lines: changes.map(
+                  (change) => `${change.key} → ${JSON.stringify(change.value)}`
+                ),
+              }
+            : entry
+        )
       )
       await wait(450)
     }
@@ -337,14 +391,24 @@ function OperatePoster({ fig }: { fig?: string }) {
       body="gap-6"
       className="max-sm:gap-6 lg:min-h-0"
     >
-      <div className={cn("flex min-w-0 flex-col @max-[56rem]:border-0 @[56rem]:bg-background", ink)}>
+      <div
+        className={cn(
+          "flex min-w-0 flex-col @max-[56rem]:border-0 @[56rem]:bg-background",
+          ink
+        )}
+      >
         <div className="hidden h-10 items-center gap-4 border-b border-foreground px-4 @[56rem]:flex">
           <span aria-hidden="true" className="flex gap-1.5">
             <span className="size-2.5 border border-foreground" />
             <span className="size-2.5 border border-foreground" />
             <span className="size-2.5 border border-foreground" />
           </span>
-          <span className={cn(label, "flex-1 truncate text-center text-muted-foreground")}>
+          <span
+            className={cn(
+              label,
+              "flex-1 truncate text-center text-muted-foreground"
+            )}
+          >
             acme/web · Settings
           </span>
           <span aria-hidden="true" className="w-[2.875rem]" />
@@ -362,7 +426,8 @@ function OperatePoster({ fig }: { fig?: string }) {
               <div className="mt-auto flex flex-col gap-3">
                 {!sent && (
                   <p className="text-sm text-pretty text-muted-foreground">
-                    Send the message below and watch the agent read the form and fill it in.
+                    Send the message below and watch the agent read the form and
+                    fill it in.
                   </p>
                 )}
                 {entries.map((entry, index) =>
@@ -384,13 +449,15 @@ function OperatePoster({ fig }: { fig?: string }) {
                         "flex flex-col gap-1 border-s-2 ps-3 font-mono text-[11.5px] leading-[1.55] transition-colors duration-300",
                         entry.type === "act" && active === entry.ref
                           ? "border-[#006bff]"
-                          : "border-foreground/20",
+                          : "border-foreground/20"
                       )}
                     >
                       <span
                         className={cn(
                           "w-fit box-decoration-clone break-words transition-colors duration-300",
-                          entry.type === "act" && active === entry.ref && "bg-[#006bff] text-white",
+                          entry.type === "act" &&
+                            active === entry.ref &&
+                            "bg-[#006bff] text-white"
                         )}
                       >
                         <span aria-hidden="true" className="opacity-50">
@@ -404,7 +471,7 @@ function OperatePoster({ fig }: { fig?: string }) {
                         </span>
                       )}
                     </div>
-                  ),
+                  )
                 )}
               </div>
             </div>
@@ -413,12 +480,14 @@ function OperatePoster({ fig }: { fig?: string }) {
                 <p
                   className={cn(
                     "min-h-[4.5rem] p-4 text-[15px] leading-[1.45] text-pretty",
-                    sent && "@[56rem]:text-background/40",
+                    sent && "@[56rem]:text-background/40"
                   )}
                 >
                   {sent ? (
                     <>
-                      <span className="hidden @[56rem]:inline">Ask the agent to change something</span>
+                      <span className="hidden @[56rem]:inline">
+                        Ask the agent to change something
+                      </span>
                       <span className="@[56rem]:hidden">
                         <Prompt active={active} changed={changed} />
                       </span>

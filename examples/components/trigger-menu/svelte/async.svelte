@@ -22,21 +22,23 @@
   ]
 
   function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
-    return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
-      const timer = setTimeout(
-        () =>
-          resolve(
-            channels
-              .filter((channel) => channel.includes(query.toLowerCase()))
-              .map((channel) => ({ value: channel, label: channel })),
-          ),
-        600,
-      )
-      signal.addEventListener("abort", () => {
-        clearTimeout(timer)
-        reject(signal.reason)
-      })
-    })
+    return new Promise<{ value: string; label: string }[]>(
+      (resolve, reject) => {
+        const timer = setTimeout(
+          () =>
+            resolve(
+              channels
+                .filter((channel) => channel.includes(query.toLowerCase()))
+                .map((channel) => ({ value: channel, label: channel }))
+            ),
+          600
+        )
+        signal.addEventListener("abort", () => {
+          clearTimeout(timer)
+          reject(signal.reason)
+        })
+      }
+    )
   }
 </script>
 
@@ -66,7 +68,7 @@
     </TriggerMenuEmpty>
     <TriggerMenuList>
       {#snippet children(state)}
-        {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+        {#each state.items as TriggerMenuDataItem[] as item (item.value)}
           <TriggerMenuItem value={item.value} label={item.label}>
             {item.label}
           </TriggerMenuItem>

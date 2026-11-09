@@ -14,8 +14,12 @@ A link in the toolbar. Arrow keys move between it and the toolbar's other items.
   let props: PartProps<"a", ToolbarLinkState> = $props()
 
   const id = $props.id()
-  const groupDisabled = getContext<(() => boolean) | undefined>(ToolbarGroupKey) ?? (() => false)
-  const link = useHandlePart(useToolbar(), "link", () => ({ id, groupDisabled: groupDisabled() }))
+  const groupDisabled =
+    getContext<(() => boolean) | undefined>(ToolbarGroupKey) ?? (() => false)
+  const link = useHandlePart(useToolbar(), "link", () => ({
+    id,
+    groupDisabled: groupDisabled(),
+  }))
 </script>
 
 <Part tag="a" part={link} {props} />

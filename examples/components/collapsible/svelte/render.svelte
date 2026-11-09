@@ -1,6 +1,10 @@
 <script lang="ts">
   import { ChevronDownIcon } from "@lucide/svelte"
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "@ui-sdk/svelte/collapsible"
 
   const updates = [
     { label: "Out for delivery", time: "07:40" },
@@ -19,7 +23,9 @@
     {#snippet children(state)}
       <span data-slot="stack">
         <span>Track parcel</span>
-        <span data-slot="hint">{state.open ? "3 updates" : "Arrives Thursday"}</span>
+        <span data-slot="hint"
+          >{state.open ? "3 updates" : "Arrives Thursday"}</span
+        >
       </span>
       <ChevronDownIcon />
     {/snippet}

@@ -22,7 +22,15 @@ const template = `
   </template>`
 
 async function render(root: HTMLElement, data = false) {
-  const { fieldset, grouped, cancel, long, controlled, defaultValue, ...options } = listboxOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    long,
+    controlled,
+    defaultValue,
+    ...options
+  } = listboxOptions()
   void controlled
   const list = long
     ? longToppings()
@@ -32,10 +40,12 @@ async function render(root: HTMLElement, data = false) {
       ? f.groups
           .map(
             (group, index) =>
-              `${index ? '<ui-listbox-separator class="separator"></ui-listbox-separator>' : ""}<ui-listbox-group class="group"><ui-listbox-group-label class="label">${group.label}</ui-listbox-group-label>${group.items.map((entry) => item(entry.value, entry.label)).join("")}</ui-listbox-group>`,
+              `${index ? '<ui-listbox-separator class="separator"></ui-listbox-separator>' : ""}<ui-listbox-group class="group"><ui-listbox-group-label class="label">${group.label}</ui-listbox-group-label>${group.items.map((entry) => item(entry.value, entry.label)).join("")}</ui-listbox-group>`
           )
           .join("")
-      : f.items.map((entry) => item(entry.value, entry.label, entry.disabled)).join("")
+      : f.items
+          .map((entry) => item(entry.value, entry.label, entry.disabled))
+          .join("")
   const control = `<ui-listbox class="listbox" aria-label="${f.label}" name="${f.name}">${data ? template : list}</ui-listbox>`
   root.innerHTML = `
     <div class="fixture">
@@ -52,23 +62,49 @@ async function render(root: HTMLElement, data = false) {
       <button id="clear">${f.clear}</button>
       <button id="select-all">${f.selectAll}</button>
     </div>`
-  const listbox = root.querySelector<HTMLElement & Record<string, any>>("ui-listbox")!
-  for (const name of ["multiple", "deselectable", "required", "disabled"] as const)
-    if (options[name]) listbox.setAttribute(name, "")
-  if (options.readOnly) listbox.setAttribute("read-only", "")
-  if (options.activation) listbox.setAttribute("activation", options.activation)
-  if (options.orientation === "horizontal") listbox.setAttribute("orientation", "horizontal")
-  if (!options.loop) listbox.setAttribute("loop", "false")
-  if (defaultValue !== undefined)
-    listbox.setAttribute("default-value", ([] as string[]).concat(defaultValue).join(","))
+  const listbox = root.querySelector<HTMLElement & Record<string, any>>(
+    "ui-listbox"
+  )!
+  for (const name of [
+    "multiple",
+    "deselectable",
+    "required",
+    "disabled",
+  ] as const) {
+    if (options[name]) {
+      listbox.setAttribute(name, "")
+    }
+  }
+  if (options.readOnly) {
+    listbox.setAttribute("read-only", "")
+  }
+  if (options.activation) {
+    listbox.setAttribute("activation", options.activation)
+  }
+  if (options.orientation === "horizontal") {
+    listbox.setAttribute("orientation", "horizontal")
+  }
+  if (!options.loop) {
+    listbox.setAttribute("loop", "false")
+  }
+  if (defaultValue !== undefined) {
+    listbox.setAttribute(
+      "default-value",
+      ([] as string[]).concat(defaultValue).join(",")
+    )
+  }
   if (data) {
     listbox.items = long ? longToppings() : listboxData(grouped)
   }
-  const output = (name: string) => root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
+  const output = (name: string) =>
+    root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
   listbox.addEventListener("valuechange", (event) => {
-    const detail = (event as CustomEvent<{ value: unknown; reason: string }>).detail
+    const detail = (event as CustomEvent<{ value: unknown; reason: string }>)
+      .detail
     output("Reason").textContent = detail.reason
-    if (cancel) return event.preventDefault()
+    if (cancel) {
+      return event.preventDefault()
+    }
     output("Last action").textContent = listboxAction(detail.value)
   })
   const form = root.querySelector("form")!
@@ -76,16 +112,27 @@ async function render(root: HTMLElement, data = false) {
     event.preventDefault()
     output("Submitted").textContent = serializeForm(form)
   })
-  root.querySelector("#clear")!.addEventListener("click", () => listbox.api?.clear())
-  root.querySelector("#select-all")!.addEventListener("click", () => listbox.api?.selectAll())
+  root
+    .querySelector("#clear")!
+    .addEventListener("click", () => listbox.api?.clear())
+  root
+    .querySelector("#select-all")!
+    .addEventListener("click", () => listbox.api?.selectAll())
   // Every item element by value, kept while the spec's changes take them out.
   const elements = new Map(
-    [...listbox.querySelectorAll<HTMLElement>("ui-listbox-item")].map((el) => [el.getAttribute("value"), el]),
+    [...listbox.querySelectorAll<HTMLElement>("ui-listbox-item")].map((el) => [
+      el.getAttribute("value"),
+      el,
+    ])
   )
   onItemsChange(changedToppings, (entries) => {
-    if (data) return void (listbox.items = entries)
+    if (data) {
+      return void (listbox.items = entries)
+    }
     // Moves the items that stay, so they keep their elements, and brings back ones that left.
-    listbox.replaceChildren(...entries.map((entry) => elements.get(entry.value)!))
+    listbox.replaceChildren(
+      ...entries.map((entry) => elements.get(entry.value)!)
+    )
   })
   await import("@ui-sdk/web/listbox")
 }

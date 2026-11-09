@@ -15,16 +15,23 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
 const { basic } = toastFixture
-const toastNamed = (page: Page, name: string) => page.getByRole(role(), { name })
+const toastNamed = (page: Page, name: string) =>
+  page.getByRole(role(), { name })
 
 test(
   "announcements while reaching a toast with F6 and leaving it",
@@ -36,14 +43,16 @@ test(
     // The toast is announced a moment after it shows. Waiting for that keeps
     // it out of the recording, which is only about reaching the toast.
     await expect(page.locator('[data-ui-sdk-announcer=""]')).toHaveText(
-      `${basic.title}. ${basic.description}`,
+      `${basic.title}. ${basic.description}`
     )
     const log = await record(page, async () => {
       await page.getByRole("button", { name: "Before" }).focus()
       await page.keyboard.press("F6")
       await expect(toastNamed(page, basic.title)).toBeFocused()
       await tab()
-      await expect(page.getByRole("button", { name: basic.action })).toBeFocused()
+      await expect(
+        page.getByRole("button", { name: basic.action })
+      ).toBeFocused()
       await page.keyboard.press("F6")
       await expect(page.getByRole("button", { name: "Before" })).toBeFocused()
     })
@@ -54,5 +63,5 @@ test(
       "button, Undo",
       "button, Before",
     ])
-  },
+  }
 )

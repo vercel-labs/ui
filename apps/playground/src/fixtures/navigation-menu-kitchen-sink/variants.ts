@@ -100,7 +100,8 @@ const nestedLinks = ["Tutorials", "Courses", "Webinars"]
 const moreLinks = ["Changelog", "Roadmap", "Status"]
 
 // Every link's href, unique per variant so a press doesn't scroll the page anywhere.
-const href = (variant: Variant, label: string) => `#${variant.id}-${label.toLowerCase()}`
+const href = (variant: Variant, label: string) =>
+  `#${variant.id}-${label.toLowerCase()}`
 
 // Whether the variant renders a viewport.
 const hasViewport = (variant: Variant) => variant.viewport !== false
@@ -115,11 +116,21 @@ const variants: Variant[] = [
       section: "Viewport placement",
       title: `side ${side}, align ${align}`,
       viewport: { side, align },
-    })),
+    }))
   ),
 
-  { id: "offset-0", section: "Viewport offsets", title: "sideOffset 0", viewport: { sideOffset: 0 } },
-  { id: "offset-16", section: "Viewport offsets", title: "sideOffset 16", viewport: { sideOffset: 16 } },
+  {
+    id: "offset-0",
+    section: "Viewport offsets",
+    title: "sideOffset 0",
+    viewport: { sideOffset: 0 },
+  },
+  {
+    id: "offset-16",
+    section: "Viewport offsets",
+    title: "sideOffset 16",
+    viewport: { sideOffset: 16 },
+  },
   {
     id: "align-16",
     section: "Viewport offsets",
@@ -321,7 +332,12 @@ const variants: Variant[] = [
     note: "Opens as the pointer arrives.",
     options: { delay: 0 },
   },
-  { id: "delay-500", section: "Behavior", title: "delay 500", options: { delay: 500 } },
+  {
+    id: "delay-500",
+    section: "Behavior",
+    title: "delay 500",
+    options: { delay: 500 },
+  },
   {
     id: "close-delay-0",
     section: "Behavior",
@@ -385,7 +401,13 @@ const variants: Variant[] = [
     note: "The buttons drive the menu from outside it.",
     controller: true,
   },
-  { id: "debug", section: "Behavior", title: "debug", note: "Logs state changes.", options: { debug: true } },
+  {
+    id: "debug",
+    section: "Behavior",
+    title: "debug",
+    note: "Logs state changes.",
+    options: { debug: true },
+  },
 
   {
     id: "keep-mounted",
@@ -480,7 +502,12 @@ const variants: Variant[] = [
     note: "Scroll the box.",
     place: "scroll",
   },
-  { id: "clip", section: "Containers", title: "Inside overflow hidden", place: "clip" },
+  {
+    id: "clip",
+    section: "Containers",
+    title: "Inside overflow hidden",
+    place: "clip",
+  },
   {
     id: "clip-popup",
     section: "Containers",
@@ -488,7 +515,12 @@ const variants: Variant[] = [
     place: "clip",
     viewport: false,
   },
-  { id: "transform", section: "Containers", title: "Inside a transform", place: "transform" },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Inside a transform",
+    place: "transform",
+  },
   {
     id: "transform-popup",
     section: "Containers",
@@ -505,7 +537,13 @@ const variants: Variant[] = [
     note: "Contents slide by data-motion. The viewport fades and resizes.",
     animation: "slide",
   },
-  { id: "anim-slow", section: "Animation", title: "Slow slide", note: "700ms.", animation: "slow" },
+  {
+    id: "anim-slow",
+    section: "Animation",
+    title: "Slow slide",
+    note: "700ms.",
+    animation: "slow",
+  },
   {
     id: "anim-slow-top",
     section: "Animation",
@@ -567,4 +605,13 @@ const variants: Variant[] = [
   },
 ]
 
-export { hasViewport, href, type Item, items, moreLinks, nestedLinks, type Variant, variants }
+export {
+  hasViewport,
+  href,
+  type Item,
+  items,
+  moreLinks,
+  nestedLinks,
+  type Variant,
+  variants,
+}

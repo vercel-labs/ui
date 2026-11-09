@@ -27,7 +27,10 @@ function searchIssues(query: string, { signal }: { signal: AbortSignal }) {
       resolve(
         issues
           .filter((issue) => issue.toLowerCase().includes(needle))
-          .map((issue) => ({ value: issue.toLowerCase().replaceAll(" ", "-"), label: issue })),
+          .map((issue) => ({
+            value: issue.toLowerCase().replaceAll(" ", "-"),
+            label: issue,
+          }))
       )
     }, 400)
     signal.addEventListener("abort", () => {
@@ -38,7 +41,10 @@ function searchIssues(query: string, { signal }: { signal: AbortSignal }) {
 }
 
 function Example() {
-  const issues = useAsyncOptions(searchIssues, { debounce: 250, immediate: true })
+  const issues = useAsyncOptions(searchIssues, {
+    debounce: 250,
+    immediate: true,
+  })
 
   return (
     <Command
@@ -50,15 +56,25 @@ function Example() {
       <CommandInput aria-label="Search issues" placeholder="Search issues…" />
       <CommandStatus>
         {(state) =>
-          state.loading ? "Searching…" : `${state.count} ${state.count === 1 ? "issue" : "issues"}`
+          state.loading
+            ? "Searching…"
+            : `${state.count} ${state.count === 1 ? "issue" : "issues"}`
         }
       </CommandStatus>
       <CommandEmpty>
-        {(state) => (state.empty && !state.loading ? `No issues match “${state.query}”.` : null)}
+        {(state) =>
+          state.empty && !state.loading
+            ? `No issues match “${state.query}”.`
+            : null
+        }
       </CommandEmpty>
       <CommandList>
         {issues.items.map((issue) => (
-          <CommandItem key={issue.value} value={issue.value} label={issue.label}>
+          <CommandItem
+            key={issue.value}
+            value={issue.value}
+            label={issue.label}
+          >
             {issue.label}
           </CommandItem>
         ))}

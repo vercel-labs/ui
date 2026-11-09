@@ -1,4 +1,8 @@
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/solid/resizable"
 import { render } from "@solidjs/web"
 import { For, untrack } from "solid-js"
 import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"

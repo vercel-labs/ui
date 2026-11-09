@@ -23,9 +23,16 @@ function Example() {
   return (
     <Field>
       <FieldLabel>Regions</FieldLabel>
-      <Select multiple defaultValue={["us-east", "europe", "asia-pacific"]} placeholder="Select regions">
+      <Select
+        multiple
+        defaultValue={["us-east", "europe", "asia-pacific"]}
+        placeholder="Select regions"
+      >
         <SelectTrigger>
-          <SelectValue maxLabels={2} getMoreLabel={(count) => `${count} more`} />
+          <SelectValue
+            maxLabels={2}
+            getMoreLabel={(count) => `${count} more`}
+          />
           <svg
             viewBox="0 0 24 24"
             fill="none"

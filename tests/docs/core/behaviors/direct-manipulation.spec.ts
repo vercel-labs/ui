@@ -3,7 +3,13 @@ import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
 
 // Presses the middle of an element and moves the pointer by dx, dy, without letting go.
-async function press(page: Page, target: Locator, dx: number, dy: number, at = { x: 0.5, y: 0.5 }) {
+async function press(
+  page: Page,
+  target: Locator,
+  dx: number,
+  dy: number,
+  at = { x: 0.5, y: 0.5 }
+) {
   await target.scrollIntoViewIfNeeded()
   const box = (await target.boundingBox())!
   const x = box.x + box.width * at.x
@@ -20,7 +26,8 @@ const lastLog = (example: Locator) =>
     .locator('section[aria-label="Console"] li:not([aria-hidden])')
     .last()
 
-const example = (page: Page, name: string) => page.locator(`[data-example="behaviors/${name}"]`)
+const example = (page: Page, name: string) =>
+  page.locator(`[data-example="behaviors/${name}"]`)
 
 test("every example renders without errors", async ({ page }) => {
   const { errors } = await openBehaviors(page, "direct-manipulation")
@@ -28,19 +35,27 @@ test("every example renders without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("move: a drag commits once on drop, and Alt with an arrow nudges", async ({ page }) => {
+test("move: a drag commits once on drop, and Alt with an arrow nudges", async ({
+  page,
+}) => {
   await openBehaviors(page, "direct-manipulation")
   const lemon = page.getByLabel("Lemon", { exact: true })
   await press(page, lemon, 40, -20)
   await expect(lemon).toHaveCSS("left", "108px")
   await page.mouse.up()
-  await expect(lastLog(example(page, "move"))).toHaveText("Lemon moved to 148, 76 (drag)")
+  await expect(lastLog(example(page, "move"))).toHaveText(
+    "Lemon moved to 148, 76 (drag)"
+  )
   await lemon.focus()
   await page.keyboard.press("Alt+ArrowDown")
-  await expect(lastLog(example(page, "move"))).toHaveText("Lemon moved to 148, 80 (move-key)")
+  await expect(lastLog(example(page, "move"))).toHaveText(
+    "Lemon moved to 148, 80 (move-key)"
+  )
 })
 
-test("resize: a corner drag resizes the box, and Escape puts it back", async ({ page }) => {
+test("resize: a corner drag resizes the box, and Escape puts it back", async ({
+  page,
+}) => {
   await openBehaviors(page, "direct-manipulation")
   const frame = page.getByLabel("Frame")
   const corner = frame.locator('[data-slot="frame-handle"]').nth(4)
@@ -50,10 +65,14 @@ test("resize: a corner drag resizes the box, and Escape puts it back", async ({ 
   await expect(frame).toHaveCSS("width", "136px")
   await press(page, corner, 40, 20)
   await page.mouse.up()
-  await expect(lastLog(example(page, "resize"))).toHaveText("176 × 116 at 68, 40 (drag)")
+  await expect(lastLog(example(page, "resize"))).toHaveText(
+    "176 × 116 at 68, 40 (drag)"
+  )
 })
 
-test("swipe actions: Left opens a row's actions, and a swipe shows them too", async ({ page }) => {
+test("swipe actions: Left opens a row's actions, and a swipe shows them too", async ({
+  page,
+}) => {
   await openBehaviors(page, "direct-manipulation")
   const list = page.getByRole("list", { name: "Messages" })
   const row = list.getByRole("listitem").first()
@@ -70,16 +89,22 @@ test("swipe actions: Left opens a row's actions, and a swipe shows them too", as
   await expect(list.getByRole("listitem")).toHaveCount(2)
 })
 
-test("area: a press moves the thumb there, and arrows step it", async ({ page }) => {
+test("area: a press moves the thumb there, and arrows step it", async ({
+  page,
+}) => {
   await openBehaviors(page, "direct-manipulation")
   const thumb = page.getByRole("slider", { name: "Mix" })
   const pad = thumb.locator("..")
   await pad.scrollIntoViewIfNeeded()
   const box = (await pad.boundingBox())!
   await page.mouse.click(box.x + box.width * 0.75, box.y + box.height * 0.75)
-  await expect(lastLog(example(page, "area"))).toHaveText("Warmth 75, energy 25 (track-press)")
+  await expect(lastLog(example(page, "area"))).toHaveText(
+    "Warmth 75, energy 25 (track-press)"
+  )
   await page.keyboard.press("ArrowUp")
-  await expect(lastLog(example(page, "area"))).toHaveText("Warmth 75, energy 26 (step-key)")
+  await expect(lastLog(example(page, "area"))).toHaveText(
+    "Warmth 75, energy 26 (step-key)"
+  )
 })
 
 test("spans: dragging a booking moves it by half hours, and a drag on empty space books", async ({
@@ -98,7 +123,9 @@ test("spans: dragging a booking moves it by half hours, and a drag on empty spac
   await expect(birch.getByLabel(/^New, Birch, 9:/)).toBeVisible()
 })
 
-test("preview: pressing and sliding previews each font, and letting go keeps one", async ({ page }) => {
+test("preview: pressing and sliding previews each font, and letting go keeps one", async ({
+  page,
+}) => {
   await openBehaviors(page, "direct-manipulation")
   const group = page.getByRole("radiogroup", { name: "Font" })
   const serif = group.getByRole("radio", { name: "Serif" })
@@ -110,7 +137,9 @@ test("preview: pressing and sliding previews each font, and letting go keeps one
   const font = () =>
     example(page, "preview")
       .locator('[data-slot="preview-sample"]')
-      .evaluate((el) => (el as HTMLElement).style.getPropertyValue("--preview-font"))
+      .evaluate((el) =>
+        (el as HTMLElement).style.getPropertyValue("--preview-font")
+      )
   await page.mouse.down()
   await expect.poll(font).toContain("serif")
   await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2, { steps: 6 })
@@ -137,13 +166,19 @@ test("move group: selected notes move together, 20 pixels a nudge, and the pinne
   await expect(draft).toHaveAttribute("aria-selected", "true")
   await press(page, draft, 40, 0)
   await page.mouse.up()
-  await expect(lastLog(example(page, "move-group"))).toHaveText("Draft moved to 140, 60")
+  await expect(lastLog(example(page, "move-group"))).toHaveText(
+    "Draft moved to 140, 60"
+  )
   await expect(plan).toHaveCSS("left", "60px")
   await expect(ship).toHaveCSS("left", "180px")
   await page.keyboard.press("Alt+ArrowDown")
-  await expect(lastLog(example(page, "move-group"))).toHaveText("Draft moved to 140, 80")
+  await expect(lastLog(example(page, "move-group"))).toHaveText(
+    "Draft moved to 140, 80"
+  )
   await expect(plan).toHaveCSS("top", "40px")
-  await expect(page.locator("[data-ui-sdk-announcer='assertive']")).toHaveText("Moved 2 notes.")
+  await expect(page.locator("[data-ui-sdk-announcer='assertive']")).toHaveText(
+    "Moved 2 notes."
+  )
   await expect(ship).toHaveCSS("top", "120px")
 })
 
@@ -157,9 +192,13 @@ test("move zoom: a drag follows the pointer at any zoom, and the buttons move fr
   await page.mouse.up()
   const log = lastLog(example(page, "move-zoom"))
   await expect(log).toHaveText("Circle at 120, 40 · Square at 168, 88")
-  await page.locator('[data-slot="canvas-action"]', { hasText: "Center" }).click()
+  await page
+    .locator('[data-slot="canvas-action"]', { hasText: "Center" })
+    .click()
   await expect(log).toHaveText("Circle at 112, 64 · Square at 168, 88")
-  await page.locator('[data-slot="canvas-action"]', { hasText: "Nudge" }).click()
+  await page
+    .locator('[data-slot="canvas-action"]', { hasText: "Nudge" })
+    .click()
   await expect(log).toHaveText("Circle at 122, 64 · Square at 168, 88")
 })
 
@@ -197,14 +236,20 @@ test("resize windows: the size follows a zoomed drag, Notes is locked, and the b
   await expect(mail).toHaveAttribute("data-resizing", "se")
   await page.mouse.up()
   await expect(mail).not.toHaveAttribute("data-resizing")
-  await expect(page.locator("[data-ui-sdk-announcer='assertive']")).toHaveText("Mail is 200 by 120.")
+  await expect(page.locator("[data-ui-sdk-announcer='assertive']")).toHaveText(
+    "Mail is 200 by 120."
+  )
   const notes = page.getByRole("group", { name: "Notes", exact: true })
   await press(page, notes.locator('[data-resize-handle="se"]'), 30, 15)
   await expect(notes).not.toHaveAttribute("data-resizing")
   await page.mouse.up()
-  await page.locator('[data-slot="desktop-action"]', { hasText: "Grow" }).click()
+  await page
+    .locator('[data-slot="desktop-action"]', { hasText: "Grow" })
+    .click()
   await expect(mail.getByText("240 × 160")).toBeVisible()
-  await page.locator('[data-slot="desktop-action"]', { hasText: "Maximize" }).click()
+  await page
+    .locator('[data-slot="desktop-action"]', { hasText: "Maximize" })
+    .click()
   await expect(mail.getByText("360 × 220")).toBeVisible()
 })
 
@@ -213,7 +258,8 @@ test("swipe full: a long swipe archives, the pinned row stays, and Peek and Clos
 }) => {
   await openBehaviors(page, "direct-manipulation")
   const list = page.getByRole("list", { name: "Mailbox" })
-  const row = (text: string) => list.getByRole("listitem").filter({ hasText: text })
+  const row = (text: string) =>
+    list.getByRole("listitem").filter({ hasText: text })
   await row("Flight to Lisbon").focus()
   await page.keyboard.press("ArrowRight")
   await expect(row("Flight to Lisbon")).toHaveAttribute("data-open", "start")
@@ -224,11 +270,17 @@ test("swipe full: a long swipe archives, the pinned row stays, and Peek and Clos
   await expect(row("Welcome to Acme")).not.toHaveAttribute("data-open")
   await press(page, row("Weekly digest"), -200, 0)
   await page.mouse.up()
-  await expect(lastLog(example(page, "swipe-full"))).toHaveText("Archived: Weekly digest")
+  await expect(lastLog(example(page, "swipe-full"))).toHaveText(
+    "Archived: Weekly digest"
+  )
   await expect(list.getByRole("listitem")).toHaveCount(2)
-  await page.locator('[data-slot="mailbox-action"]', { hasText: "Peek" }).click()
+  await page
+    .locator('[data-slot="mailbox-action"]', { hasText: "Peek" })
+    .click()
   await expect(row("Flight to Lisbon")).toHaveAttribute("data-open", "end")
-  await page.locator('[data-slot="mailbox-action"]', { hasText: "Close" }).click()
+  await page
+    .locator('[data-slot="mailbox-action"]', { hasText: "Close" })
+    .click()
   await expect(row("Flight to Lisbon")).not.toHaveAttribute("data-open")
 })
 
@@ -237,11 +289,17 @@ test("area color: the saved color changes when a drag ends, Reset sets it, and L
 }) => {
   await openBehaviors(page, "direct-manipulation")
   const thumb = page.getByRole("slider", { name: "Color" })
-  await expect(thumb).toHaveAttribute("aria-valuetext", "60% saturation, 80% brightness")
+  await expect(thumb).toHaveAttribute(
+    "aria-valuetext",
+    "60% saturation, 80% brightness"
+  )
   const square = thumb.locator("..")
   const width = (await square.boundingBox())!.width
   await press(page, square, -width / 4, 0)
-  await expect(thumb).toHaveAttribute("aria-valuetext", "25% saturation, 50% brightness")
+  await expect(thumb).toHaveAttribute(
+    "aria-valuetext",
+    "25% saturation, 50% brightness"
+  )
   const log = lastLog(example(page, "area-color"))
   await expect(log).toHaveCount(0)
   await page.mouse.up()
@@ -249,12 +307,18 @@ test("area color: the saved color changes when a drag ends, Reset sets it, and L
   await page.keyboard.press("ArrowRight")
   await expect(log).toHaveText("Saved 26% saturation, 50% brightness")
   await page.locator('[data-slot="color-reset"]').click()
-  await expect(thumb).toHaveAttribute("aria-valuetext", "60% saturation, 80% brightness")
+  await expect(thumb).toHaveAttribute(
+    "aria-valuetext",
+    "60% saturation, 80% brightness"
+  )
   await page.getByLabel("Lock").check()
   await expect(thumb).toHaveAttribute("aria-disabled", "true")
   await press(page, square, -width / 4, 0)
   await page.mouse.up()
-  await expect(thumb).toHaveAttribute("aria-valuetext", "60% saturation, 80% brightness")
+  await expect(thumb).toHaveAttribute(
+    "aria-valuetext",
+    "60% saturation, 80% brightness"
+  )
 })
 
 test("spans week: overlaps share a day, a click books an hour, and drags move, resize within limits and scroll", async ({
@@ -268,7 +332,9 @@ test("spans week: overlaps share a day, a click books an hour, and drags move, r
   const tue = (await day("Tue").boundingBox())!
   await page.mouse.move(tue.x + 10, tue.y + 30)
   await page.mouse.move(tue.x + 12, tue.y + 31)
-  await expect(lastLog(example(page, "spans-week"))).toHaveText("Pointer at Tue 8:30")
+  await expect(lastLog(example(page, "spans-week"))).toHaveText(
+    "Pointer at Tue 8:30"
+  )
   const wed = (await day("Wed").boundingBox())!
   await page.mouse.click(wed.x + wed.width / 2, wed.y + 15)
   await expect(page.getByLabel("New, Wed 8:00 to 9:00")).toBeVisible()
@@ -282,7 +348,11 @@ test("spans week: overlaps share a day, a click books an hour, and drags move, r
   await page.mouse.up()
   await expect(page.getByLabel("Call, Mon 9:30 to 12:30")).toBeVisible()
   await expect
-    .poll(() => day("Mon").evaluate((el) => el.closest('[data-slot="spans-week-frame"]')!.scrollTop))
+    .poll(() =>
+      day("Mon").evaluate(
+        (el) => el.closest('[data-slot="spans-week-frame"]')!.scrollTop
+      )
+    )
     .toBeGreaterThan(0)
 })
 
@@ -295,9 +365,13 @@ test("spans edit: the buttons change Standup, noon is checked first, and a blur 
   await expect(log).toContainText("Standup 10:00–11:30")
   await page.locator('[data-slot="room-action"]', { hasText: "Longer" }).click()
   await expect(log).toContainText("Standup 10:00–12:00")
-  await page.locator('[data-slot="room-action"]', { hasText: "Book Noon" }).click()
+  await page
+    .locator('[data-slot="room-action"]', { hasText: "Book Noon" })
+    .click()
   await expect(log).toContainText("Lunch 12:00–13:00")
-  await page.locator('[data-slot="room-action"]', { hasText: "Book Noon" }).click()
+  await page
+    .locator('[data-slot="room-action"]', { hasText: "Book Noon" })
+    .click()
   await expect(log).toHaveText("Noon is taken")
   const atlas = page.getByRole("group", { name: "Atlas" }).last()
   const width = (await atlas.boundingBox())!.width
@@ -312,7 +386,9 @@ test("spans edit: the buttons change Standup, noon is checked first, and a blur 
   await page.mouse.up()
   await expect(atlas.getByLabel("Standup, 10:00 to 12:00")).toBeVisible()
   await page.locator('[data-slot="room-action"]', { hasText: "Delete" }).click()
-  await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText("Standup is cancelled.")
+  await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText(
+    "Standup is cancelled."
+  )
   await expect(log).not.toContainText("Standup")
 })
 
@@ -324,7 +400,9 @@ test("preview themes: hovering previews, Contrast previews as nothing, and arrow
   const paper = () =>
     example(page, "preview-themes")
       .locator('[data-slot="preview-sample"]')
-      .evaluate((el) => (el as HTMLElement).style.getPropertyValue("--preview-paper"))
+      .evaluate((el) =>
+        (el as HTMLElement).style.getPropertyValue("--preview-paper")
+      )
   await group.getByRole("radio", { name: "Dark" }).hover()
   await expect.poll(paper).toBe("#171717")
   await page.mouse.move(0, 0)
@@ -334,11 +412,14 @@ test("preview themes: hovering previews, Contrast previews as nothing, and arrow
   await group.getByRole("radio", { name: "Sepia" }).click()
   await page.mouse.move(0, 0)
   await expect.poll(paper).toBe("#f4ecd8")
-  await expect(group.getByRole("radio", { name: "Sepia" })).toHaveAttribute("aria-checked", "true")
+  await expect(group.getByRole("radio", { name: "Sepia" })).toHaveAttribute(
+    "aria-checked",
+    "true"
+  )
   await page.keyboard.press("ArrowUp")
   await expect.poll(paper).toBe("#171717")
   await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText(
-    "Trying the Dark theme. Enter keeps it, Escape puts it back.",
+    "Trying the Dark theme. Enter keeps it, Escape puts it back."
   )
   await page.keyboard.press("Escape")
   await expect.poll(paper).toBe("#f4ecd8")
@@ -383,7 +464,9 @@ test("preview tabs: dragging a tab moves it into the nearest place, Escape cance
   const tablist = page.getByRole("tablist", { name: "Mailboxes" })
   const names = () => tablist.getByRole("tab").allTextContents()
   await tablist.scrollIntoViewIfNeeded()
-  const inbox = (await tablist.getByRole("tab", { name: "Inbox" }).boundingBox())!
+  const inbox = (await tablist
+    .getByRole("tab", { name: "Inbox" })
+    .boundingBox())!
   const sent = (await tablist.getByRole("tab", { name: "Sent" }).boundingBox())!
   const y = inbox.y + inbox.height / 2
   await page.mouse.move(inbox.x + 10, y)
@@ -405,7 +488,10 @@ test("preview tabs: dragging a tab moves it into the nearest place, Escape cance
   await page.keyboard.press("Alt+ArrowRight")
   expect(await names()).toEqual(["Drafts", "Spam", "Sent", "Inbox"])
   await page.keyboard.press("ArrowRight")
-  await expect(tablist.getByRole("tab", { name: "Sent" })).toHaveAttribute("aria-selected", "true")
+  await expect(tablist.getByRole("tab", { name: "Sent" })).toHaveAttribute(
+    "aria-selected",
+    "true"
+  )
 })
 
 test("hold confirm: letting go early keeps the project, and a held press deletes it without clicking Restore", async ({
@@ -418,7 +504,9 @@ test("hold confirm: letting go early keeps the project, and a held press deletes
   await press(page, remove, 0, 0)
   await expect(remove).toHaveAttribute("data-holding", "")
   await page.mouse.up()
-  await expect(page.getByText("Released before it filled", { exact: true })).toBeVisible()
+  await expect(
+    page.getByText("Released before it filled", { exact: true })
+  ).toBeVisible()
   await press(page, remove, 0, 0)
   await expect(example.getByText("Launch site deleted.")).toBeVisible()
   await page.mouse.up()
@@ -466,7 +554,9 @@ test("every option links to the example that shows it", async ({ page }) => {
     await expect(links).toHaveCount(await fields.count())
     for (const link of await links.all()) {
       const href = (await link.getAttribute("href"))!
-      if (!href.startsWith("#")) continue
+      if (!href.startsWith("#")) {
+        continue
+      }
       await expect(page.locator(`[id="${href.slice(1)}"]`)).toHaveCount(1)
     }
   }

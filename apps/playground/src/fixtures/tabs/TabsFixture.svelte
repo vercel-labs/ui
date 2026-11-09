@@ -1,6 +1,12 @@
 <script lang="ts">
   import { createTabsController } from "@ui-sdk/core/tabs"
-  import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/svelte"
+  import {
+    Tabs,
+    TabsIndicator,
+    TabsList,
+    TabsPanel,
+    TabsTab,
+  } from "@ui-sdk/svelte"
   import { tabsOptions } from "tests/fixtures/page.ts"
   import { tabsFixture } from "tests/fixtures/tabs.ts"
 
@@ -9,8 +15,13 @@
 
   let action = $state("")
 
-  function onValueChange(value: string | null, details: { cancel: () => void }) {
-    if (value === cancel) return details.cancel()
+  function onValueChange(
+    value: string | null,
+    details: { cancel: () => void }
+  ) {
+    if (value === cancel) {
+      return details.cancel()
+    }
     action = value ?? ""
   }
 </script>
@@ -20,7 +31,9 @@
   <Tabs class="tabs" {...options} {controller} {onValueChange}>
     <TabsList class="tablist" aria-label={tabsFixture.label}>
       {#each tabsFixture.tabs as tab (tab.value)}
-        <TabsTab class="tab" value={tab.value} disabled={tab.disabled}>{tab.label}</TabsTab>
+        <TabsTab class="tab" value={tab.value} disabled={tab.disabled}
+          >{tab.label}</TabsTab
+        >
       {/each}
       <TabsIndicator class="indicator" />
     </TabsList>
@@ -35,5 +48,7 @@
   </Tabs>
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>
-  <button onclick={() => controller.select("notifications")}>Show notifications</button>
+  <button onclick={() => controller.select("notifications")}
+    >Show notifications</button
+  >
 </div>

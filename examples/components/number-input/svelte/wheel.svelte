@@ -23,5 +23,5 @@
       </NumberInputIncrement>
     </NumberInputGroup>
   </NumberInput>
-  <FieldDescription >Focus the input, then scroll over it.</FieldDescription>
+  <FieldDescription>Focus the input, then scroll over it.</FieldDescription>
 </Field>

@@ -42,7 +42,12 @@ function choose(range: readonly [string, string]) {
         {{ preset.label }}
       </button>
     </div>
-    <Calendar mode="range" :controller="calendar" :today="today" default-month="2026-10">
+    <Calendar
+      mode="range"
+      :controller="calendar"
+      :today="today"
+      default-month="2026-10"
+    >
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
           <ChevronLeftIcon aria-hidden="true" />

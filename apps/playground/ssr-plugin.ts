@@ -8,9 +8,14 @@ import type { Plugin } from "vite"
 // Node's ICU, as a real server's does. In development it loads the renderer
 // through Vite. The preview server, which CI uses, loads the build
 // `vite build --ssr` wrote to dist-ssr.
-type Renderer = { renderFixture: (fixture: string, url: string) => Promise<string> }
+type Renderer = {
+  renderFixture: (fixture: string, url: string) => Promise<string>
+}
 
-const renderers: Record<string, string> = { svelte: "/src/ssr.ts", vue: "/src/ssr/vue.ts" }
+const renderers: Record<string, string> = {
+  svelte: "/src/ssr.ts",
+  vue: "/src/ssr/vue.ts",
+}
 
 function ssrFixtures() {
   const handle =
@@ -18,7 +23,9 @@ function ssrFixtures() {
     async (req: IncomingMessage, res: ServerResponse, next: () => void) => {
       const { originalUrl } = req as IncomingMessage & { originalUrl?: string }
       const url = new URL(originalUrl ?? req.url ?? "", "http://localhost")
-      if (url.pathname !== "/__ssr") return next()
+      if (url.pathname !== "/__ssr") {
+        return next()
+      }
       const fixture = url.searchParams.get("fixture")
       const framework = url.searchParams.get("framework") ?? ""
       const page = url.searchParams.get("url")
@@ -34,7 +41,11 @@ function ssrFixtures() {
         res.end(html)
       } catch (error) {
         res.statusCode = 500
-        res.end(error instanceof Error ? (error.stack ?? error.message) : String(error))
+        res.end(
+          error instanceof Error
+            ? (error.stack ?? error.message)
+            : String(error)
+        )
       }
     }
   return {
@@ -45,18 +56,27 @@ function ssrFixtures() {
     configResolved(config) {
       // vite-plugin-svelte externalizes the dependencies of a package that
       // peers on Svelte, and `external` wins over `noExternal`.
-      const ours = (dep: string | RegExp) => typeof dep === "string" && dep.startsWith("@ui-sdk/")
+      const ours = (dep: string | RegExp) =>
+        typeof dep === "string" && dep.startsWith("@ui-sdk/")
       for (const resolve of [config.ssr, config.environments.ssr?.resolve]) {
-        if (Array.isArray(resolve?.external)) resolve.external = resolve.external.filter((dep) => !ours(dep))
+        if (Array.isArray(resolve?.external)) {
+          resolve.external = resolve.external.filter((dep) => !ours(dep))
+        }
       }
     },
     configureServer(server) {
-      server.middlewares.use(handle((entry) => server.ssrLoadModule(entry) as Promise<Renderer>))
+      server.middlewares.use(
+        handle((entry) => server.ssrLoadModule(entry) as Promise<Renderer>)
+      )
     },
     configurePreviewServer(server) {
       // The entries build to dist-ssr/<name>.js.
       const built = (entry: string) =>
-        path.resolve(server.config.root, "dist-ssr", `${path.basename(entry, path.extname(entry))}.js`)
+        path.resolve(
+          server.config.root,
+          "dist-ssr",
+          `${path.basename(entry, path.extname(entry))}.js`
+        )
       server.middlewares.use(handle((entry) => import(built(entry))))
     },
   } satisfies Plugin

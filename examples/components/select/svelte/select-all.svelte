@@ -23,7 +23,11 @@
 
 <Field>
   <FieldLabel>Regions</FieldLabel>
-  <Select multiple defaultValue={["us-east", "europe", "asia-pacific"]} placeholder="Select regions">
+  <Select
+    multiple
+    defaultValue={["us-east", "europe", "asia-pacific"]}
+    placeholder="Select regions"
+  >
     <SelectTrigger>
       <SelectValue maxLabels={2} getMoreLabel={(count) => `${count} more`} />
       <ChevronDownIcon />

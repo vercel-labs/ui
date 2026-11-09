@@ -37,7 +37,9 @@ function Example() {
       <Autocomplete
         value={value()}
         onValueChange={(next, details) => {
-          if (next.length > 12) return details.cancel()
+          if (next.length > 12) {
+            return details.cancel()
+          }
           setValue(next)
           log(`text: ${details.reason}`)
         }}
@@ -46,8 +48,12 @@ function Example() {
           setOpen(next)
           log(`${next ? "opened" : "closed"}: ${details.reason}`)
         }}
-        onOpenChangeComplete={(next) => log(`${next ? "opened" : "closed"} and settled`)}
-        onHighlight={(highlighted) => highlighted && log(`highlighted ${highlighted}`)}
+        onOpenChangeComplete={(next) =>
+          log(`${next ? "opened" : "closed"} and settled`)
+        }
+        onHighlight={(highlighted) =>
+          highlighted && log(`highlighted ${highlighted}`)
+        }
         debug
       >
         <AutocompleteLabel>Fruit (12 characters at most)</AutocompleteLabel>
@@ -55,7 +61,11 @@ function Example() {
         <AutocompleteContent>
           <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
-            <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
+            <For each={fruits}>
+              {(fruit) => (
+                <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>
+              )}
+            </For>
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>

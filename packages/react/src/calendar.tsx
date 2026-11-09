@@ -12,17 +12,29 @@ import {
 } from "@ui-sdk/core/calendar"
 import * as React from "react"
 import { CalendarContext, GridContext } from "./calendar-context"
-import { renderElement, slotIn, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  renderElement,
+  slotIn,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 function useCalendar(part: string) {
   const context = React.useContext(CalendarContext)
-  if (!context) throw new Error(`${part} must be used inside <Calendar> or <DatePickerContent>.`)
+  if (!context) {
+    throw new Error(
+      `${part} must be used inside <Calendar> or <DatePickerContent>.`
+    )
+  }
   return context
 }
 
 function useGrid(part: string) {
   const context = React.useContext(GridContext)
-  if (!context) throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  }
   return context
 }
 
@@ -105,9 +117,12 @@ function Calendar({
           <CalendarHeading />
           <CalendarNext />
         </div>
-        {Array.from({ length: Math.max(1, Math.floor(months ?? 1) || 1) }, (_, offset) => (
-          <CalendarGrid key={offset} offset={offset} />
-        ))}
+        {Array.from(
+          { length: Math.max(1, Math.floor(months ?? 1) || 1) },
+          (_, offset) => (
+            <CalendarGrid key={offset} offset={offset} />
+          )
+        )}
       </>
     ) : (
       children
@@ -124,23 +139,43 @@ function Calendar({
  * The months shown, like "October 2026". Screen readers hear it change.
  * @stable
  */
-function CalendarHeading({ children = label, ...props }: PartProps<"h2", CalendarHeadingState>) {
-  return usePart(useCalendar("CalendarHeading"), "heading", {}, { ...props, children }, "h2")
+function CalendarHeading({
+  children = label,
+  ...props
+}: PartProps<"h2", CalendarHeadingState>) {
+  return usePart(
+    useCalendar("CalendarHeading"),
+    "heading",
+    {},
+    { ...props, children },
+    "h2"
+  )
 }
 
 const label = (state: { label: string }) => state.label
 
-type SelectProps = Omit<PartProps<"select", CalendarSelectState>, "value" | "defaultValue">
+type SelectProps = Omit<
+  PartProps<"select", CalendarSelectState>,
+  "value" | "defaultValue"
+>
 
 function useSelect(
   name: "month-select" | "year-select",
   part: string,
-  { render, children = options, ...props }: SelectProps,
+  { render, children = options, ...props }: SelectProps
 ) {
   // The core writes the selected option as it changes, so React only renders where it starts.
-  const select = ({ value, ...attrs }: Record<string, any>, state: CalendarSelectState) =>
-    renderElement("select", { ...attrs, defaultValue: value }, render, state)
-  return usePart(useCalendar(part), name, {}, { ...props, children, render: select }, "select")
+  const select = (
+    { value, ...attrs }: Record<string, any>,
+    state: CalendarSelectState
+  ) => renderElement("select", { ...attrs, defaultValue: value }, render, state)
+  return usePart(
+    useCalendar(part),
+    name,
+    {},
+    { ...props, children, render: select },
+    "select"
+  )
 }
 
 const options = (state: CalendarSelectState) =>
@@ -168,9 +203,19 @@ function CalendarYearSelect(props: SelectProps) {
 
 type StepProps = PartProps<"button", CalendarStepState>
 
-function useStep(name: "previous" | "next", part: string, { children, ...props }: StepProps) {
+function useStep(
+  name: "previous" | "next",
+  part: string,
+  { children, ...props }: StepProps
+) {
   const content = children ?? (name === "previous" ? "‹" : "›")
-  return usePart(useCalendar(part), name, {}, { ...props, children: content }, "button")
+  return usePart(
+    useCalendar(part),
+    name,
+    {},
+    { ...props, children: content },
+    "button"
+  )
 }
 
 /**
@@ -210,7 +255,7 @@ function CalendarGrid({
     "grid",
     { offset, id: String(offset) },
     { ...props, children: content },
-    "table",
+    "table"
   )
 }
 
@@ -230,7 +275,10 @@ function GridScope({
   state: CalendarGridState
   children: React.ReactNode
 }) {
-  const grid = React.useMemo(() => ({ offset, state }), [offset, state.month, state.weeks])
+  const grid = React.useMemo(
+    () => ({ offset, state }),
+    [offset, state.month, state.weeks]
+  )
   return <GridContext.Provider value={grid}>{children}</GridContext.Provider>
 }
 
@@ -272,7 +320,13 @@ function CalendarWeekday({
 }: PartProps<"th", CalendarWeekdayState> & { index: number }) {
   const { offset } = useGrid("CalendarWeekday")
   const part = { index, id: `${offset}-${index}` }
-  return usePart(useCalendar("CalendarWeekday"), "weekday", part, { scope: "col", ...props, children }, "th")
+  return usePart(
+    useCalendar("CalendarWeekday"),
+    "weekday",
+    part,
+    { scope: "col", ...props, children },
+    "th"
+  )
 }
 
 /**
@@ -293,7 +347,10 @@ function CalendarWeeks({
   return (
     <tbody {...props}>
       {state.weeks.map((week, index) => (
-        <tr key={week[0]!.date} {...slotIn(calendar, "week", { id: `${offset}-${index}` })}>
+        <tr
+          key={week[0]!.date}
+          {...slotIn(calendar, "week", { id: `${offset}-${index}` })}
+        >
           {week.map((cell) =>
             cell.hidden ? (
               <td key={cell.date} />
@@ -301,7 +358,7 @@ function CalendarWeeks({
               <React.Fragment key={cell.date}>
                 {children ? children(cell) : <CalendarDay value={cell.date} />}
               </React.Fragment>
-            ),
+            )
           )}
         </tr>
       ))}
@@ -320,7 +377,13 @@ function CalendarDay({
 }: PartProps<"td", CalendarDayState> & { value: string }) {
   const grid = React.useContext(GridContext)
   const part = { value, offset: grid?.offset ?? 0 }
-  return usePart(useCalendar("CalendarDay"), "day", part, { ...props, children }, "td")
+  return usePart(
+    useCalendar("CalendarDay"),
+    "day",
+    part,
+    { ...props, children },
+    "td"
+  )
 }
 
 export { createCalendarController } from "@ui-sdk/core/calendar"

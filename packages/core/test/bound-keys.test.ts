@@ -1,12 +1,19 @@
 import { describe, expect, test } from "vitest"
-import { flagWhileBound, keyWhileBound, settleFlag } from "../src/foundation/kernel/bound-keys"
+import {
+  flagWhileBound,
+  keyWhileBound,
+  settleFlag,
+} from "../src/foundation/kernel/bound-keys"
 import { createStore } from "../src/foundation/kernel/store"
 
 const tick = () => new Promise<void>((done) => queueMicrotask(done))
 
 describe("flags set while a part is bound", () => {
   test("parts that bind together write the store once, a microtask later", async () => {
-    const store = createStore({ titled: null as boolean | null, labels: [] as readonly string[] }, [])
+    const store = createStore(
+      { titled: null as boolean | null, labels: [] as readonly string[] },
+      []
+    )
     let writes = 0
     store.subscribe(() => writes++)
     flagWhileBound(store, "titled")

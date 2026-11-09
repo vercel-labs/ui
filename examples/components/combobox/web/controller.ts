@@ -22,7 +22,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -55,7 +56,7 @@ function mount(root: HTMLElement) {
                     ${item.label}
                     <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                   </ui-combobox-item>
-                `,
+                `
               )
               .join("")}
           </ui-combobox-list>
@@ -79,8 +80,9 @@ function mount(root: HTMLElement) {
     germany: () => country.setValue("de"),
     clear: () => country.clear(),
   }
-  for (const button of root.querySelectorAll<HTMLElement>("[data-action]"))
+  for (const button of root.querySelectorAll<HTMLElement>("[data-action]")) {
     button.addEventListener("click", () => actions[button.dataset.action!]())
+  }
 }
 
 export { mount }

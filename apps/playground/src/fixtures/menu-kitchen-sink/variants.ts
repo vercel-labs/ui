@@ -65,7 +65,12 @@ const everything: MenuData = [
     type: "group",
     label: "Show",
     items: [
-      { type: "checkbox", value: "toolbar", label: "Toolbar", defaultChecked: true },
+      {
+        type: "checkbox",
+        value: "toolbar",
+        label: "Toolbar",
+        defaultChecked: true,
+      },
       { type: "checkbox", value: "status", label: "Status bar" },
     ],
   },
@@ -88,10 +93,19 @@ const everything: MenuData = [
     items: [
       { value: "email", label: "Email" },
       { value: "link", label: "Copy link" },
-      { type: "submenu", label: "More", items: [{ value: "embed", label: "Embed" }] },
+      {
+        type: "submenu",
+        label: "More",
+        items: [{ value: "embed", label: "Embed" }],
+      },
     ],
   },
-  { type: "submenu", label: "Export", disabled: true, items: [{ value: "pdf", label: "PDF" }] },
+  {
+    type: "submenu",
+    label: "Export",
+    disabled: true,
+    items: [{ value: "pdf", label: "PDF" }],
+  },
 ]
 
 const nested: MenuData = [
@@ -169,7 +183,12 @@ const keepOpen: MenuData = [
   { value: "increase", label: "Increase (stays open)", closeOnSelect: false },
   { value: "decrease", label: "Decrease (stays open)", closeOnSelect: false },
   { type: "separator" },
-  { type: "checkbox", value: "wrap", label: "Wrap (closes on toggle)", closeOnSelect: true },
+  {
+    type: "checkbox",
+    value: "wrap",
+    label: "Wrap (closes on toggle)",
+    closeOnSelect: true,
+  },
   { value: "done", label: "Done" },
 ]
 
@@ -185,12 +204,30 @@ const variants: Variant[] = [
       trigger: `${side} / ${align}`,
       items: short,
       content: { side, align },
-    })),
+    }))
   ),
 
-  { id: "offset-0", section: "Offsets", title: "sideOffset 0", items: short, content: { sideOffset: 0 } },
-  { id: "offset-16", section: "Offsets", title: "sideOffset 16", items: short, content: { sideOffset: 16 } },
-  { id: "align-16", section: "Offsets", title: "alignOffset 16", items: short, content: { alignOffset: 16 } },
+  {
+    id: "offset-0",
+    section: "Offsets",
+    title: "sideOffset 0",
+    items: short,
+    content: { sideOffset: 0 },
+  },
+  {
+    id: "offset-16",
+    section: "Offsets",
+    title: "sideOffset 16",
+    items: short,
+    content: { sideOffset: 16 },
+  },
+  {
+    id: "align-16",
+    section: "Offsets",
+    title: "alignOffset 16",
+    items: short,
+    content: { alignOffset: 16 },
+  },
   {
     id: "align-neg",
     section: "Offsets",
@@ -253,7 +290,12 @@ const variants: Variant[] = [
     content: { side: "top" },
   },
 
-  { id: "sub-nested", section: "Submenus", title: "Three levels", items: nested },
+  {
+    id: "sub-nested",
+    section: "Submenus",
+    title: "Three levels",
+    items: nested,
+  },
   {
     id: "sub-instant",
     section: "Submenus",
@@ -276,8 +318,18 @@ const variants: Variant[] = [
     items: everything,
   },
 
-  { id: "items-everything", section: "Items", title: "Checkbox, radio, groups", items: everything },
-  { id: "items-keep-open", section: "Items", title: "closeOnSelect", items: keepOpen },
+  {
+    id: "items-everything",
+    section: "Items",
+    title: "Checkbox, radio, groups",
+    items: everything,
+  },
+  {
+    id: "items-keep-open",
+    section: "Items",
+    title: "closeOnSelect",
+    items: keepOpen,
+  },
   {
     id: "items-loop",
     section: "Items",
@@ -343,8 +395,20 @@ const variants: Variant[] = [
     items: basic,
     options: { presentation: "auto" },
   },
-  { id: "controlled", section: "Behavior", title: "Controlled open", items: basic, controlled: true },
-  { id: "controller", section: "Behavior", title: "Controller", items: basic, controller: true },
+  {
+    id: "controlled",
+    section: "Behavior",
+    title: "Controlled open",
+    items: basic,
+    controlled: true,
+  },
+  {
+    id: "controller",
+    section: "Behavior",
+    title: "Controller",
+    items: basic,
+    controller: true,
+  },
   {
     id: "debug",
     section: "Behavior",
@@ -403,8 +467,20 @@ const variants: Variant[] = [
     place: "rtl",
   },
 
-  { id: "anim-none", section: "Animation", title: "None", items: basic, animation: "none" },
-  { id: "anim-default", section: "Animation", title: "Scale and fade", items: basic, animation: "default" },
+  {
+    id: "anim-none",
+    section: "Animation",
+    title: "None",
+    items: basic,
+    animation: "none",
+  },
+  {
+    id: "anim-default",
+    section: "Animation",
+    title: "Scale and fade",
+    items: basic,
+    animation: "default",
+  },
   {
     id: "anim-slow",
     section: "Animation",

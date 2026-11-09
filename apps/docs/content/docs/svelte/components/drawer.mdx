@@ -123,7 +123,10 @@ Use `bind:open`, or `bind:snapPoint`, to keep the drawer's state in your compone
 With `dismissible` false, Escape, outside presses, back gestures, and swipes leave the drawer open. `onDismissAttempt` tells you what was tried, so you can offer a way to discard unsaved work. Close parts, triggers, and controllers can still close it deliberately.
 
 ```svelte
-<Drawer dismissible={false} onDismissAttempt={(details) => (attempt = details.reason)}>
+<Drawer
+  dismissible={false}
+  onDismissAttempt={(details) => (attempt = details.reason)}
+>
   <DrawerTrigger>Write a Post</DrawerTrigger>
   <DrawerBackdrop />
   <DrawerContent>
@@ -196,7 +199,9 @@ Calling `open({ payload })` on the controller returns a Promise with the closing
   }
 </script>
 
-<DrawerTrigger controller={share} payload={file} disabled={file.uploading}>Share</DrawerTrigger>
+<DrawerTrigger controller={share} payload={file} disabled={file.uploading}
+  >Share</DrawerTrigger
+>
 
 <Drawer controller={share}>
   <DrawerBackdrop />
@@ -288,7 +293,11 @@ Every part takes a `render` snippet, which receives the props to spread and the 
         <h3 {...props}>Quarterly report</h3>
       {/snippet}
     </DrawerTitle>
-    <DrawerDescription>{state.expanded ? "Showing all of it." : "Drag up to see more."}</DrawerDescription>
+    <DrawerDescription
+      >{state.expanded
+        ? "Showing all of it."
+        : "Drag up to see more."}</DrawerDescription
+    >
     <DrawerClose>
       {#snippet render({ props })}
         <a {...props} href="/reports/q3">Open the Full Page</a>
@@ -352,13 +361,19 @@ Props and callbacks are the same as below, as Svelte props. `open` and `snapPoin
 
 ### Drawer
 
-<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOptions" />
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOptions"
+/>
 
 ### DrawerTrigger
 
 A trigger outside the drawer also takes `controller`.
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerProps"
+/>
 
 ### DrawerBackdrop
 
@@ -366,7 +381,10 @@ Dims the page behind a modal drawer, which manages its opacity. Renders a `div`.
 
 ### DrawerContent
 
-<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerContentProps"
+/>
 
 ### DrawerHandle
 
@@ -382,17 +400,26 @@ Describes the drawer while it's rendered. Renders a `p`.
 
 ### DrawerClose
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogCloseProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseProps"
+/>
 
 ### DrawerShortcut
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogShortcutProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogShortcutProps"
+/>
 
 ### DrawerOutlet
 
 An outlet outside the drawer also takes `controller`.
 
-<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletProps" />
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOutletProps"
+/>
 
 ### State
 
@@ -400,45 +427,75 @@ What render functions, state-based class names and slots receive, per part.
 
 `DrawerTrigger`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerState"
+/>
 
 `DrawerBackdrop`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerBackdropState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerBackdropState"
+/>
 
 `DrawerContent`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerContentState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerContentState"
+/>
 
 `DrawerHandle`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerHandleState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerHandleState"
+/>
 
 `DrawerClose`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogCloseState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseState"
+/>
 
 `DrawerOutlet`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOutletState"
+/>
 
 ### Reasons
 
 `details.reason` says why the drawer opened or closed.
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOpenChangeReason"
+/>
 
 For a payload change, it says what opened the drawer or took it over.
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerPayloadChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerPayloadChangeReason"
+/>
 
 Why it moved to another snap point:
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerSnapPointChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerSnapPointChangeReason"
+/>
 
 The dismissals `dismissible` can refuse:
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerDismissReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerDismissReason"
+/>
 
 ### Controller
 
@@ -447,7 +504,10 @@ triggers and outlets outside it.
 
 Every write method takes an optional `{ reason, event }`, passed to the callbacks. Closing with a controller always works, even when the drawer isn't dismissible or an action is running.
 
-<ControllerTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerController" />
+<ControllerTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerController"
+/>
 
 ### Events
 

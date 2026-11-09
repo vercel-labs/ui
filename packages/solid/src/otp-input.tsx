@@ -9,16 +9,29 @@ import type { JSX } from "@solidjs/web"
 import { merge, omit, untrack } from "solid-js"
 import { useFieldControl } from "./field-context"
 import { defaultValueProps } from "./text-control"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(otpInputPrimitive, { group: "div", separator: "div" })
 
-type DivProps<State> = Omit<PartProps<"div", State>, "defaultValue" | "onChange" | "onSelect">
+type DivProps<State> = Omit<
+  PartProps<"div", State>,
+  "defaultValue" | "onChange" | "onSelect"
+>
 
 // Props that belong to the input, which is what takes focus and is named.
 type InputProps = Pick<
   JSX.IntrinsicElements["input"],
-  "id" | "autofocus" | "aria-label" | "aria-labelledby" | "aria-describedby" | "aria-invalid"
+  | "id"
+  | "autofocus"
+  | "aria-label"
+  | "aria-labelledby"
+  | "aria-describedby"
+  | "aria-invalid"
 >
 
 const named = [
@@ -35,7 +48,9 @@ const named = [
  * and the `aria-*` naming props go to that input.
  * @stable
  */
-function OTPInput(props: OTPInputOptions & InputProps & DivProps<OTPInputState>) {
+function OTPInput(
+  props: OTPInputOptions & InputProps & DivProps<OTPInputState>
+) {
   const field = useFieldControl()
   const otp = usePrimitive(otpInputPrimitive, () => ({
     value: props.value,
@@ -74,12 +89,15 @@ function OTPInput(props: OTPInputOptions & InputProps & DivProps<OTPInputState>)
     "controller",
     "debug",
     "children",
-    ...named,
+    ...named
   )
   const slot = otp.slot("control", undefined, pick(props, named))
   // The core writes the input's value, so Solid only renders where it starts.
   const initial = untrack(() => slot.value)
-  const inputProps = defaultValueProps(field ? field.props(slot) : slot, () => initial)
+  const inputProps = defaultValueProps(
+    field ? field.props(slot) : slot,
+    () => initial
+  )
   // The content, then the input after it. `props.children` is read once:
   // every read of a JSX children getter makes the slots again.
   const content = (current: OTPInputState) => {
@@ -91,7 +109,13 @@ function OTPInput(props: OTPInputOptions & InputProps & DivProps<OTPInputState>)
       </>
     )
   }
-  return usePart(otp, "root", undefined, merge(rest, { children: content }), "div")
+  return usePart(
+    otp,
+    "root",
+    undefined,
+    merge(rest, { children: content }),
+    "div"
+  )
 }
 
 // A live view of some of the props, by key.

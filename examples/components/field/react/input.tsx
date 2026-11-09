@@ -7,7 +7,9 @@ function Example() {
       <Field>
         <FieldLabel>Username</FieldLabel>
         <Input name="username" placeholder="hollis" autoComplete="username" />
-        <FieldDescription>Choose a unique username for your account.</FieldDescription>
+        <FieldDescription>
+          Choose a unique username for your account.
+        </FieldDescription>
       </Field>
     </div>
   )

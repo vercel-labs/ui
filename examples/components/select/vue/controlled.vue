@@ -24,7 +24,10 @@ const value = ref<string | null>("viewer")
 const open = ref(false)
 const log = useLog()
 
-function changeValue(next: string | null, details: { reason: string; cancel: () => void }) {
+function changeValue(
+  next: string | null,
+  details: { reason: string; cancel: () => void }
+) {
   if (next === "owner") {
     details.cancel()
     log("Only the owner can transfer ownership")
@@ -46,14 +49,20 @@ function changeValue(next: string | null, details: { reason: string; cancel: () 
         v-model:value="value"
         v-model:open="open"
         @value-change="changeValue"
-        @open-change="(next, details) => log(`open: ${next} (${details.reason})`)"
+        @open-change="
+          (next, details) => log(`open: ${next} (${details.reason})`)
+        "
       >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="role in roles" :key="role.value" :value="role.value">
+          <SelectItem
+            v-for="role in roles"
+            :key="role.value"
+            :value="role.value"
+          >
             {{ role.label }}
             <SelectItemIndicator>
               <CheckIcon />

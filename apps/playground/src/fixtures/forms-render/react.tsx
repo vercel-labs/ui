@@ -11,7 +11,11 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <form className="form" aria-label="Rendering" onSubmit={(event) => event.preventDefault()}>
+      <form
+        className="form"
+        aria-label="Rendering"
+        onSubmit={(event) => event.preventDefault()}
+      >
         <label>
           <Checkbox
             className="checkbox"
@@ -24,15 +28,23 @@ function Fixture() {
         </label>
         <Checkbox
           aria-label="Render function"
-          render={(props, state) => <button {...props}>{state.checked ? "On" : "Off"}</button>}
+          render={(props, state) => (
+            <button {...props}>{state.checked ? "On" : "Off"}</button>
+          )}
         />
         <Checkbox
           aria-label="Class from state"
-          className={(state) => `checkbox ${state.checked ? "is-checked" : "is-unchecked"}`}
+          className={(state) =>
+            `checkbox ${state.checked ? "is-checked" : "is-unchecked"}`
+          }
         />
         <label>
           <Switch className="switch" defaultChecked>
-            <SwitchThumb render={(props, state) => <span {...props}>{state.checked ? "I" : "O"}</span>} />
+            <SwitchThumb
+              render={(props, state) => (
+                <span {...props}>{state.checked ? "I" : "O"}</span>
+              )}
+            />
           </Switch>
           Labelled thumb
         </label>
@@ -50,7 +62,10 @@ function Fixture() {
         </RadioGroup>
         <Field>
           <FieldLabel>Nickname</FieldLabel>
-          <FieldControl value={nickname} onChange={(event) => setNickname(event.currentTarget.value)} />
+          <FieldControl
+            value={nickname}
+            onChange={(event) => setNickname(event.currentTarget.value)}
+          />
         </Field>
       </form>
       <button>After</button>

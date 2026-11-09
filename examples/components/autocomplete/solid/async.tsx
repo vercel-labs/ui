@@ -72,12 +72,18 @@ function Example() {
           }
         </AutocompleteStatus>
         <AutocompleteEmpty>
-          {(state) => (state.empty && !state.loading ? `No cities start with “${state.query}”.` : null)}
+          {(state) =>
+            state.empty && !state.loading
+              ? `No cities start with “${state.query}”.`
+              : null
+          }
         </AutocompleteEmpty>
         <AutocompleteList>
           {(state) => (
             <For each={state.items as string[]}>
-              {(city) => <AutocompleteItem value={city}>{city}</AutocompleteItem>}
+              {(city) => (
+                <AutocompleteItem value={city}>{city}</AutocompleteItem>
+              )}
             </For>
           )}
         </AutocompleteList>

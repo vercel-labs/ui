@@ -95,19 +95,29 @@ With only a few pages, the range has no gaps, so you can write the links out and
 <ui-pagination aria-label="Pagination" page-count="5">
   <ui-pagination-list>
     <ui-pagination-item
-      ><ui-pagination-link page="1"><button>1</button></ui-pagination-link></ui-pagination-item
+      ><ui-pagination-link page="1"
+        ><button>1</button></ui-pagination-link
+      ></ui-pagination-item
     >
     <ui-pagination-item
-      ><ui-pagination-link page="2"><button>2</button></ui-pagination-link></ui-pagination-item
+      ><ui-pagination-link page="2"
+        ><button>2</button></ui-pagination-link
+      ></ui-pagination-item
     >
     <ui-pagination-item
-      ><ui-pagination-link page="3"><button>3</button></ui-pagination-link></ui-pagination-item
+      ><ui-pagination-link page="3"
+        ><button>3</button></ui-pagination-link
+      ></ui-pagination-item
     >
     <ui-pagination-item
-      ><ui-pagination-link page="4"><button>4</button></ui-pagination-link></ui-pagination-item
+      ><ui-pagination-link page="4"
+        ><button>4</button></ui-pagination-link
+      ></ui-pagination-item
     >
     <ui-pagination-item
-      ><ui-pagination-link page="5"><button>5</button></ui-pagination-link></ui-pagination-item
+      ><ui-pagination-link page="5"
+        ><button>5</button></ui-pagination-link
+      ></ui-pagination-item
     >
   </ui-pagination-list>
 </ui-pagination>
@@ -136,7 +146,8 @@ Set the `getHref` property to map each page to a URL, and wrap `<a>` elements in
 ```
 
 ```ts
-document.querySelector("ui-pagination")!.getHref = (page) => `/posts?page=${page}`
+document.querySelector("ui-pagination")!.getHref = (page) =>
+  `/posts?page=${page}`
 ```
 
 Server-rendered anchors work before JavaScript loads. A normal click changes the page and follows the URL. Modifier clicks and middle clicks leave pagination state alone so the browser can open the link elsewhere.
@@ -161,7 +172,9 @@ The element owns its page. Listen for `pagechange`, and call `preventDefault()` 
 
 ```ts
 const pagination = document.querySelector("ui-pagination")!
-pagination.addEventListener("pagechange", (event) => console.log(event.detail.value, event.detail.reason))
+pagination.addEventListener("pagechange", (event) =>
+  console.log(event.detail.value, event.detail.reason)
+)
 pagination.page = 1
 ```
 
@@ -172,7 +185,9 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `default-page` is the page it starts on, when uncontrolled. It's 1 by default.
 
 ```html
-<ui-pagination aria-label="Pagination" page-count="10" default-page="5"> ... </ui-pagination>
+<ui-pagination aria-label="Pagination" page-count="10" default-page="5">
+  ...
+</ui-pagination>
 ```
 
 ## Siblings
@@ -180,7 +195,14 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
 
 ```html
-<ui-pagination aria-label="Pagination" page-count="20" default-page="10" siblings="2"> ... </ui-pagination>
+<ui-pagination
+  aria-label="Pagination"
+  page-count="20"
+  default-page="10"
+  siblings="2"
+>
+  ...
+</ui-pagination>
 ```
 
 ## Boundaries
@@ -188,7 +210,14 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `boundaries` is how many pages always show at each end, 1 by default.
 
 ```html
-<ui-pagination aria-label="Pagination" page-count="20" default-page="10" boundaries="2"> ... </ui-pagination>
+<ui-pagination
+  aria-label="Pagination"
+  page-count="20"
+  default-page="10"
+  boundaries="2"
+>
+  ...
+</ui-pagination>
 ```
 
 ## Paging from Anywhere
@@ -202,7 +231,9 @@ The element's `api` property is its [controller](#controller): it pages the pagi
 
 ```ts
 const pagination = document.querySelector("ui-pagination")!.api
-document.querySelector('[data-action="next"]')!.addEventListener("click", () => pagination.next())
+document
+  .querySelector('[data-action="next"]')!
+  .addEventListener("click", () => pagination.next())
 ```
 
 ## Your Own Markup
@@ -217,7 +248,12 @@ document.querySelector('[data-action="next"]')!.addEventListener("click", () => 
 import { paginationRange } from "@ui-sdk/core/pagination"
 
 function renderDots(group: HTMLElement, slide: number) {
-  const items = paginationRange({ page: slide, pageCount: 20, siblings: 2, boundaries: 1 })
+  const items = paginationRange({
+    page: slide,
+    pageCount: 20,
+    siblings: 2,
+    boundaries: 1,
+  })
   group.replaceChildren(
     ...items.map((item) => {
       if (typeof item !== "number") {
@@ -230,7 +266,7 @@ function renderDots(group: HTMLElement, slide: number) {
       if (item === slide) dot.setAttribute("aria-current", "true")
       dot.addEventListener("click", () => renderDots(group, item))
       return dot
-    }),
+    })
   )
 }
 ```
@@ -281,11 +317,17 @@ numbers. `getHref` and `controller` are properties. `page` is a live property. C
 
 ### Pagination
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationOptions" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationOptions"
+/>
 
 ### PaginationLink
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkProps" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkProps"
+/>
 
 `PaginationList`, `PaginationItem`, `PaginationPrevious`, `PaginationNext`, `PaginationFirst`, `PaginationLast` and `PaginationEllipsis` take no props of their own.
 
@@ -295,15 +337,24 @@ The same state shows as attributes on each link and step.
 
 `Pagination` and `PaginationList`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationState"
+/>
 
 `PaginationLink`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkState"
+/>
 
 `PaginationPrevious`, `PaginationNext`, `PaginationFirst` and `PaginationLast`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationStepState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationStepState"
+/>
 
 ### Reasons
 

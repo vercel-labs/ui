@@ -33,7 +33,9 @@ function Example() {
       </CarouselViewport>
       <CarouselIndicatorGroup aria-label="Choose a photo">
         <For each={photos}>
-          {(photo, index) => <CarouselIndicator page={index() + 1} aria-label={photo.name} />}
+          {(photo, index) => (
+            <CarouselIndicator page={index() + 1} aria-label={photo.name} />
+          )}
         </For>
       </CarouselIndicatorGroup>
     </Carousel>

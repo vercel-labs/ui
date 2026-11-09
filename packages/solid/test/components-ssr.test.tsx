@@ -1,8 +1,18 @@
 import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
 import { Checkbox, CheckboxGroup, CheckboxIndicator } from "../src/checkbox"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "../src/field"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "../src/field"
 import { Input } from "../src/input"
 import {
   createPopoverController,
@@ -16,7 +26,13 @@ import {
   PopoverTrigger,
 } from "../src/popover"
 import { Radio, RadioGroup } from "../src/radio"
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from "../src/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "../src/select"
 import { Switch } from "../src/switch"
 
 // Runs with no DOM: any access to window or document during render throws.
@@ -77,8 +93,15 @@ describe("server rendering form controls", () => {
     expect(html).toContain('role="checkbox"')
     expect(html).toContain('aria-checked="true"')
     const [input] = inputs(html)
-    for (const attribute of ['type="checkbox"', 'name="terms"', 'value="yes"', " checked", " required"])
+    for (const attribute of [
+      'type="checkbox"',
+      'name="terms"',
+      'value="yes"',
+      " checked",
+      " required",
+    ]) {
       expect(input).toContain(attribute)
+    }
     expect(html).toContain('data-slot="checkbox-indicator"')
   })
 
@@ -102,14 +125,20 @@ describe("server rendering form controls", () => {
 
   test("a checkbox group names its checkboxes and checks its default values", () => {
     const html = renderToString(() => (
-      <CheckboxGroup name="toppings" defaultValue={["cheese"]} allValues={["cheese", "olives"]}>
+      <CheckboxGroup
+        name="toppings"
+        defaultValue={["cheese"]}
+        allValues={["cheese", "olives"]}
+      >
         <Checkbox parent />
         <Checkbox value="cheese" />
         <Checkbox value="olives" />
       </CheckboxGroup>
     ))
     expect(html).toContain('aria-checked="mixed"')
-    const cheese = inputs(html).find((input) => input.includes('value="cheese"'))!
+    const cheese = inputs(html).find((input) =>
+      input.includes('value="cheese"')
+    )!
     expect(cheese).toContain('name="toppings"')
     expect(cheese).toMatch(/\schecked[\s>]/)
     expect(html.match(/name="toppings"/g)).toHaveLength(2)
@@ -140,29 +169,46 @@ const attribute = (tag: string | undefined, name: string) =>
 describe.each(["before", "after"])(
   "server rendering a field with its description %s the control",
   (order) => {
-    test.each(["input", "select"])("its label names the %s and its description describes it", (kind) => {
-      const html = renderToString(() => (
-        <Field>
-          <FieldLabel>Fruit</FieldLabel>
-          {order === "before" && <FieldDescription>Pick one.</FieldDescription>}
-          {kind === "input" ? (
-            <Input />
-          ) : (
-            <Select>
-              <SelectTrigger />
-            </Select>
-          )}
-          {order === "after" && <FieldDescription>Pick one.</FieldDescription>}
-        </Field>
-      ))
-      const label = tags(html).find((tag) => tag.startsWith("<label"))
-      const element = tags(html).find((tag) => attribute(tag, "id") === attribute(label, "for"))
-      expect(element).toMatch(kind === "input" ? /^<input/ : /^<button[^>]*role="combobox"/)
-      expect(attribute(element, "aria-labelledby")).toBe(attribute(label, "id"))
-      const text = tags(html).find((tag) => tag.includes('data-slot="field-description"'))
-      expect(attribute(element, "aria-describedby")).toBe(attribute(text, "id"))
-    })
-  },
+    test.each(["input", "select"])(
+      "its label names the %s and its description describes it",
+      (kind) => {
+        const html = renderToString(() => (
+          <Field>
+            <FieldLabel>Fruit</FieldLabel>
+            {order === "before" && (
+              <FieldDescription>Pick one.</FieldDescription>
+            )}
+            {kind === "input" ? (
+              <Input />
+            ) : (
+              <Select>
+                <SelectTrigger />
+              </Select>
+            )}
+            {order === "after" && (
+              <FieldDescription>Pick one.</FieldDescription>
+            )}
+          </Field>
+        ))
+        const label = tags(html).find((tag) => tag.startsWith("<label"))
+        const element = tags(html).find(
+          (tag) => attribute(tag, "id") === attribute(label, "for")
+        )
+        expect(element).toMatch(
+          kind === "input" ? /^<input/ : /^<button[^>]*role="combobox"/
+        )
+        expect(attribute(element, "aria-labelledby")).toBe(
+          attribute(label, "id")
+        )
+        const text = tags(html).find((tag) =>
+          tag.includes('data-slot="field-description"')
+        )
+        expect(attribute(element, "aria-describedby")).toBe(
+          attribute(text, "id")
+        )
+      }
+    )
+  }
 )
 
 describe("server rendering a popover", () => {
@@ -174,7 +220,9 @@ describe("server rendering a popover", () => {
       <PopoverContent>
         <PopoverArrow />
         <PopoverTitle>Edit profile</PopoverTitle>
-        <PopoverDescription>Your name appears on your posts.</PopoverDescription>
+        <PopoverDescription>
+          Your name appears on your posts.
+        </PopoverDescription>
         <PopoverClose>Close</PopoverClose>
       </PopoverContent>
     </Popover>
@@ -228,7 +276,12 @@ describe("server rendering a select", () => {
 
   test("a data select renders its label, its value's label and a hidden input that submits it", () => {
     const html = renderToString(() => (
-      <Select items={plans} name="plan" defaultValue="pro" placeholder="Choose a plan">
+      <Select
+        items={plans}
+        name="plan"
+        defaultValue="pro"
+        placeholder="Choose a plan"
+      >
         <SelectLabel>Plan</SelectLabel>
         <SelectTrigger />
       </Select>
@@ -254,7 +307,12 @@ describe("server rendering a select", () => {
 
   test("several values render one hidden input each", () => {
     const html = renderToString(() => (
-      <Select items={plans} name="plan" multiple defaultValue={["basic", "pro"]}>
+      <Select
+        items={plans}
+        name="plan"
+        multiple
+        defaultValue={["basic", "pro"]}
+      >
         <SelectTrigger />
       </Select>
     ))
@@ -265,7 +323,11 @@ describe("server rendering a select", () => {
   test("composed items give the value its label through itemToLabel, since Solid can't read items before they render", () => {
     const labels = new Map(plans.map((plan) => [plan.value, plan.label]))
     const html = renderToString(() => (
-      <Select name="plan" defaultValue="pro" itemToLabel={(value) => labels.get(value) ?? value}>
+      <Select
+        name="plan"
+        defaultValue="pro"
+        itemToLabel={(value) => labels.get(value) ?? value}
+      >
         <SelectTrigger />
         <SelectContent>
           <SelectItem value="basic" label="Basic" />

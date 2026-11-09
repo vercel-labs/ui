@@ -12,7 +12,8 @@ async function mount(root: HTMLElement) {
           ${f.groups[0].items
             .slice(0, 2)
             .map(
-              (item) => `<ui-command-item class="item" value="${item.value}">${item.label}</ui-command-item>`,
+              (item) =>
+                `<ui-command-item class="item" value="${item.value}">${item.label}</ui-command-item>`
             )
             .join("")}
         </ui-command-list>

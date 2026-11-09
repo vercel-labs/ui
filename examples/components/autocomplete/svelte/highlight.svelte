@@ -35,9 +35,7 @@
     <AutocompleteInput placeholder="e.g. berry" />
   </div>
   <AutocompleteContent>
-    <AutocompleteEmpty>
-      No fruits found.
-    </AutocompleteEmpty>
+    <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
     <AutocompleteList>
       {#each fruits as fruit (fruit)}
         <AutocompleteItem value={fruit}>

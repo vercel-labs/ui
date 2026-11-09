@@ -13,7 +13,12 @@ A dim behind the drawer. Its opacity follows the drawer, so give it a color like
   let props: PartProps<"div", DrawerBackdropState> = $props()
 
   const drawer = useDrawer()
-  const backdrop = useHandlePart(drawer.handle, "backdrop", () => ({}), portalTo(usePopupContainer(drawer.container)))
+  const backdrop = useHandlePart(
+    drawer.handle,
+    "backdrop",
+    () => ({}),
+    portalTo(usePopupContainer(drawer.container))
+  )
 </script>
 
 {#if backdrop.present}

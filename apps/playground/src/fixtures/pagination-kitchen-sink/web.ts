@@ -3,7 +3,8 @@ import type { UiPaginationElement } from "@ui-sdk/web"
 import * as classes from "./classes"
 import { kitchenSink } from "./shell"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/pagination")
@@ -27,12 +28,20 @@ async function mount(root: HTMLElement) {
         </ui-pagination-list>
       </ui-pagination>`
     const pagination = slot.querySelector<UiPaginationElement>("ui-pagination")!
-    if (variant.links) pagination.getHref = (target) => `#kitchen-${variant.id}-${target}`
+    if (variant.links) {
+      pagination.getHref = (target) => `#kitchen-${variant.id}-${target}`
+    }
     pagination.addEventListener("pagechange", (event) => {
-      if (variant.cancel) return event.preventDefault()
-      env.log(`pageChange ${event.detail.value} (${event.detail.reason}, ${event.detail.source})`)
+      if (variant.cancel) {
+        return event.preventDefault()
+      }
+      env.log(
+        `pageChange ${event.detail.value} (${event.detail.reason}, ${event.detail.source})`
+      )
     })
-    if (!variant.controller) return
+    if (!variant.controller) {
+      return
+    }
     const controller = createPaginationController()
     pagination.controller = controller
     env.controls([

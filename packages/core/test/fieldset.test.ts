@@ -14,13 +14,24 @@ const sliderControl = slider({ id: "s" })
 // `setFormDisabled` is how a disabled fieldset around a control reaches it.
 test.each([
   ["Checkbox", checkboxControl.api, () => checkboxControl.part("root")],
-  ["Checkbox Group", checkboxGroupControl.api, () => checkboxGroupControl.part("group")],
+  [
+    "Checkbox Group",
+    checkboxGroupControl.api,
+    () => checkboxGroupControl.part("group"),
+  ],
   ["Radio Group", radioGroupControl.api, () => radioGroupControl.part("group")],
-  ["Number Input", numberInputControl.api, () => numberInputControl.part("root")],
+  [
+    "Number Input",
+    numberInputControl.api,
+    () => numberInputControl.part("root"),
+  ],
   ["Slider", sliderControl.api, () => sliderControl.part("root")],
-] as const)("a disabled fieldset disables %s, and enabling it enables it again", (_, api, part) => {
-  api.internal.setFormDisabled(true)
-  expect(attrs(part())["data-disabled"]).toBe("")
-  api.internal.setFormDisabled(false)
-  expect(attrs(part())["data-disabled"]).toBeUndefined()
-})
+] as const)(
+  "a disabled fieldset disables %s, and enabling it enables it again",
+  (_, api, part) => {
+    api.internal.setFormDisabled(true)
+    expect(attrs(part())["data-disabled"]).toBe("")
+    api.internal.setFormDisabled(false)
+    expect(attrs(part())["data-disabled"]).toBeUndefined()
+  }
+)

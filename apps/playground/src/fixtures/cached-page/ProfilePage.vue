@@ -30,7 +30,9 @@ import { presentationOption } from "tests/fixtures/presentation.ts"
 // rendered in place or into ?container=id, and as a sheet with
 // ?presentation=sheet where it can be one.
 const params = new URLSearchParams(location.search)
-const container = params.has("container") ? document.getElementById(params.get("container")!) : undefined
+const container = params.has("container")
+  ? document.getElementById(params.get("container")!)
+  : undefined
 
 const popups = {
   dialog: {
@@ -82,7 +84,11 @@ const emit = defineEmits<{ leave: [] }>()
 <template>
   <component :is="popup.Root" :container="container" v-bind="popup.options">
     <component :is="popup.Trigger">Edit profile</component>
-    <component :is="popup.Backdrop" v-if="popup.Backdrop" class="dialog-backdrop" />
+    <component
+      :is="popup.Backdrop"
+      v-if="popup.Backdrop"
+      class="dialog-backdrop"
+    />
     <component :is="popup.Content" :class="popup.class">
       <component :is="popup.Title" class="title">Edit profile</component>
       <label class="field">

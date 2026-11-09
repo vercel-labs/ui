@@ -1,5 +1,9 @@
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/react/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import * as React from "react"
 
@@ -18,10 +22,20 @@ function Example() {
   return (
     <Field name="new-password">
       <FieldLabel>New password</FieldLabel>
-      <PasswordInput value={value} onValueChange={(next) => setValue(next)} autoComplete="new-password">
+      <PasswordInput
+        value={value}
+        onValueChange={(next) => setValue(next)}
+        autoComplete="new-password"
+      >
         <PasswordInputControl />
         <PasswordInputToggle aria-label="Show password">
-          {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
+          {(state) =>
+            state.visible ? (
+              <EyeOffIcon aria-hidden="true" />
+            ) : (
+              <EyeIcon aria-hidden="true" />
+            )
+          }
         </PasswordInputToggle>
       </PasswordInput>
       <div data-slot="strength" aria-hidden="true">

@@ -16,16 +16,29 @@ function Fixture() {
           <FieldLabel>Render function</FieldLabel>
           <Input
             className="input"
-            render={(props, state) => <input {...props} data-state={state.filled ? "filled" : "empty"} />}
+            render={(props, state) => (
+              <input
+                {...props}
+                data-state={state.filled ? "filled" : "empty"}
+              />
+            )}
           />
         </Field>
         <Field>
           <FieldLabel>Class from state</FieldLabel>
-          <Textarea autoResize className={(state) => `textarea ${state.filled ? "is-filled" : "is-empty"}`} />
+          <Textarea
+            autoResize
+            className={(state) =>
+              `textarea ${state.filled ? "is-filled" : "is-empty"}`
+            }
+          />
         </Field>
         <InputGroup className="input-group">
           <Input className="input" aria-label="Search" />
-          <InputClear render={<span role="button" tabIndex={0} />} aria-label="Clear search">
+          <InputClear
+            render={<span role="button" tabIndex={0} />}
+            aria-label="Clear search"
+          >
             ×
           </InputClear>
         </InputGroup>
@@ -42,7 +55,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

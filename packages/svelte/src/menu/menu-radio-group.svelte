@@ -33,7 +33,10 @@ Radio items that share one value.
   const generated = $props.id()
   // The name identifies the group for its life, so it's read once.
   const group = untrack(() => name) ?? generated
-  setContext<RadioGroupContext>(RadioGroupKey, { name: group, value: () => value })
+  setContext<RadioGroupContext>(RadioGroupKey, {
+    name: group,
+    value: () => value,
+  })
   const part = useHandlePart(menu, "radio-group", () => ({
     id: group,
     name: group,
@@ -42,9 +45,11 @@ Radio items that share one value.
     onValueChange: (next: string, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
 </script>
 
-<Part tag="div" part={part} props={rest} />
+<Part tag="div" {part} props={rest} />

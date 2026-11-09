@@ -69,7 +69,7 @@ describe("dialog server rendering", () => {
           <AlertDialogDescription>It can't be undone.</AlertDialogDescription>
           <AlertDialogClose>Cancel</AlertDialogClose>
         </AlertDialogContent>
-      </AlertDialog>,
+      </AlertDialog>
     )
     expect(html).toContain('role="alertdialog"')
   })
@@ -86,7 +86,7 @@ describe("dialog server rendering", () => {
             <DialogTitle>Search</DialogTitle>
           </DialogContent>
         </Dialog>
-      </>,
+      </>
     )
     expect(html).toContain("Search")
   })

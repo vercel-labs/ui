@@ -1,7 +1,13 @@
 // The presets of popups that resting the pointer and keyboard focus open,
 // for `createPopup`. Apart from `popup-presets.ts`, so a page with only these
 // never has the sheet's lazily loaded module in its graph.
-import { focusOpening, hoverOpening, placement, styleReset, warmGroup } from "./popup-features"
+import {
+  focusOpening,
+  hoverOpening,
+  placement,
+  styleReset,
+  warmGroup,
+} from "./popup-features"
 import { createPopupPayload } from "./popup-payload"
 import type { PopupPreset } from "./popup-presets"
 

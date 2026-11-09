@@ -1,16 +1,28 @@
 import "@ui-sdk/web/otp-input"
 import type { OTPInputEvents, UiOTPInputElement } from "@ui-sdk/web"
-import { otpInputAction, otpInputFixture, otpInputOptions } from "tests/fixtures/otp-input.ts"
+import {
+  otpInputAction,
+  otpInputFixture,
+  otpInputOptions,
+} from "tests/fixtures/otp-input.ts"
 
-const slots = (count: number) => '<ui-otp-input-slot class="otp-slot"></ui-otp-input-slot>'.repeat(count)
+const slots = (count: number) =>
+  '<ui-otp-input-slot class="otp-slot"></ui-otp-input-slot>'.repeat(count)
 
 function mount(root: HTMLElement) {
   const { cancel, defaultValue, disabled, required } = otpInputOptions()
   const { code, recovery, form } = otpInputFixture
   const groups = code.groups
-    .map((size) => `<ui-otp-input-group class="otp-group">${slots(size)}</ui-otp-input-group>`)
-    .join('<ui-otp-input-separator class="otp-separator">-</ui-otp-input-separator>')
-  const flags = [disabled && "disabled", required && "required"].filter(Boolean).join(" ")
+    .map(
+      (size) =>
+        `<ui-otp-input-group class="otp-group">${slots(size)}</ui-otp-input-group>`
+    )
+    .join(
+      '<ui-otp-input-separator class="otp-separator">-</ui-otp-input-separator>'
+    )
+  const flags = [disabled && "disabled", required && "required"]
+    .filter(Boolean)
+    .join(" ")
   const template = document.createElement("template")
   template.innerHTML = `
     <div class="fixture">
@@ -31,25 +43,35 @@ function mount(root: HTMLElement) {
     </div>
   `
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
-  if (defaultValue) template.content.querySelector("#code")!.setAttribute("default-value", defaultValue)
+  if (defaultValue) {
+    template.content
+      .querySelector("#code")!
+      .setAttribute("default-value", defaultValue)
+  }
   root.replaceChildren(template.content)
   const otp = root.querySelector<UiOTPInputElement>("#code")!
   const status = root.querySelector("output")!
   otp.addEventListener("valuechange", (event) => {
     const { value, reason } = (event as OTPInputEvents["valuechange"]).detail
-    if (cancel && value.includes(cancel)) return event.preventDefault()
+    if (cancel && value.includes(cancel)) {
+      return event.preventDefault()
+    }
     status.textContent = otpInputAction.change(value, reason)
   })
   otp.addEventListener("valuecommit", (event) => {
-    status.textContent = otpInputAction.complete((event as OTPInputEvents["valuecommit"]).detail.value)
+    status.textContent = otpInputAction.complete(
+      (event as OTPInputEvents["valuecommit"]).detail.value
+    )
   })
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
     root.querySelector("#submitted")!.textContent = String(
-      new FormData(event.currentTarget as HTMLFormElement).get(code.name),
+      new FormData(event.currentTarget as HTMLFormElement).get(code.name)
     )
   })
-  root.querySelector("#fill")!.addEventListener("click", () => otp.api.setValue(otpInputFixture.filled))
+  root
+    .querySelector("#fill")!
+    .addEventListener("click", () => otp.api.setValue(otpInputFixture.filled))
   root.querySelector("#clear")!.addEventListener("click", () => otp.api.clear())
 }
 

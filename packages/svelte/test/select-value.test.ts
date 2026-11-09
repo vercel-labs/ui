@@ -5,7 +5,9 @@ import App from "./apps/select-value-app.svelte"
 let app: ReturnType<typeof mount> | undefined
 
 afterEach(async () => {
-  if (app) await unmount(app)
+  if (app) {
+    await unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
 })
@@ -33,16 +35,20 @@ test.each(["default", "children", "render"] as const)(
     flushSync(() => current.changePlaceholder())
     expect(target.querySelector("#value")!.textContent).toBe("Choose a fruit")
     flushSync(() => current.attach())
-    expect(target.querySelector("#value")!.textContent).toBe(content === "children" ? "apple" : "Apple")
+    expect(target.querySelector("#value")!.textContent).toBe(
+      content === "children" ? "apple" : "Apple"
+    )
     flushSync(() => current.choosePear())
-    expect(target.querySelector("#value")!.textContent).toBe(content === "children" ? "pear" : "Pear")
+    expect(target.querySelector("#value")!.textContent).toBe(
+      content === "children" ? "pear" : "Pear"
+    )
     if (content !== "default") {
       const state = target.querySelector("[data-count]")!
       expect(state.getAttribute("data-value")).toBe('"pear"')
       expect(state.getAttribute("data-count")).toBe("1")
       expect(state.getAttribute("data-placeholder")).toBe("false")
     }
-  },
+  }
 )
 
 test("an external select value keeps static children when its controller connects", () => {

@@ -11,7 +11,11 @@
   } from "@ui-sdk/svelte/accordion"
 
   const items = [
-    { value: "account", label: "Account", content: "Your name, email address and profile photo." },
+    {
+      value: "account",
+      label: "Account",
+      content: "Your name, email address and profile photo.",
+    },
     {
       value: "security",
       label: "Security",
@@ -29,19 +33,28 @@
   let value = $state(["account"])
 
   function confirmClose(item: string, open: boolean, details: ChangeDetails) {
-    if (!open && item === "security" && !window.confirm("Close the security settings?")) details.cancel()
+    if (
+      !open &&
+      item === "security" &&
+      !window.confirm("Close the security settings?")
+    ) {
+      details.cancel()
+    }
   }
 </script>
 
 <div>
   <div data-slot="controls">
-    <button type="button" onclick={() => accordion.open("security")}>Review security</button>
+    <button type="button" onclick={() => accordion.open("security")}
+      >Review security</button
+    >
   </div>
   <Accordion bind:value multiple controller={accordion}>
     {#each items as item (item.value)}
       <AccordionItem
         value={item.value}
-        onOpenChange={(open, details) => confirmClose(item.value, open, details)}
+        onOpenChange={(open, details) =>
+          confirmClose(item.value, open, details)}
       >
         <AccordionHeader>
           <AccordionTrigger>

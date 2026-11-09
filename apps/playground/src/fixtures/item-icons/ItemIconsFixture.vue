@@ -57,7 +57,8 @@ import IconGlyph from "./IconGlyph.vue"
 
 const action = ref("")
 const { unnamed, select, combobox } = iconsOptions()
-const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || entry.emoji)
+const hasIcon = (entry: { icon?: string; emoji?: string }) =>
+  !!(entry.icon || entry.emoji)
 </script>
 
 <template>
@@ -67,11 +68,20 @@ const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || e
     <Menu @action="(value) => (action = `menu:${value}`)">
       <MenuTrigger class="trigger">{{ f.menu.trigger }}</MenuTrigger>
       <MenuContent class="popup">
-        <MenuItem v-for="item in f.menu.items" :key="item.value" :value="item.value">
-          <MenuItemIcon v-if="hasIcon(item)" :mirror="item.mirror"><IconGlyph :entry="item" /></MenuItemIcon>
+        <MenuItem
+          v-for="item in f.menu.items"
+          :key="item.value"
+          :value="item.value"
+        >
+          <MenuItemIcon v-if="hasIcon(item)" :mirror="item.mirror"
+            ><IconGlyph :entry="item"
+          /></MenuItemIcon>
           {{ item.label }}
         </MenuItem>
-        <MenuItem :value="f.menu.iconOnly.value" :aria-label="f.menu.iconOnly.label">
+        <MenuItem
+          :value="f.menu.iconOnly.value"
+          :aria-label="f.menu.iconOnly.label"
+        >
           <MenuItemIcon><IconGlyph :entry="f.menu.iconOnly" /></MenuItemIcon>
         </MenuItem>
         <MenuItem v-if="unnamed" :value="f.unnamed.value">
@@ -91,21 +101,38 @@ const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || e
         <SelectValue class="value" />
       </SelectTrigger>
       <SelectContent class="popup list-popup">
-        <SelectItem v-for="item in f.select.items" :key="item.value" class="item" :value="item.value">
-          <SelectItemIcon v-if="hasIcon(item)"><IconGlyph :entry="item" /></SelectItemIcon>
+        <SelectItem
+          v-for="item in f.select.items"
+          :key="item.value"
+          class="item"
+          :value="item.value"
+        >
+          <SelectItemIcon v-if="hasIcon(item)"
+            ><IconGlyph :entry="item"
+          /></SelectItemIcon>
           {{ item.label }}
         </SelectItem>
       </SelectContent>
     </Select>
 
-    <Combobox :default-value="combobox" @value-change="(value) => (action = `combobox:${value}`)">
+    <Combobox
+      :default-value="combobox"
+      @value-change="(value) => (action = `combobox:${value}`)"
+    >
       <ComboboxLabel class="label">{{ f.combobox.label }}</ComboboxLabel>
       <ComboboxValueIcon class="value-icon" />
       <ComboboxInput class="input" />
       <ComboboxContent class="popup list-popup">
         <ComboboxList>
-          <ComboboxItem v-for="item in f.combobox.items" :key="item.value" class="item" :value="item.value">
-            <ComboboxItemIcon v-if="hasIcon(item)"><IconGlyph :entry="item" /></ComboboxItemIcon>
+          <ComboboxItem
+            v-for="item in f.combobox.items"
+            :key="item.value"
+            class="item"
+            :value="item.value"
+          >
+            <ComboboxItemIcon v-if="hasIcon(item)"
+              ><IconGlyph :entry="item"
+            /></ComboboxItemIcon>
             <ComboboxItemText>{{ item.label }}</ComboboxItemText>
           </ComboboxItem>
         </ComboboxList>
@@ -113,7 +140,9 @@ const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || e
     </Combobox>
 
     <Autocomplete>
-      <AutocompleteLabel class="label">{{ f.autocomplete.label }}</AutocompleteLabel>
+      <AutocompleteLabel class="label">{{
+        f.autocomplete.label
+      }}</AutocompleteLabel>
       <AutocompleteInput class="input" />
       <AutocompleteContent class="popup list-popup">
         <AutocompleteEmpty class="empty">No results</AutocompleteEmpty>
@@ -124,7 +153,9 @@ const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || e
             class="item"
             :value="item.label"
           >
-            <AutocompleteItemIcon><IconGlyph :entry="item" /></AutocompleteItemIcon>
+            <AutocompleteItemIcon
+              ><IconGlyph :entry="item"
+            /></AutocompleteItemIcon>
             <AutocompleteItemText>{{ item.label }}</AutocompleteItemText>
           </AutocompleteItem>
         </AutocompleteList>
@@ -142,8 +173,15 @@ const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || e
       <CommandInput class="input" :aria-label="f.command.label" />
       <CommandEmpty class="empty">No results</CommandEmpty>
       <CommandList class="command-list">
-        <CommandItem v-for="item in f.command.items" :key="item.value" class="item" :value="item.value">
-          <CommandItemIcon v-if="hasIcon(item)"><IconGlyph :entry="item" /></CommandItemIcon>
+        <CommandItem
+          v-for="item in f.command.items"
+          :key="item.value"
+          class="item"
+          :value="item.value"
+        >
+          <CommandItemIcon v-if="hasIcon(item)"
+            ><IconGlyph :entry="item"
+          /></CommandItemIcon>
           <CommandItemText>{{ item.label }}</CommandItemText>
         </CommandItem>
       </CommandList>
@@ -151,11 +189,20 @@ const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || e
 
     <Tabs class="tabs">
       <TabsList class="tablist" :aria-label="f.tabs.label">
-        <TabsTab v-for="tab in f.tabs.tabs" :key="tab.value" class="tab" :value="tab.value">
+        <TabsTab
+          v-for="tab in f.tabs.tabs"
+          :key="tab.value"
+          class="tab"
+          :value="tab.value"
+        >
           <TabsTabIcon><IconGlyph :entry="tab" /></TabsTabIcon>
           {{ tab.label }}
         </TabsTab>
-        <TabsTab class="tab" :value="f.tabs.iconOnly.value" :aria-label="f.tabs.iconOnly.label">
+        <TabsTab
+          class="tab"
+          :value="f.tabs.iconOnly.value"
+          :aria-label="f.tabs.iconOnly.label"
+        >
           <TabsTabIcon><IconGlyph :entry="f.tabs.iconOnly" /></TabsTabIcon>
         </TabsTab>
       </TabsList>
@@ -166,16 +213,26 @@ const hasIcon = (entry: { icon?: string; emoji?: string }) => !!(entry.icon || e
         <ToggleIcon><IconGlyph :entry="f.toggles.bold" /></ToggleIcon>
         {{ f.toggles.bold.label }}
       </Toggle>
-      <Toggle class="toggle" :value="f.toggles.iconOnly.value" :aria-label="f.toggles.iconOnly.label">
+      <Toggle
+        class="toggle"
+        :value="f.toggles.iconOnly.value"
+        :aria-label="f.toggles.iconOnly.label"
+      >
         <ToggleIcon><IconGlyph :entry="f.toggles.iconOnly" /></ToggleIcon>
       </Toggle>
     </ToggleGroup>
 
     <NavigationMenu :aria-label="f.navigation.label" class="nav-menu">
       <NavigationMenuList class="nav-list">
-        <NavigationMenuItem v-for="link in f.navigation.links" :key="link.value" :value="link.value">
+        <NavigationMenuItem
+          v-for="link in f.navigation.links"
+          :key="link.value"
+          :value="link.value"
+        >
           <NavigationMenuLink :href="`#${link.value}`" class="nav-link">
-            <NavigationMenuLinkIcon :mirror="link.mirror"><IconGlyph :entry="link" /></NavigationMenuLinkIcon>
+            <NavigationMenuLinkIcon :mirror="link.mirror"
+              ><IconGlyph :entry="link"
+            /></NavigationMenuLinkIcon>
             {{ link.label }}
           </NavigationMenuLink>
         </NavigationMenuItem>

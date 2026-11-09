@@ -33,8 +33,14 @@ function isISODate(value: unknown): value is ISODate {
  */
 function dateParts(date: ISODate | null | undefined) {
   const match = date ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(date) : null
-  if (!match) return undefined
-  const parts = { year: Number(match[1]), month: Number(match[2]), day: Number(match[3]) }
+  if (!match) {
+    return undefined
+  }
+  const parts = {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  }
   return isRealDate(parts) ? parts : undefined
 }
 
@@ -54,12 +60,17 @@ function isoDate(year: number, month: number, day: number) {
  * @stable
  */
 function toISODate(value: ISODate | Date | DateParts | null | undefined) {
-  if (value == null) return undefined
-  if (typeof value === "string") return isISODate(value) ? value : undefined
-  if (value instanceof Date)
+  if (value == null) {
+    return undefined
+  }
+  if (typeof value === "string") {
+    return isISODate(value) ? value : undefined
+  }
+  if (value instanceof Date) {
     return Number.isNaN(value.getTime())
       ? undefined
       : isoDate(value.getFullYear(), value.getMonth() + 1, value.getDate())
+  }
   return isoDate(value.year, value.month, value.day)
 }
 
@@ -89,10 +100,18 @@ function addMonths(date: ISODate, months: number) {
   const { year, month, day } = partsOf(date)
   const index = year * 12 + month - 1 + months
   const nextYear = Math.floor(index / 12)
-  if (nextYear < 1) return format(fromDayNumber(firstDay))
-  if (nextYear > 9999) return format(fromDayNumber(lastDay))
+  if (nextYear < 1) {
+    return format(fromDayNumber(firstDay))
+  }
+  if (nextYear > 9999) {
+    return format(fromDayNumber(lastDay))
+  }
   const nextMonth = index - nextYear * 12 + 1
-  return format({ year: nextYear, month: nextMonth, day: Math.min(day, daysInMonth(nextYear, nextMonth)) })
+  return format({
+    year: nextYear,
+    month: nextMonth,
+    day: Math.min(day, daysInMonth(nextYear, nextMonth)),
+  })
 }
 
 /**
@@ -166,8 +185,12 @@ function isSameMonth(a: ISODate, b: ISODate) {
  * @stable
  */
 function clampDate(date: ISODate, min?: ISODate | null, max?: ISODate | null) {
-  if (min && date < min) return min
-  if (max && date > max) return max
+  if (min && date < min) {
+    return min
+  }
+  if (max && date > max) {
+    return max
+  }
   return date
 }
 
@@ -178,15 +201,21 @@ function clampDate(date: ISODate, min?: ISODate | null, max?: ISODate | null) {
  * calendar keeps its height from month to month.
  * @stable
  */
-function monthGrid(month: ISODate, options: { weekStartsOn?: number; fixedWeeks?: boolean } = {}) {
+function monthGrid(
+  month: ISODate,
+  options: { weekStartsOn?: number; fixedWeeks?: boolean } = {}
+) {
   const first = startOfMonth(month)
   const start = daysOf(startOfWeek(first, options.weekStartsOn ?? 0))
   const end = daysOf(endOfMonth(first))
-  const count = options.fixedWeeks === false ? Math.ceil((end - start + 1) / 7) : 6
+  const count =
+    options.fixedWeeks === false ? Math.ceil((end - start + 1) / 7) : 6
   const weeks: ISODate[][] = []
   for (let row = 0; row < count; row++) {
     const week: ISODate[] = []
-    for (let column = 0; column < 7; column++) week.push(fromDays(clampDays(start + row * 7 + column)))
+    for (let column = 0; column < 7; column++) {
+      week.push(fromDays(clampDays(start + row * 7 + column)))
+    }
     weeks.push(week)
   }
   return weeks
@@ -201,7 +230,11 @@ function toDays(year: number, month: number, day: number) {
   const era = Math.floor(shifted / 400)
   const yearOfEra = shifted - era * 400
   const dayOfYear = Math.floor((153 * ((month + 9) % 12) + 2) / 5) + day - 1
-  const dayOfEra = yearOfEra * 365 + Math.floor(yearOfEra / 4) - Math.floor(yearOfEra / 100) + dayOfYear
+  const dayOfEra =
+    yearOfEra * 365 +
+    Math.floor(yearOfEra / 4) -
+    Math.floor(yearOfEra / 100) +
+    dayOfYear
   return era * 146097 + dayOfEra - 719468
 }
 
@@ -210,10 +243,15 @@ function fromDayNumber(days: number) {
   const era = Math.floor(shifted / 146097)
   const dayOfEra = shifted - era * 146097
   const yearOfEra = Math.floor(
-    (dayOfEra - Math.floor(dayOfEra / 1460) + Math.floor(dayOfEra / 36524) - Math.floor(dayOfEra / 146096)) /
-      365,
+    (dayOfEra -
+      Math.floor(dayOfEra / 1460) +
+      Math.floor(dayOfEra / 36524) -
+      Math.floor(dayOfEra / 146096)) /
+      365
   )
-  const dayOfYear = dayOfEra - (365 * yearOfEra + Math.floor(yearOfEra / 4) - Math.floor(yearOfEra / 100))
+  const dayOfYear =
+    dayOfEra -
+    (365 * yearOfEra + Math.floor(yearOfEra / 4) - Math.floor(yearOfEra / 100))
   const shiftedMonth = Math.floor((5 * dayOfYear + 2) / 153)
   const month = shiftedMonth < 10 ? shiftedMonth + 3 : shiftedMonth - 9
   const day = dayOfYear - Math.floor((153 * shiftedMonth + 2) / 5) + 1
@@ -226,7 +264,9 @@ const clampDays = (days: number) => Math.min(Math.max(days, firstDay), lastDay)
 
 function partsOf(date: ISODate) {
   const parts = dateParts(date)
-  if (!parts) throw new RangeError(`"${date}" is not an ISO date (YYYY-MM-DD).`)
+  if (!parts) {
+    throw new RangeError(`"${date}" is not an ISO date (YYYY-MM-DD).`)
+  }
   return parts
 }
 
@@ -235,7 +275,8 @@ function daysOf(date: ISODate) {
   return toDays(year, month, day)
 }
 
-const isLeapYear = (year: number) => year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
+const isLeapYear = (year: number) =>
+  year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)
 
 function isRealDate({ year, month, day }: DateParts) {
   return (
@@ -251,7 +292,8 @@ function isRealDate({ year, month, day }: DateParts) {
   )
 }
 
-const pad = (value: number, length: number) => String(value).padStart(length, "0")
+const pad = (value: number, length: number) =>
+  String(value).padStart(length, "0")
 
 function format({ year, month, day }: DateParts) {
   return `${pad(year, 4)}-${pad(month, 2)}-${pad(day, 2)}`

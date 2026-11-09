@@ -9,7 +9,14 @@ import {
   TrashIcon,
   UndoIcon,
 } from "@lucide/vue"
-import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/vue/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuItemIcon,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/vue/menu"
 import { Menubar } from "@ui-sdk/vue/menubar"
 </script>
 

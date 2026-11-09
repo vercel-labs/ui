@@ -18,7 +18,10 @@
   </Button>
   <Toggle onPressedChange={(pressed) => (action = pressed ? "star" : "unstar")}>
     {#snippet render({ props, state })}
-      <button {...props} class={["toggle", state.pressed ? "is-pressed" : "is-unpressed"]}>
+      <button
+        {...props}
+        class={["toggle", state.pressed ? "is-pressed" : "is-unpressed"]}
+      >
         <span aria-hidden="true">{state.pressed ? "★" : "☆"}</span> Star
       </button>
     {/snippet}

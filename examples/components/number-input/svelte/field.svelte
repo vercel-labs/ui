@@ -23,5 +23,7 @@
       </NumberInputIncrement>
     </NumberInputGroup>
   </NumberInput>
-  <FieldDescription>Each ticket admits one person to the workshop.</FieldDescription>
+  <FieldDescription
+    >Each ticket admits one person to the workshop.</FieldDescription
+  >
 </Field>

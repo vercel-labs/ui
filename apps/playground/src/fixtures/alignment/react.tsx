@@ -11,11 +11,26 @@ import {
   MenuTrigger,
   type MenuDataItem,
 } from "@ui-sdk/react/menu"
-import { createPopoverController, Popover, PopoverContent, PopoverTitle } from "@ui-sdk/react/popover"
-import { createTabsController, Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+} from "@ui-sdk/react/popover"
+import {
+  createTabsController,
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/react/tabs"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { alignmentFixture, alignmentOptions, renderCounter } from "tests/fixtures/alignment.ts"
+import {
+  alignmentFixture,
+  alignmentOptions,
+  renderCounter,
+} from "tests/fixtures/alignment.ts"
 
 const rowMenu = createMenuController<string>()
 const details = createPopoverController<string>()
@@ -43,7 +58,11 @@ function Fixture() {
   const { keepMounted } = alignmentOptions()
 
   const showDetails = (payload: string) =>
-    details.open({ payload }).then((closed) => setResult(`${closed.reason}:${closed.returnValue ?? ""}`))
+    details
+      .open({ payload })
+      .then((closed) =>
+        setResult(`${closed.reason}:${closed.returnValue ?? ""}`)
+      )
 
   return (
     <div className="fixture">
@@ -53,7 +72,11 @@ function Fixture() {
         {alignmentFixture.rows.map((row) => (
           <li key={row}>
             Row {row}
-            <MenuTrigger controller={rowMenu} payload={row} aria-label={`Actions for ${row}`}>
+            <MenuTrigger
+              controller={rowMenu}
+              payload={row}
+              aria-label={`Actions for ${row}`}
+            >
               …
             </MenuTrigger>
           </li>
@@ -74,7 +97,9 @@ function Fixture() {
                   className="item"
                   value={item.value}
                   onSelect={() => {
-                    if (item.value === "details") showDetails(String(rowMenu.getPayload()))
+                    if (item.value === "details") {
+                      showDetails(String(rowMenu.getPayload()))
+                    }
                   }}
                 >
                   {item.label}
@@ -112,28 +137,42 @@ function Fixture() {
 
       <Menu
         items={dataItems}
-        onCheckedChange={(checked, details) => setChange(`checked:${details.value}:${checked}`)}
-        onValueChange={(value, details) => setChange(`value:${details.group}:${value}`)}
+        onCheckedChange={(checked, details) =>
+          setChange(`checked:${details.value}:${checked}`)
+        }
+        onValueChange={(value, details) =>
+          setChange(`value:${details.group}:${value}`)
+        }
       >
         <MenuTrigger>Data</MenuTrigger>
         {/* The data's items, rendered with the fixture's classes. */}
         <MenuContent className="popup">
           {dataItems.map((entry) =>
             entry.type === "checkbox" ? (
-              <MenuCheckboxItem key={entry.value} className="item" value={entry.value}>
+              <MenuCheckboxItem
+                key={entry.value}
+                className="item"
+                value={entry.value}
+              >
                 <MenuItemIndicator className="indicator">✓</MenuItemIndicator>
                 {entry.label}
               </MenuCheckboxItem>
             ) : entry.type === "radio-group" ? (
               <MenuRadioGroup key={entry.name} name={entry.name}>
                 {entry.items.map((radio) => (
-                  <MenuRadioItem key={radio.value} className="item" value={radio.value}>
-                    <MenuItemIndicator className="indicator">•</MenuItemIndicator>
+                  <MenuRadioItem
+                    key={radio.value}
+                    className="item"
+                    value={radio.value}
+                  >
+                    <MenuItemIndicator className="indicator">
+                      •
+                    </MenuItemIndicator>
                     {radio.label}
                   </MenuRadioItem>
                 ))}
               </MenuRadioGroup>
-            ) : null,
+            ) : null
           )}
         </MenuContent>
       </Menu>
@@ -142,7 +181,11 @@ function Fixture() {
         <MenuTrigger>View</MenuTrigger>
         <MenuContent className="popup">
           {["ruler", "guides"].map((value) => (
-            <MenuCheckboxItem key={value} className={() => count(value)} value={value}>
+            <MenuCheckboxItem
+              key={value}
+              className={() => count(value)}
+              value={value}
+            >
               <MenuItemIndicator className="indicator">✓</MenuItemIndicator>
               {value === "ruler" ? "Ruler" : "Guides"}
             </MenuCheckboxItem>
@@ -158,18 +201,28 @@ function Fixture() {
       >
         <TabsList className="tablist scrolling" aria-label="Sections">
           {alignmentFixture.sections.map((section) => (
-            <TabsTab key={section} className="tab" value={section.toLowerCase()}>
+            <TabsTab
+              key={section}
+              className="tab"
+              value={section.toLowerCase()}
+            >
               {section}
             </TabsTab>
           ))}
         </TabsList>
         {alignmentFixture.sections.map((section) => (
-          <TabsPanel key={section} className="panel" value={section.toLowerCase()}>
+          <TabsPanel
+            key={section}
+            className="panel"
+            value={section.toLowerCase()}
+          >
             {`The ${section} section`}
           </TabsPanel>
         ))}
       </Tabs>
-      <button onClick={() => sections.select("hotel")}>Show the last section</button>
+      <button onClick={() => sections.select("hotel")}>
+        Show the last section
+      </button>
 
       <button>After</button>
       <output role="status" aria-label="Last action">
@@ -187,7 +240,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

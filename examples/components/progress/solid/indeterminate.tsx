@@ -1,4 +1,9 @@
-import { Progress, ProgressIndicator, ProgressLabel, ProgressTrack } from "@ui-sdk/solid/progress"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+} from "@ui-sdk/solid/progress"
 
 function Example() {
   return (

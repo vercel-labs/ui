@@ -5,7 +5,10 @@ skip it.
 @stable
 -->
 <script lang="ts">
-  import { navigationMenu, type NavigationMenuIndicatorState } from "@ui-sdk/core/navigation-menu"
+  import {
+    navigationMenu,
+    type NavigationMenuIndicatorState,
+  } from "@ui-sdk/core/navigation-menu"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

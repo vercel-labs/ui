@@ -17,20 +17,31 @@ import { createChange, definePrimitive, type ChangeDetails } from "@ui-sdk/core"
 type RatingOptions = {
   value?: number
   defaultValue?: number
-  onValueChange?: (value: number, details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: number,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
 }
 
 const rating = definePrimitive({
   name: "rating",
-  options: { value: "number", defaultValue: "number", onValueChange: "callback" },
+  options: {
+    value: "number",
+    defaultValue: "number",
+    onValueChange: "callback",
+  },
   controlled: ["value"],
-  state: (options: RatingOptions) => ({ value: options.value ?? options.defaultValue ?? 0 }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  state: (options: RatingOptions) => ({
+    value: options.value ?? options.defaultValue ?? 0,
+  }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
 
     return {
-      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+      rate: (value: number, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
     }
   },
   slots: (slot) => ({
@@ -50,7 +61,10 @@ export { rating, type RatingOptions }
 
 Before we add stars, let's try changing the value. These buttons call `rate(3)` and `rate(0)`:
 
-<ComponentExample name="core/rating-state" caption="Press Set to 3, then Reset to return to 0." />
+<ComponentExample
+  name="core/rating-state"
+  caption="Press Set to 3, then Reset to return to 0."
+/>
 
 ## Add a Star
 
@@ -92,7 +106,10 @@ Now render five stars using the same part. They share one rating, and each gets 
 import { createParts } from "@ui-sdk/react/primitive"
 import { rating } from "./rating"
 
-const { Root: Rating, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+const { Root: Rating, Star: RatingStar } = createParts(rating, {
+  root: "div",
+  star: "button",
+})
 
 function Example() {
   return (
@@ -121,7 +138,10 @@ export { Example }
 import { createParts } from "@ui-sdk/vue/primitive"
 import { rating } from "./rating"
 
-const { Root: Rating, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+const { Root: Rating, Star: RatingStar } = createParts(rating, {
+  root: "div",
+  star: "button",
+})
 </script>
 
 <template>
@@ -146,12 +166,18 @@ const { Root: Rating, Star: RatingStar } = createParts(rating, { root: "div", st
   import { createParts } from "@ui-sdk/svelte/primitive"
   import { rating } from "./rating"
 
-  const { Root: Rating, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+  const { Root: Rating, Star: RatingStar } = createParts(rating, {
+    root: "div",
+    star: "button",
+  })
 </script>
 
 <Rating aria-label="Rating">
   {#each Array.from({ length: 5 }, (_, index) => index + 1) as star (star)}
-    <RatingStar value={String(star)} aria-label={`${star} ${star === 1 ? "star" : "stars"}`}>
+    <RatingStar
+      value={String(star)}
+      aria-label={`${star} ${star === 1 ? "star" : "stars"}`}
+    >
       ★
     </RatingStar>
   {/each}
@@ -165,13 +191,19 @@ const { Root: Rating, Star: RatingStar } = createParts(rating, { root: "div", st
 import { createParts } from "@ui-sdk/solid/primitive"
 import { rating } from "./rating"
 
-const { Root: Rating, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+const { Root: Rating, Star: RatingStar } = createParts(rating, {
+  root: "div",
+  star: "button",
+})
 
 function Example() {
   return (
     <Rating aria-label="Rating">
       {Array.from({ length: 5 }, (_, index) => (
-        <RatingStar value={String(index + 1)} aria-label={`${index + 1} ${index === 0 ? "star" : "stars"}`}>
+        <RatingStar
+          value={String(index + 1)}
+          aria-label={`${index + 1} ${index === 0 ? "star" : "stars"}`}
+        >
           ★
         </RatingStar>
       ))}
@@ -201,11 +233,21 @@ Then add the stars to your HTML. Each star's behavior connects to the native but
 
 ```html
 <my-rating aria-label="Rating">
-  <my-rating-star value="1"><button aria-label="1 star">★</button></my-rating-star>
-  <my-rating-star value="2"><button aria-label="2 stars">★</button></my-rating-star>
-  <my-rating-star value="3"><button aria-label="3 stars">★</button></my-rating-star>
-  <my-rating-star value="4"><button aria-label="4 stars">★</button></my-rating-star>
-  <my-rating-star value="5"><button aria-label="5 stars">★</button></my-rating-star>
+  <my-rating-star value="1"
+    ><button aria-label="1 star">★</button></my-rating-star
+  >
+  <my-rating-star value="2"
+    ><button aria-label="2 stars">★</button></my-rating-star
+  >
+  <my-rating-star value="3"
+    ><button aria-label="3 stars">★</button></my-rating-star
+  >
+  <my-rating-star value="4"
+    ><button aria-label="4 stars">★</button></my-rating-star
+  >
+  <my-rating-star value="5"
+    ><button aria-label="5 stars">★</button></my-rating-star
+  >
 </my-rating>
 ```
 
@@ -380,23 +422,36 @@ Here's everything we added, in one file:
 
 ```ts
 // rating.ts
-import { createChange, createRovingFocus, definePrimitive, type ChangeDetails } from "@ui-sdk/core"
+import {
+  createChange,
+  createRovingFocus,
+  definePrimitive,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 
 type RatingOptions = {
   value?: number
   defaultValue?: number
-  onValueChange?: (value: number, details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: number,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
 }
 
 const rating = definePrimitive({
   name: "rating",
-  options: { value: "number", defaultValue: "number", onValueChange: "callback" },
+  options: {
+    value: "number",
+    defaultValue: "number",
+    onValueChange: "callback",
+  },
   controlled: ["value"],
   state: (options: RatingOptions) => ({
     value: options.value ?? options.defaultValue ?? 0,
     focused: null as string | null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
     const roving = createRovingFocus(context, {
@@ -404,7 +459,8 @@ const rating = definePrimitive({
       key: "focused",
       remember: false,
       preferred: (star) => Number(star.key) === context.store.get().value,
-      claims: (state, star) => (state.value ? Number(star.key) === state.value : star.key === "1"),
+      claims: (state, star) =>
+        state.value ? Number(star.key) === state.value : star.key === "1",
       move(event, { from, items, rtl }) {
         if (event.ctrlKey || event.metaKey) {
           return
@@ -416,24 +472,33 @@ const rating = definePrimitive({
           return items[items.length - 1]?.key
         }
 
-        const next = event.key === "ArrowDown" || event.key === (rtl ? "ArrowLeft" : "ArrowRight")
-        const previous = event.key === "ArrowUp" || event.key === (rtl ? "ArrowRight" : "ArrowLeft")
+        const next =
+          event.key === "ArrowDown" ||
+          event.key === (rtl ? "ArrowLeft" : "ArrowRight")
+        const previous =
+          event.key === "ArrowUp" ||
+          event.key === (rtl ? "ArrowRight" : "ArrowLeft")
         if (!next && !previous) {
           return
         }
 
         const index = items.indexOf(from)
-        return items[(index + (next ? 1 : -1) + items.length) % items.length]?.key
+        return items[(index + (next ? 1 : -1) + items.length) % items.length]
+          ?.key
       },
     })
 
     return {
       roving,
-      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+      rate: (value: number, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
       keydown(event: KeyboardEvent, el: HTMLElement) {
         const moved = roving.keydown(event, el)
         if (moved) {
-          change("value", Number(moved.key), { reason: "list-navigation", event })
+          change("value", Number(moved.key), {
+            reason: "list-navigation",
+            event,
+          })
         }
       },
     }

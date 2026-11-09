@@ -16,8 +16,10 @@ const AreaKey = Symbol("color-picker-area")
 const SliderKey = Symbol("color-picker-slider")
 
 const provideArea = (channels: ChannelsContext) => setContext(AreaKey, channels)
-const provideSlider = (channels: ChannelsContext) => setContext(SliderKey, channels)
+const provideSlider = (channels: ChannelsContext) =>
+  setContext(SliderKey, channels)
 const useArea = () => getContext<ChannelsContext | undefined>(AreaKey) ?? none
-const useSlider = () => getContext<ChannelsContext | undefined>(SliderKey) ?? none
+const useSlider = () =>
+  getContext<ChannelsContext | undefined>(SliderKey) ?? none
 
 export { provideArea, provideSlider, useArea, useSlider }

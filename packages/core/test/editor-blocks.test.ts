@@ -33,16 +33,43 @@ afterEach(() => {
 })
 
 const key = (key: string, init: KeyboardEventInit = {}) =>
-  new KeyboardEvent("keydown", { key, cancelable: true, bubbles: true, ...init })
+  new KeyboardEvent("keydown", {
+    key,
+    cancelable: true,
+    bubbles: true,
+    ...init,
+  })
 
 const pointer = (type: string, clientX: number, clientY: number) =>
-  new PointerEvent(type, { clientX, clientY, button: 0, isPrimary: true, bubbles: true, cancelable: true })
+  new PointerEvent(type, {
+    clientX,
+    clientY,
+    button: 0,
+    isPrimary: true,
+    bubbles: true,
+    cancelable: true,
+  })
 
 // An element at a fixed place, as jsdom has no layout.
-function box(left: number, top: number, width: number, height: number, parent: Element = document.body) {
+function box(
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  parent: Element = document.body
+) {
   const el = document.createElement("div")
   el.getBoundingClientRect = () =>
-    ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top }) as DOMRect
+    ({
+      left,
+      top,
+      width,
+      height,
+      right: left + width,
+      bottom: top + height,
+      x: left,
+      y: top,
+    }) as DOMRect
   parent.append(el)
   return el
 }
@@ -65,9 +92,15 @@ describe("stackSpans and isSpanFree", () => {
       e: { lane: 0, lanes: 1 },
     })
     const spans = [{ id: "a", track: "mon", start: 0, end: 60 }]
-    expect(isSpanFree(spans, { id: "b", track: "mon", start: 60, end: 90 })).toBe(true)
-    expect(isSpanFree(spans, { id: "b", track: "mon", start: 59, end: 90 })).toBe(false)
-    expect(isSpanFree(spans, { id: "b", track: "tue", start: 0, end: 90 })).toBe(true)
+    expect(
+      isSpanFree(spans, { id: "b", track: "mon", start: 60, end: 90 })
+    ).toBe(true)
+    expect(
+      isSpanFree(spans, { id: "b", track: "mon", start: 59, end: 90 })
+    ).toBe(false)
+    expect(
+      isSpanFree(spans, { id: "b", track: "tue", start: 0, end: 90 })
+    ).toBe(true)
   })
 })
 
@@ -78,7 +111,10 @@ describe("createSpans", () => {
   const calendar = definePrimitive({
     name: "calendar",
     options: { events: "value", overlap: "boolean" },
-    state: (options: { events: Event[]; overlap?: boolean }): CalendarState => ({
+    state: (options: {
+      events: Event[]
+      overlap?: boolean
+    }): CalendarState => ({
       events: options.events,
       draft: null,
     }),
@@ -99,15 +135,28 @@ describe("createSpans", () => {
         tracks: () => ["mon", "tue", "wed"],
         overlap: context.options().overlap,
         createAutoScroll: false,
-        create: (span) => ({ ...span, id: `new-${++made}`, title: "New event" }),
-        label: (span) => `${span.title}, ${span.track} ${span.start} to ${span.end}`,
+        create: (span) => ({
+          ...span,
+          id: `new-${++made}`,
+          title: "New event",
+        }),
+        label: (span) =>
+          `${span.title}, ${span.track} ${span.start} to ${span.end}`,
       })
       return { spans, set }
     },
-    slots: (slot) => ({ span: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      span: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
 
-  const standup: Event = { id: "a", track: "mon", start: 540, end: 570, title: "Standup" }
+  const standup: Event = {
+    id: "a",
+    track: "mon",
+    start: 540,
+    end: 570,
+    title: "Standup",
+  }
 
   test("arrows move a span a step, Shift moves its end, across moves its day, each in one change", () => {
     const instance = calendar({ id: "c", events: [standup] })
@@ -125,7 +174,11 @@ describe("createSpans", () => {
     spans.keydown(key("ArrowRight"), "a")
     expect(instance.get().events[0].track).toBe("tue")
     expect(set).toHaveBeenCalledTimes(5)
-    expect(set.mock.calls.at(-1)![1]).toMatchObject({ reason: "move-key", id: "a", action: "move" })
+    expect(set.mock.calls.at(-1)![1]).toMatchObject({
+      reason: "move-key",
+      id: "a",
+      action: "move",
+    })
     spans.keydown(key("Delete"), "a")
     expect(instance.get().events).toEqual([])
   })
@@ -134,7 +187,10 @@ describe("createSpans", () => {
     const instance = calendar({
       id: "c",
       overlap: false,
-      events: [standup, { id: "b", track: "mon", start: 600, end: 660, title: "Review" }],
+      events: [
+        standup,
+        { id: "b", track: "mon", start: 600, end: 660, title: "Review" },
+      ],
     })
     cleanups.push(() => instance.destroy())
     const { spans } = instance.api
@@ -163,12 +219,26 @@ describe("createSpans", () => {
     document.dispatchEvent(pointer("pointermove", 150, 612))
     document.dispatchEvent(pointer("pointerup", 150, 612))
     expect(set).toHaveBeenCalledTimes(1)
-    expect(set.mock.calls[0][1]).toMatchObject({ reason: "drag", id: "a", action: "move" })
-    expect(instance.get().events[0]).toMatchObject({ track: "tue", start: 600, end: 630 })
+    expect(set.mock.calls[0][1]).toMatchObject({
+      reason: "drag",
+      id: "a",
+      action: "move",
+    })
+    expect(instance.get().events[0]).toMatchObject({
+      track: "tue",
+      start: 600,
+      end: 630,
+    })
   })
 
   test("a drop keeps the spans the owner changed during the drag, and a deleted span ends it", async () => {
-    const review: Event = { id: "b", track: "wed", start: 600, end: 660, title: "Review" }
+    const review: Event = {
+      id: "b",
+      track: "wed",
+      start: 600,
+      end: 660,
+      title: "Review",
+    }
     const instance = calendar({ id: "c", events: [standup] })
     cleanups.push(() => instance.destroy())
     const { spans, set } = instance.api
@@ -183,7 +253,10 @@ describe("createSpans", () => {
     await new Promise((resolve) => requestAnimationFrame(resolve))
     instance.setOptions({ id: "c", events: [standup, review] })
     document.dispatchEvent(pointer("pointerup", 150, 612))
-    expect(set.mock.calls[0][0]).toEqual([{ ...standup, track: "tue", start: 600, end: 630 }, review])
+    expect(set.mock.calls[0][0]).toEqual([
+      { ...standup, track: "tue", start: 600, end: 630 },
+      review,
+    ])
 
     spans.spanPointerdown(pointer("pointerdown", 150, 610), "a")
     document.dispatchEvent(pointer("pointermove", 250, 700))
@@ -196,7 +269,13 @@ describe("createSpans", () => {
   })
 
   test("a span the owner puts where a drag would drop ends the drag when overlap is off", async () => {
-    const review: Event = { id: "b", track: "tue", start: 600, end: 660, title: "Review" }
+    const review: Event = {
+      id: "b",
+      track: "tue",
+      start: 600,
+      end: 660,
+      title: "Review",
+    }
     const instance = calendar({ id: "c", overlap: false, events: [standup] })
     cleanups.push(() => instance.destroy())
     const { spans, set } = instance.api
@@ -225,8 +304,10 @@ describe("createSpans", () => {
     edge.dataset.spanEdge = "end"
     cleanups.push(spans.bindSpan(event, "a"))
     spans.spanPointerdown(
-      Object.defineProperty(pointer("pointerdown", 50, 568), "target", { value: edge }),
-      "a",
+      Object.defineProperty(pointer("pointerdown", 50, 568), "target", {
+        value: edge,
+      }),
+      "a"
     )
     document.dispatchEvent(pointer("pointermove", 50, 640))
     document.dispatchEvent(pointer("pointerup", 50, 640))
@@ -234,8 +315,10 @@ describe("createSpans", () => {
     expect(set.mock.calls[0][1]).toMatchObject({ action: "resize" })
 
     spans.spanPointerdown(
-      Object.defineProperty(pointer("pointerdown", 50, 640), "target", { value: edge }),
-      "a",
+      Object.defineProperty(pointer("pointerdown", 50, 640), "target", {
+        value: edge,
+      }),
+      "a"
     )
     document.dispatchEvent(pointer("pointermove", 50, 700))
     document.dispatchEvent(key("Escape"))
@@ -251,15 +334,20 @@ describe("createSpans", () => {
     const day = box(0, 0, 100, 1440)
     cleanups.push(spans.bindTrack(day, "mon"))
     spans.trackPointerdown(
-      Object.defineProperty(pointer("pointerdown", 50, 487), "target", { value: day }),
-      "mon",
+      Object.defineProperty(pointer("pointerdown", 50, 487), "target", {
+        value: day,
+      }),
+      "mon"
     )
     // Upward from 8:07: from the slot it started in, 8:00, back to 7:00.
     document.dispatchEvent(pointer("pointermove", 50, 425))
     await new Promise((resolve) => requestAnimationFrame(resolve))
     // The draft renders the span before anything commits.
     expect(set).not.toHaveBeenCalled()
-    expect(spans.spans(instance.get())[0]).toMatchObject({ start: 420, end: 495 })
+    expect(spans.spans(instance.get())[0]).toMatchObject({
+      start: 420,
+      end: 495,
+    })
     document.dispatchEvent(pointer("pointermove", 50, 560))
     document.dispatchEvent(pointer("pointerup", 50, 560))
     expect(instance.get().events).toEqual([
@@ -268,8 +356,10 @@ describe("createSpans", () => {
     expect(set.mock.calls[0][1]).toMatchObject({ action: "draw" })
 
     spans.trackPointerdown(
-      Object.defineProperty(pointer("pointerdown", 50, 905), "target", { value: day }),
-      "mon",
+      Object.defineProperty(pointer("pointerdown", 50, 905), "target", {
+        value: day,
+      }),
+      "mon"
     )
     document.dispatchEvent(pointer("pointerup", 50, 905))
     expect(instance.get().events[1]).toMatchObject({ start: 900, end: 960 })
@@ -283,12 +373,20 @@ describe("createSpans", () => {
     cleanups.push(spans.bindTrack(day, "mon"))
     const event = box(0, 540, 100, 30, day)
     cleanups.push(spans.bindSpan(event, "a"))
-    const down = Object.defineProperty(pointer("pointerdown", 50, 550), "target", { value: event })
+    const down = Object.defineProperty(
+      pointer("pointerdown", 50, 550),
+      "target",
+      { value: event }
+    )
     spans.spanPointerdown(down, "a")
     spans.trackPointerdown(down, "mon")
     document.dispatchEvent(pointer("pointermove", 50, 612))
     document.dispatchEvent(pointer("pointerup", 50, 612))
-    expect(instance.get().events[0]).toMatchObject({ track: "mon", start: 600, end: 630 })
+    expect(instance.get().events[0]).toMatchObject({
+      track: "mon",
+      start: 600,
+      end: 630,
+    })
   })
 
   test("a press the browser takes over for a scroll makes no span", () => {
@@ -298,16 +396,20 @@ describe("createSpans", () => {
     const day = box(0, 0, 100, 1440)
     cleanups.push(spans.bindTrack(day, "mon"))
     spans.trackPointerdown(
-      Object.defineProperty(pointer("pointerdown", 50, 905), "target", { value: day }),
-      "mon",
+      Object.defineProperty(pointer("pointerdown", 50, 905), "target", {
+        value: day,
+      }),
+      "mon"
     )
     document.dispatchEvent(pointer("pointercancel", 50, 905))
     expect(set).not.toHaveBeenCalled()
     expect(instance.get().events).toEqual([])
     // A tap on the still-empty track then makes one span of the default size.
     spans.trackPointerdown(
-      Object.defineProperty(pointer("pointerdown", 50, 905), "target", { value: day }),
-      "mon",
+      Object.defineProperty(pointer("pointerdown", 50, 905), "target", {
+        value: day,
+      }),
+      "mon"
     )
     document.dispatchEvent(pointer("pointerup", 50, 905))
     expect(set).toHaveBeenCalledTimes(1)
@@ -320,7 +422,7 @@ describe("createSpans", () => {
     setAnnouncer((text) => heard.push(text))
     cleanups.push(
       () => instance.destroy(),
-      () => setAnnouncer(undefined),
+      () => setAnnouncer(undefined)
     )
     const { spans, set } = instance.api
     const day = box(0, 0, 100, 1440)
@@ -337,24 +439,32 @@ describe("createSpans", () => {
     const instance = calendar({ id: "c", events: [standup] })
     cleanups.push(() => instance.destroy())
     expect(instance.api.spans.spanStyle(standup, { lane: 1, lanes: 2 })).toBe(
-      "position:absolute;top:37.5%;height:2.08%;inset-inline-start:50%;width:50%;--span-start:0.375;--span-size:0.020833333333333332",
+      "position:absolute;top:37.5%;height:2.08%;inset-inline-start:50%;width:50%;--span-start:0.375;--span-size:0.020833333333333332"
     )
   })
 })
 
 describe("createResize", () => {
-  type CropState = { boxes: Record<string, ResizeBox>; draft: ResizeDraft | null }
+  type CropState = {
+    boxes: Record<string, ResizeBox>
+    draft: ResizeDraft | null
+  }
   type CropOptions = { boxes: Record<string, ResizeBox>; aspect?: number }
   const crop = definePrimitive({
     name: "crop",
     options: { boxes: "value", aspect: "number" },
-    state: (options: CropOptions): CropState => ({ boxes: options.boxes, draft: null }),
+    state: (options: CropOptions): CropState => ({
+      boxes: options.boxes,
+      draft: null,
+    }),
     live: ["draft"],
     api: (context) => {
-      const set = vi.fn((value: Record<string, ResizeBox>, _details: object) => {
-        context.store.set({ boxes: value })
-        return true
-      })
+      const set = vi.fn(
+        (value: Record<string, ResizeBox>, _details: object) => {
+          context.store.set({ boxes: value })
+          return true
+        }
+      )
       const resize = createResize<CropState>(context, {
         boxes: (state) => state.boxes,
         draft: "draft",
@@ -368,7 +478,9 @@ describe("createResize", () => {
       })
       return { resize, set }
     },
-    slots: (slot) => ({ box: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      box: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
   const start = { x: 100, y: 100, width: 100, height: 50 }
   const mount = (options: Partial<CropOptions> = {}) => {
@@ -381,14 +493,31 @@ describe("createResize", () => {
     const instance = mount()
     const { resize, set } = instance.api
     expect(resize.keydown(key("ArrowRight"), "a", "se")).toBe(true)
-    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 110, height: 50 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 100,
+      y: 100,
+      width: 110,
+      height: 50,
+    })
     resize.keydown(key("ArrowUp", { shiftKey: true }), "a", "nw")
-    expect(instance.get().boxes.a).toEqual({ x: 100, y: 50, width: 110, height: 100 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 100,
+      y: 50,
+      width: 110,
+      height: 100,
+    })
     // An edge handle moves along its own axis only.
     expect(resize.keydown(key("ArrowUp"), "a", "e")).toBe(false)
     // Shrinking stops at the minimum, from the side that moved.
-    for (let i = 0; i < 5; i++) resize.keydown(key("ArrowRight", { shiftKey: true }), "a", "w")
-    expect(instance.get().boxes.a).toEqual({ x: 190, y: 50, width: 20, height: 100 })
+    for (let i = 0; i < 5; i++) {
+      resize.keydown(key("ArrowRight", { shiftKey: true }), "a", "w")
+    }
+    expect(instance.get().boxes.a).toEqual({
+      x: 190,
+      y: 50,
+      width: 20,
+      height: 100,
+    })
     // Two steps reach the minimum, and the ones after change nothing.
     expect(set).toHaveBeenCalledTimes(4)
     expect(set.mock.calls[0][1]).toMatchObject({ reason: "resize-key" })
@@ -401,35 +530,66 @@ describe("createResize", () => {
     const handle = document.createElement("div")
     handle.setAttribute("data-resize-handle", "se")
     el.append(handle)
-    const from = <E extends Event>(event: E) => Object.defineProperty(event, "target", { value: handle })
+    const from = <E extends Event>(event: E) =>
+      Object.defineProperty(event, "target", { value: handle })
     expect(resize.keydown(from(key("ArrowRight")), "a", "move")).toBe(false)
     resize.pointerdown(from(pointer("pointerdown", 200, 150)), "a", "move", el)
     document.dispatchEvent(pointer("pointermove", 260, 160))
     document.dispatchEvent(pointer("pointerup", 260, 160))
     expect(set).not.toHaveBeenCalled()
     expect(resize.keydown(key("ArrowRight"), "a", "move")).toBe(true)
-    expect(instance.get().boxes.a).toEqual({ x: 110, y: 100, width: 100, height: 50 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 110,
+      y: 100,
+      width: 100,
+      height: 50,
+    })
   })
 
   test("a box stays inside its bounds, moved or resized", () => {
     const instance = mount()
     const { resize } = instance.api
     resize.resizeBy("a", "move", 1000, -1000)
-    expect(instance.get().boxes.a).toEqual({ x: 300, y: 0, width: 100, height: 50 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 300,
+      y: 0,
+      width: 100,
+      height: 50,
+    })
     resize.resizeBy("a", "sw", -1000, 1000)
-    expect(instance.get().boxes.a).toEqual({ x: 0, y: 0, width: 400, height: 300 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 0,
+      y: 0,
+      width: 400,
+      height: 300,
+    })
   })
 
   test("a ratio holds on corners and edges, and an edge grows about the middle", () => {
     const instance = mount({ aspect: 2 })
     const { resize } = instance.api
     resize.resizeBy("a", "se", 40, 0)
-    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 140, height: 70 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 100,
+      y: 100,
+      width: 140,
+      height: 70,
+    })
     resize.resizeBy("a", "s", 0, 10)
-    expect(instance.get().boxes.a).toEqual({ x: 90, y: 100, width: 160, height: 80 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 90,
+      y: 100,
+      width: 160,
+      height: 80,
+    })
     // Against the right of the bounds, the box grows only as far as the ratio allows there.
     resize.resizeBy("a", "ne", 1000, -1000)
-    expect(instance.get().boxes.a).toEqual({ x: 90, y: 25, width: 310, height: 155 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 90,
+      y: 25,
+      width: 310,
+      height: 155,
+    })
   })
 
   test("a press on a handle that bubbles to its box still resizes from the handle", () => {
@@ -438,12 +598,21 @@ describe("createResize", () => {
     const el = box(100, 100, 100, 50)
     const handle = box(196, 146, 8, 8, el)
     handle.setAttribute("data-resize-handle", "")
-    const down = Object.defineProperty(pointer("pointerdown", 200, 150), "target", { value: handle })
+    const down = Object.defineProperty(
+      pointer("pointerdown", 200, 150),
+      "target",
+      { value: handle }
+    )
     resize.pointerdown(down, "a", "se", handle)
     resize.pointerdown(down, "a", "move", el)
     document.dispatchEvent(pointer("pointermove", 260, 160))
     document.dispatchEvent(pointer("pointerup", 260, 160))
-    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 160, height: 60 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 100,
+      y: 100,
+      width: 160,
+      height: 60,
+    })
   })
 
   test("a drag resizes in a draft as custom properties, Escape puts it back, and the drop commits once", () => {
@@ -454,7 +623,12 @@ describe("createResize", () => {
     resize.pointerdown(pointer("pointerdown", 200, 150), "a", "se", el)
     document.dispatchEvent(pointer("pointermove", 260, 160))
     document.dispatchEvent(pointer("pointerup", 260, 160))
-    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 160, height: 60 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 100,
+      y: 100,
+      width: 160,
+      height: 60,
+    })
     expect(set).toHaveBeenCalledTimes(1)
     expect(set.mock.calls[0][1]).toMatchObject({ reason: "drag" })
     expect(instance.get().draft).toBeNull()
@@ -464,28 +638,45 @@ describe("createResize", () => {
     return new Promise<void>((resolve) =>
       requestAnimationFrame(() => {
         expect(resize.dragging(instance.get(), "a")).toBe("move")
-        expect(resize.box(instance.get(), "a")).toEqual({ x: 120, y: 120, width: 160, height: 60 })
+        expect(resize.box(instance.get(), "a")).toEqual({
+          x: 120,
+          y: 120,
+          width: 160,
+          height: 60,
+        })
         expect(resize.style(instance.get(), "a")).toBe(
-          "--resize-x:120px;--resize-y:120px;--resize-width:160px;--resize-height:60px",
+          "--resize-x:120px;--resize-y:120px;--resize-width:160px;--resize-height:60px"
         )
         // The committed box underneath, read through the custom properties.
         expect(resize.boxStyle(instance.get(), "a")).toBe(
-          "position:absolute;left:var(--resize-x, 100px);top:var(--resize-y, 100px);width:var(--resize-width, 160px);height:var(--resize-height, 60px)",
+          "position:absolute;left:var(--resize-x, 100px);top:var(--resize-y, 100px);width:var(--resize-width, 160px);height:var(--resize-height, 60px)"
         )
         document.dispatchEvent(key("Escape"))
         expect(instance.get().draft).toBeNull()
         document.dispatchEvent(pointer("pointerup", 170, 140))
-        expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 160, height: 60 })
+        expect(instance.get().boxes.a).toEqual({
+          x: 100,
+          y: 100,
+          width: 160,
+          height: 60,
+        })
         expect(set).toHaveBeenCalledTimes(1)
         resolve()
-      }),
+      })
     )
   })
 
   test("a second finger pressing another box mid-drag leaves both boxes to the first finger", async () => {
-    const instance = mount({ boxes: { a: start, b: { x: 250, y: 200, width: 50, height: 50 } } })
+    const instance = mount({
+      boxes: { a: start, b: { x: 250, y: 200, width: 50, height: 50 } },
+    })
     const { resize, set } = instance.api
-    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+    const touch = (
+      type: string,
+      clientX: number,
+      clientY: number,
+      pointerId: number
+    ) =>
       new PointerEvent(type, {
         clientX,
         clientY,
@@ -503,10 +694,20 @@ describe("createResize", () => {
     await new Promise((resolve) => requestAnimationFrame(resolve))
     resize.pointerdown(touch("pointerdown", 260, 210, 2), "b", "move", b)
     document.dispatchEvent(touch("pointerup", 260, 210, 2))
-    expect(instance.get().boxes.b).toEqual({ x: 250, y: 200, width: 50, height: 50 })
+    expect(instance.get().boxes.b).toEqual({
+      x: 250,
+      y: 200,
+      width: 50,
+      height: 50,
+    })
     document.dispatchEvent(touch("pointermove", 260, 170, 1))
     document.dispatchEvent(touch("pointerup", 260, 170, 1))
-    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 160, height: 70 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 100,
+      y: 100,
+      width: 160,
+      height: 70,
+    })
     expect(set).toHaveBeenCalledTimes(1)
   })
 
@@ -522,10 +723,15 @@ describe("createResize", () => {
         shiftKey: true,
         isPrimary: true,
         bubbles: true,
-      }),
+      })
     )
     document.dispatchEvent(pointer("pointerup", 300, 160))
-    expect(instance.get().boxes.a).toEqual({ x: 100, y: 100, width: 200, height: 100 })
+    expect(instance.get().boxes.a).toEqual({
+      x: 100,
+      y: 100,
+      width: 200,
+      height: 100,
+    })
     expect(resize.handleAttrs("ne")).toEqual({
       "data-resize-handle": "ne",
       style: "cursor:nesw-resize;touch-action:none",
@@ -539,7 +745,11 @@ describe("createCellRange", () => {
     name: "sheet",
     state: (_options: {}): SheetState => ({ active: null, range: null }),
     api: (context) => {
-      const grid = createGridFocus<SheetState>(context, { key: "active", rows: () => 5, cols: () => 4 })
+      const grid = createGridFocus<SheetState>(context, {
+        key: "active",
+        rows: () => 5,
+        cols: () => 4,
+      })
       const set = vi.fn((range: CellRange | null, _details: object) => {
         context.store.set({ range })
         return true
@@ -554,7 +764,9 @@ describe("createCellRange", () => {
       return { grid, range, set }
     },
     slots: (slot) => ({
-      cell: slot<{ row: number; col: number }>({ props: { row: "number", col: "number" } }),
+      cell: slot<{ row: number; col: number }>({
+        props: { row: "number", col: "number" },
+      }),
     }),
   })
   const mount = () => {
@@ -563,7 +775,8 @@ describe("createCellRange", () => {
     instance.api.grid.focus({ row: 1, col: 1 })
     return instance
   }
-  const bounds = (instance: ReturnType<typeof mount>) => instance.api.range.bounds(instance.get())
+  const bounds = (instance: ReturnType<typeof mount>) =>
+    instance.api.range.bounds(instance.get())
 
   test("Shift with the arrows grows the range from the active cell, which keeps focus", () => {
     const instance = mount()
@@ -580,7 +793,9 @@ describe("createCellRange", () => {
     // Control goes to the grid's edge.
     range.keydown(key("ArrowDown", { shiftKey: true, ctrlKey: true }))
     expect(bounds(instance)).toEqual({ top: 1, left: 0, bottom: 4, right: 1 })
-    expect(instance.api.set.mock.calls[0][1]).toMatchObject({ reason: "list-navigation" })
+    expect(instance.api.set.mock.calls[0][1]).toMatchObject({
+      reason: "list-navigation",
+    })
   })
 
   test("an arrow alone moves the active cell and drops the range, and Escape drops it too", () => {
@@ -618,7 +833,11 @@ describe("createCellRange", () => {
       name: "sheet",
       state: (_options: {}): SheetState => ({ active: null, range: null }),
       api: (context) => {
-        const grid = createGridFocus<SheetState>(context, { key: "active", rows: () => 5, cols: () => 4 })
+        const grid = createGridFocus<SheetState>(context, {
+          key: "active",
+          rows: () => 5,
+          cols: () => 4,
+        })
         const range = createCellRange<SheetState>(context, {
           key: "range",
           grid,
@@ -635,7 +854,7 @@ describe("createCellRange", () => {
     setAnnouncer((text) => heard.push(text))
     cleanups.push(
       () => instance.destroy(),
-      () => setAnnouncer(undefined),
+      () => setAnnouncer(undefined)
     )
     instance.api.grid.focus({ row: 1, col: 1 })
     instance.api.range.keydown(key("a", { ctrlKey: true }))
@@ -646,16 +865,24 @@ describe("createCellRange", () => {
     const instance = mount()
     const { range } = instance.api
     // The active cell alone isn't a range.
-    expect(range.cellAttrs(instance.get(), { row: 1, col: 1 })).toEqual({ "aria-selected": "false" })
+    expect(range.cellAttrs(instance.get(), { row: 1, col: 1 })).toEqual({
+      "aria-selected": "false",
+    })
     range.select({ anchor: { row: 1, col: 1 }, end: { row: 3, col: 2 } })
     expect(range.cellAttrs(instance.get(), { row: 1, col: 1 })).toEqual({
       "aria-selected": "true",
       "data-selected": "",
       "data-range-edge": "top left",
     })
-    expect(range.cellAttrs(instance.get(), { row: 2, col: 2 })["data-range-edge"]).toBe("right")
-    expect(range.cellAttrs(instance.get(), { row: 2, col: 1 })["data-range-edge"]).toBe("left")
-    expect(range.cellAttrs(instance.get(), { row: 0, col: 1 })).toEqual({ "aria-selected": "false" })
+    expect(
+      range.cellAttrs(instance.get(), { row: 2, col: 2 })["data-range-edge"]
+    ).toBe("right")
+    expect(
+      range.cellAttrs(instance.get(), { row: 2, col: 1 })["data-range-edge"]
+    ).toBe("left")
+    expect(range.cellAttrs(instance.get(), { row: 0, col: 1 })).toEqual({
+      "aria-selected": "false",
+    })
     // Ranges past the grid are kept inside it.
     range.select({ anchor: { row: -2, col: 1 }, end: { row: 9, col: 9 } })
     expect(bounds(instance)).toEqual({ top: 0, left: 1, bottom: 4, right: 3 })
@@ -665,12 +892,13 @@ describe("createCellRange", () => {
     const instance = mount()
     const { range, set } = instance.api
     const cells = new Map<string, HTMLElement>()
-    for (let row = 0; row < 5; row++)
+    for (let row = 0; row < 5; row++) {
       for (let col = 0; col < 4; col++) {
         const el = box(col * 50, row * 20, 50, 20)
         cells.set(`${row}:${col}`, el)
         cleanups.push(range.bind(el, { row, col }))
       }
+    }
     const under = vi.fn((x: number, y: number) => {
       const el = cells.get(`${Math.floor(y / 20)}:${Math.floor(x / 50)}`)
       return el ? [el] : []
@@ -687,7 +915,11 @@ describe("createCellRange", () => {
     expect(bounds(instance)).toEqual({ top: 0, left: 0, bottom: 2, right: 2 })
     expect(set.mock.calls.at(-1)![1]).toMatchObject({ reason: "drag" })
 
-    const shift = new PointerEvent("pointerdown", { button: 0, shiftKey: true, cancelable: true })
+    const shift = new PointerEvent("pointerdown", {
+      button: 0,
+      shiftKey: true,
+      cancelable: true,
+    })
     range.pointerdown(shift, { row: 4, col: 1 })
     expect(bounds(instance)).toEqual({ top: 0, left: 0, bottom: 4, right: 1 })
     expect(instance.api.grid.active()).toEqual({ row: 0, col: 0 })
@@ -698,7 +930,7 @@ describe("createCellRange", () => {
     const { range } = instance.api
     range.select({ anchor: { row: 0, col: 0 }, end: { row: 1, col: 1 } })
     const text = range.text(instance.get(), ({ row, col }) =>
-      row === 1 && col === 1 ? 'a "b"\tc' : `${row}${col}`,
+      row === 1 && col === 1 ? 'a "b"\tc' : `${row}${col}`
     )
     expect(text).toBe('00\t01\n10\t"a ""b""\tc"')
     expect(textToCells(text)).toEqual([
@@ -729,7 +961,9 @@ describe("createSwipeActions", () => {
       })
       return { swipe, archived }
     },
-    slots: (slot) => ({ row: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      row: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
   // A row 400 wide with 160 of actions on its end, two buttons, and none on its start.
   const mount = () => {
@@ -739,7 +973,10 @@ describe("createSwipeActions", () => {
     row.tabIndex = 0
     const actions = box(240, 0, 160, 60, row)
     actions.innerHTML = "<button>Flag</button><button>Delete</button>"
-    cleanups.push(instance.api.swipe.bindRow(row, "a"), instance.api.swipe.bindActions(actions, "a", "end"))
+    cleanups.push(
+      instance.api.swipe.bindRow(row, "a"),
+      instance.api.swipe.bindActions(actions, "a", "end")
+    )
     return { instance, swipe: instance.api.swipe, row, actions }
   }
   // Pointer events a set time apart, so a swipe's speed is known.
@@ -750,9 +987,15 @@ describe("createSwipeActions", () => {
     Object.defineProperty(event, "timeStamp", { value: time })
     return event
   }
-  const swipe = (target: { swipe: { pointerdown: Function }; row: HTMLElement }, path: number[], ms = 50) => {
+  const swipe = (
+    target: { swipe: { pointerdown: Function }; row: HTMLElement },
+    path: number[],
+    ms = 50
+  ) => {
     target.swipe.pointerdown(at("pointerdown", 300, 0), "a", target.row)
-    for (const x of path) document.dispatchEvent(at("pointermove", x, ms))
+    for (const x of path) {
+      document.dispatchEvent(at("pointermove", x, ms))
+    }
     document.dispatchEvent(at("pointerup", path[path.length - 1], ms))
   }
 
@@ -797,14 +1040,17 @@ describe("createSwipeActions", () => {
         document.dispatchEvent(at("pointerup", 140, 1))
         expect(instance.get().open).toBeNull()
         resolve()
-      }),
+      })
     )
   })
 
   test("a second finger pressing another row mid-swipe leaves the first row to the first finger", async () => {
     const { instance, swipe: actions, row } = mount()
     const other = box(0, 60, 400, 60)
-    cleanups.push(actions.bindRow(other, "b"), actions.bindActions(box(240, 60, 160, 60, other), "b", "end"))
+    cleanups.push(
+      actions.bindRow(other, "b"),
+      actions.bindActions(box(240, 60, 160, 60, other), "b", "end")
+    )
     const touch = (type: string, x: number, pointerId: number) => {
       time += 50
       const event = new PointerEvent(type, {
@@ -825,7 +1071,9 @@ describe("createSwipeActions", () => {
     await new Promise((resolve) => requestAnimationFrame(resolve))
     actions.pointerdown(touch("pointerdown", 300, 2), "b", other)
     document.dispatchEvent(touch("pointerup", 300, 2))
-    for (const x of [260, 230, 210, 200]) document.dispatchEvent(touch("pointermove", x, 1))
+    for (const x of [260, 230, 210, 200]) {
+      document.dispatchEvent(touch("pointermove", x, 1))
+    }
     document.dispatchEvent(touch("pointerup", 200, 1))
     expect(instance.get().open).toEqual({ key: "a", side: "end" })
     expect(instance.get().swiping).toBeNull()
@@ -891,13 +1139,25 @@ describe("createSwipeActions", () => {
     expect(actions.keydown(key("ArrowLeft"), "a")).toBe(true)
     expect(instance.get().open).toEqual({ key: "a", side: "end" })
     expect(document.activeElement).toBe(flag)
-    actions.keydown(Object.defineProperty(key("ArrowRight"), "target", { value: flag }), "a")
+    actions.keydown(
+      Object.defineProperty(key("ArrowRight"), "target", { value: flag }),
+      "a"
+    )
     expect(document.activeElement).toBe(remove)
     // Past the last stays put; back toward the row's content from the first closes.
-    actions.keydown(Object.defineProperty(key("ArrowRight"), "target", { value: remove }), "a")
+    actions.keydown(
+      Object.defineProperty(key("ArrowRight"), "target", { value: remove }),
+      "a"
+    )
     expect(document.activeElement).toBe(remove)
-    actions.keydown(Object.defineProperty(key("ArrowLeft"), "target", { value: remove }), "a")
-    actions.keydown(Object.defineProperty(key("ArrowLeft"), "target", { value: flag }), "a")
+    actions.keydown(
+      Object.defineProperty(key("ArrowLeft"), "target", { value: remove }),
+      "a"
+    )
+    actions.keydown(
+      Object.defineProperty(key("ArrowLeft"), "target", { value: flag }),
+      "a"
+    )
     expect(instance.get().open).toBeNull()
     expect(document.activeElement).toBe(row)
 
@@ -934,7 +1194,9 @@ test("a row disabled mid-swipe neither opens nor runs its full-swipe action on r
         disabled: () => locked,
       }),
     }),
-    slots: (slot) => ({ row: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      row: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
   const instance = mail({ id: "m" })
   cleanups.push(() => instance.destroy())

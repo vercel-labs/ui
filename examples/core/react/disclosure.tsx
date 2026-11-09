@@ -5,14 +5,21 @@ import { createParts } from "@ui-sdk/react/primitive"
 type DisclosureOptions = {
   open?: boolean
   defaultOpen?: boolean
-  onOpenChange?: (open: boolean, details: ChangeDetails<"trigger-press">) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<"trigger-press">
+  ) => void
 }
 
 type DisclosureState = { open: boolean }
 
 const disclosure = definePrimitive({
   name: "disclosure",
-  options: { open: "boolean", defaultOpen: "boolean", onOpenChange: "callback" },
+  options: {
+    open: "boolean",
+    defaultOpen: "boolean",
+    onOpenChange: "callback",
+  },
   state: (options: DisclosureOptions): DisclosureState => ({
     open: options.open ?? options.defaultOpen ?? false,
   }),
@@ -21,7 +28,10 @@ const disclosure = definePrimitive({
     const change = createChange(context)
     return {
       toggle: (event?: Event) =>
-        change("open", !context.store.get().open, { reason: "trigger-press", event }),
+        change("open", !context.store.get().open, {
+          reason: "trigger-press",
+          event,
+        }),
     }
   },
   slots: (slot) => ({
@@ -41,7 +51,11 @@ const disclosure = definePrimitive({
   }),
 })
 
-const parts = createParts(disclosure, { root: "div", trigger: "button", panel: "div" })
+const parts = createParts(disclosure, {
+  root: "div",
+  trigger: "button",
+  panel: "div",
+})
 
 const Disclosure = parts.Root
 
@@ -55,7 +69,11 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={open}
+            onChange={(event) => setOpen(event.target.checked)}
+          />
           Open from outside
         </label>
       </div>

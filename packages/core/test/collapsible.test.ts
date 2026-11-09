@@ -1,5 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
-import { collapsible, createCollapsibleController } from "../src/components/collapsible/collapsible"
+import {
+  collapsible,
+  createCollapsibleController,
+} from "../src/components/collapsible/collapsible"
 import { attrs, partState, present } from "../src/foundation/kernel/part"
 import { kept } from "./kept"
 
@@ -18,25 +21,40 @@ describe("collapsible", () => {
   test("open renders the panel and the open attributes", () => {
     const instance = collapsible({ id: "x", defaultOpen: true })
     expect(present(instance.part("panel"))).toBe(true)
-    expect(attrs(instance.part("panel"))).toMatchObject({ id: "x-panel", hidden: undefined, "data-open": "" })
+    expect(attrs(instance.part("panel"))).toMatchObject({
+      id: "x-panel",
+      hidden: undefined,
+      "data-open": "",
+    })
     expect(attrs(instance.part("root"))["data-open"]).toBe("")
-    expect(partState(instance.part("trigger"))).toEqual({ open: true, disabled: false })
+    expect(partState(instance.part("trigger"))).toEqual({
+      open: true,
+      disabled: false,
+    })
   })
 
   test("a kept or findable panel stays in the page, hidden", () => {
     const instance = collapsible({ id: "x" })
     expect(present(instance.part("panel", { keepMounted: true }))).toBe(true)
     expect(attrs(instance.part("panel", { keepMounted: true })).hidden).toBe("")
-    expect(attrs(instance.part("panel", { hiddenUntilFound: true })).hidden).toBe("until-found")
+    expect(
+      attrs(instance.part("panel", { hiddenUntilFound: true })).hidden
+    ).toBe("until-found")
   })
 
   test("toggling calls back with the reason, and can be canceled", () => {
     const onOpenChange = vi.fn()
     const instance = collapsible({ id: "x", onOpenChange })
     instance.api.toggle({ reason: "trigger-press" })
-    expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: "trigger-press" }))
+    expect(onOpenChange).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ reason: "trigger-press" })
+    )
     expect(instance.api.isOpen()).toBe(true)
-    const canceling = collapsible({ id: "y", onOpenChange: (_open, details) => details.cancel() })
+    const canceling = collapsible({
+      id: "y",
+      onOpenChange: (_open, details) => details.cancel(),
+    })
     expect(canceling.api.open()).toBe(false)
     expect(canceling.api.isOpen()).toBe(false)
   })
@@ -53,7 +71,10 @@ describe("collapsible", () => {
 
   test("disabled marks every part and keeps the trigger focusable", () => {
     const instance = collapsible({ id: "x", disabled: true })
-    expect(attrs(instance.part("trigger"))).toMatchObject({ "aria-disabled": "true", "data-disabled": "" })
+    expect(attrs(instance.part("trigger"))).toMatchObject({
+      "aria-disabled": "true",
+      "data-disabled": "",
+    })
     expect(attrs(instance.part("trigger")).disabled).toBeUndefined()
     expect(attrs(instance.part("root"))["data-disabled"]).toBe("")
   })
@@ -83,8 +104,13 @@ describe("collapsible", () => {
   })
 
   test("a canceled find in page doesn't stop the next opening from animating", () => {
-    const onOpenChange = (_open: boolean, details: { reason: string; cancel: () => void }) => {
-      if (details.reason === "find-in-page") details.cancel()
+    const onOpenChange = (
+      _open: boolean,
+      details: { reason: string; cancel: () => void }
+    ) => {
+      if (details.reason === "find-in-page") {
+        details.cancel()
+      }
     }
     const instance = collapsible({ id: "x", open: false, onOpenChange })
     expect(instance.api.open({ reason: "find-in-page" })).toBe(false)
@@ -107,7 +133,12 @@ describe("collapsible", () => {
   test("nothing calls back on mount", () => {
     const onOpenChange = vi.fn()
     const onOpenChangeComplete = vi.fn()
-    collapsible({ id: "x", defaultOpen: true, onOpenChange, onOpenChangeComplete })
+    collapsible({
+      id: "x",
+      defaultOpen: true,
+      onOpenChange,
+      onOpenChangeComplete,
+    })
     expect(onOpenChange).not.toHaveBeenCalled()
     expect(onOpenChangeComplete).not.toHaveBeenCalled()
   })

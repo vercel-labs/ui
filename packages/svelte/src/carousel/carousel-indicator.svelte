@@ -18,7 +18,8 @@ Shows a page and goes to it. Indicators past the page count hide themselves.
   let {
     page,
     ...rest
-  }: PartProps<"button", CarouselIndicatorState> & CarouselIndicatorProps = $props()
+  }: PartProps<"button", CarouselIndicatorState> & CarouselIndicatorProps =
+    $props()
 
   // In a group outside its carousel, before that mounts, it's a plain button.
   const carousel = getContext<CarouselContext | undefined>(carouselPrimitive)

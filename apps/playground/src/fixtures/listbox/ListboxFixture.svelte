@@ -23,15 +23,27 @@
   let { data = false }: { data?: boolean } = $props()
 
   const controller = createListboxController<string, boolean>()
-  const { fieldset, grouped, cancel, long, controlled, defaultValue, ...options } = listboxOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    long,
+    controlled,
+    defaultValue,
+    ...options
+  } = listboxOptions()
   let action = $state("")
   let reason = $state("")
   let submitted = $state("")
-  let value = $state.raw<unknown>(defaultValue ?? (options.multiple ? [] : null))
+  let value = $state.raw<unknown>(
+    defaultValue ?? (options.multiple ? [] : null)
+  )
   let list = $state.raw(f.items)
   // Items a spec swaps in. Only in the browser: the server has no document.
   $effect(() => onItemsChange(changedToppings, (next) => (list = next)))
-  const items = $derived(long ? longToppings() : grouped ? listboxData(true) : list)
+  const items = $derived(
+    long ? longToppings() : grouped ? listboxData(true) : list
+  )
   // What both the data listbox and the composed one take.
   const shared = $derived({
     ...options,
@@ -44,21 +56,48 @@
 
   // What the composed list holds, in order: the items, or groups with a separator between.
   type Listed =
-    | { type: "item"; key: string; value: string; label: string; disabled?: boolean }
-    | { type: "group"; key: string; label: string; items: { value: string; label: string }[] }
+    | {
+        type: "item"
+        key: string
+        value: string
+        label: string
+        disabled?: boolean
+      }
+    | {
+        type: "group"
+        key: string
+        label: string
+        items: { value: string; label: string }[]
+      }
     | { type: "separator"; key: string }
   const listed = $derived<Listed[]>(
     grouped
       ? f.groups.flatMap((group, index): Listed[] => [
-          ...(index ? [{ type: "separator" as const, key: `separator-${index}` }] : []),
-          { type: "group", key: group.label, label: group.label, items: group.items },
+          ...(index
+            ? [{ type: "separator" as const, key: `separator-${index}` }]
+            : []),
+          {
+            type: "group",
+            key: group.label,
+            label: group.label,
+            items: group.items,
+          },
         ])
-      : (long ? longToppings() : list).map((item) => ({ type: "item", key: item.value, ...item })),
+      : (long ? longToppings() : list).map((item) => ({
+          type: "item",
+          key: item.value,
+          ...item,
+        }))
   )
 
-  function onValueChange(next: unknown, details: { reason: string; cancel: () => void }) {
+  function onValueChange(
+    next: unknown,
+    details: { reason: string; cancel: () => void }
+  ) {
     reason = details.reason
-    if (cancel) return details.cancel()
+    if (cancel) {
+      return details.cancel()
+    }
     value = next
     action = listboxAction(next)
   }
@@ -72,7 +111,11 @@
 <div class="fixture">
   <button>Before</button>
   <form class="select-form" aria-label={f.formLabel} onsubmit={onSubmit}>
-    <svelte:element this={fieldset ? "fieldset" : "div"} disabled={fieldset || undefined} style="display: contents">
+    <svelte:element
+      this={fieldset ? "fieldset" : "div"}
+      disabled={fieldset || undefined}
+      style="display: contents"
+    >
       <!-- A data listbox knows every option from its items, and renders the same parts. -->
       <Listbox {...shared} items={data ? items : undefined} {onValueChange}>
         {#each listed as item (item.key)}
@@ -85,12 +128,18 @@
                 <ListboxItem class="item" value={child.value}>
                   <ListboxItemIcon class="icon" />
                   {child.label}
-                  <ListboxItemIndicator class="indicator">✓</ListboxItemIndicator>
+                  <ListboxItemIndicator class="indicator"
+                    >✓</ListboxItemIndicator
+                  >
                 </ListboxItem>
               {/each}
             </ListboxGroup>
           {:else}
-            <ListboxItem class="item" value={item.value} disabled={item.disabled}>
+            <ListboxItem
+              class="item"
+              value={item.value}
+              disabled={item.disabled}
+            >
               <ListboxItemIcon class="icon" />
               {item.label}
               <ListboxItemIndicator class="indicator">✓</ListboxItemIndicator>

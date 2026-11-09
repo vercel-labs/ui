@@ -1,4 +1,8 @@
-import { toggle as togglePrimitive, type toggle, type toggleGroup } from "@ui-sdk/core/toggle"
+import {
+  toggle as togglePrimitive,
+  type toggle,
+  type toggleGroup,
+} from "@ui-sdk/core/toggle"
 import { getContext } from "svelte"
 import type { PrimitiveHandle } from "../use-primitive.svelte"
 
@@ -14,8 +18,16 @@ function useToggleGroup() {
 
 function useToggle() {
   const toggle = getContext<ToggleContext | undefined>(togglePrimitive)
-  if (!toggle) throw new Error("<ToggleIcon> must be used inside <Toggle>.")
+  if (!toggle) {
+    throw new Error("<ToggleIcon> must be used inside <Toggle>.")
+  }
   return toggle
 }
 
-export { type ToggleContext, type ToggleGroupContext, ToggleGroupKey, useToggle, useToggleGroup }
+export {
+  type ToggleContext,
+  type ToggleGroupContext,
+  ToggleGroupKey,
+  useToggle,
+  useToggleGroup,
+}

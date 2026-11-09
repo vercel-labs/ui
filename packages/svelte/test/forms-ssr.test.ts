@@ -19,7 +19,9 @@ const attribute = (tag: string | undefined, name: string) =>
 const dangling = (html: string) => {
   const ids = new Set(tags(html).map((tag) => attribute(tag, "id")))
   return ["for", "aria-controls", "aria-labelledby"]
-    .flatMap((name) => tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? []))
+    .flatMap((name) =>
+      tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? [])
+    )
     .filter((id) => !ids.has(id))
 }
 
@@ -31,7 +33,7 @@ describe("server rendering form controls", () => {
     expect(body).toContain('role="checkbox"')
     expect(body).toContain('aria-checked="true"')
     expect(body).toMatch(
-      /<input[^>]*type="checkbox"[^>]*name="terms"[^>]*value="yes"[^>]*checked[^>]*required/,
+      /<input[^>]*type="checkbox"[^>]*name="terms"[^>]*value="yes"[^>]*checked[^>]*required/
     )
   })
 
@@ -65,33 +67,52 @@ describe("server rendering form controls", () => {
       const body = render(FieldControlsApp, { props: { kind } }).body
       const label = attribute(
         tags(body).find((tag) => tag.includes('data-slot="field-label"')),
-        "for",
+        "for"
       )
-      expect(tags(body).find((tag) => attribute(tag, "id") === label)).toMatch(/^<input/)
+      expect(tags(body).find((tag) => attribute(tag, "id") === label)).toMatch(
+        /^<input/
+      )
       expect(dangling(body)).toEqual([])
-    },
+    }
   )
 
   test("a field's label points at a range slider's first input and names its group", () => {
-    const body = render(FieldControlsApp, { props: { kind: "range-slider" } }).body
-    const label = tags(body).find((tag) => tag.includes('data-slot="field-label"'))
-    const target = tags(body).find((tag) => attribute(tag, "id") === attribute(label, "for"))
+    const body = render(FieldControlsApp, {
+      props: { kind: "range-slider" },
+    }).body
+    const label = tags(body).find((tag) =>
+      tag.includes('data-slot="field-label"')
+    )
+    const target = tags(body).find(
+      (tag) => attribute(tag, "id") === attribute(label, "for")
+    )
     expect(target).toMatch(/^<input[^>]*type="range"/)
     const group = tags(body).find((tag) => tag.includes('role="group"'))
     expect(attribute(group, "aria-labelledby")).toBe(attribute(label, "id"))
     expect(dangling(body)).toEqual([])
   })
 
-  test.each(["field-control", "input", "textarea", "checkbox", "slider", "date-picker"] as const)(
+  test.each([
+    "field-control",
+    "input",
+    "textarea",
+    "checkbox",
+    "slider",
+    "date-picker",
+  ] as const)(
     "a %s keeps its own description ahead of the field's",
     (control) => {
       const body = render(FieldHintApp, { props: { control } }).body
-      const element = tags(body).find((tag) => tag.includes('aria-describedby="hint'))
-      const text = tags(body).find((tag) => tag.includes('data-slot="field-description"'))
+      const element = tags(body).find((tag) =>
+        tag.includes('aria-describedby="hint')
+      )
+      const text = tags(body).find((tag) =>
+        tag.includes('data-slot="field-description"')
+      )
       const ids = attribute(element, "aria-describedby")?.split(" ")
       expect(ids?.[0]).toBe("hint")
       expect(ids).toContain(attribute(text, "id"))
-    },
+    }
   )
 })
 
@@ -105,12 +126,22 @@ describe.each(["before", "after"] as const)(
       (kind) => {
         const body = render(FieldApp, { props: { order, kind } }).body
         const label = tags(body).find((tag) => tag.startsWith("<label"))
-        const element = tags(body).find((tag) => attribute(tag, "id") === attribute(label, "for"))
-        expect(element).toMatch(kind === "input" ? /^<input/ : /^<button[^>]*role="combobox"/)
-        expect(attribute(element, "aria-labelledby")).toBe(attribute(label, "id"))
-        const text = tags(body).find((tag) => tag.includes('data-slot="field-description"'))
-        expect(attribute(element, "aria-describedby")).toBe(attribute(text, "id"))
-      },
+        const element = tags(body).find(
+          (tag) => attribute(tag, "id") === attribute(label, "for")
+        )
+        expect(element).toMatch(
+          kind === "input" ? /^<input/ : /^<button[^>]*role="combobox"/
+        )
+        expect(attribute(element, "aria-labelledby")).toBe(
+          attribute(label, "id")
+        )
+        const text = tags(body).find((tag) =>
+          tag.includes('data-slot="field-description"')
+        )
+        expect(attribute(element, "aria-describedby")).toBe(
+          attribute(text, "id")
+        )
+      }
     )
-  },
+  }
 )

@@ -21,7 +21,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#installation",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -51,7 +52,7 @@ const RouterLink = defineComponent({
             navigate(props.to)
           },
         },
-        slots.default?.(),
+        slots.default?.()
       )
   },
 })

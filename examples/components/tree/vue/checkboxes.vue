@@ -43,12 +43,15 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, children }) =>
     h(TreeItem, { key: value, value }, () => [
       h(TreeItemLabel, {}, () => [
-        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        children &&
+          h(TreeItemIndicator, {}, () =>
+            h(ChevronRightIcon, { "aria-hidden": "true" })
+          ),
         h(TreeItemCheckbox, {}),
         label,
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
-    ]),
+    ])
   )
 
 const log = useLog()
@@ -62,7 +65,9 @@ const log = useLog()
     mode="none"
     check-strategy="trunk"
     :default-checked="['react', 'postgres']"
-    @checked-change="(checked) => log(`Checked ${checked.join(', ') || 'nothing'}`)"
+    @checked-change="
+      (checked) => log(`Checked ${checked.join(', ') || 'nothing'}`)
+    "
     :default-expanded="['frontend', 'backend', 'databases']"
   >
     <Items :items="items" />

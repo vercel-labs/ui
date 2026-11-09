@@ -8,7 +8,12 @@ import {
   AutocompleteItem,
   AutocompleteList,
 } from "@ui-sdk/react/autocomplete"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { useLog } from "../../../shared/react/log"
 
 const fruits = [
@@ -37,7 +42,9 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        const data = [...new FormData(event.currentTarget)].map(
+          ([name, value]) => `${name}=${value}`
+        )
         log(`Submitted ${data.join("&")}`)
       }}
     >

@@ -1,4 +1,10 @@
-import { Meter, MeterIndicator, MeterLabel, MeterTrack, MeterValue } from "@ui-sdk/solid/meter"
+import {
+  Meter,
+  MeterIndicator,
+  MeterLabel,
+  MeterTrack,
+  MeterValue,
+} from "@ui-sdk/solid/meter"
 
 function Example() {
   return (
@@ -8,7 +14,10 @@ function Example() {
       <MeterTrack render={(props) => <span {...props} />}>
         <MeterIndicator
           render={(props, state) => (
-            <div {...props} data-variant={state.percent >= 90 ? "destructive" : undefined} />
+            <div
+              {...props}
+              data-variant={state.percent >= 90 ? "destructive" : undefined}
+            />
           )}
         />
       </MeterTrack>

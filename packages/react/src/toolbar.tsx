@@ -7,9 +7,19 @@ import {
 } from "@ui-sdk/core/toolbar"
 import * as React from "react"
 import { ToolbarContext, ToolbarGroupContext } from "./toolbar-context"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
-const parts = createParts(toolbar, { button: "button", link: "a", input: "input", separator: "div" })
+const parts = createParts(toolbar, {
+  button: "button",
+  link: "a",
+  input: "input",
+  separator: "div",
+})
 
 /**
  * A row of controls with one tab stop and arrow keys between them. Toggles and
@@ -25,10 +35,18 @@ function Toolbar({
   debug,
   ...props
 }: ToolbarOptions & PartProps<"div", ToolbarState>) {
-  const handle = usePrimitive(toolbar, { orientation, loop, disabled, controller, debug })
+  const handle = usePrimitive(toolbar, {
+    orientation,
+    loop,
+    disabled,
+    controller,
+    debug,
+  })
   // In its own context too, so a toggle can join a toolbar without bundling it.
   return (
-    <ToolbarContext.Provider value={handle}>{usePart(handle, "root", {}, props)}</ToolbarContext.Provider>
+    <ToolbarContext.Provider value={handle}>
+      {usePart(handle, "root", {}, props)}
+    </ToolbarContext.Provider>
   )
 }
 
@@ -65,7 +83,12 @@ function ToolbarGroup({
       {typeof children === "function" ? children(state) : children}
     </ToolbarGroupContext.Provider>
   )
-  return usePart(toolbar, "group", { id: React.useId(), disabled }, { ...props, children: content })
+  return usePart(
+    toolbar,
+    "group",
+    { id: React.useId(), disabled },
+    { ...props, children: content }
+  )
 }
 
 /**
@@ -92,4 +115,11 @@ export type {
   ToolbarSeparatorState,
 } from "@ui-sdk/core/toolbar"
 
-export { Toolbar, ToolbarButton, ToolbarGroup, ToolbarInput, ToolbarLink, ToolbarSeparator }
+export {
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+  ToolbarInput,
+  ToolbarLink,
+  ToolbarSeparator,
+}

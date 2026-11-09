@@ -18,7 +18,9 @@ function Fixture() {
       <button>Before</button>
       <Autocomplete name={f.name}>
         <AutocompleteLabel class="label">{f.label}</AutocompleteLabel>
-        <AutocompleteInput class={(state) => `input ${state.open ? "is-open" : "is-closed"}`} />
+        <AutocompleteInput
+          class={(state) => `input ${state.open ? "is-open" : "is-closed"}`}
+        />
         <AutocompleteTrigger aria-label={f.trigger}>▾</AutocompleteTrigger>
         <AutocompleteContent class="popup list-popup">
           <AutocompleteList>

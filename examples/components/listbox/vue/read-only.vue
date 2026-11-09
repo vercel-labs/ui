@@ -13,7 +13,11 @@ const frameworks = [
 
 <template>
   <Listbox read-only default-value="nuxt" aria-label="Framework">
-    <ListboxItem v-for="framework in frameworks" :key="framework.value" :value="framework.value">
+    <ListboxItem
+      v-for="framework in frameworks"
+      :key="framework.value"
+      :value="framework.value"
+    >
       {{ framework.label }}
       <ListboxItemIndicator>
         <CheckIcon aria-hidden="true" />

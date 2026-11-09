@@ -1,5 +1,9 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/solid/password-input"
 import { createSignal, For } from "solid-js"
 
 function strength(password: string) {
@@ -17,7 +21,11 @@ function Example() {
   return (
     <Field name="new-password">
       <FieldLabel>New password</FieldLabel>
-      <PasswordInput value={value()} onValueChange={(next) => setValue(next)} autoComplete="new-password">
+      <PasswordInput
+        value={value()}
+        onValueChange={(next) => setValue(next)}
+        autoComplete="new-password"
+      >
         <PasswordInputControl />
         <PasswordInputToggle aria-label="Show password">
           {(state) =>
@@ -54,7 +62,9 @@ function Example() {
         </PasswordInputToggle>
       </PasswordInput>
       <div data-slot="strength" aria-hidden="true">
-        <For each={[1, 2, 3, 4]}>{(level) => <div data-on={score() >= level || undefined} />}</For>
+        <For each={[1, 2, 3, 4]}>
+          {(level) => <div data-on={score() >= level || undefined} />}
+        </For>
       </div>
       <output data-slot="output">
         {value()

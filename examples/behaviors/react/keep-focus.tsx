@@ -16,23 +16,36 @@ const checklist = definePrimitive({
     toggle(task: string) {
       const { done } = context.store.get()
       context.store.set({
-        done: done.includes(task) ? done.filter((other) => other !== task) : [...done, task],
+        done: done.includes(task)
+          ? done.filter((other) => other !== task)
+          : [...done, task],
       })
-      if (context.options().keep) keepFocus(() => context.element("task", task))
+      if (context.options().keep) {
+        keepFocus(() => context.element("task", task))
+      }
     },
   }),
   slots: (slot) => ({
-    root: slot<{}, ChecklistState>({ state: (state) => ({ done: state.done }) }),
+    root: slot<{}, ChecklistState>({
+      state: (state) => ({ done: state.done }),
+    }),
     list: slot({ attrs: () => ({ role: "list" }) }),
     task: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (state, part) => ({ type: "button", "aria-pressed": String(state.done.includes(part.key)) }),
+      attrs: (state, part) => ({
+        type: "button",
+        "aria-pressed": String(state.done.includes(part.key)),
+      }),
       press: ({ api, key }) => api.toggle(key),
     }),
   }),
 })
 
-const parts = createParts(checklist, { root: "div", list: "ul", task: "button" })
+const parts = createParts(checklist, {
+  root: "div",
+  list: "ul",
+  task: "button",
+})
 
 const Checklist = parts.Root
 
@@ -48,7 +61,11 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={keep} onChange={(event) => setKeep(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={keep}
+            onChange={(event) => setKeep(event.target.checked)}
+          />
           Keep focus on the task
         </label>
       </div>

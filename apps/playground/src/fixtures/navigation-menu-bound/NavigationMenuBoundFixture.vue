@@ -33,12 +33,20 @@ exposeNavigationMenuValue((next) => (value.value = next))
       @open-change-complete="(open: boolean) => completed.push(open)"
     >
       <NavigationMenuList class="nav-list">
-        <NavigationMenuItem v-for="item in fixture.items" :key="item.value" :value="item.value">
-          <NavigationMenuTrigger class="nav-trigger">{{ item.trigger }}</NavigationMenuTrigger>
+        <NavigationMenuItem
+          v-for="item in fixture.items"
+          :key="item.value"
+          :value="item.value"
+        >
+          <NavigationMenuTrigger class="nav-trigger">{{
+            item.trigger
+          }}</NavigationMenuTrigger>
           <NavigationMenuContent class="nav-content">
             <ul>
               <li v-for="link in item.links" :key="link.href">
-                <NavigationMenuLink :href="link.href">{{ link.label }}</NavigationMenuLink>
+                <NavigationMenuLink :href="link.href">{{
+                  link.label
+                }}</NavigationMenuLink>
               </li>
             </ul>
           </NavigationMenuContent>
@@ -47,6 +55,8 @@ exposeNavigationMenuValue((next) => (value.value = next))
       <NavigationMenuViewport v-if="layout.viewport" class="nav-viewport" />
     </NavigationMenu>
     <button>After</button>
-    <output role="status" aria-label="Completed">{{ completed.join(",") }}</output>
+    <output role="status" aria-label="Completed">{{
+      completed.join(",")
+    }}</output>
   </div>
 </template>

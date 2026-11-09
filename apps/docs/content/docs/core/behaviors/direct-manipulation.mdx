@@ -325,7 +325,8 @@ A short press still clicks, so keep a click handler for one step. A press that's
 ```ts
 const area = createArea(context, {
   value: (state) => ({ x: state.mix.warmth, y: state.mix.energy }),
-  set: (value, details) => change("mix", { warmth: value.x, energy: value.y }, details),
+  set: (value, details) =>
+    change("mix", { warmth: value.x, energy: value.y }, details),
   x: () => ({ min: 0, max: 100, step: 1, label: "Warmth" }),
   y: () => ({ min: 0, max: 100, step: 1, label: "Energy" }),
 })

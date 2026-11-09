@@ -8,7 +8,9 @@ import { defineComboboxElements } from "../src/combobox"
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   ElementInternals.prototype.setFormValue ??= () => {}
   ElementInternals.prototype.setValidity ??= () => {}
   defineComboboxElements()
@@ -26,5 +28,7 @@ test("a combobox is named by its label, not by its trigger", async () => {
       </ui-combobox-content>
     </ui-combobox>`
   await wait()
-  expect(agent.snapshot()).toEqual([expect.objectContaining({ component: "combobox", label: "Assignee" })])
+  expect(agent.snapshot()).toEqual([
+    expect.objectContaining({ component: "combobox", label: "Assignee" }),
+  ])
 })

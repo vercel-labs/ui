@@ -26,7 +26,12 @@ const segment = (root: HTMLElement, type: string) =>
 function type(text: string) {
   for (const char of text) {
     document.activeElement!.dispatchEvent(
-      new InputEvent("beforeinput", { inputType: "insertText", data: char, bubbles: true, cancelable: true }),
+      new InputEvent("beforeinput", {
+        inputType: "insertText",
+        data: char,
+        bubbles: true,
+        cancelable: true,
+      })
     )
     flush()
   }
@@ -34,31 +39,46 @@ function type(text: string) {
 
 test("typing a date fills the segments and reports the ISO value once", () => {
   const onValueChange = vi.fn()
-  const root = mount(() => <DateInput locale="en-US" onValueChange={onValueChange} />)
+  const root = mount(() => (
+    <DateInput locale="en-US" onValueChange={onValueChange} />
+  ))
   const month = segment(root, "month")
   month.focus()
   type("11042026")
-  expect(onValueChange.mock.calls.map(([value]) => value)).toEqual(["2026-11-04"])
-  expect([segment(root, "month").value, segment(root, "day").value, segment(root, "year").value]).toEqual([
-    "11",
-    "04",
-    "2026",
+  expect(onValueChange.mock.calls.map(([value]) => value)).toEqual([
+    "2026-11-04",
   ])
+  expect([
+    segment(root, "month").value,
+    segment(root, "day").value,
+    segment(root, "year").value,
+  ]).toEqual(["11", "04", "2026"])
   expect(segment(root, "month")).toBe(month)
-  expect(root.querySelector<HTMLInputElement>('input[type="hidden"]')!.value).toBe("2026-11-04")
+  expect(
+    root.querySelector<HTMLInputElement>('input[type="hidden"]')!.value
+  ).toBe("2026-11-04")
 })
 
 test("a controlled value follows its owner", () => {
   const [value, setValue] = createSignal<string | null>("09:30")
   const root = mount(() => (
     <>
-      <TimeInput value={value()} onValueChange={setValue} hourCycle={24} locale="en-US" />
+      <TimeInput
+        value={value()}
+        onValueChange={setValue}
+        hourCycle={24}
+        locale="en-US"
+      />
       <output>{value()}</output>
     </>
   ))
   segment(root, "minute").focus()
   document.activeElement!.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true }),
+    new KeyboardEvent("keydown", {
+      key: "ArrowUp",
+      bubbles: true,
+      cancelable: true,
+    })
   )
   flush()
   expect(root.querySelector("output")!.textContent).toBe("09:31")
@@ -85,7 +105,12 @@ test("children can render the segments themselves", () => {
     <DateInput defaultValue="2026-11-02" locale="en-US">
       {(state) => (
         <For each={state.segments} keyed={(item) => item.key}>
-          {(item) => <DateInputSegment segment={item()} class={`segment-${item().type}`} />}
+          {(item) => (
+            <DateInputSegment
+              segment={item()}
+              class={`segment-${item().type}`}
+            />
+          )}
         </For>
       )}
     </DateInput>

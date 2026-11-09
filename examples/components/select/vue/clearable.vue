@@ -29,7 +29,10 @@ const log = useLog()
     <Select
       default-value="ines"
       placeholder="Unassigned"
-      @value-change="(value, details) => log(`value: ${JSON.stringify(value)} (${details.reason})`)"
+      @value-change="
+        (value, details) =>
+          log(`value: ${JSON.stringify(value)} (${details.reason})`)
+      "
     >
       <div data-slot="row">
         <SelectTrigger>
@@ -41,7 +44,11 @@ const log = useLog()
         </SelectClear>
       </div>
       <SelectContent>
-        <SelectItem v-for="person in people" :key="person.value" :value="person.value">
+        <SelectItem
+          v-for="person in people"
+          :key="person.value"
+          :value="person.value"
+        >
           {{ person.label }}
           <SelectItemIndicator>
             <CheckIcon />

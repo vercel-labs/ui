@@ -1,13 +1,23 @@
 import type { Page } from "@playwright/test"
-import { expect, lastAction, opacityOf, pageNow, slowTransitions, test, transitionedIn } from "../fixtures"
+import {
+  expect,
+  lastAction,
+  opacityOf,
+  pageNow,
+  slowTransitions,
+  test,
+  transitionedIn,
+} from "../fixtures"
 
 // A hover card previews what a link leads to, like a profile, while the
 // pointer rests on the link or keyboard focus stays on it. The pointer can
 // move into the card, and it never takes focus on its own.
 
 const link = (page: Page) => page.getByRole("link", { name: "@ada" })
-const card = (page: Page) => page.getByText("Wrote the first program for the Analytical Engine.")
-const profileLink = (page: Page) => page.getByRole("link", { name: "View profile" })
+const card = (page: Page) =>
+  page.getByText("Wrote the first program for the Analytical Engine.")
+const profileLink = (page: Page) =>
+  page.getByRole("link", { name: "View profile" })
 const before = (page: Page) => page.getByRole("button", { name: "Before" })
 
 async function moveAway(page: Page) {
@@ -26,7 +36,10 @@ test.describe("pointer", () => {
     await expect(card(page)).toBeVisible()
   })
 
-  test("the card waits for its delay before opening", async ({ page, open }) => {
+  test("the card waits for its delay before opening", async ({
+    page,
+    open,
+  }) => {
     await open("hover-card", { delay: "500" })
     const start = await pageNow(page)
     await link(page).hover()
@@ -34,7 +47,10 @@ test.describe("pointer", () => {
     expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(500)
   })
 
-  test("moving the pointer away closes the card after its close delay", async ({ page, open }) => {
+  test("moving the pointer away closes the card after its close delay", async ({
+    page,
+    open,
+  }) => {
     await open("hover-card", { closeDelay: "400" })
     await link(page).hover()
     await expect(card(page)).toBeVisible()
@@ -67,7 +83,10 @@ test.describe("pointer", () => {
 })
 
 test.describe("keyboard", () => {
-  test("keyboard focus on the link opens the card after the delay", async ({ page, tab }) => {
+  test("keyboard focus on the link opens the card after the delay", async ({
+    page,
+    tab,
+  }) => {
     await before(page).focus()
     await tab()
     await expect(link(page)).toBeFocused()
@@ -75,7 +94,10 @@ test.describe("keyboard", () => {
     await expect(link(page)).toBeFocused()
   })
 
-  test("Escape closes the card and leaves focus on the link", async ({ page, tab }) => {
+  test("Escape closes the card and leaves focus on the link", async ({
+    page,
+    tab,
+  }) => {
     await before(page).focus()
     await tab()
     await expect(card(page)).toBeVisible()
@@ -114,7 +136,10 @@ test.describe("positioning", () => {
 })
 
 test.describe("animation", () => {
-  test("the card animates in from its starting style", async ({ page, open }) => {
+  test("the card animates in from its starting style", async ({
+    page,
+    open,
+  }) => {
     await open("hover-card", { animate: "" })
     await slowTransitions(page)
     await link(page).hover()
@@ -122,7 +147,10 @@ test.describe("animation", () => {
     expect(await opacityOf(page.locator(".hover-card"))).toBeLessThan(0.5)
   })
 
-  test("the card stays in the page while it animates out", async ({ page, open }) => {
+  test("the card stays in the page while it animates out", async ({
+    page,
+    open,
+  }) => {
     await open("hover-card", { animate: "", closeDelay: "0" })
     await link(page).hover()
     await expect(card(page)).toBeVisible()
@@ -134,7 +162,10 @@ test.describe("animation", () => {
 })
 
 test.describe("focus, touch and reasons", () => {
-  test("a click that focuses the link doesn't open the card from focus", async ({ page, open }) => {
+  test("a click that focuses the link doesn't open the card from focus", async ({
+    page,
+    open,
+  }) => {
     await open("hover-card", { delay: "2000" })
     await link(page).click()
     await page.clock.runFor(300)
@@ -153,8 +184,16 @@ test.describe("focus, touch and reasons", () => {
     await expect(card(page)).toBeHidden()
   })
 
-  test("a tap follows the link without opening the card", async ({ browser, framework, baseURL }) => {
-    const context = await browser.newContext({ hasTouch: true, isMobile: true, baseURL })
+  test("a tap follows the link without opening the card", async ({
+    browser,
+    framework,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      hasTouch: true,
+      isMobile: true,
+      baseURL,
+    })
     const page = await context.newPage()
     await page.clock.install()
     await page.goto(`/?fixture=hover-card&framework=${framework}&delay=0`)

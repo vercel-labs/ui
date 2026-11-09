@@ -49,9 +49,15 @@ function DataItems(props: { items: ListData }) {
   return (
     <For each={props.items}>
       {(entry) => {
-        if (typeof entry === "string") return <Item value={entry} label={entry} />
-        if ("value" in entry) return <Item {...entry} />
-        if (entry.type === "separator") return <SelectSeparator class="separator" />
+        if (typeof entry === "string") {
+          return <Item value={entry} label={entry} />
+        }
+        if ("value" in entry) {
+          return <Item {...entry} />
+        }
+        if (entry.type === "separator") {
+          return <SelectSeparator class="separator" />
+        }
         return (
           <SelectGroup>
             <SelectGroupLabel class="label">{entry.label}</SelectGroupLabel>
@@ -98,15 +104,26 @@ function Items(props: { list: Item[]; grouped: boolean; selectAll: boolean }) {
 }
 
 function Fixture(props: { data?: boolean }) {
-  const { fieldset, grouped, cancel, align, long, container, search, selectAll, recent, max, ...options } =
-    selectOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    align,
+    long,
+    container,
+    search,
+    selectAll,
+    recent,
+    max,
+    ...options
+  } = selectOptions()
   const [action, setAction] = createSignal("")
   const [submitted, setSubmitted] = createSignal("")
   const [list, setList] = createSignal<Item[]>(f.items)
   // Listens on the client only, in an effect: the server has no document.
   createEffect(
     () => 0,
-    () => onItemsChange(changedItems, setList),
+    () => onItemsChange(changedItems, setList)
   )
   const data = () => props.data || long || recent
   const items = () =>
@@ -114,13 +131,24 @@ function Fixture(props: { data?: boolean }) {
       ? longItems()
       : grouped
         ? [
-            { type: "group" as const, label: f.groups[0].label, items: f.groups[0].items },
+            {
+              type: "group" as const,
+              label: f.groups[0].label,
+              items: f.groups[0].items,
+            },
             { type: "separator" as const },
-            { type: "group" as const, label: f.groups[1].label, items: f.groups[1].items },
+            {
+              type: "group" as const,
+              label: f.groups[1].label,
+              items: f.groups[1].items,
+            },
           ]
         : list()
   const composed = (): JSX.Element => (
-    <Show when={data()} fallback={<Items list={list()} grouped={grouped} selectAll={selectAll} />}>
+    <Show
+      when={data()}
+      fallback={<Items list={list()} grouped={grouped} selectAll={selectAll} />}
+    >
       <DataItems items={items()} />
     </Show>
   )
@@ -145,8 +173,12 @@ function Fixture(props: { data?: boolean }) {
             items={data() ? items() : undefined}
             emptyItems={recent ? f.recent : undefined}
             onValueChange={(value, details) => {
-              if (cancel) return details.cancel()
-              setAction(`value:${Array.isArray(value) ? value.join(",") : String(value)}`)
+              if (cancel) {
+                return details.cancel()
+              }
+              setAction(
+                `value:${Array.isArray(value) ? value.join(",") : String(value)}`
+              )
             }}
           >
             <SelectLabel class="label">{f.label}</SelectLabel>
@@ -161,11 +193,20 @@ function Fixture(props: { data?: boolean }) {
                 <Show
                   when={data()}
                   fallback={
-                    <SelectContent class="popup list-popup" alignItemWithTrigger={align}>
+                    <SelectContent
+                      class="popup list-popup"
+                      alignItemWithTrigger={align}
+                    >
                       <Show when={selectAll && !grouped}>
-                        <SelectSelectAll class="item">{f.selectAll}</SelectSelectAll>
+                        <SelectSelectAll class="item">
+                          {f.selectAll}
+                        </SelectSelectAll>
                       </Show>
-                      <Items list={list()} grouped={grouped} selectAll={selectAll} />
+                      <Items
+                        list={list()}
+                        grouped={grouped}
+                        selectAll={selectAll}
+                      />
                     </SelectContent>
                   }
                 >
@@ -173,7 +214,9 @@ function Fixture(props: { data?: boolean }) {
                     {(state) => (
                       <>
                         <Show when={selectAll}>
-                          <SelectSelectAll class="item">{f.selectAll}</SelectSelectAll>
+                          <SelectSelectAll class="item">
+                            {f.selectAll}
+                          </SelectSelectAll>
                         </Show>
                         <DataItems items={state.items as ListData} />
                       </>
@@ -182,14 +225,19 @@ function Fixture(props: { data?: boolean }) {
                 </Show>
               }
             >
-              <SelectContent class="popup list-popup" alignItemWithTrigger={align}>
+              <SelectContent
+                class="popup list-popup"
+                alignItemWithTrigger={align}
+              >
                 <SelectInput class="input" aria-label={f.search} />
                 <SelectEmpty class="empty">{f.empty}</SelectEmpty>
                 <SelectList>
                   {(state) => (
                     <>
                       <Show when={selectAll && !grouped}>
-                        <SelectSelectAll class="item">{f.selectAll}</SelectSelectAll>
+                        <SelectSelectAll class="item">
+                          {f.selectAll}
+                        </SelectSelectAll>
                       </Show>
                       <Show when={data()} fallback={composed()}>
                         <DataItems items={state.items as ListData} />

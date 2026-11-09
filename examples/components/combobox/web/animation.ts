@@ -36,7 +36,7 @@ function mount(root: HTMLElement) {
                   ${framework.label}
                   <ui-combobox-item-indicator keep-mounted>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                 </ui-combobox-item>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>
@@ -46,7 +46,7 @@ function mount(root: HTMLElement) {
   root
     .querySelector("ui-combobox")!
     .addEventListener("openchangecomplete", (event) =>
-      log(root, event.detail.value ? "Finished opening" : "Finished closing"),
+      log(root, event.detail.value ? "Finished opening" : "Finished closing")
     )
 }
 

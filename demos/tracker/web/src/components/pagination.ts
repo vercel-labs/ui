@@ -14,13 +14,25 @@ const templates = `<template>
   </ui-pagination-item>
 </template>`
 
-function pagination(page: number, pageCount: number, getHref: (page: number) => string) {
-  return html`<ui-pagination aria-label="Pages" .page=${page} page-count=${pageCount} .getHref=${getHref}>
+function pagination(
+  page: number,
+  pageCount: number,
+  getHref: (page: number) => string
+) {
+  return html`<ui-pagination
+    aria-label="Pages"
+    .page=${page}
+    page-count=${pageCount}
+    .getHref=${getHref}
+  >
     <ui-pagination-list class="flex items-center gap-1">
       <ui-pagination-item>
         <ui-pagination-previous>
           <a class=${step}
-            >${icon("chevron-left", "size-4 rtl:rotate-180")}<span class="sr-only">Previous</span></a
+            >${icon("chevron-left", "size-4 rtl:rotate-180")}<span
+              class="sr-only"
+              >Previous</span
+            ></a
           >
         </ui-pagination-previous>
       </ui-pagination-item>
@@ -28,7 +40,8 @@ function pagination(page: number, pageCount: number, getHref: (page: number) => 
       <ui-pagination-item>
         <ui-pagination-next>
           <a class=${step}
-            ><span class="sr-only">Next</span>${icon("chevron-right", "size-4 rtl:rotate-180")}</a
+            ><span class="sr-only">Next</span
+            >${icon("chevron-right", "size-4 rtl:rotate-180")}</a
           >
         </ui-pagination-next>
       </ui-pagination-item>

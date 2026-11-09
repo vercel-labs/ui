@@ -1,4 +1,10 @@
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/react/slider"
 import { createRoot } from "react-dom/client"
 import { countRender, perfSize, perfThumbs } from "tests/fixtures/perf.ts"
 
@@ -44,7 +50,7 @@ function Fixture() {
                     return <div {...props} />
                   }}
                 />
-              ),
+              )
             )}
           </SliderTrack>
         </SliderControl>

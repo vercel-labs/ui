@@ -69,7 +69,11 @@ function PageNavigation() {
             </PaginationItem>
             {items.map((item) => (
               <PaginationItem key={item}>
-                {typeof item === "number" ? <PaginationLink page={item} /> : <PaginationEllipsis />}
+                {typeof item === "number" ? (
+                  <PaginationLink page={item} />
+                ) : (
+                  <PaginationEllipsis />
+                )}
               </PaginationItem>
             ))}
             <PaginationItem>
@@ -117,7 +121,11 @@ With only a few pages, the range has no gaps, so you can write the links out and
 Pass `getHref` to map each page to a URL. Page links and steps then render as anchors.
 
 ```tsx
-<Pagination aria-label="Pagination" pageCount={10} getHref={(page) => `/posts?page=${page}`}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={10}
+  getHref={(page) => `/posts?page=${page}`}
+>
   ...
 </Pagination>
 ```
@@ -181,7 +189,12 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
 
 ```tsx
-<Pagination aria-label="Pagination" pageCount={20} defaultPage={10} siblings={2}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={20}
+  defaultPage={10}
+  siblings={2}
+>
   ...
 </Pagination>
 ```
@@ -191,7 +204,12 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `boundaries` is how many pages always show at each end, 1 by default.
 
 ```tsx
-<Pagination aria-label="Pagination" pageCount={20} defaultPage={10} boundaries={2}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={20}
+  defaultPage={10}
+  boundaries={2}
+>
   ...
 </Pagination>
 ```
@@ -277,11 +295,17 @@ Props and callbacks are the same as below, as React props.
 
 ### Pagination
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationOptions" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationOptions"
+/>
 
 ### PaginationLink
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkProps" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkProps"
+/>
 
 `PaginationList`, `PaginationItem`, `PaginationPrevious`, `PaginationNext`, `PaginationFirst`, `PaginationLast` and `PaginationEllipsis` take no props of their own.
 
@@ -291,15 +315,24 @@ What render functions, state-based class names and slots receive, per part.
 
 `Pagination` and `PaginationList`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationState"
+/>
 
 `PaginationLink`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkState"
+/>
 
 `PaginationPrevious`, `PaginationNext`, `PaginationFirst` and `PaginationLast`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationStepState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationStepState"
+/>
 
 ### Reasons
 

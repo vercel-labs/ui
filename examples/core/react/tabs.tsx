@@ -12,7 +12,10 @@ import { createParts } from "@ui-sdk/react/primitive"
 type TabsOptions = {
   value?: string
   defaultValue?: string
-  onValueChange?: (value: string, details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
 }
 
 type TabsState = { value: string | null; focused: string | null }
@@ -21,12 +24,17 @@ type TabProps = { value: string }
 
 const tabs = definePrimitive({
   name: "tabs",
-  options: { value: "string", defaultValue: "string", onValueChange: "callback" },
+  options: {
+    value: "string",
+    defaultValue: "string",
+    onValueChange: "callback",
+  },
   state: (options: TabsOptions) => ({
     value: options.value ?? options.defaultValue ?? null,
     focused: null as string | null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
     const roving = createRovingFocus<TabsState, TabProps>(context, {
@@ -40,7 +48,8 @@ const tabs = definePrimitive({
     })
     return {
       roving,
-      select: (value: string, event?: Event) => change("value", value, { reason: "item-press", event }),
+      select: (value: string, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
       keydown(event: KeyboardEvent, el: HTMLElement) {
         const moved = roving.keydown(event, el)
         if (moved) {
@@ -52,10 +61,15 @@ const tabs = definePrimitive({
   },
   slots: (slot) => ({
     root: slot({}),
-    list: slot({ attrs: () => ({ role: "tablist", "aria-orientation": "horizontal" }) }),
+    list: slot({
+      attrs: () => ({ role: "tablist", "aria-orientation": "horizontal" }),
+    }),
     tab: slot<TabProps>({
       props: { value: "string" },
-      selects: selects({ value: ({ key }) => [key, null], focused: ({ key }) => [key, null] }),
+      selects: selects({
+        value: ({ key }) => [key, null],
+        focused: ({ key }) => [key, null],
+      }),
       attrs: (state, part) => ({
         id: `${part.id}-tab-${idPart(part.key)}`,
         role: "tab",
@@ -82,7 +96,12 @@ const tabs = definePrimitive({
   }),
 })
 
-const parts = createParts(tabs, { root: "div", list: "div", tab: "button", panel: "div" })
+const parts = createParts(tabs, {
+  root: "div",
+  list: "div",
+  tab: "button",
+  panel: "div",
+})
 
 const Tabs = parts.Root
 
@@ -102,7 +121,9 @@ function Example() {
       </TabsList>
       <TabsPanel value="overview">Eight of twelve tasks are done.</TabsPanel>
       <TabsPanel value="activity">The homepage design was approved.</TabsPanel>
-      <TabsPanel value="files">Project brief, wireframes and brand assets.</TabsPanel>
+      <TabsPanel value="files">
+        Project brief, wireframes and brand assets.
+      </TabsPanel>
     </Tabs>
   )
 }

@@ -24,7 +24,7 @@ export function mount(root: HTMLElement) {
                 </ui-checkbox>
                 ${topping.label}
               </label>
-            `,
+            `
           )
           .join("")}
       </ui-checkbox-group>

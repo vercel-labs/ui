@@ -11,7 +11,9 @@ const PaginationKey = Symbol("pagination")
 
 function usePagination(part: string) {
   const context = getContext<PaginationContext | undefined>(PaginationKey)
-  if (!context) throw new Error(`${part} must be used inside <Pagination>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Pagination>.`)
+  }
   return context
 }
 

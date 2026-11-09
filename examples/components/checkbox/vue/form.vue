@@ -8,7 +8,7 @@ const log = useLog()
 
 function onSubmit(event: Event) {
   const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-    ([name, value]) => `${name}=${value}`,
+    ([name, value]) => `${name}=${value}`
   )
   log(entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
 }
@@ -24,7 +24,10 @@ function onSubmit(event: Event) {
       </Checkbox>
       <div data-slot="stack">
         <FieldLabel>Accept terms and conditions</FieldLabel>
-        <FieldDescription>You agree to our Terms of Service and Privacy Policy.</FieldDescription>
+        <FieldDescription
+          >You agree to our Terms of Service and Privacy
+          Policy.</FieldDescription
+        >
       </div>
     </Field>
     <Field>
@@ -35,7 +38,10 @@ function onSubmit(event: Event) {
       </Checkbox>
       <div data-slot="stack">
         <FieldLabel>Send me the weekly newsletter</FieldLabel>
-        <FieldDescription>Product news and tips, once a week. Unsubscribe anytime.</FieldDescription>
+        <FieldDescription
+          >Product news and tips, once a week. Unsubscribe
+          anytime.</FieldDescription
+        >
       </div>
     </Field>
     <div data-slot="row">

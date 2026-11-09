@@ -1,6 +1,11 @@
 <script lang="ts">
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
-  import { toText, TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/svelte/token-input"
+  import {
+    toText,
+    TokenInput,
+    TokenInputEditor,
+    type TokenInputValue,
+  } from "@ui-sdk/svelte/token-input"
   import {
     type TriggerMenuDataItem,
     TriggerMenu,
@@ -34,17 +39,20 @@
     bind:value
     onValueChange={(next, details) => {
       const removed = details.removed.map((token) => token.label).join(", ")
-      log(`${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`)
+      log(
+        `${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`
+      )
     }}
     history={{ limit: 50, groupDelay: 1000 }}
-    getTokenDescription={(token) => (token.type === "file" ? "attached file" : token.type)}
+    getTokenDescription={(token) =>
+      token.type === "file" ? "attached file" : token.type}
   >
     <TokenInputEditor />
     <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>
       <TriggerMenuContent>
         <TriggerMenuList>
           {#snippet children(state)}
-            {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+            {#each state.items as TriggerMenuDataItem[] as item (item.value)}
               <TriggerMenuItem value={item.value} label={item.label}>
                 {item.label}
               </TriggerMenuItem>

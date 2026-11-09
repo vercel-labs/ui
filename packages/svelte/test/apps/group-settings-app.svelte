@@ -1,7 +1,8 @@
 <script lang="ts">
   import { Checkbox, CheckboxGroup } from "../../src/checkbox"
 
-  let { disabled = false, name }: { disabled?: boolean; name?: string } = $props()
+  let { disabled = false, name }: { disabled?: boolean; name?: string } =
+    $props()
 </script>
 
 <form>

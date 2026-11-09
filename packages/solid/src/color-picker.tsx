@@ -46,7 +46,10 @@ function ColorPicker(props: ComponentProps<typeof parts.Root>) {
     },
     get children() {
       const children = props.children
-      return (state: ColorPickerState) => [resolve(children, state), <HiddenInput />]
+      return (state: ColorPickerState) => [
+        resolve(children, state),
+        <HiddenInput />,
+      ]
     },
   })
   return <parts.Root {...root} />
@@ -101,10 +104,18 @@ function ColorPickerInput(props: InputProps) {
  * A number input for one `channel`, in the units people read it in.
  * @experimental
  */
-function ColorPickerChannelInput(props: InputProps & ColorPickerChannelInputProps) {
+function ColorPickerChannelInput(
+  props: InputProps & ColorPickerChannelInputProps
+) {
   const id = createUniqueId()
   const part = () => ({ id, channel: props.channel })
-  return usePart(colorPicker, "channel-input", part, startingText(omit(props, "channel")), "input")
+  return usePart(
+    colorPicker,
+    "channel-input",
+    part,
+    startingText(omit(props, "channel")),
+    "input"
+  )
 }
 
 /**

@@ -15,7 +15,12 @@ Radios that share one value, with one tab stop and arrow keys between them.
   import { useField, useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { GroupFieldKey, RadioGroupKey } from "./context"
 
   type Details = ChangeDetails<RadioGroupValueChangeReason>
@@ -78,14 +83,16 @@ Radios that share one value, with one tab stop and arrow keys between them.
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   setContext(RadioGroupKey, group)
   const root = useHandlePart(group, "group")
   const control = field?.control(
     () => rest.id,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
 </script>
 

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { MousePointer2Icon, PencilIcon, SquareIcon, Trash2Icon, TypeIcon } from "@lucide/vue"
+import {
+  MousePointer2Icon,
+  PencilIcon,
+  SquareIcon,
+  Trash2Icon,
+  TypeIcon,
+} from "@lucide/vue"
 import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/vue/toggle"
 import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/vue/toolbar"
 import { useLog } from "../../../shared/vue/log"
@@ -21,9 +27,17 @@ const log = useLog()
       :deselectable="false"
       orientation="vertical"
       aria-label="Tool"
-      @value-change="([value]) => log(`${tools.find((tool) => tool.value === value)?.label} tool`)"
+      @value-change="
+        ([value]) =>
+          log(`${tools.find((tool) => tool.value === value)?.label} tool`)
+      "
     >
-      <Toggle v-for="tool in tools" :key="tool.value" :value="tool.value" :aria-label="tool.label">
+      <Toggle
+        v-for="tool in tools"
+        :key="tool.value"
+        :value="tool.value"
+        :aria-label="tool.label"
+      >
         <ToggleIcon>
           <component :is="tool.icon" />
         </ToggleIcon>

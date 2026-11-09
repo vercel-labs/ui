@@ -4,7 +4,7 @@ import { cropImage } from "@ui-sdk/web"
 import { Check, ChevronDown, createElement } from "lucide"
 
 const photo = `data:image/svg+xml,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420"><rect width="640" height="420" fill="#e5e5e5"/><circle cx="460" cy="150" r="56" fill="#fafafa"/><path d="M0 280 120 170l110 100 120-130 130 125 90-60 70 40v175H0z" fill="#a3a3a3"/><path d="M0 330l160-80 120 70 150-80 210 85v95H0z" fill="#525252"/><path d="M0 380q160-35 320-10t320-5v55H0z" fill="#262626"/></svg>`,
+  `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="420"><rect width="640" height="420" fill="#e5e5e5"/><circle cx="460" cy="150" r="56" fill="#fafafa"/><path d="M0 280 120 170l110 100 120-130 130 125 90-60 70 40v175H0z" fill="#a3a3a3"/><path d="M0 330l160-80 120 70 150-80 210 85v95H0z" fill="#525252"/><path d="M0 380q160-35 320-10t320-5v55H0z" fill="#262626"/></svg>`
 )}`
 
 const ratios = [
@@ -35,7 +35,7 @@ function mount(root: HTMLElement) {
                     ${item.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -57,19 +57,32 @@ function mount(root: HTMLElement) {
     </div>
   `
   const cropper = root.querySelector("ui-image-cropper")!
-  const result = root.querySelector<HTMLImageElement>('[data-slot="image-cropper-result"] > img')!
+  const result = root.querySelector<HTMLImageElement>(
+    '[data-slot="image-cropper-result"] > img'
+  )!
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
-    const ratio = ratios.find((item) => item.value === event.detail.value)?.ratio
-    if (ratio) cropper.setAttribute("aspect-ratio", String(ratio))
-    else cropper.removeAttribute("aspect-ratio")
+    const ratio = ratios.find(
+      (item) => item.value === event.detail.value
+    )?.ratio
+    if (ratio) {
+      cropper.setAttribute("aspect-ratio", String(ratio))
+    } else {
+      cropper.removeAttribute("aspect-ratio")
+    }
   })
-  root.querySelector("[data-slot=controls] > button")!.addEventListener("click", async () => {
-    if (!cropper.crop) return
-    const file = await cropImage(photo, cropper.crop)
-    if (result.src) URL.revokeObjectURL(result.src)
-    result.src = URL.createObjectURL(file)
-    result.hidden = false
-  })
+  root
+    .querySelector("[data-slot=controls] > button")!
+    .addEventListener("click", async () => {
+      if (!cropper.crop) {
+        return
+      }
+      const file = await cropImage(photo, cropper.crop)
+      if (result.src) {
+        URL.revokeObjectURL(result.src)
+      }
+      result.src = URL.createObjectURL(file)
+      result.hidden = false
+    })
 }
 
 export { mount }

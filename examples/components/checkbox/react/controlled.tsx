@@ -1,7 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { createCheckboxController, type CheckedState } from "@ui-sdk/core/checkbox"
+import {
+  createCheckboxController,
+  type CheckedState,
+} from "@ui-sdk/core/checkbox"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
 import { CheckIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
@@ -23,7 +26,9 @@ function Example() {
           checked={checked}
           onCheckedChange={(next, details) => {
             setChecked(next)
-            log(`${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`)
+            log(
+              `${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`
+            )
           }}
           controller={updates}
         >

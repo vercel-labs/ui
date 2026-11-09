@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { NumberInputScrubAreaProps, NumberInputState } from "@ui-sdk/core/number-input"
+  import type {
+    NumberInputScrubAreaProps,
+    NumberInputState,
+  } from "@ui-sdk/core/number-input"
   import { setContext, untrack } from "svelte"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
@@ -13,11 +16,16 @@
     pixelsPerStep,
     ...rest
   }: PartProps<"span", NumberInputState> &
-    Omit<NumberInputScrubAreaProps, "controller"> & { owner: NumberInputContext } = $props()
+    Omit<NumberInputScrubAreaProps, "controller"> & {
+      owner: NumberInputContext
+    } = $props()
 
   const numberInput = untrack(() => owner)
   setContext(NumberInputKey, numberInput)
-  const scrub = useHandlePart(numberInput, "scrub-area", () => ({ orientation, pixelsPerStep }))
+  const scrub = useHandlePart(numberInput, "scrub-area", () => ({
+    orientation,
+    pixelsPerStep,
+  }))
 </script>
 
 <Part tag="span" part={scrub} props={rest} />

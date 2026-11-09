@@ -5,20 +5,31 @@ import { usePrimitive } from "@ui-sdk/react/primitive"
 type RatingOptions = {
   value?: number
   defaultValue?: number
-  onValueChange?: (value: number, details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: number,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
 }
 
 const rating = definePrimitive({
   name: "rating",
-  options: { value: "number", defaultValue: "number", onValueChange: "callback" },
+  options: {
+    value: "number",
+    defaultValue: "number",
+    onValueChange: "callback",
+  },
   controlled: ["value"],
-  state: (options: RatingOptions) => ({ value: options.value ?? options.defaultValue ?? 0 }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  state: (options: RatingOptions) => ({
+    value: options.value ?? options.defaultValue ?? 0,
+  }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
 
     return {
-      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+      rate: (value: number, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
     }
   },
   slots: (slot) => ({
@@ -33,16 +44,24 @@ function Example() {
   const state = React.useSyncExternalStore(
     handle.instance.subscribe,
     handle.instance.get,
-    handle.instance.get,
+    handle.instance.get
   )
 
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <button type="button" data-size="sm" onClick={(event) => handle.api.rate(3, event.nativeEvent)}>
+        <button
+          type="button"
+          data-size="sm"
+          onClick={(event) => handle.api.rate(3, event.nativeEvent)}
+        >
           Set to 3
         </button>
-        <button type="button" data-size="sm" onClick={(event) => handle.api.rate(0, event.nativeEvent)}>
+        <button
+          type="button"
+          data-size="sm"
+          onClick={(event) => handle.api.rate(0, event.nativeEvent)}
+        >
           Reset
         </button>
       </div>

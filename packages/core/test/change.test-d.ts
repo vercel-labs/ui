@@ -1,12 +1,22 @@
 // Compiled by `pnpm typecheck`, never run. Each `@ts-expect-error` fails the
 // build if its line stops being an error.
 import { log } from "../src/foundation/kernel/change"
-import { changeSource, createChange, createCommit } from "../src/foundation/kernel/input-source"
-import type { ChangeDetails, CommitDetails } from "../src/foundation/kernel/details"
+import {
+  changeSource,
+  createChange,
+  createCommit,
+} from "../src/foundation/kernel/input-source"
+import type {
+  ChangeDetails,
+  CommitDetails,
+} from "../src/foundation/kernel/details"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 
 type Options = {
-  onOpenChange?: (open: boolean, details: ChangeDetails<"trigger-press" | "timeout">) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<"trigger-press" | "timeout">
+  ) => void
   onValueCommit?: (value: number, details: CommitDetails<"drag">) => void
 }
 

@@ -20,14 +20,20 @@ A thumb, with the native range input that takes focus inside it. Its
   }: PartProps<"div", SliderThumbState> & SliderThumbProps = $props()
 
   const slider = useSlider("SliderThumb")
-  const thumb = useHandlePart(slider, "thumb", () => ({ index, id: String(index) }))
+  const thumb = useHandlePart(slider, "thumb", () => ({
+    index,
+    id: String(index),
+  }))
   // The input's range ends at its neighbours, so it hears their moves and its
   // own, and the thumb and its content don't.
-  const input = useHandlePart(slider, "thumb-input", () => ({ index, id: String(index) }))
+  const input = useHandlePart(slider, "thumb-input", () => ({
+    index,
+    id: String(index),
+  }))
   const field = slider.field()
   const control = field?.control(
     () => input.attrs.id,
-    () => describedBy,
+    () => describedBy
   )
   const named = $derived({
     "aria-label": label,

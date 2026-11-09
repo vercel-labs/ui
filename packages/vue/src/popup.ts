@@ -22,7 +22,8 @@ const containerProp = Object as PropType<Element | DocumentFragment | null>
 
 // The container the nearest popup above renders into. Popups inside it render
 // there too, like a menu inside a portaled popover, unless they name their own.
-const InheritedContainer: InjectionKey<() => PopupContainer> = Symbol("popup-container")
+const InheritedContainer: InjectionKey<() => PopupContainer> =
+  Symbol("popup-container")
 
 // A getter for a popup's container: its own, else the one the popup around it renders into.
 function usePopupContainer(own: () => PopupContainer) {
@@ -46,12 +47,22 @@ const ContainerScope = defineComponent({
 // top layer over the page that replaced it.
 const PopupTeleport = defineComponent({
   name: "PopupTeleport",
-  props: { to: { type: Object as PropType<Element | DocumentFragment>, required: true } },
+  props: {
+    to: {
+      type: Object as PropType<Element | DocumentFragment>,
+      required: true,
+    },
+  },
   slots: Object as SlotsType<{ default: () => VNode[] }>,
   setup(props, { slots }) {
     const isAway = useKeptAway()
     // Vue types `to` as an element, though it renders into any parent node, like a shadow root.
-    return () => h(Teleport, { to: props.to as Element, disabled: isAway.value }, slots.default())
+    return () =>
+      h(
+        Teleport,
+        { to: props.to as Element, disabled: isAway.value },
+        slots.default()
+      )
   },
 })
 
@@ -75,13 +86,17 @@ function renderPopup(element: VNode | VNode[], container: PopupContainer) {
  * it presents as a sheet. The viewport is what goes into the top layer. Its
  * attributes are a subset of the content's, so the content's render keeps it current.
  */
-function sheetViewport(popup: PrimitiveHandle<Primitive>, element: VNode | VNode[]) {
+function sheetViewport(
+  popup: PrimitiveHandle<Primitive>,
+  element: VNode | VNode[]
+) {
   return popup.present("viewport")
     ? h("div", popup.slot("viewport", {}), ([] as VNode[]).concat(element))
     : element
 }
 
-const SheetHeaderKey: InjectionKey<{ value: HTMLElement | null }> = Symbol("sheet-header")
+const SheetHeaderKey: InjectionKey<{ value: HTMLElement | null }> =
+  Symbol("sheet-header")
 
 /**
  * Where an input renders while its popup presents as a sheet: in a header the
@@ -96,15 +111,19 @@ function provideSheetHeader() {
 /** Call in the content's `setup`. Returns the render step for the header, while the popup's `header` slot is present. */
 function useSheetHeader(popup: PrimitiveHandle<Primitive>) {
   const header = inject(SheetHeaderKey, { value: null })
-  const ref = (el: unknown) => (header.value = (el as HTMLElement | null) ?? null)
-  return () => (popup.present("header") ? h("div", popup.slot("header", {}, { ref })) : null)
+  const ref = (el: unknown) =>
+    (header.value = (el as HTMLElement | null) ?? null)
+  return () =>
+    popup.present("header") ? h("div", popup.slot("header", {}, { ref })) : null
 }
 
 /** Call in the input's `setup`. Returns the render step that moves the input into the sheet's header while there is one. */
 function useInSheetHeader() {
   const header = inject(SheetHeaderKey, { value: null })
   return (element: VNode | VNode[]) =>
-    header.value ? h(Teleport, { to: header.value }, ([] as VNode[]).concat(element)) : element
+    header.value
+      ? h(Teleport, { to: header.value }, ([] as VNode[]).concat(element))
+      : element
 }
 
 type Component = new (...args: any[]) => { $slots: object }
@@ -123,7 +142,9 @@ type PayloadPart<Part extends Component> = Part &
   (new <Payload = unknown>(
     ...args: any[]
   ) => Omit<InstanceType<Part>, "$slots"> & {
-    $slots: Readonly<StateSlotFunctions<SlotState<Part> & { payload: Payload | undefined }>>
+    $slots: Readonly<
+      StateSlotFunctions<SlotState<Part> & { payload: Payload | undefined }>
+    >
   })
 
 /**
@@ -131,7 +152,8 @@ type PayloadPart<Part extends Component> = Part &
  * TooltipContent<Day>` is the same component, with a `Day` as its state's
  * payload. The payload's type is the app's; the part hands its state on as it is.
  */
-const withPayload = <Part extends Component>(part: Part) => part as PayloadPart<Part>
+const withPayload = <Part extends Component>(part: Part) =>
+  part as PayloadPart<Part>
 
 export {
   provideConnected,

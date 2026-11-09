@@ -5,7 +5,9 @@ import { Fixture } from "./solid"
 function mount(root: HTMLElement) {
   // ?data renders the same select from `items`.
   const data = new URLSearchParams(location.search).has("data")
-  return hydrateFixture(root, "select", () => <Fixture data={data} />, { serverForm: true })
+  return hydrateFixture(root, "select", () => <Fixture data={data} />, {
+    serverForm: true,
+  })
 }
 
 export { mount }

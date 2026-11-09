@@ -25,13 +25,18 @@ function Example() {
   async function remove(name: string, button: HTMLButtonElement) {
     const confirmed = await confirm({
       title: `Delete ${name}?`,
-      description: "The project and its files will be deleted for everyone on your team.",
+      description:
+        "The project and its files will be deleted for everyone on your team.",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
     })
-    if (!confirmed) return
+    if (!confirmed) {
+      return
+    }
     const row = button.closest("li")
-    const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+    const next = (
+      row?.nextElementSibling ?? row?.previousElementSibling
+    )?.querySelector("button")
     ;(next ?? reset)?.focus()
     setProjects((list) => list.filter((project) => project !== name))
     toast.success(`${name} deleted`, { priority: "assertive" })
@@ -40,7 +45,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <button ref={reset} type="button" onClick={() => setProjects(["Acme", "Globex", "Initech"])}>
+        <button
+          ref={reset}
+          type="button"
+          onClick={() => setProjects(["Acme", "Globex", "Initech"])}
+        >
           Reset Projects
         </button>
       </div>
@@ -94,10 +103,14 @@ function Example() {
             <>
               <div data-slot="stack">
                 <AlertDialogTitle>{state.payload?.title}</AlertDialogTitle>
-                <AlertDialogDescription>{state.payload?.description}</AlertDialogDescription>
+                <AlertDialogDescription>
+                  {state.payload?.description}
+                </AlertDialogDescription>
               </div>
               <div data-slot="row">
-                <AlertDialogClose>{state.payload?.cancelLabel}</AlertDialogClose>
+                <AlertDialogClose>
+                  {state.payload?.cancelLabel}
+                </AlertDialogClose>
                 <AlertDialogClose data-variant="solid" value="confirm">
                   {state.payload?.confirmLabel}
                 </AlertDialogClose>

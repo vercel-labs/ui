@@ -12,7 +12,10 @@ const delays = [
   { value: 2000, label: "2000 ms delay" },
 ]
 
-const tags = Array.from({ length: 20 }, (_, index) => `v1.2.0-beta.${50 - index}`)
+const tags = Array.from(
+  { length: 20 },
+  (_, index) => `v1.2.0-beta.${50 - index}`
+)
 </script>
 
 <template>

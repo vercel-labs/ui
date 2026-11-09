@@ -27,7 +27,11 @@ const action = ref("")
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Menu v-bind="options" :controller="controller" @action="(value: string) => (action = value)">
+    <Menu
+      v-bind="options"
+      :controller="controller"
+      @action="(value: string) => (action = value)"
+    >
       <MenuTrigger>File</MenuTrigger>
       <MenuContent class="popup">
         <MenuItem class="item" value="new" shortcut="mod+n">New file</MenuItem>
@@ -36,8 +40,12 @@ const action = ref("")
         <MenuSeparator class="separator" />
         <MenuGroup>
           <MenuGroupLabel class="label">View</MenuGroupLabel>
-          <MenuCheckboxItem class="item" value="sidebar" default-checked>Show sidebar</MenuCheckboxItem>
-          <MenuCheckboxItem class="item" value="statusbar">Show status bar</MenuCheckboxItem>
+          <MenuCheckboxItem class="item" value="sidebar" default-checked
+            >Show sidebar</MenuCheckboxItem
+          >
+          <MenuCheckboxItem class="item" value="statusbar"
+            >Show status bar</MenuCheckboxItem
+          >
         </MenuGroup>
         <MenuSeparator class="separator" />
         <MenuRadioGroup default-value="name">
@@ -65,6 +73,8 @@ const action = ref("")
     </Menu>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <button @click="controller.open({ focus: 'first' })">Open with controller</button>
+    <button @click="controller.open({ focus: 'first' })">
+      Open with controller
+    </button>
   </div>
 </template>

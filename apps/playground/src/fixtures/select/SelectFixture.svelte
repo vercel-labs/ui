@@ -31,12 +31,25 @@
   let { data = false }: { data?: boolean } = $props()
 
   const controller = createSelectController<string, boolean>()
-  const { fieldset, grouped, cancel, align, long, container, search, selectAll, recent, max, ...options } =
-    selectOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    align,
+    long,
+    container,
+    search,
+    selectAll,
+    recent,
+    max,
+    ...options
+  } = selectOptions()
   const fromData = $derived(data || long || recent)
   let action = $state("")
   let submitted = $state("")
-  let list = $state.raw<{ value: string; label: string; disabled?: boolean }[]>(f.items)
+  let list = $state.raw<{ value: string; label: string; disabled?: boolean }[]>(
+    f.items
+  )
   // Items a spec swaps in. Only in the browser: the server has no document.
   $effect(() => onItemsChange(changedItems, (next) => (list = next)))
   const items = $derived(
@@ -44,11 +57,19 @@
       ? longItems()
       : grouped
         ? [
-            { type: "group" as const, label: f.groups[0].label, items: f.groups[0].items },
+            {
+              type: "group" as const,
+              label: f.groups[0].label,
+              items: f.groups[0].items,
+            },
             { type: "separator" as const },
-            { type: "group" as const, label: f.groups[1].label, items: f.groups[1].items },
+            {
+              type: "group" as const,
+              label: f.groups[1].label,
+              items: f.groups[1].items,
+            },
           ]
-        : list,
+        : list
   )
   // A data entry's key: its value, a group's label, or a separator's place.
   const keyOf = (entry: ListData[number], index: number) =>
@@ -62,20 +83,40 @@
 
   // What the composed list holds, in order: the items, or groups with a separator between.
   type Listed =
-    | { type: "item"; key: string; value: string; label: string; disabled?: boolean }
-    | { type: "group"; key: string; label: string; items: { value: string; label: string }[] }
+    | {
+        type: "item"
+        key: string
+        value: string
+        label: string
+        disabled?: boolean
+      }
+    | {
+        type: "group"
+        key: string
+        label: string
+        items: { value: string; label: string }[]
+      }
     | { type: "separator"; key: string }
   const listed = $derived<Listed[]>(
     grouped
       ? f.groups.flatMap((group, index): Listed[] => [
-          ...(index ? [{ type: "separator" as const, key: `separator-${index}` }] : []),
-          { type: "group", key: group.label, label: group.label, items: group.items },
+          ...(index
+            ? [{ type: "separator" as const, key: `separator-${index}` }]
+            : []),
+          {
+            type: "group",
+            key: group.label,
+            label: group.label,
+            items: group.items,
+          },
         ])
-      : list.map((item) => ({ type: "item", key: item.value, ...item })),
+      : list.map((item) => ({ type: "item", key: item.value, ...item }))
   )
 
   function onValueChange(value: unknown, details: { cancel: () => void }) {
-    if (cancel) return details.cancel()
+    if (cancel) {
+      return details.cancel()
+    }
     action = `value:${Array.isArray(value) ? value.join(",") : String(value)}`
   }
 
@@ -117,7 +158,9 @@
     {:else if item.type === "group"}
       <SelectGroup>
         <SelectGroupLabel class="label">{item.label}</SelectGroupLabel>
-        {#if selectAll}<SelectSelectAll class="item">{f.selectAll} {item.label}</SelectSelectAll>{/if}
+        {#if selectAll}<SelectSelectAll class="item"
+            >{f.selectAll} {item.label}</SelectSelectAll
+          >{/if}
         {#each item.items as child (child.value)}
           <SelectItem class="item" value={child.value}>
             <SelectItemText>{child.label}</SelectItemText>
@@ -137,7 +180,11 @@
 <div class="fixture">
   <button>Before</button>
   <form class="select-form" aria-label={f.formLabel} onsubmit={onSubmit}>
-    <svelte:element this={fieldset ? "fieldset" : "div"} disabled={fieldset || undefined} style="display: contents">
+    <svelte:element
+      this={fieldset ? "fieldset" : "div"}
+      disabled={fieldset || undefined}
+      style="display: contents"
+    >
       <Select
         {...options}
         name={f.name}
@@ -160,7 +207,9 @@
             <SelectEmpty class="empty">{f.empty}</SelectEmpty>
             <SelectList>
               {#snippet children(state)}
-                {#if selectAll && !grouped}<SelectSelectAll class="item">{f.selectAll}</SelectSelectAll>{/if}
+                {#if selectAll && !grouped}<SelectSelectAll class="item"
+                    >{f.selectAll}</SelectSelectAll
+                  >{/if}
                 {#if fromData}
                   {@render dataItems(state.items as ListData)}
                 {:else}
@@ -172,13 +221,17 @@
         {:else if fromData}
           <SelectContent class="popup list-popup">
             {#snippet children(state)}
-              {#if selectAll}<SelectSelectAll class="item">{f.selectAll}</SelectSelectAll>{/if}
+              {#if selectAll}<SelectSelectAll class="item"
+                  >{f.selectAll}</SelectSelectAll
+                >{/if}
               {@render dataItems(state.items as ListData)}
             {/snippet}
           </SelectContent>
         {:else if !fromData}
           <SelectContent class="popup list-popup" alignItemWithTrigger={align}>
-            {#if selectAll && !grouped}<SelectSelectAll class="item">{f.selectAll}</SelectSelectAll>{/if}
+            {#if selectAll && !grouped}<SelectSelectAll class="item"
+                >{f.selectAll}</SelectSelectAll
+              >{/if}
             {@render composed()}
           </SelectContent>
         {/if}

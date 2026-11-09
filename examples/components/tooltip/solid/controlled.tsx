@@ -12,7 +12,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls" ref={controls}>
         <label data-slot="label">
-          <Checkbox checked={open()} onCheckedChange={(next) => setOpen(next === true)}>
+          <Checkbox
+            checked={open()}
+            onCheckedChange={(next) => setOpen(next === true)}
+          >
             <CheckboxIndicator>
               <svg
                 viewBox="0 0 24 24"
@@ -34,8 +37,11 @@ function Example() {
         open={open()}
         onOpenChange={(next, details) => {
           const target = details.event?.target
-          const inControls = target instanceof Node && controls?.contains(target)
-          if (inControls && details.reason !== "escape-key") return details.cancel()
+          const inControls =
+            target instanceof Node && controls?.contains(target)
+          if (inControls && details.reason !== "escape-key") {
+            return details.cancel()
+          }
           setOpen(next)
           log(`${next ? "Opened" : "Closed"} (${details.reason})`)
         }}

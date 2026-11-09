@@ -26,19 +26,23 @@ function mount(root: HTMLElement) {
               <ui-listbox-item value="${topping.value}">
                 ${topping.label}
                 <ui-listbox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
-              </ui-listbox-item>`,
+              </ui-listbox-item>`
           )
           .join("")}
       </ui-listbox>
     </div>
   `
   const listbox = root.querySelector("ui-listbox")!
-  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-run]"))
+  for (const button of root.querySelectorAll<HTMLButtonElement>("[data-run]")) {
     button.addEventListener("click", () =>
-      listbox.api[button.dataset.run as "selectAll" | "clear" | "focus"](),
+      listbox.api[button.dataset.run as "selectAll" | "clear" | "focus"]()
     )
+  }
   listbox.addEventListener("valuechange", (event) => {
-    log(root, `${(event.detail.value as string[]).length} selected (${event.detail.reason})`)
+    log(
+      root,
+      `${(event.detail.value as string[]).length} selected (${event.detail.reason})`
+    )
   })
 }
 

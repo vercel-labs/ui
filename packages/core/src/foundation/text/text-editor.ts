@@ -80,7 +80,11 @@ type TextEditorAdapter = {
   /** The rectangle at a text offset, for anchoring. */
   rectAt: (offset: number) => TextRect | null
   /** Replaces a range with text or a token as one undoable step, and puts the caret after it. */
-  replace: (range: TextRange, content: string | TokenInsert, options?: EditorReplaceOptions) => void
+  replace: (
+    range: TextRange,
+    content: string | TokenInsert,
+    options?: EditorReplaceOptions
+  ) => void
   /** Calls `listener` for text edits, caret moves and composition. Returns a cleanup. */
   subscribe: (listener: (change: EditorChange) => void) => () => void
   /** Whether an input method is composing. */

@@ -16,7 +16,11 @@
 </script>
 
 <div>
-  <Calendar mode="multiple" value={dates} onValueChange={(value) => (dates = value as string[])}>
+  <Calendar
+    mode="multiple"
+    value={dates}
+    onValueChange={(value) => (dates = value as string[])}
+  >
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
         <ChevronLeftIcon aria-hidden="true" />

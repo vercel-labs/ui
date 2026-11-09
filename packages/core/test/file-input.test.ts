@@ -1,5 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
-import { describeChange, fileKey } from "../src/components/file-input/file-input-api"
+import {
+  describeChange,
+  fileKey,
+} from "../src/components/file-input/file-input-api"
 import { fileInput } from "../src/components/file-input/file-input"
 import { dragStatus } from "../src/foundation/forms/files"
 import { attrs, partState } from "../src/foundation/kernel/part"
@@ -13,7 +16,9 @@ describe("value", () => {
   test("starts empty, with no drag state", () => {
     const input = fileInput({ id: "f" })
     expect(input.api.getValue()).toEqual([])
-    expect(attrs(input.part("root"))).toEqual({ "data-slot": "file-input-root" })
+    expect(attrs(input.part("root"))).toEqual({
+      "data-slot": "file-input-root",
+    })
     expect(partState(input.part("dropzone", { id: "z" }))).toEqual({
       dragging: false,
       dragAccept: false,
@@ -24,11 +29,21 @@ describe("value", () => {
 
   test("addFiles checks files and reports what it added and rejected", () => {
     const onValueChange = vi.fn()
-    const input = fileInput({ id: "f", accept: "image/*,.pdf", multiple: true, onValueChange, ...quiet })
+    const input = fileInput({
+      id: "f",
+      accept: "image/*,.pdf",
+      multiple: true,
+      onValueChange,
+      ...quiet,
+    })
     expect(input.api.addFiles([png, txt])).toBe(true)
     const [value, details] = onValueChange.mock.calls[0]
     expect(value).toEqual([png])
-    expect(details).toMatchObject({ reason: "imperative", added: [png], removed: [] })
+    expect(details).toMatchObject({
+      reason: "imperative",
+      added: [png],
+      removed: [],
+    })
     expect(details.rejected).toEqual([{ file: txt, reasons: ["file-type"] }])
   })
 
@@ -45,29 +60,50 @@ describe("value", () => {
     input.api.addFiles([png])
     input.api.addFiles([pdf, txt])
     expect(input.api.getValue()).toEqual([pdf])
-    expect(onValueChange.mock.calls[1][1]).toMatchObject({ added: [pdf], removed: [png] })
-    expect(onValueChange.mock.calls[1][1].rejected).toEqual([{ file: txt, reasons: ["too-many-files"] }])
+    expect(onValueChange.mock.calls[1][1]).toMatchObject({
+      added: [pdf],
+      removed: [png],
+    })
+    expect(onValueChange.mock.calls[1][1].rejected).toEqual([
+      { file: txt, reasons: ["too-many-files"] },
+    ])
   })
 
   test("maxFiles counts the files it already holds", () => {
     const input = fileInput({ id: "f", multiple: true, maxFiles: 2, ...quiet })
     input.api.addFiles([png])
     const onReject = vi.fn()
-    input.setOptions({ id: "f", multiple: true, maxFiles: 2, onReject, ...quiet })
+    input.setOptions({
+      id: "f",
+      multiple: true,
+      maxFiles: 2,
+      onReject,
+      ...quiet,
+    })
     input.api.addFiles([pdf, txt])
     expect(input.api.getValue()).toEqual([png, pdf])
-    expect(onReject.mock.calls[0][0]).toEqual([{ file: txt, reasons: ["too-many-files"] }])
+    expect(onReject.mock.calls[0][0]).toEqual([
+      { file: txt, reasons: ["too-many-files"] },
+    ])
   })
 
   test("without multiple, a rejected file keeps the one it has", () => {
     const onValueChange = vi.fn()
     const onReject = vi.fn()
-    const input = fileInput({ id: "f", accept: ".pdf", onValueChange, onReject, ...quiet })
+    const input = fileInput({
+      id: "f",
+      accept: ".pdf",
+      onValueChange,
+      onReject,
+      ...quiet,
+    })
     input.api.addFiles([pdf])
     expect(input.api.addFiles([png])).toBe(false)
     expect(input.api.getValue()).toEqual([pdf])
     expect(onValueChange).toHaveBeenCalledTimes(1)
-    expect(onReject.mock.calls[0][0]).toEqual([{ file: png, reasons: ["file-type"] }])
+    expect(onReject.mock.calls[0][0]).toEqual([
+      { file: png, reasons: ["file-type"] },
+    ])
   })
 
   test("a full list's rules leave no room, so its drags are rejected", () => {
@@ -81,14 +117,24 @@ describe("value", () => {
   test("a batch that's all rejected reaches onReject and changes nothing", () => {
     const onValueChange = vi.fn()
     const onReject = vi.fn()
-    const input = fileInput({ id: "f", accept: "image/*", onValueChange, onReject, ...quiet })
+    const input = fileInput({
+      id: "f",
+      accept: "image/*",
+      onValueChange,
+      onReject,
+      ...quiet,
+    })
     expect(input.api.addFiles([txt])).toBe(false)
     expect(onValueChange).not.toHaveBeenCalled()
     expect(onReject.mock.calls[0][1]).toMatchObject({ reason: "imperative" })
   })
 
   test("a canceled change keeps the value", () => {
-    const input = fileInput({ id: "f", onValueChange: (_, details) => details.cancel(), ...quiet })
+    const input = fileInput({
+      id: "f",
+      onValueChange: (_, details) => details.cancel(),
+      ...quiet,
+    })
     expect(input.api.addFiles([png])).toBe(false)
     expect(input.api.getValue()).toEqual([])
   })
@@ -105,7 +151,13 @@ describe("value", () => {
 
   test("removeFile, clear and reset", () => {
     const onValueChange = vi.fn()
-    const input = fileInput({ id: "f", multiple: true, defaultValue: [png], onValueChange, ...quiet })
+    const input = fileInput({
+      id: "f",
+      multiple: true,
+      defaultValue: [png],
+      onValueChange,
+      ...quiet,
+    })
     input.api.addFiles([pdf])
     expect(input.api.removeFile(png, { reason: "remove-press" })).toBe(true)
     expect(onValueChange.mock.calls[1][1]).toMatchObject({
@@ -116,7 +168,11 @@ describe("value", () => {
     expect(input.api.removeFile(png)).toBe(false)
     input.api.internal.reset()
     expect(input.api.getValue()).toEqual([png])
-    expect(onValueChange.mock.calls[2][1]).toMatchObject({ reason: "reset", added: [png], removed: [pdf] })
+    expect(onValueChange.mock.calls[2][1]).toMatchObject({
+      reason: "reset",
+      added: [png],
+      removed: [pdf],
+    })
     input.api.clear()
     expect(input.api.getValue()).toEqual([])
   })
@@ -125,13 +181,21 @@ describe("value", () => {
     const input = fileInput({ id: "f", disabled: true })
     expect(input.api.addFiles([png])).toBe(false)
     expect(input.api.open()).toBe(false)
-    expect(attrs(input.part("trigger"))).toMatchObject({ disabled: "", "data-disabled": "" })
+    expect(attrs(input.part("trigger"))).toMatchObject({
+      disabled: "",
+      "data-disabled": "",
+    })
   })
 })
 
 describe("parts", () => {
   test("the input carries the rules, and a folder picker allows several files", () => {
-    const input = fileInput({ id: "f", name: "files", accept: ["image/*", ".pdf"], capture: "environment" })
+    const input = fileInput({
+      id: "f",
+      name: "files",
+      accept: ["image/*", ".pdf"],
+      capture: "environment",
+    })
     expect(attrs(input.part("input"))).toMatchObject({
       type: "file",
       accept: "image/*,.pdf",
@@ -141,28 +205,40 @@ describe("parts", () => {
       tabindex: "-1",
     })
     expect(attrs(input.part("input")).multiple).toBeUndefined()
-    expect(attrs(fileInput({ id: "f", directory: true }).part("input"))).toMatchObject({
+    expect(
+      attrs(fileInput({ id: "f", directory: true }).part("input"))
+    ).toMatchObject({
       webkitdirectory: "",
       multiple: "",
     })
   })
 
   test("one item takes Tab into the list: the first, until another is focused", () => {
-    const input = fileInput({ id: "f", multiple: true, defaultValue: [png, pdf] })
+    const input = fileInput({
+      id: "f",
+      multiple: true,
+      defaultValue: [png, pdf],
+    })
     const props = (file: File) => ({ file, value: fileKey(file) })
     expect(attrs(input.part("item", props(png))).tabindex).toBe("0")
     expect(attrs(input.part("item", props(pdf))).tabindex).toBe("-1")
     input.api.internal.setActiveItem(fileKey(pdf))
     expect(attrs(input.part("item", props(png))).tabindex).toBe("-1")
     expect(attrs(input.part("item", props(pdf))).tabindex).toBe("0")
-    expect(partState(input.part("item", props(pdf)))).toEqual({ file: pdf, index: 1, disabled: false })
+    expect(partState(input.part("item", props(pdf)))).toEqual({
+      file: pdf,
+      index: 1,
+      disabled: false,
+    })
   })
 
   test("a remove button is named after its file", () => {
     const input = fileInput({ id: "f", defaultValue: [png] })
-    expect(attrs(input.part("item-remove", { file: png, value: fileKey(png) }))["aria-label"]).toBe(
-      "Remove a.png",
-    )
+    expect(
+      attrs(input.part("item-remove", { file: png, value: fileKey(png) }))[
+        "aria-label"
+      ]
+    ).toBe("Remove a.png")
   })
 
   test("file keys stay the same for a file and differ between files", () => {
@@ -179,10 +255,16 @@ test("describes what changed", () => {
     rejected: [{ file: txt, reasons: ["file-type"] }],
   }
   expect(describeChange(change)).toBe("2 files accepted. 1 file rejected.")
-  expect(describeChange({ ...change, added: [png], rejected: [] })).toBe("1 file accepted.")
+  expect(describeChange({ ...change, added: [png], rejected: [] })).toBe(
+    "1 file accepted."
+  )
   expect(describeChange({ ...change, added: [], rejected: [] })).toBe(null)
-  expect(describeChange({ ...change, added: [], removed: [png], rejected: [] })).toBe("a.png removed.")
-  expect(describeChange({ ...change, added: [], removed: [png, pdf], rejected: [] })).toBe("2 files removed.")
+  expect(
+    describeChange({ ...change, added: [], removed: [png], rejected: [] })
+  ).toBe("a.png removed.")
+  expect(
+    describeChange({ ...change, added: [], removed: [png, pdf], rejected: [] })
+  ).toBe("2 files removed.")
   expect(describeChange({ ...change, reason: "reset" })).toBe(null)
 })
 
@@ -190,7 +272,10 @@ describe("trigger", () => {
   test("a disabled fieldset disables the trigger, wherever the trigger sits", () => {
     const input = fileInput({ id: "f" })
     input.api.internal.setFormDisabled(true)
-    expect(attrs(input.part("trigger"))).toMatchObject({ disabled: "", "data-disabled": "" })
+    expect(attrs(input.part("trigger"))).toMatchObject({
+      disabled: "",
+      "data-disabled": "",
+    })
     input.api.internal.setFormDisabled(false)
     expect(attrs(input.part("trigger")).disabled).toBeUndefined()
   })

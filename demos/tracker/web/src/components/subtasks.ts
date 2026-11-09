@@ -16,7 +16,9 @@ const trees = new WeakMap<Subtask[], TreeItemData[]>()
 
 function itemsOf(subtasks: Subtask[]) {
   let items = trees.get(subtasks)
-  if (!items) trees.set(subtasks, (items = toItems(subtasks)))
+  if (!items) {
+    trees.set(subtasks, (items = toItems(subtasks)))
+  }
   return items
 }
 
@@ -28,9 +30,13 @@ function doneOf(subtasks: Subtask[]) {
 
 function subtasks(issue: Issue) {
   const all = leaves(issue.subtasks)
-  if (all.length === 0) return nothing
+  if (all.length === 0) {
+    return nothing
+  }
   const checked = doneOf(issue.subtasks)
-  const expanded = issue.subtasks.filter((subtask) => subtask.subtasks).map((subtask) => subtask.id)
+  const expanded = issue.subtasks
+    .filter((subtask) => subtask.subtasks)
+    .map((subtask) => subtask.id)
 
   return html`<section aria-labelledby="subtasks-label" class="grid gap-3">
     <h3 id="subtasks-label" class="text-sm font-medium">Subtasks</h3>
@@ -40,9 +46,15 @@ function subtasks(issue: Issue) {
       .format=${(value: number) => `${value} of ${all.length}`}
       class="flex w-full flex-wrap items-center gap-x-3 gap-y-1.5"
     >
-      <ui-progress-label class="text-xs font-medium text-muted-foreground">Done</ui-progress-label>
-      <ui-progress-value class="ms-auto text-xs text-muted-foreground tabular-nums"></ui-progress-value>
-      <ui-progress-track class="block h-1.5 w-full overflow-hidden rounded-full bg-muted">
+      <ui-progress-label class="text-xs font-medium text-muted-foreground"
+        >Done</ui-progress-label
+      >
+      <ui-progress-value
+        class="ms-auto text-xs text-muted-foreground tabular-nums"
+      ></ui-progress-value>
+      <ui-progress-track
+        class="block h-1.5 w-full overflow-hidden rounded-full bg-muted"
+      >
         <ui-progress-indicator
           class="block h-full bg-primary transition-[width] motion-reduce:transition-none"
         ></ui-progress-indicator>
@@ -58,7 +70,7 @@ function subtasks(issue: Issue) {
       .checked=${checked}
       @checkedchange=${onChange(
         () => doneOf(issueOf(issue.id)?.subtasks ?? []),
-        (done) => setSubtasksDone(issue.id, done),
+        (done) => setSubtasksDone(issue.id, done)
       )}
       class="flex flex-col rounded-2xl border border-border p-1"
     >

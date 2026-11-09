@@ -76,12 +76,20 @@ const mounted = ref(true)
       <Menu v-if="component === 'menu'">
         <MenuTrigger>Open</MenuTrigger>
         <MenuContent class="popup">
-          <MenuItem v-for="item in items" :key="item.value" class="item" :value="item.value">
+          <MenuItem
+            v-for="item in items"
+            :key="item.value"
+            class="item"
+            :value="item.value"
+          >
             {{ item.label }}
           </MenuItem>
         </MenuContent>
       </Menu>
-      <Select v-else-if="component === 'select'" :default-value="items[0].value">
+      <Select
+        v-else-if="component === 'select'"
+        :default-value="items[0].value"
+      >
         <SelectTrigger aria-label="Open" class="trigger">
           <SelectValue />
         </SelectTrigger>
@@ -124,11 +132,17 @@ const mounted = ref(true)
         <DialogTrigger>Open</DialogTrigger>
         <DialogContent class="dialog">
           <DialogTitle class="title">Delete it?</DialogTitle>
-          <DialogDescription class="description">This can't be undone.</DialogDescription>
+          <DialogDescription class="description"
+            >This can't be undone.</DialogDescription
+          >
           <DialogClose>Cancel</DialogClose>
         </DialogContent>
       </Dialog>
-      <Slider v-else-if="component === 'slider'" name="volume" :default-value="50">
+      <Slider
+        v-else-if="component === 'slider'"
+        name="volume"
+        :default-value="50"
+      >
         <SliderControl class="slider-control">
           <SliderTrack class="slider-track">
             <SliderIndicator class="slider-indicator" />
@@ -145,39 +159,82 @@ const mounted = ref(true)
         </AccordionItem>
         <AccordionItem value="second">
           <AccordionHeader>
-            <AccordionTrigger class="accordion-trigger">Second</AccordionTrigger>
+            <AccordionTrigger class="accordion-trigger"
+              >Second</AccordionTrigger
+            >
           </AccordionHeader>
-          <AccordionPanel class="accordion-panel">Another answer.</AccordionPanel>
+          <AccordionPanel class="accordion-panel"
+            >Another answer.</AccordionPanel
+          >
         </AccordionItem>
       </Accordion>
       <Collapsible v-else-if="component === 'collapsible'">
         <CollapsibleTrigger>Open</CollapsibleTrigger>
         <CollapsiblePanel class="collapsible-panel">Details.</CollapsiblePanel>
       </Collapsible>
-      <Tabs v-else-if="component === 'tabs'" class="tabs" :default-value="items[0].value">
+      <Tabs
+        v-else-if="component === 'tabs'"
+        class="tabs"
+        :default-value="items[0].value"
+      >
         <TabsList class="tablist" aria-label="Pages">
-          <TabsTab v-for="item in items" :key="item.value" class="tab" :value="item.value">
+          <TabsTab
+            v-for="item in items"
+            :key="item.value"
+            class="tab"
+            :value="item.value"
+          >
             {{ item.label }}
           </TabsTab>
           <TabsIndicator class="indicator" />
         </TabsList>
-        <TabsPanel v-for="item in items" :key="item.value" class="panel" :value="item.value">
+        <TabsPanel
+          v-for="item in items"
+          :key="item.value"
+          class="panel"
+          :value="item.value"
+        >
           {{ item.label }} content.
         </TabsPanel>
       </Tabs>
-      <Toolbar v-else-if="component === 'toolbar'" class="toolbar" aria-label="Formatting">
-        <ToolbarButton v-for="item in items" :key="item.value">{{ item.label }}</ToolbarButton>
+      <Toolbar
+        v-else-if="component === 'toolbar'"
+        class="toolbar"
+        aria-label="Formatting"
+      >
+        <ToolbarButton v-for="item in items" :key="item.value">{{
+          item.label
+        }}</ToolbarButton>
       </Toolbar>
-      <Tree v-else-if="component === 'tree'" class="tree" aria-label="Files" :items="leakTreeItems()" />
+      <Tree
+        v-else-if="component === 'tree'"
+        class="tree"
+        aria-label="Files"
+        :items="leakTreeItems()"
+      />
       <Resizable v-else-if="component === 'resizable'" class="resizable">
         <ResizablePanel id="first" :default-size="50" class="resizable-panel" />
         <ResizableHandle class="resizable-handle" aria-label="Handle" />
-        <ResizablePanel id="second" :default-size="50" class="resizable-panel" />
+        <ResizablePanel
+          id="second"
+          :default-size="50"
+          class="resizable-panel"
+        />
       </Resizable>
-      <ScrollArea v-else-if="component === 'scroll-area'" class="scroll-area" :scroll-hide-delay="50">
-        <ScrollAreaViewport class="scroll-area-viewport" role="region" aria-label="Items">
+      <ScrollArea
+        v-else-if="component === 'scroll-area'"
+        class="scroll-area"
+        :scroll-hide-delay="50"
+      >
+        <ScrollAreaViewport
+          class="scroll-area-viewport"
+          role="region"
+          aria-label="Items"
+        >
           <ScrollAreaContent>
-            <p v-for="line in lines" :key="line.value" class="scroll-area-item">{{ line.label }}</p>
+            <p v-for="line in lines" :key="line.value" class="scroll-area-item">
+              {{ line.label }}
+            </p>
           </ScrollAreaContent>
         </ScrollAreaViewport>
         <ScrollAreaScrollbar class="scroll-area-scrollbar">

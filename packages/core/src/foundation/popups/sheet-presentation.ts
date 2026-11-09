@@ -18,11 +18,13 @@ import { attachSheet, parentSheet, sheetLayers, type Sheet } from "./sheet"
 // author style wins.
 function styleBackdrop(host: HTMLElement) {
   const slot = host.getAttribute("data-slot")
-  if (!slot) return
+  if (!slot) {
+    return
+  }
   writeStyle(
     host.ownerDocument,
     `ui-sdk-sheet-${slot}`,
-    `@layer ui-sdk { :where([data-slot="${slot}"])::backdrop { background: var(--sheet-backdrop, rgb(0 0 0 / 0.2)); pointer-events: auto } }`,
+    `@layer ui-sdk { :where([data-slot="${slot}"])::backdrop { background: var(--sheet-backdrop, rgb(0 0 0 / 0.2)); pointer-events: auto } }`
   )
 }
 
@@ -30,9 +32,14 @@ function isolate(container: Element, keep: (Element | undefined)[]) {
   const restores: (() => void)[] = []
   const walk = (node: Element) => {
     for (const child of Array.from(node.children)) {
-      if (keep.includes(child)) continue
-      if (keep.some((el) => el && child.contains(el))) walk(child)
-      else if (child instanceof HTMLElement) restores.push(setStyle(child, "display", "none"))
+      if (keep.includes(child)) {
+        continue
+      }
+      if (keep.some((el) => el && child.contains(el))) {
+        walk(child)
+      } else if (child instanceof HTMLElement) {
+        restores.push(setStyle(child, "display", "none"))
+      }
     }
   }
   walk(container)
@@ -47,7 +54,9 @@ function drillIn(el: HTMLElement, popup: Popup, config: SheetConfig) {
     inline: true,
     onShow() {
       const [parent, trigger] = config.drillIn!()
-      if (parent) restore = isolate(parent, [el, trigger])
+      if (parent) {
+        restore = isolate(parent, [el, trigger])
+      }
       return () => restore?.()
     },
     onClose() {
@@ -65,9 +74,13 @@ function drillIn(el: HTMLElement, popup: Popup, config: SheetConfig) {
 // list kept in the page while closed, like a select's, is a plain hidden
 // element in its viewport, never a screen-wide layer.
 function presentSheet(el: HTMLElement, popup: Popup, config: SheetConfig) {
-  if (config.drillIn) return drillIn(el, popup, config)
+  if (config.drillIn) {
+    return drillIn(el, popup, config)
+  }
   const host = el.parentElement
-  if (!host) return
+  if (!host) {
+    return
+  }
   styleBackdrop(host)
   let sheet: Sheet | undefined
   return popup.bind(el, {
@@ -86,7 +99,13 @@ function presentSheet(el: HTMLElement, popup: Popup, config: SheetConfig) {
   })
 }
 
-function showSheet(el: HTMLElement, host: HTMLElement, popup: Popup, config: SheetConfig, layer: Layer) {
+function showSheet(
+  el: HTMLElement,
+  host: HTMLElement,
+  popup: Popup,
+  config: SheetConfig,
+  layer: Layer
+) {
   let rest: SnapPoint | null = null
   const stackedOn = parentSheet(layer)
   const dimsHost = !config.backdrop?.()
@@ -104,7 +123,9 @@ function showSheet(el: HTMLElement, host: HTMLElement, popup: Popup, config: She
       popup.requestClose("swipe", event)
       requestAnimationFrame(() => {
         const point = rest ?? sheet.snapPoints()[0]?.value
-        if (layer.active() && point !== undefined) sheet.snapTo(point, "imperative")
+        if (layer.active() && point !== undefined) {
+          sheet.snapTo(point, "imperative")
+        }
       })
     },
   })
@@ -112,12 +133,23 @@ function showSheet(el: HTMLElement, host: HTMLElement, popup: Popup, config: She
   config.onSheet?.(sheet)
   const offGrow = on(el, "focusin", (event) => {
     const largest = sheet.snapPoints().at(-1)
-    if (largest && sheet.snapPoints().length > 1 && (event.target as Element).matches("input, textarea"))
+    if (
+      largest &&
+      sheet.snapPoints().length > 1 &&
+      (event.target as Element).matches("input, textarea")
+    ) {
       sheet.snapTo(largest.value, "imperative")
+    }
   })
-  const color = dimsHost ? getComputedStyle(el).getPropertyValue("--sheet-backdrop") : "transparent"
-  if (color) host.style.setProperty("--sheet-backdrop", color)
-  if (layer.active()) sheet.open(popup.opener() !== "initial")
+  const color = dimsHost
+    ? getComputedStyle(el).getPropertyValue("--sheet-backdrop")
+    : "transparent"
+  if (color) {
+    host.style.setProperty("--sheet-backdrop", color)
+  }
+  if (layer.active()) {
+    sheet.open(popup.opener() !== "initial")
+  }
   return {
     sheet,
     hide() {

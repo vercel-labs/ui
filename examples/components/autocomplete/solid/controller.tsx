@@ -37,7 +37,11 @@ function Example() {
         <button type="button" data-size="sm" onClick={() => fruit.open()}>
           Open
         </button>
-        <button type="button" data-size="sm" onClick={() => fruit.setValue("Pea")}>
+        <button
+          type="button"
+          data-size="sm"
+          onClick={() => fruit.setValue("Pea")}
+        >
           Type “Pea”
         </button>
         <button type="button" data-size="sm" onClick={() => fruit.clear()}>
@@ -53,7 +57,11 @@ function Example() {
         <AutocompleteContent>
           <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
-            <For each={fruits}>{(item) => <AutocompleteItem value={item}>{item}</AutocompleteItem>}</For>
+            <For each={fruits}>
+              {(item) => (
+                <AutocompleteItem value={item}>{item}</AutocompleteItem>
+              )}
+            </For>
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>

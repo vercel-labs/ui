@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/vue"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/vue"
 </script>
 
 <template>

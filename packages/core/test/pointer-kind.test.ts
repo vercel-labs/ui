@@ -24,12 +24,19 @@ function device(matching: string[]) {
   const view = { matchMedia } as unknown as Window
   const change = (next: string[]) => {
     current = new Set(next)
-    for (const list of lists.values()) list.dispatchEvent(new Event("change"))
+    for (const list of lists.values()) {
+      list.dispatchEvent(new Event("change"))
+    }
   }
   return { view, change, added }
 }
 
-const phone = ["(pointer: coarse)", "(hover: none)", "(any-pointer: coarse)", "(any-hover: none)"]
+const phone = [
+  "(pointer: coarse)",
+  "(hover: none)",
+  "(any-pointer: coarse)",
+  "(any-hover: none)",
+]
 const tabletWithTrackpad = [
   "(pointer: coarse)",
   "(hover: none)",
@@ -48,7 +55,12 @@ describe("createPointerKind", () => {
       anyPointer: "unknown",
       anyHover: "unknown",
     })
-    expect(kind.get()).toEqual({ pointer: "coarse", hover: "none", anyPointer: "coarse", anyHover: "none" })
+    expect(kind.get()).toEqual({
+      pointer: "coarse",
+      hover: "none",
+      anyPointer: "coarse",
+      anyHover: "none",
+    })
     expect(kind.get()).toBe(kind.get())
     expect(createPointerKind().initialState.pointer).toBe("unknown")
   })

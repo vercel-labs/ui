@@ -41,17 +41,22 @@ async function mount(onSelect?: (event: Event) => void) {
       >
         <MenuTrigger>Account</MenuTrigger>
         <MenuContent>
-          <MenuItem value="settings" onSelect={onSelect} render={<Link href="/settings" />}>
+          <MenuItem
+            value="settings"
+            onSelect={onSelect}
+            render={<Link href="/settings" />}
+          >
             Settings
           </MenuItem>
         </MenuContent>
-      </Menu>,
-    ),
+      </Menu>
+    )
   )
   return state
 }
 
-const link = () => document.querySelector<HTMLAnchorElement>('a[href="/settings"]')!
+const link = () =>
+  document.querySelector<HTMLAnchorElement>('a[href="/settings"]')!
 
 test("a link item the router navigates closes the menu and runs its action", async () => {
   const state = await mount()

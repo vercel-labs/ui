@@ -7,10 +7,15 @@ import { exposeLayers, leakComponent, perfItems } from "tests/fixtures/perf.ts"
 const items = perfItems(3)
 const list = (tag: string) =>
   items
-    .map((item) => `<${tag} class="item" value="${item.value}" label="${item.label}">${item.label}</${tag}>`)
+    .map(
+      (item) =>
+        `<${tag} class="item" value="${item.value}" label="${item.label}">${item.label}</${tag}>`
+    )
     .join("")
-const each = (render: (item: { value: string; label: string }) => string, from = items) =>
-  from.map(render).join("")
+const each = (
+  render: (item: { value: string; label: string }) => string,
+  from = items
+) => from.map(render).join("")
 
 const components = {
   menu: `
@@ -102,7 +107,7 @@ const components = {
             <ui-tree-group>
               <ui-tree-item value="${item.value}-file"><ui-tree-item-label>${item.label} file</ui-tree-item-label></ui-tree-item>
             </ui-tree-group>
-          </ui-tree-item>`,
+          </ui-tree-item>`
       )}
     </ui-tree>`,
   resizable: `
@@ -137,10 +142,15 @@ async function mount(root: HTMLElement) {
   const markup = components[leakComponent()]
   const insert = () => (slot.innerHTML = markup)
   insert()
-  root.querySelector(".fixture > button:last-child")!.addEventListener("click", () => {
-    if (slot.firstElementChild) slot.replaceChildren()
-    else insert()
-  })
+  root
+    .querySelector(".fixture > button:last-child")!
+    .addEventListener("click", () => {
+      if (slot.firstElementChild) {
+        slot.replaceChildren()
+      } else {
+        insert()
+      }
+    })
   await import("@ui-sdk/web/menu")
   await import("@ui-sdk/web/select")
   await import("@ui-sdk/web/combobox")

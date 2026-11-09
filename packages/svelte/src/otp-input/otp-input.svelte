@@ -16,7 +16,11 @@ and the `aria-*` naming attributes go to that input.
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { inputAttributes } from "./context"
 
   let {
@@ -64,10 +68,15 @@ and the `aria-*` naming attributes go to that input.
     form,
     controller,
     debug,
-    onValueChange: (next: string, details: ChangeDetails<OTPInputValueChangeReason>) => {
+    onValueChange: (
+      next: string,
+      details: ChangeDetails<OTPInputValueChangeReason>
+    ) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onValueCommit,
   }))
@@ -81,7 +90,9 @@ and the `aria-*` naming attributes go to that input.
     const own: Record<string | symbol, unknown> = { ...rest }
     const named: Record<string, unknown> = {}
     for (const key of inputAttributes) {
-      if (!(key in own)) continue
+      if (!(key in own)) {
+        continue
+      }
       named[key] = own[key]
       delete own[key]
     }
@@ -89,13 +100,17 @@ and the `aria-*` naming attributes go to that input.
   })
   const fieldControl = field?.control(
     () => split.named.id as string | undefined,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
 </script>
 
 {#snippet content(state: OTPInputState)}
   {@render children?.(state)}
-  <input {...fieldControl ? fieldControl(control.slot(split.named)) : control.slot(split.named)} />
+  <input
+    {...fieldControl
+      ? fieldControl(control.slot(split.named))
+      : control.slot(split.named)}
+  />
 {/snippet}
 
 <Part tag="div" part={root} props={{ ...split.own, children: content }} />

@@ -23,7 +23,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue"
       </TooltipTrigger>
       <TooltipContent>
         <template #render="{ props, state }">
-          <div v-bind="props" :class="state.open ? 'tooltip is-open' : 'tooltip'">All systems normal</div>
+          <div
+            v-bind="props"
+            :class="state.open ? 'tooltip is-open' : 'tooltip'"
+          >
+            All systems normal
+          </div>
         </template>
       </TooltipContent>
     </Tooltip>

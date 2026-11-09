@@ -7,9 +7,15 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
-test("a code hydrates without mismatches and takes typing", async ({ page, open }) => {
+test("a code hydrates without mismatches and takes typing", async ({
+  page,
+  open,
+}) => {
   await open("otp-input", { default: "12" })
   await page.waitForLoadState("networkidle")
   await expect.poll(() => shownCode(page)).toBe("12")

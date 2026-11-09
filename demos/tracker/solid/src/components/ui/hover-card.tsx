@@ -4,7 +4,9 @@ import { omit, type ComponentProps } from "solid-js"
 import { popup } from "./popover"
 
 function HoverCardContent(
-  props: Omit<ComponentProps<typeof HoverCardContentPrimitive>, "class"> & { class?: string },
+  props: Omit<ComponentProps<typeof HoverCardContentPrimitive>, "class"> & {
+    class?: string
+  }
 ) {
   const rest = omit(props, "class")
   return (

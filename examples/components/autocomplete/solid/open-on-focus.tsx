@@ -22,7 +22,9 @@ function Example() {
           <AutocompleteGroup>
             <AutocompleteGroupLabel>Recent searches</AutocompleteGroupLabel>
             <For each={recent}>
-              {(search) => <AutocompleteItem value={search}>{search}</AutocompleteItem>}
+              {(search) => (
+                <AutocompleteItem value={search}>{search}</AutocompleteItem>
+              )}
             </For>
           </AutocompleteGroup>
         </AutocompleteList>

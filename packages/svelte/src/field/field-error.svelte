@@ -11,7 +11,11 @@ browser's message for the current problem.
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { outsidePart, useField } from "./context"
 
-  let { match, children, ...rest }: PartProps<"div", FieldErrorState> & FieldErrorProps = $props()
+  let {
+    match,
+    children,
+    ...rest
+  }: PartProps<"div", FieldErrorState> & FieldErrorProps = $props()
 
   const field = useField()
   const uid = $props.id()
@@ -23,7 +27,9 @@ browser's message for the current problem.
         match,
       }))
     : undefined
-  const shown = $derived(error ? error.present : fieldOutsideErrorShown({ match }))
+  const shown = $derived(
+    error ? error.present : fieldOutsideErrorShown({ match })
+  )
   const part = error ?? outsidePart("error")
 </script>
 

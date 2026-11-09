@@ -26,7 +26,11 @@ function Example() {
   const log = useLog()
 
   return (
-    <Combobox onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
+    <Combobox
+      onOpenChangeComplete={(open) =>
+        log(open ? "Finished opening" : "Finished closing")
+      }
+    >
       <div data-slot="stack">
         <ComboboxLabel>Framework</ComboboxLabel>
         <div data-slot="row">
@@ -40,7 +44,11 @@ function Example() {
         <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
         <ComboboxList>
           {frameworks.map((framework) => (
-            <ComboboxItem key={framework.value} value={framework.value} label={framework.label}>
+            <ComboboxItem
+              key={framework.value}
+              value={framework.value}
+              label={framework.label}
+            >
               {framework.label}
               <ComboboxItemIndicator keepMounted>
                 <CheckIcon />

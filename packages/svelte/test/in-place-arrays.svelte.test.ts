@@ -43,7 +43,8 @@ const components: {
 }[] = [
   {
     name: "Listbox",
-    shown: (el: HTMLElement) => labelsWhere(el, '[role="option"]', "aria-selected"),
+    shown: (el: HTMLElement) =>
+      labelsWhere(el, '[role="option"]', "aria-selected"),
     submits: true,
     // Its options keep their order on the page.
     shownReversed: ["Apple", "Banana", "Cherry"],
@@ -67,7 +68,8 @@ const components: {
   },
   {
     name: "CheckboxGroup",
-    shown: (el: HTMLElement) => labelsWhere(el, '[role="checkbox"]', "aria-checked"),
+    shown: (el: HTMLElement) =>
+      labelsWhere(el, '[role="checkbox"]', "aria-checked"),
     submits: true,
   },
   {
@@ -79,7 +81,7 @@ const components: {
     name: "Tree",
     shown: (el: HTMLElement) =>
       [...el.querySelectorAll('[role="treeitem"][aria-expanded="true"]')].map(
-        (item) => item.querySelector('[data-slot="tree-label"]')!.textContent,
+        (item) => item.querySelector('[data-slot="tree-label"]')!.textContent
       ),
     submits: false,
   },
@@ -91,48 +93,90 @@ const bindings = [
 ]
 
 describe.each(components)("$name", ({ name, shown, submits }) => {
-  test.each(bindings)("follows an item pushed into its $name list", ({ bound }) => {
-    const { form, props } = render({ component: name, bound, selected: ["apple"] })
-    expect(shown(form)).toEqual(["Apple"])
-    props.selected.push("banana")
-    flushSync()
-    expect(shown(form)).toEqual(["Apple", "Banana"])
-    if (submits) expect(new FormData(form).getAll("fruit")).toEqual(["apple", "banana"])
-  })
+  test.each(bindings)(
+    "follows an item pushed into its $name list",
+    ({ bound }) => {
+      const { form, props } = render({
+        component: name,
+        bound,
+        selected: ["apple"],
+      })
+      expect(shown(form)).toEqual(["Apple"])
+      props.selected.push("banana")
+      flushSync()
+      expect(shown(form)).toEqual(["Apple", "Banana"])
+      if (submits) {
+        expect(new FormData(form).getAll("fruit")).toEqual(["apple", "banana"])
+      }
+    }
+  )
 
-  test.each(bindings)("follows an item spliced out of its $name list", ({ bound }) => {
-    const { form, props } = render({ component: name, bound, selected: ["apple", "banana"] })
-    expect(shown(form)).toEqual(["Apple", "Banana"])
-    props.selected.splice(0, 1)
-    flushSync()
-    expect(shown(form)).toEqual(["Banana"])
-    if (submits) expect(new FormData(form).getAll("fruit")).toEqual(["banana"])
-  })
+  test.each(bindings)(
+    "follows an item spliced out of its $name list",
+    ({ bound }) => {
+      const { form, props } = render({
+        component: name,
+        bound,
+        selected: ["apple", "banana"],
+      })
+      expect(shown(form)).toEqual(["Apple", "Banana"])
+      props.selected.splice(0, 1)
+      flushSync()
+      expect(shown(form)).toEqual(["Banana"])
+      if (submits) {
+        expect(new FormData(form).getAll("fruit")).toEqual(["banana"])
+      }
+    }
+  )
 
-  test.each(bindings)("follows its $name list replaced by an equal one, then pushed into", ({ bound }) => {
-    const { form, props } = render({ component: name, bound, selected: ["apple"] })
-    props.selected.push("banana")
-    flushSync()
-    props.selected = [...props.selected]
-    flushSync()
-    props.selected.push("cherry")
-    flushSync()
-    expect(shown(form)).toEqual(["Apple", "Banana", "Cherry"])
-    if (submits) expect(new FormData(form).getAll("fruit")).toEqual(["apple", "banana", "cherry"])
-  })
+  test.each(bindings)(
+    "follows its $name list replaced by an equal one, then pushed into",
+    ({ bound }) => {
+      const { form, props } = render({
+        component: name,
+        bound,
+        selected: ["apple"],
+      })
+      props.selected.push("banana")
+      flushSync()
+      props.selected = [...props.selected]
+      flushSync()
+      props.selected.push("cherry")
+      flushSync()
+      expect(shown(form)).toEqual(["Apple", "Banana", "Cherry"])
+      if (submits) {
+        expect(new FormData(form).getAll("fruit")).toEqual([
+          "apple",
+          "banana",
+          "cherry",
+        ])
+      }
+    }
+  )
 })
 
 describe.each(components.filter((component) => component.shownReversed))(
   "$name",
   ({ name, shown, shownReversed }) => {
-    test.each(bindings)("follows its $name list reordered in place", ({ bound }) => {
-      const { form, props } = render({ component: name, bound, selected: ["apple", "banana", "cherry"] })
-      props.selected.reverse()
-      flushSync()
-      expect(shown(form)).toEqual(shownReversed)
-      expect(new FormData(form).getAll("fruit")).toEqual(["cherry", "banana", "apple"])
-    })
-  },
+    test.each(bindings)(
+      "follows its $name list reordered in place",
+      ({ bound }) => {
+        const { form, props } = render({
+          component: name,
+          bound,
+          selected: ["apple", "banana", "cherry"],
+        })
+        props.selected.reverse()
+        flushSync()
+        expect(shown(form)).toEqual(shownReversed)
+        expect(new FormData(form).getAll("fruit")).toEqual([
+          "cherry",
+          "banana",
+          "apple",
+        ])
+      }
+    )
+  }
 )
 
 test("a Listbox follows a bound list that started empty once it chose into it and the list was pushed into", () => {
@@ -146,6 +190,9 @@ test("a Listbox follows a bound list that started empty once it chose into it an
   expect(props.selected).toEqual(["apple"])
   props.selected?.push("banana")
   flushSync()
-  expect(labelsWhere(form, '[role="option"]', "aria-selected")).toEqual(["Apple", "Banana"])
+  expect(labelsWhere(form, '[role="option"]', "aria-selected")).toEqual([
+    "Apple",
+    "Banana",
+  ])
   expect(new FormData(form).getAll("fruit")).toEqual(["apple", "banana"])
 })

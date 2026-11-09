@@ -1,9 +1,21 @@
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/solid/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { render } from "@solidjs/web"
 import { For } from "solid-js"
-import { countRender, mountWhenAsked, perfItems, perfOptions, perfSize } from "tests/fixtures/perf.ts"
+import {
+  countRender,
+  mountWhenAsked,
+  perfItems,
+  perfOptions,
+  perfSize,
+} from "tests/fixtures/perf.ts"
 
 // Rows like a table's, each with a closed menu, select and tooltip, for the
 // counts specs. Every part counts its renders by kind, so specs
@@ -100,7 +112,10 @@ function Row(props: { label: string }) {
 
 function Fixture() {
   return (
-    <div class="fixture" style={{ "flex-direction": "column", "align-items": "start" }}>
+    <div
+      class="fixture"
+      style={{ "flex-direction": "column", "align-items": "start" }}
+    >
       <button>Before</button>
       <For each={rows}>{(row) => <Row label={row.label.slice(5)} />}</For>
       <button>After</button>

@@ -1,23 +1,36 @@
 import * as React from "react"
 import { StarIcon } from "lucide-react"
-import { createChange, createRovingFocus, definePrimitive, type ChangeDetails } from "@ui-sdk/core"
+import {
+  createChange,
+  createRovingFocus,
+  definePrimitive,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type RatingOptions = {
   value?: number
   defaultValue?: number
-  onValueChange?: (value: number, details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: number,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
 }
 
 const rating = definePrimitive({
   name: "rating",
-  options: { value: "number", defaultValue: "number", onValueChange: "callback" },
+  options: {
+    value: "number",
+    defaultValue: "number",
+    onValueChange: "callback",
+  },
   controlled: ["value"],
   state: (options: RatingOptions) => ({
     value: options.value ?? options.defaultValue ?? 0,
     focused: null as string | null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
     const roving = createRovingFocus(context, {
@@ -25,12 +38,14 @@ const rating = definePrimitive({
       key: "focused",
       remember: false,
       preferred: (star) => Number(star.key) === context.store.get().value,
-      claims: (state, star) => (state.value ? Number(star.key) === state.value : star.key === "1"),
+      claims: (state, star) =>
+        state.value ? Number(star.key) === state.value : star.key === "1",
     })
 
     return {
       roving,
-      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+      rate: (value: number, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
     }
   },
   slots: (slot) => ({
@@ -52,7 +67,10 @@ const rating = definePrimitive({
   }),
 })
 
-const { Root: Rating, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+const { Root: Rating, Star: RatingStar } = createParts(rating, {
+  root: "div",
+  star: "button",
+})
 
 function Example() {
   const [value, setValue] = React.useState(0)
@@ -60,7 +78,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="rating-readout">
-        <output data-slot="rating-value" data-value aria-label="Rating out of 5">
+        <output
+          data-slot="rating-value"
+          data-value
+          aria-label="Rating out of 5"
+        >
           {value}
         </output>
         <span data-slot="hint">out of 5</span>

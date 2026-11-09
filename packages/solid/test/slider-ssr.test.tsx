@@ -1,7 +1,14 @@
 import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
 import { Field, FieldLabel } from "../src/field"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack, SliderValue } from "../src/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+} from "../src/slider"
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a slider", () => {
@@ -20,8 +27,12 @@ describe("server rendering a slider", () => {
     ))
     expect(typeof window).toBe("undefined")
     expect(html).toContain("inset-inline-start:20%")
-    expect(html).toMatch(/<input(?=[^>]*type="range")(?=[^>]*aria-label="Minimum")/)
-    expect(html).toMatch(/<input(?=[^>]*type="hidden")(?=[^>]*name="price")(?=[^>]*value="20\/80")/)
+    expect(html).toMatch(
+      /<input(?=[^>]*type="range")(?=[^>]*aria-label="Minimum")/
+    )
+    expect(html).toMatch(
+      /<input(?=[^>]*type="hidden")(?=[^>]*name="price")(?=[^>]*value="20\/80")/
+    )
     expect(html).toContain("20 – 80")
   })
 
@@ -37,7 +48,9 @@ describe("server rendering a slider", () => {
         </SliderControl>
       </Slider>
     ))
-    expect(html).toMatch(/<span class="label">40<\/span><input[^>]*type="range"/)
+    expect(html).toMatch(
+      /<span class="label">40<\/span><input[^>]*type="range"/
+    )
   })
 
   test("a single thumb in a field is the field's control, which carries the field's validity", () => {
@@ -53,7 +66,11 @@ describe("server rendering a slider", () => {
         </Slider>
       </Field>
     ))
-    expect(html).toMatch(/<input(?=[^>]*type="range")(?=[^>]*aria-invalid="true")/)
-    expect(html).toMatch(/<input(?=[^>]*type="range")(?=[^>]*data-slot="slider-thumb-input")/)
+    expect(html).toMatch(
+      /<input(?=[^>]*type="range")(?=[^>]*aria-invalid="true")/
+    )
+    expect(html).toMatch(
+      /<input(?=[^>]*type="range")(?=[^>]*data-slot="slider-thumb-input")/
+    )
   })
 })

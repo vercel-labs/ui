@@ -58,7 +58,9 @@ function Example() {
       </PopoverTrigger>
       <Popover controller={editor}>
         <PopoverContent>
-          {(state) => <PopoverTitle>Edit {String(state.payload ?? "")}</PopoverTitle>}
+          {(state) => (
+            <PopoverTitle>Edit {String(state.payload ?? "")}</PopoverTitle>
+          )}
         </PopoverContent>
       </Popover>
     </>

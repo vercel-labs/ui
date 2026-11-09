@@ -9,7 +9,9 @@ const commands = Array.from({ length: 10_000 }, (_, index) => ({
 const row = 32
 
 function rank(query: string) {
-  if (!query.trim()) return commands
+  if (!query.trim()) {
+    return commands
+  }
   return commands
     .map((item) => ({ item, score: fuzzyScore(item.label, query) }))
     .filter((entry) => entry.score > 0)
@@ -28,7 +30,9 @@ function mount(root: HTMLElement) {
       </ui-command-list>
     </ui-command>
   `
-  const command = root.querySelector("ui-command") as HTMLElement & { items: typeof commands }
+  const command = root.querySelector("ui-command") as HTMLElement & {
+    items: typeof commands
+  }
   const list = root.querySelector<HTMLElement>("ui-command-list")!
   const spacer = list.querySelector<HTMLElement>("div")!
 
@@ -38,10 +42,19 @@ function mount(root: HTMLElement) {
   const render = () => {
     spacer.style.height = `${matches.length * row}px`
     const start = Math.max(0, Math.floor(list.scrollTop / row) - 4)
-    const end = Math.min(matches.length, Math.ceil((list.scrollTop + list.clientHeight) / row) + 4)
-    const visible = new Map(matches.slice(start, end).map((item, offset) => [item.value, start + offset]))
+    const end = Math.min(
+      matches.length,
+      Math.ceil((list.scrollTop + list.clientHeight) / row) + 4
+    )
+    const visible = new Map(
+      matches
+        .slice(start, end)
+        .map((item, offset) => [item.value, start + offset])
+    )
     for (const [value, el] of rendered) {
-      if (visible.has(value)) continue
+      if (visible.has(value)) {
+        continue
+      }
       el.remove()
       rendered.delete(value)
     }
@@ -55,7 +68,7 @@ function mount(root: HTMLElement) {
       const item = matches[index]
       list.insertAdjacentHTML(
         "beforeend",
-        `<ui-command-item value="${item.value}" label="${item.label}" index="${index}" style="top: ${index * row}px">${item.label}</ui-command-item>`,
+        `<ui-command-item value="${item.value}" label="${item.label}" index="${index}" style="top: ${index * row}px">${item.label}</ui-command-item>`
       )
       rendered.set(value, list.lastElementChild as HTMLElement)
     }
@@ -68,11 +81,18 @@ function mount(root: HTMLElement) {
     render()
   })
   command.addEventListener("valuechange", (event) => {
-    const { index } = (event as CustomEvent<{ value: string | null; index: number }>).detail
-    if (index < 0) return
+    const { index } = (
+      event as CustomEvent<{ value: string | null; index: number }>
+    ).detail
+    if (index < 0) {
+      return
+    }
     const top = index * row
-    if (top < list.scrollTop) list.scrollTop = top
-    else if (top + row > list.scrollTop + list.clientHeight) list.scrollTop = top + row - list.clientHeight
+    if (top < list.scrollTop) {
+      list.scrollTop = top
+    } else if (top + row > list.scrollTop + list.clientHeight) {
+      list.scrollTop = top + row - list.clientHeight
+    }
     render()
   })
 }

@@ -13,7 +13,9 @@ Give a control a `name` to include its value in a form. This works for Select an
 </script>
 
 <form action="/preferences" method="post">
-  <label><Checkbox name="updates" value="yes" defaultChecked /> Email me updates</label>
+  <label
+    ><Checkbox name="updates" value="yes" defaultChecked /> Email me updates</label
+  >
   <button type="submit">Save</button>
   <button type="reset">Reset</button>
 </form>
@@ -56,7 +58,12 @@ Uncheck the box, then press Reset. `defaultChecked` supplies the reset value. Th
 
 ```svelte
 <script lang="ts">
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
   import { Input } from "@ui-sdk/svelte/input"
 </script>
 

@@ -1,7 +1,13 @@
 "use client"
 
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/react/slider"
 
 const channels = [
   { label: "Bass", value: 50 },

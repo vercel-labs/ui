@@ -10,6 +10,9 @@ const props = defineProps<{ class?: string }>()
 <template>
   <MenuSubTrigger :class="cn(item, 'data-open:bg-accent', props.class)">
     <slot />
-    <ChevronRight aria-hidden="true" class="ms-auto text-muted-foreground rtl:rotate-180" />
+    <ChevronRight
+      aria-hidden="true"
+      class="ms-auto text-muted-foreground rtl:rotate-180"
+    />
   </MenuSubTrigger>
 </template>

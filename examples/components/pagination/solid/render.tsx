@@ -19,7 +19,12 @@ function Example() {
               <PaginationPrevious
                 aria-label="Previous page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
+                  <button
+                    {...props}
+                    title={
+                      state.disabled ? undefined : `Go to page ${state.page}`
+                    }
+                  />
                 )}
               >
                 {(state) => (
@@ -36,7 +41,9 @@ function Example() {
                       <path d="m12 19-7-7 7-7" />
                       <path d="M19 12H5" />
                     </svg>
-                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                    {!state.disabled && (
+                      <span aria-hidden="true">{state.page}</span>
+                    )}
                   </>
                 )}
               </PaginationPrevious>
@@ -46,7 +53,9 @@ function Example() {
                 <PaginationItem>
                   {typeof item === "number" ? (
                     <PaginationLink page={item}>
-                      {(state) => (state.current ? `Page ${state.page}` : state.page)}
+                      {(state) =>
+                        state.current ? `Page ${state.page}` : state.page
+                      }
                     </PaginationLink>
                   ) : (
                     <PaginationEllipsis />
@@ -58,12 +67,19 @@ function Example() {
               <PaginationNext
                 aria-label="Next page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
+                  <button
+                    {...props}
+                    title={
+                      state.disabled ? undefined : `Go to page ${state.page}`
+                    }
+                  />
                 )}
               >
                 {(state) => (
                   <>
-                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                    {!state.disabled && (
+                      <span aria-hidden="true">{state.page}</span>
+                    )}
                     <svg
                       viewBox="0 0 24 24"
                       fill="none"

@@ -31,7 +31,9 @@ function Example() {
             data-section={key}
             data-slot="tree-behavior-row"
             data-branch={outline.isBranch(key) ? "" : undefined}
-            style={{ paddingInlineStart: `${(outline.level(key) - 1) * 16 + 8}px` }}
+            style={{
+              paddingInlineStart: `${(outline.level(key) - 1) * 16 + 8}px`,
+            }}
           >
             <span>
               {outline.isBranch(key) ? "▸ " : ""}
@@ -45,7 +47,8 @@ function Example() {
         )
       })}
       <p data-slot="output">
-        {outline.size} sections{outline.has("appendix") ? ", with an appendix" : ", no appendix yet"}
+        {outline.size} sections
+        {outline.has("appendix") ? ", with an appendix" : ", no appendix yet"}
       </p>
     </div>
   )

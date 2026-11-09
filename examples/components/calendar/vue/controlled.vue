@@ -21,11 +21,17 @@ const value = ref<CalendarValue>("2026-10-16")
 const month = ref("2026-10")
 const log = useLog()
 
-function onValueChange(next: CalendarValue, details: { reason: CalendarValueChangeReason }) {
+function onValueChange(
+  next: CalendarValue,
+  details: { reason: CalendarValueChangeReason }
+) {
   log(`Selected ${String(next)} (${details.reason})`)
 }
 
-function onMonthChange(next: string, details: { reason: CalendarMonthChangeReason }) {
+function onMonthChange(
+  next: string,
+  details: { reason: CalendarMonthChangeReason }
+) {
   log(`Showing ${next} (${details.reason})`)
 }
 </script>

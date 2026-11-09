@@ -1,6 +1,11 @@
 <script lang="ts">
   import { DateInput } from "@ui-sdk/svelte/date-input"
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
 </script>
 
 <Field>

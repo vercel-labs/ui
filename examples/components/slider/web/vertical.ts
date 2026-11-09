@@ -23,7 +23,7 @@ function mount(root: HTMLElement) {
               </ui-slider>
               <ui-field-label>${channel.label}</ui-field-label>
             </ui-field>
-          `,
+          `
         )
         .join("")}
     </div>

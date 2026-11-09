@@ -54,14 +54,19 @@ Import the parts and put them together:
 </script>
 
 <ui-alert-dialog>
-  <ui-alert-dialog-trigger><button>Delete Project</button></ui-alert-dialog-trigger>
+  <ui-alert-dialog-trigger
+    ><button>Delete Project</button></ui-alert-dialog-trigger
+  >
   <ui-alert-dialog-content hidden>
     <ui-alert-dialog-title>Delete this project?</ui-alert-dialog-title>
     <ui-alert-dialog-description
-      >The project and its files will be deleted for everyone.</ui-alert-dialog-description
+      >The project and its files will be deleted for
+      everyone.</ui-alert-dialog-description
     >
     <ui-alert-dialog-close><button>Cancel</button></ui-alert-dialog-close>
-    <ui-alert-dialog-close value="confirm"><button>Delete</button></ui-alert-dialog-close>
+    <ui-alert-dialog-close value="confirm"
+      ><button>Delete</button></ui-alert-dialog-close
+    >
   </ui-alert-dialog-content>
 </ui-alert-dialog>
 ```
@@ -76,7 +81,11 @@ import { createParts, wrappedButton } from "@ui-sdk/web"
 
 createParts(alertDialog, {
   root: "confirm-dialog",
-  trigger: { tag: "confirm-trigger", target: wrappedButton, display: "contents" },
+  trigger: {
+    tag: "confirm-trigger",
+    target: wrappedButton,
+    display: "contents",
+  },
   backdrop: "confirm-backdrop",
   content: "confirm-content",
   title: "confirm-title",
@@ -91,7 +100,9 @@ createParts(alertDialog, {
   <confirm-backdrop hidden></confirm-backdrop>
   <confirm-content hidden>
     <confirm-title>Delete this project?</confirm-title>
-    <confirm-description>This permanently deletes the project.</confirm-description>
+    <confirm-description
+      >This permanently deletes the project.</confirm-description
+    >
     <confirm-close><button>Cancel</button></confirm-close>
     <confirm-close value="confirm"><button>Delete</button></confirm-close>
   </confirm-content>
@@ -241,11 +252,17 @@ Alert Dialog shares [Dialog's](./dialog) options, except `modal`, `closeOnOutsid
 
 ### AlertDialog
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOptions" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogOptions"
+/>
 
 ### AlertDialogTrigger
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogTriggerProps"
+/>
 
 ### AlertDialogBackdrop
 
@@ -253,7 +270,10 @@ Dims the page behind the dialog. `<ui-alert-dialog-backdrop>` takes no attribute
 
 ### AlertDialogContent
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogContentProps"
+/>
 
 ### AlertDialogTitle
 
@@ -265,35 +285,56 @@ What happens if you agree. `<ui-alert-dialog-description>` is a paragraph, and t
 
 ### AlertDialogClose
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogCloseProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogCloseProps"
+/>
 
 ### AlertDialogShortcut
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogShortcutProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogShortcutProps"
+/>
 
 ### Confirm Options
 
 The shared `confirm()` function uses these options when a `ui-overlay-host` renders the question. See [Toasts and Confirms](../popups#toasts-and-confirms) for the host setup. With your own dialog, `createConfirm<Payload>()` accepts the payload you choose instead.
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="ConfirmOptions" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="ConfirmOptions"
+/>
 
 ### State
 
 `AlertDialogContent`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogContentState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogContentState"
+/>
 
 `AlertDialogClose`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogCloseState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogCloseState"
+/>
 
 `AlertDialogShortcut`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogShortcutState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogShortcutState"
+/>
 
 ### Reasons
 
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogOpenChangeReason"
+/>
 
 `payloadchange` fires before `openchange` when the dialog opens with another payload. Calling `controller.open({ payload })` on an open dialog updates the payload with the reason `imperative`.
 
@@ -306,7 +347,10 @@ The shared `confirm()` function uses these options when a `ui-overlay-host` rend
 
 Use `createAlertDialogController<Payload, Result>()` from `@ui-sdk/web/alert-dialog` for direct control. The root element's `api` property has the same methods. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
 
-<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogController" />
+<ControllerTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogController"
+/>
 
 ## Accessibility
 

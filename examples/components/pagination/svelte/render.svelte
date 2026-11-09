@@ -17,7 +17,10 @@
       <PaginationItem>
         <PaginationPrevious aria-label="Previous page">
           {#snippet render({ props, state: step })}
-            <button {...props} title={step.disabled ? undefined : `Go to page ${step.page}`}>
+            <button
+              {...props}
+              title={step.disabled ? undefined : `Go to page ${step.page}`}
+            >
               <ArrowLeftIcon aria-hidden="true" />
               {#if !step.disabled}
                 <span aria-hidden="true">{step.page}</span>
@@ -42,7 +45,10 @@
       <PaginationItem>
         <PaginationNext aria-label="Next page">
           {#snippet render({ props, state: step })}
-            <button {...props} title={step.disabled ? undefined : `Go to page ${step.page}`}>
+            <button
+              {...props}
+              title={step.disabled ? undefined : `Go to page ${step.page}`}
+            >
               {#if !step.disabled}
                 <span aria-hidden="true">{step.page}</span>
               {/if}

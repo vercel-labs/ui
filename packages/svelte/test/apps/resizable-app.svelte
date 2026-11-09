@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Resizable, ResizableHandle, ResizablePanel } from "../../src/resizable"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+  } from "../../src/resizable"
 </script>
 
 <Resizable autoSaveId="editor" orientation="vertical">

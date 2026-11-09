@@ -31,11 +31,16 @@ function DocsArticle({
         <article className="w-full xl:mx-auto xl:max-w-2xl min-[100rem]:max-w-3xl px-6 pt-8 pb-24 sm:px-8 lg:px-10 lg:pt-10">
           <header className="mb-10">
             {date && (
-              <time dateTime={date} className="mb-3 block text-[13px] text-subtle">
+              <time
+                dateTime={date}
+                className="mb-3 block text-[13px] text-subtle"
+              >
                 {pageDate(date)}
               </time>
             )}
-            <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">{title}</h1>
+            <h1 className="text-[28px] leading-tight font-medium tracking-[-0.02em] text-balance">
+              {title}
+            </h1>
             {description && (
               <p className="mt-3 text-[17px] leading-relaxed sm:text-[15px] text-pretty text-subtle">
                 {description}
@@ -44,7 +49,10 @@ function DocsArticle({
           </header>
           {children}
           {(previous || next) && (
-            <nav aria-label="Pages" className="mt-20 grid grid-cols-2 gap-4 border-t border-border/70 pt-6">
+            <nav
+              aria-label="Pages"
+              className="mt-20 grid grid-cols-2 gap-4 border-t border-border/70 pt-6"
+            >
               {previous ? (
                 <Link
                   href={previous.url}
@@ -64,7 +72,9 @@ function DocsArticle({
                   className="group flex flex-col items-end gap-1 rounded-md text-end text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/30"
                 >
                   <span className="text-[13px] text-subtle">Next</span>
-                  <span className="group-hover:underline group-hover:underline-offset-4">{next.name}</span>
+                  <span className="group-hover:underline group-hover:underline-offset-4">
+                    {next.name}
+                  </span>
                 </Link>
               )}
             </nav>

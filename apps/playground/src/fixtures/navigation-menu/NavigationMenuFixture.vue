@@ -30,10 +30,25 @@ function report(value: string | null, { reason }: ChangeDetails) {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <NavigationMenu v-bind="options" aria-label="Main" class="nav-menu" @value-change="report">
-      <NavigationMenuList :class="options.orientation === 'vertical' ? 'nav-list vertical' : 'nav-list'">
-        <NavigationMenuItem v-for="(item, index) in fixture.items" :key="item.value" :value="item.value">
-          <NavigationMenuTrigger class="nav-trigger">{{ item.trigger }}</NavigationMenuTrigger>
+    <NavigationMenu
+      v-bind="options"
+      aria-label="Main"
+      class="nav-menu"
+      @value-change="report"
+    >
+      <NavigationMenuList
+        :class="
+          options.orientation === 'vertical' ? 'nav-list vertical' : 'nav-list'
+        "
+      >
+        <NavigationMenuItem
+          v-for="(item, index) in fixture.items"
+          :key="item.value"
+          :value="item.value"
+        >
+          <NavigationMenuTrigger class="nav-trigger">{{
+            item.trigger
+          }}</NavigationMenuTrigger>
           <NavigationMenuContent
             :class="index === 0 ? 'nav-content' : 'nav-content narrow'"
             :keep-mounted="layout.keepMounted"
@@ -42,10 +57,15 @@ function report(value: string | null, { reason }: ChangeDetails) {
           >
             <ul>
               <li v-for="link in item.links" :key="link.href">
-                <NavigationMenuLink :href="link.href">{{ link.label }}</NavigationMenuLink>
+                <NavigationMenuLink :href="link.href">{{
+                  link.label
+                }}</NavigationMenuLink>
               </li>
             </ul>
-            <NavigationMenu v-if="index === 1 && layout.nested" orientation="vertical">
+            <NavigationMenu
+              v-if="index === 1 && layout.nested"
+              orientation="vertical"
+            >
               <NavigationMenuList class="nav-list vertical">
                 <NavigationMenuItem :value="fixture.nested.value">
                   <NavigationMenuTrigger class="nav-trigger">{{
@@ -54,7 +74,9 @@ function report(value: string | null, { reason }: ChangeDetails) {
                   <NavigationMenuContent class="nav-content narrow">
                     <ul>
                       <li v-for="link in fixture.nested.links" :key="link.href">
-                        <NavigationMenuLink :href="link.href">{{ link.label }}</NavigationMenuLink>
+                        <NavigationMenuLink :href="link.href">{{
+                          link.label
+                        }}</NavigationMenuLink>
                       </li>
                     </ul>
                   </NavigationMenuContent>
@@ -64,13 +86,20 @@ function report(value: string | null, { reason }: ChangeDetails) {
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <NavigationMenuLink class="nav-link" :href="fixture.link.href" current>{{
-            fixture.link.label
-          }}</NavigationMenuLink>
+          <NavigationMenuLink
+            class="nav-link"
+            :href="fixture.link.href"
+            current
+            >{{ fixture.link.label }}</NavigationMenuLink
+          >
         </NavigationMenuItem>
       </NavigationMenuList>
       <NavigationMenuIndicator class="nav-indicator" />
-      <NavigationMenuViewport v-if="layout.viewport" class="nav-viewport" v-bind="layout.placement" />
+      <NavigationMenuViewport
+        v-if="layout.viewport"
+        class="nav-viewport"
+        v-bind="layout.placement"
+      />
     </NavigationMenu>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>

@@ -31,7 +31,15 @@ An option. Pressing it selects it, or toggles it with `multiple`.
     key: key(),
     label: label ?? (typeof value === "string" ? value : undefined),
   }))
-  const item = useHandlePart(combobox, "item", () => ({ id: key(), value, label, keywords, disabled, index, group }))
+  const item = useHandlePart(combobox, "item", () => ({
+    id: key(),
+    value,
+    label,
+    keywords,
+    disabled,
+    index,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={item} props={rest} />

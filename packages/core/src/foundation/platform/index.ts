@@ -42,7 +42,18 @@ export {
   prefersReducedMotion,
   supportsTopLayer,
 } from "./platform"
-export { type Anchor, type PortalProps, position, type PositionOptions, type PositionProps } from "./position"
+export {
+  type Anchor,
+  type PortalProps,
+  position,
+  type PositionOptions,
+  type PositionProps,
+} from "./position"
 export { pressedScrollbar } from "./scrollbar"
 export { physicalSide, type PhysicalSide, type Side } from "./sides"
-export { enforceHidden, registerUninherited, setStyle, writeStyle } from "./style"
+export {
+  enforceHidden,
+  registerUninherited,
+  setStyle,
+  writeStyle,
+} from "./style"

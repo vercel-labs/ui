@@ -16,18 +16,32 @@
 
 <div class="fixture">
   <button>Before</button>
-  <Resizable class="resizable" onLayoutCommit={(layout) => (action = `layout:${layout.map(Math.round)}`)}>
-    <ResizablePanel defaultSize={30} collapsible minSize={10} class="resizable-panel" role="group" aria-label="Files">
+  <Resizable
+    class="resizable"
+    onLayoutCommit={(layout) => (action = `layout:${layout.map(Math.round)}`)}
+  >
+    <ResizablePanel
+      defaultSize={30}
+      collapsible
+      minSize={10}
+      class="resizable-panel"
+      role="group"
+      aria-label="Files"
+    >
       {#snippet children(state)}
         {#if count(state.collapsed)}
-          <span class="panel-state">{state.collapsed ? "Collapsed" : "Open"}</span>
+          <span class="panel-state"
+            >{state.collapsed ? "Collapsed" : "Open"}</span
+          >
         {/if}
       {/snippet}
     </ResizablePanel>
     <ResizableHandle aria-label="Resize files" class="resizable-handle">
       {#snippet render({ props, state })}
         <span {...props}>
-          <span class="handle-state">{state.dragging ? "dragging" : "idle"}</span>
+          <span class="handle-state"
+            >{state.dragging ? "dragging" : "idle"}</span
+          >
         </span>
       {/snippet}
     </ResizableHandle>

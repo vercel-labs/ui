@@ -29,7 +29,9 @@
       <MenuSubContent>
         <MenuItem value="find" shortcut="mod+f">Find…</MenuItem>
         <MenuItem value="find-next" shortcut="mod+g">Find next</MenuItem>
-        <MenuItem value="find-previous" shortcut="mod+shift+g">Find previous</MenuItem>
+        <MenuItem value="find-previous" shortcut="mod+shift+g"
+          >Find previous</MenuItem
+        >
       </MenuSubContent>
     </MenuSub>
     <MenuSub>

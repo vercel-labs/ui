@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { ScrollArea, ScrollAreaContent, ScrollAreaViewport } from "@ui-sdk/vue/scroll-area"
+import {
+  ScrollArea,
+  ScrollAreaContent,
+  ScrollAreaViewport,
+} from "@ui-sdk/vue/scroll-area"
 
 const messages = [
   { from: "Hollis Grant", subject: "Launch checklist for Thursday" },

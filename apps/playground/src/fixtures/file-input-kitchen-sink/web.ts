@@ -1,13 +1,21 @@
 import { createFileInputController } from "@ui-sdk/core/file-input"
 import type { UiFileInputElement } from "@ui-sdk/web"
 import { classes as c, renderShell } from "./shell"
-import { announcementFor, describe, sampleFile, validateName, type Variant } from "./variants"
+import {
+  announcementFor,
+  describe,
+  sampleFile,
+  validateName,
+  type Variant,
+} from "./variants"
 
 const attributes = (options: Record<string, unknown> = {}) =>
   Object.entries(options)
     .map(([key, value]) => {
       const name = key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
-      if (value === true) return ` ${name}`
+      if (value === true) {
+        return ` ${name}`
+      }
       return ` ${name}="${Array.isArray(value) ? value.join(",") : String(value)}"`
     })
     .join("")
@@ -61,18 +69,33 @@ async function mount(root: HTMLElement) {
       announcement: announcementFor(variant),
     })
     const controller = createFileInputController()
-    if (variant.controller) input.controller = controller
-    slot.querySelector("[data-add]")?.addEventListener("click", () => controller.addFiles([sampleFile()]))
-    slot.querySelector("[data-open]")?.addEventListener("click", () => controller.open())
-    slot.querySelector("[data-clear]")?.addEventListener("click", () => controller.clear())
-    for (const el of slot.querySelectorAll<UiFileInputElement>("ui-file-input")) {
+    if (variant.controller) {
+      input.controller = controller
+    }
+    slot
+      .querySelector("[data-add]")
+      ?.addEventListener("click", () => controller.addFiles([sampleFile()]))
+    slot
+      .querySelector("[data-open]")
+      ?.addEventListener("click", () => controller.open())
+    slot
+      .querySelector("[data-clear]")
+      ?.addEventListener("click", () => controller.clear())
+    for (const el of slot.querySelectorAll<UiFileInputElement>(
+      "ui-file-input"
+    )) {
       const prefix = el.hasAttribute("data-inner") ? "inner " : ""
       el.addEventListener("valuechange", (event) => {
-        if (event.target === el) log(`${prefix}${describe(event.detail)}`)
+        if (event.target === el) {
+          log(`${prefix}${describe(event.detail)}`)
+        }
       })
       el.addEventListener("reject", (event) => {
-        if (event.target === el)
-          log(`${prefix}${describe({ reason: event.detail.reason, rejected: event.detail.value })}`)
+        if (event.target === el) {
+          log(
+            `${prefix}${describe({ reason: event.detail.reason, rejected: event.detail.value })}`
+          )
+        }
       })
     }
   })

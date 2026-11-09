@@ -52,7 +52,9 @@ function Example() {
               </svg>
             </MenuSubTrigger>
             <MenuSubContent>
-              <For each={recent}>{(name) => <MenuItem value={name}>{name}</MenuItem>}</For>
+              <For each={recent}>
+                {(name) => <MenuItem value={name}>{name}</MenuItem>}
+              </For>
             </MenuSubContent>
           </MenuSub>
           <MenuSeparator />
@@ -73,7 +75,9 @@ function Example() {
             </MenuSubTrigger>
             <MenuSubContent>
               <For each={formats}>
-                {(format) => <MenuItem value={`Export as ${format}`}>{format}</MenuItem>}
+                {(format) => (
+                  <MenuItem value={`Export as ${format}`}>{format}</MenuItem>
+                )}
               </For>
             </MenuSubContent>
           </MenuSub>
@@ -108,7 +112,9 @@ function Example() {
         </MenuContent>
       </Menu>
       <Menu
-        onCheckedChange={(checked, details) => log(`${details.value} ${checked ? "on" : "off"}`)}
+        onCheckedChange={(checked, details) =>
+          log(`${details.value} ${checked ? "on" : "off"}`)
+        }
         onValueChange={(value) => log(`${value} appearance`)}
       >
         <MenuTrigger>View</MenuTrigger>

@@ -12,6 +12,19 @@ const button =
   "inline-flex h-8 items-center rounded-md bg-neutral-900 px-3 text-[13px] font-medium text-white"
 const label = "text-[13px] font-medium"
 const description = "text-xs text-neutral-500"
-const control = "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
+const control =
+  "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
 
-export { button, control, description, group, groupLabel, icon, indicator, item, label, root, separator }
+export {
+  button,
+  control,
+  description,
+  group,
+  groupLabel,
+  icon,
+  indicator,
+  item,
+  label,
+  root,
+  separator,
+}

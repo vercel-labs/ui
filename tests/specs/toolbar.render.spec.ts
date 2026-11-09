@@ -7,7 +7,10 @@ test.describe("custom rendering", () => {
     await open("toolbar-render")
   })
 
-  test("a button rendered as a span is still a button and roves", async ({ page, tab }) => {
+  test("a button rendered as a span is still a button and roves", async ({
+    page,
+    tab,
+  }) => {
     const span = page.getByRole("button", { name: "Span tool" })
     expect(await span.evaluate((el) => el.tagName)).toBe("SPAN")
     await page.getByRole("button", { name: "Before" }).focus()
@@ -29,20 +32,37 @@ test.describe("custom rendering", () => {
   })
 
   test("class names follow the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
-    await expect(page.getByRole("link", { name: "Old docs" })).toHaveClass(/is-disabled/)
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
+    await expect(page.getByRole("link", { name: "Old docs" })).toHaveClass(
+      /is-disabled/
+    )
   })
 
-  test("a separator rendered as a rule keeps its role and orientation", async ({ page }) => {
+  test("a separator rendered as a rule keeps its role and orientation", async ({
+    page,
+  }) => {
     const rule = page.getByRole("separator")
     expect(await rule.evaluate((el) => el.tagName)).toBe("HR")
     await expect(rule).toHaveAttribute("aria-orientation", "vertical")
   })
 
-  test("moving focus renders only the items whose tab stop moved", async ({ page, framework, tab }) => {
-    test.skip(!framework.startsWith("react"), "Only React parts render by the state they read.")
+  test("moving focus renders only the items whose tab stop moved", async ({
+    page,
+    framework,
+    tab,
+  }) => {
+    test.skip(
+      !framework.startsWith("react"),
+      "Only React parts render by the state they read."
+    )
     const renders = () =>
-      page.evaluate(() => ({ ...(window as unknown as { __renders: Record<string, number> }).__renders }))
+      page.evaluate(() => ({
+        ...(window as unknown as { __renders: Record<string, number> })
+          .__renders,
+      }))
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
     await page.keyboard.press("ArrowRight")

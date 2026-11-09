@@ -10,12 +10,15 @@ function onScrollbar(
     clientWidth: number
     clientHeight: number
     borders: { top: number; right: number; bottom: number; left: number }
-  },
+  }
 ) {
   const { x, y } = point
   const { borders } = box
   const inBorders =
-    x >= borders.left && x < box.width - borders.right && y >= borders.top && y < box.height - borders.bottom
+    x >= borders.left &&
+    x < box.width - borders.right &&
+    y >= borders.top &&
+    y < box.height - borders.bottom
   // The padding box. In right-to-left layouts, clientLeft includes a scrollbar on the left.
   const inPadding =
     x >= box.clientLeft &&
@@ -26,12 +29,20 @@ function onScrollbar(
 }
 
 function pressedScrollbar(event: PointerEvent, target: Node) {
-  if (!(target instanceof Element)) return false
+  if (!(target instanceof Element)) {
+    return false
+  }
   const doc = target.ownerDocument
   // The page's own scrollbar sits outside the root element's client area.
-  if (target === doc.documentElement)
-    return event.clientX >= target.clientWidth || event.clientY >= target.clientHeight
-  if (target.clientWidth === 0 && target.clientHeight === 0) return false
+  if (target === doc.documentElement) {
+    return (
+      event.clientX >= target.clientWidth ||
+      event.clientY >= target.clientHeight
+    )
+  }
+  if (target.clientWidth === 0 && target.clientHeight === 0) {
+    return false
+  }
   const rect = target.getBoundingClientRect()
   const style = getComputedStyle(target)
   return onScrollbar(
@@ -49,7 +60,7 @@ function pressedScrollbar(event: PointerEvent, target: Node) {
         bottom: parseFloat(style.borderBottomWidth) || 0,
         left: parseFloat(style.borderLeftWidth) || 0,
       },
-    },
+    }
   )
 }
 

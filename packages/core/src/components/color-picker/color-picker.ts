@@ -5,9 +5,16 @@ import type { Color } from "../../foundation/color/convert"
 import type { ColorFormat } from "../../foundation/color/format"
 import type { ColorGamut } from "../../foundation/color/gamut"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  CommitDetails,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { colorPickerApi, initialState, syncState } from "./color-picker-api"
 import type { ColorChannel, ColorPickerSpace } from "./color-picker-channels"
 import { colorPickerSlots } from "./color-picker-parts"
@@ -31,19 +38,21 @@ type ColorPickerValueChangeReason =
  * What `onValueChange` receives after the value.
  * @experimental
  */
-type ColorPickerValueChangeDetails = ChangeDetails<ColorPickerValueChangeReason> & {
-  /** The new value as a color, in the picker's space, ready for `@ui-sdk/core/color`. */
-  color: Color
-}
+type ColorPickerValueChangeDetails =
+  ChangeDetails<ColorPickerValueChangeReason> & {
+    /** The new value as a color, in the picker's space, ready for `@ui-sdk/core/color`. */
+    color: Color
+  }
 
 /**
  * What `onValueCommit` receives after the value.
  * @experimental
  */
-type ColorPickerValueCommitDetails = CommitDetails<ColorPickerValueChangeReason> & {
-  /** The value as a color, in the picker's space. */
-  color: Color
-}
+type ColorPickerValueCommitDetails =
+  CommitDetails<ColorPickerValueChangeReason> & {
+    /** The value as a color, in the picker's space. */
+    color: Color
+  }
 
 /**
  * Options for every write method on a controller.
@@ -85,9 +94,15 @@ type ColorPickerOptions = {
    */
   defaultValue?: string
   /** Runs while the value changes: on every step of a drag or a key. `details.color` is the color, and `details.cancel()` stops it. */
-  onValueChange?: (value: string, details: ColorPickerValueChangeDetails) => void
+  onValueChange?: (
+    value: string,
+    details: ColorPickerValueChangeDetails
+  ) => void
   /** Runs once an interaction that changed the value ends: the pointer lifts, a key is pressed, a swatch is picked. For saving. */
-  onValueCommit?: (value: string, details: ColorPickerValueCommitDetails) => void
+  onValueCommit?: (
+    value: string,
+    details: ColorPickerValueCommitDetails
+  ) => void
   /**
    * The space the parts edit in, which decides their channels: `"hsv"` has
    * hue, saturation and brightness, `"hsl"` hue, saturation and lightness,
@@ -232,7 +247,8 @@ const colorPickerPrimitive = /* @__PURE__ */ definePrimitive({
     onValueCommit: "callback",
     space: "string",
     format: "string",
-    gamut: (attribute) => (attribute === "false" ? false : (attribute ?? undefined)),
+    gamut: (attribute) =>
+      attribute === "false" ? false : (attribute ?? undefined),
     disabled: "boolean",
     readOnly: "boolean",
     required: "boolean",
@@ -284,4 +300,8 @@ export {
 }
 export type { ColorPickerApi } from "./color-picker-api"
 export type { ColorChannel, ColorPickerSpace } from "./color-picker-channels"
-export type { Color, ColorFormat, ColorGamut } from "../../foundation/color/color"
+export type {
+  Color,
+  ColorFormat,
+  ColorGamut,
+} from "../../foundation/color/color"

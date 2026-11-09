@@ -14,7 +14,9 @@ async function audit(page: Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations while closed", async ({ page, open }) => {
@@ -22,7 +24,10 @@ test("no axe violations while closed", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations while open with an item highlighted", async ({ page, open }) => {
+test("no axe violations while open with an item highlighted", async ({
+  page,
+  open,
+}) => {
   await open("trigger-menu")
   await field(page).focus()
   await page.keyboard.type("@a")
@@ -64,7 +69,10 @@ test("a textarea stays a textbox, without aria-expanded, and controls the list w
   await expect(field(page)).not.toHaveAttribute("role", /.*/)
 })
 
-test("an input is a combobox that says whether it's expanded", async ({ page, open }) => {
+test("an input is a combobox that says whether it's expanded", async ({
+  page,
+  open,
+}) => {
   await open("trigger-menu", { input: "" })
   const input = page.getByRole("combobox", { name: "Message" })
   await expect(input).toHaveAttribute("aria-expanded", "false")
@@ -73,21 +81,31 @@ test("an input is a combobox that says whether it's expanded", async ({ page, op
   await expect(input).toHaveAttribute("aria-expanded", "true")
 })
 
-test("aria-activedescendant waits for an arrow key and clears on the next edit", async ({ page, open }) => {
+test("aria-activedescendant waits for an arrow key and clears on the next edit", async ({
+  page,
+  open,
+}) => {
   await open("trigger-menu")
   await field(page).focus()
   await page.keyboard.type("@a")
   await expect(listbox(page)).toBeVisible()
-  await expect(page.locator('[role="option"][data-highlighted]')).toHaveText("Alice Smith")
+  await expect(page.locator('[role="option"][data-highlighted]')).toHaveText(
+    "Alice Smith"
+  )
   await expect(field(page)).not.toHaveAttribute("aria-activedescendant", /.*/)
   await page.keyboard.press("ArrowDown")
-  const id = await page.getByRole("option", { name: "Carol White" }).getAttribute("id")
+  const id = await page
+    .getByRole("option", { name: "Carol White" })
+    .getAttribute("id")
   await expect(field(page)).toHaveAttribute("aria-activedescendant", id!)
   await page.keyboard.type("r")
   await expect(field(page)).not.toHaveAttribute("aria-activedescendant", /.*/)
 })
 
-test("two menus on a page have their own ids, and the role never changes", async ({ page, open }) => {
+test("two menus on a page have their own ids, and the role never changes", async ({
+  page,
+  open,
+}) => {
   await open("trigger-menu", { twice: "" })
   const second = page.getByRole("textbox", { name: "Second" })
   await second.focus()
@@ -95,9 +113,14 @@ test("two menus on a page have their own ids, and the role never changes", async
   await page.keyboard.press("ArrowDown")
   const list = page.getByRole("listbox", { name: "Second" })
   await expect(list).toBeVisible()
-  const ids = await page.evaluate(() => [...document.querySelectorAll("[id]")].map((el) => el.id))
+  const ids = await page.evaluate(() =>
+    [...document.querySelectorAll("[id]")].map((el) => el.id)
+  )
   expect(new Set(ids).size).toBe(ids.length)
-  await expect(second).toHaveAttribute("aria-controls", (await list.getAttribute("id"))!)
+  await expect(second).toHaveAttribute(
+    "aria-controls",
+    (await list.getAttribute("id"))!
+  )
   await expect(field(page)).not.toHaveAttribute("aria-controls", /.*/)
 })
 
@@ -106,7 +129,10 @@ test("options are named by their text", async ({ page, open }) => {
   await field(page).focus()
   await page.keyboard.type("@")
   await expect(page.getByRole("option", { name: "José García" })).toBeVisible()
-  await expect(page.getByRole("option").first()).not.toHaveAttribute("aria-label", /.*/)
+  await expect(page.getByRole("option").first()).not.toHaveAttribute(
+    "aria-label",
+    /.*/
+  )
 })
 
 test("the status says the count and the keys once typing pauses, then that nothing matches", async ({
@@ -117,7 +143,9 @@ test("the status says the count and the keys once typing pauses, then that nothi
   const status = page.locator(".status")
   await field(page).focus()
   await page.keyboard.type("@a")
-  await expect(status).toHaveText(/^4 suggestions\. Up and Down to choose, Enter to insert\s?$/)
+  await expect(status).toHaveText(
+    /^4 suggestions\. Up and Down to choose, Enter to insert\s?$/
+  )
   await page.keyboard.type("zz")
   await expect(status).toHaveText(/^No matches\s?$/)
 })

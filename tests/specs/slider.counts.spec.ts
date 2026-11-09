@@ -29,7 +29,9 @@ test.describe("work per move in a slider with many thumbs", () => {
       report("slider.drag", n, result)
       const last = page.getByRole("slider", { name: `Thumb ${n}` })
       expect(Number(await last.inputValue())).toBeGreaterThan(850)
-      expectWithin(result, budget, { see: "See tests/perf/README.md#slider-drag." })
+      expectWithin(result, budget, {
+        see: "See tests/perf/README.md#slider-drag.",
+      })
     })
 
     test(`arrow keys on a thumb do no work that grows with the thumb count (n=${n})`, async ({
@@ -44,7 +46,9 @@ test.describe("work per move in a slider with many thumbs", () => {
       const result = await countKeys(page, "ArrowRight")
       report("slider.step-key", n, result)
       await expect(last).toHaveValue(String(start + 10))
-      expectWithin(result, budget, { see: "See tests/perf/README.md#slider-step-key." })
+      expectWithin(result, budget, {
+        see: "See tests/perf/README.md#slider-step-key.",
+      })
     })
   }
 })

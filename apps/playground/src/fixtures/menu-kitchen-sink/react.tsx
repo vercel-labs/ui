@@ -25,7 +25,8 @@ import type { Variant } from "./variants"
 // The variant's items as parts, the same way at every level.
 function Entries({ items, popup }: { items: MenuData; popup: string }) {
   return items.map((entry, index) => {
-    const item: MenuDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+    const item: MenuDataItem =
+      typeof entry === "string" ? { value: entry, label: entry } : entry
     switch (item.type) {
       case undefined:
       case "item":
@@ -43,11 +44,20 @@ function Entries({ items, popup }: { items: MenuData; popup: string }) {
           </MenuItem>
         )
       case "separator":
-        return <MenuSeparator key={`separator-${index}`} className={classes.separator} />
+        return (
+          <MenuSeparator
+            key={`separator-${index}`}
+            className={classes.separator}
+          />
+        )
       case "group":
         return (
           <MenuGroup key={`group-${index}`}>
-            {item.label && <MenuGroupLabel className={classes.groupLabel}>{item.label}</MenuGroupLabel>}
+            {item.label && (
+              <MenuGroupLabel className={classes.groupLabel}>
+                {item.label}
+              </MenuGroupLabel>
+            )}
             <Entries items={item.items} popup={popup} />
           </MenuGroup>
         )
@@ -62,7 +72,9 @@ function Entries({ items, popup }: { items: MenuData; popup: string }) {
             defaultChecked={item.defaultChecked}
             closeOnSelect={item.closeOnSelect}
           >
-            <MenuItemIndicator className={classes.indicator}>✓</MenuItemIndicator>
+            <MenuItemIndicator className={classes.indicator}>
+              ✓
+            </MenuItemIndicator>
             {item.label}
           </MenuCheckboxItem>
         )
@@ -74,7 +86,11 @@ function Entries({ items, popup }: { items: MenuData; popup: string }) {
             value={item.value}
             defaultValue={item.defaultValue}
           >
-            {item.label && <MenuGroupLabel className={classes.groupLabel}>{item.label}</MenuGroupLabel>}
+            {item.label && (
+              <MenuGroupLabel className={classes.groupLabel}>
+                {item.label}
+              </MenuGroupLabel>
+            )}
             {item.items.map((radio) => (
               <MenuRadioItem
                 key={radio.value}
@@ -82,7 +98,9 @@ function Entries({ items, popup }: { items: MenuData; popup: string }) {
                 value={radio.value}
                 disabled={radio.disabled}
               >
-                <MenuItemIndicator className={classes.indicator}>•</MenuItemIndicator>
+                <MenuItemIndicator className={classes.indicator}>
+                  •
+                </MenuItemIndicator>
                 {radio.label}
               </MenuRadioItem>
             ))}
@@ -115,7 +133,9 @@ function VariantMenu({ variant, env }: { variant: Variant; env: Env }) {
     container: env.container,
     ...(variant.controlled && { open }),
     onOpenChange: (next: boolean, details: { reason: string }) => {
-      if (variant.controlled) setOpen(next)
+      if (variant.controlled) {
+        setOpen(next)
+      }
       env.log(`openChange ${next} (${details.reason})`)
     },
     onAction: (value: string) => env.log(`action ${value}`),
@@ -124,15 +144,24 @@ function VariantMenu({ variant, env }: { variant: Variant; env: Env }) {
   return (
     <div className="flex items-center gap-3">
       {/* A data menu also knows its items, and reports its checkbox items and radio groups. */}
-      <Menu {...shared} items={variant.mode === "data" ? variant.items : undefined}>
-        <MenuTrigger className={classes.trigger}>{variant.trigger ?? "Open"}</MenuTrigger>
+      <Menu
+        {...shared}
+        items={variant.mode === "data" ? variant.items : undefined}
+      >
+        <MenuTrigger className={classes.trigger}>
+          {variant.trigger ?? "Open"}
+        </MenuTrigger>
         <MenuContent className={popup} {...variant.content}>
           <Entries items={variant.items} popup={popup} />
         </MenuContent>
       </Menu>
       {variant.controlled && (
         <label className="flex items-center gap-1.5 text-xs text-neutral-600">
-          <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={open}
+            onChange={(event) => setOpen(event.target.checked)}
+          />
           open
         </label>
       )}
@@ -145,8 +174,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantMenu variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

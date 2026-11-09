@@ -14,15 +14,28 @@ const tabsFixture = {
   label: "Settings",
   defaultValue: "account",
   tabs: [
-    { value: "account", label: "Account", content: "Manage your account details." },
-    { value: "password", label: "Password", content: "Change your password.", field: "Current password" },
+    {
+      value: "account",
+      label: "Account",
+      content: "Manage your account details.",
+    },
+    {
+      value: "password",
+      label: "Password",
+      content: "Change your password.",
+      field: "Current password",
+    },
     {
       value: "billing",
       label: "Billing",
       content: "Billing is managed by your organization.",
       disabled: true,
     },
-    { value: "notifications", label: "Notifications", content: "Choose what we email you about." },
+    {
+      value: "notifications",
+      label: "Notifications",
+      content: "Choose what we email you about.",
+    },
   ] satisfies TabsFixtureTab[] as TabsFixtureTab[],
 }
 

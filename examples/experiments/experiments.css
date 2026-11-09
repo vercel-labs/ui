@@ -178,7 +178,8 @@
       border-radius: var(--radius-surface);
       background-color: var(--surface-1);
       background-image: radial-gradient(var(--line-faint) 1px, transparent 1px);
-      background-size: calc(16px * var(--canvas-zoom)) calc(16px * var(--canvas-zoom));
+      background-size: calc(16px * var(--canvas-zoom))
+        calc(16px * var(--canvas-zoom));
       box-shadow: var(--shadow-1);
       cursor: grab;
 
@@ -508,7 +509,16 @@
     & [data-slot="slider-track"] {
       height: 12px;
       border-radius: 999px;
-      background: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+      background: linear-gradient(
+        to right,
+        #f00,
+        #ff0,
+        #0f0,
+        #0ff,
+        #00f,
+        #f0f,
+        #f00
+      );
     }
 
     & > [data-slot="row"] {
@@ -905,7 +915,8 @@
 
     & [data-slot="desktop-photo"] {
       border-radius: 6px;
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 12%, transparent);
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 12%, transparent);
     }
 
     & [data-slot="desktop-progress"] {
@@ -955,19 +966,35 @@
         height: 12px;
       }
 
-      &:is([data-resize-handle="n"], [data-resize-handle="ne"], [data-resize-handle="nw"]) {
+      &:is(
+        [data-resize-handle="n"],
+        [data-resize-handle="ne"],
+        [data-resize-handle="nw"]
+      ) {
         top: 0;
       }
 
-      &:is([data-resize-handle="s"], [data-resize-handle="se"], [data-resize-handle="sw"]) {
+      &:is(
+        [data-resize-handle="s"],
+        [data-resize-handle="se"],
+        [data-resize-handle="sw"]
+      ) {
         bottom: 0;
       }
 
-      &:is([data-resize-handle="e"], [data-resize-handle="ne"], [data-resize-handle="se"]) {
+      &:is(
+        [data-resize-handle="e"],
+        [data-resize-handle="ne"],
+        [data-resize-handle="se"]
+      ) {
         right: 0;
       }
 
-      &:is([data-resize-handle="w"], [data-resize-handle="nw"], [data-resize-handle="sw"]) {
+      &:is(
+        [data-resize-handle="w"],
+        [data-resize-handle="nw"],
+        [data-resize-handle="sw"]
+      ) {
         left: 0;
       }
 
@@ -1135,19 +1162,35 @@
       border-radius: 999px;
     }
 
-    &:is([data-resize-handle="n"], [data-resize-handle="ne"], [data-resize-handle="nw"]) {
+    &:is(
+      [data-resize-handle="n"],
+      [data-resize-handle="ne"],
+      [data-resize-handle="nw"]
+    ) {
       top: 0;
     }
 
-    &:is([data-resize-handle="s"], [data-resize-handle="se"], [data-resize-handle="sw"]) {
+    &:is(
+      [data-resize-handle="s"],
+      [data-resize-handle="se"],
+      [data-resize-handle="sw"]
+    ) {
       top: 100%;
     }
 
-    &:is([data-resize-handle="w"], [data-resize-handle="nw"], [data-resize-handle="sw"]) {
+    &:is(
+      [data-resize-handle="w"],
+      [data-resize-handle="nw"],
+      [data-resize-handle="sw"]
+    ) {
       left: 0;
     }
 
-    &:is([data-resize-handle="e"], [data-resize-handle="ne"], [data-resize-handle="se"]) {
+    &:is(
+      [data-resize-handle="e"],
+      [data-resize-handle="ne"],
+      [data-resize-handle="se"]
+    ) {
       left: 100%;
     }
   }
@@ -1204,7 +1247,8 @@
       transition: opacity 0s calc(var(--duration) * 3);
       pointer-events: none;
 
-      [data-slot="inbox-message"]:has([data-swipe="start"]) > &[data-show="start"],
+      [data-slot="inbox-message"]:has([data-swipe="start"])
+        > &[data-show="start"],
       [data-slot="inbox-message"]:has([data-swipe="end"]) > &[data-show="end"] {
         opacity: 1;
         transition-delay: 0s;
@@ -1232,7 +1276,8 @@
       font-weight: 500;
 
       & + & {
-        border-inline-start: 1px solid color-mix(in oklab, var(--paper) 30%, var(--ink));
+        border-inline-start: 1px solid
+          color-mix(in oklab, var(--paper) 30%, var(--ink));
       }
 
       &:focus-visible {
@@ -1865,7 +1910,8 @@
 
     &[data-source="agent"][data-applied] {
       background-color: color-mix(in oklab, var(--ink) 45%, var(--surface-1));
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &[data-reverted] {

@@ -1,4 +1,7 @@
-import { createScrollAreaController, type ScrollAreaController } from "@ui-sdk/core/scroll-area"
+import {
+  createScrollAreaController,
+  type ScrollAreaController,
+} from "@ui-sdk/core/scroll-area"
 import * as classes from "./classes"
 import {
   fadeBottom,
@@ -15,7 +18,10 @@ import { fillContent, type Variant } from "./variants"
 // Options as attributes.
 function attributes(options: Variant["options"]) {
   return Object.entries(options)
-    .map(([name, value]) => ` ${name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)}="${value}"`)
+    .map(
+      ([name, value]) =>
+        ` ${name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)}="${value}"`
+    )
     .join("")
 }
 
@@ -42,7 +48,9 @@ async function mount(root: HTMLElement) {
   kitchenSink(root, "web", (slot, variant, env) => {
     slot.innerHTML = markup(variant)
     // Set as a property before the element upgrades, which happens once the card is in the page.
-    const area = slot.firstElementChild as HTMLElement & { controller?: ScrollAreaController }
+    const area = slot.firstElementChild as HTMLElement & {
+      controller?: ScrollAreaController
+    }
     const controller = createScrollAreaController()
     area.controller = controller
     const content = slot.querySelector<HTMLElement>("ui-scroll-area-content")!

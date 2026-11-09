@@ -9,7 +9,12 @@ import {
 import { omit } from "solid-js"
 import { joinField, useFieldControl } from "./field-context"
 import { controlProps, elementProps, type Native } from "./text-control"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const groupParts = createParts(inputGroup, { clear: "button" })
 
@@ -26,14 +31,27 @@ function Input(props: InputOptions & Native<"input", InputState>) {
     controller: props.controller,
     debug: props.debug,
   }))
-  const rest = omit(props, "value", "defaultValue", "onValueChange", "controller", "debug")
+  const rest = omit(
+    props,
+    "value",
+    "defaultValue",
+    "onValueChange",
+    "controller",
+    "debug"
+  )
   const element = elementProps(
     rest,
     field,
     () => props.value,
-    () => props.defaultValue,
+    () => props.defaultValue
   )
-  return usePart(input, "root", controlProps(props, field), joinField(field, element, "input"), "input")
+  return usePart(
+    input,
+    "root",
+    controlProps(props, field),
+    joinField(field, element, "input"),
+    "input"
+  )
 }
 
 /**
@@ -41,7 +59,9 @@ function Input(props: InputOptions & Native<"input", InputState>) {
  * on its text and icons focus the field.
  * @stable
  */
-function InputGroup(props: InputGroupOptions & PartProps<"div", InputGroupState>) {
+function InputGroup(
+  props: InputGroupOptions & PartProps<"div", InputGroupState>
+) {
   const group = usePrimitive(inputGroup, () => ({ debug: props.debug }))
   return usePart(group, "group", undefined, omit(props, "debug"), "div")
 }

@@ -20,7 +20,11 @@ export function Example() {
         </div>
         <AutocompleteContent>
           <AutocompleteList>
-            <For each={cities}>{(city) => <AutocompleteItem value={city}>{city}</AutocompleteItem>}</For>
+            <For each={cities}>
+              {(city) => (
+                <AutocompleteItem value={city}>{city}</AutocompleteItem>
+              )}
+            </For>
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>

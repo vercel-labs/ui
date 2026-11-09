@@ -18,7 +18,11 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -45,7 +49,7 @@ function mount(root: HTMLElement) {
                   <ui-combobox-item-text>${country.label}</ui-combobox-item-text>
                   <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                 </ui-combobox-item>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>

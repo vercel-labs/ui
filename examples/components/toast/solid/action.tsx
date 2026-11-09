@@ -1,4 +1,11 @@
-import { Toast, ToastAction, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import {
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -26,7 +33,11 @@ function Example() {
         {(item) => (
           <Toast>
             <ToastTitle />
-            {item.cancel && <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>}
+            {item.cancel && (
+              <ToastClose action={item.cancel.onCancel}>
+                {item.cancel.label}
+              </ToastClose>
+            )}
             <ToastAction data-variant="solid" />
           </Toast>
         )}

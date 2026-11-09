@@ -17,7 +17,8 @@ These helpers are available from `@ui-sdk/core`. You can use them inside a primi
 import { bindViewport } from "@ui-sdk/core"
 
 const stop = bindViewport(document.documentElement, {
-  onChange: (viewport) => console.log(viewport.keyboard, viewport.safeArea.bottom),
+  onChange: (viewport) =>
+    console.log(viewport.keyboard, viewport.safeArea.bottom),
 })
 ```
 
@@ -46,7 +47,10 @@ iOS zooms into a field whose text is smaller than 16 pixels when it takes focus.
 `viewport.safeArea` holds the insets around a notch, rounded corners or a home indicator, as numbers for script. In CSS, use `env(safe-area-inset-bottom)` directly. Both are 0 unless the page draws under them with `viewport-fit=cover`:
 
 ```html
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+/>
 ```
 
 The keyboard covers the home indicator, but iOS still reports its inset while the keyboard is open. Drop bottom padding then:

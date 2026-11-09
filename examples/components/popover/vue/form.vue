@@ -16,7 +16,9 @@ const log = useLog()
 const open = ref(false)
 
 function onSubmit(event: Event) {
-  log(`Saved ${new FormData(event.currentTarget as HTMLFormElement).get("name")}`)
+  log(
+    `Saved ${new FormData(event.currentTarget as HTMLFormElement).get("name")}`
+  )
   open.value = false
 }
 </script>

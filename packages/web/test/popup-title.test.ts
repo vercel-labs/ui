@@ -5,7 +5,9 @@ import { defineDialogElements } from "../src/dialog"
 import { definePopoverElements } from "../src/popover"
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   defineDialogElements()
   definePopoverElements()
 })

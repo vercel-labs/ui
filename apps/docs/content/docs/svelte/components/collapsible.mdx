@@ -34,7 +34,11 @@ Import the parts and put them together:
 
 ```svelte
 <script lang="ts">
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "@ui-sdk/svelte/collapsible"
 </script>
 
 <Collapsible>
@@ -187,7 +191,10 @@ Props and callbacks are the same as below, as Svelte props. `open` can be bound 
 
 ### Collapsible
 
-<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleOptions"
+/>
 
 ### CollapsibleTrigger
 
@@ -205,7 +212,10 @@ The trigger takes no options of its own, only the props of the element it render
 What `render` and `children` snippets receive. The trigger and the panel receive the same state as the
 collapsible.
 
-<StateTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleState" />
+<StateTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleState"
+/>
 
 ### Reasons
 
@@ -252,7 +262,10 @@ Closing a panel while focus is inside it moves focus back to the trigger.
 
 ### Tested Behavior
 
-<SpecList spec="collapsible" only={["opening and closing", "keyboard", "mounting"]} />
+<SpecList
+  spec="collapsible"
+  only={["opening and closing", "keyboard", "mounting"]}
+/>
 
 Beyond the pattern's baseline:
 

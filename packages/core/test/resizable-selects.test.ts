@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest"
-import { createResizableController, resizable } from "../src/components/resizable/resizable"
+import {
+  createResizableController,
+  resizable,
+} from "../src/components/resizable/resizable"
 import { handleBounds } from "../src/components/resizable/resizable-layout"
 import { expectNoMissedUpdates, fakeElement, type Part } from "./selects"
 import { attrs, liveAttrs, subscribe } from "../src/foundation/kernel/part"
@@ -13,7 +16,8 @@ import { kept } from "./kept"
 // tracking every handle registers with. Frames run at once.
 function fakeDocument() {
   const listeners: Record<string, (event: unknown) => void> = {}
-  const listen = (type: string, listener: (event: unknown) => void) => (listeners[type] = listener)
+  const listen = (type: string, listener: (event: unknown) => void) =>
+    (listeners[type] = listener)
   const doc = {
     addEventListener: listen,
     removeEventListener() {},
@@ -31,7 +35,12 @@ function fakeDocument() {
   return {
     doc,
     hover: (x: number) =>
-      listeners.pointermove({ clientX: x, clientY: 50, pointerType: "mouse", buttons: 0 }),
+      listeners.pointermove({
+        clientX: x,
+        clientY: 50,
+        pointerType: "mouse",
+        buttons: 0,
+      }),
     leave: () => listeners.pointerleave({}),
   }
 }
@@ -40,17 +49,30 @@ function fakeDocument() {
 function handleElement(index: number, x: number, doc: unknown) {
   return Object.assign(fakeElement(index, "DIV"), {
     ownerDocument: doc,
-    getBoundingClientRect: () => ({ left: x, right: x, top: 0, bottom: 100, width: 0, height: 100 }),
+    getBoundingClientRect: () => ({
+      left: x,
+      right: x,
+      top: 0,
+      bottom: 100,
+      width: 0,
+      height: 100,
+    }),
   })
 }
 
-function group(options: Parameters<typeof resizable>[0], count: number, instance = resizable(options)) {
+function group(
+  options: Parameters<typeof resizable>[0],
+  count: number,
+  instance = resizable(options)
+) {
   const ids = Array.from({ length: count }, (_, index) => `p${index}`)
   instance.api.internal.setPanels(
     ids,
-    ids.map((_, index) => (index === 1 ? { minSize: 10, maxSize: 60 } : {})),
+    ids.map((_, index) => (index === 1 ? { minSize: 10, maxSize: 60 } : {}))
   )
-  instance.api.internal.setHandles(Object.fromEntries(ids.slice(1).map((_, index) => [`h${index}`, index])))
+  instance.api.internal.setHandles(
+    Object.fromEntries(ids.slice(1).map((_, index) => [`h${index}`, index]))
+  )
   instance.api.internal.setSpace(1000)
   return { instance, ids }
 }
@@ -66,8 +88,8 @@ describe("resizable panels and handles select on what they show", () => {
     const unbind = [0, 1, 2].map((index) =>
       api.internal.bindHandle(
         handleElement(index, (index + 1) * 250, doc),
-        instance.part("handle", { id: `h${index}` }),
-      ),
+        instance.part("handle", { id: `h${index}` })
+      )
     )
     // Binding reads the page's panels a microtask later. There are none, so
     // the test sets them after.
@@ -75,22 +97,34 @@ describe("resizable panels and handles select on what they show", () => {
     group(options, 4, instance)
     const parts: Part[] = [
       { slot: "root", props: {} },
-      ...["p0", "p1", "p2", "p3"].map((id) => ({ slot: "panel", props: { id } })),
+      ...["p0", "p1", "p2", "p3"].map((id) => ({
+        slot: "panel",
+        props: { id },
+      })),
       { slot: "panel", props: { id: "gone" } },
       { slot: "handle", props: { id: "h0" } },
       { slot: "handle", props: { id: "h1" } },
       { slot: "handle", props: { id: "h2", disabled: true } },
     ]
-    for (const part of parts) attrs((instance as PrimitiveInstance).part(part.slot, part.props))
-    const key = (name: string) => ({ key: name, shiftKey: false, preventDefault() {} }) as KeyboardEvent
+    for (const part of parts) {
+      attrs((instance as PrimitiveInstance).part(part.slot, part.props))
+    }
+    const key = (name: string) =>
+      ({ key: name, shiftKey: false, preventDefault() {} }) as KeyboardEvent
     const heard = await expectNoMissedUpdates(instance, parts, [
       ["start a drag", () => api.internal.startDrag(0, "h0")],
       ["drag", () => api.internal.dragBy(5)],
       ["drag further", () => api.internal.dragBy(10)],
       ["drag back past the start", () => api.internal.dragBy(-20)],
       ["end the drag", () => api.internal.endDrag()],
-      ["an arrow key", () => api.internal.keydown(key("ArrowRight"), "h1", {} as HTMLElement)],
-      ["Home", () => api.internal.keydown(key("Home"), "h1", {} as HTMLElement)],
+      [
+        "an arrow key",
+        () => api.internal.keydown(key("ArrowRight"), "h1", {} as HTMLElement),
+      ],
+      [
+        "Home",
+        () => api.internal.keydown(key("Home"), "h1", {} as HTMLElement),
+      ],
       ["the key comes up", () => api.internal.commitKeys()],
       ["hover a handle", () => hover(250)],
       ["hover another handle", () => hover(500)],
@@ -101,11 +135,17 @@ describe("resizable panels and handles select on what they show", () => {
       [
         "a panel can collapse",
         () =>
-          api.internal.setPanels(["p0", "p1", "p2", "p3"], [{ minSize: 20, collapsible: true }, {}, {}, {}]),
+          api.internal.setPanels(
+            ["p0", "p1", "p2", "p3"],
+            [{ minSize: 20, collapsible: true }, {}, {}, {}]
+          ),
       ],
       ["collapse it", () => controller.collapse("p0")],
       ["expand it", () => controller.expand("p0")],
-      ["Enter collapses it", () => api.internal.keydown(key("Enter"), "h0", {} as HTMLElement)],
+      [
+        "Enter collapses it",
+        () => api.internal.keydown(key("Enter"), "h0", {} as HTMLElement),
+      ],
       [
         "drag it open",
         () => {
@@ -114,14 +154,27 @@ describe("resizable panels and handles select on what they show", () => {
           api.internal.endDrag()
         },
       ],
-      ["vertical", () => instance.setOptions({ ...options, orientation: "vertical" })],
+      [
+        "vertical",
+        () => instance.setOptions({ ...options, orientation: "vertical" }),
+      ],
       [
         "a panel changes its bounds",
-        () => api.internal.setPanels(["p0", "p1", "p2", "p3"], [{ maxSize: 20 }, {}, {}, {}]),
+        () =>
+          api.internal.setPanels(
+            ["p0", "p1", "p2", "p3"],
+            [{ maxSize: 20 }, {}, {}, {}]
+          ),
       ],
-      ["a panel leaves", () => api.internal.setPanels(["p0", "p1", "p3"], [{}, {}, {}])],
+      [
+        "a panel leaves",
+        () => api.internal.setPanels(["p0", "p1", "p3"], [{}, {}, {}]),
+      ],
       ["the handles follow", () => api.internal.setHandles({ h0: 0, h1: 1 })],
-      ["disable the group", () => instance.setOptions({ ...options, disabled: true })],
+      [
+        "disable the group",
+        () => instance.setOptions({ ...options, disabled: true }),
+      ],
     ])
     // The two panels beside the handle, the two handles whose values moved, and the root.
     expect(heard["drag"]).toBe(5)
@@ -136,8 +189,8 @@ describe("resizable panels and handles select on what they show", () => {
     const unbind = [0, 1].map((index) =>
       instance.api.internal.bindHandle(
         handleElement(index, (index + 1) * 300, doc),
-        instance.part("handle", { id: `h${index}` }),
-      ),
+        instance.part("handle", { id: `h${index}` })
+      )
     )
     await Promise.resolve()
     group({ id: "g" }, 3, instance)
@@ -150,7 +203,10 @@ describe("resizable panels and handles select on what they show", () => {
     hover(300)
     const { layout, constraints } = instance.get()
     const max = instance.api.internal.handleValue("h0")!.max
-    expect(max).toBeCloseTo(handleBounds(layout, constraints, 0, [false, true]).max, 9)
+    expect(max).toBeCloseTo(
+      handleBounds(layout, constraints, 0, [false, true]).max,
+      9
+    )
     expect(max).toBeLessThan(free)
     unbind.forEach((cleanup) => cleanup?.())
   })
@@ -169,7 +225,9 @@ describe("resizable panels and handles select on what they show", () => {
       // Each handle writes its live attributes on every change it hears, as a bound one does.
       for (const props of handles) {
         attrs(instance.part("handle", props))
-        subscribe(instance.part("handle", props), () => liveAttrs(instance.part("handle", props)))
+        subscribe(instance.part("handle", props), () =>
+          liveAttrs(instance.part("handle", props))
+        )
       }
       instance.api.internal.startDrag(0, "h0")
       reads.count = 0

@@ -9,7 +9,9 @@ const pager = definePrimitive({
   state: () => ({ page: 1 }),
   api: (context) => {
     const go = (by: number) =>
-      context.store.set({ page: Math.min(5, Math.max(1, context.store.get().page + by)) })
+      context.store.set({
+        page: Math.min(5, Math.max(1, context.store.get().page + by)),
+      })
     return {
       keydown(event: KeyboardEvent, el: HTMLElement) {
         const forward = isRTL(el) ? "ArrowLeft" : "ArrowRight"
@@ -50,7 +52,11 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={rtl} onChange={(event) => setRtl(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={rtl}
+            onChange={(event) => setRtl(event.target.checked)}
+          />
           Right to left
         </label>
       </div>
@@ -59,16 +65,24 @@ function Example() {
           <>
             <span data-slot="hint">Page {page} of 5</span>
             <span aria-hidden data-slot="pager-pages">
-              {Array.from({ length: 5 }, (_, index) => index + 1).map((number) => (
-                <span key={number} data-slot="pager-page" data-active={number === page ? "" : undefined}>
-                  {number}
-                </span>
-              ))}
+              {Array.from({ length: 5 }, (_, index) => index + 1).map(
+                (number) => (
+                  <span
+                    key={number}
+                    data-slot="pager-page"
+                    data-active={number === page ? "" : undefined}
+                  >
+                    {number}
+                  </span>
+                )
+              )}
             </span>
           </>
         )}
       </Pager>
-      <p data-slot="hint">Next page: {rtl ? "← Left arrow" : "→ Right arrow"}</p>
+      <p data-slot="hint">
+        Next page: {rtl ? "← Left arrow" : "→ Right arrow"}
+      </p>
     </div>
   )
 }

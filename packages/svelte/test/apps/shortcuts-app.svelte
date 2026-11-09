@@ -1,11 +1,14 @@
 <script lang="ts">
   import { useShortcut, useShortcutHint } from "../../src/shortcuts"
 
-  let { keys = "mod+k", onPress }: { keys?: string | null; onPress: () => void } = $props()
+  let {
+    keys = "mod+k",
+    onPress,
+  }: { keys?: string | null; onPress: () => void } = $props()
 
   useShortcut(
     () => keys,
-    () => onPress(),
+    () => onPress()
   )
   const hint = useShortcutHint("mod+k")
 </script>

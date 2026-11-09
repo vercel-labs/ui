@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/vue/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/vue/slider"
 
 const channels = [
   { label: "Bass", value: 50 },

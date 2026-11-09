@@ -6,7 +6,6 @@
     { value: "week", label: "שבוע" },
     { value: "month", label: "חודש" },
   ]
-
 </script>
 
 <div dir="rtl">

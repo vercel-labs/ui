@@ -64,10 +64,15 @@ function errorState(state: FieldStore, api: FieldApi) {
 // field shows as invalid, and a validity flag only while the browser's own
 // validation reports that problem.
 function errorShown(state: FieldStore, api: FieldApi, props: FieldErrorProps) {
-  if (typeof props.match === "boolean") return props.match
-  if (api.disabled() || !api.shown() || !api.invalid()) return false
-  if (typeof props.match === "string")
+  if (typeof props.match === "boolean") {
+    return props.match
+  }
+  if (api.disabled() || !api.shown() || !api.invalid()) {
+    return false
+  }
+  if (typeof props.match === "string") {
     return state.external === undefined && !!state.validity.flags[props.match]
+  }
   return true
 }
 
@@ -77,7 +82,9 @@ function errorShown(state: FieldStore, api: FieldApi, props: FieldErrorProps) {
 // and the first render then agree, and binding replaces them with the parts
 // in the page.
 function references(state: FieldStore, api: FieldApi) {
-  if (state.bound) return state
+  if (state.bound) {
+    return state
+  }
   return {
     labels: [`${api.id}-label`],
     descriptions: [`${api.id}-description`],
@@ -91,11 +98,13 @@ function controlAttrs(
   state: FieldStore,
   api: FieldApi,
   props: { id?: string; describedBy?: string },
-  fallback: string,
+  fallback: string
 ) {
   const { invalid } = fieldState(state, api)
   const { labels, descriptions, errors } = references(state, api)
-  const described = [props.describedBy, ...descriptions, ...errors].filter(Boolean)
+  const described = [props.describedBy, ...descriptions, ...errors].filter(
+    Boolean
+  )
   const id = props.id ?? fallback
   // A button's own text says what it does, like "Browse files", so it follows the label.
   const named = state.namedByContent && labels.length ? [...labels, id] : labels
@@ -113,7 +122,11 @@ function controlAttrs(
 
 // Without a control part, like in custom elements or around a plain input, the
 // field finds its control in `root` and writes its attributes itself. Returns a cleanup.
-function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldStore>) {
+function bindFoundControl(
+  root: HTMLElement,
+  api: FieldApi,
+  store: Store<FieldStore>
+) {
   let current: HTMLElement | undefined
   // Only attributes the field wrote are its to remove. The rest are the control's own.
   let written = new Map<string, string>()
@@ -127,7 +140,9 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
   const write = () => {
     const control = current
     // A control moved out, maybe into another field, is no longer this one's to write.
-    if (!control || !root.contains(control) || api.internal.hasControlPart()) return
+    if (!control || !root.contains(control) || api.internal.hasControlPart()) {
+      return
+    }
     const state = store.get()
     const describedBy = (control.getAttribute("aria-describedby") ?? "")
       .split(/\s+/)
@@ -138,14 +153,16 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
       state,
       api,
       { id: control.id, describedBy },
-      fieldControlId(api.id),
+      fieldControlId(api.id)
     )
     const { descriptions, errors } = references(state, api)
     added = new Set([...descriptions, ...errors])
     const next = new Map<string, string>()
     for (const [name, value] of Object.entries(attrs)) {
       if (value === undefined) {
-        if (written.has(name)) control.removeAttribute(name)
+        if (written.has(name)) {
+          control.removeAttribute(name)
+        }
         continue
       }
       const current = control.getAttribute(name)
@@ -155,10 +172,13 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
         current !== null &&
         current !== written.get(name) &&
         !madeLabel(current)
-      )
+      ) {
         continue
+      }
       next.set(name, value)
-      if (current !== value) control.setAttribute(name, value)
+      if (current !== value) {
+        control.setAttribute(name, value)
+      }
     }
     written = next
     // The field's name goes to a control that has none, so it submits: the
@@ -168,14 +188,21 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     const name = state.name
     const named = submitterOf(control, root)
     const own = named?.getAttribute("name")
-    if (!named || (own != null && (gave?.el !== named || own !== gave.name))) return
-    if (name) named.setAttribute("name", name)
-    else if (own != null) named.removeAttribute("name")
+    if (!named || (own != null && (gave?.el !== named || own !== gave.name))) {
+      return
+    }
+    if (name) {
+      named.setAttribute("name", name)
+    } else if (own != null) {
+      named.removeAttribute("name")
+    }
     gave = { el: named, name }
   }
   // Labels point at the control's id, or one the field gives it when it has none.
   const adopt = (control: HTMLElement) => {
-    if (!control.id) control.id = fieldControlId(api.id)
+    if (!control.id) {
+      control.id = fieldControlId(api.id)
+    }
     api.internal.adopt(control)
   }
   // The control's component rewriting its own description drops the field's, so
@@ -184,15 +211,24 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     typeof MutationObserver === "undefined"
       ? undefined
       : new MutationObserver((records) => {
-          if (current && records.some((record) => record.attributeName === "id")) adopt(current)
+          if (
+            current &&
+            records.some((record) => record.attributeName === "id")
+          ) {
+            adopt(current)
+          }
           write()
         })
   const find = () => {
     // Vue binds the root before a control part inside it, which then wires
     // itself. Writing here too would name its inner input, which submits twice.
-    if (api.internal.hasControlPart()) return
+    if (api.internal.hasControlPart()) {
+      return
+    }
     const next = api.control()
-    if (next === current || next === undefined) return
+    if (next === current || next === undefined) {
+      return
+    }
     current = next
     added = new Set()
     adopt(next)
@@ -205,7 +241,10 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
     find()
     write()
   })
-  const observer = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(find)
+  const observer =
+    typeof MutationObserver === "undefined"
+      ? undefined
+      : new MutationObserver(find)
   observer?.observe(root, { childList: true, subtree: true })
   return () => {
     unsubscribe()
@@ -217,9 +256,24 @@ function bindFoundControl(root: HTMLElement, api: FieldApi, store: Store<FieldSt
 // The element that submits for a control: a form-associated element around
 // it inside the field, or the control itself.
 function submitterOf(control: HTMLElement, root: HTMLElement) {
-  for (let node: HTMLElement | null = control; node && node !== root; node = node.parentElement)
-    if (formInternals(node)) return node
+  for (
+    let node: HTMLElement | null = control;
+    node && node !== root;
+    node = node.parentElement
+  ) {
+    if (formInternals(node)) {
+      return node
+    }
+  }
   return control.matches("input, select, textarea") ? control : undefined
 }
 
-export { bindFoundControl, controlAttrs, dataAttrs, errorShown, errorState, fieldState, type FieldStore }
+export {
+  bindFoundControl,
+  controlAttrs,
+  dataAttrs,
+  errorShown,
+  errorState,
+  fieldState,
+  type FieldStore,
+}

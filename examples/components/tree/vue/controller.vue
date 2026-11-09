@@ -41,11 +41,14 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, children }) =>
     h(TreeItem, { key: value, value }, () => [
       h(TreeItemLabel, {}, () => [
-        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        children &&
+          h(TreeItemIndicator, {}, () =>
+            h(ChevronRightIcon, { "aria-hidden": "true" })
+          ),
         label,
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
-    ]),
+    ])
   )
 
 const settings = createTreeController()
@@ -60,7 +63,9 @@ function findTwoFactor() {
   <div data-slot="stack">
     <div data-slot="controls">
       <button type="button" @click="settings.expandAll()">Expand All</button>
-      <button type="button" @click="settings.collapseAll()">Collapse All</button>
+      <button type="button" @click="settings.collapseAll()">
+        Collapse All
+      </button>
       <button type="button" @click="findTwoFactor">Find Two-Factor</button>
     </div>
     <Tree aria-label="Settings" :items="sections" :controller="settings">

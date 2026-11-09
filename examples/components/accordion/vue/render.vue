@@ -35,7 +35,11 @@ const steps = [
             <AccordionTrigger>
               <template #render="{ props: triggerProps, state: triggerState }">
                 <button v-bind="triggerProps">
-                  <span data-slot="hint" v-if="triggerState.index >= 0" aria-hidden="true">
+                  <span
+                    data-slot="hint"
+                    v-if="triggerState.index >= 0"
+                    aria-hidden="true"
+                  >
                     {{ String(triggerState.index + 1).padStart(2, "0") }}
                   </span>
                   <span>{{ step.label }}</span>

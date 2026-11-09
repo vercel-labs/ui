@@ -3,8 +3,16 @@ import { Radio, RadioGroup } from "@ui-sdk/solid/radio"
 import { createUniqueId, For } from "solid-js"
 
 const options = [
-  { value: "all", label: "Everything", description: "Every message and update." },
-  { value: "mentions", label: "Mentions", description: "Only when someone mentions you." },
+  {
+    value: "all",
+    label: "Everything",
+    description: "Every message and update.",
+  },
+  {
+    value: "mentions",
+    label: "Mentions",
+    description: "Only when someone mentions you.",
+  },
   { value: "none", label: "Nothing", description: "Turn notifications off." },
 ]
 
@@ -23,8 +31,13 @@ function Example() {
               render={(props, state) => (
                 <button {...props}>
                   <span data-slot="stack">
-                    <span id={`${id}-${option.value}-label`}>{option.label}</span>
-                    <span data-slot="hint" id={`${id}-${option.value}-description`}>
+                    <span id={`${id}-${option.value}-label`}>
+                      {option.label}
+                    </span>
+                    <span
+                      data-slot="hint"
+                      id={`${id}-${option.value}-description`}
+                    >
                       {option.description}
                     </span>
                   </span>

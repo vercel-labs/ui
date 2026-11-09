@@ -1,4 +1,11 @@
-import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/solid/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuItemIcon,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/solid/menu"
 import { Menubar } from "@ui-sdk/solid/menubar"
 
 export function Example() {

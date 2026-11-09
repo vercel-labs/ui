@@ -18,11 +18,18 @@ import {
 import { cases, type Case } from "../../core/test/after-mount.cases"
 
 // Each tag's `target`, which picks the native element a wrapper part binds.
-const targets = vi.hoisted(() => new Map<string, (el: HTMLElement) => HTMLElement | null>())
+const targets = vi.hoisted(
+  () => new Map<string, (el: HTMLElement) => HTMLElement | null>()
+)
 vi.mock("../src/define-element", async (original) => {
   const module = await original<typeof import("../src/define-element")>()
-  const record = (options?: string | { tag: string; target?: (el: HTMLElement) => HTMLElement | null }) => {
-    if (typeof options === "object" && options.target) targets.set(options.tag, options.target)
+  const record = (
+    options?:
+      string | { tag: string; target?: (el: HTMLElement) => HTMLElement | null }
+  ) => {
+    if (typeof options === "object" && options.target) {
+      targets.set(options.tag, options.target)
+    }
   }
   const createParts: typeof module.createParts = (primitive, tags) => {
     Object.values(tags).forEach(record)
@@ -45,7 +52,9 @@ Element.prototype.getClientRects = function () {
   const rects = this.isConnected ? [this.getBoundingClientRect()] : []
   return Object.assign(rects, { item: (index: number) => rects[index] ?? null })
 }
-await Promise.all(Object.values(import.meta.glob("../src/entries/*.ts")).map((load) => load()))
+await Promise.all(
+  Object.values(import.meta.glob("../src/entries/*.ts")).map((load) => load())
+)
 
 // Vite's `import.meta.glob`, which Vite rewrites where it's written. This package doesn't load Vite's types.
 declare global {
@@ -56,7 +65,9 @@ declare global {
 
 const tagOf = (name: string) =>
   "ui-" +
-  name.replace("OTP", "Otp").replace(/[A-Z]/g, (char, index) => (index ? "-" : "") + char.toLowerCase())
+  name
+    .replace("OTP", "Otp")
+    .replace(/[A-Z]/g, (char, index) => (index ? "-" : "") + char.toLowerCase())
 
 // Slots a native element fills, found inside its owner.
 const natives: Record<string, string> = {
@@ -65,47 +76,79 @@ const natives: Record<string, string> = {
   PasswordInputControl: "input",
 }
 // Roots that bind a native field inside them.
-const fields: Record<string, string> = { "ui-input": "input", "ui-textarea": "textarea" }
-const has = (name: string) => name in natives || !!customElements.get(tagOf(name))
+const fields: Record<string, string> = {
+  "ui-input": "input",
+  "ui-textarea": "textarea",
+}
+const has = (name: string) =>
+  name in natives || !!customElements.get(tagOf(name))
 
 // The native element a wrapper binds, found by offering it each kind.
 function wrapperOf(tag: string) {
   const target = targets.get(tag)
-  if (!target) return
+  if (!target) {
+    return
+  }
   const probe = document.createElement(tag)
   const kinds = ["button", "a", "input", "textarea", "select"]
-  probe.append(document.createElement("span"), ...kinds.map((kind) => document.createElement(kind)))
+  probe.append(
+    document.createElement("span"),
+    ...kinds.map((kind) => document.createElement(kind))
+  )
   const found = target(probe)
-  return found && found.parentElement === probe && kinds.includes(found.localName)
+  return found &&
+    found.parentElement === probe &&
+    kinds.includes(found.localName)
     ? found.localName
     : undefined
 }
 
 const asAttribute = (name: string) =>
-  /[-:]/.test(name) || ["class", "id", "role", "href", "for", "form"].includes(name)
+  /[-:]/.test(name) ||
+  ["class", "id", "role", "href", "for", "form"].includes(name)
 
-function apply(el: Element, props: Record<string, unknown>, before: Record<string, unknown> = {}) {
-  for (const name in before)
+function apply(
+  el: Element,
+  props: Record<string, unknown>,
+  before: Record<string, unknown> = {}
+) {
+  for (const name in before) {
     if (!(name in props)) {
-      if (asAttribute(name)) el.removeAttribute(name)
-      else (el as unknown as Record<string, unknown>)[name] = undefined
+      if (asAttribute(name)) {
+        el.removeAttribute(name)
+      } else {
+        ;(el as unknown as Record<string, unknown>)[name] = undefined
+      }
     }
+  }
   for (const [name, value] of Object.entries(props)) {
-    if (!asAttribute(name)) (el as unknown as Record<string, unknown>)[name] = value
-    else if (value === undefined || value === false) el.removeAttribute(name)
-    else el.setAttribute(name, value === true ? "" : String(value))
+    if (!asAttribute(name)) {
+      ;(el as unknown as Record<string, unknown>)[name] = value
+    } else if (value === undefined || value === false) {
+      el.removeAttribute(name)
+    } else {
+      el.setAttribute(name, value === true ? "" : String(value))
+    }
   }
   // jsdom never tells a form-associated element its disabled state changed, as a browser does.
-  const form = el as Element & { formDisabledCallback?: (disabled: boolean) => void }
-  if (props.disabled !== before.disabled) form.formDisabledCallback?.(el.hasAttribute("disabled"))
+  const form = el as Element & {
+    formDisabledCallback?: (disabled: boolean) => void
+  }
+  if (props.disabled !== before.disabled) {
+    form.formDisabledCallback?.(el.hasAttribute("disabled"))
+  }
 }
 
 // The elements for a tree, with each node's element, to set props on later.
 function build(nodes: Built[], made: Element[]): Node[] {
   return nodes.flatMap((node): Node[] => {
-    if (typeof node === "string") return [document.createTextNode(node)]
+    if (typeof node === "string") {
+      return [document.createTextNode(node)]
+    }
     const children = () => build(node.children, made)
-    if (!node.part && !node.tag) return children()
+    if (!node.part && !node.tag) {
+      return children()
+    }
     const tag = node.part ? (natives[node.part] ?? tagOf(node.part)) : node.tag!
     const el = document.createElement(tag)
     made.push(el)
@@ -113,9 +156,13 @@ function build(nodes: Built[], made: Element[]): Node[] {
     const wrapper = node.part && (wrapperOf(tag) ?? fields[tag])
     if (wrapper) {
       const inner = document.createElement(wrapper)
-      if (!["input", "textarea", "select"].includes(wrapper)) inner.append(...children())
+      if (!["input", "textarea", "select"].includes(wrapper)) {
+        inner.append(...children())
+      }
       el.append(inner)
-    } else el.append(...children())
+    } else {
+      el.append(...children())
+    }
     return [el]
   })
 }
@@ -125,7 +172,10 @@ function propsOf(nodes: Built[]): Record<string, unknown>[] {
   return nodes.flatMap((node) =>
     typeof node === "string"
       ? []
-      : [...(node.part || node.tag ? [node.props] : []), ...propsOf(node.children)],
+      : [
+          ...(node.part || node.tag ? [node.props] : []),
+          ...propsOf(node.children),
+        ]
   )
 }
 
@@ -151,11 +201,20 @@ async function show(trees: Built[][]) {
 // it's hidden counts.
 function hiddenParts(el: Element) {
   const copy = el.cloneNode(true) as Element
-  for (const part of [copy, ...copy.querySelectorAll('[data-slot][hidden=""]')])
-    if (part.matches('[data-slot][hidden=""]'))
-      for (const inside of [part, ...part.querySelectorAll("*")])
-        for (const { name } of [...inside.attributes])
-          if (name !== "hidden" && name !== "data-slot") inside.removeAttribute(name)
+  for (const part of [
+    copy,
+    ...copy.querySelectorAll('[data-slot][hidden=""]'),
+  ]) {
+    if (part.matches('[data-slot][hidden=""]')) {
+      for (const inside of [part, ...part.querySelectorAll("*")]) {
+        for (const { name } of [...inside.attributes]) {
+          if (name !== "hidden" && name !== "data-slot") {
+            inside.removeAttribute(name)
+          }
+        }
+      }
+    }
+  }
   return copy
 }
 
@@ -163,7 +222,7 @@ function hiddenParts(el: Element) {
 // body, like a popup, in an order moves don't change. Announcers are shared.
 function pageOf(entry: Case) {
   const portaled = [...document.body.children].filter(
-    (el) => el !== container && !el.hasAttribute("data-ui-sdk-announcer"),
+    (el) => el !== container && !el.hasAttribute("data-ui-sdk-announcer")
   )
   const ids = /mount-\d+|\bauto-\d+|(?<=ui-sdk-[0-9a-z-]+-)\d+/g
   const markup = (el: Element) => markupOf(hiddenParts(el), entry.history, ids)
@@ -186,19 +245,23 @@ const likeAController = new Set([
   'combobox > query: "" to "a"',
 ])
 
-for (const entry of cases)
+for (const entry of cases) {
   describe(entry.name, () => {
     const { changes } = changesOf(entry)
-    for (const change of changes)
+    for (const change of changes) {
       test.skipIf(
-        title(change) in (entry.skip ?? {}) || likeAController.has(`${entry.name} > ${title(change)}`),
+        title(change) in (entry.skip ?? {}) ||
+          likeAController.has(`${entry.name} > ${title(change)}`)
       )(title(change), async () => {
         const base = baseOptions(entry, change)
         const markupAt = (value: unknown) =>
-          change.kind === "prop" ? withAttribute(entry.markup, change, value) : entry.markup
+          change.kind === "prop"
+            ? withAttribute(entry.markup, change, value)
+            : entry.markup
         const optionsAt = (value: unknown) =>
           change.kind === "option" ? { ...base, [change.key]: value } : base
-        const tree = (value: unknown) => partsOf(entry, markupAt(value), optionsAt(value), has)
+        const tree = (value: unknown) =>
+          partsOf(entry, markupAt(value), optionsAt(value), has)
 
         await show([tree(change.to)])
         const expected = pageOf(entry)
@@ -208,10 +271,13 @@ for (const entry of cases)
         relayedKeys()
         await show([tree(change.from), tree(change.to)])
         expect(pageOf(entry)).toEqual(expected)
-        if (entry.history?.includes("stop") && !freshProblem)
+        if (entry.history?.includes("stop") && !freshProblem) {
           expect(tabStopProblem({ root: document.body })).toBeUndefined()
+        }
         // Each property is its own change, so one that relays elsewhere may not here.
         const relays = callbackRelays[`${entry.name} > ${title(change)}`] ?? []
         expect(relays).toEqual(expect.arrayContaining(relayedKeys()))
       })
+    }
   })
+}

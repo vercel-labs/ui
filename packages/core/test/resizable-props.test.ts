@@ -14,7 +14,12 @@ test("a panel whose minimum grows past its size while mounted grows to it", asyn
   const root = document.body.appendChild(document.createElement("div"))
   cleanups.push(bind(instance.part("root", {}), root)!)
   const element = () => root.appendChild(document.createElement("div"))
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 20, minSize: 10 }), element())!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "a", defaultSize: 20, minSize: 10 }),
+      element()
+    )!
+  )
   cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
   await Promise.resolve()
@@ -22,7 +27,9 @@ test("a panel whose minimum grows past its size while mounted grows to it", asyn
   instance.part("panel", { id: "a", defaultSize: 20, minSize: 40 })
   await Promise.resolve()
   expect(instance.api.getLayout()).toEqual([40, 60])
-  expect(liveAttrs(instance.part("handle", { id: "h" }))["aria-valuemin"]).toBe("40")
+  expect(liveAttrs(instance.part("handle", { id: "h" }))["aria-valuemin"]).toBe(
+    "40"
+  )
 })
 
 test("a controlled layout is asked to grow a panel whose minimum grows past it", async () => {
@@ -31,14 +38,19 @@ test("a controlled layout is asked to grow a panel whose minimum grows past it",
   const root = document.body.appendChild(document.createElement("div"))
   cleanups.push(bind(instance.part("root", {}), root)!)
   const element = () => root.appendChild(document.createElement("div"))
-  cleanups.push(bind(instance.part("panel", { id: "a", minSize: 10 }), element())!)
+  cleanups.push(
+    bind(instance.part("panel", { id: "a", minSize: 10 }), element())!
+  )
   cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
   await Promise.resolve()
   instance.part("panel", { id: "a", minSize: 40 })
   await Promise.resolve()
   expect(onLayoutChange).toHaveBeenCalledTimes(1)
-  expect(onLayoutChange).toHaveBeenCalledWith([40, 60], expect.objectContaining({ reason: "resize" }))
+  expect(onLayoutChange).toHaveBeenCalledWith(
+    [40, 60],
+    expect.objectContaining({ reason: "resize" })
+  )
 })
 
 test("a controlled owner that ignores a bounds resize can still be asked for a later one", async () => {
@@ -47,7 +59,9 @@ test("a controlled owner that ignores a bounds resize can still be asked for a l
   const root = document.body.appendChild(document.createElement("div"))
   cleanups.push(bind(instance.part("root", {}), root)!)
   const element = () => root.appendChild(document.createElement("div"))
-  cleanups.push(bind(instance.part("panel", { id: "a", minSize: 10 }), element())!)
+  cleanups.push(
+    bind(instance.part("panel", { id: "a", minSize: 10 }), element())!
+  )
   cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
   await Promise.resolve()
@@ -57,7 +71,10 @@ test("a controlled owner that ignores a bounds resize can still be asked for a l
   await Promise.resolve()
   onLayoutChange.mockClear()
   instance.api.resize("a", 40)
-  expect(onLayoutChange).toHaveBeenCalledWith([40, 60], expect.objectContaining({ reason: "imperative" }))
+  expect(onLayoutChange).toHaveBeenCalledWith(
+    [40, 60],
+    expect.objectContaining({ reason: "imperative" })
+  )
 })
 
 test("bounds that change on two panels in one render ask a controlled owner once, after the render", async () => {
@@ -66,7 +83,9 @@ test("bounds that change on two panels in one render ask a controlled owner once
   const root = document.body.appendChild(document.createElement("div"))
   cleanups.push(bind(instance.part("root", {}), root)!)
   const element = () => root.appendChild(document.createElement("div"))
-  cleanups.push(bind(instance.part("panel", { id: "a", minSize: 10 }), element())!)
+  cleanups.push(
+    bind(instance.part("panel", { id: "a", minSize: 10 }), element())!
+  )
   cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
   await Promise.resolve()
@@ -75,7 +94,10 @@ test("bounds that change on two panels in one render ask a controlled owner once
   expect(onLayoutChange).not.toHaveBeenCalled()
   await Promise.resolve()
   expect(onLayoutChange).toHaveBeenCalledTimes(1)
-  expect(onLayoutChange).toHaveBeenCalledWith([50, 50], expect.objectContaining({ reason: "resize" }))
+  expect(onLayoutChange).toHaveBeenCalledWith(
+    [50, 50],
+    expect.objectContaining({ reason: "resize" })
+  )
 })
 
 test("a group that shrinks as a panel's pixel minimum changes fits the new minimum to the new size", async () => {
@@ -88,8 +110,18 @@ test("a group that shrinks as a panel's pixel minimum changes fits the new minim
     el.getBoundingClientRect = () => new DOMRect(0, 0, width / 2, 10)
     return el
   }
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 40, minSize: "300px" }), panel())!)
-  cleanups.push(bind(instance.part("handle", { id: "h" }), root.appendChild(document.createElement("div")))!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "a", defaultSize: 40, minSize: "300px" }),
+      panel()
+    )!
+  )
+  cleanups.push(
+    bind(
+      instance.part("handle", { id: "h" }),
+      root.appendChild(document.createElement("div"))
+    )!
+  )
   cleanups.push(bind(instance.part("panel", { id: "b" }), panel())!)
   await Promise.resolve()
   expect(instance.api.getLayout()).toEqual([40, 60])
@@ -97,7 +129,9 @@ test("a group that shrinks as a panel's pixel minimum changes fits the new minim
   instance.part("panel", { id: "a", defaultSize: 40, minSize: "100px" })
   await Promise.resolve()
   expect(instance.api.getLayout()).toEqual([40, 60])
-  expect(liveAttrs(instance.part("handle", { id: "h" }))["aria-valuemin"]).toBe("20")
+  expect(liveAttrs(instance.part("handle", { id: "h" }))["aria-valuemin"]).toBe(
+    "20"
+  )
 })
 
 test("a collapsed panel whose collapsedSize changes while mounted takes the new size", async () => {
@@ -105,7 +139,13 @@ test("a collapsed panel whose collapsedSize changes while mounted takes the new 
   const root = document.body.appendChild(document.createElement("div"))
   cleanups.push(bind(instance.part("root", {}), root)!)
   const element = () => root.appendChild(document.createElement("div"))
-  const a = { id: "a", defaultSize: 40, minSize: 20, collapsible: true, collapsedSize: 0 }
+  const a = {
+    id: "a",
+    defaultSize: 40,
+    minSize: 20,
+    collapsible: true,
+    collapsedSize: 0,
+  }
   cleanups.push(bind(instance.part("panel", a), element())!)
   cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
@@ -122,14 +162,22 @@ function mountDragging(options: Parameters<typeof resizable>[0] = { id: "g" }) {
   const root = document.body.appendChild(document.createElement("div"))
   cleanups.push(bind(instance.part("root", {}), root)!)
   const element = () => root.appendChild(document.createElement("div"))
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 20, minSize: 10 }), element())!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "a", defaultSize: 20, minSize: 10 }),
+      element()
+    )!
+  )
   cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
   return instance
 }
 
 test("a bounds change during a drag the owner cancels keeps the uncontrolled layout", async () => {
-  const instance = mountDragging({ id: "g", onLayoutChange: (_layout, details) => details.cancel() })
+  const instance = mountDragging({
+    id: "g",
+    onLayoutChange: (_layout, details) => details.cancel(),
+  })
   await Promise.resolve()
   instance.api.internal.startDrag(0, "h")
   instance.part("panel", { id: "a", defaultSize: 20, minSize: 40 })
@@ -150,14 +198,23 @@ test("a bounds change during a drag fits the next move and the drag's end, askin
   expect(onLayoutChange).not.toHaveBeenCalled()
   instance.api.internal.dragBy(5)
   expect(instance.api.getLayout()).toEqual([40, 60])
-  expect(onLayoutChange).toHaveBeenLastCalledWith([40, 60], expect.objectContaining({ reason: "drag" }))
+  expect(onLayoutChange).toHaveBeenLastCalledWith(
+    [40, 60],
+    expect.objectContaining({ reason: "drag" })
+  )
   instance.part("panel", { id: "a", defaultSize: 20, minSize: 50 })
   await Promise.resolve()
   instance.api.internal.endDrag()
   expect(instance.api.getLayout()).toEqual([50, 50])
-  expect(onLayoutChange).toHaveBeenLastCalledWith([50, 50], expect.objectContaining({ reason: "drag" }))
+  expect(onLayoutChange).toHaveBeenLastCalledWith(
+    [50, 50],
+    expect.objectContaining({ reason: "drag" })
+  )
   expect(onLayoutCommit).toHaveBeenCalledTimes(1)
-  expect(onLayoutCommit).toHaveBeenCalledWith([50, 50], expect.objectContaining({ reason: "drag" }))
+  expect(onLayoutCommit).toHaveBeenCalledWith(
+    [50, 50],
+    expect.objectContaining({ reason: "drag" })
+  )
 })
 
 test("space that changes a pixel minimum during a drag fits at the drag's end", async () => {
@@ -166,7 +223,12 @@ test("space that changes a pixel minimum during a drag fits at the drag's end", 
   const root = document.body.appendChild(document.createElement("div"))
   cleanups.push(bind(instance.part("root", {}), root)!)
   const element = () => root.appendChild(document.createElement("div"))
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 20, minSize: "100px" }), element())!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "a", defaultSize: 20, minSize: "100px" }),
+      element()
+    )!
+  )
   cleanups.push(bind(instance.part("handle", { id: "h" }), element())!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element())!)
   await Promise.resolve()
@@ -177,7 +239,10 @@ test("space that changes a pixel minimum during a drag fits at the drag's end", 
   expect(instance.api.getLayout()).toEqual([20, 80])
   instance.api.internal.endDrag()
   expect(instance.api.getLayout()).toEqual([40, 60])
-  expect(onLayoutChange).toHaveBeenLastCalledWith([40, 60], expect.objectContaining({ reason: "drag" }))
+  expect(onLayoutChange).toHaveBeenLastCalledWith(
+    [40, 60],
+    expect.objectContaining({ reason: "drag" })
+  )
 })
 
 test("a group that grows as a panel's pixel minimum changes fits the new minimum to the new size", async () => {
@@ -190,15 +255,27 @@ test("a group that grows as a panel's pixel minimum changes fits the new minimum
     el.getBoundingClientRect = () => new DOMRect(0, 0, width / 2, 10)
     return el
   }
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 40, minSize: "100px" }), panel())!)
-  cleanups.push(bind(instance.part("handle", { id: "h" }), root.appendChild(document.createElement("div")))!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "a", defaultSize: 40, minSize: "100px" }),
+      panel()
+    )!
+  )
+  cleanups.push(
+    bind(
+      instance.part("handle", { id: "h" }),
+      root.appendChild(document.createElement("div"))
+    )!
+  )
   cleanups.push(bind(instance.part("panel", { id: "b" }), panel())!)
   await Promise.resolve()
   width = 1000
   instance.part("panel", { id: "a", defaultSize: 40, minSize: "300px" })
   await Promise.resolve()
   expect(instance.api.getLayout()).toEqual([40, 60])
-  expect(liveAttrs(instance.part("handle", { id: "h" }))["aria-valuemin"]).toBe("30")
+  expect(liveAttrs(instance.part("handle", { id: "h" }))["aria-valuemin"]).toBe(
+    "30"
+  )
 })
 
 test("a render that keeps a panel's size props measures nothing", async () => {
@@ -211,8 +288,18 @@ test("a render that keeps a panel's size props measures nothing", async () => {
     el.getBoundingClientRect = measured
     return el
   }
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 40, minSize: "100px" }), panel())!)
-  cleanups.push(bind(instance.part("handle", { id: "h" }), root.appendChild(document.createElement("div")))!)
+  cleanups.push(
+    bind(
+      instance.part("panel", { id: "a", defaultSize: 40, minSize: "100px" }),
+      panel()
+    )!
+  )
+  cleanups.push(
+    bind(
+      instance.part("handle", { id: "h" }),
+      root.appendChild(document.createElement("div"))
+    )!
+  )
   cleanups.push(bind(instance.part("panel", { id: "b" }), panel())!)
   await Promise.resolve()
   measured.mockClear()
@@ -254,7 +341,9 @@ test("a handle disabled mid-drag stops following the pointer, like a disabled gr
     el.getBoundingClientRect = () => new DOMRect(left, 0, width, 10)
     return el
   }
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 50 }), element(0, 50))!)
+  cleanups.push(
+    bind(instance.part("panel", { id: "a", defaultSize: 50 }), element(0, 50))!
+  )
   const handle = element(50, 2)
   cleanups.push(bind(instance.part("handle", { id: "h" }), handle)!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element(52, 50))!)
@@ -295,7 +384,9 @@ test("a group disabled mid-drag gives the page back its cursor, text selection a
     el.getBoundingClientRect = () => new DOMRect(left, 0, width, 10)
     return el
   }
-  cleanups.push(bind(instance.part("panel", { id: "a", defaultSize: 50 }), element(0, 50))!)
+  cleanups.push(
+    bind(instance.part("panel", { id: "a", defaultSize: 50 }), element(0, 50))!
+  )
   const handle = element(50, 2)
   cleanups.push(bind(instance.part("handle", { id: "h" }), handle)!)
   cleanups.push(bind(instance.part("panel", { id: "b" }), element(52, 50))!)
@@ -303,9 +394,11 @@ test("a group disabled mid-drag gives the page back its cursor, text selection a
   const pageStyle = () =>
     [
       ...(document.adoptedStyleSheets ?? []).flatMap((sheet) =>
-        [...sheet.cssRules].map((rule) => rule.cssText),
+        [...sheet.cssRules].map((rule) => rule.cssText)
       ),
-      ...[...document.querySelectorAll("style")].map((style) => style.textContent),
+      ...[...document.querySelectorAll("style")].map(
+        (style) => style.textContent
+      ),
     ].join("\n")
   handle.dispatchEvent(
     new PointerEvent("pointerdown", {
@@ -318,13 +411,18 @@ test("a group disabled mid-drag gives the page back its cursor, text selection a
       clientY: 5,
       bubbles: true,
       cancelable: true,
-    }),
+    })
   )
   expect(pageStyle()).toContain("user-select")
   instance.setOptions({ ...options, disabled: true })
   expect(instance.get().dragging).toBeNull()
   document.dispatchEvent(
-    new PointerEvent("pointerup", { pointerId: 1, pointerType: "mouse", isPrimary: true, bubbles: true }),
+    new PointerEvent("pointerup", {
+      pointerId: 1,
+      pointerType: "mouse",
+      isPrimary: true,
+      bubbles: true,
+    })
   )
   expect(pageStyle()).not.toContain("user-select")
   expect(pageStyle()).not.toContain("resize")

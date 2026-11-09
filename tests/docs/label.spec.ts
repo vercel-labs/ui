@@ -5,7 +5,9 @@ import { testExamples } from "./docs-helpers"
 testExamples("label", {
   basic: async (preview) => {
     await preview.getByText("Shipping speed", { exact: true }).click()
-    await expect(preview.getByRole("radiogroup", { name: "Shipping speed" })).toBeVisible()
+    await expect(
+      preview.getByRole("radiogroup", { name: "Shipping speed" })
+    ).toBeVisible()
     await expect(preview.getByRole("radio", { name: "Standard" })).toBeFocused()
   },
   slider: async (preview) => {
@@ -14,10 +16,16 @@ testExamples("label", {
   },
   switch: async (preview) => {
     await preview.getByText("Email me product updates", { exact: true }).click()
-    await expect(preview.getByRole("switch", { name: "Email me product updates" })).toBeChecked()
+    await expect(
+      preview.getByRole("switch", { name: "Email me product updates" })
+    ).toBeChecked()
   },
   wrap: async (preview) => {
-    await preview.getByText("Accept terms and conditions", { exact: true }).click()
-    await expect(preview.getByRole("checkbox", { name: "Accept terms and conditions" })).toBeChecked()
+    await preview
+      .getByText("Accept terms and conditions", { exact: true })
+      .click()
+    await expect(
+      preview.getByRole("checkbox", { name: "Accept terms and conditions" })
+    ).toBeChecked()
   },
 })

@@ -5,20 +5,34 @@
 // hydration too. Custom elements are form-associated instead, and submit
 // through ElementInternals. This module is the public API and the parts; the
 // behavior is in file-input-api.ts and file-input-dropzone.ts.
-import { fileInputApi, fileKey, isDisabled, settings, type State } from "./file-input-api"
+import {
+  fileInputApi,
+  fileKey,
+  isDisabled,
+  settings,
+  type State,
+} from "./file-input-api"
 import { bindDropzone } from "./file-input-dropzone"
 import type { FileRejection, FileRules } from "../../foundation/forms/files"
 import { hiddenInputStyle } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  CommitDetails,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Why a file input's value wants to change.
  * @stable
  */
-type FileInputValueChangeReason = "picker" | "drop" | "paste" | "remove-press" | "reset" | "imperative"
+type FileInputValueChangeReason =
+  "picker" | "drop" | "paste" | "remove-press" | "reset" | "imperative"
 
 /**
  * What a change did, beside the new value.
@@ -39,7 +53,8 @@ type FileInputChange = {
  * What `onValueChange` receives after the files: the reason, and what the change added, removed and rejected.
  * @stable
  */
-type FileInputValueChangeDetails = ChangeDetails<FileInputValueChangeReason> & Omit<FileInputChange, "reason">
+type FileInputValueChangeDetails = ChangeDetails<FileInputValueChangeReason> &
+  Omit<FileInputChange, "reason">
 
 /**
  * Options for every write method on a controller.
@@ -56,9 +71,15 @@ function createFileInputController() {
     /** The files it holds. */
     getValue: () => readonly File[]
     /** Replaces the files, without checking them. Returns false when canceled. */
-    setValue: (files: readonly File[], options?: FileInputChangeOptions) => boolean
+    setValue: (
+      files: readonly File[],
+      options?: FileInputChangeOptions
+    ) => boolean
     /** Runs files through the checks and adds the accepted ones, like a drop. Returns false when disabled or canceled. */
-    addFiles: (files: readonly File[] | FileList, options?: FileInputChangeOptions) => boolean
+    addFiles: (
+      files: readonly File[] | FileList,
+      options?: FileInputChangeOptions
+    ) => boolean
     /** Removes one file. Returns false when it isn't there, or the change is canceled. */
     removeFile: (file: File, options?: FileInputChangeOptions) => boolean
     /** Removes every file. */
@@ -82,8 +103,12 @@ type FileInputController = ReturnType<typeof createFileInputController>
 // Reads a `capture` attribute: present or "true" is the default camera, and
 // "user" and "environment" pick one.
 function captureAttribute(attribute: string | null) {
-  if (attribute === null) return undefined
-  if (attribute === "" || attribute === "true") return true
+  if (attribute === null) {
+    return undefined
+  }
+  if (attribute === "" || attribute === "true") {
+    return true
+  }
   return attribute === "false" ? false : (attribute as "user" | "environment")
 }
 
@@ -102,7 +127,10 @@ type FileInputOptions = Omit<FileRules, "multiple"> & {
   /** Runs when files are added or removed, with what changed in the details. `details.cancel()` stops it. */
   onValueChange?: (value: File[], details: FileInputValueChangeDetails) => void
   /** Runs when files fail the checks, after `onValueChange`, with every reason each failed, even when none were accepted. */
-  onReject?: (rejected: FileRejection[], details: CommitDetails<FileInputValueChangeReason>) => void
+  onReject?: (
+    rejected: FileRejection[],
+    details: CommitDetails<FileInputValueChangeReason>
+  ) => void
   /**
    * Holds more than one file. New files join the ones it has, up to
    * `maxFiles` in all. Without it, a new file replaces the one it has.
@@ -140,7 +168,8 @@ type FileInputDropzoneTarget = "element" | "document"
  * Where a drop zone takes pasted files: the page, an element, a CSS selector, or a function that returns an element.
  * @stable
  */
-type FileInputPasteTarget = "document" | string | Element | null | (() => Element | null | undefined)
+type FileInputPasteTarget =
+  "document" | string | Element | null | (() => Element | null | undefined)
 
 /**
  * The props of the trigger, in every framework.
@@ -262,7 +291,9 @@ const formAttrs = (state: State) => ({
 // The item that takes Tab into the list: the last one focused, else the first.
 function isActiveItem(state: State, key: string) {
   const active = state.activeItem
-  if (active && state.value.some((file) => fileKey(file) === active)) return active === key
+  if (active && state.value.some((file) => fileKey(file) === active)) {
+    return active === key
+  }
   return state.value.length > 0 && fileKey(state.value[0]) === key
 }
 
@@ -302,7 +333,9 @@ const fileInputPrimitive = /* @__PURE__ */ definePrimitive({
   },
   sync: (options) => ({
     ...settings(options),
-    ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: options.defaultValue }),
     ...(options.value === undefined ? {} : { value: options.value }),
   }),
   api: fileInputApi,
@@ -353,10 +386,17 @@ const fileInputPrimitive = /* @__PURE__ */ definePrimitive({
     dropzone: slot<FileInputDropzoneProps, FileInputDropzoneState>({
       // Each zone is its own part, so it needs an id. `pasteTarget` is a
       // selector or "document" as an attribute, and may be an element too.
-      props: { target: "string", pasteTarget: (attribute) => attribute, id: "id" },
+      props: {
+        target: "string",
+        pasteTarget: (attribute) => attribute,
+        id: "id",
+      },
       state: (state, { key }) => dropzoneState(state, key),
       attrs: (state, { key }) => {
-        const { dragging, dragAccept, dragReject, disabled } = dropzoneState(state, key)
+        const { dragging, dragAccept, dragReject, disabled } = dropzoneState(
+          state,
+          key
+        )
         return {
           "data-dragging": dragging ? "" : undefined,
           "data-drag-accept": dragAccept ? "" : undefined,
@@ -385,7 +425,16 @@ const fileInputPrimitive = /* @__PURE__ */ definePrimitive({
     item: slot<FileInputItemProps & { value: string }, FileInputItemState>({
       role: "listitem",
       focus: "roving",
-      keys: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End", "Backspace", "Delete"],
+      keys: [
+        "ArrowUp",
+        "ArrowDown",
+        "ArrowLeft",
+        "ArrowRight",
+        "Home",
+        "End",
+        "Backspace",
+        "Delete",
+      ],
       props: { file: "value", value: "string" },
       state: (state, { props }) => ({
         file: props.file,
@@ -397,15 +446,22 @@ const fileInputPrimitive = /* @__PURE__ */ definePrimitive({
         "data-disabled": isDisabled(state) ? "" : undefined,
       }),
       on: {
-        keydown: (event, { api, el, props }) => el && api.internal.itemKeydown(event, el, props.file),
+        keydown: (event, { api, el, props }) =>
+          el && api.internal.itemKeydown(event, el, props.file),
         focusin: (_, { api, key }) => api.internal.setActiveItem(key),
       },
     }),
 
     // Removes its item's file. Out of the tab order, since Backspace on the item does the same.
     // Renderers fill `file` from the item around it, so it's set by now.
-    "item-remove": slot<Partial<FileInputItemProps> & { value?: string }, FileInputItemRemoveState>({
-      props: { file: { kind: "value", from: "item" }, value: { kind: "string", from: "item" } },
+    "item-remove": slot<
+      Partial<FileInputItemProps> & { value?: string },
+      FileInputItemRemoveState
+    >({
+      props: {
+        file: { kind: "value", from: "item" },
+        value: { kind: "string", from: "item" },
+      },
       state: (state) => ({ disabled: isDisabled(state) }),
       attrs: (state, { props }) => ({
         type: "button",
@@ -414,7 +470,8 @@ const fileInputPrimitive = /* @__PURE__ */ definePrimitive({
         disabled: isDisabled(state) ? "" : undefined,
         "data-disabled": isDisabled(state) ? "" : undefined,
       }),
-      press: ({ api, props }, event) => api.internal.removeItem(props.file!, event as MouseEvent | undefined),
+      press: ({ api, props }, event) =>
+        api.internal.removeItem(props.file!, event as MouseEvent | undefined),
     }),
   }),
   agent: { actions: ["setValue", "addFiles", "removeFile", "clear", "open"] },
@@ -435,7 +492,12 @@ interface FileInputPrimitive extends Named<typeof fileInputPrimitive> {}
  */
 const fileInput: FileInputPrimitive = fileInputPrimitive
 export { formatFileSize, relativePath } from "../../foundation/forms/files"
-export type { FileLike, FileRejection, FileRejectionReason, FileRules } from "../../foundation/forms/files"
+export type {
+  FileLike,
+  FileRejection,
+  FileRejectionReason,
+  FileRules,
+} from "../../foundation/forms/files"
 
 export {
   createFileInputController,

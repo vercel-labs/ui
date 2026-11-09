@@ -8,8 +8,12 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
-const trigger = (page: Page) => page.getByRole("button", { name: fixture.trigger, exact: true })
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
+const trigger = (page: Page) =>
+  page.getByRole("button", { name: fixture.trigger, exact: true })
 const panel = (page: Page) => page.locator(".collapsible-panel")
 
 test("a collapsible hydrates without mismatches", async ({ page, open }) => {
@@ -19,7 +23,10 @@ test("a collapsible hydrates without mismatches", async ({ page, open }) => {
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("a panel open on the server is open after hydration, at full height", async ({ page, open }) => {
+test("a panel open on the server is open after hydration, at full height", async ({
+  page,
+  open,
+}) => {
   await open("collapsible", { open: "" })
   await expect(page.getByText(fixture.content)).toBeVisible()
   const [height, full] = await panel(page).evaluate((el) => [
@@ -30,7 +37,10 @@ test("a panel open on the server is open after hydration, at full height", async
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("a panel hidden until found hydrates and stays findable", async ({ page, open }) => {
+test("a panel hidden until found hydrates and stays findable", async ({
+  page,
+  open,
+}) => {
   await open("collapsible", { "hidden-until-found": "" })
   await expect(panel(page)).toHaveAttribute("hidden", "until-found")
   await trigger(page).click()

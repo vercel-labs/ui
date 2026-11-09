@@ -19,9 +19,19 @@ import {
   NumberInputIncrement,
 } from "../src/number-input"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "../src/otp-input"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "../src/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "../src/password-input"
 import { Separator } from "../src/separator"
-import { Slider, SliderControl, SliderThumb, SliderTrack, SliderValue } from "../src/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+} from "../src/slider"
 import { Textarea } from "../src/textarea"
 
 // Opening tags, and an attribute of one.
@@ -35,7 +45,9 @@ const attribute = (tag: string | undefined, name: string) =>
 const dangling = (html: string) => {
   const ids = new Set(tags(html).map((tag) => attribute(tag, "id")))
   return ["for", "aria-controls", "aria-labelledby"]
-    .flatMap((name) => tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? []))
+    .flatMap((name) =>
+      tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? [])
+    )
     .filter((id) => !ids.has(id))
 }
 
@@ -45,7 +57,9 @@ const dangling = (html: string) => {
 
 describe("server rendering text fields and forms", () => {
   test("an input renders its default value and filled state", () => {
-    const html = renderToString(() => <Input name="email" defaultValue="ada@example.com" required />)
+    const html = renderToString(() => (
+      <Input name="email" defaultValue="ada@example.com" required />
+    ))
     expect(typeof window).toBe("undefined")
     expect(html).toMatch(/<input[^>]*name="email"[^>]*value="ada@example.com"/)
     expect(html).toMatch(/\srequired[\s>]/)
@@ -59,7 +73,9 @@ describe("server rendering text fields and forms", () => {
   })
 
   test("a textarea renders its default value as its text", () => {
-    const html = renderToString(() => <Textarea defaultValue="Hello" autoResize />)
+    const html = renderToString(() => (
+      <Textarea defaultValue="Hello" autoResize />
+    ))
     expect(html).toMatch(/<textarea[^>]*\sdata-filled[^>]*>Hello<\/textarea>/)
   })
 
@@ -118,9 +134,11 @@ describe("server rendering text fields and forms", () => {
     ))
     const label = attribute(
       tags(html).find((tag) => tag.includes('data-slot="field-label"')),
-      "for",
+      "for"
     )
-    expect(tags(html).find((tag) => attribute(tag, "id") === label)).toMatch(/^<input/)
+    expect(tags(html).find((tag) => attribute(tag, "id") === label)).toMatch(
+      /^<input/
+    )
     expect(dangling(html)).toEqual([])
   })
 
@@ -138,8 +156,12 @@ describe("server rendering text fields and forms", () => {
         </Slider>
       </Field>
     ))
-    const label = tags(html).find((tag) => tag.includes('data-slot="field-label"'))
-    const target = tags(html).find((tag) => attribute(tag, "id") === attribute(label, "for"))
+    const label = tags(html).find((tag) =>
+      tag.includes('data-slot="field-label"')
+    )
+    const target = tags(html).find(
+      (tag) => attribute(tag, "id") === attribute(label, "for")
+    )
     expect(target).toMatch(/^<input[^>]*type="range"/)
     const group = tags(html).find((tag) => tag.includes('role="group"'))
     expect(attribute(group, "aria-labelledby")).toBe(attribute(label, "id"))
@@ -149,16 +171,21 @@ describe("server rendering text fields and forms", () => {
   test.each([
     ["FieldControl", () => <FieldControl aria-describedby="hint" />],
     ["Input", () => <Input aria-describedby="hint" />],
-  ])("a %s keeps its own description ahead of the field's", (_name, control) => {
-    const html = renderToString(() => (
-      <Field>
-        {control()}
-        <FieldDescription>We never share it.</FieldDescription>
-      </Field>
-    ))
-    const description = html.match(/<p[^>]*id="([^"]+)"/)![1]
-    expect(html).toMatch(new RegExp(`<input[^>]*aria-describedby="hint ${description}"`))
-  })
+  ])(
+    "a %s keeps its own description ahead of the field's",
+    (_name, control) => {
+      const html = renderToString(() => (
+        <Field>
+          {control()}
+          <FieldDescription>We never share it.</FieldDescription>
+        </Field>
+      ))
+      const description = html.match(/<p[^>]*id="([^"]+)"/)![1]
+      expect(html).toMatch(
+        new RegExp(`<input[^>]*aria-describedby="hint ${description}"`)
+      )
+    }
+  )
 
   test("a disabled field set renders a native disabled fieldset", () => {
     const html = renderToString(() => (
@@ -225,7 +252,9 @@ describe("server rendering a number input and an OTP input", () => {
       </NumberInput>
     ))
     expect(html).toMatch(/<input[^>]*type="text"[^>]*value="\$1,234.50"/)
-    expect(html).toMatch(/<input[^>]*type="hidden"[^>]*name="amount"[^>]*value="1234.5"/)
+    expect(html).toMatch(
+      /<input[^>]*type="hidden"[^>]*name="amount"[^>]*value="1234.5"/
+    )
     expect(html).toContain('role="group"')
   })
 
@@ -241,21 +270,29 @@ describe("server rendering a number input and an OTP input", () => {
       </OTPInput>
     ))
     const [input] = html.match(/<input[^>]*>/g)!
-    for (const attribute of ['name="code"', 'value="12"', 'maxlength="4"']) expect(input).toContain(attribute)
+    for (const attribute of ['name="code"', 'value="12"', 'maxlength="4"']) {
+      expect(input).toContain(attribute)
+    }
     expect(html).toMatch(/data-slot="otp-input-slot"[^>]*>1</)
   })
 })
 
 describe("server rendering buttons and separators", () => {
   test("a button renders as a native button that doesn't submit by default", () => {
-    expect(renderToString(() => <Button>Save</Button>)).toMatch(/<button[^>]*type="button"/)
-    expect(renderToString(() => <Button type="submit">Save</Button>)).toMatch(/type="submit"/)
+    expect(renderToString(() => <Button>Save</Button>)).toMatch(
+      /<button[^>]*type="button"/
+    )
+    expect(renderToString(() => <Button type="submit">Save</Button>)).toMatch(
+      /type="submit"/
+    )
   })
 
   test("a separator renders its role and orientation", () => {
     expect(renderToString(() => <Separator orientation="vertical" />)).toMatch(
-      /role="separator"[^>]*aria-orientation="vertical"/,
+      /role="separator"[^>]*aria-orientation="vertical"/
     )
-    expect(renderToString(() => <Separator decorative />)).toContain('role="none"')
+    expect(renderToString(() => <Separator decorative />)).toContain(
+      'role="none"'
+    )
   })
 })

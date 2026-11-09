@@ -21,8 +21,12 @@ function Fixture() {
         <ToolbarButton render={<span />} onClick={() => setAction("span")}>
           {counted("Span tool")}
         </ToolbarButton>
-        <ToolbarButton onClick={() => setAction("cut")}>{counted("Cut")}</ToolbarButton>
-        <ToolbarButton onClick={() => setAction("copy")}>{counted("Copy")}</ToolbarButton>
+        <ToolbarButton onClick={() => setAction("cut")}>
+          {counted("Cut")}
+        </ToolbarButton>
+        <ToolbarButton onClick={() => setAction("copy")}>
+          {counted("Copy")}
+        </ToolbarButton>
         <ToolbarSeparator className="rule" render={<hr />} />
         <ToolbarButton
           disabled
@@ -44,7 +48,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

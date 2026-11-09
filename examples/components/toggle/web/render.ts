@@ -11,9 +11,12 @@ function mount(root: HTMLElement) {
   `
   const favorite = root.querySelector("ui-toggle")!
   const heart = root.querySelector("svg")!
-  const render = (pressed: boolean) => heart.setAttribute("fill", pressed ? "currentColor" : "none")
+  const render = (pressed: boolean) =>
+    heart.setAttribute("fill", pressed ? "currentColor" : "none")
   render(favorite.pressed)
-  favorite.addEventListener("pressedchange", (event) => render(event.detail.value))
+  favorite.addEventListener("pressedchange", (event) =>
+    render(event.detail.value)
+  )
 }
 
 export { mount }

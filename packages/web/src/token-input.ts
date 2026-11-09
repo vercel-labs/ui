@@ -48,13 +48,21 @@ function defineTokenInputElements() {
       silent: ["onSubmit"],
       // A disabled <ui-field> around it disables it, as a disabled Field does
       // in the other frameworks.
-      options: (el) => ({ ...(el.closest("ui-field")?.hasAttribute("disabled") && { disabled: true }) }),
+      options: (el) => ({
+        ...(el.closest("ui-field")?.hasAttribute("disabled") && {
+          disabled: true,
+        }),
+      }),
       display: "block",
       state: {
         value: {
           get: (api: TokenInputApi) => api.getValue(),
           set: (api: TokenInputApi, value: TokenInputValue | string) =>
-            api.setValue(typeof value === "string" ? api.internal.codec().parse(value) : value),
+            api.setValue(
+              typeof value === "string"
+                ? api.internal.codec().parse(value)
+                : value
+            ),
         },
       },
       api: [
@@ -89,8 +97,14 @@ function defineTokenInputElements() {
           // Renderers that keep nodes per container, like lit's or React's, update
           // the ones they left, so a new renderToken renders over them. Hosts only
           // empty when the element leaves or switches to a template or labels.
-          if (el.isConnected && contentMode(target) === mode) return
-          for (const { host } of api.internal.hosts()) if (rendered.has(host)) host.replaceChildren()
+          if (el.isConnected && contentMode(target) === mode) {
+            return
+          }
+          for (const { host } of api.internal.hosts()) {
+            if (rendered.has(host)) {
+              host.replaceChildren()
+            }
+          }
         }
       },
     },
@@ -101,21 +115,37 @@ function defineTokenInputElements() {
 }
 
 const contentMode = (el: TokenInputElement) =>
-  el.renderToken ? "renderToken" : el.querySelector(":scope > template") ? "template" : "label"
+  el.renderToken
+    ? "renderToken"
+    : el.querySelector(":scope > template")
+      ? "template"
+      : "label"
 
 // Renders each token's content into its host, from `renderToken` or the template.
-function renderTokens(el: TokenInputElement, api: TokenInputApi, rendered: WeakMap<HTMLElement, Token>) {
+function renderTokens(
+  el: TokenInputElement,
+  api: TokenInputApi,
+  rendered: WeakMap<HTMLElement, Token>
+) {
   const template = el.querySelector<HTMLTemplateElement>(":scope > template")
   for (const { token, host } of api.internal.hosts()) {
-    if (rendered.get(host) === token) continue
+    if (rendered.get(host) === token) {
+      continue
+    }
     rendered.set(host, token)
     if (el.renderToken) {
       el.renderToken(token, host)
       continue
     }
-    if (!template) continue
-    if (!host.firstChild) host.append(template.content.cloneNode(true))
-    for (const label of host.querySelectorAll("[data-token-label]")) label.textContent = token.label
+    if (!template) {
+      continue
+    }
+    if (!host.firstChild) {
+      host.append(template.content.cloneNode(true))
+    }
+    for (const label of host.querySelectorAll("[data-token-label]")) {
+      label.textContent = token.label
+    }
   }
 }
 

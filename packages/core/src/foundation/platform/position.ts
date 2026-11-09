@@ -15,7 +15,14 @@ type Align = "start" | "center" | "end"
  * @stable
  */
 type VirtualAnchor =
-  | { getBoundingClientRect: () => { x: number; y: number; width: number; height: number } }
+  | {
+      getBoundingClientRect: () => {
+        x: number
+        y: number
+        width: number
+        height: number
+      }
+    }
   | { x: number; y: number }
 
 /**
@@ -74,10 +81,14 @@ type PortalProps = {
 function renderedRect(el: Element) {
   let rendered: Element | Range = el
   if (!el.getClientRects().length) {
-    if (getComputedStyle(el).display !== "contents") return undefined
+    if (getComputedStyle(el).display !== "contents") {
+      return undefined
+    }
     rendered = el.ownerDocument.createRange()
     rendered.selectNodeContents(el)
-    if (!rendered.getClientRects().length) return undefined
+    if (!rendered.getClientRects().length) {
+      return undefined
+    }
   }
   const { x, y, width, height } = rendered.getBoundingClientRect()
   return { x, y, width, height }
@@ -85,7 +96,9 @@ function renderedRect(el: Element) {
 
 function anchorRect(anchor: Anchor | Rect) {
   const rect =
-    "getBoundingClientRect" in anchor ? anchor.getBoundingClientRect() : { width: 0, height: 0, ...anchor }
+    "getBoundingClientRect" in anchor
+      ? anchor.getBoundingClientRect()
+      : { width: 0, height: 0, ...anchor }
   return {
     x: rect.x,
     y: rect.y,
@@ -123,7 +136,9 @@ type PositionOptions = {
   arrowPadding?: number
 }
 
-type Placement = Required<Omit<PositionOptions, "arrow" | "arrowPadding" | "side">> & { side: PhysicalSide }
+type Placement = Required<
+  Omit<PositionOptions, "arrow" | "arrowPadding" | "side">
+> & { side: PhysicalSide }
 
 type Rect = { x: number; y: number; width: number; height: number }
 
@@ -144,26 +159,46 @@ function place(
   size: { width: number; height: number },
   side: PhysicalSide,
   align: Align,
-  options: Placement,
+  options: Placement
 ) {
   const { sideOffset, alignOffset } = options
   const vertical = side === "top" || side === "bottom"
   let x = 0
   let y = 0
 
-  if (side === "bottom") y = anchor.y + anchor.height + sideOffset
-  if (side === "top") y = anchor.y - size.height - sideOffset
-  if (side === "right") x = anchor.x + anchor.width + sideOffset
-  if (side === "left") x = anchor.x - size.width - sideOffset
+  if (side === "bottom") {
+    y = anchor.y + anchor.height + sideOffset
+  }
+  if (side === "top") {
+    y = anchor.y - size.height - sideOffset
+  }
+  if (side === "right") {
+    x = anchor.x + anchor.width + sideOffset
+  }
+  if (side === "left") {
+    x = anchor.x - size.width - sideOffset
+  }
 
   if (vertical) {
-    if (align === "start") x = anchor.x + alignOffset
-    if (align === "center") x = anchor.x + anchor.width / 2 - size.width / 2 + alignOffset
-    if (align === "end") x = anchor.x + anchor.width - size.width - alignOffset
+    if (align === "start") {
+      x = anchor.x + alignOffset
+    }
+    if (align === "center") {
+      x = anchor.x + anchor.width / 2 - size.width / 2 + alignOffset
+    }
+    if (align === "end") {
+      x = anchor.x + anchor.width - size.width - alignOffset
+    }
   } else {
-    if (align === "start") y = anchor.y + alignOffset
-    if (align === "center") y = anchor.y + anchor.height / 2 - size.height / 2 + alignOffset
-    if (align === "end") y = anchor.y + anchor.height - size.height - alignOffset
+    if (align === "start") {
+      y = anchor.y + alignOffset
+    }
+    if (align === "center") {
+      y = anchor.y + anchor.height / 2 - size.height / 2 + alignOffset
+    }
+    if (align === "end") {
+      y = anchor.y + anchor.height - size.height - alignOffset
+    }
   }
   return { x, y }
 }
@@ -173,41 +208,62 @@ function overflow(
   point: { x: number; y: number },
   size: { width: number; height: number },
   viewport: Required<Viewport>,
-  padding: number,
+  padding: number
 ) {
-  if (side === "bottom") return point.y + size.height - (viewport.y + viewport.height - padding)
-  if (side === "top") return viewport.y + padding - point.y
-  if (side === "right") return point.x + size.width - (viewport.x + viewport.width - padding)
+  if (side === "bottom") {
+    return point.y + size.height - (viewport.y + viewport.height - padding)
+  }
+  if (side === "top") {
+    return viewport.y + padding - point.y
+  }
+  if (side === "right") {
+    return point.x + size.width - (viewport.x + viewport.width - padding)
+  }
   return viewport.x + padding - point.x
 }
 
-function available(side: PhysicalSide, anchor: Rect, viewport: Required<Viewport>, options: Placement) {
+function available(
+  side: PhysicalSide,
+  anchor: Rect,
+  viewport: Required<Viewport>,
+  options: Placement
+) {
   const { sideOffset, collisionPadding: padding } = options
   const height =
     side === "bottom"
-      ? viewport.y + viewport.height - padding - (anchor.y + anchor.height + sideOffset)
+      ? viewport.y +
+        viewport.height -
+        padding -
+        (anchor.y + anchor.height + sideOffset)
       : side === "top"
         ? anchor.y - sideOffset - padding - viewport.y
         : viewport.height - padding * 2
   const width =
     side === "right"
-      ? viewport.x + viewport.width - padding - (anchor.x + anchor.width + sideOffset)
+      ? viewport.x +
+        viewport.width -
+        padding -
+        (anchor.x + anchor.width + sideOffset)
       : side === "left"
         ? anchor.x - sideOffset - padding - viewport.x
         : viewport.width - padding * 2
   return { width: Math.max(0, width), height: Math.max(0, height) }
 }
 
-const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), Math.max(min, max))
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), Math.max(min, max))
 
 function computePlacement(
   anchor: Rect,
   size: { width: number; height: number },
   visible: Viewport,
-  placement: Omit<Placement, "side"> & { side: Side; rtl?: boolean },
+  placement: Omit<Placement, "side"> & { side: Side; rtl?: boolean }
 ) {
   const viewport = { x: 0, y: 0, ...visible }
-  const options = { ...placement, side: physicalSide(placement.side, placement.rtl) }
+  const options = {
+    ...placement,
+    side: physicalSide(placement.side, placement.rtl),
+  }
   const vertical = options.side === "top" || options.side === "bottom"
   const align: Align =
     options.rtl && vertical && options.align !== "center"
@@ -222,7 +278,10 @@ function computePlacement(
   if (over > 0) {
     const other = opposite[side]
     const otherPoint = place(anchor, size, other, align, options)
-    if (overflow(other, otherPoint, size, viewport, options.collisionPadding) < over) {
+    if (
+      overflow(other, otherPoint, size, viewport, options.collisionPadding) <
+      over
+    ) {
       side = other
       point = otherPoint
     }
@@ -233,14 +292,33 @@ function computePlacement(
   // `alignOffset` that alone takes it past the anchor is kept.
   const padding = options.collisionPadding
   if (side === "top" || side === "bottom") {
-    const x = clamp(point.x, viewport.x + padding, viewport.x + viewport.width - size.width - padding)
-    point.x = x === point.x ? x : clamp(x, anchor.x - size.width, anchor.x + anchor.width)
+    const x = clamp(
+      point.x,
+      viewport.x + padding,
+      viewport.x + viewport.width - size.width - padding
+    )
+    point.x =
+      x === point.x
+        ? x
+        : clamp(x, anchor.x - size.width, anchor.x + anchor.width)
   } else {
-    const y = clamp(point.y, viewport.y + padding, viewport.y + viewport.height - size.height - padding)
-    point.y = y === point.y ? y : clamp(y, anchor.y - size.height, anchor.y + anchor.height)
+    const y = clamp(
+      point.y,
+      viewport.y + padding,
+      viewport.y + viewport.height - size.height - padding
+    )
+    point.y =
+      y === point.y
+        ? y
+        : clamp(y, anchor.y - size.height, anchor.y + anchor.height)
   }
 
-  return { ...point, side, align: options.align, available: available(side, anchor, viewport, options) }
+  return {
+    ...point,
+    side,
+    align: options.align,
+    available: available(side, anchor, viewport, options),
+  }
 }
 
 const stillFrames = 3
@@ -256,18 +334,27 @@ const roomVariables = ["--available-height", "--available-width"]
 function createWriter(el: HTMLElement) {
   const written = new Map<string, string | null>()
   const changed = (name: string, value: string | null) => {
-    if (written.get(name) === value) return false
+    if (written.get(name) === value) {
+      return false
+    }
     written.set(name, value)
     return true
   }
   return {
     style(name: string, value: string) {
-      if (changed(`style:${name}`, value)) el.style.setProperty(name, value)
+      if (changed(`style:${name}`, value)) {
+        el.style.setProperty(name, value)
+      }
     },
     attribute(name: string, value: string | null) {
-      if (!changed(name, value)) return
-      if (value === null) el.removeAttribute(name)
-      else el.setAttribute(name, value)
+      if (!changed(name, value)) {
+        return
+      }
+      if (value === null) {
+        el.removeAttribute(name)
+      } else {
+        el.setAttribute(name, value)
+      }
     },
     reset: () => written.clear(),
   }
@@ -301,10 +388,12 @@ function visibleViewport() {
 function position(
   anchorOrGetter: Anchor | (() => Anchor | null | undefined),
   el: HTMLElement,
-  optionsOrGetter: PositionOptions | (() => PositionOptions) = {},
+  optionsOrGetter: PositionOptions | (() => PositionOptions) = {}
 ) {
-  const read = () => (typeof optionsOrGetter === "function" ? optionsOrGetter() : optionsOrGetter)
-  const anchorOf = () => (typeof anchorOrGetter === "function" ? anchorOrGetter() : anchorOrGetter)
+  const read = () =>
+    typeof optionsOrGetter === "function" ? optionsOrGetter() : optionsOrGetter
+  const anchorOf = () =>
+    typeof anchorOrGetter === "function" ? anchorOrGetter() : anchorOrGetter
   const resolve = (options: PositionOptions) => ({
     side: options.side ?? ("bottom" as Side),
     align: options.align ?? "start",
@@ -313,9 +402,16 @@ function position(
     collisionPadding: Number(options.collisionPadding ?? 8),
   })
   registerUninherited(roomVariables)
-  Object.assign(el.style, { position: "fixed", inset: "auto", margin: "0", left: "0", top: "0" })
+  Object.assign(el.style, {
+    position: "fixed",
+    inset: "auto",
+    margin: "0",
+    left: "0",
+    top: "0",
+  })
   const popup = createWriter(el)
-  let arrowWriter: { el: HTMLElement; write: ReturnType<typeof createWriter> } | undefined
+  let arrowWriter:
+    { el: HTMLElement; write: ReturnType<typeof createWriter> } | undefined
 
   let last = ""
   let placed = false
@@ -330,20 +426,29 @@ function position(
   let unwatchRoots = () => {}
 
   function update() {
-    if (stopped) return false
+    if (stopped) {
+      return false
+    }
     const options = read()
     const resolved = resolve(options)
     const arrowPadding = Number(options.arrowPadding ?? 6)
     const anchor = anchorOf()
-    if (!anchor) return false
+    if (!anchor) {
+      return false
+    }
     const node = "nodeType" in anchor ? (anchor as Element) : undefined
     const shown = node && renderedRect(node)
     // An anchor that left the page or stopped rendering has no place to
     // follow, so a placed popup stays where it was rather than jumping to a corner.
-    if (node && placed && (!node.isConnected || !shown)) return false
+    if (node && placed && (!node.isConnected || !shown)) {
+      return false
+    }
     // Read each time, since the same anchor can move to another shadow root.
     const around = node ? shadowRootsAround(node) : []
-    if (around.length !== watchedRoots.length || around.some((root, index) => root !== watchedRoots[index])) {
+    if (
+      around.length !== watchedRoots.length ||
+      around.some((root, index) => root !== watchedRoots[index])
+    ) {
       unwatchRoots()
       watchedRoots = around
       unwatchRoots = watchShadowRoots(around)
@@ -354,12 +459,16 @@ function position(
     // from the corner. Later moves, between anchors, animate.
     const first = !placed
     const transition = el.style.transition
-    if (first) el.style.transition = "none"
+    if (first) {
+      el.style.transition = "none"
+    }
     const a = anchorRect(shown ?? anchor)
     const viewport = visibleViewport()
     const offsets = { width: el.offsetWidth, height: el.offsetHeight }
     const arrow = arrowOf(options)
-    const arrowSize = arrow ? { width: arrow.offsetWidth, height: arrow.offsetHeight } : undefined
+    const arrowSize = arrow
+      ? { width: arrow.offsetWidth, height: arrow.offsetHeight }
+      : undefined
     const key = [
       a.x,
       a.y,
@@ -377,11 +486,18 @@ function position(
       arrowPadding,
     ].join()
     // A new arrow element, even one the same size, has no placement of its own yet.
-    if (key === last && (!arrow || arrow === arrowWriter?.el)) return false
+    if (key === last && (!arrow || arrow === arrowWriter?.el)) {
+      return false
+    }
     last = key
     // The padding box, which arrows are placed in. Read only when something
     // moved, and before any write, so it never forces a second layout.
-    const inner = { left: el.clientLeft, top: el.clientTop, width: el.clientWidth, height: el.clientHeight }
+    const inner = {
+      left: el.clientLeft,
+      top: el.clientTop,
+      width: el.clientWidth,
+      height: el.clientHeight,
+    }
 
     // A transformed or filtered ancestor becomes the containing block for
     // fixed elements. Where the popup is now, less its offsets, finds that
@@ -396,13 +512,24 @@ function position(
     // Placement works in screen pixels, and the popup's own styles in its
     // CSS pixels, which `zoom` or a scaled containing block make differ.
     const { scale } = box
-    const size = { width: exact.width * scale.x, height: exact.height * scale.y }
-    const result = computePlacement({ x: a.x, y: a.y, width: a.width, height: a.height }, size, viewport, {
-      ...resolved,
-      sideOffset: resolved.sideOffset * (isVertical(resolved.side) ? scale.y : scale.x),
-      alignOffset: resolved.alignOffset * (isVertical(resolved.side) ? scale.x : scale.y),
-      rtl,
-    })
+    const size = {
+      width: exact.width * scale.x,
+      height: exact.height * scale.y,
+    }
+    const result = computePlacement(
+      { x: a.x, y: a.y, width: a.width, height: a.height },
+      size,
+      viewport,
+      {
+        ...resolved,
+        sideOffset:
+          resolved.sideOffset * (isVertical(resolved.side) ? scale.y : scale.x),
+        alignOffset:
+          resolved.alignOffset *
+          (isVertical(resolved.side) ? scale.x : scale.y),
+        rtl,
+      }
+    )
     const across = isVertical(result.side) ? scale.x : scale.y
     const origin = {
       x: box.x - (parseFloat(style.left) || 0) * scale.x,
@@ -423,8 +550,18 @@ function position(
     popup.style("--available-width", `${result.available.width / scale.x}px`)
     popup.style("--anchor-width", `${a.width / scale.x}px`)
     popup.style("--anchor-height", `${a.height / scale.y}px`)
-    const [originX, originY] = transformOrigin(result.side, result.align, rtl, a, size, result)
-    popup.style("--transform-origin", `${Math.round(originX / scale.x)}px ${Math.round(originY / scale.y)}px`)
+    const [originX, originY] = transformOrigin(
+      result.side,
+      result.align,
+      rtl,
+      a,
+      size,
+      result
+    )
+    popup.style(
+      "--transform-origin",
+      `${Math.round(originX / scale.x)}px ${Math.round(originY / scale.y)}px`
+    )
     const paddingBox = {
       x: result.x + inner.left * scale.x,
       y: result.y + inner.top * scale.y,
@@ -438,10 +575,21 @@ function position(
 
     if (arrow && arrowSize) {
       const box = { ...paddingBox, ...size }
-      const length = { width: arrowSize.width * scale.x, height: arrowSize.height * scale.y }
-      const placed = computeArrow(a, box, length, result.side, arrowPadding * across)
+      const length = {
+        width: arrowSize.width * scale.x,
+        height: arrowSize.height * scale.y,
+      }
+      const placed = computeArrow(
+        a,
+        box,
+        length,
+        result.side,
+        arrowPadding * across
+      )
       const offset = Math.round(placed.offset / across)
-      if (arrowWriter?.el !== arrow) arrowWriter = { el: arrow, write: createWriter(arrow) }
+      if (arrowWriter?.el !== arrow) {
+        arrowWriter = { el: arrow, write: createWriter(arrow) }
+      }
       const { write } = arrowWriter
       write.style("position", "absolute")
       write.style("left", isVertical(result.side) ? `${offset}px` : "")
@@ -458,7 +606,9 @@ function position(
   function loop() {
     frame = 0
     still = update() ? 0 : still + 1
-    if (still < stillFrames || unwatched) frame = requestAnimationFrame(loop)
+    if (still < stillFrames || unwatched) {
+      frame = requestAnimationFrame(loop)
+    }
   }
   function wake() {
     still = 0
@@ -488,7 +638,9 @@ function position(
     const options = read()
     const next = optionsKey(options)
     const arrow = arrowOf(options)
-    if (next === asked && arrow === askedArrow) return
+    if (next === asked && arrow === askedArrow) {
+      return
+    }
     asked = next
     askedArrow = arrow
     wake()
@@ -525,8 +677,11 @@ const optionsKey = (options: PositionOptions) =>
 // scale read from it is exact. The offsets when styles don't give it, like a
 // `width` that doesn't match them.
 function exactSize(
-  style: Pick<CSSStyleDeclaration, "boxSizing" | "width" | "height" | "getPropertyValue">,
-  offsets: { width: number; height: number },
+  style: Pick<
+    CSSStyleDeclaration,
+    "boxSizing" | "width" | "height" | "getPropertyValue"
+  >,
+  offsets: { width: number; height: number }
 ) {
   const px = (name: string) => parseFloat(style.getPropertyValue(name)) || 0
   const edges = (start: string, end: string) =>
@@ -538,15 +693,28 @@ function exactSize(
         px(`border-${end}-width`)
   const width = parseFloat(style.width) + edges("left", "right")
   const height = parseFloat(style.height) + edges("top", "bottom")
-  const exact = { width: Math.abs(width - offsets.width) < 1, height: Math.abs(height - offsets.height) < 1 }
-  return { width: exact.width ? width : offsets.width, height: exact.height ? height : offsets.height, exact }
+  const exact = {
+    width: Math.abs(width - offsets.width) < 1,
+    height: Math.abs(height - offsets.height) < 1,
+  }
+  return {
+    width: exact.width ? width : offsets.width,
+    height: exact.height ? height : offsets.height,
+    exact,
+  }
 }
 
 const angle = (value: string) => {
   const number = parseFloat(value) || 0
-  if (value.endsWith("turn")) return number * 2 * Math.PI
-  if (value.endsWith("grad")) return (number * Math.PI) / 200
-  if (value.endsWith("rad")) return number
+  if (value.endsWith("turn")) {
+    return number * 2 * Math.PI
+  }
+  if (value.endsWith("grad")) {
+    return (number * Math.PI) / 200
+  }
+  if (value.endsWith("rad")) {
+    return number
+  }
   return (number * Math.PI) / 180
 }
 
@@ -555,21 +723,42 @@ const angle = (value: string) => {
 // origin. The scale left over is an ancestor's `zoom` or a scaled containing block.
 function untransformed(
   rect: { x: number; y: number; width: number; height: number },
-  size: { width: number; height: number; exact?: { width: boolean; height: boolean } },
-  style: { transformOrigin: string; translate: string; rotate?: string; scale?: string; transform?: string },
+  size: {
+    width: number
+    height: number
+    exact?: { width: boolean; height: boolean }
+  },
+  style: {
+    transformOrigin: string
+    translate: string
+    rotate?: string
+    scale?: string
+    transform?: string
+  }
 ) {
-  const [originX = 0, originY = 0] = style.transformOrigin.split(" ").map((part) => parseFloat(part) || 0)
+  const [originX = 0, originY = 0] = style.transformOrigin
+    .split(" ")
+    .map((part) => parseFloat(part) || 0)
   // A computed translate keeps percentages, of the element's own size.
   const length = (part: string | undefined, whole: number) =>
-    !part ? 0 : part.endsWith("%") ? (parseFloat(part) / 100) * whole : parseFloat(part) || 0
-  const moves = style.translate && style.translate !== "none" ? style.translate.split(" ") : []
+    !part
+      ? 0
+      : part.endsWith("%")
+        ? (parseFloat(part) / 100) * whole
+        : parseFloat(part) || 0
+  const moves =
+    style.translate && style.translate !== "none"
+      ? style.translate.split(" ")
+      : []
   const moveX = length(moves[0], size.width)
   const moveY = length(moves[1], size.height)
   // A turn around any axis shows on screen as its rotation matrix's top left
   // corner: a tilt around x or y squashes the box rather than turning it.
-  const turn = style.rotate && style.rotate !== "none" ? style.rotate.split(" ") : []
+  const turn =
+    style.rotate && style.rotate !== "none" ? style.rotate.split(" ") : []
   const named = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] }[turn[0]]
-  const [kx, ky, kz] = named ?? (turn.length === 4 ? turn.slice(0, 3).map(parseFloat) : [0, 0, 1])
+  const [kx, ky, kz] =
+    named ?? (turn.length === 4 ? turn.slice(0, 3).map(parseFloat) : [0, 0, 1])
   const axis = Math.hypot(kx, ky, kz) || 1
   const [ux, uy, uz] = [kx / axis, ky / axis, kz / axis]
   const radians = turn.length ? angle(turn[turn.length - 1]) : 0
@@ -581,7 +770,9 @@ function untransformed(
     cos + (1 - cos) * uy * uy,
   ]
   const [scaleX = 1, scaleY = scaleX] =
-    style.scale && style.scale !== "none" ? style.scale.split(" ").map(parseFloat) : []
+    style.scale && style.scale !== "none"
+      ? style.scale.split(" ").map(parseFloat)
+      : []
   const matrix = /^matrix(3d)?\((.*)\)$/.exec(style.transform ?? "")
   const m = matrix?.[2].split(",").map(parseFloat) ?? []
   // A `perspective()` puts depth in the last row, which divides each corner.
@@ -595,7 +786,10 @@ function untransformed(
     const depth = p * dx + q * dy + w || 1
     const tx = (scaleX * (a * dx + c * dy + e)) / depth
     const ty = (scaleY * (b * dx + d * dy + f)) / depth
-    return [originX + moveX + r[0] * tx + r[1] * ty, originY + moveY + r[2] * tx + r[3] * ty]
+    return [
+      originX + moveX + r[0] * tx + r[1] * ty,
+      originY + moveY + r[2] * tx + r[3] * ty,
+    ]
   }
   const corners = [
     corner(0, 0),
@@ -610,7 +804,9 @@ function untransformed(
   // Offsets round, so a box under a pixel off may be the size they gave.
   // Sizes from styles are exact, so any visible difference is a scale.
   const rest = (shown: number, whole: number, exact = false) =>
-    whole > 0.01 && Math.abs(shown - whole) >= (exact ? 0.05 : 1) ? shown / whole : 1
+    whole > 0.01 && Math.abs(shown - whole) >= (exact ? 0.05 : 1)
+      ? shown / whole
+      : 1
   const scale = {
     x: rest(rect.width, Math.max(...xs) - left, size.exact?.width),
     y: rest(rect.height, Math.max(...ys) - top, size.exact?.height),
@@ -626,11 +822,13 @@ function computeArrow(
   popup: Rect,
   arrow: { width: number; height: number },
   side: PhysicalSide,
-  padding: number,
+  padding: number
 ) {
   const vertical = side === "top" || side === "bottom"
   const length = vertical ? arrow.width : arrow.height
-  const center = vertical ? anchor.x + anchor.width / 2 - popup.x : anchor.y + anchor.height / 2 - popup.y
+  const center = vertical
+    ? anchor.x + anchor.width / 2 - popup.x
+    : anchor.y + anchor.height / 2 - popup.y
   const ideal = center - length / 2
   const max = (vertical ? popup.width : popup.height) - length - padding
   const offset = Math.max(padding, Math.min(ideal, max))
@@ -639,11 +837,20 @@ function computeArrow(
 
 // How far along the popup's edge facing the anchor its center falls, from the
 // start of the popup's padding box, kept `padding` away from both corners.
-function arrowOffset(anchor: Rect, box: Rect, side: PhysicalSide, padding: number) {
+function arrowOffset(
+  anchor: Rect,
+  box: Rect,
+  side: PhysicalSide,
+  padding: number
+) {
   const vertical = side === "top" || side === "bottom"
-  const center = vertical ? anchor.x + anchor.width / 2 - box.x : anchor.y + anchor.height / 2 - box.y
+  const center = vertical
+    ? anchor.x + anchor.width / 2 - box.x
+    : anchor.y + anchor.height / 2 - box.y
   const length = vertical ? box.width : box.height
-  return Math.round(Math.min(Math.max(center, padding), Math.max(padding, length - padding)))
+  return Math.round(
+    Math.min(Math.max(center, padding), Math.max(padding, length - padding))
+  )
 }
 
 function transformOrigin(
@@ -652,12 +859,17 @@ function transformOrigin(
   rtl: boolean,
   a: ReturnType<typeof anchorRect>,
   size: { width: number; height: number },
-  point: { x: number; y: number },
+  point: { x: number; y: number }
 ) {
   if (side === "top" || side === "bottom") {
     const start = rtl ? a.right - point.x : a.left - point.x
     const end = rtl ? a.left - point.x : a.right - point.x
-    const x = align === "center" ? a.left + a.width / 2 - point.x : align === "start" ? start : end
+    const x =
+      align === "center"
+        ? a.left + a.width / 2 - point.x
+        : align === "start"
+          ? start
+          : end
     return [x, side === "bottom" ? 0 : size.height]
   }
   const y =

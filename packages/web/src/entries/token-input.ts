@@ -26,4 +26,10 @@ export type {
   TokenInsert,
 } from "@ui-sdk/core/token-input"
 export type { TokenInputEvents, UiTokenInputElement } from "../events"
-export { createTokenInputController, defaultCodec, fromText, toLabel, toText } from "@ui-sdk/core/token-input"
+export {
+  createTokenInputController,
+  defaultCodec,
+  fromText,
+  toLabel,
+  toText,
+} from "@ui-sdk/core/token-input"

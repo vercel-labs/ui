@@ -20,7 +20,11 @@ function mount(root: HTMLElement) {
     </ui-field>
   `
   const slider = root.querySelector("ui-slider")!
-  slider.format = { style: "currency", currency: "USD", maximumFractionDigits: 0 }
+  slider.format = {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }
 }
 
 export { mount }

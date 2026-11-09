@@ -15,7 +15,15 @@ import {
 } from "@ui-sdk/react/combobox"
 import { CheckIcon, XIcon } from "lucide-react"
 
-const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const labels = [
+  "Bug",
+  "Feature",
+  "Documentation",
+  "Design",
+  "Performance",
+  "Security",
+  "Testing",
+]
 
 function Example() {
   return (
@@ -45,7 +53,9 @@ function Example() {
               {(state) => (
                 <>
                   {label}
-                  {state.maxReached && <span data-slot="hint">Limit reached</span>}
+                  {state.maxReached && (
+                    <span data-slot="hint">Limit reached</span>
+                  )}
                   <ComboboxItemIndicator>
                     <CheckIcon aria-hidden="true" />
                   </ComboboxItemIndicator>

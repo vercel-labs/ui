@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
                 <ui-menu-item>Mark all as read</ui-menu-item>
               </ui-menu-content>
             </ui-menu>
-          `,
+          `
         )
         .join("")}
     </ui-menubar>

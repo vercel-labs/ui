@@ -12,10 +12,18 @@ import {
 import { createSignal } from "solid-js"
 
 function Example() {
-  const [dates, setDates] = createSignal<string[]>(["2026-10-07", "2026-10-16", "2026-10-26"])
+  const [dates, setDates] = createSignal<string[]>([
+    "2026-10-07",
+    "2026-10-16",
+    "2026-10-26",
+  ])
   return (
     <div>
-      <Calendar mode="multiple" value={dates()} onValueChange={(value) => setDates(value as string[])}>
+      <Calendar
+        mode="multiple"
+        value={dates()}
+        onValueChange={(value) => setDates(value as string[])}
+      >
         <div data-slot="row">
           <CalendarPrevious data-variant="ghost">
             <svg
@@ -46,8 +54,12 @@ function Example() {
           </CalendarNext>
         </div>
         <CalendarGrid>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} />}
+          </CalendarWeekdays>
+          <CalendarWeeks>
+            {(cell) => <CalendarDay value={cell.date} />}
+          </CalendarWeeks>
         </CalendarGrid>
       </Calendar>
     </div>

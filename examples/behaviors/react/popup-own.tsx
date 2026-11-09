@@ -19,7 +19,11 @@ type InviteOptions = {
 
 const invite = definePrimitive({
   name: "invite",
-  options: { open: "boolean", defaultOpen: "boolean", onOpenChange: "callback" },
+  options: {
+    open: "boolean",
+    defaultOpen: "boolean",
+    onOpenChange: "callback",
+  },
   state: (options: InviteOptions) => popupState(options),
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: (context) => createPopup(context, { preset: popoverPreset }),
@@ -30,7 +34,11 @@ const invite = definePrimitive({
   }),
 })
 
-const parts = createParts(invite, { trigger: "button", content: "div", close: "button" })
+const parts = createParts(invite, {
+  trigger: "button",
+  content: "div",
+  close: "button",
+})
 
 const Invite = parts.Root
 
@@ -55,4 +63,12 @@ function Example() {
   )
 }
 
-export { Example, invite, Invite, InviteClose, InviteContent, type InviteOptions, InviteTrigger }
+export {
+  Example,
+  invite,
+  Invite,
+  InviteClose,
+  InviteContent,
+  type InviteOptions,
+  InviteTrigger,
+}

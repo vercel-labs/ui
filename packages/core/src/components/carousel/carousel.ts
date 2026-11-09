@@ -4,9 +4,15 @@ import type { CarouselAlign, CarouselSlidesPerPage } from "./carousel-layout"
 import { carouselApi, snapType, type State } from "./carousel-api"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { orientationOf } from "../../foundation/focus/collection"
 import { live } from "../../foundation/kernel/live"
 
@@ -104,7 +110,9 @@ type CarouselController = ReturnType<typeof createCarouselController>
 type CarouselOrientation = "horizontal" | "vertical"
 
 function slidesPerPageAttribute(attribute: string | null) {
-  if (attribute === null) return undefined
+  if (attribute === null) {
+    return undefined
+  }
   return attribute === "auto" ? "auto" : Number(attribute)
 }
 
@@ -121,7 +129,10 @@ type CarouselOptions = {
    */
   defaultPage?: number
   /** Runs when the page wants to change. `details.reason` says why, and `details.cancel()` stays on the page. */
-  onPageChange?: (page: number, details: ChangeDetails<CarouselPageChangeReason>) => void
+  onPageChange?: (
+    page: number,
+    details: ChangeDetails<CarouselPageChangeReason>
+  ) => void
   /** Runs once the slides come to rest on a page, after a spring, a drag or a scroll, with that page. Start work there that would stutter the motion. */
   onPageChangeComplete?: (page: number) => void
   /** Whether it rotates through the pages on its own. Pass it to control rotation. */
@@ -132,7 +143,10 @@ type CarouselOptions = {
    */
   defaultPlaying?: boolean
   /** Runs when rotation wants to start or stop. Keyboard focus moving in and the user paging stop it, as the carousel pattern asks. */
-  onPlayingChange?: (playing: boolean, details: ChangeDetails<CarouselPlayingChangeReason>) => void
+  onPlayingChange?: (
+    playing: boolean,
+    details: ChangeDetails<CarouselPlayingChangeReason>
+  ) => void
   /**
    * How long each page shows while rotating, in ms. Hovering, a hidden tab and scrolling the carousel out of view pause it.
    * @defaultValue 5000
@@ -303,7 +317,9 @@ type CarouselPlayToggleState = {
 const checkPartName =
   (part: string) =>
   (el: HTMLElement, { id }: { id: string }) => {
-    queueMicrotask(() => el.isConnected && checkName(el, part, { component: "carousel", id }))
+    queueMicrotask(
+      () => el.isConnected && checkName(el, part, { component: "carousel", id })
+    )
   }
 
 /**
@@ -328,8 +344,12 @@ function viewportStyle(state: State) {
 
 function itemStyle(state: State) {
   const declarations = ["flex-shrink:0"]
-  if (state.slidesPerPage === 1) declarations.push(`scroll-snap-align:${state.align}`)
-  if (!state.skipSnaps) declarations.push("scroll-snap-stop:always")
+  if (state.slidesPerPage === 1) {
+    declarations.push(`scroll-snap-align:${state.align}`)
+  }
+  if (!state.skipSnaps) {
+    declarations.push("scroll-snap-stop:always")
+  }
   return declarations.join(";")
 }
 
@@ -414,15 +434,27 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
         "data-orientation": state.orientation,
         "data-playing": state.playing ? "" : undefined,
       }),
-      live: live((state) => ({ "data-paused": state.playing && state.paused ? "" : undefined })),
+      live: live((state) => ({
+        "data-paused": state.playing && state.paused ? "" : undefined,
+      })),
       bind: (el, { api }) => api.internal.bindRoot(el),
     }),
 
     viewport: slot<{}, CarouselViewportState>({
-      state: (state) => ({ orientation: state.orientation, dragging: state.dragging }),
-      attrs: (state) => ({ "data-orientation": state.orientation, style: viewportStyle(state) }),
-      live: live((state) => ({ "data-dragging": state.dragging ? "" : undefined })),
-      on: { keydown: (event, { api }) => api.internal.onViewportKeyDown(event) },
+      state: (state) => ({
+        orientation: state.orientation,
+        dragging: state.dragging,
+      }),
+      attrs: (state) => ({
+        "data-orientation": state.orientation,
+        style: viewportStyle(state),
+      }),
+      live: live((state) => ({
+        "data-dragging": state.dragging ? "" : undefined,
+      })),
+      on: {
+        keydown: (event, { api }) => api.internal.onViewportKeyDown(event),
+      },
       bind: (el, { api }) => api.internal.bindViewport(el),
     }),
 
@@ -434,7 +466,10 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
         "aria-live": state.playing ? "off" : "polite",
         "aria-atomic": "false",
         "data-orientation": state.orientation,
-        style: state.orientation === "vertical" ? "display:flex;flex-direction:column" : "display:flex",
+        style:
+          state.orientation === "vertical"
+            ? "display:flex;flex-direction:column"
+            : "display:flex",
       }),
     }),
 
@@ -455,11 +490,16 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
       // Slides out of view leave the tab order and the accessibility tree,
       // except one that holds focus, until focus leaves it.
       live: live((state, { key }) => {
-        const hidden = state.pageCount !== null && !state.inView.includes(key) && state.focused !== key
+        const hidden =
+          state.pageCount !== null &&
+          !state.inView.includes(key) &&
+          state.focused !== key
         return {
           inert: hidden ? "" : undefined,
           "aria-hidden": hidden ? "true" : undefined,
-          "data-active": state.pages[state.page - 1]?.includes(key) ? "" : undefined,
+          "data-active": state.pages[state.page - 1]?.includes(key)
+            ? ""
+            : undefined,
           "data-in-view": state.inView.includes(key) ? "" : undefined,
         }
       }),
@@ -488,7 +528,9 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
       role: "tablist",
       keys: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End"],
       state: (state) => ({ page: state.page, pageCount: state.pageCount }),
-      on: { keydown: (event, { api }) => api.internal.onIndicatorKeyDown(event) },
+      on: {
+        keydown: (event, { api }) => api.internal.onIndicatorKeyDown(event),
+      },
     }),
 
     indicator: slot<CarouselIndicatorProps, CarouselIndicatorState>({
@@ -508,15 +550,20 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
           tabindex: api.internal.roving.tabIndex(state, { key, props }),
           "aria-selected": String(selected),
           "data-selected": selected ? "" : undefined,
-          hidden: state.pageCount !== null && page > state.pageCount ? "" : undefined,
+          hidden:
+            state.pageCount !== null && page > state.pageCount ? "" : undefined,
         }
       },
       live: live((state, { id, key, props, api }) => {
         const page = api.internal.indicatorPage(state, key, props)
         const slides = state.pages[page - 1]
-        return { "aria-controls": slides?.map((slide) => slideId(id, slide)).join(" ") || undefined }
+        return {
+          "aria-controls":
+            slides?.map((slide) => slideId(id, slide)).join(" ") || undefined,
+        }
       }),
-      press: ({ api, el, key, props }, event) => api.internal.pressIndicator(el, key, props, event),
+      press: ({ api, el, key, props }, event) =>
+        api.internal.pressIndicator(el, key, props, event),
       bind: (el, part) => part.api.internal.bindIndicator(el, part),
     }),
 
@@ -527,14 +574,18 @@ const carouselPrimitive = /* @__PURE__ */ definePrimitive({
         "aria-controls": contentId(id),
         "data-playing": state.playing ? "" : undefined,
       }),
-      live: live((state) => ({ "data-paused": state.playing && state.paused ? "" : undefined })),
+      live: live((state) => ({
+        "data-paused": state.playing && state.paused ? "" : undefined,
+      })),
       press: ({ api, store }, event) => {
         api.setPlaying(!store.get().playing, { reason: "toggle-press", event })
       },
       bind: dev ? checkPartName("CarouselPlayToggle") : undefined,
     }),
   }),
-  agent: { actions: ["setPage", "next", "previous", "setPlaying", "play", "pause"] },
+  agent: {
+    actions: ["setPage", "next", "previous", "setPlaying", "play", "pause"],
+  },
 })
 
 /**

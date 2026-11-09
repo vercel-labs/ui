@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
 
   const sides = [
     { side: "top", label: "Top" },

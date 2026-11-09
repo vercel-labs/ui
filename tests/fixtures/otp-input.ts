@@ -12,7 +12,8 @@ const otpInputFixture = {
 
 // What the "Last action" status says.
 const otpInputAction = {
-  change: (value: string, reason: string) => `code: ${value || "empty"} (${reason})`,
+  change: (value: string, reason: string) =>
+    `code: ${value || "empty"} (${reason})`,
   complete: (value: string) => `complete: ${value}`,
 }
 

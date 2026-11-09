@@ -19,7 +19,12 @@ import {
   type DateMatchers,
   type ISOMonth,
 } from "./calendar-model"
-import { addDays, clampDate, isISODate, type ISODate } from "../../foundation/date/plain-date"
+import {
+  addDays,
+  clampDate,
+  isISODate,
+  type ISODate,
+} from "../../foundation/date/plain-date"
 import { firstDayOfWeek } from "../../foundation/date/week"
 import {
   dateFormatter,
@@ -33,7 +38,10 @@ import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { createFocusRecovery } from "../../foundation/focus/focus-recovery"
 import { isDisabled } from "../../foundation/forms/form"
 import { bindPageLocale, localeOf } from "../../foundation/text/locale"
-import type { PrimitiveContext, SlotFactory } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveContext,
+  SlotFactory,
+} from "../../foundation/kernel/primitive-types"
 import { createChange, dispatch } from "../../foundation/kernel/input-source"
 import { selects } from "../../foundation/kernel/selects"
 import type {
@@ -99,10 +107,15 @@ const calendarSettings = (options: CalendarOptions) => ({
   disabled: !!options.disabled,
   readOnly: !!options.readOnly,
   deselectable: !!options.deselectable,
-  months: Number.isFinite(options.months) ? Math.max(1, Math.floor(options.months!)) : 1,
+  months: Number.isFinite(options.months)
+    ? Math.max(1, Math.floor(options.months!))
+    : 1,
   pageBy: options.pageBy ?? "month",
   locale: options.locale ?? null,
-  weekStartsOn: options.weekStartsOn === undefined ? null : ((options.weekStartsOn % 7) + 7) % 7,
+  weekStartsOn:
+    options.weekStartsOn === undefined
+      ? null
+      : ((options.weekStartsOn % 7) + 7) % 7,
   weekdayFormat: options.weekdayFormat ?? "short",
   monthFormat: options.monthFormat ?? "long",
   fixedWeeks: options.fixedWeeks ?? false,
@@ -112,14 +125,20 @@ const calendarSettings = (options: CalendarOptions) => ({
   allowUnavailable: options.allowUnavailable ?? false,
 })
 
-const weekStartOf = (state: State) => state.weekStartsOn ?? firstDayOfWeek(localeOf(state))
-const unavailableDate = (state: State, date: ISODate) => matchesDate(date, state.unavailable)
+const weekStartOf = (state: State) =>
+  state.weekStartsOn ?? firstDayOfWeek(localeOf(state))
+const unavailableDate = (state: State, date: ISODate) =>
+  matchesDate(date, state.unavailable)
 const outOfBounds = (state: State, date: ISODate) =>
-  (state.min !== null && date < state.min) || (state.max !== null && date > state.max)
+  (state.min !== null && date < state.min) ||
+  (state.max !== null && date > state.max)
 // A date that can't be picked. The calendar being disabled is checked apart.
-const blockedDate = (state: State, date: ISODate) => outOfBounds(state, date) || unavailableDate(state, date)
-const sameDates = (a: CalendarValue, b: CalendarValue) => String(a) === String(b)
-const gridMonth = (state: State, offset: number | undefined) => addMonthsTo(state.month, offset ?? 0)
+const blockedDate = (state: State, date: ISODate) =>
+  outOfBounds(state, date) || unavailableDate(state, date)
+const sameDates = (a: CalendarValue, b: CalendarValue) =>
+  String(a) === String(b)
+const gridMonth = (state: State, offset: number | undefined) =>
+  addMonthsTo(state.month, offset ?? 0)
 const isOutside = (state: State, props: CalendarDayProps) =>
   monthOf(props.value) !== gridMonth(state, props.offset)
 
@@ -131,10 +150,18 @@ const rangeRules = (state: State) => ({
 })
 // Whether people could pick a value now: the calendar isn't disabled or read-only, no date is blocked, and the rules allow a range.
 function isPickable(state: State, value: CalendarValue) {
-  if (isDisabled(state) || state.readOnly) return false
+  if (isDisabled(state) || state.readOnly) {
+    return false
+  }
   const dates = selectedDates(value)
-  if (dates.some((date) => blockedDate(state, date))) return false
-  return state.mode !== "range" || !dates.length || isAllowedRange(dates[0], dates[1], rangeRules(state))
+  if (dates.some((date) => blockedDate(state, date))) {
+    return false
+  }
+  return (
+    state.mode !== "range" ||
+    !dates.length ||
+    isAllowedRange(dates[0], dates[1], rangeRules(state))
+  )
 }
 const refusedEnd = (state: State, date: ISODate) =>
   state.mode === "range" &&
@@ -144,19 +171,32 @@ const refusedEnd = (state: State, date: ISODate) =>
 
 // The month a calendar opens on: the selection's, else today's, within `min` and `max`.
 function initialMonth(options: CalendarOptions, value: CalendarValue) {
-  if (isISOMonth(options.month)) return options.month
-  if (isISOMonth(options.defaultMonth)) return options.defaultMonth
+  if (isISOMonth(options.month)) {
+    return options.month
+  }
+  if (isISOMonth(options.defaultMonth)) {
+    return options.defaultMonth
+  }
   const [selected] = selectedDates(value)
-  if (selected) return monthOf(selected)
+  if (selected) {
+    return monthOf(selected)
+  }
   const today = dateOrNull(options.today) ?? todayDate(options.timeZone)
-  return monthOf(clampDate(today, dateOrNull(options.min), dateOrNull(options.max)))
+  return monthOf(
+    clampDate(today, dateOrNull(options.min), dateOrNull(options.max))
+  )
 }
 
 // The range days show: the one being picked, else the selected one.
 function shownRange(state: State) {
-  if (state.mode !== "range") return null
+  if (state.mode !== "range") {
+    return null
+  }
   if (state.anchor !== null) {
-    const preview = state.hover === null ? null : rangeTo(state.anchor, state.hover, rangeRules(state))
+    const preview =
+      state.hover === null
+        ? null
+        : rangeTo(state.anchor, state.hover, rangeRules(state))
     return preview ?? ([state.anchor, state.anchor] as const)
   }
   return state.value as [ISODate, ISODate] | null
@@ -167,20 +207,24 @@ function shownRange(state: State) {
 // every day while the stop is checked, so it's kept for the state it read.
 let preferredFor: { state: State; date: ISODate } | undefined
 function preferredDate(state: State) {
-  if (preferredFor?.state === state) return preferredFor.date
+  if (preferredFor?.state === state) {
+    return preferredFor.date
+  }
   const { start, end } = visibleRange(state.month, state.months)
-  const shows = (date: ISODate) => date >= start && date <= end && !blockedDate(state, date)
+  const shows = (date: ISODate) =>
+    date >= start && date <= end && !blockedDate(state, date)
   let date =
     selectedDates(state.value).find(shows) ??
     (state.today !== null && shows(state.today) ? state.today : undefined)
   if (date === undefined) {
     const first = clampDate(start, state.min, state.max)
     date = first
-    for (let day = first; day <= end; day = addDays(day, 1))
+    for (let day = first; day <= end; day = addDays(day, 1)) {
       if (!blockedDate(state, day)) {
         date = day
         break
       }
+    }
   }
   preferredFor = { state, date }
   return date
@@ -190,8 +234,15 @@ function headingLabel(state: State) {
   const locale = localeOf(state)
   const options = { month: state.monthFormat, year: "numeric" } as const
   const first = `${state.month}-01`
-  if (state.months === 1) return formatDate(first, locale, options)
-  return formatDateRange(first, `${addMonthsTo(state.month, state.months - 1)}-01`, locale, options)
+  if (state.months === 1) {
+    return formatDate(first, locale, options)
+  }
+  return formatDateRange(
+    first,
+    `${addMonthsTo(state.month, state.months - 1)}-01`,
+    locale,
+    options
+  )
 }
 
 // The month and year selects: every month, and the years from min to max,
@@ -203,19 +254,29 @@ function selectState(state: State, kind: "month" | "year") {
   const key = `${kind}|${state.month}|${locale}|${state.monthFormat}|${state.min}|${state.max}|${isDisabled(state)}`
   let cached = selectCache.get(key)
   if (!cached) {
-    if (selectCache.size > 50) selectCache.clear()
+    if (selectCache.size > 50) {
+      selectCache.clear()
+    }
     selectCache.set(key, (cached = buildSelectState(state, kind, locale)))
   }
   return cached
 }
 
-function buildSelectState(state: State, kind: "month" | "year", locale: string) {
+function buildSelectState(
+  state: State,
+  kind: "month" | "year",
+  locale: string
+) {
   const year = Number(state.month.slice(0, 4))
   const first = state.min && monthOf(state.min)
   const last = state.max && monthOf(state.max)
   const months = kind === "month"
-  const from = months ? 1 : Math.min(year, first ? Number(first.slice(0, 4)) : year - 10)
-  const to = months ? 12 : Math.max(year, last ? Number(last.slice(0, 4)) : year + 10)
+  const from = months
+    ? 1
+    : Math.min(year, first ? Number(first.slice(0, 4)) : year - 10)
+  const to = months
+    ? 12
+    : Math.max(year, last ? Number(last.slice(0, 4)) : year + 10)
   const names = monthNames(locale, state.monthFormat)
   const format = dateFormatter(locale, { year: "numeric" })
   const select: CalendarSelectState = {
@@ -227,7 +288,8 @@ function buildSelectState(state: State, kind: "month" | "year", locale: string) 
       return {
         value,
         label: months ? names[index] : format.format(Date.UTC(value, 0, 1)),
-        disabled: months && ((!!first && month < first) || (!!last && month > last)),
+        disabled:
+          months && ((!!first && month < first) || (!!last && month > last)),
       }
     }),
     disabled: isDisabled(state),
@@ -242,8 +304,12 @@ function selectedMonth(state: State, kind: "month" | "year", picked: number) {
     kind === "month"
       ? `${year}-${String(picked).padStart(2, "0")}`
       : `${String(picked).padStart(4, "0")}-${month}`
-  if (state.min !== null && target < monthOf(state.min)) return monthOf(state.min)
-  if (state.max !== null && target > monthOf(state.max)) return monthOf(state.max)
+  if (state.min !== null && target < monthOf(state.min)) {
+    return monthOf(state.min)
+  }
+  if (state.max !== null && target > monthOf(state.max)) {
+    return monthOf(state.max)
+  }
   return target
 }
 
@@ -254,7 +320,8 @@ function stepTarget(state: State, direction: -1 | 1) {
     isDisabled(state) ||
     (direction < 0
       ? state.min !== null && monthOf(state.min) >= state.month
-      : state.max !== null && monthOf(state.max) <= addMonthsTo(state.month, state.months - 1))
+      : state.max !== null &&
+        monthOf(state.max) <= addMonthsTo(state.month, state.months - 1))
   return { month, disabled }
 }
 
@@ -270,11 +337,19 @@ function gridState(state: State, offset: number) {
   const key = `${month}|${locale}|${state.monthFormat}|${weekStartsOn}|${state.fixedWeeks}|${state.showOutsideDays}|${first}|${last}`
   let grid = grids.get(key)
   if (!grid) {
-    if (grids.size > 50) grids.clear()
+    if (grids.size > 50) {
+      grids.clear()
+    }
     grid = {
       month,
-      label: formatDate(`${month}-01`, locale, { month: state.monthFormat, year: "numeric" }),
-      weekdays: Array.from({ length: 7 }, (_, index) => (weekStartsOn + index) % 7),
+      label: formatDate(`${month}-01`, locale, {
+        month: state.monthFormat,
+        year: "numeric",
+      }),
+      weekdays: Array.from(
+        { length: 7 },
+        (_, index) => (weekStartsOn + index) % 7
+      ),
       weeks: gridWeeks(month, {
         weekStartsOn,
         fixedWeeks: state.fixedWeeks,
@@ -299,12 +374,13 @@ function dayState(state: State, props: CalendarDayProps) {
   return {
     date,
     label: dateFormatter(localeOf(state), { day: "numeric" }).format(
-      Date.UTC(2000, 0, Number(date.slice(8))),
+      Date.UTC(2000, 0, Number(date.slice(8)))
     ),
     selected,
     today: state.today === date,
     outside: isOutside(state, props),
-    disabled: isDisabled(state) || blockedDate(state, date) || refusedEnd(state, date),
+    disabled:
+      isDisabled(state) || blockedDate(state, date) || refusedEnd(state, date),
     unavailable: unavailableDate(state, date),
     rangeStart: !!range && range[0] === date,
     rangeEnd: !!range && range[1] === date,
@@ -323,7 +399,10 @@ function calendarApi<
   S extends State,
   ValueReason extends string = CalendarValueChangeReason,
   MonthReason extends string = CalendarMonthChangeReason,
->(shared: PrimitiveContext<Options, S, string>, hooks: { picked?: (event: Event | undefined) => void } = {}) {
+>(
+  shared: PrimitiveContext<Options, S, string>,
+  hooks: { picked?: (event: Event | undefined) => void } = {}
+) {
   type ValueChangeReason = ValueReason | CalendarValueChangeReason
   type MonthChangeReason = MonthReason | CalendarMonthChangeReason
   const context = shared as unknown as PrimitiveContext<
@@ -340,11 +419,15 @@ function calendarApi<
     // Unavailable dates stay focusable, as the date picker pattern asks; they just can't be picked.
     disabled: (day) => blockedDate(store.get(), day.key),
     // Days of the months around a grid show it, but focus moves through each grid's own.
-    focusable: (day) => !isDisabled(store.get()) && !isOutside(store.get(), day.props),
+    focusable: (day) =>
+      !isDisabled(store.get()) && !isOutside(store.get(), day.props),
     preferred: (day) => day.key === preferredDate(store.get()),
-    claims: (state, day) => !isOutside(state, day.props) && day.key === preferredDate(state),
+    claims: (state, day) =>
+      !isOutside(state, day.props) && day.key === preferredDate(state),
     move: (event, { from, rtl }) => {
-      if (event.ctrlKey || event.metaKey) return
+      if (event.ctrlKey || event.metaKey) {
+        return
+      }
       const state = store.get()
       const to = moveDate(event, from.key, {
         rtl,
@@ -352,7 +435,9 @@ function calendarApi<
         min: state.min,
         max: state.max,
       })
-      return to === undefined || moveFocus(to, "list-navigation", event) ? to : from.key
+      return to === undefined || moveFocus(to, "list-navigation", event)
+        ? to
+        : from.key
     },
   })
   // A day of next month that took focus before its month showed leaves the
@@ -366,9 +451,17 @@ function calendarApi<
   let pointer: PointerEvent | undefined
   // A day a press couldn't focus, which its click then leaves unfocused.
   let refused: ISODate | null = null
-  function moveFocus(date: ISODate, reason: CalendarFocusedChangeReason, event?: Event) {
-    if (date === store.get().focused) return true
-    if (dispatch(context, "onFocusedChange", date, { reason, event })) return false
+  function moveFocus(
+    date: ISODate,
+    reason: CalendarFocusedChangeReason,
+    event?: Event
+  ) {
+    if (date === store.get().focused) {
+      return true
+    }
+    if (dispatch(context, "onFocusedChange", date, { reason, event })) {
+      return false
+    }
     approved = date
     return true
   }
@@ -379,20 +472,25 @@ function calendarApi<
     const from = store.get().focused
     const press = pointer
     pointer = undefined
-    if (date === approved) approved = null
-    else if (
+    if (date === approved) {
+      approved = null
+    } else if (
       date !== from &&
       from !== null &&
       dispatch(
         context,
         "onFocusedChange",
         date,
-        press ? { reason: "item-press", event: press } : { reason: "focus-in", event },
+        press
+          ? { reason: "item-press", event: press }
+          : { reason: "focus-in", event }
       )
     ) {
       // Before the roving focus hears it, which would move the stop here.
       event.stopImmediatePropagation()
-      if (press) refused = date
+      if (press) {
+        refused = date
+      }
       roving.focus(from)
     }
   }
@@ -401,20 +499,30 @@ function calendarApi<
     anchor: ISODate | null,
     hover: ISODate | null,
     reason: CalendarAnchorChangeReason,
-    event?: Event,
+    event?: Event
   ) {
-    if (anchor !== store.get().anchor && dispatch(context, "onAnchorChange", anchor, { reason, event }))
+    if (
+      anchor !== store.get().anchor &&
+      dispatch(context, "onAnchorChange", anchor, { reason, event })
+    ) {
       return false
+    }
     store.set({ anchor, hover })
     return true
   }
 
   function setMonth(month: ISOMonth, reason: MonthChangeReason, event?: Event) {
-    if (!isISOMonth(month)) return false
+    if (!isISOMonth(month)) {
+      return false
+    }
     return change("month", month, { reason, event })
   }
 
-  function setValue(value: CalendarValue, reason: ValueChangeReason, event?: Event) {
+  function setValue(
+    value: CalendarValue,
+    reason: ValueChangeReason,
+    event?: Event
+  ) {
     const state = store.get()
     return change("value", normalizeValue(state.mode, value), { reason, event })
   }
@@ -422,7 +530,9 @@ function calendarApi<
   function reveal(date: ISODate, reason: MonthChangeReason, event?: Event) {
     const state = store.get()
     const first = monthToShow(date, state.month, state.months, state.pageBy)
-    if (first !== state.month) setMonth(first, reason, event)
+    if (first !== state.month) {
+      setMonth(first, reason, event)
+    }
   }
 
   function step(direction: -1 | 1, reason: MonthChangeReason, event?: Event) {
@@ -432,47 +542,87 @@ function calendarApi<
 
   function pick(date: ISODate, event: Event | undefined) {
     const state = store.get()
-    if (isDisabled(state) || state.readOnly || blockedDate(state, date)) return
+    if (isDisabled(state) || state.readOnly || blockedDate(state, date)) {
+      return
+    }
     if (state.mode === "multiple") {
       const value = state.value as ISODate[]
       setValue(
-        value.includes(date) ? value.filter((selected) => selected !== date) : [...value, date],
+        value.includes(date)
+          ? value.filter((selected) => selected !== date)
+          : [...value, date],
         "item-press",
-        event,
+        event
       )
     } else if (state.mode === "range") {
       const pressed = pressRange(state.anchor, date, rangeRules(state))
-      if (!setAnchor(pressed.anchor, pressed.anchor === null ? null : date, "item-press", event)) return
+      if (
+        !setAnchor(
+          pressed.anchor,
+          pressed.anchor === null ? null : date,
+          "item-press",
+          event
+        )
+      ) {
+        return
+      }
       if (
         pressed.value &&
-        (setValue(pressed.value, "item-press", event) || sameDates(store.get().value, pressed.value))
-      )
+        (setValue(pressed.value, "item-press", event) ||
+          sameDates(store.get().value, pressed.value))
+      ) {
         hooks.picked?.(event)
-    } else if (state.deselectable && state.value === date) setValue(null, "item-press", event)
-    else if (setValue(date, "item-press", event) || store.get().value === date) hooks.picked?.(event)
+      }
+    } else if (state.deselectable && state.value === date) {
+      setValue(null, "item-press", event)
+    } else if (
+      setValue(date, "item-press", event) ||
+      store.get().value === date
+    ) {
+      hooks.picked?.(event)
+    }
   }
 
   const api = {
     getValue: () => store.get().value,
     setValue: (
       value: CalendarValue,
-      { reason = "imperative", event }: CalendarChangeOptions<ValueChangeReason> = {},
-    ) => isPickable(store.get(), normalizeValue(store.get().mode, value)) && setValue(value, reason, event),
+      {
+        reason = "imperative",
+        event,
+      }: CalendarChangeOptions<ValueChangeReason> = {}
+    ) =>
+      isPickable(store.get(), normalizeValue(store.get().mode, value)) &&
+      setValue(value, reason, event),
     getMonth: () => store.get().month,
     setMonth: (
       month: ISOMonth,
-      { reason = "imperative", event }: CalendarChangeOptions<MonthChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: CalendarChangeOptions<MonthChangeReason> = {}
     ) => setMonth(month, reason, event),
-    previous: ({ reason = "imperative", event }: CalendarChangeOptions<MonthChangeReason> = {}) =>
+    previous: ({
+      reason = "imperative",
+      event,
+    }: CalendarChangeOptions<MonthChangeReason> = {}) =>
       step(-1, reason, event),
-    next: ({ reason = "imperative", event }: CalendarChangeOptions<MonthChangeReason> = {}) =>
-      step(1, reason, event),
+    next: ({
+      reason = "imperative",
+      event,
+    }: CalendarChangeOptions<MonthChangeReason> = {}) => step(1, reason, event),
     focus(date?: ISODate) {
-      if (date === undefined) return roving.focus(store.get().focused ?? undefined)
-      if (!isISODate(date)) return
+      if (date === undefined) {
+        return roving.focus(store.get().focused ?? undefined)
+      }
+      if (!isISODate(date)) {
+        return
+      }
       const state = store.get()
       const target = clampDate(date, state.min, state.max)
-      if (!moveFocus(target, "imperative")) return
+      if (!moveFocus(target, "imperative")) {
+        return
+      }
       reveal(target, "imperative")
       roving.focus(target)
     },
@@ -484,18 +634,26 @@ function calendarApi<
       setMonth,
       reveal,
       // A press on a day, or Enter or Space on one. A day of another month turns the months to it.
-      press(props: CalendarDayProps, event: Event | undefined, el: HTMLElement | undefined) {
+      press(
+        props: CalendarDayProps,
+        event: Event | undefined,
+        el: HTMLElement | undefined
+      ) {
         const state = store.get()
-        if (isDisabled(state)) return
+        if (isDisabled(state)) {
+          return
+        }
         // Safari doesn't focus a cell on click, so arrow keys would go nowhere.
         if (
           el &&
           !isOutside(state, props) &&
           el.ownerDocument.activeElement !== el &&
           // Only the refused press's own click counts clicks; a script's click() on that day still focuses it.
-          (refused !== props.value || !(event as MouseEvent | undefined)?.detail)
-        )
+          (refused !== props.value ||
+            !(event as MouseEvent | undefined)?.detail)
+        ) {
           el.focus({ preventScroll: true })
+        }
         pointer = undefined
         refused = null
         pick(props.value, event)
@@ -511,10 +669,18 @@ function calendarApi<
       step: (direction: -1 | 1, event: Event | undefined) =>
         step(direction, direction < 0 ? "previous-press" : "next-press", event),
       select(kind: "month" | "year", value: number, event?: Event) {
-        if (Number.isInteger(value)) setMonth(selectedMonth(store.get(), kind, value), "select-change", event)
+        if (Number.isInteger(value)) {
+          setMonth(
+            selectedMonth(store.get(), kind, value),
+            "select-change",
+            event
+          )
+        }
       },
       keydown(event: KeyboardEvent, el: HTMLElement, props: CalendarDayProps) {
-        if (event.defaultPrevented) return
+        if (event.defaultPrevented) {
+          return
+        }
         const state = store.get()
         if (
           (event.key === "Enter" || event.key === " ") &&
@@ -527,14 +693,22 @@ function calendarApi<
           return
         }
         // Escape drops the start of a range being picked, before it closes anything.
-        if (event.key === "Escape" && state.anchor !== null && setAnchor(null, null, "escape-key", event)) {
+        if (
+          event.key === "Escape" &&
+          state.anchor !== null &&
+          setAnchor(null, null, "escape-key", event)
+        ) {
           event.preventDefault()
           return
         }
         const moved = roving.keydown(event, el)
-        if (!moved || moved.key === moved.from) return
+        if (!moved || moved.key === moved.from) {
+          return
+        }
         reveal(moved.key, "list-navigation", event)
-        if (store.get().anchor !== null) store.set({ hover: moved.key })
+        if (store.get().anchor !== null) {
+          store.set({ hover: moved.key })
+        }
       },
       pointerdown(event: PointerEvent) {
         pointer = event
@@ -544,15 +718,21 @@ function calendarApi<
       // focused day keeps focus. That cell has no tabindex, and the page would blur it.
       mousedown(event: MouseEvent, props: CalendarDayProps) {
         const state = store.get()
-        if (isOutside(state, props) && outOfBounds(state, props.value)) event.preventDefault()
+        if (isOutside(state, props) && outOfBounds(state, props.value)) {
+          event.preventDefault()
+        }
       },
       hover(date: ISODate) {
-        if (store.get().anchor !== null) store.set({ hover: date })
+        if (store.get().anchor !== null) {
+          store.set({ hover: date })
+        }
       },
       bindRoot(el: HTMLElement) {
         bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
         // Today on the client only, so server markup and hydration agree.
-        if (options().today === undefined) store.set({ today: todayDate(options().timeZone) })
+        if (options().today === undefined) {
+          store.set({ today: todayDate(options().timeZone) })
+        }
       },
     },
   }
@@ -561,7 +741,10 @@ function calendarApi<
 
 function calendarState(options: CalendarOptions) {
   const mode = options.mode ?? "single"
-  const value = normalizeValue(mode, options.value ?? options.defaultValue ?? null)
+  const value = normalizeValue(
+    mode,
+    options.value ?? options.defaultValue ?? null
+  )
   const state: State = {
     ...calendarSettings(options),
     value,
@@ -579,7 +762,9 @@ function calendarState(options: CalendarOptions) {
 // What new options write.
 const calendarSync = (options: CalendarOptions) => ({
   ...calendarSettings(options),
-  ...(options.value === undefined ? {} : { value: normalizeValue(options.mode ?? "single", options.value) }),
+  ...(options.value === undefined
+    ? {}
+    : { value: normalizeValue(options.mode ?? "single", options.value) }),
   ...(isISOMonth(options.month) ? { month: options.month } : {}),
   ...(options.today === undefined ? {} : { today: dateOrNull(options.today) }),
 })
@@ -589,7 +774,7 @@ type CalendarApi = ReturnType<typeof calendarApi<CalendarOptions, State>>
 // A native <select> of the months or years, which turns the first month shown.
 function selectSlot<S extends State, A extends Pick<CalendarApi, "internal">>(
   slot: SlotFactory<S, A>,
-  kind: "month" | "year",
+  kind: "month" | "year"
 ) {
   return slot<{}, CalendarSelectState>({
     state: (state) => selectState(state, kind),
@@ -601,14 +786,21 @@ function selectSlot<S extends State, A extends Pick<CalendarApi, "internal">>(
     }),
     on: {
       change: (event, { api, el }) =>
-        el && api.internal.select(kind, Number((el as HTMLSelectElement).value), event),
+        el &&
+        api.internal.select(
+          kind,
+          Number((el as HTMLSelectElement).value),
+          event
+        ),
     },
     // The selected option is written here, after the framework renders the options.
     bind(el, { store }) {
       const select = el as HTMLSelectElement
       const write = () => {
         const value = String(selectState(store.get(), kind).value)
-        if (select.value !== value) select.value = value
+        if (select.value !== value) {
+          select.value = value
+        }
       }
       write()
       return store.subscribe(write)
@@ -617,12 +809,18 @@ function selectSlot<S extends State, A extends Pick<CalendarApi, "internal">>(
 }
 
 // The parts Calendar and Date Picker share: everything but the root.
-function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>(slot: SlotFactory<S, A>) {
+function calendarSlots<
+  S extends State,
+  A extends Pick<CalendarApi, "internal">,
+>(slot: SlotFactory<S, A>) {
   return {
     heading: slot<{}, CalendarHeadingState>({
       state: (state) => ({ month: state.month, label: headingLabel(state) }),
       // Screen readers hear the month change after Previous, Next or a key turns it.
-      attrs: (state, { id }) => ({ id: `${id}-heading`, "aria-live": "polite" }),
+      attrs: (state, { id }) => ({
+        id: `${id}-heading`,
+        "aria-live": "polite",
+      }),
     }),
 
     previous: slot<{}, CalendarStepState>({
@@ -664,7 +862,10 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
       attrs: (state, { props }) => {
         const month = gridMonth(state, props.offset)
         return {
-          "aria-label": formatDate(`${month}-01`, localeOf(state), { month: "long", year: "numeric" }),
+          "aria-label": formatDate(`${month}-01`, localeOf(state), {
+            month: "long",
+            year: "numeric",
+          }),
           "aria-multiselectable": state.mode === "single" ? undefined : "true",
           "aria-readonly": state.readOnly ? "true" : undefined,
           "aria-disabled": isDisabled(state) ? "true" : undefined,
@@ -683,12 +884,16 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
         const locale = localeOf(state)
         return {
           weekday: (weekStartsOn + props.index) % 7,
-          label: weekdayNames(locale, state.weekdayFormat, weekStartsOn)[props.index]!,
+          label: weekdayNames(locale, state.weekdayFormat, weekStartsOn)[
+            props.index
+          ]!,
           name: weekdayNames(locale, "long", weekStartsOn)[props.index]!,
         }
       },
       attrs: (state, { props }) => ({
-        "aria-label": weekdayNames(localeOf(state), "long", weekStartOf(state))[props.index],
+        "aria-label": weekdayNames(localeOf(state), "long", weekStartOf(state))[
+          props.index
+        ],
       }),
     }),
 
@@ -698,18 +903,25 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
       role: "gridcell",
       focus: (state, { props }) =>
         dayState(state, props).outside
-          ? { none: "Days of the months around show here, but focus moves through each grid's own." }
+          ? {
+              none: "Days of the months around show here, but focus moves through each grid's own.",
+            }
           : "roving",
       props: { value: "string", offset: { kind: "number", from: "grid" } },
       // A key press moves the stop between two days; only they render again.
-      selects: selects<State, A, CalendarDayProps>({ focused: ({ key }) => [key, null] }),
+      selects: selects<State, A, CalendarDayProps>({
+        focused: ({ key }) => [key, null],
+      }),
       state: (state, { props }) => dayState(state, props),
       attrs: (state, part) => {
         const { props, api } = part
         const day = dayState(state, props)
         const range = shownRange(state)
         return {
-          tabindex: isDisabled(state) || day.outside ? undefined : api.internal.roving.tabIndex(state, part),
+          tabindex:
+            isDisabled(state) || day.outside
+              ? undefined
+              : api.internal.roving.tabIndex(state, part),
           "aria-label": formatDate(props.value, localeOf(state)),
           "aria-selected": day.outside ? undefined : String(day.selected),
           "aria-disabled": day.disabled ? "true" : undefined,
@@ -722,19 +934,26 @@ function calendarSlots<S extends State, A extends Pick<CalendarApi, "internal">>
           "data-unavailable": day.unavailable ? "" : undefined,
           "data-range-start": day.rangeStart ? "" : undefined,
           "data-range-end": day.rangeEnd ? "" : undefined,
-          "data-range-middle": day.inRange && !day.rangeStart && !day.rangeEnd ? "" : undefined,
-          "data-preview": range && state.anchor !== null && day.inRange ? "" : undefined,
+          "data-range-middle":
+            day.inRange && !day.rangeStart && !day.rangeEnd ? "" : undefined,
+          "data-preview":
+            range && state.anchor !== null && day.inRange ? "" : undefined,
         }
       },
-      press: ({ api, props, el }, event) => api.internal.press(props, event, el),
+      press: ({ api, props, el }, event) =>
+        api.internal.press(props, event, el),
       on: {
-        keydown: (event, { api, el, props }) => api.internal.keydown(event, el!, props),
+        keydown: (event, { api, el, props }) =>
+          api.internal.keydown(event, el!, props),
         pointerdown: (event, { api }) => api.internal.pointerdown(event),
-        mousedown: (event, { api, props }) => api.internal.mousedown(event, props),
-        pointerenter: (_event, { api, props }) => api.internal.hover(props.value),
+        mousedown: (event, { api, props }) =>
+          api.internal.mousedown(event, props),
+        pointerenter: (_event, { api, props }) =>
+          api.internal.hover(props.value),
       },
       bind: (el, part) => {
-        const landed = (event: FocusEvent) => part.api.internal.focusLanded(part.props.value, event)
+        const landed = (event: FocusEvent) =>
+          part.api.internal.focusLanded(part.props.value, event)
         // Ahead of the roving focus, which moves the stop to where focus lands.
         el.addEventListener("focus", landed)
         const cleanups = [

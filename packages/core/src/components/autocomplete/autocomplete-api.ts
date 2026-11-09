@@ -13,9 +13,17 @@ import {
   type HighlightCause,
   type SearchFilter,
 } from "../../foundation/lists/autocomplete-core"
-import { modalityOf, restoreFocus, trackModality } from "../../foundation/kernel/modality"
+import {
+  modalityOf,
+  restoreFocus,
+  trackModality,
+} from "../../foundation/kernel/modality"
 import { deriveOpen, type PopupOpener } from "../../foundation/popups/popup"
-import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  createPopup,
+  popupState,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { comboboxPreset } from "../../foundation/popups/popup-presets"
 import { normalize } from "../../foundation/text/typeahead"
 import { submitImplicitly } from "../../foundation/forms/form"
@@ -57,7 +65,9 @@ type AutocompleteState = PopupState &
 // The parts around the list. Presses on them don't dismiss it, and focus moving among them doesn't close it.
 const controlSlots = ["input", "trigger", "clear", "label"]
 
-function initialAutocompleteState(options: AutocompleteOptions): AutocompleteState {
+function initialAutocompleteState(
+  options: AutocompleteOptions
+): AutocompleteState {
   const value = options.value ?? options.defaultValue ?? ""
   return {
     ...popupState(options),
@@ -95,17 +105,21 @@ function syncAutocompleteState(options: AutocompleteOptions) {
     required: !!options.required,
     name: options.name,
     form: options.form,
-    ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: options.defaultValue }),
     ...(options.open === undefined ? {} : { open: options.open }),
     ...(options.value === undefined ? {} : { value: options.value }),
   }
 }
 
-function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, AutocompleteState, string>) {
+function autocompleteApi(
+  context: PrimitiveContext<AutocompleteOptions, AutocompleteState, string>
+) {
   const { id, store, options, element } = context
   // A controlled close clears the highlight in the same pass.
   deriveOpen(context, ["highlighted", "focusInList"], (open) =>
-    open ? undefined : { highlighted: null, focusInList: false },
+    open ? undefined : { highlighted: null, focusInList: false }
   )
   const change = createChange(context)
   // The text this autocomplete asked for last. Any other that arrives, like
@@ -126,10 +140,15 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
   // The first suggestion whose label starts with the text, for inline completion.
   function completionFor(text: string, listbox: Listbox) {
     const needle = normalize(text)
-    if (!needle) return undefined
+    if (!needle) {
+      return undefined
+    }
     return listbox
       .entries()
-      .find((entry) => !listbox.disabled(entry) && normalize(entry.label).startsWith(needle))
+      .find(
+        (entry) =>
+          !listbox.disabled(entry) && normalize(entry.label).startsWith(needle)
+      )
   }
 
   const core = createAutocompleteCore(context, {
@@ -138,30 +157,45 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     emptyItems: () => options().emptyItems,
     // Suggestions are strings, so a filter for them reads every item the engine passes.
     filter: () => (options().filter ?? "contains") as SearchFilter<unknown>,
-    autoHighlight: () => (options().autoHighlight || completes() ? "typing" : false),
-    preferred: (listbox) => (completes() ? completionFor(store.get().query, listbox)?.key : undefined),
+    autoHighlight: () =>
+      options().autoHighlight || completes() ? "typing" : false,
+    preferred: (listbox) =>
+      completes() ? completionFor(store.get().query, listbox)?.key : undefined,
     highlight(key: string | null, why: HighlightCause | null) {
       core.listbox.highlight(key, { event: why?.event })
       // Arrow keys fill in what they highlight, with inline completion.
-      if (key !== null && completes() && why?.reason === "list-navigation") fillIn(key, why.event)
+      if (key !== null && completes() && why?.reason === "list-navigation") {
+        fillIn(key, why.event)
+      }
     },
     open(event, edge) {
-      if (!event.altKey) pendingHighlight = edge
+      if (!event.altKey) {
+        pendingHighlight = edge
+      }
       show({ event, by: "keyboard" })
     },
-    onHighlight: (key, index, event) => options().onHighlight?.(key, { index, event }),
+    onHighlight: (key, index, event) =>
+      options().onHighlight?.(key, { index, event }),
     container: () => element("list") ?? contentElement(),
     scrollRoot: contentElement,
   })
   // Data that drops the highlighted suggestion settles the highlight in the
   // same pass, so it never points at a suggestion that left.
   deriveFromOptions(context, ["highlighted"], (synced, state) => {
-    if (synced.items === state.items) return
-    return { highlighted: store.view({ ...state, ...synced }, () => core.settledHighlight(false)) }
+    if (synced.items === state.items) {
+      return
+    }
+    return {
+      highlighted: store.view({ ...state, ...synced }, () =>
+        core.settledHighlight(false)
+      ),
+    }
   })
 
   const ownsElement = (target: Node) =>
-    controlSlots.some((slot) => elements(context, slot).some(({ el }) => el.contains(target)))
+    controlSlots.some((slot) =>
+      elements(context, slot).some(({ el }) => el.contains(target))
+    )
 
   const kit = createPopup(context, {
     preset: comboboxPreset,
@@ -172,30 +206,45 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
       dismiss: (reason, { event }) => hide({ reason, event }),
       contains: ownsElement,
       onOpenChange(open) {
-        if (open) return
+        if (open) {
+          return
+        }
         pendingHighlight = null
         store.set({ highlighted: null, focusInList: false })
       },
       onShow() {
         const el = element("content")
-        if (el) return trackModality(el, modalityOf(openedBy), () => [inputElement()])
+        if (el) {
+          return trackModality(el, modalityOf(openedBy), () => [inputElement()])
+        }
       },
       open({ event, by }, open) {
-        if (!editable()) return
+        if (!editable()) {
+          return
+        }
         // A touch open never focuses the popup, so the on-screen keyboard stays,
         // unless it opens a sheet, which takes focus so the keyboard stays closed.
-        openedBy = by === "touch" && presentation.resolve() !== "sheet" ? "pointer" : (by ?? "imperative")
+        openedBy =
+          by === "touch" && presentation.resolve() !== "sheet"
+            ? "pointer"
+            : (by ?? "imperative")
         // A touch screen reader's tap on a trigger moves real focus into the list,
         // since it ignores aria-activedescendant. A tap on the field is for typing.
-        store.set({ focusInList: opensIntoList(event) && event?.target !== inputElement() })
+        store.set({
+          focusInList: opensIntoList(event) && event?.target !== inputElement(),
+        })
         open(openedBy)
       },
       // Focus is in the field already, unless it left or a screen reader moved it into the list.
       close(_, close) {
-        const inList = store.get().focusInList && !!contentElement()?.contains(document.activeElement)
+        const inList =
+          store.get().focusInList &&
+          !!contentElement()?.contains(document.activeElement)
         close()
         const input = inputElement()
-        if (inList && input && !store.get().open) restoreFocus(input)
+        if (inList && input && !store.get().open) {
+          restoreFocus(input)
+        }
       },
     }),
   })
@@ -208,20 +257,26 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
   function setValue(
     value: string,
     reason: AutocompleteValueChangeReason,
-    { event, query = value }: { event?: Event; query?: string } = {},
+    { event, query = value }: { event?: Event; query?: string } = {}
   ) {
     const state = store.get()
-    if ((isDisabled(state) || state.readOnly) && reason !== "reset") return false
+    if ((isDisabled(state) || state.readOnly) && reason !== "reset") {
+      return false
+    }
     requested = value
     core.cause(reason, event)
     if (value === state.value || change("value", value, { reason, event })) {
       // A value that `onValueChange` set in its place stored its own query.
-      if (requested === value) store.set({ query })
+      if (requested === value) {
+        store.set({ query })
+      }
       return true
     }
     // Canceled: the field shows the value it had.
     const input = inputElement()
-    if (input && input.value !== state.value) input.value = state.value
+    if (input && input.value !== state.value) {
+      input.value = state.value
+    }
     return false
   }
 
@@ -229,7 +284,9 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
   // `inlineComplete` an insertion at the end completes the first match,
   // keeping the case the user typed, with the rest selected.
   function typed(input: HTMLInputElement, event: Event) {
-    if (!editable()) return
+    if (!editable()) {
+      return
+    }
     const text = input.value
     const insertion = event as InputEvent
     const completing =
@@ -240,13 +297,17 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
       input.selectionEnd === text.length
     const match = completing ? completionFor(text, core.listbox) : undefined
     const completed = match ? text + match.label.slice(text.length) : text
-    if (!setValue(completed, "input-change", { event, query: text })) return
+    if (!setValue(completed, "input-change", { event, query: text })) {
+      return
+    }
     if (match && completed !== text) {
       input.value = completed
       input.setSelectionRange(text.length, completed.length)
     }
     if (!store.get().open) {
-      if (text) pendingHighlight = "first"
+      if (text) {
+        pendingHighlight = "first"
+      }
       show({ event, by: "keyboard", reason: "input-change" })
     }
   }
@@ -257,10 +318,19 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     const label = core.listbox.find(key)?.label
     const input = inputElement()
     const { query } = store.get()
-    if (label === undefined || !setValue(label, "list-navigation", { event, query })) return
-    if (!input) return
+    if (
+      label === undefined ||
+      !setValue(label, "list-navigation", { event, query })
+    ) {
+      return
+    }
+    if (!input) {
+      return
+    }
     input.value = label
-    const start = normalize(label).startsWith(normalize(query)) ? query.length : label.length
+    const start = normalize(label).startsWith(normalize(query))
+      ? query.length
+      : label.length
     input.setSelectionRange(start, label.length)
   }
 
@@ -272,18 +342,26 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
   // Choosing fills the field with the suggestion's label and closes the list.
   function choose(key: string, event?: Event) {
     const entry = core.listbox.find(key)
-    if (!entry || core.listbox.disabled(entry) || !editable()) return false
+    if (!entry || core.listbox.disabled(entry) || !editable()) {
+      return false
+    }
     setValue(entry.label, "item-press", { event })
     const input = inputElement()
-    if (input && input.value !== store.get().value) input.value = store.get().value
+    if (input && input.value !== store.get().value) {
+      input.value = store.get().value
+    }
     hide({ reason: "item-press", event })
     return true
   }
 
   // A press on a suggestion. With `submitOnSelect`, the form submits, as Enter would.
   function press(key: string, event?: Event) {
-    if (!choose(key, event) || !options().submitOnSelect) return
-    if (submit(event)) submitImplicitly(inputElement()?.form)
+    if (!choose(key, event) || !options().submitOnSelect) {
+      return
+    }
+    if (submit(event)) {
+      submitImplicitly(inputElement()?.form)
+    }
   }
 
   function onEnter(event: KeyboardEvent) {
@@ -295,18 +373,28 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
         event.preventDefault()
         return el.click()
       }
-      if (!choose(highlighted, event)) return event.preventDefault()
+      if (!choose(highlighted, event)) {
+        return event.preventDefault()
+      }
       // A chosen suggestion submits only with `submitOnSelect`. Otherwise Enter only fills it in.
-      if (!options().submitOnSelect || !submit(event)) event.preventDefault()
+      if (!options().submitOnSelect || !submit(event)) {
+        event.preventDefault()
+      }
       return
     }
-    if (open) hide({ reason: "input-commit", event })
+    if (open) {
+      hide({ reason: "input-commit", event })
+    }
     // The browser submits the form next, unless `onSubmit` stops it.
-    if (!submit(event)) event.preventDefault()
+    if (!submit(event)) {
+      event.preventDefault()
+    }
   }
 
   function onInputKeyDown(event: KeyboardEvent) {
-    if (core.navigate(event)) return
+    if (core.navigate(event)) {
+      return
+    }
     const { open, value, query } = store.get()
     switch (event.key) {
       case "ArrowUp":
@@ -336,13 +424,21 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
       case "Escape":
         // An inline completion or a filled-in suggestion comes back out
         // before the list's layer closes it.
-        if (open && value !== query && setValue(query, "escape-key", { event })) {
+        if (
+          open &&
+          value !== query &&
+          setValue(query, "escape-key", { event })
+        ) {
           const input = inputElement()
-          if (input) input.value = query
+          if (input) {
+            input.value = query
+          }
         }
         return
       case "Tab":
-        if (open) hide({ reason: "focus-out", event })
+        if (open) {
+          hide({ reason: "focus-out", event })
+        }
     }
   }
 
@@ -352,14 +448,18 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
       el.ownerDocument,
       "reset",
       (event) => {
-        if (event.target !== el.form) return
+        if (event.target !== el.form) {
+          return
+        }
         afterReset(event, () => {
           const { initial } = store.get()
           setValue(initial, "reset")
-          if (el.value !== store.get().value) el.value = store.get().value
+          if (el.value !== store.get().value) {
+            el.value = store.get().value
+          }
         })
       },
-      { capture: true },
+      { capture: true }
     )
   }
 
@@ -373,7 +473,10 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
     getValue: () => store.get().value,
     setValue: (
       value: string,
-      { reason = "imperative", event }: AutocompleteChangeOptions<AutocompleteValueChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: AutocompleteChangeOptions<AutocompleteValueChangeReason> = {}
     ) => value !== store.get().value && setValue(value, reason, { event }),
     clear: ({
       reason = "imperative",
@@ -399,7 +502,8 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
       contentElement,
       arrowElement: () => element("arrow"),
       text: (state: AutocompleteState) => state.value,
-      itemProps: (key: string) => context.props<AutocompleteItemMeta>("item", key),
+      itemProps: (key: string) =>
+        context.props<AutocompleteItemMeta>("item", key),
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
       // Where focus goes once the list opens: it stays in the field, unless a
       // screen reader's tap moved it into the list, to the first suggestion.
@@ -408,20 +512,27 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
         pendingHighlight = null
         if (store.get().focusInList) {
           const first = core.listbox.firstEnabled()
-          if (first === undefined) return contentElement()
+          if (first === undefined) {
+            return contentElement()
+          }
           core.listbox.highlight(first, { focus: false })
           return core.listbox.element(first) ?? contentElement()
         }
         // Typing that opened the list highlights its best match, arrow keys the first or last.
-        if (target === "first" && store.get().query) core.settle(true, null)
-        else if (target) core.listbox.highlight(core.listbox.stepKey(target) ?? null)
+        if (target === "first" && store.get().query) {
+          core.settle(true, null)
+        } else if (target) {
+          core.listbox.highlight(core.listbox.stepKey(target) ?? null)
+        }
         // In a sheet the field moved into its header, and loses focus on the
         // way if the sheet showed later. It takes focus back here.
         return store.get().presentation === "sheet" ? inputElement() : undefined
       },
       // Keys in the list, when a screen reader's tap moved real focus there.
       onListKeyDown(event: KeyboardEvent) {
-        if (!store.get().focusInList || event.target === inputElement()) return
+        if (!store.get().focusInList || event.target === inputElement()) {
+          return
+        }
         listKeyDown(event, {
           listbox: core.listbox,
           highlighted: store.get().highlighted,
@@ -432,22 +543,29 @@ function autocompleteApi(context: PrimitiveContext<AutocompleteOptions, Autocomp
           },
         })
       },
-      contentProps: (key?: string) => kit.internal.contentProps(key) as AutocompleteContentProps,
+      contentProps: (key?: string) =>
+        kit.internal.contentProps(key) as AutocompleteContentProps,
     },
   }
 
   // A value from outside, like a controlled prop or a controller, also becomes what filters.
   deriveFromOptions(context, ["query"], (synced, state) =>
-    "value" in synced && synced.value !== state.value && synced.value !== requested
+    "value" in synced &&
+    synced.value !== state.value &&
+    synced.value !== requested
       ? { query: synced.value }
-      : undefined,
+      : undefined
   )
   let previousValue = store.get().value
   store.subscribe(() => {
     const { value } = store.get()
-    if (value === previousValue) return
+    if (value === previousValue) {
+      return
+    }
     previousValue = value
-    if (value === requested) return
+    if (value === requested) {
+      return
+    }
     requested = value
     store.set({ query: value })
   })

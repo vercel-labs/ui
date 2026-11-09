@@ -63,7 +63,14 @@ const defaultMaxLength = 50
 
 // Full-width forms an input method commits, like a Japanese keyboard's ＠.
 // Each is one UTF-16 unit, like its ASCII form, so offsets don't move.
-const fullWidth: Record<string, string> = { "＠": "@", "＃": "#", "／": "/", "＋": "+", "：": ":", "［": "[" }
+const fullWidth: Record<string, string> = {
+  "＠": "@",
+  "＃": "#",
+  "／": "/",
+  "＋": "+",
+  "：": ":",
+  "［": "[",
+}
 const fullWidthPattern = /[＠＃／＋：［]/g
 
 function normalizeTriggerText(text: string) {
@@ -78,17 +85,28 @@ const openers = new Set(["(", "[", "{", '"', "'", "\uFFFC"])
 // depends on the last test's position.
 const stateless = new WeakMap<RegExp, RegExp>()
 function characterPattern(pattern: RegExp) {
-  if (!pattern.global && !pattern.sticky) return pattern
+  if (!pattern.global && !pattern.sticky) {
+    return pattern
+  }
   let copy = stateless.get(pattern)
-  if (!copy) stateless.set(pattern, (copy = new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, ""))))
+  if (!copy) {
+    stateless.set(
+      pattern,
+      (copy = new RegExp(pattern.source, pattern.flags.replace(/[gy]/g, "")))
+    )
+  }
   return copy
 }
 
 // Whether text after a trigger is a query it accepts.
 function isValidQuery(query: string, rule: TriggerRule) {
-  if (query.length > (rule.maxLength ?? defaultMaxLength)) return false
+  if (query.length > (rule.maxLength ?? defaultMaxLength)) {
+    return false
+  }
   // A trigger followed by whitespace is just text, like "@ home".
-  if (/^\s/.test(query) || query.includes("\n")) return false
+  if (/^\s/.test(query) || query.includes("\n")) {
+    return false
+  }
   const pattern = characterPattern(rule.pattern ?? defaultPattern)
   const spaces = rule.spaces ?? false
   let words = 1
@@ -96,23 +114,42 @@ function isValidQuery(query: string, rule: TriggerRule) {
   for (const char of query) {
     if (char === " ") {
       // Two spaces in a row end a phrase.
-      if (!spaces || previous === " ") return false
+      if (!spaces || previous === " ") {
+        return false
+      }
       words++
-    } else if (!pattern.test(char)) return false
+    } else if (!pattern.test(char)) {
+      return false
+    }
     previous = char
   }
-  return typeof spaces !== "number" || words - (previous === " " ? 1 : 0) <= spaces
+  return (
+    typeof spaces !== "number" || words - (previous === " " ? 1 : 0) <= spaces
+  )
 }
 
 // Whether a trigger at `index` of `text`, which starts at `offset`, is where its boundary allows.
-function isAtBoundary(text: string, index: number, offset: number, boundary: TriggerBoundary) {
+function isAtBoundary(
+  text: string,
+  index: number,
+  offset: number,
+  boundary: TriggerBoundary
+) {
   const absolute = offset + index
-  if (boundary === "anywhere" || absolute === 0) return true
-  if (boundary === "start") return false
+  if (boundary === "anywhere" || absolute === 0) {
+    return true
+  }
+  if (boundary === "start") {
+    return false
+  }
   // The character before is outside the text: callers read one extra, so this means unknown.
-  if (index === 0) return false
+  if (index === 0) {
+    return false
+  }
   const before = text[index - 1]
-  if (boundary === "line") return before === "\n"
+  if (boundary === "line") {
+    return before === "\n"
+  }
   return /\s/.test(before) || openers.has(before)
 }
 
@@ -120,8 +157,12 @@ function isAtBoundary(text: string, index: number, offset: number, boundary: Tri
 // trigger, plus one for the character a boundary checks.
 function lookBehind(rules: readonly TriggerRule[]) {
   let longest = 0
-  for (const rule of rules)
-    longest = Math.max(longest, (rule.maxLength ?? defaultMaxLength) + rule.char.length)
+  for (const rule of rules) {
+    longest = Math.max(
+      longest,
+      (rule.maxLength ?? defaultMaxLength) + rule.char.length
+    )
+  }
   return longest + 1
 }
 
@@ -130,30 +171,49 @@ function lookBehind(rules: readonly TriggerRule[]) {
  * the caret and `offset` where it starts. Scans back from the caret, so the
  * nearest trigger wins, and stops at the first character no query may contain.
  */
-function findTriggerMatch(text: string, offset: number, rules: readonly TriggerRule[]) {
-  if (!rules.length) return null
+function findTriggerMatch(
+  text: string,
+  offset: number,
+  rules: readonly TriggerRule[]
+) {
+  if (!rules.length) {
+    return null
+  }
   const source = normalizeTriggerText(text)
   const caret = source.length
   const limit = lookBehind(rules)
   for (let index = caret - 1; index >= 0 && caret - index <= limit; index--) {
     for (let rule = 0; rule < rules.length; rule++) {
       const { char, boundary = "word" } = rules[rule]
-      if (!char || !source.startsWith(char, index)) continue
+      if (!char || !source.startsWith(char, index)) {
+        continue
+      }
       const query = text.slice(index + char.length)
       if (
         isValidQuery(normalizeTriggerText(query), rules[rule]) &&
         isAtBoundary(source, index, offset, boundary)
-      )
-        return { rule, match: { trigger: char, start: offset + index, end: offset + caret, query } }
+      ) {
+        return {
+          rule,
+          match: {
+            trigger: char,
+            start: offset + index,
+            end: offset + caret,
+            query,
+          },
+        }
+      }
     }
     const char = source[index]
     const continues = rules.some(
       (rule) =>
         rule.char.includes(char) ||
         (char === " " && !!rule.spaces) ||
-        characterPattern(rule.pattern ?? defaultPattern).test(char),
+        characterPattern(rule.pattern ?? defaultPattern).test(char)
     )
-    if (!continues) break
+    if (!continues) {
+      break
+    }
   }
   return null
 }
@@ -164,13 +224,26 @@ function findTriggerMatch(text: string, offset: number, rules: readonly TriggerR
  * grow or shrink it, and an edit that touches the trigger itself clears it:
  * the trigger was deleted or retyped. Caret moves and other edits leave it.
  */
-function mapDismissed(dismissed: DismissedMatch, range: TextRange, inserted: number) {
+function mapDismissed(
+  dismissed: DismissedMatch,
+  range: TextRange,
+  inserted: number
+) {
   const delta = inserted - (range.end - range.start)
   const triggerEnd = dismissed.start + dismissed.trigger.length
-  if (range.end <= dismissed.start)
-    return { ...dismissed, start: dismissed.start + delta, end: dismissed.end + delta }
-  if (range.start < triggerEnd) return null
-  if (range.start <= dismissed.end) return { ...dismissed, end: Math.max(triggerEnd, dismissed.end + delta) }
+  if (range.end <= dismissed.start) {
+    return {
+      ...dismissed,
+      start: dismissed.start + delta,
+      end: dismissed.end + delta,
+    }
+  }
+  if (range.start < triggerEnd) {
+    return null
+  }
+  if (range.start <= dismissed.end) {
+    return { ...dismissed, end: Math.max(triggerEnd, dismissed.end + delta) }
+  }
   return dismissed
 }
 

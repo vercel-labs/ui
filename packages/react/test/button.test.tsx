@@ -21,7 +21,11 @@ test("a press hands the handler its event and how the button was pressed", async
   document.body.append(host)
   root = createRoot(host)
   await React.act(async () =>
-    root!.render(<Button onClick={(event, { source }) => calls.push([event.type, source])}>Save</Button>),
+    root!.render(
+      <Button onClick={(event, { source }) => calls.push([event.type, source])}>
+        Save
+      </Button>
+    )
   )
   const button = host.querySelector("button")!
   await React.act(async () => withSource("agent", () => button.click()))

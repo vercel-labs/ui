@@ -1,5 +1,11 @@
 import { createTabsController } from "@ui-sdk/core/tabs"
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/solid/tabs"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
 import { tabsOptions } from "tests/fixtures/page.ts"
@@ -18,7 +24,9 @@ function Fixture() {
         controller={controller}
         {...options}
         onValueChange={(value, details) => {
-          if (value === cancel) return details.cancel()
+          if (value === cancel) {
+            return details.cancel()
+          }
           setAction(value ?? "")
         }}
       >
@@ -34,7 +42,11 @@ function Fixture() {
         </TabsList>
         <For each={tabsFixture.tabs}>
           {(tab) => (
-            <TabsPanel class="panel" value={tab.value} keepMounted={keepMounted}>
+            <TabsPanel
+              class="panel"
+              value={tab.value}
+              keepMounted={keepMounted}
+            >
               {tab.content}
               <Show when={tab.field}>
                 <label>
@@ -50,7 +62,9 @@ function Fixture() {
       <output role="status" aria-label="Last action">
         {action()}
       </output>
-      <button onClick={() => controller.select("notifications")}>Show notifications</button>
+      <button onClick={() => controller.select("notifications")}>
+        Show notifications
+      </button>
     </div>
   )
 }

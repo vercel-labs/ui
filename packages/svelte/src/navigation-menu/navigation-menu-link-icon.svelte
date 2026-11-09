@@ -14,7 +14,10 @@ right-to-left text.
   import ItemIcon from "../item-icon.svelte"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let { ...rest }: PartProps<"span", NavigationMenuLinkIconState> & NavigationMenuLinkIconProps = $props()
+  let {
+    ...rest
+  }: PartProps<"span", NavigationMenuLinkIconState> &
+    NavigationMenuLinkIconProps = $props()
 
   const menu = useHandle(navigationMenu)
 </script>

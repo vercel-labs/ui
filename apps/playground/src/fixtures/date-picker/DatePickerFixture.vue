@@ -14,7 +14,11 @@ import {
   DatePickerTrigger,
   type DatePickerValue,
 } from "@ui-sdk/vue/date-picker"
-import { datePickerAction, datePickerFixture as f, datePickerOptions } from "tests/fixtures/date-picker.ts"
+import {
+  datePickerAction,
+  datePickerFixture as f,
+  datePickerOptions,
+} from "tests/fixtures/date-picker.ts"
 import { ref } from "vue"
 
 const { lang, ...options } = datePickerOptions()
@@ -32,7 +36,9 @@ function onOpenChange(next: boolean, details: ChangeDetails) {
 }
 
 function onSubmit(event: Event) {
-  submitted.value = JSON.stringify([...new FormData(event.currentTarget as HTMLFormElement)])
+  submitted.value = JSON.stringify([
+    ...new FormData(event.currentTarget as HTMLFormElement),
+  ])
 }
 </script>
 
@@ -51,7 +57,10 @@ function onSubmit(event: Event) {
         @value-change="onValueChange"
         @open-change="onOpenChange"
       >
-        <DatePickerInput id="date-start" :aria-label="range ? 'Start date' : undefined" />
+        <DatePickerInput
+          id="date-start"
+          :aria-label="range ? 'Start date' : undefined"
+        />
         <DatePickerInput v-if="range" end aria-label="End date" />
         <DatePickerTrigger />
         <DatePickerClear>Clear</DatePickerClear>
@@ -63,7 +72,9 @@ function onSubmit(event: Event) {
             <CalendarNext class="calendar-step" />
           </div>
           <CalendarGrid class="calendar-grid" />
-          <DatePickerPreset :value="preset.value as DatePickerValue">{{ preset.label }}</DatePickerPreset>
+          <DatePickerPreset :value="preset.value as DatePickerValue">{{
+            preset.label
+          }}</DatePickerPreset>
         </DatePickerContent>
       </DatePicker>
       <button type="submit">Submit</button>

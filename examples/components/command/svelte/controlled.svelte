@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Command, CommandInput, CommandItem, CommandList, CommandPage } from "@ui-sdk/svelte/command"
+  import {
+    Command,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    CommandPage,
+  } from "@ui-sdk/svelte/command"
   import { useLog } from "../../../shared/svelte/log"
 
   const themes = [
@@ -18,9 +24,11 @@
   bind:value
   bind:query
   bind:pages
-  onValueChange={(next, details) => log(`Highlighted ${next ?? "nothing"} (${details.reason})`)}
+  onValueChange={(next, details) =>
+    log(`Highlighted ${next ?? "nothing"} (${details.reason})`)}
   onQueryChange={(next, details) => log(`Query “${next}” (${details.reason})`)}
-  onPagesChange={(next, details) => log(`Pages [${next.join(", ")}] (${details.reason})`)}
+  onPagesChange={(next, details) =>
+    log(`Pages [${next.join(", ")}] (${details.reason})`)}
   onAction={(next) => log(`Ran ${next}`)}
 >
   <CommandInput aria-label="Search themes" placeholder="Search themes…" />

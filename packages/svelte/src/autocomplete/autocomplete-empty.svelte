@@ -4,7 +4,10 @@ Shown while no suggestion matches. Its message is announced when it appears.
 @stable
 -->
 <script lang="ts">
-  import { autocomplete, type AutocompleteEmptyState } from "@ui-sdk/core/autocomplete"
+  import {
+    autocomplete,
+    type AutocompleteEmptyState,
+  } from "@ui-sdk/core/autocomplete"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

@@ -2,7 +2,12 @@
 // `size-budget.json`, and the code no entry may ship. tests/README.md
 // ("Bundle size") says how each row is measured.
 import { build, transform } from "esbuild"
-import { appendFileSync, readdirSync, readFileSync, writeFileSync } from "node:fs"
+import {
+  appendFileSync,
+  readdirSync,
+  readFileSync,
+  writeFileSync,
+} from "node:fs"
 import { readFile } from "node:fs/promises"
 import path from "node:path"
 import { parseArgs } from "node:util"
@@ -12,14 +17,19 @@ import { transform as compileSolid } from "@solidjs/compiler"
 
 const root = path.resolve(import.meta.dirname, "..")
 // Core modules are named from their folder, like "motion/presence" or "checkbox/checkbox".
-const foundation = new Set(readdirSync(path.join(root, "packages/core/src/foundation")))
+const foundation = new Set(
+  readdirSync(path.join(root, "packages/core/src/foundation"))
+)
 const coreFile = (module) =>
   `packages/core/src/${foundation.has(module.split("/")[0]) ? "foundation" : "components"}/${module}.ts`
 const budgetFile = path.join(root, "size-budget.json")
 const tolerance = 0.03
 
 const { values: flags } = parseArgs({
-  options: { update: { type: "boolean", default: false }, strict: { type: "boolean", default: false } },
+  options: {
+    update: { type: "boolean", default: false },
+    strict: { type: "boolean", default: false },
+  },
 })
 
 const coreManifest = readManifest("packages/core")
@@ -40,14 +50,38 @@ const perfPages = {
   menu: ["Menu", "MenuTrigger", "MenuContent", "MenuItem"],
   select: ["Select", "SelectLabel", "SelectTrigger", "SelectValue"],
   combobox: ["Combobox", "ComboboxLabel", "ComboboxInput"],
-  popover: ["Popover", "PopoverTrigger", "PopoverContent", "PopoverTitle", "PopoverClose"],
-  dialog: ["Dialog", "DialogTrigger", "DialogBackdrop", "DialogContent", "DialogClose"],
+  popover: [
+    "Popover",
+    "PopoverTrigger",
+    "PopoverContent",
+    "PopoverTitle",
+    "PopoverClose",
+  ],
+  dialog: [
+    "Dialog",
+    "DialogTrigger",
+    "DialogBackdrop",
+    "DialogContent",
+    "DialogClose",
+  ],
   tooltip: ["Tooltip", "TooltipTrigger", "TooltipContent"],
   tabs: ["Tabs", "TabsList", "TabsTab", "TabsPanel"],
-  accordion: ["Accordion", "AccordionItem", "AccordionHeader", "AccordionTrigger", "AccordionPanel"],
+  accordion: [
+    "Accordion",
+    "AccordionItem",
+    "AccordionHeader",
+    "AccordionTrigger",
+    "AccordionPanel",
+  ],
   checkbox: ["Checkbox", "CheckboxIndicator"],
   radio: ["RadioGroup", "Radio", "RadioIndicator"],
-  slider: ["Slider", "SliderControl", "SliderTrack", "SliderIndicator", "SliderThumb"],
+  slider: [
+    "Slider",
+    "SliderControl",
+    "SliderTrack",
+    "SliderIndicator",
+    "SliderThumb",
+  ],
   field: ["Field", "FieldLabel"],
   toast: ["ToastRegion", "toast"],
 }
@@ -122,18 +156,44 @@ const fieldModule = /^packages\/core\/src\/components\/field\/[^/]+\.ts$/
 const minimalPages = {
   switch: {
     parts: ["Switch", "SwitchThumb"],
-    without: ["motion/presence", "checkbox/checkbox", "checkbox/checkbox-group"],
+    without: [
+      "motion/presence",
+      "checkbox/checkbox",
+      "checkbox/checkbox-group",
+    ],
   },
-  checkbox: { parts: ["Checkbox", "CheckboxIndicator"], without: ["checkbox/checkbox-group"] },
+  checkbox: {
+    parts: ["Checkbox", "CheckboxIndicator"],
+    without: ["checkbox/checkbox-group"],
+  },
   toggle: { parts: ["Toggle"], without: ["toggle/toggle-group"] },
   select: {
-    parts: ["Select", "SelectTrigger", "SelectValue", "SelectContent", "SelectItem"],
+    parts: [
+      "Select",
+      "SelectTrigger",
+      "SelectValue",
+      "SelectContent",
+      "SelectItem",
+    ],
     without: ["lists/listbox-select-all", "lists/item-icon"],
   },
-  menu: { parts: ["Menu", "MenuTrigger", "MenuContent", "MenuItem"], without: ["lists/item-icon"] },
+  menu: {
+    parts: ["Menu", "MenuTrigger", "MenuContent", "MenuItem"],
+    without: ["lists/item-icon"],
+  },
   combobox: {
-    parts: ["Combobox", "ComboboxInput", "ComboboxContent", "ComboboxList", "ComboboxItem"],
-    without: ["lists/listbox-select-all", "lists/item-icon", "combobox/combobox-chips"],
+    parts: [
+      "Combobox",
+      "ComboboxInput",
+      "ComboboxContent",
+      "ComboboxList",
+      "ComboboxItem",
+    ],
+    without: [
+      "lists/listbox-select-all",
+      "lists/item-icon",
+      "combobox/combobox-chips",
+    ],
   },
 }
 const minimalChecked = ["react", "vue", "svelte", "solid"]
@@ -153,37 +213,71 @@ const leaks = []
 const strays = []
 for (const adapter of adapters) {
   const bareApp = adapter.app
-    ? gzip((await bundleForProduction({ source: adapter.app }, withRuntime(adapter))).code)
+    ? gzip(
+        (
+          await bundleForProduction(
+            { source: adapter.app },
+            withRuntime(adapter)
+          )
+        ).code
+      )
     : 0
-  const entries = adapter.defines ? entriesOf(adapter.name) : adapterEntries(adapter.name)
+  const entries = adapter.defines
+    ? entriesOf(adapter.name)
+    : adapterEntries(adapter.name)
   for (const entry of [...entries, perfPagesEntry(adapter)]) {
     // With the framework external, the code is the entry's alone, so the leak
     // check reads it: the Svelte runtime keeps its warnings in production.
     const own = await bundleForProduction(entry, adapter.options)
     const measured = adapter.app
-      ? await bundleForProduction(withApp(entry, adapter.app), withRuntime(adapter))
+      ? await bundleForProduction(
+          withApp(entry, adapter.app),
+          withRuntime(adapter)
+        )
       : own
-    rows.push({ name: entry.name, size: gzip(measured.code) - bareApp, budget: budgets[entry.name] })
+    rows.push({
+      name: entry.name,
+      size: gzip(measured.code) - bareApp,
+      budget: budgets[entry.name],
+    })
     const lazyName = `${entry.name} (lazy)`
-    if (measured.lazy) rows.push({ name: lazyName, size: gzip(measured.lazy), budget: budgets[lazyName] })
+    if (measured.lazy) {
+      rows.push({
+        name: lazyName,
+        size: gzip(measured.lazy),
+        budget: budgets[lazyName],
+      })
+    }
     for (const marker of devMarkers.filter(
-      (marker) => own.code.includes(marker) || own.lazy.includes(marker),
-    ))
-      leaks.push(`${entry.name} contains ${marker}, which only development code has.`)
+      (marker) => own.code.includes(marker) || own.lazy.includes(marker)
+    )) {
+      leaks.push(
+        `${entry.name} contains ${marker}, which only development code has.`
+      )
+    }
     strays.push(...fieldIn(entry, own.modules), ...absentIn(entry, own.modules))
   }
 }
-for (const adapter of adapters.filter(({ name }) => minimalChecked.includes(name)))
+for (const adapter of adapters.filter(({ name }) =>
+  minimalChecked.includes(name)
+)) {
   for (const [key, page] of Object.entries(minimalPages)) {
     const entry = minimalPageEntry(adapter.name, key, page.parts)
     const { modules } = await bundleForProduction(entry, adapter.options)
-    for (const module of page.without)
-      if (modules.has(coreFile(module)))
-        strays.push(`${entry.name} bundles ${coreFile(module)}, which only a part it doesn't render needs.`)
+    for (const module of page.without) {
+      if (modules.has(coreFile(module))) {
+        strays.push(
+          `${entry.name} bundles ${coreFile(module)}, which only a part it doesn't render needs.`
+        )
+      }
+    }
   }
+}
 
 printTable(rows)
-if (flags.update) writeBudgets(rows)
+if (flags.update) {
+  writeBudgets(rows)
+}
 // While the components change fast, growth past a budget is reported, not
 // failed: `--strict` fails it, as CI will again once sizes settle.
 const overBudget = flags.update ? [] : findBudgetFailures(rows)
@@ -212,10 +306,13 @@ function adapterEntries(adapter) {
       key !== "./testing" &&
       !key.endsWith(".css") &&
       !key.includes("*") &&
-      !adapterExports[key],
+      !adapterExports[key]
   )
-  if (missing.length)
-    throw new Error(`@ui-sdk/${adapter} has no export for the core entries ${missing.join(", ")}.`)
+  if (missing.length) {
+    throw new Error(
+      `@ui-sdk/${adapter} has no export for the core entries ${missing.join(", ")}.`
+    )
+  }
   return entriesOf(adapter)
 }
 
@@ -232,32 +329,47 @@ function entriesOf(adapter) {
 
 // The Field modules an entry bundles, unless it is Field.
 function fieldIn(entry, modules) {
-  if (!entry.file || entry.name.split("/").pop() === "field") return []
+  if (!entry.file || entry.name.split("/").pop() === "field") {
+    return []
+  }
   return [...modules]
     .filter((module) => fieldModule.test(module))
-    .map((module) => `${entry.name} bundles ${module}, which only a Field needs.`)
+    .map(
+      (module) => `${entry.name} bundles ${module}, which only a Field needs.`
+    )
 }
 
 // The core modules an entry bundles that `absent` says it must not.
 function absentIn(entry, modules) {
   return (absent[entry.name] ?? [])
     .filter((module) => modules.has(coreFile(module)))
-    .map((module) => `${entry.name} bundles ${coreFile(module)}, which it must never need.`)
+    .map(
+      (module) =>
+        `${entry.name} bundles ${coreFile(module)}, which it must never need.`
+    )
 }
 
 // One entry that imports every part the perf pages use, from the adapter's subpaths.
 function perfPagesEntry({ name, defines }) {
   const adapterExports = readManifest(`packages/${name}`).exports
   const imports = Object.entries(perfPages).map(([key, names]) => {
-    const file = JSON.stringify(path.join(root, `packages/${name}`, adapterExports[`./${key}`]))
-    return defines ? `import ${file}` : `export { ${names.join(", ")} } from ${file}`
+    const file = JSON.stringify(
+      path.join(root, `packages/${name}`, adapterExports[`./${key}`])
+    )
+    return defines
+      ? `import ${file}`
+      : `export { ${names.join(", ")} } from ${file}`
   })
   return { name: `@ui-sdk/${name} (perf pages)`, source: imports.join("\n") }
 }
 
 // One entry that imports a component's basic parts, from the adapter's subpath.
 function minimalPageEntry(adapter, key, parts) {
-  const file = path.join(root, `packages/${adapter}`, readManifest(`packages/${adapter}`).exports[`./${key}`])
+  const file = path.join(
+    root,
+    `packages/${adapter}`,
+    readManifest(`packages/${adapter}`).exports[`./${key}`]
+  )
   return {
     name: `@ui-sdk/${adapter}/${key} (${parts.join(", ")})`,
     source: `export { ${parts.join(", ")} } from ${JSON.stringify(file)}`,
@@ -266,7 +378,9 @@ function minimalPageEntry(adapter, key, parts) {
 
 // The entry and a bare app in one source, as an app that imports the entry.
 function withApp(entry, app) {
-  return { source: `${entry.source ?? `export * from ${JSON.stringify(entry.file)}`}\n${app}` }
+  return {
+    source: `${entry.source ?? `export * from ${JSON.stringify(entry.file)}`}\n${app}`,
+  }
 }
 
 // The build options that bundle the framework's runtime with the entry.
@@ -291,7 +405,10 @@ async function bundleForProduction(entry, options) {
     platform: "browser",
     target: "es2022",
     ...options,
-    plugins: [...(options.plugins ?? []), ...(entry.source === undefined ? [] : [sourceEntry(entry.source)])],
+    plugins: [
+      ...(options.plugins ?? []),
+      ...(entry.source === undefined ? [] : [sourceEntry(entry.source)]),
+    ],
     define: { ...options.define, "process.env.NODE_ENV": '"production"' },
     write: false,
     metafile: true,
@@ -304,7 +421,10 @@ async function bundleForProduction(entry, options) {
   const result = await build({
     ...shared,
     splitting: true,
-    plugins: [unshippedImports(keptModules(Object.values(whole.metafile.outputs))), ...shared.plugins],
+    plugins: [
+      unshippedImports(keptModules(Object.values(whole.metafile.outputs))),
+      ...shared.plugins,
+    ],
   })
   const outputs = result.metafile.outputs
   // The chunks a page loads up front, then the ones it can load later. esbuild
@@ -312,19 +432,29 @@ async function bundleForProduction(entry, options) {
   // it shook out, so only chunks some kept code imports count, as in Vite.
   const reach = (from, kinds, found = new Set()) => {
     const visit = (output) => {
-      if (found.has(output)) return
+      if (found.has(output)) {
+        return
+      }
       found.add(output)
-      for (const { path: imported, kind } of outputs[output].imports)
-        if (kinds.includes(kind) && outputs[imported]) visit(imported)
+      for (const { path: imported, kind } of outputs[output].imports) {
+        if (kinds.includes(kind) && outputs[imported]) {
+          visit(imported)
+        }
+      }
     }
-    for (const output of from) visit(output)
+    for (const output of from) {
+      visit(output)
+    }
     return found
   }
   const upfront = reach(["out/entry.js"], ["import-statement"])
   const loadable = reach(upfront, ["import-statement", "dynamic-import"])
-  const text = (output) => result.outputFiles.find((file) => file.path.endsWith(output)).text
+  const text = (output) =>
+    result.outputFiles.find((file) => file.path.endsWith(output)).text
   const join = (list) => list.map(text).join("\n")
-  const all = Object.keys(outputs).filter((output) => output.endsWith(".js") && loadable.has(output))
+  const all = Object.keys(outputs).filter(
+    (output) => output.endsWith(".js") && loadable.has(output)
+  )
   return {
     code: join(all.filter((output) => upfront.has(output))),
     lazy: join(all.filter((output) => !upfront.has(output))),
@@ -338,8 +468,8 @@ function keptModules(outputs) {
     outputs.flatMap((output) =>
       Object.entries(output.inputs)
         .filter(([, input]) => input.bytesInOutput)
-        .map(([file]) => file),
-    ),
+        .map(([file]) => file)
+    )
   )
 }
 
@@ -351,16 +481,22 @@ function unshippedImports(kept) {
       build.onResolve(
         { filter: /.*/ },
         async ({ path: specifier, kind, importer, resolveDir, pluginData }) => {
-          if (kind !== "dynamic-import" || pluginData === unshippedImports) return
+          if (kind !== "dynamic-import" || pluginData === unshippedImports) {
+            return
+          }
           const resolved = await build.resolve(specifier, {
             kind,
             importer,
             resolveDir,
             pluginData: unshippedImports,
           })
-          if (resolved.errors.length || resolved.namespace !== "file") return
-          if (!kept.has(path.relative(root, resolved.path))) return { path: specifier, external: true }
-        },
+          if (resolved.errors.length || resolved.namespace !== "file") {
+            return
+          }
+          if (!kept.has(path.relative(root, resolved.path))) {
+            return { path: specifier, external: true }
+          }
+        }
       )
     },
   }
@@ -371,8 +507,14 @@ function sourceEntry(source) {
   return {
     name: "source-entry",
     setup(build) {
-      build.onResolve({ filter: /^size:entry$/ }, ({ path }) => ({ path, namespace: "size" }))
-      build.onLoad({ filter: /.*/, namespace: "size" }, () => ({ contents: source, resolveDir: root }))
+      build.onResolve({ filter: /^size:entry$/ }, ({ path }) => ({
+        path,
+        namespace: "size",
+      }))
+      build.onLoad({ filter: /.*/, namespace: "size" }, () => ({
+        contents: source,
+        resolveDir: root,
+      }))
     },
   }
 }
@@ -386,32 +528,46 @@ function sourceEntry(source) {
 // It also serves `size:app.svelte`, the one component of a bare app.
 function svelteFiles() {
   const options = (filename) => ({ filename, generate: "client", dev: false })
-  const component = (source, filename) => compile(source, { ...options(filename), css: "external" }).js.code
+  const component = (source, filename) =>
+    compile(source, { ...options(filename), css: "external" }).js.code
   const runesModule = async (source, filename) => {
-    const { code } = filename.endsWith(".ts") ? await transform(source, { loader: "ts" }) : { code: source }
+    const { code } = filename.endsWith(".ts")
+      ? await transform(source, { loader: "ts" })
+      : { code: source }
     return compileModule(code, options(filename)).js.code
   }
   const compiled = new Map()
   const load = async (file, compileSource) => {
-    if (!compiled.has(file))
+    if (!compiled.has(file)) {
       compiled.set(
         file,
-        readFile(file, "utf8").then((source) => compileSource(source, file)),
+        readFile(file, "utf8").then((source) => compileSource(source, file))
       )
+    }
     return { contents: await compiled.get(file), loader: "js" }
   }
   return {
     name: "svelte",
     setup(build) {
-      build.onResolve({ filter: /^size:app\.svelte$/ }, ({ path }) => ({ path, namespace: "size-app" }))
+      build.onResolve({ filter: /^size:app\.svelte$/ }, ({ path }) => ({
+        path,
+        namespace: "size-app",
+      }))
       build.onLoad({ filter: /.*/, namespace: "size-app" }, () => ({
-        contents: component(`<button onclick={() => {}}>App</button>`, "App.svelte"),
+        contents: component(
+          `<button onclick={() => {}}>App</button>`,
+          "App.svelte"
+        ),
         resolveDir: root,
         loader: "js",
       }))
-      build.onLoad({ filter: /\.svelte$/, namespace: "file" }, ({ path: file }) => load(file, component))
-      build.onLoad({ filter: /\.svelte\.(js|ts)$/, namespace: "file" }, ({ path: file }) =>
-        load(file, runesModule),
+      build.onLoad(
+        { filter: /\.svelte$/, namespace: "file" },
+        ({ path: file }) => load(file, component)
+      )
+      build.onLoad(
+        { filter: /\.svelte\.(js|ts)$/, namespace: "file" },
+        ({ path: file }) => load(file, runesModule)
       )
     },
   }
@@ -427,24 +583,37 @@ render(() => <button onClick={() => {}}>App</button>, document.body)`
   return {
     name: "solid",
     setup(build) {
-      build.onResolve({ filter: /^size:app\.tsx$/ }, ({ path }) => ({ path, namespace: "size-app" }))
+      build.onResolve({ filter: /^size:app\.tsx$/ }, ({ path }) => ({
+        path,
+        namespace: "size-app",
+      }))
       build.onLoad({ filter: /.*/, namespace: "size-app" }, () => ({
         contents: compileSolid(app, { ...options, filename: "app.tsx" }).code,
         resolveDir: root,
         loader: "ts",
       }))
-      build.onLoad({ filter: /\.tsx$/, namespace: "file" }, async ({ path: file }) => ({
-        contents: compileSolid(await readFile(file, "utf8"), { ...options, filename: file }).code,
-        loader: "ts",
-      }))
+      build.onLoad(
+        { filter: /\.tsx$/, namespace: "file" },
+        async ({ path: file }) => ({
+          contents: compileSolid(await readFile(file, "utf8"), {
+            ...options,
+            filename: file,
+          }).code,
+          loader: "ts",
+        })
+      )
     },
   }
 }
 
 function findBudgetFailures(rows) {
   return rows.flatMap(({ name, size, budget }) => {
-    if (budget === undefined) return [`${name} has no budget. Run \`pnpm size --update\`.`]
-    if (size <= budget * (1 + tolerance)) return []
+    if (budget === undefined) {
+      return [`${name} has no budget. Run \`pnpm size --update\`.`]
+    }
+    if (size <= budget * (1 + tolerance)) {
+      return []
+    }
     return [
       `${name} is ${formatBytes(size)}, over its ${formatBytes(budget)} budget by more than ${tolerance * 100}%.`,
     ]
@@ -452,9 +621,14 @@ function findBudgetFailures(rows) {
 }
 
 function summarize(lines) {
-  if (!process.env.GITHUB_STEP_SUMMARY) return
+  if (!process.env.GITHUB_STEP_SUMMARY) {
+    return
+  }
   const list = lines.map((line) => `- ${line}`).join("\n")
-  appendFileSync(process.env.GITHUB_STEP_SUMMARY, `### Bundle size over budget\n\n${list}\n`)
+  appendFileSync(
+    process.env.GITHUB_STEP_SUMMARY,
+    `### Bundle size over budget\n\n${list}\n`
+  )
 }
 
 function writeBudgets(rows) {
@@ -465,12 +639,17 @@ function writeBudgets(rows) {
 
 function printTable(rows) {
   const width = Math.max(...rows.map((row) => row.name.length))
-  console.log(`${"Entry".padEnd(width)}  ${"gzip".padStart(9)}  ${"budget".padStart(9)}  change`)
+  console.log(
+    `${"Entry".padEnd(width)}  ${"gzip".padStart(9)}  ${"budget".padStart(9)}  change`
+  )
   for (const { name, size, budget } of rows) {
-    const change = budget === undefined ? "new" : `${(((size - budget) / budget) * 100).toFixed(1)}%`
+    const change =
+      budget === undefined
+        ? "new"
+        : `${(((size - budget) / budget) * 100).toFixed(1)}%`
     const budgetText = budget === undefined ? "-" : formatBytes(budget)
     console.log(
-      `${name.padEnd(width)}  ${formatBytes(size).padStart(9)}  ${budgetText.padStart(9)}  ${change}`,
+      `${name.padEnd(width)}  ${formatBytes(size).padStart(9)}  ${budgetText.padStart(9)}  ${change}`
     )
   }
 }

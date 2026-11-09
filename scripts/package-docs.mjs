@@ -43,8 +43,11 @@ try {
   const { writeElementsManifest, writePackageDocs } = await import(
     pathToFileURL(path.join(out, "package-docs.mjs")).href
   )
-  if (elements) await writeElementsManifest(elements)
-  else await writePackageDocs(args.length ? args : undefined)
+  if (elements) {
+    await writeElementsManifest(elements)
+  } else {
+    await writePackageDocs(args.length ? args : undefined)
+  }
 } finally {
   rmSync(out, { recursive: true, force: true })
 }

@@ -15,8 +15,13 @@ The group's heading, which names the group.
 
   const select = useHandle(selectPrimitive)
   const group = getContext<string | undefined>(GroupKey)
-  if (!group) throw new Error("<SelectGroupLabel> must be used inside <SelectGroup>.")
-  const label = useHandlePart(select, "group-label", () => ({ id: group, group }))
+  if (!group) {
+    throw new Error("<SelectGroupLabel> must be used inside <SelectGroup>.")
+  }
+  const label = useHandlePart(select, "group-label", () => ({
+    id: group,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={label} {props} />

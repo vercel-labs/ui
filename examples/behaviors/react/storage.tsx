@@ -5,7 +5,12 @@ import {
   createSessionStorage,
   type ValueStorage,
 } from "@ui-sdk/core"
-import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import {
   SegmentedControl,
   SegmentedControlIndicator,
@@ -35,7 +40,11 @@ const noServerValue = () => null
 function Example() {
   const [picked, setPicked] = React.useState("localStorage")
   const { storage, lasts } = storages.find(({ label }) => label === picked)!
-  const note = React.useSyncExternalStore(storage.subscribe, storage.get, noServerValue)
+  const note = React.useSyncExternalStore(
+    storage.subscribe,
+    storage.get,
+    noServerValue
+  )
   const [available, setAvailable] = React.useState(true)
   React.useEffect(() => setAvailable(storage.available()), [storage])
 
@@ -61,11 +70,19 @@ function Example() {
           <FieldControl
             value={note ?? ""}
             onChange={(event) => storage.set(event.target.value)}
-            placeholder={available ? "Type, then reload the page" : "Unavailable here"}
+            placeholder={
+              available ? "Type, then reload the page" : "Unavailable here"
+            }
           />
-          <FieldDescription>{available ? lasts : "This browser blocks it here."}</FieldDescription>
+          <FieldDescription>
+            {available ? lasts : "This browser blocks it here."}
+          </FieldDescription>
         </Field>
-        <button type="button" onClick={() => storage.remove()} disabled={note === null}>
+        <button
+          type="button"
+          onClick={() => storage.remove()}
+          disabled={note === null}
+        >
           Clear Note
         </button>
       </div>

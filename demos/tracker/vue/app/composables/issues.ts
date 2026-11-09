@@ -42,4 +42,11 @@ function addComment(id: string, form: FormData) {
   return send(`/api/issues/${id}/comments`, { method: "POST", body: form })
 }
 
-export { addComment, createIssue, deleteIssues, setSubtasksDone, updateIssues, useIssues }
+export {
+  addComment,
+  createIssue,
+  deleteIssues,
+  setSubtasksDone,
+  updateIssues,
+  useIssues,
+}

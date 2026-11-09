@@ -3,9 +3,19 @@ import { definePrimitive } from "@ui-sdk/core"
 import { createAgent } from "@ui-sdk/react/agent"
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/react/slider"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
-import { createTimeline, describeEntry, type TimelineEntry } from "@ui-sdk/react/timeline"
+import {
+  createTimeline,
+  describeEntry,
+  type TimelineEntry,
+} from "@ui-sdk/react/timeline"
 
 type RewindOptions = {
   agent: ReturnType<typeof createAgent>
@@ -22,12 +32,17 @@ type RewindStepState = { entry: TimelineEntry | undefined; applied: boolean }
 type RewindUndoState = { disabled: boolean }
 
 const undoable = (state: RewindState, source: string) =>
-  state.entries.slice(0, state.position).some((entry) => entry.source === source && !entry.reverted)
+  state.entries
+    .slice(0, state.position)
+    .some((entry) => entry.source === source && !entry.reverted)
 
 const rewind = /* @__PURE__ */ definePrimitive({
   name: "rewind",
   options: { agent: "value" },
-  state: (_options: RewindOptions): RewindState => ({ entries: [], position: 0 }),
+  state: (_options: RewindOptions): RewindState => ({
+    entries: [],
+    position: 0,
+  }),
   api: (context) => {
     const { store } = context
     let timeline: ReturnType<typeof createTimeline> | undefined
@@ -37,21 +52,29 @@ const rewind = /* @__PURE__ */ definePrimitive({
       record(el: HTMLElement) {
         const made = createTimeline(context.options().agent, { within: el })
         timeline = made
-        const sync = () => store.set({ entries: made.entries(), position: made.position() })
+        const sync = () =>
+          store.set({ entries: made.entries(), position: made.position() })
         sync()
         const unsubscribe = made.subscribe(sync)
         return () => {
           unsubscribe()
           made.destroy()
-          if (timeline === made) timeline = undefined
+          if (timeline === made) {
+            timeline = undefined
+          }
         }
       },
       scrubberKeydown(event: KeyboardEvent) {
         const { entries, position } = store.get()
-        const to = { ArrowLeft: position - 1, ArrowRight: position + 1, Home: 0, End: entries.length }[
-          event.key
-        ]
-        if (to === undefined) return
+        const to = {
+          ArrowLeft: position - 1,
+          ArrowRight: position + 1,
+          Home: 0,
+          End: entries.length,
+        }[event.key]
+        if (to === undefined) {
+          return
+        }
         event.preventDefault()
         void api.seek(to)
       },
@@ -96,12 +119,17 @@ const rewind = /* @__PURE__ */ definePrimitive({
       props: { value: "string" },
       state: (state, { key }) => {
         const index = state.entries.findIndex((entry) => entry.id === key)
-        return { entry: state.entries[index], applied: index >= 0 && index < state.position }
+        return {
+          entry: state.entries[index],
+          applied: index >= 0 && index < state.position,
+        }
       },
       attrs: (state, { key }) => {
         const index = state.entries.findIndex((entry) => entry.id === key)
         const entry = state.entries[index]
-        if (!entry) return {}
+        if (!entry) {
+          return {}
+        }
         return {
           type: "button",
           tabindex: "-1",
@@ -113,12 +141,17 @@ const rewind = /* @__PURE__ */ definePrimitive({
         }
       },
       press: ({ api, store, key }) =>
-        api.seek(store.get().entries.findIndex((entry) => entry.id === key) + 1),
+        api.seek(
+          store.get().entries.findIndex((entry) => entry.id === key) + 1
+        ),
     }),
     undo: slot<{ value: string }, RewindUndoState>({
       props: { value: "string" },
       state: (state, { key }) => ({ disabled: !undoable(state, key) }),
-      attrs: (state, { key }) => ({ type: "button", disabled: undoable(state, key) ? undefined : "" }),
+      attrs: (state, { key }) => ({
+        type: "button",
+        disabled: undoable(state, key) ? undefined : "",
+      }),
       press: ({ api, key }) => api.undoSource(key),
     }),
   }),
@@ -142,7 +175,10 @@ const RewindStart = parts.Start
 
 const RewindStep = parts.Step
 
-function RewindUndo({ source, ...props }: { source: string } & PartProps<"button", RewindUndoState>) {
+function RewindUndo({
+  source,
+  ...props
+}: { source: string } & PartProps<"button", RewindUndoState>) {
   return usePart(rewind, "undo", { value: source }, props, "button")
 }
 

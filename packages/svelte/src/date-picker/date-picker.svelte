@@ -22,8 +22,16 @@ renders an input, or two in range mode, the trigger and the popup.
   import Part from "../part.svelte"
   import type { PopupContainer } from "../popup.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
-  import { ContainerKey, DatePickerKey, type DatePickerContext } from "./context"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
+  import {
+    ContainerKey,
+    DatePickerKey,
+    type DatePickerContext,
+  } from "./context"
   import DatePickerContent from "./date-picker-content.svelte"
   import DatePickerInput from "./date-picker-input.svelte"
   import DatePickerTrigger from "./date-picker-trigger.svelte"
@@ -100,7 +108,9 @@ renders an input, or two in range mode, the trigger and the popup.
     onValueChange: (next: DatePickerValue, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     get month() {
       return month
@@ -108,7 +118,9 @@ renders an input, or two in range mode, the trigger and the popup.
     defaultMonth,
     onMonthChange: (next: ISOMonth, details: MonthDetails) => {
       onMonthChange?.(next, details)
-      if (!details.canceled) month = next
+      if (!details.canceled) {
+        month = next
+      }
     },
     get open() {
       return open
@@ -116,7 +128,9 @@ renders an input, or two in range mode, the trigger and the popup.
     defaultOpen,
     onOpenChange: (next: boolean, details: OpenDetails) => {
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     closeOnSelect,
@@ -150,17 +164,27 @@ renders an input, or two in range mode, the trigger and the popup.
     debug,
   }))
   // The handle's prototype keeps its `state` getter live.
-  const context: DatePickerContext = Object.assign(Object.create(picker), { field, months: () => months })
+  const context: DatePickerContext = Object.assign(Object.create(picker), {
+    field,
+    months: () => months,
+  })
   setContext(DatePickerKey, context)
   // Every Calendar part works inside the content: the date picker's primitive has the same parts.
   setContext(CalendarKey, picker as unknown as CalendarContext)
   setContext(ContainerKey, () => container)
   const root = useHandlePart(picker, "root")
-  const startInput = useHandlePart(picker, "hidden-input", () => ({ id: "start" }))
-  const endInput = useHandlePart(picker, "hidden-input", () => ({ end: true, id: "end" }))
+  const startInput = useHandlePart(picker, "hidden-input", () => ({
+    id: "start",
+  }))
+  const endInput = useHandlePart(picker, "hidden-input", () => ({
+    end: true,
+    id: "end",
+  }))
   // A hidden input renders only for an end that submits under a name.
   const range = $derived(root.state.mode === "range")
-  const submitsStart = $derived(range ? (startName ?? name ?? field?.name()) : (name ?? field?.name()))
+  const submitsStart = $derived(
+    range ? (startName ?? name ?? field?.name()) : (name ?? field?.name())
+  )
   const submitsEnd = $derived(range && (endName ?? name ?? field?.name()))
 </script>
 

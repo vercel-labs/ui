@@ -11,7 +11,11 @@ import {
 // Vue marks only a cached page's root as deactivated, so a component made
 // while its page is away, like a dialog a controller opens, looks up.
 function inDeactivatedPage(instance: ComponentInternalInstance | null) {
-  for (let current = instance; current; current = current.parent) if (current.isDeactivated) return true
+  for (let current = instance; current; current = current.parent) {
+    if (current.isDeactivated) {
+      return true
+    }
+  }
   return false
 }
 
@@ -44,7 +48,7 @@ function useBindings() {
       isReleased = isAway.value
       bound.forEach((el, ref) => ref(isReleased ? null : el))
     },
-    { flush: "post" },
+    { flush: "post" }
   )
   // Cached, so a part's ref stays the same across renders and Vue never
   // detaches it. One per component rendering the part, since a part can move
@@ -58,9 +62,13 @@ function useBindings() {
   return (ref: PartRef, slot: string) => {
     const owner = getCurrentInstance() ?? outside
     let own = refs.get(owner)
-    if (!own) refs.set(owner, (own = new WeakMap()))
+    if (!own) {
+      refs.set(owner, (own = new WeakMap()))
+    }
     let wrapped = own.get(ref)
-    if (wrapped) return wrapped
+    if (wrapped) {
+      return wrapped
+    }
     // Vue's own types leave the instance's Suspense out, though it's there.
     const suspense = (owner as { suspense?: SuspenseBoundary | null }).suspense
     // The element this component handed over.
@@ -74,26 +82,37 @@ function useBindings() {
         const last = mine
         mine = null
         // Another component's element took the part since, so it stays bound.
-        if (bound.get(ref) !== last) return
+        if (bound.get(ref) !== last) {
+          return
+        }
         bound.delete(ref)
         return ref(null)
       }
       let slots = held.get(el)
-      if (!slots) held.set(el, (slots = new Map()))
+      if (!slots) {
+        held.set(el, (slots = new Map()))
+      }
       const previous = slots.get(slot)
       slots.set(slot, ref)
       if (previous && previous !== ref && bound.get(previous) === el) {
         bound.delete(previous)
-        if (!isReleased) previous(null)
+        if (!isReleased) {
+          previous(null)
+        }
       }
       mine = el
       bound.set(ref, el)
-      if (isReleased) return
+      if (isReleased) {
+        return
+      }
       // Vue calls refs as it renders, and a Suspense renders its pending
       // branch off the page, where a popup can't open. Its elements bind with
       // the effects Vue holds back until the branch shows.
-      if (suspense?.pendingBranch) suspense.effects.push(() => bound.get(ref) === el && ref(el))
-      else ref(el)
+      if (suspense?.pendingBranch) {
+        suspense.effects.push(() => bound.get(ref) === el && ref(el))
+      } else {
+        ref(el)
+      }
     }
     own.set(ref, wrapped)
     return wrapped

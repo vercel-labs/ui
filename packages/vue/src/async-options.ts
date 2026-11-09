@@ -14,28 +14,43 @@ import { getCurrentInstance, onMounted, onScopeDispose, shallowRef } from "vue"
 function useAsyncOptions<Item>(
   load: (
     query: string,
-    context: AsyncOptionsContext,
+    context: AsyncOptionsContext
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
-  options?: AsyncOptionsOptions,
+  options?: AsyncOptionsOptions
 ) {
   // Setup runs on the server too, so an `immediate` load starts once the
   // component mounts. Until then it shows as loading, so nothing says "no match" first.
-  const helper = createAsyncOptions<Item>(load, { ...options, immediate: false })
+  const helper = createAsyncOptions<Item>(load, {
+    ...options,
+    immediate: false,
+  })
   const immediate = !!options?.immediate
   const initial = helper.getState()
-  const state = shallowRef<AsyncOptionsState<Item>>(immediate ? { ...initial, status: "loading" } : initial)
+  const state = shallowRef<AsyncOptionsState<Item>>(
+    immediate ? { ...initial, status: "loading" } : initial
+  )
   onScopeDispose(helper.subscribe(() => (state.value = helper.getState())))
   const start = () => {
-    if (immediate && helper.getState() === initial) helper.reload()
+    if (immediate && helper.getState() === initial) {
+      helper.reload()
+    }
   }
   // A component that has already mounted, like one calling a store from its
   // own `onMounted`, won't mount again, and outside a component nothing mounts:
   // both start now, in the browser only.
   const instance = getCurrentInstance()
-  if (instance && !instance.isMounted) onMounted(start)
-  else if (typeof document !== "undefined") start()
+  if (instance && !instance.isMounted) {
+    onMounted(start)
+  } else if (typeof document !== "undefined") {
+    start()
+  }
   onScopeDispose(() => helper.cancel())
-  return { state, setQuery: helper.setQuery, reload: helper.reload, loadMore: helper.loadMore }
+  return {
+    state,
+    setQuery: helper.setQuery,
+    reload: helper.reload,
+    loadMore: helper.loadMore,
+  }
 }
 
 export { createAsyncOptions } from "@ui-sdk/core/async-options"

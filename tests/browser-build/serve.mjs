@@ -16,12 +16,19 @@ const types = { ".html": "text/html", ".js": "text/javascript" }
 
 createServer(async (request, response) => {
   try {
-    const requested = decodeURIComponent(new URL(request.url, "http://host").pathname)
+    const requested = decodeURIComponent(
+      new URL(request.url, "http://host").pathname
+    )
     const file = await realpath(path.join(root, requested))
-    if (!file.startsWith(root + path.sep)) throw new Error("Outside the served folder.")
+    if (!file.startsWith(root + path.sep)) {
+      throw new Error("Outside the served folder.")
+    }
     let body = await readFile(file)
-    if (file.endsWith(".html"))
-      body = body.toString().replace(/\{\{(\w+)\}\}/g, (_, name) => values[name] ?? "")
+    if (file.endsWith(".html")) {
+      body = body
+        .toString()
+        .replace(/\{\{(\w+)\}\}/g, (_, name) => values[name] ?? "")
+    }
     response.writeHead(200, {
       "Access-Control-Allow-Origin": "*",
       "Content-Type": types[path.extname(file)] ?? "application/octet-stream",

@@ -19,7 +19,9 @@
   }
 
   /* A goal between its decrease and increase buttons. */
-  :scope[data-example="drawer/basic"] [data-slot="drawer-content"] > [data-slot="row"] {
+  :scope[data-example="drawer/basic"]
+    [data-slot="drawer-content"]
+    > [data-slot="row"] {
     flex-wrap: nowrap;
     justify-content: space-between;
 
@@ -252,14 +254,17 @@
   }
 
   /* Release notes long enough to scroll on any screen, between the header and the button. */
-  :scope[data-example="drawer/scrollable"] [data-slot="drawer-content"] > [data-slot="scroll"] {
+  :scope[data-example="drawer/scrollable"]
+    [data-slot="drawer-content"]
+    > [data-slot="scroll"] {
     max-height: 18rem;
     padding-block: var(--space-3);
     border-block: 1px solid var(--line-faint);
   }
 
   /* Places behind the directions sheet: whole rows to pick from, the chosen one marked. */
-  :scope[data-example="drawer/non-modal"] [data-slot="stack"]:has(> [data-slot="list"]) {
+  :scope[data-example="drawer/non-modal"]
+    [data-slot="stack"]:has(> [data-slot="list"]) {
     align-items: center;
 
     & > [data-slot="list"] {

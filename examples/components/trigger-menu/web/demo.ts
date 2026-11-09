@@ -27,7 +27,9 @@ function mount(root: HTMLElement) {
       </ui-trigger-menu-content>
     </ui-trigger-menu>
   `
-  root.querySelector("ui-trigger-menu")!.triggers = [{ char: "@", type: "mention", items: people }]
+  root.querySelector("ui-trigger-menu")!.triggers = [
+    { char: "@", type: "mention", items: people },
+  ]
 }
 
 export { mount }

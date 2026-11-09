@@ -1,4 +1,8 @@
-import { numberInputFixture as f, numberInputOptions, serialize } from "tests/fixtures/number-input.ts"
+import {
+  numberInputFixture as f,
+  numberInputOptions,
+  serialize,
+} from "tests/fixtures/number-input.ts"
 
 function markup(options: ReturnType<typeof numberInputOptions>) {
   const shared = [
@@ -8,11 +12,18 @@ function markup(options: ReturnType<typeof numberInputOptions>) {
   ]
     .filter(Boolean)
     .join("")
-  const quantity = options.quantity === null ? "" : ` default-value="${options.quantity}"`
-  const amountMin = options.amountMin === undefined ? "" : ` min="${options.amountMin}"`
-  const group = (item: { decrement: string; increment: string }, incrementDisabled = false) => {
-    const onElement = incrementDisabled && !options.disabledIncrementButton ? " disabled" : ""
-    const onButton = incrementDisabled && options.disabledIncrementButton ? " disabled" : ""
+  const quantity =
+    options.quantity === null ? "" : ` default-value="${options.quantity}"`
+  const amountMin =
+    options.amountMin === undefined ? "" : ` min="${options.amountMin}"`
+  const group = (
+    item: { decrement: string; increment: string },
+    incrementDisabled = false
+  ) => {
+    const onElement =
+      incrementDisabled && !options.disabledIncrementButton ? " disabled" : ""
+    const onButton =
+      incrementDisabled && options.disabledIncrementButton ? " disabled" : ""
     return `
     <ui-number-input-group class="number-input-group">
       <ui-number-input-decrement><button aria-label="${item.decrement}">−</button></ui-number-input-decrement>
@@ -58,18 +69,25 @@ async function mount(root: HTMLElement) {
   const template = document.createElement("template")
   template.innerHTML = markup(options)
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
-  for (const input of template.content.querySelectorAll("ui-number-input"))
+  for (const input of template.content.querySelectorAll("ui-number-input")) {
     input.setAttribute("locale", options.locale)
+  }
   root.replaceChildren(template.content)
   // Rich options are properties, set before the elements upgrade.
-  const amount = root.querySelector("#amount") as HTMLElement & { format?: Intl.NumberFormatOptions }
+  const amount = root.querySelector("#amount") as HTMLElement & {
+    format?: Intl.NumberFormatOptions
+  }
   amount.format = { style: "currency", currency: f.amount.currency }
   await import("@ui-sdk/web/number-input")
   await import("@ui-sdk/web/field")
 
   const form = root.querySelector("form")!
-  const action = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
-  const committed = root.querySelector<HTMLOutputElement>('output[aria-label="Committed"]')!
+  const action = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
+  const committed = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Committed"]'
+  )!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     root.querySelector("#submitted")!.textContent = serialize(form)
@@ -80,19 +98,25 @@ async function mount(root: HTMLElement) {
     "valuechange",
     (event) => {
       const name = (event.target as HTMLElement).getAttribute("name") ?? ""
-      if (options.cancel === name) return event.preventDefault()
+      if (options.cancel === name) {
+        return event.preventDefault()
+      }
       action.textContent = `${name}:${String((event as CustomEvent<{ value: number | null }>).detail.value)}`
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuecommit",
     (event) => {
       const name = (event.target as HTMLElement).getAttribute("name") ?? ""
-      const value = String((event as CustomEvent<{ value: number | null }>).detail.value)
-      committed.textContent = [committed.textContent, `${name}:${value}`].filter(Boolean).join(" ")
+      const value = String(
+        (event as CustomEvent<{ value: number | null }>).detail.value
+      )
+      committed.textContent = [committed.textContent, `${name}:${value}`]
+        .filter(Boolean)
+        .join(" ")
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

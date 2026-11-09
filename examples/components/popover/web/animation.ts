@@ -19,8 +19,12 @@ function mount(root: HTMLElement) {
     </ui-popover>
   `
   const popover = root.querySelector("ui-popover")!
-  popover.addEventListener("openchange", (event) => log(root, event.detail.value ? "Opening" : "Closing"))
-  popover.addEventListener("openchangecomplete", (event) => log(root, event.detail.value ? "Open" : "Closed"))
+  popover.addEventListener("openchange", (event) =>
+    log(root, event.detail.value ? "Opening" : "Closing")
+  )
+  popover.addEventListener("openchangecomplete", (event) =>
+    log(root, event.detail.value ? "Open" : "Closed")
+  )
 }
 
 export { mount }

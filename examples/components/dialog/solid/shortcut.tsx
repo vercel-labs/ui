@@ -34,7 +34,9 @@ function Example() {
       <DialogContent>
         <div data-slot="stack">
           <DialogTitle>New contact</DialogTitle>
-          <DialogDescription>Add someone to your address book.</DialogDescription>
+          <DialogDescription>
+            Add someone to your address book.
+          </DialogDescription>
         </div>
         <form data-slot="stack" method="dialog">
           <Field>
@@ -43,7 +45,12 @@ function Example() {
           </Field>
           <Field>
             <FieldLabel>Email</FieldLabel>
-            <Input name="email" type="email" required placeholder="kofi@example.com" />
+            <Input
+              name="email"
+              type="email"
+              required
+              placeholder="kofi@example.com"
+            />
           </Field>
           <div data-slot="row">
             <DialogClose>Cancel</DialogClose>

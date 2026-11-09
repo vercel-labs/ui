@@ -18,17 +18,21 @@ describe("server rendering a scroll area", () => {
       createSSRApp({
         render: () =>
           h(ScrollArea, { stickToEnd: true }, () => [
-            h(ScrollAreaViewport, { "aria-label": "Messages" }, () => h(ScrollAreaContent, () => "Hello")),
+            h(ScrollAreaViewport, { "aria-label": "Messages" }, () =>
+              h(ScrollAreaContent, () => "Hello")
+            ),
             h(ScrollAreaScrollbar, () => h(ScrollAreaThumb)),
             h(ScrollAreaScrollToEnd, () => "Jump to latest"),
           ]),
-      }),
+      })
     )
 
   test("the viewport scrolls and hides native scrollbars already, so they never flash", async () => {
     const html = await render()
     expect(typeof window).toBe("undefined")
-    expect(html).toMatch(/data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none;?"/)
+    expect(html).toMatch(
+      /data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none;?"/
+    )
   })
 
   test("the scrollbar is hidden from screen readers, and from view until the content is measured", async () => {

@@ -49,7 +49,12 @@ import {
   AccordionPanel,
   AccordionTrigger,
 } from "@ui-sdk/react/accordion"
-import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/react/otp-input"
+import {
+  OTPInput,
+  OTPInputGroup,
+  OTPInputSeparator,
+  OTPInputSlot,
+} from "@ui-sdk/react/otp-input"
 import { Rating, RatingItem } from "@ui-sdk/react/rating"
 import {
   SegmentedControl,
@@ -64,7 +69,11 @@ import {
   SliderTrack,
   SliderValue,
 } from "@ui-sdk/react/slider"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 import { Label } from "@ui-sdk/react/label"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
@@ -86,7 +95,13 @@ import {
 } from "@ui-sdk/react/trigger-menu"
 import { Toggle, ToggleGroup } from "@ui-sdk/react/toggle"
 import { Toolbar, ToolbarSeparator } from "@ui-sdk/react/toolbar"
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/react/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/react/tree"
 import { formatColor, parseColor } from "@ui-sdk/core/color"
 import { cn } from "cn"
 import {
@@ -118,7 +133,7 @@ const ring =
 const control = cn("h-8 bg-background text-sm transition-colors", ink, ring)
 const button = cn(
   control,
-  "inline-flex shrink-0 cursor-default items-center justify-center gap-1.5 px-3 font-medium select-none hover:bg-foreground/[0.06] [&_svg]:size-4",
+  "inline-flex shrink-0 cursor-default items-center justify-center gap-1.5 px-3 font-medium select-none hover:bg-foreground/[0.06] [&_svg]:size-4"
 )
 const icon = cn(button, "size-8 px-0")
 const item =
@@ -186,8 +201,8 @@ const patterns: Record<string, React.CSSProperties> = {
       `<svg xmlns='http://www.w3.org/2000/svg' width='1200' height='1200' fill='none' stroke='black'>${Array.from(
         { length: 30 },
         (_, index) =>
-          `<rect x='${600 - (index + 1) * 20}.5' y='${600 - (index + 1) * 20}.5' width='${(index + 1) * 40}' height='${(index + 1) * 40}'/>`,
-      ).join("")}</svg>`,
+          `<rect x='${600 - (index + 1) * 20}.5' y='${600 - (index + 1) * 20}.5' width='${(index + 1) * 40}' height='${(index + 1) * 40}'/>`
+      ).join("")}</svg>`
     )}")`,
     WebkitMaskPosition: "100% 100%",
     WebkitMaskRepeat: "no-repeat",
@@ -234,14 +249,20 @@ function Poster({
       className={cn(
         "@container relative scroll-mt-24 flex min-w-0 flex-col gap-10 border-(length:--poster-border) [--poster-border:1px] lg:min-h-[36rem] text-foreground border-foreground/10 bg-(--poster) p-6 sm:p-8 lg:p-10",
         tones[tone],
-        className,
+        className
       )}
     >
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+      >
         <div className="absolute inset-0" style={patterns[pattern]} />
         {backdrop}
       </div>
-      <div aria-hidden="true" className="pointer-events-none absolute -inset-(--poster-border)">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -inset-(--poster-border)"
+      >
         <span className={cn(cross, "-start-[5px] -top-[5px]")} />
         <span className={cn(cross, "-end-[5px] -top-[5px]")} />
         <span className={cn(cross, "-start-[5px] -bottom-[5px]")} />
@@ -258,9 +279,15 @@ function Poster({
             head
           )}
         </div>
-        {fig && <div className="hidden shrink-0 text-foreground/70 @[26rem]:block">{fig}</div>}
+        {fig && (
+          <div className="hidden shrink-0 text-foreground/70 @[26rem]:block">
+            {fig}
+          </div>
+        )}
       </div>
-      <div className={cn("relative flex min-w-0 flex-1 flex-col", body)}>{children}</div>
+      <div className={cn("relative flex min-w-0 flex-1 flex-col", body)}>
+        {children}
+      </div>
       {(title || meta) && (
         <div className="relative flex flex-col gap-4">
           {title && (
@@ -281,7 +308,7 @@ function Poster({
                   </Link>
                 ) : (
                   <span key={entry.label}>{entry.label}</span>
-                ),
+                )
               )}
             </p>
           )}
@@ -315,9 +342,11 @@ function Title({
       className={cn(
         "scroll-mt-24 font-[450] leading-[0.82] tracking-[-0.05em] whitespace-nowrap",
         vertical && "@[20rem]:[writing-mode:vertical-rl]",
-        className,
+        className
       )}
-      style={{ fontSize: `max(min(2.25rem, ${fit.toFixed(2)}cqi), min(${max}cqi, ${fit.toFixed(2)}cqi))` }}
+      style={{
+        fontSize: `max(min(2.25rem, ${fit.toFixed(2)}cqi), min(${max}cqi, ${fit.toFixed(2)}cqi))`,
+      }}
     >
       {children}
     </h2>
@@ -341,7 +370,7 @@ function Numeral({
         outline
           ? "text-(--poster) [-webkit-text-stroke:2px_var(--foreground)] [paint-order:stroke_fill]"
           : "tabular-nums",
-        className,
+        className
       )}
     >
       {children}
@@ -349,14 +378,22 @@ function Numeral({
   )
 }
 
-function Pill({ name, href, className }: { name: string; href?: string; className?: string }) {
+function Pill({
+  name,
+  href,
+  className,
+}: {
+  name: string
+  href?: string
+  className?: string
+}) {
   return (
     <Link
       data-round=""
       href={href ?? `/docs/react/components/${name}`}
       className={cn(
         "relative inline-flex h-7 w-fit max-w-full shrink-0 items-center gap-2 rounded-full whitespace-nowrap border border-foreground bg-(--poster) px-3 font-mono text-[11px] tracking-[0.02em] transition-colors outline-none after:absolute after:-inset-2 hover:bg-foreground hover:text-background focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff]",
-        className,
+        className
       )}
     >
       {href ? name : `@ui-sdk/react/${name}`}
@@ -377,20 +414,37 @@ function Measure({
   children: React.ReactNode
 }) {
   const box = React.useRef<HTMLDivElement>(null)
-  const [size, setSize] = React.useState<{ width: number; height: number } | null>(null)
+  const [size, setSize] = React.useState<{
+    width: number
+    height: number
+  } | null>(null)
   React.useEffect(() => {
     const element = box.current
-    if (!element) return
+    if (!element) {
+      return
+    }
     const observer = new ResizeObserver(([entry]) => {
       const border = entry.borderBoxSize[0]
-      setSize({ width: Math.round(border.inlineSize), height: Math.round(border.blockSize) })
+      setSize({
+        width: Math.round(border.inlineSize),
+        height: Math.round(border.blockSize),
+      })
     })
     observer.observe(element)
     return () => observer.disconnect()
   }, [])
   return (
-    <div className={cn("relative ps-7 pt-7", full ? "w-full" : "w-fit max-w-full", className)}>
-      <div aria-hidden="true" className="absolute start-7 end-0 top-0 flex h-3 items-center">
+    <div
+      className={cn(
+        "relative ps-7 pt-7",
+        full ? "w-full" : "w-fit max-w-full",
+        className
+      )}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute start-7 end-0 top-0 flex h-3 items-center"
+      >
         <span className="absolute inset-y-0 start-0 w-px bg-foreground/40" />
         <span className="h-px flex-1 bg-foreground/40" />
         <span className="bg-(--poster) px-1.5 font-mono text-[10px] text-muted-foreground tabular-nums">
@@ -399,7 +453,10 @@ function Measure({
         <span className="h-px flex-1 bg-foreground/40" />
         <span className="absolute inset-y-0 end-0 w-px bg-foreground/40" />
       </div>
-      <div aria-hidden="true" className="absolute start-0 top-7 bottom-0 flex w-3 flex-col items-center">
+      <div
+        aria-hidden="true"
+        className="absolute start-0 top-7 bottom-0 flex w-3 flex-col items-center"
+      >
         <span className="absolute inset-x-0 top-0 h-px bg-foreground/40" />
         <span className="w-px flex-1 bg-foreground/40" />
         <span className="rotate-180 bg-(--poster) py-1.5 font-mono text-[10px] text-muted-foreground tabular-nums [writing-mode:vertical-rl]">
@@ -409,10 +466,22 @@ function Measure({
         <span className="absolute inset-x-0 bottom-0 h-px bg-foreground/40" />
       </div>
       <div ref={box} className="relative">
-        <span aria-hidden="true" className={cn(tick, "-start-2 -top-2 border-e border-b")} />
-        <span aria-hidden="true" className={cn(tick, "-end-2 -top-2 border-s border-b")} />
-        <span aria-hidden="true" className={cn(tick, "-start-2 -bottom-2 border-e border-t")} />
-        <span aria-hidden="true" className={cn(tick, "-end-2 -bottom-2 border-s border-t")} />
+        <span
+          aria-hidden="true"
+          className={cn(tick, "-start-2 -top-2 border-e border-b")}
+        />
+        <span
+          aria-hidden="true"
+          className={cn(tick, "-end-2 -top-2 border-s border-b")}
+        />
+        <span
+          aria-hidden="true"
+          className={cn(tick, "-start-2 -bottom-2 border-e border-t")}
+        />
+        <span
+          aria-hidden="true"
+          className={cn(tick, "-end-2 -bottom-2 border-s border-t")}
+        />
         {children}
       </div>
     </div>
@@ -486,7 +555,13 @@ function iso(date: Date) {
     .join("-")
 }
 
-function CalendarTile({ className, fig }: { className?: string; fig?: string }) {
+function CalendarTile({
+  className,
+  fig,
+}: {
+  className?: string
+  fig?: string
+}) {
   const [range] = React.useState(() => {
     const start = new Date()
     start.setDate(start.getDate() + 3)
@@ -507,7 +582,12 @@ function CalendarTile({ className, fig }: { className?: string; fig?: string }) 
       className={className}
     >
       <Measure>
-        <Calendar mode="range" fixedWeeks defaultValue={range} className={cn("bg-background p-3", ink)}>
+        <Calendar
+          mode="range"
+          fixedWeeks
+          defaultValue={range}
+          className={cn("bg-background p-3", ink)}
+        >
           <div className="mb-3 flex items-center justify-between">
             <CalendarPrevious className={icon}>
               <ChevronLeftIcon aria-hidden="true" />
@@ -534,7 +614,7 @@ function CalendarTile({ className, fig }: { className?: string; fig?: string }) 
                     "size-9 text-center text-sm tabular-nums transition-colors @[22rem]:size-11 @[22rem]:text-base @[30rem]:size-13 @[30rem]:text-lg hover:bg-foreground/[0.06] data-outside:text-muted-foreground data-today:underline data-today:underline-offset-4",
                     "data-range-middle:bg-foreground/[0.08]",
                     "[&[data-selected]:not([data-range-middle])]:bg-foreground [&[data-selected]:not([data-range-middle])]:text-background",
-                    ring,
+                    ring
                   )}
                 />
               )}
@@ -570,7 +650,10 @@ function CommandTile({ className, fig }: { className?: string; fig?: string }) {
       <Measure full>
         <Command className={cn("flex h-[25.5rem] flex-col bg-background", ink)}>
           <div className="flex items-center gap-3 border-b border-foreground px-4 has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:-outline-offset-2 has-focus-visible:outline-[#006bff]">
-            <span aria-hidden="true" className="font-mono text-sm text-muted-foreground">
+            <span
+              aria-hidden="true"
+              className="font-mono text-sm text-muted-foreground"
+            >
               &gt;
             </span>
             <CommandInput
@@ -585,7 +668,12 @@ function CommandTile({ className, fig }: { className?: string; fig?: string }) {
           <CommandList className="min-h-0 flex-1 overflow-y-auto py-1">
             {["Pages", "Account"].map((group) => (
               <CommandGroup key={group}>
-                <CommandGroupLabel className={cn(label, "px-4 pt-3 pb-1.5 text-muted-foreground")}>
+                <CommandGroupLabel
+                  className={cn(
+                    label,
+                    "px-4 pt-3 pb-1.5 text-muted-foreground"
+                  )}
+                >
                   {group}
                 </CommandGroupLabel>
                 {commands
@@ -621,7 +709,7 @@ function CommandTile({ className, fig }: { className?: string; fig?: string }) {
 const slot = cn(
   "relative -ms-px flex h-16 min-w-0 flex-1 items-center justify-center bg-background text-3xl tabular-nums @[24rem]:h-24 @[24rem]:text-5xl first:ms-0 data-active:z-10 data-active:outline-2 data-active:outline-offset-0 data-active:outline-[#006bff]",
   ink,
-  "[&[data-fake-caret]:empty]:after:h-4 [&[data-fake-caret]:empty]:after:w-px [&[data-fake-caret]:empty]:after:animate-caret-blink [&[data-fake-caret]:empty]:after:bg-foreground [&[data-fake-caret]:empty]:after:content-['']",
+  "[&[data-fake-caret]:empty]:after:h-4 [&[data-fake-caret]:empty]:after:w-px [&[data-fake-caret]:empty]:after:animate-caret-blink [&[data-fake-caret]:empty]:after:bg-foreground [&[data-fake-caret]:empty]:after:content-['']"
 )
 
 function OTPTile({ className, fig }: { className?: string; fig?: string }) {
@@ -666,7 +754,11 @@ const step =
 
 function Star() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-[15cqi] fill-current">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      className="size-[15cqi] fill-current"
+    >
       <polygon points="12 1.4 14.58 9.35 22.94 9.35 16.18 14.26 18.76 22.2 12 17.29 5.24 22.2 7.82 14.26 1.06 9.35 9.42 9.35" />
     </svg>
   )
@@ -705,7 +797,13 @@ function RatingTile({ className, fig }: { className?: string; fig?: string }) {
   )
 }
 
-function NumberInputTile({ className, fig }: { className?: string; fig?: string }) {
+function NumberInputTile({
+  className,
+  fig,
+}: {
+  className?: string
+  fig?: string
+}) {
   return (
     <ComponentPoster
       fig={fig}
@@ -727,9 +825,18 @@ function NumberInputTile({ className, fig }: { className?: string; fig?: string 
               Guests
               <span>Drag to scrub ↔</span>
             </span>
-            <span aria-hidden="true" className="flex h-2.5 items-end justify-between">
+            <span
+              aria-hidden="true"
+              className="flex h-2.5 items-end justify-between"
+            >
               {Array.from({ length: 29 }, (_, index) => (
-                <span key={index} className={cn("w-px bg-current", index % 4 === 0 ? "h-full" : "h-1.5")} />
+                <span
+                  key={index}
+                  className={cn(
+                    "w-px bg-current",
+                    index % 4 === 0 ? "h-full" : "h-1.5"
+                  )}
+                />
               ))}
             </span>
             <NumberInputScrubAreaCursor className="text-foreground">
@@ -740,7 +847,7 @@ function NumberInputTile({ className, fig }: { className?: string; fig?: string 
             className={cn(
               "flex h-20 w-full items-center bg-background @[24rem]:h-24",
               ink,
-              "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]",
+              "has-focus-visible:outline-2 has-focus-visible:outline-solid has-focus-visible:outline-offset-2 has-focus-visible:outline-[#006bff]"
             )}
           >
             <NumberInputDecrement
@@ -753,7 +860,10 @@ function NumberInputTile({ className, fig }: { className?: string; fig?: string 
               aria-label="Guests"
               className="w-full min-w-0 flex-1 bg-transparent text-center text-5xl tracking-tight tabular-nums outline-none @[24rem]:text-[4rem]"
             />
-            <NumberInputIncrement aria-label="More guests" className={cn(step, "border-s border-foreground")}>
+            <NumberInputIncrement
+              aria-label="More guests"
+              className={cn(step, "border-s border-foreground")}
+            >
               <PlusIcon aria-hidden="true" />
             </NumberInputIncrement>
           </NumberInputGroup>
@@ -764,9 +874,17 @@ function NumberInputTile({ className, fig }: { className?: string; fig?: string 
 }
 
 const switches = [
-  { title: "Weekly digest", body: "A summary of your week, every Monday.", on: true },
+  {
+    title: "Weekly digest",
+    body: "A summary of your week, every Monday.",
+    on: true,
+  },
   { title: "Mentions", body: "Only when someone mentions you.", on: false },
-  { title: "Product news", body: "New features, a few times a year.", on: true },
+  {
+    title: "Product news",
+    body: "New features, a few times a year.",
+    on: true,
+  },
 ]
 
 function SwitchTile({ className, fig }: { className?: string; fig?: string }) {
@@ -783,14 +901,28 @@ function SwitchTile({ className, fig }: { className?: string; fig?: string }) {
       className={className}
     >
       <Measure full>
-        <div className={cn("flex flex-col divide-y divide-foreground/15 bg-background", ink)}>
+        <div
+          className={cn(
+            "flex flex-col divide-y divide-foreground/15 bg-background",
+            ink
+          )}
+        >
           {switches.map((setting) => (
-            <div key={setting.title} className="flex items-center justify-between gap-4 p-4">
+            <div
+              key={setting.title}
+              className="flex items-center justify-between gap-4 p-4"
+            >
               <div className="flex flex-col gap-1">
-                <Label htmlFor={`setting-${slug(setting.title)}`} className={cn(label, "cursor-default")}>
+                <Label
+                  htmlFor={`setting-${slug(setting.title)}`}
+                  className={cn(label, "cursor-default")}
+                >
                   {setting.title}
                 </Label>
-                <span id={`setting-${slug(setting.title)}-description`} className={description}>
+                <span
+                  id={`setting-${slug(setting.title)}-description`}
+                  className={description}
+                >
                   {setting.body}
                 </span>
               </div>
@@ -801,7 +933,7 @@ function SwitchTile({ className, fig }: { className?: string; fig?: string }) {
                 className={cn(
                   "group/switch inline-flex h-5 w-9 shrink-0 items-center bg-background p-[3px] transition-colors data-checked:bg-foreground",
                   ink,
-                  ring,
+                  ring
                 )}
               >
                 <SwitchThumb className="size-3 bg-foreground transition-transform group-data-checked/switch:translate-x-4 group-data-checked/switch:bg-background rtl:group-data-checked/switch:-translate-x-4" />
@@ -828,7 +960,10 @@ function SliderTile({ className, fig }: { className?: string; fig?: string }) {
       className={className}
     >
       <Measure full>
-        <Slider defaultValue={60} className={cn("flex flex-col gap-4 bg-background p-4", ink)}>
+        <Slider
+          defaultValue={60}
+          className={cn("flex flex-col gap-4 bg-background p-4", ink)}
+        >
           <div className="flex items-center justify-between">
             <span aria-hidden="true" className={label}>
               Volume
@@ -840,7 +975,11 @@ function SliderTile({ className, fig }: { className?: string; fig?: string }) {
               <SliderIndicator className="h-0.5 -translate-y-[0.5px] bg-foreground" />
               <SliderThumb
                 aria-label="Volume"
-                className={cn("size-4 bg-background data-dragging:bg-foreground", ink, ring)}
+                className={cn(
+                  "size-4 bg-background data-dragging:bg-foreground",
+                  ink,
+                  ring
+                )}
               />
             </SliderTrack>
           </SliderControl>
@@ -864,7 +1003,13 @@ function SliderTile({ className, fig }: { className?: string; fig?: string }) {
   )
 }
 
-function SegmentedTile({ className, fig }: { className?: string; fig?: string }) {
+function SegmentedTile({
+  className,
+  fig,
+}: {
+  className?: string
+  fig?: string
+}) {
   return (
     <ComponentPoster
       fig={fig}
@@ -890,7 +1035,7 @@ function SegmentedTile({ className, fig }: { className?: string; fig?: string })
               value={view.toLowerCase()}
               className={cn(
                 "relative h-16 min-w-0 flex-1 px-2 text-lg font-medium @[22rem]:px-4 @[22rem]:text-xl @[24rem]:h-20 @[24rem]:text-2xl text-muted-foreground transition-colors data-checked:text-background",
-                ring,
+                ring
               )}
             >
               {view}
@@ -902,10 +1047,19 @@ function SegmentedTile({ className, fig }: { className?: string; fig?: string })
   )
 }
 
-const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+const presets = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#0ea5e9",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+]
 const thumb = cn(
   "absolute size-3.5 border-2 border-white bg-(--color-picker-color) shadow-[0_0_0_1px_rgb(0_0_0/0.5)]",
-  ring,
+  ring
 )
 
 const formats = [
@@ -916,7 +1070,8 @@ const formats = [
 ] as const
 
 function ColorTile({ className, fig }: { className?: string; fig?: string }) {
-  const [format, setFormat] = React.useState<(typeof formats)[number]["value"]>("hex")
+  const [format, setFormat] =
+    React.useState<(typeof formats)[number]["value"]>("hex")
   const [value, setValue] = React.useState("#6366f1")
   return (
     <ComponentPoster
@@ -936,7 +1091,7 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
           format={format}
           className={cn(
             "flex w-64 max-w-full flex-col gap-3 bg-background p-3 @[20rem]:w-80 [&_[data-slot=color-picker-area-canvas]]:grayscale [&_[data-slot=color-picker-area-thumb]]:grayscale [&_[data-slot=color-picker-slider]]:grayscale [&_[data-slot=color-picker-swatch-item]]:grayscale [&_[data-slot=color-picker-swatch]]:grayscale",
-            ink,
+            ink
           )}
         >
           <ColorPickerArea className="relative h-32 cursor-crosshair border border-foreground @[20rem]:h-44">
@@ -951,7 +1106,7 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
               <ColorPickerSliderThumb
                 className={cn(
                   thumb,
-                  "top-1/2 translate-x-[calc(var(--color-slider-thumb-position)*-1)] -translate-y-1/2",
+                  "top-1/2 translate-x-[calc(var(--color-slider-thumb-position)*-1)] -translate-y-1/2"
                 )}
               />
             </ColorPickerSlider>
@@ -963,7 +1118,9 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
             onValueChange={(next) => {
               const color = parseColor(value)
               setFormat(next as typeof format)
-              if (color) setValue(formatColor(color, next as typeof format))
+              if (color) {
+                setValue(formatColor(color, next as typeof format))
+              }
             }}
             className={cn("relative flex w-full bg-background", ink)}
           >
@@ -974,7 +1131,7 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
                 value={entry.value}
                 className={cn(
                   "relative h-8 flex-1 font-mono text-[11px] tracking-[0.06em] text-muted-foreground transition-colors data-checked:text-background",
-                  ring,
+                  ring
                 )}
               >
                 {entry.label}
@@ -984,10 +1141,16 @@ function ColorTile({ className, fig }: { className?: string; fig?: string }) {
           <div className="flex gap-2">
             <ColorPickerInput
               aria-label="Color"
-              className={cn(control, "min-w-0 flex-1 px-2.5 font-mono text-[12px] pointer-coarse:text-base")}
+              className={cn(
+                control,
+                "min-w-0 flex-1 px-2.5 font-mono text-[12px] pointer-coarse:text-base"
+              )}
             />
           </div>
-          <ColorPickerSwatches aria-label="Presets" className="grid grid-cols-8 gap-1.5">
+          <ColorPickerSwatches
+            aria-label="Presets"
+            className="grid grid-cols-8 gap-1.5"
+          >
             {presets.map((preset) => (
               <ColorPickerSwatchItem
                 key={preset}
@@ -1027,7 +1190,11 @@ const files: Node[] = [
 
 function Files({ items }: { items: Node[] }) {
   return items.map((node) => (
-    <TreeItem key={node.value} value={node.value} className="group/item outline-none">
+    <TreeItem
+      key={node.value}
+      value={node.value}
+      className="group/item outline-none"
+    >
       <TreeItemLabel className="flex h-9 items-center gap-2 ps-[calc(0.5rem+(var(--tree-level,1)-1)*1rem)] pe-3 text-[15px] whitespace-nowrap select-none [:focus-visible>&]:outline-2 [:focus-visible>&]:outline-solid [:focus-visible>&]:-outline-offset-2 [:focus-visible>&]:outline-[#006bff] hover:bg-foreground/[0.06] data-selected:bg-foreground data-selected:text-background [&>svg]:size-4 [&>svg]:shrink-0">
         {node.children ? (
           <TreeItemIndicator className="flex size-4 items-center justify-center transition-transform data-expanded:rotate-90 rtl:-scale-x-100">
@@ -1036,7 +1203,11 @@ function Files({ items }: { items: Node[] }) {
         ) : (
           <span className="size-4" />
         )}
-        {node.children ? <FolderIcon aria-hidden="true" /> : <FileIcon aria-hidden="true" />}
+        {node.children ? (
+          <FolderIcon aria-hidden="true" />
+        ) : (
+          <FileIcon aria-hidden="true" />
+        )}
         <span>{node.label}</span>
       </TreeItemLabel>
       {node.children && (
@@ -1075,7 +1246,13 @@ function TreeTile({ className, fig }: { className?: string; fig?: string }) {
 }
 
 const periods = [
-  { value: "week", label: "Week", total: "12.4k", change: "+8%", bars: [32, 48, 40, 64, 52, 76, 94] },
+  {
+    value: "week",
+    label: "Week",
+    total: "12.4k",
+    change: "+8%",
+    bars: [32, 48, 40, 64, 52, 76, 94],
+  },
   {
     value: "month",
     label: "Month",
@@ -1093,7 +1270,7 @@ const periods = [
 ]
 const tab = cn(
   "h-11 min-w-0 flex-1 px-2 text-sm font-medium text-muted-foreground @[22rem]:px-3 transition-colors select-none hover:text-foreground data-selected:bg-foreground data-selected:text-background",
-  ring,
+  ring
 )
 
 function TabsTile({ className, fig }: { className?: string; fig?: string }) {
@@ -1109,11 +1286,18 @@ function TabsTile({ className, fig }: { className?: string; fig?: string }) {
       className={className}
     >
       <Measure full>
-        <Tabs defaultValue="week" className={cn("flex flex-col bg-background", ink)}>
+        <Tabs
+          defaultValue="week"
+          className={cn("flex flex-col bg-background", ink)}
+        >
           <div className="border-b border-foreground p-3">
             <TabsList className={cn("flex divide-x divide-foreground", ink)}>
               {periods.map((period) => (
-                <TabsTab key={period.value} value={period.value} className={tab}>
+                <TabsTab
+                  key={period.value}
+                  value={period.value}
+                  className={tab}
+                >
                   {period.label}
                 </TabsTab>
               ))}
@@ -1134,7 +1318,10 @@ function TabsTile({ className, fig }: { className?: string; fig?: string }) {
                   </span>
                 </p>
               </div>
-              <div aria-hidden="true" className="flex h-40 items-end gap-1.5 @[28rem]:h-52">
+              <div
+                aria-hidden="true"
+                className="flex h-40 items-end gap-1.5 @[28rem]:h-52"
+              >
                 {period.bars.map((height, index) => (
                   <div
                     key={index}
@@ -1154,7 +1341,11 @@ function TabsTile({ className, fig }: { className?: string; fig?: string }) {
 const mentions = [
   { value: "app/page.tsx", label: "page.tsx", keywords: ["app"] },
   { value: "app/layout.tsx", label: "layout.tsx", keywords: ["app"] },
-  { value: "components/calendar.tsx", label: "calendar.tsx", keywords: ["components"] },
+  {
+    value: "components/calendar.tsx",
+    label: "calendar.tsx",
+    keywords: ["components"],
+  },
   { value: "README.md", label: "README.md" },
   { value: "package.json", label: "package.json" },
 ]
@@ -1188,7 +1379,13 @@ const skills = [
 const token =
   "inline-flex items-center gap-1 border border-foreground px-1 font-mono text-[15px] data-selected:bg-foreground data-selected:text-background [&_svg]:size-3.5"
 
-function TokenInputTile({ className, fig }: { className?: string; fig?: string }) {
+function TokenInputTile({
+  className,
+  fig,
+}: {
+  className?: string
+  fig?: string
+}) {
   return (
     <ComponentPoster
       fig={fig}
@@ -1227,7 +1424,7 @@ function TokenInputTile({ className, fig }: { className?: string; fig?: string }
             placeholder="Type @ to pick a file, or / for a skill or model"
             className={cn(
               "relative min-h-40 bg-background p-5 text-xl leading-10 outline-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-[#006bff] data-empty:before:pointer-events-none data-empty:before:absolute data-empty:before:text-muted-foreground data-empty:before:content-[attr(aria-placeholder)]",
-              ink,
+              ink
             )}
           />
           <TriggerMenu
@@ -1238,24 +1435,34 @@ function TokenInputTile({ className, fig }: { className?: string; fig?: string }
           >
             <TriggerMenuHint className="text-muted-foreground" />
             <TriggerMenuContent className="max-h-(--available-height) min-w-56 overflow-y-auto bg-background p-1 ring-1 ring-foreground outline-none">
-              <TriggerMenuEmpty className={cn(label, "px-2 py-3 text-muted-foreground empty:hidden")}>
+              <TriggerMenuEmpty
+                className={cn(
+                  label,
+                  "px-2 py-3 text-muted-foreground empty:hidden"
+                )}
+              >
                 No matches
               </TriggerMenuEmpty>
               <TriggerMenuList>
                 {(state) =>
-                  (state.items as (TriggerMenuDataItem | string)[]).map((entry) => {
-                    const option = typeof entry === "string" ? { value: entry, label: entry } : entry
-                    return (
-                      <TriggerMenuItem
-                        key={option.value}
-                        value={option.value}
-                        label={option.label}
-                        className={cn(item, "font-mono text-[13px]")}
-                      >
-                        {option.label}
-                      </TriggerMenuItem>
-                    )
-                  })
+                  (state.items as (TriggerMenuDataItem | string)[]).map(
+                    (entry) => {
+                      const option =
+                        typeof entry === "string"
+                          ? { value: entry, label: entry }
+                          : entry
+                      return (
+                        <TriggerMenuItem
+                          key={option.value}
+                          value={option.value}
+                          label={option.label}
+                          className={cn(item, "font-mono text-[13px]")}
+                        >
+                          {option.label}
+                        </TriggerMenuItem>
+                      )
+                    }
+                  )
                 }
               </TriggerMenuList>
             </TriggerMenuContent>
@@ -1284,7 +1491,13 @@ const faq = [
   },
 ]
 
-function AccordionTile({ className, fig }: { className?: string; fig?: string }) {
+function AccordionTile({
+  className,
+  fig,
+}: {
+  className?: string
+  fig?: string
+}) {
   return (
     <ComponentPoster
       fig={fig}
@@ -1301,7 +1514,10 @@ function AccordionTile({ className, fig }: { className?: string; fig?: string })
         <Accordion
           defaultValue={["shipping"]}
           collapsible={false}
-          className={cn("flex flex-col divide-y divide-foreground bg-background", ink)}
+          className={cn(
+            "flex flex-col divide-y divide-foreground bg-background",
+            ink
+          )}
         >
           {faq.map((entry) => (
             <AccordionItem key={entry.value} value={entry.value}>
@@ -1310,11 +1526,14 @@ function AccordionTile({ className, fig }: { className?: string; fig?: string })
                   className={cn(
                     "flex h-12 w-full items-center justify-between gap-4 px-4 text-start text-[15px] font-medium hover:bg-foreground/[0.04] aria-disabled:cursor-default aria-expanded:[&>svg]:rotate-180",
                     ring,
-                    "focus-visible:-outline-offset-2",
+                    "focus-visible:-outline-offset-2"
                   )}
                 >
                   {entry.label}
-                  <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0 transition-transform" />
+                  <ChevronDownIcon
+                    aria-hidden="true"
+                    className="size-4 shrink-0 transition-transform"
+                  />
                 </AccordionTrigger>
               </AccordionHeader>
               <AccordionPanel className="min-h-[4.75rem] px-4 sm:min-h-16 pb-4 text-sm text-pretty text-muted-foreground">
@@ -1328,7 +1547,13 @@ function AccordionTile({ className, fig }: { className?: string; fig?: string })
   )
 }
 
-function ResizableTile({ className, fig }: { className?: string; fig?: string }) {
+function ResizableTile({
+  className,
+  fig,
+}: {
+  className?: string
+  fig?: string
+}) {
   return (
     <ComponentPoster
       fig={fig}
@@ -1342,10 +1567,19 @@ function ResizableTile({ className, fig }: { className?: string; fig?: string })
     >
       <Measure full>
         <Resizable className={cn("flex h-52 bg-background", ink)}>
-          <ResizablePanel defaultSize={38} minSize={20} className="flex flex-col gap-1 overflow-hidden p-4">
-            <span className={cn(label, "mb-2 text-muted-foreground")}>Files</span>
+          <ResizablePanel
+            defaultSize={38}
+            minSize={20}
+            className="flex flex-col gap-1 overflow-hidden p-4"
+          >
+            <span className={cn(label, "mb-2 text-muted-foreground")}>
+              Files
+            </span>
             {["page.tsx", "layout.tsx", "globals.css"].map((file) => (
-              <span key={file} className="flex min-w-0 items-center gap-2 text-sm">
+              <span
+                key={file}
+                className="flex min-w-0 items-center gap-2 text-sm"
+              >
                 <FileIcon aria-hidden="true" className="size-3.5 shrink-0" />
                 <span className="truncate">{file}</span>
               </span>
@@ -1357,10 +1591,17 @@ function ResizableTile({ className, fig }: { className?: string; fig?: string })
           >
             <span className="absolute top-1/2 left-1/2 h-8 w-2 -translate-1/2 border border-foreground bg-background" />
           </ResizableHandle>
-          <ResizablePanel minSize={30} className="flex flex-col gap-3 overflow-hidden p-4">
+          <ResizablePanel
+            minSize={30}
+            className="flex flex-col gap-3 overflow-hidden p-4"
+          >
             <span className={cn(label, "text-muted-foreground")}>page.tsx</span>
             {[90, 70, 82, 45, 60].map((width, index) => (
-              <span key={index} className="h-2 bg-foreground/15" style={{ width: `${width}%` }} />
+              <span
+                key={index}
+                className="h-2 bg-foreground/15"
+                style={{ width: `${width}%` }}
+              />
             ))}
           </ResizablePanel>
         </Resizable>
@@ -1383,7 +1624,7 @@ const aligns = [
 
 const toggle = cn(
   "flex size-8 items-center justify-center transition-colors @[22rem]:size-9 @[24rem]:size-10 hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-4",
-  ring,
+  ring
 )
 
 function ToolbarTile({ className, fig }: { className?: string; fig?: string }) {
@@ -1407,9 +1648,19 @@ function ToolbarTile({ className, fig }: { className?: string; fig?: string }) {
             aria-label="Formatting"
             className="flex flex-wrap items-center gap-1 border-b border-foreground p-1.5"
           >
-            <ToggleGroup aria-label="Style" value={marked} onValueChange={setMarked} className="flex">
+            <ToggleGroup
+              aria-label="Style"
+              value={marked}
+              onValueChange={setMarked}
+              className="flex"
+            >
               {marks.map(({ value, label: name, Icon }) => (
-                <Toggle key={value} value={value} aria-label={name} className={toggle}>
+                <Toggle
+                  key={value}
+                  value={value}
+                  aria-label={name}
+                  className={toggle}
+                >
                   <Icon aria-hidden="true" />
                 </Toggle>
               ))}
@@ -1423,7 +1674,12 @@ function ToolbarTile({ className, fig }: { className?: string; fig?: string }) {
               className="flex"
             >
               {aligns.map(({ value, label: name, Icon }) => (
-                <Toggle key={value} value={value} aria-label={name} className={toggle}>
+                <Toggle
+                  key={value}
+                  value={value}
+                  aria-label={name}
+                  className={toggle}
+                >
                   <Icon aria-hidden="true" />
                 </Toggle>
               ))}
@@ -1436,7 +1692,7 @@ function ToolbarTile({ className, fig }: { className?: string; fig?: string }) {
               marked.includes("italic") && "italic",
               marked.includes("underline") && "underline underline-offset-4",
               align[0] === "center" && "text-center",
-              align[0] === "right" && "text-end",
+              align[0] === "right" && "text-end"
             )}
           >
             Every button is one arrow key away.

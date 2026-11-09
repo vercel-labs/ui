@@ -54,7 +54,8 @@ describe.each(Object.entries(popups))("%s", (name, primitive) => {
   test("a canceled change returns false", () => {
     const { api } = create({
       id: name,
-      onOpenChange: (_: boolean, details: { cancel: () => void }) => details.cancel(),
+      onOpenChange: (_: boolean, details: { cancel: () => void }) =>
+        details.cancel(),
     })
     expect(api.setOpen(true)).toBe(false)
     expect(api.toggle()).toBe(false)

@@ -1,5 +1,13 @@
 import "@ui-sdk/web/autocomplete"
-import { Archive, Clock, createElement, File, Pencil, Reply, Star } from "lucide"
+import {
+  Archive,
+  Clock,
+  createElement,
+  File,
+  Pencil,
+  Reply,
+  Star,
+} from "lucide"
 
 const mailSearches = [
   { value: "Starred", icon: Star },
@@ -23,7 +31,7 @@ function mount(root: HTMLElement) {
             .map(
               (search) => `
                 <ui-autocomplete-item value="${search.value}"><ui-autocomplete-item-icon ${search.mirror ? "mirror" : ""}>${createElement(search.icon, { "aria-hidden": "true" }).outerHTML}</ui-autocomplete-item-icon>${search.value}</ui-autocomplete-item>
-              `,
+              `
             )
             .join("")}
         </ui-autocomplete-list>

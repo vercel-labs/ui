@@ -22,8 +22,12 @@ const action = ref("")
           <span v-bind="props">{{ counted("Span tool") }}</span>
         </template>
       </ToolbarButton>
-      <ToolbarButton @click="action = 'cut'">{{ counted("Cut") }}</ToolbarButton>
-      <ToolbarButton @click="action = 'copy'">{{ counted("Copy") }}</ToolbarButton>
+      <ToolbarButton @click="action = 'cut'">{{
+        counted("Cut")
+      }}</ToolbarButton>
+      <ToolbarButton @click="action = 'copy'">{{
+        counted("Copy")
+      }}</ToolbarButton>
       <ToolbarSeparator class="rule">
         <template #render="{ props }">
           <hr v-bind="props" />
@@ -31,7 +35,12 @@ const action = ref("")
       </ToolbarSeparator>
       <ToolbarButton disabled href="#old">
         <template #render="{ props, state }">
-          <a v-bind="props" href="#old" :class="state.disabled ? 'is-disabled' : 'is-enabled'">Old docs</a>
+          <a
+            v-bind="props"
+            href="#old"
+            :class="state.disabled ? 'is-disabled' : 'is-enabled'"
+            >Old docs</a
+          >
         </template>
       </ToolbarButton>
     </Toolbar>

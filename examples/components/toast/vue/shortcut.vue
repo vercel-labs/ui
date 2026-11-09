@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
+import {
+  Toast,
+  ToastAction,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/vue/toast"
 import { onUnmounted } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
@@ -10,7 +16,9 @@ onUnmounted(() => {
 })
 
 function sendMessage() {
-  toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })
+  toast("Message sent", {
+    action: { label: "Undo", onAction: () => log("Message unsent") },
+  })
 }
 </script>
 

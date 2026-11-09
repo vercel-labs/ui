@@ -31,7 +31,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function Example() {
   return (

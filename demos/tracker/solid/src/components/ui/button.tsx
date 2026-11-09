@@ -25,21 +25,28 @@ type ButtonVariants = {
   size?: keyof typeof sizes
 }
 
-function buttonVariants({ variant = "secondary", size = "default" }: ButtonVariants = {}) {
+function buttonVariants({
+  variant = "secondary",
+  size = "default",
+}: ButtonVariants = {}) {
   return cn(
     "inline-flex shrink-0 cursor-default items-center justify-center gap-1.5 rounded-2xl border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap outline-none select-none transition-[color,background-color,box-shadow] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/30 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 data-disabled:pointer-events-none data-disabled:opacity-50 motion-reduce:transition-none [&_svg:not([class*='size-'])]:size-4",
     variants[variant],
-    sizes[size],
+    sizes[size]
   )
 }
 
 function Button(
-  props: Omit<ComponentProps<typeof ButtonPrimitive>, "class"> & ButtonVariants & { class?: string },
+  props: Omit<ComponentProps<typeof ButtonPrimitive>, "class"> &
+    ButtonVariants & { class?: string }
 ) {
   const rest = omit(props, "variant", "size", "class")
   return (
     <ButtonPrimitive
-      class={cn(buttonVariants({ variant: props.variant, size: props.size }), props.class)}
+      class={cn(
+        buttonVariants({ variant: props.variant, size: props.size }),
+        props.class
+      )}
       {...rest}
     />
   )

@@ -1,4 +1,8 @@
-import { createRatingController, Rating, RatingItem } from "@ui-sdk/solid/rating"
+import {
+  createRatingController,
+  Rating,
+  RatingItem,
+} from "@ui-sdk/solid/rating"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
 import { ratingOptions } from "tests/fixtures/page.ts"
@@ -30,15 +34,28 @@ function Fixture() {
         disabled={disabled}
         controller={controller}
         onValueChange={(score, details) => {
-          if (score === cancel) return details.cancel()
+          if (score === cancel) {
+            return details.cancel()
+          }
           setAction(`${score}:${details.reason}`)
         }}
       >
-        <RatingItem>{(state) => <span class="star">{state.fill}</span>}</RatingItem>
+        <RatingItem>
+          {(state) => <span class="star">{state.fill}</span>}
+        </RatingItem>
       </Rating>
       <button type="button">After</button>
-      <Rating aria-label={value.label} name={value.name} step={value.step} deselectable />
-      <Rating value={average.value} getValueLabel={average.getValueLabel} readOnly />
+      <Rating
+        aria-label={value.label}
+        name={value.name}
+        step={value.step}
+        deselectable
+      />
+      <Rating
+        value={average.value}
+        getValueLabel={average.getValueLabel}
+        readOnly
+      />
       <button type="submit">Save</button>
       <button type="reset">Reset</button>
       <button type="button" onClick={() => controller.setValue(5)}>

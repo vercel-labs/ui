@@ -8,17 +8,20 @@ import { omit, type ComponentProps } from "solid-js"
 import type { JSX } from "@solidjs/web"
 
 function CollapsibleTrigger(
-  props: Omit<ComponentProps<typeof CollapsibleTriggerPrimitive>, "class" | "children"> & {
+  props: Omit<
+    ComponentProps<typeof CollapsibleTriggerPrimitive>,
+    "class" | "children"
+  > & {
     class?: string
     children?: JSX.Element
-  },
+  }
 ) {
   const rest = omit(props, "class", "children")
   return (
     <CollapsibleTriggerPrimitive
       class={cn(
         "group flex h-7 cursor-default items-center gap-1 rounded-xl px-1.5 text-sm font-medium outline-none select-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30",
-        props.class,
+        props.class
       )}
       {...rest}
     >
@@ -32,14 +35,16 @@ function CollapsibleTrigger(
 }
 
 function CollapsiblePanel(
-  props: Omit<ComponentProps<typeof CollapsiblePanelPrimitive>, "class"> & { class?: string },
+  props: Omit<ComponentProps<typeof CollapsiblePanelPrimitive>, "class"> & {
+    class?: string
+  }
 ) {
   const rest = omit(props, "class")
   return (
     <CollapsiblePanelPrimitive
       class={cn(
         "h-(--collapsible-panel-height) overflow-hidden transition-[height] duration-200 ease-out data-starting-style:h-0 data-ending-style:h-0 motion-reduce:transition-none",
-        props.class,
+        props.class
       )}
       {...rest}
     />

@@ -8,13 +8,17 @@ test.describe("custom rendering", () => {
     await open("progress-render")
   })
 
-  test("a progress bar rendered as a section keeps its role and value", async ({ page }) => {
+  test("a progress bar rendered as a section keeps its role and value", async ({
+    page,
+  }) => {
     const bar = page.getByRole("progressbar", { name: "Export" })
     expect(await bar.evaluate((el) => el.tagName)).toBe("SECTION")
     await expect(bar).toHaveAttribute("aria-valuenow", "40")
   })
 
-  test("render functions receive the progress bar's state", async ({ page }) => {
+  test("render functions receive the progress bar's state", async ({
+    page,
+  }) => {
     const bar = page.getByRole("progressbar", { name: "Export" })
     await expect(bar).toContainText("40% done")
     await page.getByRole("button", { name: "Finish" }).click()
@@ -24,10 +28,14 @@ test.describe("custom rendering", () => {
 
   test("an avatar's fallback reads its loading status", async ({ page }) => {
     await expect(page.locator(".avatar").locator(".is-idle")).toHaveText("RF")
-    expect(await page.locator(".avatar").evaluate((el) => el.tagName)).toBe("DIV")
+    expect(await page.locator(".avatar").evaluate((el) => el.tagName)).toBe(
+      "DIV"
+    )
   })
 
-  test("slots render their character and state through functions", async ({ page }) => {
+  test("slots render their character and state through functions", async ({
+    page,
+  }) => {
     const pin = page.getByRole("textbox", { name: "PIN" })
     expect(await page.locator("section.otp").count()).toBe(1)
     await expect(page.locator(".otp-slot").first()).toHaveText("·")

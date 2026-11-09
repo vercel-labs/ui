@@ -92,7 +92,10 @@ function ViewSwitch() {
   const { value } = usePreference(view)
 
   return (
-    <button aria-pressed={value === "grid"} onClick={() => view.set(value === "grid" ? "list" : "grid")}>
+    <button
+      aria-pressed={value === "grid"}
+      onClick={() => view.set(value === "grid" ? "list" : "grid")}
+    >
       Grid
     </button>
   )

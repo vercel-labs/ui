@@ -281,7 +281,9 @@ const fileMenu: MenuData = [
 Render an item as a native link using the shared [composition API](../parts-and-composition). Enter follows the link like a click, preserving its target and modifier-key behavior.
 
 ```tsx
-<MenuItem render={(props) => <a {...props} href="#composition" />}>Composition</MenuItem>
+<MenuItem render={(props) => <a {...props} href="#composition" />}>
+  Composition
+</MenuItem>
 ```
 
 ## Custom Rendering
@@ -354,39 +356,66 @@ Props and callbacks are the same as below, as Solid props.
 
 A trigger outside the menu also takes `controller`.
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuTriggerProps"
+/>
 
 ### MenuContextTrigger
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuContextTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuContextTriggerProps"
+/>
 
 ### MenuContent
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuContentProps"
+/>
 
 ### MenuItem
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuItemProps"
+/>
 
 ### MenuCheckboxItem
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuCheckboxItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuCheckboxItemProps"
+/>
 
 ### MenuRadioGroup
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuRadioGroupProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuRadioGroupProps"
+/>
 
 ### MenuRadioItem
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuRadioItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuRadioItemProps"
+/>
 
 ### MenuItemIndicator
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIndicatorProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuItemIndicatorProps"
+/>
 
 ### MenuItemIcon
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuItemIconProps"
+/>
 
 ### MenuSub
 
@@ -405,7 +434,10 @@ A trigger outside the menu also takes `controller`.
 
 ### MenuSubTrigger
 
-<TypeTable path="../../packages/core/src/components/menu/menu.ts" name="MenuSubTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuSubTriggerProps"
+/>
 
 ### MenuSubContent
 
@@ -421,53 +453,89 @@ What render functions, state-based class names and slots receive, per part.
 
 `MenuTrigger`, `MenuContextTrigger` and `MenuSubTrigger`:
 
-<StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuTriggerState"
+/>
 
 `MenuContent`:
 
-<StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuContentState" />
+<StateTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuContentState"
+/>
 
 `MenuItem`:
 
-<StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemState" />
+<StateTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuItemState"
+/>
 
 `MenuCheckboxItem` and `MenuRadioItem`:
 
-<StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuCheckboxItemState" />
+<StateTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuCheckboxItemState"
+/>
 
 `MenuRadioGroup`:
 
-<StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuRadioGroupState" />
+<StateTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuRadioGroupState"
+/>
 
 `MenuItemIndicator`:
 
-<StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIndicatorState" />
+<StateTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuItemIndicatorState"
+/>
 
 `MenuItemIcon`:
 
-<StateTable path="../../packages/core/src/components/menu/menu.ts" name="MenuItemIconState" />
+<StateTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuItemIconState"
+/>
 
 ### Reasons
 
 `details.reason` says why the menu or a submenu opened or closed.
 
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuOpenChangeReason"
+/>
 
 For a payload change, it says what opened the menu or took it over.
 
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuPayloadChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuPayloadChangeReason"
+/>
 
 With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
 
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuDismissReason" />
+<ReasonTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuDismissReason"
+/>
 
 Checkbox items report why they toggled, in `onCheckedChange`:
 
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuCheckedChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuCheckedChangeReason"
+/>
 
 Radio groups report why their value changed, in `onValueChange`:
 
-<ReasonTable path="../../packages/core/src/components/menu/menu.ts" name="MenuValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuValueChangeReason"
+/>
 
 ### Controller
 
@@ -476,7 +544,10 @@ triggers outside it. `Payload` is the type of the data triggers and `open()` pas
 
 Every write method takes an optional `{ reason, event }`, passed to `onOpenChange`. `open()` also takes `focus`: `"first"`, `"last"`, `"popup"` or `"none"`.
 
-<ControllerTable path="../../packages/core/src/components/menu/menu.ts" name="MenuController" />
+<ControllerTable
+  path="../../packages/core/src/components/menu/menu.ts"
+  name="MenuController"
+/>
 
 ### Events
 
@@ -503,7 +574,16 @@ The menu follows the [WAI-ARIA menu button pattern](https://www.w3.org/WAI/ARIA/
 
 Every line below is an automated test.
 
-<SpecList spec="menu" only={["trigger", "keyboard navigation", "activation", "dismissal", "submenu"]} />
+<SpecList
+  spec="menu"
+  only={[
+    "trigger",
+    "keyboard navigation",
+    "activation",
+    "dismissal",
+    "submenu",
+  ]}
+/>
 
 Screen readers hear the same thing in each tested framework, recorded by a virtual screen reader:
 

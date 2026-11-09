@@ -1,5 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
-import { accordion, createAccordionController } from "../src/components/accordion/accordion"
+import {
+  accordion,
+  createAccordionController,
+} from "../src/components/accordion/accordion"
 import { idPart } from "../src/foundation/kernel/attrs"
 import { renderVersion } from "../src/foundation/kernel/primitive"
 import { createStore, sameValue } from "../src/foundation/kernel/store"
@@ -70,7 +73,10 @@ describe("rendering", () => {
     })
     expect(present(instance.part("panel", { value: "a" }))).toBe(true)
     expect(present(instance.part("panel", { value: "b" }))).toBe(false)
-    expect(attrs(instance.part("panel", { value: "a" }))).toMatchObject({ role: "region", hidden: undefined })
+    expect(attrs(instance.part("panel", { value: "a" }))).toMatchObject({
+      role: "region",
+      hidden: undefined,
+    })
   })
 
   test("closed panels kept mounted are hidden, or hidden until found", () => {
@@ -79,9 +85,13 @@ describe("rendering", () => {
     expect(attrs(kept.part("panel", { value: "a" })).hidden).toBe("")
     const findable = accordion({ id: "x", hiddenUntilFound: true })
     expect(present(findable.part("panel", { value: "a" }))).toBe(true)
-    expect(attrs(findable.part("panel", { value: "a" })).hidden).toBe("until-found")
+    expect(attrs(findable.part("panel", { value: "a" })).hidden).toBe(
+      "until-found"
+    )
     const panel = accordion({ id: "x" })
-    expect(attrs(panel.part("panel", { value: "a", hiddenUntilFound: true })).hidden).toBe("until-found")
+    expect(
+      attrs(panel.part("panel", { value: "a", hiddenUntilFound: true })).hidden
+    ).toBe("until-found")
   })
 
   test("a disabled item disables its trigger, header and panel", () => {
@@ -91,7 +101,9 @@ describe("rendering", () => {
       "aria-disabled": "true",
       "data-disabled": "",
     })
-    expect(attrs(instance.part("header", { value: "a" }))["data-disabled"]).toBe("")
+    expect(
+      attrs(instance.part("header", { value: "a" }))["data-disabled"]
+    ).toBe("")
     expect(partState(instance.part("panel", { value: "a" }))).toEqual({
       open: false,
       disabled: true,
@@ -105,7 +117,9 @@ describe("rendering", () => {
     instance.setOptions({ id: "x", disabled: true })
     expect(renderVersion(instance)).toBeGreaterThan(version)
     expect(attrs(instance.part("root"))["data-disabled"]).toBe("")
-    expect(attrs(instance.part("trigger", { value: "a" }))["aria-disabled"]).toBe("true")
+    expect(
+      attrs(instance.part("trigger", { value: "a" }))["aria-disabled"]
+    ).toBe("true")
   })
 })
 
@@ -114,7 +128,10 @@ describe("opening and closing", () => {
     const onValueChange = vi.fn()
     const instance = accordion({ id: "x", defaultValue: ["a"], onValueChange })
     instance.api.toggle("b", { reason: "trigger-press" })
-    expect(onValueChange).toHaveBeenCalledWith(["b"], expect.objectContaining({ reason: "trigger-press" }))
+    expect(onValueChange).toHaveBeenCalledWith(
+      ["b"],
+      expect.objectContaining({ reason: "trigger-press" })
+    )
     expect(instance.api.getValue()).toEqual(["b"])
     instance.api.toggle("b")
     expect(instance.api.getValue()).toEqual([])
@@ -129,13 +146,21 @@ describe("opening and closing", () => {
   })
 
   test("without collapsible, the open item stays open and says so", () => {
-    const instance = accordion({ id: "x", defaultValue: ["a"], collapsible: false })
-    expect(attrs(instance.part("trigger", { value: "a" }))["aria-disabled"]).toBe("true")
+    const instance = accordion({
+      id: "x",
+      defaultValue: ["a"],
+      collapsible: false,
+    })
+    expect(
+      attrs(instance.part("trigger", { value: "a" }))["aria-disabled"]
+    ).toBe("true")
     expect(instance.api.close("a")).toBe(false)
     expect(instance.api.getValue()).toEqual(["a"])
     instance.api.open("b")
     expect(instance.api.getValue()).toEqual(["b"])
-    expect(attrs(instance.part("trigger", { value: "a" }))["aria-disabled"]).toBeUndefined()
+    expect(
+      attrs(instance.part("trigger", { value: "a" }))["aria-disabled"]
+    ).toBeUndefined()
   })
 
   test("a canceled change keeps the value", () => {
@@ -151,10 +176,15 @@ describe("opening and closing", () => {
   test("an item hears about its change first, and can cancel it", () => {
     const onValueChange = vi.fn()
     const instance = accordion({ id: "x", onValueChange })
-    const onOpenChange = vi.fn((_open: boolean, details: { cancel: () => void }) => details.cancel())
+    const onOpenChange = vi.fn(
+      (_open: boolean, details: { cancel: () => void }) => details.cancel()
+    )
     attrs(instance.part("item", { value: "a", onOpenChange }))
     instance.api.open("a", { reason: "trigger-press" })
-    expect(onOpenChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: "trigger-press" }))
+    expect(onOpenChange).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ reason: "trigger-press" })
+    )
     expect(onValueChange).not.toHaveBeenCalled()
     expect(instance.api.getValue()).toEqual([])
   })
@@ -171,7 +201,12 @@ describe("opening and closing", () => {
 
   test("only the item find in page opened shows at once, not one a controlled value opens later", () => {
     const onValueChange = vi.fn()
-    const options = { id: "x", multiple: true, hiddenUntilFound: true, onValueChange }
+    const options = {
+      id: "x",
+      multiple: true,
+      hiddenUntilFound: true,
+      onValueChange,
+    }
     const instance = accordion({ ...options, value: [] })
     instance.api.open("a", { reason: "find-in-page" })
     instance.setOptions({ ...options, value: ["a"] })
@@ -184,8 +219,13 @@ describe("opening and closing", () => {
     const options = {
       id: "x",
       hiddenUntilFound: true,
-      onValueChange: (_value: string[], details: { reason: string; cancel: () => void }) => {
-        if (details.reason === "find-in-page") details.cancel()
+      onValueChange: (
+        _value: string[],
+        details: { reason: string; cancel: () => void }
+      ) => {
+        if (details.reason === "find-in-page") {
+          details.cancel()
+        }
       },
     }
     const instance = accordion({ ...options, value: [] })
@@ -252,8 +292,14 @@ describe("items", () => {
   test("closing one item to open another tells both items", () => {
     const calls: string[] = []
     const instance = accordion({ id: "x", defaultValue: ["a"] })
-    for (const value of ["a", "b"])
-      attrs(instance.part("item", { value, onOpenChange: (open: boolean) => calls.push(`${value}:${open}`) }))
+    for (const value of ["a", "b"]) {
+      attrs(
+        instance.part("item", {
+          value,
+          onOpenChange: (open: boolean) => calls.push(`${value}:${open}`),
+        })
+      )
+    }
     instance.api.open("b")
     expect(calls.sort()).toEqual(["a:false", "b:true"])
   })
@@ -263,8 +309,9 @@ describe("items", () => {
     attrs(
       instance.part("item", {
         value: "a",
-        onOpenChange: (open: boolean, details: { cancel: () => void }) => !open && details.cancel(),
-      }),
+        onOpenChange: (open: boolean, details: { cancel: () => void }) =>
+          !open && details.cancel(),
+      })
     )
     expect(instance.api.open("b")).toBe(false)
     expect(instance.api.getValue()).toEqual(["a"])
@@ -272,7 +319,9 @@ describe("items", () => {
 
   test("openAll opens every enabled item, and closeAll closes them", () => {
     const instance = accordion({ id: "x", multiple: true })
-    for (const value of ["a", "b", "c"]) instance.api.internal.registerItem(value, {} as Element)
+    for (const value of ["a", "b", "c"]) {
+      instance.api.internal.registerItem(value, {} as Element)
+    }
     attrs(instance.part("item", { value: "b", disabled: true }))
     instance.api.openAll()
     expect(instance.api.getValue()).toEqual(["a", "c"])
@@ -281,7 +330,11 @@ describe("items", () => {
   })
 
   test("closeAll leaves the one item that must stay open", () => {
-    const instance = accordion({ id: "x", defaultValue: ["a"], collapsible: false })
+    const instance = accordion({
+      id: "x",
+      defaultValue: ["a"],
+      collapsible: false,
+    })
     instance.api.closeAll()
     expect(instance.api.getValue()).toEqual(["a"])
   })

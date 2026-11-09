@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Field, FieldControl, FieldLabel } from "@ui-sdk/vue/field"
-import { type TriggerDefinition, TriggerMenu, TriggerMenuInput } from "@ui-sdk/vue/trigger-menu"
+import {
+  type TriggerDefinition,
+  TriggerMenu,
+  TriggerMenuInput,
+} from "@ui-sdk/vue/trigger-menu"
 
 const people = [
   { value: "hollis", label: "Hollis Grant" },
@@ -25,8 +29,11 @@ const channels = [
 function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
   return new Promise<string[]>((resolve, reject) => {
     const timer = setTimeout(
-      () => resolve(channels.filter((channel) => channel.includes(query.toLowerCase()))),
-      400,
+      () =>
+        resolve(
+          channels.filter((channel) => channel.includes(query.toLowerCase()))
+        ),
+      400
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)

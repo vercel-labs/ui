@@ -2,7 +2,10 @@
 // contract the specs rely on, so change them here and nowhere else.
 const scrollAreaFixture = {
   // Vertical only, with nothing focusable inside: the viewport is the tab stop.
-  tags: { label: "Tags", items: Array.from({ length: 50 }, (_, index) => `Tag ${index + 1}`) },
+  tags: {
+    label: "Tags",
+    items: Array.from({ length: 50 }, (_, index) => `Tag ${index + 1}`),
+  },
   // Both axes, with links inside: Tab reaches the links, not the viewport.
   gallery: {
     label: "Gallery",
@@ -30,7 +33,8 @@ function scrollAreaOptions() {
   const params = new URLSearchParams(location.search)
   const delay = params.get("delay")
   return {
-    type: (params.get("type") ?? undefined) as ScrollAreaFixtureType | undefined,
+    type: (params.get("type") ?? undefined) as
+      ScrollAreaFixtureType | undefined,
     scrollHideDelay: delay === null ? undefined : Number(delay),
     native: params.has("native"),
   }

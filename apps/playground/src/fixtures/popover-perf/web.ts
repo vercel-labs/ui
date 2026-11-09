@@ -12,7 +12,7 @@ async function mount(root: HTMLElement) {
             ${item.label} details.
             <ui-popover-close><button>Close</button></ui-popover-close>
           </ui-popover-content>
-        </ui-popover>`,
+        </ui-popover>`
     )
     .join("")
   root.innerHTML = `<div class="fixture" style="flex-wrap: wrap"><button>Before</button>${popovers}<button>After</button></div>`

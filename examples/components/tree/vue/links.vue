@@ -36,13 +36,16 @@ const links = new Set(
   pages
     .flatMap((page) => [page, ...(page.children ?? [])])
     .filter((page) => page.href)
-    .map((page) => page.value),
+    .map((page) => page.value)
 )
 
 const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, href, children }) => {
     const content = () => [
-      children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+      children &&
+        h(TreeItemIndicator, {}, () =>
+          h(ChevronRightIcon, { "aria-hidden": "true" })
+        ),
       label,
     ]
     return h(TreeItem, { key: value, value }, () => [
@@ -60,7 +63,7 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
                 children: FunctionalComponent
               }) => h("a", { ...props, href }, h(children)),
             }
-          : content,
+          : content
       ),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
     ])
@@ -69,14 +72,22 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
 const current = ref("tree")
 
 function onAction(value: string, { event }: TreeActionDetails) {
-  if (!links.has(value)) return
+  if (!links.has(value)) {
+    return
+  }
   event?.preventDefault()
   current.value = value
 }
 </script>
 
 <template>
-  <Tree aria-label="Docs" :items="pages" mode="none" :current="current" @action="onAction">
+  <Tree
+    aria-label="Docs"
+    :items="pages"
+    mode="none"
+    :current="current"
+    @action="onAction"
+  >
     <Items :items="pages" />
   </Tree>
 </template>

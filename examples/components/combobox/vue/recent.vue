@@ -33,11 +33,19 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 const recentCountries = [
-  { type: "group" as const, label: "Recent", items: [countries[9], countries[12], countries[15]] },
+  {
+    type: "group" as const,
+    label: "Recent",
+    items: [countries[9], countries[12], countries[15]],
+  },
 ]
 
 const announcement = (change: ListAnnouncement) =>
@@ -45,7 +53,11 @@ const announcement = (change: ListAnnouncement) =>
 </script>
 
 <template>
-  <Combobox :items="countries" :empty-items="recentCountries" :announcement="announcement">
+  <Combobox
+    :items="countries"
+    :empty-items="recentCountries"
+    :announcement="announcement"
+  >
     <div data-slot="stack">
       <ComboboxLabel>Country</ComboboxLabel>
       <div data-slot="row">
@@ -59,7 +71,9 @@ const announcement = (change: ListAnnouncement) =>
       <ComboboxEmpty>No countries found.</ComboboxEmpty>
       <ComboboxList v-slot="{ state }">
         <template
-          v-for="entry in state.items as ((typeof countries)[number] | (typeof recentCountries)[number])[]"
+          v-for="entry in state.items as (
+            (typeof countries)[number] | (typeof recentCountries)[number]
+          )[]"
           :key="'items' in entry ? entry.label : entry.value"
         >
           <ComboboxGroup v-if="'items' in entry">

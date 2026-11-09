@@ -11,7 +11,9 @@ import { exposeDialogFixture, recordOpenChange } from "./shared"
 
 const parts = dialogParts()
 const backdrop = (owner: string) =>
-  parts.backdrop ? `<${owner}-backdrop class="dialog-backdrop"></${owner}-backdrop>` : ""
+  parts.backdrop
+    ? `<${owner}-backdrop class="dialog-backdrop"></${owner}-backdrop>`
+    : ""
 
 const nested = `
   <ui-dialog id="nested">
@@ -85,20 +87,31 @@ async function mount(root: HTMLElement) {
   const content = dialog.querySelector(":scope > ui-dialog-content")!
   const options = dialogOptions()
   const output = root.querySelector("output")!
-  if (options.defaultOpen) dialog.setAttribute("default-open", "")
-  if (options.modal !== undefined) dialog.setAttribute("modal", String(options.modal))
-  if (options.closeOnOutsidePress === false) dialog.setAttribute("close-on-outside-press", "false")
-  if (options.presentation) dialog.setAttribute("presentation", options.presentation)
-  if (alertDialogOptions().defaultOpen) alert.setAttribute("default-open", "")
+  if (options.defaultOpen) {
+    dialog.setAttribute("default-open", "")
+  }
+  if (options.modal !== undefined) {
+    dialog.setAttribute("modal", String(options.modal))
+  }
+  if (options.closeOnOutsidePress === false) {
+    dialog.setAttribute("close-on-outside-press", "false")
+  }
+  if (options.presentation) {
+    dialog.setAttribute("presentation", options.presentation)
+  }
+  if (alertDialogOptions().defaultOpen) {
+    alert.setAttribute("default-open", "")
+  }
   if (options.container) {
     dialog.setAttribute("container", `#${options.container.id}`)
     alert.setAttribute("container", `#${options.container.id}`)
   }
-  for (const [name, value] of Object.entries(dialogContentOptions()))
+  for (const [name, value] of Object.entries(dialogContentOptions())) {
     content.setAttribute(
       name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
-      value,
+      value
     )
+  }
   const confirm = createConfirm()
   alert.controller = confirm.controller
   // Found before the elements upgrade, since an open dialog's content may move into its container.
@@ -111,19 +124,31 @@ async function mount(root: HTMLElement) {
   exposeDialogFixture(dialog.api, confirm)
   dialog.addEventListener("openchange", (event) => {
     const { value, reason, returnValue } = (
-      event as CustomEvent<{ value: boolean; reason: string; returnValue?: string }>
+      event as CustomEvent<{
+        value: boolean
+        reason: string
+        returnValue?: string
+      }>
     ).detail
     recordOpenChange("dialog", value, { reason })
-    if (!value && returnValue) output.textContent = returnValue
+    if (!value && returnValue) {
+      output.textContent = returnValue
+    }
   })
   nested?.addEventListener("openchange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: boolean; reason: string }>).detail
+    const { value, reason } = (
+      event as CustomEvent<{ value: boolean; reason: string }>
+    ).detail
     recordOpenChange("nested", value, { reason })
   })
-  remove?.addEventListener("click", () => root.querySelector("ui-dialog-trigger")?.remove())
+  remove?.addEventListener("click", () =>
+    root.querySelector("ui-dialog-trigger")?.remove()
+  )
   save.addEventListener("click", () => (output.textContent = "save"))
   del.addEventListener("click", () => (output.textContent = "delete"))
-  root.querySelector("#controller")!.addEventListener("click", () => dialog.api.open())
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => dialog.api.open())
 }
 
 export { mount }

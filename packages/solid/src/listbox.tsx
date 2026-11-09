@@ -11,7 +11,12 @@ import { merge, omit } from "solid-js"
 import { joinField, useFieldControl } from "./field-context"
 import { formInputs } from "./form-inputs"
 import { ListItems, type ListParts } from "./list-items"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(listboxPrimitive, {
   item: "div",
@@ -29,10 +34,10 @@ type Clashing = "value" | "onChange" | "onSelect"
  * The props of `Listbox`.
  * @stable
  */
-type ListboxProps<T = string, Multiple extends boolean | undefined = false> = Omit<
-  PartProps<"div", ListboxState>,
-  Clashing | keyof ListboxOptions
-> &
+type ListboxProps<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = Omit<PartProps<"div", ListboxState>, Clashing | keyof ListboxOptions> &
   ListboxOptions<T, Multiple> & {}
 
 const optionKeys = [
@@ -63,7 +68,9 @@ const optionKeys = [
  * `multiple` makes the value a list.
  * @stable
  */
-function Listbox<T = string, Multiple extends boolean | undefined = false>(props: ListboxProps<T, Multiple>) {
+function Listbox<T = string, Multiple extends boolean | undefined = false>(
+  props: ListboxProps<T, Multiple>
+) {
   const field = useFieldControl(props)
   // Typed loosely: the union `Multiple` picks is too large for `omit`.
   const loose = props as ListboxProps<any, boolean>
@@ -76,12 +83,22 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>(props
   const rest = merge(omit(loose, ...optionKeys), {
     // Without content, a data listbox renders its items.
     get children() {
-      return props.children ?? ((state: ListboxState) => props.items && <ListboxItems items={state.items} />)
+      return (
+        props.children ??
+        ((state: ListboxState) =>
+          props.items && <ListboxItems items={state.items} />)
+      )
     },
   })
   return (
     <>
-      {usePart(listbox, "root", undefined, joinField(field, rest, "div"), "div")}
+      {usePart(
+        listbox,
+        "root",
+        undefined,
+        joinField(field, rest, "div"),
+        "div"
+      )}
       {formInputs(listbox, () => props.multiple)}
     </>
   )
@@ -92,7 +109,8 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>(props
  * @stable
  */
 const ListboxItem = parts.Item as <T = string>(
-  props: Omit<PartProps<"div", ListboxItemState>, Clashing> & ListboxItemProps<T>,
+  props: Omit<PartProps<"div", ListboxItemState>, Clashing> &
+    ListboxItemProps<T>
 ) => JSX.Element
 
 /**

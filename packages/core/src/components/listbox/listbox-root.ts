@@ -4,29 +4,47 @@
 // primitive. State and the API live in listbox-root-api.ts, keys and
 // presses in listbox-root-keyboard.ts, parts in listbox-root-parts.ts, and
 // the range math in listbox-range.ts.
-import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { type ListData, type ListHighlightDetails } from "../../foundation/lists/listbox"
+import {
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
+import {
+  type ListData,
+  type ListHighlightDetails,
+} from "../../foundation/lists/listbox"
 import { listboxSlots } from "./listbox-root-parts"
-import { initialListboxStore, listboxApi, syncListboxStore } from "./listbox-root-api"
+import {
+  initialListboxStore,
+  listboxApi,
+  syncListboxStore,
+} from "./listbox-root-api"
 import type { ListboxGeneric } from "./listbox-root-generic"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Why a listbox's value wants to change.
  * @stable
  */
-type ListboxValueChangeReason = "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
+type ListboxValueChangeReason =
+  "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
 
 /**
  * The value of a listbox: one item's value or `null`, or a list with `multiple`.
  * @stable
  */
-type ListboxValue<T = string, Multiple extends boolean | undefined = false> = Multiple extends true
-  ? T[]
-  : T | null
+type ListboxValue<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = Multiple extends true ? T[] : T | null
 
 /**
  * Options for every write method on a listbox controller.
@@ -38,7 +56,10 @@ type ListboxChangeOptions = ChangeOptions<ListboxValueChangeReason>
  * Reads and sets a listbox from outside it, like a reset button or a test. Pass it as the `controller` option.
  * @stable
  */
-function createListboxController<T = string, Multiple extends boolean | undefined = false>() {
+function createListboxController<
+  T = string,
+  Multiple extends boolean | undefined = false,
+>() {
   return createController<{
     /** The selected value. */
     getValue: () => ListboxValue<T, Multiple>
@@ -46,7 +67,10 @@ function createListboxController<T = string, Multiple extends boolean | undefine
      * Selects a value, as a user would. A disabled or read-only listbox ignores it.
      * Returns false when the change was canceled or nothing changed.
      */
-    setValue: (value: ListboxValue<T, Multiple>, options?: ListboxChangeOptions) => boolean
+    setValue: (
+      value: ListboxValue<T, Multiple>,
+      options?: ListboxChangeOptions
+    ) => boolean
     /**
      * Selects nothing: `null`, or an empty list with `multiple`.
      * Returns false when the change was canceled or nothing changed.
@@ -67,9 +91,10 @@ function createListboxController<T = string, Multiple extends boolean | undefine
  * option.
  * @stable
  */
-type ListboxController<T = string, Multiple extends boolean | undefined = false> = ReturnType<
-  typeof createListboxController<T, Multiple>
->
+type ListboxController<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = ReturnType<typeof createListboxController<T, Multiple>>
 
 /**
  * The options `listbox` takes. A component takes them as props on its root.
@@ -79,7 +104,10 @@ type ListboxController<T = string, Multiple extends boolean | undefined = false>
 // A union on `multiple`, so TypeScript infers `T` through it. The multiple side
 // comes first, so a list in a variable infers `T` as its items. A value that is
 // itself a list takes `items` or the type: `<Listbox<number[]>>`.
-type ListboxOptions<T = string, Multiple extends boolean | undefined = false> = ListboxSharedOptions<T> &
+type ListboxOptions<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = ListboxSharedOptions<T> &
   (
     | ListboxMultipleOptions<T, Multiple>
     | ListboxSingleOptions<T, Multiple>
@@ -101,8 +129,15 @@ type ListboxSingleOptions<T, Multiple> = {
   // state setter would make `T` a list here. `NoInfer` leaves `T` to the
   // value, the items and the multiple side's callback.
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: NoInfer<T> | null, details: ChangeDetails<ListboxValueChangeReason>) => void
-} & (boolean extends Multiple ? never : [Multiple] extends [true] ? never : unknown)
+  onValueChange?: (
+    value: NoInfer<T> | null,
+    details: ChangeDetails<ListboxValueChangeReason>
+  ) => void
+} & (boolean extends Multiple
+  ? never
+  : [Multiple] extends [true]
+    ? never
+    : unknown)
 
 /** The value options of a listbox that selects several items. `Multiple` `boolean` rules them out. */
 type ListboxMultipleOptions<T, Multiple> = {
@@ -113,7 +148,10 @@ type ListboxMultipleOptions<T, Multiple> = {
   /** The values selected at first, when uncontrolled. A form reset returns to them. */
   defaultValue?: T[]
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T[], details: ChangeDetails<ListboxValueChangeReason>) => void
+  onValueChange?: (
+    value: T[],
+    details: ChangeDetails<ListboxValueChangeReason>
+  ) => void
 } & (boolean extends Multiple ? never : unknown)
 
 // Only when `Multiple` is `boolean`, like `<Listbox<string, boolean>>`, so
@@ -132,7 +170,7 @@ type ListboxEitherOptions<T, Multiple> = {
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
   onValueChange?: (
     value: NoInfer<T> | NoInfer<T>[] | null,
-    details: ChangeDetails<ListboxValueChangeReason>,
+    details: ChangeDetails<ListboxValueChangeReason>
   ) => void
 } & (boolean extends Multiple ? unknown : never)
 
@@ -297,7 +335,10 @@ const listboxPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `listbox`.
  * @stable
  */
-interface ListboxPrimitive extends WithGeneric<typeof listboxPrimitive, ListboxGeneric> {}
+interface ListboxPrimitive extends WithGeneric<
+  typeof listboxPrimitive,
+  ListboxGeneric
+> {}
 
 /**
  * The listbox primitive, with the slots `root`, `item`, `item-indicator`,

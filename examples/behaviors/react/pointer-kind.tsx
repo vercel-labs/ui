@@ -12,7 +12,7 @@ function Example() {
   const hovers = kind.hover === "hover"
   React.useEffect(() => {
     log(
-      `pointer ${kind.pointer}, hover ${kind.hover}, anyPointer ${kind.anyPointer}, anyHover ${kind.anyHover}`,
+      `pointer ${kind.pointer}, hover ${kind.hover}, anyPointer ${kind.anyPointer}, anyHover ${kind.anyHover}`
     )
   }, [log, kind.pointer, kind.hover, kind.anyPointer, kind.anyHover])
   return (
@@ -30,7 +30,11 @@ function Example() {
             ? "Shipping (hover for details)"
             : "Shipping (tap for details)"}
       </button>
-      <p role="status" data-slot="pointer-kind-details" data-open={open ? "" : undefined}>
+      <p
+        role="status"
+        data-slot="pointer-kind-details"
+        data-open={open ? "" : undefined}
+      >
         {open && "Free over $50. Arrives in 2 to 4 days."}
       </p>
     </div>

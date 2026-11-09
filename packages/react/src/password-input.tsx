@@ -4,7 +4,11 @@ import {
   type PasswordInputState,
 } from "@ui-sdk/core/password-input"
 import * as React from "react"
-import { controlRender, useFieldControl, useFieldControlId } from "./field-context"
+import {
+  controlRender,
+  useFieldControl,
+  useFieldControlId,
+} from "./field-context"
 import { createParts, usePart, type PartProps } from "./use-primitive"
 
 const parts = createParts(passwordInput, { root: "div", toggle: "button" })
@@ -32,10 +36,16 @@ function PasswordInput({
   disabled,
   ...props
 }: PasswordInputOptions &
-  Omit<PartProps<"div", PasswordInputState>, "defaultValue" | "onChange" | "onSelect">) {
+  Omit<
+    PartProps<"div", PasswordInputState>,
+    "defaultValue" | "onChange" | "onSelect"
+  >) {
   const field = useFieldControl()
   const controlId = useFieldControlId()
-  const control = React.useMemo(() => ({ field, value, defaultValue }), [field, value, defaultValue])
+  const control = React.useMemo(
+    () => ({ field, value, defaultValue }),
+    [field, value, defaultValue]
+  )
   return (
     <ControlContext.Provider value={control}>
       <parts.Root

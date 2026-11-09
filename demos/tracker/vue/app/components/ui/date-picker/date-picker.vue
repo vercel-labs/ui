@@ -30,7 +30,9 @@ const iconButton =
       <DatePickerInput
         class="h-full w-full min-w-0 bg-transparent text-base tabular-nums outline-none placeholder:text-muted-foreground md:text-sm"
       />
-      <DatePickerTrigger :class="cn(iconButton, 'size-6 rounded-xl text-muted-foreground')">
+      <DatePickerTrigger
+        :class="cn(iconButton, 'size-6 rounded-xl text-muted-foreground')"
+      >
         <CalendarIcon aria-hidden="true" />
       </DatePickerTrigger>
     </div>

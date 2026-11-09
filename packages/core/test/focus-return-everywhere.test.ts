@@ -20,7 +20,11 @@ type View = Pick<
   state: { open: boolean }
   part: (slot: "trigger") => HTMLElement | undefined
 }
-type PopupCase = { name: string; trigger: string; mount: (options: Opening) => View }
+type PopupCase = {
+  name: string
+  trigger: string
+  mount: (options: Opening) => View
+}
 
 const markup = (trigger: string, content: string, viewport = false) => {
   const popup = `<content>${content}</content>`
@@ -31,7 +35,8 @@ const popups: PopupCase[] = [
   {
     name: "popover",
     trigger: "Share",
-    mount: (options) => mount(popover, options, markup("Share", `<button>Copy link</button>`)),
+    mount: (options) =>
+      mount(popover, options, markup("Share", `<button>Copy link</button>`)),
   },
   {
     name: "dialog",
@@ -40,36 +45,53 @@ const popups: PopupCase[] = [
       mount(
         dialog,
         options,
-        markup("Rename", `<title>Rename</title><button>Save</button><close>Cancel</close>`),
+        markup(
+          "Rename",
+          `<title>Rename</title><button>Save</button><close>Cancel</close>`
+        )
       ),
   },
   {
     name: "alert dialog",
     trigger: "Delete",
     mount: (options) =>
-      mount(alertDialog, options, markup("Delete", `<title>Delete?</title><close>Cancel</close>`)),
+      mount(
+        alertDialog,
+        options,
+        markup("Delete", `<title>Delete?</title><close>Cancel</close>`)
+      ),
   },
   {
     name: "drawer",
     trigger: "Filters",
     mount: (options) =>
-      mount(drawer, options, markup("Filters", `<title>Filters</title><close>Done</close>`, true)),
+      mount(
+        drawer,
+        options,
+        markup("Filters", `<title>Filters</title><close>Done</close>`, true)
+      ),
   },
   {
     name: "menu",
     trigger: "Actions",
-    mount: (options) => mount(menu, options, markup("Actions", `<item value="copy">Copy</item>`)),
+    mount: (options) =>
+      mount(menu, options, markup("Actions", `<item value="copy">Copy</item>`)),
   },
   {
     name: "select",
     trigger: "Fruit",
     mount: (options) =>
-      mount(select, options, markup("Fruit", `<list><item value="apple">Apple</item></list>`)),
+      mount(
+        select,
+        options,
+        markup("Fruit", `<list><item value="apple">Apple</item></list>`)
+      ),
   },
   {
     name: "date picker",
     trigger: "Pick a date",
-    mount: (options) => mount(datePicker, options, markup("Pick a date", `<grid></grid>`)),
+    mount: (options) =>
+      mount(datePicker, options, markup("Pick a date", `<grid></grid>`)),
   },
 ]
 
@@ -90,16 +112,24 @@ function mountPopup(popup: PopupCase, options: Opening = {}) {
   const view = popup.mount(options)
   unmounts.push(view.unmount)
   const button = (text: string) =>
-    [...view.root.querySelectorAll<HTMLElement>("button")].find((el) => el.textContent === text)!
+    [...view.root.querySelectorAll<HTMLElement>("button")].find(
+      (el) => el.textContent === text
+    )!
   const isOpen = () => view.state.open
-  return { view, api: view.api, button, isOpen, trigger: () => view.part("trigger")! }
+  return {
+    view,
+    api: view.api,
+    button,
+    isOpen,
+    trigger: () => view.part("trigger")!,
+  }
 }
 
 function mountNext(name: string) {
   const view = mount(
     dialog,
     {},
-    `<div><content><title>${name}</title><close>Close ${name}</close></content></div>`,
+    `<div><content><title>${name}</title><close>Close ${name}</close></content></div>`
   )
   unmounts.push(view.unmount)
   return view
@@ -107,7 +137,9 @@ function mountNext(name: string) {
 
 function focusElsewhere() {
   const elsewhere = document.body.appendChild(
-    Object.assign(document.createElement("button"), { textContent: "Elsewhere" }),
+    Object.assign(document.createElement("button"), {
+      textContent: "Elsewhere",
+    })
   )
   elsewhere.focus()
   return elsewhere
@@ -156,7 +188,9 @@ describe.each(popups)("$name", (popup) => {
 
   test("open from the start, closing gives focus back to what had it", async () => {
     const before = document.body.appendChild(
-      Object.assign(document.createElement("button"), { textContent: "Elsewhere" }),
+      Object.assign(document.createElement("button"), {
+        textContent: "Elsewhere",
+      })
     )
     before.focus()
     const { view, api, isOpen } = mountPopup(popup, { defaultOpen: true })
@@ -186,8 +220,13 @@ describe.each(popups)("$name opened without its trigger", (popup) => {
     "opened %s, it hands what had focus to the next dialog",
     async (how) => {
       const elsewhere = focusElsewhere()
-      const { view, api, isOpen } = mountPopup(popup, how === "from the start" ? { defaultOpen: true } : {})
-      if (how === "from code") api.setOpen(true)
+      const { view, api, isOpen } = mountPopup(
+        popup,
+        how === "from the start" ? { defaultOpen: true } : {}
+      )
+      if (how === "from code") {
+        api.setOpen(true)
+      }
       await view.settle()
       expect(isOpen()).toBe(true)
       const next = mountNext("Next")
@@ -198,7 +237,7 @@ describe.each(popups)("$name opened without its trigger", (popup) => {
       await next.keys("Escape")
       await next.settle()
       expect(document.activeElement).toBe(elsewhere)
-    },
+    }
   )
 })
 
@@ -208,9 +247,11 @@ test.each(["from the start", "from code"])(
     const elsewhere = focusElsewhere()
     const first = mountPopup(
       popups.find((popup) => popup.name === "dialog")!,
-      how === "from the start" ? { defaultOpen: true } : {},
+      how === "from the start" ? { defaultOpen: true } : {}
     )
-    if (how === "from code") first.api.setOpen(true)
+    if (how === "from code") {
+      first.api.setOpen(true)
+    }
     await first.view.settle()
     const second = mountNext("Second")
     second.api.setOpen(true)
@@ -225,7 +266,7 @@ test.each(["from the start", "from code"])(
     await third.keys("Escape")
     await third.settle()
     expect(document.activeElement).toBe(elsewhere)
-  },
+  }
 )
 
 test("a popup its trigger opened still gives focus back to the trigger after an earlier open from the start", async () => {
@@ -241,21 +282,32 @@ test("a popup its trigger opened still gives focus back to the trigger after an 
 })
 
 // Safari doesn't focus a button a mouse presses, so focus stays where it was.
-describe.each(popups)("$name opened by a press that leaves focus elsewhere", (popup) => {
-  test.each([false, true])("gives focus to its trigger, after an open from the start: %s", async (first) => {
-    const { view, api, button, trigger } = mountPopup(popup, first ? { defaultOpen: true } : {})
-    if (first) {
-      await view.settle()
-      api.setOpen(false)
-      await view.settle()
-    }
-    button("Before").focus()
-    trigger().addEventListener("mousedown", (event) => event.preventDefault())
-    await view.click(trigger())
-    await view.keys("Escape")
-    expect(document.activeElement).toBe(trigger())
-  })
-})
+describe.each(popups)(
+  "$name opened by a press that leaves focus elsewhere",
+  (popup) => {
+    test.each([false, true])(
+      "gives focus to its trigger, after an open from the start: %s",
+      async (first) => {
+        const { view, api, button, trigger } = mountPopup(
+          popup,
+          first ? { defaultOpen: true } : {}
+        )
+        if (first) {
+          await view.settle()
+          api.setOpen(false)
+          await view.settle()
+        }
+        button("Before").focus()
+        trigger().addEventListener("mousedown", (event) =>
+          event.preventDefault()
+        )
+        await view.click(trigger())
+        await view.keys("Escape")
+        expect(document.activeElement).toBe(trigger())
+      }
+    )
+  }
+)
 
 // Reopened from a dialog it opened, each one leads back to the other.
 test.each(["from the start", "from code"])(
@@ -264,9 +316,11 @@ test.each(["from the start", "from code"])(
     focusElsewhere()
     const first = mountPopup(
       popups.find((popup) => popup.name === "dialog")!,
-      how === "from the start" ? { defaultOpen: true } : {},
+      how === "from the start" ? { defaultOpen: true } : {}
     )
-    if (how === "from code") first.api.setOpen(true)
+    if (how === "from code") {
+      first.api.setOpen(true)
+    }
     await first.view.settle()
     const next = mountNext("Next")
     next.api.setOpen(true)
@@ -281,14 +335,14 @@ test.each(["from the start", "from code"])(
     await next.settle()
     expect(first.isOpen()).toBe(false)
     expect(document.activeElement).not.toBe(document.body)
-  },
+  }
 )
 
 test("the middle of three dialogs reopened from the last still closes", async () => {
   focusElsewhere()
   const first = mountPopup(
     popups.find((popup) => popup.name === "dialog")!,
-    { defaultOpen: true },
+    { defaultOpen: true }
   )
   await first.view.settle()
   const second = mountNext("Second")
@@ -311,19 +365,62 @@ test("the middle of three dialogs reopened from the last still closes", async ()
 })
 
 // What had focus can turn disabled or hidden while a dialog it opened is up.
-describe.each(popups)("$name handing focus on after what had it can't take it", (popup) => {
-  test.each(["disabled", "hidden"])(
-    "opened from code, its trigger takes focus when what had it is %s",
-    async (how) => {
-      const elsewhere = focusElsewhere()
+describe.each(popups)(
+  "$name handing focus on after what had it can't take it",
+  (popup) => {
+    test.each(["disabled", "hidden"])(
+      "opened from code, its trigger takes focus when what had it is %s",
+      async (how) => {
+        const elsewhere = focusElsewhere()
+        const { view, api, trigger } = mountPopup(popup)
+        api.setOpen(true)
+        await view.settle()
+        const content = document.querySelector<HTMLElement>(
+          `[data-slot$="-content"][data-open]`
+        )
+        const inside = content?.querySelector<HTMLElement>("button, [tabindex]")
+        if (inside && !content!.contains(document.activeElement)) {
+          inside.focus()
+        }
+        if (how === "disabled") {
+          elsewhere.disabled = true
+        } else {
+          elsewhere.hidden = true
+        }
+        const next = mountNext("Next")
+        next.api.setOpen(true)
+        await next.settle()
+        api.setOpen(false)
+        await view.settle()
+        await next.keys("Escape")
+        await next.settle()
+        expect(document.activeElement).toBe(trigger())
+      }
+    )
+  }
+)
+
+// What had focus can stop taking it without looking disabled or hidden, like a
+// div that loses its tabindex, so the next target gets a turn when focus fails.
+describe.each(popups)(
+  "$name handing focus on after what had it stops taking focus",
+  (popup) => {
+    test("opened from code, its trigger takes focus when what had it loses its tabindex", async () => {
+      const holder = document.body.appendChild(
+        Object.assign(document.createElement("div"), { tabIndex: 0 })
+      )
+      holder.focus()
       const { view, api, trigger } = mountPopup(popup)
       api.setOpen(true)
       await view.settle()
-      const content = document.querySelector<HTMLElement>(`[data-slot$="-content"][data-open]`)
+      const content = document.querySelector<HTMLElement>(
+        `[data-slot$="-content"][data-open]`
+      )
       const inside = content?.querySelector<HTMLElement>("button, [tabindex]")
-      if (inside && !content!.contains(document.activeElement)) inside.focus()
-      if (how === "disabled") elsewhere.disabled = true
-      else elsewhere.hidden = true
+      if (inside && !content!.contains(document.activeElement)) {
+        inside.focus()
+      }
+      holder.removeAttribute("tabindex")
       const next = mountNext("Next")
       next.api.setOpen(true)
       await next.settle()
@@ -332,30 +429,6 @@ describe.each(popups)("$name handing focus on after what had it can't take it", 
       await next.keys("Escape")
       await next.settle()
       expect(document.activeElement).toBe(trigger())
-    },
-  )
-})
-
-// What had focus can stop taking it without looking disabled or hidden, like a
-// div that loses its tabindex, so the next target gets a turn when focus fails.
-describe.each(popups)("$name handing focus on after what had it stops taking focus", (popup) => {
-  test("opened from code, its trigger takes focus when what had it loses its tabindex", async () => {
-    const holder = document.body.appendChild(Object.assign(document.createElement("div"), { tabIndex: 0 }))
-    holder.focus()
-    const { view, api, trigger } = mountPopup(popup)
-    api.setOpen(true)
-    await view.settle()
-    const content = document.querySelector<HTMLElement>(`[data-slot$="-content"][data-open]`)
-    const inside = content?.querySelector<HTMLElement>("button, [tabindex]")
-    if (inside && !content!.contains(document.activeElement)) inside.focus()
-    holder.removeAttribute("tabindex")
-    const next = mountNext("Next")
-    next.api.setOpen(true)
-    await next.settle()
-    api.setOpen(false)
-    await view.settle()
-    await next.keys("Escape")
-    await next.settle()
-    expect(document.activeElement).toBe(trigger())
-  })
-})
+    })
+  }
+)

@@ -22,10 +22,12 @@ The button that opens the menu. A trigger outside the menu connects through `con
     shortcut,
     controller,
     ...rest
-  }: PartProps<"button", MenuTriggerState> &
-    MenuTriggerProps = $props()
+  }: PartProps<"button", MenuTriggerState> & MenuTriggerProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<MenuContext | undefined>(menuPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<MenuContext | undefined>(menuPrimitive)
+  )
   const menu = $derived(connected())
 </script>
 
@@ -43,7 +45,10 @@ The button that opens the menu. A trigger outside the menu connects through `con
   <!-- Until the menu it names mounts, a trigger outside the menu is a plain button. -->
   <Part
     tag="button"
-    part={plainPart({ open: false, disabled: !!disabled }, { type: "button", disabled })}
+    part={plainPart(
+      { open: false, disabled: !!disabled },
+      { type: "button", disabled }
+    )}
     props={rest}
   />
 {/if}

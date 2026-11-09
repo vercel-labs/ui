@@ -6,7 +6,8 @@ import { defineCollapsibleElements } from "../src/collapsible"
 import { defineTabsElements } from "../src/tabs"
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
-;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??=
+  () => []
 
 const tabs = (value: string) =>
   `<ui-tabs value="${value}"><ui-tabs-list aria-label="Settings"><ui-tabs-tab value="a"><button>Account</button></ui-tabs-tab><ui-tabs-tab value="b"><button>Password</button></ui-tabs-tab></ui-tabs-list><ui-tabs-panel value="a">A</ui-tabs-panel><ui-tabs-panel value="b" hidden>B</ui-tabs-panel></ui-tabs>`

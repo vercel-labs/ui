@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { TooltipShortcutProps, TooltipShortcutState } from "@ui-sdk/core/tooltip"
+  import type {
+    TooltipShortcutProps,
+    TooltipShortcutState,
+  } from "@ui-sdk/core/tooltip"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import type { TooltipContext } from "./context"
@@ -10,12 +13,13 @@
     shortcut,
     children,
     ...rest
-  }: PartProps<"span", TooltipShortcutState> & TooltipShortcutProps & { owner: TooltipContext } = $props()
+  }: PartProps<"span", TooltipShortcutState> &
+    TooltipShortcutProps & { owner: TooltipContext } = $props()
 
   const part = useHandlePart(
     () => owner,
     "shortcut",
-    () => ({ shortcut }),
+    () => ({ shortcut })
   )
 </script>
 

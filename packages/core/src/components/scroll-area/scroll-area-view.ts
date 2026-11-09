@@ -117,10 +117,16 @@ const names = {
 // so they restyle only the root, never the whole content, and Chromium's
 // restyle count doesn't depend on the page's history. An element that reads
 // one, like a fade over an edge, takes it from the root with `inherit`.
-const frameVariables = axes.flatMap((axis) => [names[axis].before, names[axis].after, names[axis].progress])
+const frameVariables = axes.flatMap((axis) => [
+  names[axis].before,
+  names[axis].after,
+  names[axis].progress,
+])
 
 type Flag = {
-  [Key in keyof ScrollAreaModel]: ScrollAreaModel[Key] extends boolean ? Key : never
+  [Key in keyof ScrollAreaModel]: ScrollAreaModel[Key] extends boolean
+    ? Key
+    : never
 }[keyof ScrollAreaModel]
 type Part = { el: HTMLElement; axis: Axis }
 
@@ -164,42 +170,66 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     // page resizes nothing but flips the sign, which Safari's rubber band does too,
     // so a sign that disagrees asks the style.
     const left = el.scrollLeft
-    if (left !== 0 && left < 0 !== rtl) rtl = isRTL(el)
+    if (left !== 0 && left < 0 !== rtl) {
+      rtl = isRTL(el)
+    }
     metrics.x.position = rtl ? -left : left
     metrics.x.client = el.clientWidth
     metrics.x.scroll = el.scrollWidth
   }
 
-  function write(el: HTMLElement, property: string, value: number, unit = "px") {
+  function write(
+    el: HTMLElement,
+    property: string,
+    value: number,
+    unit = "px"
+  ) {
     let values = written.get(el)
-    if (!values) written.set(el, (values = {}))
+    if (!values) {
+      written.set(el, (values = {}))
+    }
     const rounded = Math.round(value * 100) / 100
-    if (values[property] === rounded) return
+    if (values[property] === rounded) {
+      return
+    }
     values[property] = rounded
     el.style.setProperty(property, `${rounded}${unit}`)
   }
 
   function setFlag(key: Flag, value: boolean) {
     // A computed key widens to a string index, so the patch needs its type back.
-    if (store.get()[key] !== value) store.set({ [key]: value } as Partial<ScrollAreaModel>)
+    if (store.get()[key] !== value) {
+      store.set({ [key]: value } as Partial<ScrollAreaModel>)
+    }
   }
 
   // Measures, then writes, so a frame never reads layout after a write.
   function update({ resized = false } = {}) {
     frame = 0
-    if (!viewport) return
+    if (!viewport) {
+      return
+    }
     measure()
-    if (resized) follow()
+    if (resized) {
+      follow()
+    }
     const state = store.get()
     let patch: Partial<ScrollAreaModel> | undefined
-    const set = <Key extends keyof ScrollAreaModel>(key: Key, value: ScrollAreaModel[Key]) => {
-      if (state[key] !== value) (patch ??= {})[key] = value
+    const set = <Key extends keyof ScrollAreaModel>(
+      key: Key,
+      value: ScrollAreaModel[Key]
+    ) => {
+      if (state[key] !== value) {
+        ;(patch ??= {})[key] = value
+      }
     }
 
     for (const axis of axes) {
       const axisMetrics = metrics[axis]
       const name = names[axis]
-      const delta = Number.isNaN(previous[axis]) ? 0 : axisMetrics.position - previous[axis]
+      const delta = Number.isNaN(previous[axis])
+        ? 0
+        : axisMetrics.position - previous[axis]
       previous[axis] = axisMetrics.position
       const edges = edgesOf(axisMetrics)
       set(name.overflow, overflows(axisMetrics))
@@ -211,48 +241,72 @@ function createScrollView(store: Store<ScrollAreaModel>) {
         write(root, name.progress, edges.progress, "")
       }
       writeThumb(axis)
-      if (delta === 0) continue
+      if (delta === 0) {
+        continue
+      }
       // Sticking to the end isn't scrolling: streaming shouldn't flash the scrollbars.
-      const ownScroll = axis === "y" && Math.abs(axisMetrics.position - stuckTo) < edgeTolerance
+      const ownScroll =
+        axis === "y" && Math.abs(axisMetrics.position - stuckTo) < edgeTolerance
       if (!ownScroll) {
         lastScroll[axis] = performance.now()
         set(name.scrolling, true)
-        scrollEnds[axis] ||= host().setTimeout(() => endScroll(axis), scrollEndDelay)
+        scrollEnds[axis] ||= host().setTimeout(
+          () => endScroll(axis),
+          scrollEndDelay
+        )
       }
-      if (axis === "y" && state.stickToEnd)
-        set("sticking", followsEnd(state.sticking, { delta, after: edges.after }))
+      if (axis === "y" && state.stickToEnd) {
+        set(
+          "sticking",
+          followsEnd(state.sticking, { delta, after: edges.after })
+        )
+      }
     }
-    writeCorner(patch?.overflowX ?? state.overflowX, patch?.overflowY ?? state.overflowY)
-    if (patch) store.set(patch)
+    writeCorner(
+      patch?.overflowX ?? state.overflowX,
+      patch?.overflowY ?? state.overflowY
+    )
+    if (patch) {
+      store.set(patch)
+    }
     // Scrolling only matters to visibility when a flag flipped.
-    if (patch || resized) refreshVisibility()
+    if (patch || resized) {
+      refreshVisibility()
+    }
   }
 
   function writeThumb(axis: Axis) {
     const geometry = thumbGeometry(metrics[axis], track[axis])
     for (const scrollbar of scrollbars) {
-      if (scrollbar.axis !== axis) continue
+      if (scrollbar.axis !== axis) {
+        continue
+      }
       write(scrollbar.el, names[axis].thumbSize, geometry.size)
       // Right to left, the horizontal thumb starts at the right and moves left.
       write(
         scrollbar.el,
         "--scroll-area-thumb-offset",
-        axis === "x" && rtl ? -geometry.offset : geometry.offset,
+        axis === "x" && rtl ? -geometry.offset : geometry.offset
       )
     }
   }
 
   // Scrollbars stop short of the corner only while both show.
   function writeCorner(overflowX: boolean, overflowY: boolean) {
-    if (!root) return
+    if (!root) {
+      return
+    }
     const state = store.get()
-    const both = overflowX && overflowY && state.scrollbarsX > 0 && state.scrollbarsY > 0
+    const both =
+      overflowX && overflowY && state.scrollbarsX > 0 && state.scrollbarsY > 0
     write(root, "--scroll-area-corner-width", both ? thickness.y : 0)
     write(root, "--scroll-area-corner-height", both ? thickness.x : 0)
   }
 
   function schedule() {
-    if (frame || !viewport) return
+    if (frame || !viewport) {
+      return
+    }
     frame = host().requestAnimationFrame(() => update())
   }
 
@@ -261,7 +315,10 @@ function createScrollView(store: Store<ScrollAreaModel>) {
   function endScroll(axis: Axis) {
     const elapsed = performance.now() - lastScroll[axis]
     if (elapsed < scrollEndDelay) {
-      scrollEnds[axis] = host().setTimeout(() => endScroll(axis), scrollEndDelay - elapsed)
+      scrollEnds[axis] = host().setTimeout(
+        () => endScroll(axis),
+        scrollEndDelay - elapsed
+      )
       return
     }
     scrollEnds[axis] = 0
@@ -286,15 +343,22 @@ function createScrollView(store: Store<ScrollAreaModel>) {
         setFlag(name.visible, true)
         continue
       }
-      if (!state[name.visible] || hideTimers[axis]) continue
-      const delay = state.type === "scroll" || state.type === "hover" ? state.scrollHideDelay : 0
-      if (delay <= 0) setFlag(name.visible, false)
-      else
+      if (!state[name.visible] || hideTimers[axis]) {
+        continue
+      }
+      const delay =
+        state.type === "scroll" || state.type === "hover"
+          ? state.scrollHideDelay
+          : 0
+      if (delay <= 0) {
+        setFlag(name.visible, false)
+      } else {
         hideTimers[axis] = host().setTimeout(() => {
           hideTimers[axis] = 0
           setFlag(name.visible, false)
           refreshVisibility()
         }, delay)
+      }
     }
   }
 
@@ -303,30 +367,54 @@ function createScrollView(store: Store<ScrollAreaModel>) {
   // isn't pulled away, and not while easing there already.
   function follow() {
     const state = store.get()
-    if (!state.stickToEnd || !state.sticking || state.dragging || pressed || touchY !== null || easing) return
+    if (
+      !state.stickToEnd ||
+      !state.sticking ||
+      state.dragging ||
+      pressed ||
+      touchY !== null ||
+      easing
+    ) {
+      return
+    }
     const max = maxScroll(metrics.y)
-    if (max - metrics.y.position < edgeTolerance) return
+    if (max - metrics.y.position < edgeTolerance) {
+      return
+    }
     stuckTo = max
     viewport!.scrollTo({ top: max, behavior: "instant" })
     metrics.y.position = viewport!.scrollTop
   }
 
   // Scrolls the viewport itself, never its ancestors, so the page stays put.
-  function scrollTo(axis: Axis, position: number, behavior: ScrollBehavior = "instant") {
-    if (!viewport) return
-    if (axis === "y") viewport.scrollTo({ top: position, behavior })
-    else viewport.scrollTo({ left: rtl ? -position : position, behavior })
+  function scrollTo(
+    axis: Axis,
+    position: number,
+    behavior: ScrollBehavior = "instant"
+  ) {
+    if (!viewport) {
+      return
+    }
+    if (axis === "y") {
+      viewport.scrollTo({ top: position, behavior })
+    } else {
+      viewport.scrollTo({ left: rtl ? -position : position, behavior })
+    }
   }
 
   // Input that scrolls toward the start lets go of the end before the scroll
   // lands, so growth in the same frame can't pull the view back down.
   function release() {
     stopEasing()
-    if (store.get().sticking && metrics.y.position > 0) store.set({ sticking: false })
+    if (store.get().sticking && metrics.y.position > 0) {
+      store.set({ sticking: false })
+    }
   }
 
   function stopEasing() {
-    if (!easing) return
+    if (!easing) {
+      return
+    }
     host().cancelAnimationFrame(easing)
     easing = 0
   }
@@ -335,27 +423,46 @@ function createScrollView(store: Store<ScrollAreaModel>) {
   function easeToEnd() {
     const step = () => {
       easing = 0
-      if (!viewport) return
+      if (!viewport) {
+        return
+      }
       measure()
       const gap = maxScroll(metrics.y) - metrics.y.position
-      if (gap < edgeTolerance) return update()
+      if (gap < edgeTolerance) {
+        return update()
+      }
       scrollTo("y", metrics.y.position + Math.max(1, gap * 0.2))
       easing = host().requestAnimationFrame(step)
     }
     easing = host().requestAnimationFrame(step)
   }
 
-  function scrollToEdge(edge: "start" | "end", { behavior = "smooth" }: ScrollAreaScrollOptions = {}) {
-    if (!viewport) return
+  function scrollToEdge(
+    edge: "start" | "end",
+    { behavior = "smooth" }: ScrollAreaScrollOptions = {}
+  ) {
+    if (!viewport) {
+      return
+    }
     const axis = mainAxis(store.get())
     // At scrollLeft 0 the sign can't show a turned page, so a horizontal call reads the direction.
-    if (axis === "x") rtl = isRTL(viewport)
+    if (axis === "x") {
+      rtl = isRTL(viewport)
+    }
     measure()
     const smooth = behavior === "smooth" && !prefersReducedMotion()
     stopEasing()
-    if (edge === "end" && axis === "y" && store.get().stickToEnd) setFlag("sticking", true)
-    if (edge === "end" && axis === "y" && smooth) return easeToEnd()
-    scrollTo(axis, edge === "start" ? 0 : maxScroll(metrics[axis]), smooth ? "smooth" : "instant")
+    if (edge === "end" && axis === "y" && store.get().stickToEnd) {
+      setFlag("sticking", true)
+    }
+    if (edge === "end" && axis === "y" && smooth) {
+      return easeToEnd()
+    }
+    scrollTo(
+      axis,
+      edge === "start" ? 0 : maxScroll(metrics[axis]),
+      smooth ? "smooth" : "instant"
+    )
   }
 
   function bindViewport(el: HTMLElement) {
@@ -364,7 +471,9 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     // Measures a microtask later: Vue binds before the element is in the
     // page, and while it hydrates, when a state change would mismatch.
     queueMicrotask(() => {
-      if (viewport !== el) return
+      if (viewport !== el) {
+        return
+      }
       rtl = isRTL(el)
       update({ resized: true })
       store.set({ counted: true })
@@ -382,7 +491,9 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     // Content growing inside the viewport resizes its children, not the viewport.
     const observeChildren = () => {
       resize.observe(el)
-      for (const child of Array.from(el.children)) resize.observe(child)
+      for (const child of Array.from(el.children)) {
+        resize.observe(child)
+      }
     }
     observeChildren()
     const children = new MutationObserver(() => {
@@ -396,7 +507,9 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     const tabStop = bindTabStop(el, scrollable)
     let wasScrollable = scrollable()
     const unsubscribe = store.subscribe(() => {
-      if (scrollable() === wasScrollable) return
+      if (scrollable() === wasScrollable) {
+        return
+      }
       wasScrollable = scrollable()
       tabStop.check()
     })
@@ -422,35 +535,63 @@ function createScrollView(store: Store<ScrollAreaModel>) {
         el,
         "wheel",
         (event) => {
-          if (event.deltaY >= 0) stopEasing()
-          else if (!scrollsInside(event.target, el)) release()
+          if (event.deltaY >= 0) {
+            stopEasing()
+          } else if (!scrollsInside(event.target, el)) {
+            release()
+          }
         },
-        { passive: true },
+        { passive: true }
       ),
       on(el, "keydown", (event) => {
         // A widget inside, like a listbox, used the key, or a scroller inside moves for it.
-        if (event.defaultPrevented || !scrollsTowardStart(event.key, event.shiftKey, isEditing(event.target)))
+        if (
+          event.defaultPrevented ||
+          !scrollsTowardStart(
+            event.key,
+            event.shiftKey,
+            isEditing(event.target)
+          )
+        ) {
           return
-        if (!scrollsInside(event.target, el)) release()
+        }
+        if (!scrollsInside(event.target, el)) {
+          release()
+        }
       }),
-      on(el, "touchstart", (event) => (touchY = event.touches[0]?.clientY ?? null), { passive: true }),
+      on(
+        el,
+        "touchstart",
+        (event) => (touchY = event.touches[0]?.clientY ?? null),
+        { passive: true }
+      ),
       on(
         el,
         "touchmove",
         (event) => {
           const y = event.touches[0]?.clientY
-          if (y === undefined) return
+          if (y === undefined) {
+            return
+          }
           // A finger moving down scrolls the content toward its start,
           // unless a scroller inside takes the move.
-          if (touchY !== null && y > touchY && !scrollsInside(event.target, el)) release()
+          if (
+            touchY !== null &&
+            y > touchY &&
+            !scrollsInside(event.target, el)
+          ) {
+            release()
+          }
           touchY = y
         },
-        { passive: true },
+        { passive: true }
       ),
       on(el, "touchend", endTouch, { passive: true }),
       on(el, "touchcancel", endTouch, { passive: true }),
       on(el, "pointerdown", (event) => {
-        if (event.pointerType === "touch" || event.button !== 0) return
+        if (event.pointerType === "touch" || event.button !== 0) {
+          return
+        }
         pressed = true
         stopEasing()
         view.addEventListener("pointerup", lift, true)
@@ -461,7 +602,9 @@ function createScrollView(store: Store<ScrollAreaModel>) {
       cleanups.forEach((cleanup) => cleanup())
       view.removeEventListener("pointerup", lift, true)
       view.removeEventListener("pointercancel", lift, true)
-      if (frame) view.cancelAnimationFrame(frame)
+      if (frame) {
+        view.cancelAnimationFrame(frame)
+      }
       frame = 0
       stopEasing()
       for (const axis of axes) {
@@ -469,7 +612,9 @@ function createScrollView(store: Store<ScrollAreaModel>) {
         view.clearTimeout(hideTimers[axis])
         scrollEnds[axis] = hideTimers[axis] = 0
       }
-      if (viewport === el) viewport = undefined
+      if (viewport === el) {
+        viewport = undefined
+      }
     }
   }
 
@@ -478,17 +623,26 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     root = el
     // The pointer may already be over it when it mounts.
     queueMicrotask(() => {
-      if (root === el && el.isConnected && el.matches(":hover")) setFlag("hovering", true)
+      if (root === el && el.isConnected && el.matches(":hover")) {
+        setFlag("hovering", true)
+      }
     })
     const hover = (hovering: boolean) => (event: PointerEvent) => {
-      if (event.pointerType === "touch") return
+      if (event.pointerType === "touch") {
+        return
+      }
       setFlag("hovering", hovering)
       refreshVisibility()
     }
-    const cleanups = [on(el, "pointerenter", hover(true)), on(el, "pointerleave", hover(false))]
+    const cleanups = [
+      on(el, "pointerenter", hover(true)),
+      on(el, "pointerleave", hover(false)),
+    ]
     return () => {
       cleanups.forEach((cleanup) => cleanup())
-      if (root === el) root = undefined
+      if (root === el) {
+        root = undefined
+      }
     }
   }
 
@@ -515,7 +669,8 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     queueMicrotask(countScrollbars)
     const resize = new ResizeObserver(([entry]) => {
       const box = entry.borderBoxSize?.[0]
-      const length = axis === "y" ? entry.contentRect.height : entry.contentRect.width
+      const length =
+        axis === "y" ? entry.contentRect.height : entry.contentRect.width
       const appeared = track[axis] === 0 && length > 0
       track[axis] = length
       thickness[axis] = (axis === "y" ? box?.inlineSize : box?.blockSize) ?? 0
@@ -545,7 +700,9 @@ function createScrollView(store: Store<ScrollAreaModel>) {
       countScrollbars()
       // What it wrote for its axis goes with it, so bound again along the
       // other one it holds only that one's.
-      for (const property in written.get(el)) el.style.removeProperty(property)
+      for (const property in written.get(el)) {
+        el.style.removeProperty(property)
+      }
       written.delete(el)
     }
   }
@@ -554,8 +711,11 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     let x = 0
     let y = 0
     for (const part of scrollbars) {
-      if (part.axis === "x") x++
-      else y++
+      if (part.axis === "x") {
+        x++
+      } else {
+        y++
+      }
     }
     store.set({ scrollbarsX: x, scrollbarsY: y })
   }
@@ -575,9 +735,14 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     // a scroll, so a scroll handler reading it would get where the view was.
     // Undefined without a viewport, like on the server.
     isAt(edge: "start" | "end") {
-      if (!viewport?.isConnected) return undefined
+      if (!viewport?.isConnected) {
+        return undefined
+      }
       measure()
-      const axis = mainAxis({ overflowX: overflows(metrics.x), overflowY: overflows(metrics.y) })
+      const axis = mainAxis({
+        overflowX: overflows(metrics.x),
+        overflowY: overflows(metrics.y),
+      })
       const edges = edgesOf(metrics[axis])
       return edge === "start" ? edges.atStart : edges.atEnd
     },
@@ -585,37 +750,59 @@ function createScrollView(store: Store<ScrollAreaModel>) {
     // it holds focus when it isn't a tab stop.
     focusViewport() {
       const el = viewport
-      if (!el) return
+      if (!el) {
+        return
+      }
       if (!el.hasAttribute("tabindex")) {
         el.setAttribute("tabindex", "-1")
-        const restore = () => el.getAttribute("tabindex") === "-1" && el.removeAttribute("tabindex")
+        const restore = () =>
+          el.getAttribute("tabindex") === "-1" && el.removeAttribute("tabindex")
         el.addEventListener("blur", restore, { once: true })
       }
       el.focus({ preventScroll: true })
     },
     // Applies changed options, like stickToEnd or type.
     refresh() {
-      if (viewport?.isConnected) update({ resized: true })
+      if (viewport?.isConnected) {
+        update({ resized: true })
+      }
       refreshVisibility()
     },
   }
 }
 
 function isEditing(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) return false
-  return target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)
+  if (!(target instanceof HTMLElement)) {
+    return false
+  }
+  return (
+    target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)
+  )
 }
 
 // Whether a scroller between `target` and the viewport can still scroll
 // toward its start, so it takes an upward wheel, key or swipe and the
 // viewport stays where it is, still stuck to its end.
 function scrollsInside(target: EventTarget | null, viewport: HTMLElement) {
-  for (let el = target instanceof Element ? target : null; el && el !== viewport; el = el.parentElement) {
-    if (el.scrollTop <= 0 || el.scrollHeight <= el.clientHeight) continue
+  for (
+    let el = target instanceof Element ? target : null;
+    el && el !== viewport;
+    el = el.parentElement
+  ) {
+    if (el.scrollTop <= 0 || el.scrollHeight <= el.clientHeight) {
+      continue
+    }
     const { overflowY } = getComputedStyle(el)
-    if (overflowY === "auto" || overflowY === "scroll") return true
+    if (overflowY === "auto" || overflowY === "scroll") {
+      return true
+    }
   }
   return false
 }
 
-export { createScrollView, liveKeys, type ScrollAreaModel, type ScrollAreaScrollOptions }
+export {
+  createScrollView,
+  liveKeys,
+  type ScrollAreaModel,
+  type ScrollAreaScrollOptions,
+}

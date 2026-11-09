@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createChange, createLasso, definePrimitive, live, type LassoDraft } from "@ui-sdk/core"
+import {
+  createChange,
+  createLasso,
+  definePrimitive,
+  live,
+  type LassoDraft,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type PhotosState = { selected: string[]; lasso: LassoDraft | null }
@@ -11,7 +17,10 @@ type PhotosOptions = {
 const photos = definePrimitive({
   name: "photos",
   options: { locked: "list" },
-  state: (_options: PhotosOptions): PhotosState => ({ selected: [], lasso: null }),
+  state: (_options: PhotosOptions): PhotosState => ({
+    selected: [],
+    lasso: null,
+  }),
   live: ["lasso"],
   api: (context) => {
     const change = createChange(context)
@@ -22,25 +31,37 @@ const photos = definePrimitive({
         selected: () => context.store.get().selected,
         set: (keys, details) => change("selected", keys, details),
         selectable: (key) => !context.options().locked.includes(key),
-        message: (count) => `${count} ${count === 1 ? "photo" : "photos"} selected`,
+        message: (count) =>
+          `${count} ${count === 1 ? "photo" : "photos"} selected`,
       }),
     }
   },
   slots: (slot) => ({
     root: slot({
-      attrs: () => ({ style: "position:relative;touch-action:none;user-select:none" }),
-      on: { pointerdown: (event, { el, api }) => event.target === el && api.lasso.pointerdown(event, el!) },
+      attrs: () => ({
+        style: "position:relative;touch-action:none;user-select:none",
+      }),
+      on: {
+        pointerdown: (event, { el, api }) =>
+          event.target === el && api.lasso.pointerdown(event, el!),
+      },
     }),
     photo: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (state, { key }) => ({ "data-selected": state.selected.includes(key) ? "" : undefined }),
-      live: live<PhotosState, any, { value: string }>((state, { key, api }) => ({
-        "data-lassoed": api.lasso.touches(state, key) ? "" : undefined,
-      })),
+      attrs: (state, { key }) => ({
+        "data-selected": state.selected.includes(key) ? "" : undefined,
+      }),
+      live: live<PhotosState, any, { value: string }>(
+        (state, { key, api }) => ({
+          "data-lassoed": api.lasso.touches(state, key) ? "" : undefined,
+        })
+      ),
     }),
     lasso: slot({
       attrs: () => ({ "aria-hidden": "true" }),
-      live: live<PhotosState, any, {}>((state, { api }) => ({ style: api.lasso.style(state) })),
+      live: live<PhotosState, any, {}>((state, { api }) => ({
+        style: api.lasso.style(state),
+      })),
     }),
   }),
 })
@@ -70,4 +91,12 @@ function Example() {
   )
 }
 
-export { Example, photos, Photos, PhotosLasso, PhotosPhoto, type PhotosOptions, type PhotosState }
+export {
+  Example,
+  photos,
+  Photos,
+  PhotosLasso,
+  PhotosPhoto,
+  type PhotosOptions,
+  type PhotosState,
+}

@@ -7,7 +7,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("text fields hydrate without mismatches", async ({ page, open }) => {
   await open("form")
@@ -16,27 +19,39 @@ test("text fields hydrate without mismatches", async ({ page, open }) => {
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("errors from the server hydrate without mismatches", async ({ page, open }) => {
+test("errors from the server hydrate without mismatches", async ({
+  page,
+  open,
+}) => {
   await open("form", { errors: "" })
   await expect(page.getByText("This email bounced.")).toBeVisible()
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("the server markup shows errors from the server before hydration", async ({ page, open }) => {
+test("the server markup shows errors from the server before hydration", async ({
+  page,
+  open,
+}) => {
   await open("form", { hydrate: "manual", errors: "" })
   await expect(page.getByText("This email bounced.")).toBeVisible()
   await expect(page.getByText("Too long. No links allowed.")).toBeVisible()
   await expect(textbox(page, "Email")).toHaveAttribute("aria-invalid", "true")
 })
 
-test("the server markup names fields and groups before hydration", async ({ page, open }) => {
+test("the server markup names fields and groups before hydration", async ({
+  page,
+  open,
+}) => {
   await open("form", { hydrate: "manual" })
   await expect(textbox(page, "Username")).toBeVisible()
   await expect(page.getByRole("group", { name: "Profile" })).toBeVisible()
   await expect(textbox(page, "Email")).toHaveValue("ada@example.com")
 })
 
-test("a disabled fieldset disables its controls before hydration", async ({ page, open }) => {
+test("a disabled fieldset disables its controls before hydration", async ({
+  page,
+  open,
+}) => {
   await open("form", { hydrate: "manual", disabled: "" })
   await expect(textbox(page, "Username")).toBeDisabled()
 })

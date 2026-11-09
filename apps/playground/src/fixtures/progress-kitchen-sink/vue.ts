@@ -1,5 +1,11 @@
 import type { ProgressValueState } from "@ui-sdk/core/progress"
-import { Progress, ProgressIndicator, ProgressLabel, ProgressTrack, ProgressValue } from "@ui-sdk/vue"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+  ProgressValue,
+} from "@ui-sdk/vue"
 import { createApp, defineComponent, h, ref, type PropType } from "vue"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
@@ -21,7 +27,7 @@ const VariantProgress = defineComponent({
   props,
   setup({ variant, env }) {
     const value = ref(variant.options.value)
-    if (variant.steps)
+    if (variant.steps) {
       env.controls(
         progressSteps.map(([label, step]) => [
           label,
@@ -29,30 +35,37 @@ const VariantProgress = defineComponent({
             value.value = step(value.value)
             env.log(`value ${value.value}`)
           },
-        ]),
+        ])
       )
+    }
     return () =>
-      h(Progress, { class: classes.root, ...rich(variant), value: value.value }, () => [
-        h(ProgressLabel, { class: classes.label }, () => variant.label),
-        h(
-          ProgressValue,
-          { class: classes.value },
-          variant.render
-            ? {
-                default: ({ state }: { state: ProgressValueState }) =>
-                  `${state.text || "…"} · ${state.status}`,
-              }
-            : undefined,
-        ),
-        h(ProgressTrack, { class: classes.track }, () =>
-          h(ProgressIndicator, { class: classes.progressIndicator }),
-        ),
-      ])
+      h(
+        Progress,
+        { class: classes.root, ...rich(variant), value: value.value },
+        () => [
+          h(ProgressLabel, { class: classes.label }, () => variant.label),
+          h(
+            ProgressValue,
+            { class: classes.value },
+            variant.render
+              ? {
+                  default: ({ state }: { state: ProgressValueState }) =>
+                    `${state.text || "…"} · ${state.status}`,
+                }
+              : undefined
+          ),
+          h(ProgressTrack, { class: classes.track }, () =>
+            h(ProgressIndicator, { class: classes.progressIndicator })
+          ),
+        ]
+      )
   },
 })
 
 function mount(root: HTMLElement) {
-  kitchenSink(root, "vue", (slot, variant, env) => createApp(VariantProgress, { variant, env }).mount(slot))
+  kitchenSink(root, "vue", (slot, variant, env) =>
+    createApp(VariantProgress, { variant, env }).mount(slot)
+  )
 }
 
 export { mount }

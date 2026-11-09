@@ -13,7 +13,8 @@
   } from "@ui-sdk/svelte"
   import { labelFixture } from "tests/fixtures/label.ts"
 
-  const { email, plan, volume, terms, region, delivery, quantity } = labelFixture
+  const { email, plan, volume, terms, region, delivery, quantity } =
+    labelFixture
   let shown = $state(false)
 </script>
 
@@ -30,7 +31,9 @@
   <Label for={volume.id}>{volume.label}</Label>
   <Slider id={volume.id} class="slider" defaultValue={volume.defaultValue}>
     <SliderControl>
-      <SliderTrack class="slider-track"><SliderThumb class="slider-thumb" /></SliderTrack>
+      <SliderTrack class="slider-track"
+        ><SliderThumb class="slider-thumb" /></SliderTrack
+      >
     </SliderControl>
   </Slider>
   <Label><Checkbox class="checkbox" />{terms.label}</Label>

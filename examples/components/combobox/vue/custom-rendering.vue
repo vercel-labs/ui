@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, SearchIcon } from "@lucide/vue"
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  SearchIcon,
+} from "@lucide/vue"
 import {
   Combobox,
   ComboboxContent,

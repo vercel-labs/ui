@@ -18,14 +18,21 @@ function Fixture() {
     <div className="fixture">
       <button>Before</button>
       <div role="toolbar" aria-label={f.toolbarLabel} className="row">
-        <NumberInputScrubArea controller={controller} className="number-input-scrub">
+        <NumberInputScrubArea
+          controller={controller}
+          className="number-input-scrub"
+        >
           {f.toolbarScrub}
         </NumberInputScrubArea>
       </div>
       <table>
         <thead>
           <tr>
-            <NumberInputScrubArea controller={controller} render={<th />} className="number-input-scrub">
+            <NumberInputScrubArea
+              controller={controller}
+              render={<th />}
+              className="number-input-scrub"
+            >
               {f.headerScrub}
             </NumberInputScrubArea>
           </tr>
@@ -39,16 +46,25 @@ function Fixture() {
         max={f.max}
         locale="en-US"
         onValueChange={(value) => setAction(String(value))}
-        onValueCommit={(value) => setCommits((list) => [...list, String(value)])}
+        onValueCommit={(value) =>
+          setCommits((list) => [...list, String(value)])
+        }
       >
         <NumberInputGroup className="number-input-group">
-          <NumberInputScrubArea className="number-input-scrub">{f.letterScrub}</NumberInputScrubArea>
-          <NumberInputControl aria-label={f.label} className="number-input-control" />
+          <NumberInputScrubArea className="number-input-scrub">
+            {f.letterScrub}
+          </NumberInputScrubArea>
+          <NumberInputControl
+            aria-label={f.label}
+            className="number-input-control"
+          />
         </NumberInputGroup>
         <div>
           <div>
             <div>
-              <NumberInputScrubArea className="number-input-scrub">{f.nestedScrub}</NumberInputScrubArea>
+              <NumberInputScrubArea className="number-input-scrub">
+                {f.nestedScrub}
+              </NumberInputScrubArea>
             </div>
           </div>
         </div>
@@ -68,7 +84,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

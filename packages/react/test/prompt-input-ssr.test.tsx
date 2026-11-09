@@ -13,14 +13,16 @@ describe("server rendering a prompt input", () => {
       <TokenInput defaultValue={value} name="prompt">
         <TokenInputEditor aria-label="Prompt" placeholder="Ask anything" />
         <TriggerMenu triggers={[{ char: "@", items: [] }]} />
-      </TokenInput>,
+      </TokenInput>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="textbox"')
     expect(html).toContain('contentEditable="true"')
     expect(html).toContain('aria-placeholder="Ask anything"')
     expect(html).toMatch(/Explain ​<span[^>]*data-token-type="file"/)
-    expect(html).toMatch(/<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/)
+    expect(html).toMatch(
+      /<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/
+    )
     // The list isn't in the page while closed.
     expect(html).not.toContain('role="listbox"')
   })
@@ -29,9 +31,11 @@ describe("server rendering a prompt input", () => {
     const html = renderToString(
       <TriggerMenu triggers={[{ char: "@", items: [] }]}>
         <TriggerMenuInput aria-label="Message" />
-      </TriggerMenu>,
+      </TriggerMenu>
     )
-    expect(html).toMatch(/<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/)
+    expect(html).toMatch(
+      /<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/
+    )
     expect(html).not.toContain("aria-expanded")
   })
 })

@@ -21,7 +21,9 @@ function provideTracker() {
 
 function useTracker() {
   const tracker = inject(key)
-  if (!tracker) throw new Error("useTracker() needs provideTracker() in app.vue.")
+  if (!tracker) {
+    throw new Error("useTracker() needs provideTracker() in app.vue.")
+  }
   return tracker
 }
 

@@ -24,7 +24,10 @@ function SelectTrigger({
   className,
   children,
   ...props
-}: Omit<ComponentProps<typeof SelectTriggerPrimitive>, "className" | "children"> & {
+}: Omit<
+  ComponentProps<typeof SelectTriggerPrimitive>,
+  "className" | "children"
+> & {
   variant?: keyof typeof triggers
   className?: string
   children?: ReactNode
@@ -34,7 +37,7 @@ function SelectTrigger({
       className={cn(
         "outline-none transition-[color,background-color,box-shadow] select-none focus-visible:ring-3 focus-visible:ring-ring/30 data-placeholder:text-muted-foreground",
         triggers[variant],
-        className,
+        className
       )}
       {...props}
     >
@@ -51,12 +54,14 @@ function SelectTrigger({
 function SelectContent({
   className,
   ...props
-}: Omit<ComponentProps<typeof SelectContentPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof SelectContentPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
     <SelectContentPrimitive
       className={cn(
         "max-h-(--available-height) min-w-(--anchor-width) origin-(--transform-origin) overflow-y-auto rounded-2xl bg-popover p-1 text-sm text-popover-foreground shadow-lg ring-1 ring-foreground outline-none transition-[opacity,scale] duration-100 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0 dark:ring-foreground/10",
-        className,
+        className
       )}
       {...props}
     />
@@ -67,7 +72,10 @@ function SelectItem({
   className,
   children,
   ...props
-}: Omit<ComponentProps<typeof SelectItemPrimitive>, "className" | "children"> & {
+}: Omit<
+  ComponentProps<typeof SelectItemPrimitive>,
+  "className" | "children"
+> & {
   className?: string
   children?: ReactNode
 }) {
@@ -75,7 +83,7 @@ function SelectItem({
     <SelectItemPrimitive
       className={cn(
         "relative flex min-h-7 cursor-default items-center gap-2 rounded-xl py-1.5 ps-2 pe-8 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg:not([class*='size-'])]:size-4",
-        className,
+        className
       )}
       {...props}
     >
@@ -90,7 +98,9 @@ function SelectItem({
 function SelectGroupLabel({
   className,
   ...props
-}: Omit<ComponentProps<typeof SelectGroupLabelPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof SelectGroupLabelPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
     <SelectGroupLabelPrimitive
       className={cn("px-2 pt-1.5 pb-1 text-[13px] text-subtle", className)}
@@ -102,9 +112,22 @@ function SelectGroupLabel({
 function SelectSeparator({
   className,
   ...props
-}: Omit<ComponentProps<typeof SelectSeparatorPrimitive>, "className"> & { className?: string }) {
-  return <SelectSeparatorPrimitive className={cn("mx-2 my-1 h-px bg-border/70", className)} {...props} />
+}: Omit<ComponentProps<typeof SelectSeparatorPrimitive>, "className"> & {
+  className?: string
+}) {
+  return (
+    <SelectSeparatorPrimitive
+      className={cn("mx-2 my-1 h-px bg-border/70", className)}
+      {...props}
+    />
+  )
 }
 
-export { SelectContent, SelectGroupLabel, SelectItem, SelectSeparator, SelectTrigger }
+export {
+  SelectContent,
+  SelectGroupLabel,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+}
 export { Select, SelectGroup, SelectValue } from "@ui-sdk/react/select"

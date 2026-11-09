@@ -1,7 +1,11 @@
 <script lang="ts">
   import { BoldIcon, ItalicIcon, LinkIcon, UnderlineIcon } from "@lucide/svelte"
   import { Toggle, ToggleIcon } from "@ui-sdk/svelte/toggle"
-  import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import {
+    Toolbar,
+    ToolbarButton,
+    ToolbarSeparator,
+  } from "@ui-sdk/svelte/toolbar"
   import { useLog } from "../../../shared/svelte/log"
 
   const styles = [
@@ -15,7 +19,10 @@
 
 <Toolbar aria-label="Formatting">
   {#each styles as { label, icon: Icon } (label)}
-    <Toggle aria-label={label} onPressedChange={(pressed) => log(`${label} ${pressed ? "on" : "off"}`)}>
+    <Toggle
+      aria-label={label}
+      onPressedChange={(pressed) => log(`${label} ${pressed ? "on" : "off"}`)}
+    >
       <ToggleIcon>
         <Icon />
       </ToggleIcon>

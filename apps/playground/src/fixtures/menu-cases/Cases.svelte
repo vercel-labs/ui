@@ -19,7 +19,8 @@
   let align = $state("left")
   let open = $state(false)
   // Specs close the controlled menu from outside it.
-  ;(window as unknown as { __closeControlled: () => void }).__closeControlled = () => (open = false)
+  ;(window as unknown as { __closeControlled: () => void }).__closeControlled =
+    () => (open = false)
 
   function closeFromState(event: Event) {
     event.preventDefault()
@@ -38,13 +39,25 @@
     <MenuTrigger>Edit</MenuTrigger>
     <MenuContent class="popup">
       <MenuItem class="item" value="pin" onSelect={keepOpen}>Pin</MenuItem>
-      <MenuItem class="item" value="zoom" closeOnSelect={false}>Zoom in</MenuItem>
-      <MenuItem class="item" value="erase" shortcut="mod+backspace">Erase</MenuItem>
-      <MenuItem class="item" value="window" shortcut="alt+n">New window</MenuItem>
+      <MenuItem class="item" value="zoom" closeOnSelect={false}
+        >Zoom in</MenuItem
+      >
+      <MenuItem class="item" value="erase" shortcut="mod+backspace"
+        >Erase</MenuItem
+      >
+      <MenuItem class="item" value="window" shortcut="alt+n"
+        >New window</MenuItem
+      >
       <MenuSeparator class="separator" />
-      <MenuCheckboxItem class="item" value="autosave" closeOnSelect>Autosave</MenuCheckboxItem>
+      <MenuCheckboxItem class="item" value="autosave" closeOnSelect
+        >Autosave</MenuCheckboxItem
+      >
       <!-- Controlled and always checked: the binding's getter decides, and its setter writes nothing. -->
-      <MenuCheckboxItem class="item" value="pinned" bind:checked={() => true, () => {}}>Pinned</MenuCheckboxItem>
+      <MenuCheckboxItem
+        class="item"
+        value="pinned"
+        bind:checked={() => true, () => {}}>Pinned</MenuCheckboxItem
+      >
       <MenuRadioGroup bind:value={align}>
         <MenuGroupLabel class="label">Align</MenuGroupLabel>
         <MenuRadioItem class="item" value="left">Left</MenuRadioItem>
@@ -67,7 +80,12 @@
   </Menu>
   <Menu>
     <MenuTrigger>Offsets</MenuTrigger>
-    <MenuContent class="popup" sideOffset={8} alignOffset={-4} collisionPadding={24}>
+    <MenuContent
+      class="popup"
+      sideOffset={8}
+      alignOffset={-4}
+      collisionPadding={24}
+    >
       <MenuItem class="item" value="one">One</MenuItem>
       <MenuItem class="item" value="two">Two</MenuItem>
     </MenuContent>
@@ -75,7 +93,9 @@
   <Menu bind:open>
     <MenuTrigger>Controlled</MenuTrigger>
     <MenuContent class="popup">
-      <MenuItem class="item" value="done" onSelect={closeFromState}>Done</MenuItem>
+      <MenuItem class="item" value="done" onSelect={closeFromState}
+        >Done</MenuItem
+      >
       <MenuItem class="item" value="later">Later</MenuItem>
     </MenuContent>
   </Menu>

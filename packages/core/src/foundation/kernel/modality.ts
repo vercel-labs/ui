@@ -23,7 +23,9 @@ const forgetKeyTarget = () => (keyTarget = null)
 
 // Enter and Space on a button click it, Space on release, so both key events count.
 function noteKey(event: KeyboardEvent) {
-  if (event.key !== "Enter" && event.key !== " ") return
+  if (event.key !== "Enter" && event.key !== " ") {
+    return
+  }
   keyTarget = event.target as Node
   setTimeout(forgetKeyTarget)
 }
@@ -34,8 +36,13 @@ function noteKeydown(event: KeyboardEvent) {
   // Modifier keys alone, like Command held for a click, aren't keyboard use.
   // Tab always is, even with Option held, which Safari needs to reach buttons.
   const modifierOnly =
-    event.metaKey || event.ctrlKey || event.altKey || /^(Meta|Control|Alt|Shift)$/.test(event.key)
-  if (event.key === "Tab" || !modifierOnly) modality = "keyboard"
+    event.metaKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    /^(Meta|Control|Alt|Shift)$/.test(event.key)
+  if (event.key === "Tab" || !modifierOnly) {
+    modality = "keyboard"
+  }
 }
 
 // Some engines send a tap as touch events and a click, without pointer events,
@@ -44,24 +51,37 @@ function notePress(event: PointerEvent | TouchEvent) {
   modality = "pointer"
   windowLeft = false
   if (!("pointerType" in event)) {
-    if (!pointerPressed) lastPointer = "touch"
+    if (!pointerPressed) {
+      lastPointer = "touch"
+    }
     return
   }
   pointerPressed = true
   setTimeout(forgetPointerPress)
   const type = event.pointerType
-  lastPointer = isSyntheticPointer(event) ? "virtual" : type === "touch" || type === "pen" ? type : "mouse"
+  lastPointer = isSyntheticPointer(event)
+    ? "virtual"
+    : type === "touch" || type === "pen"
+      ? type
+      : "mouse"
 }
 
 function install() {
-  if (installed || typeof document === "undefined") return
+  if (installed || typeof document === "undefined") {
+    return
+  }
   installed = true
   document.addEventListener("keydown", noteKeydown, true)
   document.addEventListener("keyup", noteKey, true)
   document.addEventListener("pointerdown", notePress, true)
-  document.addEventListener("touchstart", notePress, { capture: true, passive: true })
+  document.addEventListener("touchstart", notePress, {
+    capture: true,
+    passive: true,
+  })
   window.addEventListener("blur", (event) => {
-    if (event.target === window) windowLeft = true
+    if (event.target === window) {
+      windowLeft = true
+    }
   })
 }
 
@@ -72,7 +92,9 @@ function install() {
  * to call often.
  */
 function trackInput() {
-  if (installed || scheduled) return
+  if (installed || scheduled) {
+    return
+  }
   scheduled = true
   queueMicrotask(install)
 }
@@ -82,8 +104,12 @@ function trackInput() {
 // TalkBack's double tap on Android comes as a one-pixel mouse with no pressure
 // and no click count, which no real mouse sends: their pressure is 0.5.
 function isSyntheticPointer(event: PointerEvent) {
-  if (event.type === "pointermove") return false
-  if (event.width === 0 && event.height === 0 && event.pressure === 0) return true
+  if (event.type === "pointermove") {
+    return false
+  }
+  if (event.width === 0 && event.height === 0 && event.pressure === 0) {
+    return true
+  }
   return (
     event.pointerType === "mouse" &&
     event.width === 1 &&
@@ -97,7 +123,9 @@ function isSyntheticPointer(event: PointerEvent) {
 // takes the press's kind. One with no press behind it came from Enter or Space
 // on the element, or else from something virtual.
 function clickSource(event: MouseEvent) {
-  if (event.detail > 0) return lastPointer
+  if (event.detail > 0) {
+    return lastPointer
+  }
   const fromKey = !!keyTarget && keyTarget.contains(event.target as Node | null)
   return fromKey ? "keyboard" : "virtual"
 }
@@ -115,17 +143,34 @@ const currentSource = () => (modality === "keyboard" ? "keyboard" : lastPointer)
  */
 function sourceOf(event?: Event) {
   install()
-  if (!event) return currentSource()
-  if (!trusted(event)) return "programmatic"
-  if (event.type.startsWith("key")) return "keyboard"
-  if (event.type.startsWith("touch")) return "touch"
-  if (event.type === "click") return clickSource(event as MouseEvent)
+  if (!event) {
+    return currentSource()
+  }
+  if (!trusted(event)) {
+    return "programmatic"
+  }
+  if (event.type.startsWith("key")) {
+    return "keyboard"
+  }
+  if (event.type.startsWith("touch")) {
+    return "touch"
+  }
+  if (event.type === "click") {
+    return clickSource(event as MouseEvent)
+  }
   const pointerType = (event as PointerEvent).pointerType
-  if (pointerType === "mouse" || pointerType === "touch" || pointerType === "pen")
+  if (
+    pointerType === "mouse" ||
+    pointerType === "touch" ||
+    pointerType === "pen"
+  ) {
     return isSyntheticPointer(event as PointerEvent) ? "virtual" : pointerType
+  }
   // Other mouse events take the kind of the last press. A property check, not
   // `instanceof MouseEvent`, works without a DOM and for events from other frames.
-  if ("button" in event) return lastPointer
+  if ("button" in event) {
+    return lastPointer
+  }
   return currentSource()
 }
 
@@ -165,7 +210,9 @@ function moveFocus(el: HTMLElement) {
 // The modality a popup starts in, from how it opened. Anything but a pointer,
 // like a key or a screen reader's virtual click, counts as the keyboard.
 const modalityOf = (opener: string) =>
-  opener === "pointer" || opener === "touch" ? ("pointer" as const) : ("keyboard" as const)
+  opener === "pointer" || opener === "touch"
+    ? ("pointer" as const)
+    : ("keyboard" as const)
 
 // Writes data-modality, "keyboard" or "pointer", on a popup for how the user
 // works in it now, so highlighted items can be styled by it. Virtual focus
@@ -176,17 +223,25 @@ const modalityOf = (opener: string) =>
 function trackModality(
   el: HTMLElement,
   initial: "keyboard" | "pointer",
-  keys: () => (HTMLElement | undefined)[] = () => [],
+  keys: () => (HTMLElement | undefined)[] = () => []
 ) {
   let current = initial
   let last: { x: number; y: number } | undefined
   const write = (next: "keyboard" | "pointer") => {
     current = next
-    if (el.getAttribute("data-modality") !== next) el.setAttribute("data-modality", next)
+    if (el.getAttribute("data-modality") !== next) {
+      el.setAttribute("data-modality", next)
+    }
   }
   write(initial)
   const onKey = (event: KeyboardEvent) => {
-    if (event.metaKey || event.ctrlKey || /^(Meta|Control|Alt|Shift)$/.test(event.key)) return
+    if (
+      event.metaKey ||
+      event.ctrlKey ||
+      /^(Meta|Control|Alt|Shift)$/.test(event.key)
+    ) {
+      return
+    }
     write("keyboard")
   }
   const onDown = () => write("pointer")
@@ -194,18 +249,35 @@ function trackModality(
     const point = { x: event.clientX, y: event.clientY }
     const moved = last && Math.hypot(point.x - last.x, point.y - last.y) > 2
     last = point
-    if (moved && current !== "pointer") write("pointer")
+    if (moved && current !== "pointer") {
+      write("pointer")
+    }
   }
-  const targets = [el, ...keys().filter((target): target is HTMLElement => !!target)]
-  for (const target of targets) target.addEventListener("keydown", onKey, true)
+  const targets = [
+    el,
+    ...keys().filter((target): target is HTMLElement => !!target),
+  ]
+  for (const target of targets) {
+    target.addEventListener("keydown", onKey, true)
+  }
   el.addEventListener("pointerdown", onDown, true)
   el.addEventListener("pointermove", onMove, true)
   return () => {
-    for (const target of targets) target.removeEventListener("keydown", onKey, true)
+    for (const target of targets) {
+      target.removeEventListener("keydown", onKey, true)
+    }
     el.removeEventListener("pointerdown", onDown, true)
     el.removeEventListener("pointermove", onMove, true)
     el.removeAttribute("data-modality")
   }
 }
 
-export { isFocusFromKeyboard, modalityOf, moveFocus, restoreFocus, sourceOf, trackInput, trackModality }
+export {
+  isFocusFromKeyboard,
+  modalityOf,
+  moveFocus,
+  restoreFocus,
+  sourceOf,
+  trackInput,
+  trackModality,
+}

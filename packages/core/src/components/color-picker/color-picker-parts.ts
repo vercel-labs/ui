@@ -3,7 +3,11 @@
 import { convertColor, type Color } from "../../foundation/color/convert"
 import { isInGamut } from "../../foundation/color/gamut"
 import { parseColor } from "../../foundation/color/parse"
-import { bindInternals, bindValueInput, isDisabled } from "../../foundation/forms/form"
+import {
+  bindInternals,
+  bindValueInput,
+  isDisabled,
+} from "../../foundation/forms/form"
 import { css } from "../../foundation/kernel/inline-style"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import type { ColorPickerApi, State } from "./color-picker-api"
@@ -30,7 +34,8 @@ import type {
   ColorPickerSwatchItemState,
 } from "./color-picker"
 
-const isOutOfGamut = (state: State) => !!state.gamut && !isInGamut(state.color, state.gamut)
+const isOutOfGamut = (state: State) =>
+  !!state.gamut && !isInGamut(state.color, state.gamut)
 
 function pickerState(state: State) {
   return {
@@ -74,10 +79,14 @@ const sliderKeys = [
 const onStep = (value: number, step: number) =>
   Number(value.toFixed(Math.max(0, -Math.floor(Math.log10(step)))))
 
-const percentOf = (value: number, spec: Channel) => Math.round((value / spec.max) * 1e4) / 100
+const percentOf = (value: number, spec: Channel) =>
+  Math.round((value / spec.max) * 1e4) / 100
 
 // The slot declares the role the area's attributes carry.
-function withoutRole<Attrs extends { role?: string }>({ role, ...attrs }: Attrs) {
+function withoutRole<Attrs extends { role?: string }>({
+  role,
+  ...attrs
+}: Attrs) {
   return attrs
 }
 
@@ -88,28 +97,52 @@ const channelNames = (state: State, props: ColorPickerAreaProps) => ({
 
 // Every pixel of the area for the color's other channels, in the gamut's
 // space. Colors outside it stay transparent, so the edge shows its shape.
-function paintArea(canvas: HTMLCanvasElement, state: State, x: Channel, y: Channel) {
+function paintArea(
+  canvas: HTMLCanvasElement,
+  state: State,
+  x: Channel,
+  y: Channel
+) {
   const width = Math.max(2, Math.min(160, Math.round(canvas.clientWidth)))
-  const height = Math.max(2, Math.round((width * canvas.clientHeight) / Math.max(1, canvas.clientWidth)))
+  const height = Math.max(
+    2,
+    Math.round((width * canvas.clientHeight) / Math.max(1, canvas.clientWidth))
+  )
   const p3 = state.gamut === "p3"
-  const context = canvas.getContext("2d", { colorSpace: p3 ? "display-p3" : "srgb" })
-  if (!context) return
-  if (canvas.width !== width) canvas.width = width
-  if (canvas.height !== height) canvas.height = height
-  const image = context.createImageData(width, height, { colorSpace: p3 ? "display-p3" : "srgb" })
+  const context = canvas.getContext("2d", {
+    colorSpace: p3 ? "display-p3" : "srgb",
+  })
+  if (!context) {
+    return
+  }
+  if (canvas.width !== width) {
+    canvas.width = width
+  }
+  if (canvas.height !== height) {
+    canvas.height = height
+  }
+  const image = context.createImageData(width, height, {
+    colorSpace: p3 ? "display-p3" : "srgb",
+  })
   const base = { ...state.color, alpha: 1 }
   const target = p3 ? "display-p3" : "srgb"
-  const rowColor = (row: number) => withChannel(base, y, (1 - row / (height - 1)) * y.max)
+  const rowColor = (row: number) =>
+    withChannel(base, y, (1 - row / (height - 1)) * y.max)
   const colorAt = (atRow: Color, column: number) => {
     const along = column / (width - 1)
-    return convertColor(withChannel(atRow, x, (state.rtl ? 1 - along : along) * x.max), target).coords
+    return convertColor(
+      withChannel(atRow, x, (state.rtl ? 1 - along : along) * x.max),
+      target
+    ).coords
   }
   // Tighter than isInGamut, whose tolerance near black would paint a sliver
   // of colors past the edge.
   const fits = (coords: Color["coords"]) => {
     for (let index = 0; index < 3; index++) {
       const value = coords[index] ?? 0
-      if (value < -0.000001 || value > 1.000001) return false
+      if (value < -0.000001 || value > 1.000001) {
+        return false
+      }
     }
     return true
   }
@@ -120,8 +153,11 @@ function paintArea(canvas: HTMLCanvasElement, state: State, x: Channel, y: Chann
       const coords = colorAt(atRow, column)
       const pixel = row * width + column
       inside[pixel] = fits(coords) ? 1 : 0
-      for (let index = 0; index < 3; index++)
-        image.data[pixel * 4 + index] = Math.round(Math.min(1, Math.max(0, coords[index] ?? 0)) * 255)
+      for (let index = 0; index < 3; index++) {
+        image.data[pixel * 4 + index] = Math.round(
+          Math.min(1, Math.max(0, coords[index] ?? 0)) * 255
+        )
+      }
     }
   }
   // The canvas is smaller than the area, so a hard edge would show as steps.
@@ -141,7 +177,9 @@ function paintArea(canvas: HTMLCanvasElement, state: State, x: Channel, y: Chann
         let count = 0
         for (const down of offsets) {
           const atRow = rowColor(row + down)
-          for (const across of offsets) count += fits(colorAt(atRow, column + across)) ? 1 : 0
+          for (const across of offsets) {
+            count += fits(colorAt(atRow, column + across)) ? 1 : 0
+          }
         }
         share = count / (offsets.length * offsets.length)
       }
@@ -189,7 +227,12 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           style: css({
             position: "relative",
             "touch-action": "none",
-            "--color-area-background": areaGradient(state.color, x, y, state.rtl),
+            "--color-area-background": areaGradient(
+              state.color,
+              x,
+              y,
+              state.rtl
+            ),
           }),
         }
       },
@@ -203,7 +246,10 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
       role: "slider",
       focus: "tab-stop",
       keys: sliderKeys,
-      props: { x: { kind: "string", from: "area" }, y: { kind: "string", from: "area" } },
+      props: {
+        x: { kind: "string", from: "area" },
+        y: { kind: "string", from: "area" },
+      },
       state: pickerState,
       attrs: (state, { api, props }) => {
         const area = api.internal.area(props.x, props.y)
@@ -220,16 +266,23 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           style: area.thumbStyle(state),
         }
       },
-      on: { keydown: (event, { api, props }) => api.internal.areaKeydown(event, props.x, props.y) },
+      on: {
+        keydown: (event, { api, props }) =>
+          api.internal.areaKeydown(event, props.x, props.y),
+      },
     }),
 
     // Paints the area pixel by pixel, for channels no gradient draws, like
     // OKLCH's chroma by lightness, whose gamut edge is a curve.
     "area-canvas": slot<ColorPickerAreaProps>({
-      props: { x: { kind: "string", from: "area" }, y: { kind: "string", from: "area" } },
+      props: {
+        x: { kind: "string", from: "area" },
+        y: { kind: "string", from: "area" },
+      },
       attrs: () => ({
         "aria-hidden": "true",
-        style: "position:absolute;inset:0;width:100%;height:100%;pointer-events:none",
+        style:
+          "position:absolute;inset:0;width:100%;height:100%;pointer-events:none",
       }),
       bind(el, { api, store, props }) {
         const canvas = el as HTMLCanvasElement
@@ -243,23 +296,36 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           const x = api.internal.channel(xName)
           const y = api.internal.channel(yName)
           // Only the channels the area doesn't show change its picture.
-          const held = withChannel(withChannel({ ...state.color, alpha: 1 }, x, 0), y, 0)
+          const held = withChannel(
+            withChannel({ ...state.color, alpha: 1 }, x, 0),
+            y,
+            0
+          )
           const key = `${held.space} ${held.coords.join(" ")} ${state.gamut} ${state.rtl} ${canvas.clientWidth}x${canvas.clientHeight}`
-          if (key === painted) return
+          if (key === painted) {
+            return
+          }
           painted = key
           paintArea(canvas, state, x, y)
         }
         const schedule = () => {
-          if (!frame) frame = view.requestAnimationFrame(paint)
+          if (!frame) {
+            frame = view.requestAnimationFrame(paint)
+          }
         }
         paint()
         const unsubscribe = store.subscribe(schedule)
-        const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(schedule)
+        const observer =
+          typeof ResizeObserver === "undefined"
+            ? undefined
+            : new ResizeObserver(schedule)
         observer?.observe(canvas)
         return () => {
           unsubscribe()
           observer?.disconnect()
-          if (frame) view.cancelAnimationFrame(frame)
+          if (frame) {
+            view.cancelAnimationFrame(frame)
+          }
         }
       },
     }),
@@ -271,7 +337,11 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
       attrs: (state, { api, props }) => {
         const spec = api.internal.channel(props.channel)
         const vertical = props.orientation === "vertical"
-        const direction = vertical ? "to top" : state.rtl ? "to left" : "to right"
+        const direction = vertical
+          ? "to top"
+          : state.rtl
+            ? "to left"
+            : "to right"
         return {
           ...dataAttrs(state),
           "data-orientation": vertical ? "vertical" : "horizontal",
@@ -279,13 +349,23 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           style: css({
             position: "relative",
             "touch-action": "none",
-            "--color-slider-background": channelGradient(state.color, spec, direction),
+            "--color-slider-background": channelGradient(
+              state.color,
+              spec,
+              direction
+            ),
           }),
         }
       },
       on: {
         pointerdown: (event, { api, el, props }) =>
-          el && api.internal.sliderPointerdown(event, el, props.channel, props.orientation),
+          el &&
+          api.internal.sliderPointerdown(
+            event,
+            el,
+            props.channel,
+            props.orientation
+          ),
       },
     }),
 
@@ -320,12 +400,17 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
           "data-channel": spec.name,
           style: css({
             position: "absolute",
-            ...(vertical ? { bottom: `${percent}%` } : { "inset-inline-start": `${percent}%` }),
+            ...(vertical
+              ? { bottom: `${percent}%` }
+              : { "inset-inline-start": `${percent}%` }),
             "--color-slider-thumb-position": `${percent}%`,
           }),
         }
       },
-      on: { keydown: (event, { api, props }) => api.internal.sliderKeydown(event, props.channel) },
+      on: {
+        keydown: (event, { api, props }) =>
+          api.internal.sliderKeydown(event, props.channel),
+      },
     }),
 
     // A text input that reads any CSS color on Enter or blur. Text that isn't
@@ -344,10 +429,12 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
         ...dataAttrs(state),
       }),
       on: {
-        input: (_event, { api, el }) => el && api.internal.setText((el as HTMLInputElement).value),
+        input: (_event, { api, el }) =>
+          el && api.internal.setText((el as HTMLInputElement).value),
         keydown: (event, { api, store }) => {
-          if (event.key === "Enter") api.internal.commitText(event)
-          else if (event.key === "Escape" && store.get().text !== null) {
+          if (event.key === "Enter") {
+            api.internal.commitText(event)
+          } else if (event.key === "Escape" && store.get().text !== null) {
             event.preventDefault()
             api.internal.revertText()
           }
@@ -360,7 +447,9 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
         const write = () => {
           const { text, value } = store.get()
           const next = text ?? value
-          if (input.value !== next) input.value = next
+          if (input.value !== next) {
+            input.value = next
+          }
         }
         write()
         return store.subscribe(write)
@@ -393,15 +482,28 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
       on: {
         change: (event, { api, el, props }) => {
           const input = el as HTMLInputElement
-          api.internal.setChannelValue(props.channel, input.valueAsNumber, event)
-          input.value = String(onStep(api.internal.sliderValue(props.channel), Number(input.step)))
+          api.internal.setChannelValue(
+            props.channel,
+            input.valueAsNumber,
+            event
+          )
+          input.value = String(
+            onStep(api.internal.sliderValue(props.channel), Number(input.step))
+          )
         },
       },
       bind(el, { api, store, props }) {
         const input = el as HTMLInputElement
         const write = () => {
-          const next = String(onStep(api.internal.sliderValue(props.channel), Number(input.step)))
-          if (input.ownerDocument.activeElement !== input && input.value !== next) input.value = next
+          const next = String(
+            onStep(api.internal.sliderValue(props.channel), Number(input.step))
+          )
+          if (
+            input.ownerDocument.activeElement !== input &&
+            input.value !== next
+          ) {
+            input.value = next
+          }
         }
         write()
         input.addEventListener("blur", write)
@@ -431,7 +533,8 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
       state: pickerState,
       attrs: (state) => ({
         type: "button",
-        disabled: isLocked(state) || state.eyeDropper === false ? "" : undefined,
+        disabled:
+          isLocked(state) || state.eyeDropper === false ? "" : undefined,
         "data-unsupported": state.eyeDropper === false ? "" : undefined,
         ...dataAttrs(state),
       }),
@@ -452,35 +555,54 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
     }),
 
     // A preset color. Pressing it sets the value; arrows move between them.
-    "swatch-item": slot<ColorPickerSwatchItemProps, ColorPickerSwatchItemState>({
-      role: "option",
-      focus: "roving",
-      keys: ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Home", "End", "Enter", " "],
-      props: { value: "string" },
-      state: (state, { api, props }) => ({
-        selected: api.internal.isSelected(props.value),
-        disabled: isLocked(state),
-      }),
-      attrs: (state, { api, key, props }) => {
-        const selected = api.internal.isSelected(props.value)
-        const color = parseColor(props.value)
-        return {
-          type: "button",
-          "aria-selected": String(selected),
-          // English by default. Pass `aria-label` in another language.
-          "aria-label": color ? describeColor(color) : props.value,
-          "aria-disabled": isLocked(state) ? "true" : undefined,
-          tabindex: isDisabled(state) ? "-1" : api.internal.roving.tabIndex(state, { key, props }),
-          "data-selected": selected ? "" : undefined,
-          "data-disabled": isDisabled(state) ? "" : undefined,
-          "data-readonly": state.readOnly ? "" : undefined,
-          style: css({ "--color-picker-color": color ? props.value : undefined }),
-        }
-      },
-      press: ({ api, props }, event) => api.internal.choose(props.value, { reason: "item-press", event }),
-      on: { keydown: (event, { api, el }) => el && api.internal.roving.keydown(event, el) },
-      bind: (el, part) => part.api.internal.roving.bind(el, part),
-    }),
+    "swatch-item": slot<ColorPickerSwatchItemProps, ColorPickerSwatchItemState>(
+      {
+        role: "option",
+        focus: "roving",
+        keys: [
+          "ArrowUp",
+          "ArrowDown",
+          "ArrowLeft",
+          "ArrowRight",
+          "Home",
+          "End",
+          "Enter",
+          " ",
+        ],
+        props: { value: "string" },
+        state: (state, { api, props }) => ({
+          selected: api.internal.isSelected(props.value),
+          disabled: isLocked(state),
+        }),
+        attrs: (state, { api, key, props }) => {
+          const selected = api.internal.isSelected(props.value)
+          const color = parseColor(props.value)
+          return {
+            type: "button",
+            "aria-selected": String(selected),
+            // English by default. Pass `aria-label` in another language.
+            "aria-label": color ? describeColor(color) : props.value,
+            "aria-disabled": isLocked(state) ? "true" : undefined,
+            tabindex: isDisabled(state)
+              ? "-1"
+              : api.internal.roving.tabIndex(state, { key, props }),
+            "data-selected": selected ? "" : undefined,
+            "data-disabled": isDisabled(state) ? "" : undefined,
+            "data-readonly": state.readOnly ? "" : undefined,
+            style: css({
+              "--color-picker-color": color ? props.value : undefined,
+            }),
+          }
+        },
+        press: ({ api, props }, event) =>
+          api.internal.choose(props.value, { reason: "item-press", event }),
+        on: {
+          keydown: (event, { api, el }) =>
+            el && api.internal.roving.keydown(event, el),
+        },
+        bind: (el, part) => part.api.internal.roving.bind(el, part),
+      }
+    ),
 
     // React and Vue: the hidden input the form submits.
     "hidden-input": slot({
@@ -503,7 +625,11 @@ function colorPickerSlots(slot: SlotFactory<State, ColorPickerApi>) {
   }
 }
 
-function sliderState(state: State, api: ColorPickerApi, props: ColorPickerSliderProps) {
+function sliderState(
+  state: State,
+  api: ColorPickerApi,
+  props: ColorPickerSliderProps
+) {
   const spec = api.internal.channel(props.channel)
   return {
     ...pickerState(state),

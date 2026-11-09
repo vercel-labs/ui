@@ -15,7 +15,11 @@ import {
   Switch,
   SwitchThumb,
 } from "@ui-sdk/vue"
-import { formsFixture as f, formsOptions, serialize } from "tests/fixtures/forms.ts"
+import {
+  formsFixture as f,
+  formsOptions,
+  serialize,
+} from "tests/fixtures/forms.ts"
 import { ref } from "vue"
 
 const options = formsOptions()
@@ -27,22 +31,39 @@ const shipping = ref(false)
 const all = f.toppings.items.map((item) => item.value)
 
 // Records a change, or cancels it when the URL asks.
-function report(name: string, value: unknown, details: { cancel: () => void; source: string }) {
-  if (options.cancel === name) return details.cancel()
+function report(
+  name: string,
+  value: unknown,
+  details: { cancel: () => void; source: string }
+) {
+  if (options.cancel === name) {
+    return details.cancel()
+  }
   action.value = `${name}:${String(value)}`
   source.value = details.source
 }
 
-function onTerms(checked: CheckedState, details: { cancel: () => void; canceled: boolean; source: string }) {
+function onTerms(
+  checked: CheckedState,
+  details: { cancel: () => void; canceled: boolean; source: string }
+) {
   report(f.terms.name, checked, details)
-  if (!details.canceled) terms.value = checked
+  if (!details.canceled) {
+    terms.value = checked
+  }
 }
 
-function onToppings(value: string[], details: { cancel: () => void; source: string }) {
+function onToppings(
+  value: string[],
+  details: { cancel: () => void; source: string }
+) {
   report(f.toppings.name, value.join(","), details)
 }
 
-function onPlan(value: string | null, details: { cancel: () => void; source: string }) {
+function onPlan(
+  value: string | null,
+  details: { cancel: () => void; source: string }
+) {
   report(f.plan.name, value, details)
 }
 
@@ -54,7 +75,12 @@ function onSubmit(event: Event) {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <form class="form" :id="f.formId" :aria-label="f.formLabel" @submit.prevent="onSubmit">
+    <form
+      class="form"
+      :id="f.formId"
+      :aria-label="f.formLabel"
+      @submit.prevent="onSubmit"
+    >
       <Field>
         <div class="row">
           <Checkbox
@@ -71,7 +97,9 @@ function onSubmit(event: Event) {
           <FieldLabel>{{ f.terms.label }}</FieldLabel>
         </div>
         <FieldDescription>{{ f.terms.description }}</FieldDescription>
-        <FieldError class="field-error" match="valueMissing">{{ f.terms.error }}</FieldError>
+        <FieldError class="field-error" match="valueMissing">{{
+          f.terms.error
+        }}</FieldError>
       </Field>
 
       <fieldset>
@@ -105,7 +133,10 @@ function onSubmit(event: Event) {
           class="switch"
           :name="item.name"
           :default-checked="item.defaultChecked"
-          @checked-change="(checked: boolean, details: any) => report(item.name, checked, details)"
+          @checked-change="
+            (checked: boolean, details: any) =>
+              report(item.name, checked, details)
+          "
         >
           <SwitchThumb class="switch-thumb" />
         </Switch>
@@ -163,7 +194,12 @@ function onSubmit(event: Event) {
       </div>
     </form>
     <label>
-      <Checkbox class="checkbox" :form="f.formId" :name="f.newsletter.name" :value="f.newsletter.value">
+      <Checkbox
+        class="checkbox"
+        :form="f.formId"
+        :name="f.newsletter.name"
+        :value="f.newsletter.value"
+      >
         <CheckboxIndicator class="checkbox-indicator" />
       </Checkbox>
       {{ f.newsletter.label }}

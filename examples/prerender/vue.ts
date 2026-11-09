@@ -1,7 +1,10 @@
 import { createSSRApp, type Component } from "vue"
 import { renderToString } from "vue/server-renderer"
 
-const examples = import.meta.glob<{ default: Component }>(["../*/vue/*.vue", "../components/*/vue/*.vue"])
+const examples = import.meta.glob<{ default: Component }>([
+  "../*/vue/*.vue",
+  "../components/*/vue/*.vue",
+])
 
 async function render(module: { default: Component }) {
   const app = createSSRApp(module.default)
@@ -10,7 +13,9 @@ async function render(module: { default: Component }) {
   let failure: unknown
   app.config.errorHandler = (error) => void (failure ??= error)
   const html = await renderToString(app)
-  if (failure) throw failure
+  if (failure) {
+    throw failure
+  }
   return html
 }
 

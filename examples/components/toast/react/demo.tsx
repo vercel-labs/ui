@@ -16,7 +16,7 @@ function Example() {
     () => () => {
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   return (

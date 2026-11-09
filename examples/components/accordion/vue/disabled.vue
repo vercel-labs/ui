@@ -12,25 +12,33 @@ const items = [
   {
     value: "access",
     label: "Can I access my account history?",
-    content: "Yes. Every order and payment from the last five years is in your account.",
+    content:
+      "Yes. Every order and payment from the last five years is in your account.",
   },
   {
     value: "premium",
     label: "Premium feature information",
-    content: "Premium includes priority support and early access to new features.",
+    content:
+      "Premium includes priority support and early access to new features.",
     disabled: true,
   },
   {
     value: "email",
     label: "How do I update my email address?",
-    content: "Open Settings, then Account, and change it there. We'll send a confirmation link.",
+    content:
+      "Open Settings, then Account, and change it there. We'll send a confirmation link.",
   },
 ]
 </script>
 
 <template>
   <Accordion>
-    <AccordionItem v-for="item in items" :key="item.value" :value="item.value" :disabled="item.disabled">
+    <AccordionItem
+      v-for="item in items"
+      :key="item.value"
+      :value="item.value"
+      :disabled="item.disabled"
+    >
       <AccordionHeader>
         <AccordionTrigger>
           {{ item.label }}

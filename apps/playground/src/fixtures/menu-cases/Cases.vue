@@ -20,7 +20,8 @@ const selections = ref(0)
 const align = ref("left")
 const open = ref(false)
 // Specs close the controlled menu from outside it.
-;(window as unknown as { __closeControlled: () => void }).__closeControlled = () => (open.value = false)
+;(window as unknown as { __closeControlled: () => void }).__closeControlled =
+  () => (open.value = false)
 
 function closeFromState(event: Event) {
   event.preventDefault()
@@ -40,12 +41,22 @@ function keepOpen(event: Event) {
       <MenuTrigger>Edit</MenuTrigger>
       <MenuContent class="popup">
         <MenuItem class="item" value="pin" @select="keepOpen">Pin</MenuItem>
-        <MenuItem class="item" value="zoom" :close-on-select="false">Zoom in</MenuItem>
-        <MenuItem class="item" value="erase" shortcut="mod+backspace">Erase</MenuItem>
-        <MenuItem class="item" value="window" shortcut="alt+n">New window</MenuItem>
+        <MenuItem class="item" value="zoom" :close-on-select="false"
+          >Zoom in</MenuItem
+        >
+        <MenuItem class="item" value="erase" shortcut="mod+backspace"
+          >Erase</MenuItem
+        >
+        <MenuItem class="item" value="window" shortcut="alt+n"
+          >New window</MenuItem
+        >
         <MenuSeparator class="separator" />
-        <MenuCheckboxItem class="item" value="autosave" close-on-select>Autosave</MenuCheckboxItem>
-        <MenuCheckboxItem class="item" value="pinned" checked>Pinned</MenuCheckboxItem>
+        <MenuCheckboxItem class="item" value="autosave" close-on-select
+          >Autosave</MenuCheckboxItem
+        >
+        <MenuCheckboxItem class="item" value="pinned" checked
+          >Pinned</MenuCheckboxItem
+        >
         <MenuRadioGroup v-model:value="align">
           <MenuGroupLabel class="label">Align</MenuGroupLabel>
           <MenuRadioItem class="item" value="left">Left</MenuRadioItem>
@@ -68,7 +79,12 @@ function keepOpen(event: Event) {
     </Menu>
     <Menu>
       <MenuTrigger>Offsets</MenuTrigger>
-      <MenuContent class="popup" :side-offset="8" :align-offset="-4" :collision-padding="24">
+      <MenuContent
+        class="popup"
+        :side-offset="8"
+        :align-offset="-4"
+        :collision-padding="24"
+      >
         <MenuItem class="item" value="one">One</MenuItem>
         <MenuItem class="item" value="two">Two</MenuItem>
       </MenuContent>
@@ -76,7 +92,9 @@ function keepOpen(event: Event) {
     <Menu v-model:open="open">
       <MenuTrigger>Controlled</MenuTrigger>
       <MenuContent class="popup">
-        <MenuItem class="item" value="done" @select="closeFromState">Done</MenuItem>
+        <MenuItem class="item" value="done" @select="closeFromState"
+          >Done</MenuItem
+        >
         <MenuItem class="item" value="later">Later</MenuItem>
       </MenuContent>
     </Menu>

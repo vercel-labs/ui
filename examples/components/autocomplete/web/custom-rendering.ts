@@ -27,7 +27,7 @@ function mount(root: HTMLElement) {
                 <ui-autocomplete-item value="${page.title}" label="${page.title}" as-child>
                   <a href="${page.href}">${page.title}<span data-slot="hint">${page.section}</span></a>
                 </ui-autocomplete-item>
-              `,
+              `
             )
             .join("")}
         </ui-autocomplete-list>

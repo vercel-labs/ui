@@ -22,9 +22,9 @@ export function mount(root: HTMLElement) {
   Object.assign(root.querySelector("ui-toast-region")!, {
     toaster: toast,
   })
-  root
-    .querySelector("button")!
-    .addEventListener("click", () =>
-      toast("تم إنشاء الحدث", { description: "الأحد 3 ديسمبر الساعة 9:00 صباحًا" }),
-    )
+  root.querySelector("button")!.addEventListener("click", () =>
+    toast("تم إنشاء الحدث", {
+      description: "الأحد 3 ديسمبر الساعة 9:00 صباحًا",
+    })
+  )
 }

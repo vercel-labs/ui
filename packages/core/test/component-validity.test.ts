@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { afterEach, expect, test } from "vitest"
-import { onValidityChange, setComponentValidity } from "../src/foundation/forms/form"
+import {
+  onValidityChange,
+  setComponentValidity,
+} from "../src/foundation/forms/form"
 
 const cleanups: (() => void)[] = []
 afterEach(() => cleanups.splice(0).forEach((cleanup) => cleanup()))

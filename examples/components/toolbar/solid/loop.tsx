@@ -7,7 +7,11 @@ function Example() {
   return (
     <Toolbar loop={false} aria-label="Pages">
       <For each={["First", "Previous", "Next", "Last"]}>
-        {(label) => <ToolbarButton onClick={() => log(`${label} page`)}>{label}</ToolbarButton>}
+        {(label) => (
+          <ToolbarButton onClick={() => log(`${label} page`)}>
+            {label}
+          </ToolbarButton>
+        )}
       </For>
     </Toolbar>
   )

@@ -31,7 +31,11 @@ import { registerById, type FieldSetState } from "./field-set"
 import { held } from "../../foundation/kernel/part"
 import { on } from "../../foundation/kernel/events"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 // Field ties a control to its label, description and errors. It shows the
 // browser's own validation once a submit finds the control invalid, or the
@@ -117,7 +121,8 @@ type FieldErrorState = FieldState & {
 }
 
 // A control inside a nested field belongs to that field.
-const ownControl = (root: HTMLElement) => (el: HTMLElement) => el.closest('[data-slot="field-root"]') === root
+const ownControl = (root: HTMLElement) => (el: HTMLElement) =>
+  el.closest('[data-slot="field-root"]') === root
 
 function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
   const { id, store, element, parts } = context
@@ -136,8 +141,16 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
   const errorInPage = () => {
     const state = store.get()
     for (const part of parts()) {
-      if (part.slot !== "error" || !held(part) || part.el?.isConnected === false) continue
-      if (errorShown(state, api, part.props as FieldErrorProps)) return true
+      if (
+        part.slot !== "error" ||
+        !held(part) ||
+        part.el?.isConnected === false
+      ) {
+        continue
+      }
+      if (errorShown(state, api, part.props as FieldErrorProps)) {
+        return true
+      }
     }
     return false
   }
@@ -160,21 +173,30 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     let next = valid
     for (const el of controls) {
       const { willValidate, validity, message } = validityOf(el)
-      if (!willValidate || validity.valid) continue
+      if (!willValidate || validity.valid) {
+        continue
+      }
       const flags: Validity["flags"] = {}
-      for (const key of validityKeys) if (validity[key]) flags[key] = true
+      for (const key of validityKeys) {
+        if (validity[key]) {
+          flags[key] = true
+        }
+      }
       next = { valid: false, flags, message }
       break
     }
     const required = controls.some(isRequired)
-    if (required !== store.get().required) store.set({ required })
+    if (required !== store.get().required) {
+      store.set({ required })
+    }
     const current = store.get().validity
     if (
       current.valid !== next.valid ||
       current.message !== next.message ||
       validityKeys.some((key) => !!current.flags[key] !== !!next.flags[key])
-    )
+    ) {
       store.set({ validity: next })
+    }
   }
 
   const api = {
@@ -183,10 +205,14 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     disabled,
     invalid,
     // The element labels and messages are wired to.
-    control: () => element("control") ?? (root ? findControl(root, ownControl(root)) : undefined),
+    control: () =>
+      element("control") ??
+      (root ? findControl(root, ownControl(root)) : undefined),
     activate(event?: Event) {
       const control = api.control()
-      if (control && !disabled()) activateControl(control, event)
+      if (control && !disabled()) {
+        activateControl(control, event)
+      }
     },
     internal: {
       bindRoot(el: HTMLElement) {
@@ -198,11 +224,22 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       register(list: "labels" | "descriptions" | "errors", partId: string) {
         let active = true
         queueMicrotask(() => {
-          if (active) store.set({ [list]: [...store.get()[list].filter((item) => item !== partId), partId] })
+          if (active) {
+            store.set({
+              [list]: [
+                ...store.get()[list].filter((item) => item !== partId),
+                partId,
+              ],
+            })
+          }
         })
         return () => {
           active = false
-          queueMicrotask(() => store.set({ [list]: store.get()[list].filter((item) => item !== partId) }))
+          queueMicrotask(() =>
+            store.set({
+              [list]: store.get()[list].filter((item) => item !== partId),
+            })
+          )
         }
       },
       // The browser's message for the current problem, which an empty error shows.
@@ -212,28 +249,41 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       // Screen readers don't read an error that appears or changes while the
       // person stays where they are, so its text goes to the shared announcer.
       announce(el: HTMLElement) {
-        if (typeof MutationObserver === "undefined") return () => {}
+        if (typeof MutationObserver === "undefined") {
+          return () => {}
+        }
         const textOf = () => el.textContent?.replace(/\s+/g, " ").trim() ?? ""
         let silent = quiet
         let said = ""
         const say = () => {
           const text = textOf()
-          if (!text || text === said) return
+          if (!text || text === said) {
+            return
+          }
           said = text
-          if (silent) return
+          if (silent) {
+            return
+          }
           import("../../foundation/platform/announce").then(
-            ({ announce }) => el.isConnected && announce(text, { doc: el.ownerDocument }),
-            () => {},
+            ({ announce }) =>
+              el.isConnected && announce(text, { doc: el.ownerDocument }),
+            () => {}
           )
         }
         // A framework may fill the text after the part binds.
         const timer = setTimeout(() => {
-          if (silent) said = textOf()
+          if (silent) {
+            said = textOf()
+          }
           silent = false
           say()
         })
         const observer = new MutationObserver(say)
-        observer.observe(el, { childList: true, characterData: true, subtree: true })
+        observer.observe(el, {
+          childList: true,
+          characterData: true,
+          subtree: true,
+        })
         return () => {
           clearTimeout(timer)
           observer.disconnect()
@@ -243,13 +293,14 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
         // A plain button, like a FileInputTrigger's, is named by the label and its
         // own text through aria-labelledby. Some name computations stop at a
         // <label for> and drop the button's text, so the label activates it itself.
-        const namedByContent = el instanceof HTMLButtonElement && !el.hasAttribute("role")
+        const namedByContent =
+          el instanceof HTMLButtonElement && !el.hasAttribute("role")
         queueMicrotask(() =>
           store.set({
             controlId: el.id || null,
             labelable: isLabelable(el) && !namedByContent,
             namedByContent,
-          }),
+          })
         )
       },
     },
@@ -257,11 +308,15 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
 
   let queued = false
   const check = () => {
-    if (queued) return
+    if (queued) {
+      return
+    }
     queued = true
     queueMicrotask(() => {
       queued = false
-      if (root) readValidity(controlsIn(root))
+      if (root) {
+        readValidity(controlsIn(root))
+      }
     })
   }
 
@@ -281,7 +336,12 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       watchFieldsets(el, (formDisabled) => store.set({ formDisabled })),
       on(el, "focusin", () => store.set({ focused: true })),
       on(el, "focusout", (event) => {
-        if (event.relatedTarget instanceof Node && el.contains(event.relatedTarget)) return
+        if (
+          event.relatedTarget instanceof Node &&
+          el.contains(event.relatedTarget)
+        ) {
+          return
+        }
         store.set({ focused: false })
       }),
     ]
@@ -291,7 +351,9 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     // back and lose the keystroke, so the field listens on the document, after
     // React's root, and reads validity a microtask after React updates.
     const onChange = (event: Event) => {
-      if (event.target instanceof Node && el.contains(event.target)) check()
+      if (event.target instanceof Node && el.contains(event.target)) {
+        check()
+      }
     }
     for (const type of ["input", "change"]) {
       el.ownerDocument.addEventListener(type, onChange)
@@ -308,7 +370,9 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
       // first invalid field of the submission takes focus. Without one, the
       // browser keeps its message, and a later field doesn't take focus from the first.
       if (!errorInPage()) {
-        if (invalidFocusClaimed(target, form())) event.preventDefault()
+        if (invalidFocusClaimed(target, form())) {
+          event.preventDefault()
+        }
         return
       }
       event.preventDefault()
@@ -319,14 +383,18 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
 
     // A form reset hides the browser's validation again.
     const onReset = (event: Event) => {
-      if (event.target !== form()) return
+      if (event.target !== form()) {
+        return
+      }
       afterReset(event, () => {
         store.set({ revealed: false })
         readValidity(controlsIn(el))
       })
     }
     el.ownerDocument.addEventListener("reset", onReset, true)
-    cleanups.push(() => el.ownerDocument.removeEventListener("reset", onReset, true))
+    cleanups.push(() =>
+      el.ownerDocument.removeEventListener("reset", onReset, true)
+    )
 
     // Passing `invalid`, or no longer passing it, starts the browser's validation over.
     let external = store.get().external
@@ -340,15 +408,17 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
         external = next
         store.set({ revealed: false })
         check()
-      }),
+      })
     )
 
     // A component's own check, like a date picker's text that isn't a date,
     // changes its control's validity without an event.
     cleanups.push(
       onValidityChange((control) => {
-        if (el.contains(control)) check()
-      }),
+        if (el.contains(control)) {
+          check()
+        }
+      })
     )
 
     // Controls that become required, disabled or enabled, or change their
@@ -358,7 +428,9 @@ function fieldApi(context: PrimitiveContext<FieldOptions, FieldStore, string>) {
     if (typeof MutationObserver !== "undefined") {
       const observer = new MutationObserver((records) => {
         const left = wired.some((control) => !el.contains(control))
-        if (left || records.some((record) => record.type === "attributes")) check()
+        if (left || records.some((record) => record.type === "attributes")) {
+          check()
+        }
       })
       observer.observe(el, {
         subtree: true,
@@ -407,7 +479,11 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
     namedByContent: false,
     required: false,
   }),
-  sync: (options) => ({ disabled: !!options.disabled, name: options.name, external: options.invalid }),
+  sync: (options) => ({
+    disabled: !!options.disabled,
+    name: options.name,
+    external: options.invalid,
+  }),
   api: (context) => fieldApi(context),
   slots: (slot) => ({
     root: slot<{}, FieldState>({
@@ -417,7 +493,9 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         const cleanups = [api.internal.bindRoot(el)]
         // Without a control part, like custom elements or a plain input, the
         // field finds its control and writes its attributes itself.
-        if (!api.internal.hasControlPart()) cleanups.push(bindFoundControl(el, api, store))
+        if (!api.internal.hasControlPart()) {
+          cleanups.push(bindFoundControl(el, api, store))
+        }
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -427,15 +505,20 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state, { api }) => fieldState(state, api),
       attrs: (state, { id, props, api }) => ({
         id: props.id ?? `${id}-label`,
-        for: state.labelable ? (state.controlId ?? fieldControlId(id)) : undefined,
+        for: state.labelable
+          ? (state.controlId ?? fieldControlId(id))
+          : undefined,
         ...dataAttrs(state, api),
       }),
       // A label that isn't a native one for the control activates it all the same.
       press({ api, el }, event) {
-        if (el instanceof HTMLLabelElement && el.control) return
+        if (el instanceof HTMLLabelElement && el.control) {
+          return
+        }
         api.activate(event)
       },
-      bind: (el, { api }) => registerById(el, (id) => api.internal.register("labels", id)),
+      bind: (el, { api }) =>
+        registerById(el, (id) => api.internal.register("labels", id)),
     }),
 
     description: slot<{}, FieldState>({
@@ -445,7 +528,8 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         id: props.id ?? `${id}-description`,
         ...dataAttrs(state, api),
       }),
-      bind: (el, { api }) => registerById(el, (id) => api.internal.register("descriptions", id)),
+      bind: (el, { api }) =>
+        registerById(el, (id) => api.internal.register("descriptions", id)),
     }),
 
     error: slot<FieldErrorProps, FieldErrorState>({
@@ -461,7 +545,9 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
         ...dataAttrs(state, api),
       }),
       bind: (el, { api }) => {
-        const unregister = registerById(el, (id) => api.internal.register("errors", id))
+        const unregister = registerById(el, (id) =>
+          api.internal.register("errors", id)
+        )
         const unannounce = api.internal.announce(el)
         return () => {
           unregister()
@@ -475,7 +561,8 @@ const fieldPrimitive = /* @__PURE__ */ definePrimitive({
     control: slot<FieldControlProps, FieldState>({
       props: { id: "string", describedBy: "string" },
       state: (state, { api }) => fieldState(state, api),
-      attrs: (state, { id, props, api }) => controlAttrs(state, api, props, fieldControlId(id)),
+      attrs: (state, { id, props, api }) =>
+        controlAttrs(state, api, props, fieldControlId(id)),
       bind: (el, { api }) => {
         api.internal.adopt(el)
         return () => {}

@@ -1,4 +1,9 @@
-import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/solid/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/solid/command"
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
 import { commandFixture as f } from "tests/fixtures/command.ts"
@@ -17,13 +22,19 @@ function Fixture() {
       >
         <CommandInput class="input" aria-label={f.input} />
         <CommandList class="command-list">
-          <CommandItem class="item" value="docs" render={(props) => <a {...props} href="#docs" />}>
+          <CommandItem
+            class="item"
+            value="docs"
+            render={(props) => <a {...props} href="#docs" />}
+          >
             Docs
           </CommandItem>
           <For each={f.groups[0].items.slice(0, 2)}>
             {(item) => (
               <CommandItem
-                class={(state) => `item ${state.highlighted ? "is-highlighted" : ""}`}
+                class={(state) =>
+                  `item ${state.highlighted ? "is-highlighted" : ""}`
+                }
                 value={item.value}
                 label={item.label}
                 render={(props, state) => (

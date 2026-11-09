@@ -16,4 +16,8 @@ The format to type, like "MM/DD/YYYY". The inputs are described by it.
 
 {#snippet fallback(state: DatePickerHintState)}{state.placeholder}{/snippet}
 
-<Part tag="span" part={hint} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="span"
+  part={hint}
+  props={{ ...rest, children: children ?? fallback }}
+/>

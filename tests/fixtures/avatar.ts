@@ -18,7 +18,12 @@ const avatarFixture = {
     { name: "Ada Lovelace", initials: "AL", src: "/avatars/ada.png" },
     { name: "Grace Hopper", initials: "GH", src: "/avatars/missing.png" },
     { name: "Alan Turing", initials: "AT" },
-    { name: "Katherine Johnson", initials: "KJ", src: "/avatars/slow.png", delay: 600 },
+    {
+      name: "Katherine Johnson",
+      initials: "KJ",
+      src: "/avatars/slow.png",
+      delay: 600,
+    },
     {
       name: "Hedy Lamarr",
       initials: "HL",
@@ -31,7 +36,8 @@ const avatarFixture = {
 }
 
 // What the "Last action" status says after the first avatar's status changes.
-const avatarAction = (status: string, reason: string) => `ada: ${status} (${reason})`
+const avatarAction = (status: string, reason: string) =>
+  `ada: ${status} (${reason})`
 
 // A 2x2 PNG.
 const avatarPng =

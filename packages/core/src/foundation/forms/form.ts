@@ -15,7 +15,10 @@ import type { bindElementInternals } from "./form-internals"
 
 type InternalsBinder = typeof bindElementInternals
 
-const internalsOf = new WeakMap<HTMLElement, { internals: ElementInternals; bind: InternalsBinder }>()
+const internalsOf = new WeakMap<
+  HTMLElement,
+  { internals: ElementInternals; bind: InternalsBinder }
+>()
 
 // What a control submits: one value, several under its name, entries of its
 // own like files, or nothing.
@@ -26,37 +29,54 @@ const focusOf = new WeakMap<HTMLElement, () => void>()
 function focusWith(el: HTMLElement, focus: () => void) {
   focusOf.set(el, focus)
   return () => {
-    if (focusOf.get(el) === focus) focusOf.delete(el)
+    if (focusOf.get(el) === focus) {
+      focusOf.delete(el)
+    }
   }
 }
 
 // Focuses a control the way a user would reach it. A group focuses its tab stop.
 function focusControl(el: HTMLElement) {
   const focus = focusOf.get(el)
-  if (focus) focus()
-  else el.focus()
+  if (focus) {
+    focus()
+  } else {
+    el.focus()
+  }
 }
 
 // The first invalid control of a submission takes focus, and later ones don't
 // steal it. Microtasks run between the browser's invalid events, so the claim
 // lasts until the next task.
 const focusing = new WeakSet<object>()
-function claimInvalidFocus(el: HTMLElement, form: HTMLFormElement | null | undefined) {
+function claimInvalidFocus(
+  el: HTMLElement,
+  form: HTMLFormElement | null | undefined
+) {
   const owner = form ?? el.ownerDocument
-  if (focusing.has(owner)) return
+  if (focusing.has(owner)) {
+    return
+  }
   focusing.add(owner)
   setTimeout(() => focusing.delete(owner))
   focusControl(el)
 }
 
 // Whether an earlier control of this submission already took focus.
-function invalidFocusClaimed(el: HTMLElement, form: HTMLFormElement | null | undefined) {
+function invalidFocusClaimed(
+  el: HTMLElement,
+  form: HTMLFormElement | null | undefined
+) {
   return focusing.has(form ?? el.ownerDocument)
 }
 
 // Called by adapters for form-associated custom elements, with
 // `bindElementInternals` from form-internals.ts, so only they ship it.
-function attachFormInternals(el: HTMLElement, internals: ElementInternals, bind: InternalsBinder) {
+function attachFormInternals(
+  el: HTMLElement,
+  internals: ElementInternals,
+  bind: InternalsBinder
+) {
   internalsOf.set(el, { internals, bind })
 }
 
@@ -68,8 +88,12 @@ const messages = new Map<string, string>()
 
 // The browser's own message for a missing value, in the user's language. A
 // detached required input carries it.
-function valueMissingMessage(type: "checkbox" | "radio" | "select" | "file" | "text") {
-  if (typeof document === "undefined") return ""
+function valueMissingMessage(
+  type: "checkbox" | "radio" | "select" | "file" | "text"
+) {
+  if (typeof document === "undefined") {
+    return ""
+  }
   if (!messages.has(type)) {
     const control =
       type === "select"
@@ -102,7 +126,10 @@ function onValidityChange(listener: (el: HTMLElement) => void) {
 // The message a component holds on a control, and the app's own message it
 // replaced. Kept by element, so a part that binds again, like under React's
 // <Activity>, picks up what the element already carries.
-const heldMessages = new WeakMap<HTMLInputElement, { message: string; app: string }>()
+const heldMessages = new WeakMap<
+  HTMLInputElement,
+  { message: string; app: string }
+>()
 
 // Sets a native control's custom validity from a component's own check, like a
 // date picker's text that isn't a date, and tells fields around it. An empty
@@ -111,14 +138,24 @@ const heldMessages = new WeakMap<HTMLInputElement, { message: string; app: strin
 // one, reports no message, so there it's taken to still hold the component's.
 function setComponentValidity(el: HTMLInputElement, message: string) {
   const held = heldMessages.get(el)
-  if ((held?.message ?? "") === message) return
+  if ((held?.message ?? "") === message) {
+    return
+  }
   if (message) {
-    if (held) held.message = message
-    else heldMessages.set(el, { message, app: el.validity.customError ? el.validationMessage : "" })
+    if (held) {
+      held.message = message
+    } else {
+      heldMessages.set(el, {
+        message,
+        app: el.validity.customError ? el.validationMessage : "",
+      })
+    }
     el.setCustomValidity(message)
   } else {
     heldMessages.delete(el)
-    if (!el.willValidate || el.validationMessage === held!.message) el.setCustomValidity(held!.app)
+    if (!el.willValidate || el.validationMessage === held!.message) {
+      el.setCustomValidity(held!.app)
+    }
   }
   validityChanged(el)
 }
@@ -142,21 +179,29 @@ const blocksImplicitSubmission = new Set([
 // native one: it clicks the default button, or submits a form without one
 // when nothing else claims Enter.
 function submitImplicitly(form: HTMLFormElement | null | undefined) {
-  if (!form) return
+  if (!form) {
+    return
+  }
   const elements = Array.from(form.elements)
   const button = elements.find(
     (el) =>
       (el instanceof HTMLButtonElement && el.type === "submit") ||
-      (el instanceof HTMLInputElement && (el.type === "submit" || el.type === "image")),
+      (el instanceof HTMLInputElement &&
+        (el.type === "submit" || el.type === "image"))
   ) as HTMLButtonElement | HTMLInputElement | undefined
   if (button) {
-    if (!button.disabled) button.click()
+    if (!button.disabled) {
+      button.click()
+    }
     return
   }
   const blocking = elements.filter(
-    (el) => el instanceof HTMLInputElement && blocksImplicitSubmission.has(el.type),
+    (el) =>
+      el instanceof HTMLInputElement && blocksImplicitSubmission.has(el.type)
   )
-  if (blocking.length <= 1) form.requestSubmit()
+  if (blocking.length <= 1) {
+    form.requestSubmit()
+  }
 }
 
 // Native `input` and `change` events from the element that takes part in the
@@ -165,14 +210,22 @@ function submitImplicitly(form: HTMLFormElement | null | undefined) {
 // when the interaction ends, like a native range or text input.
 function dispatchChange(
   el: HTMLElement | undefined,
-  types: readonly ("input" | "change")[] = ["input", "change"],
+  types: readonly ("input" | "change")[] = ["input", "change"]
 ) {
-  if (!el || writingFromScript(el)) return
+  if (!el || writingFromScript(el)) {
+    return
+  }
   // Controlled components render the new value first.
   queueMicrotask(() => {
-    if (!el.isConnected) return
-    if (types.includes("input")) el.dispatchEvent(new Event("input", { bubbles: true, composed: true }))
-    if (types.includes("change")) el.dispatchEvent(new Event("change", { bubbles: true }))
+    if (!el.isConnected) {
+      return
+    }
+    if (types.includes("input")) {
+      el.dispatchEvent(new Event("input", { bubbles: true, composed: true }))
+    }
+    if (types.includes("change")) {
+      el.dispatchEvent(new Event("change", { bubbles: true }))
+    }
   })
 }
 
@@ -180,9 +233,13 @@ function dispatchChange(
 // those in its first legend.
 function fieldsetDisabled(el: Element) {
   for (let node = el.parentElement; node; node = node.parentElement) {
-    if (!(node instanceof HTMLFieldSetElement) || !node.disabled) continue
+    if (!(node instanceof HTMLFieldSetElement) || !node.disabled) {
+      continue
+    }
     const legend = node.querySelector(":scope > legend")
-    if (!legend?.contains(el)) return true
+    if (!legend?.contains(el)) {
+      return true
+    }
   }
   return false
 }
@@ -201,18 +258,25 @@ type Association = {
 
 // The form side of a hidden native input: a form reset, the browser focusing
 // it (like on an invalid submit), and ancestor fieldsets disabling it.
-function associate(input: HTMLInputElement, options: Association & { focus: () => void; write: () => void }) {
+function associate(
+  input: HTMLInputElement,
+  options: Association & { focus: () => void; write: () => void }
+) {
   const cleanups: (() => void)[] = []
 
   const onReset = (event: Event) => {
-    if (event.target !== input.form) return
+    if (event.target !== input.form) {
+      return
+    }
     afterReset(event, () => {
       options.reset()
       options.write()
     })
   }
   input.ownerDocument.addEventListener("reset", onReset, true)
-  cleanups.push(() => input.ownerDocument.removeEventListener("reset", onReset, true))
+  cleanups.push(() =>
+    input.ownerDocument.removeEventListener("reset", onReset, true)
+  )
 
   const onFocus = () => options.focus()
   input.addEventListener("focus", onFocus)
@@ -238,20 +302,37 @@ function watchFieldsets(el: Element, onChange: (disabled: boolean) => void) {
   const check = () => {
     if (observer) {
       observer.disconnect()
-      for (let node = el.parentElement; node?.closest("fieldset"); node = node.parentElement)
-        observer.observe(node, { childList: true, attributeFilter: ["disabled"] })
+      for (
+        let node = el.parentElement;
+        node?.closest("fieldset");
+        node = node.parentElement
+      ) {
+        observer.observe(node, {
+          childList: true,
+          attributeFilter: ["disabled"],
+        })
+      }
     }
     const now = fieldsetDisabled(el)
-    if (now !== disabled) onChange((disabled = now))
+    if (now !== disabled) {
+      onChange((disabled = now))
+    }
   }
   const watch = () => {
-    if (!active) return
-    if (typeof MutationObserver !== "undefined") observer = new MutationObserver(check)
+    if (!active) {
+      return
+    }
+    if (typeof MutationObserver !== "undefined") {
+      observer = new MutationObserver(check)
+    }
     check()
     moves.set(el, check)
   }
-  if (el.isConnected) watch()
-  else queueMicrotask(watch)
+  if (el.isConnected) {
+    watch()
+  } else {
+    queueMicrotask(watch)
+  }
   return () => {
     active = false
     observer?.disconnect()
@@ -267,8 +348,10 @@ const elementMoved = (el: Element) => moves.get(el)?.()
 const isDisabled = (state: { disabled: boolean; formDisabled: boolean }) =>
   state.disabled || state.formDisabled
 
-const watchFormDisabled = (el: Element, store: { set: (patch: { formDisabled: boolean }) => void }) =>
-  watchFieldsets(el, (formDisabled) => store.set({ formDisabled }))
+const watchFormDisabled = (
+  el: Element,
+  store: { set: (patch: { formDisabled: boolean }) => void }
+) => watchFieldsets(el, (formDisabled) => store.set({ formDisabled }))
 
 // Whether a person can't use `el`: natively disabled, by itself or a fieldset,
 // or marked `aria-disabled`.
@@ -290,22 +373,31 @@ function bindHiddenInput(
     control?: () => HTMLElement | undefined
     // What a click from a label does: toggle or select, like on the control.
     activate?: (event: Event) => void
-  },
+  }
 ) {
   const write = () => {
     const checked = options.checked()
-    if (input.checked !== checked) input.checked = checked
+    if (input.checked !== checked) {
+      input.checked = checked
+    }
     const indeterminate = options.indeterminate?.() ?? false
-    if (input.indeterminate !== indeterminate) input.indeterminate = indeterminate
+    if (input.indeterminate !== indeterminate) {
+      input.indeterminate = indeterminate
+    }
   }
   write()
-  const cleanups = [options.subscribe(write), associate(input, { ...options, write })]
+  const cleanups = [
+    options.subscribe(write),
+    associate(input, { ...options, write }),
+  ]
 
   // A label around a control that isn't labelable activates this input. The
   // control does what it would have done, and the input stays in step.
   const onClick = (event: MouseEvent) => {
     const control = options.control?.()
-    if (!control || isLabelable(control)) return
+    if (!control || isLabelable(control)) {
+      return
+    }
     event.preventDefault()
     options.focus()
     options.activate?.(event)
@@ -315,7 +407,9 @@ function bindHiddenInput(
   // Labels around it name the control too.
   queueMicrotask(() => {
     const control = options.control?.()
-    if (control && !isLabelable(control)) cleanups.push(labelledBy(control, () => labelsOf(input)))
+    if (control && !isLabelable(control)) {
+      cleanups.push(labelledBy(control, () => labelsOf(input)))
+    }
   })
 
   return () => cleanups.forEach((cleanup) => cleanup())
@@ -332,13 +426,15 @@ function bindValueInput(
     subscribe: (listener: () => void) => () => void
     focus: () => void
     autofill?: (value: string) => void
-  },
+  }
 ) {
   const write = () => writeValue(input, options.value())
   write()
   // Events this code dispatches itself carry no autofill.
   const onChange = (event: Event) => {
-    if (!trusted(event) || input.value === options.value()) return
+    if (!trusted(event) || input.value === options.value()) {
+      return
+    }
     options.autofill?.(input.value)
     write()
   }
@@ -354,7 +450,10 @@ function bindValueInput(
 // Reports a form-associated custom element's value and validity through its
 // ElementInternals, with the binder the web adapter attached. Elsewhere,
 // like for a React control, it does nothing.
-function bindInternals(el: HTMLElement, options: Parameters<InternalsBinder>[2]) {
+function bindInternals(
+  el: HTMLElement,
+  options: Parameters<InternalsBinder>[2]
+) {
   const attached = internalsOf.get(el)
   return attached ? attached.bind(el, attached.internals, options) : () => {}
 }
@@ -382,7 +481,9 @@ function isLabelable(el: HTMLElement) {
 // Does nothing for elements that aren't form-associated. `target` is the
 // element to name, when it isn't the custom element itself, like a select's trigger.
 function nameFromLabels(el: HTMLElement, target: HTMLElement = el) {
-  return formInternals(el) ? labelledBy(target, () => labelsOf(el), el) : () => {}
+  return formInternals(el)
+    ? labelledBy(target, () => labelsOf(el), el)
+    : () => {}
 }
 
 // The <label> elements that name a labelable element, in document order,
@@ -393,33 +494,56 @@ function nameFromLabels(el: HTMLElement, target: HTMLElement = el) {
 function labelsOf(el: HTMLElement) {
   const labels: HTMLLabelElement[] = []
   const around = el.closest("label")
-  if (around?.control === el) labels.push(around)
+  if (around?.control === el) {
+    labels.push(around)
+  }
   if (el.id) {
     const root = el.getRootNode() as ParentNode
-    root.querySelectorAll<HTMLLabelElement>(`label[for="${CSS.escape(el.id)}"]`).forEach((label) => {
-      if (label !== around && label.control === el) labels.push(label)
-    })
+    root
+      .querySelectorAll<HTMLLabelElement>(`label[for="${CSS.escape(el.id)}"]`)
+      .forEach((label) => {
+        if (label !== around && label.control === el) {
+          labels.push(label)
+        }
+      })
   }
   return labels.sort(documentOrder)
 }
 
 // Points aria-labelledby at labels, unless the element is named some other way.
 // `watch` is where focus arriving refreshes it, the element itself by default.
-function labelledBy(el: HTMLElement, findLabels: () => HTMLElement[], watch: HTMLElement = el) {
+function labelledBy(
+  el: HTMLElement,
+  findLabels: () => HTMLElement[],
+  watch: HTMLElement = el
+) {
   let written: string | undefined
   const update = () => {
     const current = el.getAttribute("aria-labelledby")
-    if (el.hasAttribute("aria-label") || (current !== null && current !== written)) return
+    if (
+      el.hasAttribute("aria-label") ||
+      (current !== null && current !== written)
+    ) {
+      return
+    }
     const labels = findLabels()
-    for (const label of labels) if (!label.id) label.id = `ui-sdk-label-${++labelCount}`
+    for (const label of labels) {
+      if (!label.id) {
+        label.id = `ui-sdk-label-${++labelCount}`
+      }
+    }
     const ids = labels.map((label) => label.id).join(" ")
     if (!ids) {
-      if (written !== undefined) el.removeAttribute("aria-labelledby")
+      if (written !== undefined) {
+        el.removeAttribute("aria-labelledby")
+      }
       written = undefined
       return
     }
     written = ids
-    if (current !== ids) el.setAttribute("aria-labelledby", ids)
+    if (current !== ids) {
+      el.setAttribute("aria-labelledby", ids)
+    }
   }
   // Labels after the element connect after it.
   queueMicrotask(update)

@@ -22,7 +22,9 @@ function Header({ issues }: { issues: { id: string; title: string }[] }) {
   return (
     <header className="flex h-12 shrink-0 items-center gap-2 border-b border-border px-3">
       <Menu>
-        <MenuTrigger className={buttonVariants({ variant: "ghost", size: "sm" })}>
+        <MenuTrigger
+          className={buttonVariants({ variant: "ghost", size: "sm" })}
+        >
           <span
             aria-hidden="true"
             className="flex size-5 items-center justify-center rounded-md bg-primary text-[10px] font-semibold text-primary-foreground"

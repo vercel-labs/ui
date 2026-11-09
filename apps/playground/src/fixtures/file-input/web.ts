@@ -72,15 +72,22 @@ async function mount(root: HTMLElement) {
   for (const el of root.querySelectorAll<UiFileInputElement>("ui-file-input")) {
     const kind = el.dataset.kind ?? ""
     el.addEventListener("valuechange", (event) => {
-      if (options.cancel) event.preventDefault()
+      if (options.cancel) {
+        event.preventDefault()
+      }
       changed = true
       queueMicrotask(() => (changed = false))
       action.textContent = describeChange(kind, event.detail)
       count.textContent = String(Number(count.textContent) + 1)
     })
     el.addEventListener("reject", (event) => {
-      if (changed) return
-      action.textContent = describeChange(kind, { reason: event.detail.reason, rejected: event.detail.value })
+      if (changed) {
+        return
+      }
+      action.textContent = describeChange(kind, {
+        reason: event.detail.reason,
+        rejected: event.detail.value,
+      })
     })
   }
   const form = root.querySelector("form")!

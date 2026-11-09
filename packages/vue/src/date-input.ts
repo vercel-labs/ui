@@ -1,7 +1,12 @@
 import { dateInput, type DateMatchers } from "@ui-sdk/core/date-input"
 import { defineComponent, type PropType } from "vue"
 import { withElement } from "./create-parts"
-import { defineSegment, rootEmits, rootProps, setupRoot } from "./segmented-input"
+import {
+  defineSegment,
+  rootEmits,
+  rootProps,
+  setupRoot,
+} from "./segmented-input"
 import type { PartSlots } from "./use-primitive"
 
 /**
@@ -22,11 +27,15 @@ const DateInput = withElement(
   defineComponent({
     name: "DateInput",
     inheritAttrs: false,
-    props: { ...rootProps, unavailable: null as unknown as PropType<DateMatchers> },
+    props: {
+      ...rootProps,
+      unavailable: null as unknown as PropType<DateMatchers>,
+    },
     emits: rootEmits,
     slots: Object as PartSlots<typeof dateInput, "root">,
-    setup: (props, context) => setupRoot(dateInput, DateInputSegment, props, context),
-  }),
+    setup: (props, context) =>
+      setupRoot(dateInput, DateInputSegment, props, context),
+  })
 )
 
 export { createDateInputController } from "@ui-sdk/core/date-input"

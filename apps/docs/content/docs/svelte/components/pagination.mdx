@@ -113,7 +113,11 @@ With only a few pages, the range has no gaps, so you can write the links out and
 Pass `getHref` to map each page to a URL. Page links and steps then render as anchors.
 
 ```svelte
-<Pagination aria-label="Pagination" pageCount={10} getHref={(page) => `/posts?page=${page}`}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={10}
+  getHref={(page) => `/posts?page=${page}`}
+>
   ...
 </Pagination>
 ```
@@ -135,7 +139,12 @@ Read the page from the URL, like your router's search params, so the route [cont
   const page = $derived(Number(route.url.searchParams.get("page") ?? 1))
 </script>
 
-<Pagination aria-label="Pagination" pageCount={10} {page} getHref={(page) => `?page=${page}`}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={10}
+  {page}
+  getHref={(page) => `?page=${page}`}
+>
   ...
 </Pagination>
 ```
@@ -149,9 +158,7 @@ Bind `page` with `bind:page` to control the pagination, and use `onPageChange` f
   let page = $state(1)
 </script>
 
-<Pagination bind:page aria-label="Pagination" pageCount={10}>
-  ...
-</Pagination>
+<Pagination bind:page aria-label="Pagination" pageCount={10}>...</Pagination>
 ```
 
 Every change carries a [reason](#reasons): `item-press` for a page, `previous-press`, `next-press`, `first-press` or `last-press` for a step, and `imperative` from a [controller](#controller). Call `details.cancel()` to keep the page, like while a form has unsaved changes. A canceled change also stops a link from navigating.
@@ -171,7 +178,12 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
 
 ```svelte
-<Pagination aria-label="Pagination" pageCount={20} defaultPage={10} siblings={2}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={20}
+  defaultPage={10}
+  siblings={2}
+>
   ...
 </Pagination>
 ```
@@ -181,7 +193,12 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `boundaries` is how many pages always show at each end, 1 by default.
 
 ```svelte
-<Pagination aria-label="Pagination" pageCount={20} defaultPage={10} boundaries={2}>
+<Pagination
+  aria-label="Pagination"
+  pageCount={20}
+  defaultPage={10}
+  boundaries={2}
+>
   ...
 </Pagination>
 ```
@@ -209,7 +226,9 @@ A [controller](#controller), from `createPaginationController()`, pages the pagi
 <script lang="ts">
   import { paginationRange } from "@ui-sdk/core/pagination"
 
-  const items = $derived(paginationRange({ page: slide, pageCount: 20, siblings: 2, boundaries: 1 }))
+  const items = $derived(
+    paginationRange({ page: slide, pageCount: 20, siblings: 2, boundaries: 1 })
+  )
 </script>
 
 <div role="group" aria-label="Slides">
@@ -270,11 +289,17 @@ Props and callbacks are the same as below, as Svelte props. `page` can be bound 
 
 ### Pagination
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationOptions" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationOptions"
+/>
 
 ### PaginationLink
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkProps" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkProps"
+/>
 
 `PaginationList`, `PaginationItem`, `PaginationPrevious`, `PaginationNext`, `PaginationFirst`, `PaginationLast` and `PaginationEllipsis` take no props of their own.
 
@@ -284,15 +309,24 @@ What `render` and `children` snippets receive, per part.
 
 `Pagination` and `PaginationList`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationState"
+/>
 
 `PaginationLink`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkState"
+/>
 
 `PaginationPrevious`, `PaginationNext`, `PaginationFirst` and `PaginationLast`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationStepState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationStepState"
+/>
 
 ### Reasons
 

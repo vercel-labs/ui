@@ -10,7 +10,10 @@
 // its controller with another payload, `open({ payload: "linus" })`, while it's open.
 const popupPayloadsFixture = {
   menu: { triggers: ["Roadmap", "Budget"], item: "Open" },
-  popover: { triggers: ["Ada", "Grace"], show: { label: "Show Linus", payload: "linus" } },
+  popover: {
+    triggers: ["Ada", "Grace"],
+    show: { label: "Show Linus", payload: "linus" },
+  },
   dialog: { triggers: ["Invoice 1", "Invoice 2"] },
   drawer: { triggers: ["Photo 1", "Photo 2"] },
 }

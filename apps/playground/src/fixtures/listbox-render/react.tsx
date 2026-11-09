@@ -30,11 +30,20 @@ function Fixture() {
         </ListboxItem>
         <ListboxItem
           value="star"
-          className={(state) => `item ${state.selected ? "is-selected" : "is-unselected"}`}
-          render={(props, state) => <li {...props}>{state.selected ? "★" : "☆"} Star</li>}
+          className={(state) =>
+            `item ${state.selected ? "is-selected" : "is-unselected"}`
+          }
+          render={(props, state) => (
+            <li {...props}>{state.selected ? "★" : "☆"} Star</li>
+          )}
         />
         {f.items.slice(0, 3).map((item) => (
-          <ListboxItem key={item.value} className="item" value={item.value} render={<li />}>
+          <ListboxItem
+            key={item.value}
+            className="item"
+            value={item.value}
+            render={<li />}
+          >
             {counted(item.label)}
           </ListboxItem>
         ))}
@@ -51,7 +60,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

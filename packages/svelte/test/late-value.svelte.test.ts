@@ -8,10 +8,17 @@ import App from "./apps/tabs-late-value-app.svelte"
 import RefusingApp from "./apps/tabs-refusing-binding-app.svelte"
 
 test("a bound value set after mount selects its tab", async () => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   const target = document.createElement("div")
   document.body.append(target)
-  const props = $state({ api: undefined as unknown as { set: (value: string) => void; get: () => unknown } })
+  const props = $state({
+    api: undefined as unknown as {
+      set: (value: string) => void
+      get: () => unknown
+    },
+  })
   const app = mount(App, { target, props })
   flushSync()
   const panel = () => target.querySelector('[role="tabpanel"]')?.textContent
@@ -34,12 +41,17 @@ test("a bound value set after mount selects its tab", async () => {
 test("a function binding that starts empty and saved one change still refuses the next", () => {
   const target = document.createElement("div")
   document.body.append(target)
-  const props = $state({ api: undefined as unknown as { refuse: () => void; get: () => unknown } })
+  const props = $state({
+    api: undefined as unknown as { refuse: () => void; get: () => unknown },
+  })
   const app = mount(RefusingApp, { target, props })
   flushSync()
   const tab = (name: string) =>
-    [...target.querySelectorAll<HTMLElement>('[role="tab"]')].find((el) => el.textContent === name)!
-  const panel = () => target.querySelector('[role="tabpanel"]:not([hidden])')?.textContent
+    [...target.querySelectorAll<HTMLElement>('[role="tab"]')].find(
+      (el) => el.textContent === name
+    )!
+  const panel = () =>
+    target.querySelector('[role="tabpanel"]:not([hidden])')?.textContent
   tab("Beta").click()
   flushSync()
   expect(props.api.get()).toBe("b")

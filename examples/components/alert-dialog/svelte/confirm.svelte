@@ -15,9 +15,13 @@
   let reset: HTMLButtonElement
 
   async function remove(name: string, button: HTMLButtonElement) {
-    if (!(await confirm({ name }))) return
+    if (!(await confirm({ name }))) {
+      return
+    }
     const row = button.closest("li")
-    const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+    const next = (
+      row?.nextElementSibling ?? row?.previousElementSibling
+    )?.querySelector("button")
     const target = next ?? reset
     target?.focus()
     projects = projects.filter((project) => project !== name)
@@ -26,7 +30,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" bind:this={reset} onclick={() => (projects = ["Acme", "Globex", "Initech"])}>
+    <button
+      type="button"
+      bind:this={reset}
+      onclick={() => (projects = ["Acme", "Globex", "Initech"])}
+    >
       Reset Projects
     </button>
   </div>
@@ -59,7 +67,9 @@
         </div>
         <div data-slot="row">
           <AlertDialogClose>Cancel</AlertDialogClose>
-          <AlertDialogClose data-variant="solid" value="confirm">Delete</AlertDialogClose>
+          <AlertDialogClose data-variant="solid" value="confirm"
+            >Delete</AlertDialogClose
+          >
         </div>
       {/snippet}
     </AlertDialogContent>

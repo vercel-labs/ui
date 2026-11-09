@@ -14,8 +14,14 @@ function exposeDialogFixture(controller: unknown, confirm: unknown) {
 }
 
 // Records "dialog:false:escape-key".
-function recordOpenChange(name: string, open: boolean, details: { reason: string }) {
-  ;((window as unknown as Window).__openChanges ??= []).push(`${name}:${open}:${details.reason}`)
+function recordOpenChange(
+  name: string,
+  open: boolean,
+  details: { reason: string }
+) {
+  ;((window as unknown as Window).__openChanges ??= []).push(
+    `${name}:${open}:${details.reason}`
+  )
 }
 
 export { exposeDialogFixture, recordOpenChange }

@@ -30,7 +30,11 @@ function Example() {
         <AutocompleteList>
           <For each={tags}>
             {(tag) => (
-              <AutocompleteItem value={tag.value} label={tag.label} keywords={tag.keywords}>
+              <AutocompleteItem
+                value={tag.value}
+                label={tag.label}
+                keywords={tag.keywords}
+              >
                 {tag.label}
                 <span data-slot="hint">{tag.keywords[0]}</span>
               </AutocompleteItem>

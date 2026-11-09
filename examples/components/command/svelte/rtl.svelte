@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/svelte/command"
+  import {
+    Command,
+    CommandEmpty,
+    CommandInput,
+    CommandItem,
+    CommandList,
+  } from "@ui-sdk/svelte/command"
 
   const commands = [
     { value: "calendar", label: "التقويم" },
@@ -7,7 +13,6 @@
     { value: "settings", label: "الإعدادات" },
     { value: "profile", label: "الملف الشخصي" },
   ]
-
 </script>
 
 <div dir="rtl" data-slot="stack">

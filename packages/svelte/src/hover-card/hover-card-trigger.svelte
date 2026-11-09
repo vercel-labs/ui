@@ -20,10 +20,12 @@ A link by default: pressing it follows the link, and hover or focus opens the ca
     payload,
     controller,
     ...rest
-  }: PartProps<"a", HoverCardTriggerState> &
-    HoverCardTriggerProps = $props()
+  }: PartProps<"a", HoverCardTriggerState> & HoverCardTriggerProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<HoverCardContext | undefined>(hoverCardPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<HoverCardContext | undefined>(hoverCardPrimitive)
+  )
   const hoverCard = $derived(connected())
 </script>
 

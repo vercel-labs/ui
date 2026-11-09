@@ -8,7 +8,9 @@
 
   function onSubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+    const entries = [...new FormData(event.currentTarget)].map(
+      ([name, value]) => `${name}=${value}`
+    )
     log(entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
   }
 </script>
@@ -22,7 +24,9 @@
     </Checkbox>
     <div data-slot="stack">
       <FieldLabel>Accept terms and conditions</FieldLabel>
-      <FieldDescription>You agree to our Terms of Service and Privacy Policy.</FieldDescription>
+      <FieldDescription
+        >You agree to our Terms of Service and Privacy Policy.</FieldDescription
+      >
     </div>
   </Field>
   <Field>
@@ -33,7 +37,9 @@
     </Checkbox>
     <div data-slot="stack">
       <FieldLabel>Send me the weekly newsletter</FieldLabel>
-      <FieldDescription>Product news and tips, once a week. Unsubscribe anytime.</FieldDescription>
+      <FieldDescription
+        >Product news and tips, once a week. Unsubscribe anytime.</FieldDescription
+      >
     </div>
   </Field>
   <div data-slot="row">

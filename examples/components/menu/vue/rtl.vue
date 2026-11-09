@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { ChevronRightIcon, FileIcon, FolderIcon, LinkIcon, MailIcon, ShareIcon, TrashIcon } from "@lucide/vue"
+import {
+  ChevronRightIcon,
+  FileIcon,
+  FolderIcon,
+  LinkIcon,
+  MailIcon,
+  ShareIcon,
+  TrashIcon,
+} from "@lucide/vue"
 import {
   Menu,
   MenuContent,
@@ -53,6 +61,8 @@ const action = ref("")
         </MenuItem>
       </MenuContent>
     </Menu>
-    <output data-slot="output">{{ action ? `نُفّذ: ${action}` : "اختر عنصرًا" }}</output>
+    <output data-slot="output">{{
+      action ? `نُفّذ: ${action}` : "اختر عنصرًا"
+    }}</output>
   </div>
 </template>

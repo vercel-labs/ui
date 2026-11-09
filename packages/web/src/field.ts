@@ -13,19 +13,24 @@ const owner = "ui-field"
 // adapters write, so styles that select it, and the rule that keeps a hidden
 // part hidden, still match.
 function writeAlone(el: HTMLElement, slot: FieldOutsideSlot) {
-  for (const [name, value] of Object.entries(fieldOutsideAttrs(slot)))
-    if (el.getAttribute(name) !== value) el.setAttribute(name, value)
+  for (const [name, value] of Object.entries(fieldOutsideAttrs(slot))) {
+    if (el.getAttribute(name) !== value) {
+      el.setAttribute(name, value)
+    }
+  }
 }
 
 // A label outside any field names its control only as a native <label>. With
 // as-child, its child may come later, and the label runs this again then.
 function labelAlone(el: HTMLElement, host: HTMLElement) {
   writeAlone(el, "label")
-  if (el === host && host.hasAttribute("as-child")) return
+  if (el === host && host.hasAttribute("as-child")) {
+    return
+  }
   checkFieldOutside(
     el,
     "label",
-    "Put `as-child` on the <ui-field-label>, around a native <label> that wraps the control.",
+    "Put `as-child` on the <ui-field-label>, around a native <label> that wraps the control."
   )
 }
 
@@ -33,10 +38,14 @@ function labelAlone(el: HTMLElement, host: HTMLElement) {
 // that is present or "true" shows it. With as-child, its child may come later,
 // and the error runs this again then.
 function errorAlone(el: HTMLElement, host: HTMLElement) {
-  if (el === host && host.hasAttribute("as-child")) return
+  if (el === host && host.hasAttribute("as-child")) {
+    return
+  }
   writeAlone(el, "error")
   const match = host.getAttribute("match")
-  el.hidden = !fieldOutsideErrorShown({ match: match === "" || match === "true" })
+  el.hidden = !fieldOutsideErrorShown({
+    match: match === "" || match === "true",
+  })
 }
 
 // <ui-field> ties the control inside it to its label and messages. The control
@@ -82,12 +91,20 @@ function defineFieldElements() {
       // Empty errors show the current message.
       render(el, instance) {
         const update = () => {
-          for (const error of Array.from(el.querySelectorAll<HTMLElement>("ui-field-error"))) {
-            if (error.closest(owner) !== el) continue
-            if (!("message" in error.dataset) && error.childNodes.length) continue
+          for (const error of Array.from(
+            el.querySelectorAll<HTMLElement>("ui-field-error")
+          )) {
+            if (error.closest(owner) !== el) {
+              continue
+            }
+            if (!("message" in error.dataset) && error.childNodes.length) {
+              continue
+            }
             error.dataset.message = ""
             const message = instance.api.internal.message()
-            if (error.textContent !== message) error.textContent = message
+            if (error.textContent !== message) {
+              error.textContent = message
+            }
           }
         }
         queueMicrotask(update)

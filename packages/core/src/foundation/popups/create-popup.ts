@@ -8,7 +8,11 @@ import { deriveFromOptions } from "../kernel/derive"
 import { createChange } from "../kernel/input-source"
 import { elements } from "../kernel/elements"
 import type { ChangeDetails } from "../kernel/details"
-import type { Part, PrimitiveContext, ReasonFor } from "../kernel/primitive-types"
+import type {
+  Part,
+  PrimitiveContext,
+  ReasonFor,
+} from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
 import type { Layer } from "../platform/layers"
 import type { DismissRules } from "./dismissal"
@@ -109,7 +113,7 @@ type PopupRules = DismissRules & {
   /** Asks to close for a dismissal the popup layer saw, like Escape or an outside press. Closes by default. */
   dismiss?: (
     reason: PopupCloseReason,
-    details: { event?: Event; focus: ReturnMode; returnValue?: string },
+    details: { event?: Event; focus: ReturnMode; returnValue?: string }
   ) => void
   /** The element it opens from, for placement, nesting and focus return, when that isn't its trigger slot's, like a combobox's input. */
   trigger?: () => HTMLElement | undefined
@@ -135,11 +139,19 @@ type PopupRules = DismissRules & {
    * the controller's `open()` was passed.
    */
   open?: (
-    request: { trigger?: string; event?: Event; by?: PopupOpener; [option: string]: unknown },
-    open: (by?: PopupOpener) => boolean,
+    request: {
+      trigger?: string
+      event?: Event
+      by?: PopupOpener
+      [option: string]: unknown
+    },
+    open: (by?: PopupOpener) => boolean
   ) => void
   /** Decides a close: call `close` to go on, or return without calling it to stay open. */
-  close?: (request: { reason: string; event?: Event }, close: () => boolean) => void
+  close?: (
+    request: { reason: string; event?: Event },
+    close: () => boolean
+  ) => void
   /** What the content's `initialFocus` of `"auto"` prefers to its first focusable element, like an autofocused one. */
   preferredFocus?: () => HTMLElement | undefined
   /** More of what its content binds with, like a sheet's snap points. */
@@ -151,7 +163,11 @@ type PopupRules = DismissRules & {
   /** How it asks to present, when that isn't its `presentation` option, like a context menu that's always a popover. */
   presentation?: () => PresentationSetting<string> | undefined
   /** An open popup asked to open again. Another trigger takes it over by default. */
-  reopen?: (request: { trigger?: string; event?: Event; [option: string]: unknown }) => void
+  reopen?: (request: {
+    trigger?: string
+    event?: Event
+    [option: string]: unknown
+  }) => void
 }
 
 // What a preset's feature makes: there when the preset names it, which a
@@ -165,7 +181,8 @@ type Feature<Preset extends PopupPreset, Key extends keyof PopupPreset> =
 
 // The controller methods `createPopup` returns, typed by the primitive's
 // `controller` option when it has one, else by its reasons.
-type PopupMethod = "isOpen" | "setOpen" | "open" | "close" | "toggle" | "getPayload" | "focus"
+type PopupMethod =
+  "isOpen" | "setOpen" | "open" | "close" | "toggle" | "getPayload" | "focus"
 type ControllerOf<Options> = Options extends { controller?: infer Controller }
   ? NonNullable<Controller>
   : never
@@ -180,7 +197,10 @@ type PopupApiOf<Options> = [ControllerOf<Options>] extends [never]
         ? ReasonFor<Options, "open">
         : Extract<ReasonFor<Options, "payload">, ReasonFor<Options, "open">>
     >
-  : Pick<ControllerOf<Options>, Extract<keyof ControllerOf<Options>, PopupMethod>>
+  : Pick<
+      ControllerOf<Options>,
+      Extract<keyof ControllerOf<Options>, PopupMethod>
+    >
 
 /**
  * Makes a primitive a popup. Call it in `api`, spread `popupSlots(slot)`
@@ -217,7 +237,11 @@ type PopupApiOf<Options> = [ControllerOf<Options>] extends [never]
  *
  * @experimental
  */
-function createPopup<Options extends PopupOptions, State extends PopupState, Preset extends PopupPreset>(
+function createPopup<
+  Options extends PopupOptions,
+  State extends PopupState,
+  Preset extends PopupPreset,
+>(
   primitiveContext: PrimitiveContext<Options, State, string>,
   config: {
     /** The behavior, like `popoverPreset` or `hoverCardPreset`. */
@@ -247,11 +271,15 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
      * @internal
      */
     behavior?: Partial<PopupBehavior>
-  },
+  }
 ) {
   // The popup reads only the keys above, so it works on those. The
   // primitive's own options and state have more.
-  const context = primitiveContext as unknown as PrimitiveContext<PopupOptions, PopupState, string>
+  const context = primitiveContext as unknown as PrimitiveContext<
+    PopupOptions,
+    PopupState,
+    string
+  >
   const { store, element, options } = context
   const { preset } = config
   const contentSlot = config.slot ?? "content"
@@ -269,7 +297,9 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
 
   // The trigger that opened the popup last, or the first one.
   const triggerElement = () => {
-    if (rules?.trigger) return rules.trigger()
+    if (rules?.trigger) {
+      return rules.trigger()
+    }
     const key = store.get().trigger
     return (key !== null && element(triggerSlot, key)) || element(triggerSlot)
   }
@@ -281,18 +311,27 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
   let onlyTrigger: boolean | undefined
   const openedFrom = () => {
     const key = store.get().trigger
-    if (rules?.trigger || key === null || key === goneAtOpen) return triggerElement()
+    if (rules?.trigger || key === null || key === goneAtOpen) {
+      return triggerElement()
+    }
     const only = onlyTrigger ?? elements(context, triggerSlot).length <= 1
-    return element(triggerSlot, key) ?? (only ? element(triggerSlot) : undefined)
+    return (
+      element(triggerSlot, key) ?? (only ? element(triggerSlot) : undefined)
+    )
   }
   // Before the layer's own listener, which reads `openedFrom` as the popup shows.
   let wasOpen = store.get().open
   store.subscribe(() => {
     const { open, trigger } = store.get()
-    if (open === wasOpen) return
+    if (open === wasOpen) {
+      return
+    }
     wasOpen = open
-    if (!open) return
-    goneAtOpen = trigger !== null && !element(triggerSlot, trigger) ? trigger : null
+    if (!open) {
+      return
+    }
+    goneAtOpen =
+      trigger !== null && !element(triggerSlot, trigger) ? trigger : null
     onlyTrigger = elements(context, triggerSlot).length <= 1
   })
 
@@ -316,7 +355,8 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     },
     triggerElement,
     triggerSlot,
-    triggerDisabled: (key) => !!context.props<{ disabled?: boolean }>(triggerSlot, key)?.disabled,
+    triggerDisabled: (key) =>
+      !!context.props<{ disabled?: boolean }>(triggerSlot, key)?.disabled,
     contentProps,
   }
   const rules = (core.rules = config.rules?.(core))
@@ -334,20 +374,31 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
   // primitive, like Dialog's, or is never modal, like hover content, which
   // WCAG 1.4.13 needs dismissible without trapping anyone.
   function modalOf(arriving: PopupOptions, state: PopupState) {
-    if (preset.modal === undefined) return
-    return { modal: arriving.modal ?? (state.presentation === "sheet" ? true : preset.modal) }
+    if (preset.modal === undefined) {
+      return
+    }
+    return {
+      modal:
+        arriving.modal ??
+        (state.presentation === "sheet" ? true : preset.modal),
+    }
   }
   function updateModal() {
     const patch = modalOf(options(), store.get())
-    if (patch) store.set(patch)
+    if (patch) {
+      store.set(patch)
+    }
   }
   // A dismissal the popup layer saw, like Escape or an outside press.
   function dismiss(
     reason: PopupCloseReason,
-    details: { event?: Event; focus: ReturnMode; returnValue?: string },
+    details: { event?: Event; focus: ReturnMode; returnValue?: string }
   ) {
-    if (rules?.dismiss) rules.dismiss(reason, details)
-    else control.hide({ reason, ...details })
+    if (rules?.dismiss) {
+      rules.dismiss(reason, details)
+    } else {
+      control.hide({ reason, ...details })
+    }
   }
 
   const popup = createPopupLayer<PopupState, string>({
@@ -361,14 +412,17 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     contains: (target, event) =>
       rules?.contains
         ? rules.contains(target, event)
-        : !!triggerElement()?.contains(target) || !!press?.contains(target, event),
+        : !!triggerElement()?.contains(target) ||
+          !!press?.contains(target, event),
     close: dismiss,
     modal: () => rules?.modal?.() ?? modalTriple(store.get().modal),
     parent: () => rules?.parent?.(),
     persistent: () => rules?.persistent?.() ?? [],
     finalFocus: () => contentProps().finalFocus,
     onEscape: (event) =>
-      rules?.onEscape ? rules.onEscape(event) : dismiss("escape-key", { event, focus: true }),
+      rules?.onEscape
+        ? rules.onEscape(event)
+        : dismiss("escape-key", { event, focus: true }),
     onShow: (layer) => rules?.onShow?.(layer),
     onOpenChange(open, closed) {
       rules?.onOpenChange?.(open, closed)
@@ -390,8 +444,11 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
     dismissal,
     popup,
     store,
-    payload: preset.payload?.(store, (payload, details) => change("payload", payload, details)),
-    change: (open, details) => change("open", open, { ...details, ...rules?.details?.() }),
+    payload: preset.payload?.(store, (payload, details) =>
+      change("payload", payload, details)
+    ),
+    change: (open, details) =>
+      change("open", open, { ...details, ...rules?.details?.() }),
     onDestroy: context.onDestroy,
     // Read on every close, once the rules exist.
     get returnFocus() {
@@ -402,37 +459,55 @@ function createPopup<Options extends PopupOptions, State extends PopupState, Pre
       open(request, open) {
         hover?.clear()
         group?.opening(request.event)
-        if (rules?.open) rules.open(request, open)
-        else open()
+        if (rules?.open) {
+          rules.open(request, open)
+        } else {
+          open()
+        }
       },
       // Another trigger that shares the open popup takes it over, with its payload.
       reopen(request) {
         hover?.clear()
-        if (rules?.reopen) return rules.reopen(request)
+        if (rules?.reopen) {
+          return rules.reopen(request)
+        }
         const { trigger, payload, payloadReason, event } = request
-        if (trigger !== undefined && trigger !== store.get().trigger)
+        if (trigger !== undefined && trigger !== store.get().trigger) {
           control.takeOver({ trigger, payload, reason: payloadReason, event })
+        }
       },
-      close: (request, close) => (rules?.close ? rules.close(request, close) : close()),
+      close: (request, close) =>
+        rules?.close ? rules.close(request, close) : close(),
     },
   })
 
   updateModal()
   deriveFromOptions(context, ["modal"], (synced, state, arriving) =>
-    modalOf(arriving as PopupOptions, { ...state, ...synced }),
+    modalOf(arriving as PopupOptions, { ...state, ...synced })
   )
   // Whatever changes `modal` while the popup shows, its option, a sheet's
   // snap point or the primitive's own state, applies to the page at once.
   let modalShown = store.get().modal
   store.subscribe(() => {
     const { modal } = store.get()
-    if (modal === modalShown) return
+    if (modal === modalShown) {
+      return
+    }
     modalShown = modal
     popup.updateModal()
   })
 
   // Typed as there when the preset names it, which TypeScript can't tell from the calls.
-  const features = { dismissal, presentation, press, group, hover, focus, triggerName, rules } as {
+  const features = {
+    dismissal,
+    presentation,
+    press,
+    group,
+    hover,
+    focus,
+    triggerName,
+    rules,
+  } as {
     dismissal: Feature<Preset, "dismissal">
     presentation: Feature<Preset, "presentation">
     press: Feature<Preset, "press">
@@ -487,4 +562,11 @@ function popupState(options: { open?: boolean; defaultOpen?: boolean }) {
   return state
 }
 
-export { createPopup, type PopupCore, type PopupOptions, type PopupRules, type PopupState, popupState }
+export {
+  createPopup,
+  type PopupCore,
+  type PopupOptions,
+  type PopupRules,
+  type PopupState,
+  popupState,
+}

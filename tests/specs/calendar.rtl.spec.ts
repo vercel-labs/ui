@@ -14,7 +14,10 @@ test("Left and Right swap in a right-to-left page", async ({ page, open }) => {
   await expectFocused(page, "2026-10-15")
 })
 
-test("the first day of the week sits on the right in a right-to-left page", async ({ page, open }) => {
+test("the first day of the week sits on the right in a right-to-left page", async ({
+  page,
+  open,
+}) => {
   await open("calendar", { dir: "rtl" })
   const first = await day(page, "2026-10-11").boundingBox()
   const second = await day(page, "2026-10-12").boundingBox()
@@ -22,7 +25,10 @@ test("the first day of the week sits on the right in a right-to-left page", asyn
   await expect(heading(page)).toHaveText("October 2026")
 })
 
-test("moving past the month's edge in a right-to-left page shows the next month", async ({ page, open }) => {
+test("moving past the month's edge in a right-to-left page shows the next month", async ({
+  page,
+  open,
+}) => {
   await open("calendar", { dir: "rtl", value: "2026-10-31" })
   await day(page, "2026-10-31").focus()
   await page.keyboard.press("ArrowLeft")

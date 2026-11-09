@@ -1,11 +1,20 @@
 import * as React from "react"
-import { createChange, createRovingFocus, definePrimitive, selects, type ChangeDetails } from "@ui-sdk/core"
+import {
+  createChange,
+  createRovingFocus,
+  definePrimitive,
+  selects,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type SizePickerOptions = {
   value?: string
   defaultValue?: string
-  onValueChange?: (value: string, details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
 }
 
 type SizePickerState = { value: string | null; focused: string | null }
@@ -14,12 +23,17 @@ type SizeProps = { value: string }
 
 const sizePicker = definePrimitive({
   name: "size-picker",
-  options: { value: "string", defaultValue: "string", onValueChange: "callback" },
+  options: {
+    value: "string",
+    defaultValue: "string",
+    onValueChange: "callback",
+  },
   state: (options: SizePickerOptions): SizePickerState => ({
     value: options.value ?? options.defaultValue ?? null,
     focused: null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
     const roving = createRovingFocus<SizePickerState, SizeProps>(context, {
@@ -33,10 +47,13 @@ const sizePicker = definePrimitive({
     })
     return {
       roving,
-      choose: (value: string, event?: Event) => change("value", value, { reason: "item-press", event }),
+      choose: (value: string, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
       keydown(event: KeyboardEvent, el: HTMLElement) {
         const moved = roving.keydown(event, el)
-        if (moved) change("value", moved.key, { reason: "list-navigation", event })
+        if (moved) {
+          change("value", moved.key, { reason: "list-navigation", event })
+        }
       },
     }
   },
@@ -44,7 +61,10 @@ const sizePicker = definePrimitive({
     root: slot({ attrs: () => ({ role: "radiogroup" }) }),
     item: slot<SizeProps>({
       props: { value: "string" },
-      selects: selects({ value: ({ key }) => [key, null], focused: ({ key }) => [key, null] }),
+      selects: selects({
+        value: ({ key }) => [key, null],
+        focused: ({ key }) => [key, null],
+      }),
       attrs: (state, part) => ({
         type: "button",
         role: "radio",
@@ -80,4 +100,10 @@ function Example() {
   )
 }
 
-export { Example, sizePicker, SizePicker, SizePickerItem, type SizePickerOptions }
+export {
+  Example,
+  sizePicker,
+  SizePicker,
+  SizePickerItem,
+  type SizePickerOptions,
+}

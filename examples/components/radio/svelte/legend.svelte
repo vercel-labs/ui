@@ -12,8 +12,14 @@
 
 <FieldSet>
   <FieldLegend id={`${id}-legend`}>Billing period</FieldLegend>
-  <FieldDescription id={`${id}-description`}>Yearly billing gets you two months free.</FieldDescription>
-  <RadioGroup defaultValue="monthly" aria-labelledby={`${id}-legend`} aria-describedby={`${id}-description`}>
+  <FieldDescription id={`${id}-description`}
+    >Yearly billing gets you two months free.</FieldDescription
+  >
+  <RadioGroup
+    defaultValue="monthly"
+    aria-labelledby={`${id}-legend`}
+    aria-describedby={`${id}-description`}
+  >
     {#each periods as period (period.value)}
       <label data-slot="label">
         <Radio value={period.value}>

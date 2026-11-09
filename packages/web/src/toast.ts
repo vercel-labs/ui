@@ -21,7 +21,10 @@ type RegionElement = UiToastRegionElement & { hosted?: boolean }
 type RegionInstance = ReturnType<typeof toastRegion>
 
 // What each region rendered: its list, and a toast element per toast id.
-const rendered = new WeakMap<RegionElement, { list: HTMLOListElement; toasts: Map<string, HTMLElement> }>()
+const rendered = new WeakMap<
+  RegionElement,
+  { list: HTMLOListElement; toasts: Map<string, HTMLElement> }
+>()
 // Parts whose content came from the toast's data, and that content, so only
 // an update replaces it. Replacing the text under a press would cancel its
 // click in Safari.
@@ -62,17 +65,26 @@ function fromData() {
 // A toast's parts, cloned from the region's template. An empty close button
 // is the toast's cancel, like one built from data.
 function fromTemplate(template: HTMLTemplateElement) {
-  const root = (template.content.cloneNode(true) as DocumentFragment).querySelector("ui-toast") as HTMLElement
-  for (const close of root.querySelectorAll("ui-toast-close"))
-    if (!(wrappedButton(close as HTMLElement) ?? close).childNodes.length) dataCloses.add(close)
+  const root = (
+    template.content.cloneNode(true) as DocumentFragment
+  ).querySelector("ui-toast") as HTMLElement
+  for (const close of root.querySelectorAll("ui-toast-close")) {
+    if (!(wrappedButton(close as HTMLElement) ?? close).childNodes.length) {
+      dataCloses.add(close)
+    }
+  }
   return root
 }
 
 // The cancel handler of a close button built from data, read at press time.
-const cancelOf = (el: HTMLElement) => (event: Event | undefined, details: ToastActionDetails) => {
-  const root = el.closest("ui-toast")
-  return root ? latest.get(root)?.cancel?.onCancel?.(event, details) : undefined
-}
+const cancelOf =
+  (el: HTMLElement) =>
+  (event: Event | undefined, details: ToastActionDetails) => {
+    const root = el.closest("ui-toast")
+    return root
+      ? latest.get(root)?.cancel?.onCancel?.(event, details)
+      : undefined
+  }
 
 // Fills parts that have no content of their own from the toast's data, again
 // after every update. Title, description or action without data stay hidden.
@@ -84,33 +96,53 @@ function fill(root: HTMLElement, toast: Toast<ToastContent>) {
     ["ui-toast-action", toast.action?.label],
     ["ui-toast-close", toast.cancel?.label],
   ]
-  for (const [tag, content] of contents)
+  for (const [tag, content] of contents) {
     for (const el of root.querySelectorAll<HTMLElement>(tag)) {
-      if (tag === "ui-toast-close" && !dataCloses.has(el)) continue
-      const target = tag === "ui-toast-action" || tag === "ui-toast-close" ? (wrappedButton(el) ?? el) : el
-      if (filled.has(target) ? filled.get(target) === content : target.childNodes.length) continue
+      if (tag === "ui-toast-close" && !dataCloses.has(el)) {
+        continue
+      }
+      const target =
+        tag === "ui-toast-action" || tag === "ui-toast-close"
+          ? (wrappedButton(el) ?? el)
+          : el
+      if (
+        filled.has(target)
+          ? filled.get(target) === content
+          : target.childNodes.length
+      ) {
+        continue
+      }
       el.hidden = content == null
       target.replaceChildren(...(content == null ? [] : [content]))
       filled.set(target, content)
     }
+  }
 }
 
 // Keeps the list in step with the region's toasts: newest first, closing ones
 // in place until their exit ends. Toasts fill again when they're new or
 // updated, or with `refresh`, once a property changed.
-function sync(region: RegionElement, instance: RegionInstance, refresh = false) {
+function sync(
+  region: RegionElement,
+  instance: RegionInstance,
+  refresh = false
+) {
   const state = rendered.get(region)
-  if (!state) return
-  const template = region.querySelector<HTMLTemplateElement>(":scope > template")
+  if (!state) {
+    return
+  }
+  const template =
+    region.querySelector<HTMLTemplateElement>(":scope > template")
   const items = instance.get().items as readonly ToastItem<ToastContent>[]
   const ids = new Set(items.map((item) => item.toast.id))
   // Forgotten before it goes: removing a focused toast blurs it, and what that
   // changes syncs again before remove() returns.
-  for (const [id, el] of state.toasts)
+  for (const [id, el] of state.toasts) {
     if (!ids.has(id)) {
       state.toasts.delete(id)
       el.remove()
     }
+  }
   let previous: Element | null = null
   for (const { toast } of items) {
     let el = state.toasts.get(toast.id)
@@ -125,8 +157,12 @@ function sync(region: RegionElement, instance: RegionInstance, refresh = false) 
     }
     // Filling can show or hide the title and description, which name the toast.
     instance.api.internal.label(toast.id)
-    const next: Element | null = previous ? previous.nextElementSibling : state.list.firstElementChild
-    if (next !== el) state.list.insertBefore(el, next)
+    const next: Element | null = previous
+      ? previous.nextElementSibling
+      : state.list.firstElementChild
+    if (next !== el) {
+      state.list.insertBefore(el, next)
+    }
     previous = el
   }
 }
@@ -169,8 +205,13 @@ function defineToastElements() {
       // Described on `UiToastRegionElement`.
       properties: ["renderToast"],
       options: (el) => {
-        if (!authorLabels.has(el)) authorLabels.set(el, el.getAttribute("aria-label") ?? undefined)
-        return { placed: !(el as RegionElement).hosted, label: authorLabels.get(el) }
+        if (!authorLabels.has(el)) {
+          authorLabels.set(el, el.getAttribute("aria-label") ?? undefined)
+        }
+        return {
+          placed: !(el as RegionElement).hosted,
+          label: authorLabels.get(el),
+        }
       },
       api: ["focus", "pause", "resume"],
       render: (el, instance) => render(el as RegionElement, instance),
@@ -180,7 +221,9 @@ function defineToastElements() {
       // Each toast fills the root slot, since the region fills `region`.
       slot: "root",
       display: "block",
-      context: (el: HTMLElement) => ({ id: el.getAttribute("toast") ?? undefined }),
+      context: (el: HTMLElement) => ({
+        id: el.getAttribute("toast") ?? undefined,
+      }),
       // In the region's list, each toast is an item of it.
       render: (el: HTMLElement) => el.setAttribute("role", "listitem"),
     },
@@ -195,7 +238,9 @@ function defineToastElements() {
       display: "contents",
       target: wrappedButton,
       // Always present, so the toast's own action runs when there's no attribute.
-      context: (el) => ({ onAction: el.hasAttribute("action") ? actionOf(el) : undefined }),
+      context: (el) => ({
+        onAction: el.hasAttribute("action") ? actionOf(el) : undefined,
+      }),
     },
     // Closes the toast. With an `action` attribute, fires `action` first, like the action part.
     close: {
@@ -203,7 +248,11 @@ function defineToastElements() {
       display: "contents",
       target: wrappedButton,
       context: (el) => ({
-        action: dataCloses.has(el) ? cancelOf(el) : el.hasAttribute("action") ? actionOf(el) : undefined,
+        action: dataCloses.has(el)
+          ? cancelOf(el)
+          : el.hasAttribute("action")
+            ? actionOf(el)
+            : undefined,
       }),
     },
   })
@@ -222,7 +271,7 @@ const toast = coreToast as Toaster<ToastContent>
  * @stable
  */
 const createToaster = createCoreToaster as <Content = ToastContent>(
-  options?: Parameters<typeof createCoreToaster>[0],
+  options?: Parameters<typeof createCoreToaster>[0]
 ) => Toaster<Content>
 
 export { createToaster, defineToastElements, toast, type ToastContent }

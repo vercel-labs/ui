@@ -22,7 +22,8 @@
     ...rest
   }: ComponentProps<typeof DatePickerPrimitive> & { class?: string } = $props()
 
-  const iconButton = "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl outline-none select-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 motion-reduce:transition-none [&_svg]:size-4"
+  const iconButton =
+    "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl outline-none select-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 motion-reduce:transition-none [&_svg]:size-4"
 </script>
 
 <DatePickerPrimitive class={cn("flex text-sm", className)} {...rest}>
@@ -32,7 +33,9 @@
     <DatePickerInput
       class="h-full w-full min-w-0 bg-transparent text-base tabular-nums outline-none placeholder:text-muted-foreground md:text-sm"
     />
-    <DatePickerTrigger class={cn(iconButton, "size-6 rounded-xl text-muted-foreground")}>
+    <DatePickerTrigger
+      class={cn(iconButton, "size-6 rounded-xl text-muted-foreground")}
+    >
       <CalendarIcon aria-hidden="true" />
     </DatePickerTrigger>
   </div>
@@ -51,7 +54,10 @@
     <CalendarGrid class="border-collapse">
       <CalendarWeekdays>
         {#snippet children(index)}
-          <CalendarWeekday {index} class="size-8 text-center text-[0.8rem] font-normal text-muted-foreground" />
+          <CalendarWeekday
+            {index}
+            class="size-8 text-center text-[0.8rem] font-normal text-muted-foreground"
+          />
         {/snippet}
       </CalendarWeekdays>
       <CalendarWeeks>

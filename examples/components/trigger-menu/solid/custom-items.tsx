@@ -37,7 +37,12 @@ function Example() {
       <Field>
         <FieldLabel>Message</FieldLabel>
         <FieldControl
-          render={(props) => <TriggerMenuInput {...props} placeholder="Type @ and a first name…" />}
+          render={(props) => (
+            <TriggerMenuInput
+              {...props}
+              placeholder="Type @ and a first name…"
+            />
+          )}
         />
       </Field>
       <TriggerMenuContent>
@@ -46,9 +51,15 @@ function Example() {
             <TriggerMenuGroupLabel>People</TriggerMenuGroupLabel>
             <For each={people}>
               {(person) => (
-                <TriggerMenuItem value={person.value} label={person.label} disabled={person.disabled}>
+                <TriggerMenuItem
+                  value={person.value}
+                  label={person.label}
+                  disabled={person.disabled}
+                >
                   {person.label}
-                  <span data-slot="hint">{person.disabled ? "Deactivated" : `@${person.value}`}</span>
+                  <span data-slot="hint">
+                    {person.disabled ? "Deactivated" : `@${person.value}`}
+                  </span>
                 </TriggerMenuItem>
               )}
             </For>

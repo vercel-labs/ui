@@ -82,7 +82,8 @@ A trigger is enough when you only need the system file picker. Read the chosen f
 ```ts
 const input = document.querySelector("ui-file-input")!
 input.addEventListener("valuechange", (event) => {
-  input.querySelector("span")!.textContent = event.detail.value[0]?.name ?? "No file chosen"
+  input.querySelector("span")!.textContent =
+    event.detail.value[0]?.name ?? "No file chosen"
 })
 ```
 
@@ -105,7 +106,12 @@ input.addEventListener("reject", (event) => setRejected(event.detail.value))
 Use `max-files` to limit the total count, and `min-size` or `max-size` for bytes per file. When too many files arrive, the component accepts the first ones that pass the other checks until the list is full, and rejects the rest with `too-many-files`.
 
 ```html
-<ui-file-input multiple max-files="3" min-size="1" max-size="5000000"></ui-file-input>
+<ui-file-input
+  multiple
+  max-files="3"
+  min-size="1"
+  max-size="5000000"
+></ui-file-input>
 ```
 
 ## One File
@@ -120,7 +126,9 @@ Without `multiple`, a new file replaces the current one. A rejected file leaves 
 
 ```ts
 input.addEventListener("valuechange", (event) => {
-  input.querySelector("button")!.textContent = event.detail.value[0] ? "Replace PDF" : "Choose a PDF"
+  input.querySelector("button")!.textContent = event.detail.value[0]
+    ? "Replace PDF"
+    : "Choose a PDF"
 })
 ```
 
@@ -130,7 +138,8 @@ Set the `validate` property for checks of your own. Return a reason string to re
 
 ```ts
 const input = document.querySelector("ui-file-input")!
-input.validate = (file) => (input.value.some((other) => other.name === file.name) ? "duplicate" : null)
+input.validate = (file) =>
+  input.value.some((other) => other.name === file.name) ? "duplicate" : null
 input.addEventListener("reject", (event) => setRejected(event.detail.value))
 ```
 
@@ -208,7 +217,9 @@ While a drop zone is connected, dropping a file outside every zone doesn't navig
 
 ```html
 <ui-file-input directory>
-  <ui-file-input-trigger><button>Choose a Folder</button></ui-file-input-trigger>
+  <ui-file-input-trigger
+    ><button>Choose a Folder</button></ui-file-input-trigger
+  >
   <ui-file-input-list aria-label="Files">
     <template>
       <ui-file-input-item><span data-file="path"></span></ui-file-input-item>
@@ -252,8 +263,12 @@ import { createFileInputController } from "@ui-sdk/web/file-input"
 
 const attachments = createFileInputController()
 document.querySelector("ui-file-input")!.controller = attachments
-document.querySelector('[data-action="open"]')!.addEventListener("click", () => attachments.open())
-document.querySelector('[data-action="clear"]')!.addEventListener("click", () => attachments.clear())
+document
+  .querySelector('[data-action="open"]')!
+  .addEventListener("click", () => attachments.open())
+document
+  .querySelector('[data-action="clear"]')!
+  .addEventListener("click", () => attachments.clear())
 ```
 
 ## Announcements
@@ -295,9 +310,14 @@ Wrap the file input in a [Field](./field) to connect its label, description, and
 <ui-field>
   <ui-field-label>Proof of address</ui-field-label>
   <ui-file-input name="proof" required accept="image/*,.pdf">
-    <ui-file-input-trigger><button>Choose a File</button></ui-file-input-trigger>
+    <ui-file-input-trigger
+      ><button>Choose a File</button></ui-file-input-trigger
+    >
   </ui-file-input>
-  <ui-field-description>A utility bill or bank statement from the last 3 months.</ui-field-description>
+  <ui-field-description
+    >A utility bill or bank statement from the last 3
+    months.</ui-field-description
+  >
   <ui-field-error match="valueMissing">Add a scan to continue.</ui-field-error>
 </ui-field>
 ```
@@ -357,15 +377,24 @@ Props are attributes in kebab case, like `max-size`. `accept` is comma-separated
 
 ### FileInput
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputOptions"
+/>
 
 ### FileInputTrigger
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputTriggerProps"
+/>
 
 ### FileInputDropzone
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputDropzoneProps" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputDropzoneProps"
+/>
 
 ### FileInputList
 
@@ -373,7 +402,10 @@ Copies the item in its `<template>` once for each file. Without a template, each
 
 ### FileInputItem
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputItemProps"
+/>
 
 ### FileInputItemRemove
 
@@ -383,7 +415,10 @@ Wraps a button that removes its item's file. It's named for the file and stays o
 
 The root's, the trigger's and the list's state:
 
-<StateTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputState" />
+<StateTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputState"
+/>
 
 A drop zone's:
 
@@ -394,7 +429,10 @@ A drop zone's:
 
 An item's:
 
-<StateTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputItemState" />
+<StateTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputItemState"
+/>
 
 A remove button's:
 

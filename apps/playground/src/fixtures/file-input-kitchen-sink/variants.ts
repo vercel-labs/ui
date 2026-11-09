@@ -37,7 +37,13 @@ const variants: Variant[] = [
     props: { multiple: true },
     ...all,
   },
-  { id: "rules-single", section: "Rules", title: "One file", props: {}, ...all },
+  {
+    id: "rules-single",
+    section: "Rules",
+    title: "One file",
+    props: {},
+    ...all,
+  },
   {
     id: "rules-images",
     section: "Rules",
@@ -81,7 +87,13 @@ const variants: Variant[] = [
     ...all,
     validate: true,
   },
-  { id: "parts-trigger", section: "Parts", title: "Trigger alone", props: {}, trigger: true },
+  {
+    id: "parts-trigger",
+    section: "Parts",
+    title: "Trigger alone",
+    props: {},
+    trigger: true,
+  },
   {
     id: "parts-trigger-list",
     section: "Parts",
@@ -122,7 +134,13 @@ const variants: Variant[] = [
     ...all,
     nested: true,
   },
-  { id: "behavior-disabled", section: "Behavior", title: "Disabled", props: { disabled: true }, ...all },
+  {
+    id: "behavior-disabled",
+    section: "Behavior",
+    title: "Disabled",
+    props: { disabled: true },
+    ...all,
+  },
   {
     id: "behavior-announcement",
     section: "Behavior",
@@ -170,7 +188,13 @@ const variants: Variant[] = [
     props: { capture: "environment" },
     trigger: true,
   },
-  { id: "forms-named", section: "Forms", title: "Named", props: { multiple: true, name: "files" }, ...all },
+  {
+    id: "forms-named",
+    section: "Forms",
+    title: "Named",
+    props: { multiple: true, name: "files" },
+    ...all,
+  },
   {
     id: "forms-field",
     section: "Forms",
@@ -190,10 +214,13 @@ const variants: Variant[] = [
 ]
 
 // A check of your own, for variants that ask for one.
-const validateName = (file: { name: string }) => (file.name.startsWith("x") ? "x-file" : null)
+const validateName = (file: { name: string }) =>
+  file.name.startsWith("x") ? "x-file" : null
 
-const customAnnouncement = (change: { added: readonly unknown[]; removed: readonly unknown[] }) =>
-  `${change.added.length} added, ${change.removed.length} removed.`
+const customAnnouncement = (change: {
+  added: readonly unknown[]
+  removed: readonly unknown[]
+}) => `${change.added.length} added, ${change.removed.length} removed.`
 
 // The announcement option a variant asks for.
 const announcementFor = (variant: Variant) =>
@@ -212,7 +239,8 @@ function describe(details: {
   removed?: readonly Named[]
   rejected?: readonly { file: Named; reasons: string[] }[]
 }) {
-  const names = (files: readonly Named[] = []) => files.map((file) => file.name).join(", ")
+  const names = (files: readonly Named[] = []) =>
+    files.map((file) => file.name).join(", ")
   const parts = [
     details.added?.length && `added ${names(details.added)}`,
     details.removed?.length && `removed ${names(details.removed)}`,
@@ -222,6 +250,15 @@ function describe(details: {
   return `${details.reason}: ${parts.join("; ") || "nothing"}`
 }
 
-const sampleFile = () => new File(["sample"], "sample.txt", { type: "text/plain" })
+const sampleFile = () =>
+  new File(["sample"], "sample.txt", { type: "text/plain" })
 
-export { announcementFor, customAnnouncement, describe, sampleFile, validateName, type Variant, variants }
+export {
+  announcementFor,
+  customAnnouncement,
+  describe,
+  sampleFile,
+  validateName,
+  type Variant,
+  variants,
+}

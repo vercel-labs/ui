@@ -1,7 +1,13 @@
 // What the rest of core may import from kernel's files. import-layers checks every
 // import from another folder against this list. Nothing imports this file, so bundles
 // don't pay for it.
-export { type ActionDetails, announcePending, isPromise, popupResult, runAction } from "./action"
+export {
+  type ActionDetails,
+  announcePending,
+  isPromise,
+  popupResult,
+  runAction,
+} from "./action"
 export { checkedAttrs, idPart, openAttrs } from "./attrs"
 export { flagWhileBound, keyWhileBound, settleFlag } from "./bound-keys"
 export { changeFrom, log } from "./change"
@@ -27,7 +33,13 @@ export { isComposing, on, selectEvent } from "./events"
 export { createHistory, type HistoryOptions } from "./history"
 export { css } from "./inline-style"
 export { isDestroying, keep, release, unwatched, whenKept } from "./keep"
-export { changeSource, createChange, createCommit, dispatch, inputSource } from "./input-source"
+export {
+  changeSource,
+  createChange,
+  createCommit,
+  dispatch,
+  inputSource,
+} from "./input-source"
 export { applyAttrs, direct, live } from "./live"
 export {
   isFocusFromKeyboard,
@@ -39,7 +51,17 @@ export {
   trackModality,
 } from "./modality"
 export { createOrder, documentOrder, inDocumentOrder, isAfter } from "./order"
-export { aliasReferences, attrs, bind, held, madeLabel, onProps, partState, present, subscribe } from "./part"
+export {
+  aliasReferences,
+  attrs,
+  bind,
+  held,
+  madeLabel,
+  onProps,
+  partState,
+  present,
+  subscribe,
+} from "./part"
 export { definePrimitive, schemaOf } from "./primitive"
 export type { Focus, HandledKey, Role, Unneeded } from "./roles"
 export type {

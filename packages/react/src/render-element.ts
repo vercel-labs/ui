@@ -5,7 +5,9 @@ import * as React from "react"
 
 // Whether a handler marked its event handled, on React's events and the DOM's.
 function prevented(event: unknown) {
-  const handled = event as { isDefaultPrevented?: () => boolean; defaultPrevented?: boolean } | undefined
+  const handled = event as
+    | { isDefaultPrevented?: () => boolean; defaultPrevented?: boolean }
+    | undefined
   return !!(handled?.isDefaultPrevented?.() ?? handled?.defaultPrevented)
 }
 
@@ -20,18 +22,32 @@ function mergeProps(...sources: Record<string, any>[]) {
   for (const source of sources) {
     for (const key in source) {
       const value = source[key]
-      if (value === undefined) continue
+      if (value === undefined) {
+        continue
+      }
       const earlier = result[key]
-      if (earlier === undefined) result[key] = value
-      else if (key === "className" && earlier) result.className = `${earlier} ${value}`
-      else if (key === "style" && earlier) result.style = mergeStyles(earlier, value)
-      else if (key === "ref" && earlier) result.ref = mergeRefs(earlier, value)
-      else if (/^on[A-Z]/.test(key) && typeof earlier === "function" && typeof value === "function")
+      if (earlier === undefined) {
+        result[key] = value
+      } else if (key === "className" && earlier) {
+        result.className = `${earlier} ${value}`
+      } else if (key === "style" && earlier) {
+        result.style = mergeStyles(earlier, value)
+      } else if (key === "ref" && earlier) {
+        result.ref = mergeRefs(earlier, value)
+      } else if (
+        /^on[A-Z]/.test(key) &&
+        typeof earlier === "function" &&
+        typeof value === "function"
+      ) {
         result[key] = (...args: unknown[]) => {
           value(...args)
-          if (!prevented(args[0])) earlier(...args)
+          if (!prevented(args[0])) {
+            earlier(...args)
+          }
         }
-      else result[key] = value
+      } else {
+        result[key] = value
+      }
     }
   }
   return result
@@ -40,17 +56,29 @@ function mergeProps(...sources: Record<string, any>[]) {
 // Styles merge, and a function of the part's state stays a function, so a
 // part's own inline styles never drop a user's style function.
 function mergeStyles(earlier: unknown, later: unknown) {
-  if (typeof earlier !== "function" && typeof later !== "function")
+  if (typeof earlier !== "function" && typeof later !== "function") {
     return { ...(earlier as object), ...(later as object) }
-  const resolve = (style: unknown, state: unknown) => (typeof style === "function" ? style(state) : style)
-  return (state: unknown) => ({ ...resolve(earlier, state), ...resolve(later, state) })
+  }
+  const resolve = (style: unknown, state: unknown) =>
+    typeof style === "function" ? style(state) : style
+  return (state: unknown) => ({
+    ...resolve(earlier, state),
+    ...resolve(later, state),
+  })
 }
 
-const mergedRefs = new WeakMap<object, WeakMap<object, (el: unknown) => () => void>>()
+const mergedRefs = new WeakMap<
+  object,
+  WeakMap<object, (el: unknown) => () => void>
+>()
 
 function setRef(ref: React.Ref<unknown>, el: unknown) {
-  if (typeof ref === "function") return ref(el)
-  if (ref) (ref as React.RefObject<unknown>).current = el
+  if (typeof ref === "function") {
+    return ref(el)
+  }
+  if (ref) {
+    ;(ref as React.RefObject<unknown>).current = el
+  }
 }
 
 /**
@@ -59,16 +87,22 @@ function setRef(ref: React.Ref<unknown>, el: unknown) {
  * own cleanup runs, and a ref without one gets null.
  */
 function mergeRefs(a: React.Ref<unknown>, b: React.Ref<unknown>) {
-  if (!a || !b) return a ?? b
+  if (!a || !b) {
+    return a ?? b
+  }
   let inner = mergedRefs.get(a)
-  if (!inner) mergedRefs.set(a, (inner = new WeakMap()))
+  if (!inner) {
+    mergedRefs.set(a, (inner = new WeakMap()))
+  }
   let merged = inner.get(b)
   if (!merged) {
     merged = (el: unknown) => {
       const cleanups = [setRef(a, el), setRef(b, el)]
       return () =>
         cleanups.forEach((cleanup, index) =>
-          typeof cleanup === "function" ? cleanup() : setRef(index ? b : a, null),
+          typeof cleanup === "function"
+            ? cleanup()
+            : setRef(index ? b : a, null)
         )
     }
     inner.set(b, merged)
@@ -82,7 +116,8 @@ function mergeRefs(a: React.Ref<unknown>, b: React.Ref<unknown>) {
  * @stable
  */
 type RenderProp<State = {}> =
-  React.ReactElement<Record<string, any>> | ((props: Record<string, any>, state: State) => React.ReactElement)
+  | React.ReactElement<Record<string, any>>
+  | ((props: Record<string, any>, state: State) => React.ReactElement)
 
 /**
  * Renders an element with no primitive behind it that takes a `render` prop,
@@ -101,15 +136,26 @@ function renderElement<State>(
   tag: string,
   props: Record<string, any>,
   render?: RenderProp<State>,
-  state: State = {} as State,
+  state: State = {} as State
 ) {
-  if (typeof props.className === "function") props = { ...props, className: props.className(state) }
-  if (typeof props.style === "function") props = { ...props, style: props.style(state) }
-  if (typeof props.children === "function") props = { ...props, children: props.children(state) }
-  if (typeof render === "function") return render(props, state)
+  if (typeof props.className === "function") {
+    props = { ...props, className: props.className(state) }
+  }
+  if (typeof props.style === "function") {
+    props = { ...props, style: props.style(state) }
+  }
+  if (typeof props.children === "function") {
+    props = { ...props, children: props.children(state) }
+  }
+  if (typeof render === "function") {
+    return render(props, state)
+  }
   if (render) {
     // The element's own props merge in: its handlers run before the part's.
-    return React.cloneElement(render, mergeProps(props, render.props as Record<string, any>))
+    return React.cloneElement(
+      render,
+      mergeProps(props, render.props as Record<string, any>)
+    )
   }
   return React.createElement(tag, props)
 }

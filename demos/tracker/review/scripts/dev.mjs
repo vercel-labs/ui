@@ -17,18 +17,30 @@ const run = (filter, env) => {
   children.push(child)
 }
 
-for (const name of names) run(`tracker-${name}`, { TRACKER_PORT: String(portOf(name)), TRACKER_REVIEW: "1" })
+for (const name of names) {
+  run(`tracker-${name}`, {
+    TRACKER_PORT: String(portOf(name)),
+    TRACKER_REVIEW: "1",
+  })
+}
 run("tracker-review", {
   REVIEW_PORT: String(reviewPort),
   ...Object.fromEntries(
-    names.map((name) => [`TRACKER_${name.toUpperCase()}_URL`, `http://localhost:${portOf(name)}`]),
+    names.map((name) => [
+      `TRACKER_${name.toUpperCase()}_URL`,
+      `http://localhost:${portOf(name)}`,
+    ])
   ),
 })
 
-console.log(`\nReview app: http://localhost:${reviewPort}/review?fw=${names[0]}\n`)
+console.log(
+  `\nReview app: http://localhost:${reviewPort}/review?fw=${names[0]}\n`
+)
 
 const stop = () => {
-  for (const child of children) child.kill("SIGTERM")
+  for (const child of children) {
+    child.kill("SIGTERM")
+  }
   process.exit()
 }
 process.on("SIGINT", stop)

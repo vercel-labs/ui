@@ -14,7 +14,9 @@ const examplesIn = (folder: string) =>
 
 // The lines an example logged to its console, oldest first.
 const logs = (preview: Locator) =>
-  preview.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])')
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
 
 // The order examples appear on the Button page.
 const order = [
@@ -35,17 +37,23 @@ for (const framework of frameworks) {
   test(`every button example works in ${framework}`, async ({ page }) => {
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/button`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
     expect(
       await previews.evaluateAll((previews) =>
-        previews.map((preview) => preview.getAttribute("data-example")),
-      ),
+        previews.map((preview) => preview.getAttribute("data-example"))
+      )
     ).toEqual(order.map((name) => `button/${name}`))
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
-    const example = (name: string) => page.locator(`[data-example="button/${name}"]`)
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+    }
+    const example = (name: string) =>
+      page.locator(`[data-example="button/${name}"]`)
 
     // A press, Enter and Space each press the button once.
     const counter = example("basic")
@@ -62,7 +70,9 @@ for (const framework of frameworks) {
     // The basic button sits in the middle of its preview.
     const preview = await counter.boundingBox()
     const basic = await button.boundingBox()
-    expect(Math.abs(basic!.x + basic!.width / 2 - (preview!.x + preview!.width / 2))).toBeLessThan(2)
+    expect(
+      Math.abs(basic!.x + basic!.width / 2 - (preview!.x + preview!.width / 2))
+    ).toBeLessThan(2)
 
     // A pending button is busy until its Promise settles.
     // It keeps focus meanwhile, and a second press doesn't start it again.
@@ -81,7 +91,9 @@ for (const framework of frameworks) {
     expect(Date.now() - pressed).toBeLessThan(2300)
 
     // Its arrow turns into a spinner only meanwhile.
-    const download = example("pending-content").getByRole("button", { name: /^Save$/ })
+    const download = example("pending-content").getByRole("button", {
+      name: /^Save$/,
+    })
     const spinner = download.locator('[data-show="pending"]')
     const arrow = download.locator('[data-show="idle"]')
     await expect(spinner).toBeHidden()
@@ -103,12 +115,17 @@ for (const framework of frameworks) {
     await expect(action).toHaveAccessibleName("Try Again")
     await expect(logs(render)).toHaveText([failure])
     await action.click()
-    await expect(action, "the next press clears the error").toHaveAccessibleName("Saving…")
+    await expect(
+      action,
+      "the next press clears the error"
+    ).toHaveAccessibleName("Saving…")
     await expect(action).toHaveAccessibleName("Try Again")
     await expect(logs(render)).toHaveText([failure, failure])
 
     // A disabled button can't be pressed.
-    await expect(example("disabled").getByRole("button", { name: /^Disabled$/ })).toBeDisabled()
+    await expect(
+      example("disabled").getByRole("button", { name: /^Disabled$/ })
+    ).toBeDisabled()
 
     // Disabled until there's a title, and it stays focusable meanwhile.
     const focusable = example("focusable-when-disabled")
@@ -121,8 +138,12 @@ for (const framework of frameworks) {
     await page.keyboard.press("Enter")
     await page.keyboard.press(" ")
     await publish.click({ force: true })
-    await expect(logs(focusable), "a disabled press does nothing").toHaveCount(0)
-    await focusable.getByRole("textbox", { name: "Title" }).fill("Release notes")
+    await expect(logs(focusable), "a disabled press does nothing").toHaveCount(
+      0
+    )
+    await focusable
+      .getByRole("textbox", { name: "Title" })
+      .fill("Release notes")
     await expect(publish).toBeEnabled()
     await expect(publish).toHaveAccessibleDescription("Ready to publish.")
     await publish.click()
@@ -149,7 +170,10 @@ for (const framework of frameworks) {
     await expect(logs(form)).toHaveText(["Subscribed user@example.com"])
     await email.focus()
     await page.keyboard.press("Enter")
-    await expect(logs(form)).toHaveText(["Subscribed user@example.com", "Subscribed user@example.com"])
+    await expect(logs(form)).toHaveText([
+      "Subscribed user@example.com",
+      "Subscribed user@example.com",
+    ])
     await form.getByRole("button", { name: /^Reset$/ }).click()
     await expect(email).toHaveValue("ada@example.com")
 

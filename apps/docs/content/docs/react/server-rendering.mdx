@@ -92,7 +92,9 @@ import { Preferences } from "@ui-sdk/react/preferences"
 import { colorScheme, skinTone } from "./preferences"
 
 function AppPreferences({ children }: { children: React.ReactNode }) {
-  return <Preferences preferences={[colorScheme, skinTone]}>{children}</Preferences>
+  return (
+    <Preferences preferences={[colorScheme, skinTone]}>{children}</Preferences>
+  )
 }
 
 export { AppPreferences }
@@ -125,7 +127,13 @@ A preference kept in a cookie can render on the server too, content included. Re
 ```tsx title="root.tsx"
 import { AppPreferences } from "./app-preferences"
 
-function Root({ cookie, children }: { cookie: string | null; children: React.ReactNode }) {
+function Root({
+  cookie,
+  children,
+}: {
+  cookie: string | null
+  children: React.ReactNode
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
@@ -153,9 +161,17 @@ const createSkinTone = (cookie: string | null) =>
     storage: createCookieStorage("skin-tone", { cookie }),
   })
 
-const SkinToneContext = createContext<ReturnType<typeof createSkinTone> | null>(null)
+const SkinToneContext = createContext<ReturnType<typeof createSkinTone> | null>(
+  null
+)
 
-function AppPreferences({ cookie, children }: { cookie: string | null; children: React.ReactNode }) {
+function AppPreferences({
+  cookie,
+  children,
+}: {
+  cookie: string | null
+  children: React.ReactNode
+}) {
   const [skinTone] = useState(() => createSkinTone(cookie))
   return (
     <SkinToneContext value={skinTone}>
@@ -180,7 +196,10 @@ import { createLocalStorage } from "@ui-sdk/core"
 import { useEffect, useState, useSyncExternalStore } from "react"
 
 const density = createLocalStorage("density")
-const script = density.script({ attribute: "data-density", values: ["comfortable", "compact"] })
+const script = density.script({
+  attribute: "data-density",
+  values: ["comfortable", "compact"],
+})
 const noSubscribe = () => () => {}
 
 function Toolbar({ children }: { children: React.ReactNode }) {
@@ -189,15 +208,20 @@ function Toolbar({ children }: { children: React.ReactNode }) {
   const fromServer = useSyncExternalStore(
     noSubscribe,
     () => false,
-    () => true,
+    () => true
   )
-  useEffect(() => setValue(density.get() === "compact" ? "compact" : "comfortable"), [])
+  useEffect(
+    () => setValue(density.get() === "compact" ? "compact" : "comfortable"),
+    []
+  )
   return (
     <>
       <div data-density={value} suppressHydrationWarning>
         {children}
       </div>
-      {fromServer && script ? <script dangerouslySetInnerHTML={{ __html: script }} /> : null}
+      {fromServer && script ? (
+        <script dangerouslySetInnerHTML={{ __html: script }} />
+      ) : null}
     </>
   )
 }

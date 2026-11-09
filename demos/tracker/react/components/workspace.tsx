@@ -1,11 +1,17 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { Resizable, ResizableHandle, ResizablePanel } from "@/components/ui/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@/components/ui/resizable"
 
 const cookieStorage = {
   getItem: (key: string) => {
-    const value = document.cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`))?.[1]
+    const value = document.cookie.match(
+      new RegExp(`(?:^|; )${key}=([^;]*)`)
+    )?.[1]
     return value === undefined ? null : decodeURIComponent(value)
   },
   setItem: (key: string, value: string) => {
@@ -23,18 +29,29 @@ function Workspace({
   children: ReactNode
 }) {
   return (
-    <Resizable autoSaveId="tracker" storage={cookieStorage} className="min-h-0 flex-1">
+    <Resizable
+      autoSaveId="tracker"
+      storage={cookieStorage}
+      className="min-h-0 flex-1"
+    >
       <ResizablePanel
         id="list"
         defaultSize={detail ? sizes[0] : 100}
         minSize={30}
-        className={detail ? "flex min-w-0 flex-col max-md:hidden" : "flex min-w-0 flex-col"}
+        className={
+          detail
+            ? "flex min-w-0 flex-col max-md:hidden"
+            : "flex min-w-0 flex-col"
+        }
       >
         {children}
       </ResizablePanel>
       {detail && (
         <>
-          <ResizableHandle aria-label="Resize issue details" className="max-md:hidden" />
+          <ResizableHandle
+            aria-label="Resize issue details"
+            className="max-md:hidden"
+          />
           <ResizablePanel
             id="detail"
             defaultSize={sizes[1]}

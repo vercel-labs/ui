@@ -32,8 +32,12 @@ function mount(root: HTMLElement) {
     </ui-drawer>
   `
   const value = root.querySelector("[aria-live]")!
-  const decrease = root.querySelector<HTMLButtonElement>('[aria-label="Decrease"]')!
-  const increase = root.querySelector<HTMLButtonElement>('[aria-label="Increase"]')!
+  const decrease = root.querySelector<HTMLButtonElement>(
+    '[aria-label="Decrease"]'
+  )!
+  const increase = root.querySelector<HTMLButtonElement>(
+    '[aria-label="Increase"]'
+  )!
   let calories = goal.initial
   const show = () => {
     value.textContent = String(calories)

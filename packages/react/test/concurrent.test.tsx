@@ -5,10 +5,27 @@ import { createRoot, type Root } from "react-dom/client"
 import { afterEach, expect, test, vi } from "vitest"
 import { fakeEditor } from "../../core/test/fake-editor"
 import { createAgent } from "../src/agent"
-import { Menu, MenuContent, MenuRadioGroup, MenuRadioItem, MenuTrigger } from "../src/menu"
-import { NumberInput, NumberInputControl, NumberInputGroup, NumberInputScrubArea } from "../src/number-input"
+import {
+  Menu,
+  MenuContent,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuTrigger,
+} from "../src/menu"
+import {
+  NumberInput,
+  NumberInputControl,
+  NumberInputGroup,
+  NumberInputScrubArea,
+} from "../src/number-input"
 import { usePart, usePrimitive, type PrimitiveHandle } from "../src/primitive"
-import { createTabsController, Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
+import {
+  createTabsController,
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "../src/tabs"
 import { Tree, TreeGroup, TreeItem, TreeItemLabel } from "../src/tree"
 import { TriggerMenu } from "../src/trigger-menu"
 
@@ -39,10 +56,14 @@ afterEach(async () => {
 })
 
 const tab = (container: HTMLElement, name: string) =>
-  [...container.querySelectorAll<HTMLElement>('[role="tab"]')].find((el) => el.textContent === name)!
+  [...container.querySelectorAll<HTMLElement>('[role="tab"]')].find(
+    (el) => el.textContent === name
+  )!
 
 function Suspends({ until }: { until?: Promise<void> }) {
-  if (until) React.use(until)
+  if (until) {
+    React.use(until)
+  }
   return null
 }
 
@@ -135,7 +156,11 @@ test("tabs Suspense hid and showed again keep their instance, and the agent stil
   await new Promise((done) => setTimeout(done, 20))
   await React.act(async () => resolve())
   expect(agent.snapshot()).toContainEqual(
-    expect.objectContaining({ component: "tabs", value: "billing", actions: ["setValue"] }),
+    expect.objectContaining({
+      component: "tabs",
+      value: "billing",
+      actions: ["setValue"],
+    })
   )
   const [{ ref }] = agent
     .snapshot()
@@ -164,8 +189,12 @@ test("tabs <Activity> hid and showed again start where they were, and keep worki
   await new Promise((done) => setTimeout(done, 20))
   await React.act(async () => root!.render(<ActivityTabs mode="visible" />))
   expect(tab(view, "Billing").getAttribute("aria-selected")).toBe("true")
-  const live = agent.snapshot().filter((component) => component.component === "tabs" && !component.offPage)
-  expect(live).toEqual([expect.objectContaining({ value: "billing", actions: ["setValue"] })])
+  const live = agent
+    .snapshot()
+    .filter((component) => component.component === "tabs" && !component.offPage)
+  expect(live).toEqual([
+    expect.objectContaining({ value: "billing", actions: ["setValue"] }),
+  ])
   await React.act(async () => tab(view, "Account").click())
   expect(tab(view, "Account").getAttribute("aria-selected")).toBe("true")
 })
@@ -240,7 +269,7 @@ test("parts that read another part's props follow it when it commits, like radio
   await render(<Align />)
   const item = (name: string) =>
     [...document.querySelectorAll<HTMLElement>('[role="menuitemradio"]')].find(
-      (el) => el.textContent === name,
+      (el) => el.textContent === name
     )!
   await React.act(async () => item("Right").click())
   expect(item("Right").getAttribute("aria-checked")).toBe("true")
@@ -254,7 +283,9 @@ test("a TriggerMenu from a render React threw away never follows the editor", as
   function Mention() {
     const [on, setOn] = React.useState(false)
     show = setOn
-    if (!on) return null
+    if (!on) {
+      return null
+    }
     return (
       <>
         <TriggerMenu
@@ -269,7 +300,7 @@ test("a TriggerMenu from a render React threw away never follows the editor", as
   await render(
     <React.Suspense fallback={null}>
       <Mention />
-    </React.Suspense>,
+    </React.Suspense>
   )
   await React.act(async () => React.startTransition(() => show(true)))
   await React.act(async () => show(false))
@@ -281,7 +312,10 @@ const list = definePrimitive({
   name: "list",
   state: (_options: {}) => ({}),
   api: ({ parts }) => ({
-    items: () => [...parts()].filter((part) => part.slot === "item").map((part) => part.key),
+    items: () =>
+      [...parts()]
+        .filter((part) => part.slot === "item")
+        .map((part) => part.key),
   }),
   slots: (slot) => ({
     root: slot({}),
@@ -336,10 +370,14 @@ test("usePart keeps committed props in event handlers while a transition suspend
     slots: (slot) => ({
       root: slot<{ disabled: boolean }>({
         props: { disabled: "boolean" },
-        attrs: (_state, { props }) => ({ disabled: props.disabled ? "" : undefined }),
+        attrs: (_state, { props }) => ({
+          disabled: props.disabled ? "" : undefined,
+        }),
         on: {
           click: (_event, { props, api }) => {
-            if (!props.disabled) api.press()
+            if (!props.disabled) {
+              api.press()
+            }
           },
         },
       }),
@@ -350,7 +388,13 @@ test("usePart keeps committed props in event handlers while a transition suspend
     const [disabled, setDisabled] = React.useState(false)
     disable = () => React.startTransition(() => setDisabled(true))
     const handle = usePrimitive(clicker, {})
-    const button = usePart(handle, "root", { disabled }, { children: "Press" }, "button")
+    const button = usePart(
+      handle,
+      "root",
+      { disabled },
+      { children: "Press" },
+      "button"
+    )
     return (
       <>
         {button}
@@ -361,7 +405,7 @@ test("usePart keeps committed props in event handlers while a transition suspend
   const view = await render(
     <React.Suspense fallback={<p>Loading</p>}>
       <Clicker />
-    </React.Suspense>,
+    </React.Suspense>
   )
   await React.act(async () => disable())
   const button = view.querySelector("button")!
@@ -375,7 +419,9 @@ let addFile = (_name: string) => {}
 function NewFile() {
   const [name, setName] = React.useState<string>()
   addFile = setName
-  if (!name) return null
+  if (!name) {
+    return null
+  }
   return (
     <TreeItem value={name}>
       <TreeItemLabel>{name}</TreeItemLabel>
@@ -405,14 +451,20 @@ test("a tree item from a render React threw away isn't checked with its folder",
           </React.Suspense>
         </TreeGroup>
       </TreeItem>
-    </Tree>,
+    </Tree>
   )
   await React.act(async () => React.startTransition(() => addFile("draft")))
   await React.act(async () => addFile("readme"))
   const folder = view.querySelector<HTMLElement>('[role="treeitem"]')!
   await React.act(async () => {
     folder.focus()
-    folder.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true }))
+    folder.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: " ",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
   })
   expect(onCheckedChange.mock.lastCall?.[0]).toEqual(["index", "readme"])
 })

@@ -3,7 +3,12 @@
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
 
 const folders = [
-  { value: "inbox", label: "Inbox", count: 12, content: "12 conversations, 3 of them unread." },
+  {
+    value: "inbox",
+    label: "Inbox",
+    count: 12,
+    content: "12 conversations, 3 of them unread.",
+  },
   {
     value: "unread",
     label: "Unread",
@@ -29,7 +34,9 @@ function Example() {
             render={(props) => (
               <button {...props}>
                 {props.children}
-                {folder.count > 0 && <span data-slot="badge">{folder.count}</span>}
+                {folder.count > 0 && (
+                  <span data-slot="badge">{folder.count}</span>
+                )}
               </button>
             )}
           >

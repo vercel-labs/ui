@@ -63,7 +63,12 @@ type PopupContentProps = PositionProps &
      * @defaultValue "auto"
      */
     initialFocus?:
-      "auto" | "content" | "none" | (string & {}) | HTMLElement | (() => HTMLElement | null | undefined)
+      | "auto"
+      | "content"
+      | "none"
+      | (string & {})
+      | HTMLElement
+      | (() => HTMLElement | null | undefined)
     /**
      * Where focus goes when the popup closes while focus is inside it. `"trigger"` returns it to
      * the trigger and `"none"` leaves it.
@@ -123,47 +128,91 @@ function triggerKeydown(
   event: KeyboardEvent,
   el: HTMLElement,
   key: string,
-  props: PopupTriggerProps,
+  props: PopupTriggerProps
 ) {
-  if (internal.press?.keydown(event, el, key, props) || internal.focus?.keydown(event)) return
+  if (
+    internal.press?.keydown(event, el, key, props) ||
+    internal.focus?.keydown(event)
+  ) {
+    return
+  }
   internal.popup.triggerKeydown(event)
 }
 
 // Keys from a popup nested in this one bubble through it. Only the owner handles them.
-function contentKeydown(internal: PopupInternal, event: KeyboardEvent, el: HTMLElement) {
-  if (ownsEvent(el, event)) internal.popup.keydown(event)
+function contentKeydown(
+  internal: PopupInternal,
+  event: KeyboardEvent,
+  el: HTMLElement
+) {
+  if (ownsEvent(el, event)) {
+    internal.popup.keydown(event)
+  }
 }
 
 // Shows the content when the popup opens: placed beside its anchor when the
 // preset places it, with focus moving in when a press opens it, and as a
 // sheet when it presents as one. Components with their own content part bind it here too.
-function bindPopupContent(el: HTMLElement, internal: PopupInternal, key?: string, part?: Part) {
-  const { preset, control, contentProps, triggerElement, element, popup, press, rules, presentation } =
-    internal
+function bindPopupContent(
+  el: HTMLElement,
+  internal: PopupInternal,
+  key?: string,
+  part?: Part
+) {
+  const {
+    preset,
+    control,
+    contentProps,
+    triggerElement,
+    element,
+    popup,
+    press,
+    rules,
+    presentation,
+  } = internal
   const { placement } = preset
   preset.resetStyles?.bind(el)
   return (presentation ?? popup).bind(el, {
     // What it's placed against: a controller's anchor, the content's, or the trigger.
-    anchor: () => control.anchor() ?? placement?.anchor(el, contentProps().anchor, triggerElement),
+    anchor: () =>
+      control.anchor() ??
+      placement?.anchor(el, contentProps().anchor, triggerElement),
     // Props are read on every check, so a new side applies while open.
     position:
       placement &&
-      (() => placement.options(contentProps(key), { side: preset.side, align: "center" }, element("arrow"))),
+      (() =>
+        placement.options(
+          contentProps(key),
+          { side: preset.side, align: "center" },
+          element("arrow")
+        )),
     rendered: part && ((listener) => onProps(part, listener)),
     // Where focus goes once the popup and its children have bound. Hover content takes none.
     initialFocus:
       press &&
-      (() => press.initialFocus(popup.element()!, contentProps().initialFocus, rules?.preferredFocus)),
+      (() =>
+        press.initialFocus(
+          popup.element()!,
+          contentProps().initialFocus,
+          rules?.preferredFocus
+        )),
     backdrop: () => element("backdrop"),
     ...rules?.bind?.(),
   })
 }
 
 // The first trigger is the one focus returns to until another opens the popup.
-function bindTrigger<State extends PopupState>(store: Store<State>, key: string) {
-  if (store.get().trigger === null) store.set({ trigger: key } as Partial<State>)
+function bindTrigger<State extends PopupState>(
+  store: Store<State>,
+  key: string
+) {
+  if (store.get().trigger === null) {
+    store.set({ trigger: key } as Partial<State>)
+  }
   return () => {
-    if (store.get().trigger === key && !store.get().open) store.set({ trigger: null } as Partial<State>)
+    if (store.get().trigger === key && !store.get().open) {
+      store.set({ trigger: null } as Partial<State>)
+    }
   }
 }
 
@@ -174,7 +223,9 @@ function bindTrigger<State extends PopupState>(store: Store<State>, key: string)
  * share one popup, each handing the content its `payload`. Part of `popupSlots`.
  * @experimental
  */
-function popupTrigger<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupTrigger<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot<PopupTriggerProps, PopupTriggerState>({
     props: { id: "id", disabled: "boolean", payload: "value" },
     state: (state, { key, props }) => ({
@@ -194,11 +245,15 @@ function popupTrigger<State extends PopupState, Api extends PopupApi>(slot: Slot
       focusin: (event, { api, key, props }) =>
         !props.disabled && api.internal.focus?.enter(key, props.payload, event),
       focusout: (event, { api }) => api.internal.focus?.leave(event),
-      keydown: (event, { api, el, key, props }) => el && triggerKeydown(api.internal, event, el, key, props),
+      keydown: (event, { api, el, key, props }) =>
+        el && triggerKeydown(api.internal, event, el, key, props),
     },
-    press: ({ api, key, props }, event) => api.internal.press?.press(key, props, event),
+    press: ({ api, key, props }, event) =>
+      api.internal.press?.press(key, props, event),
     bind(el, { api, key, id, store }) {
-      if (dev) checkName(el, "The trigger", { component: api.internal.label, id })
+      if (dev) {
+        checkName(el, "The trigger", { component: api.internal.label, id })
+      }
       return bindTrigger(store, key)
     },
   })
@@ -212,7 +267,9 @@ function popupTrigger<State extends PopupState, Api extends PopupApi>(slot: Slot
  * Part of `popupSlots`.
  * @experimental
  */
-function popupContent<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupContent<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot<PopupContentProps, PopupContentState>({
     props: {
       side: "string",
@@ -251,7 +308,8 @@ function popupContent<State extends PopupState, Api extends PopupApi>(slot: Slot
       }
     },
     on: {
-      keydown: (event, { api, el }) => el && contentKeydown(api.internal, event, el),
+      keydown: (event, { api, el }) =>
+        el && contentKeydown(api.internal, event, el),
       pointerenter: (event, { api }) => api.internal.hover?.enter(event),
       pointerleave: (event, { api }) => api.internal.hover?.leaveContent(event),
     },
@@ -267,7 +325,9 @@ function popupContent<State extends PopupState, Api extends PopupApi>(slot: Slot
  * sits in. Renderers render it around the content only then. Part of `popupSlots`.
  * @experimental
  */
-function popupViewport<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupViewport<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot({ present: (state) => state.presentation === "sheet" })
 }
 
@@ -275,7 +335,9 @@ function popupViewport<State extends PopupState, Api extends PopupApi>(slot: Slo
  * A popup's `title`, which names it while it renders. Part of `popupSlots`.
  * @experimental
  */
-function popupTitle<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupTitle<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot({
     attrs: (state, { id }) => ({ id: `${id}-title` }),
     bind: (el, { store }) => flagWhileBound(store, "titled", { now: true }),
@@ -286,7 +348,9 @@ function popupTitle<State extends PopupState, Api extends PopupApi>(slot: SlotFa
  * A popup's `description`, which describes it while it renders. Part of `popupSlots`.
  * @experimental
  */
-function popupDescription<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupDescription<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot({
     attrs: (state, { id }) => ({ id: `${id}-description` }),
     bind: (el, { store }) => flagWhileBound(store, "described", { now: true }),
@@ -297,10 +361,13 @@ function popupDescription<State extends PopupState, Api extends PopupApi>(slot: 
  * A popup's `close` button, which closes it with reason `close-press`. Part of `popupSlots`.
  * @experimental
  */
-function popupClose<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupClose<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot({
     attrs: () => ({ type: "button" }),
-    press: ({ api }, event) => api.internal.control.hide({ reason: "close-press", event }),
+    press: ({ api }, event) =>
+      api.internal.control.hide({ reason: "close-press", event }),
   })
 }
 
@@ -308,7 +375,9 @@ function popupClose<State extends PopupState, Api extends PopupApi>(slot: SlotFa
  * A popup's `arrow`, which points at the trigger. Part of `popupSlots`.
  * @experimental
  */
-function popupArrow<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupArrow<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot<{}, PopupPartState>({
     state: (state) => ({ open: state.open }),
     attrs: (state) => ({ "aria-hidden": "true", ...openAttrs(state.open) }),
@@ -325,10 +394,13 @@ function popupArrow<State extends PopupState, Api extends PopupApi>(slot: SlotFa
  * it. A press on it is an outside press. Part of `popupSlots`.
  * @experimental
  */
-function popupBackdrop<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupBackdrop<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return slot<{}, PopupPartState>({
     state: (state) => ({ open: state.open }),
-    present: (state, { api }) => state.mounted || !!api.internal.contentProps().keepMounted,
+    present: (state, { api }) =>
+      state.mounted || !!api.internal.contentProps().keepMounted,
     role: "presentation",
     attrs: (state) => ({
       hidden: state.mounted ? undefined : "",
@@ -356,7 +428,9 @@ function popupBackdrop<State extends PopupState, Api extends PopupApi>(slot: Slo
  *
  * @experimental
  */
-function popupSlots<State extends PopupState, Api extends PopupApi>(slot: SlotFactory<State, Api>) {
+function popupSlots<State extends PopupState, Api extends PopupApi>(
+  slot: SlotFactory<State, Api>
+) {
   return {
     trigger: popupTrigger(slot),
     content: popupContent(slot),

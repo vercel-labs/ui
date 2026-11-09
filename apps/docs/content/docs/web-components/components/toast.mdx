@@ -51,7 +51,9 @@ Import the parts and put them together, then call `toast()` when an action finis
 
   document
     .querySelector("#create-event")
-    .addEventListener("click", () => toast("Event created", { description: "Friday at 10:00 AM" }))
+    .addEventListener("click", () =>
+      toast("Event created", { description: "Friday at 10:00 AM" })
+    )
 </script>
 
 <button id="create-event" type="button">Create Event</button>
@@ -100,7 +102,10 @@ Add an `action`, like Undo, and a `cancel` button that dismisses the toast. Thei
 
 Give an action an `href`, and write an `<a>` in `ui-toast-action` instead of a `<button>` to render it as a link; the region's `renderToast` sets the link's `href` from the toast. It keeps normal link behavior, including opening in a new tab.
 
-<ComponentExample name="toast/link" caption="Press Send Invoice, then follow View in the toast." />
+<ComponentExample
+  name="toast/link"
+  caption="Press Send Invoice, then follow View in the toast."
+/>
 
 ## Promise
 
@@ -205,7 +210,8 @@ A stack at the bottom of the page, in plain CSS:
   z-index: calc(100 - var(--toast-index));
   overflow: hidden;
   height: var(--toast-height);
-  translate: var(--toast-swipe-x, 0px) calc(var(--y) + var(--toast-swipe-y, 0px));
+  translate: var(--toast-swipe-x, 0px)
+    calc(var(--y) + var(--toast-swipe-y, 0px));
   scale: calc(1 - var(--toast-index) * 0.05);
   transition-property: translate, scale, opacity, height;
   transition-duration: 400ms;
@@ -229,7 +235,10 @@ A stack at the bottom of the page, in plain CSS:
   --y: 100%;
 }
 
-[data-slot="toast-root"]:is([data-starting-style]:not([data-front]), [data-ending-style]) {
+[data-slot="toast-root"]:is(
+  [data-starting-style]:not([data-front]),
+  [data-ending-style]
+) {
   opacity: 0;
 }
 
@@ -274,49 +283,85 @@ Each part has a `data-slot`, such as `toast-root`, and its state attributes are 
 
 ### Toast
 
-<TypeTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastOptions" events={false} />
+<TypeTable
+  path="../../packages/core/src/components/toast/toaster.ts"
+  name="ToastOptions"
+  events={false}
+/>
 
 `toast(message, options)` and `toast(options)` return the toast's id. `toast.success`, `.info`, `.warning`, `.error` and `.loading` set the type. `toast.promise(promise, { loading, success, error })` returns the id too, and `toast.update(id, options)` returns whether the toast was still there. `toast.dismiss(id)` closes one, and `toast.dismiss()` every one.
 
 ### Actions
 
-<TypeTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastAction" events={false} />
+<TypeTable
+  path="../../packages/core/src/components/toast/toaster.ts"
+  name="ToastAction"
+  events={false}
+/>
 
-<TypeTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastCancel" events={false} />
+<TypeTable
+  path="../../packages/core/src/components/toast/toaster.ts"
+  name="ToastCancel"
+  events={false}
+/>
 
 ### ToastRegion
 
-<TypeTable path="../../packages/core/src/components/toast/toast.ts" name="ToastRegionOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toast/toast.ts"
+  name="ToastRegionOptions"
+/>
 
 ### ToastAction
 
-<TypeTable path="../../packages/core/src/components/toast/toast.ts" name="ToastActionProps" />
+<TypeTable
+  path="../../packages/core/src/components/toast/toast.ts"
+  name="ToastActionProps"
+/>
 
 ### ToastClose
 
-<TypeTable path="../../packages/core/src/components/toast/toast.ts" name="ToastCloseProps" />
+<TypeTable
+  path="../../packages/core/src/components/toast/toast.ts"
+  name="ToastCloseProps"
+/>
 
 ### Confirm
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="ConfirmOptions" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="ConfirmOptions"
+/>
 
 ### State
 
 `ui-toast-region`:
 
-<StateTable path="../../packages/core/src/components/toast/toast.ts" name="ToastRegionState" />
+<StateTable
+  path="../../packages/core/src/components/toast/toast.ts"
+  name="ToastRegionState"
+/>
 
 `ui-toast`:
 
-<StateTable path="../../packages/core/src/components/toast/toast.ts" name="ToastState" />
+<StateTable
+  path="../../packages/core/src/components/toast/toast.ts"
+  name="ToastState"
+/>
 
 `ui-toast-action` and `ui-toast-close`:
 
-<StateTable path="../../packages/core/src/components/toast/toast.ts" name="ToastButtonState" />
+<StateTable
+  path="../../packages/core/src/components/toast/toast.ts"
+  name="ToastButtonState"
+/>
 
 ### Reasons
 
-<ReasonTable path="../../packages/core/src/components/toast/toaster.ts" name="ToastDismissReason" />
+<ReasonTable
+  path="../../packages/core/src/components/toast/toaster.ts"
+  name="ToastDismissReason"
+/>
 
 ## Accessibility
 

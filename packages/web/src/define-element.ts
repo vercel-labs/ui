@@ -47,9 +47,13 @@ const claimed = new Set<string>()
  * of ui-sdk defined first keeps that definition, with a warning.
  */
 function claimTag(tagName: string) {
-  if (typeof customElements === "undefined" || claimed.has(tagName)) return false
+  if (typeof customElements === "undefined" || claimed.has(tagName)) {
+    return false
+  }
   if (customElements.get(tagName)) {
-    warn(`<${tagName}> is already defined by another library or another copy of ui-sdk. This one is skipped.`)
+    warn(
+      `<${tagName}> is already defined by another library or another copy of ui-sdk. This one is skipped.`
+    )
     return false
   }
   claimed.add(tagName)
@@ -58,7 +62,9 @@ function claimTag(tagName: string) {
 
 /** A stable id for any element, for parts that need a key and have none. */
 function autoId(el: Element) {
-  if (!autoIds.has(el)) autoIds.set(el, `auto-${++count}`)
+  if (!autoIds.has(el)) {
+    autoIds.set(el, `auto-${++count}`)
+  }
   return autoIds.get(el)!
 }
 
@@ -80,7 +86,8 @@ function wrappedButton(el: HTMLElement) {
  * @stable
  */
 const wrappedChild = (selector: string) => (el: HTMLElement) =>
-  el.querySelector<HTMLElement>(`:scope > ${selector}`) ?? (el.firstElementChild as HTMLElement | null)
+  el.querySelector<HTMLElement>(`:scope > ${selector}`) ??
+  (el.firstElementChild as HTMLElement | null)
 
 /**
  * A `target` for a wrapper part that binds a button: the one written inside
@@ -90,10 +97,14 @@ const wrappedChild = (selector: string) => (el: HTMLElement) =>
 function ownButton(fill?: (button: HTMLButtonElement) => void) {
   return (el: HTMLElement) => {
     const written = wrappedButton(el)
-    if (written) return written
+    if (written) {
+      return written
+    }
     const button = el.ownerDocument.createElement("button")
     button.append(...el.childNodes)
-    if (!button.textContent?.trim()) fill?.(button)
+    if (!button.textContent?.trim()) {
+      fill?.(button)
+    }
     el.append(button)
     return button
   }
@@ -101,17 +112,27 @@ function ownButton(fill?: (button: HTMLButtonElement) => void) {
 
 // The element a part, or an owner's own slot, binds: what `target` picks, like
 // a wrapped button, else its first child with as-child, else itself.
-function boundElement(el: HTMLElement, target?: (el: HTMLElement) => HTMLElement | null) {
-  if (target) return target(el)
-  return el.hasAttribute("as-child") ? (el.firstElementChild as HTMLElement | null) : el
+function boundElement(
+  el: HTMLElement,
+  target?: (el: HTMLElement) => HTMLElement | null
+) {
+  if (target) {
+    return target(el)
+  }
+  return el.hasAttribute("as-child")
+    ? (el.firstElementChild as HTMLElement | null)
+    : el
 }
 
 // A part's key, as core tells parts of one slot apart. A new key is a new
 // part, so it binds again, like a scrollbar keyed by its orientation.
-const rekeyed = (previous: Record<string, unknown>, next: Record<string, unknown>) =>
-  previous.id !== next.id || previous.value !== next.value
+const rekeyed = (
+  previous: Record<string, unknown>,
+  next: Record<string, unknown>
+) => previous.id !== next.id || previous.value !== next.value
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 // Author writes core can't tell apart by value, like their own `role` or
 // `aria-disabled` set to what the part rendered, are heard instead. Any other
@@ -126,25 +147,33 @@ const semantics = ["role", "aria-disabled"]
  * anything else, like `modal`, which is a boolean or a string.
  * @stable
  */
-type AttributeType = "boolean" | "number" | "string" | "list" | ((value: string | null) => unknown)
+type AttributeType =
+  "boolean" | "number" | "string" | "list" | ((value: string | null) => unknown)
 
 /**
  * An attribute's value as an option. Missing attributes are undefined, so the
  * component's default applies.
  */
 function parseAttribute(type: AttributeType, value: string | null) {
-  if (value === null) return undefined
-  if (typeof type === "function") return type(value)
-  if (type === "boolean") return value !== "false"
+  if (value === null) {
+    return undefined
+  }
+  if (typeof type === "function") {
+    return type(value)
+  }
+  if (type === "boolean") {
+    return value !== "false"
+  }
   if (type === "number") {
     const number = Number(value)
     return value.trim() === "" || Number.isNaN(number) ? undefined : number
   }
-  if (type === "list")
+  if (type === "list") {
     return value
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean)
+  }
   return value
 }
 
@@ -155,16 +184,23 @@ const presence = new Set(["disabled", "required"])
 // An option or prop from its attribute, undefined when it's missing.
 function readAttribute(el: HTMLElement, name: string, type: AttributeType) {
   const value = el.getAttribute(kebab(name))
-  if (type === "boolean" && presence.has(name)) return value === null ? undefined : true
+  if (type === "boolean" && presence.has(name)) {
+    return value === null ? undefined : true
+  }
   return parseAttribute(type, value)
 }
 
 // Options or props from an element's attributes, by schema.
-function readAttributes(el: HTMLElement, schema: Record<string, AttributeType>) {
+function readAttributes(
+  el: HTMLElement,
+  schema: Record<string, AttributeType>
+) {
   const result: Record<string, unknown> = {}
   for (const [name, type] of Object.entries(schema)) {
     const value = readAttribute(el, name, type)
-    if (value !== undefined) result[name] = value
+    if (value !== undefined) {
+      result[name] = value
+    }
   }
   return result
 }
@@ -173,8 +209,10 @@ function readAttributes(el: HTMLElement, schema: Record<string, AttributeType>) 
 // element decides, like a dialog's `closeOnOutsidePress`, which is on while it's modal.
 type BooleanDefaults = Record<string, boolean | ((el: HTMLElement) => boolean)>
 
-const defaultOn = (el: HTMLElement, value: BooleanDefaults[string] | undefined) =>
-  typeof value === "function" ? value(el) : value
+const defaultOn = (
+  el: HTMLElement,
+  value: BooleanDefaults[string] | undefined
+) => (typeof value === "function" ? value(el) : value)
 
 // A property for each attribute option the element doesn't have yet, which
 // reflects it, like an input's `disabled`. Booleans go by presence, so
@@ -184,10 +222,12 @@ const defaultOn = (el: HTMLElement, value: BooleanDefaults[string] | undefined) 
 function reflectAttributes(
   proto: HTMLElement,
   schema: Record<string, AttributeType>,
-  defaults: BooleanDefaults = {},
+  defaults: BooleanDefaults = {}
 ) {
   for (const [name, type] of Object.entries(schema)) {
-    if (name in proto) continue
+    if (name in proto) {
+      continue
+    }
     const attribute = kebab(name)
     Object.defineProperty(proto, name, {
       configurable: true,
@@ -199,13 +239,22 @@ function reflectAttributes(
         )
       },
       set(this: HTMLElement, value: unknown) {
-        const removes = value === false && type === "boolean" && !defaultOn(this, defaults[name])
-        if (value == null || removes) this.removeAttribute(attribute)
-        else
+        const removes =
+          value === false &&
+          type === "boolean" &&
+          !defaultOn(this, defaults[name])
+        if (value == null || removes) {
+          this.removeAttribute(attribute)
+        } else {
           this.setAttribute(
             attribute,
-            value === true ? "" : Array.isArray(value) ? value.join(",") : String(value),
+            value === true
+              ? ""
+              : Array.isArray(value)
+                ? value.join(",")
+                : String(value)
           )
+        }
       },
     })
   }
@@ -215,7 +264,9 @@ function reflectAttributes(
 // the accessor. Sets it again through the accessor.
 function upgradeProperties(el: HTMLElement, names: Iterable<string>) {
   for (const name of names) {
-    if (!Object.prototype.hasOwnProperty.call(el, name)) continue
+    if (!Object.prototype.hasOwnProperty.call(el, name)) {
+      continue
+    }
     const value = el[name as keyof HTMLElement]
     delete el[name as keyof HTMLElement]
     ;(el as unknown as Record<string, unknown>)[name] = value
@@ -244,14 +295,20 @@ const pendingRestores = new Map<HTMLElement, object>()
 // wins over a waiting restore: the element's own, and a group's around it,
 // which a checkbox writes through.
 function wroteFromScript(el: HTMLElement) {
-  for (const waiting of pendingRestores.keys()) if (waiting.contains(el)) pendingRestores.delete(waiting)
+  for (const waiting of pendingRestores.keys()) {
+    if (waiting.contains(el)) {
+      pendingRestores.delete(waiting)
+    }
+  }
 }
 
 function restoreOnceBound(el: HTMLElement, state: unknown, mode: string) {
   const token = {}
   pendingRestores.set(el, token)
   queueMicrotask(() => {
-    if (pendingRestores.get(el) !== token) return
+    if (pendingRestores.get(el) !== token) {
+      return
+    }
     pendingRestores.delete(el)
     restoreQuietly(el, state, mode)
   })
@@ -262,8 +319,14 @@ function restoreOnceBound(el: HTMLElement, state: unknown, mode: string) {
 // an element while one inside it is, like a group whose checkbox restores.
 function quietNow(el: HTMLElement) {
   const owner = partOwners.get(el)
-  if (quiet.has(el) || (!!owner && quiet.has(owner))) return true
-  for (const inside of quiet) if (el.contains(inside)) return true
+  if (quiet.has(el) || (!!owner && quiet.has(owner))) {
+    return true
+  }
+  for (const inside of quiet) {
+    if (el.contains(inside)) {
+      return true
+    }
+  }
   return false
 }
 
@@ -292,42 +355,66 @@ function withEvents<T extends object>(
   target: T,
   silent: string[] = [],
   actions: string[] = [],
-  names: Record<string, string> = {},
+  names: Record<string, string> = {}
 ) {
   return new Proxy(target, {
     get(target, key) {
-      if (key in target || typeof key !== "string" || !/^on[A-Z]/.test(key)) return target[key as keyof T]
-      if (silent.includes(key)) return undefined
-      return (value: unknown, details?: { cancel?: () => void; canceled?: boolean }) => {
-        if (quietNow(el)) return
+      if (key in target || typeof key !== "string" || !/^on[A-Z]/.test(key)) {
+        return target[key as keyof T]
+      }
+      if (silent.includes(key)) {
+        return undefined
+      }
+      return (
+        value: unknown,
+        details?: { cancel?: () => void; canceled?: boolean }
+      ) => {
+        if (quietNow(el)) {
+          return
+        }
         const only = detailsOnly(value, details)
-        const { cancel, canceled, ...rest } = ((only ? value : details) ?? {}) as {
+        const { cancel, canceled, ...rest } = ((only ? value : details) ??
+          {}) as {
           cancel?: () => void
           canceled?: boolean
         }
         const detail: Record<string, unknown> = only ? rest : { ...rest, value }
         const wait = actions.includes(key) ? waitList() : undefined
-        if (wait) detail.waitUntil = wait.waitUntil
+        if (wait) {
+          detail.waitUntil = wait.waitUntil
+        }
         // Only `el` hears it, like `toggle` on <details>, so a dialog never takes
         // the change of a dialog inside it for its own. A listener on an
         // ancestor hears every element inside it with `{ capture: true }`.
         // Composed, so a page that renders the element in a shadow root hears it on the host.
-        const event = new CustomEvent(names[key] ?? key.slice(2).toLowerCase(), {
-          detail,
-          bubbles: false,
-          // Only a change with details or an event to cancel is cancelable.
-          cancelable: typeof cancel === "function" || typeof (value as Event)?.preventDefault === "function",
-          composed: true,
-        })
+        const event = new CustomEvent(
+          names[key] ?? key.slice(2).toLowerCase(),
+          {
+            detail,
+            bubbles: false,
+            // Only a change with details or an event to cancel is cancelable.
+            cancelable:
+              typeof cancel === "function" ||
+              typeof (value as Event)?.preventDefault === "function",
+            composed: true,
+          }
+        )
         const proceed = el.dispatchEvent(event)
         const waiting = wait?.done() ?? []
         if (!proceed) {
-          if (typeof cancel === "function") cancel()
-          else if (value && typeof (value as Event).preventDefault === "function")
-            (value as Event).preventDefault()
+          if (typeof cancel === "function") {
+            cancel()
+          } else if (
+            value &&
+            typeof (value as Event).preventDefault === "function"
+          ) {
+            ;(value as Event).preventDefault()
+          }
         }
         // One Promise, as the core takes it: a token's patch is what the last one resolves to.
-        return waiting.length > 1 ? Promise.all(waiting).then((values) => values.at(-1)) : waiting[0]
+        return waiting.length > 1
+          ? Promise.all(waiting).then((values) => values.at(-1))
+          : waiting[0]
       }
     },
   })
@@ -340,7 +427,8 @@ const instances = new WeakMap<Element, PrimitiveInstance>()
 // The instance an owner element made, for this package's modules. The map
 // holds every primitive's instances, so the caller names the api it expects.
 function instanceOf<Api = unknown>(el: Element | null | undefined) {
-  return (el ? instances.get(el) : undefined) as (PrimitiveInstance & { api: Api }) | undefined
+  return (el ? instances.get(el) : undefined) as
+    (PrimitiveInstance & { api: Api }) | undefined
 }
 
 // Controller methods that leave the state as it is.
@@ -351,11 +439,14 @@ function controllerView(el: HTMLElement, api: object, methods: string[]) {
   const view: Record<string, unknown> = {}
   for (const name of methods) {
     const method = (api as Record<string, unknown>)[name]
-    if (typeof method === "function")
+    if (typeof method === "function") {
       view[name] = (...args: unknown[]) => {
-        if (!reads.test(name)) wroteFromScript(el)
+        if (!reads.test(name)) {
+          wroteFromScript(el)
+        }
         return method.apply(api, args)
       }
+    }
   }
   return Object.freeze(view)
 }
@@ -366,7 +457,13 @@ function controllerView(el: HTMLElement, api: object, methods: string[]) {
  * elements, like a calendar's weeks and days.
  */
 type PartDisplay =
-  "block" | "contents" | "table" | "table-header-group" | "table-row-group" | "table-row" | "table-cell"
+  | "block"
+  | "contents"
+  | "table"
+  | "table-header-group"
+  | "table-row-group"
+  | "table-row"
+  | "table-cell"
 
 // Defaults that browsers give built-in elements but not custom ones, in the
 // lowest cascade layer with zero specificity, so any class wins.
@@ -381,7 +478,9 @@ const aligned = new Set<string>()
 // numbered across the copies on the page.
 let styleId: string | undefined
 function documentStyle() {
-  if (styleId) return styleId
+  if (styleId) {
+    return styleId
+  }
   const copies = globalThis as Record<symbol, number | undefined>
   const key = Symbol.for("ui-sdk.web-styles@1")
   copies[key] = (copies[key] ?? 0) + 1
@@ -394,15 +493,24 @@ let rulesVersion = 0
 // The same rules for shadow roots, which the document's styles don't reach.
 // One sheet for each document, since a constructed sheet can only be adopted
 // into the document it was made for.
-const constructed = new WeakMap<Document, { sheet: CSSStyleSheet; version: number }>()
+const constructed = new WeakMap<
+  Document,
+  { sheet: CSSStyleSheet; version: number }
+>()
 /**
  * Gives elements matching `selector` a default display, like a part's tag,
  * or the elements a part generates inside it.
  */
 function setDisplay(selector: string, value?: PartDisplay, align = false) {
-  if (align) aligned.add(selector)
-  if (!value && !align) return
-  if (value) display.set(selector, value)
+  if (align) {
+    aligned.add(selector)
+  }
+  if (!value && !align) {
+    return
+  }
+  if (value) {
+    display.set(selector, value)
+  }
   css = rules()
   writeStyle(document, documentStyle(), css)
   rulesVersion++
@@ -416,9 +524,11 @@ function rules() {
     // Content hidden until found is only hidden inside a box, so those keep theirs.
     ...[...display].map(
       ([selector, value]) =>
-        `  :where(${selector}:not([hidden]), ${selector}[hidden="until-found"]) { display: ${value} }`,
+        `  :where(${selector}:not([hidden]), ${selector}[hidden="until-found"]) { display: ${value} }`
     ),
-    ...[...aligned].map((tag) => `  :where(${tag}[align]) { text-align: inherit }`),
+    ...[...aligned].map(
+      (tag) => `  :where(${tag}[align]) { text-align: inherit }`
+    ),
     // A part with as-child hands its role to its child, so it has no box of its own.
     "  :where([as-child]) { display: contents }",
     "}",
@@ -432,22 +542,34 @@ function rules() {
 // tells us it did.
 function adoptStyles(el: HTMLElement) {
   const root = el.getRootNode()
-  if (!isShadowRoot(root)) return copyStyles(el.ownerDocument)
+  if (!isShadowRoot(root)) {
+    return copyStyles(el.ownerDocument)
+  }
   const shared = sharedSheet(root.ownerDocument)
-  if (!shared || root.adoptedStyleSheets.includes(shared)) return
+  if (!shared || root.adoptedStyleSheets.includes(shared)) {
+    return
+  }
   root.adoptedStyleSheets = [shared, ...root.adoptedStyleSheets]
 }
 
 // By node type, since `instanceof ShadowRoot` is false for one from another document's window.
-const isShadowRoot = (node: Node): node is ShadowRoot => node.nodeType === 11 && "host" in node
+const isShadowRoot = (node: Node): node is ShadowRoot =>
+  node.nodeType === 11 && "host" in node
 
 // The document's constructed sheet with the rules, made with its own window's
 // constructor. None for a document without a window, which renders nothing.
 function sharedSheet(doc: Document) {
   const view = doc.defaultView
-  if (!view) return
+  if (!view) {
+    return
+  }
   let entry = constructed.get(doc)
-  if (!entry) constructed.set(doc, (entry = { sheet: new view.CSSStyleSheet(), version: -1 }))
+  if (!entry) {
+    constructed.set(
+      doc,
+      (entry = { sheet: new view.CSSStyleSheet(), version: -1 })
+    )
+  }
   // Rules defined since it was made.
   if (entry.version !== rulesVersion) {
     entry.sheet.replaceSync(rules())
@@ -461,7 +583,9 @@ function sharedSheet(doc: Document) {
 // one again after the page replaces its adopted sheets, which take them when
 // the page's csp-nonce tag has no nonce. Unchanged, it's one lookup.
 function copyStyles(doc: Document) {
-  if (css) writeStyle(doc, documentStyle(), css)
+  if (css) {
+    writeStyle(doc, documentStyle(), css)
+  }
 }
 
 type Part = {
@@ -500,7 +624,11 @@ type Part = {
 const dependents = new Set<HTMLElement & { reconfigure: () => void }>()
 
 function reconfigureInside(el: HTMLElement) {
-  for (const dependent of dependents) if (dependent !== el && el.contains(dependent)) dependent.reconfigure()
+  for (const dependent of dependents) {
+    if (dependent !== el && el.contains(dependent)) {
+      dependent.reconfigure()
+    }
+  }
 }
 
 type OwnerElement = HTMLElement & {
@@ -515,10 +643,16 @@ const portals = new WeakMap<Element, Element | DocumentFragment>()
 
 // Containers that pass on what they'd hand down: a popup inside a sheet
 // renders where the sheet's viewport went, never into the viewport itself.
-const passedOn = new WeakMap<Element | DocumentFragment, Element | DocumentFragment | null>()
+const passedOn = new WeakMap<
+  Element | DocumentFragment,
+  Element | DocumentFragment | null
+>()
 
 /** Popups inside `container` inherit `to` instead, or render in place for null. */
-function passPortalOn(container: Element, to: Element | DocumentFragment | null) {
+function passPortalOn(
+  container: Element,
+  to: Element | DocumentFragment | null
+) {
   passedOn.set(container, to)
 }
 
@@ -527,9 +661,15 @@ function passPortalOn(container: Element, to: Element | DocumentFragment | null)
  * inside a portaled popup renders there too, unless it names its own.
  */
 function inheritedPortal(el: Element) {
-  for (let node: Element | null = el.parentElement; node; node = node.parentElement) {
+  for (
+    let node: Element | null = el.parentElement;
+    node;
+    node = node.parentElement
+  ) {
     const target = portals.get(node)
-    if (target) return passedOn.has(target) ? passedOn.get(target)! : target
+    if (target) {
+      return passedOn.has(target) ? passedOn.get(target)! : target
+    }
   }
   return null
 }
@@ -545,10 +685,18 @@ const slotParts = new WeakMap<Element, Part>()
 // bind, like a number input's control inside a toolbar input. Its `data-slot`
 // wins, as the element passed to `render` wins in the other frameworks.
 function innerPart(part: Part, owner: HTMLElement) {
-  for (let node: HTMLElement | null = part.el; node && node !== owner; node = node.parentElement) {
+  for (
+    let node: HTMLElement | null = part.el;
+    node && node !== owner;
+    node = node.parentElement
+  ) {
     const other = slotParts.get(node)
-    if (other === part) return
-    if (other?.el === part.el && registered.has(other)) return other
+    if (other === part) {
+      return
+    }
+    if (other?.el === part.el && registered.has(other)) {
+      return other
+    }
   }
 }
 
@@ -558,14 +706,29 @@ function innerPart(part: Part, owner: HTMLElement) {
 function handOver(part: Part) {
   part.dataSlot = undefined
   const sharing: Part[] = []
-  for (let node: HTMLElement | null = part.el; node; node = node.parentElement) {
+  for (
+    let node: HTMLElement | null = part.el;
+    node;
+    node = node.parentElement
+  ) {
     const other = slotParts.get(node)
-    if (other && other !== part && other.el === part.el && registered.has(other)) sharing.push(other)
+    if (
+      other &&
+      other !== part &&
+      other.el === part.el &&
+      registered.has(other)
+    ) {
+      sharing.push(other)
+    }
   }
-  if (!sharing.length) return
+  if (!sharing.length) {
+    return
+  }
   part.el.removeAttribute("data-slot")
   markAuthored(part.el, "data-slot")
-  for (const other of sharing) other.sync?.()
+  for (const other of sharing) {
+    other.sync?.()
+  }
 }
 
 // A part its owner let go of when it left the page registers again once the owner is back.
@@ -585,9 +748,13 @@ const hasRichValue = (props: Record<string, unknown>) =>
 function propsAround(el: Element, slot: string, owner?: OwnerElement) {
   for (let node = el.parentElement; node; node = node.parentElement) {
     const part = slotParts.get(node)
-    if (part?.slot !== slot || partOwners.get(node) !== owner) continue
+    if (part?.slot !== slot || partOwners.get(node) !== owner) {
+      continue
+    }
     // An item gives the parts inside it its key as its value, as in the other frameworks.
-    return part.keyed && hasRichValue(part.props) ? { ...part.props, value: part.props.id } : part.props
+    return part.keyed && hasRichValue(part.props)
+      ? { ...part.props, value: part.props.id }
+      : part.props
   }
 }
 
@@ -604,14 +771,20 @@ function findOwner(el: Element, selector: string) {
     // Looked up in the element's own tree, like a native `for`, so it works in a shadow root.
     const root = el.getRootNode() as Document | ShadowRoot
     const owner = "getElementById" in root ? root.getElementById(target) : null
-    if (owner?.matches(selector)) return owner as OwnerElement
+    if (owner?.matches(selector)) {
+      return owner as OwnerElement
+    }
   }
   for (let node = el.parentElement; node; node = node.parentElement) {
-    if (node.matches(selector)) return node as OwnerElement
+    if (node.matches(selector)) {
+      return node as OwnerElement
+    }
     // A part of another kind of owner, like a field's label inside a number
     // field's scrub area, keeps looking past that owner's parts.
     const owner = partOwners.get(node)
-    if (owner?.matches(selector)) return owner
+    if (owner?.matches(selector)) {
+      return owner
+    }
   }
 }
 
@@ -626,13 +799,18 @@ const unmatched = new WeakMap<Element, string>()
 function findContainer(el: Element, selector: string) {
   for (let root = el.getRootNode(); ; root = root.host.getRootNode()) {
     const container = (root as ParentNode).querySelector(selector)
-    if (container) return container
-    if (!isShadowRoot(root)) break
+    if (container) {
+      return container
+    }
+    if (!isShadowRoot(root)) {
+      break
+    }
   }
-  if (unmatched.get(el) !== selector)
+  if (unmatched.get(el) !== selector) {
     warn(
-      `<${el.localName}> container="${selector}" matches no element yet, so it renders in place. A container rendered later is used from its next open.`,
+      `<${el.localName}> container="${selector}" matches no element yet, so it renders in place. A container rendered later is used from its next open.`
     )
+  }
   unmatched.set(el, selector)
   return null
 }
@@ -641,7 +819,9 @@ function findContainer(el: Element, selector: string) {
 // disconnects and reconnects in the same task, and must stay bound.
 function whenGone(el: HTMLElement, run: () => void) {
   queueMicrotask(() => {
-    if (!el.isConnected) run()
+    if (!el.isConnected) {
+      run()
+    }
   })
 }
 
@@ -696,8 +876,12 @@ function formAssociated(Base: typeof HTMLElement) {
       return this.#internals.reportValidity()
     }
     setCustomValidity(message: string) {
-      if (!formCallback(this, "customValidity", message))
-        this.#internals.setValidity(message ? { customError: true } : {}, message)
+      if (!formCallback(this, "customValidity", message)) {
+        this.#internals.setValidity(
+          message ? { customError: true } : {},
+          message
+        )
+      }
     }
     formResetCallback() {
       pendingRestores.delete(this)
@@ -709,7 +893,9 @@ function formAssociated(Base: typeof HTMLElement) {
     formStateRestoreCallback(state: unknown, mode: string) {
       pendingRestores.delete(this)
       // The browser restores state as the element upgrades, before its parts bind.
-      if (!restoreQuietly(this, state, mode)) restoreOnceBound(this, state, mode)
+      if (!restoreQuietly(this, state, mode)) {
+        restoreOnceBound(this, state, mode)
+      }
     }
   }
 }
@@ -729,7 +915,10 @@ type OwnerConfig<P extends Primitive> = {
    * change event. An attribute of the same name sets the starting state, and
    * changing it later changes the state the same way.
    */
-  state?: Record<string, { get: (api: any) => unknown; set: (api: any, value: any) => void }>
+  state?: Record<
+    string,
+    { get: (api: any) => unknown; set: (api: any, value: any) => void }
+  >
   /** The controller's methods, which the element's `api` property exposes. */
   api?: string[]
   /** Callbacks that fire no event, because part elements already report them. */
@@ -776,7 +965,10 @@ type OwnerConfig<P extends Primitive> = {
    * <input>'s `disabled`, `readonly` and `required`, or its `autocomplete`.
    * A change reads `read` and the options again.
    */
-  childProps?: { attributes: string[]; read?: (el: HTMLElement) => Record<string, unknown> }
+  childProps?: {
+    attributes: string[]
+    read?: (el: HTMLElement) => Record<string, unknown>
+  }
   /**
    * Slots that move into a container while present, like popups. Without
    * top layer support they move to the body. The container is asked on
@@ -787,7 +979,7 @@ type OwnerConfig<P extends Primitive> = {
     slots: string[]
     container: (
       el: HTMLElement,
-      part: { slot: string; el: HTMLElement; props: Record<string, unknown> },
+      part: { slot: string; el: HTMLElement; props: Record<string, unknown> }
     ) => Element | DocumentFragment | null
   }
   /**
@@ -802,48 +994,85 @@ type OwnerConfig<P extends Primitive> = {
    * properties read true without the attribute and `false` writes "false".
    * A function decides from the element, like `closeOnOutsidePress` from `modal`.
    */
-  defaults?: Partial<Record<keyof OptionsOf<P> & string, BooleanDefaults[string]>>
+  defaults?: Partial<
+    Record<keyof OptionsOf<P> & string, BooleanDefaults[string]>
+  >
 }
 
 // The option that sets where a state key starts, like `defaultChecked` for `checked`.
-const defaultOf = (name: string) => `default${name[0].toUpperCase()}${name.slice(1)}`
+const defaultOf = (name: string) =>
+  `default${name[0].toUpperCase()}${name.slice(1)}`
 
 // Defines the element that owns a primitive instance, like <ui-menu>. Part
 // elements inside it register themselves with it. Attributes become options,
 // `state` adds live properties that fire `<name>change` events, and `api`
 // exposes the controller's methods on the element's `api` property. Does
 // nothing on the server, and once per tag.
-function defineRootElement<P extends Primitive>(tagName: string, primitive: P, config: OwnerConfig<P>) {
-  if (!claimTag(tagName)) return
+function defineRootElement<P extends Primitive>(
+  tagName: string,
+  primitive: P,
+  config: OwnerConfig<P>
+) {
+  if (!claimTag(tagName)) {
+    return
+  }
   setDisplay(tagName, config.display)
-  const schema: Record<string, AttributeType> = { debug: "boolean", ...config.attributes }
+  const schema: Record<string, AttributeType> = {
+    debug: "boolean",
+    ...config.attributes,
+  }
   const state = config.state ?? {}
   // Options from attributes and properties. A state attribute, like `open`,
   // sets where the state starts, unless its `default-` attribute does.
-  const optionsOf = (el: HTMLElement, properties: Record<string, unknown>, rendered: Set<string>) => {
+  const optionsOf = (
+    el: HTMLElement,
+    properties: Record<string, unknown>,
+    rendered: Set<string>
+  ) => {
     const options = readAttributes(el, schema)
-    for (const name of rendered) delete options[name]
-    for (const [name, value] of Object.entries(properties)) if (value !== undefined) options[name] = value
+    for (const name of rendered) {
+      delete options[name]
+    }
+    for (const [name, value] of Object.entries(properties)) {
+      if (value !== undefined) {
+        options[name] = value
+      }
+    }
     for (const name of Object.keys(state)) {
-      if (!(name in options)) continue
+      if (!(name in options)) {
+        continue
+      }
       const fallback = defaultOf(name)
-      if (!(fallback in options)) options[fallback] = options[name]
+      if (!(fallback in options)) {
+        options[fallback] = options[name]
+      }
       delete options[name]
     }
     return { ...options, ...config.options?.(el) } as Partial<OptionsOf<P>>
   }
   customElements.define(
     tagName,
-    class Owner extends (config.formAssociated ? formAssociated(HTMLElement) : HTMLElement) {
-      static observedAttributes = [...Object.keys(schema).map(kebab), ...semantics]
+    class Owner extends (config.formAssociated
+      ? formAssociated(HTMLElement)
+      : HTMLElement) {
+      static observedAttributes = [
+        ...Object.keys(schema).map(kebab),
+        ...semantics,
+      ]
       #view?: object
       get #instance() {
         return instances.get(this) as ReturnType<P> | undefined
       }
       // The controller's methods. Internals stay out of reach.
       get api() {
-        if (!this.#instance) return undefined
-        return (this.#view ??= controllerView(this, this.#instance.api as object, config.api ?? []))
+        if (!this.#instance) {
+          return undefined
+        }
+        return (this.#view ??= controllerView(
+          this,
+          this.#instance.api as object,
+          config.api ?? []
+        ))
       }
       #parts = new Set<Part>()
       #pending = new Set<Part>()
@@ -863,33 +1092,48 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       #saved?: string
 
       static {
-        for (const [name, { get, set }] of Object.entries(state))
+        for (const [name, { get, set }] of Object.entries(state)) {
           Object.defineProperty(Owner.prototype, name, {
             get(this: Owner) {
-              if (name in this.#state) return this.#state[name]
+              if (name in this.#state) {
+                return this.#state[name]
+              }
               return this.#instance ? get(this.#instance.api) : undefined
             },
             set(this: Owner, value: unknown) {
               wroteFromScript(this)
-              if (this.#instance && !this.#gone) this.#quietly(() => set(this.#instance!.api, value))
-              else this.#state[name] = value
+              if (this.#instance && !this.#gone) {
+                this.#quietly(() => set(this.#instance!.api, value))
+              } else {
+                this.#state[name] = value
+              }
             },
           })
-        for (const name of config.properties ?? [])
+        }
+        for (const name of config.properties ?? []) {
           Object.defineProperty(Owner.prototype, name, {
             get(this: Owner) {
               return this.#properties[name]
             },
             set(this: Owner, value: unknown) {
               // A page that renders on every change, like lit-html, sets the same value again each time.
-              if (Object.is(this.#properties[name], value)) return
+              if (Object.is(this.#properties[name], value)) {
+                return
+              }
               this.#properties[name] = value
-              if (!this.#connected) return
+              if (!this.#connected) {
+                return
+              }
               this.#configure()
               this.#render()
             },
           })
-        reflectAttributes(Owner.prototype, schema, config.defaults as BooleanDefaults)
+        }
+        reflectAttributes(
+          Owner.prototype,
+          schema,
+          config.defaults as BooleanDefaults
+        )
       }
 
       // Options come from attributes and properties, with `defaults` over them.
@@ -898,31 +1142,55 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         this.#instance?.setOptions(
           withEvents(
             this,
-            { ...optionsOf(this, this.#properties, this.#rendered), ...defaults, id: this.#instance.id },
+            {
+              ...optionsOf(this, this.#properties, this.#rendered),
+              ...defaults,
+              id: this.#instance.id,
+            },
             config.silent,
             config.actions,
-            config.events,
-          ),
+            config.events
+          )
         )
       }
 
-      attributeChangedCallback(name: string, previous: string | null, value: string | null) {
+      attributeChangedCallback(
+        name: string,
+        previous: string | null,
+        value: string | null
+      ) {
         markAuthored(this, name)
-        if (semantics.includes(name)) return
-        const key = name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
-        if (key in state && value !== previous && !this.#rendering) wroteFromScript(this)
-        if (!this.#rendering || value === null) this.#rendered.delete(key)
-        else if (previous === null) this.#rendered.add(key)
-        if (!this.#connected) return
+        if (semantics.includes(name)) {
+          return
+        }
+        const key = name.replace(/-(\w)/g, (_, char: string) =>
+          char.toUpperCase()
+        )
+        if (key in state && value !== previous && !this.#rendering) {
+          wroteFromScript(this)
+        }
+        if (!this.#rendering || value === null) {
+          this.#rendered.delete(key)
+        } else if (previous === null) {
+          this.#rendered.add(key)
+        }
+        if (!this.#connected) {
+          return
+        }
         this.#configure()
         reconfigureInside(this)
         // A state attribute changed after the start, like `value` set from the
         // URL. Removing it clears the state, like removing `open` from <details>.
-        if (!(key in state) || value === previous) return
+        if (!(key in state) || value === previous) {
+          return
+        }
         const type = schema[key]
         const cleared = type === "boolean" ? false : type === "list" ? [] : null
         this.#quietly(() =>
-          state[key].set(this.#instance!.api, value === null ? cleared : parseAttribute(type, value)),
+          state[key].set(
+            this.#instance!.api,
+            value === null ? cleared : parseAttribute(type, value)
+          )
         )
       }
 
@@ -947,28 +1215,48 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         // Even a move within one task can take it into a shadow root or another document.
         adoptStyles(this)
         if (this.#connected) {
-          for (const part of this.#parts) elementMoved(part.el)
+          for (const part of this.#parts) {
+            elementMoved(part.el)
+          }
           // Options from its surroundings, like a disabled field around it, may differ where it landed.
-          if (config.options) this.#configure()
+          if (config.options) {
+            this.#configure()
+          }
           return
         }
-        upgradeProperties(this, [...Object.keys(state), ...(config.properties ?? []), ...Object.keys(schema)])
-        for (const [name, value] of Object.entries(config.host ?? {}))
-          if (!this.hasAttribute(name)) this.setAttribute(name, value)
+        upgradeProperties(this, [
+          ...Object.keys(state),
+          ...(config.properties ?? []),
+          ...Object.keys(schema),
+        ])
+        for (const [name, value] of Object.entries(config.host ?? {})) {
+          if (!this.hasAttribute(name)) {
+            this.setAttribute(name, value)
+          }
+        }
         // Put back after it left the page, like a view a router kept: its
         // instance was destroyed, so a new one starts where the old one was,
         // the way a native element keeps its state. A form-associated one
         // starts from its defaults, which a form reset returns to, and
         // restores its state as the browser would.
-        const restore = this.#gone && !Object.keys(this.#state).length ? this.#saved : undefined
+        const restore =
+          this.#gone && !Object.keys(this.#state).length
+            ? this.#saved
+            : undefined
         const starts: Record<string, unknown> = {}
-        if (this.#gone && restore === undefined)
-          for (const [name, { get }] of Object.entries(state)) starts[name] = get(this.#instance!.api)
+        if (this.#gone && restore === undefined) {
+          for (const [name, { get }] of Object.entries(state)) {
+            starts[name] = get(this.#instance!.api)
+          }
+        }
         // A state property set while it was away, or before it connected, wins.
         Object.assign(starts, this.#state)
         this.#state = {}
         const last = Object.fromEntries(
-          Object.entries(starts).map(([name, value]) => [defaultOf(name), value]),
+          Object.entries(starts).map(([name, value]) => [
+            defaultOf(name),
+            value,
+          ])
         )
         if (this.#gone) {
           instances.delete(this)
@@ -978,46 +1266,58 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         }
         // Attributes may have changed while it was disconnected.
         let instance = this.#instance
-        if (instance) this.#configure()
-        else {
+        if (instance) {
+          this.#configure()
+        } else {
           instance = primitive(
             withEvents(
               this,
               {
                 ...optionsOf(this, this.#properties, this.#rendered),
                 ...last,
-                id: this.id || `ui-sdk-${tagName.replace(/^ui-/, "")}-${++count}`,
+                id:
+                  this.id || `ui-sdk-${tagName.replace(/^ui-/, "")}-${++count}`,
               },
               config.silent,
               config.actions,
-              config.events,
-            ),
+              config.events
+            )
           ) as ReturnType<P>
           instances.set(this, instance)
         }
         // A form reset returns to the defaults the attributes give, not to
         // where properties set before connecting started it, like a native input.
         if (config.formAssociated && Object.keys(starts).length) {
-          const base = instance.startState(optionsOf(this, this.#properties, this.#rendered)) as Record<
-            string,
-            unknown
-          >
+          const base = instance.startState(
+            optionsOf(this, this.#properties, this.#rendered)
+          ) as Record<string, unknown>
           this.#configure(
-            Object.fromEntries(Object.keys(starts).map((name) => [defaultOf(name), base[name]])),
+            Object.fromEntries(
+              Object.keys(starts).map((name) => [defaultOf(name), base[name]])
+            )
           )
         }
         this.#connected = true
-        if (config.options) dependents.add(this)
+        if (config.options) {
+          dependents.add(this)
+        }
         if (config.self) {
           const el = boundElement(this, config.target)
-          if (el) this.#registerSelf(el)
-          else warn(`<${tagName}> needs an element inside it.`)
+          if (el) {
+            this.#registerSelf(el)
+          } else {
+            warn(`<${tagName}> needs an element inside it.`)
+          }
         }
         for (const [slot, find] of Object.entries(config.children ?? {})) {
           const child = find(this)
-          if (child) this.#registerChild(slot, child)
-          else if (!config.optionalChildren?.includes(slot))
-            warn(`<${tagName}> needs its native element inside it for "${slot}".`)
+          if (child) {
+            this.#registerChild(slot, child)
+          } else if (!config.optionalChildren?.includes(slot)) {
+            warn(
+              `<${tagName}> needs its native element inside it for "${slot}".`
+            )
+          }
         }
         // Native children can come and go, like an avatar's <img> added once a
         // URL is known, and so can the element the own slot binds, like the
@@ -1032,10 +1332,16 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         this.#render()
         if (this.id) {
           const root = this.getRootNode() as ParentNode
-          for (const el of root.querySelectorAll(`[for="${CSS.escape(this.id)}"]`)) findOwnerAgain.get(el)?.()
+          for (const el of root.querySelectorAll(
+            `[for="${CSS.escape(this.id)}"]`
+          )) {
+            findOwnerAgain.get(el)?.()
+          }
         }
         // Once its parts bind, which reports to the form again, silently.
-        if (restore !== undefined) restoreOnceBound(this, restore, "restore")
+        if (restore !== undefined) {
+          restoreOnceBound(this, restore, "restore")
+        }
       }
 
       #renderCleanup?: () => void
@@ -1043,11 +1349,14 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // Runs only while connected, when the instance exists.
       #render() {
         this.#renderCleanup?.()
-        this.#renderCleanup = config.render?.(this, this.#instance!) || undefined
+        this.#renderCleanup =
+          config.render?.(this, this.#instance!) || undefined
       }
 
       reconfigure() {
-        if (this.#connected) this.#configure()
+        if (this.#connected) {
+          this.#configure()
+        }
       }
 
       #childParts = new Map<string, Part>()
@@ -1061,25 +1370,39 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
 
       // The element the own slot binds was replaced: the new one binds instead.
       #syncSelf() {
-        if (!config.self || !config.target) return
+        if (!config.self || !config.target) {
+          return
+        }
         const el = boundElement(this, config.target)
-        if (el === this.#selfPart?.el) return
-        if (this.#selfPart) this.unregister(this.#selfPart)
+        if (el === this.#selfPart?.el) {
+          return
+        }
+        if (this.#selfPart) {
+          this.unregister(this.#selfPart)
+        }
         this.#selfPart = undefined
         // Options can come from the element, like a button's authored `type`.
         this.#configure()
-        if (el) this.#registerSelf(el)
+        if (el) {
+          this.#registerSelf(el)
+        }
       }
 
       #registerChild(slot: string, el: HTMLElement) {
-        const part: Part = { slot, el, props: config.childProps?.read?.(el) ?? {} }
+        const part: Part = {
+          slot,
+          el,
+          props: config.childProps?.read?.(el) ?? {},
+        }
         if (config.childProps) {
           part.observer = new MutationObserver(() => {
             part.props = config.childProps!.read?.(el) ?? {}
             this.#configure()
             this.update(part, false)
           })
-          part.observer.observe(el, { attributeFilter: config.childProps.attributes })
+          part.observer.observe(el, {
+            attributeFilter: config.childProps.attributes,
+          })
         }
         this.#childParts.set(slot, part)
         this.register(part)
@@ -1089,12 +1412,16 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         for (const [slot, find] of Object.entries(config.children ?? {})) {
           const child = find(this)
           const current = this.#childParts.get(slot)
-          if (current?.el === child) continue
+          if (current?.el === child) {
+            continue
+          }
           if (current) {
             this.unregister(current)
             this.#childParts.delete(slot)
           }
-          if (child) this.#registerChild(slot, child)
+          if (child) {
+            this.#registerChild(slot, child)
+          }
         }
       }
 
@@ -1112,7 +1439,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           this.#selfPart = undefined
           this.#connected = false
           dependents.delete(this)
-          for (const part of this.#parts) this.unregister(part)
+          for (const part of this.#parts) {
+            this.unregister(part)
+          }
           this.#instance?.destroy()
           this.#gone = true
         })
@@ -1124,7 +1453,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         this.#parts.add(part)
         registered.add(part)
         part.sync = () => this.#pending.has(part) || this.#sync(part)
-        if (!this.#pending.size) queueMicrotask(() => this.#flush())
+        if (!this.#pending.size) {
+          queueMicrotask(() => this.#flush())
+        }
         this.#pending.add(part)
       }
 
@@ -1132,11 +1463,17 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
         const parts = inDocumentOrder([...this.#pending])
         this.#pending.clear()
         for (const part of parts) {
-          if (!this.#parts.has(part)) continue
+          if (!this.#parts.has(part)) {
+            continue
+          }
           // Props from the parts around it, like an item's group, are read
           // again, in document order, since those may have upgraded after it.
-          if (part.reread) part.props = part.reread()
-          if (part.feature) this.#instance!.use(part.feature)
+          if (part.reread) {
+            part.props = part.reread()
+          }
+          if (part.feature) {
+            this.#instance!.use(part.feature)
+          }
           this.#watch(part)
           this.#sync(part)
         }
@@ -1160,9 +1497,13 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
             part.version = renderVersion(instance)
             return this.#sync(part)
           }
-          if (liveOnly) return
+          if (liveOnly) {
+            return
+          }
           const version = renderVersion(instance)
-          if (version === part.version) return
+          if (version === part.version) {
+            return
+          }
           part.version = version
           this.#sync(part)
         })
@@ -1189,9 +1530,15 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // Binds every bound part again, in DOM order, for what they found when
       // they bound, like the menubar a menu joins, which may upgrade later.
       rebind() {
-        const parts = inDocumentOrder([...this.#parts].filter((part) => !this.#pending.has(part)))
-        for (const part of parts) this.#unbind(part)
-        for (const part of parts) this.#sync(part)
+        const parts = inDocumentOrder(
+          [...this.#parts].filter((part) => !this.#pending.has(part))
+        )
+        for (const part of parts) {
+          this.#unbind(part)
+        }
+        for (const part of parts) {
+          this.#sync(part)
+        }
       }
 
       // Props changed. A new key needs a new binding. Other parts can depend on
@@ -1199,11 +1546,15 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // attributes, like toolbar items on their group's `disabled`, so they
       // read their props again and sync too.
       update(part: Part, rebind: boolean) {
-        if (this.#pending.has(part)) return
+        if (this.#pending.has(part)) {
+          return
+        }
         this.#rewatch(part, rebind)
         this.#sync(part)
         for (const other of this.#parts) {
-          if (other === part || this.#pending.has(other)) continue
+          if (other === part || this.#pending.has(other)) {
+            continue
+          }
           if (other.reread) {
             const previous = other.props
             other.props = other.reread()
@@ -1215,15 +1566,21 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       }
 
       #rewatch(part: Part, rebind: boolean) {
-        if (rebind) this.#unbind(part)
+        if (rebind) {
+          this.#unbind(part)
+        }
         const record = this.#instance!.part(part.slot, part.props)
-        if (record !== part.record || selectedKeys(record) !== part.selected) this.#watch(part)
+        if (record !== part.record || selectedKeys(record) !== part.selected) {
+          this.#watch(part)
+        }
       }
 
       #sync(part: Part) {
         // A write can change state as it lands, like the `disabled` a form-associated
         // element hears it lost, so the part syncs again after it, never in the middle.
-        if (this.#applying.has(part)) return void this.#stale.add(part)
+        if (this.#applying.has(part)) {
+          return void this.#stale.add(part)
+        }
         adoptStyles(part.el)
         const instance = this.#instance!
         const record = instance.part(part.slot, part.props)
@@ -1240,10 +1597,16 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           // A part whose visibility the primitive controls owns its `hidden`, so one
           // the server wrote goes when it shows. An author's own on any other part stays.
           const attrs = partAttrs(record)
-          if (attrs.hidden === undefined && (conditional(record) || "hidden" in attrs))
+          if (
+            attrs.hidden === undefined &&
+            (conditional(record) || "hidden" in attrs)
+          ) {
             part.el.removeAttribute("hidden")
+          }
           this.#apply(part, attrs)
-          if (!part.unbind) this.#bind(part, record)
+          if (!part.unbind) {
+            this.#bind(part, record)
+          }
         } else {
           // A part that was shown gets its final attributes first, so it never keeps
           // stale state like data-open. Parts never shown stay untouched.
@@ -1251,11 +1614,15 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
             this.#apply(part, partAttrs(record))
             this.#unbind(part)
           }
-          if (!part.el.hasAttribute("hidden")) part.el.setAttribute("hidden", "")
+          if (!part.el.hasAttribute("hidden")) {
+            part.el.setAttribute("hidden", "")
+          }
           // The rule that keeps hidden parts hidden over an author's display
           // classes matches `data-slot`, which a part never shown has no other way to get.
           const slot = partAttrs(record)["data-slot"]
-          if (slot && !part.el.hasAttribute("data-slot")) part.el.setAttribute("data-slot", slot)
+          if (slot && !part.el.hasAttribute("data-slot")) {
+            part.el.setAttribute("data-slot", slot)
+          }
           this.#restore(part)
         }
       }
@@ -1271,7 +1638,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           cleanup?.()
         }
         cleanup = bind(record, part.el)
-        if (unbound) cleanup()
+        if (unbound) {
+          cleanup()
+        }
       }
 
       #unbind(part: Part) {
@@ -1283,7 +1652,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // Where a portaled slot's part belongs: a container, or null for in
       // place. Undefined for slots that never move.
       #portalTarget(part: Part) {
-        if (!config.portal?.slots.includes(part.slot)) return undefined
+        if (!config.portal?.slots.includes(part.slot)) {
+          return undefined
+        }
         return portalTarget(config.portal.container(this, part))
       }
 
@@ -1294,7 +1665,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // Moves a part into its container, or back in place for null.
       #move(part: Part, target: Element | DocumentFragment | null) {
         this.#restore(part)
-        if (!target) return
+        if (!target) {
+          return
+        }
         part.placeholder = document.createComment(`${tagName} ${part.slot}`)
         part.el.replaceWith(part.placeholder)
         target.appendChild(part.el)
@@ -1305,7 +1678,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       // grouped checkbox's `disabled` from its group, so it never disables it for good.
       #apply(part: Part, attrs: Record<string, string | undefined>) {
         const inner = innerPart(part, this)
-        if (inner?.dataSlot) attrs = { ...attrs, "data-slot": inner.dataSlot }
+        if (inner?.dataSlot) {
+          attrs = { ...attrs, "data-slot": inner.dataSlot }
+        }
         part.dataSlot = attrs["data-slot"]
         const rendering = this.#rendering
         this.#rendering = part.el === this
@@ -1316,7 +1691,9 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
           this.#rendering = rendering
           this.#applying.delete(part)
         }
-        if (this.#stale.delete(part)) this.#sync(part)
+        if (this.#stale.delete(part)) {
+          this.#sync(part)
+        }
       }
 
       // What the owner writes on its parts' elements. By host, not instance, so
@@ -1326,12 +1703,14 @@ function defineRootElement<P extends Primitive>(tagName: string, primitive: P, c
       }
 
       #restore(part: Part) {
-        if (!part.placeholder) return
+        if (!part.placeholder) {
+          return
+        }
         part.placeholder.replaceWith(part.el)
         part.placeholder = undefined
         portals.delete(part.el)
       }
-    },
+    }
   )
 }
 
@@ -1389,14 +1768,22 @@ type SlotConfig = {
 // Defines a part element, like <ui-menu-item>. It finds its owner, reads its
 // props from attributes and registers. The owner binds and syncs it.
 function definePartElement(tagName: string, config: SlotConfig) {
-  if (!claimTag(tagName)) return
+  if (!claimTag(tagName)) {
+    return
+  }
   const schema = config.props ?? {}
   setDisplay(tagName, config.display, "align" in schema)
 
   customElements.define(
     tagName,
-    class PartElement extends (config.formAssociated ? formAssociated(HTMLElement) : HTMLElement) {
-      static observedAttributes = [...Object.keys(schema).map(kebab), "for", ...semantics]
+    class PartElement extends (config.formAssociated
+      ? formAssociated(HTMLElement)
+      : HTMLElement) {
+      static observedAttributes = [
+        ...Object.keys(schema).map(kebab),
+        "for",
+        ...semantics,
+      ]
       #owner?: OwnerElement
       #part?: Part
       #properties: Record<string, unknown> = {}
@@ -1404,38 +1791,60 @@ function definePartElement(tagName: string, config: SlotConfig) {
       constructor() {
         super()
         findOwnerAgain.set(this, () => {
-          if (this.isConnected) this.connectedCallback()
+          if (this.isConnected) {
+            this.connectedCallback()
+          }
         })
       }
 
       static {
-        for (const name of config.properties ?? [])
+        for (const name of config.properties ?? []) {
           Object.defineProperty(PartElement.prototype, name, {
             get(this: PartElement) {
-              return this.#properties[name] ?? (schema[name] && readAttribute(this, name, schema[name]))
+              return (
+                this.#properties[name] ??
+                (schema[name] && readAttribute(this, name, schema[name]))
+              )
             },
             set(this: PartElement, value: unknown) {
               this.#properties[name] = value
               this.attributeChangedCallback("")
             },
           })
+        }
         reflectAttributes(PartElement.prototype, schema, config.defaults)
       }
 
       // What the element says itself, its attributes and properties, wins
       // over what its surroundings give it.
       #props() {
-        const props: Record<string, unknown> = { ...config.context?.(this), ...readAttributes(this, schema) }
-        for (const name of config.properties ?? [])
-          if (this.#properties[name] !== undefined) props[name] = this.#properties[name]
-        for (const [name, { slot, prop }] of Object.entries(config.from ?? {}))
+        const props: Record<string, unknown> = {
+          ...config.context?.(this),
+          ...readAttributes(this, schema),
+        }
+        for (const name of config.properties ?? []) {
+          if (this.#properties[name] !== undefined) {
+            props[name] = this.#properties[name]
+          }
+        }
+        for (const [name, { slot, prop }] of Object.entries(
+          config.from ?? {}
+        )) {
           props[name] ??= propsAround(this, slot, this.#owner)?.[prop]
-        for (const name of config.ids ?? []) props[name] ??= autoId(this)
+        }
+        for (const name of config.ids ?? []) {
+          props[name] ??= autoId(this)
+        }
         // Parts without a value, their own or from their surroundings, still need a stable key.
-        if (props.value === undefined && props.id === undefined) props.id = autoId(this)
+        if (props.value === undefined && props.id === undefined) {
+          props.id = autoId(this)
+        }
         // The core keys a part by `String(value)`, so a rich value takes its list's key.
-        if (config.keyed && hasRichValue(props))
-          props.id ??= instanceOf<ListApi>(this.#owner)?.api.internal.keyOf(props.value)
+        if (config.keyed && hasRichValue(props)) {
+          props.id ??= instanceOf<ListApi>(this.#owner)?.api.internal.keyOf(
+            props.value
+          )
+        }
         return withEvents(this, props, [], config.actions)
       }
 
@@ -1444,14 +1853,22 @@ function definePartElement(tagName: string, config: SlotConfig) {
       #children?: MutationObserver
 
       connectedCallback() {
-        upgradeProperties(this, [...(config.properties ?? []), ...Object.keys(schema)])
+        upgradeProperties(this, [
+          ...(config.properties ?? []),
+          ...Object.keys(schema),
+        ])
         adoptStyles(this)
-        if ((config.target || this.hasAttribute("as-child")) && !this.#children) {
+        if (
+          (config.target || this.hasAttribute("as-child")) &&
+          !this.#children
+        ) {
           this.#children = new MutationObserver(() => this.#retarget())
           this.#children.observe(this, { childList: true })
         }
         const owner = findOwner(this, config.owner) ?? this.#owner
-        if (!owner) return queueMicrotask(() => this.#findOwnerLater())
+        if (!owner) {
+          return queueMicrotask(() => this.#findOwnerLater())
+        }
         // Upgrade order can reach a part before its owner. Try again once it's defined.
         if (!("register" in owner)) {
           customElements
@@ -1459,21 +1876,33 @@ function definePartElement(tagName: string, config: SlotConfig) {
             .then(() => this.isConnected && this.connectedCallback())
           return
         }
-        if (owner === this.#owner && this.#part && registered.has(this.#part)) return
-        if (this.#owner && this.#part) this.#owner.unregister(this.#part)
+        if (owner === this.#owner && this.#part && registered.has(this.#part)) {
+          return
+        }
+        if (this.#owner && this.#part) {
+          this.#owner.unregister(this.#part)
+        }
 
         const el = boundElement(this, config.target)
         // It may come later. Warned once the task that built the element ends without it.
-        if (!el)
+        if (!el) {
           return queueMicrotask(() => {
-            if (this.isConnected && !this.#part && !boundElement(this, config.target))
+            if (
+              this.isConnected &&
+              !this.#part &&
+              !boundElement(this, config.target)
+            ) {
               warn(`<${tagName}> needs an element inside it.`)
+            }
           })
+        }
         if (!this.#part) {
           config.render?.(this)
           // A render that moves the part, like into a wrapper it adds, connects
           // it again inside this call, and that call registered it already.
-          if (this.#part) return
+          if (this.#part) {
+            return
+          }
         }
         this.#owner = owner
         this.#part = {
@@ -1493,10 +1922,16 @@ function definePartElement(tagName: string, config: SlotConfig) {
       // does, like an item in a list its owner renders again. Warned only when
       // the owner is still missing once the task's other elements connected.
       #findOwnerLater() {
-        if (!this.isConnected || this.#owner) return
-        if (findOwner(this, config.owner)) this.connectedCallback()
-        else if (config.alone) config.alone(boundElement(this, config.target) ?? this, this)
-        else if (!this.hasAttribute("for")) warn(`<${tagName}> must be inside ${config.owner}.`)
+        if (!this.isConnected || this.#owner) {
+          return
+        }
+        if (findOwner(this, config.owner)) {
+          this.connectedCallback()
+        } else if (config.alone) {
+          config.alone(boundElement(this, config.target) ?? this, this)
+        } else if (!this.hasAttribute("for")) {
+          warn(`<${tagName}> must be inside ${config.owner}.`)
+        }
       }
 
       // The element the part binds came, left or was replaced: the part lets go
@@ -1504,20 +1939,30 @@ function definePartElement(tagName: string, config: SlotConfig) {
       // moved into a portal, like an input a sheet puts in its header, stays bound.
       #retarget() {
         const old = this.#part?.el
-        if (!this.isConnected || (old && portals.has(old))) return
+        if (!this.isConnected || (old && portals.has(old))) {
+          return
+        }
         const el = boundElement(this, config.target)
-        if (el === (old ?? null)) return
-        if (this.#owner && this.#part) this.#owner.unregister(this.#part)
+        if (el === (old ?? null)) {
+          return
+        }
+        if (this.#owner && this.#part) {
+          this.#owner.unregister(this.#part)
+        }
         this.#owner = undefined
         this.#part = undefined
-        if (el) this.connectedCallback()
+        if (el) {
+          this.connectedCallback()
+        }
       }
 
       disconnectedCallback() {
         whenGone(this, () => {
           this.#children?.disconnect()
           this.#children = undefined
-          if (this.#owner && this.#part) this.#owner.unregister(this.#part)
+          if (this.#owner && this.#part) {
+            this.#owner.unregister(this.#part)
+          }
           partOwners.delete(this)
           slotParts.delete(this)
           this.#owner = undefined
@@ -1527,11 +1972,15 @@ function definePartElement(tagName: string, config: SlotConfig) {
 
       attributeChangedCallback(name: string) {
         markAuthored(this, name)
-        if (semantics.includes(name)) return
+        if (semantics.includes(name)) {
+          return
+        }
         // A new `for` names another owner, or none. Only a portal move keeps an
         // owner the page no longer names.
         if (name === "for") {
-          if (!this.isConnected) return
+          if (!this.isConnected) {
+            return
+          }
           if (!findOwner(this, config.owner) && this.#owner && this.#part) {
             this.#owner.unregister(this.#part)
             this.#owner = undefined
@@ -1541,19 +1990,25 @@ function definePartElement(tagName: string, config: SlotConfig) {
           return
         }
         if (!this.#owner || !this.#part) {
-          if (config.alone && this.isConnected && !findOwner(this, config.owner))
+          if (
+            config.alone &&
+            this.isConnected &&
+            !findOwner(this, config.owner)
+          ) {
             config.alone(boundElement(this, config.target) ?? this, this)
+          }
           return
         }
         const previous = this.#part.props
         this.#part.props = this.#props()
         const next = this.#part.props
         const rebind =
-          rekeyed(previous, next) || !!config.rebind?.some((name) => previous[name] !== next[name])
+          rekeyed(previous, next) ||
+          !!config.rebind?.some((name) => previous[name] !== next[name])
         this.#owner.update(this.#part, rebind)
         config.changed?.(this)
       }
-    },
+    }
   )
 }
 
@@ -1583,7 +2038,17 @@ type PartOptions<P extends Primitive = Primitive> = {
   kinds?: Kinds
   /** Properties beyond the schema's, read as props. */
   properties?: string[]
-} & Omit<SlotConfig, "slot" | "owner" | "props" | "properties" | "from" | "ids" | "actions" | "keyed">
+} & Omit<
+  SlotConfig,
+  | "slot"
+  | "owner"
+  | "props"
+  | "properties"
+  | "from"
+  | "ids"
+  | "actions"
+  | "keyed"
+>
 
 /**
  * How `createParts` and `definePart` define the root's element, the one that owns an instance, beyond its tag.
@@ -1612,11 +2077,17 @@ type RootOptions<P extends Primitive> = {
    */
   state?: Record<
     string,
-    { get: (api: TypesOf<P>["api"]) => unknown; set: (api: TypesOf<P>["api"], value: any) => void }
+    {
+      get: (api: TypesOf<P>["api"]) => unknown
+      set: (api: TypesOf<P>["api"], value: any) => void
+    }
   >
   /** The controller's methods, which the element's `api` property exposes. */
   api?: (keyof TypesOf<P>["api"] & string)[]
-} & Omit<OwnerConfig<P>, "attributes" | "properties" | "self" | "state" | "api" | "actions">
+} & Omit<
+  OwnerConfig<P>,
+  "attributes" | "properties" | "self" | "state" | "api" | "actions"
+>
 
 // The root tags defined for each primitive, so the parts defined after them find their owner.
 const rootTags = new WeakMap<Primitive, string[]>()
@@ -1628,7 +2099,11 @@ const rootTags = new WeakMap<Primitive, string[]>()
 // nothing, since every `on*` prop fires an event, and action callbacks hand
 // their listeners `waitUntil()`. `id` is the element's own attribute, so
 // it's never a prop's unless `kinds` says so.
-function elementProps(props: Record<string, PropSpec>, schema: PrimitiveSchema, kinds: Kinds = {}) {
+function elementProps(
+  props: Record<string, PropSpec>,
+  schema: PrimitiveSchema,
+  kinds: Kinds = {}
+) {
   const attributes: Record<string, AttributeType> = {}
   const properties: string[] = []
   const ids: string[] = []
@@ -1636,24 +2111,46 @@ function elementProps(props: Record<string, PropSpec>, schema: PrimitiveSchema, 
   let keyed = false
   const from: Record<string, { slot: string; prop: string }> = {}
   for (const [name, spec] of Object.entries({ ...props, ...kinds })) {
-    if (!spec) continue
+    if (!spec) {
+      continue
+    }
     if (typeof spec === "object") {
       // `"group.id"` names the group's `id`, and `"item"` the item's prop of the same name.
       const [slot, prop = name] = spec.from.split(".")
       // A shared part's prop from a slot this primitive doesn't have, like an
       // item icon's `item` in tabs, has nowhere to come from.
-      if (slot in schema.slots) from[name] = { slot, prop }
-      if (!(name in kinds)) continue
+      if (slot in schema.slots) {
+        from[name] = { slot, prop }
+      }
+      if (!(name in kinds)) {
+        continue
+      }
     }
     const kind = typeof spec === "object" ? spec.kind : spec
-    if (kind === "value") properties.push(name)
-    else if (kind === "action") actions.push(name)
-    else if (kind === "id") ids.push(name)
-    else if (kind === "key") keyed = true
-    if (kind === "value" || kind === "action" || kind === "callback") continue
-    if (name !== "id" || name in kinds) attributes[name] = kind === "id" || kind === "key" ? "string" : kind
+    if (kind === "value") {
+      properties.push(name)
+    } else if (kind === "action") {
+      actions.push(name)
+    } else if (kind === "id") {
+      ids.push(name)
+    } else if (kind === "key") {
+      keyed = true
+    }
+    if (kind === "value" || kind === "action" || kind === "callback") {
+      continue
+    }
+    if (name !== "id" || name in kinds) {
+      attributes[name] = kind === "id" || kind === "key" ? "string" : kind
+    }
   }
-  return { attributes, properties, ids, actions, keyed, from: Object.keys(from).length ? from : undefined }
+  return {
+    attributes,
+    properties,
+    ids,
+    actions,
+    keyed,
+    from: Object.keys(from).length ? from : undefined,
+  }
 }
 
 const tagOf = <T extends { tag: string }>(tagOrOptions: string | T) =>
@@ -1672,21 +2169,35 @@ function partElement<P extends Primitive>(
   key: string,
   tagOrOptions: string | RootOptions<P> | PartOptions<P>,
   // The root defined with it, which its owners list first.
-  root?: string,
+  root?: string
 ) {
   const schema = schemaOf(primitive)
   if (key === "root") {
-    const { tag, self, kinds, properties = [], ...options } = tagOf(tagOrOptions as string | RootOptions<P>)
-    rootTags.set(primitive, [...new Set([...(rootTags.get(primitive) ?? []), tag])])
+    const {
+      tag,
+      self,
+      kinds,
+      properties = [],
+      ...options
+    } = tagOf(tagOrOptions as string | RootOptions<P>)
+    rootTags.set(primitive, [
+      ...new Set([...(rootTags.get(primitive) ?? []), tag]),
+    ])
     // `debug` is every owner's own attribute.
     const { debug: _debug, ...optionSchema } = schema.options
     const props = elementProps(optionSchema, schema, kinds)
     const config: OwnerConfig<P> = {
       ...options,
-      self: self ?? ("root" in schema.slots && !options.children?.root ? "root" : undefined),
+      self:
+        self ??
+        ("root" in schema.slots && !options.children?.root
+          ? "root"
+          : undefined),
       attributes: props.attributes,
       // Live state has its own property.
-      properties: [...new Set([...props.properties, ...properties])].filter((name) => !options.state?.[name]),
+      properties: [...new Set([...props.properties, ...properties])].filter(
+        (name) => !options.state?.[name]
+      ),
       actions: props.actions,
     }
     return { kind: "owner" as const, key, tagName: tag, config }
@@ -1700,17 +2211,26 @@ function partElement<P extends Primitive>(
     ...options
   } = tagOf(tagOrOptions as string | PartOptions<P>)
   const roots = rootTags.get(primitive)
-  if (!roots) throw new Error(`<${tag}> is a part of ${primitive.name}: define its root first.`)
+  if (!roots) {
+    throw new Error(
+      `<${tag}> is a part of ${primitive.name}: define its root first.`
+    )
+  }
   // A feature's slot, like a select's select-all option, is in the feature.
   const slotSchema = (schema.slots[slot] ??
-    (options.feature?.slots[slot] && ((options.feature.slots[slot] as { props?: object }).props ?? {}))) as
+    (options.feature?.slots[slot] &&
+      ((options.feature.slots[slot] as { props?: object }).props ?? {}))) as
     Record<string, PropSpec> | undefined
-  if (!slotSchema) throw new Error(`<${tag}>: ${primitive.name} has no ${slot} slot.`)
+  if (!slotSchema) {
+    throw new Error(`<${tag}>: ${primitive.name} has no ${slot} slot.`)
+  }
   const { attributes, ...props } = elementProps(slotSchema, schema, kinds)
   const config: SlotConfig = {
     ...options,
     slot,
-    owner: [...new Set([...(root ? [root] : []), ...roots, ...owners])].join(", "),
+    owner: [...new Set([...(root ? [root] : []), ...roots, ...owners])].join(
+      ", "
+    ),
     props: attributes,
     ...props,
     properties: [...new Set([...props.properties, ...properties])],
@@ -1736,15 +2256,23 @@ function partElements<P extends Primitive>(primitive: P, tags: PartTags<P>) {
   const owner = partElement(primitive, "root", root)
   return [
     owner,
-    ...Object.entries(parts as Record<string, string | PartOptions<P> | undefined>).flatMap(([key, tag]) =>
-      tag ? [partElement(primitive, key, tag, owner.tagName)] : [],
+    ...Object.entries(
+      parts as Record<string, string | PartOptions<P> | undefined>
+    ).flatMap(([key, tag]) =>
+      tag ? [partElement(primitive, key, tag, owner.tagName)] : []
     ),
   ]
 }
 
-function defineElement<P extends Primitive>(primitive: P, element: ReturnType<typeof partElement<P>>) {
-  if (element.kind === "owner") defineRootElement(element.tagName, primitive, element.config)
-  else definePartElement(element.tagName, element.config)
+function defineElement<P extends Primitive>(
+  primitive: P,
+  element: ReturnType<typeof partElement<P>>
+) {
+  if (element.kind === "owner") {
+    defineRootElement(element.tagName, primitive, element.config)
+  } else {
+    definePartElement(element.tagName, element.config)
+  }
 }
 
 // "tab-icon" is `TabIcon`.
@@ -1752,7 +2280,8 @@ type Pascal<Name extends string> = Name extends `${infer Head}-${infer Tail}`
   ? `${Capitalize<Head>}${Pascal<Tail>}`
   : Capitalize<Name>
 
-const pascal = (name: string) => name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
+const pascal = (name: string) =>
+  name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
 
 /**
  * The element classes `createParts` returns: `Root`, and one per tagged
@@ -1788,12 +2317,17 @@ type Parts<Tags> = {
  * })
  * @stable
  */
-function createParts<P extends Primitive, Tags extends PartTags<P>>(primitive: P, tags: Tags) {
+function createParts<P extends Primitive, Tags extends PartTags<P>>(
+  primitive: P,
+  tags: Tags
+) {
   const parts: Record<string, CustomElementConstructor | undefined> = {}
   for (const element of partElements(primitive, tags)) {
     defineElement(primitive, element)
     parts[pascal(element.key)] =
-      typeof customElements === "undefined" ? undefined : customElements.get(element.tagName)
+      typeof customElements === "undefined"
+        ? undefined
+        : customElements.get(element.tagName)
   }
   return parts as Parts<Tags>
 }
@@ -1812,7 +2346,9 @@ function createParts<P extends Primitive, Tags extends PartTags<P>>(primitive: P
 function definePart<P extends Primitive, S extends SlotName<P> | "root">(
   primitive: P,
   slot: S,
-  tagOrOptions: S extends "root" ? string | RootOptions<P> : string | PartOptions<P>,
+  tagOrOptions: S extends "root"
+    ? string | RootOptions<P>
+    : string | PartOptions<P>
 ) {
   defineElement(primitive, partElement(primitive, slot, tagOrOptions))
 }

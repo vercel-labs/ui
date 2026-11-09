@@ -13,7 +13,11 @@ import {
 } from "@ui-sdk/react/date-picker"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { datePickerAction, datePickerFixture, datePickerOptions } from "tests/fixtures/date-picker.ts"
+import {
+  datePickerAction,
+  datePickerFixture,
+  datePickerOptions,
+} from "tests/fixtures/date-picker.ts"
 
 function Fixture() {
   const { lang, ...options } = datePickerOptions()
@@ -39,10 +43,17 @@ function Fixture() {
           startName={range ? "start" : undefined}
           endName={range ? "end" : undefined}
           {...options}
-          onValueChange={(next, details) => setAction(datePickerAction("value", next, details.reason))}
-          onOpenChange={(next, details) => setAction(datePickerAction("open", next, details.reason))}
+          onValueChange={(next, details) =>
+            setAction(datePickerAction("value", next, details.reason))
+          }
+          onOpenChange={(next, details) =>
+            setAction(datePickerAction("open", next, details.reason))
+          }
         >
-          <DatePickerInput id="date-start" aria-label={range ? "Start date" : undefined} />
+          <DatePickerInput
+            id="date-start"
+            aria-label={range ? "Start date" : undefined}
+          />
           {range && <DatePickerInput end aria-label="End date" />}
           <DatePickerTrigger />
           <DatePickerClear>Clear</DatePickerClear>
@@ -54,7 +65,9 @@ function Fixture() {
               <CalendarNext className="calendar-step" />
             </div>
             <CalendarGrid className="calendar-grid" />
-            <DatePickerPreset value={preset.value as never}>{preset.label}</DatePickerPreset>
+            <DatePickerPreset value={preset.value as never}>
+              {preset.label}
+            </DatePickerPreset>
           </DatePickerContent>
         </DatePicker>
         <button type="submit">Submit</button>
@@ -75,7 +88,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

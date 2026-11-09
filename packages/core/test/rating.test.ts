@@ -10,7 +10,8 @@ describe("rating", () => {
 
   test("stars fill up to the score, with a partial star for a fraction", () => {
     const instance = rating({ id: "r", defaultValue: 2.5 })
-    const fill = (index: number) => (partState(instance.part("item", { index })) as { fill: number }).fill
+    const fill = (index: number) =>
+      (partState(instance.part("item", { index })) as { fill: number }).fill
     expect([1, 2, 3, 4].map(fill)).toEqual([1, 1, 0.5, 0])
     expect(attrs(instance.part("item", { index: 3 }))).toMatchObject({
       "data-partial": "",
@@ -47,6 +48,9 @@ describe("rating", () => {
 
   test("a read-only rating is an image named by its score", () => {
     const instance = rating({ id: "r", value: 4.2, readOnly: true })
-    expect(attrs(instance.part("root", {}))).toMatchObject({ role: "img", "aria-label": "4.2 stars" })
+    expect(attrs(instance.part("root", {}))).toMatchObject({
+      role: "img",
+      "aria-label": "4.2 stars",
+    })
   })
 })

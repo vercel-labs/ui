@@ -23,17 +23,30 @@ const selectAllOption = (label: string) =>
   `<ui-select-select-all class="item">${label}</ui-select-select-all>`
 
 async function render(root: HTMLElement, data = false) {
-  const { fieldset, grouped, cancel, align, long, container, search, selectAll, recent, max, ...options } =
-    selectOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    align,
+    long,
+    container,
+    search,
+    selectAll,
+    recent,
+    max,
+    ...options
+  } = selectOptions()
   const fromData = data || long || recent
   const list = grouped
     ? f.groups
         .map(
           (group, index) =>
-            `${index ? '<ui-select-separator class="separator"></ui-select-separator>' : ""}<ui-select-group><ui-select-group-label class="label">${group.label}</ui-select-group-label>${selectAll ? selectAllOption(`${f.selectAll} ${group.label}`) : ""}${group.items.map((entry) => item(entry.value, entry.label)).join("")}</ui-select-group>`,
+            `${index ? '<ui-select-separator class="separator"></ui-select-separator>' : ""}<ui-select-group><ui-select-group-label class="label">${group.label}</ui-select-group-label>${selectAll ? selectAllOption(`${f.selectAll} ${group.label}`) : ""}${group.items.map((entry) => item(entry.value, entry.label)).join("")}</ui-select-group>`
         )
         .join("")
-    : f.items.map((entry) => item(entry.value, entry.label, entry.disabled)).join("")
+    : f.items
+        .map((entry) => item(entry.value, entry.label, entry.disabled))
+        .join("")
   const items = `${selectAll && !grouped ? selectAllOption(f.selectAll) : ""}${fromData ? "" : list}`
   const aligned = align ? " align-item-with-trigger" : ""
   const content = search
@@ -63,58 +76,108 @@ async function render(root: HTMLElement, data = false) {
       <output role="status" aria-label="Submitted"></output>
       <button id="controller">Open with controller</button>
     </div>`
-  const select = root.querySelector<HTMLElement & Record<string, any>>("ui-select")!
-  if (options.multiple) select.setAttribute("multiple", "")
-  if (options.defaultValue !== undefined)
-    select.setAttribute("default-value", ([] as string[]).concat(options.defaultValue).join(","))
-  for (const name of ["required", "disabled"] as const) if (options[name]) select.setAttribute(name, "")
-  if (options.readOnly) select.setAttribute("read-only", "")
-  if (options.defaultOpen) select.setAttribute("default-open", "")
-  if (options.modal !== undefined) select.setAttribute("modal", String(options.modal))
-  if (options.presentation) select.setAttribute("presentation", options.presentation)
-  if (container) select.setAttribute("container", `#${container.id}`)
-  if (recent) select.emptyItems = f.recent
+  const select = root.querySelector<HTMLElement & Record<string, any>>(
+    "ui-select"
+  )!
+  if (options.multiple) {
+    select.setAttribute("multiple", "")
+  }
+  if (options.defaultValue !== undefined) {
+    select.setAttribute(
+      "default-value",
+      ([] as string[]).concat(options.defaultValue).join(",")
+    )
+  }
+  for (const name of ["required", "disabled"] as const) {
+    if (options[name]) {
+      select.setAttribute(name, "")
+    }
+  }
+  if (options.readOnly) {
+    select.setAttribute("read-only", "")
+  }
+  if (options.defaultOpen) {
+    select.setAttribute("default-open", "")
+  }
+  if (options.modal !== undefined) {
+    select.setAttribute("modal", String(options.modal))
+  }
+  if (options.presentation) {
+    select.setAttribute("presentation", options.presentation)
+  }
+  if (container) {
+    select.setAttribute("container", `#${container.id}`)
+  }
+  if (recent) {
+    select.emptyItems = f.recent
+  }
   if (fromData) {
     select.items = long
       ? longItems()
       : grouped
         ? [
-            { type: "group", label: f.groups[0].label, items: f.groups[0].items },
+            {
+              type: "group",
+              label: f.groups[0].label,
+              items: f.groups[0].items,
+            },
             { type: "separator" },
-            { type: "group", label: f.groups[1].label, items: f.groups[1].items },
+            {
+              type: "group",
+              label: f.groups[1].label,
+              items: f.groups[1].items,
+            },
           ]
         : f.items
   }
-  const output = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
+  const output = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
   select.addEventListener("valuechange", (event) => {
-    if (cancel) return event.preventDefault()
+    if (cancel) {
+      return event.preventDefault()
+    }
     const value = (event as CustomEvent<{ value: unknown }>).detail.value
     output.textContent = `value:${Array.isArray(value) ? value.join(",") : String(value)}`
   })
   const form = root.querySelector("form")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    root.querySelector<HTMLOutputElement>('output[aria-label="Submitted"]')!.textContent = serializeForm(form)
+    root.querySelector<HTMLOutputElement>(
+      'output[aria-label="Submitted"]'
+    )!.textContent = serializeForm(form)
   })
-  root.querySelector("#controller")!.addEventListener("click", () => select.api?.open())
-  if (!long && !grouped)
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => select.api?.open())
+  if (!long && !grouped) {
     onItemsChange(changedItems, (entries) => {
-      if (fromData) return void (select.items = entries)
+      if (fromData) {
+        return void (select.items = entries)
+      }
       // Moves the items that stay, so they keep their elements, and adds the new
       // ones. The content may be in a portal container, outside the select.
-      const list = document.querySelector("ui-select-list") ?? document.querySelector("ui-select-content")!
+      const list =
+        document.querySelector("ui-select-list") ??
+        document.querySelector("ui-select-content")!
       const existing = new Map(
-        [...list.querySelectorAll<HTMLElement>("ui-select-item")].map((el) => [el.getAttribute("value"), el]),
+        [...list.querySelectorAll<HTMLElement>("ui-select-item")].map((el) => [
+          el.getAttribute("value"),
+          el,
+        ])
       )
       list.replaceChildren(
         ...list.querySelectorAll("ui-select-select-all"),
         ...entries.map(
           (entry) =>
             existing.get(entry.value) ??
-            document.createRange().createContextualFragment(item(entry.value, entry.label)),
-        ),
+            document
+              .createRange()
+              .createContextualFragment(item(entry.value, entry.label))
+        )
       )
     })
+  }
   await import("@ui-sdk/web/select")
 }
 

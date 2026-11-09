@@ -7,7 +7,9 @@ function BoldToggle() {
     <Toggle
       aria-label="Bold"
       defaultPressed
-      render={(props, state) => <button {...props} data-on={state.pressed ? "" : undefined} />}
+      render={(props, state) => (
+        <button {...props} data-on={state.pressed ? "" : undefined} />
+      )}
     />
   )
 }

@@ -25,14 +25,21 @@ async function transpile({ sourceDir, outDir, useClient, serverModules = [] }) {
     metafile: true,
     logLevel: "warning",
   })
-  if (!useClient) return
+  if (!useClient) {
+    return
+  }
   // Every module marks itself as client code for React Server Components, so
   // any entry a Server Component imports is a client boundary, except
   // `serverModules`: those use no hooks or context, and under "use client"
   // every export, re-exports included, would become a client reference a
   // Server Component can't call.
   for (const [output, { entryPoint }] of Object.entries(metafile.outputs)) {
-    if (!entryPoint || serverModules.includes(path.relative(sourceDir, entryPoint))) continue
+    if (
+      !entryPoint ||
+      serverModules.includes(path.relative(sourceDir, entryPoint))
+    ) {
+      continue
+    }
     writeFileSync(output, `"use client";\n${readFileSync(output, "utf8")}`)
   }
 }
@@ -47,13 +54,20 @@ function externalImports() {
   return {
     name: "external-imports",
     setup(build) {
-      build.onResolve({ filter: /.*/ }, ({ kind, path: specifier, resolveDir }) => {
-        if (kind === "entry-point") return undefined
-        return {
-          path: isRelative(specifier) ? withJsExtension(specifier, resolveDir, [".ts", ".tsx"]) : specifier,
-          external: true,
+      build.onResolve(
+        { filter: /.*/ },
+        ({ kind, path: specifier, resolveDir }) => {
+          if (kind === "entry-point") {
+            return undefined
+          }
+          return {
+            path: isRelative(specifier)
+              ? withJsExtension(specifier, resolveDir, [".ts", ".tsx"])
+              : specifier,
+            external: true,
+          }
         }
-      })
+      )
     },
   }
 }

@@ -7,10 +7,23 @@ import {
   OTPInputSeparator,
   OTPInputSlot,
 } from "@ui-sdk/vue"
-import { createApp, defineComponent, h, ref, type PropType, type VNodeChild } from "vue"
+import {
+  createApp,
+  defineComponent,
+  h,
+  ref,
+  type PropType,
+  type VNodeChild,
+} from "vue"
 import * as classes from "./classes"
 import { formData, kitchenSink, type Env } from "./shell"
-import { groupStarts, maxLengthOf, patterns, presets, type Variant } from "./variants"
+import {
+  groupStarts,
+  maxLengthOf,
+  patterns,
+  presets,
+  type Variant,
+} from "./variants"
 
 function slots(variant: Variant) {
   const starts = groupStarts(variant)
@@ -22,10 +35,13 @@ function slots(variant: Variant) {
           OTPInputSlot,
           { key: offset, index: starts[group] + offset, class: classes.slot },
           variant.masked
-            ? { default: ({ state }: { state: OTPInputSlotState }) => (state.char ? "•" : "") }
-            : undefined,
-        ),
-      ),
+            ? {
+                default: ({ state }: { state: OTPInputSlotState }) =>
+                  state.char ? "•" : "",
+              }
+            : undefined
+        )
+      )
     ),
   ])
 }
@@ -39,18 +55,24 @@ const VariantOTPInput = defineComponent({
     const { defaultValue, ...options } = variant.options ?? {}
     const value = ref(defaultValue ?? "")
     const invalid = ref(!!variant.invalid)
-    const controller = variant.controller ? createOTPInputController() : undefined
-    if (controller)
+    const controller = variant.controller
+      ? createOTPInputController()
+      : undefined
+    if (controller) {
       env.controls([
         ["setValue(123456)", () => controller.setValue("123456")],
         ["clear()", () => controller.clear()],
         ["focus()", () => controller.focus()],
         ["getValue()", () => controller.getValue()],
       ])
-    else if (variant.controlled)
+    } else if (variant.controlled) {
       env.controls(
-        presets[variant.controlled].map(([label, next]) => [label, () => void (value.value = next)]),
+        presets[variant.controlled].map(([label, next]) => [
+          label,
+          () => void (value.value = next),
+        ])
       )
+    }
 
     const otp = () =>
       h(
@@ -66,34 +88,50 @@ const VariantOTPInput = defineComponent({
           debug: variant.debug,
           "aria-invalid": invalid.value || undefined,
           onValueChange: (next: string, details: ChangeDetails) => {
-            if (variant.cancel && next.includes(variant.cancel)) return details.cancel()
+            if (variant.cancel && next.includes(variant.cancel)) {
+              return details.cancel()
+            }
             env.log(`valueChange "${next}" (${details.reason})`)
-            if (variant.controlled)
-              value.value = variant.controlled === "uppercase" ? next.toUpperCase() : next
-            if (variant.verify) invalid.value = false
+            if (variant.controlled) {
+              value.value =
+                variant.controlled === "uppercase" ? next.toUpperCase() : next
+            }
+            if (variant.verify) {
+              invalid.value = false
+            }
           },
           onValueCommit: (next: string) => {
             env.log(`complete "${next}"`)
-            if (variant.verify) invalid.value = next !== variant.verify
+            if (variant.verify) {
+              invalid.value = next !== variant.verify
+            }
           },
         },
-        () => slots(variant),
+        () => slots(variant)
       )
 
     return (): VNodeChild => {
-      if (variant.place === "fieldset") return h("fieldset", { disabled: true }, [otp()])
-      if (!variant.form) return otp()
+      if (variant.place === "fieldset") {
+        return h("fieldset", { disabled: true }, [otp()])
+      }
+      if (!variant.form) {
+        return otp()
+      }
       return h(
         "form",
         {
           class: classes.form,
           onSubmit: (event: SubmitEvent) => {
             event.preventDefault()
-            env.log(`submit ${formData(event.currentTarget as HTMLFormElement)}`)
+            env.log(
+              `submit ${formData(event.currentTarget as HTMLFormElement)}`
+            )
           },
           onReset: () => env.log("reset"),
           onInvalidCapture: (event: Event) =>
-            env.log(`invalid: ${(event.target as HTMLInputElement).validationMessage}`),
+            env.log(
+              `invalid: ${(event.target as HTMLInputElement).validationMessage}`
+            ),
         },
         [
           otp(),
@@ -101,14 +139,16 @@ const VariantOTPInput = defineComponent({
             h("button", { class: classes.button }, "Submit"),
             h("button", { type: "reset", class: classes.button }, "Reset"),
           ]),
-        ],
+        ]
       )
     }
   },
 })
 
 function mount(root: HTMLElement) {
-  kitchenSink(root, "vue", (slot, variant, env) => createApp(VariantOTPInput, { variant, env }).mount(slot))
+  kitchenSink(root, "vue", (slot, variant, env) =>
+    createApp(VariantOTPInput, { variant, env }).mount(slot)
+  )
 }
 
 export { mount }

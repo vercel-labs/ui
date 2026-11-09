@@ -46,8 +46,12 @@ const editor = createPopoverController<string>()
 </script>
 
 <template>
-  <PopoverTrigger :controller="editor" payload="Notes">Edit Notes</PopoverTrigger>
-  <PopoverTrigger :controller="editor" payload="Tasks">Edit Tasks</PopoverTrigger>
+  <PopoverTrigger :controller="editor" payload="Notes"
+    >Edit Notes</PopoverTrigger
+  >
+  <PopoverTrigger :controller="editor" payload="Tasks"
+    >Edit Tasks</PopoverTrigger
+  >
   <Popover :controller="editor">
     <PopoverContent v-slot="{ state }"
       ><PopoverTitle>Edit {{ state.payload }}</PopoverTitle></PopoverContent

@@ -15,8 +15,17 @@ text. Its text is its content, so it takes no children.
   import type { Attachment } from "svelte/attachments"
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
-  import { controlProps, elementProps, type TextControlProps, type TextPartProps } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart } from "../use-primitive.svelte"
+  import {
+    controlProps,
+    elementProps,
+    type TextControlProps,
+    type TextPartProps,
+  } from "../text-control"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+  } from "../use-primitive.svelte"
 
   let {
     value = $bindable(),
@@ -59,19 +68,26 @@ text. Its text is its content, so it takes no children.
     onSubmit,
     controller,
     debug,
-    onValueChange: (next: string, details: ChangeDetails<InputValueChangeReason>) => {
+    onValueChange: (
+      next: string,
+      details: ChangeDetails<InputValueChangeReason>
+    ) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   // Controlled from the start, or once the parent sets it, like `bind:value` to a variable that starts empty.
   const controlled = $derived(textarea.controls("value"))
   const states = () => ({ disabled, readOnly, required })
-  const root = useHandlePart(textarea, "root", () => controlProps(states(), field, rest))
+  const root = useHandlePart(textarea, "root", () =>
+    controlProps(states(), field, rest)
+  )
   const control = field?.control(
     () => rest.id as string | undefined,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
   const element = () => elementProps(states(), field, rest)
   const bound = wrapPart(root, control)
@@ -82,15 +98,23 @@ text. Its text is its content, so it takes no children.
   // empty the field. A form reset returns to the element's default, which
   // nothing else writes, so an uncontrolled textarea sets it here.
   const setDefault: Attachment<HTMLTextAreaElement> = (el) => {
-    if (!controlled) el.defaultValue = defaultValue ?? ""
+    if (!controlled) {
+      el.defaultValue = defaultValue ?? ""
+    }
   }
 </script>
 
 {#snippet text()}{controlled ? value : defaultValue}{/snippet}
 
 {#if render}
-  <Part tag="textarea" part={bound} props={{ ...element(), render, children: text }} />
+  <Part
+    tag="textarea"
+    part={bound}
+    props={{ ...element(), render, children: text }}
+  />
 {:else}
   <!-- A static element, so the compiler renders the text as a textarea's content, without hydration markers. -->
-  <textarea {...bound.slot(element())} {@attach setDefault}>{controlled ? value : defaultValue}</textarea>
+  <textarea {...bound.slot(element())} {@attach setDefault}
+    >{controlled ? value : defaultValue}</textarea
+  >
 {/if}

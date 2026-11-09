@@ -33,9 +33,13 @@ function chipsThatFit({
   // Every width before `measured` is known.
   for (let index = 0; index < measured; index++) {
     used += (index ? gap : 0) + widths[index]!
-    if (fits === index && fit(index + 1, used, overflow + gap)) fits = index + 1
+    if (fits === index && fit(index + 1, used, overflow + gap)) {
+      fits = index + 1
+    }
   }
-  if (unknown === -1) return fit(widths.length, used, 0) ? widths.length : fits
+  if (unknown === -1) {
+    return fit(widths.length, used, 0) ? widths.length : fits
+  }
   return fits === measured ? measured + 1 : fits
 }
 
@@ -55,9 +59,11 @@ function bindChipsOverflow(
     input: () => HTMLElement | undefined
     report: (visible: number | null) => void
     subscribe: (listener: () => void) => () => void
-  },
+  }
 ) {
-  if (typeof ResizeObserver === "undefined") return () => {}
+  if (typeof ResizeObserver === "undefined") {
+    return () => {}
+  }
   const widths = new WeakMap<Element, number>()
   const observed = new Set<Element>()
   let available = 0
@@ -65,28 +71,43 @@ function bindChipsOverflow(
 
   // Decides in the next frame, after this one's layout, and writes nothing here.
   const schedule = () => {
-    if (!frame) frame = requestAnimationFrame(decide)
+    if (!frame) {
+      frame = requestAnimationFrame(decide)
+    }
   }
   const observer = new ResizeObserver((entries) => {
     for (const entry of entries) {
       const box = entry.borderBoxSize?.[0]
       if (entry.target === container) {
-        available = entry.contentBoxSize?.[0]?.inlineSize ?? entry.contentRect.width
+        available =
+          entry.contentBoxSize?.[0]?.inlineSize ?? entry.contentRect.width
         continue
       }
       const width = box?.inlineSize ?? entry.contentRect.width
       // A hidden chip reports nothing, and keeps the width it had.
-      if (width > 0) widths.set(entry.target, width)
+      if (width > 0) {
+        widths.set(entry.target, width)
+      }
     }
     schedule()
   })
 
   function observe() {
     const current = new Set<Element>([container, overflow, ...chips()])
-    for (const el of current) if (!observed.has(el)) observer.observe(el, { box: "border-box" })
-    for (const el of observed) if (!current.has(el)) observer.unobserve(el)
+    for (const el of current) {
+      if (!observed.has(el)) {
+        observer.observe(el, { box: "border-box" })
+      }
+    }
+    for (const el of observed) {
+      if (!current.has(el)) {
+        observer.unobserve(el)
+      }
+    }
     observed.clear()
-    for (const el of current) observed.add(el)
+    for (const el of current) {
+      observed.add(el)
+    }
   }
 
   function decide() {
@@ -109,7 +130,12 @@ function bindChipsOverflow(
   let seen = chips()
   const unsubscribe = subscribe(() => {
     const next = chips()
-    if (next.length === seen.length && next.every((el, index) => el === seen[index])) return
+    if (
+      next.length === seen.length &&
+      next.every((el, index) => el === seen[index])
+    ) {
+      return
+    }
     seen = next
     observe()
     schedule()

@@ -3,10 +3,11 @@ import { flushSync, mount, unmount } from "svelte"
 import { afterEach, expect, test } from "vitest"
 import App from "./apps/popover-app.svelte"
 
-const byLabel = (label: string) => document.querySelector<HTMLElement>(`[aria-label="${label}"]`)
+const byLabel = (label: string) =>
+  document.querySelector<HTMLElement>(`[aria-label="${label}"]`)
 const press = (key: string) =>
   (document.activeElement ?? document.body).dispatchEvent(
-    new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }),
+    new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
   )
 // Lets the core's microtasks run, like a press opening a popup, then renders.
 const settle = async () => {
@@ -30,7 +31,9 @@ afterEach(() => {
 // jsdom has no top layer, so content portals to the body, like in an older browser.
 test("Escape closes a popover whose content moved to the body", async () => {
   await render()
-  const trigger = target.querySelector<HTMLElement>('[data-slot="popover-trigger"]')!
+  const trigger = target.querySelector<HTMLElement>(
+    '[data-slot="popover-trigger"]'
+  )!
   trigger.click()
   await settle()
   const content = byLabel("Outer")!
@@ -43,6 +46,10 @@ test("Escape closes a popover whose content moved to the body", async () => {
 test("a trigger connected through a controller binds once the popover mounts", async () => {
   const controller = createPopoverController()
   await render({ controller, remote: true })
-  const remote = [...target.querySelectorAll("button")].find((el) => el.textContent?.startsWith("Share"))!
-  expect(remote.getAttribute("aria-keyshortcuts")).toMatch(/^(Meta|Control)\+E$/)
+  const remote = [...target.querySelectorAll("button")].find((el) =>
+    el.textContent?.startsWith("Share")
+  )!
+  expect(remote.getAttribute("aria-keyshortcuts")).toMatch(
+    /^(Meta|Control)\+E$/
+  )
 })

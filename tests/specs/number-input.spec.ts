@@ -71,27 +71,37 @@ test.describe("typing", () => {
     await expect.poll(() => status(page, "Last action")).toBe("quantity:42")
   })
 
-  test("a typed value above the maximum is lowered when focus leaves", async ({ page }) => {
+  test("a typed value above the maximum is lowered when focus leaves", async ({
+    page,
+  }) => {
     await quantity(page).fill("150")
     await amount(page).focus()
     await expect(quantity(page)).toHaveValue("99")
   })
 
-  test("typed text in the format is read and formatted when focus leaves", async ({ page }) => {
+  test("typed text in the format is read and formatted when focus leaves", async ({
+    page,
+  }) => {
     await amount(page).fill("$2,000")
     await quantity(page).focus()
     await expect(amount(page)).toHaveValue("$2,000.00")
     await save(page)
-    await expect.poll(() => status(page, "Submitted")).toBe("quantity=1&amount=2000")
+    await expect
+      .poll(() => status(page, "Submitted"))
+      .toBe("quantity=1&amount=2000")
   })
 
-  test("typing sends change only once the text is committed", async ({ page }) => {
+  test("typing sends change only once the text is committed", async ({
+    page,
+  }) => {
     await countFormEvents(page)
     await quantity(page).fill("42")
     await expect.poll(() => status(page, "Last action")).toBe("quantity:42")
     expect((await formEventCounts(page)).change).toBe(0)
     await page.keyboard.press("Enter")
-    await expect.poll(async () => (await formEventCounts(page)).change).toBeGreaterThan(0)
+    await expect
+      .poll(async () => (await formEventCounts(page)).change)
+      .toBeGreaterThan(0)
   })
 
   test("letters can't be typed", async ({ page }) => {
@@ -106,7 +116,10 @@ test.describe("typing", () => {
     await expect(quantity(page)).toHaveValue("8")
   })
 
-  test("text that isn't a number goes back to the value when focus leaves", async ({ page, open }) => {
+  test("text that isn't a number goes back to the value when focus leaves", async ({
+    page,
+    open,
+  }) => {
     await open("number-input", { negative: "" })
     await amount(page).fill("-")
     await quantity(page).focus()
@@ -128,7 +141,9 @@ test.describe("buttons", () => {
     await open("number-input")
   })
 
-  test("the increment and decrement buttons step the value", async ({ page }) => {
+  test("the increment and decrement buttons step the value", async ({
+    page,
+  }) => {
     await button(page, "Increase quantity").click()
     await expect(quantity(page)).toHaveValue("2")
     await button(page, "Increase quantity").click()
@@ -137,18 +152,27 @@ test.describe("buttons", () => {
     await expect.poll(() => status(page, "Last action")).toBe("quantity:2")
   })
 
-  test("a button at its bound is disabled and marked data-at-bound", async ({ page }) => {
+  test("a button at its bound is disabled and marked data-at-bound", async ({
+    page,
+  }) => {
     await expect(button(page, "Decrease quantity")).toBeDisabled()
-    await expect(button(page, "Decrease quantity")).toHaveAttribute("data-at-bound", "")
+    await expect(button(page, "Decrease quantity")).toHaveAttribute(
+      "data-at-bound",
+      ""
+    )
     await expect(button(page, "Increase quantity")).toBeEnabled()
-    await expect(button(page, "Increase quantity")).not.toHaveAttribute("data-at-bound")
+    await expect(button(page, "Increase quantity")).not.toHaveAttribute(
+      "data-at-bound"
+    )
   })
 
   test("holding a button repeats the step", async ({ page }) => {
     const box = (await button(page, "Increase quantity").boundingBox())!
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
     await page.mouse.down()
-    await expect.poll(async () => Number(await quantity(page).inputValue())).toBeGreaterThan(4)
+    await expect
+      .poll(async () => Number(await quantity(page).inputValue()))
+      .toBeGreaterThan(4)
     await page.mouse.up()
     const settled = await quantity(page).inputValue()
     await page.clock.runFor(200)
@@ -178,9 +202,17 @@ test.describe("buttons", () => {
     await increment.click({ force: true })
     // Presses that reach the button anyway, like a pointer on a custom element
     // or a screen reader's click, must not step either.
-    await increment.dispatchEvent("pointerdown", { button: 0, pointerType: "mouse", isPrimary: true })
+    await increment.dispatchEvent("pointerdown", {
+      button: 0,
+      pointerType: "mouse",
+      isPrimary: true,
+    })
     await page.clock.runFor(1000)
-    await increment.dispatchEvent("pointerup", { button: 0, pointerType: "mouse", isPrimary: true })
+    await increment.dispatchEvent("pointerup", {
+      button: 0,
+      pointerType: "mouse",
+      isPrimary: true,
+    })
     await increment.dispatchEvent("click", { detail: 0 })
     const box = (await increment.boundingBox())!
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
@@ -199,13 +231,18 @@ test.describe("buttons", () => {
     framework,
   }) => {
     test.skip(!framework.startsWith("web"), "Web component markup only.")
-    await open("number-input", { quantity: "98", "disabled-increment": "button" })
+    await open("number-input", {
+      quantity: "98",
+      "disabled-increment": "button",
+    })
     const increment = button(page, "Increase quantity")
     await expect(increment).toHaveAttribute("aria-disabled", "true")
     await expect(increment).toHaveAttribute("data-disabled", "")
     const setValue = (value: number) =>
       quantity(page).evaluate((el, value) => {
-        ;(el.closest("ui-number-input") as HTMLElement & { value: number }).value = value
+        ;(
+          el.closest("ui-number-input") as HTMLElement & { value: number }
+        ).value = value
       }, value)
     await setValue(99)
     await expect(quantity(page)).toHaveValue("99")
@@ -217,7 +254,11 @@ test.describe("buttons", () => {
     await expect(quantity(page)).toHaveValue("98")
   })
 
-  test("a button disabled while it's held stops repeating", async ({ page, open, framework }) => {
+  test("a button disabled while it's held stops repeating", async ({
+    page,
+    open,
+    framework,
+  }) => {
     await open("number-input", { quantity: "5" })
     const increment = button(page, "Increase quantity")
     const box = (await increment.boundingBox())!
@@ -225,8 +266,12 @@ test.describe("buttons", () => {
     await page.mouse.down()
     await expect(quantity(page)).toHaveValue("6")
     await increment.evaluate(
-      (el, web) => (web ? el.closest("ui-number-input-increment")! : el).setAttribute("disabled", ""),
-      framework.startsWith("web"),
+      (el, web) =>
+        (web ? el.closest("ui-number-input-increment")! : el).setAttribute(
+          "disabled",
+          ""
+        ),
+      framework.startsWith("web")
     )
     await page.clock.runFor(1000)
     await page.mouse.up()
@@ -238,16 +283,24 @@ test.describe("state and forms", () => {
   test("submits the number as is, not formatted", async ({ page, open }) => {
     await open("number-input")
     await save(page)
-    await expect.poll(() => status(page, "Submitted")).toBe("quantity=1&amount=1234.5")
+    await expect
+      .poll(() => status(page, "Submitted"))
+      .toBe("quantity=1&amount=1234.5")
   })
 
-  test("a disabled field can't be focused or changed", async ({ page, open }) => {
+  test("a disabled field can't be focused or changed", async ({
+    page,
+    open,
+  }) => {
     await open("number-input", { disabled: "" })
     await expect(quantity(page)).toBeDisabled()
     await expect(button(page, "Increase quantity")).toBeDisabled()
   })
 
-  test("a read-only field can be focused, but not changed", async ({ page, open }) => {
+  test("a read-only field can be focused, but not changed", async ({
+    page,
+    open,
+  }) => {
     await open("number-input", { readonly: "" })
     await quantity(page).focus()
     await page.keyboard.press("ArrowUp")
@@ -259,10 +312,17 @@ test.describe("state and forms", () => {
     await open("number-input", { quantity: "", required: "" })
     await save(page)
     expect(await status(page, "Submitted")).toBe("")
-    expect(await quantity(page).evaluate((el) => (el as HTMLInputElement).validity.valueMissing)).toBe(true)
+    expect(
+      await quantity(page).evaluate(
+        (el) => (el as HTMLInputElement).validity.valueMissing
+      )
+    ).toBe(true)
   })
 
-  test("the mouse wheel does nothing unless turned on", async ({ page, open }) => {
+  test("the mouse wheel does nothing unless turned on", async ({
+    page,
+    open,
+  }) => {
     await page.clock.install()
     await open("number-input")
     await quantity(page).focus()
@@ -272,7 +332,10 @@ test.describe("state and forms", () => {
     await expect(quantity(page)).toHaveValue("1")
   })
 
-  test("the mouse wheel steps a focused field when turned on", async ({ page, open }) => {
+  test("the mouse wheel steps a focused field when turned on", async ({
+    page,
+    open,
+  }) => {
     await open("number-input", { wheel: "" })
     await quantity(page).focus()
     await quantity(page).hover()

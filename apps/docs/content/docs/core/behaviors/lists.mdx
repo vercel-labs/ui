@@ -143,8 +143,12 @@ Then render that text through `findableText`, one empty element per piece, from 
 <FrameworkContent value="vue">
 
 ```vue
-<span :ref="(el) => virtual.findableText(item.index, el as HTMLElement | null, 0)" />
-<span :ref="(el) => virtual.findableText(item.index, el as HTMLElement | null, 1)" />
+<span
+  :ref="(el) => virtual.findableText(item.index, el as HTMLElement | null, 0)"
+/>
+<span
+  :ref="(el) => virtual.findableText(item.index, el as HTMLElement | null, 1)"
+/>
 ```
 
 </FrameworkContent>
@@ -168,7 +172,10 @@ Then render that text through `findableText`, one empty element per piece, from 
 
 ```ts
 const [idText, customerText] = row.querySelectorAll("span")
-const off = [virtual.findableText(index, idText, 0), virtual.findableText(index, customerText, 1)]
+const off = [
+  virtual.findableText(index, idText, 0),
+  virtual.findableText(index, customerText, 1),
+]
 ```
 
 </FrameworkContent>

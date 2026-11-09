@@ -62,7 +62,13 @@ If your data is already nested, `treeDataNodes` converts it to collection nodes:
 ```ts
 import { createTreeCollection, treeDataNodes } from "@ui-sdk/core"
 
-const items = [{ value: "src", label: "src", children: [{ value: "index", label: "index.ts" }] }]
+const items = [
+  {
+    value: "src",
+    label: "src",
+    children: [{ value: "index", label: "index.ts" }],
+  },
+]
 const tree = createTreeCollection(treeDataNodes(items))
 ```
 
@@ -73,7 +79,12 @@ For file paths, `treeFromPaths` builds the nested data for you:
 ```ts
 import { treeFromPaths } from "@ui-sdk/core"
 
-const items = treeFromPaths(["src/index.ts", "src/lib/util.ts", "README.md", "assets/"])
+const items = treeFromPaths([
+  "src/index.ts",
+  "src/lib/util.ts",
+  "README.md",
+  "assets/",
+])
 ```
 
 <ComponentExample
@@ -122,7 +133,11 @@ The helper supplies data. Your renderer decides how to handle it: this demo rend
 `treeCheckedStates` calculates whether each node is checked, unchecked or mixed. `toggleTreeChecked` returns the next checked value:
 
 ```ts
-import { createTreeCollection, toggleTreeChecked, treeCheckedStates } from "@ui-sdk/core"
+import {
+  createTreeCollection,
+  toggleTreeChecked,
+  treeCheckedStates,
+} from "@ui-sdk/core"
 
 const tree = createTreeCollection([
   { key: "fruit", parent: null },
@@ -184,7 +199,9 @@ Events from a nested item bubble through its parents. Before a parent handles on
 
 ```ts
 const own = (el: HTMLElement | undefined, event?: Event) =>
-  !el || !(event?.target instanceof Element) || event.target.closest('[role="treeitem"]') === el
+  !el ||
+  !(event?.target instanceof Element) ||
+  event.target.closest('[role="treeitem"]') === el
 ```
 
 Use that check in the item's handlers. For example:

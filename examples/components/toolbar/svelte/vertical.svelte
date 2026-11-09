@@ -1,7 +1,17 @@
 <script lang="ts">
-  import { MousePointer2Icon, PencilIcon, SquareIcon, Trash2Icon, TypeIcon } from "@lucide/svelte"
+  import {
+    MousePointer2Icon,
+    PencilIcon,
+    SquareIcon,
+    Trash2Icon,
+    TypeIcon,
+  } from "@lucide/svelte"
   import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/svelte/toggle"
-  import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import {
+    Toolbar,
+    ToolbarButton,
+    ToolbarSeparator,
+  } from "@ui-sdk/svelte/toolbar"
   import { useLog } from "../../../shared/svelte/log"
 
   const tools = [
@@ -20,7 +30,8 @@
     deselectable={false}
     orientation="vertical"
     aria-label="Tool"
-    onValueChange={([value]) => log(`${tools.find((tool) => tool.value === value)?.label} tool`)}
+    onValueChange={([value]) =>
+      log(`${tools.find((tool) => tool.value === value)?.label} tool`)}
   >
     {#each tools as { value, label, icon: Icon } (value)}
       <Toggle {value} aria-label={label}>

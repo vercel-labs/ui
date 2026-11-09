@@ -22,7 +22,10 @@ import { bind } from "../src/foundation/kernel/part"
 type ListOptions = {
   value?: string[]
   defaultValue?: string[]
-  onValueChange?: (value: string[], details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: string[],
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
   multiple?: boolean
   orientation?: "horizontal" | "vertical"
   columns?: number
@@ -30,7 +33,12 @@ type ListOptions = {
   /** Where PageDown goes from each item, like a calendar paging to a day of next month. */
   pages?: Record<string, string>
 }
-type ListItemProps = { value: string; disabled?: boolean; hidden?: boolean; parent?: string }
+type ListItemProps = {
+  value: string
+  disabled?: boolean
+  hidden?: boolean
+  parent?: string
+}
 
 // A list with one tab stop, selection and focus recovery, built from the public blocks.
 const list = definePrimitive({
@@ -50,24 +58,39 @@ const list = definePrimitive({
     value: options.value ?? options.defaultValue ?? [],
     focused: null as string | null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
-    const roving = createRovingFocus<{ value: string[]; focused: string | null }, ListItemProps>(context, {
+    const roving = createRovingFocus<
+      { value: string[]; focused: string | null },
+      ListItemProps
+    >(context, {
       slot: "item",
       key: "focused",
       orientation: () => context.options().orientation ?? "vertical",
       disabled: (item) => !!item.props.disabled,
       focusable: (item) => !item.props.hidden,
       preferred: (item) => context.store.get().value.includes(item.key),
-      claims: (state, item) => (state.value.length ? state.value.includes(item.key) : !item.props.disabled),
+      claims: (state, item) =>
+        state.value.length
+          ? state.value.includes(item.key)
+          : !item.props.disabled,
       move: context.options().pages
-        ? (event, { from }) => (event.key === "PageDown" ? context.options().pages![from.key] : undefined)
+        ? (event, { from }) =>
+            event.key === "PageDown"
+              ? context.options().pages![from.key]
+              : undefined
         : context.options().columns
           ? (event, { from, items }) => {
               const columns = context.options().columns!
               const index = items.findIndex((item) => item.key === from.key)
-              const by = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: columns, ArrowUp: -columns }[event.key]
+              const by = {
+                ArrowRight: 1,
+                ArrowLeft: -1,
+                ArrowDown: columns,
+                ArrowUp: -columns,
+              }[event.key]
               return by === undefined ? undefined : items[index + by]?.key
             }
           : undefined,
@@ -81,7 +104,10 @@ const list = definePrimitive({
       selectable: (key) => !context.props<ListItemProps>("item", key)?.disabled,
     })
     const recovery = createFocusRecovery<ListItemProps>({
-      fallback: (lost) => (lost.props.parent ? context.element("item", lost.props.parent) : undefined),
+      fallback: (lost) =>
+        lost.props.parent
+          ? context.element("item", lost.props.parent)
+          : undefined,
     })
     return {
       roving,
@@ -89,19 +115,36 @@ const list = definePrimitive({
       recovery,
       keydown(event: KeyboardEvent, el: HTMLElement) {
         const moved = roving.keydown(event, el)
-        if (moved?.shift) selection.extend(moved.key, { from: moved.from, reason: "list-navigation", event })
+        if (moved?.shift) {
+          selection.extend(moved.key, {
+            from: moved.from,
+            reason: "list-navigation",
+            event,
+          })
+        }
       },
     }
   },
   slots: (slot) => ({
     item: slot<ListItemProps, { selected: boolean }>({
-      props: { value: "string", disabled: "boolean", hidden: "boolean", parent: "string" },
+      props: {
+        value: "string",
+        disabled: "boolean",
+        hidden: "boolean",
+        parent: "string",
+      },
       state: (state, { key }) => ({ selected: state.value.includes(key) }),
       present: (_state, { props }) => !props.hidden,
-      attrs: (state, part) => ({ role: "option", tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        role: "option",
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: { keydown: (event, { el, api }) => api.keydown(event, el!) },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.recovery.bind(el, part)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.recovery.bind(el, part),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -116,8 +159,13 @@ afterEach(() => {
 
 const tick = () => new Promise((resolve) => setTimeout(resolve))
 
-function render(options: ListOptions, items: ListItemProps[], container: HTMLElement = document.body) {
-  const instance = list({ id: "l", ...options }) as ReturnType<typeof list> & PrimitiveInstance
+function render(
+  options: ListOptions,
+  items: ListItemProps[],
+  container: HTMLElement = document.body
+) {
+  const instance = list({ id: "l", ...options }) as ReturnType<typeof list> &
+    PrimitiveInstance
   const els = new Map<string, HTMLElement>()
   const unbind = new Map<string, () => void>()
   const add = (props: ListItemProps) => {
@@ -125,9 +173,13 @@ function render(options: ListOptions, items: ListItemProps[], container: HTMLEle
     el.textContent = props.value
     const part = instance.part("item", props)
     const write = () => {
-      for (const [name, value] of Object.entries(partAttrs(part)))
-        if (value === undefined) el.removeAttribute(name)
-        else el.setAttribute(name, value)
+      for (const [name, value] of Object.entries(partAttrs(part))) {
+        if (value === undefined) {
+          el.removeAttribute(name)
+        } else {
+          el.setAttribute(name, value)
+        }
+      }
     }
     write()
     cleanups.push(instance.subscribe(write))
@@ -140,11 +192,18 @@ function render(options: ListOptions, items: ListItemProps[], container: HTMLEle
   items.forEach(add)
   const press = (key: string, init: KeyboardEventInit = {}) =>
     (document.activeElement as HTMLElement).dispatchEvent(
-      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...init }),
+      new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      })
     )
   const focused = () => (document.activeElement as HTMLElement).textContent
   const stops = () =>
-    [...els.values()].filter((el) => el.getAttribute("tabindex") === "0").map((el) => el.textContent)
+    [...els.values()]
+      .filter((el) => el.getAttribute("tabindex") === "0")
+      .map((el) => el.textContent)
   return { instance, els, unbind, add, press, focused, stops }
 }
 
@@ -155,9 +214,15 @@ describe("createRovingFocus", () => {
     const instance = list({ id: "l" }) as PrimitiveInstance
     const tabindex = (value: string, props = {}) =>
       partAttrs(instance.part("item", { value, ...props })).tabindex
-    expect([tabindex("a", { disabled: true }), tabindex("b"), tabindex("c")]).toEqual(["-1", "0", "-1"])
+    expect([
+      tabindex("a", { disabled: true }),
+      tabindex("b"),
+      tabindex("c"),
+    ]).toEqual(["-1", "0", "-1"])
     const selected = list({ id: "m", defaultValue: ["c"] }) as PrimitiveInstance
-    const stops = ["a", "b", "c"].map((value) => partAttrs(selected.part("item", { value })).tabindex)
+    const stops = ["a", "b", "c"].map(
+      (value) => partAttrs(selected.part("item", { value })).tabindex
+    )
     expect(stops).toEqual(["-1", "-1", "0"])
   })
 
@@ -195,7 +260,11 @@ describe("createRovingFocus", () => {
     const container = document.createElement("div")
     container.style.direction = "rtl"
     document.body.append(container)
-    const { els, press, focused } = render({ orientation: "horizontal" }, abc, container)
+    const { els, press, focused } = render(
+      { orientation: "horizontal" },
+      abc,
+      container
+    )
     await tick()
     els.get("a")!.focus()
     press("ArrowLeft")
@@ -216,7 +285,10 @@ describe("createRovingFocus", () => {
   })
 
   test("a move to an item that isn't rendered yet focuses it once it binds", async () => {
-    const { els, unbind, add, press, focused, stops } = render({ pages: { b: "d" } }, abc)
+    const { els, unbind, add, press, focused, stops } = render(
+      { pages: { b: "d" } },
+      abc
+    )
     await tick()
     els.get("b")!.focus()
     press("PageDown")
@@ -269,7 +341,10 @@ describe("createRovingFocus", () => {
   })
 
   test("a move to an item that can't take focus yet focuses it once it can", async () => {
-    const { instance, els, add, press, focused } = render({ pages: { b: "d" }, value: [] }, abc)
+    const { instance, els, add, press, focused } = render(
+      { pages: { b: "d" }, value: [] },
+      abc
+    )
     add({ value: "d", hidden: true })
     await tick()
     els.get("b")!.focus()
@@ -337,7 +412,7 @@ describe("createRovingFocus", () => {
     press("ArrowDown", { shiftKey: true })
     expect(onValueChange).toHaveBeenLastCalledWith(
       ["a", "b"],
-      expect.objectContaining({ reason: "list-navigation" }),
+      expect.objectContaining({ reason: "list-navigation" })
     )
   })
 })
@@ -345,11 +420,15 @@ describe("createRovingFocus", () => {
 describe("createSelection", () => {
   const setup = async (
     options: ListOptions = {},
-    items = [...abc, { value: "d", disabled: true }, { value: "e" }],
+    items = [...abc, { value: "d", disabled: true }, { value: "e" }]
   ) => {
     const view = render({ multiple: true, ...options }, items)
     await tick()
-    return { ...view, selection: view.instance.api.selection, value: () => view.instance.get().value }
+    return {
+      ...view,
+      selection: view.instance.api.selection,
+      value: () => view.instance.get().value,
+    }
   }
   const why = { reason: "item-press" as const }
 
@@ -383,7 +462,9 @@ describe("createSelection", () => {
   })
 
   test("a value from outside starts ranges over, and a refused change moves no anchor", async () => {
-    const onValueChange = vi.fn((_value: string[], details: { cancel: () => void }) => details.cancel())
+    const onValueChange = vi.fn(
+      (_value: string[], details: { cancel: () => void }) => details.cancel()
+    )
     const { selection, value, instance } = await setup()
     selection.choose("a", why)
     instance.setOptions({ id: "l", multiple: true, value: ["e"] })
@@ -407,7 +488,10 @@ describe("createSelection", () => {
 
 describe("createFocusRecovery", () => {
   test("focus that leaves with its part goes to the fallback", async () => {
-    const { els, unbind } = render({}, [{ value: "a" }, { value: "b", parent: "a" }])
+    const { els, unbind } = render({}, [
+      { value: "a" },
+      { value: "b", parent: "a" },
+    ])
     els.get("b")!.focus()
     // Like a framework removing the part: the element goes, then its cleanup runs.
     els.get("b")!.remove()
@@ -417,7 +501,10 @@ describe("createFocusRecovery", () => {
   })
 
   test("focus that moved elsewhere first stays there", async () => {
-    const { els, unbind } = render({}, [{ value: "a" }, { value: "b", parent: "a" }])
+    const { els, unbind } = render({}, [
+      { value: "a" },
+      { value: "b", parent: "a" },
+    ])
     const other = document.createElement("button")
     document.body.append(other)
     els.get("b")!.focus()
@@ -449,7 +536,10 @@ describe("bindPanel", () => {
       opening: () => "mount",
       reveal: () => {},
       trigger: () => undefined,
-      subscribe: (listener) => (listeners.add(listener), () => listeners.delete(listener)),
+      subscribe: (listener) => (
+        listeners.add(listener),
+        () => listeners.delete(listener)
+      ),
       settled,
       exited,
     })
@@ -474,9 +564,14 @@ describe("reading parts", () => {
   test("attributes, state and presence, the way adapters read them", () => {
     const instance = list({ id: "l", defaultValue: ["a"] }) as PrimitiveInstance
     const part = instance.part("item", { value: "a" })
-    expect(partAttrs(part)).toMatchObject({ "data-slot": "list-item", role: "option" })
+    expect(partAttrs(part)).toMatchObject({
+      "data-slot": "list-item",
+      role: "option",
+    })
     expect(partState(part)).toEqual({ selected: true })
-    expect(partPresent(instance.part("item", { value: "b", hidden: true }))).toBe(false)
+    expect(
+      partPresent(instance.part("item", { value: "b", hidden: true }))
+    ).toBe(false)
   })
 })
 
@@ -491,7 +586,9 @@ describe("locales", () => {
 describe("announce", () => {
   afterEach(() => {
     vi.useRealTimers()
-    for (const region of document.querySelectorAll("[data-ui-sdk-announcer]")) region.remove()
+    for (const region of document.querySelectorAll("[data-ui-sdk-announcer]")) {
+      region.remove()
+    }
   })
 
   test("reads text through a live region, politely unless asked to interrupt", () => {

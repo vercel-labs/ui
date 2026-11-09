@@ -13,9 +13,18 @@ import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { frameworks, isFramework, type Framework } from "@/lib/frameworks"
 
-function FrameworkPicker({ framework, available }: { framework: Framework; available: Framework[] }) {
+function FrameworkPicker({
+  framework,
+  available,
+}: {
+  framework: Framework
+  available: Framework[]
+}) {
   const router = useRouter()
-  const items = available.map((value) => ({ value, label: frameworks[value].label }))
+  const items = available.map((value) => ({
+    value,
+    label: frameworks[value].label,
+  }))
   const [value, setValue] = useState(framework)
   const [shown, setShown] = useState(framework)
 
@@ -29,7 +38,9 @@ function FrameworkPicker({ framework, available }: { framework: Framework; avail
       items={items}
       value={value}
       onValueChange={(next) => {
-        if (!isFramework(next) || next === value) return
+        if (!isFramework(next) || next === value) {
+          return
+        }
         setValue(next)
         router.push(`?fw=${next}`)
       }}
@@ -39,7 +50,10 @@ function FrameworkPicker({ framework, available }: { framework: Framework; avail
         className="inline-flex h-8 min-w-0 items-center gap-1 rounded-2xl bg-foreground/5 px-2.5 text-sm outline-none transition-[color,background-color,box-shadow] select-none hover:bg-foreground/10 focus-visible:ring-3 focus-visible:ring-ring/30 data-open:bg-foreground/10"
       >
         <SelectValue className="truncate" />
-        <ChevronDownIcon aria-hidden="true" className="size-3.5 shrink-0 text-muted-foreground" />
+        <ChevronDownIcon
+          aria-hidden="true"
+          className="size-3.5 shrink-0 text-muted-foreground"
+        />
       </SelectTrigger>
       <SelectContent
         align="start"

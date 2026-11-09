@@ -13,7 +13,11 @@ import {
 import { render } from "@solidjs/web"
 import type { JSX } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
-import { toolbarFixture as f, toolbarLocked, toolbarOptions } from "tests/fixtures/toolbar.ts"
+import {
+  toolbarFixture as f,
+  toolbarLocked,
+  toolbarOptions,
+} from "tests/fixtures/toolbar.ts"
 
 const controller = createToolbarController()
 
@@ -28,17 +32,26 @@ function Fixture() {
       </ToolbarGroup>
     </Show>
   )
-  const group = ({ label, defaultValue, items }: typeof f.style, multiple: boolean) => (
+  const group = (
+    { label, defaultValue, items }: typeof f.style,
+    multiple: boolean
+  ) => (
     <ToggleGroup
       class="toggle-group"
       aria-label={label}
       multiple={multiple}
       defaultValue={defaultValue}
-      onValueChange={(value) => setAction(`${label}: ${value.join(", ") || "none"}`)}
+      onValueChange={(value) =>
+        setAction(`${label}: ${value.join(", ") || "none"}`)
+      }
     >
       <For each={items}>
         {(item: (typeof f.style.items)[number]) => (
-          <Toggle class="toggle" value={item.value} disabled={"disabled" in item && item.disabled}>
+          <Toggle
+            class="toggle"
+            value={item.value}
+            disabled={"disabled" in item && item.disabled}
+          >
             {item.label}
           </Toggle>
         )}
@@ -49,13 +62,20 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Toolbar class="toolbar" aria-label={f.label} controller={controller} {...toolbarOptions()}>
+      <Toolbar
+        class="toolbar"
+        aria-label={f.label}
+        controller={controller}
+        {...toolbarOptions()}
+      >
         {lock("Locked style", () => group(f.style, true))}
         <ToolbarSeparator />
         {group(f.alignment, false)}
         <ToolbarSeparator />
         <Menu onAction={(value) => setAction(`font: ${value}`)}>
-          <ToolbarButton render={(props) => <MenuTrigger {...props} />}>{f.font.trigger}</ToolbarButton>
+          <ToolbarButton render={(props) => <MenuTrigger {...props} />}>
+            {f.font.trigger}
+          </ToolbarButton>
           <MenuContent class="popup">
             <For each={f.font.items}>
               {(item) => (
@@ -70,9 +90,16 @@ function Fixture() {
           defaultValue={f.size.defaultValue}
           onValueChange={(value) => setAction(`size: ${value}`)}
         >
-          <ToolbarInput render={(props) => <NumberInputControl {...props} aria-label={f.size.label} />} />
+          <ToolbarInput
+            render={(props) => (
+              <NumberInputControl {...props} aria-label={f.size.label} />
+            )}
+          />
         </NumberInput>
-        <ToolbarInput aria-label={f.comment.label} value={f.comment.defaultValue} />
+        <ToolbarInput
+          aria-label={f.comment.label}
+          value={f.comment.defaultValue}
+        />
         <ToolbarGroup
           class="toolbar-group"
           aria-label={f.history.label}
@@ -92,7 +119,9 @@ function Fixture() {
         {lock("Locked proofing", () => (
           <Toggle
             class="toggle"
-            onPressedChange={(pressed) => setAction(`spellcheck: ${pressed ? "on" : "off"}`)}
+            onPressedChange={(pressed) =>
+              setAction(`spellcheck: ${pressed ? "on" : "off"}`)
+            }
           >
             {f.spellcheck.label}
           </Toggle>

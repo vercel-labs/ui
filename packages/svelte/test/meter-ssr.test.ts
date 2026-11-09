@@ -13,7 +13,9 @@ describe("server rendering a meter", () => {
     expect(html).toMatch(/role="meter"[^>]*aria-valuenow="3"/)
     expect(html).toContain('aria-valuetext="50%"')
     expect(html).toContain("--meter-value:50%")
-    expect(html).toMatch(/data-slot="meter-indicator"[^>]*style="[^"]*width:50%/)
+    expect(html).toMatch(
+      /data-slot="meter-indicator"[^>]*style="[^"]*width:50%/
+    )
     expect(html).toContain(">50%</span>")
   })
 })

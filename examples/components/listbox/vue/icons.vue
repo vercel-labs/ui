@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { ArchiveIcon, ArrowRightIcon, MailIcon, PencilIcon, StarIcon } from "@lucide/vue"
+import {
+  ArchiveIcon,
+  ArrowRightIcon,
+  MailIcon,
+  PencilIcon,
+  StarIcon,
+} from "@lucide/vue"
 import { Listbox, ListboxItem, ListboxItemIcon } from "@ui-sdk/vue/listbox"
 
 const views = [

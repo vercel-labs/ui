@@ -1,7 +1,16 @@
 // @vitest-environment jsdom
 import { createChange, definePrimitive, type ChangeDetails } from "@ui-sdk/core"
 import { afterEach, expect, test, vi } from "vitest"
-import { createApp, defineComponent, h, nextTick, ref, shallowRef, type App, type VNode } from "vue"
+import {
+  createApp,
+  defineComponent,
+  h,
+  nextTick,
+  ref,
+  shallowRef,
+  type App,
+  type VNode,
+} from "vue"
 import { createParts } from "../src/primitive"
 
 const signal = definePrimitive({
@@ -16,8 +25,15 @@ const signal = definePrimitive({
         onCommit?: (value: string) => void
         onValueChange?: (value: string, details: { canceled: boolean }) => void
       }>({
-        props: { value: "string", onCommit: "callback", onValueChange: "callback" },
-        attrs: (_state, { props }) => ({ type: "button", "data-value": props.value }),
+        props: {
+          value: "string",
+          onCommit: "callback",
+          onValueChange: "callback",
+        },
+        attrs: (_state, { props }) => ({
+          type: "button",
+          "data-value": props.value,
+        }),
         on: {
           click: (_event, { props }) => {
             props.onCommit?.(props.value ?? "initial")
@@ -76,7 +92,11 @@ for (const part of ["root", "child"] as const) {
       value.value = next
     })
     const button = mount(() =>
-      render({ value: value.value, onValueChange: changed, "onUpdate:value": updated }),
+      render({
+        value: value.value,
+        onValueChange: changed,
+        "onUpdate:value": updated,
+      })
     )
 
     button.click()
@@ -101,7 +121,9 @@ test("a generated root binds its slot value through plain v-model", async () => 
   const updated = vi.fn((next: string) => {
     value.value = next
   })
-  const button = mount(() => h(Root, { modelValue: value.value, "onUpdate:modelValue": updated }))
+  const button = mount(() =>
+    h(Root, { modelValue: value.value, "onUpdate:modelValue": updated })
+  )
 
   expect(button.dataset.value).toBe("initial")
   button.click()
@@ -118,13 +140,16 @@ test("a generated root keeps its option model controlled and emits each update o
       value?: string
       onValueChange?: (value: string, details: ChangeDetails<"press">) => void
     }) => ({ value: "initial" }),
-    sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+    sync: (options) =>
+      options.value === undefined ? {} : { value: options.value },
     api: (context) => {
       const change = createChange(context)
       return { set: () => change("value", "next", { reason: "press" }) }
     },
     slots: (slot) => ({
-      root: slot<{ onValueChange?: (value: string, details: ChangeDetails<"press">) => void }>({
+      root: slot<{
+        onValueChange?: (value: string, details: ChangeDetails<"press">) => void
+      }>({
         props: { onValueChange: "callback" },
         attrs: (state) => ({ type: "button", "data-value": state.value }),
         on: { click: (_event, { api }) => api.set() },
@@ -141,7 +166,7 @@ test("a generated root keeps its option model controlled and emits each update o
       onValueChange: changed,
       "onUpdate:value": updated,
       "onUpdate:modelValue": modelUpdated,
-    }),
+    })
   )
 
   button.click()

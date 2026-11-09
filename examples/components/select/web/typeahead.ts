@@ -40,7 +40,7 @@ function mount(root: HTMLElement) {
                   <span data-slot="hint">${country.code}</span>
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>

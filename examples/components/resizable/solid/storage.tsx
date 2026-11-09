@@ -1,4 +1,9 @@
-import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  type ResizableStorage,
+} from "@ui-sdk/solid/resizable"
 
 const session: ResizableStorage = {
   getItem: (key) => sessionStorage.getItem(key),

@@ -1,4 +1,8 @@
-import { autocomplete, type AutocompleteApi, type ListData } from "@ui-sdk/core/autocomplete"
+import {
+  autocomplete,
+  type AutocompleteApi,
+  type ListData,
+} from "@ui-sdk/core/autocomplete"
 import { createParts, wrappedChild } from "./define-element"
 import { copy, itemText, renderData, stashedEmpty, templateOf } from "./list"
 import { popupKinds, popupState, sheetInputPortal } from "./popup"
@@ -46,17 +50,29 @@ function defineAutocompleteElements() {
             filter: data.filter as never,
           }),
           container: undefined,
-          onSubmit: (value: string, { event }: { event?: Event }) => submitted(el, value, event),
+          onSubmit: (value: string, { event }: { event?: Event }) =>
+            submitted(el, value, event),
         }
       },
       state: {
         value: {
           get: (api: AutocompleteApi) => api.getValue(),
-          set: (api: AutocompleteApi, value: string | null) => api.setValue(value ?? ""),
+          set: (api: AutocompleteApi, value: string | null) =>
+            api.setValue(value ?? ""),
         },
         ...popupState,
       },
-      api: ["isOpen", "setOpen", "open", "close", "toggle", "getValue", "setValue", "clear", "focus"],
+      api: [
+        "isOpen",
+        "setOpen",
+        "open",
+        "close",
+        "toggle",
+        "getValue",
+        "setValue",
+        "clear",
+        "focus",
+      ],
       // container="#id" renders the suggestions there. As a sheet, they sit in a
       // viewport there and the field moves into its header.
       portal: sheetInputPortal("ui-autocomplete-viewport"),
@@ -69,9 +85,21 @@ function defineAutocompleteElements() {
     },
     label: { tag: "ui-autocomplete-label", display: "block" },
     // Wrappers, so the field stays a real input and the buttons real buttons.
-    input: { tag: "ui-autocomplete-input", display: "contents", target: wrappedChild("input") },
-    trigger: { tag: "ui-autocomplete-trigger", display: "contents", target: wrappedChild("button") },
-    clear: { tag: "ui-autocomplete-clear", display: "contents", target: wrappedChild("button") },
+    input: {
+      tag: "ui-autocomplete-input",
+      display: "contents",
+      target: wrappedChild("input"),
+    },
+    trigger: {
+      tag: "ui-autocomplete-trigger",
+      display: "contents",
+      target: wrappedChild("button"),
+    },
+    clear: {
+      tag: "ui-autocomplete-clear",
+      display: "contents",
+      target: wrappedChild("button"),
+    },
     content: { tag: "ui-autocomplete-content", kinds: popupKinds },
     list: { tag: "ui-autocomplete-list", display: "block" },
     item: { tag: "ui-autocomplete-item", display: "block" },
@@ -91,19 +119,27 @@ function defineAutocompleteElements() {
 // Fires `submit` on the element, with the text. It doesn't bubble, so the
 // form around it never takes it for its own. Canceling it keeps the form from submitting.
 function submitted(el: HTMLElement, value: string, event?: Event) {
-  const submit = new CustomEvent("submit", { cancelable: true, composed: true, detail: { value } })
-  if (!el.dispatchEvent(submit)) event?.preventDefault()
+  const submit = new CustomEvent("submit", {
+    cancelable: true,
+    composed: true,
+    detail: { value },
+  })
+  if (!el.dispatchEvent(submit)) {
+    event?.preventDefault()
+  }
 }
 
 // The suggestions that match, in the list part, or in content the element adds.
 function renderSuggestions(el: AutocompleteElement, api: AutocompleteApi) {
-  if (!el.items) return
+  if (!el.items) {
+    return
+  }
   const template = templateOf(el)
   let list =
     lists.get(el) ??
-    [...el.querySelectorAll("ui-autocomplete-content ui-autocomplete-list")].find(
-      (found) => found.closest("ui-autocomplete") === el,
-    )
+    [
+      ...el.querySelectorAll("ui-autocomplete-content ui-autocomplete-list"),
+    ].find((found) => found.closest("ui-autocomplete") === el)
   if (!list) {
     const created = copy(template, "ui-autocomplete-content", false)
     list = copy(template, "ui-autocomplete-list", false)

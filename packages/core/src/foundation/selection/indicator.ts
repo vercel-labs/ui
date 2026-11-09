@@ -18,19 +18,27 @@ function bindIndicator(options: {
     const item = options.active()
     options.write(item && list ? layoutBox(item, list) : undefined)
   }
-  const observer = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update)
+  const observer =
+    typeof ResizeObserver === "undefined"
+      ? undefined
+      : new ResizeObserver(update)
   // The watched set holds what it watches, so items that left leave it, or they stay alive.
   const observed = new Set<Element>()
   const remeasure = () => {
     const list = options.list()
-    const targets = new Set(list ? [list, ...list.querySelectorAll(options.itemSelector)] : [])
-    for (const target of observed)
+    const targets = new Set(
+      list ? [list, ...list.querySelectorAll(options.itemSelector)] : []
+    )
+    for (const target of observed) {
       if (!targets.has(target)) {
         observed.delete(target)
         observer?.unobserve(target)
       }
+    }
     for (const target of targets) {
-      if (observed.has(target)) continue
+      if (observed.has(target)) {
+        continue
+      }
       observed.add(target)
       observer?.observe(target)
     }

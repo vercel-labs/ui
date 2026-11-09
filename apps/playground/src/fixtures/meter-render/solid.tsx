@@ -1,4 +1,9 @@
-import { Meter, MeterIndicator, MeterTrack, MeterValue } from "@ui-sdk/solid/meter"
+import {
+  Meter,
+  MeterIndicator,
+  MeterTrack,
+  MeterValue,
+} from "@ui-sdk/solid/meter"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
 

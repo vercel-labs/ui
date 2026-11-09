@@ -15,7 +15,9 @@ const items = (done: string[] = []) => [
 ]
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   defineTreeElements()
 })
 
@@ -24,7 +26,8 @@ async function mount() {
   const tree = document.body.firstElementChild as TreeElement
   tree.items = items()
   await wait()
-  const item = (value: string) => tree.querySelector<HTMLElement>(`ui-tree-item[value="${value}"]`)!
+  const item = (value: string) =>
+    tree.querySelector<HTMLElement>(`ui-tree-item[value="${value}"]`)!
   return { tree, item }
 }
 
@@ -54,16 +57,21 @@ test("checking an item from the keyboard, with a page that renders new items bac
     tree.items = items((event as CustomEvent<{ value: string[] }>).detail.value)
   })
   await wait()
-  const item = (value: string) => tree.querySelector<HTMLElement>(`ui-tree-item[value="${value}"]`)!
+  const item = (value: string) =>
+    tree.querySelector<HTMLElement>(`ui-tree-item[value="${value}"]`)!
   item("c").focus()
-  item("c").dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true }))
+  item("c").dispatchEvent(
+    new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true })
+  )
   await wait()
   expect(item("c").textContent).toContain("C done")
   expect(document.activeElement).toBe(item("c"))
 })
 
 test("new items keep focus on a nested item that had it", async () => {
-  const nested = (label: string) => [{ value: "a", label: "A", children: [{ value: "a1", label }] }]
+  const nested = (label: string) => [
+    { value: "a", label: "A", children: [{ value: "a1", label }] },
+  ]
   document.body.innerHTML = `<ui-tree aria-label="Tasks" default-expanded="a"></ui-tree>`
   const tree = document.body.firstElementChild as TreeElement
   tree.items = nested("A1")

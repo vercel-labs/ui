@@ -2,7 +2,12 @@ import "@ui-sdk/web/dialog"
 import type { UiDialogElement } from "@ui-sdk/web/dialog"
 import { log } from "../../../shared/web/log"
 
-type Invoice = { id: string; customer: string; amount: string; status: "Paid" | "Due" }
+type Invoice = {
+  id: string
+  customer: string
+  amount: string
+  status: "Paid" | "Due"
+}
 
 const invoices: Invoice[] = [
   { id: "INV-001", customer: "Acme", amount: "$250.00", status: "Paid" },
@@ -42,26 +47,42 @@ function mount(root: HTMLElement) {
     const row = document.createElement("li")
     row.dataset.slot = "row"
     row.innerHTML = `${invoice.customer}<span data-slot="hint">${invoice.amount} · ${invoice.status}</span>`
-    const trigger = Object.assign(document.createElement("ui-dialog-trigger"), { payload: invoice })
+    const trigger = Object.assign(document.createElement("ui-dialog-trigger"), {
+      payload: invoice,
+    })
     trigger.setAttribute("for", "invoice-reminder")
-    if (invoice.status === "Paid") trigger.setAttribute("disabled", "")
+    if (invoice.status === "Paid") {
+      trigger.setAttribute("disabled", "")
+    }
     trigger.innerHTML = `<button aria-label="Remind ${invoice.customer}">Remind</button>`
     row.append(trigger)
     list.append(row)
   }
   dialog.addEventListener("payloadchange", (event) => {
     const invoice = event.detail.value
-    root.querySelector("ui-dialog-title")!.textContent = `Remind ${invoice?.customer}`
+    root.querySelector("ui-dialog-title")!.textContent =
+      `Remind ${invoice?.customer}`
     root.querySelector("ui-dialog-description")!.textContent =
       `${invoice?.id} for ${invoice?.amount} is due. We'll email the billing contact.`
   })
   dialog.addEventListener("openchange", (event) => {
-    if (!event.detail.value && event.detail.returnValue === "send") log(root, "Reminder sent")
+    if (!event.detail.value && event.detail.returnValue === "send") {
+      log(root, "Reminder sent")
+    }
   })
-  root.querySelector("[data-slot=controls] button")!.addEventListener("click", async () => {
-    const { reason, returnValue } = await dialog.api.open({ payload: invoices[2] })
-    log(root, returnValue === "send" ? "Reminder sent from code" : `Closed (${reason})`)
-  })
+  root
+    .querySelector("[data-slot=controls] button")!
+    .addEventListener("click", async () => {
+      const { reason, returnValue } = await dialog.api.open({
+        payload: invoices[2],
+      })
+      log(
+        root,
+        returnValue === "send"
+          ? "Reminder sent from code"
+          : `Closed (${reason})`
+      )
+    })
 }
 
 export { mount }

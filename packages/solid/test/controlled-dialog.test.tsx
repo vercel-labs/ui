@@ -4,9 +4,18 @@
 import { render } from "@solidjs/web"
 import { createSignal, flush, type Accessor, type JSX } from "solid-js"
 import { afterEach, expect, test } from "vitest"
-import { AlertDialog, AlertDialogContent, AlertDialogTrigger } from "../src/alert-dialog"
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTrigger,
+} from "../src/alert-dialog"
 import { Dialog, DialogContent, DialogTrigger } from "../src/dialog"
-import { Drawer, DrawerContent, DrawerTrigger, type DrawerContentState } from "../src/drawer"
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTrigger,
+  type DrawerContentState,
+} from "../src/drawer"
 
 // jsdom has no top layer, and no ResizeObserver, which a drawer measures itself with.
 HTMLElement.prototype.showPopover ??= function () {}
@@ -25,8 +34,9 @@ afterEach(() => {
 
 // What core's development build recorded writing while options were handed over.
 const relays = () =>
-  (globalThis as Record<symbol, { relays?: unknown[] } | undefined>)[Symbol.for("ui-sdk.devtools.history@1")]
-    ?.relays ?? []
+  (globalThis as Record<symbol, { relays?: unknown[] } | undefined>)[
+    Symbol.for("ui-sdk.devtools.history@1")
+  ]?.relays ?? []
 
 const dialogs: Record<string, (open: Accessor<boolean>) => JSX.Element> = {
   dialog: (open) => (
@@ -43,20 +53,26 @@ const dialogs: Record<string, (open: Accessor<boolean>) => JSX.Element> = {
   ),
 }
 
-for (const [name, view] of Object.entries(dialogs))
+for (const [name, view] of Object.entries(dialogs)) {
   test(`an untitled ${name} opened through its prop is named after its trigger and records no relays`, async () => {
     relays().splice(0)
     const [open, setOpen] = createSignal(false)
-    dispose = render(() => view(open), document.body.appendChild(document.createElement("div")))
+    dispose = render(
+      () => view(open),
+      document.body.appendChild(document.createElement("div"))
+    )
     flush()
     setOpen(true)
     flush()
     await new Promise((done) => setTimeout(done))
     flush()
-    const content = document.querySelector('[role="dialog"], [role="alertdialog"]')!
+    const content = document.querySelector(
+      '[role="dialog"], [role="alertdialog"]'
+    )!
     expect(content.getAttribute("aria-label")).toBe("Edit profile")
     expect(relays()).toEqual([])
   })
+}
 
 test("a drawer opened through its prop records no relays and opens at its default snap point each time", async () => {
   relays().splice(0)
@@ -68,7 +84,7 @@ test("a drawer opened through its prop records no relays and opens at its defaul
         <DrawerContent>Body</DrawerContent>
       </Drawer>
     ),
-    document.body.appendChild(document.createElement("div")),
+    document.body.appendChild(document.createElement("div"))
   )
   const settle = async () => {
     flush()
@@ -78,7 +94,9 @@ test("a drawer opened through its prop records no relays and opens at its defaul
   for (const _ of [1, 2]) {
     setOpen(true)
     await settle()
-    expect(document.querySelector('[role="dialog"]')!.getAttribute("data-snap-point")).toBe("content")
+    expect(
+      document.querySelector('[role="dialog"]')!.getAttribute("data-snap-point")
+    ).toBe("content")
     setOpen(false)
     await settle()
   }
@@ -104,7 +122,7 @@ test("a drawer opened with new snap points renders at the first of them, as moda
         </DrawerContent>
       </Drawer>
     ),
-    document.body.appendChild(document.createElement("div")),
+    document.body.appendChild(document.createElement("div"))
   )
   flush()
   setSnapPoints([0.25, 1])

@@ -8,7 +8,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("groups hydrate without mismatches", async ({ page, open }) => {
   await open("resizable")
@@ -18,11 +21,24 @@ test("groups hydrate without mismatches", async ({ page, open }) => {
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("the server markup lays panels out at their default sizes before hydration", async ({ page, open }) => {
+test("the server markup lays panels out at their default sizes before hydration", async ({
+  page,
+  open,
+}) => {
   await open("resizable", { hydrate: "manual" })
-  expect(Math.abs((await panel(page, "Sidebar").boundingBox())!.width - editorSpace / 4)).toBeLessThan(2)
-  expect(Math.abs((await panel(page, "Preview").boundingBox())!.width - editorSpace / 4)).toBeLessThan(2)
-  expect(Math.abs((await panel(page, "Code").boundingBox())!.height - 298 * 0.7)).toBeLessThan(2)
+  expect(
+    Math.abs(
+      (await panel(page, "Sidebar").boundingBox())!.width - editorSpace / 4
+    )
+  ).toBeLessThan(2)
+  expect(
+    Math.abs(
+      (await panel(page, "Preview").boundingBox())!.width - editorSpace / 4
+    )
+  ).toBeLessThan(2)
+  expect(
+    Math.abs((await panel(page, "Code").boundingBox())!.height - 298 * 0.7)
+  ).toBeLessThan(2)
 })
 
 // Before hydration, percentages are of the whole group. After, of what the
@@ -30,8 +46,12 @@ test("the server markup lays panels out at their default sizes before hydration"
 test("panels barely move when the page hydrates", async ({ page, open }) => {
   await open("resizable", { hydrate: "manual" })
   const before = (await panel(page, "Main").boundingBox())!.width
-  await page.evaluate(() => (window as unknown as { hydrate: () => void }).hydrate())
+  await page.evaluate(() =>
+    (window as unknown as { hydrate: () => void }).hydrate()
+  )
   await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
-  expect(Math.abs((await panel(page, "Main").boundingBox())!.width - before)).toBeLessThan(4)
+  expect(
+    Math.abs((await panel(page, "Main").boundingBox())!.width - before)
+  ).toBeLessThan(4)
   expect(await hydrationErrors(page)).toEqual([])
 })

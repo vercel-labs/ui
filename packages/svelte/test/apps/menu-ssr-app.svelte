@@ -1,6 +1,14 @@
 <script lang="ts">
   import type { MenuData } from "@ui-sdk/core/menu"
-  import { Menu, MenuContent, MenuItem, MenuSub, MenuSubContent, MenuSubTrigger, MenuTrigger } from "../../src/menu"
+  import {
+    Menu,
+    MenuContent,
+    MenuItem,
+    MenuSub,
+    MenuSubContent,
+    MenuSubTrigger,
+    MenuTrigger,
+  } from "../../src/menu"
 
   let { open = false, items }: { open?: boolean; items?: MenuData } = $props()
 </script>
@@ -14,7 +22,8 @@
       <MenuItem value="new" shortcut="mod+n">New file</MenuItem>
       <MenuSub>
         <MenuSubTrigger>Share</MenuSubTrigger>
-        <MenuSubContent><MenuItem value="email">Email</MenuItem></MenuSubContent>
+        <MenuSubContent><MenuItem value="email">Email</MenuItem></MenuSubContent
+        >
       </MenuSub>
     </MenuContent>
   </Menu>

@@ -18,7 +18,10 @@
     <AutocompleteLabel class="label">{f.label}</AutocompleteLabel>
     <AutocompleteInput>
       {#snippet render({ props, state })}
-        <input {...props} class={["input", state.open ? "is-open" : "is-closed"]} />
+        <input
+          {...props}
+          class={["input", state.open ? "is-open" : "is-closed"]}
+        />
       {/snippet}
     </AutocompleteInput>
     <AutocompleteTrigger aria-label={f.trigger}>▾</AutocompleteTrigger>

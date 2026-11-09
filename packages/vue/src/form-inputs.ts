@@ -16,7 +16,10 @@ const FormInputs = defineComponent({
         h("input", handle.slot("form-input")),
         ...(handle.state.multiple
           ? (handle.api.internal.serialized() as string[]).map((key) =>
-              h("input", { key, ...handle.slot("value-input", { id: key, value: key }) }),
+              h("input", {
+                key,
+                ...handle.slot("value-input", { id: key, value: key }),
+              })
             )
           : []),
       ]

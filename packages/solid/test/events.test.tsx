@@ -2,8 +2,17 @@ import { createPopoverController } from "@ui-sdk/core/popover"
 import { render } from "@solidjs/web"
 import { flush } from "solid-js"
 import { describe, expect, test } from "vitest"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
-import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "../src/popover"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "../src/popover"
 
 function mount(code: () => any) {
   const root = document.createElement("div")
@@ -15,7 +24,9 @@ function mount(code: () => any) {
 
 // Settles the microtasks a change queues, like binding and core's own deferrals.
 const settle = async () => {
-  for (let i = 0; i < 3; i++) await Promise.resolve()
+  for (let i = 0; i < 3; i++) {
+    await Promise.resolve()
+  }
   flush()
 }
 
@@ -24,7 +35,9 @@ describe("event handlers", () => {
     const calls: string[] = []
     const { root, dispose } = mount(() => (
       <Collapsible onOpenChange={(open) => calls.push(`open:${open}`)}>
-        <CollapsibleTrigger onClick={() => calls.push("user")}>Details</CollapsibleTrigger>
+        <CollapsibleTrigger onClick={() => calls.push("user")}>
+          Details
+        </CollapsibleTrigger>
         <CollapsiblePanel>Panel</CollapsiblePanel>
       </Collapsible>
     ))
@@ -53,7 +66,9 @@ describe("event handlers", () => {
     root.querySelector("button")!.click()
     await settle()
     expect(calls).toEqual(["user"])
-    expect(root.querySelector("button")!.getAttribute("aria-expanded")).toBe("false")
+    expect(root.querySelector("button")!.getAttribute("aria-expanded")).toBe(
+      "false"
+    )
     dispose()
   })
 
@@ -80,11 +95,21 @@ describe("event handlers", () => {
     inner.open()
     await settle()
     const dialogs = () =>
-      [...document.querySelectorAll('[role="dialog"]')].map((el) => el.querySelector("h2")!.textContent)
+      [...document.querySelectorAll('[role="dialog"]')].map(
+        (el) => el.querySelector("h2")!.textContent
+      )
     expect(dialogs()).toEqual(["Outer title", "Inner title"])
-    const input = document.querySelector<HTMLInputElement>('input[aria-label="Name"]')!
+    const input = document.querySelector<HTMLInputElement>(
+      'input[aria-label="Name"]'
+    )!
     input.focus()
-    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    input.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     await settle()
     expect(dialogs()).toEqual(["Outer title"])
     expect(outer.isOpen()).toBe(true)

@@ -8,17 +8,21 @@ function showDefaultText(
   owner: HTMLElement,
   instance: PrimitiveInstance,
   selector: string,
-  text: (el: HTMLElement, instance: PrimitiveInstance, index: number) => string,
+  text: (el: HTMLElement, instance: PrimitiveInstance, index: number) => string
 ) {
   const update = () => {
-    const parts = Array.from(owner.querySelectorAll<HTMLElement>(selector)).filter(
-      (el) => el.closest(owner.localName) === owner,
-    )
+    const parts = Array.from(
+      owner.querySelectorAll<HTMLElement>(selector)
+    ).filter((el) => el.closest(owner.localName) === owner)
     parts.forEach((el, index) => {
-      if (!("text" in el.dataset) && el.childNodes.length) return
+      if (!("text" in el.dataset) && el.childNodes.length) {
+        return
+      }
       el.dataset.text = ""
       const next = text(el, instance, index)
-      if (el.textContent !== next) el.textContent = next
+      if (el.textContent !== next) {
+        el.textContent = next
+      }
     })
   }
   const unsubscribe = instance.subscribe(update)

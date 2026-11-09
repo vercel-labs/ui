@@ -6,7 +6,10 @@ import { mountWhenAsked, perfItems, perfSize } from "tests/fixtures/perf.ts"
 function mount(root: HTMLElement) {
   mountWhenAsked(root, (target) => {
     const items = perfItems(perfSize())
-      .map((item) => `<ui-select-item class="item" value="${item.value}">${item.label}</ui-select-item>`)
+      .map(
+        (item) =>
+          `<ui-select-item class="item" value="${item.value}">${item.label}</ui-select-item>`
+      )
       .join("")
     target.innerHTML = `
       <div class="fixture">

@@ -1,6 +1,10 @@
 "use client"
 
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
 
@@ -22,7 +26,9 @@ function Example() {
       <Resizable
         layout={layout}
         onLayoutChange={(next, details) => {
-          if (format(next) !== format(layout)) log(`${format(next)} (${details.reason})`)
+          if (format(next) !== format(layout)) {
+            log(`${format(next)} (${details.reason})`)
+          }
           setLayout(next)
         }}
       >

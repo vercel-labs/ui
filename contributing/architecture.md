@@ -31,7 +31,11 @@ Core imports downward only: kernel, platform, the jobs, components, page. Each f
 export const thing = definePrimitive({
   name: "thing", // data-slot becomes "thing-<slot>"
   // Every option's kind, which renderers read to tell options from element props. Required.
-  options: { open: "boolean", defaultOpen: "boolean", onOpenChange: "callback" },
+  options: {
+    open: "boolean",
+    defaultOpen: "boolean",
+    onOpenChange: "callback",
+  },
   state: (options: {
     open?: boolean
     defaultOpen?: boolean
@@ -52,12 +56,18 @@ export const thing = definePrimitive({
     // A `controller` option drives what this returns. elements(context, slot) reads bound parts in DOM order.
     return {
       toggle: (event?: Event) =>
-        change("open", !context.store.get().open, { reason: "trigger-press", event }),
+        change("open", !context.store.get().open, {
+          reason: "trigger-press",
+          event,
+        }),
     }
   },
   slots: (slot) => ({
     trigger: slot({
-      attrs: (state, { id }) => ({ type: "button", "aria-expanded": String(state.open) }), // Pure, SSR-safe.
+      attrs: (state, { id }) => ({
+        type: "button",
+        "aria-expanded": String(state.open),
+      }), // Pure, SSR-safe.
       press: ({ api }, event) => api.toggle(event), // Runs on click.
     }),
     item: slot<{ value: string; disabled?: boolean }>({
@@ -65,7 +75,9 @@ export const thing = definePrimitive({
       props: { value: "string", disabled: "boolean" },
       present: (state) => state.open, // Element should exist. Custom elements bind and unbind on it.
       attrs: (state, { id, key, props, api }) => ({ role: "option" }),
-      live: live((state, { key }) => ({ "data-highlighted": state.highlighted === key ? "" : undefined })),
+      live: live((state, { key }) => ({
+        "data-highlighted": state.highlighted === key ? "" : undefined,
+      })),
       selects: selects({ highlighted: ({ key }) => [key] }), // Hear only changes that concern this part.
       // Public state for render functions, typed by slot's second type argument: slot<Props, State>.
       state: (state, { key, props }) => ({

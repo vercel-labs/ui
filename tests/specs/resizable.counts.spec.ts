@@ -17,7 +17,10 @@ test.describe("work per move in a resizable group with many panels", () => {
     }) => {
       const budget = budgets["resizable.drag"]
       await open("resizable-perf", { n: String(n) })
-      const handle = page.getByRole("separator", { name: "Handle 1", exact: true })
+      const handle = page.getByRole("separator", {
+        name: "Handle 1",
+        exact: true,
+      })
       await expect(handle).toHaveAttribute("aria-valuenow", "25")
       const box = (await handle.boundingBox())!
       // Each move of 6 pixels is half a percent of the group's 1,200.
@@ -28,7 +31,9 @@ test.describe("work per move in a resizable group with many panels", () => {
       })
       report("resizable.drag", n, result)
       await expect(handle).toHaveAttribute("aria-valuenow", "31")
-      expectWithin(result, budget, { see: "See tests/perf/README.md#resizable-drag." })
+      expectWithin(result, budget, {
+        see: "See tests/perf/README.md#resizable-drag.",
+      })
     })
 
     test(`arrow keys on a handle do no work that grows with the panel count (n=${n})`, async ({
@@ -37,7 +42,10 @@ test.describe("work per move in a resizable group with many panels", () => {
     }) => {
       const budget = budgets["resizable.step-key"]
       await open("resizable-perf", { n: String(n) })
-      const handle = page.getByRole("separator", { name: "Handle 1", exact: true })
+      const handle = page.getByRole("separator", {
+        name: "Handle 1",
+        exact: true,
+      })
       await expect(handle).toHaveAttribute("aria-valuenow", "25")
       await handle.focus()
       // The group measures its panels when it first resizes, which WebKit
@@ -46,7 +54,9 @@ test.describe("work per move in a resizable group with many panels", () => {
       const result = await countKeys(page, "ArrowRight")
       report("resizable.step-key", n, result)
       await expect(handle).toHaveAttribute("aria-valuenow", "35")
-      expectWithin(result, budget, { see: "See tests/perf/README.md#resizable-step-key." })
+      expectWithin(result, budget, {
+        see: "See tests/perf/README.md#resizable-step-key.",
+      })
     })
   }
 })

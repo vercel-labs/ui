@@ -51,5 +51,7 @@ test("a tab's panel follows the id passed to the tab as it changes", async () =>
   await new Promise((resolve) => setTimeout(resolve, 20))
   flushSync()
   expect(document.querySelector('[role="tab"]')!.id).toBe("billing")
-  expect(document.querySelector('[role="tabpanel"]')!.getAttribute("aria-labelledby")).toBe("billing")
+  expect(
+    document.querySelector('[role="tabpanel"]')!.getAttribute("aria-labelledby")
+  ).toBe("billing")
 })

@@ -17,7 +17,9 @@ function Example() {
     <div>
       <Calendar
         mode="range"
-        onAnchorChange={(anchor) => log(anchor ? `Started on ${anchor}` : "Range finished")}
+        onAnchorChange={(anchor) =>
+          log(anchor ? `Started on ${anchor}` : "Range finished")
+        }
         onFocusedChange={(focused) => log(`Focus on ${focused}`)}
       >
         <div data-slot="row">
@@ -50,8 +52,12 @@ function Example() {
           </CalendarNext>
         </div>
         <CalendarGrid>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} />}
+          </CalendarWeekdays>
+          <CalendarWeeks>
+            {(cell) => <CalendarDay value={cell.date} />}
+          </CalendarWeeks>
         </CalendarGrid>
       </Calendar>
     </div>

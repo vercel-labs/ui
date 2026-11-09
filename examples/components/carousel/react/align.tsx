@@ -17,7 +17,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/react/select"
-import { CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "lucide-react"
 import * as React from "react"
 
 const photos = [

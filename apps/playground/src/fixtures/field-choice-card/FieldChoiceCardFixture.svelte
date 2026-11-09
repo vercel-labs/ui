@@ -1,7 +1,10 @@
 <script lang="ts">
   import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
   import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
-  import { fieldChoiceCardFixture as f, fieldChoiceCardOptions } from "tests/fixtures/field.ts"
+  import {
+    fieldChoiceCardFixture as f,
+    fieldChoiceCardOptions,
+  } from "tests/fixtures/field.ts"
 
   const { alone, later } = fieldChoiceCardOptions()
   let ready = $state(false)

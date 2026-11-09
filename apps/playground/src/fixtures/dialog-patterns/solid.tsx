@@ -18,7 +18,12 @@ import {
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
-import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/solid/popover"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/solid/popover"
 import { useShortcut } from "@ui-sdk/solid/shortcuts"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
@@ -35,7 +40,10 @@ function Fixture() {
   useShortcut(f.pageShortcut, () => setAction("page shortcut"))
   useShortcut(f.slashShortcut, () => setAction("slash"))
   // Belongs to the dialog, so it runs while the dialog is open and modal.
-  useShortcut(f.rename.save, () => setAction("saved"), { layer: () => field ?? null, allowInInput: true })
+  useShortcut(f.rename.save, () => setAction("saved"), {
+    layer: () => field ?? null,
+    allowInInput: true,
+  })
   return (
     <div class="fixture">
       <button>Before</button>
@@ -55,7 +63,9 @@ function Fixture() {
         onDismissAttempt={({ reason }) => setAction(`attempt:${reason}`)}
         onOpenChange={(open, details) => {
           recordOpenChange("rename", open, details)
-          if (!open) setDirty(false)
+          if (!open) {
+            setDirty(false)
+          }
         }}
       >
         <DialogTrigger shortcut={f.rename.shortcut}>
@@ -66,17 +76,27 @@ function Fixture() {
           <DialogTitle class="title">{f.rename.title}</DialogTitle>
           <label class="field">
             {f.rename.field}
-            <input ref={field} value={f.rename.defaultValue} onInput={() => setDirty(true)} />
+            <input
+              ref={field}
+              value={f.rename.defaultValue}
+              onInput={() => setDirty(true)}
+            />
           </label>
           <DialogClose>{f.rename.cancel}</DialogClose>
         </DialogContent>
       </Dialog>
-      <AlertDialog onOpenChange={(open, details) => recordOpenChange("delete", open, details)}>
+      <AlertDialog
+        onOpenChange={(open, details) =>
+          recordOpenChange("delete", open, details)
+        }
+      >
         <AlertDialogTrigger>{f.remove.trigger}</AlertDialogTrigger>
         <AlertDialogBackdrop class="dialog-backdrop" />
         <AlertDialogContent class="dialog">
           <AlertDialogTitle class="title">{f.remove.title}</AlertDialogTitle>
-          <AlertDialogDescription class="description">{f.remove.description}</AlertDialogDescription>
+          <AlertDialogDescription class="description">
+            {f.remove.description}
+          </AlertDialogDescription>
           <AlertDialogClose>{f.remove.cancel}</AlertDialogClose>
           <AlertDialogClose value="confirm" action={pendingAction}>
             {f.remove.action}
@@ -91,7 +111,9 @@ function Fixture() {
         {f.chat}
       </button>
       <Popover container={document.getElementById("popover-root")}>
-        <PopoverTrigger shortcut={f.share.shortcut}>{f.share.trigger}</PopoverTrigger>
+        <PopoverTrigger shortcut={f.share.shortcut}>
+          {f.share.trigger}
+        </PopoverTrigger>
         <PopoverContent class="popover">
           <PopoverTitle>{f.share.title}</PopoverTitle>
           <Menu>

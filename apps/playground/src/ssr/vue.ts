@@ -18,7 +18,9 @@ Object.assign(globalThis, { $RefreshSig$: () => (type: unknown) => type })
 
 async function renderFixture(fixture: string, url: string) {
   const load = fixtures[`../fixtures/${fixture}/vue-ssr.ts`]
-  if (!load) throw new Error(`No Vue fixture for ${fixture}.`)
+  if (!load) {
+    throw new Error(`No Vue fixture for ${fixture}.`)
+  }
   const { Fixture } = await load()
   const location = new URL(url)
   // Without an error handler, Vue's development build throws out of a
@@ -40,7 +42,9 @@ async function renderFixture(fixture: string, url: string) {
     delete realm.location
   }
   const html = await rendering
-  if (failure) throw failure
+  if (failure) {
+    throw failure
+  }
   return html
 }
 

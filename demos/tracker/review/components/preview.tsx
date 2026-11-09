@@ -1,16 +1,30 @@
 "use client"
 
 import { cn } from "cn"
-import { ArrowLeft, ArrowRight, ExternalLink, Monitor, RotateCw, ScanSearch, Smartphone } from "lucide-react"
+import {
+  ArrowLeft,
+  ArrowRight,
+  ExternalLink,
+  Monitor,
+  RotateCw,
+  ScanSearch,
+  Smartphone,
+} from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import type { Root } from "@/lib/files"
 import { frameworkCookie, type Framework } from "@/lib/frameworks"
 import { inspect, type Inspection } from "@/lib/inspect"
 
-function startInspecting(frame: HTMLIFrameElement, onPick: (element: Element) => void, onStop: () => void) {
+function startInspecting(
+  frame: HTMLIFrameElement,
+  onPick: (element: Element) => void,
+  onStop: () => void
+) {
   const view = frame.contentWindow
   const doc = frame.contentDocument
-  if (!view || !doc?.body) return () => {}
+  if (!view || !doc?.body) {
+    return () => {}
+  }
   const box = doc.createElement("div")
   box.style.cssText =
     "position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #3b82f6;background:rgb(59 130 246 / 0.12);border-radius:3px;display:none"
@@ -21,7 +35,9 @@ function startInspecting(frame: HTMLIFrameElement, onPick: (element: Element) =>
   doc.body.append(box)
   const show = (event: Event) => {
     const target = event.target as Element
-    if (!target || target.nodeType !== 1) return
+    if (!target || target.nodeType !== 1) {
+      return
+    }
     const rect = target.getBoundingClientRect()
     Object.assign(box.style, {
       display: "block",
@@ -31,7 +47,9 @@ function startInspecting(frame: HTMLIFrameElement, onPick: (element: Element) =>
       height: `${rect.height}px`,
     })
     const part = target.closest("[data-slot]")?.getAttribute("data-slot")
-    label.textContent = part ? `${target.tagName.toLowerCase()} · ${part}` : target.tagName.toLowerCase()
+    label.textContent = part
+      ? `${target.tagName.toLowerCase()} · ${part}`
+      : target.tagName.toLowerCase()
   }
   const block = (event: Event) => {
     event.preventDefault()
@@ -43,21 +61,34 @@ function startInspecting(frame: HTMLIFrameElement, onPick: (element: Element) =>
     onStop()
   }
   const escape = (event: KeyboardEvent) => {
-    if (event.key !== "Escape") return
+    if (event.key !== "Escape") {
+      return
+    }
     block(event)
     onStop()
   }
-  const blocked = ["pointerdown", "pointerup", "mousedown", "mouseup", "dblclick", "contextmenu"] as const
+  const blocked = [
+    "pointerdown",
+    "pointerup",
+    "mousedown",
+    "mouseup",
+    "dblclick",
+    "contextmenu",
+  ] as const
   view.addEventListener("pointermove", show, true)
   view.addEventListener("click", pick, true)
   view.addEventListener("keydown", escape, true)
-  for (const type of blocked) view.addEventListener(type, block, true)
+  for (const type of blocked) {
+    view.addEventListener(type, block, true)
+  }
   return () => {
     box.remove()
     view.removeEventListener("pointermove", show, true)
     view.removeEventListener("click", pick, true)
     view.removeEventListener("keydown", escape, true)
-    for (const type of blocked) view.removeEventListener(type, block, true)
+    for (const type of blocked) {
+      view.removeEventListener(type, block, true)
+    }
   }
 }
 
@@ -92,9 +123,13 @@ function Preview({
   useEffect(() => {
     const timer = setInterval(() => {
       const location = frame.current?.contentWindow?.location
-      if (!location || location.href === "about:blank") return
+      if (!location || location.href === "about:blank") {
+        return
+      }
       const next = location.pathname + location.search
-      if (next === path) return
+      if (next === path) {
+        return
+      }
       setPath(next)
       setDraft(next)
       onNavigate(next)
@@ -103,18 +138,22 @@ function Preview({
   }, [path, onNavigate])
 
   useEffect(() => {
-    if (!inspecting || !frame.current) return
+    if (!inspecting || !frame.current) {
+      return
+    }
     frame.current.focus()
     return startInspecting(
       frame.current,
       (element) => onInspect(inspect(element, framework, roots, files)),
-      () => setInspecting(false),
+      () => setInspecting(false)
     )
   }, [inspecting, loads, framework, roots, files, onInspect])
 
   const go = (to: string) => {
     const location = frame.current?.contentWindow?.location
-    if (location) location.assign(to.startsWith("/") ? to : `/${to}`)
+    if (location) {
+      location.assign(to.startsWith("/") ? to : `/${to}`)
+    }
   }
 
   const button =
@@ -168,7 +207,8 @@ function Preview({
           title="Click anything in the app to open its code"
           className={cn(
             button,
-            inspecting && "bg-blue-500/15 text-blue-600 hover:bg-blue-500/20 hover:text-blue-600",
+            inspecting &&
+              "bg-blue-500/15 text-blue-600 hover:bg-blue-500/20 hover:text-blue-600"
           )}
           onClick={() => setInspecting((current) => !current)}
         >
@@ -186,7 +226,13 @@ function Preview({
             <Smartphone aria-hidden="true" className="size-4" />
           )}
         </button>
-        <a href={path} target="_blank" rel="noreferrer" aria-label="Open in a new tab" className={button}>
+        <a
+          href={path}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Open in a new tab"
+          className={button}
+        >
           <ExternalLink aria-hidden="true" className="size-3.5" />
         </a>
       </div>
@@ -198,7 +244,10 @@ function Preview({
             src={src}
             title={`Tracker preview (${framework})`}
             onLoad={() => setLoads((count) => count + 1)}
-            className={cn("h-full bg-background", phone ? "w-[390px] border-x border-border" : "w-full")}
+            className={cn(
+              "h-full bg-background",
+              phone ? "w-[390px] border-x border-border" : "w-full"
+            )}
           />
         )}
       </div>

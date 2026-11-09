@@ -36,7 +36,9 @@ function Example() {
       pages={pages}
       onPagesChange={setPages}
       onAction={(value) => {
-        if (value === "back") command.pop()
+        if (value === "back") {
+          command.pop()
+        }
       }}
     >
       <div data-slot="row">
@@ -48,7 +50,9 @@ function Example() {
       </div>
       <CommandInput
         aria-label="Search commands"
-        placeholder={pages.length ? "Search… (Backspace to go back)" : "What do you need?"}
+        placeholder={
+          pages.length ? "Search… (Backspace to go back)" : "What do you need?"
+        }
       />
       <CommandEmpty>No results found.</CommandEmpty>
       <CommandList>

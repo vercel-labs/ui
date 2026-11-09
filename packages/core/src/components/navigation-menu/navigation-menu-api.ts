@@ -3,28 +3,53 @@
 // content itself, positioned against its trigger, when there isn't. Each
 // surface reads the menu's one store through a lens, so dismissal, Escape,
 // focus return and Tab flow come from the layer for both.
-import { bindFindable, focusPressedTrigger } from "../../foundation/disclosure/disclosure"
+import {
+  bindFindable,
+  focusPressedTrigger,
+} from "../../foundation/disclosure/disclosure"
 import { createHoverIntent } from "../../foundation/popups/hover"
 import { createSafeArea } from "../../foundation/popups/safe-area"
 import { ownsEvent } from "../../foundation/popups/popup-elements"
-import { contentAnchor, placementOptions } from "../../foundation/popups/popup-features"
+import {
+  contentAnchor,
+  placementOptions,
+} from "../../foundation/popups/popup-features"
 import { restoreFocus } from "../../foundation/kernel/modality"
-import { modalTriple, openerOf, resetPopoverStyles, type PopupOpener } from "../../foundation/popups/popup"
+import {
+  modalTriple,
+  openerOf,
+  resetPopoverStyles,
+  type PopupOpener,
+} from "../../foundation/popups/popup"
 import { createSteppedPopup } from "../../foundation/popups/popup-steps"
 import { position, type Anchor } from "../../foundation/platform/position"
 import { type Side } from "../../foundation/platform/sides"
-import { animateIn, animateOut, writeOpen } from "../../foundation/motion/presence"
-import { bindIndicator, collapseWhileHidden, createViewportSize } from "./navigation-menu-dom"
+import {
+  animateIn,
+  animateOut,
+  writeOpen,
+} from "../../foundation/motion/presence"
+import {
+  bindIndicator,
+  collapseWhileHidden,
+  createViewportSize,
+} from "./navigation-menu-dom"
 import { createFocus } from "./navigation-menu-focus"
 import { opensElsewhere } from "./navigation-menu-keyboard"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import type { ChangeOptions } from "../../foundation/kernel/details"
 import { isComposing, on } from "../../foundation/kernel/events"
 import { onProps } from "../../foundation/kernel/part"
-import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import type {
+  Part,
+  PrimitiveContext,
+} from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
-import type { NavigationMenuContentProps, NavigationMenuLinkProps } from "./navigation-menu"
+import type {
+  NavigationMenuContentProps,
+  NavigationMenuLinkProps,
+} from "./navigation-menu"
 
 type Orientation = "horizontal" | "vertical"
 
@@ -76,11 +101,18 @@ type PlacementProps = {
   anchor?: Anchor | string | null
 }
 
-type CloseOptions = { reason?: string; event?: Event; focus?: boolean | "later" }
+type CloseOptions = {
+  reason?: string
+  event?: Event
+  focus?: boolean | "later"
+}
 type OpenOptions = { reason?: string; event?: Event; by?: PopupOpener }
 
 // The browser's own popover styles go from surfaces, so any class styles them.
-const popupSelectors = ['[data-slot="navigation-menu-viewport"]', '[data-slot="navigation-menu-content"]']
+const popupSelectors = [
+  '[data-slot="navigation-menu-viewport"]',
+  '[data-slot="navigation-menu-content"]',
+]
 
 // Opening again within this many milliseconds of closing skips the delay, so
 // the pointer can leave and come back without waiting.
@@ -93,7 +125,9 @@ const warmFor = 300
  */
 type NavigationMenuApi = ReturnType<typeof navigationMenuApi>
 
-function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuStoreState, string>) {
+function navigationMenuApi(
+  context: PrimitiveContext<ApiOptions, NavigationMenuStoreState, string>
+) {
   const { store, options, element } = context
   const change = createChange(context)
   let closedAt = -Infinity
@@ -106,20 +140,25 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   let reportedOpen = store.get().value !== null
   let openedSinceClose = reportedOpen
 
-  const triggerOf = (key: string | null) => (key === null ? undefined : element("trigger", key))
+  const triggerOf = (key: string | null) =>
+    key === null ? undefined : element("trigger", key)
   // The item the menu shows now, or the one animating out.
   const shownItem = () => store.get().value ?? store.get().active
 
   // Derived state, written in the same change as the value, before any
   // surface hears about it, so a surface opening finds its trigger.
   function followUp(from: string | null, state: NavigationMenuStoreState) {
-    if (state.value === null) return { previous: null, forward: null }
+    if (state.value === null) {
+      return { previous: null, forward: null }
+    }
     const order = elements(context, "trigger").map((entry) => entry.key)
     const switching = from !== null
     return {
       active: state.value,
       previous: switching ? from : null,
-      forward: switching ? order.indexOf(state.value) > order.indexOf(from) : null,
+      forward: switching
+        ? order.indexOf(state.value) > order.indexOf(from)
+        : null,
       exiting: [
         ...state.exiting.filter((key) => key !== state.value && key !== from),
         ...(switching && state.viewport ? [from] : []),
@@ -127,15 +166,23 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     }
   }
   // A controlled `value` brings its derived state in the same pass.
-  deriveFromOptions(context, ["active", "previous", "forward", "exiting"], (synced, state) =>
-    "value" in synced && synced.value !== state.value
-      ? followUp(state.value, { ...state, value: (synced.value ?? null) as string | null })
-      : undefined,
+  deriveFromOptions(
+    context,
+    ["active", "previous", "forward", "exiting"],
+    (synced, state) =>
+      "value" in synced && synced.value !== state.value
+        ? followUp(state.value, {
+            ...state,
+            value: (synced.value ?? null) as string | null,
+          })
+        : undefined
   )
   let lastValue = store.get().value
   store.subscribe(() => {
     const state = store.get()
-    if (state.value === lastValue) return
+    if (state.value === lastValue) {
+      return
+    }
     const from = lastValue
     lastValue = state.value
     store.set(followUp(from, state))
@@ -143,20 +190,24 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       closedAt = performance.now()
       return
     }
-    if (from === null) openedSinceClose = true
+    if (from === null) {
+      openedSinceClose = true
+    }
     ensureSurface(state.value)
     writeViewportSize()
   })
 
   // A nested menu closes once its parent moves on to another item.
   const parent = options().parent
-  if (parent)
+  if (parent) {
     context.onDestroy(
       parent.api.internal.watch((value) => {
-        if (value !== parent.item && store.get().value !== null)
+        if (value !== parent.item && store.get().value !== null) {
           close({ reason: "parent-close", focus: false })
-      }),
+        }
+      })
     )
+  }
 
   // A surface: the popup layer and its open and close steps over one view of
   // the store. The viewport's is open while any item is, and a content's while its item is.
@@ -167,14 +218,18 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
         : { open: state.value === key, mounted: state.contents.includes(key) }
     // Contents left over from a viewport that closed mid-switch go with it.
     function mountedPatch(mounted: boolean, state: NavigationMenuStoreState) {
-      if (key === null) return mounted ? { mounted } : { mounted, exiting: [] }
+      if (key === null) {
+        return mounted ? { mounted } : { mounted, exiting: [] }
+      }
       const others = state.contents.filter((other) => other !== key)
       return { contents: mounted ? [...others, key] : others }
     }
     const lens = {
       get: () => view(store.get()),
       set({ mounted }: { mounted?: boolean }) {
-        if (mounted !== undefined) store.set(mountedPatch(mounted, store.get()))
+        if (mounted !== undefined) {
+          store.set(mountedPatch(mounted, store.get()))
+        }
       },
       subscribe: store.subscribe,
     }
@@ -191,43 +246,67 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
         // moving between its items never dismisses the open one.
         contains: (target) => !!element("root")?.contains(target),
         onOpenChange(open) {
-          if (!open) stopHover()
+          if (!open) {
+            stopHover()
+          }
         },
         onOpenChangeComplete(open) {
-          if (key === null && !open) detachViewport()
+          if (key === null && !open) {
+            detachViewport()
+          }
           // Only the surface in use reports, and only when the menu as a whole
           // opened or closed: without a viewport, a switch opens another
           // surface. A close reports even when its open never completed, like
           // Escape during the intro.
-          if (surface() !== surfaces.get(key) || open !== (store.get().value !== null)) return
-          if (open ? reportedOpen : !openedSinceClose) return
+          if (
+            surface() !== surfaces.get(key) ||
+            open !== (store.get().value !== null)
+          ) {
+            return
+          }
+          if (open ? reportedOpen : !openedSinceClose) {
+            return
+          }
           reportedOpen = open
-          if (!open) openedSinceClose = false
+          if (!open) {
+            openedSinceClose = false
+          }
           options().onOpenChangeComplete?.(open)
         },
       },
       {
         change(open, { reason, event }) {
-          changed = change("value", open ? (key ?? asked) : null, { reason, event })
+          changed = change("value", open ? (key ?? asked) : null, {
+            reason,
+            event,
+          })
           return changed
         },
         onDestroy: context.onDestroy,
         rules: {
           // The viewport stays open while another item takes it over, which opens it anew.
           reopen(_request, open) {
-            if (store.get().value !== asked) open()
+            if (store.get().value !== asked) {
+              open()
+            }
           },
         },
-      },
+      }
     )
     // A controlled value mounts the surface in the same pass. The layer
     // derives that on the lens, which the options never reach.
-    deriveFromOptions(context, key === null ? ["mounted", "exiting"] : ["contents"], (synced, state) => {
-      const next = { ...state, ...synced }
-      const { open } = view(next)
-      if (open === view(state).open || popup.mountedAs(open) !== open) return
-      return mountedPatch(open, next)
-    })
+    deriveFromOptions(
+      context,
+      key === null ? ["mounted", "exiting"] : ["contents"],
+      (synced, state) => {
+        const next = { ...state, ...synced }
+        const { open } = view(next)
+        if (open === view(state).open || popup.mountedAs(open) !== open) {
+          return
+        }
+        return mountedPatch(open, next)
+      }
+    )
     return { ...popup, show: steps.show, hide: steps.hide }
   }
 
@@ -237,19 +316,26 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // Contents need their surface before their item first opens, so it hears
   // the opening. Every part of an item creates it when it binds.
   function ensureSurface(key: string) {
-    if (surfaces.has(key)) return
+    if (surfaces.has(key)) {
+      return
+    }
     // Opened before anything for it bound, like from a controller: it counts as in the page.
-    if (store.get().value === key && !store.get().contents.includes(key))
+    if (store.get().value === key && !store.get().contents.includes(key)) {
       store.set({ contents: [...store.get().contents, key] })
+    }
     surfaces.set(key, createSurface(key))
   }
 
   surfaces.set(null, createSurface(null))
-  if (store.get().value !== null) ensureSurface(store.get().value!)
+  if (store.get().value !== null) {
+    ensureSurface(store.get().value!)
+  }
 
   // The surface showing the menu now: the viewport, or the open content.
   function surface() {
-    if (store.get().viewport) return surfaces.get(null)!
+    if (store.get().viewport) {
+      return surfaces.get(null)!
+    }
     const key = shownItem()
     return (key !== null && surfaces.get(key)) || surfaces.get(null)!
   }
@@ -257,11 +343,14 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   const intent = createHoverIntent({
     trigger: () => triggerOf(store.get().value),
     popup: () => surface().element(),
-    closesOnLeave: () => store.get().value !== null && surface().opener() === "hover",
+    closesOnLeave: () =>
+      store.get().value !== null && surface().opener() === "hover",
     closeDelay: () => options().closeDelay ?? 50,
     close(event) {
       // Someone working inside the panel keeps it open.
-      if (surface().element()?.contains(document.activeElement)) return
+      if (surface().element()?.contains(document.activeElement)) {
+        return
+      }
       close({ reason: "trigger-hover", event, focus: false })
     },
   })
@@ -277,18 +366,31 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
 
   // Opening the open item again keeps it open, and a press on a panel the
   // pointer opened keeps it open from now on.
-  function open(key: string, { reason = "imperative", event, by = "imperative" }: OpenOptions = {}) {
+  function open(
+    key: string,
+    { reason = "imperative", event, by = "imperative" }: OpenOptions = {}
+  ) {
     stopHover()
     ensureSurface(key)
     asked = key
     changed = store.get().value === key
-    ;(store.get().viewport ? surfaces.get(null)! : surfaces.get(key)!).show({ reason, event, by })
+    ;(store.get().viewport ? surfaces.get(null)! : surfaces.get(key)!).show({
+      reason,
+      event,
+      by,
+    })
     return changed
   }
 
   // Controlled menus close when the new value comes back, and focus returns then.
-  function close({ reason = "imperative", event, focus = true }: CloseOptions = {}) {
-    if (store.get().value === null) return false
+  function close({
+    reason = "imperative",
+    event,
+    focus = true,
+  }: CloseOptions = {}) {
+    if (store.get().value === null) {
+      return false
+    }
     changed = false
     surface().hide({ reason, event, focus })
     return changed
@@ -297,7 +399,9 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // The pointer left the open panel. Onto its own trigger, it's still hovering.
   function leavePanel(event: PointerEvent) {
     const target = event.relatedTarget as Node | null
-    if (target && triggerOf(store.get().value)?.contains(target)) return
+    if (target && triggerOf(store.get().value)?.contains(target)) {
+      return
+    }
     intent.leave(event)
   }
 
@@ -307,7 +411,9 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   }
 
   function leaveTrigger(event: PointerEvent, key: string) {
-    if (pointerOn === key) pointerOn = null
+    if (pointerOn === key) {
+      pointerOn = null
+    }
     const panel = surface().element()
     if (store.get().value === key && panel && event.pointerType !== "touch") {
       const along = store.get().orientation === "horizontal" ? "y" : "x"
@@ -317,21 +423,35 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   }
 
   function hoverEnter(event: PointerEvent, key: string, disabled?: boolean) {
-    if (options().openOnHover === false || disabled) return
+    if (options().openOnHover === false || disabled) {
+      return
+    }
     pointerOn = key
     if (store.get().value !== null) {
       intent.enter(event)
-      if (store.get().value === key) return
-      const switchTo = () => open(key, { reason: "trigger-hover", event, by: "hover" })
+      if (store.get().value === key) {
+        return
+      }
+      const switchTo = () =>
+        open(key, { reason: "trigger-hover", event, by: "hover" })
       // Another trigger takes the open menu over at once, unless the pointer
       // is only crossing it on its way to the open panel.
-      if (aim.contains({ x: event.clientX, y: event.clientY }, () => pointerOn === key && switchTo())) return
+      if (
+        aim.contains(
+          { x: event.clientX, y: event.clientY },
+          () => pointerOn === key && switchTo()
+        )
+      ) {
+        return
+      }
       switchTo()
       return
     }
     // Still animating out, or just closed: the delay is skipped.
     const warm =
-      store.get().mounted || store.get().contents.length > 0 || performance.now() - closedAt < warmFor
+      store.get().mounted ||
+      store.get().contents.length > 0 ||
+      performance.now() - closedAt < warmFor
     const delay = warm ? 0 : (options().delay ?? 50)
     intent.enter(
       event,
@@ -339,17 +459,27 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
         !context.props<{ disabled?: boolean }>("trigger", key)?.disabled &&
         options().openOnHover !== false &&
         open(key, { reason: "trigger-hover", event, by: "hover" }),
-      delay,
+      delay
     )
   }
 
-  function triggerPress(key: string, el: HTMLElement | undefined, event?: Event) {
+  function triggerPress(
+    key: string,
+    el: HTMLElement | undefined,
+    event?: Event
+  ) {
     focusPressedTrigger(el)
     const by = openerOf(event)
-    if (store.get().value !== key) return open(key, { reason: "trigger-press", event, by })
-    // A click on a trigger the pointer opened keeps it open: the user meant to open it.
-    if (surface().opener() === "hover" && (by === "pointer" || by === "touch"))
+    if (store.get().value !== key) {
       return open(key, { reason: "trigger-press", event, by })
+    }
+    // A click on a trigger the pointer opened keeps it open: the user meant to open it.
+    if (
+      surface().opener() === "hover" &&
+      (by === "pointer" || by === "touch")
+    ) {
+      return open(key, { reason: "trigger-press", event, by })
+    }
     close({ reason: "trigger-press", event })
   }
 
@@ -362,14 +492,19 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     trigger: triggerOf,
     content: (key) => element("content", key),
     panel: () => surface().element(),
-    open: (key, event) => open(key, { reason: "trigger-press", event, by: "keyboard" }),
+    open: (key, event) =>
+      open(key, { reason: "trigger-press", event, by: "keyboard" }),
   })
   const topLevel = keys.topLevel
 
   // A link was pressed: the menu closes, and so does every menu it's nested in.
   function linkPress(event: Event, closeOnSelect: boolean | undefined) {
-    if (opensElsewhere(event)) return
-    if (!(closeOnSelect ?? options().closeOnSelect ?? true)) return
+    if (opensElsewhere(event)) {
+      return
+    }
+    if (!(closeOnSelect ?? options().closeOnSelect ?? true)) {
+      return
+    }
     close({ reason: "link-press", event })
     parent?.api.internal.linkPress(event, true)
   }
@@ -381,7 +516,10 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     let cancelPress = () => {}
     const unlisten = on(el, "click", (event) => {
       cancelPress = afterDispatch(el, event, () =>
-        linkPress(event, context.props<NavigationMenuLinkProps>("link", key)?.closeOnSelect),
+        linkPress(
+          event,
+          context.props<NavigationMenuLinkProps>("link", key)?.closeOnSelect
+        )
       )
     })
     return () => {
@@ -393,21 +531,32 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // The viewport takes the open content's size.
   const viewportSize = createViewportSize({
     viewport: () => element("viewport"),
-    content: () => (store.get().value === null ? undefined : element("content", store.get().value!)),
+    content: () =>
+      store.get().value === null
+        ? undefined
+        : element("content", store.get().value!),
   })
   const writeViewportSize = viewportSize.write
   context.onDestroy(viewportSize.disconnect)
 
   // Where a surface goes: against its anchor prop, or the trigger, on the side
   // the orientation suggests unless the props say otherwise.
-  function placement(el: HTMLElement, props: () => PlacementProps, key: string | null, part: Part) {
+  function placement(
+    el: HTMLElement,
+    props: () => PlacementProps,
+    key: string | null,
+    part: Part
+  ) {
     return {
-      anchor: () => contentAnchor(el, props().anchor, () => triggerOf(key ?? shownItem())),
+      anchor: () =>
+        contentAnchor(el, props().anchor, () => triggerOf(key ?? shownItem())),
       // A new orientation moves the side it opens on, like new props.
       rendered(listener: () => void) {
         let { orientation } = store.get()
         const offState = store.subscribe(() => {
-          if (store.get().orientation === orientation) return
+          if (store.get().orientation === orientation) {
+            return
+          }
           orientation = store.get().orientation
           listener()
         })
@@ -429,26 +578,39 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
   // shows for the first time with that content's size, in its final place.
   // It leaves once it has closed, so the next open waits for its content too.
   let viewportPopup:
-    { el: HTMLElement; config: Parameters<Surface["bind"]>[1]; unbind?: () => void } | undefined
+    | {
+        el: HTMLElement
+        config: Parameters<Surface["bind"]>[1]
+        unbind?: () => void
+      }
+    | undefined
 
   // Returns whether it joined just now.
   function attachViewport() {
-    if (!viewportPopup || viewportPopup.unbind) return false
-    viewportPopup.unbind = surfaces.get(null)!.bind(viewportPopup.el, viewportPopup.config)
+    if (!viewportPopup || viewportPopup.unbind) {
+      return false
+    }
+    viewportPopup.unbind = surfaces
+      .get(null)!
+      .bind(viewportPopup.el, viewportPopup.config)
     return true
   }
 
   // The first content to render shows the viewport. Measured at once, it's
   // placed for its real size before the browser paints it.
   function showViewport(content: HTMLElement) {
-    if (!attachViewport()) return
+    if (!attachViewport()) {
+      return
+    }
     viewportSize.measure(content)
     surfaces.get(null)!.place()
   }
 
   function detachViewport() {
     viewportPopup?.unbind?.()
-    if (viewportPopup) viewportPopup.unbind = undefined
+    if (viewportPopup) {
+      viewportPopup.unbind = undefined
+    }
   }
 
   // The viewport binds as soon as it renders, closed or not, so contents know
@@ -461,20 +623,34 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       context.props<PlacementProps>("viewport") ??
       {}
     const viewport = surfaces.get(null)!
-    viewportPopup = { el, config: { ...placement(el, props, null, part), initialFocus: () => undefined } }
+    viewportPopup = {
+      el,
+      config: {
+        ...placement(el, props, null, part),
+        initialFocus: () => undefined,
+      },
+    }
     // Last: contents may move in and bind right away, and show the viewport.
     store.set({ viewport: true })
     // Bound again, like into a new container, around content still showing in it.
     const { value } = store.get()
     const shown = value === null ? undefined : element("content", value)
-    if (shown && el.contains(shown)) showViewport(shown)
+    if (shown && el.contains(shown)) {
+      showViewport(shown)
+    }
     // Listened to on the element itself, not through the framework: React
     // routes events from portaled contents through its own tree, where the
     // contents aren't inside the viewport.
     const listeners = [
       on(el, "keydown", (event) => {
         // Keys from a nested menu's viewport are its own.
-        if (ownsEvent(el, event) && !event.defaultPrevented && !isComposing(event)) viewport.keydown(event)
+        if (
+          ownsEvent(el, event) &&
+          !event.defaultPrevented &&
+          !isComposing(event)
+        ) {
+          viewport.keydown(event)
+        }
       }),
       on(el, "pointerenter", enterPanel),
       on(el, "pointerleave", leavePanel),
@@ -489,21 +665,36 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
 
   // A content binds one of three ways: inside the viewport, kept in place
   // while closed next to a viewport, or as its own popup without one.
-  function bindContent(el: HTMLElement, key: string, props: { hiddenUntilFound?: boolean }, part: Part) {
+  function bindContent(
+    el: HTMLElement,
+    key: string,
+    props: { hiddenUntilFound?: boolean },
+    part: Part
+  ) {
     ensureSurface(key)
     const cleanups: (() => void)[] = []
     const viewport = element("viewport")
-    if (viewport?.contains(el)) cleanups.push(bindInViewport(el, key))
-    else {
+    if (viewport?.contains(el)) {
+      cleanups.push(bindInViewport(el, key))
+    } else {
       // A viewport later in the page binds after its contents. Waiting a
       // microtask lets it, so a content never shows as its own popup first.
       let unbind: (() => void) | undefined
       let cancelled = false
       queueMicrotask(() => {
-        if (cancelled || store.get().viewport) return
+        if (cancelled || store.get().viewport) {
+          return
+        }
         resetPopoverStyles(el.ownerDocument, popupSelectors)
-        const placed = placement(el, () => context.props<PlacementProps>("content", key) ?? {}, key, part)
-        unbind = surfaces.get(key)!.bind(el, { ...placed, initialFocus: () => undefined })
+        const placed = placement(
+          el,
+          () => context.props<PlacementProps>("content", key) ?? {},
+          key,
+          part
+        )
+        unbind = surfaces
+          .get(key)!
+          .bind(el, { ...placed, initialFocus: () => undefined })
       })
       cleanups.push(() => {
         cancelled = true
@@ -513,10 +704,13 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     // Find in page follows `hiddenUntilFound` as it renders, and costs
     // nothing while it's off.
     const isFindable = () =>
-      !!(context.props<NavigationMenuContentProps>("content", key) ?? props).hiddenUntilFound
+      !!(context.props<NavigationMenuContentProps>("content", key) ?? props)
+        .hiddenUntilFound
     let stopFinding: (() => void) | undefined
     const follow = () => {
-      if (isFindable() === !!stopFinding) return
+      if (isFindable() === !!stopFinding) {
+        return
+      }
       if (stopFinding) {
         stopFinding()
         stopFinding = undefined
@@ -529,7 +723,11 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       })
       const stops = [findable, store.subscribe(findable.check)]
       // Kept in place, its own width and padding would push the items beside it.
-      if (!viewport?.contains(el)) stops.push(collapseWhileHidden(el, () => isShown(store.get(), key), store))
+      if (!viewport?.contains(el)) {
+        stops.push(
+          collapseWhileHidden(el, () => isShown(store.get(), key), store)
+        )
+      }
       stopFinding = () => {
         findable.check()
         stops.forEach((stop) => stop())
@@ -556,11 +754,15 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
         stopAnimation()
         // Content animating out is inert. Focus inside it goes back to its trigger.
         const trigger = triggerOf(key)
-        if (el.contains(document.activeElement) && trigger) restoreFocus(trigger)
+        if (el.contains(document.activeElement) && trigger) {
+          restoreFocus(trigger)
+        }
         // Ahead of the render, for exit keyframes keyed on the state.
         writeOpen(el, false)
         stopAnimation = animateOut(el, () =>
-          store.set({ exiting: store.get().exiting.filter((other) => other !== key) }),
+          store.set({
+            exiting: store.get().exiting.filter((other) => other !== key),
+          })
         )
       } else if (!exiting && leaving && state.value === key) {
         leaving = false
@@ -582,7 +784,11 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     return bindIndicator(el, {
       target: () =>
         triggerOf(store.get().value) ??
-        topLevel().find((item) => item.matches('[data-slot="navigation-menu-link"][aria-current="page"]')),
+        topLevel().find((item) =>
+          item.matches(
+            '[data-slot="navigation-menu-link"][aria-current="page"]'
+          )
+        ),
       watched: () => [element("list"), ...topLevel()],
       root: () => element("root"),
       onChange: api.internal.watch,
@@ -593,17 +799,26 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
     /** The open item's value, or null when every panel is closed. */
     getValue: () => store.get().value,
     /** Opens an item's panel, or closes the open one with `null`. Returns false when canceled. */
-    setValue(value: string | null, { reason = "imperative", event }: ChangeOptions<string> = {}) {
-      return value === null ? close({ reason, event }) : open(value, { reason, event })
+    setValue(
+      value: string | null,
+      { reason = "imperative", event }: ChangeOptions<string> = {}
+    ) {
+      return value === null
+        ? close({ reason, event })
+        : open(value, { reason, event })
     },
     /** Whether a panel is open. */
     isOpen: () => store.get().value !== null,
     /** Closes the open panel. Returns false when canceled or already closed. */
-    close: ({ reason = "imperative", event }: ChangeOptions<string> = {}) => close({ reason, event }),
+    close: ({ reason = "imperative", event }: ChangeOptions<string> = {}) =>
+      close({ reason, event }),
     /** Moves focus to an item's trigger: the open one, or the first one, without a value. */
     focus(value?: string) {
       const key = value ?? store.get().value
-      ;(key === null ? elements(context, "trigger")[0]?.el : triggerOf(key))?.focus()
+      ;(key === null
+        ? elements(context, "trigger")[0]?.el
+        : triggerOf(key)
+      )?.focus()
     },
     internal: {
       options,
@@ -614,7 +829,9 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       surfaces,
       hoverEnter,
       hoverMove(event: PointerEvent, key: string, disabled?: boolean) {
-        if (aim.active() && store.get().value !== key) hoverEnter(event, key, disabled)
+        if (aim.active() && store.get().value !== key) {
+          hoverEnter(event, key, disabled)
+        }
       },
       leaveTrigger,
       enterPanel,
@@ -628,7 +845,9 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
       watch(listener: (value: string | null) => void) {
         let value = store.get().value
         return store.subscribe(() => {
-          if (store.get().value === value) return
+          if (store.get().value === value) {
+            return
+          }
           value = store.get().value
           listener(value)
         })
@@ -653,12 +872,18 @@ function navigationMenuApi(context: PrimitiveContext<ApiOptions, NavigationMenuS
 // Whether a content shows in the viewport: open, the last open while the
 // viewport animates out, or animating out after a switch.
 function isShownInViewport(state: NavigationMenuStoreState, key: string) {
-  return key === state.value || (state.value === null && key === state.active) || state.exiting.includes(key)
+  return (
+    key === state.value ||
+    (state.value === null && key === state.active) ||
+    state.exiting.includes(key)
+  )
 }
 
 // Whether a content shows at all, in the viewport or as its own popup.
 function isShown(state: NavigationMenuStoreState, key: string) {
-  if (state.viewport) return state.mounted && isShownInViewport(state, key)
+  if (state.viewport) {
+    return state.mounted && isShownInViewport(state, key)
+  }
   return key === state.value || state.contents.includes(key)
 }
 

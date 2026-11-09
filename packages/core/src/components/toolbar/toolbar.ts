@@ -22,7 +22,12 @@ import { fieldKeeps, placeCaret } from "./toolbar-fields"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { createController } from "../../foundation/kernel/controller"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, Part, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  Part,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { onProps } from "../../foundation/kernel/part"
 import { selects } from "../../foundation/kernel/selects"
 
@@ -191,8 +196,10 @@ type State = {
   bound: boolean
 }
 
-const elementOf = (state: State, key: string) => state.elements[key] ?? (state.bound ? "button" : "unknown")
-const across = (orientation: ToolbarOrientation) => (orientation === "horizontal" ? "vertical" : "horizontal")
+const elementOf = (state: State, key: string) =>
+  state.elements[key] ?? (state.bound ? "button" : "unknown")
+const across = (orientation: ToolbarOrientation) =>
+  orientation === "horizontal" ? "vertical" : "horizontal"
 const isToolbarDisabled = (state: State) => state.disabled || state.formDisabled
 const isDisabled = (state: State, props: ItemProps) =>
   !!(props.disabled || props.groupDisabled || isToolbarDisabled(state))
@@ -201,7 +208,14 @@ const isFocusable = (state: State, props: ItemProps) =>
 
 // Keys that would use a disabled item, or a component rendered through it,
 // like Down opening a menu. Arrows that move between items still move.
-const usingKeys = new Set(["Enter", " ", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"])
+const usingKeys = new Set([
+  "Enter",
+  " ",
+  "ArrowUp",
+  "ArrowDown",
+  "ArrowLeft",
+  "ArrowRight",
+])
 
 function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
   const { store, options, props } = context
@@ -226,12 +240,22 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
   // Moves focus for a key pressed on an item. A text field focus moves into
   // gets its caret at the end the move pointed to.
   function move(event: KeyboardEvent, el: HTMLElement) {
-    if (event.shiftKey || fields.get(el)?.(event)) return
+    if (event.shiftKey || fields.get(el)?.(event)) {
+      return
+    }
     const moved = roving.keydown(event, el)
-    const next = moved && moved.key !== moved.from && roving.items().find((item) => item.key === moved.key)
-    if (!next) return
+    const next =
+      moved &&
+      moved.key !== moved.from &&
+      roving.items().find((item) => item.key === moved.key)
+    if (!next) {
+      return
+    }
     const step = stepFor(event.key, orientation(), isRTL(el))
-    placeCaret(next.el, step === "last" || (typeof step === "number" && step > 0))
+    placeCaret(
+      next.el,
+      step === "last" || (typeof step === "number" && step > 0)
+    )
   }
 
   // What toggles and toggle groups inside see.
@@ -249,12 +273,17 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
   // the toolbar, so the group's disabled reaches them as the toolbar's.
   const disabledScope: RovingScope = { ...scope, disabled: () => true }
 
-  const itemProps = (slot: string, key: string) => (props(slot, key) ?? {}) as ItemProps
+  const itemProps = (slot: string, key: string) =>
+    (props(slot, key) ?? {}) as ItemProps
 
   // Joins an item. A disabled one keeps focus and moves between items, but
   // presses and keys never reach it or a component rendered through it, like
   // a menu trigger. Capturing them on the item stops them before any handler.
-  function join(part: Part, el: HTMLElement, keeps?: (event: KeyboardEvent) => boolean) {
+  function join(
+    part: Part,
+    el: HTMLElement,
+    keeps?: (event: KeyboardEvent) => boolean
+  ) {
     const { slot, key } = part
     const disabled = () => isDisabled(store.get(), itemProps(slot, key))
     const focusable = () => isFocusable(store.get(), itemProps(slot, key))
@@ -262,33 +291,51 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
     // A prop that disables the item, its own or its group's, can move the stop.
     let rules = [disabled(), focusable()]
     const unwatch = onProps(part, () => {
-      if (rules[0] === disabled() && rules[1] === focusable()) return
+      if (rules[0] === disabled() && rules[1] === focusable()) {
+        return
+      }
       rules = [disabled(), focusable()]
       scope.queueCheck()
     })
-    if (keeps) fields.set(el, keeps)
+    if (keeps) {
+      fields.set(el, keeps)
+    }
     const refuse = (event: Event) => {
-      if (!disabled()) return
+      if (!disabled()) {
+        return
+      }
       if (event instanceof KeyboardEvent) {
-        if (!usingKeys.has(event.key)) return
+        if (!usingKeys.has(event.key)) {
+          return
+        }
         move(event, el)
         // A disabled field still moves its caret for the arrows it keeps, so
         // they reach the end an arrow leaves from, as in a read-only field.
-        if (!keeps?.(event)) event.preventDefault()
+        if (!keeps?.(event)) {
+          event.preventDefault()
+        }
         event.stopImmediatePropagation()
         return
       }
       // A press still focuses the item, like any focusable disabled control.
-      if (event.type !== "pointerdown") event.preventDefault()
+      if (event.type !== "pointerdown") {
+        event.preventDefault()
+      }
       event.stopImmediatePropagation()
     }
     const types = ["click", "pointerdown", "keydown"] as const
-    for (const type of types) el.addEventListener(type, refuse, true)
+    for (const type of types) {
+      el.addEventListener(type, refuse, true)
+    }
     return () => {
       unwatch()
       leave()
-      if (fields.get(el) === keeps) fields.delete(el)
-      for (const type of types) el.removeEventListener(type, refuse, true)
+      if (fields.get(el) === keeps) {
+        fields.delete(el)
+      }
+      for (const type of types) {
+        el.removeEventListener(type, refuse, true)
+      }
     }
   }
 
@@ -298,17 +345,24 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
       orientation,
       scope,
       // The scope for toggles and toggle groups in a group, disabled or not.
-      scopeIn: (groupDisabled: boolean) => (groupDisabled ? disabledScope : scope),
+      scopeIn: (groupDisabled: boolean) =>
+        groupDisabled ? disabledScope : scope,
       join,
       isStop: (key: string, enabled: boolean) =>
-        roving.tabIndex(store.get(), { key, props: { disabled: () => !enabled } }) === "0",
+        roving.tabIndex(store.get(), {
+          key,
+          props: { disabled: () => !enabled },
+        }) === "0",
       // Arrow keys from any item, after the item's own handlers, so a component
       // rendered through it, like a number field, keeps the keys it uses.
-      keydown: (event: KeyboardEvent) => move(event, event.target as HTMLElement),
+      keydown: (event: KeyboardEvent) =>
+        move(event, event.target as HTMLElement),
       setElement(key: string, el: HTMLElement) {
         const element = buttonElement(el)
         const { elements } = store.get()
-        if ((elements[key] ?? "button") !== element) store.set({ elements: { ...elements, [key]: element } })
+        if ((elements[key] ?? "button") !== element) {
+          store.set({ elements: { ...elements, [key]: element } })
+        }
       },
     },
   }
@@ -322,13 +376,22 @@ function toolbarApi(context: PrimitiveContext<ToolbarOptions, State, string>) {
 type ToolbarApi = ReturnType<typeof toolbarApi>
 
 // The tab stop and data every item renders.
-function itemAttrs(state: State, key: string, props: ItemProps, api: ToolbarApi) {
+function itemAttrs(
+  state: State,
+  key: string,
+  props: ItemProps,
+  api: ToolbarApi
+) {
   const disabled = isDisabled(state, props)
   const focusable = isFocusable(state, props)
   return {
     disabled,
     focusable,
-    tabindex: focusable ? (api.internal.isStop(key, !disabled) ? "0" : "-1") : undefined,
+    tabindex: focusable
+      ? api.internal.isStop(key, !disabled)
+        ? "0"
+        : "-1"
+      : undefined,
     data: {
       "data-disabled": disabled ? "" : undefined,
       "data-orientation": state.orientation,
@@ -339,7 +402,10 @@ function itemAttrs(state: State, key: string, props: ItemProps, api: ToolbarApi)
 // Every option is controlled. A custom element passes `orientation` as written,
 // so anything but "vertical" is the default rather than an invalid ARIA value.
 const fromOptions = (options: ToolbarOptions) => ({
-  orientation: options.orientation === "vertical" ? ("vertical" as const) : ("horizontal" as const),
+  orientation:
+    options.orientation === "vertical"
+      ? ("vertical" as const)
+      : ("horizontal" as const),
   disabled: !!options.disabled,
 })
 
@@ -364,11 +430,16 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     root: slot<{}, ToolbarState>({
       role: "toolbar",
       keys: (state) => [
-        ...(state.orientation === "vertical" ? ["ArrowUp", "ArrowDown"] : ["ArrowLeft", "ArrowRight"]),
+        ...(state.orientation === "vertical"
+          ? ["ArrowUp", "ArrowDown"]
+          : ["ArrowLeft", "ArrowRight"]),
         "Home",
         "End",
       ],
-      state: (state) => ({ orientation: state.orientation, disabled: isToolbarDisabled(state) }),
+      state: (state) => ({
+        orientation: state.orientation,
+        disabled: isToolbarDisabled(state),
+      }),
       attrs: (state) => ({
         "aria-orientation": state.orientation,
         "data-orientation": state.orientation,
@@ -378,7 +449,10 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         keydown: (event, { api }) => api.internal.keydown(event),
       },
       bind: (el, { store }) => {
-        const cleanups = [flagWhileBound(store, "bound", { now: true }), watchFormDisabled(el, store)]
+        const cleanups = [
+          flagWhileBound(store, "bound", { now: true }),
+          watchFormDisabled(el, store),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -386,7 +460,9 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     button: slot<ItemProps, ToolbarButtonState>({
       ...buttonRole<State>((state, { key }) => elementOf(state, key)),
       focus: "roving",
-      press: { none: "The author's click does the work, and Enter and Space on other elements send one." },
+      press: {
+        none: "The author's click does the work, and Enter and Space on other elements send one.",
+      },
       props: {
         id: "id",
         disabled: "boolean",
@@ -396,8 +472,14 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
       },
       // Buttons rendered as other elements record which in `elements`, each
       // reading only its own entry.
-      selects: selects({ stop: ({ key }) => [key, null], elements: ({ key }) => [key] }),
-      state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
+      selects: selects({
+        stop: ({ key }) => [key, null],
+        elements: ({ key }) => [key],
+      }),
+      state: (state, { props }) => ({
+        disabled: isDisabled(state, props),
+        orientation: state.orientation,
+      }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
         return {
@@ -421,12 +503,26 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     link: slot<Pick<ItemProps, "groupDisabled">, ToolbarLinkState>({
-      props: { id: "id", groupDisabled: { kind: "boolean", from: "group.disabled" } },
-      selects: selects({ stop: ({ key }) => [key, null], elements: [], bound: [] }),
-      state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
+      props: {
+        id: "id",
+        groupDisabled: { kind: "boolean", from: "group.disabled" },
+      },
+      selects: selects({
+        stop: ({ key }) => [key, null],
+        elements: [],
+        bound: [],
+      }),
+      state: (state, { props }) => ({
+        disabled: isDisabled(state, props),
+        orientation: state.orientation,
+      }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
-        return { tabindex: item.tabindex, "aria-disabled": item.disabled ? "true" : undefined, ...item.data }
+        return {
+          tabindex: item.tabindex,
+          "aria-disabled": item.disabled ? "true" : undefined,
+          ...item.data,
+        }
       },
       bind: (el, part) => part.api.internal.join(part, el),
     }),
@@ -440,8 +536,15 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         // From the group the item sits in.
         groupDisabled: { kind: "boolean", from: "group.disabled" },
       },
-      selects: selects({ stop: ({ key }) => [key, null], elements: [], bound: [] }),
-      state: (state, { props }) => ({ disabled: isDisabled(state, props), orientation: state.orientation }),
+      selects: selects({
+        stop: ({ key }) => [key, null],
+        elements: [],
+        bound: [],
+      }),
+      state: (state, { props }) => ({
+        disabled: isDisabled(state, props),
+        orientation: state.orientation,
+      }),
       attrs: (state, { key, props, api }) => {
         const item = itemAttrs(state, key, props, api)
         const native = item.disabled && !item.focusable
@@ -454,7 +557,8 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
           ...item.data,
         }
       },
-      bind: (el, part) => part.api.internal.join(part, el, (event) => fieldKeeps(event, el)),
+      bind: (el, part) =>
+        part.api.internal.join(part, el, (event) => fieldKeeps(event, el)),
     }),
 
     group: slot<GroupProps, ToolbarGroupState>({
@@ -465,7 +569,8 @@ const toolbarPrimitive = /* @__PURE__ */ definePrimitive({
         orientation: state.orientation,
       }),
       attrs: (state, { props }) => ({
-        "data-disabled": props.disabled || isToolbarDisabled(state) ? "" : undefined,
+        "data-disabled":
+          props.disabled || isToolbarDisabled(state) ? "" : undefined,
         "data-orientation": state.orientation,
       }),
     }),

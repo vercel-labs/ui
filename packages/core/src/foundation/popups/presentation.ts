@@ -49,18 +49,26 @@ function createPresentation<Default extends string>(
   setting: () => PresentationSetting<Default> | undefined,
   fallback: Default,
   // Whether a swipe can dismiss the sheet, unless `bind`'s config says.
-  dismissal?: Pick<ReturnType<typeof createDismissal>, "sheet">,
+  dismissal?: Pick<ReturnType<typeof createDismissal>, "sheet">
 ) {
   const resolve = () => {
     const value = setting()
-    const phone = value === "auto" && matches("(max-width: 640px) and (pointer: coarse)")
+    const phone =
+      value === "auto" && matches("(max-width: 640px) and (pointer: coarse)")
     return value === "sheet" || phone ? "sheet" : fallback
   }
   const open = () => store.set({ presentation: resolve() })
   const value = setting()
-  if (value === "sheet") open()
-  if (isBrowser && !loading && (value === "sheet" || (value === "auto" && matches("(pointer: coarse)"))))
-    (window.requestIdleCallback ?? setTimeout)(load)
+  if (value === "sheet") {
+    open()
+  }
+  if (
+    isBrowser &&
+    !loading &&
+    (value === "sheet" || (value === "auto" && matches("(pointer: coarse)")))
+  ) {
+    ;(window.requestIdleCallback ?? setTimeout)(load)
+  }
   return {
     open,
     /** How it would present if it opened now. */
@@ -69,14 +77,26 @@ function createPresentation<Default extends string>(
       const popup = layer()
       // Open from the start, it rendered its default on the server and in the
       // first render, so hydration matches. Once the client binds it, `"auto"` decides.
-      if (setting() === "auto" && popup.opener() === "initial" && store.get().open) queueMicrotask(open)
-      if (store.get().presentation !== "sheet") return popup.bind(el, config)
+      if (
+        setting() === "auto" &&
+        popup.opener() === "initial" &&
+        store.get().open
+      ) {
+        queueMicrotask(open)
+      }
+      if (store.get().presentation !== "sheet") {
+        return popup.bind(el, config)
+      }
       let cleanup: (() => void) | undefined
       let cancelled = false
-      const show = (present: () => (() => void) | undefined) => cancelled || (cleanup = present())
+      const show = (present: () => (() => void) | undefined) =>
+        cancelled || (cleanup = present())
       load().then(
-        ({ presentSheet }) => show(() => presentSheet(el, popup, { ...dismissal?.sheet, ...config })),
-        () => show(() => popup.bind(el, config)),
+        ({ presentSheet }) =>
+          show(() =>
+            presentSheet(el, popup, { ...dismissal?.sheet, ...config })
+          ),
+        () => show(() => popup.bind(el, config))
       )
       el.hidden = true
       const unregister = registerPopupElement(el)
@@ -93,8 +113,11 @@ function createPresentation<Default extends string>(
  * The `modal` setting a popup uses: the app's, else modal while it presents
  * as a sheet, like iOS's sheets, else the component's default.
  */
-const sheetModal = <Setting>(presentation: string, setting: Setting | undefined, fallback: Setting) =>
-  setting ?? (presentation === "sheet" ? true : fallback)
+const sheetModal = <Setting>(
+  presentation: string,
+  setting: Setting | undefined,
+  fallback: Setting
+) => setting ?? (presentation === "sheet" ? true : fallback)
 
 /** Where a list with an input rests as a sheet: at most half the screen, and its full size once someone types. */
 const sheetSnapPoints: SnapPoint[] = [0.5, 1]
@@ -112,33 +135,46 @@ function bindSheetInput(
     store: Store<{ open: boolean; presentation: string }>
     presentation: Pick<ReturnType<typeof createPresentation>, "resolve">
     open: (event: Event) => void
-  },
+  }
 ) {
   const { store } = link
   // Moving into the header and back renders the input again, and a closing
   // sheet's inert content takes focus from it, which some engines don't
   // report. So the input remembers it held focus until focus went somewhere
   // else, and takes it back where it lands. A finger's keyboard stays closed.
-  if (held.get(store) && store.get().presentation === "sheet" && sourceOf() !== "touch")
+  if (
+    held.get(store) &&
+    store.get().presentation === "sheet" &&
+    sourceOf() !== "touch"
+  ) {
     queueMicrotask(() => el.isConnected && el.focus({ preventScroll: true }))
+  }
   held.delete(store)
   const offs = [
     on(
       el,
       "touchend",
       (event) => {
-        if (store.get().open || !event.cancelable || link.presentation.resolve() !== "sheet") return
+        if (
+          store.get().open ||
+          !event.cancelable ||
+          link.presentation.resolve() !== "sheet"
+        ) {
+          return
+        }
         event.preventDefault()
         link.open(event)
       },
-      { passive: false },
+      { passive: false }
     ),
     on(el, "focus", () => held.set(store, true)),
     on(el, "blur", (event) => event.relatedTarget && held.set(store, false)),
   ]
   return () => {
     offs.forEach((off) => off())
-    if (el.ownerDocument.activeElement === el) held.set(store, true)
+    if (el.ownerDocument.activeElement === el) {
+      held.set(store, true)
+    }
   }
 }
 

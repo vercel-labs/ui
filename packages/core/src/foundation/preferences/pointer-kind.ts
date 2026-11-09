@@ -80,18 +80,27 @@ const sharedByView = new WeakMap<Window, Shared>()
 
 // The window's queries and listeners, made the first time a pointer kind reads them.
 function sharedOf(view: Window | undefined) {
-  if (!view || typeof view.matchMedia !== "function") return
+  if (!view || typeof view.matchMedia !== "function") {
+    return
+  }
   let shared = sharedByView.get(view)
-  if (shared) return shared
+  if (shared) {
+    return shared
+  }
   const queries = Object.fromEntries(
-    Object.entries(features).map(([name, query]) => [name, view.matchMedia(query)]),
+    Object.entries(features).map(([name, query]) => [
+      name,
+      view.matchMedia(query),
+    ])
   ) as Shared["queries"]
   const listeners = new Set<() => void>()
   shared = {
     queries,
     listeners,
     notify: () => {
-      for (const listener of [...listeners]) listener()
+      for (const listener of [...listeners]) {
+        listener()
+      }
     },
   }
   sharedByView.set(view, shared)
@@ -99,8 +108,18 @@ function sharedOf(view: Window | undefined) {
 }
 
 // A browser that doesn't know a feature matches none of its values, which reads as "unknown".
-const precision = (fine: MediaQueryList, coarse: MediaQueryList, none: MediaQueryList) =>
-  fine.matches ? "fine" : coarse.matches ? "coarse" : none.matches ? "none" : "unknown"
+const precision = (
+  fine: MediaQueryList,
+  coarse: MediaQueryList,
+  none: MediaQueryList
+) =>
+  fine.matches
+    ? "fine"
+    : coarse.matches
+      ? "coarse"
+      : none.matches
+        ? "none"
+        : "unknown"
 const hovering = (hover: MediaQueryList, none: MediaQueryList) =>
   hover.matches ? "hover" : none.matches ? "none" : "unknown"
 
@@ -115,7 +134,10 @@ const read = ({ queries: q }: Shared) => {
 }
 
 const same = (a: PointerKindState, b: PointerKindState) =>
-  a.pointer === b.pointer && a.hover === b.hover && a.anyPointer === b.anyPointer && a.anyHover === b.anyHover
+  a.pointer === b.pointer &&
+  a.hover === b.hover &&
+  a.anyPointer === b.anyPointer &&
+  a.anyHover === b.anyHover
 
 /**
  * The device's pointer: whether it's a finger or a mouse, and whether it can
@@ -132,22 +154,29 @@ function createPointerKind(options: PointerKindOptions = {}) {
     anyHover: "unknown",
     ...options.initial,
   }
-  const shared = () => sharedOf(options.view ?? (isBrowser ? window : undefined))
+  const shared = () =>
+    sharedOf(options.view ?? (isBrowser ? window : undefined))
   // The same object until something changes, so frameworks can compare snapshots.
   let state = initialState
 
   const get = () => {
     const current = shared()
-    if (!current) return state
+    if (!current) {
+      return state
+    }
     const next = read(current)
-    if (!same(state, next)) state = next
+    if (!same(state, next)) {
+      state = next
+    }
     return state
   }
 
   const listeners = new Set<(state: PointerKindState) => void>()
   const notify = () => {
     const next = get()
-    for (const listener of [...listeners]) listener(next)
+    for (const listener of [...listeners]) {
+      listener(next)
+    }
   }
 
   const subscribe = (listener: (state: PointerKindState) => void) => {
@@ -156,14 +185,23 @@ function createPointerKind(options: PointerKindOptions = {}) {
     listeners.add(entry)
     const current = shared()
     if (listeners.size === 1 && current) {
-      if (current.listeners.size === 0)
-        for (const query of Object.values(current.queries)) query.addEventListener("change", current.notify)
+      if (current.listeners.size === 0) {
+        for (const query of Object.values(current.queries)) {
+          query.addEventListener("change", current.notify)
+        }
+      }
       current.listeners.add(notify)
     }
     return () => {
-      if (!listeners.delete(entry) || listeners.size > 0) return
-      if (!current?.listeners.delete(notify) || current.listeners.size > 0) return
-      for (const query of Object.values(current.queries)) query.removeEventListener("change", current.notify)
+      if (!listeners.delete(entry) || listeners.size > 0) {
+        return
+      }
+      if (!current?.listeners.delete(notify) || current.listeners.size > 0) {
+        return
+      }
+      for (const query of Object.values(current.queries)) {
+        query.removeEventListener("change", current.notify)
+      }
     }
   }
 

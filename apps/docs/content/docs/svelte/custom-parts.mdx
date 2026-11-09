@@ -12,14 +12,30 @@ Here's a replacement for the generated `RatingRoot`. `usePrimitive` creates its 
 ```svelte title="rating-root.svelte"
 <script lang="ts">
   import type { StateOf } from "@ui-sdk/core"
-  import { Part, usePart, usePrimitive, type PartProps } from "@ui-sdk/svelte/primitive"
+  import {
+    Part,
+    usePart,
+    usePrimitive,
+    type PartProps,
+  } from "@ui-sdk/svelte/primitive"
   import { setContext } from "svelte"
   import { rating, type RatingOptions } from "./rating"
 
-  let { value, defaultValue, onValueChange, ...props }: RatingOptions &
-    Omit<PartProps<"div", StateOf<typeof rating, "root">>, "defaultValue"> = $props()
+  let {
+    value,
+    defaultValue,
+    onValueChange,
+    ...props
+  }: RatingOptions &
+    Omit<PartProps<"div", StateOf<typeof rating, "root">>, "defaultValue"> =
+    $props()
   const id = $props.id()
-  const handle = usePrimitive(rating, () => ({ id, value, defaultValue, onValueChange }))
+  const handle = usePrimitive(rating, () => ({
+    id,
+    value,
+    defaultValue,
+    onValueChange,
+  }))
   setContext(rating, handle)
   const root = usePart(handle, "root")
 </script>
@@ -44,7 +60,10 @@ Pass the primitive itself to `usePart` to find the instance shared by the root a
   import { Part, usePart, type PartProps } from "@ui-sdk/svelte/primitive"
   import { rating } from "./rating"
 
-  let { value, ...props }: { value: string } & Omit<PartProps<"button">, "value"> = $props()
+  let {
+    value,
+    ...props
+  }: { value: string } & Omit<PartProps<"button">, "value"> = $props()
   const star = usePart(rating, "star", () => ({ value }))
 </script>
 

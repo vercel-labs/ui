@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { CheckIcon, ChevronsUpDownIcon, ZoomInIcon, ZoomOutIcon } from "@lucide/svelte"
+  import {
+    CheckIcon,
+    ChevronsUpDownIcon,
+    ZoomInIcon,
+    ZoomOutIcon,
+  } from "@lucide/svelte"
   import {
     Select,
     SelectContent,
@@ -24,7 +29,11 @@
 </script>
 
 <Toolbar aria-label="View">
-  <ToolbarButton aria-label="Zoom out" disabled={index === 0} onclick={() => change(zooms[index - 1])}>
+  <ToolbarButton
+    aria-label="Zoom out"
+    disabled={index === 0}
+    onclick={() => change(zooms[index - 1])}
+  >
     <ZoomOutIcon aria-hidden="true" />
   </ToolbarButton>
   <Select value={zoom} onValueChange={(value) => value && change(value)}>

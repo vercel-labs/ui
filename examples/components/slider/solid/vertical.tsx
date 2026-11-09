@@ -1,5 +1,11 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/solid/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/solid/slider"
 import { For } from "solid-js"
 
 const channels = [

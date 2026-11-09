@@ -41,7 +41,9 @@ function Example() {
             key={name}
             items={choices[name].values}
             value={offsets[name]}
-            onValueChange={(next) => next && setOffsets({ ...offsets, [name]: next })}
+            onValueChange={(next) =>
+              next && setOffsets({ ...offsets, [name]: next })
+            }
           >
             <SelectLabel>{choices[name].label}</SelectLabel>
             <SelectTrigger>
@@ -70,7 +72,9 @@ function Example() {
           collisionPadding={Number(offsets.collisionPadding)}
         >
           <PopoverTitle>Delivery window</PopoverTitle>
-          <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
+          <PopoverDescription>
+            Arrives Tuesday between 9 AM and noon.
+          </PopoverDescription>
         </PopoverContent>
       </Popover>
     </div>

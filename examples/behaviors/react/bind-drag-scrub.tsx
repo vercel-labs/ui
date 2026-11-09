@@ -1,5 +1,11 @@
 import * as React from "react"
-import { bindDrag, createChange, definePrimitive, dragThreshold, type ChangeDetails } from "@ui-sdk/core"
+import {
+  bindDrag,
+  createChange,
+  definePrimitive,
+  dragThreshold,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
 import { CheckIcon } from "lucide-react"
@@ -8,7 +14,10 @@ type ScrubState = { value: number }
 
 type ScrubOptions = {
   locked?: boolean
-  onValueChange?: (value: number, details: ChangeDetails<"drag" | "keyboard">) => void
+  onValueChange?: (
+    value: number,
+    details: ChangeDetails<"drag" | "keyboard">
+  ) => void
 }
 
 const clamp = (value: number) => Math.round(Math.min(100, Math.max(0, value)))
@@ -30,15 +39,25 @@ const scrub = definePrimitive({
           lock: true,
           onStart: () => !context.options().locked,
           onMove: ({ movementX, event }) =>
-            change("value", clamp(store.get().value + movementX / 2), { reason: "drag", event }),
+            change("value", clamp(store.get().value + movementX / 2), {
+              reason: "drag",
+              event,
+            }),
           onEnd: () => (stop = undefined),
         })
       },
       keydown(event: KeyboardEvent) {
-        const by = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[event.key]
-        if (!by) return
+        const by = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1 }[
+          event.key
+        ]
+        if (!by) {
+          return
+        }
         event.preventDefault()
-        change("value", clamp(store.get().value + by), { reason: "keyboard", event })
+        change("value", clamp(store.get().value + by), {
+          reason: "keyboard",
+          event,
+        })
       },
     }
   },
@@ -71,7 +90,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <Checkbox checked={locked} onCheckedChange={(next) => setLocked(next === true)}>
+          <Checkbox
+            checked={locked}
+            onCheckedChange={(next) => setLocked(next === true)}
+          >
             <CheckboxIndicator>
               <CheckIcon aria-hidden="true" />
             </CheckboxIndicator>

@@ -9,8 +9,11 @@ const datePickerFixture = {
 }
 
 // What the "Last action" status says after a change.
-const datePickerAction = (key: "value" | "open", value: unknown, reason: string) =>
-  `${key}: ${JSON.stringify(value)} (${reason})`
+const datePickerAction = (
+  key: "value" | "open",
+  value: unknown,
+  reason: string
+) => `${key}: ${JSON.stringify(value)} (${reason})`
 
 // Options a spec can set through the URL: ?mode=range, ?value=<date>[,<date>]
 // (the default value), ?min, ?max, ?unavailable=<date>,<date>, ?required,
@@ -19,13 +22,18 @@ const datePickerAction = (key: "value" | "open", value: unknown, reason: string)
 // date picker's surroundings are in that language).
 function datePickerOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   const string = (name: string) => params.get(name) ?? undefined
   const mode = (string("mode") ?? "single") as "single" | "range"
   const container = params.get("container")
   const dates = params.get("value")?.split(",").filter(Boolean) ?? []
   const value =
-    mode === "single" ? (dates[0] ?? null) : dates.length === 2 ? (dates as [string, string]) : null
+    mode === "single"
+      ? (dates[0] ?? null)
+      : dates.length === 2
+        ? (dates as [string, string])
+        : null
   return {
     mode,
     defaultValue: value,

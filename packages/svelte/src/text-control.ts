@@ -1,5 +1,8 @@
 import type { ChangeDetails } from "@ui-sdk/core"
-import type { InputController, InputValueChangeReason } from "@ui-sdk/core/input"
+import type {
+  InputController,
+  InputValueChangeReason,
+} from "@ui-sdk/core/input"
 import type { Snippet } from "svelte"
 import type { SvelteHTMLElements } from "svelte/elements"
 import type { useFieldControl } from "./field/context"
@@ -29,7 +32,10 @@ type TextControlProps = {
    * field (`"clear-press"`), a form resets (`"reset"`) or a controller writes
    * (`"imperative"`). `details.cancel()` keeps the text as it was.
    */
-  onValueChange?: (value: string, details: ChangeDetails<InputValueChangeReason>) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<InputValueChangeReason>
+  ) => void
 }
 
 /**
@@ -42,7 +48,9 @@ type TextPartProps<Tag extends "input" | "textarea", State> = Omit<
   "children" | "value" | "defaultValue" | "defaultvalue"
 > & { [attribute: string]: unknown } & {
   /** Renders your own element. Receives the props to spread on it and the part's state. */
-  render?: Snippet<[{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]>
+  render?: Snippet<
+    [{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]
+  >
   /** Content. Receives the part's state. */
   children?: Snippet<[State]>
 }
@@ -52,14 +60,23 @@ type Field = ReturnType<typeof useFieldControl>
 type NativeStates = Pick<TextControlProps, "disabled" | "readOnly" | "required">
 
 /** Whether a field is read-only: its `readOnly` prop, or else a native `readonly` attribute among its other props. */
-function readOnlyOf(readOnly: boolean | undefined, attributes: Record<string, unknown>) {
-  if (readOnly !== undefined) return readOnly
+function readOnlyOf(
+  readOnly: boolean | undefined,
+  attributes: Record<string, unknown>
+) {
+  if (readOnly !== undefined) {
+    return readOnly
+  }
   const native = attributes.readonly
   return native !== undefined && native !== null && native !== false
 }
 
 /** The native states a text field's part attributes follow, from its own props and its field's. */
-function controlProps(props: NativeStates, field: Field, attributes: Record<string, unknown>) {
+function controlProps(
+  props: NativeStates,
+  field: Field,
+  attributes: Record<string, unknown>
+) {
   return {
     disabled: props.disabled || field?.disabled(),
     readOnly: readOnlyOf(props.readOnly, attributes),
@@ -71,7 +88,11 @@ function controlProps(props: NativeStates, field: Field, attributes: Record<stri
  * The element's attributes: the field's name, the user's, and the native
  * states. Each state is set or absent, never false, so the server omits it too.
  */
-function elementProps(props: NativeStates, field: Field, attributes: Record<string, unknown>) {
+function elementProps(
+  props: NativeStates,
+  field: Field,
+  attributes: Record<string, unknown>
+) {
   const states = controlProps(props, field, attributes)
   return {
     name: field?.name(),
@@ -82,4 +103,10 @@ function elementProps(props: NativeStates, field: Field, attributes: Record<stri
   }
 }
 
-export { controlProps, elementProps, readOnlyOf, type TextControlProps, type TextPartProps }
+export {
+  controlProps,
+  elementProps,
+  readOnlyOf,
+  type TextControlProps,
+  type TextPartProps,
+}

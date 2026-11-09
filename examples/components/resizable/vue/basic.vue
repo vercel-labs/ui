@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/vue/resizable"
 </script>
 
 <template>

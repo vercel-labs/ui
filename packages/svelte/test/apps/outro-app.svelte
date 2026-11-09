@@ -2,7 +2,9 @@
   import { fade } from "svelte/transition"
   import { Popover, PopoverContent, PopoverTrigger } from "../../src/popover"
 
-  let { onOpenChangeComplete }: { onOpenChangeComplete: (open: boolean) => void } = $props()
+  let {
+    onOpenChangeComplete,
+  }: { onOpenChangeComplete: (open: boolean) => void } = $props()
 </script>
 
 <Popover {onOpenChangeComplete}>

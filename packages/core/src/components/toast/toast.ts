@@ -3,7 +3,10 @@
 // and where focus goes is in `toast-api.ts`, the parts in `toast-parts.ts`,
 // the countdowns in `toast-timers.ts` and the DOM helpers in `toast-dom.ts`.
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { toastSlots } from "./toast-parts"
 import { initialToastState, syncToastState, toastRegionApi } from "./toast-api"
 import type { Toast, ToastActionDetails, Toaster } from "./toaster"
@@ -109,7 +112,9 @@ type ToastButtonState = {
 
 // A `shortcut` attribute: "none" or an empty one turns the shortcut off.
 function shortcutAttribute(attribute: string | null) {
-  if (attribute === null) return undefined
+  if (attribute === null) {
+    return undefined
+  }
   return attribute === "none" || attribute === "" ? null : attribute
 }
 

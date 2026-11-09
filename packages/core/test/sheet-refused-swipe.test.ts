@@ -1,7 +1,10 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, test } from "vitest"
 import { sheetPhysics } from "../src/foundation/motion/physics"
-import type { SheetDriver, SheetDriverOptions } from "../src/foundation/popups/sheet-driver"
+import type {
+  SheetDriver,
+  SheetDriverOptions,
+} from "../src/foundation/popups/sheet-driver"
 import { createPointerDriver } from "../src/foundation/popups/sheet-pointer"
 import { createScrollSnapDriver } from "../src/foundation/popups/sheet-scroll-snap"
 
@@ -67,13 +70,21 @@ function setup(create: (options: SheetDriverOptions) => SheetDriver) {
 }
 
 const pointer = (type: string, clientY: number) =>
-  new PointerEvent(type, { bubbles: true, button: 0, pointerId: 1, pointerType: "mouse", clientY })
+  new PointerEvent(type, {
+    bubbles: true,
+    button: 0,
+    pointerId: 1,
+    pointerType: "mouse",
+    clientY,
+  })
 
 describe("a swipe the popup refuses snaps back", () => {
   test("with the pointer driver", () => {
     const { sheet, rests } = setup(createPointerDriver)
     sheet.dispatchEvent(pointer("pointerdown", 100))
-    for (const y of [150, 300, 500]) document.dispatchEvent(pointer("pointermove", y))
+    for (const y of [150, 300, 500]) {
+      document.dispatchEvent(pointer("pointermove", y))
+    }
     document.dispatchEvent(pointer("pointerup", 500))
     finishLast()
     expect(rests.at(-1)).toBe("full")

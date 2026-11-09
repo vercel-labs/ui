@@ -34,12 +34,19 @@ function newMessage() {
     <template #default="{ toast: item }">
       <Toast>
         <template #render="{ props, state, children }">
-          <li v-bind="props" :inert="state.leaving || (!state.expanded && state.index > 0) || undefined">
+          <li
+            v-bind="props"
+            :inert="
+              state.leaving || (!state.expanded && state.index > 0) || undefined
+            "
+          >
             <component :is="children" />
           </li>
         </template>
         <template #default>
-          <span data-slot="media">{{ (item.data as { initials: string }).initials }}</span>
+          <span data-slot="media">{{
+            (item.data as { initials: string }).initials
+          }}</span>
           <div data-slot="stack">
             <ToastTitle />
             <ToastDescription />

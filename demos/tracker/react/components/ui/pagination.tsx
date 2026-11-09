@@ -30,20 +30,32 @@ function Pagination({
   getHref: (page: number) => string
 }) {
   return (
-    <PaginationPrimitive aria-label="Pages" page={page} pageCount={pageCount} getHref={getHref}>
+    <PaginationPrimitive
+      aria-label="Pages"
+      page={page}
+      pageCount={pageCount}
+      getHref={getHref}
+    >
       <PaginationList className="flex items-center gap-1">
         {({ items }) => (
           <>
             <PaginationItem>
               <PaginationPrevious render={RouterLink} className={step}>
-                <ChevronLeft aria-hidden="true" className="size-4 rtl:rotate-180" />
+                <ChevronLeft
+                  aria-hidden="true"
+                  className="size-4 rtl:rotate-180"
+                />
                 <span className="sr-only">Previous</span>
               </PaginationPrevious>
             </PaginationItem>
             {items.map((item) => (
               <PaginationItem key={item}>
                 {typeof item === "number" ? (
-                  <PaginationLink page={item} render={RouterLink} className={step} />
+                  <PaginationLink
+                    page={item}
+                    render={RouterLink}
+                    className={step}
+                  />
                 ) : (
                   <PaginationEllipsis className="flex size-8 items-center justify-center text-muted-foreground">
                     <Ellipsis aria-hidden="true" className="size-4" />
@@ -54,7 +66,10 @@ function Pagination({
             <PaginationItem>
               <PaginationNext render={RouterLink} className={step}>
                 <span className="sr-only">Next</span>
-                <ChevronRight aria-hidden="true" className="size-4 rtl:rotate-180" />
+                <ChevronRight
+                  aria-hidden="true"
+                  className="size-4 rtl:rotate-180"
+                />
               </PaginationNext>
             </PaginationItem>
           </>

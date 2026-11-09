@@ -2,7 +2,13 @@
 import { renderToString } from "react-dom/server"
 import { describe, expect, test } from "vitest"
 import { Checkbox, CheckboxGroup, CheckboxIndicator } from "../src/checkbox"
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "../src/field"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "../src/field"
 import { DatePicker, DatePickerInput } from "../src/date-picker"
 import { Input } from "../src/input"
 import {
@@ -11,10 +17,20 @@ import {
   NumberInputDecrement,
   NumberInputIncrement,
 } from "../src/number-input"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "../src/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "../src/password-input"
 import { Radio, RadioGroup } from "../src/radio"
 import { Select, SelectTrigger } from "../src/select"
-import { Slider, SliderControl, SliderThumb, SliderTrack, SliderValue } from "../src/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+} from "../src/slider"
 import { Switch } from "../src/switch"
 
 // The attributes of every <input> in the markup, in any order.
@@ -31,7 +47,9 @@ const attribute = (tag: string | undefined, name: string) =>
 const dangling = (html: string) => {
   const ids = new Set(tags(html).map((tag) => attribute(tag, "id")))
   return ["for", "aria-controls", "aria-labelledby"]
-    .flatMap((name) => tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? []))
+    .flatMap((name) =>
+      tags(html).flatMap((tag) => attribute(tag, name)?.split(" ") ?? [])
+    )
     .filter((id) => !ids.has(id))
 }
 
@@ -41,14 +59,21 @@ describe("server rendering form controls", () => {
     const html = renderToString(
       <Checkbox name="terms" value="yes" defaultChecked required>
         <CheckboxIndicator />
-      </Checkbox>,
+      </Checkbox>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="checkbox"')
     expect(html).toContain('aria-checked="true"')
     const [input] = inputs(html)
-    for (const attribute of ['type="checkbox"', 'name="terms"', 'value="yes"', 'checked=""', 'required=""'])
+    for (const attribute of [
+      'type="checkbox"',
+      'name="terms"',
+      'value="yes"',
+      'checked=""',
+      'required=""',
+    ]) {
       expect(input).toContain(attribute)
+    }
     expect(html).toContain('data-slot="checkbox-indicator"')
   })
 
@@ -70,7 +95,7 @@ describe("server rendering form controls", () => {
         <Radio value="free" disabled />
         <Radio value="pro" />
         <Radio value="team" />
-      </RadioGroup>,
+      </RadioGroup>
     )
     expect(html.match(/tabindex="0"/g)).toHaveLength(1)
     expect(html.match(/type="radio"[^>]*name="plan"/g)).toHaveLength(3)
@@ -78,14 +103,20 @@ describe("server rendering form controls", () => {
 
   test("a checkbox group names its checkboxes and checks its default values", () => {
     const html = renderToString(
-      <CheckboxGroup name="toppings" defaultValue={["cheese"]} allValues={["cheese", "olives"]}>
+      <CheckboxGroup
+        name="toppings"
+        defaultValue={["cheese"]}
+        allValues={["cheese", "olives"]}
+      >
         <Checkbox parent />
         <Checkbox value="cheese" />
         <Checkbox value="olives" />
-      </CheckboxGroup>,
+      </CheckboxGroup>
     )
     expect(html).toContain('aria-checked="mixed"')
-    const cheese = inputs(html).find((input) => input.includes('value="cheese"'))!
+    const cheese = inputs(html).find((input) =>
+      input.includes('value="cheese"')
+    )!
     expect(cheese).toContain('name="toppings"')
     expect(cheese).toContain('checked=""')
     expect(html.match(/name="toppings"/g)).toHaveLength(2)
@@ -98,7 +129,7 @@ describe("server rendering form controls", () => {
         <FieldControl type="email" required />
         <FieldDescription>We never share it.</FieldDescription>
         <FieldError />
-      </Field>,
+      </Field>
     )
     const id = html.match(/<input[^>]*id="([^"]+)"/)![1]
     expect(html).toContain(`for="${id}"`)
@@ -137,13 +168,15 @@ describe("server rendering form controls", () => {
       <Field>
         <FieldLabel>Amount</FieldLabel>
         {control}
-      </Field>,
+      </Field>
     )
     const label = attribute(
       tags(html).find((tag) => tag.includes('data-slot="field-label"')),
-      "for",
+      "for"
     )
-    expect(tags(html).find((tag) => attribute(tag, "id") === label)).toMatch(/^<input/)
+    expect(tags(html).find((tag) => attribute(tag, "id") === label)).toMatch(
+      /^<input/
+    )
     expect(dangling(html)).toEqual([])
   })
 
@@ -159,10 +192,14 @@ describe("server rendering form controls", () => {
             </SliderTrack>
           </SliderControl>
         </Slider>
-      </Field>,
+      </Field>
     )
-    const label = tags(html).find((tag) => tag.includes('data-slot="field-label"'))
-    const target = tags(html).find((tag) => attribute(tag, "id") === attribute(label, "for"))
+    const label = tags(html).find((tag) =>
+      tag.includes('data-slot="field-label"')
+    )
+    const target = tags(html).find(
+      (tag) => attribute(tag, "id") === attribute(label, "for")
+    )
     expect(target).toMatch(/^<input[^>]*type="range"/)
     const group = tags(html).find((tag) => tag.includes('role="group"'))
     expect(attribute(group, "aria-labelledby")).toBe(attribute(label, "id"))
@@ -172,8 +209,14 @@ describe("server rendering form controls", () => {
   test.each([
     ["FieldControl", <FieldControl aria-describedby="hint" />],
     ["Input", <Input aria-describedby="hint" />],
-    ["FieldControl's render element", <FieldControl render={<input aria-describedby="hint" />} />],
-    ["Input's render element", <Input render={<input aria-describedby="hint" />} />],
+    [
+      "FieldControl's render element",
+      <FieldControl render={<input aria-describedby="hint" />} />,
+    ],
+    [
+      "Input's render element",
+      <Input render={<input aria-describedby="hint" />} />,
+    ],
     [
       "NumberInput's render element",
       <NumberInput>
@@ -186,16 +229,23 @@ describe("server rendering form controls", () => {
         <DatePickerInput render={<input aria-describedby="hint" />} />
       </DatePicker>,
     ],
-  ])("a %s keeps its own description ahead of the field's", (_name, control) => {
-    const html = renderToString(
-      <Field>
-        {control}
-        <FieldDescription>We never share it.</FieldDescription>
-      </Field>,
-    )
-    const text = tags(html).find((tag) => tag.includes('data-slot="field-description"'))
-    expect(attribute(inputs(html)[0], "aria-describedby")).toBe(`hint ${attribute(text, "id")}`)
-  })
+  ])(
+    "a %s keeps its own description ahead of the field's",
+    (_name, control) => {
+      const html = renderToString(
+        <Field>
+          {control}
+          <FieldDescription>We never share it.</FieldDescription>
+        </Field>
+      )
+      const text = tags(html).find((tag) =>
+        tag.includes('data-slot="field-description"')
+      )
+      expect(attribute(inputs(html)[0], "aria-describedby")).toBe(
+        `hint ${attribute(text, "id")}`
+      )
+    }
+  )
 })
 
 // Before hydration, the parts register nothing, so the server's HTML has to
@@ -203,30 +253,43 @@ describe("server rendering form controls", () => {
 describe.each(["before", "after"])(
   "server rendering a field with its description %s the control",
   (order) => {
-    test.each(["input", "select"])("its label names the %s and its description describes it", (kind) => {
-      const description = <FieldDescription>Pick one.</FieldDescription>
-      const control =
-        kind === "input" ? (
-          <Input />
-        ) : (
-          <Select>
-            <SelectTrigger />
-          </Select>
+    test.each(["input", "select"])(
+      "its label names the %s and its description describes it",
+      (kind) => {
+        const description = <FieldDescription>Pick one.</FieldDescription>
+        const control =
+          kind === "input" ? (
+            <Input />
+          ) : (
+            <Select>
+              <SelectTrigger />
+            </Select>
+          )
+        const html = renderToString(
+          <Field>
+            <FieldLabel>Fruit</FieldLabel>
+            {order === "before" && description}
+            {control}
+            {order === "after" && description}
+          </Field>
         )
-      const html = renderToString(
-        <Field>
-          <FieldLabel>Fruit</FieldLabel>
-          {order === "before" && description}
-          {control}
-          {order === "after" && description}
-        </Field>,
-      )
-      const label = tags(html).find((tag) => tag.startsWith("<label"))
-      const element = tags(html).find((tag) => attribute(tag, "id") === attribute(label, "for"))
-      expect(element).toMatch(kind === "input" ? /^<input/ : /^<button[^>]*role="combobox"/)
-      expect(attribute(element, "aria-labelledby")).toBe(attribute(label, "id"))
-      const text = tags(html).find((tag) => tag.includes('data-slot="field-description"'))
-      expect(attribute(element, "aria-describedby")).toBe(attribute(text, "id"))
-    })
-  },
+        const label = tags(html).find((tag) => tag.startsWith("<label"))
+        const element = tags(html).find(
+          (tag) => attribute(tag, "id") === attribute(label, "for")
+        )
+        expect(element).toMatch(
+          kind === "input" ? /^<input/ : /^<button[^>]*role="combobox"/
+        )
+        expect(attribute(element, "aria-labelledby")).toBe(
+          attribute(label, "id")
+        )
+        const text = tags(html).find((tag) =>
+          tag.includes('data-slot="field-description"')
+        )
+        expect(attribute(element, "aria-describedby")).toBe(
+          attribute(text, "id")
+        )
+      }
+    )
+  }
 )

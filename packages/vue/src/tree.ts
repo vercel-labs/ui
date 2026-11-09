@@ -27,7 +27,12 @@ import {
 } from "./use-primitive"
 
 // The parts inside an item take its `value` from it.
-const parts = createParts(treePrimitive, { label: "span", indicator: "span", checkbox: "span", group: "div" })
+const parts = createParts(treePrimitive, {
+  label: "span",
+  indicator: "span",
+  checkbox: "span",
+  group: "div",
+})
 
 type Value = string | string[] | null
 
@@ -45,39 +50,64 @@ const Tree = withElement(
       paths: Array as PropType<string[]>,
       mode: String as PropType<TreeMode>,
       value: { type: null as unknown as PropType<Value>, default: undefined },
-      modelValue: { type: null as unknown as PropType<Value>, default: undefined },
-      defaultValue: { type: null as unknown as PropType<Value>, default: undefined },
+      modelValue: {
+        type: null as unknown as PropType<Value>,
+        default: undefined,
+      },
+      defaultValue: {
+        type: null as unknown as PropType<Value>,
+        default: undefined,
+      },
       activation: String as PropType<"automatic" | "manual">,
       expanded: { type: Array as PropType<string[]>, default: undefined },
-      defaultExpanded: { type: Array as PropType<string[]>, default: undefined },
+      defaultExpanded: {
+        type: Array as PropType<string[]>,
+        default: undefined,
+      },
       expandOnPress: optionalBoolean,
       checkable: optionalBoolean,
       checked: { type: Array as PropType<string[]>, default: undefined },
       defaultChecked: { type: Array as PropType<string[]>, default: undefined },
       checkStrategy: String as PropType<TreeCheckStrategy>,
       // A function prop beside the emit, so a returned Promise marks the item pending.
-      onAction: Function as PropType<(value: string, details: TreeActionDetails) => unknown>,
+      onAction: Function as PropType<
+        (value: string, details: TreeActionDetails) => unknown
+      >,
       pendingAnnouncement: String,
       loadChildren: Function as PropType<
-        (value: string, details: { signal: AbortSignal }) => void | Promise<unknown>
+        (
+          value: string,
+          details: { signal: AbortSignal }
+        ) => void | Promise<unknown>
       >,
       current: { type: String as PropType<string | null>, default: undefined },
       disabled: optionalBoolean,
       focusableWhenDisabled: optionalBoolean,
       keepMounted: optionalBoolean,
       hiddenUntilFound: optionalBoolean,
-      announcement: Function as PropType<(change: TreeAnnouncement) => string | null | undefined>,
+      announcement: Function as PropType<
+        (change: TreeAnnouncement) => string | null | undefined
+      >,
       controller: Object as PropType<TreeController>,
       debug: optionalBoolean,
     },
     emits: {
       "update:value": (_value: Value) => true,
       "update:modelValue": (_value: Value) => true,
-      valueChange: (_value: Value, _details: ChangeDetails<TreeValueChangeReason>) => true,
+      valueChange: (
+        _value: Value,
+        _details: ChangeDetails<TreeValueChangeReason>
+      ) => true,
       "update:expanded": (_expanded: string[]) => true,
-      expandedChange: (_expanded: string[], _details: ChangeDetails<TreeExpandedChangeReason>) => true,
+      expandedChange: (
+        _expanded: string[],
+        _details: ChangeDetails<TreeExpandedChangeReason>
+      ) => true,
       "update:checked": (_checked: string[]) => true,
-      checkedChange: (_checked: string[], _details: ChangeDetails<TreeCheckedChangeReason>) => true,
+      checkedChange: (
+        _checked: string[],
+        _details: ChangeDetails<TreeCheckedChangeReason>
+      ) => true,
       highlight: (_value: string, _details: ListHighlightDetails) => true,
     },
     slots: Object as PartSlots<typeof treePrimitive, "root">,
@@ -85,33 +115,52 @@ const Tree = withElement(
       const tree = usePrimitive(treePrimitive, () => ({
         ...props,
         value: orModel(props.value, props.modelValue),
-        onValueChange: (value: Value, details: ChangeDetails<TreeValueChangeReason>) => {
+        onValueChange: (
+          value: Value,
+          details: ChangeDetails<TreeValueChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onExpandedChange: (expanded: string[], details: ChangeDetails<TreeExpandedChangeReason>) => {
+        onExpandedChange: (
+          expanded: string[],
+          details: ChangeDetails<TreeExpandedChangeReason>
+        ) => {
           emit("expandedChange", expanded, details)
-          if (!details.canceled) emit("update:expanded", expanded)
+          if (!details.canceled) {
+            emit("update:expanded", expanded)
+          }
         },
-        onCheckedChange: (checked: string[], details: ChangeDetails<TreeCheckedChangeReason>) => {
+        onCheckedChange: (
+          checked: string[],
+          details: ChangeDetails<TreeCheckedChangeReason>
+        ) => {
           emit("checkedChange", checked, details)
-          if (!details.canceled) emit("update:checked", checked)
+          if (!details.canceled) {
+            emit("update:checked", checked)
+          }
         },
-        onHighlight: (value: string, details: ListHighlightDetails) => emit("highlight", value, details),
+        onHighlight: (value: string, details: ListHighlightDetails) =>
+          emit("highlight", value, details),
       }))
       return usePart(tree, "root", undefined, undefined, {
         tag: "div",
         // Without content, a data tree renders its items.
         children: (state) => {
           const data = tree.api.internal.items()
-          return slotContent(slots.default, { state }) ?? (data && h(TreeItems, { items: data }))
+          return (
+            slotContent(slots.default, { state }) ??
+            (data && h(TreeItems, { items: data }))
+          )
         },
       })
     },
-  }),
+  })
 )
 
 /**
@@ -150,14 +199,17 @@ const TreeItem = withElement(
         disabled: props.disabled,
         label: props.label,
       })
-      const part = usePart(treePrimitive, "item", item, undefined, { tag: "div", children: () => children })
+      const part = usePart(treePrimitive, "item", item, undefined, {
+        tag: "div",
+        children: () => children,
+      })
       return () => {
         children = slots.default?.({ state: part.state })
         grouped = hasChild(children, TreeGroup) || undefined
         return part()
       }
     },
-  }),
+  })
 )
 
 /**
@@ -211,12 +263,15 @@ const TreeItems = defineComponent({
               TreeItemLabel,
               { href: item.href },
               item.href
-                ? { render: ({ props }: { props: Record<string, unknown> }) => h("a", props, item.label) }
-                : () => item.label,
+                ? {
+                    render: ({ props }: { props: Record<string, unknown> }) =>
+                      h("a", props, item.label),
+                  }
+                : () => item.label
             ),
             item.children && h(TreeGroup, null, () => render(item.children!)),
-          ],
-        ),
+          ]
+        )
       )
     return () => render(props.items)
   },
@@ -230,7 +285,15 @@ export {
   visibleTreeRows,
 } from "@ui-sdk/core/tree"
 
-export { Tree, TreeGroup, TreeItem, TreeItemCheckbox, TreeItemIndicator, TreeItemLabel, TreeItems }
+export {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemCheckbox,
+  TreeItemIndicator,
+  TreeItemLabel,
+  TreeItems,
+}
 
 export type {
   ListHighlightDetails,

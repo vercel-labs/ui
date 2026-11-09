@@ -18,7 +18,9 @@ function Example() {
           <NumberInputDecrement aria-label="Decrease font size">
             <MinusIcon aria-hidden="true" />
           </NumberInputDecrement>
-          <ToolbarInput render={<NumberInputControl aria-label="Font size" />} />
+          <ToolbarInput
+            render={<NumberInputControl aria-label="Font size" />}
+          />
           <NumberInputIncrement aria-label="Increase font size">
             <PlusIcon aria-hidden="true" />
           </NumberInputIncrement>

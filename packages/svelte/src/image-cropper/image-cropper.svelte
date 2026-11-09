@@ -16,7 +16,11 @@ The root: a group around the image and its controls, busy until the image loads.
   } from "@ui-sdk/core/image-cropper"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     src,
@@ -60,9 +64,15 @@ The root: a group around the image and its controls, busy until the image loads.
     /** Logs every crop change with its reason. */
     debug?: boolean
     /** Runs while the crop changes: on every step of a drag, a key or the wheel. `details.cancel()` keeps the crop. */
-    onCropChange?: (crop: Required<ImageCrop>, details: ImageCropperCropChangeDetails) => void
+    onCropChange?: (
+      crop: Required<ImageCrop>,
+      details: ImageCropperCropChangeDetails
+    ) => void
     /** Runs once an interaction that changed the crop ends. For saving. */
-    onCropCommit?: (crop: Required<ImageCrop>, details: ImageCropperCropCommitDetails) => void
+    onCropCommit?: (
+      crop: Required<ImageCrop>,
+      details: ImageCropperCropCommitDetails
+    ) => void
   } = $props()
 
   const id = $props.id()
@@ -82,10 +92,15 @@ The root: a group around the image and its controls, busy until the image loads.
     disabled,
     controller,
     debug,
-    onCropChange: (next: Required<ImageCrop>, details: ImageCropperCropChangeDetails) => {
+    onCropChange: (
+      next: Required<ImageCrop>,
+      details: ImageCropperCropChangeDetails
+    ) => {
       // The callback runs first, so canceling there also keeps a bound `crop` as it was.
       onCropChange?.(next, details)
-      if (!details.canceled) crop = next
+      if (!details.canceled) {
+        crop = next
+      }
     },
     onCropCommit,
   }))

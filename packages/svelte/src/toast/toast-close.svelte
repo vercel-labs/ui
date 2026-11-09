@@ -11,11 +11,18 @@ settles.
   import { useToast } from "./context"
 
   /** Closes the toast. With an `action`, runs it first, and a returned Promise keeps the toast open until it settles. */
-  let { action, ...rest }: PartProps<"button", ToastButtonState> & ToastCloseProps = $props()
+  let {
+    action,
+    ...rest
+  }: PartProps<"button", ToastButtonState> & ToastCloseProps = $props()
 
   const { region, toast } = useToast("ToastClose")
   const id = $props.id()
-  const close = useHandlePart(region, "close", () => ({ id, toast: toast().id, action }))
+  const close = useHandlePart(region, "close", () => ({
+    id,
+    toast: toast().id,
+    action,
+  }))
 </script>
 
 <Part tag="button" part={close} props={{ type: "button", ...rest }} />

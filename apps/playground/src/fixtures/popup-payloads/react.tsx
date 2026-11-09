@@ -1,7 +1,19 @@
 import { Dialog, DialogContent, DialogTrigger } from "@ui-sdk/react/dialog"
 import { Drawer, DrawerContent, DrawerTrigger } from "@ui-sdk/react/drawer"
-import { Menu, MenuContent, MenuGroup, MenuGroupLabel, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
-import { createPopoverController, Popover, PopoverContent, PopoverTrigger } from "@ui-sdk/react/popover"
+import {
+  Menu,
+  MenuContent,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@ui-sdk/react/popover"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import {
@@ -55,7 +67,11 @@ function Fixture() {
           {(state) => (
             <>
               {contentFor(state.payload)}
-              <button onClick={() => people.open({ payload: fixture.popover.show.payload })}>
+              <button
+                onClick={() =>
+                  people.open({ payload: fixture.popover.show.payload })
+                }
+              >
                 {fixture.popover.show.label}
               </button>
             </>
@@ -68,7 +84,9 @@ function Fixture() {
             {label}
           </DialogTrigger>
         ))}
-        <DialogContent className="dialog">{(state) => contentFor(state.payload)}</DialogContent>
+        <DialogContent className="dialog">
+          {(state) => contentFor(state.payload)}
+        </DialogContent>
       </Dialog>
       <Drawer modal={false} {...report("drawer")}>
         {fixture.drawer.triggers.map((label) => (
@@ -76,7 +94,9 @@ function Fixture() {
             {label}
           </DrawerTrigger>
         ))}
-        <DrawerContent className="drawer">{(state) => contentFor(state.payload)}</DrawerContent>
+        <DrawerContent className="drawer">
+          {(state) => contentFor(state.payload)}
+        </DrawerContent>
       </Drawer>
       <output role="status" aria-label="Last open">
         {lastOpen}
@@ -92,7 +112,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

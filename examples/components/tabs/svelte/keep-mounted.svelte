@@ -1,7 +1,13 @@
 <script lang="ts">
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Textarea } from "@ui-sdk/svelte/textarea"
-  import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/svelte/tabs"
+  import {
+    Tabs,
+    TabsIndicator,
+    TabsList,
+    TabsPanel,
+    TabsTab,
+  } from "@ui-sdk/svelte/tabs"
 </script>
 
 <Tabs defaultValue="reply">

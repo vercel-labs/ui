@@ -122,7 +122,9 @@ Use a button when clicking an avatar performs an action. Give it an accessible n
 <template>
   <Avatar @click="openProfile">
     <template #render="{ props, children }">
-      <button v-bind="props" type="button" aria-label="shadcn"><component :is="children" /></button>
+      <button v-bind="props" type="button" aria-label="shadcn">
+        <component :is="children" />
+      </button>
     </template>
     <AvatarImage src="https://github.com/shadcn.png" alt="" />
     <AvatarFallback aria-hidden="true">CN</AvatarFallback>
@@ -194,7 +196,10 @@ Props are the same as below, and callbacks are events.
 
 ### Avatar
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarOptions" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarOptions"
+/>
 
 ### AvatarImage
 
@@ -202,13 +207,19 @@ The image. Renders a real `img`, so the browser can fetch it before hydration, a
 
 ### AvatarFallback
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarFallbackProps" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarFallbackProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive. Every part gets the same state.
 
-<StateTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarState" />
+<StateTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarState"
+/>
 
 ### Reasons
 

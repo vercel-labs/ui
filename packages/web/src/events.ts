@@ -7,15 +7,24 @@ import type {
   TreeItemData,
   TreeValueChangeReason,
 } from "@ui-sdk/core/tree"
-import type { AccordionController, AccordionValueChangeReason } from "@ui-sdk/core/accordion"
+import type {
+  AccordionController,
+  AccordionValueChangeReason,
+} from "@ui-sdk/core/accordion"
 import type {
   CheckboxCheckedChangeReason,
   CheckboxController,
   CheckboxGroupController,
   CheckboxGroupValueChangeReason,
 } from "@ui-sdk/core/checkbox"
-import type { SwitchCheckedChangeReason, SwitchController } from "@ui-sdk/core/switch"
-import type { CollapsibleController, CollapsibleOpenChangeReason } from "@ui-sdk/core/collapsible"
+import type {
+  SwitchCheckedChangeReason,
+  SwitchController,
+} from "@ui-sdk/core/switch"
+import type {
+  CollapsibleController,
+  CollapsibleOpenChangeReason,
+} from "@ui-sdk/core/collapsible"
 import type {
   FileInputController,
   FileInputOptions,
@@ -61,21 +70,33 @@ import type {
   ImageCropperCropChangeDetails,
   ImageCropperCropCommitDetails,
 } from "@ui-sdk/core/image-cropper"
-import type { NavigationMenuController, NavigationMenuValueChangeReason } from "@ui-sdk/core/navigation-menu"
-import type { InputController, InputValueChangeReason } from "@ui-sdk/core/input"
+import type {
+  NavigationMenuController,
+  NavigationMenuValueChangeReason,
+} from "@ui-sdk/core/navigation-menu"
+import type {
+  InputController,
+  InputValueChangeReason,
+} from "@ui-sdk/core/input"
 import type {
   NumberInputController,
   NumberInputOptions,
   NumberInputValueChangeReason,
 } from "@ui-sdk/core/number-input"
-import type { OTPInputController, OTPInputValueChangeReason } from "@ui-sdk/core/otp-input"
+import type {
+  OTPInputController,
+  OTPInputValueChangeReason,
+} from "@ui-sdk/core/otp-input"
 import type {
   SliderController,
   SliderOptions,
   SliderValueChangeDetails,
   SliderValueCommitDetails,
 } from "@ui-sdk/core/slider"
-import type { PaginationController, PaginationPageChangeReason } from "@ui-sdk/core/pagination"
+import type {
+  PaginationController,
+  PaginationPageChangeReason,
+} from "@ui-sdk/core/pagination"
 import type {
   CalendarAnchorChangeReason,
   CalendarController,
@@ -95,16 +116,32 @@ import type {
   DatePickerValue,
   DatePickerValueChangeReason,
 } from "@ui-sdk/core/date-picker"
-import type { DateInputController, DateInputValueChangeReason } from "@ui-sdk/core/date-input"
-import type { TimeInputController, TimeInputValueChangeReason } from "@ui-sdk/core/time-input"
+import type {
+  DateInputController,
+  DateInputValueChangeReason,
+} from "@ui-sdk/core/date-input"
+import type {
+  TimeInputController,
+  TimeInputValueChangeReason,
+} from "@ui-sdk/core/time-input"
 import type {
   CarouselController,
   CarouselPageChangeReason,
   CarouselPlayingChangeReason,
 } from "@ui-sdk/core/carousel"
-import type { PasswordInputController, PasswordInputVisibleChangeReason } from "@ui-sdk/core/password-input"
-import type { ListboxController, ListboxOptions, ListboxValueChangeReason } from "@ui-sdk/core/listbox"
-import type { AvatarLoadingStatus, AvatarLoadingStatusChangeReason } from "@ui-sdk/core/avatar"
+import type {
+  PasswordInputController,
+  PasswordInputVisibleChangeReason,
+} from "@ui-sdk/core/password-input"
+import type {
+  ListboxController,
+  ListboxOptions,
+  ListboxValueChangeReason,
+} from "@ui-sdk/core/listbox"
+import type {
+  AvatarLoadingStatus,
+  AvatarLoadingStatusChangeReason,
+} from "@ui-sdk/core/avatar"
 import type { GaugeOptions } from "@ui-sdk/core/renderer"
 import type { MeterOptions } from "@ui-sdk/core/meter"
 import type {
@@ -113,8 +150,15 @@ import type {
   PopoverOpenChangeReason,
   PopoverPayloadChangeReason,
 } from "@ui-sdk/core/popover"
-import type { RadioGroupController, RadioGroupValueChangeReason } from "@ui-sdk/core/radio"
-import type { RatingController, RatingOptions, RatingValueChangeReason } from "@ui-sdk/core/rating"
+import type {
+  RadioGroupController,
+  RadioGroupValueChangeReason,
+} from "@ui-sdk/core/radio"
+import type {
+  RatingController,
+  RatingOptions,
+  RatingValueChangeReason,
+} from "@ui-sdk/core/rating"
 import type { ScrollAreaController } from "@ui-sdk/core/scroll-area"
 import type {
   SegmentedControlController,
@@ -262,7 +306,9 @@ import type {
 } from "@ui-sdk/core"
 
 // Omit for each member of a union, so a reason still narrows its event.
-type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown
+  ? Omit<T, K>
+  : never
 
 /**
  * What a change event carries in `detail`: the new `value`, and the change
@@ -270,10 +316,10 @@ type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K>
  * Checking `detail.reason` narrows `detail.event`, like in the other frameworks.
  * @stable
  */
-type UiChangeDetail<Value, Details extends { reason: string }> = DistributiveOmit<
-  Details,
-  "cancel" | "canceled"
-> & { value: Value }
+type UiChangeDetail<
+  Value,
+  Details extends { reason: string },
+> = DistributiveOmit<Details, "cancel" | "canceled"> & { value: Value }
 
 /**
  * A change event, like `openchange` or `valuechange`.
@@ -287,9 +333,10 @@ type UiChangeEvent<Value, Reason extends string = string> = CustomEvent<
  * A change event whose details carry more than the shared fields, like a menu's `checkedchange`.
  * @stable
  */
-type UiDetailedChangeEvent<Value, Details extends { reason: string }> = CustomEvent<
-  UiChangeDetail<Value, Details>
->
+type UiDetailedChangeEvent<
+  Value,
+  Details extends { reason: string },
+> = CustomEvent<UiChangeDetail<Value, Details>>
 
 /**
  * An `openchangecomplete` event: whether it opened or closed, once any animation finished.
@@ -301,7 +348,9 @@ type UiOpenChangeCompleteEvent = CustomEvent<{ value: boolean }>
  * A `dismissattempt` event: `dismissible` refused a dismissal, with its `reason` and `event` in `detail`.
  * @stable
  */
-type UiDismissAttemptEvent<Reason extends DismissAttemptReason> = CustomEvent<DismissAttemptDetails<Reason>>
+type UiDismissAttemptEvent<Reason extends DismissAttemptReason> = CustomEvent<
+  DismissAttemptDetails<Reason>
+>
 
 /**
  * An element's attribute options as properties, like `loop` on `<ui-tabs>`:
@@ -312,18 +361,24 @@ type UiDismissAttemptEvent<Reason extends DismissAttemptReason> = CustomEvent<Di
  */
 type AttributeProperties<P extends Primitive, Own extends string = never> = {
   -readonly [
-    K in keyof OptionsOf<P> & string as K extends Own | keyof HTMLElement | "id" | `on${string}`
+    K in keyof OptionsOf<P> & string as K extends
+      Own | keyof HTMLElement | "id" | `on${string}`
       ? never
-      : NonNullable<OptionsOf<P>[K]> extends string | number | boolean | readonly string[]
+      : NonNullable<OptionsOf<P>[K]> extends
+            string | number | boolean | readonly string[]
         ? K
         : never
-  ]-?: NonNullable<OptionsOf<P>[K]> extends boolean ? boolean : OptionsOf<P>[K] | undefined
+  ]-?: NonNullable<OptionsOf<P>[K]> extends boolean
+    ? boolean
+    : OptionsOf<P>[K] | undefined
 }
 
 // What an attribute of a part holds: the prop's text, number or list, the
 // boolean of a three-way one, like a field error's `match`, or the selector
 // that stands in for an element, like a popup's `container`.
-type AttributeValue<T> = [Extract<T, string | number | boolean | readonly string[]>] extends [never]
+type AttributeValue<T> = [
+  Extract<T, string | number | boolean | readonly string[]>,
+] extends [never]
   ? string
   : Extract<T, string | number | boolean | readonly string[]>
 
@@ -354,10 +409,15 @@ type ArgumentsDetail<Value, Rest extends unknown[]> = Rest extends []
     : { value: Value }
   : Rest[0] extends infer Details extends { reason: string }
     ? UiChangeDetail<Value, Details>
-    : DistributiveOmit<NonNullable<Rest[0]>, "cancel" | "canceled"> & { value: Value }
+    : DistributiveOmit<NonNullable<Rest[0]>, "cancel" | "canceled"> & {
+        value: Value
+      }
 
 // An action, a callback that returns `unknown` or may return a Promise, hands listeners `waitUntil()` too.
-type CallbackDetail<Callback> = Callback extends (value: infer Value, ...rest: infer Rest) => infer Result
+type CallbackDetail<Callback> = Callback extends (
+  value: infer Value,
+  ...rest: infer Rest
+) => infer Result
   ? unknown extends Result
     ? ArgumentsDetail<Value, Rest> & Pick<UiActionDetail, "waitUntil">
     : [Extract<Result, PromiseLike<unknown>>] extends [never]
@@ -372,7 +432,8 @@ type CallbackDetail<Callback> = Callback extends (value: infer Value, ...rest: i
  */
 type PartEvents<P extends Primitive, S extends SlotName<P>> = {
   [
-    K in keyof PropsOf<P, S> & string as K extends `on${infer Name extends Capitalize<string>}`
+    K in keyof PropsOf<P, S> &
+      string as K extends `on${infer Name extends Capitalize<string>}`
       ? Lowercase<Name>
       : never
   ]-?: CustomEvent<CallbackDetail<NonNullable<PropsOf<P, S>[K]>>>
@@ -423,7 +484,10 @@ interface FormAssociatedMembers {
 
 // A form-associated element's attribute options as properties, beside the
 // members a native control has.
-type FormControlProperties<P extends Primitive, Own extends string = never> = FormAssociatedMembers &
+type FormControlProperties<
+  P extends Primitive,
+  Own extends string = never,
+> = FormAssociatedMembers &
   AttributeProperties<P, Own | keyof FormAssociatedMembers>
 
 /**
@@ -435,32 +499,32 @@ interface UiElement<Events> extends HTMLElement {
   addEventListener<K extends keyof Events>(
     type: K,
     listener: (this: this, event: Events[K]) => unknown,
-    options?: boolean | AddEventListenerOptions,
+    options?: boolean | AddEventListenerOptions
   ): void
   addEventListener<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: (this: this, event: HTMLElementEventMap[K]) => unknown,
-    options?: boolean | AddEventListenerOptions,
+    options?: boolean | AddEventListenerOptions
   ): void
   addEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | AddEventListenerOptions,
+    options?: boolean | AddEventListenerOptions
   ): void
   removeEventListener<K extends keyof Events>(
     type: K,
     listener: (this: this, event: Events[K]) => unknown,
-    options?: boolean | EventListenerOptions,
+    options?: boolean | EventListenerOptions
   ): void
   removeEventListener<K extends keyof HTMLElementEventMap>(
     type: K,
     listener: (this: this, event: HTMLElementEventMap[K]) => unknown,
-    options?: boolean | EventListenerOptions,
+    options?: boolean | EventListenerOptions
   ): void
   removeEventListener(
     type: string,
     listener: EventListenerOrEventListenerObject,
-    options?: boolean | EventListenerOptions,
+    options?: boolean | EventListenerOptions
   ): void
 }
 
@@ -514,9 +578,13 @@ interface UiTooltipElement<Payload = unknown>
  * The events of `<ui-hover-card>`. `payloadchange` fires when another trigger's payload reaches the content.
  * @stable
  */
-type HoverCardEvents<Payload = unknown> = OpenEvents<HoverCardOpenChangeReason> & {
-  payloadchange: UiChangeEvent<Payload | undefined, HoverCardPayloadChangeReason>
-}
+type HoverCardEvents<Payload = unknown> =
+  OpenEvents<HoverCardOpenChangeReason> & {
+    payloadchange: UiChangeEvent<
+      Payload | undefined,
+      HoverCardPayloadChangeReason
+    >
+  }
 /**
  * `<ui-hover-card>`: `open`, the controller's methods on `api`, and typed events. `Payload` types its payload.
  * @stable
@@ -538,7 +606,11 @@ interface UiHoverCardElement<Payload = unknown>
 type MenuEvents<Payload = unknown> = OpenEvents<MenuOpenChangeReason> & {
   payloadchange: UiChangeEvent<Payload | undefined, MenuPayloadChangeReason>
   /** An item ran, with its value. Pass a Promise to `waitUntil()` to keep it pending, and the menu open, until it settles. */
-  action: CustomEvent<{ value: string; event?: Event; waitUntil: (promise: Promise<unknown>) => void }>
+  action: CustomEvent<{
+    value: string
+    event?: Event
+    waitUntil: (promise: Promise<unknown>) => void
+  }>
   checkedchange: UiDetailedChangeEvent<boolean, MenuCheckedChangeDetails>
   valuechange: UiDetailedChangeEvent<string, MenuValueChangeDetails>
   dismissattempt: UiDismissAttemptEvent<MenuDismissReason>
@@ -567,7 +639,12 @@ interface UiMenuSubElement
     UiElement<MenuEvents>,
     AttributeProperties<
       typeof menu,
-      "container" | "dismissible" | "modal" | "open" | "presentation" | "shortcuts"
+      | "container"
+      | "dismissible"
+      | "modal"
+      | "open"
+      | "presentation"
+      | "shortcuts"
     > {
   open: boolean
   api: MenuController
@@ -602,9 +679,15 @@ interface UiDialogElement<Payload = unknown>
  * @stable
  */
 type AlertDialogEvents<Payload = unknown> = {
-  openchange: UiDetailedChangeEvent<boolean, DialogOpenChangeDetails<AlertDialogOpenChangeReason>>
+  openchange: UiDetailedChangeEvent<
+    boolean,
+    DialogOpenChangeDetails<AlertDialogOpenChangeReason>
+  >
   openchangecomplete: UiOpenChangeCompleteEvent
-  payloadchange: UiChangeEvent<Payload | undefined, AlertDialogPayloadChangeReason>
+  payloadchange: UiChangeEvent<
+    Payload | undefined,
+    AlertDialogPayloadChangeReason
+  >
   dismissattempt: CustomEvent<DialogDismissAttemptDetails>
 }
 /**
@@ -625,7 +708,10 @@ interface UiAlertDialogElement<Payload = unknown>
  * @stable
  */
 type DrawerEvents<Payload = unknown> = {
-  openchange: UiDetailedChangeEvent<boolean, DialogOpenChangeDetails<DrawerOpenChangeReason>>
+  openchange: UiDetailedChangeEvent<
+    boolean,
+    DialogOpenChangeDetails<DrawerOpenChangeReason>
+  >
   openchangecomplete: UiOpenChangeCompleteEvent
   payloadchange: UiChangeEvent<Payload | undefined, DrawerPayloadChangeReason>
   snappointchange: UiChangeEvent<SnapPoint, DrawerSnapPointChangeReason>
@@ -639,7 +725,10 @@ interface UiDrawerElement<Payload = unknown>
   extends
     UiElement<DrawerEvents<Payload>>,
     Pick<DrawerOptions, "physics" | "snapPoints">,
-    AttributeProperties<typeof drawer, "api" | "controller" | "open" | "snapPoint"> {
+    AttributeProperties<
+      typeof drawer,
+      "api" | "controller" | "open" | "snapPoint"
+    > {
   open: boolean
   snapPoint: SnapPoint | null
   api: DrawerController<Payload>
@@ -656,7 +745,9 @@ type CollapsibleEvents = OpenEvents<CollapsibleOpenChangeReason>
  * @stable
  */
 interface UiCollapsibleElement
-  extends UiElement<CollapsibleEvents>, AttributeProperties<typeof collapsible, "api" | "open"> {
+  extends
+    UiElement<CollapsibleEvents>,
+    AttributeProperties<typeof collapsible, "api" | "open"> {
   open: boolean
   api: CollapsibleController
 }
@@ -673,7 +764,9 @@ type AccordionEvents = OpenEvents<AccordionValueChangeReason> & {
  * @stable
  */
 interface UiAccordionElement
-  extends UiElement<AccordionEvents>, AttributeProperties<typeof accordion, "api" | "value"> {
+  extends
+    UiElement<AccordionEvents>,
+    AttributeProperties<typeof accordion, "api" | "value"> {
   value: string[]
   api: AccordionController
 }
@@ -682,12 +775,17 @@ interface UiAccordionElement
  * The events of `<ui-tabs>`.
  * @stable
  */
-type TabsEvents = { valuechange: UiChangeEvent<string | null, TabsValueChangeReason> }
+type TabsEvents = {
+  valuechange: UiChangeEvent<string | null, TabsValueChangeReason>
+}
 /**
  * `<ui-tabs>`: `value` and typed events.
  * @stable
  */
-interface UiTabsElement extends UiElement<TabsEvents>, AttributeProperties<typeof tabs, "api" | "value"> {
+interface UiTabsElement
+  extends
+    UiElement<TabsEvents>,
+    AttributeProperties<typeof tabs, "api" | "value"> {
   value: string | null
   api: TabsController
 }
@@ -719,7 +817,10 @@ interface UiNavigationMenuElement
  */
 type ResizableEvents = {
   layoutchange: UiChangeEvent<number[], ResizableLayoutChangeReason>
-  layoutcommit: UiDetailedChangeEvent<number[], CommitDetails<ResizableLayoutChangeReason>>
+  layoutcommit: UiDetailedChangeEvent<
+    number[],
+    CommitDetails<ResizableLayoutChangeReason>
+  >
 }
 /**
  * `<ui-resizable>`: `layout`, the controller's methods on `api`, and typed events.
@@ -728,7 +829,10 @@ type ResizableEvents = {
 interface UiResizableElement
   extends
     UiElement<ResizableEvents>,
-    AttributeProperties<typeof resizable, "api" | "controller" | "layout" | "storage"> {
+    AttributeProperties<
+      typeof resizable,
+      "api" | "controller" | "layout" | "storage"
+    > {
   layout: number[]
   /** Where `auto-save-id` saves, instead of `localStorage`. */
   storage?: ResizableStorage
@@ -741,14 +845,19 @@ interface UiResizableElement
  * @stable
  */
 type CheckboxEvents = {
-  checkedchange: UiChangeEvent<boolean | "indeterminate", CheckboxCheckedChangeReason>
+  checkedchange: UiChangeEvent<
+    boolean | "indeterminate",
+    CheckboxCheckedChangeReason
+  >
 }
 /**
  * `<ui-checkbox>`: `checked`, the controller's methods on `api`, form members like a native input, and typed events.
  * @stable
  */
 interface UiCheckboxElement
-  extends UiElement<CheckboxEvents>, FormControlProperties<typeof checkbox, "api" | "checked"> {
+  extends
+    UiElement<CheckboxEvents>,
+    FormControlProperties<typeof checkbox, "api" | "checked"> {
   checked: boolean | "indeterminate"
   api: CheckboxController
 }
@@ -765,7 +874,9 @@ type SwitchEvents = {
  * @stable
  */
 interface UiSwitchElement
-  extends UiElement<SwitchEvents>, FormControlProperties<typeof switchPrimitive, "api" | "checked"> {
+  extends
+    UiElement<SwitchEvents>,
+    FormControlProperties<typeof switchPrimitive, "api" | "checked"> {
   checked: boolean
   api: SwitchController
 }
@@ -774,13 +885,17 @@ interface UiSwitchElement
  * The events of `<ui-checkbox-group>`.
  * @stable
  */
-type CheckboxGroupEvents = { valuechange: UiChangeEvent<string[], CheckboxGroupValueChangeReason> }
+type CheckboxGroupEvents = {
+  valuechange: UiChangeEvent<string[], CheckboxGroupValueChangeReason>
+}
 /**
  * `<ui-checkbox-group>`: `value`, form members like a native input, and typed events.
  * @stable
  */
 interface UiCheckboxGroupElement
-  extends UiElement<CheckboxGroupEvents>, FormControlProperties<typeof checkboxGroup, "api" | "value"> {
+  extends
+    UiElement<CheckboxGroupEvents>,
+    FormControlProperties<typeof checkboxGroup, "api" | "value"> {
   value: string[]
   api: CheckboxGroupController
 }
@@ -789,13 +904,17 @@ interface UiCheckboxGroupElement
  * The events of `<ui-radio-group>`.
  * @stable
  */
-type RadioGroupEvents = { valuechange: UiChangeEvent<string | null, RadioGroupValueChangeReason> }
+type RadioGroupEvents = {
+  valuechange: UiChangeEvent<string | null, RadioGroupValueChangeReason>
+}
 /**
  * `<ui-radio-group>`: `value`, form members like a native input, and typed events.
  * @stable
  */
 interface UiRadioGroupElement
-  extends UiElement<RadioGroupEvents>, FormControlProperties<typeof radioGroup, "api" | "value"> {
+  extends
+    UiElement<RadioGroupEvents>,
+    FormControlProperties<typeof radioGroup, "api" | "value"> {
   value: string | null
   api: RadioGroupController
 }
@@ -813,7 +932,9 @@ interface UiRadioElement
  * The events of `<ui-rating>`.
  * @experimental
  */
-type RatingEvents = { valuechange: UiChangeEvent<number | null, RatingValueChangeReason> }
+type RatingEvents = {
+  valuechange: UiChangeEvent<number | null, RatingValueChangeReason>
+}
 /**
  * `<ui-rating>`: `value`, `getValueLabel`, form members like a native input, and typed events.
  * @experimental
@@ -839,7 +960,9 @@ type SegmentedControlEvents = {
  * @experimental
  */
 interface UiSegmentedControlElement
-  extends UiElement<SegmentedControlEvents>, FormControlProperties<typeof segmentedControl, "api" | "value"> {
+  extends
+    UiElement<SegmentedControlEvents>,
+    FormControlProperties<typeof segmentedControl, "api" | "value"> {
   value: string | null
   api: SegmentedControlController
 }
@@ -858,12 +981,17 @@ interface UiSegmentedControlItemElement
  * The events of `<ui-input>` and `<ui-textarea>`.
  * @stable
  */
-type InputEvents = { valuechange: UiChangeEvent<string, InputValueChangeReason> }
+type InputEvents = {
+  valuechange: UiChangeEvent<string, InputValueChangeReason>
+}
 /**
  * `<ui-input>`: `value`, the controller's methods on `api`, and typed events.
  * @stable
  */
-interface UiInputElement extends UiElement<InputEvents>, AttributeProperties<typeof input, "api" | "value"> {
+interface UiInputElement
+  extends
+    UiElement<InputEvents>,
+    AttributeProperties<typeof input, "api" | "value"> {
   value: string
   api: InputController
 }
@@ -873,7 +1001,9 @@ interface UiInputElement extends UiElement<InputEvents>, AttributeProperties<typ
  * @stable
  */
 interface UiTextareaElement
-  extends UiElement<InputEvents>, AttributeProperties<typeof textarea, "api" | "value"> {
+  extends
+    UiElement<InputEvents>,
+    AttributeProperties<typeof textarea, "api" | "value"> {
   value: string
   api: InputController
 }
@@ -893,7 +1023,10 @@ type PasswordInputEvents = {
 interface UiPasswordInputElement
   extends
     UiElement<PasswordInputEvents>,
-    AttributeProperties<typeof passwordInput, "api" | "controller" | "value" | "visible"> {
+    AttributeProperties<
+      typeof passwordInput,
+      "api" | "controller" | "value" | "visible"
+    > {
   value: string
   visible: boolean
   api: PasswordInputController
@@ -916,7 +1049,10 @@ interface UiListboxElement
   extends
     UiElement<ListboxEvents>,
     Pick<ListboxOptions<unknown>, "itemToValue" | "isItemEqualToValue">,
-    FormControlProperties<typeof listbox, "api" | "controller" | "items" | "value"> {
+    FormControlProperties<
+      typeof listbox,
+      "api" | "controller" | "items" | "value"
+    > {
   /** The selected value. A string names an item by its key, comma-separated with `multiple`. */
   value: unknown
   /** The items as data. Renders them for you. */
@@ -942,7 +1078,10 @@ type CarouselEvents = {
 interface UiCarouselElement
   extends
     UiElement<CarouselEvents>,
-    AttributeProperties<typeof carousel, "api" | "controller" | "page" | "playing"> {
+    AttributeProperties<
+      typeof carousel,
+      "api" | "controller" | "page" | "playing"
+    > {
   page: number
   playing: boolean
   api: CarouselController
@@ -953,7 +1092,9 @@ interface UiCarouselElement
  * The events of `<ui-pagination>`.
  * @stable
  */
-type PaginationEvents = { pagechange: UiChangeEvent<number, PaginationPageChangeReason> }
+type PaginationEvents = {
+  pagechange: UiChangeEvent<number, PaginationPageChangeReason>
+}
 /**
  * `<ui-pagination>`: `page`, the controller's methods on `api`, and typed events.
  * @stable
@@ -961,7 +1102,10 @@ type PaginationEvents = { pagechange: UiChangeEvent<number, PaginationPageChange
 interface UiPaginationElement
   extends
     UiElement<PaginationEvents>,
-    AttributeProperties<typeof pagination, "api" | "controller" | "getHref" | "page"> {
+    AttributeProperties<
+      typeof pagination,
+      "api" | "controller" | "getHref" | "page"
+    > {
   page: number
   api: PaginationController
   controller?: PaginationController
@@ -986,7 +1130,10 @@ type CalendarEvents = {
 interface UiCalendarElement
   extends
     UiElement<CalendarEvents>,
-    AttributeProperties<typeof calendar, "api" | "controller" | "month" | "unavailable" | "value"> {
+    AttributeProperties<
+      typeof calendar,
+      "api" | "controller" | "month" | "unavailable" | "value"
+    > {
   value: CalendarValue
   month: ISOMonth
   api: CalendarController
@@ -1038,7 +1185,10 @@ type DateInputEvents = {
 interface UiDateInputElement
   extends
     UiElement<DateInputEvents>,
-    FormControlProperties<typeof dateInput, "api" | "controller" | "unavailable" | "value"> {
+    FormControlProperties<
+      typeof dateInput,
+      "api" | "controller" | "unavailable" | "value"
+    > {
   value: string | null
   api: DateInputController
   controller?: DateInputController
@@ -1072,14 +1222,19 @@ interface UiTimeInputElement
  */
 type OTPInputEvents = {
   valuechange: UiChangeEvent<string, OTPInputValueChangeReason>
-  valuecommit: UiDetailedChangeEvent<string, CommitDetails<OTPInputValueChangeReason>>
+  valuecommit: UiDetailedChangeEvent<
+    string,
+    CommitDetails<OTPInputValueChangeReason>
+  >
 }
 /**
  * `<ui-otp-input>`: `value`, the controller's methods on `api`, and typed events.
  * @stable
  */
 interface UiOTPInputElement
-  extends UiElement<OTPInputEvents>, AttributeProperties<typeof otpInput, "api" | "value"> {
+  extends
+    UiElement<OTPInputEvents>,
+    AttributeProperties<typeof otpInput, "api" | "value"> {
   value: string
   api: OTPInputController
 }
@@ -1089,8 +1244,14 @@ interface UiOTPInputElement
  * @stable
  */
 type SliderEvents = {
-  valuechange: UiDetailedChangeEvent<number | number[], SliderValueChangeDetails>
-  valuecommit: UiDetailedChangeEvent<number | number[], SliderValueCommitDetails>
+  valuechange: UiDetailedChangeEvent<
+    number | number[],
+    SliderValueChangeDetails
+  >
+  valuecommit: UiDetailedChangeEvent<
+    number | number[],
+    SliderValueCommitDetails
+  >
 }
 /**
  * `<ui-slider>`: `value`, the controller's methods on `api`, form members like a native input, and typed events.
@@ -1133,7 +1294,10 @@ interface UiColorPickerElement
  */
 type NumberInputEvents = {
   valuechange: UiChangeEvent<number | null, NumberInputValueChangeReason>
-  valuecommit: UiDetailedChangeEvent<number | null, CommitDetails<NumberInputValueChangeReason>>
+  valuecommit: UiDetailedChangeEvent<
+    number | null,
+    CommitDetails<NumberInputValueChangeReason>
+  >
 }
 /**
  * `<ui-number-input>`: `value`, the controller's methods on `api`, form members like a native input, and typed events.
@@ -1154,14 +1318,20 @@ interface UiNumberInputElement
  * @stable
  */
 interface UiGaugeElement
-  extends HTMLElement, AttributeProperties<typeof progress>, Pick<GaugeOptions, "format" | "getValueLabel"> {}
+  extends
+    HTMLElement,
+    AttributeProperties<typeof progress>,
+    Pick<GaugeOptions, "format" | "getValueLabel"> {}
 
 /**
  * `<ui-meter>`: the options attributes can't hold, as properties.
  * @stable
  */
 interface UiMeterElement
-  extends HTMLElement, AttributeProperties<typeof meter>, Pick<MeterOptions, "format" | "getValueLabel"> {}
+  extends
+    HTMLElement,
+    AttributeProperties<typeof meter>,
+    Pick<MeterOptions, "format" | "getValueLabel"> {}
 
 /**
  * `<ui-separator>`: `orientation` and `decorative` as properties.
@@ -1177,13 +1347,15 @@ interface UiSeparatorElement
  * `<ui-label>`: its options as properties.
  * @experimental
  */
-interface UiLabelElement extends HTMLElement, AttributeProperties<typeof label> {}
+interface UiLabelElement
+  extends HTMLElement, AttributeProperties<typeof label> {}
 
 /**
  * `<ui-field>`: `invalid` as a property, three-way like the attribute.
  * @stable
  */
-interface UiFieldElement extends HTMLElement, AttributeProperties<typeof field, "invalid"> {
+interface UiFieldElement
+  extends HTMLElement, AttributeProperties<typeof field, "invalid"> {
   /**
    * `true` shows the field invalid, `false` shows no errors whatever the
    * browser thinks, and `undefined` hands it back to the browser's own
@@ -1196,26 +1368,31 @@ interface UiFieldElement extends HTMLElement, AttributeProperties<typeof field, 
  * `<ui-field-set>`: `disabled` as a property.
  * @stable
  */
-interface UiFieldSetElement extends HTMLElement, AttributeProperties<typeof fieldSet> {}
+interface UiFieldSetElement
+  extends HTMLElement, AttributeProperties<typeof fieldSet> {}
 
 /**
  * `<ui-field-group>`: its options as properties.
  * @stable
  */
-interface UiFieldGroupElement extends HTMLElement, AttributeProperties<typeof fieldGroup> {}
+interface UiFieldGroupElement
+  extends HTMLElement, AttributeProperties<typeof fieldGroup> {}
 
 /**
  * `<ui-input-group>`: its options as properties.
  * @stable
  */
-interface UiInputGroupElement extends HTMLElement, AttributeProperties<typeof inputGroup> {}
+interface UiInputGroupElement
+  extends HTMLElement, AttributeProperties<typeof inputGroup> {}
 
 /**
  * `<ui-scroll-area>`: the controller's methods on `api`, like `el.api.scrollToEnd()`.
  * @stable
  */
 interface UiScrollAreaElement
-  extends HTMLElement, AttributeProperties<typeof scrollArea, "api" | "controller"> {
+  extends
+    HTMLElement,
+    AttributeProperties<typeof scrollArea, "api" | "controller"> {
   api: ScrollAreaController
   controller?: ScrollAreaController
 }
@@ -1225,22 +1402,33 @@ interface UiScrollAreaElement
  * @stable
  */
 type AvatarEvents = {
-  loadingstatuschange: UiChangeEvent<AvatarLoadingStatus, AvatarLoadingStatusChangeReason>
+  loadingstatuschange: UiChangeEvent<
+    AvatarLoadingStatus,
+    AvatarLoadingStatusChangeReason
+  >
 }
 /**
  * `<ui-avatar>`: typed events.
  * @stable
  */
 interface UiAvatarElement
-  extends UiElement<AvatarEvents>, AttributeProperties<typeof avatar, "api" | "pressed"> {}
+  extends
+    UiElement<AvatarEvents>,
+    AttributeProperties<typeof avatar, "api" | "pressed"> {}
 
 /**
  * The events of `<ui-image-cropper>`. `cropchange` fires on every step of a drag, and `cropcommit` once the interaction ends.
  * @experimental
  */
 type ImageCropperEvents = {
-  cropchange: UiDetailedChangeEvent<Required<ImageCrop>, ImageCropperCropChangeDetails>
-  cropcommit: UiDetailedChangeEvent<Required<ImageCrop>, ImageCropperCropCommitDetails>
+  cropchange: UiDetailedChangeEvent<
+    Required<ImageCrop>,
+    ImageCropperCropChangeDetails
+  >
+  cropcommit: UiDetailedChangeEvent<
+    Required<ImageCrop>,
+    ImageCropperCropCommitDetails
+  >
 }
 /**
  * `<ui-image-cropper>`: `crop`, the controller's methods on `api`, and typed events.
@@ -1265,19 +1453,25 @@ type ButtonEvents = ActionEvents
  * @stable
  */
 interface UiButtonElement
-  extends UiElement<ButtonEvents>, AttributeProperties<typeof button, "api" | "pressed"> {}
+  extends
+    UiElement<ButtonEvents>,
+    AttributeProperties<typeof button, "api" | "pressed"> {}
 
 /**
  * The events of `<ui-toggle>`.
  * @stable
  */
-type ToggleEvents = { pressedchange: UiChangeEvent<boolean, TogglePressedChangeReason> }
+type ToggleEvents = {
+  pressedchange: UiChangeEvent<boolean, TogglePressedChangeReason>
+}
 /**
  * `<ui-toggle>`: `pressed`, the controller's methods on `api`, and typed events.
  * @stable
  */
 interface UiToggleElement
-  extends UiElement<ToggleEvents>, AttributeProperties<typeof toggle, "api" | "pressed"> {
+  extends
+    UiElement<ToggleEvents>,
+    AttributeProperties<typeof toggle, "api" | "pressed"> {
   pressed: boolean
   api: ToggleController
 }
@@ -1294,7 +1488,9 @@ type ToggleGroupEvents = ToggleEvents & {
  * @stable
  */
 interface UiToggleGroupElement
-  extends UiElement<ToggleGroupEvents>, AttributeProperties<typeof toggleGroup, "api" | "value"> {
+  extends
+    UiElement<ToggleGroupEvents>,
+    AttributeProperties<typeof toggleGroup, "api" | "value"> {
   value: string[]
   api: ToggleGroupController
 }
@@ -1303,7 +1499,8 @@ interface UiToggleGroupElement
  * `<ui-toolbar>`: the controller's methods on `api`.
  * @stable
  */
-interface UiToolbarElement extends UiElement<{}>, AttributeProperties<typeof toolbar> {
+interface UiToolbarElement
+  extends UiElement<{}>, AttributeProperties<typeof toolbar> {
   api: ToolbarController
 }
 
@@ -1311,7 +1508,8 @@ interface UiToolbarElement extends UiElement<{}>, AttributeProperties<typeof too
  * `<ui-toast-region>`: the toaster it shows, how toasts rendered from data look, and `api` to focus or pause it.
  * @stable
  */
-interface UiToastRegionElement extends UiElement<{}>, AttributeProperties<typeof toastRegion> {
+interface UiToastRegionElement
+  extends UiElement<{}>, AttributeProperties<typeof toastRegion> {
   /** Moves focus to the region, and pauses or resumes its toasts' timers for a reason. */
   api: Pick<TypesOf<typeof toastRegion>["api"], "focus" | "pause" | "resume">
   toaster?: Toaster<ToastContent>
@@ -1346,7 +1544,8 @@ interface UiOverlayHostElement extends HTMLElement {
  * `<ui-menubar>`: the controller's methods on `api`. Its menus fire their own events.
  * @stable
  */
-interface UiMenubarElement extends UiElement<{}>, AttributeProperties<typeof menubar> {
+interface UiMenubarElement
+  extends UiElement<{}>, AttributeProperties<typeof menubar> {
   api: MenubarController
 }
 
@@ -1382,11 +1581,24 @@ interface UiSelectElement
     UiElement<SelectEvents>,
     Pick<
       SelectOptions<unknown>,
-      "itemToValue" | "itemToLabel" | "isItemEqualToValue" | "filter" | "emptyItems" | "announcement"
+      | "itemToValue"
+      | "itemToLabel"
+      | "isItemEqualToValue"
+      | "filter"
+      | "emptyItems"
+      | "announcement"
     >,
     FormControlProperties<
       typeof select,
-      "announcement" | "emptyItems" | "filter" | "api" | "controller" | "items" | "open" | "query" | "value"
+      | "announcement"
+      | "emptyItems"
+      | "filter"
+      | "api"
+      | "controller"
+      | "items"
+      | "open"
+      | "query"
+      | "value"
     > {
   open: boolean
   /** The selected value. A string names an item by its key, comma-separated with `multiple`. */
@@ -1409,7 +1621,10 @@ type ComboboxEvents = OpenEvents<ComboboxOpenChangeReason> & {
   highlight: UiHighlightEvent
   loadmore: UiLoadMoreEvent
   /** The create part was chosen, with the text. Pass a Promise to `waitUntil()` to keep it pending until it settles. */
-  create: CustomEvent<{ value: string; waitUntil: (promise: Promise<unknown>) => void }>
+  create: CustomEvent<{
+    value: string
+    waitUntil: (promise: Promise<unknown>) => void
+  }>
   dismissattempt: UiDismissAttemptEvent<ComboboxDismissReason>
 }
 /**
@@ -1421,11 +1636,24 @@ interface UiComboboxElement
     UiElement<ComboboxEvents>,
     Pick<
       ComboboxOptions<unknown>,
-      "itemToValue" | "itemToLabel" | "isItemEqualToValue" | "filter" | "emptyItems" | "announcement"
+      | "itemToValue"
+      | "itemToLabel"
+      | "isItemEqualToValue"
+      | "filter"
+      | "emptyItems"
+      | "announcement"
     >,
     FormControlProperties<
       typeof combobox,
-      "announcement" | "emptyItems" | "filter" | "api" | "controller" | "items" | "open" | "query" | "value"
+      | "announcement"
+      | "emptyItems"
+      | "filter"
+      | "api"
+      | "controller"
+      | "items"
+      | "open"
+      | "query"
+      | "value"
     > {
   open: boolean
   /** The selected value. A string names an item by its key, comma-separated with `multiple`. */
@@ -1460,7 +1688,14 @@ interface UiAutocompleteElement
     Pick<AutocompleteOptions, "filter" | "emptyItems" | "announcement">,
     AttributeProperties<
       typeof autocomplete,
-      "announcement" | "emptyItems" | "filter" | "api" | "controller" | "items" | "open" | "value"
+      | "announcement"
+      | "emptyItems"
+      | "filter"
+      | "api"
+      | "controller"
+      | "items"
+      | "open"
+      | "value"
     > {
   open: boolean
   /** The text. */
@@ -1481,7 +1716,10 @@ type CommandEvents = {
   pageschange: UiChangeEvent<string[], CommandPagesChangeReason>
   loadmore: UiLoadMoreEvent
   /** A command ran, with its value. Pass a Promise to `waitUntil()` to keep it pending until it settles. */
-  action: CustomEvent<{ value: string; waitUntil: (promise: Promise<unknown>) => void }>
+  action: CustomEvent<{
+    value: string
+    waitUntil: (promise: Promise<unknown>) => void
+  }>
 }
 /**
  * `<ui-command>`: `value`, `query`, `pages`, rich options, the controller's methods on `api`, and typed events.
@@ -1493,7 +1731,15 @@ interface UiCommandElement
     Pick<CommandOptions, "filter" | "emptyItems" | "announcement">,
     AttributeProperties<
       typeof command,
-      "announcement" | "emptyItems" | "filter" | "api" | "controller" | "items" | "pages" | "query" | "value"
+      | "announcement"
+      | "emptyItems"
+      | "filter"
+      | "api"
+      | "controller"
+      | "items"
+      | "pages"
+      | "query"
+      | "value"
     > {
   /** The highlighted command's value. */
   value: string | null
@@ -1512,7 +1758,10 @@ interface UiCommandElement
  * @stable
  */
 type TokenInputEvents = {
-  valuechange: UiDetailedChangeEvent<TokenInputValue, TokenInputValueChangeDetails>
+  valuechange: UiDetailedChangeEvent<
+    TokenInputValue,
+    TokenInputValueChangeDetails
+  >
 }
 /**
  * `<ui-token-input>`: `value`, rich options as properties, the controller's methods on `api`, form members like a native input, and typed events.
@@ -1562,14 +1811,20 @@ type TriggerMenuEvents = {
   openchangecomplete: UiOpenChangeCompleteEvent
   querychange: UiDetailedChangeEvent<
     string,
-    ChangeDetails<TriggerMenuQueryChangeReason> & { trigger: string; argument?: string }
+    ChangeDetails<TriggerMenuQueryChangeReason> & {
+      trigger: string
+      argument?: string
+    }
   >
   /**
    * An item was chosen. `preventDefault()` skips the insertion, and `detail.waitUntil(promise)` inserts a pending token.
    * Not `select`, which the field fires for selected text.
    */
   itemselect: CustomEvent<
-    Omit<TriggerMenuSelectDetails<string>, "preventDefault" | "defaultPrevented"> & { value: string }
+    Omit<
+      TriggerMenuSelectDetails<string>,
+      "preventDefault" | "defaultPrevented"
+    > & { value: string }
   >
   dismissattempt: UiDismissAttemptEvent<TriggerMenuDismissReason>
 }
@@ -1580,7 +1835,10 @@ type TriggerMenuEvents = {
 interface UiTriggerMenuElement
   extends
     UiElement<TriggerMenuEvents>,
-    AttributeProperties<typeof triggerMenu, "api" | "controller" | "editor" | "open" | "triggers"> {
+    AttributeProperties<
+      typeof triggerMenu,
+      "api" | "controller" | "editor" | "open" | "triggers"
+    > {
   open: boolean
   /** The texts that open the menu, and what each one lists. */
   triggers?: TriggerDefinition<string>[]
@@ -1601,7 +1859,11 @@ type TreeEvents = {
   /** The keyboard moved focus to an item, with its row among the items that show, from 0. */
   highlight: CustomEvent<{ value: string; index: number; event?: Event }>
   /** An item was pressed, or Enter was pressed on it, with its value and the event behind it. Pass a Promise to `waitUntil()` to keep it pending until it settles. */
-  action: CustomEvent<{ value: string; event?: Event; waitUntil: (promise: Promise<unknown>) => void }>
+  action: CustomEvent<{
+    value: string
+    event?: Event
+    waitUntil: (promise: Promise<unknown>) => void
+  }>
 }
 /**
  * `<ui-tree>`: `value`, `expanded`, `checked`, rich options, the controller's methods on `api`, and typed events.
@@ -1633,7 +1895,10 @@ interface UiTreeElement
   /** Items from file paths. Renders them for you. */
   paths?: readonly string[]
   /** Loads a branch's children the first time it expands while it has none. */
-  loadChildren?: (value: string, details: { signal: AbortSignal }) => void | Promise<unknown>
+  loadChildren?: (
+    value: string,
+    details: { signal: AbortSignal }
+  ) => void | Promise<unknown>
   /** What screen readers hear when a branch expands, collapses, starts loading or fails to load. */
   announcement?: (change: TreeAnnouncement) => string | null | undefined
   api: TreeController
@@ -1708,18 +1973,40 @@ declare global {
     "ui-otp-input": UiOTPInputElement
     "ui-avatar": UiAvatarElement
     // The parts, by the slot they fill and the props they read.
-    "ui-accordion-item": UiPartElement<typeof accordion, "item", "value" | "disabled">
+    "ui-accordion-item": UiPartElement<
+      typeof accordion,
+      "item",
+      "value" | "disabled"
+    >
     "ui-accordion-header": UiPartElement<typeof accordion, "header">
-    "ui-accordion-trigger": UiPartElement<typeof accordion, "trigger", "disabled">
-    "ui-accordion-panel": UiPartElement<typeof accordion, "panel", "keepMounted" | "hiddenUntilFound">
+    "ui-accordion-trigger": UiPartElement<
+      typeof accordion,
+      "trigger",
+      "disabled"
+    >
+    "ui-accordion-panel": UiPartElement<
+      typeof accordion,
+      "panel",
+      "keepMounted" | "hiddenUntilFound"
+    >
     "ui-alert-dialog-trigger": UiPartElement<
       typeof alertDialog,
       "trigger",
       "disabled" | "shortcut",
       "payload"
     >
-    "ui-alert-dialog-close": UiPartElement<typeof alertDialog, "close", "value", never, ActionEvents>
-    "ui-alert-dialog-shortcut": UiPartElement<typeof alertDialog, "shortcut", "shortcut">
+    "ui-alert-dialog-close": UiPartElement<
+      typeof alertDialog,
+      "close",
+      "value",
+      never,
+      ActionEvents
+    >
+    "ui-alert-dialog-shortcut": UiPartElement<
+      typeof alertDialog,
+      "shortcut",
+      "shortcut"
+    >
     "ui-alert-dialog-backdrop": UiPartElement<typeof alertDialog, "backdrop">
     "ui-alert-dialog-content": UiPartElement<
       typeof alertDialog,
@@ -1727,11 +2014,18 @@ declare global {
       "container" | "initialFocus" | "finalFocus" | "keepMounted"
     >
     "ui-alert-dialog-title": UiPartElement<typeof alertDialog, "title">
-    "ui-alert-dialog-description": UiPartElement<typeof alertDialog, "description">
+    "ui-alert-dialog-description": UiPartElement<
+      typeof alertDialog,
+      "description"
+    >
     "ui-autocomplete-label": UiPartElement<typeof autocomplete, "label">
     "ui-autocomplete-input": UiPartElement<typeof autocomplete, "input">
     "ui-autocomplete-trigger": UiPartElement<typeof autocomplete, "trigger">
-    "ui-autocomplete-clear": UiPartElement<typeof autocomplete, "clear", "keepMounted">
+    "ui-autocomplete-clear": UiPartElement<
+      typeof autocomplete,
+      "clear",
+      "keepMounted"
+    >
     "ui-autocomplete-content": UiPartElement<
       typeof autocomplete,
       "content",
@@ -1752,9 +2046,16 @@ declare global {
       "value" | "label" | "keywords" | "disabled" | "index"
     >
     "ui-autocomplete-item-text": UiPartElement<typeof autocomplete, "item-text">
-    "ui-autocomplete-item-icon": UiPartElement<typeof autocomplete, "item-icon", "mirror">
+    "ui-autocomplete-item-icon": UiPartElement<
+      typeof autocomplete,
+      "item-icon",
+      "mirror"
+    >
     "ui-autocomplete-group": UiPartElement<typeof autocomplete, "group">
-    "ui-autocomplete-group-label": UiPartElement<typeof autocomplete, "group-label">
+    "ui-autocomplete-group-label": UiPartElement<
+      typeof autocomplete,
+      "group-label"
+    >
     "ui-autocomplete-separator": UiPartElement<typeof autocomplete, "separator">
     "ui-autocomplete-empty": UiPartElement<typeof autocomplete, "empty">
     "ui-autocomplete-status": UiPartElement<typeof autocomplete, "status">
@@ -1776,11 +2077,22 @@ declare global {
     "ui-carousel-previous": UiPartElement<typeof carousel, "previous">
     "ui-carousel-next": UiPartElement<typeof carousel, "next">
     "ui-carousel-play-toggle": UiPartElement<typeof carousel, "play-toggle">
-    "ui-carousel-indicator-group": UiPartElement<typeof carousel, "indicator-group">
+    "ui-carousel-indicator-group": UiPartElement<
+      typeof carousel,
+      "indicator-group"
+    >
     "ui-carousel-indicator": UiPartElement<typeof carousel, "indicator", "page">
-    "ui-checkbox-indicator": UiPartElement<typeof checkbox, "indicator", "keepMounted">
+    "ui-checkbox-indicator": UiPartElement<
+      typeof checkbox,
+      "indicator",
+      "keepMounted"
+    >
     "ui-collapsible-trigger": UiPartElement<typeof collapsible, "trigger">
-    "ui-collapsible-panel": UiPartElement<typeof collapsible, "panel", "keepMounted" | "hiddenUntilFound">
+    "ui-collapsible-panel": UiPartElement<
+      typeof collapsible,
+      "panel",
+      "keepMounted" | "hiddenUntilFound"
+    >
     "ui-combobox-label": UiPartElement<typeof combobox, "label">
     "ui-combobox-input": UiPartElement<typeof combobox, "input">
     "ui-combobox-trigger": UiPartElement<typeof combobox, "trigger">
@@ -1804,19 +2116,36 @@ declare global {
       "item",
       "label" | "keywords" | "disabled" | "index" | "value"
     >
-    "ui-combobox-item-indicator": UiPartElement<typeof combobox, "item-indicator", "keepMounted">
-    "ui-combobox-item-icon": UiPartElement<typeof combobox, "item-icon", "mirror">
+    "ui-combobox-item-indicator": UiPartElement<
+      typeof combobox,
+      "item-indicator",
+      "keepMounted"
+    >
+    "ui-combobox-item-icon": UiPartElement<
+      typeof combobox,
+      "item-icon",
+      "mirror"
+    >
     "ui-combobox-value-icon": UiPartElement<typeof combobox, "value-icon">
     "ui-combobox-group": UiPartElement<typeof combobox, "group">
     "ui-combobox-group-label": UiPartElement<typeof combobox, "group-label">
     "ui-combobox-separator": UiPartElement<typeof combobox, "separator">
     // Its `create` event fires on the combobox.
-    "ui-combobox-create": UiPartElement<typeof combobox, "create", "minLength", never, {}>
+    "ui-combobox-create": UiPartElement<
+      typeof combobox,
+      "create",
+      "minLength",
+      never,
+      {}
+    >
     "ui-combobox-empty": UiPartElement<typeof combobox, "empty">
     "ui-combobox-status": UiPartElement<typeof combobox, "status">
     "ui-combobox-chips": UiPartElement<typeof combobox, "chips">
     "ui-combobox-chip": UiPartElement<typeof combobox, "chip", "value">
-    "ui-combobox-chips-overflow": UiPartElement<typeof combobox, "chips-overflow">
+    "ui-combobox-chips-overflow": UiPartElement<
+      typeof combobox,
+      "chips-overflow"
+    >
     "ui-combobox-item-text": UiPartElement<typeof combobox, "item-text">
     "ui-combobox-select-all": UiPartElement<typeof combobox, "select-all">
     "ui-combobox-chip-remove": UiPartElement<typeof combobox, "chip-remove">
@@ -1827,7 +2156,13 @@ declare global {
     "ui-command-item": UiPartElement<
       typeof command,
       "item",
-      "value" | "label" | "keywords" | "disabled" | "shortcut" | "page" | "index"
+      | "value"
+      | "label"
+      | "keywords"
+      | "disabled"
+      | "shortcut"
+      | "page"
+      | "index"
     >
     "ui-command-shortcut": UiPartElement<typeof command, "shortcut", "shortcut">
     "ui-command-page": UiPartElement<typeof command, "page", "value">
@@ -1837,8 +2172,16 @@ declare global {
     "ui-command-separator": UiPartElement<typeof command, "separator">
     "ui-command-empty": UiPartElement<typeof command, "empty">
     "ui-command-status": UiPartElement<typeof command, "status">
-    "ui-date-input-segment": UiPartElement<typeof dateInput, "segment", "segment">
-    "ui-time-input-segment": UiPartElement<typeof timeInput, "segment", "segment">
+    "ui-date-input-segment": UiPartElement<
+      typeof dateInput,
+      "segment",
+      "segment"
+    >
+    "ui-time-input-segment": UiPartElement<
+      typeof timeInput,
+      "segment",
+      "segment"
+    >
     "ui-date-picker-input": UiPartElement<typeof datePicker, "input", "end">
     "ui-date-picker-trigger": UiPartElement<typeof datePicker, "trigger">
     "ui-date-picker-content": UiPartElement<
@@ -1858,8 +2201,19 @@ declare global {
     "ui-date-picker-hint": UiPartElement<typeof datePicker, "hint">
     "ui-date-picker-clear": UiPartElement<typeof datePicker, "clear">
     "ui-date-picker-preset": UiPartElement<typeof datePicker, "preset", "value">
-    "ui-dialog-trigger": UiPartElement<typeof dialog, "trigger", "disabled" | "shortcut", "payload">
-    "ui-dialog-close": UiPartElement<typeof dialog, "close", "value", never, ActionEvents>
+    "ui-dialog-trigger": UiPartElement<
+      typeof dialog,
+      "trigger",
+      "disabled" | "shortcut",
+      "payload"
+    >
+    "ui-dialog-close": UiPartElement<
+      typeof dialog,
+      "close",
+      "value",
+      never,
+      ActionEvents
+    >
     "ui-dialog-shortcut": UiPartElement<typeof dialog, "shortcut", "shortcut">
     "ui-dialog-backdrop": UiPartElement<typeof dialog, "backdrop">
     "ui-dialog-content": UiPartElement<
@@ -1869,8 +2223,19 @@ declare global {
     >
     "ui-dialog-title": UiPartElement<typeof dialog, "title">
     "ui-dialog-description": UiPartElement<typeof dialog, "description">
-    "ui-drawer-trigger": UiPartElement<typeof drawer, "trigger", "disabled" | "shortcut", "payload">
-    "ui-drawer-close": UiPartElement<typeof drawer, "close", "value", never, ActionEvents>
+    "ui-drawer-trigger": UiPartElement<
+      typeof drawer,
+      "trigger",
+      "disabled" | "shortcut",
+      "payload"
+    >
+    "ui-drawer-close": UiPartElement<
+      typeof drawer,
+      "close",
+      "value",
+      never,
+      ActionEvents
+    >
     "ui-drawer-shortcut": UiPartElement<typeof drawer, "shortcut", "shortcut">
     "ui-drawer-backdrop": UiPartElement<typeof drawer, "backdrop">
     "ui-drawer-viewport": UiPartElement<typeof drawer, "viewport">
@@ -1880,7 +2245,12 @@ declare global {
       "container" | "initialFocus" | "finalFocus" | "keepMounted"
     >
     "ui-drawer-handle": UiPartElement<typeof drawer, "handle">
-    "ui-drawer-outlet": UiPartElement<typeof drawer, "outlet", never, "keyframes">
+    "ui-drawer-outlet": UiPartElement<
+      typeof drawer,
+      "outlet",
+      never,
+      "keyframes"
+    >
     "ui-drawer-title": UiPartElement<typeof drawer, "title">
     "ui-drawer-description": UiPartElement<typeof drawer, "description">
     "ui-field-label": UiPartElement<typeof field, "label">
@@ -1888,19 +2258,39 @@ declare global {
     "ui-field-error": UiPartElement<typeof field, "error", "match">
     "ui-field-legend": UiPartElement<typeof fieldSet, "legend">
     "ui-file-input-trigger": UiPartElement<typeof fileInput, "trigger">
-    "ui-file-input-dropzone": UiPartElement<typeof fileInput, "dropzone", "target" | "pasteTarget">
+    "ui-file-input-dropzone": UiPartElement<
+      typeof fileInput,
+      "dropzone",
+      "target" | "pasteTarget"
+    >
     "ui-file-input-list": UiPartElement<typeof fileInput, "list">
     "ui-file-input-item": UiPartElement<typeof fileInput, "item", never, "file">
     "ui-file-input-item-remove": UiPartElement<typeof fileInput, "item-remove">
-    "ui-hover-card-trigger": UiPartElement<typeof hoverCard, "trigger", never, "payload">
+    "ui-hover-card-trigger": UiPartElement<
+      typeof hoverCard,
+      "trigger",
+      never,
+      "payload"
+    >
     "ui-image-cropper-viewport": UiPartElement<typeof imageCropper, "viewport">
     "ui-image-cropper-image": UiPartElement<typeof imageCropper, "image">
-    "ui-image-cropper-selection": UiPartElement<typeof imageCropper, "selection">
+    "ui-image-cropper-selection": UiPartElement<
+      typeof imageCropper,
+      "selection"
+    >
     "ui-image-cropper-grid": UiPartElement<typeof imageCropper, "grid">
-    "ui-image-cropper-handle": UiPartElement<typeof imageCropper, "handle", "position">
+    "ui-image-cropper-handle": UiPartElement<
+      typeof imageCropper,
+      "handle",
+      "position"
+    >
     "ui-image-cropper-zoom": UiPartElement<typeof imageCropper, "zoom">
     "ui-image-cropper-rotate": UiPartElement<typeof imageCropper, "rotate">
-    "ui-image-cropper-flip": UiPartElement<typeof imageCropper, "flip", "direction">
+    "ui-image-cropper-flip": UiPartElement<
+      typeof imageCropper,
+      "flip",
+      "direction"
+    >
     "ui-hover-card-content": UiPartElement<
       typeof hoverCard,
       "content",
@@ -1916,14 +2306,32 @@ declare global {
     >
     "ui-hover-card-arrow": UiPartElement<typeof hoverCard, "arrow">
     "ui-input-clear": UiPartElement<typeof inputGroup, "clear">
-    "ui-listbox-item": UiPartElement<typeof listbox, "item", "value" | "label" | "disabled" | "index">
-    "ui-listbox-item-indicator": UiPartElement<typeof listbox, "item-indicator", "keepMounted">
+    "ui-listbox-item": UiPartElement<
+      typeof listbox,
+      "item",
+      "value" | "label" | "disabled" | "index"
+    >
+    "ui-listbox-item-indicator": UiPartElement<
+      typeof listbox,
+      "item-indicator",
+      "keepMounted"
+    >
     "ui-listbox-item-icon": UiPartElement<typeof listbox, "item-icon", "mirror">
     "ui-listbox-group": UiPartElement<typeof listbox, "group">
     "ui-listbox-group-label": UiPartElement<typeof listbox, "group-label">
     "ui-listbox-separator": UiPartElement<typeof listbox, "separator">
-    "ui-menu-trigger": UiPartElement<typeof menu, "trigger", "disabled" | "shortcut", "payload">
-    "ui-menu-context-trigger": UiPartElement<typeof menu, "context-trigger", "disabled", "payload">
+    "ui-menu-trigger": UiPartElement<
+      typeof menu,
+      "trigger",
+      "disabled" | "shortcut",
+      "payload"
+    >
+    "ui-menu-context-trigger": UiPartElement<
+      typeof menu,
+      "context-trigger",
+      "disabled",
+      "payload"
+    >
     "ui-menu-content": UiPartElement<
       typeof menu,
       "content",
@@ -1949,24 +2357,47 @@ declare global {
       | "anchor"
       | "keepMounted"
     >
-    "ui-menu-sub-trigger": UiPartElement<typeof menu, "trigger", "disabled" | "shortcut", "payload">
+    "ui-menu-sub-trigger": UiPartElement<
+      typeof menu,
+      "trigger",
+      "disabled" | "shortcut",
+      "payload"
+    >
     "ui-menu-item": UiPartElement<
       typeof menu,
       "item",
-      "value" | "label" | "disabled" | "destructive" | "shortcut" | "closeOnSelect"
+      | "value"
+      | "label"
+      | "disabled"
+      | "destructive"
+      | "shortcut"
+      | "closeOnSelect"
     >
     "ui-menu-checkbox-item": UiPartElement<
       typeof menu,
       "checkbox-item",
-      "value" | "label" | "disabled" | "checked" | "defaultChecked" | "closeOnSelect"
+      | "value"
+      | "label"
+      | "disabled"
+      | "checked"
+      | "defaultChecked"
+      | "closeOnSelect"
     >
-    "ui-menu-radio-group": UiPartElement<typeof menu, "radio-group", "value" | "defaultValue">
+    "ui-menu-radio-group": UiPartElement<
+      typeof menu,
+      "radio-group",
+      "value" | "defaultValue"
+    >
     "ui-menu-radio-item": UiPartElement<
       typeof menu,
       "radio-item",
       "value" | "label" | "disabled" | "closeOnSelect"
     >
-    "ui-menu-item-indicator": UiPartElement<typeof menu, "item-indicator", "keepMounted">
+    "ui-menu-item-indicator": UiPartElement<
+      typeof menu,
+      "item-indicator",
+      "keepMounted"
+    >
     "ui-menu-group": UiPartElement<typeof menu, "group">
     "ui-menu-group-label": UiPartElement<typeof menu, "group-label">
     "ui-menu-separator": UiPartElement<typeof menu, "separator">
@@ -1977,8 +2408,16 @@ declare global {
     "ui-meter-label": UiPartElement<typeof meter, "label">
     "ui-meter-value": UiPartElement<typeof meter, "value">
     "ui-navigation-menu-list": UiPartElement<typeof navigationMenu, "list">
-    "ui-navigation-menu-item": UiPartElement<typeof navigationMenu, "item", "value">
-    "ui-navigation-menu-trigger": UiPartElement<typeof navigationMenu, "trigger", "disabled">
+    "ui-navigation-menu-item": UiPartElement<
+      typeof navigationMenu,
+      "item",
+      "value"
+    >
+    "ui-navigation-menu-trigger": UiPartElement<
+      typeof navigationMenu,
+      "trigger",
+      "disabled"
+    >
     "ui-navigation-menu-content": UiPartElement<
       typeof navigationMenu,
       "content",
@@ -1992,24 +2431,52 @@ declare global {
       | "keepMounted"
       | "hiddenUntilFound"
     >
-    "ui-navigation-menu-link": UiPartElement<typeof navigationMenu, "link", "current" | "closeOnSelect">
-    "ui-navigation-menu-link-icon": UiPartElement<typeof navigationMenu, "link-icon", "mirror">
+    "ui-navigation-menu-link": UiPartElement<
+      typeof navigationMenu,
+      "link",
+      "current" | "closeOnSelect"
+    >
+    "ui-navigation-menu-link-icon": UiPartElement<
+      typeof navigationMenu,
+      "link-icon",
+      "mirror"
+    >
     "ui-navigation-menu-viewport": UiPartElement<
       typeof navigationMenu,
       "viewport",
-      "side" | "align" | "sideOffset" | "alignOffset" | "collisionPadding" | "arrowPadding" | "anchor"
+      | "side"
+      | "align"
+      | "sideOffset"
+      | "alignOffset"
+      | "collisionPadding"
+      | "arrowPadding"
+      | "anchor"
     >
-    "ui-navigation-menu-indicator": UiPartElement<typeof navigationMenu, "indicator">
+    "ui-navigation-menu-indicator": UiPartElement<
+      typeof navigationMenu,
+      "indicator"
+    >
     "ui-number-input-group": UiPartElement<typeof numberInput, "group">
     "ui-number-input-control": UiPartElement<typeof numberInput, "control">
-    "ui-number-input-increment": UiPartElement<typeof numberInput, "increment", "disabled">
-    "ui-number-input-decrement": UiPartElement<typeof numberInput, "decrement", "disabled">
+    "ui-number-input-increment": UiPartElement<
+      typeof numberInput,
+      "increment",
+      "disabled"
+    >
+    "ui-number-input-decrement": UiPartElement<
+      typeof numberInput,
+      "decrement",
+      "disabled"
+    >
     "ui-number-input-scrub-area": UiPartElement<
       typeof numberInput,
       "scrub-area",
       "orientation" | "pixelsPerStep"
     >
-    "ui-number-input-scrub-area-cursor": UiPartElement<typeof numberInput, "scrub-area-cursor">
+    "ui-number-input-scrub-area-cursor": UiPartElement<
+      typeof numberInput,
+      "scrub-area-cursor"
+    >
     "ui-otp-input-control": UiPartElement<typeof otpInput, "control">
     "ui-otp-input-group": UiPartElement<typeof otpInput, "group">
     "ui-otp-input-slot": UiPartElement<typeof otpInput, "slot", "index">
@@ -2017,8 +2484,20 @@ declare global {
     "ui-toast": UiPartElement<typeof toastRegion, "root">
     "ui-toast-title": UiPartElement<typeof toastRegion, "title">
     "ui-toast-description": UiPartElement<typeof toastRegion, "description">
-    "ui-toast-action": UiPartElement<typeof toastRegion, "action", "dismiss", never, ActionEvents>
-    "ui-toast-close": UiPartElement<typeof toastRegion, "close", never, never, ActionEvents>
+    "ui-toast-action": UiPartElement<
+      typeof toastRegion,
+      "action",
+      "dismiss",
+      never,
+      ActionEvents
+    >
+    "ui-toast-close": UiPartElement<
+      typeof toastRegion,
+      "close",
+      never,
+      never,
+      ActionEvents
+    >
     "ui-pagination-list": UiPartElement<typeof pagination, "list">
     "ui-pagination-item": UiPartElement<typeof pagination, "item">
     "ui-pagination-link": UiPartElement<typeof pagination, "link", "page">
@@ -2028,7 +2507,12 @@ declare global {
     "ui-pagination-last": UiPartElement<typeof pagination, "last">
     "ui-pagination-ellipsis": UiPartElement<typeof pagination, "ellipsis">
     "ui-password-input-toggle": UiPartElement<typeof passwordInput, "toggle">
-    "ui-popover-trigger": UiPartElement<typeof popover, "trigger", "disabled" | "shortcut", "payload">
+    "ui-popover-trigger": UiPartElement<
+      typeof popover,
+      "trigger",
+      "disabled" | "shortcut",
+      "payload"
+    >
     "ui-popover-close": UiPartElement<typeof popover, "close">
     "ui-popover-shortcut": UiPartElement<typeof popover, "shortcut", "shortcut">
     "ui-popover-content": UiPartElement<
@@ -2053,9 +2537,17 @@ declare global {
     "ui-progress-indicator": UiPartElement<typeof progress, "indicator">
     "ui-progress-label": UiPartElement<typeof progress, "label">
     "ui-progress-value": UiPartElement<typeof progress, "value">
-    "ui-radio-indicator": UiPartElement<typeof radioGroup, "indicator", "keepMounted">
+    "ui-radio-indicator": UiPartElement<
+      typeof radioGroup,
+      "indicator",
+      "keepMounted"
+    >
     "ui-rating-item": UiPartElement<typeof rating, "item", "index">
-    "ui-rating-radio": UiPartElement<typeof rating, "radio", "value" | "disabled">
+    "ui-rating-radio": UiPartElement<
+      typeof rating,
+      "radio",
+      "value" | "disabled"
+    >
     "ui-resizable-panel": UiPartElement<
       typeof resizable,
       "panel",
@@ -2064,13 +2556,25 @@ declare global {
     "ui-resizable-handle": UiPartElement<typeof resizable, "handle", "disabled">
     "ui-scroll-area-viewport": UiPartElement<typeof scrollArea, "viewport">
     "ui-scroll-area-content": UiPartElement<typeof scrollArea, "content">
-    "ui-scroll-area-scrollbar": UiPartElement<typeof scrollArea, "scrollbar", "orientation">
+    "ui-scroll-area-scrollbar": UiPartElement<
+      typeof scrollArea,
+      "scrollbar",
+      "orientation"
+    >
     "ui-scroll-area-thumb": UiPartElement<typeof scrollArea, "thumb">
     "ui-scroll-area-corner": UiPartElement<typeof scrollArea, "corner">
-    "ui-scroll-area-scroll-to-end": UiPartElement<typeof scrollArea, "scroll-to-end">
+    "ui-scroll-area-scroll-to-end": UiPartElement<
+      typeof scrollArea,
+      "scroll-to-end"
+    >
     "ui-select-label": UiPartElement<typeof select, "label">
     "ui-select-trigger": UiPartElement<typeof select, "trigger", "disabled">
-    "ui-select-value": UiPartElement<typeof select, "value", "placeholder" | "maxLabels", "getMoreLabel">
+    "ui-select-value": UiPartElement<
+      typeof select,
+      "value",
+      "placeholder" | "maxLabels",
+      "getMoreLabel"
+    >
     "ui-select-clear": UiPartElement<typeof select, "clear", "keepMounted">
     "ui-select-content": UiPartElement<
       typeof select,
@@ -2092,8 +2596,17 @@ declare global {
     "ui-select-status": UiPartElement<typeof select, "status">
     "ui-select-item-text": UiPartElement<typeof select, "item-text">
     "ui-select-select-all": UiPartElement<typeof select, "select-all">
-    "ui-select-item": UiPartElement<typeof select, "item", "label" | "disabled" | "index", "value">
-    "ui-select-item-indicator": UiPartElement<typeof select, "item-indicator", "keepMounted">
+    "ui-select-item": UiPartElement<
+      typeof select,
+      "item",
+      "label" | "disabled" | "index",
+      "value"
+    >
+    "ui-select-item-indicator": UiPartElement<
+      typeof select,
+      "item-indicator",
+      "keepMounted"
+    >
     "ui-select-item-icon": UiPartElement<typeof select, "item-icon", "mirror">
     "ui-select-value-icon": UiPartElement<typeof select, "value-icon">
     "ui-select-group": UiPartElement<typeof select, "group">
@@ -2101,16 +2614,40 @@ declare global {
     "ui-select-separator": UiPartElement<typeof select, "separator">
     "ui-select-arrow": UiPartElement<typeof select, "arrow">
     "ui-color-picker-area": UiPartElement<typeof colorPicker, "area", "x" | "y">
-    "ui-color-picker-area-thumb": UiPartElement<typeof colorPicker, "area-thumb">
-    "ui-color-picker-area-canvas": UiPartElement<typeof colorPicker, "area-canvas">
-    "ui-color-picker-slider": UiPartElement<typeof colorPicker, "slider", "channel" | "orientation">
-    "ui-color-picker-slider-thumb": UiPartElement<typeof colorPicker, "slider-thumb">
+    "ui-color-picker-area-thumb": UiPartElement<
+      typeof colorPicker,
+      "area-thumb"
+    >
+    "ui-color-picker-area-canvas": UiPartElement<
+      typeof colorPicker,
+      "area-canvas"
+    >
+    "ui-color-picker-slider": UiPartElement<
+      typeof colorPicker,
+      "slider",
+      "channel" | "orientation"
+    >
+    "ui-color-picker-slider-thumb": UiPartElement<
+      typeof colorPicker,
+      "slider-thumb"
+    >
     "ui-color-picker-input": UiPartElement<typeof colorPicker, "input">
-    "ui-color-picker-channel-input": UiPartElement<typeof colorPicker, "channel-input", "channel">
+    "ui-color-picker-channel-input": UiPartElement<
+      typeof colorPicker,
+      "channel-input",
+      "channel"
+    >
     "ui-color-picker-swatch": UiPartElement<typeof colorPicker, "swatch">
-    "ui-color-picker-eye-dropper": UiPartElement<typeof colorPicker, "eye-dropper">
+    "ui-color-picker-eye-dropper": UiPartElement<
+      typeof colorPicker,
+      "eye-dropper"
+    >
     "ui-color-picker-swatches": UiPartElement<typeof colorPicker, "swatches">
-    "ui-color-picker-swatch-item": UiPartElement<typeof colorPicker, "swatch-item", "value">
+    "ui-color-picker-swatch-item": UiPartElement<
+      typeof colorPicker,
+      "swatch-item",
+      "value"
+    >
     "ui-slider-control": UiPartElement<typeof slider, "control">
     "ui-slider-track": UiPartElement<typeof slider, "track">
     "ui-slider-indicator": UiPartElement<typeof slider, "indicator">
@@ -2118,22 +2655,50 @@ declare global {
     "ui-slider-thumb-input": UiPartElement<typeof slider, "thumb-input">
     "ui-slider-value": UiPartElement<typeof slider, "value">
     "ui-switch-thumb": UiPartElement<typeof switchPrimitive, "thumb">
-    "ui-segmented-control-indicator": UiPartElement<typeof segmentedControl, "indicator">
+    "ui-segmented-control-indicator": UiPartElement<
+      typeof segmentedControl,
+      "indicator"
+    >
     "ui-tabs-list": UiPartElement<typeof tabs, "list">
     "ui-tabs-tab": UiPartElement<typeof tabs, "tab", "value" | "disabled">
     "ui-tabs-tab-icon": UiPartElement<typeof tabs, "tab-icon", "mirror">
     "ui-tabs-indicator": UiPartElement<typeof tabs, "indicator">
-    "ui-tabs-panel": UiPartElement<typeof tabs, "panel", "value" | "keepMounted" | "hiddenUntilFound">
+    "ui-tabs-panel": UiPartElement<
+      typeof tabs,
+      "panel",
+      "value" | "keepMounted" | "hiddenUntilFound"
+    >
     "ui-toggle-icon": UiPartElement<typeof toggle, "icon", "mirror">
-    "ui-token-input-editor": UiPartElement<typeof tokenInput, "editor", "placeholder">
+    "ui-token-input-editor": UiPartElement<
+      typeof tokenInput,
+      "editor",
+      "placeholder"
+    >
     "ui-token-input-token": UiPartElement<typeof tokenInput, "token", "token">
-    "ui-token-input-token-remove": UiPartElement<typeof tokenInput, "token-remove", "token">
-    "ui-toolbar-button": UiPartElement<typeof toolbar, "button", "disabled" | "focusableWhenDisabled">
-    "ui-toolbar-input": UiPartElement<typeof toolbar, "input", "disabled" | "focusableWhenDisabled">
+    "ui-token-input-token-remove": UiPartElement<
+      typeof tokenInput,
+      "token-remove",
+      "token"
+    >
+    "ui-toolbar-button": UiPartElement<
+      typeof toolbar,
+      "button",
+      "disabled" | "focusableWhenDisabled"
+    >
+    "ui-toolbar-input": UiPartElement<
+      typeof toolbar,
+      "input",
+      "disabled" | "focusableWhenDisabled"
+    >
     "ui-toolbar-link": UiPartElement<typeof toolbar, "link">
     "ui-toolbar-group": UiPartElement<typeof toolbar, "group", "disabled">
     "ui-toolbar-separator": UiPartElement<typeof toolbar, "separator">
-    "ui-tooltip-trigger": UiPartElement<typeof tooltip, "trigger", never, "payload">
+    "ui-tooltip-trigger": UiPartElement<
+      typeof tooltip,
+      "trigger",
+      never,
+      "payload"
+    >
     "ui-tooltip-content": UiPartElement<
       typeof tooltip,
       "content",
@@ -2148,11 +2713,19 @@ declare global {
     >
     "ui-tooltip-arrow": UiPartElement<typeof tooltip, "arrow">
     "ui-tooltip-shortcut": UiPartElement<typeof tooltip, "shortcut", "shortcut">
-    "ui-tree-item": UiPartElement<typeof tree, "item", "value" | "branch" | "disabled" | "label">
+    "ui-tree-item": UiPartElement<
+      typeof tree,
+      "item",
+      "value" | "branch" | "disabled" | "label"
+    >
     "ui-tree-item-label": UiPartElement<typeof tree, "label">
     "ui-tree-item-indicator": UiPartElement<typeof tree, "indicator">
     "ui-tree-item-checkbox": UiPartElement<typeof tree, "checkbox">
-    "ui-tree-group": UiPartElement<typeof tree, "group", "keepMounted" | "hiddenUntilFound">
+    "ui-tree-group": UiPartElement<
+      typeof tree,
+      "group",
+      "keepMounted" | "hiddenUntilFound"
+    >
     "ui-trigger-menu-input": UiPartElement<typeof triggerMenu, "input">
     "ui-trigger-menu-content": UiPartElement<
       typeof triggerMenu,
@@ -2176,9 +2749,16 @@ declare global {
       never,
       {}
     >
-    "ui-trigger-menu-item-icon": UiPartElement<typeof triggerMenu, "item-icon", "mirror">
+    "ui-trigger-menu-item-icon": UiPartElement<
+      typeof triggerMenu,
+      "item-icon",
+      "mirror"
+    >
     "ui-trigger-menu-group": UiPartElement<typeof triggerMenu, "group">
-    "ui-trigger-menu-group-label": UiPartElement<typeof triggerMenu, "group-label">
+    "ui-trigger-menu-group-label": UiPartElement<
+      typeof triggerMenu,
+      "group-label"
+    >
     "ui-trigger-menu-separator": UiPartElement<typeof triggerMenu, "separator">
     "ui-trigger-menu-empty": UiPartElement<typeof triggerMenu, "empty">
     "ui-trigger-menu-status": UiPartElement<typeof triggerMenu, "status">
@@ -2194,7 +2774,10 @@ declare global {
  */
 type FileInputEvents = {
   valuechange: UiDetailedChangeEvent<File[], FileInputValueChangeDetails>
-  reject: UiDetailedChangeEvent<FileRejection[], CommitDetails<FileInputValueChangeReason>>
+  reject: UiDetailedChangeEvent<
+    FileRejection[],
+    CommitDetails<FileInputValueChangeReason>
+  >
 }
 /**
  * `<ui-file-input>`: the files as `value`, the controller's methods on `api`, form members like a native input, and typed events.
@@ -2205,7 +2788,12 @@ interface UiFileInputElement
     UiElement<FileInputEvents>,
     FormControlProperties<
       typeof fileInput,
-      "announcement" | "api" | "controller" | "defaultValue" | "validate" | "value"
+      | "announcement"
+      | "api"
+      | "controller"
+      | "defaultValue"
+      | "validate"
+      | "value"
     > {
   value: readonly File[]
   api: FileInputController

@@ -8,7 +8,10 @@
   // specs can tell what a focus move rendered. An update is the part's props
   // changing, which the text reads so it counts them.
   const tips = Array.from({ length: perfSize() }, (_, index) => index + 1)
-  const count = (kind: "trigger" | "tooltip", ...reads: unknown[]) => (countRender(kind), "")
+  const count = (kind: "trigger" | "tooltip", ...reads: unknown[]) => (
+    countRender(kind),
+    ""
+  )
 </script>
 
 <div class="fixture tooltip-page" style="flex-wrap: wrap">

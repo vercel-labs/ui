@@ -14,7 +14,12 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/react/date-picker"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
@@ -48,8 +53,12 @@ function Example() {
               </CalendarNext>
             </div>
             <CalendarGrid>
-              <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-              <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+              <CalendarWeekdays>
+                {(index) => <CalendarWeekday index={index} />}
+              </CalendarWeekdays>
+              <CalendarWeeks>
+                {(cell) => <CalendarDay value={cell.date} />}
+              </CalendarWeeks>
             </CalendarGrid>
           </DatePickerContent>
         </DatePicker>

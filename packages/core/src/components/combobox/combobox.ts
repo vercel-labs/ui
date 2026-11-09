@@ -6,7 +6,10 @@
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import {
   filterAttribute,
@@ -16,13 +19,27 @@ import {
   type ListHighlightDetails,
   type ListStatusState,
 } from "../../foundation/lists/listbox"
-import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { type ListAnnouncement, type ListItemTextState } from "../../foundation/lists/listbox-search"
+import {
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
+import {
+  type ListAnnouncement,
+  type ListItemTextState,
+} from "../../foundation/lists/listbox-search"
 import { type ListSelectAllState } from "../../foundation/lists/listbox-select-all"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, DismissAttemptReason } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  DismissAttemptReason,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithFeatures, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithFeatures,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import {
   comboboxSlots,
   type comboboxChips,
@@ -30,7 +47,11 @@ import {
   type comboboxItemIcons,
   type comboboxSelectAll,
 } from "./combobox-parts"
-import { comboboxApi, initialComboboxState, syncComboboxState } from "./combobox-api"
+import {
+  comboboxApi,
+  initialComboboxState,
+  syncComboboxState,
+} from "./combobox-api"
 import type { ComboboxGeneric } from "./combobox-generic"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
 
@@ -88,15 +109,19 @@ type ComboboxOpenChangeReason =
  * The dismissals `dismissible` refuses that `onDismissAttempt` hears about.
  * @stable
  */
-type ComboboxDismissReason = Extract<ComboboxOpenChangeReason, DismissAttemptReason>
+type ComboboxDismissReason = Extract<
+  ComboboxOpenChangeReason,
+  DismissAttemptReason
+>
 
 /**
  * The value of a combobox: one item's value or `null`, or a list with `multiple`.
  * @stable
  */
-type ComboboxValue<T = string, Multiple extends boolean | undefined = false> = Multiple extends true
-  ? T[]
-  : T | null
+type ComboboxValue<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = Multiple extends true ? T[] : T | null
 
 /**
  * Options for every write method on a combobox controller.
@@ -109,7 +134,10 @@ type ComboboxChangeOptions<Reason extends string> = ChangeOptions<Reason>
  * `controller` option.
  * @stable
  */
-function createComboboxController<T = string, Multiple extends boolean | undefined = false>() {
+function createComboboxController<
+  T = string,
+  Multiple extends boolean | undefined = false,
+>() {
   return createController<{
     /** Whether the list is open. */
     isOpen: () => boolean
@@ -117,7 +145,10 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
      * Opens or closes the list.
      * Returns false when the change was canceled or it was already open or closed.
      */
-    setOpen: (open: boolean, options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
+    setOpen: (
+      open: boolean,
+      options?: ComboboxChangeOptions<ComboboxOpenChangeReason>
+    ) => boolean
     /**
      * Opens the list, and resolves once it closes, with why and how. Resolves exactly once and never
      * rejects: on the next close from any source, when `signal` aborts, or with reason `"unmount"`
@@ -127,15 +158,19 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
       options?: ComboboxChangeOptions<ComboboxOpenChangeReason> & {
         /** Closes the list, with reason `"imperative"`, when it aborts. An already aborted signal never opens it. */
         signal?: AbortSignal
-      },
+      }
     ) => Promise<PopupResult<ComboboxOpenChangeReason, never>>
     /** Closes the list. Returns false when the close was canceled or it was already closed. */
-    close: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
+    close: (
+      options?: ComboboxChangeOptions<ComboboxOpenChangeReason>
+    ) => boolean
     /**
      * Opens the list when it's closed, and closes it when it's open.
      * Returns false when the change was canceled.
      */
-    toggle: (options?: ComboboxChangeOptions<ComboboxOpenChangeReason>) => boolean
+    toggle: (
+      options?: ComboboxChangeOptions<ComboboxOpenChangeReason>
+    ) => boolean
     /** The selected value. */
     getValue: () => ComboboxValue<T, Multiple>
     /**
@@ -144,20 +179,25 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
      */
     setValue: (
       value: ComboboxValue<T, Multiple>,
-      options?: ComboboxChangeOptions<ComboboxValueChangeReason>,
+      options?: ComboboxChangeOptions<ComboboxValueChangeReason>
     ) => boolean
     /**
      * Selects nothing and empties the input.
      * Returns false when the change was canceled or nothing changed.
      */
-    clear: (options?: ComboboxChangeOptions<ComboboxValueChangeReason>) => boolean
+    clear: (
+      options?: ComboboxChangeOptions<ComboboxValueChangeReason>
+    ) => boolean
     /** The input's text. */
     getQuery: () => string
     /**
      * Changes the input's text, which filters the list.
      * Returns false when the change was canceled or nothing changed.
      */
-    setQuery: (query: string, options?: ComboboxChangeOptions<ComboboxQueryChangeReason>) => boolean
+    setQuery: (
+      query: string,
+      options?: ComboboxChangeOptions<ComboboxQueryChangeReason>
+    ) => boolean
     /** Moves focus to the input. */
     focus: () => void
   }>()
@@ -168,9 +208,10 @@ function createComboboxController<T = string, Multiple extends boolean | undefin
  * option.
  * @stable
  */
-type ComboboxController<T = string, Multiple extends boolean | undefined = false> = ReturnType<
-  typeof createComboboxController<T, Multiple>
->
+type ComboboxController<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = ReturnType<typeof createComboboxController<T, Multiple>>
 
 /**
  * The options `combobox` takes. A component takes them as props on its root.
@@ -180,7 +221,10 @@ type ComboboxController<T = string, Multiple extends boolean | undefined = false
 // A union on `multiple`, so TypeScript infers `T` through it. The multiple side
 // comes first, so a list in a variable infers `T` as its items. A value that is
 // itself a list takes `items` or the type: `<Combobox<number[]>>`.
-type ComboboxOptions<T = string, Multiple extends boolean | undefined = false> = ComboboxSharedOptions<T> &
+type ComboboxOptions<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = ComboboxSharedOptions<T> &
   (
     | ComboboxMultipleOptions<T, Multiple>
     | ComboboxSingleOptions<T, Multiple>
@@ -202,8 +246,15 @@ type ComboboxSingleOptions<T, Multiple> = {
   // state setter would make `T` a list here. `NoInfer` leaves `T` to the
   // value, the items and the multiple side's callback.
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: NoInfer<T> | null, details: ChangeDetails<ComboboxValueChangeReason>) => void
-} & (boolean extends Multiple ? never : [Multiple] extends [true] ? never : unknown)
+  onValueChange?: (
+    value: NoInfer<T> | null,
+    details: ChangeDetails<ComboboxValueChangeReason>
+  ) => void
+} & (boolean extends Multiple
+  ? never
+  : [Multiple] extends [true]
+    ? never
+    : unknown)
 
 /** The value options of a combobox that selects several items. `Multiple` `boolean` rules them out. */
 type ComboboxMultipleOptions<T, Multiple> = {
@@ -214,7 +265,10 @@ type ComboboxMultipleOptions<T, Multiple> = {
   /** The values selected at first, when uncontrolled. A form reset returns to them. */
   defaultValue?: T[]
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T[], details: ChangeDetails<ComboboxValueChangeReason>) => void
+  onValueChange?: (
+    value: T[],
+    details: ChangeDetails<ComboboxValueChangeReason>
+  ) => void
 } & (boolean extends Multiple ? never : unknown)
 
 // Only when `Multiple` is `boolean`, like `<Combobox<string, boolean>>`, so
@@ -233,7 +287,7 @@ type ComboboxEitherOptions<T, Multiple> = {
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
   onValueChange?: (
     value: NoInfer<T> | NoInfer<T>[] | null,
-    details: ChangeDetails<ComboboxValueChangeReason>,
+    details: ChangeDetails<ComboboxValueChangeReason>
   ) => void
 } & (boolean extends Multiple ? unknown : never)
 
@@ -244,7 +298,10 @@ type ComboboxSharedOptions<T> = PortalProps & {
   /** The input's text at first, when uncontrolled. Defaults to the selected item's label. */
   defaultQuery?: string
   /** Runs when the input's text wants to change: typing, choosing an item, or closing with text that wasn't chosen. */
-  onQueryChange?: (query: string, details: ChangeDetails<ComboboxQueryChangeReason>) => void
+  onQueryChange?: (
+    query: string,
+    details: ChangeDetails<ComboboxQueryChangeReason>
+  ) => void
   /** Whether the list is open. Pass it to control it. */
   open?: boolean
   /**
@@ -253,7 +310,10 @@ type ComboboxSharedOptions<T> = PortalProps & {
    */
   defaultOpen?: boolean
   /** Runs when the list wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<ComboboxOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<ComboboxOpenChangeReason>
+  ) => void
   /** Runs once the list has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /** With `multiple`, how many items can be selected. Once reached, the other items are disabled. */
@@ -644,7 +704,11 @@ const comboboxPrimitive = /* @__PURE__ */ definePrimitive({
     itemToLabel: "value",
     isItemEqualToValue: "value",
     autoHighlight: (attribute: string | null) =>
-      attribute === null ? undefined : attribute === "always" ? "always" : attribute !== "false",
+      attribute === null
+        ? undefined
+        : attribute === "always"
+          ? "always"
+          : attribute !== "false",
     keepQuery: "boolean",
     allowCustomValue: "boolean",
     status: "string",
@@ -680,7 +744,10 @@ const comboboxPrimitive = /* @__PURE__ */ definePrimitive({
 interface ComboboxPrimitive extends WithGeneric<
   WithFeatures<
     typeof comboboxPrimitive,
-    typeof comboboxSelectAll | typeof comboboxItemIcons | typeof comboboxCreate | typeof comboboxChips
+    | typeof comboboxSelectAll
+    | typeof comboboxItemIcons
+    | typeof comboboxCreate
+    | typeof comboboxChips
   >,
   ComboboxGeneric
 > {}

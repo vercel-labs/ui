@@ -1,6 +1,10 @@
 import { mkdir, rm, writeFile } from "node:fs/promises"
 import path from "node:path"
-import { customElementsManifest, describeElements, htmlCustomData } from "./custom-elements"
+import {
+  customElementsManifest,
+  describeElements,
+  htmlCustomData,
+} from "./custom-elements"
 import { frameworkIds, frameworks, type Framework } from "./frameworks"
 import { frameworkLlms } from "./llms"
 import { pageMarkdown, type LinkTarget } from "./page-markdown"
@@ -23,7 +27,9 @@ const packageFrameworks: Record<string, Framework | undefined> = {
   web: "web-components",
 }
 
-const guidesByFramework = new Map(frameworkIds.map((framework) => [framework, frameworkGuides(framework)]))
+const guidesByFramework = new Map(
+  frameworkIds.map((framework) => [framework, frameworkGuides(framework)])
+)
 
 // A heading's anchor, the way GitHub and most Markdown viewers make it.
 const anchor = (heading: string) =>
@@ -43,7 +49,9 @@ function fileOf({ slugs, hash }: LinkTarget, framework: Framework | undefined) {
     const file = section === "agents" ? "agents.md" : "core.md"
     return `${file}${hash ? `#${hash}` : page ? `#${anchor(page.title)}` : ""}`
   }
-  if (!framework) return null
+  if (!framework) {
+    return null
+  }
   // A link that names no framework, from Core or Agents, is this framework's.
   const [folder, name] = frameworkPages.includes(section)
     ? [section === "utilities" ? utilitiesFolder(framework) : section, rest[0]]
@@ -51,29 +59,40 @@ function fileOf({ slugs, hash }: LinkTarget, framework: Framework | undefined) {
       ? rest
       : []
   const at = hash ? `#${hash}` : ""
-  if (section === framework && !folder) return `introduction.md${at}`
-  if (folder && guidesByFramework.get(framework)!.some((page) => page.slugs[1] === folder))
+  if (section === framework && !folder) {
+    return `introduction.md${at}`
+  }
+  if (
+    folder &&
+    guidesByFramework.get(framework)!.some((page) => page.slugs[1] === folder)
+  ) {
     return `${folder}.md${at}`
-  if (folder === "components" || folder === utilitiesFolder(framework))
+  }
+  if (folder === "components" || folder === utilitiesFolder(framework)) {
     return `${name ? `${folder}/${name}.md` : "README.md"}${at}`
+  }
   return null
 }
 
 // Maps a link from the file at `from` to the copy it points to.
-const linksFrom = (from: string, framework: Framework | undefined) => (target: LinkTarget) => {
-  const file = fileOf(target, framework)
-  if (file === null) return null
-  const relative =
-    path.posix.relative(path.posix.dirname(from), file.split("#")[0]) || path.posix.basename(from)
-  return `${relative.startsWith(".") ? "" : "./"}${relative}${file.includes("#") ? `#${file.split("#")[1]}` : ""}`
-}
+const linksFrom =
+  (from: string, framework: Framework | undefined) => (target: LinkTarget) => {
+    const file = fileOf(target, framework)
+    if (file === null) {
+      return null
+    }
+    const relative =
+      path.posix.relative(path.posix.dirname(from), file.split("#")[0]) ||
+      path.posix.basename(from)
+    return `${relative.startsWith(".") ? "" : "./"}${relative}${file.includes("#") ? `#${file.split("#")[1]}` : ""}`
+  }
 
 // The pages a framework's package ships, besides Core and Agents.
 const frameworkFiles = (framework: Framework) => [
   ...[["components"], [utilitiesFolder(framework)]].flatMap(([folder]) =>
     docPages(`${framework}/${folder}`)
       .filter((page) => page.slugs.length === 3)
-      .map((page) => ({ page, file: `${folder}/${page.slugs[2]}.md` })),
+      .map((page) => ({ page, file: `${folder}/${page.slugs[2]}.md` }))
   ),
   ...guidesByFramework.get(framework)!.map((page) => ({
     page,
@@ -93,7 +112,7 @@ function index(name: string, framework: Framework | undefined) {
 - [Core](./core.md): ${core.description} Every Core page in one file.
 - [Agents](./agents.md): ${agents.description} Every Agents page in one file.
 `
-  if (!framework)
+  if (!framework) {
     return `# @ui-sdk/${name} docs
 
 The ui-sdk docs for the framework-free core, as Markdown, for the release this package came from. Each framework's package has its own pages, like \`@ui-sdk/react/docs\`.
@@ -103,16 +122,20 @@ ${llms}${shared}
 
 - [ui-sdk](../skills/ui-sdk/SKILL.md): builds interfaces with ui-sdk, components it doesn't ship from the behaviors in this package, agent support and tests.
 `
+  }
   const list = (folder: string) =>
     frameworkFiles(framework)
       .filter(({ file }) => file.startsWith(`${folder}/`))
       .map(
-        ({ page, file }) => `- [${page.title}](./${file})${page.description ? `: ${page.description}` : ""}`,
+        ({ page, file }) =>
+          `- [${page.title}](./${file})${page.description ? `: ${page.description}` : ""}`
       )
       .join("\n")
   const guides = frameworkFiles(framework)
     .filter(({ file }) => !file.includes("/"))
-    .map(({ page, file }) => `- [${page.title}](./${file}): ${page.description}`)
+    .map(
+      ({ page, file }) => `- [${page.title}](./${file}): ${page.description}`
+    )
     .join("\n")
   return `# @ui-sdk/${name} docs
 
@@ -139,28 +162,43 @@ async function writePackageDocs(names = Object.keys(packageFrameworks)) {
     const framework = packageFrameworks[name]
     const dir = path.join(repoRoot, "packages", name, "docs")
     await rm(dir, { recursive: true, force: true })
-    const files: Record<string, string> = { "README.md": index(name, framework) }
-    for (const section of ["core", "agents"] as const)
+    const files: Record<string, string> = {
+      "README.md": index(name, framework),
+    }
+    for (const section of ["core", "agents"] as const) {
       files[`${section}.md`] = await sectionMarkdown(
         section,
         (slugs, hash) => linksFrom(`${section}.md`, framework)({ slugs, hash }),
-        `<!-- ui-sdk ${section === "core" ? "Core" : "Agents"} docs, as one file. -->`,
+        `<!-- ui-sdk ${section === "core" ? "Core" : "Agents"} docs, as one file. -->`
       )
+    }
     files["llms.txt"] = framework
       ? await frameworkLlms(framework, linksFrom("llms.txt", framework))
-      : await sectionMarkdown("core", (slugs, hash) => linksFrom("llms.txt", framework)({ slugs, hash }))
+      : await sectionMarkdown("core", (slugs, hash) =>
+          linksFrom("llms.txt", framework)({ slugs, hash })
+        )
     if (framework)
-      // Component and utility pages are in folders; guides keep every example styled.
-      for (const { page, file } of frameworkFiles(framework))
-        files[file] = await pageMarkdown(page.file, framework, linksFrom(file, framework), {
-          lean: file.includes("/"),
-        })
+    // Component and utility pages are in folders; guides keep every example styled.
+    {
+      for (const { page, file } of frameworkFiles(framework)) {
+        files[file] = await pageMarkdown(
+          page.file,
+          framework,
+          linksFrom(file, framework),
+          {
+            lean: file.includes("/"),
+          }
+        )
+      }
+    }
     for (const [file, text] of Object.entries(files)) {
       await mkdir(path.dirname(path.join(dir, file)), { recursive: true })
       await writeFile(path.join(dir, file), text)
     }
     console.log(`packages/${name}/docs: ${Object.keys(files).length} files`)
-    if (name === "web") await writeElementsManifest(path.join(repoRoot, "packages", name))
+    if (name === "web") {
+      await writeElementsManifest(path.join(repoRoot, "packages", name))
+    }
   }
 }
 
@@ -173,16 +211,20 @@ async function writeElementsManifest(dir: string) {
   const { entries, elements, missing } = await describeElements()
   await writeFile(
     path.join(dir, "custom-elements.json"),
-    `${JSON.stringify(customElementsManifest(elements, entries), null, 2)}\n`,
+    `${JSON.stringify(customElementsManifest(elements, entries), null, 2)}\n`
   )
   await writeFile(
     path.join(dir, "html-custom-data.json"),
-    `${JSON.stringify(htmlCustomData(elements), null, 2)}\n`,
+    `${JSON.stringify(htmlCustomData(elements), null, 2)}\n`
   )
   console.log(
-    `${path.relative(repoRoot, dir)}: custom-elements.json and html-custom-data.json, ${elements.length} elements`,
+    `${path.relative(repoRoot, dir)}: custom-elements.json and html-custom-data.json, ${elements.length} elements`
   )
-  if (missing.length) console.warn(`Not described yet:\n${missing.map((item) => `  ${item}`).join("\n")}`)
+  if (missing.length) {
+    console.warn(
+      `Not described yet:\n${missing.map((item) => `  ${item}`).join("\n")}`
+    )
+  }
   return { elements, missing }
 }
 

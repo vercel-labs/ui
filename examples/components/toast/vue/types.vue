@@ -1,6 +1,17 @@
 <script setup lang="ts">
-import { CircleCheckIcon, InfoIcon, LoaderCircleIcon, OctagonXIcon, TriangleAlertIcon } from "@lucide/vue"
-import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  LoaderCircleIcon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "@lucide/vue"
+import {
+  Toast,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/vue/toast"
 import { onUnmounted } from "vue"
 
 const toast = createToaster()

@@ -29,11 +29,17 @@ if (event.key === "Escape") close()
 // The site's color scheme, shown on <html> as `data-color-scheme`, which the
 // stylesheet's colors follow. It's kept under "theme", the key the site used
 // before, so readers keep what they chose.
-const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
+const colorScheme = createColorScheme({
+  storage: createLocalStorage("theme"),
+  global: true,
+})
 
 // After
 // "theme" is the key the site used before, so readers keep their choice.
-const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
+const colorScheme = createColorScheme({
+  storage: createLocalStorage("theme"),
+  global: true,
+})
 ```
 
 **A comment longer than three lines.** Cut it to the reason. An explanation that needs more goes in the docs page, a test title or `contributing/`. `pnpm lint` flags it (`comment-length`).

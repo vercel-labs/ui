@@ -33,7 +33,10 @@
       gap: var(--space-1);
     }
 
-    & :has(> [data-slot="alert-dialog-close"]):not([data-slot="alert-dialog-content"]) {
+    &
+      :has(> [data-slot="alert-dialog-close"]):not(
+        [data-slot="alert-dialog-content"]
+      ) {
       display: flex;
       flex-wrap: wrap;
       justify-content: flex-end;
@@ -81,7 +84,8 @@
     font-size: var(--text-md);
   }
 
-  :scope[data-example="alert-dialog/confirm"] :is([data-slot="list"], [data-slot="controls"]) {
+  :scope[data-example="alert-dialog/confirm"]
+    :is([data-slot="list"], [data-slot="controls"]) {
     width: 20rem;
   }
 
@@ -93,7 +97,8 @@
   }
 
   /* Only this demo animates; the slide, fade and scale are what it shows. */
-  :scope[data-example="alert-dialog/animation"] [data-slot="alert-dialog-content"] {
+  :scope[data-example="alert-dialog/animation"]
+    [data-slot="alert-dialog-content"] {
     transition:
       opacity 0.2s,
       translate 0.25s cubic-bezier(0.22, 1, 0.36, 1),

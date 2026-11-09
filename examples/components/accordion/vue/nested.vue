@@ -23,8 +23,16 @@ const sections: {
     value: "notifications",
     label: "Notifications",
     topics: [
-      { value: "email", label: "Email", content: "A weekly digest, and mentions as they happen." },
-      { value: "push", label: "Push", content: "Direct messages and replies to your comments." },
+      {
+        value: "email",
+        label: "Email",
+        content: "A weekly digest, and mentions as they happen.",
+      },
+      {
+        value: "push",
+        label: "Push",
+        content: "Direct messages and replies to your comments.",
+      },
     ],
   },
   {
@@ -48,7 +56,11 @@ const sections: {
 
 <template>
   <Accordion :default-value="['notifications']">
-    <AccordionItem v-for="section in sections" :key="section.value" :value="section.value">
+    <AccordionItem
+      v-for="section in sections"
+      :key="section.value"
+      :value="section.value"
+    >
       <AccordionHeader>
         <AccordionTrigger>
           {{ section.label }}
@@ -57,7 +69,11 @@ const sections: {
       </AccordionHeader>
       <AccordionPanel>
         <Accordion v-if="section.topics" multiple>
-          <AccordionItem v-for="topic in section.topics" :key="topic.value" :value="topic.value">
+          <AccordionItem
+            v-for="topic in section.topics"
+            :key="topic.value"
+            :value="topic.value"
+          >
             <AccordionHeader>
               <template #render="{ props }">
                 <h4 v-bind="props">

@@ -19,11 +19,20 @@ interface ModuleOptions {
  * @experimental
  */
 const uiSdk: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOptions>({
-  meta: { name: "@ui-sdk/vue", configKey: "uiSdk", compatibility: { nuxt: "^4.0.0 || ^5.0.0-0" } },
+  meta: {
+    name: "@ui-sdk/vue",
+    configKey: "uiSdk",
+    compatibility: { nuxt: "^4.0.0 || ^5.0.0-0" },
+  },
   defaults: { prefix: "" },
   setup(options) {
-    const { components, imports } = nuxtRegistrations(readEntries(), options.prefix ?? "")
-    for (const component of components) addComponent(component)
+    const { components, imports } = nuxtRegistrations(
+      readEntries(),
+      options.prefix ?? ""
+    )
+    for (const component of components) {
+      addComponent(component)
+    }
     addImportsSources(imports)
   },
 })
@@ -32,7 +41,9 @@ const uiSdk: NuxtModule<ModuleOptions> = defineNuxtModule<ModuleOptions>({
 // runs this file from `nuxt/`, so it reads the build's copy in `dist`.
 function readEntries() {
   const built = new URL("./entries.json", import.meta.url)
-  const file = existsSync(built) ? built : new URL("../dist/nuxt/entries.json", import.meta.url)
+  const file = existsSync(built)
+    ? built
+    : new URL("../dist/nuxt/entries.json", import.meta.url)
   return JSON.parse(readFileSync(file, "utf8")) as NuxtEntry[]
 }
 

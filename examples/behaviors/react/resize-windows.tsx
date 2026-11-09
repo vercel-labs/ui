@@ -10,7 +10,10 @@ import {
 import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 import { LockIcon } from "lucide-react"
 
-type DesktopState = { windows: Record<string, ResizeBox>; draft: ResizeDraft | null }
+type DesktopState = {
+  windows: Record<string, ResizeBox>
+  draft: ResizeDraft | null
+}
 
 const titles: Record<string, string> = { mail: "Mail", notes: "Notes" }
 
@@ -35,13 +38,18 @@ const desktop = definePrimitive({
       disabled: (key) => key === "notes",
       label: (key) => titles[key],
       message: ({ label, handle, box }) =>
-        handle === "move" ? `${label} moved.` : `${label} is ${box.width} by ${box.height}.`,
+        handle === "move"
+          ? `${label} moved.`
+          : `${label} is ${box.width} by ${box.height}.`,
     })
     return {
       resize,
       act(action: string) {
-        if (action === "maximize") resize.resizeTo("mail", { x: 0, y: 0, width: 360, height: 220 })
-        else if (action === "grow") resize.resizeBy("mail", "se", 40, 40)
+        if (action === "maximize") {
+          resize.resizeTo("mail", { x: 0, y: 0, width: 360, height: 220 })
+        } else if (action === "grow") {
+          resize.resizeBy("mail", "se", 40, 40)
+        }
       },
     }
   },
@@ -69,12 +77,18 @@ const desktop = definePrimitive({
         "data-resizing": api.resize.dragging(state, key),
         style: `${api.resize.boxStyle(state, key)};${api.resize.style(state, key) ?? ""};touch-action:none`,
       }),
-      on: { pointerdown: (event, { el, api, key }) => api.resize.pointerdown(event, key, "move", el!) },
+      on: {
+        pointerdown: (event, { el, api, key }) =>
+          api.resize.pointerdown(event, key, "move", el!),
+      },
     }),
     corner: slot<{ id: string; box: string }>({
       props: { box: "string" },
       attrs: (_state, { api }) => api.resize.handleAttrs("se"),
-      on: { pointerdown: (event, { el, api, props }) => api.resize.pointerdown(event, props.box, "se", el!) },
+      on: {
+        pointerdown: (event, { el, api, props }) =>
+          api.resize.pointerdown(event, props.box, "se", el!),
+      },
     }),
     action: slot<{ value: string }>({
       props: { value: "string" },
@@ -84,7 +98,12 @@ const desktop = definePrimitive({
   }),
 })
 
-const parts = createParts(desktop, { root: "div", screen: "div", window: "div", action: "button" })
+const parts = createParts(desktop, {
+  root: "div",
+  screen: "div",
+  window: "div",
+  action: "button",
+})
 
 const Desktop = parts.Root
 

@@ -18,10 +18,15 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -46,7 +51,7 @@ function mount(root: HTMLElement) {
                   ${country.label}
                   <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                 </ui-combobox-item>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>
@@ -61,15 +66,21 @@ function mount(root: HTMLElement) {
   const combobox = root.querySelector("ui-combobox")!
   combobox.itemToLabel = (value) => countryLabel(value as string)
   const summary = root.querySelector("p")!
-  const list = new Intl.ListFormat(document.documentElement.lang || undefined, { type: "conjunction" })
+  const list = new Intl.ListFormat(document.documentElement.lang || undefined, {
+    type: "conjunction",
+  })
   const show = (value: string[]) => {
     const labels = value.map(countryLabel)
     summary.textContent = list.format(
-      labels.length > 2 ? [...labels.slice(0, 2), `${labels.length - 2} more`] : labels,
+      labels.length > 2
+        ? [...labels.slice(0, 2), `${labels.length - 2} more`]
+        : labels
     )
   }
   show(["fr", "jp", "se", "de", "ch"])
-  combobox.addEventListener("valuechange", (event) => show(event.detail.value as string[]))
+  combobox.addEventListener("valuechange", (event) =>
+    show(event.detail.value as string[])
+  )
 }
 
 export { mount }

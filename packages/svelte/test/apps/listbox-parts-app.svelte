@@ -10,7 +10,9 @@
 
 <Listbox itemToValue={(fruit: { id: string }) => fruit.id} aria-label="Fruit">
   {#each fruits as fruit (fruit.id)}
-    <ListboxItem value={fruit}>{fruit.name}<ListboxItemIndicator>✓</ListboxItemIndicator></ListboxItem>
+    <ListboxItem value={fruit}
+      >{fruit.name}<ListboxItemIndicator>✓</ListboxItemIndicator></ListboxItem
+    >
   {/each}
   {#if stray}<ListboxItemIndicator>✓</ListboxItemIndicator>{/if}
 </Listbox>

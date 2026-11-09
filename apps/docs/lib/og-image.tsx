@@ -8,7 +8,13 @@ const folder = join(process.cwd(), "app/og")
 
 const size = { width: 1200, height: 630 }
 
-async function renderOgImage({ title, description }: { title: string; description?: string }) {
+async function renderOgImage({
+  title,
+  description,
+}: {
+  title: string
+  description?: string
+}) {
   const [regular, light, background] = await Promise.all([
     readFile(join(folder, "geist-regular.ttf")),
     readFile(join(folder, "geist-light.ttf")),
@@ -24,7 +30,9 @@ async function renderOgImage({ title, description }: { title: string; descriptio
         src={`data:image/png;base64,${background.toString("base64")}`}
       />
       <div tw="absolute flex flex-col left-[112px] bottom-[144px] w-[452px]">
-        <div tw="flex text-[52px] leading-[1.04] tracking-[-2.34px] text-[#0a0a0a]">{title}</div>
+        <div tw="flex text-[52px] leading-[1.04] tracking-[-2.34px] text-[#0a0a0a]">
+          {title}
+        </div>
         {description && (
           <div
             style={{ fontWeight: 300, textWrap: "balance" }}
@@ -41,7 +49,7 @@ async function renderOgImage({ title, description }: { title: string; descriptio
         { name: "Geist", data: regular, weight: 400 },
         { name: "Geist", data: light, weight: 300 },
       ],
-    },
+    }
   )
 }
 

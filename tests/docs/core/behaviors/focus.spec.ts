@@ -15,7 +15,9 @@ test("every example renders without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("roving focus: one tab stop, arrows and End move along the toolbar", async ({ page }) => {
+test("roving focus: one tab stop, arrows and End move along the toolbar", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const toolbar = page.getByRole("toolbar", { name: "Formatting" })
   await expect(toolbar.locator('[tabindex="0"]')).toHaveCount(1)
@@ -35,7 +37,10 @@ test("roving focus: Tab skips disabled items, the arrows reach them, and the col
   await toolbar.getByRole("button", { name: "Cut" }).focus()
   await page.keyboard.press("ArrowUp")
   await expect(toolbar.getByRole("button", { name: "Redo" })).toBeFocused()
-  await expect(toolbar.getByRole("button", { name: "Redo" })).toHaveAttribute("aria-disabled", "true")
+  await expect(toolbar.getByRole("button", { name: "Redo" })).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  )
   await page.keyboard.press("ArrowUp")
   await page.keyboard.press("ArrowUp")
   await expect(toolbar.getByRole("button", { name: "Paste" })).toBeFocused()
@@ -43,7 +48,9 @@ test("roving focus: Tab skips disabled items, the arrows reach them, and the col
   await expect(toolbar.getByRole("button", { name: "Undo" })).toBeFocused()
 })
 
-test("roving focus: the arrows skip the labels under a closed Labels row", async ({ page }) => {
+test("roving focus: the arrows skip the labels under a closed Labels row", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const folders = page.getByRole("group", { name: "Folders" })
   await folders.getByRole("button", { name: "Labels" }).focus()
@@ -51,14 +58,19 @@ test("roving focus: the arrows skip the labels under a closed Labels row", async
   await expect(folders.getByRole("button", { name: "Trash" })).toBeFocused()
   await page.keyboard.press("ArrowUp")
   await page.keyboard.press("Enter")
-  await expect(folders.getByRole("button", { name: "Labels" })).toHaveAttribute("aria-expanded", "true")
+  await expect(folders.getByRole("button", { name: "Labels" })).toHaveAttribute(
+    "aria-expanded",
+    "true"
+  )
   await page.keyboard.press("ArrowDown")
   await expect(folders.getByRole("button", { name: "Work" })).toBeFocused()
   await page.keyboard.press("End")
   await expect(folders.getByRole("button", { name: "Trash" })).toBeFocused()
 })
 
-test("roving focus: a new tag takes focus once it renders, and the count follows", async ({ page }) => {
+test("roving focus: a new tag takes focus once it renders, and the count follows", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const tags = page.getByRole("group", { name: "Tags" })
   await page.getByRole("textbox", { name: "New tag" }).fill("release")
@@ -70,7 +82,9 @@ test("roving focus: a new tag takes focus once it renders, and the count follows
   await expect(tags.getByRole("button", { name: "design" })).toBeFocused()
 })
 
-test("roving focus: a shortcut in the field moves the toolbar's stop to its button", async ({ page }) => {
+test("roving focus: a shortcut in the field moves the toolbar's stop to its button", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const toolbar = page.getByRole("toolbar", { name: "Format", exact: true })
   await expect(toolbar.locator('[tabindex="0"]')).toHaveText("Bold")
@@ -96,7 +110,9 @@ test("roving focus: each option links to its explanation", async ({ page }) => {
   }
 })
 
-test("roving focus: a custom move goes a row at a time on the keypad", async ({ page }) => {
+test("roving focus: a custom move goes a row at a time on the keypad", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const keypad = page.getByRole("group", { name: "Keypad" })
   await expect(keypad.locator('[tabindex="0"]')).toHaveCount(1)
@@ -112,7 +128,9 @@ test("roving focus: a custom move goes a row at a time on the keypad", async ({ 
   await expect(keypad.getByRole("button", { name: "5" })).toBeFocused()
 })
 
-test("spatial focus: arrows go to the nearest note that way", async ({ page }) => {
+test("spatial focus: arrows go to the nearest note that way", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const board = page.getByRole("group", { name: "Notes" })
   await board.getByRole("button", { name: "Call Hollis" }).focus()
@@ -126,7 +144,9 @@ test("spatial focus: arrows go to the nearest note that way", async ({ page }) =
   await expect(board.getByRole("button", { name: "Ship docs" })).toBeFocused()
 })
 
-test("typeahead: typing steps through matches and jumps to a longer one", async ({ page }) => {
+test("typeahead: typing steps through matches and jumps to a longer one", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const list = page.getByRole("listbox", { name: "Fruit" })
   await list.getByRole("option", { name: "Apple" }).focus()
@@ -139,18 +159,26 @@ test("typeahead: typing steps through matches and jumps to a longer one", async 
   await expect(list.getByRole("option", { name: "Plum" })).toBeFocused()
 })
 
-test("focus recovery: deleting the focused task focuses the one in its place", async ({ page }) => {
+test("focus recovery: deleting the focused task focuses the one in its place", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const list = page.getByRole("list", { name: "Tasks" })
   await list.getByRole("listitem").filter({ hasText: "Add examples" }).focus()
   await page.keyboard.press("Delete")
-  await expect(list.getByRole("listitem").filter({ hasText: "Fix the links" })).toBeFocused()
+  await expect(
+    list.getByRole("listitem").filter({ hasText: "Fix the links" })
+  ).toBeFocused()
   await page.keyboard.press("End")
   await page.keyboard.press("Delete")
-  await expect(list.getByRole("listitem").filter({ hasText: "Fix the links" })).toBeFocused()
+  await expect(
+    list.getByRole("listitem").filter({ hasText: "Fix the links" })
+  ).toBeFocused()
 })
 
-test("grid focus: arrows move by row and column, Control+End to the last seat", async ({ page }) => {
+test("grid focus: arrows move by row and column, Control+End to the last seat", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const grid = page.getByRole("grid", { name: "Seats" })
   await expect(grid.locator('[tabindex="0"]')).toHaveCount(1)
@@ -162,16 +190,34 @@ test("grid focus: arrows move by row and column, Control+End to the last seat", 
   await expect(grid.getByRole("gridcell", { name: "Seat C6" })).toBeFocused()
 })
 
-test("roving focus: Left and Right keep cycling around the ring", async ({ page }) => {
+test("roving focus: Left and Right keep cycling around the ring", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const ring = page.getByRole("toolbar", { name: "Message" })
   await ring.getByRole("button", { name: "Reply" }).focus()
-  for (const name of ["Label", "Delete", "Snooze", "Archive", "Forward", "Reply", "Label"]) {
+  for (const name of [
+    "Label",
+    "Delete",
+    "Snooze",
+    "Archive",
+    "Forward",
+    "Reply",
+    "Label",
+  ]) {
     await page.keyboard.press("ArrowLeft")
     await expect(ring.getByRole("button", { name, exact: true })).toBeFocused()
     await expect(ring.locator('[tabindex="0"]')).toHaveCount(1)
   }
-  for (const name of ["Reply", "Forward", "Archive", "Snooze", "Delete", "Label", "Reply"]) {
+  for (const name of [
+    "Reply",
+    "Forward",
+    "Archive",
+    "Snooze",
+    "Delete",
+    "Label",
+    "Reply",
+  ]) {
     await page.keyboard.press("ArrowRight")
     await expect(ring.getByRole("button", { name, exact: true })).toBeFocused()
   }
@@ -213,11 +259,17 @@ test("keep focus: a task that moves to the other list keeps focus, and loses it 
   await page.getByRole("checkbox", { name: "Keep focus on the task" }).uncheck()
   await todo.getByRole("button", { name: "Fix the links" }).focus()
   await page.keyboard.press("Enter")
-  await expect(done.getByRole("button", { name: "Fix the links" })).toBeVisible()
-  await expect(done.getByRole("button", { name: "Fix the links" })).not.toBeFocused()
+  await expect(
+    done.getByRole("button", { name: "Fix the links" })
+  ).toBeVisible()
+  await expect(
+    done.getByRole("button", { name: "Fix the links" })
+  ).not.toBeFocused()
 })
 
-test("grid focus: the arrows skip taken seats, and the active seat stays marked", async ({ page }) => {
+test("grid focus: the arrows skip taken seats, and the active seat stays marked", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
   const grid = page.getByRole("grid", { name: "Theater" })
   await grid.getByRole("gridcell", { name: "Seat A1", exact: true }).focus()
@@ -228,7 +280,10 @@ test("grid focus: the arrows skip taken seats, and the active seat stays marked"
   await page.keyboard.press("Home")
   await expect(grid.getByRole("gridcell", { name: "Seat C2" })).toBeFocused()
   await page.keyboard.press("Tab")
-  await expect(grid.getByRole("gridcell", { name: "Seat C2" })).toHaveAttribute("data-active", "")
+  await expect(grid.getByRole("gridcell", { name: "Seat C2" })).toHaveAttribute(
+    "data-active",
+    ""
+  )
   await expect(grid.locator("[data-active]")).toHaveCount(1)
 })
 
@@ -244,7 +299,9 @@ test("grid focus: Shift with the arrows stretches a range, and a plain move star
   await expect(selected).toHaveText(["A1", "B1", "A2", "B2"])
   await page.keyboard.press("ArrowRight")
   await expect(selected).toHaveText(["C2"])
-  await grid.getByRole("gridcell", { name: "D4" }).click({ modifiers: ["Shift"] })
+  await grid
+    .getByRole("gridcell", { name: "D4" })
+    .click({ modifiers: ["Shift"] })
   await expect(selected).toHaveCount(6)
 })
 
@@ -264,7 +321,10 @@ test("grid focus: the window slides to rows that aren't rendered, and Page Down 
   await expect(firstRow).toHaveAttribute("aria-rowindex", "8")
   await page.keyboard.press("Control+End")
   await expect(firstRow).toHaveAttribute("aria-rowindex", "95")
-  await expect(grid.getByRole("row").last()).toHaveAttribute("aria-rowindex", "100")
+  await expect(grid.getByRole("row").last()).toHaveAttribute(
+    "aria-rowindex",
+    "100"
+  )
   await expect(grid.locator(":focus")).toHaveText("Platform 4")
 })
 
@@ -283,16 +343,22 @@ test("grid focus: each option links to its explanation", async ({ page }) => {
   }
 })
 
-test("input hints: each field gets its keyboard and Return key", async ({ page }) => {
+test("input hints: each field gets its keyboard and Return key", async ({
+  page,
+}) => {
   await openBehaviors(page, "focus")
-  const form = page.locator("form").filter({ has: page.getByRole("textbox", { name: "Verification code" }) })
+  const form = page
+    .locator("form")
+    .filter({ has: page.getByRole("textbox", { name: "Verification code" }) })
   const email = form.getByRole("textbox", { name: "Email" })
   await expect(email).toHaveAttribute("inputmode", "email")
   await expect(email).toHaveAttribute("enterkeyhint", "next")
   await expect(email).toHaveAttribute("autocapitalize", "none")
-  await expect(form.getByRole("textbox", { name: "Verification code" })).toHaveAttribute(
-    "autocomplete",
-    "one-time-code",
+  await expect(
+    form.getByRole("textbox", { name: "Verification code" })
+  ).toHaveAttribute("autocomplete", "one-time-code")
+  await expect(form.getByRole("textbox", { name: "Message" })).toHaveAttribute(
+    "enterkeyhint",
+    "send"
   )
-  await expect(form.getByRole("textbox", { name: "Message" })).toHaveAttribute("enterkeyhint", "send")
 })

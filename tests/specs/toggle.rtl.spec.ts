@@ -6,7 +6,9 @@ test.beforeEach(async ({ open }) => {
   await open("toggle", { dir: "rtl" })
 })
 
-test("ArrowLeft moves to the next toggle and ArrowRight to the previous one", async ({ page }) => {
+test("ArrowLeft moves to the next toggle and ArrowRight to the previous one", async ({
+  page,
+}) => {
   await buttonNamed(page, "Left").focus()
   await page.keyboard.press("ArrowLeft")
   await expect(buttonNamed(page, "Center")).toBeFocused()
@@ -14,7 +16,9 @@ test("ArrowLeft moves to the next toggle and ArrowRight to the previous one", as
   await expect(buttonNamed(page, "Left")).toBeFocused()
 })
 
-test("Home and End still go to the first and last toggles", async ({ page }) => {
+test("Home and End still go to the first and last toggles", async ({
+  page,
+}) => {
   await buttonNamed(page, "Left").focus()
   await page.keyboard.press("End")
   await expect(buttonNamed(page, "Right")).toBeFocused()

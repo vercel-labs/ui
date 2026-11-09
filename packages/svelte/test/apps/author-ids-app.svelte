@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "../../src/dialog"
+  import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+    DialogTrigger,
+  } from "../../src/dialog"
   import { Tabs, TabsList, TabsPanel, TabsTab } from "../../src/tabs"
   import { Toolbar, ToolbarLink } from "../../src/toolbar"
 

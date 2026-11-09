@@ -9,7 +9,15 @@ import {
   type CarouselState,
   type CarouselStepState,
 } from "@ui-sdk/core/carousel"
-import { createContext, createUniqueId, merge, omit, Show, untrack, useContext } from "solid-js"
+import {
+  createContext,
+  createUniqueId,
+  merge,
+  omit,
+  Show,
+  untrack,
+  useContext,
+} from "solid-js"
 import { useControllerEntry, useControllerTarget } from "./controller-target"
 import {
   createParts,
@@ -25,12 +33,18 @@ type CarouselContextValue = PrimitiveHandle<typeof carouselPrimitive>
 // The carousel, for parts that may also connect from outside it through a controller.
 const CarouselContext = createContext<CarouselContextValue | null>(null)
 
-const parts = createParts(carouselPrimitive, { viewport: "div", content: "div", item: "div" })
+const parts = createParts(carouselPrimitive, {
+  viewport: "div",
+  content: "div",
+  item: "div",
+})
 
 // The carousel a part belongs to: the one its `controller` drives, from
 // anywhere on the page, or else the one it's inside. Reading it tracks the
 // controller's carousel, which registers once it mounts.
-function useConnectedCarousel(controller: () => CarouselControlProps["controller"]) {
+function useConnectedCarousel(
+  controller: () => CarouselControlProps["controller"]
+) {
   return useControllerTarget(controller, useContext(CarouselContext))
 }
 
@@ -76,11 +90,13 @@ function Carousel(props: CarouselOptions & PartProps<"div", CarouselState>) {
     "dragFree",
     "drag",
     "controller",
-    "debug",
+    "debug"
   )
   useControllerEntry(() => props.controller, carousel)
   return (
-    <CarouselContext value={carousel}>{usePart(carousel, "root", undefined, rest, "div")}</CarouselContext>
+    <CarouselContext value={carousel}>
+      {usePart(carousel, "root", undefined, rest, "div")}
+    </CarouselContext>
   )
 }
 
@@ -102,7 +118,10 @@ const CarouselContent = parts.Content
  */
 const CarouselItem = parts.Item
 
-type StepProps = Omit<PartProps<"button", CarouselStepState>, "value" | "defaultValue" | "onChange"> &
+type StepProps = Omit<
+  PartProps<"button", CarouselStepState>,
+  "value" | "defaultValue" | "onChange"
+> &
   CarouselControlProps
 
 // What a part outside its carousel renders with until that mounts.
@@ -110,7 +129,11 @@ const unconnected: CarouselStepState = { disabled: true }
 
 // A plain button, for a part outside its carousel until that mounts.
 function plainButton(props: Record<string, any>, state: object) {
-  return renderStatic("button", () => ({ attrs: {}, state }), merge(props, { type: "button" }))
+  return renderStatic(
+    "button",
+    () => ({ attrs: {}, state }),
+    merge(props, { type: "button" })
+  )
 }
 
 function stepPart(name: "previous" | "next", props: StepProps) {
@@ -143,14 +166,20 @@ function CarouselNext(props: StepProps) {
  * The indicators, as a tablist with one tab stop. Its children can be a function of the state.
  * @stable
  */
-function CarouselIndicatorGroup(props: PartProps<"div", CarouselIndicatorGroupState> & CarouselControlProps) {
+function CarouselIndicatorGroup(
+  props: PartProps<"div", CarouselIndicatorGroupState> & CarouselControlProps
+) {
   const carousel = useConnectedCarousel(() => props.controller)
   const rest = omit(props, "controller")
   return (
     <Show
       when={carousel()}
       keyed
-      fallback={renderStatic("div", () => ({ attrs: {}, state: { page: 1, pageCount: null } }), rest)}
+      fallback={renderStatic(
+        "div",
+        () => ({ attrs: {}, state: { page: 1, pageCount: null } }),
+        rest
+      )}
     >
       {(carousel) => (
         <CarouselContext value={carousel}>
@@ -175,9 +204,20 @@ function CarouselIndicator(props: IndicatorProps) {
   const carousel = useContext(CarouselContext)
   const rest = omit(props, "page")
   // In a group outside its carousel, before that mounts, it's a plain button.
-  if (!carousel) return plainButton(rest, { page: untrack(() => props.page) ?? 0, selected: false })
+  if (!carousel) {
+    return plainButton(rest, {
+      page: untrack(() => props.page) ?? 0,
+      selected: false,
+    })
+  }
   const id = createUniqueId()
-  return usePart(carousel, "indicator", () => ({ id, page: props.page }), rest, "button")
+  return usePart(
+    carousel,
+    "indicator",
+    () => ({ id, page: props.page }),
+    rest,
+    "button"
+  )
 }
 
 /**
@@ -185,14 +225,23 @@ function CarouselIndicator(props: IndicatorProps) {
  * @stable
  */
 function CarouselPlayToggle(
-  props: Omit<PartProps<"button", CarouselPlayToggleState>, "value" | "defaultValue" | "onChange"> &
-    CarouselControlProps,
+  props: Omit<
+    PartProps<"button", CarouselPlayToggleState>,
+    "value" | "defaultValue" | "onChange"
+  > &
+    CarouselControlProps
 ) {
   const carousel = useConnectedCarousel(() => props.controller)
   const rest = omit(props, "controller")
   return (
-    <Show when={carousel()} keyed fallback={plainButton(rest, { playing: false, paused: false })}>
-      {(carousel) => usePart(carousel, "play-toggle", undefined, rest, "button")}
+    <Show
+      when={carousel()}
+      keyed
+      fallback={plainButton(rest, { playing: false, paused: false })}
+    >
+      {(carousel) =>
+        usePart(carousel, "play-toggle", undefined, rest, "button")
+      }
     </Show>
   )
 }

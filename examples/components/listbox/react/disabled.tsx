@@ -1,6 +1,10 @@
 "use client"
 
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/react/listbox"
 import { CheckIcon } from "lucide-react"
 import * as React from "react"
 
@@ -23,9 +27,18 @@ function Example() {
           {disabled ? "Enable the List" : "Disable the List"}
         </button>
       </div>
-      <Listbox multiple disabled={disabled} defaultValue={["basil"]} aria-label="Toppings">
+      <Listbox
+        multiple
+        disabled={disabled}
+        defaultValue={["basil"]}
+        aria-label="Toppings"
+      >
         {toppings.map((topping) => (
-          <ListboxItem key={topping.value} value={topping.value} disabled={topping.value === "olive"}>
+          <ListboxItem
+            key={topping.value}
+            value={topping.value}
+            disabled={topping.value === "olive"}
+          >
             {topping.label}
             <ListboxItemIndicator>
               <CheckIcon aria-hidden="true" />

@@ -8,7 +8,9 @@ import {
 } from "tests/fixtures/drawer.ts"
 
 const parts = drawerParts()
-const backdrop = parts.backdrop ? `<ui-drawer-backdrop class="drawer-backdrop"></ui-drawer-backdrop>` : ""
+const backdrop = parts.backdrop
+  ? `<ui-drawer-backdrop class="drawer-backdrop"></ui-drawer-backdrop>`
+  : ""
 
 const nested = `
   <ui-drawer id="nested">
@@ -65,43 +67,65 @@ const markup = `
 function applyOptions(el: HTMLElement & Record<string, unknown>) {
   const options = drawerOptions() as Record<string, unknown>
   for (const [name, value] of Object.entries(options)) {
-    if (name === "container") continue
-    if (name === "defaultOpen") el.setAttribute("default-open", "")
-    else if (name === "snapPoints") el.setAttribute("snap-points", (value as unknown[]).join(","))
-    else
+    if (name === "container") {
+      continue
+    }
+    if (name === "defaultOpen") {
+      el.setAttribute("default-open", "")
+    } else if (name === "snapPoints") {
+      el.setAttribute("snap-points", (value as unknown[]).join(","))
+    } else {
       el.setAttribute(
         name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`),
-        String(value),
+        String(value)
       )
+    }
   }
   const container = new URLSearchParams(location.search).get("container")
-  if (container) el.setAttribute("container", `#${container}`)
+  if (container) {
+    el.setAttribute("container", `#${container}`)
+  }
 }
 
 async function mount(root: HTMLElement) {
   root.innerHTML = markup
   const controller = createDrawerController()
   exposeDrawerFixture(controller)
-  const el = root.querySelector<HTMLElement & Record<string, unknown>>("#drawer")!
+  const el = root.querySelector<HTMLElement & Record<string, unknown>>(
+    "#drawer"
+  )!
   applyOptions(el)
   el.controller = controller
   await import("@ui-sdk/web/drawer")
   const output = root.querySelector("output")!
-  root.querySelector("#submit")!.addEventListener("click", () => (output.textContent = "submit"))
-  root.querySelector("#page")!.addEventListener("click", () => (output.textContent = "page"))
-  root.querySelector("#controller")!.addEventListener("click", () => controller.open())
+  root
+    .querySelector("#submit")!
+    .addEventListener("click", () => (output.textContent = "submit"))
+  root
+    .querySelector("#page")!
+    .addEventListener("click", () => (output.textContent = "page"))
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => controller.open())
   root.querySelector("#grow")?.addEventListener("click", (event) => {
     const more = document.createElement("p")
     more.className = "more"
     more.textContent = drawerFixture.grow.text
     ;(event.target as HTMLElement).after(more)
   })
-  const outlet = root.querySelector<HTMLElement & { keyframes?: unknown }>("ui-drawer-outlet")
-  if (outlet) outlet.keyframes = drawerFixture.outlet.keyframes
+  const outlet = root.querySelector<HTMLElement & { keyframes?: unknown }>(
+    "ui-drawer-outlet"
+  )
+  if (outlet) {
+    outlet.keyframes = drawerFixture.outlet.keyframes
+  }
   el.addEventListener("openchange", (event) => {
     const { value, reason } = (event as CustomEvent).detail
-    if ((event.target as HTMLElement).id === "drawer") recordDrawer(`drawer:${value}:${reason}`)
-    else recordDrawer(`nested:${value}:${reason}`)
+    if ((event.target as HTMLElement).id === "drawer") {
+      recordDrawer(`drawer:${value}:${reason}`)
+    } else {
+      recordDrawer(`nested:${value}:${reason}`)
+    }
   })
   el.addEventListener("snappointchange", (event) => {
     const { value, reason } = (event as CustomEvent).detail

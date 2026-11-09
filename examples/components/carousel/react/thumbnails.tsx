@@ -1,6 +1,11 @@
 "use client"
 
-import { Carousel, CarouselContent, CarouselItem, CarouselViewport } from "@ui-sdk/react/carousel"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselViewport,
+} from "@ui-sdk/react/carousel"
 import * as React from "react"
 
 const photos = [
@@ -34,12 +39,21 @@ function Example() {
           </CarouselContent>
         </CarouselViewport>
       </Carousel>
-      <Carousel ref={strip} aria-label="Thumbnails" dragFree slidesPerPage="auto">
+      <Carousel
+        ref={strip}
+        aria-label="Thumbnails"
+        dragFree
+        slidesPerPage="auto"
+      >
         <CarouselViewport>
           <CarouselContent>
             {photos.map((photo, index) => (
               <CarouselItem key={photo.name} aria-label={photo.name}>
-                <button type="button" aria-pressed={page === index + 1} onClick={() => setPage(index + 1)}>
+                <button
+                  type="button"
+                  aria-pressed={page === index + 1}
+                  onClick={() => setPage(index + 1)}
+                >
                   {photo.name}
                 </button>
               </CarouselItem>

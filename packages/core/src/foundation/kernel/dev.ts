@@ -40,7 +40,13 @@ type DevEvent =
     }
   | {
       type: "layers"
-      stack: { component: string; id: string; modal: boolean | "pointer"; blocking: boolean; el?: Element }[]
+      stack: {
+        component: string
+        id: string
+        modal: boolean | "pointer"
+        blocking: boolean
+        el?: Element
+      }[]
     }
   | { type: "warn"; message: string; component?: string; id?: string }
   | {
@@ -84,16 +90,25 @@ const history = ((globalThis as Record<symbol, unknown>)[historyKey] ??= {
 
 function keep<T>(list: T[], item: T) {
   list.push(item)
-  if (list.length > limit) list.splice(0, list.length - limit)
+  if (list.length > limit) {
+    list.splice(0, list.length - limit)
+  }
 }
 
 /** Reports an event to the devtools hook, when one is present, and to `__UI_SDK__`. */
 function emit(event: DevEvent) {
-  if (!installed) install()
-  if (event.type === "change") keep(history.changes, event)
-  else if (event.type === "warn") keep(history.warnings, event)
-  else if (event.type === "relay") keep((history.relays ??= []), event)
-  else if (event.type === "layers") history.layers = event.stack
+  if (!installed) {
+    install()
+  }
+  if (event.type === "change") {
+    keep(history.changes, event)
+  } else if (event.type === "warn") {
+    keep(history.warnings, event)
+  } else if (event.type === "relay") {
+    keep((history.relays ??= []), event)
+  } else if (event.type === "layers") {
+    history.layers = event.stack
+  }
   const hook = (globalThis as Record<symbol, unknown>)[hookKey] as
     { emit?: (event: DevEvent) => void } | undefined
   hook?.emit?.(event)
@@ -105,7 +120,11 @@ function emit(event: DevEvent) {
  * `globalThis.__UI_SDK_DEV__ = false` to silence warnings, or
  * `globalThis.__UI_SDK_STRICT__ = true`, as tests do, to throw them instead.
  */
-function warn(message: string, from?: { component: string; id?: string }, detail?: unknown) {
+function warn(
+  message: string,
+  from?: { component: string; id?: string },
+  detail?: unknown
+) {
   say(message, from, detail, true)
 }
 
@@ -113,7 +132,11 @@ function warn(message: string, from?: { component: string; id?: string }, detail
  * Like `warn`, for what the app meant to happen, like an action that failed:
  * it's logged and reported, but never thrown in strict mode.
  */
-function note(message: string, from?: { component: string; id?: string }, detail?: unknown) {
+function note(
+  message: string,
+  from?: { component: string; id?: string },
+  detail?: unknown
+) {
   say(message, from, detail, false)
 }
 
@@ -121,16 +144,26 @@ function say(
   message: string,
   from: { component: string; id?: string } | undefined,
   detail: unknown,
-  strict: boolean,
+  strict: boolean
 ) {
-  const flags = globalThis as { __UI_SDK_DEV__?: boolean; __UI_SDK_STRICT__?: boolean }
-  if (flags.__UI_SDK_DEV__ === false) return
+  const flags = globalThis as {
+    __UI_SDK_DEV__?: boolean
+    __UI_SDK_STRICT__?: boolean
+  }
+  if (flags.__UI_SDK_DEV__ === false) {
+    return
+  }
   const name = from ? `${from.component}${from.id ? `#${from.id}` : ""}: ` : ""
   emit({ type: "warn", message, component: from?.component, id: from?.id })
-  if (strict && flags.__UI_SDK_STRICT__) throw new Error(`[ui-sdk] ${name}${message}`, { cause: detail })
+  if (strict && flags.__UI_SDK_STRICT__) {
+    throw new Error(`[ui-sdk] ${name}${message}`, { cause: detail })
+  }
   // A detail like an error is logged as itself, so the console shows its stack.
-  if (detail === undefined) console.warn(`[ui-sdk] ${name}${message}`)
-  else console.warn(`[ui-sdk] ${name}${message}`, detail)
+  if (detail === undefined) {
+    console.warn(`[ui-sdk] ${name}${message}`)
+  } else {
+    console.warn(`[ui-sdk] ${name}${message}`, detail)
+  }
 }
 
 const needMessages = {
@@ -142,22 +175,34 @@ const needMessages = {
 }
 
 /** Checks each slot's declared role, and that the slot meets what the role needs. */
-function checkRoles(slots: Record<string, object>, from: { component: string }) {
+function checkRoles(
+  slots: Record<string, object>,
+  from: { component: string }
+) {
   for (const [slot, definition] of Object.entries(slots)) {
-    const { role, roles } = definition as { role?: unknown; roles?: readonly string[] }
-    if (role === undefined) continue
-    if (typeof role === "function" && !roles?.length)
+    const { role, roles } = definition as {
+      role?: unknown
+      roles?: readonly string[]
+    }
+    if (role === undefined) {
+      continue
+    }
+    if (typeof role === "function" && !roles?.length) {
       warn(
         `the "${slot}" part picks its role from state, so its slot lists every role it can pick in \`roles\`.`,
-        from,
+        from
       )
+    }
     for (const each of typeof role === "string" ? [role] : (roles ?? [])) {
-      if (!knownRoles.has(each)) warn(`the "${slot}" part's role "${each}" isn't a WAI-ARIA role.`, from)
-      for (const need of unmetNeeds(each, definition))
+      if (!knownRoles.has(each)) {
+        warn(`the "${slot}" part's role "${each}" isn't a WAI-ARIA role.`, from)
+      }
+      for (const need of unmetNeeds(each, definition)) {
         warn(
           `the "${slot}" part is ${/^[aeiou]/.test(each) ? "an" : "a"} ${each}, which ${needMessages[need]}.`,
-          from,
+          from
         )
+      }
     }
   }
 }
@@ -173,15 +218,19 @@ function checkRole(
   own: Record<string, unknown> | undefined,
   role: unknown,
   from: { component: string; id?: string },
-  live?: Record<string, unknown>,
+  live?: Record<string, unknown>
 ) {
-  if (typeof role === "string") checkAria(definition, slot, role, { ...own, ...live }, from)
-  if (warnedRole.has(definition)) return
+  if (typeof role === "string") {
+    checkAria(definition, slot, role, { ...own, ...live }, from)
+  }
+  if (warnedRole.has(definition)) {
+    return
+  }
   if (own?.role !== undefined && definition.role !== undefined) {
     warnedRole.add(definition)
     warn(
       `the "${slot}" part declares its role, and its \`attrs\` writes one too. Leave \`role\` out of \`attrs\`.`,
-      from,
+      from
     )
   } else if (
     typeof definition.role === "function" &&
@@ -191,7 +240,7 @@ function checkRole(
     warnedRole.add(definition)
     warn(
       `the "${slot}" part picked the role "${String(role)}", which its slot's \`roles\` doesn't list.`,
-      from,
+      from
     )
   }
 }
@@ -203,27 +252,35 @@ function checkAria(
   slot: string,
   role: string,
   written: Record<string, unknown>,
-  from: { component: string; id?: string },
+  from: { component: string; id?: string }
 ) {
   const { notAllowed, missing } = ariaProblems(role, written)
-  if (!notAllowed.length && !missing.length) return
+  if (!notAllowed.length && !missing.length) {
+    return
+  }
   let warned = warnedAria.get(definition)
-  if (!warned) warnedAria.set(definition, (warned = new Set()))
+  if (!warned) {
+    warnedAria.set(definition, (warned = new Set()))
+  }
   const a = /^[aeiou]/.test(role) ? "an" : "a"
   for (const name of notAllowed) {
-    if (warned.has(name)) continue
+    if (warned.has(name)) {
+      continue
+    }
     warned.add(name)
     warn(
       `the "${slot}" part is ${a} ${role}, which doesn't take \`${name}\`, so assistive technology ignores it.`,
-      from,
+      from
     )
   }
   for (const name of missing) {
-    if (warned.has(name)) continue
+    if (warned.has(name)) {
+      continue
+    }
     warned.add(name)
     warn(
       `the "${slot}" part is ${a} ${role}, which needs \`${name}\`, and neither its \`attrs\` nor its \`live\` writes it.`,
-      from,
+      from
     )
   }
 }
@@ -235,32 +292,49 @@ const focusesOnItsOwn =
  * Checks a bound element can take focus the way its slot says, a task later,
  * once a framework or an element's own upgrade has written its attributes.
  */
-function checkFocus(focus: unknown, slot: string, el: HTMLElement, from: { component: string; id?: string }) {
+function checkFocus(
+  focus: unknown,
+  slot: string,
+  el: HTMLElement,
+  from: { component: string; id?: string }
+) {
   // Unit tests bind stand-ins that aren't elements.
-  if (typeof focus !== "string" || typeof Element === "undefined" || !(el instanceof Element)) return
+  if (
+    typeof focus !== "string" ||
+    typeof Element === "undefined" ||
+    !(el instanceof Element)
+  ) {
+    return
+  }
   setTimeout(() => {
     // A part that isn't meant to take focus now, like an option of a disabled list, has no tabindex on purpose.
-    if (!el.isConnected || el.closest('[aria-disabled="true"], [disabled], [inert], [hidden]')) return
+    if (
+      !el.isConnected ||
+      el.closest('[aria-disabled="true"], [disabled], [inert], [hidden]')
+    ) {
+      return
+    }
     const tag = `<${el.localName}>`
-    if (focus === "native" && !el.matches(focusesOnItsOwn))
+    if (focus === "native" && !el.matches(focusesOnItsOwn)) {
       warn(
         `the "${slot}" part's focus is "native", but a ${tag} doesn't take focus on its own. Render a native control, or use "roving" or "tab-stop" with a tabindex.`,
-        from,
+        from
       )
-    else if (
+    } else if (
       (focus === "roving" || focus === "tab-stop") &&
       !el.hasAttribute("tabindex") &&
       !el.matches(focusesOnItsOwn)
-    )
+    ) {
       warn(
         `the "${slot}" part's focus is "${focus}", but its ${tag} has no tabindex, so it can't take focus.`,
-        from,
+        from
       )
-    else if (focus === "active-descendant" && !el.id)
+    } else if (focus === "active-descendant" && !el.id) {
       warn(
         `the "${slot}" part's focus is "active-descendant", but it has no id for \`aria-activedescendant\` to point at.`,
-        from,
+        from
       )
+    }
   })
 }
 
@@ -275,12 +349,14 @@ function warnMissing(slots: object, from: { component: string; id?: string }) {
   warnedMissing.set(slots, warned)
   return new Proxy(slots as Record<string, unknown>, {
     get(target, slot) {
-      if (typeof slot != "string" || slot in target) return target[slot as string]
+      if (typeof slot != "string" || slot in target) {
+        return target[slot as string]
+      }
       if (!warned.has(slot)) {
         warned.add(slot)
         warn(
           `the "${slot}" part isn't defined. A part that ships with a feature registers it with \`use\` before it renders.`,
-          from,
+          from
         )
       }
       return {}
@@ -363,24 +439,39 @@ const reasonEvents: Record<string, string[]> = {
 const checked = new Set<string>()
 
 /** Warns once when a change's event doesn't match what its reason declares. */
-function checkEvent(reason: string, event: Event | undefined, from: { component: string; id?: string }) {
-  if (!event || typeof window === "undefined") return
+function checkEvent(
+  reason: string,
+  event: Event | undefined,
+  from: { component: string; id?: string }
+) {
+  if (!event || typeof window === "undefined") {
+    return
+  }
   const allowed = reasonEvents[reason]
-  if (!allowed) return
+  if (!allowed) {
+    return
+  }
   // Event constructors looked up by name, so engines without one, like
   // SubmitEvent in older browsers, skip it instead of throwing.
-  const constructors = window as unknown as Record<string, (new () => Event) | undefined>
+  const constructors = window as unknown as Record<
+    string,
+    (new () => Event) | undefined
+  >
   const matches = allowed.some((name) => {
     const constructor = constructors[name]
     return !!constructor && event instanceof constructor
   })
-  if (matches) return
+  if (matches) {
+    return
+  }
   const key = `${reason}:${event.constructor.name}`
-  if (checked.has(key)) return
+  if (checked.has(key)) {
+    return
+  }
   checked.add(key)
   warn(
     `reported \`${reason}\` with a ${event.constructor.name} (\`${event.type}\`), which the vocabulary doesn't list.`,
-    from,
+    from
   )
 }
 
@@ -393,15 +484,19 @@ function checkPrevented(
   name: string,
   prevented: boolean,
   details: { event?: Event; canceled: boolean },
-  from: { component: string; id?: string },
+  from: { component: string; id?: string }
 ) {
-  if (prevented || !details.event?.defaultPrevented || details.canceled) return
+  if (prevented || !details.event?.defaultPrevented || details.canceled) {
+    return
+  }
   const key = `${from.component}:${name}`
-  if (preventedOnce.has(key)) return
+  if (preventedOnce.has(key)) {
+    return
+  }
   preventedOnce.add(key)
   warn(
     `\`details.event.preventDefault()\` in \`${name}\` stopped the browser's default, not the change. Call \`details.cancel()\` to stop the change.`,
-    from,
+    from
   )
 }
 
@@ -410,8 +505,13 @@ function distance(a: string, b: string) {
   let row = Array.from({ length: b.length + 1 }, (_, index) => index)
   for (let i = 1; i <= a.length; i++) {
     const next = [i]
-    for (let j = 1; j <= b.length; j++)
-      next[j] = Math.min(row[j] + 1, next[j - 1] + 1, row[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1))
+    for (let j = 1; j <= b.length; j++) {
+      next[j] = Math.min(
+        row[j] + 1,
+        next[j - 1] + 1,
+        row[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+      )
+    }
     row = next
   }
   return row[b.length]
@@ -425,17 +525,26 @@ const marked = new WeakSet<Element>()
  * app may use `data-agent-*` for its own data, like a support agent's id.
  */
 function checkMarks(elements: Element[], marks: string[]) {
-  for (const start of elements)
-    for (let el: Element | null = start; el && !marked.has(el); el = el.parentElement) {
+  for (const start of elements) {
+    for (
+      let el: Element | null = start;
+      el && !marked.has(el);
+      el = el.parentElement
+    ) {
       marked.add(el)
       for (const { name } of el.attributes) {
         const near =
           name.startsWith("data-agent-") &&
           !marks.includes(name) &&
           marks.find((mark) => distance(name, mark) <= 2)
-        if (near) warn(`${name} isn't an agent mark, so it does nothing. Did you mean ${near}?`)
+        if (near) {
+          warn(
+            `${name} isn't an agent mark, so it does nothing. Did you mean ${near}?`
+          )
+        }
       }
     }
+  }
 }
 
 /** Lets `__UI_SDK__.shortcuts()` list the shared shortcut manager's shortcuts. */
@@ -445,20 +554,31 @@ function exposeShortcuts(list: () => unknown[]) {
 
 // Per instance: whether each controlled key was controlled last time, and
 // what it already warned about, so each warning shows once.
-const controls = new WeakMap<object, { was: Map<string, boolean>; warned: Set<string> }>()
+const controls = new WeakMap<
+  object,
+  { was: Map<string, boolean>; warned: Set<string> }
+>()
 
 /**
  * Warns about controlled state misuse, once per key: `open` with
  * `defaultOpen`, or a key that was controlled and is now undefined. A value
  * that arrives later, like a bound variable that starts empty, is fine.
  */
-function checkControlled(from: { component: string; id: string }, keys: string[], options: object) {
+function checkControlled(
+  from: { component: string; id: string },
+  keys: string[],
+  options: object
+) {
   const values = options as Record<string, unknown>
   let control = controls.get(from)
-  if (!control) controls.set(from, (control = { was: new Map(), warned: new Set() }))
+  if (!control) {
+    controls.set(from, (control = { was: new Map(), warned: new Set() }))
+  }
   const { was, warned } = control
   const once = (key: string, message: string) => {
-    if (warned.has(key)) return
+    if (warned.has(key)) {
+      return
+    }
     warned.add(key)
     warn(message, from)
   }
@@ -466,13 +586,15 @@ function checkControlled(from: { component: string; id: string }, keys: string[]
     const fallback = defaultName(key)
     const isControlled = values[key] !== undefined
     // Both from the start. A value that arrives later takes over from where the default started.
-    if (isControlled && !was.has(key) && values[fallback] !== undefined)
+    if (isControlled && !was.has(key) && values[fallback] !== undefined) {
       once(`${key}+`, `got \`${key}\` and \`${fallback}\`. Pass one.`)
-    if (was.get(key) && !isControlled)
+    }
+    if (was.get(key) && !isControlled) {
       once(
         key,
-        `stopped controlling \`${key}\`: it was passed and is now undefined, so the component keeps its last value.`,
+        `stopped controlling \`${key}\`: it was passed and is now undefined, so the component keeps its last value.`
       )
+    }
     was.set(key, isControlled)
   }
 }
@@ -480,7 +602,10 @@ function checkControlled(from: { component: string; id: string }, keys: string[]
 // What a stuck controlled change looks like: the component asked for a new
 // value, and the owner never passed it back. Each key waits with the value it
 // had when asked.
-const pending = new WeakMap<object, Map<string, { timer: ReturnType<typeof setTimeout>; before: unknown }>>()
+const pending = new WeakMap<
+  object,
+  Map<string, { timer: ReturnType<typeof setTimeout>; before: unknown }>
+>()
 
 /**
  * Warns when a controlled change was requested and the option it controls
@@ -490,16 +615,27 @@ const pending = new WeakMap<object, Map<string, { timer: ReturnType<typeof setTi
  */
 function expectControlled(
   instance: object,
-  info: { component: string; id: string; key: string; value: unknown; reason: string; source: string },
-  current: () => unknown,
+  info: {
+    component: string
+    id: string
+    key: string
+    value: unknown
+    reason: string
+    source: string
+  },
+  current: () => unknown
 ) {
   let waiting = pending.get(instance)
-  if (!waiting) pending.set(instance, (waiting = new Map()))
+  if (!waiting) {
+    pending.set(instance, (waiting = new Map()))
+  }
   clearTimeout(waiting.get(info.key)?.timer)
   const before = current()
   const timer = setTimeout(() => {
     waiting.delete(info.key)
-    if (!Object.is(current(), before) || Object.is(before, info.value)) return
+    if (!Object.is(current(), before) || Object.is(before, info.value)) {
+      return
+    }
     const asked =
       info.key === "open"
         ? info.value
@@ -509,7 +645,7 @@ function expectControlled(
     const callback = callbackName(info.key, "Change")
     warn(
       `asked ${asked} (\`${info.reason}\`, \`${info.source}\`), and \`${info.key}\` stayed ${JSON.stringify(before)}. Update it in \`${callback}\`, right away even when a save or navigation follows, or call \`details.cancel()\` there to refuse.`,
-      info,
+      info
     )
   }, 1000)
   waiting.set(info.key, { timer, before })
@@ -522,13 +658,16 @@ function expectControlled(
  */
 function heardControlled(instance: object, options: object) {
   const waiting = pending.get(instance)
-  if (!waiting) return
+  if (!waiting) {
+    return
+  }
   const values = options as Record<string, unknown>
-  for (const [key, { timer, before }] of waiting)
+  for (const [key, { timer, before }] of waiting) {
     if (!Object.is(values[key], before)) {
       clearTimeout(timer)
       waiting.delete(key)
     }
+  }
 }
 
 /** Stops waiting for a controlled value, like when the instance leaves the page. */
@@ -549,7 +688,7 @@ function install() {
         (change) =>
           (!filter.component || change.component === filter.component) &&
           (!filter.id || change.id === filter.id) &&
-          (!filter.key || change.key === filter.key),
+          (!filter.key || change.key === filter.key)
       ),
     layers: () => history.layers,
     shortcuts: () => history.shortcuts?.() ?? [],

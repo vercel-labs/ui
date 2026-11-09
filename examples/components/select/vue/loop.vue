@@ -28,7 +28,11 @@ const priorities = [
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem v-for="priority in priorities" :key="priority.value" :value="priority.value">
+        <SelectItem
+          v-for="priority in priorities"
+          :key="priority.value"
+          :value="priority.value"
+        >
           {{ priority.label }}
           <SelectItemIndicator>
             <CheckIcon />

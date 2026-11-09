@@ -5,7 +5,10 @@ import path from "node:path"
 
 const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
 const folders = ["react", "vue", "svelte", "web", "solid"]
-const root = path.join(import.meta.dirname, "../../examples/components/hover-card")
+const root = path.join(
+  import.meta.dirname,
+  "../../examples/components/hover-card"
+)
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
     .filter((entry) => entry.isFile())
@@ -33,7 +36,10 @@ const examples: Record<string, Example> = {
     check: async ({ card }) => {
       await expect(card).toContainText("Inès Moreau")
       const arrow = card.locator('[data-slot="hover-card-arrow"]')
-      await expect(arrow).toHaveAttribute("data-side", (await card.getAttribute("data-side"))!)
+      await expect(arrow).toHaveAttribute(
+        "data-side",
+        (await card.getAttribute("data-side"))!
+      )
     },
   },
 }
@@ -43,18 +49,27 @@ for (const framework of frameworks) {
   test(`every hover card example works in ${framework}`, async ({ page }) => {
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/hover-card`)
     await page.waitForLoadState("networkidle")
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...order, "rtl"].sort())
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual(
+        [...order, "rtl"].sort()
+      )
+    }
     const cards = page.locator('[data-slot="hover-card-content"]:visible')
 
     for (const [index, name] of order.entries()) {
       await test.step(name, async () => {
         const preview = previews.nth(index)
-        const trigger = preview.getByRole("link", { name: examples[name].trigger }).first()
+        const trigger = preview
+          .getByRole("link", { name: examples[name].trigger })
+          .first()
         await trigger.scrollIntoViewIfNeeded()
         await trigger.hover()
         const card = cards.first()
@@ -72,7 +87,9 @@ for (const framework of frameworks) {
 
 // The card follows the side chosen for it, and the arrow follows the card.
 for (const framework of frameworks) {
-  test(`the card opens on the chosen side in ${framework}`, async ({ page }) => {
+  test(`the card opens on the chosen side in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/hover-card`)
     await page.waitForLoadState("networkidle")
     const preview = page.locator("[data-example]").nth(order.indexOf("side"))
@@ -82,8 +99,13 @@ for (const framework of frameworks) {
     await trigger.hover()
     const card = page.locator('[data-slot="hover-card-content"]:visible')
     await expect(card).toHaveAttribute("data-side", "top")
-    await expect(card.locator('[data-slot="hover-card-arrow"]')).toHaveAttribute("data-side", "top")
-    const [link, box] = await Promise.all([trigger.boundingBox(), card.boundingBox()])
+    await expect(
+      card.locator('[data-slot="hover-card-arrow"]')
+    ).toHaveAttribute("data-side", "top")
+    const [link, box] = await Promise.all([
+      trigger.boundingBox(),
+      card.boundingBox(),
+    ])
     expect(box!.y + box!.height).toBeLessThanOrEqual(link!.y)
   })
 }
@@ -93,7 +115,10 @@ for (const framework of frameworks) {
   test(`Escape closes the card in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/hover-card`)
     await page.waitForLoadState("networkidle")
-    const trigger = page.locator("[data-example]").first().getByRole("link", { name: "@hollis" })
+    const trigger = page
+      .locator("[data-example]")
+      .first()
+      .getByRole("link", { name: "@hollis" })
     await trigger.scrollIntoViewIfNeeded()
     await trigger.hover()
     const card = page.locator('[data-slot="hover-card-content"]:visible')

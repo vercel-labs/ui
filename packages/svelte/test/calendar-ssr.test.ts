@@ -16,7 +16,9 @@ describe("server rendering a calendar", () => {
   })
 
   test("two months render two grids under one heading", () => {
-    const html = render(App, { props: { months: 2, defaultMonth: "2026-10" } }).body
+    const html = render(App, {
+      props: { months: 2, defaultMonth: "2026-10" },
+    }).body
     expect(html.match(/role="grid"/g)).toHaveLength(2)
     expect(html).toMatch(/October\s–\sNovember 2026/)
   })

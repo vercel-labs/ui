@@ -25,7 +25,7 @@ function mount(root: HTMLElement) {
                   <li>
                     ${message.from}
                     <span data-slot="hint">${message.subject}</span>
-                  </li>`,
+                  </li>`
               )
               .join("")}
           </ul>

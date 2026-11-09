@@ -23,7 +23,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
@@ -51,7 +52,7 @@ function mount(root: HTMLElement) {
                       ${country.label}
                       <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                     </ui-combobox-item>
-                  `,
+                  `
                 )
                 .join("")}
             </ui-combobox-list>
@@ -79,7 +80,7 @@ function mount(root: HTMLElement) {
                       ${interest}
                       <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                     </ui-combobox-item>
-                  `,
+                  `
                 )
                 .join("")}
             </ui-combobox-list>
@@ -99,11 +100,14 @@ function mount(root: HTMLElement) {
       </div>
     </form>
   `
-  root.querySelector("ui-combobox")!.itemToLabel = (value) => countryLabel(value as string)
+  root.querySelector("ui-combobox")!.itemToLabel = (value) =>
+    countryLabel(value as string)
   const form = root.querySelector("form")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    const entries = [...new FormData(form)].map(([name, value]) => `${name}=${value}`)
+    const entries = [...new FormData(form)].map(
+      ([name, value]) => `${name}=${value}`
+    )
     log(root, `Submitted ${entries.join("&")}`)
   })
 }

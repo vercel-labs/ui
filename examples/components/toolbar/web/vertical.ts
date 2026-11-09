@@ -1,6 +1,13 @@
 import "@ui-sdk/web/toolbar"
 import "@ui-sdk/web/toggle"
-import { createElement, MousePointer2, Pencil, Square, Trash2, Type } from "lucide"
+import {
+  createElement,
+  MousePointer2,
+  Pencil,
+  Square,
+  Trash2,
+  Type,
+} from "lucide"
 import { log } from "../../../shared/web/log"
 
 const tools = [
@@ -22,7 +29,7 @@ function mount(root: HTMLElement) {
                   <ui-toggle-icon>${createElement(tool.icon, { "aria-hidden": "true" }).outerHTML}</ui-toggle-icon>
                 </button>
               </ui-toggle>
-            `,
+            `
           )
           .join("")}
       </ui-toggle-group>
@@ -34,11 +41,15 @@ function mount(root: HTMLElement) {
       </ui-toolbar-button>
     </ui-toolbar>
   `
-  root.querySelector("ui-toggle-group")!.addEventListener("valuechange", (event) => {
-    const [value] = event.detail.value
-    log(root, `${tools.find((tool) => tool.value === value)?.label} tool`)
-  })
-  root.querySelector('[aria-label="Delete"]')!.addEventListener("click", () => log(root, "Deleted selection"))
+  root
+    .querySelector("ui-toggle-group")!
+    .addEventListener("valuechange", (event) => {
+      const [value] = event.detail.value
+      log(root, `${tools.find((tool) => tool.value === value)?.label} tool`)
+    })
+  root
+    .querySelector('[aria-label="Delete"]')!
+    .addEventListener("click", () => log(root, "Deleted selection"))
 }
 
 export { mount }

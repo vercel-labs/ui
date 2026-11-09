@@ -5,7 +5,12 @@
     <title>Sheet</title>
     <script type="module" src="{{files}}/web.js"></script>
     <script type="module">
-      import { createCellRange, createGridFocus, createParts, definePrimitive } from "{{files}}/web/core.js"
+      import {
+        createCellRange,
+        createGridFocus,
+        createParts,
+        definePrimitive,
+      } from "{{files}}/web/core.js"
 
       const sheet = definePrimitive({
         name: "sheet",
@@ -15,7 +20,10 @@
           const rows = () => context.options().rows
           const cols = () => context.options().cols
           const grid = createGridFocus(context, { key: "active", rows, cols })
-          return { grid, range: createCellRange(context, { key: "range", grid, rows, cols }) }
+          return {
+            grid,
+            range: createCellRange(context, { key: "range", grid, rows, cols }),
+          }
         },
         slots: (slot) => ({
           root: slot({ attrs: () => ({ role: "grid" }) }),
@@ -29,14 +37,19 @@
             }),
             on: {
               keydown: (event, { api }) => api.range.keydown(event),
-              pointerdown: (event, { api, props }) => api.range.pointerdown(event, props),
+              pointerdown: (event, { api, props }) =>
+                api.range.pointerdown(event, props),
             },
             bind: (el, { api, props }) => api.range.bind(el, props),
           }),
         }),
       })
 
-      createParts(sheet, { root: "my-sheet", row: "my-sheet-row", cell: "my-sheet-cell" })
+      createParts(sheet, {
+        root: "my-sheet",
+        row: "my-sheet-row",
+        cell: "my-sheet-cell",
+      })
     </script>
   </head>
   <body>

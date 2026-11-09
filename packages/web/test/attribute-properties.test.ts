@@ -4,7 +4,11 @@
 // "false", like `spellcheck`, and the rest as text.
 import { beforeAll, describe, expect, test } from "vitest"
 import { defineDialogElements } from "../src/dialog"
-import type { UiDialogElement, UiPaginationElement, UiTabsElement } from "../src/events"
+import type {
+  UiDialogElement,
+  UiPaginationElement,
+  UiTabsElement,
+} from "../src/events"
 import { definePaginationElements } from "../src/pagination"
 import { defineTabsElements } from "../src/tabs"
 import { defineToolbarElements } from "../src/toolbar"
@@ -16,7 +20,9 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 let early: HTMLElement & { pageCount?: number }
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   early = document.createElement("ui-pagination")
   early.pageCount = 50
   defineTabsElements()
@@ -58,9 +64,11 @@ describe("attribute properties", () => {
 
   test("disabled is true whenever present, like a native control's", async () => {
     const toolbar = await mount(
-      `<ui-toolbar aria-label="Format"><ui-toolbar-button><button>Bold</button></ui-toolbar-button></ui-toolbar>`,
+      `<ui-toolbar aria-label="Format"><ui-toolbar-button><button>Bold</button></ui-toolbar-button></ui-toolbar>`
     )
-    const button = toolbar.querySelector("ui-toolbar-button") as HTMLElement & { disabled: boolean }
+    const button = toolbar.querySelector("ui-toolbar-button") as HTMLElement & {
+      disabled: boolean
+    }
     expect(button.disabled).toBe(false)
     button.setAttribute("disabled", "false")
     expect(button.disabled).toBe(true)
@@ -75,17 +83,23 @@ describe("attribute properties", () => {
     expect(tabs.getAttribute("orientation")).toBe("vertical")
     expect(tabs.orientation).toBe("vertical")
     await wait()
-    expect(tabs.querySelector("[role=tablist]")?.getAttribute("aria-orientation")).toBe("vertical")
+    expect(
+      tabs.querySelector("[role=tablist]")?.getAttribute("aria-orientation")
+    ).toBe("vertical")
     tabs.orientation = undefined
     expect(tabs.hasAttribute("orientation")).toBe(false)
   })
 
   test("numbers read as numbers, and lists join with commas", async () => {
-    const pagination = await mount<UiPaginationElement>(`<ui-pagination aria-label="Pages"></ui-pagination>`)
+    const pagination = await mount<UiPaginationElement>(
+      `<ui-pagination aria-label="Pages"></ui-pagination>`
+    )
     pagination.pageCount = 5
     expect(pagination.getAttribute("page-count")).toBe("5")
     expect(pagination.pageCount).toBe(5)
-    const tree = await mount<HTMLElement & { defaultExpanded?: string[] }>(`<ui-tree></ui-tree>`)
+    const tree = await mount<HTMLElement & { defaultExpanded?: string[] }>(
+      `<ui-tree></ui-tree>`
+    )
     tree.defaultExpanded = ["docs", "src"]
     expect(tree.getAttribute("default-expanded")).toBe("docs,src")
     expect(tree.defaultExpanded).toEqual(["docs", "src"])
@@ -93,7 +107,7 @@ describe("attribute properties", () => {
 
   test("parts have them too", async () => {
     const toolbar = await mount(
-      `<ui-toolbar aria-label="Format"><ui-toolbar-button><button>Bold</button></ui-toolbar-button></ui-toolbar>`,
+      `<ui-toolbar aria-label="Format"><ui-toolbar-button><button>Bold</button></ui-toolbar-button></ui-toolbar>`
     )
     const button = toolbar.querySelector("ui-toolbar-button") as HTMLElement & {
       focusableWhenDisabled: boolean
@@ -104,7 +118,9 @@ describe("attribute properties", () => {
   })
 
   test("a default that depends on another attribute reads like the component's", async () => {
-    const dialog = await mount<UiDialogElement>(`<ui-dialog modal="false"></ui-dialog>`)
+    const dialog = await mount<UiDialogElement>(
+      `<ui-dialog modal="false"></ui-dialog>`
+    )
     expect(dialog.closeOnOutsidePress).toBe(false)
     dialog.closeOnOutsidePress = true
     expect(dialog.getAttribute("close-on-outside-press")).toBe("")
@@ -126,14 +142,21 @@ describe("attribute properties", () => {
     const tabs = await mount<UiTabsElement>(tabsMarkup)
     tabs.dir = "rtl"
     expect(tabs.getAttribute("dir")).toBe("rtl")
-    expect(Object.getOwnPropertyDescriptor(Object.getPrototypeOf(tabs), "dir")).toBeUndefined()
+    expect(
+      Object.getOwnPropertyDescriptor(Object.getPrototypeOf(tabs), "dir")
+    ).toBeUndefined()
   })
 })
 
 describe("the element's own api", () => {
   test("an owner exposes its controller's methods and keeps its instance private", async () => {
     const tabs = await mount<UiTabsElement>(tabsMarkup)
-    expect(Object.keys(tabs.api!).sort()).toEqual(["focus", "getValue", "select", "setValue"])
+    expect(Object.keys(tabs.api!).sort()).toEqual([
+      "focus",
+      "getValue",
+      "select",
+      "setValue",
+    ])
     expect("instance" in tabs).toBe(false)
   })
 })

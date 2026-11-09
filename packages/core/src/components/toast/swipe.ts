@@ -7,8 +7,12 @@ const slop = 8
 
 // Movement toward a direction: positive when the pointer moved that way.
 function along(direction: SwipeDirection, x: number, y: number) {
-  if (direction === "up") return -y
-  if (direction === "down") return y
+  if (direction === "up") {
+    return -y
+  }
+  if (direction === "down") {
+    return y
+  }
   return direction === "left" ? -x : x
 }
 
@@ -20,12 +24,24 @@ function resist(distance: number) {
  * Where a swiped element shows, from how far the pointer moved: freely toward
  * an allowed direction, and resisting on the rest of that axis.
  */
-function swipeOffset(x: number, y: number, axis: "x" | "y", directions: SwipeDirection[]) {
-  const free = (value: number, negative: SwipeDirection, positive: SwipeDirection) =>
-    (value < 0 && directions.includes(negative)) || (value > 0 && directions.includes(positive))
+function swipeOffset(
+  x: number,
+  y: number,
+  axis: "x" | "y",
+  directions: SwipeDirection[]
+) {
+  const free = (
+    value: number,
+    negative: SwipeDirection,
+    positive: SwipeDirection
+  ) =>
+    (value < 0 && directions.includes(negative)) ||
+    (value > 0 && directions.includes(positive))
       ? value
       : resist(value)
-  return axis === "x" ? { x: free(x, "left", "right"), y: 0 } : { x: 0, y: free(y, "up", "down") }
+  return axis === "x"
+    ? { x: free(x, "left", "right"), y: 0 }
+    : { x: 0, y: free(y, "up", "down") }
 }
 
 /**
@@ -53,19 +69,27 @@ function swipeOutcome({
   for (const direction of directions) {
     const distance = along(direction, x, y)
     const speed = along(direction, velocityX, velocityY)
-    if (distance >= threshold || (distance > slop && speed >= flick)) return direction
+    if (distance >= threshold || (distance > slop && speed >= flick)) {
+      return direction
+    }
   }
   return null
 }
 
 // Which axis a press moved along first, if one of its directions is on it.
 function swipeAxis(x: number, y: number, directions: SwipeDirection[]) {
-  if (Math.hypot(x, y) < slop) return undefined
+  if (Math.hypot(x, y) < slop) {
+    return undefined
+  }
   const axis = Math.abs(x) > Math.abs(y) ? "x" : "y"
   const allowed =
     axis === "x"
-      ? directions.some((direction) => direction === "left" || direction === "right")
-      : directions.some((direction) => direction === "up" || direction === "down")
+      ? directions.some(
+          (direction) => direction === "left" || direction === "right"
+        )
+      : directions.some(
+          (direction) => direction === "up" || direction === "down"
+        )
   return allowed ? axis : null
 }
 
@@ -89,23 +113,33 @@ function trackSwipe(
   el: HTMLElement,
   down: PointerEvent,
   directions: SwipeDirection[],
-  callbacks: SwipeCallbacks,
+  callbacks: SwipeCallbacks
 ) {
   const start = { x: down.clientX, y: down.clientY }
   const samples = [{ x: start.x, y: start.y, time: down.timeStamp }]
   let axis: "x" | "y" = "x"
   drags.startOnMove(el, down, {
     pick(move) {
-      const picked = swipeAxis(move.clientX - start.x, move.clientY - start.y, directions)
-      if (picked === undefined) return undefined
-      if (picked === null) return false
+      const picked = swipeAxis(
+        move.clientX - start.x,
+        move.clientY - start.y,
+        directions
+      )
+      if (picked === undefined) {
+        return undefined
+      }
+      if (picked === null) {
+        return false
+      }
       axis = picked
       callbacks.onStart(axis)
       return true
     },
     onMove: ({ x, y, event }) => {
       samples.push({ x, y, time: event.timeStamp })
-      if (samples.length > 2) samples.shift()
+      if (samples.length > 2) {
+        samples.shift()
+      }
       callbacks.onMove(swipeOffset(x - start.x, y - start.y, axis, directions))
     },
     onEnd: (event, canceled) => {
@@ -127,4 +161,11 @@ function trackSwipe(
   })
 }
 
-export { along, swipeAxis, type SwipeDirection, swipeOffset, swipeOutcome, trackSwipe }
+export {
+  along,
+  swipeAxis,
+  type SwipeDirection,
+  swipeOffset,
+  swipeOutcome,
+  trackSwipe,
+}

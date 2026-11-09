@@ -3,26 +3,42 @@ import { sortable } from "../sortable"
 
 function arrange(list: HTMLElement, instance: ReturnType<typeof sortable>) {
   const items = new Map<string, Element>()
-  for (const child of list.children)
-    if (child.localName === "ui-sortable-item") items.set(child.getAttribute("value") ?? "", child)
+  for (const child of list.children) {
+    if (child.localName === "ui-sortable-item") {
+      items.set(child.getAttribute("value") ?? "", child)
+    }
+  }
   let next = items.values().next().value ?? null
-  for (const [index, key] of instance.api.reorder.order(instance.get()).entries()) {
+  for (const [index, key] of instance.api.reorder
+    .order(instance.get())
+    .entries()) {
     const item = items.get(key)
-    if (!item) continue
-    if (item === next) next = item.nextElementSibling
-    else list.insertBefore(item, next)
+    if (!item) {
+      continue
+    }
+    if (item === next) {
+      next = item.nextElementSibling
+    } else {
+      list.insertBefore(item, next)
+    }
     item.querySelector("[data-position]")?.replaceChildren(String(index + 1))
   }
 }
 
 createParts(sortable, {
-  root: { tag: "ui-sortable", render: (el, instance) => instance.subscribe(() => arrange(el, instance)) },
+  root: {
+    tag: "ui-sortable",
+    render: (el, instance) => instance.subscribe(() => arrange(el, instance)),
+  },
   item: "ui-sortable-item",
   handle: "ui-sortable-handle",
   instructions: "ui-sortable-instructions",
 })
 
-const tracks: Record<string, { title: string; artist: string; length: string }> = {
+const tracks: Record<
+  string,
+  { title: string; artist: string; length: string }
+> = {
   t1: { title: "Northern Lights", artist: "Halden", length: "3:42" },
   t2: { title: "Glass Harbor", artist: "Mira Vale", length: "4:05" },
   t3: { title: "Copper Sky", artist: "The Fieldnotes", length: "2:58" },
@@ -44,7 +60,9 @@ const photos: Record<string, { label: string; tone: string }> = {
 }
 
 const grip = [4, 8, 12]
-  .flatMap((y) => [6, 10].map((x) => `<circle cx="${x}" cy="${y}" r="1.2"></circle>`))
+  .flatMap((y) =>
+    [6, 10].map((x) => `<circle cx="${x}" cy="${y}" r="1.2"></circle>`)
+  )
   .join("")
 
 const track = (key: string, index: number) => `
@@ -92,18 +110,25 @@ function mount(root: HTMLElement) {
   `
   const playlist = root.querySelector("ui-sortable")!
   const playlistOrder = () => playlist.getAttribute("value")!.split(",")
-  const setPlaylistOrder = (keys: string[]) => playlist.setAttribute("value", keys.join(","))
+  const setPlaylistOrder = (keys: string[]) =>
+    playlist.setAttribute("value", keys.join(","))
   playlist.addEventListener("valuechange", (event) =>
-    setPlaylistOrder((event as CustomEvent<{ value: string[] }>).detail.value),
+    setPlaylistOrder((event as CustomEvent<{ value: string[] }>).detail.value)
   )
   root
     .querySelector("[data-sort]")!
     .addEventListener("click", () =>
-      setPlaylistOrder(playlistOrder().sort((a, b) => tracks[a].title.localeCompare(tracks[b].title))),
+      setPlaylistOrder(
+        playlistOrder().sort((a, b) =>
+          tracks[a].title.localeCompare(tracks[b].title)
+        )
+      )
     )
   root
     .querySelector("[data-reverse]")!
-    .addEventListener("click", () => setPlaylistOrder(playlistOrder().reverse()))
+    .addEventListener("click", () =>
+      setPlaylistOrder(playlistOrder().reverse())
+    )
 }
 
 export { mount }

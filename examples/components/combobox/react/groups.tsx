@@ -69,7 +69,11 @@ function Example() {
               <ComboboxGroup>
                 <ComboboxGroupLabel>{group.label}</ComboboxGroupLabel>
                 {group.items.map((item) => (
-                  <ComboboxItem key={item.value} value={item.value} label={item.label}>
+                  <ComboboxItem
+                    key={item.value}
+                    value={item.value}
+                    label={item.label}
+                  >
                     {item.label}
                     <ComboboxItemIndicator>
                       <CheckIcon aria-hidden="true" />

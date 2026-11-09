@@ -16,7 +16,10 @@ test.each(["raw", "reactive", "ref", "spread"])(
   async (kind) => {
     const element = document.body.appendChild(document.createElement("div"))
     app = createApp(
-      defineComponent({ setup: () => () => h(Input, { defaultValue: "initial", "aria-label": "Value" }) }),
+      defineComponent({
+        setup: () => () =>
+          h(Input, { defaultValue: "initial", "aria-label": "Value" }),
+      })
     )
     app.mount(element)
     const raw = createAgent()
@@ -30,14 +33,18 @@ test.each(["raw", "reactive", "ref", "spread"])(
             : raw
     const timeline = createTimeline(agent)
     try {
-      expect((await agent.act({ steps: [{ ref: "Value", action: "setValue", args: ["next"] }] })).ok).toBe(
-        true,
-      )
+      expect(
+        (
+          await agent.act({
+            steps: [{ ref: "Value", action: "setValue", args: ["next"] }],
+          })
+        ).ok
+      ).toBe(true)
       expect(element.querySelector("input")?.value).toBe("next")
       expect(await timeline.seek(0)).toEqual([])
       expect(element.querySelector("input")?.value).toBe("initial")
     } finally {
       timeline.destroy()
     }
-  },
+  }
 )

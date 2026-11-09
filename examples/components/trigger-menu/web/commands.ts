@@ -7,11 +7,25 @@ const commands = [
     value: "status",
     label: "status",
     arguments: [
-      { name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] },
-      { name: "until", hint: "[until]", items: ["30m", "1h", "4h", "today"], allowCustomValue: false },
+      {
+        name: "status",
+        hint: "<status>",
+        required: true,
+        items: ["available", "busy", "away"],
+      },
+      {
+        name: "until",
+        hint: "[until]",
+        items: ["30m", "1h", "4h", "today"],
+        allowCustomValue: false,
+      },
     ],
   },
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+  {
+    value: "search",
+    label: "search",
+    arguments: [{ name: "query", hint: "<query>", required: true }],
+  },
   { value: "away", label: "away", after: "submit" as const },
   { value: "clear", label: "clear" },
 ]
@@ -32,9 +46,18 @@ function mount(root: HTMLElement) {
   `
   const form = root.querySelector("form")!
   const menu = root.querySelector("ui-trigger-menu")!
-  menu.triggers = [{ char: "/", boundary: "start", type: "command", items: commands }]
+  menu.triggers = [
+    { char: "/", boundary: "start", type: "command", items: commands },
+  ]
   menu.addEventListener("itemselect", (event) => {
-    log(root, ["Chose", `/${event.detail.value}`, ...Object.values(event.detail.arguments)].join(" "))
+    log(
+      root,
+      [
+        "Chose",
+        `/${event.detail.value}`,
+        ...Object.values(event.detail.arguments),
+      ].join(" ")
+    )
   })
   form.addEventListener("submit", (event) => {
     event.preventDefault()

@@ -1,14 +1,31 @@
-import { iconMarkup, iconsFixture as f, iconsOptions, type IconName } from "tests/fixtures/item-icons.ts"
+import {
+  iconMarkup,
+  iconsFixture as f,
+  iconsOptions,
+  type IconName,
+} from "tests/fixtures/item-icons.ts"
 
-type Entry = { value: string; label: string; icon?: IconName; emoji?: string; mirror?: boolean }
-
-// An entry's icon part, holding its SVG or its emoji, or nothing without one.
-function icon(tag: string, entry: { icon?: IconName; emoji?: string; mirror?: boolean }) {
-  const glyph = entry.icon ? iconMarkup(entry.icon) : entry.emoji
-  return glyph ? `<${tag}${entry.mirror ? " mirror" : ""}>${glyph}</${tag}>` : ""
+type Entry = {
+  value: string
+  label: string
+  icon?: IconName
+  emoji?: string
+  mirror?: boolean
 }
 
-const each = (entries: Entry[], render: (entry: Entry) => string) => entries.map(render).join("")
+// An entry's icon part, holding its SVG or its emoji, or nothing without one.
+function icon(
+  tag: string,
+  entry: { icon?: IconName; emoji?: string; mirror?: boolean }
+) {
+  const glyph = entry.icon ? iconMarkup(entry.icon) : entry.emoji
+  return glyph
+    ? `<${tag}${entry.mirror ? " mirror" : ""}>${glyph}</${tag}>`
+    : ""
+}
+
+const each = (entries: Entry[], render: (entry: Entry) => string) =>
+  entries.map(render).join("")
 
 function markup(unnamed: boolean) {
   return `
@@ -51,10 +68,12 @@ function markup(unnamed: boolean) {
           <ui-autocomplete-list>
             ${each(
               f.autocomplete.items,
-              (item) => `<ui-autocomplete-item class="item" value="${item.label}">
+              (
+                item
+              ) => `<ui-autocomplete-item class="item" value="${item.label}">
               ${icon("ui-autocomplete-item-icon", item)}
               <ui-autocomplete-item-text>${item.label}</ui-autocomplete-item-text>
-            </ui-autocomplete-item>`,
+            </ui-autocomplete-item>`
             )}
           </ui-autocomplete-list>
         </ui-autocomplete-content>
@@ -94,17 +113,33 @@ function markup(unnamed: boolean) {
 async function mount(root: HTMLElement) {
   const options = iconsOptions()
   root.innerHTML = markup(options.unnamed)
-  if (options.select) root.querySelector("ui-select")!.setAttribute("default-value", options.select)
-  if (options.combobox) root.querySelector("ui-combobox")!.setAttribute("default-value", options.combobox)
+  if (options.select) {
+    root
+      .querySelector("ui-select")!
+      .setAttribute("default-value", options.select)
+  }
+  if (options.combobox) {
+    root
+      .querySelector("ui-combobox")!
+      .setAttribute("default-value", options.combobox)
+  }
   const output = root.querySelector("output")!
   const report = (name: string) => (event: Event) => {
-    if (!(event.target as Element).localName.startsWith(`ui-${name}`)) return
+    if (!(event.target as Element).localName.startsWith(`ui-${name}`)) {
+      return
+    }
     output.textContent = `${name}:${(event as CustomEvent<{ value: unknown }>).detail.value}`
   }
   root.querySelector("ui-menu")!.addEventListener("action", report("menu"))
-  root.querySelector("ui-select")!.addEventListener("valuechange", report("select"))
-  root.querySelector("ui-combobox")!.addEventListener("valuechange", report("combobox"))
-  root.querySelector("ui-command")!.addEventListener("action", report("command"))
+  root
+    .querySelector("ui-select")!
+    .addEventListener("valuechange", report("select"))
+  root
+    .querySelector("ui-combobox")!
+    .addEventListener("valuechange", report("combobox"))
+  root
+    .querySelector("ui-command")!
+    .addEventListener("action", report("command"))
   await import("@ui-sdk/web/menu")
   await import("@ui-sdk/web/select")
   await import("@ui-sdk/web/combobox")

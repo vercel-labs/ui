@@ -4,7 +4,10 @@
 // it: an agent's press stays the agent's for `observe` and `undoSource`. `bind`
 // from the kernel stands in for an adapter.
 import { afterEach, expect, test, vi } from "vitest"
-import { button, type ButtonActionDetails } from "../src/components/button/button"
+import {
+  button,
+  type ButtonActionDetails,
+} from "../src/components/button/button"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { alertDialog } from "../src/components/dialog/dialog"
 import { input } from "../src/components/input/input"
@@ -14,7 +17,11 @@ import { createToaster } from "../src/components/toast/toaster"
 import { bind, press } from "../src/foundation/kernel/part"
 import { createOverlays } from "../src/page/overlays/overlays"
 import { createAgent } from "../src/page/agent/agent"
-import { observe, withSource, type ObservedChange } from "../src/page/observe/observe"
+import {
+  observe,
+  withSource,
+  type ObservedChange,
+} from "../src/page/observe/observe"
 import { createTimeline } from "../src/page/timeline/timeline"
 import { keys } from "../src/testing/input"
 
@@ -26,7 +33,11 @@ afterEach(() => {
 })
 
 // Puts a part's element on the page, bound the way an adapter binds it.
-function place(el: HTMLElement, part: Parameters<typeof bind>[0], destroy: () => void) {
+function place(
+  el: HTMLElement,
+  part: Parameters<typeof bind>[0],
+  destroy: () => void
+) {
   document.body.append(el)
   cleanups.push(bind(part, el), destroy)
 }
@@ -42,7 +53,7 @@ function mountInput(label: string) {
 function mountButton(
   text: string,
   action: (event: Event | undefined, details: ButtonActionDetails) => unknown,
-  tag = "button",
+  tag = "button"
 ) {
   const instance = button({ id: text, action } as Parameters<typeof button>[0])
   const el = document.createElement(tag)
@@ -63,7 +74,10 @@ function mountCheckbox(text: string) {
 function waitingAction() {
   const sources: string[] = []
   let finish = () => {}
-  const action = (_event: Event | undefined, { source }: { source: string }) => {
+  const action = (
+    _event: Event | undefined,
+    { source }: { source: string }
+  ) => {
     sources.push(source)
     return new Promise<void>((resolve) => (finish = resolve))
   }
@@ -74,7 +88,9 @@ const settle = () => new Promise((resolve) => setTimeout(resolve))
 
 test("a press hands its action how the button was pressed", () => {
   const sources: string[] = []
-  const { el } = mountButton("Save", (_event, { source }) => sources.push(source))
+  const { el } = mountButton("Save", (_event, { source }) =>
+    sources.push(source)
+  )
   withSource("keyboard", () => el.click())
   el.click()
   expect(sources).toEqual(["keyboard", "programmatic"])
@@ -82,7 +98,11 @@ test("a press hands its action how the button was pressed", () => {
 
 test("Enter and Space on a button rendered as a span hand its action the keyboard", async () => {
   const sources: string[] = []
-  const { el } = mountButton("Save", (_event, { source }) => sources.push(source), "span")
+  const { el } = mountButton(
+    "Save",
+    (_event, { source }) => sources.push(source),
+    "span"
+  )
   el.tabIndex = 0
   el.focus()
   await keys(document, ["Enter", "Space"])
@@ -91,7 +111,10 @@ test("Enter and Space on a button rendered as a span hand its action the keyboar
 
 test("Enter and Space on a toggle rendered as a span report the keyboard", async () => {
   const sources: string[] = []
-  const instance = toggle({ id: "Bold", onPressedChange: (_pressed, { source }) => sources.push(source) })
+  const instance = toggle({
+    id: "Bold",
+    onPressedChange: (_pressed, { source }) => sources.push(source),
+  })
   const el = document.createElement("span")
   el.textContent = "Bold"
   el.tabIndex = 0
@@ -122,7 +145,9 @@ test("a change the action makes after an await reports the agent that pressed, a
   finish()
   expect(await pressed).toMatchObject({ ok: true })
 
-  expect(changes.map(({ label, value, source }) => ({ label, value, source }))).toEqual([
+  expect(
+    changes.map(({ label, value, source }) => ({ label, value, source }))
+  ).toEqual([
     { label: "Weekly digest", value: true, source: "keyboard" },
     { label: "Status", value: "saved", source: "agent" },
   ])
@@ -139,7 +164,9 @@ test("a Close part's action hears how it was pressed, and the dialog closes with
     onOpenChange: (_open, { source }) => closes.push(source),
   })
   const { action, sources, finish } = waitingAction()
-  withSource("agent", () => press(instance.part("close", { id: "delete", action }))?.())
+  withSource("agent", () =>
+    press(instance.part("close", { id: "delete", action }))?.()
+  )
   expect(sources).toEqual(["agent"])
   finish()
   await settle()
@@ -161,9 +188,17 @@ test("a toast's action and close buttons hear how they were pressed, and the toa
   const closing = waitingAction()
   const saved = toaster("Saved", { duration: Infinity, onDismiss })
 
-  withSource("agent", () => press(region.part("action", { id: "undo", toast: undone }))?.())
+  withSource("agent", () =>
+    press(region.part("action", { id: "undo", toast: undone }))?.()
+  )
   withSource("keyboard", () =>
-    press(region.part("close", { id: "close", toast: saved, action: closing.action }))?.(),
+    press(
+      region.part("close", {
+        id: "close",
+        toast: saved,
+        action: closing.action,
+      })
+    )?.()
   )
   expect([...own.sources, ...closing.sources]).toEqual(["agent", "keyboard"])
   own.finish()

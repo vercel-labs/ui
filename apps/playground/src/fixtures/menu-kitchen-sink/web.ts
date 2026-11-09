@@ -36,9 +36,13 @@ function mount(root: HTMLElement) {
       api?: { open: (options: object) => void; close: () => void }
     }
     for (const [option, value] of Object.entries(variant.options ?? {})) {
-      if (attributes[option]) menu.setAttribute(attributes[option], String(value))
+      if (attributes[option]) {
+        menu.setAttribute(attributes[option], String(value))
+      }
     }
-    if (env.container) menu.setAttribute("container", `#${env.container.id}`)
+    if (env.container) {
+      menu.setAttribute("container", `#${env.container.id}`)
+    }
 
     const button = Object.assign(document.createElement("button"), {
       className: classes.trigger,
@@ -56,32 +60,43 @@ function mount(root: HTMLElement) {
         className: classes.content(variant.animation),
       })
       // Positioning props are attributes on the content element.
-      for (const [prop, value] of Object.entries(variant.content ?? {}))
+      for (const [prop, value] of Object.entries(variant.content ?? {})) {
         content.setAttribute(
           prop.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
-          String(value),
+          String(value)
         )
+      }
       content.append(...renderMenuItems(variant.items, template))
       menu.append(content)
     }
 
-    const wrapper = Object.assign(document.createElement("div"), { className: "flex items-center gap-3" })
+    const wrapper = Object.assign(document.createElement("div"), {
+      className: "flex items-center gap-3",
+    })
     wrapper.append(menu)
     slot.append(wrapper)
 
     // Callbacks are DOM events on the element.
     menu.addEventListener("openchange", (event) => {
-      const { value, reason } = (event as CustomEvent<{ value: boolean; reason: string }>).detail
+      const { value, reason } = (
+        event as CustomEvent<{ value: boolean; reason: string }>
+      ).detail
       env.log(`openChange ${value} (${reason})`)
-      if (variant.controlled) checkbox.checked = value
+      if (variant.controlled) {
+        checkbox.checked = value
+      }
     })
     menu.addEventListener("action", (event) =>
-      env.log(`action ${(event as CustomEvent<{ value: string }>).detail.value}`),
+      env.log(
+        `action ${(event as CustomEvent<{ value: string }>).detail.value}`
+      )
     )
     menu.controller = env.controller
 
     // Web components have no controlled prop. The checkbox drives the element's api instead.
-    const checkbox = Object.assign(document.createElement("input"), { type: "checkbox" })
+    const checkbox = Object.assign(document.createElement("input"), {
+      type: "checkbox",
+    })
     if (variant.controlled) {
       const label = Object.assign(document.createElement("label"), {
         className: "flex items-center gap-1.5 text-xs text-neutral-600",
@@ -89,8 +104,11 @@ function mount(root: HTMLElement) {
       label.append(checkbox, "open")
       wrapper.append(label)
       checkbox.addEventListener("change", () => {
-        if (checkbox.checked) menu.api?.open({ focus: "first" })
-        else menu.api?.close()
+        if (checkbox.checked) {
+          menu.api?.open({ focus: "first" })
+        } else {
+          menu.api?.close()
+        }
       })
     }
   })

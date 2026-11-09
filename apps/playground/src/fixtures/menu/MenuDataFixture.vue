@@ -24,6 +24,8 @@ const action = ref("")
     </Menu>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <button @click="controller.open({ focus: 'first' })">Open with controller</button>
+    <button @click="controller.open({ focus: 'first' })">
+      Open with controller
+    </button>
   </div>
 </template>

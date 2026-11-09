@@ -36,13 +36,17 @@ function Fixture() {
           <For each={fixture.items}>
             {(item) => (
               <NavigationMenuItem value={item.value}>
-                <NavigationMenuTrigger class="nav-trigger">{item.trigger}</NavigationMenuTrigger>
+                <NavigationMenuTrigger class="nav-trigger">
+                  {item.trigger}
+                </NavigationMenuTrigger>
                 <NavigationMenuContent class="nav-content">
                   <ul>
                     <For each={item.links}>
                       {(link) => (
                         <li>
-                          <NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink>
+                          <NavigationMenuLink href={link.href}>
+                            {link.label}
+                          </NavigationMenuLink>
                         </li>
                       )}
                     </For>

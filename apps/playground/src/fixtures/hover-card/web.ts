@@ -21,22 +21,31 @@ const markup = `
   </div>
 `
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 async function mount(root: HTMLElement) {
   root.innerHTML = markup
   const card = root.querySelector("ui-hover-card")!
   for (const [name, value] of Object.entries(hoverCardOptions())) {
-    if (name === "container") card.setAttribute("container", `#${(value as HTMLElement).id}`)
-    else if (value === true) card.setAttribute(kebab(name), "")
-    else card.setAttribute(kebab(name), String(value))
+    if (name === "container") {
+      card.setAttribute("container", `#${(value as HTMLElement).id}`)
+    } else if (value === true) {
+      card.setAttribute(kebab(name), "")
+    } else {
+      card.setAttribute(kebab(name), String(value))
+    }
   }
-  for (const [name, value] of Object.entries(hoverCardContentOptions()))
+  for (const [name, value] of Object.entries(hoverCardContentOptions())) {
     card.querySelector("ui-hover-card-content")!.setAttribute(name, value)
+  }
   await import("@ui-sdk/web/hover-card")
   card.addEventListener("openchange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: boolean; reason: string }>).detail
-    root.querySelector("output")!.textContent = `${value ? "open" : "close"}: ${reason}`
+    const { value, reason } = (
+      event as CustomEvent<{ value: boolean; reason: string }>
+    ).detail
+    root.querySelector("output")!.textContent =
+      `${value ? "open" : "close"}: ${reason}`
   })
 }
 

@@ -19,7 +19,12 @@ import {
         <span v-bind="props">
           <ProgressIndicator>
             <template #render="{ props, state }">
-              <div v-bind="props" :data-variant="(state.percent ?? 0) < 20 ? 'destructive' : undefined" />
+              <div
+                v-bind="props"
+                :data-variant="
+                  (state.percent ?? 0) < 20 ? 'destructive' : undefined
+                "
+              />
             </template>
           </ProgressIndicator>
         </span>

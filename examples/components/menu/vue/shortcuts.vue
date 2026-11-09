@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@ui-sdk/vue/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/vue/menu"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()

@@ -8,7 +8,11 @@ import {
 import { cn } from "cn"
 import type { JSX } from "@solidjs/web"
 
-function ScrollArea(props: { label?: string; class?: string; children: JSX.Element }) {
+function ScrollArea(props: {
+  label?: string
+  class?: string
+  children: JSX.Element
+}) {
   return (
     <ScrollAreaPrimitive class={cn("relative min-h-0", props.class)}>
       <ScrollAreaViewport

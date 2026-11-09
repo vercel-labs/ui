@@ -7,7 +7,10 @@ import type { UiSeparatorElement } from "@ui-sdk/web/separator"
 import type { UiSliderElement } from "@ui-sdk/web/slider"
 
 // True only when the two are the same type, so neither `any` nor a wider type passes.
-type Same<A, B> = (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false
+type Same<A, B> =
+  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2
+    ? true
+    : false
 
 // Each tag gives its element type to `querySelector` and `createElement`.
 const tags: [

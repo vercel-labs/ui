@@ -12,7 +12,10 @@
     --ui-input: light-dark(oklch(0.82 0 0), oklch(0.409 0 0));
     --ui-primary: var(--ui-foreground);
     --ui-primary-foreground: var(--ui-background);
-    --ui-destructive: light-dark(oklch(0.552 0.224 25.5), oklch(0.712 0.181 22.8));
+    --ui-destructive: light-dark(
+      oklch(0.552 0.224 25.5),
+      oklch(0.712 0.181 22.8)
+    );
     --ui-ring: light-dark(oklch(0.913 0 0), oklch(0.333 0 0));
     --ui-ring-border: light-dark(oklch(0.699 0 0), oklch(0.538 0 0));
     --ui-overlay: light-dark(oklch(1 0 0 / 0.7), oklch(0 0 0 / 0.7));
@@ -23,7 +26,8 @@
     --ui-spacing: 0.25rem;
     --ui-font-size: 0.8125rem;
     --ui-line-height: 1.5;
-    --ui-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --ui-font-sans:
+      ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --ui-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     --ui-icon-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='square'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     --ui-icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='square'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
@@ -180,7 +184,11 @@
   }
 
   :is(label, [data-slot="label-root"]):has(
-    > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+    > :is(
+      [data-slot="checkbox-root"],
+      [data-slot="radio-root"],
+      [data-slot="switch-root"]
+    )
   ) {
     display: inline-flex;
     align-items: flex-start;
@@ -240,17 +248,33 @@
       color: var(--ui-primary-foreground);
 
       &:hover:not([data-disabled]) {
-        background: color-mix(in oklab, var(--ui-primary) 85%, var(--ui-background));
+        background: color-mix(
+          in oklab,
+          var(--ui-primary) 85%,
+          var(--ui-background)
+        );
       }
     }
 
     &[data-variant="destructive"] {
-      border-color: color-mix(in oklab, var(--ui-destructive) 30%, var(--ui-background));
-      background: color-mix(in oklab, var(--ui-destructive) 8%, var(--ui-background));
+      border-color: color-mix(
+        in oklab,
+        var(--ui-destructive) 30%,
+        var(--ui-background)
+      );
+      background: color-mix(
+        in oklab,
+        var(--ui-destructive) 8%,
+        var(--ui-background)
+      );
       color: var(--ui-destructive);
 
       &:hover:not([data-disabled]) {
-        background: color-mix(in oklab, var(--ui-destructive) 14%, var(--ui-background));
+        background: color-mix(
+          in oklab,
+          var(--ui-destructive) 14%,
+          var(--ui-background)
+        );
       }
     }
 
@@ -266,8 +290,12 @@
   }
 
   /* A trigger right after its input sits inside the input's end. Web components wrap each part, and :has() can't nest. */
-  :not([data-slot="field-root"]):has(> [data-slot="combobox-input"] + [data-slot="combobox-trigger"]),
-  :not([data-slot="field-root"]):has(> ui-combobox-input + ui-combobox-trigger) {
+  :not([data-slot="field-root"]):has(
+    > [data-slot="combobox-input"] + [data-slot="combobox-trigger"]
+  ),
+  :not([data-slot="field-root"]):has(
+    > ui-combobox-input + ui-combobox-trigger
+  ) {
     display: flex;
 
     & > :is([data-slot="combobox-input"], ui-combobox-input) {
@@ -457,7 +485,10 @@
     display: inline-flex;
   }
 
-  :is([data-slot="number-input-decrement"], [data-slot="number-input-increment"]) {
+  :is(
+    [data-slot="number-input-decrement"],
+    [data-slot="number-input-increment"]
+  ) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -622,7 +653,11 @@
     min-width: 12rem;
   }
 
-  :is([data-slot="slider-value"], [data-slot="progress-value"], [data-slot="meter-value"]) {
+  :is(
+    [data-slot="slider-value"],
+    [data-slot="progress-value"],
+    [data-slot="meter-value"]
+  ) {
     color: var(--ui-muted-foreground);
     font-size: calc(var(--ui-font-size) - 0.0625rem);
     font-variant-numeric: tabular-nums;
@@ -870,7 +905,11 @@
     outline: none;
   }
 
-  :is([data-slot="select-content"], [data-slot="combobox-content"], [data-slot="autocomplete-content"]) {
+  :is(
+    [data-slot="select-content"],
+    [data-slot="combobox-content"],
+    [data-slot="autocomplete-content"]
+  ) {
     min-width: var(--anchor-width);
   }
 
@@ -1017,7 +1056,8 @@
   }
 
   :is([data-slot="menu-group-label"], [data-slot="command-group-label"]) {
-    padding: calc(var(--ui-spacing) * 1.5) calc(var(--ui-spacing) * 2) calc(var(--ui-spacing) * 1);
+    padding: calc(var(--ui-spacing) * 1.5) calc(var(--ui-spacing) * 2)
+      calc(var(--ui-spacing) * 1);
     color: var(--ui-muted-foreground);
     font-size: calc(var(--ui-font-size) - 0.125rem);
   }
@@ -1098,7 +1138,9 @@
 
   :is(
     [data-slot="navigation-menu-trigger"],
-    [data-slot="navigation-menu-link"]:not([data-slot="navigation-menu-content"] *)
+    [data-slot="navigation-menu-link"]:not(
+      [data-slot="navigation-menu-content"] *
+    )
   ) {
     display: inline-flex;
     align-items: center;
@@ -1254,7 +1296,11 @@
     display: none;
   }
 
-  :is([data-slot="dialog-backdrop"], [data-slot="alert-dialog-backdrop"], [data-slot="drawer-backdrop"]) {
+  :is(
+    [data-slot="dialog-backdrop"],
+    [data-slot="alert-dialog-backdrop"],
+    [data-slot="drawer-backdrop"]
+  ) {
     position: fixed;
     inset: 0;
     z-index: 50;
@@ -1404,7 +1450,11 @@
     }
   }
 
-  :is([data-slot="dialog-title"], [data-slot="alert-dialog-title"], [data-slot="drawer-title"]) {
+  :is(
+    [data-slot="dialog-title"],
+    [data-slot="alert-dialog-title"],
+    [data-slot="drawer-title"]
+  ) {
     margin: 0;
     font-size: calc(var(--ui-font-size) + 0.125rem);
     font-weight: 600;
@@ -1465,27 +1515,37 @@
     rotate: 90deg;
   }
 
-  :is([data-slot="calendar-next"], [data-slot="carousel-next"], [data-slot="pagination-next"])::before {
+  :is(
+    [data-slot="calendar-next"],
+    [data-slot="carousel-next"],
+    [data-slot="pagination-next"]
+  )::before {
     rotate: -90deg;
   }
 
-  :is([data-slot="calendar-previous"], [data-slot="carousel-previous"], [data-slot="pagination-previous"]):is(
-      [dir="rtl"] *
-    )::before {
+  :is(
+      [data-slot="calendar-previous"],
+      [data-slot="carousel-previous"],
+      [data-slot="pagination-previous"]
+    ):is([dir="rtl"] *)::before {
     rotate: -90deg;
   }
 
-  :is([data-slot="calendar-next"], [data-slot="carousel-next"], [data-slot="pagination-next"]):is(
-      [dir="rtl"] *
-    )::before {
+  :is(
+      [data-slot="calendar-next"],
+      [data-slot="carousel-next"],
+      [data-slot="pagination-next"]
+    ):is([dir="rtl"] *)::before {
     rotate: 90deg;
   }
 
-  [data-slot="carousel-root"][data-orientation="vertical"] [data-slot="carousel-previous"]::before {
+  [data-slot="carousel-root"][data-orientation="vertical"]
+    [data-slot="carousel-previous"]::before {
     rotate: 180deg;
   }
 
-  [data-slot="carousel-root"][data-orientation="vertical"] [data-slot="carousel-next"]::before {
+  [data-slot="carousel-root"][data-orientation="vertical"]
+    [data-slot="carousel-next"]::before {
     rotate: none;
   }
 
@@ -1566,7 +1626,11 @@
       color: var(--ui-primary-foreground);
 
       &:hover:not([data-disabled]) {
-        background: color-mix(in oklab, var(--ui-primary) 85%, var(--ui-background));
+        background: color-mix(
+          in oklab,
+          var(--ui-primary) 85%,
+          var(--ui-background)
+        );
       }
     }
   }
@@ -1631,7 +1695,11 @@
   }
 
   /* Inputs made of a box around their own parts. */
-  :is([data-slot="date-input-root"], [data-slot="time-input-root"], [data-slot="password-input-root"]) {
+  :is(
+    [data-slot="date-input-root"],
+    [data-slot="time-input-root"],
+    [data-slot="password-input-root"]
+  ) {
     display: inline-flex;
     align-items: center;
     gap: calc(var(--ui-spacing) * 1);
@@ -1869,7 +1937,8 @@
     }
   }
 
-  [data-slot="otp-input-root"]:has([aria-invalid="true"]) [data-slot="otp-input-slot"] {
+  [data-slot="otp-input-root"]:has([aria-invalid="true"])
+    [data-slot="otp-input-slot"] {
     border-color: var(--ui-destructive);
   }
 
@@ -1927,7 +1996,12 @@
     white-space: nowrap;
     vertical-align: 1px;
 
-    &:has([data-slot="token-input-token-remove"]:not([data-disabled], [data-readonly])) {
+    &:has(
+      [data-slot="token-input-token-remove"]:not(
+        [data-disabled],
+        [data-readonly]
+      )
+    ) {
       padding-inline-end: 2px;
     }
 
@@ -2073,7 +2147,11 @@
     font-size: var(--ui-font-size);
 
     &
-      > :not(:has(> :is([data-slot="calendar-previous"], [data-slot="calendar-next"]))):not(
+      > :not(
+        :has(
+          > :is([data-slot="calendar-previous"], [data-slot="calendar-next"])
+        )
+      ):not(
         [data-slot="calendar-heading"],
         [data-slot="calendar-previous"],
         [data-slot="calendar-next"]
@@ -2144,7 +2222,12 @@
     cursor: pointer;
     user-select: none;
 
-    &:hover:not([data-outside], [data-disabled], [data-unavailable], [data-selected]) {
+    &:hover:not(
+        [data-outside],
+        [data-disabled],
+        [data-unavailable],
+        [data-selected]
+      ) {
       background: var(--ui-muted);
     }
 
@@ -2174,7 +2257,11 @@
       background: var(--ui-muted);
     }
 
-    &:is([data-selected]:not([data-range-middle]), [data-range-start], [data-range-end]) {
+    &:is(
+      [data-selected]:not([data-range-middle]),
+      [data-range-start],
+      [data-range-end]
+    ) {
       background: var(--ui-primary);
       color: var(--ui-primary-foreground);
     }
@@ -2215,7 +2302,11 @@
     outline: none;
 
     &
-      > :not(:has(> :is([data-slot="calendar-previous"], [data-slot="calendar-next"]))):not(
+      > :not(
+        :has(
+          > :is([data-slot="calendar-previous"], [data-slot="calendar-next"])
+        )
+      ):not(
         [data-slot="calendar-heading"],
         [data-slot="calendar-previous"],
         [data-slot="calendar-next"]
@@ -2250,7 +2341,11 @@
   }
 
   [data-slot="color-picker-root"] {
-    --ui-checker: repeating-conic-gradient(var(--ui-muted) 0 25%, var(--ui-background) 0 50%) 0 0 / 8px 8px;
+    --ui-checker: repeating-conic-gradient(
+        var(--ui-muted) 0 25%,
+        var(--ui-background) 0 50%
+      )
+      0 0 / 8px 8px;
     display: flex;
     flex-direction: column;
     gap: calc(var(--ui-spacing) * 3);
@@ -2309,7 +2404,10 @@
     }
   }
 
-  :is([data-slot="color-picker-area-thumb"], [data-slot="color-picker-slider-thumb"]) {
+  :is(
+    [data-slot="color-picker-area-thumb"],
+    [data-slot="color-picker-slider-thumb"]
+  ) {
     width: 1rem;
     height: 1rem;
     border: 2px solid oklch(1 0 0);
@@ -2343,14 +2441,19 @@
     }
   }
 
-  :is([data-slot="color-picker-swatch"], [data-slot="color-picker-swatch-item"]) {
+  :is(
+    [data-slot="color-picker-swatch"],
+    [data-slot="color-picker-swatch-item"]
+  ) {
     flex-shrink: 0;
     width: calc(var(--ui-spacing) * 8);
     height: calc(var(--ui-spacing) * 8);
     padding: 0;
     border: 0;
     border-radius: var(--ui-radius);
-    background: linear-gradient(var(--color-picker-color), var(--color-picker-color)), var(--ui-checker);
+    background:
+      linear-gradient(var(--color-picker-color), var(--color-picker-color)),
+      var(--ui-checker);
     box-shadow: inset 0 0 0 1px oklch(0 0 0 / 0.1);
   }
 
@@ -2377,7 +2480,10 @@
     }
   }
 
-  :is([data-slot="color-picker-input"], [data-slot="color-picker-channel-input"]) {
+  :is(
+    [data-slot="color-picker-input"],
+    [data-slot="color-picker-channel-input"]
+  ) {
     width: 100%;
     min-width: 0;
     height: calc(var(--ui-spacing) * 8);
@@ -2601,7 +2707,11 @@
     list-style: none;
   }
 
-  :is([data-slot="pagination-link"], [data-slot="pagination-previous"], [data-slot="pagination-next"]) {
+  :is(
+    [data-slot="pagination-link"],
+    [data-slot="pagination-previous"],
+    [data-slot="pagination-next"]
+  ) {
     padding-inline: calc(var(--ui-spacing) * 2);
     border-color: transparent;
     background: transparent;
@@ -2868,7 +2978,12 @@
       flex-direction: column;
     }
 
-    & :is([data-slot="toolbar-button"], [data-slot="toolbar-link"], [data-slot="toggle-root"]) {
+    &
+      :is(
+        [data-slot="toolbar-button"],
+        [data-slot="toolbar-link"],
+        [data-slot="toggle-root"]
+      ) {
       min-width: calc(var(--ui-spacing) * 7);
       height: calc(var(--ui-spacing) * 7);
       padding-inline: calc(var(--ui-spacing) * 2.5);
@@ -2905,7 +3020,10 @@
     }
   }
 
-  :is([data-slot="toolbar-group"], [data-slot="toolbar-root"] [data-slot="toggle-group"]) {
+  :is(
+    [data-slot="toolbar-group"],
+    [data-slot="toolbar-root"] [data-slot="toggle-group"]
+  ) {
     display: flex;
     align-items: center;
     gap: 2px;
@@ -2966,7 +3084,8 @@
     gap: calc(var(--ui-spacing) * 2);
     min-width: 0;
     height: calc(var(--ui-spacing) * 7.5);
-    padding-inline: calc(var(--ui-spacing) * 2 + var(--ui-tree-indent)) calc(var(--ui-spacing) * 2);
+    padding-inline: calc(var(--ui-spacing) * 2 + var(--ui-tree-indent))
+      calc(var(--ui-spacing) * 2);
     border-radius: var(--ui-radius);
     color: inherit;
     text-decoration: none;
@@ -2975,7 +3094,9 @@
     user-select: none;
 
     &:not([data-branch]) {
-      padding-inline-start: calc(var(--ui-spacing) * 4 + 1rem + var(--ui-tree-indent));
+      padding-inline-start: calc(
+        var(--ui-spacing) * 4 + 1rem + var(--ui-tree-indent)
+      );
     }
 
     &:hover:not([data-disabled]) {
@@ -3079,7 +3200,11 @@
     font-size: var(--ui-font-size);
 
     &[data-type="error"] {
-      border-color: color-mix(in oklab, var(--ui-destructive) 30%, var(--ui-background));
+      border-color: color-mix(
+        in oklab,
+        var(--ui-destructive) 30%,
+        var(--ui-background)
+      );
     }
   }
 
@@ -3104,7 +3229,11 @@
   }
 
   /* Shows only after 150ms and stays at least 300ms, so a quick action never flickers. */
-  :where(button[data-slot], [data-slot][role="menuitem"], [data-slot][role="option"]) {
+  :where(
+    button[data-slot],
+    [data-slot][role="menuitem"],
+    [data-slot][role="option"]
+  ) {
     transition: filter 0s linear 0.3s;
   }
 
@@ -3117,7 +3246,12 @@
   /* Touch: inputs at 16px stop iOS from zooming on focus, and small targets get a 44px hit area. */
   @media (pointer: coarse) {
     :is(
-      input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"]),
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="range"],
+        [type="file"]
+      ),
       textarea,
       select,
       [contenteditable="true"]
@@ -3163,10 +3297,18 @@
       [data-slot="navigation-menu-link"],
       [data-slot="segmented-control-item"],
       :is(label, [data-slot="label-root"]):has(
-        > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+        > :is(
+          [data-slot="checkbox-root"],
+          [data-slot="radio-root"],
+          [data-slot="switch-root"]
+        )
       ),
       :not(label, [data-slot="label-root"])
-        > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+        > :is(
+          [data-slot="checkbox-root"],
+          [data-slot="radio-root"],
+          [data-slot="switch-root"]
+        )
     ) {
       position: relative;
     }
@@ -3197,10 +3339,18 @@
         [data-slot="color-picker-area-thumb"],
         [data-slot="color-picker-slider-thumb"],
         :not(label, [data-slot="label-root"])
-          > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+          > :is(
+            [data-slot="checkbox-root"],
+            [data-slot="radio-root"],
+            [data-slot="switch-root"]
+          )
       )::after,
     :is(label, [data-slot="label-root"]):has(
-        > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+        > :is(
+          [data-slot="checkbox-root"],
+          [data-slot="radio-root"],
+          [data-slot="switch-root"]
+        )
       )::after,
     :is(
       [data-slot="select-trigger"],
@@ -3235,7 +3385,11 @@
       [data-slot="color-picker-area-thumb"],
       [data-slot="color-picker-slider-thumb"],
       :not(label, [data-slot="label-root"])
-        > :is([data-slot="checkbox-root"], [data-slot="radio-root"], [data-slot="switch-root"])
+        > :is(
+          [data-slot="checkbox-root"],
+          [data-slot="radio-root"],
+          [data-slot="switch-root"]
+        )
     )::after {
       position: absolute;
       inset: min(0px, calc((100% - 2.75rem) / 2));

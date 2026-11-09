@@ -76,7 +76,14 @@ type TransferOptions<State extends object> = {
    */
   set: (
     value: TransferLists,
-    details: { reason: TransferReason; event?: Event; key: string; from: string; to: string; index: number },
+    details: {
+      reason: TransferReason
+      event?: Event
+      key: string
+      from: string
+      to: string
+      index: number
+    }
   ) => boolean
   /** The lists in the order Left and Right go through them. Defaults to the order of the value's keys. */
   order?: () => string[]
@@ -98,18 +105,37 @@ type TransferOptions<State extends object> = {
  * The English messages `createTransfer` announces unless you pass `message`.
  * @experimental
  */
-function transferMessage({ type, label, list, position, total }: TransferMessage) {
+function transferMessage({
+  type,
+  label,
+  list,
+  position,
+  total,
+}: TransferMessage) {
   const at = `${list}, position ${position} of ${total}`
-  if (type === "grab") return `Picked up ${label}, ${at}.`
-  if (type === "move") return `${label}, ${at}.`
-  if (type === "drop") return `Dropped ${label} in ${at}.`
+  if (type === "grab") {
+    return `Picked up ${label}, ${at}.`
+  }
+  if (type === "move") {
+    return `${label}, ${at}.`
+  }
+  if (type === "drop") {
+    return `Dropped ${label} in ${at}.`
+  }
   return `Moved ${label} back to ${at}.`
 }
 
 // The lists with `key` taken out and put in `list` at `index`.
-function transferred(lists: TransferLists, key: string, list: string, index: number) {
+function transferred(
+  lists: TransferLists,
+  key: string,
+  list: string,
+  index: number
+) {
   const next: TransferLists = {}
-  for (const [name, keys] of Object.entries(lists)) next[name] = keys.filter((k) => k !== key)
+  for (const [name, keys] of Object.entries(lists)) {
+    next[name] = keys.filter((k) => k !== key)
+  }
   const target = [...(next[list] ?? [])]
   target.splice(Math.max(0, Math.min(target.length, index)), 0, key)
   next[list] = target
@@ -123,7 +149,11 @@ const sameLists = (a: TransferLists, b: TransferLists) => {
   const keys = Object.keys(a)
   return (
     keys.length === Object.keys(b).length &&
-    keys.every((list) => a[list].length === b[list]?.length && a[list].every((key, i) => b[list][i] === key))
+    keys.every(
+      (list) =>
+        a[list].length === b[list]?.length &&
+        a[list].every((key, i) => b[list][i] === key)
+    )
   )
 }
 
@@ -150,7 +180,7 @@ const sameLists = (a: TransferLists, b: TransferLists) => {
  */
 function createTransfer<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: TransferOptions<State>,
+  options: TransferOptions<State>
 ) {
   const { store } = context
   const items = new Map<string, HTMLElement>()
@@ -163,25 +193,52 @@ function createTransfer<State extends object>(
     same: sameLists,
     rebase(current, now, moved) {
       const from = listWith(now, current.key)
-      if (from === undefined) return null
-      if (!moved) return { ...current, from, lists: now }
+      if (from === undefined) {
+        return null
+      }
+      if (!moved) {
+        return { ...current, from, lists: now }
+      }
       const list = listWith(current.lists, current.key)!
-      if (!now[list] || (list !== from && options.accepts && !options.accepts(current.key, list))) return null
+      if (
+        !now[list] ||
+        (list !== from &&
+          options.accepts &&
+          !options.accepts(current.key, list))
+      ) {
+        return null
+      }
       const keys = current.lists[list]
-      const index = keys.slice(0, keys.indexOf(current.key)).filter((key) => now[list].includes(key)).length
-      return { ...current, from, lists: transferred(now, current.key, list, index) }
+      const index = keys
+        .slice(0, keys.indexOf(current.key))
+        .filter((key) => now[list].includes(key)).length
+      return {
+        ...current,
+        from,
+        lists: transferred(now, current.key, list, index),
+      }
     },
     commit(current, details) {
       const to = listWith(current.lists, current.key) ?? current.from
       const index = current.lists[to]?.indexOf(current.key) ?? 0
-      return options.set(current.lists, { ...details, key: current.key, from: current.from, to, index })
+      return options.set(current.lists, {
+        ...details,
+        key: current.key,
+        from: current.from,
+        to,
+        index,
+      })
     },
     say: (type, current, lists) => say(type, current.key, lists),
     element: (key) => items.get(key),
   })
   const order = () => options.order?.() ?? Object.keys(value())
 
-  function say(type: TransferMessage["type"], key: string, current: TransferLists) {
+  function say(
+    type: TransferMessage["type"],
+    key: string,
+    current: TransferLists
+  ) {
     const el = items.get(key)
     const list = listWith(current, key) ?? ""
     const message = {
@@ -192,12 +249,16 @@ function createTransfer<State extends object>(
       position: (current[list]?.indexOf(key) ?? 0) + 1,
       total: current[list]?.length ?? 0,
     }
-    announce((options.message ?? transferMessage)(message), { priority: "assertive" })
+    announce((options.message ?? transferMessage)(message), {
+      priority: "assertive",
+    })
   }
 
   function grab(key: string, pointer: boolean) {
     const from = listWith(value(), key)
-    if (draft() || from === undefined || options.disabled?.(key)) return false
+    if (draft() || from === undefined || options.disabled?.(key)) {
+      return false
+    }
     setDraft({ key, from, lists: value(), pointer })
     say("grab", key, value())
     return true
@@ -205,14 +266,22 @@ function createTransfer<State extends object>(
 
   function moveTo(list: string, index: number) {
     const current = draft()
-    if (!current) return false
+    if (!current) {
+      return false
+    }
     const changesList = list !== listWith(current.lists, current.key)
-    if (changesList && options.accepts && !options.accepts(current.key, list)) return false
+    if (changesList && options.accepts && !options.accepts(current.key, list)) {
+      return false
+    }
     const next = transferred(current.lists, current.key, list, index)
-    if (sameLists(next, current.lists)) return false
+    if (sameLists(next, current.lists)) {
+      return false
+    }
     setDraft({ ...current, lists: next })
     say("move", current.key, next)
-    if (!current.pointer) focusLater(current.key)
+    if (!current.pointer) {
+      focusLater(current.key)
+    }
     return true
   }
 
@@ -220,12 +289,18 @@ function createTransfer<State extends object>(
   function listAt(x: number, y: number) {
     let best: { list: string; distance: number } | undefined
     for (const [list, el] of lists) {
-      if (!el.isConnected) continue
+      if (!el.isConnected) {
+        continue
+      }
       const rect = el.getBoundingClientRect()
-      const dx = x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0
-      const dy = y < rect.top ? rect.top - y : y > rect.bottom ? y - rect.bottom : 0
+      const dx =
+        x < rect.left ? rect.left - x : x > rect.right ? x - rect.right : 0
+      const dy =
+        y < rect.top ? rect.top - y : y > rect.bottom ? y - rect.bottom : 0
       const distance = Math.hypot(dx, dy)
-      if (!best || distance < best.distance) best = { list, distance }
+      if (!best || distance < best.distance) {
+        best = { list, distance }
+      }
     }
     return best?.list
   }
@@ -234,7 +309,9 @@ function createTransfer<State extends object>(
 
   function pointerdown(event: PointerEvent, key: string) {
     const start = items.get(key)
-    if (!start || !drags.accepts(event) || draft()) return
+    if (!start || !drags.accepts(event) || draft()) {
+      return
+    }
     let pointer = { x: event.clientX, y: event.clientY }
     let dragging = false
     // Whether the item had focus, which the new element in another list takes over.
@@ -244,7 +321,9 @@ function createTransfer<State extends object>(
     const track = () => {
       const current = draft()
       const list = listAt(pointer.x, pointer.y)
-      if (!current || list === undefined) return
+      if (!current || list === undefined) {
+        return
+      }
       const others = (current.lists[list] ?? []).filter((k) => k !== key)
       const middles = others.map((k) => {
         const rect = items.get(k)?.getBoundingClientRect()
@@ -255,12 +334,18 @@ function createTransfer<State extends object>(
     const scroller =
       options.createAutoScroll === false
         ? undefined
-        : createAutoScroll({ ...options.createAutoScroll, ignore: () => items.get(key), onScroll: track })
+        : createAutoScroll({
+            ...options.createAutoScroll,
+            ignore: () => items.get(key),
+            onScroll: track,
+          })
     drags.start(start, event, {
       threshold: dragThreshold,
       cancelOnEscape: true,
       onStart: () => {
-        if (!grab(key, true)) return false
+        if (!grab(key, true)) {
+          return false
+        }
         preview = bindDragPreview(start, { x: event.clientX, y: event.clientY })
         // The copy is the item in flight, not the place it would drop.
         preview.el.removeAttribute("data-moving")
@@ -282,11 +367,18 @@ function createTransfer<State extends object>(
         preview?.remove()
         preview = undefined
         dragging = false
-        if (!dragged) return
-        if (canceled) cancel()
-        else drop("drag", lastMove ?? endEvent)
+        if (!dragged) {
+          return
+        }
+        if (canceled) {
+          cancel()
+        } else {
+          drop("drag", lastMove ?? endEvent)
+        }
         // The item renders as a new element in its new list; focus follows it there.
-        if (focused) focusLater(key)
+        if (focused) {
+          focusLater(key)
+        }
       },
     })
   }
@@ -296,19 +388,26 @@ function createTransfer<State extends object>(
     bindList(el: HTMLElement, list: string) {
       lists.set(list, el)
       return () => {
-        if (lists.get(list) === el) lists.delete(list)
+        if (lists.get(list) === el) {
+          lists.delete(list)
+        }
       }
     },
     /** Joins an item's element. Return its cleanup from the item slot's `bind`. */
     bindItem(el: HTMLElement, key: string) {
       items.set(key, el)
       return () => {
-        if (items.get(key) === el) items.delete(key)
+        if (items.get(key) === el) {
+          items.delete(key)
+        }
       }
     },
     /** The lists to render: the draft's while an item moves, else the value. Pure, so `state` and `attrs` can call it. */
     lists(state: State) {
-      return (state[options.draft] as TransferDraft | null)?.lists ?? (state[options.key] as TransferLists)
+      return (
+        (state[options.draft] as TransferDraft | null)?.lists ??
+        (state[options.key] as TransferLists)
+      )
     },
     /** Whether an item is being moved. */
     moving(state: State, key: string) {
@@ -328,10 +427,18 @@ function createTransfer<State extends object>(
      */
     keydown(event: KeyboardEvent, key: string) {
       const current = draft()
-      if (event.defaultPrevented || current?.pointer) return !!current
+      if (event.defaultPrevented || current?.pointer) {
+        return !!current
+      }
       const modified = event.altKey || event.ctrlKey || event.metaKey
       if (!current) {
-        if (modified || (event.key !== " " && event.key !== "Enter") || !grab(key, false)) return false
+        if (
+          modified ||
+          (event.key !== " " && event.key !== "Enter") ||
+          !grab(key, false)
+        ) {
+          return false
+        }
         event.preventDefault()
         return true
       }
@@ -343,7 +450,15 @@ function createTransfer<State extends object>(
       const index = current.lists[list].indexOf(current.key)
       const rtl = event.target instanceof Element && isRTL(event.target)
       const across =
-        event.key === "ArrowLeft" ? (rtl ? 1 : -1) : event.key === "ArrowRight" ? (rtl ? -1 : 1) : 0
+        event.key === "ArrowLeft"
+          ? rtl
+            ? 1
+            : -1
+          : event.key === "ArrowRight"
+            ? rtl
+              ? -1
+              : 1
+            : 0
       if (event.key === " " || event.key === "Enter") {
         event.preventDefault()
         drop("move-key", event)
@@ -361,8 +476,15 @@ function createTransfer<State extends object>(
         event.preventDefault()
         const names = order()
         // The next list that takes it, at about the same height.
-        for (let i = names.indexOf(list) + across; i >= 0 && i < names.length; i += across)
-          if (moveTo(names[i], index)) break
+        for (
+          let i = names.indexOf(list) + across;
+          i >= 0 && i < names.length;
+          i += across
+        ) {
+          if (moveTo(names[i], index)) {
+            break
+          }
+        }
       }
       return true
     },
@@ -379,11 +501,21 @@ function createTransfer<State extends object>(
     /** Moves an item to `index` in `list` at once, like a "Move to Done" menu item. Returns whether it went through. */
     move(key: string, list: string, index: number) {
       const from = listWith(value(), key)
-      if (from === undefined || (from !== list && options.accepts && !options.accepts(key, list)))
+      if (
+        from === undefined ||
+        (from !== list && options.accepts && !options.accepts(key, list))
+      ) {
         return false
+      }
       const next = transferred(value(), key, list, index)
-      if (sameLists(next, value())) return false
-      if (!options.set(next, { reason: "imperative", key, from, to: list, index })) return false
+      if (sameLists(next, value())) {
+        return false
+      }
+      if (
+        !options.set(next, { reason: "imperative", key, from, to: list, index })
+      ) {
+        return false
+      }
       say("drop", key, next)
       return true
     },

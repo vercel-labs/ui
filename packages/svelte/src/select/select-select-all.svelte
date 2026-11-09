@@ -6,7 +6,10 @@ group inside a `SelectGroup`, or in the whole list.
 -->
 <script lang="ts">
   import { selectAllKey, selectSelectAll } from "@ui-sdk/core/renderer"
-  import { select as selectPrimitive, type SelectSelectAllState } from "@ui-sdk/core/select"
+  import {
+    select as selectPrimitive,
+    type SelectSelectAllState,
+  } from "@ui-sdk/core/select"
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
@@ -22,5 +25,5 @@ group inside a `SelectGroup`, or in the whole list.
 </script>
 
 {#if part.present}
-  <Part tag="div" part={part} {props} />
+  <Part tag="div" {part} {props} />
 {/if}

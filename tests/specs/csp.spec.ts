@@ -14,7 +14,8 @@ import { expect, test, waitForStill } from "../fixtures"
 const policies = [
   {
     name: "a nonce",
-    policy: "style-src 'self' 'nonce-ui-sdk' 'report-sample'; style-src-attr 'unsafe-inline'",
+    policy:
+      "style-src 'self' 'nonce-ui-sdk' 'report-sample'; style-src-attr 'unsafe-inline'",
     meta: '<meta property="csp-nonce" nonce="ui-sdk">',
     layers: "",
   },
@@ -29,8 +30,13 @@ const policies = [
 // Serves the fixture page with the policy, the meta tag and a stylesheet of
 // the page's own, and records every style the policy blocks, except the ones
 // Vite's development server adds for the playground's own CSS.
-async function serve(page: Page, { policy, meta, css = "" }: { policy: string; meta: string; css?: string }) {
-  await page.route("**/page-styles.css", (route) => route.fulfill({ contentType: "text/css", body: css }))
+async function serve(
+  page: Page,
+  { policy, meta, css = "" }: { policy: string; meta: string; css?: string }
+) {
+  await page.route("**/page-styles.css", (route) =>
+    route.fulfill({ contentType: "text/css", body: css })
+  )
   await page.route(
     (url) => url.pathname === "/" && url.searchParams.has("fixture"),
     async (route) => {
@@ -41,54 +47,84 @@ async function serve(page: Page, { policy, meta, css = "" }: { policy: string; m
         body: (await response.text()).replace("<head>", head),
         headers: { ...response.headers(), "content-security-policy": policy },
       })
-    },
+    }
   )
   await page.addInitScript(() => {
     const blocked: string[] = []
     Object.assign(window, { blockedStyles: blocked })
     document.addEventListener("securitypolicyviolation", (event) => {
-      if (event.target instanceof Element && event.target.hasAttribute("data-vite-dev-id")) return
-      blocked.push(`${event.effectiveDirective}: ${event.sample || event.blockedURI}`)
+      if (
+        event.target instanceof Element &&
+        event.target.hasAttribute("data-vite-dev-id")
+      ) {
+        return
+      }
+      blocked.push(
+        `${event.effectiveDirective}: ${event.sample || event.blockedURI}`
+      )
     })
   })
 }
 
 const blockedStyles = (page: Page) =>
-  page.evaluate(() => (window as unknown as { blockedStyles: string[] }).blockedStyles)
+  page.evaluate(
+    () => (window as unknown as { blockedStyles: string[] }).blockedStyles
+  )
 
 const backdropColor = (page: Page) =>
   page
     .getByRole("listbox")
-    .evaluate((el) => getComputedStyle(el.parentElement!, "::backdrop").backgroundColor)
+    .evaluate(
+      (el) => getComputedStyle(el.parentElement!, "::backdrop").backgroundColor
+    )
 
 for (const { name, policy, meta, layers } of policies) {
   test.describe(`under a policy with ${name} for styles`, () => {
-    test("a modal dialog locks scrolling, and contains overscroll on iOS", async ({ page, open }) => {
+    test("a modal dialog locks scrolling, and contains overscroll on iOS", async ({
+      page,
+      open,
+    }) => {
       await serve(page, { policy, meta })
       await page.addInitScript(() =>
-        Object.defineProperty(Navigator.prototype, "platform", { get: () => "iPhone" }),
+        Object.defineProperty(Navigator.prototype, "platform", {
+          get: () => "iPhone",
+        })
       )
       await open("dialog")
       await page.getByRole("button", { name: "Edit profile" }).click()
       const dialog = page.getByRole("dialog", { name: "Profile settings" })
       await expect(dialog).toBeVisible()
-      expect(await page.evaluate(() => getComputedStyle(document.scrollingElement!).overflow)).toBe("hidden")
-      expect(await dialog.evaluate((el) => getComputedStyle(el).overscrollBehaviorY)).toBe("contain")
+      expect(
+        await page.evaluate(
+          () => getComputedStyle(document.scrollingElement!).overflow
+        )
+      ).toBe("hidden")
+      expect(
+        await dialog.evaluate((el) => getComputedStyle(el).overscrollBehaviorY)
+      ).toBe("contain")
       expect(await blockedStyles(page)).toEqual([])
     })
 
-    test("a select opens its list, and hides it again once closed", async ({ page, open }) => {
+    test("a select opens its list, and hides it again once closed", async ({
+      page,
+      open,
+    }) => {
       await serve(page, { policy, meta })
       await open("select")
       await page.getByRole("combobox", { name: "Fruit" }).click()
       await expect(page.getByRole("listbox")).toBeVisible()
       await page.getByRole("option", { name: "Banana" }).click()
       await expect(page.getByRole("listbox")).toBeHidden()
-      await expect(page.getByRole("combobox", { name: "Fruit" })).toHaveText(/Banana/)
+      await expect(page.getByRole("combobox", { name: "Fruit" })).toHaveText(
+        /Banana/
+      )
       expect(await blockedStyles(page)).toEqual([])
     })
 
-    test("a select presented as a sheet dims the page behind it", async ({ page, open }) => {
+    test("a select presented as a sheet dims the page behind it", async ({
+      page,
+      open,
+    }) => {
       await serve(page, { policy, meta })
       await open("select", { presentation: "sheet" })
       await page.getByRole("combobox", { name: "Fruit" }).click()
@@ -98,17 +134,26 @@ for (const { name, policy, meta, layers } of policies) {
       expect(await blockedStyles(page)).toEqual([])
     })
 
-    test("a frame on the page takes the page's tag, and its styles apply", async ({ page, open }) => {
+    test("a frame on the page takes the page's tag, and its styles apply", async ({
+      page,
+      open,
+    }) => {
       await serve(page, { policy, meta })
       await open("dialog")
       const display = await page.evaluate(async () => {
         const { loadCoreModule } = window as unknown as {
-          loadCoreModule: (name: string) => Promise<{ enforceHidden: (doc: Document) => void }>
+          loadCoreModule: (
+            name: string
+          ) => Promise<{ enforceHidden: (doc: Document) => void }>
         }
         const { enforceHidden } = await loadCoreModule("style")
-        const doc = document.body.appendChild(document.createElement("iframe")).contentDocument!
+        const doc = document.body.appendChild(
+          document.createElement("iframe")
+        ).contentDocument!
         doc.addEventListener("securitypolicyviolation", (event) =>
-          (window as unknown as { blockedStyles: string[] }).blockedStyles.push(`frame: ${event.sample}`),
+          (window as unknown as { blockedStyles: string[] }).blockedStyles.push(
+            `frame: ${event.sample}`
+          )
         )
         const part = doc.body.appendChild(doc.createElement("div"))
         part.dataset.slot = "part"
@@ -121,7 +166,10 @@ for (const { name, policy, meta, layers } of policies) {
       expect(await blockedStyles(page)).toEqual([])
     })
 
-    test("the page's own cascade layers win over ui-sdk's styles", async ({ page, open }) => {
+    test("the page's own cascade layers win over ui-sdk's styles", async ({
+      page,
+      open,
+    }) => {
       await serve(page, {
         policy,
         meta,
@@ -147,7 +195,11 @@ test("a page that replaces its adopted sheets gets ui-sdk's styles back at the n
   const slot = await content.getAttribute("data-slot")
   const rules = await content.evaluate(async (el, slot) => {
     const { loadCoreModule } = window as unknown as {
-      loadCoreModule: (name: string) => Promise<Record<string, (doc: Document, selectors?: string[]) => void>>
+      loadCoreModule: (
+        name: string
+      ) => Promise<
+        Record<string, (doc: Document, selectors?: string[]) => void>
+      >
     }
     const [{ enforceHidden }, { resetPopoverStyles }] = await Promise.all([
       loadCoreModule("style"),
@@ -170,11 +222,18 @@ test("a page that replaces its adopted sheets gets the web components' defaults 
   open,
   framework,
 }) => {
-  test.skip(framework !== "web", "Only custom elements take default displays from ui-sdk.")
+  test.skip(
+    framework !== "web",
+    "Only custom elements take default displays from ui-sdk."
+  )
   await serve(page, policies[1])
   await open("popover")
-  const trigger = page.locator("ui-popover-trigger", { has: page.getByRole("button", { name: "Profile" }) })
-  expect(await trigger.evaluate((el) => getComputedStyle(el).display)).toBe("contents")
+  const trigger = page.locator("ui-popover-trigger", {
+    has: page.getByRole("button", { name: "Profile" }),
+  })
+  expect(await trigger.evaluate((el) => getComputedStyle(el).display)).toBe(
+    "contents"
+  )
   await page.evaluate(() => {
     document.adoptedStyleSheets = []
   })
@@ -182,6 +241,8 @@ test("a page that replaces its adopted sheets gets the web components' defaults 
   await expect(page.getByRole("dialog", { name: "Edit profile" })).toBeVisible()
   await page.keyboard.press("Escape")
   await expect(page.getByRole("dialog", { name: "Edit profile" })).toBeHidden()
-  expect(await trigger.evaluate((el) => getComputedStyle(el).display)).toBe("contents")
+  expect(await trigger.evaluate((el) => getComputedStyle(el).display)).toBe(
+    "contents"
+  )
   expect(await blockedStyles(page)).toEqual([])
 })

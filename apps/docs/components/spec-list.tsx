@@ -16,22 +16,31 @@ async function SpecList({ spec, only }: { spec: string; only?: string[] }) {
           )}
           <ul className="divide-y divide-border/60 text-foreground/75">
             {group.tests.map((test) => (
-              <li key={test.title} className="flex gap-2.5 px-4 py-2.5 leading-relaxed">
+              <li
+                key={test.title}
+                className="flex gap-2.5 px-4 py-2.5 leading-relaxed"
+              >
                 <span aria-hidden className="text-subtle">
                   ✓
                 </span>
                 <span>
                   {sentence(test.title)}.
-                  {test.frameworks.length > 0 && test.frameworks.length < frameworks.length && (
-                    <span className="text-subtle"> {sentence(listOf(test.frameworks))} only.</span>
-                  )}
+                  {test.frameworks.length > 0 &&
+                    test.frameworks.length < frameworks.length && (
+                      <span className="text-subtle">
+                        {" "}
+                        {sentence(listOf(test.frameworks))} only.
+                      </span>
+                    )}
                 </span>
               </li>
             ))}
           </ul>
         </Frame>
       ))}
-      {frameworks.length > 0 && <p className="text-subtle">Runs in {listOf(frameworks)}.</p>}
+      {frameworks.length > 0 && (
+        <p className="text-subtle">Runs in {listOf(frameworks)}.</p>
+      )}
     </div>
   )
 }

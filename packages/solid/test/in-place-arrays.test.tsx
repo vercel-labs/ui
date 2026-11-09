@@ -4,7 +4,13 @@
 import { createStore, flush } from "solid-js"
 import { render, type JSX } from "@solidjs/web"
 import { afterEach, describe, expect, test } from "vitest"
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "../src/accordion"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "../src/accordion"
 import { Checkbox, CheckboxGroup } from "../src/checkbox"
 import { Combobox, ComboboxInput, ComboboxValue } from "../src/combobox"
 import { Listbox } from "../src/listbox"
@@ -45,8 +51,11 @@ const labelsIn = (el: HTMLElement, selector: string) =>
 const components = [
   {
     name: "Listbox",
-    render: (value: () => string[]) => <Listbox multiple name="fruit" items={fruits} value={value()} />,
-    shown: (el: HTMLElement) => labelsWhere(el, '[role="option"]', "aria-selected"),
+    render: (value: () => string[]) => (
+      <Listbox multiple name="fruit" items={fruits} value={value()} />
+    ),
+    shown: (el: HTMLElement) =>
+      labelsWhere(el, '[role="option"]', "aria-selected"),
     submits: true,
     // Its options keep their order on the page.
     shownReversed: ["Apple", "Banana", "Cherry"],
@@ -97,7 +106,8 @@ const components = [
         ))}
       </CheckboxGroup>
     ),
-    shown: (el: HTMLElement) => labelsWhere(el, '[role="checkbox"]', "aria-checked"),
+    shown: (el: HTMLElement) =>
+      labelsWhere(el, '[role="checkbox"]', "aria-checked"),
     submits: true,
   },
   {
@@ -131,7 +141,7 @@ const components = [
     ),
     shown: (el: HTMLElement) =>
       [...el.querySelectorAll('[role="treeitem"][aria-expanded="true"]')].map(
-        (item) => item.querySelector('[data-slot="tree-label"]')!.textContent,
+        (item) => item.querySelector('[data-slot="tree-label"]')!.textContent
       ),
     submits: false,
   },
@@ -147,7 +157,9 @@ describe.each(components)("$name", ({ render, shown, submits }) => {
     })
     flush()
     expect(shown(form)).toEqual(["Apple", "Banana"])
-    if (submits) expect(new FormData(form).getAll("fruit")).toEqual(["apple", "banana"])
+    if (submits) {
+      expect(new FormData(form).getAll("fruit")).toEqual(["apple", "banana"])
+    }
   })
 
   test("follows an item spliced out of its store list", () => {
@@ -159,7 +171,9 @@ describe.each(components)("$name", ({ render, shown, submits }) => {
     })
     flush()
     expect(shown(form)).toEqual(["Banana"])
-    if (submits) expect(new FormData(form).getAll("fruit")).toEqual(["banana"])
+    if (submits) {
+      expect(new FormData(form).getAll("fruit")).toEqual(["banana"])
+    }
   })
 
   test("follows its store list replaced by an equal one, then pushed into", () => {
@@ -178,7 +192,13 @@ describe.each(components)("$name", ({ render, shown, submits }) => {
     })
     flush()
     expect(shown(form)).toEqual(["Apple", "Banana", "Cherry"])
-    if (submits) expect(new FormData(form).getAll("fruit")).toEqual(["apple", "banana", "cherry"])
+    if (submits) {
+      expect(new FormData(form).getAll("fruit")).toEqual([
+        "apple",
+        "banana",
+        "cherry",
+      ])
+    }
   })
 })
 
@@ -186,14 +206,20 @@ describe.each(components.filter((component) => component.shownReversed))(
   "$name",
   ({ render, shown, shownReversed }) => {
     test("follows its store list reordered in place", () => {
-      const [state, setState] = createStore({ selected: ["apple", "banana", "cherry"] })
+      const [state, setState] = createStore({
+        selected: ["apple", "banana", "cherry"],
+      })
       const form = mount(() => render(() => state.selected))
       setState((draft) => {
         draft.selected.reverse()
       })
       flush()
       expect(shown(form)).toEqual(shownReversed)
-      expect(new FormData(form).getAll("fruit")).toEqual(["cherry", "banana", "apple"])
+      expect(new FormData(form).getAll("fruit")).toEqual([
+        "cherry",
+        "banana",
+        "apple",
+      ])
     })
-  },
+  }
 )

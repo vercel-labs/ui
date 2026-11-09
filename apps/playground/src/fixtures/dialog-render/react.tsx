@@ -23,9 +23,15 @@ function Fixture() {
           )}
         />
         <DialogBackdrop className="dialog-backdrop" render={<section />} />
-        <DialogContent className={(state) => `dialog ${state.open ? "is-open" : "is-closed"}`}>
+        <DialogContent
+          className={(state) =>
+            `dialog ${state.open ? "is-open" : "is-closed"}`
+          }
+        >
           <DialogTitle render={<h3 />}>Shipping</DialogTitle>
-          <DialogDescription render={<div />}>Arrives in two days.</DialogDescription>
+          <DialogDescription render={<div />}>
+            Arrives in two days.
+          </DialogDescription>
           <DialogClose render={<a href="#done" />}>Done</DialogClose>
         </DialogContent>
       </Dialog>

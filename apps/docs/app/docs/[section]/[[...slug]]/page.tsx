@@ -6,9 +6,13 @@ import { notFound } from "next/navigation"
 
 // Each framework's pages. Core's and Agents' are built once per framework, in
 // app/for/[framework], and next.config.mjs serves the reader's.
-export default async function Page(props: PageProps<"/docs/[section]/[[...slug]]">) {
+export default async function Page(
+  props: PageProps<"/docs/[section]/[[...slug]]">
+) {
   const { section, slug = [] } = await props.params
-  if (!isFramework(section)) notFound()
+  if (!isFramework(section)) {
+    notFound()
+  }
   return <DocsPage section={section} slug={slug} framework={section} />
 }
 
@@ -19,7 +23,9 @@ export async function generateStaticParams() {
     .map((page) => ({ section: page.slugs[0], slug: page.slugs.slice(1) }))
 }
 
-export async function generateMetadata(props: PageProps<"/docs/[section]/[[...slug]]">): Promise<Metadata> {
+export async function generateMetadata(
+  props: PageProps<"/docs/[section]/[[...slug]]">
+): Promise<Metadata> {
   const { section, slug = [] } = await props.params
   return docsMetadata(section, slug)
 }

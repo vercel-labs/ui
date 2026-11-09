@@ -13,11 +13,17 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
@@ -32,13 +38,17 @@ test(
       await page.getByRole("button", { name: "Before" }).focus()
       await tab()
       await page.keyboard.press("Enter")
-      await expect(page.getByRole("textbox", { name: "Display name" })).toBeFocused()
+      await expect(
+        page.getByRole("textbox", { name: "Display name" })
+      ).toBeFocused()
       await tab()
       await expect(page.getByRole("button", { name: "Save" })).toBeFocused()
       await tab()
       await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
       await page.keyboard.press("Enter")
-      await expect(page.getByRole("button", { name: "Edit profile" })).toBeFocused()
+      await expect(
+        page.getByRole("button", { name: "Edit profile" })
+      ).toBeFocused()
     })
     expect(log).toEqual([
       "document",
@@ -50,21 +60,29 @@ test(
       "button, Close",
       "button, Edit profile, has popup dialog",
     ])
-  },
+  }
 )
 
-test("announcements while using the alert dialog with a keyboard", async ({ page, open, tab }) => {
+test("announcements while using the alert dialog with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("dialog", { sr: "" })
   const log = await record(page, async () => {
     await page.getByRole("button", { name: "Delete project" }).focus()
     await page.keyboard.press("Enter")
     await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused()
     await tab()
-    await expect(page.getByRole("button", { name: "Delete", exact: true })).toBeFocused()
+    await expect(
+      page.getByRole("button", { name: "Delete", exact: true })
+    ).toBeFocused()
     await tab({ shift: true })
     await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused()
     await page.keyboard.press("Enter")
-    await expect(page.getByRole("button", { name: "Delete project" })).toBeFocused()
+    await expect(
+      page.getByRole("button", { name: "Delete project" })
+    ).toBeFocused()
   })
   // Only what the dialog itself says is the contract. How the trigger reads
   // depends on whether it sets aria-expanded.
@@ -73,7 +91,7 @@ test("announcements while using the alert dialog with a keyboard", async ({ page
   const start = moves.findIndex((line) => line.startsWith("alertdialog"))
   expect(moves.slice(start, -1)).toEqual([
     expect.stringMatching(
-      /^alertdialog, Delete project\?, This permanently deletes the project and its files\./,
+      /^alertdialog, Delete project\?, This permanently deletes the project and its files\./
     ),
     "button, Cancel",
     "button, Delete",

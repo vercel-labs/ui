@@ -44,7 +44,11 @@
   ]
 
   const popularCountries = [
-    { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
+    {
+      type: "group" as const,
+      label: "Popular",
+      items: [countries[5], countries[11], countries[16]],
+    },
   ]
 </script>
 
@@ -56,14 +60,19 @@
     placeholder="Select a country"
     filter="contains"
     announcement={(change) =>
-      change.type === "results" ? `${change.count} ${change.count === 1 ? "country" : "countries"} found` : null}
+      change.type === "results"
+        ? `${change.count} ${change.count === 1 ? "country" : "countries"} found`
+        : null}
   >
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />
     </SelectTrigger>
     <SelectContent>
-      <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+      <SelectInput
+        aria-label="Search countries"
+        placeholder="Search countries…"
+      />
       <SelectEmpty>No countries found.</SelectEmpty>
       <SelectList>
         {#snippet children(state)}
@@ -75,7 +84,7 @@
               </SelectItemIndicator>
             </SelectItem>
           {/snippet}
-          {#each (state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]) as entry ("items" in entry ? entry.label : entry.value)}
+          {#each state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[] as entry ("items" in entry ? entry.label : entry.value)}
             {#if "items" in entry}
               <SelectGroup>
                 <SelectGroupLabel>{entry.label}</SelectGroupLabel>

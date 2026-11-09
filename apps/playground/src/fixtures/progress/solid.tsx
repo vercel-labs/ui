@@ -37,8 +37,19 @@ function Fixture() {
         max={files.max}
         getValueLabel={(value) => files.valueLabel(value!)}
       />
-      <Bar label={disk.label} value={disk.value} max={disk.max} format={disk.format} />
-      <button onClick={() => setValue((current) => Math.min(100, current + upload.step))}>Advance</button>
+      <Bar
+        label={disk.label}
+        value={disk.value}
+        max={disk.max}
+        format={disk.format}
+      />
+      <button
+        onClick={() =>
+          setValue((current) => Math.min(100, current + upload.step))
+        }
+      >
+        Advance
+      </button>
       <button onClick={() => setValue(upload.value)}>Restart</button>
       <button>After</button>
       <output role="status" aria-label="Last action" />

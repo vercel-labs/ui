@@ -12,12 +12,17 @@ import {
 } from "@ui-sdk/solid/pagination"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
-import { paginationAction, paginationFixture, paginationOptions } from "tests/fixtures/pagination.ts"
+import {
+  paginationAction,
+  paginationFixture,
+  paginationOptions,
+} from "tests/fixtures/pagination.ts"
 
 const pages = createPaginationController()
 
 function Fixture() {
-  const { controlled, cancel, rekey, defaultPage, ...options } = paginationOptions()
+  const { controlled, cancel, rekey, defaultPage, ...options } =
+    paginationOptions()
   const [action, setAction] = createSignal("")
   const [page, setPage] = createSignal(defaultPage ?? 1)
   const f = paginationFixture
@@ -72,7 +77,9 @@ function Fixture() {
         page={controlled ? page() : undefined}
         defaultPage={controlled ? undefined : defaultPage}
         onPageChange={(next, details) => {
-          if (next === cancel) return details.cancel()
+          if (next === cancel) {
+            return details.cancel()
+          }
           setPage(next)
           setAction(paginationAction(next, details.reason))
         }}
@@ -81,7 +88,9 @@ function Fixture() {
           {list()}
         </Show>
       </Pagination>
-      <button onClick={() => pages.setPage(f.controller.page)}>{f.controller.label}</button>
+      <button onClick={() => pages.setPage(f.controller.page)}>
+        {f.controller.label}
+      </button>
       <button>After</button>
       <output role="status" aria-label="Last action">
         {action()}

@@ -32,10 +32,16 @@ function Example() {
     <Preferences preferences={[view]}>
       <div data-slot="stack">
         <div data-slot="controls" role="group" aria-label="View">
-          <Button aria-pressed={value === "list"} onClick={(event) => choose("list", event)}>
+          <Button
+            aria-pressed={value === "list"}
+            onClick={(event) => choose("list", event)}
+          >
             List
           </Button>
-          <Button aria-pressed={value === "grid"} onClick={(event) => choose("grid", event)}>
+          <Button
+            aria-pressed={value === "grid"}
+            onClick={(event) => choose("grid", event)}
+          >
             Grid
           </Button>
         </div>

@@ -33,8 +33,13 @@ function Example() {
         <button
           type="button"
           onClick={async (event) => {
-            const result = await popover.open({ payload: newest, anchor: event.currentTarget })
-            log(`Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`)
+            const result = await popover.open({
+              payload: newest,
+              anchor: event.currentTarget,
+            })
+            log(
+              `Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`
+            )
           }}
         >
           Edit Newest Member
@@ -62,7 +67,9 @@ function Example() {
         controller={popover}
         onPayloadChange={(payload) => {
           const member = payload as Member | undefined
-          if (member) log(`Editing ${member.name}`)
+          if (member) {
+            log(`Editing ${member.name}`)
+          }
         }}
       >
         <PopoverContent<Member> align="end" sideOffset={8}>
@@ -71,16 +78,25 @@ function Example() {
             return (
               <>
                 <PopoverTitle>{member?.name}</PopoverTitle>
-                <PopoverDescription>Roles decide what they can change.</PopoverDescription>
+                <PopoverDescription>
+                  Roles decide what they can change.
+                </PopoverDescription>
                 <form
                   data-slot="stack"
                   method="dialog"
                   onSubmit={(event) => {
-                    const submitter = (event.nativeEvent as SubmitEvent).submitter as HTMLButtonElement
-                    if (submitter.value !== "save" || !member) return
-                    const role = String(new FormData(event.currentTarget).get("role"))
+                    const submitter = (event.nativeEvent as SubmitEvent)
+                      .submitter as HTMLButtonElement
+                    if (submitter.value !== "save" || !member) {
+                      return
+                    }
+                    const role = String(
+                      new FormData(event.currentTarget).get("role")
+                    )
                     setMembers((current) =>
-                      current.map((entry) => (entry.name === member.name ? { ...entry, role } : entry)),
+                      current.map((entry) =>
+                        entry.name === member.name ? { ...entry, role } : entry
+                      )
                     )
                   }}
                 >

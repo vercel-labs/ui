@@ -19,7 +19,10 @@ import { comboboxFixture as f } from "tests/fixtures/combobox.ts"
       <ComboboxLabel class="label">{{ f.label }}</ComboboxLabel>
       <ComboboxInput>
         <template #render="{ props, state }">
-          <input v-bind="props" :class="['input', state.open ? 'is-open' : 'is-closed']" />
+          <input
+            v-bind="props"
+            :class="['input', state.open ? 'is-open' : 'is-closed']"
+          />
         </template>
       </ComboboxInput>
       <ComboboxTrigger :aria-label="f.trigger">▾</ComboboxTrigger>

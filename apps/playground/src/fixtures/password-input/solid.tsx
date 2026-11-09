@@ -28,14 +28,21 @@ function Fixture() {
         class="password-form"
         onSubmit={(event) => {
           event.preventDefault()
-          const field = event.currentTarget.elements.namedItem(password.name) as HTMLInputElement
+          const field = event.currentTarget.elements.namedItem(
+            password.name
+          ) as HTMLInputElement
           setAction(passwordInputAction.submit(field.type))
         }}
       >
         <fieldset>
           <legend>{form.account}</legend>
           <label>
-            {email.label} <input class="input" name={email.name} defaultValue={email.defaultValue} />
+            {email.label}{" "}
+            <input
+              class="input"
+              name={email.name}
+              defaultValue={email.defaultValue}
+            />
           </label>
           <Field>
             <FieldLabel>{password.label}</FieldLabel>
@@ -47,13 +54,18 @@ function Fixture() {
               visible={controlled ? visible() : undefined}
               defaultVisible={controlled ? undefined : options.defaultVisible}
               onVisibleChange={(next, details) => {
-                if (cancel) return details.cancel()
+                if (cancel) {
+                  return details.cancel()
+                }
                 setVisible(next)
                 setAction(passwordInputAction.visible(next, details.reason))
               }}
             >
               <PasswordInputControl class="input" />
-              <PasswordInputToggle class="password-toggle" aria-label={password.toggle}>
+              <PasswordInputToggle
+                class="password-toggle"
+                aria-label={password.toggle}
+              >
                 <span aria-hidden="true">👁</span>
               </PasswordInputToggle>
             </PasswordInput>
@@ -64,7 +76,9 @@ function Fixture() {
         <button type="submit">{form.submit}</button>
         <button type="reset">{form.reset}</button>
       </form>
-      <button onClick={() => reveal.toggleVisible()}>{passwordInputFixture.controller}</button>
+      <button onClick={() => reveal.toggleVisible()}>
+        {passwordInputFixture.controller}
+      </button>
       <button>After</button>
       <output role="status" aria-label="Last action">
         {action()}

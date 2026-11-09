@@ -16,7 +16,12 @@ import {
 } from "@ui-sdk/solid/command"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
-import { commandData, commandFixture as f, commandOptions, runAction } from "tests/fixtures/command.ts"
+import {
+  commandData,
+  commandFixture as f,
+  commandOptions,
+  runAction,
+} from "tests/fixtures/command.ts"
 import { longItems } from "tests/fixtures/select.ts"
 
 function Fixture(props: { data?: boolean }) {
@@ -36,14 +41,20 @@ function Fixture(props: { data?: boolean }) {
         class="command"
         items={items}
         onAction={onAction}
-        onValueChange={(value, details) => setLastHighlight(`${value}:${details.reason}`)}
+        onValueChange={(value, details) =>
+          setLastHighlight(`${value}:${details.reason}`)
+        }
       >
         <CommandInput class="input" aria-label={f.input} />
         <CommandEmpty class="empty">{f.empty}</CommandEmpty>
-        <CommandStatus class="status">{(state) => (state.loading ? "Loading…" : "")}</CommandStatus>
+        <CommandStatus class="status">
+          {(state) => (state.loading ? "Loading…" : "")}
+        </CommandStatus>
         <CommandList class="command-list">
           {items ? (
-            (state) => <DataCommands items={state.items} highlight={highlight} />
+            (state) => (
+              <DataCommands items={state.items} highlight={highlight} />
+            )
           ) : (
             <>
               <CommandPage>
@@ -54,19 +65,33 @@ function Fixture(props: { data?: boolean }) {
                         <CommandSeparator class="separator" />
                       </Show>
                       <CommandGroup>
-                        <CommandGroupLabel class="label">{group.label}</CommandGroupLabel>
+                        <CommandGroupLabel class="label">
+                          {group.label}
+                        </CommandGroupLabel>
                         <For each={group.items}>
                           {(item) => (
                             <CommandItem
                               class="item"
                               value={unvalued ? undefined : item.value}
-                              keywords={"keywords" in item ? item.keywords : undefined}
-                              disabled={"disabled" in item ? item.disabled : undefined}
-                              shortcut={"shortcut" in item ? item.shortcut : undefined}
+                              keywords={
+                                "keywords" in item ? item.keywords : undefined
+                              }
+                              disabled={
+                                "disabled" in item ? item.disabled : undefined
+                              }
+                              shortcut={
+                                "shortcut" in item ? item.shortcut : undefined
+                              }
                               page={"page" in item ? item.page : undefined}
                             >
-                              {highlight ? <CommandItemText>{item.label}</CommandItemText> : item.label}
-                              {"shortcut" in item && <CommandShortcut class="shortcut" />}
+                              {highlight ? (
+                                <CommandItemText>{item.label}</CommandItemText>
+                              ) : (
+                                item.label
+                              )}
+                              {"shortcut" in item && (
+                                <CommandShortcut class="shortcut" />
+                              )}
                             </CommandItem>
                           )}
                         </For>
@@ -105,17 +130,22 @@ function DataCommands(props: { items: CommandData; highlight?: boolean }) {
     <For each={props.items}>
       {(entry) => {
         if (typeof entry !== "string" && "type" in entry) {
-          if (entry.type === "separator") return <CommandSeparator class="separator" />
+          if (entry.type === "separator") {
+            return <CommandSeparator class="separator" />
+          }
           return (
             <CommandGroup>
               <Show when={entry.label}>
-                <CommandGroupLabel class="label">{entry.label}</CommandGroupLabel>
+                <CommandGroupLabel class="label">
+                  {entry.label}
+                </CommandGroupLabel>
               </Show>
               <DataCommands items={entry.items} highlight={props.highlight} />
             </CommandGroup>
           )
         }
-        const command: CommandDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+        const command: CommandDataItem =
+          typeof entry === "string" ? { value: entry, label: entry } : entry
         return (
           <CommandItem
             class="item"
@@ -125,7 +155,11 @@ function DataCommands(props: { items: CommandData; highlight?: boolean }) {
             disabled={command.disabled}
             shortcut={command.shortcut}
           >
-            {props.highlight ? <CommandItemText>{command.label}</CommandItemText> : command.label}
+            {props.highlight ? (
+              <CommandItemText>{command.label}</CommandItemText>
+            ) : (
+              command.label
+            )}
             <Show when={command.shortcut}>
               <CommandShortcut class="shortcut" />
             </Show>

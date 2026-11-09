@@ -24,20 +24,36 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Menubar className="menubar" aria-label={f.label} controller={controller} {...menubarOptions()}>
+      <Menubar
+        className="menubar"
+        aria-label={f.label}
+        controller={controller}
+        {...menubarOptions()}
+      >
         <Menu onAction={setAction}>
           <MenuTrigger>{f.file.trigger}</MenuTrigger>
           <MenuContent className="popup">
             {f.file.items.map((item) => (
-              <MenuItem key={item.value} className="item" value={item.value} shortcut={item.shortcut}>
+              <MenuItem
+                key={item.value}
+                className="item"
+                value={item.value}
+                shortcut={item.shortcut}
+              >
                 {item.label}
               </MenuItem>
             ))}
             <MenuSub>
-              <MenuSubTrigger className="item">{f.file.share.trigger}</MenuSubTrigger>
+              <MenuSubTrigger className="item">
+                {f.file.share.trigger}
+              </MenuSubTrigger>
               <MenuSubContent className="popup">
                 {f.file.share.items.map((item) => (
-                  <MenuItem key={item.value} className="item" value={item.value}>
+                  <MenuItem
+                    key={item.value}
+                    className="item"
+                    value={item.value}
+                  >
                     {item.label}
                   </MenuItem>
                 ))}
@@ -53,13 +69,22 @@ function Fixture() {
           <MenuTrigger>{f.edit.trigger}</MenuTrigger>
           <MenuContent className="popup">
             {f.edit.items.map((item) => (
-              <MenuItem key={item.value} className="item" value={item.value} disabled={item.disabled}>
+              <MenuItem
+                key={item.value}
+                className="item"
+                value={item.value}
+                disabled={item.disabled}
+              >
                 {item.label}
               </MenuItem>
             ))}
           </MenuContent>
         </Menu>
-        <Menu onCheckedChange={(checked, { value }) => setAction(`${value}: ${checked ? "on" : "off"}`)}>
+        <Menu
+          onCheckedChange={(checked, { value }) =>
+            setAction(`${value}: ${checked ? "on" : "off"}`)
+          }
+        >
           <MenuTrigger shortcut={f.view.shortcut}>{f.view.trigger}</MenuTrigger>
           <MenuContent className="popup">
             {f.view.checkboxes.map((item) => (
@@ -82,7 +107,11 @@ function Fixture() {
               onValueChange={(value) => setAction(`profile: ${value}`)}
             >
               {f.profiles.items.map((item) => (
-                <MenuRadioItem key={item.value} className="item" value={item.value}>
+                <MenuRadioItem
+                  key={item.value}
+                  className="item"
+                  value={item.value}
+                >
                   {item.label}
                 </MenuRadioItem>
               ))}
@@ -112,7 +141,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

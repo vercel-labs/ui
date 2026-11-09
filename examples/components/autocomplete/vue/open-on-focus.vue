@@ -21,9 +21,12 @@ const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
       <AutocompleteList>
         <AutocompleteGroup>
           <AutocompleteGroupLabel>Recent searches</AutocompleteGroupLabel>
-          <AutocompleteItem v-for="search in recent" :key="search" :value="search">{{
-            search
-          }}</AutocompleteItem>
+          <AutocompleteItem
+            v-for="search in recent"
+            :key="search"
+            :value="search"
+            >{{ search }}</AutocompleteItem
+          >
         </AutocompleteGroup>
       </AutocompleteList>
     </AutocompleteContent>

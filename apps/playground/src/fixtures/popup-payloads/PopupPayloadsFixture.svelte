@@ -30,10 +30,16 @@
   let lastPayload = $state("")
 
   function opened(name: string, open: boolean, { event }: ChangeDetails) {
-    if (open) lastOpen = describeChange(name, "open", event)
+    if (open) {
+      lastOpen = describeChange(name, "open", event)
+    }
   }
 
-  function payloadChanged(name: string, payload: unknown, { event }: ChangeDetails) {
+  function payloadChanged(
+    name: string,
+    payload: unknown,
+    { event }: ChangeDetails
+  ) {
     lastPayload = describeChange(name, `payload ${payload}`, event)
   }
 </script>
@@ -42,7 +48,8 @@
   <button>Before</button>
   <Menu
     onOpenChange={(open, details) => opened("menu", open, details)}
-    onPayloadChange={(payload, details) => payloadChanged("menu", payload, details)}
+    onPayloadChange={(payload, details) =>
+      payloadChanged("menu", payload, details)}
   >
     {#each fixture.menu.triggers as label (label)}
       <MenuTrigger payload={payloadOf(label)}>{label}</MenuTrigger>
@@ -59,7 +66,8 @@
   <Popover
     controller={people}
     onOpenChange={(open, details) => opened("popover", open, details)}
-    onPayloadChange={(payload, details) => payloadChanged("popover", payload, details)}
+    onPayloadChange={(payload, details) =>
+      payloadChanged("popover", payload, details)}
   >
     {#each fixture.popover.triggers as label (label)}
       <PopoverTrigger payload={payloadOf(label)}>{label}</PopoverTrigger>
@@ -67,7 +75,9 @@
     <PopoverContent class="popup">
       {#snippet children(state)}
         {contentFor(state.payload)}
-        <button onclick={() => people.open({ payload: fixture.popover.show.payload })}>
+        <button
+          onclick={() => people.open({ payload: fixture.popover.show.payload })}
+        >
           {fixture.popover.show.label}
         </button>
       {/snippet}
@@ -76,7 +86,8 @@
   <Dialog
     modal={false}
     onOpenChange={(open, details) => opened("dialog", open, details)}
-    onPayloadChange={(payload, details) => payloadChanged("dialog", payload, details)}
+    onPayloadChange={(payload, details) =>
+      payloadChanged("dialog", payload, details)}
   >
     {#each fixture.dialog.triggers as label (label)}
       <DialogTrigger payload={payloadOf(label)}>{label}</DialogTrigger>
@@ -88,7 +99,8 @@
   <Drawer
     modal={false}
     onOpenChange={(open, details) => opened("drawer", open, details)}
-    onPayloadChange={(payload, details) => payloadChanged("drawer", payload, details)}
+    onPayloadChange={(payload, details) =>
+      payloadChanged("drawer", payload, details)}
   >
     {#each fixture.drawer.triggers as label (label)}
       <DrawerTrigger payload={payloadOf(label)}>{label}</DrawerTrigger>

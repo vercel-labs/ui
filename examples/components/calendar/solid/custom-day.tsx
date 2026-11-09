@@ -51,7 +51,9 @@ function Example() {
               {(state) => (
                 <abbr
                   title={state.name}
-                  data-weekend={state.weekday === 0 || state.weekday === 6 || undefined}
+                  data-weekend={
+                    state.weekday === 0 || state.weekday === 6 || undefined
+                  }
                 >
                   {state.label}
                 </abbr>
@@ -65,7 +67,9 @@ function Example() {
               {(state) => (
                 <span data-slot="stack">
                   <span>{state.label}</span>
-                  {!state.outside && !state.disabled && <span data-slot="hint">${priceOf(state.date)}</span>}
+                  {!state.outside && !state.disabled && (
+                    <span data-slot="hint">${priceOf(state.date)}</span>
+                  )}
                 </span>
               )}
             </CalendarDay>

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Tooltip, TooltipArrow, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipTrigger,
+} from "@ui-sdk/vue/tooltip"
 
 const sides = [
   { side: "right", label: "يمين" },

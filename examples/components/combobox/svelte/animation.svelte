@@ -26,7 +26,10 @@
   const log = useLog()
 </script>
 
-<Combobox onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
+<Combobox
+  onOpenChangeComplete={(open) =>
+    log(open ? "Finished opening" : "Finished closing")}
+>
   <div data-slot="stack">
     <ComboboxLabel>Framework</ComboboxLabel>
     <div data-slot="row">

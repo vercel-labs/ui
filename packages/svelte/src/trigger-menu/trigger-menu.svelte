@@ -28,8 +28,13 @@ pass `editor`.
   import { ContainerKey, OwnContentKey } from "./context"
   import TriggerMenuContent from "./trigger-menu-content.svelte"
 
-  type OpenDetails = ChangeDetails<TriggerMenuOpenChangeReason> & { trigger: string | null }
-  type QueryDetails = ChangeDetails<TriggerMenuQueryChangeReason> & { trigger: string; argument?: string }
+  type OpenDetails = ChangeDetails<TriggerMenuOpenChangeReason> & {
+    trigger: string | null
+  }
+  type QueryDetails = ChangeDetails<TriggerMenuQueryChangeReason> & {
+    trigger: string
+    argument?: string
+  }
 
   let {
     triggers,
@@ -74,7 +79,10 @@ pass `editor`.
     /** Renders the list into this element instead of in place. */
     container?: PopupContainer
     /** Runs when an item, with every required argument, is chosen. Return a Promise and a pending token is inserted at once. */
-    onSelect?: (value: any, details: TriggerMenuSelectDetails<any>) => void | Promise<void | Partial<TokenInsert>>
+    onSelect?: (
+      value: any,
+      details: TriggerMenuSelectDetails<any>
+    ) => void | Promise<void | Partial<TokenInsert>>
     /** What screen readers hear once an `onSelect` Promise has been pending for a second. An empty string says nothing. */
     pendingAnnouncement?: string
     /** Runs when the menu wants to open or close. `details.trigger` says which trigger, and `details.cancel()` stops it. */
@@ -84,7 +92,9 @@ pass `editor`.
     /** Runs when the text after the trigger changes. `details.argument` names the argument being typed. */
     onQueryChange?: (query: string, details: QueryDetails) => void
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press or the screen reader's escape. Focus or the window leaving is refused without it. */
-    onDismissAttempt?: (details: DismissAttemptDetails<TriggerMenuDismissReason>) => void
+    onDismissAttempt?: (
+      details: DismissAttemptDetails<TriggerMenuDismissReason>
+    ) => void
     children?: Snippet
   } = $props()
 
@@ -110,7 +120,9 @@ pass `editor`.
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onQueryChange,

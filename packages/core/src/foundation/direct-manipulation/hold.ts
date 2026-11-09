@@ -116,19 +116,24 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
   function start(
     details: HoldDetails,
     extra: Pick<Press, "pointerId" | "key">,
-    listen: () => (() => void)[],
+    listen: () => (() => void)[]
   ) {
-    if (press || options.disabled?.() || options.onPress?.(details) === false) return false
+    if (press || options.disabled?.() || options.onPress?.(details) === false) {
+      return false
+    }
     let count = 0
     const tick = () => {
       const current = press
-      if (!current || options.disabled?.()) return
+      if (!current || options.disabled?.()) {
+        return
+      }
       current.held = true
       el.setAttribute("data-held", "")
       const repeats = options.onHold?.({ ...details, count: ++count }) !== false
       // onHold may have ended the press, like by unbinding or moving focus.
-      if (repeats && options.repeat && press === current)
+      if (repeats && options.repeat && press === current) {
         current.timer = view.setTimeout(tick, options.repeat)
+      }
     }
     const listeners = listen()
     press = {
@@ -145,7 +150,9 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
   function stop() {
     const current = press
     press = undefined
-    if (!current) return
+    if (!current) {
+      return
+    }
     view.clearTimeout(current.timer)
     current.unlisten()
     el.removeAttribute("data-holding")
@@ -155,16 +162,26 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
 
   function end(event: Event, canceled: boolean) {
     const current = stop()
-    if (!current) return
+    if (!current) {
+      return
+    }
     const { input, pointerId, key, held } = current
     // A release still to come, after Escape or focus leaving, waits for it.
-    if (pointerId !== undefined && (held || canceled) && event.type !== "pointercancel") {
+    if (
+      pointerId !== undefined &&
+      (held || canceled) &&
+      event.type !== "pointercancel"
+    ) {
       const released = event.type === "pointerup"
       swallowNextClick(doc, !released, released ? undefined : pointerId)
     }
-    if (key !== undefined && canceled && doc.activeElement === el) swallowKey(key)
+    if (key !== undefined && canceled && doc.activeElement === el) {
+      swallowKey(key)
+    }
     options.onEnd?.({ event, input, held, canceled })
-    if (key !== undefined && !held && !canceled) el.click()
+    if (key !== undefined && !held && !canceled) {
+      el.click()
+    }
   }
 
   // A button clicks on Enter's repeats and Space's keyup, so a canceled press
@@ -173,7 +190,9 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
     const listeners = [
       on(el, "keydown", (down) => down.key === key && down.preventDefault()),
       on(el, "keyup", (up) => {
-        if (up.key !== key) return
+        if (up.key !== key) {
+          return
+        }
         up.preventDefault()
         listeners.forEach((remove) => remove())
       }),
@@ -188,12 +207,14 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
       doc,
       "keydown",
       (event) => {
-        if (event.key !== "Escape") return
+        if (event.key !== "Escape") {
+          return
+        }
         event.preventDefault()
         event.stopPropagation()
         end(event, true)
       },
-      { capture: true },
+      { capture: true }
     ),
     on(el, "blur", (blur) => end(blur, true)),
     on(view, "blur", (blur) => end(blur, true)),
@@ -202,41 +223,79 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
   const onPointerDown = (event: PointerEvent) => {
     // A mouse is always primary; a second finger or pen joins no press.
     const secondary = !event.isPrimary && event.pointerType !== "mouse"
-    if (event.button !== 0 || secondary || event.defaultPrevented) return
+    if (event.button !== 0 || secondary || event.defaultPrevented) {
+      return
+    }
     const input = (event.pointerType || "mouse") as HoldInput
     const ours = (move: PointerEvent) => move.pointerId === event.pointerId
     start({ event, input }, { pointerId: event.pointerId }, () => [
       on(doc, "pointermove", (move) => {
-        if (!ours(move)) return
+        if (!ours(move)) {
+          return
+        }
         // A mouse released outside a frame that missed the pointerup.
-        if (move.pointerType === "mouse" && move.buttons === 0) return end(move, false)
-        const distance = Math.hypot(move.clientX - event.clientX, move.clientY - event.clientY)
-        if (!press?.held && distance > tolerance) end(move, true)
+        if (move.pointerType === "mouse" && move.buttons === 0) {
+          return end(move, false)
+        }
+        const distance = Math.hypot(
+          move.clientX - event.clientX,
+          move.clientY - event.clientY
+        )
+        if (!press?.held && distance > tolerance) {
+          end(move, true)
+        }
       }),
       on(doc, "pointerup", (up) => ours(up) && end(up, false)),
       on(doc, "pointercancel", (cancel) => ours(cancel) && end(cancel, true)),
-      on(doc, "contextmenu", (menu) => input !== "mouse" && menu.preventDefault()),
+      on(
+        doc,
+        "contextmenu",
+        (menu) => input !== "mouse" && menu.preventDefault()
+      ),
       ...cancels(),
     ])
   }
 
   const onKeyDown = (event: KeyboardEvent) => {
-    if (event.target !== el || !keys.includes(event.key)) return
+    if (event.target !== el || !keys.includes(event.key)) {
+      return
+    }
     // The keyboard's own repeats would click a button again and again.
-    if (press?.input === "keyboard") return event.preventDefault()
-    if (event.repeat || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
-    const started = start({ event, input: "keyboard" }, { key: event.key }, () => [
-      on(el, "keyup", (up) => {
-        if (up.key !== event.key) return
-        up.preventDefault()
-        end(up, false)
-      }),
-      ...cancels(),
-    ])
-    if (started) event.preventDefault()
+    if (press?.input === "keyboard") {
+      return event.preventDefault()
+    }
+    if (
+      event.repeat ||
+      event.defaultPrevented ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey
+    ) {
+      return
+    }
+    const started = start(
+      { event, input: "keyboard" },
+      { key: event.key },
+      () => [
+        on(el, "keyup", (up) => {
+          if (up.key !== event.key) {
+            return
+          }
+          up.preventDefault()
+          end(up, false)
+        }),
+        ...cancels(),
+      ]
+    )
+    if (started) {
+      event.preventDefault()
+    }
   }
 
-  const listeners = [on(el, "pointerdown", onPointerDown), on(el, "keydown", onKeyDown)]
+  const listeners = [
+    on(el, "pointerdown", onPointerDown),
+    on(el, "keydown", onKeyDown),
+  ]
   return () => {
     stop()
     listeners.forEach((remove) => remove())
@@ -245,4 +304,10 @@ function bindHold(el: HTMLElement, options: BindHoldOptions = {}) {
   }
 }
 
-export { bindHold, type BindHoldOptions, type HoldDetails, type HoldEndDetails, type HoldInput }
+export {
+  bindHold,
+  type BindHoldOptions,
+  type HoldDetails,
+  type HoldEndDetails,
+  type HoldInput,
+}

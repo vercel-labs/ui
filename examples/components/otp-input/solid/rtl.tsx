@@ -8,7 +8,9 @@ function Example() {
       <FieldLabel>رمز التحقق</FieldLabel>
       <OTPInput maxLength={6}>
         <OTPInputGroup>
-          <For each={[0, 1, 2, 3, 4, 5]}>{(index) => <OTPInputSlot index={index} />}</For>
+          <For each={[0, 1, 2, 3, 4, 5]}>
+            {(index) => <OTPInputSlot index={index} />}
+          </For>
         </OTPInputGroup>
       </OTPInput>
     </Field>

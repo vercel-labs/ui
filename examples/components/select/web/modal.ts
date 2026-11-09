@@ -24,7 +24,7 @@ function mount(root: HTMLElement) {
           .map(
             (mode) => `
               <button type="button" data-mode="${mode.value}" aria-pressed="${mode.value === "pointer"}">${mode.label}</button>
-            `,
+            `
           )
           .join("")}
       </div>
@@ -45,7 +45,7 @@ function mount(root: HTMLElement) {
                     ${status.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -56,12 +56,17 @@ function mount(root: HTMLElement) {
   `
   const select = root.querySelector("ui-select")!
   const buttons = root.querySelectorAll<HTMLButtonElement>("[data-mode]")
-  for (const button of buttons)
+  for (const button of buttons) {
     button.addEventListener("click", () => {
       select.setAttribute("modal", button.dataset.mode!)
-      for (const other of buttons) other.setAttribute("aria-pressed", String(other === button))
+      for (const other of buttons) {
+        other.setAttribute("aria-pressed", String(other === button))
+      }
     })
-  root.querySelector("[data-action=save]")!.addEventListener("click", () => log(root, "Pressed Save Draft"))
+  }
+  root
+    .querySelector("[data-action=save]")!
+    .addEventListener("click", () => log(root, "Pressed Save Draft"))
 }
 
 export { mount }

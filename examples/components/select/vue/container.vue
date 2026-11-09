@@ -31,7 +31,11 @@ const container = ref<HTMLDivElement | null>(null)
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="font in fonts" :key="font.value" :value="font.value">
+          <SelectItem
+            v-for="font in fonts"
+            :key="font.value"
+            :value="font.value"
+          >
             {{ font.label }}
             <SelectItemIndicator>
               <CheckIcon />

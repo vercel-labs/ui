@@ -21,7 +21,11 @@ describe("a menu item whose action returns a Promise", () => {
     instance.api.open()
     const item = () => instance.part("item", { value: "save" })
     press(item())?.()
-    expect(attrs(item())).toMatchObject({ "aria-busy": "true", "aria-disabled": "true", "data-pending": "" })
+    expect(attrs(item())).toMatchObject({
+      "aria-busy": "true",
+      "aria-disabled": "true",
+      "data-pending": "",
+    })
     expect(partState(item())).toMatchObject({ pending: true })
     expect(instance.get().open).toBe(true)
     press(item())?.()
@@ -38,12 +42,16 @@ describe("a menu item whose action returns a Promise", () => {
     const save = deferred()
     const instance = menu({ id: "fail" })
     instance.api.open()
-    const item = () => instance.part("item", { value: "save", onSelect: () => save.promise })
+    const item = () =>
+      instance.part("item", { value: "save", onSelect: () => save.promise })
     press(item())?.()
     save.reject("offline")
     await save.promise.catch(() => {})
     await Promise.resolve()
-    expect(partState(item())).toMatchObject({ pending: false, error: "offline" })
+    expect(partState(item())).toMatchObject({
+      pending: false,
+      error: "offline",
+    })
     expect(instance.get().open).toBe(true)
   })
 
@@ -58,7 +66,7 @@ describe("a menu item whose action returns a Promise", () => {
           event.preventDefault()
           return save.promise
         },
-      }),
+      })
     )?.()
     save.resolve()
     await save.promise
@@ -71,7 +79,12 @@ describe("a menu item that opens a popup", () => {
     const rename = dialog({ id: "rename" })
     const instance = menu({ id: "file" })
     instance.api.open()
-    press(instance.part("item", { value: "rename", onSelect: () => rename.api.open() }))?.()
+    press(
+      instance.part("item", {
+        value: "rename",
+        onSelect: () => rename.api.open(),
+      })
+    )?.()
     expect(instance.get().open).toBe(false)
     expect(rename.get().open).toBe(true)
   })
@@ -83,7 +96,8 @@ describe("an item whose onSelect and onAction both return Promises", () => {
     const action = deferred()
     const instance = menu({ id: "both", onAction: () => action.promise })
     instance.api.open()
-    const item = () => instance.part("item", { value: "save", onSelect: () => select.promise })
+    const item = () =>
+      instance.part("item", { value: "save", onSelect: () => select.promise })
     press(item())?.()
     select.resolve()
     await select.promise
@@ -91,7 +105,10 @@ describe("an item whose onSelect and onAction both return Promises", () => {
     action.reject("offline")
     await action.promise.catch(() => {})
     await Promise.resolve()
-    expect(partState(item())).toMatchObject({ pending: false, error: "offline" })
+    expect(partState(item())).toMatchObject({
+      pending: false,
+      error: "offline",
+    })
     expect(instance.get().open).toBe(true)
   })
 })

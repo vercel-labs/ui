@@ -11,7 +11,12 @@ function controlledSignal(controller: object) {
   let current = controlled.get(controller)
   // Cleared from the entry's cleanup, which can run inside another
   // computation, like a `For` disposing the component.
-  if (!current) controlled.set(controller, (current = createSignal<unknown>(undefined, { ownedWrite: true })))
+  if (!current) {
+    controlled.set(
+      controller,
+      (current = createSignal<unknown>(undefined, { ownedWrite: true }))
+    )
+  }
   return current
 }
 
@@ -21,10 +26,17 @@ function controlledSignal(controller: object) {
 // once that one mounts. `nearest` is a context's value, null outside one.
 // Reading it in a tracking scope tracks it, so a part renders again once the
 // component mounts.
-function useControllerTarget<T>(controller: () => object | undefined, nearest: T | null) {
+function useControllerTarget<T>(
+  controller: () => object | undefined,
+  nearest: T | null
+) {
   return () => {
     const current = controller()
-    return (current && (controlledSignal(current)[0]() as T | undefined)) ?? nearest ?? undefined
+    return (
+      (current && (controlledSignal(current)[0]() as T | undefined)) ??
+      nearest ??
+      undefined
+    )
   }
 }
 
@@ -32,21 +44,30 @@ function useControllerTarget<T>(controller: () => object | undefined, nearest: T
 // It registers after mount, from an effect: the server never runs it, so a
 // trigger's first client render stays the plain button the server rendered,
 // and hydration matches before the trigger binds.
-function useControllerEntry(controller: () => object | undefined, value: unknown) {
+function useControllerEntry(
+  controller: () => object | undefined,
+  value: unknown
+) {
   createEffect(controller, (current) => {
-    if (!current) return
+    if (!current) {
+      return
+    }
     const [get, set] = controlledSignal(current)
     // A microtask later, so a trigger later in the tree hydrates as the plain
     // button the server rendered before it learns of the popup.
     let registered = false
     queueMicrotask(() => {
-      if (registered) return
+      if (registered) {
+        return
+      }
       registered = true
       set(() => value)
     })
     return () => {
       registered = true
-      if (untrack(get) === value) set(undefined)
+      if (untrack(get) === value) {
+        set(undefined)
+      }
     }
   })
 }

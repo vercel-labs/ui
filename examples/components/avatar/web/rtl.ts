@@ -24,7 +24,7 @@ function mount(root: HTMLElement) {
       <ui-avatar>
         <img src="${person.src}" alt="${person.name}" />
         <ui-avatar-fallback>${person.initials}</ui-avatar-fallback>
-      </ui-avatar>`,
+      </ui-avatar>`
   )
   root.innerHTML = `
     <div data-slot="row" dir="rtl">

@@ -1,6 +1,10 @@
 <script lang="ts">
   import { ChevronDownIcon } from "@lucide/svelte"
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "@ui-sdk/svelte/collapsible"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Textarea } from "@ui-sdk/svelte/textarea"
 </script>

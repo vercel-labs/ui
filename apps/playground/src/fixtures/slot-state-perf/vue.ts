@@ -20,7 +20,10 @@ const Item = defineComponent({
       "item",
       () => ({ value: props.value }),
       () => ({ "data-round": props.round }),
-      { tag: "div", children: (state) => [state.highlighted ? "→ " : "", props.label] },
+      {
+        tag: "div",
+        children: (state) => [state.highlighted ? "→ " : "", props.label],
+      }
     )
   },
 })
@@ -39,8 +42,13 @@ const Fixture = defineComponent({
           "div",
           { role: "menu", "aria-label": "Items" },
           items.map((item) =>
-            h(Item, { key: item.value, value: item.value, label: item.label, round: renders.value }),
-          ),
+            h(Item, {
+              key: item.value,
+              value: item.value,
+              label: item.label,
+              round: renders.value,
+            })
+          )
         ),
         h("button", "After"),
       ])

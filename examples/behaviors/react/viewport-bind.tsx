@@ -15,7 +15,9 @@ function Example() {
     return bindViewport(ref.current!, {
       onChange: (viewport) => {
         const line = describe(viewport)
-        if (line !== last) log(line)
+        if (line !== last) {
+          log(line)
+        }
         last = line
       },
     })

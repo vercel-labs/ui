@@ -21,14 +21,19 @@ const idle = () => {}
 let unlisten = idle
 
 const wakeOutside = (event: Event) =>
-  wakers.forEach((popup, wake) => (event.target instanceof Node && popup?.contains(event.target)) || wake())
+  wakers.forEach(
+    (popup, wake) =>
+      (event.target instanceof Node && popup?.contains(event.target)) || wake()
+  )
 
 const wakeOnChanges = (records: MutationRecord[]) =>
   wakers.forEach(
     (popup, wake) =>
       records.some(
-        (record) => record.attributeName != "aria-activedescendant" && !popup?.contains(record.target),
-      ) && wake(),
+        (record) =>
+          record.attributeName != "aria-activedescendant" &&
+          !popup?.contains(record.target)
+      ) && wake()
   )
 
 function listen() {
@@ -40,16 +45,35 @@ function listen() {
     // Pointer moves and focus can change layout through `:hover` and `:focus`
     // styles, and typing through fields that grow with their text. A
     // transition starts after its delay.
-    [document, ["scroll", "load", "input", "pointermove", "focusin", "transitionstart", "animationstart"]],
+    [
+      document,
+      [
+        "scroll",
+        "load",
+        "input",
+        "pointermove",
+        "focusin",
+        "transitionstart",
+        "animationstart",
+      ],
+    ],
     [window, ["resize"]],
     // Pinch zoom moves the visual viewport without resizing the window.
     [window.visualViewport, ["resize", "scroll"]],
     [document.fonts, ["loadingdone"]],
   ] as const
-  for (const [target, types] of targets)
-    for (const type of types) target?.addEventListener(type, wakeOutside, options)
+  for (const [target, types] of targets) {
+    for (const type of types) {
+      target?.addEventListener(type, wakeOutside, options)
+    }
+  }
   const changes = new MutationObserver(wakeOnChanges)
-  changes.observe(document, { subtree: true, childList: true, attributes: true, characterData: true })
+  changes.observe(document, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    characterData: true,
+  })
   return () => {
     listening.abort()
     changes.disconnect()
@@ -63,10 +87,16 @@ const roots = new Map<Node, { count: number; stop: () => void }>()
 function listenIn(root: Node) {
   const listening = new AbortController()
   const options = { capture: true, passive: true, signal: listening.signal }
-  for (const type of ["scroll", "load", "transitionstart", "animationstart"])
+  for (const type of ["scroll", "load", "transitionstart", "animationstart"]) {
     root.addEventListener(type, wakeOutside, options)
+  }
   const changes = new MutationObserver(wakeOnChanges)
-  changes.observe(root, { subtree: true, childList: true, attributes: true, characterData: true })
+  changes.observe(root, {
+    subtree: true,
+    childList: true,
+    attributes: true,
+    characterData: true,
+  })
   return () => {
     listening.abort()
     changes.disconnect()
@@ -86,7 +116,9 @@ function shadowRootsAround(node: Node) {
     if (at.nodeType === 11 && "host" in at) {
       found.push(at)
       at = (at as ShadowRoot).host
-    } else at = (at as Element).assignedSlot ?? at.parentNode
+    } else {
+      at = (at as Element).assignedSlot ?? at.parentNode
+    }
   }
   return found
 }
@@ -105,7 +137,9 @@ function watchShadowRoots(shadowRoots: Node[]) {
   return () => {
     for (const root of watched.splice(0)) {
       const entry = roots.get(root)!
-      if (--entry.count) continue
+      if (--entry.count) {
+        continue
+      }
       entry.stop()
       roots.delete(root)
     }
@@ -118,14 +152,21 @@ function watchShadowRoots(shadowRoots: Node[]) {
  * open popup shares one set of listeners.
  */
 function watchMoves(wake: () => void, popup?: Element) {
-  if (!wakers.size) unlisten = listen()
-  const sizes = typeof ResizeObserver == "function" ? new ResizeObserver(wake) : undefined
-  if (popup) sizes?.observe(popup)
+  if (!wakers.size) {
+    unlisten = listen()
+  }
+  const sizes =
+    typeof ResizeObserver == "function" ? new ResizeObserver(wake) : undefined
+  if (popup) {
+    sizes?.observe(popup)
+  }
   wakers.set(wake, sizes && popup)
   return () => {
     sizes?.disconnect()
     wakers.delete(wake)
-    if (wakers.size) return
+    if (wakers.size) {
+      return
+    }
     unlisten()
     unlisten = idle
   }

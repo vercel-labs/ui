@@ -31,11 +31,19 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 const recentCountries = [
-  { type: "group" as const, label: "Recent", items: [countries[9], countries[12], countries[15]] },
+  {
+    type: "group" as const,
+    label: "Recent",
+    items: [countries[9], countries[12], countries[15]],
+  },
 ]
 
 function Example() {
@@ -43,7 +51,9 @@ function Example() {
     <Combobox
       items={countries}
       emptyItems={recentCountries}
-      announcement={(change) => (change.type === "results" ? `${change.count} countries match` : null)}
+      announcement={(change) =>
+        change.type === "results" ? `${change.count} countries match` : null
+      }
     >
       <div data-slot="stack">
         <ComboboxLabel>Country</ComboboxLabel>
@@ -68,14 +78,23 @@ function Example() {
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>
           {(state) => (
-            <For each={state.items as ((typeof countries)[number] | (typeof recentCountries)[number])[]}>
+            <For
+              each={
+                state.items as (
+                  (typeof countries)[number] | (typeof recentCountries)[number]
+                )[]
+              }
+            >
               {(entry) =>
                 "items" in entry ? (
                   <ComboboxGroup>
                     <ComboboxGroupLabel>{entry.label}</ComboboxGroupLabel>
                     <For each={entry.items}>
                       {(country) => (
-                        <ComboboxItem value={country.value} label={country.label}>
+                        <ComboboxItem
+                          value={country.value}
+                          label={country.label}
+                        >
                           <ComboboxItemText />
                           <ComboboxItemIndicator>
                             <svg

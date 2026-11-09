@@ -42,10 +42,16 @@ test.each([
     root = createRoot(container)
     await React.act(async () => root!.render(<Price value={before} />))
     await React.act(async () => root!.render(<Price value={after} />))
-    await React.act(async () => new Promise((resolve) => setTimeout(resolve, 20)))
-    const target = container.querySelector('[data-slot="field-label"]')!.getAttribute("for")
-    if (target !== null) expect(document.getElementById(target)?.tagName).toBe("INPUT")
+    await React.act(
+      async () => new Promise((resolve) => setTimeout(resolve, 20))
+    )
+    const target = container
+      .querySelector('[data-slot="field-label"]')!
+      .getAttribute("for")
+    if (target !== null) {
+      expect(document.getElementById(target)?.tagName).toBe("INPUT")
+    }
     const ids = [...container.querySelectorAll("[id]")].map((el) => el.id)
     expect(new Set(ids).size).toBe(ids.length)
-  },
+  }
 )

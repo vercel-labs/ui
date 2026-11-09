@@ -2,7 +2,10 @@ import { activateControl, findControl } from "../../foundation/forms/control"
 import { isDisabledElement } from "../../foundation/forms/form"
 import { documentOrder } from "../../foundation/kernel/order"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * The options `label` takes. A component takes them as props.
@@ -21,7 +24,9 @@ function ownControl(el: HTMLElement) {
   const id = el.getAttribute("for")
   const native = el instanceof HTMLLabelElement
   const target = id ? forTarget(el, id) : native && el.control ? null : el
-  if (!target || (native && el.control === target)) return
+  if (!target || (native && el.control === target)) {
+    return
+  }
   return findControl(target)
 }
 
@@ -31,7 +36,9 @@ const written = new WeakMap<HTMLElement, string>()
 function writeName(control: HTMLElement) {
   const current = control.getAttribute("aria-labelledby")
   const ours = written.get(control)
-  if (current !== null && current !== ours) return
+  if (current !== null && current !== ours) {
+    return
+  }
   const ids = control.hasAttribute("aria-label")
     ? ""
     : (labelsByControl.get(control) ?? [])
@@ -40,7 +47,9 @@ function writeName(control: HTMLElement) {
         .join(" ")
   if (ids) {
     written.set(control, ids)
-    if (current !== ids) control.setAttribute("aria-labelledby", ids)
+    if (current !== ids) {
+      control.setAttribute("aria-labelledby", ids)
+    }
   } else if (ours !== undefined) {
     written.delete(control)
     control.removeAttribute("aria-labelledby")
@@ -53,7 +62,7 @@ function nameControl(control: HTMLElement, label: HTMLElement) {
   return () => {
     labelsByControl.set(
       control,
-      labelsByControl.get(control)!.filter((other) => other !== label),
+      labelsByControl.get(control)!.filter((other) => other !== label)
     )
     writeName(control)
   }
@@ -61,13 +70,18 @@ function nameControl(control: HTMLElement, label: HTMLElement) {
 
 // The control a label names can render after it, or be replaced, like a group
 // behind a condition. One observer per document or shadow root hears it.
-const trees = new Map<Node, { observer: MutationObserver; checks: Set<() => void> }>()
+const trees = new Map<
+  Node,
+  { observer: MutationObserver; checks: Set<() => void> }
+>()
 
 function watchTree(root: Node, check: () => void) {
   let tree = trees.get(root)
   if (!tree) {
     const checks = new Set<() => void>()
-    const observer = new MutationObserver(() => checks.forEach((each) => each()))
+    const observer = new MutationObserver(() =>
+      checks.forEach((each) => each())
+    )
     observer.observe(root, { childList: true, subtree: true })
     trees.set(root, (tree = { observer, checks }))
   }
@@ -75,14 +89,18 @@ function watchTree(root: Node, check: () => void) {
   checks.add(check)
   return () => {
     checks.delete(check)
-    if (checks.size) return
+    if (checks.size) {
+      return
+    }
     observer.disconnect()
     trees.delete(root)
   }
 }
 
 // Attributes on the label or its control that change which control it names, or whether it names one.
-const naming = { attributeFilter: ["for", "id", "role", "type", "aria-hidden", "aria-label"] }
+const naming = {
+  attributeFilter: ["for", "id", "role", "type", "aria-hidden", "aria-label"],
+}
 
 function bindLabel(el: HTMLElement) {
   let control: HTMLElement | undefined
@@ -90,10 +108,14 @@ function bindLabel(el: HTMLElement) {
   let unwatch: (() => void) | undefined
   let active = true
   const update = () => {
-    if (!active) return
+    if (!active) {
+      return
+    }
     const next = ownControl(el)
     if (next === control) {
-      if (control) writeName(control)
+      if (control) {
+        writeName(control)
+      }
     } else {
       unname?.()
       control = next
@@ -107,12 +129,15 @@ function bindLabel(el: HTMLElement) {
       }
     }
     // A native label that wraps a labelable control never needs to look for it.
-    const looks = el.hasAttribute("for") || !(el instanceof HTMLLabelElement) || !el.control
-    if (looks && !unwatch)
+    const looks =
+      el.hasAttribute("for") || !(el instanceof HTMLLabelElement) || !el.control
+    if (looks && !unwatch) {
       unwatch = watchTree(el.getRootNode(), () => {
-        if (!control?.isConnected) update()
+        if (!control?.isConnected) {
+          update()
+        }
       })
-    else if (!looks && unwatch) {
+    } else if (!looks && unwatch) {
       unwatch()
       unwatch = undefined
     }
@@ -131,9 +156,15 @@ function bindLabel(el: HTMLElement) {
 
 // A press on the control, or on a link or a control inside the label, is
 // theirs, as on a native label.
-function pressesInside(event: Event, el: HTMLElement, control: HTMLElement | undefined) {
+function pressesInside(
+  event: Event,
+  el: HTMLElement,
+  control: HTMLElement | undefined
+) {
   const target = event.target as Element
-  if (control?.contains(target)) return true
+  if (control?.contains(target)) {
+    return true
+  }
   const inner = target.closest?.("a[href], button, input, select, textarea")
   return !!inner && inner !== el && el.contains(inner)
 }
@@ -148,12 +179,20 @@ const labelPrimitive = /* @__PURE__ */ definePrimitive({
       on: {
         // A double click would select the label's text as it activates the control.
         mousedown: (event, { el }) => {
-          if (event.detail > 1 && !pressesInside(event, el!, ownControl(el!))) event.preventDefault()
+          if (event.detail > 1 && !pressesInside(event, el!, ownControl(el!))) {
+            event.preventDefault()
+          }
         },
       },
       press({ el }, event) {
         const control = el && ownControl(el)
-        if (!control || isDisabledElement(control) || (event && pressesInside(event, el!, control))) return
+        if (
+          !control ||
+          isDisabledElement(control) ||
+          (event && pressesInside(event, el!, control))
+        ) {
+          return
+        }
         activateControl(control, event)
       },
       bind: (el) => bindLabel(el),

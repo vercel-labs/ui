@@ -24,7 +24,10 @@ function bindContent(instance: ReturnType<typeof popover>) {
 
 test("a popover open before its parts bind doesn't know yet whether it's titled and is named by its trigger", () => {
   const instance = popover({ id: "p", defaultOpen: true })
-  expect({ titled: instance.get().titled, labelledBy: labelledBy(instance) }).toEqual({
+  expect({
+    titled: instance.get().titled,
+    labelledBy: labelledBy(instance),
+  }).toEqual({
     titled: null,
     labelledBy: "p-trigger",
   })
@@ -34,7 +37,10 @@ test("a popover whose content binds without a title is named by its trigger", as
   const instance = popover({ id: "p", defaultOpen: true })
   bindContent(instance)
   await Promise.resolve()
-  expect({ titled: instance.get().titled, labelledBy: labelledBy(instance) }).toEqual({
+  expect({
+    titled: instance.get().titled,
+    labelledBy: labelledBy(instance),
+  }).toEqual({
     titled: false,
     labelledBy: "p-trigger",
   })
@@ -43,9 +49,15 @@ test("a popover whose content binds without a title is named by its trigger", as
 test("a popover whose title binds after its content is named by the title", async () => {
   const instance = popover({ id: "p", defaultOpen: true })
   const content = bindContent(instance)
-  ref(instance.part("title"), host)(content.appendChild(document.createElement("h2")))
+  ref(
+    instance.part("title"),
+    host
+  )(content.appendChild(document.createElement("h2")))
   await Promise.resolve()
-  expect({ titled: instance.get().titled, labelledBy: labelledBy(instance) }).toEqual({
+  expect({
+    titled: instance.get().titled,
+    labelledBy: labelledBy(instance),
+  }).toEqual({
     titled: true,
     labelledBy: "p-title",
   })

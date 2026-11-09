@@ -9,7 +9,13 @@ import {
   TriggerMenuItemIcon,
   TriggerMenuList,
 } from "@ui-sdk/react/trigger-menu"
-import { ClockIcon, ReplyIcon, SearchIcon, ShareIcon, TrashIcon } from "lucide-react"
+import {
+  ClockIcon,
+  ReplyIcon,
+  SearchIcon,
+  ShareIcon,
+  TrashIcon,
+} from "lucide-react"
 
 const commands = [
   { value: "reply", icon: ReplyIcon, mirror: true },
@@ -24,7 +30,9 @@ function Example() {
     <TriggerMenu triggers={[{ char: "/", boundary: "start", type: "command" }]}>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type / for commands…" />} />
+        <FieldControl
+          render={<TriggerMenuInput placeholder="Type / for commands…" />}
+        />
       </Field>
       <TriggerMenuContent>
         <TriggerMenuList>

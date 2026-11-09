@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ChevronDownIcon } from "@lucide/vue"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/vue/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/vue/collapsible"
 
 const updates = [
   { label: "Out for delivery", time: "07:40" },
@@ -20,7 +24,9 @@ const updates = [
       <template #default="{ state }">
         <span data-slot="stack">
           <span>Track parcel</span>
-          <span data-slot="hint">{{ state.open ? "3 updates" : "Arrives Thursday" }}</span>
+          <span data-slot="hint">{{
+            state.open ? "3 updates" : "Arrives Thursday"
+          }}</span>
         </span>
         <ChevronDownIcon />
       </template>

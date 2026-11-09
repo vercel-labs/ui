@@ -1,7 +1,9 @@
 import { triggerMenu } from "@ui-sdk/core/trigger-menu"
 import { createParts } from "../src/use-primitive"
 
-const { Root: TriggerMenu, Item: TriggerMenuItem } = createParts(triggerMenu, { item: "div" })
+const { Root: TriggerMenu, Item: TriggerMenuItem } = createParts(triggerMenu, {
+  item: "div",
+})
 type Person = { id: number; name: string }
 declare const ada: Person
 

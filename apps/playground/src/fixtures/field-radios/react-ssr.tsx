@@ -5,7 +5,8 @@ import { Fixture } from "./react"
 
 function mount(root: HTMLElement) {
   const errors: string[] = []
-  ;(window as unknown as { __hydrationErrors: string[] }).__hydrationErrors = errors
+  ;(window as unknown as { __hydrationErrors: string[] }).__hydrationErrors =
+    errors
   const app = (
     <React.StrictMode>
       <Fixture />
@@ -18,11 +19,15 @@ function mount(root: HTMLElement) {
       errors.push(args.map(String).join(" "))
       error(...args)
     }
-    hydrateRoot(root, app, { onRecoverableError: (cause) => errors.push(String(cause)) })
+    hydrateRoot(root, app, {
+      onRecoverableError: (cause) => errors.push(String(cause)),
+    })
   }
-  if (new URLSearchParams(location.search).get("hydrate") === "manual")
-    (window as unknown as { hydrate: () => void }).hydrate = hydrate
-  else hydrate()
+  if (new URLSearchParams(location.search).get("hydrate") === "manual") {
+    ;(window as unknown as { hydrate: () => void }).hydrate = hydrate
+  } else {
+    hydrate()
+  }
 }
 
 export { mount }

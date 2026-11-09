@@ -18,12 +18,24 @@ const DrawerKey = Symbol("drawer")
 // drawer comes from here.
 const TriggerKey = Symbol("drawer-trigger")
 
-type TriggerContext = { shortcut: () => string | undefined; drawer: () => DrawerContext | undefined }
+type TriggerContext = {
+  shortcut: () => string | undefined
+  drawer: () => DrawerContext | undefined
+}
 
 function useDrawer() {
   const context = getContext<DrawerContext | undefined>(DrawerKey)
-  if (!context) throw new Error("Drawer parts must be used inside <Drawer>.")
+  if (!context) {
+    throw new Error("Drawer parts must be used inside <Drawer>.")
+  }
   return context
 }
 
-export { type DrawerContext, type DrawerHandle, DrawerKey, type TriggerContext, TriggerKey, useDrawer }
+export {
+  type DrawerContext,
+  type DrawerHandle,
+  DrawerKey,
+  type TriggerContext,
+  TriggerKey,
+  useDrawer,
+}

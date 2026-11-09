@@ -10,7 +10,9 @@ test("every example renders without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("announce: copying says Copied through the shared live region", async ({ page }) => {
+test("announce: copying says Copied through the shared live region", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const button = page.getByRole("button", { name: "Copy command" })
   await button.scrollIntoViewIfNeeded()
@@ -20,17 +22,23 @@ test("announce: copying says Copied through the shared live region", async ({ pa
   await expect(button).toHaveText("Copy", { timeout: 3000 })
 })
 
-test("direction: the arrows follow the text, and swap right to left", async ({ page }) => {
+test("direction: the arrows follow the text, and swap right to left", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const pager = page.getByRole("spinbutton", { name: "Page" })
   await expect(pager).toHaveAttribute("dir", "ltr")
-  await expect(page.getByText("Next page: → Right arrow", { exact: true })).toBeVisible()
+  await expect(
+    page.getByText("Next page: → Right arrow", { exact: true })
+  ).toBeVisible()
   await pager.focus()
   await page.keyboard.press("ArrowRight")
   await expect(pager).toHaveAttribute("aria-valuenow", "2")
   await page.getByRole("checkbox", { name: "Right to left" }).check()
   await expect(pager).toHaveAttribute("dir", "rtl")
-  await expect(page.getByText("Next page: ← Left arrow", { exact: true })).toBeVisible()
+  await expect(
+    page.getByText("Next page: ← Left arrow", { exact: true })
+  ).toBeVisible()
   await pager.focus()
   await page.keyboard.press("ArrowLeft")
   await expect(pager).toHaveAttribute("aria-valuenow", "3")
@@ -38,7 +46,9 @@ test("direction: the arrows follow the text, and swap right to left", async ({ p
   await expect(pager).toHaveAttribute("aria-valuenow", "2")
 })
 
-test("shortcuts: the platform's label, aria-keyshortcuts, and the keys toggle bold", async ({ page }) => {
+test("shortcuts: the platform's label, aria-keyshortcuts, and the keys toggle bold", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const bold = page.getByRole("button", { name: /^Bold/ })
   await expect(bold).toHaveAttribute("aria-keyshortcuts", "Control+B")

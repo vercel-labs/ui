@@ -22,7 +22,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#installation",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -35,7 +36,10 @@ function Link({
   href,
   onNavigate,
   ...props
-}: React.ComponentProps<"a"> & { href: string; onNavigate: (href: string) => void }) {
+}: React.ComponentProps<"a"> & {
+  href: string
+  onNavigate: (href: string) => void
+}) {
   return (
     <a
       {...props}

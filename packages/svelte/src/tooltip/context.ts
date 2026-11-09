@@ -13,4 +13,10 @@ const TriggerKey = Symbol("tooltip-trigger")
 type ContainerContext = () => PopupContainer
 type TriggerContext = () => TooltipContext | undefined
 
-export { type ContainerContext, ContainerKey, type TooltipContext, type TriggerContext, TriggerKey }
+export {
+  type ContainerContext,
+  ContainerKey,
+  type TooltipContext,
+  type TriggerContext,
+  TriggerKey,
+}

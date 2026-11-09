@@ -13,7 +13,9 @@ The field's label, which names its control. Outside a Field it's a plain
   let props: PartProps<"label", FieldState> = $props()
 
   const field = useField()
-  const label = field ? useHandlePart(field, "label", () => ({ id: props.id })) : outsidePart("label")
+  const label = field
+    ? useHandlePart(field, "label", () => ({ id: props.id }))
+    : outsidePart("label")
 </script>
 
 <Part tag="label" part={label} {props} />

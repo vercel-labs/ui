@@ -23,19 +23,35 @@ const bare = new Set([
 
 function stamp(code, file, root, find) {
   const relative = path.relative(root, file)
-  if (relative.startsWith("..") || relative.split(path.sep).includes("node_modules")) return null
-  const source = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
+  if (
+    relative.startsWith("..") ||
+    relative.split(path.sep).includes("node_modules")
+  ) {
+    return null
+  }
+  const source = ts.createSourceFile(
+    file,
+    code,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX
+  )
   const inserts = []
   const at = (position, offset) => {
     const { line } = source.getLineAndCharacterOfPosition(position)
-    inserts.push({ offset, text: ` data-review-loc="${relative.split(path.sep).join("/")}:${line + 1}"` })
+    inserts.push({
+      offset,
+      text: ` data-review-loc="${relative.split(path.sep).join("/")}:${line + 1}"`,
+    })
   }
   const visit = (node) => {
     find(node, at, source)
     ts.forEachChild(node, visit)
   }
   visit(source)
-  if (inserts.length === 0) return null
+  if (inserts.length === 0) {
+    return null
+  }
   let result = code
   for (const { offset, text } of inserts.sort((a, b) => b.offset - a.offset)) {
     result = result.slice(0, offset) + text + result.slice(offset)
@@ -45,15 +61,24 @@ function stamp(code, file, root, find) {
 
 function jsxLocations(code, file, root) {
   return stamp(code, file, root, (node, at) => {
-    if (!ts.isJsxOpeningElement(node) && !ts.isJsxSelfClosingElement(node)) return
-    if (!ts.isIdentifier(node.tagName) || bare.has(node.tagName.text)) return
+    if (!ts.isJsxOpeningElement(node) && !ts.isJsxSelfClosingElement(node)) {
+      return
+    }
+    if (!ts.isIdentifier(node.tagName) || bare.has(node.tagName.text)) {
+      return
+    }
     at(node.getStart(), node.attributes.pos)
   })
 }
 
 function litLocations(code, file, root) {
   return stamp(code, file, root, (node, at, source) => {
-    if (!ts.isTaggedTemplateExpression(node) || node.tag.getText(source) !== "html") return
+    if (
+      !ts.isTaggedTemplateExpression(node) ||
+      node.tag.getText(source) !== "html"
+    ) {
+      return
+    }
     const template = node.template
     const parts = ts.isNoSubstitutionTemplateLiteral(template)
       ? [template]

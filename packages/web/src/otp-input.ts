@@ -9,15 +9,25 @@ const owner = "ui-otp-input"
 // A slot's index is its place among its input's slots, unless it sets `index`.
 function slotIndex(el: HTMLElement) {
   const explicit = el.getAttribute("index")
-  if (explicit !== null) return { index: Number(explicit), id: explicit }
+  if (explicit !== null) {
+    return { index: Number(explicit), id: explicit }
+  }
   const root = el.closest(owner)
-  const slots = root ? Array.from(root.querySelectorAll("ui-otp-input-slot")) : [el]
+  const slots = root
+    ? Array.from(root.querySelectorAll("ui-otp-input-slot"))
+    : [el]
   const index = Math.max(0, slots.indexOf(el))
   return { index, id: String(index) }
 }
 
 // Names go to the input, which is what takes focus.
-const inputAttributes = ["aria-label", "aria-labelledby", "aria-describedby", "aria-invalid", "autofocus"]
+const inputAttributes = [
+  "aria-label",
+  "aria-labelledby",
+  "aria-describedby",
+  "aria-invalid",
+  "autofocus",
+]
 
 // Roots that have their input, which keeps taking their attributes across reconnects.
 const withInput = new WeakSet<HTMLElement>()
@@ -45,14 +55,17 @@ function defineOTPInputElements() {
       state: {
         value: {
           get: (api: OTPInputApi) => api.getValue(),
-          set: (api: OTPInputApi, value: string | null) => api.setValue(value ?? ""),
+          set: (api: OTPInputApi, value: string | null) =>
+            api.setValue(value ?? ""),
         },
       },
       api: ["getValue", "setValue", "clear", "focus"],
       render(el, instance) {
         if (!withInput.has(el)) {
           withInput.add(el)
-          const written = el.querySelector<HTMLInputElement>(":scope > ui-otp-input-control input")
+          const written = el.querySelector<HTMLInputElement>(
+            ":scope > ui-otp-input-control input"
+          )
           const input = written ?? document.createElement("input")
           forwardAttributes(el, input, inputAttributes)
           if (!written) {
@@ -62,12 +75,18 @@ function defineOTPInputElements() {
           }
         }
         return showDefaultText(el, instance, "ui-otp-input-slot", (slot) => {
-          const { char } = partState(instance.part("slot", slotIndex(slot))) as { char: string | null }
+          const { char } = partState(
+            instance.part("slot", slotIndex(slot))
+          ) as { char: string | null }
           return char ?? ""
         })
       },
     },
-    control: { tag: "ui-otp-input-control", display: "contents", target: (el) => el.querySelector("input") },
+    control: {
+      tag: "ui-otp-input-control",
+      display: "contents",
+      target: (el) => el.querySelector("input"),
+    },
     group: { tag: "ui-otp-input-group", display: "block" },
     slot: { tag: "ui-otp-input-slot", display: "block", context: slotIndex },
     separator: { tag: "ui-otp-input-separator", display: "block" },

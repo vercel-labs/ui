@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createChange, createRovingFocus, createSelection, definePrimitive, selects } from "@ui-sdk/core"
+import {
+  createChange,
+  createRovingFocus,
+  createSelection,
+  definePrimitive,
+  selects,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type MembersState = { value: string[]; focused: string | null }
@@ -11,7 +17,10 @@ type MembersOptions = {
 const members = definePrimitive({
   name: "members",
   options: { owners: "list" },
-  state: (options: MembersOptions): MembersState => ({ value: [...options.owners], focused: null }),
+  state: (options: MembersOptions): MembersState => ({
+    value: [...options.owners],
+    focused: null,
+  }),
   api: (context) => {
     const change = createChange(context)
     const roving = createRovingFocus<MembersState, { value: string }>(context, {
@@ -35,12 +44,16 @@ const members = definePrimitive({
         } else if (event.key === " ") {
           event.preventDefault()
           selection.toggle(key, { reason: "item-press", event })
-        } else roving.keydown(event, el)
+        } else {
+          roving.keydown(event, el)
+        }
       },
     }
   },
   slots: (slot) => ({
-    root: slot({ attrs: () => ({ role: "listbox", "aria-multiselectable": "true" }) }),
+    root: slot({
+      attrs: () => ({ role: "listbox", "aria-multiselectable": "true" }),
+    }),
     member: slot<{ value: string }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
@@ -51,7 +64,8 @@ const members = definePrimitive({
       }),
       on: {
         keydown: (event, { el, api, key }) => api.keydown(event, el!, key),
-        pointerdown: (event, { api, key }) => api.selection.toggle(key, { reason: "item-press", event }),
+        pointerdown: (event, { api, key }) =>
+          api.selection.toggle(key, { reason: "item-press", event }),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -64,14 +78,24 @@ const Members = parts.Root
 
 const MembersMember = parts.Member
 
-const names = ["Hollis Grant", "Inès Moreau", "Kofi Mensah", "Wren Takahashi", "Tomasz Wójcik"]
+const names = [
+  "Hollis Grant",
+  "Inès Moreau",
+  "Kofi Mensah",
+  "Wren Takahashi",
+  "Tomasz Wójcik",
+]
 const owners = ["Hollis Grant"]
 
 function Example() {
   return (
     <Members owners={owners} aria-label="Members">
       {names.map((name) => (
-        <MembersMember key={name} value={name} aria-disabled={owners.includes(name) || undefined}>
+        <MembersMember
+          key={name}
+          value={name}
+          aria-disabled={owners.includes(name) || undefined}
+        >
           {name}
           {owners.includes(name) && <span data-slot="hint">Owner</span>}
         </MembersMember>
@@ -80,4 +104,11 @@ function Example() {
   )
 }
 
-export { Example, members, Members, MembersMember, type MembersOptions, type MembersState }
+export {
+  Example,
+  members,
+  Members,
+  MembersMember,
+  type MembersOptions,
+  type MembersState,
+}

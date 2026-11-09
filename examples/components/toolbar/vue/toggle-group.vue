@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, ListIcon, ListOrderedIcon } from "@lucide/vue"
+import {
+  AlignCenterIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
+  ListIcon,
+  ListOrderedIcon,
+} from "@lucide/vue"
 import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/vue/toggle"
 import { Toolbar, ToolbarSeparator } from "@ui-sdk/vue/toolbar"
 import { useLog } from "../../../shared/vue/log"
@@ -26,7 +32,12 @@ const log = useLog()
       aria-label="Alignment"
       @value-change="([value]) => log(`Align ${value}`)"
     >
-      <Toggle v-for="item in alignments" :key="item.value" :value="item.value" :aria-label="item.label">
+      <Toggle
+        v-for="item in alignments"
+        :key="item.value"
+        :value="item.value"
+        :aria-label="item.label"
+      >
         <ToggleIcon>
           <component :is="item.icon" />
         </ToggleIcon>
@@ -35,9 +46,17 @@ const log = useLog()
     <ToolbarSeparator />
     <ToggleGroup
       aria-label="List"
-      @value-change="([value]) => log(lists.find((list) => list.value === value)?.label ?? 'No list')"
+      @value-change="
+        ([value]) =>
+          log(lists.find((list) => list.value === value)?.label ?? 'No list')
+      "
     >
-      <Toggle v-for="item in lists" :key="item.value" :value="item.value" :aria-label="item.label">
+      <Toggle
+        v-for="item in lists"
+        :key="item.value"
+        :value="item.value"
+        :aria-label="item.label"
+      >
         <ToggleIcon>
           <component :is="item.icon" />
         </ToggleIcon>

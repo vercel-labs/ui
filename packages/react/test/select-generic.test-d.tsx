@@ -2,7 +2,10 @@ import * as React from "react"
 import { select } from "@ui-sdk/core/select"
 import { createParts } from "../src/use-primitive"
 
-const { Root: Select, Item: SelectItem } = createParts(select, { root: "div", item: "div" })
+const { Root: Select, Item: SelectItem } = createParts(select, {
+  root: "div",
+  item: "div",
+})
 type Fruit = { name: string }
 declare const apple: Fruit
 
@@ -39,11 +42,17 @@ declare const apple: Fruit
 />
 // Without a value, it's a string.
 ;<Select onValueChange={(value) => value?.toUpperCase()} />
-;<Select multiple onValueChange={(value) => value.map((item) => item.toUpperCase())} />
+;<Select
+  multiple
+  onValueChange={(value) => value.map((item) => item.toUpperCase())}
+/>
 // @ts-expect-error With `multiple`, the value is a list.
 ;<Select multiple value={apple} />
 // An item's `value` is any type, and the root's `T` doesn't reach it.
-;<SelectItem value={apple} className={(state) => (state.selected ? "on" : "off")} />
+;<SelectItem
+  value={apple}
+  className={(state) => (state.selected ? "on" : "off")}
+/>
 
 // A state's setter is a callback for either shape.
 function Controlled() {

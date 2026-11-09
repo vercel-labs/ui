@@ -18,17 +18,30 @@ test.describe("selection", () => {
   })
 
   test("the default tab is selected and shows its panel", async ({ page }) => {
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
-    for (const name of ["Password", "Billing", "Notifications"])
-      await expect(tabNamed(page, name)).toHaveAttribute("aria-selected", "false")
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
+    for (const name of ["Password", "Billing", "Notifications"]) {
+      await expect(tabNamed(page, name)).toHaveAttribute(
+        "aria-selected",
+        "false"
+      )
+    }
     await expect(panelNamed(page, "Account")).toBeVisible()
     await expect(page.getByRole("tabpanel")).toHaveCount(1)
   })
 
   test("clicking a tab selects it and shows its panel", async ({ page }) => {
     await tabNamed(page, "Password").click()
-    await expect(tabNamed(page, "Password")).toHaveAttribute("aria-selected", "true")
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "false")
+    await expect(tabNamed(page, "Password")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    )
     await expect(panelNamed(page, "Password")).toBeVisible()
     await expect(panelNamed(page, "Account")).toBeHidden()
     expect(await lastAction(page)).toBe("password")
@@ -36,29 +49,44 @@ test.describe("selection", () => {
 
   test("clicking a disabled tab does nothing", async ({ page }) => {
     await tabNamed(page, "Billing").click({ force: true })
-    await expect(tabNamed(page, "Billing")).toHaveAttribute("aria-selected", "false")
+    await expect(tabNamed(page, "Billing")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    )
     await expect(panelNamed(page, "Account")).toBeVisible()
     expect(await lastAction(page)).toBe("")
   })
 
   test("clicking the selected tab keeps it selected", async ({ page }) => {
     await tabNamed(page, "Account").click()
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 
   test("a change can be cancelled", async ({ page, open }) => {
     await open("tabs", { cancel: "notifications" })
     await tabNamed(page, "Notifications").click()
-    await expect(tabNamed(page, "Notifications")).toHaveAttribute("aria-selected", "false")
+    await expect(tabNamed(page, "Notifications")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    )
     await expect(panelNamed(page, "Account")).toBeVisible()
     await tabNamed(page, "Password").click()
     await expect(panelNamed(page, "Password")).toBeVisible()
   })
 
-  test("without a default value, the first enabled tab is selected", async ({ page, open }) => {
+  test("without a default value, the first enabled tab is selected", async ({
+    page,
+    open,
+  }) => {
     await open("tabs", { default: "none" })
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 
@@ -78,11 +106,19 @@ test.describe("selection", () => {
             record.type === "attributes" &&
             record.oldValue !== null &&
             (role === "tab" || role === "tabpanel")
-          )
-            changes.push(`${el.textContent?.trim()} ${record.attributeName} was ${record.oldValue}`)
-          for (const node of record.addedNodes)
-            if (node instanceof Element && node.getAttribute("role") === "tabpanel")
+          ) {
+            changes.push(
+              `${el.textContent?.trim()} ${record.attributeName} was ${record.oldValue}`
+            )
+          }
+          for (const node of record.addedNodes) {
+            if (
+              node instanceof Element &&
+              node.getAttribute("role") === "tabpanel"
+            ) {
               changes.push(`${node.textContent?.trim()} added`)
+            }
+          }
         }
       }).observe(document, {
         subtree: true,
@@ -93,9 +129,11 @@ test.describe("selection", () => {
     })
     await open("tabs", { default: "none" })
     await expect(panelNamed(page, "Account")).toBeVisible()
-    expect(await page.evaluate(() => (window as unknown as { __tabChanges: string[] }).__tabChanges)).toEqual(
-      [],
-    )
+    expect(
+      await page.evaluate(
+        () => (window as unknown as { __tabChanges: string[] }).__tabChanges
+      )
+    ).toEqual([])
   })
 })
 
@@ -114,10 +152,15 @@ test.describe("keyboard navigation", () => {
     await expect(tabNamed(page, "Notifications")).toBeFocused()
   })
 
-  test("ArrowRight and ArrowLeft move focus and select the tab", async ({ page }) => {
+  test("ArrowRight and ArrowLeft move focus and select the tab", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowRight")
     await expect(tabNamed(page, "Password")).toBeFocused()
-    await expect(tabNamed(page, "Password")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Password")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await expect(panelNamed(page, "Password")).toBeVisible()
     expect(await lastAction(page)).toBe("password")
     await page.keyboard.press("ArrowLeft")
@@ -139,10 +182,16 @@ test.describe("keyboard navigation", () => {
   test("focus wraps at both ends", async ({ page }) => {
     await page.keyboard.press("ArrowLeft")
     await expect(tabNamed(page, "Notifications")).toBeFocused()
-    await expect(tabNamed(page, "Notifications")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Notifications")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await page.keyboard.press("ArrowRight")
     await expect(tabNamed(page, "Account")).toBeFocused()
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
   })
 
   test("Home and End move to the first and last tabs", async ({ page }) => {
@@ -154,18 +203,28 @@ test.describe("keyboard navigation", () => {
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 
-  test("ArrowUp and ArrowDown do nothing in a horizontal tab list", async ({ page }) => {
+  test("ArrowUp and ArrowDown do nothing in a horizontal tab list", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowDown")
     await page.keyboard.press("ArrowUp")
     await expect(tabNamed(page, "Account")).toBeFocused()
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
   })
 
-  test("arrow keys with a modifier are left to the browser", async ({ page }) => {
+  test("arrow keys with a modifier are left to the browser", async ({
+    page,
+  }) => {
     await page.keyboard.press("Alt+ArrowRight")
     await page.keyboard.press("Shift+ArrowRight")
     await expect(tabNamed(page, "Account")).toBeFocused()
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
   })
 
   test("keys pressed in quick succession are never lost", async ({ page }) => {
@@ -178,12 +237,18 @@ test.describe("keyboard navigation", () => {
     await expect(panelNamed(page, "Notifications")).toBeVisible()
   })
 
-  test("Tab moves focus from the tab list into the selected panel", async ({ page, tab }) => {
+  test("Tab moves focus from the tab list into the selected panel", async ({
+    page,
+    tab,
+  }) => {
     await tab()
     await expect(panelNamed(page, "Account")).toBeFocused()
   })
 
-  test("Shift+Tab from the panel returns to the selected tab", async ({ page, tab }) => {
+  test("Shift+Tab from the panel returns to the selected tab", async ({
+    page,
+    tab,
+  }) => {
     await tab()
     await expect(panelNamed(page, "Account")).toBeFocused()
     await tab({ shift: true })
@@ -202,16 +267,24 @@ test.describe("manual activation", () => {
   test("arrow keys move focus without selecting", async ({ page }) => {
     await page.keyboard.press("ArrowRight")
     await expect(tabNamed(page, "Password")).toBeFocused()
-    await expect(tabNamed(page, "Password")).toHaveAttribute("aria-selected", "false")
+    await expect(tabNamed(page, "Password")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    )
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 
   for (const key of ["Enter", " "]) {
-    test(`${key === " " ? "Space" : key} selects the focused tab`, async ({ page }) => {
+    test(`${key === " " ? "Space" : key} selects the focused tab`, async ({
+      page,
+    }) => {
       await page.keyboard.press("ArrowRight")
       await expect(tabNamed(page, "Password")).toBeFocused()
       await page.keyboard.press(key)
-      await expect(tabNamed(page, "Password")).toHaveAttribute("aria-selected", "true")
+      await expect(tabNamed(page, "Password")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      )
       await expect(panelNamed(page, "Password")).toBeVisible()
       expect(await lastAction(page)).toBe("password")
     })
@@ -222,7 +295,10 @@ test.describe("manual activation", () => {
     await page.keyboard.press("ArrowRight")
     await expect(tabNamed(page, "Billing")).toBeFocused()
     await page.keyboard.press("Enter")
-    await expect(tabNamed(page, "Billing")).toHaveAttribute("aria-selected", "false")
+    await expect(tabNamed(page, "Billing")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    )
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 })
@@ -236,7 +312,10 @@ test.describe("vertical", () => {
   })
 
   test("the tab list reports its orientation", async ({ page }) => {
-    await expect(page.getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical")
+    await expect(page.getByRole("tablist")).toHaveAttribute(
+      "aria-orientation",
+      "vertical"
+    )
   })
 
   test("ArrowDown and ArrowUp move between tabs", async ({ page }) => {
@@ -248,11 +327,16 @@ test.describe("vertical", () => {
     await expect(panelNamed(page, "Account")).toBeVisible()
   })
 
-  test("ArrowLeft and ArrowRight do nothing in a vertical tab list", async ({ page }) => {
+  test("ArrowLeft and ArrowRight do nothing in a vertical tab list", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("ArrowLeft")
     await expect(tabNamed(page, "Account")).toBeFocused()
-    await expect(tabNamed(page, "Account")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Account")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
   })
 })
 
@@ -261,7 +345,9 @@ test.describe("panels", () => {
     await open("tabs")
   })
 
-  test("the selected tab controls its panel, and the panel is labelled by its tab", async ({ page }) => {
+  test("the selected tab controls its panel, and the panel is labelled by its tab", async ({
+    page,
+  }) => {
     const tab = tabNamed(page, "Account")
     const panel = panelNamed(page, "Account")
     const tabId = await tab.getAttribute("id")
@@ -272,7 +358,10 @@ test.describe("panels", () => {
     await expect(panel).toHaveAttribute("aria-labelledby", tabId!)
   })
 
-  test("with keepMounted, hidden panels stay in the page", async ({ page, open }) => {
+  test("with keepMounted, hidden panels stay in the page", async ({
+    page,
+    open,
+  }) => {
     await open("tabs", { "keep-mounted": "" })
     await expect(page.locator('[role="tabpanel"]')).toHaveCount(4)
     await expect(page.getByRole("tabpanel")).toHaveCount(1)
@@ -286,15 +375,25 @@ test.describe("panels", () => {
       expect(controls, name).toBeTruthy()
       const panel = page.locator(`[id="${controls}"]`)
       await expect(panel).toHaveAttribute("role", "tabpanel")
-      await expect(panel).toHaveAttribute("aria-labelledby", (await tab.getAttribute("id"))!)
+      await expect(panel).toHaveAttribute(
+        "aria-labelledby",
+        (await tab.getAttribute("id"))!
+      )
     }
   })
 
-  test("with keepMounted, a class that sets display doesn't show hidden panels", async ({ page, open }) => {
+  test("with keepMounted, a class that sets display doesn't show hidden panels", async ({
+    page,
+    open,
+  }) => {
     await open("tabs", { "keep-mounted": "" })
     await page.addStyleTag({ content: ".panel { display: flex }" })
     const displays = () =>
-      page.locator(".panel").evaluateAll((panels) => panels.map((el) => getComputedStyle(el).display))
+      page
+        .locator(".panel")
+        .evaluateAll((panels) =>
+          panels.map((el) => getComputedStyle(el).display)
+        )
     await expect.poll(displays).toEqual(["flex", "none", "none", "none"])
     await tabNamed(page, "Notifications").click()
     await expect.poll(displays).toEqual(["none", "none", "none", "flex"])
@@ -313,14 +412,22 @@ test.describe("indicator", () => {
     await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
   })
 
-  test("the indicator follows the selected tab when it resizes", async ({ page, open }) => {
+  test("the indicator follows the selected tab when it resizes", async ({
+    page,
+    open,
+  }) => {
     await open("tabs")
     await expect.poll(() => coversTab(page, "Account")).toBe(true)
-    await tabNamed(page, "Account").evaluate((el) => ((el as HTMLElement).style.paddingInline = "40px"))
+    await tabNamed(page, "Account").evaluate(
+      (el) => ((el as HTMLElement).style.paddingInline = "40px")
+    )
     await expect.poll(() => coversTab(page, "Account")).toBe(true)
   })
 
-  test("the indicator covers the selected tab in a vertical list", async ({ page, open }) => {
+  test("the indicator covers the selected tab in a vertical list", async ({
+    page,
+    open,
+  }) => {
     await open("tabs", { orientation: "vertical" })
     await tabNamed(page, "Notifications").click()
     await expect.poll(() => coversTab(page, "Notifications")).toBe(true)
@@ -333,7 +440,10 @@ test.describe("activation direction", () => {
     const list = page.getByRole("tablist")
     await tabNamed(page, "Notifications").click()
     await expect(list).toHaveAttribute("data-activation-direction", "right")
-    await expect(panelNamed(page, "Notifications")).toHaveAttribute("data-activation-direction", "right")
+    await expect(panelNamed(page, "Notifications")).toHaveAttribute(
+      "data-activation-direction",
+      "right"
+    )
     await tabNamed(page, "Password").click()
     await expect(list).toHaveAttribute("data-activation-direction", "left")
   })
@@ -349,7 +459,10 @@ test.describe("activation direction", () => {
 })
 
 test.describe("animation", () => {
-  test("the next panel animates in from its starting style", async ({ page, open }) => {
+  test("the next panel animates in from its starting style", async ({
+    page,
+    open,
+  }) => {
     await open("tabs", { animate: "" })
     await slowTransitions(page)
     await expect(panelNamed(page, "Account")).toBeVisible()
@@ -358,17 +471,25 @@ test.describe("animation", () => {
     expect(await opacityOf(panelNamed(page, "Password"))).toBeLessThan(0.5)
   })
 
-  test("the previous panel stays mounted while it animates out", async ({ page, open }) => {
+  test("the previous panel stays mounted while it animates out", async ({
+    page,
+    open,
+  }) => {
     await open("tabs", { animate: "" })
     await expect(panelNamed(page, "Account")).toBeVisible()
     await tabNamed(page, "Password").click()
-    await expect(page.locator('[role="tabpanel"][data-ending-style]')).toHaveCount(1)
+    await expect(
+      page.locator('[role="tabpanel"][data-ending-style]')
+    ).toHaveCount(1)
     await expect(panelNamed(page, "Password")).toBeVisible()
     await expect(page.getByRole("tabpanel")).toHaveCount(1)
     await expect(panelNamed(page, "Account")).toBeHidden()
   })
 
-  test("exit keyframes keyed on the selected state play on the previous panel", async ({ page, open }) => {
+  test("exit keyframes keyed on the selected state play on the previous panel", async ({
+    page,
+    open,
+  }) => {
     await open("tabs")
     await page.addStyleTag({
       content:
@@ -376,16 +497,25 @@ test.describe("animation", () => {
     })
     await expect(panelNamed(page, "Account")).toBeVisible()
     await tabNamed(page, "Password").click()
-    const exiting = page.locator('[role="tabpanel"]:not([data-selected])[data-ending-style]')
+    const exiting = page.locator(
+      '[role="tabpanel"]:not([data-selected])[data-ending-style]'
+    )
     await expect(exiting).toHaveCount(1)
     expect(
       await exiting.evaluate((el) =>
-        el.getAnimations().some((animation) => (animation as CSSAnimation).animationName === "exit"),
-      ),
+        el
+          .getAnimations()
+          .some(
+            (animation) => (animation as CSSAnimation).animationName === "exit"
+          )
+      )
     ).toBe(true)
   })
 
-  test("switching tabs quickly while panels animate leaves one panel", async ({ page, open }) => {
+  test("switching tabs quickly while panels animate leaves one panel", async ({
+    page,
+    open,
+  }) => {
     await open("tabs", { animate: "" })
     await tabNamed(page, "Password").click()
     await tabNamed(page, "Notifications").click()

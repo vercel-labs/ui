@@ -8,10 +8,20 @@ const fruits = [
 
 describe("select headless", () => {
   test("clearing a read-only or disabled select keeps its value", () => {
-    const readOnly = select({ id: "r", items: fruits, defaultValue: "apple", readOnly: true })
+    const readOnly = select({
+      id: "r",
+      items: fruits,
+      defaultValue: "apple",
+      readOnly: true,
+    })
     readOnly.api.clear()
     expect(readOnly.api.getValue()).toBe("apple")
-    const disabled = select({ id: "d", items: fruits, defaultValue: "apple", disabled: true })
+    const disabled = select({
+      id: "d",
+      items: fruits,
+      defaultValue: "apple",
+      disabled: true,
+    })
     disabled.api.clear()
     expect(disabled.api.getValue()).toBe("apple")
   })
@@ -34,7 +44,7 @@ describe("select headless", () => {
     instance.api.setValue("apple", { reason: "imperative", event })
     expect(onValueChange).toHaveBeenCalledWith(
       "apple",
-      expect.objectContaining({ reason: "imperative", event }),
+      expect.objectContaining({ reason: "imperative", event })
     )
   })
 })

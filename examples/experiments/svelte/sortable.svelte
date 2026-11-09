@@ -7,9 +7,17 @@
     Item: SortableItem,
     Handle: SortableHandle,
     Instructions: SortableInstructions,
-  } = createParts(sortable, { root: "div", item: "div", handle: "span", instructions: "div" })
+  } = createParts(sortable, {
+    root: "div",
+    item: "div",
+    handle: "span",
+    instructions: "div",
+  })
 
-  const tracks: Record<string, { title: string; artist: string; length: string }> = {
+  const tracks: Record<
+    string,
+    { title: string; artist: string; length: string }
+  > = {
     t1: { title: "Northern Lights", artist: "Halden", length: "3:42" },
     t2: { title: "Glass Harbor", artist: "Mira Vale", length: "4:05" },
     t3: { title: "Copper Sky", artist: "The Fieldnotes", length: "2:58" },
@@ -29,7 +37,6 @@
     p8: { label: "Harbor", tone: "#475569" },
     p9: { label: "Lagoon", tone: "#0891b2" },
   }
-
 </script>
 
 <script lang="ts">
@@ -42,18 +49,30 @@
       <button
         type="button"
         data-size="sm"
-        onclick={() => (playlist = [...playlist].sort((a, b) => tracks[a].title.localeCompare(tracks[b].title)))}
+        onclick={() =>
+          (playlist = [...playlist].sort((a, b) =>
+            tracks[a].title.localeCompare(tracks[b].title)
+          ))}
       >
         Sort by title
       </button>
-      <button type="button" data-size="sm" onclick={() => (playlist = [...playlist].reverse())}>Reverse</button>
+      <button
+        type="button"
+        data-size="sm"
+        onclick={() => (playlist = [...playlist].reverse())}>Reverse</button
+      >
     </div>
     <Sortable bind:value={playlist} aria-label="Playlist">
       {#snippet children({ order })}
         {#each order as key, index (key)}
           <SortableItem value={key}>
             <SortableHandle>
-              <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
+              <svg
+                viewBox="0 0 16 16"
+                width="16"
+                height="16"
+                fill="currentColor"
+              >
                 {#each [4, 8, 12] as y (y)}
                   {#each [6, 10] as x (x)}
                     <circle cx={x} cy={y} r="1.2"></circle>
@@ -70,13 +89,18 @@
           </SortableItem>
         {/each}
         <SortableInstructions>
-          Space picks up the focused track, or every selected track; then Up and Down move them, Space drops them
-          and Escape puts them back. Shift with an arrow selects, Control or Command with A selects all.
+          Space picks up the focused track, or every selected track; then Up and
+          Down move them, Space drops them and Escape puts them back. Shift with
+          an arrow selects, Control or Command with A selects all.
         </SortableInstructions>
       {/snippet}
     </Sortable>
   </div>
-  <Sortable defaultValue={Object.keys(photos)} orientation="grid" aria-label="Photos">
+  <Sortable
+    defaultValue={Object.keys(photos)}
+    orientation="grid"
+    aria-label="Photos"
+  >
     {#snippet children({ order })}
       {#each order as key (key)}
         <SortableItem value={key} style="--tone: {photos[key].tone}">
@@ -84,8 +108,8 @@
         </SortableItem>
       {/each}
       <SortableInstructions>
-        Space picks up the focused photo, or every selected photo; then the arrows move them, Space drops them and
-        Escape puts them back.
+        Space picks up the focused photo, or every selected photo; then the
+        arrows move them, Space drops them and Escape puts them back.
       </SortableInstructions>
     {/snippet}
   </Sortable>

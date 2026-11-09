@@ -34,7 +34,8 @@ One item: a header with its trigger, and the panel the trigger opens.
   const item = useHandlePart(accordion, "item", () => ({
     value: itemValue(),
     disabled,
-    onOpenChange: (open: boolean, details: Details) => onOpenChange?.(open, details),
+    onOpenChange: (open: boolean, details: Details) =>
+      onOpenChange?.(open, details),
     onOpenChangeComplete: (open: boolean) => onOpenChangeComplete?.(open),
   }))
 </script>

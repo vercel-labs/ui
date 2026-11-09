@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import type { ChangeDetails } from "@ui-sdk/core"
-import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@ui-sdk/vue"
+import {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/vue"
 import {
   hoverCardContentOptions,
   hoverCardFixture as fixture,
@@ -21,7 +26,9 @@ function report(open: boolean, { reason }: ChangeDetails) {
   <div class="fixture">
     <button>Before</button>
     <HoverCard v-bind="options" @open-change="report">
-      <HoverCardTrigger :href="fixture.href">{{ fixture.trigger }}</HoverCardTrigger>
+      <HoverCardTrigger :href="fixture.href">{{
+        fixture.trigger
+      }}</HoverCardTrigger>
       <HoverCardContent class="hover-card" v-bind="content">
         <HoverCardArrow class="arrow" />
         <p>

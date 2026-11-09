@@ -31,7 +31,9 @@ const nextId = () => `t${++lastId}`
 // A supplied id shaped like a generated one moves the count past it, so no generated id repeats it.
 // Past 15 digits the count would lose precision and stall, and it never gets that far itself.
 const reserveId = (id: string) => {
-  if (/^t\d{1,15}$/.test(id)) lastId = Math.max(lastId, Number(id.slice(1)))
+  if (/^t\d{1,15}$/.test(id)) {
+    lastId = Math.max(lastId, Number(id.slice(1)))
+  }
 }
 
 const isToken = (segment: string | Token | undefined): segment is Token =>
@@ -41,20 +43,32 @@ const isToken = (segment: string | Token | undefined): segment is Token =>
  * Merges adjacent strings, drops empty ones and gives tokens without one an id. Tokens that have an id keep their identity, except one repeating an earlier token's id, which gets a new one.
  */
 function normalizeValue(value: readonly (string | Token)[]) {
-  for (const segment of value) if (isToken(segment) && segment.id) reserveId(segment.id)
+  for (const segment of value) {
+    if (isToken(segment) && segment.id) {
+      reserveId(segment.id)
+    }
+  }
   const ids = new Set<string>()
   const result: TokenInputValue = []
   for (const segment of value) {
     if (isToken(segment)) {
-      const token = segment.id && !ids.has(segment.id) ? segment : { ...segment, id: nextId() }
+      const token =
+        segment.id && !ids.has(segment.id)
+          ? segment
+          : { ...segment, id: nextId() }
       ids.add(token.id!)
       result.push(token)
       continue
     }
-    if (!segment) continue
+    if (!segment) {
+      continue
+    }
     const last = result.length - 1
-    if (typeof result[last] === "string") result[last] += segment
-    else result.push(segment)
+    if (typeof result[last] === "string") {
+      result[last] += segment
+    } else {
+      result.push(segment)
+    }
   }
   return result
 }
@@ -62,13 +76,17 @@ function normalizeValue(value: readonly (string | Token)[]) {
 /** How many offsets a value spans. A token is one. */
 function valueLength(value: TokenInputValue) {
   let length = 0
-  for (const segment of value) length += isToken(segment) ? 1 : segment.length
+  for (const segment of value) {
+    length += isToken(segment) ? 1 : segment.length
+  }
   return length
 }
 
 /** The value as text with every token as U+FFFC, so offsets line up. */
 function offsetText(value: TokenInputValue) {
-  return value.map((segment) => (isToken(segment) ? TOKEN_CHAR : segment)).join("")
+  return value
+    .map((segment) => (isToken(segment) ? TOKEN_CHAR : segment))
+    .join("")
 }
 
 /** The part of a value between two offsets. */
@@ -79,9 +97,13 @@ function sliceValue(value: TokenInputValue, start: number, end = Infinity) {
     const length = isToken(segment) ? 1 : segment.length
     const from = Math.max(start - at, 0)
     const to = Math.min(end - at, length)
-    if (from < to) result.push(isToken(segment) ? segment : segment.slice(from, to))
+    if (from < to) {
+      result.push(isToken(segment) ? segment : segment.slice(from, to))
+    }
     at += length
-    if (at >= end) break
+    if (at >= end) {
+      break
+    }
   }
   return result
 }
@@ -90,8 +112,16 @@ function sliceValue(value: TokenInputValue, start: number, end = Infinity) {
  * Replaces a range with `content`. Offsets never split a token, so an edit
  * that covers part of a token's range covers all of it: the range rule.
  */
-function replaceRange(value: TokenInputValue, range: TextRange, content: TokenInputValue) {
-  return normalizeValue([...sliceValue(value, 0, range.start), ...content, ...sliceValue(value, range.end)])
+function replaceRange(
+  value: TokenInputValue,
+  range: TextRange,
+  content: TokenInputValue
+) {
+  return normalizeValue([
+    ...sliceValue(value, 0, range.start),
+    ...content,
+    ...sliceValue(value, range.end),
+  ])
 }
 
 /** The token at an offset, if one starts there. */
@@ -104,7 +134,9 @@ function tokenAt(value: TokenInputValue, offset: number) {
 function offsetOfToken(value: TokenInputValue, id: string) {
   let at = 0
   for (const segment of value) {
-    if (isToken(segment) && segment.id === id) return at
+    if (isToken(segment) && segment.id === id) {
+      return at
+    }
     at += isToken(segment) ? 1 : segment.length
   }
   return -1
@@ -121,10 +153,14 @@ function removedTokens(before: TokenInputValue, after: TokenInputValue) {
 
 /** Whether two values hold the same text and the same tokens. */
 function sameValue(a: TokenInputValue, b: TokenInputValue) {
-  if (a.length !== b.length) return false
+  if (a.length !== b.length) {
+    return false
+  }
   return a.every((segment, index) => {
     const other = b[index]
-    if (!isToken(segment) || !isToken(other)) return segment === other
+    if (!isToken(segment) || !isToken(other)) {
+      return segment === other
+    }
     return (
       segment.id === other.id &&
       segment.type === other.type &&
@@ -141,20 +177,37 @@ function sameValue(a: TokenInputValue, b: TokenInputValue) {
  * spaces, then past the word. A token is a word of its own, so the deletion
  * stops at it, or removes just it when it's next.
  */
-function wordBoundary(value: TokenInputValue, offset: number, direction: -1 | 1) {
+function wordBoundary(
+  value: TokenInputValue,
+  offset: number,
+  direction: -1 | 1
+) {
   const text = offsetText(value)
   let at = offset
   const charAt = (index: number) => text[direction < 0 ? index - 1 : index]
-  const inside = (index: number) => (direction < 0 ? index > 0 : index < text.length)
-  if (charAt(at) === TOKEN_CHAR) return at + direction
-  while (inside(at) && /\s/.test(charAt(at)) && charAt(at) !== "\n") at += direction
-  if (charAt(at) === TOKEN_CHAR && at !== offset) return at
-  while (inside(at) && !/\s/.test(charAt(at)) && charAt(at) !== TOKEN_CHAR) at += direction
+  const inside = (index: number) =>
+    direction < 0 ? index > 0 : index < text.length
+  if (charAt(at) === TOKEN_CHAR) {
+    return at + direction
+  }
+  while (inside(at) && /\s/.test(charAt(at)) && charAt(at) !== "\n") {
+    at += direction
+  }
+  if (charAt(at) === TOKEN_CHAR && at !== offset) {
+    return at
+  }
+  while (inside(at) && !/\s/.test(charAt(at)) && charAt(at) !== TOKEN_CHAR) {
+    at += direction
+  }
   return at === offset && inside(at) ? at + direction : at
 }
 
 /** Where the line around `offset` starts or ends. */
-function lineBoundary(value: TokenInputValue, offset: number, direction: -1 | 1) {
+function lineBoundary(
+  value: TokenInputValue,
+  offset: number,
+  direction: -1 | 1
+) {
   const text = offsetText(value)
   if (direction < 0) {
     const start = text.lastIndexOf("\n", offset - 1) + 1
@@ -168,9 +221,11 @@ function lineBoundary(value: TokenInputValue, offset: number, direction: -1 | 1)
 // Inside the brackets `\`, `[` and `]` are escaped, inside the parentheses
 // `\`, `(` and `)`. In plain text, `[@` is escaped by an odd run of
 // backslashes before it, so text that looks like a token stays text.
-const escapeIn = (text: string, special: RegExp) => text.replace(special, (char) => `\\${char}`)
+const escapeIn = (text: string, special: RegExp) =>
+  text.replace(special, (char) => `\\${char}`)
 const unescape = (text: string) => text.replace(/\\([\s\S])/g, "$1")
-const linkPattern = /\[@((?:\\[\s\S]|[^\\\]])*)\]\(([\w-]+):((?:\\[\s\S]|[^\\()])*)\)/y
+const linkPattern =
+  /\[@((?:\\[\s\S]|[^\\\]])*)\]\(([\w-]+):((?:\\[\s\S]|[^\\()])*)\)/y
 
 /**
  * The codec TokenInput uses unless you pass your own: `[@label](type:value)`. A type is letters, digits, `_` and `-`; any other type is written but reads back as text.
@@ -182,8 +237,13 @@ const defaultCodec: TokenCodec = {
   // Backslashes before `[@` double, plus one more when the bracket is literal.
   // A run of backslashes at the end of text before a token doubles too.
   escape(text, next) {
-    let result = text.replace(/(\\*)\[@/g, (_, slashes: string) => `${slashes}${slashes}\\[@`)
-    if (next) result = result.replace(/(\\+)$/, "$1$1")
+    let result = text.replace(
+      /(\\*)\[@/g,
+      (_, slashes: string) => `${slashes}${slashes}\\[@`
+    )
+    if (next) {
+      result = result.replace(/(\\+)$/, "$1$1")
+    }
     return result
   },
   parse(text) {
@@ -192,11 +252,20 @@ const defaultCodec: TokenCodec = {
     let index = 0
     while (index < text.length) {
       const bracket = text.indexOf("[@", index)
-      if (bracket === -1) break
+      if (bracket === -1) {
+        break
+      }
       // An odd run of backslashes before the bracket makes it literal; each pair is one backslash.
       let slashes = 0
-      while (bracket - slashes - 1 >= index && text[bracket - slashes - 1] === "\\") slashes++
-      plain += text.slice(index, bracket - slashes) + "\\".repeat(Math.floor(slashes / 2))
+      while (
+        bracket - slashes - 1 >= index &&
+        text[bracket - slashes - 1] === "\\"
+      ) {
+        slashes++
+      }
+      plain +=
+        text.slice(index, bracket - slashes) +
+        "\\".repeat(Math.floor(slashes / 2))
       if (slashes % 2) {
         plain += "[@"
         index = bracket + 2
@@ -209,7 +278,11 @@ const defaultCodec: TokenCodec = {
         index = bracket + 2
         continue
       }
-      value.push(plain, { type: link[2], value: unescape(link[3]), label: unescape(link[1]) })
+      value.push(plain, {
+        type: link[2],
+        value: unescape(link[3]),
+        label: unescape(link[1]),
+      })
       plain = ""
       index = linkPattern.lastIndex
     }
@@ -225,9 +298,13 @@ const defaultCodec: TokenCodec = {
 function toText(value: TokenInputValue, codec: TokenCodec = defaultCodec) {
   return value
     .map((segment, index) => {
-      if (isToken(segment)) return codec.format(segment)
+      if (isToken(segment)) {
+        return codec.format(segment)
+      }
       const next = value[index + 1]
-      return codec.escape ? codec.escape(segment, isToken(next) ? next : undefined) : segment
+      return codec.escape
+        ? codec.escape(segment, isToken(next) ? next : undefined)
+        : segment
     })
     .join("")
 }
@@ -237,7 +314,9 @@ function toText(value: TokenInputValue, codec: TokenCodec = defaultCodec) {
  * @stable
  */
 function toLabel(value: TokenInputValue) {
-  return value.map((segment) => (isToken(segment) ? segment.label : segment)).join("")
+  return value
+    .map((segment) => (isToken(segment) ? segment.label : segment))
+    .join("")
 }
 
 /**

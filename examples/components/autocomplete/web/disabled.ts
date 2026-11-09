@@ -49,7 +49,7 @@ function mount(root: HTMLElement) {
             ${fruits
               .map(
                 (fruit, index) =>
-                  `<ui-autocomplete-item value="${fruit}" ${index % 3 === 0 ? "disabled" : ""}>${fruit}</ui-autocomplete-item>`,
+                  `<ui-autocomplete-item value="${fruit}" ${index % 3 === 0 ? "disabled" : ""}>${fruit}</ui-autocomplete-item>`
               )
               .join("")}
           </ui-autocomplete-list>

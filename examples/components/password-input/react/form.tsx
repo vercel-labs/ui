@@ -1,6 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Input } from "@ui-sdk/react/input"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/react/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
@@ -16,7 +20,9 @@ function Example() {
           event.preventDefault()
           const data = new FormData(event.currentTarget)
           const length = String(data.get("password")).length
-          log(`Signed in as ${data.get("email")}, with a password of ${length} characters`)
+          log(
+            `Signed in as ${data.get("email")}, with a password of ${length} characters`
+          )
         }}
       >
         <Field name="email">
@@ -29,7 +35,13 @@ function Example() {
         <PasswordInput name="password" form="sign-in" required>
           <PasswordInputControl />
           <PasswordInputToggle aria-label="Show password">
-            {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
+            {(state) =>
+              state.visible ? (
+                <EyeOffIcon aria-hidden="true" />
+              ) : (
+                <EyeIcon aria-hidden="true" />
+              )
+            }
           </PasswordInputToggle>
         </PasswordInput>
       </Field>

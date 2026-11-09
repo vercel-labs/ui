@@ -1,6 +1,12 @@
 import { expect } from "@playwright/test"
 import { test } from "./docs-test"
-import { existsSync, globSync, readdirSync, readFileSync, statSync } from "node:fs"
+import {
+  existsSync,
+  globSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+} from "node:fs"
 import path from "node:path"
 import ts from "typescript"
 
@@ -10,9 +16,10 @@ import ts from "typescript"
 // example uses it.
 const repo = path.join(import.meta.dirname, "../..")
 const exampleFolder = (name: string) =>
-  [path.join(repo, "examples/components", name), path.join(repo, "examples", name)].find((dir) =>
-    existsSync(dir),
-  )!
+  [
+    path.join(repo, "examples/components", name),
+    path.join(repo, "examples", name),
+  ].find((dir) => existsSync(dir))!
 
 type Component = {
   // The core module, in packages/core/src/foundation or components.
@@ -542,7 +549,12 @@ const components: Record<string, Component> = {
   checkbox: {
     source: "checkbox/checkbox.ts",
     examples: "checkbox",
-    types: ["CheckboxOptions", "CheckboxIndicatorProps", "CheckboxState", "CheckboxIndicatorState"],
+    types: [
+      "CheckboxOptions",
+      "CheckboxIndicatorProps",
+      "CheckboxState",
+      "CheckboxIndicatorState",
+    ],
   },
   switch: {
     source: "switch/switch.ts",
@@ -561,7 +573,12 @@ const components: Record<string, Component> = {
   toggle: {
     source: "toggle/toggle.ts",
     examples: "toggle",
-    types: ["ToggleOptions", "ToggleState", "ToggleIconProps", "ToggleIconState"],
+    types: [
+      "ToggleOptions",
+      "ToggleState",
+      "ToggleIconProps",
+      "ToggleIconState",
+    ],
   },
   "toggle group": {
     source: "toggle/toggle-group.ts",
@@ -680,7 +697,13 @@ const components: Record<string, Component> = {
   slider: {
     source: "slider/slider.ts",
     examples: "slider",
-    types: ["SliderOptions", "SliderThumbProps", "SliderState", "SliderThumbState", "SliderValueState"],
+    types: [
+      "SliderOptions",
+      "SliderThumbProps",
+      "SliderState",
+      "SliderThumbState",
+      "SliderValueState",
+    ],
     allowed: {
       // The thumb sets it as `--slider-thumb-position`, which the render example's bubble reads.
       percent: "SliderThumbState",
@@ -709,12 +732,22 @@ const components: Record<string, Component> = {
   progress: {
     source: "progress/progress.ts",
     examples: "progress",
-    types: ["ProgressOptions", "ProgressState", "ProgressValueState", "GaugeLabelDetails"],
+    types: [
+      "ProgressOptions",
+      "ProgressState",
+      "ProgressValueState",
+      "GaugeLabelDetails",
+    ],
   },
   meter: {
     source: "meter/meter.ts",
     examples: "meter",
-    types: ["MeterOptions", "MeterState", "MeterValueState", "MeterLabelDetails"],
+    types: [
+      "MeterOptions",
+      "MeterState",
+      "MeterValueState",
+      "MeterLabelDetails",
+    ],
   },
   "scroll-area": {
     source: "scroll-area/scroll-area.ts",
@@ -736,7 +769,12 @@ const components: Record<string, Component> = {
   "date-input": {
     source: "date-input/date-input.ts",
     examples: "date-input",
-    types: ["DateInputOptions", "DateInputSegmentProps", "DateInputState", "DateInputSegmentState"],
+    types: [
+      "DateInputOptions",
+      "DateInputSegmentProps",
+      "DateInputState",
+      "DateInputSegmentState",
+    ],
     allowed: {
       // Logs every change to the console, which no example should do.
       debug: "DateInputOptions",
@@ -763,7 +801,12 @@ const components: Record<string, Component> = {
   "otp-input": {
     source: "otp-input/otp-input.ts",
     examples: "otp-input",
-    types: ["OTPInputOptions", "OTPInputSlotProps", "OTPInputState", "OTPInputSlotState"],
+    types: [
+      "OTPInputOptions",
+      "OTPInputSlotProps",
+      "OTPInputState",
+      "OTPInputSlotState",
+    ],
   },
   "password-input": {
     source: "password-input/password-input.ts",
@@ -927,15 +970,20 @@ let program: ts.Program | undefined
 const coreFile = (source: string) =>
   ["foundation", "components", "."]
     .map((folder) => path.join(repo, "packages/core/src", folder, source))
-    .find((file) => existsSync(file)) ?? path.join(repo, "packages/core/src/components", source)
+    .find((file) => existsSync(file)) ??
+  path.join(repo, "packages/core/src/components", source)
 function moduleOf(source: string) {
   program ??= ts.createProgram(
-    [...new Set(Object.values(components).map((component) => coreFile(component.source)))],
-    { strict: true, noEmit: true, skipLibCheck: true },
+    [
+      ...new Set(
+        Object.values(components).map((component) => coreFile(component.source))
+      ),
+    ],
+    { strict: true, noEmit: true, skipLibCheck: true }
   )
   const checker = program.getTypeChecker()
   const exports = checker.getExportsOfModule(
-    checker.getSymbolAtLocation(program.getSourceFile(coreFile(source))!)!,
+    checker.getSymbolAtLocation(program.getSourceFile(coreFile(source))!)!
   )
   return { checker, exports }
 }
@@ -951,8 +999,14 @@ function publicNames(component: Component) {
     const members = type.isUnion() ? type.types : [type]
     for (const member of members) {
       for (const property of checker.getPropertiesOfType(member)) {
-        if (property.getJsDocTags(checker).some((tag) => tag.name === "internal")) continue
-        if (!names.has(property.name)) names.set(property.name, typeName)
+        if (
+          property.getJsDocTags(checker).some((tag) => tag.name === "internal")
+        ) {
+          continue
+        }
+        if (!names.has(property.name)) {
+          names.set(property.name, typeName)
+        }
       }
     }
   }
@@ -961,30 +1015,49 @@ function publicNames(component: Component) {
 
 // A framework's examples, the local modules they import and the code snippets on
 // its component pages, without comments.
-function exampleSource(folders: string | string[], framework: "react" | "solid") {
+function exampleSource(
+  folders: string | string[],
+  framework: "react" | "solid"
+) {
   const seen = new Set<string>()
   const read = (file: string) => {
-    if (seen.has(file)) return
+    if (seen.has(file)) {
+      return
+    }
     seen.add(file)
     const code = readFileSync(file, "utf8")
     for (const [, specifier] of code.matchAll(/from "(\.{1,2}\/[^"]+)"/g)) {
       const base = path.resolve(path.dirname(file), specifier)
       const resolved = ["", ".ts", ".tsx"]
         .map((ext) => base + ext)
-        .find((candidate) => existsSync(candidate) && statSync(candidate).isFile())
-      if (resolved) read(resolved)
+        .find(
+          (candidate) => existsSync(candidate) && statSync(candidate).isFile()
+        )
+      if (resolved) {
+        read(resolved)
+      }
     }
   }
   const snippets: string[] = []
   for (const folder of [folders].flat()) {
     const examples = path.join(exampleFolder(folder), framework)
-    for (const file of readdirSync(examples)) read(path.join(examples, file))
-    const page = path.join(repo, "apps/docs/content/docs", framework, "components", `${folder}.mdx`)
-    if (existsSync(page))
+    for (const file of readdirSync(examples)) {
+      read(path.join(examples, file))
+    }
+    const page = path.join(
+      repo,
+      "apps/docs/content/docs",
+      framework,
+      "components",
+      `${folder}.mdx`
+    )
+    if (existsSync(page)) {
       for (const [, block] of readFileSync(page, "utf8").matchAll(
-        /```(?:tsx|jsx|ts|js)\b[^\n]*\n([\s\S]*?)```/g,
-      ))
+        /```(?:tsx|jsx|ts|js)\b[^\n]*\n([\s\S]*?)```/g
+      )) {
         snippets.push(block)
+      }
+    }
   }
   return (
     [...[...seen].map((file) => readFileSync(file, "utf8")), ...snippets]
@@ -999,29 +1072,35 @@ function exampleSource(folders: string | string[], framework: "react" | "solid")
 // JSX attribute, including one followed by another attribute.
 function uses(code: string, name: string) {
   return new RegExp(
-    `(\\b${name}\\s*[=:?]|\\.${name}\\b|[\\s{(,]${name}(?=\\s*[,})\\n>/]|\\s+[\\w-]+[=\\s>]))`,
+    `(\\b${name}\\s*[=:?]|\\.${name}\\b|[\\s{(,]${name}(?=\\s*[,})\\n>/]|\\s+[\\w-]+[=\\s>]))`
   ).test(code)
 }
 
 // The examples show a part's state through its data attribute, which the docs
 // stylesheet selects, so a state field the stylesheet styles counts as shown.
 // A boolean's attribute drops its prefix: `isActive` is `data-active`.
-const stylesheet = globSync("examples/{styles,components/*}/*.css", { cwd: repo })
+const stylesheet = globSync("examples/{styles,components/*}/*.css", {
+  cwd: repo,
+})
   .map((file) => readFileSync(path.join(repo, file), "utf8"))
   .join("\n")
 const styled = (name: string) =>
   stylesheet.includes(
-    `[data-${name.replace(/^(is|has)(?=[A-Z])/, "").replace(/[A-Z]/g, (c, i) => `${i ? "-" : ""}${c.toLowerCase()}`)}`,
+    `[data-${name.replace(/^(is|has)(?=[A-Z])/, "").replace(/[A-Z]/g, (c, i) => `${i ? "-" : ""}${c.toLowerCase()}`)}`
   )
 
 // The Solid examples are ports of React's, so they show the same props. They're
 // checked once every folder a component counts has them.
 const hasSolidExamples = (component: Component) =>
-  [component.examples].flat().every((folder) => existsSync(path.join(exampleFolder(folder), "solid")))
+  [component.examples]
+    .flat()
+    .every((folder) => existsSync(path.join(exampleFolder(folder), "solid")))
 
 for (const [name, component] of Object.entries(components)) {
-  const frameworks = hasSolidExamples(component) ? (["react", "solid"] as const) : (["react"] as const)
-  for (const framework of frameworks)
+  const frameworks = hasSolidExamples(component)
+    ? (["react", "solid"] as const)
+    : (["react"] as const)
+  for (const framework of frameworks) {
     test(`every public ${name} prop appears in a ${framework === "react" ? "React" : "Solid"} example`, () => {
       const code = exampleSource(component.examples, framework)
       const names = publicNames(component)
@@ -1039,15 +1118,24 @@ for (const [name, component] of Object.entries(components)) {
         .map(([prop, typeName]) => `${typeName}.${prop}`)
       expect(missing, "props with no example").toEqual([])
       // Keep the allow list honest: a name it lists must still exist.
-      for (const prop of Object.keys(allowed)) expect(names.has(prop), `${prop} is still public`).toBe(true)
+      for (const prop of Object.keys(allowed)) {
+        expect(names.has(prop), `${prop} is still public`).toBe(true)
+      }
     })
+  }
 }
 
 // `label` only feeds typeahead. Its docs must not promise an accessible name.
 test("menu item labels are documented as typeahead text, not accessible names", () => {
   const { checker, exports } = moduleOf("menu/menu.ts")
-  for (const typeName of ["MenuItemProps", "MenuCheckboxItemProps", "MenuRadioItemProps"]) {
-    const type = checker.getDeclaredTypeOfSymbol(exports.find((symbol) => symbol.name === typeName)!)
+  for (const typeName of [
+    "MenuItemProps",
+    "MenuCheckboxItemProps",
+    "MenuRadioItemProps",
+  ]) {
+    const type = checker.getDeclaredTypeOfSymbol(
+      exports.find((symbol) => symbol.name === typeName)!
+    )
     const label = checker.getPropertyOfType(type, "label")!
     const docs = ts.displayPartsToString(label.getDocumentationComment(checker))
     expect(docs, typeName).toContain("typeahead")

@@ -1,6 +1,10 @@
 "use client"
 
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import { ChevronDownIcon } from "lucide-react"
 
 const items = [

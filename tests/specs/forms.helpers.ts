@@ -2,10 +2,14 @@ import type { Page } from "@playwright/test"
 import { expect } from "../fixtures"
 
 // Controls are found by role and name. Every implementation names them from their labels.
-const checkbox = (page: Page, name: string) => page.getByRole("checkbox", { name, exact: true })
-const switchNamed = (page: Page, name: string) => page.getByRole("switch", { name, exact: true })
-const radio = (page: Page, name: string) => page.getByRole("radio", { name, exact: true })
-const email = (page: Page) => page.getByRole("textbox", { name: "Email", exact: true })
+const checkbox = (page: Page, name: string) =>
+  page.getByRole("checkbox", { name, exact: true })
+const switchNamed = (page: Page, name: string) =>
+  page.getByRole("switch", { name, exact: true })
+const radio = (page: Page, name: string) =>
+  page.getByRole("radio", { name, exact: true })
+const email = (page: Page) =>
+  page.getByRole("textbox", { name: "Email", exact: true })
 const form = (page: Page) => page.getByRole("form", { name: "Preferences" })
 
 async function submitted(page: Page) {
@@ -30,7 +34,9 @@ async function fillRequired(page: Page) {
 async function formData(page: Page) {
   return page.evaluate(() => {
     const form = document.querySelector("form")!
-    return new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString()
+    return new URLSearchParams(
+      new FormData(form) as unknown as Record<string, string>
+    ).toString()
   })
 }
 
@@ -38,4 +44,15 @@ async function formData(page: Page) {
 // gives them. Custom elements keep parts that aren't shown, hidden.
 const errors = (page: Page) => page.locator(".field-error:visible")
 
-export { checkbox, email, errors, fillRequired, form, formData, radio, save, submitted, switchNamed }
+export {
+  checkbox,
+  email,
+  errors,
+  fillRequired,
+  form,
+  formData,
+  radio,
+  save,
+  submitted,
+  switchNamed,
+}

@@ -4,9 +4,17 @@ The sheet itself, a dialog, inside a full-screen viewport the drawer positions i
 @stable
 -->
 <script lang="ts" generics="Payload = unknown">
-  import type { DrawerContentProps, DrawerContentState } from "@ui-sdk/core/drawer"
+  import type {
+    DrawerContentProps,
+    DrawerContentState,
+  } from "@ui-sdk/core/drawer"
   import Part from "../part.svelte"
-  import { portalTo, providePopupContainer, usePopupContainer, type PopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+    type PopupContainer,
+  } from "../popup.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { useDrawer } from "./context"
 
@@ -26,12 +34,17 @@ The sheet itself, a dialog, inside a full-screen viewport the drawer positions i
   const target = usePopupContainer(() => container ?? drawer.container())
   providePopupContainer(target)
   // The viewport is what moves into the container and the top layer.
-  const viewport = useHandlePart(drawer.handle, "viewport", () => ({}), portalTo(target))
+  const viewport = useHandlePart(
+    drawer.handle,
+    "viewport",
+    () => ({}),
+    portalTo(target)
+  )
   const content = useHandlePart(
     drawer.handle,
     "content",
     () => ({ initialFocus, finalFocus, keepMounted }),
-    portalTo(() => (viewport.present ? false : target())),
+    portalTo(() => (viewport.present ? false : target()))
   )
 </script>
 

@@ -4,7 +4,10 @@ Renders data items. Used by data listboxes, and available for custom layouts.
 @stable
 -->
 <script lang="ts">
-  import { listbox as listboxPrimitive, type ListData } from "@ui-sdk/core/listbox"
+  import {
+    listbox as listboxPrimitive,
+    type ListData,
+  } from "@ui-sdk/core/listbox"
   import { useHandle } from "../instance"
   import ListboxGroupLabel from "./listbox-group-label.svelte"
   import ListboxGroup from "./listbox-group.svelte"
@@ -28,7 +31,11 @@ Renders data items. Used by data listboxes, and available for custom layouts.
       <Self items={entry.items} />
     </ListboxGroup>
   {:else}
-    <ListboxItem value={entry.value} label={entry.label} disabled={entry.disabled}>
+    <ListboxItem
+      value={entry.value}
+      label={entry.label}
+      disabled={entry.disabled}
+    >
       {entry.label}
     </ListboxItem>
   {/if}

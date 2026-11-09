@@ -20,11 +20,16 @@ test("an action with its own handler renders for a toast that has no action", ()
   const log: string[] = []
   const toaster = createToaster<string>()
   const target = document.body.appendChild(document.createElement("div"))
-  const app = mount(App, { target, props: { log: (entry: string) => log.push(entry), toaster } })
+  const app = mount(App, {
+    target,
+    props: { log: (entry: string) => log.push(entry), toaster },
+  })
   cleanup = () => unmount(app)
   toaster("Saved", { duration: Infinity })
   flushSync()
-  const action = document.querySelector<HTMLButtonElement>('[data-slot="toast-action"]')
+  const action = document.querySelector<HTMLButtonElement>(
+    '[data-slot="toast-action"]'
+  )
   expect(action?.textContent).toBe("")
   action?.click()
   expect(log).toEqual(["action"])

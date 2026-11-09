@@ -17,8 +17,8 @@ function Example() {
         <div data-slot="stack">
           <AlertDialogTitle>Delete this project?</AlertDialogTitle>
           <AlertDialogDescription>
-            This permanently deletes the project, its files and its deployment history for everyone on your
-            team.
+            This permanently deletes the project, its files and its deployment
+            history for everyone on your team.
           </AlertDialogDescription>
         </div>
         <div data-slot="row">

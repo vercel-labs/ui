@@ -28,7 +28,9 @@ const items = [
   {
     value: "support",
     label: "How can I reach support?",
-    content: ["Write to us by email or chat, or call us. We answer within 24 hours on business days."],
+    content: [
+      "Write to us by email or chat, or call us. We answer within 24 hours on business days.",
+    ],
   },
 ]
 

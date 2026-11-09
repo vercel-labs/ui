@@ -14,20 +14,38 @@ type Direction = "none" | "left" | "right" | "up" | "down"
 
 // How many items a key moves focus by, or "first" and "last". Undefined for
 // keys the list doesn't handle, including arrows along the other axis.
-function stepFor(key: string, orientation: "horizontal" | "vertical", rtl: boolean) {
-  const forward = orientation === "vertical" ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight"
-  const backward = orientation === "vertical" ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft"
-  if (key === forward) return 1
-  if (key === backward) return -1
-  if (key === "Home") return "first" as const
-  if (key === "End") return "last" as const
+function stepFor(
+  key: string,
+  orientation: "horizontal" | "vertical",
+  rtl: boolean
+) {
+  const forward =
+    orientation === "vertical" ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight"
+  const backward =
+    orientation === "vertical" ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft"
+  if (key === forward) {
+    return 1
+  }
+  if (key === backward) {
+    return -1
+  }
+  if (key === "Home") {
+    return "first" as const
+  }
+  if (key === "End") {
+    return "last" as const
+  }
 }
 
 // The item a radio key moves to: Down and Right go forward, Up and Left back,
 // with Left and Right swapped right to left. Like native radios, both axes work.
 function radioStep(key: string, rtl: boolean) {
-  if (key === "ArrowDown" || key === (rtl ? "ArrowLeft" : "ArrowRight")) return 1
-  if (key === "ArrowUp" || key === (rtl ? "ArrowRight" : "ArrowLeft")) return -1
+  if (key === "ArrowDown" || key === (rtl ? "ArrowLeft" : "ArrowRight")) {
+    return 1
+  }
+  if (key === "ArrowUp" || key === (rtl ? "ArrowRight" : "ArrowLeft")) {
+    return -1
+  }
 }
 
 /** An item of a roving group, as the tab stop decision sees it. */
@@ -44,11 +62,22 @@ type RovingCandidate = {
 // The item that holds a group's one tab stop: the item focused last, when the
 // group remembers one, else the first preferred item that's enabled, else the
 // first enabled one, else the first that can take focus.
-function rovingStop(items: readonly RovingCandidate[], remembered: string | null = null) {
+function rovingStop(
+  items: readonly RovingCandidate[],
+  remembered: string | null = null
+) {
   const focusable = items.filter((item) => item.focusable)
-  if (remembered !== null && focusable.some((item) => item.key === remembered)) return remembered
+  if (
+    remembered !== null &&
+    focusable.some((item) => item.key === remembered)
+  ) {
+    return remembered
+  }
   const enabled = focusable.filter((item) => !item.disabled)
-  return (enabled.find((item) => item.preferred) ?? enabled[0] ?? focusable[0])?.key ?? null
+  return (
+    (enabled.find((item) => item.preferred) ?? enabled[0] ?? focusable[0])
+      ?.key ?? null
+  )
 }
 
 // Whether a text field keeps a key for its caret instead of letting a roving
@@ -58,24 +87,51 @@ function rovingStop(items: readonly RovingCandidate[], remembered: string | null
 // multi-line text and number fields.
 function fieldKeepsKey(
   key: string,
-  field: { start: number | null; end: number | null; length: number; rtl: boolean; usesUpDown: boolean },
+  field: {
+    start: number | null
+    end: number | null
+    length: number
+    rtl: boolean
+    usesUpDown: boolean
+  }
 ) {
-  if (key === "Home" || key === "End") return true
-  if (key === "ArrowUp" || key === "ArrowDown") return field.usesUpDown
-  if (key !== "ArrowLeft" && key !== "ArrowRight") return false
+  if (key === "Home" || key === "End") {
+    return true
+  }
+  if (key === "ArrowUp" || key === "ArrowDown") {
+    return field.usesUpDown
+  }
+  if (key !== "ArrowLeft" && key !== "ArrowRight") {
+    return false
+  }
   // Fields without a caret, like checkboxes, never keep arrows.
-  if (field.start === null || field.end === null) return false
-  if (field.start !== field.end) return true
+  if (field.start === null || field.end === null) {
+    return false
+  }
+  if (field.start !== field.end) {
+    return true
+  }
   const backward = key === (field.rtl ? "ArrowRight" : "ArrowLeft")
   return backward ? field.start > 0 : field.end < field.length
 }
 
 // The index a step lands on, wrapping or stopping at the ends.
-function moveIndex(index: number, step: number | "first" | "last", count: number, loop: boolean) {
-  if (step === "first") return 0
-  if (step === "last") return count - 1
+function moveIndex(
+  index: number,
+  step: number | "first" | "last",
+  count: number,
+  loop: boolean
+) {
+  if (step === "first") {
+    return 0
+  }
+  if (step === "last") {
+    return count - 1
+  }
   const next = index + step
-  if (loop) return ((next % count) + count) % count
+  if (loop) {
+    return ((next % count) + count) % count
+  }
   return Math.max(0, Math.min(count - 1, next))
 }
 
@@ -91,9 +147,20 @@ function inOrder(values: readonly string[], order: readonly string[]) {
 // The scroll position that brings a span into a viewport along one axis, or
 // the current one when it's already in view. The span stays `before` and
 // `after` clear of the edges, like scroll-padding.
-function scrollToShow(scroll: number, viewport: number, start: number, size: number, before = 0, after = 0) {
-  if (start - before < scroll) return Math.max(0, start - before)
-  if (start + size + after > scroll + viewport) return Math.max(0, start + size + after - viewport)
+function scrollToShow(
+  scroll: number,
+  viewport: number,
+  start: number,
+  size: number,
+  before = 0,
+  after = 0
+) {
+  if (start - before < scroll) {
+    return Math.max(0, start - before)
+  }
+  if (start + size + after > scroll + viewport) {
+    return Math.max(0, start + size + after - viewport)
+  }
   return scroll
 }
 

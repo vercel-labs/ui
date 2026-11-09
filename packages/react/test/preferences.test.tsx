@@ -1,7 +1,11 @@
 // @vitest-environment jsdom
 // Preferences across a page load: the server's HTML, its script run the way
 // the parser would, then hydration.
-import { createColorScheme, createLocalStorage, createPreference } from "@ui-sdk/core"
+import {
+  createColorScheme,
+  createLocalStorage,
+  createPreference,
+} from "@ui-sdk/core"
 import * as React from "react"
 import { createRoot, hydrateRoot, type Root } from "react-dom/client"
 import { renderToString } from "react-dom/server"
@@ -18,14 +22,20 @@ afterEach(async () => {
   document.body.replaceChildren()
   localStorage.clear()
   delete (window as Window & { __uiSdkStorage?: unknown }).__uiSdkStorage
-  for (const name of document.documentElement.getAttributeNames())
-    if (name.startsWith("data-")) document.documentElement.removeAttribute(name)
+  for (const name of document.documentElement.getAttributeNames()) {
+    if (name.startsWith("data-")) {
+      document.documentElement.removeAttribute(name)
+    }
+  }
 })
 
 const tones = ["default", "light", "medium", "dark"] as const
 
 function setup() {
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme"), global: true })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme"),
+    global: true,
+  })
   const skinTone = createPreference({
     values: tones,
     defaultValue: "default",
@@ -47,10 +57,16 @@ function setup() {
 function load(container: HTMLElement, html: string) {
   container.innerHTML = html
   for (const script of container.querySelectorAll("script")) {
-    Object.defineProperty(document, "currentScript", { configurable: true, value: script })
+    Object.defineProperty(document, "currentScript", {
+      configurable: true,
+      value: script,
+    })
     new Function(script.textContent!)()
   }
-  Object.defineProperty(document, "currentScript", { configurable: true, value: null })
+  Object.defineProperty(document, "currentScript", {
+    configurable: true,
+    value: null,
+  })
 }
 
 test("the server renders one script first, and the defaults on its element", () => {
@@ -58,7 +74,7 @@ test("the server renders one script first, and the defaults on its element", () 
   const html = renderToString(app)
   expect(html.match(/<script/g)).toHaveLength(1)
   expect(html).toMatch(
-    /^<div data-slot="preferences" data-skin-tone="default" style="display:contents"><script>/,
+    /^<div data-slot="preferences" data-skin-tone="default" style="display:contents"><script>/
   )
   expect(html).toContain("Tone: default")
 })
@@ -69,7 +85,9 @@ test("saved values show before hydration, which then matches, and content catche
   const { app, skinTone } = setup()
   const container = document.body.appendChild(document.createElement("div"))
   load(container, renderToString(app))
-  const element = container.querySelector<HTMLElement>('[data-slot="preferences"]')!
+  const element = container.querySelector<HTMLElement>(
+    '[data-slot="preferences"]'
+  )!
   // The first paint.
   expect(document.documentElement.dataset.colorScheme).toBe("dark")
   expect(element.dataset.skinTone).toBe("medium")
@@ -107,7 +125,8 @@ test("a client-only render leaves the script out, and still shows the saved valu
 test("a restore that onValueChange cancels leaves the default on the attributes the script set", async () => {
   localStorage.setItem("color-scheme", "dark")
   localStorage.setItem("skin-tone", "medium")
-  const cancel = (_value: string, details: { cancel: () => void }) => details.cancel()
+  const cancel = (_value: string, details: { cancel: () => void }) =>
+    details.cancel()
   const colorScheme = createColorScheme({
     storage: createLocalStorage("color-scheme"),
     global: true,
@@ -123,7 +142,9 @@ test("a restore that onValueChange cancels leaves the default on the attributes 
   const app = <Preferences preferences={[colorScheme, skinTone]} />
   const container = document.body.appendChild(document.createElement("div"))
   load(container, renderToString(app))
-  const element = container.querySelector<HTMLElement>('[data-slot="preferences"]')!
+  const element = container.querySelector<HTMLElement>(
+    '[data-slot="preferences"]'
+  )!
   expect(element.dataset.skinTone).toBe("medium")
   await React.act(async () => {
     root = hydrateRoot(container, app)

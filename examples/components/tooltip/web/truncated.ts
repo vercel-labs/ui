@@ -19,16 +19,19 @@ function mount(root: HTMLElement) {
           <ui-tooltip-trigger><button>${createElement(File, { "aria-hidden": "true" }).outerHTML}<span>${file}</span></button></ui-tooltip-trigger>
           <ui-tooltip-content>${file}</ui-tooltip-content>
         </ui-tooltip>
-      </li>`,
+      </li>`
         )
         .join("")}
     </ul>
   `
-  for (const tooltip of root.querySelectorAll("ui-tooltip"))
+  for (const tooltip of root.querySelectorAll("ui-tooltip")) {
     tooltip.addEventListener("openchange", (event) => {
       const name = tooltip.querySelector("span")
-      if (event.detail.value && name && name.scrollWidth <= name.clientWidth) event.preventDefault()
+      if (event.detail.value && name && name.scrollWidth <= name.clientWidth) {
+        event.preventDefault()
+      }
     })
+  }
 }
 
 export { mount }

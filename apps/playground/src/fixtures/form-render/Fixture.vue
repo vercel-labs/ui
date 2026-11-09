@@ -27,7 +27,10 @@ const renders = ref(0)
         <FieldLabel>Render function</FieldLabel>
         <Input class="input">
           <template #render="{ props, state }">
-            <input v-bind="props" :data-state="state.filled ? 'filled' : 'empty'" />
+            <input
+              v-bind="props"
+              :data-state="state.filled ? 'filled' : 'empty'"
+            />
           </template>
         </Input>
       </Field>
@@ -44,7 +47,9 @@ const renders = ref(0)
         </InputClear>
       </InputGroup>
     </FieldSet>
-    <button type="button" @click="renders++">Render again ({{ renders }})</button>
+    <button type="button" @click="renders++">
+      Render again ({{ renders }})
+    </button>
     <button>After</button>
   </div>
 </template>

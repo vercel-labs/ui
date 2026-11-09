@@ -1,23 +1,36 @@
 import * as React from "react"
 import { StarIcon } from "lucide-react"
-import { createChange, createRovingFocus, definePrimitive, type ChangeDetails } from "@ui-sdk/core"
+import {
+  createChange,
+  createRovingFocus,
+  definePrimitive,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type RatingOptions = {
   value?: number
   defaultValue?: number
-  onValueChange?: (value: number, details: ChangeDetails<"item-press" | "list-navigation">) => void
+  onValueChange?: (
+    value: number,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
 }
 
 const rating = definePrimitive({
   name: "rating",
-  options: { value: "number", defaultValue: "number", onValueChange: "callback" },
+  options: {
+    value: "number",
+    defaultValue: "number",
+    onValueChange: "callback",
+  },
   controlled: ["value"],
   state: (options: RatingOptions) => ({
     value: options.value ?? options.defaultValue ?? 0,
     focused: null as string | null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
     const roving = createRovingFocus(context, {
@@ -33,25 +46,35 @@ const rating = definePrimitive({
         if (event.key === "End") {
           return items[items.length - 1]?.key
         }
-        const next = event.key === "ArrowDown" || event.key === (rtl ? "ArrowLeft" : "ArrowRight")
-        const previous = event.key === "ArrowUp" || event.key === (rtl ? "ArrowRight" : "ArrowLeft")
+        const next =
+          event.key === "ArrowDown" ||
+          event.key === (rtl ? "ArrowLeft" : "ArrowRight")
+        const previous =
+          event.key === "ArrowUp" ||
+          event.key === (rtl ? "ArrowRight" : "ArrowLeft")
         if (!next && !previous) {
           return
         }
         const index = items.indexOf(from)
-        return items[(index + (next ? 1 : -1) + items.length) % items.length]?.key
+        return items[(index + (next ? 1 : -1) + items.length) % items.length]
+          ?.key
       },
       remember: false,
       preferred: (star) => Number(star.key) === context.store.get().value,
-      claims: (state, star) => (state.value ? Number(star.key) === state.value : star.key === "1"),
+      claims: (state, star) =>
+        state.value ? Number(star.key) === state.value : star.key === "1",
     })
     return {
       roving,
-      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+      rate: (value: number, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
       keydown(event: KeyboardEvent, el: HTMLElement) {
         const moved = roving.keydown(event, el)
         if (moved) {
-          change("value", Number(moved.key), { reason: "list-navigation", event })
+          change("value", Number(moved.key), {
+            reason: "list-navigation",
+            event,
+          })
         }
       },
     }
@@ -93,7 +116,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="rating-readout">
-        <output data-slot="rating-value" data-value aria-label="Rating out of 5">
+        <output
+          data-slot="rating-value"
+          data-value
+          aria-label="Rating out of 5"
+        >
           {value}
         </output>
         <span data-slot="hint">out of 5</span>

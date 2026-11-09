@@ -13,7 +13,11 @@
     DatePickerTrigger,
     type DatePickerValue,
   } from "@ui-sdk/svelte/date-picker"
-  import { datePickerAction, datePickerFixture as f, datePickerOptions } from "tests/fixtures/date-picker.ts"
+  import {
+    datePickerAction,
+    datePickerFixture as f,
+    datePickerOptions,
+  } from "tests/fixtures/date-picker.ts"
 
   const { lang, ...options } = datePickerOptions()
   const range = options.mode === "range"
@@ -23,7 +27,9 @@
 
   function onSubmit(event: SubmitEvent) {
     event.preventDefault()
-    submitted = JSON.stringify([...new FormData(event.currentTarget as HTMLFormElement)])
+    submitted = JSON.stringify([
+      ...new FormData(event.currentTarget as HTMLFormElement),
+    ])
   }
 </script>
 
@@ -38,10 +44,15 @@
       startName={range ? "start" : undefined}
       endName={range ? "end" : undefined}
       {...options}
-      onValueChange={(next, details) => (action = datePickerAction("value", next, details.reason))}
-      onOpenChange={(next, details) => (action = datePickerAction("open", next, details.reason))}
+      onValueChange={(next, details) =>
+        (action = datePickerAction("value", next, details.reason))}
+      onOpenChange={(next, details) =>
+        (action = datePickerAction("open", next, details.reason))}
     >
-      <DatePickerInput id="date-start" aria-label={range ? "Start date" : undefined} />
+      <DatePickerInput
+        id="date-start"
+        aria-label={range ? "Start date" : undefined}
+      />
       {#if range}<DatePickerInput end aria-label="End date" />{/if}
       <DatePickerTrigger />
       <DatePickerClear>Clear</DatePickerClear>
@@ -53,7 +64,9 @@
           <CalendarNext class="calendar-step" />
         </div>
         <CalendarGrid class="calendar-grid" />
-        <DatePickerPreset value={preset.value as DatePickerValue}>{preset.label}</DatePickerPreset>
+        <DatePickerPreset value={preset.value as DatePickerValue}
+          >{preset.label}</DatePickerPreset
+        >
       </DatePickerContent>
     </DatePicker>
     <button type="submit">Submit</button>

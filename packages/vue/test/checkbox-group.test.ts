@@ -15,9 +15,11 @@ test("a checkbox group disabled and named after mount disables and names its che
   const name = ref<string>()
   const root = document.body.appendChild(document.createElement("form"))
   app = createApp(() =>
-    h(CheckboxGroup, { "aria-label": "Toppings", disabled: disabled.value, name: name.value }, () =>
-      h(Checkbox, { value: "cheese", "aria-label": "Cheese" }),
-    ),
+    h(
+      CheckboxGroup,
+      { "aria-label": "Toppings", disabled: disabled.value, name: name.value },
+      () => h(Checkbox, { value: "cheese", "aria-label": "Cheese" })
+    )
   )
   app.mount(root)
   await nextTick()
@@ -26,10 +28,12 @@ test("a checkbox group disabled and named after mount disables and names its che
   await nextTick()
   await new Promise((resolve) => setTimeout(resolve))
   const checkbox = document.querySelector('[role="checkbox"]')!
-  const input = document.querySelector<HTMLInputElement>('[data-slot="checkbox-input"]')!
-  expect([checkbox.getAttribute("aria-disabled"), input.disabled, input.name]).toEqual([
-    "true",
-    true,
-    "toppings",
-  ])
+  const input = document.querySelector<HTMLInputElement>(
+    '[data-slot="checkbox-input"]'
+  )!
+  expect([
+    checkbox.getAttribute("aria-disabled"),
+    input.disabled,
+    input.name,
+  ]).toEqual(["true", true, "toppings"])
 })

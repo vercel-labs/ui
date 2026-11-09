@@ -27,7 +27,9 @@ const items = [
   {
     value: "support",
     label: "How can I reach support?",
-    content: ["Write to us by email or chat, or call us. We answer within 24 hours on business days."],
+    content: [
+      "Write to us by email or chat, or call us. We answer within 24 hours on business days.",
+    ],
   },
 ]
 </script>
@@ -42,7 +44,9 @@ const items = [
         </AccordionTrigger>
       </AccordionHeader>
       <AccordionPanel>
-        <p v-for="paragraph in item.content" :key="paragraph">{{ paragraph }}</p>
+        <p v-for="paragraph in item.content" :key="paragraph">
+          {{ paragraph }}
+        </p>
       </AccordionPanel>
     </AccordionItem>
   </Accordion>

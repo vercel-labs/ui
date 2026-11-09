@@ -20,7 +20,9 @@ import {
     </PopoverTrigger>
     <PopoverContent>
       <PopoverTitle>Invite people</PopoverTitle>
-      <PopoverDescription>They'll get an email with a link to join.</PopoverDescription>
+      <PopoverDescription
+        >They'll get an email with a link to join.</PopoverDescription
+      >
       <Field>
         <FieldLabel>Email</FieldLabel>
         <Input type="email" placeholder="wren@example.com" />

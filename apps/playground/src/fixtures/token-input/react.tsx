@@ -24,7 +24,8 @@ import {
 } from "tests/fixtures/token-input.ts"
 
 function Fixture() {
-  const { value, pending, fail, form, otherForm, controlled, ...options } = tokenInputOptions()
+  const { value, pending, fail, form, otherForm, controlled, ...options } =
+    tokenInputOptions()
   const [action, setAction] = React.useState("")
   const [submitted, setSubmitted] = React.useState("")
   const [triggers] = React.useState(tokenTriggers)
@@ -62,11 +63,17 @@ function Fixture() {
           <label className="label" id="prompt-label">
             {f.label}
           </label>
-          <TokenInputEditor aria-labelledby="prompt-label" className="editor" placeholder={f.placeholder} />
+          <TokenInputEditor
+            aria-labelledby="prompt-label"
+            className="editor"
+            placeholder={f.placeholder}
+          />
           <TriggerMenu
             triggers={triggers}
             onSelect={(selected, details) =>
-              pending && details.trigger === "@" ? pendingSelect({ fail }) : undefined
+              pending && details.trigger === "@"
+                ? pendingSelect({ fail })
+                : undefined
             }
           >
             <TriggerMenuHint className="hint" />
@@ -97,7 +104,9 @@ function Fixture() {
           aria-label="Other"
           onSubmit={(event) => {
             event.preventDefault()
-            setSubmitted(`other:${new FormData(event.currentTarget).get(f.name)}`)
+            setSubmitted(
+              `other:${new FormData(event.currentTarget).get(f.name)}`
+            )
           }}
         />
       )}
@@ -117,7 +126,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

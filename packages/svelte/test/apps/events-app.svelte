@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../../src/collapsible"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "../../src/collapsible"
   import { Popover, PopoverContent, PopoverTrigger } from "../../src/popover"
 
   let {
@@ -12,7 +16,9 @@
   <CollapsibleTrigger
     onclick={(event) => {
       log("user:click")
-      if (prevent) event.preventDefault()
+      if (prevent) {
+        event.preventDefault()
+      }
     }}
     onkeydown={() => log("user:keydown")}
     onpointerdown={() => log("user:pointerdown")}
@@ -27,7 +33,9 @@
   <PopoverContent aria-label="Outer">
     <Popover onOpenChange={(open) => log(`inner:${open}`)}>
       <PopoverTrigger>More</PopoverTrigger>
-      <PopoverContent aria-label="Inner"><button>Archive</button></PopoverContent>
+      <PopoverContent aria-label="Inner"
+        ><button>Archive</button></PopoverContent
+      >
     </Popover>
   </PopoverContent>
 </Popover>

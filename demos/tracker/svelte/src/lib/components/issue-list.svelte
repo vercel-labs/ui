@@ -43,7 +43,11 @@
     type Status,
   } from "tracker-data"
 
-  let { issues, query, pageSize }: { issues: Issue[]; query: Query; pageSize: number } = $props()
+  let {
+    issues,
+    query,
+    pageSize,
+  }: { issues: Issue[]; query: Query; pageSize: number } = $props()
 
   const { confirm } = getTracker()
   const menu = createMenuController<Issue>()
@@ -53,8 +57,11 @@
   const pageCount = $derived(Math.max(1, Math.ceil(issues.length / pageSize)))
   const page = $derived(Math.min(query.page, pageCount))
   const rows = $derived(issues.slice((page - 1) * pageSize, page * pageSize))
-  const latest = (payload: Issue) => issues.find((issue) => issue.id === payload.id) ?? payload
-  const checked = $derived(selected.filter((id) => rows.some((issue) => issue.id === id)))
+  const latest = (payload: Issue) =>
+    issues.find((issue) => issue.id === payload.id) ?? payload
+  const checked = $derived(
+    selected.filter((id) => rows.some((issue) => issue.id === id))
+  )
 
   function plural(count: number) {
     return count === 1 ? "1 issue" : `${count} issues`
@@ -62,7 +69,11 @@
 
   async function setStatus(ids: string[], status: Status) {
     const result = await act("update", { id: ids, status })
-    if (result.type === "success") toast(`${ids.length === 1 ? ids[0] : plural(ids.length)} moved to ${statusOf(status).label}`)
+    if (result.type === "success") {
+      toast(
+        `${ids.length === 1 ? ids[0] : plural(ids.length)} moved to ${statusOf(status).label}`
+      )
+    }
   }
 
   async function setPriority(ids: string[], priority: Priority) {
@@ -75,11 +86,17 @@
       description: "Deleted issues and their comments can't be brought back.",
       confirmLabel: "Delete",
     })
-    if (!yes) return
+    if (!yes) {
+      return
+    }
     const result = await act("delete", { id: ids })
-    if (result.type !== "success") return
+    if (result.type !== "success") {
+      return
+    }
     selected = []
-    if (query.issue && ids.includes(query.issue)) await goto(href(query, { issue: null }), { reset: false })
+    if (query.issue && ids.includes(query.issue)) {
+      await goto(href(query, { issue: null }), { reset: false })
+    }
     toast.success(`${plural(ids.length)} deleted`)
     await tick()
     head?.querySelector("button")?.focus()
@@ -87,13 +104,19 @@
 
   async function run(action: string) {
     const issue = menu.getPayload()
-    if (!issue) return
-    if (action === "open") goto(href(query, { issue: issue.id }), { reset: false })
+    if (!issue) {
+      return
+    }
+    if (action === "open") {
+      goto(href(query, { issue: issue.id }), { reset: false })
+    }
     if (action === "copy") {
       await navigator.clipboard.writeText(issue.id)
       toast(`Copied ${issue.id}`)
     }
-    if (action === "delete") remove([issue.id])
+    if (action === "delete") {
+      remove([issue.id])
+    }
   }
 </script>
 
@@ -104,13 +127,25 @@
     allValues={rows.map((issue) => issue.id)}
     class="flex min-h-0 flex-1 flex-col"
   >
-    <div bind:this={head} class="flex h-11 shrink-0 items-center gap-3 border-b border-border ps-4 pe-2">
-      <Checkbox parent aria-label="Select all issues on this page" disabled={rows.length === 0} />
+    <div
+      bind:this={head}
+      class="flex h-11 shrink-0 items-center gap-3 border-b border-border ps-4 pe-2"
+    >
+      <Checkbox
+        parent
+        aria-label="Select all issues on this page"
+        disabled={rows.length === 0}
+      />
       {#if checked.length > 0}
         <Toolbar aria-label="Selected issues" class="flex-1 gap-1">
-          <span class="me-2 text-sm font-medium">{checked.length} selected</span>
-          <Menu onAction={(status: string) => setStatus(checked, status as Status)}>
-            <ToolbarButton class={buttonVariants({ size: "sm", variant: "ghost" })}>
+          <span class="me-2 text-sm font-medium">{checked.length} selected</span
+          >
+          <Menu
+            onAction={(status: string) => setStatus(checked, status as Status)}
+          >
+            <ToolbarButton
+              class={buttonVariants({ size: "sm", variant: "ghost" })}
+            >
               {#snippet render({ props })}
                 <MenuTrigger {...props}>Set status</MenuTrigger>
               {/snippet}
@@ -118,13 +153,18 @@
             <MenuContent align="start">
               {#each statuses as status (status.value)}
                 <MenuItem value={status.value}>
-                  <MenuItemIcon><StatusIcon status={status.value} /></MenuItemIcon>
+                  <MenuItemIcon
+                    ><StatusIcon status={status.value} /></MenuItemIcon
+                  >
                   {status.label}
                 </MenuItem>
               {/each}
             </MenuContent>
           </Menu>
-          <ToolbarButton onclick={() => remove(checked)} class={buttonVariants({ size: "sm", variant: "ghost" })}>
+          <ToolbarButton
+            onclick={() => remove(checked)}
+            class={buttonVariants({ size: "sm", variant: "ghost" })}
+          >
             <Trash2 aria-hidden="true" />
             Delete
           </ToolbarButton>
@@ -138,12 +178,16 @@
           </ToolbarButton>
         </Toolbar>
       {:else}
-        <span class="text-sm text-muted-foreground">{plural(issues.length)}</span>
+        <span class="text-sm text-muted-foreground"
+          >{plural(issues.length)}</span
+        >
       {/if}
     </div>
     <ScrollArea label="Issue list" class="flex-1">
       {#if rows.length === 0}
-        <div class="flex flex-col items-center gap-2 py-24 text-muted-foreground">
+        <div
+          class="flex flex-col items-center gap-2 py-24 text-muted-foreground"
+        >
           <Inbox aria-hidden="true" class="size-6" />
           No issues match these filters.
         </div>
@@ -156,7 +200,10 @@
             >
               <Checkbox value={issue.id} aria-label={`Select ${issue.id}`} />
               <PriorityIcon priority={issue.priority} label />
-              <span class="hidden w-12 shrink-0 text-xs text-muted-foreground tabular-nums @md:block">{issue.id}</span>
+              <span
+                class="hidden w-12 shrink-0 text-xs text-muted-foreground tabular-nums @md:block"
+                >{issue.id}</span
+              >
               <StatusIcon status={issue.status} label />
               <a
                 href={href(query, { issue: issue.id })}
@@ -165,9 +212,14 @@
               >
                 {issue.title}
               </a>
-              <IssueLabels labels={issue.labels} class="hidden shrink-0 gap-1 @3xl:flex" />
+              <IssueLabels
+                labels={issue.labels}
+                class="hidden shrink-0 gap-1 @3xl:flex"
+              />
               {#if issue.due}
-                <span class="hidden w-12 shrink-0 text-end text-xs text-muted-foreground @lg:block">
+                <span
+                  class="hidden w-12 shrink-0 text-end text-xs text-muted-foreground @lg:block"
+                >
                   {formatDate(issue.due)}
                 </span>
               {/if}
@@ -188,7 +240,11 @@
   </CheckboxGroup>
   {#if pageCount > 1}
     <footer class="flex shrink-0 justify-center border-t border-border p-2">
-      <Pagination {page} {pageCount} getHref={(page) => href(query, { page })} />
+      <Pagination
+        {page}
+        {pageCount}
+        getHref={(page) => href(query, { page })}
+      />
     </footer>
   {/if}
   <Menu controller={menu} onAction={run}>
@@ -203,10 +259,13 @@
               <MenuSubContent>
                 <MenuRadioGroup
                   value={latest(payload).status}
-                  onValueChange={(status: string) => setStatus([payload.id], status as Status)}
+                  onValueChange={(status: string) =>
+                    setStatus([payload.id], status as Status)}
                 >
                   {#each statuses as status (status.value)}
-                    <MenuRadioItem value={status.value}>{status.label}</MenuRadioItem>
+                    <MenuRadioItem value={status.value}
+                      >{status.label}</MenuRadioItem
+                    >
                   {/each}
                 </MenuRadioGroup>
               </MenuSubContent>
@@ -216,10 +275,13 @@
               <MenuSubContent>
                 <MenuRadioGroup
                   value={latest(payload).priority}
-                  onValueChange={(priority: string) => setPriority([payload.id], priority as Priority)}
+                  onValueChange={(priority: string) =>
+                    setPriority([payload.id], priority as Priority)}
                 >
                   {#each priorities as priority (priority.value)}
-                    <MenuRadioItem value={priority.value}>{priority.label}</MenuRadioItem>
+                    <MenuRadioItem value={priority.value}
+                      >{priority.label}</MenuRadioItem
+                    >
                   {/each}
                 </MenuRadioGroup>
               </MenuSubContent>

@@ -30,10 +30,16 @@
 <Preferences preferences={[view]}>
   <div data-slot="stack">
     <div data-slot="controls" role="group" aria-label="View">
-      <Button aria-pressed={state.current.value === "list"} onclick={(event) => choose("list", event)}>
+      <Button
+        aria-pressed={state.current.value === "list"}
+        onclick={(event) => choose("list", event)}
+      >
         List
       </Button>
-      <Button aria-pressed={state.current.value === "grid"} onclick={(event) => choose("grid", event)}>
+      <Button
+        aria-pressed={state.current.value === "grid"}
+        onclick={(event) => choose("grid", event)}
+      >
         Grid
       </Button>
     </div>

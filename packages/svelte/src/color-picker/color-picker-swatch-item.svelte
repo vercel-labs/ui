@@ -13,7 +13,11 @@ A preset color, as `--color-picker-color`. Pressing it sets the value.
   import Part from "../part.svelte"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let { value, ...rest }: PartProps<"button", ColorPickerSwatchItemState> & ColorPickerSwatchItemProps = $props()
+  let {
+    value,
+    ...rest
+  }: PartProps<"button", ColorPickerSwatchItemState> &
+    ColorPickerSwatchItemProps = $props()
 
   const item = usePart(colorPicker, "swatch-item", () => ({ value }))
 </script>

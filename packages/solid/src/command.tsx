@@ -46,7 +46,9 @@ const parts = createParts(commandPrimitive, {
   status: "div",
 })
 
-const CommandContext = createContext<PrimitiveHandle<typeof commandPrimitive> | null>(null)
+const CommandContext = createContext<PrimitiveHandle<
+  typeof commandPrimitive
+> | null>(null)
 // The page parts sit on: `null` for the first page. Not provided outside any page.
 const PageContext = createContext<{ page: string | null } | null>(null)
 // Set while rendering data commands, whose shortcuts the root binds.
@@ -57,7 +59,9 @@ const OwnListContext = createContext<((present: boolean) => void) | null>(null)
 
 function useCommand() {
   const context = useContext(CommandContext)
-  if (!context) throw new Error("Command parts must be used inside <Command>.")
+  if (!context) {
+    throw new Error("Command parts must be used inside <Command>.")
+  }
   return context
 }
 
@@ -68,7 +72,8 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * The props of `Command`.
  * @stable
  */
-type CommandProps = CommandOptions & Omit<PartProps<"div", CommandState>, Clashing> & {}
+type CommandProps = CommandOptions &
+  Omit<PartProps<"div", CommandState>, Clashing> & {}
 
 const optionKeys = [
   "value",
@@ -137,8 +142,9 @@ function Command(props: CommandProps) {
         <OwnListContext value={setHasList}>
           {(() => {
             const children = props.children
-            if (typeof children === "function" && children.length > 0)
+            if (typeof children === "function" && children.length > 0) {
               return (children as (state: CommandState) => JSX.Element)(state)
+            }
             return (
               <>
                 {children}
@@ -154,7 +160,11 @@ function Command(props: CommandProps) {
       )
     },
   })
-  return <CommandContext value={command}>{usePart(command, "root", undefined, rest, "div")}</CommandContext>
+  return (
+    <CommandContext value={command}>
+      {usePart(command, "root", undefined, rest, "div")}
+    </CommandContext>
+  )
 }
 
 /**
@@ -176,7 +186,8 @@ function CommandList(props: PartProps<"div", CommandListState>) {
     get children() {
       return (
         props.children ??
-        ((state: CommandListState) => (command.state.items ? <CommandItems items={state.items} /> : null))
+        ((state: CommandListState) =>
+          command.state.items ? <CommandItems items={state.items} /> : null)
       )
     },
   })
@@ -188,9 +199,12 @@ function CommandList(props: PartProps<"div", CommandListState>) {
  * `onAction`.
  * @stable
  */
-function CommandItem(props: Omit<PartProps<"div", CommandItemState>, Clashing> & CommandItemProps) {
+function CommandItem(
+  props: Omit<PartProps<"div", CommandItemState>, Clashing> & CommandItemProps
+) {
   const generated = createUniqueId()
-  const group = useAround(commandPrimitive, "group")?.().id as string | undefined
+  const group = useAround(commandPrimitive, "group")?.().id as
+    string | undefined
   const inPage = useContext(PageContext)
   const data = useContext(DataContext)
   const key = () => props.value ?? generated
@@ -207,7 +221,17 @@ function CommandItem(props: Omit<PartProps<"div", CommandItemState>, Clashing> &
     inPage: inPage?.page,
     data,
   })
-  const rest = omit(props, "value", "label", "keywords", "disabled", "shortcut", "page", "index", "onSelect")
+  const rest = omit(
+    props,
+    "value",
+    "label",
+    "keywords",
+    "disabled",
+    "shortcut",
+    "page",
+    "index",
+    "onSelect"
+  )
   return usePart(useCommand(), "item", item, rest, "div")
 }
 
@@ -217,9 +241,14 @@ function CommandItem(props: Omit<PartProps<"div", CommandItemState>, Clashing> &
  */
 function CommandItemText(props: PartProps<"span", CommandItemTextState>) {
   const item = useAround(commandPrimitive, "item")
-  if (!item) throw new Error("<CommandItemText> must be used inside <CommandItem>.")
+  if (!item) {
+    throw new Error("<CommandItemText> must be used inside <CommandItem>.")
+  }
   const key = () => item().value as string
-  const part = () => ({ id: key(), text: textToMark(props.children, (item().label as string) ?? key()) })
+  const part = () => ({
+    id: key(),
+    text: textToMark(props.children, (item().label as string) ?? key()),
+  })
   const rest = merge(props, {
     get children() {
       const children = props.children
@@ -258,7 +287,9 @@ function CommandPage(props: CommandPageProps & { children?: JSX.Element }) {
   const command = useCommand()
   return (
     <Show when={command.present("page", () => ({ value: props.value }))}>
-      <PageContext value={{ page: props.value ?? null }}>{props.children}</PageContext>
+      <PageContext value={{ page: props.value ?? null }}>
+        {props.children}
+      </PageContext>
     </Show>
   )
 }
@@ -312,15 +343,22 @@ function CommandItems(props: { items: CommandData }) {
     <DataContext value={true}>
       <For each={props.items}>
         {(entry) => {
-          if (typeof entry === "string") return <CommandItem value={entry}>{entry}</CommandItem>
-          if ("type" in entry && entry.type === "separator") return <CommandSeparator />
-          if ("type" in entry && entry.type === "group")
+          if (typeof entry === "string") {
+            return <CommandItem value={entry}>{entry}</CommandItem>
+          }
+          if ("type" in entry && entry.type === "separator") {
+            return <CommandSeparator />
+          }
+          if ("type" in entry && entry.type === "group") {
             return (
               <CommandGroup>
-                {entry.label && <CommandGroupLabel>{entry.label}</CommandGroupLabel>}
+                {entry.label && (
+                  <CommandGroupLabel>{entry.label}</CommandGroupLabel>
+                )}
                 <CommandItems items={entry.items} />
               </CommandGroup>
             )
+          }
           return (
             <CommandItem
               value={entry.value}

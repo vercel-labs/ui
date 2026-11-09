@@ -33,15 +33,21 @@
   <button>Before</button>
   <Popover {...options} {controller}>
     {#if triggerShown}
-      <PopoverTrigger shortcut={parts.shortcut ? popoverFixture.shortcut.trigger : undefined}>
+      <PopoverTrigger
+        shortcut={parts.shortcut ? popoverFixture.shortcut.trigger : undefined}
+      >
         {popoverFixture.trigger}
         {#if parts.shortcut}<PopoverShortcut />{/if}
       </PopoverTrigger>
     {/if}
     <PopoverContent class="popup" sideOffset={8} {...content}>
       <PopoverArrow class="arrow" />
-      {#if parts.title}<PopoverTitle class="title">{popoverFixture.title}</PopoverTitle>{/if}
-      <PopoverDescription class="description">{popoverFixture.description}</PopoverDescription>
+      {#if parts.title}<PopoverTitle class="title"
+          >{popoverFixture.title}</PopoverTitle
+        >{/if}
+      <PopoverDescription class="description"
+        >{popoverFixture.description}</PopoverDescription
+      >
       <label class="field">
         {popoverFixture.field}
         <input value={popoverFixture.defaultValue} />
@@ -49,15 +55,22 @@
       <div class="actions">
         <button onclick={() => (action = "save")}>
           {popoverFixture.action}
-          {#if parts.shortcut}<PopoverShortcut shortcut={popoverFixture.shortcut.save} />{/if}
+          {#if parts.shortcut}<PopoverShortcut
+              shortcut={popoverFixture.shortcut.save}
+            />{/if}
         </button>
         <PopoverClose>{popoverFixture.close}</PopoverClose>
         {#if parts.removable}
-          <button onclick={() => (triggerShown = false)}>{popoverFixture.remove}</button>
+          <button onclick={() => (triggerShown = false)}
+            >{popoverFixture.remove}</button
+          >
         {/if}
       </div>
       {#if parts.menu}
-        <Menu container={options.container} onAction={(value) => (action = value)}>
+        <Menu
+          container={options.container}
+          onAction={(value) => (action = value)}
+        >
           <MenuTrigger>{popoverFixture.menu.trigger}</MenuTrigger>
           <MenuContent class="popup">
             {#each popoverFixture.menu.items as item (item.value)}
@@ -70,8 +83,12 @@
         <Popover>
           <PopoverTrigger>{popoverFixture.nested.trigger}</PopoverTrigger>
           <PopoverContent class="popup">
-            <PopoverTitle class="title">{popoverFixture.nested.title}</PopoverTitle>
-            <button onclick={() => (action = "archive")}>{popoverFixture.nested.action}</button>
+            <PopoverTitle class="title"
+              >{popoverFixture.nested.title}</PopoverTitle
+            >
+            <button onclick={() => (action = "archive")}
+              >{popoverFixture.nested.action}</button
+            >
           </PopoverContent>
         </Popover>
       {/if}

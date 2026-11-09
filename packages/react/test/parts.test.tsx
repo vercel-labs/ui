@@ -3,7 +3,11 @@ import * as React from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, expect, test } from "vitest"
 import { Checkbox } from "../src/checkbox"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
 import { createRadioGroupController, Radio, RadioGroup } from "../src/radio"
 import { Tabs, TabsList, TabsTab } from "../src/tabs"
 
@@ -31,14 +35,14 @@ afterEach(async () => {
 
 const byRole = (container: HTMLElement, role: string, name: string) =>
   [...container.querySelectorAll<HTMLElement>(`[role="${role}"]`)].find(
-    (el) => el.getAttribute("aria-label") === name || el.textContent === name,
+    (el) => el.getAttribute("aria-label") === name || el.textContent === name
   )!
 
 test("a checkbox under StrictMode checks on a click", async () => {
   const view = await render(
     <React.StrictMode>
       <Checkbox aria-label="Terms" />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
   const checkbox = byRole(view, "checkbox", "Terms")
   await React.act(async () => checkbox.click())
@@ -49,7 +53,9 @@ test("a checkbox under StrictMode checks on a click", async () => {
 const never = new Promise<void>(() => {})
 
 function Suspends({ until }: { until: Promise<void> | undefined }) {
-  if (until) React.use(until)
+  if (until) {
+    React.use(until)
+  }
   return null
 }
 
@@ -74,7 +80,9 @@ test("a collapsible that Suspense hid and showed again opens and points at its p
   await React.act(async () => resolve())
   const trigger = view.querySelector("button")!
   await React.act(async () => trigger.click())
-  const panel = view.querySelector<HTMLElement>('[data-slot="collapsible-panel"]')!
+  const panel = view.querySelector<HTMLElement>(
+    '[data-slot="collapsible-panel"]'
+  )!
   expect(trigger.getAttribute("aria-expanded")).toBe("true")
   expect(panel.textContent).toBe("Shipping in two days.")
   expect(trigger.getAttribute("aria-controls")).toBe(panel.id)
@@ -107,7 +115,9 @@ test("a part keeps its committed props when a transition with new ones suspends"
   const account = byRole(view, "tab", "Account")
   expect(account.getAttribute("aria-selected")).toBe("false")
   expect(account.getAttribute("aria-disabled")).toBe(null)
-  expect(byRole(view, "tab", "Billing").getAttribute("aria-selected")).toBe("true")
+  expect(byRole(view, "tab", "Billing").getAttribute("aria-selected")).toBe(
+    "true"
+  )
 })
 
 const controller = createRadioGroupController()
@@ -125,6 +135,10 @@ test("a radio whose value changed checks when the group selects the new value", 
   const view = await render(<Plans value="monthly" />)
   await React.act(async () => root!.render(<Plans value="yearly" />))
   await React.act(async () => controller.setValue("yearly"))
-  expect(byRole(view, "radio", "Paid").getAttribute("aria-checked")).toBe("true")
-  expect(byRole(view, "radio", "Free").getAttribute("aria-checked")).toBe("false")
+  expect(byRole(view, "radio", "Paid").getAttribute("aria-checked")).toBe(
+    "true"
+  )
+  expect(byRole(view, "radio", "Free").getAttribute("aria-checked")).toBe(
+    "false"
+  )
 })

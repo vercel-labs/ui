@@ -15,7 +15,13 @@ import { nearestInDirection } from "../focus/spatial"
  * The connection being drawn: where it starts, the port it would land on, and its loose end in your units.
  * @experimental
  */
-type ConnectDraft = { from: string; to: string | null; x: number; y: number; keyboard: boolean }
+type ConnectDraft = {
+  from: string
+  to: string | null
+  x: number
+  y: number
+  keyboard: boolean
+}
 
 /**
  * Why a connection was made: a pointer let go on a port, or a key.
@@ -43,7 +49,11 @@ type ConnectOptions<State extends object> = {
   /** The state key that holds the `ConnectDraft` while one is drawn. Start it at `null`, and list it in `live`. */
   draft: keyof State & string
   /** Makes the connection and returns whether it went through. */
-  connect: (from: string, to: string, details: { reason: ConnectReason; event?: Event }) => boolean
+  connect: (
+    from: string,
+    to: string,
+    details: { reason: ConnectReason; event?: Event }
+  ) => boolean
   /** Whether `from` can connect to `to`. Defaults to any other port. */
   canConnect?: (from: string, to: string) => boolean
   /** Turns a point on screen into your units, like a canvas viewport's `toCanvas`. Defaults to client pixels. */
@@ -60,11 +70,19 @@ type ConnectOptions<State extends object> = {
  * The English messages `createConnect` announces unless you pass `message`.
  * @experimental
  */
-function connectMessage(message: ConnectMessage, label: (key: string) => string) {
-  if (message.type === "start")
+function connectMessage(
+  message: ConnectMessage,
+  label: (key: string) => string
+) {
+  if (message.type === "start") {
     return `Connecting from ${label(message.from)}. Arrows choose a port, Enter connects, Escape cancels.`
-  if (message.type === "target") return `To ${label(message.to)}.`
-  if (message.type === "connect") return `Connected ${label(message.from)} to ${label(message.to)}.`
+  }
+  if (message.type === "target") {
+    return `To ${label(message.to)}.`
+  }
+  if (message.type === "connect") {
+    return `Connected ${label(message.from)} to ${label(message.to)}.`
+  }
   return "Canceled."
 }
 
@@ -98,17 +116,24 @@ const center = (el: Element) => {
  * @experimental
  */
 function createConnect<State extends object>(
-  context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy" | "parts">,
-  options: ConnectOptions<State>,
+  context: Pick<
+    PrimitiveContext<any, State, any>,
+    "store" | "onDestroy" | "parts"
+  >,
+  options: ConnectOptions<State>
 ) {
   const { store } = context
   const draft = () => store.get()[options.draft] as ConnectDraft | null
-  const setDraft = (value: ConnectDraft | null) => store.set({ [options.draft]: value } as Partial<State>)
+  const setDraft = (value: ConnectDraft | null) =>
+    store.set({ [options.draft]: value } as Partial<State>)
   const point = (x: number, y: number) => options.point?.(x, y) ?? { x, y }
   const label = (key: string) => options.label?.(key) ?? key
   const say = (message: ConnectMessage) =>
-    announce((options.message ?? connectMessage)(message, label), { priority: "assertive" })
-  const can = (from: string, to: string) => from !== to && (options.canConnect?.(from, to) ?? true)
+    announce((options.message ?? connectMessage)(message, label), {
+      priority: "assertive",
+    })
+  const can = (from: string, to: string) =>
+    from !== to && (options.canConnect?.(from, to) ?? true)
   const ports = () => elements(context, options.slot)
   const drags = createDragSession(context.onDestroy)
 
@@ -120,7 +145,9 @@ function createConnect<State extends object>(
     /** Starts a connection from a port with the keyboard. Returns whether it started. */
     start(from: string) {
       const el = ports().find((port) => port.key === from)?.el
-      if (!el || !ports().some((port) => can(from, port.key))) return false
+      if (!el || !ports().some((port) => can(from, port.key))) {
+        return false
+      }
       const at = center(el)
       setDraft({ from, to: null, ...point(at.x, at.y), keyboard: true })
       say({ type: "start", from })
@@ -129,20 +156,32 @@ function createConnect<State extends object>(
     /** Points the connection at a port, or at none. */
     target(to: string | null) {
       const current = draft()
-      if (!current || (to && !can(current.from, to))) return false
+      if (!current || (to && !can(current.from, to))) {
+        return false
+      }
       const el = to ? ports().find((port) => port.key === to)?.el : undefined
       const at = el ? center(el) : undefined
       setDraft({ ...current, to, ...(at ? point(at.x, at.y) : {}) })
-      if (to) say({ type: "target", from: current.from, to })
+      if (to) {
+        say({ type: "target", from: current.from, to })
+      }
       return true
     },
     /** Makes the connection the draft points at, and ends it. */
-    commit(details: { reason: ConnectReason; event?: Event } = { reason: "connect-key" }) {
+    commit(
+      details: { reason: ConnectReason; event?: Event } = {
+        reason: "connect-key",
+      }
+    ) {
       const current = draft()
       setDraft(null)
-      if (!current?.to) return false
+      if (!current?.to) {
+        return false
+      }
       const done = options.connect(current.from, current.to, details)
-      if (done) say({ type: "connect", from: current.from, to: current.to })
+      if (done) {
+        say({ type: "connect", from: current.from, to: current.to })
+      }
       return done
     },
     /** Lets go of the connection without making it. */
@@ -150,7 +189,9 @@ function createConnect<State extends object>(
       const current = draft()
       drags.cancel()
       setDraft(null)
-      if (current?.keyboard) say({ type: "cancel", from: current.from })
+      if (current?.keyboard) {
+        say({ type: "cancel", from: current.from })
+      }
     },
     /**
      * While connecting from the keyboard: arrows go to the nearest port that
@@ -159,27 +200,48 @@ function createConnect<State extends object>(
      */
     keydown(event: KeyboardEvent) {
       const current = draft()
-      if (!current) return false
+      if (!current) {
+        return false
+      }
       const direction = arrows[event.key]
       if (direction) {
         event.preventDefault()
         const all = ports()
-        const fromEl = all.find((port) => port.key === (current.to ?? current.from))?.el
-        if (!fromEl) return true
+        const fromEl = all.find(
+          (port) => port.key === (current.to ?? current.from)
+        )?.el
+        if (!fromEl) {
+          return true
+        }
         const candidates = all
-          .filter((port) => port.key !== current.to && can(current.from, port.key))
-          .map((port) => ({ key: port.key, rect: port.el.getBoundingClientRect() }))
-        const next = nearestInDirection(fromEl.getBoundingClientRect(), candidates, direction)
-        if (next) api.target(next)
+          .filter(
+            (port) => port.key !== current.to && can(current.from, port.key)
+          )
+          .map((port) => ({
+            key: port.key,
+            rect: port.el.getBoundingClientRect(),
+          }))
+        const next = nearestInDirection(
+          fromEl.getBoundingClientRect(),
+          candidates,
+          direction
+        )
+        if (next) {
+          api.target(next)
+        }
         return true
       }
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault()
-        if (current.to) api.commit({ reason: "connect-key", event })
+        if (current.to) {
+          api.commit({ reason: "connect-key", event })
+        }
         return true
       }
       if (event.key === "Escape" || event.key === "Tab") {
-        if (event.key === "Escape") event.preventDefault()
+        if (event.key === "Escape") {
+          event.preventDefault()
+        }
         api.cancel()
         return true
       }
@@ -187,7 +249,9 @@ function createConnect<State extends object>(
     },
     /** Drags a loose line out of a port; letting go near a port that can take it connects. */
     pointerdown(event: PointerEvent, from: string, el: HTMLElement) {
-      if (!drags.accepts(event)) return
+      if (!drags.accepts(event)) {
+        return
+      }
       event.preventDefault()
       event.stopPropagation()
       const radius = options.radius?.() ?? 28
@@ -198,11 +262,20 @@ function createConnect<State extends object>(
         let best: { key: string; distance: number } | undefined
         for (const target of targets) {
           const distance = Math.hypot(target.at.x - x, target.at.y - y)
-          if (distance <= radius && (!best || distance < best.distance)) best = { key: target.key, distance }
+          if (distance <= radius && (!best || distance < best.distance)) {
+            best = { key: target.key, distance }
+          }
         }
-        return best ? targets.find((target) => target.key === best.key)! : undefined
+        return best
+          ? targets.find((target) => target.key === best.key)!
+          : undefined
       }
-      setDraft({ from, to: null, ...point(event.clientX, event.clientY), keyboard: false })
+      setDraft({
+        from,
+        to: null,
+        ...point(event.clientX, event.clientY),
+        keyboard: false,
+      })
       drags.start(el, event, {
         cancelOnEscape: true,
         onMove: ({ x, y }) => {
@@ -216,17 +289,26 @@ function createConnect<State extends object>(
           })
         },
         onEnd: (end, canceled) => {
-          if (canceled) api.cancel()
-          else api.commit({ reason: "drag", event: end })
+          if (canceled) {
+            api.cancel()
+          } else {
+            api.commit({ reason: "drag", event: end })
+          }
         },
       })
     },
     /** A port's part in the connection being drawn, for a data attribute: `source`, `target`, `candidate`, or `undefined`. */
     role(state: State, key: string) {
       const current = state[options.draft] as ConnectDraft | null
-      if (!current) return undefined
-      if (current.from === key) return "source"
-      if (current.to === key) return "target"
+      if (!current) {
+        return undefined
+      }
+      if (current.from === key) {
+        return "source"
+      }
+      if (current.to === key) {
+        return "target"
+      }
       return can(current.from, key) ? "candidate" : undefined
     },
   }

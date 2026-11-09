@@ -16,4 +16,8 @@ The months shown, like "October 2026". Screen readers hear it change.
 
 {#snippet fallback(state: CalendarHeadingState)}{state.label}{/snippet}
 
-<Part tag="h2" part={heading} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="h2"
+  part={heading}
+  props={{ ...rest, children: children ?? fallback }}
+/>

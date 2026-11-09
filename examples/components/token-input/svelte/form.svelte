@@ -2,7 +2,11 @@
   import { CheckIcon } from "@lucide/svelte"
   import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
-  import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/svelte/token-input"
+  import {
+    TokenInput,
+    TokenInputEditor,
+    type TokenInputValue,
+  } from "@ui-sdk/svelte/token-input"
   import { useLog } from "../../../shared/svelte/log"
 
   const draft: TokenInputValue = [
@@ -25,7 +29,10 @@
 <div data-slot="stack">
   <div data-slot="controls">
     <label data-slot="label">
-      <Checkbox checked={disabled} onCheckedChange={(next) => (disabled = next === true)}>
+      <Checkbox
+        checked={disabled}
+        onCheckedChange={(next) => (disabled = next === true)}
+      >
         <CheckboxIndicator>
           <CheckIcon aria-hidden="true" />
         </CheckboxIndicator>
@@ -33,7 +40,10 @@
       Disabled
     </label>
     <label data-slot="label">
-      <Checkbox checked={readOnly} onCheckedChange={(next) => (readOnly = next === true)}>
+      <Checkbox
+        checked={readOnly}
+        onCheckedChange={(next) => (readOnly = next === true)}
+      >
         <CheckboxIndicator>
           <CheckIcon aria-hidden="true" />
         </CheckboxIndicator>
@@ -44,7 +54,13 @@
   <div data-slot="stack">
     <Field {disabled}>
       <FieldLabel>Prompt</FieldLabel>
-      <TokenInput form={formId} name="prompt" required defaultValue={draft} {readOnly}>
+      <TokenInput
+        form={formId}
+        name="prompt"
+        required
+        defaultValue={draft}
+        {readOnly}
+      >
         <TokenInputEditor />
       </TokenInput>
     </Field>

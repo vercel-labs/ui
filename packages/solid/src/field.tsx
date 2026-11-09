@@ -17,9 +17,24 @@ import {
   fieldOutsideState,
   type FieldOutsideSlot,
 } from "@ui-sdk/core/renderer"
-import { createContext, createUniqueId, merge, omit, onSettled, Show, untrack, useContext } from "solid-js"
+import {
+  createContext,
+  createUniqueId,
+  merge,
+  omit,
+  onSettled,
+  Show,
+  untrack,
+  useContext,
+} from "solid-js"
 import { FieldContext, type FieldContextValue } from "./field-context"
-import { renderStatic, usePart, usePrimitive, type PartProps, type PrimitiveHandle } from "./use-primitive"
+import {
+  renderStatic,
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 type FieldHandle = PrimitiveHandle<typeof fieldPrimitive>
 type FieldSetHandle = PrimitiveHandle<typeof fieldSetPrimitive>
@@ -27,7 +42,9 @@ type FieldSetHandle = PrimitiveHandle<typeof fieldSetPrimitive>
 const FieldSetContext = createContext<FieldSetHandle | null>(null)
 // What a FieldDescription describes: the nearest Field, or a FieldSet when no
 // Field is closer.
-const DescribedContext = createContext<FieldHandle | FieldSetHandle | null>(null)
+const DescribedContext = createContext<FieldHandle | FieldSetHandle | null>(
+  null
+)
 
 // Checks a part outside a field once its component settles, so a label
 // behind a pending boundary is in the page by then.
@@ -38,14 +55,26 @@ const outsideRefs: Partial<Record<FieldOutsideSlot, (el: Element) => void>> = {
 
 // A part outside any Field: a plain element with no field wiring, so a
 // FieldLabel is a native <label> that labels the control it wraps.
-function outside(slot: FieldOutsideSlot, tag: string, props: Record<string, any>) {
+function outside(
+  slot: FieldOutsideSlot,
+  tag: string,
+  props: Record<string, any>
+) {
   const check = outsideRefs[slot]
   let el: Element | undefined
-  if (check) onSettled(() => void (el && check(el)))
+  if (check) {
+    onSettled(() => void (el && check(el)))
+  }
   const ref = (node: Element) => void (el = node)
   const userRef = untrack(() => props.ref)
-  const user = check ? merge(props, { ref: userRef ? [userRef, ref] : ref }) : props
-  return renderStatic(tag, () => ({ attrs: fieldOutsideAttrs(slot), state: fieldOutsideState }), user)
+  const user = check
+    ? merge(props, { ref: userRef ? [userRef, ref] : ref })
+    : props
+  return renderStatic(
+    tag,
+    () => ({ attrs: fieldOutsideAttrs(slot), state: fieldOutsideState }),
+    user
+  )
 }
 
 /**
@@ -68,7 +97,9 @@ function Field(props: FieldOptions & PartProps<"div", FieldState>) {
   })
   return (
     <FieldContext value={context}>
-      <DescribedContext value={field}>{usePart(field, "root", undefined, rest, "div")}</DescribedContext>
+      <DescribedContext value={field}>
+        {usePart(field, "root", undefined, rest, "div")}
+      </DescribedContext>
     </FieldContext>
   )
 }
@@ -80,8 +111,16 @@ function Field(props: FieldOptions & PartProps<"div", FieldState>) {
  */
 function FieldLabel(props: PartProps<"label", FieldState>) {
   const field = useContext(FieldContext)
-  if (!field) return outside("label", "label", props)
-  return usePart(field, "label", () => ({ id: props.id as string | undefined }), props, "label")
+  if (!field) {
+    return outside("label", "label", props)
+  }
+  return usePart(
+    field,
+    "label",
+    () => ({ id: props.id as string | undefined }),
+    props,
+    "label"
+  )
 }
 
 /**
@@ -91,11 +130,19 @@ function FieldLabel(props: PartProps<"label", FieldState>) {
  */
 function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
   const described = useContext(DescribedContext)
-  if (!described) return outside("description", "p", props)
+  if (!described) {
+    return outside("description", "p", props)
+  }
   // A field set's description slot takes the same props, and its state is the
   // `disabled` that FieldDescriptionState always has.
   const owner = described as FieldHandle
-  return usePart(owner, "description", () => ({ id: props.id as string | undefined }), props, "p")
+  return usePart(
+    owner,
+    "description",
+    () => ({ id: props.id as string | undefined }),
+    props,
+    "p"
+  )
 }
 
 /**
@@ -103,7 +150,9 @@ function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
  * browser's message for the current problem.
  * @stable
  */
-function FieldError(props: PartProps<"div", FieldErrorState> & FieldErrorProps) {
+function FieldError(
+  props: PartProps<"div", FieldErrorState> & FieldErrorProps
+) {
   const field = useContext(FieldContext)
   const made = createUniqueId()
   const rest = merge(omit(props, "match"), {
@@ -111,12 +160,19 @@ function FieldError(props: PartProps<"div", FieldErrorState> & FieldErrorProps) 
       return props.children ?? ((state: FieldErrorState) => state.message)
     },
   })
-  if (!field)
-    return <Show when={fieldOutsideErrorShown({ match: props.match })}>{outside("error", "div", rest)}</Show>
+  if (!field) {
+    return (
+      <Show when={fieldOutsideErrorShown({ match: props.match })}>
+        {outside("error", "div", rest)}
+      </Show>
+    )
+  }
   // Only an error with `match` needs an id of its own. One without takes the
   // field's, which the control points at before the field binds.
   const error = () => ({
-    id: (props.id as string | undefined) ?? (props.match === undefined ? undefined : made),
+    id:
+      (props.id as string | undefined) ??
+      (props.match === undefined ? undefined : made),
     match: props.match,
   })
   return usePart(field, "error", error, rest, "div")
@@ -128,7 +184,9 @@ function FieldError(props: PartProps<"div", FieldErrorState> & FieldErrorProps) 
  */
 function FieldControl(props: PartProps<"input", FieldState>) {
   const field = useContext(FieldContext)
-  if (!field) return outside("control", "input", props)
+  if (!field) {
+    return outside("control", "input", props)
+  }
   const user = merge(omit(props, "name"), {
     get name() {
       return props.name ?? field.name()
@@ -145,12 +203,20 @@ function FieldControl(props: PartProps<"input", FieldState>) {
  * A native <fieldset>, so `disabled` disables every control inside it.
  * @stable
  */
-function FieldSet(props: FieldSetOptions & Omit<PartProps<"fieldset", FieldSetState>, "disabled">) {
-  const set = usePrimitive(fieldSetPrimitive, () => ({ disabled: props.disabled, debug: props.debug }))
+function FieldSet(
+  props: FieldSetOptions &
+    Omit<PartProps<"fieldset", FieldSetState>, "disabled">
+) {
+  const set = usePrimitive(fieldSetPrimitive, () => ({
+    disabled: props.disabled,
+    debug: props.debug,
+  }))
   const rest = omit(props, "disabled", "debug")
   return (
     <FieldSetContext value={set}>
-      <DescribedContext value={set}>{usePart(set, "set", undefined, rest, "fieldset")}</DescribedContext>
+      <DescribedContext value={set}>
+        {usePart(set, "set", undefined, rest, "fieldset")}
+      </DescribedContext>
     </FieldSetContext>
   )
 }
@@ -161,8 +227,16 @@ function FieldSet(props: FieldSetOptions & Omit<PartProps<"fieldset", FieldSetSt
  */
 function FieldLegend(props: PartProps<"legend", FieldSetState>) {
   const set = useContext(FieldSetContext)
-  if (!set) throw new Error("FieldLegend must be used inside <FieldSet>.")
-  return usePart(set, "legend", () => ({ id: props.id as string | undefined }), props, "legend")
+  if (!set) {
+    throw new Error("FieldLegend must be used inside <FieldSet>.")
+  }
+  return usePart(
+    set,
+    "legend",
+    () => ({ id: props.id as string | undefined }),
+    props,
+    "legend"
+  )
 }
 
 /**
@@ -175,11 +249,20 @@ function FieldGroup(props: PartProps<"div">) {
     "group",
     undefined,
     props,
-    "div",
+    "div"
   )
 }
 
-export { Field, FieldControl, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet }
+export {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+}
 export type {
   FieldApi,
   FieldDescriptionState,

@@ -16,9 +16,9 @@ import { createSignal, isHydrating, onCleanup, onSettled } from "solid-js"
 function useAsyncOptions<Item>(
   load: (
     query: string,
-    context: AsyncOptionsContext,
+    context: AsyncOptionsContext
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
-  options?: AsyncOptionsOptions,
+  options?: AsyncOptionsOptions
 ) {
   // An `immediate` load starts at once in the browser, so it doesn't wait for a
   // `<Loading>` boundary to reveal. A component's body runs on the server too,
@@ -31,13 +31,16 @@ function useAsyncOptions<Item>(
   // Written from the helper's listeners, which can fire inside a disposal.
   const [state, setState] = createSignal<AsyncOptionsState<Item>>(
     immediate ? { ...initial, status: "loading" } : initial,
-    { ownedWrite: true },
+    { ownedWrite: true }
   )
   onCleanup(helper.subscribe(() => setState(helper.getState())))
-  if (immediate && !now)
+  if (immediate && !now) {
     onSettled(() => {
-      if (helper.getState() === initial) helper.reload()
+      if (helper.getState() === initial) {
+        helper.reload()
+      }
     })
+  }
   // Cancels on unmount, so a load that lands later changes nothing.
   onCleanup(() => helper.cancel())
   return {

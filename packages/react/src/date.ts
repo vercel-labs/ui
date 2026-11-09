@@ -27,4 +27,9 @@ export {
   weekday,
   weekdayNames,
 } from "@ui-sdk/core/date"
-export type { DateField, DateParts, DatePattern, ISODate } from "@ui-sdk/core/date"
+export type {
+  DateField,
+  DateParts,
+  DatePattern,
+  ISODate,
+} from "@ui-sdk/core/date"

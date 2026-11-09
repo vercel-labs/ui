@@ -46,7 +46,11 @@ const cart = definePrimitive({
   }),
 })
 
-const parts = createParts(cart, { trigger: "button", content: "div", close: "button" })
+const parts = createParts(cart, {
+  trigger: "button",
+  content: "div",
+  close: "button",
+})
 
 const Cart = parts.Root
 
@@ -76,7 +80,9 @@ function Example() {
           openOnHover={openOnHover}
           delay={200}
           dismissible={dismissible}
-          onDismissAttempt={(details: { reason: string }) => log(`Kept open: ${details.reason}`)}
+          onDismissAttempt={(details: { reason: string }) =>
+            log(`Kept open: ${details.reason}`)
+          }
         >
           <CartTrigger>Cart</CartTrigger>
           <CartContent sideOffset={6}>
@@ -92,7 +98,11 @@ function Example() {
       </div>
       <div data-slot="row">
         <label data-slot="label">
-          <input type="checkbox" checked={modal} onChange={(event) => setModal(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={modal}
+            onChange={(event) => setModal(event.target.checked)}
+          />
           Modal
         </label>
         <label data-slot="label">
@@ -116,4 +126,12 @@ function Example() {
   )
 }
 
-export { Cart, cart, CartClose, CartContent, type CartOptions, CartTrigger, Example }
+export {
+  Cart,
+  cart,
+  CartClose,
+  CartContent,
+  type CartOptions,
+  CartTrigger,
+  Example,
+}

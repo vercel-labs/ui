@@ -37,15 +37,18 @@ async function mount(onSelect?: (event: Event) => void) {
                   h(
                     "a",
                     mergeProps(
-                      { href: "/settings", onClick: (event: Event) => event.preventDefault() },
-                      props,
+                      {
+                        href: "/settings",
+                        onClick: (event: Event) => event.preventDefault(),
+                      },
+                      props
                     ),
-                    "Settings",
+                    "Settings"
                   ),
-              },
-            ),
+              }
+            )
           ),
-        ],
+        ]
       ),
   })
   app.mount(document.body.appendChild(document.createElement("div")))
@@ -53,7 +56,8 @@ async function mount(onSelect?: (event: Event) => void) {
   return state
 }
 
-const link = () => document.querySelector<HTMLAnchorElement>('a[href="/settings"]')!
+const link = () =>
+  document.querySelector<HTMLAnchorElement>('a[href="/settings"]')!
 
 test("a link item the router navigates closes the menu and runs its action", async () => {
   const state = await mount()
@@ -73,7 +77,9 @@ test("@select can still keep the menu open", async () => {
 
 test("a click that opens the link elsewhere leaves the menu open", async () => {
   const state = await mount()
-  link().dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, metaKey: true }))
+  link().dispatchEvent(
+    new MouseEvent("click", { bubbles: true, cancelable: true, metaKey: true })
+  )
   await nextTick()
   expect(state.open).toBe(true)
 })

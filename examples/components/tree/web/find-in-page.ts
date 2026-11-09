@@ -9,7 +9,11 @@ const items: TreeItemData[] = [
     children: [
       { value: "mercury", label: "Mercury" },
       { value: "venus", label: "Venus" },
-      { value: "earth", label: "Earth", children: [{ value: "moon", label: "The Moon" }] },
+      {
+        value: "earth",
+        label: "Earth",
+        children: [{ value: "moon", label: "The Moon" }],
+      },
       {
         value: "mars",
         label: "Mars",
@@ -25,14 +29,18 @@ const items: TreeItemData[] = [
     label: "Dwarf planets",
     children: [
       { value: "ceres", label: "Ceres" },
-      { value: "pluto", label: "Pluto", children: [{ value: "charon", label: "Charon" }] },
+      {
+        value: "pluto",
+        label: "Pluto",
+        children: [{ value: "charon", label: "Charon" }],
+      },
     ],
   },
 ]
 
 function markup(items: TreeItemData[]) {
   let html = ""
-  for (const item of items)
+  for (const item of items) {
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
@@ -45,6 +53,7 @@ function markup(items: TreeItemData[]) {
         </ui-tree-item-label>
         ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
       </ui-tree-item>`
+  }
   return html
 }
 

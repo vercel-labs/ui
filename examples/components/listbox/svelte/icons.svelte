@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { ArchiveIcon, ArrowRightIcon, MailIcon, PencilIcon, StarIcon } from "@lucide/svelte"
+  import {
+    ArchiveIcon,
+    ArrowRightIcon,
+    MailIcon,
+    PencilIcon,
+    StarIcon,
+  } from "@lucide/svelte"
   import { Listbox, ListboxItem, ListboxItemIcon } from "@ui-sdk/svelte/listbox"
 
   const views = [

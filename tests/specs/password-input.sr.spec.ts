@@ -14,11 +14,17 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
@@ -27,13 +33,19 @@ async function record(page: Page, steps: () => Promise<void>) {
 const withoutNoise = (log: string[]) =>
   log
     .filter((phrase) => !phrase.startsWith("polite:"))
-    .map((phrase) => phrase.replace(", not disabled", "").replace(", 1 control", ""))
+    .map((phrase) =>
+      phrase.replace(", not disabled", "").replace(", 1 control", "")
+    )
 
 const { password } = passwordInputFixture
 
 // Focuses the field, tabs on to the toggle and presses it, back to the field,
 // which is a text field now, and on to the toggle again, which is pressed.
-test("announcements while showing and hiding a password with a keyboard", async ({ page, open, tab }) => {
+test("announcements while showing and hiding a password with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("password-input", { sr: "" })
   const field = page.getByLabel(password.label, { exact: true })
   const toggle = buttonNamed(page, password.toggle)

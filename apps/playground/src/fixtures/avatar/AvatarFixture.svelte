@@ -34,7 +34,9 @@
           crossorigin={item.crossOrigin}
         />
       {/if}
-      <AvatarFallback class="avatar-fallback" delay={item.delay}>{item.initials}</AvatarFallback>
+      <AvatarFallback class="avatar-fallback" delay={item.delay}
+        >{item.initials}</AvatarFallback
+      >
     </Avatar>
   {/each}
   <button onclick={() => (src = avatarFixture.nextSrc)}>Change image</button>

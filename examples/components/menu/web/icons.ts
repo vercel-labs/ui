@@ -48,7 +48,9 @@ function mount(root: HTMLElement) {
   `
   root
     .querySelector("ui-menu")!
-    .addEventListener("action", (event) => log(root, `Chose ${event.detail.value}`))
+    .addEventListener("action", (event) =>
+      log(root, `Chose ${event.detail.value}`)
+    )
 }
 
 export { mount }

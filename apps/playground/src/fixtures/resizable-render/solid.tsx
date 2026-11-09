@@ -1,4 +1,8 @@
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/solid/resizable"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
 
@@ -12,7 +16,12 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Resizable class="resizable" onLayoutCommit={(layout) => setAction(`layout:${layout.map(Math.round)}`)}>
+      <Resizable
+        class="resizable"
+        onLayoutCommit={(layout) =>
+          setAction(`layout:${layout.map(Math.round)}`)
+        }
+      >
         <ResizablePanel
           defaultSize={30}
           collapsible
@@ -23,15 +32,25 @@ function Fixture() {
         >
           {(state) => {
             counts.renders++
-            return <span class="panel-state">{state.collapsed ? "Collapsed" : "Open"}</span>
+            return (
+              <span class="panel-state">
+                {state.collapsed ? "Collapsed" : "Open"}
+              </span>
+            )
           }}
         </ResizablePanel>
         <ResizableHandle
           render={(props) => <span {...props} />}
           aria-label="Resize files"
-          class={(state) => `resizable-handle ${state.dragging ? "is-dragging" : "is-idle"}`}
+          class={(state) =>
+            `resizable-handle ${state.dragging ? "is-dragging" : "is-idle"}`
+          }
         />
-        <ResizablePanel class="resizable-panel" role="group" aria-label="Editor">
+        <ResizablePanel
+          class="resizable-panel"
+          role="group"
+          aria-label="Editor"
+        >
           {(state) => <span class="panel-size">{Math.round(state.size)}</span>}
         </ResizablePanel>
       </Resizable>

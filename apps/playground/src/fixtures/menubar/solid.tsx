@@ -20,26 +20,40 @@ const controller = createMenubarController()
 
 function Fixture() {
   // Specs drive the menubar through its controller. There's no window on the server.
-  if (!isServer) (window as unknown as { __menubar: typeof controller }).__menubar = controller
+  if (!isServer) {
+    ;(window as unknown as { __menubar: typeof controller }).__menubar =
+      controller
+  }
   const [action, setAction] = createSignal("")
   // Read here, not at module level, so the server reads each request's URL.
   const options = menubarOptions()
   return (
     <div class="fixture">
       <button>Before</button>
-      <Menubar class="menubar" aria-label={f.label} controller={controller} {...options}>
+      <Menubar
+        class="menubar"
+        aria-label={f.label}
+        controller={controller}
+        {...options}
+      >
         <Menu onAction={setAction}>
           <MenuTrigger>{f.file.trigger}</MenuTrigger>
           <MenuContent class="popup">
             <For each={f.file.items}>
               {(item) => (
-                <MenuItem class="item" value={item.value} shortcut={item.shortcut}>
+                <MenuItem
+                  class="item"
+                  value={item.value}
+                  shortcut={item.shortcut}
+                >
                   {item.label}
                 </MenuItem>
               )}
             </For>
             <MenuSub>
-              <MenuSubTrigger class="item">{f.file.share.trigger}</MenuSubTrigger>
+              <MenuSubTrigger class="item">
+                {f.file.share.trigger}
+              </MenuSubTrigger>
               <MenuSubContent class="popup">
                 <For each={f.file.share.items}>
                   {(item) => (
@@ -61,19 +75,31 @@ function Fixture() {
           <MenuContent class="popup">
             <For each={f.edit.items}>
               {(item) => (
-                <MenuItem class="item" value={item.value} disabled={item.disabled}>
+                <MenuItem
+                  class="item"
+                  value={item.value}
+                  disabled={item.disabled}
+                >
                   {item.label}
                 </MenuItem>
               )}
             </For>
           </MenuContent>
         </Menu>
-        <Menu onCheckedChange={(checked, { value }) => setAction(`${value}: ${checked ? "on" : "off"}`)}>
+        <Menu
+          onCheckedChange={(checked, { value }) =>
+            setAction(`${value}: ${checked ? "on" : "off"}`)
+          }
+        >
           <MenuTrigger shortcut={f.view.shortcut}>{f.view.trigger}</MenuTrigger>
           <MenuContent class="popup">
             <For each={f.view.checkboxes}>
               {(item) => (
-                <MenuCheckboxItem class="item" value={item.value} defaultChecked={item.defaultChecked}>
+                <MenuCheckboxItem
+                  class="item"
+                  value={item.value}
+                  defaultChecked={item.defaultChecked}
+                >
                   {item.label}
                 </MenuCheckboxItem>
               )}

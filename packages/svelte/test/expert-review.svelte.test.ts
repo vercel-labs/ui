@@ -7,7 +7,9 @@ import App from "./apps/expert-review-app.svelte"
 const log: string[] = []
 let app: ReturnType<typeof mount> | undefined
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
 })
@@ -23,7 +25,9 @@ function render() {
   return props
 }
 const button = (text: string) =>
-  [...document.querySelectorAll("button")].find((el) => el.textContent === text)!
+  [...document.querySelectorAll("button")].find(
+    (el) => el.textContent === text
+  )!
 
 test("a handler on a component that renders its own element runs first and can prevent the built-in click", () => {
   render()
@@ -35,7 +39,8 @@ test("a handler on a component that renders its own element runs first and can p
 
 test("a refusing function binding set to the default after mount keeps its value", () => {
   const props = render()
-  const panel = () => document.querySelector('[role="tabpanel"]:not([hidden])')?.textContent
+  const panel = () =>
+    document.querySelector('[role="tabpanel"]:not([hidden])')?.textContent
   props.api.set("a")
   flushSync()
   button("Beta").click()

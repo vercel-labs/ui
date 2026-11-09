@@ -20,7 +20,11 @@ const count = (kind: "item" | "content" | "thumb") => (countRender(kind), "")
   <div class="fixture scroll-fixture">
     <button>Before</button>
     <ScrollArea class="scroll-area" type="always">
-      <ScrollAreaViewport class="scroll-area-viewport" role="region" aria-label="Items">
+      <ScrollAreaViewport
+        class="scroll-area-viewport"
+        role="region"
+        aria-label="Items"
+      >
         <ScrollAreaContent>
           {{ count("content") }}
           <p v-for="item in items" :key="item.value" class="scroll-area-item">

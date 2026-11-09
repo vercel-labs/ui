@@ -1,5 +1,10 @@
 import * as React from "react"
-import { formatColor, mixColor, parseColor, type ColorSpace } from "@ui-sdk/core/color"
+import {
+  formatColor,
+  mixColor,
+  parseColor,
+  type ColorSpace,
+} from "@ui-sdk/core/color"
 
 const spaces: [ColorSpace, string][] = [
   ["oklab", "Oklab"],
@@ -13,16 +18,26 @@ function Example() {
   const [from, setFrom] = React.useState("#2563eb")
   const [to, setTo] = React.useState("#facc15")
   const [space, setSpace] = React.useState<ColorSpace>("oklab")
-  const mixes = steps.map((step) => mixColor(parseColor(from)!, parseColor(to)!, step, { space }))
+  const mixes = steps.map((step) =>
+    mixColor(parseColor(from)!, parseColor(to)!, step, { space })
+  )
   return (
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="color" value={from} onChange={(event) => setFrom(event.target.value)} />
+          <input
+            type="color"
+            value={from}
+            onChange={(event) => setFrom(event.target.value)}
+          />
           From
         </label>
         <label data-slot="label">
-          <input type="color" value={to} onChange={(event) => setTo(event.target.value)} />
+          <input
+            type="color"
+            value={to}
+            onChange={(event) => setTo(event.target.value)}
+          />
           To
         </label>
         <select
@@ -39,7 +54,11 @@ function Example() {
       </div>
       <ol data-slot="color-steps">
         {mixes.map((mix, index) => (
-          <li key={index} title={formatColor(mix, "hex")} style={{ background: formatColor(mix) }} />
+          <li
+            key={index}
+            title={formatColor(mix, "hex")}
+            style={{ background: formatColor(mix) }}
+          />
         ))}
       </ol>
     </div>

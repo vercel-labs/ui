@@ -8,9 +8,15 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
-test("a pagination hydrates without mismatches and pages", async ({ page, open }) => {
+test("a pagination hydrates without mismatches and pages", async ({
+  page,
+  open,
+}) => {
   await open("pagination", { page: "5" })
   await page.waitForLoadState("networkidle")
   expect(await range(page)).toBe("1 … 4 5 6 … 10")
@@ -19,7 +25,10 @@ test("a pagination hydrates without mismatches and pages", async ({ page, open }
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("the server renders links with their hrefs, and the ends without", async ({ page, open }) => {
+test("the server renders links with their hrefs, and the ends without", async ({
+  page,
+  open,
+}) => {
   await open("pagination", { links: "" })
   await expect(part(page, 2, "link")).toHaveAttribute("href", "#page-2")
   await expect(part(page, f.previous, "link")).not.toHaveAttribute("href")

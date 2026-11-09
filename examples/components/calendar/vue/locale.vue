@@ -14,7 +14,12 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 </script>
 
 <template>
-  <Calendar locale="de-DE" :week-starts-on="1" weekday-format="narrow" default-value="2026-10-16">
+  <Calendar
+    locale="de-DE"
+    :week-starts-on="1"
+    weekday-format="narrow"
+    default-value="2026-10-16"
+  >
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
         <ChevronLeftIcon aria-hidden="true" />

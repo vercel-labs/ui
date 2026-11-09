@@ -20,5 +20,9 @@ export type {
   TextareaState,
   TextareaSubmitDetails,
 } from "@ui-sdk/core/input"
-export type { InputEvents, UiInputElement, UiInputGroupElement } from "../events"
+export type {
+  InputEvents,
+  UiInputElement,
+  UiInputGroupElement,
+} from "../events"
 export { createInputController } from "@ui-sdk/core/input"

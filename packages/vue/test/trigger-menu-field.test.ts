@@ -36,7 +36,13 @@ test("a field control binds a trigger menu input that renders its own #render el
   })
   const el = document.body.appendChild(document.createElement("div"))
   app = createApp({
-    components: { TriggerMenu, Field, FieldControl, FieldLabel, TriggerMenuInput },
+    components: {
+      TriggerMenu,
+      Field,
+      FieldControl,
+      FieldLabel,
+      TriggerMenuInput,
+    },
     render: new Function("Vue", code)(Vue),
   })
   app.mount(el)
@@ -46,6 +52,8 @@ test("a field control binds a trigger menu input that renders its own #render el
   expect(el.querySelectorAll("input, textarea")).toHaveLength(1)
   expect(input.id).toBeTruthy()
   expect(el.querySelector("label")!.htmlFor).toBe(input.id)
-  expect(input.getAttribute("aria-labelledby")).toBe(el.querySelector("label")!.id)
+  expect(input.getAttribute("aria-labelledby")).toBe(
+    el.querySelector("label")!.id
+  )
   expect(input.getAttribute("role")).toBe("combobox")
 })

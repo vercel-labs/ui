@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { PopoverTriggerProps, PopoverTriggerState } from "@ui-sdk/core/popover"
+  import type {
+    PopoverTriggerProps,
+    PopoverTriggerState,
+  } from "@ui-sdk/core/popover"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import type { PopoverContext } from "./context"
@@ -12,13 +15,14 @@
     payload,
     shortcut,
     ...rest
-  }: PartProps<"button", PopoverTriggerState> & PopoverTriggerProps & { owner: PopoverContext } = $props()
+  }: PartProps<"button", PopoverTriggerState> &
+    PopoverTriggerProps & { owner: PopoverContext } = $props()
 
   const id = $props.id()
   const trigger = useHandlePart(
     () => owner,
     "trigger",
-    () => ({ id, disabled, payload, shortcut }),
+    () => ({ id, disabled, payload, shortcut })
   )
 </script>
 

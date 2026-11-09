@@ -22,7 +22,9 @@ const seats = definePrimitive({
         "aria-label": `Seat ${part.key}`,
         "aria-pressed": String(state.selected === part.key),
       }),
-      live: live((state, part) => ({ "data-hovered": state.hovered === part.key ? "" : undefined })),
+      live: live((state, part) => ({
+        "data-hovered": state.hovered === part.key ? "" : undefined,
+      })),
       press: ({ api, key }) => api.choose(key),
       on: {
         pointerenter: (_event, { api, key }) => api.hover(key),
@@ -50,12 +52,14 @@ function Example() {
     <Seats aria-label="Seats">
       <div data-slot="seats-grid">
         {rows.flatMap((row) =>
-          Array.from({ length: 8 }, (_, index) => `${row}${index + 1}`).map((value) => (
-            <Seat key={value} value={value} />
-          )),
+          Array.from({ length: 8 }, (_, index) => `${row}${index + 1}`).map(
+            (value) => <Seat key={value} value={value} />
+          )
         )}
       </div>
-      <SeatsLabel data-seat>{({ seat }) => (seat ? `Seat ${seat}` : "Choose a seat")}</SeatsLabel>
+      <SeatsLabel data-seat>
+        {({ seat }) => (seat ? `Seat ${seat}` : "Choose a seat")}
+      </SeatsLabel>
     </Seats>
   )
 }

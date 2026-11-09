@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui-sdk/svelte"
+  import {
+    Accordion,
+    AccordionHeader,
+    AccordionItem,
+    AccordionPanel,
+    AccordionTrigger,
+  } from "@ui-sdk/svelte"
   import { perfSize } from "tests/fixtures/perf.ts"
 
   // An accordion of N items, like a long FAQ.
@@ -15,9 +21,13 @@
     {#each items as index (index)}
       <AccordionItem class="accordion-item" value={`item-${index}`}>
         <AccordionHeader class="accordion-header">
-          <AccordionTrigger class="accordion-trigger">Question {index + 1}</AccordionTrigger>
+          <AccordionTrigger class="accordion-trigger"
+            >Question {index + 1}</AccordionTrigger
+          >
         </AccordionHeader>
-        <AccordionPanel class="accordion-panel">Answer {index + 1}</AccordionPanel>
+        <AccordionPanel class="accordion-panel"
+          >Answer {index + 1}</AccordionPanel
+        >
       </AccordionItem>
     {/each}
   </Accordion>

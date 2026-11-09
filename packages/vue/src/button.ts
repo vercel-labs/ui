@@ -1,7 +1,15 @@
-import { button as buttonPrimitive, type ButtonActionDetails } from "@ui-sdk/core/button"
+import {
+  button as buttonPrimitive,
+  type ButtonActionDetails,
+} from "@ui-sdk/core/button"
 import { defineComponent, type PropType } from "vue"
 import { withElement } from "./create-parts"
-import { optionalBoolean, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 
 /**
  * A button, or a link or any element that acts as one through the `render` slot.
@@ -20,7 +28,9 @@ const Button = withElement(
       debug: optionalBoolean,
       // `@click="save"` binds here, so the button gets the handler's Promise and
       // stays pending until it settles.
-      onClick: Function as PropType<(event: MouseEvent, details: ButtonActionDetails) => unknown>,
+      onClick: Function as PropType<
+        (event: MouseEvent, details: ButtonActionDetails) => unknown
+      >,
     },
     slots: Object as PartSlots<typeof buttonPrimitive, "root">,
     setup(props) {
@@ -30,11 +40,12 @@ const Button = withElement(
         type: props.type,
         pendingAnnouncement: props.pendingAnnouncement,
         debug: props.debug,
-        action: (event, details) => props.onClick?.(event as MouseEvent, details),
+        action: (event, details) =>
+          props.onClick?.(event as MouseEvent, details),
       }))
       return usePart(button, "root", undefined, undefined, "button")
     },
-  }),
+  })
 )
 
 export { Button }

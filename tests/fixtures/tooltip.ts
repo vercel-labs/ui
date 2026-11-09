@@ -21,15 +21,27 @@ const tooltipFixture = {
     help: { trigger: "Help", content: "Opens the help center" },
     close: "Close",
   },
-  info: { trigger: "About billing", content: "Billing runs on the first of the month." },
+  info: {
+    trigger: "About billing",
+    content: "Billing runs on the first of the month.",
+  },
   // Rendered with ?disabled: a button that looks disabled, through aria-disabled, and explains why.
-  publish: { trigger: "Publish", content: "Add a title to publish", action: "publish" },
+  publish: {
+    trigger: "Publish",
+    content: "Add a title to publish",
+    action: "publish",
+  },
   // Rendered with ?shortcut: a trigger after the page's buttons, connected to the
   // Save tooltip through its controller, with a Shortcut part showing its keys.
   shortcut: { trigger: "Save copy" },
   // Rendered with ?icon-popover: an icon button that opens a popover and that its
   // tooltip names, and an icon popover trigger with no tooltip and no name.
-  iconPopover: { icon: "N", content: "Notifications", popover: "All caught up", unnamed: "?" },
+  iconPopover: {
+    icon: "N",
+    content: "Notifications",
+    popover: "All caught up",
+    unnamed: "?",
+  },
 }
 
 // Tooltip options a spec can set through the URL, for every tooltip on the page:
@@ -37,7 +49,8 @@ const tooltipFixture = {
 // ?open opens the Save tooltip from the start.
 function tooltipOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   const container = params.get("container")
   const type = params.get("type")
   return {

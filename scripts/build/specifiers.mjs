@@ -11,10 +11,19 @@ import path from "node:path"
 function withJsExtension(specifier, fromDir, extensions) {
   const target = path.resolve(fromDir, specifier)
   const namesDirectory = /(^|\/)\.\.?$|\/$/.test(specifier)
-  if (!namesDirectory && extensions.some((extension) => existsSync(target + extension)))
+  if (
+    !namesDirectory &&
+    extensions.some((extension) => existsSync(target + extension))
+  ) {
     return `${specifier}.js`
-  if (extensions.some((extension) => existsSync(path.join(target, `index${extension}`))))
+  }
+  if (
+    extensions.some((extension) =>
+      existsSync(path.join(target, `index${extension}`))
+    )
+  ) {
     return `${specifier.replace(/\/$/, "")}/index.js`
+  }
   throw new Error(`Can't resolve "${specifier}" from ${fromDir}.`)
 }
 

@@ -11,7 +11,10 @@ import {
 } from "../../foundation/forms/form"
 import type { CheckedState } from "../../foundation/forms/toggle-control"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
   PrimitiveContext,
@@ -27,7 +30,9 @@ import { createChange } from "../../foundation/kernel/input-source"
  */
 function groupChecked(selected: readonly string[], all: readonly string[]) {
   const count = all.filter((value) => selected.includes(value)).length
-  if (count === 0) return false
+  if (count === 0) {
+    return false
+  }
   return count === all.length ? true : "indeterminate"
 }
 
@@ -35,7 +40,8 @@ function groupChecked(selected: readonly string[], all: readonly string[]) {
  * Why a checkbox group's value wants to change.
  * @stable
  */
-type CheckboxGroupValueChangeReason = "item-press" | "reset" | "restore" | "imperative"
+type CheckboxGroupValueChangeReason =
+  "item-press" | "reset" | "restore" | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -65,7 +71,9 @@ function createCheckboxGroupController<T extends string = string>() {
  * `controller` option.
  * @stable
  */
-type CheckboxGroupController<T extends string = string> = ReturnType<typeof createCheckboxGroupController<T>>
+type CheckboxGroupController<T extends string = string> = ReturnType<
+  typeof createCheckboxGroupController<T>
+>
 
 /**
  * The options `checkboxGroup` takes. A component takes them as props on its
@@ -81,7 +89,10 @@ type CheckboxGroupOptions<T extends string = string> = {
    */
   defaultValue?: T[]
   /** Runs when a user or a form reset wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T[], details: ChangeDetails<CheckboxGroupValueChangeReason>) => void
+  onValueChange?: (
+    value: T[],
+    details: ChangeDetails<CheckboxGroupValueChangeReason>
+  ) => void
   /**
    * Every value a parent checkbox checks. Without it, the parent checks the
    * checkboxes in the group. Pass it to render the parent right on the server.
@@ -139,13 +150,19 @@ const same = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((value, index) => value === b[index])
 
 // What the form gets, like native checkboxes: the checked ones on the page that aren't disabled.
-const submitted = (state: GroupState) => state.enabled.filter((value) => state.value.includes(value))
+const submitted = (state: GroupState) =>
+  state.enabled.filter((value) => state.value.includes(value))
 
-function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupState, string>) {
+function checkboxGroupApi(
+  context: PrimitiveContext<CheckboxGroupOptions, GroupState, string>
+) {
   const { id, store, element } = context
   const change = createChange(context)
   // Each checkbox in the group: its root element, and whether it's disabled.
-  const children = new Map<string, { el: HTMLElement; disabled: () => boolean }>()
+  const children = new Map<
+    string,
+    { el: HTMLElement; disabled: () => boolean }
+  >()
 
   const disabled = () => isDisabled(store.get())
   const all = () => store.get().allValues ?? store.get().children
@@ -154,12 +171,19 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
   function firstEnabled() {
     for (const value of store.get().children) {
       const child = children.get(value)
-      if (child?.el.isConnected && !child.disabled()) return child.el
+      if (child?.el.isConnected && !child.disabled()) {
+        return child.el
+      }
     }
   }
 
-  function setValue(value: string[], details: { reason: CheckboxGroupValueChangeReason; event?: Event }) {
-    if (same(value, store.get().value)) return true
+  function setValue(
+    value: string[],
+    details: { reason: CheckboxGroupValueChangeReason; event?: Event }
+  ) {
+    if (same(value, store.get().value)) {
+      return true
+    }
     // Keep the document order, so forms submit values the same way every time.
     return change("value", inOrder(value, all()), details)
   }
@@ -183,8 +207,10 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
   const api = {
     id,
     getValue: () => store.get().value,
-    setValue: (value: string[], { reason = "imperative", event }: Details = {}) =>
-      !disabled() && setValue(value, { reason, event }),
+    setValue: (
+      value: string[],
+      { reason = "imperative", event }: Details = {}
+    ) => !disabled() && setValue(value, { reason, event }),
     focus: () => firstEnabled()?.focus(),
     name: () => store.get().name,
     form: () => store.get().form,
@@ -196,21 +222,25 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
     setChild(
       value: string,
       checked: boolean,
-      details: { reason: CheckboxGroupValueChangeReason; event?: Event },
+      details: { reason: CheckboxGroupValueChangeReason; event?: Event }
     ) {
-      if (disabled()) return false
+      if (disabled()) {
+        return false
+      }
       const current = store.get().value
       return setValue(
         checked
           ? [...current.filter((item) => item !== value), value]
           : current.filter((item) => item !== value),
-        details,
+        details
       )
     },
     // Whether every enabled checkbox is checked, so a parent's press can only uncheck.
     allEnabledChecked() {
       const current = store.get().value
-      return all().every((value) => children.get(value)?.disabled() || current.includes(value))
+      return all().every(
+        (value) => children.get(value)?.disabled() || current.includes(value)
+      )
     },
     // The form the group belongs to, for its checkboxes.
     formOwner: () =>
@@ -218,8 +248,13 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
       (element("group-input") as HTMLInputElement | undefined)?.form ??
       null,
     // Checks or unchecks every enabled checkbox. Disabled ones keep their state.
-    setAll(checked: boolean, details: { reason: CheckboxGroupValueChangeReason; event?: Event }) {
-      if (disabled()) return false
+    setAll(
+      checked: boolean,
+      details: { reason: CheckboxGroupValueChangeReason; event?: Event }
+    ) {
+      if (disabled()) {
+        return false
+      }
       const locked = (value: string) => children.get(value)?.disabled() ?? false
       const current = store.get().value
       const next = checked
@@ -231,21 +266,29 @@ function checkboxGroupApi(context: PrimitiveContext<CheckboxGroupOptions, GroupS
     childIds: () => store.get().ids,
     // Checkboxes in the group register as they bind.
     register(value: string, el: HTMLElement, isDisabled: () => boolean) {
-      if (!el.id) el.id = `${id}-${value.replace(/[\s%]/g, encodeURIComponent)}`
+      if (!el.id) {
+        el.id = `${id}-${value.replace(/[\s%]/g, encodeURIComponent)}`
+      }
       // Checkboxes register by value, so two with the same one, like two
       // without a `value` ("on"), replace each other.
       if (dev) {
         const other = children.get(value)?.el
-        if (other && other !== el && other.isConnected)
-          warn(`two checkboxes in a group share the value "${value}". Give each its own \`value\`.`, {
-            component: "checkbox-group",
-            id,
-          })
+        if (other && other !== el && other.isConnected) {
+          warn(
+            `two checkboxes in a group share the value "${value}". Give each its own \`value\`.`,
+            {
+              component: "checkbox-group",
+              id,
+            }
+          )
+        }
       }
       children.set(value, { el, disabled: isDisabled })
       queueMicrotask(refreshChildren)
       return () => {
-        if (children.get(value)?.el === el) children.delete(value)
+        if (children.get(value)?.el === el) {
+          children.delete(value)
+        }
         queueMicrotask(refreshChildren)
       }
     },
@@ -325,7 +368,9 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
     name: options.name,
     form: options.form,
     // Like the native `defaultChecked`, changing it changes what a reset returns to.
-    ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: options.defaultValue }),
     ...(options.value === undefined ? {} : { value: options.value }),
   }),
   live: ["ids"],
@@ -351,7 +396,8 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
           name: () => store.get().name,
           state: () => store.get().value.join("\n"),
           restore: api.internal.restore,
-          valueMissing: () => store.get().required && submitted(store.get()).length === 0,
+          valueMissing: () =>
+            store.get().required && submitted(store.get()).length === 0,
           message: () => valueMissingMessage("checkbox"),
           anchor: api.internal.anchor,
           focus: api.focus,
@@ -392,7 +438,10 @@ const checkboxGroupPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `checkboxGroup`.
  * @stable
  */
-interface CheckboxGroupPrimitive extends WithGeneric<typeof checkboxGroupPrimitive, CheckboxGroupGeneric> {}
+interface CheckboxGroupPrimitive extends WithGeneric<
+  typeof checkboxGroupPrimitive,
+  CheckboxGroupGeneric
+> {}
 
 /**
  * The checkbox group primitive, with the slots `group`, `group-input`.

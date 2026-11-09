@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
+  import {
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    EllipsisIcon,
+  } from "@lucide/svelte"
   import {
     Pagination,
     PaginationEllipsis,
@@ -37,7 +41,13 @@
       </select>
     </label>
   </div>
-  <Pagination bind:page aria-label="Pagination" {total} {pageSize} onPageChange={(next) => log(`Page ${next}`)}>
+  <Pagination
+    bind:page
+    aria-label="Pagination"
+    {total}
+    {pageSize}
+    onPageChange={(next) => log(`Page ${next}`)}
+  >
     <PaginationList>
       {#snippet children(state)}
         <PaginationItem>

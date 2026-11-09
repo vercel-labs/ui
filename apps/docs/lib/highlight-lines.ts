@@ -4,8 +4,12 @@ import type { ShikiTransformer } from "shiki"
 const highlightLines = {
   name: "highlight-lines",
   line(node, line) {
-    const ranges = String(this.options.meta?.__raw ?? "").match(/\{([\d,\s-]+)\}/)?.[1]
-    if (ranges && inRanges(line, ranges)) this.addClassToHast(node, "highlighted")
+    const ranges = String(this.options.meta?.__raw ?? "").match(
+      /\{([\d,\s-]+)\}/
+    )?.[1]
+    if (ranges && inRanges(line, ranges)) {
+      this.addClassToHast(node, "highlighted")
+    }
   },
 } satisfies ShikiTransformer
 

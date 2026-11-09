@@ -1,7 +1,8 @@
 import { accordionFixture, describeValue } from "tests/fixtures/accordion.ts"
 import { accordionOptions } from "tests/fixtures/page.ts"
 
-const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
+const escape = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
 
 function markup() {
   const items = accordionFixture.items
@@ -14,7 +15,7 @@ function markup() {
           <ui-accordion-panel class="accordion-panel">${escape(item.content)}${
             item.field ? `<label> ${escape(item.field)} <input></label>` : ""
           }${item.close ? `<button data-close="${item.value}">${escape(item.close)}</button>` : ""}</ui-accordion-panel>
-        </ui-accordion-item>`,
+        </ui-accordion-item>`
     )
     .join("")
   return `
@@ -31,29 +32,47 @@ function markup() {
 }
 
 type AccordionElement = HTMLElement & {
-  api?: { open: (value: string) => void; close: (value: string) => void; getValue: () => string[] }
+  api?: {
+    open: (value: string) => void
+    close: (value: string) => void
+    getValue: () => string[]
+  }
 }
 
 async function mount(root: HTMLElement) {
   const { cancel, defaultValue, ...options } = accordionOptions()
   root.innerHTML = markup()
   const accordion = root.querySelector<AccordionElement>("ui-accordion")!
-  if (defaultValue) accordion.setAttribute("default-value", defaultValue.join(","))
+  if (defaultValue) {
+    accordion.setAttribute("default-value", defaultValue.join(","))
+  }
   for (const [name, value] of Object.entries({
     multiple: options.multiple,
     disabled: options.disabled,
     "keep-mounted": options.keepMounted,
     "hidden-until-found": options.hiddenUntilFound,
-  }))
-    if (value) accordion.setAttribute(name, "")
-  if (options.collapsible === false) accordion.setAttribute("collapsible", "false")
+  })) {
+    if (value) {
+      accordion.setAttribute(name, "")
+    }
+  }
+  if (options.collapsible === false) {
+    accordion.setAttribute("collapsible", "false")
+  }
   await import("@ui-sdk/web/accordion")
-  root.querySelector("#controller")!.addEventListener("click", () => accordion.api?.open("support"))
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => accordion.api?.open("support"))
   root
     .querySelector("#toggle-warranty")!
-    .addEventListener("click", () => root.querySelector('[value="warranty"]')!.toggleAttribute("disabled"))
-  for (const button of root.querySelectorAll<HTMLElement>("[data-close]"))
-    button.addEventListener("click", () => accordion.api?.close(button.dataset.close!))
+    .addEventListener("click", () =>
+      root.querySelector('[value="warranty"]')!.toggleAttribute("disabled")
+    )
+  for (const button of root.querySelectorAll<HTMLElement>("[data-close]")) {
+    button.addEventListener("click", () =>
+      accordion.api?.close(button.dataset.close!)
+    )
+  }
   root.addEventListener(
     "openchangecomplete",
     (event) => {
@@ -62,17 +81,22 @@ async function mount(root: HTMLElement) {
       root.querySelector('output[aria-label="Last completed"]')!.textContent =
         `${item} ${open ? "open" : "closed"}`
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuechange",
     (event) => {
       const detail = (event as CustomEvent<{ value: string[] }>).detail
-      if (cancel && detail.value.includes(cancel) && !accordion.api?.getValue().includes(cancel))
+      if (
+        cancel &&
+        detail.value.includes(cancel) &&
+        !accordion.api?.getValue().includes(cancel)
+      ) {
         return event.preventDefault()
+      }
       root.querySelector("output")!.textContent = describeValue(detail.value)
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

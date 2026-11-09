@@ -1,11 +1,16 @@
 <script setup lang="ts">
 // A client-side router's link: it navigates without a page load, unless a
 // handler before it prevented that.
-const props = defineProps<{ href?: string; onClick?: (event: MouseEvent) => void }>()
+const props = defineProps<{
+  href?: string
+  onClick?: (event: MouseEvent) => void
+}>()
 
 function navigate(event: MouseEvent) {
   props.onClick?.(event)
-  if (event.defaultPrevented) return
+  if (event.defaultPrevented) {
+    return
+  }
   event.preventDefault()
   history.pushState(null, "", props.href)
 }

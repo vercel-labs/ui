@@ -28,16 +28,28 @@ const { save, toolbar, profile, info, publish, iconPopover } = tooltipFixture
 const action = ref("")
 
 function publishPress(event: MouseEvent) {
-  if ((event.currentTarget as HTMLElement).getAttribute("aria-disabled") !== "true")
+  if (
+    (event.currentTarget as HTMLElement).getAttribute("aria-disabled") !==
+    "true"
+  ) {
     action.value = publish.action
+  }
 }
 </script>
 
 <template>
   <div class="fixture tooltip-page">
     <button>Before</button>
-    <Tooltip v-bind="options" :controller="controller" :default-open="parts.open" :shortcut="save.shortcut">
-      <TooltipTrigger :disabled="parts.nativeDisabled || undefined" @click="action = 'save'">
+    <Tooltip
+      v-bind="options"
+      :controller="controller"
+      :default-open="parts.open"
+      :shortcut="save.shortcut"
+    >
+      <TooltipTrigger
+        :disabled="parts.nativeDisabled || undefined"
+        @click="action = 'save'"
+      >
         {{ save.trigger }}
       </TooltipTrigger>
       <TooltipContent class="tooltip" v-bind="content">
@@ -58,7 +70,9 @@ function publishPress(event: MouseEvent) {
       <Tooltip v-bind="options">
         <TooltipTrigger>
           <template #render="{ props }">
-            <PopoverTrigger v-bind="props">{{ profile.trigger }}</PopoverTrigger>
+            <PopoverTrigger v-bind="props">{{
+              profile.trigger
+            }}</PopoverTrigger>
           </template>
         </TooltipTrigger>
         <TooltipContent class="tooltip">{{ profile.content }}</TooltipContent>
@@ -68,7 +82,9 @@ function publishPress(event: MouseEvent) {
         <div class="actions">
           <Tooltip v-bind="options">
             <TooltipTrigger>{{ profile.help.trigger }}</TooltipTrigger>
-            <TooltipContent class="tooltip">{{ profile.help.content }}</TooltipContent>
+            <TooltipContent class="tooltip">{{
+              profile.help.content
+            }}</TooltipContent>
           </Tooltip>
           <PopoverClose>{{ profile.close }}</PopoverClose>
         </div>
@@ -81,7 +97,9 @@ function publishPress(event: MouseEvent) {
       <TooltipContent class="tooltip">{{ info.content }}</TooltipContent>
     </Tooltip>
     <Tooltip v-if="parts.disabled" v-bind="options">
-      <TooltipTrigger aria-disabled="true" @click="publishPress">{{ publish.trigger }}</TooltipTrigger>
+      <TooltipTrigger aria-disabled="true" @click="publishPress">{{
+        publish.trigger
+      }}</TooltipTrigger>
       <TooltipContent class="tooltip">{{ publish.content }}</TooltipContent>
     </Tooltip>
     <template v-if="parts.iconPopover">
@@ -94,7 +112,9 @@ function publishPress(event: MouseEvent) {
               </PopoverTrigger>
             </template>
           </TooltipTrigger>
-          <TooltipContent class="tooltip">{{ iconPopover.content }}</TooltipContent>
+          <TooltipContent class="tooltip">{{
+            iconPopover.content
+          }}</TooltipContent>
         </Tooltip>
         <PopoverContent class="popup">{{ iconPopover.popover }}</PopoverContent>
       </Popover>

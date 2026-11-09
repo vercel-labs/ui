@@ -11,9 +11,15 @@ const mounts: { unmount: () => void }[] = []
 afterEach(() => mounts.splice(0).forEach((mounted) => mounted.unmount()))
 
 function render(options: { onValueChange?: () => void } = {}) {
-  const view = mount(navigationMenu, { defaultValue: "learn", ...options }, markup)
+  const view = mount(
+    navigationMenu,
+    { defaultValue: "learn", ...options },
+    markup
+  )
   mounts.push(view)
-  const link = view.root.querySelector<HTMLElement>('[data-slot="navigation-menu-link"]')!
+  const link = view.root.querySelector<HTMLElement>(
+    '[data-slot="navigation-menu-link"]'
+  )!
   return { view, link }
 }
 
@@ -35,7 +41,9 @@ test("a pressed link closes the menu once the click has reached every handler", 
 
 test("a pressed link still closes the menu when a handler stops the click", async () => {
   const { view, link } = render()
-  link.parentElement!.addEventListener("click", (event) => event.stopPropagation())
+  link.parentElement!.addEventListener("click", (event) =>
+    event.stopPropagation()
+  )
   link.click()
   await new Promise((resolve) => setTimeout(resolve))
   expect(view.api.isOpen()).toBe(false)

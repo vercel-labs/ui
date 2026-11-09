@@ -100,16 +100,23 @@ The server reads the value from `cookie`, and the browser from `document.cookie`
   let { children } = $props()
 
   const density = createLocalStorage("density")
-  const script = density.script({ attribute: "data-density", values: ["comfortable", "compact"] })
+  const script = density.script({
+    attribute: "data-density",
+    values: ["comfortable", "compact"],
+  })
   let element: HTMLDivElement | undefined = $state()
   // The script is in the server's HTML until then.
   let mounted = $state(false)
   // Only the server renders the attribute. Svelte writes attributes while it
   // hydrates, which would put the server's value back over the saved one.
-  const server = typeof window === "undefined" ? { "data-density": "comfortable" } : {}
+  const server =
+    typeof window === "undefined" ? { "data-density": "comfortable" } : {}
 
   $effect(() => {
-    element?.setAttribute("data-density", density.get() === "compact" ? "compact" : "comfortable")
+    element?.setAttribute(
+      "data-density",
+      density.get() === "compact" ? "compact" : "comfortable"
+    )
     mounted = true
   })
 </script>

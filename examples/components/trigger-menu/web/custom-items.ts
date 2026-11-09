@@ -29,7 +29,7 @@ function mount(root: HTMLElement) {
                   <ui-trigger-menu-item value="${person.value}" label="${person.label}"${person.disabled ? " disabled" : ""}>
                     ${person.label}
                     <span data-slot="hint">${person.disabled ? "Deactivated" : `@${person.value}`}</span>
-                  </ui-trigger-menu-item>`,
+                  </ui-trigger-menu-item>`
               )
               .join("")}
           </ui-trigger-menu-group>
@@ -56,7 +56,9 @@ function mount(root: HTMLElement) {
     },
   ]
   menu.addEventListener("itemselect", (event) => {
-    if (event.detail.value === "here") event.detail.insert("@here ")
+    if (event.detail.value === "here") {
+      event.detail.insert("@here ")
+    }
   })
 }
 

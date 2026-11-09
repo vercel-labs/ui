@@ -7,16 +7,29 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 const serverForm = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __serverForm: string }).__serverForm)
+  page.evaluate(
+    () => (window as unknown as { __serverForm: string }).__serverForm
+  )
 const searches = (page: Page) =>
   page.evaluate(
-    () => (window as unknown as { fruitSearches?: { query: string; aborted: boolean }[] }).fruitSearches,
+    () =>
+      (
+        window as unknown as {
+          fruitSearches?: { query: string; aborted: boolean }[]
+        }
+      ).fruitSearches
   )
 
 // React and Vue render to a string in the page, so a load the server started would be recorded too.
-test("an async autocomplete loads its first options once, after hydration", async ({ page, open }) => {
+test("an async autocomplete loads its first options once, after hydration", async ({
+  page,
+  open,
+}) => {
   await open("autocomplete", { async: "" })
   await page.getByRole("button", { name: "Show fruits" }).click()
   await expect(page.getByRole("option", { name: "Grape" })).toBeVisible()
@@ -29,7 +42,9 @@ test("an autocomplete with text hydrates without mismatches, and its text submit
   open,
 }) => {
   await open("autocomplete", { value: "Mango" })
-  await expect(page.getByRole("combobox", { name: "Fruit" })).toHaveValue("Mango")
+  await expect(page.getByRole("combobox", { name: "Fruit" })).toHaveValue(
+    "Mango"
+  )
   expect(await serverForm(page)).toBe("fruit=Mango")
   await page.getByRole("combobox", { name: "Fruit" }).fill("gr")
   await expect(page.getByRole("option", { name: "Grape" })).toBeVisible()

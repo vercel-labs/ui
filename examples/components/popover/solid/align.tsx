@@ -22,7 +22,9 @@ function Example() {
             <PopoverTrigger>{align.label}</PopoverTrigger>
             <PopoverContent align={align.value} sideOffset={8}>
               <PopoverTitle>Delivery window</PopoverTitle>
-              <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
+              <PopoverDescription>
+                Arrives Tuesday between 9 AM and noon.
+              </PopoverDescription>
             </PopoverContent>
           </Popover>
         )}

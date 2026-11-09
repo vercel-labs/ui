@@ -1,6 +1,11 @@
 import { dateInput, type DateInputOptions } from "@ui-sdk/core/date-input"
 import { useFieldControl } from "./field-context"
-import { useSegmentedRoot, useSegment, type RootProps, type SegmentProps } from "./segmented-input"
+import {
+  useSegmentedRoot,
+  useSegment,
+  type RootProps,
+  type SegmentProps,
+} from "./segmented-input"
 import { usePrimitive } from "./use-primitive"
 
 /**

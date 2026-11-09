@@ -5,7 +5,10 @@ description: Connect a form control to its label, description, and validation er
 
 A field connects a form control to its label, its description and the errors it shows, and wires up `id`, `for` and `aria-describedby` for you.
 
-<ComponentExample name="field/input" caption="Press Username to focus the input, then type a name." />
+<ComponentExample
+  name="field/input"
+  caption="Press Username to focus the input, then type a name."
+/>
 
 ## Installation
 
@@ -29,7 +32,12 @@ Field
 
 ```vue
 <script setup lang="ts">
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 import { Input } from "@ui-sdk/vue/input"
 </script>
 
@@ -316,29 +324,50 @@ A field has no change events. Read its state from the parts' data attributes, or
 
 ### Field
 
-<TypeTable path="../../packages/core/src/components/field/field.ts" name="FieldOptions" />
+<TypeTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldOptions"
+/>
 
 ### FieldError
 
-<TypeTable path="../../packages/core/src/components/field/field.ts" name="FieldErrorProps" />
+<TypeTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldErrorProps"
+/>
 
 ### FieldSet
 
-<TypeTable path="../../packages/core/src/components/field/field-set.ts" name="FieldSetOptions" />
+<TypeTable
+  path="../../packages/core/src/components/field/field-set.ts"
+  name="FieldSetOptions"
+/>
 
 ### State
 
-<StateTable path="../../packages/core/src/components/field/field.ts" name="FieldState" />
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldState"
+/>
 
-<StateTable path="../../packages/core/src/components/field/field.ts" name="FieldErrorState" />
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldErrorState"
+/>
 
 A `FieldDescription` receives the field's state, or only `disabled` when it describes a field set.
 
-<StateTable path="../../packages/core/src/components/field/field.ts" name="FieldDescriptionState" />
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldDescriptionState"
+/>
 
 Every part of a field set receives the same state.
 
-<StateTable path="../../packages/core/src/components/field/field-set.ts" name="FieldSetState" />
+<StateTable
+  path="../../packages/core/src/components/field/field-set.ts"
+  name="FieldSetState"
+/>
 
 ## Accessibility
 

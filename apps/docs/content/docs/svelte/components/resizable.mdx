@@ -35,7 +35,11 @@ Import the parts and put them together:
 
 ```svelte
 <script lang="ts">
-  import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/svelte/resizable"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+  } from "@ui-sdk/svelte/resizable"
 </script>
 
 <Resizable>
@@ -183,13 +187,20 @@ export function load({ cookies }) {
 
 ```svelte title="src/routes/editor.svelte"
 <script lang="ts">
-  import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/svelte/resizable"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+    type ResizableStorage,
+  } from "@ui-sdk/svelte/resizable"
 
   let { sidebar, main }: { sidebar: number; main: number } = $props()
 
   const cookieStorage: ResizableStorage = {
     getItem: (key) => {
-      const value = document.cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`))?.[1]
+      const value = document.cookie.match(
+        new RegExp(`(?:^|; )${key}=([^;]*)`)
+      )?.[1]
       return value === undefined ? null : decodeURIComponent(value)
     },
     setItem: (key, value) => {
@@ -273,29 +284,47 @@ Props and callbacks are the same as below, as Svelte props. `layout` can be boun
 
 ### Resizable
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableOptions"
+/>
 
 ### ResizablePanel
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelProps"
+/>
 
 ### ResizableHandle
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive.
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableState"
+/>
 
 Panels:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelState"
+/>
 
 Handles:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleState"
+/>
 
 ### Reasons
 

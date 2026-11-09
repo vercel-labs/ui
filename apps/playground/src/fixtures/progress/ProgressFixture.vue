@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Progress, ProgressIndicator, ProgressLabel, ProgressTrack, ProgressValue } from "@ui-sdk/vue"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+  ProgressValue,
+} from "@ui-sdk/vue"
 import { progressFixture } from "tests/fixtures/progress.ts"
 import { ref } from "vue"
 
@@ -23,12 +29,21 @@ const bars = [
     <Progress class="gauge" :value="value">
       <ProgressLabel>{{ upload.label }}</ProgressLabel>
       <ProgressValue class="gauge-value" />
-      <ProgressTrack class="gauge-track"><ProgressIndicator class="gauge-indicator" /></ProgressTrack>
+      <ProgressTrack class="gauge-track"
+        ><ProgressIndicator class="gauge-indicator"
+      /></ProgressTrack>
     </Progress>
-    <Progress v-for="{ label, ...bar } in bars" :key="label" class="gauge" v-bind="bar">
+    <Progress
+      v-for="{ label, ...bar } in bars"
+      :key="label"
+      class="gauge"
+      v-bind="bar"
+    >
       <ProgressLabel>{{ label }}</ProgressLabel>
       <ProgressValue class="gauge-value" />
-      <ProgressTrack class="gauge-track"><ProgressIndicator class="gauge-indicator" /></ProgressTrack>
+      <ProgressTrack class="gauge-track"
+        ><ProgressIndicator class="gauge-indicator"
+      /></ProgressTrack>
     </Progress>
     <button @click="value = Math.min(100, value + upload.step)">Advance</button>
     <button @click="value = upload.value">Restart</button>

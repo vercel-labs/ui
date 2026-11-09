@@ -5,7 +5,8 @@
  * What a phone labels the Return key, through `enterkeyhint`.
  * @experimental
  */
-type EnterKeyHint = "enter" | "done" | "go" | "next" | "previous" | "search" | "send"
+type EnterKeyHint =
+  "enter" | "done" | "go" | "next" | "previous" | "search" | "send"
 
 /**
  * The kinds of field `inputHints` knows.
@@ -50,7 +51,11 @@ type InputHintOptions = {
 }
 
 // Typed exactly as it's meant, like an address or a code: no capitals, corrections or spelling marks.
-const exact = { autoCapitalize: "none", autoCorrect: "off", spellCheck: "false" } as const
+const exact = {
+  autoCapitalize: "none",
+  autoCorrect: "off",
+  spellCheck: "false",
+} as const
 
 const kinds: Record<InputHintKind, InputHints> = {
   search: {
@@ -63,10 +68,19 @@ const kinds: Record<InputHintKind, InputHints> = {
   email: { inputMode: "email", autoComplete: "email", ...exact },
   tel: { inputMode: "tel", autoComplete: "tel" },
   url: { inputMode: "url", autoComplete: "url", ...exact },
-  "one-time-code": { inputMode: "numeric", autoComplete: "one-time-code", ...exact },
+  "one-time-code": {
+    inputMode: "numeric",
+    autoComplete: "one-time-code",
+    ...exact,
+  },
   numeric: { inputMode: "numeric", autoComplete: "off" },
   decimal: { inputMode: "decimal", autoComplete: "off" },
-  name: { autoComplete: "name", autoCapitalize: "words", autoCorrect: "off", spellCheck: "false" },
+  name: {
+    autoComplete: "name",
+    autoCapitalize: "words",
+    autoCorrect: "off",
+    spellCheck: "false",
+  },
   username: { autoComplete: "username", ...exact },
   "current-password": { autoComplete: "current-password", ...exact },
   "new-password": { autoComplete: "new-password", ...exact },
@@ -93,8 +107,16 @@ const kinds: Record<InputHintKind, InputHints> = {
  */
 function inputHints(kind: InputHintKind, options: InputHintOptions = {}) {
   const hints: InputHints = { ...kinds[kind] }
-  if (options.enter) hints.enterKeyHint = options.enter
+  if (options.enter) {
+    hints.enterKeyHint = options.enter
+  }
   return hints
 }
 
-export { type EnterKeyHint, type InputHintKind, type InputHintOptions, type InputHints, inputHints }
+export {
+  type EnterKeyHint,
+  type InputHintKind,
+  type InputHintOptions,
+  type InputHints,
+  inputHints,
+}

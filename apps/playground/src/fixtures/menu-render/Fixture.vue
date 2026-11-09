@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/vue"
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuItem,
+  MenuTrigger,
+} from "@ui-sdk/vue"
 import { ref } from "vue"
 
 // Counts renders of each custom item, so specs can check what re-renders.
@@ -23,7 +29,9 @@ const count = (key: "watched" | "plain") => (renders[key]++, "")
         </MenuItem>
         <MenuItem class="item" value="watched">
           <template #render="{ props, state }">
-            <div v-bind="props">{{ count("watched") }}{{ state.highlighted ? "→ " : "" }}Watched</div>
+            <div v-bind="props">
+              {{ count("watched") }}{{ state.highlighted ? "→ " : "" }}Watched
+            </div>
           </template>
         </MenuItem>
         <MenuItem class="item" value="plain">
@@ -32,7 +40,9 @@ const count = (key: "watched" | "plain") => (renders[key]++, "")
           </template>
         </MenuItem>
         <MenuCheckboxItem v-slot="{ state }" value="pinned" class="item">
-          <span :class="state.checked ? 'is-checked' : 'is-unchecked'">Pinned</span>
+          <span :class="state.checked ? 'is-checked' : 'is-unchecked'"
+            >Pinned</span
+          >
         </MenuCheckboxItem>
       </MenuContent>
     </Menu>

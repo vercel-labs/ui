@@ -58,7 +58,11 @@ function Example() {
         <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
         <ComboboxList>
           {frameworks.map((framework) => (
-            <ComboboxItem key={framework.value} value={framework.value} label={framework.label}>
+            <ComboboxItem
+              key={framework.value}
+              value={framework.value}
+              label={framework.label}
+            >
               {framework.label}
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />

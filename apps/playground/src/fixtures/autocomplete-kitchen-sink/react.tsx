@@ -23,23 +23,43 @@ import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
 import { anchorOf, filterOf, listOf, search, type Variant } from "./variants"
 
-type Remote = { items: ListData<string>; status: AsyncOptionsStatus; setQuery: (query: string) => void }
+type Remote = {
+  items: ListData<string>
+  status: AsyncOptionsStatus
+  setQuery: (query: string) => void
+}
 
 // AutocompleteItem, AutocompleteGroup and AutocompleteSeparator parts for a list: the variant's own,
 // or what a data autocomplete shows.
 function Items({ list }: { list: ListData<string> }) {
   return list.map((entry, index) => {
-    if (typeof entry === "string") return null
-    if ("type" in entry && entry.type === "separator")
-      return <AutocompleteSeparator key={`separator-${index}`} className={classes.separator} />
-    if ("type" in entry && entry.type === "group")
+    if (typeof entry === "string") {
+      return null
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return (
+        <AutocompleteSeparator
+          key={`separator-${index}`}
+          className={classes.separator}
+        />
+      )
+    }
+    if ("type" in entry && entry.type === "group") {
       return (
         <AutocompleteGroup key={entry.label}>
-          <AutocompleteGroupLabel className={classes.groupLabel}>{entry.label}</AutocompleteGroupLabel>
+          <AutocompleteGroupLabel className={classes.groupLabel}>
+            {entry.label}
+          </AutocompleteGroupLabel>
           <Items list={entry.items} />
         </AutocompleteGroup>
       )
-    const item = entry as { value: string; label: string; keywords?: string[]; disabled?: boolean }
+    }
+    const item = entry as {
+      value: string
+      label: string
+      keywords?: string[]
+      disabled?: boolean
+    }
     return (
       <AutocompleteItem
         key={item.value}
@@ -55,7 +75,15 @@ function Items({ list }: { list: ListData<string> }) {
   })
 }
 
-function VariantAutocomplete({ variant, env, remote }: { variant: Variant; env: Env; remote?: Remote }) {
+function VariantAutocomplete({
+  variant,
+  env,
+  remote,
+}: {
+  variant: Variant
+  env: Env
+  remote?: Remote
+}) {
   const [value, setValue] = React.useState(variant.options?.defaultValue ?? "")
   const [open, setOpen] = React.useState(false)
   const data = variant.mode === "data" || !!remote
@@ -73,22 +101,36 @@ function VariantAutocomplete({ variant, env, remote }: { variant: Variant; env: 
         controller={env.controller}
         container={env.container}
         onValueChange={(next, details) => {
-          if (variant.controlled === "value") setValue(next)
+          if (variant.controlled === "value") {
+            setValue(next)
+          }
           remote?.setQuery(next)
           env.log(`valueChange ${JSON.stringify(next)} (${details.reason})`)
         }}
         onOpenChange={(next, details) => {
-          if (variant.controlled === "open") setOpen(next)
+          if (variant.controlled === "open") {
+            setOpen(next)
+          }
           env.log(`openChange ${next} (${details.reason})`)
         }}
         onOpenChangeComplete={(next) => env.log(`openChangeComplete ${next}`)}
-        onHighlight={(next, details) => env.log(`highlight ${JSON.stringify(next)} #${details.index}`)}
+        onHighlight={(next, details) =>
+          env.log(`highlight ${JSON.stringify(next)} #${details.index}`)
+        }
         onSubmit={(next) => env.log(`onSubmit ${JSON.stringify(next)}`)}
       >
-        <AutocompleteLabel className={classes.label}>{variant.title}</AutocompleteLabel>
-        <AutocompleteInput className={classes.input} placeholder="Search fruits…" />
+        <AutocompleteLabel className={classes.label}>
+          {variant.title}
+        </AutocompleteLabel>
+        <AutocompleteInput
+          className={classes.input}
+          placeholder="Search fruits…"
+        />
         {variant.trigger && (
-          <AutocompleteTrigger className={classes.trigger} aria-label="Show fruits">
+          <AutocompleteTrigger
+            className={classes.trigger}
+            aria-label="Show fruits"
+          >
             ▾
           </AutocompleteTrigger>
         )}
@@ -119,27 +161,49 @@ function VariantAutocomplete({ variant, env, remote }: { variant: Variant; env: 
             </AutocompleteStatus>
           )}
           <AutocompleteEmpty className={classes.empty}>
-            {(state) => (state.empty && !state.loading ? "No fruits found." : null)}
+            {(state) =>
+              state.empty && !state.loading ? "No fruits found." : null
+            }
           </AutocompleteEmpty>
-          <AutocompleteList className={variant.arrow ? classes.scrollingList : undefined}>
-            {data ? (state) => <Items list={state.items as ListData<string>} /> : <Items list={list} />}
+          <AutocompleteList
+            className={variant.arrow ? classes.scrollingList : undefined}
+          >
+            {data ? (
+              (state) => <Items list={state.items as ListData<string>} />
+            ) : (
+              <Items list={list} />
+            )}
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>
       {variant.controlled === "value" && (
         <>
-          <span className="text-xs text-neutral-600">value: {JSON.stringify(value)}</span>
-          <button type="button" className={classes.button} onClick={() => setValue("Mango")}>
+          <span className="text-xs text-neutral-600">
+            value: {JSON.stringify(value)}
+          </span>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setValue("Mango")}
+          >
             Set “Mango”
           </button>
-          <button type="button" className={classes.button} onClick={() => setValue("")}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setValue("")}
+          >
             Empty
           </button>
         </>
       )}
       {variant.controlled === "open" && (
         <label className="flex items-center gap-1.5 text-xs text-neutral-600">
-          <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={open}
+            onChange={(event) => setOpen(event.target.checked)}
+          />
           open
         </label>
       )}
@@ -163,8 +227,8 @@ function mount(root: HTMLElement) {
         ) : (
           <VariantAutocomplete variant={variant} env={env} />
         )}
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

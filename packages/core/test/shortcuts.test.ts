@@ -1,6 +1,14 @@
 import { describe, expect, test, vi } from "vitest"
-import { ariaKeyshortcuts, formatShortcut, matchesShortcut } from "../src/foundation/platform/platform"
-import { isShortcutAllowed, isTypingIn, shortcutOrder } from "../src/foundation/shortcuts/shortcut-order"
+import {
+  ariaKeyshortcuts,
+  formatShortcut,
+  matchesShortcut,
+} from "../src/foundation/platform/platform"
+import {
+  isShortcutAllowed,
+  isTypingIn,
+  shortcutOrder,
+} from "../src/foundation/shortcuts/shortcut-order"
 import { hasCommandModifier } from "../src/foundation/platform/platform"
 import { createShortcuts } from "../src/foundation/shortcuts/create-shortcuts"
 
@@ -28,9 +36,19 @@ const plain = (text: string) => text.replace(/[⁦⁩]/g, "")
 
 describe("matching shortcuts", () => {
   test("letters match the typed key, case-insensitively", () => {
-    expect(matchesShortcut(key({ key: "n", code: "KeyN", meta: true }), "mod+n", true)).toBe(true)
     expect(
-      matchesShortcut(key({ key: "N", code: "KeyN", ctrl: true, shift: true }), "mod+shift+n", false),
+      matchesShortcut(
+        key({ key: "n", code: "KeyN", meta: true }),
+        "mod+n",
+        true
+      )
+    ).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: "N", code: "KeyN", ctrl: true, shift: true }),
+        "mod+shift+n",
+        false
+      )
     ).toBe(true)
   })
 
@@ -44,41 +62,109 @@ describe("matching shortcuts", () => {
   })
 
   test("Option shortcuts on a Mac match by physical key", () => {
-    expect(matchesShortcut(key({ key: "˜", code: "KeyN", alt: true }), "alt+n", true)).toBe(true)
-    expect(matchesShortcut(key({ key: "Dead", code: "KeyN", alt: true }), "alt+n", true)).toBe(true)
-    expect(matchesShortcut(key({ key: "¡", code: "Digit1", alt: true }), "alt+1", true)).toBe(true)
+    expect(
+      matchesShortcut(key({ key: "˜", code: "KeyN", alt: true }), "alt+n", true)
+    ).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: "Dead", code: "KeyN", alt: true }),
+        "alt+n",
+        true
+      )
+    ).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: "¡", code: "Digit1", alt: true }),
+        "alt+1",
+        true
+      )
+    ).toBe(true)
   })
 
   test("other alphabets match by physical key", () => {
-    expect(matchesShortcut(key({ key: "т", code: "KeyN", ctrl: true }), "mod+n", false)).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: "т", code: "KeyN", ctrl: true }),
+        "mod+n",
+        false
+      )
+    ).toBe(true)
   })
 
   test("a Latin letter matches by what it types, so other layouts keep their letters", () => {
     // AZERTY: the key in QWERTY's A position types "q".
-    expect(matchesShortcut(key({ key: "q", code: "KeyA", ctrl: true }), "mod+a", false)).toBe(false)
-    expect(matchesShortcut(key({ key: "a", code: "KeyQ", ctrl: true }), "mod+a", false)).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: "q", code: "KeyA", ctrl: true }),
+        "mod+a",
+        false
+      )
+    ).toBe(false)
+    expect(
+      matchesShortcut(
+        key({ key: "a", code: "KeyQ", ctrl: true }),
+        "mod+a",
+        false
+      )
+    ).toBe(true)
   })
 
   test("shifted digits match by physical key", () => {
-    expect(matchesShortcut(key({ key: "!", code: "Digit1", shift: true }), "shift+1", false)).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: "!", code: "Digit1", shift: true }),
+        "shift+1",
+        false
+      )
+    ).toBe(true)
   })
 
   test("other keys match by name, with aliases", () => {
     expect(
-      matchesShortcut(key({ key: "Backspace", code: "Backspace", meta: true }), "mod+backspace", true),
+      matchesShortcut(
+        key({ key: "Backspace", code: "Backspace", meta: true }),
+        "mod+backspace",
+        true
+      )
     ).toBe(true)
     expect(matchesShortcut(key({ key: "Escape" }), "esc", true)).toBe(true)
-    expect(matchesShortcut(key({ key: "ArrowUp", alt: true }), "alt+up", true)).toBe(true)
-    expect(matchesShortcut(key({ key: " ", code: "Space", ctrl: true }), "ctrl+space", true)).toBe(true)
-    expect(matchesShortcut(key({ key: "/", code: "Slash", meta: true }), "mod+/", true)).toBe(true)
+    expect(
+      matchesShortcut(key({ key: "ArrowUp", alt: true }), "alt+up", true)
+    ).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: " ", code: "Space", ctrl: true }),
+        "ctrl+space",
+        true
+      )
+    ).toBe(true)
+    expect(
+      matchesShortcut(
+        key({ key: "/", code: "Slash", meta: true }),
+        "mod+/",
+        true
+      )
+    ).toBe(true)
   })
 
   test("modifiers must match exactly", () => {
-    expect(matchesShortcut(key({ key: "n", code: "KeyN", meta: true, shift: true }), "mod+n", true)).toBe(
-      false,
-    )
-    expect(matchesShortcut(key({ key: "n", code: "KeyN" }), "mod+n", true)).toBe(false)
-    expect(matchesShortcut(key({ key: "m", code: "KeyM", meta: true }), "mod+n", true)).toBe(false)
+    expect(
+      matchesShortcut(
+        key({ key: "n", code: "KeyN", meta: true, shift: true }),
+        "mod+n",
+        true
+      )
+    ).toBe(false)
+    expect(
+      matchesShortcut(key({ key: "n", code: "KeyN" }), "mod+n", true)
+    ).toBe(false)
+    expect(
+      matchesShortcut(
+        key({ key: "m", code: "KeyM", meta: true }),
+        "mod+n",
+        true
+      )
+    ).toBe(false)
   })
 })
 
@@ -139,8 +225,8 @@ describe("the shortcut manager", () => {
     expect(
       shortcutOrder(
         () => null,
-        () => ({ order: 2 }),
-      ),
+        () => ({ order: 2 })
+      )
     ).toBe(null)
   })
 
@@ -151,8 +237,8 @@ describe("the shortcut manager", () => {
     expect(
       shortcutOrder(
         () => el,
-        () => undefined,
-      ),
+        () => undefined
+      )
     ).toBe(0)
   })
 
@@ -164,16 +250,16 @@ describe("the shortcut manager", () => {
         el,
         closed,
         () => false,
-        () => true,
-      ),
+        () => true
+      )
     ).toBe(null)
     expect(
       shortcutOrder(
         el,
         () => ({ order: 3 }),
         () => false,
-        () => true,
-      ),
+        () => true
+      )
     ).toBe(3)
   })
 
@@ -186,13 +272,23 @@ describe("the shortcut manager", () => {
   })
 
   test("text fields take letters, other controls don't", () => {
-    const input = (type: string) => ({ tagName: "INPUT", type }) as unknown as EventTarget
+    const input = (type: string) =>
+      ({ tagName: "INPUT", type }) as unknown as EventTarget
     expect(isTypingIn(input("text"))).toBe(true)
     expect(isTypingIn(input("search"))).toBe(true)
     expect(isTypingIn(input("checkbox"))).toBe(false)
-    expect(isTypingIn({ tagName: "TEXTAREA" } as unknown as EventTarget)).toBe(true)
-    expect(isTypingIn({ tagName: "DIV", isContentEditable: true } as unknown as EventTarget)).toBe(true)
-    expect(isTypingIn({ tagName: "BUTTON" } as unknown as EventTarget)).toBe(false)
+    expect(isTypingIn({ tagName: "TEXTAREA" } as unknown as EventTarget)).toBe(
+      true
+    )
+    expect(
+      isTypingIn({
+        tagName: "DIV",
+        isContentEditable: true,
+      } as unknown as EventTarget)
+    ).toBe(true)
+    expect(isTypingIn({ tagName: "BUTTON" } as unknown as EventTarget)).toBe(
+      false
+    )
     expect(isTypingIn(null)).toBe(false)
   })
 

@@ -9,7 +9,10 @@
   // which the first handle resizes, is a watched one. An update is the part's
   // props changing, which each count reads so it counts them, or a state key it read.
   const panels = perfItems(perfSize())
-  const count = (kind: "watched" | "plain" | "handle", ...reads: unknown[]) => (countRender(kind), "")
+  const count = (kind: "watched" | "plain" | "handle", ...reads: unknown[]) => (
+    countRender(kind),
+    ""
+  )
 </script>
 
 <div class="fixture">
@@ -17,14 +20,21 @@
   <Resizable class="resizable-perf">
     {#each panels as panel, index (panel.value)}
       {#if index > 0}
-        <ResizableHandle class="resizable-perf-handle" aria-label={`Handle ${index}`}>
+        <ResizableHandle
+          class="resizable-perf-handle"
+          aria-label={`Handle ${index}`}
+        >
           {#snippet render({ props })}
             <div {...props}>{count("handle", props)}</div>
           {/snippet}
         </ResizableHandle>
       {/if}
       {#if index % 2}
-        <ResizablePanel id={panel.value} defaultSize={index < 2 ? 25 : undefined} class="resizable-panel">
+        <ResizablePanel
+          id={panel.value}
+          defaultSize={index < 2 ? 25 : undefined}
+          class="resizable-panel"
+        >
           {#snippet render({ props, state })}
             <div {...props} data-size={Math.round(state.size)}>
               {count("watched", props, state.size)}{panel.label}
@@ -32,7 +42,11 @@
           {/snippet}
         </ResizablePanel>
       {:else}
-        <ResizablePanel id={panel.value} defaultSize={index < 2 ? 25 : undefined} class="resizable-panel">
+        <ResizablePanel
+          id={panel.value}
+          defaultSize={index < 2 ? 25 : undefined}
+          class="resizable-panel"
+        >
           {#snippet render({ props })}
             <div {...props}>{count("plain", props)}{panel.label}</div>
           {/snippet}

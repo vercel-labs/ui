@@ -27,7 +27,8 @@
   aria-label="Photos"
   defaultPlaying
   interval={4000}
-  onPlayingChange={(playing, details) => log(`${playing ? "Playing" : "Stopped"} (${details.reason})`)}
+  onPlayingChange={(playing, details) =>
+    log(`${playing ? "Playing" : "Stopped"} (${details.reason})`)}
 >
   <div data-slot="controls">
     <CarouselPlayToggle>

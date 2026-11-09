@@ -25,12 +25,23 @@ const action = ref("")
           </ListboxItem>
           <ListboxItem value="star">
             <template #render="{ props, state }">
-              <li v-bind="props" :class="['item', state.selected ? 'is-selected' : 'is-unselected']">
+              <li
+                v-bind="props"
+                :class="[
+                  'item',
+                  state.selected ? 'is-selected' : 'is-unselected',
+                ]"
+              >
                 {{ state.selected ? "★" : "☆" }} Star
               </li>
             </template>
           </ListboxItem>
-          <ListboxItem v-for="item in f.items.slice(0, 3)" :key="item.value" class="item" :value="item.value">
+          <ListboxItem
+            v-for="item in f.items.slice(0, 3)"
+            :key="item.value"
+            class="item"
+            :value="item.value"
+          >
             <template #render="{ props }">
               <li v-bind="props">
                 {{ item.label }}

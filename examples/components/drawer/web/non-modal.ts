@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
           .map(
             (place) => `<li>
               <button type="button" data-place="${place.name}">${place.name}<span data-slot="hint">${place.detail}</span></button>
-            </li>`,
+            </li>`
           )
           .join("")}
       </ul>
@@ -47,8 +47,12 @@ function mount(root: HTMLElement) {
   const arrival = root.querySelector("ol li:last-child")!
   const buttons = [...root.querySelectorAll<HTMLButtonElement>("[data-place]")]
   const select = (destination: string) => {
-    for (const button of buttons)
-      button.setAttribute("aria-pressed", String(button.dataset.place === destination))
+    for (const button of buttons) {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.place === destination)
+      )
+    }
     title.textContent = `To ${destination}`
     arrival.textContent = `Arrive at ${destination}.`
   }
@@ -57,8 +61,13 @@ function mount(root: HTMLElement) {
       ? "12 min walk. Pick another place behind the sheet."
       : "12 min walk. Drag the sheet down to see the places."
   }
-  for (const button of buttons) button.addEventListener("click", () => select(button.dataset.place!))
-  new MutationObserver(describe).observe(content, { attributes: true, attributeFilter: ["data-interactive"] })
+  for (const button of buttons) {
+    button.addEventListener("click", () => select(button.dataset.place!))
+  }
+  new MutationObserver(describe).observe(content, {
+    attributes: true,
+    attributeFilter: ["data-interactive"],
+  })
   select(places[0].name)
   describe()
 }

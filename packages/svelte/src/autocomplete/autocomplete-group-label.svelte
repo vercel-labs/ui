@@ -15,8 +15,15 @@ The group's heading, which names the group.
 
   const autocomplete = useHandle(autocompletePrimitive)
   const group = getContext<string | undefined>(GroupKey)
-  if (!group) throw new Error("<AutocompleteGroupLabel> must be used inside <AutocompleteGroup>.")
-  const label = useHandlePart(autocomplete, "group-label", () => ({ id: group, group }))
+  if (!group) {
+    throw new Error(
+      "<AutocompleteGroupLabel> must be used inside <AutocompleteGroup>."
+    )
+  }
+  const label = useHandlePart(autocomplete, "group-label", () => ({
+    id: group,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={label} {props} />

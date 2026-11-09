@@ -1,9 +1,21 @@
 import { expect, test } from "../fixtures"
-import { center, drag, maximum, minimum, pressAt, thumbBox, track, volume } from "./slider.helpers"
+import {
+  center,
+  drag,
+  maximum,
+  minimum,
+  pressAt,
+  thumbBox,
+  track,
+  volume,
+} from "./slider.helpers"
 
 // Right to left, a horizontal slider starts at the right, and Left and Right swap.
 
-test("ArrowLeft increases it and ArrowRight decreases it", async ({ page, open }) => {
+test("ArrowLeft increases it and ArrowRight decreases it", async ({
+  page,
+  open,
+}) => {
   await open("slider", { dir: "rtl" })
   await volume(page).focus()
   await page.keyboard.press("ArrowLeft")
@@ -32,7 +44,7 @@ test(
     // The range's first thumb is at 20, a fifth of the way from the right.
     const low = await center(thumbBox(page, minimum(page)))
     expect(Math.abs(low.x - (box.x + box.width * 0.8))).toBeLessThan(1.5)
-  },
+  }
 )
 
 test("dragging left increases it", async ({ page, open }) => {
@@ -50,5 +62,5 @@ test(
     await volume(page).focus()
     await page.keyboard.press("ArrowRight")
     await expect(volume(page)).toHaveValue("51")
-  },
+  }
 )

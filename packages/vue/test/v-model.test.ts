@@ -28,12 +28,18 @@ function mount(render: () => unknown) {
 test("v-model selects a tab and hears the selection", async () => {
   const value = ref("account")
   const { el, unmount } = mount(() =>
-    h(Tabs, { modelValue: value.value, "onUpdate:modelValue": (next: string) => (value.value = next) }, () =>
-      h(TabsList, null, () => [
-        h(TabsTab, { value: "account" }, () => "Account"),
-        h(TabsTab, { value: "billing" }, () => "Billing"),
-      ]),
-    ),
+    h(
+      Tabs,
+      {
+        modelValue: value.value,
+        "onUpdate:modelValue": (next: string) => (value.value = next),
+      },
+      () =>
+        h(TabsList, null, () => [
+          h(TabsTab, { value: "account" }, () => "Account"),
+          h(TabsTab, { value: "billing" }, () => "Billing"),
+        ])
+    )
   )
   const [account, billing] = el.querySelectorAll<HTMLElement>('[role="tab"]')
   expect(account.getAttribute("aria-selected")).toBe("true")
@@ -53,16 +59,22 @@ test("v-model checks a checkbox and fills an input", async () => {
     h(Checkbox, {
       "aria-label": "Terms",
       modelValue: checked.value,
-      "onUpdate:modelValue": (next: boolean | "indeterminate") => (checked.value = next),
+      "onUpdate:modelValue": (next: boolean | "indeterminate") =>
+        (checked.value = next),
     }),
-    h(Input, { modelValue: text.value, "onUpdate:modelValue": (next: string) => (text.value = next) }),
+    h(Input, {
+      modelValue: text.value,
+      "onUpdate:modelValue": (next: string) => (text.value = next),
+    }),
   ])
   const box = el.querySelector<HTMLElement>('[role="checkbox"]')!
   box.click()
   await nextTick()
   expect(checked.value).toBe(true)
   expect(box.getAttribute("aria-checked")).toBe("true")
-  const input = el.querySelector("input:not([type=checkbox]):not([aria-hidden])") as HTMLInputElement
+  const input = el.querySelector(
+    "input:not([type=checkbox]):not([aria-hidden])"
+  ) as HTMLInputElement
   expect(input.value).toBe("Ada")
   text.value = "Grace"
   await nextTick()
@@ -77,13 +89,15 @@ test("a value of null stays controlled, like a navigation menu with nothing open
         h(NavigationMenuItem, { value: "products" }, () => [
           h(NavigationMenuTrigger, null, () => "Products"),
           h(NavigationMenuContent, null, () => "Catalog"),
-        ]),
-      ),
-    ),
+        ])
+      )
+    )
   )
   el.querySelector("button")!.click()
   await nextTick()
-  expect(el.querySelector("button")!.getAttribute("aria-expanded")).toBe("false")
+  expect(el.querySelector("button")!.getAttribute("aria-expanded")).toBe(
+    "false"
+  )
   unmount()
 })
 
@@ -96,21 +110,30 @@ test.each(["value", "modelValue"])(
     const { el, unmount } = mount(() =>
       h(Field, null, () => [
         h(FieldLabel, null, () => "Price"),
-        h(Slider, key === "value" ? { value: value.value } : { modelValue: value.value }, () =>
-          h(SliderControl, null, () =>
-            h(SliderTrack, null, () =>
-              [value.value]
-                .flat()
-                .map((_, index) => h(SliderThumb, { index, "aria-label": `Thumb ${index}` })),
-            ),
-          ),
+        h(
+          Slider,
+          key === "value"
+            ? { value: value.value }
+            : { modelValue: value.value },
+          () =>
+            h(SliderControl, null, () =>
+              h(SliderTrack, null, () =>
+                [value.value]
+                  .flat()
+                  .map((_, index) =>
+                    h(SliderThumb, { index, "aria-label": `Thumb ${index}` })
+                  )
+              )
+            )
         ),
-      ]),
+      ])
     )
     const labelled = async () => {
       await new Promise((resolve) => setTimeout(resolve))
       const label = el.querySelector("label")!.id
-      return Array.from(el.querySelectorAll('[data-slot="slider-root"], input[type="range"]'))
+      return Array.from(
+        el.querySelectorAll('[data-slot="slider-root"], input[type="range"]')
+      )
         .filter((node) => node.getAttribute("aria-labelledby") === label)
         .map((node) => node.tagName)
     }
@@ -120,5 +143,5 @@ test.each(["value", "modelValue"])(
     value.value = [20, 80]
     expect(await labelled()).toEqual(["DIV"])
     unmount()
-  },
+  }
 )

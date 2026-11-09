@@ -32,7 +32,10 @@ function mount(root: HTMLElement) {
   const popover = root.querySelector("ui-popover")!
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
-    log(root, `Saved ${new FormData(event.target as HTMLFormElement).get("name")}`)
+    log(
+      root,
+      `Saved ${new FormData(event.target as HTMLFormElement).get("name")}`
+    )
     popover.open = false
   })
 }

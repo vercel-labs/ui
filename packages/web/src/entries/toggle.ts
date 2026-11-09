@@ -23,5 +23,13 @@ export type {
   TogglePrimitive,
   ToggleState,
 } from "@ui-sdk/core/toggle"
-export type { ToggleEvents, ToggleGroupEvents, UiToggleElement, UiToggleGroupElement } from "../events"
-export { createToggleController, createToggleGroupController } from "@ui-sdk/core/toggle"
+export type {
+  ToggleEvents,
+  ToggleGroupEvents,
+  UiToggleElement,
+  UiToggleGroupElement,
+} from "../events"
+export {
+  createToggleController,
+  createToggleGroupController,
+} from "@ui-sdk/core/toggle"

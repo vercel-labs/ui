@@ -14,7 +14,11 @@ const thumbs = ["Low", "Medium", "High"]
 
 <template>
   <Field>
-    <Slider :default-value="[10, 20, 70]" :step="10" :format="{ style: 'unit', unit: 'percent' }">
+    <Slider
+      :default-value="[10, 20, 70]"
+      :step="10"
+      :format="{ style: 'unit', unit: 'percent' }"
+    >
       <div data-slot="row">
         <FieldLabel>Alert thresholds</FieldLabel>
         <SliderValue />
@@ -22,7 +26,12 @@ const thumbs = ["Low", "Medium", "High"]
       <SliderControl>
         <SliderTrack>
           <SliderIndicator />
-          <SliderThumb v-for="(label, index) in thumbs" :key="label" :index="index" :aria-label="label" />
+          <SliderThumb
+            v-for="(label, index) in thumbs"
+            :key="label"
+            :index="index"
+            :aria-label="label"
+          />
         </SliderTrack>
       </SliderControl>
     </Slider>

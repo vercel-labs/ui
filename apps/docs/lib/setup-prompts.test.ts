@@ -3,7 +3,10 @@ import path from "node:path"
 import { describe, expect, test } from "vitest"
 import { quickStartPrompt, setupPrompt } from "./setup-prompts"
 
-const promptsDir = path.join(import.meta.dirname, "../content/shared/setup-prompt")
+const promptsDir = path.join(
+  import.meta.dirname,
+  "../content/shared/setup-prompt"
+)
 
 function quickStartFile(name: string) {
   const source = readFileSync(path.join(promptsDir, `${name}.mdx`), "utf8")
@@ -17,54 +20,87 @@ describe("setup prompts", () => {
     "rebuilds the %s Quick Start prompt word for word",
     (stackId) => {
       expect(quickStartPrompt(stackId)).toBe(quickStartFile(stackId))
-    },
+    }
   )
 
   test("names the project and how to create it", () => {
-    const prompt = setupPrompt({ stackId: "svelte", projectId: "sveltekit", site })
+    const prompt = setupPrompt({
+      stackId: "svelte",
+      projectId: "sveltekit",
+      site,
+    })
     expect(prompt).toMatch(
-      /^Set up ui-sdk in this Svelte project with SvelteKit\. It needs Svelte 5\.33 or newer\.\n/,
+      /^Set up ui-sdk in this Svelte project with SvelteKit\. It needs Svelte 5\.33 or newer\.\n/
     )
-    expect(prompt).toContain("If the folder is empty, create the project first: npx sv create .")
+    expect(prompt).toContain(
+      "If the folder is empty, create the project first: npx sv create ."
+    )
   })
 
   test("imports web.css after installing", () => {
     const prompt = setupPrompt({ stackId: "react", projectId: "next", site })
     expect(prompt).toContain(
-      `2. Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
+      `2. Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`
     )
   })
 
   test("adds the .npmrc step only with a registry", () => {
     expect(setupPrompt({ stackId: "vue", site })).not.toContain(".npmrc")
-    expect(setupPrompt({ stackId: "vue", site, registry: "https://registry.example.com/" })).toContain(
-      "1. Add this line to .npmrc in the project root, creating it if needed:\n   @ui-sdk:registry=https://registry.example.com/",
+    expect(
+      setupPrompt({
+        stackId: "vue",
+        site,
+        registry: "https://registry.example.com/",
+      })
+    ).toContain(
+      "1. Add this line to .npmrc in the project root, creating it if needed:\n   @ui-sdk:registry=https://registry.example.com/"
     )
   })
 
   test.each([
     ["web-components", "html"],
     ["artifacts", undefined],
-  ])("loads web.js and web.css from the site for %s without a registry", (stackId, projectId) => {
-    const prompt = setupPrompt({ stackId, projectId, site })
-    expect(prompt).toContain(`<script type="module" src="https://ui-sdk.dev/web.js"></script>`)
-    expect(prompt).toContain(`<link rel="stylesheet" href="https://ui-sdk.dev/web.css" />`)
-    expect(prompt).toContain("read https://ui-sdk.dev/docs/web-components/llms.txt.")
-  })
+  ])(
+    "loads web.js and web.css from the site for %s without a registry",
+    (stackId, projectId) => {
+      const prompt = setupPrompt({ stackId, projectId, site })
+      expect(prompt).toContain(
+        `<script type="module" src="https://ui-sdk.dev/web.js"></script>`
+      )
+      expect(prompt).toContain(
+        `<link rel="stylesheet" href="https://ui-sdk.dev/web.css" />`
+      )
+      expect(prompt).toContain(
+        "read https://ui-sdk.dev/docs/web-components/llms.txt."
+      )
+    }
+  )
 
   test.each([
     ["web-components", "html"],
     ["artifacts", undefined],
-  ])("loads web.js and web.css from the registry for %s", (stackId, projectId) => {
-    const prompt = setupPrompt({ stackId, projectId, site, registry: "https://registry.example.com/" })
-    expect(prompt).toContain(`<script type="module" src="https://registry.example.com/web.js"></script>`)
-    expect(prompt).toContain(`<link rel="stylesheet" href="https://registry.example.com/web.css" />`)
-    expect(prompt).not.toContain(".npmrc")
-  })
+  ])(
+    "loads web.js and web.css from the registry for %s",
+    (stackId, projectId) => {
+      const prompt = setupPrompt({
+        stackId,
+        projectId,
+        site,
+        registry: "https://registry.example.com/",
+      })
+      expect(prompt).toContain(
+        `<script type="module" src="https://registry.example.com/web.js"></script>`
+      )
+      expect(prompt).toContain(
+        `<link rel="stylesheet" href="https://registry.example.com/web.css" />`
+      )
+      expect(prompt).not.toContain(".npmrc")
+    }
+  )
 
   test("asks what to build once the setup is done", () => {
     expect(setupPrompt({ stackId: "solid", projectId: "start", site })).toMatch(
-      /\n\nWhen you're done, ask me what I'd like to build\.$/,
+      /\n\nWhen you're done, ask me what I'd like to build\.$/
     )
   })
 })

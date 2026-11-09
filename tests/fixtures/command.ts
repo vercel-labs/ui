@@ -59,7 +59,7 @@ function commandData() {
         type: "group" as const,
         label: group.label,
         items: group.items.map(({ page, ...item }: FixtureItem) =>
-          page ? { ...item, items: commandFixture.theme } : item,
+          page ? { ...item, items: commandFixture.theme } : item
         ),
       },
     ])
@@ -93,9 +93,11 @@ function commandOptions() {
 
 // An action: at once, or pending for 300ms with ?slow, and rejected with ?fail.
 function runAction(slow: boolean, fail: boolean) {
-  if (!slow && !fail) return undefined
+  if (!slow && !fail) {
+    return undefined
+  }
   return new Promise<void>((resolve, reject) =>
-    setTimeout(() => (fail ? reject(new Error("Offline")) : resolve()), 300),
+    setTimeout(() => (fail ? reject(new Error("Offline")) : resolve()), 300)
   )
 }
 

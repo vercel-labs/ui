@@ -62,9 +62,18 @@ For example, keep a popover open when someone clicks outside it:
 
 ```vue
 <script setup lang="ts">
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/vue/popover"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/vue/popover"
 
-function keepOpen(open: boolean, details: { reason: string; cancel: () => void }) {
+function keepOpen(
+  open: boolean,
+  details: { reason: string; cancel: () => void }
+) {
   if (!open && details.reason === "outside-press") {
     details.cancel()
   }

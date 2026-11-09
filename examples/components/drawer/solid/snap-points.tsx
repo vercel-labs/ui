@@ -33,7 +33,9 @@ function Example() {
         <DrawerHandle aria-label="Resize" />
         <div data-slot="stack">
           <DrawerTitle>Places nearby</DrawerTitle>
-          <DrawerDescription>Drag the drawer, or press the handle, to see more.</DrawerDescription>
+          <DrawerDescription>
+            Drag the drawer, or press the handle, to see more.
+          </DrawerDescription>
         </div>
         <div data-slot="scroll">
           <ul data-slot="list">

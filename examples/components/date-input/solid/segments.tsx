@@ -12,7 +12,9 @@ function Example() {
             {(segment) => (
               <Show
                 when={segment().editable}
-                fallback={<DateInputSegment segment={segment()}>–</DateInputSegment>}
+                fallback={
+                  <DateInputSegment segment={segment()}>–</DateInputSegment>
+                }
               >
                 <DateInputSegment segment={segment()} />
               </Show>

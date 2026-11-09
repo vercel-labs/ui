@@ -13,7 +13,8 @@ async function mount(root: HTMLElement) {
           ${f.items
             .slice(0, 3)
             .map(
-              (item) => `<ui-select-item class="item" value="${item.value}">${item.label}</ui-select-item>`,
+              (item) =>
+                `<ui-select-item class="item" value="${item.value}">${item.label}</ui-select-item>`
             )
             .join("")}
         </ui-select-content>

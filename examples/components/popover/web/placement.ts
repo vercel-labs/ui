@@ -21,7 +21,7 @@ function select(
   attribute: string,
   label: string,
   value: string,
-  options: { value: string; label: string }[],
+  options: { value: string; label: string }[]
 ) {
   return `
     <ui-select data-attribute="${attribute}" default-value="${value}">
@@ -40,7 +40,7 @@ function select(
                 ${option.label}
                 <ui-select-item-indicator>${check}</ui-select-item-indicator>
               </ui-select-item>
-            `,
+            `
           )
           .join("")}
       </ui-select-content>
@@ -67,11 +67,14 @@ function mount(root: HTMLElement) {
     </div>
   `
   const content = root.querySelector("ui-popover-content")!
-  for (const control of root.querySelectorAll("ui-select"))
+  for (const control of root.querySelectorAll("ui-select")) {
     control.addEventListener("valuechange", (event) => {
       const value = event.detail.value
-      if (typeof value === "string") content.setAttribute(control.dataset.attribute!, value)
+      if (typeof value === "string") {
+        content.setAttribute(control.dataset.attribute!, value)
+      }
     })
+  }
 }
 
 export { mount }

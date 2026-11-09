@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@ui-sdk/svelte/dialog"
+  import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogTitle,
+    DialogTrigger,
+  } from "@ui-sdk/svelte/dialog"
   import { Menu, MenuTrigger } from "@ui-sdk/svelte"
   import { casesData } from "./data"
 
@@ -12,7 +18,11 @@
 
 <div class="fixture">
   <button>Before</button>
-  <Menu {items} itemShortcuts={shortcuts} onAction={(value) => (action = value)}>
+  <Menu
+    {items}
+    itemShortcuts={shortcuts}
+    onAction={(value) => (action = value)}
+  >
     <MenuTrigger>Edit</MenuTrigger>
   </Menu>
   <button onclick={() => (align = "right")}>Align right</button>

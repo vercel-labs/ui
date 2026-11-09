@@ -4,7 +4,13 @@ import {
   type PaginationController,
   type PaginationPageChangeReason,
 } from "@ui-sdk/core/pagination"
-import { defineComponent, inject, provide, type InjectionKey, type PropType } from "vue"
+import {
+  defineComponent,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { slotContent } from "./children"
 import { createParts, withElement } from "./create-parts"
 import { orModel, usePart, usePrimitive, type PartSlots } from "./use-primitive"
@@ -15,7 +21,9 @@ const TagKey: InjectionKey<() => "a" | "button"> = Symbol("pagination-tag")
 // A link or step's tag: the root's, which follows `getHref`.
 function useTag(part: string) {
   const tag = inject(TagKey, null)
-  if (!tag) throw new Error(`${part} must be used inside <Pagination>.`)
+  if (!tag) {
+    throw new Error(`${part} must be used inside <Pagination>.`)
+  }
   return tag
 }
 
@@ -46,7 +54,10 @@ const Pagination = withElement(
     emits: {
       "update:page": (_page: number) => true,
       "update:modelValue": (_page: number) => true,
-      pageChange: (_page: number, _details: ChangeDetails<PaginationPageChangeReason>) => true,
+      pageChange: (
+        _page: number,
+        _details: ChangeDetails<PaginationPageChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof paginationPrimitive, "root">,
     setup(props, { emit }) {
@@ -62,9 +73,14 @@ const Pagination = withElement(
         controller: props.controller,
         debug: props.debug,
         // The change event runs first, so canceling it also keeps v-model as it was.
-        onPageChange: (page: number, details: ChangeDetails<PaginationPageChangeReason>) => {
+        onPageChange: (
+          page: number,
+          details: ChangeDetails<PaginationPageChangeReason>
+        ) => {
           emit("pageChange", page, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:page", page)
           emit("update:modelValue", page)
         },
@@ -72,7 +88,7 @@ const Pagination = withElement(
       provide(TagKey, () => (props.getHref ? "a" : "button"))
       return usePart(pagination, "root", undefined, undefined, "nav")
     },
-  }),
+  })
 )
 
 /**
@@ -104,7 +120,7 @@ const PaginationEllipsis = withElement(
         children: (state) => slotContent(slots.default, { state }) ?? "…",
       })
     },
-  }),
+  })
 )
 
 /**
@@ -125,13 +141,17 @@ const PaginationLink = withElement(
         get tag() {
           return tag()
         },
-        children: (state) => slotContent(slots.default, { state }) ?? String(props.page),
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? String(props.page),
       })
     },
-  }),
+  })
 )
 
-function stepPart<S extends "previous" | "next" | "first" | "last">(name: string, slot: S) {
+function stepPart<S extends "previous" | "next" | "first" | "last">(
+  name: string,
+  slot: S
+) {
   return withElement(
     "a",
     defineComponent({
@@ -146,7 +166,7 @@ function stepPart<S extends "previous" | "next" | "first" | "last">(name: string
           },
         })
       },
-    }),
+    })
   )
 }
 
@@ -171,7 +191,10 @@ const PaginationFirst = stepPart("PaginationFirst", "first")
  */
 const PaginationLast = stepPart("PaginationLast", "last")
 
-export { createPaginationController, paginationRange } from "@ui-sdk/core/pagination"
+export {
+  createPaginationController,
+  paginationRange,
+} from "@ui-sdk/core/pagination"
 export type {
   PaginationChangeOptions,
   PaginationController,

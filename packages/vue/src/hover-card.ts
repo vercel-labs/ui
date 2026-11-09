@@ -5,7 +5,14 @@ import {
   type HoverCardOpenChangeReason,
   type HoverCardPayloadChangeReason,
 } from "@ui-sdk/core/hover-card"
-import { defineComponent, inject, provide, useId, type InjectionKey, type PropType } from "vue"
+import {
+  defineComponent,
+  inject,
+  provide,
+  useId,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import {
   containerProp,
   type PopupContainer,
@@ -18,14 +25,23 @@ import {
   withPayload,
 } from "./popup"
 import { createParts, withElement } from "./create-parts"
-import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 import { renderless } from "./renderless"
 
 type OpenDetails = ChangeDetails<HoverCardOpenChangeReason>
 type PayloadDetails = ChangeDetails<HoverCardPayloadChangeReason>
 
 // Where the popup renders. Set on <HoverCard> or <HoverCardContent>.
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("hover-card-container")
+const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(
+  "hover-card-container"
+)
 
 const parts = createParts(hoverCardPrimitive, { arrow: "div" })
 
@@ -63,18 +79,21 @@ const HoverCard = /* @__PURE__ */ renderless(
         onOpenChange: (open: boolean, details: OpenDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("openChange", open, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:open", open)
           emit("update:modelValue", open)
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
         onPayloadChange: (payload: unknown, details: PayloadDetails) =>
           emit("payloadChange", payload, details),
       }))
       useControllerEntry(() => props.controller, hoverCard)
       return () => slots.default?.()
     },
-  }),
+  })
 )
 
 /**
@@ -93,16 +112,26 @@ const HoverCardTrigger = withElement(
     },
     slots: Object as PartSlots<typeof hoverCardPrimitive, "trigger">,
     setup(props, { slots, attrs }) {
-      const connected = useControllerTarget(hoverCardPrimitive, () => props.controller)
+      const connected = useControllerTarget(
+        hoverCardPrimitive,
+        () => props.controller
+      )
       const id = useId()
       return useConnectedPart(
         connected,
-        (hoverCard) => usePart(hoverCard, "trigger", () => ({ id, payload: props.payload }), undefined, "a"),
+        (hoverCard) =>
+          usePart(
+            hoverCard,
+            "trigger",
+            () => ({ id, payload: props.payload }),
+            undefined,
+            "a"
+          ),
         // Until the card it names mounts, a trigger outside the card is a plain link.
-        () => renderUnbound("a", attrs, { slots, state: { open: false } }),
+        () => renderUnbound("a", attrs, { slots, state: { open: false } })
       )
     },
-  }),
+  })
 )
 
 /**
@@ -142,8 +171,8 @@ const HoverCardContent = withPayload(
           return element && renderPopup(element, target())
         }
       },
-    }),
-  ),
+    })
+  )
 )
 
 /**

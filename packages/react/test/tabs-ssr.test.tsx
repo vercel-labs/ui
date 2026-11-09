@@ -15,11 +15,13 @@ describe("server rendering tabs", () => {
         </TabsList>
         <TabsPanel value="a">Panel A</TabsPanel>
         <TabsPanel value="b">Panel B</TabsPanel>
-      </Tabs>,
+      </Tabs>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="tablist"')
-    expect(html).toMatch(/aria-selected="true"[^>]*tabindex="0"|tabindex="0"[^>]*aria-selected="true"/)
+    expect(html).toMatch(
+      /aria-selected="true"[^>]*tabindex="0"|tabindex="0"[^>]*aria-selected="true"/
+    )
     expect(html).toContain("Panel B")
     expect(html).not.toContain("Panel A")
   })
@@ -35,7 +37,7 @@ describe("server rendering tabs", () => {
         <TabsPanel value="b" keepMounted>
           Panel B
         </TabsPanel>
-      </Tabs>,
+      </Tabs>
     )
     expect(html).toMatch(/hidden=""[^>]*>Panel B|<div[^>]*hidden[^>]*>Panel B/)
   })

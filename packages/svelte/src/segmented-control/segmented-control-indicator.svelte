@@ -5,7 +5,10 @@ Sits behind the checked item. Its box comes from the
 @experimental
 -->
 <script lang="ts">
-  import { segmentedControl, type SegmentedControlIndicatorState } from "@ui-sdk/core/segmented-control"
+  import {
+    segmentedControl,
+    type SegmentedControlIndicatorState,
+  } from "@ui-sdk/core/segmented-control"
   import { usePart } from "../instance"
   import Part from "../part.svelte"
   import type { PartProps } from "../use-primitive.svelte"

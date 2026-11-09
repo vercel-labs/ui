@@ -54,9 +54,14 @@ function TimeInput(props: TimeInputOptions & RootProps) {
     "name",
     "form",
     "controller",
-    "debug",
+    "debug"
   )
-  return renderRoot(handle as unknown as PrimitiveHandle<Segmented>, field, rest, TimeInputSegment)
+  return renderRoot(
+    handle as unknown as PrimitiveHandle<Segmented>,
+    field,
+    rest,
+    TimeInputSegment
+  )
 }
 
 /**

@@ -38,7 +38,10 @@ test("a focused trigger keeps its element and its focus when its controller chan
   const target = document.body.appendChild(document.createElement("div"))
   const app = mount(App, {
     target,
-    props: { first: createPopoverController(), second: createPopoverController() },
+    props: {
+      first: createPopoverController(),
+      second: createPopoverController(),
+    },
   })
   await settle()
   const before = target.querySelector("button")!
@@ -46,7 +49,10 @@ test("a focused trigger keeps its element and its focus when its controller chan
   app.swap()
   await settle()
   const after = target.querySelector("button")!
-  expect({ same: after === before, focused: document.activeElement === after }).toEqual({
+  expect({
+    same: after === before,
+    focused: document.activeElement === after,
+  }).toEqual({
     same: true,
     focused: true,
   })
@@ -56,9 +62,15 @@ test("a focused trigger keeps its element and its focus when its controller chan
 
 test("a select trigger given another controller keeps its element and shows that select's value", async () => {
   const target = document.body.appendChild(document.createElement("div"))
-  const selects = [createSelectController<string>(), createSelectController<string>()] as const
+  const selects = [
+    createSelectController<string>(),
+    createSelectController<string>(),
+  ] as const
   const menus = [createMenuController(), createMenuController()] as const
-  const app = mount(SwapApp, { target, props: { selects: [...selects], menus: [...menus] } })
+  const app = mount(SwapApp, {
+    target,
+    props: { selects: [...selects], menus: [...menus] },
+  })
   await settle()
   const before = target.querySelector<HTMLElement>("[aria-label=Fruit]")!
   before.focus()
@@ -80,19 +92,34 @@ test("a select trigger given another controller keeps its element and shows that
 
 test("a context menu area given another controller keeps its element and opens that controller's menu", async () => {
   const target = document.body.appendChild(document.createElement("div"))
-  const selects = [createSelectController<string>(), createSelectController<string>()] as const
+  const selects = [
+    createSelectController<string>(),
+    createSelectController<string>(),
+  ] as const
   const menus = [createMenuController(), createMenuController()] as const
-  const app = mount(SwapApp, { target, props: { selects: [...selects], menus: [...menus] } })
+  const app = mount(SwapApp, {
+    target,
+    props: { selects: [...selects], menus: [...menus] },
+  })
   await settle()
   const before = target.querySelector("[data-testid=area]")!
   app.swap()
   await settle()
   const after = target.querySelector("[data-testid=area]")!
   after.dispatchEvent(
-    new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 5, clientY: 5 }),
+    new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+      clientX: 5,
+      clientY: 5,
+    })
   )
   await settle()
-  expect({ same: after === before, first: menus[0].isOpen(), second: menus[1].isOpen() }).toEqual({
+  expect({
+    same: after === before,
+    first: menus[0].isOpen(),
+    second: menus[1].isOpen(),
+  }).toEqual({
     same: true,
     first: false,
     second: true,

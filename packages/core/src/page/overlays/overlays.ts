@@ -35,7 +35,9 @@ function createOverlays() {
 
   function unmount(id: string) {
     const next = entries.filter((entry) => entry.id !== id)
-    if (next.length === entries.length) return
+    if (next.length === entries.length) {
+      return
+    }
     entries = next
     notify()
   }
@@ -52,13 +54,19 @@ function createOverlays() {
       entries = [...entries, { id, type, data }]
       notify()
       // A host that mounts in the same task, like during hydration, still counts.
-      if (dev && typeof window !== "undefined")
+      if (dev && typeof window !== "undefined") {
         setTimeout(() => {
-          if (!hosts && !rendered?.() && entries.some((entry) => entry.id === id))
+          if (
+            !hosts &&
+            !rendered?.() &&
+            entries.some((entry) => entry.id === id)
+          ) {
             warn(
-              `A ${type} opened, but no host renders it. Mount <OverlayHost /> (or <ui-overlay-host>) once in your app.`,
+              `A ${type} opened, but no host renders it. Mount <OverlayHost /> (or <ui-overlay-host>) once in your app.`
             )
+          }
         }, 1000)
+      }
       return id
     },
     /** Removes an overlay. */
@@ -77,7 +85,9 @@ function createOverlays() {
       hosts++
       let attached = true
       return () => {
-        if (attached) hosts--
+        if (attached) {
+          hosts--
+        }
         attached = false
       }
     },
@@ -98,7 +108,8 @@ type Overlays = ReturnType<typeof createOverlays>
  * the package load on one page.
  * @stable
  */
-const overlays = ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.overlays@1")] ??=
-  createOverlays()) as Overlays
+const overlays = ((globalThis as Record<symbol, unknown>)[
+  Symbol.for("ui-sdk.overlays@1")
+] ??= createOverlays()) as Overlays
 
 export { createOverlays, type OverlayEntry, overlays, type Overlays }

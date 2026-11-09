@@ -48,8 +48,9 @@ function mount(root: HTMLElement) {
     clear: () => fruit.clear(),
     focus: () => fruit.focus(),
   }
-  for (const button of root.querySelectorAll<HTMLElement>("[data-action]"))
+  for (const button of root.querySelectorAll<HTMLElement>("[data-action]")) {
     button.addEventListener("click", () => actions[button.dataset.action!]())
+  }
 }
 
 export { mount }

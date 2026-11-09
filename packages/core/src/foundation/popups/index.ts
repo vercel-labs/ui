@@ -24,7 +24,11 @@ export {
   resetPopoverStyles,
 } from "./popup"
 export { createOpenSteps, createSteppedPopup, unopened } from "./popup-steps"
-export { inPopupElement, ownsEvent, registerPopupElement } from "./popup-elements"
+export {
+  inPopupElement,
+  ownsEvent,
+  registerPopupElement,
+} from "./popup-elements"
 export { contentAnchor, placementOptions } from "./popup-features"
 export { hoverCardPreset, tooltipPreset } from "./popup-hover-presets"
 export {

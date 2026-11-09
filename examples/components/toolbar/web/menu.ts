@@ -28,11 +28,17 @@ function mount(root: HTMLElement) {
       </ui-toolbar-button>
     </ui-toolbar>
   `
-  root.querySelector("[data-action=save]")!.addEventListener("click", () => log(root, "Saved"))
+  root
+    .querySelector("[data-action=save]")!
+    .addEventListener("click", () => log(root, "Saved"))
   root
     .querySelector("ui-menu")!
-    .addEventListener("action", (event) => log(root, `Shared by ${event.detail.value}`))
-  root.querySelector("[data-action=print]")!.addEventListener("click", () => log(root, "Printed"))
+    .addEventListener("action", (event) =>
+      log(root, `Shared by ${event.detail.value}`)
+    )
+  root
+    .querySelector("[data-action=print]")!
+    .addEventListener("click", () => log(root, "Printed"))
 }
 
 export { mount }

@@ -42,7 +42,8 @@ function createShell(root: HTMLElement) {
     </div>
   `
   const logEl = root.querySelector<HTMLElement>("[data-log]")!
-  const log = (line: string) => (logEl.textContent = `${line}\n${logEl.textContent}`)
+  const log = (line: string) =>
+    (logEl.textContent = `${line}\n${logEl.textContent}`)
   const sections = new Map<string, HTMLElement>()
   for (const variant of variants) {
     let section = sections.get(variant.section)
@@ -62,10 +63,15 @@ function createShell(root: HTMLElement) {
   }
   root.querySelector("[data-controls]")!.addEventListener("change", (event) => {
     const input = event.target as HTMLInputElement
-    if (input.name === "expanded") options.expanded = input.checked
-    else if (input.name === "maxVisible") options.maxVisible = Number(input.value)
-    else if (input.name === "shortcut") options.shortcut = input.value || null
-    else (options as Record<string, unknown>)[input.name] = input.value
+    if (input.name === "expanded") {
+      options.expanded = input.checked
+    } else if (input.name === "maxVisible") {
+      options.maxVisible = Number(input.value)
+    } else if (input.name === "shortcut") {
+      options.shortcut = input.value || null
+    } else {
+      ;(options as Record<string, unknown>)[input.name] = input.value
+    }
     log(`option: ${input.name}`)
     listeners.forEach((listener) => listener())
   })
@@ -87,7 +93,8 @@ const classes = {
   content: "grid flex-1 gap-1",
   title: "font-medium",
   description: "text-neutral-500",
-  action: "rounded bg-neutral-900 px-2 py-1 text-xs text-white data-pending:opacity-60",
+  action:
+    "rounded bg-neutral-900 px-2 py-1 text-xs text-white data-pending:opacity-60",
   close: "rounded border px-2 py-1 text-xs",
 }
 

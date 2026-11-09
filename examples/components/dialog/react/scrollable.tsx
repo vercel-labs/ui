@@ -25,7 +25,9 @@ function Example() {
       <DialogContent initialFocus="content">
         <div data-slot="stack">
           <DialogTitle>Terms of service</DialogTitle>
-          <DialogDescription>Please read before you continue.</DialogDescription>
+          <DialogDescription>
+            Please read before you continue.
+          </DialogDescription>
         </div>
         <div data-slot="scroll">
           {paragraphs.map((paragraph) => (

@@ -11,7 +11,9 @@ const { cancel, keepMounted, ...options } = tabsOptions()
 const action = ref("")
 
 function onValueChange(value: string | null, details: { cancel: () => void }) {
-  if (value === cancel) return details.cancel()
+  if (value === cancel) {
+    return details.cancel()
+  }
   action.value = value ?? ""
 }
 </script>
@@ -19,7 +21,12 @@ function onValueChange(value: string | null, details: { cancel: () => void }) {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Tabs class="tabs" v-bind="options" :controller="controller" @value-change="onValueChange">
+    <Tabs
+      class="tabs"
+      v-bind="options"
+      :controller="controller"
+      @value-change="onValueChange"
+    >
       <TabsList class="tablist" :aria-label="tabsFixture.label">
         <TabsTab
           v-for="tab in tabsFixture.tabs"
@@ -40,11 +47,15 @@ function onValueChange(value: string | null, details: { cancel: () => void }) {
         :keep-mounted="keepMounted"
       >
         {{ tab.content }}
-        <label v-if="tab.field"> {{ tab.field }} <input type="password" /></label>
+        <label v-if="tab.field">
+          {{ tab.field }} <input type="password"
+        /></label>
       </TabsPanel>
     </Tabs>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <button @click="controller.select('notifications')">Show notifications</button>
+    <button @click="controller.select('notifications')">
+      Show notifications
+    </button>
   </div>
 </template>

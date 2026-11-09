@@ -18,18 +18,27 @@ function createDocsProxy(options: {
   const send = options.fetch ?? fetch
   const matches = (pathname: string) =>
     options.paths.some((path) =>
-      path.endsWith("*") ? pathname.startsWith(path.slice(0, -1)) : pathname === path,
+      path.endsWith("*")
+        ? pathname.startsWith(path.slice(0, -1))
+        : pathname === path
     )
 
   return async (request: Request) => {
     const url = new URL(request.url)
-    if (!matches(url.pathname)) return null
-    if (!options.bypass) return new Response("Not Found", { status: 404 })
+    if (!matches(url.pathname)) {
+      return null
+    }
+    if (!options.bypass) {
+      return new Response("Not Found", { status: 404 })
+    }
 
-    const upstream = await send(new URL(url.pathname + url.search, options.origin), {
-      headers: { "x-vercel-protection-bypass": options.bypass },
-      redirect: "manual",
-    })
+    const upstream = await send(
+      new URL(url.pathname + url.search, options.origin),
+      {
+        headers: { "x-vercel-protection-bypass": options.bypass },
+        redirect: "manual",
+      }
+    )
     const headers = new Headers()
     for (const name of [
       "content-type",
@@ -39,7 +48,9 @@ function createDocsProxy(options: {
       "last-modified",
     ]) {
       const value = upstream.headers.get(name)
-      if (value) headers.set(name, value)
+      if (value) {
+        headers.set(name, value)
+      }
     }
     const location = upstream.headers.get("location")
     if (location) {
@@ -48,7 +59,7 @@ function createDocsProxy(options: {
         "location",
         target.origin === new URL(options.origin).origin
           ? new URL(target.pathname + target.search, url.origin).href
-          : target.href,
+          : target.href
       )
     }
     return new Response(upstream.body, { status: upstream.status, headers })

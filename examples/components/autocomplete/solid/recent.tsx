@@ -12,8 +12,15 @@ import {
 import { For } from "solid-js"
 
 const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
-const topics = [...recent, "react server components", "tailwind colors", "vue router"]
-const recentSearches = [{ type: "group" as const, label: "Recent searches", items: recent }]
+const topics = [
+  ...recent,
+  "react server components",
+  "tailwind colors",
+  "vue router",
+]
+const recentSearches = [
+  { type: "group" as const, label: "Recent searches", items: recent },
+]
 
 function Example() {
   return (
@@ -22,15 +29,23 @@ function Example() {
       emptyItems={recentSearches}
       openOnFocus
       announcement={(change) =>
-        change.type === "results" ? `${change.count} ${change.count === 1 ? "topic" : "topics"}` : null
+        change.type === "results"
+          ? `${change.count} ${change.count === 1 ? "topic" : "topics"}`
+          : null
       }
     >
-      <AutocompleteInput type="search" aria-label="Search docs" placeholder="Search docs…" />
+      <AutocompleteInput
+        type="search"
+        aria-label="Search docs"
+        placeholder="Search docs…"
+      />
       <AutocompleteContent>
         <AutocompleteEmpty>No topics found.</AutocompleteEmpty>
         <AutocompleteList>
           {(state) => (
-            <For each={state.items as (string | (typeof recentSearches)[number])[]}>
+            <For
+              each={state.items as (string | (typeof recentSearches)[number])[]}
+            >
               {(entry) =>
                 typeof entry === "string" ? (
                   <AutocompleteItem value={entry}>
@@ -38,7 +53,9 @@ function Example() {
                   </AutocompleteItem>
                 ) : (
                   <AutocompleteGroup>
-                    <AutocompleteGroupLabel>{entry.label}</AutocompleteGroupLabel>
+                    <AutocompleteGroupLabel>
+                      {entry.label}
+                    </AutocompleteGroupLabel>
                     <For each={entry.items}>
                       {(topic) => (
                         <AutocompleteItem value={topic}>

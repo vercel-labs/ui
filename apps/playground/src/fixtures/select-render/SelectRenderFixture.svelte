@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@ui-sdk/svelte"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte"
   import { selectFixture as f } from "tests/fixtures/select.ts"
 </script>
 
@@ -10,7 +17,10 @@
     <SelectLabel class="label">{f.label}</SelectLabel>
     <SelectTrigger>
       {#snippet render({ props, state })}
-        <button {...props} class={["trigger", state.open ? "is-open" : "is-closed"]}>
+        <button
+          {...props}
+          class={["trigger", state.open ? "is-open" : "is-closed"]}
+        >
           <SelectValue />
           <span aria-hidden="true">{state.open ? "▲" : "▼"}</span>
         </button>

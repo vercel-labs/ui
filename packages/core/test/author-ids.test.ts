@@ -5,7 +5,13 @@ import { expect, test, vi } from "vitest"
 import { triggerMenu } from "../src/components/trigger-menu/trigger-menu"
 import { applyAttrs, live } from "../src/foundation/kernel/live"
 import { field, fieldSet } from "../src/components/field/field"
-import { attrs, bind, liveAttrs, subscribe, takeOwnId } from "../src/foundation/kernel/part"
+import {
+  attrs,
+  bind,
+  liveAttrs,
+  subscribe,
+  takeOwnId,
+} from "../src/foundation/kernel/part"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { fakeEditor } from "./fake-editor"
 
@@ -20,7 +26,9 @@ const tabs = definePrimitive({
   api: () => ({}),
   slots: (slot) => ({
     list: slot({
-      live: live((state, { id }) => ({ "aria-activedescendant": `${id}-tab-${state.highlighted}` })),
+      live: live((state, { id }) => ({
+        "aria-activedescendant": `${id}-tab-${state.highlighted}`,
+      })),
     }),
     tab: slot<{ value: string }>({
       props: { value: "string" },
@@ -42,7 +50,9 @@ const tabs = definePrimitive({
 
 const element = (id?: string, tag = "div") => {
   const el = document.createElement(tag)
-  if (id) el.id = id
+  if (id) {
+    el.id = id
+  }
   return el
 }
 
@@ -132,7 +142,9 @@ test("live references follow an author's id too", async () => {
 test("an id a part takes as it renders names it in the parts rendered after it, with no element bound", () => {
   const instance = tabs({ id: "t" })
   takeOwnId(instance.part("tab", { value: "a" }), "account")
-  expect(attrs(instance.part("panel", { value: "a" }))["aria-labelledby"]).toBe("account")
+  expect(attrs(instance.part("panel", { value: "a" }))["aria-labelledby"]).toBe(
+    "account"
+  )
 })
 
 test("parts hear once the element of a part that took its id as it rendered binds", async () => {
@@ -236,7 +248,9 @@ test("a part binding with the id it rendered reads no attribute back", async () 
   bind(instance.part("tab", { value: "a" }), tab)
   await settle()
   expect(read).not.toHaveBeenCalled()
-  expect(attrs(instance.part("panel", { value: "a" }))["aria-labelledby"]).toBe("t-tab-a")
+  expect(attrs(instance.part("panel", { value: "a" }))["aria-labelledby"]).toBe(
+    "t-tab-a"
+  )
 })
 
 // The count gates read `getAttribute` as the parts a change reached, one read
@@ -245,7 +259,10 @@ test("writing attributes reads each one once, and an id only where one is writte
   const el = element("account")
   const read = vi.spyOn(el, "getAttribute")
   applyAttrs(el, { "aria-valuenow": "5", "data-dragging": "" }, "live:t")
-  expect(read.mock.calls.map(([name]) => name)).toEqual(["aria-valuenow", "data-dragging"])
+  expect(read.mock.calls.map(([name]) => name)).toEqual([
+    "aria-valuenow",
+    "data-dragging",
+  ])
   read.mockClear()
   applyAttrs(el, { id: "t-tab-a", role: "tab" })
   expect(read.mock.calls.map(([name]) => name)).toEqual(["id", "role"])
@@ -274,8 +291,12 @@ test("a trigger menu points its editor at an option's author id", async () => {
   bind(instance.part("list"), list)
   bind(instance.part("item", { value: "alice" }), option)
   await settleChange()
-  instance.api.internal.onKeyDown(new KeyboardEvent("keydown", { key: "ArrowDown", cancelable: true }))
-  expect(editor.element.getAttribute("aria-activedescendant")).toBe("person-alice")
+  instance.api.internal.onKeyDown(
+    new KeyboardEvent("keydown", { key: "ArrowDown", cancelable: true })
+  )
+  expect(editor.element.getAttribute("aria-activedescendant")).toBe(
+    "person-alice"
+  )
   instance.destroy()
   document.body.replaceChildren()
 })

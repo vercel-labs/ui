@@ -19,7 +19,10 @@ let compared = 0
 let walked = 0
 
 // A node and its descendants, children first, the order a TreeWalker visits.
-const inOrder = (node: FakeNode): FakeNode[] => [node, ...node.children.flatMap(inOrder)]
+const inOrder = (node: FakeNode): FakeNode[] => [
+  node,
+  ...node.children.flatMap(inOrder),
+]
 
 const fakeDocument = {
   createTreeWalker(root: FakeNode) {
@@ -42,34 +45,45 @@ function node(name: string, children: FakeNode[] = []): FakeNode {
     isConnected: true,
     ownerDocument: fakeDocument,
     contains(other) {
-      for (let at: FakeNode | null = other; at; at = at.parentNode) if (at === self) return true
+      for (let at: FakeNode | null = other; at; at = at.parentNode) {
+        if (at === self) {
+          return true
+        }
+      }
       return false
     },
     compareDocumentPosition: () => 0,
   }
-  for (const child of children) child.parentNode = self
+  for (const child of children) {
+    child.parentNode = self
+  }
   return self
 }
 
 // Compares nodes by their place in `roots`, one tree after another.
 function compareWithin(...roots: FakeNode[]) {
   const all = roots.flatMap(inOrder)
-  for (const each of all)
+  for (const each of all) {
     each.compareDocumentPosition = (other) => {
       compared++
       // Node.DOCUMENT_POSITION_FOLLOWING or PRECEDING.
       return all.indexOf(other) > all.indexOf(each) ? 4 : 2
     }
+  }
 }
 
 const itemsIn = (count: number, prefix: string) =>
-  Array.from({ length: count }, (_, index) => node(`${prefix}${index}`, [node(`${prefix}${index}-label`)]))
+  Array.from({ length: count }, (_, index) =>
+    node(`${prefix}${index}`, [node(`${prefix}${index}-label`)])
+  )
 
 // Adds the items back to front, like parts a framework binds out of order,
 // and reads the order.
 function listOf(items: FakeNode[]) {
   const order = createOrder<{ key: string; el: HTMLElement }>()
-  for (const item of [...items].reverse()) order.add({ key: item.name, el: item as unknown as HTMLElement })
+  for (const item of [...items].reverse()) {
+    order.add({ key: item.name, el: item as unknown as HTMLElement })
+  }
   compared = 0
   walked = 0
   return order.list().map((entry) => entry.key)
@@ -80,7 +94,11 @@ describe("document order", () => {
     const first = itemsIn(20, "a")
     const second = itemsIn(20, "b")
     const page = node("page", [
-      node("list", [node("group", first), node("separator"), node("group", second)]),
+      node("list", [
+        node("group", first),
+        node("separator"),
+        node("group", second),
+      ]),
     ])
     compareWithin(page)
     const items = [...first, ...second]
@@ -112,7 +130,7 @@ describe("document order", () => {
     // Twenty items, each at the end of a section of a hundred elements.
     const items = itemsIn(20, "a")
     const sections = items.map((item, index) =>
-      node(`section${index}`, [...itemsIn(100, `s${index}-`), item]),
+      node(`section${index}`, [...itemsIn(100, `s${index}-`), item])
     )
     compareWithin(node("page", sections))
     expect(listOf(items)).toEqual(items.map((item) => item.name))
@@ -131,8 +149,11 @@ describe("items joining a kept order", () => {
     const page = node("page", [node("list", [...before, ...added, ...after])])
     compareWithin(page)
     const order = createOrder<{ key: string; el: HTMLElement }>()
-    const add = (item: FakeNode) => order.add({ key: item.name, el: item as unknown as HTMLElement })
-    const leaves = new Map([...before, ...after].map((item) => [item.name, add(item)]))
+    const add = (item: FakeNode) =>
+      order.add({ key: item.name, el: item as unknown as HTMLElement })
+    const leaves = new Map(
+      [...before, ...after].map((item) => [item.name, add(item)])
+    )
     order.list()
     compared = 0
     walked = 0
@@ -142,7 +163,9 @@ describe("items joining a kept order", () => {
   test("take their places by binary search, without sorting or walking the list again", () => {
     const { order, add, items, added } = joined()
     added.forEach(add)
-    expect(order.list().map((entry) => entry.key)).toEqual(items.map((item) => item.name))
+    expect(order.list().map((entry) => entry.key)).toEqual(
+      items.map((item) => item.name)
+    )
     expect(walked).toBe(0)
     expect(compared).toBeLessThanOrEqual(2 * Math.ceil(Math.log2(1002)))
   })
@@ -172,13 +195,16 @@ describe("items joining a kept order", () => {
     const late = itemsIn(400, "late")
     compareWithin(node("page", [node("list", [...kept, ...late])]))
     const order = createOrder<{ key: string; el: HTMLElement }>()
-    const add = (item: FakeNode) => order.add({ key: item.name, el: item as unknown as HTMLElement })
+    const add = (item: FakeNode) =>
+      order.add({ key: item.name, el: item as unknown as HTMLElement })
     kept.forEach(add)
     order.list()
     late.forEach(add)
     compared = 0
     walked = 0
-    expect(order.list().map((entry) => entry.key)).toEqual([...kept, ...late].map((item) => item.name))
+    expect(order.list().map((entry) => entry.key)).toEqual(
+      [...kept, ...late].map((item) => item.name)
+    )
     // One walk of the list, not 400 binary searches.
     expect(compared).toBe(0)
     expect(walked).toBeGreaterThan(0)
@@ -191,7 +217,12 @@ describe("a slot's elements", () => {
     const list = node("list", items)
     const page = node("page", [list])
     compareWithin(page)
-    const parts = items.map((item) => ({ slot: "item", key: item.name, props: {}, el: item }))
+    const parts = items.map((item) => ({
+      slot: "item",
+      key: item.name,
+      props: {},
+      el: item,
+    }))
     const context = { parts: () => parts as unknown as Part[] }
     const keys = () => elements(context, "item").map(({ key }) => key)
     expect(keys()).toEqual(items.map((item) => item.name))

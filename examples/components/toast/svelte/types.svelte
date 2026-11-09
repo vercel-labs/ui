@@ -1,7 +1,18 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import { CircleCheckIcon, InfoIcon, LoaderCircleIcon, OctagonXIcon, TriangleAlertIcon } from "@lucide/svelte"
-  import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import {
+    CircleCheckIcon,
+    InfoIcon,
+    LoaderCircleIcon,
+    OctagonXIcon,
+    TriangleAlertIcon,
+  } from "@lucide/svelte"
+  import {
+    Toast,
+    ToastRegion,
+    ToastTitle,
+    createToaster,
+  } from "@ui-sdk/svelte/toast"
 
   function upload() {
     return new Promise((resolve) => setTimeout(resolve, 2000))
@@ -17,7 +28,9 @@
   <button onclick={() => toast("Event created")}>Default</button>
   <button onclick={() => toast.success("Changes saved")}>Success</button>
   <button onclick={() => toast.info("A new version is available")}>Info</button>
-  <button onclick={() => toast.warning("Storage is almost full")}>Warning</button>
+  <button onclick={() => toast.warning("Storage is almost full")}
+    >Warning</button
+  >
   <button onclick={() => toast.error("Couldn't save changes")}>Error</button>
   <button
     onclick={() =>

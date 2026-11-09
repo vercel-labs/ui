@@ -5,12 +5,14 @@ import * as React from "react"
 // renders its own part when the app gives none checks here, so a part placed
 // in the markup never renders a second one, not even for a frame.
 function hasChild(children: React.ReactNode, type: React.ElementType) {
-  for (const child of React.Children.toArray(children))
+  for (const child of React.Children.toArray(children)) {
     if (
       React.isValidElement<{ children?: React.ReactNode }>(child) &&
       (child.type === type || hasChild(child.props.children, type))
-    )
+    ) {
       return true
+    }
+  }
   return false
 }
 
@@ -69,10 +71,12 @@ function notLabel<Part extends object>(part: Part) {
 function learnLabels(
   internal: {
     keyOf: (value: unknown) => string
-    learnLabels: (find: (keys: ReadonlySet<string>) => { value: unknown; label: string }[]) => void
+    learnLabels: (
+      find: (keys: ReadonlySet<string>) => { value: unknown; label: string }[]
+    ) => void
   },
   children: React.ReactNode,
-  skip: ReadonlySet<unknown>,
+  skip: ReadonlySet<unknown>
 ) {
   internal.learnLabels((keys) => {
     const found: { value: unknown; label: string }[] = []
@@ -89,12 +93,21 @@ function learnLabels(
             ? text(node.props.children as React.ReactNode)
             : ""
     const visit = (node: React.ReactNode) => {
-      if (Array.isArray(node)) return node.forEach(visit)
-      if (!React.isValidElement<Record<string, unknown>>(node)) return
+      if (Array.isArray(node)) {
+        return node.forEach(visit)
+      }
+      if (!React.isValidElement<Record<string, unknown>>(node)) {
+        return
+      }
       const { value, label, children } = node.props
       // An element, like an `<input>` with its own `value`, is never an item.
-      if (value === undefined || typeof node.type === "string" || !keys.has(internal.keyOf(value)))
+      if (
+        value === undefined ||
+        typeof node.type === "string" ||
+        !keys.has(internal.keyOf(value))
+      ) {
         return visit(children as React.ReactNode)
+      }
       // Whitespace collapsed, as an item's label reads once it mounts.
       const shown =
         typeof label === "string"
@@ -102,11 +115,20 @@ function learnLabels(
           : text(children as React.ReactNode)
               .replace(/\s+/g, " ")
               .trim()
-      if (shown) found.push({ value, label: shown })
+      if (shown) {
+        found.push({ value, label: shown })
+      }
     }
     visit(children)
     return found
   })
 }
 
-export { hasChild, learnLabels, notLabel, Placed, usePlaceContent, usePlacedContent }
+export {
+  hasChild,
+  learnLabels,
+  notLabel,
+  Placed,
+  usePlaceContent,
+  usePlacedContent,
+}

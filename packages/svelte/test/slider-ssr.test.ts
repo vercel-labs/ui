@@ -10,7 +10,7 @@ describe("server rendering a slider", () => {
     expect(typeof window).toBe("undefined")
     expect(html).toContain("inset-inline-start:20%")
     expect(html).toMatch(
-      /<input[^>]*type="range"[^>]*aria-label="Minimum"|<input[^>]*aria-label="Minimum"[^>]*type="range"/,
+      /<input[^>]*type="range"[^>]*aria-label="Minimum"|<input[^>]*aria-label="Minimum"[^>]*type="range"/
     )
     expect(html).toMatch(/<input[^>]*name="price"[^>]*value="20\/80"/)
     expect(html).toContain("20 – 80")
@@ -19,8 +19,12 @@ describe("server rendering a slider", () => {
   // The range input reaches a custom thumb as `children`, and is the only thing that takes focus.
   test("the docs' render example keeps its thumb's range input", () => {
     const html = render(RenderExample).body
-    const [label, labelId] = html.match(/<label[^>]*\sid="([^"]+)"[^>]*>.*?Brightness/)!
-    const [input, inputId] = html.match(/<input[^>]*type="range"[^>]*\sid="([^"]+)"[^>]*>/)!
+    const [label, labelId] = html.match(
+      /<label[^>]*\sid="([^"]+)"[^>]*>.*?Brightness/
+    )!
+    const [input, inputId] = html.match(
+      /<input[^>]*type="range"[^>]*\sid="([^"]+)"[^>]*>/
+    )!
     expect(input).toContain(`aria-labelledby="${labelId}"`)
     expect(label).toContain(`for="${inputId}"`)
   })

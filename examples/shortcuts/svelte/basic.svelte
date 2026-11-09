@@ -12,16 +12,9 @@
 
 <div data-slot="stack">
   <div data-slot="row">
-    <button
-      type="button"
-      aria-keyshortcuts="N"
-      onclick={newNote}
-    >
+    <button type="button" aria-keyshortcuts="N" onclick={newNote}>
       New note
-      <kbd
-        aria-hidden="true" data-slot="kbd"
-        >N</kbd
-      >
+      <kbd aria-hidden="true" data-slot="kbd">N</kbd>
     </button>
     <button
       type="button"
@@ -29,10 +22,7 @@
       onclick={save}
     >
       Save
-      <kbd
-        aria-hidden="true" data-slot="kbd"
-        >{saveHint.text}</kbd
-      >
+      <kbd aria-hidden="true" data-slot="kbd">{saveHint.text}</kbd>
     </button>
   </div>
   <output data-slot="output">{status}</output>

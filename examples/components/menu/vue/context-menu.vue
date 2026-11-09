@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Menu, MenuContent, MenuContextTrigger, MenuItem, MenuSeparator } from "@ui-sdk/vue/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuContextTrigger,
+  MenuItem,
+  MenuSeparator,
+} from "@ui-sdk/vue/menu"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
@@ -7,7 +13,9 @@ const log = useLog()
 
 <template>
   <Menu @action="(value) => log(`Chose ${value}`)">
-    <MenuContextTrigger tabindex="0">Right-click or long-press here</MenuContextTrigger>
+    <MenuContextTrigger tabindex="0"
+      >Right-click or long-press here</MenuContextTrigger
+    >
     <MenuContent>
       <MenuItem value="back">Back</MenuItem>
       <MenuItem value="forward" disabled>Forward</MenuItem>

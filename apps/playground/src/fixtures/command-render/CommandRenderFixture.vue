@@ -16,7 +16,10 @@ function onAction(value: string) {
     <button>Before</button>
     <Command @action="onAction">
       <template #render="{ props, state }">
-        <div v-bind="props" :class="['command', state.page ? 'is-paged' : 'is-first']">
+        <div
+          v-bind="props"
+          :class="['command', state.page ? 'is-paged' : 'is-first']"
+        >
           <CommandInput class="input" :aria-label="f.input" />
           <CommandList class="command-list">
             <CommandItem class="item" value="docs" href="#docs">
@@ -31,7 +34,13 @@ function onAction(value: string) {
               :label="item.label"
             >
               <template #render="{ props, state: itemState }">
-                <div v-bind="props" :class="['item', itemState.highlighted ? 'is-highlighted' : '']">
+                <div
+                  v-bind="props"
+                  :class="[
+                    'item',
+                    itemState.highlighted ? 'is-highlighted' : '',
+                  ]"
+                >
                   {{ item.label }}{{ itemState.highlighted ? " ←" : "" }}
                 </div>
               </template>

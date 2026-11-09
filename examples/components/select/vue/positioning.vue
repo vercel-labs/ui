@@ -45,14 +45,22 @@ const anchored = ref(false)
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <Select :items="sides" :value="side" @value-change="(next) => next && (side = next as Side)">
+      <Select
+        :items="sides"
+        :value="side"
+        @value-change="(next) => next && (side = next as Side)"
+      >
         <SelectLabel>Side</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in sides" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in sides"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon />
@@ -60,14 +68,22 @@ const anchored = ref(false)
           </SelectItem>
         </SelectContent>
       </Select>
-      <Select :items="aligns" :value="align" @value-change="(next) => next && (align = next as Align)">
+      <Select
+        :items="aligns"
+        :value="align"
+        @value-change="(next) => next && (align = next as Align)"
+      >
         <SelectLabel>Align</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in aligns" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in aligns"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon />
@@ -76,7 +92,10 @@ const anchored = ref(false)
         </SelectContent>
       </Select>
       <label data-slot="label">
-        <Checkbox :checked="anchored" @checked-change="(next) => (anchored = next === true)">
+        <Checkbox
+          :checked="anchored"
+          @checked-change="(next) => (anchored = next === true)"
+        >
           <CheckboxIndicator>
             <CheckIcon />
           </CheckboxIndicator>
@@ -99,7 +118,11 @@ const anchored = ref(false)
           :anchor="anchored ? box : null"
         >
           <SelectArrow />
-          <SelectItem v-for="font in fonts" :key="font.value" :value="font.value">
+          <SelectItem
+            v-for="font in fonts"
+            :key="font.value"
+            :value="font.value"
+          >
             {{ font.label }}
             <SelectItemIndicator>
               <CheckIcon />

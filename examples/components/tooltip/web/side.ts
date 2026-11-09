@@ -17,7 +17,7 @@ function mount(root: HTMLElement) {
               <ui-tooltip-trigger><button>${label}</button></ui-tooltip-trigger>
               <ui-tooltip-content side="${side}">Add to library</ui-tooltip-content>
             </ui-tooltip>
-          `,
+          `
         )
         .join("")}
     </div>

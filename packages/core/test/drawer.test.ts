@@ -23,7 +23,11 @@ describe("snap points while closed", () => {
   })
 
   test("a controlled snap point stays as passed while closed", () => {
-    const instance = drawer({ id: "d", snapPoints: [0.25, 0.5, 1], snapPoint: 0.5 })
+    const instance = drawer({
+      id: "d",
+      snapPoints: [0.25, 0.5, 1],
+      snapPoint: 0.5,
+    })
     instance.api.open()
     instance.api.close()
     expect(instance.api.getSnapPoint()).toBe(0.5)
@@ -32,8 +36,9 @@ describe("snap points while closed", () => {
 
 // What the development build recorded writing while options were handed over.
 const relays = () =>
-  (globalThis as Record<symbol, { relays?: unknown[] } | undefined>)[Symbol.for("ui-sdk.devtools.history@1")]
-    ?.relays ?? []
+  (globalThis as Record<symbol, { relays?: unknown[] } | undefined>)[
+    Symbol.for("ui-sdk.devtools.history@1")
+  ]?.relays ?? []
 
 describe("opened through `open`", () => {
   test.each([{ open: true }, { defaultOpen: true }])(
@@ -59,7 +64,7 @@ describe("opened through `open`", () => {
         interactive: true,
       })
       instance.destroy()
-    },
+    }
   )
 
   test("controlled closed state has no initial snap point", () => {
@@ -69,7 +74,12 @@ describe("opened through `open`", () => {
       snapPoints: [0.25, 1],
       modalAbove: 0.25,
     })
-    expect(instance.get()).toMatchObject({ open: false, mounted: false, snapPoint: null, interactive: false })
+    expect(instance.get()).toMatchObject({
+      open: false,
+      mounted: false,
+      snapPoint: null,
+      interactive: false,
+    })
     instance.destroy()
   })
 
@@ -82,13 +92,22 @@ describe("opened through `open`", () => {
       snapPoint: 1,
       modalAbove: 0.25,
     })
-    expect(instance.get()).toMatchObject({ snapPoint: 1, interactive: false, modal: true })
+    expect(instance.get()).toMatchObject({
+      snapPoint: 1,
+      interactive: false,
+      modal: true,
+    })
     instance.destroy()
   })
 
   test("it starts at its first snap point with the option, before it's handed over, each time", () => {
     relays().splice(0)
-    let options = { id: "d", snapPoints: [0.25, 0.5, 1], modalAbove: 0.25, open: false }
+    let options = {
+      id: "d",
+      snapPoints: [0.25, 0.5, 1],
+      modalAbove: 0.25,
+      open: false,
+    }
     const instance = drawer(options)
     instance.follow(() => options)
     const hand = (open: boolean) => {
@@ -98,31 +117,54 @@ describe("opened through `open`", () => {
       return followed
     }
     for (const _ of [1, 2]) {
-      expect(hand(true)).toMatchObject({ open: true, snapPoint: 0.25, interactive: true, modal: false })
-      expect(hand(false)).toMatchObject({ open: false, mounted: false, snapPoint: null })
+      expect(hand(true)).toMatchObject({
+        open: true,
+        snapPoint: 0.25,
+        interactive: true,
+        modal: false,
+      })
+      expect(hand(false)).toMatchObject({
+        open: false,
+        mounted: false,
+        snapPoint: null,
+      })
     }
     expect(relays()).toEqual([])
   })
 
   test.each([
-    ["snap points", { snapPoints: [0.25, 1] }, { snapPoint: 0.25, interactive: true, modal: false }],
-    ["a default snap point", { defaultSnapPoint: 1 }, { snapPoint: 1, interactive: false, modal: true }],
-  ])("it opens with %s changed with it, before they're handed over", (_, change, expected) => {
-    relays().splice(0)
-    let options: DrawerOptions & { id: string } = {
-      id: "d",
-      snapPoints: [0.5, 1],
-      modalAbove: 0.25,
-      open: false,
+    [
+      "snap points",
+      { snapPoints: [0.25, 1] },
+      { snapPoint: 0.25, interactive: true, modal: false },
+    ],
+    [
+      "a default snap point",
+      { defaultSnapPoint: 1 },
+      { snapPoint: 1, interactive: false, modal: true },
+    ],
+  ])(
+    "it opens with %s changed with it, before they're handed over",
+    (_, change, expected) => {
+      relays().splice(0)
+      let options: DrawerOptions & { id: string } = {
+        id: "d",
+        snapPoints: [0.5, 1],
+        modalAbove: 0.25,
+        open: false,
+      }
+      const instance = drawer(options)
+      instance.follow(() => options)
+      options = { ...options, ...change, open: true }
+      const followed = instance.get()
+      instance.setOptions(options)
+      expect({ followed, landed: instance.get() }).toMatchObject({
+        followed: expected,
+        landed: expected,
+      })
+      expect(relays()).toEqual([])
     }
-    const instance = drawer(options)
-    instance.follow(() => options)
-    options = { ...options, ...change, open: true }
-    const followed = instance.get()
-    instance.setOptions(options)
-    expect({ followed, landed: instance.get() }).toMatchObject({ followed: expected, landed: expected })
-    expect(relays()).toEqual([])
-  })
+  )
 })
 
 test("an open drawer whose snap point and default both leave its snap points moves to the first left", () => {
@@ -139,7 +181,11 @@ test("an open drawer whose snap point and default both leave its snap points mov
 })
 
 test("an open drawer whose snap points become empty keeps a snap point", () => {
-  const options: DrawerOptions & { id: string } = { id: "d", defaultOpen: true, snapPoints: [0.5, 1] }
+  const options: DrawerOptions & { id: string } = {
+    id: "d",
+    defaultOpen: true,
+    snapPoints: [0.5, 1],
+  }
   const instance = drawer(options)
   instance.setOptions({ ...options, snapPoints: [] })
   expect(instance.api.getSnapPoint()).not.toBeUndefined()

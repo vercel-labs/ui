@@ -7,9 +7,14 @@ type Variant = {
   title: string
   note?: string
   // Plain options, so the web components take them as attributes.
-  options: { type?: ScrollAreaType; scrollHideDelay?: number; stickToEnd?: boolean }
+  options: {
+    type?: ScrollAreaType
+    scrollHideDelay?: number
+    stickToEnd?: boolean
+  }
   // What fills the viewport. Plain DOM, filled by the shell, so every framework shows the same.
-  content: "text" | "links" | "short" | "grid" | "wide" | "chat" | "snap" | "nested"
+  content:
+    "text" | "links" | "short" | "grid" | "wide" | "chat" | "snap" | "nested"
   // Which Scrollbar parts render. "none" keeps the native scrollbars.
   scrollbars: "vertical" | "horizontal" | "both" | "none"
   // Where the scroll area sits.
@@ -196,7 +201,9 @@ const variants: Variant[] = [
 function chipsOf(variant: Variant) {
   return {
     ...variant.options,
-    ...(variant.scrollbars !== "vertical" && { scrollbars: variant.scrollbars }),
+    ...(variant.scrollbars !== "vertical" && {
+      scrollbars: variant.scrollbars,
+    }),
     ...(variant.place && { place: variant.place }),
   }
 }
@@ -204,7 +211,7 @@ function chipsOf(variant: Variant) {
 const paragraphs = Array.from(
   { length: 24 },
   (_, index) =>
-    `Line ${index + 1}: a scroll area keeps the browser's own scrolling and draws its own scrollbars.`,
+    `Line ${index + 1}: a scroll area keeps the browser's own scrolling and draws its own scrollbars.`
 )
 
 // Fills a variant's content element with plain DOM, the same in every framework.
@@ -212,49 +219,82 @@ function fillContent(el: HTMLElement, variant: Variant) {
   const add = (tag: string, text: string, className = "") => {
     const child = document.createElement(tag)
     child.textContent = text
-    if (className) child.className = className
+    if (className) {
+      child.className = className
+    }
     el.append(child)
     return child
   }
-  if (variant.content === "short") add("p", "Two lines.")
-  if (variant.content === "text") for (const line of paragraphs) add("p", line, "py-1")
-  if (variant.content === "links")
+  if (variant.content === "short") {
+    add("p", "Two lines.")
+  }
+  if (variant.content === "text") {
+    for (const line of paragraphs) {
+      add("p", line, "py-1")
+    }
+  }
+  if (variant.content === "links") {
     for (let index = 1; index <= 20; index++) {
       const link = add("a", `Link ${index}`, "block py-1 underline")
       link.setAttribute("href", `#link-${index}`)
     }
+  }
   if (variant.content === "wide") {
     el.className += " flex w-max gap-2"
-    for (let index = 1; index <= 12; index++)
-      add("div", `Card ${index}`, "grid h-32 w-28 place-items-center rounded bg-neutral-100")
+    for (let index = 1; index <= 12; index++) {
+      add(
+        "div",
+        `Card ${index}`,
+        "grid h-32 w-28 place-items-center rounded bg-neutral-100"
+      )
+    }
   }
   if (variant.content === "grid") {
     el.className += " grid w-max grid-cols-[repeat(8,6rem)] gap-2"
-    for (let index = 1; index <= 48; index++)
-      add("div", `${index}`, "grid h-16 place-items-center rounded bg-neutral-100")
+    for (let index = 1; index <= 48; index++) {
+      add(
+        "div",
+        `${index}`,
+        "grid h-16 place-items-center rounded bg-neutral-100"
+      )
+    }
   }
-  if (variant.content === "chat")
-    for (let index = 1; index <= 12; index++)
+  if (variant.content === "chat") {
+    for (let index = 1; index <= 12; index++) {
       add("p", `Message ${index}`, "my-1 rounded bg-neutral-100 px-2 py-1")
-  if (variant.content === "snap")
-    for (let index = 1; index <= 12; index++)
-      add("div", `Slide ${index}`, "grid h-44 snap-start place-items-center border-b")
+    }
+  }
+  if (variant.content === "snap") {
+    for (let index = 1; index <= 12; index++) {
+      add(
+        "div",
+        `Slide ${index}`,
+        "grid h-44 snap-start place-items-center border-b"
+      )
+    }
+  }
   if (variant.content === "nested") {
-    for (const line of paragraphs.slice(0, 6)) add("p", line, "py-1")
+    for (const line of paragraphs.slice(0, 6)) {
+      add("p", line, "py-1")
+    }
     const inner = add("div", "", "my-2 h-24 overflow-auto rounded border p-2")
     for (const line of paragraphs.slice(0, 10)) {
       const child = document.createElement("p")
       child.textContent = line
       inner.append(child)
     }
-    for (const line of paragraphs.slice(6, 14)) add("p", line, "py-1")
+    for (const line of paragraphs.slice(6, 14)) {
+      add("p", line, "py-1")
+    }
   }
 }
 
 // Words streamed into the last message of a chat variant.
 function streamInto(el: HTMLElement) {
   const last = el.lastElementChild
-  if (!last) return
+  if (!last) {
+    return
+  }
   last.append(" and more words while the answer streams in")
 }
 

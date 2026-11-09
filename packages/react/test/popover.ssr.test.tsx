@@ -23,7 +23,9 @@ describe("popover server rendering", () => {
       <PopoverContent>
         <PopoverArrow />
         <PopoverTitle>Edit profile</PopoverTitle>
-        <PopoverDescription>Your name appears on your posts.</PopoverDescription>
+        <PopoverDescription>
+          Your name appears on your posts.
+        </PopoverDescription>
         <PopoverClose>Close</PopoverClose>
       </PopoverContent>
     </Popover>
@@ -49,14 +51,16 @@ describe("popover server rendering", () => {
     const html = renderToString(popover(false))
     // Neutral names until the client knows its platform, so hydration never mismatches.
     expect(html).toContain('aria-keyshortcuts="Control+I"')
-    expect(html).toMatch(/<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+I\u2069<\/span>/)
+    expect(html).toMatch(
+      /<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+I\u2069<\/span>/
+    )
   })
 
   test("a shortcut part takes its own keys", () => {
     const html = renderToString(
       <Popover>
         <PopoverShortcut shortcut="mod+s" />
-      </Popover>,
+      </Popover>
     )
     expect(html).toContain("Ctrl+S")
   })
@@ -73,7 +77,7 @@ describe("popover server rendering", () => {
             <PopoverTitle>Share</PopoverTitle>
           </PopoverContent>
         </Popover>
-      </>,
+      </>
     )
     expect(html).toContain("Share")
   })

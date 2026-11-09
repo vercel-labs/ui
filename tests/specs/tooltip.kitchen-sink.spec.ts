@@ -11,7 +11,10 @@ const openTooltips = (page: Page) => page.locator('[role="tooltip"][data-open]')
 const moveAway = (page: Page) => page.mouse.move(5, 5)
 
 // Focuses the trigger with the keyboard, so it counts as keyboard focus.
-async function tabTo(trigger: Locator, tab: (options?: { shift?: boolean }) => Promise<void>) {
+async function tabTo(
+  trigger: Locator,
+  tab: (options?: { shift?: boolean }) => Promise<void>
+) {
   await trigger.focus()
   await tab({ shift: true })
   await tab()
@@ -20,7 +23,10 @@ async function tabTo(trigger: Locator, tab: (options?: { shift?: boolean }) => P
 
 async function expectPositioned(tooltip: Locator, label: string) {
   await expect(tooltip, label).toBeVisible()
-  await expect(tooltip, label).toHaveAttribute("data-side", /top|right|bottom|left/)
+  await expect(tooltip, label).toHaveAttribute(
+    "data-side",
+    /top|right|bottom|left/
+  )
 }
 
 // A popup animating out may cover the next trigger.
@@ -30,20 +36,28 @@ async function expectClosed(page: Page, label: string) {
 }
 
 test("every kitchen sink variant opens", async ({ page, framework, tab }) => {
-  test.skip(!["react", "vue", "web"].includes(framework), "Composition frameworks only.")
+  test.skip(
+    !["react", "vue", "web"].includes(framework),
+    "Composition frameworks only."
+  )
   test.setTimeout(120_000)
   const errors: string[] = []
   page.on("pageerror", (error) => errors.push(error.message))
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+  page.on(
+    "console",
+    (message) => message.type() === "error" && errors.push(message.text())
+  )
 
   // ?delay=50 keeps variants that don't test the delay from waiting 600ms each.
   // Fake timers, so the checks that a variant stays closed run the time ahead.
   await page.clock.install()
-  await page.goto(`/?fixture=tooltip-kitchen-sink&framework=${framework}&delay=50`)
+  await page.goto(
+    `/?fixture=tooltip-kitchen-sink&framework=${framework}&delay=50`
+  )
   await page.locator("body[data-mounted]").waitFor({ state: "attached" })
   // Triggers inside closed popovers are tested on their own below.
   const triggers = page.locator(
-    '[data-slot="tooltip-trigger"]:not([data-slot="popover-content"] *, ui-popover-content *)',
+    '[data-slot="tooltip-trigger"]:not([data-slot="popover-content"] *, ui-popover-content *)'
   )
   // Each card mounts its own root, so wait for all of them.
   await expect.poll(() => triggers.count()).toBeGreaterThan(55)
@@ -57,7 +71,9 @@ test("every kitchen sink variant opens", async ({ page, framework, tab }) => {
 
   for (let index = 0; index < count; index++) {
     const trigger = triggers.nth(index)
-    const id = await trigger.evaluate((el) => el.closest<HTMLElement>("[data-variant]")!.dataset.variant!)
+    const id = await trigger.evaluate(
+      (el) => el.closest<HTMLElement>("[data-variant]")!.dataset.variant!
+    )
     const label = `variant ${index} (${id})`
     await trigger.scrollIntoViewIfNeeded()
     const tooltip = openTooltips(page).first()
@@ -71,10 +87,17 @@ test("every kitchen sink variant opens", async ({ page, framework, tab }) => {
     }
 
     // Every third variant opens from the keyboard, unless it's about presses.
-    const pressed = ["toggleable", "close-on-press", "close-on-press-false"].includes(id)
+    const pressed = [
+      "toggleable",
+      "close-on-press",
+      "close-on-press-false",
+    ].includes(id)
     const keyboard = index % 3 === 2 && !pressed
-    if (keyboard) await tabTo(trigger, tab)
-    else await trigger.hover()
+    if (keyboard) {
+      await tabTo(trigger, tab)
+    } else {
+      await trigger.hover()
+    }
     await expectPositioned(tooltip, label)
 
     if (id === "toggleable") {
@@ -97,22 +120,31 @@ test("every kitchen sink variant opens", async ({ page, framework, tab }) => {
       await trigger.click()
       await expect(tooltip, `${label} stays open`).toHaveText("Copied")
     }
-    if (id === "controller") await expect(tooltip).toHaveText(`Open ${await trigger.textContent()}`)
+    if (id === "controller") {
+      await expect(tooltip).toHaveText(`Open ${await trigger.textContent()}`)
+    }
 
     // What the keyboard or a press opened, Escape closes. What the pointer opened closes as it leaves, or on Escape.
-    if (keyboard || pressed || index % 2) await page.keyboard.press("Escape")
-    else await moveAway(page)
+    if (keyboard || pressed || index % 2) {
+      await page.keyboard.press("Escape")
+    } else {
+      await moveAway(page)
+    }
     await expectClosed(page, label)
     await moveAway(page)
   }
 
   // A tooltip on a popover's trigger: hover shows it, and pressing opens the popover and closes it.
-  const profile = page.locator('[data-variant="popover-trigger"] button').first()
+  const profile = page
+    .locator('[data-variant="popover-trigger"] button')
+    .first()
   await profile.scrollIntoViewIfNeeded()
   await profile.hover()
   await expectPositioned(openTooltips(page).first(), "popover trigger")
   await profile.click()
-  await expect(page.getByRole("dialog", { name: "Profile settings" })).toBeVisible()
+  await expect(
+    page.getByRole("dialog", { name: "Profile settings" })
+  ).toBeVisible()
   await expect(openTooltips(page)).toHaveCount(0)
   await page.keyboard.press("Escape")
   await expect(page.getByRole("dialog")).toHaveCount(0)
@@ -134,7 +166,9 @@ test("every kitchen sink variant opens", async ({ page, framework, tab }) => {
 
   // The controller opens the shared tooltip with its own payload.
   await moveAway(page)
-  const controls = page.locator("article", { has: page.locator('[data-variant="controller"]') })
+  const controls = page.locator("article", {
+    has: page.locator('[data-variant="controller"]'),
+  })
   await controls.getByRole("button", { name: "Open", exact: true }).click()
   await expect(openTooltips(page)).toHaveText("Open the Open button")
   await expectPositioned(openTooltips(page).first(), "controller open")

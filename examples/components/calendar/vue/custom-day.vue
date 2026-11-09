@@ -28,7 +28,12 @@ const priceOf = (date: string) => 80 + ((Number(date.slice(8)) * 7) % 5) * 10
     <CalendarGrid>
       <CalendarWeekdays v-slot="{ index }">
         <CalendarWeekday v-slot="{ state }" :index="index">
-          <abbr :title="state.name" :data-weekend="state.weekday === 0 || state.weekday === 6 || undefined">
+          <abbr
+            :title="state.name"
+            :data-weekend="
+              state.weekday === 0 || state.weekday === 6 || undefined
+            "
+          >
             {{ state.label }}
           </abbr>
         </CalendarWeekday>
@@ -37,7 +42,9 @@ const priceOf = (date: string) => 80 + ((Number(date.slice(8)) * 7) % 5) * 10
         <CalendarDay v-slot="{ state }" :value="cell.date">
           <span data-slot="stack">
             <span>{{ state.label }}</span>
-            <span v-if="!state.outside && !state.disabled" data-slot="hint">${{ priceOf(state.date) }}</span>
+            <span v-if="!state.outside && !state.disabled" data-slot="hint"
+              >${{ priceOf(state.date) }}</span
+            >
           </span>
         </CalendarDay>
       </CalendarWeeks>

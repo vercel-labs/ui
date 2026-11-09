@@ -16,7 +16,11 @@ import {
   ToolbarSeparator,
   createToolbarController,
 } from "@ui-sdk/vue"
-import { toolbarFixture as f, toolbarLocked, toolbarOptions } from "tests/fixtures/toolbar.ts"
+import {
+  toolbarFixture as f,
+  toolbarLocked,
+  toolbarOptions,
+} from "tests/fixtures/toolbar.ts"
 import { ref, type SetupContext } from "vue"
 
 const action = ref("")
@@ -36,18 +40,30 @@ const groups = [
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Toolbar class="toolbar" :aria-label="f.label" :controller="controller" v-bind="options">
+    <Toolbar
+      class="toolbar"
+      :aria-label="f.label"
+      :controller="controller"
+      v-bind="options"
+    >
       <template v-for="(group, index) in groups" :key="group.label">
         <component
           :is="lockable && index === 0 ? ToolbarGroup : Plain"
-          v-bind="lockable && index === 0 ? { 'aria-label': 'Locked style', disabled: locked } : {}"
+          v-bind="
+            lockable && index === 0
+              ? { 'aria-label': 'Locked style', disabled: locked }
+              : {}
+          "
         >
           <ToggleGroup
             class="toggle-group"
             :aria-label="group.label"
             :multiple="group.multiple"
             :default-value="group.defaultValue"
-            @value-change="(value: string[]) => (action = `${group.label}: ${value.join(', ') || 'none'}`)"
+            @value-change="
+              (value: string[]) =>
+                (action = `${group.label}: ${value.join(', ') || 'none'}`)
+            "
           >
             <Toggle
               v-for="item in group.items"
@@ -69,7 +85,13 @@ const groups = [
           </template>
         </ToolbarButton>
         <MenuContent class="popup">
-          <MenuItem v-for="item in f.font.items" :key="item" class="item" :value="item">{{ item }}</MenuItem>
+          <MenuItem
+            v-for="item in f.font.items"
+            :key="item"
+            class="item"
+            :value="item"
+            >{{ item }}</MenuItem
+          >
         </MenuContent>
       </Menu>
       <NumberInput
@@ -82,8 +104,15 @@ const groups = [
           </template>
         </ToolbarInput>
       </NumberInput>
-      <ToolbarInput :aria-label="f.comment.label" :value="f.comment.defaultValue" />
-      <ToolbarGroup class="toolbar-group" :aria-label="f.history.label" :disabled="lockable && locked">
+      <ToolbarInput
+        :aria-label="f.comment.label"
+        :value="f.comment.defaultValue"
+      />
+      <ToolbarGroup
+        class="toolbar-group"
+        :aria-label="f.history.label"
+        :disabled="lockable && locked"
+      >
         <ToolbarButton
           v-for="item in f.history.items"
           :key="item.label"
@@ -95,18 +124,25 @@ const groups = [
       </ToolbarGroup>
       <component
         :is="lockable ? ToolbarGroup : Plain"
-        v-bind="lockable ? { 'aria-label': 'Locked proofing', disabled: locked } : {}"
+        v-bind="
+          lockable ? { 'aria-label': 'Locked proofing', disabled: locked } : {}
+        "
       >
         <Toggle
           class="toggle"
-          @pressed-change="(pressed: boolean) => (action = `spellcheck: ${pressed ? 'on' : 'off'}`)"
+          @pressed-change="
+            (pressed: boolean) =>
+              (action = `spellcheck: ${pressed ? 'on' : 'off'}`)
+          "
         >
           {{ f.spellcheck.label }}
         </Toggle>
       </component>
       <component
         :is="lockable ? ToolbarGroup : Plain"
-        v-bind="lockable ? { 'aria-label': 'Locked help', disabled: locked } : {}"
+        v-bind="
+          lockable ? { 'aria-label': 'Locked help', disabled: locked } : {}
+        "
       >
         <ToolbarLink :href="f.help.href">{{ f.help.label }}</ToolbarLink>
       </component>

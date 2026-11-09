@@ -20,7 +20,6 @@
     { value: "amman", label: "عمّان" },
     { value: "rabat", label: "الرباط" },
   ]
-
 </script>
 
 <div dir="rtl">

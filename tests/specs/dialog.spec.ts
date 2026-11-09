@@ -15,22 +15,31 @@ import {
 // https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/ and
 // https://www.w3.org/WAI/ARIA/apg/patterns/alertdialog/
 
-const dialog = (page: Page) => page.getByRole("dialog", { name: "Profile settings" })
-const trigger = (page: Page) => page.getByRole("button", { name: "Edit profile" })
-const field = (page: Page) => page.getByRole("textbox", { name: "Display name" })
-const alert = (page: Page) => page.getByRole("alertdialog", { name: "Delete project?" })
-const alertTrigger = (page: Page) => page.getByRole("button", { name: "Delete project" })
+const dialog = (page: Page) =>
+  page.getByRole("dialog", { name: "Profile settings" })
+const trigger = (page: Page) =>
+  page.getByRole("button", { name: "Edit profile" })
+const field = (page: Page) =>
+  page.getByRole("textbox", { name: "Display name" })
+const alert = (page: Page) =>
+  page.getByRole("alertdialog", { name: "Delete project?" })
+const alertTrigger = (page: Page) =>
+  page.getByRole("button", { name: "Delete project" })
 // While a modal dialog is open, the rest of the page is hidden from
 // assistive technology, so outside elements are found by text.
-const outside = (page: Page, text: string) => page.locator("button", { hasText: new RegExp(`^${text}$`) })
+const outside = (page: Page, text: string) =>
+  page.locator("button", { hasText: new RegExp(`^${text}$`) })
 
-const nestedDialog = (page: Page) => page.getByRole("dialog", { name: "Advanced settings" })
+const nestedDialog = (page: Page) =>
+  page.getByRole("dialog", { name: "Advanced settings" })
 
 // Defines a custom element whose open shadow root holds `html`.
 async function defineElement(page: Page, name: string, html: string) {
   await page.evaluate(
     ([name, html]) => {
-      if (customElements.get(name)) return
+      if (customElements.get(name)) {
+        return
+      }
       customElements.define(
         name,
         class extends HTMLElement {
@@ -38,10 +47,10 @@ async function defineElement(page: Page, name: string, html: string) {
             super()
             this.attachShadow({ mode: "open" }).innerHTML = html
           }
-        },
+        }
       )
     },
-    [name, html],
+    [name, html]
   )
 }
 
@@ -49,7 +58,9 @@ async function defineElement(page: Page, name: string, html: string) {
 const focusedText = (page: Page) =>
   page.evaluate(() => {
     let el = document.activeElement
-    while (el?.shadowRoot?.activeElement) el = el.shadowRoot.activeElement
+    while (el?.shadowRoot?.activeElement) {
+      el = el.shadowRoot.activeElement
+    }
     return el?.textContent?.trim()
   })
 
@@ -74,7 +85,9 @@ test.describe("trigger", () => {
   })
 
   for (const key of ["Enter", " "]) {
-    test(`${key === " " ? "Space" : key} opens the dialog`, async ({ page }) => {
+    test(`${key === " " ? "Space" : key} opens the dialog`, async ({
+      page,
+    }) => {
       await trigger(page).focus()
       await page.keyboard.press(key)
       await expect(dialog(page)).toBeVisible()
@@ -83,7 +96,9 @@ test.describe("trigger", () => {
 })
 
 test.describe("focus", () => {
-  test("opening moves focus to the first focusable element", async ({ page }) => {
+  test("opening moves focus to the first focusable element", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await expect(field(page)).toBeFocused()
   })
@@ -97,7 +112,7 @@ test.describe("focus", () => {
       await page.keyboard.press("Escape")
       await expect(trigger(page)).toBeFocused()
       expect(await dialogNamesAtFocus(page), `open ${time}`).toEqual(
-        Array(time).fill("Profile settings / Make changes to your profile."),
+        Array(time).fill("Profile settings / Make changes to your profile.")
       )
     }
   })
@@ -110,14 +125,20 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
   })
 
-  test("Tab from the last element wraps to the first", async ({ page, tab }) => {
+  test("Tab from the last element wraps to the first", async ({
+    page,
+    tab,
+  }) => {
     await openWithKeyboard(page)
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
     await expect(field(page)).toBeFocused()
   })
 
-  test("Shift+Tab from the first element wraps to the last", async ({ page, tab }) => {
+  test("Shift+Tab from the first element wraps to the last", async ({
+    page,
+    tab,
+  }) => {
     await openWithKeyboard(page)
     await tab({ shift: true })
     await expect(page.getByRole("button", { name: "Close" })).toBeFocused()
@@ -131,33 +152,45 @@ test.describe("focus", () => {
     await dialog(page).evaluate((el) =>
       el.insertAdjacentHTML(
         "beforeend",
-        `<label><input type="radio" name="speed" checked> Standard</label><label><input type="radio" name="speed"> Express</label>`,
-      ),
+        `<label><input type="radio" name="speed" checked> Standard</label><label><input type="radio" name="speed"> Express</label>`
+      )
     )
     await tab({ shift: true })
     await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
   })
 
-  test("Tab reaches radios whose group's checked radio is behind the dialog", async ({ page, tab }) => {
+  test("Tab reaches radios whose group's checked radio is behind the dialog", async ({
+    page,
+    tab,
+  }) => {
     await outside(page, "After").evaluate((el) =>
-      el.insertAdjacentHTML("afterend", `<input type="radio" name="speed" aria-label="Page speed" checked>`),
+      el.insertAdjacentHTML(
+        "afterend",
+        `<input type="radio" name="speed" aria-label="Page speed" checked>`
+      )
     )
     await openWithKeyboard(page)
     await dialog(page).evaluate((el) =>
       el.insertAdjacentHTML(
         "beforeend",
-        `<label><input type="radio" name="speed"> Standard</label><label><input type="radio" name="speed"> Express</label>`,
-      ),
+        `<label><input type="radio" name="speed"> Standard</label><label><input type="radio" name="speed"> Express</label>`
+      )
     )
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
     await expect(page.getByRole("radio", { name: "Standard" })).toBeFocused()
   })
 
-  test("Tab visits a positive tabindex first, like the browser", async ({ page, tab }) => {
+  test("Tab visits a positive tabindex first, like the browser", async ({
+    page,
+    tab,
+  }) => {
     await openWithKeyboard(page)
     await dialog(page).evaluate((el) =>
-      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<button type="button" tabindex="1">Jump ahead</button>`
+      )
     )
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
@@ -174,7 +207,10 @@ test.describe("focus", () => {
     await open("dialog", { modal: "trap-focus" })
     await openWithKeyboard(page)
     await dialog(page).evaluate((el) =>
-      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<button type="button" tabindex="1">Jump ahead</button>`
+      )
     )
     await page.getByRole("button", { name: "Jump ahead" }).focus()
     await tab()
@@ -183,14 +219,17 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Jump ahead" })).toBeFocused()
   })
 
-  test("a positive tabindex slotted into a custom element keeps its host's place", async ({ page, tab }) => {
+  test("a positive tabindex slotted into a custom element keeps its host's place", async ({
+    page,
+    tab,
+  }) => {
     await defineElement(page, "x-card", "<slot></slot>")
     await openWithKeyboard(page)
     await dialog(page).evaluate((el) =>
       el.insertAdjacentHTML(
         "beforeend",
-        `<x-card><button type="button" tabindex="1">Slotted</button></x-card>`,
-      ),
+        `<x-card><button type="button" tabindex="1">Slotted</button></x-card>`
+      )
     )
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
@@ -206,18 +245,25 @@ test.describe("focus", () => {
     await defineElement(
       page,
       "x-pair",
-      `<button type="button">Inner A</button><button type="button">Inner B</button>`,
+      `<button type="button">Inner A</button><button type="button">Inner B</button>`
     )
-    await defineElement(page, "x-swap", `<slot name="a"></slot><slot name="b"></slot>`)
+    await defineElement(
+      page,
+      "x-swap",
+      `<slot name="a"></slot><slot name="b"></slot>`
+    )
     await openWithKeyboard(page)
     await field(page).evaluate((el) =>
       el.insertAdjacentHTML(
         "afterend",
-        `<x-pair></x-pair><x-swap><button type="button" slot="b">Slot B</button><button type="button" slot="a">Slot A</button></x-swap>`,
-      ),
+        `<x-pair></x-pair><x-swap><button type="button" slot="b">Slot B</button><button type="button" slot="a">Slot A</button></x-swap>`
+      )
     )
     await dialog(page).evaluate((el) =>
-      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<button type="button" tabindex="1">Jump ahead</button>`
+      )
     )
     const visited = []
     for (let step = 0; step < 4; step++) {
@@ -232,20 +278,35 @@ test.describe("focus", () => {
     tab,
   }) => {
     await openWithKeyboard(page)
-    await field(page).evaluate((el) => el.insertAdjacentHTML("afterend", `<p tabindex="-1">Note</p>`))
+    await field(page).evaluate((el) =>
+      el.insertAdjacentHTML("afterend", `<p tabindex="-1">Note</p>`)
+    )
     await dialog(page).evaluate((el) =>
-      el.insertAdjacentHTML("beforeend", `<button type="button" tabindex="1">Jump ahead</button>`),
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<button type="button" tabindex="1">Jump ahead</button>`
+      )
     )
     await page.getByText("Note").focus()
     await tab()
     await expect(page.getByRole("button", { name: "Save" })).toBeFocused()
   })
 
-  test("Tab from a custom element with a positive tabindex enters its shadow root", async ({ page, tab }) => {
-    await defineElement(page, "x-panel", `<button type="button">Inside</button>`)
+  test("Tab from a custom element with a positive tabindex enters its shadow root", async ({
+    page,
+    tab,
+  }) => {
+    await defineElement(
+      page,
+      "x-panel",
+      `<button type="button">Inside</button>`
+    )
     await openWithKeyboard(page)
     await dialog(page).evaluate((el) =>
-      el.insertAdjacentHTML("beforeend", `<x-panel tabindex="1" aria-label="Panel"></x-panel>`),
+      el.insertAdjacentHTML(
+        "beforeend",
+        `<x-panel tabindex="1" aria-label="Panel"></x-panel>`
+      )
     )
     await page.locator("x-panel").focus()
     await tab()
@@ -254,24 +315,35 @@ test.describe("focus", () => {
     await expect(field(page)).toBeFocused()
   })
 
-  test("opening focuses the first field even when a later one has a positive tabindex", async ({ page }) => {
+  test("opening focuses the first field even when a later one has a positive tabindex", async ({
+    page,
+  }) => {
     await page.evaluate(() => {
       const raise = () =>
-        document.querySelectorAll("button").forEach((el) => el.textContent === "Save" && (el.tabIndex = 1))
+        document
+          .querySelectorAll("button")
+          .forEach((el) => el.textContent === "Save" && (el.tabIndex = 1))
       raise()
-      new MutationObserver(raise).observe(document.body, { childList: true, subtree: true })
+      new MutationObserver(raise).observe(document.body, {
+        childList: true,
+        subtree: true,
+      })
     })
     await openWithKeyboard(page)
   })
 
-  test("Escape closes the dialog and returns focus to the trigger", async ({ page }) => {
+  test("Escape closes the dialog and returns focus to the trigger", async ({
+    page,
+  }) => {
     await openWithKeyboard(page)
     await page.keyboard.press("Escape")
     await expect(dialog(page)).toBeHidden()
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("Escape after a click returns focus to the trigger", async ({ page }) => {
+  test("Escape after a click returns focus to the trigger", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await expect(field(page)).toBeFocused()
     await page.keyboard.press("Escape")
@@ -279,7 +351,9 @@ test.describe("focus", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("the close button closes the dialog and returns focus to the trigger", async ({ page }) => {
+  test("the close button closes the dialog and returns focus to the trigger", async ({
+    page,
+  }) => {
     await openWithKeyboard(page)
     await page.getByRole("button", { name: "Close" }).focus()
     await page.keyboard.press("Enter")
@@ -287,7 +361,9 @@ test.describe("focus", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("a virtual click from a screen reader moves focus into the dialog", async ({ page }) => {
+  test("a virtual click from a screen reader moves focus into the dialog", async ({
+    page,
+  }) => {
     await trigger(page).evaluate((el) => (el as HTMLElement).click())
     await expect(field(page)).toBeFocused()
   })
@@ -297,7 +373,11 @@ test.describe("focus", () => {
     framework,
     baseURL,
   }) => {
-    const context = await browser.newContext({ hasTouch: true, isMobile: true, baseURL })
+    const context = await browser.newContext({
+      hasTouch: true,
+      isMobile: true,
+      baseURL,
+    })
     const page = await context.newPage()
     await page.goto(`/?fixture=dialog&framework=${framework}`)
     await page.locator("body[data-mounted]").waitFor({ state: "attached" })
@@ -324,7 +404,9 @@ test.describe("dismissal", () => {
     await expect(dialog(page)).toBeHidden()
   })
 
-  test("pressing the backdrop returns focus to the trigger", async ({ page }) => {
+  test("pressing the backdrop returns focus to the trigger", async ({
+    page,
+  }) => {
     await openWithKeyboard(page)
     await page.mouse.click(5, 5)
     await expect(dialog(page)).toBeHidden()
@@ -339,7 +421,9 @@ test.describe("dismissal", () => {
 
   test("an outside press doesn't reach the page", async ({ page }) => {
     const after = outside(page, "After")
-    await after.evaluate((el) => el.addEventListener("click", () => (el.dataset.clicked = "")))
+    await after.evaluate((el) =>
+      el.addEventListener("click", () => (el.dataset.clicked = ""))
+    )
     const box = (await after.boundingBox())!
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
@@ -366,20 +450,28 @@ test.describe("presses", () => {
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("pressing the backdrop and releasing inside the dialog keeps it open", async ({ page, open }) => {
+  test("pressing the backdrop and releasing inside the dialog keeps it open", async ({
+    page,
+    open,
+  }) => {
     await open("dialog")
     await openWithKeyboard(page)
     const point = { x: 5, y: 5 }
     await page.mouse.move(point.x, point.y)
     await page.mouse.down()
-    const box = (await page.getByRole("heading", { name: "Profile settings" }).boundingBox())!
+    const box = (await page
+      .getByRole("heading", { name: "Profile settings" })
+      .boundingBox())!
     await page.mouse.move(box.x + 4, box.y + 4, { steps: 6 })
     await page.mouse.up()
     await page.waitForTimeout(100)
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("a right click on the backdrop keeps the dialog open", async ({ page, open }) => {
+  test("a right click on the backdrop keeps the dialog open", async ({
+    page,
+    open,
+  }) => {
     await open("dialog")
     await openWithKeyboard(page)
     await page.mouse.click(5, 5, { button: "right" })
@@ -387,7 +479,10 @@ test.describe("presses", () => {
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("a dialog styled only with ::backdrop closes when the backdrop is pressed", async ({ page, open }) => {
+  test("a dialog styled only with ::backdrop closes when the backdrop is pressed", async ({
+    page,
+    open,
+  }) => {
     await open("dialog", { backdrop: "none" })
     await openWithKeyboard(page)
     await page.mouse.click(5, 5)
@@ -408,7 +503,10 @@ test.describe("presses", () => {
     await expect(dialog(page)).toBeHidden()
   })
 
-  test("pressing a nested dialog's backdrop closes only the nested dialog", async ({ page, open }) => {
+  test("pressing a nested dialog's backdrop closes only the nested dialog", async ({
+    page,
+    open,
+  }) => {
     await open("dialog", { nested: "" })
     await openWithKeyboard(page)
     await page.getByRole("button", { name: "Advanced" }).click()
@@ -424,15 +522,24 @@ test.describe("presses", () => {
     open,
   }) => {
     await open("dialog", { animate: "" })
-    await page.addStyleTag({ content: ".dialog, .dialog-backdrop { transition-duration: 3s !important }" })
+    await page.addStyleTag({
+      content:
+        ".dialog, .dialog-backdrop { transition-duration: 3s !important }",
+    })
     const after = outside(page, "After")
-    await after.evaluate((el) => el.addEventListener("click", () => (el.dataset.clicked = "")))
+    await after.evaluate((el) =>
+      el.addEventListener("click", () => (el.dataset.clicked = ""))
+    )
     const box = (await after.boundingBox())!
     await openWithKeyboard(page)
     // Closing during the entrance would reverse it, which CSS shortens to how far it got.
     await expect
       .poll(() =>
-        dialog(page).evaluate((el) => !el.hasAttribute("data-starting-style") && !el.getAnimations().length),
+        dialog(page).evaluate(
+          (el) =>
+            !el.hasAttribute("data-starting-style") &&
+            !el.getAnimations().length
+        )
       )
       .toBe(true)
     await page.keyboard.press("Escape")
@@ -441,7 +548,10 @@ test.describe("presses", () => {
     await expect(after).not.toHaveAttribute("data-clicked")
   })
 
-  test("Escape right after opening a nested dialog closes only the nested one", async ({ page, open }) => {
+  test("Escape right after opening a nested dialog closes only the nested one", async ({
+    page,
+    open,
+  }) => {
     await open("dialog", { nested: "" })
     await openWithKeyboard(page)
     await page.getByRole("button", { name: "Advanced" }).focus()
@@ -458,12 +568,19 @@ test.describe("modal", () => {
     for (let i = 0; i < 5; i++) {
       await tab()
       await expect
-        .poll(() => page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]')))
+        .poll(() =>
+          page.evaluate(
+            () => !!document.activeElement?.closest('[role="dialog"]')
+          )
+        )
         .toBe(true)
     }
   })
 
-  test("the page doesn't scroll while the dialog is open", async ({ page, open }) => {
+  test("the page doesn't scroll while the dialog is open", async ({
+    page,
+    open,
+  }) => {
     await open("dialog", { layout: "tall" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
@@ -481,10 +598,14 @@ test.describe("modal", () => {
       .toBeGreaterThan(0)
   })
 
-  test("the rest of the page is hidden from assistive technology", async ({ page }) => {
+  test("the rest of the page is hidden from assistive technology", async ({
+    page,
+  }) => {
     // Hidden either way: inert, or aria-hidden.
     const hidden = () =>
-      outside(page, "After").evaluate((el) => !!el.closest('[inert], [aria-hidden="true"]'))
+      outside(page, "After").evaluate(
+        (el) => !!el.closest('[inert], [aria-hidden="true"]')
+      )
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     expect(await hidden()).toBe(true)
@@ -502,7 +623,8 @@ test.describe("modal", () => {
 })
 
 test.describe("nested dialogs", () => {
-  const nested = (page: Page) => page.getByRole("dialog", { name: "Advanced settings" })
+  const nested = (page: Page) =>
+    page.getByRole("dialog", { name: "Advanced settings" })
 
   test.beforeEach(async ({ open, page }) => {
     await open("dialog", { nested: "" })
@@ -511,7 +633,9 @@ test.describe("nested dialogs", () => {
     await expect(nested(page)).toBeVisible()
   })
 
-  test("Escape closes only the nested dialog and returns focus to its trigger", async ({ page }) => {
+  test("Escape closes only the nested dialog and returns focus to its trigger", async ({
+    page,
+  }) => {
     await page.keyboard.press("Escape")
     await expect(nested(page)).toBeHidden()
     await expect(dialog(page)).toBeVisible()
@@ -524,13 +648,18 @@ test.describe("nested dialogs", () => {
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("the outer dialog's open change hears only the outer dialog", async ({ page }) => {
+  test("the outer dialog's open change hears only the outer dialog", async ({
+    page,
+  }) => {
     await page.keyboard.press("Escape")
     await expect(nested(page)).toBeHidden()
     const changes = await page.evaluate(
-      () => (window as unknown as { __openChanges?: string[] }).__openChanges ?? [],
+      () =>
+        (window as unknown as { __openChanges?: string[] }).__openChanges ?? []
     )
-    expect(changes.filter((change) => change.startsWith("dialog:"))).toEqual(["dialog:true:trigger-press"])
+    expect(changes.filter((change) => change.startsWith("dialog:"))).toEqual([
+      "dialog:true:trigger-press",
+    ])
   })
 
   test("Tab stays inside the nested dialog", async ({ page, tab }) => {
@@ -559,7 +688,7 @@ test.describe("alert dialog", () => {
   test("is described by its message", async ({ page }) => {
     await alertTrigger(page).click()
     await expect(alert(page)).toHaveAccessibleDescription(
-      "This permanently deletes the project and its files.",
+      "This permanently deletes the project and its files."
     )
   })
 
@@ -571,7 +700,9 @@ test.describe("alert dialog", () => {
     await expect(alert(page)).toBeVisible()
   })
 
-  test("Escape closes it and returns focus to the trigger", async ({ page }) => {
+  test("Escape closes it and returns focus to the trigger", async ({
+    page,
+  }) => {
     await alertTrigger(page).focus()
     await page.keyboard.press("Enter")
     await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused()
@@ -584,7 +715,9 @@ test.describe("alert dialog", () => {
     await alertTrigger(page).click()
     await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused()
     await tab()
-    await expect(page.getByRole("button", { name: "Delete", exact: true })).toBeFocused()
+    await expect(
+      page.getByRole("button", { name: "Delete", exact: true })
+    ).toBeFocused()
     await tab()
     await expect(page.getByRole("button", { name: "Cancel" })).toBeFocused()
   })
@@ -604,16 +737,24 @@ test.describe("animation", () => {
     open,
     fixtureOptions,
   }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet slides in, with no starting style to fade from."
+    )
     await open("dialog", { animate: "" })
     await slowTransitions(page)
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     expect(await opacityOf(dialog(page))).toBeLessThan(0.5)
-    expect(await opacityOf(page.locator(".dialog-backdrop:visible"))).toBeLessThan(0.5)
+    expect(
+      await opacityOf(page.locator(".dialog-backdrop:visible"))
+    ).toBeLessThan(0.5)
   })
 
-  test("an alert dialog animates in from its starting style", async ({ page, open }) => {
+  test("an alert dialog animates in from its starting style", async ({
+    page,
+    open,
+  }) => {
     await open("dialog", { animate: "" })
     await slowTransitions(page)
     await alertTrigger(page).click()
@@ -621,7 +762,10 @@ test.describe("animation", () => {
     expect(await opacityOf(alert(page))).toBeLessThan(0.5)
   })
 
-  test("reopened while it animates out, it takes focus and hides the page again", async ({ page, open }) => {
+  test("reopened while it animates out, it takes focus and hides the page again", async ({
+    page,
+    open,
+  }) => {
     await open("dialog", { animate: "" })
     await openWithKeyboard(page)
     await entered(page)
@@ -630,31 +774,48 @@ test.describe("animation", () => {
     await page.keyboard.press("Enter")
     await expect(field(page)).toBeFocused()
     await expect
-      .poll(() => outside(page, "After").evaluate((el) => !!el.closest('[inert], [aria-hidden="true"]')), {
-        message: "the page outside is hidden again",
-      })
+      .poll(
+        () =>
+          outside(page, "After").evaluate(
+            (el) => !!el.closest('[inert], [aria-hidden="true"]')
+          ),
+        {
+          message: "the page outside is hidden again",
+        }
+      )
       .toBe(true)
   })
 
-  test("the dialog and its backdrop stay mounted while they animate out", async ({ page, open }) => {
+  test("the dialog and its backdrop stay mounted while they animate out", async ({
+    page,
+    open,
+  }) => {
     await open("dialog", { animate: "" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     // Closing during the entrance would reverse it, which CSS shortens to how far it got.
     await expect
       .poll(() =>
-        dialog(page).evaluate((el) => !el.hasAttribute("data-starting-style") && !el.getAnimations().length),
+        dialog(page).evaluate(
+          (el) =>
+            !el.hasAttribute("data-starting-style") &&
+            !el.getAnimations().length
+        )
       )
       .toBe(true)
     await page.keyboard.press("Escape")
     await expect(page.locator(".dialog[data-ending-style]")).toHaveCount(1)
-    await expect(page.locator(".dialog-backdrop[data-ending-style]")).toHaveCount(1)
+    await expect(
+      page.locator(".dialog-backdrop[data-ending-style]")
+    ).toHaveCount(1)
     // Custom elements stay in the page, hidden.
     await expect(page.locator(".dialog:visible")).toHaveCount(0)
     await expect(page.locator(".dialog-backdrop:visible")).toHaveCount(0)
   })
 
-  test("exit keyframes keyed on data-closed play before the dialog unmounts", async ({ page }) => {
+  test("exit keyframes keyed on data-closed play before the dialog unmounts", async ({
+    page,
+  }) => {
     await page.addStyleTag({
       content:
         "@keyframes exit { to { opacity: 0 } } :is(.dialog, .dialog-backdrop)[data-closed] { animation: exit 3s }",
@@ -662,14 +823,23 @@ test.describe("animation", () => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     await page.keyboard.press("Escape")
-    await expect(page.locator(".dialog[data-closed][data-ending-style]")).toHaveCount(1)
-    await expect(page.locator(".dialog-backdrop[data-closed][data-ending-style]")).toHaveCount(1)
+    await expect(
+      page.locator(".dialog[data-closed][data-ending-style]")
+    ).toHaveCount(1)
+    await expect(
+      page.locator(".dialog-backdrop[data-closed][data-ending-style]")
+    ).toHaveCount(1)
     expect(
       await page
         .locator(".dialog[data-ending-style]")
         .evaluate((el) =>
-          el.getAnimations().some((animation) => (animation as CSSAnimation).animationName === "exit"),
-        ),
+          el
+            .getAnimations()
+            .some(
+              (animation) =>
+                (animation as CSSAnimation).animationName === "exit"
+            )
+        )
     ).toBe(true)
   })
 
@@ -683,10 +853,16 @@ test.describe("animation", () => {
 })
 
 test.describe("top layer", () => {
-  test("dialogs render into their container", async ({ page, open, fixtureOptions }) => {
+  test("dialogs render into their container", async ({
+    page,
+    open,
+    fixtureOptions,
+  }) => {
     test.skip(!fixtureOptions.container, "Only for portal projects.")
     await open("dialog")
     await trigger(page).click()
-    await expect(page.locator(`#${fixtureOptions.container} > [role="dialog"]`)).toHaveCount(1)
+    await expect(
+      page.locator(`#${fixtureOptions.container} > [role="dialog"]`)
+    ).toHaveCount(1)
   })
 })

@@ -1,4 +1,11 @@
-import { Menu, MenuContent, MenuGroup, MenuGroupLabel, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuTrigger,
+} from "@ui-sdk/solid/menu"
 import { render } from "@solidjs/web"
 import { createEffect, createSignal, For } from "solid-js"
 import { onItemsChange } from "tests/fixtures/items.ts"
@@ -9,7 +16,7 @@ function Fixture() {
   const [groups, setGroups] = createSignal(menuGroups)
   createEffect(
     () => 0,
-    () => onItemsChange(changedMenuGroups, setGroups),
+    () => onItemsChange(changedMenuGroups, setGroups)
   )
   return (
     <div class="fixture">

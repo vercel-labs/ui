@@ -79,7 +79,10 @@ Import the parts and put them together:
 
 Write a range as numbers joined with a slash, like `default-value="25/50"`, then render one thumb per number. Thumbs take their index from their order, so give each its own name, like "Minimum price". The indicator fills the space between the first and the last thumb, and the `ui-field-label` names the group.
 
-<ComponentExample name="slider/range" caption="Move either end of Price. The thumbs stay in order." />
+<ComponentExample
+  name="slider/range"
+  caption="Move either end of Price. The thumbs stay in order."
+/>
 
 ## Multiple Thumbs
 
@@ -130,7 +133,10 @@ Listen for `valuechange`, and set the element's `value` property to change it fr
 
 `min` and `max` set the bounds, 0 and 100 by default, and `step` sets how far one step moves, counted from `min`. Decimal steps avoid floating-point drift, so a 0.1 step can reach 0.3 cleanly. When the steps from `min` don't land on `max`, the highest step below it is the end.
 
-<ComponentExample name="slider/step" caption="Move Year in steps of five, and Opacity in steps of 0.05." />
+<ComponentExample
+  name="slider/step"
+  caption="Move Year in steps of five, and Opacity in steps of 0.05."
+/>
 
 ## Large Step
 
@@ -272,31 +278,49 @@ Props are attributes in kebab case, like `default-value` and `min-steps-between-
 
 ### Slider
 
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderOptions" />
+<TypeTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderOptions"
+/>
 
 ### SliderThumb
 
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbProps" />
+<TypeTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderThumbProps"
+/>
 
 ### State
 
 The same state shows as data attributes on each element. Every part gets the slider's state.
 
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderState" />
+<StateTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderState"
+/>
 
 Thumbs add their own fields, and have their own value, `thumbValue`, in place of the whole `value`:
 
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbState" />
+<StateTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderThumbState"
+/>
 
 `ui-slider-value` adds the formatted text:
 
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueState" />
+<StateTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderValueState"
+/>
 
 ### Reasons
 
 `event.detail.reason` says why the value changed.
 
-<ReasonTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderValueChangeReason"
+/>
 
 ### Controller
 
@@ -304,7 +328,10 @@ The element's `api` property has the same methods. The `value` property reads an
 
 `setValue()` takes an optional `{ reason, event }`, fires the change event like a drag, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/slider/slider.ts" name="SliderController" />
+<ControllerTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderController"
+/>
 
 ### Events
 

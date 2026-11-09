@@ -1,5 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/solid/otp-input"
+import {
+  OTPInput,
+  OTPInputGroup,
+  OTPInputSeparator,
+  OTPInputSlot,
+} from "@ui-sdk/solid/otp-input"
 import { For } from "solid-js"
 
 function Example() {
@@ -8,7 +13,9 @@ function Example() {
       <FieldLabel>Recovery code</FieldLabel>
       <OTPInput maxLength={8} pattern="alphanumeric">
         <OTPInputGroup>
-          <For each={[0, 1, 2, 3]}>{(index) => <OTPInputSlot index={index} />}</For>
+          <For each={[0, 1, 2, 3]}>
+            {(index) => <OTPInputSlot index={index} />}
+          </For>
         </OTPInputGroup>
         <OTPInputSeparator>
           <svg
@@ -24,7 +31,9 @@ function Example() {
           </svg>
         </OTPInputSeparator>
         <OTPInputGroup>
-          <For each={[4, 5, 6, 7]}>{(index) => <OTPInputSlot index={index} />}</For>
+          <For each={[4, 5, 6, 7]}>
+            {(index) => <OTPInputSlot index={index} />}
+          </For>
         </OTPInputGroup>
       </OTPInput>
     </Field>

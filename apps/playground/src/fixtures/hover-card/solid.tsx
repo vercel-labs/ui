@@ -1,7 +1,16 @@
-import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@ui-sdk/solid/hover-card"
+import {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/solid/hover-card"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
-import { hoverCardContentOptions, hoverCardFixture, hoverCardOptions } from "tests/fixtures/hover-card.ts"
+import {
+  hoverCardContentOptions,
+  hoverCardFixture,
+  hoverCardOptions,
+} from "tests/fixtures/hover-card.ts"
 
 function Fixture() {
   const [action, setAction] = createSignal("")
@@ -13,9 +22,13 @@ function Fixture() {
       <button>Before</button>
       <HoverCard
         {...options}
-        onOpenChange={(open, { reason }) => setAction(`${open ? "open" : "close"}: ${reason}`)}
+        onOpenChange={(open, { reason }) =>
+          setAction(`${open ? "open" : "close"}: ${reason}`)
+        }
       >
-        <HoverCardTrigger href={fixture.href}>{fixture.trigger}</HoverCardTrigger>
+        <HoverCardTrigger href={fixture.href}>
+          {fixture.trigger}
+        </HoverCardTrigger>
         <HoverCardContent class="hover-card" {...hoverCardContentOptions()}>
           <HoverCardArrow class="arrow" />
           <p>

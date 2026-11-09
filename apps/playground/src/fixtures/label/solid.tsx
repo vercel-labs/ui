@@ -2,14 +2,23 @@ import { Checkbox } from "@ui-sdk/solid/checkbox"
 import { Label } from "@ui-sdk/solid/label"
 import { NumberInput, NumberInputControl } from "@ui-sdk/solid/number-input"
 import { Radio, RadioGroup } from "@ui-sdk/solid/radio"
-import { Slider, SliderControl, SliderThumb, SliderTrack } from "@ui-sdk/solid/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/solid/slider"
 import { render } from "@solidjs/web"
 import { createSignal, For, omit, Show, type ComponentProps } from "solid-js"
 import { labelFixture } from "tests/fixtures/label.ts"
 
 const { email, plan, volume, terms, region, delivery, quantity } = labelFixture
 
-function Group(props: { group: typeof plan | typeof region } & ComponentProps<typeof RadioGroup>) {
+function Group(
+  props: { group: typeof plan | typeof region } & ComponentProps<
+    typeof RadioGroup
+  >
+) {
   const rest = omit(props, "group")
   return (
     <RadioGroup id={props.group.id} class="radio-group" {...rest}>
@@ -50,7 +59,12 @@ function Fixture() {
       <Label for={delivery.id}>{delivery.label}</Label>
       <Group group={delivery} aria-label={delivery.name} />
       <Label for={quantity.id}>{quantity.label}</Label>
-      <Show when={shown()} fallback={<button onClick={() => setShown(true)}>{quantity.show}</button>}>
+      <Show
+        when={shown()}
+        fallback={
+          <button onClick={() => setShown(true)}>{quantity.show}</button>
+        }
+      >
         <NumberInput id={quantity.id} defaultValue={quantity.defaultValue}>
           <NumberInputControl />
         </NumberInput>

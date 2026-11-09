@@ -12,17 +12,24 @@ Element.prototype.scrollIntoView ??= () => {}
 afterEach(() => document.body.replaceChildren())
 
 const refusing =
-  (reason: MenuOpenChangeReason) => (open: boolean, details: ChangeDetails<MenuOpenChangeReason>) => {
-    if (!open && details.reason === reason) details.cancel()
+  (reason: MenuOpenChangeReason) =>
+  (open: boolean, details: ChangeDetails<MenuOpenChangeReason>) => {
+    if (!open && details.reason === reason) {
+      details.cancel()
+    }
   }
 
 const settle = () => new Promise((resolve) => setTimeout(resolve))
 
 function pressShortcut() {
-  document.dispatchEvent(new KeyboardEvent("keydown", { key: "s", code: "KeyS", ctrlKey: true }))
+  document.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "s", code: "KeyS", ctrlKey: true })
+  )
 }
 
-function dataMenu(onAction: (value: string, details: { event?: Event }) => unknown) {
+function dataMenu(
+  onAction: (value: string, details: { event?: Event }) => unknown
+) {
   const instance = menu({
     id: "file",
     items: [{ value: "save", label: "Save", shortcut: "mod+s" }],
@@ -82,8 +89,14 @@ describe("a submenu that refuses to close", () => {
       return el
     }
     bind(root.part("item", { id: "copy" }), element("copy"))
-    bind(share.part("trigger", { id: "share-trigger" }), element("share-trigger"))
-    bind(exporting.part("trigger", { id: "export-trigger" }), element("export-trigger"))
+    bind(
+      share.part("trigger", { id: "share-trigger" }),
+      element("share-trigger")
+    )
+    bind(
+      exporting.part("trigger", { id: "export-trigger" }),
+      element("export-trigger")
+    )
     root.api.open()
     share.api.open()
     return { root, share, exporting }
@@ -111,7 +124,10 @@ describe("a submenu that refuses to close", () => {
     root.api.internal.highlight("share-trigger")
     onOpenChange.mockClear()
     const copy = document.getElementById("copy")!
-    root.api.internal.hoverItem(copy, new PointerEvent("pointermove", { pointerType: "mouse", clientX: 1 }))
+    root.api.internal.hoverItem(
+      copy,
+      new PointerEvent("pointermove", { pointerType: "mouse", clientX: 1 })
+    )
     expect(share.get().open).toBe(true)
     expect(root.get().highlighted).toBe("share-trigger")
     expect(onOpenChange).toHaveBeenCalledTimes(1)
@@ -138,7 +154,9 @@ describe("closing a menu with focus in its submenu", () => {
     shareTrigger.id = "share-trigger"
     shareTrigger.textContent = "Share"
     bind(share.part("trigger", { id: "share-trigger" }), shareTrigger)
-    const shareContent = document.body.appendChild(document.createElement("div"))
+    const shareContent = document.body.appendChild(
+      document.createElement("div")
+    )
     bind(share.part("content"), shareContent)
     const email = shareContent.appendChild(document.createElement("div"))
     email.textContent = "Email"
@@ -159,13 +177,23 @@ describe("closing a menu with focus in its submenu", () => {
 describe("a menubar menu that refuses to close", () => {
   function setup(editDisabled: boolean) {
     const bar = menubar({ id: "bar" })
-    const file = menu({ id: "file", menubar: () => bar.api, onOpenChange: refusing("submenu-switch") })
+    const file = menu({
+      id: "file",
+      menubar: () => bar.api,
+      onOpenChange: refusing("submenu-switch"),
+    })
     const edit = menu({ id: "edit", menubar: () => bar.api })
     const triggers = [file, edit].map((instance) => {
       const el = document.body.appendChild(document.createElement("button"))
       el.textContent = instance.api.id
       const disabled = instance === edit && editDisabled
-      bind(instance.part("trigger", { id: `${instance.api.id}-trigger`, disabled }), el)
+      bind(
+        instance.part("trigger", {
+          id: `${instance.api.id}-trigger`,
+          disabled,
+        }),
+        el
+      )
       return el
     })
     file.api.open()
@@ -181,7 +209,11 @@ describe("a menubar menu that refuses to close", () => {
 
   test("keeps focus off a disabled trigger an arrow key moves to", () => {
     const { bar, file, triggers } = setup(true)
-    bar.api.internal.menuArrow("file", 1, new KeyboardEvent("keydown", { key: "ArrowRight" }))
+    bar.api.internal.menuArrow(
+      "file",
+      1,
+      new KeyboardEvent("keydown", { key: "ArrowRight" })
+    )
     expect(file.get().open).toBe(true)
     expect(document.activeElement).not.toBe(triggers[1])
   })
@@ -200,7 +232,9 @@ describe("a root menu closing with focus in a portalled submenu", () => {
     const shareTrigger = content.appendChild(document.createElement("div"))
     shareTrigger.tabIndex = -1
     bind(share.part("trigger", { id: "share-trigger" }), shareTrigger)
-    const shareContent = document.body.appendChild(document.createElement("div"))
+    const shareContent = document.body.appendChild(
+      document.createElement("div")
+    )
     bind(share.part("content"), shareContent)
     const item = shareContent.appendChild(document.createElement("div"))
     item.tabIndex = -1

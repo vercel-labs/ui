@@ -31,9 +31,14 @@ const log = useLog()
       name="assignee"
       :item-to-value="(member: Member) => String(member.id)"
       :item-to-label="(member: Member) => member.name"
-      :is-item-equal-to-value="(item: Member, value: Member) => item.id === value.id"
+      :is-item-equal-to-value="
+        (item: Member, value: Member) => item.id === value.id
+      "
       placeholder="Unassigned"
-      @value-change="(member: Member | null) => log(`Submits assignee=${member ? member.id : ''}`)"
+      @value-change="
+        (member: Member | null) =>
+          log(`Submits assignee=${member ? member.id : ''}`)
+      "
     >
       <SelectTrigger>
         <SelectValue />

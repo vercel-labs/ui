@@ -35,7 +35,11 @@ Import the parts and put them together:
 
 ```vue
 <script setup lang="ts">
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/vue/resizable"
 </script>
 
 <template>
@@ -169,7 +173,10 @@ A server can't read `localStorage`, so it renders each panel's `default-size` an
 <script setup lang="ts">
 import { resizableStorageKey } from "@ui-sdk/vue/resizable"
 
-const saved = useCookie<Record<string, number[]>>(resizableStorageKey("editor"), { default: () => ({}) })
+const saved = useCookie<Record<string, number[]>>(
+  resizableStorageKey("editor"),
+  { default: () => ({}) }
+)
 const [sidebar = 25, main = 75] = saved.value["sidebar,main"] ?? []
 </script>
 
@@ -180,13 +187,20 @@ const [sidebar = 25, main = 75] = saved.value["sidebar,main"] ?? []
 
 ```vue title="components/Editor.vue"
 <script setup lang="ts">
-import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/vue/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  type ResizableStorage,
+} from "@ui-sdk/vue/resizable"
 
 defineProps<{ sidebar: number; main: number }>()
 
 const cookieStorage: ResizableStorage = {
   getItem: (key) => {
-    const value = document.cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`))?.[1]
+    const value = document.cookie.match(
+      new RegExp(`(?:^|; )${key}=([^;]*)`)
+    )?.[1]
     return value === undefined ? null : decodeURIComponent(value)
   },
   setItem: (key, value) => {
@@ -272,29 +286,47 @@ Props are the same as below, and callbacks are events.
 
 ### Resizable
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableOptions"
+/>
 
 ### ResizablePanel
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelProps"
+/>
 
 ### ResizableHandle
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive.
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableState"
+/>
 
 Panels:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelState"
+/>
 
 Handles:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleState"
+/>
 
 ### Reasons
 

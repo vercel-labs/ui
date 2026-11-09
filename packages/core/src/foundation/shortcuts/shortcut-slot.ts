@@ -5,7 +5,11 @@ import { formatShortcut, isApple } from "../platform/platform"
 import { elements } from "../kernel/elements"
 import type { Part, SlotFactory } from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
-import { shortcuts, type ShortcutHandler, type ShortcutOptions } from "./shortcuts"
+import {
+  shortcuts,
+  type ShortcutHandler,
+  type ShortcutOptions,
+} from "./shortcuts"
 
 // What a Shortcut part shows: "⌘K" on Apple platforms, "Ctrl+K" elsewhere,
 // and nothing without keys.
@@ -18,7 +22,11 @@ function shortcutText(shortcut: string | undefined, apple: boolean) {
 // hydration finish first.
 function adoptPlatform<State extends { apple: boolean }>(store: Store<State>) {
   // A cast, since TypeScript can't tell that `apple` alone is a Partial<State>.
-  queueMicrotask(() => store.get().apple !== isApple() && store.set({ apple: isApple() } as Partial<State>))
+  queueMicrotask(
+    () =>
+      store.get().apple !== isApple() &&
+      store.set({ apple: isApple() } as Partial<State>)
+  )
 }
 
 // Registers the shortcut a part's props name while they name one, and again
@@ -29,13 +37,15 @@ function bindPartShortcut(
   keys: () => string | null | undefined,
   handler: ShortcutHandler,
   options: ShortcutOptions,
-  onProps: (listener: () => void) => () => void,
+  onProps: (listener: () => void) => () => void
 ) {
   let current: string | undefined
   let off: (() => void) | undefined
   const update = () => {
     const next = keys() || undefined
-    if (next === current) return
+    if (next === current) {
+      return
+    }
     off?.()
     current = next
     off = next ? shortcuts.register(next, handler, options) : undefined
@@ -55,10 +65,12 @@ function shortcutOf(
   context: { parts(): Iterable<Part> },
   slot: string,
   el: HTMLElement,
-  { beside = false } = {},
+  { beside = false } = {}
 ) {
   const owner = elements<{ shortcut?: string }>(context, slot).find(
-    (entry) => entry.el.contains(el) || (beside && !!el.parentElement?.contains(entry.el)),
+    (entry) =>
+      entry.el.contains(el) ||
+      (beside && !!el.parentElement?.contains(entry.el))
   )
   return owner?.props?.shortcut
 }
@@ -67,7 +79,7 @@ function shortcutOf(
 // shortcut of the trigger it sits in. Renders call it without an element.
 function shortcutSlot<State extends { apple: boolean }, Api>(
   slot: SlotFactory<State, Api>,
-  inherited: (state: State, api: Api, el?: HTMLElement) => string | undefined,
+  inherited: (state: State, api: Api, el?: HTMLElement) => string | undefined
 ) {
   return slot<
     {
@@ -85,10 +97,15 @@ function shortcutSlot<State extends { apple: boolean }, Api>(
       // A popup opened only through a controller has no trigger to learn the platform from.
       adoptPlatform(store)
       // An empty element shows the keys itself, like a web component without children.
-      if (el.childNodes.length) return
+      if (el.childNodes.length) {
+        return
+      }
       const write = () => {
         const state = store.get()
-        el.textContent = shortcutText(props.shortcut ?? inherited(state, api, el), state.apple)
+        el.textContent = shortcutText(
+          props.shortcut ?? inherited(state, api, el),
+          state.apple
+        )
       }
       write()
       const off = store.subscribe(write)

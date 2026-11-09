@@ -11,7 +11,8 @@
   import { changedValue, toggleOptions } from "tests/fixtures/page.ts"
   import { toggleAction, toggleFixture } from "tests/fixtures/toggle.ts"
 
-  const { cancel, defaultPressed, disabled, alignment, ...groupOptions } = toggleOptions()
+  const { cancel, defaultPressed, disabled, alignment, ...groupOptions } =
+    toggleOptions()
   const formatting = createToggleGroupController()
   let action = $state("")
   let pressedWith = $state("")
@@ -23,26 +24,46 @@
     formatting: toggleFixture.formatting.defaultValue,
   }
   const groups = [
-    { ...toggleFixture.alignment, multiple: false, disabled: false, controller: undefined },
-    { ...toggleFixture.formatting, multiple: true, disabled, controller: formatting },
+    {
+      ...toggleFixture.alignment,
+      multiple: false,
+      disabled: false,
+      controller: undefined,
+    },
+    {
+      ...toggleFixture.formatting,
+      multiple: true,
+      disabled,
+      controller: formatting,
+    },
   ]
 
-  function onValueChange(name: string, value: string[], details: { cancel: () => void }) {
-    if (cancel && changedValue(values[name], value) === cancel) return details.cancel()
+  function onValueChange(
+    name: string,
+    value: string[],
+    details: { cancel: () => void }
+  ) {
+    if (cancel && changedValue(values[name], value) === cancel) {
+      return details.cancel()
+    }
     values[name] = value
     action = toggleAction.group(name, value)
   }
 
   function onPressedChange(pressed: boolean, details: ChangeDetails) {
-    if (cancel === toggleFixture.toggle.value) return details.cancel()
+    if (cancel === toggleFixture.toggle.value) {
+      return details.cancel()
+    }
     action = toggleAction.toggle(pressed)
   }
 
   // A Promise and the buttons that settle it.
   function gate() {
-    let settle: { resolve: () => void; reject: (reason: Error) => void } | undefined
+    let settle:
+      { resolve: () => void; reject: (reason: Error) => void } | undefined
     return {
-      wait: () => new Promise<void>((resolve, reject) => (settle = { resolve, reject })),
+      wait: () =>
+        new Promise<void>((resolve, reject) => (settle = { resolve, reject })),
       resolve: () => settle?.resolve(),
       reject: () => settle?.reject(new Error("Offline")),
     }
@@ -69,7 +90,9 @@
 
 <div class="fixture">
   <button>Before</button>
-  <Toggle class="toggle" {defaultPressed} {onPressedChange}>{toggleFixture.toggle.label}</Toggle>
+  <Toggle class="toggle" {defaultPressed} {onPressedChange}
+    >{toggleFixture.toggle.label}</Toggle
+  >
   {#each groups as group, index (group.name)}
     {#if index === 1}
       <Separator class="rule" orientation="vertical" />
@@ -82,21 +105,33 @@
       disabled={group.disabled}
       controller={group.controller}
       {...groupOptions}
-      onValueChange={(value, details) => onValueChange(group.name, value, details)}
+      onValueChange={(value, details) =>
+        onValueChange(group.name, value, details)}
     >
       {#each group.items as item (item.value)}
-        <Toggle class="toggle" value={item.value} disabled={item.disabled}>{item.label}</Toggle>
+        <Toggle class="toggle" value={item.value} disabled={item.disabled}
+          >{item.label}</Toggle
+        >
       {/each}
     </ToggleGroup>
   {/each}
   <form aria-label={toggleFixture.form.label} onsubmit={onSubmit}>
     <label>
-      {toggleFixture.form.field} <input name="name" defaultValue={toggleFixture.form.defaultName} />
+      {toggleFixture.form.field}
+      <input name="name" defaultValue={toggleFixture.form.defaultName} />
     </label>
     <Button class="button" type="submit" onclick={saving.wait}>Submit</Button>
     <Button class="button" type="reset">Reset</Button>
-    <Button class="button" disabled onclick={() => (action = "delete")}>Delete</Button>
-    <Button class="button" type="submit" disabled focusableWhenDisabled onclick={() => (action = "archive")}>
+    <Button class="button" disabled onclick={() => (action = "delete")}
+      >Delete</Button
+    >
+    <Button
+      class="button"
+      type="submit"
+      disabled
+      focusableWhenDisabled
+      onclick={() => (action = "archive")}
+    >
       Archive
     </Button>
   </form>

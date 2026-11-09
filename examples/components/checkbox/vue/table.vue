@@ -1,14 +1,38 @@
 <script setup lang="ts">
 import { CheckIcon, MinusIcon } from "@lucide/vue"
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/vue/checkbox"
 import { ref } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
 const people = [
-  { id: "hollis", name: "Hollis Grant", email: "hollis@example.com", role: "Owner" },
-  { id: "ines", name: "Inès Moreau", email: "ines@example.com", role: "Editor" },
-  { id: "kofi", name: "Kofi Mensah", email: "kofi@example.com", role: "Viewer" },
-  { id: "wren", name: "Wren Takahashi", email: "wren@example.com", role: "Editor" },
+  {
+    id: "hollis",
+    name: "Hollis Grant",
+    email: "hollis@example.com",
+    role: "Owner",
+  },
+  {
+    id: "ines",
+    name: "Inès Moreau",
+    email: "ines@example.com",
+    role: "Editor",
+  },
+  {
+    id: "kofi",
+    name: "Kofi Mensah",
+    email: "kofi@example.com",
+    role: "Viewer",
+  },
+  {
+    id: "wren",
+    name: "Wren Takahashi",
+    email: "wren@example.com",
+    role: "Editor",
+  },
 ]
 
 const log = useLog()
@@ -20,7 +44,9 @@ const selected = ref(["hollis"])
     v-model:value="selected"
     aria-label="Team members"
     :all-values="people.map((person) => person.id)"
-    @value-change="(next: string[]) => log(`${next.length} of ${people.length} selected`)"
+    @value-change="
+      (next: string[]) => log(`${next.length} of ${people.length} selected`)
+    "
   >
     <table>
       <caption data-slot="visually-hidden">

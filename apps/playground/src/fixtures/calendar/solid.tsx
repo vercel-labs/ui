@@ -11,15 +11,22 @@ import {
 } from "@ui-sdk/solid/calendar"
 import { render } from "@solidjs/web"
 import { createSignal, Repeat, Show } from "solid-js"
-import { calendarAction, calendarFixture, calendarOptions } from "tests/fixtures/calendar.ts"
+import {
+  calendarAction,
+  calendarFixture,
+  calendarOptions,
+} from "tests/fixtures/calendar.ts"
 
 const controller = createCalendarController()
 
 function Fixture() {
-  const { controlled, selects, lang, defaultValue, defaultMonth, ...options } = calendarOptions()
+  const { controlled, selects, lang, defaultValue, defaultMonth, ...options } =
+    calendarOptions()
   const [action, setAction] = createSignal("")
   const [value, setValue] = createSignal<CalendarValue>(defaultValue)
-  const [month, setMonth] = createSignal(defaultMonth ?? calendarFixture.today.slice(0, 7))
+  const [month, setMonth] = createSignal(
+    defaultMonth ?? calendarFixture.today.slice(0, 7)
+  )
   const f = calendarFixture
   return (
     <div class="fixture" lang={lang}>
@@ -57,7 +64,9 @@ function Fixture() {
           </Repeat>
         </div>
       </Calendar>
-      <button onClick={() => controller.focus(f.controller.date)}>{f.controller.label}</button>
+      <button onClick={() => controller.focus(f.controller.date)}>
+        {f.controller.label}
+      </button>
       <button>After</button>
       <output role="status" aria-label="Last action">
         {action()}

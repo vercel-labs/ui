@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ChevronDownIcon } from "@lucide/vue"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/vue/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/vue/collapsible"
 
 const items = [
   { name: "Linen shirt", price: "$48.00" },

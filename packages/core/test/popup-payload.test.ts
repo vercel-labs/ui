@@ -30,22 +30,28 @@ describe.each(Object.entries(popups))("%s payload changes", (_name, create) => {
     press(instance, "a", "Ada")
     expect(onPayloadChange).toHaveBeenLastCalledWith(
       "Ada",
-      expect.objectContaining({ reason: "trigger-press" }),
+      expect.objectContaining({ reason: "trigger-press" })
     )
     press(instance, "b", "Grace")
     expect(onPayloadChange).toHaveBeenLastCalledWith(
       "Grace",
-      expect.objectContaining({ reason: "trigger-press" }),
+      expect.objectContaining({ reason: "trigger-press" })
     )
     expect(onPayloadChange).toHaveBeenCalledTimes(2)
     expect(onOpenChange).toHaveBeenCalledOnce()
-    expect(instance.get()).toMatchObject({ open: true, trigger: "b", payload: "Grace" })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      trigger: "b",
+      payload: "Grace",
+    })
     instance.api.close()
   })
 
   test("the payload changes before the open, so onOpenChange reads the new one", () => {
     const payloads: unknown[] = []
-    const instance = create({ onOpenChange: () => payloads.push(instance.api.getPayload()) })
+    const instance = create({
+      onOpenChange: () => payloads.push(instance.api.getPayload()),
+    })
     press(instance, "a", "Ada")
     expect(payloads).toEqual(["Ada"])
     instance.api.close()
@@ -58,7 +64,10 @@ describe.each(Object.entries(popups))("%s payload changes", (_name, create) => {
     instance.api.close()
     instance.api.open({ payload: "Ada" })
     expect(onPayloadChange).toHaveBeenCalledOnce()
-    expect(onPayloadChange).toHaveBeenLastCalledWith("Ada", expect.objectContaining({ reason: "imperative" }))
+    expect(onPayloadChange).toHaveBeenLastCalledWith(
+      "Ada",
+      expect.objectContaining({ reason: "imperative" })
+    )
     instance.api.close()
   })
 
@@ -69,7 +78,11 @@ describe.each(Object.entries(popups))("%s payload changes", (_name, create) => {
     })
     press(instance, "a", "Ada")
     press(instance, "b", "Grace")
-    expect(instance.get()).toMatchObject({ open: true, trigger: "b", payload: "Ada" })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      trigger: "b",
+      payload: "Ada",
+    })
     instance.api.close()
   })
 
@@ -77,13 +90,18 @@ describe.each(Object.entries(popups))("%s payload changes", (_name, create) => {
     const instance = create({})
     press(instance, "a", "Ada")
     instance.api.open({ payload: "Grace" })
-    expect(instance.get()).toMatchObject({ open: true, trigger: "a", payload: "Grace" })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      trigger: "a",
+      payload: "Grace",
+    })
     instance.api.close()
   })
 
   test("a canceled open puts the previous payload back", () => {
     const instance = create({
-      onOpenChange: (open: boolean, details: { cancel: () => void }) => open && details.cancel(),
+      onOpenChange: (open: boolean, details: { cancel: () => void }) =>
+        open && details.cancel(),
     })
     press(instance, "a", "Ada")
     expect(instance.get()).toMatchObject({ open: false, payload: undefined })
@@ -99,71 +117,74 @@ const controlled = {
   "hover card": (options: object) => hoverCard({ id: "h", ...options }),
 }
 
-describe.each(Object.entries(controlled))("%s controller opens while open", (_name, create) => {
-  test("a new payload replaces the shown one, with reason imperative and the same promise", () => {
-    const onOpenChange = vi.fn()
-    const onPayloadChange = vi.fn()
-    const instance = create({ onOpenChange, onPayloadChange })
-    const first = instance.api.open({ payload: "Ada" })
-    onPayloadChange.mockClear()
-    const second = instance.api.open({ payload: "Grace" })
-    expect(second).toBe(first)
-    expect(onPayloadChange).toHaveBeenCalledOnce()
-    expect(onPayloadChange).toHaveBeenLastCalledWith(
-      "Grace",
-      expect.objectContaining({ reason: "imperative" }),
-    )
-    expect(onOpenChange).toHaveBeenCalledOnce()
-    expect(instance.get()).toMatchObject({ open: true, payload: "Grace" })
-    instance.api.close()
-  })
-
-  test("canceling the new payload keeps the shown one", () => {
-    const instance = create({
-      onPayloadChange: (payload: unknown, details: { cancel: () => void }) =>
-        payload === "Grace" && details.cancel(),
-    })
-    const first = instance.api.open({ payload: "Ada" })
-    expect(instance.api.open({ payload: "Grace" })).toBe(first)
-    expect(instance.get()).toMatchObject({ open: true, payload: "Ada" })
-    instance.api.close()
-  })
-
-  test("an open without a payload, or with the same one, changes nothing", () => {
-    const onPayloadChange = vi.fn()
-    const instance = create({ onPayloadChange })
-    instance.api.open({ payload: "Ada" })
-    instance.api.open()
-    instance.api.open({ payload: "Ada" })
-    expect(onPayloadChange).toHaveBeenCalledOnce()
-    expect(instance.get()).toMatchObject({ open: true, payload: "Ada" })
-    instance.api.close()
-  })
-
-  test("setOpen and toggle carry no payload, so the payload hears imperative", () => {
-    const onOpenChange = vi.fn()
-    const onPayloadChange = vi.fn()
-    const instance = create({ onOpenChange, onPayloadChange })
-    for (const open of [
-      () => instance.api.setOpen(true, { reason: "trigger-press" }),
-      () => instance.api.toggle({ reason: "trigger-press" }),
-    ]) {
-      instance.api.open({ payload: "Ada" })
-      instance.api.close()
+describe.each(Object.entries(controlled))(
+  "%s controller opens while open",
+  (_name, create) => {
+    test("a new payload replaces the shown one, with reason imperative and the same promise", () => {
+      const onOpenChange = vi.fn()
+      const onPayloadChange = vi.fn()
+      const instance = create({ onOpenChange, onPayloadChange })
+      const first = instance.api.open({ payload: "Ada" })
       onPayloadChange.mockClear()
-      open()
-      expect(onOpenChange).toHaveBeenLastCalledWith(
-        true,
-        expect.objectContaining({ reason: "trigger-press" }),
+      const second = instance.api.open({ payload: "Grace" })
+      expect(second).toBe(first)
+      expect(onPayloadChange).toHaveBeenCalledOnce()
+      expect(onPayloadChange).toHaveBeenLastCalledWith(
+        "Grace",
+        expect.objectContaining({ reason: "imperative" })
       )
-      expect(onPayloadChange).toHaveBeenCalledExactlyOnceWith(
-        undefined,
-        expect.objectContaining({ reason: "imperative" }),
-      )
+      expect(onOpenChange).toHaveBeenCalledOnce()
+      expect(instance.get()).toMatchObject({ open: true, payload: "Grace" })
       instance.api.close()
-    }
-  })
-})
+    })
+
+    test("canceling the new payload keeps the shown one", () => {
+      const instance = create({
+        onPayloadChange: (payload: unknown, details: { cancel: () => void }) =>
+          payload === "Grace" && details.cancel(),
+      })
+      const first = instance.api.open({ payload: "Ada" })
+      expect(instance.api.open({ payload: "Grace" })).toBe(first)
+      expect(instance.get()).toMatchObject({ open: true, payload: "Ada" })
+      instance.api.close()
+    })
+
+    test("an open without a payload, or with the same one, changes nothing", () => {
+      const onPayloadChange = vi.fn()
+      const instance = create({ onPayloadChange })
+      instance.api.open({ payload: "Ada" })
+      instance.api.open()
+      instance.api.open({ payload: "Ada" })
+      expect(onPayloadChange).toHaveBeenCalledOnce()
+      expect(instance.get()).toMatchObject({ open: true, payload: "Ada" })
+      instance.api.close()
+    })
+
+    test("setOpen and toggle carry no payload, so the payload hears imperative", () => {
+      const onOpenChange = vi.fn()
+      const onPayloadChange = vi.fn()
+      const instance = create({ onOpenChange, onPayloadChange })
+      for (const open of [
+        () => instance.api.setOpen(true, { reason: "trigger-press" }),
+        () => instance.api.toggle({ reason: "trigger-press" }),
+      ]) {
+        instance.api.open({ payload: "Ada" })
+        instance.api.close()
+        onPayloadChange.mockClear()
+        open()
+        expect(onOpenChange).toHaveBeenLastCalledWith(
+          true,
+          expect.objectContaining({ reason: "trigger-press" })
+        )
+        expect(onPayloadChange).toHaveBeenCalledExactlyOnceWith(
+          undefined,
+          expect.objectContaining({ reason: "imperative" })
+        )
+        instance.api.close()
+      }
+    })
+  }
+)
 
 describe("payload changes elsewhere", () => {
   test("an alert dialog reports the payload it opens with", () => {
@@ -172,7 +193,7 @@ describe("payload changes elsewhere", () => {
     instance.api.open({ payload: "Delete Roadmap.pdf?" })
     expect(onPayloadChange).toHaveBeenCalledWith(
       "Delete Roadmap.pdf?",
-      expect.objectContaining({ reason: "imperative" }),
+      expect.objectContaining({ reason: "imperative" })
     )
     instance.api.close()
   })
@@ -180,9 +201,18 @@ describe("payload changes elsewhere", () => {
   test("a context area that takes an open menu over reports its payload", () => {
     const onPayloadChange = vi.fn()
     const instance = menu({ id: "m", onPayloadChange })
-    instance.api.internal.contextOpen({ x: 0, y: 0 }, { by: "pointer", key: "a", payload: "Ada" })
-    instance.api.internal.contextOpen({ x: 0, y: 40 }, { by: "pointer", key: "b", payload: "Grace" })
-    expect(onPayloadChange.mock.calls.map(([payload]) => payload)).toEqual(["Ada", "Grace"])
+    instance.api.internal.contextOpen(
+      { x: 0, y: 0 },
+      { by: "pointer", key: "a", payload: "Ada" }
+    )
+    instance.api.internal.contextOpen(
+      { x: 0, y: 40 },
+      { by: "pointer", key: "b", payload: "Grace" }
+    )
+    expect(onPayloadChange.mock.calls.map(([payload]) => payload)).toEqual([
+      "Ada",
+      "Grace",
+    ])
     expect(instance.get()).toMatchObject({ open: true, trigger: "b" })
     instance.api.close()
   })

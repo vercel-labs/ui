@@ -12,7 +12,13 @@ import {
 import { createAgent } from "@ui-sdk/react/agent"
 import { elementOf } from "@ui-sdk/react/observe"
 import { createParts } from "@ui-sdk/react/primitive"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/react/slider"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import { stageChanges } from "@ui-sdk/react/timeline"
 import { CheckIcon, XIcon } from "lucide-react"
@@ -46,10 +52,16 @@ type SuggestionsOptions = {
   defaultStatus?: Record<string, SuggestionStatus>
   onStatusChange?: (
     status: Record<string, SuggestionStatus>,
-    details: ChangeDetails<SuggestionsDecisionReason>,
+    details: ChangeDetails<SuggestionsDecisionReason>
   ) => void
-  onAccept?: (suggestion: Suggestion, details: ChangeDetails<SuggestionsDecisionReason>) => void
-  onReject?: (suggestion: Suggestion, details: ChangeDetails<SuggestionsDecisionReason>) => void
+  onAccept?: (
+    suggestion: Suggestion,
+    details: ChangeDetails<SuggestionsDecisionReason>
+  ) => void
+  onReject?: (
+    suggestion: Suggestion,
+    details: ChangeDetails<SuggestionsDecisionReason>
+  ) => void
 }
 
 type SuggestionsListState = {
@@ -64,12 +76,17 @@ type SuggestionsItemState = {
 type SuggestionsAcceptAllState = { disabled: boolean }
 
 function showValue(value: unknown) {
-  if (Array.isArray(value)) return value.join(", ") || "none"
-  if (typeof value === "boolean") return value ? "on" : "off"
+  if (Array.isArray(value)) {
+    return value.join(", ") || "none"
+  }
+  if (typeof value === "boolean") {
+    return value ? "on" : "off"
+  }
   return String(value)
 }
 
-const statusOf = (state: SuggestionsState, id: string) => state.status[id] ?? "pending"
+const statusOf = (state: SuggestionsState, id: string) =>
+  state.status[id] ?? "pending"
 const anyPending = (state: SuggestionsState) =>
   state.suggestions.some((s) => statusOf(state, s.id) === "pending")
 
@@ -100,26 +117,47 @@ const suggestions = /* @__PURE__ */ definePrimitive({
   api: (context) => {
     const { store, options, onDestroy } = context
     const change = createChange(context)
-    const roving = createRovingFocus<SuggestionsState, { value: string }>(context, {
-      slot: "item",
-      key: "focused",
-    })
+    const roving = createRovingFocus<SuggestionsState, { value: string }>(
+      context,
+      {
+        slot: "item",
+        key: "focused",
+      }
+    )
     let queue: Promise<unknown> = Promise.resolve()
-    const run = (task: () => Promise<unknown>) => (queue = queue.then(task, task))
-    let staged: { id: string; revert: () => Promise<unknown>; ref?: string } | null = null
+    const run = (task: () => Promise<unknown>) =>
+      (queue = queue.then(task, task))
+    let staged: {
+      id: string
+      revert: () => Promise<unknown>
+      ref?: string
+    } | null = null
 
     const get = (id: string) => store.get().suggestions.find((s) => s.id === id)
     const stage = async (suggestion: Suggestion) => {
       const done = await stageChanges(options().agent, [
         { ref: suggestion.ref, key: suggestion.key, value: suggestion.value },
       ])
-      return { id: suggestion.id, revert: done.revert, ref: done.applied[0]?.ref }
+      return {
+        id: suggestion.id,
+        revert: done.revert,
+        ref: done.applied[0]?.ref,
+      }
     }
     const place = () => {
       const el = staged?.ref ? elementOf(staged.ref) : undefined
-      if (!el) return store.set({ spot: null })
+      if (!el) {
+        return store.set({ spot: null })
+      }
       const box = el.getBoundingClientRect()
-      store.set({ spot: { left: box.left, top: box.top, width: box.width, height: box.height } })
+      store.set({
+        spot: {
+          left: box.left,
+          top: box.top,
+          width: box.width,
+          height: box.height,
+        },
+      })
     }
     const restore = async () => {
       const current = staged
@@ -131,7 +169,7 @@ const suggestions = /* @__PURE__ */ definePrimitive({
     const decide = (
       id: string,
       status: SuggestionStatus,
-      details: { reason: SuggestionsDecisionReason; event?: Event },
+      details: { reason: SuggestionsDecisionReason; event?: Event }
     ) => change("status", { ...store.get().status, [id]: status }, details)
 
     const api = {
@@ -139,7 +177,13 @@ const suggestions = /* @__PURE__ */ definePrimitive({
       preview(id: string) {
         return run(async () => {
           const suggestion = get(id)
-          if (!suggestion || statusOf(store.get(), id) !== "pending" || store.get().previewing === id) return
+          if (
+            !suggestion ||
+            statusOf(store.get(), id) !== "pending" ||
+            store.get().previewing === id
+          ) {
+            return
+          }
           await restore()
           store.set({ previewing: id })
           staged = await stage(suggestion)
@@ -148,44 +192,66 @@ const suggestions = /* @__PURE__ */ definePrimitive({
       },
       unpreview(id?: string) {
         return run(async () => {
-          if (id && store.get().previewing !== id) return
+          if (id && store.get().previewing !== id) {
+            return
+          }
           store.set({ previewing: null, spot: null })
           await restore()
         })
       },
       accept(
         id: string,
-        details: { reason: SuggestionsDecisionReason; event?: Event } = { reason: "imperative" },
+        details: { reason: SuggestionsDecisionReason; event?: Event } = {
+          reason: "imperative",
+        }
       ) {
         return run(async () => {
           const suggestion = get(id)
-          if (!suggestion || statusOf(store.get(), id) !== "pending") return
-          if (staged?.id === id) staged = null
-          else {
+          if (!suggestion || statusOf(store.get(), id) !== "pending") {
+            return
+          }
+          if (staged?.id === id) {
+            staged = null
+          } else {
             await restore()
             await stage(suggestion)
           }
           store.set({ previewing: null, spot: null })
-          if (decide(id, "accepted", details)) dispatch(context, "onAccept", suggestion, details)
+          if (decide(id, "accepted", details)) {
+            dispatch(context, "onAccept", suggestion, details)
+          }
         })
       },
       reject(
         id: string,
-        details: { reason: SuggestionsDecisionReason; event?: Event } = { reason: "imperative" },
+        details: { reason: SuggestionsDecisionReason; event?: Event } = {
+          reason: "imperative",
+        }
       ) {
         return run(async () => {
           const suggestion = get(id)
-          if (!suggestion || statusOf(store.get(), id) !== "pending") return
+          if (!suggestion || statusOf(store.get(), id) !== "pending") {
+            return
+          }
           if (store.get().previewing === id) {
             store.set({ previewing: null, spot: null })
             await restore()
           }
-          if (decide(id, "rejected", details)) dispatch(context, "onReject", suggestion, details)
+          if (decide(id, "rejected", details)) {
+            dispatch(context, "onReject", suggestion, details)
+          }
         })
       },
-      acceptAll(details: { reason: SuggestionsDecisionReason; event?: Event } = { reason: "imperative" }) {
-        for (const suggestion of store.get().suggestions)
-          if (statusOf(store.get(), suggestion.id) === "pending") void api.accept(suggestion.id, details)
+      acceptAll(
+        details: { reason: SuggestionsDecisionReason; event?: Event } = {
+          reason: "imperative",
+        }
+      ) {
+        for (const suggestion of store.get().suggestions) {
+          if (statusOf(store.get(), suggestion.id) === "pending") {
+            void api.accept(suggestion.id, details)
+          }
+        }
         return queue
       },
       place,
@@ -198,7 +264,9 @@ const suggestions = /* @__PURE__ */ definePrimitive({
           void api.reject(id, { reason: "item-press", event })
         } else if (event.key === "Escape") {
           void api.unpreview()
-        } else roving.keydown(event, el)
+        } else {
+          roving.keydown(event, el)
+        }
       },
     }
     return api
@@ -206,7 +274,9 @@ const suggestions = /* @__PURE__ */ definePrimitive({
   slots: (slot) => ({
     list: slot<{}, SuggestionsListState>({
       state: (state) => ({
-        pending: state.suggestions.filter((s) => statusOf(state, s.id) === "pending").length,
+        pending: state.suggestions.filter(
+          (s) => statusOf(state, s.id) === "pending"
+        ).length,
         previewing: state.previewing,
       }),
       attrs: () => ({
@@ -216,10 +286,14 @@ const suggestions = /* @__PURE__ */ definePrimitive({
       }),
       on: {
         focusout: (event, { el, api }) => {
-          if (!el?.contains(event.relatedTarget as Node)) void api.unpreview()
+          if (!el?.contains(event.relatedTarget as Node)) {
+            void api.unpreview()
+          }
         },
         pointerleave: (_event, { el, api }) => {
-          if (!el?.contains(document.activeElement)) void api.unpreview()
+          if (!el?.contains(document.activeElement)) {
+            void api.unpreview()
+          }
         },
       },
     }),
@@ -244,7 +318,8 @@ const suggestions = /* @__PURE__ */ definePrimitive({
         }
       },
       on: {
-        keydown: (event, { el, api, key }) => el && api.itemKeydown(event, el, key),
+        keydown: (event, { el, api, key }) =>
+          el && api.itemKeydown(event, el, key),
         focus: (_event, { api, key }) => void api.preview(key),
         pointerenter: (_event, { api, key }) => void api.preview(key),
       },
@@ -253,17 +328,23 @@ const suggestions = /* @__PURE__ */ definePrimitive({
     accept: slot<{ value: string }>({
       props: { value: "string" },
       attrs: () => ({ type: "button", tabindex: "-1" }),
-      press: ({ api, props }, event) => void api.accept(props.value, { reason: "item-press", event }),
+      press: ({ api, props }, event) =>
+        void api.accept(props.value, { reason: "item-press", event }),
     }),
     reject: slot<{ value: string }>({
       props: { value: "string" },
       attrs: () => ({ type: "button", tabindex: "-1" }),
-      press: ({ api, props }, event) => void api.reject(props.value, { reason: "item-press", event }),
+      press: ({ api, props }, event) =>
+        void api.reject(props.value, { reason: "item-press", event }),
     }),
     "accept-all": slot<{}, SuggestionsAcceptAllState>({
       state: (state) => ({ disabled: !anyPending(state) }),
-      attrs: (state) => ({ type: "button", disabled: anyPending(state) ? undefined : "" }),
-      press: ({ api }, event) => void api.acceptAll({ reason: "item-press", event }),
+      attrs: (state) => ({
+        type: "button",
+        disabled: anyPending(state) ? undefined : "",
+      }),
+      press: ({ api }, event) =>
+        void api.acceptAll({ reason: "item-press", event }),
     }),
     spotlight: slot({
       present: (state) => !!state.previewing,
@@ -281,7 +362,7 @@ const suggestions = /* @__PURE__ */ definePrimitive({
                 height: `${state.spot.height}px`,
               }),
             }
-          : { style: css({ display: "none" }) },
+          : { style: css({ display: "none" }) }
       ),
       bind: (_el, { api }) => {
         const update = () => api.place()
@@ -322,9 +403,25 @@ const SuggestionsSpotlight = parts.Spotlight
 const agent = createAgent()
 
 const proposed: Suggestion[] = [
-  { id: "volume", ref: "Volume", value: 35, reason: "Quieter for an open office" },
-  { id: "focus", ref: "Focus mode", key: "checked", value: true, reason: "You have a review at 3" },
-  { id: "brightness", ref: "Brightness", value: 80, reason: "The room is bright" },
+  {
+    id: "volume",
+    ref: "Volume",
+    value: 35,
+    reason: "Quieter for an open office",
+  },
+  {
+    id: "focus",
+    ref: "Focus mode",
+    key: "checked",
+    value: true,
+    reason: "You have a review at 3",
+  },
+  {
+    id: "brightness",
+    ref: "Brightness",
+    value: 80,
+    reason: "The room is bright",
+  },
 ]
 
 function Example() {
@@ -351,7 +448,9 @@ function Example() {
               </SuggestionsItem>
             ))}
           </SuggestionsList>
-          <SuggestionsAcceptAll data-variant="solid">Accept all</SuggestionsAcceptAll>
+          <SuggestionsAcceptAll data-variant="solid">
+            Accept all
+          </SuggestionsAcceptAll>
         </div>
         <SuggestionsSpotlight />
       </div>

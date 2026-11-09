@@ -38,7 +38,13 @@ Use `CommandGroup` and `CommandGroupLabel` to name related commands, with a `Com
 Import the parts and put them together:
 
 ```tsx
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/solid/command"
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/solid/command"
 
 function Example() {
   return (
@@ -153,7 +159,10 @@ The data can render bare parts for you. For styled commands, render from the lis
 Pass `emptyItems` alongside `items` to show suggested or recent commands while the first page's search is empty. Once someone types, the full collection is searched.
 
 ```tsx
-<Command items={commands} emptyItems={[{ type: "group", label: "Suggested", items: recent }]} />
+<Command
+  items={commands}
+  emptyItems={[{ type: "group", label: "Suggested", items: recent }]}
+/>
 ```
 
 <ComponentExample
@@ -273,7 +282,10 @@ Props and callbacks are the same as below, as Solid props.
 
 ### Command
 
-<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandOptions" />
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandOptions"
+/>
 
 ### CommandInput
 
@@ -293,7 +305,10 @@ Holds the commands. Renders a `div` with the listbox role, always shown.
 
 ### CommandPage
 
-<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandPageProps" />
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandPageProps"
+/>
 
 ### CommandGroup
 
@@ -305,11 +320,17 @@ Names its group. Renders a `div`.
 
 ### CommandItem
 
-<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemProps"
+/>
 
 ### CommandItemIcon
 
-<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandItemIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemIconProps"
+/>
 
 ### CommandItemText
 
@@ -317,7 +338,10 @@ Shows its command's label, and marks what matched the search. Renders a `span`.
 
 ### CommandShortcut
 
-<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandShortcutProps" />
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandShortcutProps"
+/>
 
 ### CommandSeparator
 
@@ -327,7 +351,10 @@ Separates commands or groups. Renders a `div` with the separator role.
 
 Each command in `items`. Groups are `{ type: "group", label, items }` and separators `{ type: "separator" }`.
 
-<TypeTable path="../../packages/core/src/components/command/command.ts" name="CommandDataItem" />
+<TypeTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandDataItem"
+/>
 
 ### State
 
@@ -335,59 +362,98 @@ What render functions, state-based class names and slots receive, per part.
 
 `Command`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandState"
+/>
 
 `CommandInput`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandInputState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandInputState"
+/>
 
 `CommandList`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandListState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandListState"
+/>
 
 `CommandItem`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandItemState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemState"
+/>
 
 `CommandEmpty`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandEmptyState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandEmptyState"
+/>
 
 `CommandStatus`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandStatusState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandStatusState"
+/>
 
 `CommandShortcut`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandShortcutState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandShortcutState"
+/>
 
 `CommandItemText`, which takes no props of its own:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandItemTextState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemTextState"
+/>
 
 `CommandItemIcon`:
 
-<StateTable path="../../packages/core/src/components/command/command.ts" name="CommandItemIconState" />
+<StateTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandItemIconState"
+/>
 
 ### Reasons
 
 Why the highlighted command changed:
 
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandValueChangeReason"
+/>
 
 Why the search text changed:
 
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandQueryChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandQueryChangeReason"
+/>
 
 And why the stack of pages changed:
 
-<ReasonTable path="../../packages/core/src/components/command/command.ts" name="CommandPagesChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandPagesChangeReason"
+/>
 
 ### Controller
 
 Create one with `createCommandController()` and pass it as `controller`.
 
-<ControllerTable path="../../packages/core/src/components/command/command.ts" name="CommandController" />
+<ControllerTable
+  path="../../packages/core/src/components/command/command.ts"
+  name="CommandController"
+/>
 
 ### Events
 

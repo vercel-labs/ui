@@ -16,17 +16,29 @@ import {
 } from "../src/index"
 import { partAttrs } from "../src/testing"
 import { bind } from "../src/foundation/kernel/part"
-import { columnsOf, dropIndex, gridDropIndex, movedTo } from "../src/foundation/drag-and-drop/reorder"
+import {
+  columnsOf,
+  dropIndex,
+  gridDropIndex,
+  movedTo,
+} from "../src/foundation/drag-and-drop/reorder"
 
 type SortableOptions = {
   value?: string[]
   defaultValue?: string[]
-  onValueChange?: (value: string[], details: ChangeDetails<"drag" | "move-key" | "imperative">) => void
+  onValueChange?: (
+    value: string[],
+    details: ChangeDetails<"drag" | "move-key" | "imperative">
+  ) => void
   orientation?: "horizontal" | "vertical" | "grid"
   group?: string[]
   preview?: boolean
 }
-type SortableState = { value: string[]; focused: string | null; moving: ReorderDraft | null }
+type SortableState = {
+  value: string[]
+  focused: string | null
+  moving: ReorderDraft | null
+}
 type ItemProps = { value: string; disabled?: boolean }
 
 const sortable = definePrimitive({
@@ -44,14 +56,16 @@ const sortable = definePrimitive({
     focused: null,
     moving: null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
     const orientation = () => context.options().orientation ?? "vertical"
     const roving = createRovingFocus<SortableState, ItemProps>(context, {
       slot: "item",
       key: "focused",
-      orientation: () => (orientation() === "vertical" ? "vertical" : "horizontal"),
+      orientation: () =>
+        orientation() === "vertical" ? "vertical" : "horizontal",
     })
     const reorder = createReorder<SortableState, ItemProps>(context, {
       slot: "item",
@@ -79,10 +93,14 @@ const sortable = definePrimitive({
       on: {
         keydown: (event, { el, api, key }) =>
           api.reorder.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.reorder.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.reorder.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.reorder.bind(el, part)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.reorder.bind(el, part),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -102,19 +120,33 @@ const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 // Items 40px tall stacked from the top, by where each element is in the list now.
 function stackRects(list: HTMLElement) {
   const top = (el: HTMLElement) => [...list.children].indexOf(el) * 40
-  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-    return { top: top(this), left: 0, width: 100, height: 40, bottom: top(this) + 40, right: 100 } as DOMRect
-  })
-  vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(function (this: HTMLElement) {
-    return top(this)
-  })
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+    function (this: HTMLElement) {
+      return {
+        top: top(this),
+        left: 0,
+        width: 100,
+        height: 40,
+        bottom: top(this) + 40,
+        right: 100,
+      } as DOMRect
+    }
+  )
+  vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(
+    function (this: HTMLElement) {
+      return top(this)
+    }
+  )
 }
 
 function render(
   options: SortableOptions,
-  items: ItemProps[] = ["a", "b", "c", "d"].map((value) => ({ value })),
+  items: ItemProps[] = ["a", "b", "c", "d"].map((value) => ({ value }))
 ) {
-  const instance = sortable({ id: "s", ...options }) as ReturnType<typeof sortable> & PrimitiveInstance
+  const instance = sortable({ id: "s", ...options }) as ReturnType<
+    typeof sortable
+  > &
+    PrimitiveInstance
   const list = document.createElement("div")
   document.body.append(list)
   const els = new Map<string, HTMLElement>()
@@ -123,9 +155,13 @@ function render(
     el.textContent = `Item ${props.value}`
     const part = instance.part("item", props)
     const write = () => {
-      for (const [name, value] of Object.entries(partAttrs(part)))
-        if (value === undefined) el.removeAttribute(name)
-        else el.setAttribute(name, value)
+      for (const [name, value] of Object.entries(partAttrs(part))) {
+        if (value === undefined) {
+          el.removeAttribute(name)
+        } else {
+          el.setAttribute(name, value)
+        }
+      }
     }
     write()
     cleanups.push(instance.subscribe(write))
@@ -139,24 +175,39 @@ function render(
     instance.subscribe(() =>
       queueMicrotask(() => {
         const order = instance.api.reorder.order(instance.get())
-        if (order === shown) return
+        if (order === shown) {
+          return
+        }
         shown = order
         // Moving an element out of the document drops its focus, like a browser does.
         const active = document.activeElement as HTMLElement | null
-        for (const key of order) list.append(els.get(key)!)
-        if (active && list.contains(active)) active.blur()
-      }),
-    ),
+        for (const key of order) {
+          list.append(els.get(key)!)
+        }
+        if (active && list.contains(active)) {
+          active.blur()
+        }
+      })
+    )
   )
   const press = (key: string, init: KeyboardEventInit = {}) =>
     (document.activeElement as HTMLElement).dispatchEvent(
-      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...init }),
+      new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      })
     )
-  const shownOrder = () => [...list.children].map((el) => el.textContent!.slice(5))
+  const shownOrder = () =>
+    [...list.children].map((el) => el.textContent!.slice(5))
   return { instance, list, els, press, shownOrder }
 }
 
-const pointer = (type: string, init: { x?: number; y?: number; target?: EventTarget; id?: number } = {}) => {
+const pointer = (
+  type: string,
+  init: { x?: number; y?: number; target?: EventTarget; id?: number } = {}
+) => {
   const event = new MouseEvent(type, {
     bubbles: true,
     cancelable: true,
@@ -164,7 +215,11 @@ const pointer = (type: string, init: { x?: number; y?: number; target?: EventTar
     clientY: init.y ?? 0,
     buttons: type === "pointerup" ? 0 : 1,
   })
-  Object.assign(event, { pointerId: init.id ?? 1, isPrimary: true, pointerType: "mouse" })
+  Object.assign(event, {
+    pointerId: init.id ?? 1,
+    isPrimary: true,
+    pointerType: "mouse",
+  })
   ;(init.target ?? document).dispatchEvent(event)
   return event
 }
@@ -172,7 +227,10 @@ const pointer = (type: string, init: { x?: number; y?: number; target?: EventTar
 describe("createReorder with the keyboard", () => {
   test("Space picks an item up, arrows move it, and Space drops it in one change", async () => {
     const onValueChange = vi.fn()
-    const { instance, els, press, shownOrder } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance, els, press, shownOrder } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     await tick()
     els.get("b")!.focus()
     press(" ")
@@ -187,7 +245,10 @@ describe("createReorder with the keyboard", () => {
     expect(onValueChange).toHaveBeenCalledTimes(1)
     expect(onValueChange.mock.calls[0][0]).toEqual(["a", "c", "d", "b"])
     expect(onValueChange.mock.calls[0][1]).toMatchObject({ reason: "move-key" })
-    expect(instance.get()).toMatchObject({ value: ["a", "c", "d", "b"], moving: null })
+    expect(instance.get()).toMatchObject({
+      value: ["a", "c", "d", "b"],
+      moving: null,
+    })
   })
 
   test("the moved item keeps focus when the list moves its element", async () => {
@@ -201,7 +262,9 @@ describe("createReorder with the keyboard", () => {
   })
 
   test("Home and End move the item to either end, and arrows stop there", async () => {
-    const { press, els, shownOrder } = render({ defaultValue: ["a", "b", "c", "d"] })
+    const { press, els, shownOrder } = render({
+      defaultValue: ["a", "b", "c", "d"],
+    })
     await tick()
     els.get("c")!.focus()
     press(" ")
@@ -216,7 +279,10 @@ describe("createReorder with the keyboard", () => {
 
   test("Escape puts the item back and changes nothing", async () => {
     const onValueChange = vi.fn()
-    const { instance, els, press, shownOrder } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance, els, press, shownOrder } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     await tick()
     els.get("a")!.focus()
     press(" ")
@@ -262,11 +328,10 @@ describe("createReorder with the keyboard", () => {
   })
 
   test("a disabled item can't be picked up, but others move past it", async () => {
-    const { els, press, shownOrder } = render({ defaultValue: ["a", "b", "c"] }, [
-      { value: "a" },
-      { value: "b", disabled: true },
-      { value: "c" },
-    ])
+    const { els, press, shownOrder } = render(
+      { defaultValue: ["a", "b", "c"] },
+      [{ value: "a" }, { value: "b", disabled: true }, { value: "c" }]
+    )
     await tick()
     els.get("b")!.focus()
     press(" ")
@@ -290,7 +355,10 @@ describe("createReorder with the keyboard", () => {
     press("ArrowDown")
     press(" ")
     await tick()
-    expect(instance.get()).toMatchObject({ value: ["a", "b", "c", "d"], moving: null })
+    expect(instance.get()).toMatchObject({
+      value: ["a", "b", "c", "d"],
+      moving: null,
+    })
     expect(shownOrder()).toEqual(["a", "b", "c", "d"])
   })
 
@@ -305,10 +373,17 @@ describe("createReorder with the keyboard", () => {
     view.els.get("a")!.focus()
     view.press(" ")
     view.press("ArrowDown")
-    cleanups.push(instance.subscribe(() => rendered.push(instance.api.reorder.order(instance.get()))))
+    cleanups.push(
+      instance.subscribe(() =>
+        rendered.push(instance.api.reorder.order(instance.get()))
+      )
+    )
     view.press(" ")
     await tick()
-    expect(instance.get()).toMatchObject({ value: ["b", "a", "c", "d"], moving: null })
+    expect(instance.get()).toMatchObject({
+      value: ["b", "a", "c", "d"],
+      moving: null,
+    })
     expect(rendered.length).toBeGreaterThan(0)
     expect(rendered.every((order) => order[0] === "b")).toBe(true)
   })
@@ -332,7 +407,12 @@ describe("createReorder with the keyboard", () => {
   test("a controlled list whose new value also drops an item lets go of the dropped one", async () => {
     let instance!: ReturnType<typeof render>["instance"]
     const onValueChange = (value: string[]) =>
-      queueMicrotask(() => instance.setOptions({ value: value.filter((key) => key !== "d"), onValueChange }))
+      queueMicrotask(() =>
+        instance.setOptions({
+          value: value.filter((key) => key !== "d"),
+          onValueChange,
+        })
+      )
     const view = render({ value: ["a", "b", "c", "d"], onValueChange })
     instance = view.instance
     await tick()
@@ -348,9 +428,14 @@ describe("createReorder with the keyboard", () => {
 
   test("move() commits at once, for a menu item like Move to top", () => {
     const onValueChange = vi.fn()
-    const { instance } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     expect(instance.api.reorder.move("c", 0)).toBe(true)
-    expect(onValueChange.mock.calls[0][1]).toMatchObject({ reason: "imperative" })
+    expect(onValueChange.mock.calls[0][1]).toMatchObject({
+      reason: "imperative",
+    })
     expect(instance.get().value).toEqual(["c", "a", "b", "d"])
     expect(instance.api.reorder.move("c", 0)).toBe(false)
   })
@@ -359,7 +444,10 @@ describe("createReorder with the keyboard", () => {
 describe("createReorder with a pointer", () => {
   test("a drag past the threshold picks the item up, reorders by the items' middles, and drops in one change", async () => {
     const onValueChange = vi.fn()
-    const { instance, list, els, shownOrder } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance, list, els, shownOrder } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     stackRects(list)
     await tick()
     pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
@@ -374,7 +462,10 @@ describe("createReorder with a pointer", () => {
     pointer("pointerup", { x: 10, y: 105 })
     expect(onValueChange).toHaveBeenCalledTimes(1)
     expect(onValueChange.mock.calls[0][1]).toMatchObject({ reason: "drag" })
-    expect(instance.get()).toMatchObject({ value: ["b", "c", "a", "d"], moving: null })
+    expect(instance.get()).toMatchObject({
+      value: ["b", "c", "a", "d"],
+      moving: null,
+    })
   })
 
   test("the dragged element gets --drag-x and --drag-y that keep it under the pointer, cleared on drop", async () => {
@@ -395,7 +486,10 @@ describe("createReorder with a pointer", () => {
 
   test("a press that doesn't move is a click, and changes nothing", async () => {
     const onValueChange = vi.fn()
-    const { instance, list, els } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance, list, els } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     stackRects(list)
     await tick()
     pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
@@ -406,10 +500,18 @@ describe("createReorder with a pointer", () => {
 
   test("a press something else already handled, like a toggle inside the item, doesn't start a drag", async () => {
     const onValueChange = vi.fn()
-    const { instance, list } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance, list } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     stackRects(list)
     await tick()
-    const down = new MouseEvent("pointerdown", { cancelable: true, clientX: 10, clientY: 20, buttons: 1 })
+    const down = new MouseEvent("pointerdown", {
+      cancelable: true,
+      clientX: 10,
+      clientY: 20,
+      buttons: 1,
+    })
     Object.assign(down, { pointerId: 1, isPrimary: true, pointerType: "mouse" })
     down.preventDefault()
     instance.api.reorder.pointerdown(down as PointerEvent, "a")
@@ -422,13 +524,22 @@ describe("createReorder with a pointer", () => {
 
   test("Escape during a drag puts the item back", async () => {
     const onValueChange = vi.fn()
-    const { instance, list, els, shownOrder } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance, list, els, shownOrder } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     stackRects(list)
     await tick()
     pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
     pointer("pointermove", { x: 10, y: 105 })
     await frame()
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     pointer("pointerup", { x: 10, y: 105 })
     await tick()
     expect(instance.get().moving).toBeNull()
@@ -437,18 +548,25 @@ describe("createReorder with a pointer", () => {
   })
 
   test("pointercancel, like the browser taking over for a scroll, puts the item back", async () => {
-    const { instance, list, els } = render({ defaultValue: ["a", "b", "c", "d"] })
+    const { instance, list, els } = render({
+      defaultValue: ["a", "b", "c", "d"],
+    })
     stackRects(list)
     await tick()
     pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
     pointer("pointermove", { x: 10, y: 105 })
     await frame()
     pointer("pointercancel")
-    expect(instance.get()).toMatchObject({ value: ["a", "b", "c", "d"], moving: null })
+    expect(instance.get()).toMatchObject({
+      value: ["a", "b", "c", "d"],
+      moving: null,
+    })
   })
 
   test("destroying the list mid-drag stops following the pointer", async () => {
-    const { instance, list, els } = render({ defaultValue: ["a", "b", "c", "d"] })
+    const { instance, list, els } = render({
+      defaultValue: ["a", "b", "c", "d"],
+    })
     stackRects(list)
     await tick()
     const remove = vi.spyOn(document, "removeEventListener")
@@ -457,7 +575,12 @@ describe("createReorder with a pointer", () => {
     await frame()
     instance.destroy()
     expect(remove.mock.calls.map(([type]) => type)).toEqual(
-      expect.arrayContaining(["pointermove", "pointerup", "pointercancel", "keydown"]),
+      expect.arrayContaining([
+        "pointermove",
+        "pointerup",
+        "pointercancel",
+        "keydown",
+      ])
     )
   })
 })
@@ -510,17 +633,30 @@ function gridRects(list: HTMLElement, columns: number) {
     const index = [...list.children].indexOf(el)
     const left = (index % columns) * 100
     const top = Math.floor(index / columns) * 40
-    return { left, top, right: left + 100, bottom: top + 40, width: 100, height: 40 }
+    return {
+      left,
+      top,
+      right: left + 100,
+      bottom: top + 40,
+      width: 100,
+      height: 40,
+    }
   }
-  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-    return box(this) as DOMRect
-  })
-  vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(function (this: HTMLElement) {
-    return box(this).top
-  })
-  vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(function (this: HTMLElement) {
-    return box(this).left
-  })
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+    function (this: HTMLElement) {
+      return box(this) as DOMRect
+    }
+  )
+  vi.spyOn(HTMLElement.prototype, "offsetTop", "get").mockImplementation(
+    function (this: HTMLElement) {
+      return box(this).top
+    }
+  )
+  vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(
+    function (this: HTMLElement) {
+      return box(this).left
+    }
+  )
 }
 
 const six = ["a", "b", "c", "d", "e", "f"]
@@ -530,7 +666,7 @@ describe("createReorder with groups", () => {
     const onValueChange = vi.fn()
     const { instance, els, press, shownOrder } = render(
       { defaultValue: six, group: ["b", "e"], onValueChange },
-      six.map((value) => ({ value })),
+      six.map((value) => ({ value }))
     )
     await tick()
     els.get("e")!.focus()
@@ -550,7 +686,7 @@ describe("createReorder with groups", () => {
   test("Escape puts the whole group back where each item was", async () => {
     const { instance, els, press, shownOrder } = render(
       { defaultValue: six, group: ["a", "f"] },
-      six.map((value) => ({ value })),
+      six.map((value) => ({ value }))
     )
     await tick()
     els.get("a")!.focus()
@@ -565,13 +701,15 @@ describe("createReorder with groups", () => {
   test("announcements count the items that move together", async () => {
     const { els, press } = render(
       { defaultValue: six, group: ["a", "c"] },
-      six.map((value) => ({ value })),
+      six.map((value) => ({ value }))
     )
     await tick()
     els.get("a")!.focus()
     press(" ")
     await new Promise((resolve) => setTimeout(resolve, 150))
-    expect(document.body.textContent).toContain("Picked up 2 items, position 1 of 6.")
+    expect(document.body.textContent).toContain(
+      "Picked up 2 items, position 1 of 6."
+    )
   })
 })
 
@@ -579,7 +717,7 @@ describe("createReorder in a grid", () => {
   test("Left and Right move by one, Up and Down by a row, and a row past either end stays put", async () => {
     const { instance, list, els, press } = render(
       { defaultValue: six, orientation: "grid" },
-      six.map((value) => ({ value })),
+      six.map((value) => ({ value }))
     )
     gridRects(list, 3)
     await tick()
@@ -600,7 +738,7 @@ describe("createReorder in a grid", () => {
     const onValueChange = vi.fn()
     const { instance, list, els, shownOrder } = render(
       { defaultValue: six, orientation: "grid", onValueChange },
-      six.map((value) => ({ value })),
+      six.map((value) => ({ value }))
     )
     gridRects(list, 3)
     await tick()
@@ -620,7 +758,7 @@ describe("createReorder with a preview", () => {
   test("a copy follows the pointer above the page with the group's count, and goes on drop", async () => {
     const { list, els } = render(
       { defaultValue: ["a", "b", "c", "d"], group: ["a", "b"], preview: true },
-      ["a", "b", "c", "d"].map((value) => ({ value })),
+      ["a", "b", "c", "d"].map((value) => ({ value }))
     )
     stackRects(list)
     await tick()
@@ -648,7 +786,12 @@ describe("bindDrag", () => {
     const onMove = vi.fn()
     const onEnd = vi.fn()
     const down = pointer("pointerdown", { target: el }) as PointerEvent
-    bindDrag(el, down, { threshold: 3, onStart, onMove: (sample) => onMove({ ...sample }), onEnd })
+    bindDrag(el, down, {
+      threshold: 3,
+      onStart,
+      onMove: (sample) => onMove({ ...sample }),
+      onEnd,
+    })
     pointer("pointermove", { x: 2 })
     await frame()
     expect(onStart).not.toHaveBeenCalled()
@@ -682,16 +825,31 @@ describe("bindDrag", () => {
     el.addEventListener("click", onClick)
     const onEnd = vi.fn()
     const down = pointer("pointerdown", { target: el }) as PointerEvent
-    bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove: () => {}, onEnd })
+    bindDrag(el, down, {
+      threshold: 3,
+      cancelOnEscape: true,
+      onMove: () => {},
+      onEnd,
+    })
     pointer("pointermove", { x: 20 })
     await frame()
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     expect(onEnd).toHaveBeenCalledWith(expect.anything(), true)
     pointer("pointerup", { target: el })
-    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+    el.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
     expect(onClick).not.toHaveBeenCalled()
     await tick()
-    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+    el.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
@@ -702,15 +860,28 @@ describe("bindDrag", () => {
     const onClick = vi.fn()
     el.addEventListener("click", onClick)
     const down = pointer("pointerdown", { target: el }) as PointerEvent
-    bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove: () => {}, onEnd: () => {} })
+    bindDrag(el, down, {
+      threshold: 3,
+      cancelOnEscape: true,
+      onMove: () => {},
+      onEnd: () => {},
+    })
     pointer("pointermove", { x: 20 })
     await frame()
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     pointer("pointerdown", { id: 2 })
     pointer("pointerup", { id: 2 })
     await tick()
     pointer("pointerup", { target: el })
-    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+    el.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
     expect(onClick).not.toHaveBeenCalled()
   })
 
@@ -721,13 +892,26 @@ describe("bindDrag", () => {
     const onClick = vi.fn()
     el.addEventListener("click", onClick)
     const down = pointer("pointerdown", { target: el }) as PointerEvent
-    bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove: () => {}, onEnd: () => {} })
+    bindDrag(el, down, {
+      threshold: 3,
+      cancelOnEscape: true,
+      onMove: () => {},
+      onEnd: () => {},
+    })
     pointer("pointermove", { x: 20 })
     await frame()
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     pointer("pointerup", { target: el })
     await tick()
-    el.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+    el.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true })
+    )
     expect(onClick).toHaveBeenCalledOnce()
   })
 
@@ -740,7 +924,13 @@ describe("bindDrag", () => {
     bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove, onEnd })
     pointer("pointermove", { x: 20 })
     await frame()
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     const moves = onMove.mock.calls.length
     pointer("pointermove", { x: 60 })
     await frame()
@@ -757,19 +947,36 @@ describe("bindDrag", () => {
     const onClick = vi.fn()
     el.addEventListener("click", onClick)
     const down = pointer("pointerdown", { target: el }) as PointerEvent
-    bindDrag(el, down, { threshold: 3, cancelOnEscape: true, onMove: () => {}, onEnd: () => {} })
+    bindDrag(el, down, {
+      threshold: 3,
+      cancelOnEscape: true,
+      onMove: () => {},
+      onEnd: () => {},
+    })
     pointer("pointermove", { x: 20 })
     await frame()
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     pointer("pointerdown", { id: 2, target: el })
     pointer("pointerup", { id: 2, target: el })
-    const other = Object.assign(new MouseEvent("click", { bubbles: true, cancelable: true }), {
-      pointerId: 2,
-    })
+    const other = Object.assign(
+      new MouseEvent("click", { bubbles: true, cancelable: true }),
+      {
+        pointerId: 2,
+      }
+    )
     expect(el.dispatchEvent(other)).toBe(true)
     expect(onClick).toHaveBeenCalledOnce()
     pointer("pointerup", { target: el })
-    const own = Object.assign(new MouseEvent("click", { bubbles: true, cancelable: true }), { pointerId: 1 })
+    const own = Object.assign(
+      new MouseEvent("click", { bubbles: true, cancelable: true }),
+      { pointerId: 1 }
+    )
     expect(el.dispatchEvent(own)).toBe(false)
     expect(onClick).toHaveBeenCalledOnce()
   })
@@ -792,10 +999,16 @@ describe("bindDrag", () => {
 describe("createReorder after a missed release", () => {
   test("a new pen press ends the drag that missed its release, without committing it, and picks up the pressed item", async () => {
     const onValueChange = vi.fn()
-    const { instance, list, els } = render({ defaultValue: ["a", "b", "c", "d"], onValueChange })
+    const { instance, list, els } = render({
+      defaultValue: ["a", "b", "c", "d"],
+      onValueChange,
+    })
     stackRects(list)
     await tick()
-    const pen = (type: string, init: { x: number; y: number; id: number; target?: EventTarget }) => {
+    const pen = (
+      type: string,
+      init: { x: number; y: number; id: number; target?: EventTarget }
+    ) => {
       const event = new MouseEvent(type, {
         bubbles: true,
         cancelable: true,
@@ -803,7 +1016,11 @@ describe("createReorder after a missed release", () => {
         clientY: init.y,
         buttons: 1,
       })
-      Object.assign(event, { pointerId: init.id, isPrimary: true, pointerType: "pen" })
+      Object.assign(event, {
+        pointerId: init.id,
+        isPrimary: true,
+        pointerType: "pen",
+      })
       ;(init.target ?? document).dispatchEvent(event)
     }
     pen("pointerdown", { target: els.get("a"), x: 10, y: 20, id: 1 })
@@ -822,7 +1039,10 @@ describe("createReorder after a missed release", () => {
 // A drop commits the order the list has now, moved: only `set` changes which items there are.
 test("an item the owner removes mid-drag stays removed when the drag drops", async () => {
   const onValueChange = vi.fn()
-  const { instance, list, els } = render({ value: ["a", "b", "c", "d"], onValueChange })
+  const { instance, list, els } = render({
+    value: ["a", "b", "c", "d"],
+    onValueChange,
+  })
   stackRects(list)
   await tick()
   pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
@@ -838,7 +1058,10 @@ test("an item the owner removes mid-drag stays removed when the drag drops", asy
 // React renders a controlled value before it hands it over.
 test("an item the owner removes mid-drag stays removed when the value renders before it lands", async () => {
   const onValueChange = vi.fn()
-  const { instance, list, els } = render({ value: ["a", "b", "c", "d"], onValueChange })
+  const { instance, list, els } = render({
+    value: ["a", "b", "c", "d"],
+    onValueChange,
+  })
   stackRects(list)
   await tick()
   pointer("pointerdown", { target: els.get("a"), x: 10, y: 20 })
@@ -874,10 +1097,18 @@ test("an order the owner changes mid-move keeps the moved item where the user pu
 
 test("a group the owner reverses mid-move stays where the user put it", () => {
   const onValueChange = vi.fn()
-  const { instance } = render({ value: ["a", "b", "c", "d"], group: ["a", "b"], onValueChange })
+  const { instance } = render({
+    value: ["a", "b", "c", "d"],
+    group: ["a", "b"],
+    onValueChange,
+  })
   instance.api.reorder.grab("a")
   instance.api.reorder.moveTo(1)
-  instance.setOptions({ value: ["b", "a", "c", "d"], group: ["a", "b"], onValueChange })
+  instance.setOptions({
+    value: ["b", "a", "c", "d"],
+    group: ["a", "b"],
+    onValueChange,
+  })
   instance.api.reorder.drop()
   expect(onValueChange.mock.calls[0][0]).toEqual(["c", "b", "a", "d"])
 })

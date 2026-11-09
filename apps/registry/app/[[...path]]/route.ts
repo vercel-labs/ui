@@ -9,7 +9,8 @@ const handle = createRegistry({
   base: "",
   ...registryStore,
   // A Web Analytics custom event, under Events in the project's Analytics tab.
-  onDownload: ({ name, version, request }) => track("download", { package: name, version }, { request }),
+  onDownload: ({ name, version, request }) =>
+    track("download", { package: name, version }, { request }),
 })
 
 // Public copies of some docs paths while the docs site is protected; see REGISTRY.md.

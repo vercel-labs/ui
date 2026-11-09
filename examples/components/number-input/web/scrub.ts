@@ -31,7 +31,7 @@ function mount(root: HTMLElement) {
                   </ui-number-input-control>
                 </ui-number-input-group>
               </ui-number-input>
-            `,
+            `
           )
           .join("")}
       </div>

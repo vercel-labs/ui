@@ -61,7 +61,10 @@ type CarouselMotionOptions = {
   /** A drag was released, and it's heading for this page index. */
   onRelease: (index: number, event: PointerEvent) => void
   /** The user's own scroll came to rest. `touch` says whether a finger drove it. */
-  onScrollRest: (position: number, cause: { touch: boolean; event?: Event }) => void
+  onScrollRest: (
+    position: number,
+    cause: { touch: boolean; event?: Event }
+  ) => void
   onDragChange: (dragging: boolean) => void
   /** A spring came to rest, from a drag's release or a programmatic move. */
   onSettle: () => void
@@ -97,40 +100,55 @@ function createCarouselMotion(options: CarouselMotionOptions) {
 
   const offs = [
     on(viewport, "scroll", onScroll, { passive: true }),
-    ...(supportsScrollEnd ? [on(viewport, "scrollend" as "scroll", (event) => onRest(event))] : []),
+    ...(supportsScrollEnd
+      ? [on(viewport, "scrollend" as "scroll", (event) => onRest(event))]
+      : []),
     on(viewport, "touchstart", onTouchStart, { passive: true }),
     on(viewport, "touchend", onTouchEnd, { passive: true }),
     on(viewport, "touchcancel", onTouchEnd, { passive: true }),
     on(viewport, "pointerdown", onPointerDown),
     // A dragged image or link would start the browser's drag and drop instead.
     on(viewport, "dragstart", (event) => {
-      if (options.canDrag()) event.preventDefault()
+      if (options.canDrag()) {
+        event.preventDefault()
+      }
     }),
   ]
 
   function position() {
     const { vertical, rtl } = options.axis()
-    if (vertical) return viewport.scrollTop
+    if (vertical) {
+      return viewport.scrollTop
+    }
     return rtl ? -viewport.scrollLeft : viewport.scrollLeft
   }
 
   // Shows `target`: the scroll position within range, and the rest as a stretch.
   function write(target: number) {
-    if (destroyed) return
+    if (destroyed) {
+      return
+    }
     const { vertical, rtl } = options.axis()
     const scroll = clamp(target, 0, options.maxScroll())
     written = scroll
-    if (vertical) viewport.scrollTop = scroll
-    else viewport.scrollLeft = rtl ? -scroll : scroll
+    if (vertical) {
+      viewport.scrollTop = scroll
+    } else {
+      viewport.scrollLeft = rtl ? -scroll : scroll
+    }
     writeOvershoot(target - scroll)
     options.onScroll()
   }
 
   function writeOvershoot(amount: number) {
     const content = options.content()
-    if (!content || (amount === 0 && overshoot === 0)) return
+    if (!content || (amount === 0 && overshoot === 0)) {
+      return
+    }
     overshoot = amount
-    if (amount === 0) return content.style.removeProperty("translate")
+    if (amount === 0) {
+      return content.style.removeProperty("translate")
+    }
     const { vertical, rtl } = options.axis()
     const offset = `${Math.round(-amount * (rtl && !vertical ? -1 : 1) * 100) / 100}px`
     content.style.translate = vertical ? `0 ${offset}` : `${offset} 0`
@@ -138,7 +156,9 @@ function createCarouselMotion(options: CarouselMotionOptions) {
 
   function config() {
     return {
-      snapPoints: options.positions().map((extent, index) => ({ id: String(index), extent })),
+      snapPoints: options
+        .positions()
+        .map((extent, index) => ({ id: String(index), extent })),
       dimension: options.viewportSize(),
       dismissible: false,
       expandOnScroll: false,
@@ -155,17 +175,23 @@ function createCarouselMotion(options: CarouselMotionOptions) {
   const pagesAt = () => options.positions().map((position) => ({ position }))
 
   function dispatch(event: SheetEvent, source?: Event) {
-    if (destroyed || options.positions().length === 0) return
+    if (destroyed || options.positions().length === 0) {
+      return
+    }
     const result = next(state, event, config())
     state = result.state
     // Before the effects, so a release that reports its page finds the drag over.
     setDragging(state.phase === "dragging")
     const time = "time" in event ? event.time : performance.now()
-    for (const effect of result.effects) run(effect, time, source)
+    for (const effect of result.effects) {
+      run(effect, time, source)
+    }
   }
 
   function setDragging(value: boolean) {
-    if (value === dragging) return
+    if (value === dragging) {
+      return
+    }
     dragging = value
     options.onDragChange(value)
   }
@@ -182,20 +208,32 @@ function createCarouselMotion(options: CarouselMotionOptions) {
       moveFrame ||= view.requestAnimationFrame(flushMove)
       return
     }
-    if (effect.type === "settle") return startSpring(effect, time)
+    if (effect.type === "settle") {
+      return startSpring(effect, time)
+    }
     // Only a drag's release picks a page here. Programmatic moves already changed it.
-    if (effect.type === "snap" && effect.reason === "swipe" && source instanceof PointerEvent)
+    if (
+      effect.type === "snap" &&
+      effect.reason === "swipe" &&
+      source instanceof PointerEvent
+    ) {
       options.onRelease(Number(effect.id), source)
+    }
   }
 
   function flushMove() {
     moveFrame = 0
-    if (pendingPosition === null) return
+    if (pendingPosition === null) {
+      return
+    }
     write(pendingPosition)
     pendingPosition = null
   }
 
-  function startSpring(effect: Extract<SheetEffect, { type: "settle" }>, startTime: number) {
+  function startSpring(
+    effect: Extract<SheetEffect, { type: "settle" }>,
+    startTime: number
+  ) {
     stopSpring()
     pendingPosition = null
     const { from, to, velocity } = effect
@@ -205,12 +243,19 @@ function createCarouselMotion(options: CarouselMotionOptions) {
       return finishSpring()
     }
     options.setSnapping(false)
-    const solver = solveSpring(effect.response, effect.dampingRatio, from - to, velocity)
+    const solver = solveSpring(
+      effect.response,
+      effect.dampingRatio,
+      from - to,
+      velocity
+    )
     const duration = settleTime(solver)
     // Its target moves when a looping track rotates under it.
     const running = { frame: 0, to }
     const step = (now: number) => {
-      if (spring !== running) return
+      if (spring !== running) {
+        return
+      }
       const elapsed = now - startTime
       if (elapsed >= duration) {
         write(running.to)
@@ -224,16 +269,22 @@ function createCarouselMotion(options: CarouselMotionOptions) {
   }
 
   function stopSpring() {
-    if (spring) view.cancelAnimationFrame(spring.frame)
+    if (spring) {
+      view.cancelAnimationFrame(spring.frame)
+    }
     spring = null
   }
 
   function finishSpring() {
     spring = null
     dispatch({ type: "settled" })
-    if (state.phase !== "idle") return
+    if (state.phase !== "idle") {
+      return
+    }
     // Resting exactly on a page, so snapping comes back on without a jump.
-    if (!options.dragFree() || isOnPage()) options.setSnapping(true)
+    if (!options.dragFree() || isOnPage()) {
+      options.setSnapping(true)
+    }
     options.onSettle()
   }
 
@@ -246,17 +297,23 @@ function createCarouselMotion(options: CarouselMotionOptions) {
     const at = position()
     const isOwn = written !== null && Math.abs(at - written) < 1
     written = null
-    if (spring || dragging || isOwn) return
+    if (spring || dragging || isOwn) {
+      return
+    }
     userScrolled = true
     lastScrollEvent = event
     options.onScroll()
-    if (supportsScrollEnd) return
+    if (supportsScrollEnd) {
+      return
+    }
     view.clearTimeout(restTimer)
     restTimer = view.setTimeout(() => onRest(event), restTimeout)
   }
 
   function onRest(event?: Event) {
-    if (spring || dragging || !userScrolled) return
+    if (spring || dragging || !userScrolled) {
+      return
+    }
     // The browser's scroll can end before the page hears the finger lift.
     if (touching) {
       restMissed = true
@@ -307,9 +364,19 @@ function createCarouselMotion(options: CarouselMotionOptions) {
   }
 
   function onPointerDown(event: PointerEvent) {
-    if (event.pointerType === "touch" || event.button !== 0 || pointerId !== null) return
-    if (!options.canDrag() || isIgnored(event.target)) return
-    if (state.phase === "idle") restHere()
+    if (
+      event.pointerType === "touch" ||
+      event.button !== 0 ||
+      pointerId !== null
+    ) {
+      return
+    }
+    if (!options.canDrag() || isIgnored(event.target)) {
+      return
+    }
+    if (state.phase === "idle") {
+      restHere()
+    }
     pointerId = event.pointerId
     mouseDragged = false
     // A press that starts selecting text would scroll the viewport with the
@@ -326,18 +393,35 @@ function createCarouselMotion(options: CarouselMotionOptions) {
       on(doc, "pointercancel", onPointerUp, { capture: true }),
     ]
     const pointer = event.pointerType === "pen" ? "pen" : "mouse"
-    dispatch({ type: "down", time: event.timeStamp, x: point.x, y: point.y, pointer }, event)
+    dispatch(
+      { type: "down", time: event.timeStamp, x: point.x, y: point.y, pointer },
+      event
+    )
   }
 
   function onPointerMove(event: PointerEvent) {
-    if (event.pointerId !== pointerId) return
+    if (event.pointerId !== pointerId) {
+      return
+    }
     // Engines without coalescing, and synthetic events, give an empty list.
     const coalesced = event.getCoalescedEvents?.()
-    for (const sample of coalesced?.length ? coalesced : [event])
+    for (const sample of coalesced?.length ? coalesced : [event]) {
       tracker.add(sample.timeStamp, axisPoint(sample.clientX, sample.clientY).y)
+    }
     axisPoint(event.clientX, event.clientY)
-    dispatch({ type: "move", time: event.timeStamp, x: point.x, y: point.y, scroll: null }, event)
-    if (state.phase !== "dragging" || mouseDragged) return
+    dispatch(
+      {
+        type: "move",
+        time: event.timeStamp,
+        x: point.x,
+        y: point.y,
+        scroll: null,
+      },
+      event
+    )
+    if (state.phase !== "dragging" || mouseDragged) {
+      return
+    }
     // A mouse drag would also select text. The drag wins, and keeps the
     // pointer outside the viewport and the window.
     mouseDragged = true
@@ -350,27 +434,37 @@ function createCarouselMotion(options: CarouselMotionOptions) {
   }
 
   function onPointerUp(event: PointerEvent) {
-    if (event.pointerId !== pointerId) return
+    if (event.pointerId !== pointerId) {
+      return
+    }
     pointerId = null
     offPointer.forEach((off) => off())
     offPointer = []
     viewport.style.removeProperty("user-select")
-    const velocity = event.type === "pointercancel" ? 0 : tracker.velocity(event.timeStamp)
-    if (state.phase === "dragging" && options.dragFree()) releaseFree(event, velocity)
-    else dispatch({ type: "up", time: event.timeStamp, velocity }, event)
+    const velocity =
+      event.type === "pointercancel" ? 0 : tracker.velocity(event.timeStamp)
+    if (state.phase === "dragging" && options.dragFree()) {
+      releaseFree(event, velocity)
+    } else {
+      dispatch({ type: "up", time: event.timeStamp, velocity }, event)
+    }
     // The press that dragged the slides isn't a click on what it started on.
-    if (mouseDragged) swallowNextClick(doc)
+    if (mouseDragged) {
+      swallowNextClick(doc)
+    }
   }
 
   // A free drag coasts to where the release velocity would carry it, like a
   // scroll view, and rests there. The nearest page becomes the current one.
   function releaseFree(event: PointerEvent, fingerVelocity: number) {
-    if (state.phase !== "dragging") return
+    if (state.phase !== "dragging") {
+      return
+    }
     const velocity = -fingerVelocity
     const target = clamp(
       state.extent + projectDistance(velocity, freeDecelerationRate),
       0,
-      options.maxScroll(),
+      options.maxScroll()
     )
     const physics = options.physics()
     const index = Math.max(0, nearestPage(pagesAt(), target))
@@ -400,9 +494,13 @@ function createCarouselMotion(options: CarouselMotionOptions) {
     /** Moves to a page index: springs there from wherever it is, or jumps without `animate`. */
     moveTo(index: number, { animate = true } = {}) {
       const positions = options.positions()
-      if (destroyed || index < 0 || index >= positions.length) return
+      if (destroyed || index < 0 || index >= positions.length) {
+        return
+      }
       // A finger or a drag holds it. Its release settles it, and the carousel follows from there.
-      if (touching || dragging || pointerId !== null) return
+      if (touching || dragging || pointerId !== null) {
+        return
+      }
       if (!animate) {
         stopSpring()
         write(positions[index])
@@ -410,8 +508,15 @@ function createCarouselMotion(options: CarouselMotionOptions) {
         options.setSnapping(true)
         return
       }
-      if (state.phase === "idle") restHere()
-      dispatch({ type: "snap-to", time: performance.now(), id: String(index), reason: "imperative" })
+      if (state.phase === "idle") {
+        restHere()
+      }
+      dispatch({
+        type: "snap-to",
+        time: performance.now(),
+        id: String(index),
+        reason: "imperative",
+      })
     },
     /**
      * Moves the scroll position from `from` by `delta` after a looping track
@@ -421,9 +526,13 @@ function createCarouselMotion(options: CarouselMotionOptions) {
      * indexes into the new ones.
      */
     shift(from: number, delta: number, remap: (index: number) => number) {
-      if (destroyed) return
-      if (spring) spring.to += delta
-      if (state.phase === "settling")
+      if (destroyed) {
+        return
+      }
+      if (spring) {
+        spring.to += delta
+      }
+      if (state.phase === "settling") {
         state = {
           ...state,
           extent: state.extent + delta,
@@ -432,17 +541,24 @@ function createCarouselMotion(options: CarouselMotionOptions) {
           restingIndex: remap(state.restingIndex),
           targetIndex: remap(state.targetIndex),
         }
+      }
       write(from + delta)
-      if (state.phase === "idle") restHere()
+      if (state.phase === "idle") {
+        restHere()
+      }
     },
     destroy() {
       destroyed = true
       stopSpring()
-      if (moveFrame) view.cancelAnimationFrame(moveFrame)
+      if (moveFrame) {
+        view.cancelAnimationFrame(moveFrame)
+      }
       view.clearTimeout(restTimer)
       offs.forEach((off) => off())
       offPointer.forEach((off) => off())
-      if (dragging) options.onDragChange(false)
+      if (dragging) {
+        options.onDragChange(false)
+      }
       viewport.style.removeProperty("user-select")
       options.content()?.style.removeProperty("translate")
     },
@@ -451,4 +567,9 @@ function createCarouselMotion(options: CarouselMotionOptions) {
 
 type CarouselMotion = ReturnType<typeof createCarouselMotion>
 
-export { type CarouselAxis, type CarouselMotion, type CarouselMotionOptions, createCarouselMotion }
+export {
+  type CarouselAxis,
+  type CarouselMotion,
+  type CarouselMotionOptions,
+  createCarouselMotion,
+}

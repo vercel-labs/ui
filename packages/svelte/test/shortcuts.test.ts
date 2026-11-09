@@ -2,10 +2,17 @@ import { flushSync, mount, unmount } from "svelte"
 import { afterEach, expect, test } from "vitest"
 import App from "./apps/shortcuts-app.svelte"
 
-const byLabel = (label: string) => document.querySelector<HTMLElement>(`[aria-label="${label}"]`)
+const byLabel = (label: string) =>
+  document.querySelector<HTMLElement>(`[aria-label="${label}"]`)
 const pressK = () =>
   document.body.dispatchEvent(
-    new KeyboardEvent("keydown", { key: "k", code: "KeyK", ctrlKey: true, bubbles: true, cancelable: true }),
+    new KeyboardEvent("keydown", {
+      key: "k",
+      code: "KeyK",
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    })
   )
 
 let target: HTMLElement
@@ -19,7 +26,9 @@ function render(props: Record<string, unknown> = {}) {
   flushSync()
 }
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   target.remove()
 })

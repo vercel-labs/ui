@@ -17,7 +17,13 @@ We built more than 40 of them. You, or your agent, combine them to build your ow
 Here's a small popover. You define it once with `@ui-sdk/core`, and `createPopup` does the hard part: it opens next to its button, closes on Escape or a click outside, and puts focus back where it was.
 
 ```ts title="lib/share.ts"
-import { createPopup, definePrimitive, popupContent, popupState, popupTrigger } from "@ui-sdk/core"
+import {
+  createPopup,
+  definePrimitive,
+  popupContent,
+  popupState,
+  popupTrigger,
+} from "@ui-sdk/core"
 import { popoverPreset } from "@ui-sdk/core/popover"
 
 const share = definePrimitive({

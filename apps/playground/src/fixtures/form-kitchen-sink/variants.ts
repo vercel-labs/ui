@@ -29,7 +29,13 @@ type Variant = {
 }
 
 const variants: Variant[] = [
-  { id: "input-default", section: "Input", title: "Default", kind: "input", field: true },
+  {
+    id: "input-default",
+    section: "Input",
+    title: "Default",
+    kind: "input",
+    field: true,
+  },
   {
     id: "input-default-value",
     section: "Input",
@@ -102,9 +108,27 @@ const variants: Variant[] = [
     field: true,
     options: { debug: true },
   },
-  { id: "input-bare", section: "Input", title: "Without a field", kind: "input" },
-  { id: "input-rtl", section: "Input", title: "Right to left", kind: "input", field: true, place: "rtl" },
-  { id: "textarea-default", section: "Textarea", title: "Default", kind: "textarea", field: true },
+  {
+    id: "input-bare",
+    section: "Input",
+    title: "Without a field",
+    kind: "input",
+  },
+  {
+    id: "input-rtl",
+    section: "Input",
+    title: "Right to left",
+    kind: "input",
+    field: true,
+    place: "rtl",
+  },
+  {
+    id: "textarea-default",
+    section: "Textarea",
+    title: "Default",
+    kind: "textarea",
+    field: true,
+  },
   {
     id: "textarea-auto",
     section: "Textarea",
@@ -188,7 +212,12 @@ const variants: Variant[] = [
     place: "rtl",
     options: { defaultValue: "shoes" },
   },
-  { id: "field-set-default", section: "Field set", title: "Default", kind: "set" },
+  {
+    id: "field-set-default",
+    section: "Field set",
+    title: "Default",
+    kind: "set",
+  },
   {
     id: "field-set-disabled",
     section: "Field set",

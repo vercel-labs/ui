@@ -2,8 +2,10 @@ import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
 import App from "./apps/collapsible-app.svelte"
 
-const html = (props: { defaultOpen?: boolean; panel?: Record<string, unknown> }) =>
-  render(App, { props }).body
+const html = (props: {
+  defaultOpen?: boolean
+  panel?: Record<string, unknown>
+}) => render(App, { props }).body
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a collapsible", () => {
@@ -20,7 +22,7 @@ describe("server rendering a collapsible", () => {
 
   test("renders a findable panel as hidden until found, so find in page works before hydration", () => {
     expect(html({ panel: { hiddenUntilFound: true } })).toMatch(
-      /<div[^>]*hidden="until-found"[^>]*>(<!---->)?Panel/,
+      /<div[^>]*hidden="until-found"[^>]*>(<!---->)?Panel/
     )
   })
 

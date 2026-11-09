@@ -14,27 +14,32 @@
     {
       value: "week-1",
       label: "Week 1: Foundations",
-      content: "Set up your editor, meet the command line and write your first script.",
+      content:
+        "Set up your editor, meet the command line and write your first script.",
     },
     {
       value: "week-2",
       label: "Week 2: Data and types",
-      content: "Strings, numbers, lists and objects, and how to tell them apart when a program runs.",
+      content:
+        "Strings, numbers, lists and objects, and how to tell them apart when a program runs.",
     },
     {
       value: "week-3",
       label: "Week 3: Control flow",
-      content: "Conditions, loops and functions. The project this week is a small text adventure.",
+      content:
+        "Conditions, loops and functions. The project this week is a small text adventure.",
     },
     {
       value: "week-4",
       label: "Week 4: Working with files",
-      content: "Read and write files, parse CSV and JSON, and handle the errors that come with them.",
+      content:
+        "Read and write files, parse CSV and JSON, and handle the errors that come with them.",
     },
     {
       value: "week-5",
       label: "Week 5: Final project",
-      content: "Build a tool you'll use yourself, then present it to the group in a five-minute demo.",
+      content:
+        "Build a tool you'll use yourself, then present it to the group in a five-minute demo.",
     },
   ]
 
@@ -50,21 +55,30 @@
 
   let pressed: string | null = null
   function openChange(value: string, open: boolean, details: ChangeDetails) {
-    if (open && details.reason === "trigger-press") pressed = value
-    else if (pressed === value) pressed = null
+    if (open && details.reason === "trigger-press") {
+      pressed = value
+    } else if (pressed === value) {
+      pressed = null
+    }
   }
 
   function openChangeComplete(value: string, open: boolean) {
-    if (!open || pressed !== value) return
+    if (!open || pressed !== value) {
+      return
+    }
     pressed = null
-    elements.get(value)?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+    elements
+      .get(value)
+      ?.scrollIntoView({ block: "nearest", behavior: "smooth" })
   }
 </script>
 
 <div>
   <div data-slot="controls">
     <button type="button" onclick={() => syllabus.openAll()}>Expand all</button>
-    <button type="button" onclick={() => syllabus.closeAll()}>Collapse all</button>
+    <button type="button" onclick={() => syllabus.closeAll()}
+      >Collapse all</button
+    >
   </div>
   <div data-slot="scroll">
     <Accordion multiple controller={syllabus}>
@@ -72,7 +86,8 @@
         <AccordionItem
           {@attach setElement(week.value)}
           value={week.value}
-          onOpenChange={(open, details) => openChange(week.value, open, details)}
+          onOpenChange={(open, details) =>
+            openChange(week.value, open, details)}
           onOpenChangeComplete={(open) => openChangeComplete(week.value, open)}
         >
           <AccordionHeader>

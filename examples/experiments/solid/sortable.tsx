@@ -7,9 +7,17 @@ const {
   Item: SortableItem,
   Handle: SortableHandle,
   Instructions: SortableInstructions,
-} = createParts(sortable, { root: "div", item: "div", handle: "span", instructions: "div" })
+} = createParts(sortable, {
+  root: "div",
+  item: "div",
+  handle: "span",
+  instructions: "div",
+})
 
-const tracks: Record<string, { title: string; artist: string; length: string }> = {
+const tracks: Record<
+  string,
+  { title: string; artist: string; length: string }
+> = {
   t1: { title: "Northern Lights", artist: "Halden", length: "3:42" },
   t2: { title: "Glass Harbor", artist: "Mira Vale", length: "4:05" },
   t3: { title: "Copper Sky", artist: "The Fieldnotes", length: "2:58" },
@@ -40,23 +48,41 @@ function Example() {
             type="button"
             data-size="sm"
             onClick={() =>
-              setPlaylist([...playlist()].sort((a, b) => tracks[a].title.localeCompare(tracks[b].title)))
+              setPlaylist(
+                [...playlist()].sort((a, b) =>
+                  tracks[a].title.localeCompare(tracks[b].title)
+                )
+              )
             }
           >
             Sort by title
           </button>
-          <button type="button" data-size="sm" onClick={() => setPlaylist([...playlist()].reverse())}>
+          <button
+            type="button"
+            data-size="sm"
+            onClick={() => setPlaylist([...playlist()].reverse())}
+          >
             Reverse
           </button>
         </div>
-        <Sortable value={playlist()} onValueChange={(value) => setPlaylist(value)} aria-label="Playlist">
+        <Sortable
+          value={playlist()}
+          onValueChange={(value) => setPlaylist(value)}
+          aria-label="Playlist"
+        >
           {(state) => (
             <>
               <For each={state.order}>
                 {(key, index) => (
                   <SortableItem value={key}>
                     <SortableHandle>
-                      <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true">
+                      <svg
+                        viewBox="0 0 16 16"
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
                         <circle cx="6" cy="4" r="1.2" />
                         <circle cx="10" cy="4" r="1.2" />
                         <circle cx="6" cy="8" r="1.2" />
@@ -75,27 +101,35 @@ function Example() {
                 )}
               </For>
               <SortableInstructions>
-                Space picks up the focused track, or every selected track; then Up and Down move them, Space
-                drops them and Escape puts them back. Shift with an arrow selects, Control or Command with A
+                Space picks up the focused track, or every selected track; then
+                Up and Down move them, Space drops them and Escape puts them
+                back. Shift with an arrow selects, Control or Command with A
                 selects all.
               </SortableInstructions>
             </>
           )}
         </Sortable>
       </div>
-      <Sortable defaultValue={Object.keys(photos)} orientation="grid" aria-label="Photos">
+      <Sortable
+        defaultValue={Object.keys(photos)}
+        orientation="grid"
+        aria-label="Photos"
+      >
         {(state) => (
           <>
             <For each={state.order}>
               {(key) => (
-                <SortableItem value={key} style={{ "--tone": photos[key].tone }}>
+                <SortableItem
+                  value={key}
+                  style={{ "--tone": photos[key].tone }}
+                >
                   {photos[key].label}
                 </SortableItem>
               )}
             </For>
             <SortableInstructions>
-              Space picks up the focused photo, or every selected photo; then the arrows move them, Space
-              drops them and Escape puts them back.
+              Space picks up the focused photo, or every selected photo; then
+              the arrows move them, Space drops them and Escape puts them back.
             </SortableInstructions>
           </>
         )}

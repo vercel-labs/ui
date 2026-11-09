@@ -38,21 +38,31 @@ function mount(root: HTMLElement) {
 
   const update = () => {
     const { value } = view.get()
-    for (const button of buttons) button.setAttribute("aria-pressed", String(button.dataset.value === value))
+    for (const button of buttons) {
+      button.setAttribute(
+        "aria-pressed",
+        String(button.dataset.value === value)
+      )
+    }
   }
   const choose = (event: MouseEvent) => {
-    const next = (event.currentTarget as HTMLButtonElement).dataset.value as "list" | "grid"
+    const next = (event.currentTarget as HTMLButtonElement).dataset.value as
+      "list" | "grid"
     view.set(next, { reason: "press", event })
     log(root, `Saved the ${next} view`)
   }
 
   const stop = view.subscribe(update)
   update()
-  for (const button of buttons) button.addEventListener("click", choose)
+  for (const button of buttons) {
+    button.addEventListener("click", choose)
+  }
 
   return () => {
     stop()
-    for (const button of buttons) button.removeEventListener("click", choose)
+    for (const button of buttons) {
+      button.removeEventListener("click", choose)
+    }
     preferences.preferences = []
   }
 }

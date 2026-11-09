@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { EyeIcon, EyeOffIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/vue/password-input"
 </script>
 
 <template>

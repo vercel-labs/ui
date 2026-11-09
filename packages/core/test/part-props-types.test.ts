@@ -15,9 +15,13 @@ function reads(context: PrimitiveContext<object, object, "item">) {
   void context.props<ItemProps>("item", "a")?.disabeld
   // @ts-expect-error The same for `elements`.
   void elements<ItemProps>(context, "item")[0]?.props.disabeld
-  expectTypeOf(context.props<ItemProps>("item", "a")).toEqualTypeOf<ItemProps | undefined>()
+  expectTypeOf(context.props<ItemProps>("item", "a")).toEqualTypeOf<
+    ItemProps | undefined
+  >()
   expectTypeOf(context.props("item", "a")).toEqualTypeOf<object | undefined>()
-  expectTypeOf(elements<ItemProps>(context, "item")[0]!.props).toEqualTypeOf<ItemProps>()
+  expectTypeOf(
+    elements<ItemProps>(context, "item")[0]!.props
+  ).toEqualTypeOf<ItemProps>()
 }
 
 test("part props are typed only when named", () => {

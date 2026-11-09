@@ -48,37 +48,55 @@ function Fixture() {
         {...dialogOptions()}
         onOpenChange={(open, details) => {
           recordOpenChange("dialog", open, details)
-          if (!open && details.returnValue) setAction(details.returnValue)
+          if (!open && details.returnValue) {
+            setAction(details.returnValue)
+          }
         }}
       >
         {triggerShown && <DialogTrigger>{dialogFixture.trigger}</DialogTrigger>}
         {parts.backdrop && <DialogBackdrop className="dialog-backdrop" />}
         <DialogContent className="dialog" {...dialogContentOptions()}>
-          {parts.title && <DialogTitle className="title">{dialogFixture.title}</DialogTitle>}
-          <DialogDescription className="description">{dialogFixture.description}</DialogDescription>
+          {parts.title && (
+            <DialogTitle className="title">{dialogFixture.title}</DialogTitle>
+          )}
+          <DialogDescription className="description">
+            {dialogFixture.description}
+          </DialogDescription>
           <label className="field">
             {dialogFixture.field}
             <input defaultValue={dialogFixture.defaultValue} />
           </label>
           {parts.long && <p className="long">{dialogFixture.long}</p>}
           <div className="actions">
-            <button onClick={() => setAction("save")}>{dialogFixture.action}</button>
+            <button onClick={() => setAction("save")}>
+              {dialogFixture.action}
+            </button>
             <DialogClose>{dialogFixture.close}</DialogClose>
             {parts.removable && (
-              <button onClick={() => setTriggerShown(false)}>{dialogFixture.remove}</button>
+              <button onClick={() => setTriggerShown(false)}>
+                {dialogFixture.remove}
+              </button>
             )}
           </div>
           {parts.form && (
             <form method="dialog">
-              <button value={dialogFixture.form.value}>{dialogFixture.form.label}</button>
+              <button value={dialogFixture.form.value}>
+                {dialogFixture.form.label}
+              </button>
             </form>
           )}
           {parts.nested && (
-            <Dialog onOpenChange={(open, details) => recordOpenChange("nested", open, details)}>
+            <Dialog
+              onOpenChange={(open, details) =>
+                recordOpenChange("nested", open, details)
+              }
+            >
               <DialogTrigger>{dialogFixture.nested.trigger}</DialogTrigger>
               {parts.backdrop && <DialogBackdrop className="dialog-backdrop" />}
               <DialogContent className="dialog">
-                <DialogTitle className="title">{dialogFixture.nested.title}</DialogTitle>
+                <DialogTitle className="title">
+                  {dialogFixture.nested.title}
+                </DialogTitle>
                 <DialogClose>{dialogFixture.nested.close}</DialogClose>
               </DialogContent>
             </Dialog>
@@ -89,13 +107,18 @@ function Fixture() {
         <AlertDialogTrigger>{alertDialogFixture.trigger}</AlertDialogTrigger>
         {parts.backdrop && <AlertDialogBackdrop className="dialog-backdrop" />}
         <AlertDialogContent className="dialog">
-          <AlertDialogTitle className="title">{alertDialogFixture.title}</AlertDialogTitle>
+          <AlertDialogTitle className="title">
+            {alertDialogFixture.title}
+          </AlertDialogTitle>
           <AlertDialogDescription className="description">
             {alertDialogFixture.description}
           </AlertDialogDescription>
           <div className="actions">
             <AlertDialogClose>{alertDialogFixture.cancel}</AlertDialogClose>
-            <AlertDialogClose value="confirm" onClick={() => setAction("delete")}>
+            <AlertDialogClose
+              value="confirm"
+              onClick={() => setAction("delete")}
+            >
               {alertDialogFixture.action}
             </AlertDialogClose>
           </div>
@@ -107,7 +130,10 @@ function Fixture() {
       </output>
       <button onClick={() => controller.open()}>Open with controller</button>
       {parts.shortcut && (
-        <DialogTrigger controller={controller} shortcut={dialogFixture.shortcut.keys}>
+        <DialogTrigger
+          controller={controller}
+          shortcut={dialogFixture.shortcut.keys}
+        >
           {dialogFixture.shortcut.trigger} <DialogShortcut />
         </DialogTrigger>
       )}
@@ -119,7 +145,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

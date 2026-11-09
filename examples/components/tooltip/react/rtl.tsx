@@ -1,6 +1,11 @@
 "use client"
 
-import { Tooltip, TooltipArrow, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipTrigger,
+} from "@ui-sdk/react/tooltip"
 
 const sides = [
   { side: "right", label: "يمين" },

@@ -5,13 +5,18 @@ import { expect, lastAction, test } from "../fixtures"
 // forms follow the WAI-ARIA radio group pattern and native radios:
 // https://www.w3.org/WAI/ARIA/apg/patterns/radio/
 
-const quality = (page: Page) => page.getByRole("radiogroup", { name: "Quality" })
-const value = (page: Page) => page.getByRole("radiogroup", { name: "Value for money" })
-const star = (group: Locator, name: string) => group.getByRole("radio", { name, exact: true })
+const quality = (page: Page) =>
+  page.getByRole("radiogroup", { name: "Quality" })
+const value = (page: Page) =>
+  page.getByRole("radiogroup", { name: "Value for money" })
+const star = (group: Locator, name: string) =>
+  group.getByRole("radio", { name, exact: true })
 const items = (group: Locator) => group.locator('[data-slot="rating-item"]')
 const fills = (group: Locator) =>
   items(group).evaluateAll((els) =>
-    els.map((el) => Number((el as HTMLElement).style.getPropertyValue("--rating-fill"))),
+    els.map((el) =>
+      Number((el as HTMLElement).style.getPropertyValue("--rating-fill"))
+    )
   )
 const submitted = async (page: Page) => {
   await page.getByRole("button", { name: "Save" }).click()
@@ -19,13 +24,22 @@ const submitted = async (page: Page) => {
 }
 
 test.describe("selection", () => {
-  test("the default score is checked, and the stars up to it are full", async ({ page, open }) => {
+  test("the default score is checked, and the stars up to it are full", async ({
+    page,
+    open,
+  }) => {
     await open("rating")
     await expect(star(quality(page), "3 stars")).toBeChecked()
     expect(await fills(quality(page))).toEqual([1, 1, 1, 0, 0])
-    await expect(items(quality(page)).nth(2)).toHaveAttribute("data-checked", "")
+    await expect(items(quality(page)).nth(2)).toHaveAttribute(
+      "data-checked",
+      ""
+    )
     await expect(items(quality(page)).nth(2)).toHaveAttribute("data-filled", "")
-    await expect(items(quality(page)).nth(3)).not.toHaveAttribute("data-filled", "")
+    await expect(items(quality(page)).nth(3)).not.toHaveAttribute(
+      "data-filled",
+      ""
+    )
   })
 
   test("clicking a star checks it and says why", async ({ page, open }) => {
@@ -52,7 +66,9 @@ test.describe("selection", () => {
     await open("rating")
     await star(value(page), "2 stars").click()
     await star(value(page), "2 stars").click()
-    await expect(value(page).getByRole("radio", { checked: true })).toHaveCount(0)
+    await expect(value(page).getByRole("radio", { checked: true })).toHaveCount(
+      0
+    )
     await star(quality(page), "3 stars").click()
     await expect(star(quality(page), "3 stars")).toBeChecked()
   })
@@ -78,15 +94,25 @@ test.describe("preview", () => {
     await open("rating")
     await star(value(page), "3.5 stars").hover()
     expect(await fills(value(page))).toEqual([1, 1, 1, 0.5, 0])
-    await expect(items(value(page)).nth(3)).toHaveAttribute("data-highlighted", "")
-    await expect(items(value(page)).nth(4)).not.toHaveAttribute("data-highlighted", "")
+    await expect(items(value(page)).nth(3)).toHaveAttribute(
+      "data-highlighted",
+      ""
+    )
+    await expect(items(value(page)).nth(4)).not.toHaveAttribute(
+      "data-highlighted",
+      ""
+    )
     await page.getByRole("button", { name: "Save" }).hover()
     expect(await fills(value(page))).toEqual([0, 0, 0, 0, 0])
   })
 })
 
 test.describe("keyboard", () => {
-  test("Tab lands on the checked star, and the next Tab leaves", async ({ page, open, tab }) => {
+  test("Tab lands on the checked star, and the next Tab leaves", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("rating")
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
@@ -95,7 +121,10 @@ test.describe("keyboard", () => {
     await expect(page.getByRole("button", { name: "After" })).toBeFocused()
   })
 
-  test("arrow keys change the score by a step, and stop at the ends", async ({ page, open }) => {
+  test("arrow keys change the score by a step, and stop at the ends", async ({
+    page,
+    open,
+  }) => {
     await open("rating")
     await star(quality(page), "3 stars").focus()
     await page.keyboard.press("ArrowRight")
@@ -109,13 +138,18 @@ test.describe("keyboard", () => {
     await expect(star(quality(page), "4 stars")).toBeChecked()
   })
 
-  test("Space on the checked star clears a deselectable rating", async ({ page, open }) => {
+  test("Space on the checked star clears a deselectable rating", async ({
+    page,
+    open,
+  }) => {
     await open("rating")
     await star(value(page), "1.5 stars").click()
     await page.keyboard.press("ArrowRight")
     await expect(star(value(page), "2 stars")).toBeChecked()
     await page.keyboard.press("Space")
-    await expect(value(page).getByRole("radio", { checked: true })).toHaveCount(0)
+    await expect(value(page).getByRole("radio", { checked: true })).toHaveCount(
+      0
+    )
   })
 })
 
@@ -125,7 +159,9 @@ test.describe("read-only", () => {
     open,
   }) => {
     await open("rating")
-    const average = page.getByRole("img", { name: "Average rating: 4.2 out of 5" })
+    const average = page.getByRole("img", {
+      name: "Average rating: 4.2 out of 5",
+    })
     await expect(average).toBeVisible()
     await expect(average.getByRole("radio")).toHaveCount(0)
     expect(await fills(average)).toEqual([1, 1, 1, 1, 0.2])

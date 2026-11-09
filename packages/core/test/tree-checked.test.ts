@@ -1,6 +1,12 @@
 import { describe, expect, test } from "vitest"
-import { toggleTreeChecked, treeCheckedStates } from "../src/foundation/lists/tree-checked"
-import { createTreeCollection, treeDataNodes } from "../src/foundation/lists/tree-collection"
+import {
+  toggleTreeChecked,
+  treeCheckedStates,
+} from "../src/foundation/lists/tree-checked"
+import {
+  createTreeCollection,
+  treeDataNodes,
+} from "../src/foundation/lists/tree-collection"
 
 // fruit: apple, berries (straw, blue), lemon. veg: carrot. nuts loads later.
 const tree = createTreeCollection(
@@ -21,9 +27,13 @@ const tree = createTreeCollection(
         { value: "lemon", label: "Lemon" },
       ],
     },
-    { value: "veg", label: "Veg", children: [{ value: "carrot", label: "Carrot" }] },
+    {
+      value: "veg",
+      label: "Veg",
+      children: [{ value: "carrot", label: "Carrot" }],
+    },
     { value: "nuts", label: "Nuts", children: [] },
-  ]),
+  ])
 )
 
 describe("treeCheckedStates", () => {
@@ -37,7 +47,9 @@ describe("treeCheckedStates", () => {
 
   test("a branch in the value stands for everything in it", () => {
     const state = treeCheckedStates(tree, ["fruit"])
-    for (const key of ["fruit", "apple", "berries", "straw", "blue", "lemon"]) expect(state(key)).toBe(true)
+    for (const key of ["fruit", "apple", "berries", "straw", "blue", "lemon"]) {
+      expect(state(key)).toBe(true)
+    }
   })
 
   test("independent checks never cascade", () => {
@@ -54,14 +66,18 @@ describe("treeCheckedStates", () => {
 describe("toggleTreeChecked", () => {
   test("checking a branch checks everything in it, reported per strategy", () => {
     expect(toggleTreeChecked(tree, [], "berries")).toEqual(["straw", "blue"])
-    expect(toggleTreeChecked(tree, [], "berries", { strategy: "branch" })).toEqual([
-      "berries",
-      "straw",
-      "blue",
-    ])
-    expect(toggleTreeChecked(tree, [], "berries", { strategy: "trunk" })).toEqual(["berries"])
+    expect(
+      toggleTreeChecked(tree, [], "berries", { strategy: "branch" })
+    ).toEqual(["berries", "straw", "blue"])
+    expect(
+      toggleTreeChecked(tree, [], "berries", { strategy: "trunk" })
+    ).toEqual(["berries"])
     // Checking the last leaf makes the whole branch the trunk.
-    expect(toggleTreeChecked(tree, ["apple", "berries"], "lemon", { strategy: "trunk" })).toEqual(["fruit"])
+    expect(
+      toggleTreeChecked(tree, ["apple", "berries"], "lemon", {
+        strategy: "trunk",
+      })
+    ).toEqual(["fruit"])
   })
 
   test("pressing a mixed branch checks everything in it, and a checked one unchecks it", () => {
@@ -77,7 +93,10 @@ describe("toggleTreeChecked", () => {
 
   test("refused items keep their state and shield what's under them", () => {
     const checkable = (key: string) => key !== "berries" && key !== "lemon"
-    expect(toggleTreeChecked(tree, ["lemon"], "fruit", { checkable })).toEqual(["apple", "lemon"])
+    expect(toggleTreeChecked(tree, ["lemon"], "fruit", { checkable })).toEqual([
+      "apple",
+      "lemon",
+    ])
     expect(toggleTreeChecked(tree, [], "berries", { checkable })).toEqual([])
   })
 
@@ -90,12 +109,13 @@ describe("toggleTreeChecked", () => {
   })
 
   test("independent checks toggle one item", () => {
-    expect(toggleTreeChecked(tree, ["fruit"], "apple", { strategy: "independent" })).toEqual([
-      "fruit",
-      "apple",
-    ])
-    expect(toggleTreeChecked(tree, ["fruit", "apple"], "fruit", { strategy: "independent" })).toEqual([
-      "apple",
-    ])
+    expect(
+      toggleTreeChecked(tree, ["fruit"], "apple", { strategy: "independent" })
+    ).toEqual(["fruit", "apple"])
+    expect(
+      toggleTreeChecked(tree, ["fruit", "apple"], "fruit", {
+        strategy: "independent",
+      })
+    ).toEqual(["apple"])
   })
 })

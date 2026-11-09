@@ -25,7 +25,10 @@ const commits = ref<string[]>([])
     <table>
       <thead>
         <tr>
-          <NumberInputScrubArea :controller="controller" class="number-input-scrub">
+          <NumberInputScrubArea
+            :controller="controller"
+            class="number-input-scrub"
+          >
             <template #render="{ props }">
               <th v-bind="props">
                 {{ f.headerScrub }}
@@ -46,19 +49,28 @@ const commits = ref<string[]>([])
       @value-commit="(value) => (commits = [...commits, String(value)])"
     >
       <NumberInputGroup class="number-input-group">
-        <NumberInputScrubArea class="number-input-scrub">{{ f.letterScrub }}</NumberInputScrubArea>
-        <NumberInputControl :aria-label="f.label" class="number-input-control" />
+        <NumberInputScrubArea class="number-input-scrub">{{
+          f.letterScrub
+        }}</NumberInputScrubArea>
+        <NumberInputControl
+          :aria-label="f.label"
+          class="number-input-control"
+        />
       </NumberInputGroup>
       <div>
         <div>
           <div>
-            <NumberInputScrubArea class="number-input-scrub">{{ f.nestedScrub }}</NumberInputScrubArea>
+            <NumberInputScrubArea class="number-input-scrub">{{
+              f.nestedScrub
+            }}</NumberInputScrubArea>
           </div>
         </div>
       </div>
     </NumberInput>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <output role="status" aria-label="Committed">{{ commits.join(" ") }}</output>
+    <output role="status" aria-label="Committed">{{
+      commits.join(" ")
+    }}</output>
   </div>
 </template>

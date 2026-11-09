@@ -19,7 +19,7 @@ function mount(root: HTMLElement) {
               <a href="#${framework.value}">
                 <span>${framework.label}</span>
               </a>
-            </ui-listbox-item>`,
+            </ui-listbox-item>`
         )
         .join("")}
     </ui-listbox>
@@ -28,8 +28,11 @@ function mount(root: HTMLElement) {
   const icon = createElement(ExternalLink, { "aria-hidden": "true" })
   function update() {
     const link = root.querySelector(`a[href="#${listbox.value}"]`)
-    if (link) link.append(icon)
-    else icon.remove()
+    if (link) {
+      link.append(icon)
+    } else {
+      icon.remove()
+    }
   }
   update()
   listbox.addEventListener("valuechange", update)

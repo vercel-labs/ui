@@ -4,9 +4,15 @@ import "./styles.css"
 function applyFixtureOptions() {
   const params = new URLSearchParams(location.search)
   const layout = params.get("layout")
-  if (layout) document.body.dataset.layout = layout
-  if (params.get("dir") === "rtl") document.documentElement.dir = "rtl"
-  if (params.has("animate")) document.body.dataset.animate = params.get("animate") ?? ""
+  if (layout) {
+    document.body.dataset.layout = layout
+  }
+  if (params.get("dir") === "rtl") {
+    document.documentElement.dir = "rtl"
+  }
+  if (params.has("animate")) {
+    document.body.dataset.animate = params.get("animate") ?? ""
+  }
   // A container for specs that render popups somewhere else.
   const container = params.get("container")
   if (container && !document.getElementById(container)) {
@@ -34,14 +40,20 @@ function menuOptions() {
   return {
     ...(params.has("open") && { defaultOpen: true }),
     ...(container && { container: document.getElementById(container) }),
-    ...(modal && { modal: modal === "pointer" ? ("pointer" as const) : modal === "true" }),
-    ...(presentation && { presentation: presentation as "auto" | "popover" | "sheet" }),
+    ...(modal && {
+      modal: modal === "pointer" ? ("pointer" as const) : modal === "true",
+    }),
+    ...(presentation && {
+      presentation: presentation as "auto" | "popover" | "sheet",
+    }),
   }
 }
 
 // ?sr loads a virtual screen reader that records what would be announced.
 async function loadScreenReader() {
-  if (!new URLSearchParams(location.search).has("sr")) return
+  if (!new URLSearchParams(location.search).has("sr")) {
+    return
+  }
   const { virtual } = await import("@guidepup/virtual-screen-reader")
   ;(window as unknown as { virtual: typeof virtual }).virtual = virtual
 }
@@ -58,7 +70,9 @@ function tabsOptions() {
     keepMounted: params.has("keep-mounted"),
     cancel: params.get("cancel"),
     ...(activation && { activation: activation as "automatic" | "manual" }),
-    ...(orientation && { orientation: orientation as "horizontal" | "vertical" }),
+    ...(orientation && {
+      orientation: orientation as "horizontal" | "vertical",
+    }),
   }
 }
 
@@ -67,7 +81,10 @@ function tabsOptions() {
 function ratingOptions() {
   const params = new URLSearchParams(location.search)
   const cancel = params.get("cancel")
-  return { disabled: params.has("disabled"), cancel: cancel === null ? null : Number(cancel) }
+  return {
+    disabled: params.has("disabled"),
+    cancel: cancel === null ? null : Number(cancel),
+  }
 }
 
 // Segmented control options a spec can set through the URL: ?default=<value>,
@@ -81,7 +98,9 @@ function segmentedControlOptions() {
     defaultValue: defaultValue === "none" ? undefined : defaultValue,
     disabled: params.has("disabled"),
     cancel: params.get("cancel"),
-    ...(orientation && { orientation: orientation as "horizontal" | "vertical" }),
+    ...(orientation && {
+      orientation: orientation as "horizontal" | "vertical",
+    }),
   }
 }
 
@@ -96,9 +115,13 @@ function colorPickerOptions() {
     disabled: params.has("disabled"),
     readOnly: params.has("readonly"),
     cancel: params.has("cancel"),
-    ...(params.get("space") && { space: params.get("space") as "hsv" | "hsl" | "srgb" | "oklch" }),
+    ...(params.get("space") && {
+      space: params.get("space") as "hsv" | "hsl" | "srgb" | "oklch",
+    }),
     ...(params.get("format") && { format: params.get("format") as "hex" }),
-    ...(gamut && { gamut: gamut === "false" ? (false as const) : (gamut as "srgb" | "p3") }),
+    ...(gamut && {
+      gamut: gamut === "false" ? (false as const) : (gamut as "srgb" | "p3"),
+    }),
   }
 }
 
@@ -114,7 +137,9 @@ function imageCropperOptions() {
     disabled: params.has("disabled"),
     cancel: params.has("cancel"),
     ...(params.get("aspect") && { aspectRatio: Number(params.get("aspect")) }),
-    ...(crop && { defaultCrop: { x: crop[0], y: crop[1], width: crop[2], height: crop[3] } }),
+    ...(crop && {
+      defaultCrop: { x: crop[0], y: crop[1], width: crop[2], height: crop[3] },
+    }),
   }
 }
 
@@ -126,7 +151,8 @@ function accordionOptions() {
   const params = new URLSearchParams(location.search)
   const value = params.get("default")
   return {
-    defaultValue: value === "none" ? undefined : value ? value.split(",") : ["shipping"],
+    defaultValue:
+      value === "none" ? undefined : value ? value.split(",") : ["shipping"],
     multiple: params.has("multiple"),
     disabled: params.has("disabled"),
     keepMounted: params.has("keep-mounted"),
@@ -160,7 +186,8 @@ function toggleOptions() {
   const params = new URLSearchParams(location.search)
   const orientation = params.get("orientation")
   return {
-    orientation: (orientation ?? undefined) as "horizontal" | "vertical" | undefined,
+    orientation: (orientation ?? undefined) as
+      "horizontal" | "vertical" | undefined,
     deselectable: params.get("deselectable") !== "false",
     loop: params.get("loop") !== "false",
     disabled: params.has("disabled"),
@@ -173,7 +200,9 @@ function toggleOptions() {
 // The value a toggle group change touches: the one added or removed.
 function changedValue(before: readonly string[], after: readonly string[]) {
   return (
-    after.find((value) => !before.includes(value)) ?? before.find((value) => !after.includes(value)) ?? null
+    after.find((value) => !before.includes(value)) ??
+    before.find((value) => !after.includes(value)) ??
+    null
   )
 }
 
@@ -184,16 +213,20 @@ function changedValue(before: readonly string[], after: readonly string[]) {
 function treeOptions() {
   const params = new URLSearchParams(location.search)
   const list = (name: string) => params.get(name)?.split(",").filter(Boolean)
-  const mode = (params.get("selection") ?? "single") as "none" | "single" | "multiple"
+  const mode = (params.get("selection") ?? "single") as
+    "none" | "single" | "multiple"
   const selected = list("default")
   return {
     mode,
-    defaultValue: mode === "multiple" ? (selected ?? []) : (selected?.[0] ?? null),
+    defaultValue:
+      mode === "multiple" ? (selected ?? []) : (selected?.[0] ?? null),
     defaultExpanded: list("expanded") ?? [],
     checkable: params.has("checkable"),
-    checkStrategy: (params.get("strategy") ?? "leaf") as "leaf" | "trunk" | "branch" | "independent",
+    checkStrategy: (params.get("strategy") ?? "leaf") as
+      "leaf" | "trunk" | "branch" | "independent",
     current: params.get("current") ?? undefined,
-    activation: (params.get("activation") ?? "manual") as "automatic" | "manual",
+    activation: (params.get("activation") ?? "manual") as
+      "automatic" | "manual",
     disabled: params.has("disabled"),
     keepMounted: params.has("keep-mounted"),
     hiddenUntilFound: params.has("hidden-until-found"),

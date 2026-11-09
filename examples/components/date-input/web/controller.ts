@@ -21,9 +21,11 @@ function mount(root: HTMLElement) {
     year: () => publish.focus("year"),
     clear: () => publish.clear(),
   }
-  root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
-    button.addEventListener("click", () => actions[button.dataset.action!]())
-  })
+  root
+    .querySelectorAll<HTMLButtonElement>("[data-action]")
+    .forEach((button) => {
+      button.addEventListener("click", () => actions[button.dataset.action!]())
+    })
 }
 
 export { mount }

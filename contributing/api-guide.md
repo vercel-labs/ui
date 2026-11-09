@@ -246,7 +246,10 @@ tabs.focus()
 
   ```ts
   const pick = createDialogController<Row, { id: string }>()
-  const { reason, returnValue } = await pick.open({ payload: row, signal: AbortSignal.timeout(30_000) })
+  const { reason, returnValue } = await pick.open({
+    payload: row,
+    signal: AbortSignal.timeout(30_000),
+  })
   pick.close({ returnValue: { id: "42" } }) // Web components: await el.api.open({ signal }).
   ```
 

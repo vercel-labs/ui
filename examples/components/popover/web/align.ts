@@ -21,7 +21,7 @@ function mount(root: HTMLElement) {
                 <ui-popover-description>Arrives Tuesday between 9 AM and noon.</ui-popover-description>
               </ui-popover-content>
             </ui-popover>
-          `,
+          `
         )
         .join("")}
     </div>

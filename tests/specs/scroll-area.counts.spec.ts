@@ -36,7 +36,9 @@ test.describe("work per move in a scroll area with many items", () => {
       await open("scroll-area-perf", { n: String(n) })
       const result = await dragThumb(page, false)
       report("scroll-area.drag", n, result)
-      expectWithin(result, budget, { see: "See tests/perf/README.md#scroll-area-drag." })
+      expectWithin(result, budget, {
+        see: "See tests/perf/README.md#scroll-area-drag.",
+      })
     })
 
     test(`dragging the thumb restyles only the scroll area's own parts (n=${n})`, async ({
@@ -44,14 +46,17 @@ test.describe("work per move in a scroll area with many items", () => {
       open,
       browserName,
     }) => {
-      test.skip(browserName !== "chromium", "Counts restyled elements from a Chromium trace.")
+      test.skip(
+        browserName !== "chromium",
+        "Counts restyled elements from a Chromium trace."
+      )
       const budget = budgets["scroll-area.drag"]
       await open("scroll-area-perf", { n: String(n) })
       const result = await dragThumb(page, true)
       report("scroll-area.restyle", n, result)
       expect(
         result.restyled!.elements / 10,
-        "Elements restyled per move. See tests/perf/README.md#scroll-area-drag.",
+        "Elements restyled per move. See tests/perf/README.md#scroll-area-drag."
       ).toBeLessThanOrEqual(budget.restyledPerMove)
     })
   }

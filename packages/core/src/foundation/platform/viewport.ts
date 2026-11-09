@@ -2,7 +2,13 @@
 // layout viewport's bottom, the visual viewport iOS pans to keep a field in
 // view, and the safe areas around a notch or home indicator.
 
-import { followViewport, keyboardHeight, keyboardInset, measureViewport, type ViewportSize } from "./keyboard"
+import {
+  followViewport,
+  keyboardHeight,
+  keyboardInset,
+  measureViewport,
+  type ViewportSize,
+} from "./keyboard"
 
 /**
  * What `bindViewport` reports, in CSS pixels.
@@ -43,7 +49,9 @@ function safeAreaProbe(doc: Document) {
 // The visual viewport, or the window where a browser has none.
 function sizeOf(view: Window) {
   const visual = view.visualViewport
-  if (visual) return measureViewport(view, visual)
+  if (visual) {
+    return measureViewport(view, visual)
+  }
   return {
     width: view.innerWidth,
     layoutHeight: view.innerHeight,
@@ -56,11 +64,22 @@ function sizeOf(view: Window) {
 function safeAreaOf(view: Window, probe: HTMLElement) {
   const style = view.getComputedStyle(probe)
   const inset = (side: (typeof sides)[number]) =>
-    Math.round(Number.parseFloat(style.getPropertyValue(`padding-${side}`)) || 0)
-  return { top: inset("top"), right: inset("right"), bottom: inset("bottom"), left: inset("left") }
+    Math.round(
+      Number.parseFloat(style.getPropertyValue(`padding-${side}`)) || 0
+    )
+  return {
+    top: inset("top"),
+    right: inset("right"),
+    bottom: inset("bottom"),
+    left: inset("left"),
+  }
 }
 
-type KeyboardFollower = (size: ViewportSize, keyboard: number, event?: Event) => void
+type KeyboardFollower = (
+  size: ViewportSize,
+  keyboard: number,
+  event?: Event
+) => void
 
 const keyboardByView = new WeakMap<
   Window,
@@ -75,7 +94,9 @@ function shareKeyboard(view: Window) {
   const notify = (size: ViewportSize, event: Event) => {
     const height = keyboard(size, event)
     shared.height = height
-    for (const follow of followers) follow(size, height, event)
+    for (const follow of followers) {
+      follow(size, height, event)
+    }
   }
   const measure = (event: Event) => notify(sizeOf(view), event)
   const visual = view.visualViewport
@@ -106,7 +127,9 @@ function followKeyboard(view: Window, follower: KeyboardFollower) {
   // page under an open keyboard as the page without one.
   follower(sizeOf(view), shared.height)
   return () => {
-    if (followers.delete(follower) && !followers.size) stop()
+    if (followers.delete(follower) && !followers.size) {
+      stop()
+    }
   }
 }
 
@@ -117,20 +140,29 @@ function followKeyboard(view: Window, follower: KeyboardFollower) {
  * and once at the start. Returns a cleanup that removes what it wrote.
  * @experimental
  */
-function bindViewport(el: HTMLElement, { onChange }: { onChange?: (viewport: ViewportState) => void } = {}) {
+function bindViewport(
+  el: HTMLElement,
+  { onChange }: { onChange?: (viewport: ViewportState) => void } = {}
+) {
   const doc = el.ownerDocument
   const view = doc.defaultView
-  if (!view) return () => {}
+  if (!view) {
+    return () => {}
+  }
   const probe = safeAreaProbe(doc)
   let safeArea = safeAreaOf(view, probe)
   let last = ""
   const write = (name: string, px: number) => {
     const value = `${px}px`
-    if (el.style.getPropertyValue(name) !== value) el.style.setProperty(name, value)
+    if (el.style.getPropertyValue(name) !== value) {
+      el.style.setProperty(name, value)
+    }
   }
   const stop = followKeyboard(view, (size, keyboard, event) => {
     // Safe areas change only with the window's size, and reading them costs a style recalc.
-    if (event?.type === "resize") safeArea = safeAreaOf(view, probe)
+    if (event?.type === "resize") {
+      safeArea = safeAreaOf(view, probe)
+    }
     const viewport: ViewportState = {
       keyboard,
       keyboardInset: keyboardInset(view, size, keyboard),
@@ -147,7 +179,9 @@ function bindViewport(el: HTMLElement, { onChange }: { onChange?: (viewport: Vie
     write("--visual-viewport-top", viewport.offsetTop)
     el.toggleAttribute("data-keyboard", keyboard > 0)
     const key = JSON.stringify(viewport)
-    if (key === last) return
+    if (key === last) {
+      return
+    }
     last = key
     onChange?.(viewport)
   })
@@ -159,8 +193,9 @@ function bindViewport(el: HTMLElement, { onChange }: { onChange?: (viewport: Vie
       "--visual-viewport-width",
       "--visual-viewport-height",
       "--visual-viewport-top",
-    ])
+    ]) {
       el.style.removeProperty(name)
+    }
     el.removeAttribute("data-keyboard")
   }
 }
@@ -171,13 +206,16 @@ function lengthOf(value: string) {
   const length = { percent: 0, px: 0 }
   for (const [, number = "0", unit] of value
     .replaceAll(" ", "")
-    .matchAll(/([+-]?[\d.]+(?:e[+-]?\d+)?)(%|px)?/gi))
+    .matchAll(/([+-]?[\d.]+(?:e[+-]?\d+)?)(%|px)?/gi)) {
     length[unit === "%" ? "percent" : "px"] += Number.parseFloat(number)
+  }
   return length
 }
 
 const cssLength = ({ percent, px }: { percent: number; px: number }) =>
-  !percent ? `${px}px` : `calc(${percent}% ${px < 0 ? "-" : "+"} ${Math.abs(px)}px)`
+  !percent
+    ? `${px}px`
+    : `calc(${percent}% ${px < 0 ? "-" : "+"} ${Math.abs(px)}px)`
 
 /**
  * Keeps `el` above the on-screen keyboard, like a chat composer or a toolbar
@@ -192,14 +230,17 @@ const cssLength = ({ percent, px }: { percent: number; px: number }) =>
 function bindAvoidKeyboard(el: HTMLElement) {
   const view = el.ownerDocument.defaultView
   const visual = view?.visualViewport
-  if (!view || !visual) return () => {}
+  if (!view || !visual) {
+    return () => {}
+  }
   const own = el.style.translate
   // The translate el has now, as shown: mid-transition, part of the way to the
   // lift. Its x and z stay as they're written; its y takes the lift.
   const shown = () => {
     const value = view.getComputedStyle(el).translate
     // Spaces inside calc() aren't between parts, so split outside parentheses only.
-    const [x = "0px", y = "0px", z] = value === "none" ? [] : value.split(/ (?![^(]*\))/)
+    const [x = "0px", y = "0px", z] =
+      value === "none" ? [] : value.split(/ (?![^(]*\))/)
     return { x, y: lengthOf(y), z }
   }
   const rest = shown()
@@ -208,7 +249,8 @@ function bindAvoidKeyboard(el: HTMLElement) {
   const origin = el.ownerDocument.createElement("div")
   origin.setAttribute("aria-hidden", "true")
   origin.setAttribute("data-viewport-origin", "")
-  origin.style.cssText = "position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none"
+  origin.style.cssText =
+    "position:fixed;top:0;left:0;width:0;height:0;visibility:hidden;pointer-events:none"
   el.ownerDocument.body.append(origin)
   // Where el would be without the lift, in the layout viewport the keyboard
   // covers, against where the visible part of the page ends.
@@ -221,7 +263,10 @@ function bindAvoidKeyboard(el: HTMLElement) {
       ((now.percent - rest.y.percent) * box.height) / 100 +
       origin.getBoundingClientRect().top
     const bottom = Math.min(box.bottom - shift, view.innerHeight)
-    const below = box.top - shift < view.innerHeight ? bottom - visual.offsetTop - visual.height : 0
+    const below =
+      box.top - shift < view.innerHeight
+        ? bottom - visual.offsetTop - visual.height
+        : 0
     return Math.round(Math.max(0, below))
   }
   let keyboard = 0
@@ -229,23 +274,32 @@ function bindAvoidKeyboard(el: HTMLElement) {
   const update = () => {
     el.toggleAttribute("data-keyboard", keyboard > 0)
     const next = keyboard ? covered() : 0
-    if (next === lifted) return
+    if (next === lifted) {
+      return
+    }
     lifted = next
     const y = cssLength({ percent: rest.y.percent, px: rest.y.px - lifted })
-    el.style.translate = lifted ? [rest.x, y, rest.z].filter(Boolean).join(" ") : own
+    el.style.translate = lifted
+      ? [rest.x, y, rest.z].filter(Boolean).join(" ")
+      : own
   }
   // Scrolling reports late and often, so it measures once a frame, as the page
   // paints, and only while the keyboard is open: closed, nothing is lifted.
   let frame = 0
   const scrolled = () => {
-    if (!keyboard && !lifted) return
+    if (!keyboard && !lifted) {
+      return
+    }
     view.cancelAnimationFrame(frame)
     frame = view.requestAnimationFrame(update)
   }
   const stop = followKeyboard(view, (_, height, event) => {
     keyboard = height
-    if (event?.type === "scroll") scrolled()
-    else update()
+    if (event?.type === "scroll") {
+      scrolled()
+    } else {
+      update()
+    }
   })
   // A container's scroll doesn't bubble, so the window hears every one as it passes down.
   view.addEventListener("scroll", scrolled, { capture: true, passive: true })

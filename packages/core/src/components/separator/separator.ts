@@ -1,5 +1,8 @@
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Which way the line runs.
@@ -39,7 +42,8 @@ type SeparatorState = {
 // written, so anything but "vertical" is the default rather than an invalid
 // ARIA value.
 function settings(options: SeparatorOptions) {
-  const orientation: SeparatorOrientation = options.orientation === "vertical" ? "vertical" : "horizontal"
+  const orientation: SeparatorOrientation =
+    options.orientation === "vertical" ? "vertical" : "horizontal"
   return { orientation, decorative: !!options.decorative }
 }
 

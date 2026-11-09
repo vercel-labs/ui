@@ -1,12 +1,21 @@
-import { toggle, toggleGroup, type ToggleApi, type ToggleGroupApi } from "@ui-sdk/core/toggle"
+import {
+  toggle,
+  toggleGroup,
+  type ToggleApi,
+  type ToggleGroupApi,
+} from "@ui-sdk/core/toggle"
 import type { ToolbarApi } from "@ui-sdk/core/toolbar"
 import { createParts, instanceOf, wrappedButton } from "./define-element"
 
 // The toolbar a toggle or a toggle group sits in, read when needed, since it
 // may upgrade later, and whether a toolbar group around it is disabled.
 const toolbarOf = (el: HTMLElement) => () =>
-  instanceOf<ToolbarApi>(el.parentElement?.closest("ui-toolbar"))?.api.internal.scopeIn(
-    !!el.parentElement?.closest('ui-toolbar-group[disabled]:not([disabled="false"])'),
+  instanceOf<ToolbarApi>(
+    el.parentElement?.closest("ui-toolbar")
+  )?.api.internal.scopeIn(
+    !!el.parentElement?.closest(
+      'ui-toolbar-group[disabled]:not([disabled="false"])'
+    )
   )
 
 // <ui-toggle> wraps your own <button>. Inside <ui-toggle-group>, the group
@@ -23,7 +32,10 @@ function defineToggleElements() {
       kinds: { group: null, toolbar: null },
       options: (el) => ({
         // Read when needed, since the group may upgrade after the toggle.
-        group: () => instanceOf<ToggleGroupApi>(el.parentElement?.closest("ui-toggle-group"))?.api,
+        group: () =>
+          instanceOf<ToggleGroupApi>(
+            el.parentElement?.closest("ui-toggle-group")
+          )?.api,
         toolbar: toolbarOf(el),
       }),
       state: {
@@ -59,7 +71,8 @@ function defineToggleGroupElements() {
       state: {
         value: {
           get: (api: ToggleGroupApi) => api.getValue(),
-          set: (api: ToggleGroupApi, value: string[]) => api.setValue(value ?? []),
+          set: (api: ToggleGroupApi, value: string[]) =>
+            api.setValue(value ?? []),
         },
       },
       api: ["getValue", "setValue", "isPressed", "toggle", "focus"],

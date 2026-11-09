@@ -53,7 +53,10 @@ For your own confirmation UI, return a `Promise<boolean>` that resolves with the
 Some controls should always wait for the person, whatever your `allow` rules say. Add `data-agent-confirm` with a sentence that says what the control does:
 
 ```tsx
-<Button data-agent-confirm="Charges $20 to your card for 1,000 credits" onClick={buyCredits}>
+<Button
+  data-agent-confirm="Charges $20 to your card for 1,000 credits"
+  onClick={buyCredits}
+>
   Buy credits
 </Button>
 ```
@@ -68,7 +71,8 @@ With `allow`, the step waits for your callback, and `step.confirm` carries the s
 
 ```ts
 const agent = createAgent({
-  allow: (step, { signal }) => (step.confirm ? showConfirm(step.confirm, { signal }) : true),
+  allow: (step, { signal }) =>
+    step.confirm ? showConfirm(step.confirm, { signal }) : true,
 })
 ```
 

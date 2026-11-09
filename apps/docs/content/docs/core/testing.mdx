@@ -74,7 +74,11 @@ Always call `unmount` when you're done. It removes the markup, unbinds the parts
 Focus an input before calling `type`. Use `keys` for special keys and combinations, including `Tab`, `Shift+Tab`, and `Space`:
 
 ```ts
-const search = mount(searchField, {}, `<root><input aria-label="Search"></input></root>`)
+const search = mount(
+  searchField,
+  {},
+  `<root><input aria-label="Search"></input></root>`
+)
 try {
   search.part("input")!.focus()
   await search.type("pear")
@@ -111,7 +115,11 @@ expect(form.announced).toContain("Enter an email address")
 ```ts
 import { checkServer } from "@ui-sdk/core/testing"
 
-const html = checkServer(readMore, {}, `<root><trigger>Read more</trigger><panel>More</panel></root>`)
+const html = checkServer(
+  readMore,
+  {},
+  `<root><trigger>Read more</trigger><panel>More</panel></root>`
+)
 ```
 
 This uses the [read-more primitive](./kernel/define-a-primitive#parts-that-come-and-go). The check throws if it finds a dependency that could make a part render differently on the server and client:
@@ -196,7 +204,9 @@ HTMLElement.prototype.showPopover ??= function () {}
 HTMLElement.prototype.hidePopover ??= function () {}
 Element.prototype.getAnimations ??= () => []
 document.head.append(
-  Object.assign(document.createElement("style"), { textContent: "[popover] { display: block !important }" }),
+  Object.assign(document.createElement("style"), {
+    textContent: "[popover] { display: block !important }",
+  })
 )
 ```
 

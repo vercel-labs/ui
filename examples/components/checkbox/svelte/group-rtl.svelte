@@ -1,6 +1,10 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
-  import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
+  import {
+    Checkbox,
+    CheckboxGroup,
+    CheckboxIndicator,
+  } from "@ui-sdk/svelte/checkbox"
 
   const toppings = [
     { value: "cheese", label: "جبن" },

@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 import { For } from "solid-js"
 
 const updates = [
@@ -21,7 +25,9 @@ function Example() {
           <>
             <span data-slot="stack">
               <span>Track parcel</span>
-              <span data-slot="hint">{state.open ? "3 updates" : "Arrives Thursday"}</span>
+              <span data-slot="hint">
+                {state.open ? "3 updates" : "Arrives Thursday"}
+              </span>
             </span>
             <svg
               viewBox="0 0 24 24"

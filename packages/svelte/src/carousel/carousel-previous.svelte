@@ -19,9 +19,13 @@ Goes to the previous page. `aria-disabled` on the first page without `loop`, whe
   let {
     controller,
     ...rest
-  }: PartProps<"button", CarouselPreviousState> & CarouselControlProps = $props()
+  }: PartProps<"button", CarouselPreviousState> & CarouselControlProps =
+    $props()
 
-  const connected = useControllerTarget(() => controller, getContext<CarouselContext | undefined>(carouselPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<CarouselContext | undefined>(carouselPrimitive)
+  )
   const carousel = $derived(connected())
 </script>
 
@@ -32,5 +36,9 @@ Goes to the previous page. `aria-disabled` on the first page without `loop`, whe
   {/key}
 {:else}
   <!-- Until the carousel it names mounts, a control outside the carousel is a plain element. -->
-  <Part tag="button" part={plainPart({ disabled: true }, { type: "button" })} props={rest} />
+  <Part
+    tag="button"
+    part={plainPart({ disabled: true }, { type: "button" })}
+    props={rest}
+  />
 {/if}

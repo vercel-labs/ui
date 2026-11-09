@@ -15,7 +15,11 @@ and toggle groups inside join it. Render menu and select triggers through
   import { setContext } from "svelte"
   import Part from "../part.svelte"
   import { ToolbarKey } from "../toolbar-context"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     orientation,
@@ -38,7 +42,14 @@ and toggle groups inside join it. Render menu and select triggers through
   } = $props()
 
   const id = $props.id()
-  const toolbar = usePrimitive(toolbarPrimitive, () => ({ id, orientation, loop, disabled, controller, debug }))
+  const toolbar = usePrimitive(toolbarPrimitive, () => ({
+    id,
+    orientation,
+    loop,
+    disabled,
+    controller,
+    debug,
+  }))
   setContext(ToolbarKey, toolbar)
   const root = useHandlePart(toolbar, "root")
 </script>

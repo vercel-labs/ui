@@ -7,7 +7,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("a closed popover hydrates without mismatches", async ({ page, open }) => {
   await open("popover")
@@ -21,24 +24,38 @@ test("shortcut parts hydrate without mismatches, then show the keys for this pla
   open,
 }) => {
   await open("popover", { shortcut: "" })
-  const apple = await page.evaluate(() => /Mac|iPhone|iPad|iPod/.test(navigator.platform))
-  const hint = page.getByRole("button", { name: "Profile" }).locator("[data-slot=popover-shortcut]")
+  const apple = await page.evaluate(() =>
+    /Mac|iPhone|iPad|iPod/.test(navigator.platform)
+  )
+  const hint = page
+    .getByRole("button", { name: "Profile" })
+    .locator("[data-slot=popover-shortcut]")
   await expect(hint).toHaveText(apple ? "\u2066⌘I\u2069" : "\u2066Ctrl+I\u2069")
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("an open popover hydrates without mismatches and keeps focus where it was", async ({ page, open }) => {
+test("an open popover hydrates without mismatches and keeps focus where it was", async ({
+  page,
+  open,
+}) => {
   await open("popover", { open: "" })
   await expect(page.getByRole("dialog", { name: "Edit profile" })).toBeVisible()
   expect(await hydrationErrors(page)).toEqual([])
-  expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true)
+  expect(
+    await page.evaluate(() => document.activeElement === document.body)
+  ).toBe(true)
 })
 
-test("an open popover is visible before it hydrates", async ({ page, open }) => {
+test("an open popover is visible before it hydrates", async ({
+  page,
+  open,
+}) => {
   await open("popover", { open: "" })
   expect(
     await page.evaluate(
-      () => (window as unknown as { __visibleBeforeHydration: boolean }).__visibleBeforeHydration,
-    ),
+      () =>
+        (window as unknown as { __visibleBeforeHydration: boolean })
+          .__visibleBeforeHydration
+    )
   ).toBe(true)
 })

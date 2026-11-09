@@ -9,7 +9,11 @@ import {
 } from "@ui-sdk/solid/number-input"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
-import { numberInputFixture as f, numberInputOptions, serialize } from "tests/fixtures/number-input.ts"
+import {
+  numberInputFixture as f,
+  numberInputOptions,
+  serialize,
+} from "tests/fixtures/number-input.ts"
 
 function Fixture() {
   const options = numberInputOptions()
@@ -18,8 +22,14 @@ function Fixture() {
   const [submitted, setSubmitted] = createSignal("")
   const [quantity, setQuantity] = createSignal<number | null>(options.quantity)
   // Records a change, or cancels it when the URL asks.
-  const report = (name: string, value: number | null, details: { cancel: () => void }) => {
-    if (options.cancel === name) return details.cancel()
+  const report = (
+    name: string,
+    value: number | null,
+    details: { cancel: () => void }
+  ) => {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     setAction(`${name}:${String(value)}`)
   }
   const commit = (name: string) => (value: number | null) =>
@@ -54,14 +64,21 @@ function Fixture() {
             defaultValue={options.controlled ? undefined : options.quantity}
             onValueChange={(value, details) => {
               report(f.quantity.name, value, details)
-              if (!details.canceled) setQuantity(value)
+              if (!details.canceled) {
+                setQuantity(value)
+              }
             }}
             onValueCommit={commit(f.quantity.name)}
           >
             <NumberInputGroup class="number-input-group">
-              <NumberInputDecrement aria-label={f.quantity.decrement}>−</NumberInputDecrement>
+              <NumberInputDecrement aria-label={f.quantity.decrement}>
+                −
+              </NumberInputDecrement>
               <NumberInputControl class="number-input-control" />
-              <NumberInputIncrement aria-label={f.quantity.increment} disabled={options.disabledIncrement}>
+              <NumberInputIncrement
+                aria-label={f.quantity.increment}
+                disabled={options.disabledIncrement}
+              >
                 +
               </NumberInputIncrement>
             </NumberInputGroup>
@@ -78,14 +95,22 @@ function Fixture() {
             min={options.amountMin}
             step={f.amount.step}
             format={{ style: "currency", currency: f.amount.currency }}
-            onValueChange={(value, details) => report(f.amount.name, value, details)}
+            onValueChange={(value, details) =>
+              report(f.amount.name, value, details)
+            }
             onValueCommit={commit(f.amount.name)}
           >
-            <NumberInputScrubArea class="number-input-scrub">{f.amount.scrub}</NumberInputScrubArea>
+            <NumberInputScrubArea class="number-input-scrub">
+              {f.amount.scrub}
+            </NumberInputScrubArea>
             <NumberInputGroup class="number-input-group">
-              <NumberInputDecrement aria-label={f.amount.decrement}>−</NumberInputDecrement>
+              <NumberInputDecrement aria-label={f.amount.decrement}>
+                −
+              </NumberInputDecrement>
               <NumberInputControl class="number-input-control" />
-              <NumberInputIncrement aria-label={f.amount.increment}>+</NumberInputIncrement>
+              <NumberInputIncrement aria-label={f.amount.increment}>
+                +
+              </NumberInputIncrement>
             </NumberInputGroup>
           </NumberInput>
         </Field>

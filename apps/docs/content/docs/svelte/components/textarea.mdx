@@ -98,7 +98,12 @@ Set `submitShortcut` to submit the textarea's form from the keyboard. With `"mod
 </script>
 
 <form action="/messages" method="post">
-  <Textarea name="message" aria-label="Message" required submitShortcut="mod+enter" />
+  <Textarea
+    name="message"
+    aria-label="Message"
+    required
+    submitShortcut="mod+enter"
+  />
   <button type="submit">Send</button>
 </form>
 ```
@@ -123,23 +128,38 @@ Props and callbacks are the same as below, as Svelte props, plus every native te
 
 ### Textarea
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="TextareaOptions" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="TextareaOptions"
+/>
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="TextareaProps" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="TextareaProps"
+/>
 
 ### State
 
-<StateTable path="../../packages/core/src/components/input/input.ts" name="TextareaState" />
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="TextareaState"
+/>
 
 ### Reasons
 
-<ReasonTable path="../../packages/core/src/components/input/input.ts" name="InputValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputValueChangeReason"
+/>
 
 ### Controller
 
 Create one with `createInputController()` and pass it as `controller`.
 
-<ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
+<ControllerTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputController"
+/>
 
 ## Accessibility
 

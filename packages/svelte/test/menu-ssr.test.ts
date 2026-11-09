@@ -22,7 +22,10 @@ describe("menu server rendering", () => {
   })
 
   test("data menus render on the server", () => {
-    const body = html({ open: true, items: [{ value: "new", label: "New file" }, { type: "separator" }] })
+    const body = html({
+      open: true,
+      items: [{ value: "new", label: "New file" }, { type: "separator" }],
+    })
     expect(body).toContain('role="menuitem"')
     expect(body).toContain('role="separator"')
   })

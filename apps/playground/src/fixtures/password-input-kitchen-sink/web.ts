@@ -5,15 +5,19 @@ import { kitchenSink } from "./shell"
 
 const eye = `<svg aria-hidden="true" viewBox="0 0 24 24" class="size-4" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>`
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/field")
   await import("@ui-sdk/web/password-input")
   kitchenSink(root, "web", (slot, variant, env) => {
-    const { fieldDisabled, autoComplete, ...options } = (variant.options ?? {}) as Record<string, unknown>
+    const { fieldDisabled, autoComplete, ...options } = (variant.options ??
+      {}) as Record<string, unknown>
     const attributes = Object.entries(options)
-      .map(([key, value]) => (value === true ? kebab(key) : `${kebab(key)}="${value}"`))
+      .map(([key, value]) =>
+        value === true ? kebab(key) : `${kebab(key)}="${value}"`
+      )
       .join(" ")
     const toggleTag = variant.render === "span" ? "span" : "button"
     const input = `
@@ -31,21 +35,30 @@ async function mount(root: HTMLElement) {
         : variant.form
           ? `<form class="flex flex-col items-start gap-2">${input}<div class="flex gap-2"><button class="${classes.button}">Submit</button><button type="reset" class="${classes.control}">Reset</button></div></form>`
           : input
-    const element = slot.querySelector<UiPasswordInputElement>("ui-password-input")!
+    const element =
+      slot.querySelector<UiPasswordInputElement>("ui-password-input")!
     element.addEventListener("valuechange", (event) =>
-      env.log(`valueChange "${event.detail.value}" (${event.detail.reason})`),
+      env.log(`valueChange "${event.detail.value}" (${event.detail.reason})`)
     )
     element.addEventListener("visiblechange", (event) => {
-      if (variant.cancel) return event.preventDefault()
-      env.log(`visibleChange ${event.detail.value} (${event.detail.reason}, ${event.detail.source})`)
+      if (variant.cancel) {
+        return event.preventDefault()
+      }
+      env.log(
+        `visibleChange ${event.detail.value} (${event.detail.reason}, ${event.detail.source})`
+      )
     })
     const form = slot.querySelector("form")
     form?.addEventListener("submit", (event) => {
       event.preventDefault()
-      env.log(`submit password=${JSON.stringify(new FormData(form).get("password"))}`)
+      env.log(
+        `submit password=${JSON.stringify(new FormData(form).get("password"))}`
+      )
     })
     form?.addEventListener("reset", () => env.log("reset"))
-    if (!variant.controller) return
+    if (!variant.controller) {
+      return
+    }
     const controller = createPasswordInputController()
     element.controller = controller
     env.controls([

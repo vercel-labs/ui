@@ -35,18 +35,30 @@ const svelteFiles = [
 
 const config = [
   { ignores: ["**/dist/**", "**/node_modules/**", "**/.svelte-kit/**"] },
-  { files: [...react, ...solidFiles], languageOptions: { parser: tseslint.parser } },
+  {
+    files: [...react, ...solidFiles],
+    languageOptions: { parser: tseslint.parser },
+  },
   { ...reactHooks.configs.flat.recommended, files: react },
   { ...solid, files: solidFiles },
-  ...vue.configs["flat/recommended"].map((block) => ({ ...block, files: vueFiles })),
+  ...vue.configs["flat/recommended"].map((block) => ({
+    ...block,
+    files: vueFiles,
+  })),
   { ...vue.configs["no-layout-rules"], files: vueFiles },
   {
     files: vueFiles,
     languageOptions: { parserOptions: { parser: tseslint.parser } },
     rules: { "vue/multi-word-component-names": "off" },
   },
-  ...svelte.configs.recommended.map((block) => ({ ...block, files: svelteFiles })),
-  { files: svelteFiles, languageOptions: { parserOptions: { parser: tseslint.parser } } },
+  ...svelte.configs.recommended.map((block) => ({
+    ...block,
+    files: svelteFiles,
+  })),
+  {
+    files: svelteFiles,
+    languageOptions: { parserOptions: { parser: tseslint.parser } },
+  },
 ]
 
 export default config

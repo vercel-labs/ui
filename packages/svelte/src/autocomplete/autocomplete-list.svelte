@@ -13,7 +13,8 @@ The listbox. Without children, it renders the autocomplete's `items`, filtered.
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import AutocompleteItems from "./autocomplete-items.svelte"
 
-  let { children, ...rest }: PartProps<"div", AutocompleteContentState> = $props()
+  let { children, ...rest }: PartProps<"div", AutocompleteContentState> =
+    $props()
 
   const autocomplete = useHandle(autocompletePrimitive)
   const list = useHandlePart(autocomplete, "list")

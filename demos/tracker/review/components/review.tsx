@@ -1,6 +1,10 @@
 "use client"
 
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useMemo, useState } from "react"
 import { CodeView } from "@/components/code-view"
@@ -47,30 +51,40 @@ function Review({
   const url = useCallback((changes: Record<string, string | null>) => {
     const next = new URLSearchParams(window.location.search)
     for (const [key, value] of Object.entries(changes)) {
-      if (value === null) next.delete(key)
-      else next.set(key, value)
+      if (value === null) {
+        next.delete(key)
+      } else {
+        next.set(key, value)
+      }
     }
     return `?${next}`
   }, [])
 
   const open = useCallback(
-    (frame: Frame) => router.push(url({ file: frame.file, line: String(frame.line) }), { scroll: false }),
-    [router, url],
+    (frame: Frame) =>
+      router.push(url({ file: frame.file, line: String(frame.line) }), {
+        scroll: false,
+      }),
+    [router, url]
   )
 
   const onInspect = useCallback(
     (next: Inspection) => {
       setInspection(next)
       const first =
-        next.frames.find((frame) => frame.file.startsWith("app/")) ?? next.frames[0] ?? next.library[0]
-      if (first) open(first)
+        next.frames.find((frame) => frame.file.startsWith("app/")) ??
+        next.frames[0] ??
+        next.library[0]
+      if (first) {
+        open(first)
+      }
     },
-    [open],
+    [open]
   )
 
   const onNavigate = useCallback(
     (path: string) => window.history.replaceState(null, "", url({ path })),
-    [url],
+    [url]
   )
 
   return (
@@ -103,12 +117,18 @@ function Review({
         </div>
       </header>
       <Resizable id="review" className="flex min-h-0 flex-1">
-        <ResizablePanel defaultSize={18} minSize={10} className="min-w-0 overflow-auto">
+        <ResizablePanel
+          defaultSize={18}
+          minSize={10}
+          className="min-w-0 overflow-auto"
+        >
           <FileTree
             roots={roots}
             files={files}
             file={file}
-            onOpen={(next) => router.push(url({ file: next, line: null }), { scroll: false })}
+            onOpen={(next) =>
+              router.push(url({ file: next, line: null }), { scroll: false })
+            }
           />
         </ResizablePanel>
         <Handle />
@@ -121,7 +141,9 @@ function Review({
             line={line}
             inspection={inspection}
             onOpen={open}
-            onLine={(next) => window.history.replaceState(null, "", url({ line: String(next) }))}
+            onLine={(next) =>
+              window.history.replaceState(null, "", url({ line: String(next) }))
+            }
           />
         </ResizablePanel>
         <Handle />

@@ -1,6 +1,11 @@
 // One set of keyboard shortcuts with one key listener, scoped to the open layers.
 import { dev, warn } from "#dev"
-import { activeLayers, findLayer, inPersistentLayer, type Layer } from "../platform/layers"
+import {
+  activeLayers,
+  findLayer,
+  inPersistentLayer,
+  type Layer,
+} from "../platform/layers"
 import { isBrowser } from "../platform/env"
 import {
   ariaKeyshortcuts,
@@ -73,9 +78,15 @@ type ShortcutInfo = {
  */
 type ShortcutKeys = string | (() => string | null | undefined)
 
-type Entry = { keys: ShortcutKeys; handler: ShortcutHandler; options: ShortcutOptions; id: number }
+type Entry = {
+  keys: ShortcutKeys
+  handler: ShortcutHandler
+  options: ShortcutOptions
+  id: number
+}
 
-const keysOf = (entry: Entry) => (typeof entry.keys === "function" ? entry.keys() : entry.keys) || undefined
+const keysOf = (entry: Entry) =>
+  (typeof entry.keys === "function" ? entry.keys() : entry.keys) || undefined
 
 // The same keys on every platform, to tell conflicting registrations apart.
 function normalize(keys: string) {
@@ -101,36 +112,69 @@ function createShortcuts() {
   // A shortcut's place among the layers, if it may run at all right now.
   function runnable(entry: Entry, blocking: number | undefined) {
     const { scope, when, layer } = entry.options
-    if (scope !== undefined && !scopes.has(scope)) return null
-    if (when && !when()) return null
-    const order = shortcutOrder(layer, findLayer, inPersistentLayer, inPopupElement)
+    if (scope !== undefined && !scopes.has(scope)) {
+      return null
+    }
+    if (when && !when()) {
+      return null
+    }
+    const order = shortcutOrder(
+      layer,
+      findLayer,
+      inPersistentLayer,
+      inPopupElement
+    )
     return isShortcutAllowed(order, blocking) ? order : null
   }
 
   function onKeydown(event: KeyboardEvent) {
-    if (event.defaultPrevented || event.repeat || isComposing(event)) return
+    if (event.defaultPrevented || event.repeat || isComposing(event)) {
+      return
+    }
     // Read only once some keys match, so typing that matches nothing allocates nothing.
     let context: { typing: boolean; blocking: number | undefined } | undefined
     let best: { entry: Entry; order: number } | undefined
     const apple = isApple()
     for (const entry of entries) {
       const keys = keysOf(entry)
-      if (!keys || !matchesShortcut(event, keys, apple)) continue
-      context ??= { typing: isTypingIn(event.composedPath()[0]), blocking: topBlocking() }
-      if (context.typing && !entry.options.allowInInput && !hasCommandModifier(keys)) continue
+      if (!keys || !matchesShortcut(event, keys, apple)) {
+        continue
+      }
+      context ??= {
+        typing: isTypingIn(event.composedPath()[0]),
+        blocking: topBlocking(),
+      }
+      if (
+        context.typing &&
+        !entry.options.allowInInput &&
+        !hasCommandModifier(keys)
+      ) {
+        continue
+      }
       const order = runnable(entry, context.blocking)
-      if (order === null) continue
+      if (order === null) {
+        continue
+      }
       // The topmost layer's shortcut wins, then the newest registration.
-      if (!best || order > best.order || (order === best.order && entry.id > best.entry.id))
+      if (
+        !best ||
+        order > best.order ||
+        (order === best.order && entry.id > best.entry.id)
+      ) {
         best = { entry, order }
+      }
     }
-    if (!best) return
+    if (!best) {
+      return
+    }
     event.preventDefault()
     best.entry.handler(event)
   }
 
   function listen() {
-    if (off || !isBrowser) return
+    if (off || !isBrowser) {
+      return
+    }
     off = on(document, "keydown", onKeydown)
   }
 
@@ -140,7 +184,11 @@ function createShortcuts() {
      * `+`-separated: `mod` is Command on Apple platforms and Control elsewhere.
      * Returns a function that unregisters it.
      */
-    register(keys: ShortcutKeys, handler: ShortcutHandler, options: ShortcutOptions = {}) {
+    register(
+      keys: ShortcutKeys,
+      handler: ShortcutHandler,
+      options: ShortcutOptions = {}
+    ) {
       const key = typeof keys === "string" ? normalize(keys) : undefined
       // Development builds only, so production skips the scan.
       const clash =
@@ -153,15 +201,21 @@ function createShortcuts() {
             normalize(entry.keys) === key &&
             entry.options.scope === options.scope &&
             entry.options.layer === options.layer &&
-            !entry.options.when,
+            !entry.options.when
         )
-      if (clash) warn(`The shortcut "${keys}" is registered twice in the same scope. The newest one wins.`)
+      if (clash) {
+        warn(
+          `The shortcut "${keys}" is registered twice in the same scope. The newest one wins.`
+        )
+      }
       const entry = { keys, handler, options, id: next++ }
       entries.push(entry)
       listen()
       return () => {
         const index = entries.indexOf(entry)
-        if (index !== -1) entries.splice(index, 1)
+        if (index !== -1) {
+          entries.splice(index, 1)
+        }
         if (!entries.length) {
           off?.()
           off = undefined
@@ -173,7 +227,9 @@ function createShortcuts() {
       const blocking = isBrowser ? topBlocking() : undefined
       const apple = isApple()
       return entries
-        .filter((entry) => !!keysOf(entry) && runnable(entry, blocking) !== null)
+        .filter(
+          (entry) => !!keysOf(entry) && runnable(entry, blocking) !== null
+        )
         .map((entry) => ({
           keys: keysOf(entry)!,
           hint: formatShortcut(keysOf(entry)!, apple),
@@ -184,8 +240,11 @@ function createShortcuts() {
     },
     /** Turns a named scope on or off. Shortcuts registered with that `scope` run only while it's on. */
     setScope(name: string, active: boolean) {
-      if (active) scopes.add(name)
-      else scopes.delete(name)
+      if (active) {
+        scopes.add(name)
+      } else {
+        scopes.delete(name)
+      }
     },
     /** Whether a named scope is on. */
     isScopeActive: (name: string) => scopes.has(name),
@@ -199,4 +258,10 @@ function createShortcuts() {
   }
 }
 
-export { createShortcuts, type ShortcutHandler, type ShortcutInfo, type ShortcutKeys, type ShortcutOptions }
+export {
+  createShortcuts,
+  type ShortcutHandler,
+  type ShortcutInfo,
+  type ShortcutKeys,
+  type ShortcutOptions,
+}

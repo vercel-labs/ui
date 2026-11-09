@@ -28,7 +28,9 @@ async function mention() {
 }
 
 function insertDate() {
-  menu.insert(new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" }))
+  menu.insert(
+    new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" })
+  )
 }
 </script>
 
@@ -36,7 +38,9 @@ function insertDate() {
   <div data-slot="stack">
     <div data-slot="controls">
       <button type="button" @mousedown.prevent @click="mention">Mention</button>
-      <button type="button" @mousedown.prevent @click="insertDate">Insert Date</button>
+      <button type="button" @mousedown.prevent @click="insertDate">
+        Insert Date
+      </button>
     </div>
     <TriggerMenu :controller="menu" :triggers="[{ char: '@', items: people }]">
       <Field>

@@ -1,6 +1,10 @@
 <script lang="ts">
   import { CheckIcon, CopyIcon } from "@lucide/svelte"
-  import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
 
   const command = "npm install @ui-sdk/svelte"
   let copied = $state(false)
@@ -11,7 +15,9 @@
   <Tooltip
     closeOnPress={false}
     onOpenChangeComplete={(open) => {
-      if (!open) copied = false
+      if (!open) {
+        copied = false
+      }
     }}
   >
     <TooltipTrigger

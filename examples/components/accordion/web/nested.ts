@@ -16,8 +16,16 @@ const sections: {
     value: "notifications",
     label: "Notifications",
     topics: [
-      { value: "email", label: "Email", content: "A weekly digest, and mentions as they happen." },
-      { value: "push", label: "Push", content: "Direct messages and replies to your comments." },
+      {
+        value: "email",
+        label: "Email",
+        content: "A weekly digest, and mentions as they happen.",
+      },
+      {
+        value: "push",
+        label: "Push",
+        content: "Direct messages and replies to your comments.",
+      },
     ],
   },
   {
@@ -57,7 +65,7 @@ const topics = (list: { value: string; label: string; content: string }[]) => `
             <ui-accordion-panel hidden>
               ${topic.content}
             </ui-accordion-panel>
-          </ui-accordion-item>`,
+          </ui-accordion-item>`
       )
       .join("")}
   </ui-accordion>`
@@ -82,7 +90,7 @@ function mount(root: HTMLElement) {
               <ui-accordion-panel${section.value === "notifications" ? "" : " hidden"}>
                 ${section.topics ? topics(section.topics) : `<div>${section.content}</div>`}
               </ui-accordion-panel>
-            </ui-accordion-item>`,
+            </ui-accordion-item>`
         )
         .join("")}
     </ui-accordion>

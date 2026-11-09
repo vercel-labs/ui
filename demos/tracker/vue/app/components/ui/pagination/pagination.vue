@@ -11,7 +11,11 @@ import {
 } from "@ui-sdk/vue/pagination"
 import { NuxtLink } from "#components"
 
-const props = defineProps<{ page: number; pageCount: number; getHref: (page: number) => string }>()
+const props = defineProps<{
+  page: number
+  pageCount: number
+  getHref: (page: number) => string
+}>()
 
 function routed({ href, ...props }: Record<string, unknown>) {
   return href ? { ...props, to: href } : props
@@ -40,12 +44,21 @@ const step =
         </PaginationPrevious>
       </PaginationItem>
       <PaginationItem v-for="item in state.items" :key="item">
-        <PaginationLink v-if="typeof item === 'number'" :page="item" :class="step">
+        <PaginationLink
+          v-if="typeof item === 'number'"
+          :page="item"
+          :class="step"
+        >
           <template #render="{ props: link }">
-            <component :is="link.href ? NuxtLink : 'a'" v-bind="routed(link)">{{ item }}</component>
+            <component :is="link.href ? NuxtLink : 'a'" v-bind="routed(link)">{{
+              item
+            }}</component>
           </template>
         </PaginationLink>
-        <PaginationEllipsis v-else class="flex size-8 items-center justify-center text-muted-foreground">
+        <PaginationEllipsis
+          v-else
+          class="flex size-8 items-center justify-center text-muted-foreground"
+        >
           <Ellipsis aria-hidden="true" class="size-4" />
         </PaginationEllipsis>
       </PaginationItem>

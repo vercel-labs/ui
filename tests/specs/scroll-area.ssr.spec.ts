@@ -10,7 +10,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("scroll areas hydrate without mismatches, then measure and show their scrollbars", async ({
   page,
@@ -35,5 +38,5 @@ test(
       })
       .toBeLessThan(1)
     expect(await hydrationErrors(page)).toEqual([])
-  },
+  }
 )

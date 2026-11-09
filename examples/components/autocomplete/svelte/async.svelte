@@ -77,7 +77,7 @@
     </AutocompleteEmpty>
     <AutocompleteList>
       {#snippet children(state)}
-        {#each (state.items as string[]) as city (city)}
+        {#each state.items as string[] as city (city)}
           <AutocompleteItem value={city}>
             {city}
           </AutocompleteItem>

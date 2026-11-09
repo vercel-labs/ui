@@ -14,7 +14,9 @@ import { isRelative, withJsExtension } from "./specifiers.mjs"
  * stays external.
  */
 async function transpileSolid({ packageDir, sourceDir, outDir }) {
-  const { transform } = createRequire(path.join(packageDir, "package.json"))("@solidjs/compiler")
+  const { transform } = createRequire(path.join(packageDir, "package.json"))(
+    "@solidjs/compiler"
+  )
   const files = listSourceFiles(sourceDir)
   await build({
     entryPoints: files,
@@ -85,13 +87,26 @@ function externalImports(jsxExtension) {
   return {
     name: "external-imports",
     setup(build) {
-      build.onResolve({ filter: /.*/ }, ({ kind, path: specifier, resolveDir }) => {
-        if (kind === "entry-point") return undefined
-        if (!isRelative(specifier)) return { path: specifier, external: true }
-        const resolved = withJsExtension(specifier, resolveDir, [".ts", ".tsx"])
-        const isJsx = /\.tsx$/.test(sourceOf(resolved, resolveDir))
-        return { path: isJsx ? resolved.replace(/\.js$/, jsxExtension) : resolved, external: true }
-      })
+      build.onResolve(
+        { filter: /.*/ },
+        ({ kind, path: specifier, resolveDir }) => {
+          if (kind === "entry-point") {
+            return undefined
+          }
+          if (!isRelative(specifier)) {
+            return { path: specifier, external: true }
+          }
+          const resolved = withJsExtension(specifier, resolveDir, [
+            ".ts",
+            ".tsx",
+          ])
+          const isJsx = /\.tsx$/.test(sourceOf(resolved, resolveDir))
+          return {
+            path: isJsx ? resolved.replace(/\.js$/, jsxExtension) : resolved,
+            external: true,
+          }
+        }
+      )
     },
   }
 }
@@ -99,7 +114,9 @@ function externalImports(jsxExtension) {
 // The source file behind a resolved `./name.js` specifier.
 function sourceOf(resolved, resolveDir) {
   const base = path.resolve(resolveDir, resolved.replace(/\.js$/, ""))
-  return readdirSync(path.dirname(base)).find((file) => file === `${path.basename(base)}.tsx`)
+  return readdirSync(path.dirname(base)).find(
+    (file) => file === `${path.basename(base)}.tsx`
+  )
     ? `${base}.tsx`
     : `${base}.ts`
 }

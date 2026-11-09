@@ -53,14 +53,26 @@ const issues: Issue[] = [
     due: "2026-11-06",
     createdAt: "2026-10-02T09:12:00Z",
     subtasks: [
-      { id: "TRK-1-1", title: "Reproduce on a throttled connection", done: true },
+      {
+        id: "TRK-1-1",
+        title: "Reproduce on a throttled connection",
+        done: true,
+      },
       {
         id: "TRK-1-2",
         title: "Inline the critical styles",
         done: false,
         subtasks: [
-          { id: "TRK-1-2-1", title: "Measure the critical stylesheet", done: true },
-          { id: "TRK-1-2-2", title: "Move it into the document head", done: false },
+          {
+            id: "TRK-1-2-1",
+            title: "Measure the critical stylesheet",
+            done: true,
+          },
+          {
+            id: "TRK-1-2-2",
+            title: "Move it into the document head",
+            done: false,
+          },
         ],
       },
       { id: "TRK-1-3", title: "Check it again on mobile", done: false },
@@ -99,7 +111,8 @@ const issues: Issue[] = [
   {
     id: "TRK-3",
     title: "Export issues as CSV",
-    description: "Teams want to pull their issues into a spreadsheet for planning.",
+    description:
+      "Teams want to pull their issues into a spreadsheet for planning.",
     status: "backlog",
     priority: "low",
     assignee: null,
@@ -126,13 +139,16 @@ const issues: Issue[] = [
     labels: ["bug"],
     due: "2026-11-04",
     createdAt: "2026-10-05T13:10:00Z",
-    subtasks: [{ id: "TRK-4-1", title: "Normalize text before indexing", done: false }],
+    subtasks: [
+      { id: "TRK-4-1", title: "Normalize text before indexing", done: false },
+    ],
     comments: [],
   },
   {
     id: "TRK-5",
     title: "Write the getting started guide",
-    description: "A short guide that takes a new team from sign-up to their first project.",
+    description:
+      "A short guide that takes a new team from sign-up to their first project.",
     status: "in-progress",
     priority: "medium",
     assignee: "elena",
@@ -169,7 +185,8 @@ const issues: Issue[] = [
   {
     id: "TRK-7",
     title: "Slow load on projects with many issues",
-    description: "Projects with more than 5,000 issues take several seconds to open.",
+    description:
+      "Projects with more than 5,000 issues take several seconds to open.",
     status: "backlog",
     priority: "high",
     assignee: "dev",
@@ -195,7 +212,8 @@ const issues: Issue[] = [
   {
     id: "TRK-9",
     title: "Webhook retries send duplicate events",
-    description: "When the first delivery times out, the retry and the late original both arrive.",
+    description:
+      "When the first delivery times out, the retry and the late original both arrive.",
     status: "in-progress",
     priority: "urgent",
     assignee: "dev",
@@ -211,7 +229,8 @@ const issues: Issue[] = [
   {
     id: "TRK-10",
     title: "Redesign the empty state for new projects",
-    description: "New projects open on a blank list with no hint of what to do next.",
+    description:
+      "New projects open on a blank list with no hint of what to do next.",
     status: "todo",
     priority: "medium",
     assignee: "chloe",
@@ -250,7 +269,8 @@ const issues: Issue[] = [
   {
     id: "TRK-13",
     title: "Attachments over 10 MB fail silently",
-    description: "Uploading a large file shows a spinner forever with no error.",
+    description:
+      "Uploading a large file shows a spinner forever with no error.",
     status: "todo",
     priority: "high",
     assignee: "felix",
@@ -263,7 +283,8 @@ const issues: Issue[] = [
   {
     id: "TRK-14",
     title: "Bulk edit labels",
-    description: "Select several issues and add or remove a label from all of them.",
+    description:
+      "Select several issues and add or remove a label from all of them.",
     status: "backlog",
     priority: "medium",
     assignee: null,
@@ -289,7 +310,8 @@ const issues: Issue[] = [
   {
     id: "TRK-16",
     title: "Weekly summary email",
-    description: "A Monday email with what closed last week and what's due this week.",
+    description:
+      "A Monday email with what closed last week and what's due this week.",
     status: "backlog",
     priority: "low",
     assignee: "elena",
@@ -357,7 +379,8 @@ const issues: Issue[] = [
   {
     id: "TRK-21",
     title: "Right-to-left layout for the issue page",
-    description: "Arabic and Hebrew workspaces see the sidebar on the wrong side.",
+    description:
+      "Arabic and Hebrew workspaces see the sidebar on the wrong side.",
     status: "todo",
     priority: "medium",
     assignee: "chloe",
@@ -370,7 +393,8 @@ const issues: Issue[] = [
   {
     id: "TRK-22",
     title: "Rate limit the public API",
-    description: "A single integration sent 40,000 requests in a minute last week.",
+    description:
+      "A single integration sent 40,000 requests in a minute last week.",
     status: "done",
     priority: "urgent",
     assignee: "dev",
@@ -383,7 +407,8 @@ const issues: Issue[] = [
   {
     id: "TRK-23",
     title: "Support replies land in spam",
-    description: "Replies from the help desk are flagged by some mail providers.",
+    description:
+      "Replies from the help desk are flagged by some mail providers.",
     status: "in-progress",
     priority: "high",
     assignee: "felix",

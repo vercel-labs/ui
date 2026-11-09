@@ -1,7 +1,11 @@
 "use client"
 
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 import { CheckIcon } from "lucide-react"
 import * as React from "react"
 
@@ -11,7 +15,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <Checkbox checked={locked} onCheckedChange={(next) => setLocked(next === true)}>
+          <Checkbox
+            checked={locked}
+            onCheckedChange={(next) => setLocked(next === true)}
+          >
             <CheckboxIndicator>
               <CheckIcon aria-hidden="true" />
             </CheckboxIndicator>

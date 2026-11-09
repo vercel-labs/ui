@@ -39,21 +39,67 @@ type Variant = {
 }
 
 const items = [
-  { value: "a", label: "Is it accessible?", content: "Yes. It follows the WAI-ARIA accordion pattern." },
-  { value: "b", label: "Is it unstyled?", content: "Yes. Every part takes your classes." },
-  { value: "c", label: "Can it animate?", content: "Yes. Search the page for needle to open this one." },
-  { value: "d", label: "Does it work everywhere?", content: "Yes. Every framework has the same parts." },
-  { value: "e", label: "Does it render on the server?", content: "Yes. Open panels show before hydration." },
-  { value: "f", label: "Can I control it?", content: "Yes. Pass a value, or use a controller." },
-  { value: "g", label: "Can items be disabled?", content: "Yes. Disabled triggers stay focusable." },
-  { value: "h", label: "Can several open at once?", content: "Yes, with multiple." },
-  { value: "i", label: "Does find in page work?", content: "Yes, with hiddenUntilFound." },
+  {
+    value: "a",
+    label: "Is it accessible?",
+    content: "Yes. It follows the WAI-ARIA accordion pattern.",
+  },
+  {
+    value: "b",
+    label: "Is it unstyled?",
+    content: "Yes. Every part takes your classes.",
+  },
+  {
+    value: "c",
+    label: "Can it animate?",
+    content: "Yes. Search the page for needle to open this one.",
+  },
+  {
+    value: "d",
+    label: "Does it work everywhere?",
+    content: "Yes. Every framework has the same parts.",
+  },
+  {
+    value: "e",
+    label: "Does it render on the server?",
+    content: "Yes. Open panels show before hydration.",
+  },
+  {
+    value: "f",
+    label: "Can I control it?",
+    content: "Yes. Pass a value, or use a controller.",
+  },
+  {
+    value: "g",
+    label: "Can items be disabled?",
+    content: "Yes. Disabled triggers stay focusable.",
+  },
+  {
+    value: "h",
+    label: "Can several open at once?",
+    content: "Yes, with multiple.",
+  },
+  {
+    value: "i",
+    label: "Does find in page work?",
+    content: "Yes, with hiddenUntilFound.",
+  },
   { value: "j", label: "Is there a tenth question?", content: "There is now." },
 ]
 
 const variants: Variant[] = [
-  { id: "single", section: "Modes", title: "Single", note: "Opening one item closes the other." },
-  { id: "default-open", section: "Modes", title: "Default value", options: { defaultValue: ["a"] } },
+  {
+    id: "single",
+    section: "Modes",
+    title: "Single",
+    note: "Opening one item closes the other.",
+  },
+  {
+    id: "default-open",
+    section: "Modes",
+    title: "Default value",
+    options: { defaultValue: ["a"] },
+  },
   {
     id: "not-collapsible",
     section: "Modes",
@@ -61,17 +107,38 @@ const variants: Variant[] = [
     note: "One item always stays open. Its trigger is aria-disabled.",
     options: { collapsible: false, defaultValue: ["a"] },
   },
-  { id: "multiple", section: "Modes", title: "Multiple", options: { multiple: true } },
+  {
+    id: "multiple",
+    section: "Modes",
+    title: "Multiple",
+    options: { multiple: true },
+  },
   {
     id: "multiple-open",
     section: "Modes",
     title: "Multiple, several open",
     options: { multiple: true, defaultValue: ["a", "c"] },
   },
-  { id: "many", section: "Modes", title: "Ten items", count: 10, options: { multiple: true } },
+  {
+    id: "many",
+    section: "Modes",
+    title: "Ten items",
+    count: 10,
+    options: { multiple: true },
+  },
 
-  { id: "item-disabled", section: "Disabled", title: "Disabled item", disabledItems: ["b"] },
-  { id: "trigger-disabled", section: "Disabled", title: "Disabled trigger", disabledTriggers: ["b"] },
+  {
+    id: "item-disabled",
+    section: "Disabled",
+    title: "Disabled item",
+    disabledItems: ["b"],
+  },
+  {
+    id: "trigger-disabled",
+    section: "Disabled",
+    title: "Disabled trigger",
+    disabledTriggers: ["b"],
+  },
   {
     id: "root-disabled",
     section: "Disabled",
@@ -79,8 +146,18 @@ const variants: Variant[] = [
     options: { disabled: true, defaultValue: ["a"] },
   },
 
-  { id: "unmount", section: "Mounting", title: "Unmounted when closed", note: "The default." },
-  { id: "keep-mounted", section: "Mounting", title: "keepMounted", options: { keepMounted: true } },
+  {
+    id: "unmount",
+    section: "Mounting",
+    title: "Unmounted when closed",
+    note: "The default.",
+  },
+  {
+    id: "keep-mounted",
+    section: "Mounting",
+    title: "keepMounted",
+    options: { keepMounted: true },
+  },
   {
     id: "panel-keep-mounted",
     section: "Mounting",
@@ -101,10 +178,30 @@ const variants: Variant[] = [
     panel: { hiddenUntilFound: true },
   },
 
-  { id: "animation-none", section: "Animation", title: "No animation", animation: "none" },
-  { id: "animation-height", section: "Animation", title: "Height transition", animation: "height" },
-  { id: "animation-slow", section: "Animation", title: "Slow, interrupt it", animation: "slow" },
-  { id: "animation-keyframes", section: "Animation", title: "Keyframes", animation: "keyframes" },
+  {
+    id: "animation-none",
+    section: "Animation",
+    title: "No animation",
+    animation: "none",
+  },
+  {
+    id: "animation-height",
+    section: "Animation",
+    title: "Height transition",
+    animation: "height",
+  },
+  {
+    id: "animation-slow",
+    section: "Animation",
+    title: "Slow, interrupt it",
+    animation: "slow",
+  },
+  {
+    id: "animation-keyframes",
+    section: "Animation",
+    title: "Keyframes",
+    animation: "keyframes",
+  },
   {
     id: "animation-keyframes-open",
     section: "Animation",
@@ -113,11 +210,21 @@ const variants: Variant[] = [
     animation: "keyframes",
     options: { defaultValue: ["a"] },
   },
-  { id: "animation-fade", section: "Animation", title: "Fade only", animation: "fade" },
+  {
+    id: "animation-fade",
+    section: "Animation",
+    title: "Fade only",
+    animation: "fade",
+  },
 
   { id: "long", section: "Content", title: "Long panel", body: "long" },
   { id: "form", section: "Content", title: "Panel with a field", body: "form" },
-  { id: "nested", section: "Content", title: "Nested accordion", body: "nested" },
+  {
+    id: "nested",
+    section: "Content",
+    title: "Nested accordion",
+    body: "nested",
+  },
   {
     id: "nested-deep",
     section: "Content",
@@ -134,8 +241,18 @@ const variants: Variant[] = [
   },
 
   { id: "rtl", section: "Containers", title: "Right to left", place: "rtl" },
-  { id: "scroll", section: "Containers", title: "Scroll container", place: "scroll" },
-  { id: "transform", section: "Containers", title: "Scaled container", place: "transform" },
+  {
+    id: "scroll",
+    section: "Containers",
+    title: "Scroll container",
+    place: "scroll",
+  },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Scaled container",
+    place: "transform",
+  },
   { id: "row", section: "Containers", title: "In a flex row", place: "row" },
 
   {

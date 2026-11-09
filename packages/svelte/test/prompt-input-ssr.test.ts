@@ -12,12 +12,16 @@ describe("server rendering a prompt input", () => {
     expect(body).toContain('role="textbox"')
     expect(body).toContain('contenteditable="true"')
     expect(body).toMatch(/Explain ​<span[^>]*data-token-type="file"/)
-    expect(body).toMatch(/<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/)
+    expect(body).toMatch(
+      /<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/
+    )
   })
 
   test("a trigger menu's textarea says it autocompletes from a list, and stays a textbox", () => {
     const body = html({})
-    expect(body).toMatch(/<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/)
+    expect(body).toMatch(
+      /<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/
+    )
     expect(body).not.toContain("aria-expanded")
   })
 })

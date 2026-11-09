@@ -37,11 +37,16 @@
   useShortcut(f.pageShortcut, () => (action = "page shortcut"))
   useShortcut(f.slashShortcut, () => (action = "slash"))
   // Belongs to the dialog, so it runs while the dialog is open and modal.
-  useShortcut(f.rename.save, () => (action = "saved"), { layer: () => field, allowInInput: true })
+  useShortcut(f.rename.save, () => (action = "saved"), {
+    layer: () => field,
+    allowInInput: true,
+  })
 
   function onRenameChange(open: boolean, details: { reason: string }) {
     recordOpenChange("rename", open, details)
-    if (!open) dirty = false
+    if (!open) {
+      dirty = false
+    }
   }
 </script>
 
@@ -50,7 +55,9 @@
   <Menu>
     <MenuTrigger shortcut={f.menu.shortcut}>{f.menu.trigger}</MenuTrigger>
     <MenuContent>
-      <MenuItem value="rename" onSelect={() => rename.open()}>{f.menu.rename}</MenuItem>
+      <MenuItem value="rename" onSelect={() => rename.open()}
+        >{f.menu.rename}</MenuItem
+      >
       <MenuItem value="close">{f.menu.close}</MenuItem>
     </MenuContent>
   </Menu>
@@ -62,26 +69,37 @@
     onOpenChange={onRenameChange}
   >
     <DialogTrigger shortcut={f.rename.shortcut}>
-      {f.rename.trigger} <DialogShortcut class="shortcut" />
+      {f.rename.trigger}
+      <DialogShortcut class="shortcut" />
     </DialogTrigger>
     <DialogBackdrop class="dialog-backdrop" />
     <DialogContent class="dialog">
       <DialogTitle class="title">{f.rename.title}</DialogTitle>
       <label class="field">
         {f.rename.field}
-        <input bind:this={field} value={f.rename.defaultValue} oninput={() => (dirty = true)} />
+        <input
+          bind:this={field}
+          value={f.rename.defaultValue}
+          oninput={() => (dirty = true)}
+        />
       </label>
       <DialogClose>{f.rename.cancel}</DialogClose>
     </DialogContent>
   </Dialog>
-  <AlertDialog onOpenChange={(open, details) => recordOpenChange("delete", open, details)}>
+  <AlertDialog
+    onOpenChange={(open, details) => recordOpenChange("delete", open, details)}
+  >
     <AlertDialogTrigger>{f.remove.trigger}</AlertDialogTrigger>
     <AlertDialogBackdrop class="dialog-backdrop" />
     <AlertDialogContent class="dialog">
       <AlertDialogTitle class="title">{f.remove.title}</AlertDialogTitle>
-      <AlertDialogDescription class="description">{f.remove.description}</AlertDialogDescription>
+      <AlertDialogDescription class="description"
+        >{f.remove.description}</AlertDialogDescription
+      >
       <AlertDialogClose>{f.remove.cancel}</AlertDialogClose>
-      <AlertDialogClose value="confirm" action={pendingAction}>{f.remove.action}</AlertDialogClose>
+      <AlertDialogClose value="confirm" action={pendingAction}
+        >{f.remove.action}</AlertDialogClose
+      >
     </AlertDialogContent>
   </AlertDialog>
   <label>
@@ -90,7 +108,9 @@
   </label>
   <button id="chat" onclick={() => (action = "chat")}>{f.chat}</button>
   <Popover container={popoverRoot}>
-    <PopoverTrigger shortcut={f.share.shortcut}>{f.share.trigger}</PopoverTrigger>
+    <PopoverTrigger shortcut={f.share.shortcut}
+      >{f.share.trigger}</PopoverTrigger
+    >
     <PopoverContent>
       <PopoverTitle>{f.share.title}</PopoverTitle>
       <Menu>

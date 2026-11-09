@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { Calendar, CalendarDay, CalendarGrid, CalendarWeekday, CalendarWeekdays, CalendarWeeks } from "../../src/calendar"
+  import {
+    Calendar,
+    CalendarDay,
+    CalendarGrid,
+    CalendarWeekday,
+    CalendarWeekdays,
+    CalendarWeeks,
+  } from "../../src/calendar"
 </script>
 
 <Calendar defaultMonth="2026-10" showOutsideDays={false}>

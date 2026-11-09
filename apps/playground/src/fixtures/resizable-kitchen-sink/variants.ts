@@ -67,7 +67,11 @@ const variants: Variant[] = [
     section: "Layout",
     title: "Three panels",
     group: {
-      panels: [{ label: "One", defaultSize: 20 }, { label: "Two" }, { label: "Three", defaultSize: 20 }],
+      panels: [
+        { label: "One", defaultSize: 20 },
+        { label: "Two" },
+        { label: "Three", defaultSize: 20 },
+      ],
     },
   },
   {
@@ -85,7 +89,10 @@ const variants: Variant[] = [
         { label: "Left", defaultSize: 40 },
         {
           label: "Right",
-          nested: { options: { orientation: "vertical" }, panels: [{ label: "Top" }, { label: "Bottom" }] },
+          nested: {
+            options: { orientation: "vertical" },
+            panels: [{ label: "Top" }, { label: "Bottom" }],
+          },
         },
       ],
     },
@@ -94,7 +101,12 @@ const variants: Variant[] = [
     id: "many",
     section: "Layout",
     title: "Five panels, cascading",
-    group: { panels: ["A", "B", "C", "D", "E"].map((label) => ({ label, minSize: 10 })) },
+    group: {
+      panels: ["A", "B", "C", "D", "E"].map((label) => ({
+        label,
+        minSize: 10,
+      })),
+    },
   },
 
   {
@@ -108,14 +120,27 @@ const variants: Variant[] = [
     section: "Sizes",
     title: "Min and max in pixels",
     group: {
-      panels: [{ label: "Rail", defaultSize: "120px", minSize: "80px", maxSize: "200px" }, { label: "Main" }],
+      panels: [
+        {
+          label: "Rail",
+          defaultSize: "120px",
+          minSize: "80px",
+          maxSize: "200px",
+        },
+        { label: "Main" },
+      ],
     },
   },
   {
     id: "rem",
     section: "Sizes",
     title: "Sizes in rem",
-    group: { panels: [{ label: "Rail", defaultSize: "8rem", minSize: "5rem" }, { label: "Main" }] },
+    group: {
+      panels: [
+        { label: "Rail", defaultSize: "8rem", minSize: "5rem" },
+        { label: "Main" },
+      ],
+    },
   },
   {
     id: "collapsed-size",
@@ -123,7 +148,13 @@ const variants: Variant[] = [
     title: "Collapses to an icon rail",
     group: {
       panels: [
-        { label: "Rail", defaultSize: 30, minSize: 20, collapsible: true, collapsedSize: "40px" },
+        {
+          label: "Rail",
+          defaultSize: 30,
+          minSize: 20,
+          collapsible: true,
+          collapsedSize: "40px",
+        },
         { label: "Main" },
       ],
     },
@@ -133,7 +164,10 @@ const variants: Variant[] = [
     section: "Sizes",
     title: "Collapsible last panel",
     group: {
-      panels: [{ label: "Main" }, { label: "Panel", defaultSize: 30, minSize: 20, collapsible: true }],
+      panels: [
+        { label: "Main" },
+        { label: "Panel", defaultSize: 30, minSize: 20, collapsible: true },
+      ],
     },
   },
   {
@@ -153,7 +187,10 @@ const variants: Variant[] = [
     id: "disabled-handle",
     section: "Behavior",
     title: "One disabled handle",
-    group: { panels: [{ label: "One" }, { label: "Two" }, { label: "Three" }], disabledHandles: [0] },
+    group: {
+      panels: [{ label: "One" }, { label: "Two" }, { label: "Three" }],
+      disabledHandles: [0],
+    },
   },
   {
     id: "steps",
@@ -161,7 +198,13 @@ const variants: Variant[] = [
     title: "Step 5, large step 25",
     group: { options: { step: 5, largeStep: 25 }, panels: two },
   },
-  { id: "controlled", section: "Behavior", title: "Controlled", group: { panels: two }, controlled: true },
+  {
+    id: "controlled",
+    section: "Behavior",
+    title: "Controlled",
+    group: { panels: two },
+    controlled: true,
+  },
   {
     id: "controller",
     section: "Behavior",

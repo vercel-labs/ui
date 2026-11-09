@@ -21,7 +21,8 @@ function Fixture() {
   const [align, setAlign] = React.useState("left")
   const [open, setOpen] = React.useState(false)
   // Specs close the controlled menu from outside it.
-  ;(window as unknown as { __closeControlled: () => void }).__closeControlled = () => setOpen(false)
+  ;(window as unknown as { __closeControlled: () => void }).__closeControlled =
+    () => setOpen(false)
   return (
     <div className="fixture">
       <button>Before</button>
@@ -88,7 +89,12 @@ function Fixture() {
       </Menu>
       <Menu>
         <MenuTrigger>Offsets</MenuTrigger>
-        <MenuContent className="popup" sideOffset={8} alignOffset={-4} collisionPadding={24}>
+        <MenuContent
+          className="popup"
+          sideOffset={8}
+          alignOffset={-4}
+          collisionPadding={24}
+        >
           <MenuItem className="item" value="one">
             One
           </MenuItem>

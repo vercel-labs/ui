@@ -26,16 +26,22 @@ function Example() {
         {(state) => (
           <>
             <div data-slot="stack">
-              <DialogTitle render={(props) => <h3 {...props} />}>Details</DialogTitle>
+              <DialogTitle render={(props) => <h3 {...props} />}>
+                Details
+              </DialogTitle>
               <DialogDescription>
-                {state.nested ? "Opened from another dialog." : "Quarterly report, updated today."}
+                {state.nested
+                  ? "Opened from another dialog."
+                  : "Quarterly report, updated today."}
               </DialogDescription>
             </div>
             <div data-slot="row">
               <DialogClose>Close</DialogClose>
               <DialogClose
                 data-variant="solid"
-                render={(props) => <a {...props} href="https://example.com/details" />}
+                render={(props) => (
+                  <a {...props} href="https://example.com/details" />
+                )}
               >
                 Open the Full Page
               </DialogClose>

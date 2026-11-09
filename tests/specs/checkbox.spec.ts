@@ -84,7 +84,10 @@ test.describe("checkbox", () => {
     await expect(terms).not.toBeChecked()
   })
 
-  test("a read-only checkbox can be focused but not changed", async ({ page, open }) => {
+  test("a read-only checkbox can be focused but not changed", async ({
+    page,
+    open,
+  }) => {
     await open("forms", { readonly: "" })
     const terms = checkbox(page, "Accept the terms")
     await expect(terms).toHaveAttribute("aria-readonly", "true")
@@ -109,16 +112,25 @@ test.describe("checkbox", () => {
     await terms.click()
     await expect(terms.locator(".checkbox-indicator")).toBeVisible()
     await terms.click()
-    const exiting = terms.locator(".checkbox-indicator[data-unchecked][data-ending-style]")
+    const exiting = terms.locator(
+      ".checkbox-indicator[data-unchecked][data-ending-style]"
+    )
     await expect(exiting).toHaveCount(1)
     expect(
       await exiting.evaluate((el) =>
-        el.getAnimations().some((animation) => (animation as CSSAnimation).animationName === "exit"),
-      ),
+        el
+          .getAnimations()
+          .some(
+            (animation) => (animation as CSSAnimation).animationName === "exit"
+          )
+      )
     ).toBe(true)
   })
 
-  test("an infinite exit animation still unmounts the indicator", async ({ page, open }) => {
+  test("an infinite exit animation still unmounts the indicator", async ({
+    page,
+    open,
+  }) => {
     await open("forms", { animate: "infinite" })
     const terms = checkbox(page, "Accept the terms")
     await terms.click()

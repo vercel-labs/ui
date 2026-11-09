@@ -12,9 +12,16 @@ test("a number input's control in a field renders the id passed to it, and the b
   const html = tags(render(App, { props: { kind: "number-input" } }).body)
   expect(
     attribute(
-      html.find((tag) => tag.startsWith("<input") && !tag.includes('type="hidden"')),
-      "id",
-    ),
+      html.find(
+        (tag) => tag.startsWith("<input") && !tag.includes('type="hidden"')
+      ),
+      "id"
+    )
   ).toBe("mine")
-  expect(attribute(html.filter((tag) => tag.startsWith("<button")).at(-1), "aria-controls")).toBe("mine")
+  expect(
+    attribute(
+      html.filter((tag) => tag.startsWith("<button")).at(-1),
+      "aria-controls"
+    )
+  ).toBe("mine")
 })

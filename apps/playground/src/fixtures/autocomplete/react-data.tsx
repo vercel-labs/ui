@@ -7,7 +7,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture data />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

@@ -6,7 +6,9 @@ import { Items } from "../tree/react"
 
 // A tree of links, rendered with the tree fixture's classes. The current page follows the address.
 function Fixture() {
-  const [current, setCurrent] = React.useState(location.hash.slice(1) || "usage")
+  const [current, setCurrent] = React.useState(
+    location.hash.slice(1) || "usage"
+  )
   React.useEffect(() => {
     const changed = () => setCurrent(location.hash.slice(1))
     window.addEventListener("hashchange", changed)
@@ -36,7 +38,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

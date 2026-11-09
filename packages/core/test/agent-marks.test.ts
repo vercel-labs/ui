@@ -36,7 +36,11 @@ function mountButton(text: string, parent: HTMLElement = document.body) {
 }
 
 // An input with a label, inside `parent`.
-function mountInput(label: string, parent: HTMLElement = document.body, onValueChange = vi.fn()) {
+function mountInput(
+  label: string,
+  parent: HTMLElement = document.body,
+  onValueChange = vi.fn()
+) {
   const instance = input({ id: label, onValueChange })
   const el = document.createElement("input")
   el.setAttribute("aria-label", label)
@@ -44,7 +48,9 @@ function mountInput(label: string, parent: HTMLElement = document.body, onValueC
   const unbind = bind(instance.part("root"), el)
   let mounted = true
   const unmount = () => {
-    if (!mounted) return
+    if (!mounted) {
+      return
+    }
     mounted = false
     unbind()
     instance.destroy()
@@ -69,8 +75,13 @@ describe("data-agent-confirm", () => {
   test("without allow, a marked press fails, says what it does and leaves the click to the person", async () => {
     const agent = createAgent()
     const { el, onClick } = mountButton("Buy credits")
-    el.setAttribute("data-agent-confirm", "Charges $20 to your card for 1,000 credits")
-    const outcome = await agent.act({ steps: [{ ref: "Buy credits", action: "press" }] })
+    el.setAttribute(
+      "data-agent-confirm",
+      "Charges $20 to your card for 1,000 credits"
+    )
+    const outcome = await agent.act({
+      steps: [{ ref: "Buy credits", action: "press" }],
+    })
     expect(outcome).toMatchObject({
       ok: false,
       error: {
@@ -84,10 +95,16 @@ describe("data-agent-confirm", () => {
 
   test("the snapshot says which component needs a person", () => {
     const agent = createAgent()
-    mountButton("Buy credits").el.setAttribute("data-agent-confirm", "Charges $20 to your card")
+    mountButton("Buy credits").el.setAttribute(
+      "data-agent-confirm",
+      "Charges $20 to your card"
+    )
     mountButton("Cancel")
     expect(agent.snapshot()).toEqual([
-      expect.objectContaining({ label: "Buy credits", confirm: "Charges $20 to your card" }),
+      expect.objectContaining({
+        label: "Buy credits",
+        confirm: "Charges $20 to your card",
+      }),
       expect.not.objectContaining({ confirm: expect.anything() }),
     ])
   })
@@ -98,14 +115,21 @@ describe("data-agent-confirm", () => {
     const agent = createAgent({ allow })
     const { el, onClick } = mountButton("Buy credits")
     el.setAttribute("data-agent-confirm", "Charges $20 to your card")
-    expect(await agent.act({ steps: [{ ref: "Buy credits", action: "press" }] })).toMatchObject({ ok: true })
+    expect(
+      await agent.act({ steps: [{ ref: "Buy credits", action: "press" }] })
+    ).toMatchObject({ ok: true })
     expect(allow).toHaveBeenCalledWith(
-      expect.objectContaining({ action: "press", confirm: "Charges $20 to your card" }),
-      { signal: expect.any(AbortSignal) },
+      expect.objectContaining({
+        action: "press",
+        confirm: "Charges $20 to your card",
+      }),
+      { signal: expect.any(AbortSignal) }
     )
     expect(onClick).toHaveBeenCalledTimes(1)
     answer = false
-    expect(await agent.act({ steps: [{ ref: "Buy credits", action: "press" }] })).toMatchObject({
+    expect(
+      await agent.act({ steps: [{ ref: "Buy credits", action: "press" }] })
+    ).toMatchObject({
       ok: false,
       error: { message: 'The person said no to "Charges $20 to your card".' },
     })
@@ -115,18 +139,25 @@ describe("data-agent-confirm", () => {
   test("a mark on a region covers every control inside it, for any action", async () => {
     const agent = createAgent()
     const onValueChange = vi.fn()
-    mountInput("Billing email", region("data-agent-confirm", "Changes where invoices go"), onValueChange)
+    mountInput(
+      "Billing email",
+      region("data-agent-confirm", "Changes where invoices go"),
+      onValueChange
+    )
     const outcome = await agent.act({
       steps: [{ ref: "Billing email", action: "setValue", args: ["a@b.co"] }],
     })
     expect(outcome.error?.message).toBe(
-      'Needs a person: "Changes where invoices go". Ask them to make this change themselves.',
+      'Needs a person: "Changes where invoices go". Ask them to make this change themselves.'
     )
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
   test("through WebMCP, registerTools' allow answers for the person", async () => {
-    const tools = new Map<string, { execute: (input: object) => Promise<{ ok: boolean }> }>()
+    const tools = new Map<
+      string,
+      { execute: (input: object) => Promise<{ ok: boolean }> }
+    >()
     const registerTool = async (tool: {
       name: string
       execute: (input: object) => Promise<{ ok: boolean }>
@@ -138,16 +169,21 @@ describe("data-agent-confirm", () => {
     const { el, onClick } = mountButton("Buy credits")
     el.setAttribute("data-agent-confirm", "Charges $20")
     cleanups.push(registerTools(createAgent(), { allow }), () =>
-      Reflect.deleteProperty(document, "modelContext"),
+      Reflect.deleteProperty(document, "modelContext")
     )
     expect(
-      await tools.get("act")!.execute({ steps: [{ ref: "Buy credits", action: "press" }] }),
+      await tools
+        .get("act")!
+        .execute({ steps: [{ ref: "Buy credits", action: "press" }] })
     ).toMatchObject({
       ok: true,
     })
-    expect(allow).toHaveBeenCalledWith(expect.objectContaining({ confirm: "Charges $20" }), {
-      signal: expect.any(AbortSignal),
-    })
+    expect(allow).toHaveBeenCalledWith(
+      expect.objectContaining({ confirm: "Charges $20" }),
+      {
+        signal: expect.any(AbortSignal),
+      }
+    )
     expect(onClick).toHaveBeenCalledTimes(1)
   })
 
@@ -160,9 +196,16 @@ describe("data-agent-confirm", () => {
         return new Promise<boolean>(() => {})
       },
     })
-    mountButton("Buy credits").el.setAttribute("data-agent-confirm", "Charges $20")
-    const late = await agent.act({ steps: [{ ref: "Buy credits", action: "press" }] })
-    expect(late.error?.message).toMatch(/^No answer to press on c\d+ in 0 seconds\.$/)
+    mountButton("Buy credits").el.setAttribute(
+      "data-agent-confirm",
+      "Charges $20"
+    )
+    const late = await agent.act({
+      steps: [{ ref: "Buy credits", action: "press" }],
+    })
+    expect(late.error?.message).toMatch(
+      /^No answer to press on c\d+ in 0 seconds\.$/
+    )
     expect(signal?.aborted).toBe(true)
   })
 })
@@ -171,17 +214,24 @@ describe("data-agent-confirm on items", () => {
   // A list with one item per value, the last marked, in an element named `label`.
   function mountList(
     label: string,
-    instance: { part: (slot: never, props?: never) => never; destroy: () => void },
+    instance: {
+      part: (slot: never, props?: never) => never
+      destroy: () => void
+    },
     values: string[],
-    slot = "item",
+    slot = "item"
   ) {
     const root = document.body.appendChild(document.createElement("div"))
     root.setAttribute("aria-label", label)
-    cleanups.push(bind(instance.part("root" as never), root), () => instance.destroy())
+    cleanups.push(bind(instance.part("root" as never), root), () =>
+      instance.destroy()
+    )
     for (const value of values) {
       const el = root.appendChild(document.createElement("div"))
       el.textContent = value
-      if (value === values.at(-1)) el.setAttribute("data-agent-confirm", `Grants ${value}`)
+      if (value === values.at(-1)) {
+        el.setAttribute("data-agent-confirm", `Grants ${value}`)
+      }
       cleanups.push(bind(instance.part(slot as never, { value } as never), el))
     }
   }
@@ -196,10 +246,12 @@ describe("data-agent-confirm on items", () => {
     ]) {
       const outcome = await agent.act({ steps: [step] })
       expect(outcome.error?.message).toBe(
-        'Needs a person: "Grants admin". Ask them to make this change themselves.',
+        'Needs a person: "Grants admin". Ask them to make this change themselves.'
       )
     }
-    const unknown = await agent.act({ steps: [{ ref: "Roles", action: "setValue", args: [["owner"]] }] })
+    const unknown = await agent.act({
+      steps: [{ ref: "Roles", action: "setValue", args: [["owner"]] }],
+    })
     expect(unknown.error?.message).toMatch(/^No item "owner" in Roles/)
     expect(instance.get().value).toEqual([])
   })
@@ -217,13 +269,21 @@ describe("data-agent-confirm on items", () => {
     })
     mountList("Permissions", instance as never, ["read", "delete"])
     const marked = await agent.act({
-      steps: [{ ref: "Permissions", action: "setChecked", args: [["read", "delete"]] }],
+      steps: [
+        {
+          ref: "Permissions",
+          action: "setChecked",
+          args: [["read", "delete"]],
+        },
+      ],
     })
     expect(marked.error?.message).toMatch(/^Needs a person: "Grants delete"/)
     const disabled = await agent.act({
       steps: [{ ref: "Permissions", action: "setChecked", args: [["locked"]] }],
     })
-    expect(disabled.error?.message).toMatch(/^"locked" in Permissions \(c\d+\) is disabled now\.$/)
+    expect(disabled.error?.message).toMatch(
+      /^"locked" in Permissions \(c\d+\) is disabled now\.$/
+    )
     expect(instance.get().checked).toEqual([])
   })
 
@@ -238,20 +298,40 @@ describe("data-agent-confirm on items", () => {
       ["publish", "data-agent-confirm"],
       ["locked", "disabled"],
     ] as const) {
-      const instance = toggle({ id: value, value, disabled: mark === "disabled", group: () => group.api })
+      const instance = toggle({
+        id: value,
+        value,
+        disabled: mark === "disabled",
+        group: () => group.api,
+      })
       const el = root.appendChild(document.createElement("button"))
       el.textContent = value
-      if (mark === "data-agent-confirm") el.setAttribute(mark, "Publishes the post")
-      for (const [name, value] of Object.entries(attrs(instance.part("root"))))
-        if (value !== undefined) el.setAttribute(name, String(value))
+      if (mark === "data-agent-confirm") {
+        el.setAttribute(mark, "Publishes the post")
+      }
+      for (const [name, value] of Object.entries(
+        attrs(instance.part("root"))
+      )) {
+        if (value !== undefined) {
+          el.setAttribute(name, String(value))
+        }
+      }
       cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
     }
     const marked = await agent.act({
-      steps: [{ ref: "Format", action: "setValue", args: [["bold", "publish"]] }],
+      steps: [
+        { ref: "Format", action: "setValue", args: [["bold", "publish"]] },
+      ],
     })
-    expect(marked.error?.message).toMatch(/^Needs a person: "Publishes the post"/)
-    const disabled = await agent.act({ steps: [{ ref: "Format", action: "setValue", args: [["locked"]] }] })
-    expect(disabled.error?.message).toMatch(/^"locked" in Format \(c\d+\) is disabled now\.$/)
+    expect(marked.error?.message).toMatch(
+      /^Needs a person: "Publishes the post"/
+    )
+    const disabled = await agent.act({
+      steps: [{ ref: "Format", action: "setValue", args: [["locked"]] }],
+    })
+    expect(disabled.error?.message).toMatch(
+      /^"locked" in Format \(c\d+\) is disabled now\.$/
+    )
     expect(group.get().value).toEqual([])
   })
 
@@ -264,11 +344,15 @@ describe("data-agent-confirm on items", () => {
       onOpenChange: (open) => {
         unbindItems.splice(0).forEach((unbind) => unbind())
         content.replaceChildren()
-        if (!open) return
+        if (!open) {
+          return
+        }
         for (const value of ["Free", "Pro"]) {
           const item = content.appendChild(document.createElement("div"))
           item.textContent = value
-          if (value === "Pro") item.setAttribute("data-agent-confirm", "Charges $20 a month")
+          if (value === "Pro") {
+            item.setAttribute("data-agent-confirm", "Charges $20 a month")
+          }
           unbindItems.push(bind(instance.part("item", { value }), item))
         }
       },
@@ -279,8 +363,12 @@ describe("data-agent-confirm on items", () => {
       unbindItems.forEach((unbind) => unbind())
       instance.destroy()
     })
-    const outcome = await agent.act({ steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }] })
-    expect(outcome.error?.message).toMatch(/^Needs a person: "Charges \$20 a month"/)
+    const outcome = await agent.act({
+      steps: [{ ref: "Plan", action: "setValue", args: ["Pro"] }],
+    })
+    expect(outcome.error?.message).toMatch(
+      /^Needs a person: "Charges \$20 a month"/
+    )
     expect(instance.get().value).toBeNull()
   })
 })
@@ -298,14 +386,23 @@ describe("while allow decides", () => {
         return true
       },
     })
-    await marking.act({ steps: [{ ref: "Billing email", action: "setValue", args: ["a@example.com"] }] })
-    expect(steps.map((step) => step.confirm)).toEqual([undefined, "Changes where invoices go"])
+    await marking.act({
+      steps: [
+        { ref: "Billing email", action: "setValue", args: ["a@example.com"] },
+      ],
+    })
+    expect(steps.map((step) => step.confirm)).toEqual([
+      undefined,
+      "Changes where invoices go",
+    ])
     section.removeAttribute("data-agent-confirm")
     onValueChange.mockClear()
     const field = section.querySelector("input")!
     const disabling = createAgent({ allow: () => !!(field.disabled = true) })
     const outcome = await disabling.act({
-      steps: [{ ref: "Billing email", action: "setValue", args: ["b@example.com"] }],
+      steps: [
+        { ref: "Billing email", action: "setValue", args: ["b@example.com"] },
+      ],
     })
     expect(outcome.error?.message).toMatch(/is disabled now\.$/)
     expect(onValueChange).not.toHaveBeenCalled()
@@ -317,9 +414,15 @@ describe("data-agent-hidden", () => {
     const agent = createAgent()
     mountInput("New password", region("data-agent-hidden"))
     mountInput("Display name")
-    expect(onPage(agent).map((component) => component.label)).toEqual(["Display name"])
-    const outcome = await agent.act({ steps: [{ ref: "New password", action: "setValue", args: ["x"] }] })
-    expect(outcome.error?.message).toBe(`"New password" isn't available to agents here. Ask the person.`)
+    expect(onPage(agent).map((component) => component.label)).toEqual([
+      "Display name",
+    ])
+    const outcome = await agent.act({
+      steps: [{ ref: "New password", action: "setValue", args: ["x"] }],
+    })
+    expect(outcome.error?.message).toBe(
+      `"New password" isn't available to agents here. Ask the person.`
+    )
   })
 
   test("its buttons can't be pressed, and its fields aren't kept after they leave", async () => {
@@ -328,7 +431,9 @@ describe("data-agent-hidden", () => {
     const { unmount } = mountInput("Recovery code", region("data-agent-hidden"))
     unmount()
     expect(onPage(agent)).toEqual([])
-    expect(agent.snapshot().map((component) => component.label)).not.toContain("Recovery code")
+    expect(agent.snapshot().map((component) => component.label)).not.toContain(
+      "Recovery code"
+    )
     await agent.act({ steps: [{ ref: "Rotate keys", action: "press" }] })
     expect(onClick).not.toHaveBeenCalled()
   })
@@ -339,12 +444,20 @@ describe("data-agent-hidden", () => {
     const logged: ObservedChange[] = []
     cleanups.push(
       agent.subscribe((change) => heard.push(change)),
-      observe((change) => logged.push(change)),
+      observe((change) => logged.push(change))
     )
-    const { instance } = mountInput("Recovery email", region("data-agent-hidden"))
+    const { instance } = mountInput(
+      "Recovery email",
+      region("data-agent-hidden")
+    )
     instance.api.setValue("me@example.com")
     expect(heard).toEqual([])
-    expect(logged).toEqual([expect.objectContaining({ label: "Recovery email", value: "me@example.com" })])
+    expect(logged).toEqual([
+      expect.objectContaining({
+        label: "Recovery email",
+        value: "me@example.com",
+      }),
+    ])
   })
 })
 
@@ -354,11 +467,12 @@ describe("data-agent-hidden inside a component", () => {
     const instance = dialog({ id: "recovery", defaultOpen: true })
     const content = document.body.appendChild(document.createElement("div"))
     const description = content.appendChild(document.createElement("p"))
-    description.innerHTML = 'Save your codes. <span data-agent-hidden="">ABCD-1234</span>'
+    description.innerHTML =
+      'Save your codes. <span data-agent-hidden="">ABCD-1234</span>'
     cleanups.push(
       bind(instance.part("content"), content),
       bind(instance.part("description"), description),
-      () => instance.destroy(),
+      () => instance.destroy()
     )
     expect(JSON.stringify(agent.snapshot())).not.toContain("ABCD-1234")
     expect(onPage(agent)[0].text).toEqual(["Save your codes."])
@@ -370,11 +484,17 @@ describe("data-agent-secret", () => {
     const agent = createAgent()
     const onValueChange = vi.fn()
     mountInput("Tax ID", region("data-agent-secret"), onValueChange)
-    expect(onPage(agent)).toEqual([expect.objectContaining({ label: "Tax ID", value: "" })])
-    const outcome = await agent.act({ steps: [{ ref: "Tax ID", action: "setValue", args: ["12-345"] }] })
+    expect(onPage(agent)).toEqual([
+      expect.objectContaining({ label: "Tax ID", value: "" }),
+    ])
+    const outcome = await agent.act({
+      steps: [{ ref: "Tax ID", action: "setValue", args: ["12-345"] }],
+    })
     expect(onValueChange).toHaveBeenCalledWith("12-345", expect.anything())
     expect(JSON.stringify(outcome)).not.toContain("12-345")
-    expect(outcome.values).toMatchObject({ [`${outcome.steps[0].ref} Tax ID`]: "[redacted]" })
+    expect(outcome.values).toMatchObject({
+      [`${outcome.steps[0].ref} Tax ID`]: "[redacted]",
+    })
     expect(onPage(agent)[0].value).toBe("[redacted]")
   })
 
@@ -384,11 +504,17 @@ describe("data-agent-secret", () => {
       id: "Reveal",
       action: () => Promise.reject(new Error("Token sk-live-42 expired")),
     } as Parameters<typeof button>[0])
-    const el = region("data-agent-secret").appendChild(document.createElement("button"))
+    const el = region("data-agent-secret").appendChild(
+      document.createElement("button")
+    )
     el.textContent = "Reveal"
     cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
-    const outcome = await agent.act({ steps: [{ ref: "Reveal", action: "press" }] })
-    expect(outcome.error?.message).toBe('Pressed "Reveal", and its action failed: [redacted]')
+    const outcome = await agent.act({
+      steps: [{ ref: "Reveal", action: "press" }],
+    })
+    expect(outcome.error?.message).toBe(
+      'Pressed "Reveal", and its action failed: [redacted]'
+    )
     expect(JSON.stringify(agent.snapshot())).not.toContain("sk-live-42")
   })
 
@@ -405,7 +531,9 @@ describe("data-agent-secret", () => {
     cleanups.push(observe((change) => logged.push(change)))
     const { instance } = mountInput("Tax ID", region("data-agent-secret"))
     instance.api.setValue("12-345")
-    expect(logged).toEqual([expect.objectContaining({ value: "[redacted]", previous: "[redacted]" })])
+    expect(logged).toEqual([
+      expect.objectContaining({ value: "[redacted]", previous: "[redacted]" }),
+    ])
   })
 })
 
@@ -417,7 +545,9 @@ describe("mark names", () => {
     mountButton("Assign", region("data-agent-id", "42"))
     agent.snapshot()
     expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn.mock.calls[0][0]).toContain("data-agent-confim isn't an agent mark")
+    expect(warn.mock.calls[0][0]).toContain(
+      "data-agent-confim isn't an agent mark"
+    )
     expect(warn.mock.calls[0][0]).toContain("data-agent-confirm")
     warn.mockRestore()
   })

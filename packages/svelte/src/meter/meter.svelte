@@ -12,7 +12,11 @@ The root, which is the meter.
   } from "@ui-sdk/core/meter"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     value,
@@ -41,7 +45,16 @@ The root, which is the meter.
   } = $props()
 
   const id = $props.id()
-  const meter = usePrimitive(meterPrimitive, () => ({ id, value, min, max, format, locale, getValueLabel, debug }))
+  const meter = usePrimitive(meterPrimitive, () => ({
+    id,
+    value,
+    min,
+    max,
+    format,
+    locale,
+    getValueLabel,
+    debug,
+  }))
   provideInstance(meterPrimitive, meter)
   const root = useHandlePart(meter, "root")
 </script>

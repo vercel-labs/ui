@@ -19,7 +19,7 @@ function mount(root: HTMLElement) {
             <ui-tooltip-arrow></ui-tooltip-arrow>
             أضف إلى المكتبة
           </ui-tooltip-content>
-        </ui-tooltip>`,
+        </ui-tooltip>`
         )
         .join("")}
     </div>

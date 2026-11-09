@@ -11,7 +11,13 @@ import {
 import { createSignal, For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
-const titles = ["Designer", "Engineer", "Engineering manager", "Product manager", "Researcher"]
+const titles = [
+  "Designer",
+  "Engineer",
+  "Engineering manager",
+  "Product manager",
+  "Researcher",
+]
 
 function Example() {
   const log = useLog()
@@ -32,7 +38,9 @@ function Example() {
       </div>
       <ComboboxContent>
         <ComboboxEmpty>
-          {(state) => (state.empty ? `Press Enter to use “${state.query}”.` : null)}
+          {(state) =>
+            state.empty ? `Press Enter to use “${state.query}”.` : null
+          }
         </ComboboxEmpty>
         <ComboboxList>
           <For each={titles}>

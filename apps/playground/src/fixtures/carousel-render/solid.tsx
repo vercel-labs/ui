@@ -17,13 +17,19 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Carousel class="carousel" aria-label="Photos" onPageChange={(page) => setAction(String(page))}>
+      <Carousel
+        class="carousel"
+        aria-label="Photos"
+        onPageChange={(page) => setAction(String(page))}
+      >
         <CarouselViewport class="carousel-viewport">
           <CarouselContent>
             <For each={slides}>
               {(slide) => (
                 <CarouselItem
-                  class={(state) => `carousel-slide ${state.active ? "is-active" : "is-inactive"}`}
+                  class={(state) =>
+                    `carousel-slide ${state.active ? "is-active" : "is-inactive"}`
+                  }
                 >
                   {slide}
                 </CarouselItem>
@@ -33,7 +39,9 @@ function Fixture() {
         </CarouselViewport>
         <CarouselNext
           render={(props, state) => (
-            <button {...props}>{state.disabled ? "No more photos" : "Next photo"}</button>
+            <button {...props}>
+              {state.disabled ? "No more photos" : "Next photo"}
+            </button>
           )}
         />
         <CarouselIndicatorGroup aria-label="Choose a photo">
@@ -41,7 +49,9 @@ function Fixture() {
             {(_, index) => (
               <CarouselIndicator
                 aria-label={`Photo ${index() + 1}`}
-                render={(props) => <a {...props} href={`#photo-${index() + 1}`} />}
+                render={(props) => (
+                  <a {...props} href={`#photo-${index() + 1}`} />
+                )}
               >
                 {index() + 1}
               </CarouselIndicator>

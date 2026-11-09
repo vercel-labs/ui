@@ -8,7 +8,12 @@ import { labelFixture } from "tests/fixtures/label.ts"
 const { email, plan, volume, terms, region, delivery, quantity } = labelFixture
 
 const radios = (items: { value: string; label: string }[]) =>
-  items.map((item) => `<ui-radio class="radio" value="${item.value}">${item.label}</ui-radio>`).join("")
+  items
+    .map(
+      (item) =>
+        `<ui-radio class="radio" value="${item.value}">${item.label}</ui-radio>`
+    )
+    .join("")
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -38,7 +43,8 @@ function mount(root: HTMLElement) {
     const input = document.createElement("ui-number-input")
     input.id = quantity.id
     input.setAttribute("default-value", String(quantity.defaultValue))
-    input.innerHTML = "<ui-number-input-control><input /></ui-number-input-control>"
+    input.innerHTML =
+      "<ui-number-input-control><input /></ui-number-input-control>"
     ;(event.currentTarget as HTMLElement).replaceWith(input)
   })
 }

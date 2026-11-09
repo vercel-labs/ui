@@ -33,11 +33,17 @@
     <NavigationMenuList class="nav-list">
       {#each fixture.items as item (item.value)}
         <NavigationMenuItem value={item.value}>
-          <NavigationMenuTrigger class="nav-trigger">{item.trigger}</NavigationMenuTrigger>
+          <NavigationMenuTrigger class="nav-trigger"
+            >{item.trigger}</NavigationMenuTrigger
+          >
           <NavigationMenuContent class="nav-content">
             <ul>
               {#each item.links as link (link.href)}
-                <li><NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink></li>
+                <li>
+                  <NavigationMenuLink href={link.href}
+                    >{link.label}</NavigationMenuLink
+                  >
+                </li>
               {/each}
             </ul>
           </NavigationMenuContent>

@@ -34,9 +34,14 @@ function mount(root: HTMLElement) {
       </div>
     </ui-carousel>
   `
-  root.querySelector("ui-carousel")!.addEventListener("playingchange", (event) => {
-    log(root, `${event.detail.value ? "Playing" : "Stopped"} (${event.detail.reason})`)
-  })
+  root
+    .querySelector("ui-carousel")!
+    .addEventListener("playingchange", (event) => {
+      log(
+        root,
+        `${event.detail.value ? "Playing" : "Stopped"} (${event.detail.reason})`
+      )
+    })
 }
 
 export { mount }

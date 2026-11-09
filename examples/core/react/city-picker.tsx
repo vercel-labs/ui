@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createTypeahead, definePrimitive, elements, idPart, isTypeaheadKey } from "@ui-sdk/core"
+import {
+  createTypeahead,
+  definePrimitive,
+  elements,
+  idPart,
+  isTypeaheadKey,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
@@ -13,12 +19,17 @@ type CityPickerState = { city: string; picked: string | null }
 const cityPicker = definePrimitive({
   name: "city-picker",
   options: { delay: "number", onPick: "callback" },
-  state: (_options: CityPickerOptions): CityPickerState => ({ city: "Nairobi", picked: null }),
+  state: (_options: CityPickerOptions): CityPickerState => ({
+    city: "Nairobi",
+    picked: null,
+  }),
   api: (context) => {
     let delay = context.options().delay
     let typeahead = createTypeahead(delay)
     context.onOptions((options) => {
-      if (options.delay === delay) return
+      if (options.delay === delay) {
+        return
+      }
       delay = options.delay
       typeahead.reset()
       typeahead = createTypeahead(delay)
@@ -27,16 +38,25 @@ const cityPicker = definePrimitive({
       keydown(event: KeyboardEvent) {
         const cities = elements(context, "city").map((city) => city.key)
         const { city } = context.store.get()
-        if (event.key === "Escape") return typeahead.reset()
-        if (event.key === "Enter" || (event.key === " " && !typeahead.active())) {
+        if (event.key === "Escape") {
+          return typeahead.reset()
+        }
+        if (
+          event.key === "Enter" ||
+          (event.key === " " && !typeahead.active())
+        ) {
           event.preventDefault()
           context.store.set({ picked: city })
           return context.options().onPick?.(city)
         }
-        if (!isTypeaheadKey(event)) return
+        if (!isTypeaheadKey(event)) {
+          return
+        }
         const next = typeahead(event.key, cities, cities.indexOf(city))
         event.preventDefault()
-        if (next !== -1) context.store.set({ city: cities[next] })
+        if (next !== -1) {
+          context.store.set({ city: cities[next] })
+        }
       },
     }
   },
@@ -67,7 +87,15 @@ const CityPicker = parts.Root
 
 const CityPickerCity = parts.City
 
-const cities = ["Nairobi", "Naples", "New Delhi", "New Orleans", "New York", "Newark", "Nice"]
+const cities = [
+  "Nairobi",
+  "Naples",
+  "New Delhi",
+  "New Orleans",
+  "New York",
+  "Newark",
+  "Nice",
+]
 
 function Example() {
   const [slow, setSlow] = React.useState(false)
@@ -76,11 +104,19 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={slow} onChange={(event) => setSlow(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={slow}
+            onChange={(event) => setSlow(event.target.checked)}
+          />
           Wait 1.5 seconds between keys
         </label>
       </div>
-      <CityPicker aria-label="City" delay={slow ? 1500 : 500} onPick={(city) => log(`Picked ${city}`)}>
+      <CityPicker
+        aria-label="City"
+        delay={slow ? 1500 : 500}
+        onPick={(city) => log(`Picked ${city}`)}
+      >
         {cities.map((city) => (
           <CityPickerCity key={city} value={city}>
             {city}
@@ -94,4 +130,11 @@ function Example() {
   )
 }
 
-export { CityPicker, CityPickerCity, cityPicker, type CityPickerOptions, type CityPickerState, Example }
+export {
+  CityPicker,
+  CityPickerCity,
+  cityPicker,
+  type CityPickerOptions,
+  type CityPickerState,
+  Example,
+}

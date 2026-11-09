@@ -4,9 +4,17 @@ The dialog itself, named by its title and described by its description.
 @stable
 -->
 <script lang="ts" generics="Payload = unknown">
-  import type { DialogContentProps, DialogContentState } from "@ui-sdk/core/dialog"
+  import type {
+    DialogContentProps,
+    DialogContentState,
+  } from "@ui-sdk/core/dialog"
   import Part from "../part.svelte"
-  import { portalTo, providePopupContainer, usePopupContainer, type PopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+    type PopupContainer,
+  } from "../popup.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { useDialog } from "./context"
 
@@ -28,12 +36,14 @@ The dialog itself, named by its title and described by its description.
   // Presented as a sheet, the content sits in a full-screen viewport, which is
   // what moves into the container and the top layer. An alert dialog never
   // presents as a sheet, so it has no viewport to bind.
-  const viewport = dialog.sheet ? useHandlePart(dialog.handle, "viewport", () => ({}), portalTo(target)) : undefined
+  const viewport = dialog.sheet
+    ? useHandlePart(dialog.handle, "viewport", () => ({}), portalTo(target))
+    : undefined
   const content = useHandlePart(
     dialog.handle,
     "content",
     () => ({ initialFocus, finalFocus, keepMounted }),
-    portalTo(() => (viewport?.present ? false : target())),
+    portalTo(() => (viewport?.present ? false : target()))
   )
 </script>
 

@@ -13,7 +13,12 @@
     TooltipContent,
     TooltipTrigger,
   } from "@ui-sdk/svelte"
-  import { countRender, perfItems, perfOptions, perfSize } from "tests/fixtures/perf.ts"
+  import {
+    countRender,
+    perfItems,
+    perfOptions,
+    perfSize,
+  } from "tests/fixtures/perf.ts"
 
   // Rows like a table's, each with a closed menu, select and tooltip, for the
   // counts specs. Every part counts its updates by kind, so
@@ -53,7 +58,13 @@
               {count("trigger", props)}
               <SelectValue>
                 {#snippet render({ props: valueProps, state })}
-                  <span {...valueProps}>{count("value", valueProps, state.label)}{state.label}</span>
+                  <span {...valueProps}
+                    >{count(
+                      "value",
+                      valueProps,
+                      state.label
+                    )}{state.label}</span
+                  >
                 {/snippet}
               </SelectValue>
             </button>

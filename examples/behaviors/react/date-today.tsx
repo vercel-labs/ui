@@ -17,14 +17,18 @@ function Example() {
         <li key={zone} data-slot="row">
           {city}
           <span data-slot="hint" data-zone={zone}>
-            {mounted ? formatDate(todayDate(zone), "en-US", { dateStyle: "medium" }) : ""}
+            {mounted
+              ? formatDate(todayDate(zone), "en-US", { dateStyle: "medium" })
+              : ""}
           </span>
         </li>
       ))}
       <li data-slot="row">
         Here
         <span data-slot="hint" data-zone="here">
-          {mounted ? formatDate(todayDate(), "en-US", { dateStyle: "medium" }) : ""}
+          {mounted
+            ? formatDate(todayDate(), "en-US", { dateStyle: "medium" })
+            : ""}
         </span>
       </li>
     </ul>

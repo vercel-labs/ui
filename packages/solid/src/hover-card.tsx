@@ -36,7 +36,9 @@ const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 
 function useHoverCard() {
   const context = useContext(HoverCardContext)
-  if (!context) throw new Error("HoverCard parts must be used inside <HoverCard>.")
+  if (!context) {
+    throw new Error("HoverCard parts must be used inside <HoverCard>.")
+  }
   return context
 }
 
@@ -56,30 +58,46 @@ function HoverCard(props: HoverCardProps) {
   useControllerEntry(() => props.controller, hoverCard)
   return providePrimitive(hoverCard, () => (
     <HoverCardContext value={hoverCard}>
-      <ContainerContext value={() => props.container}>{props.children}</ContainerContext>
+      <ContainerContext value={() => props.container}>
+        {props.children}
+      </ContainerContext>
     </HoverCardContext>
   ))
 }
 
-type TriggerPartProps = PartProps<"a", HoverCardTriggerState> & HoverCardTriggerProps
+type TriggerPartProps = PartProps<"a", HoverCardTriggerState> &
+  HoverCardTriggerProps
 
 /**
  * A link by default: pressing it follows the link, and hover or focus opens the card.
  * @stable
  */
 function HoverCardTrigger(props: TriggerPartProps) {
-  const hoverCard = useControllerTarget(() => props.controller, useContext(HoverCardContext))
+  const hoverCard = useControllerTarget(
+    () => props.controller,
+    useContext(HoverCardContext)
+  )
   const rest = omit(props, "payload", "controller")
   return (
     <Show
       when={hoverCard()}
       keyed
       // Until the card it names mounts, a trigger outside the card is a plain link.
-      fallback={renderStatic("a", () => ({ attrs: {}, state: { open: false } }), rest)}
+      fallback={renderStatic(
+        "a",
+        () => ({ attrs: {}, state: { open: false } }),
+        rest
+      )}
     >
       {(hoverCard) => {
         const id = createUniqueId()
-        return usePart(hoverCard, "trigger", () => ({ id, payload: props.payload }), rest, "a")
+        return usePart(
+          hoverCard,
+          "trigger",
+          () => ({ id, payload: props.payload }),
+          rest,
+          "a"
+        )
       }}
     </Show>
   )
@@ -90,7 +108,8 @@ function HoverCardTrigger(props: TriggerPartProps) {
  * @stable
  */
 function HoverCardContent<Payload = unknown>(
-  props: PartProps<"div", HoverCardContentState<Payload>> & HoverCardContentProps,
+  props: PartProps<"div", HoverCardContentState<Payload>> &
+    HoverCardContentProps
 ) {
   const fromRoot = useContext(ContainerContext)
   const target = usePopupContainer(() => props.container ?? fromRoot())
@@ -114,7 +133,7 @@ function HoverCardContent<Payload = unknown>(
     "arrowPadding",
     "anchor",
     "keepMounted",
-    "container",
+    "container"
   )
   return popupPart(useHoverCard(), "content", content, rest, target)
 }
@@ -140,4 +159,10 @@ export type {
   HoverCardTriggerState,
 } from "@ui-sdk/core/hover-card"
 
-export { HoverCard, HoverCardArrow, HoverCardContent, type HoverCardProps, HoverCardTrigger }
+export {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  type HoverCardProps,
+  HoverCardTrigger,
+}

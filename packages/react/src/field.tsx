@@ -35,21 +35,38 @@ type FieldSetHandle = PrimitiveHandle<typeof fieldSet>
 
 // What a FieldDescription describes: the nearest Field, or a FieldSet when no
 // Field is closer.
-const DescribedContext = React.createContext<FieldHandle | FieldSetHandle | null>(null)
+const DescribedContext = React.createContext<
+  FieldHandle | FieldSetHandle | null
+>(null)
 
 // Checks a part outside a field once it's in the page. Made once, so React
 // keeps the same ref and hands the element over once.
-const outsideRefs: Partial<Record<FieldOutsideSlot, (el: Element | null) => void>> = {
+const outsideRefs: Partial<
+  Record<FieldOutsideSlot, (el: Element | null) => void>
+> = {
   label: (el) =>
-    checkFieldOutside(el, "label", "Put the control inside it, or point its `htmlFor` at the control."),
+    checkFieldOutside(
+      el,
+      "label",
+      "Put the control inside it, or point its `htmlFor` at the control."
+    ),
   control: (el) => checkFieldOutside(el, "control"),
 }
 
 // A part outside any Field: a plain element with no field wiring, so a
 // FieldLabel is a native <label> that labels the control it wraps.
-function outside(slot: FieldOutsideSlot, tag: string, { render, ...props }: Record<string, any>) {
+function outside(
+  slot: FieldOutsideSlot,
+  tag: string,
+  { render, ...props }: Record<string, any>
+) {
   const ref = outsideRefs[slot]
-  return renderElement(tag, mergeProps(fieldOutsideAttrs(slot), props, { ref }), render, fieldOutsideState)
+  return renderElement(
+    tag,
+    mergeProps(fieldOutsideAttrs(slot), props, { ref }),
+    render,
+    fieldOutsideState
+  )
 }
 
 // A part inside its field, as a component of its own, so whether a field is
@@ -74,9 +91,18 @@ function InField<S extends FieldOutsideSlot>({
  * Ties a form control to its label, description and error messages.
  * @stable
  */
-function Field({ name, disabled, invalid, debug, ...props }: FieldOptions & PartProps<"div", FieldState>) {
+function Field({
+  name,
+  disabled,
+  invalid,
+  debug,
+  ...props
+}: FieldOptions & PartProps<"div", FieldState>) {
   const field = usePrimitive(fieldPrimitive, { name, disabled, invalid, debug })
-  const context = React.useMemo(() => extendHandle(field, { name, disabled }), [field, name, disabled])
+  const context = React.useMemo(
+    () => extendHandle(field, { name, disabled }),
+    [field, name, disabled]
+  )
   return (
     <FieldContext.Provider value={context}>
       <DescribedContext.Provider value={field}>
@@ -95,8 +121,18 @@ function Field({ name, disabled, invalid, debug, ...props }: FieldOptions & Part
  */
 function FieldLabel(props: PartProps<"label", FieldState>) {
   const field = React.useContext(FieldContext)
-  if (!field) return outside("label", "label", props)
-  return <InField field={field} slot="label" part={{ id: props.id }} props={props} tag="label" />
+  if (!field) {
+    return outside("label", "label", props)
+  }
+  return (
+    <InField
+      field={field}
+      slot="label"
+      part={{ id: props.id }}
+      props={props}
+      tag="label"
+    />
+  )
 }
 
 /**
@@ -106,11 +142,21 @@ function FieldLabel(props: PartProps<"label", FieldState>) {
  */
 function FieldDescription(props: PartProps<"p", FieldDescriptionState>) {
   const described = React.useContext(DescribedContext)
-  if (!described) return outside("description", "p", props)
+  if (!described) {
+    return outside("description", "p", props)
+  }
   // A field set's description slot takes the same props, and its state is the
   // `disabled` that FieldDescriptionState always has.
   const owner = described as FieldHandle
-  return <InField field={owner} slot="description" part={{ id: props.id }} props={props} tag="p" />
+  return (
+    <InField
+      field={owner}
+      slot="description"
+      part={{ id: props.id }}
+      props={props}
+      tag="p"
+    />
+  )
 }
 
 /**
@@ -125,12 +171,23 @@ function FieldError({
 }: PartProps<"div", FieldErrorState> & FieldErrorProps) {
   const field = React.useContext(FieldContext)
   const made = React.useId()
-  if (!field)
-    return fieldOutsideErrorShown({ match }) ? outside("error", "div", { ...props, children }) : null
+  if (!field) {
+    return fieldOutsideErrorShown({ match })
+      ? outside("error", "div", { ...props, children })
+      : null
+  }
   // Only an error with `match` needs an id of its own. One without takes the
   // field's, which the control points at before the field binds.
   const id = props.id ?? (match === undefined ? undefined : made)
-  return <InField field={field} slot="error" part={{ id, match }} props={{ ...props, children }} tag="div" />
+  return (
+    <InField
+      field={field}
+      slot="error"
+      part={{ id, match }}
+      props={{ ...props, children }}
+      tag="div"
+    />
+  )
 }
 
 const message = (state: FieldErrorState) => state.message
@@ -139,13 +196,27 @@ const message = (state: FieldErrorState) => state.message
  * A native control: an <input> by default, or anything through `render`.
  * @stable
  */
-function FieldControl({ name, render, ...rest }: PartProps<"input", FieldState>) {
+function FieldControl({
+  name,
+  render,
+  ...rest
+}: PartProps<"input", FieldState>) {
   const field = React.useContext(FieldContext)
-  if (!field) return outside("control", "input", { ...rest, name, render })
+  if (!field) {
+    return outside("control", "input", { ...rest, name, render })
+  }
   const [props, element] = ownDescription(rest, render)
   const control = { id: props.id, describedBy: props["aria-describedby"] }
   const user = { ...props, render: element, name: name ?? field.name }
-  return <InField field={field} slot="control" part={control} props={user} tag="input" />
+  return (
+    <InField
+      field={field}
+      slot="control"
+      part={control}
+      props={user}
+      tag="input"
+    />
+  )
 }
 
 /**
@@ -181,7 +252,16 @@ function FieldGroup(props: PartProps<"div">) {
   return usePart(usePrimitive(fieldGroup, {}), "group", {}, props, "div")
 }
 
-export { Field, FieldControl, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet }
+export {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+}
 export type {
   FieldApi,
   FieldDescriptionState,

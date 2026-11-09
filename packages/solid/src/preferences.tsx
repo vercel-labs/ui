@@ -34,27 +34,32 @@ function Preferences(props: PreferencesProps) {
   // values back over the ones the script put there.
   const server = () => {
     const shown: Record<string, string> = {}
-    if (isServer)
-      for (const preference of props.preferences)
-        if (!preference.global) shown[preference.attribute] = preference.initialState.value
+    if (isServer) {
+      for (const preference of props.preferences) {
+        if (!preference.global) {
+          shown[preference.attribute] = preference.initialState.value
+        }
+      }
+    }
     return shown
   }
   createEffect(
     () => props.preferences,
     (list) => {
       const write = () => {
-        for (const preference of list)
-          (preference.global ? document.documentElement : element)?.setAttribute(
-            preference.attribute,
-            preference.get().value,
-          )
+        for (const preference of list) {
+          ;(preference.global
+            ? document.documentElement
+            : element
+          )?.setAttribute(preference.attribute, preference.get().value)
+        }
       }
       // Subscribing first reads back what was saved.
       const stops = list.map((preference) => preference.subscribe(write))
       write()
       setMounted(true)
       return () => stops.forEach((stop) => stop())
-    },
+    }
   )
   return (
     <div
@@ -64,7 +69,12 @@ function Preferences(props: PreferencesProps) {
       style={{ display: "contents" }}
       ref={(el: HTMLDivElement) => (element = el)}
     >
-      {mounted() ? null : <script nonce={props.nonce} innerHTML={preferencesScript(props.preferences)} />}
+      {mounted() ? null : (
+        <script
+          nonce={props.nonce}
+          innerHTML={preferencesScript(props.preferences)}
+        />
+      )}
       {props.children}
     </div>
   )
@@ -82,17 +92,22 @@ function usePreference<State extends object>(preference: {
   subscribe: (listener: () => void) => () => void
 }) {
   // A state is an object, never a function, which a signal would take for a way to compute it.
-  const [state, setState] = createSignal(preference.initialState as Exclude<State, Function>, {
-    ownedWrite: true,
-  })
+  const [state, setState] = createSignal(
+    preference.initialState as Exclude<State, Function>,
+    {
+      ownedWrite: true,
+    }
+  )
   createEffect(
     () => preference,
     (current) => {
       // Subscribing first reads back what was saved.
-      const stop = current.subscribe(() => setState(() => current.get() as Exclude<State, Function>))
+      const stop = current.subscribe(() =>
+        setState(() => current.get() as Exclude<State, Function>)
+      )
       setState(() => current.get() as Exclude<State, Function>)
       return stop
-    },
+    }
   )
   return state
 }

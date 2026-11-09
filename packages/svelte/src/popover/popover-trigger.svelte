@@ -13,7 +13,11 @@ The button that opens the popover. A trigger outside the popover connects throug
   import Part from "../part.svelte"
   import { useControllerTarget } from "../popup.svelte"
   import { plainPart, type PartProps } from "../use-primitive.svelte"
-  import { TriggerKey, type PopoverContext, type TriggerContext } from "./context"
+  import {
+    TriggerKey,
+    type PopoverContext,
+    type TriggerContext,
+  } from "./context"
   import TriggerBinding from "./popover-trigger-binding.svelte"
 
   let {
@@ -22,12 +26,17 @@ The button that opens the popover. A trigger outside the popover connects throug
     shortcut,
     controller,
     ...rest
-  }: PartProps<"button", PopoverTriggerState> &
-    PopoverTriggerProps = $props()
+  }: PartProps<"button", PopoverTriggerState> & PopoverTriggerProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<PopoverContext | undefined>(popoverPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<PopoverContext | undefined>(popoverPrimitive)
+  )
   const popover = $derived(connected())
-  setContext<TriggerContext>(TriggerKey, { shortcut: () => shortcut, popover: () => popover })
+  setContext<TriggerContext>(TriggerKey, {
+    shortcut: () => shortcut,
+    popover: () => popover,
+  })
 </script>
 
 {#if popover}
@@ -36,7 +45,10 @@ The button that opens the popover. A trigger outside the popover connects throug
   <!-- Until the popover it names mounts, a trigger outside the popover is a plain button. -->
   <Part
     tag="button"
-    part={plainPart({ open: false, disabled: !!disabled }, { type: "button", disabled })}
+    part={plainPart(
+      { open: false, disabled: !!disabled },
+      { type: "button", disabled }
+    )}
     props={rest}
   />
 {/if}

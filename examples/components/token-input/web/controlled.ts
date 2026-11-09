@@ -33,12 +33,18 @@ function mount(root: HTMLElement) {
   `
   const prompt = root.querySelector("ui-token-input")!
   prompt.history = { limit: 50, groupDelay: 1000 }
-  prompt.getTokenDescription = (token) => (token.type === "file" ? "attached file" : token.type)
-  root.querySelector("ui-trigger-menu")!.triggers = [{ char: "@", type: "file", items: files }]
+  prompt.getTokenDescription = (token) =>
+    token.type === "file" ? "attached file" : token.type
+  root.querySelector("ui-trigger-menu")!.triggers = [
+    { char: "@", type: "file", items: files },
+  ]
   prompt.addEventListener("valuechange", (event) => {
     const { value, reason } = event.detail
     const removed = event.detail.removed.map((token) => token.label).join(", ")
-    log(root, `${toText(value)} (${reason}${removed ? `, removed ${removed}` : ""})`)
+    log(
+      root,
+      `${toText(value)} (${reason}${removed ? `, removed ${removed}` : ""})`
+    )
   })
 }
 

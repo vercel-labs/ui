@@ -10,7 +10,9 @@ const popup =
 function PopoverContent({
   className,
   ...props
-}: Omit<ComponentProps<typeof PopoverContentPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof PopoverContentPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
     <PopoverContentPrimitive
       sideOffset={8}

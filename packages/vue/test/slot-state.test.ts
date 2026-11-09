@@ -31,10 +31,12 @@ const { createApp } = createRenderer<FakeNode, FakeNode>({
     child.parent = null
   },
   parentNode: (node) => node.parent,
-  nextSibling: (node) => node.parent?.children[node.parent.children.indexOf(node) + 1] ?? null,
+  nextSibling: (node) =>
+    node.parent?.children[node.parent.children.indexOf(node) + 1] ?? null,
   patchProp() {},
 })
-const textOf = (node: FakeNode): string => node.text + node.children.map(textOf).join("")
+const textOf = (node: FakeNode): string =>
+  node.text + node.children.map(textOf).join("")
 
 describe("a part's state", () => {
   test("a part that takes another key hears its new key's changes, even when only another component reads its state", async () => {
@@ -44,7 +46,9 @@ describe("a part's state", () => {
     const Item = defineComponent({
       props: { value: { type: String, required: true } },
       setup(props) {
-        state = usePart(menu, "checkbox-item", () => ({ value: props.value })).state
+        state = usePart(menu, "checkbox-item", () => ({
+          value: props.value,
+        })).state
         return () => null
       },
     })
@@ -63,7 +67,10 @@ describe("a part's state", () => {
       },
     })
     const root = fakeNode()
-    const app = createApp({ setup: () => () => h(Menu, () => [h(Item, { value: value.value }), h(Reader)]) })
+    const app = createApp({
+      setup: () => () =>
+        h(Menu, () => [h(Item, { value: value.value }), h(Reader)]),
+    })
     app.mount(root)
     expect(textOf(root)).toBe("unchecked")
 
@@ -93,7 +100,9 @@ describe("a part's state", () => {
       slots: (slot) => ({
         column: slot<{ value: string }, { cards: Card[] }>({
           props: { value: "string" },
-          state: (state, { key }) => ({ cards: state.cards.filter((card) => card.column === key) }),
+          state: (state, { key }) => ({
+            cards: state.cards.filter((card) => card.column === key),
+          }),
         }),
       }),
     })
@@ -102,7 +111,10 @@ describe("a part's state", () => {
     const Column = defineComponent({
       setup() {
         const column = usePart(board, "column", () => ({ value: "todo" }))
-        return () => (renders++, column.state.cards.map((card) => card.id).join(","))
+        return () => (
+          renders++,
+          column.state.cards.map((card) => card.id).join(",")
+        )
       },
     })
     const Board = defineComponent({
@@ -140,7 +152,10 @@ describe("a part's state", () => {
       }),
       slots: (slot) => ({
         marker: slot<{}, { point: Point; points: Point[] }>({
-          state: (state) => ({ point: { x: state.x }, points: [{ x: state.x }] }),
+          state: (state) => ({
+            point: { x: state.x },
+            points: [{ x: state.x }],
+          }),
         }),
       }),
     })
@@ -149,7 +164,10 @@ describe("a part's state", () => {
     const Marker = defineComponent({
       setup() {
         const marker = usePart(plot, "marker")
-        return () => (renders++, `${marker.state.point.x},${marker.state.points[0]!.x}`)
+        return () => (
+          renders++,
+          `${marker.state.point.x},${marker.state.points[0]!.x}`
+        )
       },
     })
     const Plot = defineComponent({

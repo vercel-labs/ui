@@ -1,7 +1,19 @@
 import { Dialog, DialogContent, DialogTrigger } from "@ui-sdk/solid/dialog"
 import { Drawer, DrawerContent, DrawerTrigger } from "@ui-sdk/solid/drawer"
-import { Menu, MenuContent, MenuGroup, MenuGroupLabel, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
-import { createPopoverController, Popover, PopoverContent, PopoverTrigger } from "@ui-sdk/solid/popover"
+import {
+  Menu,
+  MenuContent,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuTrigger,
+} from "@ui-sdk/solid/menu"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@ui-sdk/solid/popover"
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
 import {
@@ -30,7 +42,9 @@ function Fixture() {
       <button>Before</button>
       <Menu {...report("menu")}>
         <For each={fixture.menu.triggers}>
-          {(label) => <MenuTrigger payload={payloadOf(label)}>{label}</MenuTrigger>}
+          {(label) => (
+            <MenuTrigger payload={payloadOf(label)}>{label}</MenuTrigger>
+          )}
         </For>
         <MenuContent class="popup">
           {(state) => (
@@ -45,13 +59,19 @@ function Fixture() {
       </Menu>
       <Popover controller={people} {...report("popover")}>
         <For each={fixture.popover.triggers}>
-          {(label) => <PopoverTrigger payload={payloadOf(label)}>{label}</PopoverTrigger>}
+          {(label) => (
+            <PopoverTrigger payload={payloadOf(label)}>{label}</PopoverTrigger>
+          )}
         </For>
         <PopoverContent class="popup">
           {(state) => (
             <>
               {contentFor(state.payload)}
-              <button onClick={() => people.open({ payload: fixture.popover.show.payload })}>
+              <button
+                onClick={() =>
+                  people.open({ payload: fixture.popover.show.payload })
+                }
+              >
                 {fixture.popover.show.label}
               </button>
             </>
@@ -60,15 +80,23 @@ function Fixture() {
       </Popover>
       <Dialog modal={false} {...report("dialog")}>
         <For each={fixture.dialog.triggers}>
-          {(label) => <DialogTrigger payload={payloadOf(label)}>{label}</DialogTrigger>}
+          {(label) => (
+            <DialogTrigger payload={payloadOf(label)}>{label}</DialogTrigger>
+          )}
         </For>
-        <DialogContent class="dialog">{(state) => contentFor(state.payload)}</DialogContent>
+        <DialogContent class="dialog">
+          {(state) => contentFor(state.payload)}
+        </DialogContent>
       </Dialog>
       <Drawer modal={false} {...report("drawer")}>
         <For each={fixture.drawer.triggers}>
-          {(label) => <DrawerTrigger payload={payloadOf(label)}>{label}</DrawerTrigger>}
+          {(label) => (
+            <DrawerTrigger payload={payloadOf(label)}>{label}</DrawerTrigger>
+          )}
         </For>
-        <DrawerContent class="drawer">{(state) => contentFor(state.payload)}</DrawerContent>
+        <DrawerContent class="drawer">
+          {(state) => contentFor(state.payload)}
+        </DrawerContent>
       </Drawer>
       <output role="status" aria-label="Last open">
         {lastOpen()}

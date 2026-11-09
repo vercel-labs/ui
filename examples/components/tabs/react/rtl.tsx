@@ -1,4 +1,10 @@
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/react/tabs"
 
 export function Example() {
   return (
@@ -10,8 +16,12 @@ export function Example() {
           <TabsTab value="notifications">الإشعارات</TabsTab>
           <TabsIndicator />
         </TabsList>
-        <TabsPanel value="account">عدّل اسمك وبريدك الإلكتروني وصورتك.</TabsPanel>
-        <TabsPanel value="password">غيّر كلمة المرور وفعّل التحقق بخطوتين.</TabsPanel>
+        <TabsPanel value="account">
+          عدّل اسمك وبريدك الإلكتروني وصورتك.
+        </TabsPanel>
+        <TabsPanel value="password">
+          غيّر كلمة المرور وفعّل التحقق بخطوتين.
+        </TabsPanel>
         <TabsPanel value="notifications">اختر ما نرسله إليك بالبريد.</TabsPanel>
       </Tabs>
     </div>

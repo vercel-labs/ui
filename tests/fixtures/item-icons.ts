@@ -6,7 +6,10 @@
 // The SVG icons, by the text of their `<title>`. Each framework renders the
 // same markup from `iconMarkup`.
 const icons = {
-  gear: { title: "Gear", path: "M8 2v2M8 12v2M2 8h2M12 8h2M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6" },
+  gear: {
+    title: "Gear",
+    path: "M8 2v2M8 12v2M2 8h2M12 8h2M8 5a3 3 0 1 0 0 6 3 3 0 0 0 0-6",
+  },
   arrow: { title: "Arrow", path: "M3 8h10M9 4l4 4-4 4" },
   trash: { title: "Trash", path: "M3 4h10M5 4v9h6V4M7 2h2" },
   berry: { title: "Berry", path: "M8 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8M8 5V2" },
@@ -27,7 +30,13 @@ function iconMarkup(name: IconName) {
 }
 
 // An icon is an SVG's name, an emoji, or nothing. `mirror` flips it in right-to-left text.
-type Entry = { value: string; label: string; icon?: IconName; emoji?: string; mirror?: boolean }
+type Entry = {
+  value: string
+  label: string
+  icon?: IconName
+  emoji?: string
+  mirror?: boolean
+}
 
 const iconsFixture = {
   menu: {
@@ -105,8 +114,12 @@ function iconsOptions() {
   const params = new URLSearchParams(location.search)
   return {
     unnamed: params.has("unnamed"),
-    select: params.has("selected") ? iconsFixture.select.items[0].value : undefined,
-    combobox: params.has("selected") ? iconsFixture.combobox.items[0].value : undefined,
+    select: params.has("selected")
+      ? iconsFixture.select.items[0].value
+      : undefined,
+    combobox: params.has("selected")
+      ? iconsFixture.combobox.items[0].value
+      : undefined,
   }
 }
 

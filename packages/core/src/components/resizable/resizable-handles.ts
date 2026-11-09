@@ -34,7 +34,9 @@ function registerHandle(target: HandleTarget) {
   listen(target.el.ownerDocument)
   return () => {
     targets.delete(target)
-    if (hovered.includes(target)) setHovered(hovered.filter((other) => other !== target))
+    if (hovered.includes(target)) {
+      setHovered(hovered.filter((other) => other !== target))
+    }
     active = active.filter((other) => other !== target)
     updateCursor(target.el.ownerDocument)
   }
@@ -55,27 +57,44 @@ function hitTest(x: number, y: number, coarse: boolean, top: Element | null) {
   const hits: { target: HandleTarget; axis: "x" | "y"; distance: number }[] = []
   for (const target of targets) {
     const axis = target.axis()
-    if (!axis || !target.el.isConnected) continue
+    if (!axis || !target.el.isConnected) {
+      continue
+    }
     const rect = target.el.getBoundingClientRect()
-    if (!rect.width && !rect.height) continue
+    if (!rect.width && !rect.height) {
+      continue
+    }
     const thickness = axis === "x" ? rect.width : rect.height
     const reach = Math.max(0, (pad - thickness) / 2)
     const dx = Math.max(rect.left - x, 0, x - rect.right)
     const dy = Math.max(rect.top - y, 0, y - rect.bottom)
-    if (dx <= reach && dy <= reach) hits.push({ target, axis, distance: Math.hypot(dx, dy) })
+    if (dx <= reach && dy <= reach) {
+      hits.push({ target, axis, distance: Math.hypot(dx, dy) })
+    }
   }
   // What the press landed on must belong to one of these groups. Anything
   // else above them, like a dialog or a popover, owns the press.
-  if (top && !hits.some(({ target }) => target.el.contains(top) || target.root()?.contains(top))) return []
+  if (
+    top &&
+    !hits.some(
+      ({ target }) => target.el.contains(top) || target.root()?.contains(top)
+    )
+  ) {
+    return []
+  }
   hits.sort((a, b) => a.distance - b.distance)
   const nearest = hits[0]
-  if (!nearest) return []
+  if (!nearest) {
+    return []
+  }
   const crossing = hits.find((hit) => hit.axis !== nearest.axis)
   return crossing ? [nearest.target, crossing.target] : [nearest.target]
 }
 
 function listen(doc: Document) {
-  if (listening.has(doc)) return
+  if (listening.has(doc)) {
+    return
+  }
   listening.add(doc)
   const view = doc.defaultView ?? window
   let frame = 0
@@ -84,18 +103,40 @@ function listen(doc: Document) {
   // Bubbling, after the page's own handlers, so one that calls
   // preventDefault() keeps the press, like a button inside a panel.
   doc.addEventListener("pointerdown", (event) => {
-    if (event.button !== 0 || !event.isPrimary || event.defaultPrevented || !targets.size) return
-    const top = event.target as Element | null
-    const hits = hitTest(event.clientX, event.clientY, event.pointerType !== "mouse", top)
-    if (!hits.length || (top && !hits.some((hit) => hit.el.contains(top)) && pressedScrollbar(event, top)))
+    if (
+      event.button !== 0 ||
+      !event.isPrimary ||
+      event.defaultPrevented ||
+      !targets.size
+    ) {
       return
+    }
+    const top = event.target as Element | null
+    const hits = hitTest(
+      event.clientX,
+      event.clientY,
+      event.pointerType !== "mouse",
+      top
+    )
+    if (
+      !hits.length ||
+      (top &&
+        !hits.some((hit) => hit.el.contains(top)) &&
+        pressedScrollbar(event, top))
+    ) {
+      return
+    }
     // No text selection and no focus change: focus stays where the user was working.
     event.preventDefault()
     // A press beside a handle, over a panel's content, drags. Its release
     // would click whatever is under it, moved or not.
-    if (top && !hits.some((hit) => hit.el.contains(top))) swallowNextClick(doc, true)
+    if (top && !hits.some((hit) => hit.el.contains(top))) {
+      swallowNextClick(doc, true)
+    }
     active = hits
-    for (const hit of hits) hit.start(event)
+    for (const hit of hits) {
+      hit.start(event)
+    }
     updateCursor(doc)
   })
 
@@ -103,16 +144,31 @@ function listen(doc: Document) {
   doc.addEventListener(
     "pointermove",
     (event) => {
-      if (event.buttons || active.length || !targets.size) return
-      point = { x: event.clientX, y: event.clientY, coarse: event.pointerType !== "mouse" }
+      if (event.buttons || active.length || !targets.size) {
+        return
+      }
+      point = {
+        x: event.clientX,
+        y: event.clientY,
+        coarse: event.pointerType !== "mouse",
+      }
       frame ||= view.requestAnimationFrame(() => {
         frame = 0
-        if (!point || active.length) return
-        setHovered(hitTest(point.x, point.y, point.coarse, doc.elementFromPoint(point.x, point.y)))
+        if (!point || active.length) {
+          return
+        }
+        setHovered(
+          hitTest(
+            point.x,
+            point.y,
+            point.coarse,
+            doc.elementFromPoint(point.x, point.y)
+          )
+        )
         updateCursor(doc)
       })
     },
-    { passive: true },
+    { passive: true }
   )
   doc.documentElement.addEventListener("pointerleave", () => {
     point = undefined
@@ -122,8 +178,16 @@ function listen(doc: Document) {
 }
 
 function setHovered(next: HandleTarget[]) {
-  for (const target of hovered) if (!next.includes(target)) target.hover(false)
-  for (const target of next) if (!hovered.includes(target)) target.hover(true)
+  for (const target of hovered) {
+    if (!next.includes(target)) {
+      target.hover(false)
+    }
+  }
+  for (const target of next) {
+    if (!hovered.includes(target)) {
+      target.hover(true)
+    }
+  }
   hovered = next
 }
 
@@ -132,15 +196,23 @@ function setHovered(next: HandleTarget[]) {
 // keeps iframes from swallowing the moves.
 function updateCursor(doc: Document) {
   const shown = active.length ? active : hovered
-  if (!shown.length) return setPageStyle(doc, "")
+  if (!shown.length) {
+    return setPageStyle(doc, "")
+  }
   const cursor = shown.length > 1 ? "move" : shown[0].cursor()
   const dragging = active.length
     ? "user-select:none!important;-webkit-user-select:none!important}iframe{pointer-events:none!important"
     : ""
-  setPageStyle(doc, `*,*::before,*::after{cursor:${cursor}!important;${dragging}}`)
+  setPageStyle(
+    doc,
+    `*,*::before,*::after{cursor:${cursor}!important;${dragging}}`
+  )
 }
 
-const sheets = new WeakMap<Document, { css: string; set: (css: string) => void }>()
+const sheets = new WeakMap<
+  Document,
+  { css: string; set: (css: string) => void }
+>()
 
 // One style sheet per document, adopted after the page's own, so its
 // important rules win. Constructed sheets need no nonce under a strict
@@ -150,17 +222,22 @@ const sheets = new WeakMap<Document, { css: string; set: (css: string) => void }
 function setPageStyle(doc: Document, css: string) {
   let sheet = sheets.get(doc)
   if (!sheet) {
-    if (!css) return
+    if (!css) {
+      return
+    }
     sheet = { css: "", set: pageSheet(doc) }
     sheets.set(doc, sheet)
   }
-  if (sheet.css === css) return
+  if (sheet.css === css) {
+    return
+  }
   sheet.css = css
   sheet.set(css)
 }
 
 function pageSheet(doc: Document) {
-  const View = doc.defaultView as (Window & { CSSStyleSheet: typeof CSSStyleSheet }) | null
+  const View = doc.defaultView as
+    (Window & { CSSStyleSheet: typeof CSSStyleSheet }) | null
   try {
     const sheet = new View!.CSSStyleSheet()
     doc.adoptedStyleSheets = [...doc.adoptedStyleSheets, sheet]

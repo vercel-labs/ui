@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { Toast, ToastAction, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
+import {
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/vue/toast"
 import { onUnmounted } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
@@ -24,7 +31,9 @@ function archive() {
     <template #default="{ toast: item }">
       <Toast>
         <ToastTitle />
-        <ToastClose v-if="item.cancel" :action="item.cancel.onCancel">{{ item.cancel.label }}</ToastClose>
+        <ToastClose v-if="item.cancel" :action="item.cancel.onCancel">{{
+          item.cancel.label
+        }}</ToastClose>
         <ToastAction data-variant="solid" />
       </Toast>
     </template>

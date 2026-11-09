@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "../../src/tabs"
+  import {
+    Tabs,
+    TabsIndicator,
+    TabsList,
+    TabsPanel,
+    TabsTab,
+  } from "../../src/tabs"
 
   let { defaultValue }: { defaultValue?: string } = $props()
 </script>

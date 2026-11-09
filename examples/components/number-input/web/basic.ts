@@ -31,9 +31,11 @@ function mount(root: HTMLElement) {
       </ui-number-input>
     </ui-field>
   `
-  root.querySelector("ui-number-input")!.addEventListener("valuecommit", (event) => {
-    log(root, `Quantity ${event.detail.value ?? "empty"}`)
-  })
+  root
+    .querySelector("ui-number-input")!
+    .addEventListener("valuecommit", (event) => {
+      log(root, `Quantity ${event.detail.value ?? "empty"}`)
+    })
 }
 
 export { mount }

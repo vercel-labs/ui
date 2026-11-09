@@ -1,6 +1,13 @@
 import "@ui-sdk/web/autocomplete"
 
-const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Blackberry", "Blueberry"]
+const fruits = [
+  "Apple",
+  "Apricot",
+  "Avocado",
+  "Banana",
+  "Blackberry",
+  "Blueberry",
+]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `

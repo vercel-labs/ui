@@ -8,7 +8,9 @@ test("the introduction's examples render without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("icon picker: opens in a popover, search, then arrows and Enter pick an icon", async ({ page }) => {
+test("icon picker: opens in a popover, search, then arrows and Enter pick an icon", async ({
+  page,
+}) => {
   await openExamples(page, "/docs/core")
   const example = page.locator('[data-example="core/icon-picker"]')
   const trigger = example.getByRole("button", { name: "Pick an Icon" })
@@ -19,8 +21,13 @@ test("icon picker: opens in a popover, search, then arrows and Enter pick an ico
   const preview = page.locator('[data-slot="icon-picker-preview"]')
   await expect(grid.locator('[tabindex="0"]')).toHaveCount(1)
   await search.fill("idea")
-  await expect(grid.getByRole("button").first()).toHaveAccessibleName("Lightbulb")
-  await expect(grid.getByRole("button", { name: "Lightbulb" })).toHaveAttribute("data-highlighted", "")
+  await expect(grid.getByRole("button").first()).toHaveAccessibleName(
+    "Lightbulb"
+  )
+  await expect(grid.getByRole("button", { name: "Lightbulb" })).toHaveAttribute(
+    "data-highlighted",
+    ""
+  )
   await expect(preview).toHaveText("Lightbulb")
   // Enter in the search picks the highlighted match, closes the popover and returns focus.
   await search.press("Enter")
@@ -30,7 +37,10 @@ test("icon picker: opens in a popover, search, then arrows and Enter pick an ico
   await page.keyboard.press("Enter")
   await expect(search).toBeFocused()
   await expect(search).toHaveValue("")
-  await expect(grid.getByRole("button", { name: "Lightbulb" })).toHaveAttribute("aria-pressed", "true")
+  await expect(grid.getByRole("button", { name: "Lightbulb" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
   await expect(grid.locator("[data-highlighted]")).toHaveCount(0)
   await search.press("ArrowDown")
   await expect(grid.getByRole("button", { name: "Rocket" })).toBeFocused()
@@ -51,13 +61,17 @@ test("icon picker: opens in a popover, search, then arrows and Enter pick an ico
 test.describe("on a phone", () => {
   test.use({ viewport: { width: 375, height: 800 }, hasTouch: true })
 
-  test("icon picker: the arrows follow the columns that fit, and a tap picks", async ({ page }) => {
+  test("icon picker: the arrows follow the columns that fit, and a tap picks", async ({
+    page,
+  }) => {
     await openExamples(page, "/docs/core")
     const example = page.locator('[data-example="core/icon-picker"]')
     await example.getByRole("button", { name: "Pick an Icon" }).tap()
     const grid = page.getByRole("group", { name: "Icons" })
     const buttons = grid.getByRole("button")
-    const tops = await buttons.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().top))
+    const tops = await buttons.evaluateAll((els) =>
+      els.map((el) => el.getBoundingClientRect().top)
+    )
     const columns = tops.filter((top) => top === tops[0]).length
     expect(columns).toBeGreaterThan(3)
     await buttons.nth(0).focus()

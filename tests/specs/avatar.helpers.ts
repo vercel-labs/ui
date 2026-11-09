@@ -5,14 +5,20 @@ import { avatarPng } from "../fixtures/avatar"
 // slow.png and the next image wait `slowMs` first. Unless `cacheable`,
 // responses can't be cached, so every fetch reaches here. Returns the
 // requests seen, by path.
-async function routeAvatars(page: Page, { slowMs = 1500, cacheable = false } = {}) {
+async function routeAvatars(
+  page: Page,
+  { slowMs = 1500, cacheable = false } = {}
+) {
   const requests = new Map<string, Request[]>()
   await page.route("**/avatars/*", async (route) => {
     const path = new URL(route.request().url()).pathname
     requests.set(path, [...(requests.get(path) ?? []), route.request()])
-    if (path.endsWith("missing.png")) return route.fulfill({ status: 404 })
-    if (path.endsWith("slow.png") || path.endsWith("ada-2.png"))
+    if (path.endsWith("missing.png")) {
+      return route.fulfill({ status: 404 })
+    }
+    if (path.endsWith("slow.png") || path.endsWith("ada-2.png")) {
       await new Promise((resolve) => setTimeout(resolve, slowMs))
+    }
     await route.fulfill({
       status: 200,
       contentType: "image/png",

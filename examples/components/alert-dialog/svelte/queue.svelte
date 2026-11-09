@@ -37,7 +37,9 @@
         </div>
         <div data-slot="row">
           <AlertDialogClose>Cancel</AlertDialogClose>
-          <AlertDialogClose data-variant="solid" value="confirm">Archive</AlertDialogClose>
+          <AlertDialogClose data-variant="solid" value="confirm"
+            >Archive</AlertDialogClose
+          >
         </div>
       {/snippet}
     </AlertDialogContent>

@@ -27,10 +27,10 @@ async function mount(root: HTMLElement) {
     "valuechange",
     (event) => {
       root.querySelector("output")!.textContent = describeValue(
-        (event as CustomEvent<{ value: string[] }>).detail.value,
+        (event as CustomEvent<{ value: string[] }>).detail.value
       )
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

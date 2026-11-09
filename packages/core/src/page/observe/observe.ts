@@ -31,13 +31,17 @@ function observe(
     within?: Element | (() => Element | null | undefined)
     /** Hears every step of an interaction, like each move of a drag, instead of one change when it commits. */
     live?: boolean
-  } = {},
+  } = {}
 ) {
   const { within, live } = options
-  if (!within) return listen((change) => listener(change), live)
+  if (!within) {
+    return listen((change) => listener(change), live)
+  }
   return listen((change, parts) => {
     const root = typeof within === "function" ? within() : within
-    if (root && parts.some((part) => root.contains(part.el))) listener(change)
+    if (root && parts.some((part) => root.contains(part.el))) {
+      listener(change)
+    }
   }, live)
 }
 
@@ -49,7 +53,11 @@ function observe(
  */
 function elementOf(ref: string) {
   const elements = elementsOf(ref)
-  return elements.find((el) => !elements.some((other) => other !== el && other.contains(el))) ?? elements[0]
+  return (
+    elements.find(
+      (el) => !elements.some((other) => other !== el && other.contains(el))
+    ) ?? elements[0]
+  )
 }
 
 export { elementOf, observe, type ObservedChange }

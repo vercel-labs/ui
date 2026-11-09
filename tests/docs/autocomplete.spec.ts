@@ -4,7 +4,10 @@ import { readdirSync } from "node:fs"
 import path from "node:path"
 
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/components/autocomplete")
+const root = path.join(
+  import.meta.dirname,
+  "../../examples/components/autocomplete"
+)
 const folders = ["react", "vue", "svelte", "web", "solid"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -28,7 +31,8 @@ const lastLogIn = (preview: Locator) =>
 async function listOf(field: Locator, page: Page) {
   return page.locator(`[id="${await field.getAttribute("aria-controls")}"]`)
 }
-const optionsOf = async (field: Locator, page: Page) => (await listOf(field, page)).getByRole("option")
+const optionsOf = async (field: Locator, page: Page) =>
+  (await listOf(field, page)).getByRole("option")
 const groupsOf = async (field: Locator, page: Page) =>
   (await listOf(field, page)).getByRole("group").filter({ visible: true })
 
@@ -45,10 +49,12 @@ async function type(field: Locator, text: string) {
   await field.pressSequentially(text)
 }
 
-const highlightedIn = (page: Page) => page.locator('[role="option"][data-highlighted]')
+const highlightedIn = (page: Page) =>
+  page.locator('[role="option"][data-highlighted]')
 
 // The suggestions that are open, wherever they render.
-const openContentIn = (page: Page) => page.locator('[data-slot="autocomplete-content"][data-open]')
+const openContentIn = (page: Page) =>
+  page.locator('[data-slot="autocomplete-content"][data-open]')
 
 // The web frameworks, in the order the examples appear on the Autocomplete page.
 const web: Record<string, Check> = {
@@ -58,14 +64,19 @@ const web: Record<string, Check> = {
     const options = await optionsOf(field, page)
     await expect(options).toHaveText(["Mango"])
     await field.press("ArrowDown")
-    await expect(field).toHaveAttribute("aria-activedescendant", (await options.first().getAttribute("id"))!)
+    await expect(field).toHaveAttribute(
+      "aria-activedescendant",
+      (await options.first().getAttribute("id"))!
+    )
     await field.press("Enter")
     await expect(field).toHaveValue("Mango")
     await expect(field).toHaveAttribute("aria-expanded", "false")
     await expect(field).toBeFocused()
     // Text that matches nothing stays, with the empty message.
     await type(field, "zz")
-    await expect(openContentIn(page).getByText("No fruits found.")).toBeVisible()
+    await expect(
+      openContentIn(page).getByText("No fruits found.")
+    ).toBeVisible()
     await close(field, page)
     await expect(field).toHaveValue("zz")
   },
@@ -75,9 +86,12 @@ const web: Record<string, Check> = {
     // It keeps the case typed, with the rest of the first match selected.
     await type(field, "bl")
     await expect(field).toHaveValue("blackberry")
-    expect(await field.evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd])).toEqual([
-      2, 10,
-    ])
+    expect(
+      await field.evaluate((el: HTMLInputElement) => [
+        el.selectionStart,
+        el.selectionEnd,
+      ])
+    ).toEqual([2, 10])
     await field.press("Backspace")
     await expect(field).toHaveValue("bl")
     // The first match stays highlighted, and the arrow keys fill in the suggestion they highlight.
@@ -107,9 +121,9 @@ const web: Record<string, Check> = {
     await field.click()
     await expect(field).toHaveAttribute("aria-expanded", "true")
     const options = await optionsOf(field, page)
-    await expect(page.locator(`[id="${await field.getAttribute("aria-controls")}"]`)).toContainText(
-      "Recent searches",
-    )
+    await expect(
+      page.locator(`[id="${await field.getAttribute("aria-controls")}"]`)
+    ).toContainText("Recent searches")
     await expect(options).toHaveCount(4)
     await field.pressSequentially("react")
     await expect(options).toHaveText(["react hooks", "react server components"])
@@ -121,7 +135,13 @@ const web: Record<string, Check> = {
     const field = fieldIn(preview)
     await type(field, "b")
     const options = await optionsOf(field, page)
-    await expect(options).toHaveText(["Barcelona", "Berlin", "Boston", "Brussels", "Buenos Aires"])
+    await expect(options).toHaveText([
+      "Barcelona",
+      "Berlin",
+      "Boston",
+      "Brussels",
+      "Buenos Aires",
+    ])
     await expect(page.getByText("5 cities")).toBeVisible()
     await field.pressSequentially("x")
     await expect(page.getByText("No cities start with “bx”.")).toBeVisible()
@@ -206,7 +226,9 @@ const web: Record<string, Check> = {
     await close(field, page)
     await preview.getByRole("button", { name: "Submit" }).click()
     await expect(output).toHaveText("Submitted fruit=Apple")
-    expect(await field.evaluate((el: HTMLInputElement) => el.validity.valueMissing)).toBe(true)
+    expect(
+      await field.evaluate((el: HTMLInputElement) => el.validity.valueMissing)
+    ).toBe(true)
     await preview.getByRole("button", { name: "Reset" }).click()
     await expect(field).toHaveValue("Apple")
   },
@@ -239,7 +261,11 @@ const web: Record<string, Check> = {
     const options = await optionsOf(field, preview.page())
     await expect(options).toHaveText([/^\s*fix/])
     await type(field, "re")
-    await expect(options).toHaveText([/^\s*feature/, /^\s*docs/, /^\s*refactor/])
+    await expect(options).toHaveText([
+      /^\s*feature/,
+      /^\s*docs/,
+      /^\s*refactor/,
+    ])
     await field.press("ArrowDown")
     await field.press("Enter")
     await expect(field).toHaveValue("feature")
@@ -252,7 +278,9 @@ const web: Record<string, Check> = {
     // With loop={false}, the arrow keys stop at either end.
     await field.press("ArrowUp")
     await expect(highlightedIn(page)).toHaveText("Grape")
-    for (let step = 0; step < 4; step++) await field.press("ArrowDown")
+    for (let step = 0; step < 4; step++) {
+      await field.press("ArrowDown")
+    }
     await expect(highlightedIn(page)).toHaveText("Pear")
     await type(field, "pe")
     await field.press("Enter")
@@ -264,10 +292,14 @@ const web: Record<string, Check> = {
     await type(field, "ال")
     await expect(field).toHaveValue("القاهرة")
     // The suggestions line up with the field's right edge.
-    const content = page.locator('[data-slot="autocomplete-content"][data-open]')
+    const content = page.locator(
+      '[data-slot="autocomplete-content"][data-open]'
+    )
     const fieldBox = (await field.boundingBox())!
     const contentBox = (await content.boundingBox())!
-    expect(Math.abs(fieldBox.x + fieldBox.width - (contentBox.x + contentBox.width))).toBeLessThan(2)
+    expect(
+      Math.abs(fieldBox.x + fieldBox.width - (contentBox.x + contentBox.width))
+    ).toBeLessThan(2)
     await close(field, page)
   },
 
@@ -315,7 +347,9 @@ const web: Record<string, Check> = {
     await expect(field).toHaveValue("")
     await preview.getByRole("button", { name: "Focus" }).click()
     await expect(field).toBeFocused()
-    if ((await field.getAttribute("aria-expanded")) === "true") await close(field, page)
+    if ((await field.getAttribute("aria-expanded")) === "true") {
+      await close(field, page)
+    }
   },
 
   async positioning(preview, page) {
@@ -330,7 +364,11 @@ const web: Record<string, Check> = {
     const boxRect = (await box.boundingBox())!
     const contentRect = (await content.boundingBox())!
     expect(contentRect.y + contentRect.height).toBeLessThanOrEqual(boxRect.y)
-    expect(Math.abs(contentRect.x + contentRect.width - (boxRect.x + boxRect.width + 4))).toBeLessThan(2)
+    expect(
+      Math.abs(
+        contentRect.x + contentRect.width - (boxRect.x + boxRect.width + 4)
+      )
+    ).toBeLessThan(2)
     // An outside press closes it, and it stays in the page, hidden.
     await page.mouse.click(5, 5)
     await expect(field).toHaveAttribute("aria-expanded", "false")
@@ -350,7 +388,12 @@ const web: Record<string, Check> = {
       // Reads the records, not the element: the attribute can come and go before the callback runs.
       new MutationObserver((records) => {
         for (const record of records) {
-          if (record.attributeName === "data-ending-style" && record.oldValue === null) seen.ending = true
+          if (
+            record.attributeName === "data-ending-style" &&
+            record.oldValue === null
+          ) {
+            seen.ending = true
+          }
         }
       }).observe(el, { attributes: true, attributeOldValue: true })
       return seen
@@ -358,7 +401,11 @@ const web: Record<string, Check> = {
     await close(field, page)
     expect(await watch.evaluate((seen) => seen.ending)).toBe(true)
     await expect
-      .poll(() => watch.evaluate((seen) => !seen.el.isConnected || (seen.el as HTMLElement).hidden))
+      .poll(() =>
+        watch.evaluate(
+          (seen) => !seen.el.isConnected || (seen.el as HTMLElement).hidden
+        )
+      )
       .toBe(true)
   },
 
@@ -366,14 +413,20 @@ const web: Record<string, Check> = {
     const field = fieldIn(preview)
     await field.click()
     await field.press("ArrowDown")
-    const content = page.locator('[data-slot="autocomplete-content"][data-open]')
+    const content = page.locator(
+      '[data-slot="autocomplete-content"][data-open]'
+    )
     await expect(content).toHaveAttribute("data-presentation", "sheet")
     // The field moves into the sheet's header, and keeps focus there.
-    await expect(content.locator('[data-slot="autocomplete-header"] input')).toBeFocused()
+    await expect(
+      content.locator('[data-slot="autocomplete-header"] input')
+    ).toBeFocused()
     await page.keyboard.type("man")
     await expect(content.getByRole("option")).toHaveText(["Mango"])
     await page.keyboard.press("Escape")
-    await expect(page.locator('[data-slot="autocomplete-content"][data-open]')).toHaveCount(0)
+    await expect(
+      page.locator('[data-slot="autocomplete-content"][data-open]')
+    ).toHaveCount(0)
     await expect(preview.getByRole("combobox")).toHaveValue("man")
   },
 
@@ -381,7 +434,9 @@ const web: Record<string, Check> = {
     const field = fieldIn(preview)
     // The section hint doesn't count toward filtering.
     await type(field, "con")
-    await expect((await optionsOf(field, page)).filter({ visible: true })).toHaveCount(0)
+    await expect(
+      (await optionsOf(field, page)).filter({ visible: true })
+    ).toHaveCount(0)
     // Each suggestion is a link, and Enter follows the highlighted one.
     await field.fill("")
     await type(field, "sty")
@@ -421,12 +476,19 @@ for (const framework of ["react", "vue", "svelte", "web-components", "solid"]) {
     test.setTimeout(120_000)
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/autocomplete`)
     await page.waitForLoadState("networkidle")
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtureNames].sort())
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual(
+        [...fixtureNames].sort()
+      )
+    }
 
     for (const name of order) {
       const preview = page.locator(`[data-example="autocomplete/${name}"]`)

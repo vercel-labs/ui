@@ -11,9 +11,22 @@ import {
   type TriggerMenuStatusState,
 } from "@ui-sdk/core/trigger-menu"
 import type { JSX } from "@solidjs/web"
-import { createContext, createSignal, merge, omit, onCleanup, Show, useContext } from "solid-js"
+import {
+  createContext,
+  createSignal,
+  merge,
+  omit,
+  onCleanup,
+  Show,
+  useContext,
+} from "solid-js"
 import { EditorContext } from "./editor-context"
-import { renderPopup, useControllerEntry, usePopupContainer, type PopupContainer } from "./popup"
+import {
+  renderPopup,
+  useControllerEntry,
+  usePopupContainer,
+  type PopupContainer,
+} from "./popup"
 import { ListItems, type ListParts } from "./list-items"
 import {
   createParts,
@@ -39,11 +52,15 @@ const TriggerMenuContext = createContext<TriggerMenuContextValue | null>(null)
 const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 // Where a TriggerMenuContent among the menu's children says it's there, so
 // the menu renders its own content only when there's none.
-const OwnContentContext = createContext<((present: boolean) => void) | null>(null)
+const OwnContentContext = createContext<((present: boolean) => void) | null>(
+  null
+)
 
 function useTriggerMenu() {
   const context = useContext(TriggerMenuContext)
-  if (!context) throw new Error("TriggerMenu parts must be used inside <TriggerMenu>.")
+  if (!context) {
+    throw new Error("TriggerMenu parts must be used inside <TriggerMenu>.")
+  }
   return context
 }
 
@@ -78,7 +95,9 @@ function TriggerMenu<T = string>(props: TriggerMenuProps<T>) {
       <ContainerContext value={() => props.container}>
         {providePrimitive(menu, () => (
           <>
-            <OwnContentContext value={setHasContent}>{props.children}</OwnContentContext>
+            <OwnContentContext value={setHasContent}>
+              {props.children}
+            </OwnContentContext>
             <Show when={!hasContent()}>
               <TriggerMenuContent />
             </Show>
@@ -99,7 +118,9 @@ const TriggerMenuInput = parts.Input
  * The popup that holds the suggestions, anchored at the caret.
  * @stable
  */
-function TriggerMenuContent(props: PartProps<"div", TriggerMenuContentState> & TriggerMenuContentProps) {
+function TriggerMenuContent(
+  props: PartProps<"div", TriggerMenuContentState> & TriggerMenuContentProps
+) {
   const menu = useTriggerMenu()
   const fromRoot = useContext(ContainerContext)
   const target = usePopupContainer(() => props.container ?? fromRoot())
@@ -126,7 +147,7 @@ function TriggerMenuContent(props: PartProps<"div", TriggerMenuContentState> & T
     "arrowPadding",
     "anchor",
     "keepMounted",
-    "container",
+    "container"
   )
   const withList = merge(rest, {
     get children() {
@@ -135,7 +156,10 @@ function TriggerMenuContent(props: PartProps<"div", TriggerMenuContentState> & T
   })
   return (
     <Show when={menu.present("content", content)}>
-      {renderPopup(() => usePart(menu, "content", content, withList, "div"), target)}
+      {renderPopup(
+        () => usePart(menu, "content", content, withList, "div"),
+        target
+      )}
     </Show>
   )
 }
@@ -147,7 +171,12 @@ function TriggerMenuContent(props: PartProps<"div", TriggerMenuContentState> & T
 function TriggerMenuList(props: PartProps<"div", TriggerMenuContentState>) {
   const withItems = merge(props, {
     get children() {
-      return props.children ?? ((state: TriggerMenuContentState) => <TriggerMenuItems items={state.items} />)
+      return (
+        props.children ??
+        ((state: TriggerMenuContentState) => (
+          <TriggerMenuItems items={state.items} />
+        ))
+      )
     },
   })
   return usePart(useTriggerMenu(), "list", undefined, withItems, "div")
@@ -158,7 +187,8 @@ function TriggerMenuList(props: PartProps<"div", TriggerMenuContentState>) {
  * @stable
  */
 const TriggerMenuItem = parts.Item as <T = string>(
-  props: Omit<PartProps<"div", TriggerMenuItemState>, Clashing> & TriggerMenuItemProps<T>,
+  props: Omit<PartProps<"div", TriggerMenuItemState>, Clashing> &
+    TriggerMenuItemProps<T>
 ) => JSX.Element
 
 /**
@@ -211,7 +241,13 @@ const hasChildren = (props: object) => "children" in props
  * @stable
  */
 function TriggerMenuStatus(props: PartProps<"div", TriggerMenuStatusState>) {
-  return usePart(useTriggerMenu(), "status", () => ({ text: !hasChildren(props) }), props, "div")
+  return usePart(
+    useTriggerMenu(),
+    "status",
+    () => ({ text: !hasChildren(props) }),
+    props,
+    "div"
+  )
 }
 
 /**
@@ -219,7 +255,13 @@ function TriggerMenuStatus(props: PartProps<"div", TriggerMenuStatusState>) {
  * @stable
  */
 function TriggerMenuHint(props: PartProps<"span", TriggerMenuHintState>) {
-  return usePart(useTriggerMenu(), "hint", () => ({ text: !hasChildren(props) }), props, "span")
+  return usePart(
+    useTriggerMenu(),
+    "hint",
+    () => ({ text: !hasChildren(props) }),
+    props,
+    "span"
+  )
 }
 
 /**
@@ -237,7 +279,10 @@ const listParts: ListParts = {
   Separator: TriggerMenuSeparator,
 }
 
-export { createTriggerMenuController, textFieldAdapter } from "@ui-sdk/core/trigger-menu"
+export {
+  createTriggerMenuController,
+  textFieldAdapter,
+} from "@ui-sdk/core/trigger-menu"
 export type {
   EditorChange,
   EditorReplaceOptions,

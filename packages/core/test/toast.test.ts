@@ -1,12 +1,27 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
-import { alertDialog, createConfirm, type ConfirmEntry } from "../src/components/dialog/dialog"
-import { swipeAxis, swipeOffset, swipeOutcome } from "../src/components/toast/swipe"
+import {
+  alertDialog,
+  createConfirm,
+  type ConfirmEntry,
+} from "../src/components/dialog/dialog"
+import {
+  swipeAxis,
+  swipeOffset,
+  swipeOutcome,
+} from "../src/components/toast/swipe"
 import { createOverlays } from "../src/page/overlays/overlays"
 import { attachController } from "../src/foundation/kernel/controller"
-import { focusAfterClose, stackLayout, swipeDirections } from "../src/components/toast/toast-dom"
+import {
+  focusAfterClose,
+  stackLayout,
+  swipeDirections,
+} from "../src/components/toast/toast-dom"
 import { createToastTimers } from "../src/components/toast/toast-timers"
 import { toastRegion } from "../src/components/toast/toast"
-import { createToaster, toasterInternals } from "../src/components/toast/toaster"
+import {
+  createToaster,
+  toasterInternals,
+} from "../src/components/toast/toaster"
 import { press } from "../src/foundation/kernel/part"
 
 const quiet = () => createToaster({ overlays: createOverlays() })
@@ -17,14 +32,25 @@ describe("the queue", () => {
     const first = toast("Saved")
     const second = toast({ title: "Deleted", description: "report.pdf" })
     expect(toast.toasts().map((item) => item.id)).toEqual([second, first])
-    expect(toast.toasts()[1]).toMatchObject({ title: "Saved", type: "default", duration: 5000 })
-    expect(toast.toasts()[0]).toMatchObject({ title: "Deleted", description: "report.pdf" })
+    expect(toast.toasts()[1]).toMatchObject({
+      title: "Saved",
+      type: "default",
+      duration: 5000,
+    })
+    expect(toast.toasts()[0]).toMatchObject({
+      title: "Deleted",
+      description: "report.pdf",
+    })
   })
 
   test("a message with options merges them", () => {
     const toast = quiet()
     toast("Saved", { description: "Just now", duration: 1000 })
-    expect(toast.toasts()[0]).toMatchObject({ title: "Saved", description: "Just now", duration: 1000 })
+    expect(toast.toasts()[0]).toMatchObject({
+      title: "Saved",
+      description: "Just now",
+      duration: 1000,
+    })
   })
 
   test("framework elements are content, not options", () => {
@@ -40,7 +66,11 @@ describe("the queue", () => {
     toast.loading("Saving")
     toast.success("Saved")
     const [success, loading, error] = toast.toasts()
-    expect(success).toMatchObject({ type: "success", priority: "polite", duration: 5000 })
+    expect(success).toMatchObject({
+      type: "success",
+      priority: "polite",
+      duration: 5000,
+    })
     expect(loading).toMatchObject({ type: "loading", duration: Infinity })
     expect(error).toMatchObject({ type: "error", priority: "assertive" })
   })
@@ -49,7 +79,10 @@ describe("the queue", () => {
     const toast = createToaster({ duration: 8000, overlays: createOverlays() })
     toast("A")
     toast("B", { duration: Infinity })
-    expect(toast.toasts().map((item) => item.duration)).toEqual([Infinity, 8000])
+    expect(toast.toasts().map((item) => item.duration)).toEqual([
+      Infinity,
+      8000,
+    ])
   })
 
   test("a toast with an id that's showing is updated, not added again", () => {
@@ -57,7 +90,11 @@ describe("the queue", () => {
     toast("Uploading", { id: "upload" })
     toast("Uploaded", { id: "upload" })
     expect(toast.toasts()).toHaveLength(1)
-    expect(toast.toasts()[0]).toMatchObject({ id: "upload", title: "Uploaded", version: 2 })
+    expect(toast.toasts()[0]).toMatchObject({
+      id: "upload",
+      title: "Uploaded",
+      version: 2,
+    })
   })
 
   test("update changes a showing toast and never brings back a closed one", () => {
@@ -73,7 +110,9 @@ describe("the queue", () => {
   test("dismiss closes one toast by id, or all of them, and reports why", () => {
     const toast = quiet()
     const reasons: string[] = []
-    const a = toast("A", { onDismiss: ({ reason }) => reasons.push(`a:${reason}`) })
+    const a = toast("A", {
+      onDismiss: ({ reason }) => reasons.push(`a:${reason}`),
+    })
     toast("B", { onDismiss: ({ reason }) => reasons.push(`b:${reason}`) })
     toast("C")
     toast.dismiss(a)
@@ -85,7 +124,9 @@ describe("the queue", () => {
 
   test("onDismiss can keep a toast", () => {
     const toast = quiet()
-    const id = toast("Unsaved", { onDismiss: (details) => details.reason === "swipe" && details.cancel() })
+    const id = toast("Unsaved", {
+      onDismiss: (details) => details.reason === "swipe" && details.cancel(),
+    })
     expect(toasterInternals(toast).close(id, "swipe")).toBe(false)
     expect(toast.toasts()).toHaveLength(1)
     expect(toasterInternals(toast).close(id, "close-press")).toBe(true)
@@ -99,7 +140,11 @@ describe("the queue", () => {
       success: (name) => `Saved ${name}`,
       error: "Failed",
     })
-    expect(toast.toasts()[0]).toMatchObject({ id, type: "loading", duration: Infinity })
+    expect(toast.toasts()[0]).toMatchObject({
+      id,
+      type: "loading",
+      duration: Infinity,
+    })
     resolve("report.pdf")
     await Promise.resolve()
     expect(toast.toasts()[0]).toMatchObject({
@@ -114,10 +159,17 @@ describe("the queue", () => {
     const toast = quiet()
     toast.promise(() => Promise.reject(new Error("offline")), {
       loading: "Saving",
-      error: (error) => ({ title: "Failed", description: (error as Error).message }),
+      error: (error) => ({
+        title: "Failed",
+        description: (error as Error).message,
+      }),
     })
     await new Promise((done) => setTimeout(done))
-    expect(toast.toasts()[0]).toMatchObject({ type: "error", title: "Failed", description: "offline" })
+    expect(toast.toasts()[0]).toMatchObject({
+      type: "error",
+      title: "Failed",
+      description: "offline",
+    })
   })
 
   test("a promise toast dismissed while loading stays closed", async () => {
@@ -152,7 +204,12 @@ describe("timers", () => {
   beforeEach(() => vi.useFakeTimers())
   afterEach(() => vi.useRealTimers())
 
-  const shown = (id: string, duration = 4000, version = 1, held = false) => ({ id, version, duration, held })
+  const shown = (id: string, duration = 4000, version = 1, held = false) => ({
+    id,
+    version,
+    duration,
+    held,
+  })
 
   test("a shown toast expires after its duration", () => {
     const expired: string[] = []
@@ -287,14 +344,34 @@ describe("swipe", () => {
   })
 
   test("far enough or fast enough dismisses, toward allowed directions only", () => {
-    const still = { velocityX: 0, velocityY: 0, directions: ["down", "right"] as const }
-    expect(swipeOutcome({ ...still, directions: [...still.directions], x: 0, y: 45 })).toBe("down")
-    expect(swipeOutcome({ ...still, directions: [...still.directions], x: 0, y: 20 })).toBeNull()
-    expect(swipeOutcome({ ...still, directions: [...still.directions], x: 0, y: 20, velocityY: 0.5 })).toBe(
-      "down",
-    )
+    const still = {
+      velocityX: 0,
+      velocityY: 0,
+      directions: ["down", "right"] as const,
+    }
     expect(
-      swipeOutcome({ ...still, directions: [...still.directions], x: -80, y: 0, velocityX: -2 }),
+      swipeOutcome({ ...still, directions: [...still.directions], x: 0, y: 45 })
+    ).toBe("down")
+    expect(
+      swipeOutcome({ ...still, directions: [...still.directions], x: 0, y: 20 })
+    ).toBeNull()
+    expect(
+      swipeOutcome({
+        ...still,
+        directions: [...still.directions],
+        x: 0,
+        y: 20,
+        velocityY: 0.5,
+      })
+    ).toBe("down")
+    expect(
+      swipeOutcome({
+        ...still,
+        directions: [...still.directions],
+        x: -80,
+        y: 0,
+        velocityX: -2,
+      })
     ).toBeNull()
   })
 })
@@ -312,7 +389,7 @@ describe("stacking and focus", () => {
         { id: "b", index: 1, leaving: true },
         { id: "a", index: 1, leaving: false },
       ],
-      heights,
+      heights
     )
     expect([...stack.layout]).toEqual([
       ["c", { index: 0, offset: 0 }],
@@ -358,7 +435,9 @@ describe("confirm", () => {
     ;(overlays.entries()[0].data as ConfirmEntry).done()
     expect(await first).toBe(false)
     await Promise.resolve()
-    expect((overlays.entries()[0].data as ConfirmEntry).payload).toEqual({ title: "Second?" })
+    expect((overlays.entries()[0].data as ConfirmEntry).payload).toEqual({
+      title: "Second?",
+    })
     ;(overlays.entries()[0].data as ConfirmEntry).done()
     expect(await second).toBe(false)
   })
@@ -372,13 +451,27 @@ describe("buttons", () => {
     const region = toastRegion({ id: "r", toaster })
     const disconnect = region.api.internal.connect()
     const id = toaster("Saved", { duration: Infinity })
-    region.api.internal.press("action-1", id, () => Promise.resolve(), false, "action")
+    region.api.internal.press(
+      "action-1",
+      id,
+      () => Promise.resolve(),
+      false,
+      "action"
+    )
     expect(Object.keys(region.get().buttons)).toEqual(["action-1"])
     await settle()
     expect(region.get().buttons).toEqual({})
-    region.api.internal.press("action-2", id, () => Promise.reject("offline"), false, "action")
+    region.api.internal.press(
+      "action-2",
+      id,
+      () => Promise.reject("offline"),
+      false,
+      "action"
+    )
     await settle()
-    expect(region.get().buttons).toEqual({ "action-2": { pending: false, error: "offline" } })
+    expect(region.get().buttons).toEqual({
+      "action-2": { pending: false, error: "offline" },
+    })
     toaster.dismiss(id)
     await settle()
     expect(region.get().buttons).toEqual({})
@@ -396,7 +489,13 @@ describe("debug", () => {
     const region = toastRegion({ id: "r", toaster, debug: true })
     const disconnect = region.api.internal.connect()
     const id = toaster("Saved", { duration: Infinity })
-    region.api.internal.press("a", id, () => Promise.reject("offline"), false, "action")
+    region.api.internal.press(
+      "a",
+      id,
+      () => Promise.reject("offline"),
+      false,
+      "action"
+    )
     await settle()
     expect(log.mock.calls.map(([line]) => String(line))).toEqual([
       expect.stringContaining("toast#r pending: true (action"),

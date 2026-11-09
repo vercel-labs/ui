@@ -1,5 +1,10 @@
 import * as React from "react"
-import { createChange, createController, definePrimitive, type ChangeDetails } from "@ui-sdk/core"
+import {
+  createChange,
+  createController,
+  definePrimitive,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 function createCountdownController() {
@@ -12,7 +17,10 @@ function createCountdownController() {
 
 type CountdownOptions = {
   controller?: ReturnType<typeof createCountdownController>
-  onLeftChange?: (left: number, details: ChangeDetails<"imperative" | "timeout">) => void
+  onLeftChange?: (
+    left: number,
+    details: ChangeDetails<"imperative" | "timeout">
+  ) => void
 }
 
 type CountdownState = { left: number }
@@ -32,7 +40,9 @@ const countdown = definePrimitive({
         timer = setInterval(() => {
           const left = context.store.get().left - 1
           change("left", left, { reason: "timeout" })
-          if (left <= 0) clearInterval(timer)
+          if (left <= 0) {
+            clearInterval(timer)
+          }
         }, 1000)
       },
       stop() {

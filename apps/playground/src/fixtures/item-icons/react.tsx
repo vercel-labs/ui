@@ -29,7 +29,13 @@ import {
   CommandItemText,
   CommandList,
 } from "@ui-sdk/react/command"
-import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuTrigger } from "@ui-sdk/react/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuItemIcon,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -51,11 +57,22 @@ import { Tabs, TabsList, TabsTab, TabsTabIcon } from "@ui-sdk/react/tabs"
 import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/react/toggle"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { icons, iconsFixture as f, iconsOptions, type IconName } from "tests/fixtures/item-icons.ts"
+import {
+  icons,
+  iconsFixture as f,
+  iconsOptions,
+  type IconName,
+} from "tests/fixtures/item-icons.ts"
 
 function Svg({ name }: { name: IconName }) {
   return (
-    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor">
+    <svg
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+    >
       <title>{icons[name].title}</title>
       <path d={icons[name].path} />
     </svg>
@@ -78,11 +95,16 @@ function Fixture() {
         <MenuContent className="popup">
           {f.menu.items.map((item) => (
             <MenuItem key={item.value} value={item.value}>
-              {(item.icon || item.emoji) && <MenuItemIcon mirror={item.mirror}>{glyph(item)}</MenuItemIcon>}
+              {(item.icon || item.emoji) && (
+                <MenuItemIcon mirror={item.mirror}>{glyph(item)}</MenuItemIcon>
+              )}
               {item.label}
             </MenuItem>
           ))}
-          <MenuItem value={f.menu.iconOnly.value} aria-label={f.menu.iconOnly.label}>
+          <MenuItem
+            value={f.menu.iconOnly.value}
+            aria-label={f.menu.iconOnly.label}
+          >
             <MenuItemIcon>{glyph(f.menu.iconOnly)}</MenuItemIcon>
           </MenuItem>
           {unnamed && (
@@ -108,22 +130,33 @@ function Fixture() {
         <SelectContent className="popup list-popup">
           {f.select.items.map((item) => (
             <SelectItem key={item.value} className="item" value={item.value}>
-              {(item.icon || item.emoji) && <SelectItemIcon>{glyph(item)}</SelectItemIcon>}
+              {(item.icon || item.emoji) && (
+                <SelectItemIcon>{glyph(item)}</SelectItemIcon>
+              )}
               {item.label}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
-      <Combobox<string> defaultValue={combobox} onValueChange={(value) => setAction(`combobox:${value}`)}>
+      <Combobox<string>
+        defaultValue={combobox}
+        onValueChange={(value) => setAction(`combobox:${value}`)}
+      >
         <ComboboxLabel className="label">{f.combobox.label}</ComboboxLabel>
         <ComboboxValueIcon className="value-icon" />
         <ComboboxInput className="input" />
         <ComboboxContent className="popup list-popup">
           <ComboboxList>
             {f.combobox.items.map((item) => (
-              <ComboboxItem key={item.value} className="item" value={item.value}>
-                {(item.icon || item.emoji) && <ComboboxItemIcon>{glyph(item)}</ComboboxItemIcon>}
+              <ComboboxItem
+                key={item.value}
+                className="item"
+                value={item.value}
+              >
+                {(item.icon || item.emoji) && (
+                  <ComboboxItemIcon>{glyph(item)}</ComboboxItemIcon>
+                )}
                 <ComboboxItemText>{item.label}</ComboboxItemText>
               </ComboboxItem>
             ))}
@@ -132,13 +165,19 @@ function Fixture() {
       </Combobox>
 
       <Autocomplete>
-        <AutocompleteLabel className="label">{f.autocomplete.label}</AutocompleteLabel>
+        <AutocompleteLabel className="label">
+          {f.autocomplete.label}
+        </AutocompleteLabel>
         <AutocompleteInput className="input" />
         <AutocompleteContent className="popup list-popup">
           <AutocompleteEmpty className="empty">No results</AutocompleteEmpty>
           <AutocompleteList>
             {f.autocomplete.items.map((item) => (
-              <AutocompleteItem key={item.value} className="item" value={item.label}>
+              <AutocompleteItem
+                key={item.value}
+                className="item"
+                value={item.label}
+              >
                 <AutocompleteItemIcon>{glyph(item)}</AutocompleteItemIcon>
                 <AutocompleteItemText>{item.label}</AutocompleteItemText>
               </AutocompleteItem>
@@ -147,13 +186,18 @@ function Fixture() {
         </AutocompleteContent>
       </Autocomplete>
 
-      <Command className="command" onAction={(value) => setAction(`command:${value}`)}>
+      <Command
+        className="command"
+        onAction={(value) => setAction(`command:${value}`)}
+      >
         <CommandInput className="input" aria-label={f.command.label} />
         <CommandEmpty className="empty">No results</CommandEmpty>
         <CommandList className="command-list">
           {f.command.items.map((item) => (
             <CommandItem key={item.value} className="item" value={item.value}>
-              {(item.icon || item.emoji) && <CommandItemIcon>{glyph(item)}</CommandItemIcon>}
+              {(item.icon || item.emoji) && (
+                <CommandItemIcon>{glyph(item)}</CommandItemIcon>
+              )}
               <CommandItemText>{item.label}</CommandItemText>
             </CommandItem>
           ))}
@@ -168,7 +212,11 @@ function Fixture() {
               {tab.label}
             </TabsTab>
           ))}
-          <TabsTab className="tab" value={f.tabs.iconOnly.value} aria-label={f.tabs.iconOnly.label}>
+          <TabsTab
+            className="tab"
+            value={f.tabs.iconOnly.value}
+            aria-label={f.tabs.iconOnly.label}
+          >
             <TabsTabIcon>{glyph(f.tabs.iconOnly)}</TabsTabIcon>
           </TabsTab>
         </TabsList>
@@ -179,7 +227,11 @@ function Fixture() {
           <ToggleIcon>{glyph(f.toggles.bold)}</ToggleIcon>
           {f.toggles.bold.label}
         </Toggle>
-        <Toggle className="toggle" value={f.toggles.iconOnly.value} aria-label={f.toggles.iconOnly.label}>
+        <Toggle
+          className="toggle"
+          value={f.toggles.iconOnly.value}
+          aria-label={f.toggles.iconOnly.label}
+        >
           <ToggleIcon>{glyph(f.toggles.iconOnly)}</ToggleIcon>
         </Toggle>
       </ToggleGroup>
@@ -189,7 +241,9 @@ function Fixture() {
           {f.navigation.links.map((link) => (
             <NavigationMenuItem key={link.value} value={link.value}>
               <NavigationMenuLink href={`#${link.value}`} className="nav-link">
-                <NavigationMenuLinkIcon mirror={link.mirror}>{glyph(link)}</NavigationMenuLinkIcon>
+                <NavigationMenuLinkIcon mirror={link.mirror}>
+                  {glyph(link)}
+                </NavigationMenuLinkIcon>
                 {link.label}
               </NavigationMenuLink>
             </NavigationMenuItem>

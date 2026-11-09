@@ -1,6 +1,10 @@
 <script lang="ts">
   import { ChevronDownIcon } from "@lucide/svelte"
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "@ui-sdk/svelte/collapsible"
 
   const items = [
     { name: "Linen shirt", price: "$48.00" },

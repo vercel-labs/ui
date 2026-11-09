@@ -8,7 +8,14 @@ import {
   type CheckedState,
 } from "@ui-sdk/core/checkbox"
 import type { ChangeDetails } from "@ui-sdk/core"
-import { defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
+import {
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { useFieldControl } from "./field-context"
 import { toggleProps } from "./toggle-props"
 import { createParts, withElement } from "./create-parts"
@@ -25,8 +32,9 @@ import { readOnlyOf } from "./text-control"
 const parts = createParts(checkboxPrimitive, { indicator: "span" })
 
 // The group's own key, so a checkbox can join a group without bundling it.
-const CheckboxGroupKey: InjectionKey<PrimitiveHandle<typeof checkboxGroupPrimitive>> =
-  Symbol("checkbox-group")
+const CheckboxGroupKey: InjectionKey<
+  PrimitiveHandle<typeof checkboxGroupPrimitive>
+> = Symbol("checkbox-group")
 
 /**
  * The control and the hidden native input that takes part in the form.
@@ -38,9 +46,18 @@ const Checkbox = withElement(
     name: "Checkbox",
     inheritAttrs: false,
     props: {
-      checked: { type: [Boolean, String] as PropType<CheckedState>, default: undefined },
-      modelValue: { type: [Boolean, String] as PropType<CheckedState>, default: undefined },
-      defaultChecked: { type: [Boolean, String] as PropType<CheckedState>, default: undefined },
+      checked: {
+        type: [Boolean, String] as PropType<CheckedState>,
+        default: undefined,
+      },
+      modelValue: {
+        type: [Boolean, String] as PropType<CheckedState>,
+        default: undefined,
+      },
+      defaultChecked: {
+        type: [Boolean, String] as PropType<CheckedState>,
+        default: undefined,
+      },
       parent: optionalBoolean,
       controller: Object as PropType<CheckboxController>,
       ...toggleProps,
@@ -48,7 +65,10 @@ const Checkbox = withElement(
     emits: {
       "update:checked": (_checked: CheckedState) => true,
       "update:modelValue": (_checked: CheckedState) => true,
-      checkedChange: (_checked: CheckedState, _details: ChangeDetails<CheckboxCheckedChangeReason>) => true,
+      checkedChange: (
+        _checked: CheckedState,
+        _details: ChangeDetails<CheckboxCheckedChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof checkboxPrimitive, "root">,
     setup(props, { attrs, emit }) {
@@ -68,18 +88,26 @@ const Checkbox = withElement(
         form: props.form,
         controller: props.controller,
         debug: props.debug,
-        onCheckedChange: (checked: CheckedState, details: ChangeDetails<CheckboxCheckedChangeReason>) => {
+        onCheckedChange: (
+          checked: CheckedState,
+          details: ChangeDetails<CheckboxCheckedChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("checkedChange", checked, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:checked", checked)
           emit("update:modelValue", checked)
         },
       }))
-      const root = usePart(checkbox, "root", undefined, undefined, { tag: "button", extend: field?.props })
+      const root = usePart(checkbox, "root", undefined, undefined, {
+        tag: "button",
+        extend: field?.props,
+      })
       return () => [root(), h("input", checkbox.slot("input"))]
     },
-  }),
+  })
 )
 
 /**
@@ -114,7 +142,10 @@ const CheckboxGroup = /* @__PURE__ */ withElement(
     emits: {
       "update:value": (_value: string[]) => true,
       "update:modelValue": (_value: string[]) => true,
-      valueChange: (_value: string[], _details: ChangeDetails<CheckboxGroupValueChangeReason>) => true,
+      valueChange: (
+        _value: string[],
+        _details: ChangeDetails<CheckboxGroupValueChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof checkboxGroupPrimitive, "group">,
     setup(props, { emit }) {
@@ -130,22 +161,33 @@ const CheckboxGroup = /* @__PURE__ */ withElement(
         form: props.form,
         controller: props.controller,
         debug: props.debug,
-        onValueChange: (value: string[], details: ChangeDetails<CheckboxGroupValueChangeReason>) => {
+        onValueChange: (
+          value: string[],
+          details: ChangeDetails<CheckboxGroupValueChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
       }))
       provide(CheckboxGroupKey, group)
-      const root = usePart(group, "group", undefined, undefined, { tag: "div", extend: field?.props })
+      const root = usePart(group, "group", undefined, undefined, {
+        tag: "div",
+        extend: field?.props,
+      })
       return () => [root(), h("input", group.slot("group-input"))]
     },
-  }),
+  })
 )
 
-export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
+export {
+  createCheckboxController,
+  createCheckboxGroupController,
+} from "@ui-sdk/core/checkbox"
 export type {
   CheckboxApi,
   CheckboxChangeOptions,

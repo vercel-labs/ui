@@ -1,5 +1,9 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/solid/password-input"
 
 function Example() {
   return (
@@ -41,7 +45,9 @@ function Example() {
           }
         </PasswordInputToggle>
       </PasswordInput>
-      <FieldDescription>Keep it somewhere safe. You can show it, but not change it.</FieldDescription>
+      <FieldDescription>
+        Keep it somewhere safe. You can show it, but not change it.
+      </FieldDescription>
     </Field>
   )
 }

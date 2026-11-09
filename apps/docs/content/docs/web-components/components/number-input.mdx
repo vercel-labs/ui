@@ -55,9 +55,15 @@ Import the parts and put them together:
 
 <ui-number-input default-value="1" min="0">
   <ui-number-input-group>
-    <ui-number-input-decrement><button aria-label="Decrease">−</button></ui-number-input-decrement>
-    <ui-number-input-control><input aria-label="Quantity" /></ui-number-input-control>
-    <ui-number-input-increment><button aria-label="Increase">+</button></ui-number-input-increment>
+    <ui-number-input-decrement
+      ><button aria-label="Decrease">−</button></ui-number-input-decrement
+    >
+    <ui-number-input-control
+      ><input aria-label="Quantity"
+    /></ui-number-input-control>
+    <ui-number-input-increment
+      ><button aria-label="Increase">+</button></ui-number-input-increment
+    >
   </ui-number-input-group>
 </ui-number-input>
 ```
@@ -138,12 +144,18 @@ Set `disabled` on the component or its enclosing fieldset to prevent focus, chan
   <ui-field-label>Quantity</ui-field-label>
   <ui-number-input default-value="3" disabled>
     <ui-number-input-group>
-      <ui-number-input-decrement><button aria-label="Decrease">−</button></ui-number-input-decrement>
+      <ui-number-input-decrement
+        ><button aria-label="Decrease">−</button></ui-number-input-decrement
+      >
       <ui-number-input-control><input /></ui-number-input-control>
-      <ui-number-input-increment><button aria-label="Increase">+</button></ui-number-input-increment>
+      <ui-number-input-increment
+        ><button aria-label="Increase">+</button></ui-number-input-increment
+      >
     </ui-number-input-group>
   </ui-number-input>
-  <ui-field-description>Sold out. You can't change the quantity.</ui-field-description>
+  <ui-field-description
+    >Sold out. You can't change the quantity.</ui-field-description
+  >
 </ui-field>
 ```
 
@@ -158,9 +170,13 @@ Set `read-only` to keep the value focusable and included in form data while prev
   <ui-field-label>Seats included</ui-field-label>
   <ui-number-input default-value="5" read-only>
     <ui-number-input-group>
-      <ui-number-input-decrement><button aria-label="Decrease">−</button></ui-number-input-decrement>
+      <ui-number-input-decrement
+        ><button aria-label="Decrease">−</button></ui-number-input-decrement
+      >
       <ui-number-input-control><input /></ui-number-input-control>
-      <ui-number-input-increment><button aria-label="Increase">+</button></ui-number-input-increment>
+      <ui-number-input-increment
+        ><button aria-label="Increase">+</button></ui-number-input-increment
+      >
     </ui-number-input-group>
   </ui-number-input>
   <ui-field-description>Set by your plan.</ui-field-description>
@@ -177,9 +193,13 @@ Use `required` to block an empty value. Field associates its error with the inpu
     <ui-field-label>Age</ui-field-label>
     <ui-number-input name="age" required min="18" max="120">
       <ui-number-input-group>
-        <ui-number-input-decrement><button aria-label="Decrease">−</button></ui-number-input-decrement>
+        <ui-number-input-decrement
+          ><button aria-label="Decrease">−</button></ui-number-input-decrement
+        >
         <ui-number-input-control><input /></ui-number-input-control>
-        <ui-number-input-increment><button aria-label="Increase">+</button></ui-number-input-increment>
+        <ui-number-input-increment
+          ><button aria-label="Increase">+</button></ui-number-input-increment
+        >
       </ui-number-input-group>
     </ui-number-input>
     <ui-field-error match="valueMissing">Enter your age.</ui-field-error>
@@ -274,7 +294,10 @@ Props are attributes in kebab case, like `default-value`, `large-step` and `read
 
 ### NumberInput
 
-<TypeTable path="../../packages/core/src/components/number-input/number-input.ts" name="NumberInputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputOptions"
+/>
 
 ### NumberInputScrubArea
 
@@ -294,7 +317,10 @@ Props are attributes in kebab case, like `default-value`, `large-step` and `read
 
 The same state shows as data attributes on each element.
 
-<StateTable path="../../packages/core/src/components/number-input/number-input.ts" name="NumberInputState" />
+<StateTable
+  path="../../packages/core/src/components/number-input/number-input.ts"
+  name="NumberInputState"
+/>
 
 The buttons' state, `NumberInputButtonState`, says whether that button can step, and whether the value is at its bound, apart from a disabled field:
 

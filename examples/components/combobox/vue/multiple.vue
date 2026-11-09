@@ -31,13 +31,21 @@ const frameworkLabel = (value: string) =>
 </script>
 
 <template>
-  <Combobox multiple :default-value="['next', 'astro']" :item-to-label="frameworkLabel">
+  <Combobox
+    multiple
+    :default-value="['next', 'astro']"
+    :item-to-label="frameworkLabel"
+  >
     <div data-slot="stack">
       <ComboboxLabel>Frameworks</ComboboxLabel>
       <div data-slot="row">
         <ComboboxChips>
           <ComboboxValue v-slot="{ state }">
-            <ComboboxChip v-for="(value, index) in state.value as string[]" :key="value" :value="value">
+            <ComboboxChip
+              v-for="(value, index) in state.value as string[]"
+              :key="value"
+              :value="value"
+            >
               {{ state.labels[index] }}
               <ComboboxChipRemove :aria-label="`Remove ${state.labels[index]}`">
                 <XIcon aria-hidden="true" />

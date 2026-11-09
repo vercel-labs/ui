@@ -2,7 +2,8 @@ import AxeBuilder from "@axe-core/playwright"
 import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
 
-const dialog = (page: Page) => page.getByRole("dialog", { name: "Edit profile" })
+const dialog = (page: Page) =>
+  page.getByRole("dialog", { name: "Edit profile" })
 const trigger = (page: Page) => page.getByRole("button", { name: "Profile" })
 
 async function audit(page: Page) {
@@ -10,7 +11,9 @@ async function audit(page: Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations while closed", async ({ page, open }) => {
@@ -32,11 +35,16 @@ test("no axe violations while open as a modal", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("the popover is named by its title and described by its description", async ({ page, open }) => {
+test("the popover is named by its title and described by its description", async ({
+  page,
+  open,
+}) => {
   await open("popover")
   await trigger(page).click()
   await expect(dialog(page)).toHaveAccessibleName("Edit profile")
-  await expect(dialog(page)).toHaveAccessibleDescription("Your name appears on your posts.")
+  await expect(dialog(page)).toHaveAccessibleDescription(
+    "Your name appears on your posts."
+  )
 })
 
 test("the trigger advertises a dialog", async ({ page, open }) => {
@@ -57,7 +65,7 @@ test(
     await open("popover", { modal: "true" })
     await trigger(page).click()
     await expect(dialog(page)).toHaveAttribute("aria-modal", "true")
-  },
+  }
 )
 
 // Every implementation must expose the same accessibility tree.

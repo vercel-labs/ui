@@ -21,7 +21,9 @@ function Example() {
       multiple
       activation="automatic"
       defaultValue={["readme"]}
-      onValueChange={(value, details) => log(`${value.length} selected (${details.reason})`)}
+      onValueChange={(value, details) =>
+        log(`${value.length} selected (${details.reason})`)
+      }
       aria-label="Files"
     >
       {files.map((file) => (

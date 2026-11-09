@@ -23,11 +23,17 @@ class FakeTextarea extends EventTarget {
     height: "",
     fieldSizing: "",
     setProperty(name: string, value: string) {
-      if (name === "field-sizing") this.fieldSizing = value
+      if (name === "field-sizing") {
+        this.fieldSizing = value
+      }
     },
     removeProperty(name: string) {
-      if (name === "height") this.height = ""
-      if (name === "field-sizing") this.fieldSizing = ""
+      if (name === "height") {
+        this.height = ""
+      }
+      if (name === "field-sizing") {
+        this.fieldSizing = ""
+      }
     },
   }
   get scrollHeight() {
@@ -56,7 +62,12 @@ function setup(options: { autoResize?: boolean; defaultValue?: string } = {}) {
 }
 
 // Binds with core attaching the listeners, so dispatched keys reach the root's handlers.
-function setupKeys(options: { submitShortcut?: "enter" | "mod+enter"; onSubmit?: () => void } = {}) {
+function setupKeys(
+  options: {
+    submitShortcut?: "enter" | "mod+enter"
+    onSubmit?: () => void
+  } = {}
+) {
   const el = new FakeTextarea()
   el.value = "Hi Hollis"
   el.form = { requestSubmit: vi.fn() }
@@ -89,7 +100,15 @@ afterEach(() => {
 describe("textarea", () => {
   test("marks its state with data attributes", () => {
     const instance = textarea({ id: "t", defaultValue: "Hello" })
-    expect(attrs(instance.part("root", { disabled: true, readOnly: true, required: true }))).toMatchObject({
+    expect(
+      attrs(
+        instance.part("root", {
+          disabled: true,
+          readOnly: true,
+          required: true,
+        })
+      )
+    ).toMatchObject({
       "data-filled": "",
       "data-disabled": "",
       "data-readonly": "",
@@ -119,7 +138,10 @@ describe("textarea", () => {
     instance.api.setValue("One")
     expect(el.style.height).toBe("38px")
     // Typing changes the value without going through the \`value\` setter.
-    Object.getOwnPropertyDescriptor(FakeTextarea.prototype, "value")!.set!.call(el, "One\nTwo")
+    Object.getOwnPropertyDescriptor(FakeTextarea.prototype, "value")!.set!.call(
+      el,
+      "One\nTwo"
+    )
     el.dispatchEvent(new Event("input"))
     expect(el.style.height).toBe("58px")
     unbind()
@@ -129,7 +151,8 @@ describe("textarea", () => {
 
   test("with autoResize, browsers with field-sizing size it with CSS", () => {
     vi.stubGlobal("CSS", {
-      supports: (property: string, value: string) => property === "field-sizing" && value === "content",
+      supports: (property: string, value: string) =>
+        property === "field-sizing" && value === "content",
     })
     const { el, unbind } = setup({ autoResize: true, defaultValue: "One\nTwo" })
     expect(el.style.fieldSizing).toBe("content")
@@ -160,7 +183,9 @@ describe("textarea", () => {
     })
 
     test("with enter, Enter submits the form and Shift+Enter starts a new line", () => {
-      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "enter" })
+      const { press, requestSubmit, unbind } = setupKeys({
+        submitShortcut: "enter",
+      })
       expect(press({ shiftKey: true }).defaultPrevented).toBe(false)
       expect(press({ ctrlKey: true }).defaultPrevented).toBe(false)
       expect(requestSubmit).not.toHaveBeenCalled()
@@ -170,10 +195,14 @@ describe("textarea", () => {
     })
 
     test("with mod+enter, Ctrl+Enter submits and Enter starts a new line", () => {
-      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "mod+enter" })
+      const { press, requestSubmit, unbind } = setupKeys({
+        submitShortcut: "mod+enter",
+      })
       expect(press().defaultPrevented).toBe(false)
       expect(press({ metaKey: true }).defaultPrevented).toBe(false)
-      expect(press({ ctrlKey: true, shiftKey: true }).defaultPrevented).toBe(false)
+      expect(press({ ctrlKey: true, shiftKey: true }).defaultPrevented).toBe(
+        false
+      )
       expect(requestSubmit).not.toHaveBeenCalled()
       expect(press({ ctrlKey: true }).defaultPrevented).toBe(true)
       expect(requestSubmit).toHaveBeenCalledTimes(1)
@@ -182,7 +211,9 @@ describe("textarea", () => {
 
     test("with mod+enter on Apple platforms, Command+Enter submits", () => {
       setPlatform("apple")
-      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "mod+enter" })
+      const { press, requestSubmit, unbind } = setupKeys({
+        submitShortcut: "mod+enter",
+      })
       expect(press({ ctrlKey: true }).defaultPrevented).toBe(false)
       expect(press({ metaKey: true }).defaultPrevented).toBe(true)
       expect(requestSubmit).toHaveBeenCalledTimes(1)
@@ -191,7 +222,10 @@ describe("textarea", () => {
 
     test("onSubmit gets the value and the key press instead of the form submitting", () => {
       const onSubmit = vi.fn()
-      const { press, requestSubmit, unbind } = setupKeys({ submitShortcut: "enter", onSubmit })
+      const { press, requestSubmit, unbind } = setupKeys({
+        submitShortcut: "enter",
+        onSubmit,
+      })
       const event = press()
       expect(onSubmit).toHaveBeenCalledWith("Hi Hollis", { event })
       expect(requestSubmit).not.toHaveBeenCalled()
@@ -207,7 +241,10 @@ describe("textarea", () => {
 
     test("outside a form, onSubmit still runs on the shortcut", () => {
       const onSubmit = vi.fn()
-      const { el, press, unbind } = setupKeys({ submitShortcut: "mod+enter", onSubmit })
+      const { el, press, unbind } = setupKeys({
+        submitShortcut: "mod+enter",
+        onSubmit,
+      })
       el.form = null
       expect(press({ ctrlKey: true }).defaultPrevented).toBe(true)
       expect(onSubmit).toHaveBeenCalledTimes(1)
@@ -227,7 +264,11 @@ describe("textarea", () => {
     test("setting it after binding takes effect on the next key press", () => {
       const { instance, press, requestSubmit, unbind } = setupKeys()
       press()
-      instance.setOptions({ id: "t", defaultValue: "Hi Hollis", submitShortcut: "enter" })
+      instance.setOptions({
+        id: "t",
+        defaultValue: "Hi Hollis",
+        submitShortcut: "enter",
+      })
       press()
       expect(requestSubmit).toHaveBeenCalledTimes(1)
       unbind()

@@ -4,7 +4,9 @@ import type { ComponentProps, Snippet } from "svelte"
 import { TooltipContent } from "../../src/tooltip"
 
 type Day = { count: number }
-type StateOf<Props> = Props extends { children?: Snippet<[infer State]> } ? State : never
+type StateOf<Props> = Props extends { children?: Snippet<[infer State]> }
+  ? State
+  : never
 type DayPayload = StateOf<ComponentProps<typeof TooltipContent<Day>>>["payload"]
 type DefaultPayload = StateOf<ComponentProps<typeof TooltipContent>>["payload"]
 type IsUnknown<T> = unknown extends T ? true : false

@@ -14,15 +14,25 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
-test("announcements while searching with a keyboard", async ({ page, open, tab }) => {
+test("announcements while searching with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("command", { sr: "" })
   const input = page.getByRole("combobox", { name: "Search commands" })
   const log = await record(page, async () => {
@@ -30,11 +40,18 @@ test("announcements while searching with a keyboard", async ({ page, open, tab }
     await tab()
     await expect(input).toBeFocused()
     await page.keyboard.type("bil")
-    await expect(page.getByRole("option", { name: /Billing/ })).toHaveAttribute("data-highlighted", "")
+    await expect(page.getByRole("option", { name: /Billing/ })).toHaveAttribute(
+      "data-highlighted",
+      ""
+    )
   })
   // The fixture's own status regions aren't part of the contract, and neither
   // are live regions that empty out, which say nothing.
-  expect(log.filter((phrase) => !/^polite: (Last action|Last highlight|$)/.test(phrase))).toEqual([
+  expect(
+    log.filter(
+      (phrase) => !/^polite: (Last action|Last highlight|$)/.test(phrase)
+    )
+  ).toEqual([
     "document",
     "button, Before",
     "combobox, Search commands, has popup listbox, expanded, active descendant Calendar, autocomplete in list, 1 control",

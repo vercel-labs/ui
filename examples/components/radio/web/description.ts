@@ -3,8 +3,16 @@ import "@ui-sdk/web/radio"
 
 const frequencies = [
   { value: "instant", label: "Instantly", description: "An email right away." },
-  { value: "daily", label: "Daily digest", description: "One email each morning." },
-  { value: "weekly", label: "Weekly digest", description: "A summary every Monday." },
+  {
+    value: "daily",
+    label: "Daily digest",
+    description: "One email each morning.",
+  },
+  {
+    value: "weekly",
+    label: "Weekly digest",
+    description: "A summary every Monday.",
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -24,7 +32,7 @@ function mount(root: HTMLElement) {
                   <ui-field-description>${frequency.description}</ui-field-description>
                 </div>
               </ui-field>
-            `,
+            `
           )
           .join("")}
       </ui-radio-group>

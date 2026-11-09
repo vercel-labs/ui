@@ -50,7 +50,12 @@ const items: ListData = [
         <SelectSeparator />
         <SelectGroup>
           <SelectGroupLabel>Contact sales</SelectGroupLabel>
-          <SelectItem v-for="plan in sales" :key="plan.value" :value="plan.value" :disabled="plan.disabled">
+          <SelectItem
+            v-for="plan in sales"
+            :key="plan.value"
+            :value="plan.value"
+            :disabled="plan.disabled"
+          >
             {{ plan.label }}
             <SelectItemIndicator>
               <CheckIcon />

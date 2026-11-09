@@ -8,12 +8,17 @@ test.beforeEach(async ({ open }) => {
   await open("toolbar")
 })
 
-test("the toolbar is named and has a horizontal orientation", async ({ page }) => {
+test("the toolbar is named and has a horizontal orientation", async ({
+  page,
+}) => {
   await expect(toolbar(page)).toBeVisible()
   await expect(toolbar(page)).toHaveAttribute("aria-orientation", "horizontal")
 })
 
-test("Tab lands on the first item, and Tab again leaves the toolbar", async ({ page, tab }) => {
+test("Tab lands on the first item, and Tab again leaves the toolbar", async ({
+  page,
+  tab,
+}) => {
   await page.getByRole("button", { name: "Before" }).focus()
   await tab()
   await expectFocus(page, "Bold")
@@ -21,17 +26,26 @@ test("Tab lands on the first item, and Tab again leaves the toolbar", async ({ p
   await expectFocus(page, "After")
 })
 
-test("Shift+Tab from after the toolbar lands on its tab stop", async ({ page, tab }) => {
+test("Shift+Tab from after the toolbar lands on its tab stop", async ({
+  page,
+  tab,
+}) => {
   await page.getByRole("button", { name: "After" }).focus()
   await tab({ shift: true })
   await expectFocus(page, "Bold")
 })
 
-test("ArrowRight moves through every item, into toggle groups and out of fields", async ({ page, tab }) => {
+test("ArrowRight moves through every item, into toggle groups and out of fields", async ({
+  page,
+  tab,
+}) => {
   await walkTo(page, tab, "Help")
 })
 
-test("ArrowRight on the last item wraps to the first, and ArrowLeft back", async ({ page, tab }) => {
+test("ArrowRight on the last item wraps to the first, and ArrowLeft back", async ({
+  page,
+  tab,
+}) => {
   await walkTo(page, tab, "Help")
   await page.keyboard.press("ArrowRight")
   await expectFocus(page, "Bold")
@@ -39,11 +53,20 @@ test("ArrowRight on the last item wraps to the first, and ArrowLeft back", async
   await expectFocus(page, "Help")
 })
 
-test("arrow keys never press a toggle, and Space and Enter do", async ({ page, tab }) => {
+test("arrow keys never press a toggle, and Space and Enter do", async ({
+  page,
+  tab,
+}) => {
   await walkTo(page, tab, "Italic")
-  await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "false")
+  await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  )
   await page.keyboard.press("Space")
-  await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "true")
+  await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
   expect(await lastAction(page)).toBe("Text style: bold, italic")
   await page.keyboard.press("ArrowRight")
   await expectFocus(page, "Underline")
@@ -61,16 +84,25 @@ test("Tab comes back to the item focused last", async ({ page, tab }) => {
   await expectFocus(page, "Center")
 })
 
-test("a toggle group in the toolbar is no tab stop of its own", async ({ page, tab }) => {
+test("a toggle group in the toolbar is no tab stop of its own", async ({
+  page,
+  tab,
+}) => {
   await page.getByRole("button", { name: "Before" }).focus()
   await tab()
   await expectFocus(page, "Bold")
   await tab()
   await expectFocus(page, "After")
-  await expect(page.getByRole("button", { name: "Left" })).toHaveAttribute("tabindex", "-1")
+  await expect(page.getByRole("button", { name: "Left" })).toHaveAttribute(
+    "tabindex",
+    "-1"
+  )
 })
 
-test("a disabled button stays reachable, says it's disabled and does nothing", async ({ page, tab }) => {
+test("a disabled button stays reachable, says it's disabled and does nothing", async ({
+  page,
+  tab,
+}) => {
   await walkTo(page, tab, "Redo")
   const redo = page.getByRole("button", { name: "Redo" })
   await expect(redo).toHaveAttribute("aria-disabled", "true")
@@ -92,7 +124,10 @@ test("a menu trigger rendered through a button opens with ArrowDown, and arrows 
   tab,
 }) => {
   await walkTo(page, tab, "Font")
-  await expect(page.getByRole("button", { name: "Font" })).toHaveAttribute("aria-haspopup", "menu")
+  await expect(page.getByRole("button", { name: "Font" })).toHaveAttribute(
+    "aria-haspopup",
+    "menu"
+  )
   await page.keyboard.press("ArrowDown")
   await expect(menuNamed(page, "Font")).toBeVisible()
   await expectFocus(page, "Sans")
@@ -102,7 +137,9 @@ test("a menu trigger rendered through a button opens with ArrowDown, and arrows 
   await expectFocus(page, "Font size")
 })
 
-test("choosing from a menu in the toolbar returns focus to its trigger", async ({ page }) => {
+test("choosing from a menu in the toolbar returns focus to its trigger", async ({
+  page,
+}) => {
   await page.getByRole("button", { name: "Font" }).click()
   await page.getByRole("menuitem", { name: "Serif" }).click()
   expect(await lastAction(page)).toBe("font: Serif")
@@ -119,24 +156,37 @@ test("a text field keeps Home and End for its caret", async ({ page, tab }) => {
   await expectFocus(page, "Comment")
 })
 
-test("Up and Down step a number field in the toolbar", async ({ page, tab }) => {
+test("Up and Down step a number field in the toolbar", async ({
+  page,
+  tab,
+}) => {
   await walkTo(page, tab, "Font size")
   await page.keyboard.press("ArrowUp")
-  await expect(page.getByRole("textbox", { name: "Font size" })).toHaveValue("15")
+  await expect(page.getByRole("textbox", { name: "Font size" })).toHaveValue(
+    "15"
+  )
   await expectFocus(page, "Font size")
 })
 
 test("separators run across the toolbar", async ({ page }) => {
   const separators = toolbar(page).getByRole("separator")
   await expect(separators).toHaveCount(2)
-  await expect(separators.first()).toHaveAttribute("aria-orientation", "vertical")
+  await expect(separators.first()).toHaveAttribute(
+    "aria-orientation",
+    "vertical"
+  )
 })
 
 test("a group of buttons is named", async ({ page }) => {
-  await expect(toolbar(page).getByRole("group", { name: "History" })).toBeVisible()
+  await expect(
+    toolbar(page).getByRole("group", { name: "History" })
+  ).toBeVisible()
 })
 
-test("a link in the toolbar follows its href with Enter", async ({ page, tab }) => {
+test("a link in the toolbar follows its href with Enter", async ({
+  page,
+  tab,
+}) => {
   await walkTo(page, tab, "Help")
   await page.keyboard.press("Enter")
   await expect(page).toHaveURL(/#help$/)
@@ -147,7 +197,10 @@ test.describe("vertical", () => {
     await open("toolbar", { orientation: "vertical" })
   })
 
-  test("ArrowDown and ArrowUp move between items, and Left and Right don't", async ({ page, tab }) => {
+  test("ArrowDown and ArrowUp move between items, and Left and Right don't", async ({
+    page,
+    tab,
+  }) => {
     await expect(toolbar(page)).toHaveAttribute("aria-orientation", "vertical")
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
@@ -162,7 +215,7 @@ test.describe("vertical", () => {
   test("separators run across a vertical toolbar", async ({ page }) => {
     await expect(toolbar(page).getByRole("separator").first()).toHaveAttribute(
       "aria-orientation",
-      "horizontal",
+      "horizontal"
     )
   })
 })
@@ -184,9 +237,18 @@ test("a disabled toolbar keeps one tab stop, and every item says it's disabled",
   await page.getByRole("button", { name: "Before" }).focus()
   await tab()
   await expectFocus(page, "Bold")
-  await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-disabled", "true")
-  await expect(page.getByRole("button", { name: "Undo" })).toHaveAttribute("aria-disabled", "true")
-  await expect(page.getByRole("link", { name: "Help" })).toHaveAttribute("aria-disabled", "true")
+  await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  )
+  await expect(page.getByRole("button", { name: "Undo" })).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  )
+  await expect(page.getByRole("link", { name: "Help" })).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  )
   await page.keyboard.press("Space")
   await page.keyboard.press("ArrowRight")
   await expectFocus(page, "Italic")
@@ -200,16 +262,29 @@ test.describe("disabled groups", () => {
     await open("toolbar", { locked: "" })
   })
 
-  test("toggles and toggle groups in a disabled group are disabled", async ({ page }) => {
-    for (const name of ["Bold", "Italic", "Spellcheck", "Undo"])
-      await expect(page.getByRole("button", { name })).toHaveAttribute("aria-disabled", "true")
-    await page.getByRole("button", { name: "Spellcheck" }).click({ force: true })
+  test("toggles and toggle groups in a disabled group are disabled", async ({
+    page,
+  }) => {
+    for (const name of ["Bold", "Italic", "Spellcheck", "Undo"]) {
+      await expect(page.getByRole("button", { name })).toHaveAttribute(
+        "aria-disabled",
+        "true"
+      )
+    }
+    await page
+      .getByRole("button", { name: "Spellcheck" })
+      .click({ force: true })
     await page.getByRole("button", { name: "Italic" }).click({ force: true })
     expect(await lastAction(page)).toBe("")
-    await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "false")
+    await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    )
   })
 
-  test("a link in a disabled group is disabled, and follows its href once enabled", async ({ page }) => {
+  test("a link in a disabled group is disabled, and follows its href once enabled", async ({
+    page,
+  }) => {
     const help = page.getByRole("link", { name: "Help" })
     await expect(help).toHaveAttribute("aria-disabled", "true")
     await expect(help).toHaveAttribute("data-disabled", "")
@@ -221,10 +296,16 @@ test.describe("disabled groups", () => {
     await expect(page).toHaveURL(/#help$/)
   })
 
-  test("enabling a group enables the toggles and buttons in it", async ({ page }) => {
+  test("enabling a group enables the toggles and buttons in it", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: "Unlock" }).click()
-    for (const name of ["Bold", "Italic", "Spellcheck", "Undo"])
-      await expect(page.getByRole("button", { name })).not.toHaveAttribute("aria-disabled", "true")
+    for (const name of ["Bold", "Italic", "Spellcheck", "Undo"]) {
+      await expect(page.getByRole("button", { name })).not.toHaveAttribute(
+        "aria-disabled",
+        "true"
+      )
+    }
     await page.getByRole("button", { name: "Spellcheck" }).click()
     expect(await lastAction(page)).toBe("spellcheck: on")
     await page.getByRole("button", { name: "Italic" }).click()

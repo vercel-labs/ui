@@ -5,8 +5,19 @@ import { spawnSync } from "node:child_process"
 import { createRequire } from "node:module"
 import path from "node:path"
 
-const require = createRequire(path.join(import.meta.dirname, "typescript7/package.json"))
-const bin = path.join(path.dirname(require.resolve("typescript7/package.json")), "bin/tsc")
-const { status, error } = spawnSync(process.execPath, [bin, ...process.argv.slice(2)], { stdio: "inherit" })
-if (error) throw error
+const require = createRequire(
+  path.join(import.meta.dirname, "typescript7/package.json")
+)
+const bin = path.join(
+  path.dirname(require.resolve("typescript7/package.json")),
+  "bin/tsc"
+)
+const { status, error } = spawnSync(
+  process.execPath,
+  [bin, ...process.argv.slice(2)],
+  { stdio: "inherit" }
+)
+if (error) {
+  throw error
+}
 process.exit(status ?? 1)

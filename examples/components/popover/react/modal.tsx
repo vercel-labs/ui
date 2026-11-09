@@ -43,7 +43,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={modes} value={mode} onValueChange={(next) => next && setMode(next as Mode)}>
+        <Select
+          items={modes}
+          value={mode}
+          onValueChange={(next) => next && setMode(next as Mode)}
+        >
           <SelectLabel>Modal</SelectLabel>
           <SelectTrigger>
             <SelectValue />

@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { EyeIcon, EyeOffIcon } from "@lucide/vue"
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/vue/password-input"
 </script>
 
 <template>
@@ -14,6 +18,8 @@ import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sd
         <EyeIcon v-else aria-hidden="true" />
       </PasswordInputToggle>
     </PasswordInput>
-    <FieldDescription>Your administrator manages this password.</FieldDescription>
+    <FieldDescription
+      >Your administrator manages this password.</FieldDescription
+    >
   </Field>
 </template>

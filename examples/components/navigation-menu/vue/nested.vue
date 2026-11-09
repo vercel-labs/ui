@@ -19,7 +19,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -77,7 +78,11 @@ const groups = [
         <NavigationMenuContent>
           <NavigationMenu orientation="vertical">
             <NavigationMenuList>
-              <NavigationMenuItem v-for="group in groups" :key="group.value" :value="group.value">
+              <NavigationMenuItem
+                v-for="group in groups"
+                :key="group.value"
+                :value="group.value"
+              >
                 <NavigationMenuTrigger>
                   {{ group.label }}
                   <ChevronRightIcon />

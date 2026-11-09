@@ -12,7 +12,7 @@ const props = defineProps<{ value: string; label: string; class?: string }>()
     :class="
       cn(
         'flex h-5.5 w-fit items-center gap-1 rounded-2xl bg-input ps-1.5 pe-0.5 text-xs font-medium whitespace-nowrap outline-none focus-visible:ring-3 focus-visible:ring-ring/30',
-        props.class,
+        props.class
       )
     "
   >

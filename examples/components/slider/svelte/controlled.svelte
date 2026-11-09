@@ -21,7 +21,8 @@
   <Field>
     <Slider
       bind:value
-      onValueChange={(next, details) => log(`${[next].flat().join(" – ")} (${details.reason})`)}
+      onValueChange={(next, details) =>
+        log(`${[next].flat().join(" – ")} (${details.reason})`)}
       min={0}
       max={1}
       step={0.1}

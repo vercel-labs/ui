@@ -7,7 +7,15 @@ import path from "node:path"
 // `#`, which the preview ignores. Navigation Menu's router example keeps hash routes,
 // and pages whose links are hash routes on purpose, like Tabs', aren't listed.
 const root = path.join(import.meta.dirname, "../../examples/components")
-const components = ["hover-card", "navigation-menu", "carousel", "dialog", "drawer", "popover", "tooltip"]
+const components = [
+  "hover-card",
+  "navigation-menu",
+  "carousel",
+  "dialog",
+  "drawer",
+  "popover",
+  "tooltip",
+]
 const hashLink = /href(?:=|: ?|", )["'`{]*#[^"'`]/
 
 test("no example links to a hash on the docs page", () => {
@@ -16,10 +24,17 @@ test("no example links to a hash on the docs page", () => {
     for (const folder of ["react", "vue", "svelte", "web", "solid"]) {
       const dir = path.join(root, component, folder)
       for (const file of readdirSync(dir)) {
-        if (component === "navigation-menu" && file.startsWith("link-component.")) continue
+        if (
+          component === "navigation-menu" &&
+          file.startsWith("link-component.")
+        ) {
+          continue
+        }
         const source = readFileSync(path.join(dir, file), "utf8")
         source.split("\n").forEach((line, index) => {
-          if (hashLink.test(line)) found.push(`${component}/${folder}/${file}:${index + 1}`)
+          if (hashLink.test(line)) {
+            found.push(`${component}/${folder}/${file}:${index + 1}`)
+          }
         })
       }
     }

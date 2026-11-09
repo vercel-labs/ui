@@ -13,7 +13,10 @@ This page renders the rating from [Compose Behaviors](../core/compose-behaviors)
 import { createParts } from "@ui-sdk/svelte/primitive"
 import { rating } from "./rating"
 
-const { Root: RatingRoot, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+const { Root: RatingRoot, Star: RatingStar } = createParts(rating, {
+  root: "div",
+  star: "button",
+})
 
 export { RatingRoot, RatingStar }
 ```
@@ -33,7 +36,11 @@ The root accepts the primitive's options and the element's props. Each star rece
 
 <RatingRoot defaultValue={4} aria-label="Rating" class="flex gap-1">
   {#each Array.from({ length: 5 }, (_, index) => index + 1) as star (star)}
-    <RatingStar value={String(star)} aria-label={`${star} ${star === 1 ? "star" : "stars"}`} class="opacity-40 data-filled:opacity-100">★</RatingStar>
+    <RatingStar
+      value={String(star)}
+      aria-label={`${star} ${star === 1 ? "star" : "stars"}`}
+      class="opacity-40 data-filled:opacity-100">★</RatingStar
+    >
   {/each}
 </RatingRoot>
 ```

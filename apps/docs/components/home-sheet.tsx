@@ -34,7 +34,13 @@ type SheetOptions = {
   onUndo?: () => void
   onRedo?: () => void
 }
-type CellState = { value: string; active: boolean; selected: boolean; editing: boolean; pending: boolean }
+type CellState = {
+  value: string
+  active: boolean
+  selected: boolean
+  editing: boolean
+  pending: boolean
+}
 
 const ink = "border border-foreground"
 const ring =
@@ -43,7 +49,7 @@ const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
 const press = cn(
   "inline-flex h-7 min-w-7 shrink-0 cursor-default items-center justify-center gap-1.5 bg-background px-2 font-mono text-[10px] tracking-[0.06em] uppercase select-none hover:bg-foreground/[0.06] disabled:opacity-40 [&_svg]:size-3.5",
   ink,
-  ring,
+  ring
 )
 
 const rows = 7
@@ -109,12 +115,19 @@ const sheet = definePrimitive({
     const write = (entries: [string, string][]) => {
       const cells = { ...store.get().cells }
       for (const [name, text] of entries) {
-        if (text === "") delete cells[name]
-        else cells[name] = text
+        if (text === "") {
+          delete cells[name]
+        } else {
+          cells[name] = text
+        }
       }
       return change("cells", cells, { reason: "imperative" })
     }
-    const grid = createGridFocus<SheetState>(context, { key: "active", rows: () => rows, cols: () => cols })
+    const grid = createGridFocus<SheetState>(context, {
+      key: "active",
+      rows: () => rows,
+      cols: () => cols,
+    })
     const range = createCellRange<SheetState>(context, {
       key: "range",
       grid,
@@ -129,9 +142,13 @@ const sheet = definePrimitive({
     const selected = () => {
       const bounds = range.bounds(store.get())
       const names: string[] = []
-      if (bounds)
-        for (let row = bounds.top; row <= bounds.bottom; row++)
-          for (let col = bounds.left; col <= bounds.right; col++) names.push(cellName({ row, col }))
+      if (bounds) {
+        for (let row = bounds.top; row <= bounds.bottom; row++) {
+          for (let col = bounds.left; col <= bounds.right; col++) {
+            names.push(cellName({ row, col }))
+          }
+        }
+      }
       return names
     }
     return {
@@ -140,7 +157,9 @@ const sheet = definePrimitive({
       edit,
       run: () => context.options().onRun?.(selected()),
       cellKeydown(event: KeyboardEvent, cell: GridCell) {
-        if (store.get().editing) return
+        if (store.get().editing) {
+          return
+        }
         if (matchesShortcut(event, "mod+shift+z")) {
           event.preventDefault()
           return context.options().onRedo?.()
@@ -153,22 +172,32 @@ const sheet = definePrimitive({
           event.preventDefault()
           return context.options().onRun?.(selected())
         }
-        if ((event.key === "Delete" || event.key === "Backspace") && !event.metaKey && !event.ctrlKey) {
+        if (
+          (event.key === "Delete" || event.key === "Backspace") &&
+          !event.metaKey &&
+          !event.ctrlKey
+        ) {
           event.preventDefault()
           return write(selected().map((name) => [name, ""]))
         }
-        if (edit.keydown(event, cellName(cell))) return
+        if (edit.keydown(event, cellName(cell))) {
+          return
+        }
         range.keydown(event)
       },
       cellPointerdown(event: PointerEvent, cell: GridCell, name: string) {
-        if (store.get().editing !== name) range.pointerdown(event, cell)
+        if (store.get().editing !== name) {
+          range.pointerdown(event, cell)
+        }
       },
       editorKeydown(event: KeyboardEvent) {
         const active = grid.active()
-        if (!edit.inputKeydown(event) || !active || event.key !== "Enter") return
+        if (!edit.inputKeydown(event) || !active || event.key !== "Enter") {
+          return
+        }
         grid.focus(
           { row: Math.min(rows - 1, active.row + 1), col: active.col },
-          { reason: "list-navigation", event },
+          { reason: "list-navigation", event }
         )
         range.select(null, { reason: "list-navigation", event })
       },
@@ -201,7 +230,9 @@ const sheet = definePrimitive({
       state: (state, { key, api }) => {
         const bounds = api.range.bounds(state)
         const row = Number(key)
-        return { selected: !!bounds && row >= bounds.top && row <= bounds.bottom }
+        return {
+          selected: !!bounds && row >= bounds.top && row <= bounds.bottom,
+        }
       },
       attrs: (state, { key, api }) => {
         const bounds = api.range.bounds(state)
@@ -209,7 +240,10 @@ const sheet = definePrimitive({
         return {
           role: "rowheader",
           "aria-colindex": "1",
-          "data-selected": bounds && row >= bounds.top && row <= bounds.bottom ? "" : undefined,
+          "data-selected":
+            bounds && row >= bounds.top && row <= bounds.bottom
+              ? ""
+              : undefined,
         }
       },
     }),
@@ -236,7 +270,8 @@ const sheet = definePrimitive({
       },
       bind: (el, { api, props, key }) => {
         // The range reads the press's currentTarget, which a delegated listener doesn't give.
-        const press = (event: PointerEvent) => api.cellPointerdown(event, props, key)
+        const press = (event: PointerEvent) =>
+          api.cellPointerdown(event, props, key)
         el.addEventListener("pointerdown", press)
         const leave = api.range.bind(el, props)
         return () => {
@@ -246,7 +281,11 @@ const sheet = definePrimitive({
       },
     }),
     editor: slot({
-      attrs: () => ({ "aria-label": "Edit cell", autocomplete: "off", spellcheck: "false" }),
+      attrs: () => ({
+        "aria-label": "Edit cell",
+        autocomplete: "off",
+        spellcheck: "false",
+      }),
       on: {
         keydown: (event, { api }) => api.editorKeydown(event),
         focusout: (event, { api }) => api.edit.end("focus-out", event),
@@ -260,7 +299,11 @@ const sheet = definePrimitive({
   }),
 })
 
-const parts = createParts(sheet, { grid: "div", editor: "input", run: "button" })
+const parts = createParts(sheet, {
+  grid: "div",
+  editor: "input",
+  run: "button",
+})
 const Sheet = parts.Root
 const SheetGrid = parts.Grid
 const SheetEditor = parts.Editor
@@ -270,18 +313,27 @@ function SheetRow({ value, ...props }: { value: number } & PartProps<"div">) {
   return usePart(sheet, "row", { value: String(value) }, props)
 }
 
-function SheetHeader({ value, ...props }: { value: number } & PartProps<"div", { selected: boolean }>) {
+function SheetHeader({
+  value,
+  ...props
+}: { value: number } & PartProps<"div", { selected: boolean }>) {
   return usePart(sheet, "header", { value: String(value) }, props)
 }
 
-function SheetCell({ row, col, ...props }: { row: number; col: number } & PartProps<"div", CellState>) {
+function SheetCell({
+  row,
+  col,
+  ...props
+}: { row: number; col: number } & PartProps<"div", CellState>) {
   return usePart(sheet, "cell", { id: cellName({ row, col }), row, col }, props)
 }
 
 function SheetTile({ className, fig }: { className?: string; fig?: string }) {
   const [cells, setCells] = React.useState(start)
   const [pending, setPending] = React.useState<string[]>([])
-  const [note, setNote] = React.useState("Select cells under Feeling or Next step, then press Run")
+  const [note, setNote] = React.useState(
+    "Select cells under Feeling or Next step, then press Run"
+  )
   const history = React.useRef(createHistory(start))
   const timers = React.useRef<number[]>([])
   React.useEffect(() => () => timers.current.forEach(clearTimeout), [])
@@ -290,21 +342,29 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
     history.current.record(next)
   }
   const step = (direction: "undo" | "redo") => {
-    if (pending.length) return
+    if (pending.length) {
+      return
+    }
     const next = history.current[direction]()
-    if (!next) return
+    if (!next) {
+      return
+    }
     setCells(next)
     setNote(direction === "undo" ? "Undone" : "Redone")
   }
   const run = (names: string[]) => {
-    if (pending.length) return
+    if (pending.length) {
+      return
+    }
     const targets = names.filter((name) => answers[name])
     if (!targets.length) {
       setNote("Select cells under Feeling or Next step first")
       return
     }
     setPending(targets)
-    setNote(`Filling ${targets.length} ${targets.length === 1 ? "cell" : "cells"}`)
+    setNote(
+      `Filling ${targets.length} ${targets.length === 1 ? "cell" : "cells"}`
+    )
     let next = cells
     timers.current = targets.map((name, index) =>
       window.setTimeout(
@@ -312,12 +372,16 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
           next = { ...next, [name]: answers[name] }
           setCells(next)
           setPending((current) => current.filter((item) => item !== name))
-          if (index < targets.length - 1) return
+          if (index < targets.length - 1) {
+            return
+          }
           history.current.record(next)
-          setNote(`Filled ${targets.length} ${targets.length === 1 ? "cell" : "cells"}. Press ⌘Z to undo`)
+          setNote(
+            `Filled ${targets.length} ${targets.length === 1 ? "cell" : "cells"}. Press ⌘Z to undo`
+          )
         },
-        300 + index * 180,
-      ),
+        300 + index * 180
+      )
     )
   }
   const filled = Object.keys(answers).filter((name) => cells[name]).length
@@ -339,7 +403,9 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
           <Numeral className="text-[length:clamp(2rem,6cqi,3.5rem)]">
             {filled}/{Object.keys(answers).length}
           </Numeral>
-          <span className={cn(label, "text-muted-foreground")}>cells filled</span>
+          <span className={cn(label, "text-muted-foreground")}>
+            cells filled
+          </span>
         </div>
       </div>
       <Sheet
@@ -351,7 +417,12 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
         onRedo={() => step("redo")}
       >
         <div className="flex flex-col gap-4">
-          <div className={cn("flex items-center gap-2 bg-background p-1.5 ps-3", ink)}>
+          <div
+            className={cn(
+              "flex items-center gap-2 bg-background p-1.5 ps-3",
+              ink
+            )}
+          >
             <SparklesIcon aria-hidden="true" className="size-3.5 shrink-0" />
             <span className="min-w-0 flex-1 truncate font-mono text-[12px]">
               Fill this in from the feedback
@@ -379,14 +450,17 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
                       className={cn(
                         "relative flex h-11 min-w-0 cursor-cell items-center border-e border-b border-foreground/15 px-2 select-none last:border-e-0 data-selected:bg-foreground/[0.07] data-active:outline-2 data-active:-outline-offset-2 data-active:outline-foreground data-active:outline-solid",
                         row === 0 &&
-                          "font-mono text-[10px] tracking-[0.06em] text-muted-foreground uppercase",
+                          "font-mono text-[10px] tracking-[0.06em] text-muted-foreground uppercase"
                       )}
                     >
                       {({ value, editing, pending: waiting }) =>
                         editing ? (
                           <SheetEditor className="h-full w-full bg-transparent outline-none pointer-coarse:text-base" />
                         ) : waiting ? (
-                          <span aria-hidden="true" className="h-2 w-2/3 animate-pulse bg-foreground/15" />
+                          <span
+                            aria-hidden="true"
+                            className="h-2 w-2/3 animate-pulse bg-foreground/15"
+                          />
                         ) : (
                           <span className="truncate">{value}</span>
                         )
@@ -398,13 +472,26 @@ function SheetTile({ className, fig }: { className?: string; fig?: string }) {
             </SheetGrid>
           </div>
           <div className="flex items-center gap-2">
-            <button type="button" aria-label="Undo" onClick={() => step("undo")} className={press}>
+            <button
+              type="button"
+              aria-label="Undo"
+              onClick={() => step("undo")}
+              className={press}
+            >
               <Undo2Icon aria-hidden="true" />
             </button>
-            <button type="button" aria-label="Redo" onClick={() => step("redo")} className={press}>
+            <button
+              type="button"
+              aria-label="Redo"
+              onClick={() => step("redo")}
+              className={press}
+            >
               <Redo2Icon aria-hidden="true" />
             </button>
-            <span aria-live="polite" className={cn(label, "ms-1 truncate text-muted-foreground")}>
+            <span
+              aria-live="polite"
+              className={cn(label, "ms-1 truncate text-muted-foreground")}
+            >
               {note}
             </span>
           </div>

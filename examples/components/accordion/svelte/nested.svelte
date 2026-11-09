@@ -23,8 +23,16 @@
       value: "notifications",
       label: "Notifications",
       topics: [
-        { value: "email", label: "Email", content: "A weekly digest, and mentions as they happen." },
-        { value: "push", label: "Push", content: "Direct messages and replies to your comments." },
+        {
+          value: "email",
+          label: "Email",
+          content: "A weekly digest, and mentions as they happen.",
+        },
+        {
+          value: "push",
+          label: "Push",
+          content: "Direct messages and replies to your comments.",
+        },
       ],
     },
     {

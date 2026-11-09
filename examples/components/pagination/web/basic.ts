@@ -37,10 +37,12 @@ function mount(root: HTMLElement) {
       </ui-pagination-list>
     </ui-pagination>
   `
-  root.querySelector("ui-pagination")!.addEventListener("pagechange", (event) => {
-    const { value, reason } = event.detail
-    log(root, `Page ${value} (${reason})`)
-  })
+  root
+    .querySelector("ui-pagination")!
+    .addEventListener("pagechange", (event) => {
+      const { value, reason } = event.detail
+      log(root, `Page ${value} (${reason})`)
+    })
 }
 
 export { mount }

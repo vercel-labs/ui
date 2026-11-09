@@ -4,7 +4,8 @@ import type { PrimitiveHandle } from "./use-primitive"
 
 // The toolbar's injection key, apart from the toolbar, so a toggle or a toggle
 // group can join one without bundling it.
-const ToolbarKey: InjectionKey<PrimitiveHandle<typeof toolbar>> = Symbol("toolbar")
+const ToolbarKey: InjectionKey<PrimitiveHandle<typeof toolbar>> =
+  Symbol("toolbar")
 
 // Whether the toolbar group an item, toggle or toggle group sits in is disabled.
 const ToolbarGroupKey: InjectionKey<() => boolean> = Symbol("toolbar-group")
@@ -15,7 +16,9 @@ function useToolbarScope() {
   const toolbar = inject(ToolbarKey, null)
   const groupDisabled = inject(ToolbarGroupKey, () => false)
   return computed(() => {
-    if (!toolbar) return undefined
+    if (!toolbar) {
+      return undefined
+    }
     const disabled = groupDisabled()
     return () => toolbar.api.internal.scopeIn(disabled)
   })

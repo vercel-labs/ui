@@ -6,7 +6,8 @@ import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import { LoaderCircleIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
-const save = (_checked: boolean) => new Promise((resolve) => setTimeout(resolve, 800))
+const save = (_checked: boolean) =>
+  new Promise((resolve) => setTimeout(resolve, 800))
 
 function Example() {
   const log = useLog()
@@ -21,9 +22,13 @@ function Example() {
         controller={backups}
         aria-busy={saving}
         onCheckedChange={(next, details) => {
-          if (details.reason === "imperative") return
+          if (details.reason === "imperative") {
+            return
+          }
           details.cancel()
-          if (pending.current) return
+          if (pending.current) {
+            return
+          }
           pending.current = true
           setSaving(true)
           log("Saving…")
@@ -35,7 +40,11 @@ function Example() {
           })
         }}
       >
-        <SwitchThumb>{saving && <LoaderCircleIcon data-slot="spinner" aria-hidden="true" />}</SwitchThumb>
+        <SwitchThumb>
+          {saving && (
+            <LoaderCircleIcon data-slot="spinner" aria-hidden="true" />
+          )}
+        </SwitchThumb>
       </Switch>
     </label>
   )

@@ -6,12 +6,17 @@ import { icon } from "../lib/icons"
 import { addComment } from "../lib/tracker"
 import { avatar, button, styles } from "../lib/ui"
 
-const date = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" })
+const date = new Intl.DateTimeFormat("en", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+})
 const triggers = [{ char: "@", type: "mention" }]
 
 function mention(id: string, label: string) {
   const person = personOf(id)
-  if (!person) return html`@${label}`
+  if (!person) {
+    return html`@${label}`
+  }
   return html`<ui-hover-card>
     <ui-hover-card-trigger>
       <a
@@ -41,13 +46,18 @@ function commentItem(comment: Comment) {
     <div class="grid min-w-0 flex-1 gap-1">
       <p class="flex items-baseline gap-2">
         <span class="font-medium">${author?.name}</span>
-        <time datetime=${comment.createdAt} class="text-xs text-muted-foreground">
+        <time
+          datetime=${comment.createdAt}
+          class="text-xs text-muted-foreground"
+        >
           ${date.format(new Date(comment.createdAt))}
         </time>
       </p>
       <div class="leading-relaxed whitespace-pre-wrap">
         ${fromText(comment.body).map((segment) =>
-          typeof segment === "string" ? segment : mention(segment.value, segment.label),
+          typeof segment === "string"
+            ? segment
+            : mention(segment.value, segment.label)
         )}
       </div>
     </div>
@@ -56,14 +66,21 @@ function commentItem(comment: Comment) {
 
 function send(issue: Issue, event: SubmitEvent) {
   event.preventDefault()
-  const composer = (event.currentTarget as HTMLFormElement).querySelector("ui-token-input")
-  if (!composer?.api.getLabel().trim()) return
+  const composer = (event.currentTarget as HTMLFormElement).querySelector(
+    "ui-token-input"
+  )
+  if (!composer?.api.getLabel().trim()) {
+    return
+  }
   addComment(issue.id, composer.api.getText().trim())
   composer.api.clear()
 }
 
 function composer(issue: Issue) {
-  return html`<form class="grid gap-2" @submit=${(event: SubmitEvent) => send(issue, event)}>
+  return html`<form
+    class="grid gap-2"
+    @submit=${(event: SubmitEvent) => send(issue, event)}
+  >
     <ui-token-input submit-shortcut="mod+enter">
       <ui-token-input-editor
         aria-label="Comment"
@@ -89,15 +106,18 @@ function composer(issue: Issue) {
                   keywords=${person.role}
                   class="flex min-h-7 cursor-default items-center gap-2 rounded-xl px-2 py-1.5 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50"
                 >
-                  ${avatar(person.name, { size: "sm", decorative: true })} ${person.name}
-                </ui-trigger-menu-item>`,
+                  ${avatar(person.name, { size: "sm", decorative: true })}
+                  ${person.name}
+                </ui-trigger-menu-item>`
             )}
           </ui-trigger-menu-list>
         </ui-trigger-menu-content>
       </ui-trigger-menu>
     </ui-token-input>
     <div class="flex items-center justify-end gap-3">
-      <span class="text-xs text-muted-foreground">⌘ or Ctrl + Enter to send</span>
+      <span class="text-xs text-muted-foreground"
+        >⌘ or Ctrl + Enter to send</span
+      >
       <button type="submit" class=${button({ size: "sm" })}>Comment</button>
     </div>
   </form>`
@@ -111,10 +131,12 @@ function issueActivity(issue: Issue) {
       >
         ${icon(
           "chevron-right",
-          "size-4 text-muted-foreground transition-transform group-data-open:rotate-90 motion-reduce:transition-none rtl:rotate-180 rtl:group-data-open:rotate-90",
+          "size-4 text-muted-foreground transition-transform group-data-open:rotate-90 motion-reduce:transition-none rtl:rotate-180 rtl:group-data-open:rotate-90"
         )}
         Activity
-        <span class="text-muted-foreground tabular-nums">${issue.comments.length}</span>
+        <span class="text-muted-foreground tabular-nums"
+          >${issue.comments.length}</span
+        >
       </button>
     </ui-collapsible-trigger>
     <ui-collapsible-panel

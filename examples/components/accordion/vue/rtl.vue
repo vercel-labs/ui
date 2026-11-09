@@ -30,7 +30,11 @@ const items = [
 <template>
   <div dir="rtl">
     <Accordion :default-value="['shipping']">
-      <AccordionItem v-for="item in items" :key="item.value" :value="item.value">
+      <AccordionItem
+        v-for="item in items"
+        :key="item.value"
+        :value="item.value"
+      >
         <AccordionHeader>
           <AccordionTrigger>
             {{ item.label }}

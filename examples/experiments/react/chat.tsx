@@ -33,7 +33,11 @@ const away = (state: StickToBottomState) => !state.following && !state.atBottom
 const chat = /* @__PURE__ */ definePrimitive({
   name: "chat",
   options: { threshold: "number", controller: "value" },
-  state: (_options: ChatOptions): StickToBottomState => ({ following: true, unseen: false, atBottom: true }),
+  state: (_options: ChatOptions): StickToBottomState => ({
+    following: true,
+    unseen: false,
+    atBottom: true,
+  }),
   api: (context) => {
     const { store } = context
     const stick = createStickToBottom({
@@ -42,7 +46,8 @@ const chat = /* @__PURE__ */ definePrimitive({
     })
     return {
       stick,
-      scrollToBottom: (options?: { behavior?: ScrollBehavior }) => stick.scrollToBottom(options),
+      scrollToBottom: (options?: { behavior?: ScrollBehavior }) =>
+        stick.scrollToBottom(options),
     }
   },
   slots: (slot) => ({
@@ -74,7 +79,12 @@ const chat = /* @__PURE__ */ definePrimitive({
   }),
 })
 
-const parts = createParts(chat, { root: "div", log: "div", jump: "button", earlier: "button" })
+const parts = createParts(chat, {
+  root: "div",
+  log: "div",
+  jump: "button",
+  earlier: "button",
+})
 
 const Chat = parts.Root
 
@@ -110,7 +120,9 @@ const oldestLoadable = -60
 
 function Example() {
   const [controller] = React.useState(createChatController)
-  const [messages, setMessages] = React.useState<Message[]>(() => earlierMessages(0, 12))
+  const [messages, setMessages] = React.useState<Message[]>(() =>
+    earlierMessages(0, 12)
+  )
   const [oldest, setOldest] = React.useState(0)
   const [draft, setDraft] = React.useState("How do primitives help?")
   const [typing, setTyping] = React.useState(false)
@@ -120,10 +132,16 @@ function Example() {
 
   const send = () => {
     const text = draft.trim()
-    if (!text || typing) return
+    if (!text || typing) {
+      return
+    }
     const id = Date.now()
     const reply = replies[turn.current++ % replies.length].split(" ")
-    setMessages((list) => [...list, { id, from: "you", text }, { id: id + 1, from: "them", text: "" }])
+    setMessages((list) => [
+      ...list,
+      { id, from: "you", text },
+      { id: id + 1, from: "them", text: "" },
+    ])
     setDraft("")
     setTyping(true)
     controller.scrollToBottom()
@@ -133,8 +151,10 @@ function Example() {
       word++
       setMessages((list) =>
         list.map((message) =>
-          message.id === id + 1 ? { ...message, text: reply.slice(0, word).join(" ") } : message,
-        ),
+          message.id === id + 1
+            ? { ...message, text: reply.slice(0, word).join(" ") }
+            : message
+        )
       )
       if (word >= reply.length) {
         clearInterval(timer.current)
@@ -151,14 +171,21 @@ function Example() {
         <ChatEarlier
           disabled={atStart}
           onClick={() => {
-            setMessages((list) => [...earlierMessages(oldest - 12, 12), ...list])
+            setMessages((list) => [
+              ...earlierMessages(oldest - 12, 12),
+              ...list,
+            ])
             setOldest(oldest - 12)
           }}
         >
           {atStart ? "Start of conversation" : "Load earlier messages"}
         </ChatEarlier>
         {messages.map((message) => (
-          <div key={message.id} data-slot="chat-message" data-from={message.from}>
+          <div
+            key={message.id}
+            data-slot="chat-message"
+            data-from={message.from}
+          >
             {message.text || <span data-slot="hint">…</span>}
           </div>
         ))}
@@ -180,13 +207,21 @@ function Example() {
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+            if (
+              event.key === "Enter" &&
+              !event.shiftKey &&
+              !event.nativeEvent.isComposing
+            ) {
               event.preventDefault()
               send()
             }
           }}
         />
-        <button type="submit" data-variant="solid" disabled={typing || !draft.trim()}>
+        <button
+          type="submit"
+          data-variant="solid"
+          disabled={typing || !draft.trim()}
+        >
           Send
         </button>
       </form>

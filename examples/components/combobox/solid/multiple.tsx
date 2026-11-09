@@ -30,7 +30,11 @@ const frameworkLabel = (value: string) =>
 
 function Example() {
   return (
-    <Combobox multiple defaultValue={["next", "astro"]} itemToLabel={frameworkLabel}>
+    <Combobox
+      multiple
+      defaultValue={["next", "astro"]}
+      itemToLabel={frameworkLabel}
+    >
       <div data-slot="stack">
         <ComboboxLabel>Frameworks</ComboboxLabel>
         <div data-slot="row">
@@ -41,7 +45,9 @@ function Example() {
                   {(value, index) => (
                     <ComboboxChip value={value}>
                       {state.labels[index()]}
-                      <ComboboxChipRemove aria-label={`Remove ${state.labels[index()]}`}>
+                      <ComboboxChipRemove
+                        aria-label={`Remove ${state.labels[index()]}`}
+                      >
                         <svg
                           viewBox="0 0 24 24"
                           fill="none"

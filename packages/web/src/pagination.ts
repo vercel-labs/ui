@@ -27,10 +27,19 @@ function definePaginationElements() {
       state: {
         page: {
           get: (api: { getPage: () => number }) => api.getPage(),
-          set: (api: { setPage: (page: number) => boolean }, page: number) => api.setPage(Number(page)),
+          set: (api: { setPage: (page: number) => boolean }, page: number) =>
+            api.setPage(Number(page)),
         },
       },
-      api: ["getPage", "getPageCount", "setPage", "next", "previous", "first", "last"],
+      api: [
+        "getPage",
+        "getPageCount",
+        "setPage",
+        "next",
+        "previous",
+        "first",
+        "last",
+      ],
       // Lists follow the range.
       render(el, { api, subscribe }) {
         const render = () => renderLists(el, api)
@@ -42,11 +51,31 @@ function definePaginationElements() {
     },
     list: { tag: "ui-pagination-list", display: "block" },
     item: { tag: "ui-pagination-item", display: "block" },
-    link: { tag: "ui-pagination-link", display: "contents", target: wrappedButton },
-    previous: { tag: "ui-pagination-previous", display: "contents", target: wrappedButton },
-    next: { tag: "ui-pagination-next", display: "contents", target: wrappedButton },
-    first: { tag: "ui-pagination-first", display: "contents", target: wrappedButton },
-    last: { tag: "ui-pagination-last", display: "contents", target: wrappedButton },
+    link: {
+      tag: "ui-pagination-link",
+      display: "contents",
+      target: wrappedButton,
+    },
+    previous: {
+      tag: "ui-pagination-previous",
+      display: "contents",
+      target: wrappedButton,
+    },
+    next: {
+      tag: "ui-pagination-next",
+      display: "contents",
+      target: wrappedButton,
+    },
+    first: {
+      tag: "ui-pagination-first",
+      display: "contents",
+      target: wrappedButton,
+    },
+    last: {
+      tag: "ui-pagination-last",
+      display: "contents",
+      target: wrappedButton,
+    },
     ellipsis: { tag: "ui-pagination-ellipsis", display: "block" },
   })
 }
@@ -60,45 +89,75 @@ const itemOf = new WeakMap<Element, PaginationRangeItem>()
 function createEntry(list: Element, item: PaginationRangeItem) {
   const isPage = typeof item === "number"
   const template = list.querySelector<HTMLTemplateElement>(
-    isPage ? ":scope > template:not([data-ellipsis])" : ":scope > template[data-ellipsis]",
+    isPage
+      ? ":scope > template:not([data-ellipsis])"
+      : ":scope > template[data-ellipsis]"
   )
-  const copy = template?.content.firstElementChild?.cloneNode(true) as HTMLElement | undefined
+  const copy = template?.content.firstElementChild?.cloneNode(true) as
+    HTMLElement | undefined
   if (!isPage) {
-    if (copy) return copy
+    if (copy) {
+      return copy
+    }
     const entry = element("ui-pagination-item")
     entry.append(element("ui-pagination-ellipsis", {}, "…"))
     return entry
   }
-  if (!copy) return undefined
-  const link = copy.localName === "ui-pagination-link" ? copy : copy.querySelector("ui-pagination-link")
+  if (!copy) {
+    return undefined
+  }
+  const link =
+    copy.localName === "ui-pagination-link"
+      ? copy
+      : copy.querySelector("ui-pagination-link")
   link?.setAttribute("page", String(item))
   const content = link && wrappedButton(link as HTMLElement)
-  if (content && !content.textContent?.trim()) content.textContent = String(item)
+  if (content && !content.textContent?.trim()) {
+    content.textContent = String(item)
+  }
   return copy
 }
 
 // One entry per item in every templated list, kept by item, so focus on a
 // link survives the range moving around it.
-function renderLists(el: HTMLElement, api: { internal: { items: () => PaginationRangeItem[] } }) {
+function renderLists(
+  el: HTMLElement,
+  api: { internal: { items: () => PaginationRangeItem[] } }
+) {
   const items = api.internal.items()
   for (const list of el.querySelectorAll("ui-pagination-list")) {
     const templates = list.querySelectorAll(":scope > template")
-    if (list.closest(owner) !== el || !templates.length || renderedItems.get(list) === items) continue
+    if (
+      list.closest(owner) !== el ||
+      !templates.length ||
+      renderedItems.get(list) === items
+    ) {
+      continue
+    }
     renderedItems.set(list, items)
     const existing = new Map<PaginationRangeItem, Element>()
     for (const child of [...list.children]) {
       const item = itemOf.get(child)
-      if (item === undefined) continue
-      if (items.includes(item)) existing.set(item, child)
-      else child.remove()
+      if (item === undefined) {
+        continue
+      }
+      if (items.includes(item)) {
+        existing.set(item, child)
+      } else {
+        child.remove()
+      }
     }
     // Entries already in place stay put: moving a focused one would blur it.
     let previous: Element = templates[templates.length - 1]
     for (const item of items) {
       const entry = existing.get(item) ?? createEntry(list, item)
-      if (!entry) continue
+      if (!entry) {
+        continue
+      }
       itemOf.set(entry, item)
-      if (previous.nextElementSibling !== entry) previous.after(entry)
+      if (previous.nextElementSibling !== entry) {
+        previous.after(entry)
+      }
       previous = entry
     }
   }

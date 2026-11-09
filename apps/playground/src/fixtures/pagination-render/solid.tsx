@@ -13,8 +13,12 @@ import { createSignal, For, merge, omit } from "solid-js"
 // handler before it prevented that.
 function RouterLink(props: JSX.IntrinsicElements["a"]) {
   const onClick: JSX.EventHandler<HTMLAnchorElement, MouseEvent> = (event) => {
-    if (typeof props.onClick === "function") props.onClick(event)
-    if (event.defaultPrevented) return
+    if (typeof props.onClick === "function") {
+      props.onClick(event)
+    }
+    if (event.defaultPrevented) {
+      return
+    }
     event.preventDefault()
     history.pushState(null, "", String(props.href))
   }
@@ -32,7 +36,9 @@ function Fixture() {
         pageCount={5}
         getHref={(page) => `#results-${page}`}
         onPageChange={(page, details) => {
-          if (page === 4) return details.cancel()
+          if (page === 4) {
+            return details.cancel()
+          }
           setAction(`page: ${page}`)
         }}
       >
@@ -40,7 +46,10 @@ function Fixture() {
           {({ items }) => (
             <>
               <PaginationItem>
-                <PaginationPrevious render={(props) => <RouterLink {...props} />} class="pagination-step">
+                <PaginationPrevious
+                  render={(props) => <RouterLink {...props} />}
+                  class="pagination-step"
+                >
                   Previous
                 </PaginationPrevious>
               </PaginationItem>
@@ -50,7 +59,9 @@ function Fixture() {
                     <PaginationLink
                       page={item as number}
                       render={(props) => <RouterLink {...props} />}
-                      class={(state) => `pagination-link ${state.current ? "is-active" : "is-inactive"}`}
+                      class={(state) =>
+                        `pagination-link ${state.current ? "is-active" : "is-inactive"}`
+                      }
                     >
                       {(state) => (
                         <>
@@ -64,7 +75,9 @@ function Fixture() {
               </For>
               <PaginationItem>
                 <PaginationNext
-                  render={(props, state) => <RouterLink {...props} data-target={state.page} />}
+                  render={(props, state) => (
+                    <RouterLink {...props} data-target={state.page} />
+                  )}
                   class="pagination-step"
                 >
                   Next

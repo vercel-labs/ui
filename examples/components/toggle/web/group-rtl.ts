@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
               <ui-toggle value="${item.value}">
                 <button>${item.label}</button>
               </ui-toggle>
-            `,
+            `
           )
           .join("")}
       </ui-toggle-group>

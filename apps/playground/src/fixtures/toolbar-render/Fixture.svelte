@@ -21,8 +21,12 @@
         <span {...props}>{counted("Span tool")}</span>
       {/snippet}
     </ToolbarButton>
-    <ToolbarButton onclick={() => (action = "cut")}>{counted("Cut")}</ToolbarButton>
-    <ToolbarButton onclick={() => (action = "copy")}>{counted("Copy")}</ToolbarButton>
+    <ToolbarButton onclick={() => (action = "cut")}
+      >{counted("Cut")}</ToolbarButton
+    >
+    <ToolbarButton onclick={() => (action = "copy")}
+      >{counted("Copy")}</ToolbarButton
+    >
     <ToolbarSeparator class="rule">
       {#snippet render({ props })}
         <hr {...props} />
@@ -30,7 +34,11 @@
     </ToolbarSeparator>
     <ToolbarButton disabled href="#old">
       {#snippet render({ props, state })}
-        <a {...props} href="#old" class={state.disabled ? "is-disabled" : "is-enabled"}>Old docs</a>
+        <a
+          {...props}
+          href="#old"
+          class={state.disabled ? "is-disabled" : "is-enabled"}>Old docs</a
+        >
       {/snippet}
     </ToolbarButton>
   </Toolbar>

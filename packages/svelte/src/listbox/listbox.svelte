@@ -17,7 +17,12 @@ An always-visible list to choose one option from, or several with `multiple`.
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import ValueInput from "../value-input.svelte"
   import ListboxItems from "./listbox-items.svelte"
 
@@ -112,7 +117,9 @@ An always-visible list to choose one option from, or several with `multiple`.
     onValueChange: (next: unknown, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onHighlight,
   }))
@@ -120,14 +127,15 @@ An always-visible list to choose one option from, or several with `multiple`.
   const root = useHandlePart(listbox, "root")
   const control = field?.control(
     () => rest.id as string | undefined,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
   // The hidden inputs that take part in a form: one for the value, or one
   // more per value with `multiple`. The input's attributes change with the
   // value, so reading them keeps the list of values current.
   const formInput = useHandlePart(listbox, "form-input")
   const values = $derived(
-    (formInput.attrs, listbox.state.multiple ? listbox.api.internal.serialized() : []),
+    (formInput.attrs,
+    listbox.state.multiple ? listbox.api.internal.serialized() : [])
   )
 </script>
 
@@ -136,7 +144,11 @@ An always-visible list to choose one option from, or several with `multiple`.
   {#if items}<ListboxItems items={state.items} />{/if}
 {/snippet}
 
-<Part tag="div" part={wrapPart(root, control)} props={{ ...rest, children: children ?? data }} />
+<Part
+  tag="div"
+  part={wrapPart(root, control)}
+  props={{ ...rest, children: children ?? data }}
+/>
 <input {...formInput.slot()} />
 {#each values as key (key)}
   <ValueInput owner={listbox} value={key} />

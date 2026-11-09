@@ -12,7 +12,11 @@ const files = [
 ]
 
 const skills = [
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+  {
+    value: "search",
+    label: "search",
+    arguments: [{ name: "query", hint: "<query>", required: true }],
+  },
   { value: "review", label: "review" },
   { value: "summarize", label: "summarize" },
 ]
@@ -59,38 +63,54 @@ function mount(root: HTMLElement) {
         <ui-token-input-token-remove>${createElement(X, { "aria-hidden": "true" }).outerHTML}</ui-token-input-token-remove>
       </ui-token-input-token>
     `
-    host.querySelector("span")!.textContent = token.type === "skill" ? `/${token.label}` : token.label
+    host.querySelector("span")!.textContent =
+      token.type === "skill" ? `/${token.label}` : token.label
   }
   menu.triggers = [
     { char: "@", type: "file", items: files },
     { char: "/", boundary: "start", type: "skill", items: skills },
   ]
   menu.addEventListener("itemselect", (event) => {
-    if (event.detail.trigger === "@") event.detail.waitUntil(loadFile())
+    if (event.detail.trigger === "@") {
+      event.detail.waitUntil(loadFile())
+    }
   })
 
   const setRunning = (next: boolean) => {
     running = next
     send.disabled = next
     send.setAttribute("aria-label", next ? "Running" : "Send")
-    send.innerHTML = createElement(next ? Clock : ArrowUp, { "aria-hidden": "true" }).outerHTML
+    send.innerHTML = createElement(next ? Clock : ArrowUp, {
+      "aria-hidden": "true",
+    }).outerHTML
   }
 
   attach.addEventListener("mousedown", (event) => event.preventDefault())
   attach.addEventListener("click", () =>
-    prompt.insert({ type: "file", value: "README.md", label: "README.md" }, { resolve: loadFile() }),
+    prompt.insert(
+      { type: "file", value: "README.md", label: "README.md" },
+      { resolve: loadFile() }
+    )
   )
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
-    if (running || !prompt.getLabel().trim()) return
+    if (running || !prompt.getLabel().trim()) {
+      return
+    }
     setRunning(true)
     const skillTokens = prompt
       .getValue()
-      .filter((segment): segment is Token => typeof segment !== "string" && segment.type === "skill")
-    for (const skill of skillTokens)
+      .filter(
+        (segment): segment is Token =>
+          typeof segment !== "string" && segment.type === "skill"
+      )
+    for (const skill of skillTokens) {
       prompt.updateToken(skill.id!, { data: { ...skill.data, run: "running" } })
+    }
     sendTimer = setTimeout(() => {
-      for (const skill of skillTokens) prompt.updateToken(skill.id!, { data: { ...skill.data, run: "done" } })
+      for (const skill of skillTokens) {
+        prompt.updateToken(skill.id!, { data: { ...skill.data, run: "done" } })
+      }
       log(root, `Sent ${toText(prompt.getValue())}`)
       prompt.clear()
       setRunning(false)

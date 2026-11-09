@@ -17,7 +17,9 @@ function RouterLink({ onClick, ...props }: React.ComponentProps<"a">) {
       {...props}
       onClick={(event) => {
         onClick?.(event)
-        if (event.defaultPrevented) return
+        if (event.defaultPrevented) {
+          return
+        }
         event.preventDefault()
         history.pushState(null, "", props.href)
       }}
@@ -35,7 +37,9 @@ function Fixture() {
         pageCount={5}
         getHref={(page) => `#results-${page}`}
         onPageChange={(page, details) => {
-          if (page === 4) return details.cancel()
+          if (page === 4) {
+            return details.cancel()
+          }
           setAction(`page: ${page}`)
         }}
       >
@@ -43,7 +47,10 @@ function Fixture() {
           {({ items }) => (
             <>
               <PaginationItem>
-                <PaginationPrevious render={<RouterLink />} className="pagination-step">
+                <PaginationPrevious
+                  render={<RouterLink />}
+                  className="pagination-step"
+                >
                   Previous
                 </PaginationPrevious>
               </PaginationItem>
@@ -52,7 +59,9 @@ function Fixture() {
                   <PaginationLink
                     page={item as number}
                     render={<RouterLink />}
-                    className={(state) => `pagination-link ${state.current ? "is-active" : "is-inactive"}`}
+                    className={(state) =>
+                      `pagination-link ${state.current ? "is-active" : "is-inactive"}`
+                    }
                   >
                     {(state) => (
                       <>
@@ -65,7 +74,9 @@ function Fixture() {
               ))}
               <PaginationItem>
                 <PaginationNext
-                  render={(props, state) => <RouterLink {...props} data-target={state.page} />}
+                  render={(props, state) => (
+                    <RouterLink {...props} data-target={state.page} />
+                  )}
                   className="pagination-step"
                 >
                   Next
@@ -87,7 +98,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

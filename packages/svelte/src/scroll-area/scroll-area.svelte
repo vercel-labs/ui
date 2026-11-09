@@ -12,7 +12,11 @@ Groups the parts. The scrollbars are placed against it.
   } from "@ui-sdk/core/scroll-area"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     type,

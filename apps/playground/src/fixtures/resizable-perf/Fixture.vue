@@ -16,7 +16,11 @@ const count = (kind: "watched" | "plain" | "handle") => (countRender(kind), "")
     <button>Before</button>
     <Resizable class="resizable-perf">
       <template v-for="(panel, index) in panels" :key="panel.value">
-        <ResizableHandle v-if="index > 0" class="resizable-perf-handle" :aria-label="`Handle ${index}`">
+        <ResizableHandle
+          v-if="index > 0"
+          class="resizable-perf-handle"
+          :aria-label="`Handle ${index}`"
+        >
           <template #render="{ props }">
             <div v-bind="props">{{ count("handle") }}</div>
           </template>

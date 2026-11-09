@@ -5,7 +5,11 @@ const tabs = [
   { value: "active", label: "Active", statuses: ["todo", "in-progress"] },
   { value: "backlog", label: "Backlog", statuses: ["backlog"] },
   { value: "closed", label: "Closed", statuses: ["done", "canceled"] },
-  { value: "all", label: "All", statuses: statuses.map((status) => status.value) },
+  {
+    value: "all",
+    label: "All",
+    statuses: statuses.map((status) => status.value),
+  },
 ] satisfies { value: string; label: string; statuses: Status[] }[]
 
 const viewer = people[0]
@@ -32,9 +36,13 @@ function one(value: SearchParam | SearchParam[]) {
 }
 
 function parseQuery(params: SearchParams): Query {
-  const tab = tabs.find((tab) => tab.value === one(params.tab))?.value ?? "active"
-  const priority = priorities.find((priority) => priority.value === one(params.priority))?.value ?? null
-  const assignee = people.find((person) => person.id === one(params.assignee))?.id ?? null
+  const tab =
+    tabs.find((tab) => tab.value === one(params.tab))?.value ?? "active"
+  const priority =
+    priorities.find((priority) => priority.value === one(params.priority))
+      ?.value ?? null
+  const assignee =
+    people.find((person) => person.id === one(params.assignee))?.id ?? null
   const page = Math.max(1, Number.parseInt(one(params.page) ?? "1", 10) || 1)
   return {
     tab,
@@ -49,12 +57,24 @@ function parseQuery(params: SearchParams): Query {
 function href(query: Query, patch: Partial<Query> = {}) {
   const next = { ...query, ...patch }
   const params = new URLSearchParams()
-  if (next.tab !== "active") params.set("tab", next.tab)
-  if (next.view !== "list") params.set("view", next.view)
-  if (next.priority) params.set("priority", next.priority)
-  if (next.assignee) params.set("assignee", next.assignee)
-  if (next.page > 1) params.set("page", String(next.page))
-  if (next.issue) params.set("issue", next.issue)
+  if (next.tab !== "active") {
+    params.set("tab", next.tab)
+  }
+  if (next.view !== "list") {
+    params.set("view", next.view)
+  }
+  if (next.priority) {
+    params.set("priority", next.priority)
+  }
+  if (next.assignee) {
+    params.set("assignee", next.assignee)
+  }
+  if (next.page > 1) {
+    params.set("page", String(next.page))
+  }
+  if (next.issue) {
+    params.set("issue", next.issue)
+  }
   const search = params.toString()
   return search ? `/?${search}` : "/"
 }
@@ -65,7 +85,7 @@ function filterIssues(issues: Issue[], query: Query) {
     (issue) =>
       (tab.statuses as Status[]).includes(issue.status) &&
       (!query.priority || issue.priority === query.priority) &&
-      (!query.assignee || issue.assignee === query.assignee),
+      (!query.assignee || issue.assignee === query.assignee)
   )
 }
 
@@ -73,8 +93,10 @@ function countByTab(issues: Issue[]) {
   return Object.fromEntries(
     tabs.map((tab) => [
       tab.value,
-      issues.filter((issue) => (tab.statuses as Status[]).includes(issue.status)).length,
-    ]),
+      issues.filter((issue) =>
+        (tab.statuses as Status[]).includes(issue.status)
+      ).length,
+    ])
   ) as Record<Tab, number>
 }
 
@@ -95,21 +117,31 @@ function priorityOf(value: Priority) {
 }
 
 function leaves(subtasks: Subtask[]): Subtask[] {
-  return subtasks.flatMap((subtask) => (subtask.subtasks ? leaves(subtask.subtasks) : [subtask]))
+  return subtasks.flatMap((subtask) =>
+    subtask.subtasks ? leaves(subtask.subtasks) : [subtask]
+  )
 }
 
 function markSubtasks(subtasks: Subtask[], done: string[]): Subtask[] {
   return subtasks.map((subtask) => {
-    if (!subtask.subtasks) return { ...subtask, done: done.includes(subtask.id) }
+    if (!subtask.subtasks) {
+      return { ...subtask, done: done.includes(subtask.id) }
+    }
     const children = markSubtasks(subtask.subtasks, done)
-    return { ...subtask, done: children.every((child) => child.done), subtasks: children }
+    return {
+      ...subtask,
+      done: children.every((child) => child.done),
+      subtasks: children,
+    }
   })
 }
 
 function formatDate(date: string) {
-  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", timeZone: "UTC" }).format(
-    new Date(date),
-  )
+  return new Intl.DateTimeFormat("en", {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(date))
 }
 
 export {

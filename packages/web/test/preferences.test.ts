@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 // <ui-preferences> on a static page: its script, first inside it, runs as
 // the page loads, before the element is defined, then the element follows.
-import { createColorScheme, createLocalStorage, createPreference, preferencesScript } from "@ui-sdk/core"
+import {
+  createColorScheme,
+  createLocalStorage,
+  createPreference,
+  preferencesScript,
+} from "@ui-sdk/core"
 import { afterEach, expect, test } from "vitest"
 import { definePreferencesElements } from "../src/preferences"
 
@@ -11,14 +16,20 @@ afterEach(() => {
   document.body.replaceChildren()
   localStorage.clear()
   delete (window as Window & { __uiSdkStorage?: unknown }).__uiSdkStorage
-  for (const name of document.documentElement.getAttributeNames())
-    if (name.startsWith("data-")) document.documentElement.removeAttribute(name)
+  for (const name of document.documentElement.getAttributeNames()) {
+    if (name.startsWith("data-")) {
+      document.documentElement.removeAttribute(name)
+    }
+  }
 })
 
 const tick = () => new Promise<void>((resolve) => queueMicrotask(resolve))
 
 function setup() {
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme"), global: true })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme"),
+    global: true,
+  })
   const skinTone = createPreference({
     values: ["default", "light", "medium", "dark"],
     defaultValue: "default",
@@ -35,12 +46,20 @@ test("shows the saved values from its script, then follows them once given its p
   // The page as served: the script runs as the parser reaches it.
   const template = document.createElement("template")
   template.innerHTML = `<ui-preferences><script></script><p>App</p></ui-preferences>`
-  const element = template.content.firstElementChild as HTMLElement & { preferences: typeof preferences }
+  const element = template.content.firstElementChild as HTMLElement & {
+    preferences: typeof preferences
+  }
   const script = element.querySelector("script")!
   script.textContent = preferencesScript(preferences)
-  Object.defineProperty(document, "currentScript", { configurable: true, value: script })
+  Object.defineProperty(document, "currentScript", {
+    configurable: true,
+    value: script,
+  })
   new Function(script.textContent)()
-  Object.defineProperty(document, "currentScript", { configurable: true, value: null })
+  Object.defineProperty(document, "currentScript", {
+    configurable: true,
+    value: null,
+  })
   expect(document.documentElement.dataset.colorScheme).toBe("dark")
   expect(element.dataset.skinTone).toBe("medium")
 
@@ -80,11 +99,17 @@ test("preferences assigned before the element upgraded still take effect", () =>
   const { preferences, skinTone } = setup()
   // A document with no definitions, so the element stays un-upgraded, like one parsed before its script ran.
   const other = document.implementation.createHTMLDocument()
-  const element = other.createElement("ui-preferences") as HTMLElement & { preferences: typeof preferences }
+  const element = other.createElement("ui-preferences") as HTMLElement & {
+    preferences: typeof preferences
+  }
   element.preferences = preferences
-  expect(Object.prototype.hasOwnProperty.call(element, "preferences")).toBe(true)
+  expect(Object.prototype.hasOwnProperty.call(element, "preferences")).toBe(
+    true
+  )
   document.body.append(document.adoptNode(element))
-  expect(Object.prototype.hasOwnProperty.call(element, "preferences")).toBe(false)
+  expect(Object.prototype.hasOwnProperty.call(element, "preferences")).toBe(
+    false
+  )
   expect(element.preferences).toBe(preferences)
   skinTone.set("medium")
   expect(element.dataset.skinTone).toBe("medium")

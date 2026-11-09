@@ -10,7 +10,12 @@
     AutocompleteList,
   } from "@ui-sdk/svelte/autocomplete"
 
-  const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
+  const recent = [
+    "react hooks",
+    "tailwind grid",
+    "web components",
+    "vue v-model",
+  ]
 </script>
 
 <Autocomplete openOnFocus>

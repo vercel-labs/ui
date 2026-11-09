@@ -18,7 +18,10 @@
     <ComboboxLabel class="label">{f.label}</ComboboxLabel>
     <ComboboxInput>
       {#snippet render({ props, state })}
-        <input {...props} class={["input", state.open ? "is-open" : "is-closed"]} />
+        <input
+          {...props}
+          class={["input", state.open ? "is-open" : "is-closed"]}
+        />
       {/snippet}
     </ComboboxInput>
     <ComboboxTrigger aria-label={f.trigger}>▾</ComboboxTrigger>

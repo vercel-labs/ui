@@ -1,5 +1,9 @@
 import type { PrimitiveGeneric } from "../../foundation/kernel/primitive-types"
-import type { AccordionItemProps, AccordionOptions, AccordionState } from "./accordion"
+import type {
+  AccordionItemProps,
+  AccordionOptions,
+  AccordionState,
+} from "./accordion"
 
 // Accordion's types as functions of its item value type `T`, so every
 // renderer's `Accordion` infers `T` from `value`, `defaultValue` or

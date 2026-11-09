@@ -14,7 +14,12 @@ import {
   ComboboxTrigger,
   ComboboxValue,
 } from "@ui-sdk/react/combobox"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { CheckIcon, ChevronDownIcon, XIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
@@ -38,7 +43,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
@@ -50,7 +56,9 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        const entries = [...new FormData(event.currentTarget)].map(
+          ([name, value]) => `${name}=${value}`
+        )
         log(`Submitted ${entries.join("&")}`)
       }}
     >
@@ -67,7 +75,11 @@ function Example() {
             <ComboboxEmpty>No countries found.</ComboboxEmpty>
             <ComboboxList>
               {countries.map((country) => (
-                <ComboboxItem key={country.value} value={country.value} label={country.label}>
+                <ComboboxItem
+                  key={country.value}
+                  value={country.value}
+                  label={country.label}
+                >
                   {country.label}
                   <ComboboxItemIndicator>
                     <CheckIcon aria-hidden="true" />

@@ -16,4 +16,8 @@ Shows the month before. Named "Previous month"; pass `aria-label` in another lan
 
 {#snippet fallback()}‹{/snippet}
 
-<Part tag="button" part={step} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="button"
+  part={step}
+  props={{ ...rest, children: children ?? fallback }}
+/>

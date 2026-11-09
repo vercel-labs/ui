@@ -54,7 +54,10 @@ function validates(el: Element) {
 // Another library's form-associated custom element, which reports its
 // validity the way native controls do.
 function isFormAssociated(el: Element) {
-  return !!(el.constructor as { formAssociated?: boolean }).formAssociated && "validity" in el
+  return (
+    !!(el.constructor as { formAssociated?: boolean }).formAssociated &&
+    "validity" in el
+  )
 }
 
 // The form controls inside a field, not counting nested fields.
@@ -63,14 +66,18 @@ function controlsIn(root: HTMLElement) {
     (el) =>
       validates(el) &&
       (el as HTMLInputElement).type !== "hidden" &&
-      el.closest('[data-slot="field-root"]') === root,
+      el.closest('[data-slot="field-root"]') === root
   ) as HTMLElement[]
 }
 
 function validityOf(el: HTMLElement) {
   const internals = formInternals(el)
   const target = internals ?? (el as HTMLInputElement)
-  return { willValidate: target.willValidate, validity: target.validity, message: target.validationMessage }
+  return {
+    willValidate: target.willValidate,
+    validity: target.validity,
+    message: target.validationMessage,
+  }
 }
 
 // Whether a control says it's required. Our own controls mark the hidden input
@@ -78,4 +85,12 @@ function validityOf(el: HTMLElement) {
 const isRequired = (el: HTMLElement) =>
   el.hasAttribute("required") || el.getAttribute("aria-required") === "true"
 
-export { controlsIn, isRequired, valid, type Validity, type ValidityKey, validityKeys, validityOf }
+export {
+  controlsIn,
+  isRequired,
+  valid,
+  type Validity,
+  type ValidityKey,
+  validityKeys,
+  validityOf,
+}

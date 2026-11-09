@@ -21,8 +21,18 @@ type Variant = {
 
 const variants: Variant[] = [
   { id: "default", section: "Basics", title: "Default" },
-  { id: "default-visible", section: "Basics", title: "defaultVisible", options: { defaultVisible: true } },
-  { id: "default-value", section: "Basics", title: "defaultValue", options: { defaultValue: "hunter22" } },
+  {
+    id: "default-visible",
+    section: "Basics",
+    title: "defaultVisible",
+    options: { defaultVisible: true },
+  },
+  {
+    id: "default-value",
+    section: "Basics",
+    title: "defaultValue",
+    options: { defaultValue: "hunter22" },
+  },
   {
     id: "new-password",
     section: "Basics",
@@ -30,7 +40,12 @@ const variants: Variant[] = [
     note: "Password managers offer a strong new password.",
     options: { autoComplete: "new-password" },
   },
-  { id: "disabled", section: "Basics", title: "disabled", options: { disabled: true } },
+  {
+    id: "disabled",
+    section: "Basics",
+    title: "disabled",
+    options: { disabled: true },
+  },
   {
     id: "read-only",
     section: "Basics",
@@ -38,7 +53,13 @@ const variants: Variant[] = [
     note: "The toggle still shows it.",
     options: { readOnly: true, defaultValue: "hunter22" },
   },
-  { id: "rtl", section: "Basics", title: "Right to left", place: "rtl", options: { defaultValue: "שלום" } },
+  {
+    id: "rtl",
+    section: "Basics",
+    title: "Right to left",
+    place: "rtl",
+    options: { defaultValue: "שלום" },
+  },
   {
     id: "form",
     section: "Form",
@@ -55,7 +76,12 @@ const variants: Variant[] = [
     field: true,
     options: { fieldDisabled: true },
   },
-  { id: "controlled", section: "State", title: "Controlled visible", controlled: true },
+  {
+    id: "controlled",
+    section: "State",
+    title: "Controlled visible",
+    controlled: true,
+  },
   { id: "controller", section: "State", title: "Controller", controller: true },
   { id: "cancel", section: "State", title: "Canceled changes", cancel: true },
   {
@@ -64,7 +90,12 @@ const variants: Variant[] = [
     title: "Caps Lock",
     note: "Turn Caps Lock on while typing.",
   },
-  { id: "span-toggle", section: "Rendering", title: "Toggle as a span", render: "span" },
+  {
+    id: "span-toggle",
+    section: "Rendering",
+    title: "Toggle as a span",
+    render: "span",
+  },
 ]
 
 export { type Variant, variants }

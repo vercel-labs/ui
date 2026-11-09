@@ -33,7 +33,9 @@ describe("scrollToShow", () => {
 // A 100px list of twenty 20px options, with layout faked since jsdom has none.
 function list(style: Record<string, string>) {
   const root = document.createElement("div")
-  const options = Array.from({ length: 20 }, () => root.appendChild(document.createElement("div")))
+  const options = Array.from({ length: 20 }, () =>
+    root.appendChild(document.createElement("div"))
+  )
   document.body.append(root)
   Object.defineProperties(root, {
     scrollTop: { value: 0, writable: true },
@@ -44,7 +46,8 @@ function list(style: Record<string, string>) {
   root.getBoundingClientRect = () => new DOMRect(0, 0, 100, 102)
   options.forEach((option, index) => {
     Object.defineProperty(option, "offsetHeight", { value: 20 })
-    option.getBoundingClientRect = () => new DOMRect(0, root.clientTop + index * 20 - root.scrollTop, 100, 20)
+    option.getBoundingClientRect = () =>
+      new DOMRect(0, root.clientTop + index * 20 - root.scrollTop, 100, 20)
   })
   vi.stubGlobal("getComputedStyle", () => ({ overflowY: "auto", ...style }))
   return { root, options }
@@ -69,7 +72,10 @@ describe("revealInList", () => {
   })
 
   test("reads padding of auto as none", () => {
-    const { root, options } = list({ scrollPaddingTop: "auto", scrollPaddingBottom: "auto" })
+    const { root, options } = list({
+      scrollPaddingTop: "auto",
+      scrollPaddingBottom: "auto",
+    })
     revealInList(options[5]!, root)
     expect(root.scrollTop).toBe(20)
     root.scrollTop = 200

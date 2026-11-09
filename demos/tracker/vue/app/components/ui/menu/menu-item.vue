@@ -3,9 +3,12 @@ import { MenuItem } from "@ui-sdk/vue/menu"
 import { cn } from "cn"
 import { item } from "./styles"
 
-const props = withDefaults(defineProps<{ variant?: "default" | "destructive"; class?: string }>(), {
-  variant: "default",
-})
+const props = withDefaults(
+  defineProps<{ variant?: "default" | "destructive"; class?: string }>(),
+  {
+    variant: "default",
+  }
+)
 </script>
 
 <template>
@@ -15,7 +18,7 @@ const props = withDefaults(defineProps<{ variant?: "default" | "destructive"; cl
         item,
         props.variant === 'destructive' &&
           'text-destructive data-highlighted:bg-destructive/10 data-highlighted:text-destructive',
-        props.class,
+        props.class
       )
     "
   >

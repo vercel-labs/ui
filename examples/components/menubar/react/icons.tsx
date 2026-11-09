@@ -1,4 +1,11 @@
-import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/react/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuItemIcon,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
 import { Menubar } from "@ui-sdk/react/menubar"
 import {
   CircleHelpIcon,

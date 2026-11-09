@@ -20,7 +20,8 @@ type MaybeAccessor<T> = T | (() => T)
  */
 type UseShortcutOptions = ShortcutOptions
 
-const read = <T>(value: MaybeAccessor<T>) => (typeof value === "function" ? (value as () => T)() : value)
+const read = <T>(value: MaybeAccessor<T>) =>
+  typeof value === "function" ? (value as () => T)() : value
 
 /**
  * Registers a keyboard shortcut for the life of the component, in the shared
@@ -33,14 +34,16 @@ const read = <T>(value: MaybeAccessor<T>) => (typeof value === "function" ? (val
 function useShortcut(
   keys: MaybeAccessor<string | null | undefined>,
   handler: ShortcutHandler,
-  options: MaybeAccessor<UseShortcutOptions> = {},
+  options: MaybeAccessor<UseShortcutOptions> = {}
 ) {
   createEffect(
     () => ({ keys: read(keys), options: read(options) }),
     ({ keys, options }) => {
-      if (!keys) return
+      if (!keys) {
+        return
+      }
       return shortcuts.register(keys, handler, options)
-    },
+    }
   )
 }
 
@@ -57,7 +60,7 @@ function useShortcutHint(keys: MaybeAccessor<string>) {
     () => 0,
     () => {
       setApple(isApple())
-    },
+    }
   )
   return {
     text: () => formatShortcut(read(keys), apple()),
@@ -65,7 +68,12 @@ function useShortcutHint(keys: MaybeAccessor<string>) {
   }
 }
 
-export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
+export {
+  ariaKeyshortcuts,
+  formatShortcut,
+  registerShortcut,
+  shortcuts,
+} from "@ui-sdk/core/shortcuts"
 export type {
   ShortcutHandler,
   ShortcutInfo,
@@ -74,4 +82,9 @@ export type {
   Shortcuts,
 } from "@ui-sdk/core/shortcuts"
 
-export { type MaybeAccessor, useShortcut, useShortcutHint, type UseShortcutOptions }
+export {
+  type MaybeAccessor,
+  useShortcut,
+  useShortcutHint,
+  type UseShortcutOptions,
+}

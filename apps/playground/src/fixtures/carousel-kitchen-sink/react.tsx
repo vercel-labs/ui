@@ -19,7 +19,13 @@ import { slideBasis, slideCount, type Variant } from "./variants"
 
 const slides = Array.from({ length: slideCount }, (_, index) => index + 1)
 
-function Controls({ variant, controller }: { variant: Variant; controller?: CarouselController }) {
+function Controls({
+  variant,
+  controller,
+}: {
+  variant: Variant
+  controller?: CarouselController
+}) {
   return (
     <div className={classes.controls}>
       <CarouselPrevious className={classes.step} controller={controller}>
@@ -43,7 +49,11 @@ function Controls({ variant, controller }: { variant: Variant; controller?: Caro
             key={slide}
             className={classes.indicator}
             aria-label={`Slide ${slide}`}
-            render={variant.links ? <a href={`#kitchen-${variant.id}-${slide}`} /> : undefined}
+            render={
+              variant.links ? (
+                <a href={`#kitchen-${variant.id}-${slide}`} />
+              ) : undefined
+            }
           />
         ))}
       </CarouselIndicatorGroup>
@@ -54,10 +64,14 @@ function Controls({ variant, controller }: { variant: Variant; controller?: Caro
 function VariantCarousel({ variant, env }: { variant: Variant; env: Env }) {
   const [page, setPage] = React.useState(1)
   const [controller] = React.useState(() =>
-    variant.controller || variant.outside ? createCarouselController() : undefined,
+    variant.controller || variant.outside
+      ? createCarouselController()
+      : undefined
   )
   React.useEffect(() => {
-    if (!controller || !variant.controller) return
+    if (!controller || !variant.controller) {
+      return
+    }
     env.controls([
       ["next()", () => controller.next()],
       ["previous()", () => controller.previous()],
@@ -77,11 +91,17 @@ function VariantCarousel({ variant, env }: { variant: Variant; env: Env }) {
         {...(variant.controlled && { page })}
         controller={controller}
         onPageChange={(next, details) => {
-          if (variant.cancel) return details.cancel()
-          if (variant.controlled) setPage(next)
+          if (variant.cancel) {
+            return details.cancel()
+          }
+          if (variant.controlled) {
+            setPage(next)
+          }
           env.log(`pageChange ${next} (${details.reason}, ${details.source})`)
         }}
-        onPlayingChange={(playing, details) => env.log(`playingChange ${playing} (${details.reason})`)}
+        onPlayingChange={(playing, details) =>
+          env.log(`playingChange ${playing} (${details.reason})`)
+        }
       >
         <CarouselViewport className={classes.viewport}>
           <CarouselContent className={classes.content}>
@@ -98,7 +118,9 @@ function VariantCarousel({ variant, env }: { variant: Variant; env: Env }) {
         </CarouselViewport>
         {!variant.outside && <Controls variant={variant} />}
       </Carousel>
-      {variant.outside && <Controls variant={variant} controller={controller} />}
+      {variant.outside && (
+        <Controls variant={variant} controller={controller} />
+      )}
     </>
   )
 }
@@ -108,8 +130,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantCarousel variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

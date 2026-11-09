@@ -32,19 +32,29 @@ function Fixture() {
       <button>Before</button>
       <Popover controller={controller} {...options}>
         <Show when={triggerShown()}>
-          <PopoverTrigger shortcut={parts.shortcut ? popoverFixture.shortcut.trigger : undefined}>
+          <PopoverTrigger
+            shortcut={
+              parts.shortcut ? popoverFixture.shortcut.trigger : undefined
+            }
+          >
             {popoverFixture.trigger}
             <Show when={parts.shortcut}>
               <PopoverShortcut />
             </Show>
           </PopoverTrigger>
         </Show>
-        <PopoverContent class="popup" sideOffset={8} {...popoverContentOptions()}>
+        <PopoverContent
+          class="popup"
+          sideOffset={8}
+          {...popoverContentOptions()}
+        >
           <PopoverArrow class="arrow" />
           <Show when={parts.title}>
             <PopoverTitle class="title">{popoverFixture.title}</PopoverTitle>
           </Show>
-          <PopoverDescription class="description">{popoverFixture.description}</PopoverDescription>
+          <PopoverDescription class="description">
+            {popoverFixture.description}
+          </PopoverDescription>
           <label class="field">
             {popoverFixture.field}
             <input value={popoverFixture.defaultValue} />
@@ -58,7 +68,9 @@ function Fixture() {
             </button>
             <PopoverClose>{popoverFixture.close}</PopoverClose>
             <Show when={parts.removable}>
-              <button onClick={() => setTriggerShown(false)}>{popoverFixture.remove}</button>
+              <button onClick={() => setTriggerShown(false)}>
+                {popoverFixture.remove}
+              </button>
             </Show>
           </div>
           <Show when={parts.menu}>
@@ -79,8 +91,12 @@ function Fixture() {
             <Popover>
               <PopoverTrigger>{popoverFixture.nested.trigger}</PopoverTrigger>
               <PopoverContent class="popup">
-                <PopoverTitle class="title">{popoverFixture.nested.title}</PopoverTitle>
-                <button onClick={() => setAction("archive")}>{popoverFixture.nested.action}</button>
+                <PopoverTitle class="title">
+                  {popoverFixture.nested.title}
+                </PopoverTitle>
+                <button onClick={() => setAction("archive")}>
+                  {popoverFixture.nested.action}
+                </button>
               </PopoverContent>
             </Popover>
           </Show>
@@ -92,7 +108,10 @@ function Fixture() {
       </output>
       <button onClick={() => controller.open()}>Open with controller</button>
       <Show when={parts.shortcut}>
-        <PopoverTrigger controller={controller} shortcut={popoverFixture.shortcut.remote.keys}>
+        <PopoverTrigger
+          controller={controller}
+          shortcut={popoverFixture.shortcut.remote.keys}
+        >
           {popoverFixture.shortcut.remote.trigger}
           <PopoverShortcut />
         </PopoverTrigger>

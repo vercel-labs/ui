@@ -1,6 +1,11 @@
 "use client"
 
-import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  type ResizableStorage,
+} from "@ui-sdk/react/resizable"
 
 const session: ResizableStorage = {
   getItem: (key) => sessionStorage.getItem(key),

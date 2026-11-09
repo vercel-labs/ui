@@ -25,7 +25,12 @@ type TeamCardOptions = {
 
 const teamCard = definePrimitive({
   name: "team-card",
-  options: { open: "boolean", defaultOpen: "boolean", onOpenChange: "callback", onPayloadChange: "callback" },
+  options: {
+    open: "boolean",
+    defaultOpen: "boolean",
+    onOpenChange: "callback",
+    onPayloadChange: "callback",
+  },
   state: (options: TeamCardOptions) => popupState(options),
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: (context) => createPopup(context, { preset: popoverPreset }),
@@ -74,7 +79,11 @@ function Example() {
     >
       <div data-slot="row">
         {team.map((person) => (
-          <TeamCardTrigger key={person.initials} payload={person} aria-label={person.name}>
+          <TeamCardTrigger
+            key={person.initials}
+            payload={person}
+            aria-label={person.name}
+          >
             {person.initials}
           </TeamCardTrigger>
         ))}

@@ -16,15 +16,26 @@ const found = new URLSearchParams(location.search).has("found")
 
 function Fixture() {
   return (
-    <div className="fixture" style={{ flexDirection: "column", alignItems: "start" }}>
+    <div
+      className="fixture"
+      style={{ flexDirection: "column", alignItems: "start" }}
+    >
       <button>Before</button>
       <Accordion className="accordion" hiddenUntilFound={found}>
         {items.map((index) => (
-          <AccordionItem key={index} className="accordion-item" value={`item-${index}`}>
+          <AccordionItem
+            key={index}
+            className="accordion-item"
+            value={`item-${index}`}
+          >
             <AccordionHeader className="accordion-header">
-              <AccordionTrigger className="accordion-trigger">Question {index + 1}</AccordionTrigger>
+              <AccordionTrigger className="accordion-trigger">
+                Question {index + 1}
+              </AccordionTrigger>
             </AccordionHeader>
-            <AccordionPanel className="accordion-panel">Answer {index + 1}</AccordionPanel>
+            <AccordionPanel className="accordion-panel">
+              Answer {index + 1}
+            </AccordionPanel>
           </AccordionItem>
         ))}
       </Accordion>

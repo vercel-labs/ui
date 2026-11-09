@@ -11,15 +11,24 @@
     TooltipContent,
     TooltipTrigger,
   } from "@ui-sdk/svelte"
-  import { describeChange, hoverPopupsFixture as fixture } from "tests/fixtures/hover-popups.ts"
+  import {
+    describeChange,
+    hoverPopupsFixture as fixture,
+  } from "tests/fixtures/hover-popups.ts"
 
   let change = $state("")
 
   function opened(component: string, open: boolean, { event }: ChangeDetails) {
-    if (open) change = describeChange(component, "open", event)
+    if (open) {
+      change = describeChange(component, "open", event)
+    }
   }
 
-  function payloadChanged(component: string, payload: unknown, { event }: ChangeDetails) {
+  function payloadChanged(
+    component: string,
+    payload: unknown,
+    { event }: ChangeDetails
+  ) {
     change = describeChange(component, `payload ${payload}`, event)
   }
 </script>
@@ -29,7 +38,8 @@
   <Tooltip
     delay={0}
     onOpenChange={(open, details) => opened("tooltip", open, details)}
-    onPayloadChange={(payload, details) => payloadChanged("tooltip", payload, details)}
+    onPayloadChange={(payload, details) =>
+      payloadChanged("tooltip", payload, details)}
   >
     {#each fixture.days as day (day)}
       <TooltipTrigger payload={day.toLowerCase()}>{day}</TooltipTrigger>
@@ -42,10 +52,13 @@
     delay={0}
     closeDelay={0}
     onOpenChange={(open, details) => opened("hover card", open, details)}
-    onPayloadChange={(payload, details) => payloadChanged("hover card", payload, details)}
+    onPayloadChange={(payload, details) =>
+      payloadChanged("hover card", payload, details)}
   >
     {#each fixture.people as person (person)}
-      <HoverCardTrigger href={`#${person}`} payload={person.toLowerCase()}>{person}</HoverCardTrigger>
+      <HoverCardTrigger href={`#${person}`} payload={person.toLowerCase()}
+        >{person}</HoverCardTrigger
+      >
     {/each}
     <HoverCardContent class="hover-card">
       {#snippet children(state)}Card for {state.payload}{/snippet}

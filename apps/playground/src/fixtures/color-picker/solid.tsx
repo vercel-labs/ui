@@ -43,10 +43,14 @@ function Fixture() {
         controller={controller}
         {...options}
         onValueChange={(value, details) => {
-          if (cancel) return details.cancel()
+          if (cancel) {
+            return details.cancel()
+          }
           setAction(`${value}:${details.reason}`)
         }}
-        onValueCommit={(value, details) => setCommitted(`${value}:${details.reason}`)}
+        onValueCommit={(value, details) =>
+          setCommitted(`${value}:${details.reason}`)
+        }
       >
         <ColorPickerArea>
           <Show when={options.space === "oklch"}>
@@ -65,13 +69,18 @@ function Fixture() {
         <ColorPickerSwatch />
         <ColorPickerEyeDropper>Pick from screen</ColorPickerEyeDropper>
         <ColorPickerSwatches aria-label="Presets">
-          <For each={colorPickerFixture.swatches}>{(swatch) => <ColorPickerSwatchItem value={swatch} />}</For>
+          <For each={colorPickerFixture.swatches}>
+            {(swatch) => <ColorPickerSwatchItem value={swatch} />}
+          </For>
         </ColorPickerSwatches>
       </ColorPicker>
       <button type="button">After</button>
       <button type="submit">Save</button>
       <button type="reset">Reset</button>
-      <button type="button" onClick={() => controller.setValue("rebeccapurple")}>
+      <button
+        type="button"
+        onClick={() => controller.setValue("rebeccapurple")}
+      >
         Use purple
       </button>
       <output role="status" aria-label="Last action">

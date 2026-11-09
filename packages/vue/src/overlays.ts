@@ -1,6 +1,9 @@
 import type { ConfirmEntry, ConfirmOptions } from "@ui-sdk/core/dialog"
 import { toasterInternals } from "@ui-sdk/core/renderer"
-import { overlays as sharedOverlays, type Overlays } from "@ui-sdk/core/overlays"
+import {
+  overlays as sharedOverlays,
+  type Overlays,
+} from "@ui-sdk/core/overlays"
 import type { Toaster, ToastItem } from "@ui-sdk/core/toast"
 import {
   defineComponent,
@@ -47,7 +50,9 @@ const HostedToaster = defineComponent({
   setup(props) {
     const placed = shallowRef(toasterInternals(props.toaster).hasPlacedRegion())
     onScopeDispose(
-      props.toaster.subscribe(() => (placed.value = toasterInternals(props.toaster).hasPlacedRegion())),
+      props.toaster.subscribe(
+        () => (placed.value = toasterInternals(props.toaster).hasPlacedRegion())
+      )
     )
     return () =>
       placed.value
@@ -55,7 +60,7 @@ const HostedToaster = defineComponent({
         : h(
             HostedToastRegion,
             { ...props.regionProps, toaster: props.toaster },
-            props.renderToast && { default: props.renderToast },
+            props.renderToast && { default: props.renderToast }
           )
   },
 })
@@ -80,12 +85,18 @@ const HostedConfirm = defineComponent({
         () =>
           h(AlertDialogContent, null, () => [
             h(AlertDialogTitle, null, () => question.title),
-            question.description ? h(AlertDialogDescription, null, () => question.description) : null,
+            question.description
+              ? h(AlertDialogDescription, null, () => question.description)
+              : null,
             h("div", [
               h(AlertDialogClose, null, () => question.cancelLabel ?? "Cancel"),
-              h(AlertDialogClose, { value: "confirm" }, () => question.confirmLabel ?? "Continue"),
+              h(
+                AlertDialogClose,
+                { value: "confirm" },
+                () => question.confirmLabel ?? "Continue"
+              ),
             ]),
-          ]),
+          ])
       )
     }
   },
@@ -107,27 +118,37 @@ const OverlayHost = defineComponent({
   },
   slots: Object as SlotsType<{
     /** Renders each toast of the regions it renders, like a `ToastRegion`'s default slot: `#toast="{ toast }"`. */
-    toast?: (scope: { toast: ToastItem<ToastContent>["toast"]; item: ToastItem<ToastContent> }) => VNode[]
+    toast?: (scope: {
+      toast: ToastItem<ToastContent>["toast"]
+      item: ToastItem<ToastContent>
+    }) => VNode[]
   }>,
   setup(props, { slots }) {
     const registry = props.overlays ?? sharedOverlays
     const entries = shallowRef(registry.entries())
-    onScopeDispose(registry.subscribe(() => (entries.value = registry.entries())))
+    onScopeDispose(
+      registry.subscribe(() => (entries.value = registry.entries()))
+    )
     // Counted only on the client, once mounted.
     let release = () => {}
     onMounted(() => (release = registry.attachHost()))
     onBeforeUnmount(() => release())
     return () =>
       entries.value.map((entry) => {
-        if (entry.type === "toaster")
+        if (entry.type === "toaster") {
           return h(HostedToaster, {
             key: entry.id,
             toaster: (entry.data as { toaster: Toaster }).toaster,
             regionProps: props.toast,
             renderToast: slots.toast,
           })
-        if (entry.type === "confirm")
-          return h(HostedConfirm, { key: entry.id, entry: entry.data as ConfirmEntry })
+        }
+        if (entry.type === "confirm") {
+          return h(HostedConfirm, {
+            key: entry.id,
+            entry: entry.data as ConfirmEntry,
+          })
+        }
         return null
       })
   },

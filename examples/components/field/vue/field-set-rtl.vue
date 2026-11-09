@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Field, FieldDescription, FieldLabel, FieldLegend, FieldSet } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@ui-sdk/vue/field"
 import { Input } from "@ui-sdk/vue/input"
 </script>
 

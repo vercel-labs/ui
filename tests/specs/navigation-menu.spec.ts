@@ -1,13 +1,23 @@
 import type { Locator, Page } from "@playwright/test"
-import { entered, expect, lastAction, opacityOf, pageNow, slowTransitions, test } from "../fixtures"
+import {
+  entered,
+  expect,
+  lastAction,
+  opacityOf,
+  pageNow,
+  slowTransitions,
+  test,
+} from "../fixtures"
 
 // Site navigation with the APG disclosure navigation pattern: buttons that
 // show panels of links inside a <nav>, not a menu. Tab reaches every trigger
 // and link, Enter and Space toggle a panel, Escape closes it, and the pointer
 // opens panels by resting on their triggers.
 
-const trigger = (page: Page, name: string) => page.getByRole("button", { name, exact: true })
-const link = (page: Page, name: string) => page.getByRole("link", { name, exact: true })
+const trigger = (page: Page, name: string) =>
+  page.getByRole("button", { name, exact: true })
+const link = (page: Page, name: string) =>
+  page.getByRole("link", { name, exact: true })
 const before = (page: Page) => page.getByRole("button", { name: "Before" })
 const after = (page: Page) => page.getByRole("button", { name: "After" })
 const viewport = (page: Page) => page.locator(".nav-viewport")
@@ -16,7 +26,9 @@ const viewport = (page: Page) => page.locator(".nav-viewport")
 // events, since a menu may route them elsewhere while the pointer crosses.
 async function pointAt(page: Page, target: Locator) {
   const box = (await target.boundingBox())!
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 4 })
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, {
+    steps: 4,
+  })
 }
 
 async function moveAway(page: Page) {
@@ -31,10 +43,16 @@ test.describe("pointer", () => {
   test("resting the pointer on a trigger opens its panel", async ({ page }) => {
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    await expect(trigger(page, "Products")).toHaveAttribute("aria-expanded", "true")
+    await expect(trigger(page, "Products")).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    )
   })
 
-  test("the panel waits for its delay before opening", async ({ page, open }) => {
+  test("the panel waits for its delay before opening", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { delay: "400" })
     const start = await pageNow(page)
     await trigger(page, "Products").hover()
@@ -42,7 +60,10 @@ test.describe("pointer", () => {
     expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(400)
   })
 
-  test("moving to another trigger while a panel is open switches at once", async ({ page, open }) => {
+  test("moving to another trigger while a panel is open switches at once", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { delay: "600" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
@@ -53,18 +74,25 @@ test.describe("pointer", () => {
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
-  test("crossing another trigger on the way to the open panel keeps the panel", async ({ page }) => {
+  test("crossing another trigger on the way to the open panel keeps the panel", async ({
+    page,
+  }) => {
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
     const from = (await trigger(page, "Products").boundingBox())!
     const to = (await viewport(page).boundingBox())!
     await page.mouse.move(from.x + from.width - 6, from.y + 6)
-    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.8, { steps: 12 })
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.8, {
+      steps: 12,
+    })
     await expect(link(page, "Analytics")).toBeVisible()
     await expect(link(page, "Blog")).toBeHidden()
   })
 
-  test("resting on another trigger on the way to the open panel switches to it", async ({ page, open }) => {
+  test("resting on another trigger on the way to the open panel switches to it", async ({
+    page,
+    open,
+  }) => {
     await page.clock.install()
     await open("navigation-menu")
     const products = (await trigger(page, "Products").boundingBox())!
@@ -72,13 +100,20 @@ test.describe("pointer", () => {
     await page.clock.runFor(100)
     await expect(link(page, "Analytics")).toBeVisible()
     const resources = (await trigger(page, "Resources").boundingBox())!
-    await page.mouse.move(resources.x + 12, resources.y + resources.height - 4, { steps: 4 })
+    await page.mouse.move(
+      resources.x + 12,
+      resources.y + resources.height - 4,
+      { steps: 4 }
+    )
     await expect(link(page, "Analytics")).toBeVisible()
     await page.clock.runFor(300)
     await expect(link(page, "Blog")).toBeVisible()
   })
 
-  test("moving the pointer away closes the panel after its close delay", async ({ page, open }) => {
+  test("moving the pointer away closes the panel after its close delay", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { closeDelay: "400" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
@@ -104,7 +139,10 @@ test.describe("pointer", () => {
     await expect(before(page)).toBeFocused()
   })
 
-  test("clicking a trigger opens its panel, and clicking it again closes it", async ({ page, open }) => {
+  test("clicking a trigger opens its panel, and clicking it again closes it", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { delay: "2000" })
     await trigger(page, "Products").click()
     await expect(link(page, "Analytics")).toBeVisible()
@@ -112,7 +150,9 @@ test.describe("pointer", () => {
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
-  test("clicking a trigger the pointer just opened keeps it open", async ({ page }) => {
+  test("clicking a trigger the pointer just opened keeps it open", async ({
+    page,
+  }) => {
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
     await trigger(page, "Products").click()
@@ -128,8 +168,16 @@ test.describe("pointer", () => {
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
-  test("a tap opens a panel and another tap closes it", async ({ browser, framework, baseURL }) => {
-    const context = await browser.newContext({ hasTouch: true, isMobile: true, baseURL })
+  test("a tap opens a panel and another tap closes it", async ({
+    browser,
+    framework,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      hasTouch: true,
+      isMobile: true,
+      baseURL,
+    })
     const page = await context.newPage()
     await page.goto(`/?fixture=navigation-menu&framework=${framework}`)
     await page.locator("body[data-mounted]").waitFor({ state: "attached" })
@@ -148,12 +196,16 @@ test.describe("pointer", () => {
     await page.keyboard.press("Escape")
     await expect(link(page, "Analytics")).toBeHidden()
     const box = (await trigger(page, "Products").boundingBox())!
-    await page.mouse.move(box.x + box.width / 2 + 3, box.y + box.height / 2, { steps: 3 })
+    await page.mouse.move(box.x + box.width / 2 + 3, box.y + box.height / 2, {
+      steps: 3,
+    })
     await page.waitForTimeout(300)
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
-  test("sweeping across every trigger leaves the menu working", async ({ page }) => {
+  test("sweeping across every trigger leaves the menu working", async ({
+    page,
+  }) => {
     const first = (await trigger(page, "Products").boundingBox())!
     const last = (await link(page, "Pricing").boundingBox())!
     const y = first.y + first.height / 2
@@ -170,7 +222,10 @@ test.describe("pointer", () => {
 })
 
 test.describe("keyboard", () => {
-  test("Tab moves through the triggers and links in order while closed", async ({ page, tab }) => {
+  test("Tab moves through the triggers and links in order while closed", async ({
+    page,
+    tab,
+  }) => {
     await before(page).focus()
     for (const name of ["Products", "Resources"]) {
       await tab()
@@ -182,7 +237,9 @@ test.describe("keyboard", () => {
     await expect(after(page)).toBeFocused()
   })
 
-  test("Enter opens a panel and leaves focus on its trigger", async ({ page }) => {
+  test("Enter opens a panel and leaves focus on its trigger", async ({
+    page,
+  }) => {
     await trigger(page, "Products").focus()
     await page.keyboard.press("Enter")
     await expect(link(page, "Analytics")).toBeVisible()
@@ -209,7 +266,10 @@ test.describe("keyboard", () => {
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
-  test("Tab from an open trigger moves into its panel", async ({ page, tab }) => {
+  test("Tab from an open trigger moves into its panel", async ({
+    page,
+    tab,
+  }) => {
     await trigger(page, "Products").focus()
     await page.keyboard.press("Enter")
     await expect(link(page, "Analytics")).toBeVisible()
@@ -219,7 +279,10 @@ test.describe("keyboard", () => {
     await expect(link(page, "Engagement")).toBeFocused()
   })
 
-  test("Tab past the panel's last link moves on to the next trigger", async ({ page, tab }) => {
+  test("Tab past the panel's last link moves on to the next trigger", async ({
+    page,
+    tab,
+  }) => {
     await trigger(page, "Resources").focus()
     await page.keyboard.press("Enter")
     await expect(link(page, "Blog")).toBeVisible()
@@ -231,7 +294,10 @@ test.describe("keyboard", () => {
     await expect(link(page, "Pricing")).toBeFocused()
   })
 
-  test("Shift+Tab from the panel's first link returns to its trigger", async ({ page, tab }) => {
+  test("Shift+Tab from the panel's first link returns to its trigger", async ({
+    page,
+    tab,
+  }) => {
     await trigger(page, "Products").focus()
     await page.keyboard.press("Enter")
     await tab()
@@ -241,7 +307,10 @@ test.describe("keyboard", () => {
     await expect(link(page, "Analytics")).toBeVisible()
   })
 
-  test("Shift+Tab from the item after an open panel goes back into the panel", async ({ page, tab }) => {
+  test("Shift+Tab from the item after an open panel goes back into the panel", async ({
+    page,
+    tab,
+  }) => {
     await trigger(page, "Resources").focus()
     await page.keyboard.press("Enter")
     await expect(link(page, "Blog")).toBeVisible()
@@ -250,7 +319,10 @@ test.describe("keyboard", () => {
     await expect(link(page, "Guides")).toBeFocused()
   })
 
-  test("Escape inside a panel closes it and returns focus to its trigger", async ({ page, tab }) => {
+  test("Escape inside a panel closes it and returns focus to its trigger", async ({
+    page,
+    tab,
+  }) => {
     await trigger(page, "Products").focus()
     await page.keyboard.press("Enter")
     await tab()
@@ -270,7 +342,10 @@ test.describe("keyboard", () => {
     await expect(trigger(page, "Products")).toBeFocused()
   })
 
-  test("focus leaving the navigation closes the panel", async ({ page, tab }) => {
+  test("focus leaving the navigation closes the panel", async ({
+    page,
+    tab,
+  }) => {
     await trigger(page, "Resources").focus()
     await page.keyboard.press("Enter")
     await expect(link(page, "Blog")).toBeVisible()
@@ -281,7 +356,9 @@ test.describe("keyboard", () => {
     expect(await lastAction(page)).toBe("close: focus-out")
   })
 
-  test("Right and Left arrows move between the top-level items", async ({ page }) => {
+  test("Right and Left arrows move between the top-level items", async ({
+    page,
+  }) => {
     await trigger(page, "Products").focus()
     await page.keyboard.press("ArrowRight")
     await expect(trigger(page, "Resources")).toBeFocused()
@@ -306,7 +383,10 @@ test.describe("keyboard", () => {
     await expect(link(page, "Analytics")).toBeVisible()
   })
 
-  test("Down and Up arrows move between the links in a panel", async ({ page, tab }) => {
+  test("Down and Up arrows move between the links in a panel", async ({
+    page,
+    tab,
+  }) => {
     await trigger(page, "Products").focus()
     await page.keyboard.press("Enter")
     await tab()
@@ -346,7 +426,10 @@ test.describe("keyboard", () => {
     }
   })
 
-  test("a vertical menu moves between items with Down and Up", async ({ page, open }) => {
+  test("a vertical menu moves between items with Down and Up", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { orientation: "vertical" })
     await trigger(page, "Products").focus()
     await page.keyboard.press("ArrowDown")
@@ -357,7 +440,9 @@ test.describe("keyboard", () => {
 })
 
 test.describe("links", () => {
-  test("a link in a panel follows its href and closes the menu", async ({ page }) => {
+  test("a link in a panel follows its href and closes the menu", async ({
+    page,
+  }) => {
     await trigger(page, "Products").click()
     await link(page, "Engagement").click()
     await expect(page).toHaveURL(/#engagement$/)
@@ -373,7 +458,10 @@ test.describe("links", () => {
     await expect(page).toHaveURL(/#analytics$/)
   })
 
-  test("a link with closing turned off leaves the menu open", async ({ page, open }) => {
+  test("a link with closing turned off leaves the menu open", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { "close-on-select": "false" })
     await trigger(page, "Products").click()
     await link(page, "Engagement").click()
@@ -388,7 +476,9 @@ test.describe("links", () => {
 })
 
 test.describe("viewport", () => {
-  test("the viewport opens below the open trigger, lined up with its start", async ({ page }) => {
+  test("the viewport opens below the open trigger, lined up with its start", async ({
+    page,
+  }) => {
     await pointAt(page, trigger(page, "Resources"))
     await expect(link(page, "Blog")).toBeVisible()
     const box = (await viewport(page).boundingBox())!
@@ -426,7 +516,10 @@ test.describe("viewport", () => {
 })
 
 test.describe("kept content", () => {
-  test("closed content kept mounted stays in the page, hidden", async ({ page, open }) => {
+  test("closed content kept mounted stays in the page, hidden", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { "keep-mounted": "" })
     await expect(page.locator('a[href="#engagement"]')).toHaveCount(1)
     await expect(page.locator('a[href="#engagement"]')).toBeHidden()
@@ -434,12 +527,16 @@ test.describe("kept content", () => {
     await expect(link(page, "Engagement")).toBeVisible()
   })
 
-  test("the viewport follows the open panel when its size changes", async ({ page }) => {
+  test("the viewport follows the open panel when its size changes", async ({
+    page,
+  }) => {
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    await page.locator(".nav-content", { has: link(page, "Analytics") }).evaluate((el) => {
-      ;(el as HTMLElement).style.width = "400px"
-    })
+    await page
+      .locator(".nav-content", { has: link(page, "Analytics") })
+      .evaluate((el) => {
+        ;(el as HTMLElement).style.width = "400px"
+      })
     await expect(async () => {
       const box = (await viewport(page).boundingBox())!
       expect(Math.round(box.width)).toBe(402)
@@ -453,34 +550,49 @@ test.describe("animation", () => {
     await page.emulateMedia({ reducedMotion: "no-preference" })
   })
 
-  test("the viewport and its content animate in from their starting style", async ({ page, open }) => {
+  test("the viewport and its content animate in from their starting style", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { animate: "" })
     await slowTransitions(page)
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
     expect(await opacityOf(page.locator(".nav-viewport"))).toBeLessThan(0.5)
-    expect(await opacityOf(page.locator(".nav-content", { has: link(page, "Analytics") }))).toBeLessThan(0.5)
+    expect(
+      await opacityOf(
+        page.locator(".nav-content", { has: link(page, "Analytics") })
+      )
+    ).toBeLessThan(0.5)
   })
 
-  test("the viewport stays in the page while it animates out", async ({ page, open }) => {
+  test("the viewport stays in the page while it animates out", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { animate: "", closeDelay: "0" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
     await entered(page)
     await moveAway(page)
-    await expect(page.locator(".nav-viewport[data-ending-style]")).toHaveCount(1)
+    await expect(page.locator(".nav-viewport[data-ending-style]")).toHaveCount(
+      1
+    )
     await expect(link(page, "Analytics")).toBeHidden()
   })
 
   test("a menu opening from closed has no motion", async ({ page }) => {
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
-    await expect(page.locator(".nav-content", { has: link(page, "Analytics") })).not.toHaveAttribute(
-      "data-motion",
-    )
+    await expect(
+      page.locator(".nav-content", { has: link(page, "Analytics") })
+    ).not.toHaveAttribute("data-motion")
   })
 
-  test("with reduced motion, panels switch and close without waiting", async ({ page, open }) => {
+  test("with reduced motion, panels switch and close without waiting", async ({
+    page,
+    open,
+  }) => {
     await page.emulateMedia({ reducedMotion: "reduce" })
     await open("navigation-menu", { animate: "", closeDelay: "0" })
     await trigger(page, "Products").hover()
@@ -493,7 +605,10 @@ test.describe("animation", () => {
     await expect(page.locator("[data-ending-style]")).toHaveCount(0)
   })
 
-  test("the viewport appears in place, without sliding in from the corner", async ({ page, open }) => {
+  test("the viewport appears in place, without sliding in from the corner", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { animate: "" })
     await trigger(page, "Resources").hover()
     await expect(viewport(page)).toBeVisible()
@@ -502,9 +617,12 @@ test.describe("animation", () => {
     expect(Math.abs(box.x - anchor.x)).toBeLessThanOrEqual(1)
   })
 
-  test("exit keyframes keyed on data-closed play on the content that gave way", async ({ page }) => {
+  test("exit keyframes keyed on data-closed play on the content that gave way", async ({
+    page,
+  }) => {
     await page.addStyleTag({
-      content: "@keyframes exit { to { opacity: 0 } } .nav-content[data-closed] { animation: exit 3s }",
+      content:
+        "@keyframes exit { to { opacity: 0 } } .nav-content[data-closed] { animation: exit 3s }",
     })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
@@ -514,12 +632,19 @@ test.describe("animation", () => {
     await expect(exiting).toHaveCount(1)
     expect(
       await exiting.evaluate((el) =>
-        el.getAnimations().some((animation) => (animation as CSSAnimation).animationName === "exit"),
-      ),
+        el
+          .getAnimations()
+          .some(
+            (animation) => (animation as CSSAnimation).animationName === "exit"
+          )
+      )
     ).toBe(true)
   })
 
-  test("the content that gave way animates out while the next one comes in", async ({ page, open }) => {
+  test("the content that gave way animates out while the next one comes in", async ({
+    page,
+    open,
+  }) => {
     await open("navigation-menu", { animate: "" })
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
@@ -533,7 +658,9 @@ test.describe("animation", () => {
 })
 
 test.describe("reasons", () => {
-  test("changes report why the menu opened, switched and closed", async ({ page }) => {
+  test("changes report why the menu opened, switched and closed", async ({
+    page,
+  }) => {
     await trigger(page, "Products").hover()
     await expect(link(page, "Analytics")).toBeVisible()
     expect(await lastAction(page)).toBe("products: trigger-hover")

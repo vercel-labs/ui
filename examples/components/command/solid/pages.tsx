@@ -25,10 +25,10 @@ const icon = (markup: string) => () => (
   />
 )
 const Moon = icon(
-  '<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />',
+  '<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401" />'
 )
 const Users = icon(
-  '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" />',
+  '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M16 3.128a4 4 0 0 1 0 7.744" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><circle cx="9" cy="7" r="4" />'
 )
 const ArrowLeft = icon('<path d="m12 19-7-7 7-7" /><path d="M19 12H5" />')
 
@@ -53,15 +53,23 @@ function Example() {
       pages={pages()}
       onPagesChange={(next) => setPages(next)}
       onAction={(value) => {
-        if (value === "back") command.pop()
+        if (value === "back") {
+          command.pop()
+        }
       }}
     >
       <div data-slot="row">
-        <For each={pages()}>{(page) => <span data-slot="badge">{page}</span>}</For>
+        <For each={pages()}>
+          {(page) => <span data-slot="badge">{page}</span>}
+        </For>
       </div>
       <CommandInput
         aria-label="Search commands"
-        placeholder={pages().length ? "Search… (Backspace to go back)" : "What do you need?"}
+        placeholder={
+          pages().length
+            ? "Search… (Backspace to go back)"
+            : "What do you need?"
+        }
       />
       <CommandEmpty>No results found.</CommandEmpty>
       <CommandList>
@@ -83,10 +91,18 @@ function Example() {
           </CommandGroup>
         </CommandPage>
         <CommandPage value="theme">
-          <For each={themes}>{(theme) => <CommandItem value={theme.value}>{theme.label}</CommandItem>}</For>
+          <For each={themes}>
+            {(theme) => (
+              <CommandItem value={theme.value}>{theme.label}</CommandItem>
+            )}
+          </For>
         </CommandPage>
         <CommandPage value="teams">
-          <For each={teams}>{(team) => <CommandItem value={team.value}>{team.label}</CommandItem>}</For>
+          <For each={teams}>
+            {(team) => (
+              <CommandItem value={team.value}>{team.label}</CommandItem>
+            )}
+          </For>
         </CommandPage>
         <Show when={pages().length > 0}>
           <CommandItem value="back">

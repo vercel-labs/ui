@@ -6,7 +6,12 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/vue/date-picker"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 import {
   datePickerFieldFixture as f,
   datePickerFieldOptions,
@@ -19,7 +24,9 @@ const submitted = ref("")
 const shown = ref(true)
 
 function onSubmit(event: Event) {
-  submitted.value = JSON.stringify([...new FormData(event.currentTarget as HTMLFormElement)])
+  submitted.value = JSON.stringify([
+    ...new FormData(event.currentTarget as HTMLFormElement),
+  ])
 }
 </script>
 
@@ -29,7 +36,12 @@ function onSubmit(event: Event) {
     <form @submit.prevent="onSubmit">
       <Field class="field" :name="datePickerFixture.name" :disabled="disabled">
         <FieldLabel>{{ f.label }}</FieldLabel>
-        <DatePicker v-if="shown" class="date-picker" :today="datePickerFixture.today" :required="required">
+        <DatePicker
+          v-if="shown"
+          class="date-picker"
+          :today="datePickerFixture.today"
+          :required="required"
+        >
           <DatePickerInput />
           <DatePickerTrigger />
           <DatePickerHint class="date-picker-hint" />

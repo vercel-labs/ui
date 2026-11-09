@@ -10,7 +10,8 @@ const items = [
   {
     value: "two",
     label: "Where does the height come from?",
-    content: "The panel measures itself and writes the result to a CSS variable while it animates.",
+    content:
+      "The panel measures itself and writes the result to a CSS variable while it animates.",
   },
   {
     value: "three",
@@ -39,7 +40,7 @@ function mount(root: HTMLElement) {
               <ui-accordion-panel${item.value === "one" ? "" : " hidden"}>
                 ${item.content}
               </ui-accordion-panel>
-            </ui-accordion-item>`,
+            </ui-accordion-item>`
         )
         .join("")}
     </ui-accordion>

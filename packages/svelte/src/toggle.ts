@@ -1,7 +1,10 @@
 export { default as Toggle } from "./toggle/toggle.svelte"
 export { default as ToggleGroup } from "./toggle/toggle-group.svelte"
 export { default as ToggleIcon } from "./toggle/toggle-icon.svelte"
-export { createToggleController, createToggleGroupController } from "@ui-sdk/core/toggle"
+export {
+  createToggleController,
+  createToggleGroupController,
+} from "@ui-sdk/core/toggle"
 export type {
   ToggleApi,
   ToggleChangeOptions,

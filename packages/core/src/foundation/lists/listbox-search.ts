@@ -33,9 +33,15 @@ type ListAnnouncement =
 
 /** What a list announces by default, in English: "3 results", "No results", "Loading" or "Pear removed". */
 function describeList(change: ListAnnouncement) {
-  if (change.type === "removed") return `${change.label} removed`
-  if (change.loading) return "Loading"
-  if (!change.count) return "No results"
+  if (change.type === "removed") {
+    return `${change.label} removed`
+  }
+  if (change.loading) {
+    return "Loading"
+  }
+  if (!change.count) {
+    return "No results"
+  }
   return change.count === 1 ? "1 result" : `${change.count} results`
 }
 
@@ -57,7 +63,9 @@ type ListItemTextProps = {
 
 // How a filter marks matches, or undefined for one that can't say, like a function.
 function matchMode(filter: ListFilter<unknown> | "fuzzy" | undefined) {
-  return filter === "contains" || filter === "startsWith" || filter === "fuzzy" ? filter : undefined
+  return filter === "contains" || filter === "startsWith" || filter === "fuzzy"
+    ? filter
+    : undefined
 }
 
 // What an item's text part needs from its component: the text that filters
@@ -78,14 +86,21 @@ const unmatched = (text: string) => ({
 // The same text and query give the same state object, so a part that reads it
 // only renders again when its marks change.
 function itemTextPart<State extends object, Api extends ItemTextApi>() {
-  const memo = new WeakMap<object, Map<string, { text: string; query: string; state: ListItemTextState }>>()
+  const memo = new WeakMap<
+    object,
+    Map<string, { text: string; query: string; state: ListItemTextState }>
+  >()
   const stateOf = (api: Api, key: string, text: string) => {
     const { matchQuery, matchMode: mode } = api.internal
     const query = mode() ? matchQuery() : ""
     let cache = memo.get(api)
-    if (!cache) memo.set(api, (cache = new Map()))
+    if (!cache) {
+      memo.set(api, (cache = new Map()))
+    }
     const last = cache.get(key)
-    if (last && last.text === text && last.query === query) return last.state
+    if (last && last.text === text && last.query === query) {
+      return last.state
+    }
     const ranges = query.trim() ? matchRanges(text, query, mode()!) : []
     const state = ranges.length
       ? { segments: matchSegments(text, ranges), matched: true }
@@ -103,20 +118,26 @@ function itemTextPart<State extends object, Api extends ItemTextApi>() {
       "data-matched": stateOf(api, key, props.text).matched ? "" : undefined,
     }),
     bind(el, { api, key, props, store }) {
-      if (!props.write) return
+      if (!props.write) {
+        return
+      }
       // Web components mark their own text, rebuilding it only when the marks change.
       let written: ListItemTextState | undefined
       const write = () => {
         const next = stateOf(api, key, props.text)
-        if (next === written) return
+        if (next === written) {
+          return
+        }
         written = next
         el.replaceChildren(
           ...next.segments.map(({ text, match }) => {
-            if (!match) return text
+            if (!match) {
+              return text
+            }
             const mark = el.ownerDocument.createElement("mark")
             mark.textContent = text
             return mark
-          }),
+          })
         )
       }
       write()
@@ -126,13 +147,19 @@ function itemTextPart<State extends object, Api extends ItemTextApi>() {
         el.textContent = props.text
       }
     },
-  } satisfies SlotDefinition<State, Api, ListItemTextProps & BaseSlotProps, ListItemTextState>
+  } satisfies SlotDefinition<
+    State,
+    Api,
+    ListItemTextProps & BaseSlotProps,
+    ListItemTextState
+  >
 }
 
 // Whether opening from this event should move real focus into the list.
 // VoiceOver on iOS ignores aria-activedescendant, so a screen reader's tap,
 // which arrives as a click with no pointer or key behind it, gets real focus.
-const opensIntoList = (event?: Event) => !!event && trusted(event) && sourceOf(event) === "virtual"
+const opensIntoList = (event?: Event) =>
+  !!event && trusted(event) && sourceOf(event) === "virtual"
 
 // How long typing must pause before result counts are announced.
 const ANNOUNCE_DELAY = 500
@@ -156,7 +183,8 @@ function announceResults({
   loading: () => boolean
   shown: () => boolean
   silent: () => boolean
-  announcement: () => ((change: ListAnnouncement) => string | null | undefined) | undefined
+  announcement: () =>
+    ((change: ListAnnouncement) => string | null | undefined) | undefined
 }) {
   let timer: ReturnType<typeof setTimeout> | undefined
   let previousQuery = query()
@@ -165,10 +193,19 @@ function announceResults({
   const say = () => {
     timer = undefined
     // An empty field shows everything, or suggestions, which aren't results to count.
-    if (!shown() || silent() || !query().trim()) return
-    const change: ListAnnouncement = { type: "results", count: count(), query: query(), loading: loading() }
+    if (!shown() || silent() || !query().trim()) {
+      return
+    }
+    const change: ListAnnouncement = {
+      type: "results",
+      count: count(),
+      query: query(),
+      loading: loading(),
+    }
     const message = (announcement() ?? describeList)(change)
-    if (message) announce(message)
+    if (message) {
+      announce(message)
+    }
     // Results still loading are said again once they arrive.
     waiting = change.loading
   }
@@ -179,7 +216,9 @@ function announceResults({
     const arrived = previousLoading && !nowLoading && waiting
     previousQuery = next
     previousLoading = nowLoading
-    if (!typed && !arrived) return
+    if (!typed && !arrived) {
+      return
+    }
     clearTimeout(timer)
     timer = setTimeout(say, ANNOUNCE_DELAY)
   })
@@ -201,8 +240,12 @@ function createLoadMore({
   function reached() {
     const load = onLoadMore()
     const current = status()
-    if (!load || current === "loading") return
-    if (count() === requestedAt && current !== "error") return
+    if (!load || current === "loading") {
+      return
+    }
+    if (count() === requestedAt && current !== "error") {
+      return
+    }
     requestedAt = count()
     load()
   }
@@ -211,9 +254,13 @@ function createLoadMore({
   function bind(el: HTMLElement) {
     const onScroll = (event: Event) => {
       const target = event.target as HTMLElement
-      if (!(target instanceof HTMLElement)) return
+      if (!(target instanceof HTMLElement)) {
+        return
+      }
       // Within the height of a row or so of the end.
-      if (target.scrollTop + target.clientHeight >= target.scrollHeight - 40) reached()
+      if (target.scrollTop + target.clientHeight >= target.scrollHeight - 40) {
+        reached()
+      }
     }
     el.addEventListener("scroll", onScroll, { capture: true, passive: true })
     return () => el.removeEventListener("scroll", onScroll, { capture: true })

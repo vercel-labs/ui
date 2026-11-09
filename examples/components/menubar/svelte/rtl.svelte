@@ -10,7 +10,6 @@
     MenuTrigger,
   } from "@ui-sdk/svelte/menu"
   import { Menubar } from "@ui-sdk/svelte/menubar"
-
 </script>
 
 <div dir="rtl">

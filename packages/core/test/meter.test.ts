@@ -13,15 +13,23 @@ describe("meter parts", () => {
       "aria-valuetext": "40%",
       style: "--meter-value:40%",
     })
-    expect(attrs(instance.part("indicator")).style).toBe("inset-inline-start:0;width:40%")
+    expect(attrs(instance.part("indicator")).style).toBe(
+      "inset-inline-start:0;width:40%"
+    )
   })
 
   test("a meter has no status attributes, at any value", () => {
     for (const value of [0, 40, 100]) {
       const instance = meter({ id: "m", value })
-      for (const slot of ["root", "track", "indicator", "label", "value"] as const) {
+      for (const slot of [
+        "root",
+        "track",
+        "indicator",
+        "label",
+        "value",
+      ] as const) {
         const data = Object.keys(attrs(instance.part(slot))).filter(
-          (name) => name.startsWith("data-") && name !== "data-slot",
+          (name) => name.startsWith("data-") && name !== "data-slot"
         )
         expect(data, `${slot} at ${value}`).toEqual([])
       }
@@ -31,13 +39,19 @@ describe("meter parts", () => {
   test("parts receive the value and where it sits", () => {
     const instance = meter({ id: "m", value: 3, min: 1, max: 5 })
     expect(partState(instance.part("track"))).toEqual({ value: 3, percent: 50 })
-    expect(partState(instance.part("value"))).toEqual({ value: 3, percent: 50, text: "50%" })
+    expect(partState(instance.part("value"))).toEqual({
+      value: 3,
+      percent: 50,
+      text: "50%",
+    })
   })
 
   test("a value outside the bounds reads as the nearest bound", () => {
     const above = meter({ id: "m", value: 140 })
     expect(attrs(above.part("root"))["aria-valuenow"]).toBe("100")
-    expect(attrs(above.part("indicator")).style).toBe("inset-inline-start:0;width:100%")
+    expect(attrs(above.part("indicator")).style).toBe(
+      "inset-inline-start:0;width:100%"
+    )
     const below = meter({ id: "m", value: -5, min: 0, max: 10 })
     expect(attrs(below.part("root"))["aria-valuenow"]).toBe("0")
     expect(partState(below.part("root")).percent).toBe(0)
@@ -72,14 +86,19 @@ describe("meter parts", () => {
         return `${value} of ${details.max} requests (${details.formatted})`
       },
     })
-    expect(attrs(instance.part("root"))["aria-valuetext"]).toBe("750 of 1000 requests (75%)")
+    expect(attrs(instance.part("root"))["aria-valuetext"]).toBe(
+      "750 of 1000 requests (75%)"
+    )
     expect(received).toEqual([750, 75])
   })
 
   test("a new value updates every part", () => {
     const instance = meter({ id: "m", value: 20 })
     instance.setOptions({ id: "m", value: 65 })
-    expect(attrs(instance.part("root"))).toMatchObject({ "aria-valuenow": "65", style: "--meter-value:65%" })
+    expect(attrs(instance.part("root"))).toMatchObject({
+      "aria-valuenow": "65",
+      style: "--meter-value:65%",
+    })
     expect(partState(instance.part("value")).text).toBe("65%")
   })
 })

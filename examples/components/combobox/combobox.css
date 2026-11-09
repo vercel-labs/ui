@@ -59,7 +59,8 @@
       padding-inline-end: calc(var(--space-2) + 24px);
     }
 
-    &:has([data-slot="combobox-trigger"]):has([data-slot="combobox-clear"]) [data-slot="combobox-input"] {
+    &:has([data-slot="combobox-trigger"]):has([data-slot="combobox-clear"])
+      [data-slot="combobox-input"] {
       padding-inline-end: calc(var(--space-2) + 48px);
     }
 
@@ -240,7 +241,8 @@
       width: auto;
       height: auto;
       max-height: 85dvh;
-      padding: var(--space-2) var(--space-2) max(env(safe-area-inset-bottom), var(--space-3));
+      padding: var(--space-2) var(--space-2)
+        max(env(safe-area-inset-bottom), var(--space-3));
       scroll-padding-top: 48px;
 
       & > [data-slot$="-header"] {
@@ -280,7 +282,10 @@
 
   /* A leading box marks items in multi-select lists. */
   :is([data-slot="combobox-item"], [data-slot="combobox-select-all"])
-    > span:not([data-slot]):first-child:is(:empty, :has(> :is(svg, [data-slot="combobox-item-indicator"]))) {
+    > span:not([data-slot]):first-child:is(
+      :empty,
+      :has(> :is(svg, [data-slot="combobox-item-indicator"]))
+    ) {
     display: grid;
     flex-shrink: 0;
     place-items: center;
@@ -303,7 +308,8 @@
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 
-    [data-highlighted]:is([data-selected], [data-checked], [data-indeterminate]) > & {
+    [data-highlighted]:is([data-selected], [data-checked], [data-indeterminate])
+      > & {
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 

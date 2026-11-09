@@ -13,7 +13,11 @@ function useItemFile(part: string, own: () => File | undefined) {
   const listed = getContext<(() => File) | undefined>(FileKey)
   return () => {
     const file = own() ?? listed?.()
-    if (!file) throw new Error(`${part} must be used inside <FileInputList>, or be given a file.`)
+    if (!file) {
+      throw new Error(
+        `${part} must be used inside <FileInputList>, or be given a file.`
+      )
+    }
     return file
   }
 }

@@ -17,7 +17,10 @@ import { checkName } from "#name-check"
 import { css } from "../../foundation/kernel/inline-style"
 import { bindPageLocale } from "../../foundation/text/locale"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * What `getValueLabel` receives after the value.
@@ -64,7 +67,8 @@ type State = GaugeSettings & {
   labels: number
 }
 
-const percentOf = (state: State) => percentBetween(state.value, state.min, state.max)
+const percentOf = (state: State) =>
+  percentBetween(state.value, state.min, state.max)
 
 function meterState(state: State) {
   return { value: state.value, percent: percentOf(state) }
@@ -88,7 +92,11 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
     getValueLabel: "value",
     value: "number",
   },
-  state: (options: MeterOptions): State => ({ ...settings(options), labels: 0, pageLocale: null }),
+  state: (options: MeterOptions): State => ({
+    ...settings(options),
+    labels: 0,
+    pageLocale: null,
+  }),
   sync: settings,
   // `value` is a reading, not state a user changes, so it has no `onValueChange`.
   controlled: [],
@@ -106,7 +114,9 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
       bind: (el, { store, id }) => {
         bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
         // A meter's content never names it, so only a label or `aria-label` does.
-        if (dev) checkName(el, "Meter", { component: "meter", id })
+        if (dev) {
+          checkName(el, "Meter", { component: "meter", id })
+        }
       },
     }),
     track: slot<{}, MeterState>({ state: meterState }),
@@ -123,7 +133,10 @@ const meterPrimitive = /* @__PURE__ */ definePrimitive({
     // The formatted value. Its text isn't announced on its own: a meter's
     // content is presentational, and the meter reads the value through `aria-valuetext`.
     value: slot<{}, MeterValueState>({
-      state: (state) => ({ ...meterState(state), text: formatGaugeValue(state.value, state) }),
+      state: (state) => ({
+        ...meterState(state),
+        text: formatGaugeValue(state.value, state),
+      }),
     }),
   }),
 })

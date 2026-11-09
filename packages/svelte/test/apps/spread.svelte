@@ -10,12 +10,17 @@
     name,
     props,
     tag,
-  }: { handle: PrimitiveHandle<any>; name: string; props: Record<string, unknown>; tag: string } = $props()
+  }: {
+    handle: PrimitiveHandle<any>
+    name: string
+    props: Record<string, unknown>
+    tag: string
+  } = $props()
 
   const part = usePart<any, string>(
     untrack(() => handle),
     untrack(() => name),
-    () => props,
+    () => props
   )
   // Object.entries leaves the attachment's symbol key out.
   const attrs = $derived(Object.fromEntries(Object.entries(part.slot())))

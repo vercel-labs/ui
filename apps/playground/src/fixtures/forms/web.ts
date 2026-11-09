@@ -1,5 +1,9 @@
 import type { CheckedState } from "@ui-sdk/core/checkbox"
-import { formsFixture as f, formsOptions, serialize } from "tests/fixtures/forms.ts"
+import {
+  formsFixture as f,
+  formsOptions,
+  serialize,
+} from "tests/fixtures/forms.ts"
 
 const indicator = `<ui-checkbox-indicator class="checkbox-indicator"></ui-checkbox-indicator>`
 const attr = (name: string, on: boolean | undefined) => (on ? ` ${name}` : "")
@@ -25,7 +29,7 @@ function markup(options: ReturnType<typeof formsOptions>) {
             ${f.toppings.items
               .map(
                 (item) =>
-                  `<label><ui-checkbox class="checkbox" value="${item.value}">${indicator}</ui-checkbox>${item.label}</label>`,
+                  `<label><ui-checkbox class="checkbox" value="${item.value}">${indicator}</ui-checkbox>${item.label}</label>`
               )
               .join("")}
           </ui-checkbox-group>
@@ -34,7 +38,7 @@ function markup(options: ReturnType<typeof formsOptions>) {
         ${f.switches
           .map(
             (item) =>
-              `<label><ui-switch class="switch" name="${item.name}"${attr("default-checked", item.defaultChecked)}><ui-switch-thumb class="switch-thumb"></ui-switch-thumb></ui-switch>${item.label}</label>`,
+              `<label><ui-switch class="switch" name="${item.name}"${attr("default-checked", item.defaultChecked)}><ui-switch-thumb class="switch-thumb"></ui-switch-thumb></ui-switch>${item.label}</label>`
           )
           .join("")}
 
@@ -44,7 +48,7 @@ function markup(options: ReturnType<typeof formsOptions>) {
             ${f.plan.items
               .map(
                 (item) =>
-                  `<label><ui-radio class="radio" value="${item.value}"${attr("disabled", item.disabled)}><ui-radio-indicator class="radio-indicator"></ui-radio-indicator></ui-radio>${item.label}</label>`,
+                  `<label><ui-radio class="radio" value="${item.value}"${attr("disabled", item.disabled)}><ui-radio-indicator class="radio-indicator"></ui-radio-indicator></ui-radio>${item.label}</label>`
               )
               .join("")}
           </ui-radio-group>
@@ -93,8 +97,11 @@ async function mount(root: HTMLElement) {
   const template = document.createElement("template")
   template.innerHTML = markup(options)
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
-  if (options.plan)
-    template.content.querySelector("ui-radio-group")!.setAttribute("default-value", options.plan)
+  if (options.plan) {
+    template.content
+      .querySelector("ui-radio-group")!
+      .setAttribute("default-value", options.plan)
+  }
   root.replaceChildren(template.content)
   await import("@ui-sdk/web/checkbox")
   await import("@ui-sdk/web/switch")
@@ -102,8 +109,12 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/field")
 
   const form = root.querySelector("form")!
-  const action = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
-  const source = root.querySelector<HTMLOutputElement>('output[aria-label="Last source"]')!
+  const action = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
+  const source = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last source"]'
+  )!
 
   form.addEventListener("submit", (event) => {
     event.preventDefault()
@@ -119,26 +130,39 @@ async function mount(root: HTMLElement) {
   root.addEventListener(
     "checkedchange",
     (event) => {
-      const detail = (event as CustomEvent<{ value: CheckedState; source: string }>).detail
+      const detail = (
+        event as CustomEvent<{ value: CheckedState; source: string }>
+      ).detail
       const target = event.target as HTMLElement
-      if (target.closest("ui-checkbox-group")) return
+      if (target.closest("ui-checkbox-group")) {
+        return
+      }
       const name = target.getAttribute("name") ?? ""
-      if (options.cancel === name) return event.preventDefault()
+      if (options.cancel === name) {
+        return event.preventDefault()
+      }
       action.textContent = `${name}:${String(detail.value)}`
       source.textContent = detail.source
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuechange",
     (event) => {
-      const detail = (event as CustomEvent<{ value: string | string[] | null; source: string }>).detail
+      const detail = (
+        event as CustomEvent<{
+          value: string | string[] | null
+          source: string
+        }>
+      ).detail
       const name = (event.target as HTMLElement).getAttribute("name") ?? ""
-      if (options.cancel === name) return event.preventDefault()
+      if (options.cancel === name) {
+        return event.preventDefault()
+      }
       action.textContent = `${name}:${Array.isArray(detail.value) ? detail.value.join(",") : detail.value}`
       source.textContent = detail.source
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

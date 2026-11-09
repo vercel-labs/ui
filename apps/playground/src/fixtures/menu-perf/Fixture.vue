@@ -1,12 +1,22 @@
 <script setup lang="ts">
-import { Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuItemIndicator, MenuTrigger } from "@ui-sdk/vue"
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuItem,
+  MenuItemIndicator,
+  MenuTrigger,
+} from "@ui-sdk/vue"
 import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"
 
 // A long menu for the counts specs. Every other item reads `highlighted` in
 // its render slot, so specs can tell plain items' renders from watched ones.
 // A checkbox item at the end changes state that only it and its indicator show.
 const items = perfItems(perfSize())
-const count = (kind: "watched" | "plain" | "checkbox") => (countRender(kind), "")
+const count = (kind: "watched" | "plain" | "checkbox") => (
+  countRender(kind),
+  ""
+)
 </script>
 
 <template>
@@ -19,7 +29,8 @@ const count = (kind: "watched" | "plain" | "checkbox") => (countRender(kind), ""
           <MenuItem v-if="index % 2" class="item" :value="item.value">
             <template #render="{ props, state }">
               <div v-bind="props">
-                {{ count("watched") }}{{ state.highlighted ? "→ " : "" }}{{ item.label }}
+                {{ count("watched") }}{{ state.highlighted ? "→ " : ""
+                }}{{ item.label }}
               </div>
             </template>
           </MenuItem>
@@ -32,7 +43,8 @@ const count = (kind: "watched" | "plain" | "checkbox") => (countRender(kind), ""
         <MenuCheckboxItem class="item" value="wrap">
           <template #render="{ props }">
             <div v-bind="props">
-              {{ count("checkbox") }}<MenuItemIndicator>✓</MenuItemIndicator>Wrap lines
+              {{ count("checkbox")
+              }}<MenuItemIndicator>✓</MenuItemIndicator>Wrap lines
             </div>
           </template>
         </MenuCheckboxItem>

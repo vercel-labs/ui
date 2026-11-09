@@ -2,7 +2,12 @@
 
 import { cn } from "cn"
 import { bindPersistentLayer } from "@ui-sdk/core"
-import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/react/popover"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/react/popover"
 import { frameworkIds, frameworks } from "@/lib/frameworks"
 import { menu } from "@/lib/menu"
 import type { Section } from "@/lib/sections"
@@ -43,11 +48,17 @@ function MobileNav({
   // Search can navigate while the menu is open, so the menu closes on any navigation.
   React.useEffect(() => setOpen(false), [pathname])
   React.useEffect(() => {
-    if (searching) setOpen(false)
+    if (searching) {
+      setOpen(false)
+    }
   }, [searching])
 
   // The modal menu makes the page inert, but the header stays usable above it.
-  React.useEffect(() => (open && header.current ? bindPersistentLayer(header.current) : undefined), [open])
+  React.useEffect(
+    () =>
+      open && header.current ? bindPersistentLayer(header.current) : undefined,
+    [open]
+  )
 
   const [hidden, setHidden] = React.useState(false)
   React.useEffect(() => {
@@ -61,8 +72,11 @@ function MobileNav({
         anchor = last
       }
       last = y
-      if (y < 56 || (!down && anchor - y > 120)) setHidden(false)
-      else if (down && y - anchor > 8) setHidden(true)
+      if (y < 56 || (!down && anchor - y > 120)) {
+        setHidden(false)
+      } else if (down && y - anchor > 8) {
+        setHidden(true)
+      }
     }
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
@@ -97,7 +111,10 @@ function MobileNav({
         <Logo className="h-[18px] w-auto" />
       </Link>
       <div className="ms-auto flex items-center gap-1">
-        <HeaderCopyPrompt registry={registry} className="me-1.5 h-7 px-2.5 text-[13px]" />
+        <HeaderCopyPrompt
+          registry={registry}
+          className="me-1.5 h-7 px-2.5 text-[13px]"
+        />
         {/* Phones show the icon alone, so the breadcrumb fits. */}
         <SearchTrigger className="hit-area flex size-8 items-center justify-center rounded-2xl text-sm text-foreground outline-none transition-colors hover:bg-foreground/[0.06] focus-visible:ring-3 focus-visible:ring-ring/30 max-sm:[&>span]:sr-only max-sm:[&_svg]:size-5 sm:h-8 sm:w-auto sm:gap-2 sm:ps-2.5 sm:pe-3" />
         <GitHubLink className="text-foreground hover:bg-foreground/[0.06] [&_svg]:size-5" />
@@ -137,13 +154,24 @@ function MobileNav({
             className="h-(--available-height) w-(--anchor-width) overflow-y-auto overscroll-contain bg-canvas outline-none [scrollbar-width:none] lg:hidden"
           >
             <PopoverTitle className="sr-only">Menu</PopoverTitle>
-            <MobileMenu section={section} tree={tree} urls={urls} onNavigate={() => setOpen(false)} />
+            <MobileMenu
+              section={section}
+              tree={tree}
+              urls={urls}
+              onNavigate={() => setOpen(false)}
+            />
           </PopoverContent>
         </Popover>
       </div>
-      <div aria-hidden="true" className="pointer-events-none absolute inset-x-6 -bottom-px h-px sm:inset-x-8">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-6 -bottom-px h-px sm:inset-x-8"
+      >
         <span
-          className={cn("absolute inset-x-3.5 top-0 h-px", docs ? "bg-foreground/[0.06]" : "bg-foreground")}
+          className={cn(
+            "absolute inset-x-3.5 top-0 h-px",
+            docs ? "bg-foreground/[0.06]" : "bg-foreground"
+          )}
         />
         <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -start-[5px] -top-[5px] group-data-open/header:hidden" />
         <span className="pointer-events-none absolute size-[11px] text-foreground group-data-docs/header:text-foreground/30 before:absolute before:inset-x-0 before:top-[5px] before:h-px before:bg-current/40 after:absolute after:inset-y-0 after:start-[5px] after:w-px after:bg-current/40 -end-[5px] -top-[5px] group-data-open/header:hidden" />
@@ -157,7 +185,10 @@ const menuButton =
 
 function MenuIcon({ open }: { open: boolean }) {
   return (
-    <span data-open={open ? "" : undefined} className="group/icon relative size-5">
+    <span
+      data-open={open ? "" : undefined}
+      className="group/icon relative size-5"
+    >
       <span className="absolute start-0 top-[0.375rem] h-[1.5px] w-5 bg-foreground transition-all duration-100 group-data-open/icon:top-[0.5625rem] group-data-open/icon:-rotate-45 motion-reduce:transition-none" />
       <span className="absolute start-0 top-[0.75rem] h-[1.5px] w-5 bg-foreground transition-all duration-100 group-data-open/icon:top-[0.5625rem] group-data-open/icon:rotate-45 motion-reduce:transition-none" />
     </span>
@@ -171,11 +202,16 @@ type Group = { label?: string; pages: PageTree.Item[] }
 function groupPages(nodes: PageTree.Node[], label?: string) {
   const groups: Group[] = [{ label, pages: [] }]
   for (const node of nodes) {
-    if (node.type === "separator") groups.push({ label: String(node.name), pages: [] })
-    else if (node.type === "page") groups[groups.length - 1].pages.push(node)
-    else {
+    if (node.type === "separator") {
+      groups.push({ label: String(node.name), pages: [] })
+    } else if (node.type === "page") {
+      groups[groups.length - 1].pages.push(node)
+    } else {
       const pages = groupPages(node.children).flatMap((group) => group.pages)
-      groups.push({ label: String(node.name), pages: node.index ? [node.index, ...pages] : pages })
+      groups.push({
+        label: String(node.name),
+        pages: node.index ? [node.index, ...pages] : pages,
+      })
     }
   }
   return groups.filter((group) => group.pages.length)
@@ -203,7 +239,9 @@ function MobileMenu({
       <nav aria-label="Sections" className="flex flex-col gap-12">
         <MenuGroup label="Menu">
           {menu.map((item) => {
-            if (item.href === "/docs/frameworks") return null
+            if (item.href === "/docs/frameworks") {
+              return null
+            }
             if (item.href.startsWith("http")) {
               return (
                 <li key={item.href}>
@@ -221,7 +259,12 @@ function MobileMenu({
             }
             const { href, current } = link(item.href)
             return (
-              <MenuLink key={item.href} href={href} current={current} onNavigate={onNavigate}>
+              <MenuLink
+                key={item.href}
+                href={href}
+                current={current}
+                onNavigate={onNavigate}
+              >
                 {item.title}
               </MenuLink>
             )
@@ -266,11 +309,19 @@ function MobileMenu({
   )
 }
 
-function MenuGroup({ label, children }: { label?: string; children: React.ReactNode }) {
+function MenuGroup({
+  label,
+  children,
+}: {
+  label?: string
+  children: React.ReactNode
+}) {
   return (
     <div className="flex flex-col gap-4">
       {label && (
-        <div className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">{label}</div>
+        <div className="font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase">
+          {label}
+        </div>
       )}
       <ul className="flex flex-col gap-3">{children}</ul>
     </div>
@@ -297,7 +348,7 @@ function MenuLink({
         className={cn(
           "block w-fit rounded-md text-2xl font-medium tracking-tight outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
           "text-foreground decoration-1 underline-offset-[0.2em] hover:underline",
-          current && "underline",
+          current && "underline"
         )}
       >
         {children}

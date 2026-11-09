@@ -37,7 +37,11 @@ Import the parts and put them together:
 
 ```vue
 <script setup lang="ts">
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui-sdk/vue/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/vue/hover-card"
 </script>
 
 <template>
@@ -65,7 +69,13 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui-sdk/vue/hover
 `side-offset` is the gap to the link, 4 pixels by default. `align-offset` shifts the card along it, and `collision-padding` is the space kept from the edges of the window. `anchor` positions the card against something other than the link: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`.
 
 ```vue
-<HoverCardContent side="right" align="start" :side-offset="8" :collision-padding="16" :anchor="row" />
+<HoverCardContent
+  side="right"
+  align="start"
+  :side-offset="8"
+  :collision-padding="16"
+  :anchor="row"
+/>
 ```
 
 ## Delays
@@ -205,17 +215,26 @@ Props are the same as below, and callbacks are events.
 
 ### HoverCard
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardOptions" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardOptions"
+/>
 
 ### HoverCardTrigger
 
 A trigger outside the card also takes `controller`.
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerProps"
+/>
 
 ### HoverCardContent
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentProps"
+/>
 
 ### HoverCardArrow
 
@@ -227,15 +246,24 @@ What render functions, state-based class names and slots receive, per part.
 
 `HoverCardTrigger`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerState"
+/>
 
 `HoverCardContent`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentState"
+/>
 
 `HoverCardArrow`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardArrowState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardArrowState"
+/>
 
 ### Reasons
 

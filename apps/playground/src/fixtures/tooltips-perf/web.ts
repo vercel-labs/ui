@@ -14,7 +14,7 @@ function mount(root: HTMLElement) {
             <ui-tooltip-trigger><button class="tooltip-trigger">Tip ${index + 1}</button></ui-tooltip-trigger>
             <ui-tooltip-content class="tooltip">Hint ${index + 1}</ui-tooltip-content>
           </ui-tooltip>
-        </div>`,
+        </div>`
     ).join("")
     target.innerHTML = `
       <div class="fixture tooltip-page" style="flex-wrap: wrap">

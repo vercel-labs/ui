@@ -14,7 +14,8 @@ function IssuesPage() {
   const query = createMemo(() => parseQuery(params))
   const counts = createMemo(() => countByTab(db.issues))
   const matching = createMemo(() => filterIssues(db.issues, query()), {
-    equals: (a, b) => a.length === b.length && a.every((issue, index) => issue === b[index]),
+    equals: (a, b) =>
+      a.length === b.length && a.every((issue, index) => issue === b[index]),
   })
   const issue = createMemo(() => getIssue(query().issue))
 
@@ -34,7 +35,13 @@ function IssuesPage() {
       >
         <Show
           when={query().view === "board"}
-          fallback={<IssueList issues={matching()} query={query()} pageSize={db.settings.pageSize} />}
+          fallback={
+            <IssueList
+              issues={matching()}
+              query={query()}
+              pageSize={db.settings.pageSize}
+            />
+          }
         >
           <IssueBoard issues={matching()} query={query()} />
         </Show>

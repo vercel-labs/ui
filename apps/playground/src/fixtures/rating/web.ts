@@ -31,25 +31,39 @@ async function mount(root: HTMLElement) {
   const { cancel, disabled } = ratingOptions()
   root.innerHTML = markup()
   const rating = root.querySelector<RatingElement>("#quality")!
-  if (disabled) rating.setAttribute("disabled", "")
-  root.querySelector<RatingElement>("#average")!.getValueLabel = average.getValueLabel
+  if (disabled) {
+    rating.setAttribute("disabled", "")
+  }
+  root.querySelector<RatingElement>("#average")!.getValueLabel =
+    average.getValueLabel
   await import("@ui-sdk/web/rating")
   const form = root.querySelector("form")!
   const [action, submitted] = root.querySelectorAll("output")
-  root.querySelector("#controller")!.addEventListener("click", () => rating.api?.setValue(5))
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => rating.api?.setValue(5))
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    submitted!.textContent = Array.from(new FormData(form), ([key, entry]) => `${key}=${entry}`).join("&")
+    submitted!.textContent = Array.from(
+      new FormData(form),
+      ([key, entry]) => `${key}=${entry}`
+    ).join("&")
   })
   root.addEventListener(
     "valuechange",
     (event) => {
-      if (event.target !== rating) return
-      const detail = (event as CustomEvent<{ value: number | null; reason: string }>).detail
-      if (detail.value === cancel) return event.preventDefault()
+      if (event.target !== rating) {
+        return
+      }
+      const detail = (
+        event as CustomEvent<{ value: number | null; reason: string }>
+      ).detail
+      if (detail.value === cancel) {
+        return event.preventDefault()
+      }
       action!.textContent = `${detail.value}:${detail.reason}`
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

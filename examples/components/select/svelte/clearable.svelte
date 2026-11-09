@@ -28,7 +28,8 @@
   <Select
     defaultValue="ines"
     placeholder="Unassigned"
-    onValueChange={(value, details) => log(`value: ${JSON.stringify(value)} (${details.reason})`)}
+    onValueChange={(value, details) =>
+      log(`value: ${JSON.stringify(value)} (${details.reason})`)}
   >
     <div data-slot="row">
       <SelectTrigger>

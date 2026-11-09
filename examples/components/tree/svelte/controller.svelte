@@ -61,8 +61,12 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => settings.expandAll()}>Expand All</button>
-    <button type="button" onclick={() => settings.collapseAll()}>Collapse All</button>
+    <button type="button" onclick={() => settings.expandAll()}
+      >Expand All</button
+    >
+    <button type="button" onclick={() => settings.collapseAll()}
+      >Collapse All</button
+    >
     <button
       type="button"
       onclick={() => {

@@ -11,10 +11,17 @@ import {
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type SelectionToolbarState = { open: boolean; text: string; focused: string | null }
+type SelectionToolbarState = {
+  open: boolean
+  text: string
+  focused: string | null
+}
 
 type SelectionToolbarOptions = {
-  onAction?: (value: string, details: ChangeDetails<"item-press"> & { text: string }) => void
+  onAction?: (
+    value: string,
+    details: ChangeDetails<"item-press"> & { text: string }
+  ) => void
 }
 
 type SelectionToolbarRootState = {
@@ -32,14 +39,20 @@ const selectionToolbar = /* @__PURE__ */ definePrimitive({
   }),
   api: (context) => {
     const { store } = context
-    const roving = createRovingFocus<SelectionToolbarState, { value: string }>(context, {
-      slot: "action",
-      key: "focused",
-      orientation: () => "horizontal",
-      loop: () => true,
-    })
+    const roving = createRovingFocus<SelectionToolbarState, { value: string }>(
+      context,
+      {
+        slot: "action",
+        key: "focused",
+        orientation: () => "horizontal",
+        loop: () => true,
+      }
+    )
     let range: Range | null = null
-    const anchor = { getBoundingClientRect: () => range?.getBoundingClientRect() ?? new DOMRect() }
+    const anchor = {
+      getBoundingClientRect: () =>
+        range?.getBoundingClientRect() ?? new DOMRect(),
+    }
 
     const api = {
       roving,
@@ -55,19 +68,29 @@ const selectionToolbar = /* @__PURE__ */ definePrimitive({
           passage.contains(selection.anchorNode) &&
           passage.contains(selection.focusNode)
         const toolbar = context.element("toolbar")
-        if (toolbar?.contains(document.activeElement)) return
+        if (toolbar?.contains(document.activeElement)) {
+          return
+        }
         range = inside ? selection!.getRangeAt(0).cloneRange() : null
         const text = inside ? selection!.toString().trim() : ""
         store.set({ open: !!text, text })
       },
       close() {
-        const back = context.element("toolbar")?.contains(document.activeElement)
+        const back = context
+          .element("toolbar")
+          ?.contains(document.activeElement)
         range = null
         store.set({ open: false, text: "" })
-        if (back) context.element("passage")?.focus()
+        if (back) {
+          context.element("passage")?.focus()
+        }
       },
       run(value: string, event: Event) {
-        dispatch(context, "onAction", value, { reason: "item-press", event, text: store.get().text })
+        dispatch(context, "onAction", value, {
+          reason: "item-press",
+          event,
+          text: store.get().text,
+        })
         api.close()
         document.getSelection()?.removeAllRanges()
       },
@@ -80,11 +103,15 @@ const selectionToolbar = /* @__PURE__ */ definePrimitive({
     }
     const listener = () => api.update()
     document.addEventListener("selectionchange", listener)
-    context.onDestroy(() => document.removeEventListener("selectionchange", listener))
+    context.onDestroy(() =>
+      document.removeEventListener("selectionchange", listener)
+    )
     return api
   },
   slots: (slot) => ({
-    root: slot<{}, SelectionToolbarRootState>({ state: (state) => ({ open: state.open, text: state.text }) }),
+    root: slot<{}, SelectionToolbarRootState>({
+      state: (state) => ({ open: state.open, text: state.text }),
+    }),
     passage: slot({
       attrs: () => ({
         contenteditable: "true",
@@ -106,8 +133,15 @@ const selectionToolbar = /* @__PURE__ */ definePrimitive({
         style: css({ inset: "auto", margin: "0" }),
       }),
       bind: (el, { api }) => {
-        const stopLayer = bindLayer(el, { topLayer: true, onDismiss: () => api.close() })
-        const stopPosition = position(api.anchor, el, { side: "top", align: "center", sideOffset: 8 })
+        const stopLayer = bindLayer(el, {
+          topLayer: true,
+          onDismiss: () => api.close(),
+        })
+        const stopPosition = position(api.anchor, el, {
+          side: "top",
+          align: "center",
+          sideOffset: 8,
+        })
         return () => {
           stopPosition()
           stopLayer()
@@ -117,9 +151,13 @@ const selectionToolbar = /* @__PURE__ */ definePrimitive({
     action: slot<{ value: string }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      attrs: (state, part) => ({ type: "button", tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        type: "button",
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: {
-        keydown: (event, { el, api }) => event.key !== "Escape" && el && api.roving.keydown(event, el),
+        keydown: (event, { el, api }) =>
+          event.key !== "Escape" && el && api.roving.keydown(event, el),
         pointerdown: (event) => event.preventDefault(),
         click: (event, { api, key }) => api.run(key, event),
       },
@@ -128,7 +166,12 @@ const selectionToolbar = /* @__PURE__ */ definePrimitive({
   }),
 })
 
-const parts = createParts(selectionToolbar, { root: "div", passage: "div", toolbar: "div", action: "button" })
+const parts = createParts(selectionToolbar, {
+  root: "div",
+  passage: "div",
+  toolbar: "div",
+  action: "button",
+})
 
 const SelectionToolbar = parts.Root
 
@@ -160,10 +203,12 @@ function Example() {
       }}
     >
       <SelectionToolbarPassage aria-label="Passage">
-        Most interfaces are rebuilt from the same handful of parts. A table that scrolls ten thousand rows, a
-        log that follows its end, a board whose cards move between columns, a menu that opens where you click.
-        Each one hides the same hard problems: where focus goes, what a screen reader hears, what happens at
-        the edge of the screen. Select any of this text to see a toolbar appear above it.
+        Most interfaces are rebuilt from the same handful of parts. A table that
+        scrolls ten thousand rows, a log that follows its end, a board whose
+        cards move between columns, a menu that opens where you click. Each one
+        hides the same hard problems: where focus goes, what a screen reader
+        hears, what happens at the edge of the screen. Select any of this text
+        to see a toolbar appear above it.
       </SelectionToolbarPassage>
       <SelectionToolbarPopup>
         {actions.map((action) => (

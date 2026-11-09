@@ -20,7 +20,10 @@ describe("server rendering a carousel", () => {
       createSSRApp(() =>
         h(Carousel, { "aria-label": "Featured", defaultPage: 2 }, () => [
           h(CarouselViewport, () =>
-            h(CarouselContent, () => [h(CarouselItem, () => "One"), h(CarouselItem, () => "Two")]),
+            h(CarouselContent, () => [
+              h(CarouselItem, () => "One"),
+              h(CarouselItem, () => "Two"),
+            ])
           ),
           h(CarouselPrevious, () => "Previous"),
           h(CarouselNext, () => "Next"),
@@ -28,8 +31,8 @@ describe("server rendering a carousel", () => {
             h(CarouselIndicator, { page: 1 }, () => "1"),
             h(CarouselIndicator, { page: 2 }, () => "2"),
           ]),
-        ]),
-      ),
+        ])
+      )
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('aria-roledescription="carousel"')

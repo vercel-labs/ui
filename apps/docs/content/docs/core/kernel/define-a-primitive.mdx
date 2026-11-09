@@ -117,7 +117,9 @@ root: slot<{}, { copied: boolean }>({
 The first type argument describes the part's props; the second describes what its `state` returns. In React, the copy button's children can now read `copied`:
 
 ```tsx
-<CopyButton text="npm add @ui-sdk/core">{({ copied }) => (copied ? "Copied" : "Copy")}</CopyButton>
+<CopyButton text="npm add @ui-sdk/core">
+  {({ copied }) => (copied ? "Copied" : "Copy")}
+</CopyButton>
 ```
 
 Try it. This version also resets after a short timeout.
@@ -348,7 +350,8 @@ For state attributes, `openAttrs(open)` returns `data-open` or `data-closed`. `c
   name="SlotDefinition"
   events={false}
   types={{
-    press: "(context: { el, id, key, props, store, api }, event?: Event) => void",
+    press:
+      "(context: { el, id, key, props, store, api }, event?: Event) => void",
     on: "Partial<Record<keyof HTMLElementEventMap, (event: Event, context: { el, id, key, props, store, api }) => void>>",
   }}
   examples={{
@@ -375,7 +378,8 @@ For state attributes, `openAttrs(open)` returns `data-open` or `data-closed`. `c
   types={{
     role: "Role | ((state, context) => Role | undefined)",
     keys: "HandledKey[] | ((state) => HandledKey[]) | { none: string }",
-    focus: '"roving" | "tab-stop" | "active-descendant" | "native" | { none: string }',
+    focus:
+      '"roving" | "tab-stop" | "active-descendant" | "native" | { none: string }',
   }}
   examples={{
     role: "Roles, Focus and Keys",

@@ -22,7 +22,9 @@
 
   const controller = createDrawerController()
   // The specs' hooks live on the window, which the server doesn't have.
-  if (typeof window !== "undefined") exposeDrawerFixture(controller)
+  if (typeof window !== "undefined") {
+    exposeDrawerFixture(controller)
+  }
 
   const options = drawerOptions()
   const parts = drawerParts()
@@ -35,8 +37,10 @@
   <Drawer
     {controller}
     {...options}
-    onOpenChange={(open, details) => recordDrawer(`drawer:${open}:${details.reason}`)}
-    onSnapPointChange={(snapPoint, details) => recordDrawer(`${snapPoint}:${details.reason}`)}
+    onOpenChange={(open, details) =>
+      recordDrawer(`drawer:${open}:${details.reason}`)}
+    onSnapPointChange={(snapPoint, details) =>
+      recordDrawer(`${snapPoint}:${details.reason}`)}
     onDismissAttempt={(details) => recordDrawer(`attempt:${details.reason}`)}
   >
     <DrawerTrigger>{drawerFixture.trigger}</DrawerTrigger>
@@ -44,7 +48,9 @@
     <DrawerContent class="drawer">
       <DrawerHandle class="handle" aria-label={drawerFixture.handle} />
       <DrawerTitle class="title">{drawerFixture.title}</DrawerTitle>
-      <DrawerDescription class="description">{drawerFixture.description}</DrawerDescription>
+      <DrawerDescription class="description"
+        >{drawerFixture.description}</DrawerDescription
+      >
       {#if parts.field}
         <label class="field">
           {drawerFixture.field}
@@ -53,23 +59,33 @@
       {/if}
       {#if parts.scroll}
         <ul class="scroll" aria-label={drawerFixture.scroll.label} tabindex="0">
-          {#each drawerFixture.scroll.items as item (item)}<li>{item}</li>{/each}
+          {#each drawerFixture.scroll.items as item (item)}<li>
+              {item}
+            </li>{/each}
         </ul>
       {/if}
       {#if parts.grow}
-        <button onclick={() => (more = true)}>{drawerFixture.grow.button}</button>
+        <button onclick={() => (more = true)}
+          >{drawerFixture.grow.button}</button
+        >
         {#if more}<p class="more">{drawerFixture.grow.text}</p>{/if}
       {/if}
       <div class="actions">
-        <button onclick={() => (action = "submit")}>{drawerFixture.action}</button>
+        <button onclick={() => (action = "submit")}
+          >{drawerFixture.action}</button
+        >
         <DrawerClose>{drawerFixture.close}</DrawerClose>
       </div>
       {#if parts.nested}
-        <Drawer onOpenChange={(open, details) => recordDrawer(`nested:${open}:${details.reason}`)}>
+        <Drawer
+          onOpenChange={(open, details) =>
+            recordDrawer(`nested:${open}:${details.reason}`)}
+        >
           <DrawerTrigger>{drawerFixture.nested.trigger}</DrawerTrigger>
           {#if parts.backdrop}<DrawerBackdrop class="drawer-backdrop" />{/if}
           <DrawerContent class="drawer">
-            <DrawerTitle class="title">{drawerFixture.nested.title}</DrawerTitle>
+            <DrawerTitle class="title">{drawerFixture.nested.title}</DrawerTitle
+            >
             <DrawerClose>{drawerFixture.nested.close}</DrawerClose>
           </DrawerContent>
         </Drawer>

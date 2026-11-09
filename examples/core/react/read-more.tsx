@@ -29,7 +29,11 @@ const readMore = definePrimitive({
   }),
 })
 
-const parts = createParts(readMore, { root: "div", trigger: "button", panel: "div" })
+const parts = createParts(readMore, {
+  root: "div",
+  trigger: "button",
+  panel: "div",
+})
 
 const ReadMore = parts.Root
 
@@ -41,15 +45,24 @@ function Example() {
   return (
     <ReadMore>
       <p>Core is the part of ui-sdk that makes an interface work.</p>
-      <ReadMoreTrigger>{({ open }) => (open ? "Show less" : "Read more")}</ReadMoreTrigger>
+      <ReadMoreTrigger>
+        {({ open }) => (open ? "Show less" : "Read more")}
+      </ReadMoreTrigger>
       <div data-slot="read-more-body">
         <ReadMorePanel>
-          It handles what happens on every key, press and drag, so your code stays focused on how the
-          interface looks.
+          It handles what happens on every key, press and drag, so your code
+          stays focused on how the interface looks.
         </ReadMorePanel>
       </div>
     </ReadMore>
   )
 }
 
-export { Example, readMore, ReadMore, ReadMorePanel, type ReadMoreState, ReadMoreTrigger }
+export {
+  Example,
+  readMore,
+  ReadMore,
+  ReadMorePanel,
+  type ReadMoreState,
+  ReadMoreTrigger,
+}

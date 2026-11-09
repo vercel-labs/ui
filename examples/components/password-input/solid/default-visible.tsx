@@ -1,11 +1,19 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/solid/password-input"
 
 function Example() {
   return (
     <Field name="wifi-password">
       <FieldLabel>Wi-Fi password</FieldLabel>
-      <PasswordInput defaultVisible defaultValue="maple-orbit-42" autoComplete="new-password">
+      <PasswordInput
+        defaultVisible
+        defaultValue="maple-orbit-42"
+        autoComplete="new-password"
+      >
         <PasswordInputControl />
         <PasswordInputToggle aria-label="Show password">
           {(state) =>
@@ -41,7 +49,9 @@ function Example() {
           }
         </PasswordInputToggle>
       </PasswordInput>
-      <FieldDescription>Guests read it from here, so it starts shown.</FieldDescription>
+      <FieldDescription>
+        Guests read it from here, so it starts shown.
+      </FieldDescription>
     </Field>
   )
 }

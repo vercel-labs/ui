@@ -45,7 +45,9 @@ test("writes the declared role, from state too, over one in attrs", () => {
   expect(partAttrs(instance.part("root")).role).toBe("none")
   expect(partAttrs(instance.part("label")).role).toBe("note")
   expect(read()).toEqual([
-    expect.stringContaining('the "label" part declares its role, and its `attrs` writes one too'),
+    expect.stringContaining(
+      'the "label" part declares its role, and its `attrs` writes one too'
+    ),
   ])
 })
 
@@ -64,13 +66,19 @@ test("warns once per need a role's slot doesn't meet", () => {
   })
   expect(read()).toEqual([
     expect.stringContaining(
-      'the "list" part is a listbox, which lists `keys`, so its slot needs an `on.keydown`',
+      'the "list" part is a listbox, which lists `keys`, so its slot needs an `on.keydown`'
     ),
-    expect.stringContaining('the "item" part is an option, which takes focus, so its slot needs `focus`'),
-    expect.stringContaining('the "item" part is an option, which activates, so its slot needs `press`'),
-    expect.stringContaining('the "typo" part\'s role "lisbox" isn\'t a WAI-ARIA role'),
     expect.stringContaining(
-      'the "picked" part picks its role from state, so its slot lists every role it can pick',
+      'the "item" part is an option, which takes focus, so its slot needs `focus`'
+    ),
+    expect.stringContaining(
+      'the "item" part is an option, which activates, so its slot needs `press`'
+    ),
+    expect.stringContaining(
+      'the "typo" part\'s role "lisbox" isn\'t a WAI-ARIA role'
+    ),
+    expect.stringContaining(
+      'the "picked" part picks its role from state, so its slot lists every role it can pick'
     ),
   ])
 })
@@ -85,7 +93,7 @@ test("warns about keys no keydown handles, on a role the types don't ask for key
   })
   expect(read()).toEqual([
     expect.stringContaining(
-      'the "group" part is a group, which lists `keys`, so its slot needs an `on.keydown`',
+      'the "group" part is a group, which lists `keys`, so its slot needs an `on.keydown`'
     ),
   ])
 })
@@ -96,11 +104,15 @@ test("warns when a role picked from state isn't one the slot lists", () => {
     name: "pick",
     state: () => ({}),
     api: () => ({}),
-    slots: (slot) => ({ root: slot(loose({ role: () => "status", roles: ["none"] })) }),
+    slots: (slot) => ({
+      root: slot(loose({ role: () => "status", roles: ["none"] })),
+    }),
   })
   partAttrs(pick({ id: "p" }).part("root"))
   expect(read()).toEqual([
-    expect.stringContaining("picked the role \"status\", which its slot's `roles` doesn't list"),
+    expect.stringContaining(
+      "picked the role \"status\", which its slot's `roles` doesn't list"
+    ),
   ])
 })
 
@@ -119,7 +131,12 @@ test("warns once about ARIA a part's role doesn't take, or a state it renders wi
         attrs: () => ({ "aria-orientation": "vertical" }),
       }),
       box: slot(loose({ role: "checkbox", focus: "native", press })),
-      unset: slot({ role: "option", focus: "roving", press, attrs: () => ({ "aria-selected": undefined }) }),
+      unset: slot({
+        role: "option",
+        focus: "roving",
+        press,
+        attrs: () => ({ "aria-selected": undefined }),
+      }),
       range: slot({
         role: "slider",
         focus: "native",
@@ -137,16 +154,24 @@ test("warns once about ARIA a part's role doesn't take, or a state it renders wi
     }),
   })
   const instance = aria({ id: "a" })
-  for (const name of ["line", "box", "unset", "range", "written"] as const) partAttrs(instance.part(name))
+  for (const name of ["line", "box", "unset", "range", "written"] as const) {
+    partAttrs(instance.part(name))
+  }
   expect(read()).toEqual([
-    expect.stringContaining('the "box" part is a checkbox, which needs `aria-checked`'),
-    expect.stringContaining('the "unset" part is an option, which needs `aria-selected`'),
+    expect.stringContaining(
+      'the "box" part is a checkbox, which needs `aria-checked`'
+    ),
+    expect.stringContaining(
+      'the "unset" part is an option, which needs `aria-selected`'
+    ),
   ])
   instance.api.decorate()
   partAttrs(instance.part("line"))
   partAttrs(instance.part("line"))
   expect(read().slice(2)).toEqual([
-    expect.stringContaining('the "line" part is a none, which doesn\'t take `aria-orientation`'),
+    expect.stringContaining(
+      'the "line" part is a none, which doesn\'t take `aria-orientation`'
+    ),
   ])
 })
 
@@ -159,7 +184,12 @@ test("checks the element can take focus the way the slot says", async () => {
     api: () => ({}),
     slots: (slot) => ({
       native: slot({ role: "button", focus: "native", press }),
-      roving: slot({ role: "tab", focus: "roving", press, attrs: () => ({ "aria-selected": "false" }) }),
+      roving: slot({
+        role: "tab",
+        focus: "roving",
+        press,
+        attrs: () => ({ "aria-selected": "false" }),
+      }),
       stop: slot({
         role: "tab",
         focus: "roving",
@@ -169,14 +199,20 @@ test("checks the element can take focus the way the slot says", async () => {
     }),
   })
   mounts.push(
-    mount(buttons, {}, '<native as="button">OK</native><native>Div</native><roving>A</roving><stop>B</stop>'),
+    mount(
+      buttons,
+      {},
+      '<native as="button">OK</native><native>Div</native><roving>A</roving><stop>B</stop>'
+    )
   )
   await new Promise((done) => setTimeout(done))
   expect(read()).toEqual([
     expect.stringContaining(
-      'the "native" part\'s focus is "native", but a <div> doesn\'t take focus on its own',
+      'the "native" part\'s focus is "native", but a <div> doesn\'t take focus on its own'
     ),
-    expect.stringContaining('the "roving" part\'s focus is "roving", but its <div> has no tabindex'),
+    expect.stringContaining(
+      'the "roving" part\'s focus is "roving", but its <div> has no tabindex'
+    ),
   ])
 })
 
@@ -187,15 +223,23 @@ test("throws instead of warning when strict, as in tests", () => {
       name: "strict",
       state: () => ({}),
       api: () => ({}),
-      slots: (slot) => ({ item: slot(loose({ role: "option", focus: "roving" })) }),
-    }),
-  ).toThrow('[ui-sdk] strict: the "item" part is an option, which activates, so its slot needs `press`.')
+      slots: (slot) => ({
+        item: slot(loose({ role: "option", focus: "roving" })),
+      }),
+    })
+  ).toThrow(
+    '[ui-sdk] strict: the "item" part is an option, which activates, so its slot needs `press`.'
+  )
 })
 
 test("doesn't ask a part that can't take focus now for a tabindex, like a disabled list's option", async () => {
   const read = warnings()
   mounts.push(
-    mount(listbox, { disabled: true }, '<root aria-label="Fruit"><item value="a">Apple</item></root>'),
+    mount(
+      listbox,
+      { disabled: true },
+      '<root aria-label="Fruit"><item value="a">Apple</item></root>'
+    )
   )
   await new Promise((done) => setTimeout(done))
   expect(read()).toEqual([])

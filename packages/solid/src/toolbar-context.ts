@@ -4,7 +4,9 @@ import type { PrimitiveHandle } from "./use-primitive"
 
 // The toolbar's context, apart from the toolbar, so a toggle or a toggle group
 // can join one without bundling it.
-const ToolbarContext = createContext<PrimitiveHandle<typeof toolbar> | null>(null)
+const ToolbarContext = createContext<PrimitiveHandle<typeof toolbar> | null>(
+  null
+)
 
 // Whether the toolbar group an item, toggle or toggle group sits in is disabled.
 const ToolbarGroupContext = createContext<() => boolean>(() => false)
@@ -16,7 +18,9 @@ const ToolbarGroupContext = createContext<() => boolean>(() => false)
 function useToolbarScope() {
   const toolbar = useContext(ToolbarContext)
   const groupDisabled = useContext(ToolbarGroupContext)
-  if (!toolbar) return undefined
+  if (!toolbar) {
+    return undefined
+  }
   return createMemo(() => {
     const disabled = groupDisabled()
     return () => toolbar.api.internal.scopeIn(disabled)

@@ -1,7 +1,9 @@
 import { menu } from "@ui-sdk/core/menu"
 import { createParts } from "../src/use-primitive"
 
-const { Root: Menu, RadioGroup: MenuRadioGroup } = createParts(menu, { "radio-group": "div" })
+const { Root: Menu, RadioGroup: MenuRadioGroup } = createParts(menu, {
+  "radio-group": "div",
+})
 
 // A radio group's `T` comes from its `value`, and reaches `onValueChange`.
 ;<Menu>

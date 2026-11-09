@@ -18,10 +18,18 @@ function Fixture() {
       <Tabs
         className="tabs"
         {...(controlled
-          ? { value, onValueChange: (next: string | null) => setValue(next ?? items[0].value) }
+          ? {
+              value,
+              onValueChange: (next: string | null) =>
+                setValue(next ?? items[0].value),
+            }
           : { defaultValue: items[0].value })}
       >
-        <TabsList className="tablist" aria-label="Pages" style={{ flexWrap: "wrap" }}>
+        <TabsList
+          className="tablist"
+          aria-label="Pages"
+          style={{ flexWrap: "wrap" }}
+        >
           {items.map((item) => (
             <TabsTab key={item.value} className="tab" value={item.value}>
               {item.label}

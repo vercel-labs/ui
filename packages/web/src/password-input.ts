@@ -1,4 +1,7 @@
-import { passwordInput, type PasswordInputController } from "@ui-sdk/core/password-input"
+import {
+  passwordInput,
+  type PasswordInputController,
+} from "@ui-sdk/core/password-input"
 import { createParts, wrappedButton } from "./define-element"
 
 const owner = "ui-password-input"
@@ -21,7 +24,9 @@ function definePasswordInputElements() {
         // The field is yours, so default-value becomes its `value` attribute,
         // which the field starts with and a form reset returns to.
         const defaultValue = el.getAttribute("default-value")
-        if (input && defaultValue !== null && !input.hasAttribute("value")) input.defaultValue = defaultValue
+        if (input && defaultValue !== null && !input.hasAttribute("value")) {
+          input.defaultValue = defaultValue
+        }
         return {
           controlId: input?.id || undefined,
           autoComplete: input?.getAttribute("autocomplete") ?? undefined,
@@ -35,16 +40,30 @@ function definePasswordInputElements() {
       state: {
         value: {
           get: (api: PasswordInputController) => api.getValue(),
-          set: (api: PasswordInputController, value: string | null) => api.setValue(value ?? ""),
+          set: (api: PasswordInputController, value: string | null) =>
+            api.setValue(value ?? ""),
         },
         visible: {
           get: (api: PasswordInputController) => api.isVisible(),
-          set: (api: PasswordInputController, visible: boolean) => api.setVisible(!!visible),
+          set: (api: PasswordInputController, visible: boolean) =>
+            api.setVisible(!!visible),
         },
       },
-      api: ["getValue", "setValue", "clear", "isVisible", "setVisible", "toggleVisible", "focus"],
+      api: [
+        "getValue",
+        "setValue",
+        "clear",
+        "isVisible",
+        "setVisible",
+        "toggleVisible",
+        "focus",
+      ],
     },
-    toggle: { tag: "ui-password-input-toggle", display: "contents", target: wrappedButton },
+    toggle: {
+      tag: "ui-password-input-toggle",
+      display: "contents",
+      target: wrappedButton,
+    },
   })
 }
 

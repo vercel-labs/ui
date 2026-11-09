@@ -1,19 +1,38 @@
 import * as React from "react"
-import { bindDrag, createChange, definePrimitive, dragThreshold, type ChangeDetails } from "@ui-sdk/core"
+import {
+  bindDrag,
+  createChange,
+  definePrimitive,
+  dragThreshold,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { scrubTo } from "@ui-sdk/core/number"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type SidebarState = { width: number; opened: number; draft: number | null; landing: number | null }
+type SidebarState = {
+  width: number
+  opened: number
+  draft: number | null
+  landing: number | null
+}
 
 type SidebarOptions = {
   defaultWidth?: number
-  onWidthChange?: (width: number, details: ChangeDetails<"drag" | "keyboard">) => void
+  onWidthChange?: (
+    width: number,
+    details: ChangeDetails<"drag" | "keyboard">
+  ) => void
 }
 
 const minWidth = 160
 const maxWidth = 280
 
-const collapse = { min: 0, max: minWidth, step: 1, snap: { points: [0, minWidth], threshold: minWidth / 2 } }
+const collapse = {
+  min: 0,
+  max: minWidth,
+  step: 1,
+  snap: { points: [0, minWidth], threshold: minWidth / 2 },
+}
 
 const widthAt = (pointer: number) =>
   pointer >= minWidth
@@ -32,8 +51,14 @@ const sidebar = definePrimitive({
   api: (context) => {
     const { store } = context
     const change = createChange(context)
-    const resize = (width: number, reason: "drag" | "keyboard", event: Event) => {
-      if (width) store.set({ opened: width })
+    const resize = (
+      width: number,
+      reason: "drag" | "keyboard",
+      event: Event
+    ) => {
+      if (width) {
+        store.set({ opened: width })
+      }
       change("width", width, { reason, event })
     }
     let stop: (() => void) | undefined
@@ -41,20 +66,26 @@ const sidebar = definePrimitive({
     return {
       pointerdown(event: PointerEvent, el: HTMLElement) {
         const root = el.parentElement
-        if (event.button !== 0 || !root) return
+        if (event.button !== 0 || !root) {
+          return
+        }
         stop?.()
         stop = bindDrag(el, event, {
           threshold: dragThreshold,
           cancelOnEscape: true,
           onMove: ({ x }) => {
-            const { value, point } = widthAt(x - root.getBoundingClientRect().left)
+            const { value, point } = widthAt(
+              x - root.getBoundingClientRect().left
+            )
             store.set({ draft: value, landing: point ?? null })
           },
           onEnd: (end, canceled) => {
             const { draft, landing } = store.get()
             stop = undefined
             store.set({ draft: null, landing: null })
-            if (!canceled && draft !== null) resize(landing ?? draft, "drag", end)
+            if (!canceled && draft !== null) {
+              resize(landing ?? draft, "drag", end)
+            }
           },
         })
       },
@@ -74,7 +105,9 @@ const sidebar = definePrimitive({
                   ? Math.min(maxWidth, width + 16)
                   : minWidth
                 : undefined
-        if (next === undefined) return
+        if (next === undefined) {
+          return
+        }
         event.preventDefault()
         resize(next, "keyboard", event)
       },
@@ -88,7 +121,12 @@ const sidebar = definePrimitive({
           style: `--sidebar:${width}px`,
           "data-collapsed": width === 0 ? "" : undefined,
           "data-dragging": state.draft !== null ? "" : undefined,
-          "data-landing": state.landing === null ? undefined : state.landing ? "open" : "collapsed",
+          "data-landing":
+            state.landing === null
+              ? undefined
+              : state.landing
+                ? "open"
+                : "collapsed",
         }
       },
     }),

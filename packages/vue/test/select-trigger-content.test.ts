@@ -40,7 +40,7 @@ test("a select trigger whose content is left out by v-if shows the value", async
     `<Select :items="['apple', 'banana']" default-value="banana">
       <SelectTrigger><span v-if="custom">Custom</span></SelectTrigger>
     </Select>`,
-    () => ({ custom }),
+    () => ({ custom })
   )
   const trigger = el.querySelector("button")!
   expect(trigger.textContent).toBe("banana")

@@ -36,7 +36,10 @@ function mount(root: HTMLElement) {
     event.preventDefault()
     const data = new FormData(form)
     const length = String(data.get("password")).length
-    log(root, `Signed in as ${data.get("email")}, with a password of ${length} characters`)
+    log(
+      root,
+      `Signed in as ${data.get("email")}, with a password of ${length} characters`
+    )
   })
 }
 

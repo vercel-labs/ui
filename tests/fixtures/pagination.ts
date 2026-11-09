@@ -14,7 +14,8 @@ const paginationFixture = {
 }
 
 // What the "Last action" status says after a change.
-const paginationAction = (page: number, reason: string) => `page: ${page} (${reason})`
+const paginationAction = (page: number, reason: string) =>
+  `page: ${page} (${reason})`
 
 // Options a spec can set through the URL: ?page=<n> (the default page),
 // ?count=<n>, ?siblings=<n>, ?boundaries=<n>, ?links (parts are links to
@@ -23,13 +24,16 @@ const paginationAction = (page: number, reason: string) => `page: ${page} (${rea
 // every page, like a list keyed by page).
 function paginationOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   return {
     defaultPage: number("page"),
     pageCount: number("count") ?? paginationFixture.pageCount,
     siblings: number("siblings"),
     boundaries: number("boundaries"),
-    getHref: params.has("links") ? (page: number) => `#page-${page}` : undefined,
+    getHref: params.has("links")
+      ? (page: number) => `#page-${page}`
+      : undefined,
     controlled: params.has("controlled"),
     cancel: number("cancel"),
     rekey: params.has("rekey"),

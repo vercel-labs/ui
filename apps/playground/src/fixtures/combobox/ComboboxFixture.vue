@@ -61,39 +61,66 @@ const {
 const action = ref("")
 const submitted = ref("")
 const created = ref<{ value: string; label: string }[]>([])
-const remote = useAsyncOptions(pages ? searchCountryPages : searchCountries, { immediate: async || pages })
+const remote = useAsyncOptions(pages ? searchCountryPages : searchCountries, {
+  immediate: async || pages,
+})
 const remoteMode = async || pages
-const list = shallowRef<{ value: string; label: string; keywords?: string[]; disabled?: boolean }[]>(f.items)
+const list = shallowRef<
+  { value: string; label: string; keywords?: string[]; disabled?: boolean }[]
+>(f.items)
 // Items a spec swaps in. Only in the browser: the server has no document.
 let stopItemChanges = () => {}
-onMounted(() => (stopItemChanges = onItemsChange(changedItems, (next) => (list.value = next))))
+onMounted(
+  () =>
+    (stopItemChanges = onItemsChange(
+      changedItems,
+      (next) => (list.value = next)
+    ))
+)
 onBeforeUnmount(() => stopItemChanges())
 const all = computed(() => [...list.value, ...created.value])
-const labels = computed(() => new Map([...f.items, ...all.value].map((item) => [item.value, item.label])))
+const labels = computed(
+  () =>
+    new Map([...f.items, ...all.value].map((item) => [item.value, item.label]))
+)
 const items = computed(() =>
   remoteMode
     ? remote.state.value.items
     : long
       ? longItems()
       : grouped
-        ? f.groups.map((group) => ({ type: "group" as const, label: group.label, items: group.items }))
-        : all.value,
+        ? f.groups.map((group) => ({
+            type: "group" as const,
+            label: group.label,
+            items: group.items,
+          }))
+        : all.value
 )
 
 // What the list shows from its data: items, and groups of them.
-type Entry = { value: string; label: string; keywords?: string[]; disabled?: boolean }
+type Entry = {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+}
 type Shown = Entry | { type: "group"; label: string; items: Entry[] }
 const dataMode = props.data || remoteMode || long || recent
 
 function onValueChange(value: unknown, details: { cancel: () => void }) {
-  if (cancelsValue(value, cancel)) return details.cancel()
+  if (cancelsValue(value, cancel)) {
+    return details.cancel()
+  }
   action.value = `value:${Array.isArray(value) ? value.join(",") : String(value)}`
 }
 
 async function onCreate(query: string) {
   action.value = `create:${query}`
   await createDelay(slow)
-  created.value = [...created.value, { value: query.toLowerCase(), label: query }]
+  created.value = [
+    ...created.value,
+    { value: query.toLowerCase(), label: query },
+  ]
 }
 
 function onSubmit(event: Event) {
@@ -104,7 +131,11 @@ function onSubmit(event: Event) {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <form class="select-form" :aria-label="f.formLabel" @submit.prevent="onSubmit">
+    <form
+      class="select-form"
+      :aria-label="f.formLabel"
+      @submit.prevent="onSubmit"
+    >
       <component
         :is="fieldset ? 'fieldset' : 'div'"
         :disabled="fieldset || undefined"
@@ -118,39 +149,69 @@ function onSubmit(event: Event) {
           :empty-items="recent ? f.recent : undefined"
           :filter="remoteMode ? false : undefined"
           :status="remoteMode ? remote.state.value.status : undefined"
-          :item-to-label="labelsFromItems ? undefined : (value: string) => labels.get(value) ?? value"
+          :item-to-label="
+            labelsFromItems
+              ? undefined
+              : (value: string) => labels.get(value) ?? value
+          "
           @value-change="onValueChange"
-          @query-change="(query: string) => remoteMode && remote.setQuery(query)"
+          @query-change="
+            (query: string) => remoteMode && remote.setQuery(query)
+          "
           @load-more="() => pages && remote.loadMore()"
         >
           <ComboboxLabel class="label">{{ f.label }}</ComboboxLabel>
-          <ComboboxChips v-if="options.multiple" :class="overflow ? 'chips chips-line' : 'chips'">
+          <ComboboxChips
+            v-if="options.multiple"
+            :class="overflow ? 'chips chips-line' : 'chips'"
+          >
             <ComboboxValue v-slot="{ value }">
-              <ComboboxChip v-for="item in value as string[]" :key="item" class="chip" :value="item">
+              <ComboboxChip
+                v-for="item in value as string[]"
+                :key="item"
+                class="chip"
+                :value="item"
+              >
                 {{ labels.get(item) ?? item }}
-                <ComboboxChipRemove :aria-label="`Remove ${labels.get(item) ?? item}`">×</ComboboxChipRemove>
+                <ComboboxChipRemove
+                  :aria-label="`Remove ${labels.get(item) ?? item}`"
+                  >×</ComboboxChipRemove
+                >
               </ComboboxChip>
             </ComboboxValue>
             <ComboboxChipsOverflow v-if="overflow" class="chips-overflow" />
             <ComboboxInput class="input" />
           </ComboboxChips>
           <ComboboxInput v-else class="input" />
-          <output v-if="summary" :aria-label="f.summary"><ComboboxValue :max-labels="summary" /></output>
+          <output v-if="summary" :aria-label="f.summary"
+            ><ComboboxValue :max-labels="summary"
+          /></output>
           <ComboboxTrigger :aria-label="f.trigger">▾</ComboboxTrigger>
           <ComboboxClear>{{ f.clear }}</ComboboxClear>
-          <ComboboxContent :class="pages ? 'popup list-popup list-short' : 'popup list-popup'">
-            <ComboboxStatus v-if="!nostatus" v-slot="{ state }" class="status">{{
-              state.loading ? (pages ? "Loading more…" : "Loading…") : ""
-            }}</ComboboxStatus>
+          <ComboboxContent
+            :class="pages ? 'popup list-popup list-short' : 'popup list-popup'"
+          >
+            <ComboboxStatus
+              v-if="!nostatus"
+              v-slot="{ state }"
+              class="status"
+              >{{
+                state.loading ? (pages ? "Loading more…" : "Loading…") : ""
+              }}</ComboboxStatus
+            >
             <ComboboxEmpty class="empty">{{ f.empty }}</ComboboxEmpty>
             <ComboboxList v-if="dataMode" v-slot="{ state }">
-              <ComboboxSelectAll v-if="selectAll" class="item">{{ f.selectAll }}</ComboboxSelectAll>
+              <ComboboxSelectAll v-if="selectAll" class="item">{{
+                f.selectAll
+              }}</ComboboxSelectAll>
               <template
                 v-for="entry in state.items as Shown[]"
                 :key="'items' in entry ? entry.label : entry.value"
               >
                 <ComboboxGroup v-if="'items' in entry">
-                  <ComboboxGroupLabel class="label">{{ entry.label }}</ComboboxGroupLabel>
+                  <ComboboxGroupLabel class="label">{{
+                    entry.label
+                  }}</ComboboxGroupLabel>
                   <ComboboxItem
                     v-for="item in entry.items"
                     :key="item.value"
@@ -160,9 +221,13 @@ function onSubmit(event: Event) {
                     :keywords="item.keywords"
                     :disabled="item.disabled"
                   >
-                    <ComboboxItemText v-if="highlight">{{ item.label }}</ComboboxItemText>
+                    <ComboboxItemText v-if="highlight">{{
+                      item.label
+                    }}</ComboboxItemText>
                     <template v-else>{{ item.label }}</template>
-                    <ComboboxItemIndicator class="indicator">✓</ComboboxItemIndicator>
+                    <ComboboxItemIndicator class="indicator"
+                      >✓</ComboboxItemIndicator
+                    >
                   </ComboboxItem>
                 </ComboboxGroup>
                 <ComboboxItem
@@ -173,9 +238,13 @@ function onSubmit(event: Event) {
                   :keywords="entry.keywords"
                   :disabled="entry.disabled"
                 >
-                  <ComboboxItemText v-if="highlight">{{ entry.label }}</ComboboxItemText>
+                  <ComboboxItemText v-if="highlight">{{
+                    entry.label
+                  }}</ComboboxItemText>
                   <template v-else>{{ entry.label }}</template>
-                  <ComboboxItemIndicator class="indicator">✓</ComboboxItemIndicator>
+                  <ComboboxItemIndicator class="indicator"
+                    >✓</ComboboxItemIndicator
+                  >
                 </ComboboxItem>
               </template>
               <ComboboxCreate v-if="create" class="item" @create="onCreate" />
@@ -183,7 +252,9 @@ function onSubmit(event: Event) {
             <ComboboxList v-else>
               <template v-if="grouped">
                 <ComboboxGroup v-for="group in f.groups" :key="group.label">
-                  <ComboboxGroupLabel class="label">{{ group.label }}</ComboboxGroupLabel>
+                  <ComboboxGroupLabel class="label">{{
+                    group.label
+                  }}</ComboboxGroupLabel>
                   <ComboboxSelectAll v-if="selectAll" class="item"
                     >{{ f.selectAll }} {{ group.label }}</ComboboxSelectAll
                   >
@@ -194,14 +265,20 @@ function onSubmit(event: Event) {
                     :value="item.value"
                     :label="item.label"
                   >
-                    <ComboboxItemText v-if="highlight">{{ item.label }}</ComboboxItemText>
+                    <ComboboxItemText v-if="highlight">{{
+                      item.label
+                    }}</ComboboxItemText>
                     <template v-else>{{ item.label }}</template>
-                    <ComboboxItemIndicator class="indicator">✓</ComboboxItemIndicator>
+                    <ComboboxItemIndicator class="indicator"
+                      >✓</ComboboxItemIndicator
+                    >
                   </ComboboxItem>
                 </ComboboxGroup>
               </template>
               <template v-else>
-                <ComboboxSelectAll v-if="selectAll" class="item">{{ f.selectAll }}</ComboboxSelectAll>
+                <ComboboxSelectAll v-if="selectAll" class="item">{{
+                  f.selectAll
+                }}</ComboboxSelectAll>
                 <ComboboxItem
                   v-for="item in all"
                   :key="item.value"
@@ -211,9 +288,13 @@ function onSubmit(event: Event) {
                   :keywords="(item as { keywords?: string[] }).keywords"
                   :disabled="(item as { disabled?: boolean }).disabled"
                 >
-                  <ComboboxItemText v-if="highlight">{{ item.label }}</ComboboxItemText>
+                  <ComboboxItemText v-if="highlight">{{
+                    item.label
+                  }}</ComboboxItemText>
                   <template v-else>{{ item.label }}</template>
-                  <ComboboxItemIndicator class="indicator">✓</ComboboxItemIndicator>
+                  <ComboboxItemIndicator class="indicator"
+                    >✓</ComboboxItemIndicator
+                  >
                 </ComboboxItem>
               </template>
               <ComboboxCreate v-if="create" class="item" @create="onCreate" />

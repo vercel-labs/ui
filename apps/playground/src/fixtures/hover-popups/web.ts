@@ -1,4 +1,7 @@
-import { describeChange, hoverPopupsFixture as fixture } from "tests/fixtures/hover-popups.ts"
+import {
+  describeChange,
+  hoverPopupsFixture as fixture,
+} from "tests/fixtures/hover-popups.ts"
 
 type ChangeEvent = CustomEvent<{ value: unknown; event?: Event }>
 
@@ -35,18 +38,34 @@ async function mount(root: HTMLElement) {
   const tooltip = root.querySelector("ui-tooltip")!
   const card = root.querySelector("ui-hover-card")!
   tooltip.prepend(
-    ...fixture.days.map((day) => trigger("ui-tooltip-trigger", day.toLowerCase(), `<button>${day}</button>`)),
+    ...fixture.days.map((day) =>
+      trigger(
+        "ui-tooltip-trigger",
+        day.toLowerCase(),
+        `<button>${day}</button>`
+      )
+    )
   )
   card.prepend(
     ...fixture.people.map((person) =>
-      trigger("ui-hover-card-trigger", person.toLowerCase(), `<a href="#${person}">${person}</a>`),
-    ),
+      trigger(
+        "ui-hover-card-trigger",
+        person.toLowerCase(),
+        `<a href="#${person}">${person}</a>`
+      )
+    )
   )
 
-  const report = (component: string, element: Element, show?: (payload: unknown) => void) => {
+  const report = (
+    component: string,
+    element: Element,
+    show?: (payload: unknown) => void
+  ) => {
     element.addEventListener("openchange", (event) => {
       const { value, event: cause } = (event as ChangeEvent).detail
-      if (value) output.textContent = describeChange(component, "open", cause)
+      if (value) {
+        output.textContent = describeChange(component, "open", cause)
+      }
     })
     element.addEventListener("payloadchange", (event) => {
       const { value, event: cause } = (event as ChangeEvent).detail
@@ -56,8 +75,16 @@ async function mount(root: HTMLElement) {
   }
   const tooltipContent = tooltip.querySelector("ui-tooltip-content")!
   const cardContent = card.querySelector("ui-hover-card-content")!
-  report("tooltip", tooltip, (payload) => (tooltipContent.textContent = `Tip for ${payload}`))
-  report("hover card", card, (payload) => (cardContent.textContent = `Card for ${payload}`))
+  report(
+    "tooltip",
+    tooltip,
+    (payload) => (tooltipContent.textContent = `Tip for ${payload}`)
+  )
+  report(
+    "hover card",
+    card,
+    (payload) => (cardContent.textContent = `Card for ${payload}`)
+  )
   report("popover", root.querySelector("ui-popover")!)
 }
 

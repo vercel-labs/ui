@@ -16,7 +16,10 @@ async function withKeyboard(page: Page) {
       offsetLeft: { value: 0 },
       scale: { value: 1 },
     })
-    Object.defineProperty(window, "visualViewport", { value: visual, configurable: true })
+    Object.defineProperty(window, "visualViewport", {
+      value: visual,
+      configurable: true,
+    })
     Object.assign(window, {
       openKeyboard: (height: number) => {
         keyboard = height
@@ -28,8 +31,11 @@ async function withKeyboard(page: Page) {
 
 const openKeyboard = (page: Page, height: number) =>
   page.evaluate(
-    (height) => (window as unknown as { openKeyboard: (h: number) => void }).openKeyboard(height),
-    height,
+    (height) =>
+      (window as unknown as { openKeyboard: (h: number) => void }).openKeyboard(
+        height
+      ),
+    height
   )
 
 test("every example renders without errors", async ({ page }) => {
@@ -38,7 +44,9 @@ test("every example renders without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("bind viewport: the console follows the keyboard as it opens and closes", async ({ page }) => {
+test("bind viewport: the console follows the keyboard as it opens and closes", async ({
+  page,
+}) => {
   await withKeyboard(page)
   await openExamples(page, url)
   const example = page.locator('[data-example="behaviors/viewport-bind"]')
@@ -55,7 +63,10 @@ test("bind viewport: the console follows the keyboard as it opens and closes", a
   await page.getByPlaceholder("Tap here on a phone").focus()
   await openKeyboard(page, 300)
   await expect(keyboard).toHaveText(/^Keyboard 300px/)
-  await expect(example.locator('[data-slot="stack"]')).toHaveAttribute("data-keyboard", "")
+  await expect(example.locator('[data-slot="stack"]')).toHaveAttribute(
+    "data-keyboard",
+    ""
+  )
   await openKeyboard(page, 0)
   await expect(keyboard).toHaveText(/^Keyboard 0px/)
 })
@@ -68,45 +79,67 @@ test("avoid keyboard: the pill under the list rises above the keyboard, and sett
   const list = page.getByRole("textbox", { name: "Groceries" })
   const pill = page.locator("p[aria-live]").filter({ hasText: "Saved" })
   await expect(pill).toHaveText("2 items · Saved")
-  const gap = () => pill.evaluate((el) => Math.round(window.innerHeight - el.getBoundingClientRect().bottom))
+  const gap = () =>
+    pill.evaluate((el) =>
+      Math.round(window.innerHeight - el.getBoundingClientRect().bottom)
+    )
   // Put the pill 40 pixels above the bottom of the screen, where a 300-pixel keyboard covers it, again until the page settles.
   await expect
     .poll(async () => {
       await pill.evaluate((el) =>
-        window.scrollBy(0, el.getBoundingClientRect().bottom - (window.innerHeight - 40)),
+        window.scrollBy(
+          0,
+          el.getBoundingClientRect().bottom - (window.innerHeight - 40)
+        )
       )
       return gap()
     })
     .toBe(40)
   // The browser keeps the field in view on its own; the pill needs the lift.
-  await list.evaluate((el) => (el as HTMLElement).focus({ preventScroll: true }))
+  await list.evaluate((el) =>
+    (el as HTMLElement).focus({ preventScroll: true })
+  )
   await openKeyboard(page, 300)
   await expect(pill.locator("..")).toHaveAttribute("data-keyboard", "")
   // The example's wrapper keeps 16 pixels between the pill and the keyboard.
   await expect.poll(gap).toBe(316)
   // End scrolls the page on macOS instead of moving the caret.
-  await list.evaluate((el: HTMLTextAreaElement) => el.setSelectionRange(el.value.length, el.value.length))
+  await list.evaluate((el: HTMLTextAreaElement) =>
+    el.setSelectionRange(el.value.length, el.value.length)
+  )
   await list.pressSequentially("\n- eggs")
   await expect(pill).toHaveText("3 items · Saved")
   await openKeyboard(page, 0)
   await expect.poll(gap).toBe(40)
 })
 
-test("pointer kind: a mouse hovers, so the details open on hover", async ({ page }) => {
+test("pointer kind: a mouse hovers, so the details open on hover", async ({
+  page,
+}) => {
   await openExamples(page, url)
-  const button = page.getByRole("button", { name: "Shipping (hover for details)" })
+  const button = page.getByRole("button", {
+    name: "Shipping (hover for details)",
+  })
   await expect(button).toBeVisible()
   await button.hover()
-  await expect(page.getByRole("status").filter({ hasText: "Free over $50" })).toBeVisible()
+  await expect(
+    page.getByRole("status").filter({ hasText: "Free over $50" })
+  ).toBeVisible()
 })
 
 test.describe("on a phone", () => {
   test.use({ hasTouch: true, isMobile: true })
 
-  test("pointer kind: a finger can't hover, so the details open on tap", async ({ page }) => {
+  test("pointer kind: a finger can't hover, so the details open on tap", async ({
+    page,
+  }) => {
     await openExamples(page, url)
-    const button = page.getByRole("button", { name: "Shipping (tap for details)" })
+    const button = page.getByRole("button", {
+      name: "Shipping (tap for details)",
+    })
     await button.tap()
-    await expect(page.getByRole("status").filter({ hasText: "Free over $50" })).toBeVisible()
+    await expect(
+      page.getByRole("status").filter({ hasText: "Free over $50" })
+    ).toBeVisible()
   })
 })

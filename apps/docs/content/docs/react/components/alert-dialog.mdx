@@ -112,7 +112,9 @@ export {
   <ConfirmBackdrop />
   <ConfirmContent>
     <ConfirmTitle>Delete this project?</ConfirmTitle>
-    <ConfirmDescription>This permanently deletes the project.</ConfirmDescription>
+    <ConfirmDescription>
+      This permanently deletes the project.
+    </ConfirmDescription>
     <ConfirmClose>Cancel</ConfirmClose>
     <ConfirmClose value="confirm">Delete</ConfirmClose>
   </ConfirmContent>
@@ -260,11 +262,17 @@ Alert Dialog shares [Dialog's](./dialog) options, except `modal`, `closeOnOutsid
 
 ### AlertDialog
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOptions" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogOptions"
+/>
 
 ### AlertDialogTrigger
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogTriggerProps"
+/>
 
 ### AlertDialogBackdrop
 
@@ -272,7 +280,10 @@ Dims the page behind the dialog. Renders a `div` and accepts its props and `rend
 
 ### AlertDialogContent
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogContentProps"
+/>
 
 ### AlertDialogTitle
 
@@ -284,35 +295,56 @@ What happens if you agree. Renders a `p`, and the content uses it as its accessi
 
 ### AlertDialogClose
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogCloseProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogCloseProps"
+/>
 
 ### AlertDialogShortcut
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogShortcutProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogShortcutProps"
+/>
 
 ### Confirm Options
 
 The shared `confirm()` function uses these options when an `OverlayHost` renders the question. See [Toasts and Confirms](../popups#toasts-and-confirms) for the host setup. With your own dialog, `createConfirm<Payload>()` accepts the payload you choose instead.
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="ConfirmOptions" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="ConfirmOptions"
+/>
 
 ### State
 
 `AlertDialogContent`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogContentState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogContentState"
+/>
 
 `AlertDialogClose`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogCloseState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogCloseState"
+/>
 
 `AlertDialogShortcut`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogShortcutState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogShortcutState"
+/>
 
 ### Reasons
 
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogOpenChangeReason"
+/>
 
 `onPayloadChange(payload, details)` runs before `onOpenChange` when the dialog opens with another payload. Calling `controller.open({ payload })` on an open dialog updates the payload with the reason `imperative`.
 
@@ -325,7 +357,10 @@ The shared `confirm()` function uses these options when an `OverlayHost` renders
 
 Use `createAlertDialogController<Payload, Result>()` for direct control. `createConfirm<Payload>()` returns a confirm function with its own `controller`.
 
-<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="AlertDialogController" />
+<ControllerTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="AlertDialogController"
+/>
 
 ## Accessibility
 

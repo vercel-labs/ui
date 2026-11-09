@@ -14,9 +14,13 @@ const workspaceOnly = new Set(["./internal/*"])
  * file behind them.
  */
 function findPublishProblems(packageDir) {
-  const manifest = JSON.parse(readFileSync(path.join(packageDir, "package.json"), "utf8"))
+  const manifest = JSON.parse(
+    readFileSync(path.join(packageDir, "package.json"), "utf8")
+  )
   return [
-    ...(manifest.files?.includes("dist") ? [] : ['"files" must include "dist".']),
+    ...(manifest.files?.includes("dist")
+      ? []
+      : ['"files" must include "dist".']),
     ...findMapProblems(packageDir, manifest, "exports"),
     ...findMapProblems(packageDir, manifest, "imports"),
   ]
@@ -28,22 +32,32 @@ function findMapProblems(packageDir, manifest, field) {
   const problems = []
   for (const key of Object.keys(sourceMap)) {
     if (workspaceOnly.has(key)) {
-      if (key in publishedMap)
+      if (key in publishedMap) {
         problems.push(
-          `publishConfig.${field}["${key}"] is for the workspace only, so it must not be published.`,
+          `publishConfig.${field}["${key}"] is for the workspace only, so it must not be published.`
         )
-    } else if (!(key in publishedMap))
+      }
+    } else if (!(key in publishedMap)) {
       problems.push(
-        `publishConfig.${field} has no "${key}". Map each ./src/<file>.ts to ./dist/<file>.js, with "types" first.`,
+        `publishConfig.${field} has no "${key}". Map each ./src/<file>.ts to ./dist/<file>.js, with "types" first.`
       )
+    }
   }
   for (const [key, target] of Object.entries(publishedMap)) {
     // TypeScript takes the first matching condition, so `types` must come first.
-    if (typeof target === "object" && "types" in target && Object.keys(target)[0] !== "types")
+    if (
+      typeof target === "object" &&
+      "types" in target &&
+      Object.keys(target)[0] !== "types"
+    ) {
       problems.push(`publishConfig.${field}["${key}"] must list "types" first.`)
+    }
     for (const file of publishedFiles(packageDir, target, sourceMap[key])) {
-      if (!existsSync(path.join(packageDir, file)))
-        problems.push(`publishConfig.${field}["${key}"] points at ${file}, which the build didn't emit.`)
+      if (!existsSync(path.join(packageDir, file))) {
+        problems.push(
+          `publishConfig.${field}["${key}"] points at ${file}, which the build didn't emit.`
+        )
+      }
     }
   }
   return problems
@@ -57,20 +71,31 @@ function findMapProblems(packageDir, manifest, field) {
  */
 function publishedFiles(packageDir, target, sourceTarget) {
   const files = stringLeaves(target)
-  if (!files.some((file) => file.includes("*"))) return files
-  const names = stringLeaves(sourceTarget ?? {}).flatMap((pattern) => wildcardMatches(packageDir, pattern))
+  if (!files.some((file) => file.includes("*"))) {
+    return files
+  }
+  const names = stringLeaves(sourceTarget ?? {}).flatMap((pattern) =>
+    wildcardMatches(packageDir, pattern)
+  )
   return files.flatMap((file) => names.map((name) => file.replace("*", name)))
 }
 
 function stringLeaves(target) {
-  return typeof target === "string" ? [target] : Object.values(target).flatMap(stringLeaves)
+  return typeof target === "string"
+    ? [target]
+    : Object.values(target).flatMap(stringLeaves)
 }
 
 // What `*` stands for in each file under the package that `pattern` matches.
 function wildcardMatches(packageDir, pattern) {
   const [prefix, suffix] = pattern.split("*")
-  if (suffix === undefined) return []
-  const searchDir = path.join(packageDir, prefix.slice(0, prefix.lastIndexOf("/")))
+  if (suffix === undefined) {
+    return []
+  }
+  const searchDir = path.join(
+    packageDir,
+    prefix.slice(0, prefix.lastIndexOf("/"))
+  )
   return readdirSync(searchDir, { recursive: true })
     .map((file) => `./${path.relative(packageDir, path.join(searchDir, file))}`)
     .filter((file) => file.startsWith(prefix) && file.endsWith(suffix))

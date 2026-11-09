@@ -33,18 +33,24 @@ const note = ref<HTMLTextAreaElement | null>(null)
 let changed = false
 function onChange(kind: string) {
   return (value: File[], details: FileInputValueChangeDetails) => {
-    if (options.cancel) details.cancel()
+    if (options.cancel) {
+      details.cancel()
+    }
     changed = true
     queueMicrotask(() => (changed = false))
     action.value = describeChange(kind, details)
     count.value++
     const ignored = options.ignoreRemovals && details.reason === "remove-press"
-    if (kind === "attachments" && !details.canceled && !ignored) attachments.value = value
+    if (kind === "attachments" && !details.canceled && !ignored) {
+      attachments.value = value
+    }
   }
 }
 function onReject(kind: string) {
   return (rejected: FileRejection[], details: { reason: string }) => {
-    if (!changed) action.value = describeChange(kind, { ...details, rejected })
+    if (!changed) {
+      action.value = describeChange(kind, { ...details, rejected })
+    }
   }
 }
 const attachmentsChange = onChange("attachments")
@@ -64,7 +70,12 @@ function onSubmit(event: Event) {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <form class="form" :id="f.formId" :aria-label="f.formLabel" @submit.prevent="onSubmit">
+    <form
+      class="form"
+      :id="f.formId"
+      :aria-label="f.formLabel"
+      @submit.prevent="onSubmit"
+    >
       <Field>
         <FieldLabel>{{ f.field.label }}</FieldLabel>
         <FileInput
@@ -99,7 +110,9 @@ function onSubmit(event: Event) {
           </FileInputList>
         </FileInput>
         <FieldDescription>{{ f.field.description }}</FieldDescription>
-        <FieldError class="field-error" match="valueMissing">{{ f.field.error }}</FieldError>
+        <FieldError class="field-error" match="valueMissing">{{
+          f.field.error
+        }}</FieldError>
       </Field>
       <label>
         {{ f.note.label }}
@@ -121,8 +134,18 @@ function onSubmit(event: Event) {
     <FileInput directory @value-change="folderChange" @reject="folderReject">
       <FileInputTrigger>{{ f.folder.label }}</FileInputTrigger>
     </FileInput>
-    <FileInput v-if="options.page" multiple @value-change="pageChange" @reject="pageReject">
-      <FileInputDropzone class="page-zone" role="group" :aria-label="f.page.label" target="document">
+    <FileInput
+      v-if="options.page"
+      multiple
+      @value-change="pageChange"
+      @reject="pageReject"
+    >
+      <FileInputDropzone
+        class="page-zone"
+        role="group"
+        :aria-label="f.page.label"
+        target="document"
+      >
         {{ f.page.text }}
       </FileInputDropzone>
     </FileInput>

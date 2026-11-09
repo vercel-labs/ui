@@ -40,11 +40,21 @@ describe("keys", () => {
 
 describe("direction", () => {
   test("follows the screen along the list's axis", () => {
-    expect(directionBetween({ left: 0, top: 0 }, { left: 80, top: 0 }, "horizontal")).toBe("right")
-    expect(directionBetween({ left: 80, top: 0 }, { left: 0, top: 0 }, "horizontal")).toBe("left")
-    expect(directionBetween({ left: 0, top: 40 }, { left: 0, top: 0 }, "vertical")).toBe("up")
-    expect(directionBetween({ left: 0, top: 0 }, { left: 0, top: 40 }, "vertical")).toBe("down")
-    expect(directionBetween(undefined, { left: 0, top: 0 }, "horizontal")).toBe("none")
+    expect(
+      directionBetween({ left: 0, top: 0 }, { left: 80, top: 0 }, "horizontal")
+    ).toBe("right")
+    expect(
+      directionBetween({ left: 80, top: 0 }, { left: 0, top: 0 }, "horizontal")
+    ).toBe("left")
+    expect(
+      directionBetween({ left: 0, top: 40 }, { left: 0, top: 0 }, "vertical")
+    ).toBe("up")
+    expect(
+      directionBetween({ left: 0, top: 0 }, { left: 0, top: 40 }, "vertical")
+    ).toBe("down")
+    expect(directionBetween(undefined, { left: 0, top: 0 }, "horizontal")).toBe(
+      "none"
+    )
   })
 })
 
@@ -74,7 +84,7 @@ describe("selection", () => {
   test("pairs tabs and panels by value", () => {
     const instance = tabs({ id: "t", defaultValue: "a" })
     expect(attrs(instance.part("tab", { value: "a" })).id).toBe(
-      attrs(instance.part("panel", { value: "a" }))["aria-labelledby"],
+      attrs(instance.part("panel", { value: "a" }))["aria-labelledby"]
     )
   })
 
@@ -87,21 +97,28 @@ describe("selection", () => {
       "aria-orientation": "vertical",
       "data-orientation": "vertical",
     })
-    expect(partState(instance.part("indicator"))).toMatchObject({ orientation: "vertical" })
+    expect(partState(instance.part("indicator"))).toMatchObject({
+      orientation: "vertical",
+    })
   })
 
   test("only the selected panel is present, unless kept mounted", () => {
     const instance = tabs({ id: "t", defaultValue: "a" })
     expect(present(instance.part("panel", { value: "a" }))).toBe(true)
     expect(present(instance.part("panel", { value: "b" }))).toBe(false)
-    expect(present(instance.part("panel", { value: "b", keepMounted: true }))).toBe(true)
+    expect(
+      present(instance.part("panel", { value: "b", keepMounted: true }))
+    ).toBe(true)
   })
 
   test("selecting reports the value and a reason", () => {
     const onValueChange = vi.fn()
     const instance = tabs({ id: "t", defaultValue: "a", onValueChange })
     instance.api.select("b", { reason: "list-navigation" })
-    expect(onValueChange).toHaveBeenCalledWith("b", expect.objectContaining({ reason: "list-navigation" }))
+    expect(onValueChange).toHaveBeenCalledWith(
+      "b",
+      expect.objectContaining({ reason: "list-navigation" })
+    )
     expect(instance.api.getValue()).toBe("b")
   })
 
@@ -132,7 +149,9 @@ describe("selection", () => {
     instance.setOptions({ id: "t", defaultValue: "a", controller })
     controller.select("c")
     expect(controller.getValue()).toBe("c")
-    expect(attrs(instance.part("tab", { value: "c" }))["aria-selected"]).toBe("true")
+    expect(attrs(instance.part("tab", { value: "c" }))["aria-selected"]).toBe(
+      "true"
+    )
   })
 
   test("a controller reaches only the public api", async () => {
@@ -156,7 +175,12 @@ describe("selection", () => {
 
   test("vertical lists say so", () => {
     const instance = tabs({ id: "t", orientation: "vertical" })
-    expect(attrs(instance.part("list"))).toMatchObject({ role: "tablist", "aria-orientation": "vertical" })
-    expect(attrs(tabs({ id: "u" }).part("list"))["aria-orientation"]).toBeUndefined()
+    expect(attrs(instance.part("list"))).toMatchObject({
+      role: "tablist",
+      "aria-orientation": "vertical",
+    })
+    expect(
+      attrs(tabs({ id: "u" }).part("list"))["aria-orientation"]
+    ).toBeUndefined()
   })
 })

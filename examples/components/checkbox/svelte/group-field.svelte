@@ -1,7 +1,16 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
-  import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Checkbox,
+    CheckboxGroup,
+    CheckboxIndicator,
+  } from "@ui-sdk/svelte/checkbox"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
   import { useLog } from "../../../shared/svelte/log"
 
   const channels = [
@@ -14,7 +23,9 @@
 
   function onSubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+    const entries = [...new FormData(event.currentTarget)].map(
+      ([name, value]) => `${name}=${value}`
+    )
     log(`Saved ${entries.join("&")}`)
   }
 </script>
@@ -22,7 +33,9 @@
 <form data-slot="stack" onsubmit={onSubmit}>
   <Field>
     <FieldLabel>Notifications</FieldLabel>
-    <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+    <FieldDescription
+      >Choose how we tell you about your orders.</FieldDescription
+    >
     <CheckboxGroup name="notifications" required>
       {#each channels as channel (channel.value)}
         <label data-slot="label">

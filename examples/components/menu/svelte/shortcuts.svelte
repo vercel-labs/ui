@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@ui-sdk/svelte/menu"
+  import {
+    Menu,
+    MenuContent,
+    MenuItem,
+    MenuSeparator,
+    MenuTrigger,
+  } from "@ui-sdk/svelte/menu"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()

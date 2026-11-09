@@ -9,7 +9,8 @@
     size,
     class: className,
     ...rest
-  }: ComponentProps<typeof Button> & ButtonVariants & { class?: string } = $props()
+  }: ComponentProps<typeof Button> &
+    ButtonVariants & { class?: string } = $props()
 </script>
 
 <Button class={cn(buttonVariants({ variant, size }), className)} {...rest} />

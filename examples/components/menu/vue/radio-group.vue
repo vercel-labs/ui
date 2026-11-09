@@ -34,7 +34,10 @@ const log = useLog()
         </MenuRadioItem>
       </MenuRadioGroup>
       <MenuSeparator />
-      <MenuRadioGroup default-value="comfortable" @value-change="(value) => log(`${value} density`)">
+      <MenuRadioGroup
+        default-value="comfortable"
+        @value-change="(value) => log(`${value} density`)"
+      >
         <MenuGroupLabel>Density</MenuGroupLabel>
         <MenuRadioItem
           v-for="option in ['Compact', 'Comfortable']"

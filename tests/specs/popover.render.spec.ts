@@ -12,10 +12,14 @@ test.describe("custom rendering", () => {
     await open("popover-render")
   })
 
-  test("a title rendered as another heading still names the popover", async ({ page }) => {
+  test("a title rendered as another heading still names the popover", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
-    await expect(page.getByRole("heading", { name: "Shipping", level: 3 })).toBeVisible()
+    await expect(
+      page.getByRole("heading", { name: "Shipping", level: 3 })
+    ).toBeVisible()
   })
 
   test("a close button rendered as a link follows it, closes the popover and returns focus", async ({
@@ -31,15 +35,24 @@ test.describe("custom rendering", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("render functions receive the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+  test("render functions receive the part's state", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     await expect(trigger(page)).toContainText("▼")
     await trigger(page).click()
     await expect(trigger(page)).toContainText("▲")
   })
 
   test("class names follow the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     await expect(trigger(page)).toHaveClass(/is-closed/)
     await trigger(page).click()
     await expect(trigger(page)).toHaveClass(/is-open/)

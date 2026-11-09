@@ -12,9 +12,21 @@ import { ChevronDownIcon } from "lucide-react"
 import * as React from "react"
 
 const items = [
-  { value: "account", label: "Account", content: "Your name, email address and profile photo." },
-  { value: "security", label: "Security", content: "Your password, passkeys and two-factor authentication." },
-  { value: "sessions", label: "Sessions", content: "Devices signed in to your account in the last 30 days." },
+  {
+    value: "account",
+    label: "Account",
+    content: "Your name, email address and profile photo.",
+  },
+  {
+    value: "security",
+    label: "Security",
+    content: "Your password, passkeys and two-factor authentication.",
+  },
+  {
+    value: "sessions",
+    label: "Sessions",
+    content: "Devices signed in to your account in the last 30 days.",
+  },
 ]
 
 function Example() {
@@ -28,14 +40,24 @@ function Example() {
           Review security
         </button>
       </div>
-      <Accordion multiple value={value} onValueChange={setValue} controller={accordion}>
+      <Accordion
+        multiple
+        value={value}
+        onValueChange={setValue}
+        controller={accordion}
+      >
         {items.map((item) => (
           <AccordionItem
             key={item.value}
             value={item.value}
             onOpenChange={(open, details) => {
-              if (!open && item.value === "security" && !window.confirm("Close the security settings?"))
+              if (
+                !open &&
+                item.value === "security" &&
+                !window.confirm("Close the security settings?")
+              ) {
                 details.cancel()
+              }
             }}
           >
             <AccordionHeader>

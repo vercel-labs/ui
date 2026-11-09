@@ -14,7 +14,8 @@ import {
   type Variant,
 } from "./variants"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 type ComboboxElement = HTMLElement & {
   items?: ListData<any>
@@ -27,8 +28,13 @@ type ComboboxElement = HTMLElement & {
 }
 
 function item(
-  entry: { value: string; label: string; keywords?: string[]; disabled?: boolean },
-  variant: Variant,
+  entry: {
+    value: string
+    label: string
+    keywords?: string[]
+    disabled?: boolean
+  },
+  variant: Variant
 ) {
   return `<ui-combobox-item class="${classes.item}" value="${entry.value}" label="${entry.label}"${entry.keywords ? ` keywords="${entry.keywords.join(",")}"` : ""}${entry.disabled ? " disabled" : ""}><ui-combobox-item-indicator class="${classes.indicator}"${variant.indicatorKeepMounted ? " keep-mounted" : ""}>✓</ui-combobox-item-indicator><ui-combobox-item-text class="${classes.itemText}">${entry.label}</ui-combobox-item-text></ui-combobox-item>`
 }
@@ -49,13 +55,19 @@ function template(variant: Variant) {
 function items(list: ListData<any>, variant: Variant) {
   return list
     .map((entry) => {
-      if (typeof entry === "string") return ""
-      if ("type" in entry && entry.type === "separator")
+      if (typeof entry === "string") {
+        return ""
+      }
+      if ("type" in entry && entry.type === "separator") {
         return `<ui-combobox-separator class="${classes.separator}"></ui-combobox-separator>`
-      if ("type" in entry && entry.type === "group")
+      }
+      if ("type" in entry && entry.type === "group") {
         return `<ui-combobox-group><ui-combobox-group-label class="${classes.groupLabel}">${entry.label}</ui-combobox-group-label>${entry.items
-          .map((child: unknown) => (typeof child === "string" ? "" : item(child as never, variant)))
+          .map((child: unknown) =>
+            typeof child === "string" ? "" : item(child as never, variant)
+          )
           .join("")}</ui-combobox-group>`
+      }
       return item(entry as never, variant)
     })
     .join("")
@@ -64,12 +76,17 @@ function items(list: ListData<any>, variant: Variant) {
 function attributes(values: Record<string, unknown>) {
   return Object.entries(values)
     .filter(([, value]) => value !== undefined && value !== false)
-    .map(([name, value]) => (value === true ? kebab(name) : `${kebab(name)}="${value}"`))
+    .map(([name, value]) =>
+      value === true ? kebab(name) : `${kebab(name)}="${value}"`
+    )
     .join(" ")
 }
 
 function button(label: string, run: () => void) {
-  const el = Object.assign(document.createElement("button"), { type: "button", className: classes.button })
+  const el = Object.assign(document.createElement("button"), {
+    type: "button",
+    className: classes.button,
+  })
   el.textContent = label
   el.addEventListener("click", run)
   return el
@@ -79,16 +96,30 @@ function mount(root: HTMLElement) {
   kitchenSink(root, "web", (slot, variant, env) => {
     const combobox = document.createElement("ui-combobox") as ComboboxElement
     const { defaultValue, filter, ...options } = variant.options ?? {}
-    for (const [option, value] of Object.entries(options)) combobox.setAttribute(kebab(option), String(value))
-    if (defaultValue !== undefined) combobox.setAttribute("default-value", [defaultValue].flat().join(","))
+    for (const [option, value] of Object.entries(options)) {
+      combobox.setAttribute(kebab(option), String(value))
+    }
+    if (defaultValue !== undefined) {
+      combobox.setAttribute("default-value", [defaultValue].flat().join(","))
+    }
     // The filter is an attribute, so a function can't be set: that variant falls back to "contains".
-    if (filter !== undefined && filter !== "function") combobox.setAttribute("filter", String(filter))
-    if (env.container) combobox.setAttribute("container", `#${env.container.id}`)
+    if (filter !== undefined && filter !== "function") {
+      combobox.setAttribute("filter", String(filter))
+    }
+    if (env.container) {
+      combobox.setAttribute("container", `#${env.container.id}`)
+    }
     const data = variant.mode === "data" || !!variant.async
     const own = !data || !!variant.async || !!variant.create
-    if (data) combobox.items = variant.async ? [] : listOf(variant)
-    if (variant.list === "objects") Object.assign(combobox, objectOptions)
-    if (variant.recent) Object.assign(combobox, { emptyItems: recentCountries })
+    if (data) {
+      combobox.items = variant.async ? [] : listOf(variant)
+    }
+    if (variant.list === "objects") {
+      Object.assign(combobox, objectOptions)
+    }
+    if (variant.recent) {
+      Object.assign(combobox, { emptyItems: recentCountries })
+    }
 
     const input = `<ui-combobox-input><input class="${variant.chips ? classes.chipsInput : classes.input}" placeholder="Search countries…" /></ui-combobox-input>`
     combobox.innerHTML = `
@@ -111,29 +142,45 @@ function mount(root: HTMLElement) {
     slot.append(combobox)
 
     // Web components have no controlled props. The state shows here, and buttons drive the element.
-    const output = Object.assign(document.createElement("span"), { className: "text-xs text-neutral-600" })
-    const checkbox = Object.assign(document.createElement("input"), { type: "checkbox" })
+    const output = Object.assign(document.createElement("span"), {
+      className: "text-xs text-neutral-600",
+    })
+    const checkbox = Object.assign(document.createElement("input"), {
+      type: "checkbox",
+    })
 
     // Callbacks are DOM events on the element, with the value and the reason in `detail`.
     const detail = (event: Event) =>
-      (event as CustomEvent<{ value: unknown; reason?: string; index?: number }>).detail
+      (
+        event as CustomEvent<{
+          value: unknown
+          reason?: string
+          index?: number
+        }>
+      ).detail
     combobox.addEventListener("valuechange", (event) => {
       const { value, reason } = detail(event)
       env.log(`valueChange ${show(value)} (${reason})`)
-      if (variant.controlled === "value") output.textContent = `value: ${show(value)}`
+      if (variant.controlled === "value") {
+        output.textContent = `value: ${show(value)}`
+      }
     })
     combobox.addEventListener("openchange", (event) => {
       const { value, reason } = detail(event)
       env.log(`openChange ${value} (${reason})`)
-      if (variant.controlled === "open") checkbox.checked = value as boolean
+      if (variant.controlled === "open") {
+        checkbox.checked = value as boolean
+      }
     })
     combobox.addEventListener("querychange", (event) => {
       const { value, reason } = detail(event)
       env.log(`queryChange ${JSON.stringify(value)} (${reason})`)
-      if (variant.controlled === "query") output.textContent = `query: ${JSON.stringify(value)}`
+      if (variant.controlled === "query") {
+        output.textContent = `query: ${JSON.stringify(value)}`
+      }
     })
     combobox.addEventListener("openchangecomplete", (event) =>
-      env.log(`openChangeComplete ${detail(event).value}`),
+      env.log(`openChangeComplete ${detail(event).value}`)
     )
     combobox.addEventListener("highlight", (event) => {
       const { value, index } = detail(event)
@@ -145,16 +192,23 @@ function mount(root: HTMLElement) {
       const onCreate = createHandler(variant.create, env.log)
       combobox.addEventListener("create", (event) => {
         const { value, waitUntil } = (
-          event as CustomEvent<{ value: string; waitUntil: (promise: Promise<unknown>) => void }>
+          event as CustomEvent<{
+            value: string
+            waitUntil: (promise: Promise<unknown>) => void
+          }>
         ).detail
         const result = onCreate(value)
-        if (result) waitUntil(result)
+        if (result) {
+          waitUntil(result)
+        }
       })
     }
 
     // Async results: the helper loads for the text, and its state feeds the element.
     if (variant.async) {
-      const remote = createAsyncOptions(search(variant.async), { immediate: true })
+      const remote = createAsyncOptions(search(variant.async), {
+        immediate: true,
+      })
       const status = combobox.querySelector("ui-combobox-status")!
       combobox.setAttribute("filter", "false")
       remote.subscribe(() => {
@@ -170,7 +224,9 @@ function mount(root: HTMLElement) {
               ? "Couldn't load countries."
               : `${state.items.length} results`
       })
-      combobox.addEventListener("querychange", (event) => remote.setQuery(detail(event).value as string))
+      combobox.addEventListener("querychange", (event) =>
+        remote.setQuery(detail(event).value as string)
+      )
       combobox.addEventListener("loadmore", () => remote.loadMore())
     }
 
@@ -181,7 +237,7 @@ function mount(root: HTMLElement) {
       slot.append(
         output,
         button("Set", () => (combobox.value = sampleValue(variant))),
-        button("Null", () => (combobox.value = null)),
+        button("Null", () => (combobox.value = null))
       )
     }
     if (variant.controlled === "query") {
@@ -189,7 +245,7 @@ function mount(root: HTMLElement) {
       slot.append(
         output,
         button("Set “ca”", () => (combobox.query = "ca")),
-        button("Empty", () => (combobox.query = "")),
+        button("Empty", () => (combobox.query = ""))
       )
     }
     if (variant.controlled === "open") {
@@ -199,8 +255,11 @@ function mount(root: HTMLElement) {
       label.append(checkbox, "open")
       slot.append(label)
       checkbox.addEventListener("change", () => {
-        if (checkbox.checked) combobox.api?.open()
-        else combobox.api?.close()
+        if (checkbox.checked) {
+          combobox.api?.open()
+        } else {
+          combobox.api?.close()
+        }
       })
     }
   })

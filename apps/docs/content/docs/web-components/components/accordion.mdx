@@ -62,7 +62,9 @@ Import the parts and put them together:
         <ui-accordion-trigger><button>Shipping</button></ui-accordion-trigger>
       </h3>
     </ui-accordion-header>
-    <ui-accordion-panel hidden>Orders arrive in five to seven days.</ui-accordion-panel>
+    <ui-accordion-panel hidden
+      >Orders arrive in five to seven days.</ui-accordion-panel
+    >
   </ui-accordion-item>
 </ui-accordion>
 ```
@@ -78,7 +80,10 @@ import { createParts, wrappedButton } from "@ui-sdk/web"
 createParts(accordion, {
   root: "faq-list",
   item: "faq-item",
-  header: { tag: "faq-heading", target: (el) => el.querySelector<HTMLElement>("h3") ?? el },
+  header: {
+    tag: "faq-heading",
+    target: (el) => el.querySelector<HTMLElement>("h3") ?? el,
+  },
   trigger: { tag: "faq-question", target: wrappedButton, display: "contents" },
   panel: "faq-answer",
 })
@@ -89,7 +94,9 @@ createParts(accordion, {
   <faq-item value="shipping">
     <faq-heading>
       <h3>
-        <faq-question><button>What are your shipping options?</button></faq-question>
+        <faq-question
+          ><button>What are your shipping options?</button></faq-question
+        >
       </h3>
     </faq-heading>
     <faq-answer>Standard, express and overnight.</faq-answer>
@@ -355,11 +362,17 @@ Props are attributes in kebab case, like `default-value` (open values separated 
 
 ### Accordion
 
-<TypeTable path="../../packages/core/src/components/accordion/accordion.ts" name="AccordionOptions" />
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionOptions"
+/>
 
 ### AccordionItem
 
-<TypeTable path="../../packages/core/src/components/accordion/accordion.ts" name="AccordionItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionItemProps"
+/>
 
 ### AccordionHeader
 
@@ -367,22 +380,34 @@ The header takes no options of its own, only the props of the element it renders
 
 ### AccordionTrigger
 
-<TypeTable path="../../packages/core/src/components/accordion/accordion.ts" name="AccordionTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionTriggerProps"
+/>
 
 ### AccordionPanel
 
-<TypeTable path="../../packages/core/src/components/accordion/accordion.ts" name="AccordionPanelProps" />
+<TypeTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionPanelProps"
+/>
 ### State
 
 Read the full state from the element's `api`. Part of it also shows as data attributes: the item, header, trigger and panel write `data-open` or `data-closed` and `data-disabled`, the item adds `data-index`, and the root writes only `data-disabled`. [Styling](#styling) lists every attribute.
 
 `Accordion`:
 
-<StateTable path="../../packages/core/src/components/accordion/accordion.ts" name="AccordionState" />
+<StateTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionState"
+/>
 
 `AccordionItem`, `AccordionHeader`, `AccordionTrigger` and `AccordionPanel`:
 
-<StateTable path="../../packages/core/src/components/accordion/accordion.ts" name="AccordionItemState" />
+<StateTable
+  path="../../packages/core/src/components/accordion/accordion.ts"
+  name="AccordionItemState"
+/>
 
 ### Reasons
 
@@ -422,7 +447,14 @@ The accordion follows the [WAI-ARIA accordion pattern](https://www.w3.org/WAI/AR
 
 <SpecList
   spec="accordion"
-  only={["expanding and collapsing", "multiple", "disabled", "keyboard", "structure", "mounting"]}
+  only={[
+    "expanding and collapsing",
+    "multiple",
+    "disabled",
+    "keyboard",
+    "structure",
+    "mounting",
+  ]}
 />
 
 Beyond the pattern's baseline:

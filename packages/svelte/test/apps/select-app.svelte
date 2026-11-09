@@ -1,7 +1,14 @@
 <script lang="ts">
-  import { Select, SelectContent, SelectItem, SelectTrigger } from "../../src/select"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+  } from "../../src/select"
 
-  let { onOpenChangeComplete }: { onOpenChangeComplete: (open: boolean) => void } = $props()
+  let {
+    onOpenChangeComplete,
+  }: { onOpenChangeComplete: (open: boolean) => void } = $props()
 </script>
 
 <Select {onOpenChangeComplete}>

@@ -35,7 +35,11 @@ const produce = [
       <ListboxSeparator v-if="index > 0" />
       <ListboxGroup>
         <ListboxGroupLabel>{{ group.label }}</ListboxGroupLabel>
-        <ListboxItem v-for="item in group.items" :key="item.value" :value="item.value">
+        <ListboxItem
+          v-for="item in group.items"
+          :key="item.value"
+          :value="item.value"
+        >
           {{ item.label }}
           <ListboxItemIndicator>
             <CheckIcon aria-hidden="true" />

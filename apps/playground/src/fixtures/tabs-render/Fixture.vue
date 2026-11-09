@@ -35,11 +35,15 @@ const reason = ref("")
         </TabsTab>
         <TabsTab class="tab" value="watched">
           <template #render="{ props, state }">
-            <button v-bind="props">Watched<span v-if="state.selected" aria-hidden="true"> •</span></button>
+            <button v-bind="props">
+              Watched<span v-if="state.selected" aria-hidden="true"> •</span>
+            </button>
           </template>
         </TabsTab>
         <TabsTab v-slot="{ state }" class="tab" value="plain">
-          <span :class="state.selected ? 'is-selected' : 'is-unselected'">Plain</span>
+          <span :class="state.selected ? 'is-selected' : 'is-unselected'"
+            >Plain</span
+          >
         </TabsTab>
       </TabsList>
       <TabsPanel

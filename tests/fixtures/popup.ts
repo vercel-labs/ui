@@ -12,12 +12,15 @@ async function addScroller(page: Page) {
     document.head.append(style)
     const el = document.createElement("div")
     el.id = "scroller"
-    el.style.cssText = "position: fixed; left: 0; bottom: 0; width: 200px; height: 100px; overflow-y: scroll"
+    el.style.cssText =
+      "position: fixed; left: 0; bottom: 0; width: 200px; height: 100px; overflow-y: scroll"
     el.innerHTML = '<div style="height: 400px"></div>'
     document.body.append(el)
     const width = el.offsetWidth - el.clientWidth
     const rect = el.getBoundingClientRect()
-    return width > 0 ? { x: rect.left + el.clientWidth + width / 2, y: rect.top + 50 } : undefined
+    return width > 0
+      ? { x: rect.left + el.clientWidth + width / 2, y: rect.top + 50 }
+      : undefined
   })
 }
 
@@ -26,8 +29,13 @@ async function addScroller(page: Page) {
 async function composingEscape(page: Page) {
   await page.evaluate(() =>
     document.activeElement?.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "Escape", isComposing: true, bubbles: true, cancelable: true }),
-    ),
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        isComposing: true,
+        bubbles: true,
+        cancelable: true,
+      })
+    )
   )
 }
 
@@ -35,15 +43,19 @@ async function composingEscape(page: Page) {
 // named "Shadow", like a design system's button inside a popup.
 async function addShadowButton(el: Locator) {
   await el.evaluate((el) => {
-    if (!customElements.get("shadow-button"))
+    if (!customElements.get("shadow-button")) {
       customElements.define(
         "shadow-button",
         class extends HTMLElement {
           connectedCallback() {
-            if (!this.shadowRoot) this.attachShadow({ mode: "open" }).innerHTML = "<button>Shadow</button>"
+            if (!this.shadowRoot) {
+              this.attachShadow({ mode: "open" }).innerHTML =
+                "<button>Shadow</button>"
+            }
           }
-        },
+        }
       )
+    }
     el.before(document.createElement("shadow-button"))
   })
 }
@@ -63,8 +75,13 @@ async function moveIntoShadowRoot(el: Locator) {
 async function scrollIn(listbox: Locator, part: "content" | "list") {
   await listbox.evaluate((list, part) => {
     const content = list.closest<HTMLElement>(".list-popup")!
-    if (part === "list") Object.assign(content.style, { maxHeight: "none", overflowY: "visible" })
-    Object.assign((part === "list" ? list : content).style, { maxHeight: "80px", overflowY: "auto" })
+    if (part === "list") {
+      Object.assign(content.style, { maxHeight: "none", overflowY: "visible" })
+    }
+    Object.assign((part === "list" ? list : content).style, {
+      maxHeight: "80px",
+      overflowY: "auto",
+    })
   }, part)
 }
 
@@ -74,14 +91,27 @@ async function scrolledIntoView(el: Locator) {
     let node = el.parentElement
     while (
       node &&
-      !(/(auto|scroll)/.test(getComputedStyle(node).overflowY) && node.scrollHeight > node.clientHeight)
-    )
+      !(
+        /(auto|scroll)/.test(getComputedStyle(node).overflowY) &&
+        node.scrollHeight > node.clientHeight
+      )
+    ) {
       node = node.parentElement
-    if (!node) return false
+    }
+    if (!node) {
+      return false
+    }
     const box = el.getBoundingClientRect()
     const view = node.getBoundingClientRect()
     return box.top >= view.top - 1 && box.bottom <= view.bottom + 1
   })
 }
 
-export { addScroller, addShadowButton, composingEscape, moveIntoShadowRoot, scrollIn, scrolledIntoView }
+export {
+  addScroller,
+  addShadowButton,
+  composingEscape,
+  moveIntoShadowRoot,
+  scrollIn,
+  scrolledIntoView,
+}

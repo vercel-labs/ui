@@ -69,7 +69,8 @@ const readSaved = `function(k,i){var c=window.__uiSdkStorage||(window.__uiSdkSto
 const seed = `function(k,i,a,v){try{var s=(${readSaved})(k,i),t=document.currentScript,r=t&&t.previousElementSibling;if(r&&s!==null&&v.indexOf(s)>-1)r.setAttribute(a,s)}catch(e){}}`
 
 // JSON, with `<` escaped so a value can't close the script element.
-const literal = (value: unknown) => JSON.stringify(value).replace(/</g, "\\u003c")
+const literal = (value: unknown) =>
+  JSON.stringify(value).replace(/</g, "\\u003c")
 
 // The listeners of every storage with one kind and ID, on this page.
 const listenersByKey = new Map<string, Set<(value: string | null) => void>>()
@@ -77,7 +78,9 @@ const listenersByKey = new Map<string, Set<(value: string | null) => void>>()
 const listenersOf = (kind: Kind, id: string) => {
   const key = `${kind}:${id}`
   let listeners = listenersByKey.get(key)
-  if (!listeners) listenersByKey.set(key, (listeners = new Set()))
+  if (!listeners) {
+    listenersByKey.set(key, (listeners = new Set()))
+  }
   return listeners
 }
 
@@ -88,7 +91,9 @@ const writable = new WeakSet<Storage>()
 // The page's localStorage or sessionStorage, or undefined where reading it
 // throws, like in a sandboxed frame.
 function areaOf(kind: "local" | "session") {
-  if (!isBrowser) return
+  if (!isBrowser) {
+    return
+  }
   try {
     return kind === "local" ? window.localStorage : window.sessionStorage
   } catch {
@@ -98,7 +103,9 @@ function areaOf(kind: "local" | "session") {
 
 // Whether a write goes through now, unlike in a browser that blocks storage or once it's full.
 function canWrite(area: Storage) {
-  if (writable.has(area)) return true
+  if (writable.has(area)) {
+    return true
+  }
   try {
     const probe = "__ui-sdk-storage__"
     area.setItem(probe, probe)
@@ -111,8 +118,11 @@ function canWrite(area: Storage) {
 }
 
 function checkId(id: string) {
-  if (typeof id !== "string" || id === "")
-    throw new Error('A storage needs an ID, like createLocalStorage("color-scheme").')
+  if (typeof id !== "string" || id === "") {
+    throw new Error(
+      'A storage needs an ID, like createLocalStorage("color-scheme").'
+    )
+  }
 }
 
 // What every kind shares: the ID, telling the other storages with it about a
@@ -127,15 +137,19 @@ function createStorage(
     read: () => string | null
     write: (value: string | null) => boolean
     watch: (heard: () => void) => () => void
-  },
+  }
 ) {
   checkId(id)
   const listeners = listenersOf(kind, id)
   const storageKind = kind
 
   const save = (value: string | null) => {
-    if (!area.write(value)) return false
-    for (const listener of [...listeners]) listener(value)
+    if (!area.write(value)) {
+      return false
+    }
+    for (const listener of [...listeners]) {
+      listener(value)
+    }
     return true
   }
 
@@ -193,8 +207,11 @@ function createAreaStorage(kind: "local" | "session", id: string) {
   return createStorage(kind, id, {
     readsOnServer: false,
     script: ({ attribute, values }) => {
-      if (!/^data-[a-z0-9-]+$/.test(attribute))
-        throw new Error(`A storage script only sets data-* attributes, not "${attribute}".`)
+      if (!/^data-[a-z0-9-]+$/.test(attribute)) {
+        throw new Error(
+          `A storage script only sets data-* attributes, not "${attribute}".`
+        )
+      }
       return `(${seed})(${[kind, id, attribute, values].map(literal).join(",")})`
     },
     available: () => {
@@ -210,10 +227,15 @@ function createAreaStorage(kind: "local" | "session", id: string) {
     },
     write: (value) => {
       const area = areaOf(kind)
-      if (!area) return false
+      if (!area) {
+        return false
+      }
       try {
-        if (value === null) area.removeItem(id)
-        else area.setItem(id, value)
+        if (value === null) {
+          area.removeItem(id)
+        } else {
+          area.setItem(id, value)
+        }
         return true
       } catch {
         // Blocked, or full.
@@ -221,10 +243,16 @@ function createAreaStorage(kind: "local" | "session", id: string) {
       }
     },
     watch: (heard) => {
-      if (!isBrowser) return () => {}
+      if (!isBrowser) {
+        return () => {}
+      }
       const onStorage = (event: StorageEvent) => {
-        if (event.key !== id && event.key !== null) return
-        if (event.storageArea !== areaOf(kind)) return
+        if (event.key !== id && event.key !== null) {
+          return
+        }
+        if (event.storageArea !== areaOf(kind)) {
+          return
+        }
         heard()
       }
       window.addEventListener("storage", onStorage)
@@ -252,10 +280,14 @@ function createSessionStorage(id: string) {
 }
 
 const cookieValue = (header: string | null | undefined, name: string) => {
-  if (!header) return null
+  if (!header) {
+    return null
+  }
   for (const pair of header.split(";")) {
     const at = pair.indexOf("=")
-    if (at < 0 || pair.slice(0, at).trim() !== name) continue
+    if (at < 0 || pair.slice(0, at).trim() !== name) {
+      continue
+    }
     try {
       return decodeURIComponent(pair.slice(at + 1).trim())
     } catch {
@@ -267,7 +299,11 @@ const cookieValue = (header: string | null | undefined, name: string) => {
 
 const cookiesEnabled = () => {
   try {
-    return isBrowser && navigator.cookieEnabled !== false && typeof document.cookie === "string"
+    return (
+      isBrowser &&
+      navigator.cookieEnabled !== false &&
+      typeof document.cookie === "string"
+    )
   } catch {
     return false
   }
@@ -284,7 +320,9 @@ function createCookieStorage(id: string, options: CookieStorageOptions = {}) {
     readsOnServer: true,
     available: () => (isBrowser ? cookiesEnabled() : options.cookie != null),
     read: () => {
-      if (!isBrowser) return cookieValue(options.cookie, name)
+      if (!isBrowser) {
+        return cookieValue(options.cookie, name)
+      }
       try {
         return cookieValue(document.cookie, name)
       } catch {
@@ -292,7 +330,9 @@ function createCookieStorage(id: string, options: CookieStorageOptions = {}) {
       }
     },
     write: (value) => {
-      if (!cookiesEnabled()) return false
+      if (!cookiesEnabled()) {
+        return false
+      }
       const secure = options.secure ?? location.protocol === "https:"
       const parts = [
         `${name}=${value === null ? "" : encodeURIComponent(value)}`,
@@ -300,8 +340,12 @@ function createCookieStorage(id: string, options: CookieStorageOptions = {}) {
         `max-age=${value === null ? 0 : (options.maxAge ?? 31536000)}`,
         `samesite=${options.sameSite ?? "lax"}`,
       ]
-      if (options.domain) parts.push(`domain=${options.domain}`)
-      if (secure) parts.push("secure")
+      if (options.domain) {
+        parts.push(`domain=${options.domain}`)
+      }
+      if (secure) {
+        parts.push("secure")
+      }
       try {
         document.cookie = parts.join("; ")
         return true
@@ -311,14 +355,20 @@ function createCookieStorage(id: string, options: CookieStorageOptions = {}) {
     },
     watch: (heard) => {
       // `cookieStore` hears other tabs' writes, where the browser has it.
-      const store = isBrowser ? (window as Window & { cookieStore?: EventTarget }).cookieStore : undefined
-      if (!store) return () => {}
+      const store = isBrowser
+        ? (window as Window & { cookieStore?: EventTarget }).cookieStore
+        : undefined
+      if (!store) {
+        return () => {}
+      }
       const onChange = (event: Event) => {
         const { changed = [], deleted = [] } = event as Event & {
           changed?: { name: string }[]
           deleted?: { name: string }[]
         }
-        if ([...changed, ...deleted].some((cookie) => cookie.name === name)) heard()
+        if ([...changed, ...deleted].some((cookie) => cookie.name === name)) {
+          heard()
+        }
       }
       store.addEventListener("change", onChange)
       return () => store.removeEventListener("change", onChange)

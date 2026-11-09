@@ -99,7 +99,11 @@ Name the picker with `aria-label`, or put it in a [Field](./field) whose label n
 Set `format` to write the value another way, like `format="hex"` in any space. Every space has an `alpha` channel too. Set `x` and `y` on the area, or `channel` on a slider, to edit other channels:
 
 ```html
-<ui-color-picker aria-label="Background" space="hsl" default-value="hsl(220 60% 50%)">
+<ui-color-picker
+  aria-label="Background"
+  space="hsl"
+  default-value="hsl(220 60% 50%)"
+>
   <ui-color-picker-area x="hue" y="lightness">
     <ui-color-picker-area-canvas></ui-color-picker-area-canvas>
     <ui-color-picker-area-thumb></ui-color-picker-area-thumb>
@@ -124,7 +128,12 @@ OKLCH spaces its colors evenly for the eye, so two colors with the same lightnes
 While a drag holds a color past the edge, the value is already the closest color inside it, and every part has `data-out-of-gamut`. Once the drag ends, the thumb moves to that color. Colors stay inside sRGB by default. Set `gamut="p3"` for wide-gamut screens, or `gamut="false"` to allow any color:
 
 ```html
-<ui-color-picker aria-label="Accent" space="oklch" gamut="p3" default-value="oklch(0.7 0.25 150)">
+<ui-color-picker
+  aria-label="Accent"
+  space="oklch"
+  gamut="p3"
+  default-value="oklch(0.7 0.25 150)"
+>
   <!-- … -->
 </ui-color-picker>
 ```
@@ -153,7 +162,10 @@ Put a `ui-popover` inside the picker to open it from a swatch. The parts inside 
 
 Set `disabled`. A disabled picker can't be focused or changed, and isn't submitted. A disabled `<fieldset>` around it disables it too.
 
-<ComponentExample name="color-picker/disabled" caption="The thumbs can't be focused or dragged." />
+<ComponentExample
+  name="color-picker/disabled"
+  caption="The thumbs can't be focused or dragged."
+/>
 
 Set `read-only` to keep the parts focusable and the value submitted, while drags, keys and typing leave the color alone:
 
@@ -276,7 +288,10 @@ Props are attributes in kebab case, like `default-value` and `read-only`. `contr
 
 ### ui-color-picker
 
-<TypeTable path="../../packages/core/src/components/color-picker/color-picker.ts" name="ColorPickerOptions" />
+<TypeTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerOptions"
+/>
 
 ### ui-color-picker-area
 
@@ -310,7 +325,10 @@ Props are attributes in kebab case, like `default-value` and `read-only`. `contr
 
 The same state shows as data attributes on each element.
 
-<StateTable path="../../packages/core/src/components/color-picker/color-picker.ts" name="ColorPickerState" />
+<StateTable
+  path="../../packages/core/src/components/color-picker/color-picker.ts"
+  name="ColorPickerState"
+/>
 
 <StateTable
   path="../../packages/core/src/components/color-picker/color-picker.ts"

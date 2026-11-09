@@ -3,7 +3,9 @@ import { Textarea } from "@ui-sdk/react/textarea"
 import * as React from "react"
 
 function Example() {
-  const [bio, setBio] = React.useState("Product designer in Lisbon. I write about type and interfaces.")
+  const [bio, setBio] = React.useState(
+    "Product designer in Lisbon. I write about type and interfaces."
+  )
   return (
     <Field name="bio">
       <FieldLabel>Bio</FieldLabel>

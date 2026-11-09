@@ -21,7 +21,7 @@ function mount(root: HTMLElement) {
                 </ui-radio>
                 ${speed.label}
               </ui-label>
-            `,
+            `
           )
           .join("")}
       </ui-radio-group>

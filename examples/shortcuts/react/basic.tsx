@@ -19,7 +19,11 @@ export function Example() {
             N
           </kbd>
         </button>
-        <button type="button" onClick={save} aria-keyshortcuts={saveHint.ariaKeyshortcuts}>
+        <button
+          type="button"
+          onClick={save}
+          aria-keyshortcuts={saveHint.ariaKeyshortcuts}
+        >
           Save
           <kbd aria-hidden="true" data-slot="kbd">
             {saveHint.text}

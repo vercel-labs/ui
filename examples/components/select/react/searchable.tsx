@@ -45,7 +45,11 @@ const countries = [
 ]
 
 const popularCountries = [
-  { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
+  {
+    type: "group" as const,
+    label: "Popular",
+    items: [countries[5], countries[11], countries[16]],
+  },
 ]
 
 function Example() {
@@ -68,22 +72,28 @@ function Example() {
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectInput
+            aria-label="Search countries"
+            placeholder="Search countries…"
+          />
           <SelectEmpty>No countries found.</SelectEmpty>
           <SelectList>
             {(state) =>
-              (state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]).map(
-                (entry) =>
-                  "items" in entry ? (
-                    <SelectGroup key={entry.label}>
-                      <SelectGroupLabel>{entry.label}</SelectGroupLabel>
-                      {entry.items.map((country) => (
-                        <CountryItem key={country.value} country={country} />
-                      ))}
-                    </SelectGroup>
-                  ) : (
-                    <CountryItem key={entry.value} country={entry} />
-                  ),
+              (
+                state.items as (
+                  (typeof countries)[number] | (typeof popularCountries)[number]
+                )[]
+              ).map((entry) =>
+                "items" in entry ? (
+                  <SelectGroup key={entry.label}>
+                    <SelectGroupLabel>{entry.label}</SelectGroupLabel>
+                    {entry.items.map((country) => (
+                      <CountryItem key={country.value} country={country} />
+                    ))}
+                  </SelectGroup>
+                ) : (
+                  <CountryItem key={entry.value} country={entry} />
+                )
               )
             }
           </SelectList>
@@ -93,7 +103,11 @@ function Example() {
   )
 }
 
-function CountryItem({ country }: { country: { value: string; label: string } }) {
+function CountryItem({
+  country,
+}: {
+  country: { value: string; label: string }
+}) {
   return (
     <SelectItem value={country.value} label={country.label}>
       <SelectItemText />

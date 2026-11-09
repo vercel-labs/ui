@@ -53,17 +53,33 @@ type Remote = {
 // data combobox shows.
 function Items({ list, variant }: { list: ListData<any>; variant: Variant }) {
   return list.map((entry, index) => {
-    if (typeof entry === "string") return null
-    if ("type" in entry && entry.type === "separator")
-      return <ComboboxSeparator key={`separator-${index}`} className={classes.separator} />
-    if ("type" in entry && entry.type === "group")
+    if (typeof entry === "string") {
+      return null
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return (
+        <ComboboxSeparator
+          key={`separator-${index}`}
+          className={classes.separator}
+        />
+      )
+    }
+    if ("type" in entry && entry.type === "group") {
       return (
         <ComboboxGroup key={entry.label}>
-          <ComboboxGroupLabel className={classes.groupLabel}>{entry.label}</ComboboxGroupLabel>
+          <ComboboxGroupLabel className={classes.groupLabel}>
+            {entry.label}
+          </ComboboxGroupLabel>
           <Items list={entry.items} variant={variant} />
         </ComboboxGroup>
       )
-    const item = entry as { value: unknown; label: string; keywords?: string[]; disabled?: boolean }
+    }
+    const item = entry as {
+      value: unknown
+      label: string
+      keywords?: string[]
+      disabled?: boolean
+    }
     // Keyed by label, since values may be objects.
     return (
       <ComboboxItem
@@ -74,22 +90,37 @@ function Items({ list, variant }: { list: ListData<any>; variant: Variant }) {
         keywords={item.keywords}
         disabled={item.disabled}
       >
-        <ComboboxItemIndicator className={classes.indicator} keepMounted={variant.indicatorKeepMounted}>
+        <ComboboxItemIndicator
+          className={classes.indicator}
+          keepMounted={variant.indicatorKeepMounted}
+        >
           ✓
         </ComboboxItemIndicator>
-        <ComboboxItemText className={classes.itemText}>{item.label}</ComboboxItemText>
+        <ComboboxItemText className={classes.itemText}>
+          {item.label}
+        </ComboboxItemText>
       </ComboboxItem>
     )
   })
 }
 
-function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env; remote?: Remote }) {
+function VariantCombobox({
+  variant,
+  env,
+  remote,
+}: {
+  variant: Variant
+  env: Env
+  remote?: Remote
+}) {
   const [value, setValue] = React.useState<unknown>(
-    defaultValueOf(variant) ?? (variant.options?.multiple ? [] : null),
+    defaultValueOf(variant) ?? (variant.options?.multiple ? [] : null)
   )
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
-  const [onCreate] = React.useState(() => variant.create && createHandler(variant.create, env.log))
+  const [onCreate] = React.useState(
+    () => variant.create && createHandler(variant.create, env.log)
+  )
   const data = variant.mode === "data" || !!remote
   const list = remote ? remote.items : listOf(variant)
   const { defaultValue, filter, ...options } = variant.options ?? {}
@@ -115,7 +146,9 @@ function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env;
       <Combobox<any, boolean>
         {...options}
         {...(variant.list === "objects" && objectOptions)}
-        {...(variant.controlled === "value" ? { value } : { defaultValue: defaultValueOf(variant) })}
+        {...(variant.controlled === "value"
+          ? { value }
+          : { defaultValue: defaultValueOf(variant) })}
         {...(variant.controlled === "open" && { open })}
         {...(variant.controlled === "query" && { query })}
         filter={remote ? false : filterOf(variant)}
@@ -126,28 +159,42 @@ function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env;
         controller={env.controller}
         container={env.container}
         onValueChange={(next, details) => {
-          if (variant.controlled === "value") setValue(next)
+          if (variant.controlled === "value") {
+            setValue(next)
+          }
           env.log(`valueChange ${show(next)} (${details.reason})`)
         }}
         onOpenChange={(next, details) => {
-          if (variant.controlled === "open") setOpen(next)
+          if (variant.controlled === "open") {
+            setOpen(next)
+          }
           env.log(`openChange ${next} (${details.reason})`)
         }}
         onQueryChange={(next, details) => {
-          if (variant.controlled === "query") setQuery(next)
+          if (variant.controlled === "query") {
+            setQuery(next)
+          }
           remote?.setQuery(next)
           env.log(`queryChange ${JSON.stringify(next)} (${details.reason})`)
         }}
         onOpenChangeComplete={(next) => env.log(`openChangeComplete ${next}`)}
-        onHighlight={(next, details) => env.log(`highlight ${show(next)} #${details.index}`)}
+        onHighlight={(next, details) =>
+          env.log(`highlight ${show(next)} #${details.index}`)
+        }
       >
         <ComboboxLabel className={classes.label}>{variant.title}</ComboboxLabel>
         {variant.chips ? (
-          <ComboboxChips className={variant.overflow ? classes.chipsLine : classes.chips}>
+          <ComboboxChips
+            className={variant.overflow ? classes.chipsLine : classes.chips}
+          >
             <ComboboxValue>
               {({ value }) =>
                 (value as string[]).map((item) => (
-                  <ComboboxChip key={item} className={classes.chip} value={item}>
+                  <ComboboxChip
+                    key={item}
+                    className={classes.chip}
+                    value={item}
+                  >
                     {(state) => (
                       <>
                         {state.label}
@@ -163,7 +210,9 @@ function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env;
                 ))
               }
             </ComboboxValue>
-            {variant.overflow && <ComboboxChipsOverflow className={classes.overflow} />}
+            {variant.overflow && (
+              <ComboboxChipsOverflow className={classes.overflow} />
+            )}
             {input}
           </ComboboxChips>
         ) : (
@@ -175,16 +224,25 @@ function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env;
           </span>
         )}
         {variant.trigger && (
-          <ComboboxTrigger className={classes.trigger} aria-label="Show countries">
+          <ComboboxTrigger
+            className={classes.trigger}
+            aria-label="Show countries"
+          >
             ▾
           </ComboboxTrigger>
         )}
         {variant.clear && (
-          <ComboboxClear className={classes.clear} keepMounted={variant.clear === "keep-mounted"}>
+          <ComboboxClear
+            className={classes.clear}
+            keepMounted={variant.clear === "keep-mounted"}
+          >
             Clear
           </ComboboxClear>
         )}
-        <ComboboxContent className={classes.content(variant.animation, variant.arrow)} {...variant.content}>
+        <ComboboxContent
+          className={classes.content(variant.animation, variant.arrow)}
+          {...variant.content}
+        >
           {variant.arrow && <ComboboxArrow className={classes.arrow} />}
           {remote && (
             <ComboboxStatus className={classes.status}>
@@ -200,20 +258,29 @@ function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env;
             </ComboboxStatus>
           )}
           <ComboboxEmpty className={classes.empty}>
-            {(state) => (state.empty && !state.loading ? "No countries found." : null)}
+            {(state) =>
+              state.empty && !state.loading ? "No countries found." : null
+            }
           </ComboboxEmpty>
-          <ComboboxList className={variant.arrow ? classes.scrollingList : undefined}>
+          <ComboboxList
+            className={variant.arrow ? classes.scrollingList : undefined}
+          >
             {data ? (
               (state) => (
                 <>
-                  <Items list={state.items as ListData<any>} variant={variant} />
+                  <Items
+                    list={state.items as ListData<any>}
+                    variant={variant}
+                  />
                   {create}
                 </>
               )
             ) : (
               <>
                 {variant.selectAll && (
-                  <ComboboxSelectAll className={classes.selectAll}>Select all</ComboboxSelectAll>
+                  <ComboboxSelectAll className={classes.selectAll}>
+                    Select all
+                  </ComboboxSelectAll>
                 )}
                 <Items list={list} variant={variant} />
                 {create}
@@ -225,27 +292,49 @@ function VariantCombobox({ variant, env, remote }: { variant: Variant; env: Env;
       {variant.controlled === "value" && (
         <>
           <span className="text-xs text-neutral-600">value: {show(value)}</span>
-          <button type="button" className={classes.button} onClick={() => setValue(sampleValue(variant))}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setValue(sampleValue(variant))}
+          >
             Set
           </button>
-          <button type="button" className={classes.button} onClick={() => setValue(null)}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setValue(null)}
+          >
             Null
           </button>
         </>
       )}
       {variant.controlled === "open" && (
         <label className="flex items-center gap-1.5 text-xs text-neutral-600">
-          <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={open}
+            onChange={(event) => setOpen(event.target.checked)}
+          />
           open
         </label>
       )}
       {variant.controlled === "query" && (
         <>
-          <span className="text-xs text-neutral-600">query: {JSON.stringify(query)}</span>
-          <button type="button" className={classes.button} onClick={() => setQuery("ca")}>
+          <span className="text-xs text-neutral-600">
+            query: {JSON.stringify(query)}
+          </span>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setQuery("ca")}
+          >
             Set “ca”
           </button>
-          <button type="button" className={classes.button} onClick={() => setQuery("")}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setQuery("")}
+          >
             Empty
           </button>
         </>
@@ -270,8 +359,8 @@ function mount(root: HTMLElement) {
         ) : (
           <VariantCombobox variant={variant} env={env} />
         )}
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

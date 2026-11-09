@@ -1,4 +1,8 @@
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/react/checkbox"
 import { CheckIcon, MinusIcon } from "lucide-react"
 
 const backups = [
@@ -19,7 +23,11 @@ function Example() {
       <div data-slot="stack">
         <h3 id="disabled-backups">Backups</h3>
         <p data-slot="hint">Managed by your organization.</p>
-        <CheckboxGroup aria-labelledby="disabled-backups" defaultValue={["photos", "documents"]} disabled>
+        <CheckboxGroup
+          aria-labelledby="disabled-backups"
+          defaultValue={["photos", "documents"]}
+          disabled
+        >
           {backups.map((item) => (
             <label data-slot="label" key={item.value}>
               <Checkbox value={item.value}>

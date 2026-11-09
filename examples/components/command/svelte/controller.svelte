@@ -24,9 +24,7 @@
     <button type="button" onclick={() => palette.push("theme")}>
       Open Themes
     </button>
-    <button type="button" onclick={() => palette.pop()}>
-      Back
-    </button>
+    <button type="button" onclick={() => palette.pop()}> Back </button>
     <button type="button" onclick={() => palette.setValue("dark")}>
       Highlight Dark
     </button>
@@ -36,9 +34,7 @@
     <button type="button" onclick={() => palette.run()}>
       Run Highlighted
     </button>
-    <button type="button" onclick={() => palette.focus()}>
-      Focus
-    </button>
+    <button type="button" onclick={() => palette.focus()}> Focus </button>
   </div>
   <Command controller={palette} onAction={(value) => log(`Ran ${value}`)}>
     <CommandInput aria-label="Search commands" />

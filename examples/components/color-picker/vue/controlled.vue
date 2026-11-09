@@ -19,13 +19,17 @@ const value = ref("#0ea5e9")
 <template>
   <div>
     <div data-slot="controls">
-      <button type="button" @click="picker.setValue('#663399')">Use Purple</button>
+      <button type="button" @click="picker.setValue('#663399')">
+        Use Purple
+      </button>
     </div>
     <ColorPicker
       v-model:value="value"
       aria-label="Theme color"
       :controller="picker"
-      @value-commit="(next, details) => log(`committed: ${next} (${details.reason})`)"
+      @value-commit="
+        (next, details) => log(`committed: ${next} (${details.reason})`)
+      "
     >
       <ColorPickerArea>
         <ColorPickerAreaThumb />

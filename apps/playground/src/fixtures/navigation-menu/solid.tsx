@@ -23,13 +23,17 @@ function Nested() {
     <NavigationMenu orientation="vertical">
       <NavigationMenuList class="nav-list vertical">
         <NavigationMenuItem value={nested.value}>
-          <NavigationMenuTrigger class="nav-trigger">{nested.trigger}</NavigationMenuTrigger>
+          <NavigationMenuTrigger class="nav-trigger">
+            {nested.trigger}
+          </NavigationMenuTrigger>
           <NavigationMenuContent class="nav-content narrow">
             <ul>
               <For each={nested.links}>
                 {(link) => (
                   <li>
-                    <NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink>
+                    <NavigationMenuLink href={link.href}>
+                      {link.label}
+                    </NavigationMenuLink>
                   </li>
                 )}
               </For>
@@ -52,13 +56,23 @@ function Fixture() {
         {...options}
         aria-label={fixture.label}
         class="nav-menu"
-        onValueChange={(value, { reason }) => setAction(navigationMenuAction(value, reason))}
+        onValueChange={(value, { reason }) =>
+          setAction(navigationMenuAction(value, reason))
+        }
       >
-        <NavigationMenuList class={options.orientation === "vertical" ? "nav-list vertical" : "nav-list"}>
+        <NavigationMenuList
+          class={
+            options.orientation === "vertical"
+              ? "nav-list vertical"
+              : "nav-list"
+          }
+        >
           <For each={fixture.items}>
             {(item, index) => (
               <NavigationMenuItem value={item.value}>
-                <NavigationMenuTrigger class="nav-trigger">{item.trigger}</NavigationMenuTrigger>
+                <NavigationMenuTrigger class="nav-trigger">
+                  {item.trigger}
+                </NavigationMenuTrigger>
                 <NavigationMenuContent
                   class={index() === 0 ? "nav-content" : "nav-content narrow"}
                   keepMounted={layout.keepMounted}
@@ -69,7 +83,9 @@ function Fixture() {
                     <For each={item.links}>
                       {(link) => (
                         <li>
-                          <NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink>
+                          <NavigationMenuLink href={link.href}>
+                            {link.label}
+                          </NavigationMenuLink>
                         </li>
                       )}
                     </For>
@@ -82,7 +98,11 @@ function Fixture() {
             )}
           </For>
           <NavigationMenuItem>
-            <NavigationMenuLink class="nav-link" href={fixture.link.href} current>
+            <NavigationMenuLink
+              class="nav-link"
+              href={fixture.link.href}
+              current
+            >
               {fixture.link.label}
             </NavigationMenuLink>
           </NavigationMenuItem>

@@ -17,7 +17,8 @@ always with `keepMounted`. Name it with `aria-label`.
   let {
     keepMounted,
     ...rest
-  }: PartProps<"button", AutocompleteClearState> & AutocompleteClearProps = $props()
+  }: PartProps<"button", AutocompleteClearState> & AutocompleteClearProps =
+    $props()
 
   const clear = usePart(autocomplete, "clear", () => ({ keepMounted }))
 </script>

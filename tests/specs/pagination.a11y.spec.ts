@@ -8,7 +8,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 for (const [name, options] of [
@@ -18,22 +20,31 @@ for (const [name, options] of [
   ["with links", { links: "", page: "5" }],
   ["with links at an end", { links: "" }],
   ["with one page", { count: "1" }],
-] as const)
+] as const) {
   test(`no axe violations ${name}`, async ({ page, open }) => {
     await open("pagination", options)
     expect(await audit(page)).toEqual([])
   })
+}
 
-test("no axe violations with focus on a disabled step", async ({ page, open }) => {
+test("no axe violations with focus on a disabled step", async ({
+  page,
+  open,
+}) => {
   await open("pagination")
   await part(page, f.previous).focus()
   expect(await audit(page)).toEqual([])
 })
 
-test("the landmark is named, and steps by their aria-label", async ({ page, open }) => {
+test("the landmark is named, and steps by their aria-label", async ({
+  page,
+  open,
+}) => {
   await open("pagination")
   await expect(nav(page)).toBeVisible()
-  for (const name of [f.first, f.previous, f.next, f.last]) await expect(part(page, name)).toBeVisible()
+  for (const name of [f.first, f.previous, f.next, f.last]) {
+    await expect(part(page, name)).toBeVisible()
+  }
 })
 
 // Every implementation must expose the same accessibility tree.

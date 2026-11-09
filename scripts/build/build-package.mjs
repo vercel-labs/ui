@@ -30,24 +30,44 @@ const sourceDir = path.join(packageDir, "src")
 const outDir = path.join(packageDir, "dist")
 
 rmSync(outDir, { recursive: true, force: true })
-if (flags.solid) await transpileSolid({ packageDir, sourceDir, outDir })
-else await transpile({ sourceDir, outDir, useClient: flags["use-client"], serverModules: flags.server })
+if (flags.solid) {
+  await transpileSolid({ packageDir, sourceDir, outDir })
+} else {
+  await transpile({
+    sourceDir,
+    outDir,
+    useClient: flags["use-client"],
+    serverModules: flags.server,
+  })
+}
 emitDeclarations({ packageDir, sourceDir, outDir })
 for (const file of readdirSync(sourceDir, { recursive: true })) {
-  if (file.endsWith(".css")) cpSync(path.join(sourceDir, file), path.join(outDir, file))
+  if (file.endsWith(".css")) {
+    cpSync(path.join(sourceDir, file), path.join(outDir, file))
+  }
 }
 // --nuxt builds the Nuxt module in `nuxt/` into `dist/nuxt`, for Vue.
-if (flags.nuxt) await buildNuxtModule({ packageDir, outDir })
+if (flags.nuxt) {
+  await buildNuxtModule({ packageDir, outDir })
+}
 
 const problems = findPublishProblems(packageDir)
 if (problems.length) {
-  console.error(`The published package.json doesn't match the build:\n  ${problems.join("\n  ")}`)
+  console.error(
+    `The published package.json doesn't match the build:\n  ${problems.join("\n  ")}`
+  )
   process.exitCode = 1
 }
 const serverProblems = flags["use-client"]
-  ? findServerModuleProblems({ packageDir, outDir, serverModules: flags.server })
+  ? findServerModuleProblems({
+      packageDir,
+      outDir,
+      serverModules: flags.server,
+    })
   : []
 if (serverProblems.length) {
-  console.error(`The build doesn't work in Server Components:\n  ${serverProblems.join("\n  ")}`)
+  console.error(
+    `The build doesn't work in Server Components:\n  ${serverProblems.join("\n  ")}`
+  )
   process.exitCode = 1
 }

@@ -28,39 +28,52 @@ const load: PageServerLoad = ({ url, cookies }) => {
 
 function fieldsOf(form: FormData) {
   return Object.fromEntries(
-    [...new Set(form.keys())].map((key) => [key, key === "labels" ? form.getAll(key) : form.get(key)]),
+    [...new Set(form.keys())].map((key) => [
+      key,
+      key === "labels" ? form.getAll(key) : form.get(key),
+    ])
   )
 }
 
 const actions: Actions = {
   create: async ({ request }) => {
     const input = readNewIssue(fieldsOf(await request.formData()))
-    if ("error" in input) return fail(400, { error: input.error })
+    if ("error" in input) {
+      return fail(400, { error: input.error })
+    }
     return { id: db.createIssue(input).id }
   },
   update: async ({ request }) => {
     const form = await request.formData()
     const ids = readIds(form.getAll("id"))
     const patch = readIssuePatch(fieldsOf(form))
-    if (!ids || !patch) return fail(400)
+    if (!ids || !patch) {
+      return fail(400)
+    }
     db.updateIssues(ids, patch)
   },
   delete: async ({ request }) => {
     const ids = readIds((await request.formData()).getAll("id"))
-    if (!ids) return fail(400)
+    if (!ids) {
+      return fail(400)
+    }
     db.deleteIssues(ids)
   },
   subtasks: async ({ request }) => {
     const form = await request.formData()
     const id = String(form.get("id"))
-    if (!db.getIssue(id)) return fail(404)
+    if (!db.getIssue(id)) {
+      return fail(404)
+    }
     db.setSubtasksDone(id, form.getAll("done").map(String))
   },
   comment: async ({ request }) => {
     const form = await request.formData()
     const id = String(form.get("id"))
     const body = String(form.get("body") ?? "").trim()
-    if (!db.getIssue(id) || !body) return fail(400)
+    if (!db.getIssue(id) || !body) {
+      return fail(400)
+    }
     db.addComment(id, viewer.id, body)
   },
 }

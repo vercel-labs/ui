@@ -12,9 +12,7 @@
 
 <div dir="rtl">
   <AlertDialog>
-    <AlertDialogTrigger>
-      حذف الحساب
-    </AlertDialogTrigger>
+    <AlertDialogTrigger>حذف الحساب</AlertDialogTrigger>
     <AlertDialogBackdrop />
     <AlertDialogContent>
       <div data-slot="stack">
@@ -24,9 +22,7 @@
         </AlertDialogDescription>
       </div>
       <div data-slot="row">
-        <AlertDialogClose>
-          إلغاء
-        </AlertDialogClose>
+        <AlertDialogClose>إلغاء</AlertDialogClose>
         <AlertDialogClose data-variant="solid" value="confirm">
           متابعة
         </AlertDialogClose>

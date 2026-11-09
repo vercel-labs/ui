@@ -28,7 +28,11 @@ const files = [
 ]
 
 const skills = [
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+  {
+    value: "search",
+    label: "search",
+    arguments: [{ name: "query", hint: "<query>", required: true }],
+  },
   { value: "review", label: "review" },
   { value: "summarize", label: "summarize" },
 ]
@@ -44,15 +48,28 @@ function Example() {
   onCleanup(() => clearTimeout(sendTimer))
 
   function send(value: TokenInputValue) {
-    if (running() || !prompt.getLabel().trim()) return
+    if (running() || !prompt.getLabel().trim()) {
+      return
+    }
     setRunning(true)
-    const skillTokens = value.filter((segment) => typeof segment !== "string" && segment.type === "skill")
-    for (const skill of skillTokens)
-      if (typeof skill !== "string")
-        prompt.updateToken(skill.id!, { data: { ...skill.data, run: "running" } })
+    const skillTokens = value.filter(
+      (segment) => typeof segment !== "string" && segment.type === "skill"
+    )
+    for (const skill of skillTokens) {
+      if (typeof skill !== "string") {
+        prompt.updateToken(skill.id!, {
+          data: { ...skill.data, run: "running" },
+        })
+      }
+    }
     sendTimer = setTimeout(() => {
-      for (const skill of skillTokens)
-        if (typeof skill !== "string") prompt.updateToken(skill.id!, { data: { ...skill.data, run: "done" } })
+      for (const skill of skillTokens) {
+        if (typeof skill !== "string") {
+          prompt.updateToken(skill.id!, {
+            data: { ...skill.data, run: "done" },
+          })
+        }
+      }
       log(`Sent ${toText(prompt.getValue())}`)
       prompt.clear()
       setRunning(false)
@@ -141,14 +158,20 @@ function Example() {
       )}
     >
       <div data-slot="card">
-        <TokenInputEditor aria-label="Prompt" placeholder="Ask anything. Type @ or /" />
+        <TokenInputEditor
+          aria-label="Prompt"
+          placeholder="Ask anything. Type @ or /"
+        />
         <div data-slot="row">
           <button
             type="button"
             data-size="sm"
             onMouseDown={(event) => event.preventDefault()}
             onClick={() =>
-              prompt.insert({ type: "file", value: "README.md", label: "README.md" }, { resolve: loadFile() })
+              prompt.insert(
+                { type: "file", value: "README.md", label: "README.md" },
+                { resolve: loadFile() }
+              )
             }
           >
             Attach README
@@ -200,7 +223,9 @@ function Example() {
           { char: "@", type: "file", items: files },
           { char: "/", boundary: "start", type: "skill", items: skills },
         ]}
-        onSelect={(value, details) => (details.trigger === "@" ? loadFile() : undefined)}
+        onSelect={(value, details) =>
+          details.trigger === "@" ? loadFile() : undefined
+        }
       >
         <TriggerMenuHint />
         <TriggerMenuContent>
@@ -209,7 +234,11 @@ function Example() {
             {(state) => (
               <For each={state.items as TriggerMenuDataItem[]}>
                 {(item) => (
-                  <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+                  <TriggerMenuItem
+                    value={item.value}
+                    label={item.label}
+                    disabled={item.disabled}
+                  >
                     {item.label}
                   </TriggerMenuItem>
                 )}

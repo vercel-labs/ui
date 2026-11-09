@@ -14,8 +14,15 @@ import { kept } from "./kept"
 
 describe("change details", () => {
   test("say why, carry extra context and cancel once", () => {
-    const details = createDetails({ reason: "item-press", value: "grid" }, "programmatic")
-    expect(details).toMatchObject({ reason: "item-press", value: "grid", canceled: false })
+    const details = createDetails(
+      { reason: "item-press", value: "grid" },
+      "programmatic"
+    )
+    expect(details).toMatchObject({
+      reason: "item-press",
+      value: "grid",
+      canceled: false,
+    })
     expect("cancelled" in details).toBe(false)
     details.cancel()
     expect(details.canceled).toBe(true)
@@ -37,7 +44,9 @@ describe("controlled and uncontrolled warnings", () => {
   const thing = definePrimitive({
     name: "thing",
     options: { value: "string", defaultValue: "string" },
-    state: (options: { value?: string; defaultValue?: string }) => ({ value: options.defaultValue ?? "" }),
+    state: (options: { value?: string; defaultValue?: string }) => ({
+      value: options.defaultValue ?? "",
+    }),
     api: () => ({}),
     slots: () => ({}),
   })
@@ -47,7 +56,9 @@ describe("controlled and uncontrolled warnings", () => {
     const instance = thing({ id: "a", value: "x", defaultValue: "y" })
     instance.setOptions({ id: "a", value: "x", defaultValue: "y" })
     expect(warn).toHaveBeenCalledOnce()
-    expect(warn.mock.calls[0][0]).toContain("`value` and `defaultValue`. Pass one.")
+    expect(warn.mock.calls[0][0]).toContain(
+      "`value` and `defaultValue`. Pass one."
+    )
     warn.mockRestore()
   })
 
@@ -94,8 +105,14 @@ describe("attributes", () => {
 
   test("only remove what they wrote, so an author's own attributes stay", () => {
     const el = element({ disabled: "" })
-    applyAttrs(el as unknown as HTMLElement, { disabled: undefined, "data-open": "" })
-    applyAttrs(el as unknown as HTMLElement, { disabled: undefined, "data-open": undefined })
+    applyAttrs(el as unknown as HTMLElement, {
+      disabled: undefined,
+      "data-open": "",
+    })
+    applyAttrs(el as unknown as HTMLElement, {
+      disabled: undefined,
+      "data-open": undefined,
+    })
     expect(el.values.get("disabled")).toBe("")
     expect(el.values.has("data-open")).toBe(false)
   })
@@ -116,13 +133,20 @@ describe("data menus", () => {
     const item = vi.fn()
     const shared = vi.fn()
     const instance = menu({ id: "m", onCheckedChange: shared })
-    press(instance.part("checkbox-item", { value: "grid", onCheckedChange: item }))?.()
-    expect(item).toHaveBeenCalledWith(true, expect.objectContaining({ reason: "item-press" }))
+    press(
+      instance.part("checkbox-item", { value: "grid", onCheckedChange: item })
+    )?.()
+    expect(item).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ reason: "item-press" })
+    )
     expect(shared).toHaveBeenCalledWith(
       true,
-      expect.objectContaining({ reason: "item-press", value: "grid" }),
+      expect.objectContaining({ reason: "item-press", value: "grid" })
     )
-    expect(partState(instance.part("checkbox-item", { value: "grid" }))).toMatchObject({ checked: true })
+    expect(
+      partState(instance.part("checkbox-item", { value: "grid" }))
+    ).toMatchObject({ checked: true })
   })
 
   test("canceling a checkbox change keeps the item as it was", () => {
@@ -131,25 +155,39 @@ describe("data menus", () => {
       onCheckedChange: (checked, details) => details.cancel(),
     })
     press(instance.part("checkbox-item", { value: "grid" }))?.()
-    expect(partState(instance.part("checkbox-item", { value: "grid" }))).toMatchObject({ checked: false })
-    expect(attrs(instance.part("checkbox-item", { value: "grid" }))).toMatchObject({ "data-unchecked": "" })
+    expect(
+      partState(instance.part("checkbox-item", { value: "grid" }))
+    ).toMatchObject({ checked: false })
+    expect(
+      attrs(instance.part("checkbox-item", { value: "grid" }))
+    ).toMatchObject({ "data-unchecked": "" })
   })
 
   test("radio groups report the group they belong to", () => {
     const shared = vi.fn()
     const instance = menu({ id: "r", onValueChange: shared })
-    attrs(instance.part("radio-group", { id: "sort", name: "sort", defaultValue: "name" }))
+    attrs(
+      instance.part("radio-group", {
+        id: "sort",
+        name: "sort",
+        defaultValue: "name",
+      })
+    )
     press(instance.part("radio-item", { group: "sort", value: "date" }))?.()
     expect(shared).toHaveBeenCalledWith(
       "date",
-      expect.objectContaining({ group: "sort", reason: "item-press" }),
+      expect.objectContaining({ group: "sort", reason: "item-press" })
     )
-    expect(partState(instance.part("radio-group", { id: "sort", name: "sort" }))).toEqual({ value: "date" })
+    expect(
+      partState(instance.part("radio-group", { id: "sort", name: "sort" }))
+    ).toEqual({ value: "date" })
   })
 
   test("a radio group with nothing selected reports null", () => {
     const instance = menu({ id: "s" })
-    expect(partState(instance.part("radio-group", { id: "g", name: "g" }))).toEqual({ value: null })
+    expect(
+      partState(instance.part("radio-group", { id: "g", name: "g" }))
+    ).toEqual({ value: null })
   })
 })
 
@@ -158,7 +196,9 @@ describe("popup controllers", () => {
     const instance = popover({ id: "c" })
     const result = instance.api.open({ payload: { row: 3 } })
     expect(instance.api.getPayload()).toEqual({ row: 3 })
-    expect(partState(instance.part("content"))).toMatchObject({ payload: { row: 3 } })
+    expect(partState(instance.part("content"))).toMatchObject({
+      payload: { row: 3 },
+    })
     instance.api.close({ returnValue: "saved" })
     await expect(result).resolves.toEqual({
       reason: "imperative",
@@ -170,14 +210,23 @@ describe("popup controllers", () => {
   })
 
   test("a canceled open resolves at once", async () => {
-    const instance = popover({ id: "d", onOpenChange: (open, details) => details.cancel() })
-    await expect(instance.api.open()).resolves.toEqual({ reason: "imperative", source: "programmatic" })
+    const instance = popover({
+      id: "d",
+      onOpenChange: (open, details) => details.cancel(),
+    })
+    await expect(instance.api.open()).resolves.toEqual({
+      reason: "imperative",
+      source: "programmatic",
+    })
     expect(instance.api.isOpen()).toBe(false)
   })
 
   test("setOpen and toggle pass their reason", () => {
     const reasons: string[] = []
-    const instance = popover({ id: "e", onOpenChange: (open, details) => reasons.push(details.reason) })
+    const instance = popover({
+      id: "e",
+      onOpenChange: (open, details) => reasons.push(details.reason),
+    })
     instance.api.setOpen(true, { reason: "imperative" })
     instance.api.toggle({ reason: "trigger-press" })
     expect(reasons).toEqual(["imperative", "trigger-press"])
@@ -185,7 +234,10 @@ describe("popup controllers", () => {
 
   test("report when opening and closing finish, without a DOM at once", () => {
     const complete: boolean[] = []
-    const instance = menu({ id: "f", onOpenChangeComplete: (open) => complete.push(open) })
+    const instance = menu({
+      id: "f",
+      onOpenChangeComplete: (open) => complete.push(open),
+    })
     instance.api.open()
     instance.api.close()
     expect(complete).toEqual([true, false])
@@ -198,7 +250,9 @@ describe("popup controllers", () => {
       "aria-expanded": "true",
       id: "g-trigger",
     })
-    expect(attrs(instance.part("trigger", { id: "a" }))).toMatchObject({ "aria-expanded": "false" })
+    expect(attrs(instance.part("trigger", { id: "a" }))).toMatchObject({
+      "aria-expanded": "false",
+    })
     expect(attrs(instance.part("trigger", { id: "a" })).id).toBeUndefined()
     expect(instance.api.getPayload()).toBe("row b")
   })
@@ -208,21 +262,39 @@ describe("positioning", () => {
   const viewport = { width: 1000, height: 800 }
   const anchor = { x: 400, y: 300, width: 100, height: 40 }
   const size = { width: 200, height: 100 }
-  const base = { align: "center" as const, sideOffset: 0, alignOffset: 0, collisionPadding: 8 }
+  const base = {
+    align: "center" as const,
+    sideOffset: 0,
+    alignOffset: 0,
+    collisionPadding: 8,
+  }
 
   test("logical sides follow the reading direction", () => {
     expect(physicalSide("start")).toBe("left")
     expect(physicalSide("end", true)).toBe("left")
-    expect(computePlacement(anchor, size, viewport, { ...base, side: "end" }).side).toBe("right")
-    expect(computePlacement(anchor, size, viewport, { ...base, side: "end", rtl: true }).side).toBe("left")
+    expect(
+      computePlacement(anchor, size, viewport, { ...base, side: "end" }).side
+    ).toBe("right")
+    expect(
+      computePlacement(anchor, size, viewport, {
+        ...base,
+        side: "end",
+        rtl: true,
+      }).side
+    ).toBe("left")
   })
 
   test("a point is a zero-size anchor", () => {
-    const placed = computePlacement({ x: 100, y: 100, width: 0, height: 0 }, size, viewport, {
-      ...base,
-      side: "bottom",
-      align: "start",
-    })
+    const placed = computePlacement(
+      { x: 100, y: 100, width: 0, height: 0 },
+      size,
+      viewport,
+      {
+        ...base,
+        side: "bottom",
+        align: "start",
+      }
+    )
     expect(placed).toMatchObject({ x: 100, y: 100, side: "bottom" })
   })
 })

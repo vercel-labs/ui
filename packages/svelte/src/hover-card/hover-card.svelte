@@ -75,7 +75,9 @@ A preview of what a link points to, shown when the pointer rests on the link or 
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onPayloadChange,

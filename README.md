@@ -28,7 +28,10 @@ const searchField = definePrimitive({
   slots: (slot) => ({
     input: slot({
       attrs: (state) => ({ value: state.value }),
-      on: { input: (event, { api }) => api.set((event.target as HTMLInputElement).value) },
+      on: {
+        input: (event, { api }) =>
+          api.set((event.target as HTMLInputElement).value),
+      },
     }),
     clear: slot({
       present: (state) => state.value !== "",

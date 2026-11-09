@@ -19,7 +19,9 @@ const toolbar = definePrimitive({
     }),
   }),
   slots: (slot) => ({
-    root: slot({ attrs: () => ({ role: "toolbar", "aria-orientation": "vertical" }) }),
+    root: slot({
+      attrs: () => ({ role: "toolbar", "aria-orientation": "vertical" }),
+    }),
     item: slot<ToolProps>({
       props: { value: "string", disabled: "boolean" },
       selects: selects({ focused: ({ key }) => [key, null] }),
@@ -44,7 +46,11 @@ function Example() {
   return (
     <Toolbar aria-label="Edit">
       {["Undo", "Redo", "Cut", "Copy", "Paste"].map((label) => (
-        <ToolbarItem key={label} value={label} disabled={label === "Undo" || label === "Redo"}>
+        <ToolbarItem
+          key={label}
+          value={label}
+          disabled={label === "Undo" || label === "Redo"}
+        >
           {label}
         </ToolbarItem>
       ))}
@@ -52,4 +58,11 @@ function Example() {
   )
 }
 
-export { Example, toolbar, Toolbar, ToolbarItem, type ToolbarState, type ToolProps }
+export {
+  Example,
+  toolbar,
+  Toolbar,
+  ToolbarItem,
+  type ToolbarState,
+  type ToolProps,
+}

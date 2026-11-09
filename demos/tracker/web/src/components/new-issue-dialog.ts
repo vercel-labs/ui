@@ -2,7 +2,13 @@ import { createDialogController } from "@ui-sdk/core/dialog"
 import { toast } from "@ui-sdk/web"
 import { cn } from "cn"
 import { html, nothing } from "lit-html"
-import { people, personOf, priorities, readNewIssue, statuses } from "tracker-data"
+import {
+  people,
+  personOf,
+  priorities,
+  readNewIssue,
+  statuses,
+} from "tracker-data"
 import { icon } from "../lib/icons"
 import { navigate } from "../lib/router"
 import { createIssue } from "../lib/tracker"
@@ -23,7 +29,9 @@ const newIssue = createDialogController()
 let error: string | null = null
 
 function setError(message: string | null) {
-  if (error === message) return
+  if (error === message) {
+    return
+  }
   error = message
   redraw()
 }
@@ -32,7 +40,9 @@ function submit(event: SubmitEvent) {
   event.preventDefault()
   const form = event.currentTarget as HTMLFormElement
   const input = readNewIssue(Object.fromEntries(new FormData(form)))
-  if ("error" in input) return setError(input.error)
+  if ("error" in input) {
+    return setError(input.error)
+  }
   const id = createIssue(input)
   form.reset()
   newIssue.close()
@@ -51,7 +61,9 @@ function newIssueForm() {
         class=${styles.control}
         @input=${() => setError(null)}
       />
-      <ui-field-error match="valueMissing" class=${styles.error}>Give the issue a title.</ui-field-error>
+      <ui-field-error match="valueMissing" class=${styles.error}
+        >Give the issue a title.</ui-field-error
+      >
       ${error ? html`<ui-field-error match="" class=${styles.error}>${error}</ui-field-error>` : nothing}
     </ui-field>
     <ui-field name="description" class="grid gap-2">
@@ -80,7 +92,10 @@ function newIssueForm() {
           ${priorities.map((priority) => selectItem(priority.value, priority.label))}
         </ui-select-content>
       </ui-select>
-      <ui-combobox name="assignee" .itemToLabel=${(id: string) => personOf(id)?.name ?? ""}>
+      <ui-combobox
+        name="assignee"
+        .itemToLabel=${(id: string) => personOf(id)?.name ?? ""}
+      >
         <div class="grid gap-2">
           <ui-combobox-label class=${styles.label}>Assignee</ui-combobox-label>
           <div class="relative">
@@ -90,15 +105,20 @@ function newIssueForm() {
             ${comboboxTrigger("Show people")}
           </div>
         </div>
-        <ui-combobox-content class=${cn(styles.list, "w-(--anchor-width) min-w-44")}>
-          <ui-combobox-empty class=${styles.empty}>Nobody matches.</ui-combobox-empty>
+        <ui-combobox-content
+          class=${cn(styles.list, "w-(--anchor-width) min-w-44")}
+        >
+          <ui-combobox-empty class=${styles.empty}
+            >Nobody matches.</ui-combobox-empty
+          >
           <ui-combobox-list>
             ${people.map((person) =>
               comboboxItem(
                 person.id,
                 person.name,
-                html`${avatar(person.name, { size: "sm", decorative: true })} ${person.name}`,
-              ),
+                html`${avatar(person.name, { size: "sm", decorative: true })}
+                ${person.name}`
+              )
             )}
           </ui-combobox-list>
         </ui-combobox-content>
@@ -106,23 +126,33 @@ function newIssueForm() {
     </div>
     <div class="flex justify-end gap-2">
       <ui-dialog-close
-        ><button type="button" class=${button({ variant: "ghost" })}>Cancel</button></ui-dialog-close
+        ><button type="button" class=${button({ variant: "ghost" })}>
+          Cancel
+        </button></ui-dialog-close
       >
-      <button type="submit" class=${button({ variant: "primary" })}>Create issue</button>
+      <button type="submit" class=${button({ variant: "primary" })}>
+        Create issue
+      </button>
     </div>
   </form>`
 }
 
 function newIssueDialog() {
-  return html`<ui-dialog .controller=${newIssue} @openchange=${() => setError(null)}>
+  return html`<ui-dialog
+    .controller=${newIssue}
+    @openchange=${() => setError(null)}
+  >
     ${tooltip(
       html`<ui-dialog-trigger shortcut="c">
-        <button aria-label="New issue" class=${button({ variant: "primary", size: "icon" })}>
+        <button
+          aria-label="New issue"
+          class=${button({ variant: "primary", size: "icon" })}
+        >
           ${icon("plus")}
         </button>
       </ui-dialog-trigger>`,
       "New issue",
-      { shortcut: "c" },
+      { shortcut: "c" }
     )}
     <ui-dialog-backdrop hidden class=${styles.backdrop}></ui-dialog-backdrop>
     <ui-dialog-content hidden class=${cn(styles.dialog, "sm:max-w-lg")}>

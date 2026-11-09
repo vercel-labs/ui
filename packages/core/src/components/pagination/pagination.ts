@@ -1,9 +1,20 @@
-import { clampPage, pageCountOf, paginationRange, type PaginationRangeItem } from "./pagination-range"
+import {
+  clampPage,
+  pageCountOf,
+  paginationRange,
+  type PaginationRangeItem,
+} from "./pagination-range"
 import { opensElsewhere } from "../../foundation/platform/button"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { createChange } from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
 
@@ -12,7 +23,12 @@ import { elements } from "../../foundation/kernel/elements"
  * @stable
  */
 type PaginationPageChangeReason =
-  "item-press" | "previous-press" | "next-press" | "first-press" | "last-press" | "imperative"
+  | "item-press"
+  | "previous-press"
+  | "next-press"
+  | "first-press"
+  | "last-press"
+  | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -67,7 +83,10 @@ type PaginationOptions = {
    * Previous, Next, First or Last part, or a controller (`"imperative"`).
    * `details.cancel()` keeps the page, and stops a link from navigating.
    */
-  onPageChange?: (page: number, details: ChangeDetails<PaginationPageChangeReason>) => void
+  onPageChange?: (
+    page: number,
+    details: ChangeDetails<PaginationPageChangeReason>
+  ) => void
   /** How many pages there are. Or pass `total` and `pageSize`. */
   pageCount?: number
   /** How many items there are, for `pageCount` from `pageSize`. */
@@ -157,10 +176,20 @@ const currentPage = (state: State) => clampPage(state.page, state.pageCount)
 // Where a step part points. A step link the browser is about to follow keeps
 // its target; the controller steps from the current page whatever is held.
 function stepTarget(state: State, step: Step, holds = true) {
-  if (holds && state.held?.step === step) return { page: state.held.page, disabled: false }
+  if (holds && state.held?.step === step) {
+    return { page: state.held.page, disabled: false }
+  }
   const page = currentPage(state)
-  const target = { previous: page - 1, next: page + 1, first: 1, last: state.pageCount }[step]
-  const atEnd = step === "previous" || step === "first" ? page === 1 : page === state.pageCount
+  const target = {
+    previous: page - 1,
+    next: page + 1,
+    first: 1,
+    last: state.pageCount,
+  }[step]
+  const atEnd =
+    step === "previous" || step === "first"
+      ? page === 1
+      : page === state.pageCount
   return { page: clampPage(target, state.pageCount), disabled: atEnd }
 }
 
@@ -172,8 +201,12 @@ function partAttrs(state: State, page: number, disabled: boolean) {
     "aria-disabled": disabled ? "true" : undefined,
     "data-disabled": disabled ? "" : undefined,
   }
-  if (!state.getHref) return { type: "button", ...disabledAttrs }
-  if (disabled) return { tabindex: "-1", ...disabledAttrs }
+  if (!state.getHref) {
+    return { type: "button", ...disabledAttrs }
+  }
+  if (disabled) {
+    return { tabindex: "-1", ...disabledAttrs }
+  }
   return { href: state.getHref(page) }
 }
 
@@ -224,8 +257,16 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
       const state = store.get()
       const page = currentPage(state)
       const key = `${page}:${state.pageCount}:${state.siblings}:${state.boundaries}`
-      if (cached?.key !== key)
-        cached = { key, items: paginationRange({ ...state, page, pageCount: state.pageCount }) }
+      if (cached?.key !== key) {
+        cached = {
+          key,
+          items: paginationRange({
+            ...state,
+            page,
+            pageCount: state.pageCount,
+          }),
+        }
+      }
       return cached.items
     }
 
@@ -234,17 +275,25 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
     // which blurs it. Focus goes to the pressed part, or the one that replaced
     // it: the current page's link, or the same step. A frame later, once
     // frameworks have rendered. Focus the app moved on purpose stays.
-    function keepFocus(pressed: { el: HTMLElement; slot: "link" | Step } | undefined) {
+    function keepFocus(
+      pressed: { el: HTMLElement; slot: "link" | Step } | undefined
+    ) {
       const root = element("root")
       const doc = root?.ownerDocument
-      if (!pressed || !doc || !root.contains(doc.activeElement)) return
+      if (!pressed || !doc || !root.contains(doc.activeElement)) {
+        return
+      }
       requestAnimationFrame(() => {
-        if (doc.activeElement && doc.activeElement !== doc.body) return
+        if (doc.activeElement && doc.activeElement !== doc.body) {
+          return
+        }
         const page = currentPage(store.get())
         const target = pressed.el.isConnected
           ? pressed.el
           : pressed.slot === "link"
-            ? elements<PaginationLinkProps>(context, "link").find((link) => link.props?.page === page)?.el
+            ? elements<PaginationLinkProps>(context, "link").find(
+                (link) => link.props?.page === page
+              )?.el
             : element(pressed.slot)
         target?.focus({ preventScroll: true })
       })
@@ -254,11 +303,13 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
       page: number,
       reason: PaginationPageChangeReason,
       event?: Event,
-      pressed?: { el: HTMLElement; slot: "link" | Step },
+      pressed?: { el: HTMLElement; slot: "link" | Step }
     ) {
       const state = store.get()
       const target = clampPage(page, state.pageCount)
-      if (target === currentPage(state)) return false
+      if (target === currentPage(state)) {
+        return false
+      }
       keepFocus(pressed)
       return change("page", target, { reason, event })
     }
@@ -273,8 +324,10 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
     return {
       getPage: () => currentPage(store.get()),
       getPageCount: () => store.get().pageCount,
-      setPage: (page: number, { reason = "imperative", event }: PaginationChangeOptions = {}) =>
-        go(page, reason, event),
+      setPage: (
+        page: number,
+        { reason = "imperative", event }: PaginationChangeOptions = {}
+      ) => go(page, reason, event),
       next: step("next"),
       previous: step("previous"),
       first: step("first"),
@@ -288,11 +341,19 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
           slot: "link" | Step,
           target: { page: number; disabled?: boolean },
           event: Event | undefined,
-          el: HTMLElement | undefined,
+          el: HTMLElement | undefined
         ) {
-          if (target.disabled) return event?.preventDefault()
-          if (opensElsewhere(event, el) || target.page === currentPage(store.get())) return
-          const reason = slot === "link" ? "item-press" : (`${slot}-press` as const)
+          if (target.disabled) {
+            return event?.preventDefault()
+          }
+          if (
+            opensElsewhere(event, el) ||
+            target.page === currentPage(store.get())
+          ) {
+            return
+          }
+          const reason =
+            slot === "link" ? "item-press" : (`${slot}-press` as const)
           // The browser follows a link after the click, when a framework may
           // already have rendered the new page: Next would point one page
           // further, or lose its href on the last page. So a step link holds
@@ -301,7 +362,9 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
             store.set({ held: { step: slot, page: target.page } })
             setTimeout(() => store.set({ held: null }))
           }
-          if (!go(target.page, reason, event, el && { el, slot })) event?.preventDefault()
+          if (!go(target.page, reason, event, el && { el, slot })) {
+            event?.preventDefault()
+          }
         },
       },
     }
@@ -309,7 +372,7 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
   slots: (slot) => {
     const rangeState = (
       state: State,
-      { api }: { api: { internal: { items: () => PaginationRangeItem[] } } },
+      { api }: { api: { internal: { items: () => PaginationRangeItem[] } } }
     ) => ({
       page: currentPage(state),
       pageCount: state.pageCount,
@@ -317,7 +380,10 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
     })
     const stepSlot = (kind: Step) =>
       slot<{}, PaginationStepState>({
-        role: (state) => (state.getHref && stepTarget(state, kind).disabled ? "link" : undefined),
+        role: (state) =>
+          state.getHref && stepTarget(state, kind).disabled
+            ? "link"
+            : undefined,
         roles: ["link"],
         focus: "native",
         state: (state) => stepTarget(state, kind),
@@ -342,7 +408,10 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
       item: slot({ role: "listitem" }),
       link: slot<PaginationLinkProps, PaginationLinkState>({
         props: { page: "number" },
-        state: (state, { props }) => ({ page: props.page, current: props.page === currentPage(state) }),
+        state: (state, { props }) => ({
+          page: props.page,
+          current: props.page === currentPage(state),
+        }),
         attrs: (state, { props }) => {
           const current = props.page === currentPage(state)
           return {
@@ -351,7 +420,8 @@ const paginationPrimitive = /* @__PURE__ */ definePrimitive({
             "data-current": current ? "" : undefined,
           }
         },
-        press: ({ api, props, el }, event) => api.internal.press("link", props, event, el),
+        press: ({ api, props, el }, event) =>
+          api.internal.press("link", props, event, el),
       }),
       previous: stepSlot("previous"),
       next: stepSlot("next"),
@@ -392,4 +462,8 @@ export {
   type PaginationState,
   type PaginationStepState,
 }
-export { paginationRange, type PaginationRangeItem, type PaginationRangeOptions } from "./pagination-range"
+export {
+  paginationRange,
+  type PaginationRangeItem,
+  type PaginationRangeOptions,
+} from "./pagination-range"

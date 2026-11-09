@@ -10,7 +10,11 @@ import {
   CalendarWeeks,
 } from "@ui-sdk/solid/calendar"
 
-const unavailable = ["2026-10-08", { from: "2026-10-20", to: "2026-10-23" }, { weekday: [0, 6] }]
+const unavailable = [
+  "2026-10-08",
+  { from: "2026-10-20", to: "2026-10-23" },
+  { weekday: [0, 6] },
+]
 
 function Example() {
   return (
@@ -45,8 +49,12 @@ function Example() {
         </CalendarNext>
       </div>
       <CalendarGrid>
-        <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-        <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+        <CalendarWeekdays>
+          {(index) => <CalendarWeekday index={index} />}
+        </CalendarWeekdays>
+        <CalendarWeeks>
+          {(cell) => <CalendarDay value={cell.date} />}
+        </CalendarWeeks>
       </CalendarGrid>
     </Calendar>
   )

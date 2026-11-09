@@ -1,7 +1,12 @@
 import "@ui-sdk/web/menu"
 import "@ui-sdk/web/select"
 import "@ui-sdk/web/tooltip"
-import { mountWhenAsked, perfItems, perfOptions, perfSize } from "tests/fixtures/perf.ts"
+import {
+  mountWhenAsked,
+  perfItems,
+  perfOptions,
+  perfSize,
+} from "tests/fixtures/perf.ts"
 
 // Rows like a table's, each with a closed menu, select and tooltip, for the
 // counts specs. Web components have no renders to count.
@@ -9,11 +14,15 @@ function mount(root: HTMLElement) {
   mountWhenAsked(root, (target) => {
     const options = perfItems(perfOptions())
       .map(
-        (option) => `<ui-select-item class="item" value="${option.value}">${option.label}</ui-select-item>`,
+        (option) =>
+          `<ui-select-item class="item" value="${option.value}">${option.label}</ui-select-item>`
       )
       .join("")
     const actions = ["Rename", "Duplicate", "Delete"]
-      .map((action) => `<ui-menu-item class="item" value="${action}">${action}</ui-menu-item>`)
+      .map(
+        (action) =>
+          `<ui-menu-item class="item" value="${action}">${action}</ui-menu-item>`
+      )
       .join("")
     const rows = perfItems(perfSize(200))
       .map(({ label }) => label.slice(5))
@@ -32,7 +41,7 @@ function mount(root: HTMLElement) {
               <ui-tooltip-trigger><button>Tip ${label}</button></ui-tooltip-trigger>
               <ui-tooltip-content class="tooltip">Hint ${label}</ui-tooltip-content>
             </ui-tooltip>
-          </div>`,
+          </div>`
       )
       .join("")
     target.innerHTML = `

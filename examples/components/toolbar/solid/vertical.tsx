@@ -16,14 +16,14 @@ const icon = (markup: string) => () => (
   />
 )
 const MousePointer2 = icon(
-  '<path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />',
+  '<path d="M4.037 4.688a.495.495 0 0 1 .651-.651l16 6.5a.5.5 0 0 1-.063.947l-6.124 1.58a2 2 0 0 0-1.438 1.435l-1.579 6.126a.5.5 0 0 1-.947.063z" />'
 )
 const Pencil = icon(
-  '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" />',
+  '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" /><path d="m15 5 4 4" />'
 )
 const Square = icon('<rect width="18" height="18" x="3" y="3" rx="2" />')
 const Type = icon(
-  '<path d="M12 4v16" /><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" /><path d="M9 20h6" />',
+  '<path d="M12 4v16" /><path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" /><path d="M9 20h6" />'
 )
 
 const tools = [
@@ -42,7 +42,9 @@ function Example() {
         deselectable={false}
         orientation="vertical"
         aria-label="Tool"
-        onValueChange={([value]) => log(`${tools.find((tool) => tool.value === value)?.label} tool`)}
+        onValueChange={([value]) =>
+          log(`${tools.find((tool) => tool.value === value)?.label} tool`)
+        }
       >
         <For each={tools}>
           {(tool) => (
@@ -55,7 +57,10 @@ function Example() {
         </For>
       </ToggleGroup>
       <ToolbarSeparator />
-      <ToolbarButton aria-label="Delete" onClick={() => log("Deleted selection")}>
+      <ToolbarButton
+        aria-label="Delete"
+        onClick={() => log("Deleted selection")}
+      >
         <svg
           viewBox="0 0 24 24"
           fill="none"

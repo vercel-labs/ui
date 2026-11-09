@@ -2,7 +2,11 @@
 // Letting go of an element removes what a channel wrote on it, and leaves it
 // with what its author gave it, even values the channel wrote too.
 import { expect, test } from "vitest"
-import { applyAttrs, markAuthored, releaseAttrs } from "../src/foundation/kernel/live"
+import {
+  applyAttrs,
+  markAuthored,
+  releaseAttrs,
+} from "../src/foundation/kernel/live"
 
 const element = (html: string) => {
   document.body.innerHTML = html
@@ -17,10 +21,19 @@ test("letting go of an element removes what was written on it", () => {
 })
 
 test("letting go of an element keeps what its author wrote with the same value", () => {
-  const el = element(`<div disabled="" role="checkbox" aria-disabled="true"></div>`)
-  applyAttrs(el, { disabled: "", role: "checkbox", "aria-disabled": "true", tabindex: "0" })
+  const el = element(
+    `<div disabled="" role="checkbox" aria-disabled="true"></div>`
+  )
+  applyAttrs(el, {
+    disabled: "",
+    role: "checkbox",
+    "aria-disabled": "true",
+    tabindex: "0",
+  })
   releaseAttrs(el, "render")
-  expect(el.outerHTML).toBe(`<div disabled="" role="checkbox" aria-disabled="true"></div>`)
+  expect(el.outerHTML).toBe(
+    `<div disabled="" role="checkbox" aria-disabled="true"></div>`
+  )
 })
 
 test("letting go of an element puts back what its author wrote that was written over", () => {
@@ -49,8 +62,13 @@ test("letting go of an element another channel wrote the same attribute on keeps
 })
 
 test("letting go of a copied element doesn't give back the ids the original's parts made", () => {
-  const el = element(`<div id="ui-sdk-tabs-1-tab-a" aria-controls="ui-sdk-tabs-1-panel-a"></div>`)
-  applyAttrs(el, { id: "ui-sdk-tabs-2-tab-a", "aria-controls": "ui-sdk-tabs-2-panel-a" })
+  const el = element(
+    `<div id="ui-sdk-tabs-1-tab-a" aria-controls="ui-sdk-tabs-1-panel-a"></div>`
+  )
+  applyAttrs(el, {
+    id: "ui-sdk-tabs-2-tab-a",
+    "aria-controls": "ui-sdk-tabs-2-panel-a",
+  })
   releaseAttrs(el, "render")
   expect(el.getAttributeNames()).toEqual([])
 })
@@ -65,23 +83,28 @@ for (const name of [
   "aria-owns",
   "for",
   "headers",
-])
+]) {
   test(`letting go of a copied element keeps its author's ${name} without the original's made ids`, () => {
     const el = element(`<div ${name}="hint ui-sdk-field-1-description"></div>`)
     applyAttrs(el, { [name]: "hint ui-sdk-field-2-description" })
     releaseAttrs(el, "render")
     expect(el.getAttribute(name)).toBe("hint")
   })
+}
 
 test("letting go of a copied element that referenced only the original's made ids removes the reference", () => {
-  const el = element(`<div aria-describedby="ui-sdk-field-1-description"></div>`)
+  const el = element(
+    `<div aria-describedby="ui-sdk-field-1-description"></div>`
+  )
   applyAttrs(el, { "aria-describedby": "hint ui-sdk-field-2-description" })
   releaseAttrs(el, "render")
   expect(el.hasAttribute("aria-describedby")).toBe(false)
 })
 
 test("letting go of an element puts back its author's value that starts like a made id", () => {
-  const el = element(`<div disabled="ui-sdk-disabled" data-theme="ui-sdk-dark"></div>`)
+  const el = element(
+    `<div disabled="ui-sdk-disabled" data-theme="ui-sdk-dark"></div>`
+  )
   applyAttrs(el, { disabled: "", "data-theme": "light" })
   releaseAttrs(el, "render")
   expect([el.getAttribute("disabled"), el.getAttribute("data-theme")]).toEqual([

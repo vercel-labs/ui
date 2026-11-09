@@ -2,7 +2,15 @@
 // A findable virtual list rendered by Vue, binding its text with function refs.
 import { createVirtualizer } from "@ui-sdk/core"
 import { afterEach, beforeAll, expect, test, vi } from "vitest"
-import { createApp, defineComponent, h, nextTick, onUnmounted, shallowRef, type App } from "vue"
+import {
+  createApp,
+  defineComponent,
+  h,
+  nextTick,
+  onUnmounted,
+  shallowRef,
+  type App,
+} from "vue"
 
 beforeAll(() => {
   Element.prototype.scrollIntoView ??= () => {}
@@ -31,7 +39,10 @@ function scroller(height: number, contentHeight: () => number) {
     scrollTop: {
       get: () => top,
       set: (value: number) => {
-        top = Math.max(0, Math.min(value, Math.max(0, contentHeight() - height)))
+        top = Math.max(
+          0,
+          Math.min(value, Math.max(0, contentHeight() - height))
+        )
       },
     },
   })
@@ -42,7 +53,10 @@ function scroller(height: number, contentHeight: () => number) {
   return el
 }
 
-const pieces = (index: number) => [`Row ${index}`, index % 100 === 0 ? "needle" : "plain"]
+const pieces = (index: number) => [
+  `Row ${index}`,
+  index % 100 === 0 ? "needle" : "plain",
+]
 
 // Every row's number in page order, as find in page walks the text.
 function order(el: Element) {
@@ -50,17 +64,25 @@ function order(el: Element) {
   const found: number[] = []
   while (walker.nextNode()) {
     const match = /^Row (\d+)$/.exec(walker.currentNode.textContent ?? "")
-    if (match) found.push(Number(match[1]))
+    if (match) {
+      found.push(Number(match[1]))
+    }
   }
   return found
 }
 
 const all = Array.from({ length: 1000 }, (_, index) => index)
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
-const row = (el: Element, index: number) => el.querySelector(`[data-index="${index}"]`)
+const row = (el: Element, index: number) =>
+  el.querySelector(`[data-index="${index}"]`)
 
 function setup() {
-  const virtual = createVirtualizer({ count: () => 1000, estimate: () => 20, overscan: 2, findable: pieces })
+  const virtual = createVirtualizer({
+    count: () => 1000,
+    estimate: () => 20,
+    overscan: 2,
+    findable: pieces,
+  })
   const el = scroller(100, () => virtual.size())
   const content = document.createElement("div")
   el.append(content)
@@ -72,10 +94,16 @@ function setup() {
       return () =>
         items.value.map((item) =>
           h("div", { key: item.key, "data-index": item.index }, [
-            h("span", { ref: (span) => virtual.findableText(item.index, span as HTMLElement | null, 0) }),
+            h("span", {
+              ref: (span) =>
+                virtual.findableText(item.index, span as HTMLElement | null, 0),
+            }),
             " ",
-            h("span", { ref: (span) => virtual.findableText(item.index, span as HTMLElement | null, 1) }),
-          ]),
+            h("span", {
+              ref: (span) =>
+                virtual.findableText(item.index, span as HTMLElement | null, 1),
+            }),
+          ])
         )
     },
   })
@@ -88,19 +116,18 @@ test("rows bind their text, a match renders its row before the next frame, and r
   const { el, settle } = setup()
   await vi.dynamicImportSettled()
   await settle()
-  expect([...row(el, 1)!.querySelectorAll("span")].map((span) => span.textContent)).toEqual([
-    "Row 1",
-    "plain",
-  ])
+  expect(
+    [...row(el, 1)!.querySelectorAll("span")].map((span) => span.textContent)
+  ).toEqual(["Row 1", "plain"])
   expect(order(el)).toEqual(all)
   el.scrollTop = 8000
   el.dispatchEvent(new Event("scroll"))
   await settle()
   expect(row(el, 1)).toBeNull()
   expect(order(el)).toEqual(all)
-  const match = [...el.querySelectorAll("[data-findable-layer] > div > div")].find(
-    (node) => node.textContent === "Row 500 needle",
-  )!
+  const match = [
+    ...el.querySelectorAll("[data-findable-layer] > div > div"),
+  ].find((node) => node.textContent === "Row 500 needle")!
   const text = match.firstChild
   match.dispatchEvent(new Event("beforematch", { bubbles: true }))
   await settle()

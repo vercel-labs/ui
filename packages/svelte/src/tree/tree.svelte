@@ -23,8 +23,17 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
   import { setContext } from "svelte"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
-  import { DataKey, ItemKey, type DataContext, type ItemContext } from "./context"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
+  import {
+    DataKey,
+    ItemKey,
+    type DataContext,
+    type ItemContext,
+  } from "./context"
   import TreeItems from "./tree-items.svelte"
 
   let {
@@ -90,7 +99,10 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     /** What screen readers hear once an item's action has been pending for a second. An empty string says nothing. */
     pendingAnnouncement?: string
     /** Loads a branch's children the first time it expands while it has none. */
-    loadChildren?: (value: string, details: { signal: AbortSignal }) => void | Promise<unknown>
+    loadChildren?: (
+      value: string,
+      details: { signal: AbortSignal }
+    ) => void | Promise<unknown>
     /** The value of the item for the current page. It gets `aria-current="page"`, takes the tab stop first, and its ancestors expand. */
     current?: string | null
     /** Disables every item. Items stay focusable unless `focusableWhenDisabled` is false. */
@@ -108,11 +120,20 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when the selection wants to change. `details.reason` says why, and `details.cancel()` stops it. */
-    onValueChange?: (value: TreeValue<Mode>, details: ChangeDetails<TreeValueChangeReason>) => void
+    onValueChange?: (
+      value: TreeValue<Mode>,
+      details: ChangeDetails<TreeValueChangeReason>
+    ) => void
     /** Runs when branches want to expand or collapse. `details.reason` says why, and `details.cancel()` stops it. */
-    onExpandedChange?: (expanded: string[], details: ChangeDetails<TreeExpandedChangeReason>) => void
+    onExpandedChange?: (
+      expanded: string[],
+      details: ChangeDetails<TreeExpandedChangeReason>
+    ) => void
     /** Runs when checkboxes want to change. `details.reason` says why, and `details.cancel()` stops it. */
-    onCheckedChange?: (checked: string[], details: ChangeDetails<TreeCheckedChangeReason>) => void
+    onCheckedChange?: (
+      checked: string[],
+      details: ChangeDetails<TreeCheckedChangeReason>
+    ) => void
     /** Runs when the keyboard moves focus to an item, with its row among the items that show, from 0. */
     onHighlight?: (value: string, details: ListHighlightDetails) => void
   } = $props()
@@ -150,18 +171,33 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
     announcement,
     controller,
     debug,
-    onValueChange: (next: string | string[] | null, details: ChangeDetails<TreeValueChangeReason>) => {
+    onValueChange: (
+      next: string | string[] | null,
+      details: ChangeDetails<TreeValueChangeReason>
+    ) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next as TreeValue<Mode>, details)
-      if (!details.canceled) value = next as TreeValue<Mode>
+      if (!details.canceled) {
+        value = next as TreeValue<Mode>
+      }
     },
-    onExpandedChange: (next: string[], details: ChangeDetails<TreeExpandedChangeReason>) => {
+    onExpandedChange: (
+      next: string[],
+      details: ChangeDetails<TreeExpandedChangeReason>
+    ) => {
       onExpandedChange?.(next, details)
-      if (!details.canceled) expanded = next
+      if (!details.canceled) {
+        expanded = next
+      }
     },
-    onCheckedChange: (next: string[], details: ChangeDetails<TreeCheckedChangeReason>) => {
+    onCheckedChange: (
+      next: string[],
+      details: ChangeDetails<TreeCheckedChangeReason>
+    ) => {
       onCheckedChange?.(next, details)
-      if (!details.canceled) checked = next
+      if (!details.canceled) {
+        checked = next
+      }
     },
     onHighlight,
   }))
@@ -183,4 +219,8 @@ A tree of items that expand and collapse, with one tab stop and arrow keys betwe
   {#if data}<TreeItems items={data} />{/if}
 {/snippet}
 
-<Part tag="div" part={root} props={{ ...rest, children: children ?? content }} />
+<Part
+  tag="div"
+  part={root}
+  props={{ ...rest, children: children ?? content }}
+/>

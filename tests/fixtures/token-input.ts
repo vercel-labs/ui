@@ -27,7 +27,11 @@ const tokenInputFixture = {
     { value: "README.md", label: "README.md" },
   ],
   skills: [
-    { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+    {
+      value: "search",
+      label: "search",
+      arguments: [{ name: "query", hint: "<query>", required: true }],
+    },
   ],
 }
 
@@ -35,7 +39,12 @@ const tokenInputFixture = {
 function tokenTriggers() {
   return [
     { char: "@", type: "file", items: tokenInputFixture.files },
-    { char: "/", boundary: "start" as const, type: "skill", items: tokenInputFixture.skills },
+    {
+      char: "/",
+      boundary: "start" as const,
+      type: "skill",
+      items: tokenInputFixture.skills,
+    },
   ]
 }
 
@@ -50,8 +59,10 @@ function tokenInputOptions() {
   const params = new URLSearchParams(location.search)
   return {
     value: params.get("value") ?? "",
-    tokenDeletion: (params.get("deletion") ?? undefined) as "whole" | "select" | "revert" | undefined,
-    submitShortcut: (params.get("shortcut") ?? undefined) as "enter" | "mod+enter" | undefined,
+    tokenDeletion: (params.get("deletion") ?? undefined) as
+      "whole" | "select" | "revert" | undefined,
+    submitShortcut: (params.get("shortcut") ?? undefined) as
+      "enter" | "mod+enter" | undefined,
     copy: (params.get("copy") ?? undefined) as "codec" | "label" | undefined,
     pending: params.has("pending"),
     fail: params.has("fail"),
@@ -66,11 +77,15 @@ function tokenInputOptions() {
 // What choosing a file returns with ?pending: a promise that settles after 300ms
 // with the token's label and data.
 function pendingSelect({ fail }: { fail: boolean }) {
-  return new Promise<{ label: string; data: { loaded: boolean } }>((resolve, reject) =>
-    setTimeout(
-      () => (fail ? reject(new Error("Not found")) : resolve({ label: "Loaded", data: { loaded: true } })),
-      300,
-    ),
+  return new Promise<{ label: string; data: { loaded: boolean } }>(
+    (resolve, reject) =>
+      setTimeout(
+        () =>
+          fail
+            ? reject(new Error("Not found"))
+            : resolve({ label: "Loaded", data: { loaded: true } }),
+        300
+      )
   )
 }
 

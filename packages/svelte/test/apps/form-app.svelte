@@ -1,12 +1,24 @@
 <script lang="ts">
-  import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from "../../src/field"
+  import {
+    Field,
+    FieldError,
+    FieldLabel,
+    FieldLegend,
+    FieldSet,
+  } from "../../src/field"
   import { Input } from "../../src/input"
   import { Textarea } from "../../src/textarea"
 
   let {
     which,
   }: {
-    which: "input" | "textarea" | "errors" | "fieldset" | "readonly-input" | "readonly-textarea"
+    which:
+      | "input"
+      | "textarea"
+      | "errors"
+      | "fieldset"
+      | "readonly-input"
+      | "readonly-textarea"
   } = $props()
 </script>
 

@@ -22,7 +22,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -53,7 +54,7 @@ function mount(root: HTMLElement) {
                     ${country.label}
                     <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                   </ui-combobox-item>
-                `,
+                `
               )
               .join("")}
           </ui-combobox-list>
@@ -64,16 +65,20 @@ function mount(root: HTMLElement) {
   const combobox = root.querySelector("ui-combobox")!
   combobox.itemToLabel = (value) => countryLabel(value as string)
   combobox.addEventListener("valuechange", (event) =>
-    log(root, `value: ${event.detail.value} (${event.detail.reason})`),
+    log(root, `value: ${event.detail.value} (${event.detail.reason})`)
   )
   combobox.addEventListener("querychange", (event) =>
-    log(root, `query: “${event.detail.value}” (${event.detail.reason})`),
+    log(root, `query: “${event.detail.value}” (${event.detail.reason})`)
   )
   combobox.addEventListener("openchange", (event) =>
-    log(root, `open: ${event.detail.value} (${event.detail.reason})`),
+    log(root, `open: ${event.detail.value} (${event.detail.reason})`)
   )
-  root.querySelector("[data-action=value]")!.addEventListener("click", () => (combobox.value = "jp"))
-  root.querySelector("[data-action=open]")!.addEventListener("click", () => (combobox.open = true))
+  root
+    .querySelector("[data-action=value]")!
+    .addEventListener("click", () => (combobox.value = "jp"))
+  root
+    .querySelector("[data-action=open]")!
+    .addEventListener("click", () => (combobox.open = true))
 }
 
 export { mount }

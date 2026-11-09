@@ -2,7 +2,11 @@
   import { EyeIcon, EyeOffIcon } from "@lucide/svelte"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Input } from "@ui-sdk/svelte/input"
-  import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/svelte/password-input"
+  import {
+    PasswordInput,
+    PasswordInputControl,
+    PasswordInputToggle,
+  } from "@ui-sdk/svelte/password-input"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -16,7 +20,9 @@
       event.preventDefault()
       const data = new FormData(event.currentTarget)
       const length = String(data.get("password")).length
-      log(`Signed in as ${data.get("email")}, with a password of ${length} characters`)
+      log(
+        `Signed in as ${data.get("email")}, with a password of ${length} characters`
+      )
     }}
   >
     <Field name="email">

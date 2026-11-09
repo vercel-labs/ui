@@ -43,19 +43,29 @@ const record = (
   kind: Definition["kind"],
   tagName: string,
   config: Definition["config"] = {},
-  key?: string,
+  key?: string
 ) => {
-  definitions.push({ kind, entry, tagName, key, config, stack: new Error().stack ?? "" })
+  definitions.push({
+    kind,
+    entry,
+    tagName,
+    key,
+    config,
+    stack: new Error().stack ?? "",
+  })
 }
 
 // The elements `createParts` and `definePart` describe from the primitive's
 // schema, each recorded at the call, which the manifest finds by key.
 function createParts(...[primitive, tags]: Parameters<typeof createPartsType>) {
-  for (const element of partElements(primitive, tags))
+  for (const element of partElements(primitive, tags)) {
     record(element.kind, element.tagName, element.config, element.key)
+  }
 }
 
-function definePart(...[primitive, slot, tagOrOptions]: Parameters<typeof definePartType>) {
+function definePart(
+  ...[primitive, slot, tagOrOptions]: Parameters<typeof definePartType>
+) {
   const element = partElement(primitive, slot, tagOrOptions)
   record(element.kind, element.tagName, element.config, element.key)
 }
@@ -69,5 +79,13 @@ function claimTag(tagName: string) {
 
 function setDisplay() {}
 
-export { begin, claimTag, createParts, definePart, type Definition, definitions, setDisplay }
+export {
+  begin,
+  claimTag,
+  createParts,
+  definePart,
+  type Definition,
+  definitions,
+  setDisplay,
+}
 export * from "../../../packages/web/src/define-element"

@@ -28,9 +28,9 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
         resolve(
           channels
             .filter((channel) => channel.includes(query.toLowerCase()))
-            .map((channel) => ({ value: channel, label: channel })),
+            .map((channel) => ({ value: channel, label: channel }))
         ),
-      600,
+      600
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -41,12 +41,17 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
 </script>
 
 <template>
-  <TriggerMenu :triggers="[{ char: '#', type: 'channel', items: searchChannels }]">
+  <TriggerMenu
+    :triggers="[{ char: '#', type: 'channel', items: searchChannels }]"
+  >
     <Field>
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type # to link a channel…" />
+          <TriggerMenuInput
+            v-bind="props"
+            placeholder="Type # to link a channel…"
+          />
         </template>
       </FieldControl>
     </Field>
@@ -61,7 +66,9 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
         }}
       </TriggerMenuStatus>
       <TriggerMenuEmpty v-slot="{ state }">
-        <template v-if="state.empty && !state.loading">No channels match “{{ state.query }}”</template>
+        <template v-if="state.empty && !state.loading"
+          >No channels match “{{ state.query }}”</template
+        >
       </TriggerMenuEmpty>
       <TriggerMenuList v-slot="{ state }">
         <TriggerMenuItem

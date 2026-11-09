@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createChange, createRovingFocus, createSelection, definePrimitive, selects } from "@ui-sdk/core"
+import {
+  createChange,
+  createRovingFocus,
+  createSelection,
+  definePrimitive,
+  selects,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type ToppingsState = { value: string[]; focused: string | null }
@@ -9,11 +15,14 @@ const toppings = definePrimitive({
   state: (): ToppingsState => ({ value: ["Cheese"], focused: null }),
   api: (context) => {
     const change = createChange(context)
-    const roving = createRovingFocus<ToppingsState, { value: string }>(context, {
-      slot: "topping",
-      key: "focused",
-      orientation: () => "horizontal",
-    })
+    const roving = createRovingFocus<ToppingsState, { value: string }>(
+      context,
+      {
+        slot: "topping",
+        key: "focused",
+        orientation: () => "horizontal",
+      }
+    )
     const selection = createSelection(context, {
       key: "value",
       set: (value, details) => change("value", value, details),
@@ -24,14 +33,18 @@ const toppings = definePrimitive({
       roving,
       selection,
       keydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (event.key !== " ") return roving.keydown(event, el)
+        if (event.key !== " ") {
+          return roving.keydown(event, el)
+        }
         event.preventDefault()
         selection.toggle(key, { reason: "item-press", event })
       },
     }
   },
   slots: (slot) => ({
-    root: slot({ attrs: () => ({ role: "listbox", "aria-multiselectable": "true" }) }),
+    root: slot({
+      attrs: () => ({ role: "listbox", "aria-multiselectable": "true" }),
+    }),
     topping: slot<{ value: string }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
@@ -42,7 +55,8 @@ const toppings = definePrimitive({
       }),
       on: {
         keydown: (event, { el, api, key }) => api.keydown(event, el!, key),
-        pointerdown: (event, { api, key }) => api.selection.toggle(key, { reason: "item-press", event }),
+        pointerdown: (event, { api, key }) =>
+          api.selection.toggle(key, { reason: "item-press", event }),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),

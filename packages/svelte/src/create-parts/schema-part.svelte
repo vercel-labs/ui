@@ -12,9 +12,15 @@ are the user's, as the parent passed them.
   import Part from "../part.svelte"
   import { provideInstance, usePart } from "../instance"
   import { usePrimitive } from "../use-primitive.svelte"
-  import { omitProps, rootOptions, slotPropsOf, type PartConfig } from "./schema.svelte"
+  import {
+    omitProps,
+    rootOptions,
+    slotPropsOf,
+    type PartConfig,
+  } from "./schema.svelte"
 
-  let { config, props }: { config: PartConfig; props: Record<string, any> } = $props()
+  let { config, props }: { config: PartConfig; props: Record<string, any> } =
+    $props()
 
   const id = $props.id()
   // The config never changes, and the props object is the parent's, whose
@@ -23,10 +29,17 @@ are the user's, as the parent passed them.
   const { primitive, slot, tag } = bound
   const own = untrack(() => props)
   const options = slot === "root" ? bound.schema.options : {}
-  if (slot === "root") provideInstance(primitive, usePrimitive(primitive, rootOptions(options, own, id)))
+  if (slot === "root") {
+    provideInstance(
+      primitive,
+      usePrimitive(primitive, rootOptions(options, own, id))
+    )
+  }
   const slotProps = slotPropsOf(bound, own, id)
   // Whether there's a tag never changes.
-  const part = tag ? usePart<Primitive, string>(primitive, slot, slotProps.props) : undefined
+  const part = tag
+    ? usePart<Primitive, string>(primitive, slot, slotProps.props)
+    : undefined
   const rest = $derived(omitProps(own, options, slotProps.schema))
 </script>
 

@@ -5,7 +5,12 @@ import {
   type ButtonState,
 } from "@ui-sdk/core/button"
 import type * as React from "react"
-import { renderElement, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  renderElement,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 type ButtonProps = Omit<PartProps<"button", ButtonState>, "type" | "onClick"> &
   ButtonOptions & {
@@ -17,7 +22,10 @@ type ButtonProps = Omit<PartProps<"button", ButtonState>, "type" | "onClick"> &
      * The event's element is whatever `render` renders, like a link.
      * `details.source` says how it was pressed, for changes made after an `await`.
      */
-    onClick?: (event: React.MouseEvent<HTMLElement>, details: ButtonActionDetails) => unknown
+    onClick?: (
+      event: React.MouseEvent<HTMLElement>,
+      details: ButtonActionDetails
+    ) => unknown
   }
 
 /**
@@ -43,7 +51,9 @@ function Button({
   })
   // React hands the handler its own event, so the part runs the press itself.
   const press = (event: React.MouseEvent<HTMLElement>) =>
-    button.api.internal.press(event.nativeEvent, (details) => onClick?.(event, details))
+    button.api.internal.press(event.nativeEvent, (details) =>
+      onClick?.(event, details)
+    )
   return usePart(
     button,
     "root",
@@ -53,7 +63,7 @@ function Button({
       render: (root: Record<string, any>, state: ButtonState) =>
         renderElement("button", { ...root, onClick: press }, render, state),
     },
-    "button",
+    "button"
   )
 }
 

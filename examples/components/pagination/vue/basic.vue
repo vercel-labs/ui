@@ -28,7 +28,11 @@ const log = useLog()
         </PaginationPrevious>
       </PaginationItem>
       <PaginationItem v-for="item in state.items" :key="item">
-        <PaginationLink v-if="typeof item === 'number'" data-variant="ghost" :page="item" />
+        <PaginationLink
+          v-if="typeof item === 'number'"
+          data-variant="ghost"
+          :page="item"
+        />
         <PaginationEllipsis v-else>
           <EllipsisIcon />
         </PaginationEllipsis>

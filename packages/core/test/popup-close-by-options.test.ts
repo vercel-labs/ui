@@ -23,7 +23,9 @@ test.each(Object.keys(popups))(
   async (name) => {
     const completed: boolean[] = []
     const onOpenChangeComplete = (open: boolean) => completed.push(open)
-    const create = popups[name as keyof typeof popups] as unknown as typeof popover
+    const create = popups[
+      name as keyof typeof popups
+    ] as unknown as typeof popover
     let options = { id: name, open: false, onOpenChangeComplete }
     const instance = create(options)
     instance.follow(() => options)
@@ -36,9 +38,12 @@ test.each(Object.keys(popups))(
     hand(true)
     await new Promise((done) => setTimeout(done))
     hand(false)
-    expect({ state: instance.get(), closes: completed.filter((open) => !open) }).toMatchObject({
+    expect({
+      state: instance.get(),
+      closes: completed.filter((open) => !open),
+    }).toMatchObject({
       state: { open: false, mounted: false },
       closes: [false],
     })
-  },
+  }
 )

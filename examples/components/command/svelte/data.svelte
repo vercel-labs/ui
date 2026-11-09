@@ -37,7 +37,11 @@
             { value: "system", label: "System" },
           ],
         },
-        { value: "language", label: "Change language…", items: ["English", "Français", "Deutsch", "日本語"] },
+        {
+          value: "language",
+          label: "Change language…",
+          items: ["English", "Français", "Deutsch", "日本語"],
+        },
         { value: "sign-out", label: "Sign out", shortcut: "mod+shift+q" },
       ],
     },
@@ -58,7 +62,9 @@
         </CommandGroup>
       {/if}
     {:else}
-      {@render commandItem(typeof entry === "string" ? { value: entry, label: entry } : entry)}
+      {@render commandItem(
+        typeof entry === "string" ? { value: entry, label: entry } : entry
+      )}
     {/if}
   {/each}
 {/snippet}

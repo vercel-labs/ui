@@ -16,7 +16,9 @@ type RangeAnchor = { key: string; base: readonly string[] }
 function keysBetween(order: readonly string[], from: string, to: string) {
   const start = order.indexOf(from)
   const end = order.indexOf(to)
-  if (start === -1 || end === -1) return []
+  if (start === -1 || end === -1) {
+    return []
+  }
   return order.slice(Math.min(start, end), Math.max(start, end) + 1)
 }
 
@@ -31,7 +33,10 @@ function rangeSelection(
   order: readonly string[],
   anchor: RangeAnchor,
   to: string,
-  { additive, selectable }: { additive: boolean; selectable: (key: string) => boolean },
+  {
+    additive,
+    selectable,
+  }: { additive: boolean; selectable: (key: string) => boolean }
 ) {
   const range = keysBetween(order, anchor.key, to).filter(selectable)
   const base = additive ? anchor.base : []
@@ -43,14 +48,19 @@ function rangeSelection(
  * The selection with `key` added, or removed when it's there, like Ctrl+Space.
  */
 function toggledKeys(selected: readonly string[], key: string) {
-  return selected.includes(key) ? selected.filter((item) => item !== key) : [...selected, key]
+  return selected.includes(key)
+    ? selected.filter((item) => item !== key)
+    : [...selected, key]
 }
 
 /**
  * Every key that can be chosen, or none once they all are, like Ctrl+A pressed
  * twice. Keys that can't be chosen keep whatever state they had.
  */
-function allToggled(selected: readonly string[], selectable: readonly string[]) {
+function allToggled(
+  selected: readonly string[],
+  selectable: readonly string[]
+) {
   const current = new Set(selected)
   if (selectable.length && selectable.every((key) => current.has(key))) {
     const removed = new Set(selectable)
@@ -66,4 +76,11 @@ function isSameKeys(a: readonly string[], b: readonly string[]) {
   return a.length === b.length && a.every((key, index) => key === b[index])
 }
 
-export { allToggled, isSameKeys, keysBetween, type RangeAnchor, rangeSelection, toggledKeys }
+export {
+  allToggled,
+  isSameKeys,
+  keysBetween,
+  type RangeAnchor,
+  rangeSelection,
+  toggledKeys,
+}

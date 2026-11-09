@@ -36,10 +36,17 @@
 </script>
 
 {#if remote}
-  <DrawerTrigger controller={goal} shortcut="mod+g">Move goal<DrawerShortcut /></DrawerTrigger>
-  <Drawer controller={goal}><DrawerContent><DrawerTitle>Move goal</DrawerTitle></DrawerContent></Drawer>
+  <DrawerTrigger controller={goal} shortcut="mod+g"
+    >Move goal<DrawerShortcut /></DrawerTrigger
+  >
+  <Drawer controller={goal}
+    ><DrawerContent><DrawerTitle>Move goal</DrawerTitle></DrawerContent></Drawer
+  >
 {:else if shortcut}
-  <Drawer><DrawerTrigger shortcut="mod+g">Move goal<DrawerShortcut /></DrawerTrigger></Drawer>
+  <Drawer
+    ><DrawerTrigger shortcut="mod+g">Move goal<DrawerShortcut /></DrawerTrigger
+    ></Drawer
+  >
 {:else}
   <Drawer
     open={controlled ? open : undefined}

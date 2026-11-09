@@ -32,7 +32,10 @@ definePrimitive({
     }),
     // @ts-expect-error No `keys`.
     unkeyed: slot({ role: "listbox", on: { keydown } }),
-    inputKeys: slot({ role: "listbox", keys: { none: "The combobox's input handles them." } }),
+    inputKeys: slot({
+      role: "listbox",
+      keys: { none: "The combobox's input handles them." },
+    }),
     // @ts-expect-error Keys with no keydown handler to press them.
     unhandled: slot({ role: "listbox", keys: ["ArrowDown"] }),
     // On a role that doesn't ask for keys, development builds check it instead,
@@ -50,7 +53,12 @@ definePrimitive({
     // A role's required states are always written, even as `undefined`,
     // and attributes the role doesn't take don't compile.
     // @ts-expect-error No `aria-checked`.
-    unchecked: slot({ role: "checkbox", focus: "native", press, attrs: () => ({ type: "button" }) }),
+    unchecked: slot({
+      role: "checkbox",
+      focus: "native",
+      press,
+      attrs: () => ({ type: "button" }),
+    }),
     checkedLater: slot({
       role: "checkbox",
       focus: "native",
@@ -66,7 +74,10 @@ definePrimitive({
       live: live(selected),
     }),
     // @ts-expect-error A group has no orientation.
-    orientedGroup: slot({ role: "group", attrs: () => ({ "aria-orientation": "vertical" }) }),
+    orientedGroup: slot({
+      role: "group",
+      attrs: () => ({ "aria-orientation": "vertical" }),
+    }),
     orientedList: slot({
       role: "listbox",
       keys: ["ArrowDown"],
@@ -74,7 +85,10 @@ definePrimitive({
       attrs: () => ({ "aria-orientation": "vertical" }),
     }),
     // @ts-expect-error `none` can't be named.
-    namedNone: slot({ role: "none", attrs: () => ({ "aria-label": "Divider" }) }),
+    namedNone: slot({
+      role: "none",
+      attrs: () => ({ "aria-label": "Divider" }),
+    }),
     // Without a literal role, development builds check instead.
     pickedAria: slot({
       role: () => "none",

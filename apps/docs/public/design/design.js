@@ -4,7 +4,9 @@ for (const template of document.querySelectorAll(".ds-example > template")) {
   const example = template.parentElement
   const preview = document.createElement("div")
   preview.className = "ds-preview"
-  if (example.dataset.layout) preview.dataset.layout = example.dataset.layout
+  if (example.dataset.layout) {
+    preview.dataset.layout = example.dataset.layout
+  }
   preview.append(template.content.cloneNode(true))
   template.before(preview)
   if (example.dataset.caption) {
@@ -26,17 +28,23 @@ for (const template of document.querySelectorAll(".ds-example > template")) {
 
 function dedent(html) {
   const lines = html.replace(/^\n+|\s+$/g, "").split("\n")
-  const indent = Math.min(...lines.filter((line) => line.trim()).map((line) => line.match(/^ */)[0].length))
+  const indent = Math.min(
+    ...lines
+      .filter((line) => line.trim())
+      .map((line) => line.match(/^ */)[0].length)
+  )
   return lines.map((line) => line.slice(indent)).join("\n")
 }
 
-document.getElementById("ds-scheme").addEventListener("pressedchange", (event) => {
-  root.dataset.scheme = event.detail.value ? "dark" : "light"
-  for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
-    meta.content = event.detail.value ? "#0a0a0a" : "#ffffff"
-  }
-  refresh()
-})
+document
+  .getElementById("ds-scheme")
+  .addEventListener("pressedchange", (event) => {
+    root.dataset.scheme = event.detail.value ? "dark" : "light"
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+      meta.content = event.detail.value ? "#0a0a0a" : "#ffffff"
+    }
+    refresh()
+  })
 
 const probe = document.createElement("div")
 probe.style.cssText = "position:absolute;visibility:hidden;pointer-events:none"
@@ -46,9 +54,14 @@ function resolveColor(token) {
   probe.style.backgroundColor = `var(${token})`
   const value = getComputedStyle(probe).backgroundColor
   const numbers = value.match(/[\d.]+/g).map(Number)
-  const [l, c, h, a = 1] = value.startsWith("oklch") ? numbers : toOklch(...numbers)
+  const [l, c, h, a = 1] = value.startsWith("oklch")
+    ? numbers
+    : toOklch(...numbers)
   const round = (number, digits) => +number.toFixed(digits)
-  const color = c < 0.0005 ? `${round(l, 3)} 0 0` : `${round(l, 3)} ${round(c, 3)} ${round(h, 1)}`
+  const color =
+    c < 0.0005
+      ? `${round(l, 3)} 0 0`
+      : `${round(l, 3)} ${round(c, 3)} ${round(h, 1)}`
   return a < 1 ? `oklch(${color} / ${round(a, 2)})` : `oklch(${color})`
 }
 
@@ -78,9 +91,12 @@ function refresh() {
     for (const measure of document.querySelectorAll("[data-measure]")) {
       const [selector, property] = measure.dataset.measure.split("|")
       const target = document.querySelector(selector)
-      if (!target) continue
+      if (!target) {
+        continue
+      }
       const value = getComputedStyle(target)[property]
-      measure.textContent = property === "borderRadius" && parseFloat(value) > 100 ? "full" : value
+      measure.textContent =
+        property === "borderRadius" && parseFloat(value) > 100 ? "full" : value
     }
   })
 }
@@ -89,7 +105,9 @@ customElements.whenDefined("ui-slider").then(refresh)
 addEventListener("load", refresh)
 
 customElements.whenDefined("ui-trigger-menu").then(() => {
-  for (const menu of document.querySelectorAll("ui-trigger-menu[data-mentions]")) {
+  for (const menu of document.querySelectorAll(
+    "ui-trigger-menu[data-mentions]"
+  )) {
     menu.triggers = [
       {
         char: "@",
@@ -106,12 +124,21 @@ customElements.whenDefined("ui-trigger-menu").then(() => {
 
 document.addEventListener("submit", (event) => event.preventDefault())
 
-const tags = new Set([...document.querySelectorAll("*")].map((element) => element.localName))
-const defined = [...tags].filter((tag) => tag.startsWith("ui-")).map((tag) => customElements.whenDefined(tag))
-Promise.race([Promise.all(defined), new Promise((resolve) => setTimeout(resolve, 3000))]).then(() =>
+const tags = new Set(
+  [...document.querySelectorAll("*")].map((element) => element.localName)
+)
+const defined = [...tags]
+  .filter((tag) => tag.startsWith("ui-"))
+  .map((tag) => customElements.whenDefined(tag))
+Promise.race([
+  Promise.all(defined),
+  new Promise((resolve) => setTimeout(resolve, 3000)),
+]).then(() =>
   requestAnimationFrame(() => {
     refresh()
     root.dataset.ready = ""
-    if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView()
-  }),
+    if (location.hash) {
+      document.getElementById(location.hash.slice(1))?.scrollIntoView()
+    }
+  })
 )

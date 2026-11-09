@@ -15,23 +15,33 @@ import { isPlainObject, markChangedInPlace, sameValue } from "./store"
  */
 type Memo = <Value>(compute: () => Value) => () => Value
 
-const keysByPrimitive = new WeakMap<Primitive, { controlled: string[]; data: string[] }>()
+const keysByPrimitive = new WeakMap<
+  Primitive,
+  { controlled: string[]; data: string[] }
+>()
 
 // The options that hold state a parent controls: those with a `default<Key>`
 // or an `on<Key>Change` beside them. The others that can hold a list, apart
 // from a controlled list's default, hold data, like `items`.
 function keysOf(primitive: Primitive) {
   let keys = keysByPrimitive.get(primitive)
-  if (keys) return keys
+  if (keys) {
+    return keys
+  }
   const options = schemaOf(primitive).options
   const controlled = Object.keys(options).filter(
-    (key) => defaultName(key) in options || callbackName(key, "Change") in options,
+    (key) =>
+      defaultName(key) in options || callbackName(key, "Change") in options
   )
   const defaults = new Set(controlled.map(defaultName))
   const data = Object.keys(options).filter((key) => {
     const spec = options[key]
     const kind = typeof spec === "object" ? spec.kind : spec
-    return (kind === "value" || kind === "list") && !controlled.includes(key) && !defaults.has(key)
+    return (
+      (kind === "value" || kind === "list") &&
+      !controlled.includes(key) &&
+      !defaults.has(key)
+    )
   })
   keys = { controlled, data }
   keysByPrimitive.set(primitive, keys)
@@ -45,12 +55,18 @@ function keysOf(primitive: Primitive) {
 // short as the data is deep, which keeps a long list cheaper than a set of
 // every item would.
 function readAll(value: unknown, path: object[]) {
-  if (typeof value !== "object" || value === null || path.includes(value)) return
+  if (typeof value !== "object" || value === null || path.includes(value)) {
+    return
+  }
   path.push(value)
   if (Array.isArray(value)) {
-    for (let index = 0; index < value.length; index++) readAll(value[index], path)
+    for (let index = 0; index < value.length; index++) {
+      readAll(value[index], path)
+    }
   } else if (isPlainObject(value)) {
-    for (const key in value) readAll(value[key], path)
+    for (const key in value) {
+      readAll(value[key], path)
+    }
   }
   path.pop()
 }
@@ -87,19 +103,26 @@ function trackList(list: readonly unknown[], memo: Memo) {
 function createListSnapshots(primitive: Primitive, memo: Memo) {
   const keys = keysOf(primitive)
   const snapshots: Record<string, unknown[]> = {}
-  const trackers: Record<string, { list: readonly unknown[]; handed: () => readonly unknown[] }> = {}
+  const trackers: Record<
+    string,
+    { list: readonly unknown[]; handed: () => readonly unknown[] }
+  > = {}
   return <Options extends object>(options: Options) => {
     // Options are read by key, whatever primitive they're for.
     const given = options as Record<string, unknown>
     let swapped: Record<string, unknown> | undefined
     for (const key of keys.controlled) {
       const list = given[key]
-      if (!Array.isArray(list)) continue
+      if (!Array.isArray(list)) {
+        continue
+      }
       // Copied before comparing: a Vue `reactive` array then tracks one
       // dependency for its items, not one per index.
       const items = [...list]
       let snapshot = snapshots[key]
-      if (!snapshot || !sameValue(snapshot, items)) snapshots[key] = snapshot = items
+      if (!snapshot || !sameValue(snapshot, items)) {
+        snapshots[key] = snapshot = items
+      }
       swapped ??= { ...given }
       swapped[key] = snapshot
     }
@@ -110,9 +133,13 @@ function createListSnapshots(primitive: Primitive, memo: Memo) {
         continue
       }
       let tracker = trackers[key]
-      if (tracker?.list !== list) trackers[key] = tracker = { list, handed: trackList(list, memo) }
+      if (tracker?.list !== list) {
+        trackers[key] = tracker = { list, handed: trackList(list, memo) }
+      }
       const handed = tracker.handed()
-      if (handed === list) continue
+      if (handed === list) {
+        continue
+      }
       swapped ??= { ...given }
       swapped[key] = handed
     }

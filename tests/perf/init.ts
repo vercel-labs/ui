@@ -24,7 +24,10 @@ function countDomCalls() {
   }
   Object.assign(window, { __perf: perf })
 
-  const count = <Target extends object>(target: Target, name: keyof Target & string) => {
+  const count = <Target extends object>(
+    target: Target,
+    name: keyof Target & string
+  ) => {
     const original = target[name] as (...args: unknown[]) => unknown
     Object.defineProperty(target, name, {
       configurable: true,
@@ -72,8 +75,9 @@ function countDomCalls() {
     HTMLButtonElement.prototype,
     HTMLSelectElement.prototype,
     HTMLTextAreaElement.prototype,
-  ])
+  ]) {
     countGetter(target, "labels")
+  }
 }
 
 /** Installs the counters on every page the test opens. Call before `open()`. */
@@ -83,13 +87,17 @@ async function countCalls(page: Page) {
 
 /** Zeroes every counter, so what follows counts only the interaction. */
 async function resetCounts(page: Page) {
-  await page.evaluate(() => (window as unknown as { __perf: { reset: () => void } }).__perf.reset())
+  await page.evaluate(() =>
+    (window as unknown as { __perf: { reset: () => void } }).__perf.reset()
+  )
 }
 
 /** The counts since the last reset. */
 async function readCounts(page: Page) {
   return page.evaluate(() => {
-    const { counts, renders, subscriptions } = (window as unknown as { __perf: PerfCounts }).__perf
+    const { counts, renders, subscriptions } = (
+      window as unknown as { __perf: PerfCounts }
+    ).__perf
     return { counts: { ...counts }, renders: { ...renders }, subscriptions }
   })
 }
@@ -108,7 +116,7 @@ async function waitFrames(page: Page, frames: number) {
         const step = () => (--left ? requestAnimationFrame(step) : resolve())
         requestAnimationFrame(step)
       }),
-    frames,
+    frames
   )
 }
 
@@ -123,19 +131,35 @@ async function countRestyles(page: Page, run: () => Promise<unknown>) {
   await browser.startTracing(page, { categories: ["devtools.timeline"] })
   await run()
   const trace = JSON.parse((await browser.stopTracing()).toString()) as {
-    traceEvents: { name: string; ph: string; args?: { elementCount?: number } }[]
+    traceEvents: {
+      name: string
+      ph: string
+      args?: { elementCount?: number }
+    }[]
   }
-  const recalcs = trace.traceEvents.filter(({ name, ph }) => name === "UpdateLayoutTree" && ph === "X")
+  const recalcs = trace.traceEvents.filter(
+    ({ name, ph }) => name === "UpdateLayoutTree" && ph === "X"
+  )
   return {
     recalcs: recalcs.length,
-    elements: recalcs.reduce((sum, { args }) => sum + (args?.elementCount ?? 0), 0),
+    elements: recalcs.reduce(
+      (sum, { args }) => sum + (args?.elementCount ?? 0),
+      0
+    ),
   }
 }
 
 /** Prints a gate's counts when PERF_REPORT is set. */
-function report(name: string, n: number, counts: Awaited<ReturnType<typeof readCounts>>) {
-  if (process.env.PERF_REPORT)
-    console.log(`[perf] ${test.info().project.name} ${name} n=${n} ${JSON.stringify(counts)}`)
+function report(
+  name: string,
+  n: number,
+  counts: Awaited<ReturnType<typeof readCounts>>
+) {
+  if (process.env.PERF_REPORT) {
+    console.log(
+      `[perf] ${test.info().project.name} ${name} n=${n} ${JSON.stringify(counts)}`
+    )
+  }
 }
 
 /**
@@ -150,7 +174,12 @@ async function watchSettle(page: Page, selector: string) {
     const settledFrame = new Promise<number>((resolve) => {
       const look = () => {
         const el = document.querySelector(selector)
-        if (!el?.checkVisibility({ opacityProperty: true, visibilityProperty: true })) {
+        if (
+          !el?.checkVisibility({
+            opacityProperty: true,
+            visibilityProperty: true,
+          })
+        ) {
           return undefined
         }
         const { x, y, width, height } = el.getBoundingClientRect()
@@ -164,7 +193,8 @@ async function watchSettle(page: Page, selector: string) {
         if (looks !== undefined && looks === settled?.looks) {
           settled.same++
         } else {
-          settled = looks === undefined ? undefined : { looks, frame: frames, same: 0 }
+          settled =
+            looks === undefined ? undefined : { looks, frame: frames, same: 0 }
         }
         // Gives up after a second of frames, for an element that never settles.
         if (settled?.same === 2 || frames >= 60) {
@@ -178,11 +208,28 @@ async function watchSettle(page: Page, selector: string) {
         channel.port1.onmessage = rendered
         channel.port2.postMessage(0)
       }
-      addEventListener("keydown", () => requestAnimationFrame(next), { capture: true, once: true })
+      addEventListener("keydown", () => requestAnimationFrame(next), {
+        capture: true,
+        once: true,
+      })
     })
     Object.assign(window, { __settledFrame: settledFrame })
   }, selector)
-  return () => page.evaluate(() => (window as unknown as { __settledFrame: Promise<number> }).__settledFrame)
+  return () =>
+    page.evaluate(
+      () =>
+        (window as unknown as { __settledFrame: Promise<number> })
+          .__settledFrame
+    )
 }
 
-export { countCalls, countRestyles, readCounts, report, resetCounts, sizes, waitFrames, watchSettle }
+export {
+  countCalls,
+  countRestyles,
+  readCounts,
+  report,
+  resetCounts,
+  sizes,
+  waitFrames,
+  watchSettle,
+}

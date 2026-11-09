@@ -1,4 +1,9 @@
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import {
   FileInput,
   FileInputDropzone,
@@ -30,16 +35,23 @@ function Fixture() {
   let changed = false
   const callbacks = (kind: string) => ({
     onValueChange: (value: File[], details: FileInputValueChangeDetails) => {
-      if (options.cancel) details.cancel()
+      if (options.cancel) {
+        details.cancel()
+      }
       changed = true
       queueMicrotask(() => (changed = false))
       setAction(describeChange(kind, details))
       setCount((current) => current + 1)
-      const ignored = options.ignoreRemovals && details.reason === "remove-press"
-      if (kind === "attachments" && !details.canceled && !ignored) setAttachments(value)
+      const ignored =
+        options.ignoreRemovals && details.reason === "remove-press"
+      if (kind === "attachments" && !details.canceled && !ignored) {
+        setAttachments(value)
+      }
     },
     onReject: (rejected: FileRejection[], details: { reason: string }) => {
-      if (!changed) setAction(describeChange(kind, { ...details, rejected }))
+      if (!changed) {
+        setAction(describeChange(kind, { ...details, rejected }))
+      }
     },
   })
 
@@ -108,7 +120,11 @@ function Fixture() {
           <button type="reset">Reset</button>
         </div>
       </form>
-      <FileInput accept={f.avatar.accept} capture={f.avatar.capture} {...callbacks("avatar")}>
+      <FileInput
+        accept={f.avatar.accept}
+        capture={f.avatar.capture}
+        {...callbacks("avatar")}
+      >
         <FileInputTrigger>{f.avatar.label}</FileInputTrigger>
       </FileInput>
       <FileInput directory {...callbacks("folder")}>
@@ -116,7 +132,12 @@ function Fixture() {
       </FileInput>
       <Show when={options.page}>
         <FileInput multiple {...callbacks("page")}>
-          <FileInputDropzone class="page-zone" role="group" aria-label={f.page.label} target="document">
+          <FileInputDropzone
+            class="page-zone"
+            role="group"
+            aria-label={f.page.label}
+            target="document"
+          >
             {f.page.text}
           </FileInputDropzone>
         </FileInput>

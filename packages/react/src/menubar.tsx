@@ -1,4 +1,8 @@
-import { menubar as menubarPrimitive, type MenubarOptions, type MenubarState } from "@ui-sdk/core/menubar"
+import {
+  menubar as menubarPrimitive,
+  type MenubarOptions,
+  type MenubarState,
+} from "@ui-sdk/core/menubar"
 import { MenubarContext } from "./menubar-context"
 import { usePart, usePrimitive, type PartProps } from "./use-primitive"
 
@@ -16,10 +20,19 @@ function Menubar({
   debug,
   ...props
 }: MenubarOptions & PartProps<"div", MenubarState>) {
-  const menubar = usePrimitive(menubarPrimitive, { orientation, loop, disabled, modal, controller, debug })
+  const menubar = usePrimitive(menubarPrimitive, {
+    orientation,
+    loop,
+    disabled,
+    modal,
+    controller,
+    debug,
+  })
   // In its own context, so a menu can join a menubar without bundling it.
   return (
-    <MenubarContext.Provider value={menubar}>{usePart(menubar, "root", {}, props)}</MenubarContext.Provider>
+    <MenubarContext.Provider value={menubar}>
+      {usePart(menubar, "root", {}, props)}
+    </MenubarContext.Provider>
   )
 }
 

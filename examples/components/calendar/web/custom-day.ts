@@ -41,25 +41,38 @@ function mount(root: HTMLElement) {
   const decorate = () => {
     for (const day of calendar.querySelectorAll("ui-calendar-day")) {
       const label = day.querySelector("[data-label]")!
-      if (label.textContent) continue
+      if (label.textContent) {
+        continue
+      }
       const date = day.getAttribute("value")!
       label.textContent = String(Number(date.slice(8)))
       day.querySelector("[data-price]")!.textContent = `$${priceOf(date)}`
     }
     const firstWeek = calendar.querySelector("ui-calendar-week")
-    calendar.querySelectorAll("ui-calendar-weekday").forEach((header, index) => {
-      const name = header.getAttribute("aria-label")
-      const date = firstWeek?.children[index]?.getAttribute("value")
-      if (!name || !date || header.firstElementChild) return
-      const abbr = document.createElement("abbr")
-      abbr.title = name
-      abbr.toggleAttribute("data-weekend", weekday(date) === 0 || weekday(date) === 6)
-      abbr.append(...header.childNodes)
-      header.append(abbr)
-    })
+    calendar
+      .querySelectorAll("ui-calendar-weekday")
+      .forEach((header, index) => {
+        const name = header.getAttribute("aria-label")
+        const date = firstWeek?.children[index]?.getAttribute("value")
+        if (!name || !date || header.firstElementChild) {
+          return
+        }
+        const abbr = document.createElement("abbr")
+        abbr.title = name
+        abbr.toggleAttribute(
+          "data-weekend",
+          weekday(date) === 0 || weekday(date) === 6
+        )
+        abbr.append(...header.childNodes)
+        header.append(abbr)
+      })
   }
   const observer = new MutationObserver(decorate)
-  observer.observe(calendar, { childList: true, subtree: true, attributeFilter: ["aria-label"] })
+  observer.observe(calendar, {
+    childList: true,
+    subtree: true,
+    attributeFilter: ["aria-label"],
+  })
   decorate()
   return () => observer.disconnect()
 }

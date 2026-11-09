@@ -4,7 +4,12 @@ import { slotContent } from "./children"
 import { createParts, withElement } from "./create-parts"
 import { usePart, type PartSlots } from "./use-primitive"
 
-const parts = createParts(progress, { root: "div", track: "div", indicator: "div", label: "span" })
+const parts = createParts(progress, {
+  root: "div",
+  track: "div",
+  indicator: "div",
+  label: "span",
+})
 
 /**
  * The root, which is the progressbar.
@@ -43,10 +48,11 @@ const ProgressValue = withElement(
     setup(_, { slots }) {
       return usePart(progress, "value", undefined, undefined, {
         tag: "span",
-        children: (state) => slotContent(slots.default, { state }) ?? state.text,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.text,
       })
     },
-  }),
+  })
 )
 
 export type {
@@ -59,4 +65,10 @@ export type {
   ProgressValueState,
 } from "@ui-sdk/core/progress"
 
-export { Progress, ProgressIndicator, ProgressLabel, ProgressTrack, ProgressValue }
+export {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+  ProgressValue,
+}

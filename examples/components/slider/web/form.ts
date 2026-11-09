@@ -65,7 +65,7 @@ function mount(root: HTMLElement) {
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
     const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-      ([name, value]) => `${name}=${value}`,
+      ([name, value]) => `${name}=${value}`
     )
     log(root, `Submitted ${data.join(", ")}`)
   })

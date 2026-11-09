@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { HoverCardTriggerProps, HoverCardTriggerState } from "@ui-sdk/core/hover-card"
+  import type {
+    HoverCardTriggerProps,
+    HoverCardTriggerState,
+  } from "@ui-sdk/core/hover-card"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import type { HoverCardContext } from "./context"
@@ -10,13 +13,14 @@
     owner,
     payload,
     ...rest
-  }: PartProps<"a", HoverCardTriggerState> & HoverCardTriggerProps & { owner: HoverCardContext } = $props()
+  }: PartProps<"a", HoverCardTriggerState> &
+    HoverCardTriggerProps & { owner: HoverCardContext } = $props()
 
   const id = $props.id()
   const trigger = useHandlePart(
     () => owner,
     "trigger",
-    () => ({ id, payload }),
+    () => ({ id, payload })
   )
 </script>
 

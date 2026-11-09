@@ -10,7 +10,13 @@
     SelectTrigger,
     SelectValue,
   } from "@ui-sdk/svelte/select"
-  import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import {
+    Toast,
+    ToastDescription,
+    ToastRegion,
+    ToastTitle,
+    createToaster,
+  } from "@ui-sdk/svelte/toast"
 
   const sides = [
     { value: "top", label: "Top" },
@@ -34,7 +40,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={sides} value={side} onValueChange={(next) => next && (side = next as Side)}>
+    <Select
+      items={sides}
+      value={side}
+      onValueChange={(next) => next && (side = next as Side)}
+    >
       <SelectLabel>Side</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -51,7 +61,11 @@
         {/each}
       </SelectContent>
     </Select>
-    <Select items={aligns} value={align} onValueChange={(next) => next && (align = next as Align)}>
+    <Select
+      items={aligns}
+      value={align}
+      onValueChange={(next) => next && (align = next as Align)}
+    >
       <SelectLabel>Align</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -69,7 +83,10 @@
       </SelectContent>
     </Select>
   </div>
-  <button onclick={() => toast("Event created", { description: "Friday, June 12 at 10:00 AM" })}>
+  <button
+    onclick={() =>
+      toast("Event created", { description: "Friday, June 12 at 10:00 AM" })}
+  >
     Create Event
   </button>
   <ToastRegion toaster={toast} {side} {align}>

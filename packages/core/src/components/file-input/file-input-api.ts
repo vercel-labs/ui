@@ -5,7 +5,12 @@ import { dev } from "#dev"
 import { announce } from "../../foundation/platform/announce"
 import { isRTL } from "../../foundation/platform/env"
 import { moveIndex, radioStep } from "../../foundation/focus/collection"
-import { parseAccept, validateFiles, type FileLike, type FileRejection } from "../../foundation/forms/files"
+import {
+  parseAccept,
+  validateFiles,
+  type FileLike,
+  type FileRejection,
+} from "../../foundation/forms/files"
 import { writingFromScript } from "../../foundation/forms/value"
 import {
   associate,
@@ -25,7 +30,10 @@ import { on } from "../../foundation/kernel/events"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { sameValue } from "../../foundation/kernel/store"
 import { createDetails } from "../../foundation/kernel/details"
-import { changeSource, createChange } from "../../foundation/kernel/input-source"
+import {
+  changeSource,
+  createChange,
+} from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
 
 type DragStatus = "accept" | "reject"
@@ -76,17 +84,28 @@ let fileCount = 0
 /** A key for a file that stays the same while the file lives, for lists keyed by file. */
 function fileKey(file: object) {
   let key = fileKeys.get(file)
-  if (!key) fileKeys.set(file, (key = `file-${++fileCount}`))
+  if (!key) {
+    fileKeys.set(file, (key = `file-${++fileCount}`))
+  }
   return key
 }
 
 // Puts files in a file input, so its form submits exactly those.
 function setInputFiles(input: HTMLInputElement, files: readonly File[]) {
   const current = Array.from(input.files ?? [])
-  if (current.length === files.length && current.every((file, index) => file === files[index])) return
-  if (typeof DataTransfer !== "function") return
+  if (
+    current.length === files.length &&
+    current.every((file, index) => file === files[index])
+  ) {
+    return
+  }
+  if (typeof DataTransfer !== "function") {
+    return
+  }
   const transfer = new DataTransfer()
-  for (const file of files) transfer.items.add(file)
+  for (const file of files) {
+    transfer.items.add(file)
+  }
   input.files = transfer.files
 }
 
@@ -105,21 +124,32 @@ function describeChange(details: {
   removed: readonly FileLike[]
   rejected: readonly FileRejection<FileLike>[]
 }) {
-  if (details.reason === "reset") return null
+  if (details.reason === "reset") {
+    return null
+  }
   const parts = []
-  if (details.added.length) parts.push(`${plural(details.added.length)} accepted.`)
-  if (details.rejected.length) parts.push(`${plural(details.rejected.length)} rejected.`)
-  if (details.removed.length && !details.added.length)
+  if (details.added.length) {
+    parts.push(`${plural(details.added.length)} accepted.`)
+  }
+  if (details.rejected.length) {
+    parts.push(`${plural(details.rejected.length)} rejected.`)
+  }
+  if (details.removed.length && !details.added.length) {
     parts.push(
       details.removed.length === 1
         ? `${details.removed[0].name} removed.`
-        : `${plural(details.removed.length)} removed.`,
+        : `${plural(details.removed.length)} removed.`
     )
+  }
   return parts.length ? parts.join(" ") : null
 }
 
 function fileInputApi(
-  context: PrimitiveContext<FileInputOptions, State, "root" | "input" | "trigger" | "dropzone" | "item">,
+  context: PrimitiveContext<
+    FileInputOptions,
+    State,
+    "root" | "input" | "trigger" | "dropzone" | "item"
+  >
 ) {
   const { id, store, options, element } = context
   const change = createChange(context)
@@ -129,7 +159,10 @@ function fileInputApi(
   const rules = () => {
     const { accept, maxFiles, maxSize, minSize, validate } = options()
     const { multiple, value } = store.get()
-    const room = maxFiles !== undefined && multiple ? Math.max(0, maxFiles - value.length) : maxFiles
+    const room =
+      maxFiles !== undefined && multiple
+        ? Math.max(0, maxFiles - value.length)
+        : maxFiles
     return { accept, multiple, maxFiles: room, maxSize, minSize, validate }
   }
 
@@ -150,9 +183,13 @@ function fileInputApi(
   let echoing = false
   function echoChange() {
     const el = formElement()
-    if (el && writingFromScript(el)) return
+    if (el && writingFromScript(el)) {
+      return
+    }
     queueMicrotask(() => {
-      if (!el?.isConnected) return
+      if (!el?.isConnected) {
+        return
+      }
       echoing = true
       el.dispatchEvent(new Event("input", { bubbles: true, composed: true }))
       el.dispatchEvent(new Event("change", { bubbles: true }))
@@ -162,9 +199,14 @@ function fileInputApi(
 
   function writeInput() {
     const el = input()
-    if (!el) return
-    if (keepsFiles()) setInputFiles(el, store.get().value)
-    else el.value = ""
+    if (!el) {
+      return
+    }
+    if (keepsFiles()) {
+      setInputFiles(el, store.get().value)
+    } else {
+      el.value = ""
+    }
   }
 
   // Reports a change with what it added, removed and rejected, then
@@ -178,59 +220,102 @@ function fileInputApi(
       added = noFiles,
       removed = noFiles,
       rejected = noRejections,
-    }: { added?: readonly File[]; removed?: readonly File[]; rejected?: readonly FileRejection[] } = {},
+    }: {
+      added?: readonly File[]
+      removed?: readonly File[]
+      rejected?: readonly FileRejection[]
+    } = {}
   ) {
-    const summary = { reason, added: [...added], removed: [...removed], rejected: [...rejected] }
-    if (dev && options().debug)
+    const summary = {
+      reason,
+      added: [...added],
+      removed: [...removed],
+      rejected: [...rejected],
+    }
+    if (dev && options().debug) {
       console.debug(
-        `[ui-sdk] file-input#${id} ${added.length} added, ${removed.length} removed, ${rejected.length} rejected (${reason})`,
+        `[ui-sdk] file-input#${id} ${added.length} added, ${removed.length} removed, ${rejected.length} rejected (${reason})`
       )
+    }
     const differs = !sameValue(store.get().value, next)
     const changed = differs && change("value", [...next], { event, ...summary })
     // After the change, so a handler that clears messages on a change doesn't
     // clear the ones for this batch's rejections.
-    if (rejected.length)
+    if (rejected.length) {
       options().onReject?.(
         summary.rejected,
-        createDetails({ reason, event }, changeSource(reason, event), false),
+        createDetails({ reason, event }, changeSource(reason, event), false)
       )
+    }
     // A canceled change leaves the input as it was, and says nothing.
     writeInput()
-    if (differs && !changed) return false
-    if (changed && reason !== "picker" && reason !== "reset") echoChange()
+    if (differs && !changed) {
+      return false
+    }
+    if (changed && reason !== "picker" && reason !== "reset") {
+      echoChange()
+    }
     const { announcement } = options()
-    const message = announcement ? announcement(summary) : describeChange(summary)
-    if (message) announce(message)
+    const message = announcement
+      ? announcement(summary)
+      : describeChange(summary)
+    if (message) {
+      announce(message)
+    }
     return changed
   }
 
   // Runs files through the rules. With `multiple` they join the value, up to
   // `maxFiles` in all; without it, the first one replaces it, and a batch with
   // nothing accepted keeps the file it has.
-  function receive(files: readonly File[], reason: FileInputValueChangeReason, event?: Event) {
+  function receive(
+    files: readonly File[],
+    reason: FileInputValueChangeReason,
+    event?: Event
+  ) {
     const state = store.get()
-    if (isDisabled(state)) return false
+    if (isDisabled(state)) {
+      return false
+    }
     const { accepted, rejected } = validateFiles(files, rules())
-    if (!state.multiple && !accepted.length) return commit(state.value, reason, event, { rejected })
+    if (!state.multiple && !accepted.length) {
+      return commit(state.value, reason, event, { rejected })
+    }
     const current = state.multiple ? state.value : noFiles
     const added = accepted.filter((file) => !current.includes(file))
-    const removed = state.multiple ? noFiles : state.value.filter((file) => !added.includes(file))
-    return commit([...current, ...added], reason, event, { added, removed, rejected })
+    const removed = state.multiple
+      ? noFiles
+      : state.value.filter((file) => !added.includes(file))
+    return commit([...current, ...added], reason, event, {
+      added,
+      removed,
+      rejected,
+    })
   }
 
-  function remove(file: File, reason: FileInputValueChangeReason = "imperative", event?: Event) {
+  function remove(
+    file: File,
+    reason: FileInputValueChangeReason = "imperative",
+    event?: Event
+  ) {
     const state = store.get()
-    if (isDisabled(state) || !state.value.includes(file)) return false
+    if (isDisabled(state) || !state.value.includes(file)) {
+      return false
+    }
     return commit(
       state.value.filter((item) => item !== file),
       reason,
       event,
-      { removed: [file] },
+      { removed: [file] }
     )
   }
 
   // Replaces the files as they are, without the checks.
-  function replace(files: readonly File[], reason: FileInputValueChangeReason, event?: Event) {
+  function replace(
+    files: readonly File[],
+    reason: FileInputValueChangeReason,
+    event?: Event
+  ) {
     const { value } = store.get()
     return commit(files, reason, event, {
       added: files.filter((file) => !value.includes(file)),
@@ -246,21 +331,35 @@ function fileInputApi(
   function removeItem(file: File, event?: MouseEvent | KeyboardEvent) {
     const list = items()
     const index = list.findIndex(({ props }) => props.file === file)
-    const hadFocus = list[index]?.el.contains(list[index].el.ownerDocument.activeElement)
+    const hadFocus = list[index]?.el.contains(
+      list[index].el.ownerDocument.activeElement
+    )
     const neighbour = list[index + 1] ?? list[index - 1]
-    if (!remove(file, "remove-press", event) || !hadFocus) return
-    const moveFocus = () => {
-      if (store.get().value.includes(file)) return
-      if (neighbour?.el.isConnected) neighbour.el.focus()
-      else element("trigger")?.focus()
+    if (!remove(file, "remove-press", event) || !hadFocus) {
+      return
     }
-    if (options().value === undefined) moveFocus()
-    else queueMicrotask(moveFocus)
+    const moveFocus = () => {
+      if (store.get().value.includes(file)) {
+        return
+      }
+      if (neighbour?.el.isConnected) {
+        neighbour.el.focus()
+      } else {
+        element("trigger")?.focus()
+      }
+    }
+    if (options().value === undefined) {
+      moveFocus()
+    } else {
+      queueMicrotask(moveFocus)
+    }
   }
 
   // Arrow keys move between items, and Backspace and Delete remove the focused one.
   function itemKeydown(event: KeyboardEvent, el: HTMLElement, file: File) {
-    if (event.target !== el || event.altKey || event.ctrlKey || event.metaKey) return
+    if (event.target !== el || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
     if (event.key === "Backspace" || event.key === "Delete") {
       event.preventDefault()
       return removeItem(file, event)
@@ -268,33 +367,49 @@ function fileInputApi(
     const list = items().map((item) => item.el)
     const step =
       radioStep(event.key, isRTL(el)) ??
-      (event.key === "Home" ? "first" : event.key === "End" ? "last" : undefined)
-    if (step === undefined) return
+      (event.key === "Home"
+        ? "first"
+        : event.key === "End"
+          ? "last"
+          : undefined)
+    if (step === undefined) {
+      return
+    }
     const target = list[moveIndex(list.indexOf(el), step, list.length, false)]
-    if (!target) return
+    if (!target) {
+      return
+    }
     event.preventDefault()
     target.focus()
   }
 
   const api = {
     getValue: () => store.get().value,
-    setValue: (files: readonly File[], { reason = "imperative", event }: FileInputChangeOptions = {}) =>
-      replace(files, reason, event),
+    setValue: (
+      files: readonly File[],
+      { reason = "imperative", event }: FileInputChangeOptions = {}
+    ) => replace(files, reason, event),
     addFiles(
       files: readonly File[] | FileList,
-      { reason = "imperative", event }: FileInputChangeOptions = {},
+      { reason = "imperative", event }: FileInputChangeOptions = {}
     ) {
       return receive(Array.from(files), reason, event)
     },
-    removeFile: (file: File, { reason = "imperative", event }: FileInputChangeOptions = {}) =>
-      remove(file, reason, event),
+    removeFile: (
+      file: File,
+      { reason = "imperative", event }: FileInputChangeOptions = {}
+    ) => remove(file, reason, event),
     clear: ({ reason = "imperative", event }: FileInputChangeOptions = {}) =>
       api.setValue([], { reason, event }),
     open() {
       const state = store.get()
-      if (isDisabled(state)) return false
+      if (isDisabled(state)) {
+        return false
+      }
       const el = input()
-      if (!el) return false
+      if (!el) {
+        return false
+      }
       el.click()
       return true
     },
@@ -305,16 +420,21 @@ function fileInputApi(
       removeItem,
       itemKeydown,
       setActiveItem(key: string) {
-        if (store.get().activeItem !== key) store.set({ activeItem: key })
+        if (store.get().activeItem !== key) {
+          store.set({ activeItem: key })
+        }
       },
       setDrag(key: string, status: DragStatus | null) {
         const { [key]: current, ...rest } = store.get().drags
-        if (current === (status ?? undefined)) return
+        if (current === (status ?? undefined)) {
+          return
+        }
         store.set({ drags: status ? { ...rest, [key]: status } : rest })
       },
       rules,
       dropzoneProps(key: string) {
-        const props: FileInputDropzoneProps = context.props("dropzone", key) ?? {}
+        const props: FileInputDropzoneProps =
+          context.props("dropzone", key) ?? {}
         return props
       },
       reset: () => replace(store.get().initial, "reset"),
@@ -326,7 +446,9 @@ function fileInputApi(
         let written = store.get()
         const cleanups = [
           on(el, "change", (event) => {
-            if (!echoing) receive(Array.from(el.files ?? []), "picker", event)
+            if (!echoing) {
+              receive(Array.from(el.files ?? []), "picker", event)
+            }
           }),
           // A controlled value, a new name or a removal changes what the input holds.
           store.subscribe(() => {
@@ -335,8 +457,9 @@ function fileInputApi(
               state.value === written.value &&
               state.name === written.name &&
               state.required === written.required
-            )
+            ) {
               return
+            }
             written = state
             writeInput()
           }),
@@ -352,14 +475,20 @@ function fileInputApi(
       },
       // Custom elements submit their files through ElementInternals.
       bindRoot(el: HTMLElement) {
-        if (!formInternals(el)) return () => {}
+        if (!formInternals(el)) {
+          return () => {}
+        }
         store.set({ associated: true })
         return bindInternals(el, {
           value: () => {
             const { name, value } = store.get()
-            if (!name) return null
+            if (!name) {
+              return null
+            }
             const data = new FormData()
-            for (const file of value.length ? value : [noFile()]) data.append(name, file)
+            for (const file of value.length ? value : [noFile()]) {
+              data.append(name, file)
+            }
             return data
           },
           state: () => "",

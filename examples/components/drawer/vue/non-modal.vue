@@ -26,7 +26,11 @@ const destination = ref(places[0].name)
   <div data-slot="stack">
     <ul data-slot="list" aria-label="Places">
       <li v-for="place in places" :key="place.name">
-        <button type="button" :aria-pressed="destination === place.name" @click="destination = place.name">
+        <button
+          type="button"
+          :aria-pressed="destination === place.name"
+          @click="destination = place.name"
+        >
           {{ place.name }}
           <span data-slot="hint">{{ place.detail }}</span>
         </button>

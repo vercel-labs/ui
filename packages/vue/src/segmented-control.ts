@@ -33,8 +33,14 @@ const SegmentedControl = withElement(
     inheritAttrs: false,
     props: {
       value: { type: String as PropType<string | null>, default: undefined },
-      modelValue: { type: String as PropType<string | null>, default: undefined },
-      defaultValue: { type: String as PropType<string | null>, default: undefined },
+      modelValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
+      defaultValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
       required: optionalBoolean,
@@ -48,8 +54,10 @@ const SegmentedControl = withElement(
     emits: {
       "update:value": (_value: string | null) => true,
       "update:modelValue": (_value: string | null) => true,
-      valueChange: (_value: string | null, _details: ChangeDetails<SegmentedControlValueChangeReason>) =>
-        true,
+      valueChange: (
+        _value: string | null,
+        _details: ChangeDetails<SegmentedControlValueChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof segmentedControl, "root">,
     setup(props, { attrs, emit }) {
@@ -66,17 +74,25 @@ const SegmentedControl = withElement(
         orientation: props.orientation,
         controller: props.controller,
         debug: props.debug,
-        onValueChange: (value: string | null, details: ChangeDetails<SegmentedControlValueChangeReason>) => {
+        onValueChange: (
+          value: string | null,
+          details: ChangeDetails<SegmentedControlValueChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
       }))
-      return usePart(control, "root", undefined, undefined, { tag: "div", extend: field?.props })
+      return usePart(control, "root", undefined, undefined, {
+        tag: "div",
+        extend: field?.props,
+      })
     },
-  }),
+  })
 )
 
 /**
@@ -88,17 +104,24 @@ const SegmentedControlItem = withElement(
   defineComponent({
     name: "SegmentedControlItem",
     inheritAttrs: false,
-    props: { value: { type: String, required: true }, disabled: optionalBoolean },
+    props: {
+      value: { type: String, required: true },
+      disabled: optionalBoolean,
+    },
     slots: Object as PartSlots<typeof segmentedControl, "item">,
     setup(props) {
       const control = useScope(segmentedControl)?.handle
-      if (!control) throw new Error("SegmentedControlItem must be used inside <SegmentedControl>.")
+      if (!control) {
+        throw new Error(
+          "SegmentedControlItem must be used inside <SegmentedControl>."
+        )
+      }
       const item = () => ({ value: props.value, disabled: props.disabled })
       provideProps(segmentedControl, "item", item)
       const button = usePart(control, "item", item, undefined, "button")
       return () => [button(), h("input", control.slot("input", item()))]
     },
-  }),
+  })
 )
 
 /**

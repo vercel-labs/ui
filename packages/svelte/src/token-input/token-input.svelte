@@ -18,7 +18,14 @@ it. The `token` snippet renders each token's content.
     type TokenInputValueChangeReason,
   } from "@ui-sdk/core/token-input"
   import { renderVersion } from "@ui-sdk/core/renderer"
-  import { getAllContexts, mount, onDestroy, setContext, unmount, type Snippet } from "svelte"
+  import {
+    getAllContexts,
+    mount,
+    onDestroy,
+    setContext,
+    unmount,
+    type Snippet,
+  } from "svelte"
   import { EditorKey, type EditorContext } from "../editor-context"
   import { useFieldControl } from "../field/context"
   import { provideInstance } from "../instance"
@@ -26,7 +33,10 @@ it. The `token` snippet renders each token's content.
   import { TokenKey } from "./context"
   import TokenInputHost from "./token-input-host.svelte"
 
-  type ValueDetails = ChangeDetails<TokenInputValueChangeReason> & { inputType?: string; removed: Token[] }
+  type ValueDetails = ChangeDetails<TokenInputValueChangeReason> & {
+    inputType?: string
+    removed: Token[]
+  }
 
   let {
     value = $bindable(),
@@ -80,7 +90,10 @@ it. The `token` snippet renders each token's content.
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs on the submit shortcut. Without it, the shortcut submits the form the input is in. */
-    onSubmit?: (value: TokenInputValue, details: TokenInputSubmitDetails) => void
+    onSubmit?: (
+      value: TokenInputValue,
+      details: TokenInputSubmitDetails
+    ) => void
     /** Runs when typing, pasting, a menu, undo or a controller wants to change the value. `details.cancel()` stops it. */
     onValueChange?: (value: TokenInputValue, details: ValueDetails) => void
     children?: Snippet
@@ -113,7 +126,9 @@ it. The `token` snippet renders each token's content.
     onValueChange: (next: TokenInputValue, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   provideInstance(tokenInputPrimitive, input)
@@ -132,8 +147,16 @@ it. The `token` snippet renders each token's content.
   // an effect stays alive when the effect runs again; it leaves when its
   // host does, or with this component.
   const contexts = getAllContexts()
-  const mounted = new Map<string, { host: Element; update: (token: Token) => void; destroy: () => void }>()
-  const mountHost = (key: string, host: Element, first: Token, render: Snippet<[Token]>) => {
+  const mounted = new Map<
+    string,
+    { host: Element; update: (token: Token) => void; destroy: () => void }
+  >()
+  const mountHost = (
+    key: string,
+    host: Element,
+    first: Token,
+    render: Snippet<[Token]>
+  ) => {
     let current = $state.raw(first)
     const component = mount(TokenInputHost, {
       target: host,
@@ -148,12 +171,20 @@ it. The `token` snippet renders each token's content.
       },
       context: new Map<unknown, unknown>([...contexts, [TokenKey, key]]),
     })
-    return { host, update: (next: Token) => (current = next), destroy: () => unmount(component) }
+    return {
+      host,
+      update: (next: Token) => (current = next),
+      destroy: () => unmount(component),
+    }
   }
   const sync = (render: Snippet<[Token]> | undefined) => {
     const seen = new Set<string>()
-    if (render)
-      for (const { id: key, token: current, host } of input.api.internal.hosts()) {
+    if (render) {
+      for (const {
+        id: key,
+        token: current,
+        host,
+      } of input.api.internal.hosts()) {
         seen.add(key)
         const entry = mounted.get(key)
         if (entry?.host === host) {
@@ -163,15 +194,19 @@ it. The `token` snippet renders each token's content.
         entry?.destroy()
         mounted.set(key, mountHost(key, host, current, render))
       }
-    for (const [key, entry] of mounted)
+    }
+    for (const [key, entry] of mounted) {
       if (!seen.has(key)) {
         entry.destroy()
         mounted.delete(key)
       }
+    }
   }
   // Runs again when hosts come and go, and when tokens change.
   let version = $state(0)
-  $effect(() => input.instance.subscribe(() => (version = renderVersion(input.instance))))
+  $effect(() =>
+    input.instance.subscribe(() => (version = renderVersion(input.instance)))
+  )
   $effect(() => {
     version
     sync(token)

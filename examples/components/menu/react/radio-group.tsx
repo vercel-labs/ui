@@ -33,7 +33,10 @@ function Example() {
           ))}
         </MenuRadioGroup>
         <MenuSeparator />
-        <MenuRadioGroup defaultValue="comfortable" onValueChange={(value) => log(`${value} density`)}>
+        <MenuRadioGroup
+          defaultValue="comfortable"
+          onValueChange={(value) => log(`${value} density`)}
+        >
           <MenuGroupLabel>Density</MenuGroupLabel>
           {["Compact", "Comfortable"].map((option) => (
             <MenuRadioItem key={option} value={option.toLowerCase()}>

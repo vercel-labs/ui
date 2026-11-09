@@ -16,14 +16,25 @@ import {
 } from "@ui-sdk/vue/combobox"
 import { ref } from "vue"
 
-const initialLabels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const initialLabels = [
+  "Bug",
+  "Feature",
+  "Documentation",
+  "Design",
+  "Performance",
+  "Security",
+  "Testing",
+]
 
 function saveLabel(name: string) {
   return new Promise<void>((resolve, reject) =>
     setTimeout(
-      () => (name.length > 20 ? reject(new Error("Labels are 20 characters at most.")) : resolve()),
-      800,
-    ),
+      () =>
+        name.length > 20
+          ? reject(new Error("Labels are 20 characters at most."))
+          : resolve(),
+      800
+    )
   )
 }
 
@@ -43,7 +54,11 @@ async function create(query: string) {
       <ComboboxLabel>Labels</ComboboxLabel>
       <ComboboxChips>
         <ComboboxValue v-slot="{ value: selected }">
-          <ComboboxChip v-for="label in selected as string[]" :key="label" :value="label">
+          <ComboboxChip
+            v-for="label in selected as string[]"
+            :key="label"
+            :value="label"
+          >
             {{ label }}
             <ComboboxChipRemove :aria-label="`Remove ${label}`">
               <XIcon aria-hidden="true" />
@@ -70,7 +85,9 @@ async function create(query: string) {
             <PlusIcon aria-hidden="true" />
             <span data-slot="stack">
               Create “{{ state.query }}”
-              <span v-if="state.error" data-slot="hint">{{ (state.error as Error).message }}</span>
+              <span v-if="state.error" data-slot="hint">{{
+                (state.error as Error).message
+              }}</span>
             </span>
           </template>
         </ComboboxCreate>

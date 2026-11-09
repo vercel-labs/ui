@@ -9,27 +9,62 @@ import {
   NavigationMenuTrigger,
   NavigationMenuViewport,
 } from "@ui-sdk/vue"
-import { createApp, defineComponent, h, onBeforeUnmount, ref, watch, type PropType } from "vue"
+import {
+  createApp,
+  defineComponent,
+  h,
+  onBeforeUnmount,
+  ref,
+  watch,
+  type PropType,
+} from "vue"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
-import { hasViewport, href, items, moreLinks, nestedLinks, type Item, type Variant } from "./variants"
+import {
+  hasViewport,
+  href,
+  items,
+  moreLinks,
+  nestedLinks,
+  type Item,
+  type Variant,
+} from "./variants"
 
 const chevron = () =>
-  h("svg", { class: classes.chevron, viewBox: "0 0 12 12", fill: "none", "aria-hidden": "true" }, [
-    h("path", {
-      d: "M3 4.5 6 7.5l3-3",
-      stroke: "currentColor",
-      "stroke-width": "1.5",
-      "stroke-linecap": "round",
-    }),
-  ])
+  h(
+    "svg",
+    {
+      class: classes.chevron,
+      viewBox: "0 0 12 12",
+      fill: "none",
+      "aria-hidden": "true",
+    },
+    [
+      h("path", {
+        d: "M3 4.5 6 7.5l3-3",
+        stroke: "currentColor",
+        "stroke-width": "1.5",
+        "stroke-linecap": "round",
+      }),
+    ]
+  )
 
-function link(variant: Variant, label: string, description?: string, closeOnSelect?: boolean) {
+function link(
+  variant: Variant,
+  label: string,
+  description?: string,
+  closeOnSelect?: boolean
+) {
   return h("li", { key: label }, [
-    h(NavigationMenuLink, { class: classes.link, href: href(variant, label), closeOnSelect }, () => [
-      h("span", { class: classes.linkTitle }, label),
-      description && h("span", { class: classes.linkDescription }, description),
-    ]),
+    h(
+      NavigationMenuLink,
+      { class: classes.link, href: href(variant, label), closeOnSelect },
+      () => [
+        h("span", { class: classes.linkTitle }, label),
+        description &&
+          h("span", { class: classes.linkDescription }, description),
+      ]
+    ),
   ])
 }
 
@@ -46,16 +81,19 @@ function nested(variant: Variant, env: Env) {
     () =>
       h(NavigationMenuList, { class: classes.list }, () =>
         h(NavigationMenuItem, { value: "learn" }, () => [
-          h(NavigationMenuTrigger, { class: classes.trigger }, () => ["Learn ", chevron()]),
+          h(NavigationMenuTrigger, { class: classes.trigger }, () => [
+            "Learn ",
+            chevron(),
+          ]),
           h(NavigationMenuContent, { class: classes.nestedContent }, () =>
             h(
               "ul",
               { class: classes.links },
-              nestedLinks.map((label) => link(variant, label)),
-            ),
+              nestedLinks.map((label) => link(variant, label))
+            )
           ),
-        ]),
-      ),
+        ])
+      )
   )
 }
 
@@ -71,7 +109,10 @@ const Panel = defineComponent({
     const menuCloses = variant.options?.closeOnSelect ?? true
     const links =
       first && variant.body === "long"
-        ? Array.from({ length: 30 }, (_, index) => ({ label: `Product ${index + 1}`, description: "" }))
+        ? Array.from({ length: 30 }, (_, index) => ({
+            label: `Product ${index + 1}`,
+            description: "",
+          }))
         : item.links
     return () =>
       h(
@@ -88,18 +129,27 @@ const Panel = defineComponent({
                 variant,
                 entry.label,
                 entry.description,
-                variant.linkCloseOnSelect && index === 0 ? !menuCloses : undefined,
-              ),
+                variant.linkCloseOnSelect && index === 0
+                  ? !menuCloses
+                  : undefined
+              )
             ),
-            ...(grown.value ? moreLinks.map((label) => link(variant, label)) : []),
+            ...(grown.value
+              ? moreLinks.map((label) => link(variant, label))
+              : []),
           ]),
           first &&
             variant.body === "dynamic" &&
-            h("button", { class: classes.more, onClick: () => (grown.value = !grown.value) }, [
-              grown.value ? "Show less" : "Show more",
-            ]),
+            h(
+              "button",
+              {
+                class: classes.more,
+                onClick: () => (grown.value = !grown.value),
+              },
+              [grown.value ? "Show less" : "Show more"]
+            ),
           first && variant.body === "nested" && nested(variant, env),
-        ],
+        ]
       )
   },
 })
@@ -131,23 +181,33 @@ const VariantMenu = defineComponent({
           container: env.container,
           controller: env.controller,
           "onUpdate:value": (next: string | null) => {
-            if (variant.controlled) value.value = next
+            if (variant.controlled) {
+              value.value = next
+            }
           },
           onValueChange: (next: string | null, { reason }: ChangeDetails) =>
             env.log(`valueChange ${next} (${reason})`),
-          onOpenChangeComplete: (open: boolean) => env.log(`openChangeComplete ${open}`),
+          onOpenChangeComplete: (open: boolean) =>
+            env.log(`openChangeComplete ${open}`),
         },
         () => [
           h(NavigationMenuList, { class: classes.list }, () => [
             ...items.map((item) =>
-              h(NavigationMenuItem, { key: item.value, value: item.value }, () => [
-                h(
-                  NavigationMenuTrigger,
-                  { class: classes.trigger, disabled: variant.disabled === item.value },
-                  () => [`${item.label} `, chevron()],
-                ),
-                h(Panel, { variant, env, item }),
-              ]),
+              h(
+                NavigationMenuItem,
+                { key: item.value, value: item.value },
+                () => [
+                  h(
+                    NavigationMenuTrigger,
+                    {
+                      class: classes.trigger,
+                      disabled: variant.disabled === item.value,
+                    },
+                    () => [`${item.label} `, chevron()]
+                  ),
+                  h(Panel, { variant, env, item }),
+                ]
+              )
             ),
             h(NavigationMenuItem, () =>
               h(
@@ -157,8 +217,8 @@ const VariantMenu = defineComponent({
                   href: href(variant, "pricing"),
                   current: variant.activeLink !== false,
                 },
-                () => "Pricing",
-              ),
+                () => "Pricing"
+              )
             ),
           ]),
           h(NavigationMenuIndicator, { class: classes.indicator }),
@@ -168,7 +228,7 @@ const VariantMenu = defineComponent({
               ...(variant.viewport || {}),
               anchor: env.anchor,
             }),
-        ],
+        ]
       )
   },
 })

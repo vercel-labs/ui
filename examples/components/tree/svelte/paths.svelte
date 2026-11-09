@@ -28,7 +28,9 @@
   const log = useLog()
 
   async function onAction(value: string) {
-    if (!files.has(value)) return
+    if (!files.has(value)) {
+      return
+    }
     await new Promise((resolve) => setTimeout(resolve, 600))
     log(`Opened ${value}`)
   }

@@ -21,7 +21,10 @@ import { createParts } from "@ui-sdk/react/primitive"
 
 function sectorPoint(index: number, count: number, radius: number, start = 0) {
   const angle = (index / Math.max(count, 1) + start) * 2 * Math.PI
-  return { x: Math.round(Math.sin(angle) * radius), y: Math.round(-Math.cos(angle) * radius) }
+  return {
+    x: Math.round(Math.sin(angle) * radius),
+    y: Math.round(-Math.cos(angle) * radius),
+  }
 }
 
 type MarkingMenuItemData = { value: string; label: string; disabled?: boolean }
@@ -40,15 +43,27 @@ type MarkingMenuState = {
 }
 
 type MarkingMenuOpenChangeReason =
-  "trigger-press" | "item-press" | "mark" | "escape-key" | "outside-press" | "window-blur" | "imperative"
+  | "trigger-press"
+  | "item-press"
+  | "mark"
+  | "escape-key"
+  | "outside-press"
+  | "window-blur"
+  | "imperative"
 type MarkingMenuActionReason = "item-press" | "mark"
 
 type MarkingMenuOptions = {
   items: MarkingMenuItemData[]
   open?: boolean
   defaultOpen?: boolean
-  onOpenChange?: (open: boolean, details: ChangeDetails<MarkingMenuOpenChangeReason>) => void
-  onAction?: (value: string, details: ChangeDetails<MarkingMenuActionReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<MarkingMenuOpenChangeReason>
+  ) => void
+  onAction?: (
+    value: string,
+    details: ChangeDetails<MarkingMenuActionReason>
+  ) => void
   radius?: number
   delay?: number
 }
@@ -61,7 +76,11 @@ const deadZone = 18
 const markLength = 40
 const markSpeed = 0.6
 
-function wedgeOf(items: readonly MarkingMenuItemData[], dx: number, dy: number) {
+function wedgeOf(
+  items: readonly MarkingMenuItemData[],
+  dx: number,
+  dy: number
+) {
   const item = items[sectorOf(dx, dy, items.length, { deadZone })]
   return item && !item.disabled ? item.value : null
 }
@@ -97,13 +116,18 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
     const { store, options, onDestroy } = context
     const change = createChange(context)
     const typeahead = createTypeahead()
-    const roving = createRovingFocus<MarkingMenuState, { value: string }>(context, {
-      slot: "item",
-      key: "focused",
-      remember: false,
-      move: spatialMove(),
-      disabled: (item) => !!store.get().items.find((entry) => entry.value === item.key)?.disabled,
-    })
+    const roving = createRovingFocus<MarkingMenuState, { value: string }>(
+      context,
+      {
+        slot: "item",
+        key: "focused",
+        remember: false,
+        move: spatialMove(),
+        disabled: (item) =>
+          !!store.get().items.find((entry) => entry.value === item.key)
+            ?.disabled,
+      }
+    )
     const vx = createVelocityTracker()
     const vy = createVelocityTracker()
     let timer: ReturnType<typeof setTimeout> | undefined
@@ -113,37 +137,68 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
       clearTimeout(timer)
       stopDrag?.()
     })
-    const labelFor = (value: string) => store.get().items.find((item) => item.value === value)?.label ?? value
-    const reset = () => store.set({ mode: "idle", highlighted: null, stroke: { dx: 0, dy: 0 } })
+    const labelFor = (value: string) =>
+      store.get().items.find((item) => item.value === value)?.label ?? value
+    const reset = () =>
+      store.set({ mode: "idle", highlighted: null, stroke: { dx: 0, dy: 0 } })
 
     const api = {
       roving,
       openAt(
         x: number,
         y: number,
-        details: { reason: "trigger-press" | "imperative"; event?: Event } = { reason: "imperative" },
+        details: { reason: "trigger-press" | "imperative"; event?: Event } = {
+          reason: "imperative",
+        }
       ) {
-        store.set({ origin: { x, y }, mode: "menu", highlighted: null, stroke: { dx: 0, dy: 0 } })
-        if (!change("open", true, details)) reset()
+        store.set({
+          origin: { x, y },
+          mode: "menu",
+          highlighted: null,
+          stroke: { dx: 0, dy: 0 },
+        })
+        if (!change("open", true, details)) {
+          reset()
+        }
       },
-      close(details: { reason: MarkingMenuOpenChangeReason; event?: Event } = { reason: "imperative" }) {
+      close(
+        details: { reason: MarkingMenuOpenChangeReason; event?: Event } = {
+          reason: "imperative",
+        }
+      ) {
         clearTimeout(timer)
         reset()
-        if (store.get().open) change("open", false, details)
-        if (details.reason !== "outside-press" && details.reason !== "window-blur")
+        if (store.get().open) {
+          change("open", false, details)
+        }
+        if (
+          details.reason !== "outside-press" &&
+          details.reason !== "window-blur"
+        ) {
           opener?.focus({ preventScroll: true })
+        }
       },
       select(
         value: string,
-        details: { reason: MarkingMenuActionReason; event?: Event } = { reason: "item-press" },
+        details: { reason: MarkingMenuActionReason; event?: Event } = {
+          reason: "item-press",
+        }
       ) {
-        if (store.get().items.find((item) => item.value === value)?.disabled) return
-        if (dispatch(context, "onAction", value, details)) return
-        if (details.reason === "mark") announce(labelFor(value))
+        if (store.get().items.find((item) => item.value === value)?.disabled) {
+          return
+        }
+        if (dispatch(context, "onAction", value, details)) {
+          return
+        }
+        if (details.reason === "mark") {
+          announce(labelFor(value))
+        }
         api.close(details)
       },
       surfacePointerdown(event: PointerEvent, el: HTMLElement) {
-        if (event.button !== 0 || store.get().open) return
+        if (event.button !== 0 || store.get().open) {
+          return
+        }
         event.preventDefault()
         opener = el
         vx.reset()
@@ -155,7 +210,9 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
           stroke: { dx: 0, dy: 0 },
         })
         timer = setTimeout(() => {
-          if (store.get().mode !== "holding") return
+          if (store.get().mode !== "holding") {
+            return
+          }
           store.set({ mode: "menu" })
           change("open", true, { reason: "trigger-press", event })
         }, options().delay ?? 250)
@@ -166,7 +223,10 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
             const dy = y - origin.y
             vx.add(move.timeStamp, x)
             vy.add(move.timeStamp, y)
-            const speed = Math.hypot(vx.velocity(move.timeStamp), vy.velocity(move.timeStamp))
+            const speed = Math.hypot(
+              vx.velocity(move.timeStamp),
+              vy.velocity(move.timeStamp)
+            )
             if (
               mode === "holding" &&
               Math.hypot(dx, dy) > deadZone &&
@@ -175,27 +235,44 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
               clearTimeout(timer)
               store.set({ mode: "marking" })
             }
-            store.set({ stroke: { dx, dy }, highlighted: wedgeOf(items, dx, dy) })
+            store.set({
+              stroke: { dx, dy },
+              highlighted: wedgeOf(items, dx, dy),
+            })
           },
           onEnd: (end, canceled) => {
             clearTimeout(timer)
             const { mode, highlighted } = store.get()
             if (canceled || !highlighted) {
-              if (mode === "menu") store.set({ stroke: { dx: 0, dy: 0 } })
-              else reset()
+              if (mode === "menu") {
+                store.set({ stroke: { dx: 0, dy: 0 } })
+              } else {
+                reset()
+              }
               return
             }
-            api.select(highlighted, { reason: mode === "marking" ? "mark" : "item-press", event: end })
+            api.select(highlighted, {
+              reason: mode === "marking" ? "mark" : "item-press",
+              event: end,
+            })
           },
         })
       },
       surfaceKeydown(event: KeyboardEvent, el: HTMLElement) {
-        if (event.key !== "ContextMenu" && !(event.key === "F10" && event.shiftKey) && event.key !== "Enter")
+        if (
+          event.key !== "ContextMenu" &&
+          !(event.key === "F10" && event.shiftKey) &&
+          event.key !== "Enter"
+        ) {
           return
+        }
         event.preventDefault()
         opener = el
         const box = el.getBoundingClientRect()
-        api.openAt(box.left + box.width / 2, box.top + box.height / 2, { reason: "trigger-press", event })
+        api.openAt(box.left + box.width / 2, box.top + box.height / 2, {
+          reason: "trigger-press",
+          event,
+        })
       },
       itemKeydown(event: KeyboardEvent, el: HTMLElement, value: string) {
         if (event.key === "Enter" || event.key === " ") {
@@ -208,10 +285,14 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
           const index = typeahead(
             event.key,
             items.map((item) => labelOf(item.el)),
-            items.findIndex((item) => item.el === el),
+            items.findIndex((item) => item.el === el)
           )
-          if (index !== -1) items[index].el.focus()
-        } else roving.keydown(event, el)
+          if (index !== -1) {
+            items[index].el.focus()
+          }
+        } else {
+          roving.keydown(event, el)
+        }
       },
     }
     return api
@@ -224,10 +305,15 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
         "aria-haspopup": "menu",
         "aria-expanded": String(state.open),
         "data-mode": state.mode,
-        style: css({ "touch-action": "none", "user-select": "none", "-webkit-user-select": "none" }),
+        style: css({
+          "touch-action": "none",
+          "user-select": "none",
+          "-webkit-user-select": "none",
+        }),
       }),
       on: {
-        pointerdown: (event, { el, api }) => el && api.surfacePointerdown(event, el),
+        pointerdown: (event, { el, api }) =>
+          el && api.surfacePointerdown(event, el),
         keydown: (event, { el, api }) => el && api.surfaceKeydown(event, el),
         contextmenu: (event) => event.preventDefault(),
       },
@@ -272,20 +358,26 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
       }),
       bind: (el, { api }) => {
         requestAnimationFrame(() => api.roving.focus())
-        return bindLayer(el, { topLayer: true, onDismiss: (reason, event) => api.close({ reason, event }) })
+        return bindLayer(el, {
+          topLayer: true,
+          onDismiss: (reason, event) => api.close({ reason, event }),
+        })
       },
     }),
     item: slot<{ value: string }, MarkingMenuItemState>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      state: (state, { key }) => ({ disabled: !!state.items.find((item) => item.value === key)?.disabled }),
+      state: (state, { key }) => ({
+        disabled: !!state.items.find((item) => item.value === key)?.disabled,
+      }),
       attrs: (state, part) => {
         const at = sectorPoint(
           state.items.findIndex((item) => item.value === part.key),
           state.items.length,
-          state.radius,
+          state.radius
         )
-        const disabled = !!state.items.find((item) => item.value === part.key)?.disabled
+        const disabled = !!state.items.find((item) => item.value === part.key)
+          ?.disabled
         return {
           role: "menuitem",
           tabindex: part.api.roving.tabIndex(state, part),
@@ -300,19 +392,28 @@ const markingMenu = /* @__PURE__ */ definePrimitive({
           }),
         }
       },
-      live: live<MarkingMenuState, any, { value: string }>((state, { key }) => ({
-        "data-highlighted": state.highlighted === key ? "" : undefined,
-      })),
+      live: live<MarkingMenuState, any, { value: string }>(
+        (state, { key }) => ({
+          "data-highlighted": state.highlighted === key ? "" : undefined,
+        })
+      ),
       on: {
-        keydown: (event, { el, api, key }) => el && api.itemKeydown(event, el, key),
-        click: (event, { api, key }) => api.select(key, { reason: "item-press", event }),
+        keydown: (event, { el, api, key }) =>
+          el && api.itemKeydown(event, el, key),
+        click: (event, { api, key }) =>
+          api.select(key, { reason: "item-press", event }),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
   }),
 })
 
-const parts = createParts(markingMenu, { surface: "div", stroke: "div", ring: "div", item: "div" })
+const parts = createParts(markingMenu, {
+  surface: "div",
+  stroke: "div",
+  ring: "div",
+  item: "div",
+})
 
 const MarkingMenu = parts.Root
 
@@ -340,7 +441,7 @@ function Example() {
       items={items}
       onAction={(value, details) =>
         setLast(
-          `${items.find((item) => item.value === value)?.label} (${details.reason === "mark" ? "flick" : "ring"})`,
+          `${items.find((item) => item.value === value)?.label} (${details.reason === "mark" ? "flick" : "ring"})`
         )
       }
     >
@@ -348,12 +449,14 @@ function Example() {
         <MarkingMenuSurface aria-label="Message, press and hold for actions">
           <span>Design review moved to Thursday</span>
           <span data-slot="hint">
-            Press and hold here, then move toward an action. Or flick: a quick stroke runs it without the
-            ring.
+            Press and hold here, then move toward an action. Or flick: a quick
+            stroke runs it without the ring.
           </span>
         </MarkingMenuSurface>
         <p data-slot="hint" aria-live="polite">
-          {last ? `Ran ${last}` : "Enter or Shift+F10 opens the ring from the keyboard."}
+          {last
+            ? `Ran ${last}`
+            : "Enter or Shift+F10 opens the ring from the keyboard."}
         </p>
         <MarkingMenuStroke>
           <span />

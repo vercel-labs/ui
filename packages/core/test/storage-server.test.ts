@@ -7,7 +7,10 @@ import {
 } from "../src/foundation/storage/storage"
 
 test("localStorage and sessionStorage are unavailable on the server", () => {
-  for (const storage of [createLocalStorage("color-scheme"), createSessionStorage("color-scheme")]) {
+  for (const storage of [
+    createLocalStorage("color-scheme"),
+    createSessionStorage("color-scheme"),
+  ]) {
     expect(storage.available()).toBe(false)
     expect(storage.readsOnServer).toBe(false)
     expect(storage.get()).toBeNull()
@@ -17,7 +20,9 @@ test("localStorage and sessionStorage are unavailable on the server", () => {
 })
 
 test("a cookie reads the request's Cookie header on the server", () => {
-  const storage = createCookieStorage("color-scheme", { cookie: "density=compact; color-scheme=dark" })
+  const storage = createCookieStorage("color-scheme", {
+    cookie: "density=compact; color-scheme=dark",
+  })
   expect(storage.available()).toBe(true)
   expect(storage.get()).toBe("dark")
   expect(storage.set("light")).toBe(false)

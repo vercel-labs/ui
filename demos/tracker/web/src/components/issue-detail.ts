@@ -38,7 +38,7 @@ function datePicker(issue: Issue, save: (patch: IssuePatch) => void) {
     .value=${issue.due}
     @valuechange=${onChange(
       () => issueOf(issue.id)?.due ?? null,
-      (due) => save({ due }),
+      (due) => save({ due })
     )}
     class="flex text-sm"
   >
@@ -98,9 +98,16 @@ function datePicker(issue: Issue, save: (patch: IssuePatch) => void) {
 function issueDetail(issue: Issue, query: Query) {
   const save = (patch: IssuePatch) => updateIssues([issue.id], patch)
 
-  return html`<article aria-labelledby="issue-title" class="flex min-h-0 flex-1 flex-col">
-    <div class="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2">
-      <span class="text-sm text-muted-foreground tabular-nums">${issue.id}</span>
+  return html`<article
+    aria-labelledby="issue-title"
+    class="flex min-h-0 flex-1 flex-col"
+  >
+    <div
+      class="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2"
+    >
+      <span class="text-sm text-muted-foreground tabular-nums"
+        >${issue.id}</span
+      >
       <span class="ms-auto">
         ${tooltip(
           html`<a
@@ -109,7 +116,7 @@ function issueDetail(issue: Issue, query: Query) {
             class=${button({ variant: "ghost", size: "icon-sm" })}
             >${icon("x")}</a
           >`,
-          "Close",
+          "Close"
         )}
       </span>
     </div>
@@ -128,8 +135,12 @@ function issueDetail(issue: Issue, query: Query) {
                 .defaultValue=${issue.title}
                 class=${cn(styles.control, "h-auto bg-transparent px-1.5 py-1 text-lg font-semibold md:text-lg")}
                 @blur=${(event: FocusEvent) => {
-                  const title = (event.currentTarget as HTMLInputElement).value.trim()
-                  if (title && title !== issue.title) save({ title })
+                  const title = (
+                    event.currentTarget as HTMLInputElement
+                  ).value.trim()
+                  if (title && title !== issue.title) {
+                    save({ title })
+                  }
                 }}
               />
             </ui-field>
@@ -140,8 +151,12 @@ function issueDetail(issue: Issue, query: Query) {
                 placeholder="Add a description…"
                 class=${cn(styles.control, "h-auto min-h-20 resize-none bg-transparent px-1.5 py-2")}
                 @blur=${(event: FocusEvent) => {
-                  const description = (event.currentTarget as HTMLTextAreaElement).value
-                  if (description !== issue.description) save({ description })
+                  const description = (
+                    event.currentTarget as HTMLTextAreaElement
+                  ).value
+                  if (description !== issue.description) {
+                    save({ description })
+                  }
                 }}
               ></textarea>
             </ui-field>
@@ -150,11 +165,13 @@ function issueDetail(issue: Issue, query: Query) {
                 .value=${issue.status}
                 @valuechange=${onChange(
                   () => issueOf(issue.id)?.status ?? null,
-                  (status) => status && save({ status }),
+                  (status) => status && save({ status })
                 )}
               >
                 <div class="grid gap-2">
-                  <ui-select-label class=${styles.label}>Status</ui-select-label>
+                  <ui-select-label class=${styles.label}
+                    >Status</ui-select-label
+                  >
                   ${selectTrigger({ icon: true })}
                 </div>
                 <ui-select-content class=${styles.list}>
@@ -166,27 +183,36 @@ function issueDetail(issue: Issue, query: Query) {
                 .itemToLabel=${(id: string) => personOf(id)?.name ?? ""}
                 @valuechange=${onChange(
                   () => issueOf(issue.id)?.assignee ?? null,
-                  (assignee) => save({ assignee }),
+                  (assignee) => save({ assignee })
                 )}
               >
                 <div class="grid gap-2">
-                  <ui-combobox-label class=${styles.label}>Assignee</ui-combobox-label>
+                  <ui-combobox-label class=${styles.label}
+                    >Assignee</ui-combobox-label
+                  >
                   <div class="relative">
                     <ui-combobox-input
-                      ><input placeholder="Nobody" class=${styles.comboboxInput}
+                      ><input
+                        placeholder="Nobody"
+                        class=${styles.comboboxInput}
                     /></ui-combobox-input>
                     ${comboboxTrigger("Show people")}
                   </div>
                 </div>
-                <ui-combobox-content class=${cn(styles.list, "w-(--anchor-width) min-w-44")}>
-                  <ui-combobox-empty class=${styles.empty}>Nobody matches.</ui-combobox-empty>
+                <ui-combobox-content
+                  class=${cn(styles.list, "w-(--anchor-width) min-w-44")}
+                >
+                  <ui-combobox-empty class=${styles.empty}
+                    >Nobody matches.</ui-combobox-empty
+                  >
                   <ui-combobox-list>
                     ${people.map((person) =>
                       comboboxItem(
                         person.id,
                         person.name,
-                        html`${avatar(person.name, { size: "sm", decorative: true })} ${person.name}`,
-                      ),
+                        html`${avatar(person.name, { size: "sm", decorative: true })}
+                        ${person.name}`
+                      )
                     )}
                   </ui-combobox-list>
                 </ui-combobox-content>
@@ -201,11 +227,13 @@ function issueDetail(issue: Issue, query: Query) {
                 .itemToLabel=${(id: string) => labelOf(id)?.name ?? id}
                 @valuechange=${onChange(
                   () => issueOf(issue.id)?.labels ?? [],
-                  (labels) => save({ labels }),
+                  (labels) => save({ labels })
                 )}
               >
                 <div class="grid gap-2">
-                  <ui-combobox-label class=${styles.label}>Labels</ui-combobox-label>
+                  <ui-combobox-label class=${styles.label}
+                    >Labels</ui-combobox-label
+                  >
                   <ui-combobox-chips class=${styles.chips}>
                     <ui-combobox-input>
                       <input
@@ -216,16 +244,23 @@ function issueDetail(issue: Issue, query: Query) {
                     ${comboboxTrigger("Show labels")}
                   </ui-combobox-chips>
                 </div>
-                <ui-combobox-content class=${cn(styles.list, "w-(--anchor-width) min-w-44")}>
-                  <ui-combobox-empty class=${styles.empty}>No labels match.</ui-combobox-empty>
+                <ui-combobox-content
+                  class=${cn(styles.list, "w-(--anchor-width) min-w-44")}
+                >
+                  <ui-combobox-empty class=${styles.empty}
+                    >No labels match.</ui-combobox-empty
+                  >
                   <ui-combobox-list>
                     ${labels.map((label) =>
                       comboboxItem(
                         label.id,
                         label.name,
-                        html`<span class="size-2 rounded-full" style="background: ${label.color}"></span>
-                          ${label.name}`,
-                      ),
+                        html`<span
+                            class="size-2 rounded-full"
+                            style="background: ${label.color}"
+                          ></span>
+                          ${label.name}`
+                      )
                     )}
                   </ui-combobox-list>
                 </ui-combobox-content>
@@ -250,11 +285,13 @@ function issueDetail(issue: Issue, query: Query) {
               .value=${issue.priority}
               @valuechange=${onChange(
                 () => issueOf(issue.id)?.priority ?? null,
-                (priority) => priority && save({ priority }),
+                (priority) => priority && save({ priority })
               )}
               class="grid gap-2"
             >
-              <span id="priority-label" class="text-sm leading-none font-medium">Priority</span>
+              <span id="priority-label" class="text-sm leading-none font-medium"
+                >Priority</span
+              >
               <div class="flex flex-wrap gap-x-4 gap-y-2">
                 ${priorities.map(
                   (priority) =>
@@ -265,7 +302,7 @@ function issueDetail(issue: Issue, query: Query) {
                         ></ui-radio-indicator>
                       </ui-radio>
                       ${priorityIcon(priority.value)} ${priority.label}
-                    </label>`,
+                    </label>`
                 )}
               </div>
             </ui-radio-group>
@@ -276,7 +313,9 @@ function issueDetail(issue: Issue, query: Query) {
       <ui-scroll-area-scrollbar
         class="flex w-2.5 p-px opacity-0 transition-opacity duration-150 data-visible:opacity-100 motion-reduce:transition-none"
       >
-        <ui-scroll-area-thumb class="relative flex-1 rounded-full bg-border"></ui-scroll-area-thumb>
+        <ui-scroll-area-thumb
+          class="relative flex-1 rounded-full bg-border"
+        ></ui-scroll-area-thumb>
       </ui-scroll-area-scrollbar>
     </ui-scroll-area>
   </article>`

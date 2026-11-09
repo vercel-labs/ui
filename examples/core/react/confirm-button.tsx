@@ -4,7 +4,10 @@ import { useLog } from "../../shared/react/log"
 
 type ConfirmButtonOptions = {
   onConfirm?: () => void
-  onArmedChange?: (armed: boolean, details: ChangeDetails<"press" | "timeout">) => void
+  onArmedChange?: (
+    armed: boolean,
+    details: ChangeDetails<"press" | "timeout">
+  ) => void
   timeout?: number
 }
 
@@ -12,8 +15,14 @@ type ConfirmButtonState = { armed: boolean }
 
 const confirmButton = definePrimitive({
   name: "confirm-button",
-  options: { onConfirm: "callback", onArmedChange: "callback", timeout: "number" },
-  state: (_options: ConfirmButtonOptions): ConfirmButtonState => ({ armed: false }),
+  options: {
+    onConfirm: "callback",
+    onArmedChange: "callback",
+    timeout: "number",
+  },
+  state: (_options: ConfirmButtonOptions): ConfirmButtonState => ({
+    armed: false,
+  }),
   api: (context) => {
     const { store, options, onDestroy } = context
     const change = createChange(context)
@@ -26,7 +35,10 @@ const confirmButton = definePrimitive({
           change("armed", false, { reason: "press", event })
           options().onConfirm?.()
         } else if (change("armed", true, { reason: "press", event })) {
-          timer = setTimeout(() => change("armed", false, { reason: "timeout" }), options().timeout ?? 3000)
+          timer = setTimeout(
+            () => change("armed", false, { reason: "timeout" }),
+            options().timeout ?? 3000
+          )
         }
       },
     }
@@ -34,7 +46,10 @@ const confirmButton = definePrimitive({
   slots: (slot) => ({
     root: slot<{}, ConfirmButtonState>({
       state: (state) => ({ armed: state.armed }),
-      attrs: (state) => ({ type: "button", "data-armed": state.armed ? "" : undefined }),
+      attrs: (state) => ({
+        type: "button",
+        "data-armed": state.armed ? "" : undefined,
+      }),
       press: ({ api }, event) => api.press(event),
     }),
   }),
@@ -53,4 +68,10 @@ function Example() {
   )
 }
 
-export { confirmButton, ConfirmButton, Example, type ConfirmButtonOptions, type ConfirmButtonState }
+export {
+  confirmButton,
+  ConfirmButton,
+  Example,
+  type ConfirmButtonOptions,
+  type ConfirmButtonState,
+}

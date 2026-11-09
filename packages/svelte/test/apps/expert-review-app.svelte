@@ -10,11 +10,13 @@
   let {
     log,
     api = $bindable(),
-  }: { log: (entry: string) => void; api?: { set: (value: string) => void } } = $props()
+  }: { log: (entry: string) => void; api?: { set: (value: string) => void } } =
+    $props()
   let selected = $state<string>()
   api = { set: (value) => (selected = value) }
   const { Root: GeneratedToggle } = createParts(toggle, { root: "button" })
-  const inspect: Attachment<HTMLElement> = (el) => log(`attached:${el.textContent}`)
+  const inspect: Attachment<HTMLElement> = (el) =>
+    log(`attached:${el.textContent}`)
 </script>
 
 <Toggle
@@ -29,7 +31,10 @@
   {/snippet}
 </Toggle>
 
-<Tabs defaultValue="a" bind:value={() => selected, (next) => log(`requested:${next}`)}>
+<Tabs
+  defaultValue="a"
+  bind:value={() => selected, (next) => log(`requested:${next}`)}
+>
   <TabsList aria-label="Settings">
     <TabsTab value="a">Alpha</TabsTab>
     <TabsTab value="b">Beta</TabsTab>

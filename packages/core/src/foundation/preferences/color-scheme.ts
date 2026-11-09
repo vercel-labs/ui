@@ -60,7 +60,10 @@ type ColorSchemeOptions = {
    */
   initial?: SystemColorScheme
   /** Called before the app's scheme changes. `details.cancel()` keeps the current one. */
-  onValueChange?: (value: ColorSchemeValue, details: ChangeDetails<ChangeReason>) => void
+  onValueChange?: (
+    value: ColorSchemeValue,
+    details: ChangeDetails<ChangeReason>
+  ) => void
   /** Called when the browser's preference changes, while something subscribes or follows. */
   onSystemValueChange?: (value: "light" | "dark") => void
   /**
@@ -102,9 +105,13 @@ const sharedByView = new WeakMap<Window, Shared>()
 
 // The window's one query and its listeners, made the first time a color scheme reads it.
 function sharedOf(view: Window | undefined) {
-  if (!view || typeof view.matchMedia !== "function") return
+  if (!view || typeof view.matchMedia !== "function") {
+    return
+  }
   let shared = sharedByView.get(view)
-  if (shared) return shared
+  if (shared) {
+    return shared
+  }
   const query = view.matchMedia("(prefers-color-scheme: dark)")
   const listeners = new Set<() => void>()
   shared = {
@@ -113,14 +120,17 @@ function sharedOf(view: Window | undefined) {
     supported: query.media !== "not all",
     listeners,
     notify: () => {
-      for (const listener of [...listeners]) listener()
+      for (const listener of [...listeners]) {
+        listener()
+      }
     },
   }
   sharedByView.set(view, shared)
   return shared
 }
 
-const resolve = (value: ColorSchemeValue, system: SystemColorScheme) => (value === "system" ? system : value)
+const resolve = (value: ColorSchemeValue, system: SystemColorScheme) =>
+  value === "system" ? system : value
 
 /**
  * The app's color scheme: a choice of `"system"`, `"light"` or `"dark"`, the
@@ -140,7 +150,8 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
     storage: options.storage,
     onValueChange: options.onValueChange,
   })
-  const shared = () => sharedOf(options.view ?? (isBrowser ? window : undefined))
+  const shared = () =>
+    sharedOf(options.view ?? (isBrowser ? window : undefined))
   const listeners = new Set<(state: ColorSchemeState) => void>()
 
   const systemNow = () => {
@@ -154,7 +165,11 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
   }
 
   const snapshot = (value: ColorSchemeValue, system: SystemColorScheme) => {
-    const next: ColorSchemeState = { value, system, resolved: resolve(value, system) }
+    const next: ColorSchemeState = {
+      value,
+      system,
+      resolved: resolve(value, system),
+    }
     return next
   }
   const initialState = snapshot(choice.initialState.value, initial)
@@ -164,21 +179,29 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
   const get = () => {
     const value = choice.get().value
     const system = systemNow()
-    if (state.value !== value || state.system !== system) state = snapshot(value, system)
+    if (state.value !== value || state.system !== system) {
+      state = snapshot(value, system)
+    }
     return state
   }
 
   const notify = () => {
     const next = get()
-    for (const listener of [...listeners]) listener(next)
+    for (const listener of [...listeners]) {
+      listener(next)
+    }
   }
 
   let lastSystem: SystemColorScheme | undefined
   const onSystem = () => {
     const system = systemNow()
-    if (system === lastSystem) return
+    if (system === lastSystem) {
+      return
+    }
     lastSystem = system
-    if (system !== "unknown") options.onSystemValueChange?.(system)
+    if (system !== "unknown") {
+      options.onSystemValueChange?.(system)
+    }
     notify()
   }
 
@@ -192,18 +215,26 @@ function createColorScheme(options: ColorSchemeOptions = {}) {
     if (listeners.size === 1) {
       if (current?.supported) {
         lastSystem = systemNow()
-        if (current.listeners.size === 0) current.query.addEventListener("change", current.notify)
+        if (current.listeners.size === 0) {
+          current.query.addEventListener("change", current.notify)
+        }
         current.listeners.add(onSystem)
       }
       // The choice's first subscriber reads back what was saved, after hydration.
       unwatchChoice = choice.subscribe(notify)
     }
     return () => {
-      if (!listeners.delete(entry) || listeners.size > 0) return
+      if (!listeners.delete(entry) || listeners.size > 0) {
+        return
+      }
       unwatchChoice?.()
       unwatchChoice = undefined
-      if (!current?.listeners.delete(onSystem)) return
-      if (current.listeners.size === 0) current.query.removeEventListener("change", current.notify)
+      if (!current?.listeners.delete(onSystem)) {
+        return
+      }
+      if (current.listeners.size === 0) {
+        current.query.removeEventListener("change", current.notify)
+      }
     }
   }
 
@@ -253,7 +284,8 @@ type ColorScheme = ReturnType<typeof createColorScheme>
  */
 function colorSchemeOf(hint: string | null | undefined) {
   const value = hint?.trim().replace(/^"(.*)"$/, "$1")
-  const system: SystemColorScheme = value === "light" || value === "dark" ? value : "unknown"
+  const system: SystemColorScheme =
+    value === "light" || value === "dark" ? value : "unknown"
   return system
 }
 

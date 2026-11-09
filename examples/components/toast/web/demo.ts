@@ -23,7 +23,7 @@ function mount(root: HTMLElement) {
     toast("Event created", {
       description: "Friday, June 12 at 10:00 AM",
       action: { label: "Undo", onAction: () => log(root, "Event removed") },
-    }),
+    })
   )
   return () => {
     toast.dismiss()

@@ -8,7 +8,11 @@ const frameworks = [
 
 describe("combobox headless", () => {
   test("clearing empties the value and the text", () => {
-    const instance = combobox({ id: "c", items: frameworks, defaultValue: "astro" })
+    const instance = combobox({
+      id: "c",
+      items: frameworks,
+      defaultValue: "astro",
+    })
     expect(instance.api.getQuery()).toBe("Astro")
     instance.api.clear()
     expect(instance.api.getValue()).toBe(null)
@@ -71,7 +75,11 @@ describe("combobox headless", () => {
   })
 
   test("Escape after clearing keeps the value cleared", () => {
-    const instance = combobox({ id: "c", items: frameworks, defaultValue: "astro" })
+    const instance = combobox({
+      id: "c",
+      items: frameworks,
+      defaultValue: "astro",
+    })
     instance.api.internal.typed("")
     instance.api.internal.typed("N")
     instance.api.clear({ reason: "clear-press" })
@@ -81,7 +89,11 @@ describe("combobox headless", () => {
   })
 
   test("Escape brings back the value deleted last, not an earlier one", () => {
-    const instance = combobox({ id: "c", items: frameworks, defaultValue: "astro" })
+    const instance = combobox({
+      id: "c",
+      items: frameworks,
+      defaultValue: "astro",
+    })
     // Deleting the text without the list opening, then setting a value from code.
     instance.api.internal.typed("")
     instance.api.setValue("next")
@@ -100,7 +112,12 @@ describe("combobox headless", () => {
   })
 
   test("a read-only combobox ignores clear", () => {
-    const instance = combobox({ id: "c", items: frameworks, defaultValue: "astro", readOnly: true })
+    const instance = combobox({
+      id: "c",
+      items: frameworks,
+      defaultValue: "astro",
+      readOnly: true,
+    })
     instance.api.clear()
     expect(instance.api.getValue()).toBe("astro")
     expect(instance.api.getQuery()).toBe("Astro")
@@ -113,7 +130,12 @@ describe("combobox headless", () => {
   })
 
   test("a multiple combobox keeps its text when new items arrive", () => {
-    const options = { id: "c", items: frameworks, multiple: true, keepQuery: true }
+    const options = {
+      id: "c",
+      items: frameworks,
+      multiple: true,
+      keepQuery: true,
+    }
     const instance = combobox(options)
     instance.api.setQuery("astro")
     instance.api.internal.choose("astro")

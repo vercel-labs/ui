@@ -13,7 +13,11 @@
 </script>
 
 <Field>
-  <Slider defaultValue={[10, 20, 70]} step={10} format={{ style: "unit", unit: "percent" }}>
+  <Slider
+    defaultValue={[10, 20, 70]}
+    step={10}
+    format={{ style: "unit", unit: "percent" }}
+  >
     <div data-slot="row">
       <FieldLabel>Alert thresholds</FieldLabel>
       <SliderValue />

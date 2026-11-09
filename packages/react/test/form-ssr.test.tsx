@@ -1,14 +1,22 @@
 // @vitest-environment node
 import { renderToString } from "react-dom/server"
 import { describe, expect, test } from "vitest"
-import { Field, FieldError, FieldLabel, FieldLegend, FieldSet } from "../src/field"
+import {
+  Field,
+  FieldError,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "../src/field"
 import { Input, InputClear, InputGroup } from "../src/input"
 import { Textarea } from "../src/textarea"
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering text fields and forms", () => {
   test("an input renders its default value and filled state", () => {
-    const html = renderToString(<Input name="email" defaultValue="ada@example.com" required />)
+    const html = renderToString(
+      <Input name="email" defaultValue="ada@example.com" required />
+    )
     expect(typeof window).toBe("undefined")
     expect(html).toMatch(/<input[^>]*name="email"[^>]*value="ada@example.com"/)
     expect(html).toContain('required=""')
@@ -27,7 +35,7 @@ describe("server rendering text fields and forms", () => {
         <FieldLabel>Email</FieldLabel>
         <Input type="email" />
         <FieldError>This email bounced.</FieldError>
-      </Field>,
+      </Field>
     )
     expect(html).toContain("This email bounced.")
     expect(html).toContain('aria-invalid="true"')
@@ -40,7 +48,7 @@ describe("server rendering text fields and forms", () => {
         <Field name="email" invalid={invalid}>
           <Input type="email" required />
           <FieldError>Enter your email.</FieldError>
-        </Field>,
+        </Field>
       )
       expect(html).not.toContain("Enter your email.")
       expect(html).not.toContain("aria-invalid")
@@ -52,7 +60,7 @@ describe("server rendering text fields and forms", () => {
       <FieldSet disabled>
         <FieldLegend>Contact</FieldLegend>
         <Input />
-      </FieldSet>,
+      </FieldSet>
     )
     expect(html).toMatch(/<fieldset[^>]*disabled=""[^>]*data-disabled=""/)
     expect(html).toMatch(/<legend[^>]*>Contact<\/legend>/)
@@ -63,7 +71,7 @@ describe("server rendering text fields and forms", () => {
       <InputGroup>
         <Input defaultValue="shoes" />
         <InputClear>Clear</InputClear>
-      </InputGroup>,
+      </InputGroup>
     )
     expect(html).toContain('data-slot="input-group"')
     expect(html).not.toContain("Clear")

@@ -8,7 +8,12 @@ import {
 } from "@ui-sdk/core/segmented-control"
 import * as React from "react"
 import { controlRender, FieldContext, useJoinField } from "./field-context"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(segmentedControl, { indicator: "span" })
 
@@ -34,7 +39,10 @@ function SegmentedControl<T extends string = string>({
   render,
   ...props
 }: SegmentedControlOptions<T> &
-  Omit<PartProps<"div", SegmentedControlState>, "defaultValue" | "onChange" | "onSelect">) {
+  Omit<
+    PartProps<"div", SegmentedControlState>,
+    "defaultValue" | "onChange" | "onSelect"
+  >) {
   const field = useJoinField(React.useContext(FieldContext))
   const control = usePrimitive(segmentedControl, {
     value,
@@ -50,7 +58,12 @@ function SegmentedControl<T extends string = string>({
     controller: controller as SegmentedControlController | undefined,
     debug,
   })
-  return usePart(control, "root", {}, { ...props, render: controlRender(field, "div", render) })
+  return usePart(
+    control,
+    "root",
+    {},
+    { ...props, render: controlRender(field, "div", render) }
+  )
 }
 
 function SegmentedControlInput(props: SegmentedControlItemProps) {
@@ -66,14 +79,15 @@ function SegmentedControlItem({
   disabled,
   render,
   ...props
-}: Omit<PartProps<"button", SegmentedControlItemState>, "value" | "onSelect"> & SegmentedControlItemProps) {
+}: Omit<PartProps<"button", SegmentedControlItemState>, "value" | "onSelect"> &
+  SegmentedControlItemProps) {
   const input = <SegmentedControlInput value={value} disabled={disabled} />
   return usePart(
     segmentedControl,
     "item",
     { value, disabled },
     { ...props, render: controlRender(null, "button", render, input) },
-    "button",
+    "button"
   )
 }
 

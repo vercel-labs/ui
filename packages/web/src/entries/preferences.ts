@@ -3,6 +3,15 @@ import { definePreferencesElements } from "../preferences"
 
 definePreferencesElements()
 
-export { createColorScheme, createPreference, preferencesScript } from "@ui-sdk/core"
-export type { ColorScheme, Preference, PreferenceLike, PreferenceOptions } from "@ui-sdk/core"
+export {
+  createColorScheme,
+  createPreference,
+  preferencesScript,
+} from "@ui-sdk/core"
+export type {
+  ColorScheme,
+  Preference,
+  PreferenceLike,
+  PreferenceOptions,
+} from "@ui-sdk/core"
 export type { UiPreferencesElement } from "../events"

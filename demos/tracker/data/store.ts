@@ -20,7 +20,12 @@ function getIssue(id: string) {
   return store.issues.find((issue) => issue.id === id) ?? null
 }
 
-function createIssue(input: Pick<Issue, "title" | "description" | "status" | "priority" | "assignee">) {
+function createIssue(
+  input: Pick<
+    Issue,
+    "title" | "description" | "status" | "priority" | "assignee"
+  >
+) {
   const issue: Issue = {
     ...input,
     id: `TRK-${store.nextId++}`,
@@ -35,7 +40,11 @@ function createIssue(input: Pick<Issue, "title" | "description" | "status" | "pr
 }
 
 function updateIssues(ids: string[], patch: Partial<Omit<Issue, "id">>) {
-  for (const issue of store.issues) if (ids.includes(issue.id)) Object.assign(issue, patch)
+  for (const issue of store.issues) {
+    if (ids.includes(issue.id)) {
+      Object.assign(issue, patch)
+    }
+  }
 }
 
 function deleteIssues(ids: string[]) {
@@ -44,7 +53,9 @@ function deleteIssues(ids: string[]) {
 
 function setSubtasksDone(id: string, done: string[]) {
   const issue = getIssue(id)
-  if (issue) issue.subtasks = markSubtasks(issue.subtasks, done)
+  if (issue) {
+    issue.subtasks = markSubtasks(issue.subtasks, done)
+  }
 }
 
 function addComment(id: string, author: string, body: string) {

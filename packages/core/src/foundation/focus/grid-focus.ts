@@ -42,12 +42,19 @@ type GridFocusOptions<State extends object> = {
   /** Runs after the active cell moves, with the cell it left. */
   onMove?: (
     cell: GridCell,
-    details: { from: GridCell | null; reason: GridFocusReason; event?: Event; shift: boolean },
+    details: {
+      from: GridCell | null
+      reason: GridFocusReason
+      event?: Event
+      shift: boolean
+    }
   ) => void
 }
 
-const sameCell = (a: GridCell | null | undefined, b: GridCell | null | undefined) =>
-  !!a && !!b && a.row === b.row && a.col === b.col
+const sameCell = (
+  a: GridCell | null | undefined,
+  b: GridCell | null | undefined
+) => !!a && !!b && a.row === b.row && a.col === b.col
 
 /**
  * Gives a grid one tab stop and moves it by row and column. Call it once in
@@ -77,7 +84,7 @@ const sameCell = (a: GridCell | null | undefined, b: GridCell | null | undefined
  */
 function createGridFocus<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "options">,
-  options: GridFocusOptions<State>,
+  options: GridFocusOptions<State>
 ) {
   const { store } = context
   const cells = new Map<string, HTMLElement>()
@@ -86,7 +93,15 @@ function createGridFocus<State extends object>(
   // The cell to focus once it binds, when it wasn't rendered as focus moved to it.
   let pending: GridCell | null = null
   // Kept until state or options change, so rendering every cell scans the grid once.
-  let first: { state: State; options: object; rows: number; cols: number; cell: GridCell | null } | undefined
+  let first:
+    | {
+        state: State
+        options: object
+        rows: number
+        cols: number
+        cell: GridCell | null
+      }
+    | undefined
 
   const allowed = (cell: GridCell) =>
     cell.row >= 0 &&
@@ -99,11 +114,22 @@ function createGridFocus<State extends object>(
     const rows = options.rows()
     const cols = options.cols()
     const current = context.options()
-    if (first?.state === state && first.options === current && first.rows === rows && first.cols === cols)
+    if (
+      first?.state === state &&
+      first.options === current &&
+      first.rows === rows &&
+      first.cols === cols
+    ) {
       return first.cell
+    }
     let cell: GridCell | null = null
-    for (let row = 0; row < rows && !cell; row++)
-      for (let col = 0; col < cols && !cell; col++) if (allowed({ row, col })) cell = { row, col }
+    for (let row = 0; row < rows && !cell; row++) {
+      for (let col = 0; col < cols && !cell; col++) {
+        if (allowed({ row, col })) {
+          cell = { row, col }
+        }
+      }
+    }
     first = { state, options: current, rows, cols, cell }
     return cell
   }
@@ -111,8 +137,15 @@ function createGridFocus<State extends object>(
   // The nearest allowed cell from `cell` going by `dr`, `dc`, or `cell` itself.
   function step(cell: GridCell, dr: number, dc: number) {
     let next = { row: cell.row + dr, col: cell.col + dc }
-    while (next.row >= 0 && next.col >= 0 && next.row < options.rows() && next.col < options.cols()) {
-      if (allowed(next)) return next
+    while (
+      next.row >= 0 &&
+      next.col >= 0 &&
+      next.row < options.rows() &&
+      next.col < options.cols()
+    ) {
+      if (allowed(next)) {
+        return next
+      }
       next = { row: next.row + dr, col: next.col + dc }
     }
     return cell
@@ -122,8 +155,12 @@ function createGridFocus<State extends object>(
     const el = cells.get(id(cell))
     if (el?.isConnected) {
       pending = null
-      if (el.ownerDocument.activeElement !== el) el.focus({ preventScroll: false })
-    } else pending = cell
+      if (el.ownerDocument.activeElement !== el) {
+        el.focus({ preventScroll: false })
+      }
+    } else {
+      pending = cell
+    }
   }
 
   const api = {
@@ -134,7 +171,12 @@ function createGridFocus<State extends object>(
      * the grid is entered, the first cell that isn't disabled has it, row by row.
      */
     tabIndex(state: State, cell: GridCell) {
-      return sameCell((state[options.key] as GridCell | null) ?? firstAllowed(state), cell) ? "0" : "-1"
+      return sameCell(
+        (state[options.key] as GridCell | null) ?? firstAllowed(state),
+        cell
+      )
+        ? "0"
+        : "-1"
     },
     /** Whether a cell is the active one. */
     isActive(state: State, cell: GridCell) {
@@ -144,24 +186,41 @@ function createGridFocus<State extends object>(
     bind(el: HTMLElement, cell: GridCell) {
       const key = id(cell)
       cells.set(key, el)
-      if (sameCell(pending, cell)) queueMicrotask(() => sameCell(pending, cell) && focusElement(cell))
+      if (sameCell(pending, cell)) {
+        queueMicrotask(() => sameCell(pending, cell) && focusElement(cell))
+      }
       return () => {
-        if (cells.get(key) === el) cells.delete(key)
+        if (cells.get(key) === el) {
+          cells.delete(key)
+        }
       }
     },
     /** Makes a cell active and focuses it, scrolling it in through `reveal` first. */
     focus(
       cell: GridCell,
-      details: { reason: GridFocusReason; event?: Event; shift?: boolean } = { reason: "imperative" },
+      details: { reason: GridFocusReason; event?: Event; shift?: boolean } = {
+        reason: "imperative",
+      }
     ) {
-      if (!allowed(cell)) return false
+      if (!allowed(cell)) {
+        return false
+      }
       const from = active()
-      if (!sameCell(from, cell))
-        store.set({ [options.key]: { row: cell.row, col: cell.col } } as Partial<State>)
+      if (!sameCell(from, cell)) {
+        store.set({
+          [options.key]: { row: cell.row, col: cell.col },
+        } as Partial<State>)
+      }
       options.reveal?.(cell)
       focusElement(cell)
-      if (!sameCell(from, cell))
-        options.onMove?.(cell, { from, reason: details.reason, event: details.event, shift: !!details.shift })
+      if (!sameCell(from, cell)) {
+        options.onMove?.(cell, {
+          from,
+          reason: details.reason,
+          event: details.event,
+          shift: !!details.shift,
+        })
+      }
       return true
     },
     /**
@@ -171,31 +230,56 @@ function createGridFocus<State extends object>(
      * move `pageSize` rows.
      */
     keydown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.altKey || event.metaKey) return false
+      if (event.defaultPrevented || event.altKey || event.metaKey) {
+        return false
+      }
       const from = active() ?? firstAllowed(store.get())
-      if (!from) return false
+      if (!from) {
+        return false
+      }
       const rtl = event.target instanceof Element && isRTL(event.target)
       const page = options.pageSize?.() ?? 10
       const last = { row: options.rows() - 1, col: options.cols() - 1 }
       let to: GridCell | undefined
       const ctrl = event.ctrlKey
-      if (event.key === "ArrowUp" && !ctrl) to = step(from, -1, 0)
-      else if (event.key === "ArrowDown" && !ctrl) to = step(from, 1, 0)
-      else if (event.key === "ArrowLeft" && !ctrl) to = step(from, 0, rtl ? 1 : -1)
-      else if (event.key === "ArrowRight" && !ctrl) to = step(from, 0, rtl ? -1 : 1)
-      else if (event.key === "Home")
-        to = ctrl ? step({ row: -1, col: 0 }, 1, 0) : step({ row: from.row, col: -1 }, 0, 1)
-      else if (event.key === "End")
+      if (event.key === "ArrowUp" && !ctrl) {
+        to = step(from, -1, 0)
+      } else if (event.key === "ArrowDown" && !ctrl) {
+        to = step(from, 1, 0)
+      } else if (event.key === "ArrowLeft" && !ctrl) {
+        to = step(from, 0, rtl ? 1 : -1)
+      } else if (event.key === "ArrowRight" && !ctrl) {
+        to = step(from, 0, rtl ? -1 : 1)
+      } else if (event.key === "Home") {
+        to = ctrl
+          ? step({ row: -1, col: 0 }, 1, 0)
+          : step({ row: from.row, col: -1 }, 0, 1)
+      } else if (event.key === "End") {
         to = ctrl
           ? step({ row: last.row + 1, col: last.col }, -1, 0)
           : step({ row: from.row, col: last.col + 1 }, 0, -1)
-      else if (event.key === "PageUp")
-        to = step({ row: Math.max(0, from.row - page) + 1, col: from.col }, -1, 0)
-      else if (event.key === "PageDown")
-        to = step({ row: Math.min(last.row, from.row + page) - 1, col: from.col }, 1, 0)
-      if (!to) return false
+      } else if (event.key === "PageUp") {
+        to = step(
+          { row: Math.max(0, from.row - page) + 1, col: from.col },
+          -1,
+          0
+        )
+      } else if (event.key === "PageDown") {
+        to = step(
+          { row: Math.min(last.row, from.row + page) - 1, col: from.col },
+          1,
+          0
+        )
+      }
+      if (!to) {
+        return false
+      }
       event.preventDefault()
-      return api.focus(to, { reason: "list-navigation", event, shift: event.shiftKey })
+      return api.focus(to, {
+        reason: "list-navigation",
+        event,
+        shift: event.shiftKey,
+      })
     },
   }
   return api
@@ -207,4 +291,10 @@ function createGridFocus<State extends object>(
  */
 type GridFocus = ReturnType<typeof createGridFocus>
 
-export { createGridFocus, type GridCell, type GridFocus, type GridFocusOptions, type GridFocusReason }
+export {
+  createGridFocus,
+  type GridCell,
+  type GridFocus,
+  type GridFocusOptions,
+  type GridFocusReason,
+}

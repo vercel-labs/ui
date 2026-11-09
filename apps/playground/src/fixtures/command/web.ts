@@ -1,4 +1,9 @@
-import { commandData, commandFixture as f, commandOptions, runAction } from "tests/fixtures/command.ts"
+import {
+  commandData,
+  commandFixture as f,
+  commandOptions,
+  runAction,
+} from "tests/fixtures/command.ts"
 import { longItems } from "tests/fixtures/select.ts"
 
 type Item = {
@@ -23,7 +28,7 @@ async function render(root: HTMLElement, data = false) {
   const list = f.groups
     .map(
       (group, index) =>
-        `${index ? '<ui-command-separator class="separator"></ui-command-separator>' : ""}<ui-command-group><ui-command-group-label class="label">${group.label}</ui-command-group-label>${group.items.map(item).join("")}</ui-command-group>`,
+        `${index ? '<ui-command-separator class="separator"></ui-command-separator>' : ""}<ui-command-group><ui-command-group-label class="label">${group.label}</ui-command-group-label>${group.items.map(item).join("")}</ui-command-group>`
     )
     .join("")
   root.innerHTML = `
@@ -47,29 +52,52 @@ async function render(root: HTMLElement, data = false) {
       <output role="status" aria-label="Last action"></output>
       <output role="status" aria-label="Last highlight"></output>
     </div>`
-  const command = root.querySelector<HTMLElement & Record<string, any>>("ui-command")!
-  if (options.defaultValue !== undefined) command.setAttribute("default-value", options.defaultValue)
-  if (options.defaultPages) command.setAttribute("default-pages", options.defaultPages.join(","))
-  if (options.autoHighlight === false) command.setAttribute("auto-highlight", "false")
-  if (options.filter) command.setAttribute("filter", options.filter)
+  const command = root.querySelector<HTMLElement & Record<string, any>>(
+    "ui-command"
+  )!
+  if (options.defaultValue !== undefined) {
+    command.setAttribute("default-value", options.defaultValue)
+  }
+  if (options.defaultPages) {
+    command.setAttribute("default-pages", options.defaultPages.join(","))
+  }
+  if (options.autoHighlight === false) {
+    command.setAttribute("auto-highlight", "false")
+  }
+  if (options.filter) {
+    command.setAttribute("filter", options.filter)
+  }
   if (options.status) {
     command.setAttribute("status", options.status)
     root.querySelector("ui-command-status")!.textContent = "Loading…"
   }
-  if (dataMode) command.items = long ? longItems() : commandData()
-  const output = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
-  const lastHighlight = root.querySelector<HTMLOutputElement>('output[aria-label="Last highlight"]')!
+  if (dataMode) {
+    command.items = long ? longItems() : commandData()
+  }
+  const output = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
+  const lastHighlight = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last highlight"]'
+  )!
   command.addEventListener("valuechange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: string | null; reason: string }>).detail
+    const { value, reason } = (
+      event as CustomEvent<{ value: string | null; reason: string }>
+    ).detail
     lastHighlight.textContent = `${value}:${reason}`
   })
   command.addEventListener("action", (event) => {
     const { value, waitUntil } = (
-      event as CustomEvent<{ value: string; waitUntil: (p: Promise<unknown>) => void }>
+      event as CustomEvent<{
+        value: string
+        waitUntil: (p: Promise<unknown>) => void
+      }>
     ).detail
     output.textContent = `action:${value}`
     const pending = runAction(slow, fail)
-    if (pending) waitUntil(pending)
+    if (pending) {
+      waitUntil(pending)
+    }
   })
   await import("@ui-sdk/web/command")
 }

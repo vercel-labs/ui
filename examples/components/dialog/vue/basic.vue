@@ -20,7 +20,10 @@ import { XIcon } from "@lucide/vue"
     <DialogContent>
       <div data-slot="stack">
         <DialogTitle>Share link</DialogTitle>
-        <DialogDescription>Anyone who has this link will be able to view this.</DialogDescription>
+        <DialogDescription
+          >Anyone who has this link will be able to view
+          this.</DialogDescription
+        >
       </div>
       <Field>
         <FieldLabel>Link</FieldLabel>

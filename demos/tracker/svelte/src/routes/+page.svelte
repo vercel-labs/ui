@@ -11,7 +11,9 @@
 </script>
 
 <main class="flex min-h-0 flex-1 flex-col">
-  <div class="flex flex-wrap items-center gap-3 border-b border-border px-3 py-2">
+  <div
+    class="flex flex-wrap items-center gap-3 border-b border-border px-3 py-2"
+  >
     <IssueTabs query={data.query} counts={data.counts} />
     <IssueToolbar query={data.query} />
   </div>
@@ -20,7 +22,11 @@
       {#if data.query.view === "board"}
         <IssueBoard issues={data.matching} query={data.query} />
       {:else}
-        <IssueList issues={data.matching} query={data.query} pageSize={data.pageSize} />
+        <IssueList
+          issues={data.matching}
+          query={data.query}
+          pageSize={data.pageSize}
+        />
       {/if}
     {/snippet}
     {#snippet detail()}

@@ -99,7 +99,10 @@ const CarouselItem = parts.Item
 // Parts that can sit outside their carousel, driven through `controller`,
 // render as plain elements until it mounts.
 
-type StepProps = Omit<PartProps<"button", CarouselStepState>, "value" | "defaultValue" | "onChange"> &
+type StepProps = Omit<
+  PartProps<"button", CarouselStepState>,
+  "value" | "defaultValue" | "onChange"
+> &
   CarouselControlProps
 
 // What a part outside its carousel renders with until that mounts.
@@ -113,7 +116,14 @@ function connectedStep(Step: typeof parts.Previous) {
       <Connected
         primitive={carousel}
         controller={controller}
-        fallback={() => renderElement("button", { type: "button", ...rest }, render, unconnected)}
+        fallback={() =>
+          renderElement(
+            "button",
+            { type: "button", ...rest },
+            render,
+            unconnected
+          )
+        }
       >
         <Step {...props} />
       </Connected>
@@ -146,7 +156,9 @@ function CarouselIndicatorGroup({
     <Connected
       primitive={carousel}
       controller={controller}
-      fallback={() => renderElement("div", rest, render, { page: 1, pageCount: null })}
+      fallback={() =>
+        renderElement("div", rest, render, { page: 1, pageCount: null })
+      }
     >
       <parts.IndicatorGroup {...props} />
     </Connected>
@@ -167,7 +179,10 @@ function CarouselIndicator(props: IndicatorProps) {
   // In a group outside its carousel, before that mounts, it's a plain button.
   if (!useNearest(carousel)) {
     const { page, render, ...rest } = props
-    return renderElement("button", { type: "button", ...rest }, render, { page: page ?? 0, selected: false })
+    return renderElement("button", { type: "button", ...rest }, render, {
+      page: page ?? 0,
+      selected: false,
+    })
   }
   return <parts.Indicator {...props} />
 }
@@ -179,7 +194,10 @@ function CarouselIndicator(props: IndicatorProps) {
 function CarouselPlayToggle({
   controller,
   ...props
-}: Omit<PartProps<"button", CarouselPlayToggleState>, "value" | "defaultValue" | "onChange"> &
+}: Omit<
+  PartProps<"button", CarouselPlayToggleState>,
+  "value" | "defaultValue" | "onChange"
+> &
   CarouselControlProps) {
   const { render, ...rest } = props
   const unconnectedState = { playing: false, paused: false }
@@ -187,7 +205,14 @@ function CarouselPlayToggle({
     <Connected
       primitive={carousel}
       controller={controller}
-      fallback={() => renderElement("button", { type: "button", ...rest }, render, unconnectedState)}
+      fallback={() =>
+        renderElement(
+          "button",
+          { type: "button", ...rest },
+          render,
+          unconnectedState
+        )
+      }
     >
       <parts.PlayToggle {...props} />
     </Connected>

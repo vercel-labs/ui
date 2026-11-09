@@ -18,7 +18,9 @@ next to the input. Screen readers, typeahead and filtering skip it, and
   import type { PartProps } from "../use-primitive.svelte"
   import { ItemKey, type ItemContext } from "./context"
 
-  let { ...rest }: PartProps<"span", ComboboxItemIconState> & ComboboxItemIconProps = $props()
+  let {
+    ...rest
+  }: PartProps<"span", ComboboxItemIconState> & ComboboxItemIconProps = $props()
 
   const combobox = useHandle(comboboxPrimitive)
   combobox.instance.use(comboboxItemIcons)

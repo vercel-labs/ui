@@ -21,7 +21,10 @@ const log = useLog()
   <Carousel
     v-model:page="page"
     aria-label="Featured"
-    @page-change="(next: number, details: { reason: string }) => log(`Page ${next} (${details.reason})`)"
+    @page-change="
+      (next: number, details: { reason: string }) =>
+        log(`Page ${next} (${details.reason})`)
+    "
   >
     <div data-slot="row">
       <CarouselPrevious aria-label="Previous slide">

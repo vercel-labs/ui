@@ -3,7 +3,10 @@
 // the editor's edits and caret, remembers dismissed matches, and decides when
 // a match starts, changes or ends. Opening, items and announcements belong to
 // the state module, which it calls back.
-import type { EditorChange, TextEditorAdapter } from "../../foundation/text/text-editor"
+import type {
+  EditorChange,
+  TextEditorAdapter,
+} from "../../foundation/text/text-editor"
 import type {
   TriggerArgument,
   TriggerMenuDataItem,
@@ -37,11 +40,15 @@ type TriggerLevel = {
 
 // The argument a level asks for, if it's an argument level.
 const argumentOf = (level: TriggerLevel | null) =>
-  level?.item?.arguments?.[level.starts.length - 1] as TriggerArgument | undefined
+  level?.item?.arguments?.[level.starts.length - 1] as
+    TriggerArgument | undefined
 
 // The level for a match the trigger itself makes.
 // check-code: allow return-type the empty array and object would infer as never[] and {}.
-const triggerLevel = (found: { rule: number; match: TriggerMatch }): TriggerLevel => ({
+const triggerLevel = (found: {
+  rule: number
+  match: TriggerMatch
+}): TriggerLevel => ({
   rule: found.rule,
   match: found.match,
   queryStart: found.match.start + found.match.trigger.length,
@@ -66,7 +73,7 @@ function createTriggerLevels({
     query: string,
     reason: TriggerMenuQueryChangeReason,
     open: TriggerMenuOpenChangeReason,
-    event?: Event,
+    event?: Event
   ) => void
   // Ends the match and closes the list.
   close: (reason: TriggerMenuOpenChangeReason, event?: Event) => void
@@ -83,13 +90,17 @@ function createTriggerLevels({
   // The text between `start` and the caret.
   function textFrom(start: number) {
     const at = caret()
-    if (at === null || at < start) return null
+    if (at === null || at < start) {
+      return null
+    }
     const before = editor()?.textBefore(at - start)
     return before && before.offset === start ? before.text : null
   }
 
   function matchAtCaret() {
-    if (caret() === null) return null
+    if (caret() === null) {
+      return null
+    }
     const before = editor()?.textBefore(lookBehind(rules()))
     return before ? findTriggerMatch(before.text, before.offset, rules()) : null
   }
@@ -99,7 +110,7 @@ function createTriggerLevels({
     query: string,
     reason: TriggerMenuQueryChangeReason,
     open: TriggerMenuOpenChangeReason,
-    event?: Event,
+    event?: Event
   ) {
     current = level
     apply(level, query, reason, open, event)
@@ -107,7 +118,11 @@ function createTriggerLevels({
 
   // Ends the match. Escape also remembers it as dismissed, so it stays closed
   // until its trigger is deleted or retyped.
-  function end(reason: TriggerMenuOpenChangeReason, event?: Event, { dismiss = false } = {}) {
+  function end(
+    reason: TriggerMenuOpenChangeReason,
+    event?: Event,
+    { dismiss = false } = {}
+  ) {
     const level = current
     if (dismiss && level && !level.continued) {
       const at = caret() ?? level.match.end
@@ -124,14 +139,16 @@ function createTriggerLevels({
   // Opens the match at the caret, even a dismissed one, like for a shortcut or a controller.
   function reopen(reason: TriggerMenuOpenChangeReason, event?: Event) {
     const found = matchAtCaret()
-    if (!found) return false
+    if (!found) {
+      return false
+    }
     dismissed = dismissed.filter((entry) => entry.start !== found.match.start)
     enter(
       triggerLevel(found),
       found.match.query,
       reason === "shortcut" ? "input-change" : "imperative",
       reason,
-      event,
+      event
     )
     return true
   }
@@ -140,40 +157,77 @@ function createTriggerLevels({
   // match opens only when a person's edit touched it: never on focus, a caret
   // move, a program's edit or a collaborator's.
   function onInput(change: Extract<EditorChange, { type: "input" }>) {
-    dismissed = dismissed.flatMap((entry) => mapDismissed(entry, change.range, change.inserted.length) ?? [])
-    if (isWriting() || editor()?.composing()) return
-    if (current?.item || current?.continued) return followLevel(change.user)
+    dismissed = dismissed.flatMap(
+      (entry) => mapDismissed(entry, change.range, change.inserted.length) ?? []
+    )
+    if (isWriting() || editor()?.composing()) {
+      return
+    }
+    if (current?.item || current?.continued) {
+      return followLevel(change.user)
+    }
     const found = matchAtCaret()
     const isDismissed =
       !!found &&
-      dismissed.some((entry) => entry.start === found.match.start && entry.trigger === found.match.trigger)
+      dismissed.some(
+        (entry) =>
+          entry.start === found.match.start &&
+          entry.trigger === found.match.trigger
+      )
     const editEnd = change.range.start + change.inserted.length
-    const touched = !!found && change.range.start <= found.match.end && editEnd >= found.match.start
+    const touched =
+      !!found &&
+      change.range.start <= found.match.end &&
+      editEnd >= found.match.start
     const same =
-      !!found && current?.match.start === found.match.start && current.match.trigger === found.match.trigger
+      !!found &&
+      current?.match.start === found.match.start &&
+      current.match.trigger === found.match.trigger
     if (!found || isDismissed || (!same && !(change.user && touched))) {
-      if (current) end("input-change")
+      if (current) {
+        end("input-change")
+      }
       return
     }
-    enter(triggerLevel(found), found.match.query, "input-change", "input-change")
+    enter(
+      triggerLevel(found),
+      found.match.query,
+      "input-change",
+      "input-change"
+    )
   }
 
   // An argument level or a continued level follows the caret from where it started.
   function followLevel(user: boolean) {
     const level = current!
     const at = caret()
-    if (at === null) return end("input-change")
-    if (at < level.queryStart) return user ? stepBack() : end("input-change")
-    const query = textFrom(level.queryStart) ?? ""
-    if (query.includes("\n") || (level.continued && !isValidQuery(query, rules()[level.rule])))
+    if (at === null) {
       return end("input-change")
-    enter({ ...level, match: { ...level.match, end: at } }, query, "input-change", "input-change")
+    }
+    if (at < level.queryStart) {
+      return user ? stepBack() : end("input-change")
+    }
+    const query = textFrom(level.queryStart) ?? ""
+    if (
+      query.includes("\n") ||
+      (level.continued && !isValidQuery(query, rules()[level.rule]))
+    ) {
+      return end("input-change")
+    }
+    enter(
+      { ...level, match: { ...level.match, end: at } },
+      query,
+      "input-change",
+      "input-change"
+    )
   }
 
   // Backspace past an argument's start goes back to the previous argument, or to the item.
   function stepBack() {
     const level = current!
-    if (level.continued) return end("input-change")
+    if (level.continued) {
+      return end("input-change")
+    }
     if (level.starts.length > 1) {
       const starts = level.starts.slice(0, -1)
       const values = { ...level.values }
@@ -183,23 +237,38 @@ function createTriggerLevels({
         { ...level, starts, values, queryStart },
         textFrom(queryStart) ?? "",
         "input-change",
-        "input-change",
+        "input-change"
       )
     }
     current = null
     const found = matchAtCaret()
-    if (!found) return end("input-change")
-    enter(triggerLevel(found), found.match.query, "input-change", "input-change")
+    if (!found) {
+      return end("input-change")
+    }
+    enter(
+      triggerLevel(found),
+      found.match.query,
+      "input-change",
+      "input-change"
+    )
   }
 
   // The caret left the match: closes with `caret-move`. A caret still in the
   // same match stays, which also covers a caret reported before the text.
   function onSelection() {
-    if (!current || isWriting()) return
+    if (!current || isWriting()) {
+      return
+    }
     const at = caret()
-    if (at === null || at < current.queryStart) return end("caret-move")
-    if (current.item || current.continued) return
-    if (matchAtCaret()?.match.start !== current.match.start) end("caret-move")
+    if (at === null || at < current.queryStart) {
+      return end("caret-move")
+    }
+    if (current.item || current.continued) {
+      return
+    }
+    if (matchAtCaret()?.match.start !== current.match.start) {
+      end("caret-move")
+    }
   }
 
   return {
@@ -211,12 +280,20 @@ function createTriggerLevels({
     end,
     reopen,
     onEditorChange(change: EditorChange) {
-      if (change.type === "input") onInput(change)
-      else if (change.type === "selection") onSelection()
+      if (change.type === "input") {
+        onInput(change)
+      } else if (change.type === "selection") {
+        onSelection()
+      }
     },
   }
 }
 
 type TriggerLevels = ReturnType<typeof createTriggerLevels>
 
-export { argumentOf, createTriggerLevels, type TriggerLevel, type TriggerLevels }
+export {
+  argumentOf,
+  createTriggerLevels,
+  type TriggerLevel,
+  type TriggerLevels,
+}

@@ -86,7 +86,8 @@
       }
     }
 
-    [data-slot="tabs-list"]:has([data-slot="tabs-indicator"]) > &[data-selected] {
+    [data-slot="tabs-list"]:has([data-slot="tabs-indicator"])
+      > &[data-selected] {
       background: transparent;
       box-shadow: none;
     }

@@ -9,7 +9,11 @@ import {
   live,
   type ChangeDetails,
 } from "@ui-sdk/core"
-import { createVelocityTracker, projectDistance, solveSpring } from "@ui-sdk/core/gesture"
+import {
+  createVelocityTracker,
+  projectDistance,
+  solveSpring,
+} from "@ui-sdk/core/gesture"
 import { createParts } from "@ui-sdk/react/primitive"
 
 const speeds = ["Off", "Low", "Medium", "High"]
@@ -22,15 +26,22 @@ type FanState = {
 
 type FanOptions = {
   defaultSpeed?: number
-  onSpeedChange?: (speed: number, details: ChangeDetails<"drag" | "step-key">) => void
+  onSpeedChange?: (
+    speed: number,
+    details: ChangeDetails<"drag" | "step-key">
+  ) => void
 }
 
-const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, value))
 
 const fan = definePrimitive({
   name: "fan",
   options: { defaultSpeed: "number", onSpeedChange: "callback" },
-  state: (options: FanOptions): FanState => ({ speed: options.defaultSpeed ?? 0, offset: null }),
+  state: (options: FanOptions): FanState => ({
+    speed: options.defaultSpeed ?? 0,
+    offset: null,
+  }),
   live: ["offset"],
   api: (context) => {
     const { store } = context
@@ -48,9 +59,12 @@ const fan = definePrimitive({
     return {
       pointerdown(event: PointerEvent, thumb: HTMLElement) {
         const track = thumb.parentElement
-        if (event.button !== 0 || !track) return
+        if (event.button !== 0 || !track) {
+          return
+        }
         settle()
-        const span = (track.clientWidth - thumb.offsetWidth) * (isRTL(track) ? -1 : 1)
+        const span =
+          (track.clientWidth - thumb.offsetWidth) * (isRTL(track) ? -1 : 1)
         const from = store.get().speed / last
         const velocity = createVelocityTracker()
         stop = bindDrag(thumb, event, {
@@ -58,21 +72,29 @@ const fan = definePrimitive({
           cancelOnEscape: true,
           onMove: ({ x, event: move }) => {
             velocity.add(move.timeStamp, x)
-            store.set({ offset: clamp(from + (x - event.clientX) / span, 0, 1) })
+            store.set({
+              offset: clamp(from + (x - event.clientX) / span, 0, 1),
+            })
           },
           onEnd: (end, canceled) => {
             stop = undefined
             const at = store.get().offset
-            if (canceled || at === null) return settle()
+            if (canceled || at === null) {
+              return settle()
+            }
             const v = velocity.velocity(end.timeStamp) / span
-            const target = Math.round(clamp(at + projectDistance(v, 0.994), 0, 1) * last)
+            const target = Math.round(
+              clamp(at + projectDistance(v, 0.994), 0, 1) * last
+            )
             change("speed", target, { reason: "drag", event: end })
             const spring = solveSpring(0.4, 0.8, at - target / last, v)
             const start = performance.now()
             const tick = () => {
               const t = performance.now() - start
               const done = t > 1000 || Math.abs(spring.position(t) * span) < 0.5
-              if (done) return settle()
+              if (done) {
+                return settle()
+              }
               store.set({ offset: target / last + spring.position(t) })
               frame = requestAnimationFrame(tick)
             }
@@ -81,12 +103,19 @@ const fan = definePrimitive({
         })
       },
       keydown(event: KeyboardEvent, el: HTMLElement) {
-        const step = { ArrowLeft: -1, ArrowRight: 1, Home: -last, End: last }[event.key]
-        if (!step) return
+        const step = { ArrowLeft: -1, ArrowRight: 1, Home: -last, End: last }[
+          event.key
+        ]
+        if (!step) {
+          return
+        }
         event.preventDefault()
         settle()
         const flip = event.key.startsWith("Arrow") && isRTL(el) ? -1 : 1
-        change("speed", clamp(store.get().speed + step * flip, 0, last), { reason: "step-key", event })
+        change("speed", clamp(store.get().speed + step * flip, 0, last), {
+          reason: "step-key",
+          event,
+        })
       },
     }
   },
@@ -129,7 +158,11 @@ const FanThumb = parts.Thumb
 function Example() {
   return (
     <div data-slot="stack">
-      <Fan>{({ speed }) => <FanThumb aria-label="Fan speed">{speeds[speed]}</FanThumb>}</Fan>
+      <Fan>
+        {({ speed }) => (
+          <FanThumb aria-label="Fan speed">{speeds[speed]}</FanThumb>
+        )}
+      </Fan>
       <div data-slot="gesture-scale">
         {speeds.map((speed) => (
           <span key={speed}>{speed}</span>

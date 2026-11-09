@@ -15,8 +15,13 @@ The group's heading, which names the group.
 
   const menu = useHandle(menuPrimitive)
   const group =
-    getContext<RadioGroupContext | undefined>(RadioGroupKey)?.name ?? getContext<string | undefined>(GroupKey)
-  if (!group) throw new Error("<MenuGroupLabel> must be used inside <MenuGroup> or <MenuRadioGroup>.")
+    getContext<RadioGroupContext | undefined>(RadioGroupKey)?.name ??
+    getContext<string | undefined>(GroupKey)
+  if (!group) {
+    throw new Error(
+      "<MenuGroupLabel> must be used inside <MenuGroup> or <MenuRadioGroup>."
+    )
+  }
   const label = useHandlePart(menu, "group-label", () => ({ id: group, group }))
 </script>
 

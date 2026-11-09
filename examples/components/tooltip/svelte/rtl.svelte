@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Tooltip, TooltipArrow, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipArrow,
+    TooltipContent,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
 
   const sides = [
     { side: "right", label: "يمين" },

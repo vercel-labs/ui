@@ -13,11 +13,19 @@ import {
 <template>
   <Field>
     <FieldLabel>Temperature</FieldLabel>
-    <NumberInput :default-value="-2" :min="-20" :max="40" :format="{ style: 'unit', unit: 'celsius' }">
+    <NumberInput
+      :default-value="-2"
+      :min="-20"
+      :max="40"
+      :format="{ style: 'unit', unit: 'celsius' }"
+    >
       <NumberInputGroup>
         <NumberInputDecrement aria-label="Colder">
           <template #render="{ props, state }">
-            <button v-bind="props" :title="state.atBound ? 'As cold as it goes' : 'Colder'">
+            <button
+              v-bind="props"
+              :title="state.atBound ? 'As cold as it goes' : 'Colder'"
+            >
               <MinusIcon aria-hidden="true" />
             </button>
           </template>

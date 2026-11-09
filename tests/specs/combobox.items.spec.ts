@@ -12,12 +12,18 @@ import { changedItems } from "../fixtures/combobox"
 
 const input = (page: Page) => page.getByRole("combobox", { name: "Country" })
 const listbox = (page: Page) => page.getByRole("listbox")
-const option = (page: Page, name: string) => page.getByRole("option", { name, exact: true })
+const option = (page: Page, name: string) =>
+  page.getByRole("option", { name, exact: true })
 
 async function highlighted(page: Page) {
   const id = await input(page).getAttribute("aria-activedescendant")
-  if (!id) return null
-  return page.evaluate((id) => document.getElementById(id)?.textContent?.replace("✓", "").trim(), id)
+  if (!id) {
+    return null
+  }
+  return page.evaluate(
+    (id) => document.getElementById(id)?.textContent?.replace("✓", "").trim(),
+    id
+  )
 }
 
 // Whether aria-activedescendant names nothing, or an element on the page.
@@ -29,7 +35,7 @@ async function pointsAtNothingMissing(page: Page) {
 // The options in the order the page shows them. An item's text may hold its check.
 async function expectOrder(page: Page, labels: string[]) {
   await expect(listbox(page).getByRole("option")).toHaveText(
-    labels.map((label) => new RegExp(`^✓?\\s*${label}\\s*✓?$`)),
+    labels.map((label) => new RegExp(`^✓?\\s*${label}\\s*✓?$`))
   )
 }
 
@@ -42,7 +48,11 @@ async function openList(page: Page) {
 // Presses ArrowDown until the item is highlighted. Opening may highlight the
 // first item or the selected one, so specs don't rely on where it starts.
 async function highlight(page: Page, label: string) {
-  for (let presses = 0; presses < 12 && (await highlighted(page)) !== label; presses++) {
+  for (
+    let presses = 0;
+    presses < 12 && (await highlighted(page)) !== label;
+    presses++
+  ) {
     await page.keyboard.press("ArrowDown")
     await page.evaluate(() => new Promise(requestAnimationFrame))
   }
@@ -72,7 +82,7 @@ test.describe("items that change while open", () => {
       await page.keyboard.press("ArrowUp")
       await expect.poll(() => highlighted(page)).toBe("Austria")
       await expect(input(page)).toBeFocused()
-    },
+    }
   )
 
   test(
@@ -84,10 +94,16 @@ test.describe("items that change while open", () => {
       await changeItems(page, "reversed")
       await expectOrder(page, labels(changedItems.reversed))
       await expect.poll(() => highlighted(page)).toBe("Brazil")
-      await expect(option(page, "Brazil")).toHaveAttribute("data-highlighted", "")
-      await expect(option(page, "France")).toHaveAttribute("aria-selected", "true")
+      await expect(option(page, "Brazil")).toHaveAttribute(
+        "data-highlighted",
+        ""
+      )
+      await expect(option(page, "France")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      )
       await expect(input(page)).toHaveValue("France")
-    },
+    }
   )
 
   test(
@@ -100,13 +116,16 @@ test.describe("items that change while open", () => {
       await expectOrder(page, labels(changedItems.replaced))
       await expect(listbox(page)).toBeVisible()
       await expect.poll(() => highlighted(page)).toBe("Brazil")
-      await expect(option(page, "France")).toHaveAttribute("aria-selected", "true")
+      await expect(option(page, "France")).toHaveAttribute(
+        "aria-selected",
+        "true"
+      )
       await page.keyboard.press("ArrowUp")
       await expect.poll(() => highlighted(page)).toBe("Italy")
       await page.keyboard.press("ArrowUp")
       await expect.poll(() => highlighted(page)).toBe("France")
       await expect(input(page)).toHaveValue("France")
-    },
+    }
   )
 
   test("removing the highlighted item keeps the list open, pointing at no missing option", async ({
@@ -135,7 +154,7 @@ test.describe("items that change while open", () => {
       await expect.poll(() => highlighted(page)).toBeNull()
       await page.keyboard.press("ArrowDown")
       await expect.poll(() => highlighted(page)).toBe("Spain")
-    },
+    }
   )
 
   test("new items can be reached and chosen", async ({ page }) => {
@@ -150,7 +169,9 @@ test.describe("items that change while open", () => {
     expect(await lastAction(page)).toBe("value:it")
   })
 
-  test("the new order stays after the list closes and opens again", async ({ page }) => {
+  test("the new order stays after the list closes and opens again", async ({
+    page,
+  }) => {
     await openList(page)
     await changeItems(page, "reversed")
     await page.keyboard.press("Escape")
@@ -165,7 +186,9 @@ test.describe("items that change while open", () => {
     await expect.poll(() => highlighted(page)).toBe("Brazil")
   })
 
-  test("a reorder keeps the filtered results, in the new order", async ({ page }) => {
+  test("a reorder keeps the filtered results, in the new order", async ({
+    page,
+  }) => {
     await input(page).fill("an")
     await expectOrder(page, ["Canada", "France", "Germany"])
     await changeItems(page, "reversed")
@@ -187,7 +210,7 @@ test.describe("items that change while open", () => {
       await expect.poll(() => highlighted(page)).toBe("Canada")
       await page.keyboard.press("ArrowUp")
       await expect.poll(() => highlighted(page)).toBe("France")
-    },
+    }
   )
 })
 
@@ -197,7 +220,10 @@ test.describe("items that arrive while open", () => {
     open,
     framework,
   }) => {
-    test.skip(!framework.startsWith("react"), "The ?late fixture is React only.")
+    test.skip(
+      !framework.startsWith("react"),
+      "The ?late fixture is React only."
+    )
     await open("combobox", { late: "" })
     await input(page).focus()
     await page.keyboard.press("ArrowDown")

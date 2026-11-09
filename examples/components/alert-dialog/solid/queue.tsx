@@ -34,9 +34,12 @@ function Example() {
           {(state) => (
             <>
               <div data-slot="stack">
-                <AlertDialogTitle>Archive {state.payload?.name}?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  Archive {state.payload?.name}?
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Archived projects leave the active list. You can restore them later.
+                  Archived projects leave the active list. You can restore them
+                  later.
                 </AlertDialogDescription>
               </div>
               <div data-slot="row">

@@ -42,12 +42,31 @@ const handleNames: Record<ResizeHandle, string> = {
   move: "crop",
 }
 
-function fitAspect(box: ResizeBox, aspect: number, size: { width: number; height: number }) {
-  const width = Math.min(size.width, size.height * aspect, Math.max(box.width, box.height * aspect))
+function fitAspect(
+  box: ResizeBox,
+  aspect: number,
+  size: { width: number; height: number }
+) {
+  const width = Math.min(
+    size.width,
+    size.height * aspect,
+    Math.max(box.width, box.height * aspect)
+  )
   const height = width / aspect
-  const x = Math.min(size.width - width, Math.max(0, box.x + box.width / 2 - width / 2))
-  const y = Math.min(size.height - height, Math.max(0, box.y + box.height / 2 - height / 2))
-  return { x: Math.round(x), y: Math.round(y), width: Math.round(width), height: Math.round(height) }
+  const x = Math.min(
+    size.width - width,
+    Math.max(0, box.x + box.width / 2 - width / 2)
+  )
+  const y = Math.min(
+    size.height - height,
+    Math.max(0, box.y + box.height / 2 - height / 2)
+  )
+  return {
+    x: Math.round(x),
+    y: Math.round(y),
+    width: Math.round(width),
+    height: Math.round(height),
+  }
 }
 
 const imageCropper = /* @__PURE__ */ definePrimitive({
@@ -62,7 +81,12 @@ const imageCropper = /* @__PURE__ */ definePrimitive({
   },
   state: (options: ImageCropperOptions): ImageCropperState => ({
     crop: options.crop ??
-      options.defaultCrop ?? { x: 0, y: 0, width: options.size.width, height: options.size.height },
+      options.defaultCrop ?? {
+        x: 0,
+        y: 0,
+        width: options.size.width,
+        height: options.size.height,
+      },
     draft: null,
   }),
   sync: (options) => (options.crop === undefined ? {} : { crop: options.crop }),
@@ -74,7 +98,10 @@ const imageCropper = /* @__PURE__ */ definePrimitive({
       boxes: (state) => ({ crop: state.crop }),
       draft: "draft",
       set: (boxes, details) => change("crop", boxes.crop, details),
-      min: () => ({ width: context.options().minSize ?? 24, height: context.options().minSize ?? 24 }),
+      min: () => ({
+        width: context.options().minSize ?? 24,
+        height: context.options().minSize ?? 24,
+      }),
       bounds: () => {
         const { width, height } = context.options().size
         return { left: 0, top: 0, right: width, bottom: height }
@@ -107,7 +134,9 @@ const imageCropper = /* @__PURE__ */ definePrimitive({
       }),
     }),
     box: slot<{}, ImageCropperBoxState>({
-      state: (state, { api }) => ({ dragging: api.resize.dragging(state, "crop") }),
+      state: (state, { api }) => ({
+        dragging: api.resize.dragging(state, "crop"),
+      }),
       attrs: (state, { api }) => {
         const { crop } = state
         return {
@@ -123,7 +152,8 @@ const imageCropper = /* @__PURE__ */ definePrimitive({
         "data-dragging": api.resize.dragging(state, "crop"),
       })),
       on: {
-        pointerdown: (event, { el, api }) => el && api.resize.pointerdown(event, "crop", "move", el),
+        pointerdown: (event, { el, api }) =>
+          el && api.resize.pointerdown(event, "crop", "move", el),
         keydown: (event, { api }) => api.resize.keydown(event, "crop", "move"),
       },
     }),
@@ -138,14 +168,21 @@ const imageCropper = /* @__PURE__ */ definePrimitive({
       on: {
         pointerdown: (event, { el, api, key }) =>
           el && api.resize.pointerdown(event, "crop", key as ResizeHandle, el),
-        keydown: (event, { api, key }) => api.resize.keydown(event, "crop", key as ResizeHandle),
+        keydown: (event, { api, key }) =>
+          api.resize.keydown(event, "crop", key as ResizeHandle),
       },
     }),
-    instructions: slot({ attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }) }),
+    instructions: slot({
+      attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }),
+    }),
   }),
 })
 
-const parts = createParts(imageCropper, { root: "div", box: "div", instructions: "div" })
+const parts = createParts(imageCropper, {
+  root: "div",
+  box: "div",
+  instructions: "div",
+})
 
 const ImageCropper = parts.Root
 
@@ -165,7 +202,12 @@ const size = { width: 480, height: 300 }
 function Landscape(props: React.SVGProps<SVGSVGElement>) {
   const sky = React.useId()
   return (
-    <svg viewBox="0 0 480 300" preserveAspectRatio="none" aria-hidden="true" {...props}>
+    <svg
+      viewBox="0 0 480 300"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      {...props}
+    >
       <defs>
         <linearGradient id={sky} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stopColor="#fde68a" />
@@ -180,7 +222,11 @@ function Landscape(props: React.SVGProps<SVGSVGElement>) {
         fill="#7c3aed"
         opacity="0.55"
       />
-      <path d="M0 250 L120 190 L210 240 L320 180 L480 245 V300 H0 Z" fill="#4c1d95" opacity="0.8" />
+      <path
+        d="M0 250 L120 190 L210 240 L320 180 L480 245 V300 H0 Z"
+        fill="#4c1d95"
+        opacity="0.8"
+      />
       <path d="M0 280 Q120 255 240 275 T480 270 V300 H0 Z" fill="#1e1b4b" />
     </svg>
   )
@@ -195,7 +241,12 @@ const ratios = [
 const corners = ["nw", "ne", "sw", "se"] as const
 const edges = ["n", "e", "s", "w"] as const
 function Example() {
-  const [crop, setCrop] = React.useState<ResizeBox>({ x: 96, y: 60, width: 288, height: 180 })
+  const [crop, setCrop] = React.useState<ResizeBox>({
+    x: 96,
+    y: 60,
+    width: 288,
+    height: 180,
+  })
   const [aspect, setAspect] = React.useState<number | undefined>(undefined)
   return (
     <div data-slot="stack">
@@ -208,7 +259,9 @@ function Example() {
             aria-pressed={aspect === ratio.value}
             onClick={() => {
               setAspect(ratio.value)
-              if (ratio.value) setCrop(fitAspect(crop, ratio.value, size))
+              if (ratio.value) {
+                setCrop(fitAspect(crop, ratio.value, size))
+              }
             }}
           >
             {ratio.label}
@@ -243,8 +296,9 @@ function Example() {
           ))}
         </ImageCropperBox>
         <ImageCropperInstructions>
-          Drag the crop or its handles. Arrows move the crop while it has focus, and move an edge while its
-          handle has focus. Shift moves five times as far.
+          Drag the crop or its handles. Arrows move the crop while it has focus,
+          and move an edge while its handle has focus. Shift moves five times as
+          far.
         </ImageCropperInstructions>
       </ImageCropper>
       <div data-slot="row">

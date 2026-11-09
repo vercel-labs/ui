@@ -14,7 +14,12 @@ import {
   CommandStatus,
 } from "@ui-sdk/vue"
 import CommandFixtureData from "./CommandFixtureData.vue"
-import { commandData, commandFixture as f, commandOptions, runAction } from "tests/fixtures/command.ts"
+import {
+  commandData,
+  commandFixture as f,
+  commandOptions,
+  runAction,
+} from "tests/fixtures/command.ts"
 import { longItems } from "tests/fixtures/select.ts"
 import { ref } from "vue"
 
@@ -39,12 +44,15 @@ function onAction(value: string) {
       :items="items"
       @action="onAction"
       @value-change="
-        (value: string | null, details: { reason: string }) => (lastHighlight = `${value}:${details.reason}`)
+        (value: string | null, details: { reason: string }) =>
+          (lastHighlight = `${value}:${details.reason}`)
       "
     >
       <CommandInput class="input" :aria-label="f.input" />
       <CommandEmpty class="empty">{{ f.empty }}</CommandEmpty>
-      <CommandStatus v-slot="{ state }" class="status">{{ state.loading ? "Loading…" : "" }}</CommandStatus>
+      <CommandStatus v-slot="{ state }" class="status">{{
+        state.loading ? "Loading…" : ""
+      }}</CommandStatus>
       <CommandList v-if="items" v-slot="{ state }" class="command-list">
         <CommandFixtureData :items="state.items" :highlight="highlight" />
       </CommandList>
@@ -53,7 +61,9 @@ function onAction(value: string) {
           <template v-for="(group, index) in f.groups" :key="group.label">
             <CommandSeparator v-if="index > 0" class="separator" />
             <CommandGroup>
-              <CommandGroupLabel class="label">{{ group.label }}</CommandGroupLabel>
+              <CommandGroupLabel class="label">{{
+                group.label
+              }}</CommandGroupLabel>
               <CommandItem
                 v-for="item in group.items"
                 :key="item.value"
@@ -64,7 +74,9 @@ function onAction(value: string) {
                 :shortcut="'shortcut' in item ? item.shortcut : undefined"
                 :page="'page' in item ? item.page : undefined"
               >
-                <CommandItemText v-if="highlight">{{ item.label }}</CommandItemText>
+                <CommandItemText v-if="highlight">{{
+                  item.label
+                }}</CommandItemText>
                 <template v-else>{{ item.label }}</template>
                 <CommandShortcut v-if="'shortcut' in item" class="shortcut" />
               </CommandItem>
@@ -72,7 +84,12 @@ function onAction(value: string) {
           </template>
         </CommandPage>
         <CommandPage value="theme">
-          <CommandItem v-for="item in f.theme" :key="item.value" class="item" :value="item.value">
+          <CommandItem
+            v-for="item in f.theme"
+            :key="item.value"
+            class="item"
+            :value="item.value"
+          >
             {{ item.label }}
           </CommandItem>
         </CommandPage>
@@ -80,6 +97,8 @@ function onAction(value: string) {
     </Command>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <output role="status" aria-label="Last highlight">{{ lastHighlight }}</output>
+    <output role="status" aria-label="Last highlight">{{
+      lastHighlight
+    }}</output>
   </div>
 </template>

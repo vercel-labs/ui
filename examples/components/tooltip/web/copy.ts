@@ -19,7 +19,9 @@ function mount(root: HTMLElement) {
   const render = (copied: boolean) => {
     const label = copied ? "Copied" : "Copy"
     button.setAttribute("aria-label", label)
-    button.replaceChildren(createElement(copied ? Check : Copy, { "aria-hidden": "true" }))
+    button.replaceChildren(
+      createElement(copied ? Check : Copy, { "aria-hidden": "true" })
+    )
     content.textContent = label
   }
   render(false)
@@ -28,7 +30,9 @@ function mount(root: HTMLElement) {
     render(true)
   })
   tooltip.addEventListener("openchangecomplete", (event) => {
-    if (!event.detail.value) render(false)
+    if (!event.detail.value) {
+      render(false)
+    }
   })
 }
 

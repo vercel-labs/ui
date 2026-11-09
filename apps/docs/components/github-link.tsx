@@ -9,7 +9,7 @@ function GitHubLink({ className }: { className?: string }) {
       aria-label="GitHub"
       className={cn(
         "hit-area inline-flex size-8 items-center justify-center rounded-2xl text-subtle outline-none transition-colors hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/30",
-        className,
+        className
       )}
     >
       <svg aria-hidden viewBox="0 0 16 16" width="16" height="16">

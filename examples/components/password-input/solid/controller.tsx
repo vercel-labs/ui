@@ -31,7 +31,9 @@ function Example() {
         <button
           type="button"
           onClick={() =>
-            log(`${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`)
+            log(
+              `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`
+            )
           }
         >
           Read

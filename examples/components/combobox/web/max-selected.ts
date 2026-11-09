@@ -1,7 +1,15 @@
 import "@ui-sdk/web/combobox"
 import { Check, createElement } from "lucide"
 
-const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const labels = [
+  "Bug",
+  "Feature",
+  "Documentation",
+  "Design",
+  "Performance",
+  "Security",
+  "Testing",
+]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -24,7 +32,7 @@ function mount(root: HTMLElement) {
                   <span data-slot="hint" data-show="disabled">Limit reached</span>
                   <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                 </ui-combobox-item>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>

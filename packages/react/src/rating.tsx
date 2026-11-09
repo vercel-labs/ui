@@ -10,7 +10,9 @@ import * as React from "react"
 import { controlRender, FieldContext, useJoinField } from "./field-context"
 import { usePart, usePrimitive, type PartProps } from "./use-primitive"
 
-const ItemContext = React.createContext<{ index: number; step: number } | null>(null)
+const ItemContext = React.createContext<{ index: number; step: number } | null>(
+  null
+)
 
 /**
  * A score picked from a row of stars, a radio per star or half star, with a
@@ -37,7 +39,10 @@ function Rating({
   children,
   ...props
 }: RatingOptions &
-  Omit<PartProps<"div", RatingState>, "defaultValue" | "onChange" | "onSelect" | "children"> & {
+  Omit<
+    PartProps<"div", RatingState>,
+    "defaultValue" | "onChange" | "onSelect" | "children"
+  > & {
     children?: React.ReactNode
   }) {
   const field = useJoinField(React.useContext(FieldContext))
@@ -67,7 +72,7 @@ function Rating({
     control,
     "root",
     {},
-    { ...props, render: controlRender(field, "div", render), children: stars },
+    { ...props, render: controlRender(field, "div", render), children: stars }
   )
 }
 
@@ -85,9 +90,14 @@ function RatingRadio({ value }: { value: string }) {
  * radios that pick its score sit over it.
  * @experimental
  */
-function RatingItem({ children, ...props }: PartProps<"span", RatingItemState>) {
+function RatingItem({
+  children,
+  ...props
+}: PartProps<"span", RatingItemState>) {
   const item = React.useContext(ItemContext)
-  if (!item) throw new Error("RatingItem must be used inside <Rating>.")
+  if (!item) {
+    throw new Error("RatingItem must be used inside <Rating>.")
+  }
   const radios = ratingItemValues(item.index, item.step).map((score) => (
     <RatingRadio key={score} value={String(score)} />
   ))
@@ -104,7 +114,7 @@ function RatingItem({ children, ...props }: PartProps<"span", RatingItemState>) 
         </>
       ),
     },
-    "span",
+    "span"
   )
 }
 

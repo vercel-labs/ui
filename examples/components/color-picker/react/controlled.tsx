@@ -28,7 +28,9 @@ function Example() {
         aria-label="Theme color"
         value={value}
         onValueChange={(next) => setValue(next)}
-        onValueCommit={(next, details) => log(`committed: ${next} (${details.reason})`)}
+        onValueCommit={(next, details) =>
+          log(`committed: ${next} (${details.reason})`)
+        }
         controller={picker}
       >
         <ColorPickerArea>

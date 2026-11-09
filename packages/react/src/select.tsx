@@ -16,9 +16,20 @@ import {
   type SelectValueProps,
   type SelectValueState,
 } from "@ui-sdk/core/select"
-import { selectAllKey, selectItemIcons, selectSelectAll } from "@ui-sdk/core/renderer"
+import {
+  selectAllKey,
+  selectItemIcons,
+  selectSelectAll,
+} from "@ui-sdk/core/renderer"
 import * as React from "react"
-import { hasChild, learnLabels, notLabel, Placed, usePlaceContent, usePlacedContent } from "./children"
+import {
+  hasChild,
+  learnLabels,
+  notLabel,
+  Placed,
+  usePlaceContent,
+  usePlacedContent,
+} from "./children"
 import { controlRender, useFieldControl } from "./field-context"
 import { markSegments, textToMark } from "./list-text"
 import {
@@ -70,7 +81,10 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * The props of `Select`.
  * @stable
  */
-type SelectProps<T = string, Multiple extends boolean | undefined = false> = SelectOptions<T, Multiple> & {
+type SelectProps<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = SelectOptions<T, Multiple> & {
   children?: React.ReactNode
 }
 
@@ -102,7 +116,9 @@ function Select<T = string, Multiple extends boolean | undefined = false>({
     <HandleScope handle={select}>
       <ContainerContext.Provider value={container}>
         <Placed value={place}>{children}</Placed>
-        <Placed value={null}>{options.items && !own && <SelectContent />}</Placed>
+        <Placed value={null}>
+          {options.items && !own && <SelectContent />}
+        </Placed>
         <FormInputs handle={select} />
       </ContainerContext.Provider>
     </HandleScope>
@@ -124,7 +140,8 @@ function SelectTrigger({
   controller,
   render,
   ...props
-}: Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps) {
+}: Omit<PartProps<"button", SelectTriggerState>, Clashing> &
+  SelectTriggerProps) {
   const unconnected = () =>
     renderElement("button", { type: "button", disabled, ...props }, render, {
       open: false,
@@ -134,7 +151,11 @@ function SelectTrigger({
       placeholder: true,
     })
   return (
-    <Connected primitive={selectPrimitive} controller={controller} fallback={unconnected}>
+    <Connected
+      primitive={selectPrimitive}
+      controller={controller}
+      fallback={unconnected}
+    >
       <TriggerPart disabled={disabled} render={render} {...props} />
     </Connected>
   )
@@ -145,20 +166,30 @@ function TriggerPart({
   render,
   children = <SelectValue />,
   ...props
-}: Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps) {
+}: Omit<PartProps<"button", SelectTriggerState>, Clashing> &
+  SelectTriggerProps) {
   // Without content, the trigger shows the value.
   const field = useFieldControl(props)
-  const element = { ...props, children, render: controlRender(field, "button", render) }
+  const element = {
+    ...props,
+    children,
+    render: controlRender(field, "button", render),
+  }
   return usePart(
     selectPrimitive,
     "trigger",
     { disabled, named: !!field || props["aria-labelledby"] != null },
     element,
-    "button",
+    "button"
   )
 }
 
-const unselected: SelectValueState = { value: null, label: "", labels: [], placeholder: true }
+const unselected: SelectValueState = {
+  value: null,
+  label: "",
+  labels: [],
+  placeholder: true,
+}
 
 /**
  * The selected item's label, or the placeholder. Renders it for you when it has no children.
@@ -173,10 +204,20 @@ function SelectValue({
   ...props
 }: Omit<PartProps<"span", SelectValueState>, Clashing> & SelectValueProps) {
   // A trigger outside its select renders before the select it names has mounted.
-  if (!useNearest(selectPrimitive))
-    return renderElement("span", { ...props, children: children ?? placeholder ?? null }, render, unselected)
+  if (!useNearest(selectPrimitive)) {
+    return renderElement(
+      "span",
+      { ...props, children: children ?? placeholder ?? null },
+      render,
+      unselected
+    )
+  }
   return (
-    <ValuePart part={{ placeholder, maxLabels, getMoreLabel }} render={render} props={props}>
+    <ValuePart
+      part={{ placeholder, maxLabels, getMoreLabel }}
+      render={render}
+      props={props}
+    >
       {children}
     </ValuePart>
   )
@@ -198,8 +239,17 @@ function ValuePart({
   const content = (state: SelectValueState) =>
     typeof children === "function"
       ? children(state)
-      : (children ?? (state.placeholder ? (placeholder ?? select.state.placeholder ?? null) : state.label))
-  return usePart(select, "value", part, { ...props, children: content, render }, "span")
+      : (children ??
+        (state.placeholder
+          ? (placeholder ?? select.state.placeholder ?? null)
+          : state.label))
+  return usePart(
+    select,
+    "value",
+    part,
+    { ...props, children: content, render },
+    "span"
+  )
 }
 
 /**
@@ -240,7 +290,10 @@ function SelectContent({
   const body = (state: SelectContentState) =>
     typeof children === "function"
       ? children(state)
-      : (children ?? (state.items && select.state.items && <SelectItems items={state.items} />))
+      : (children ??
+        (state.items && select.state.items && (
+          <SelectItems items={state.items} />
+        )))
   const element = usePart(select, "content", content, {
     ...props,
     children: body,
@@ -253,12 +306,17 @@ function SelectContent({
  * The listbox, when the content holds more than items, like a `SelectInput`. Without children, it renders the select's `items` that match.
  * @stable
  */
-function SelectList({ children = listItems, ...props }: PartProps<"div", SelectContentState>) {
+function SelectList({
+  children = listItems,
+  ...props
+}: PartProps<"div", SelectContentState>) {
   return usePart(selectPrimitive, "list", {}, { ...props, children })
 }
 
 // From the part's state, so new items re-render the list. Without items it's empty.
-const listItems = (state: SelectContentState) => <SelectItems items={state.items} />
+const listItems = (state: SelectContentState) => (
+  <SelectItems items={state.items} />
+)
 
 /**
  * A search field inside `SelectContent` that filters the list while focus stays in it. Put the items in a `SelectList`. Name it with `aria-label`.
@@ -270,9 +328,16 @@ const SelectInput = parts.Input
  * Shown while no item matches the search. Its message is announced when it appears.
  * @stable
  */
-function SelectEmpty({ children, ...props }: PartProps<"div", SelectEmptyState>) {
+function SelectEmpty({
+  children,
+  ...props
+}: PartProps<"div", SelectEmptyState>) {
   const content = (state: SelectEmptyState) =>
-    typeof children === "function" ? children(state) : state.empty ? children : null
+    typeof children === "function"
+      ? children(state)
+      : state.empty
+        ? children
+        : null
   return usePart(selectPrimitive, "empty", {}, { ...props, children: content })
 }
 
@@ -287,31 +352,51 @@ const SelectStatus = parts.Status
  * @stable
  */
 const SelectItem = parts.Item as <T = string>(
-  props: Omit<PartProps<"div", SelectItemState>, Clashing> & SelectItemProps<T>,
+  props: Omit<PartProps<"div", SelectItemState>, Clashing> & SelectItemProps<T>
 ) => React.ReactNode
 
 /**
  * The item's text, with the part the search matched in `<mark>`. Without string content, it shows the item's label.
  * @stable
  */
-function SelectItemText({ children, ...props }: PartProps<"span", SelectItemTextState>) {
+function SelectItemText({
+  children,
+  ...props
+}: PartProps<"span", SelectItemTextState>) {
   const item = useAround(selectPrimitive, "item")
-  if (!item) throw new Error("<SelectItemText> must be used inside <SelectItem>.")
+  if (!item) {
+    throw new Error("<SelectItemText> must be used inside <SelectItem>.")
+  }
   const label = (item.label as string | undefined) ?? (item.value as string)
   const part = { id: item.value as string, text: textToMark(children, label) }
   const content =
-    typeof children === "function" ? children : (state: SelectItemTextState) => markSegments(state.segments)
-  return usePart(selectPrimitive, "item-text", part, { ...props, children: content }, "span")
+    typeof children === "function"
+      ? children
+      : (state: SelectItemTextState) => markSegments(state.segments)
+  return usePart(
+    selectPrimitive,
+    "item-text",
+    part,
+    { ...props, children: content },
+    "span"
+  )
 }
 
 /**
  * An option that selects every item that matches, with `multiple`: in its group inside a `SelectGroup`, or in the whole list.
  * @stable
  */
-function SelectSelectAll({ render, ...props }: PartProps<"div", SelectSelectAllState>) {
+function SelectSelectAll({
+  render,
+  ...props
+}: PartProps<"div", SelectSelectAllState>) {
   const select = useSelect()
   select.instance.use(selectSelectAll)
-  const part = { id: selectAllKey(useAround(selectPrimitive, "group")?.id as string | undefined) }
+  const part = {
+    id: selectAllKey(
+      useAround(selectPrimitive, "group")?.id as string | undefined
+    ),
+  }
   return usePart(select, "select-all", part, { ...props, render }, "div")
 }
 
@@ -397,7 +482,13 @@ const SelectArrow = parts.Arrow
  */
 function SelectItems({ items }: { items: ListData<unknown> }) {
   const select = useSelect()
-  return <ListItems items={items} parts={listParts} keyOf={select.api.internal.keyOf} />
+  return (
+    <ListItems
+      items={items}
+      parts={listParts}
+      keyOf={select.api.internal.keyOf}
+    />
+  )
 }
 
 const listParts: ListParts = {

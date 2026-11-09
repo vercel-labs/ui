@@ -54,7 +54,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-slot="progress-track"][data-indeterminate] [data-slot="progress-indicator"] {
+    [data-slot="progress-track"][data-indeterminate]
+      [data-slot="progress-indicator"] {
       width: 100%;
       background: color-mix(in oklab, var(--ink) 30%, transparent);
       animation: none;

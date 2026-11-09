@@ -5,7 +5,10 @@ group inside a `ComboboxGroup`, or in the whole list.
 @stable
 -->
 <script lang="ts">
-  import { combobox as comboboxPrimitive, type ComboboxSelectAllState } from "@ui-sdk/core/combobox"
+  import {
+    combobox as comboboxPrimitive,
+    type ComboboxSelectAllState,
+  } from "@ui-sdk/core/combobox"
   import { comboboxSelectAll, selectAllKey } from "@ui-sdk/core/renderer"
   import { getContext } from "svelte"
   import Part from "../part.svelte"
@@ -22,5 +25,5 @@ group inside a `ComboboxGroup`, or in the whole list.
 </script>
 
 {#if part.present}
-  <Part tag="div" part={part} {props} />
+  <Part tag="div" {part} {props} />
 {/if}

@@ -7,9 +7,12 @@ test.describe("custom rendering", () => {
     await open("password-input-render")
   })
 
-  const field = (page: import("@playwright/test").Page) => page.getByLabel("Password", { exact: true })
+  const field = (page: import("@playwright/test").Page) =>
+    page.getByLabel("Password", { exact: true })
 
-  test("a toggle rendered as a span is still a toggle button", async ({ page }) => {
+  test("a toggle rendered as a span is still a toggle button", async ({
+    page,
+  }) => {
     const toggle = buttonNamed(page, "Show password")
     expect(await toggle.evaluate((el) => el.tagName)).toBe("SPAN")
     await expect(toggle).toHaveAttribute("aria-pressed", "false")
@@ -19,17 +22,27 @@ test.describe("custom rendering", () => {
     expect(await lastAction(page)).toBe("visible: true")
   })
 
-  for (const key of [" ", "Enter"])
-    test(`${key === " " ? "Space" : key} presses a toggle rendered as a span`, async ({ page, tab }) => {
+  for (const key of [" ", "Enter"]) {
+    test(`${key === " " ? "Space" : key} presses a toggle rendered as a span`, async ({
+      page,
+      tab,
+    }) => {
       await field(page).focus()
       await tab()
       await expect(buttonNamed(page, "Show password")).toBeFocused()
       await page.keyboard.press(key)
       await expect(field(page)).toHaveAttribute("type", "text")
     })
+  }
 
-  test("render functions and class names follow whether the password shows", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+  test("render functions and class names follow whether the password shows", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     const toggle = buttonNamed(page, "Show password")
     await expect(toggle).toHaveClass(/is-hidden/)
     await expect(toggle).toContainText("Show")
@@ -38,7 +51,10 @@ test.describe("custom rendering", () => {
     await expect(toggle).toContainText("Hide")
   })
 
-  test("web components mark state on the wrapped element", async ({ page, framework }) => {
+  test("web components mark state on the wrapped element", async ({
+    page,
+    framework,
+  }) => {
     test.skip(!framework.startsWith("web"), "Only web components.")
     const toggle = buttonNamed(page, "Show password")
     await toggle.click()

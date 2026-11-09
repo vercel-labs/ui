@@ -40,20 +40,25 @@
   ]
 
   function searchMovies(query: string, { signal }: { signal: AbortSignal }) {
-    return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
-      const timer = setTimeout(() => {
-        const needle = query.trim().toLowerCase()
-        resolve(
-          movieTitles
-            .filter((title) => title.toLowerCase().includes(needle))
-            .map((title) => ({ value: title.toLowerCase().replace(/\W+/g, "-"), label: title })),
-        )
-      }, 500)
-      signal.addEventListener("abort", () => {
-        clearTimeout(timer)
-        reject(signal.reason)
-      })
-    })
+    return new Promise<{ value: string; label: string }[]>(
+      (resolve, reject) => {
+        const timer = setTimeout(() => {
+          const needle = query.trim().toLowerCase()
+          resolve(
+            movieTitles
+              .filter((title) => title.toLowerCase().includes(needle))
+              .map((title) => ({
+                value: title.toLowerCase().replace(/\W+/g, "-"),
+                label: title,
+              }))
+          )
+        }, 500)
+        signal.addEventListener("abort", () => {
+          clearTimeout(timer)
+          reject(signal.reason)
+        })
+      }
+    )
   }
 
   const movies = useAsyncOptions(searchMovies, {
@@ -96,8 +101,12 @@
     </ComboboxEmpty>
     <ComboboxList>
       {#snippet children(state)}
-        {#each (state.items as { value: string; label: string; disabled?: boolean }[]) as item (item.value)}
-          <ComboboxItem value={item.value} label={item.label} disabled={item.disabled}>
+        {#each state.items as { value: string; label: string; disabled?: boolean }[] as item (item.value)}
+          <ComboboxItem
+            value={item.value}
+            label={item.label}
+            disabled={item.disabled}
+          >
             {item.label}
             <ComboboxItemIndicator>
               <CheckIcon aria-hidden="true" />

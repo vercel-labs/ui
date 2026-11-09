@@ -1,7 +1,10 @@
 import "@ui-sdk/web/scroll-area"
 import { log } from "../../../shared/web/log"
 
-const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}`)
+const tags = Array.from(
+  { length: 50 },
+  (_, index) => `v1.2.0-beta.${50 - index}`
+)
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -33,11 +36,15 @@ function mount(root: HTMLElement) {
   root.querySelector('[data-action="end"]')!.addEventListener("click", () => {
     api.scrollToEnd({ behavior: "instant" })
   })
-  root.querySelector("ui-scroll-area-viewport")!.addEventListener("scroll", () => {
-    const next = api.isAtEnd() ? "end" : api.isAtStart() ? "start" : null
-    if (next && next !== edge) log(root, `At the ${next}`)
-    edge = next
-  })
+  root
+    .querySelector("ui-scroll-area-viewport")!
+    .addEventListener("scroll", () => {
+      const next = api.isAtEnd() ? "end" : api.isAtStart() ? "start" : null
+      if (next && next !== edge) {
+        log(root, `At the ${next}`)
+      }
+      edge = next
+    })
 }
 
 export { mount }

@@ -12,7 +12,10 @@ import {
   spatialMove,
   type ChangeDetails,
 } from "@ui-sdk/core"
-import { popoverPreset, type PopoverOpenChangeReason } from "@ui-sdk/core/popover"
+import {
+  popoverPreset,
+  type PopoverOpenChangeReason,
+} from "@ui-sdk/core/popover"
 import { fuzzyScore } from "@ui-sdk/core/text-match"
 import { createParts } from "@ui-sdk/react/primitive"
 import {
@@ -64,10 +67,16 @@ type IconPickerPickReason = "item-press" | "search-enter"
 type IconPickerOptions = {
   open?: boolean
   defaultOpen?: boolean
-  onOpenChange?: (open: boolean, details: ChangeDetails<PopoverOpenChangeReason | "item-press">) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<PopoverOpenChangeReason | "item-press">
+  ) => void
   value?: string
   defaultValue?: string
-  onValueChange?: (value: string, details: ChangeDetails<IconPickerPickReason>) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<IconPickerPickReason>
+  ) => void
 }
 
 type IconPickerState = ReturnType<typeof popupState> & {
@@ -110,17 +119,27 @@ const iconPicker = definePrimitive({
     const change = createChange(context)
     let searched = false
     const highlightBest = () =>
-      store.set({ highlighted: store.get().query.trim() ? (roving.items()[0]?.key ?? null) : null })
+      store.set({
+        highlighted: store.get().query.trim()
+          ? (roving.items()[0]?.key ?? null)
+          : null,
+      })
     const roving = createRovingFocus<IconPickerState, IconProps>(context, {
       slot: "icon",
       key: "stop",
       move: spatialMove(),
       onItemsChange: () => {
-        if (!searched) return
+        if (!searched) {
+          return
+        }
         const items = roving.items()
         highlightBest()
         announce(
-          items.length === 0 ? "No icons found" : items.length === 1 ? "1 icon" : `${items.length} icons`,
+          items.length === 0
+            ? "No icons found"
+            : items.length === 1
+              ? "1 icon"
+              : `${items.length} icons`
         )
       },
     })
@@ -128,9 +147,13 @@ const iconPicker = definePrimitive({
     let wasOpen = store.get().open
     store.subscribe(() => {
       const { open, value } = store.get()
-      if (open === wasOpen) return
+      if (open === wasOpen) {
+        return
+      }
       wasOpen = open
-      if (!open) return
+      if (!open) {
+        return
+      }
       searched = false
       store.set({ query: "", stop: value, hovered: null, highlighted: null })
     })
@@ -162,13 +185,23 @@ const iconPicker = definePrimitive({
       iconKeydown(event: KeyboardEvent, el: HTMLElement) {
         const search = context.element("search") as HTMLInputElement | null
         const typing =
-          event.key.length === 1 && event.key !== " " && !event.ctrlKey && !event.metaKey && !event.altKey
-        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
+          event.key.length === 1 &&
+          event.key !== " " &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          !event.altKey
+        if (
+          (event.metaKey || event.ctrlKey) &&
+          event.key.toLowerCase() === "a"
+        ) {
           event.preventDefault()
           search?.focus()
           search?.select()
-        } else if (typing) search?.focus()
-        else roving.keydown(event, el)
+        } else if (typing) {
+          search?.focus()
+        } else {
+          roving.keydown(event, el)
+        }
       },
     }
     return api
@@ -177,9 +210,14 @@ const iconPicker = definePrimitive({
     trigger: popupTrigger(slot),
     content: popupContent(slot),
     search: slot({
-      attrs: (state) => ({ type: "search", value: state.query, autocomplete: "off" }),
+      attrs: (state) => ({
+        type: "search",
+        value: state.query,
+        autocomplete: "off",
+      }),
       on: {
-        input: (event, { api }) => api.search((event.target as HTMLInputElement).value),
+        input: (event, { api }) =>
+          api.search((event.target as HTMLInputElement).value),
         keydown: (event, { api }) => api.searchKeydown(event),
       },
     }),
@@ -195,7 +233,10 @@ const iconPicker = definePrimitive({
         type: "button",
         tabindex: part.api.roving.tabIndex(state, part),
         "aria-pressed": String(state.value === part.key),
-        "data-highlighted": state.focused === null && state.highlighted === part.key ? "" : undefined,
+        "data-highlighted":
+          state.focused === null && state.highlighted === part.key
+            ? ""
+            : undefined,
       }),
       press: ({ api, key }, event) => api.pick(key, "item-press", event),
       on: {
@@ -207,7 +248,10 @@ const iconPicker = definePrimitive({
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
     preview: slot<{}, { active: string | null }>({
-      state: (state) => ({ active: state.hovered ?? state.focused ?? state.highlighted ?? state.value }),
+      state: (state) => ({
+        active:
+          state.hovered ?? state.focused ?? state.highlighted ?? state.value,
+      }),
     }),
   }),
 })
@@ -263,7 +307,11 @@ const icons: Entry[] = [
   { name: "Code", icon: CodeIcon, keywords: "developer programming" },
   { name: "Terminal", icon: TerminalIcon, keywords: "console command shell" },
   { name: "Bug", icon: BugIcon, keywords: "issue error insect" },
-  { name: "Flask", icon: FlaskConicalIcon, keywords: "experiment lab science test" },
+  {
+    name: "Flask",
+    icon: FlaskConicalIcon,
+    keywords: "experiment lab science test",
+  },
   { name: "Lightbulb", icon: LightbulbIcon, keywords: "idea tip" },
   { name: "Wrench", icon: WrenchIcon, keywords: "settings tools fix" },
   { name: "Folder", icon: FolderIcon, keywords: "files directory project" },
@@ -283,11 +331,16 @@ const icons: Entry[] = [
 const byName = new Map(icons.map((entry) => [entry.name, entry]))
 
 function search(query: string) {
-  if (!query.trim()) return icons
+  if (!query.trim()) {
+    return icons
+  }
   return icons
     .map((entry) => ({
       entry,
-      score: Math.max(fuzzyScore(entry.name, query), fuzzyScore(entry.keywords, query) * 0.9),
+      score: Math.max(
+        fuzzyScore(entry.name, query),
+        fuzzyScore(entry.keywords, query) * 0.9
+      ),
     }))
     .filter(({ score }) => score > 0)
     .sort((a, b) => b.score - a.score)
@@ -298,7 +351,10 @@ function Example() {
   const [value, setValue] = React.useState<string | null>(null)
   const Picked = value ? byName.get(value)!.icon : null
   return (
-    <IconPicker value={value ?? undefined} onValueChange={(next: string) => setValue(next)}>
+    <IconPicker
+      value={value ?? undefined}
+      onValueChange={(next: string) => setValue(next)}
+    >
       <IconPickerTrigger>
         {Picked ? (
           <>
@@ -310,11 +366,16 @@ function Example() {
         )}
       </IconPickerTrigger>
       <IconPickerContent sideOffset={6} aria-label="Choose an icon">
-        <IconPickerSearch aria-label="Search icons" placeholder="Search icons…" />
+        <IconPickerSearch
+          aria-label="Search icons"
+          placeholder="Search icons…"
+        />
         <IconPickerGrid aria-label="Icons">
           {({ query }) => {
             const results = search(query)
-            if (results.length === 0) return <p data-slot="hint">No icons found.</p>
+            if (results.length === 0) {
+              return <p data-slot="hint">No icons found.</p>
+            }
             return results.map(({ name, icon: Icon }) => (
               <IconPickerIcon key={name} value={name} aria-label={name}>
                 <Icon />
@@ -325,7 +386,9 @@ function Example() {
         <IconPickerPreview>
           {({ active }) => {
             const entry = active ? byName.get(active) : undefined
-            if (!entry) return "Pick an icon"
+            if (!entry) {
+              return "Pick an icon"
+            }
             const Icon = entry.icon
             return (
               <>

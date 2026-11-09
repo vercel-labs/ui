@@ -10,7 +10,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -63,7 +64,7 @@ function mount(root: HTMLElement) {
                     <span data-slot="hint">${link.description}</span>
                   </a>
                 </ui-navigation-menu-link>
-              </li>`,
+              </li>`
                 )
                 .join("")}
             </ul>
@@ -98,12 +99,12 @@ function mount(root: HTMLElement) {
                         <ui-navigation-menu-link>
                           <a href="${link.href}">${link.title}</a>
                         </ui-navigation-menu-link>
-                      </li>`,
+                      </li>`
                         )
                         .join("")}
                     </ul>
                   </ui-navigation-menu-content>
-                </ui-navigation-menu-item>`,
+                </ui-navigation-menu-item>`
                   )
                   .join("")}
               </ui-navigation-menu-list>

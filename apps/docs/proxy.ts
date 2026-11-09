@@ -2,8 +2,12 @@ import { NextResponse, type NextRequest } from "next/server"
 
 // The newest `@ui-sdk/web` release of each major, and of all as `latest`,
 // and the releases that ship a stylesheet, from `next.config.mjs`.
-const newest: Record<string, string> = JSON.parse(process.env.WEB_RELEASES ?? "{}")
-const withStyle = new Set<string>(JSON.parse(process.env.WEB_STYLE_RELEASES ?? "[]"))
+const newest: Record<string, string> = JSON.parse(
+  process.env.WEB_RELEASES ?? "{}"
+)
+const withStyle = new Set<string>(
+  JSON.parse(process.env.WEB_STYLE_RELEASES ?? "[]")
+)
 
 /**
  * Sends a major, like `/web@1.js`, `/web@1.css` or `/web@1/tabs.js`, to its
@@ -19,8 +23,13 @@ function proxy(request: NextRequest) {
     request.nextUrl.pathname.match(/^\/web(?:@(\d+))?(\.js|\.css|\/.+)$/) ?? []
   const version = match && newest[major]
   // `/web@1.css` names the same release as `/web@1.js`, so the two always match.
-  if (!version || (rest === ".css" && !withStyle.has(version))) return NextResponse.next()
-  const response = NextResponse.redirect(new URL(`/web@${version}${rest}`, request.url), 307)
+  if (!version || (rest === ".css" && !withStyle.has(version))) {
+    return NextResponse.next()
+  }
+  const response = NextResponse.redirect(
+    new URL(`/web@${version}${rest}`, request.url),
+    307
+  )
   response.headers.set("Access-Control-Allow-Origin", "*")
   // Five minutes, so a page picks up a release soon after it ships.
   response.headers.set("Cache-Control", "public, max-age=300")

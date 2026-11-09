@@ -14,12 +14,15 @@ function callbacks(entry: Case) {
   const options = schemaOf(entry.primitive as Primitive).options ?? {}
   return Object.fromEntries(
     Object.keys(options)
-      .filter((key) => kindOf(options[key]) === "callback" && !(key in (entry.options ?? {})))
-      .map((key) => [key, () => {}]),
+      .filter(
+        (key) =>
+          kindOf(options[key]) === "callback" && !(key in (entry.options ?? {}))
+      )
+      .map((key) => [key, () => {}])
   )
 }
 
-for (const entry of cases)
+for (const entry of cases) {
   describe(entry.name, () => {
     test("does nothing when rendered again unchanged", async () => {
       const work: string[] = []
@@ -38,24 +41,35 @@ for (const entry of cases)
             characterData: true,
           })
           const frames = await framesDuring(async () => {
-            rerenderOf(view).setOptions(Object.fromEntries(Object.keys(inline).map((key) => [key, () => {}])))
+            rerenderOf(view).setOptions(
+              Object.fromEntries(
+                Object.keys(inline).map((key) => [key, () => {}])
+              )
+            )
             await idle()
           })
           records.push(...observer.takeRecords())
           observer.disconnect()
           stop()
-          if (told) work.push(`after ${step.key}: told subscribers ${told} times`)
-          for (const record of records)
+          if (told) {
+            work.push(`after ${step.key}: told subscribers ${told} times`)
+          }
+          for (const record of records) {
             work.push(
               `after ${step.key}: ${record.type}${record.attributeName ? ` ${record.attributeName}` : ""} on ${
-                (record.target as Element).getAttribute?.("data-slot") ?? record.target.nodeName
-              }`,
+                (record.target as Element).getAttribute?.("data-slot") ??
+                record.target.nodeName
+              }`
             )
-          if (frames > 6) work.push(`after ${step.key}: ${frames - 6} frames`)
+          }
+          if (frames > 6) {
+            work.push(`after ${step.key}: ${frames - 6} frames`)
+          }
         },
-        inline,
+        inline
       )
       view.unmount()
       expect([...new Set(work)]).toEqual([])
     })
   })
+}

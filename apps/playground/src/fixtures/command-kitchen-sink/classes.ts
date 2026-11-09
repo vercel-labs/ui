@@ -27,7 +27,8 @@ const dialogBackdrop =
   "fixed inset-0 z-40 bg-black/40 transition-opacity duration-150 data-starting-style:opacity-0 data-ending-style:opacity-0"
 const dialogContent =
   "fixed top-24 left-1/2 z-50 w-[32rem] max-w-[calc(100vw-2rem)] -translate-x-1/2 rounded-xl border border-neutral-200 bg-white p-0 shadow-xl outline-none transition-[opacity,scale] duration-150 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0"
-const dialogRoot = "flex w-full flex-col overflow-hidden rounded-xl text-[13px] text-neutral-950"
+const dialogRoot =
+  "flex w-full flex-col overflow-hidden rounded-xl text-[13px] text-neutral-950"
 
 export {
   breadcrumb,

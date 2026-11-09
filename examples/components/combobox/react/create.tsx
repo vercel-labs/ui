@@ -17,14 +17,25 @@ import {
 import { CheckIcon, LoaderCircleIcon, PlusIcon, XIcon } from "lucide-react"
 import * as React from "react"
 
-const initialLabels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const initialLabels = [
+  "Bug",
+  "Feature",
+  "Documentation",
+  "Design",
+  "Performance",
+  "Security",
+  "Testing",
+]
 
 function saveLabel(name: string) {
   return new Promise<void>((resolve, reject) =>
     setTimeout(
-      () => (name.length > 20 ? reject(new Error("Labels are 20 characters at most.")) : resolve()),
-      800,
-    ),
+      () =>
+        name.length > 20
+          ? reject(new Error("Labels are 20 characters at most."))
+          : resolve(),
+      800
+    )
   )
 }
 
@@ -81,7 +92,11 @@ function Example() {
                   <PlusIcon aria-hidden="true" />
                   <span data-slot="stack">
                     Create “{state.query}”
-                    {state.error ? <span data-slot="hint">{(state.error as Error).message}</span> : null}
+                    {state.error ? (
+                      <span data-slot="hint">
+                        {(state.error as Error).message}
+                      </span>
+                    ) : null}
                   </span>
                 </>
               )

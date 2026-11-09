@@ -28,7 +28,11 @@ function Example() {
           Today
         </button>
       </div>
-      <Calendar controller={calendar} defaultValue="2026-10-16" defaultMonth="2026-10">
+      <Calendar
+        controller={calendar}
+        defaultValue="2026-10-16"
+        defaultMonth="2026-10"
+      >
         <div data-slot="row">
           <CalendarPrevious data-variant="ghost">
             <svg
@@ -59,8 +63,12 @@ function Example() {
           </CalendarNext>
         </div>
         <CalendarGrid>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} />}
+          </CalendarWeekdays>
+          <CalendarWeeks>
+            {(cell) => <CalendarDay value={cell.date} />}
+          </CalendarWeeks>
         </CalendarGrid>
       </Calendar>
     </div>

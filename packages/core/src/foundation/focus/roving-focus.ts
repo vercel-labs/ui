@@ -77,7 +77,10 @@ type RovingFocusOptions<State extends object, Props = any> = {
    * follows when its item can take it, as long as focus is still where the
    * press left it.
    */
-  move?: (event: KeyboardEvent, context: RovingFocusMoveContext<Props>) => string | undefined
+  move?: (
+    event: KeyboardEvent,
+    context: RovingFocusMoveContext<Props>
+  ) => string | undefined
   /** Runs once after items join or leave, however many did, once the stop has moved to where the rules put it. */
   onItemsChange?: () => void
 }
@@ -88,7 +91,9 @@ type RovingFocusOptions<State extends object, Props = any> = {
 function createClaim() {
   let claimed: string | undefined
   return (key: string, eligible: boolean) => {
-    if (claimed === undefined && eligible) claimed = key
+    if (claimed === undefined && eligible) {
+      claimed = key
+    }
     return claimed === key
   }
 }
@@ -115,35 +120,50 @@ function createClaim() {
  */
 function createRovingFocus<State extends object, Props = any>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: RovingFocusOptions<State, Props>,
+  options: RovingFocusOptions<State, Props>
 ) {
   const { store } = context
   const key = options.key
   const remember = options.remember ?? true
   // Bound items in document order, sorted once and again only after one
   // joins, leaves or moves, so a key press never sorts every item.
-  const order = createOrder<{ key: string; el: HTMLElement; part: RovingFocusItem<Props> }>()
+  const order = createOrder<{
+    key: string
+    el: HTMLElement
+    part: RovingFocusItem<Props>
+  }>()
   const claim = createClaim()
   // The item focus was on last, which a group that remembers keeps the stop on.
   let remembered: string | null = null
   // An item focus is moving to that hasn't bound yet, and the element focus
   // left, so focus only follows if nothing else took it in between.
-  let pending: { key: string; from: Element | null; left?: boolean } | null = null
+  let pending: { key: string; from: Element | null; left?: boolean } | null =
+    null
   // The item element that has focus, which keeps it until it blurs.
   let holder: HTMLElement | null = null
 
   const orientation = () => options.orientation?.() ?? "vertical"
-  const isDisabled = (item: RovingFocusItem<Props>) => options.disabled?.(item) ?? false
-  const isFocusable = (item: RovingFocusItem<Props>) => options.focusable?.(item) ?? true
-  const isPreferred = (item: RovingFocusItem<Props>) => options.preferred?.(item) ?? false
+  const isDisabled = (item: RovingFocusItem<Props>) =>
+    options.disabled?.(item) ?? false
+  const isFocusable = (item: RovingFocusItem<Props>) =>
+    options.focusable?.(item) ?? true
+  const isPreferred = (item: RovingFocusItem<Props>) =>
+    options.preferred?.(item) ?? false
 
   // Where the group's rules put the stop, with `preferred` deciding which
   // items are preferred, or undefined while they can't decide it.
   function stopFor(preferred = isPreferred) {
     const list = order.list()
-    if (!list.length) return
+    if (!list.length) {
+      return
+    }
     // The stop already sits on an item about to render; the items bound now don't decide it.
-    if (pending && !list.some(({ part }) => part.key === pending!.key && isFocusable(part))) return
+    if (
+      pending &&
+      !list.some(({ part }) => part.key === pending!.key && isFocusable(part))
+    ) {
+      return
+    }
     const candidates = list.map(({ part }) => ({
       key: part.key,
       disabled: isDisabled(part),
@@ -156,7 +176,9 @@ function createRovingFocus<State extends object, Props = any>(
   // Moves the stop to where the group's rules put it now.
   function check() {
     const stop = stopFor()
-    if (stop !== undefined) store.set({ [key]: stop } as Partial<State>)
+    if (stop !== undefined) {
+      store.set({ [key]: stop } as Partial<State>)
+    }
   }
 
   // A change that can move the stop, like a selection or a branch expanding, checks it once.
@@ -164,13 +186,17 @@ function createRovingFocus<State extends object, Props = any>(
   let joined = false
   function queue(joinedOrLeft: boolean) {
     joined ||= joinedOrLeft
-    if (queued) return
+    if (queued) {
+      return
+    }
     queued = true
     queueMicrotask(() => {
       queued = false
       check()
       focusPending()
-      if (joined) options.onItemsChange?.()
+      if (joined) {
+        options.onItemsChange?.()
+      }
       joined = false
     })
   }
@@ -182,14 +208,20 @@ function createRovingFocus<State extends object, Props = any>(
   function moveTo(itemKey: string, from: Element | null) {
     const move = (pending = { key: itemKey, from })
     const before = remembered
-    if (remember) remembered = itemKey
+    if (remember) {
+      remembered = itemKey
+    }
     store.set({ [key]: itemKey } as Partial<State>)
     setTimeout(() => {
       // An item the framework kept, which only now renders its tabindex, takes focus here.
       focusPending()
-      if (pending !== move) return
+      if (pending !== move) {
+        return
+      }
       pending = null
-      if (remembered === itemKey) remembered = before
+      if (remembered === itemKey) {
+        remembered = before
+      }
       queue(false)
     })
   }
@@ -203,13 +235,22 @@ function createRovingFocus<State extends object, Props = any>(
 
   // Focuses the item a move was waiting for, once it can take focus.
   function focusPending() {
-    if (!pending) return
+    if (!pending) {
+      return
+    }
     const item = order.list().find(({ part }) => part.key === pending!.key)
-    if (!item || !isFocusable(item.part)) return
+    if (!item || !isFocusable(item.part)) {
+      return
+    }
     const active = item.el.ownerDocument.activeElement
     // The element focus left is often gone, like last month's day, which drops focus to the body.
-    const untouched = active === pending.from || active === null || active === item.el.ownerDocument.body
-    if (!untouched || focusOn(item.el)) pending = null
+    const untouched =
+      active === pending.from ||
+      active === null ||
+      active === item.el.ownerDocument.body
+    if (!untouched || focusOn(item.el)) {
+      pending = null
+    }
   }
   // Any change but a stop move, which only the group makes, can move the stop.
   let stop = store.get()[key]
@@ -217,8 +258,10 @@ function createRovingFocus<State extends object, Props = any>(
     store.subscribe(() => {
       const was = stop
       stop = store.get()[key]
-      if (stop === was && order.size()) queue(false)
-    }),
+      if (stop === was && order.size()) {
+        queue(false)
+      }
+    })
   )
 
   // The items that can take focus now, in document order.
@@ -238,16 +281,26 @@ function createRovingFocus<State extends object, Props = any>(
       if (pending?.left && pending.from === el) {
         const was = pending.key
         pending.key = part.key
-        if (remembered === was) remembered = part.key
-        if (store.get()[key] === was) store.set({ [key]: part.key } as Partial<State>)
-        if (el.ownerDocument.activeElement === el) holder = el
+        if (remembered === was) {
+          remembered = part.key
+        }
+        if (store.get()[key] === was) {
+          store.set({ [key]: part.key } as Partial<State>)
+        }
+        if (el.ownerDocument.activeElement === el) {
+          holder = el
+        }
       }
       const focused = () => {
         holder = el
-        if (remember) roving.remember(part.key)
+        if (remember) {
+          roving.remember(part.key)
+        }
       }
       const blurred = () => {
-        if (holder === el) holder = null
+        if (holder === el) {
+          holder = null
+        }
       }
       el.addEventListener("focus", focused)
       el.addEventListener("blur", blurred)
@@ -257,7 +310,9 @@ function createRovingFocus<State extends object, Props = any>(
       // that joins with plain data, like a menubar trigger, never hears any.
       let wasDisabled = isDisabled(part)
       const unwatch = onProps(part as Part, () => {
-        if (isDisabled(part) === wasDisabled) return
+        if (isDisabled(part) === wasDisabled) {
+          return
+        }
         wasDisabled = !wasDisabled
         queue(false)
       })
@@ -268,8 +323,13 @@ function createRovingFocus<State extends object, Props = any>(
         el.removeEventListener("blur", blurred)
         // An element removed with focus fires no blur, and focus drops to the body.
         const doc = el.ownerDocument
-        const had = !!doc && (doc.activeElement === el || (holder === el && doc.activeElement === doc.body))
-        if (holder === el) holder = null
+        const had =
+          !!doc &&
+          (doc.activeElement === el ||
+            (holder === el && doc.activeElement === doc.body))
+        if (holder === el) {
+          holder = null
+        }
         leave()
         // The item with the stop may render again as a new element, like a
         // card an undo moves to another column: focus follows it there if it
@@ -277,7 +337,9 @@ function createRovingFocus<State extends object, Props = any>(
         if (had && !pending && store.get()[key] === part.key) {
           const wait = (pending = { key: part.key, from: el, left: true })
           setTimeout(() => {
-            if (pending !== wait) return
+            if (pending !== wait) {
+              return
+            }
             pending = null
             queue(false)
           })
@@ -288,8 +350,12 @@ function createRovingFocus<State extends object, Props = any>(
     /** The item's `tabindex`: `"0"` for the item with the stop, `"-1"` for the rest. Pure, so `attrs` can call it. */
     tabIndex(state: State, part: RovingFocusItem<Props>) {
       const stop = (state[key] as string | null | undefined) ?? null
-      if (stop !== null) return stop === part.key ? "0" : "-1"
-      const eligible = options.claims ? options.claims(state, part) : !isDisabled(part) && isFocusable(part)
+      if (stop !== null) {
+        return stop === part.key ? "0" : "-1"
+      }
+      const eligible = options.claims
+        ? options.claims(state, part)
+        : !isDisabled(part) && isFocusable(part)
       return claim(part.key, eligible) ? "0" : "-1"
     },
     /**
@@ -299,23 +365,41 @@ function createRovingFocus<State extends object, Props = any>(
      * group's. At either end without `loop`, `key` is `from`.
      */
     keydown(event: KeyboardEvent, el: HTMLElement) {
-      if (event.defaultPrevented || event.altKey) return
+      if (event.defaultPrevented || event.altKey) {
+        return
+      }
       const list = focusables()
       const from = list.find((item) => item.el === el)
-      if (!from) return
+      if (!from) {
+        return
+      }
       const rtl = isRTL(el)
       let to: string | undefined
-      if (options.move) to = options.move(event, { from, items: list, rtl })
-      else if (!event.ctrlKey && !event.metaKey) {
+      if (options.move) {
+        to = options.move(event, { from, items: list, rtl })
+      } else if (!event.ctrlKey && !event.metaKey) {
         const step = stepFor(event.key, orientation(), rtl)
-        if (step !== undefined)
-          to = list[moveIndex(list.indexOf(from), step, list.length, options.loop?.() ?? false)]?.key
+        if (step !== undefined) {
+          to =
+            list[
+              moveIndex(
+                list.indexOf(from),
+                step,
+                list.length,
+                options.loop?.() ?? false
+              )
+            ]?.key
+        }
       }
-      if (to === undefined) return
+      if (to === undefined) {
+        return
+      }
       event.preventDefault()
       const next = list.find((item) => item.key === to)
       // A key no item can take focus for yet, like next month's day, renders before it does.
-      if (!next || (next !== from && !focusOn(next.el))) moveTo(to, el)
+      if (!next || (next !== from && !focusOn(next.el))) {
+        moveTo(to, el)
+      }
       return { key: to, from: from.key, shift: event.shiftKey }
     },
     /** The items that can take focus now, in document order, with their elements. */
@@ -327,8 +411,13 @@ function createRovingFocus<State extends object, Props = any>(
     focus(itemKey?: string) {
       if (itemKey !== undefined) {
         const item = order.list().find(({ part }) => part.key === itemKey)
-        if (item && isFocusable(item.part) && focusOn(item.el)) return
-        moveTo(itemKey, typeof document === "undefined" ? null : document.activeElement)
+        if (item && isFocusable(item.part) && focusOn(item.el)) {
+          return
+        }
+        moveTo(
+          itemKey,
+          typeof document === "undefined" ? null : document.activeElement
+        )
         return
       }
       const list = order.list()
@@ -341,7 +430,9 @@ function createRovingFocus<State extends object, Props = any>(
      * preferred item.
      */
     remember(itemKey: string) {
-      if (!remember) return
+      if (!remember) {
+        return
+      }
       remembered = itemKey
       store.set({ [key]: itemKey } as Partial<State>)
     },
@@ -355,7 +446,9 @@ function createRovingFocus<State extends object, Props = any>(
      * changed, and the group decides once it has.
      */
     stopFor: (preferred: (item: RovingFocusItem<Props>) => boolean) =>
-      order.list().some(({ part }) => preferred(part)) ? stopFor(preferred) : undefined,
+      order.list().some(({ part }) => preferred(part))
+        ? stopFor(preferred)
+        : undefined,
   }
   return roving
 }

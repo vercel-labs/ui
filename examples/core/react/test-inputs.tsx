@@ -13,7 +13,7 @@ async function test() {
   const search = mount(
     searchField,
     {},
-    `<root><input aria-label="Search"></input><clear>Clear</clear></root>`,
+    `<root><input aria-label="Search"></input><clear>Clear</clear></root>`
   )
   try {
     search.part("input")!.focus()
@@ -25,10 +25,17 @@ async function test() {
     search.unmount()
   }
 
-  const map = mount(seats, {}, `<root><seat value="A1"></seat><seat value="A2"></seat></root>`)
+  const map = mount(
+    seats,
+    {},
+    `<root><seat value="A1"></seat><seat value="A2"></seat></root>`
+  )
   try {
     await map.hover(map.part("seat", "A2")!)
-    expect("Hovering a seat marks it", map.part("seat", "A2")!.hasAttribute("data-hovered"))
+    expect(
+      "Hovering a seat marks it",
+      map.part("seat", "A2")!.hasAttribute("data-hovered")
+    )
   } finally {
     map.unmount()
   }
@@ -36,12 +43,15 @@ async function test() {
   const form = mount(
     subscribe,
     {},
-    `<root as="form"><input as="input"></input><button type="submit">Subscribe</button><error></error></root>`,
+    `<root as="form"><input as="input"></input><button type="submit">Subscribe</button><error></error></root>`
   )
   try {
     await form.click(form.root.querySelector("button")!)
     await form.settle()
-    expect("An empty email is announced", form.announced.includes("Enter an email address"))
+    expect(
+      "An empty email is announced",
+      form.announced.includes("Enter an email address")
+    )
   } finally {
     form.unmount()
   }
@@ -52,7 +62,11 @@ function Example() {
   const [checks, setChecks] = React.useState<Check[] | null>(null)
   return (
     <div data-slot="stack">
-      <button type="button" data-variant="solid" onClick={async () => setChecks(await test())}>
+      <button
+        type="button"
+        data-variant="solid"
+        onClick={async () => setChecks(await test())}
+      >
         Run the Tests
       </button>
       {checks && (

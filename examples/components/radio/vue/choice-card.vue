@@ -3,9 +3,21 @@ import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/vue/radio"
 
 const plans = [
-  { value: "hobby", label: "Hobby", description: "Free for personal projects." },
-  { value: "pro", label: "Pro", description: "$20 per month for growing teams." },
-  { value: "enterprise", label: "Enterprise", description: "Custom pricing and support." },
+  {
+    value: "hobby",
+    label: "Hobby",
+    description: "Free for personal projects.",
+  },
+  {
+    value: "pro",
+    label: "Pro",
+    description: "$20 per month for growing teams.",
+  },
+  {
+    value: "enterprise",
+    label: "Enterprise",
+    description: "Custom pricing and support.",
+  },
 ]
 </script>
 

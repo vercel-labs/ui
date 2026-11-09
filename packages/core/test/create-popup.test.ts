@@ -4,7 +4,10 @@
 // `tooltipPreset`, and our Popover, Hover Card and Tooltip on them, driven
 // the way a person would, with the testing kit.
 import { afterEach, describe, expect, onTestFinished, test, vi } from "vitest"
-import { linkPreview, type LinkPreviewOptions } from "../../../examples/experiments/link-preview"
+import {
+  linkPreview,
+  type LinkPreviewOptions,
+} from "../../../examples/experiments/link-preview"
 import type { ChangeDetails } from "../src/foundation/kernel/details"
 import { bind } from "../src/foundation/kernel/part"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
@@ -30,10 +33,15 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-const frame = () => new Promise((done) => requestAnimationFrame(() => setTimeout(done)))
+const frame = () =>
+  new Promise((done) => requestAnimationFrame(() => setTimeout(done)))
 
 const page = (title: string) =>
-  JSON.stringify({ title, description: `About ${title}.`, image: `/${title}.png` })
+  JSON.stringify({
+    title,
+    description: `About ${title}.`,
+    image: `/${title}.png`,
+  })
 
 const previewMarkup = `<div>
   <button>Before</button>
@@ -49,12 +57,18 @@ function preview(options: LinkPreviewOptions = {}) {
   const reasons: string[] = []
   const view = mount(
     linkPreview,
-    { delay: 50, ...options, onOpenChange: (_open, details) => reasons.push(details.reason) },
-    previewMarkup,
+    {
+      delay: 50,
+      ...options,
+      onOpenChange: (_open, details) => reasons.push(details.reason),
+    },
+    previewMarkup
   )
   mounts.push(view)
   const button = (name: string) =>
-    [...view.root.querySelectorAll("button")].find((el) => el.textContent === name)!
+    [...view.root.querySelectorAll("button")].find(
+      (el) => el.textContent === name
+    )!
   // `state` is a getter, so the view gets the extras rather than being copied.
   return Object.assign(view, { reasons, button })
 }
@@ -65,7 +79,9 @@ describe("a link preview on the hoverCard preset", () => {
     const view = preview({ delay: 500 })
     await view.hover(view.part("trigger", "popups")!)
     expect(view.state.open).toBe(false)
-    await vi.waitFor(() => expect(view.state.open).toBe(true), { timeout: 2000 })
+    await vi.waitFor(() => expect(view.state.open).toBe(true), {
+      timeout: 2000,
+    })
     expect(view.part("content")!.isConnected).toBe(true)
     expect(view.part("trigger", "popups")!.hasAttribute("data-open")).toBe(true)
     expect(view.reasons).toEqual(["trigger-hover"])
@@ -125,7 +141,10 @@ describe("a link preview on the hoverCard preset", () => {
     const payloads: { title: string; reason: string }[] = []
     const view = preview({
       onPayloadChange: (page, details) =>
-        payloads.push({ title: (page as { title: string }).title, reason: details.reason }),
+        payloads.push({
+          title: (page as { title: string }).title,
+          reason: details.reason,
+        }),
     })
     await view.hover(view.part("trigger", "popups")!)
     await vi.waitFor(() => expect(view.state.open).toBe(true))
@@ -135,7 +154,9 @@ describe("a link preview on the hoverCard preset", () => {
     expect(view.state.trigger).toBe("focus")
     expect(view.part("image")!.getAttribute("src")).toBe("/Focus.png")
     expect(view.part("trigger", "focus")!.hasAttribute("data-open")).toBe(true)
-    expect(view.part("trigger", "popups")!.hasAttribute("data-open")).toBe(false)
+    expect(view.part("trigger", "popups")!.hasAttribute("data-open")).toBe(
+      false
+    )
     expect(payloads).toEqual([
       { title: "Popups", reason: "trigger-hover" },
       { title: "Focus", reason: "trigger-hover" },
@@ -209,8 +230,11 @@ function sharing(options: ShareOptions = {}) {
   const reasons: string[] = []
   const view = mount(
     share,
-    { ...options, onOpenChange: (_open, details) => reasons.push(details.reason) },
-    shareMarkup,
+    {
+      ...options,
+      onOpenChange: (_open, details) => reasons.push(details.reason),
+    },
+    shareMarkup
   )
   mounts.push(view)
   return Object.assign(view, { reasons })
@@ -220,7 +244,8 @@ const outsideButton = (root: Element) =>
   [...root.querySelectorAll("button")].find((el) => el.textContent === "After")!
 
 // Lays an element out at a box, since jsdom lays nothing out.
-const place = (el: Element, box: DOMRect) => Object.assign(el, { getBoundingClientRect: () => box })
+const place = (el: Element, box: DOMRect) =>
+  Object.assign(el, { getBoundingClientRect: () => box })
 
 // Keeps elements animating out for the rest of the test.
 function holdExit(...els: Element[]) {
@@ -232,10 +257,13 @@ function holdExit(...els: Element[]) {
     animationDelay: "0s",
   }
   vi.spyOn(window, "getComputedStyle").mockImplementation((el, pseudo) =>
-    els.includes(el) ? (fading as CSSStyleDeclaration) : computed(el, pseudo),
+    els.includes(el) ? (fading as CSSStyleDeclaration) : computed(el, pseudo)
   )
-  for (const el of els)
-    Object.assign(el, { getAnimations: () => [{ finished: new Promise(() => {}), effect: null }] })
+  for (const el of els) {
+    Object.assign(el, {
+      getAnimations: () => [{ finished: new Promise(() => {}), effect: null }],
+    })
+  }
   onTestFinished(() => {
     vi.restoreAllMocks()
   })
@@ -243,28 +271,39 @@ function holdExit(...els: Element[]) {
 
 // What reached an element pressed with the mouse: its pointerdown, said
 // prevented when it was, and its click.
-async function pressOn(view: { click: (el: Element) => Promise<void> }, el: Element) {
+async function pressOn(
+  view: { click: (el: Element) => Promise<void> },
+  el: Element
+) {
   const heard: string[] = []
-  const hear = (event: Event) => heard.push(`${event.type}${event.defaultPrevented ? " prevented" : ""}`)
-  for (const type of ["pointerdown", "click"]) el.addEventListener(type, hear)
+  const hear = (event: Event) =>
+    heard.push(`${event.type}${event.defaultPrevented ? " prevented" : ""}`)
+  for (const type of ["pointerdown", "click"]) {
+    el.addEventListener(type, hear)
+  }
   await view.click(el)
-  for (const type of ["pointerdown", "click"]) el.removeEventListener(type, hear)
+  for (const type of ["pointerdown", "click"]) {
+    el.removeEventListener(type, hear)
+  }
   return heard
 }
 
 describe("a popup animating out", () => {
-  test.each([false, true])("lets a press on its content through to the page, modal: %s", async (modal) => {
-    const view = sharing({ modal })
-    await view.click(view.part("trigger")!)
-    const content = view.part("content")!
-    holdExit(content)
-    place(content, new DOMRect(0, 0, 200, 200))
-    await view.keys("Escape")
-    expect(view.state).toMatchObject({ open: false, mounted: true })
-    const after = place(outsideButton(view.root), new DOMRect(50, 50, 20, 20))
-    expect(await pressOn(view, after)).toEqual(["pointerdown", "click"])
-    expect(view.state.mounted).toBe(true)
-  })
+  test.each([false, true])(
+    "lets a press on its content through to the page, modal: %s",
+    async (modal) => {
+      const view = sharing({ modal })
+      await view.click(view.part("trigger")!)
+      const content = view.part("content")!
+      holdExit(content)
+      place(content, new DOMRect(0, 0, 200, 200))
+      await view.keys("Escape")
+      expect(view.state).toMatchObject({ open: false, mounted: true })
+      const after = place(outsideButton(view.root), new DOMRect(50, 50, 20, 20))
+      expect(await pressOn(view, after)).toEqual(["pointerdown", "click"])
+      expect(view.state.mounted).toBe(true)
+    }
+  )
 
   test("a modal dialog swallows a press on its backdrop, so it never reaches the page", async () => {
     const view = mount(dialog, { modal: true }, backdropMarkup)
@@ -277,8 +316,12 @@ describe("a popup animating out", () => {
     await view.keys("Escape")
     expect(view.state).toMatchObject({ open: false, mounted: true })
     const after = outsideButton(view.root)
-    expect(await pressOn(view, place(after, new DOMRect(50, 50, 20, 20)))).toEqual(["pointerdown prevented"])
-    expect(await pressOn(view, place(after, new DOMRect(350, 350, 20, 20)))).toEqual(["pointerdown", "click"])
+    expect(
+      await pressOn(view, place(after, new DOMRect(50, 50, 20, 20)))
+    ).toEqual(["pointerdown prevented"])
+    expect(
+      await pressOn(view, place(after, new DOMRect(350, 350, 20, 20)))
+    ).toEqual(["pointerdown", "click"])
     expect(view.state.mounted).toBe(true)
   })
 })
@@ -292,7 +335,11 @@ describe("a popover on the popover preset", () => {
   })
 
   test("one with no sync follows a modal option that changes while it's open", async () => {
-    const view = mount(unsyncedShare, { defaultOpen: true, modal: true }, shareMarkup)
+    const view = mount(
+      unsyncedShare,
+      { defaultOpen: true, modal: true },
+      shareMarkup
+    )
     mounts.push(view)
     expect(view.part("content")!.getAttribute("aria-modal")).toBe("true")
     rerenderOf(view).setOptions({ modal: false })
@@ -337,18 +384,28 @@ describe("a popover on the popover preset", () => {
   test("onOpenChange hears the details its rules add", async () => {
     type TaggedOptions = {
       defaultOpen?: boolean
-      onOpenChange?: (open: boolean, details: ChangeDetails<string> & { tag: string }) => void
+      onOpenChange?: (
+        open: boolean,
+        details: ChangeDetails<string> & { tag: string }
+      ) => void
     }
     const tagged = definePrimitive({
       name: "tagged",
       options: { defaultOpen: "boolean", onOpenChange: "callback" },
       state: (options: TaggedOptions) => popupState(options),
       api: (context) =>
-        createPopup(context, { preset: popoverPreset, rules: () => ({ details: () => ({ tag: "share" }) }) }),
+        createPopup(context, {
+          preset: popoverPreset,
+          rules: () => ({ details: () => ({ tag: "share" }) }),
+        }),
       slots: (slot) => popupSlots(slot),
     })
     const tags: string[] = []
-    const view = mount(tagged, { onOpenChange: (_open, details) => tags.push(details.tag) }, shareMarkup)
+    const view = mount(
+      tagged,
+      { onOpenChange: (_open, details) => tags.push(details.tag) },
+      shareMarkup
+    )
     mounts.push(view)
     await view.click(view.part("trigger")!)
     await view.keys("Escape")
@@ -372,7 +429,11 @@ describe("a popover on the popover preset", () => {
   })
 
   test("renders on the server from state alone", () => {
-    const html = checkServer(share, { defaultOpen: true, modal: true }, shareMarkup)
+    const html = checkServer(
+      share,
+      { defaultOpen: true, modal: true },
+      shareMarkup
+    )
     expect(html).toContain('role="dialog"')
     expect(html).toContain('aria-labelledby="server-')
   })
@@ -382,7 +443,8 @@ describe("a popover on the popover preset", () => {
 const tip = definePrimitive({
   name: "tip",
   options: { open: "boolean", defaultOpen: "boolean", delay: "number" },
-  state: (options: { open?: boolean; defaultOpen?: boolean; delay?: number }) => popupState(options),
+  state: (options: { open?: boolean; defaultOpen?: boolean; delay?: number }) =>
+    popupState(options),
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: (context) => createPopup(context, { preset: tooltipPreset }),
   slots: (slot) => popupSlots(slot),
@@ -397,7 +459,9 @@ describe("tooltips on tooltipPreset", () => {
     const second = mount(tip, { delay: 50 }, tipMarkup("Italic"))
     mounts.push(first, second)
     const trigger = first.part("trigger")!
-    expect(trigger.getAttribute("aria-describedby")).toBe(first.part("content")!.id)
+    expect(trigger.getAttribute("aria-describedby")).toBe(
+      first.part("content")!.id
+    )
     await first.hover(trigger)
     await vi.waitFor(() => expect(first.state.open).toBe(true))
     await second.hover(second.part("trigger")!)
@@ -411,7 +475,7 @@ describe("our popups on the kit", () => {
     const view = mount(
       popover,
       {},
-      `<div><trigger shortcut="mod+i">Share</trigger><content><title>Share</title><button>Copy link</button><close>Close</close></content><button>After</button></div>`,
+      `<div><trigger shortcut="mod+i">Share</trigger><content><title>Share</title><button>Copy link</button><close>Close</close></content><button>After</button></div>`
     )
     mounts.push(view)
     await view.click(view.part("trigger")!)
@@ -423,7 +487,7 @@ describe("our popups on the kit", () => {
     const view = mount(
       popover,
       {},
-      `<div><trigger id="ada">Ada</trigger><trigger id="grace">Grace</trigger><button>After</button><content><button>Copy link</button></content></div>`,
+      `<div><trigger id="ada">Ada</trigger><trigger id="grace">Grace</trigger><button>After</button><content><button>Copy link</button></content></div>`
     )
     mounts.push(view)
     const grace = view.part("trigger", "grace")!
@@ -438,10 +502,12 @@ describe("our popups on the kit", () => {
 
   test("Popover whose only trigger renders again while open returns focus to the new one", async () => {
     const instance = popover({ id: "p" })
-    const first = Object.assign(document.createElement("button"), { textContent: "Open" })
+    const first = Object.assign(document.createElement("button"), {
+      textContent: "Open",
+    })
     const content = document.createElement("div")
     const inside = content.appendChild(
-      Object.assign(document.createElement("button"), { textContent: "Inside" }),
+      Object.assign(document.createElement("button"), { textContent: "Inside" })
     )
     document.body.append(first, content)
     const unbindContent = bind(instance.part("content"), content)
@@ -450,10 +516,14 @@ describe("our popups on the kit", () => {
     await frame()
     inside.focus()
     unbindFirst()
-    const second = Object.assign(document.createElement("button"), { textContent: "Close" })
+    const second = Object.assign(document.createElement("button"), {
+      textContent: "Close",
+    })
     first.replaceWith(second)
     const unbindSecond = bind(instance.part("trigger", { id: "t2" }), second)
-    inside.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    inside.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
     await frame()
     expect(instance.get().open).toBe(false)
     expect(document.activeElement).toBe(second)
@@ -465,7 +535,8 @@ describe("our popups on the kit", () => {
   test("Popover that mounts open and whose only trigger renders again returns focus to the new one", async () => {
     for (const options of [{ defaultOpen: true }, { open: true }]) {
       const instance = popover({ id: "p", ...options })
-      const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+      const button = (text: string) =>
+        Object.assign(document.createElement("button"), { textContent: text })
       const [first, after] = [button("Open"), button("After")]
       const content = document.createElement("div")
       const inside = content.appendChild(button("Inside"))
@@ -479,7 +550,9 @@ describe("our popups on the kit", () => {
       first.replaceWith(second)
       const unbindSecond = bind(instance.part("trigger", { id: "t2" }), second)
       instance.api.close()
-      if ("open" in options) instance.setOptions({ id: "p", open: false })
+      if ("open" in options) {
+        instance.setOptions({ id: "p", open: false })
+      }
       await frame()
       expect(document.activeElement).toBe(second)
       unbindSecond()
@@ -491,7 +564,8 @@ describe("our popups on the kit", () => {
 
   test("Popover whose triggers all bind again while open keeps the one that opened it", async () => {
     const instance = popover({ id: "p" })
-    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+    const button = (text: string) =>
+      Object.assign(document.createElement("button"), { textContent: text })
     const [ada, grace] = [button("Ada"), button("Grace")]
     const content = document.createElement("div")
     const inside = content.appendChild(button("Copy link"))
@@ -505,20 +579,32 @@ describe("our popups on the kit", () => {
     grace.click()
     await frame()
     inside.focus()
-    for (const cleanup of unbind) cleanup()
+    for (const cleanup of unbind) {
+      cleanup()
+    }
     unbind = triggers()
     expect(instance.get().trigger).toBe("grace")
-    inside.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    inside.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
     await frame()
     expect(document.activeElement).toBe(grace)
-    for (const cleanup of [...unbind, unbindContent]) cleanup()
+    for (const cleanup of [...unbind, unbindContent]) {
+      cleanup()
+    }
     instance.destroy()
   })
 
   test("Popover closing after the trigger that opened it is gone and another binds moves focus past it", async () => {
     const instance = popover({ id: "p" })
-    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
-    const [ada, grace, after, linus] = [button("Ada"), button("Grace"), button("After"), button("Linus")]
+    const button = (text: string) =>
+      Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace, after, linus] = [
+      button("Ada"),
+      button("Grace"),
+      button("After"),
+      button("Linus"),
+    ]
     const content = document.createElement("div")
     const inside = content.appendChild(button("Copy link"))
     const row = document.body.appendChild(document.createElement("div"))
@@ -536,17 +622,26 @@ describe("our popups on the kit", () => {
     grace.remove()
     row.append(linus)
     unbind.push(bind(instance.part("trigger", { id: "linus" }), linus))
-    inside.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    inside.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
     await frame()
     expect(document.activeElement).toBe(after)
-    for (const cleanup of unbind) cleanup()
+    for (const cleanup of unbind) {
+      cleanup()
+    }
     instance.destroy()
   })
 
   test("Popover whose content binds again after the trigger that opened it is gone moves focus past it", async () => {
     const instance = popover({ id: "p" })
-    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
-    const [ada, grace, after] = [button("Ada"), button("Grace"), button("After")]
+    const button = (text: string) =>
+      Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace, after] = [
+      button("Ada"),
+      button("Grace"),
+      button("After"),
+    ]
     const content = document.createElement("div")
     const inside = content.appendChild(button("Copy link"))
     const row = document.body.appendChild(document.createElement("div"))
@@ -565,18 +660,27 @@ describe("our popups on the kit", () => {
     unbindContent = bind(instance.part("content"), content)
     await frame()
     inside.focus()
-    inside.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    inside.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
     await frame()
     expect(instance.get().open).toBe(false)
     expect(document.activeElement).toBe(after)
-    for (const cleanup of [unbindContent, ...unbind]) cleanup()
+    for (const cleanup of [unbindContent, ...unbind]) {
+      cleanup()
+    }
     instance.destroy()
   })
 
   test("Popover closing from its other trigger after the one that opened it is gone leaves focus there", async () => {
     const instance = popover({ id: "p" })
-    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
-    const [ada, grace, after] = [button("Ada"), button("Grace"), button("After")]
+    const button = (text: string) =>
+      Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace, after] = [
+      button("Ada"),
+      button("Grace"),
+      button("After"),
+    ]
     const content = document.createElement("div")
     content.append(button("Copy link"))
     const row = document.body.appendChild(document.createElement("div"))
@@ -592,19 +696,28 @@ describe("our popups on the kit", () => {
     await frame()
     grace.remove()
     ada.focus()
-    ada.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    ada.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
     await frame()
     expect(instance.get().open).toBe(false)
     expect(document.activeElement).toBe(ada)
-    for (const cleanup of unbind) cleanup()
+    for (const cleanup of unbind) {
+      cleanup()
+    }
     instance.destroy()
   })
 
   test("Dialog opened from a popover whose trigger is then removed returns focus past that trigger", async () => {
     const menu = popover({ id: "p" })
     const confirm = dialog({ id: "d" })
-    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
-    const [ada, grace, after] = [button("Ada"), button("Grace"), button("After")]
+    const button = (text: string) =>
+      Object.assign(document.createElement("button"), { textContent: text })
+    const [ada, grace, after] = [
+      button("Ada"),
+      button("Grace"),
+      button("After"),
+    ]
     const content = document.createElement("div")
     const remove = content.appendChild(button("Delete"))
     const dialogContent = document.createElement("div")
@@ -628,11 +741,15 @@ describe("our popups on the kit", () => {
     await frame()
     grace.remove()
     yes.focus()
-    yes.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    yes.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
     await frame()
     expect(confirm.get().open).toBe(false)
     expect(document.activeElement).toBe(after)
-    for (const cleanup of unbind) cleanup()
+    for (const cleanup of unbind) {
+      cleanup()
+    }
     confirm.destroy()
     menu.destroy()
   })
@@ -641,7 +758,7 @@ describe("our popups on the kit", () => {
     const view = mount(
       popover,
       {},
-      `<div><trigger id="ada">Ada</trigger><trigger id="grace">Grace</trigger><button>After</button><content><button>Copy link</button></content></div>`,
+      `<div><trigger id="ada">Ada</trigger><trigger id="grace">Grace</trigger><button>After</button><content><button>Copy link</button></content></div>`
     )
     mounts.push(view)
     await view.click(view.part("trigger", "grace")!)
@@ -656,13 +773,18 @@ describe("our popups on the kit", () => {
   })
 
   test("Popover opened by its open option after the trigger that opened it last is gone returns focus to its other trigger", async () => {
-    let options = { id: "p", open: false, onOpenChange: (open: boolean) => hand(open) }
+    let options = {
+      id: "p",
+      open: false,
+      onOpenChange: (open: boolean) => hand(open),
+    }
     const instance = popover(options)
     const hand = (open: boolean) => {
       options = { ...options, open }
       instance.setOptions(options)
     }
-    const button = (text: string) => Object.assign(document.createElement("button"), { textContent: text })
+    const button = (text: string) =>
+      Object.assign(document.createElement("button"), { textContent: text })
     const [ada, grace] = [button("Ada"), button("Grace")]
     const content = document.createElement("div")
     const inside = content.appendChild(button("Copy link"))
@@ -684,7 +806,9 @@ describe("our popups on the kit", () => {
     hand(false)
     await frame()
     expect(document.activeElement).toBe(ada)
-    for (const cleanup of unbind) cleanup()
+    for (const cleanup of unbind) {
+      cleanup()
+    }
     instance.destroy()
   })
 
@@ -692,7 +816,7 @@ describe("our popups on the kit", () => {
     const view = mount(
       hoverCard,
       { delay: 0 },
-      `<div><trigger as="a" href="/ada">Ada</trigger><content>Wrote the first program.</content></div>`,
+      `<div><trigger as="a" href="/ada">Ada</trigger><content>Wrote the first program.</content></div>`
     )
     mounts.push(view)
     await view.keys("Tab")
@@ -703,7 +827,11 @@ describe("our popups on the kit", () => {
   })
 
   test("Tooltip opens at once on keyboard focus, a press closes it, and it renders on the server", async () => {
-    const view = mount(tooltip, {}, `<div><trigger>Save</trigger><content>Save</content></div>`)
+    const view = mount(
+      tooltip,
+      {},
+      `<div><trigger>Save</trigger><content>Save</content></div>`
+    )
     mounts.push(view)
     await view.keys("Tab")
     expect(view.state.open).toBe(true)
@@ -713,8 +841,8 @@ describe("our popups on the kit", () => {
       checkServer(
         tooltip,
         { defaultOpen: true },
-        `<div><trigger>Save</trigger><content>Save</content></div>`,
-      ),
+        `<div><trigger>Save</trigger><content>Save</content></div>`
+      )
     ).toContain('role="tooltip"')
   })
 })
@@ -723,77 +851,109 @@ describe("a shown popup's modal effects", () => {
   const listMarkup = `<root><input><content><list></list></content></root>`
   const selectMarkup = `<root><trigger><value></value></trigger><content><list></list></content></root>`
   const changes = <T>(values: readonly T[]) =>
-    values.flatMap((from) => values.filter((to) => to !== from).map((to) => ({ from, to })))
+    values.flatMap((from) =>
+      values.filter((to) => to !== from).map((to) => ({ from, to }))
+    )
   const cases = [
-    ...changes([undefined, false, true, "trap-focus"] as const).flatMap(({ from, to }) => [
-      {
-        name: "a custom popup",
-        from,
-        to,
-        show: () => mount(unsyncedShare, { defaultOpen: true, modal: from }, shareMarkup),
-      },
-      {
-        name: "Dialog",
-        from,
-        to,
-        show: () => mount(dialog, { defaultOpen: true, modal: from }, shareMarkup),
-      },
-      {
-        name: "Popover",
-        from,
-        to,
-        show: () => mount(popover, { defaultOpen: true, modal: from }, shareMarkup),
-      },
-    ]),
-    ...changes([undefined, false, true, "pointer"] as const).flatMap(({ from, to }) => [
-      {
-        name: "Select",
-        from,
-        to,
-        show: () => mount(select, { defaultOpen: true, modal: from }, selectMarkup),
-      },
-      {
-        name: "Combobox",
-        from,
-        to,
-        show: () => mount(combobox, { defaultOpen: true, modal: from }, listMarkup),
-      },
-      {
-        name: "Autocomplete",
-        from,
-        to,
-        show: () => mount(autocomplete, { defaultOpen: true, modal: from }, listMarkup),
-      },
-    ]),
+    ...changes([undefined, false, true, "trap-focus"] as const).flatMap(
+      ({ from, to }) => [
+        {
+          name: "a custom popup",
+          from,
+          to,
+          show: () =>
+            mount(
+              unsyncedShare,
+              { defaultOpen: true, modal: from },
+              shareMarkup
+            ),
+        },
+        {
+          name: "Dialog",
+          from,
+          to,
+          show: () =>
+            mount(dialog, { defaultOpen: true, modal: from }, shareMarkup),
+        },
+        {
+          name: "Popover",
+          from,
+          to,
+          show: () =>
+            mount(popover, { defaultOpen: true, modal: from }, shareMarkup),
+        },
+      ]
+    ),
+    ...changes([undefined, false, true, "pointer"] as const).flatMap(
+      ({ from, to }) => [
+        {
+          name: "Select",
+          from,
+          to,
+          show: () =>
+            mount(select, { defaultOpen: true, modal: from }, selectMarkup),
+        },
+        {
+          name: "Combobox",
+          from,
+          to,
+          show: () =>
+            mount(combobox, { defaultOpen: true, modal: from }, listMarkup),
+        },
+        {
+          name: "Autocomplete",
+          from,
+          to,
+          show: () =>
+            mount(autocomplete, { defaultOpen: true, modal: from }, listMarkup),
+        },
+      ]
+    ),
   ]
 
-  test.each(cases)("$name follows modal from $from to $to while open", ({ show, to }) => {
-    const outside = document.body.appendChild(document.createElement("button"))
-    const view = show()
-    mounts.push(view)
-    const focused = document.activeElement
-    rerenderOf(view).setOptions({ modal: to })
-    const effects = modalTriple(view.state.modal)
-    expect(view.state.open).toBe(true)
-    expect(document.activeElement).toBe(focused)
-    expect(!!outside.inert).toBe(effects.inertAndLock)
-    expect(document.documentElement.style.overflow === "hidden").toBe(effects.inertAndLock)
-    expect(findLayer(view.part("content")!)?.modal).toBe(effects.consumeOutsidePress)
-  })
+  test.each(cases)(
+    "$name follows modal from $from to $to while open",
+    ({ show, to }) => {
+      const outside = document.body.appendChild(
+        document.createElement("button")
+      )
+      const view = show()
+      mounts.push(view)
+      const focused = document.activeElement
+      rerenderOf(view).setOptions({ modal: to })
+      const effects = modalTriple(view.state.modal)
+      expect(view.state.open).toBe(true)
+      expect(document.activeElement).toBe(focused)
+      expect(!!outside.inert).toBe(effects.inertAndLock)
+      expect(document.documentElement.style.overflow === "hidden").toBe(
+        effects.inertAndLock
+      )
+      expect(findLayer(view.part("content")!)?.modal).toBe(
+        effects.consumeOutsidePress
+      )
+    }
+  )
 
   test.each([false, true])(
     "a child shown outside its parent stays usable when the parent turns modal, child modal: %s",
     (modal) => {
-      const parent = mount(dialog, { defaultOpen: true, modal: false }, shareMarkup)
+      const parent = mount(
+        dialog,
+        { defaultOpen: true, modal: false },
+        shareMarkup
+      )
       const child = mount(dialog, { modal }, shareMarkup)
       mounts.push(parent, child)
       parent.part("content")!.append(child.part("trigger")!)
       rerenderOf(child).setOptions({ modal, open: true })
       const content = child.part("content")!
-      expect(findLayer(content)?.parent).toBe(findLayer(parent.part("content")!))
+      expect(findLayer(content)?.parent).toBe(
+        findLayer(parent.part("content")!)
+      )
       rerenderOf(parent).setOptions({ modal: true })
-      const inert = (node: HTMLElement | null): boolean => !!node && (node.inert || inert(node.parentElement))
+      const inert = (node: HTMLElement | null): boolean =>
+        !!node && (node.inert || inert(node.parentElement))
       expect(inert(content)).toBe(false)
-    },
+    }
   )
 })

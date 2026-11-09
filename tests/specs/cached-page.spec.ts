@@ -23,13 +23,13 @@ const pageEffects = (page: Page) =>
   page.evaluate(() => ({
     topLayer: document.querySelectorAll(":popover-open").length > 0,
     locked: [document.documentElement, document.body].some(
-      (el) => getComputedStyle(el).overflowY === "hidden",
+      (el) => getComputedStyle(el).overflowY === "hidden"
     ),
     inert: !!document.querySelector("[inert]"),
   }))
 
-for (const { popup, role } of popups)
-  for (const { placement, options } of placements)
+for (const { popup, role } of popups) {
+  for (const { placement, options } of placements) {
     test(`an open ${popup} rendered ${placement} goes with its cached page and comes back as it was`, async ({
       page,
       open,
@@ -52,32 +52,49 @@ for (const { popup, role } of popups)
 
         await back.click()
         await expect(content).toBeVisible()
-        await expect(content.getByRole("textbox", { name: "Name" })).toHaveValue("Ada")
+        await expect(
+          content.getByRole("textbox", { name: "Name" })
+        ).toHaveValue("Ada")
         await expect
           .poll(() => pageEffects(page), `back ${cycle}`)
           .toEqual({ topLayer: true, locked: true, inert: true })
-        await expect.poll(() => focusIsWithin(page, role), `back ${cycle}`).toBe(true)
+        await expect
+          .poll(() => focusIsWithin(page, role), `back ${cycle}`)
+          .toBe(true)
       }
 
       await content.getByRole("button", { name: "Close" }).click()
       await expect(page.getByRole(role)).toHaveCount(0)
-      await expect.poll(() => pageEffects(page)).toEqual({ topLayer: false, locked: false, inert: false })
+      await expect
+        .poll(() => pageEffects(page))
+        .toEqual({ topLayer: false, locked: false, inert: false })
     })
+  }
+}
 
-for (const popup of ["dialog", "popover"])
+for (const popup of ["dialog", "popover"]) {
   test(`an open ${popup} presented as a sheet goes with its cached page and comes back`, async ({
     page,
     open,
   }) => {
-    await open("cached-page", { popup, presentation: "sheet", container: "portal-root" })
+    await open("cached-page", {
+      popup,
+      presentation: "sheet",
+      container: "portal-root",
+    })
     await page.getByRole("button", { name: "Edit profile" }).click()
     const content = page.getByRole("dialog", { name: "Edit profile" })
     await expect(content).toBeVisible()
     await content.getByRole("button", { name: "Leave page" }).click()
     await expect(page.getByRole("dialog")).toHaveCount(0)
-    await expect.poll(() => pageEffects(page)).toEqual({ topLayer: false, locked: false, inert: false })
+    await expect
+      .poll(() => pageEffects(page))
+      .toEqual({ topLayer: false, locked: false, inert: false })
     await page.getByRole("button", { name: "Back to profile" }).click()
     await expect(content).toBeVisible()
-    await expect.poll(() => pageEffects(page)).toEqual({ topLayer: true, locked: true, inert: true })
+    await expect
+      .poll(() => pageEffects(page))
+      .toEqual({ topLayer: true, locked: true, inert: true })
     await expect.poll(() => focusIsWithin(page, "dialog")).toBe(true)
   })
+}

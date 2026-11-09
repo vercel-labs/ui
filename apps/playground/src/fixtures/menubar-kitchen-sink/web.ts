@@ -10,14 +10,19 @@ import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
 import { menus, type Variant } from "./variants"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 // Attributes for every option that is set: booleans by presence.
 function attributes(options: Record<string, unknown> = {}) {
   return Object.entries(options)
     .map(([name, value]) => {
-      if (value === true) return ` ${kebab(name)}`
-      if (value === false) return ` ${kebab(name)}="false"`
+      if (value === true) {
+        return ` ${kebab(name)}`
+      }
+      if (value === false) {
+        return ` ${kebab(name)}="false"`
+      }
       return ` ${kebab(name)}="${value}"`
     })
     .join("")
@@ -27,7 +32,7 @@ const button = (label: string, extra = "") =>
   `<ui-toolbar-button${extra}><button class="${classes.item}" data-log="${label.toLowerCase()}">${label}</button></ui-toolbar-button>`
 
 function toolbarContent(variant: Variant) {
-  if (variant.content === "basic")
+  if (variant.content === "basic") {
     return `
       <ui-toggle-group class="${classes.group}" aria-label="Style" multiple>
         <ui-toggle value="bold"><button class="${classes.item}">Bold</button></ui-toggle>
@@ -37,7 +42,8 @@ function toolbarContent(variant: Variant) {
       ${button("Undo")}
       ${button("Redo", ` disabled${variant.skipDisabled ? ' focusable-when-disabled="false"' : ""}`)}
       <ui-toolbar-link><a class="${classes.item}" href="#kitchen-sink-help">Help</a></ui-toolbar-link>`
-  if (variant.content === "composed")
+  }
+  if (variant.content === "composed") {
     return `
       <ui-menu>
         <ui-toolbar-button><ui-menu-trigger><button class="${classes.item}">Font</button></ui-menu-trigger></ui-toolbar-button>
@@ -55,6 +61,7 @@ function toolbarContent(variant: Variant) {
         <ui-toolbar-input><ui-number-input-control><input class="${classes.input}" aria-label="Size" /></ui-number-input-control></ui-toolbar-input>
       </ui-number-input>
       <ui-toolbar-input><input class="${classes.input}" aria-label="Find" placeholder="Find" /></ui-toolbar-input>`
+  }
   return `
     <ui-toolbar-group class="${classes.group}" aria-label="Clipboard">${button("Cut")}${button("Copy")}</ui-toolbar-group>
     <ui-toolbar-separator class="${classes.separator}"></ui-toolbar-separator>
@@ -64,7 +71,12 @@ function toolbarContent(variant: Variant) {
 
 const { file, edit, view, profiles } = menus
 
-const item = (entry: { value: string; label: string; shortcut?: string; disabled?: boolean }) =>
+const item = (entry: {
+  value: string
+  label: string
+  shortcut?: string
+  disabled?: boolean
+}) =>
   `<ui-menu-item class="${classes.menuItem}" value="${entry.value}"${entry.shortcut ? ` shortcut="${entry.shortcut}"` : ""}${entry.disabled ? " disabled" : ""}>${entry.label}</ui-menu-item>`
 
 const trigger = (label: string) =>
@@ -82,10 +94,11 @@ const template = `<template>
 </template>`
 
 function menubarContent(variant: Variant) {
-  if (variant.data)
+  if (variant.data) {
     return [file, edit, view, profiles]
       .map((menu) => `<ui-menu>${trigger(menu.trigger)}${template}</ui-menu>`)
       .join("")
+  }
   return `
     <ui-menu>
       ${trigger(file.trigger)}
@@ -120,7 +133,11 @@ function menubarContent(variant: Variant) {
 const data: MenuData[] = [
   [
     ...file.items,
-    { type: "submenu", label: "Share", items: file.share.map((label) => ({ value: label, label })) },
+    {
+      type: "submenu",
+      label: "Share",
+      items: file.share.map((label) => ({ value: label, label })),
+    },
   ],
   edit.items,
   view.checkboxes.map((entry) => ({ type: "checkbox" as const, ...entry })),
@@ -135,14 +152,27 @@ const data: MenuData[] = [
 ]
 
 function listen(slot: HTMLElement, env: Env) {
-  for (const type of ["valuechange", "pressedchange", "checkedchange", "action", "openchange"])
+  for (const type of [
+    "valuechange",
+    "pressedchange",
+    "checkedchange",
+    "action",
+    "openchange",
+  ]) {
     slot.addEventListener(type, (event) => {
       const { value, reason, source } = (event as CustomEvent).detail
-      env.log(`${type} ${JSON.stringify(value)}${reason ? ` (${reason}, ${source})` : ""}`)
+      env.log(
+        `${type} ${JSON.stringify(value)}${reason ? ` (${reason}, ${source})` : ""}`
+      )
     })
+  }
   slot.addEventListener("click", (event) => {
-    const log = (event.target as HTMLElement).closest("[data-log]")?.getAttribute("data-log")
-    if (log) env.log(log)
+    const log = (event.target as HTMLElement)
+      .closest("[data-log]")
+      ?.getAttribute("data-log")
+    if (log) {
+      env.log(log)
+    }
   })
 }
 
@@ -151,14 +181,20 @@ type Controlled = HTMLElement & { api: Record<string, () => unknown> }
 function mount(root: HTMLElement) {
   kitchenSink(root, "web", (slot, variant, env) => {
     const tag = variant.section === "Toolbar" ? "ui-toolbar" : "ui-menubar"
-    const content = variant.section === "Toolbar" ? toolbarContent(variant) : menubarContent(variant)
+    const content =
+      variant.section === "Toolbar"
+        ? toolbarContent(variant)
+        : menubarContent(variant)
     slot.innerHTML = `<${tag} class="${classes.bar}" aria-label="${variant.title}"${attributes(variant.options)}>${content}</${tag}>`
-    if (variant.data)
+    if (variant.data) {
       slot
         .querySelectorAll<HTMLElement & { items?: MenuData }>("ui-menu")
         .forEach((menu, index) => (menu.items = data[index]))
+    }
     listen(slot, env)
-    if (!variant.controller) return
+    if (!variant.controller) {
+      return
+    }
     const owner = slot.querySelector<Controlled>(tag)!
     env.controls(
       variant.section === "Toolbar"
@@ -167,7 +203,7 @@ function mount(root: HTMLElement) {
             ["focus()", () => owner.api.focus()],
             ["isOpen()", () => owner.api.isOpen()],
             ["close()", () => owner.api.close()],
-          ],
+          ]
     )
   })
 }

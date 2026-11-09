@@ -36,11 +36,14 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     expect(
       await page
         .getByRole("textbox", { name: "Font size" })
-        .evaluate((el: HTMLInputElement) => el.selectionStart),
+        .evaluate((el: HTMLInputElement) => el.selectionStart)
     ).toBe(1)
   })
 
-  test("a controller focuses the toolbar's tab stop from anywhere", async ({ page, tab }) => {
+  test("a controller focuses the toolbar's tab stop from anywhere", async ({
+    page,
+    tab,
+  }) => {
     await walkTo(page, tab, "Right")
     await page.getByRole("button", { name: "Focus toolbar" }).click()
     await expectFocus(page, "Right")

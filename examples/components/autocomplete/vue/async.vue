@@ -46,7 +46,11 @@ function searchCities(query: string, { signal }: { signal: AbortSignal }) {
   })
 }
 
-const { state: results, setQuery, loadMore } = useAsyncOptions(searchCities, { debounce: 200 })
+const {
+  state: results,
+  setQuery,
+  loadMore,
+} = useAsyncOptions(searchCities, { debounce: 200 })
 </script>
 
 <template>
@@ -72,12 +76,17 @@ const { state: results, setQuery, loadMore } = useAsyncOptions(searchCities, { d
         }}
       </AutocompleteStatus>
       <AutocompleteEmpty v-slot="{ state }">
-        <template v-if="state.empty && !state.loading">No cities start with “{{ state.query }}”.</template>
+        <template v-if="state.empty && !state.loading"
+          >No cities start with “{{ state.query }}”.</template
+        >
       </AutocompleteEmpty>
       <AutocompleteList v-slot="{ state }">
-        <AutocompleteItem v-for="city in state.items as string[]" :key="city" :value="city">{{
-          city
-        }}</AutocompleteItem>
+        <AutocompleteItem
+          v-for="city in state.items as string[]"
+          :key="city"
+          :value="city"
+          >{{ city }}</AutocompleteItem
+        >
       </AutocompleteList>
     </AutocompleteContent>
   </Autocomplete>

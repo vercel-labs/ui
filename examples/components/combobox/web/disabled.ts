@@ -21,7 +21,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const variants = [
   { label: "Billing country", attributes: 'default-value="fr" disabled' },
@@ -57,21 +58,22 @@ function mount(root: HTMLElement) {
                           ${country.label}
                           <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                         </ui-combobox-item>
-                      `,
+                      `
                     )
                     .join("")}
                 </ui-combobox-list>
               </ui-combobox-content>
             </ui-combobox>
-          `,
+          `
         )
         .join("")}
     </div>
   `
-  for (const combobox of root.querySelectorAll<HTMLElement & { itemToLabel: (value: string) => string }>(
-    "ui-combobox",
-  ))
+  for (const combobox of root.querySelectorAll<
+    HTMLElement & { itemToLabel: (value: string) => string }
+  >("ui-combobox")) {
     combobox.itemToLabel = countryLabel
+  }
 }
 
 export { mount }

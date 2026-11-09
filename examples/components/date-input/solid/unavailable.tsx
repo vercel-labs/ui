@@ -1,5 +1,10 @@
 import { DateInput } from "@ui-sdk/solid/date-input"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 
 function Example() {
   return (

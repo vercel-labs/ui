@@ -9,7 +9,11 @@
   import { cn } from "cn"
   import type { Snippet } from "svelte"
 
-  let { label, class: className, children }: { label?: string; class?: string; children: Snippet } = $props()
+  let {
+    label,
+    class: className,
+    children,
+  }: { label?: string; class?: string; children: Snippet } = $props()
 </script>
 
 <ScrollAreaPrimitive class={cn("relative min-h-0", className)}>

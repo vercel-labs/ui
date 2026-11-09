@@ -15,7 +15,10 @@ function copy() {
 <template>
   <div data-slot="row">
     <code>{{ command }}</code>
-    <Tooltip :close-on-press="false" @open-change-complete="(open) => !open && (copied = false)">
+    <Tooltip
+      :close-on-press="false"
+      @open-change-complete="(open) => !open && (copied = false)"
+    >
       <TooltipTrigger :aria-label="copied ? 'Copied' : 'Copy'" @click="copy">
         <CheckIcon v-if="copied" aria-hidden="true" />
         <CopyIcon v-else aria-hidden="true" />

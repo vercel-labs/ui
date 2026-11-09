@@ -52,7 +52,12 @@
       background: var(--tint);
     }
 
-    & :is([data-slot="pagination-link"], [data-slot="pagination-previous"], [data-slot="pagination-next"]) {
+    &
+      :is(
+        [data-slot="pagination-link"],
+        [data-slot="pagination-previous"],
+        [data-slot="pagination-next"]
+      ) {
       gap: 4px;
       height: 28px;
       min-width: 28px;
@@ -157,7 +162,12 @@
     }
 
     :scope[data-example="pagination/render"] {
-      & :is([data-slot="pagination-link"], [data-slot="pagination-previous"], [data-slot="pagination-next"]) {
+      &
+        :is(
+          [data-slot="pagination-link"],
+          [data-slot="pagination-previous"],
+          [data-slot="pagination-next"]
+        ) {
         min-width: 26px;
         padding-inline: 7px;
 

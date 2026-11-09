@@ -4,8 +4,12 @@ import { drawer } from "../src/components/drawer/drawer"
 import { mount, rerenderOf } from "../src/testing/mount"
 
 // jsdom lays nothing out. A 1000px page and sheet put snap point 0.2 at 200px.
-for (const name of ["offsetHeight", "clientHeight"] as const)
-  Object.defineProperty(HTMLElement.prototype, name, { configurable: true, get: () => 1000 })
+for (const name of ["offsetHeight", "clientHeight"] as const) {
+  Object.defineProperty(HTMLElement.prototype, name, {
+    configurable: true,
+    get: () => 1000,
+  })
+}
 globalThis.ResizeObserver ??= class {
   observe() {}
   unobserve() {}
@@ -29,7 +33,8 @@ afterEach(() => mounts.splice(0).forEach((mounted) => mounted.unmount()))
 
 const frames = (count: number) =>
   new Promise<void>((resolve) => {
-    const next = (left: number) => (left ? requestAnimationFrame(() => next(left - 1)) : resolve())
+    const next = (left: number) =>
+      left ? requestAnimationFrame(() => next(left - 1)) : resolve()
     next(count)
   })
 
@@ -37,7 +42,7 @@ test("an open drawer whose snap point leaves its snap points rests on the first 
   const view = mount(
     drawer,
     { defaultOpen: true, snapPoints: [0.5, 1], defaultSnapPoint: 0.5 },
-    `<div><trigger>Open</trigger><viewport><content><title>Filters</title></content></viewport></div>`,
+    `<div><trigger>Open</trigger><viewport><content><title>Filters</title></content></viewport></div>`
   )
   mounts.push(view)
   await frames(30)
@@ -51,7 +56,7 @@ test("an open drawer whose snap point leaves its snap points rests on its defaul
   const view = mount(
     drawer,
     { defaultOpen: true, snapPoints: [0.5, 1], defaultSnapPoint: 0.6 },
-    `<div><trigger>Open</trigger><viewport><content><title>Filters</title></content></viewport></div>`,
+    `<div><trigger>Open</trigger><viewport><content><title>Filters</title></content></viewport></div>`
   )
   mounts.push(view)
   await frames(30)

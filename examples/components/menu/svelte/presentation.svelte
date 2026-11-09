@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { ChevronRightIcon, DownloadIcon, LinkIcon, ShareIcon, TrashIcon } from "@lucide/svelte"
+  import {
+    ChevronRightIcon,
+    DownloadIcon,
+    LinkIcon,
+    ShareIcon,
+    TrashIcon,
+  } from "@lucide/svelte"
   import {
     Menu,
     MenuContent,

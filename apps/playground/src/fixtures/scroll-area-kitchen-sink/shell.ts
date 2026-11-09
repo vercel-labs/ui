@@ -1,7 +1,13 @@
 import type { ScrollAreaController } from "@ui-sdk/core/scroll-area"
 import "./styles.css"
 import * as classes from "./classes"
-import { addMessage, chipsOf, streamInto, variants, type Variant } from "./variants"
+import {
+  addMessage,
+  chipsOf,
+  streamInto,
+  variants,
+  type Variant,
+} from "./variants"
 
 type Env = {
   log: (message: string) => void
@@ -21,7 +27,9 @@ function viewportClass(variant: Variant) {
 }
 
 function rootClass(variant: Variant) {
-  return variant.place === "max-height" ? classes.root.replace("h-48", "max-h-48") : classes.root
+  return variant.place === "max-height"
+    ? classes.root.replace("h-48", "max-h-48")
+    : classes.root
 }
 
 // Fades over the edges, as tall as the content reaching past each one, up to
@@ -34,32 +42,49 @@ const fadeBottomStyle =
   "opacity:1;--scroll-area-overflow-y-end:inherit;height:min(1.5rem,var(--scroll-area-overflow-y-end))"
 
 // Buttons that grow a chat's content, and a controller's methods.
-function variantControls(variant: Variant, content: HTMLElement, controller: ScrollAreaController, env: Env) {
+function variantControls(
+  variant: Variant,
+  content: HTMLElement,
+  controller: ScrollAreaController,
+  env: Env
+) {
   const list: [string, () => unknown][] = []
-  if (variant.content === "chat")
-    list.push(["stream", () => streamInto(content)], ["add message", () => addMessage(content)])
-  if (variant.controller)
+  if (variant.content === "chat") {
+    list.push(
+      ["stream", () => streamInto(content)],
+      ["add message", () => addMessage(content)]
+    )
+  }
+  if (variant.controller) {
     list.push(
       ["scrollToStart()", () => controller.scrollToStart()],
       ["scrollToEnd()", () => controller.scrollToEnd()],
       ["isAtEnd()", () => controller.isAtEnd()],
-      ["isSticking()", () => controller.isSticking()],
+      ["isSticking()", () => controller.isSticking()]
     )
-  if (list.length) env.controls(list)
+  }
+  if (list.length) {
+    env.controls(list)
+  }
 }
 
 type Framework = "react" | "vue" | "web"
 
-const frameworks: Record<Framework, string> = { react: "React", vue: "Vue", web: "Web Components" }
+const frameworks: Record<Framework, string> = {
+  react: "React",
+  vue: "Vue",
+  web: "Web Components",
+}
 
 // Builds the page in plain DOM and asks the framework to mount one variant per card.
 function kitchenSink(
   root: HTMLElement,
   framework: Framework,
-  mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
+  mount: (slot: HTMLElement, variant: Variant, env: Env) => void
 ) {
   document.title = `Scroll Area kitchen sink · ${frameworks[framework]}`
-  root.className = "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
+  root.className =
+    "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
   root.innerHTML = `
     <header class="sticky top-0 z-10 flex flex-wrap items-center gap-4 border-b border-neutral-200 bg-white/90 px-6 py-3 backdrop-blur">
       <h1 class="text-sm font-semibold">Scroll Area kitchen sink</h1>
@@ -68,8 +93,10 @@ function kitchenSink(
           .map(
             ([id, label]) =>
               `<a href="?fixture=scroll-area-kitchen-sink&framework=${id}" class="rounded-md px-2.5 py-1 ${
-                id === framework ? "bg-neutral-950 text-white" : "text-neutral-600 hover:bg-neutral-100"
-              }">${label}</a>`,
+                id === framework
+                  ? "bg-neutral-950 text-white"
+                  : "text-neutral-600 hover:bg-neutral-100"
+              }">${label}</a>`
           )
           .join("")}
       </nav>
@@ -86,7 +113,9 @@ function kitchenSink(
   `
   const main = root.querySelector("main")!
   const logList = root.querySelector<HTMLOListElement>("[data-log]")!
-  root.querySelector("[data-clear]")!.addEventListener("click", () => logList.replaceChildren())
+  root
+    .querySelector("[data-clear]")!
+    .addEventListener("click", () => logList.replaceChildren())
 
   const sections = new Map<string, HTMLElement>()
   for (const variant of variants) {
@@ -95,7 +124,8 @@ function kitchenSink(
       const section = document.createElement("section")
       section.innerHTML = `<h2 class="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">${variant.section}</h2>`
       grid = document.createElement("div")
-      grid.className = "grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] items-start gap-3"
+      grid.className =
+        "grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] items-start gap-3"
       section.append(grid)
       main.append(section)
       sections.set(variant.section, grid)
@@ -108,7 +138,7 @@ function chips(variant: Variant) {
   return Object.entries(chipsOf(variant))
     .map(
       ([key, value]) =>
-        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`,
+        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`
     )
     .join("")
 }
@@ -116,10 +146,11 @@ function chips(variant: Variant) {
 function card(
   variant: Variant,
   mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
-  logList: HTMLOListElement,
+  logList: HTMLOListElement
 ) {
   const el = document.createElement("article")
-  el.className = "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
+  el.className =
+    "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
   el.dataset.variant = variant.id
   // Whether the content overflows, for the smoke spec.
   el.dataset.overflows = String(variant.content !== "short")
@@ -134,7 +165,9 @@ function card(
   const stage = el.querySelector<HTMLElement>("[data-stage]")!
   const slot = document.createElement("div")
   slot.className = "contents"
-  if (variant.place === "rtl") stage.dir = "rtl"
+  if (variant.place === "rtl") {
+    stage.dir = "rtl"
+  }
   stage.append(slot)
 
   const env: Env = {
@@ -145,7 +178,9 @@ function card(
     },
     // Once per card, though StrictMode runs effects twice.
     controls(list) {
-      if (el.querySelector("[data-controller]")) return
+      if (el.querySelector("[data-controller]")) {
+        return
+      }
       const buttons = document.createElement("div")
       buttons.className = "flex flex-wrap gap-2"
       for (const [label, run] of list) {
@@ -155,7 +190,9 @@ function card(
         button.textContent = label
         button.addEventListener("click", () => {
           const result = run()
-          if (result !== undefined) env.log(`${label} returned ${JSON.stringify(result)}`)
+          if (result !== undefined) {
+            env.log(`${label} returned ${JSON.stringify(result)}`)
+          }
         })
         buttons.append(button)
       }

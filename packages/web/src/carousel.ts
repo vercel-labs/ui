@@ -42,7 +42,8 @@ function defineCarouselElements() {
         },
         playing: {
           get: (api: CarouselApi) => api.isPlaying(),
-          set: (api: CarouselApi, playing: boolean) => api.setPlaying(!!playing),
+          set: (api: CarouselApi, playing: boolean) =>
+            api.setPlaying(!!playing),
         },
       },
       api: [
@@ -67,7 +68,11 @@ function defineCarouselElements() {
     next: { tag: "ui-carousel-next", ...wrapper },
     "play-toggle": { tag: "ui-carousel-play-toggle", ...wrapper },
     "indicator-group": { tag: "ui-carousel-indicator-group", display: "block" },
-    indicator: { tag: "ui-carousel-indicator", ...wrapper, render: (el) => el.setAttribute("role", "none") },
+    indicator: {
+      tag: "ui-carousel-indicator",
+      ...wrapper,
+      render: (el) => el.setAttribute("role", "none"),
+    },
   })
 }
 

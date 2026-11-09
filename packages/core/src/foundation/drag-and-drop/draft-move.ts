@@ -11,7 +11,11 @@ import type { Store } from "../kernel/store"
 // What ended a move: a pointer letting go, or a key.
 type DropReason = "drag" | "move-key"
 
-function createDraftMove<State extends object, Draft extends { key: string; pointer: boolean }, Value>({
+function createDraftMove<
+  State extends object,
+  Draft extends { key: string; pointer: boolean },
+  Value,
+>({
   store,
   draft: draftKey,
   value: valueKey,
@@ -34,7 +38,10 @@ function createDraftMove<State extends object, Draft extends { key: string; poin
   // put where the user moved it if they did, or null when the item is gone.
   rebase: (draft: Draft, value: Value, moved: boolean) => Draft | null
   // Commits a moved draft. Returns false when the change was canceled.
-  commit: (draft: Draft, details: { reason: DropReason; event?: Event }) => boolean
+  commit: (
+    draft: Draft,
+    details: { reason: DropReason; event?: Event }
+  ) => boolean
   // Tells screen readers the item dropped or went back, in the value it's shown in.
   say: (type: "drop" | "cancel", draft: Draft, shownValue: Value) => void
   element: (key: string) => HTMLElement | undefined
@@ -53,15 +60,21 @@ function createDraftMove<State extends object, Draft extends { key: string; poin
 
   deriveState({ store }, [draftKey], (state) => {
     const current = state[draftKey] as Draft | null
-    if (!current || !held) return
+    if (!current || !held) {
+      return
+    }
     const next = rebase(current, state[valueKey] as Value, moved)
-    if (next && same(shown(next), shown(current))) return
+    if (next && same(shown(next), shown(current))) {
+      return
+    }
     return { [draftKey]: next } as Partial<State>
   })
 
   function drop(reason: DropReason, event?: Event) {
     const current = draft()
-    if (!current) return
+    if (!current) {
+      return
+    }
     held = false
     const before = value()
     const changed = !same(shown(current), before)
@@ -71,21 +84,31 @@ function createDraftMove<State extends object, Draft extends { key: string; poin
     } else {
       say("drop", current, shown(current))
       // Keeps the draft until a controlled value's new value arrives.
-      if (!changed) setDraft(null)
-      else
+      if (!changed) {
+        setDraft(null)
+      } else {
         settleDraft(store, value, before, () => {
-          if (draft()?.key === current.key) setDraft(null)
+          if (draft()?.key === current.key) {
+            setDraft(null)
+          }
         })
+      }
     }
-    if (!current.pointer) focusLater(current.key)
+    if (!current.pointer) {
+      focusLater(current.key)
+    }
   }
 
   function cancel(refocus = true) {
     const current = draft()
-    if (!current) return
+    if (!current) {
+      return
+    }
     setDraft(null)
     say("cancel", current, value())
-    if (!current.pointer && refocus) focusLater(current.key)
+    if (!current.pointer && refocus) {
+      focusLater(current.key)
+    }
   }
 
   return { draft, value, setDraft, focusLater, drop, cancel }

@@ -29,7 +29,12 @@ const item = (option: { value: string; label: string }) => `
   </ui-select-item>
 `
 
-const control = (name: string, label: string, options: { value: string; label: string }[], value: string) => `
+const control = (
+  name: string,
+  label: string,
+  options: { value: string; label: string }[],
+  value: string
+) => `
   <ui-select data-control="${name}" default-value="${value}">
     <ui-select-label>${label}</ui-select-label>
     <ui-select-trigger>
@@ -73,18 +78,31 @@ function mount(root: HTMLElement) {
       </div>
     </div>
   `
-  const content = root.querySelector("#select-positioning-box ui-select-content")!
+  const content = root.querySelector(
+    "#select-positioning-box ui-select-content"
+  )!
   const [side, align] = root.querySelectorAll("ui-select")
   side.items = sides
   align.items = aligns
-  for (const control of [side, align])
+  for (const control of [side, align]) {
     control.addEventListener("valuechange", (event) => {
-      if (event.detail.value) content.setAttribute(control.dataset.control!, String(event.detail.value))
+      if (event.detail.value) {
+        content.setAttribute(
+          control.dataset.control!,
+          String(event.detail.value)
+        )
+      }
     })
-  root.querySelector("ui-checkbox")!.addEventListener("checkedchange", (event) => {
-    if (event.detail.value === true) content.setAttribute("anchor", "#select-positioning-box")
-    else content.removeAttribute("anchor")
-  })
+  }
+  root
+    .querySelector("ui-checkbox")!
+    .addEventListener("checkedchange", (event) => {
+      if (event.detail.value === true) {
+        content.setAttribute("anchor", "#select-positioning-box")
+      } else {
+        content.removeAttribute("anchor")
+      }
+    })
 }
 
 export { mount }

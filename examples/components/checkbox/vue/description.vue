@@ -13,7 +13,10 @@ import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
     </Checkbox>
     <div data-slot="stack">
       <FieldLabel>Accept terms and conditions</FieldLabel>
-      <FieldDescription>By clicking this checkbox, you agree to the terms and conditions.</FieldDescription>
+      <FieldDescription
+        >By clicking this checkbox, you agree to the terms and
+        conditions.</FieldDescription
+      >
     </div>
   </Field>
 </template>

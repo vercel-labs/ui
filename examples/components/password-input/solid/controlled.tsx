@@ -1,5 +1,9 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/solid/password-input"
 import { createSignal } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 

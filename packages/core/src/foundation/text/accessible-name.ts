@@ -38,21 +38,27 @@ const namedByContent = new Set([
 
 function roleOf(el: Element) {
   const explicit = el.getAttribute("role")?.trim().split(/\s+/)[0]
-  if (explicit) return explicit
+  if (explicit) {
+    return explicit
+  }
   return implicitRoles.find(([selector]) => el.matches(selector))?.[1] ?? ""
 }
 
 // Hidden from everyone, by attribute or, where there's a window to compute
 // them, by styles.
 function isHidden(el: Element) {
-  if (el.hasAttribute("hidden") || el.getAttribute("aria-hidden") === "true") return true
+  if (el.hasAttribute("hidden") || el.getAttribute("aria-hidden") === "true") {
+    return true
+  }
   const style = el.ownerDocument.defaultView?.getComputedStyle(el)
   return style?.display === "none" || style?.visibility === "hidden"
 }
 
 // The element an id names in the tree `el` is in, so a label inside a shadow root is found.
 function byId(el: Element, id: string) {
-  const root = el.getRootNode() as Node & { getElementById?: (id: string) => Element | null }
+  const root = el.getRootNode() as Node & {
+    getElementById?: (id: string) => Element | null
+  }
   return root.getElementById?.(id) ?? null
 }
 
@@ -68,9 +74,16 @@ function labelledByOf(el: Element) {
 
 // What an image or an icon is called by its own markup: an `<img>`'s alt or an `<svg>`'s `<title>`.
 function embeddedName(el: Element) {
-  if (el.localName === "img") return el.getAttribute("alt") ?? ""
-  if (el.localName !== "svg") return ""
-  return [...el.children].find((child) => child.localName === "title")?.textContent ?? ""
+  if (el.localName === "img") {
+    return el.getAttribute("alt") ?? ""
+  }
+  if (el.localName !== "svg") {
+    return ""
+  }
+  return (
+    [...el.children].find((child) => child.localName === "title")
+      ?.textContent ?? ""
+  )
 }
 
 // What an element inside another's content adds to its name
@@ -79,11 +92,20 @@ function embeddedName(el: Element) {
 // then its title. A field inside a label adds nothing, so a label doesn't
 // repeat the name of the field it names.
 function nameWithin(el: Element, labelling: boolean, hidden: boolean) {
-  if (el.matches("input, select, textarea")) return ""
-  const own = (!labelling && labelledByOf(el)) || el.getAttribute("aria-label")?.trim() || embeddedName(el)
-  if (own) return ` ${own} `
+  if (el.matches("input, select, textarea")) {
+    return ""
+  }
+  const own =
+    (!labelling && labelledByOf(el)) ||
+    el.getAttribute("aria-label")?.trim() ||
+    embeddedName(el)
+  if (own) {
+    return ` ${own} `
+  }
   // An icon's drawing isn't text.
-  if (el.localName === "svg") return ""
+  if (el.localName === "svg") {
+    return ""
+  }
   const content = contentOf(el, labelling, hidden)
   const title = el.getAttribute("title")
   return content || (title ? ` ${title} ` : "")
@@ -95,9 +117,14 @@ function nameWithin(el: Element, labelling: boolean, hidden: boolean) {
 function contentOf(el: Element, labelling = false, hidden = isHidden(el)) {
   let text = ""
   for (const node of el.childNodes) {
-    if (node.nodeType === Node.TEXT_NODE) text += node.nodeValue
-    else if (node.nodeType === Node.ELEMENT_NODE && (hidden || !isHidden(node as Element)))
+    if (node.nodeType === Node.TEXT_NODE) {
+      text += node.nodeValue
+    } else if (
+      node.nodeType === Node.ELEMENT_NODE &&
+      (hidden || !isHidden(node as Element))
+    ) {
       text += nameWithin(node as Element, labelling, hidden)
+    }
   }
   return text
 }
@@ -106,7 +133,9 @@ const collapse = (text: string) => text.replace(/\s+/g, " ").trim()
 
 // Only labelable elements have `labels`. Read only when needed: Chromium walks the page for them.
 const labelsOf = (el: Element) =>
-  [...((el as HTMLInputElement).labels ?? [])].map((label) => contentOf(label)).join(" ")
+  [...((el as HTMLInputElement).labels ?? [])]
+    .map((label) => contentOf(label))
+    .join(" ")
 
 // Where a name comes from, in the order browsers take them.
 const nameSources = [
@@ -119,12 +148,17 @@ const nameSources = [
 ]
 
 // The same sources with labels last, for asking only whether there's a name.
-const labelsLast = [...nameSources.filter((source) => source !== labelsOf), labelsOf]
+const labelsLast = [
+  ...nameSources.filter((source) => source !== labelsOf),
+  labelsOf,
+]
 
 function firstName(el: Element, sources: typeof nameSources) {
   for (const source of sources) {
     const name = collapse(source(el))
-    if (name) return name
+    if (name) {
+      return name
+    }
   }
   return ""
 }

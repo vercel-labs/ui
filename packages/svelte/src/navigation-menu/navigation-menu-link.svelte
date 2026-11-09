@@ -17,10 +17,15 @@ A link. Pressing it closes the menu, and `current` marks the current page with `
     current,
     closeOnSelect,
     ...rest
-  }: PartProps<"a", NavigationMenuLinkState> & NavigationMenuLinkProps = $props()
+  }: PartProps<"a", NavigationMenuLinkState> & NavigationMenuLinkProps =
+    $props()
 
   const id = $props.id()
-  const link = usePart(navigationMenu, "link", () => ({ id, current, closeOnSelect }))
+  const link = usePart(navigationMenu, "link", () => ({
+    id,
+    current,
+    closeOnSelect,
+  }))
 </script>
 
 <Part tag="a" part={link} props={rest} />

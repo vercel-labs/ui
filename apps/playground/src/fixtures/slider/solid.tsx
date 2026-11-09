@@ -9,7 +9,11 @@ import {
 } from "@ui-sdk/solid/slider"
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
-import { serialize, sliderFixture as f, sliderOptions } from "tests/fixtures/slider.ts"
+import {
+  serialize,
+  sliderFixture as f,
+  sliderOptions,
+} from "tests/fixtures/slider.ts"
 
 function Fixture() {
   const options = sliderOptions()
@@ -18,8 +22,14 @@ function Fixture() {
   const [submitted, setSubmitted] = createSignal("")
   const [volume, setVolume] = createSignal(options.volume)
   // Records a change, or cancels it when the URL asks.
-  const report = (name: string, value: number | number[], details: { cancel: () => void }) => {
-    if (options.cancel === name) return details.cancel()
+  const report = (
+    name: string,
+    value: number | number[],
+    details: { cancel: () => void }
+  ) => {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     setAction(`${name}:${String(value)}`)
   }
   const commit = (name: string) => (value: number | number[]) =>
@@ -52,7 +62,9 @@ function Fixture() {
             defaultValue={options.controlled ? undefined : options.volume}
             onValueChange={(value, details) => {
               report(f.volume.name, value, details)
-              if (!details.canceled) setVolume(value)
+              if (!details.canceled) {
+                setVolume(value)
+              }
             }}
             onValueCommit={commit(f.volume.name)}
           >
@@ -75,7 +87,9 @@ function Fixture() {
             defaultValue={options.price}
             minStepsBetweenThumbs={options.minSteps}
             format={options.format}
-            onValueChange={(value, details) => report(f.price.name, value, details)}
+            onValueChange={(value, details) =>
+              report(f.price.name, value, details)
+            }
             onValueCommit={commit(f.price.name)}
           >
             <SliderValue class="slider-value" />
@@ -83,7 +97,13 @@ function Fixture() {
               <SliderTrack class="slider-track">
                 <SliderIndicator class="slider-indicator" />
                 <For each={f.price.thumbs}>
-                  {(label, index) => <SliderThumb index={index()} class="slider-thumb" aria-label={label} />}
+                  {(label, index) => (
+                    <SliderThumb
+                      index={index()}
+                      class="slider-thumb"
+                      aria-label={label}
+                    />
+                  )}
                 </For>
               </SliderTrack>
             </SliderControl>

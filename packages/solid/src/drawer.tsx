@@ -1,4 +1,8 @@
-import type { DialogShortcutProps, DialogShortcutState, DialogTriggerState } from "@ui-sdk/core/dialog"
+import type {
+  DialogShortcutProps,
+  DialogShortcutState,
+  DialogTriggerState,
+} from "@ui-sdk/core/dialog"
 import {
   drawer as drawerPrimitive,
   type DrawerBackdropState,
@@ -11,7 +15,14 @@ import {
   type DrawerOutletState,
 } from "@ui-sdk/core/drawer"
 import type { JSX } from "@solidjs/web"
-import { createContext, createUniqueId, merge, omit, Show, useContext } from "solid-js"
+import {
+  createContext,
+  createUniqueId,
+  merge,
+  omit,
+  Show,
+  useContext,
+} from "solid-js"
 import {
   popupPart,
   sheetViewport,
@@ -32,7 +43,10 @@ import {
 
 type DrawerContextValue = PrimitiveHandle<typeof drawerPrimitive>
 
-type TriggerPartProps = Omit<PartProps<"button", DialogTriggerState>, "value" | "onChange"> &
+type TriggerPartProps = Omit<
+  PartProps<"button", DialogTriggerState>,
+  "value" | "onChange"
+> &
   DrawerTriggerProps
 type OutletPartProps = PartProps<"div", DrawerOutletState> & DrawerOutletProps
 
@@ -56,12 +70,16 @@ const TriggerContext = createContext<{
 
 function useDrawer() {
   const context = useContext(Context)
-  if (!context) throw new Error("Drawer parts must be used inside <Drawer>.")
+  if (!context) {
+    throw new Error("Drawer parts must be used inside <Drawer>.")
+  }
   return context
 }
 
 // The drawer a part belongs to: the one its controller names, else the one around it.
-function useDrawerOrRemote(controller: () => DrawerController<any, any> | undefined) {
+function useDrawerOrRemote(
+  controller: () => DrawerController<any, any> | undefined
+) {
   return useControllerTarget(controller, useContext(Context))
 }
 
@@ -81,7 +99,9 @@ function Drawer(props: DrawerProps) {
   useControllerEntry(() => props.controller, drawer)
   return providePrimitive(drawer, () => (
     <Context value={drawer}>
-      <ContainerContext value={() => props.container}>{props.children}</ContainerContext>
+      <ContainerContext value={() => props.container}>
+        {props.children}
+      </ContainerContext>
     </Context>
   ))
 }
@@ -102,13 +122,16 @@ function DrawerTrigger(props: TriggerPartProps) {
         // Until the drawer it names mounts, a trigger outside the drawer is a plain button.
         fallback={renderStatic(
           "button",
-          () => ({ attrs: {}, state: { open: false, disabled: !!props.disabled } }),
+          () => ({
+            attrs: {},
+            state: { open: false, disabled: !!props.disabled },
+          }),
           merge(rest, {
             type: "button",
             get disabled() {
               return props.disabled
             },
-          }),
+          })
         )}
       >
         {(drawer) => {
@@ -140,7 +163,7 @@ function DrawerBackdrop(props: PartProps<"div", DrawerBackdropState>) {
  * @stable
  */
 function DrawerContent<Payload = unknown>(
-  props: PartProps<"div", DrawerContentState<Payload>> & DrawerContentProps,
+  props: PartProps<"div", DrawerContentState<Payload>> & DrawerContentProps
 ) {
   const fromRoot = useContext(ContainerContext)
   const target = usePopupContainer(() => props.container ?? fromRoot())
@@ -149,7 +172,13 @@ function DrawerContent<Payload = unknown>(
     finalFocus: props.finalFocus,
     keepMounted: props.keepMounted,
   })
-  const rest = omit(props, "initialFocus", "finalFocus", "keepMounted", "container")
+  const rest = omit(
+    props,
+    "initialFocus",
+    "finalFocus",
+    "keepMounted",
+    "container"
+  )
   return popupPart(useDrawer(), "content", content, rest, target, sheetViewport)
 }
 
@@ -182,10 +211,14 @@ const DrawerClose = parts.Close
  * Shows a trigger's shortcut, like `⌘K`, inside the trigger. Hidden from screen readers, which hear `aria-keyshortcuts`.
  * @stable
  */
-function DrawerShortcut(props: PartProps<"span", DialogShortcutState> & DialogShortcutProps) {
+function DrawerShortcut(
+  props: PartProps<"span", DialogShortcutState> & DialogShortcutProps
+) {
   const trigger = useContext(TriggerContext)
   const context = useContext(Context)
-  if (!context && !trigger) throw new Error("Drawer parts must be used inside <Drawer>.")
+  if (!context && !trigger) {
+    throw new Error("Drawer parts must be used inside <Drawer>.")
+  }
   // A trigger outside the drawer finds it through its controller only once
   // mounted, so inside one whose drawer hasn't mounted yet, there's no
   // shortcut to show, as on the server.
@@ -218,7 +251,11 @@ function DrawerOutlet(props: OutletPartProps) {
     <Show
       when={drawer()}
       keyed
-      fallback={renderStatic("div", () => ({ attrs: {}, state: { open: false } }), rest)}
+      fallback={renderStatic(
+        "div",
+        () => ({ attrs: {}, state: { open: false } }),
+        rest
+      )}
     >
       {(drawer) => usePart(drawer, "outlet", outlet, rest, "div")}
     </Show>

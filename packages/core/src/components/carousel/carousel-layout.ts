@@ -46,12 +46,19 @@ type CarouselPage = {
 const mergeDistance = 1
 
 /** Groups slides into pages: `count` at a time, or with `"auto"`, as many as fit in the snapport. */
-function groupSlides(slides: readonly CarouselSlideBox[], snapport: number, count: CarouselSlidesPerPage) {
+function groupSlides(
+  slides: readonly CarouselSlideBox[],
+  snapport: number,
+  count: CarouselSlidesPerPage
+) {
   const groups: number[][] = []
   if (count !== "auto") {
     const size = Math.max(1, Math.floor(count))
-    for (let index = 0; index < slides.length; index += size)
-      groups.push(slides.slice(index, index + size).map((_, offset) => index + offset))
+    for (let index = 0; index < slides.length; index += size) {
+      groups.push(
+        slides.slice(index, index + size).map((_, offset) => index + offset)
+      )
+    }
     return groups
   }
   for (let index = 0; index < slides.length; index++) {
@@ -59,15 +66,20 @@ function groupSlides(slides: readonly CarouselSlideBox[], snapport: number, coun
     const first = group && slides[group[0]]
     const end = slides[index].start + slides[index].size
     // Half a pixel of slack, since measured sizes carry fractions.
-    if (first && end - first.start <= snapport + 0.5) group.push(index)
-    else groups.push([index])
+    if (first && end - first.start <= snapport + 0.5) {
+      group.push(index)
+    } else {
+      groups.push([index])
+    }
   }
   return groups
 }
 
 // How far before the snapport's start a page's first slide sits, so the page lines up by `align`.
 function alignOffset(align: CarouselAlign, snapport: number, size: number) {
-  if (align === "start") return 0
+  if (align === "start") {
+    return 0
+  }
   return align === "center" ? (snapport - size) / 2 : snapport - size
 }
 
@@ -78,14 +90,18 @@ function alignOffset(align: CarouselAlign, snapport: number, size: number) {
  */
 function carouselPages(
   geometry: CarouselGeometry,
-  options: { align: CarouselAlign; slidesPerPage: CarouselSlidesPerPage },
+  options: { align: CarouselAlign; slidesPerPage: CarouselSlidesPerPage }
 ) {
   const { slides, snapport, paddingStart, maxScroll } = geometry
   const pages: CarouselPage[] = []
   for (const group of groupSlides(slides, snapport, options.slidesPerPage)) {
     const first = slides[group[0]]
     const last = slides[group[group.length - 1]]
-    const margin = alignOffset(options.align, snapport, last.start + last.size - first.start)
+    const margin = alignOffset(
+      options.align,
+      snapport,
+      last.start + last.size - first.start
+    )
     const position = clamp(first.start - margin - paddingStart, 0, maxScroll)
     const previous = pages[pages.length - 1]
     if (previous && Math.abs(position - previous.position) < mergeDistance) {
@@ -119,7 +135,9 @@ type CarouselLoopView = {
  * the content doesn't lay out by CSS `order`; the carousel rewinds instead.
  */
 function measureTrack(slides: readonly CarouselSlideBox[], first: number) {
-  if (slides.length < 2 || !slides[first]) return null
+  if (slides.length < 2 || !slides[first]) {
+    return null
+  }
   const lead = slides[first]
   const next = slides[(first + 1) % slides.length]
   const track: CarouselTrack = {
@@ -128,7 +146,11 @@ function measureTrack(slides: readonly CarouselSlideBox[], first: number) {
     start: lead.start,
   }
   const placed = placeSlides(track, first)
-  return placed.every((box, index) => Math.abs(box.start - slides[index].start) < 1) ? track : null
+  return placed.every(
+    (box, index) => Math.abs(box.start - slides[index].start) < 1
+  )
+    ? track
+    : null
 }
 
 /** Where each slide sits when the track shows slide `first` first. */
@@ -149,11 +171,24 @@ function loopGroups(track: CarouselTrack, view: CarouselLoopView) {
   return groupSlides(placeSlides(track, 0), view.snapport, view.slidesPerPage)
 }
 
-function loopPage(boxes: readonly CarouselSlideBox[], group: number[], view: CarouselLoopView) {
+function loopPage(
+  boxes: readonly CarouselSlideBox[],
+  group: number[],
+  view: CarouselLoopView
+) {
   const first = boxes[group[0]]
   const last = boxes[group[group.length - 1]]
-  const margin = alignOffset(view.align, view.snapport, last.start + last.size - first.start)
-  return { slides: [...group], position: first.start - margin - view.paddingStart, leader: group[0], margin }
+  const margin = alignOffset(
+    view.align,
+    view.snapport,
+    last.start + last.size - first.start
+  )
+  return {
+    slides: [...group],
+    position: first.start - margin - view.paddingStart,
+    leader: group[0],
+    margin,
+  }
 }
 
 /**
@@ -163,13 +198,18 @@ function loopPage(boxes: readonly CarouselSlideBox[], group: number[], view: Car
  */
 function canLoop(track: CarouselTrack, view: CarouselLoopView) {
   const groups = loopGroups(track, view)
-  if (groups.length < 2) return false
+  if (groups.length < 2) {
+    return false
+  }
   const boxes = placeSlides(track, 0)
   const length = track.sizes.reduce((sum, size) => sum + size + track.gap, 0)
   let step = 0
   groups.forEach((group, index) => {
     const next = groups[(index + 1) % groups.length]
-    step = Math.max(step, (boxes[next[0]].start - boxes[group[0]].start + length) % length)
+    step = Math.max(
+      step,
+      (boxes[next[0]].start - boxes[group[0]].start + length) % length
+    )
   })
   return view.maxScroll >= 2 * step - 1
 }
@@ -180,7 +220,11 @@ function canLoop(track: CarouselTrack, view: CarouselLoopView) {
  * merged: a loop has no ends, and pages far from the current one may lie
  * past the scroll range until the track rotates again.
  */
-function loopPages(track: CarouselTrack, view: CarouselLoopView, first: number) {
+function loopPages(
+  track: CarouselTrack,
+  view: CarouselLoopView,
+  first: number
+) {
   const boxes = placeSlides(track, first)
   return loopGroups(track, view).map((group) => loopPage(boxes, group, view))
 }
@@ -198,7 +242,7 @@ function loopRotation(
   view: CarouselLoopView,
   at: { position: number; first: number },
   to?: { page: number; heading: 1 | -1 },
-  { lazy = false } = {},
+  { lazy = false } = {}
 ) {
   const groups = loopGroups(track, view)
   const now = placeSlides(track, at.first)
@@ -206,10 +250,14 @@ function loopRotation(
   const edge = at.position + view.paddingStart
   let anchor = at.first
   now.forEach((box, index) => {
-    if (box.start <= edge + 0.5 && box.start > now[anchor].start) anchor = index
+    if (box.start <= edge + 0.5 && box.start > now[anchor].start) {
+      anchor = index
+    }
   })
   const leaders = groups.map((group) => group[0])
-  if (leaders.includes(at.first)) leaders.unshift(at.first)
+  if (leaders.includes(at.first)) {
+    leaders.unshift(at.first)
+  }
   let best: { first: number; delta: number; room: number } | null = null
   for (const first of leaders) {
     const boxes = first === at.first ? now : placeSlides(track, first)
@@ -219,12 +267,20 @@ function loopRotation(
     if (to) {
       const target = loopPage(boxes, groups[to.page], view).position
       // It must lie the way the carousel heads, or right where it is.
-      if ((target - position) * to.heading < -0.5) continue
+      if ((target - position) * to.heading < -0.5) {
+        continue
+      }
       room = Math.min(room, target, view.maxScroll - target)
     }
-    if (room < -0.5) continue
-    if (!best || room > best.room + 0.5) best = { first, delta, room }
-    if (lazy && first === at.first) break
+    if (room < -0.5) {
+      continue
+    }
+    if (!best || room > best.room + 0.5) {
+      best = { first, delta, room }
+    }
+    if (lazy && first === at.first) {
+      break
+    }
   }
   return best && { first: best.first, delta: best.delta }
 }
@@ -233,8 +289,13 @@ function loopRotation(
 function nearestPage(pages: readonly { position: number }[], position: number) {
   let best = -1
   for (let index = 0; index < pages.length; index++) {
-    if (best === -1 || Math.abs(pages[index].position - position) < Math.abs(pages[best].position - position))
+    if (
+      best === -1 ||
+      Math.abs(pages[index].position - position) <
+        Math.abs(pages[best].position - position)
+    ) {
       best = index
+    }
   }
   return best
 }
@@ -243,16 +304,26 @@ function nearestPage(pages: readonly { position: number }[], position: number) {
  * Whether a slide counts as in view at `position`: at least half of it shows,
  * or, for a slide larger than the viewport, it fills at least half of it.
  */
-function isSlideInView(slide: CarouselSlideBox, position: number, viewport: number) {
-  const shown = Math.min(slide.start + slide.size, position + viewport) - Math.max(slide.start, position)
+function isSlideInView(
+  slide: CarouselSlideBox,
+  position: number,
+  viewport: number
+) {
+  const shown =
+    Math.min(slide.start + slide.size, position + viewport) -
+    Math.max(slide.start, position)
   return shown >= Math.min(slide.size, viewport) / 2 - 0.5
 }
 
 /** The page after or before `page` (from 1), wrapping with `loop`. Returns `page` at an end. */
 function stepPage(page: number, by: 1 | -1, count: number, loop: boolean) {
   const next = page + by
-  if (next >= 1 && next <= count) return next
-  if (!loop || count < 2) return page
+  if (next >= 1 && next <= count) {
+    return next
+  }
+  if (!loop || count < 2) {
+    return page
+  }
   return next < 1 ? count : 1
 }
 

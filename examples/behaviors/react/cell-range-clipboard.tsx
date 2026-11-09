@@ -13,7 +13,11 @@ import { useLog } from "../../shared/react/log"
 
 type PricesOptions = { onCopy?: (text: string) => void }
 
-type PricesState = { active: GridCell | null; range: CellRange | null; cells: string[][] }
+type PricesState = {
+  active: GridCell | null
+  range: CellRange | null
+  cells: string[][]
+}
 
 const start = [
   ["Tea", "3", "12"],
@@ -27,10 +31,18 @@ const cols = start[0].length
 const prices = definePrimitive({
   name: "prices",
   options: { onCopy: "callback" },
-  state: (_options: PricesOptions): PricesState => ({ active: null, range: null, cells: start }),
+  state: (_options: PricesOptions): PricesState => ({
+    active: null,
+    range: null,
+    cells: start,
+  }),
   api: (context) => {
     const { store } = context
-    const grid = createGridFocus<PricesState>(context, { key: "active", rows: () => rows, cols: () => cols })
+    const grid = createGridFocus<PricesState>(context, {
+      key: "active",
+      rows: () => rows,
+      cols: () => cols,
+    })
     const range = createCellRange<PricesState>(context, {
       key: "range",
       grid,
@@ -50,16 +62,22 @@ const prices = definePrimitive({
       paste(event: ClipboardEvent) {
         const state = store.get()
         const bounds = range.bounds(state)
-        if (!bounds) return
+        if (!bounds) {
+          return
+        }
         event.preventDefault()
-        const pasted = textToCells(event.clipboardData?.getData("text/plain") ?? "")
+        const pasted = textToCells(
+          event.clipboardData?.getData("text/plain") ?? ""
+        )
         const cells = state.cells.map((row) => [...row])
         pasted.forEach((values, r) =>
           values.forEach((value, c) => {
             const row = bounds.top + r
             const col = bounds.left + c
-            if (row < rows && col < cols) cells[row][col] = value
-          }),
+            if (row < rows && col < cols) {
+              cells[row][col] = value
+            }
+          })
         )
         store.set({ cells })
       },
@@ -73,16 +91,24 @@ const prices = definePrimitive({
   slots: (slot) => ({
     root: slot({}),
     grid: slot({
-      attrs: () => ({ role: "grid", style: "user-select:none;touch-action:none" }),
+      attrs: () => ({
+        role: "grid",
+        style: "user-select:none;touch-action:none",
+      }),
       on: {
         copy: (event, { api }) => api.copy(event as ClipboardEvent),
         paste: (event, { api }) => api.paste(event as ClipboardEvent),
       },
     }),
-    row: slot<{ id: string }>({ props: { id: "string" }, attrs: () => ({ role: "row" }) }),
+    row: slot<{ id: string }>({
+      props: { id: "string" },
+      attrs: () => ({ role: "row" }),
+    }),
     cell: slot<{ id: string; row: number; col: number }, { text: string }>({
       props: { row: "number", col: "number" },
-      state: (state, { props }) => ({ text: state.cells[props.row][props.col] }),
+      state: (state, { props }) => ({
+        text: state.cells[props.row][props.col],
+      }),
       attrs: (state, { props, api }) => ({
         role: "gridcell",
         tabindex: api.grid.tabIndex(state, props),
@@ -90,15 +116,24 @@ const prices = definePrimitive({
       }),
       on: {
         keydown: (event, { api }) => api.range.keydown(event),
-        pointerdown: (event, { api, props }) => api.range.pointerdown(event, props),
+        pointerdown: (event, { api, props }) =>
+          api.range.pointerdown(event, props),
       },
       bind: (el, { api, props }) => api.range.bind(el, props),
     }),
-    copyAll: slot({ attrs: () => ({ type: "button" }), press: ({ api }) => api.copyAll() }),
+    copyAll: slot({
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.copyAll(),
+    }),
   }),
 })
 
-const parts = createParts(prices, { root: "div", grid: "div", row: "div", copyAll: "button" })
+const parts = createParts(prices, {
+  root: "div",
+  grid: "div",
+  row: "div",
+  copyAll: "button",
+})
 
 const Prices = parts.Root
 
@@ -111,7 +146,13 @@ function PricesCell({
   col,
   ...props
 }: { row: number; col: number } & PartProps<"div", { text: string }>) {
-  return usePart(prices, "cell", { id: `${row}:${col}`, row, col }, props, "div")
+  return usePart(
+    prices,
+    "cell",
+    { id: `${row}:${col}`, row, col },
+    props,
+    "div"
+  )
 }
 
 const PricesCopyAll = parts.CopyAll

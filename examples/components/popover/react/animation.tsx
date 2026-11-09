@@ -21,7 +21,9 @@ function Example() {
       <PopoverTrigger>What's New</PopoverTrigger>
       <PopoverContent keepMounted>
         <PopoverTitle>What's new</PopoverTitle>
-        <PopoverDescription>Comments now support threads and reactions.</PopoverDescription>
+        <PopoverDescription>
+          Comments now support threads and reactions.
+        </PopoverDescription>
         <div data-slot="row">
           <PopoverClose data-variant="solid">Got It</PopoverClose>
         </div>

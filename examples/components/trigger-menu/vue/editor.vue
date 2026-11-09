@@ -31,7 +31,11 @@ const vEditor: Directive<HTMLTextAreaElement> = {
       <FieldLabel>Notes</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <textarea v-bind="props" v-editor placeholder="Type @ to mention someone…" />
+          <textarea
+            v-bind="props"
+            v-editor
+            placeholder="Type @ to mention someone…"
+          />
         </template>
       </FieldControl>
     </Field>

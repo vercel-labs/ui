@@ -6,10 +6,9 @@ testExamples(
   "meter",
   {
     basic: async (preview) => {
-      await expect(preview.getByRole("meter", { name: "Storage used" })).toHaveAttribute(
-        "aria-valuenow",
-        "68",
-      )
+      await expect(
+        preview.getByRole("meter", { name: "Storage used" })
+      ).toHaveAttribute("aria-valuenow", "68")
     },
     "min-max": async (preview) => {
       const meter = preview.getByRole("meter")
@@ -23,9 +22,12 @@ testExamples(
       await expect(preview.getByText("18 of 25 seats")).toBeVisible()
     },
     "value-label": async (preview) => {
-      await expect(preview.getByRole("meter")).toHaveAttribute("aria-valuetext", "750 of 1000 requests, 75%")
+      await expect(preview.getByRole("meter")).toHaveAttribute(
+        "aria-valuetext",
+        "750 of 1000 requests, 75%"
+      )
     },
   },
   "components",
-  ["basic", "label", "rtl", "min-max", "format", "value-label", "render"],
+  ["basic", "label", "rtl", "min-max", "format", "value-label", "render"]
 )

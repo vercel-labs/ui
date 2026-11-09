@@ -20,7 +20,10 @@ The content the trigger shows and hides. Closed, it leaves the page unless `keep
     ...rest
   }: PartProps<"div", CollapsiblePanelState> & CollapsiblePanelProps = $props()
 
-  const panel = usePart(collapsible, "panel", () => ({ keepMounted, hiddenUntilFound }))
+  const panel = usePart(collapsible, "panel", () => ({
+    keepMounted,
+    hiddenUntilFound,
+  }))
 </script>
 
 {#if panel.present}

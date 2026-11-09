@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/vue/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  type ResizableStorage,
+} from "@ui-sdk/vue/resizable"
 
 const session: ResizableStorage = {
   getItem: (key) => sessionStorage.getItem(key),

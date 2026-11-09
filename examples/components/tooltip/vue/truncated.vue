@@ -20,10 +20,15 @@ function fits(file: string) {
 <template>
   <ul>
     <li v-for="file in files" :key="file">
-      <Tooltip type="label" @open-change="(open, details) => open && fits(file) && details.cancel()">
+      <Tooltip
+        type="label"
+        @open-change="(open, details) => open && fits(file) && details.cancel()"
+      >
         <TooltipTrigger>
           <FileIcon aria-hidden="true" />
-          <span :ref="(el) => el && names.set(file, el as HTMLElement)">{{ file }}</span>
+          <span :ref="(el) => el && names.set(file, el as HTMLElement)">{{
+            file
+          }}</span>
         </TooltipTrigger>
         <TooltipContent>{{ file }}</TooltipContent>
       </Tooltip>

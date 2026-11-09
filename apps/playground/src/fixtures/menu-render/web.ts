@@ -17,9 +17,11 @@ async function mount(root: HTMLElement) {
   root.addEventListener(
     "action",
     (event) => {
-      root.querySelector("output")!.textContent = (event as CustomEvent<{ value: string }>).detail.value
+      root.querySelector("output")!.textContent = (
+        event as CustomEvent<{ value: string }>
+      ).detail.value
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

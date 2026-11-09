@@ -2,10 +2,14 @@ import "@ui-sdk/web/command"
 import { createElement, LoaderCircle } from "lucide"
 import { log } from "../../../shared/web/log"
 
-const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+const wait = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 function mount(root: HTMLElement) {
-  const spinner = createElement(LoaderCircle, { "data-slot": "spinner", "aria-hidden": "true" }).outerHTML
+  const spinner = createElement(LoaderCircle, {
+    "data-slot": "spinner",
+    "aria-hidden": "true",
+  }).outerHTML
   root.innerHTML = `
     <div data-slot="stack">
       <ui-command>
@@ -29,7 +33,9 @@ function mount(root: HTMLElement) {
   const error = root.querySelector<HTMLElement>("[data-error]")!
   root.querySelector("ui-command")!.addEventListener("action", (event) => {
     const { value, waitUntil } = event.detail
-    if (value === "deploy") waitUntil(wait(1200).then(() => log(root, "Deployed to production")))
+    if (value === "deploy") {
+      waitUntil(wait(1200).then(() => log(root, "Deployed to production")))
+    }
     if (value === "sync") {
       error.hidden = true
       const sync = wait(600).then(() => {

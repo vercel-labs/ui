@@ -15,18 +15,27 @@ import {
 import type { ToastRegionInternalOptions } from "@ui-sdk/core/renderer"
 import * as React from "react"
 import { renderPopup, type PopupContainer } from "./popup"
-import { slotIn, usePart, usePrimitive, type PartProps, type PrimitiveHandle } from "./use-primitive"
+import {
+  slotIn,
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 type RegionHandle = PrimitiveHandle<typeof toastRegion>
 
 // The region and the toast a part belongs to.
-const ToastContext = React.createContext<{ region: RegionHandle; toast: ToastData<React.ReactNode> } | null>(
-  null,
-)
+const ToastContext = React.createContext<{
+  region: RegionHandle
+  toast: ToastData<React.ReactNode>
+} | null>(null)
 
 function useToast(part: string) {
   const context = React.useContext(ToastContext)
-  if (!context) throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  }
   return context
 }
 
@@ -34,10 +43,16 @@ function useToast(part: string) {
  * Props for `ToastRegion`.
  * @stable
  */
-type ToastRegionProps = Omit<PartProps<"section", ToastRegionState>, "children"> &
+type ToastRegionProps = Omit<
+  PartProps<"section", ToastRegionState>,
+  "children"
+> &
   ToastRegionOptions & {
     /** Renders each toast, usually with `Toast` and its parts. Without it, each toast renders its title, description, action and cancel button. */
-    children?: (toast: ToastData<React.ReactNode>, item: ToastItem<React.ReactNode>) => React.ReactNode
+    children?: (
+      toast: ToastData<React.ReactNode>,
+      item: ToastItem<React.ReactNode>
+    ) => React.ReactNode
     /** Where the region renders. Without top layer support, the body. */
     container?: PopupContainer
   }
@@ -85,13 +100,23 @@ function Region({
         const toast = item.toast as ToastData<React.ReactNode>
         return (
           <ToastContext.Provider key={toast.id} value={{ region, toast }}>
-            {children ? children(toast, item as ToastItem<React.ReactNode>) : <DataToast toast={toast} />}
+            {children ? (
+              children(toast, item as ToastItem<React.ReactNode>)
+            ) : (
+              <DataToast toast={toast} />
+            )}
           </ToastContext.Provider>
         )
       })}
     </ol>
   )
-  const element = usePart(region, "region", {}, { ...props, children: list }, "section")
+  const element = usePart(
+    region,
+    "region",
+    {},
+    { ...props, children: list },
+    "section"
+  )
   return element && renderPopup(element, container)
 }
 
@@ -104,7 +129,11 @@ function DataToast({ toast }: { toast: ToastData<React.ReactNode> }) {
         {toast.description != null && <ToastDescription />}
       </div>
       {toast.action && <ToastAction />}
-      {toast.cancel && <ToastClose action={toast.cancel.onCancel}>{toast.cancel.label}</ToastClose>}
+      {toast.cancel && (
+        <ToastClose action={toast.cancel.onCancel}>
+          {toast.cancel.label}
+        </ToastClose>
+      )}
     </Toast>
   )
 }
@@ -147,7 +176,10 @@ function ToastDescription({ children, ...props }: PartProps<"div">) {
 }
 
 // A title or description with content to show.
-function TextPart({ text, ...props }: PartProps<"div"> & { text: "title" | "description" }) {
+function TextPart({
+  text,
+  ...props
+}: PartProps<"div"> & { text: "title" | "description" }) {
   const { region, toast } = useToast("ToastTitle")
   return usePart(region, text, { id: toast.id }, props)
 }
@@ -158,7 +190,10 @@ function TextPart({ text, ...props }: PartProps<"div"> & { text: "title" | "desc
  * handler keeps the toast open and the button pending.
  * @stable
  */
-function ToastAction(props: Omit<PartProps<"button", ToastButtonState>, "onAction"> & ToastActionProps) {
+function ToastAction(
+  props: Omit<PartProps<"button", ToastButtonState>, "onAction"> &
+    ToastActionProps
+) {
   const { toast } = useToast("ToastAction")
   return toast.action || props.onAction ? <ActionPart {...props} /> : null
 }
@@ -183,7 +218,7 @@ function ActionPart({
     "action",
     part,
     element as PartProps<"button", ToastButtonState>,
-    href ? "a" : "button",
+    href ? "a" : "button"
   )
 }
 
@@ -214,7 +249,7 @@ const toast = coreToast as Toaster<React.ReactNode>
  * @stable
  */
 const createToaster = createCoreToaster as <Content = React.ReactNode>(
-  options?: Parameters<typeof createCoreToaster>[0],
+  options?: Parameters<typeof createCoreToaster>[0]
 ) => Toaster<Content>
 
 export {

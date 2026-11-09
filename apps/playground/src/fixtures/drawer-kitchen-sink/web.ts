@@ -1,37 +1,60 @@
 import "@ui-sdk/web/drawer"
 import type { UiDrawerElement } from "@ui-sdk/web/drawer"
 import * as classes from "./classes"
-import { kitchenSink, openChangeMessage, refuses, snapPointChangeMessage, snapPointsOf } from "./shell"
+import {
+  kitchenSink,
+  openChangeMessage,
+  refuses,
+  snapPointChangeMessage,
+  snapPointsOf,
+} from "./shell"
 import { flakyAction, type Variant } from "./variants"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 // Options as attributes, except the ones only a property can hold.
 function applyOptions(el: UiDrawerElement, options: Variant["options"] = {}) {
   for (const [option, value] of Object.entries(options)) {
-    if (option === "physics") el.physics = options.physics
-    else el.setAttribute(kebab(option), Array.isArray(value) ? value.join(",") : String(value))
+    if (option === "physics") {
+      el.physics = options.physics
+    } else {
+      el.setAttribute(
+        kebab(option),
+        Array.isArray(value) ? value.join(",") : String(value)
+      )
+    }
   }
 }
 
 function body(variant: Variant) {
-  if (variant.body === "scroll")
+  if (variant.body === "scroll") {
     return `<ul class="${classes.scroll}" aria-label="Activity" tabindex="0">${Array.from(
       { length: 40 },
-      (_, index) => `<li class="${classes.scrollItem}">Day ${index + 1}</li>`,
+      (_, index) => `<li class="${classes.scrollItem}">Day ${index + 1}</li>`
     ).join("")}</ul>`
-  if (variant.body === "tall")
-    return Array.from({ length: 60 }, (_, index) => `<p>Paragraph ${index + 1}</p>`).join("")
-  if (variant.body === "form")
+  }
+  if (variant.body === "tall") {
+    return Array.from(
+      { length: 60 },
+      (_, index) => `<p>Paragraph ${index + 1}</p>`
+    ).join("")
+  }
+  if (variant.body === "form") {
     return `<div class="flex flex-col gap-3">
       <label class="${classes.field}">Name<input class="${classes.input}" value="Ada" /></label>
       <label class="${classes.field}">Email<input class="${classes.input}" type="email" /></label>
       <label class="${classes.field}">Notes<textarea class="${classes.textarea}"></textarea></label>
     </div>`
-  if (variant.body === "snap-buttons")
+  }
+  if (variant.body === "snap-buttons") {
     return `<div class="${classes.snapButtons}">${snapPointsOf(variant)
-      .map((point) => `<button class="${classes.button}" data-snap="${point}">${point}</button>`)
+      .map(
+        (point) =>
+          `<button class="${classes.button}" data-snap="${point}">${point}</button>`
+      )
       .join("")}</div>`
+  }
   return ""
 }
 
@@ -39,7 +62,7 @@ function body(variant: Variant) {
 function nestedDrawers(variant: Variant) {
   const side = variant.options?.side ? `side="${variant.options.side}"` : ""
   let inner = ""
-  for (let level = (variant.nested ?? 0) + 1; level >= 2; level--)
+  for (let level = (variant.nested ?? 0) + 1; level >= 2; level--) {
     inner = `
       <ui-drawer ${side} data-level="${level}">
         <ui-drawer-trigger><button class="${classes.trigger}">Open level ${level}</button></ui-drawer-trigger>
@@ -56,6 +79,7 @@ function nestedDrawers(variant: Variant) {
           </div>
         </ui-drawer-content>
       </ui-drawer>`
+  }
   return inner
 }
 
@@ -69,7 +93,9 @@ function mount(root: HTMLElement) {
     drawer.id = env.id
     applyOptions(drawer, variant.options)
     drawer.controller = env.controller
-    if (env.container) drawer.setAttribute("container", `#${env.container.id}`)
+    if (env.container) {
+      drawer.setAttribute("container", `#${env.container.id}`)
+    }
     const contentAttributes = Object.entries(variant.content ?? {})
       .map(([name, value]) => `${kebab(name)}="${value}"`)
       .join(" ")
@@ -96,31 +122,46 @@ function mount(root: HTMLElement) {
     })
     row.append(drawer)
     slot.append(row)
-    if (variant.outlet && !variant.outlet.inside)
+    if (variant.outlet && !variant.outlet.inside) {
       slot.insertAdjacentHTML("beforeend", outlet(variant, `for="${env.id}"`))
-    for (const el of slot.querySelectorAll<HTMLElement & { keyframes?: unknown }>("ui-drawer-outlet"))
+    }
+    for (const el of slot.querySelectorAll<
+      HTMLElement & { keyframes?: unknown }
+    >("ui-drawer-outlet")) {
       el.keyframes = variant.outlet?.keyframes
+    }
 
     // Web components have no controlled props. The checkbox and the snap
     // buttons set the element's live properties instead.
     const snapLabel = document.createElement("span")
     snapLabel.className = "text-xs text-neutral-600"
-    const showSnap = () => (snapLabel.textContent = `snapPoint=${JSON.stringify(drawer.snapPoint ?? null)}`)
+    const showSnap = () =>
+      (snapLabel.textContent = `snapPoint=${JSON.stringify(drawer.snapPoint ?? null)}`)
     for (const button of drawer.querySelectorAll<HTMLElement>("[data-snap]")) {
-      const point = snapPointsOf(variant).find((entry) => String(entry) === button.dataset.snap)!
+      const point = snapPointsOf(variant).find(
+        (entry) => String(entry) === button.dataset.snap
+      )!
       button.addEventListener("click", () => {
-        if (variant.controlled?.snapPoint) drawer.snapPoint = point
-        else env.controller.setSnapPoint(point)
+        if (variant.controlled?.snapPoint) {
+          drawer.snapPoint = point
+        } else {
+          env.controller.setSnapPoint(point)
+        }
       })
     }
-    const checkbox = Object.assign(document.createElement("input"), { type: "checkbox" })
+    const checkbox = Object.assign(document.createElement("input"), {
+      type: "checkbox",
+    })
     if (variant.controlled?.open) {
       const label = Object.assign(document.createElement("label"), {
         className: "flex items-center gap-1.5 text-xs text-neutral-600",
       })
       label.append(checkbox, "open")
       row.append(label)
-      checkbox.addEventListener("change", () => (drawer.open = checkbox.checked))
+      checkbox.addEventListener(
+        "change",
+        () => (drawer.open = checkbox.checked)
+      )
     }
     if (variant.controlled?.snapPoint) {
       row.append(snapLabel)
@@ -133,7 +174,9 @@ function mount(root: HTMLElement) {
       const button = action.querySelector("button")!
       button.textContent = "Saving…"
       const run = flakyAction()
-      ;(event as CustomEvent<{ waitUntil: (promise: Promise<unknown>) => void }>).detail.waitUntil(run)
+      ;(
+        event as CustomEvent<{ waitUntil: (promise: Promise<unknown>) => void }>
+      ).detail.waitUntil(run)
       run.catch(() => (button.textContent = "Retry"))
     })
 
@@ -141,25 +184,36 @@ function mount(root: HTMLElement) {
     drawer.addEventListener("openchange", (event) => {
       const { value, reason, returnValue } = event.detail
       const target = event.target as HTMLElement
-      if (target !== drawer)
-        return env.log(`level ${target.dataset.level} ${openChangeMessage(value, { reason })}`)
+      if (target !== drawer) {
+        return env.log(
+          `level ${target.dataset.level} ${openChangeMessage(value, { reason })}`
+        )
+      }
       env.log(openChangeMessage(value, { reason, returnValue }))
       checkbox.checked = value
     })
     drawer.addEventListener("openchangecomplete", (event) => {
-      if (event.target === drawer) env.log(`openChangeComplete ${event.detail.value}`)
+      if (event.target === drawer) {
+        env.log(`openChangeComplete ${event.detail.value}`)
+      }
     })
     drawer.addEventListener("snappointchange", (event) => {
-      if (event.target !== drawer) return
+      if (event.target !== drawer) {
+        return
+      }
       const { value: point, reason } = event.detail
       const refused = refuses(variant, point)
       // Canceling the event cancels the change.
-      if (refused) event.preventDefault()
+      if (refused) {
+        event.preventDefault()
+      }
       env.log(snapPointChangeMessage(point, { reason }, refused))
       queueMicrotask(showSnap)
     })
     drawer.addEventListener("dismissattempt", (event) => {
-      if (event.target === drawer) env.log(`dismissAttempt (${event.detail.reason})`)
+      if (event.target === drawer) {
+        env.log(`dismissAttempt (${event.detail.reason})`)
+      }
     })
   })
 }

@@ -4,7 +4,10 @@ import { readdirSync } from "node:fs"
 import path from "node:path"
 
 const frameworks = ["react", "solid", "vue", "svelte", "web-components"]
-const root = path.join(import.meta.dirname, "../../examples/components/alert-dialog")
+const root = path.join(
+  import.meta.dirname,
+  "../../examples/components/alert-dialog"
+)
 const folders = ["react", "solid", "vue", "svelte", "web"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -15,7 +18,12 @@ const retainedFixtures = ["rtl"]
 
 // The order examples appear on the page, with each one's trigger and answers.
 const examples = {
-  basic: { trigger: "Delete Project", title: "Delete this project?", cancel: "Cancel", agree: "Delete" },
+  basic: {
+    trigger: "Delete Project",
+    title: "Delete this project?",
+    cancel: "Cancel",
+    agree: "Delete",
+  },
   controlled: {
     trigger: "Review Changes",
     title: "Discard unsaved changes?",
@@ -32,14 +40,20 @@ const examples = {
 }
 // The lines an example logged to its console, oldest first.
 const logs = (preview: Locator) =>
-  preview.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])')
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
 
-const exact = (text: string) => new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`)
+const exact = (text: string) =>
+  new RegExp(`^${text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`)
 
 async function load(page: Page, framework: string) {
   const errors: string[] = []
   page.on("pageerror", (error) => errors.push(error.message))
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+  page.on(
+    "console",
+    (message) => message.type() === "error" && errors.push(message.text())
+  )
   await page.goto(`/docs/${framework}/components/alert-dialog`)
   // A modal makes the rest of the page inert. Opening one before the docs
   // shell hydrates would change markup React is still hydrating.
@@ -48,13 +62,21 @@ async function load(page: Page, framework: string) {
   const shown = examples
   await expect(previews).toHaveCount(Object.keys(shown).length)
   expect(
-    await previews.evaluateAll((items) => items.map((item) => item.getAttribute("data-example"))),
+    await previews.evaluateAll((items) =>
+      items.map((item) => item.getAttribute("data-example"))
+    )
   ).toEqual(Object.keys(shown).map((name) => `alert-dialog/${name}`))
-  return { errors, example: (name: string) => page.locator(`[data-example="alert-dialog/${name}"]`) }
+  return {
+    errors,
+    example: (name: string) =>
+      page.locator(`[data-example="alert-dialog/${name}"]`),
+  }
 }
 
 for (const framework of frameworks) {
-  test(`every alert dialog asks and answers in ${framework}`, async ({ page }) => {
+  test(`every alert dialog asks and answers in ${framework}`, async ({
+    page,
+  }) => {
     test.setTimeout(120_000)
     for (const folder of folders) {
       const files = [...Object.keys(examples), ...retainedFixtures]
@@ -64,8 +86,12 @@ for (const framework of frameworks) {
     const alert = page.getByRole("alertdialog")
 
     for (const [name, parts] of Object.entries(examples)) {
-      if (!parts) continue
-      const trigger = example(name).getByRole("button", { name: exact(parts.trigger) })
+      if (!parts) {
+        continue
+      }
+      const trigger = example(name).getByRole("button", {
+        name: exact(parts.trigger),
+      })
       await trigger.scrollIntoViewIfNeeded()
 
       // The keyboard opens it on the least destructive answer, and Tab stays inside.
@@ -86,7 +112,10 @@ for (const framework of frameworks) {
       await expect(alert, "a press outside keeps it open").toBeVisible()
       await page.keyboard.press("Escape")
       await expect(alert, `${name} closes`).toHaveCount(0)
-      await expect(trigger, "escape closes it back to the trigger").toBeFocused()
+      await expect(
+        trigger,
+        "escape closes it back to the trigger"
+      ).toBeFocused()
 
       await trigger.click()
       await agree.click()
@@ -121,7 +150,9 @@ for (const framework of frameworks) {
     expect(errors).toEqual([])
   })
 
-  test(`an async action keeps the dialog open until it settles in ${framework}`, async ({ page }) => {
+  test(`an async action keeps the dialog open until it settles in ${framework}`, async ({
+    page,
+  }) => {
     test.setTimeout(60_000)
     const { errors, example } = await load(page, framework)
     const preview = example("async-action")
@@ -131,7 +162,9 @@ for (const framework of frameworks) {
 
     await trigger.click()
     await action.click()
-    await expect(action, "the first try is pending meanwhile").toHaveText("Deleting…")
+    await expect(action, "the first try is pending meanwhile").toHaveText(
+      "Deleting…"
+    )
     await expect(action).toHaveAttribute("aria-busy", "true")
     await page.keyboard.press("Escape")
     await alert.getByRole("button", { name: "Cancel" }).click()
@@ -139,14 +172,17 @@ for (const framework of frameworks) {
     await expect(action).toHaveText("Try Again")
     await expect(action).not.toHaveAttribute("aria-busy", "true")
     await expect(alert).toBeVisible()
-    await expect(alert.getByRole("alert"), "the first try fails, then the error shows").toHaveText(
-      "Couldn't delete the project.",
-    )
+    await expect(
+      alert.getByRole("alert"),
+      "the first try fails, then the error shows"
+    ).toHaveText("Couldn't delete the project.")
 
     await alert.getByRole("button", { name: "Cancel" }).click()
     await expect(alert).toHaveCount(0)
     await trigger.click()
-    await expect(action, "the error is gone the next time it opens").toHaveText("Delete")
+    await expect(action, "the error is gone the next time it opens").toHaveText(
+      "Delete"
+    )
 
     await action.click()
     await expect(alert, "the second try succeeds and closes it").toHaveCount(0)
@@ -158,17 +194,23 @@ for (const framework of frameworks) {
 
 // Triggers say they open a dialog.
 for (const framework of frameworks) {
-  test(`the trigger says it opens a dialog in ${framework}`, async ({ page }) => {
+  test(`the trigger says it opens a dialog in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/alert-dialog`)
-    const trigger = page.locator('[data-example="alert-dialog/basic"]').getByRole("button", {
-      name: "Delete Project",
-    })
+    const trigger = page
+      .locator('[data-example="alert-dialog/basic"]')
+      .getByRole("button", {
+        name: "Delete Project",
+      })
     await expect(trigger).toHaveAttribute("aria-haspopup", "dialog")
   })
 }
 
 for (const framework of frameworks) {
-  test(`confirms answer queued questions one at a time in ${framework}`, async ({ page }) => {
+  test(`confirms answer queued questions one at a time in ${framework}`, async ({
+    page,
+  }) => {
     const { errors, example } = await load(page, framework)
     const preview = example("queue")
     const trigger = preview.getByRole("button", { name: "Review Two Projects" })
@@ -182,7 +224,10 @@ for (const framework of frameworks) {
     await alert.getByRole("button", { name: "Archive", exact: true }).click()
     await expect(alert).toHaveCount(0)
     // Both answers settle together, in the order they were asked.
-    await expect(logs(preview)).toHaveText(["Acme: canceled", "Globex: confirmed"])
+    await expect(logs(preview)).toHaveText([
+      "Acme: canceled",
+      "Globex: confirmed",
+    ])
     await expect(trigger).toBeFocused()
     expect(errors).toEqual([])
   })

@@ -13,7 +13,7 @@ describe("server rendering toggles, buttons and separators", () => {
         <Toggle value="a">A</Toggle>
         <Toggle value="b">B</Toggle>
         <Toggle value="c">C</Toggle>
-      </ToggleGroup>,
+      </ToggleGroup>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="group"')
@@ -22,13 +22,17 @@ describe("server rendering toggles, buttons and separators", () => {
   })
 
   test("a button renders as a native button that doesn't submit by default", () => {
-    expect(renderToString(<Button>Save</Button>)).toMatch(/<button[^>]*type="button"/)
-    expect(renderToString(<Button type="submit">Save</Button>)).toMatch(/type="submit"/)
+    expect(renderToString(<Button>Save</Button>)).toMatch(
+      /<button[^>]*type="button"/
+    )
+    expect(renderToString(<Button type="submit">Save</Button>)).toMatch(
+      /type="submit"/
+    )
   })
 
   test("a separator renders its role and orientation", () => {
     expect(renderToString(<Separator orientation="vertical" />)).toMatch(
-      /role="separator"[^>]*aria-orientation="vertical"/,
+      /role="separator"[^>]*aria-orientation="vertical"/
     )
     expect(renderToString(<Separator decorative />)).toContain('role="none"')
   })

@@ -6,7 +6,9 @@ import { Fixture } from "./solid"
 // name the toolbar specs use.
 function mount(root: HTMLElement) {
   const page = window as unknown as { __serverHtml?: string }
-  Object.defineProperty(window, "__serverMarkup", { get: () => page.__serverHtml })
+  Object.defineProperty(window, "__serverMarkup", {
+    get: () => page.__serverHtml,
+  })
   return hydrateFixture(root, "toolbar", () => <Fixture />)
 }
 

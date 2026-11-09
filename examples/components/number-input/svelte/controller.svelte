@@ -17,10 +17,17 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => zoom.decrement({ large: true })}>Zoom Out</button>
-    <button type="button" onclick={() => zoom.increment({ large: true })}>Zoom In</button>
-    <button type="button" onclick={() => zoom.setValue(100)}>Actual Size</button>
-    <button type="button" onclick={() => log(`Zoom is ${zoom.getValue()}%`)}>Read</button>
+    <button type="button" onclick={() => zoom.decrement({ large: true })}
+      >Zoom Out</button
+    >
+    <button type="button" onclick={() => zoom.increment({ large: true })}
+      >Zoom In</button
+    >
+    <button type="button" onclick={() => zoom.setValue(100)}>Actual Size</button
+    >
+    <button type="button" onclick={() => log(`Zoom is ${zoom.getValue()}%`)}
+      >Read</button
+    >
     <button type="button" onclick={() => zoom.focus()}>Focus</button>
   </div>
   <Field>
@@ -32,7 +39,8 @@
       step={10}
       format={{ style: "unit", unit: "percent" }}
       controller={zoom}
-      onValueChange={(value, details) => log(`Zoom ${value ?? "empty"}% (${details.reason})`)}
+      onValueChange={(value, details) =>
+        log(`Zoom ${value ?? "empty"}% (${details.reason})`)}
     >
       <NumberInputGroup>
         <NumberInputDecrement aria-label="Decrease">

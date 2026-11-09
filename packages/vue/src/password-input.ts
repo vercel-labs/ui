@@ -6,10 +6,22 @@ import {
   type PasswordInputOptions,
   type PasswordInputVisibleChangeReason,
 } from "@ui-sdk/core/password-input"
-import { defineComponent, inject, provide, type InjectionKey, type PropType } from "vue"
+import {
+  defineComponent,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { useFieldControl, useFieldControlId } from "./field-context"
 import { createParts, withElement } from "./create-parts"
-import { optionalBoolean, orModel, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 import { readOnlyOf } from "./text-control"
 
 // What the control takes from its root: the field it joins, and the value it shows.
@@ -19,7 +31,9 @@ type ControlContext = {
   defaultValue: () => string | undefined
 }
 
-const ControlKey: InjectionKey<ControlContext> = Symbol("password-input-control")
+const ControlKey: InjectionKey<ControlContext> = Symbol(
+  "password-input-control"
+)
 
 const parts = createParts(passwordInputPrimitive, { toggle: "button" })
 
@@ -50,9 +64,15 @@ const PasswordInput = withElement(
     emits: {
       "update:value": (_value: string) => true,
       "update:modelValue": (_value: string) => true,
-      valueChange: (_value: string, _details: ChangeDetails<InputValueChangeReason>) => true,
+      valueChange: (
+        _value: string,
+        _details: ChangeDetails<InputValueChangeReason>
+      ) => true,
       "update:visible": (_visible: boolean) => true,
-      visibleChange: (_visible: boolean, _details: ChangeDetails<PasswordInputVisibleChangeReason>) => true,
+      visibleChange: (
+        _visible: boolean,
+        _details: ChangeDetails<PasswordInputVisibleChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof passwordInputPrimitive, "root">,
     setup(props, { attrs, emit }) {
@@ -73,15 +93,25 @@ const PasswordInput = withElement(
         controlId,
         debug: props.debug,
         // The change events run first, so canceling one also keeps v-model as it was.
-        onValueChange: (value: string, details: ChangeDetails<InputValueChangeReason>) => {
+        onValueChange: (
+          value: string,
+          details: ChangeDetails<InputValueChangeReason>
+        ) => {
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onVisibleChange: (visible: boolean, details: ChangeDetails<PasswordInputVisibleChangeReason>) => {
+        onVisibleChange: (
+          visible: boolean,
+          details: ChangeDetails<PasswordInputVisibleChangeReason>
+        ) => {
           emit("visibleChange", visible, details)
-          if (!details.canceled) emit("update:visible", visible)
+          if (!details.canceled) {
+            emit("update:visible", visible)
+          }
         },
       }))
       provide(ControlKey, {
@@ -91,7 +121,7 @@ const PasswordInput = withElement(
       })
       return usePart(passwordInput, "root")
     },
-  }),
+  })
 )
 
 /**
@@ -108,19 +138,34 @@ const PasswordInputControl = withElement(
     slots: Object as PartSlots<typeof passwordInputPrimitive, "control">,
     setup(props, { attrs }) {
       const context = inject(ControlKey)
-      if (!context) throw new Error("PasswordInputControl must be used inside <PasswordInput>.")
+      if (!context) {
+        throw new Error(
+          "PasswordInputControl must be used inside <PasswordInput>."
+        )
+      }
       // A controlled value is the DOM property, which Vue sets on every render.
       // A default is the `value` attribute, which a form reset returns to.
       const element = () => {
         const value = context.value()
-        return { ...attrs, ...(value !== undefined ? { value } : { "^value": context.defaultValue() }) }
+        return {
+          ...attrs,
+          ...(value !== undefined
+            ? { value }
+            : { "^value": context.defaultValue() }),
+        }
       }
-      return usePart(passwordInputPrimitive, "control", () => ({ id: props.id }), element, {
-        tag: "input",
-        extend: context.field?.props,
-      })
+      return usePart(
+        passwordInputPrimitive,
+        "control",
+        () => ({ id: props.id }),
+        element,
+        {
+          tag: "input",
+          extend: context.field?.props,
+        }
+      )
     },
-  }),
+  })
 )
 
 /**

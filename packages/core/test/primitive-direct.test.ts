@@ -40,8 +40,12 @@ function element(initial: Record<string, string> = {}) {
 describe("direct attributes", () => {
   test("render, so the server and every render have them", () => {
     const instance = filtered({ id: "f", query: "an" })
-    expect(attrs(instance.part("item", { id: "a", label: "Apple" })).hidden).toBe("")
-    expect(attrs(instance.part("item", { id: "b", label: "Banana" })).hidden).toBeUndefined()
+    expect(
+      attrs(instance.part("item", { id: "a", label: "Apple" })).hidden
+    ).toBe("")
+    expect(
+      attrs(instance.part("item", { id: "b", label: "Banana" })).hidden
+    ).toBeUndefined()
     expect(directNames(instance.part("item"))).toEqual(["hidden"])
   })
 
@@ -50,7 +54,9 @@ describe("direct attributes", () => {
     const props = { id: "a", label: "Apple" }
     attrs(instance.part("item", props))
     const el = element({ role: "option" })
-    ref(instance.part("item", props), { by: "framework", attaches: "all" })(el as unknown as HTMLElement)
+    ref(instance.part("item", props), { by: "framework", attaches: "all" })(
+      el as unknown as HTMLElement
+    )
     instance.setOptions({ id: "f", query: "x" })
     expect(el.getAttribute("hidden")).toBe("")
     instance.setOptions({ id: "f", query: "pp" })
@@ -61,8 +67,13 @@ describe("direct attributes", () => {
     const instance = filtered({ id: "f", query: "x" })
     const props = { id: "a", label: "Apple" }
     // Rendered hidden, as the server would.
-    const el = element({ role: "option", hidden: attrs(instance.part("item", props)).hidden! })
-    ref(instance.part("item", props), { by: "framework", attaches: "all" })(el as unknown as HTMLElement)
+    const el = element({
+      role: "option",
+      hidden: attrs(instance.part("item", props)).hidden!,
+    })
+    ref(instance.part("item", props), { by: "framework", attaches: "all" })(
+      el as unknown as HTMLElement
+    )
     instance.setOptions({ id: "f", query: "" })
     expect(el.getAttribute("hidden")).toBeNull()
   })

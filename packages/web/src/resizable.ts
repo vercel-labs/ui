@@ -22,11 +22,20 @@ function defineResizableElements() {
         layout: {
           get: (api: ResizableApi) => api.getLayout(),
           set: (api: ResizableApi, layout: number[] | null | undefined) => {
-            if (Array.isArray(layout)) api.setLayout(layout)
+            if (Array.isArray(layout)) {
+              api.setLayout(layout)
+            }
           },
         },
       },
-      api: ["getLayout", "setLayout", "collapse", "expand", "resize", "isCollapsed"],
+      api: [
+        "getLayout",
+        "setLayout",
+        "collapse",
+        "expand",
+        "resize",
+        "isCollapsed",
+      ],
     },
     panel: {
       tag: "ui-resizable-panel",

@@ -18,7 +18,10 @@
 
 <div class="fixture">
   <button>Before</button>
-  <Slider defaultValue={40} onValueChange={(value) => (action = `brightness:${value}`)}>
+  <Slider
+    defaultValue={40}
+    onValueChange={(value) => (action = `brightness:${value}`)}
+  >
     <SliderValue class="slider-value">
       {#snippet children(state)}Brightness {state.text}{/snippet}
     </SliderValue>

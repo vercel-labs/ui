@@ -23,10 +23,18 @@ function Fixture() {
         {...options}
         onValueChange={(value) => setAction(describeTree("selected", value))}
         onExpandedChange={(expanded, details) => {
-          if (cancel && expanded.includes(cancel) && !controller.isExpanded(cancel)) return details.cancel()
+          if (
+            cancel &&
+            expanded.includes(cancel) &&
+            !controller.isExpanded(cancel)
+          ) {
+            return details.cancel()
+          }
           setAction(describeTree("expanded", expanded))
         }}
-        onCheckedChange={(checked) => setAction(describeTree("checked", checked))}
+        onCheckedChange={(checked) =>
+          setAction(describeTree("checked", checked))
+        }
         onAction={(value) => setAction(describeTree("action", value))}
       >
         <Items items={treeFixture.items} checkable={options.checkable} />
@@ -37,7 +45,9 @@ function Fixture() {
       </output>
       <button onClick={() => controller.expandAll()}>Expand all</button>
       <button onClick={() => controller.collapseAll()}>Collapse all</button>
-      <button onClick={() => controller.reveal("dialog.tsx")}>Reveal dialog</button>
+      <button onClick={() => controller.reveal("dialog.tsx")}>
+        Reveal dialog
+      </button>
     </div>
   )
 }
@@ -46,7 +56,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

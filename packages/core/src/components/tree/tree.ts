@@ -2,12 +2,21 @@ import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { hiddenAttrs } from "../../foundation/motion/panel"
 import { checkedAttrs, idPart, openAttrs } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import { live } from "../../foundation/kernel/live"
 import { selects } from "../../foundation/kernel/selects"
-import type { TreeCheckStrategy, TreeCheckedState } from "../../foundation/lists/tree-checked"
+import type {
+  TreeCheckStrategy,
+  TreeCheckedState,
+} from "../../foundation/lists/tree-checked"
 import type { ListHighlightDetails } from "../../foundation/lists/listbox"
 import type { TreeItemData } from "../../foundation/lists/tree-collection"
 import { treeApi, type TreeApi, type TreeStore } from "./tree-api"
@@ -24,7 +33,9 @@ type TreeMode = "none" | "single" | "multiple"
  * The selected value: one item's value or `null`, or a list with `mode: "multiple"`.
  * @stable
  */
-type TreeValue<Mode extends TreeMode = "single"> = Mode extends "multiple" ? string[] : string | null
+type TreeValue<Mode extends TreeMode = "single"> = Mode extends "multiple"
+  ? string[]
+  : string | null
 
 /**
  * Why branches expanded or collapsed: a branch's row was pressed, its
@@ -33,7 +44,11 @@ type TreeValue<Mode extends TreeMode = "single"> = Mode extends "multiple" ? str
  * @stable
  */
 type TreeExpandedChangeReason =
-  "item-press" | "trigger-press" | "list-navigation" | "find-in-page" | "imperative"
+  | "item-press"
+  | "trigger-press"
+  | "list-navigation"
+  | "find-in-page"
+  | "imperative"
 
 /**
  * Why the selection changed: an item was pressed, the keyboard moved it, or a controller changed it.
@@ -85,27 +100,49 @@ function createTreeController() {
     /** The values of the expanded branches. */
     getExpanded: () => string[]
     /** Expands exactly these branches. Returns false when canceled. */
-    setExpanded: (expanded: string[], options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
+    setExpanded: (
+      expanded: string[],
+      options?: TreeChangeOptions<TreeExpandedChangeReason>
+    ) => boolean
     /** Whether a branch is expanded. */
     isExpanded: (value: string) => boolean
     /** Expands a branch, loading its children first with `loadChildren` when it has none. */
-    expand: (value: string, options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
+    expand: (
+      value: string,
+      options?: TreeChangeOptions<TreeExpandedChangeReason>
+    ) => boolean
     /** Collapses a branch. Focus inside it moves to the branch. */
-    collapse: (value: string, options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
+    collapse: (
+      value: string,
+      options?: TreeChangeOptions<TreeExpandedChangeReason>
+    ) => boolean
     /** Expands a collapsed branch, or collapses an expanded one. */
-    toggle: (value: string, options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
+    toggle: (
+      value: string,
+      options?: TreeChangeOptions<TreeExpandedChangeReason>
+    ) => boolean
     /** Expands every branch, and every branch that renders inside one later. */
-    expandAll: (options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
+    expandAll: (
+      options?: TreeChangeOptions<TreeExpandedChangeReason>
+    ) => boolean
     /** Collapses every branch. */
-    collapseAll: (options?: TreeChangeOptions<TreeExpandedChangeReason>) => boolean
+    collapseAll: (
+      options?: TreeChangeOptions<TreeExpandedChangeReason>
+    ) => boolean
     /** The selected value: a value or `null`, or a list with `mode: "multiple"`. */
     getValue: () => string | string[] | null
     /** Selects these items. */
-    setValue: (value: string | string[] | null, options?: TreeChangeOptions<TreeValueChangeReason>) => boolean
+    setValue: (
+      value: string | string[] | null,
+      options?: TreeChangeOptions<TreeValueChangeReason>
+    ) => boolean
     /** The checked value, as `checkStrategy` reports it. */
     getChecked: () => string[]
     /** Sets the checked value. */
-    setChecked: (checked: string[], options?: TreeChangeOptions<TreeCheckedChangeReason>) => boolean
+    setChecked: (
+      checked: string[],
+      options?: TreeChangeOptions<TreeCheckedChangeReason>
+    ) => boolean
     /** Whether an item's checkbox is checked, unchecked or `"indeterminate"`. */
     checkedState: (value: string) => TreeCheckedState
     /** Expands an item's ancestors, scrolls it into view and focuses it. */
@@ -140,7 +177,10 @@ type TreeOptions<Mode extends TreeMode = TreeMode> = {
   /** The value selected at first, when uncontrolled. */
   defaultValue?: TreeValue<Mode>
   /** Runs when the selection wants to change. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: TreeValue<Mode>, details: ChangeDetails<TreeValueChangeReason>) => void
+  onValueChange?: (
+    value: TreeValue<Mode>,
+    details: ChangeDetails<TreeValueChangeReason>
+  ) => void
   /**
    * Whether moving focus with the keyboard selects, with one item
    * selectable: `"automatic"` selects the focused item, `"manual"` waits for
@@ -153,7 +193,10 @@ type TreeOptions<Mode extends TreeMode = TreeMode> = {
   /** The branches expanded at first, when uncontrolled. The ancestors of `current` are added. */
   defaultExpanded?: string[]
   /** Runs when branches want to expand or collapse. `details.reason` says why, and `details.cancel()` stops it. */
-  onExpandedChange?: (expanded: string[], details: ChangeDetails<TreeExpandedChangeReason>) => void
+  onExpandedChange?: (
+    expanded: string[],
+    details: ChangeDetails<TreeExpandedChangeReason>
+  ) => void
   /**
    * Whether pressing a branch's row expands or collapses it. Its indicator always does.
    * @defaultValue true
@@ -171,7 +214,10 @@ type TreeOptions<Mode extends TreeMode = TreeMode> = {
   /** The items checked at first, when uncontrolled. A branch stands for everything in it. */
   defaultChecked?: string[]
   /** Runs when checkboxes want to change. `details.reason` says why, and `details.cancel()` stops it. */
-  onCheckedChange?: (checked: string[], details: ChangeDetails<TreeCheckedChangeReason>) => void
+  onCheckedChange?: (
+    checked: string[],
+    details: ChangeDetails<TreeCheckedChangeReason>
+  ) => void
   /**
    * Which items the checked value lists: `"leaf"` the checked leaves,
    * `"trunk"` the outermost fully checked items, `"branch"` every fully
@@ -193,7 +239,10 @@ type TreeOptions<Mode extends TreeMode = TreeMode> = {
    * rejection marks it `data-failed` and the next expand tries again. Expanding
    * it again while loading cancels through `signal`.
    */
-  loadChildren?: (value: string, details: { signal: AbortSignal }) => void | Promise<unknown>
+  loadChildren?: (
+    value: string,
+    details: { signal: AbortSignal }
+  ) => void | Promise<unknown>
   /** The value of the item for the current page. It gets `aria-current="page"`, takes the tab stop first, and its ancestors expand, at first and whenever it changes. */
   current?: string | null
   /**
@@ -328,7 +377,12 @@ type TreeGroupState = {
 type ItemProps = TreeItemProps
 
 // Every part of an item shares its state.
-function itemState(state: TreeStore, key: string, props: ItemProps | undefined, api: TreeApi): TreeItemState {
+function itemState(
+  state: TreeStore,
+  key: string,
+  props: ItemProps | undefined,
+  api: TreeApi
+): TreeItemState {
   const branch = api.internal.isBranch(key, props)
   return {
     expanded: branch && state.expanded.includes(key),
@@ -348,7 +402,9 @@ const flag = (on: boolean) => (on ? "" : undefined)
 
 // Items nest, so a key or press on a child item bubbles through its parents. Only its own item acts on it.
 const ownEvent = (el: HTMLElement | undefined, event?: Event) =>
-  !el || !(event?.target instanceof Element) || event.target.closest('[role="treeitem"]') === el
+  !el ||
+  !(event?.target instanceof Element) ||
+  event.target.closest('[role="treeitem"]') === el
 
 // Data attributes every part of an item writes.
 function itemDataAttrs(item: TreeItemState) {
@@ -399,8 +455,10 @@ const partReads = {
   siblings: [],
 }
 
-const keepsMounted = (state: TreeStore, props: GroupProps) => props.keepMounted ?? state.keepMounted
-const findable = (state: TreeStore, props: GroupProps) => props.hiddenUntilFound ?? state.hiddenUntilFound
+const keepsMounted = (state: TreeStore, props: GroupProps) =>
+  props.keepMounted ?? state.keepMounted
+const findable = (state: TreeStore, props: GroupProps) =>
+  props.hiddenUntilFound ?? state.hiddenUntilFound
 
 const treePrimitive = /* @__PURE__ */ definePrimitive({
   name: "tree",
@@ -496,7 +554,10 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
         "data-disabled": flag(isDisabled(state)),
       }),
       bind(el, { api, store }) {
-        const cleanups = [watchFormDisabled(el, store), api.internal.bindRoot(el)]
+        const cleanups = [
+          watchFormDisabled(el, store),
+          api.internal.bindRoot(el),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup?.())
       },
     }),
@@ -543,7 +604,8 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
           "aria-posinset": position && String(position.index),
           "aria-setsize": position && String(position.size),
           "aria-expanded": item.branch ? String(item.expanded) : undefined,
-          "aria-selected": state.mode === "none" ? undefined : String(item.selected),
+          "aria-selected":
+            state.mode === "none" ? undefined : String(item.selected),
           "aria-checked": state.checkable
             ? item.checked === "indeterminate"
               ? "mixed"
@@ -559,16 +621,27 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
       },
       // Composed items learn their place among their siblings once they're in the page.
       live: live((state, { key, props, api }) => {
-        if (api.internal.dataPosition(key)) return {}
-        const position = api.internal.composedPosition(state.siblings, key, props)
+        if (api.internal.dataPosition(key)) {
+          return {}
+        }
+        const position = api.internal.composedPosition(
+          state.siblings,
+          key,
+          props
+        )
         return position
-          ? { "aria-posinset": String(position.index), "aria-setsize": String(position.size) }
+          ? {
+              "aria-posinset": String(position.index),
+              "aria-setsize": String(position.size),
+            }
           : {}
       }),
-      press: ({ api, key, el }, event) => ownEvent(el, event) && api.internal.press(key, el, event),
+      press: ({ api, key, el }, event) =>
+        ownEvent(el, event) && api.internal.press(key, el, event),
       on: {
         keydown: (event, { api, el, key }) =>
-          ownEvent(el, event) && api.internal.keydown(event as KeyboardEvent, el, key),
+          ownEvent(el, event) &&
+          api.internal.keydown(event as KeyboardEvent, el, key),
       },
       bind: (el, part) => part.api.internal.bindItem(el, part),
     }),
@@ -577,7 +650,8 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
     label: slot<ValueProps, TreeItemState>({
       props: { value: { kind: "string", from: "item" } },
       selects: selects(partReads),
-      state: (state, { props, api }) => itemState(state, itemOf(props), undefined, api),
+      state: (state, { props, api }) =>
+        itemState(state, itemOf(props), undefined, api),
       // The item's data attributes too, so a row styles from its label, apart from the items nested in it.
       attrs: (state, { id, props, api }) => ({
         id: `${id}-label-${idPart(itemOf(props))}`,
@@ -585,7 +659,9 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
       }),
       // A link inside an item leaves the tab order to the item.
       bind: (el) => {
-        if (el.matches("a[href]") && !el.hasAttribute("tabindex")) el.tabIndex = -1
+        if (el.matches("a[href]") && !el.hasAttribute("tabindex")) {
+          el.tabIndex = -1
+        }
       },
     }),
 
@@ -593,30 +669,42 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
     indicator: slot<ValueProps, TreeItemState>({
       props: { value: { kind: "string", from: "item" } },
       selects: selects(partReads),
-      state: (state, { props, api }) => itemState(state, itemOf(props), undefined, api),
+      state: (state, { props, api }) =>
+        itemState(state, itemOf(props), undefined, api),
       attrs: (state, { props, api }) => ({
         "aria-hidden": "true",
         ...itemDataAttrs(itemState(state, itemOf(props), undefined, api)),
       }),
-      press: ({ api, props }, event) => api.internal.pressIndicator(itemOf(props), event),
+      press: ({ api, props }, event) =>
+        api.internal.pressIndicator(itemOf(props), event),
     }),
 
     // The item's checkbox. Hidden from screen readers, which hear the item's `aria-checked`.
     checkbox: slot<ValueProps, TreeItemState>({
       props: { value: { kind: "string", from: "item" } },
       selects: selects(partReads),
-      state: (state, { props, api }) => itemState(state, itemOf(props), undefined, api),
+      state: (state, { props, api }) =>
+        itemState(state, itemOf(props), undefined, api),
       attrs: (state, { props, api }) => {
         const item = itemState(state, itemOf(props), undefined, api)
-        return { "aria-hidden": "true", ...checkedAttrs(item.checked), "data-disabled": flag(item.disabled) }
+        return {
+          "aria-hidden": "true",
+          ...checkedAttrs(item.checked),
+          "data-disabled": flag(item.disabled),
+        }
       },
-      press: ({ api, props }, event) => api.internal.pressCheckbox(itemOf(props), event),
+      press: ({ api, props }, event) =>
+        api.internal.pressCheckbox(itemOf(props), event),
     }),
 
     // A branch's children. A collapsed group stays in the page while it animates out.
     group: slot<GroupProps, TreeGroupState>({
       role: "group",
-      props: { value: { kind: "string", from: "item" }, keepMounted: "boolean", hiddenUntilFound: "boolean" },
+      props: {
+        value: { kind: "string", from: "item" },
+        keepMounted: "boolean",
+        hiddenUntilFound: "boolean",
+      },
       selects: selects({ ...partReads, exiting: byItem }),
       present: (state, { props }) =>
         state.expanded.includes(itemOf(props)) ||
@@ -631,7 +719,10 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
         const open = state.expanded.includes(itemOf(props))
         return {
           id: `${id}-group-${idPart(itemOf(props))}`,
-          ...hiddenAttrs(open || state.exiting.includes(itemOf(props)), findable(state, props)),
+          ...hiddenAttrs(
+            open || state.exiting.includes(itemOf(props)),
+            findable(state, props)
+          ),
           ...openAttrs(open),
         }
       },
@@ -640,12 +731,20 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
           el,
           itemOf(part.props),
           () => findable(part.store.get(), part.props),
-          part,
+          part
         ),
     }),
   }),
   agent: {
-    actions: ["setExpanded", "expand", "collapse", "expandAll", "collapseAll", "setValue", "setChecked"],
+    actions: [
+      "setExpanded",
+      "expand",
+      "collapse",
+      "expandAll",
+      "collapseAll",
+      "setValue",
+      "setChecked",
+    ],
     items: (api) => api.internal.items(),
   },
 })
@@ -653,7 +752,10 @@ const treePrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `tree`.
  * @stable
  */
-interface TreePrimitive extends WithGeneric<typeof treePrimitive, TreeGeneric> {}
+interface TreePrimitive extends WithGeneric<
+  typeof treePrimitive,
+  TreeGeneric
+> {}
 
 /**
  * The tree primitive, with the slots `root`, `item`, `label`, `indicator`,
@@ -685,14 +787,20 @@ export {
   type TreeValue,
   type TreeValueChangeReason,
 }
-export type { TreeCheckStrategy, TreeCheckedState } from "../../foundation/lists/tree-checked"
+export type {
+  TreeCheckStrategy,
+  TreeCheckedState,
+} from "../../foundation/lists/tree-checked"
 export type {
   TreeCollection,
   TreeCollectionNode,
   TreeItemData,
   TreeRow,
 } from "../../foundation/lists/tree-collection"
-export { toggleTreeChecked, treeCheckedStates } from "../../foundation/lists/tree-checked"
+export {
+  toggleTreeChecked,
+  treeCheckedStates,
+} from "../../foundation/lists/tree-checked"
 export {
   createTreeCollection,
   treeDataNodes,

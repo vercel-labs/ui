@@ -32,11 +32,21 @@ const keyOf = (entry: CommandData[number], index: number) =>
 <template>
   <template v-for="(entry, index) in items" :key="keyOf(entry, index)">
     <CommandSeparator
-      v-if="typeof entry !== 'string' && 'type' in entry && entry.type === 'separator'"
+      v-if="
+        typeof entry !== 'string' &&
+        'type' in entry &&
+        entry.type === 'separator'
+      "
       class="separator"
     />
-    <CommandGroup v-else-if="typeof entry !== 'string' && 'type' in entry && entry.type === 'group'">
-      <CommandGroupLabel v-if="entry.label" class="label">{{ entry.label }}</CommandGroupLabel>
+    <CommandGroup
+      v-else-if="
+        typeof entry !== 'string' && 'type' in entry && entry.type === 'group'
+      "
+    >
+      <CommandGroupLabel v-if="entry.label" class="label">{{
+        entry.label
+      }}</CommandGroupLabel>
       <CommandFixtureData :items="entry.items" :highlight="highlight" />
     </CommandGroup>
     <CommandItem
@@ -48,7 +58,9 @@ const keyOf = (entry: CommandData[number], index: number) =>
       :disabled="commandOf(entry).disabled"
       :shortcut="commandOf(entry).shortcut"
     >
-      <CommandItemText v-if="highlight">{{ commandOf(entry).label }}</CommandItemText>
+      <CommandItemText v-if="highlight">{{
+        commandOf(entry).label
+      }}</CommandItemText>
       <template v-else>{{ commandOf(entry).label }}</template>
       <CommandShortcut v-if="commandOf(entry).shortcut" class="shortcut" />
     </CommandItem>

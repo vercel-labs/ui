@@ -20,8 +20,10 @@
   const item = usePart(
     untrack(() => handle),
     "item",
-    () => ({ value }),
+    () => ({ value })
   )
 </script>
 
-<div {...item.slot({ "data-round": round })}>{item.state.highlighted ? "→ " : ""}{label}</div>
+<div {...item.slot({ "data-round": round })}>
+  {item.state.highlighted ? "→ " : ""}{label}
+</div>

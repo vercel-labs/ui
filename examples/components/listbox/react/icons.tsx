@@ -1,7 +1,13 @@
 "use client"
 
 import { Listbox, ListboxItem, ListboxItemIcon } from "@ui-sdk/react/listbox"
-import { ArchiveIcon, ArrowRightIcon, MailIcon, PencilIcon, StarIcon } from "lucide-react"
+import {
+  ArchiveIcon,
+  ArrowRightIcon,
+  MailIcon,
+  PencilIcon,
+  StarIcon,
+} from "lucide-react"
 
 const views = [
   { value: "inbox", label: "Inbox", icon: MailIcon },

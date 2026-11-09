@@ -4,7 +4,10 @@ import { alertDialog as alertDialogPrimitive } from "@ui-sdk/core/alert-dialog"
 import { defineDialogParts } from "./dialog-parts"
 
 // The alert dialog's slots and state are the dialog's. Only its options are narrower.
-const alertParts = defineDialogParts(alertDialogPrimitive as unknown as typeof dialogPrimitive, "AlertDialog")
+const alertParts = defineDialogParts(
+  alertDialogPrimitive as unknown as typeof dialogPrimitive,
+  "AlertDialog"
+)
 
 /**
  * A modal dialog that interrupts the user with something important and waits for an answer.
@@ -50,7 +53,11 @@ const AlertDialogClose = alertParts.Close
  */
 const AlertDialogShortcut = alertParts.Shortcut
 
-export { confirm, createAlertDialogController, createConfirm } from "@ui-sdk/core/alert-dialog"
+export {
+  confirm,
+  createAlertDialogController,
+  createConfirm,
+} from "@ui-sdk/core/alert-dialog"
 export type {
   AlertDialogBackdropState,
   AlertDialogCloseActionDetails,

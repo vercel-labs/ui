@@ -20,7 +20,12 @@ const field = ref<HTMLElement | null>(null)
 </script>
 
 <template>
-  <DatePicker mode="range" :months="2" month-format="short" :default-value="['2026-10-12', '2026-10-16']">
+  <DatePicker
+    mode="range"
+    :months="2"
+    month-format="short"
+    :default-value="['2026-10-12', '2026-10-16']"
+  >
     <div ref="field" data-slot="row">
       <DatePickerInput aria-label="Check in" placeholder="Check in" />
       <span data-slot="hint">–</span>

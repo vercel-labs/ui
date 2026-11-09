@@ -19,9 +19,12 @@ const photos = [
 ]
 
 const nextFocused = () =>
-  typeof document !== "undefined" && document.activeElement?.getAttribute("data-slot") === "carousel-next"
+  typeof document !== "undefined" &&
+  document.activeElement?.getAttribute("data-slot") === "carousel-next"
 const focusIf = (focus: boolean) => (link: unknown) => {
-  if (focus) (link as HTMLElement | null)?.focus()
+  if (focus) {
+    ;(link as HTMLElement | null)?.focus()
+  }
 }
 </script>
 
@@ -29,11 +32,16 @@ const focusIf = (focus: boolean) => (link: unknown) => {
   <Carousel aria-label="Photos">
     <CarouselViewport>
       <CarouselContent>
-        <CarouselItem v-for="photo in photos" :key="photo.name" v-slot="{ state }">
+        <CarouselItem
+          v-for="photo in photos"
+          :key="photo.name"
+          v-slot="{ state }"
+        >
           <div data-slot="tile">
             {{ photo.name }}
             <span data-slot="hint">
-              {{ state.index + 1 }} / {{ photos.length }}{{ state.active ? " · showing" : "" }}
+              {{ state.index + 1 }} / {{ photos.length
+              }}{{ state.active ? " · showing" : "" }}
             </span>
           </div>
         </CarouselItem>
@@ -46,7 +54,10 @@ const focusIf = (focus: boolean) => (link: unknown) => {
       </CarouselPrevious>
       <CarouselNext>
         <template #render="{ props, state }">
-          <a v-if="state.disabled" :ref="focusIf(nextFocused())" href="https://example.com/gallery"
+          <a
+            v-if="state.disabled"
+            :ref="focusIf(nextFocused())"
+            href="https://example.com/gallery"
             >See all photos</a
           >
           <button v-else v-bind="props">

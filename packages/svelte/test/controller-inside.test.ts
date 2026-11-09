@@ -25,7 +25,9 @@ HTMLElement.prototype.hidePopover ??= function () {}
 
 let app: ReturnType<typeof mount> | undefined
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
 })
@@ -55,11 +57,36 @@ type Case = {
 }
 
 const cases: Case[] = [
-  { name: "dialog", root: Dialog, trigger: DialogTrigger, controller: createDialogController },
-  { name: "drawer", root: Drawer, trigger: DrawerTrigger, controller: createDrawerController },
-  { name: "popover", root: Popover, trigger: PopoverTrigger, controller: createPopoverController },
-  { name: "menu", root: Menu, trigger: MenuTrigger, controller: createMenuController },
-  { name: "context menu", root: Menu, trigger: MenuContextTrigger, controller: createMenuController },
+  {
+    name: "dialog",
+    root: Dialog,
+    trigger: DialogTrigger,
+    controller: createDialogController,
+  },
+  {
+    name: "drawer",
+    root: Drawer,
+    trigger: DrawerTrigger,
+    controller: createDrawerController,
+  },
+  {
+    name: "popover",
+    root: Popover,
+    trigger: PopoverTrigger,
+    controller: createPopoverController,
+  },
+  {
+    name: "menu",
+    root: Menu,
+    trigger: MenuTrigger,
+    controller: createMenuController,
+  },
+  {
+    name: "context menu",
+    root: Menu,
+    trigger: MenuContextTrigger,
+    controller: createMenuController,
+  },
   {
     name: "tooltip",
     root: Tooltip,
@@ -68,12 +95,23 @@ const cases: Case[] = [
     opened: (el) => el.getAttribute("aria-describedby") === "other-content",
     content: TooltipContent,
   },
-  { name: "hover card", root: HoverCard, trigger: HoverCardTrigger, controller: createHoverCardController },
+  {
+    name: "hover card",
+    root: HoverCard,
+    trigger: HoverCardTrigger,
+    controller: createHoverCardController,
+  },
 ]
 
 describe.each(cases)(
   "a $name trigger inside another $name",
-  ({ root, trigger, controller, opened = (el) => el.hasAttribute("data-open"), content }) => {
+  ({
+    root,
+    trigger,
+    controller,
+    opened = (el) => el.hasAttribute("data-open"),
+    content,
+  }) => {
     test("connects to the one its controller names", async () => {
       const around = controller()
       const other = controller()
@@ -84,7 +122,7 @@ describe.each(cases)(
       expect(opened(view.querySelector("#trigger")!)).toBe(true)
       expect(around.isOpen()).toBe(false)
     })
-  },
+  }
 )
 
 test.each([
@@ -112,9 +150,12 @@ test.each([
     const trigger = view.querySelector<HTMLElement>("#trigger")!
     trigger.click()
     await settle()
-    expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({ other: true, around: false })
+    expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({
+      other: true,
+      around: false,
+    })
     expect(trigger.getAttribute("aria-controls")).toBe("other-content")
-  },
+  }
 )
 
 test("a select trigger inside one select shows the value of the select its controller names", async () => {
@@ -127,11 +168,11 @@ test("a file input trigger inside one file input opens the picker of the one its
   const view = render(FileInputApp, { other: createFileInputController() })
   await settle()
   const picked: string[] = []
-  const pick = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(function (
-    this: HTMLInputElement,
-  ) {
-    picked.push(this.name)
-  })
+  const pick = vi
+    .spyOn(HTMLInputElement.prototype, "click")
+    .mockImplementation(function (this: HTMLInputElement) {
+      picked.push(this.name)
+    })
   view.querySelector<HTMLElement>("#trigger")!.click()
   pick.mockRestore()
   expect(picked).toEqual(["other"])
@@ -139,7 +180,12 @@ test("a file input trigger inside one file input opens the picker of the one its
 
 test("a trigger inside its own popover, given that popover's controller, keeps its element and focus", async () => {
   const shared = createPopoverController()
-  const view = render(App, { root: Popover, trigger: PopoverTrigger, around: shared, other: shared })
+  const view = render(App, {
+    root: Popover,
+    trigger: PopoverTrigger,
+    around: shared,
+    other: shared,
+  })
   const trigger = view.querySelector<HTMLElement>("#trigger")!
   trigger.focus()
   await settle()

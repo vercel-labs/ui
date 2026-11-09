@@ -30,7 +30,11 @@ function Avatar({
   return (
     <AvatarPrimitive
       aria-hidden={decorative || undefined}
-      className={cn("relative flex shrink-0 rounded-full select-none", sizes[size], className)}
+      className={cn(
+        "relative flex shrink-0 rounded-full select-none",
+        sizes[size],
+        className
+      )}
     >
       <AvatarFallback className="flex size-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground">
         <span aria-hidden="true">{initials(name)}</span>

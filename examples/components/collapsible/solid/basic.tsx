@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 import { For } from "solid-js"
 
 const items = [

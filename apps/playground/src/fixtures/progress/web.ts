@@ -23,7 +23,8 @@ function mount(root: HTMLElement) {
       <output role="status" aria-label="Last action"></output>
     </div>
   `
-  const element = (id: string) => root.querySelector<HTMLElement & Record<string, unknown>>(`#${id}`)!
+  const element = (id: string) =>
+    root.querySelector<HTMLElement & Record<string, unknown>>(`#${id}`)!
   element("files").getValueLabel = (value: number) => files.valueLabel(value)
   element("disk").format = disk.format
   const adjust = (id: string, change: (value: number) => number) => {
@@ -31,9 +32,11 @@ function mount(root: HTMLElement) {
     el.setAttribute("value", String(change(Number(el.getAttribute("value")))))
   }
   element("advance").addEventListener("click", () =>
-    adjust("upload", (value) => Math.min(100, value + upload.step)),
+    adjust("upload", (value) => Math.min(100, value + upload.step))
   )
-  element("restart").addEventListener("click", () => adjust("upload", () => upload.value))
+  element("restart").addEventListener("click", () =>
+    adjust("upload", () => upload.value)
+  )
 }
 
 export { mount }

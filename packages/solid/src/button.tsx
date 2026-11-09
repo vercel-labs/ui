@@ -6,7 +6,12 @@ import {
 } from "@ui-sdk/core/button"
 import type { JSX } from "@solidjs/web"
 import { omit } from "solid-js"
-import { callHandler, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  callHandler,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 // The click event, as Solid types it for a handler on the element `render` renders.
 type ButtonClickEvent = Parameters<JSX.EventHandler<HTMLElement, MouseEvent>>[0]
@@ -16,7 +21,11 @@ type ButtonClickEvent = Parameters<JSX.EventHandler<HTMLElement, MouseEvent>>[0]
 type ButtonClickHandlers = {
   handler(event: ButtonClickEvent, details: ButtonActionDetails): unknown
   // Its data is `any`, as in Solid's own bound form, so a handler for any data fits.
-  bound(data: any, event: ButtonClickEvent, details: ButtonActionDetails): unknown
+  bound(
+    data: any,
+    event: ButtonClickEvent,
+    details: ButtonActionDetails
+  ): unknown
 }
 
 type ButtonProps = Omit<PartProps<"button", ButtonState>, "type" | "onClick"> &
@@ -30,7 +39,9 @@ type ButtonProps = Omit<PartProps<"button", ButtonState>, "type" | "onClick"> &
      * `details.source` says how it was pressed, for changes made after an `await`.
      * Solid's bound form, `[handler, data]`, calls `handler(data, event, details)`.
      */
-    onClick?: ButtonClickHandlers["handler"] | { 0: ButtonClickHandlers["bound"]; 1: any }
+    onClick?:
+      | ButtonClickHandlers["handler"]
+      | { 0: ButtonClickHandlers["bound"]; 1: any }
   }
 
 /**
@@ -45,7 +56,8 @@ function Button(props: ButtonProps) {
     pendingAnnouncement: props.pendingAnnouncement,
     debug: props.debug,
     // The press runs the handler itself, so a disabled or pending button skips it.
-    action: (event, details) => callHandler(props.onClick, event as MouseEvent, details),
+    action: (event, details) =>
+      callHandler(props.onClick, event as MouseEvent, details),
   }))
   const rest = omit(
     props,
@@ -54,7 +66,7 @@ function Button(props: ButtonProps) {
     "type",
     "pendingAnnouncement",
     "debug",
-    "onClick",
+    "onClick"
   )
   return usePart(button, "root", undefined, rest, "button")
 }

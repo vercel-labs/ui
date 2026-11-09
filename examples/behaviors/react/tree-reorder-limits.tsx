@@ -11,11 +11,27 @@ import {
   type TreeReorderRow,
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
-import { ArrowLeftIcon, ArrowRightIcon, FolderIcon, InboxIcon } from "lucide-react"
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  FolderIcon,
+  InboxIcon,
+} from "lucide-react"
 
-type FoldersState = { rows: TreeReorderRow[]; focused: string | null; moving: TreeReorderDraft | null }
+type FoldersState = {
+  rows: TreeReorderRow[]
+  focused: string | null
+  moving: TreeReorderDraft | null
+}
 
-const counts: Record<string, number> = { Inbox: 12, Work: 4, Reports: 2, Drafts: 1, Personal: 7, Travel: 3 }
+const counts: Record<string, number> = {
+  Inbox: 12,
+  Work: 4,
+  Reports: 2,
+  Drafts: 1,
+  Personal: 7,
+  Travel: 3,
+}
 
 const folders = definePrimitive({
   name: "folders",
@@ -48,7 +64,10 @@ const folders = definePrimitive({
           : treeReorderMessage(message),
     })
     return {
-      roving: createRovingFocus<FoldersState, { value: string }>(context, { slot: "row", key: "focused" }),
+      roving: createRovingFocus<FoldersState, { value: string }>(context, {
+        slot: "row",
+        key: "focused",
+      }),
       tree,
       shift(key: string, by: number) {
         const rows = store.get().rows
@@ -73,36 +92,59 @@ const folders = definePrimitive({
           "aria-level": String(rows[index].depth + 1),
           tabindex: part.api.roving.tabIndex(state, part),
           "data-moving": part.api.tree.moving(state, part.key) ? "" : undefined,
-          "data-dragging": part.api.tree.dragging(state, part.key) ? "" : undefined,
+          "data-dragging": part.api.tree.dragging(state, part.key)
+            ? ""
+            : undefined,
           "data-parent": subtreeEnd(rows, index) > index + 1 ? "" : undefined,
-          style: css({ "--depth": String(rows[index].depth), "touch-action": "none", "user-select": "none" }),
+          style: css({
+            "--depth": String(rows[index].depth),
+            "touch-action": "none",
+            "user-select": "none",
+          }),
         }
       },
       on: {
-        keydown: (event, { el, api, key }) => api.tree.keydown(event, key) || api.roving.keydown(event, el!),
+        keydown: (event, { el, api, key }) =>
+          api.tree.keydown(event, key) || api.roving.keydown(event, el!),
         pointerdown: (event, { api, key }) => api.tree.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.tree.bind(el, part.key)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.tree.bind(el, part.key),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
     indent: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (_state, part) => ({ type: "button", tabindex: "-1", "aria-label": `Indent ${part.key}` }),
+      attrs: (_state, part) => ({
+        type: "button",
+        tabindex: "-1",
+        "aria-label": `Indent ${part.key}`,
+      }),
       on: { pointerdown: (event) => event.preventDefault() },
       press: ({ api, key }) => api.shift(key, 1),
     }),
     outdent: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (_state, part) => ({ type: "button", tabindex: "-1", "aria-label": `Outdent ${part.key}` }),
+      attrs: (_state, part) => ({
+        type: "button",
+        tabindex: "-1",
+        "aria-label": `Outdent ${part.key}`,
+      }),
       on: { pointerdown: (event) => event.preventDefault() },
       press: ({ api, key }) => api.shift(key, -1),
     }),
   }),
 })
 
-const parts = createParts(folders, { root: "div", row: "div", indent: "button", outdent: "button" })
+const parts = createParts(folders, {
+  root: "div",
+  row: "div",
+  indent: "button",
+  outdent: "button",
+})
 
 const Folders = parts.Root
 
@@ -118,7 +160,11 @@ function Example() {
       {({ rows }) =>
         rows.map((row) => (
           <FoldersRow key={row.key} value={row.key}>
-            {row.key === "Inbox" ? <InboxIcon aria-hidden="true" /> : <FolderIcon aria-hidden="true" />}
+            {row.key === "Inbox" ? (
+              <InboxIcon aria-hidden="true" />
+            ) : (
+              <FolderIcon aria-hidden="true" />
+            )}
             <span>{row.key}</span>
             <span data-slot="hint">{counts[row.key]}</span>
             {row.key !== "Inbox" && (

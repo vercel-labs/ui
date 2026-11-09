@@ -11,12 +11,19 @@ function Example() {
     <Progress value={18}>
       <ProgressLabel>Battery</ProgressLabel>
       <ProgressValue>
-        {(state) => (state.status === "complete" ? "Charged" : `${state.text} charged`)}
+        {(state) =>
+          state.status === "complete" ? "Charged" : `${state.text} charged`
+        }
       </ProgressValue>
       <ProgressTrack render={<span />}>
         <ProgressIndicator
           render={(props, state) => (
-            <div {...props} data-variant={(state.percent ?? 0) < 20 ? "destructive" : undefined} />
+            <div
+              {...props}
+              data-variant={
+                (state.percent ?? 0) < 20 ? "destructive" : undefined
+              }
+            />
           )}
         />
       </ProgressTrack>

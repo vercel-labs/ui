@@ -39,7 +39,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={alignments} value={align()} onValueChange={(next) => next && setAlign(next as Align)}>
+        <Select
+          items={alignments}
+          value={align()}
+          onValueChange={(next) => next && setAlign(next as Align)}
+        >
           <SelectLabel>Align</SelectLabel>
           <SelectTrigger>
             <SelectValue />

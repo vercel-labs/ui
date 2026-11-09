@@ -20,7 +20,9 @@ const derivations = new WeakMap<object, Derivation[]>()
 
 function register(store: object, derivation: Derivation) {
   let list = derivations.get(store)
-  if (!list) derivations.set(store, (list = []))
+  if (!list) {
+    derivations.set(store, (list = []))
+  }
   list.push(derivation)
 }
 
@@ -38,12 +40,20 @@ function register(store: object, derivation: Derivation) {
 function deriveFromOptions<State extends object, Options = unknown>(
   context: { store: Pick<Store<State>, "get">; options?: () => Options },
   keys: (keyof State & string)[],
-  derive: (synced: Partial<State>, state: State, options: Options) => Partial<State> | void,
+  derive: (
+    synced: Partial<State>,
+    state: State,
+    options: Options
+  ) => Partial<State> | void
 ) {
   register(context.store, {
     from: "options",
     keys,
-    derive: derive as (synced: object, state: object, options: object) => object | void,
+    derive: derive as (
+      synced: object,
+      state: object,
+      options: object
+    ) => object | void,
   })
 }
 
@@ -61,14 +71,22 @@ function deriveState<State extends object>(
   context: { store: Store<State> },
   keys: (keyof State & string)[],
   derive: (state: State) => Partial<State> | void,
-  { live = true } = {},
+  { live = true } = {}
 ) {
   const { store } = context
-  register(store, { from: "state", keys, derive: derive as (state: object) => object | void })
+  register(store, {
+    from: "state",
+    keys,
+    derive: derive as (state: object) => object | void,
+  })
   store.subscribe((liveOnly) => {
-    if (liveOnly && !live) return
+    if (liveOnly && !live) {
+      return
+    }
     const patch = derive(store.get())
-    if (patch) store.set(patch)
+    if (patch) {
+      store.set(patch)
+    }
   })
 }
 
@@ -80,14 +98,18 @@ function withDerived<State extends object>(
   store: Store<State>,
   options: object,
   synced: Partial<State> | undefined,
-  state: State,
+  state: State
 ) {
   const list = derivations.get(store)
-  if (!list) return synced
+  if (!list) {
+    return synced
+  }
   let result = (synced ?? {}) as Record<string, unknown>
   for (const derivation of list) {
     // With nothing synced, state is as it was, so only what options derive can change.
-    if (!synced && derivation.from === "state") continue
+    if (!synced && derivation.from === "state") {
+      continue
+    }
     const next = { ...state, ...result } as State
     const derived = (
       derivation.from === "state"
@@ -95,11 +117,16 @@ function withDerived<State extends object>(
         : derivation.derive(result, state, options)
     ) as Record<string, unknown> | undefined
     result = { ...result }
-    for (const key of derivation.keys)
-      if (derived && key in derived) result[key] = derived[key]
-      else if (derivation.from === "state") result[key] = next[key as keyof State]
+    for (const key of derivation.keys) {
+      if (derived && key in derived) {
+        result[key] = derived[key]
+      } else if (derivation.from === "state") {
+        result[key] = next[key as keyof State]
+      }
+    }
   }
-  return (synced || Object.keys(result).length ? result : undefined) as Partial<State> | undefined
+  return (synced || Object.keys(result).length ? result : undefined) as
+    Partial<State> | undefined
 }
 
 export { deriveFromOptions, deriveState, withDerived }

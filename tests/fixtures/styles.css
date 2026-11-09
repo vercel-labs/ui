@@ -48,8 +48,10 @@
       transform 200ms;
   }
 
-  body[data-animate] :is(.popup, [data-slot="menu-content"])[data-starting-style],
-  body[data-animate] :is(.popup, [data-slot="menu-content"])[data-ending-style] {
+  body[data-animate]
+    :is(.popup, [data-slot="menu-content"])[data-starting-style],
+  body[data-animate]
+    :is(.popup, [data-slot="menu-content"])[data-ending-style] {
     opacity: 0;
     transform: scale(0.96);
   }
@@ -179,7 +181,10 @@
     bottom: 2px;
   }
 
-  :is(.arrow, [data-slot="popover-arrow"]):is([data-side="left"], [data-side="right"]) {
+  :is(.arrow, [data-slot="popover-arrow"]):is(
+    [data-side="left"],
+    [data-side="right"]
+  ) {
     width: 6px;
     height: 12px;
   }
@@ -192,7 +197,10 @@
     right: -6px;
   }
 
-  :is(.arrow, [data-slot="popover-arrow"]):is([data-side="left"], [data-side="right"])::before {
+  :is(.arrow, [data-slot="popover-arrow"]):is(
+      [data-side="left"],
+      [data-side="right"]
+    )::before {
     top: 1px;
   }
 
@@ -211,7 +219,11 @@
       transform 200ms;
   }
 
-  body[data-animate] [data-slot="popover-content"]:is([data-starting-style], [data-ending-style]) {
+  body[data-animate]
+    [data-slot="popover-content"]:is(
+      [data-starting-style],
+      [data-ending-style]
+    ) {
     opacity: 0;
     transform: scale(0.96);
   }
@@ -444,7 +456,11 @@
     transition: opacity 200ms;
   }
 
-  body[data-animate] :is(.panel, [data-slot="tabs-panel"]):is([data-starting-style], [data-ending-style]) {
+  body[data-animate]
+    :is(.panel, [data-slot="tabs-panel"]):is(
+      [data-starting-style],
+      [data-ending-style]
+    ) {
     opacity: 0;
   }
 
@@ -470,7 +486,8 @@
     display: block;
   }
 
-  :is(.tree-item, [data-slot="tree-item"])[data-selected] > :is(.tree-label, [data-slot="tree-label"]) {
+  :is(.tree-item, [data-slot="tree-item"])[data-selected]
+    > :is(.tree-label, [data-slot="tree-label"]) {
     font-weight: bold;
   }
 
@@ -498,7 +515,10 @@
     border: 1px solid;
   }
 
-  :is(.tree-checkbox, [data-slot="tree-checkbox"]):is([data-checked], [data-indeterminate]) {
+  :is(.tree-checkbox, [data-slot="tree-checkbox"]):is(
+    [data-checked],
+    [data-indeterminate]
+  ) {
     background: currentColor;
   }
 
@@ -509,7 +529,10 @@
     padding-inline-start: 16px;
   }
 
-  :is(.tree-group, [data-slot="tree-group"]):is([data-starting-style], [data-ending-style]) {
+  :is(.tree-group, [data-slot="tree-group"]):is(
+    [data-starting-style],
+    [data-ending-style]
+  ) {
     height: 0;
   }
 
@@ -553,7 +576,10 @@
     overflow: hidden;
   }
 
-  :is(.accordion-panel, [data-slot="accordion-panel"]):is([data-starting-style], [data-ending-style]) {
+  :is(.accordion-panel, [data-slot="accordion-panel"]):is(
+    [data-starting-style],
+    [data-ending-style]
+  ) {
     height: 0;
   }
 
@@ -561,7 +587,8 @@
     transition: height 200ms;
   }
 
-  body[data-animate="slow"] :is(.accordion-panel, [data-slot="accordion-panel"]) {
+  body[data-animate="slow"]
+    :is(.accordion-panel, [data-slot="accordion-panel"]) {
     transition-duration: 1s;
   }
 
@@ -672,19 +699,25 @@
   }
 
   body[data-animate]
-    :is(.checkbox-indicator, [data-slot="checkbox-indicator"], [data-slot="radio-indicator"]) {
+    :is(
+      .checkbox-indicator,
+      [data-slot="checkbox-indicator"],
+      [data-slot="radio-indicator"]
+    ) {
     transition: transform 200ms;
   }
 
   body[data-animate]
-    :is(.checkbox-indicator, [data-slot="checkbox-indicator"], [data-slot="radio-indicator"]):is(
-      [data-starting-style],
-      [data-ending-style]
-    ) {
+    :is(
+      .checkbox-indicator,
+      [data-slot="checkbox-indicator"],
+      [data-slot="radio-indicator"]
+    ):is([data-starting-style], [data-ending-style]) {
     transform: scale(0);
   }
 
-  body[data-animate="infinite"] [data-slot="checkbox-indicator"][data-ending-style] {
+  body[data-animate="infinite"]
+    [data-slot="checkbox-indicator"][data-ending-style] {
     animation: spin 300ms linear infinite;
   }
 
@@ -712,7 +745,12 @@
   }
 
   /* Custom elements keep parts that aren't shown, hidden. Class styles must not show them. */
-  :is(.checkbox-indicator, .radio-indicator, .switch-thumb, .field-error)[hidden] {
+  :is(
+    .checkbox-indicator,
+    .radio-indicator,
+    .switch-thumb,
+    .field-error
+  )[hidden] {
     display: none;
   }
 
@@ -732,7 +770,10 @@
     overflow: hidden;
   }
 
-  :is(.collapsible-panel, [data-slot="collapsible-panel"]):is([data-starting-style], [data-ending-style]) {
+  :is(.collapsible-panel, [data-slot="collapsible-panel"]):is(
+    [data-starting-style],
+    [data-ending-style]
+  ) {
     height: 0;
   }
 
@@ -740,7 +781,8 @@
     transition: height 200ms;
   }
 
-  body[data-animate="slow"] :is(.collapsible-panel, [data-slot="collapsible-panel"]) {
+  body[data-animate="slow"]
+    :is(.collapsible-panel, [data-slot="collapsible-panel"]) {
     transition-duration: 1s;
   }
 
@@ -829,7 +871,11 @@
       scale 200ms;
   }
 
-  body[data-animate] :is(.dialog, .dialog-backdrop):is([data-starting-style], [data-ending-style]) {
+  body[data-animate]
+    :is(.dialog, .dialog-backdrop):is(
+      [data-starting-style],
+      [data-ending-style]
+    ) {
     opacity: 0;
   }
 
@@ -1216,7 +1262,10 @@
   }
 
   body[data-animate]
-    :is(.tooltip, [data-slot="tooltip-content"]):is([data-starting-style], [data-ending-style]) {
+    :is(.tooltip, [data-slot="tooltip-content"]):is(
+      [data-starting-style],
+      [data-ending-style]
+    ) {
     opacity: 0;
   }
 
@@ -1236,7 +1285,10 @@
   }
 
   body[data-animate]
-    :is(.hover-card, [data-slot="hover-card-content"]):is([data-starting-style], [data-ending-style]) {
+    :is(.hover-card, [data-slot="hover-card-content"]):is(
+      [data-starting-style],
+      [data-ending-style]
+    ) {
     opacity: 0;
   }
 }
@@ -1619,7 +1671,8 @@
     outline: none;
   }
 
-  [data-slot="navigation-menu-viewport"] > [data-slot="navigation-menu-content"] {
+  [data-slot="navigation-menu-viewport"]
+    > [data-slot="navigation-menu-content"] {
     position: absolute;
     top: 0;
     inset-inline-start: 0;
@@ -1669,7 +1722,8 @@
       top 200ms;
   }
 
-  body[data-animate] .nav-viewport:is([data-starting-style], [data-ending-style]) {
+  body[data-animate]
+    .nav-viewport:is([data-starting-style], [data-ending-style]) {
     opacity: 0;
   }
 
@@ -1679,7 +1733,8 @@
       translate 200ms;
   }
 
-  body[data-animate] .nav-content:is([data-starting-style], [data-ending-style]) {
+  body[data-animate]
+    .nav-content:is([data-starting-style], [data-ending-style]) {
     opacity: 0;
   }
 
@@ -1688,7 +1743,8 @@
     translate: 40px 0;
   }
 
-  body[data-animate] .nav-content[data-motion="from-start"][data-starting-style],
+  body[data-animate]
+    .nav-content[data-motion="from-start"][data-starting-style],
   body[data-animate] .nav-content[data-motion="to-start"][data-ending-style] {
     translate: -40px 0;
   }
@@ -1840,14 +1896,17 @@
     flex-wrap: wrap;
   }
 
-  .icons-fixture :is(.item, [role^="menuitem"], .tab, .toggle, .nav-link, .trigger) {
+  .icons-fixture
+    :is(.item, [role^="menuitem"], .tab, .toggle, .nav-link, .trigger) {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     gap: 8px;
   }
 
-  .icons-fixture [data-has-icons] :is(.item, [role^="menuitem"]):not([data-has-icon]) {
+  .icons-fixture
+    [data-has-icons]
+    :is(.item, [role^="menuitem"]):not([data-has-icon]) {
     padding-inline-start: 32px;
   }
 
@@ -1921,7 +1980,8 @@
     box-shadow: none;
   }
 
-  body[data-animate] [data-presentation="sheet"]:is([data-starting-style], [data-ending-style]) {
+  body[data-animate]
+    [data-presentation="sheet"]:is([data-starting-style], [data-ending-style]) {
     opacity: 1;
     scale: none;
     transform: none;

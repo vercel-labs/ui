@@ -8,10 +8,15 @@ test.beforeEach(async ({ open }) => {
 })
 
 test("a toggle starts unpressed", async ({ page }) => {
-  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute("aria-pressed", "false")
+  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  )
 })
 
-test("clicking a toggle presses it, and clicking again unpresses it", async ({ page }) => {
+test("clicking a toggle presses it, and clicking again unpresses it", async ({
+  page,
+}) => {
   const bookmark = buttonNamed(page, "Bookmark")
   await bookmark.click()
   await expect(bookmark).toHaveAttribute("aria-pressed", "true")
@@ -21,27 +26,37 @@ test("clicking a toggle presses it, and clicking again unpresses it", async ({ p
   expect(await lastAction(page)).toBe("bookmark: off")
 })
 
-for (const key of [" ", "Enter"])
+for (const key of [" ", "Enter"]) {
   test(`${key} presses a focused toggle`, async ({ page }) => {
     const bookmark = buttonNamed(page, "Bookmark")
     await bookmark.focus()
     await page.keyboard.press(key)
     await expect(bookmark).toHaveAttribute("aria-pressed", "true")
   })
+}
 
 test("a toggle can start pressed", async ({ page, open }) => {
   await open("toggle", { pressed: "" })
-  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute("aria-pressed", "true")
+  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
 })
 
 test("a change can be cancelled", async ({ page, open }) => {
   await open("toggle", { cancel: "bookmark" })
   await buttonNamed(page, "Bookmark").click()
-  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute("aria-pressed", "false")
+  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  )
   expect(await lastAction(page)).toBe("")
 })
 
 test("a toggle keeps its name when it's pressed", async ({ page }) => {
   await buttonNamed(page, "Bookmark").click()
-  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute("aria-pressed", "true")
+  await expect(buttonNamed(page, "Bookmark")).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
 })

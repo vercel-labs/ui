@@ -11,7 +11,9 @@ function Example() {
     <Progress
       value={3}
       max={12}
-      getValueLabel={(value, details) => `${value} of ${details.max} files, ${details.formatted}`}
+      getValueLabel={(value, details) =>
+        `${value} of ${details.max} files, ${details.formatted}`
+      }
     >
       <ProgressLabel>Copying files</ProgressLabel>
       <ProgressValue>3 of 12</ProgressValue>

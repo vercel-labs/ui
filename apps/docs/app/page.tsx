@@ -80,7 +80,13 @@ function fig(index: number) {
   return `FIG. ${String(index).padStart(2, "0")}`
 }
 
-function Section({ title, children }: { title: React.ReactNode; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: React.ReactNode
+  children: React.ReactNode
+}) {
   return (
     <>
       <Rule className="mt-20 sm:mt-28" />
@@ -107,7 +113,8 @@ export default function HomePage() {
       <Search pages={pages} />
       <main data-width="wide" className="container flex-1 pt-6 pb-24 sm:pt-10">
         <h1 className="text-4xl leading-[1.15] font-[450] tracking-[-0.045em] text-balance sm:text-6xl sm:leading-[1.08] lg:text-7xl">
-          A library of behaviors for agents to build the next generation of user interfaces.
+          A library of behaviors for agents to build the next generation of user
+          interfaces.
         </h1>
         <div className="mt-8 grid grid-cols-1 gap-3 sm:mt-10 lg:grid-cols-2 lg:gap-4">
           <div className="flex flex-col gap-3 max-lg:contents lg:gap-4">
@@ -124,16 +131,19 @@ export default function HomePage() {
               </p>
               <div className="flex max-w-[46rem] min-w-0 flex-col items-start gap-5 text-xl leading-[1.5] tracking-[-0.02em] text-pretty text-foreground 2xl:text-[1.375rem] [&_code]:border [&_code]:border-foreground/20 [&_code]:px-1 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.8em] [&_code]:whitespace-nowrap [&_code]:text-foreground">
                 <p className="text-2xl leading-[1.4] tracking-[-0.025em] sm:leading-[1.3] 2xl:text-[1.75rem]">
-                  Say we give an agent a Select component. It can build a Select. Makes sense, right?
+                  Say we give an agent a Select component. It can build a
+                  Select. Makes sense, right?
                 </p>
                 <p>
-                  But what if, instead, we gave it the pieces that make up a Select? The popup (
-                  <code>createPopup</code>), the list (<code>createListbox</code>), and finding an option by
-                  typing (<code>createTypeahead</code>).
+                  But what if, instead, we gave it the pieces that make up a
+                  Select? The popup (<code>createPopup</code>), the list (
+                  <code>createListbox</code>), and finding an option by typing (
+                  <code>createTypeahead</code>).
                 </p>
                 <p>
-                  Now not only can it build a Select, but it can build an autocomplete, a combobox or even a
-                  new component we haven’t thought of yet.
+                  Now not only can it build a Select, but it can build an
+                  autocomplete, a combobox or even a new component we haven’t
+                  thought of yet.
                 </p>
                 <p className="flex items-center gap-2">
                   That’s
@@ -149,8 +159,9 @@ export default function HomePage() {
                   </span>
                 </p>
                 <p>
-                  We abstracted the complex interactions of user interfaces into reusable behaviors. And we
-                  taught agents how to build and how to use them.
+                  We abstracted the complex interactions of user interfaces into
+                  reusable behaviors. And we taught agents how to build and how
+                  to use them.
                 </p>
               </div>
             </Poster>
@@ -178,7 +189,11 @@ export default function HomePage() {
             body="justify-between gap-8"
           >
             <SelectBlueprint />
-            <Title id="inside-a-select" max={20} className="-me-[0.05em] self-end text-end">
+            <Title
+              id="inside-a-select"
+              max={20}
+              className="-me-[0.05em] self-end text-end"
+            >
               Inside a Select.
             </Title>
           </Poster>
@@ -189,8 +204,8 @@ export default function HomePage() {
             Behaviors? What are those?
           </h2>
           <p className="max-w-[50rem] text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-foreground/70 sm:text-xl lg:text-2xl lg:leading-[1.45]">
-            They are the pieces that make a component work: keyboard navigation, focus, selection, popups,
-            drag and drop, and screen reader support.
+            They are the pieces that make a component work: keyboard navigation,
+            focus, selection, popups, drag and drop, and screen reader support.
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
@@ -203,8 +218,9 @@ export default function HomePage() {
             to build components?
           </h2>
           <p className="max-w-[50rem] text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-foreground/70 sm:text-xl lg:text-2xl lg:leading-[1.45]">
-            You don’t. Ask your agent. We made them really good at it. The agent picks the behaviors it needs
-            and puts them together in your framework.
+            You don’t. Ask your agent. We made them really good at it. The agent
+            picks the behaviors it needs and puts them together in your
+            framework.
           </p>
         </div>
         <div className="mt-8 sm:mt-10">
@@ -218,11 +234,13 @@ export default function HomePage() {
             </>
           }
         >
-          Every component is made from the same behaviors and works in React, Vue, Svelte, Solid and Web
-          Components.
+          Every component is made from the same behaviors and works in React,
+          Vue, Svelte, Solid and Web Components.
         </Section>
         <PhoneStrip
-          names={components.filter((item) => item.phone).map((item) => item.name)}
+          names={components
+            .filter((item) => item.phone)
+            .map((item) => item.name)}
           className="relative grid grid-cols-1 gap-3 max-sm:-mx-6 max-sm:flex max-sm:gap-6 max-sm:snap-x max-sm:snap-mandatory max-sm:-my-2 max-sm:overflow-x-auto max-sm:overflow-y-hidden max-sm:overscroll-x-contain max-sm:px-6 max-sm:py-2 max-sm:[scrollbar-width:none] lg:grid-cols-2 lg:gap-4 min-[90rem]:grid-cols-3"
         >
           {components.map((item, index) => (
@@ -232,7 +250,8 @@ export default function HomePage() {
               className={cn(
                 "max-sm:w-[calc(100vw-5rem)] max-sm:shrink-0 max-sm:snap-center max-sm:gap-8",
                 !item.phone && "max-sm:hidden",
-                index === components.length - 1 && "lg:col-span-2 min-[90rem]:col-span-1",
+                index === components.length - 1 &&
+                  "lg:col-span-2 min-[90rem]:col-span-1"
               )}
             />
           ))}
@@ -245,8 +264,8 @@ export default function HomePage() {
             </>
           }
         >
-          Add the UI SDK skill to your agent. It learns all the behaviors and how they fit together. It writes
-          less code and gets more of it right.
+          Add the UI SDK skill to your agent. It learns all the behaviors and
+          how they fit together. It writes less code and gets more of it right.
         </Section>
         <PhoneStrip
           names={builds.map((item) => item.name)}
@@ -265,8 +284,9 @@ export default function HomePage() {
             at using what they build.
           </h2>
           <p className="max-w-[50rem] text-lg leading-[1.5] tracking-[-0.015em] text-pretty text-foreground/70 sm:text-xl lg:text-2xl lg:leading-[1.45]">
-            They read the page and work the controls directly, without screenshots. That makes them more than
-            twice as fast, at less than half the cost.
+            They read the page and work the controls directly, without
+            screenshots. That makes them more than twice as fast, at less than
+            half the cost.
           </p>
         </div>
         <div className="mt-8 sm:mt-10">

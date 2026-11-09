@@ -51,21 +51,30 @@ async function mount(root: HTMLElement) {
   const group = root.querySelector("ui-menu-radio-group")!
   const selections = root.querySelector('output[aria-label="Selections"]')!
   // Canceling the select event keeps the menu open, like preventDefault() in onSelect.
-  root.querySelector('ui-menu-item[value="pin"]')!.addEventListener("select", (event) => {
-    event.preventDefault()
-    selections.textContent = String(Number(selections.textContent) + 1)
-  })
+  root
+    .querySelector('ui-menu-item[value="pin"]')!
+    .addEventListener("select", (event) => {
+      event.preventDefault()
+      selections.textContent = String(Number(selections.textContent) + 1)
+    })
   // The group is controlled: its value attribute follows each pick.
   group.addEventListener("valuechange", (event) =>
-    group.setAttribute("value", (event as CustomEvent<{ value: string }>).detail.value),
+    group.setAttribute(
+      "value",
+      (event as CustomEvent<{ value: string }>).detail.value
+    )
   )
-  root.querySelector("#align-right")!.addEventListener("click", () => group.setAttribute("value", "right"))
+  root
+    .querySelector("#align-right")!
+    .addEventListener("click", () => group.setAttribute("value", "right"))
   root.addEventListener(
     "action",
     (event) => {
-      root.querySelector("output")!.textContent = (event as CustomEvent<{ value: string }>).detail.value
+      root.querySelector("output")!.textContent = (
+        event as CustomEvent<{ value: string }>
+      ).detail.value
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

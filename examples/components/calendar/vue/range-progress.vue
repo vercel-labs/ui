@@ -20,7 +20,9 @@ const log = useLog()
   <div>
     <Calendar
       mode="range"
-      @anchor-change="(anchor) => log(anchor ? `Started on ${anchor}` : 'Range finished')"
+      @anchor-change="
+        (anchor) => log(anchor ? `Started on ${anchor}` : 'Range finished')
+      "
       @focused-change="(focused) => log(`Focus on ${focused}`)"
     >
       <div data-slot="row">

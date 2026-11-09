@@ -6,9 +6,12 @@ function ChangelogPosts() {
   const posts = source
     .getPages()
     .flatMap((page) =>
-      page.slugs.length === 3 && page.slugs[0] === "core" && page.slugs[1] === "changelog" && page.data.date
+      page.slugs.length === 3 &&
+      page.slugs[0] === "core" &&
+      page.slugs[1] === "changelog" &&
+      page.data.date
         ? [{ ...page, date: page.data.date }]
-        : [],
+        : []
     )
     .sort((a, b) => b.date.localeCompare(a.date))
 

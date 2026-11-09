@@ -46,8 +46,9 @@ describe("server rendering a calendar", () => {
               CalendarWeekday,
               { index, class: "weekday" },
               {
-                default: ({ state }: { state: CalendarWeekdayState }) => state.name.slice(0, 2),
-              },
+                default: ({ state }: { state: CalendarWeekdayState }) =>
+                  state.name.slice(0, 2),
+              }
             ),
         }),
         h(CalendarWeeks, null, {
@@ -56,21 +57,24 @@ describe("server rendering a calendar", () => {
               CalendarDay,
               { value: cell.date, class: "day" },
               {
-                default: ({ state }: { state: CalendarDayState }) => `[${state.date.slice(8)}]`,
-              },
+                default: ({ state }: { state: CalendarDayState }) =>
+                  `[${state.date.slice(8)}]`,
+              }
             ),
         }),
-      ]),
+      ])
     )
     expect(html).toMatch(/<th[^>]*scope="col"[^>]*class="weekday"[^>]*>Su</)
-    expect(html).toMatch(/<td[^>]*class="day"[^>]*data-value="2026-10-16"[^>]*>\[16\]</)
+    expect(html).toMatch(
+      /<td[^>]*class="day"[^>]*data-value="2026-10-16"[^>]*>\[16\]</
+    )
   })
 
   test("the month and year selects render their options with the month shown selected", async () => {
-    const html = await render({ defaultMonth: "2026-10", min: "2024-03-10", max: "2026-11-02" }, () => [
-      h(CalendarMonthSelect),
-      h(CalendarYearSelect),
-    ])
+    const html = await render(
+      { defaultMonth: "2026-10", min: "2024-03-10", max: "2026-11-02" },
+      () => [h(CalendarMonthSelect), h(CalendarYearSelect)]
+    )
     expect(html).toMatch(/<select[^>]*aria-label="Month"/)
     expect(html).not.toMatch(/<select[^>]*value=/)
     expect(html).toMatch(/<option value="10" selected>October<\/option>/)

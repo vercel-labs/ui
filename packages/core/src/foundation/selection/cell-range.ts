@@ -48,7 +48,10 @@ type CellRangeOptions<State extends object> = {
    * Asks for a new range and returns whether it went through. Defaults to
    * writing the state; pass the primitive's change to report it.
    */
-  set?: (range: CellRange | null, details: { reason: CellRangeReason; event?: Event }) => boolean
+  set?: (
+    range: CellRange | null,
+    details: { reason: CellRangeReason; event?: Event }
+  ) => boolean
   /** What screen readers hear after the range changes from the keyboard. Defaults to English. */
   message?: (bounds: CellBounds) => string
 }
@@ -77,7 +80,8 @@ const boundsOf = ({ anchor, end }: CellRange) => ({
  * @experimental
  */
 function cellsToText(rows: string[][]) {
-  const quote = (value: string) => (/[\t\n\r"]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value)
+  const quote = (value: string) =>
+    /[\t\n\r"]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value
   return rows.map((row) => row.map(quote).join("\t")).join("\n")
 }
 
@@ -95,22 +99,36 @@ function textToCells(text: string) {
       if (char === '"' && text[i + 1] === '"') {
         cell += '"'
         i++
-      } else if (char === '"') quoted = false
-      else cell += char
-    } else if (char === '"' && cell === "") quoted = true
-    else if (char === "\t") {
+      } else if (char === '"') {
+        quoted = false
+      } else {
+        cell += char
+      }
+    } else if (char === '"' && cell === "") {
+      quoted = true
+    } else if (char === "\t") {
       rows[rows.length - 1].push(cell)
       cell = ""
     } else if (char === "\n" || char === "\r") {
-      if (char === "\r" && text[i + 1] === "\n") i++
+      if (char === "\r" && text[i + 1] === "\n") {
+        i++
+      }
       rows[rows.length - 1].push(cell)
       cell = ""
       rows.push([])
-    } else cell += char
+    } else {
+      cell += char
+    }
   }
   rows[rows.length - 1].push(cell)
   // A copied range ends with a newline, which isn't another row.
-  if (rows.length > 1 && rows[rows.length - 1].length === 1 && rows[rows.length - 1][0] === "") rows.pop()
+  if (
+    rows.length > 1 &&
+    rows[rows.length - 1].length === 1 &&
+    rows[rows.length - 1][0] === ""
+  ) {
+    rows.pop()
+  }
   return rows
 }
 
@@ -143,7 +161,7 @@ function textToCells(text: string) {
  */
 function createCellRange<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: CellRangeOptions<State>,
+  options: CellRangeOptions<State>
 ) {
   const { store } = context
   const { grid } = options
@@ -151,8 +169,13 @@ function createCellRange<State extends object>(
   const drags = createDragSession(context.onDestroy)
 
   const current = () => store.get()[options.key] as CellRange | null
-  const set = (range: CellRange | null, details: { reason: CellRangeReason; event?: Event }) =>
-    options.set ? options.set(range, details) : (store.set({ [options.key]: range } as Partial<State>), true)
+  const set = (
+    range: CellRange | null,
+    details: { reason: CellRangeReason; event?: Event }
+  ) =>
+    options.set
+      ? options.set(range, details)
+      : (store.set({ [options.key]: range } as Partial<State>), true)
   const clamp = (cell: GridCell) => ({
     row: Math.max(0, Math.min(options.rows() - 1, cell.row)),
     col: Math.max(0, Math.min(options.cols() - 1, cell.col)),
@@ -163,16 +186,27 @@ function createCellRange<State extends object>(
   })
   const say = (range: CellRange | null) => {
     const bounds = api.bounds({ [options.key]: range } as State)
-    if (bounds) announce((options.message ?? cellRangeMessage)(bounds))
+    if (bounds) {
+      announce((options.message ?? cellRangeMessage)(bounds))
+    }
   }
 
   const api = {
     /** The selected rows and columns: the range, or the active cell alone, or `null` before the grid is entered. */
     bounds(state: State) {
       const range = state[options.key] as CellRange | null
-      if (range) return boundsOf(range)
+      if (range) {
+        return boundsOf(range)
+      }
       const active = grid.active()
-      return active ? { top: active.row, left: active.col, bottom: active.row, right: active.col } : null
+      return active
+        ? {
+            top: active.row,
+            left: active.col,
+            bottom: active.row,
+            right: active.col,
+          }
+        : null
     },
     /** Whether a cell is in the range. */
     contains(state: State, cell: GridCell) {
@@ -193,7 +227,9 @@ function createCellRange<State extends object>(
     cellAttrs(state: State, cell: GridCell) {
       const range = state[options.key] as CellRange | null
       const selected = !!range && api.contains(state, cell)
-      if (!selected) return { "aria-selected": "false" }
+      if (!selected) {
+        return { "aria-selected": "false" }
+      }
       const { top, left, bottom, right } = boundsOf(range)
       const edges = [
         cell.row === top && "top",
@@ -210,9 +246,14 @@ function createCellRange<State extends object>(
     /** Selects a range, or `null` for the active cell alone. */
     select(
       range: CellRange | null,
-      details: { reason: CellRangeReason; event?: Event } = { reason: "imperative" },
+      details: { reason: CellRangeReason; event?: Event } = {
+        reason: "imperative",
+      }
     ) {
-      const next = range && { anchor: clamp(range.anchor), end: clamp(range.end) }
+      const next = range && {
+        anchor: clamp(range.anchor),
+        end: clamp(range.end),
+      }
       const previous = current()
       if (
         previous === next ||
@@ -222,8 +263,9 @@ function createCellRange<State extends object>(
           previous.anchor.col === next.anchor.col &&
           previous.end.row === next.end.row &&
           previous.end.col === next.end.col)
-      )
+      ) {
         return false
+      }
       return set(next, details)
     },
     /** Selects every cell, keeping the active one. */
@@ -231,12 +273,32 @@ function createCellRange<State extends object>(
       return api.select(everyCell(), details)
     },
     /** Selects whole rows, from one to another. */
-    selectRows(from: number, to = from, details?: { reason: CellRangeReason; event?: Event }) {
-      return api.select({ anchor: { row: from, col: 0 }, end: { row: to, col: options.cols() - 1 } }, details)
+    selectRows(
+      from: number,
+      to = from,
+      details?: { reason: CellRangeReason; event?: Event }
+    ) {
+      return api.select(
+        {
+          anchor: { row: from, col: 0 },
+          end: { row: to, col: options.cols() - 1 },
+        },
+        details
+      )
     },
     /** Selects whole columns, from one to another. */
-    selectColumns(from: number, to = from, details?: { reason: CellRangeReason; event?: Event }) {
-      return api.select({ anchor: { row: 0, col: from }, end: { row: options.rows() - 1, col: to } }, details)
+    selectColumns(
+      from: number,
+      to = from,
+      details?: { reason: CellRangeReason; event?: Event }
+    ) {
+      return api.select(
+        {
+          anchor: { row: 0, col: from },
+          end: { row: options.rows() - 1, col: to },
+        },
+        details
+      )
     },
     /** Joins a rendered cell, for focus and for finding it under a dragging pointer. Return its cleanup from `bind`. */
     bind(el: HTMLElement, cell: GridCell) {
@@ -256,46 +318,81 @@ function createCellRange<State extends object>(
      * through the grid, which drops the range.
      */
     keydown(event: KeyboardEvent) {
-      if (event.defaultPrevented || event.altKey) return false
+      if (event.defaultPrevented || event.altKey) {
+        return false
+      }
       const active = grid.active() ?? { row: 0, col: 0 }
       const range = current()
       const mod = event.ctrlKey || event.metaKey
       const done = (next: CellRange | null) => {
         event.preventDefault()
-        if (api.select(next, { reason: "list-navigation", event })) say(next)
+        if (api.select(next, { reason: "list-navigation", event })) {
+          say(next)
+        }
         return true
       }
-      if (mod && !event.shiftKey && event.key.toLowerCase() === "a") return done(everyCell())
+      if (mod && !event.shiftKey && event.key.toLowerCase() === "a") {
+        return done(everyCell())
+      }
       if (event.key === " " && event.shiftKey && !mod) {
-        const { top, bottom } = range ? boundsOf(range) : { top: active.row, bottom: active.row }
-        return done({ anchor: { row: top, col: 0 }, end: { row: bottom, col: options.cols() - 1 } })
+        const { top, bottom } = range
+          ? boundsOf(range)
+          : { top: active.row, bottom: active.row }
+        return done({
+          anchor: { row: top, col: 0 },
+          end: { row: bottom, col: options.cols() - 1 },
+        })
       }
       if (event.key === " " && mod && !event.shiftKey) {
-        const { left, right } = range ? boundsOf(range) : { left: active.col, right: active.col }
-        return done({ anchor: { row: 0, col: left }, end: { row: options.rows() - 1, col: right } })
+        const { left, right } = range
+          ? boundsOf(range)
+          : { left: active.col, right: active.col }
+        return done({
+          anchor: { row: 0, col: left },
+          end: { row: options.rows() - 1, col: right },
+        })
       }
-      if (event.key === "Escape" && range) return done(null)
+      if (event.key === "Escape" && range) {
+        return done(null)
+      }
       if (event.shiftKey) {
         const rtl = event.target instanceof Element && isRTL(event.target)
         const end = range?.end ?? active
         const last = { row: options.rows() - 1, col: options.cols() - 1 }
         const far = (to: number, edge: number) => (mod ? edge : to)
         let to: GridCell | undefined
-        if (event.key === "ArrowUp") to = { row: far(end.row - 1, 0), col: end.col }
-        else if (event.key === "ArrowDown") to = { row: far(end.row + 1, last.row), col: end.col }
-        else if (event.key === "ArrowLeft")
-          to = { row: end.row, col: far(end.col + (rtl ? 1 : -1), rtl ? last.col : 0) }
-        else if (event.key === "ArrowRight")
-          to = { row: end.row, col: far(end.col + (rtl ? -1 : 1), rtl ? 0 : last.col) }
-        else if (event.key === "Home") to = mod ? { row: 0, col: 0 } : { row: end.row, col: 0 }
-        else if (event.key === "End") to = mod ? last : { row: end.row, col: last.col }
+        if (event.key === "ArrowUp") {
+          to = { row: far(end.row - 1, 0), col: end.col }
+        } else if (event.key === "ArrowDown") {
+          to = { row: far(end.row + 1, last.row), col: end.col }
+        } else if (event.key === "ArrowLeft") {
+          to = {
+            row: end.row,
+            col: far(end.col + (rtl ? 1 : -1), rtl ? last.col : 0),
+          }
+        } else if (event.key === "ArrowRight") {
+          to = {
+            row: end.row,
+            col: far(end.col + (rtl ? -1 : 1), rtl ? 0 : last.col),
+          }
+        } else if (event.key === "Home") {
+          to = mod ? { row: 0, col: 0 } : { row: end.row, col: 0 }
+        } else if (event.key === "End") {
+          to = mod ? last : { row: end.row, col: last.col }
+        }
         if (to) {
           const next = { anchor: range?.anchor ?? active, end: clamp(to) }
           options.reveal?.(next.end)
-          return done(next.anchor.row === next.end.row && next.anchor.col === next.end.col ? null : next)
+          return done(
+            next.anchor.row === next.end.row && next.anchor.col === next.end.col
+              ? null
+              : next
+          )
         }
       }
-      if (!grid.keydown(event)) return false
+      if (!grid.keydown(event)) {
+        return false
+      }
       api.select(null, { reason: "list-navigation", event })
       return true
     },
@@ -305,28 +402,43 @@ function createCellRange<State extends object>(
      * edges. Shift stretches the range from the active cell instead.
      */
     pointerdown(event: PointerEvent, cell: GridCell) {
-      if (!drags.accepts(event)) return
+      if (!drags.accepts(event)) {
+        return
+      }
       const active = grid.active()
       if (event.shiftKey && active) {
         event.preventDefault()
-        api.select({ anchor: current()?.anchor ?? active, end: cell }, { reason: "item-press", event })
+        api.select(
+          { anchor: current()?.anchor ?? active, end: cell },
+          { reason: "item-press", event }
+        )
         return
       }
       grid.focus(cell, { reason: "item-press", event })
       api.select(null, { reason: "item-press", event })
-      const el = event.currentTarget instanceof HTMLElement ? event.currentTarget : null
-      if (!el) return
+      const el =
+        event.currentTarget instanceof HTMLElement ? event.currentTarget : null
+      if (!el) {
+        return
+      }
       let last = { x: event.clientX, y: event.clientY }
       const paint = () => {
         const hit = el.ownerDocument
           .elementsFromPoint(last.x, last.y)
           .map((node) => cellOf.get(node))
           .find(Boolean)
-        if (!hit) return
-        api.select(hit.row === cell.row && hit.col === cell.col ? null : { anchor: cell, end: hit }, {
-          reason: "drag",
-          event,
-        })
+        if (!hit) {
+          return
+        }
+        api.select(
+          hit.row === cell.row && hit.col === cell.col
+            ? null
+            : { anchor: cell, end: hit },
+          {
+            reason: "drag",
+            event,
+          }
+        )
       }
       const scroll = createAutoScroll({ onScroll: paint })
       drags.start(el, event, {
@@ -341,11 +453,15 @@ function createCellRange<State extends object>(
     /** The range's text, read cell by cell, with tabs between cells and newlines between rows. */
     text(state: State, read: (cell: GridCell) => string) {
       const bounds = api.bounds(state)
-      if (!bounds) return ""
+      if (!bounds) {
+        return ""
+      }
       const rows: string[][] = []
       for (let row = bounds.top; row <= bounds.bottom; row++) {
         const cells: string[] = []
-        for (let col = bounds.left; col <= bounds.right; col++) cells.push(read({ row, col }))
+        for (let col = bounds.left; col <= bounds.right; col++) {
+          cells.push(read({ row, col }))
+        }
         rows.push(cells)
       }
       return cellsToText(rows)

@@ -1,4 +1,8 @@
-import { createToaster as createCoreToaster, toast as coreToast, type Toaster } from "@ui-sdk/core/toast"
+import {
+  createToaster as createCoreToaster,
+  toast as coreToast,
+  type Toaster,
+} from "@ui-sdk/core/toast"
 import type { ToastContent } from "./toast/context"
 
 /**
@@ -14,7 +18,7 @@ const toast = coreToast as Toaster<ToastContent>
  * @stable
  */
 const createToaster = createCoreToaster as <Content = ToastContent>(
-  options?: Parameters<typeof createCoreToaster>[0],
+  options?: Parameters<typeof createCoreToaster>[0]
 ) => Toaster<Content>
 
 // Core's `Toast` and `ToastAction` types end in `Data` here, since the components have their names.

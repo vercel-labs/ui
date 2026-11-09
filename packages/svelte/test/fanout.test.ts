@@ -12,12 +12,22 @@ const settle = async () => {
   flushSync()
 }
 const key = (event: string, target = document.activeElement ?? document.body) =>
-  target.dispatchEvent(new KeyboardEvent("keydown", { key: event, bubbles: true, cancelable: true }))
+  target.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: event,
+      bubbles: true,
+      cancelable: true,
+    })
+  )
 
 let target: HTMLElement
 let app: ReturnType<typeof mount>
 const updated = new Map<string, number>()
-async function render(props: { n: number; kind: "select" | "listbox" | "data"; items?: string[] }) {
+async function render(props: {
+  n: number
+  kind: "select" | "listbox" | "data"
+  items?: string[]
+}) {
   updated.clear()
   target = document.createElement("div")
   document.body.append(target)
@@ -46,10 +56,14 @@ for (const n of [10, 500]) {
       key("ArrowDown")
       await settle()
     }
-    const plain = [...updated.keys()].filter((name) => Number(name.slice(5)) % 2 === 1)
+    const plain = [...updated.keys()].filter(
+      (name) => Number(name.slice(5)) % 2 === 1
+    )
     const watched = [...updated.values()].reduce((sum, count) => sum + count, 0)
     expect(plain, "plain options updated for a highlight change").toEqual([])
-    expect(watched).toBeLessThanOrEqual(budgets["select.arrow-key"].renders.watched)
+    expect(watched).toBeLessThanOrEqual(
+      budgets["select.arrow-key"].renders.watched
+    )
   })
 
   test(`selecting one listbox item updates that item and the one that held the tab stop (n=${n})`, async () => {
@@ -70,12 +84,18 @@ test("items that change while a select is open keep the list open and follow the
   const props = await render({ n: 3, kind: "select", items })
   target.querySelector<HTMLElement>('[data-slot="select-trigger"]')!.click()
   await settle()
-  expect([...document.querySelectorAll('[role="option"]')].map((el) => el.textContent)).toEqual(items)
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (el) => el.textContent
+    )
+  ).toEqual(items)
   props.items = [...items].reverse()
   await settle()
-  expect([...document.querySelectorAll('[role="option"]')].map((el) => el.textContent)).toEqual(
-    [...items].reverse(),
-  )
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (el) => el.textContent
+    )
+  ).toEqual([...items].reverse())
 })
 
 test("items that change while a data select is open keep the list open and follow the new order", async () => {
@@ -83,10 +103,16 @@ test("items that change while a data select is open keep the list open and follo
   const props = await render({ n: 3, kind: "data", items })
   target.querySelector<HTMLElement>('[data-slot="select-trigger"]')!.click()
   await settle()
-  expect([...document.querySelectorAll('[role="option"]')].map((el) => el.textContent)).toEqual(items)
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (el) => el.textContent
+    )
+  ).toEqual(items)
   props.items = [...items].reverse()
   await settle()
-  expect([...document.querySelectorAll('[role="option"]')].map((el) => el.textContent)).toEqual(
-    [...items].reverse(),
-  )
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (el) => el.textContent
+    )
+  ).toEqual([...items].reverse())
 })

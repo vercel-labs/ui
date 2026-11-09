@@ -12,7 +12,11 @@ import {
 } from "@ui-sdk/react/toolbar"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { toolbarFixture as f, toolbarLocked, toolbarOptions } from "tests/fixtures/toolbar.ts"
+import {
+  toolbarFixture as f,
+  toolbarLocked,
+  toolbarOptions,
+} from "tests/fixtures/toolbar.ts"
 
 const controller = createToolbarController()
 
@@ -28,13 +32,18 @@ function Fixture() {
     ) : (
       item
     )
-  const group = ({ label, defaultValue, items }: typeof f.style, multiple: boolean) => (
+  const group = (
+    { label, defaultValue, items }: typeof f.style,
+    multiple: boolean
+  ) => (
     <ToggleGroup
       className="toggle-group"
       aria-label={label}
       multiple={multiple}
       defaultValue={defaultValue}
-      onValueChange={(value) => setAction(`${label}: ${value.join(", ") || "none"}`)}
+      onValueChange={(value) =>
+        setAction(`${label}: ${value.join(", ") || "none"}`)
+      }
     >
       {items.map((item: (typeof f.style.items)[number]) => (
         <Toggle
@@ -52,13 +61,20 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Toolbar className="toolbar" aria-label={f.label} controller={controller} {...toolbarOptions()}>
+      <Toolbar
+        className="toolbar"
+        aria-label={f.label}
+        controller={controller}
+        {...toolbarOptions()}
+      >
         {lock("Locked style", group(f.style, true))}
         <ToolbarSeparator />
         {group(f.alignment, false)}
         <ToolbarSeparator />
         <Menu onAction={(value) => setAction(`font: ${value}`)}>
-          <ToolbarButton render={<MenuTrigger />}>{f.font.trigger}</ToolbarButton>
+          <ToolbarButton render={<MenuTrigger />}>
+            {f.font.trigger}
+          </ToolbarButton>
           <MenuContent className="popup">
             {f.font.items.map((item) => (
               <MenuItem key={item} className="item" value={item}>
@@ -71,9 +87,14 @@ function Fixture() {
           defaultValue={f.size.defaultValue}
           onValueChange={(value) => setAction(`size: ${value}`)}
         >
-          <ToolbarInput render={<NumberInputControl aria-label={f.size.label} />} />
+          <ToolbarInput
+            render={<NumberInputControl aria-label={f.size.label} />}
+          />
         </NumberInput>
-        <ToolbarInput aria-label={f.comment.label} defaultValue={f.comment.defaultValue} />
+        <ToolbarInput
+          aria-label={f.comment.label}
+          defaultValue={f.comment.defaultValue}
+        />
         <ToolbarGroup
           className="toolbar-group"
           aria-label={f.history.label}
@@ -93,12 +114,17 @@ function Fixture() {
           "Locked proofing",
           <Toggle
             className="toggle"
-            onPressedChange={(pressed) => setAction(`spellcheck: ${pressed ? "on" : "off"}`)}
+            onPressedChange={(pressed) =>
+              setAction(`spellcheck: ${pressed ? "on" : "off"}`)
+            }
           >
             {f.spellcheck.label}
-          </Toggle>,
+          </Toggle>
         )}
-        {lock("Locked help", <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>)}
+        {lock(
+          "Locked help",
+          <ToolbarLink href={f.help.href}>{f.help.label}</ToolbarLink>
+        )}
       </Toolbar>
       <button>After</button>
       <output role="status" aria-label="Last action">
@@ -114,7 +140,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

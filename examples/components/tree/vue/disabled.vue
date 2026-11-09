@@ -34,11 +34,14 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, disabled, children }) =>
     h(TreeItem, { key: value, value, disabled }, () => [
       h(TreeItemLabel, {}, () => [
-        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        children &&
+          h(TreeItemIndicator, {}, () =>
+            h(ChevronRightIcon, { "aria-hidden": "true" })
+          ),
         label,
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
-    ]),
+    ])
   )
 
 const focusable = ref(true)

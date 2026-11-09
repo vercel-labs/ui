@@ -28,15 +28,35 @@ import { onItemsChange } from "tests/fixtures/items.ts"
 import { serializeForm } from "tests/fixtures/select.ts"
 
 // The list's data, rendered like the composed list: items, and groups with their labels.
-function DataItems({ items, highlight }: { items: ListData; highlight: boolean }) {
+function DataItems({
+  items,
+  highlight,
+}: {
+  items: ListData
+  highlight: boolean
+}) {
   return items.map((entry, index) => {
-    if (typeof entry === "string")
-      return <DataItem key={entry} value={entry} label={entry} highlight={highlight} />
-    if ("value" in entry) return <DataItem key={entry.value} {...entry} highlight={highlight} />
-    if (entry.type === "separator") return <AutocompleteSeparator key={`separator-${index}`} />
+    if (typeof entry === "string") {
+      return (
+        <DataItem
+          key={entry}
+          value={entry}
+          label={entry}
+          highlight={highlight}
+        />
+      )
+    }
+    if ("value" in entry) {
+      return <DataItem key={entry.value} {...entry} highlight={highlight} />
+    }
+    if (entry.type === "separator") {
+      return <AutocompleteSeparator key={`separator-${index}`} />
+    }
     return (
       <AutocompleteGroup key={entry.label}>
-        <AutocompleteGroupLabel className="label">{entry.label}</AutocompleteGroupLabel>
+        <AutocompleteGroupLabel className="label">
+          {entry.label}
+        </AutocompleteGroupLabel>
         <DataItems items={entry.items} highlight={highlight} />
       </AutocompleteGroup>
     )
@@ -55,14 +75,27 @@ function DataItem({
 }) {
   return (
     <AutocompleteItem className="item" {...item}>
-      {highlight ? <AutocompleteItemText>{item.label}</AutocompleteItemText> : item.label}
+      {highlight ? (
+        <AutocompleteItemText>{item.label}</AutocompleteItemText>
+      ) : (
+        item.label
+      )}
     </AutocompleteItem>
   )
 }
 
 function Fixture({ data = false }: { data?: boolean }) {
-  const { fieldset, grouped, async, late, container, highlight, recent, nostatus, ...options } =
-    autocompleteOptions()
+  const {
+    fieldset,
+    grouped,
+    async,
+    late,
+    container,
+    highlight,
+    recent,
+    nostatus,
+    ...options
+  } = autocompleteOptions()
   const [action, setAction] = React.useState("")
   const [submitted, setSubmitted] = React.useState("")
   const remote = useAsyncOptions(searchFruits, { immediate: async })
@@ -77,25 +110,39 @@ function Fixture({ data = false }: { data?: boolean }) {
         setList(items)
         setArrived(true)
       }),
-    [],
+    []
   )
   const items = async
     ? remote.items
     : grouped
-      ? f.groups.map((group) => ({ type: "group" as const, label: group.label, items: group.items }))
+      ? f.groups.map((group) => ({
+          type: "group" as const,
+          label: group.label,
+          items: group.items,
+        }))
       : list
   const control = (
     <Autocomplete
       {...options}
       name={f.name}
       container={container}
-      items={late ? (arrived ? items : undefined) : data || async || recent ? items : undefined}
+      items={
+        late
+          ? arrived
+            ? items
+            : undefined
+          : data || async || recent
+            ? items
+            : undefined
+      }
       emptyItems={recent ? f.recent : undefined}
       filter={async ? false : undefined}
       status={async ? remote.status : undefined}
       onValueChange={(value, details) => {
         setAction(`value:${value}:${details.reason}`)
-        if (async) remote.setQuery(value)
+        if (async) {
+          remote.setQuery(value)
+        }
       }}
       onSubmit={(value) => setAction(`submit:${value}`)}
     >
@@ -115,11 +162,18 @@ function Fixture({ data = false }: { data?: boolean }) {
           <AutocompleteEmpty className="empty">{f.empty}</AutocompleteEmpty>
           <AutocompleteList>
             {data || async || recent
-              ? (state) => <DataItems items={state.items as ListData} highlight={highlight} />
+              ? (state) => (
+                  <DataItems
+                    items={state.items as ListData}
+                    highlight={highlight}
+                  />
+                )
               : grouped
                 ? f.groups.map((group) => (
                     <AutocompleteGroup key={group.label}>
-                      <AutocompleteGroupLabel className="label">{group.label}</AutocompleteGroupLabel>
+                      <AutocompleteGroupLabel className="label">
+                        {group.label}
+                      </AutocompleteGroupLabel>
                       {group.items.map((item) => (
                         <AutocompleteItem
                           key={item.value}
@@ -141,7 +195,13 @@ function Fixture({ data = false }: { data?: boolean }) {
                       keywords={item.keywords}
                       disabled={item.disabled}
                     >
-                      {highlight ? <AutocompleteItemText>{item.label}</AutocompleteItemText> : item.label}
+                      {highlight ? (
+                        <AutocompleteItemText>
+                          {item.label}
+                        </AutocompleteItemText>
+                      ) : (
+                        item.label
+                      )}
                     </AutocompleteItem>
                   ))}
           </AutocompleteList>
@@ -179,7 +239,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

@@ -23,7 +23,11 @@ import { noListing } from "../../foundation/lists/listbox-listing"
 import { announcePending, isPromise } from "../../foundation/kernel/action"
 import { selectEvent } from "../../foundation/kernel/events"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
-import { adoptPlatform, bindPartShortcut, shortcutOf } from "../../foundation/shortcuts/shortcut-slot"
+import {
+  adoptPlatform,
+  bindPartShortcut,
+  shortcutOf,
+} from "../../foundation/shortcuts/shortcut-slot"
 import { shortcuts } from "../../foundation/shortcuts/shortcuts"
 import { createChange } from "../../foundation/kernel/input-source"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
@@ -57,7 +61,10 @@ function initialCommandState(options: CommandOptions): CommandStore {
   return {
     // Inline, so always open.
     open: true,
-    value: options.value !== undefined ? options.value : (options.defaultValue ?? null),
+    value:
+      options.value !== undefined
+        ? options.value
+        : (options.defaultValue ?? null),
     highlighted: null,
     query: options.query ?? options.defaultQuery ?? "",
     pages: options.pages ?? options.defaultPages ?? [],
@@ -89,7 +96,9 @@ function syncCommandState(options: CommandOptions) {
 // The page on top of the stack, or `null` on the first page.
 const currentPage = (state: { pages: string[] }) => state.pages.at(-1) ?? null
 
-function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, string>) {
+function commandApi(
+  context: PrimitiveContext<CommandOptions, CommandStore, string>
+) {
   const { id, store, options, element } = context
   announcePending(context, () => store.get().pending.length > 0)
   const change = createChange(context)
@@ -97,14 +106,29 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
   // The current page's data commands, or undefined for a page only parts compose.
   const items = () => pageItems(store.get().items, store.get().pages)
   const indexOf = (key: string | null) =>
-    key === null ? -1 : core.listbox.entries().findIndex((entry) => entry.key === key)
+    key === null
+      ? -1
+      : core.listbox.entries().findIndex((entry) => entry.key === key)
 
   // The highlight is the value, through `onValueChange`, so a controlled one waits for it to come back.
-  function highlight(key: string | null, why: HighlightCause<CommandValueChangeReason> | null) {
-    if (key === store.get().value) return false
-    if (why) return change("value", key, { reason: why.reason, event: why.event, index: indexOf(key) })
+  function highlight(
+    key: string | null,
+    why: HighlightCause<CommandValueChangeReason> | null
+  ) {
+    if (key === store.get().value) {
+      return false
+    }
+    if (why) {
+      return change("value", key, {
+        reason: why.reason,
+        event: why.event,
+        index: indexOf(key),
+      })
+    }
     // A highlight the component picks with nothing before it is a default, not a change.
-    if (options().value === undefined) store.set({ value: key })
+    if (options().value === undefined) {
+      store.set({ value: key })
+    }
     return false
   }
 
@@ -112,7 +136,8 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
   let awaiting: HighlightCause<CommandValueChangeReason> | null = null
 
   // Commands shown on the first page while the search is empty.
-  const emptyItems = () => (store.get().pages.length ? undefined : options().emptyItems)
+  const emptyItems = () =>
+    store.get().pages.length ? undefined : options().emptyItems
 
   const core = createAutocompleteCore(context, {
     query: () => store.get().query,
@@ -129,7 +154,11 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
     settlesMount: () => awaiting !== null,
   })
 
-  function setQuery(query: string, reason: CommandQueryChangeReason, event?: Event) {
+  function setQuery(
+    query: string,
+    reason: CommandQueryChangeReason,
+    event?: Event
+  ) {
     core.cause(reason, event)
     return change("query", query, { reason, event })
   }
@@ -140,7 +169,9 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
   function push(page: string, reason: CommandPagesChangeReason, event?: Event) {
     const { pages, query, queries } = store.get()
     pageCause = { reason, event }
-    if (!change("pages", [...pages, page], { reason, event })) return false
+    if (!change("pages", [...pages, page], { reason, event })) {
+      return false
+    }
     store.set({ queries: [...queries.slice(0, pages.length), query] })
     setQuery("", reason, event)
     return true
@@ -148,9 +179,13 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
 
   function pop(reason: CommandPagesChangeReason, event?: Event) {
     const { pages, queries } = store.get()
-    if (!pages.length) return false
+    if (!pages.length) {
+      return false
+    }
     pageCause = { reason, event }
-    if (!change("pages", pages.slice(0, -1), { reason, event })) return false
+    if (!change("pages", pages.slice(0, -1), { reason, event })) {
+      return false
+    }
     store.set({ queries: queries.slice(0, pages.length - 1) })
     setQuery(queries[pages.length - 1] ?? "", reason, event)
     return true
@@ -160,57 +195,90 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
   // then its page or `onAction`. A returned Promise marks it pending.
   function run(
     key: string,
-    { event, reason = "item-press" }: { event?: Event; reason?: "item-press" | "shortcut" },
+    {
+      event,
+      reason = "item-press",
+    }: { event?: Event; reason?: "item-press" | "shortcut" }
   ) {
     const props = itemProps(key)
     // A command from the data, whether the list renders it or you do.
-    const data = findCommand(store.get().items, key) ?? findCommand(options().emptyItems, key)
-    if (!props && !data) return
-    if (props?.disabled || data?.disabled || store.get().pending.includes(key)) {
-      // A command rendered as a link would still follow its href.
-      if (event?.type === "click") event.preventDefault()
+    const data =
+      findCommand(store.get().items, key) ??
+      findCommand(options().emptyItems, key)
+    if (!props && !data) {
       return
     }
-    if (store.get().error?.key === key) store.set({ error: null })
+    if (
+      props?.disabled ||
+      data?.disabled ||
+      store.get().pending.includes(key)
+    ) {
+      // A command rendered as a link would still follow its href.
+      if (event?.type === "click") {
+        event.preventDefault()
+      }
+      return
+    }
+    if (store.get().error?.key === key) {
+      store.set({ error: null })
+    }
     // A shortcut's key press is already handled, so `onSelect` gets a fresh event to cancel.
     const selection = event && !event.defaultPrevented ? event : selectEvent()
     const results = [props?.onSelect?.(selection)]
     const page = props?.page ?? (data?.items ? data.value : undefined)
     if (!selection.defaultPrevented) {
-      if (page !== undefined) push(page, reason, event)
-      else results.push(options().onAction?.(key, { event }))
+      if (page !== undefined) {
+        push(page, reason, event)
+      } else {
+        results.push(options().onAction?.(key, { event }))
+      }
     }
     const pending = results.filter(isPromise)
-    if (!pending.length) return
+    if (!pending.length) {
+      return
+    }
     // Each command is pending on its own, so others that started meanwhile stay pending.
     store.set({ pending: [...store.get().pending, key] })
     const settled = () => store.get().pending.filter((other) => other !== key)
     Promise.all(pending).then(
       () => store.set({ pending: settled() }),
-      (failure) => store.set({ pending: settled(), error: { key, reason: failure } }),
+      (failure) =>
+        store.set({ pending: settled(), error: { key, reason: failure } })
     )
   }
 
   function onInputKeyDown(event: KeyboardEvent) {
-    if (core.navigate(event)) return
+    if (core.navigate(event)) {
+      return
+    }
     const { value, query, pages } = store.get()
     switch (event.key) {
       case "Enter": {
-        if (value === null) return
+        if (value === null) {
+          return
+        }
         const el = core.listbox.element(value)
         // Links follow themselves, so routers and modifier keys work.
-        if (el?.matches("a[href]")) el.click()
-        else run(value, { event })
+        if (el?.matches("a[href]")) {
+          el.click()
+        } else {
+          run(value, { event })
+        }
         event.preventDefault()
         return
       }
       // Escape steps back one thing at a time: the search text, then a page.
       // With neither, it's left to a dialog around the list.
       case "Escape":
-        if (!query && !pages.length) return
+        if (!query && !pages.length) {
+          return
+        }
         event.preventDefault()
-        if (query) setQuery("", "escape-key", event)
-        else pop("escape-key", event)
+        if (query) {
+          setQuery("", "escape-key", event)
+        } else {
+          pop("escape-key", event)
+        }
         return
       case "Backspace":
         // Backspace in an empty field goes back a page.
@@ -223,7 +291,9 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
 
   // A value from options is highlighted in the same pass; the reveal follows it.
   deriveFromOptions(context, ["highlighted"], (synced, state) =>
-    "value" in synced && synced.value !== state.highlighted ? { highlighted: synced.value } : undefined,
+    "value" in synced && synced.value !== state.highlighted
+      ? { highlighted: synced.value }
+      : undefined
   )
   // The highlight follows the value, from a choice, a controller or a
   // controlled prop. A new page highlights its best match: at once for data,
@@ -241,8 +311,11 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
       previousPages = state.pages
       const why = pageCause ?? { reason: "imperative" }
       pageCause = null
-      if (items()) core.settle(true, why)
-      else awaiting = why
+      if (items()) {
+        core.settle(true, why)
+      } else {
+        awaiting = why
+      }
     } else if (awaiting && state.mounts !== previousMounts) {
       const why = awaiting
       awaiting = null
@@ -258,11 +331,17 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
     let offs: (() => void)[] = []
     const sync = () => {
       const { items } = store.get()
-      if (items === bound) return
+      if (items === bound) {
+        return
+      }
       bound = items
       offs.forEach((off) => off())
       offs = commandShortcuts(items).map(({ value, shortcut }) =>
-        shortcuts.register(shortcut, (event) => run(value, { event, reason: "shortcut" }), { layer: el }),
+        shortcuts.register(
+          shortcut,
+          (event) => run(value, { event, reason: "shortcut" }),
+          { layer: el }
+        )
       )
     }
     sync()
@@ -275,15 +354,21 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
 
   // A composed command's shortcut, registered while its props name one. The
   // root already binds the shortcuts of commands from the data.
-  function bindItemShortcut(el: HTMLElement, key: string, onProps: (listener: () => void) => () => void) {
+  function bindItemShortcut(
+    el: HTMLElement,
+    key: string,
+    onProps: (listener: () => void) => () => void
+  ) {
     return bindPartShortcut(
       () => {
         const props = itemProps(key)
-        return props?.data || findCommand(store.get().items, key)?.shortcut ? undefined : props?.shortcut
+        return props?.data || findCommand(store.get().items, key)?.shortcut
+          ? undefined
+          : props?.shortcut
       },
       (event) => run(key, { event, reason: "shortcut" }),
       { layer: el },
-      onProps,
+      onProps
     )
   }
 
@@ -292,30 +377,47 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
     getValue: () => store.get().value,
     setValue: (
       value: string | null,
-      { reason = "imperative", event }: CommandChangeOptions<CommandValueChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: CommandChangeOptions<CommandValueChangeReason> = {}
     ) => highlight(value, { reason, event }),
     getQuery: () => store.get().query,
     setQuery: (
       query: string,
-      { reason = "imperative", event }: CommandChangeOptions<CommandQueryChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: CommandChangeOptions<CommandQueryChangeReason> = {}
     ) => setQuery(query, reason, event),
     getPages: () => store.get().pages,
     setPages(
       pages: string[],
-      { reason = "imperative", event }: CommandChangeOptions<CommandPagesChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: CommandChangeOptions<CommandPagesChangeReason> = {}
     ) {
       pageCause = { reason, event }
       return change("pages", pages, { reason, event })
     },
     push: (
       page: string,
-      { reason = "imperative", event }: CommandChangeOptions<CommandPagesChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: CommandChangeOptions<CommandPagesChangeReason> = {}
     ) => push(page, reason, event),
-    pop: ({ reason = "imperative", event }: CommandChangeOptions<CommandPagesChangeReason> = {}) =>
+    pop: ({
+      reason = "imperative",
+      event,
+    }: CommandChangeOptions<CommandPagesChangeReason> = {}) =>
       pop(reason, event),
     run(value?: string) {
       const key = value ?? store.get().value
-      if (key !== null) run(key, {})
+      if (key !== null) {
+        run(key, {})
+      }
     },
     focus: () => element("input")?.focus(),
     // Internal. Used by slots and adapters.
@@ -326,7 +428,8 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
       run,
       press: (key: string, event?: Event) => run(key, { event }),
       text: (state: CommandStore) => state.query,
-      typed: (el: HTMLInputElement, event?: Event) => setQuery(el.value, "input-change", event),
+      typed: (el: HTMLInputElement, event?: Event) =>
+        setQuery(el.value, "input-change", event),
       onInputKeyDown,
       // Whether a command is on the page shown: outside any page, or on the current one.
       onCurrentPage: (state: CommandStore, page: string | null | undefined) =>
@@ -342,7 +445,9 @@ function commandApi(context: PrimitiveContext<CommandOptions, CommandStore, stri
 
   // The value it starts with is highlighted, and data commands are known at
   // once, so without one the first is, before anything mounts.
-  if (store.get().value !== null) core.listbox.highlight(store.get().value)
+  if (store.get().value !== null) {
+    core.listbox.highlight(store.get().value)
+  }
   core.settle(false, null)
   return api
 }

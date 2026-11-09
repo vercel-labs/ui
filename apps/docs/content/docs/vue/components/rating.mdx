@@ -5,7 +5,10 @@ description: Pick a score from a row of stars, whole or half, with a preview as 
 
 Use a rating to collect a score, like how a stay went, or to show one, like an average. Each star is a radio, so it works like a radio group, with one value and a single tab stop.
 
-<ComponentExample name="rating/basic" caption="Choose a star, then use the arrow keys to change the score." />
+<ComponentExample
+  name="rating/basic"
+  caption="Choose a star, then use the arrow keys to change the score."
+/>
 
 ## Installation
 
@@ -86,7 +89,10 @@ While a pointer moves over the stars, they show the score under it: `--rating-fi
 
 Set `deselectable` to let people clear their score: a press on the checked star, or Space on it, sets the score back to `null`.
 
-<ComponentExample name="rating/deselectable" caption="Press the fourth star. The score clears." />
+<ComponentExample
+  name="rating/deselectable"
+  caption="Press the fourth star. The score clears."
+/>
 
 ## Read-Only
 
@@ -94,7 +100,10 @@ Set `read-only` to show a score that can't change, like an average. Any score sh
 
 Name a read-only rating with `get-value-label`, so its name includes the score. An `aria-label` would replace it.
 
-<ComponentExample name="rating/read-only" caption="An average of 4.2, named Rated 4.2 out of 5." />
+<ComponentExample
+  name="rating/read-only"
+  caption="An average of 4.2, named Rated 4.2 out of 5."
+/>
 
 ## Disabled
 
@@ -130,7 +139,12 @@ Each radio renders a hidden native radio, so the rating takes part in forms. Set
 Set `max` for the number of stars, and `loop` to let the arrow keys wrap from the last star to the first. Each radio is named by `get-value-label`, which gets the score and `max` and says "1 star" or "3 stars" by default.
 
 ```vue
-<Rating aria-label="Difficulty" :max="10" loop :get-value-label="(value, max) => `${value} of ${max}`" />
+<Rating
+  aria-label="Difficulty"
+  :max="10"
+  loop
+  :get-value-label="(value, max) => `${value} of ${max}`"
+/>
 ```
 
 ## Styling
@@ -159,21 +173,33 @@ Props are the same as below. `onValueChange` is `v-model:value`, or `@value-chan
 
 ### Rating
 
-<TypeTable path="../../packages/core/src/components/rating/rating.ts" name="RatingOptions" />
+<TypeTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingOptions"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive.
 
-<StateTable path="../../packages/core/src/components/rating/rating.ts" name="RatingState" />
+<StateTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingState"
+/>
 
-<StateTable path="../../packages/core/src/components/rating/rating.ts" name="RatingItemState" />
+<StateTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingItemState"
+/>
 
 ### Reasons
 
 `details.reason` says why the score changed.
 
-<ReasonTable path="../../packages/core/src/components/rating/rating.ts" name="RatingValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingValueChangeReason"
+/>
 
 ### Controller
 
@@ -181,7 +207,10 @@ Create one with `createRatingController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/rating/rating.ts" name="RatingController" />
+<ControllerTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingController"
+/>
 
 ### Events
 

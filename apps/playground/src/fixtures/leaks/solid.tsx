@@ -5,8 +5,18 @@ import {
   AccordionPanel,
   AccordionTrigger,
 } from "@ui-sdk/solid/accordion"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem, ComboboxList } from "@ui-sdk/solid/combobox"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@ui-sdk/solid/combobox"
 import {
   Dialog,
   DialogClose,
@@ -16,8 +26,17 @@ import {
   DialogTrigger,
 } from "@ui-sdk/solid/dialog"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@ui-sdk/solid/popover"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "@ui-sdk/solid/popover"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/solid/resizable"
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -25,15 +44,38 @@ import {
   ScrollAreaThumb,
   ScrollAreaViewport,
 } from "@ui-sdk/solid/scroll-area"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/solid/select"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/solid/slider"
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/solid/slider"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/solid/tabs"
 import { Toolbar, ToolbarButton } from "@ui-sdk/solid/toolbar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
 import { Tree } from "@ui-sdk/solid/tree"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
-import { exposeLayers, leakComponent, leakTreeItems, perfItems } from "tests/fixtures/perf.ts"
+import {
+  exposeLayers,
+  leakComponent,
+  leakTreeItems,
+  perfItems,
+} from "tests/fixtures/perf.ts"
 
 // One component for the leak specs, picked with ?component=, and a button
 // that mounts and unmounts it. The scroll area hides its scrollbars soon after
@@ -102,7 +144,9 @@ const components = {
       <DialogTrigger>Open</DialogTrigger>
       <DialogContent class="dialog">
         <DialogTitle class="title">Delete it?</DialogTitle>
-        <DialogDescription class="description">This can't be undone.</DialogDescription>
+        <DialogDescription class="description">
+          This can't be undone.
+        </DialogDescription>
         <DialogClose>Cancel</DialogClose>
       </DialogContent>
     </Dialog>
@@ -168,7 +212,9 @@ const components = {
   ),
   toolbar: () => (
     <Toolbar class="toolbar" aria-label="Formatting">
-      <For each={items}>{(item) => <ToolbarButton>{item.label}</ToolbarButton>}</For>
+      <For each={items}>
+        {(item) => <ToolbarButton>{item.label}</ToolbarButton>}
+      </For>
     </Toolbar>
   ),
   tree: () => <Tree class="tree" aria-label="Files" items={leakTreeItems()} />,
@@ -181,9 +227,15 @@ const components = {
   ),
   "scroll-area": () => (
     <ScrollArea class="scroll-area" scrollHideDelay={50}>
-      <ScrollAreaViewport class="scroll-area-viewport" role="region" aria-label="Items">
+      <ScrollAreaViewport
+        class="scroll-area-viewport"
+        role="region"
+        aria-label="Items"
+      >
         <ScrollAreaContent>
-          <For each={lines}>{(line) => <p class="scroll-area-item">{line.label}</p>}</For>
+          <For each={lines}>
+            {(line) => <p class="scroll-area-item">{line.label}</p>}
+          </For>
         </ScrollAreaContent>
       </ScrollAreaViewport>
       <ScrollAreaScrollbar class="scroll-area-scrollbar">

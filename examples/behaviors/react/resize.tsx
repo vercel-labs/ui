@@ -13,17 +13,26 @@ import {
 import { usePart, usePrimitive, type PartProps } from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
-type FrameState = { boxes: Record<string, ResizeBox>; draft: ResizeDraft | null }
+type FrameState = {
+  boxes: Record<string, ResizeBox>
+  draft: ResizeDraft | null
+}
 
 type FrameOptions = {
   defaultBox: ResizeBox
-  onBoxesChange?: (boxes: Record<string, ResizeBox>, details: ChangeDetails<ResizeReason>) => void
+  onBoxesChange?: (
+    boxes: Record<string, ResizeBox>,
+    details: ChangeDetails<ResizeReason>
+  ) => void
 }
 
 const frame = definePrimitive({
   name: "frame",
   options: { defaultBox: "value", onBoxesChange: "callback" },
-  state: (options: FrameOptions): FrameState => ({ boxes: { frame: options.defaultBox }, draft: null }),
+  state: (options: FrameOptions): FrameState => ({
+    boxes: { frame: options.defaultBox },
+    draft: null,
+  }),
   live: ["draft"],
   api: (context) => {
     const change = createChange(context)
@@ -40,28 +49,50 @@ const frame = definePrimitive({
   },
   slots: (slot) => ({
     box: slot({
-      attrs: (state, { api }) => ({ style: `${api.resize.boxStyle(state, "frame")};touch-action:none` }),
-      live: live<FrameState, any, {}>((state, { api }) => ({ style: api.resize.style(state, "frame") })),
-      on: { pointerdown: (event, { el, api }) => api.resize.pointerdown(event, "frame", "move", el!) },
+      attrs: (state, { api }) => ({
+        style: `${api.resize.boxStyle(state, "frame")};touch-action:none`,
+      }),
+      live: live<FrameState, any, {}>((state, { api }) => ({
+        style: api.resize.style(state, "frame"),
+      })),
+      on: {
+        pointerdown: (event, { el, api }) =>
+          api.resize.pointerdown(event, "frame", "move", el!),
+      },
     }),
     handle: slot<{ id: string; handle: ResizeHandle }>({
       props: { handle: "string" },
       attrs: (_state, { props, api }) => api.resize.handleAttrs(props.handle),
       on: {
-        pointerdown: (event, { el, api, props }) => api.resize.pointerdown(event, "frame", props.handle, el!),
-        keydown: (event, { api, props }) => api.resize.keydown(event, "frame", props.handle),
+        pointerdown: (event, { el, api, props }) =>
+          api.resize.pointerdown(event, "frame", props.handle, el!),
+        keydown: (event, { api, props }) =>
+          api.resize.keydown(event, "frame", props.handle),
       },
     }),
   }),
 })
 
-function Frame({ defaultBox, onBoxesChange, ...props }: FrameOptions & PartProps<"div">) {
+function Frame({
+  defaultBox,
+  onBoxesChange,
+  ...props
+}: FrameOptions & PartProps<"div">) {
   const handle = usePrimitive(frame, { defaultBox, onBoxesChange })
   return usePart(handle, "box", {}, props, "div")
 }
 
-function FrameHandle({ handle, ...props }: { handle: ResizeHandle } & PartProps<"button">) {
-  return usePart(frame, "handle", { id: handle, handle }, { type: "button", ...props }, "button")
+function FrameHandle({
+  handle,
+  ...props
+}: { handle: ResizeHandle } & PartProps<"button">) {
+  return usePart(
+    frame,
+    "handle",
+    { id: handle, handle },
+    { type: "button", ...props },
+    "button"
+  )
 }
 
 const handles: Partial<Record<ResizeHandle, string>> = {
@@ -83,11 +114,17 @@ function Example() {
         aria-label="Frame"
         defaultBox={{ x: 68, y: 40, width: 136, height: 96 }}
         onBoxesChange={({ frame }, details) =>
-          log(`${frame.width} × ${frame.height} at ${frame.x}, ${frame.y} (${details.reason})`)
+          log(
+            `${frame.width} × ${frame.height} at ${frame.x}, ${frame.y} (${details.reason})`
+          )
         }
       >
         {(Object.keys(handles) as ResizeHandle[]).map((name) => (
-          <FrameHandle key={name} handle={name} aria-label={`Resize ${handles[name]}`} />
+          <FrameHandle
+            key={name}
+            handle={name}
+            aria-label={`Resize ${handles[name]}`}
+          />
         ))}
       </Frame>
     </div>

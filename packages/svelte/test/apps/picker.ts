@@ -11,13 +11,22 @@ type PickerOptions = {
 
 const picker = definePrimitive({
   name: "picker",
-  options: { value: "string", defaultValue: "string", onValueChange: "callback" },
-  state: (options: PickerOptions) => ({ value: options.value ?? options.defaultValue ?? "" }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  options: {
+    value: "string",
+    defaultValue: "string",
+    onValueChange: "callback",
+  },
+  state: (options: PickerOptions) => ({
+    value: options.value ?? options.defaultValue ?? "",
+  }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   controlled: ["value"],
   api: (context) => {
     const change = createChange(context)
-    return { pick: (value: string) => change("value", value, { reason: "item-press" }) }
+    return {
+      pick: (value: string) => change("value", value, { reason: "item-press" }),
+    }
   },
   slots: (slot) => ({
     root: slot<{}, { value: string }>({
@@ -27,7 +36,9 @@ const picker = definePrimitive({
     item: slot<{ value: string }, { picked: boolean }>({
       props: { value: "string" },
       state: (state, { key }) => ({ picked: state.value === key }),
-      attrs: (state, { key }) => ({ "data-picked": state.value === key ? "" : undefined }),
+      attrs: (state, { key }) => ({
+        "data-picked": state.value === key ? "" : undefined,
+      }),
     }),
     label: slot<{ value?: string; item?: string; id?: string }, {}>({
       props: {
@@ -35,8 +46,14 @@ const picker = definePrimitive({
         item: { kind: "string", from: "item.value" },
         id: "id",
       },
-      attrs: (_state, { props }) => ({ id: props.id, "data-value": props.value, "data-item": props.item }),
-      on: { click: (_event, { api, props }) => props.value && api.pick(props.value) },
+      attrs: (_state, { props }) => ({
+        id: props.id,
+        "data-value": props.value,
+        "data-item": props.item,
+      }),
+      on: {
+        click: (_event, { api, props }) => props.value && api.pick(props.value),
+      },
     }),
   }),
 })

@@ -25,10 +25,17 @@
   ])
   const newest = $derived(members[members.length - 1])
 
-  function save(event: SubmitEvent & { currentTarget: HTMLFormElement }, member: Member | undefined) {
-    if ((event.submitter as HTMLButtonElement).value !== "save" || !member) return
+  function save(
+    event: SubmitEvent & { currentTarget: HTMLFormElement },
+    member: Member | undefined
+  ) {
+    if ((event.submitter as HTMLButtonElement).value !== "save" || !member) {
+      return
+    }
     const role = String(new FormData(event.currentTarget).get("role"))
-    members = members.map((entry) => (entry.name === member.name ? { ...entry, role } : entry))
+    members = members.map((entry) =>
+      entry.name === member.name ? { ...entry, role } : entry
+    )
   }
 </script>
 
@@ -37,8 +44,13 @@
     <button
       type="button"
       onclick={async (event) => {
-        const result = await popover.open({ payload: newest, anchor: event.currentTarget })
-        log(`Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`)
+        const result = await popover.open({
+          payload: newest,
+          anchor: event.currentTarget,
+        })
+        log(
+          `Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`
+        )
       }}
     >
       Edit Newest Member
@@ -66,14 +78,22 @@
     controller={popover}
     onPayloadChange={(payload) => {
       const member = payload as Member | undefined
-      if (member) log(`Editing ${member.name}`)
+      if (member) {
+        log(`Editing ${member.name}`)
+      }
     }}
   >
     <PopoverContent align="end" sideOffset={8}>
       {#snippet children(state: PopoverContentState<Member>)}
         <PopoverTitle>{state.payload?.name}</PopoverTitle>
-        <PopoverDescription>Roles decide what they can change.</PopoverDescription>
-        <form data-slot="stack" method="dialog" onsubmit={(event) => save(event, state.payload)}>
+        <PopoverDescription
+          >Roles decide what they can change.</PopoverDescription
+        >
+        <form
+          data-slot="stack"
+          method="dialog"
+          onsubmit={(event) => save(event, state.payload)}
+        >
           <Field>
             <FieldLabel>Role</FieldLabel>
             {#key state.payload?.name}
@@ -90,7 +110,8 @@
           </Field>
           <div data-slot="row">
             <button type="submit" value="cancel" formnovalidate>Cancel</button>
-            <button type="submit" value="save" data-variant="solid">Save</button>
+            <button type="submit" value="save" data-variant="solid">Save</button
+            >
           </div>
         </form>
       {/snippet}

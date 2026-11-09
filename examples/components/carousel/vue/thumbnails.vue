@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Carousel, CarouselContent, CarouselItem, CarouselViewport } from "@ui-sdk/vue/carousel"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselViewport,
+} from "@ui-sdk/vue/carousel"
 import { ref, useTemplateRef, watch } from "vue"
 
 const photos = [
@@ -16,7 +21,7 @@ const strip = useTemplateRef<{ $el: HTMLElement }>("strip")
 watch(page, (next) =>
   strip.value?.$el
     .querySelectorAll("button")
-    [next - 1]?.scrollIntoView({ block: "nearest", inline: "nearest" }),
+    [next - 1]?.scrollIntoView({ block: "nearest", inline: "nearest" })
 )
 </script>
 
@@ -33,11 +38,24 @@ watch(page, (next) =>
         </CarouselContent>
       </CarouselViewport>
     </Carousel>
-    <Carousel ref="strip" aria-label="Thumbnails" drag-free slides-per-page="auto">
+    <Carousel
+      ref="strip"
+      aria-label="Thumbnails"
+      drag-free
+      slides-per-page="auto"
+    >
       <CarouselViewport>
         <CarouselContent>
-          <CarouselItem v-for="(photo, index) in photos" :key="photo.name" :aria-label="photo.name">
-            <button type="button" :aria-pressed="page === index + 1" @click="page = index + 1">
+          <CarouselItem
+            v-for="(photo, index) in photos"
+            :key="photo.name"
+            :aria-label="photo.name"
+          >
+            <button
+              type="button"
+              :aria-pressed="page === index + 1"
+              @click="page = index + 1"
+            >
               {{ photo.name }}
             </button>
           </CarouselItem>

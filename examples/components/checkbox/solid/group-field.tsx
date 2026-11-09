@@ -1,5 +1,14 @@
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/solid/checkbox"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -17,13 +26,17 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        const entries = [...new FormData(event.currentTarget)].map(
+          ([name, value]) => `${name}=${value}`
+        )
         log(`Saved ${entries.join("&")}`)
       }}
     >
       <Field>
         <FieldLabel>Notifications</FieldLabel>
-        <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+        <FieldDescription>
+          Choose how we tell you about your orders.
+        </FieldDescription>
         <CheckboxGroup name="notifications" required>
           <For each={channels}>
             {(channel) => (

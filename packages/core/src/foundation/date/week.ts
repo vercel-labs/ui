@@ -13,8 +13,11 @@ for (const [day, regions] of [
   ],
   [5, "MV"],
   [6, "AF BH DJ DZ EG IQ IR JO KW LY OM QA SD SY"],
-] as const)
-  for (const region of regions.split(" ")) regionDays.set(region, day)
+] as const) {
+  for (const region of regions.split(" ")) {
+    regionDays.set(region, day)
+  }
+}
 
 // The `-u-fw-` extension a tag can carry to pick the first day itself, like `en-US-u-fw-mon`.
 const extensionDays = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"]
@@ -31,29 +34,42 @@ const cache = new Map<string, number>()
 function firstDayOfWeek(locale?: string) {
   const key = locale ?? ""
   let day = cache.get(key)
-  if (day === undefined) cache.set(key, (day = resolveFirstDay(locale)))
+  if (day === undefined) {
+    cache.set(key, (day = resolveFirstDay(locale)))
+  }
   return day
 }
 
 function resolveFirstDay(locale: string | undefined) {
   let tag: Intl.Locale
   try {
-    tag = new Intl.Locale(locale ?? new Intl.DateTimeFormat().resolvedOptions().locale)
+    tag = new Intl.Locale(
+      locale ?? new Intl.DateTimeFormat().resolvedOptions().locale
+    )
   } catch {
     return 1
   }
-  const extension = /-u(?:-[a-z0-9]{2,8})*?-fw-([a-z]{3})\b/i.exec(tag.toString())?.[1]?.toLowerCase()
-  if (extension && extensionDays.includes(extension)) return extensionDays.indexOf(extension)
+  const extension = /-u(?:-[a-z0-9]{2,8})*?-fw-([a-z]{3})\b/i
+    .exec(tag.toString())?.[1]
+    ?.toLowerCase()
+  if (extension && extensionDays.includes(extension)) {
+    return extensionDays.indexOf(extension)
+  }
   const info = weekInfo(tag)
   // `getWeekInfo` counts from 1 for Monday to 7 for Sunday.
-  if (info) return info.firstDay % 7
+  if (info) {
+    return info.firstDay % 7
+  }
   return regionDays.get(tag.maximize().region ?? "") ?? 1
 }
 
 type WeekInfo = { firstDay: number }
 
 function weekInfo(tag: Intl.Locale) {
-  const locale = tag as Intl.Locale & { getWeekInfo?: () => WeekInfo; weekInfo?: WeekInfo }
+  const locale = tag as Intl.Locale & {
+    getWeekInfo?: () => WeekInfo
+    weekInfo?: WeekInfo
+  }
   try {
     return locale.getWeekInfo?.() ?? locale.weekInfo
   } catch {

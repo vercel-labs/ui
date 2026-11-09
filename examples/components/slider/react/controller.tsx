@@ -23,10 +23,16 @@ function Example() {
         <button type="button" onClick={() => volume.setValue(0)}>
           Mute
         </button>
-        <button type="button" onClick={() => volume.setValue(volume.getValue() + 10)}>
+        <button
+          type="button"
+          onClick={() => volume.setValue(volume.getValue() + 10)}
+        >
           Louder
         </button>
-        <button type="button" onClick={() => log(`Volume is ${volume.getValue()}`)}>
+        <button
+          type="button"
+          onClick={() => log(`Volume is ${volume.getValue()}`)}
+        >
           Read
         </button>
         <button type="button" onClick={() => volume.focus()}>
@@ -37,7 +43,9 @@ function Example() {
         <Slider
           defaultValue={40}
           controller={volume}
-          onValueChange={(value, details) => log(`Volume ${value} (${details.reason})`)}
+          onValueChange={(value, details) =>
+            log(`Volume ${value} (${details.reason})`)
+          }
         >
           <div data-slot="row">
             <FieldLabel>Volume</FieldLabel>

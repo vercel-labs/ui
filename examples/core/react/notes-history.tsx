@@ -11,7 +11,9 @@ const notes = definePrimitive({
     const { store } = context
     const history = createHistory("", { limit: 10, groupDelay: 800 })
     const show = (text: string | undefined) => {
-      if (text !== undefined) store.set({ text })
+      if (text !== undefined) {
+        store.set({ text })
+      }
       store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
     }
     return {
@@ -20,9 +22,13 @@ const notes = definePrimitive({
         show(text)
       },
       key(event: KeyboardEvent) {
-        if (matchesShortcut(event, "mod+shift+z")) show(history.redo())
-        else if (matchesShortcut(event, "mod+z")) show(history.undo())
-        else return
+        if (matchesShortcut(event, "mod+shift+z")) {
+          show(history.redo())
+        } else if (matchesShortcut(event, "mod+z")) {
+          show(history.undo())
+        } else {
+          return
+        }
         event.preventDefault()
       },
       seal: () => history.seal(),
@@ -42,21 +48,34 @@ const notes = definePrimitive({
     input: slot({
       attrs: (state) => ({ value: state.text }),
       on: {
-        input: (event, { api }) => api.type((event.target as HTMLTextAreaElement).value),
+        input: (event, { api }) =>
+          api.type((event.target as HTMLTextAreaElement).value),
         keydown: (event, { api }) => api.key(event),
         pointerup: (_event, { api }) => api.seal(),
       },
     }),
     undo: slot({
-      attrs: (state) => ({ type: "button", disabled: state.canUndo ? undefined : "" }),
+      attrs: (state) => ({
+        type: "button",
+        disabled: state.canUndo ? undefined : "",
+      }),
       press: ({ api }) => api.undo(),
     }),
     redo: slot({
-      attrs: (state) => ({ type: "button", disabled: state.canRedo ? undefined : "" }),
+      attrs: (state) => ({
+        type: "button",
+        disabled: state.canRedo ? undefined : "",
+      }),
       press: ({ api }) => api.redo(),
     }),
-    fix: slot({ attrs: () => ({ type: "button" }), press: ({ api }) => api.fix() }),
-    clear: slot({ attrs: () => ({ type: "button" }), press: ({ api }) => api.clear() }),
+    fix: slot({
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.fix(),
+    }),
+    clear: slot({
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.clear(),
+    }),
   }),
 })
 

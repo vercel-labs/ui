@@ -31,7 +31,10 @@ import {
   selectItemIcons,
   selectSelectAll,
 } from "@ui-sdk/core/renderer"
-import { attrs as partAttrs, press } from "@ui-sdk/core/internal/foundation/kernel/part"
+import {
+  attrs as partAttrs,
+  press,
+} from "@ui-sdk/core/internal/foundation/kernel/part"
 import { selectAllKey } from "@ui-sdk/core/internal/foundation/lists/listbox-keys"
 import { tooltip } from "@ui-sdk/core/tooltip"
 import { hoverCard } from "@ui-sdk/core/hover-card"
@@ -72,14 +75,20 @@ import { repoRoot } from "./repo-root"
 // Core files are named from their folder, like "motion/presence.ts" or "menu/menu.ts".
 const coreSource = (file: string) => {
   const foundation = path.join(repoRoot, "packages/core/src/foundation", file)
-  return existsSync(foundation) ? foundation : path.join(repoRoot, "packages/core/src/components", file)
+  return existsSync(foundation)
+    ? foundation
+    : path.join(repoRoot, "packages/core/src/components", file)
 }
 
 type Description = { text: string; values?: string[] }
 
 // Date Input and Time Input set the same attributes.
-const segmentedDescriptions = (kind: "date" | "time"): Record<string, Description> => ({
-  "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+const segmentedDescriptions = (
+  kind: "date" | "time"
+): Record<string, Description> => ({
+  "data-disabled": {
+    text: "Present when disabled, by its own prop or a `<fieldset>`.",
+  },
   "data-readonly": { text: "Present when read-only." },
   "data-required": { text: "Present when required." },
   "data-invalid": {
@@ -89,12 +98,23 @@ const segmentedDescriptions = (kind: "date" | "time"): Record<string, Descriptio
         : "Present while the time is before `min` or after `max`.",
   },
   "root:data-empty": { text: "Present while every segment is empty." },
-  "segment:data-empty": { text: "Present while the segment is empty. It shows its placeholder." },
+  "segment:data-empty": {
+    text: "Present while the segment is empty. It shows its placeholder.",
+  },
   "segment:data-type": {
     text: "The segment's unit, or `literal` for the text between segments.",
     values:
       kind === "date"
-        ? ["year", "month", "day", "hour", "minute", "second", "dayPeriod", "literal"]
+        ? [
+            "year",
+            "month",
+            "day",
+            "hour",
+            "minute",
+            "second",
+            "dayPeriod",
+            "literal",
+          ]
         : ["hour", "minute", "second", "dayPeriod", "literal"],
   },
 })
@@ -103,9 +123,11 @@ const segmentedDescriptions = (kind: "date" | "time"): Record<string, Descriptio
 // an adapter registers one when its part renders.
 function withFeatures<T extends Pick<PrimitiveInstance, "use">>(
   instance: T,
-  features: Parameters<PrimitiveInstance["use"]>[0][],
+  features: Parameters<PrimitiveInstance["use"]>[0][]
 ) {
-  for (const feature of features) instance.use(feature)
+  for (const feature of features) {
+    instance.use(feature)
+  }
   return instance
 }
 
@@ -127,20 +149,39 @@ function resizing(instance: ReturnType<typeof resizable>) {
 
 // A dialog whose Close part's action is running, for data-pending.
 function pending(instance: PrimitiveInstance) {
-  press(instance.part("close", { id: "pending", action: () => new Promise(() => {}) }))?.()
+  press(
+    instance.part("close", {
+      id: "pending",
+      action: () => new Promise(() => {}),
+    })
+  )?.()
   return instance
 }
 
 const DIALOG_DESCRIPTIONS: Record<string, Description> = {
-  "data-open": { text: "Present while the dialog is open. On a trigger, while it's open from that trigger." },
-  "data-closed": { text: "Present while the dialog is closed, including while it animates out." },
+  "data-open": {
+    text: "Present while the dialog is open. On a trigger, while it's open from that trigger.",
+  },
+  "data-closed": {
+    text: "Present while the dialog is closed, including while it animates out.",
+  },
   "trigger:data-disabled": { text: "Present when the trigger is disabled." },
-  "data-nested": { text: "Present when the dialog was opened from inside another dialog." },
-  "data-nested-open": { text: "Present while a dialog opened from inside this one is open." },
+  "data-nested": {
+    text: "Present when the dialog was opened from inside another dialog.",
+  },
+  "data-nested-open": {
+    text: "Present while a dialog opened from inside this one is open.",
+  },
   "data-pending": { text: "Present on a Close part while its action runs." },
-  "data-keyboard": { text: "Present while the on-screen keyboard covers part of the page." },
-  "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-  "data-ending-style": { text: "Present while the dialog animates out. Style the state you animate to." },
+  "data-keyboard": {
+    text: "Present while the on-screen keyboard covers part of the page.",
+  },
+  "data-starting-style": {
+    text: "Present for the first frame. Style the state you animate from.",
+  },
+  "data-ending-style": {
+    text: "Present while the dialog animates out. Style the state you animate to.",
+  },
 }
 
 // A file for the file input's samples.
@@ -168,7 +209,13 @@ const components: Record<
 > = {
   meter: {
     instances: () => [meter({ id: "docs", value: 40 })],
-    samples: { root: [{}], track: [{}], indicator: [{}], label: [{}], value: [{}] },
+    samples: {
+      root: [{}],
+      track: [{}],
+      indicator: [{}],
+      label: [{}],
+      value: [{}],
+    },
     interactive: [],
     descriptions: {},
     parts: { root: { react: "Meter", web: "<ui-meter>" } },
@@ -176,11 +223,17 @@ const components: Record<
   menu: {
     instances: () =>
       [false, true].flatMap((open) => {
-        const root = withFeatures(menu({ id: "docs", defaultOpen: open }), menuFeatures)
+        const root = withFeatures(
+          menu({ id: "docs", defaultOpen: open }),
+          menuFeatures
+        )
         // A submenu, for attributes only nested menus have.
         return [
           root,
-          withFeatures(menu({ id: "docs-sub", defaultOpen: open, parent: root.api }), menuFeatures),
+          withFeatures(
+            menu({ id: "docs-sub", defaultOpen: open, parent: root.api }),
+            menuFeatures
+          ),
         ]
       }),
     samples: {
@@ -214,28 +267,50 @@ const components: Record<
     ],
     extra: { item: ["data-has-icon"], content: ["data-has-icons"] },
     descriptions: {
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on an item while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on an item while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any item inside holds an icon part, so items without one can line up.",
       },
       "data-open": {
         text: "Present while the menu is open. A submenu trigger has it while its submenu is open.",
       },
-      "data-closed": { text: "Present while the menu is closed, including while it animates out." },
-      "trigger:data-open": { text: "Present on the trigger that opened the menu, while it's open." },
-      "trigger:data-closed": { text: "Present on a trigger while the menu isn't open from it." },
-      "context-trigger:data-open": { text: "Present on the area that opened the menu, while it's open." },
-      "context-trigger:data-closed": { text: "Present on an area while the menu isn't open from it." },
+      "data-closed": {
+        text: "Present while the menu is closed, including while it animates out.",
+      },
+      "trigger:data-open": {
+        text: "Present on the trigger that opened the menu, while it's open.",
+      },
+      "trigger:data-closed": {
+        text: "Present on a trigger while the menu isn't open from it.",
+      },
+      "context-trigger:data-open": {
+        text: "Present on the area that opened the menu, while it's open.",
+      },
+      "context-trigger:data-closed": {
+        text: "Present on an area while the menu isn't open from it.",
+      },
       "data-checked": {
         text: "Present on checked checkbox items, and on the radio item that's its group's value.",
       },
       "data-unchecked": { text: "Present on items that aren't checked." },
-      "item-indicator:data-checked": { text: "Present while its item is checked." },
-      "item-indicator:data-unchecked": { text: "Present while its item isn't checked, with `keepMounted`." },
+      "item-indicator:data-checked": {
+        text: "Present while its item is checked.",
+      },
+      "item-indicator:data-unchecked": {
+        text: "Present while its item isn't checked, with `keepMounted`.",
+      },
       "data-disabled": { text: "Present when the item can't be chosen." },
-      "trigger:data-disabled": { text: "Present when the trigger is disabled." },
-      "data-highlighted": { text: "Present on the item with keyboard focus or under the pointer." },
+      "trigger:data-disabled": {
+        text: "Present when the trigger is disabled.",
+      },
+      "data-highlighted": {
+        text: "Present on the item with keyboard focus or under the pointer.",
+      },
       "data-presentation": {
         text: "How the menu presents this time it's open. Submenus present like their root.",
         values: ["popover", "sheet"],
@@ -245,18 +320,39 @@ const components: Record<
         text: "Where the menu ended up, after flipping away from edges.",
         values: ["top", "right", "bottom", "left"],
       },
-      "data-align": { text: "How the menu lines up with its trigger.", values: ["start", "center", "end"] },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while the menu animates out. Style the state you animate to." },
+      "data-align": {
+        text: "How the menu lines up with its trigger.",
+        values: ["start", "center", "end"],
+      },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while the menu animates out. Style the state you animate to.",
+      },
     },
   },
   select: {
     instances: () =>
       [
-        ...[false, true].map((open) => select({ id: "docs", defaultOpen: open, defaultValue: "a" })),
-        select({ id: "docs-form", disabled: true, readOnly: true, required: true }),
-        select({ id: "docs-multiple", multiple: true, defaultValue: ["a"], status: "loading" }),
-      ].map((instance) => withFeatures(instance, [selectItemIcons, selectSelectAll])),
+        ...[false, true].map((open) =>
+          select({ id: "docs", defaultOpen: open, defaultValue: "a" })
+        ),
+        select({
+          id: "docs-form",
+          disabled: true,
+          readOnly: true,
+          required: true,
+        }),
+        select({
+          id: "docs-multiple",
+          multiple: true,
+          defaultValue: ["a"],
+          status: "loading",
+        }),
+      ].map((instance) =>
+        withFeatures(instance, [selectItemIcons, selectSelectAll])
+      ),
     samples: {
       label: [{}],
       trigger: [{}, { disabled: true }],
@@ -298,58 +394,100 @@ const components: Record<
         text: "How the list presents this time it's open.",
         values: ["popover", "sheet"],
       },
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on an item while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on an item while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any item inside holds an icon part, so items without one can line up.",
       },
       "data-open": { text: "Present while the list is open." },
-      "data-closed": { text: "Present while the list is closed, including while it animates out." },
+      "data-closed": {
+        text: "Present while the list is closed, including while it animates out.",
+      },
       "data-disabled": {
         text: "Present when the select is disabled, by its own prop, a field or a `<fieldset>`.",
       },
-      "trigger:data-disabled": { text: "Present when the select or the trigger is disabled." },
+      "trigger:data-disabled": {
+        text: "Present when the select or the trigger is disabled.",
+      },
       "item:data-disabled": { text: "Present when the item can't be chosen." },
-      "clear:data-disabled": { text: "Present when the select is disabled or read-only." },
+      "clear:data-disabled": {
+        text: "Present when the select is disabled or read-only.",
+      },
       "data-readonly": { text: "Present when the select is read-only." },
       "data-required": { text: "Present when the select is required." },
-      "data-placeholder": { text: "Present while nothing is selected, so the placeholder shows." },
-      "data-selected": { text: "Present on selected items, and on the check inside them." },
+      "data-placeholder": {
+        text: "Present while nothing is selected, so the placeholder shows.",
+      },
+      "data-selected": {
+        text: "Present on selected items, and on the check inside them.",
+      },
       "data-highlighted": {
         text: "Present on the item with keyboard focus or under the pointer, or highlighted while focus stays in the search field.",
       },
       "data-matched": {
         text: "Present on an item's text while the search matched part of it, which is marked.",
       },
-      "data-checked": { text: "Present on a select-all option while every item it covers is selected." },
-      "data-unchecked": { text: "Present on a select-all option while none of its items is selected." },
-      "data-indeterminate": { text: "Present on a select-all option while some of its items are selected." },
+      "data-checked": {
+        text: "Present on a select-all option while every item it covers is selected.",
+      },
+      "data-unchecked": {
+        text: "Present on a select-all option while none of its items is selected.",
+      },
+      "data-indeterminate": {
+        text: "Present on a select-all option while some of its items are selected.",
+      },
       "select-all:data-disabled": {
         text: "Present when nothing the select-all option covers can be chosen.",
       },
       "data-empty": { text: "Present while no item matches the search." },
-      "data-loading": { text: 'Present while results load, with `status="loading"`.' },
+      "data-loading": {
+        text: 'Present while results load, with `status="loading"`.',
+      },
       "data-side": {
         text: "Where the list ended up, after flipping away from edges.",
         values: ["top", "right", "bottom", "left"],
       },
-      "data-align": { text: "How the list lines up with the trigger.", values: ["start", "center", "end"] },
+      "data-align": {
+        text: "How the list lines up with the trigger.",
+        values: ["start", "center", "end"],
+      },
       "data-modality": {
         text: "Whether the keyboard or a pointer is in use, for focus styles.",
         values: ["keyboard", "pointer"],
       },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while the list animates out. Style the state you animate to." },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while the list animates out. Style the state you animate to.",
+      },
     },
   },
   combobox: {
     instances: () =>
       [
-        ...[false, true].map((open) => combobox({ id: "docs", defaultOpen: open, defaultValue: "a" })),
-        combobox({ id: "docs-form", disabled: true, readOnly: true, required: true, status: "loading" }),
+        ...[false, true].map((open) =>
+          combobox({ id: "docs", defaultOpen: open, defaultValue: "a" })
+        ),
+        combobox({
+          id: "docs-form",
+          disabled: true,
+          readOnly: true,
+          required: true,
+          status: "loading",
+        }),
         combobox({ id: "docs-multiple", multiple: true, defaultValue: ["a"] }),
       ].map((instance) =>
-        withFeatures(instance, [comboboxChips, comboboxCreate, comboboxItemIcons, comboboxSelectAll]),
+        withFeatures(instance, [
+          comboboxChips,
+          comboboxCreate,
+          comboboxItemIcons,
+          comboboxSelectAll,
+        ])
       ),
     samples: {
       label: [{}],
@@ -397,37 +535,65 @@ const components: Record<
         text: "How the list presents this time it's open.",
         values: ["popover", "sheet"],
       },
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on an item while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on an item while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any item inside holds an icon part, so items without one can line up.",
       },
       "data-open": { text: "Present while the list is open." },
-      "data-closed": { text: "Present while the list is closed, including while it animates out." },
+      "data-closed": {
+        text: "Present while the list is closed, including while it animates out.",
+      },
       "data-disabled": {
         text: "Present when the combobox is disabled, by its own prop, a field or a `<fieldset>`.",
       },
-      "item:data-disabled": { text: "Present when the item can't be chosen, or `maxSelected` is reached." },
-      "clear:data-disabled": { text: "Present when the combobox is disabled or read-only." },
+      "item:data-disabled": {
+        text: "Present when the item can't be chosen, or `maxSelected` is reached.",
+      },
+      "clear:data-disabled": {
+        text: "Present when the combobox is disabled or read-only.",
+      },
       "chip:data-disabled": {
         text: "Present when the combobox is disabled or read-only, so the chip can't be removed.",
       },
-      "chip-remove:data-disabled": { text: "Present when the combobox is disabled or read-only." },
+      "chip-remove:data-disabled": {
+        text: "Present when the combobox is disabled or read-only.",
+      },
       "data-readonly": { text: "Present when the combobox is read-only." },
       "data-required": { text: "Present when the combobox is required." },
       "data-value": { text: "The chip's value, as the string it submits as." },
-      "data-selected": { text: "Present on selected items, and on the check inside them." },
-      "data-highlighted": { text: "Present on the highlighted item. Focus stays in the input." },
-      "create:data-highlighted": { text: "Present while the create option is highlighted." },
-      "data-pending": { text: "Present while the Promise `onCreate` returned is running." },
+      "data-selected": {
+        text: "Present on selected items, and on the check inside them.",
+      },
+      "data-highlighted": {
+        text: "Present on the highlighted item. Focus stays in the input.",
+      },
+      "create:data-highlighted": {
+        text: "Present while the create option is highlighted.",
+      },
+      "data-pending": {
+        text: "Present while the Promise `onCreate` returned is running.",
+      },
       "data-empty": { text: "Present while no item matches." },
-      "data-loading": { text: 'Present while results load, with `status="loading"`.' },
+      "data-loading": {
+        text: 'Present while results load, with `status="loading"`.',
+      },
       "data-matched": {
         text: "Present on an item's text while the input's text matched part of it, which is marked.",
       },
-      "data-checked": { text: "Present on a select-all option while every item it covers is selected." },
-      "data-unchecked": { text: "Present on a select-all option while none of its items is selected." },
-      "data-indeterminate": { text: "Present on a select-all option while some of its items are selected." },
+      "data-checked": {
+        text: "Present on a select-all option while every item it covers is selected.",
+      },
+      "data-unchecked": {
+        text: "Present on a select-all option while none of its items is selected.",
+      },
+      "data-indeterminate": {
+        text: "Present on a select-all option while some of its items are selected.",
+      },
       "select-all:data-disabled": {
         text: "Present when nothing the select-all option covers can be chosen, or choosing them all would pass `maxSelected`.",
       },
@@ -435,17 +601,27 @@ const components: Record<
         text: "Where the list ended up, after flipping away from edges.",
         values: ["top", "right", "bottom", "left"],
       },
-      "data-align": { text: "How the list lines up with the input.", values: ["start", "center", "end"] },
+      "data-align": {
+        text: "How the list lines up with the input.",
+        values: ["start", "center", "end"],
+      },
       "data-modality": {
         text: "Whether the keyboard or a pointer moves the highlight. Style a focus ring for the keyboard only.",
         values: ["keyboard", "pointer"],
       },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while the list animates out. Style the state you animate to." },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while the list animates out. Style the state you animate to.",
+      },
     },
   },
   command: {
-    instances: () => [command({ id: "docs" }), command({ id: "docs-loading", status: "loading" })],
+    instances: () => [
+      command({ id: "docs" }),
+      command({ id: "docs-loading", status: "loading" }),
+    ],
     samples: {
       root: [{}],
       input: [{}],
@@ -472,13 +648,21 @@ const components: Record<
       list: ["data-has-icons"],
     },
     descriptions: {
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on a command while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on a command while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any command inside holds an icon part, so items without one can line up.",
       },
-      "data-loading": { text: 'Present while results load, with `status="loading"`.' },
-      "data-disabled": { text: "Present when the command can't run. Arrow keys skip it." },
+      "data-loading": {
+        text: 'Present while results load, with `status="loading"`.',
+      },
+      "data-disabled": {
+        text: "Present when the command can't run. Arrow keys skip it.",
+      },
       "data-highlighted": {
         text: "Present on the highlighted command, which Enter runs. Focus stays in the field.",
       },
@@ -493,8 +677,16 @@ const components: Record<
   },
   autocomplete: {
     instances: () => [
-      ...[false, true].map((open) => autocomplete({ id: "docs", defaultOpen: open, defaultValue: "a" })),
-      autocomplete({ id: "docs-form", disabled: true, readOnly: true, required: true, status: "loading" }),
+      ...[false, true].map((open) =>
+        autocomplete({ id: "docs", defaultOpen: open, defaultValue: "a" })
+      ),
+      autocomplete({
+        id: "docs-form",
+        disabled: true,
+        readOnly: true,
+        required: true,
+        status: "loading",
+      }),
     ],
     samples: {
       label: [{}],
@@ -532,18 +724,28 @@ const components: Record<
         text: "How the suggestions present this time they're open.",
         values: ["popover", "sheet"],
       },
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on a suggestion while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on a suggestion while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any suggestion inside holds an icon part, so items without one can line up.",
       },
       "data-open": { text: "Present while the suggestions are open." },
-      "data-closed": { text: "Present while the suggestions are closed, including while they animate out." },
+      "data-closed": {
+        text: "Present while the suggestions are closed, including while they animate out.",
+      },
       "data-disabled": {
         text: "Present when the field is disabled, by its own prop, a field or a `<fieldset>`.",
       },
-      "item:data-disabled": { text: "Present when the suggestion can't be chosen. Arrow keys skip it." },
-      "clear:data-disabled": { text: "Present when the field is disabled or read-only." },
+      "item:data-disabled": {
+        text: "Present when the suggestion can't be chosen. Arrow keys skip it.",
+      },
+      "clear:data-disabled": {
+        text: "Present when the field is disabled or read-only.",
+      },
       "data-readonly": { text: "Present when the field is read-only." },
       "data-required": { text: "Present when the field is required." },
       "data-highlighted": {
@@ -553,7 +755,9 @@ const components: Record<
       "data-matched": {
         text: "Present on a suggestion's text while the field's text matched part of it, which is marked.",
       },
-      "data-loading": { text: 'Present while results load, with `status="loading"`.' },
+      "data-loading": {
+        text: 'Present while results load, with `status="loading"`.',
+      },
       "data-side": {
         text: "Where the suggestions ended up, after flipping away from edges.",
         values: ["top", "right", "bottom", "left"],
@@ -566,8 +770,12 @@ const components: Record<
         text: "Whether the keyboard or a pointer moves the highlight. Style a focus ring for the keyboard only.",
         values: ["keyboard", "pointer"],
       },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while the list animates out. Style the state you animate to." },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while the list animates out. Style the state you animate to.",
+      },
     },
   },
   tabs: {
@@ -587,8 +795,12 @@ const components: Record<
     interactive: [{ file: "motion/presence.ts", slot: "panel" }],
     extra: { tab: ["data-has-icon"], list: ["data-has-icons"] },
     descriptions: {
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on a tab while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on a tab while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any tab inside holds an icon part, so items without one can line up.",
       },
@@ -599,7 +811,9 @@ const components: Record<
       },
       "data-selected": { text: "Present on the selected tab and its panel." },
       "data-disabled": { text: "Present when the tab can't be selected." },
-      "data-starting-style": { text: "Present for a panel's first frame. Style the state you animate from." },
+      "data-starting-style": {
+        text: "Present for a panel's first frame. Style the state you animate from.",
+      },
       "data-ending-style": {
         text: "Present while the previous panel animates out. Style the state you animate to.",
       },
@@ -621,12 +835,22 @@ const components: Record<
     interactive: [{ file: "motion/presence.ts", slot: "panel" }],
     descriptions: {
       "data-open": { text: "Present while the item is open." },
-      "data-closed": { text: "Present while the item is closed, including while its panel animates out." },
-      "data-index": { text: "The item's position among the items, from 0. Written once it's in the page." },
+      "data-closed": {
+        text: "Present while the item is closed, including while its panel animates out.",
+      },
+      "data-index": {
+        text: "The item's position among the items, from 0. Written once it's in the page.",
+      },
       "data-disabled": { text: "Present when the item can't open or close." },
-      "root:data-disabled": { text: "Present when the whole accordion is disabled." },
-      "data-starting-style": { text: "Present for a panel's first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while a panel animates closed. Style the state you animate to." },
+      "root:data-disabled": {
+        text: "Present when the whole accordion is disabled.",
+      },
+      "data-starting-style": {
+        text: "Present for a panel's first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while a panel animates closed. Style the state you animate to.",
+      },
     },
   },
   collapsible: {
@@ -639,8 +863,12 @@ const components: Record<
     parts: { root: { react: "Collapsible", web: "<ui-collapsible>" } },
     descriptions: {
       "data-open": { text: "Present while the panel is open." },
-      "data-closed": { text: "Present while the panel is closed, including while it animates out." },
-      "data-disabled": { text: "Present when the collapsible can't open or close." },
+      "data-closed": {
+        text: "Present while the panel is closed, including while it animates out.",
+      },
+      "data-disabled": {
+        text: "Present when the collapsible can't open or close.",
+      },
       "data-starting-style": {
         text: "Present for the panel's first frame. Style the state you animate from.",
       },
@@ -651,7 +879,13 @@ const components: Record<
   },
   "image-cropper": {
     instances: () => [
-      imageCropper({ id: "docs", src: "photo.jpg", mode: "frame", shape: "circle", disabled: true }),
+      imageCropper({
+        id: "docs",
+        src: "photo.jpg",
+        mode: "frame",
+        shape: "circle",
+        disabled: true,
+      }),
       imageCropper({ id: "docs-box", src: "photo.jpg" }),
     ],
     samples: {
@@ -671,14 +905,24 @@ const components: Record<
         ["root", "viewport", "selection", "grid", "handle"].map((slot) => [
           slot,
           ["data-error", "data-dragging"],
-        ]),
+        ])
       ),
-      ...Object.fromEntries(["image", "zoom", "rotate", "flip"].map((slot) => [slot, ["data-error"]])),
+      ...Object.fromEntries(
+        ["image", "zoom", "rotate", "flip"].map((slot) => [
+          slot,
+          ["data-error"],
+        ])
+      ),
     },
     descriptions: {
       "data-mode": { text: "How the crop changes.", values: ["box", "frame"] },
-      "data-shape": { text: "The selection's shape.", values: ["rectangle", "circle"] },
-      "data-loading": { text: "Present until the image loads, while nothing can change." },
+      "data-shape": {
+        text: "The selection's shape.",
+        values: ["rectangle", "circle"],
+      },
+      "data-loading": {
+        text: "Present until the image loads, while nothing can change.",
+      },
       "data-error": { text: "Present when the image failed to load." },
       "data-disabled": { text: "Present when the cropper is disabled." },
       "data-dragging": {
@@ -697,15 +941,27 @@ const components: Record<
   },
   "color-picker": {
     instances: () => [
-      colorPicker({ id: "docs", defaultValue: "#0ea5e9", disabled: true, readOnly: true, required: true }),
+      colorPicker({
+        id: "docs",
+        defaultValue: "#0ea5e9",
+        disabled: true,
+        readOnly: true,
+        required: true,
+      }),
       colorPicker({ id: "docs-enabled", defaultValue: "#0ea5e9" }),
     ],
     samples: {
       root: [{}],
       area: [{}],
       "area-thumb": [{}],
-      slider: [{ channel: "hue" }, { channel: "alpha", orientation: "vertical" }],
-      "slider-thumb": [{ channel: "hue" }, { channel: "alpha", orientation: "vertical" }],
+      slider: [
+        { channel: "hue" },
+        { channel: "alpha", orientation: "vertical" },
+      ],
+      "slider-thumb": [
+        { channel: "hue" },
+        { channel: "alpha", orientation: "vertical" },
+      ],
       input: [{}],
       "channel-input": [{ channel: "red" }],
       swatch: [{}],
@@ -726,41 +982,70 @@ const components: Record<
           "channel-input",
           "swatch",
           "swatches",
-        ].map((slot) => [slot, ["data-out-of-gamut"]]),
+        ].map((slot) => [slot, ["data-out-of-gamut"]])
       ),
       "eye-dropper": ["data-out-of-gamut", "data-unsupported"],
     },
     descriptions: {
-      "data-disabled": { text: "Present when the picker is disabled, by its own prop or a `<fieldset>`." },
-      "data-readonly": { text: "Present when the picker shows its color but can't change it." },
+      "data-disabled": {
+        text: "Present when the picker is disabled, by its own prop or a `<fieldset>`.",
+      },
+      "data-readonly": {
+        text: "Present when the picker shows its color but can't change it.",
+      },
       "data-required": { text: "Present when the picker is required." },
       "data-out-of-gamut": {
         text: "Present while a drag or a key holds a color outside the gamut. The value is the closest color inside, and the parts move there once the change commits.",
       },
       "data-channel": {
         text: "The channel the part edits.",
-        values: ["hue", "saturation", "brightness", "lightness", "chroma", "red", "green", "blue", "alpha"],
+        values: [
+          "hue",
+          "saturation",
+          "brightness",
+          "lightness",
+          "chroma",
+          "red",
+          "green",
+          "blue",
+          "alpha",
+        ],
       },
       "data-area-thumb": {
         text: "Present on the area's thumb, which a press on the area moves and focuses.",
       },
-      "data-orientation": { text: "The slider's axis.", values: ["horizontal", "vertical"] },
-      "data-selected": { text: "Present on the swatch item whose color is the value." },
-      "data-unsupported": { text: "Present when the browser can't pick a color from the screen." },
+      "data-orientation": {
+        text: "The slider's axis.",
+        values: ["horizontal", "vertical"],
+      },
+      "data-selected": {
+        text: "Present on the swatch item whose color is the value.",
+      },
+      "data-unsupported": {
+        text: "Present when the browser can't pick a color from the screen.",
+      },
     },
     parts: { root: { react: "ColorPicker", web: "<ui-color-picker>" } },
   },
   checkbox: {
     instances: () =>
       ([true, false, "indeterminate"] as const).map((checked) =>
-        checkbox({ id: "docs", defaultChecked: checked, disabled: true, readOnly: true, required: true }),
+        checkbox({
+          id: "docs",
+          defaultChecked: checked,
+          disabled: true,
+          readOnly: true,
+          required: true,
+        })
       ),
     samples: { root: [{}], indicator: [{ keepMounted: true }] },
     interactive: [{ file: "motion/presence.ts", slot: "indicator" }],
     descriptions: {
       "data-checked": { text: "Present while checked." },
       "data-unchecked": { text: "Present while unchecked." },
-      "data-disabled": { text: "Present when disabled, by its own prop, a group or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop, a group or a `<fieldset>`.",
+      },
       "data-readonly": { text: "Present when read-only." },
       "data-required": { text: "Present when required." },
       "data-indeterminate": { text: "Present while indeterminate." },
@@ -774,14 +1059,26 @@ const components: Record<
     parts: { root: { react: "Checkbox", web: "<ui-checkbox>" } },
   },
   "checkbox-group": {
-    instances: () => [checkboxGroup({ id: "docs", disabled: true, required: true })],
+    instances: () => [
+      checkboxGroup({ id: "docs", disabled: true, required: true }),
+    ],
     samples: { group: [{}] },
     interactive: [],
     descriptions: {
-      "data-disabled": { text: "Present when the group is disabled, by its own prop or a `<fieldset>`." },
-      "data-required": { text: "Present when at least one checkbox must be checked." },
+      "data-disabled": {
+        text: "Present when the group is disabled, by its own prop or a `<fieldset>`.",
+      },
+      "data-required": {
+        text: "Present when at least one checkbox must be checked.",
+      },
     },
-    parts: { group: { react: "CheckboxGroup", web: "<ui-checkbox-group>", slot: "checkbox-group" } },
+    parts: {
+      group: {
+        react: "CheckboxGroup",
+        web: "<ui-checkbox-group>",
+        slot: "checkbox-group",
+      },
+    },
   },
   switch: {
     instances: () =>
@@ -792,14 +1089,16 @@ const components: Record<
           disabled: true,
           readOnly: true,
           required: true,
-        }),
+        })
       ),
     samples: { root: [{}], thumb: [{}] },
     interactive: [],
     descriptions: {
       "data-checked": { text: "Present while on." },
       "data-unchecked": { text: "Present while off." },
-      "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop or a `<fieldset>`.",
+      },
       "data-readonly": { text: "Present when read-only." },
       "data-required": { text: "Present when required." },
       "data-invalid": {
@@ -812,7 +1111,10 @@ const components: Record<
   },
   button: {
     instances: () => {
-      const running = button({ id: "docs", action: () => new Promise(() => {}) })
+      const running = button({
+        id: "docs",
+        action: () => new Promise(() => {}),
+      })
       running.api.internal.press()
       return [running, button({ id: "docs-disabled", disabled: true })]
     },
@@ -820,7 +1122,9 @@ const components: Record<
     interactive: [],
     descriptions: {
       "data-disabled": { text: "Present when disabled." },
-      "data-pending": { text: "Present while the Promise its press handler returned is running." },
+      "data-pending": {
+        text: "Present while the Promise its press handler returned is running.",
+      },
     },
     parts: { root: { react: "Button", web: "<ui-button>" } },
   },
@@ -837,10 +1141,14 @@ const components: Record<
     interactive: [],
     extra: { root: ["data-has-icon"] },
     descriptions: {
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
       "data-has-icon": { text: "Present while the toggle holds an icon part." },
       "data-pressed": { text: "Present while pressed." },
-      "data-disabled": { text: "Present when disabled, by its own prop or its group." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop or its group.",
+      },
       "data-orientation": {
         text: "Inside a group, the group's orientation.",
         values: ["horizontal", "vertical"],
@@ -863,7 +1171,13 @@ const components: Record<
         values: ["horizontal", "vertical"],
       },
     },
-    parts: { group: { react: "ToggleGroup", web: "<ui-toggle-group>", slot: "toggle-group" } },
+    parts: {
+      group: {
+        react: "ToggleGroup",
+        web: "<ui-toggle-group>",
+        slot: "toggle-group",
+      },
+    },
   },
   toolbar: {
     instances: () => [
@@ -880,7 +1194,9 @@ const components: Record<
     },
     interactive: [],
     descriptions: {
-      "data-disabled": { text: "Present when disabled, by the item itself, its group or the toolbar." },
+      "data-disabled": {
+        text: "Present when disabled, by the item itself, its group or the toolbar.",
+      },
       "data-orientation": {
         text: "The toolbar's orientation. On a separator, which way the line runs: across the toolbar.",
         values: ["horizontal", "vertical"],
@@ -919,12 +1235,22 @@ const components: Record<
           defaultChecked: ["a.ts"],
           current: "a.ts",
         }),
-        tree({ id: "docs-collapsed", items, checkable: true, defaultChecked: ["src"] }),
+        tree({
+          id: "docs-collapsed",
+          items,
+          checkable: true,
+          defaultChecked: ["src"],
+        }),
       ]
     },
     samples: {
       root: [{}],
-      item: [{ value: "src" }, { value: "a.ts" }, { value: "b.ts" }, { value: "c.ts" }],
+      item: [
+        { value: "src" },
+        { value: "a.ts" },
+        { value: "b.ts" },
+        { value: "c.ts" },
+      ],
       label: [{ value: "src" }, { value: "a.ts" }, { value: "b.ts" }],
       indicator: [{ value: "src" }],
       checkbox: [{ value: "src" }, { value: "a.ts" }, { value: "c.ts" }],
@@ -940,28 +1266,55 @@ const components: Record<
       "data-level": {
         text: "The item's depth, from 1 at the top level. Also in the `--tree-level` variable.",
       },
-      "data-branch": { text: "Present on a branch: an item with children, or with `branch` set." },
+      "data-branch": {
+        text: "Present on a branch: an item with children, or with `branch` set.",
+      },
       "data-expanded": { text: "Present while a branch is expanded." },
       "data-selected": { text: "Present while the item is selected." },
-      "data-disabled": { text: "Present when the item, or the whole tree, is disabled." },
-      "data-current": { text: "Present on the item for the current page, from `current`." },
-      "data-loading": { text: "Present while `loadChildren` loads the branch's children." },
-      "data-failed": { text: "Present after the branch's children failed to load, until it loads again." },
-      "data-pending": { text: "Present while the item's `onAction` Promise hasn't settled." },
-      "data-checked": { text: "Present while the item's checkbox is checked, with `checkable`." },
-      "data-unchecked": { text: "Present while the item's checkbox is unchecked, with `checkable`." },
-      "data-indeterminate": { text: "Present while only some of a branch is checked, with `checkable`." },
-      "group:data-open": { text: "Present while the group's branch is expanded." },
+      "data-disabled": {
+        text: "Present when the item, or the whole tree, is disabled.",
+      },
+      "data-current": {
+        text: "Present on the item for the current page, from `current`.",
+      },
+      "data-loading": {
+        text: "Present while `loadChildren` loads the branch's children.",
+      },
+      "data-failed": {
+        text: "Present after the branch's children failed to load, until it loads again.",
+      },
+      "data-pending": {
+        text: "Present while the item's `onAction` Promise hasn't settled.",
+      },
+      "data-checked": {
+        text: "Present while the item's checkbox is checked, with `checkable`.",
+      },
+      "data-unchecked": {
+        text: "Present while the item's checkbox is unchecked, with `checkable`.",
+      },
+      "data-indeterminate": {
+        text: "Present while only some of a branch is checked, with `checkable`.",
+      },
+      "group:data-open": {
+        text: "Present while the group's branch is expanded.",
+      },
       "group:data-closed": {
         text: "Present while the group's branch is collapsed, including while it animates out.",
       },
-      "data-starting-style": { text: "Present for a group's first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while a group animates closed. Style the state you animate to." },
+      "data-starting-style": {
+        text: "Present for a group's first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while a group animates closed. Style the state you animate to.",
+      },
     },
     parts: {
       root: { react: "Tree", web: "<ui-tree>" },
       label: { react: "TreeItemLabel", web: "<ui-tree-item-label>" },
-      indicator: { react: "TreeItemIndicator", web: "<ui-tree-item-indicator>" },
+      indicator: {
+        react: "TreeItemIndicator",
+        web: "<ui-tree-item-indicator>",
+      },
       checkbox: { react: "TreeItemCheckbox", web: "<ui-tree-item-checkbox>" },
     },
   },
@@ -995,13 +1348,21 @@ const components: Record<
     samples: { root: [{}] },
     interactive: [],
     descriptions: {
-      "data-orientation": { text: "Which way the line runs.", values: ["horizontal", "vertical"] },
+      "data-orientation": {
+        text: "Which way the line runs.",
+        values: ["horizontal", "vertical"],
+      },
     },
     parts: { root: { react: "Separator", web: "<ui-separator>" } },
   },
   radio: {
     instances: () => [
-      radioGroup({ id: "docs", defaultValue: "a", readOnly: true, required: true }),
+      radioGroup({
+        id: "docs",
+        defaultValue: "a",
+        readOnly: true,
+        required: true,
+      }),
       radioGroup({ id: "docs-disabled", disabled: true }),
     ],
     samples: {
@@ -1013,7 +1374,9 @@ const components: Record<
     descriptions: {
       "data-checked": { text: "Present on the checked radio." },
       "data-unchecked": { text: "Present on radios that aren't checked." },
-      "data-disabled": { text: "Present when disabled, by its own prop, the group or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop, the group or a `<fieldset>`.",
+      },
       "data-readonly": { text: "Present when the group is read-only." },
       "data-required": { text: "Present when the group is required." },
       "data-starting-style": {
@@ -1024,53 +1387,104 @@ const components: Record<
       },
     },
     parts: {
-      group: { react: "RadioGroup", web: "<ui-radio-group>", slot: "radio-group" },
+      group: {
+        react: "RadioGroup",
+        web: "<ui-radio-group>",
+        slot: "radio-group",
+      },
       root: { react: "Radio", web: "<ui-radio>", slot: "radio-root" },
-      indicator: { react: "RadioIndicator", web: "<ui-radio-indicator>", slot: "radio-indicator" },
+      indicator: {
+        react: "RadioIndicator",
+        web: "<ui-radio-indicator>",
+        slot: "radio-indicator",
+      },
     },
   },
   rating: {
     instances: () => [
       rating({ id: "docs", defaultValue: 2.5, step: 0.5, required: true }),
-      rating({ id: "docs-read-only", value: 3, readOnly: true, disabled: true }),
+      rating({
+        id: "docs-read-only",
+        value: 3,
+        readOnly: true,
+        disabled: true,
+      }),
     ],
     samples: { root: [{}], item: [{ index: 1 }, { index: 3 }, { index: 4 }] },
     interactive: [],
     extra: { item: ["data-highlighted"] },
     descriptions: {
       "data-filled": { text: "Present on stars the shown score covers whole." },
-      "data-partial": { text: "Present on the star the shown score covers part of, like the last of 2.5." },
+      "data-partial": {
+        text: "Present on the star the shown score covers part of, like the last of 2.5.",
+      },
       "data-checked": { text: "Present on the star the score ends in." },
-      "data-highlighted": { text: "Present on the stars up to the score a pointer previews." },
-      "data-disabled": { text: "Present when the rating is disabled, by its own prop or a `<fieldset>`." },
-      "data-readonly": { text: "Present when the rating only shows its score." },
+      "data-highlighted": {
+        text: "Present on the stars up to the score a pointer previews.",
+      },
+      "data-disabled": {
+        text: "Present when the rating is disabled, by its own prop or a `<fieldset>`.",
+      },
+      "data-readonly": {
+        text: "Present when the rating only shows its score.",
+      },
       "data-required": { text: "Present when the rating is required." },
     },
   },
   "segmented-control": {
     instances: () => [
-      segmentedControl({ id: "docs", defaultValue: "a", readOnly: true, required: true }),
-      segmentedControl({ id: "docs-disabled", disabled: true, orientation: "vertical" }),
+      segmentedControl({
+        id: "docs",
+        defaultValue: "a",
+        readOnly: true,
+        required: true,
+      }),
+      segmentedControl({
+        id: "docs-disabled",
+        disabled: true,
+        orientation: "vertical",
+      }),
     ],
-    samples: { root: [{}], item: [{ value: "a" }, { value: "b" }], indicator: [{}] },
+    samples: {
+      root: [{}],
+      item: [{ value: "a" }, { value: "b" }],
+      indicator: [{}],
+    },
     interactive: [],
     descriptions: {
       "data-orientation": { text: "Which way the items run." },
       "data-checked": { text: "Present on the checked item." },
       "data-unchecked": { text: "Present on items that aren't checked." },
-      "data-disabled": { text: "Present when disabled, by its own prop, the control or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop, the control or a `<fieldset>`.",
+      },
       "data-readonly": { text: "Present when the control is read-only." },
       "data-required": { text: "Present when the control is required." },
     },
     parts: {
       root: { react: "SegmentedControl", web: "<ui-segmented-control>" },
-      item: { react: "SegmentedControlItem", web: "<ui-segmented-control-item>" },
-      indicator: { react: "SegmentedControlIndicator", web: "<ui-segmented-control-indicator>" },
+      item: {
+        react: "SegmentedControlItem",
+        web: "<ui-segmented-control-item>",
+      },
+      indicator: {
+        react: "SegmentedControlIndicator",
+        web: "<ui-segmented-control-indicator>",
+      },
     },
   },
   field: {
-    instances: () => [field({ id: "docs", invalid: true, disabled: true }), field({ id: "docs-valid" })],
-    samples: { root: [{}], label: [{}], description: [{}], error: [{ match: true }], control: [{}] },
+    instances: () => [
+      field({ id: "docs", invalid: true, disabled: true }),
+      field({ id: "docs-valid" }),
+    ],
+    samples: {
+      root: [{}],
+      label: [{}],
+      description: [{}],
+      error: [{ match: true }],
+      control: [{}],
+    },
     interactive: [],
     descriptions: {
       "data-invalid": {
@@ -1088,7 +1502,13 @@ const components: Record<
   slider: {
     instances: () => [
       slider({ id: "docs", defaultValue: 50, disabled: true }),
-      dragging(slider({ id: "docs-range", defaultValue: [20, 80], orientation: "vertical" })),
+      dragging(
+        slider({
+          id: "docs-range",
+          defaultValue: [20, 80],
+          orientation: "vertical",
+        })
+      ),
     ],
     samples: {
       root: [{}],
@@ -1100,10 +1520,17 @@ const components: Record<
     },
     interactive: [],
     descriptions: {
-      "data-orientation": { text: "The slider's axis.", values: ["horizontal", "vertical"] },
-      "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+      "data-orientation": {
+        text: "The slider's axis.",
+        values: ["horizontal", "vertical"],
+      },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop or a `<fieldset>`.",
+      },
       "data-dragging": { text: "Present while a thumb is being dragged." },
-      "thumb:data-dragging": { text: "Present while this thumb is being dragged." },
+      "thumb:data-dragging": {
+        text: "Present while this thumb is being dragged.",
+      },
       "data-index": { text: "Which value the thumb shows, from 0." },
     },
     parts: { root: { react: "Slider", web: "<ui-slider>" } },
@@ -1126,10 +1553,18 @@ const components: Record<
         text: "The group's direction, on every part. A handle's own `aria-orientation` is the other one, since it runs across the group.",
         values: ["horizontal", "vertical"],
       },
-      "data-disabled": { text: "Present when the group, or this handle, is disabled." },
-      "data-dragging": { text: "Present while a handle of the group is being dragged." },
-      "handle:data-dragging": { text: "Present while this handle is being dragged." },
-      "data-collapsed": { text: "Present while a collapsible panel is collapsed." },
+      "data-disabled": {
+        text: "Present when the group, or this handle, is disabled.",
+      },
+      "data-dragging": {
+        text: "Present while a handle of the group is being dragged.",
+      },
+      "handle:data-dragging": {
+        text: "Present while this handle is being dragged.",
+      },
+      "data-collapsed": {
+        text: "Present while a collapsible panel is collapsed.",
+      },
       "data-hovering": {
         text: "Present while the pointer is over the handle or within its hit area, which reaches past the handle itself.",
       },
@@ -1138,7 +1573,14 @@ const components: Record<
   },
   "number-input": {
     instances: () => [
-      numberInput({ id: "docs", defaultValue: 0, min: 0, disabled: true, readOnly: true, required: true }),
+      numberInput({
+        id: "docs",
+        defaultValue: 0,
+        min: 0,
+        disabled: true,
+        readOnly: true,
+        required: true,
+      }),
     ],
     samples: {
       root: [{}],
@@ -1160,7 +1602,9 @@ const components: Record<
       "scrub-area-cursor": ["data-scrubbing"],
     },
     descriptions: {
-      "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop or a `<fieldset>`.",
+      },
       "increment:data-disabled": {
         text: "Present when the button can't step: it or the field is disabled, the field is read-only, or the value is at `max`.",
       },
@@ -1169,8 +1613,13 @@ const components: Record<
       },
       "data-readonly": { text: "Present when read-only." },
       "data-required": { text: "Present when required." },
-      "data-scrubbing": { text: "Present while a drag on the scrub area changes the value." },
-      "scrub-area:data-orientation": { text: "Which way to drag.", values: ["horizontal", "vertical"] },
+      "data-scrubbing": {
+        text: "Present while a drag on the scrub area changes the value.",
+      },
+      "scrub-area:data-orientation": {
+        text: "Which way to drag.",
+        values: ["horizontal", "vertical"],
+      },
     },
     parts: { root: { react: "NumberInput", web: "<ui-number-input>" } },
   },
@@ -1184,7 +1633,10 @@ const components: Record<
         values: ["idle", "loading", "loaded", "error"],
       },
     },
-    parts: { root: { react: "Avatar", web: "<ui-avatar>" }, image: { react: "AvatarImage", web: "<img>" } },
+    parts: {
+      root: { react: "Avatar", web: "<ui-avatar>" },
+      image: { react: "AvatarImage", web: "<img>" },
+    },
   },
   progress: {
     instances: () => [
@@ -1192,7 +1644,13 @@ const components: Record<
       progress({ id: "docs-progressing", value: 40 }),
       progress({ id: "docs-complete", value: 100 }),
     ],
-    samples: { root: [{}], track: [{}], indicator: [{}], label: [{}], value: [{}] },
+    samples: {
+      root: [{}],
+      track: [{}],
+      indicator: [{}],
+      label: [{}],
+      value: [{}],
+    },
     interactive: [],
     descriptions: {
       "data-indeterminate": {
@@ -1233,31 +1691,62 @@ const components: Record<
         "data-hovering",
         "data-sticking",
       ],
-      viewport: ["data-overflow-y", "data-at-start", "data-at-end", "data-scrolling", "data-sticking"],
+      viewport: [
+        "data-overflow-y",
+        "data-at-start",
+        "data-at-end",
+        "data-scrolling",
+        "data-sticking",
+      ],
       content: ["data-overflow-y", "data-at-start", "data-at-end"],
-      scrollbar: ["data-visible", "data-scrolling", "data-hovering", "data-dragging", "data-overflow-y"],
+      scrollbar: [
+        "data-visible",
+        "data-scrolling",
+        "data-hovering",
+        "data-dragging",
+        "data-overflow-y",
+      ],
       thumb: ["data-dragging"],
       "scroll-to-end": ["data-visible"],
     },
     descriptions: {
-      "data-orientation": { text: "The axis the scrollbar scrolls.", values: ["vertical", "horizontal"] },
-      "data-overflow-x": { text: "Present while the content is wider than the viewport." },
-      "data-overflow-y": { text: "Present while the content is taller than the viewport." },
+      "data-orientation": {
+        text: "The axis the scrollbar scrolls.",
+        values: ["vertical", "horizontal"],
+      },
+      "data-overflow-x": {
+        text: "Present while the content is wider than the viewport.",
+      },
+      "data-overflow-y": {
+        text: "Present while the content is taller than the viewport.",
+      },
       "data-at-start": {
         text: "Present while the view is at the start: the top, or the inline start when only the horizontal axis overflows. Also when nothing overflows.",
       },
       "data-at-end": {
         text: "Present while the view is at the end: the bottom, or the inline end when only the horizontal axis overflows.",
       },
-      "data-at-x-start": { text: "Present while the view is at the inline start, within a pixel." },
-      "data-at-x-end": { text: "Present while the view is at the inline end, within a pixel." },
-      "data-at-y-start": { text: "Present while the view is at the top, within a pixel." },
-      "data-at-y-end": { text: "Present while the view is at the bottom, within a pixel." },
+      "data-at-x-start": {
+        text: "Present while the view is at the inline start, within a pixel.",
+      },
+      "data-at-x-end": {
+        text: "Present while the view is at the inline end, within a pixel.",
+      },
+      "data-at-y-start": {
+        text: "Present while the view is at the top, within a pixel.",
+      },
+      "data-at-y-end": {
+        text: "Present while the view is at the bottom, within a pixel.",
+      },
       "data-scrolling": {
         text: "Present while the user scrolls, and for a moment after. Keeping the end in view doesn't count.",
       },
-      "scrollbar:data-scrolling": { text: "Present while its own axis scrolls." },
-      "data-hovering": { text: "Present while a mouse or pen is over the scroll area." },
+      "scrollbar:data-scrolling": {
+        text: "Present while its own axis scrolls.",
+      },
+      "data-hovering": {
+        text: "Present while a mouse or pen is over the scroll area.",
+      },
       "data-sticking": {
         text: "Present while the view follows the end as content grows, with `stickToEnd`.",
       },
@@ -1276,16 +1765,27 @@ const components: Record<
       otpInput({ id: "docs", defaultValue: "123456", disabled: true }),
       otpInput({ id: "docs-partial", defaultValue: "12" }),
     ],
-    samples: { root: [{}], group: [{}], slot: [{ index: 0 }, { index: 3 }], separator: [{}] },
+    samples: {
+      root: [{}],
+      group: [{}],
+      slot: [{ index: 0 }, { index: 3 }],
+      separator: [{}],
+    },
     interactive: [],
     // Focus decides which slot is active, and the samples are never focused.
-    extra: { root: ["data-focused"], group: ["data-focused"], slot: ["data-active", "data-fake-caret"] },
+    extra: {
+      root: ["data-focused"],
+      group: ["data-focused"],
+      slot: ["data-active", "data-fake-caret"],
+    },
     descriptions: {
       "data-focused": { text: "Present while the input has focus." },
       "data-complete": { text: "Present while every slot is filled." },
       "data-filled": { text: "Present while the code holds any character." },
       "slot:data-filled": { text: "Present while the slot holds a character." },
-      "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop or a `<fieldset>`.",
+      },
       "slot:data-active": {
         text: "Present on the slot typing goes to: the selected character, or the empty slot after the last one. Only while focused.",
       },
@@ -1297,13 +1797,26 @@ const components: Record<
       root: { react: "OTPInput", web: "<ui-otp-input>" },
       group: { react: "OTPInputGroup", web: "<ui-otp-input-group>" },
       slot: { react: "OTPInputSlot", web: "<ui-otp-input-slot>" },
-      separator: { react: "OTPInputSeparator", web: "<ui-otp-input-separator>" },
+      separator: {
+        react: "OTPInputSeparator",
+        web: "<ui-otp-input-separator>",
+      },
     },
   },
   "date-input": {
     instances: () => [
-      dateInput({ id: "docs", defaultValue: "2026-11-02", disabled: true, readOnly: true, required: true }),
-      dateInput({ id: "docs-invalid", defaultValue: "2026-12-02", max: "2026-11-30" }),
+      dateInput({
+        id: "docs",
+        defaultValue: "2026-11-02",
+        disabled: true,
+        readOnly: true,
+        required: true,
+      }),
+      dateInput({
+        id: "docs-invalid",
+        defaultValue: "2026-12-02",
+        max: "2026-11-30",
+      }),
       dateInput({ id: "docs-empty" }),
     ],
     samples: {
@@ -1322,7 +1835,13 @@ const components: Record<
   },
   "time-input": {
     instances: () => [
-      timeInput({ id: "docs", defaultValue: "14:30", disabled: true, readOnly: true, required: true }),
+      timeInput({
+        id: "docs",
+        defaultValue: "14:30",
+        disabled: true,
+        readOnly: true,
+        required: true,
+      }),
       timeInput({ id: "docs-invalid", defaultValue: "18:00", max: "17:00" }),
       timeInput({ id: "docs-empty" }),
     ],
@@ -1355,25 +1874,44 @@ const components: Record<
     samples: { root: [{}], control: [{}], toggle: [{}] },
     interactive: [],
     // Caps Lock is read from key events while the field has focus, which the samples never get.
-    extra: { root: ["data-capslock"], control: ["data-capslock"], toggle: ["data-capslock"] },
+    extra: {
+      root: ["data-capslock"],
+      control: ["data-capslock"],
+      toggle: ["data-capslock"],
+    },
     descriptions: {
-      "data-visible": { text: "Present while the password is shown, so the field is a text field." },
-      "data-capslock": { text: "Present while Caps Lock is on and the field has focus." },
+      "data-visible": {
+        text: "Present while the password is shown, so the field is a text field.",
+      },
+      "data-capslock": {
+        text: "Present while Caps Lock is on and the field has focus.",
+      },
       "data-filled": { text: "Present while the field holds any text." },
-      "data-disabled": { text: "Present when disabled, by its own prop, a Field or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop, a Field or a `<fieldset>`.",
+      },
       "data-readonly": { text: "Present when the field is read-only." },
       "data-required": { text: "Present when a password is required." },
     },
     parts: {
       root: { react: "PasswordInput", web: "<ui-password-input>" },
       control: { react: "PasswordInputControl", web: "the <input> inside" },
-      toggle: { react: "PasswordInputToggle", web: "<ui-password-input-toggle>" },
+      toggle: {
+        react: "PasswordInputToggle",
+        web: "<ui-password-input-toggle>",
+      },
     },
   },
   listbox: {
     instances: () => [
       listbox({ id: "docs", defaultValue: "a" }),
-      listbox({ id: "docs-form", multiple: true, disabled: true, readOnly: true, required: true }),
+      listbox({
+        id: "docs-form",
+        multiple: true,
+        disabled: true,
+        readOnly: true,
+        required: true,
+      }),
       listbox({ id: "docs-horizontal", orientation: "horizontal" }),
     ],
     samples: {
@@ -1390,7 +1928,10 @@ const components: Record<
     },
     interactive: [],
     // Focus decides the highlighted option, and the samples are never focused.
-    extra: { item: ["data-highlighted", "data-has-icon"], root: ["data-has-icons"] },
+    extra: {
+      item: ["data-highlighted", "data-has-icon"],
+      root: ["data-has-icons"],
+    },
     descriptions: {
       "data-orientation": {
         text: "Which arrow keys move between items.",
@@ -1399,13 +1940,21 @@ const components: Record<
       "data-disabled": {
         text: "Present when the listbox is disabled, by its own prop, a Field or a `<fieldset>`.",
       },
-      "item:data-disabled": { text: "Present when the item can't be chosen. It can still be focused." },
+      "item:data-disabled": {
+        text: "Present when the item can't be chosen. It can still be focused.",
+      },
       "data-readonly": { text: "Present when the listbox is read-only." },
       "data-required": { text: "Present when the listbox is required." },
-      "data-selected": { text: "Present on selected items, and on the check inside them." },
+      "data-selected": {
+        text: "Present on selected items, and on the check inside them.",
+      },
       "data-highlighted": { text: "Present on the item that has focus." },
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on an item while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on an item while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any item inside holds an icon part, so items without one can line up.",
       },
@@ -1413,16 +1962,27 @@ const components: Record<
     parts: {
       root: { react: "Listbox", web: "<ui-listbox>" },
       item: { react: "ListboxItem", web: "<ui-listbox-item>" },
-      "item-indicator": { react: "ListboxItemIndicator", web: "<ui-listbox-item-indicator>" },
+      "item-indicator": {
+        react: "ListboxItemIndicator",
+        web: "<ui-listbox-item-indicator>",
+      },
       "item-icon": { react: "ListboxItemIcon", web: "<ui-listbox-item-icon>" },
       group: { react: "ListboxGroup", web: "<ui-listbox-group>" },
-      "group-label": { react: "ListboxGroupLabel", web: "<ui-listbox-group-label>" },
+      "group-label": {
+        react: "ListboxGroupLabel",
+        web: "<ui-listbox-group-label>",
+      },
       separator: { react: "ListboxSeparator", web: "<ui-listbox-separator>" },
     },
   },
   calendar: {
     instances: () => [
-      calendar({ id: "docs", today: "2026-10-16", defaultValue: "2026-10-16", unavailable: ["2026-10-24"] }),
+      calendar({
+        id: "docs",
+        today: "2026-10-16",
+        defaultValue: "2026-10-16",
+        unavailable: ["2026-10-24"],
+      }),
       calendar({
         id: "docs-range",
         mode: "range",
@@ -1453,19 +2013,36 @@ const components: Record<
     // A range being picked previews until its end is chosen.
     extra: { day: ["data-preview"] },
     descriptions: {
-      "data-mode": { text: "How the calendar selects.", values: ["single", "multiple", "range"] },
+      "data-mode": {
+        text: "How the calendar selects.",
+        values: ["single", "multiple", "range"],
+      },
       "data-disabled": {
         text: "Present on the root, grids and selects when the calendar is disabled, on a day that can't be picked, and on Previous or Next at `min` or `max`.",
       },
-      "data-readonly": { text: "Present when dates can be focused but not picked." },
+      "data-readonly": {
+        text: "Present when dates can be focused but not picked.",
+      },
       "data-value": { text: "A day's ISO date." },
-      "data-selected": { text: "Present on selected days. In a range, every day from start to end." },
+      "data-selected": {
+        text: "Present on selected days. In a range, every day from start to end.",
+      },
       "data-today": { text: 'Present on today, beside `aria-current="date"`.' },
-      "data-outside": { text: "Present on a day of the month before or after its grid's." },
-      "data-unavailable": { text: "Present on a day `unavailable` names. It stays focusable." },
-      "data-range-start": { text: "Present on the day a range starts, including one being picked." },
-      "data-range-end": { text: "Present on the day a range ends, including one being picked." },
-      "data-range-middle": { text: "Present on the days inside a range, between its ends." },
+      "data-outside": {
+        text: "Present on a day of the month before or after its grid's.",
+      },
+      "data-unavailable": {
+        text: "Present on a day `unavailable` names. It stays focusable.",
+      },
+      "data-range-start": {
+        text: "Present on the day a range starts, including one being picked.",
+      },
+      "data-range-end": {
+        text: "Present on the day a range ends, including one being picked.",
+      },
+      "data-range-middle": {
+        text: "Present on the days inside a range, between its ends.",
+      },
       "data-preview": {
         text: "Present on the days of a range being picked, from its start to the day under the pointer or focus.",
       },
@@ -1474,15 +2051,26 @@ const components: Record<
       root: { react: "Calendar", web: "<ui-calendar>" },
       previous: { react: "CalendarPrevious", web: "<ui-calendar-previous>" },
       next: { react: "CalendarNext", web: "<ui-calendar-next>" },
-      "month-select": { react: "CalendarMonthSelect", web: "<ui-calendar-month-select>" },
-      "year-select": { react: "CalendarYearSelect", web: "<ui-calendar-year-select>" },
+      "month-select": {
+        react: "CalendarMonthSelect",
+        web: "<ui-calendar-month-select>",
+      },
+      "year-select": {
+        react: "CalendarYearSelect",
+        web: "<ui-calendar-year-select>",
+      },
       grid: { react: "CalendarGrid", web: "<ui-calendar-grid>" },
       day: { react: "CalendarDay", web: "<ui-calendar-day>" },
     },
   },
   "date-picker": {
     instances: () => [
-      datePicker({ id: "docs", today: "2026-10-16", defaultValue: "2026-10-16", defaultOpen: true }),
+      datePicker({
+        id: "docs",
+        today: "2026-10-16",
+        defaultValue: "2026-10-16",
+        defaultOpen: true,
+      }),
       datePicker({ id: "docs-range", mode: "range", readOnly: true }),
       datePicker({ id: "docs-disabled", disabled: true }),
     ],
@@ -1505,11 +2093,18 @@ const components: Record<
     // Text that isn't a date marks the root and its input.
     extra: { root: ["data-invalid"], input: ["data-invalid"] },
     descriptions: {
-      "data-mode": { text: "How the date picker selects.", values: ["single", "range"] },
+      "data-mode": {
+        text: "How the date picker selects.",
+        values: ["single", "range"],
+      },
       "data-open": { text: "Present while the popup is open." },
-      "data-closed": { text: "Present while the popup is closed, including while it animates out." },
+      "data-closed": {
+        text: "Present while the popup is closed, including while it animates out.",
+      },
       "data-disabled": { text: "Present when the date picker is disabled." },
-      "data-readonly": { text: "Present when the date can be seen but not changed." },
+      "data-readonly": {
+        text: "Present when the date can be seen but not changed.",
+      },
       "data-invalid": {
         text: "Present when an input holds text that isn't a date, or a date that can't be picked.",
       },
@@ -1521,11 +2116,20 @@ const components: Record<
         text: "Where the popup ended up, after flipping away from edges.",
         values: ["top", "right", "bottom", "left"],
       },
-      "data-align": { text: "How the popup lines up with the input.", values: ["start", "center", "end"] },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while the popup animates out. Style the state you animate to." },
+      "data-align": {
+        text: "How the popup lines up with the input.",
+        values: ["start", "center", "end"],
+      },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while the popup animates out. Style the state you animate to.",
+      },
       "data-empty": { text: "Present when there's no date to clear." },
-      "data-selected": { text: "Present while the preset's value is the one selected." },
+      "data-selected": {
+        text: "Present while the preset's value is the one selected.",
+      },
     },
     parts: {
       root: { react: "DatePicker", web: "<ui-date-picker>" },
@@ -1552,7 +2156,9 @@ const components: Record<
     },
     interactive: [],
     descriptions: {
-      "link:data-current": { text: 'Present on the current page\'s link, beside `aria-current="page"`.' },
+      "link:data-current": {
+        text: 'Present on the current page\'s link, beside `aria-current="page"`.',
+      },
       "data-disabled": {
         text: "Present on a step at the end it goes to, beside `aria-disabled`. It stays focusable and does nothing.",
       },
@@ -1586,12 +2192,16 @@ const components: Record<
       "play-toggle": ["data-paused"],
     },
     descriptions: {
-      "data-orientation": { text: "Which way the slides scroll, and which arrow keys page." },
+      "data-orientation": {
+        text: "Which way the slides scroll, and which arrow keys page.",
+      },
       "data-playing": { text: "Present while it rotates on its own." },
       "data-paused": {
         text: "Present while rotation is paused for now: hovered, the tab hidden, scrolled out of view or held. Pause a progress animation with it.",
       },
-      "data-dragging": { text: "Present while a mouse or pen drags the slides." },
+      "data-dragging": {
+        text: "Present while a mouse or pen drags the slides.",
+      },
       "data-active": { text: "Present on the slides of the current page." },
       "data-in-view": {
         text: "Present on slides at least half in view. Slides without it are inert and hidden from screen readers.",
@@ -1599,12 +2209,17 @@ const components: Record<
       "data-disabled": {
         text: "Present on Previous or Next when there's no page that way, beside `aria-disabled`. It stays focusable and does nothing.",
       },
-      "data-selected": { text: "Present on the current page's indicator, beside `aria-selected`." },
+      "data-selected": {
+        text: "Present on the current page's indicator, beside `aria-selected`.",
+      },
     },
     parts: { root: { react: "Carousel", web: "<ui-carousel>" } },
   },
   "field-set": {
-    instances: () => [fieldSet({ id: "docs", disabled: true }), fieldSet({ id: "docs-enabled" })],
+    instances: () => [
+      fieldSet({ id: "docs", disabled: true }),
+      fieldSet({ id: "docs-enabled" }),
+    ],
     samples: { set: [{}], legend: [{}], description: [{}] },
     interactive: [],
     descriptions: {
@@ -1613,9 +2228,21 @@ const components: Record<
       },
     },
     parts: {
-      set: { react: "FieldSet", web: "<fieldset> in <ui-field-set>", slot: "field-set" },
-      legend: { react: "FieldLegend", web: "<legend> or <ui-field-legend>", slot: "field-legend" },
-      description: { react: "FieldDescription", web: "<ui-field-description>", slot: "field-description" },
+      set: {
+        react: "FieldSet",
+        web: "<fieldset> in <ui-field-set>",
+        slot: "field-set",
+      },
+      legend: {
+        react: "FieldLegend",
+        web: "<legend> or <ui-field-legend>",
+        slot: "field-legend",
+      },
+      description: {
+        react: "FieldDescription",
+        web: "<ui-field-description>",
+        slot: "field-description",
+      },
     },
   },
   input: {
@@ -1624,7 +2251,9 @@ const components: Record<
     interactive: [],
     descriptions: {
       "data-filled": { text: "Present while the field holds any text." },
-      "data-disabled": { text: "Present when the field is disabled, by its own prop or its Field." },
+      "data-disabled": {
+        text: "Present when the field is disabled, by its own prop or its Field.",
+      },
       "data-readonly": { text: "Present when the field is read-only." },
       "data-required": { text: "Present when the field is required." },
     },
@@ -1636,7 +2265,9 @@ const components: Record<
     interactive: [],
     descriptions: {
       "data-filled": { text: "Present while the field holds any text." },
-      "data-disabled": { text: "Present when the field is disabled, by its own prop or its Field." },
+      "data-disabled": {
+        text: "Present when the field is disabled, by its own prop or its Field.",
+      },
       "data-readonly": { text: "Present when the field is read-only." },
       "data-required": { text: "Present when the field is required." },
     },
@@ -1645,25 +2276,48 @@ const components: Record<
   "input-group": {
     instances: () => {
       const group = inputGroup({ id: "docs" })
-      group.api.internal.update({ filled: true, disabled: true, readOnly: true })
+      group.api.internal.update({
+        filled: true,
+        disabled: true,
+        readOnly: true,
+      })
       return [group]
     },
     samples: { group: [{}], clear: [{}] },
     interactive: [],
     descriptions: {
-      "data-filled": { text: "Present while the field in the group holds any text." },
+      "data-filled": {
+        text: "Present while the field in the group holds any text.",
+      },
       "data-disabled": {
         text: "Present while the field in the group is disabled, by itself or a `<fieldset>`.",
       },
-      "data-readonly": { text: "Present while the field in the group is read-only." },
+      "data-readonly": {
+        text: "Present while the field in the group is read-only.",
+      },
     },
     parts: {
-      group: { react: "InputGroup", web: "<ui-input-group>", slot: "input-group" },
-      clear: { react: "InputClear", web: "<ui-input-clear>", slot: "input-clear" },
+      group: {
+        react: "InputGroup",
+        web: "<ui-input-group>",
+        slot: "input-group",
+      },
+      clear: {
+        react: "InputClear",
+        web: "<ui-input-clear>",
+        slot: "input-clear",
+      },
     },
   },
   "file-input": {
-    instances: () => [fileInput({ id: "docs", disabled: true, required: true, defaultValue: [docsFile] })],
+    instances: () => [
+      fileInput({
+        id: "docs",
+        disabled: true,
+        required: true,
+        defaultValue: [docsFile],
+      }),
+    ],
     samples: {
       root: [{}],
       trigger: [{}],
@@ -1673,11 +2327,18 @@ const components: Record<
       "item-remove": [{ file: docsFile, value: "docs" }],
     },
     interactive: [],
-    extra: { root: ["data-dragging"], dropzone: ["data-dragging", "data-drag-accept", "data-drag-reject"] },
+    extra: {
+      root: ["data-dragging"],
+      dropzone: ["data-dragging", "data-drag-accept", "data-drag-reject"],
+    },
     descriptions: {
-      "data-disabled": { text: "Present when disabled, by its own prop or a `<fieldset>`." },
+      "data-disabled": {
+        text: "Present when disabled, by its own prop or a `<fieldset>`.",
+      },
       "data-required": { text: "Present when a file is required." },
-      "data-dragging": { text: "Present while files are dragged over one of its drop zones." },
+      "data-dragging": {
+        text: "Present while files are dragged over one of its drop zones.",
+      },
       "dropzone:data-dragging": {
         text: 'Present while files are dragged over the zone, or the window with `target="document"`.',
       },
@@ -1690,7 +2351,10 @@ const components: Record<
     },
     parts: {
       root: { react: "FileInput", web: "<ui-file-input>" },
-      trigger: { react: "FileInputTrigger", web: "the button inside <ui-file-input-trigger>" },
+      trigger: {
+        react: "FileInputTrigger",
+        web: "the button inside <ui-file-input-trigger>",
+      },
     },
   },
   dialog: {
@@ -1757,8 +2421,14 @@ const components: Record<
       root: { react: "Toast", web: "<ui-toast>" },
     },
     descriptions: {
-      "data-side": { text: "The edge of the viewport the region sits on.", values: ["top", "bottom"] },
-      "data-align": { text: "Where along that edge.", values: ["start", "center", "end"] },
+      "data-side": {
+        text: "The edge of the viewport the region sits on.",
+        values: ["top", "bottom"],
+      },
+      "data-align": {
+        text: "Where along that edge.",
+        values: ["start", "center", "end"],
+      },
       "data-expanded": {
         text: "Present while the stack is expanded: hovered, focused, or always with `expanded`.",
       },
@@ -1774,12 +2444,18 @@ const components: Record<
         text: "The direction a swipe dismissed the toast toward, while it animates out.",
         values: ["up", "down", "left", "right"],
       },
-      "data-pending": { text: "Present on an action or close button while its handler's Promise runs." },
+      "data-pending": {
+        text: "Present on an action or close button while its handler's Promise runs.",
+      },
       "data-keyboard": {
         text: "Present on the region while the on-screen keyboard covers part of the page.",
       },
-      "data-starting-style": { text: "Present for a toast's first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while a toast animates out. Style the state you animate to." },
+      "data-starting-style": {
+        text: "Present for a toast's first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while a toast animates out. Style the state you animate to.",
+      },
     },
   },
   drawer: {
@@ -1787,7 +2463,12 @@ const components: Record<
     instances: () => [
       drawer({ id: "docs" }),
       drawer({ id: "docs", defaultOpen: true }),
-      drawer({ id: "docs", defaultOpen: true, snapPoints: [0.2, 0.6], modalAbove: 0.2 }),
+      drawer({
+        id: "docs",
+        defaultOpen: true,
+        snapPoints: [0.2, 0.6],
+        modalAbove: 0.2,
+      }),
       pending(drawer({ id: "docs", defaultOpen: true })),
     ],
     samples: {
@@ -1822,9 +2503,15 @@ const components: Record<
       "data-open": {
         text: "Present while the drawer is open. On a trigger, while it's open from that trigger.",
       },
-      "data-closed": { text: "Present while the drawer is closed, including while it animates out." },
-      "data-nested": { text: "Present when the drawer was opened from inside another drawer." },
-      "data-nested-open": { text: "Present while a drawer opened from inside this one is open." },
+      "data-closed": {
+        text: "Present while the drawer is closed, including while it animates out.",
+      },
+      "data-nested": {
+        text: "Present when the drawer was opened from inside another drawer.",
+      },
+      "data-nested-open": {
+        text: "Present while a drawer opened from inside this one is open.",
+      },
       "data-side": {
         text: "The edge it comes from, with `start` and `end` resolved for the writing direction.",
         values: ["top", "right", "bottom", "left"],
@@ -1832,12 +2519,19 @@ const components: Record<
       "data-snap-point": {
         text: "The snap point it rests on or is moving to, as written, like `0.5` or `content`.",
       },
-      "data-expanded": { text: "Present while it rests at its largest snap point." },
-      "data-dragging": { text: "Present while a finger, mouse or pen drags it." },
+      "data-expanded": {
+        text: "Present while it rests at its largest snap point.",
+      },
+      "data-dragging": {
+        text: "Present while a finger, mouse or pen drags it.",
+      },
       "data-interactive": {
         text: "Present while it rests at or below `modalAbove`, so the page behind is usable. The backdrop lets presses through.",
       },
-      "data-driver": { text: "What moves it.", values: ["pointer", "scroll-snap"] },
+      "data-driver": {
+        text: "What moves it.",
+        values: ["pointer", "scroll-snap"],
+      },
       "data-keyboard": {
         text: "Present on the viewport while the on-screen keyboard covers part of the page.",
       },
@@ -1870,7 +2564,8 @@ const components: Record<
     descriptions: DIALOG_DESCRIPTIONS,
   },
   popover: {
-    instances: () => [false, true].map((open) => popover({ id: "docs", defaultOpen: open })),
+    instances: () =>
+      [false, true].map((open) => popover({ id: "docs", defaultOpen: open })),
     samples: {
       trigger: [{}, { disabled: true }],
       content: [{}],
@@ -1891,8 +2586,12 @@ const components: Record<
       "data-open": {
         text: "Present while the popover is open. On a trigger, while it's open from that trigger.",
       },
-      "data-closed": { text: "Present while the popover is closed, including while it animates out." },
-      "trigger:data-disabled": { text: "Present when the trigger is disabled." },
+      "data-closed": {
+        text: "Present while the popover is closed, including while it animates out.",
+      },
+      "trigger:data-disabled": {
+        text: "Present when the trigger is disabled.",
+      },
       "data-side": {
         text: "Where the popover ended up, after flipping away from edges. Set on the arrow too.",
         values: ["top", "right", "bottom", "left"],
@@ -1901,7 +2600,9 @@ const components: Record<
         text: "How the popover lines up with its trigger.",
         values: ["start", "center", "end"],
       },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
       "data-ending-style": {
         text: "Present while the popover animates out. Style the state you animate to.",
       },
@@ -1911,7 +2612,8 @@ const components: Record<
     },
   },
   tooltip: {
-    instances: () => [false, true].map((open) => tooltip({ id: "docs", defaultOpen: open })),
+    instances: () =>
+      [false, true].map((open) => tooltip({ id: "docs", defaultOpen: open })),
     samples: {
       trigger: [{}],
       content: [{}],
@@ -1924,7 +2626,9 @@ const components: Record<
     ],
     descriptions: {
       "data-open": { text: "Present while the tooltip is open." },
-      "data-closed": { text: "Present while the tooltip is closed, including while it animates out." },
+      "data-closed": {
+        text: "Present while the tooltip is closed, including while it animates out.",
+      },
       "data-side": {
         text: "Where the tooltip ended up, after flipping away from edges. Set on the arrow too.",
         values: ["top", "right", "bottom", "left"],
@@ -1933,7 +2637,9 @@ const components: Record<
         text: "How the tooltip lines up with its trigger.",
         values: ["start", "center", "end"],
       },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
       "data-ending-style": {
         text: "Present while the tooltip animates out. Style the state you animate to.",
       },
@@ -1943,7 +2649,8 @@ const components: Record<
     },
   },
   "hover-card": {
-    instances: () => [false, true].map((open) => hoverCard({ id: "docs", defaultOpen: open })),
+    instances: () =>
+      [false, true].map((open) => hoverCard({ id: "docs", defaultOpen: open })),
     samples: {
       trigger: [{}],
       content: [{}],
@@ -1957,7 +2664,9 @@ const components: Record<
       "data-open": {
         text: "Present while the card is open. On a trigger, while it's open from that trigger.",
       },
-      "data-closed": { text: "Present while the card is closed, including while it animates out." },
+      "data-closed": {
+        text: "Present while the card is closed, including while it animates out.",
+      },
       "data-side": {
         text: "Where the card ended up, after flipping away from edges. Set on the arrow too.",
         values: ["top", "right", "bottom", "left"],
@@ -1966,7 +2675,9 @@ const components: Record<
         text: "How the card lines up with its trigger.",
         values: ["start", "center", "end"],
       },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
       "data-ending-style": {
         text: "Present while the card animates out. Style the state you animate to.",
       },
@@ -1980,9 +2691,16 @@ const components: Record<
       const closed = navigationMenu({ id: "docs" })
       return [
         closed,
-        navigationMenu({ id: "docs-open", defaultValue: "a", orientation: "vertical" }),
+        navigationMenu({
+          id: "docs-open",
+          defaultValue: "a",
+          orientation: "vertical",
+        }),
         // A submenu, for attributes only nested menus have.
-        navigationMenu({ id: "docs-sub", parent: { api: closed.api, item: "a" } }),
+        navigationMenu({
+          id: "docs-sub",
+          parent: { api: closed.api, item: "a" },
+        }),
       ]
     },
     samples: {
@@ -2009,26 +2727,42 @@ const components: Record<
       list: ["data-has-icons"],
     },
     descriptions: {
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on a link while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on a link while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any link inside holds an icon part, so items without one can line up.",
       },
-      "data-orientation": { text: "Which arrow keys move between the items, and where panels open." },
-      "root:data-nested": { text: "Present on a menu inside another menu's content." },
+      "data-orientation": {
+        text: "Which arrow keys move between the items, and where panels open.",
+      },
+      "root:data-nested": {
+        text: "Present on a menu inside another menu's content.",
+      },
       "data-open": { text: "Present while the item's panel is open." },
-      "data-closed": { text: "Present while the item's panel is closed, including while it animates out." },
+      "data-closed": {
+        text: "Present while the item's panel is closed, including while it animates out.",
+      },
       "viewport:data-open": { text: "Present while a panel is open." },
       "viewport:data-closed": {
         text: "Present while every panel is closed, including while it animates out.",
       },
-      "indicator:data-open": { text: "Present while a panel is open, so it sits under a trigger." },
+      "indicator:data-open": {
+        text: "Present while a panel is open, so it sits under a trigger.",
+      },
       "indicator:data-closed": { text: "Present while every panel is closed." },
       "indicator:data-visible": {
         text: "Present while there's a trigger or a current page's link to sit under.",
       },
-      "trigger:data-disabled": { text: "Present when the trigger is disabled." },
-      "data-current": { text: "Present on the link for the current page, which also gets aria-current." },
+      "trigger:data-disabled": {
+        text: "Present when the trigger is disabled.",
+      },
+      "data-current": {
+        text: "Present on the link for the current page, which also gets aria-current.",
+      },
       "data-motion": {
         text: "Which way the content moves while another item takes over. Order is logical, so in right-to-left layouts the end is on the left.",
         values: ["from-start", "from-end", "to-start", "to-end"],
@@ -2041,8 +2775,12 @@ const components: Record<
         text: "How it lines up with the trigger.",
         values: ["start", "center", "end"],
       },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while it animates out. Style the state you animate to." },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while it animates out. Style the state you animate to.",
+      },
     },
   },
   "trigger-menu": {
@@ -2074,46 +2812,75 @@ const components: Record<
       empty: ["data-empty", "data-loading"],
     },
     descriptions: {
-      "data-mirror": { text: "Present on an icon that flips in right-to-left text, with `mirror`." },
-      "data-has-icon": { text: "Present on an item while it holds an icon part." },
+      "data-mirror": {
+        text: "Present on an icon that flips in right-to-left text, with `mirror`.",
+      },
+      "data-has-icon": {
+        text: "Present on an item while it holds an icon part.",
+      },
       "data-has-icons": {
         text: "Present while any item inside holds an icon part, so items without one can line up.",
       },
       "data-open": { text: "Present while the list is open." },
-      "data-closed": { text: "Present while the list is closed, including while it animates out." },
-      "data-trigger": { text: "The trigger of the current match, like `@`, while there is one." },
+      "data-closed": {
+        text: "Present while the list is closed, including while it animates out.",
+      },
+      "data-trigger": {
+        text: "The trigger of the current match, like `@`, while there is one.",
+      },
       "data-disabled": { text: "Present when the item can't be chosen." },
-      "data-highlighted": { text: "Present on the highlighted item. Focus stays in the field." },
+      "data-highlighted": {
+        text: "Present on the highlighted item. Focus stays in the field.",
+      },
       "data-empty": { text: "Present while no item matches." },
       "data-loading": { text: "Present while items load." },
       "data-side": {
         text: "Where the list ended up, after flipping away from edges.",
         values: ["top", "right", "bottom", "left"],
       },
-      "data-align": { text: "How the list lines up with the trigger.", values: ["start", "center", "end"] },
-      "data-starting-style": { text: "Present for the first frame. Style the state you animate from." },
-      "data-ending-style": { text: "Present while the list animates out. Style the state you animate to." },
+      "data-align": {
+        text: "How the list lines up with the trigger.",
+        values: ["start", "center", "end"],
+      },
+      "data-starting-style": {
+        text: "Present for the first frame. Style the state you animate from.",
+      },
+      "data-ending-style": {
+        text: "Present while the list animates out. Style the state you animate to.",
+      },
     },
   },
   "token-input": {
     instances: () => [
       tokenInput({
         id: "docs",
-        defaultValue: [{ type: "file", value: "a", label: "a", id: "t", status: "pending" }],
+        defaultValue: [
+          { type: "file", value: "a", label: "a", id: "t", status: "pending" },
+        ],
       }),
       tokenInput({ id: "docs-disabled", disabled: true, readOnly: true }),
     ],
-    samples: { editor: [{}], token: [{ id: "t", token: "t" }], "token-remove": [{ id: "t", token: "t" }] },
+    samples: {
+      editor: [{}],
+      token: [{ id: "t", token: "t" }],
+      "token-remove": [{ id: "t", token: "t" }],
+    },
     interactive: [{ file: "token-input/token-input-view.ts", slot: "token" }],
     extra: { token: ["data-selected", "data-unresolved"] },
     descriptions: {
-      "data-empty": { text: "Present while the input holds nothing. Show the placeholder with it." },
+      "data-empty": {
+        text: "Present while the input holds nothing. Show the placeholder with it.",
+      },
       "data-disabled": {
         text: "Present when the input is disabled, by its own prop, a field or a `<fieldset>`.",
       },
       "data-readonly": { text: "Present when the input is read-only." },
-      "data-token-type": { text: "The token's type, like `file` or `mention`. Also on its host." },
-      "data-pending": { text: "Present while the token loads. Also on its host." },
+      "data-token-type": {
+        text: "The token's type, like `file` or `mention`. Also on its host.",
+      },
+      "data-pending": {
+        text: "Present while the token loads. Also on its host.",
+      },
       "data-unresolved": {
         text: "Present while the token needs the user, like an ambiguous mention. Also on its host.",
       },
@@ -2137,21 +2904,36 @@ async function collect(component: string) {
   for (const instance of instances()) {
     for (const [slot, propsList] of Object.entries(samples)) {
       for (const props of propsList) {
-        for (const [name, value] of Object.entries(partAttrs(instance.part(slot, props)))) {
-          if (name.startsWith("data-") && name !== "data-slot" && value !== undefined) add(slot, name, value)
+        for (const [name, value] of Object.entries(
+          partAttrs(instance.part(slot, props))
+        )) {
+          if (
+            name.startsWith("data-") &&
+            name !== "data-slot" &&
+            value !== undefined
+          ) {
+            add(slot, name, value)
+          }
         }
       }
     }
   }
   for (const { file, slot } of interactive) {
     const source = await readFile(coreSource(file), "utf8")
-    for (const match of source.matchAll(/setAttribute\("(data-[\w-]+)"/g)) add(slot, match[1], "")
+    for (const match of source.matchAll(/setAttribute\("(data-[\w-]+)"/g)) {
+      add(slot, match[1], "")
+    }
   }
-  for (const [slot, names] of Object.entries(extra)) for (const name of names) add(slot, name, "")
+  for (const [slot, names] of Object.entries(extra)) {
+    for (const name of names) {
+      add(slot, name, "")
+    }
+  }
   return found
 }
 
-const pascal = (slot: string) => slot.replace(/(^|-)(\w)/g, (_, __, char: string) => char.toUpperCase())
+const pascal = (slot: string) =>
+  slot.replace(/(^|-)(\w)/g, (_, __, char: string) => char.toUpperCase())
 
 /** A part's name in `framework`, like `AccordionPanel` or `<ui-accordion-panel>`. */
 function partLabel(component: string, slot: string, framework: Framework) {
@@ -2179,14 +2961,17 @@ async function dataAttributeTables(component: string, framework: Framework) {
         slot,
         name: name(slot),
         dataSlot: dataSlot(slot),
-        attributes: [...found.get(slot)!.entries()].map(([attribute, sampled]) => {
-          const description = descriptions[`${slot}:${attribute}`] ?? descriptions[attribute]
-          return {
-            attribute,
-            values: description?.values ?? [...sampled].filter(Boolean),
-            text: description?.text,
+        attributes: [...found.get(slot)!.entries()].map(
+          ([attribute, sampled]) => {
+            const description =
+              descriptions[`${slot}:${attribute}`] ?? descriptions[attribute]
+            return {
+              attribute,
+              values: description?.values ?? [...sampled].filter(Boolean),
+              text: description?.text,
+            }
           }
-        }),
+        ),
       })),
     plain: slots
       .filter((slot) => !found.get(slot)?.size)

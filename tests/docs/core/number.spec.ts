@@ -61,7 +61,10 @@ test("scale: the slider turns the needle, and a log scale gives small angles mos
   await slider.fill("0.5")
   await expect(angle).toHaveText("13°")
   await expect(slider).toHaveAttribute("aria-valuetext", "13°")
-  await expect(page.locator("[data-needle]")).toHaveAttribute("style", /rotate: -13\.4\d*deg/)
+  await expect(page.locator("[data-needle]")).toHaveAttribute(
+    "style",
+    /rotate: -13\.4\d*deg/
+  )
   await slider.fill("1")
   await expect(angle).toHaveText("180°")
 })
@@ -95,7 +98,10 @@ test("scrub: the playhead snaps to sections, keys stop at them, and Command scru
   // thumb itself changes nothing, so it starts away from there.
   await slider.scrollIntoViewIfNeeded()
   const box = (await slider.boundingBox())!
-  const at = (seconds: number) => ({ x: box.x + (box.width * seconds) / 60, y: box.y + box.height / 2 })
+  const at = (seconds: number) => ({
+    x: box.x + (box.width * seconds) / 60,
+    y: box.y + box.height / 2,
+  })
   await slider.fill("5")
   await page.mouse.click(at(23.2).x, at(23.2).y)
   await expect(time).toHaveText("0:24.0")
@@ -107,10 +113,14 @@ test("scrub: the playhead snaps to sections, keys stop at them, and Command scru
   await expect(time).not.toHaveText("0:05.0")
 })
 
-test("format: the value, its range and its parts follow the locale and the style", async ({ page }) => {
+test("format: the value, its range and its parts follow the locale and the style", async ({
+  page,
+}) => {
   await openExamples(page, "/docs/core/number")
   await expect(page.locator("[data-plain]")).toHaveText("€1,234.50")
-  await expect(page.locator("[data-formatted] [data-type=currency]")).toHaveText("€")
+  await expect(
+    page.locator("[data-formatted] [data-type=currency]")
+  ).toHaveText("€")
   await page.getByLabel("Locale").first().selectOption("de-DE")
   await expect(page.locator("[data-plain]")).toHaveText("1.234,50 €")
   await expect(page.locator("[data-formatted]")).toHaveText("1.234,50 €")

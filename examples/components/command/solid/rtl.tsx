@@ -1,4 +1,10 @@
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/solid/command"
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/solid/command"
 import { For } from "solid-js"
 
 const commands = [

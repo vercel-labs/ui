@@ -21,9 +21,14 @@ function Fixture() {
       >
         <AccordionItem
           value="overview"
-          class={(state) => `accordion-item ${state.open ? "is-open" : "is-closed"}`}
+          class={(state) =>
+            `accordion-item ${state.open ? "is-open" : "is-closed"}`
+          }
         >
-          <AccordionHeader class="accordion-header" render={(props) => <h2 {...props} />}>
+          <AccordionHeader
+            class="accordion-header"
+            render={(props) => <h2 {...props} />}
+          >
             <AccordionTrigger
               class="accordion-trigger"
               render={(props, state) => (
@@ -39,17 +44,25 @@ function Fixture() {
               Overview
             </AccordionTrigger>
           </AccordionHeader>
-          <AccordionPanel class="accordion-panel" render={(props) => <section {...props} />}>
+          <AccordionPanel
+            class="accordion-panel"
+            render={(props) => <section {...props} />}
+          >
             The overview panel.
           </AccordionPanel>
         </AccordionItem>
         <AccordionItem value="details" class="accordion-item">
           <AccordionHeader class="accordion-header">
-            <AccordionTrigger class="accordion-trigger" render={(props) => <div {...props} />}>
+            <AccordionTrigger
+              class="accordion-trigger"
+              render={(props) => <div {...props} />}
+            >
               Details
             </AccordionTrigger>
           </AccordionHeader>
-          <AccordionPanel class="accordion-panel">The details panel.</AccordionPanel>
+          <AccordionPanel class="accordion-panel">
+            The details panel.
+          </AccordionPanel>
         </AccordionItem>
       </Accordion>
       <button>After</button>

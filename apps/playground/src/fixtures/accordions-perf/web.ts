@@ -15,7 +15,7 @@ function mount(root: HTMLElement) {
             <h3 class="accordion-header"><ui-accordion-trigger><button class="accordion-trigger">Question ${index + 1}</button></ui-accordion-trigger></h3>
           </ui-accordion-header>
           <ui-accordion-panel class="accordion-panel">Answer ${index + 1}</ui-accordion-panel>
-        </ui-accordion-item>`,
+        </ui-accordion-item>`
     ).join("")
     target.innerHTML = `
       <div class="fixture" style="flex-direction: column; align-items: start">

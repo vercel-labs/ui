@@ -27,9 +27,11 @@ function mount(root: HTMLElement) {
     </ui-menu>
   `
   const menu = root.querySelector("ui-menu")!
-  menu.addEventListener("openchange", (event) => log(root, event.detail.value ? "Opening" : "Closing"))
+  menu.addEventListener("openchange", (event) =>
+    log(root, event.detail.value ? "Opening" : "Closing")
+  )
   menu.addEventListener("openchangecomplete", (event) =>
-    log(root, event.detail.value ? "Finished opening" : "Finished closing"),
+    log(root, event.detail.value ? "Finished opening" : "Finished closing")
   )
 }
 

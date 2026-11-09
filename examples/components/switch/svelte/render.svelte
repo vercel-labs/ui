@@ -9,7 +9,9 @@
     <SwitchThumb>
       {#snippet render({ props, state })}
         <span {...props}>
-          {#if state.checked}<MoonIcon aria-hidden="true" />{:else}<SunIcon aria-hidden="true" />{/if}
+          {#if state.checked}<MoonIcon aria-hidden="true" />{:else}<SunIcon
+              aria-hidden="true"
+            />{/if}
         </span>
       {/snippet}
     </SwitchThumb>

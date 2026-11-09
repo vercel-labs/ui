@@ -12,8 +12,13 @@ import { ref } from "vue"
 
 const open = ref(false)
 
-function onNestedOpenChange(nested: boolean, details: { returnValue?: string }) {
-  if (!nested && details.returnValue === "confirm") open.value = false
+function onNestedOpenChange(
+  nested: boolean,
+  details: { returnValue?: string }
+) {
+  if (!nested && details.returnValue === "confirm") {
+    open.value = false
+  }
 }
 </script>
 
@@ -25,7 +30,8 @@ function onNestedOpenChange(nested: boolean, details: { returnValue?: string }) 
       <div data-slot="stack">
         <AlertDialogTitle>Delete this workspace?</AlertDialogTitle>
         <AlertDialogDescription>
-          All 12 projects and their deployments will be deleted for everyone on your team.
+          All 12 projects and their deployments will be deleted for everyone on
+          your team.
         </AlertDialogDescription>
       </div>
       <div data-slot="row">
@@ -36,11 +42,16 @@ function onNestedOpenChange(nested: boolean, details: { returnValue?: string }) 
           <AlertDialogContent>
             <div data-slot="stack">
               <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>There's no way to get the workspace back.</AlertDialogDescription>
+              <AlertDialogDescription
+                >There's no way to get the workspace
+                back.</AlertDialogDescription
+              >
             </div>
             <div data-slot="row">
               <AlertDialogClose>Go Back</AlertDialogClose>
-              <AlertDialogClose data-variant="solid" value="confirm">Delete Workspace</AlertDialogClose>
+              <AlertDialogClose data-variant="solid" value="confirm"
+                >Delete Workspace</AlertDialogClose
+              >
             </div>
           </AlertDialogContent>
         </AlertDialog>

@@ -6,9 +6,13 @@ import { describe, groups, toppings, variantData } from "./variants"
 
 const leaf = `<svg aria-hidden="true" viewBox="0 0 24 24" class="size-3.5" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19c8 0 14-6 14-14C11 5 5 11 5 19Zm0 0 7-7"/></svg>`
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
-const item = (entry: { value: string; label: string; disabled?: boolean }, link = false) => {
+const item = (
+  entry: { value: string; label: string; disabled?: boolean },
+  link = false
+) => {
   const content = `<ui-listbox-item-icon class="${classes.icon}">${leaf}</ui-listbox-item-icon>${entry.label}<ui-listbox-item-indicator class="${classes.indicator}">✓</ui-listbox-item-indicator>`
   return link
     ? `<ui-listbox-item value="${entry.value}" as-child><a class="${classes.item}" href="#${entry.value}">${content}</a></ui-listbox-item>`
@@ -27,19 +31,24 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/field")
   await import("@ui-sdk/web/listbox")
   kitchenSink(root, "web", (slot, variant, env) => {
-    const { fieldDisabled, defaultValue, ...options } = (variant.options ?? {}) as Record<string, unknown>
+    const { fieldDisabled, defaultValue, ...options } = (variant.options ??
+      {}) as Record<string, unknown>
     const attributes = Object.entries(options)
-      .map(([key, value]) => (value === true ? kebab(key) : `${kebab(key)}="${value}"`))
+      .map(([key, value]) =>
+        value === true ? kebab(key) : `${kebab(key)}="${value}"`
+      )
       .join(" ")
     const start =
-      defaultValue === undefined ? "" : ` default-value="${([] as unknown[]).concat(defaultValue)}"`
+      defaultValue === undefined
+        ? ""
+        : ` default-value="${([] as unknown[]).concat(defaultValue)}"`
     const content = variant.data
       ? template
       : variant.items === "grouped"
         ? groups
             .map(
               (group, index) =>
-                `${index ? `<ui-listbox-separator class="${classes.separator}"></ui-listbox-separator>` : ""}<ui-listbox-group class="${classes.group}"><ui-listbox-group-label class="${classes.groupLabel}">${group.label}</ui-listbox-group-label>${group.items.map((entry) => item(entry)).join("")}</ui-listbox-group>`,
+                `${index ? `<ui-listbox-separator class="${classes.separator}"></ui-listbox-separator>` : ""}<ui-listbox-group class="${classes.group}"><ui-listbox-group-label class="${classes.groupLabel}">${group.label}</ui-listbox-group-label>${group.items.map((entry) => item(entry)).join("")}</ui-listbox-group>`
             )
             .join("")
         : toppings.map((entry) => item(entry, variant.links)).join("")
@@ -54,18 +63,28 @@ async function mount(root: HTMLElement) {
         ? `<form class="flex flex-col items-start gap-2">${listbox}<div class="flex gap-2"><button class="${classes.button}">Submit</button><button type="reset" class="${classes.control}">Reset</button></div></form>`
         : listbox
     const element = slot.querySelector<UiListboxElement>("ui-listbox")!
-    if (variant.data) element.items = variantData(variant)
+    if (variant.data) {
+      element.items = variantData(variant)
+    }
     element.addEventListener("valuechange", (event) => {
-      if (variant.cancel) return event.preventDefault()
-      env.log(`valueChange ${describe(event.detail.value)} (${event.detail.reason}, ${event.detail.source})`)
+      if (variant.cancel) {
+        return event.preventDefault()
+      }
+      env.log(
+        `valueChange ${describe(event.detail.value)} (${event.detail.reason}, ${event.detail.source})`
+      )
     })
     const form = slot.querySelector("form")
     form?.addEventListener("submit", (event) => {
       event.preventDefault()
-      env.log(`submit ${new URLSearchParams(new FormData(form) as never).toString()}`)
+      env.log(
+        `submit ${new URLSearchParams(new FormData(form) as never).toString()}`
+      )
     })
     form?.addEventListener("reset", () => env.log("reset"))
-    if (!variant.controller) return
+    if (!variant.controller) {
+      return
+    }
     const controller = createListboxController<string, true>()
     element.controller = controller
     env.controls([

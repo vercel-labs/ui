@@ -5,11 +5,25 @@
 // State and the API live in trigger-menu-api.ts, keys in
 // trigger-menu-keyboard.ts, and parts in trigger-menu-parts.ts, on the
 // listbox engine and the popup layer Combobox uses.
-import { type AsyncOptionsContext, type AsyncOptionsStatus } from "../../foundation/lists/async-options"
+import {
+  type AsyncOptionsContext,
+  type AsyncOptionsStatus,
+} from "../../foundation/lists/async-options"
 import { type PopupResult } from "../../foundation/popups/popup"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
-import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { type ListData, type ListFilter, type ListGroup, type ListItem } from "../../foundation/lists/listbox"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
+import {
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
+import {
+  type ListData,
+  type ListFilter,
+  type ListGroup,
+  type ListItem,
+} from "../../foundation/lists/listbox"
 import { createController } from "../../foundation/kernel/controller"
 import type {
   ChangeDetails,
@@ -18,10 +32,20 @@ import type {
   DismissAttemptReason,
 } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
-import type { TextEditorAdapter, TokenInsert } from "../../foundation/text/text-editor"
+import type {
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
+import type {
+  TextEditorAdapter,
+  TokenInsert,
+} from "../../foundation/text/text-editor"
 import { triggerMenuSlots } from "./trigger-menu-parts"
-import { initialTriggerMenuState, syncTriggerMenuState, triggerMenuApi } from "./trigger-menu-api"
+import {
+  initialTriggerMenuState,
+  syncTriggerMenuState,
+  triggerMenuApi,
+} from "./trigger-menu-api"
 import type { TriggerMenuGeneric } from "./trigger-menu-generic"
 import type { TriggerMatch, TriggerRule } from "./trigger-match"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
@@ -65,7 +89,7 @@ type TriggerMenuData<T = string> = ListData<T, TriggerMenuDataItem<T>>
  */
 type TriggerItemsLoader<T = string> = (
   query: string,
-  context: AsyncOptionsContext,
+  context: AsyncOptionsContext
 ) => Promise<TriggerMenuData<T>> | TriggerMenuData<T>
 
 /**
@@ -111,7 +135,7 @@ type TriggerDefinition<T = string> = TriggerRule & {
   /** What replaces the trigger and query. Defaults to a token where the editor takes tokens, else the trigger, the label and a space. */
   insert?: (
     item: TriggerMenuDataItem<T>,
-    details: { match: TriggerMatch; arguments: Record<string, string> },
+    details: { match: TriggerMatch; arguments: Record<string, string> }
   ) => string | TokenInsert
 }
 
@@ -135,7 +159,10 @@ type TriggerMenuOpenChangeReason =
  * The dismissals `dismissible` refuses that `onDismissAttempt` hears about.
  * @stable
  */
-type TriggerMenuDismissReason = Extract<TriggerMenuOpenChangeReason, DismissAttemptReason>
+type TriggerMenuDismissReason = Extract<
+  TriggerMenuOpenChangeReason,
+  DismissAttemptReason
+>
 
 /**
  * Why a trigger menu's query changed.
@@ -188,7 +215,10 @@ function createTriggerMenuController() {
      * Opens or closes the menu. Opening needs a match; see `open()` for one that types the trigger.
      * Returns false when the change was canceled or it was already open or closed.
      */
-    setOpen: (open: boolean, options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => boolean
+    setOpen: (
+      open: boolean,
+      options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>
+    ) => boolean
     /**
      * Opens the menu for `trigger`, typing it at the caret first unless a match for it is already
      * there, and resolves once it closes. Resolves exactly once and never rejects.
@@ -199,13 +229,15 @@ function createTriggerMenuController() {
         trigger?: string
         /** Closes the menu, with reason `"imperative"`, when it aborts. */
         signal?: AbortSignal
-      },
+      }
     ) => Promise<PopupResult<TriggerMenuOpenChangeReason, never>>
     /**
      * Closes the menu. The match isn't dismissed, so typing in it opens it again.
      * Returns false when the close was canceled or it was already closed.
      */
-    close: (options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>) => boolean
+    close: (
+      options?: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason>
+    ) => boolean
     /** The text after the trigger, or after the current argument's start. Empty while closed. */
     getQuery: () => string
     /** The current match, or null. */
@@ -239,21 +271,29 @@ type TriggerMenuOptions<T = string> = PortalProps & {
   /** Runs when the menu wants to open or close. `details.reason` says why, `details.trigger` which trigger, and `details.cancel()` stops it. */
   onOpenChange?: (
     open: boolean,
-    details: ChangeDetails<TriggerMenuOpenChangeReason> & { trigger: string | null },
+    details: ChangeDetails<TriggerMenuOpenChangeReason> & {
+      trigger: string | null
+    }
   ) => void
   /** Runs once the menu has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /** Runs when the text after the trigger changes. Read-only: it's the editor's text. `details.argument` names the argument being typed. */
   onQueryChange?: (
     query: string,
-    details: ChangeDetails<TriggerMenuQueryChangeReason> & { trigger: string; argument?: string },
+    details: ChangeDetails<TriggerMenuQueryChangeReason> & {
+      trigger: string
+      argument?: string
+    }
   ) => void
   /**
    * Runs when an item, with every required argument, is chosen. The default insertion follows
    * unless `details.preventDefault()`. Return a Promise and a token is inserted at once as pending,
    * updated with what it resolves to and removed if it rejects; the menu closes either way.
    */
-  onSelect?: (value: T, details: TriggerMenuSelectDetails<T>) => void | Promise<void | Partial<TokenInsert>>
+  onSelect?: (
+    value: T,
+    details: TriggerMenuSelectDetails<T>
+  ) => void | Promise<void | Partial<TokenInsert>>
   /**
    * What screen readers hear once an `onSelect` Promise has been pending for a second, so a slow action
    * doesn't pass in silence. Set it in the page's language. An empty string says nothing.
@@ -333,7 +373,10 @@ type TriggerMenuItemProps<T = string> = {
   /** Keeps the item from being chosen. It can still be highlighted, as the listbox pattern asks. */
   disabled?: boolean
   /** Runs before the menu's `onSelect`. `details.preventDefault()` skips the default insertion. */
-  onSelect?: (value: T, details: TriggerMenuSelectDetails<T>) => void | Promise<void | Partial<TokenInsert>>
+  onSelect?: (
+    value: T,
+    details: TriggerMenuSelectDetails<T>
+  ) => void | Promise<void | Partial<TokenInsert>>
 }
 
 /**
@@ -463,7 +506,10 @@ const triggerMenuPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `triggerMenu`.
  * @stable
  */
-interface TriggerMenuPrimitive extends WithGeneric<typeof triggerMenuPrimitive, TriggerMenuGeneric> {}
+interface TriggerMenuPrimitive extends WithGeneric<
+  typeof triggerMenuPrimitive,
+  TriggerMenuGeneric
+> {}
 
 /**
  * The trigger menu primitive, with the slots `input`, `content`, `list`,
@@ -505,7 +551,11 @@ export {
   type TriggerMenuStatusState,
 }
 export type { TriggerMenuApi } from "./trigger-menu-api"
-export type { TriggerBoundary, TriggerMatch, TriggerRule } from "./trigger-match"
+export type {
+  TriggerBoundary,
+  TriggerMatch,
+  TriggerRule,
+} from "./trigger-match"
 export type {
   EditorChange,
   EditorReplaceOptions,
@@ -515,5 +565,9 @@ export type {
   Token,
   TokenInsert,
 } from "../../foundation/text/text-editor"
-export type { ListFilter, ListItem, ListSeparator } from "../../foundation/lists/listbox"
+export type {
+  ListFilter,
+  ListItem,
+  ListSeparator,
+} from "../../foundation/lists/listbox"
 export { textFieldAdapter } from "../../foundation/text/caret"

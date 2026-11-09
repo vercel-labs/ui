@@ -4,7 +4,11 @@ The item's checkbox, with `checkable`. Screen readers hear the item's checked st
 @stable
 -->
 <script lang="ts">
-  import { tree, type TreeItemPartProps, type TreeItemState } from "@ui-sdk/core/tree"
+  import {
+    tree,
+    type TreeItemPartProps,
+    type TreeItemState,
+  } from "@ui-sdk/core/tree"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

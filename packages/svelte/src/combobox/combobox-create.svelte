@@ -24,11 +24,18 @@ text matches no item's label exactly. Without content, `Create “text”`.
 
   const combobox = useHandle(comboboxPrimitive)
   combobox.instance.use(comboboxCreate)
-  const create = useHandlePart(combobox, "create", () => ({ onCreate, minLength }))
+  const create = useHandlePart(combobox, "create", () => ({
+    onCreate,
+    minLength,
+  }))
 </script>
 
 {#snippet text(state: ComboboxCreateState)}Create “{state.query}”{/snippet}
 
 {#if create.present}
-  <Part tag="div" part={create} props={{ ...rest, children: children ?? text }} />
+  <Part
+    tag="div"
+    part={create}
+    props={{ ...rest, children: children ?? text }}
+  />
 {/if}

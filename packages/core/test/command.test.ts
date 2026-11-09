@@ -1,8 +1,17 @@
 import { describe, expect, test, vi } from "vitest"
 import { command, type CommandData } from "../src/components/command/command"
-import { commandShortcuts, findCommand, pageItems } from "../src/components/command/command-data"
+import {
+  commandShortcuts,
+  findCommand,
+  pageItems,
+} from "../src/components/command/command-data"
 import { fuzzyFilter, fuzzyScore } from "../src/foundation/text/fuzzy"
-import { createListbox, filterData, itemKey, type ListData } from "../src/foundation/lists/listbox"
+import {
+  createListbox,
+  filterData,
+  itemKey,
+  type ListData,
+} from "../src/foundation/lists/listbox"
 import { attrs } from "../src/foundation/kernel/part"
 import { createStore } from "../src/foundation/kernel/store"
 import { fakeElement } from "./selects"
@@ -62,15 +71,21 @@ function key(name: string, value = "") {
 
 describe("fuzzy scores", () => {
   test("the whole text beats a prefix, which beats a word, a substring and scattered letters", () => {
-    const scores = ["Set", "Settings", "Quick setup", "Assets", "Show emoji teams"].map((text) =>
-      fuzzyScore(text, "set"),
-    )
+    const scores = [
+      "Set",
+      "Settings",
+      "Quick setup",
+      "Assets",
+      "Show emoji teams",
+    ].map((text) => fuzzyScore(text, "set"))
     expect(scores).toEqual([...scores].sort((a, b) => b - a))
     expect(scores.every((score) => score > 0)).toBe(true)
   })
 
   test("letters in order match across words, and word starts count most", () => {
-    expect(fuzzyScore("Git push", "gp")).toBeGreaterThan(fuzzyScore("Grep", "gp"))
+    expect(fuzzyScore("Git push", "gp")).toBeGreaterThan(
+      fuzzyScore("Grep", "gp")
+    )
     expect(fuzzyScore("git push", "git ps")).toBeGreaterThan(0)
     expect(fuzzyScore("Calendar", "xyz")).toBe(0)
     expect(fuzzyScore("Calendar", "rac")).toBe(0)
@@ -83,7 +98,9 @@ describe("fuzzy scores", () => {
 
 describe("ranking", () => {
   test("data ranks best matches first, within groups and among them, without separators", () => {
-    const ranked = filterData(commands as ListData, "se", fuzzyFilter, { rank: true })
+    const ranked = filterData(commands as ListData, "se", fuzzyFilter, {
+      rank: true,
+    })
     expect(ranked).toEqual([
       {
         type: "group",
@@ -93,19 +110,26 @@ describe("ranking", () => {
       {
         type: "group",
         label: "Suggestions",
-        items: [{ value: "emoji", label: "Search Emoji", keywords: ["smiley"] }],
+        items: [
+          { value: "emoji", label: "Search Emoji", keywords: ["smiley"] },
+        ],
       },
     ])
   })
 
   test("an empty query keeps the source order", () => {
-    expect(filterData(commands as ListData, "", fuzzyFilter, { rank: true })).toBe(commands)
+    expect(
+      filterData(commands as ListData, "", fuzzyFilter, { rank: true })
+    ).toBe(commands)
   })
 
   test("a scoring function ranks, and 0 hides", () => {
     const items: ListData = ["a", "bb", "ccc"]
     const byLength = (item: { label: string }) => item.label.length - 1
-    expect(filterData(items, "x", byLength, { rank: true })).toEqual(["ccc", "bb"])
+    expect(filterData(items, "x", byLength, { rank: true })).toEqual([
+      "ccc",
+      "bb",
+    ])
   })
 
   test("separators stay while scores move no entry", () => {
@@ -118,7 +142,8 @@ describe("ranking", () => {
       separator,
       "Avocado",
     ])
-    const avocadoFirst = (item: { label: string }) => (item.label === "Avocado" ? 2 : 1)
+    const avocadoFirst = (item: { label: string }) =>
+      item.label === "Avocado" ? 2 : 1
     expect(filterData(items, "a", avocadoFirst, { rank: true })).toEqual([
       "Avocado",
       "Apple",
@@ -134,7 +159,9 @@ describe("ranking", () => {
     }))
     let query = ""
     const listbox = createListbox({
-      store: createStore({ highlighted: null as string | null }, ["highlighted"]),
+      store: createStore({ highlighted: null as string | null }, [
+        "highlighted",
+      ]),
       focus: "virtual",
       items: () => many,
       toKey: (value) => itemKey(value),
@@ -171,7 +198,11 @@ describe("command data", () => {
 
   test("commands and shortcuts are found on every page", () => {
     expect(findCommand(commands, "dark")?.label).toBe("Dark")
-    expect(commandShortcuts(commands).map((entry) => entry.value)).toEqual(["profile", "light", "settings"])
+    expect(commandShortcuts(commands).map((entry) => entry.value)).toEqual([
+      "profile",
+      "light",
+      "settings",
+    ])
   })
 })
 
@@ -191,7 +222,7 @@ describe("command headless", () => {
     expect(instance.api.getValue()).toBe("settings")
     expect(onValueChange).toHaveBeenLastCalledWith(
       "settings",
-      expect.objectContaining({ reason: "input-change", index: 0 }),
+      expect.objectContaining({ reason: "input-change", index: 0 })
     )
   })
 
@@ -210,7 +241,9 @@ describe("command headless", () => {
 
   test("Enter runs the highlighted command, and a Promise marks it pending", async () => {
     let finish = () => {}
-    const onAction = vi.fn(() => new Promise<void>((resolve) => (finish = resolve)))
+    const onAction = vi.fn(
+      () => new Promise<void>((resolve) => (finish = resolve))
+    )
     const instance = command({ id: "c", items: commands, onAction })
     instance.api.internal.onInputKeyDown(key("Enter"))
     expect(onAction).toHaveBeenCalledWith("calendar", expect.anything())
@@ -228,7 +261,11 @@ describe("command headless", () => {
   })
 
   test("a click on a disabled or pending command is canceled, so one rendered as a link stays put", () => {
-    const instance = command({ id: "c", items: commands, onAction: () => new Promise(() => {}) })
+    const instance = command({
+      id: "c",
+      items: commands,
+      onAction: () => new Promise(() => {}),
+    })
     const click = () => new Event("click", { cancelable: true })
     const disabled = click()
     instance.api.internal.press("calculator", disabled)
@@ -254,22 +291,35 @@ describe("command headless", () => {
     })
     instance.api.run("profile")
     expect(received).toBeInstanceOf(Event)
-    expect(received).toMatchObject({ type: "select", cancelable: true, defaultPrevented: true, target: null })
+    expect(received).toMatchObject({
+      type: "select",
+      cancelable: true,
+      defaultPrevented: true,
+      target: null,
+    })
     expect(onAction).not.toHaveBeenCalled()
   })
 
   test("a rejected action keeps its reason as the command's error until it runs again", async () => {
-    const instance = command({ id: "c", items: commands, onAction: () => Promise.reject("offline") })
+    const instance = command({
+      id: "c",
+      items: commands,
+      onAction: () => Promise.reject("offline"),
+    })
     instance.api.run("profile")
     await new Promise((resolve) => setTimeout(resolve))
-    expect(instance.get()).toMatchObject({ error: { key: "profile", reason: "offline" } })
+    expect(instance.get()).toMatchObject({
+      error: { key: "profile", reason: "offline" },
+    })
   })
 
   test("a command that fails while another runs leaves the other pending", async () => {
     let fail = (_reason: unknown) => {}
     const onAction = (value: string) =>
       new Promise<void>((_resolve, reject) => {
-        if (value === "profile") fail = reject
+        if (value === "profile") {
+          fail = reject
+        }
       })
     const instance = command({ id: "c", items: commands, onAction })
     instance.api.run("profile")
@@ -284,7 +334,9 @@ describe("command headless", () => {
 
   test("a pending command waits while another command runs", async () => {
     const finishes: (() => void)[] = []
-    const onAction = vi.fn(() => new Promise<void>((resolve) => finishes.push(resolve)))
+    const onAction = vi.fn(
+      () => new Promise<void>((resolve) => finishes.push(resolve))
+    )
     const instance = command({ id: "c", items: commands, onAction })
     instance.api.run("profile")
     instance.api.run("settings")
@@ -301,7 +353,9 @@ describe("command headless", () => {
   test("two items with one value warn in development, naming the component and the value", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     const listbox = createListbox({
-      store: createStore({ highlighted: null as string | null }, ["highlighted"]),
+      store: createStore({ highlighted: null as string | null }, [
+        "highlighted",
+      ]),
       focus: "virtual",
       items: () => undefined,
       toKey: (value) => itemKey(value),
@@ -323,7 +377,9 @@ describe("command headless", () => {
     expect(warn).not.toHaveBeenCalled()
     listbox.register("https://example.com/docs", item(1), meta)
     expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining('command: Two items have the value "https://example.com/docs"'),
+      expect.stringContaining(
+        'command: Two items have the value "https://example.com/docs"'
+      )
     )
     warn.mockRestore()
   })
@@ -338,12 +394,19 @@ describe("command headless", () => {
     expect(keys(instance)).toEqual(["light", "dark"])
     expect(instance.api.getValue()).toBe("light")
     instance.api.internal.onInputKeyDown(key("Backspace"))
-    expect(onPagesChange).toHaveBeenLastCalledWith([], expect.objectContaining({ reason: "back" }))
+    expect(onPagesChange).toHaveBeenLastCalledWith(
+      [],
+      expect.objectContaining({ reason: "back" })
+    )
     expect(instance.api.getQuery()).toBe("them")
   })
 
   test("Escape clears the text, then goes back a page, then leaves the key alone", () => {
-    const instance = command({ id: "c", items: commands, defaultPages: ["theme"] })
+    const instance = command({
+      id: "c",
+      items: commands,
+      defaultPages: ["theme"],
+    })
     type(instance, "da")
     const first = key("Escape")
     instance.api.internal.onInputKeyDown(first)
@@ -377,11 +440,21 @@ describe("command headless", () => {
 
   test("a controlled value moves the highlight only when it comes back", () => {
     const onValueChange = vi.fn()
-    const instance = command({ id: "c", items: commands, value: "profile", onValueChange })
+    const instance = command({
+      id: "c",
+      items: commands,
+      value: "profile",
+      onValueChange,
+    })
     instance.api.internal.onInputKeyDown(key("ArrowDown"))
     expect(onValueChange).toHaveBeenLastCalledWith("theme", expect.anything())
     expect(instance.api.getValue()).toBe("profile")
-    instance.setOptions({ id: "c", items: commands, value: "theme", onValueChange })
+    instance.setOptions({
+      id: "c",
+      items: commands,
+      value: "theme",
+      onValueChange,
+    })
     expect(instance.get()).toMatchObject({ highlighted: "theme" })
   })
 })

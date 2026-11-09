@@ -12,7 +12,9 @@ function render(markup: string) {
 }
 
 test("a region whose only controls are inert is a tab stop until they stop being inert", async () => {
-  const region = render(`<div id="region"><div inert><button>Play</button></div></div>`)
+  const region = render(
+    `<div id="region"><div inert><button>Play</button></div></div>`
+  )
   const { stop } = bindTabStop(region, () => true)
   expect(region.getAttribute("tabindex")).toBe("0")
   region.querySelector("[inert]")!.removeAttribute("inert")
@@ -25,7 +27,9 @@ test("a region whose only controls are inert is a tab stop until they stop being
 })
 
 test("a region inside inert content keeps counting its controls", () => {
-  const region = render(`<div inert><div id="region"><button>Play</button></div></div>`)
+  const region = render(
+    `<div inert><div id="region"><button>Play</button></div></div>`
+  )
   const { stop } = bindTabStop(region, () => true)
   expect(region.hasAttribute("tabindex")).toBe(false)
   stop()

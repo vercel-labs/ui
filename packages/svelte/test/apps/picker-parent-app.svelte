@@ -11,6 +11,8 @@
 <Picker {value}>
   {#snippet children(state)}
     <output>{state.value}</output>
-    <PickerItem value="pear"><PickerLabel type="button">pear</PickerLabel></PickerItem>
+    <PickerItem value="pear"
+      ><PickerLabel type="button">pear</PickerLabel></PickerItem
+    >
   {/snippet}
 </Picker>

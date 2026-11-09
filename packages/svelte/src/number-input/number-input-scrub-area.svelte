@@ -5,7 +5,10 @@ input, and outside it through `controller`, like an icon in a toolbar.
 @stable
 -->
 <script lang="ts">
-  import type { NumberInputScrubAreaProps, NumberInputState } from "@ui-sdk/core/number-input"
+  import type {
+    NumberInputScrubAreaProps,
+    NumberInputState,
+  } from "@ui-sdk/core/number-input"
   import { getContext } from "svelte"
   import { useControllerTarget } from "../controller-target.svelte"
   import Part from "../part.svelte"
@@ -20,7 +23,10 @@ input, and outside it through `controller`, like an icon in a toolbar.
     ...rest
   }: PartProps<"span", NumberInputState> & NumberInputScrubAreaProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<NumberInputContext | undefined>(NumberInputKey))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<NumberInputContext | undefined>(NumberInputKey)
+  )
   const numberInput = $derived(connected())
   // What a scrub area outside its number input renders with until that mounts.
   const unconnected: NumberInputState = {
@@ -35,7 +41,12 @@ input, and outside it through `controller`, like an icon in a toolbar.
 {#if numberInput}
   <!-- A new number input needs a new part, bound to its instance. -->
   {#key numberInput}
-    <ScrubAreaBinding owner={numberInput} {orientation} {pixelsPerStep} {...rest} />
+    <ScrubAreaBinding
+      owner={numberInput}
+      {orientation}
+      {pixelsPerStep}
+      {...rest}
+    />
   {/key}
 {:else}
   <!-- Until the number input it names mounts, a scrub area outside it is a plain span. -->

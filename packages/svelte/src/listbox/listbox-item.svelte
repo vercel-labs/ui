@@ -27,7 +27,14 @@ An option. Pressing it selects it, or toggles it with `multiple`.
   const group = getContext<string | undefined>(GroupKey)
   const key = () => listbox.api.internal.keyOf(value)
   setContext<ItemContext>(ItemKey, () => ({ key: key() }))
-  const item = useHandlePart(listbox, "item", () => ({ id: key(), value, label, disabled, index, group }))
+  const item = useHandlePart(listbox, "item", () => ({
+    id: key(),
+    value,
+    label,
+    disabled,
+    index,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={item} props={rest} />

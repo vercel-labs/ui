@@ -12,7 +12,11 @@ The root, which is the progressbar.
   } from "@ui-sdk/core/progress"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     value = null,
@@ -41,7 +45,16 @@ The root, which is the progressbar.
   } = $props()
 
   const id = $props.id()
-  const progress = usePrimitive(progressPrimitive, () => ({ id, value, min, max, format, locale, getValueLabel, debug }))
+  const progress = usePrimitive(progressPrimitive, () => ({
+    id,
+    value,
+    min,
+    max,
+    format,
+    locale,
+    getValueLabel,
+    debug,
+  }))
   provideInstance(progressPrimitive, progress)
   const root = useHandlePart(progress, "root")
 </script>

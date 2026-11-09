@@ -1,12 +1,36 @@
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/solid/checkbox"
 import { createSignal, For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
 const people = [
-  { id: "hollis", name: "Hollis Grant", email: "hollis@example.com", role: "Owner" },
-  { id: "ines", name: "Inès Moreau", email: "ines@example.com", role: "Editor" },
-  { id: "kofi", name: "Kofi Mensah", email: "kofi@example.com", role: "Viewer" },
-  { id: "wren", name: "Wren Takahashi", email: "wren@example.com", role: "Editor" },
+  {
+    id: "hollis",
+    name: "Hollis Grant",
+    email: "hollis@example.com",
+    role: "Owner",
+  },
+  {
+    id: "ines",
+    name: "Inès Moreau",
+    email: "ines@example.com",
+    role: "Editor",
+  },
+  {
+    id: "kofi",
+    name: "Kofi Mensah",
+    email: "kofi@example.com",
+    role: "Viewer",
+  },
+  {
+    id: "wren",
+    name: "Wren Takahashi",
+    email: "wren@example.com",
+    role: "Editor",
+  },
 ]
 
 function Example() {
@@ -65,7 +89,10 @@ function Example() {
             {(person) => (
               <tr>
                 <td>
-                  <Checkbox value={person.id} aria-label={`Select ${person.name}`}>
+                  <Checkbox
+                    value={person.id}
+                    aria-label={`Select ${person.name}`}
+                  >
                     <CheckboxIndicator>
                       <svg
                         viewBox="0 0 24 24"

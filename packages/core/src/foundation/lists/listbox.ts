@@ -16,9 +16,15 @@ import { foldText, leadingSpaces } from "../text/match"
 
 // Whether text matches a query the way a filter asks. Case and accents are
 // ignored the way the user's language ignores them.
-function textMatches(text: string, query: string, mode: "contains" | "startsWith") {
+function textMatches(
+  text: string,
+  query: string,
+  mode: "contains" | "startsWith"
+) {
   const needle = foldText(query.trim())
-  if (!needle) return true
+  if (!needle) {
+    return true
+  }
   const haystack = foldText(text)
   return mode === "startsWith"
     ? haystack.startsWith(needle, leadingSpaces(haystack))
@@ -26,16 +32,30 @@ function textMatches(text: string, query: string, mode: "contains" | "startsWith
 }
 
 // How well an item matches a query: 0 hides it, and higher ranks it first.
-function itemScore<T>(item: ListItem<T>, query: string, filter: ListFilter<T> | undefined) {
-  if (filter === false || filter === undefined || !query.trim()) return 1
+function itemScore<T>(
+  item: ListItem<T>,
+  query: string,
+  filter: ListFilter<T> | undefined
+) {
+  if (filter === false || filter === undefined || !query.trim()) {
+    return 1
+  }
   if (typeof filter === "function") {
     const result = filter(item, query)
     return typeof result === "number" ? Math.max(0, result) : result ? 1 : 0
   }
-  return [item.label, ...(item.keywords ?? [])].some((text) => textMatches(text, query, filter)) ? 1 : 0
+  return [item.label, ...(item.keywords ?? [])].some((text) =>
+    textMatches(text, query, filter)
+  )
+    ? 1
+    : 0
 }
 
-function itemMatches<T>(item: ListItem<T>, query: string, filter: ListFilter<T> | undefined) {
+function itemMatches<T>(
+  item: ListItem<T>,
+  query: string,
+  filter: ListFilter<T> | undefined
+) {
   return itemScore(item, query, filter) > 0
 }
 
@@ -46,15 +66,21 @@ function filterData<T>(
   data: ListData<T>,
   query: string,
   filter: ListFilter<T> | undefined,
-  { rank = false }: { rank?: boolean } = {},
+  { rank = false }: { rank?: boolean } = {}
 ) {
-  if (filter === false || filter === undefined || !query.trim()) return data
-  if (rank) return rankData(data, query, filter)
+  if (filter === false || filter === undefined || !query.trim()) {
+    return data
+  }
+  if (rank) {
+    return rankData(data, query, filter)
+  }
   const result: ListData<T> = []
   // A separator waits for the next kept entry, so none leads, trails or doubles.
   let separator: ListData<T>[number] | undefined
   const keep = (entry: ListData<T>[number]) => {
-    if (separator && result.length) result.push(separator)
+    if (separator && result.length) {
+      result.push(separator)
+    }
     separator = undefined
     result.push(entry)
   }
@@ -64,16 +90,26 @@ function filterData<T>(
       continue
     }
     if (isGroup(entry)) {
-      const items = entry.items.filter((child) => itemMatches(toListItem(child), query, filter))
-      if (items.length) keep({ ...entry, items })
+      const items = entry.items.filter((child) =>
+        itemMatches(toListItem(child), query, filter)
+      )
+      if (items.length) {
+        keep({ ...entry, items })
+      }
       continue
     }
-    if (itemMatches(toListItem(entry), query, filter)) keep(entry)
+    if (itemMatches(toListItem(entry), query, filter)) {
+      keep(entry)
+    }
   }
   return result
 }
 
-type Ranked<T> = { entry: ListData<T>[number]; score: number; separator?: ListData<T>[number] }
+type Ranked<T> = {
+  entry: ListData<T>[number]
+  score: number
+  separator?: ListData<T>[number]
+}
 
 // Sorts by score, best first. Equal scores keep their order, since sort is stable.
 const byScore = <T>(a: Ranked<T>, b: Ranked<T>) => b.score - a.score
@@ -82,7 +118,11 @@ function rankData<T>(data: ListData<T>, query: string, filter: ListFilter<T>) {
   const ranked: Ranked<T>[] = []
   let separator: ListData<T>[number] | undefined
   const keep = (entry: ListData<T>[number], score: number) => {
-    ranked.push({ entry, score, separator: ranked.length ? separator : undefined })
+    ranked.push({
+      entry,
+      score,
+      separator: ranked.length ? separator : undefined,
+    })
     separator = undefined
   }
   for (const entry of data) {
@@ -94,19 +134,35 @@ function rankData<T>(data: ListData<T>, query: string, filter: ListFilter<T>) {
       const items: Ranked<T>[] = []
       for (const child of entry.items) {
         const score = itemScore(toListItem(child), query, filter)
-        if (score > 0) items.push({ entry: child, score })
+        if (score > 0) {
+          items.push({ entry: child, score })
+        }
       }
-      if (!items.length) continue
+      if (!items.length) {
+        continue
+      }
       items.sort(byScore)
-      keep({ ...entry, items: items.map((item) => item.entry) as ListGroup<T>["items"] }, items[0].score)
+      keep(
+        {
+          ...entry,
+          items: items.map((item) => item.entry) as ListGroup<T>["items"],
+        },
+        items[0].score
+      )
       continue
     }
     const score = itemScore(toListItem(entry), query, filter)
-    if (score > 0) keep(entry, score)
+    if (score > 0) {
+      keep(entry, score)
+    }
   }
   const sorted = [...ranked].sort(byScore)
-  if (sorted.some((item, index) => item !== ranked[index])) return sorted.map((item) => item.entry)
-  return ranked.flatMap((item) => (item.separator ? [item.separator, item.entry] : [item.entry]))
+  if (sorted.some((item, index) => item !== ranked[index])) {
+    return sorted.map((item) => item.entry)
+  }
+  return ranked.flatMap((item) =>
+    item.separator ? [item.separator, item.entry] : [item.entry]
+  )
 }
 
 const filtering = { data: filterData, matches: itemMatches }
@@ -121,10 +177,17 @@ function createListbox(config: Parameters<typeof createListboxEngine>[0]) {
  * every item, one of `modes` filters that way, and any other value, like a
  * bare `filter`, the way `fallback` does.
  */
-function filterAttribute<Mode extends string>(modes: readonly Mode[], fallback: NoInfer<Mode>) {
+function filterAttribute<Mode extends string>(
+  modes: readonly Mode[],
+  fallback: NoInfer<Mode>
+) {
   return (attribute: string | null) => {
-    if (attribute === null) return undefined
-    if (attribute === "false") return false
+    if (attribute === null) {
+      return undefined
+    }
+    if (attribute === "false") {
+      return false
+    }
     return modes.includes(attribute as Mode) ? (attribute as Mode) : fallback
   }
 }

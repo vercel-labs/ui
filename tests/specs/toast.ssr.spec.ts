@@ -10,20 +10,33 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
-test("the region hydrates without mismatches, then shows toasts", async ({ page, open }) => {
+test("the region hydrates without mismatches, then shows toasts", async ({
+  page,
+  open,
+}) => {
   await open("toast")
   await page.waitForLoadState("networkidle")
   await page.getByRole("button", { name: toastFixture.basic.trigger }).click()
-  await expect(page.getByRole(role(), { name: toastFixture.basic.title })).toBeVisible()
+  await expect(
+    page.getByRole(role(), { name: toastFixture.basic.title })
+  ).toBeVisible()
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("the overlay host hydrates without mismatches, then shows toasts", async ({ page, open }) => {
+test("the overlay host hydrates without mismatches, then shows toasts", async ({
+  page,
+  open,
+}) => {
   await open("toast", { host: "" })
   await page.waitForLoadState("networkidle")
   await page.getByRole("button", { name: toastFixture.basic.trigger }).click()
-  await expect(page.getByRole(role(), { name: toastFixture.basic.title })).toBeVisible()
+  await expect(
+    page.getByRole(role(), { name: toastFixture.basic.title })
+  ).toBeVisible()
   expect(await hydrationErrors(page)).toEqual([])
 })

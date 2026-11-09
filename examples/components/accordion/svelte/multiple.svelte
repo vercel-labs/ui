@@ -17,7 +17,8 @@
     {
       value: "privacy",
       label: "Privacy and security",
-      content: "Turn on two-factor authentication and review signed-in devices.",
+      content:
+        "Turn on two-factor authentication and review signed-in devices.",
     },
     {
       value: "billing",

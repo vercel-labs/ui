@@ -26,7 +26,9 @@ function Fixture() {
         items={items}
         onHighlight={(value, { index }) => {
           const el = scroller.current
-          if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, height, row)
+          if (el && index >= 0) {
+            el.scrollTop = scrollForRow(index, el.scrollTop, height, row)
+          }
         }}
       >
         <ComboboxLabel className="label">Item</ComboboxLabel>
@@ -40,10 +42,23 @@ function Fixture() {
           >
             <ComboboxList style={{ position: "relative", height: "auto" }}>
               {(state) => {
-                const visible = state.items as { value: string; label: string }[]
-                const { start, end } = visibleRows(scrollTop, height, visible.length, row)
+                const visible = state.items as {
+                  value: string
+                  label: string
+                }[]
+                const { start, end } = visibleRows(
+                  scrollTop,
+                  height,
+                  visible.length,
+                  row
+                )
                 return (
-                  <div style={{ height: visible.length * row, position: "relative" }}>
+                  <div
+                    style={{
+                      height: visible.length * row,
+                      position: "relative",
+                    }}
+                  >
                     {visible.slice(start, end).map((item, offset) => (
                       <ComboboxItem
                         key={item.value}
@@ -78,7 +93,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

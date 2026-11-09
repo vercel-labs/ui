@@ -27,7 +27,12 @@ const wrappedControl = (el: HTMLElement) =>
 // </ui-toolbar>
 function defineToolbarElements() {
   createParts(toolbar, {
-    root: { tag: "ui-toolbar", display: "block", defaults: { loop: true }, api: ["focus"] },
+    root: {
+      tag: "ui-toolbar",
+      display: "block",
+      defaults: { loop: true },
+      api: ["focus"],
+    },
     button: {
       tag: "ui-toolbar-button",
       display: "contents",
@@ -40,7 +45,11 @@ function defineToolbarElements() {
       target: wrappedControl,
       defaults: { focusableWhenDisabled: true },
     },
-    link: { tag: "ui-toolbar-link", display: "contents", target: wrappedControl },
+    link: {
+      tag: "ui-toolbar-link",
+      display: "contents",
+      target: wrappedControl,
+    },
     group: { tag: "ui-toolbar-group", display: "block" },
     separator: { tag: "ui-toolbar-separator", display: "block" },
   })

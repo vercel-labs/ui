@@ -24,15 +24,23 @@ const log = useLog()
 const anchor = ref<HTMLElement | null>(null)
 const container = ref<HTMLElement | null>(null)
 
-function onOpenChange(open: boolean, details: { reason: DatePickerOpenChangeReason }) {
+function onOpenChange(
+  open: boolean,
+  details: { reason: DatePickerOpenChangeReason }
+) {
   log(`${open ? "Opened" : "Closed"} (${details.reason})`)
 }
 
 function onOpenChangeComplete(open: boolean) {
-  if (!open) log("Finished closing")
+  if (!open) {
+    log("Finished closing")
+  }
 }
 
-function onMonthChange(month: string, details: { reason: DatePickerMonthChangeReason }) {
+function onMonthChange(
+  month: string,
+  details: { reason: DatePickerMonthChangeReason }
+) {
   log(`Showing ${month} (${details.reason})`)
 }
 </script>
@@ -54,7 +62,12 @@ function onMonthChange(month: string, details: { reason: DatePickerMonthChangeRe
         </DatePickerTrigger>
       </div>
       <DatePickerHint />
-      <DatePickerContent :anchor="anchor" :side-offset="6" :collision-padding="16" keep-mounted>
+      <DatePickerContent
+        :anchor="anchor"
+        :side-offset="6"
+        :collision-padding="16"
+        keep-mounted
+      >
         <div data-slot="row">
           <CalendarPrevious data-variant="ghost">
             <ChevronLeftIcon aria-hidden="true" />

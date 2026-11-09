@@ -2,7 +2,10 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
 import { onMounted, onUnmounted, ref } from "vue"
-import { fieldChoiceCardFixture as f, fieldChoiceCardOptions } from "tests/fixtures/field.ts"
+import {
+  fieldChoiceCardFixture as f,
+  fieldChoiceCardOptions,
+} from "tests/fixtures/field.ts"
 
 const { alone, later } = fieldChoiceCardOptions()
 const ready = ref(false)

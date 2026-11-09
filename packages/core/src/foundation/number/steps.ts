@@ -15,7 +15,9 @@ function clamp(value: number, min: number, max: number) {
  * @experimental
  */
 function decimalsOf(value: number) {
-  if (!Number.isFinite(value) || Number.isInteger(value)) return 0
+  if (!Number.isFinite(value) || Number.isInteger(value)) {
+    return 0
+  }
   const [mantissa, exponent] = String(value).toLowerCase().split("e")
   const decimals = (mantissa.split(".")[1] ?? "").length
   return Math.max(0, decimals - Number(exponent ?? 0))
@@ -59,23 +61,39 @@ function precisionOf(range: StepRange) {
  * @experimental
  */
 function maxOnGrid(range: StepRange) {
-  if (!Number.isFinite(range.max) || !(range.step > 0)) return range.max
+  if (!Number.isFinite(range.max) || !(range.step > 0)) {
+    return range.max
+  }
   const base = stepBase(range)
   const steps = Math.floor(stepCount(range.max - base, range.step))
   return roundTo(base + steps * range.step, precisionOf(range))
 }
 
 // A value on the step grid, rounded with `round`, like `Math.floor` for where a drag on a track starts; not bounded.
-function onGrid(value: number, range: StepRange, round: (steps: number) => number = Math.round) {
-  if (!(range.step > 0)) return value
+function onGrid(
+  value: number,
+  range: StepRange,
+  round: (steps: number) => number = Math.round
+) {
+  if (!(range.step > 0)) {
+    return value
+  }
   const base = stepBase(range)
-  return roundTo(base + round(stepCount(value - base, range.step)) * range.step, precisionOf(range))
+  return roundTo(
+    base + round(stepCount(value - base, range.step)) * range.step,
+    precisionOf(range)
+  )
 }
 
 // The nearest value on the step grid, within the bounds. Public as `scrubTo` without snap points.
 function snapToStep(value: number, range: StepRange) {
-  if (!(range.step > 0)) return clamp(value, range.min, range.max)
-  return roundTo(clamp(onGrid(value, range), range.min, maxOnGrid(range)), precisionOf(range))
+  if (!(range.step > 0)) {
+    return clamp(value, range.min, range.max)
+  }
+  return roundTo(
+    clamp(onGrid(value, range), range.min, maxOnGrid(range)),
+    precisionOf(range)
+  )
 }
 
 /**
@@ -85,11 +103,17 @@ function snapToStep(value: number, range: StepRange) {
  * @experimental
  */
 function stepValue(value: number, steps: number, range: StepRange) {
-  if (!(range.step > 0)) return clamp(value + steps, range.min, range.max)
+  if (!(range.step > 0)) {
+    return clamp(value + steps, range.min, range.max)
+  }
   const base = stepBase(range)
   const position = stepCount(value - base, range.step)
   const onGrid = Number.isInteger(position)
-  const from = onGrid ? position : steps > 0 ? Math.floor(position) : Math.ceil(position)
+  const from = onGrid
+    ? position
+    : steps > 0
+      ? Math.floor(position)
+      : Math.ceil(position)
   const next = base + (from + steps) * range.step
   return roundTo(clamp(next, range.min, maxOnGrid(range)), precisionOf(range))
 }
@@ -101,7 +125,9 @@ function stepValue(value: number, steps: number, range: StepRange) {
  */
 function wrap(value: number, min: number, max: number) {
   const span = max - min
-  if (!(span > 0)) return min
+  if (!(span > 0)) {
+    return min
+  }
   return ((((value - min) % span) + span) % span) + min
 }
 
@@ -110,7 +136,9 @@ function wrap(value: number, min: number, max: number) {
  * the large step or the small one, or a bound. `stepFromKey` reads one from a key.
  * @experimental
  */
-type NumberMove = { direction: 1 | -1; size: "step" | "large" | "small" } | { bound: "min" | "max" }
+type NumberMove =
+  | { direction: 1 | -1; size: "step" | "large" | "small" }
+  | { bound: "min" | "max" }
 
 /**
  * Values a scrub lands on when it comes close, like a timeline's chapters or keyframes.
@@ -141,15 +169,21 @@ type NumberRange = StepRange & {
 function stepOnGrid(
   value: number,
   move: { direction: 1 | -1; size: "step" | "large" | "small" },
-  range: NumberRange,
+  range: NumberRange
 ) {
-  if (move.size === "large")
+  if (move.size === "large") {
     return snapToStep(
-      clamp(value + move.direction * (range.largeStep ?? range.step * 10), range.min, range.max),
-      range,
+      clamp(
+        value + move.direction * (range.largeStep ?? range.step * 10),
+        range.min,
+        range.max
+      ),
+      range
     )
-  if (move.size === "small" && range.smallStep)
+  }
+  if (move.size === "small" && range.smallStep) {
     return stepValue(value, move.direction, { ...range, step: range.smallStep })
+  }
   return stepValue(value, move.direction, range)
 }
 
@@ -160,17 +194,32 @@ function stepOnGrid(
  * reaches ahead, and leaves the point it's on freely; `{ snap: false }` steps past them.
  * @experimental
  */
-function stepBy(value: number, move: NumberMove, range: NumberRange, { snap = true } = {}) {
-  if ("bound" in move) return move.bound === "min" ? range.min : maxOnGrid(range)
+function stepBy(
+  value: number,
+  move: NumberMove,
+  range: NumberRange,
+  { snap = true } = {}
+) {
+  if ("bound" in move) {
+    return move.bound === "min" ? range.min : maxOnGrid(range)
+  }
   const next = stepOnGrid(value, move, range)
-  if (!snap || !range.snap) return next
+  if (!snap || !range.snap) {
+    return next
+  }
   const { points, threshold } = range.snap
   const direction = move.direction
   let stop: number | undefined
   for (const point of points) {
     const ahead = (point - value) * direction > 0
     const reached = (next + direction * threshold - point) * direction >= 0
-    if (ahead && reached && (stop === undefined || (point - stop) * direction < 0)) stop = point
+    if (
+      ahead &&
+      reached &&
+      (stop === undefined || (point - stop) * direction < 0)
+    ) {
+      stop = point
+    }
   }
   return stop === undefined ? next : clamp(stop, range.min, range.max)
 }
@@ -197,23 +246,37 @@ type NumberScrub = { value: number; point: number | undefined }
 function scrubTo(
   value: number,
   range: NumberRange,
-  { snap = true, ease }: { snap?: boolean; ease?: boolean | ((closeness: number) => number) } = {},
+  {
+    snap = true,
+    ease,
+  }: { snap?: boolean; ease?: boolean | ((closeness: number) => number) } = {}
 ) {
   let nearest: number | undefined
   const threshold = range.snap?.threshold ?? 0
-  if (snap && range.snap)
-    for (const point of range.snap.points)
+  if (snap && range.snap) {
+    for (const point of range.snap.points) {
       if (
         Math.abs(point - value) <= threshold &&
-        (nearest === undefined || Math.abs(point - value) < Math.abs(nearest - value))
-      )
+        (nearest === undefined ||
+          Math.abs(point - value) < Math.abs(nearest - value))
+      ) {
         nearest = point
-  if (nearest === undefined) return { value: snapToStep(value, range), point: undefined }
+      }
+    }
+  }
+  if (nearest === undefined) {
+    return { value: snapToStep(value, range), point: undefined }
+  }
   const point = clamp(nearest, range.min, range.max)
-  if (!ease || !(threshold > 0)) return { value: point, point }
+  if (!ease || !(threshold > 0)) {
+    return { value: point, point }
+  }
   const closeness = 1 - Math.abs(point - value) / threshold
   const pull = ease === true ? closeness : ease(closeness)
-  return { value: clamp(value + (point - value) * pull, range.min, range.max), point }
+  return {
+    value: clamp(value + (point - value) * pull, range.min, range.max),
+    point,
+  }
 }
 
 export {

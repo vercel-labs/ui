@@ -16,8 +16,19 @@ type ContainerContext = () => PopupContainer
 
 function useItem(part: string) {
   const value = getContext<ItemContext | undefined>(ItemKey)
-  if (value?.() == null) throw new Error(`<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`)
+  if (value?.() == null) {
+    throw new Error(
+      `<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`
+    )
+  }
   return value as () => string
 }
 
-export { type ContainerContext, ContainerKey, type ItemContext, ItemKey, type NavigationMenuContext, useItem }
+export {
+  type ContainerContext,
+  ContainerKey,
+  type ItemContext,
+  ItemKey,
+  type NavigationMenuContext,
+  useItem,
+}

@@ -1,11 +1,20 @@
 import { expect, lastAction, test } from "../fixtures"
 import { otpInputAction } from "../fixtures/otp-input"
-import { codeSlots, focusCode, paste, pressSlot, shownCode } from "./otp-input.helpers"
+import {
+  codeSlots,
+  focusCode,
+  paste,
+  pressSlot,
+  shownCode,
+} from "./otp-input.helpers"
 
 const input = (page: import("@playwright/test").Page) =>
   page.getByRole("textbox", { name: "Verification code" })
 
-test("correcting a middle character keeps the others in their slots @enhancement", async ({ page, open }) => {
+test("correcting a middle character keeps the others in their slots @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("otp-input")
   await focusCode(page)
   await page.keyboard.type("123456")
@@ -15,7 +24,10 @@ test("correcting a middle character keeps the others in their slots @enhancement
   await expect.poll(() => shownCode(page)).toBe("129456")
 })
 
-test("an incomplete code stops the form, and typing carries on @enhancement", async ({ page, open }) => {
+test("an incomplete code stops the form, and typing carries on @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("otp-input")
   await focusCode(page)
   await page.keyboard.type("12")
@@ -25,7 +37,10 @@ test("an incomplete code stops the form, and typing carries on @enhancement", as
   await expect.poll(() => shownCode(page)).toBe("123456")
 })
 
-test("full-width digits from an input method become digits @enhancement", async ({ page, open }) => {
+test("full-width digits from an input method become digits @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("otp-input")
   await focusCode(page)
   await page.keyboard.insertText("１２３")
@@ -37,7 +52,10 @@ test("undo after a paste brings back the code before it @enhancement", async ({
   open,
   browserName,
 }) => {
-  test.skip(browserName !== "chromium", "Only Chromium keeps clipboard data on synthetic paste events.")
+  test.skip(
+    browserName !== "chromium",
+    "Only Chromium keeps clipboard data on synthetic paste events."
+  )
   await open("otp-input")
   await focusCode(page)
   await page.keyboard.type("12")
@@ -78,7 +96,10 @@ test("the slot where typing goes is active, and draws a caret while empty @enhan
   await expect(page.locator(".otp-slot[data-active]")).toHaveCount(0)
 })
 
-test("a password manager's badge is pushed past the last slot @enhancement", async ({ page, open }) => {
+test("a password manager's badge is pushed past the last slot @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("otp-input")
   await page.evaluate(() => {
     const badge = document.createElement("div")
@@ -88,10 +109,15 @@ test("a password manager's badge is pushed past the last slot @enhancement", asy
   await focusCode(page)
   const root = page.getByRole("form", { name: "Verify" }).locator(".otp")
   const width = (await root.boundingBox())!.width
-  await expect.poll(async () => (await input(page).boundingBox())!.width).toBeCloseTo(width + 40, 0)
+  await expect
+    .poll(async () => (await input(page).boundingBox())!.width)
+    .toBeCloseTo(width + 40, 0)
 })
 
-test("a form reset returns to the default code @enhancement", async ({ page, open }) => {
+test("a form reset returns to the default code @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("otp-input", { default: "123" })
   await expect.poll(() => shownCode(page)).toBe("123")
   await focusCode(page)
@@ -100,11 +126,16 @@ test("a form reset returns to the default code @enhancement", async ({ page, ope
   await expect.poll(() => shownCode(page)).toBe("123")
 })
 
-test("a controller fills the code and completes it @enhancement", async ({ page, open }) => {
+test("a controller fills the code and completes it @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("otp-input")
   await page.getByRole("button", { name: "Fill code" }).click()
   await expect.poll(() => shownCode(page)).toBe("654321")
-  await expect.poll(() => lastAction(page)).toBe(otpInputAction.complete("654321"))
+  await expect
+    .poll(() => lastAction(page))
+    .toBe(otpInputAction.complete("654321"))
   await page.getByRole("button", { name: "Clear code" }).click()
   await expect.poll(() => shownCode(page)).toBe("")
 })

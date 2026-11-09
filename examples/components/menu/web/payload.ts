@@ -42,7 +42,9 @@ function mount(root: HTMLElement) {
     const row = document.createElement("li")
     row.dataset.slot = "row"
     row.innerHTML = `${file.name}<span data-slot="hint">${file.size}</span>`
-    const trigger = Object.assign(document.createElement("ui-menu-trigger"), { payload: file })
+    const trigger = Object.assign(document.createElement("ui-menu-trigger"), {
+      payload: file,
+    })
     trigger.setAttribute("for", id)
     trigger.innerHTML = `
       <button data-variant="ghost" data-size="sm" aria-label="Actions for ${file.name}">
@@ -62,7 +64,9 @@ function mount(root: HTMLElement) {
     log(root, `${value} ${menu.api.getPayload()?.name}`)
   })
 
-  const opener = root.querySelector<HTMLButtonElement>('[data-slot="controls"] button')!
+  const opener = root.querySelector<HTMLButtonElement>(
+    '[data-slot="controls"] button'
+  )!
   opener.addEventListener("click", async () => {
     const result = await menu.api.open({ payload: files[0], anchor: opener })
     log(root, `Closed with ${result.reason}`)

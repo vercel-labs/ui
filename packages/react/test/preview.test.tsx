@@ -3,16 +3,32 @@ import { definePrimitive } from "@ui-sdk/core"
 import * as React from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, expect, test } from "vitest"
-import { Accordion, AccordionHeader, AccordionItem, AccordionTrigger } from "../src/accordion"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionTrigger,
+} from "../src/accordion"
 import { Checkbox, CheckboxGroup } from "../src/checkbox"
 import { Combobox } from "../src/combobox"
 import { DatePicker } from "../src/date-picker"
 import { Listbox, ListboxItem, ListboxItemIndicator } from "../src/listbox"
-import { Menu, MenuContent, MenuItemIndicator, MenuRadioGroup, MenuRadioItem, MenuTrigger } from "../src/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItemIndicator,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuTrigger,
+} from "../src/menu"
 import { usePart, usePrimitive, type PrimitiveHandle } from "../src/primitive"
 import { Radio, RadioGroup, RadioIndicator } from "../src/radio"
 import { Rating } from "../src/rating"
-import { createResizableController, Resizable, ResizablePanel } from "../src/resizable"
+import {
+  createResizableController,
+  Resizable,
+  ResizablePanel,
+} from "../src/resizable"
 import { Select } from "../src/select"
 import { Separator } from "../src/separator"
 import { Toggle, ToggleGroup } from "../src/toggle"
@@ -37,7 +53,8 @@ async function render(element: React.ReactNode) {
   return container
 }
 
-const rerender = (element: React.ReactNode) => React.act(async () => root!.render(element))
+const rerender = (element: React.ReactNode) =>
+  React.act(async () => root!.render(element))
 
 afterEach(async () => {
   await React.act(async () => root?.unmount())
@@ -54,12 +71,17 @@ function Probe({ seen, read }: { seen: unknown[]; read: () => unknown }) {
   return null
 }
 
-const submitted = () => new FormData(document.querySelector("form")!).getAll("choice")
+const submitted = () =>
+  new FormData(document.querySelector("form")!).getAll("choice")
 
 const controls = {
   Select: (value: string[]) => <Select name="choice" multiple value={value} />,
-  Combobox: (value: string[]) => <Combobox name="choice" multiple value={value} />,
-  Listbox: (value: string[]) => <Listbox aria-label="Choice" name="choice" multiple value={value} />,
+  Combobox: (value: string[]) => (
+    <Combobox name="choice" multiple value={value} />
+  ),
+  Listbox: (value: string[]) => (
+    <Listbox aria-label="Choice" name="choice" multiple value={value} />
+  ),
 }
 
 test.each(Object.entries(controls))(
@@ -74,9 +96,11 @@ test.each(Object.entries(controls))(
       </>
     )
     await render(view(values[0]))
-    for (const value of values.slice(1)) await rerender(view(value))
+    for (const value of values.slice(1)) {
+      await rerender(view(value))
+    }
     expect(seen).toEqual(values)
-  },
+  }
 )
 
 const options = () => [...document.querySelectorAll('[role="option"]')]
@@ -106,17 +130,17 @@ test.each(Object.entries(dataLists))(
       view([
         { value: "a", label: "After" },
         { value: "b", label: "Next" },
-      ]),
+      ])
     )
     await rerender(view([{ value: "b", label: "Next" }]))
     expect(seen).toEqual([["After", "Next"], ["Next"]])
-  },
+  }
 )
 
 const selected = () =>
   options().map(
     (option) =>
-      `${option.getAttribute("aria-selected")} ${option.querySelectorAll("[data-slot=listbox-item-indicator]").length}`,
+      `${option.getAttribute("aria-selected")} ${option.querySelectorAll("[data-slot=listbox-item-indicator]").length}`
   )
 
 test("a controlled multiple listbox marks each new value selected in the render that changes it", async () => {
@@ -170,7 +194,7 @@ const groups = {
     () =>
       [...document.querySelectorAll('[role="menuitemradio"]')].map(
         (item) =>
-          `${item.getAttribute("aria-checked")} ${item.querySelectorAll("[data-slot=menu-item-indicator]").length}`,
+          `${item.getAttribute("aria-checked")} ${item.querySelectorAll("[data-slot=menu-item-indicator]").length}`
       ),
     [
       ["true 1", "false 0"],
@@ -206,7 +230,10 @@ const groups = {
       ["true", "false"],
     ],
   ],
-} satisfies Record<string, [(value: string) => React.ReactNode, () => unknown, unknown[]]>
+} satisfies Record<
+  string,
+  [(value: string) => React.ReactNode, () => unknown, unknown[]]
+>
 
 test.each(Object.entries(groups))(
   "the items of a controlled %s show its new value in the render that changes it",
@@ -222,7 +249,7 @@ test.each(Object.entries(groups))(
     await rerender(view("right"))
     await rerender(view("left"))
     expect(seen).toEqual(expected)
-  },
+  }
 )
 
 test("toggles show their toolbar's disabled state in the render that changes it", async () => {
@@ -271,7 +298,10 @@ const aroundParts = {
     ),
     attribute("[data-slot=radio-indicator]", "data-disabled"),
   ],
-} satisfies Record<string, [(disabled: boolean) => React.ReactNode, () => unknown]>
+} satisfies Record<
+  string,
+  [(disabled: boolean) => React.ReactNode, () => unknown]
+>
 
 test.each(Object.entries(aroundParts))(
   "a part shows the props of the part around it in the render that changes them, like %s disabled",
@@ -287,10 +317,13 @@ test.each(Object.entries(aroundParts))(
     await rerender(view(true))
     await rerender(view(false))
     expect(seen).toEqual([[null], [""], [null]])
-  },
+  }
 )
 
-const treeLabels = () => [...document.querySelectorAll('[role="treeitem"]')].map((item) => item.textContent)
+const treeLabels = () =>
+  [...document.querySelectorAll('[role="treeitem"]')].map(
+    (item) => item.textContent
+  )
 
 test("a data tree shows its new items in the render that replaces, adds or removes them", async () => {
   const seen: unknown[] = []
@@ -306,7 +339,7 @@ test("a data tree shows its new items in the render that replaces, adds or remov
     view([
       { value: "file", label: "After" },
       { value: "notes", label: "Notes" },
-    ]),
+    ])
   )
   await rerender(view([{ value: "notes", label: "Notes" }]))
   expect(seen).toEqual([["Before"], ["After"], ["After", "Notes"], ["Notes"]])
@@ -318,7 +351,12 @@ const grids = () => document.querySelectorAll('[role="grid"]').length
 function Picker({ months, seen }: { months: number; seen: unknown[] }) {
   return (
     <>
-      <DatePicker defaultOpen months={months} today="2026-10-01" defaultMonth="2026-10" />
+      <DatePicker
+        defaultOpen
+        months={months}
+        today="2026-10-01"
+        defaultMonth="2026-10"
+      />
       <Probe seen={seen} read={() => [months, grids()]} />
     </>
   )
@@ -357,10 +395,15 @@ test("a date picker shows the months of a deferred render as it commits", async 
 })
 
 const sizes = (view: HTMLElement) =>
-  [...view.querySelectorAll("[data-slot=resizable-panel]")].map((panel) => panel.textContent)
+  [...view.querySelectorAll("[data-slot=resizable-panel]")].map(
+    (panel) => panel.textContent
+  )
 
 const panel = (id: string) => (
-  <ResizablePanel id={id} render={(props, state) => <div {...props}>{state.size}</div>} />
+  <ResizablePanel
+    id={id}
+    render={(props, state) => <div {...props}>{state.size}</div>}
+  />
 )
 
 test("a panel that renders its size mounts and shows its share", async () => {
@@ -374,7 +417,7 @@ test("panels that render their sizes share the group, and follow its controller"
     <Resizable controller={controller}>
       {panel("start")}
       {panel("end")}
-    </Resizable>,
+    </Resizable>
   )
   expect(sizes(view)).toEqual(["50", "50"])
   await React.act(async () => controller.setLayout([30, 70]))
@@ -384,12 +427,18 @@ test("panels that render their sizes share the group, and follow its controller"
 const pointer = definePrimitive({
   name: "pointer",
   options: { value: "string" },
-  state: (options: { value?: string }) => ({ value: options.value ?? "", at: 0 }),
+  state: (options: { value?: string }) => ({
+    value: options.value ?? "",
+    at: 0,
+  }),
   live: ["at"],
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: ({ store }) => ({ move: (at: number) => store.set({ at }) }),
   slots: (slot) => ({
-    root: slot<{}, { value: string; at: number }>({ state: ({ value, at }) => ({ value, at }) }),
+    root: slot<{}, { value: string; at: number }>({
+      state: ({ value, at }) => ({ value, at }),
+    }),
   }),
 })
 
@@ -403,14 +452,28 @@ function Move({ handle, at }: { handle: PointerHandle; at: number }) {
 }
 
 function Shown({ handle, seen }: { handle: PointerHandle; seen: string[] }) {
-  const element = usePart(handle, "root", {}, { children: (state) => `${state.value} ${state.at}` }, "p")
+  const element = usePart(
+    handle,
+    "root",
+    {},
+    { children: (state) => `${state.value} ${state.at}` },
+    "p"
+  )
   React.useLayoutEffect(() => {
     seen.push(document.querySelector("p")!.textContent!)
   })
   return element
 }
 
-function Pointer({ value, at, seen }: { value: string; at: number; seen?: string[] }) {
+function Pointer({
+  value,
+  at,
+  seen,
+}: {
+  value: string
+  at: number
+  seen?: string[]
+}) {
   const handle = usePrimitive(pointer, { value })
   return (
     <>
@@ -432,7 +495,10 @@ test("a handle extended with a context's keys shows what its render shows and fo
   let extended: (PointerHandle & { field: string }) | undefined
   function Extended({ value }: { value: string }) {
     const handle = usePrimitive(pointer, { value })
-    extended = React.useMemo(() => extendHandle(handle, { field: "name" }), [handle])
+    extended = React.useMemo(
+      () => extendHandle(handle, { field: "name" }),
+      [handle]
+    )
     seen.push(extended.state.value)
     return null
   }
@@ -479,14 +545,25 @@ test("a controlled toggle renders once when its pressed state changes", async ()
 
 test("a rating's stars take a new getValueLabel or max in the same render", async () => {
   const seen: unknown[] = []
-  const names = () => [...document.querySelectorAll('[role="radio"]')].map((radio) => radio.ariaLabel)
+  const names = () =>
+    [...document.querySelectorAll('[role="radio"]')].map(
+      (radio) => radio.ariaLabel
+    )
   const view = (unit: string, max: number) => (
     <>
-      <Rating defaultValue={2} max={max} getValueLabel={(value, of) => `${value} ${unit} of ${of}`} />
+      <Rating
+        defaultValue={2}
+        max={max}
+        getValueLabel={(value, of) => `${value} ${unit} of ${of}`}
+      />
       <Probe seen={seen} read={names} />
     </>
   )
   await render(view("stars", 5))
   await rerender(view("hearts", 3))
-  expect(seen.at(-1)).toEqual(["1 hearts of 3", "2 hearts of 3", "3 hearts of 3"])
+  expect(seen.at(-1)).toEqual([
+    "1 hearts of 3",
+    "2 hearts of 3",
+    "3 hearts of 3",
+  ])
 })

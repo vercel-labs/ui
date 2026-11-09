@@ -37,13 +37,28 @@ import {
 type Setting = { presentation?: "auto" | "sheet" }
 
 // A root, a part before the content, the content, and an item inside it.
-const parts: Record<string, [Component, Component, Component, Component, Component?]> = {
+const parts: Record<
+  string,
+  [Component, Component, Component, Component, Component?]
+> = {
   popover: [Popover, PopoverTrigger, PopoverContent, PopoverTitle],
   dialog: [Dialog, DialogTrigger, DialogContent, DialogTitle],
   menu: [Menu, MenuTrigger, MenuContent, MenuItem],
   select: [Select, SelectTrigger, SelectContent, SelectItem],
-  combobox: [Combobox, ComboboxInput, ComboboxContent, ComboboxItem, ComboboxList],
-  autocomplete: [Autocomplete, AutocompleteInput, AutocompleteContent, AutocompleteItem, AutocompleteList],
+  combobox: [
+    Combobox,
+    ComboboxInput,
+    ComboboxContent,
+    ComboboxItem,
+    ComboboxList,
+  ],
+  autocomplete: [
+    Autocomplete,
+    AutocompleteInput,
+    AutocompleteContent,
+    AutocompleteItem,
+    AutocompleteList,
+  ],
 }
 
 function app(name: string, setting: Setting) {
@@ -53,7 +68,7 @@ function app(name: string, setting: Setting) {
     h(Root, { defaultOpen: true, ...setting }, () => [
       h(Before, { "aria-label": "Open" }, () => "Open"),
       h(Content, null, () => (List ? h(List, null, () => item()) : item())),
-    ]),
+    ])
   )
 }
 

@@ -48,7 +48,9 @@ Import the parts and put them together:
 </script>
 
 <ui-hover-card>
-  <ui-hover-card-trigger><a href="/people/hollis">@hollis</a></ui-hover-card-trigger>
+  <ui-hover-card-trigger
+    ><a href="/people/hollis">@hollis</a></ui-hover-card-trigger
+  >
   <ui-hover-card-content hidden>
     <p>Hollis Grant</p>
     <p>Design engineer on the payments team.</p>
@@ -116,7 +118,10 @@ A feed or a list can share one card instead of rendering one per link. Give the 
 <script type="module">
   const card = document.querySelector("#profile")
   for (const person of people) {
-    const trigger = Object.assign(document.createElement("ui-hover-card-trigger"), { payload: person })
+    const trigger = Object.assign(
+      document.createElement("ui-hover-card-trigger"),
+      { payload: person }
+    )
     trigger.setAttribute("for", "profile")
     trigger.innerHTML = `<a href="${person.url}">${person.name}</a>`
     feed.append(trigger)
@@ -208,17 +213,26 @@ Props are attributes in kebab case, like `close-delay` and `side-offset`: `"fals
 
 ### HoverCard
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardOptions" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardOptions"
+/>
 
 ### HoverCardTrigger
 
 A trigger outside the card names it with `for="card-id"`, and takes `payload` as a property.
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerProps"
+/>
 
 ### HoverCardContent
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentProps"
+/>
 
 ### HoverCardArrow
 
@@ -230,15 +244,24 @@ The same state shows as data attributes on each element.
 
 `HoverCardTrigger`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerState"
+/>
 
 `HoverCardContent`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentState"
+/>
 
 `HoverCardArrow`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardArrowState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardArrowState"
+/>
 
 ### Reasons
 

@@ -30,7 +30,7 @@ function mount(root: HTMLElement) {
                   ${zoom}
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>
@@ -60,7 +60,9 @@ function mount(root: HTMLElement) {
   zoomIn.addEventListener("click", () => step(1))
   select.addEventListener("valuechange", (event) => {
     const value = event.detail.value as string | null
-    if (value) change(value)
+    if (value) {
+      change(value)
+    }
   })
 }
 

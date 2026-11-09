@@ -12,7 +12,14 @@ import { defineComponent, h, useId, type PropType } from "vue"
 import { createParts, withElement } from "./create-parts"
 import { useFieldControl } from "./field-context"
 import { readOnlyOf } from "./text-control"
-import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 
 const parts = createParts(colorPicker, {
   area: "div",
@@ -51,7 +58,10 @@ const ColorPicker = withElement(
       defaultValue: { type: String, default: undefined },
       space: String as PropType<ColorPickerSpace>,
       format: String as PropType<ColorFormat>,
-      gamut: { type: [String, Boolean] as PropType<ColorGamut | false>, default: undefined },
+      gamut: {
+        type: [String, Boolean] as PropType<ColorGamut | false>,
+        default: undefined,
+      },
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
       required: optionalBoolean,
@@ -63,8 +73,10 @@ const ColorPicker = withElement(
     emits: {
       "update:value": (_value: string) => true,
       "update:modelValue": (_value: string) => true,
-      valueChange: (_value: string, _details: ColorPickerValueChangeDetails) => true,
-      valueCommit: (_value: string, _details: ColorPickerValueCommitDetails) => true,
+      valueChange: (_value: string, _details: ColorPickerValueChangeDetails) =>
+        true,
+      valueCommit: (_value: string, _details: ColorPickerValueCommitDetails) =>
+        true,
     },
     slots: Object as PartSlots<typeof colorPicker, "root">,
     setup(props, { slots, emit, attrs }) {
@@ -82,23 +94,33 @@ const ColorPicker = withElement(
         form: props.form,
         controller: props.controller,
         debug: props.debug,
-        onValueChange: (value: string, details: ColorPickerValueChangeDetails) => {
+        onValueChange: (
+          value: string,
+          details: ColorPickerValueChangeDetails
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onValueCommit: (value: string, details: ColorPickerValueCommitDetails) =>
-          emit("valueCommit", value, details),
+        onValueCommit: (
+          value: string,
+          details: ColorPickerValueCommitDetails
+        ) => emit("valueCommit", value, details),
       }))
       return usePart(picker, "root", undefined, undefined, {
         tag: "div",
-        children: (state) => [slots.default?.({ state }), h(ColorPickerHiddenInput)],
+        children: (state) => [
+          slots.default?.({ state }),
+          h(ColorPickerHiddenInput),
+        ],
         extend: field?.props,
       })
     },
-  }),
+  })
 )
 
 /**
@@ -146,9 +168,11 @@ const ColorPickerInput = withElement(
     slots: Object as PartSlots<typeof colorPicker, "input">,
     setup() {
       // The core writes the text as it changes. Vue sets the same text, which the server renders.
-      return usePart(colorPicker, "input", undefined, undefined, { tag: "input" })
+      return usePart(colorPicker, "input", undefined, undefined, {
+        tag: "input",
+      })
     },
-  }),
+  })
 )
 
 /**
@@ -164,11 +188,17 @@ const ColorPickerChannelInput = withElement(
     slots: Object as PartSlots<typeof colorPicker, "channel-input">,
     setup(props) {
       const id = useId()
-      return usePart(colorPicker, "channel-input", () => ({ id, channel: props.channel }), undefined, {
-        tag: "input",
-      })
+      return usePart(
+        colorPicker,
+        "channel-input",
+        () => ({ id, channel: props.channel }),
+        undefined,
+        {
+          tag: "input",
+        }
+      )
     },
-  }),
+  })
 )
 
 /**

@@ -34,7 +34,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const value = ref<string | null>("fr")
 const query = ref("France")
@@ -55,12 +56,17 @@ const log = useLog()
       :item-to-label="countryLabel"
       debug
       @value-change="
-        (next: unknown, details: { reason: string }) => log(`value: ${next} (${details.reason})`)
+        (next: unknown, details: { reason: string }) =>
+          log(`value: ${next} (${details.reason})`)
       "
       @query-change="
-        (next: string, details: { reason: string }) => log(`query: “${next}” (${details.reason})`)
+        (next: string, details: { reason: string }) =>
+          log(`query: “${next}” (${details.reason})`)
       "
-      @open-change="(next: boolean, details: { reason: string }) => log(`open: ${next} (${details.reason})`)"
+      @open-change="
+        (next: boolean, details: { reason: string }) =>
+          log(`open: ${next} (${details.reason})`)
+      "
     >
       <div data-slot="stack">
         <ComboboxLabel>Country</ComboboxLabel>

@@ -1,4 +1,11 @@
-import { Toast, ToastAction, ToastClose, ToastDescription, ToastRegion, ToastTitle } from "@ui-sdk/vue"
+import {
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+} from "@ui-sdk/vue"
 import { createApp, defineComponent, h, shallowRef } from "vue"
 import type { Toast as ToastData } from "@ui-sdk/core/toast"
 import { classes, createShell } from "./shell"
@@ -23,21 +30,33 @@ function mount(root: HTMLElement) {
                 ToastAction,
                 { class: classes.action },
                 {
-                  default: ({ state }: { state: { pending: boolean; error?: unknown } }) =>
-                    state.pending ? "…" : state.error ? "Retry" : toast.action?.label,
-                },
+                  default: ({
+                    state,
+                  }: {
+                    state: { pending: boolean; error?: unknown }
+                  }) =>
+                    state.pending
+                      ? "…"
+                      : state.error
+                        ? "Retry"
+                        : toast.action?.label,
+                }
               ),
               toast.cancel
                 ? h(
                     ToastClose,
                     { class: classes.close, action: toast.cancel.onCancel },
-                    () => toast.cancel!.label,
+                    () => toast.cancel!.label
                   )
                 : null,
-              h(ToastClose, { class: classes.close, "aria-label": "Close" }, () => "×"),
+              h(
+                ToastClose,
+                { class: classes.close, "aria-label": "Close" },
+                () => "×"
+              ),
             ]),
-        },
-      ),
+        }
+      )
   )
   createApp(Region).mount(shell.slot)
 }

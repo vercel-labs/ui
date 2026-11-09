@@ -14,7 +14,7 @@ describe("toast server rendering", () => {
             <ToastTitle />
           </Toast>
         )}
-      </ToastRegion>,
+      </ToastRegion>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('data-slot="toast-region"')

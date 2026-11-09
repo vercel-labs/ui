@@ -30,14 +30,18 @@ async function review() {
       <AlertDialogBackdrop />
       <ProjectAlertDialogContent v-slot="{ state }">
         <div data-slot="stack">
-          <AlertDialogTitle>Archive {{ state.payload?.name }}?</AlertDialogTitle>
+          <AlertDialogTitle
+            >Archive {{ state.payload?.name }}?</AlertDialogTitle
+          >
           <AlertDialogDescription>
             Archived projects leave the active list. You can restore them later.
           </AlertDialogDescription>
         </div>
         <div data-slot="row">
           <AlertDialogClose>Cancel</AlertDialogClose>
-          <AlertDialogClose data-variant="solid" value="confirm">Archive</AlertDialogClose>
+          <AlertDialogClose data-variant="solid" value="confirm"
+            >Archive</AlertDialogClose
+          >
         </div>
       </ProjectAlertDialogContent>
     </AlertDialog>

@@ -1,4 +1,8 @@
-import type { AutocompleteEmptyState, AutocompleteStatusState, ListData } from "@ui-sdk/core/autocomplete"
+import type {
+  AutocompleteEmptyState,
+  AutocompleteStatusState,
+  ListData,
+} from "@ui-sdk/core/autocomplete"
 import {
   Autocomplete,
   AutocompleteArrow,
@@ -22,7 +26,12 @@ import { kitchenSink, type Env } from "./shell"
 import { anchorOf, filterOf, listOf, search, type Variant } from "./variants"
 
 // One composed suggestion.
-function item(entry: { value: string; label: string; keywords?: string[]; disabled?: boolean }) {
+function item(entry: {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+}) {
   return h(
     AutocompleteItem,
     {
@@ -33,7 +42,7 @@ function item(entry: { value: string; label: string; keywords?: string[]; disabl
       keywords: entry.keywords,
       disabled: entry.disabled,
     },
-    () => entry.label,
+    () => entry.label
   )
 }
 
@@ -41,14 +50,27 @@ function item(entry: { value: string; label: string; keywords?: string[]; disabl
 // or what a data autocomplete shows. Groups hold only items.
 function items(list: ListData<string>) {
   return list.map((entry, index) => {
-    if (typeof entry === "string") return null
-    if ("type" in entry && entry.type === "separator")
-      return h(AutocompleteSeparator, { key: `separator-${index}`, class: classes.separator })
-    if ("type" in entry && entry.type === "group")
+    if (typeof entry === "string") {
+      return null
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return h(AutocompleteSeparator, {
+        key: `separator-${index}`,
+        class: classes.separator,
+      })
+    }
+    if ("type" in entry && entry.type === "group") {
       return h(AutocompleteGroup, { key: entry.label }, () => [
-        h(AutocompleteGroupLabel, { class: classes.groupLabel }, () => entry.label),
-        ...entry.items.map((child) => typeof child !== "string" && item(child as never)),
+        h(
+          AutocompleteGroupLabel,
+          { class: classes.groupLabel },
+          () => entry.label
+        ),
+        ...entry.items.map(
+          (child) => typeof child !== "string" && item(child as never)
+        ),
       ])
+    }
     return item(entry as never)
   })
 }
@@ -62,7 +84,9 @@ const VariantAutocomplete = defineComponent({
     const value = ref(variant.options?.defaultValue ?? "")
     const open = ref(false)
     // Async results come from a composable, which runs once, in setup.
-    const remote = variant.async ? useAsyncOptions(search(variant.async), { immediate: true }) : undefined
+    const remote = variant.async
+      ? useAsyncOptions(search(variant.async), { immediate: true })
+      : undefined
     const data = variant.mode === "data" || !!remote
     const { defaultValue, filter, ...options } = variant.options ?? {}
 
@@ -74,7 +98,9 @@ const VariantAutocomplete = defineComponent({
           // Undefined props fall back to their defaults, which the typed overloads don't allow.
           {
             ...options,
-            ...(variant.controlled === "value" ? { value: value.value } : { defaultValue }),
+            ...(variant.controlled === "value"
+              ? { value: value.value }
+              : { defaultValue }),
             ...(variant.controlled === "open" && { open: open.value }),
             filter: remote ? false : filterOf(variant),
             status: remote?.state.value.status,
@@ -82,10 +108,14 @@ const VariantAutocomplete = defineComponent({
             controller: env.controller,
             container: env.container,
             "onUpdate:value": (next: string) => {
-              if (variant.controlled === "value") value.value = next
+              if (variant.controlled === "value") {
+                value.value = next
+              }
             },
             "onUpdate:open": (next: boolean) => {
-              if (variant.controlled === "open") open.value = next
+              if (variant.controlled === "open") {
+                open.value = next
+              }
             },
             onValueChange: (next: string, details: { reason: string }) => {
               remote?.setQuery(next)
@@ -93,21 +123,33 @@ const VariantAutocomplete = defineComponent({
             },
             onOpenChange: (next: boolean, details: { reason: string }) =>
               env.log(`openChange ${next} (${details.reason})`),
-            onOpenChangeComplete: (next: boolean) => env.log(`openChangeComplete ${next}`),
+            onOpenChangeComplete: (next: boolean) =>
+              env.log(`openChangeComplete ${next}`),
             onHighlight: (next: string | null, details: { index: number }) =>
               env.log(`highlight ${JSON.stringify(next)} #${details.index}`),
-            onSubmit: (next: string) => env.log(`onSubmit ${JSON.stringify(next)}`),
+            onSubmit: (next: string) =>
+              env.log(`onSubmit ${JSON.stringify(next)}`),
           } as Record<string, unknown>,
           () => [
             h(AutocompleteLabel, { class: classes.label }, () => variant.title),
-            h(AutocompleteInput, { class: classes.input, placeholder: "Search fruits…" }),
+            h(AutocompleteInput, {
+              class: classes.input,
+              placeholder: "Search fruits…",
+            }),
             variant.trigger &&
-              h(AutocompleteTrigger, { class: classes.trigger, "aria-label": "Show fruits" }, () => "▾"),
+              h(
+                AutocompleteTrigger,
+                { class: classes.trigger, "aria-label": "Show fruits" },
+                () => "▾"
+              ),
             variant.clear &&
               h(
                 AutocompleteClear,
-                { class: classes.clear, keepMounted: variant.clear === "keep-mounted" },
-                () => "Clear",
+                {
+                  class: classes.clear,
+                  keepMounted: variant.clear === "keep-mounted",
+                },
+                () => "Clear"
               ),
             h(
               AutocompleteContent,
@@ -123,13 +165,17 @@ const VariantAutocomplete = defineComponent({
                     AutocompleteStatus,
                     { class: classes.status },
                     {
-                      default: ({ state }: { state: AutocompleteStatusState }) =>
+                      default: ({
+                        state,
+                      }: {
+                        state: AutocompleteStatusState
+                      }) =>
                         state.loading
                           ? "Loading…"
                           : state.status === "error"
                             ? "Couldn't load fruits."
                             : `${state.count} results`,
-                    },
+                    }
                   ),
                 h(
                   AutocompleteEmpty,
@@ -137,38 +183,62 @@ const VariantAutocomplete = defineComponent({
                   {
                     default: ({ state }: { state: AutocompleteEmptyState }) =>
                       state.loading ? null : "No fruits found.",
-                  },
+                  }
                 ),
                 h(
                   AutocompleteList,
                   { class: variant.arrow ? classes.scrollingList : undefined },
                   {
-                    default: ({ state }: { state: { items: ListData<string> } }) =>
-                      items(data ? state.items : list),
-                  },
+                    default: ({
+                      state,
+                    }: {
+                      state: { items: ListData<string> }
+                    }) => items(data ? state.items : list),
+                  }
                 ),
-              ],
+              ]
             ),
-          ],
+          ]
         ),
         variant.controlled === "value" && [
-          h("span", { class: "text-xs text-neutral-600" }, `value: ${JSON.stringify(value.value)}`),
+          h(
+            "span",
+            { class: "text-xs text-neutral-600" },
+            `value: ${JSON.stringify(value.value)}`
+          ),
           h(
             "button",
-            { type: "button", class: classes.button, onClick: () => (value.value = "Mango") },
-            "Set “Mango”",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (value.value = "Mango"),
+            },
+            "Set “Mango”"
           ),
-          h("button", { type: "button", class: classes.button, onClick: () => (value.value = "") }, "Empty"),
+          h(
+            "button",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (value.value = ""),
+            },
+            "Empty"
+          ),
         ],
         variant.controlled === "open" &&
-          h("label", { class: "flex items-center gap-1.5 text-xs text-neutral-600" }, [
-            h("input", {
-              type: "checkbox",
-              checked: open.value,
-              onChange: (event: Event) => (open.value = (event.target as HTMLInputElement).checked),
-            }),
-            "open",
-          ]),
+          h(
+            "label",
+            { class: "flex items-center gap-1.5 text-xs text-neutral-600" },
+            [
+              h("input", {
+                type: "checkbox",
+                checked: open.value,
+                onChange: (event: Event) =>
+                  (open.value = (event.target as HTMLInputElement).checked),
+              }),
+              "open",
+            ]
+          ),
       ]
     }
   },

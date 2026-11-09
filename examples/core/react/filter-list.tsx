@@ -13,7 +13,10 @@ const filterList = definePrimitive({
   slots: (slot) => ({
     input: slot({
       attrs: (state) => ({ type: "search", value: state.query }),
-      on: { input: (event, { api }) => api.filter((event.target as HTMLInputElement).value) },
+      on: {
+        input: (event, { api }) =>
+          api.filter((event.target as HTMLInputElement).value),
+      },
     }),
     list: slot({ attrs: () => ({ role: "list" }) }),
     item: slot<{ value: string }>({
@@ -21,13 +24,19 @@ const filterList = definePrimitive({
       direct: direct(["hidden"]),
       attrs: (state, part) => ({
         role: "listitem",
-        hidden: part.key.toLowerCase().includes(state.query.toLowerCase()) ? undefined : "",
+        hidden: part.key.toLowerCase().includes(state.query.toLowerCase())
+          ? undefined
+          : "",
       }),
     }),
   }),
 })
 
-const parts = createParts(filterList, { input: "input", list: "ul", item: "li" })
+const parts = createParts(filterList, {
+  input: "input",
+  list: "ul",
+  item: "li",
+})
 
 const FilterList = parts.Root
 
@@ -37,13 +46,25 @@ const FilterListList = parts.List
 
 const FilterListItem = parts.Item
 
-const countries = ["Argentina", "Australia", "Austria", "Belgium", "Brazil", "Canada", "Chile", "Denmark"]
+const countries = [
+  "Argentina",
+  "Australia",
+  "Austria",
+  "Belgium",
+  "Brazil",
+  "Canada",
+  "Chile",
+  "Denmark",
+]
 
 function Example() {
   return (
     <FilterList>
       <div data-slot="stack">
-        <FilterListInput aria-label="Filter countries" placeholder="Filter countries…" />
+        <FilterListInput
+          aria-label="Filter countries"
+          placeholder="Filter countries…"
+        />
         <FilterListList>
           {countries.map((country) => (
             <FilterListItem key={country} value={country}>

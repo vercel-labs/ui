@@ -1,6 +1,11 @@
 import * as React from "react"
 import { inputHints, type EnterKeyHint, type InputHintKind } from "@ui-sdk/core"
-import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 
 const fields: { label: string; kind: InputHintKind; enter?: EnterKeyHint }[] = [
   { label: "Email", kind: "email", enter: "next" },

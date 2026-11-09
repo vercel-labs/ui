@@ -7,7 +7,12 @@ import { dev } from "#dev"
 import { checkName } from "#name-check"
 import { clamp } from "../../foundation/number/steps"
 import { createAutoplay } from "./carousel-autoplay"
-import { clearSnapAreas, labelSlide, readCarouselLayout, writeSnapAreas } from "./carousel-dom"
+import {
+  clearSnapAreas,
+  labelSlide,
+  readCarouselLayout,
+  writeSnapAreas,
+} from "./carousel-dom"
 import { carouselIndicators } from "./carousel-indicators"
 import { carouselKeys } from "./carousel-keyboard"
 import {
@@ -94,19 +99,30 @@ const userReasons = new Set<string>([
 
 // Carousel physics: the sheet's springs, with UIScrollView's rubber band
 // against the viewport's own size.
-const physics = { ...sheetPhysics.ios, rubberBand: 0.55, rubberBandDimension: null }
+const physics = {
+  ...sheetPhysics.ios,
+  rubberBand: 0.55,
+  rubberBandDimension: null,
+}
 
 function onVisibilityChange(doc: Document, listener: () => void) {
   doc.addEventListener("visibilitychange", listener)
   return () => doc.removeEventListener("visibilitychange", listener)
 }
 
-function snapType(state: Pick<State, "orientation" | "dragFree">, snapping: boolean) {
-  if (!snapping || state.dragFree) return "none"
+function snapType(
+  state: Pick<State, "orientation" | "dragFree">,
+  snapping: boolean
+) {
+  if (!snapping || state.dragFree) {
+    return "none"
+  }
   return `${state.orientation === "vertical" ? "y" : "x"} mandatory`
 }
 
-function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) {
+function carouselApi(
+  context: PrimitiveContext<CarouselOptions, State, string>
+) {
   const { id, store, options, element, onDestroy } = context
   const change = createChange(context)
   let layout: CarouselPage[] = []
@@ -128,13 +144,20 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   let motion: CarouselMotion | undefined
   // Which way a step heads, 1 or -1, for the loop to rotate toward it.
   let heading: 1 | -1 | undefined
-  const readDirection = () => (isRtl = isRTL(element("viewport") ?? element("root")))
-  const turned = () => measured && isRtl !== isRTL(element("viewport") ?? element("root"))
+  const readDirection = () =>
+    (isRtl = isRTL(element("viewport") ?? element("root")))
+  const turned = () =>
+    measured && isRtl !== isRTL(element("viewport") ?? element("root"))
   const followDirection = () => {
-    if (turned()) measure()
+    if (turned()) {
+      measure()
+    }
     return isRtl
   }
-  const axis = () => ({ vertical: store.get().orientation === "vertical", rtl: isRtl })
+  const axis = () => ({
+    vertical: store.get().orientation === "vertical",
+    rtl: isRtl,
+  })
   const loop = createCarouselLoop({
     slides: () => elements(context, "item"),
     motion: () => motion,
@@ -148,7 +171,9 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     // Rotation always wraps: it's a rotation, whatever `loop` says about the buttons.
     onTick: () => {
       const { page, pageCount } = store.get()
-      if (pageCount) go(stepPage(page, 1, pageCount, true), "timeout", undefined, 1)
+      if (pageCount) {
+        go(stepPage(page, 1, pageCount, true), "timeout", undefined, 1)
+      }
     },
     onPausedChange: (paused) => store.set({ paused }),
   })
@@ -158,13 +183,18 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   const canStep = (by: 1 | -1) => {
     const { page, loop } = store.get()
     const count = pageCount()
-    if (count === null) return by === 1 || page > 1
+    if (count === null) {
+      return by === 1 || page > 1
+    }
     return stepPage(page, by, count, loop) !== page
   }
 
   // The next or previous page, wrapping with `loop`. Before the pages are
   // measured, it steps freely forward and down to the first.
-  function step(by: 1 | -1, { reason = "imperative", event }: CarouselPageOptions = {}) {
+  function step(
+    by: 1 | -1,
+    { reason = "imperative", event }: CarouselPageOptions = {}
+  ) {
     const { page, loop } = store.get()
     const count = pageCount()
     const target = count === null ? page + by : stepPage(page, by, count, loop)
@@ -173,22 +203,39 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
 
   // Changes the page for a reason. A change the user made stops rotation.
   // `by` is the step that led here, which a loop moves along.
-  function go(page: number, reason: CarouselPageChangeReason, event?: Event, by?: 1 | -1) {
+  function go(
+    page: number,
+    reason: CarouselPageChangeReason,
+    event?: Event,
+    by?: 1 | -1
+  ) {
     followDirection()
     const count = pageCount()
-    const target = count === null ? Math.max(1, page) : Math.min(Math.max(1, page), count)
-    if (userReasons.has(reason) && store.get().playing)
-      change("playing", false, { reason: reason as CarouselPlayingChangeReason, event })
-    if (target === store.get().page) return false
+    const target =
+      count === null ? Math.max(1, page) : Math.min(Math.max(1, page), count)
+    if (userReasons.has(reason) && store.get().playing) {
+      change("playing", false, {
+        reason: reason as CarouselPlayingChangeReason,
+        event,
+      })
+    }
+    if (target === store.get().page) {
+      return false
+    }
     heading = by
     const changed = change("page", target, { reason, event })
     heading = undefined
     // A canceled change, or a controlled page that stayed, moves back.
-    if (!changed || store.get().page !== target) queueMicrotask(followPage)
+    if (!changed || store.get().page !== target) {
+      queueMicrotask(followPage)
+    }
     return changed
   }
 
-  function setPlaying(playing: boolean, { reason = "imperative", event }: CarouselPlayingOptions = {}) {
+  function setPlaying(
+    playing: boolean,
+    { reason = "imperative", event }: CarouselPlayingOptions = {}
+  ) {
     return change("playing", playing, { reason, event })
   }
 
@@ -196,14 +243,26 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   // its way somewhere else turns toward it; the user's own scroll or drag
   // settles it later.
   function followPage({ animate = true } = {}) {
-    if (loop.isRotating() || !motion || !measured || motion.isHeld() || (!animate && motion.isMoving()))
+    if (
+      loop.isRotating() ||
+      !motion ||
+      !measured ||
+      motion.isHeld() ||
+      (!animate && motion.isMoving())
+    ) {
       return
+    }
     const index = store.get().page - 1
-    if (!layout[index]) return
-    if (animate) loop.rotateToward(index, heading)
+    if (!layout[index]) {
+      return
+    }
+    if (animate) {
+      loop.rotateToward(index, heading)
+    }
     const position = clamp(layout[index].position, 0, maxScroll)
-    if (Math.abs(motion.position() - position) >= 1 || !store.get().snapping)
+    if (Math.abs(motion.position() - position) >= 1 || !store.get().snapping) {
       motion.moveTo(visual.indexOf(index), { animate })
+    }
   }
 
   let snapAreas = false
@@ -212,17 +271,26 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     measureQueued = false
     const viewport = element("viewport")
     const slides = elements(context, "item")
-    if (!viewport || !viewport.isConnected) return
+    if (!viewport || !viewport.isConnected) {
+      return
+    }
     // Slides that bound before they were in the page, as Vue binds them, get watched now.
-    for (const { el } of slides) resizeObserver?.observe(el)
+    for (const { el } of slides) {
+      resizeObserver?.observe(el)
+    }
     readDirection()
     // A loop rotates the slides, unless they don't lay out by CSS order, and
     // then it rewinds.
-    const first = loop.prepare(slides, store.get().loop && slides.length > 1 && motion !== undefined)
+    const first = loop.prepare(
+      slides,
+      store.get().loop && slides.length > 1 && motion !== undefined
+    )
     // Read after writing the order, to check the slides follow it.
     applyLayout({ ...readCarouselLayout(viewport, slides, axis()), first })
     // Slides that didn't rotate, or a track too short to, lay out in their own order.
-    if (first && !loop.isActive()) return measure()
+    if (first && !loop.isActive()) {
+      return measure()
+    }
     if (store.get().slidesPerPage !== 1) {
       writeSnapAreas(slides, layout, axis().vertical)
       snapAreas = true
@@ -242,9 +310,18 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     const { align, slidesPerPage } = store.get()
     const snapport = viewportSize - paddingStart - paddingEnd
     layout =
-      loop.layout(boxes, { snapport, paddingStart, maxScroll, align, slidesPerPage }, first) ??
-      carouselPages({ slides: boxes, snapport, paddingStart, maxScroll }, { align, slidesPerPage })
-    visual = layout.map((_, index) => index).sort((a, b) => layout[a].position - layout[b].position)
+      loop.layout(
+        boxes,
+        { snapport, paddingStart, maxScroll, align, slidesPerPage },
+        first
+      ) ??
+      carouselPages(
+        { slides: boxes, snapport, paddingStart, maxScroll },
+        { align, slidesPerPage }
+      )
+    visual = layout
+      .map((_, index) => index)
+      .sort((a, b) => layout[a].position - layout[b].position)
     const keys = measure.slides.map((slide) => slide.key)
     store.set({
       pageCount: layout.length || null,
@@ -254,28 +331,40 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     const { page } = store.get()
     if (layout.length && page > layout.length) {
       // The first measure picks a default, which is not a change.
-      if (measured) go(layout.length, "content-resize")
-      else store.set({ page: layout.length })
+      if (measured) {
+        go(layout.length, "content-resize")
+      } else {
+        store.set({ page: layout.length })
+      }
     }
     measured = layout.length > 0
     // A rotation keeps the slides in view, and moves the scroll position itself.
-    if (loop.isRotating()) return
+    if (loop.isRotating()) {
+      return
+    }
     // New layout keeps the current page in place, without animating.
     followPage({ animate: false })
     updateInView()
   }
 
   function queueMeasure() {
-    if (measureQueued) return
+    if (measureQueued) {
+      return
+    }
     measureQueued = true
     queueMicrotask(measure)
   }
 
   function updateInView() {
-    if (!motion) return
+    if (!motion) {
+      return
+    }
     const at = motion.position()
     const { order } = store.get()
-    const inView = order.filter((_, index) => boxes[index] && isSlideInView(boxes[index], at, viewportSize))
+    const inView = order.filter(
+      (_, index) =>
+        boxes[index] && isSlideInView(boxes[index], at, viewportSize)
+    )
     store.set({ inView })
     writeProgress()
   }
@@ -283,13 +372,23 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   // How far along the slides are: by scroll position, or round a looping
   // track by page, since its scroll position moves with each rotation.
   function progress() {
-    if (!motion || !layout.length) return 0
+    if (!motion || !layout.length) {
+      return 0
+    }
     const at = motion.position()
-    if (!loop.isActive()) return maxScroll > 0 ? clamp(at / maxScroll, 0, 1) : 0
+    if (!loop.isActive()) {
+      return maxScroll > 0 ? clamp(at / maxScroll, 0, 1) : 0
+    }
     let step = 0
-    while (step < visual.length - 1 && layout[visual[step + 1]].position <= at) step++
+    while (
+      step < visual.length - 1 &&
+      layout[visual[step + 1]].position <= at
+    ) {
+      step++
+    }
     const from = layout[visual[step]].position
-    const to = step < visual.length - 1 ? layout[visual[step + 1]].position : from
+    const to =
+      step < visual.length - 1 ? layout[visual[step + 1]].position : from
     const fraction = to > from ? clamp((at - from) / (to - from), 0, 1) : 0
     return ((visual[step] + fraction) / layout.length) % 1
   }
@@ -299,29 +398,46 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   let writtenProgress = -1
   function writeProgress() {
     const root = element("root")
-    if (!root) return
+    if (!root) {
+      return
+    }
     const value = Math.round(progress() * 10000)
-    if (value === writtenProgress) return
+    if (value === writtenProgress) {
+      return
+    }
     writtenProgress = value
     root.style.setProperty("--carousel-progress", (value / 10000).toFixed(4))
   }
 
   // The slides came to rest: a looping track recenters, and the page is complete.
   function rested() {
-    if (!motion || motion.isMoving()) return
+    if (!motion || motion.isMoving()) {
+      return
+    }
     loop.recenter()
     options().onPageChangeComplete?.(store.get().page)
   }
 
-  function onScrollRest(position: number, cause: { touch: boolean; event?: Event }) {
+  function onScrollRest(
+    position: number,
+    cause: { touch: boolean; event?: Event }
+  ) {
     const wasRtl = isRtl
-    if (followDirection() !== wasRtl && motion) position = motion.position()
+    if (followDirection() !== wasRtl && motion) {
+      position = motion.position()
+    }
     updateInView()
     const index = nearestPage(layout, position)
-    if (index === -1) return
+    if (index === -1) {
+      return
+    }
     const reason = cause.touch ? "swipe" : "scroll"
-    if (index + 1 !== store.get().page) go(index + 1, reason, cause.event)
-    if (!store.get().dragFree) followPage()
+    if (index + 1 !== store.get().page) {
+      go(index + 1, reason, cause.event)
+    }
+    if (!store.get().dragFree) {
+      followPage()
+    }
     rested()
   }
 
@@ -332,7 +448,8 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
       content: () => element("content"),
       axis,
       // In the order they rest, within the scroll range.
-      positions: () => visual.map((index) => clamp(layout[index].position, 0, maxScroll)),
+      positions: () =>
+        visual.map((index) => clamp(layout[index].position, 0, maxScroll)),
       maxScroll: () => maxScroll,
       viewportSize: () => viewportSize,
       physics: () => ({ ...physics, skipSnapPoints: store.get().skipSnaps }),
@@ -341,13 +458,18 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
       reducedMotion: prefersReducedMotion,
       setSnapping: (snapping) => {
         // Written at once too, since the next frame's scroll must not snap.
-        viewport.style.setProperty("scroll-snap-type", snapType(store.get(), snapping))
+        viewport.style.setProperty(
+          "scroll-snap-type",
+          snapType(store.get(), snapping)
+        )
         store.set({ snapping })
       },
       onRelease: (index, event) => go(visual[index] + 1, "swipe", event),
       onScrollRest,
       onSettle: () => {
-        if (!store.get().dragFree) followPage()
+        if (!store.get().dragFree) {
+          followPage()
+        }
         rested()
       },
       onDragChange: (dragging) => {
@@ -358,15 +480,25 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     })
     motion = viewportMotion
     cleanups.push(viewportMotion.destroy, () => {
-      if (motion === viewportMotion) motion = undefined
+      if (motion === viewportMotion) {
+        motion = undefined
+      }
       loop.reset(elements(context, "item"))
     })
-    cleanups.push(on(viewport, "pointerdown", followDirection, { capture: true }))
+    cleanups.push(
+      on(viewport, "pointerdown", followDirection, { capture: true })
+    )
     // A finger down pauses rotation; the swipe it makes stops it.
     cleanups.push(
-      on(viewport, "touchstart", () => autoplay.setPaused("touch", true), { passive: true }),
-      on(viewport, "touchend", () => autoplay.setPaused("touch", false), { passive: true }),
-      on(viewport, "touchcancel", () => autoplay.setPaused("touch", false), { passive: true }),
+      on(viewport, "touchstart", () => autoplay.setPaused("touch", true), {
+        passive: true,
+      }),
+      on(viewport, "touchend", () => autoplay.setPaused("touch", false), {
+        passive: true,
+      }),
+      on(viewport, "touchcancel", () => autoplay.setPaused("touch", false), {
+        passive: true,
+      })
     )
     if (typeof ResizeObserver !== "undefined") {
       const observer = new ResizeObserver(queueMeasure)
@@ -374,7 +506,9 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
       resizeObserver = observer
       cleanups.push(() => {
         observer.disconnect()
-        if (resizeObserver === observer) resizeObserver = undefined
+        if (resizeObserver === observer) {
+          resizeObserver = undefined
+        }
       })
     }
     // Content that can't take focus still needs a tab stop to scroll by keyboard.
@@ -392,29 +526,48 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
 
   function bindRoot(root: HTMLElement) {
     writeInterval(root)
-    if (dev)
-      queueMicrotask(() => root.isConnected && checkName(root, "Carousel", { component: "carousel", id }))
+    if (dev) {
+      queueMicrotask(
+        () =>
+          root.isConnected &&
+          checkName(root, "Carousel", { component: "carousel", id })
+      )
+    }
     const cleanups = [
       // Rotation pauses under the mouse, and stops when keyboard focus moves in.
       on(root, "pointerenter", (event) => {
-        if (event.pointerType === "mouse") autoplay.setPaused("hover", true)
+        if (event.pointerType === "mouse") {
+          autoplay.setPaused("hover", true)
+        }
       }),
       on(root, "pointerleave", (event) => {
-        if (event.pointerType === "mouse") autoplay.setPaused("hover", false)
+        if (event.pointerType === "mouse") {
+          autoplay.setPaused("hover", false)
+        }
       }),
       on(root, "focusin", (event) => {
         const from = event.relatedTarget as Node | null
-        if (store.get().playing && isFocusFromKeyboard() && !(from && root.contains(from)))
+        if (
+          store.get().playing &&
+          isFocusFromKeyboard() &&
+          !(from && root.contains(from))
+        ) {
           setPlaying(false, { reason: "focus-in", event })
+        }
       }),
       onVisibilityChange(root.ownerDocument, () =>
-        autoplay.setPaused("hidden", root.ownerDocument.visibilityState === "hidden"),
+        autoplay.setPaused(
+          "hidden",
+          root.ownerDocument.visibilityState === "hidden"
+        )
       ),
     ]
     if (typeof IntersectionObserver !== "undefined") {
       const observer = new IntersectionObserver((entries) => {
         const entry = entries[entries.length - 1]
-        if (entry) autoplay.setPaused("offscreen", !entry.isIntersecting)
+        if (entry) {
+          autoplay.setPaused("offscreen", !entry.isIntersecting)
+        }
       })
       observer.observe(root)
       cleanups.push(() => observer.disconnect())
@@ -426,7 +579,13 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   // Starts rotating if it should, for as long as the root is in the page.
   // Rotation that would start by default doesn't when the user prefers less motion.
   function runRotation(reducedMotion: boolean) {
-    if (store.get().playing && options().playing === undefined && reducedMotion) store.set({ playing: false })
+    if (
+      store.get().playing &&
+      options().playing === undefined &&
+      reducedMotion
+    ) {
+      store.set({ playing: false })
+    }
     autoplay.setRunning(store.get().playing)
     return () => autoplay.setRunning(false)
   }
@@ -438,16 +597,33 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
     const state = store.get()
     const before = previous
     previous = state
-    if (state.playing !== before.playing) autoplay.setRunning(state.playing)
-    if (state.interval !== before.interval) writeInterval()
+    if (state.playing !== before.playing) {
+      autoplay.setRunning(state.playing)
+    }
+    if (state.interval !== before.interval) {
+      writeInterval()
+    }
     if (state.page !== before.page) {
       autoplay.restart()
       // A controlled page can arrive while an adapter hands over props, so a turn measures later, which follows the page.
-      if (turned()) queueMeasure()
-      else followPage()
+      if (turned()) {
+        queueMeasure()
+      } else {
+        followPage()
+      }
     }
-    if (state.slidesPerPage !== before.slidesPerPage || state.align !== before.align) queueMeasure()
-    if (state.orientation !== before.orientation || state.loop !== before.loop) queueMeasure()
+    if (
+      state.slidesPerPage !== before.slidesPerPage ||
+      state.align !== before.align
+    ) {
+      queueMeasure()
+    }
+    if (
+      state.orientation !== before.orientation ||
+      state.loop !== before.loop
+    ) {
+      queueMeasure()
+    }
   })
 
   const indicators = carouselIndicators(context, go)
@@ -456,15 +632,18 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
   const api = {
     getPage: () => store.get().page,
     getPageCount: pageCount,
-    setPage: (page: number, { reason = "imperative", event }: CarouselPageOptions = {}) =>
-      go(page, reason, event),
+    setPage: (
+      page: number,
+      { reason = "imperative", event }: CarouselPageOptions = {}
+    ) => go(page, reason, event),
     next: (options?: CarouselPageOptions) => step(1, options),
     canNext: () => canStep(1),
     canPrevious: () => canStep(-1),
     getProgress: progress,
     previous: (options?: CarouselPageOptions) => step(-1, options),
     isPlaying: () => store.get().playing,
-    setPlaying: (playing: boolean, options?: CarouselPlayingOptions) => setPlaying(playing, options),
+    setPlaying: (playing: boolean, options?: CarouselPlayingOptions) =>
+      setPlaying(playing, options),
     play: (options?: CarouselPlayingOptions) => setPlaying(true, options),
     pause: (options?: CarouselPlayingOptions) => setPlaying(false, options),
     internal: {
@@ -481,14 +660,20 @@ function carouselApi(context: PrimitiveContext<CarouselOptions, State, string>) 
           labelSlide(el, key, store),
           on(el, "focusin", () => store.set({ focused: key })),
           on(el, "focusout", (event) => {
-            if (!el.contains(event.relatedTarget as Node | null) && store.get().focused === key)
+            if (
+              !el.contains(event.relatedTarget as Node | null) &&
+              store.get().focused === key
+            ) {
               store.set({ focused: null })
+            }
           }),
         ]
         return () => {
           cleanups.forEach((cleanup) => cleanup())
           resizeObserver?.unobserve(el)
-          if (store.get().focused === key) store.set({ focused: null })
+          if (store.get().focused === key) {
+            store.set({ focused: null })
+          }
           queueMeasure()
         }
       },

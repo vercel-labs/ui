@@ -16,16 +16,16 @@ Keys are joined with `+`. `mod` means Command on Apple platforms and Control els
 
 ```svelte
 <script lang="ts">
-import { useShortcut, useShortcutHint } from "@ui-sdk/svelte/shortcuts"
+  import { useShortcut, useShortcutHint } from "@ui-sdk/svelte/shortcuts"
 
-let count = $state(0)
-const addNote = () => count++
-useShortcut("mod+enter", addNote, { description: "New note" })
-const hint = useShortcutHint("mod+enter")
+  let count = $state(0)
+  const addNote = () => count++
+  useShortcut("mod+enter", addNote, { description: "New note" })
+  const hint = useShortcutHint("mod+enter")
 </script>
 
 <button onclick={addNote} aria-keyshortcuts={hint.ariaKeyshortcuts}>
-New note ({count}) <kbd aria-hidden="true">{hint.text}</kbd>
+  New note ({count}) <kbd aria-hidden="true">{hint.text}</kbd>
 </button>
 ```
 
@@ -49,15 +49,26 @@ Use a named `scope` for an editor or another area. Turn it on while that area ha
 
 ```svelte
 <script lang="ts">
-import { shortcuts, useShortcut } from "@ui-sdk/svelte/shortcuts"
-import { onDestroy } from "svelte"
+  import { shortcuts, useShortcut } from "@ui-sdk/svelte/shortcuts"
+  import { onDestroy } from "svelte"
 
-let text = $state("")
-useShortcut("escape", () => { text = "" }, { scope: "note", allowInInput: true })
-onDestroy(() => shortcuts.setScope("note", false))
+  let text = $state("")
+  useShortcut(
+    "escape",
+    () => {
+      text = ""
+    },
+    { scope: "note", allowInInput: true }
+  )
+  onDestroy(() => shortcuts.setScope("note", false))
 </script>
 
-<textarea aria-label="Note" bind:value={text} onfocus={() => shortcuts.setScope("note", true)} onblur={() => shortcuts.setScope("note", false)} />
+<textarea
+  aria-label="Note"
+  bind:value={text}
+  onfocus={() => shortcuts.setScope("note", true)}
+  onblur={() => shortcuts.setScope("note", false)}
+/>
 ```
 
 Scope names are shared, so choose one for each area you want to enable together. A `when` function can add another condition, checked each time the keys are pressed.

@@ -1,11 +1,24 @@
 // `definePrimitive`: a component's behavior without its markup, and the
 // instances adapters make of it. Its types are in `primitive-types.ts`.
-import { checkControlled, checkRoles, dev, emit, isMeasuring, warn, warnMissing } from "#dev"
+import {
+  checkControlled,
+  checkRoles,
+  dev,
+  emit,
+  isMeasuring,
+  warn,
+  warnMissing,
+} from "#dev"
 import { connectController } from "./controller"
 import { withDerived } from "./derive"
 import { withSource, type ChangeSource } from "./details"
 import { discard, whileDestroying, withLifecycle } from "./keep"
-import { propsRendered, provisional, type PartOwner, type PartRecord } from "./part"
+import {
+  propsRendered,
+  provisional,
+  type PartOwner,
+  type PartRecord,
+} from "./part"
 import type {
   AnySlot,
   BaseSlotProps,
@@ -109,12 +122,14 @@ function definePrimitive<
       /** Its value is hidden from agents and `observe`, like a password's. */
       secret?: boolean
     }
-  } & OptionsSchema<Options>,
+  } & OptionsSchema<Options>
 ) {
   const slots = definition.slots((slot) => slot)
   const name = definition.name
   const label = definition.label ?? name
-  if (dev) checkRoles(slots as Record<string, object>, { component: label })
+  if (dev) {
+    checkRoles(slots as Record<string, object>, { component: label })
+  }
   type Slot = keyof Slots & string
 
   const make = (initialOptions: Options & { id: string }) => {
@@ -122,28 +137,44 @@ function definePrimitive<
     const id = initialOptions.id
     const store = createStore(
       { ...definition.state(options), ...definition.sync?.(options) },
-      definition.live ?? [],
+      definition.live ?? []
     )
     const destroys: (() => void)[] = []
-    const optionsListeners: Parameters<PrimitiveContext<Options, State, Slot>["onOptions"]>[0][] = []
+    const optionsListeners: Parameters<
+      PrimitiveContext<Options, State, Slot>["onOptions"]
+    >[0][] = []
     // Development code below is behind `dev`, so production builds drop it
     // with its arguments. `from` names the instance in warnings and the devtools.
     const from = { component: label, id }
     const controlled = dev
-      ? (definition.controlled ?? ["open", "value", "checked"]).filter((key) => key in store.get())
+      ? (definition.controlled ?? ["open", "value", "checked"]).filter(
+          (key) => key in store.get()
+        )
       : []
-    if (dev) checkControlled(from, controlled, options)
+    if (dev) {
+      checkControlled(from, controlled, options)
+    }
 
-    const own: Record<string, AnySlot> = Object.create(dev ? warnMissing(slots, from) : slots)
+    const own: Record<string, AnySlot> = Object.create(
+      dev ? warnMissing(slots, from) : slots
+    )
     const used = new Set<Feature>()
     function use(feature: Feature<Api>) {
-      if (used.has(feature)) return
+      if (used.has(feature)) {
+        return
+      }
       used.add(feature)
       Object.assign(own, feature.slots)
       feature.extend?.(api)
     }
 
-    const owner: PartOwner = { name, label, slots: own, parts: new Map(), released: [] }
+    const owner: PartOwner = {
+      name,
+      label,
+      slots: own,
+      parts: new Map(),
+      released: [],
+    }
     const { parts } = owner
 
     // A value of any type keys its part, so items valued 1 and 2 are two parts.
@@ -153,21 +184,43 @@ function definePrimitive<
 
     // Inside `view`, the props a framework renders the parts around the one
     // it's rendering with, by slot, before it commits them.
-    let viewedParts: Record<string, BaseSlotProps & { value?: unknown }> | undefined
+    let viewedParts:
+      Record<string, BaseSlotProps & { value?: unknown }> | undefined
 
     // What an adapter calls as it renders a part: the part for `props`, made
     // and kept if it's new, with `props` as its newest render's, and its
     // `onProps` listeners run. A framework that may throw a render away, like
     // React, passes `rendering`: the part keeps the props it committed, which
     // its handlers and the parts around read, until `commit()`.
-    function part<S extends Slot>(slot: S, props: SlotProps<Slots[S]> = {} as never, rendering = false) {
+    function part<S extends Slot>(
+      slot: S,
+      props: SlotProps<Slots[S]> = {} as never,
+      rendering = false
+    ) {
       const key = keyOf(props)
       const mapKey = `${slot}:${key}`
       let found = parts.get(mapKey)
       if (!found) {
-        parts.set(mapKey, (found = { slot, key, id, api, store, props, el: undefined, owner, leases: 0 }))
-        if (rendering) provisional(found as PartRecord)
-      } else if (rendering) return found as Part<State, Api, SlotProps<Slots[S]>>
+        parts.set(
+          mapKey,
+          (found = {
+            slot,
+            key,
+            id,
+            api,
+            store,
+            props,
+            el: undefined,
+            owner,
+            leases: 0,
+          })
+        )
+        if (rendering) {
+          provisional(found as PartRecord)
+        }
+      } else if (rendering) {
+        return found as Part<State, Api, SlotProps<Slots[S]>>
+      }
       found.props = props
       propsRendered(found)
       return found as Part<State, Api, SlotProps<Slots[S]>>
@@ -177,7 +230,11 @@ function definePrimitive<
     // until its cleanup runs.
     function element(slot: Slot, key?: string) {
       if (key === undefined) {
-        for (const part of parts.values()) if (part.slot === slot && part.el?.isConnected) return part.el
+        for (const part of parts.values()) {
+          if (part.slot === slot && part.el?.isConnected) {
+            return part.el
+          }
+        }
         return
       }
       const el = parts.get(`${slot}:${key}`)?.el
@@ -195,16 +252,23 @@ function definePrimitive<
       element,
       props: (slot, key = "") => {
         const shown = viewedParts?.[slot]
-        return shown && keyOf(shown) === key ? shown : parts.get(`${slot}:${key}`)?.props
+        return shown && keyOf(shown) === key
+          ? shown
+          : parts.get(`${slot}:${key}`)?.props
       },
     }
     const api = definition.api(context)
     connectController(context, api)
 
     if (dev) {
-      for (const action of definition.agent?.actions ?? [])
-        if (typeof (api as Record<string, unknown>)[action] !== "function")
-          warn(`lists \`${action}\` in \`agent.actions\`, but its api has no such method.`, from)
+      for (const action of definition.agent?.actions ?? []) {
+        if (typeof (api as Record<string, unknown>)[action] !== "function") {
+          warn(
+            `lists \`${action}\` in \`agent.actions\`, but its api has no such method.`,
+            from
+          )
+        }
+      }
     }
 
     // Whether `setOptions` is handing options over, and whether a framework
@@ -218,7 +282,12 @@ function definePrimitive<
       withDerived(store, options, definition.sync?.(options), state)
     const instance = {
       // Type-only. Lets adapters read slot props, state and api types.
-      types: undefined as unknown as { options: Options; state: State; api: Api; slots: Slots },
+      types: undefined as unknown as {
+        options: Options
+        state: State
+        api: Api
+        slots: Slots
+      },
       name,
       id,
       get: store.get,
@@ -229,10 +298,14 @@ function definePrimitive<
       // The state `next` would make, or undefined when it makes none new, so
       // a framework can render a controlled value before it commits it.
       preview(next: Options & { id: string }) {
-        const synced = syncFrom({ ...next, id }, store.get()) as Record<string, unknown> | undefined
+        const synced = syncFrom({ ...next, id }, store.get()) as
+          Record<string, unknown> | undefined
         const current = store.get() as Record<string, unknown>
-        for (const key in synced)
-          if (!sameValue(current[key], synced[key])) return { ...current, ...synced } as State
+        for (const key in synced) {
+          if (!sameValue(current[key], synced[key])) {
+            return { ...current, ...synced } as State
+          }
+        }
       },
       // Runs `read` with `get()` returning `state`, and the api reading the
       // parts in `around` with the props given there, so a framework that
@@ -253,21 +326,32 @@ function definePrimitive<
         // What `follow` showed of these options, while the instance still had the last ones.
         const shown = dev && following ? syncFrom(arriving, held) : undefined
         options = arriving
-        if (dev) checkControlled(from, controlled, options)
+        if (dev) {
+          checkControlled(from, controlled, options)
+        }
         const synced = syncFrom(options, held)
         if (dev && shown) {
           const torn = tornKeys(shown, synced)
-          if (torn.length) emit({ type: "relay", ...from, keys: torn })
+          if (torn.length) {
+            emit({ type: "relay", ...from, keys: torn })
+          }
         }
         let source: ChangeSource | undefined
         handing = true
         try {
-          for (const listener of optionsListeners) source = listener(options, synced) ?? source
+          for (const listener of optionsListeners) {
+            source = listener(options, synced) ?? source
+          }
           // A listener's write lands what `follow` delivers first, with what
           // that sets off, like a close whose exit ended at once. Synced from
           // the state before, the options would undo it.
-          const landing = heldState(store) === held ? synced : syncFrom(options, heldState(store))
-          if (landing) withSource(source, () => store.set(landing, true))
+          const landing =
+            heldState(store) === held
+              ? synced
+              : syncFrom(options, heldState(store))
+          if (landing) {
+            withSource(source, () => store.set(landing, true))
+          }
         } finally {
           handing = false
         }
@@ -275,7 +359,8 @@ function definePrimitive<
       // The state a new instance with `next` would start at. The web adapter
       // reads a form reset's defaults from it when properties set before
       // connecting started an element elsewhere.
-      startState: (next: Options & { id: string }) => definition.state({ ...next, id }),
+      startState: (next: Options & { id: string }) =>
+        definition.state({ ...next, id }),
       // Reads the keys `sync` makes from `current`, a framework's props, from
       // now on: state has them the moment the props change, before
       // `setOptions` hands them over from an effect, and parts the framework
@@ -289,12 +374,16 @@ function definePrimitive<
         let last: { options: object; state: State } | undefined
         let synced: Partial<State> | undefined
         const read = (state = heldState(store), before?: Options) => {
-          if (before) return syncFrom({ ...before, id }, state)
+          if (before) {
+            return syncFrom({ ...before, id }, state)
+          }
           // Once the instance is destroyed, what it reads, like a checkbox
           // group counting its checkboxes after they left, keeps what the
           // framework last delivered: the framework's values may have gone
           // with the component, like a Svelte `$derived` of its effects.
-          if (destroyed) return synced
+          if (destroyed) {
+            return synced
+          }
           const options = current()
           if (last?.options !== options || last.state !== state) {
             last = { options, state }
@@ -305,10 +394,13 @@ function definePrimitive<
         store.follow(read)
         // What the options change besides the keys they deliver, parts hear
         // inside the effect that handed them over.
-        if (dev)
+        if (dev) {
           store.subscribe((_, delivered, keys) => {
-            if (handing && !delivered && !isMeasuring()) emit({ type: "relay", ...from, keys: [...keys] })
+            if (handing && !delivered && !isMeasuring()) {
+              emit({ type: "relay", ...from, keys: [...keys] })
+            }
           })
+        }
         return read
       },
       // The instance left the page. Stops what it started outside itself for
@@ -316,24 +408,34 @@ function definePrimitive<
       // it, like a popup's pending `open()`. Adapters call it once the
       // component unmounts, and a second call does nothing.
       destroy() {
-        if (destroyed) return
+        if (destroyed) {
+          return
+        }
         destroyed = true
         discard(instance)
         whileDestroying(() => destroys.forEach((cleanup) => cleanup()))
-        if (dev) emit({ type: "instance", action: "destroy", ...from, controlled })
+        if (dev) {
+          emit({ type: "instance", action: "destroy", ...from, controlled })
+        }
       },
     }
     standFor(instance, store)
     watchWhileKept(instance, parts, definition)
-    if (dev) emit({ type: "instance", action: "create", ...from, controlled })
+    if (dev) {
+      emit({ type: "instance", action: "create", ...from, controlled })
+    }
     return instance
   }
-  const create = (initialOptions: Options & { id: string }) => withLifecycle(() => make(initialOptions))
+  const create = (initialOptions: Options & { id: string }) =>
+    withLifecycle(() => make(initialOptions))
   // Named like its instances, so renderers can name its parts, like `TabsList`.
   // Its options schema and slots are for renderers, which read the schema
   // with `schemaOf`, so primitives no renderer reads that way pay nothing for it.
   Object.defineProperty(create, "name", { value: name })
-  return Object.assign(create, { options: definition.options as Record<string, PropSpec> | undefined, slots })
+  return Object.assign(create, {
+    options: definition.options as Record<string, PropSpec> | undefined,
+    slots,
+  })
 }
 
 // The keys `follow` showed with another value than the handover lands, which
@@ -356,7 +458,10 @@ function schemaOf(primitive: Primitive) {
     schema = {
       options: { debug: "boolean", ...options },
       slots: Object.fromEntries(
-        Object.entries(slots as Record<string, AnySlot>).map(([slot, def]) => [slot, def.props ?? {}]),
+        Object.entries(slots as Record<string, AnySlot>).map(([slot, def]) => [
+          slot,
+          def.props ?? {},
+        ])
       ),
     }
     schemas.set(primitive, schema)

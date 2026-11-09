@@ -20,10 +20,18 @@ function Fixture() {
         }}
       >
         <TabsList className="tablist" aria-label="Project">
-          <TabsTab className="tab" value="overview" render={<a href="#overview" />}>
+          <TabsTab
+            className="tab"
+            value="overview"
+            render={<a href="#overview" />}
+          >
             Overview
           </TabsTab>
-          <TabsTab className="tab" value="activity" render={<a href="#activity" />}>
+          <TabsTab
+            className="tab"
+            value="activity"
+            render={<a href="#activity" />}
+          >
             Activity
           </TabsTab>
           <TabsTab
@@ -40,7 +48,9 @@ function Fixture() {
           </TabsTab>
           <TabsTab
             value="plain"
-            className={(state) => `tab ${state.selected ? "is-selected" : "is-unselected"}`}
+            className={(state) =>
+              `tab ${state.selected ? "is-selected" : "is-unselected"}`
+            }
           >
             Plain
           </TabsTab>

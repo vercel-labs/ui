@@ -11,7 +11,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#installation",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -43,7 +44,7 @@ function mount(root: HTMLElement) {
                     <span data-slot="hint">${page.description}</span>
                   </a>
                 </ui-navigation-menu-link>
-              </li>`,
+              </li>`
                 )
                 .join("")}
             </ul>
@@ -60,10 +61,15 @@ function mount(root: HTMLElement) {
   `
   function setRoute(route: string) {
     for (const link of root.querySelectorAll("ui-navigation-menu-link")) {
-      link.toggleAttribute("current", link.querySelector("a")!.getAttribute("href") === route)
+      link.toggleAttribute(
+        "current",
+        link.querySelector("a")!.getAttribute("href") === route
+      )
     }
   }
-  for (const link of root.querySelectorAll<HTMLAnchorElement>("a[data-router]")) {
+  for (const link of root.querySelectorAll<HTMLAnchorElement>(
+    "a[data-router]"
+  )) {
     link.addEventListener("click", (event) => {
       event.preventDefault()
       const href = link.getAttribute("href")!

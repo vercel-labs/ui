@@ -1,4 +1,10 @@
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem, ComboboxList } from "@ui-sdk/react/combobox"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@ui-sdk/react/combobox"
 import { createRoot } from "react-dom/client"
 import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"
 
@@ -47,7 +53,7 @@ function Fixture() {
                 >
                   {item.label}
                 </ComboboxItem>
-              ),
+              )
             )}
           </ComboboxList>
         </ComboboxContent>

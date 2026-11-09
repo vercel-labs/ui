@@ -4,12 +4,23 @@ import type { PopupOpener } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
 import { createSafeArea } from "../../foundation/popups/safe-area"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
-import { createTypeahead, isTypeaheadKey, labelOf } from "../../foundation/text/typeahead"
-import type { MenuOpenChangeReason, MenuPayloadChangeReason } from "../menu/menu"
+import {
+  createTypeahead,
+  isTypeaheadKey,
+  labelOf,
+} from "../../foundation/text/typeahead"
+import type {
+  MenuOpenChangeReason,
+  MenuPayloadChangeReason,
+} from "../menu/menu"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeOptions } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Opens, closes and focuses a menubar's menus from outside it, like the F10
@@ -107,7 +118,11 @@ type MenubarMember = {
     event?: Event
     by?: PopupOpener
   }) => void
-  close: (options: { reason: MenuOpenChangeReason; event?: Event; focus: boolean }) => boolean
+  close: (options: {
+    reason: MenuOpenChangeReason
+    event?: Event
+    focus: boolean
+  }) => boolean
 }
 
 type State = {
@@ -144,7 +159,9 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
   // opens its menu. Escape and focus leaving the trigger end it.
   let held: HTMLElement | null = null
   const release = (event: Event) => {
-    if (event.target === held) held = null
+    if (event.target === held) {
+      held = null
+    }
   }
 
   // Crossing other triggers on the way to the open menu doesn't switch to them.
@@ -158,20 +175,37 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
 
   // Moves focus to the trigger `next`, opening its menu when `open` says so.
   // A disabled menu takes focus on its trigger instead, and the open menu closes.
-  function moveTo(next: { key: string; el: HTMLElement } | undefined, event: Event, open: boolean) {
-    if (!next) return
+  function moveTo(
+    next: { key: string; el: HTMLElement } | undefined,
+    event: Event,
+    open: boolean
+  ) {
+    if (!next) {
+      return
+    }
     const member = members.get(next.key)
-    if (open && member && !member.disabled()) member.open({ focus: "first", reason: "trigger-press", event })
-    else if (openMember()?.close({ reason: "submenu-switch", event, focus: false }) !== false) next.el.focus()
+    if (open && member && !member.disabled()) {
+      member.open({ focus: "first", reason: "trigger-press", event })
+    } else if (
+      openMember()?.close({ reason: "submenu-switch", event, focus: false }) !==
+      false
+    ) {
+      next.el.focus()
+    }
     // A menu that refused to close keeps the menubar where it was.
     const current = store.get().open
-    if (current === null || current === next.key) roving.remember(next.key)
+    if (current === null || current === next.key) {
+      roving.remember(next.key)
+    }
   }
 
   const api = {
     focus: () => roving.focus(),
     isOpen: () => store.get().open !== null,
-    close: ({ reason = "imperative", event }: ChangeOptions<MenuOpenChangeReason> = {}) =>
+    close: ({
+      reason = "imperative",
+      event,
+    }: ChangeOptions<MenuOpenChangeReason> = {}) =>
       openMember()?.close({ reason, event, focus: true }) ?? false,
     internal: {
       orientation,
@@ -181,32 +215,38 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       subscribe: store.subscribe,
       element: () => element("root"),
       isStop: (key: string, enabled: boolean) =>
-        roving.tabIndex(store.get(), { key, props: { disabled: !enabled } }) === "0",
+        roving.tabIndex(store.get(), { key, props: { disabled: !enabled } }) ===
+        "0",
       join(key: string, el: HTMLElement, member: MenubarMember) {
         members.set(key, member)
         const leave = roving.bind(el, { key, props: {} })
         return () => {
-          if (members.get(key) === member) members.delete(key)
+          if (members.get(key) === member) {
+            members.delete(key)
+          }
           leave()
         }
       },
       // Whether a press lands on one of the menubar's triggers, which never
       // counts as outside its open menu: it switches menus instead.
-      onTrigger: (target: Node) => roving.items().some((item) => item.el.contains(target)),
+      onTrigger: (target: Node) =>
+        roving.items().some((item) => item.el.contains(target)),
       // One menu is open at a time. Another opening closes it, unless it refuses.
       opening: (key: string, event?: Event) =>
         [...members].every(
           ([other, member]) =>
             other === key ||
             !member.isOpen() ||
-            member.close({ reason: "submenu-switch", event, focus: false }),
+            member.close({ reason: "submenu-switch", event, focus: false })
         ),
       openChanged(key: string, open: boolean) {
         aim.stop()
         if (open) {
           held = null
           store.set({ open: key })
-        } else if (store.get().open === key) store.set({ open: null })
+        } else if (store.get().open === key) {
+          store.set({ open: null })
+        }
       },
       // Left and Right inside an open menu, on an item without a submenu. A
       // horizontal menubar opens the neighbouring menu at its first item, as
@@ -214,11 +254,15 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       // the side, so the key back toward the menubar returns "close", for the
       // menu to close like a submenu, and the other does nothing.
       menuArrow(key: string, by: 1 | -1, event: Event) {
-        if (orientation() === "vertical") return by === -1 ? ("close" as const) : undefined
+        if (orientation() === "vertical") {
+          return by === -1 ? ("close" as const) : undefined
+        }
         const list = roving.items()
         const index = list.findIndex((item) => item.key === key)
         const next = list[moveIndex(index, by, list.length, loop())]
-        if (next && next.key !== key) moveTo(next, event, true)
+        if (next && next.key !== key) {
+          moveTo(next, event, true)
+        }
         return "moved" as const
       },
       // Keys on a trigger. Arrows along the menubar, Home, End and typeahead
@@ -226,40 +270,63 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       // Returns where focus goes when the key opens the trigger's menu: the
       // arrow across the menubar, Enter and Space open it at its first item,
       // and Up at its last.
-      triggerKeydown(event: KeyboardEvent, key: string, el: HTMLElement, disabled: boolean) {
-        if (event.key === "Escape") held = null
+      triggerKeydown(
+        event: KeyboardEvent,
+        key: string,
+        el: HTMLElement,
+        disabled: boolean
+      ) {
+        if (event.key === "Escape") {
+          held = null
+        }
         const wasOpen = members.get(key)?.isOpen() ?? false
         const moved = event.shiftKey ? undefined : roving.keydown(event, el)
         if (moved) {
-          if (wasOpen && moved.key !== moved.from)
+          if (wasOpen && moved.key !== moved.from) {
             moveTo(
               roving.items().find((item) => item.key === moved.key),
               event,
-              true,
+              true
             )
+          }
           return
         }
-        if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return
+        if (
+          event.defaultPrevented ||
+          event.altKey ||
+          event.ctrlKey ||
+          event.metaKey
+        ) {
+          return
+        }
         if (isTypeaheadKey(event) && event.key !== " ") {
           const list = roving.items()
           const found = typeahead(
             event.key,
             list.map((item) => labelOf(item.el)),
-            list.findIndex((item) => item.key === key),
+            list.findIndex((item) => item.key === key)
           )
-          if (found === -1) return
+          if (found === -1) {
+            return
+          }
           event.preventDefault()
           return moveTo(list[found], event, wasOpen)
         }
-        if (disabled) return
+        if (disabled) {
+          return
+        }
         const vertical = orientation() === "vertical"
         const first = vertical
           ? event.key === (isRTL(el) ? "ArrowLeft" : "ArrowRight")
           : event.key === "ArrowDown"
         const last = !vertical && event.key === "ArrowUp"
         // Native buttons press themselves.
-        const activate = el.tagName !== "BUTTON" && (event.key === "Enter" || event.key === " ")
-        if (!first && !last && !activate) return
+        const activate =
+          el.tagName !== "BUTTON" &&
+          (event.key === "Enter" || event.key === " ")
+        if (!first && !last && !activate) {
+          return
+        }
         event.preventDefault()
         return last ? ("last" as const) : ("first" as const)
       },
@@ -268,30 +335,58 @@ function menubarApi(context: PrimitiveContext<MenubarOptions, State, string>) {
       hover(key: string, event: PointerEvent) {
         const open = store.get().open
         const member = members.get(key)
-        if ((open === null && !held) || open === key || !member || event.pointerType === "touch") return
+        if (
+          (open === null && !held) ||
+          open === key ||
+          !member ||
+          event.pointerType === "touch"
+        ) {
+          return
+        }
         pointerOn = key
         const rested = () => pointerOn === key && api.internal.hover(key, event)
-        if (aim.contains({ x: event.clientX, y: event.clientY }, rested)) return
+        if (aim.contains({ x: event.clientX, y: event.clientY }, rested)) {
+          return
+        }
         aim.stop()
         if (member.disabled()) {
           const next = roving.items().find((item) => item.key === key)
-          if (!next) return
+          if (!next) {
+            return
+          }
           moveTo(next, event, false)
-          if (store.get().open !== null) return
+          if (store.get().open !== null) {
+            return
+          }
           held = next.el
           next.el.addEventListener("blur", release, { once: true })
           return
         }
         roving.remember(key)
-        member.open({ focus: "popup", reason: "trigger-hover", event, by: "pointer" })
+        member.open({
+          focus: "popup",
+          reason: "trigger-hover",
+          event,
+          by: "pointer",
+        })
       },
       hoverMove(key: string, event: PointerEvent) {
-        if (aim.active()) api.internal.hover(key, event)
+        if (aim.active()) {
+          api.internal.hover(key, event)
+        }
       },
       leave(key: string, event: PointerEvent, menu: HTMLElement | undefined) {
-        if (pointerOn === key) pointerOn = null
-        if (store.get().open !== key || !menu) return
-        aim.start({ x: event.clientX, y: event.clientY }, menu, orientation() === "vertical" ? "x" : "y")
+        if (pointerOn === key) {
+          pointerOn = null
+        }
+        if (store.get().open !== key || !menu) {
+          return
+        }
+        aim.start(
+          { x: event.clientX, y: event.clientY },
+          menu,
+          orientation() === "vertical" ? "x" : "y"
+        )
       },
       enterMenu: () => aim.stop(),
     },
@@ -333,7 +428,9 @@ const menubarPrimitive = /* @__PURE__ */ definePrimitive({
   slots: (slot) => ({
     root: slot<{}, MenubarState>({
       role: "menubar",
-      keys: { none: "Each menu's trigger, an item of the menubar, handles them." },
+      keys: {
+        none: "Each menu's trigger, an item of the menubar, handles them.",
+      },
       state: (state) => ({
         orientation: state.orientation,
         disabled: state.disabled,

@@ -69,17 +69,30 @@ function Example() {
           </CalendarNext>
         </div>
         <CalendarGrid>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} />}
+          </CalendarWeekdays>
+          <CalendarWeeks>
+            {(cell) => <CalendarDay value={cell.date} />}
+          </CalendarWeeks>
         </CalendarGrid>
         <div data-slot="row">
-          <DatePickerPreset data-variant="ghost" value={["2026-10-10", "2026-10-16"]}>
+          <DatePickerPreset
+            data-variant="ghost"
+            value={["2026-10-10", "2026-10-16"]}
+          >
             Last 7 Days
           </DatePickerPreset>
-          <DatePickerPreset data-variant="ghost" value={["2026-09-17", "2026-10-16"]}>
+          <DatePickerPreset
+            data-variant="ghost"
+            value={["2026-09-17", "2026-10-16"]}
+          >
             Last 30 Days
           </DatePickerPreset>
-          <DatePickerPreset data-variant="ghost" value={["2026-10-01", "2026-10-31"]}>
+          <DatePickerPreset
+            data-variant="ghost"
+            value={["2026-10-01", "2026-10-31"]}
+          >
             This Month
           </DatePickerPreset>
         </div>

@@ -1,9 +1,23 @@
-import { ariaKeyshortcuts, initialApple } from "../../foundation/platform/platform"
-import { createPopupController, type Modal, type PopupFocusTarget } from "../../foundation/popups/popup"
+import {
+  ariaKeyshortcuts,
+  initialApple,
+} from "../../foundation/platform/platform"
+import {
+  createPopupController,
+  type Modal,
+  type PopupFocusTarget,
+} from "../../foundation/popups/popup"
 import { modalAttribute } from "../../foundation/popups/modal-attribute"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
 import { type PresentationSetting } from "../../foundation/popups/presentation"
-import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  createPopup,
+  popupState,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { popoverPreset } from "../../foundation/popups/popup-presets"
 import {
   popupArrow,
@@ -14,9 +28,16 @@ import {
   popupTrigger,
   popupViewport,
 } from "../../foundation/popups/popup-slots"
-import type { ChangeDetails, DismissAttemptReason } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  DismissAttemptReason,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import {
   adoptPlatform,
   bindPartShortcut,
@@ -47,13 +68,17 @@ type PopoverOpenChangeReason =
  * The dismissals `dismissible` refuses that `onDismissAttempt` hears about.
  * @stable
  */
-type PopoverDismissReason = Extract<PopoverOpenChangeReason, DismissAttemptReason>
+type PopoverDismissReason = Extract<
+  PopoverOpenChangeReason,
+  DismissAttemptReason
+>
 
 /**
  * Why the popover's payload changed: a trigger opened it, another trigger took it over while open, or a controller opened it or gave the open one another payload.
  * @stable
  */
-type PopoverPayloadChangeReason = "trigger-press" | "trigger-hover" | "shortcut" | "imperative"
+type PopoverPayloadChangeReason =
+  "trigger-press" | "trigger-hover" | "shortcut" | "imperative"
 
 /**
  * Opens, closes and inspects a popover from outside it: a toolbar, a hotkey,
@@ -63,7 +88,13 @@ type PopoverPayloadChangeReason = "trigger-press" | "trigger-hover" | "shortcut"
  * @stable
  */
 function createPopoverController<Payload = unknown, Result = string>() {
-  return createPopupController<Payload, PopoverOpenChangeReason, {}, Result, PopoverPayloadChangeReason>()
+  return createPopupController<
+    Payload,
+    PopoverOpenChangeReason,
+    {},
+    Result,
+    PopoverPayloadChangeReason
+  >()
 }
 
 /**
@@ -83,7 +114,12 @@ type PopoverController<Payload = unknown, Result = string> = ReturnType<
  * @stable
  */
 type PopoverInitialFocus =
-  "auto" | "content" | "none" | (string & {}) | HTMLElement | (() => HTMLElement | null | undefined)
+  | "auto"
+  | "content"
+  | "none"
+  | (string & {})
+  | HTMLElement
+  | (() => HTMLElement | null | undefined)
 
 /**
  * Where focus goes when the popover closes while focus was inside it.
@@ -106,7 +142,10 @@ type PopoverOptions = PortalProps & {
    */
   defaultOpen?: boolean
   /** Runs when the popover wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<PopoverOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<PopoverOpenChangeReason>
+  ) => void
   /** Runs once the popover has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /**
@@ -114,7 +153,10 @@ type PopoverOptions = PortalProps & {
    * popover, or takes the open popover over, which fires no `onOpenChange`, and so does a
    * controller's `open({ payload })` on the open popover. `details.cancel()` keeps the previous payload.
    */
-  onPayloadChange?: (payload: unknown, details: ChangeDetails<PopoverPayloadChangeReason>) => void
+  onPayloadChange?: (
+    payload: unknown,
+    details: ChangeDetails<PopoverPayloadChangeReason>
+  ) => void
   /**
    * `false`: the rest of the page stays usable, and focus leaving the popover closes it. `true`: also traps focus, locks scroll and makes the rest of the page inert, and an outside press only closes the popover. `"trap-focus"`: traps focus but leaves the page scrollable and clickable.
    * @defaultValue false, or true while it presents as a sheet
@@ -281,13 +323,16 @@ type PopoverState = PopupState & {
 type PopoverApi = ReturnType<typeof popoverApi>
 
 // A popover is `createPopup` with `popoverPreset`. What's its own: trigger shortcuts.
-function popoverApi(context: PrimitiveContext<PopoverOptions, PopoverState, string>) {
+function popoverApi(
+  context: PrimitiveContext<PopoverOptions, PopoverState, string>
+) {
   const popup = createPopup(context, { preset: popoverPreset })
   return {
     ...popup,
     internal: Object.assign(popup.internal, {
       // The shortcut of the trigger an element sits in or beside.
-      shortcutOf: (el: HTMLElement) => shortcutOf(context, "trigger", el, { beside: true }),
+      shortcutOf: (el: HTMLElement) =>
+        shortcutOf(context, "trigger", el, { beside: true }),
     }),
   }
 }
@@ -310,7 +355,10 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
     dismissible: "boolean",
     onDismissAttempt: "callback",
   },
-  state: (options: PopoverOptions): PopoverState => ({ ...popupState(options), apple: initialApple() }),
+  state: (options: PopoverOptions): PopoverState => ({
+    ...popupState(options),
+    apple: initialApple(),
+  }),
   sync: (options) => (options.open === undefined ? {} : { open: options.open }),
   api: popoverApi,
   slots: (slot) => {
@@ -319,7 +367,12 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
     return {
       // A popup trigger whose `shortcut` presses it.
       trigger: slot<TriggerProps, PopoverTriggerState>({
-        props: { id: "id", disabled: "boolean", payload: "value", shortcut: "string" },
+        props: {
+          id: "id",
+          disabled: "boolean",
+          payload: "value",
+          shortcut: "string",
+        },
         state: trigger.state,
         attrs: (state, part) => ({
           ...trigger.attrs!(state, part),
@@ -336,9 +389,12 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
           const offShortcut = bindPartShortcut(
             () => part.props.shortcut,
             (event) => {
-              if (part.props.disabled) return
-              if (api.isOpen()) api.internal.control.hide({ reason: "shortcut", event })
-              else
+              if (part.props.disabled) {
+                return
+              }
+              if (api.isOpen()) {
+                api.internal.control.hide({ reason: "shortcut", event })
+              } else {
                 api.internal.control.show({
                   event,
                   by: "keyboard",
@@ -346,9 +402,10 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
                   trigger: key,
                   payload: part.props.payload,
                 })
+              }
             },
             { layer: el },
-            (listener) => onProps(part, listener),
+            (listener) => onProps(part, listener)
           )
           return () => {
             offShortcut()
@@ -363,7 +420,8 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
         state: (state) => ({
           open: state.open,
           modal: state.modal as PopoverContentState["modal"],
-          presentation: state.presentation as PopoverContentState["presentation"],
+          presentation:
+            state.presentation as PopoverContentState["presentation"],
           payload: state.payload,
         }),
       }),
@@ -373,7 +431,10 @@ const popoverPrimitive = /* @__PURE__ */ definePrimitive({
       close: popupClose(slot),
       arrow: popupArrow(slot),
       // Without keys of its own, it shows the shortcut of the trigger it sits in.
-      shortcut: shortcutSlot(slot, (_state, api, el) => el && api.internal.shortcutOf(el)),
+      shortcut: shortcutSlot(
+        slot,
+        (_state, api, el) => el && api.internal.shortcutOf(el)
+      ),
     }
   },
   agent: { actions: ["setOpen"] },

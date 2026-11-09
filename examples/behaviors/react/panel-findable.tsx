@@ -11,28 +11,46 @@ type NotesState = {
 
 type NotesOptions = { onSettled?: (value: string, open: boolean) => void }
 
-const without = (list: string[], value: string) => list.filter((other) => other !== value)
+const without = (list: string[], value: string) =>
+  list.filter((other) => other !== value)
 
 const notes = definePrimitive({
   name: "notes",
   options: { onSettled: "callback" },
-  state: (_options: NotesOptions): NotesState => ({ expanded: ["3.0"], exiting: [], opening: "mount" }),
+  state: (_options: NotesOptions): NotesState => ({
+    expanded: ["3.0"],
+    exiting: [],
+    opening: "mount",
+  }),
   api: (context) => {
     const { store } = context
     return {
-      settle: (value: string, open: boolean) => context.options().onSettled?.(value, open),
+      settle: (value: string, open: boolean) =>
+        context.options().onSettled?.(value, open),
       toggle(value: string) {
         const { expanded, exiting } = store.get()
-        if (expanded.includes(value))
-          store.set({ opening: "animate", expanded: without(expanded, value), exiting: [...exiting, value] })
-        else
-          store.set({ opening: "animate", expanded: [...expanded, value], exiting: without(exiting, value) })
+        if (expanded.includes(value)) {
+          store.set({
+            opening: "animate",
+            expanded: without(expanded, value),
+            exiting: [...exiting, value],
+          })
+        } else {
+          store.set({
+            opening: "animate",
+            expanded: [...expanded, value],
+            exiting: without(exiting, value),
+          })
+        }
       },
       show(values: string[]) {
         const { expanded } = store.get()
         store.set({
           opening: "instant",
-          expanded: [...expanded, ...values.filter((v) => !expanded.includes(v))],
+          expanded: [
+            ...expanded,
+            ...values.filter((v) => !expanded.includes(v)),
+          ],
         })
       },
     }
@@ -53,7 +71,10 @@ const notes = definePrimitive({
       attrs: (state, { id, key }) => ({
         id: `${id}-${key}`,
         role: "region",
-        ...hiddenAttrs(state.expanded.includes(key) || state.exiting.includes(key), true),
+        ...hiddenAttrs(
+          state.expanded.includes(key) || state.exiting.includes(key),
+          true
+        ),
       }),
       bind: (el, { api, key, store }) =>
         bindPanel(el, {
@@ -66,7 +87,8 @@ const notes = definePrimitive({
           trigger: () => el.previousElementSibling as HTMLElement | undefined,
           subscribe: store.subscribe,
           settled: (open) => api.settle(key, open),
-          exited: () => store.set({ exiting: without(store.get().exiting, key) }),
+          exited: () =>
+            store.set({ exiting: without(store.get().exiting, key) }),
         }),
     }),
     expand: slot<{ value: string }>({
@@ -77,7 +99,12 @@ const notes = definePrimitive({
   }),
 })
 
-const parts = createParts(notes, { root: "div", trigger: "button", panel: "div", expand: "button" })
+const parts = createParts(notes, {
+  root: "div",
+  trigger: "button",
+  panel: "div",
+  expand: "button",
+})
 
 const Notes = parts.Root
 
@@ -88,24 +115,40 @@ const NotesPanel = parts.Panel
 const NotesExpand = parts.Expand
 
 const releases = [
-  { value: "3.0", notes: "Dark mode follows your system, and the sidebar remembers its width." },
-  { value: "2.4", notes: "Drafts save while you're offline and sync once you're back." },
+  {
+    value: "3.0",
+    notes:
+      "Dark mode follows your system, and the sidebar remembers its width.",
+  },
+  {
+    value: "2.4",
+    notes: "Drafts save while you're offline and sync once you're back.",
+  },
   { value: "2.3", notes: "Export a board as a PDF, with one page per column." },
 ]
 
 function Example() {
   const log = useLog()
   return (
-    <Notes onSettled={(value, open) => log(`Version ${value} ${open ? "opened" : "closed"}`)}>
+    <Notes
+      onSettled={(value, open) =>
+        log(`Version ${value} ${open ? "opened" : "closed"}`)
+      }
+    >
       <div data-slot="controls">
-        <NotesExpand value={releases.map((release) => release.value).join(" ")} data-size="sm">
+        <NotesExpand
+          value={releases.map((release) => release.value).join(" ")}
+          data-size="sm"
+        >
           Open All
         </NotesExpand>
       </div>
       <div data-slot="panel-list">
         {releases.map((release) => (
           <div key={release.value}>
-            <NotesTrigger value={release.value}>Version {release.value}</NotesTrigger>
+            <NotesTrigger value={release.value}>
+              Version {release.value}
+            </NotesTrigger>
             <NotesPanel value={release.value}>
               <p>{release.notes}</p>
             </NotesPanel>
@@ -116,4 +159,13 @@ function Example() {
   )
 }
 
-export { Example, notes, Notes, NotesExpand, type NotesOptions, NotesPanel, NotesTrigger, type NotesState }
+export {
+  Example,
+  notes,
+  Notes,
+  NotesExpand,
+  type NotesOptions,
+  NotesPanel,
+  NotesTrigger,
+  type NotesState,
+}

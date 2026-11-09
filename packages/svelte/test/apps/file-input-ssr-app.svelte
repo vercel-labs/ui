@@ -11,12 +11,17 @@
   let {
     which,
     files = [],
-  }: { which: "named" | "disabled" | "list" | "render" | "forwarded" | "remove"; files?: File[] } = $props()
+  }: {
+    which: "named" | "disabled" | "list" | "render" | "forwarded" | "remove"
+    files?: File[]
+  } = $props()
 </script>
 
 {#if which === "named"}
   <FileInput name="files" accept="image/*" multiple required>
-    <FileInputDropzone><FileInputTrigger>Browse files</FileInputTrigger></FileInputDropzone>
+    <FileInputDropzone
+      ><FileInputTrigger>Browse files</FileInputTrigger></FileInputDropzone
+    >
   </FileInput>
 {:else if which === "disabled"}
   <FileInput disabled><FileInputTrigger>Browse</FileInputTrigger></FileInput>
@@ -45,5 +50,7 @@
     <FileInputTrigger>Browse</FileInputTrigger>
   </FileInput>
 {:else}
-  <FileInput defaultValue={files}><FileInputItemRemove file={files[0]}>×</FileInputItemRemove></FileInput>
+  <FileInput defaultValue={files}
+    ><FileInputItemRemove file={files[0]}>×</FileInputItemRemove></FileInput
+  >
 {/if}

@@ -39,7 +39,11 @@ const MeterLabel = parts.Label
  * @stable
  */
 function MeterValue(props: ComponentProps<typeof parts.Value>) {
-  return <parts.Value {...props}>{props.children ?? ((state: MeterValueState) => state.text)}</parts.Value>
+  return (
+    <parts.Value {...props}>
+      {props.children ?? ((state: MeterValueState) => state.text)}
+    </parts.Value>
+  )
 }
 
 export type {

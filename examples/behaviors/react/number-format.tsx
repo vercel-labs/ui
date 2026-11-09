@@ -1,5 +1,9 @@
 import * as React from "react"
-import { formatNumber, formatNumberRange, formatNumberToParts } from "@ui-sdk/core/number"
+import {
+  formatNumber,
+  formatNumberRange,
+  formatNumberToParts,
+} from "@ui-sdk/core/number"
 
 const locales = ["en-US", "de-DE", "ja-JP", "zh-CN", "ar-EG", "hi-IN"]
 const styles: Record<string, Intl.NumberFormatOptions> = {
@@ -23,12 +27,20 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
+        <select
+          aria-label="Locale"
+          value={locale}
+          onChange={(event) => setLocale(event.target.value)}
+        >
           {locales.map((option) => (
             <option key={option}>{option}</option>
           ))}
         </select>
-        <select aria-label="Style" value={style} onChange={(event) => setStyle(event.target.value)}>
+        <select
+          aria-label="Style"
+          value={style}
+          onChange={(event) => setStyle(event.target.value)}
+        >
           {Object.keys(styles).map((option) => (
             <option key={option}>{option}</option>
           ))}

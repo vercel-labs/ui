@@ -44,7 +44,9 @@ function HoverCard({ children, container, ...options }: HoverCardProps) {
   useControllerEntry(options.controller, handle)
   return (
     <HandleScope handle={handle}>
-      <ContainerContext.Provider value={container}>{children}</ContainerContext.Provider>
+      <ContainerContext.Provider value={container}>
+        {children}
+      </ContainerContext.Provider>
     </HandleScope>
   )
 }
@@ -61,7 +63,11 @@ function HoverCardTrigger({
   // Until the card it names mounts, a trigger outside the card is a plain link.
   const unconnected = () => renderElement("a", rest, render, { open: false })
   return (
-    <Connected primitive={hoverCard} controller={controller} fallback={unconnected}>
+    <Connected
+      primitive={hoverCard}
+      controller={controller}
+      fallback={unconnected}
+    >
       <parts.Trigger {...props} />
     </Connected>
   )
@@ -95,7 +101,12 @@ function HoverCardContent<Payload = unknown>({
     keepMounted,
   }
   // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
-  const element = usePart(hoverCard, "content", content, props as PartProps<"div", HoverCardContentState>)
+  const element = usePart(
+    hoverCard,
+    "content",
+    content,
+    props as PartProps<"div", HoverCardContentState>
+  )
   return element && renderPopup(element, target)
 }
 
@@ -120,4 +131,10 @@ export type {
   HoverCardTriggerState,
 } from "@ui-sdk/core/hover-card"
 
-export { HoverCard, HoverCardArrow, HoverCardContent, type HoverCardProps, HoverCardTrigger }
+export {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  type HoverCardProps,
+  HoverCardTrigger,
+}

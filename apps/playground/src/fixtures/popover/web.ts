@@ -68,43 +68,69 @@ const markup = `
 
 async function mount(root: HTMLElement) {
   root.innerHTML = markup
-  const popover = root.querySelector<HTMLElement & { api?: { open: () => void } }>(".fixture > ui-popover")!
+  const popover = root.querySelector<
+    HTMLElement & { api?: { open: () => void } }
+  >(".fixture > ui-popover")!
   const content = popover.querySelector("ui-popover-content")!
   const options = popoverOptions()
-  if (options.defaultOpen) popover.setAttribute("default-open", "")
-  if (options.modal !== undefined) popover.setAttribute("modal", String(options.modal))
-  if (options.openOnHover) popover.setAttribute("open-on-hover", "")
-  if (options.delay !== undefined) popover.setAttribute("delay", String(options.delay))
-  if (options.closeDelay !== undefined) popover.setAttribute("close-delay", String(options.closeDelay))
-  if (options.presentation) popover.setAttribute("presentation", options.presentation)
+  if (options.defaultOpen) {
+    popover.setAttribute("default-open", "")
+  }
+  if (options.modal !== undefined) {
+    popover.setAttribute("modal", String(options.modal))
+  }
+  if (options.openOnHover) {
+    popover.setAttribute("open-on-hover", "")
+  }
+  if (options.delay !== undefined) {
+    popover.setAttribute("delay", String(options.delay))
+  }
+  if (options.closeDelay !== undefined) {
+    popover.setAttribute("close-delay", String(options.closeDelay))
+  }
+  if (options.presentation) {
+    popover.setAttribute("presentation", options.presentation)
+  }
   if (options.dismissible === false) {
     popover.setAttribute("dismissible", "false")
     popover.addEventListener("dismissattempt", (event) =>
-      recordPopover(`attempt:${(event as CustomEvent<{ reason: string }>).detail.reason}`),
+      recordPopover(
+        `attempt:${(event as CustomEvent<{ reason: string }>).detail.reason}`
+      )
     )
   }
   if (options.container) {
     popover.setAttribute("container", `#${options.container.id}`)
-    popover.querySelector("ui-menu")?.setAttribute("container", `#${options.container.id}`)
+    popover
+      .querySelector("ui-menu")
+      ?.setAttribute("container", `#${options.container.id}`)
   }
-  for (const [name, value] of Object.entries(popoverContentOptions()))
+  for (const [name, value] of Object.entries(popoverContentOptions())) {
     content.setAttribute(
       name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
-      value,
+      value
     )
+  }
   await import("@ui-sdk/web/popover")
   await import("@ui-sdk/web/menu")
   root
     .querySelector("#remove")
-    ?.addEventListener("click", () => root.querySelector("ui-popover-trigger")?.remove())
+    ?.addEventListener("click", () =>
+      root.querySelector("ui-popover-trigger")?.remove()
+    )
   popover.querySelector("ui-menu")?.addEventListener("action", (event) => {
-    root.querySelector("output")!.textContent = (event as CustomEvent<{ value: string }>).detail.value
+    root.querySelector("output")!.textContent = (
+      event as CustomEvent<{ value: string }>
+    ).detail.value
   })
-  root.querySelector("#controller")!.addEventListener("click", () => popover.api?.open())
-  for (const action of ["save", "archive"])
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => popover.api?.open())
+  for (const action of ["save", "archive"]) {
     root.querySelector(`#${action}`)?.addEventListener("click", () => {
       root.querySelector("output")!.textContent = action
     })
+  }
 }
 
 export { mount }

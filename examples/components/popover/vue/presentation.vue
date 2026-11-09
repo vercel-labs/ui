@@ -16,7 +16,9 @@ import {
     <PopoverTrigger>Add Reminder</PopoverTrigger>
     <PopoverContent>
       <PopoverTitle>New reminder</PopoverTitle>
-      <PopoverDescription>We'll notify you at the time you pick.</PopoverDescription>
+      <PopoverDescription
+        >We'll notify you at the time you pick.</PopoverDescription
+      >
       <Field>
         <FieldLabel>Remind me to</FieldLabel>
         <Input default-value="Send the Q3 roadmap" />

@@ -1,5 +1,9 @@
 import * as React from "react"
-import { createPopoverController, Popover, PopoverContent } from "@ui-sdk/react/popover"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+} from "@ui-sdk/react/popover"
 import { useLog } from "../../shared/react/log"
 
 type Spot = { x: number; y: number }
@@ -13,7 +17,11 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={timed} onChange={(event) => setTimed(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={timed}
+            onChange={(event) => setTimed(event.target.checked)}
+          />
           Close by itself
         </label>
       </div>
@@ -25,11 +33,14 @@ function Example() {
           const box = event.currentTarget.getBoundingClientRect()
           const result = await note.open({
             anchor: { x: event.clientX, y: event.clientY },
-            payload: { x: Math.round(event.clientX - box.left), y: Math.round(event.clientY - box.top) },
+            payload: {
+              x: Math.round(event.clientX - box.left),
+              y: Math.round(event.clientY - box.top),
+            },
             signal: timed ? AbortSignal.timeout(2000) : undefined,
           })
           log(
-            `Closed by ${result.reason} (${result.source})${result.returnValue ? `, ${result.returnValue}` : ""}`,
+            `Closed by ${result.reason} (${result.source})${result.returnValue ? `, ${result.returnValue}` : ""}`
           )
         }}
         data-slot="popup-surface"

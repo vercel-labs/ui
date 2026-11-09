@@ -29,7 +29,10 @@ const toolbarFixture = {
   // A plain text field.
   comment: { label: "Comment", defaultValue: "Draft" },
   // A group of buttons, Redo disabled.
-  history: { label: "History", items: [{ label: "Undo" }, { label: "Redo", disabled: true }] },
+  history: {
+    label: "History",
+    items: [{ label: "Undo" }, { label: "Redo", disabled: true }],
+  },
   // A toggle on its own.
   spellcheck: { label: "Spellcheck" },
   help: { label: "Help", href: "#help" },
@@ -61,7 +64,9 @@ function toolbarOptions() {
   const params = new URLSearchParams(location.search)
   const orientation = params.get("orientation")
   return {
-    ...(orientation && { orientation: orientation as "horizontal" | "vertical" }),
+    ...(orientation && {
+      orientation: orientation as "horizontal" | "vertical",
+    }),
     ...(params.get("loop") === "false" && { loop: false }),
     ...(params.has("disabled") && { disabled: true }),
   }

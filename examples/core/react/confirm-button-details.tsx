@@ -9,16 +9,22 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={locked} onChange={(event) => setLocked(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={locked}
+            onChange={(event) => setLocked(event.target.checked)}
+          />
           Lock
         </label>
       </div>
       <ConfirmButton
         timeout={2000}
         onArmedChange={(armed, details) => {
-          if (locked) details.cancel()
+          if (locked) {
+            details.cancel()
+          }
           log(
-            `${armed ? "Arm" : "Disarm"}: ${details.reason}, from ${details.source}${details.canceled ? ", canceled" : ""}`,
+            `${armed ? "Arm" : "Disarm"}: ${details.reason}, from ${details.source}${details.canceled ? ", canceled" : ""}`
           )
         }}
       >

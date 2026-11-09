@@ -11,17 +11,31 @@ import {
 import { createParts } from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
-type FontsState = { value: string; preview: string | null; focused: string | null }
+type FontsState = {
+  value: string
+  preview: string | null
+  focused: string | null
+}
 
 type FontsOptions = {
   defaultValue: string
-  onValueChange?: (value: string, details: ChangeDetails<"item-press" | "list-navigation">) => void
-  onPreviewChange?: (preview: string | null, details: ChangeDetails<PreviewReason>) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<"item-press" | "list-navigation">
+  ) => void
+  onPreviewChange?: (
+    preview: string | null,
+    details: ChangeDetails<PreviewReason>
+  ) => void
 }
 
 const fonts = definePrimitive({
   name: "fonts",
-  options: { defaultValue: "string", onValueChange: "callback", onPreviewChange: "callback" },
+  options: {
+    defaultValue: "string",
+    onValueChange: "callback",
+    onPreviewChange: "callback",
+  },
   state: (options: FontsOptions): FontsState => ({
     value: options.defaultValue,
     preview: null,
@@ -50,7 +64,12 @@ const fonts = definePrimitive({
       attrs: () => ({ role: "radiogroup" }),
       on: {
         focusout: (event, { el, api }) => {
-          if (api.preview.dragging() || el?.contains(event.relatedTarget as Node)) return
+          if (
+            api.preview.dragging() ||
+            el?.contains(event.relatedTarget as Node)
+          ) {
+            return
+          }
           api.preview.clear({ reason: "focus-out", event })
         },
       },
@@ -68,11 +87,16 @@ const fonts = definePrimitive({
         style: "touch-action:none;user-select:none",
       }),
       on: {
-        pointerdown: (event, { el, api, key }) => api.preview.pointerdown(event, key, el!.parentElement!),
+        pointerdown: (event, { el, api, key }) =>
+          api.preview.pointerdown(event, key, el!.parentElement!),
         keydown: (event, { el, api, key }) => {
-          if (api.preview.keydown(event, key)) return
+          if (api.preview.keydown(event, key)) {
+            return
+          }
           const moved = api.roving.keydown(event, el!)
-          if (moved) api.preview.show(moved.key, { reason: "list-navigation", event })
+          if (moved) {
+            api.preview.show(moved.key, { reason: "list-navigation", event })
+          }
         },
       },
       bind: (el, part) => part.api.roving.bind(el, part),
@@ -100,7 +124,11 @@ function Example() {
     <div data-slot="stack">
       <p
         data-slot="preview-sample"
-        style={{ "--preview-font": families[preview ?? shown] } as React.CSSProperties}
+        style={
+          {
+            "--preview-font": families[preview ?? shown],
+          } as React.CSSProperties
+        }
       >
         The quick brown fox
       </p>

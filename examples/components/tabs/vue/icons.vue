@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ArchiveIcon, MailIcon, ReplyIcon } from "@lucide/vue"
-import { Tabs, TabsList, TabsPanel, TabsTab, TabsTabIcon } from "@ui-sdk/vue/tabs"
+import {
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+  TabsTabIcon,
+} from "@ui-sdk/vue/tabs"
 </script>
 
 <template>
@@ -25,8 +31,14 @@ import { Tabs, TabsList, TabsPanel, TabsTab, TabsTabIcon } from "@ui-sdk/vue/tab
         Archive
       </TabsTab>
     </TabsList>
-    <TabsPanel value="inbox">3 new messages from Inès Moreau and Kofi Mensah.</TabsPanel>
-    <TabsPanel value="replies">Wren Takahashi replied to your message about the launch.</TabsPanel>
-    <TabsPanel value="archive">Messages you archived stay here and in search.</TabsPanel>
+    <TabsPanel value="inbox"
+      >3 new messages from Inès Moreau and Kofi Mensah.</TabsPanel
+    >
+    <TabsPanel value="replies"
+      >Wren Takahashi replied to your message about the launch.</TabsPanel
+    >
+    <TabsPanel value="archive"
+      >Messages you archived stay here and in search.</TabsPanel
+    >
   </Tabs>
 </template>

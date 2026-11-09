@@ -13,7 +13,11 @@ A number input for one `channel`, in the units people read it in.
   import Part from "../part.svelte"
   import type { TextPartProps } from "../text-control"
 
-  let { channel, ...rest }: TextPartProps<"input", ColorPickerState> & ColorPickerChannelInputProps = $props()
+  let {
+    channel,
+    ...rest
+  }: TextPartProps<"input", ColorPickerState> & ColorPickerChannelInputProps =
+    $props()
 
   const id = $props.id()
   const input = usePart(colorPicker, "channel-input", () => ({ id, channel }))

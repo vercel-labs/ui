@@ -40,7 +40,16 @@ type BaseSlotProps = { id?: string }
  * `"key"` is a list item's value, of any type, which keys the part by
  * `api.internal.keyOf(value)`, and which the parts inside it take as that key.
  */
-type PropKind = "string" | "number" | "boolean" | "list" | "value" | "callback" | "action" | "id" | "key"
+type PropKind =
+  | "string"
+  | "number"
+  | "boolean"
+  | "list"
+  | "value"
+  | "callback"
+  | "action"
+  | "id"
+  | "key"
 
 /**
  * An option or slot prop's kind. With `from`, a part nested in a part of that
@@ -53,7 +62,9 @@ type PropKind = "string" | "number" | "boolean" | "list" | "value" | "callback" 
  * @stable
  */
 type PropSpec =
-  PropKind | { kind: PropKind; from: string; required?: boolean } | ((attribute: string | null) => unknown)
+  | PropKind
+  | { kind: PropKind; from: string; required?: boolean }
+  | ((attribute: string | null) => unknown)
 
 /**
  * Every option or prop of `Props`, by name, with its kind. A slot's `id` needs
@@ -61,7 +72,9 @@ type PropSpec =
  * one, `"id"`.
  * @stable
  */
-type PropSchema<Props> = { [Key in Exclude<keyof Props, "id"> & string]: PropSpec } & { id?: PropSpec }
+type PropSchema<Props> = {
+  [Key in Exclude<keyof Props, "id"> & string]: PropSpec
+} & { id?: PropSpec }
 
 /**
  * The options every primitive takes, beside its own. `definePrimitive` adds
@@ -75,7 +88,10 @@ type PrimitiveOptions = {
 }
 
 /** What adapters read about a primitive at runtime: its options and each slot's props, with their kinds. */
-type PrimitiveSchema = { options: Record<string, PropSpec>; slots: Record<string, Record<string, PropSpec>> }
+type PrimitiveSchema = {
+  options: Record<string, PropSpec>
+  slots: Record<string, Record<string, PropSpec>>
+}
 
 // The DOM events a slot's `on` handlers take.
 type EventMap = HTMLElementEventMap
@@ -126,15 +142,24 @@ type SlotFields<State extends object, Api, Props, Public> = {
    * Keyed parts, like one panel among many, decide from their own props.
    * May read live state: adapters check presence on every change.
    */
-  present?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => boolean
+  present?: (
+    state: State,
+    context: { id: string; key: string; props: Props; api: Api }
+  ) => boolean
   /** Pure. Runs on the server and on every render. Never reads live state. */
-  attrs?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => Attrs
+  attrs?: (
+    state: State,
+    context: { id: string; key: string; props: Props; api: Api }
+  ) => Attrs
   /**
    * What `render` functions and state-based class names see, like
    * { highlighted, disabled }. May read live state: adapters only re-render a
    * part for live changes when its render function actually read them.
    */
-  state?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => Public
+  state?: (
+    state: State,
+    context: { id: string; key: string; props: Props; api: Api }
+  ) => Public
   /** Attributes written straight to the element on every change, built by `live()`. */
   live?: Live<State, Api, Props>
   /** Attributes of `attrs` core keeps current on a framework's element, built by `direct()`. */
@@ -145,13 +170,18 @@ type SlotFields<State extends object, Api, Props, Public> = {
    * Activation: a click, which keys and screen readers send too. `{ none: "why" }`
    * for a role that activates when another handler does it, like the author's own click.
    */
-  press?: ((context: SlotContext<State, Api, Props>, event?: Event) => void) | Unneeded
+  press?:
+    | ((context: SlotContext<State, Api, Props>, event?: Event) => void)
+    | Unneeded
   /**
    * DOM events. Adapters attach these so user handlers run first and can
    * call preventDefault() to skip them.
    */
   on?: {
-    [Type in keyof EventMap]?: (event: EventMap[Type], context: SlotContext<State, Api, Props>) => void
+    [Type in keyof EventMap]?: (
+      event: EventMap[Type],
+      context: SlotContext<State, Api, Props>
+    ) => void
   }
   /**
    * Client only, web only. Focus, positioning, observers. Gets the part, whose
@@ -173,10 +203,16 @@ type SlotFields<State extends object, Api, Props, Public> = {
  * receives. Every field is optional.
  * @stable
  */
-type SlotDefinition<State extends object, Api, Props, Public = {}> = SlotFields<State, Api, Props, Public> &
+type SlotDefinition<State extends object, Api, Props, Public = {}> = SlotFields<
+  State,
+  Api,
+  Props,
+  Public
+> &
   SlotSchema<Props>
 
-type Keys<State> = readonly HandledKey[] | ((state: State) => readonly HandledKey[])
+type Keys<State> =
+  readonly HandledKey[] | ((state: State) => readonly HandledKey[])
 
 // What a role asks of its slot and which ARIA it takes: whether it takes
 // focus, activates, moves with keys or can't be named, its role-specific
@@ -194,14 +230,18 @@ type Profile = [0 | 1, 0 | 1, 0 | 1, 0 | 1, RoleAria, RoleAria]
 
 type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
 
-type RolesLike<P extends Profile> = { [R in Role]: Same<ProfileOf<R>, P> extends true ? R : never }[Role]
+type RolesLike<P extends Profile> = {
+  [R in Role]: Same<ProfileOf<R>, P> extends true ? R : never
+}[Role]
 
 // One required field per need, so the error names a missing one. Presence
 // only: the definition types each field, so one is built per profile. Listed
 // keys ask for an `on.keydown`, last so a list without one is told so.
 type Needs<P extends Profile> = (P[0] extends 1 ? { focus: {} } : unknown) &
   (P[1] extends 1 ? { press: {} } : unknown) &
-  (P[2] extends 1 ? { keys: Unneeded } | { keys: {}; on: { keydown: {} } } : unknown)
+  (P[2] extends 1
+    ? { keys: Unneeded } | { keys: {}; on: { keydown: {} } }
+    : unknown)
 
 /**
  * A slot's role and what the role asks of it. Core reads these from the
@@ -215,7 +255,11 @@ type RoleFields<State extends object, Api, Props> = {
    * from state, with every role it can pick in `roles`. Never put `role` in `attrs`.
    */
   role?:
-    Role | ((state: State, context: { id: string; key: string; props: Props; api: Api }) => Role | undefined)
+    | Role
+    | ((
+        state: State,
+        context: { id: string; key: string; props: Props; api: Api }
+      ) => Role | undefined)
   /** Every role a `role` function can pick. Development builds check what each one needs. */
   roles?: readonly Role[]
   /**
@@ -225,7 +269,10 @@ type RoleFields<State extends object, Api, Props> = {
   focus?:
     | Focus
     | Unneeded
-    | ((state: State, context: { id: string; key: string; props: Props; api: Api }) => Focus | Unneeded)
+    | ((
+        state: State,
+        context: { id: string; key: string; props: Props; api: Api }
+      ) => Focus | Unneeded)
   /**
    * The keys the part's `on.keydown` handles, for a role whose pattern moves
    * with keys, or a function of state when they depend on it, like the arrows
@@ -238,45 +285,61 @@ type RoleFields<State extends object, Api, Props> = {
 // An attribute the role doesn't take, typed as the sentence that says so, so
 // the error names it: "aria-orientation isn't allowed on a group". Roles that
 // share a member are "this role"; the error shows which one.
-type NotAllowed<K extends string, P extends Profile> = `${K} isn't allowed on ${Label<RolesLike<P>>}`
+type NotAllowed<
+  K extends string,
+  P extends Profile,
+> = `${K} isn't allowed on ${Label<RolesLike<P>>}`
 
 type Label<R extends string> = [R] extends [UnionToIntersection<R>]
   ? `${R extends `${"a" | "e" | "i" | "o" | "u"}${string}` ? "an" : "a"} ${R}`
   : "this role"
 
-type UnionToIntersection<U> = (U extends unknown ? (union: U) => void : never) extends (
-  union: infer I,
-) => void
+type UnionToIntersection<U> = (
+  U extends unknown ? (union: U) => void : never
+) extends (union: infer I) => void
   ? I
   : never
 
 type RoleAttrs<P extends Profile> = Attrs & {
-  [K in Exclude<RoleAria, P[4]> | (P[3] extends 1 ? "aria-label" | "aria-labelledby" : never)]?: NotAllowed<
-    K,
-    P
-  >
+  [
+    K in
+      | Exclude<RoleAria, P[4]>
+      | (P[3] extends 1 ? "aria-label" | "aria-labelledby" : never)
+  ]?: NotAllowed<K, P>
 }
 
 // A role's required states are keys its `attrs` always returns, so leaving
 // one out is a build error. One that `live` keeps current is `undefined` here.
 // One field, not a union, so the error names the missing state.
-type AttrsFor<P extends Profile, State extends object, Api, Props> = [P[5]] extends [never]
-  ? { attrs?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => RoleAttrs<P> }
+type AttrsFor<P extends Profile, State extends object, Api, Props> = [
+  P[5],
+] extends [never]
+  ? {
+      attrs?: (
+        state: State,
+        context: { id: string; key: string; props: Props; api: Api }
+      ) => RoleAttrs<P>
+    }
   : {
       attrs: (
         state: State,
-        context: { id: string; key: string; props: Props; api: Api },
+        context: { id: string; key: string; props: Props; api: Api }
       ) => RoleAttrs<P> & { [K in P[5]]: string | undefined }
     }
 
 // One member per profile: TypeScript reuses an alias's instantiation for the
 // same arguments, so roles alike collapse into one, which keeps checking cheap.
-type RoleMember<P extends Profile, State extends object, Api, Props> = { role: RolesLike<P> } & Needs<P> &
+type RoleMember<P extends Profile, State extends object, Api, Props> = {
+  role: RolesLike<P>
+} & Needs<P> &
   AttrsFor<P, State, Api, Props>
 
 // Without a literal role, the role's attributes aren't known here, so development builds check them.
 type UnroledAttrs<State extends object, Api, Props> = {
-  attrs?: (state: State, context: { id: string; key: string; props: Props; api: Api }) => Attrs
+  attrs?: (
+    state: State,
+    context: { id: string; key: string; props: Props; api: Api }
+  ) => Attrs
 }
 
 // The role's literal picks the member, so TypeScript asks for exactly what that role needs.
@@ -287,7 +350,10 @@ type RoleDeclaration<State extends object, Api, Props> = Omit<
   (
     | ({ role?: undefined } & UnroledAttrs<State, Api, Props>)
     | ({
-        role: (state: State, context: { id: string; key: string; props: Props; api: Api }) => Role | undefined
+        role: (
+          state: State,
+          context: { id: string; key: string; props: Props; api: Api }
+        ) => Role | undefined
         roles: readonly Role[]
       } & UnroledAttrs<State, Api, Props>)
     | { [R in Role]: RoleMember<ProfileOf<R>, State, Api, Props> }[Role]
@@ -318,24 +384,36 @@ type AnySlot = SlotDefinition<any, any, any, any>
  * neither takes no props and has empty state instead of `any`.
  * @stable
  */
-type SlotFactory<State extends object, Api> = <Props extends object = {}, Public extends object = {}>(
+type SlotFactory<State extends object, Api> = <
+  Props extends object = {},
+  Public extends object = {},
+>(
   // `attrs` comes from the role's member alone, typed for that role: one
   // signature, so its parameters keep their types.
-  definition: Omit<SlotFields<State, Api, Props & BaseSlotProps, Public>, "attrs"> &
+  definition: Omit<
+    SlotFields<State, Api, Props & BaseSlotProps, Public>,
+    "attrs"
+  > &
     SlotSchema<Props & BaseSlotProps> &
-    RoleDeclaration<State, Api, Props & BaseSlotProps>,
+    RoleDeclaration<State, Api, Props & BaseSlotProps>
 ) => SlotDefinition<State, Api, NoInfer<Props> & BaseSlotProps, NoInfer<Public>>
 
 // Exported because emitted declarations name it in every instance's `part`
 // signature: unexported, tsc inlines it and prints the slots type twice.
-type SlotProps<Slot> = Slot extends SlotDefinition<any, any, infer Props, any> ? Props : never
-type SlotState<Slot> = Slot extends SlotDefinition<any, any, any, infer Public> ? Public : never
+type SlotProps<Slot> =
+  Slot extends SlotDefinition<any, any, infer Props, any> ? Props : never
+type SlotState<Slot> =
+  Slot extends SlotDefinition<any, any, any, infer Public> ? Public : never
 
 // The reasons `on<Key>Change`, or `on<Key>Commit` with `Kind` "Commit", lists.
-type ReasonFor<Options, Key extends string, Kind extends string = "Change"> = Options extends {
+type ReasonFor<
+  Options,
+  Key extends string,
+  Kind extends string = "Change",
+> = Options extends {
   [Callback in `on${Capitalize<Key>}${Kind}`]?: (
     value: never,
-    details: infer Details extends { reason: string },
+    details: infer Details extends { reason: string }
   ) => unknown
 }
   ? Details["reason"]
@@ -361,7 +439,12 @@ type PrimitiveContext<Options, State extends object, Slot extends string> = {
    * Runs after the adapter passes new options, before `sync` writes them. May
    * return the source that write reports, like the change that asked for it.
    */
-  onOptions: (listener: (options: Options, synced: Partial<State> | undefined) => ChangeSource | void) => void
+  onOptions: (
+    listener: (
+      options: Options,
+      synced: Partial<State> | undefined
+    ) => ChangeSource | void
+  ) => void
   /**
    * Runs when the instance leaves the page, from `destroy()`, once. A popup
    * settles a pending controller `open()` here. Work that reaches outside the
@@ -376,7 +459,10 @@ type PrimitiveContext<Options, State extends object, Slot extends string> = {
    * The props the part of `slot` with `key` last rendered with. `key` defaults to `""`, a part with no `id` or `value`.
    * Name the slot's props to type them: `props<{ disabled?: boolean }>("item", key)`.
    */
-  props<Props extends object = object>(slot: Slot, key?: string): Props | undefined
+  props<Props extends object = object>(
+    slot: Slot,
+    key?: string
+  ): Props | undefined
 }
 
 /**
@@ -387,7 +473,10 @@ type PrimitiveContext<Options, State extends object, Slot extends string> = {
  * marked `/* @__PURE__ *\/`, so a page that never imports it drops it.
  * Internal: our components use it, through `@ui-sdk/core/renderer`.
  */
-type Feature<Api = any, Slots extends Record<string, AnySlot> = Record<string, AnySlot>> = {
+type Feature<
+  Api = any,
+  Slots extends Record<string, AnySlot> = Record<string, AnySlot>,
+> = {
   /** The slots it adds, defined like the ones in `definePrimitive`'s `slots`. */
   slots: Slots
   /** Runs once per instance, the first time a part uses the feature. Fills in hooks the component's api calls. */
@@ -400,13 +489,18 @@ type Feature<Api = any, Slots extends Record<string, AnySlot> = Record<string, A
  * until a part imports them. Internal, like `Feature`.
  */
 type WithFeatures<
-  P extends (options: any) => { types: { slots: object }; part: (...args: any) => any },
+  P extends (options: any) => {
+    types: { slots: object }
+    part: (...args: any) => any
+  },
   Features,
 > = ((options: Parameters<P>[0]) => Omit<ReturnType<P>, "types" | "part"> & {
-  types: Omit<ReturnType<P>["types"], "slots"> & { slots: AllSlots<P, Features> }
+  types: Omit<ReturnType<P>["types"], "slots"> & {
+    slots: AllSlots<P, Features>
+  }
   part: <S extends keyof AllSlots<P, Features> & string>(
     slot: S,
-    props?: SlotProps<AllSlots<P, Features>[S]>,
+    props?: SlotProps<AllSlots<P, Features>[S]>
   ) => ReturnType<ReturnType<P>["part"]>
 }) & { options?: Record<string, PropSpec>; slots?: object }
 
@@ -449,7 +543,9 @@ interface PrimitiveGeneric {
 /**
  * A primitive with the generic types renderers make its parts from. Type-only and internal.
  */
-type WithGeneric<P extends Primitive, G extends PrimitiveGeneric> = P & { generic?: G }
+type WithGeneric<P extends Primitive, G extends PrimitiveGeneric> = P & {
+  generic?: G
+}
 
 /**
  * A type as it is, for an interface to extend, which gives a primitive's type
@@ -460,7 +556,9 @@ type WithGeneric<P extends Primitive, G extends PrimitiveGeneric> = P & { generi
 type Named<T> = T
 
 // A primitive with options of its own names each with its kind; one without needs no schema.
-type OptionsSchema<Options, Own = Omit<Options, keyof PrimitiveOptions>> = [keyof Own] extends [never]
+type OptionsSchema<Options, Own = Omit<Options, keyof PrimitiveOptions>> = [
+  keyof Own,
+] extends [never]
   ? {
       /** Each option, with its kind, for renderers to read. A primitive without options leaves it out. */
       options?: PropSchema<Own>
@@ -473,7 +571,9 @@ type OptionsSchema<Options, Own = Omit<Options, keyof PrimitiveOptions>> = [keyo
       options: PropSchema<Own>
     }
 
-type ControlledBy<Options> = NonNullable<(Options & { controller?: unknown })["controller"]>
+type ControlledBy<Options> = NonNullable<
+  (Options & { controller?: unknown })["controller"]
+>
 
 // What a primitive's `agent` key declares, as the agent bridge reads it.
 type AgentSurface = {
@@ -499,7 +599,12 @@ type Primitive = ((options: any) => PrimitiveInstance) & {
  * @stable
  */
 type PrimitiveInstance = {
-  types: { options: object; state: object; api: unknown; slots: Record<string, AnySlot> }
+  types: {
+    options: object
+    state: object
+    api: unknown
+    slots: Record<string, AnySlot>
+  }
   name: string
   id: string
   get: () => object
@@ -517,7 +622,9 @@ type PrimitiveInstance = {
   setOptions: (options: any) => void
   /** @internal The state these options would start a new instance at. */
   startState: (options: any) => object
-  follow: (current: () => any) => (state?: any, before?: any) => Record<string, unknown> | undefined
+  follow: (
+    current: () => any
+  ) => (state?: any, before?: any) => Record<string, unknown> | undefined
   destroy: () => void
 }
 
@@ -535,7 +642,9 @@ type SlotName<P extends Primitive> = keyof TypesOf<P>["slots"] & string
  * The props a primitive's slot takes.
  * @stable
  */
-type PropsOf<P extends Primitive, S extends SlotName<P>> = SlotProps<TypesOf<P>["slots"][S]>
+type PropsOf<P extends Primitive, S extends SlotName<P>> = SlotProps<
+  TypesOf<P>["slots"][S]
+>
 /**
  * The options a primitive takes, without `id`, which adapters supply.
  * @stable
@@ -545,7 +654,9 @@ type OptionsOf<P extends Primitive> = Omit<TypesOf<P>["options"], "id">
  * The state a primitive's slot hands render functions, from its `state`.
  * @stable
  */
-type StateOf<P extends Primitive, S extends SlotName<P>> = SlotState<TypesOf<P>["slots"][S]>
+type StateOf<P extends Primitive, S extends SlotName<P>> = SlotState<
+  TypesOf<P>["slots"][S]
+>
 
 export {
   type AgentSurface,

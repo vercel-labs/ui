@@ -18,7 +18,9 @@ const log = useLog()
 <template>
   <Menu
     @open-change="(open) => log(open ? 'Opening' : 'Closing')"
-    @open-change-complete="(open) => log(open ? 'Finished opening' : 'Finished closing')"
+    @open-change-complete="
+      (open) => log(open ? 'Finished opening' : 'Finished closing')
+    "
   >
     <MenuTrigger>Animated</MenuTrigger>
     <MenuContent keep-mounted>

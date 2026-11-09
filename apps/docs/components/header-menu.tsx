@@ -28,7 +28,9 @@ function HeaderMenu({ urls }: { urls: string[] }) {
     <NavigationMenu aria-label="Sections">
       <NavigationMenuList className="flex items-center gap-6">
         {menu.map((item) => {
-          if (item.href.startsWith("http")) return null
+          if (item.href.startsWith("http")) {
+            return null
+          }
           const { href, current } = link(item.href)
           if (item.href === "/docs/frameworks") {
             return (
@@ -56,7 +58,10 @@ function HeaderMenu({ urls }: { urls: string[] }) {
                           className="relative flex min-h-7 items-center rounded-xl py-1.5 ps-2 pe-8 outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground"
                         >
                           {frameworks[framework].label}
-                          <FrameworkCheck framework={framework} className="absolute end-2" />
+                          <FrameworkCheck
+                            framework={framework}
+                            className="absolute end-2"
+                          />
                         </NavigationMenuLink>
                       </li>
                     ))}
@@ -67,7 +72,11 @@ function HeaderMenu({ urls }: { urls: string[] }) {
           }
           return (
             <NavigationMenuItem key={item.href}>
-              <NavigationMenuLink current={current} render={<Link href={href} />} className={itemClassName}>
+              <NavigationMenuLink
+                current={current}
+                render={<Link href={href} />}
+                className={itemClassName}
+              >
                 {item.title}
               </NavigationMenuLink>
             </NavigationMenuItem>

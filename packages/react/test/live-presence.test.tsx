@@ -14,7 +14,9 @@ const hover = definePrimitive({
   name: "live-presence",
   state: (_options: {}) => ({ hovered: null as string | null }),
   live: ["hovered"],
-  api: ({ store }) => ({ hover: (hovered: string | null) => store.set({ hovered }) }),
+  api: ({ store }) => ({
+    hover: (hovered: string | null) => store.set({ hovered }),
+  }),
   slots: (slot) => ({
     card: slot({ present: (state) => state.hovered !== null }),
   }),

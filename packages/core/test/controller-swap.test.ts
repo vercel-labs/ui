@@ -2,7 +2,10 @@
 // A controller swapped for another lets go of the instance, so it never
 // drives a component it was taken from.
 import { expect, test, vi } from "vitest"
-import { createController, isControllerAttached } from "../src/foundation/kernel/controller"
+import {
+  createController,
+  isControllerAttached,
+} from "../src/foundation/kernel/controller"
 import { keep, release, unwatched } from "../src/foundation/kernel/keep"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { createTabsController, tabs } from "../src/components/tabs/tabs"
@@ -10,7 +13,11 @@ import { createTabsController, tabs } from "../src/components/tabs/tabs"
 test("a controller swapped for another detaches, and the new one attaches", () => {
   const first = createTabsController()
   const second = createTabsController()
-  const instance = tabs({ id: "settings", defaultValue: "a", controller: first })
+  const instance = tabs({
+    id: "settings",
+    defaultValue: "a",
+    controller: first,
+  })
   expect(isControllerAttached(first)).toBe(true)
   instance.setOptions({ id: "settings", defaultValue: "a", controller: second })
   expect(isControllerAttached(first)).toBe(false)
@@ -46,7 +53,10 @@ test("a re-render of one instance leaves a shared controller with the instance i
   // The newest attach wins: the controller drives `mobile`.
   desktop.setOptions({ id: "desktop", defaultValue: "a", controller })
   controller.setValue("b")
-  expect({ desktop: desktop.get().value, mobile: mobile.get().value }).toEqual({ desktop: "a", mobile: "b" })
+  expect({ desktop: desktop.get().value, mobile: mobile.get().value }).toEqual({
+    desktop: "a",
+    mobile: "b",
+  })
 })
 
 test("a controller hands out the same method on every read, calling the instance attached now", () => {
@@ -67,7 +77,9 @@ test("a controller lists the attached api's members, without its internal one", 
   const instance = tabs({ id: "listed", defaultValue: "a", controller })
   expect("setValue" in controller).toBe(true)
   expect("internal" in controller).toBe(false)
-  expect(Object.keys(controller)).toEqual(Object.keys(instance.api).filter((key) => key !== "internal"))
+  expect(Object.keys(controller)).toEqual(
+    Object.keys(instance.api).filter((key) => key !== "internal")
+  )
   expect({ ...controller }.getValue?.()).toBe("a")
   instance.destroy()
   expect("setValue" in controller).toBe(false)
@@ -76,7 +88,9 @@ test("a controller lists the attached api's members, without its internal one", 
 const counter = definePrimitive({
   name: "counter",
   options: { controller: "value" },
-  state: (_options: { controller?: ReturnType<typeof createController<{ count: () => number }>> }) => ({}),
+  state: (_options: {
+    controller?: ReturnType<typeof createController<{ count: () => number }>>
+  }) => ({}),
   api: () => ({ count: () => 1 }),
   slots: () => ({}),
 })
@@ -118,7 +132,9 @@ test("a method called before its controller attaches warns once in development, 
   controller.select("b")
   controller.select("c")
   expect(warn.mock.calls.map(([message]) => String(message))).toEqual([
-    expect.stringContaining("select() was called before its component attached"),
+    expect.stringContaining(
+      "select() was called before its component attached"
+    ),
   ])
   const instance = tabs({ id: "warned", defaultValue: "a", controller })
   controller.setValue("b")

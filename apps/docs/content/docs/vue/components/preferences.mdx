@@ -91,7 +91,10 @@ const state = usePreference(view)
 </script>
 
 <template>
-  <button :aria-pressed="state.value === 'grid'" @click="view.set(state.value === 'grid' ? 'list' : 'grid')">
+  <button
+    :aria-pressed="state.value === 'grid'"
+    @click="view.set(state.value === 'grid' ? 'list' : 'grid')"
+  >
     Grid
   </button>
 </template>

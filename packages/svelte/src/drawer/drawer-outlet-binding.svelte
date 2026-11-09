@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { DrawerOutletProps, DrawerOutletState } from "@ui-sdk/core/drawer"
+  import type {
+    DrawerOutletProps,
+    DrawerOutletState,
+  } from "@ui-sdk/core/drawer"
   import { untrack } from "svelte"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
@@ -10,13 +13,14 @@
     owner,
     keyframes,
     ...rest
-  }: PartProps<"div", DrawerOutletState> & DrawerOutletProps & { owner: DrawerContext } = $props()
+  }: PartProps<"div", DrawerOutletState> &
+    DrawerOutletProps & { owner: DrawerContext } = $props()
 
   const id = $props.id()
   const outlet = useHandlePart(
     untrack(() => owner.handle),
     "outlet",
-    () => ({ id, keyframes }),
+    () => ({ id, keyframes })
   )
 </script>
 

@@ -16,15 +16,18 @@ const grid = (offset: number) =>
   `<ui-calendar-grid offset="${offset}"><div><ui-calendar-weekdays></ui-calendar-weekdays><ui-calendar-weeks></ui-calendar-weeks></div></ui-calendar-grid>`
 
 const owners = {
-  calendar: (offset: number) => `<ui-calendar month="2026-10">${grid(offset)}</ui-calendar>`,
+  calendar: (offset: number) =>
+    `<ui-calendar month="2026-10">${grid(offset)}</ui-calendar>`,
   "date picker": (offset: number) =>
     `<ui-date-picker month="2026-10" open><ui-date-picker-content>${grid(offset)}</ui-date-picker-content></ui-date-picker>`,
 }
 
 const days = () =>
-  [...document.querySelectorAll("ui-calendar-day")].map((day) => day.getAttribute("data-value"))
+  [...document.querySelectorAll("ui-calendar-day")].map((day) =>
+    day.getAttribute("data-value")
+  )
 
-for (const [name, markup] of Object.entries(owners))
+for (const [name, markup] of Object.entries(owners)) {
   test(`a ${name} grid's new offset shows its month through a wrapper`, async () => {
     defineCalendarElements()
     defineDatePickerElements()
@@ -39,3 +42,4 @@ for (const [name, markup] of Object.entries(owners))
     await wait()
     expect(days()).toEqual(expected)
   })
+}

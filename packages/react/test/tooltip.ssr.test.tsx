@@ -1,7 +1,11 @@
 // @vitest-environment node
 import { renderToString } from "react-dom/server"
 import { describe, expect, test } from "vitest"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../src/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../src/hover-card"
 import {
   createTooltipController,
   Tooltip,
@@ -19,7 +23,7 @@ describe("tooltip server rendering", () => {
         <TooltipContent>
           Save your changes <TooltipShortcut />
         </TooltipContent>
-      </Tooltip>,
+      </Tooltip>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toMatch(/aria-describedby="[^"]+-content"/)
@@ -36,7 +40,7 @@ describe("tooltip server rendering", () => {
           <svg aria-hidden="true" />
         </TooltipTrigger>
         <TooltipContent>Bold</TooltipContent>
-      </Tooltip>,
+      </Tooltip>
     )
     expect(html).toMatch(/aria-labelledby="[^"]+-content"/)
     expect(html).not.toContain("aria-describedby")
@@ -52,7 +56,7 @@ describe("tooltip server rendering", () => {
         <Tooltip controller={save} shortcut="mod+s">
           <TooltipContent>Save your changes</TooltipContent>
         </Tooltip>
-      </>,
+      </>
     )
     expect(html).toContain("Save")
     expect(html).not.toContain('data-slot="tooltip-shortcut"')
@@ -63,7 +67,7 @@ describe("tooltip server rendering", () => {
       <Tooltip defaultOpen>
         <TooltipTrigger>Save</TooltipTrigger>
         <TooltipContent>Save your changes</TooltipContent>
-      </Tooltip>,
+      </Tooltip>
     )
     expect(html).toContain("data-open")
     expect(html).not.toMatch(/role="tooltip"[^>]*hidden/)

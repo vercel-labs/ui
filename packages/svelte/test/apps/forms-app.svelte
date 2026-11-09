@@ -4,7 +4,9 @@
   import { Radio, RadioGroup } from "../../src/radio"
   import { Switch } from "../../src/switch"
 
-  let { which }: { which: "checkbox" | "switch" | "radio" | "group" | "field" } = $props()
+  let {
+    which,
+  }: { which: "checkbox" | "switch" | "radio" | "group" | "field" } = $props()
 </script>
 
 {#if which === "checkbox"}
@@ -18,7 +20,11 @@
     <Radio value="team" />
   </RadioGroup>
 {:else if which === "group"}
-  <CheckboxGroup name="toppings" defaultValue={["cheese"]} allValues={["cheese", "olives"]}>
+  <CheckboxGroup
+    name="toppings"
+    defaultValue={["cheese"]}
+    allValues={["cheese", "olives"]}
+  >
     <Checkbox parent />
     <Checkbox value="cheese" />
     <Checkbox value="olives" />

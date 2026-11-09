@@ -17,7 +17,11 @@ const items: TreeItemData[] = [
     children: [
       { value: "mercury", label: "Mercury" },
       { value: "venus", label: "Venus" },
-      { value: "earth", label: "Earth", children: [{ value: "moon", label: "The Moon" }] },
+      {
+        value: "earth",
+        label: "Earth",
+        children: [{ value: "moon", label: "The Moon" }],
+      },
       {
         value: "mars",
         label: "Mars",
@@ -33,7 +37,11 @@ const items: TreeItemData[] = [
     label: "Dwarf planets",
     children: [
       { value: "ceres", label: "Ceres" },
-      { value: "pluto", label: "Pluto", children: [{ value: "charon", label: "Charon" }] },
+      {
+        value: "pluto",
+        label: "Pluto",
+        children: [{ value: "charon", label: "Charon" }],
+      },
     ],
   },
 ]

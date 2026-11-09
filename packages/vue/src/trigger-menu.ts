@@ -1,4 +1,9 @@
-import type { Anchor, ChangeDetails, DismissAttemptDetails, Side } from "@ui-sdk/core"
+import type {
+  Anchor,
+  ChangeDetails,
+  DismissAttemptDetails,
+  Side,
+} from "@ui-sdk/core"
 import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
 import {
   triggerMenu as triggerMenuPrimitive,
@@ -12,10 +17,27 @@ import {
   type TriggerMenuQueryChangeReason,
   type TriggerMenuSelectDetails,
 } from "@ui-sdk/core/trigger-menu"
-import { defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
-import { hasChild, NotPlaced, usePlaceContent, usePlacedContent } from "./children"
+import {
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
+import {
+  hasChild,
+  NotPlaced,
+  usePlaceContent,
+  usePlacedContent,
+} from "./children"
 import { EditorKey } from "./editor-context"
-import { containerProp, renderPopup, useControllerEntry, type PopupContainer } from "./popup"
+import {
+  containerProp,
+  renderPopup,
+  useControllerEntry,
+  type PopupContainer,
+} from "./popup"
 import { ListItems, type ListParts } from "./list-items"
 import { createParts, withElement } from "./create-parts"
 import {
@@ -29,13 +51,20 @@ import {
 } from "./use-primitive"
 import { renderless } from "./renderless"
 
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("trigger-menu-container")
+const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(
+  "trigger-menu-container"
+)
 
-type OpenDetails = ChangeDetails<TriggerMenuOpenChangeReason> & { trigger: string | null }
-type QueryDetails = ChangeDetails<TriggerMenuQueryChangeReason> & { trigger: string; argument?: string }
+type OpenDetails = ChangeDetails<TriggerMenuOpenChangeReason> & {
+  trigger: string | null
+}
+type QueryDetails = ChangeDetails<TriggerMenuQueryChangeReason> & {
+  trigger: string
+  argument?: string
+}
 type SelectHandler = (
   value: any,
-  details: TriggerMenuSelectDetails<any>,
+  details: TriggerMenuSelectDetails<any>
 ) => void | Promise<void | Partial<TokenInsert>>
 
 const useTriggerMenu = () => useHandle(triggerMenuPrimitive)
@@ -58,7 +87,10 @@ const TriggerMenu = /* @__PURE__ */ renderless(
   defineComponent({
     name: "TriggerMenu",
     props: {
-      triggers: { type: Array as PropType<TriggerDefinition<any>[]>, required: true },
+      triggers: {
+        type: Array as PropType<TriggerDefinition<any>[]>,
+        required: true,
+      },
       editor: Object as PropType<TextEditorAdapter>,
       open: optionalBoolean,
       modelValue: optionalBoolean,
@@ -79,7 +111,9 @@ const TriggerMenu = /* @__PURE__ */ renderless(
       "update:modelValue": (_open: boolean) => true,
       openChange: (_open: boolean, _details: OpenDetails) => true,
       openChangeComplete: (_open: boolean) => true,
-      dismissAttempt: (_details: DismissAttemptDetails<TriggerMenuDismissReason>) => true,
+      dismissAttempt: (
+        _details: DismissAttemptDetails<TriggerMenuDismissReason>
+      ) => true,
       queryChange: (_query: string, _details: QueryDetails) => true,
     },
     setup(props, { slots, emit }) {
@@ -93,14 +127,19 @@ const TriggerMenu = /* @__PURE__ */ renderless(
         onOpenChange: (open: boolean, details: OpenDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("openChange", open, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:open", open)
           emit("update:modelValue", open)
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-        onDismissAttempt: (details: DismissAttemptDetails<TriggerMenuDismissReason>) =>
-          emit("dismissAttempt", details),
-        onQueryChange: (query: string, details: QueryDetails) => emit("queryChange", query, details),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
+        onDismissAttempt: (
+          details: DismissAttemptDetails<TriggerMenuDismissReason>
+        ) => emit("dismissAttempt", details),
+        onQueryChange: (query: string, details: QueryDetails) =>
+          emit("queryChange", query, details),
       }))
       useControllerEntry(() => props.controller, menu)
       const placed = usePlacedContent()
@@ -112,7 +151,7 @@ const TriggerMenu = /* @__PURE__ */ renderless(
         return [children, !own && h(NotPlaced, () => h(TriggerMenuContent))]
       }
     },
-  }),
+  })
 )
 
 /**
@@ -152,15 +191,18 @@ const TriggerMenuContent = withElement(
       }
       const part = usePart(menu, "content", content, undefined, {
         tag: "div",
-        children: (state) => defaultSlot(slots, state, () => h(TriggerMenuList)),
+        children: (state) =>
+          defaultSlot(slots, state, () => h(TriggerMenuList)),
       })
       return () => {
         const element = part()
-        if (!element) return null
+        if (!element) {
+          return null
+        }
         return renderPopup(element, props.container ?? inherited())
       }
     },
-  }),
+  })
 )
 
 /**
@@ -178,11 +220,11 @@ const TriggerMenuList = withElement(
         tag: "div",
         children: (state) =>
           defaultSlot(slots, state, () =>
-            h(TriggerMenuItems, { items: state.items as TriggerMenuData<any> }),
+            h(TriggerMenuItems, { items: state.items as TriggerMenuData<any> })
           ),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -232,7 +274,7 @@ const TriggerMenuEmpty = withElement(
         children: (state) => (state.empty ? slots.default?.({ state }) : null),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -246,9 +288,11 @@ const TriggerMenuStatus = withElement(
     inheritAttrs: false,
     slots: Object as PartSlots<typeof triggerMenuPrimitive, "status">,
     setup(_, { slots }) {
-      return usePart(triggerMenuPrimitive, "status", () => ({ text: !slots.default }))
+      return usePart(triggerMenuPrimitive, "status", () => ({
+        text: !slots.default,
+      }))
     },
-  }),
+  })
 )
 
 /**
@@ -262,9 +306,15 @@ const TriggerMenuHint = withElement(
     inheritAttrs: false,
     slots: Object as PartSlots<typeof triggerMenuPrimitive, "hint">,
     setup(_, { slots }) {
-      return usePart(triggerMenuPrimitive, "hint", () => ({ text: !slots.default }), undefined, "span")
+      return usePart(
+        triggerMenuPrimitive,
+        "hint",
+        () => ({ text: !slots.default }),
+        undefined,
+        "span"
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -294,7 +344,10 @@ const listParts: ListParts = {
   Separator: TriggerMenuSeparator,
 }
 
-export { createTriggerMenuController, textFieldAdapter } from "@ui-sdk/core/trigger-menu"
+export {
+  createTriggerMenuController,
+  textFieldAdapter,
+} from "@ui-sdk/core/trigger-menu"
 export type {
   EditorChange,
   EditorReplaceOptions,

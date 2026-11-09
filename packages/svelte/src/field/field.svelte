@@ -7,7 +7,11 @@ Ties a form control to its label, description and error messages.
   import { field as fieldPrimitive, type FieldState } from "@ui-sdk/core/field"
   import { setContext } from "svelte"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { DescribedKey, FieldKey, type FieldContext } from "./context"
 
   let {
@@ -35,7 +39,11 @@ Ties a form control to its label, description and error messages.
     invalid,
     debug,
   }))
-  const context: FieldContext = { ...field, name: () => name, disabled: () => disabled }
+  const context: FieldContext = {
+    ...field,
+    name: () => name,
+    disabled: () => disabled,
+  }
   setContext(FieldKey, context)
   setContext(DescribedKey, context)
   const root = useHandlePart(field, "root")

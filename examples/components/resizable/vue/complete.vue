@@ -9,7 +9,10 @@ import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
 
-function onLayoutCommit(layout: number[], details: ResizableLayoutCommitDetails) {
+function onLayoutCommit(
+  layout: number[],
+  details: ResizableLayoutCommitDetails
+) {
   log(`Saved ${layout.map(Math.round).join(" / ")} (${details.reason})`)
 }
 </script>

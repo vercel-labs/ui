@@ -42,7 +42,7 @@ function mount(root: HTMLElement) {
                   ${framework.label}
                   <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                 </ui-combobox-item>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>
@@ -53,7 +53,10 @@ function mount(root: HTMLElement) {
   combobox.itemToLabel = (value) => frameworkLabel(value as string)
   combobox.addEventListener("valuechange", (event) => {
     const { value, reason } = event.detail
-    log(root, `${value ? frameworkLabel(value as string) : "Cleared"} (${reason})`)
+    log(
+      root,
+      `${value ? frameworkLabel(value as string) : "Cleared"} (${reason})`
+    )
   })
 }
 

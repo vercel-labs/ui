@@ -35,13 +35,20 @@ function Example() {
         data-slot="stack"
         onSubmit={(event) => {
           event.preventDefault()
-          const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+          const entries = [...new FormData(event.currentTarget)].map(
+            ([name, value]) => `${name}=${value}`
+          )
           log(`Submitted ${entries.join("&")}`)
         }}
       >
         <Field>
           <FieldLabel>Country</FieldLabel>
-          <Select name="country" autoComplete="country" required placeholder="Select a country">
+          <Select
+            name="country"
+            autoComplete="country"
+            required
+            placeholder="Select a country"
+          >
             <SelectTrigger>
               <SelectValue />
               <svg

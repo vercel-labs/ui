@@ -13,7 +13,12 @@ The popup that holds the suggestions, positioned against the field.
   import { claimOwnPart } from "../own-part.svelte"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
-  import { portalTo, providePopupContainer, usePopupContainer, type PopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+    type PopupContainer,
+  } from "../popup.svelte"
   import { useSheetHeader } from "../sheet-header.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { ContainerKey, OwnContentKey, type ContainerContext } from "./context"
@@ -43,21 +48,37 @@ The popup that holds the suggestions, positioned against the field.
   const autocomplete = useHandle(autocompletePrimitive)
   // The root renders its own content when the app gives none, so one in the
   // app's children says it's there.
-  if (!untrack(() => fromRoot)) claimOwnPart(OwnContentKey)
+  if (!untrack(() => fromRoot)) {
+    claimOwnPart(OwnContentKey)
+  }
   const inherited = getContext<ContainerContext | undefined>(ContainerKey)
   const target = usePopupContainer(() => container ?? inherited?.())
   providePopupContainer(target)
   // Presented as a sheet, the content sits in a full-screen viewport, which is
   // what moves into the container and the top layer, with a header at its top
   // that the field moves into.
-  const viewport = useHandlePart(autocomplete, "viewport", () => ({}), portalTo(target))
+  const viewport = useHandlePart(
+    autocomplete,
+    "viewport",
+    () => ({}),
+    portalTo(target)
+  )
   const header = useHandlePart(autocomplete, "header")
   const recordHeader = useSheetHeader()
   const content = useHandlePart(
     autocomplete,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, keepMounted }),
-    portalTo(() => (viewport.present ? false : target())),
+    () => ({
+      side,
+      align,
+      sideOffset,
+      alignOffset,
+      collisionPadding,
+      arrowPadding,
+      anchor,
+      keepMounted,
+    }),
+    portalTo(() => (viewport.present ? false : target()))
   )
 </script>
 

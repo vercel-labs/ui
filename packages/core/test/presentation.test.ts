@@ -15,7 +15,11 @@ describe("presentation", () => {
   })
 
   test('"sheet" presents as a sheet from the start, in a viewport', () => {
-    const instance = popover({ id: "p", defaultOpen: true, presentation: "sheet" })
+    const instance = popover({
+      id: "p",
+      defaultOpen: true,
+      presentation: "sheet",
+    })
     expect(attrs(instance.part("content"))["data-presentation"]).toBe("sheet")
     expect(present(instance.part("viewport"))).toBe(true)
   })
@@ -38,7 +42,9 @@ describe("presentation", () => {
 
   test("an alert dialog has none", () => {
     expect(
-      attrs(alertDialog({ id: "a", defaultOpen: true }).part("content"))["data-presentation"],
+      attrs(alertDialog({ id: "a", defaultOpen: true }).part("content"))[
+        "data-presentation"
+      ]
     ).toBeUndefined()
   })
 

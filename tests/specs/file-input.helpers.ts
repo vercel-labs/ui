@@ -47,24 +47,36 @@ function transfer(page: Page, files: TestFile[], text?: string) {
   return page.evaluateHandle(
     ({ files, text }) => {
       const data = new DataTransfer()
-      for (const { name, type = "", size = 10 } of files)
+      for (const { name, type = "", size = 10 } of files) {
         data.items.add(new File(["x".repeat(size)], name, { type }))
-      if (text !== undefined) data.setData("text/plain", text)
+      }
+      if (text !== undefined) {
+        data.setData("text/plain", text)
+      }
       return data
     },
-    { files, text },
+    { files, text }
   )
 }
 
 // Fires one drag event on an element, and says whether something prevented its default.
-async function fire(target: Locator, type: string, dataTransfer: Awaited<ReturnType<typeof transfer>>) {
+async function fire(
+  target: Locator,
+  type: string,
+  dataTransfer: Awaited<ReturnType<typeof transfer>>
+) {
   return target.evaluate(
     (el, { type, dataTransfer }) => {
-      const event = new DragEvent(type, { bubbles: true, cancelable: true, composed: true, dataTransfer })
+      const event = new DragEvent(type, {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        dataTransfer,
+      })
       el.dispatchEvent(event)
       return event.defaultPrevented
     },
-    { type, dataTransfer },
+    { type, dataTransfer }
   )
 }
 
@@ -80,7 +92,11 @@ async function drop(target: Locator, files: TestFile[]) {
 async function paste(target: Locator, files: TestFile[], text?: string) {
   const data = await transfer(target.page(), files, text)
   return target.evaluate((el, data) => {
-    const event = new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data })
+    const event = new ClipboardEvent("paste", {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: data,
+    })
     // Firefox copies nothing from `clipboardData` into a scripted paste, so it's set as it is.
     Object.defineProperty(event, "clipboardData", { value: data })
     el.dispatchEvent(event)
@@ -99,12 +115,17 @@ async function choose(page: Page, button: Locator, files: TestFile[]) {
       name,
       mimeType: type || "application/octet-stream",
       buffer: Buffer.from("x".repeat(size)),
-    })),
+    }))
   )
 }
 
 // Writes a folder with files in it, nested ones too, and picks it in the chooser a click opens.
-async function chooseFolder(page: Page, button: Locator, root: string, files: string[]) {
+async function chooseFolder(
+  page: Page,
+  button: Locator,
+  root: string,
+  files: string[]
+) {
   for (const file of files) {
     mkdirSync(path.dirname(path.join(root, file)), { recursive: true })
     writeFileSync(path.join(root, file), "x")

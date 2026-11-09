@@ -8,7 +8,8 @@ An upgraded element exposes its controller as `api`. Use it when an action that 
 ## Use the Element's Controller
 
 ```html
-<button id="toggle-bold">Toggle Bold</button> <ui-toggle id="bold"><button>Bold</button></ui-toggle>
+<button id="toggle-bold">Toggle Bold</button>
+<ui-toggle id="bold"><button>Bold</button></ui-toggle>
 ```
 
 ```ts
@@ -16,7 +17,9 @@ import "@ui-sdk/web/toggle"
 
 await customElements.whenDefined("ui-toggle")
 const toggle = document.querySelector("ui-toggle")!
-document.querySelector("#toggle-bold")!.addEventListener("click", () => toggle.api.toggle())
+document
+  .querySelector("#toggle-bold")!
+  .addEventListener("click", () => toggle.api.toggle())
 ```
 
 Controller methods run the same change events as user input, including cancellation. Each component lists its methods, such as `open()`, `close()`, `setValue()`, or `focus()`.
@@ -32,8 +35,12 @@ import "@ui-sdk/web/popover"
 ```
 
 ```html
-<ui-popover-trigger for="editor"><button>Edit Notes</button></ui-popover-trigger>
-<ui-popover-trigger for="editor"><button>Edit Tasks</button></ui-popover-trigger>
+<ui-popover-trigger for="editor"
+  ><button>Edit Notes</button></ui-popover-trigger
+>
+<ui-popover-trigger for="editor"
+  ><button>Edit Tasks</button></ui-popover-trigger
+>
 <ui-popover id="editor">
   <ui-popover-content>
     <ui-popover-title>Edit Item</ui-popover-title>

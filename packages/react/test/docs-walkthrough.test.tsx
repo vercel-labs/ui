@@ -9,7 +9,10 @@ import { createRoot, type Root } from "react-dom/client"
 import { renderToString } from "react-dom/server"
 import { afterEach, expect, test } from "vitest"
 
-const docs = path.resolve(import.meta.dirname, "../../../apps/docs/content/docs")
+const docs = path.resolve(
+  import.meta.dirname,
+  "../../../apps/docs/content/docs"
+)
 const page = ["core/compose-behaviors.mdx", "react/rendering.mdx"]
   .map((file) => readFileSync(path.join(docs, file), "utf8"))
   .join("\n")
@@ -19,12 +22,15 @@ mkdirSync(dir, { recursive: true })
 // Each file is a code block whose first line names it, like `// rating.ts`.
 function extract(name: string, as = name) {
   const block = [...page.matchAll(/```\w+\n([\s\S]*?)```/g)].find((match) =>
-    match[1].startsWith(`// ${name}\n`),
+    match[1].startsWith(`// ${name}\n`)
   )
   if (!block) {
     throw new Error(`The page has no ${name}`)
   }
-  writeFileSync(path.join(dir, as), block[1].replace('"@ui-sdk/react/primitive"', '"../../src/primitive"'))
+  writeFileSync(
+    path.join(dir, as),
+    block[1].replace('"@ui-sdk/react/primitive"', '"../../src/primitive"')
+  )
 }
 
 extract("rating.ts")
@@ -62,7 +68,9 @@ async function render(element: React.ReactElement) {
 }
 
 test("the React rating renders a radio group with one tab stop on the server", () => {
-  const html = renderToString(<Rating defaultValue={2} max={3} aria-label="Rating" />)
+  const html = renderToString(
+    <Rating defaultValue={2} max={3} aria-label="Rating" />
+  )
   expect(html).toContain('role="radiogroup"')
   expect(html.match(/tabindex="0"/g)).toHaveLength(1)
   expect(html).toContain('aria-label="2 stars"')
@@ -75,7 +83,7 @@ test("all four arrows check, focus and wrap, and a click checks one", async () =
       defaultValue={3}
       aria-label="Rating"
       onValueChange={(value, { reason }) => changes.push([value, reason])}
-    />,
+    />
   )
   stars[2].focus()
   for (const [key, value] of [
@@ -86,12 +94,14 @@ test("all four arrows check, focus and wrap, and a click checks one", async () =
     ["ArrowLeft", 4],
   ] as const) {
     await React.act(async () =>
-      document.activeElement!.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true })),
+      document.activeElement!.dispatchEvent(
+        new KeyboardEvent("keydown", { key, bubbles: true })
+      )
     )
     expect(document.activeElement).toBe(stars[value - 1])
     expect(stars[value - 1].getAttribute("aria-checked")).toBe("true")
     expect(stars.map((star) => star.tabIndex)).toEqual(
-      stars.map((_, index) => (index === value - 1 ? 0 : -1)),
+      stars.map((_, index) => (index === value - 1 ? 0 : -1))
     )
   }
   await React.act(async () => stars[0].click())
@@ -104,5 +114,11 @@ test("all four arrows check, focus and wrap, and a click checks one", async () =
     [1, "item-press"],
   ])
   expect(stars.map((star) => star.tabIndex)).toEqual([0, -1, -1, -1, -1])
-  expect(stars.map((star) => star.hasAttribute("data-filled"))).toEqual([true, false, false, false, false])
+  expect(stars.map((star) => star.hasAttribute("data-filled"))).toEqual([
+    true,
+    false,
+    false,
+    false,
+    false,
+  ])
 })

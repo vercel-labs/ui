@@ -35,14 +35,16 @@ type UseShortcutOptions = Omit<ShortcutOptions, "layer"> & {
 function useShortcut(
   keys: MaybeRefOrGetter<string | null | undefined>,
   handler: ShortcutHandler,
-  options: MaybeRefOrGetter<UseShortcutOptions> = {},
+  options: MaybeRefOrGetter<UseShortcutOptions> = {}
 ) {
   let off: (() => void) | undefined
   watchEffect(() => {
     off?.()
     off = undefined
     const current = toValue(keys)
-    if (!current || typeof document === "undefined") return
+    if (!current || typeof document === "undefined") {
+      return
+    }
     const { layer, ...rest } = toValue(options)
     off = shortcuts.register(current, handler, {
       ...rest,
@@ -64,11 +66,18 @@ function useShortcutHint(keys: MaybeRefOrGetter<string>) {
   onMounted(() => (apple.value = isApple()))
   return {
     text: computed(() => formatShortcut(toValue(keys), apple.value)),
-    ariaKeyshortcuts: computed(() => ariaKeyshortcuts(toValue(keys), apple.value)),
+    ariaKeyshortcuts: computed(() =>
+      ariaKeyshortcuts(toValue(keys), apple.value)
+    ),
   }
 }
 
-export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
+export {
+  ariaKeyshortcuts,
+  formatShortcut,
+  registerShortcut,
+  shortcuts,
+} from "@ui-sdk/core/shortcuts"
 export type {
   ShortcutHandler,
   ShortcutInfo,

@@ -1,6 +1,11 @@
 "use client"
 
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
 import { useLog } from "../../../shared/react/log"
 
@@ -23,7 +28,9 @@ function Example() {
     >
       <Field>
         <FieldLabel>Order updates</FieldLabel>
-        <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+        <FieldDescription>
+          Choose how we tell you about your orders.
+        </FieldDescription>
         <RadioGroup name="updates" required>
           {channels.map((channel) => (
             <label data-slot="label" key={channel.value}>

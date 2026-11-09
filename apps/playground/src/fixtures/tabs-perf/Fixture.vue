@@ -11,11 +11,21 @@ const items = perfItems(perfSize())
     <button>Before</button>
     <Tabs class="tabs" :default-value="items[0].value">
       <TabsList class="tablist" aria-label="Pages" style="flex-wrap: wrap">
-        <TabsTab v-for="item in items" :key="item.value" class="tab" :value="item.value">
+        <TabsTab
+          v-for="item in items"
+          :key="item.value"
+          class="tab"
+          :value="item.value"
+        >
           {{ item.label }}
         </TabsTab>
       </TabsList>
-      <TabsPanel v-for="item in items" :key="item.value" class="panel" :value="item.value">
+      <TabsPanel
+        v-for="item in items"
+        :key="item.value"
+        class="panel"
+        :value="item.value"
+      >
         {{ item.label }} content.
       </TabsPanel>
     </Tabs>

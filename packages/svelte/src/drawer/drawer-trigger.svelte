@@ -11,7 +11,12 @@ The button that opens the drawer. A trigger outside the drawer, like one per tab
   import Part from "../part.svelte"
   import { useControllerTarget } from "../popup.svelte"
   import { plainPart, type PartProps } from "../use-primitive.svelte"
-  import { DrawerKey, TriggerKey, type DrawerContext, type TriggerContext } from "./context"
+  import {
+    DrawerKey,
+    TriggerKey,
+    type DrawerContext,
+    type TriggerContext,
+  } from "./context"
   import TriggerBinding from "./drawer-trigger-binding.svelte"
 
   let {
@@ -20,12 +25,17 @@ The button that opens the drawer. A trigger outside the drawer, like one per tab
     shortcut,
     controller,
     ...rest
-  }: PartProps<"button", DialogTriggerState> &
-    DrawerTriggerProps = $props()
+  }: PartProps<"button", DialogTriggerState> & DrawerTriggerProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<DrawerContext | undefined>(DrawerKey))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<DrawerContext | undefined>(DrawerKey)
+  )
   const drawer = $derived(connected())
-  setContext<TriggerContext>(TriggerKey, { shortcut: () => shortcut, drawer: () => drawer })
+  setContext<TriggerContext>(TriggerKey, {
+    shortcut: () => shortcut,
+    drawer: () => drawer,
+  })
 </script>
 
 {#if drawer}
@@ -34,7 +44,10 @@ The button that opens the drawer. A trigger outside the drawer, like one per tab
   <!-- Until the drawer it names mounts, a trigger outside the drawer is a plain button. -->
   <Part
     tag="button"
-    part={plainPart({ open: false, disabled: !!disabled }, { type: "button", disabled })}
+    part={plainPart(
+      { open: false, disabled: !!disabled },
+      { type: "button", disabled }
+    )}
     props={rest}
   />
 {/if}

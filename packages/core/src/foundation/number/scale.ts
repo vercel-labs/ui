@@ -8,10 +8,16 @@ import { clamp } from "./steps"
  * and `from`, which map values into an even space and back.
  * @experimental
  */
-type NumberScale = "linear" | "log" | { to: (value: number) => number; from: (position: number) => number }
+type NumberScale =
+  | "linear"
+  | "log"
+  | { to: (value: number) => number; from: (position: number) => number }
 
 const scales = {
-  linear: { to: (value: number) => value, from: (position: number) => position },
+  linear: {
+    to: (value: number) => value,
+    from: (position: number) => position,
+  },
   log: { to: Math.log, from: Math.exp },
 }
 
@@ -21,7 +27,11 @@ const scales = {
  * bounds sit at an end.
  * @experimental
  */
-function fractionOf(value: number, range: { min: number; max: number }, scale: NumberScale = "linear") {
+function fractionOf(
+  value: number,
+  range: { min: number; max: number },
+  scale: NumberScale = "linear"
+) {
   const { to } = typeof scale === "string" ? scales[scale] : scale
   const low = to(range.min)
   const span = to(range.max) - low
@@ -34,7 +44,11 @@ function fractionOf(value: number, range: { min: number; max: number }, scale: N
  * like where a press on a track lands. Unsnapped; `scrubTo` puts it on the grid.
  * @experimental
  */
-function valueAt(fraction: number, range: { min: number; max: number }, scale: NumberScale = "linear") {
+function valueAt(
+  fraction: number,
+  range: { min: number; max: number },
+  scale: NumberScale = "linear"
+) {
   const { to, from } = typeof scale === "string" ? scales[scale] : scale
   const low = to(range.min)
   const value = from(low + clamp(fraction, 0, 1) * (to(range.max) - low))

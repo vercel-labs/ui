@@ -1,4 +1,8 @@
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/solid/listbox"
 import { createSignal, For } from "solid-js"
 
 const toppings = [
@@ -20,10 +24,18 @@ function Example() {
           {disabled() ? "Enable the List" : "Disable the List"}
         </button>
       </div>
-      <Listbox multiple disabled={disabled()} defaultValue={["basil"]} aria-label="Toppings">
+      <Listbox
+        multiple
+        disabled={disabled()}
+        defaultValue={["basil"]}
+        aria-label="Toppings"
+      >
         <For each={toppings}>
           {(topping) => (
-            <ListboxItem value={topping.value} disabled={topping.value === "olive"}>
+            <ListboxItem
+              value={topping.value}
+              disabled={topping.value === "olive"}
+            >
               {topping.label}
               <ListboxItemIndicator>
                 <svg

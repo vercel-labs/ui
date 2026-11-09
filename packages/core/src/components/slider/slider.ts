@@ -4,9 +4,16 @@ import { bindPageLocale } from "../../foundation/text/locale"
 import { type NumberFormat } from "../../foundation/number/format"
 import { parseRange } from "../../foundation/number/parse"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  CommitDetails,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import {
   isDisabled,
   normalized,
@@ -29,7 +36,13 @@ import { subscribe } from "../../foundation/kernel/part"
  * @stable
  */
 type SliderValueChangeReason =
-  "track-press" | "drag" | "step-key" | "accessibility-adjust" | "reset" | "restore" | "imperative"
+  | "track-press"
+  | "drag"
+  | "step-key"
+  | "accessibility-adjust"
+  | "reset"
+  | "restore"
+  | "imperative"
 
 /**
  * What `onValueChange` receives after the value.
@@ -59,7 +72,9 @@ type SliderChangeOptions = ChangeOptions<SliderValueChangeReason>
  * Moves and inspects a slider from outside it. Pass it as the `controller` option.
  * @stable
  */
-function createSliderController<Value extends number | number[] = number | number[]>() {
+function createSliderController<
+  Value extends number | number[] = number | number[],
+>() {
   return createController<{
     /** The value: a number, or one number per thumb. */
     getValue: () => Value
@@ -76,9 +91,8 @@ function createSliderController<Value extends number | number[] = number | numbe
  * option.
  * @stable
  */
-type SliderController<Value extends number | number[] = number | number[]> = ReturnType<
-  typeof createSliderController<Value>
->
+type SliderController<Value extends number | number[] = number | number[]> =
+  ReturnType<typeof createSliderController<Value>>
 
 /**
  * The options `slider` takes. A component takes them as props on its root.
@@ -158,7 +172,9 @@ type SliderInternalOptions = SliderOptions & { thumbInputId?: string }
 // range, like the value the form submits.
 function valueAttribute(attribute: string | null) {
   const values = attribute === null ? null : parseRange(attribute)
-  if (!values) return undefined
+  if (!values) {
+    return undefined
+  }
   return values.length === 1 ? values[0] : values
 }
 
@@ -230,7 +246,8 @@ function sharedState(state: State) {
   }
 }
 
-const thumbValue = (state: State, index: number) => state.thumbValues[index] ?? state.min
+const thumbValue = (state: State, index: number) =>
+  state.thumbValues[index] ?? state.min
 
 function dataAttrs(state: State) {
   return {
@@ -262,7 +279,8 @@ function thumbStyle(state: State, index: number, percent: number) {
           top: "50%",
           translate: "0 -50%",
         }),
-    "z-index": state.active === index ? 2 : state.last === index ? 1 : undefined,
+    "z-index":
+      state.active === index ? 2 : state.last === index ? 1 : undefined,
     "--slider-thumb-position": `${percent}%`,
   })
 }
@@ -332,7 +350,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
     thumbInputId: "string",
   },
   state: (options: SliderInternalOptions): State => {
-    const initial = normalized(options.value ?? options.defaultValue ?? options.min ?? 0, options)
+    const initial = normalized(
+      options.value ?? options.defaultValue ?? options.min ?? 0,
+      options
+    )
     return {
       ...settings(options),
       value: initial,
@@ -348,9 +369,15 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
   sync: (options) => ({
     ...settings(options),
     // Like `defaultChecked`, changing it changes what a reset returns to.
-    ...(options.defaultValue === undefined ? {} : { initial: normalized(options.defaultValue, options) }),
-    ...(options.value === undefined ? {} : { value: normalized(options.value, options) }),
-    ...(options.thumbInputId === undefined ? {} : { thumbInputId: options.thumbInputId }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: normalized(options.defaultValue, options) }),
+    ...(options.value === undefined
+      ? {}
+      : { value: normalized(options.value, options) }),
+    ...(options.thumbInputId === undefined
+      ? {}
+      : { thumbInputId: options.thumbInputId }),
   }),
   commits: ["value"],
   api: sliderApi,
@@ -359,7 +386,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
       role: "group",
       state: sliderState,
       attrs: (state, { id }) => ({
-        id: state.thumbInputId && valuesOf(state.value).length > 1 ? `${id}-group` : undefined,
+        id:
+          state.thumbInputId && valuesOf(state.value).length > 1
+            ? `${id}-group`
+            : undefined,
         ...dataAttrs(state),
       }),
       bind: (el, { api, store }) => {
@@ -370,7 +400,9 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
           restore: api.internal.restore,
           valueMissing: () => false,
           message: () => "",
-          anchor: () => el.querySelector<HTMLElement>('[data-slot="slider-thumb-input"]') ?? el,
+          anchor: () =>
+            el.querySelector<HTMLElement>('[data-slot="slider-thumb-input"]') ??
+            el,
           focus: () => api.focus(),
           reset: api.internal.reset,
           disabled: api.internal.setFormDisabled,
@@ -383,7 +415,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
     control: slot<{}, SliderState>({
       state: sliderState,
       attrs: (state) => ({ ...dataAttrs(state), style: "touch-action:none" }),
-      on: { pointerdown: (event, { api, el }) => el && api.internal.press(event, el) },
+      on: {
+        pointerdown: (event, { api, el }) =>
+          el && api.internal.press(event, el),
+      },
     }),
 
     // The rail the thumbs move along. Positions are percentages of it.
@@ -407,7 +442,12 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state, { props }) => {
         const index = props.index ?? 0
         const value = thumbValue(state, index)
-        return { ...sharedState(state), index, thumbValue: value, percent: percentOf(value, rangeOf(state)) }
+        return {
+          ...sharedState(state),
+          index,
+          thumbValue: value,
+          percent: percentOf(value, rangeOf(state)),
+        }
       },
       attrs: (state, { props }) => {
         const index = props.index ?? 0
@@ -459,7 +499,7 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
         const { lower, upper } = boundsBetween(
           state.thumbValues[index - 1],
           state.thumbValues[index + 1],
-          rangeOf(state),
+          rangeOf(state)
         )
         return {
           type: "range",
@@ -481,7 +521,8 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
         }
       },
       on: {
-        keydown: (event, { api, el, props }) => el && api.internal.keydown(event, props.index ?? 0, el),
+        keydown: (event, { api, el, props }) =>
+          el && api.internal.keydown(event, props.index ?? 0, el),
         keyup: (event, { api }) => api.internal.commitKeys(event),
         focusout: (_, { api }) => api.internal.commitKeys(),
         input: (event, { api, el, props }) => {
@@ -547,7 +588,10 @@ const sliderPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `slider`.
  * @stable
  */
-interface SliderPrimitive extends WithGeneric<typeof sliderPrimitive, SliderGeneric> {}
+interface SliderPrimitive extends WithGeneric<
+  typeof sliderPrimitive,
+  SliderGeneric
+> {}
 
 /**
  * The slider primitive, with the slots `root`, `control`, `track`,

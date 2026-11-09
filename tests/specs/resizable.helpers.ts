@@ -2,8 +2,10 @@ import type { Locator, Page } from "@playwright/test"
 
 // Handles are separators named by their label. Panels are groups named by
 // theirs, which the fixture gives them.
-const handle = (page: Page, name: string) => page.getByRole("separator", { name, exact: true })
-const panel = (page: Page, name: string) => page.getByRole("group", { name, exact: true })
+const handle = (page: Page, name: string) =>
+  page.getByRole("separator", { name, exact: true })
+const panel = (page: Page, name: string) =>
+  page.getByRole("group", { name, exact: true })
 const sidebarHandle = (page: Page) => handle(page, "Resize sidebar")
 const previewHandle = (page: Page) => handle(page, "Resize preview")
 const terminalHandle = (page: Page) => handle(page, "Resize terminal")
@@ -23,10 +25,16 @@ async function center(locator: Locator) {
 }
 
 // Drags from a point by an offset, in steps, so every engine sends moves.
-async function drag(page: Page, from: { x: number; y: number }, by: { x?: number; y?: number }) {
+async function drag(
+  page: Page,
+  from: { x: number; y: number },
+  by: { x?: number; y?: number }
+) {
   await page.mouse.move(from.x, from.y)
   await page.mouse.down()
-  await page.mouse.move(from.x + (by.x ?? 0), from.y + (by.y ?? 0), { steps: 8 })
+  await page.mouse.move(from.x + (by.x ?? 0), from.y + (by.y ?? 0), {
+    steps: 8,
+  })
   await page.mouse.up()
 }
 

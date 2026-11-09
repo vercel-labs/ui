@@ -42,7 +42,11 @@ function Example() {
             <TriggerMenuList>
               {(state) =>
                 (state.items as TriggerMenuDataItem[]).map((item) => (
-                  <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+                  <TriggerMenuItem
+                    key={item.value}
+                    value={item.value}
+                    label={item.label}
+                  >
                     {item.label}
                   </TriggerMenuItem>
                 ))

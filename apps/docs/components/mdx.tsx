@@ -22,13 +22,27 @@ import {
   FrameworkTabs,
 } from "./code-tabs"
 import { SpecList } from "./spec-list"
-import { ControllerTable, ReasonTable, StateTable, TypeTable } from "./type-tables"
+import {
+  ControllerTable,
+  ReasonTable,
+  StateTable,
+  TypeTable,
+} from "./type-tables"
 
 // A heading that links to itself. The hairline after an h2 marks the start of a section.
 function heading(Tag: "h2" | "h3" | "h4", className: string) {
-  return function Heading({ id, children, className: _, ...props }: ComponentProps<"h2">) {
+  return function Heading({
+    id,
+    children,
+    className: _,
+    ...props
+  }: ComponentProps<"h2">) {
     return (
-      <Tag id={id} className={cn("group scroll-mt-28 text-foreground", className)} {...props}>
+      <Tag
+        id={id}
+        className={cn("group scroll-mt-28 text-foreground", className)}
+        {...props}
+      >
         {id ? (
           <a
             href={`#${id}`}
@@ -46,12 +60,13 @@ function heading(Tag: "h2" | "h3" | "h4", className: string) {
 
 function InlineCode(props: ComponentProps<"code">) {
   // Long code, like a file path, still has to wrap on a phone.
-  const short = typeof props.children === "string" && props.children.length <= 30
+  const short =
+    typeof props.children === "string" && props.children.length <= 30
   return (
     <code
       className={cn(
         "rounded-md bg-foreground/[0.055] px-[0.3em] py-[0.15em] font-mono text-[0.85em] text-foreground",
-        short ? "whitespace-nowrap" : "[overflow-wrap:anywhere]",
+        short ? "whitespace-nowrap" : "[overflow-wrap:anywhere]"
       )}
       {...props}
     />
@@ -66,30 +81,46 @@ const frameworkHref = new RegExp(`^/docs/(${frameworkPages.join("|")})\\b`)
 // framework. Core and Agents pages have none.
 function getMDXComponents(
   framework: Framework = "react",
-  resolve: (href: string) => string = (href) => href,
+  resolve: (href: string) => string = (href) => href
 ) {
   return {
     h2: heading(
       "h2",
-      "mt-14 mb-4 flex items-center gap-4 text-lg leading-snug font-medium tracking-[-0.01em] after:h-px after:flex-1 after:bg-border/70",
+      "mt-14 mb-4 flex items-center gap-4 text-lg leading-snug font-medium tracking-[-0.01em] after:h-px after:flex-1 after:bg-border/70"
     ),
-    h3: heading("h3", "mt-10 mb-3 text-[17px] leading-snug font-medium sm:text-[15px]"),
+    h3: heading(
+      "h3",
+      "mt-10 mb-3 text-[17px] leading-snug font-medium sm:text-[15px]"
+    ),
     h4: heading("h4", "mt-8 mb-2 text-sm font-medium"),
     p: (props) => (
-      <p className="my-4 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px]" {...props} />
+      <p
+        className="my-4 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px]"
+        {...props}
+      />
     ),
     a: ({ href = "", ...props }) => {
       const url = resolve(href)
       const className =
         "font-normal text-foreground underline decoration-foreground/25 underline-offset-[3px] transition-colors hover:decoration-foreground"
-      if (frameworkHref.test(url)) return <FrameworkLink href={url} className={className} {...props} />
+      if (frameworkHref.test(url)) {
+        return <FrameworkLink href={url} className={className} {...props} />
+      }
       return url.startsWith("/") || url.startsWith("#") ? (
         <Link href={url} className={className} {...props} />
       ) : (
-        <a href={url} className={className} target="_blank" rel="noreferrer" {...props} />
+        <a
+          href={url}
+          className={className}
+          target="_blank"
+          rel="noreferrer"
+          {...props}
+        />
       )
     },
-    strong: (props) => <strong className="font-medium text-foreground" {...props} />,
+    strong: (props) => (
+      <strong className="font-medium text-foreground" {...props} />
+    ),
     ul: (props) => (
       <ul
         className="my-4 flex list-disc flex-col gap-1.5 ps-5 text-[17px] leading-[1.65] text-foreground/75 sm:text-[15px] marker:text-foreground/25"
@@ -153,7 +184,10 @@ function getMDXComponents(
     ),
     // A table cell's value where we win, filling the cell as on the why page.
     Won: ({ children }: { children: ReactNode }) => (
-      <span data-won className="font-semibold text-green-800 dark:text-green-300">
+      <span
+        data-won
+        className="font-semibold text-green-800 dark:text-green-300"
+      >
         {children}
       </span>
     ),
@@ -165,7 +199,9 @@ function getMDXComponents(
       <Card {...props} href={resolve(props.href)} />
     ),
     ComponentGrid: () => <ComponentGrid framework={framework} />,
-    ComponentCards: (props: { names: string }) => <ComponentCards {...props} framework={framework} />,
+    ComponentCards: (props: { names: string }) => (
+      <ComponentCards {...props} framework={framework} />
+    ),
     ChangelogPosts,
     ComponentExample: (props: {
       name: string

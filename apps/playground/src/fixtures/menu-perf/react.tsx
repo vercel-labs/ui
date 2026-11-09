@@ -21,7 +21,10 @@ function Fixture() {
       <button>Before</button>
       <Menu>
         <MenuTrigger>File</MenuTrigger>
-        <MenuContent className="popup" style={{ maxHeight: 320, overflow: "auto" }}>
+        <MenuContent
+          className="popup"
+          style={{ maxHeight: 320, overflow: "auto" }}
+        >
           {items.map((item, index) =>
             index % 2 ? (
               <MenuItem
@@ -52,7 +55,7 @@ function Fixture() {
               >
                 {item.label}
               </MenuItem>
-            ),
+            )
           )}
           <MenuCheckboxItem
             className="item"

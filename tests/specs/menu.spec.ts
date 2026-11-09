@@ -11,7 +11,11 @@ import {
   transitionedIn,
   waitForStill,
 } from "../fixtures"
-import { addScroller, composingEscape, moveIntoShadowRoot } from "../fixtures/popup"
+import {
+  addScroller,
+  composingEscape,
+  moveIntoShadowRoot,
+} from "../fixtures/popup"
 
 // Behavior follows the WAI-ARIA menu button pattern:
 // https://www.w3.org/WAI/ARIA/apg/patterns/menu-button/
@@ -35,7 +39,7 @@ async function scrollUnder(menu: Locator, item: Locator, y: number) {
     (el, by) => {
       el.scrollTop += by
     },
-    box.y + box.height / 2 - y,
+    box.y + box.height / 2 - y
   )
 }
 
@@ -64,10 +68,14 @@ test.describe("trigger", () => {
   })
 
   for (const key of ["Enter", " ", "ArrowDown"]) {
-    test(`${key === " " ? "Space" : key} opens the menu and focuses the first item`, async ({ page }) => {
+    test(`${key === " " ? "Space" : key} opens the menu and focuses the first item`, async ({
+      page,
+    }) => {
       await page.getByRole("button", { name: "File" }).focus()
       await page.keyboard.press(key)
-      await expect(page.getByRole("menuitem", { name: "New file" })).toBeFocused()
+      await expect(
+        page.getByRole("menuitem", { name: "New file" })
+      ).toBeFocused()
     })
   }
 
@@ -83,7 +91,7 @@ test.describe("trigger", () => {
   }) => {
     test.skip(
       framework.startsWith("react"),
-      "React stops hearing events once its tree moves into a shadow root.",
+      "React stops hearing events once its tree moves into a shadow root."
     )
     await moveIntoShadowRoot(page.locator(".fixture"))
     const trigger = page.getByRole("button", { name: "File" })
@@ -102,12 +110,16 @@ test.describe("keyboard navigation", () => {
     await expect(page.getByRole("menuitem", { name: "New file" })).toBeFocused()
   })
 
-  test("ArrowDown and ArrowUp move between items, skipping separators and labels", async ({ page }) => {
+  test("ArrowDown and ArrowUp move between items, skipping separators and labels", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowDown")
     await expect(page.getByRole("menuitem", { name: "Open…" })).toBeFocused()
     await page.keyboard.press("ArrowDown")
     await page.keyboard.press("ArrowDown")
-    await expect(page.getByRole("menuitemcheckbox", { name: "Show sidebar" })).toBeFocused()
+    await expect(
+      page.getByRole("menuitemcheckbox", { name: "Show sidebar" })
+    ).toBeFocused()
     await page.keyboard.press("ArrowUp")
     await page.keyboard.press("ArrowUp")
     await expect(page.getByRole("menuitem", { name: "Open…" })).toBeFocused()
@@ -135,22 +147,30 @@ test.describe("keyboard navigation", () => {
     await expect(page.getByRole("menuitem", { name: "New file" })).toBeFocused()
   })
 
-  test("typing a character moves to the next item that starts with it", async ({ page }) => {
+  test("typing a character moves to the next item that starts with it", async ({
+    page,
+  }) => {
     await page.keyboard.press("d")
-    await expect(page.getByRole("menuitemradio", { name: "Date" })).toBeFocused()
+    await expect(
+      page.getByRole("menuitemradio", { name: "Date" })
+    ).toBeFocused()
     await page.waitForTimeout(800)
     await page.keyboard.press("d")
     await expect(page.getByRole("menuitem", { name: "Delete" })).toBeFocused()
   })
 
-  test("typing several characters quickly matches the whole prefix", async ({ page }) => {
+  test("typing several characters quickly matches the whole prefix", async ({
+    page,
+  }) => {
     await page.keyboard.type("sha")
     await expect(page.getByRole("menuitem", { name: "Share" })).toBeFocused()
   })
 })
 
 test.describe("activation", () => {
-  test("Enter on an item runs it, closes the menu and returns focus", async ({ page }) => {
+  test("Enter on an item runs it, closes the menu and returns focus", async ({
+    page,
+  }) => {
     const trigger = page.getByRole("button", { name: "File" })
     await trigger.focus()
     await page.keyboard.press("Enter")
@@ -190,7 +210,9 @@ test.describe("activation", () => {
     await expect(sidebar).toHaveAttribute("aria-checked", "true")
   })
 
-  test("radio items select one value and keep the menu open", async ({ page }) => {
+  test("radio items select one value and keep the menu open", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: "File" }).click()
     const name = page.getByRole("menuitemradio", { name: "Name" })
     const date = page.getByRole("menuitemradio", { name: "Date" })
@@ -211,7 +233,9 @@ test.describe("activation", () => {
 })
 
 test.describe("dismissal", () => {
-  test("Escape closes the menu and returns focus to the trigger", async ({ page }) => {
+  test("Escape closes the menu and returns focus to the trigger", async ({
+    page,
+  }) => {
     const trigger = page.getByRole("button", { name: "File" })
     await trigger.click()
     await page.keyboard.press("Escape")
@@ -231,16 +255,20 @@ test.describe("dismissal", () => {
     async ({ page }) => {
       await page.getByRole("button", { name: "File" }).focus()
       await page.keyboard.press("Enter")
-      await expect(page.getByRole("menuitem", { name: "New file" })).toBeFocused()
+      await expect(
+        page.getByRole("menuitem", { name: "New file" })
+      ).toBeFocused()
       await composingEscape(page)
       await page.waitForTimeout(100)
       await expect(menuNamed(page, "File")).toBeVisible()
       await page.keyboard.press("Escape")
       await expect(menuNamed(page, "File")).toBeHidden()
-    },
+    }
   )
 
-  test("pressing a scrollbar outside the menu leaves it open", async ({ page }) => {
+  test("pressing a scrollbar outside the menu leaves it open", async ({
+    page,
+  }) => {
     const scrollbar = await addScroller(page)
     test.skip(!scrollbar, "This browser hides scrollbars in automation.")
     await page.getByRole("button", { name: "File" }).click()
@@ -267,13 +295,17 @@ test.describe("submenu", () => {
     await expect(page.getByRole("menuitem", { name: "Share" })).toBeFocused()
   })
 
-  test("the submenu trigger advertises its menu", { tag: "@enhancement" }, async ({ page }) => {
-    const share = page.getByRole("menuitem", { name: "Share" })
-    await expect(share).toHaveAttribute("aria-haspopup", "menu")
-    await expect(share).toHaveAttribute("aria-expanded", "false")
-    await page.keyboard.press("ArrowRight")
-    await expect(share).toHaveAttribute("aria-expanded", "true")
-  })
+  test(
+    "the submenu trigger advertises its menu",
+    { tag: "@enhancement" },
+    async ({ page }) => {
+      const share = page.getByRole("menuitem", { name: "Share" })
+      await expect(share).toHaveAttribute("aria-haspopup", "menu")
+      await expect(share).toHaveAttribute("aria-expanded", "false")
+      await page.keyboard.press("ArrowRight")
+      await expect(share).toHaveAttribute("aria-expanded", "true")
+    }
+  )
 
   for (const key of ["ArrowRight", "Enter", " "]) {
     const tag = key === " " ? ["@enhancement"] : []
@@ -282,12 +314,16 @@ test.describe("submenu", () => {
       { tag },
       async ({ page }) => {
         await page.keyboard.press(key)
-        await expect(page.getByRole("menuitem", { name: "Email" })).toBeFocused()
-      },
+        await expect(
+          page.getByRole("menuitem", { name: "Email" })
+        ).toBeFocused()
+      }
     )
   }
 
-  test("ArrowLeft closes the submenu and returns focus to its trigger", async ({ page }) => {
+  test("ArrowLeft closes the submenu and returns focus to its trigger", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowRight")
     await expect(page.getByRole("menuitem", { name: "Email" })).toBeFocused()
     await page.keyboard.press("ArrowLeft")
@@ -308,7 +344,9 @@ test.describe("submenu", () => {
     await expect(page.getByRole("button", { name: "File" })).toBeFocused()
   })
 
-  test("submenu keyboard navigation stays inside the submenu", async ({ page }) => {
+  test("submenu keyboard navigation stays inside the submenu", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowRight")
     await expect(page.getByRole("menuitem", { name: "Email" })).toBeFocused()
     await page.keyboard.press("ArrowUp")
@@ -317,13 +355,17 @@ test.describe("submenu", () => {
     await expect(page.getByRole("menuitem", { name: "Email" })).toBeFocused()
   })
 
-  test("keys pressed in quick succession are never lost", { tag: "@enhancement" }, async ({ page }) => {
-    await page.keyboard.press("ArrowRight")
-    await page.keyboard.press("End")
-    await page.keyboard.press("ArrowRight")
-    await page.keyboard.press("Enter")
-    expect(await lastAction(page)).toBe("embed")
-  })
+  test(
+    "keys pressed in quick succession are never lost",
+    { tag: "@enhancement" },
+    async ({ page }) => {
+      await page.keyboard.press("ArrowRight")
+      await page.keyboard.press("End")
+      await page.keyboard.press("ArrowRight")
+      await page.keyboard.press("Enter")
+      expect(await lastAction(page)).toBe("embed")
+    }
+  )
 
   test("clicking outside closes every menu", async ({ page }) => {
     await page.keyboard.press("ArrowRight")
@@ -334,7 +376,10 @@ test.describe("submenu", () => {
 
 test.describe("submenu with a pointer", () => {
   test.beforeEach(({ fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "In a sheet, a submenu opens on a press, in its parent's place.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "In a sheet, a submenu opens on a press, in its parent's place."
+    )
   })
 
   test("hovering the submenu trigger opens it", async ({ page }) => {
@@ -343,7 +388,9 @@ test.describe("submenu with a pointer", () => {
     await expect(menuNamed(page, "Share")).toBeVisible()
   })
 
-  test("moving diagonally toward the submenu keeps it open", async ({ page }) => {
+  test("moving diagonally toward the submenu keeps it open", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: "File" }).click()
     const share = page.getByRole("menuitem", { name: "Share" })
     await share.hover()
@@ -352,12 +399,17 @@ test.describe("submenu with a pointer", () => {
 
     // Cross the item below Share on the way to the submenu's last item.
     const from = (await share.boundingBox())!
-    const to = (await page.getByRole("menuitem", { name: "More" }).boundingBox())!
+    const to = (await page
+      .getByRole("menuitem", { name: "More" })
+      .boundingBox())!
     await page.mouse.move(from.x + from.width - 12, from.y + from.height / 2)
     await page.mouse.move(to.x + 12, to.y + to.height / 2, { steps: 12 })
 
     await expect(submenu).toBeVisible()
-    await expect(page.getByRole("menuitem", { name: "More" })).toHaveAttribute("data-highlighted", "")
+    await expect(page.getByRole("menuitem", { name: "More" })).toHaveAttribute(
+      "data-highlighted",
+      ""
+    )
   })
 
   test("resting on a sibling item on the way to the submenu moves to it once the safe area expires", async ({
@@ -367,14 +419,21 @@ test.describe("submenu with a pointer", () => {
     await page.clock.install()
     await open("menu")
     await page.getByRole("button", { name: "File" }).click()
-    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
-    await page.mouse.move(share.x + share.width - 12, share.y + share.height / 2)
+    const share = (await page
+      .getByRole("menuitem", { name: "Share" })
+      .boundingBox())!
+    await page.mouse.move(
+      share.x + share.width - 12,
+      share.y + share.height / 2
+    )
     await page.clock.runFor(300)
     await expect(menuNamed(page, "Share")).toBeVisible()
 
     const remove = page.getByRole("menuitem", { name: "Delete" })
     const box = (await remove.boundingBox())!
-    await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2, { steps: 4 })
+    await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2, {
+      steps: 4,
+    })
     await expect(menuNamed(page, "Share")).toBeVisible()
     await page.clock.runFor(300)
     await expect(menuNamed(page, "Share")).toBeHidden()
@@ -385,7 +444,9 @@ test.describe("submenu with a pointer", () => {
     await page.getByRole("button", { name: "File" }).click()
     await page.getByRole("menuitem", { name: "Share" }).hover()
     await expect(menuNamed(page, "Share")).toBeVisible()
-    const open = (await page.getByRole("menuitem", { name: "Open…" }).boundingBox())!
+    const open = (await page
+      .getByRole("menuitem", { name: "Open…" })
+      .boundingBox())!
     await page.mouse.move(open.x + 12, open.y + open.height / 2, { steps: 8 })
     await expect(menuNamed(page, "Share")).toBeHidden()
   })
@@ -394,7 +455,9 @@ test.describe("submenu with a pointer", () => {
     page,
   }) => {
     await page.getByRole("button", { name: "File" }).click()
-    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const share = (await page
+      .getByRole("menuitem", { name: "Share" })
+      .boundingBox())!
     const menu = (await menuNamed(page, "File").boundingBox())!
     await page.mouse.move(share.x + 12, share.y + share.height / 2)
     await page.mouse.move(menu.x - 40, share.y + share.height / 2, { steps: 2 })
@@ -402,12 +465,20 @@ test.describe("submenu with a pointer", () => {
     await expect(menuNamed(page, "Share")).toBeHidden()
   })
 
-  test("returning to the submenu trigger from a separator opens it", async ({ page, open }) => {
+  test("returning to the submenu trigger from a separator opens it", async ({
+    page,
+    open,
+  }) => {
     await page.clock.install()
     await open("menu")
     await page.getByRole("button", { name: "File" }).click()
-    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
-    const separator = (await menuNamed(page, "File").getByRole("separator").last().boundingBox())!
+    const share = (await page
+      .getByRole("menuitem", { name: "Share" })
+      .boundingBox())!
+    const separator = (await menuNamed(page, "File")
+      .getByRole("separator")
+      .last()
+      .boundingBox())!
     const x = share.x + 12
     const y = share.y + share.height / 2
     await page.mouse.move(x, y)
@@ -426,7 +497,9 @@ test.describe("submenu with a pointer", () => {
     await page.clock.install()
     await open("menu")
     await page.getByRole("button", { name: "File" }).click()
-    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const share = (await page
+      .getByRole("menuitem", { name: "Share" })
+      .boundingBox())!
     const remove = page.getByRole("menuitem", { name: "Delete" })
     const box = (await remove.boundingBox())!
     await page.mouse.move(share.x + 12, share.y + share.height / 2)
@@ -440,7 +513,9 @@ test.describe("submenu with a pointer", () => {
     page,
   }) => {
     await page.getByRole("button", { name: "File" }).click()
-    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const share = (await page
+      .getByRole("menuitem", { name: "Share" })
+      .boundingBox())!
     const x = share.x + 12
     const y = share.y + share.height / 2
     await page.mouse.move(x, y)
@@ -458,7 +533,9 @@ test.describe("submenu with a pointer", () => {
     await page.getByRole("button", { name: "File" }).click()
     const menu = menuNamed(page, "File")
     await clip(menu, 0)
-    const share = (await page.getByRole("menuitem", { name: "Share" }).boundingBox())!
+    const share = (await page
+      .getByRole("menuitem", { name: "Share" })
+      .boundingBox())!
     const x = share.x + 12
     const y = share.y + share.height / 2
     await page.mouse.move(x, y)
@@ -471,7 +548,11 @@ test.describe("submenu with a pointer", () => {
     const remove = page.getByRole("menuitem", { name: "Delete" })
     await expect(remove).toBeFocused()
 
-    await scrollUnder(menu, page.getByRole("menuitemradio", { name: "Size" }), y)
+    await scrollUnder(
+      menu,
+      page.getByRole("menuitemradio", { name: "Size" }),
+      y
+    )
     await page.mouse.move(x, y)
     await expect(remove).toBeFocused()
   })
@@ -502,7 +583,10 @@ test.describe("submenu with a pointer", () => {
 
 test.describe("positioning", () => {
   test.beforeEach(({ fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet isn't placed against its trigger.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet isn't placed against its trigger."
+    )
   })
 
   test("the menu opens below the trigger", async ({ page }) => {
@@ -513,7 +597,10 @@ test.describe("positioning", () => {
     expect(menu.y).toBeGreaterThanOrEqual(anchor.y + anchor.height - 1)
   })
 
-  test("the menu flips above the trigger when there is no room below", async ({ page, open }) => {
+  test("the menu flips above the trigger when there is no room below", async ({
+    page,
+    open,
+  }) => {
     await open("menu", { layout: "bottom" })
     const trigger = page.getByRole("button", { name: "File" })
     await trigger.click()
@@ -522,7 +609,10 @@ test.describe("positioning", () => {
     expect(menu.y + menu.height).toBeLessThanOrEqual(anchor.y + 1)
   })
 
-  test("submenus open to the side and flip when there is no room", async ({ page, open }) => {
+  test("submenus open to the side and flip when there is no room", async ({
+    page,
+    open,
+  }) => {
     await page.getByRole("button", { name: "File" }).click()
     await page.getByRole("menuitem", { name: "Share" }).hover()
     let parent = (await menuNamed(page, "File").boundingBox())!
@@ -539,8 +629,15 @@ test.describe("positioning", () => {
 })
 
 test.describe("animation", () => {
-  test("the popup animates in from its starting style", async ({ page, open, fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+  test("the popup animates in from its starting style", async ({
+    page,
+    open,
+    fixtureOptions,
+  }) => {
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet slides in, with no starting style to fade from."
+    )
     await open("menu", { animate: "" })
     await slowTransitions(page)
     await page.getByRole("button", { name: "File" }).click()
@@ -549,7 +646,10 @@ test.describe("animation", () => {
     expect(await opacityOf(menu)).toBeLessThan(0.5)
   })
 
-  test("the popup stays mounted while it animates out", async ({ page, open }) => {
+  test("the popup stays mounted while it animates out", async ({
+    page,
+    open,
+  }) => {
     await open("menu", { animate: "" })
     await page.getByRole("button", { name: "File" }).click()
     const menu = menuNamed(page, "File")

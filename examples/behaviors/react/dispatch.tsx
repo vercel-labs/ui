@@ -13,13 +13,21 @@ type FileListOptions = {
 const fileList = definePrimitive({
   name: "file-list",
   options: { defaultFiles: "list", onDelete: "callback" },
-  state: (options: FileListOptions): FileListState => ({ files: options.defaultFiles }),
+  state: (options: FileListOptions): FileListState => ({
+    files: options.defaultFiles,
+  }),
   api: (context) => {
     const { store } = context
     return {
       remove(file: string, event?: Event) {
-        if (dispatch(context, "onDelete", file, { reason: "delete-press", event })) return
-        store.set({ files: store.get().files.filter((other) => other !== file) })
+        if (
+          dispatch(context, "onDelete", file, { reason: "delete-press", event })
+        ) {
+          return
+        }
+        store.set({
+          files: store.get().files.filter((other) => other !== file),
+        })
       },
     }
   },
@@ -28,16 +36,26 @@ const fileList = definePrimitive({
       state: (state) => ({ files: state.files }),
       attrs: () => ({ role: "list" }),
     }),
-    file: slot<{ value: string }>({ props: { value: "string" }, attrs: () => ({ role: "listitem" }) }),
+    file: slot<{ value: string }>({
+      props: { value: "string" },
+      attrs: () => ({ role: "listitem" }),
+    }),
     delete: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (_state, { key }) => ({ type: "button", "aria-label": `Delete ${key}` }),
+      attrs: (_state, { key }) => ({
+        type: "button",
+        "aria-label": `Delete ${key}`,
+      }),
       press: ({ api, key }, event) => api.remove(key, event),
     }),
   }),
 })
 
-const parts = createParts(fileList, { root: "div", file: "div", delete: "button" })
+const parts = createParts(fileList, {
+  root: "div",
+  file: "div",
+  delete: "button",
+})
 
 const FileList = parts.Root
 
@@ -55,7 +73,9 @@ function Example() {
         if (file === "README.md") {
           details.cancel()
           log("Canceled: the readme stays")
-        } else log(`Deleted ${file}`)
+        } else {
+          log(`Deleted ${file}`)
+        }
       }}
     >
       {({ files }) =>
@@ -70,4 +90,12 @@ function Example() {
   )
 }
 
-export { Example, fileList, FileList, FileListDelete, FileListItem, type FileListOptions, type FileListState }
+export {
+  Example,
+  fileList,
+  FileList,
+  FileListDelete,
+  FileListItem,
+  type FileListOptions,
+  type FileListState,
+}

@@ -34,7 +34,8 @@
     { value: "ch", label: "Switzerland" },
   ]
 
-  const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+  const countryLabel = (value: string) =>
+    countries.find((country) => country.value === value)?.label ?? value
 
   const country = createComboboxController<string>()
   const log = useLog()
@@ -53,18 +54,12 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={openAndWait}>
-      Open and Wait
-    </button>
-    <button type="button" onclick={search}>
-      Search “sw”
-    </button>
+    <button type="button" onclick={openAndWait}> Open and Wait </button>
+    <button type="button" onclick={search}> Search “sw” </button>
     <button type="button" onclick={() => country.setValue("de")}>
       Choose Germany
     </button>
-    <button type="button" onclick={() => country.clear()}>
-      Clear
-    </button>
+    <button type="button" onclick={() => country.clear()}> Clear </button>
   </div>
   <Combobox controller={country} itemToLabel={countryLabel}>
     <div data-slot="stack">

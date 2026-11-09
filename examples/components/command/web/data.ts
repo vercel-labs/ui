@@ -25,7 +25,11 @@ const commands: CommandData = [
           { value: "system", label: "System" },
         ],
       },
-      { value: "language", label: "Change language…", items: ["English", "Français", "Deutsch", "日本語"] },
+      {
+        value: "language",
+        label: "Change language…",
+        items: ["English", "Français", "Deutsch", "日本語"],
+      },
       { value: "sign-out", label: "Sign out", shortcut: "mod+shift+q" },
     ],
   },
@@ -55,7 +59,9 @@ function mount(root: HTMLElement) {
   `
   const command = root.querySelector("ui-command")!
   command.items = commands
-  command.addEventListener("action", (event) => log(root, `Ran ${event.detail.value}`))
+  command.addEventListener("action", (event) =>
+    log(root, `Ran ${event.detail.value}`)
+  )
 }
 
 export { mount }

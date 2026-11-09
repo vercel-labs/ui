@@ -10,13 +10,15 @@ function mount(root: HTMLElement) {
             <ui-toolbar-button>
               <button>${label}</button>
             </ui-toolbar-button>
-          `,
+          `
         )
         .join("")}
     </ui-toolbar>
   `
   for (const button of root.querySelectorAll("button")) {
-    button.addEventListener("click", () => log(root, `${button.textContent} page`))
+    button.addEventListener("click", () =>
+      log(root, `${button.textContent} page`)
+    )
   }
 }
 

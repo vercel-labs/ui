@@ -18,7 +18,7 @@ function Example() {
     () => () => {
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   return (
@@ -29,7 +29,10 @@ function Example() {
             title: "Hollis Grant",
             description: "Can you review the draft?",
             data: { initials: "HG" },
-            action: { label: "Reply", onAction: () => log("Replying to Hollis Grant") },
+            action: {
+              label: "Reply",
+              onAction: () => log("Replying to Hollis Grant"),
+            },
           })
         }
       >
@@ -39,10 +42,19 @@ function Example() {
         {(item) => (
           <Toast
             render={(props, state) => (
-              <li {...props} inert={state.leaving || (!state.expanded && state.index > 0) || undefined} />
+              <li
+                {...props}
+                inert={
+                  state.leaving ||
+                  (!state.expanded && state.index > 0) ||
+                  undefined
+                }
+              />
             )}
           >
-            <span data-slot="media">{(item.data as { initials: string }).initials}</span>
+            <span data-slot="media">
+              {(item.data as { initials: string }).initials}
+            </span>
             <div data-slot="stack">
               <ToastTitle />
               <ToastDescription />

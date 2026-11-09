@@ -9,11 +9,16 @@ const owner = "ui-slider"
 // A thumb's index is its place among its slider's thumbs, unless it sets `index`.
 function thumbIndex(el: HTMLElement) {
   const own = el.closest("ui-slider-thumb") as HTMLElement | null
-  if (!own) return {}
+  if (!own) {
+    return {}
+  }
   const explicit = own.getAttribute("index")
   const root = own.closest(owner)
-  const thumbs = root ? Array.from(root.querySelectorAll("ui-slider-thumb")) : [own]
-  const index = explicit === null ? Math.max(0, thumbs.indexOf(own)) : Number(explicit)
+  const thumbs = root
+    ? Array.from(root.querySelectorAll("ui-slider-thumb"))
+    : [own]
+  const index =
+    explicit === null ? Math.max(0, thumbs.indexOf(own)) : Number(explicit)
   return { index, id: String(index) }
 }
 
@@ -46,16 +51,23 @@ function defineSliderElements() {
       state: {
         value: {
           get: (api: SliderApi) => api.getValue(),
-          set: (api: SliderApi, value: number | number[]) => api.setValue(value),
+          set: (api: SliderApi, value: number | number[]) =>
+            api.setValue(value),
         },
       },
       api: ["getValue", "setValue", "focus"],
       // Empty values show the formatted value, and inside a thumb, that thumb's.
       render(el, instance) {
         return showDefaultText(el, instance, "ui-slider-value", (value) => {
-          if (!value.closest("ui-slider-thumb"))
-            return (partState(instance.part("value", {})) as { text: string }).text
-          return String(attrs(instance.part("thumb-input", thumbIndex(value)))["aria-valuetext"])
+          if (!value.closest("ui-slider-thumb")) {
+            return (partState(instance.part("value", {})) as { text: string })
+              .text
+          }
+          return String(
+            attrs(instance.part("thumb-input", thumbIndex(value)))[
+              "aria-valuetext"
+            ]
+          )
         })
       },
     },
@@ -68,7 +80,9 @@ function defineSliderElements() {
       context: thumbIndex,
       // Adds the range input that takes focus, named by the thumb's own label.
       render(el) {
-        if (el.querySelector(":scope > ui-slider-thumb-input")) return
+        if (el.querySelector(":scope > ui-slider-thumb-input")) {
+          return
+        }
         const wrapper = document.createElement("ui-slider-thumb-input")
         const input = document.createElement("input")
         forwardAttributes(el, input, inputAttributes)

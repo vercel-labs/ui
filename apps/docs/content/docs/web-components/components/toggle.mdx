@@ -148,8 +148,13 @@ Read or set the element's `pressed` property, and listen for `pressedchange`. Se
   let starred = false
   const star = document.querySelector("ui-toggle")
   star.pressed = starred
-  star.addEventListener("pressedchange", (event) => (starred = event.detail.value))
-  document.querySelector("#toggle-star").addEventListener("click", () => star.api.toggle())
+  star.addEventListener(
+    "pressedchange",
+    (event) => (starred = event.detail.value)
+  )
+  document
+    .querySelector("#toggle-star")
+    .addEventListener("click", () => star.api.toggle())
 </script>
 ```
 
@@ -172,8 +177,13 @@ Read or set the group element's `value` property, and listen for `valuechange`, 
   let formats = ["bold"]
   const editor = document.querySelector("ui-toggle-group")
   editor.value = formats
-  editor.addEventListener("valuechange", (event) => (formats = event.detail.value))
-  document.querySelector("#clear-formatting").addEventListener("click", () => editor.api.setValue([]))
+  editor.addEventListener(
+    "valuechange",
+    (event) => (formats = event.detail.value)
+  )
+  document
+    .querySelector("#clear-formatting")
+    .addEventListener("click", () => editor.api.setValue([]))
 </script>
 ```
 
@@ -184,7 +194,9 @@ See [State and Events](../state-and-events) for controlled state, cancellation a
 Set `orientation="vertical"` to move with Up and Down instead of Left and Right. The group and its toggles get `data-orientation`.
 
 ```html
-<ui-toggle-group orientation="vertical" aria-label="Tool"> ... </ui-toggle-group>
+<ui-toggle-group orientation="vertical" aria-label="Tool">
+  ...
+</ui-toggle-group>
 ```
 
 ## Loop
@@ -192,7 +204,9 @@ Set `orientation="vertical"` to move with Up and Down instead of Left and Right.
 Arrow keys wrap from the last toggle to the first. Set `loop="false"` to stop at the ends.
 
 ```html
-<ui-toggle-group multiple loop="false" aria-label="Text formatting"> ... </ui-toggle-group>
+<ui-toggle-group multiple loop="false" aria-label="Text formatting">
+  ...
+</ui-toggle-group>
 ```
 
 ## Forms
@@ -234,35 +248,56 @@ Props are attributes in kebab case, like `default-pressed` and `focusable-when-d
 
 ### Toggle
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleOptions"
+/>
 
 ### ToggleIcon
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconProps"
+/>
 
 ### ToggleGroup
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupOptions"
+/>
 
 ### State
 
 The same state shows as data attributes on each button and on the group.
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleState"
+/>
 
 In a group, a toggle's `disabled` includes the group's. The group:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupState"
+/>
 
 `ui-toggle-icon`:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconState"
+/>
 
 ### Reasons
 
 `event.detail.reason` says why the toggle was pressed or unpressed.
 
-<ReasonTable path="../../packages/core/src/components/toggle/toggle.ts" name="TogglePressedChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="TogglePressedChangeReason"
+/>
 
 For a group, it says why the pressed toggles changed.
 
@@ -277,7 +312,10 @@ The element's `api` property has the same methods. The `pressed` property reads 
 
 Every write method takes an optional `{ reason, event }`, fires the change event like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleController" />
+<ControllerTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleController"
+/>
 
 ### ToggleGroup Controller
 

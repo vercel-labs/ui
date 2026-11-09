@@ -12,7 +12,13 @@ import {
 
 function Example() {
   return (
-    <Calendar months={2} pageBy="page" defaultValue="2026-10-16" weekdayFormat="narrow" monthFormat="short">
+    <Calendar
+      months={2}
+      pageBy="page"
+      defaultValue="2026-10-16"
+      weekdayFormat="narrow"
+      monthFormat="short"
+    >
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
           <svg
@@ -44,12 +50,20 @@ function Example() {
       </div>
       <div data-slot="row">
         <CalendarGrid offset={0}>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} />}
+          </CalendarWeekdays>
+          <CalendarWeeks>
+            {(cell) => <CalendarDay value={cell.date} />}
+          </CalendarWeeks>
         </CalendarGrid>
         <CalendarGrid offset={1}>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} />}
+          </CalendarWeekdays>
+          <CalendarWeeks>
+            {(cell) => <CalendarDay value={cell.date} />}
+          </CalendarWeeks>
         </CalendarGrid>
       </div>
     </Calendar>

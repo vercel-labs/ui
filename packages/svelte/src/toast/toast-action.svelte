@@ -25,17 +25,28 @@ the action has an `href`. A Promise from its handler keeps the toast open and th
 
   const { region, toast } = useToast("ToastAction")
   const id = $props.id()
-  const part = useHandlePart(region, "action", () => ({ id, toast: toast().id, onAction, dismiss }))
+  const part = useHandlePart(region, "action", () => ({
+    id,
+    toast: toast().id,
+    onAction,
+    dismiss,
+  }))
   const action = $derived(toast().action)
   const href = $derived(action?.href)
 </script>
 
-{#snippet fallback()}{#if action}<Content content={action.label} />{/if}{/snippet}
+{#snippet fallback()}{#if action}<Content
+      content={action.label}
+    />{/if}{/snippet}
 
 {#if action || onAction}
   <Part
     tag={href ? "a" : "button"}
     {part}
-    props={{ ...(href ? { href } : { type: "button" }), ...rest, children: children ?? fallback }}
+    props={{
+      ...(href ? { href } : { type: "button" }),
+      ...rest,
+      children: children ?? fallback,
+    }}
   />
 {/if}

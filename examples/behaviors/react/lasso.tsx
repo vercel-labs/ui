@@ -13,13 +13,19 @@ import { useLog } from "../../shared/react/log"
 type ShapesState = { selected: string[]; lasso: LassoDraft | null }
 
 type ShapesOptions = {
-  onSelectedChange?: (selected: string[], details: ChangeDetails<"lasso">) => void
+  onSelectedChange?: (
+    selected: string[],
+    details: ChangeDetails<"lasso">
+  ) => void
 }
 
 const shapes = definePrimitive({
   name: "shapes",
   options: { onSelectedChange: "callback" },
-  state: (_options: ShapesOptions): ShapesState => ({ selected: [], lasso: null }),
+  state: (_options: ShapesOptions): ShapesState => ({
+    selected: [],
+    lasso: null,
+  }),
   live: ["lasso"],
   api: (context) => {
     const change = createChange(context)
@@ -34,19 +40,30 @@ const shapes = definePrimitive({
   },
   slots: (slot) => ({
     root: slot({
-      attrs: () => ({ style: "position:relative;touch-action:none;user-select:none" }),
-      on: { pointerdown: (event, { el, api }) => event.target === el && api.lasso.pointerdown(event, el!) },
+      attrs: () => ({
+        style: "position:relative;touch-action:none;user-select:none",
+      }),
+      on: {
+        pointerdown: (event, { el, api }) =>
+          event.target === el && api.lasso.pointerdown(event, el!),
+      },
     }),
     shape: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (state, { key }) => ({ "data-selected": state.selected.includes(key) ? "" : undefined }),
-      live: live<ShapesState, any, { value: string }>((state, { key, api }) => ({
-        "data-lassoed": api.lasso.touches(state, key) ? "" : undefined,
-      })),
+      attrs: (state, { key }) => ({
+        "data-selected": state.selected.includes(key) ? "" : undefined,
+      }),
+      live: live<ShapesState, any, { value: string }>(
+        (state, { key, api }) => ({
+          "data-lassoed": api.lasso.touches(state, key) ? "" : undefined,
+        })
+      ),
     }),
     lasso: slot({
       attrs: () => ({ "aria-hidden": "true" }),
-      live: live<ShapesState, any, {}>((state, { api }) => ({ style: api.lasso.style(state) })),
+      live: live<ShapesState, any, {}>((state, { api }) => ({
+        style: api.lasso.style(state),
+      })),
     }),
   }),
 })
@@ -71,7 +88,9 @@ function Example() {
   return (
     <Shapes
       aria-label="Shapes"
-      onSelectedChange={(selected: string[]) => log(`Selected: ${selected.join(", ") || "none"}`)}
+      onSelectedChange={(selected: string[]) =>
+        log(`Selected: ${selected.join(", ") || "none"}`)
+      }
     >
       {items.map((item) => (
         <ShapesItem
@@ -86,4 +105,12 @@ function Example() {
   )
 }
 
-export { Example, shapes, Shapes, ShapesItem, ShapesLasso, type ShapesOptions, type ShapesState }
+export {
+  Example,
+  shapes,
+  Shapes,
+  ShapesItem,
+  ShapesLasso,
+  type ShapesOptions,
+  type ShapesState,
+}

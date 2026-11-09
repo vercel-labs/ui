@@ -18,7 +18,11 @@ import {
   type PrimitiveHandle,
 } from "./use-primitive"
 
-const parts = createParts(numberInputPrimitive, { group: "div", increment: "button", decrement: "button" })
+const parts = createParts(numberInputPrimitive, {
+  group: "div",
+  increment: "button",
+  decrement: "button",
+})
 
 type NumberInputContextValue = PrimitiveHandle<typeof numberInputPrimitive> & {
   field: ReturnType<typeof useFieldControl>
@@ -28,11 +32,16 @@ const NumberInputContext = createContext<NumberInputContextValue | null>(null)
 
 function useNumberInput(part: string) {
   const context = useContext(NumberInputContext)
-  if (!context) throw new Error(`${part} must be used inside <NumberInput>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <NumberInput>.`)
+  }
   return context
 }
 
-type DivProps = Omit<PartProps<"div", NumberInputState>, "defaultValue" | "onChange" | "onSelect">
+type DivProps = Omit<
+  PartProps<"div", NumberInputState>,
+  "defaultValue" | "onChange" | "onSelect"
+>
 
 /**
  * The root, and the hidden input that submits the number as is.
@@ -84,10 +93,13 @@ function NumberInput(props: NumberInputOptions & DivProps) {
     "form",
     "controller",
     "debug",
-    "children",
+    "children"
   )
   // The handle with the field beside it. Its prototype keeps the handle's `state` getter live.
-  const context: NumberInputContextValue = Object.assign(Object.create(numberInput), { field })
+  const context: NumberInputContextValue = Object.assign(
+    Object.create(numberInput),
+    { field }
+  )
   useControllerEntry(() => props.controller, context)
   const hidden = numberInput.slot("hidden-input")
   // The content, then the hidden input after it. `props.children` is read
@@ -104,7 +116,13 @@ function NumberInput(props: NumberInputOptions & DivProps) {
   }
   return (
     <NumberInputContext value={context}>
-      {usePart(numberInput, "root", undefined, merge(rest, { children: content }), "div")}
+      {usePart(
+        numberInput,
+        "root",
+        undefined,
+        merge(rest, { children: content }),
+        "div"
+      )}
     </NumberInputContext>
   )
 }
@@ -120,7 +138,10 @@ const NumberInputGroup = parts.Group
  * @stable
  */
 function NumberInputControl(
-  props: Omit<PartProps<"input", NumberInputState>, "value" | "defaultValue" | "children" | "readonly">,
+  props: Omit<
+    PartProps<"input", NumberInputState>,
+    "value" | "defaultValue" | "children" | "readonly"
+  >
 ) {
   const numberInput = useNumberInput("NumberInputControl")
   return usePart(
@@ -128,7 +149,7 @@ function NumberInputControl(
     "control",
     undefined,
     joinField(numberInput.field, startingText(props), "input"),
-    "input",
+    "input"
   )
 }
 
@@ -158,24 +179,36 @@ const unconnected: NumberInputState = {
  * input, and outside it through `controller`, like an icon in a toolbar.
  * @stable
  */
-function NumberInputScrubArea(props: PartProps<"span", NumberInputState> & NumberInputScrubAreaProps) {
-  const numberInput = useControllerTarget(() => props.controller, useContext(NumberInputContext))
+function NumberInputScrubArea(
+  props: PartProps<"span", NumberInputState> & NumberInputScrubAreaProps
+) {
+  const numberInput = useControllerTarget(
+    () => props.controller,
+    useContext(NumberInputContext)
+  )
   const rest = omit(props, "orientation", "pixelsPerStep", "controller")
   return (
     <Show
       when={numberInput()}
       keyed
       // Until the number input it names mounts, a scrub area outside it is a plain span.
-      fallback={renderStatic("span", () => ({ attrs: {}, state: unconnected }), rest)}
+      fallback={renderStatic(
+        "span",
+        () => ({ attrs: {}, state: unconnected }),
+        rest
+      )}
     >
       {(numberInput) => (
         <NumberInputContext value={numberInput}>
           {usePart(
             numberInput,
             "scrub-area",
-            () => ({ orientation: props.orientation, pixelsPerStep: props.pixelsPerStep }),
+            () => ({
+              orientation: props.orientation,
+              pixelsPerStep: props.pixelsPerStep,
+            }),
             rest,
-            "span",
+            "span"
           )}
         </NumberInputContext>
       )}
@@ -188,14 +221,20 @@ function NumberInputScrubArea(props: PartProps<"span", NumberInputState> & Numbe
  * the body, so transformed ancestors can't move it.
  * @stable
  */
-function NumberInputScrubAreaCursor(props: PartProps<"span", NumberInputState>) {
+function NumberInputScrubAreaCursor(
+  props: PartProps<"span", NumberInputState>
+) {
   const numberInput = useContext(NumberInputContext)
   // A scrub area outside its number input renders before that mounts, with no cursor yet.
-  if (!numberInput) return null
+  if (!numberInput) {
+    return null
+  }
   // Present only while scrubbing, so the portal isn't in the page otherwise.
   return (
     <Show when={numberInput.present("scrub-area-cursor")}>
-      <Portal>{usePart(numberInput, "scrub-area-cursor", undefined, props, "span")}</Portal>
+      <Portal>
+        {usePart(numberInput, "scrub-area-cursor", undefined, props, "span")}
+      </Portal>
     </Show>
   )
 }

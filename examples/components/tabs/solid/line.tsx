@@ -1,4 +1,10 @@
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/solid/tabs"
 
 export function Example() {
   return (
@@ -9,8 +15,12 @@ export function Example() {
         <TabsTab value="reports">Reports</TabsTab>
         <TabsIndicator />
       </TabsList>
-      <TabsPanel value="overview">Revenue, visitors and sign-ups for the last 30 days.</TabsPanel>
-      <TabsPanel value="analytics">Where visitors come from and what they do.</TabsPanel>
+      <TabsPanel value="overview">
+        Revenue, visitors and sign-ups for the last 30 days.
+      </TabsPanel>
+      <TabsPanel value="analytics">
+        Where visitors come from and what they do.
+      </TabsPanel>
       <TabsPanel value="reports">Monthly reports, ready to download.</TabsPanel>
     </Tabs>
   )

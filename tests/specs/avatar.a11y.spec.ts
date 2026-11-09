@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations while images load", async ({ page, open }) => {
@@ -16,7 +18,10 @@ test("no axe violations while images load", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations once images loaded or failed", async ({ page, open }) => {
+test("no axe violations once images loaded or failed", async ({
+  page,
+  open,
+}) => {
   await routeAvatars(page)
   await open("avatar")
   await expect(page.getByRole("img", { name: "Hedy Lamarr" })).toBeVisible()

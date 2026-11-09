@@ -28,7 +28,10 @@ const nodes = treeDataNodes(items)
 const tree = createTreeCollection(nodes)
 const itemOf = new Map(nodes.map((node) => [node.key, node.item]))
 
-type BackupOptions = { strategy: TreeCheckStrategy; onCheckedChange?: (checked: string[]) => void }
+type BackupOptions = {
+  strategy: TreeCheckStrategy
+  onCheckedChange?: (checked: string[]) => void
+}
 
 type BackupState = { checked: string[]; strategy: TreeCheckStrategy }
 
@@ -59,11 +62,16 @@ const backup = definePrimitive({
     item: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, { key }) => {
-        const checked = treeCheckedStates(tree, state.checked, state.strategy)(key)
+        const checked = treeCheckedStates(
+          tree,
+          state.checked,
+          state.strategy
+        )(key)
         return {
           type: "button",
           role: "checkbox",
-          "aria-checked": checked === "indeterminate" ? "mixed" : String(checked),
+          "aria-checked":
+            checked === "indeterminate" ? "mixed" : String(checked),
           "aria-disabled": itemOf.get(key)?.disabled ? "true" : undefined,
           style: `padding-inline-start:${(tree.level(key) - 1) * 20}px`,
         }
@@ -79,7 +87,12 @@ const Backup = parts.Root
 
 const BackupItem = parts.Item
 
-const strategies: TreeCheckStrategy[] = ["leaf", "trunk", "branch", "independent"]
+const strategies: TreeCheckStrategy[] = [
+  "leaf",
+  "trunk",
+  "branch",
+  "independent",
+]
 
 function Example() {
   const log = useLog()
@@ -87,7 +100,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <div role="radiogroup" aria-label="Strategy" data-slot="tree-behavior-strategies">
+        <div
+          role="radiogroup"
+          aria-label="Strategy"
+          data-slot="tree-behavior-strategies"
+        >
           {strategies.map((option) => (
             <button
               key={option}
@@ -105,7 +122,9 @@ function Example() {
       <Backup
         strategy={strategy}
         aria-label="Backup"
-        onCheckedChange={(checked: string[]) => log(`Value: ${checked.join(", ") || "none"}`)}
+        onCheckedChange={(checked: string[]) =>
+          log(`Value: ${checked.join(", ") || "none"}`)
+        }
       >
         {tree.keys().map((key) => (
           <BackupItem key={key} value={key} aria-label={itemOf.get(key)!.label}>
@@ -121,4 +140,11 @@ function Example() {
   )
 }
 
-export { backup, Backup, BackupItem, type BackupOptions, type BackupState, Example }
+export {
+  backup,
+  Backup,
+  BackupItem,
+  type BackupOptions,
+  type BackupState,
+  Example,
+}

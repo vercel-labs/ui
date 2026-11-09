@@ -11,7 +11,10 @@ import {
 
 const types: ScrollAreaType[] = ["hover", "scroll", "auto", "always"]
 
-const tags = Array.from({ length: 20 }, (_, index) => `v1.2.0-beta.${50 - index}`)
+const tags = Array.from(
+  { length: 20 },
+  (_, index) => `v1.2.0-beta.${50 - index}`
+)
 
 function Example() {
   return (

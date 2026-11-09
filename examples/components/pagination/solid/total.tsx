@@ -20,7 +20,8 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="row">
         <p>
-          Showing {(page() - 1) * pageSize() + 1}–{Math.min(page() * pageSize(), total)} of {total}
+          Showing {(page() - 1) * pageSize() + 1}–
+          {Math.min(page() * pageSize(), total)} of {total}
         </p>
         <label data-slot="label">
           Rows per page

@@ -10,7 +10,8 @@ Screen readers skip it, and `mirror` flips it in right-to-left text.
   import type { PartProps } from "../use-primitive.svelte"
   import { useToggle } from "./context"
 
-  let { ...rest }: PartProps<"span", ToggleIconState> & ToggleIconProps = $props()
+  let { ...rest }: PartProps<"span", ToggleIconState> & ToggleIconProps =
+    $props()
 
   const toggle = useToggle()
 </script>

@@ -38,12 +38,20 @@
     { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
     { value: "es", label: "Spain", keywords: ["españa"] },
     { value: "se", label: "Sweden", keywords: ["sverige"] },
-    { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+    {
+      value: "ch",
+      label: "Switzerland",
+      keywords: ["schweiz", "suisse", "svizzera"],
+    },
   ]
 
   function fuzzy(item: { label: string }, query: string) {
     let at = 0
-    for (const char of item.label.toLowerCase()) if (char === query[at]?.toLowerCase()) at++
+    for (const char of item.label.toLowerCase()) {
+      if (char === query[at]?.toLowerCase()) {
+        at++
+      }
+    }
     return at === query.length
   }
 
@@ -64,7 +72,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={modes} value={mode} onValueChange={(next) => next && (mode = next as Mode)}>
+    <Select
+      items={modes}
+      value={mode}
+      onValueChange={(next) => next && (mode = next as Mode)}
+    >
       <SelectLabel>Filter</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -96,7 +108,11 @@
       <ComboboxEmpty>No countries found.</ComboboxEmpty>
       <ComboboxList>
         {#each countries as country (country.value)}
-          <ComboboxItem value={country.value} label={country.label} keywords={country.keywords}>
+          <ComboboxItem
+            value={country.value}
+            label={country.label}
+            keywords={country.keywords}
+          >
             {country.label}
             <ComboboxItemIndicator>
               <CheckIcon aria-hidden="true" />

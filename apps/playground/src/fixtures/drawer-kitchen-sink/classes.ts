@@ -34,7 +34,8 @@ const header = "flex flex-col gap-1"
 const title = "text-base font-semibold"
 const description = "text-neutral-500"
 const actions = "flex flex-wrap justify-end gap-2"
-const scroll = "-mx-4 min-h-0 flex-1 overflow-y-auto border-y border-neutral-100 px-4"
+const scroll =
+  "-mx-4 min-h-0 flex-1 overflow-y-auto border-y border-neutral-100 px-4"
 const scrollItem = "border-b border-neutral-100 py-2 last:border-0"
 const field = "flex flex-col gap-1"
 const input =

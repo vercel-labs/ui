@@ -14,7 +14,9 @@ function Example() {
         <Input
           placeholder="example.com"
           defaultValue="hollisgrant.com"
-          onValueChange={(value, details) => log(`${value ? `“${value}”` : "Empty"} (${details.reason})`)}
+          onValueChange={(value, details) =>
+            log(`${value ? `“${value}”` : "Empty"} (${details.reason})`)
+          }
         />
         <InputClear aria-label="Clear website">
           <XIcon aria-hidden="true" />

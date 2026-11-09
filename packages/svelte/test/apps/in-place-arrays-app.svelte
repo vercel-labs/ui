@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "../../src/accordion"
+  import {
+    Accordion,
+    AccordionHeader,
+    AccordionItem,
+    AccordionPanel,
+    AccordionTrigger,
+  } from "../../src/accordion"
   import { Checkbox, CheckboxGroup } from "../../src/checkbox"
   import { Combobox, ComboboxInput, ComboboxValue } from "../../src/combobox"
   import { Listbox } from "../../src/listbox"
@@ -14,7 +20,14 @@
     bound,
     selected = $bindable(),
   }: {
-    component: "Listbox" | "Select" | "Combobox" | "ToggleGroup" | "CheckboxGroup" | "Accordion" | "Tree"
+    component:
+      | "Listbox"
+      | "Select"
+      | "Combobox"
+      | "ToggleGroup"
+      | "CheckboxGroup"
+      | "Accordion"
+      | "Tree"
     bound: boolean
     selected?: string[]
   } = $props()
@@ -24,7 +37,10 @@
     { value: "banana", label: "Banana" },
     { value: "cherry", label: "Cherry" },
   ]
-  const branches = fruits.map((fruit) => ({ ...fruit, children: [{ value: `${fruit.value}-seed`, label: "Seed" }] }))
+  const branches = fruits.map((fruit) => ({
+    ...fruit,
+    children: [{ value: `${fruit.value}-seed`, label: "Seed" }],
+  }))
 </script>
 
 <form>
@@ -36,23 +52,36 @@
     {/if}
   {:else if component === "Select"}
     {#if bound}
-      <Select multiple name="fruit" items={fruits} bind:value={selected}><SelectTrigger /></Select>
+      <Select multiple name="fruit" items={fruits} bind:value={selected}
+        ><SelectTrigger /></Select
+      >
     {:else}
-      <Select multiple name="fruit" items={fruits} value={selected}><SelectTrigger /></Select>
+      <Select multiple name="fruit" items={fruits} value={selected}
+        ><SelectTrigger /></Select
+      >
     {/if}
   {:else if component === "Combobox"}
-    {#snippet field()}<output><ComboboxValue /></output><ComboboxInput />{/snippet}
+    {#snippet field()}<output><ComboboxValue /></output><ComboboxInput
+      />{/snippet}
     {#if bound}
-      <Combobox multiple name="fruit" items={fruits} bind:value={selected}>{@render field()}</Combobox>
+      <Combobox multiple name="fruit" items={fruits} bind:value={selected}
+        >{@render field()}</Combobox
+      >
     {:else}
-      <Combobox multiple name="fruit" items={fruits} value={selected}>{@render field()}</Combobox>
+      <Combobox multiple name="fruit" items={fruits} value={selected}
+        >{@render field()}</Combobox
+      >
     {/if}
   {:else if component === "ToggleGroup"}
     {#snippet toggles()}
-      {#each fruits as fruit (fruit.value)}<Toggle value={fruit.value}>{fruit.label}</Toggle>{/each}
+      {#each fruits as fruit (fruit.value)}<Toggle value={fruit.value}
+          >{fruit.label}</Toggle
+        >{/each}
     {/snippet}
     {#if bound}
-      <ToggleGroup multiple bind:value={selected}>{@render toggles()}</ToggleGroup>
+      <ToggleGroup multiple bind:value={selected}
+        >{@render toggles()}</ToggleGroup
+      >
     {:else}
       <ToggleGroup multiple value={selected}>{@render toggles()}</ToggleGroup>
     {/if}
@@ -60,7 +89,9 @@
     {#snippet sections()}
       {#each fruits as fruit (fruit.value)}
         <AccordionItem value={fruit.value}>
-          <AccordionHeader><AccordionTrigger>{fruit.label}</AccordionTrigger></AccordionHeader>
+          <AccordionHeader
+            ><AccordionTrigger>{fruit.label}</AccordionTrigger></AccordionHeader
+          >
           <AccordionPanel>{fruit.label} panel</AccordionPanel>
         </AccordionItem>
       {/each}
@@ -78,12 +109,19 @@
     {/if}
   {:else}
     {#snippet checkboxes()}
-      {#each fruits as fruit (fruit.value)}<Checkbox value={fruit.value} aria-label={fruit.label} />{/each}
+      {#each fruits as fruit (fruit.value)}<Checkbox
+          value={fruit.value}
+          aria-label={fruit.label}
+        />{/each}
     {/snippet}
     {#if bound}
-      <CheckboxGroup name="fruit" bind:value={selected}>{@render checkboxes()}</CheckboxGroup>
+      <CheckboxGroup name="fruit" bind:value={selected}
+        >{@render checkboxes()}</CheckboxGroup
+      >
     {:else}
-      <CheckboxGroup name="fruit" value={selected}>{@render checkboxes()}</CheckboxGroup>
+      <CheckboxGroup name="fruit" value={selected}
+        >{@render checkboxes()}</CheckboxGroup
+      >
     {/if}
   {/if}
 </form>

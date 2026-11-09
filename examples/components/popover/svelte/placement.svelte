@@ -37,7 +37,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={sides} value={side} onValueChange={(next) => next && (side = next as Side)}>
+    <Select
+      items={sides}
+      value={side}
+      onValueChange={(next) => next && (side = next as Side)}
+    >
       <SelectLabel>Side</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -54,7 +58,11 @@
         {/each}
       </SelectContent>
     </Select>
-    <Select items={aligns} value={align} onValueChange={(next) => next && (align = next as Align)}>
+    <Select
+      items={aligns}
+      value={align}
+      onValueChange={(next) => next && (align = next as Align)}
+    >
       <SelectLabel>Align</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -76,7 +84,9 @@
     <PopoverTrigger>Delivery</PopoverTrigger>
     <PopoverContent {side} {align} sideOffset={8}>
       <PopoverTitle>Delivery window</PopoverTitle>
-      <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
+      <PopoverDescription
+        >Arrives Tuesday between 9 AM and noon.</PopoverDescription
+      >
     </PopoverContent>
   </Popover>
 </div>

@@ -30,7 +30,7 @@ const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
 const press = cn(
   "inline-flex h-7 min-w-7 shrink-0 cursor-default items-center justify-center gap-1.5 bg-background px-2 font-mono text-[10px] tracking-[0.06em] uppercase select-none hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-3.5",
   ink,
-  ring,
+  ring
 )
 
 function useFit(width: number) {
@@ -38,18 +38,34 @@ function useFit(width: number) {
   const [scale, setScale] = React.useState(1)
   React.useEffect(() => {
     const element = ref.current
-    if (!element) return
-    const observer = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / width))
+    if (!element) {
+      return
+    }
+    const observer = new ResizeObserver(([entry]) =>
+      setScale(entry.contentRect.width / width)
+    )
     observer.observe(element)
     return () => observer.disconnect()
   }, [width])
   return [ref, scale] as const
 }
 
-type CrewState = { lists: TransferLists; focused: string | null; moving: TransferDraft | null }
-type CrewOptions = { lists: TransferLists; onListsChange?: (lists: TransferLists) => void }
+type CrewState = {
+  lists: TransferLists
+  focused: string | null
+  moving: TransferDraft | null
+}
+type CrewOptions = {
+  lists: TransferLists
+  onListsChange?: (lists: TransferLists) => void
+}
 
-const lanes: Record<string, string> = { research: "Research", code: "Code", review: "Review", done: "Done" }
+const lanes: Record<string, string> = {
+  research: "Research",
+  code: "Code",
+  review: "Review",
+  done: "Done",
+}
 
 const jobs: Record<string, { title: string; steps: string[] }> = {
   pricing: {
@@ -58,11 +74,22 @@ const jobs: Record<string, { title: string; steps: string[] }> = {
   },
   feedback: {
     title: "Sort user feedback",
-    steps: ["Thinking", "read feedback.csv", "group 212 notes", "write themes.md"],
+    steps: [
+      "Thinking",
+      "read feedback.csv",
+      "group 212 notes",
+      "write themes.md",
+    ],
   },
   search: {
     title: "Add search to the docs",
-    steps: ["Thinking", "grep Search", "read layout.tsx", "edit search.tsx", "run tests"],
+    steps: [
+      "Thinking",
+      "grep Search",
+      "read layout.tsx",
+      "edit search.tsx",
+      "run tests",
+    ],
   },
   dark: {
     title: "Fix dark mode flash",
@@ -86,13 +113,26 @@ const start: TransferLists = {
   done: ["readme"],
 }
 
-const progressStart: Record<string, number> = { pricing: 0.55, search: 0.3, billing: 0.7, readme: 1 }
-const speeds: Record<string, number> = { research: 0.035, code: 0.025, review: 0.05 }
+const progressStart: Record<string, number> = {
+  pricing: 0.55,
+  search: 0.3,
+  billing: 0.7,
+  readme: 1,
+}
+const speeds: Record<string, number> = {
+  research: 0.035,
+  code: 0.025,
+  review: 0.05,
+}
 
 const crew = definePrimitive({
   name: "crew",
   options: { lists: "value", onListsChange: "callback" },
-  state: (options: CrewOptions): CrewState => ({ lists: options.lists, focused: null, moving: null }),
+  state: (options: CrewOptions): CrewState => ({
+    lists: options.lists,
+    focused: null,
+    moving: null,
+  }),
   sync: (options) => ({ lists: options.lists }),
   api: (context) => {
     const change = createChange(context)
@@ -128,16 +168,22 @@ const crew = definePrimitive({
         role: "option",
         "aria-selected": String(part.api.transfer.moving(state, part.key)),
         tabindex: part.api.roving.tabIndex(state, part),
-        "data-dragging": part.api.transfer.dragging(state, part.key) ? "" : undefined,
+        "data-dragging": part.api.transfer.dragging(state, part.key)
+          ? ""
+          : undefined,
         style: "touch-action:none;user-select:none",
       }),
       on: {
         keydown: (event, { el, api, key }) =>
           api.transfer.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.transfer.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.transfer.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.transfer.bindItem(el, part.key)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.transfer.bindItem(el, part.key),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -155,23 +201,39 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
   const [running, setRunning] = React.useState(false)
   const latest = React.useRef({ lists, progress })
   latest.current = { lists, progress }
-  const busy = ["research", "code", "review"].some((lane) => lists[lane].length > 0)
+  const busy = ["research", "code", "review"].some(
+    (lane) => lists[lane].length > 0
+  )
   React.useEffect(() => {
-    if (!running) return
+    if (!running) {
+      return
+    }
     const id = window.setInterval(() => {
       const now = latest.current
       const next = { ...now.progress }
       let moved = now.lists
       for (const lane of Object.keys(speeds)) {
         const key = now.lists[lane][0]
-        if (!key) continue
+        if (!key) {
+          continue
+        }
         next[key] = Math.min(1, (next[key] ?? 0) + speeds[lane])
-        if (next[key] < 1) continue
-        moved = { ...moved, [lane]: moved[lane].filter((item) => item !== key), done: [key, ...moved.done] }
+        if (next[key] < 1) {
+          continue
+        }
+        moved = {
+          ...moved,
+          [lane]: moved[lane].filter((item) => item !== key),
+          done: [key, ...moved.done],
+        }
       }
       setProgress(next)
-      if (moved !== now.lists) setLists(moved)
-      if (Object.keys(speeds).every((lane) => moved[lane].length === 0)) setRunning(false)
+      if (moved !== now.lists) {
+        setLists(moved)
+      }
+      if (Object.keys(speeds).every((lane) => moved[lane].length === 0)) {
+        setRunning(false)
+      }
     }, 160)
     return () => window.clearInterval(id)
   }, [running])
@@ -179,7 +241,11 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
     setLists(value)
     setProgress((current) => {
       const next = { ...current }
-      for (const key of Object.keys(next)) if (!value.done.includes(key) && next[key] >= 1) next[key] = 0
+      for (const key of Object.keys(next)) {
+        if (!value.done.includes(key) && next[key] >= 1) {
+          next[key] = 0
+        }
+      }
       return next
     })
   }
@@ -191,7 +257,9 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
   return (
     <Poster
       fig={fig}
-      head={"A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER\nOR USE SPACE AND THE ARROWS"}
+      head={
+        "A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER\nOR USE SPACE AND THE ARROWS"
+      }
       touch={"A BOARD FOR THREE AGENTS\nDRAG A TASK TO HAND IT OVER"}
       pattern="columns"
       body="justify-between gap-8"
@@ -224,7 +292,10 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
               Run again
             </button>
           )}
-          <span aria-live="polite" className={cn(label, "text-muted-foreground")}>
+          <span
+            aria-live="polite"
+            className={cn(label, "text-muted-foreground")}
+          >
             {!busy ? "All done" : running ? "Working" : "Paused"}
           </span>
         </div>
@@ -232,7 +303,10 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
           {({ lists: shown }) => (
             <div className="grid grid-cols-2 gap-2 @[34rem]:grid-cols-4">
               {Object.keys(lanes).map((lane) => (
-                <div key={lane} className={cn("flex min-w-0 flex-col bg-background", ink)}>
+                <div
+                  key={lane}
+                  className={cn("flex min-w-0 flex-col bg-background", ink)}
+                >
                   <div className="flex h-9 items-center justify-between gap-2 border-b border-foreground px-2.5">
                     <span className={label}>{lanes[lane]}</span>
                     {lane !== "done" && (
@@ -240,7 +314,9 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
                         aria-hidden="true"
                         className={cn(
                           "size-2 transition-colors",
-                          running && shown[lane].length ? "animate-pulse bg-foreground" : "bg-foreground/20",
+                          running && shown[lane].length
+                            ? "animate-pulse bg-foreground"
+                            : "bg-foreground/20"
                         )}
                       />
                     )}
@@ -256,7 +332,12 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
                       const active = !done && index === 0
                       const amount = progress[key] ?? 0
                       const step =
-                        job.steps[Math.min(job.steps.length - 1, Math.floor(amount * job.steps.length))]
+                        job.steps[
+                          Math.min(
+                            job.steps.length - 1,
+                            Math.floor(amount * job.steps.length)
+                          )
+                        ]
                       return (
                         <CrewCard
                           key={key}
@@ -268,19 +349,31 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
                             done
                               ? "h-9 justify-center border-foreground/30 px-2.5 text-muted-foreground"
                               : "h-[5.25rem] justify-between p-2.5",
-                            active && running && "border-2 p-[9px]",
+                            active && running && "border-2 p-[9px]"
                           )}
                         >
                           <span className="flex items-start justify-between gap-2">
-                            <span className={done ? "truncate" : "line-clamp-2"}>{job.title}</span>
-                            {done && <CheckIcon aria-hidden="true" className="size-3.5 shrink-0" />}
+                            <span
+                              className={done ? "truncate" : "line-clamp-2"}
+                            >
+                              {job.title}
+                            </span>
+                            {done && (
+                              <CheckIcon
+                                aria-hidden="true"
+                                className="size-3.5 shrink-0"
+                              />
+                            )}
                           </span>
                           {!done && (
                             <span className="flex flex-col gap-1.5">
                               <span className="truncate font-mono text-[10px] text-muted-foreground">
                                 {active ? `→ ${step}` : "Queued"}
                               </span>
-                              <span aria-hidden="true" className="h-0.5 w-full bg-foreground/10">
+                              <span
+                                aria-hidden="true"
+                                className="h-0.5 w-full bg-foreground/10"
+                              >
                                 <span
                                   className="block h-full bg-foreground transition-[width] duration-150"
                                   style={{ width: `${amount * 100}%` }}
@@ -302,7 +395,13 @@ function AgentsTile({ className, fig }: { className?: string; fig?: string }) {
   )
 }
 
-type Step = { value: string; label: string; kind: string; input: boolean; output: boolean }
+type Step = {
+  value: string
+  label: string
+  kind: string
+  input: boolean
+  output: boolean
+}
 type Wire = { from: string; to: string }
 type FlowState = {
   layout: Layout
@@ -312,15 +411,44 @@ type FlowState = {
   moving: MoveDraft | null
   connecting: ConnectDraft | null
 }
-type FlowOptions = { layout: Layout; edges: Wire[]; onEdgesChange?: (edges: Wire[]) => void; scale?: number }
+type FlowOptions = {
+  layout: Layout
+  edges: Wire[]
+  onEdgesChange?: (edges: Wire[]) => void
+  scale?: number
+}
 
 const node = { width: 150, height: 56 }
 
 const steps: Step[] = [
-  { value: "email", label: "New email", kind: "Trigger", input: false, output: true },
-  { value: "docs", label: "Fetch docs", kind: "Tool", input: false, output: true },
-  { value: "summarize", label: "Summarize", kind: "Model", input: true, output: true },
-  { value: "slack", label: "Send to Slack", kind: "Action", input: true, output: false },
+  {
+    value: "email",
+    label: "New email",
+    kind: "Trigger",
+    input: false,
+    output: true,
+  },
+  {
+    value: "docs",
+    label: "Fetch docs",
+    kind: "Tool",
+    input: false,
+    output: true,
+  },
+  {
+    value: "summarize",
+    label: "Summarize",
+    kind: "Model",
+    input: true,
+    output: true,
+  },
+  {
+    value: "slack",
+    label: "Send to Slack",
+    kind: "Action",
+    input: true,
+    output: false,
+  },
 ]
 
 const layouts = {
@@ -362,12 +490,22 @@ function portPoint(state: FlowState, port: string) {
   const out = port.endsWith(":out")
   const vertical = layouts[state.layout].vertical
   return {
-    x: at.x + (drag?.dx ?? 0) + (vertical ? node.width / 2 : out ? node.width : 0),
-    y: at.y + (drag?.dy ?? 0) + (vertical ? (out ? node.height : 0) : node.height / 2),
+    x:
+      at.x +
+      (drag?.dx ?? 0) +
+      (vertical ? node.width / 2 : out ? node.width : 0),
+    y:
+      at.y +
+      (drag?.dy ?? 0) +
+      (vertical ? (out ? node.height : 0) : node.height / 2),
   }
 }
 
-function curve(state: FlowState, from: { x: number; y: number }, to: { x: number; y: number }) {
+function curve(
+  state: FlowState,
+  from: { x: number; y: number },
+  to: { x: number; y: number }
+) {
   if (layouts[state.layout].vertical) {
     const reach = Math.max(40, Math.abs(to.y - from.y) / 2)
     return `M${from.x},${from.y} C${from.x},${from.y + reach} ${to.x},${to.y - reach} ${to.x},${to.y}`
@@ -378,7 +516,12 @@ function curve(state: FlowState, from: { x: number; y: number }, to: { x: number
 
 const flow = definePrimitive({
   name: "flow",
-  options: { layout: "value", edges: "value", onEdgesChange: "callback", scale: "number" },
+  options: {
+    layout: "value",
+    edges: "value",
+    onEdgesChange: "callback",
+    scale: "number",
+  },
   state: (options: FlowOptions): FlowState => ({
     layout: options.layout,
     positions: layouts[options.layout].placed,
@@ -406,7 +549,12 @@ const flow = definePrimitive({
       scale,
       bounds: () => {
         const { world } = layouts[store.get().layout]
-        return { minX: 0, minY: 0, maxX: world.width - node.width, maxY: world.height - node.height }
+        return {
+          minX: 0,
+          minY: 0,
+          maxX: world.width - node.width,
+          maxY: world.height - node.height,
+        }
       },
       label: (key) => stepOf(key).label,
     })
@@ -416,31 +564,50 @@ const flow = definePrimitive({
       slot: "port",
       draft: "connecting",
       canConnect: (from, to) =>
-        from.endsWith(":out") && to.endsWith(":in") && nodeOf(from) !== nodeOf(to) && !linked(from, to),
+        from.endsWith(":out") &&
+        to.endsWith(":in") &&
+        nodeOf(from) !== nodeOf(to) &&
+        !linked(from, to),
       point: (clientX, clientY) => {
         const box = context.element("root")!.getBoundingClientRect()
-        return { x: (clientX - box.left) / scale(), y: (clientY - box.top) / scale() }
+        return {
+          x: (clientX - box.left) / scale(),
+          y: (clientY - box.top) / scale(),
+        }
       },
-      label: (port) => `${stepOf(nodeOf(port)).label} ${port.endsWith(":out") ? "output" : "input"}`,
-      connect: (from, to, details) => change("edges", [...store.get().edges, { from, to }], details),
+      label: (port) =>
+        `${stepOf(nodeOf(port)).label} ${port.endsWith(":out") ? "output" : "input"}`,
+      connect: (from, to, details) =>
+        change("edges", [...store.get().edges, { from, to }], details),
     })
     return {
       roving,
       move,
       connect,
       nodeKeydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (connect.keydown(event) || move.keydown(event, key)) return
+        if (connect.keydown(event) || move.keydown(event, key)) {
+          return
+        }
         const letter = event.key.toLowerCase()
-        if (letter === "c" && !event.ctrlKey && !event.metaKey && stepOf(key).output) {
+        if (
+          letter === "c" &&
+          !event.ctrlKey &&
+          !event.metaKey &&
+          stepOf(key).output
+        ) {
           event.preventDefault()
           connect.start(`${key}:out`)
         } else if (event.key === "Backspace" || event.key === "Delete") {
           event.preventDefault()
           const edges = store
             .get()
-            .edges.filter((edge) => nodeOf(edge.from) !== key && nodeOf(edge.to) !== key)
+            .edges.filter(
+              (edge) => nodeOf(edge.from) !== key && nodeOf(edge.to) !== key
+            )
           change("edges", edges, { reason: "delete-key", event })
-        } else roving.keydown(event, el)
+        } else {
+          roving.keydown(event, el)
+        }
       },
     }
   },
@@ -450,7 +617,11 @@ const flow = definePrimitive({
       attrs: (state) => {
         const { world } = layouts[state.layout]
         return {
-          style: css({ position: "relative", width: `${world.width}px`, height: `${world.height}px` }),
+          style: css({
+            position: "relative",
+            width: `${world.width}px`,
+            height: `${world.height}px`,
+          }),
         }
       },
     }),
@@ -464,9 +635,13 @@ const flow = definePrimitive({
         return {
           role: "button",
           "aria-roledescription": "node",
-          "aria-description": links.length ? `Connected to ${links.join(", ")}.` : undefined,
+          "aria-description": links.length
+            ? `Connected to ${links.join(", ")}.`
+            : undefined,
           tabindex: part.api.roving.tabIndex(state, part),
-          "data-dragging": part.api.move.dragging(state, part.key) ? "" : undefined,
+          "data-dragging": part.api.move.dragging(state, part.key)
+            ? ""
+            : undefined,
           style: `${css({
             position: "absolute",
             left: `${at.x}px`,
@@ -479,7 +654,8 @@ const flow = definePrimitive({
       },
       on: {
         keydown: (event, { el, api, key }) => api.nodeKeydown(event, el!, key),
-        pointerdown: (event, { el, api, key }) => api.move.pointerdown(event, key, el!),
+        pointerdown: (event, { el, api, key }) =>
+          api.move.pointerdown(event, key, el!),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -499,22 +675,37 @@ const flow = definePrimitive({
     edge: slot<{ value: string; from: string; to: string }>({
       props: { value: "string", from: "string", to: "string" },
       attrs: (state, { props }) => ({
-        d: curve(state, portPoint(state, props.from), portPoint(state, props.to)),
+        d: curve(
+          state,
+          portPoint(state, props.from),
+          portPoint(state, props.to)
+        ),
       }),
     }),
     wire: slot({
       live: live<FlowState, any, {}>((state) => {
         const draft = state.connecting
-        if (!draft) return { d: "" }
+        if (!draft) {
+          return { d: "" }
+        }
         return {
-          d: curve(state, portPoint(state, draft.from), draft.to ? portPoint(state, draft.to) : draft),
+          d: curve(
+            state,
+            portPoint(state, draft.from),
+            draft.to ? portPoint(state, draft.to) : draft
+          ),
         }
       }),
     }),
   }),
 })
 
-const flowParts = createParts(flow, { root: "div", node: "div", port: "span", wire: "path" })
+const flowParts = createParts(flow, {
+  root: "div",
+  node: "div",
+  port: "span",
+  wire: "path",
+})
 const Flow = flowParts.Root
 const FlowNode = flowParts.Node
 const FlowPort = flowParts.Port
@@ -526,20 +717,27 @@ function FlowEdge({ edge, ...props }: { edge: Wire } & PartProps<"path">) {
     "edge",
     { value: `${edge.from}>${edge.to}`, from: edge.from, to: edge.to },
     props,
-    "path",
+    "path"
   )
 }
 
 function order(edges: Wire[]) {
   const level: Record<string, number> = {}
-  for (const step of steps) if (!step.input) level[step.value] = 0
-  for (let pass = 0; pass < steps.length; pass++)
+  for (const step of steps) {
+    if (!step.input) {
+      level[step.value] = 0
+    }
+  }
+  for (let pass = 0; pass < steps.length; pass++) {
     for (const edge of edges) {
       const from = level[nodeOf(edge.from)]
-      if (from === undefined) continue
+      if (from === undefined) {
+        continue
+      }
       const to = nodeOf(edge.to)
       level[to] = Math.max(level[to] ?? 0, from + 1)
     }
+  }
   return level
 }
 
@@ -564,7 +762,8 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
     timers.current.forEach(clearTimeout)
     setRun({})
     const depth = Math.max(...Object.values(level))
-    const keys = (at: number) => Object.keys(level).filter((key) => level[key] === at)
+    const keys = (at: number) =>
+      Object.keys(level).filter((key) => level[key] === at)
     timers.current = Array.from({ length: depth + 1 }, (_, at) => [
       window.setTimeout(
         () =>
@@ -572,12 +771,15 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
             ...current,
             ...Object.fromEntries(keys(at).map((key) => [key, "running"])),
           })),
-        at * 700 + 50,
+        at * 700 + 50
       ),
       window.setTimeout(
         () =>
-          setRun((current) => ({ ...current, ...Object.fromEntries(keys(at).map((key) => [key, "done"])) })),
-        at * 700 + 650,
+          setRun((current) => ({
+            ...current,
+            ...Object.fromEntries(keys(at).map((key) => [key, "done"])),
+          })),
+        at * 700 + 650
       ),
     ]).flat()
   }
@@ -597,7 +799,9 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
   return (
     <Poster
       fig={fig}
-      head={"WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER\nOR PRESS C TO CONNECT"}
+      head={
+        "WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER\nOR PRESS C TO CONNECT"
+      }
       touch={"WIRE UP A WORKFLOW\nDRAG FROM ONE DOT TO ANOTHER"}
       pattern="plus"
       body="justify-between gap-8"
@@ -619,15 +823,25 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
           <button type="button" onClick={go} className={press}>
             Run
           </button>
-          <span aria-live="polite" className={cn(label, "text-muted-foreground")}>
+          <span
+            aria-live="polite"
+            className={cn(label, "text-muted-foreground")}
+          >
             {status}
           </span>
         </div>
         <div ref={frame} className={cn("overflow-hidden bg-background", ink)}>
-          <div className="mx-auto" style={{ height: world.height * scale, width: world.width * scale }}>
+          <div
+            className="mx-auto"
+            style={{ height: world.height * scale, width: world.width * scale }}
+          >
             <div
               dir="ltr"
-              style={{ width: world.width, transform: `scale(${scale})`, transformOrigin: "0 0" }}
+              style={{
+                width: world.width,
+                transform: `scale(${scale})`,
+                transformOrigin: "0 0",
+              }}
             >
               <Flow
                 key={layout}
@@ -653,7 +867,7 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                             "stroke-[1.5] transition-colors",
                             run[nodeOf(edge.from)] === "done"
                               ? "stroke-foreground [stroke-width:2.5]"
-                              : "stroke-foreground",
+                              : "stroke-foreground"
                           )}
                         />
                       ))}
@@ -671,19 +885,34 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                             ink,
                             ring,
                             state === "running" && "border-2 px-[11px]",
-                            state === "done" && "bg-foreground text-background",
+                            state === "done" && "bg-foreground text-background"
                           )}
                         >
                           <span className="flex items-center justify-between gap-2">
-                            <span className={cn(label, state ? "opacity-80" : "text-muted-foreground")}>
+                            <span
+                              className={cn(
+                                label,
+                                state ? "opacity-80" : "text-muted-foreground"
+                              )}
+                            >
                               {step.kind}
                             </span>
                             {state === "running" && (
-                              <span aria-hidden="true" className="size-1.5 animate-pulse bg-current" />
+                              <span
+                                aria-hidden="true"
+                                className="size-1.5 animate-pulse bg-current"
+                              />
                             )}
-                            {state === "done" && <CheckIcon aria-hidden="true" className="size-3" />}
+                            {state === "done" && (
+                              <CheckIcon
+                                aria-hidden="true"
+                                className="size-3"
+                              />
+                            )}
                           </span>
-                          <span className="text-[14px] font-medium">{step.label}</span>
+                          <span className="text-[14px] font-medium">
+                            {step.label}
+                          </span>
                           {step.input && (
                             <FlowPort
                               value={`${step.value}:in`}
@@ -691,7 +920,7 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                                 port,
                                 vertical
                                   ? "-top-[5px] left-1/2 -translate-x-1/2"
-                                  : "top-1/2 -left-[5px] -translate-y-1/2",
+                                  : "top-1/2 -left-[5px] -translate-y-1/2"
                               )}
                             />
                           )}
@@ -702,7 +931,7 @@ function FlowTile({ className, fig }: { className?: string; fig?: string }) {
                                 port,
                                 vertical
                                   ? "-bottom-[5px] left-1/2 -translate-x-1/2"
-                                  : "top-1/2 -right-[5px] -translate-y-1/2",
+                                  : "top-1/2 -right-[5px] -translate-y-1/2"
                               )}
                             />
                           )}

@@ -15,20 +15,29 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <button type="button" onClick={() => editor.collapse("controller-sidebar")}>
+        <button
+          type="button"
+          onClick={() => editor.collapse("controller-sidebar")}
+        >
           Collapse
         </button>
-        <button type="button" onClick={() => editor.expand("controller-sidebar")}>
+        <button
+          type="button"
+          onClick={() => editor.expand("controller-sidebar")}
+        >
           Expand
         </button>
-        <button type="button" onClick={() => editor.resize("controller-sidebar", "240px")}>
+        <button
+          type="button"
+          onClick={() => editor.resize("controller-sidebar", "240px")}
+        >
           240px
         </button>
         <button
           type="button"
           onClick={() =>
             log(
-              `Layout ${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed("controller-sidebar") ? ", collapsed" : ""}`,
+              `Layout ${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed("controller-sidebar") ? ", collapsed" : ""}`
             )
           }
         >
@@ -36,7 +45,12 @@ function Example() {
         </button>
       </div>
       <Resizable controller={editor}>
-        <ResizablePanel id="controller-sidebar" defaultSize={30} minSize={20} collapsible>
+        <ResizablePanel
+          id="controller-sidebar"
+          defaultSize={30}
+          minSize={20}
+          collapsible
+        >
           <h3>Files</h3>
           <ul>
             <li>page.tsx</li>

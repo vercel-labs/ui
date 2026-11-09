@@ -24,7 +24,9 @@ function mount(root: HTMLElement) {
   message.setAttribute("copy", "label")
   message.defaultValue = draft
   message.innerHTML = `<ui-token-input-editor></ui-token-input-editor>`
-  message.addEventListener("valuechange", (event) => log(root, toText(event.detail.value, chat)))
+  message.addEventListener("valuechange", (event) =>
+    log(root, toText(event.detail.value, chat))
+  )
   root.querySelector("ui-field")!.append(message)
 }
 

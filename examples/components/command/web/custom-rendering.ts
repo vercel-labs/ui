@@ -19,7 +19,7 @@ function mount(root: HTMLElement) {
                   ${createElement(CornerDownLeft, { "aria-hidden": "true" }).outerHTML}
                 </a>
               </ui-command-item>
-            `,
+            `
           )
           .join("")}
       </ui-command-list>

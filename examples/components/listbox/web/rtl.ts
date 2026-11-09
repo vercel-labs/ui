@@ -13,7 +13,7 @@ export function mount(root: HTMLElement) {
         ${views
           .map(
             (view) => `
-              <ui-listbox-item value="${view.value}">${view.label}</ui-listbox-item>`,
+              <ui-listbox-item value="${view.value}">${view.label}</ui-listbox-item>`
           )
           .join("")}
       </ui-listbox>

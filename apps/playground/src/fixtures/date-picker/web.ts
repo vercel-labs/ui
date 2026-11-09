@@ -1,13 +1,19 @@
 import type { UiDatePickerElement } from "@ui-sdk/web"
-import { datePickerAction, datePickerFixture as f, datePickerOptions } from "tests/fixtures/date-picker.ts"
+import {
+  datePickerAction,
+  datePickerFixture as f,
+  datePickerOptions,
+} from "tests/fixtures/date-picker.ts"
 
 // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
 function setAttributes(
   el: Element,
-  attributes: Record<string, string | number | boolean | null | undefined>,
+  attributes: Record<string, string | number | boolean | null | undefined>
 ) {
   for (const [name, value] of Object.entries(attributes)) {
-    if (value === undefined || value === null || value === false) continue
+    if (value === undefined || value === null || value === false) {
+      continue
+    }
     el.setAttribute(name, value === true ? "" : String(value))
   }
 }
@@ -74,10 +80,18 @@ async function mount(root: HTMLElement) {
   const form = root.querySelector("form")!
   const [action, submitted] = root.querySelectorAll("output")
   picker.addEventListener("valuechange", (event) => {
-    action!.textContent = datePickerAction("value", event.detail.value, event.detail.reason)
+    action!.textContent = datePickerAction(
+      "value",
+      event.detail.value,
+      event.detail.reason
+    )
   })
   picker.addEventListener("openchange", (event) => {
-    action!.textContent = datePickerAction("open", event.detail.value, event.detail.reason)
+    action!.textContent = datePickerAction(
+      "open",
+      event.detail.value,
+      event.detail.reason
+    )
   })
   form.addEventListener("submit", (event) => {
     event.preventDefault()

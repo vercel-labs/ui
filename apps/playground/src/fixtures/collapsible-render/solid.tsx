@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
 
@@ -19,7 +23,10 @@ function Fixture() {
             </div>
           )}
         />
-        <CollapsiblePanel class="collapsible-panel" render={(props) => <section {...props} />}>
+        <CollapsiblePanel
+          class="collapsible-panel"
+          render={(props) => <section {...props} />}
+        >
           The files panel.
         </CollapsiblePanel>
       </Collapsible>

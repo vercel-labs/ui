@@ -39,7 +39,10 @@ const text = (state: ProgressValueState) => state.text
  * The formatted value, like "40%". Children replace it.
  * @stable
  */
-function ProgressValue({ children = text, ...props }: PartProps<"span", ProgressValueState>) {
+function ProgressValue({
+  children = text,
+  ...props
+}: PartProps<"span", ProgressValueState>) {
   return <parts.Value {...props}>{children}</parts.Value>
 }
 
@@ -53,4 +56,10 @@ export type {
   ProgressValueState,
 } from "@ui-sdk/core/progress"
 
-export { Progress, ProgressIndicator, ProgressLabel, ProgressTrack, ProgressValue }
+export {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+  ProgressValue,
+}

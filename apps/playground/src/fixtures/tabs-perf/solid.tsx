@@ -11,7 +11,11 @@ function Fixture() {
     <div class="fixture">
       <button>Before</button>
       <Tabs class="tabs" defaultValue={items[0].value}>
-        <TabsList class="tablist" aria-label="Pages" style={{ "flex-wrap": "wrap" }}>
+        <TabsList
+          class="tablist"
+          aria-label="Pages"
+          style={{ "flex-wrap": "wrap" }}
+        >
           <For each={items}>
             {(item) => (
               <TabsTab class="tab" value={item.value}>

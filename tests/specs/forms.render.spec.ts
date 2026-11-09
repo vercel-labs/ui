@@ -7,7 +7,9 @@ test.describe("custom rendering", () => {
     await open("forms-render")
   })
 
-  test("a checkbox rendered as a span is still a checkbox, and Space toggles it", async ({ page }) => {
+  test("a checkbox rendered as a span is still a checkbox, and Space toggles it", async ({
+    page,
+  }) => {
     const box = page.getByRole("checkbox", { name: "Rendered as a span" })
     expect(await box.evaluate((el) => el.tagName)).not.toBe("BUTTON")
     await box.focus()
@@ -18,12 +20,18 @@ test.describe("custom rendering", () => {
     await expect(box).toBeChecked()
   })
 
-  test("clicking the label of a checkbox rendered as a span toggles it", async ({ page }) => {
+  test("clicking the label of a checkbox rendered as a span toggles it", async ({
+    page,
+  }) => {
     await page.getByText("Rendered as a span").click()
-    await expect(page.getByRole("checkbox", { name: "Rendered as a span" })).toBeChecked()
+    await expect(
+      page.getByRole("checkbox", { name: "Rendered as a span" })
+    ).toBeChecked()
   })
 
-  test("radios rendered as spans keep arrow keys and selection", async ({ page }) => {
+  test("radios rendered as spans keep arrow keys and selection", async ({
+    page,
+  }) => {
     const small = page.getByRole("radio", { name: "Small" })
     await small.focus()
     await page.keyboard.press("ArrowDown")
@@ -34,8 +42,14 @@ test.describe("custom rendering", () => {
     await expect(page.getByRole("radio", { name: "Large" })).toBeChecked()
   })
 
-  test("render functions receive the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+  test("render functions receive the part's state", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     const box = page.getByRole("checkbox", { name: "Render function" })
     await expect(box).toHaveText("Off")
     await box.click()
@@ -49,7 +63,7 @@ test.describe("custom rendering", () => {
   test("class names follow the part's state", async ({ page, framework }) => {
     test.skip(
       !framework.startsWith("react") && !framework.startsWith("solid"),
-      "Class functions are React and Solid only. Vue uses slot state.",
+      "Class functions are React and Solid only. Vue uses slot state."
     )
     const box = page.getByRole("checkbox", { name: "Class from state" })
     await expect(box).toHaveClass(/is-unchecked/)
@@ -57,8 +71,14 @@ test.describe("custom rendering", () => {
     await expect(box).toHaveClass(/is-checked/)
   })
 
-  test("a controlled field control keeps every keystroke", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Custom elements don't control inputs.")
+  test("a controlled field control keeps every keystroke", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Custom elements don't control inputs."
+    )
     const nickname = page.getByRole("textbox", { name: "Nickname" })
     await nickname.click()
     await page.keyboard.type("Grace", { delay: 20 })

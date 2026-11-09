@@ -76,7 +76,13 @@ export { Example }
 import { Toggle } from "@ui-sdk/react/toggle"
 
 function Example() {
-  return <Toggle className={(state) => (state.pressed ? "font-bold" : "font-normal")}>Bold</Toggle>
+  return (
+    <Toggle
+      className={(state) => (state.pressed ? "font-bold" : "font-normal")}
+    >
+      Bold
+    </Toggle>
+  )
 }
 
 export { Example }
@@ -149,7 +155,11 @@ In Next.js, render the tag in the root layout's `<head>`, with the nonce your mi
 ```tsx
 import { headers } from "next/headers"
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const nonce = (await headers()).get("x-nonce") ?? undefined
   return (
     <html lang="en">

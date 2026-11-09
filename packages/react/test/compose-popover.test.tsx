@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 // The recipe on the Popups page for composing a public component inside
 // your own primitive: an emoji picker that owns `open` and renders a Popover.
-import { createChange, definePrimitive, type ChangeDetails, type ChangeSource } from "@ui-sdk/core"
+import {
+  createChange,
+  definePrimitive,
+  type ChangeDetails,
+  type ChangeSource,
+} from "@ui-sdk/core"
 import type { PopoverOpenChangeReason } from "@ui-sdk/core/popover"
 import * as React from "react"
 import { createRoot, type Root } from "react-dom/client"
@@ -18,7 +23,7 @@ beforeAll(() => {
   document.head.append(
     Object.assign(document.createElement("style"), {
       textContent: "[popover] { display: block !important }",
-    }),
+    })
   )
 })
 
@@ -34,7 +39,12 @@ type OpenReason = PopoverOpenChangeReason | "item-press"
 
 const emojiPicker = definePrimitive({
   name: "emoji-picker",
-  options: { open: "boolean", defaultOpen: "boolean", onOpenChange: "callback", onPick: "callback" },
+  options: {
+    open: "boolean",
+    defaultOpen: "boolean",
+    onOpenChange: "callback",
+    onPick: "callback",
+  },
   state: (options: {
     open?: boolean
     defaultOpen?: boolean
@@ -45,8 +55,10 @@ const emojiPicker = definePrimitive({
   api: (context) => {
     const change = createChange(context)
     return {
-      setOpen: (open: boolean, details: { reason: OpenReason; event?: Event; source?: ChangeSource }) =>
-        change("open", open, details),
+      setOpen: (
+        open: boolean,
+        details: { reason: OpenReason; event?: Event; source?: ChangeSource }
+      ) => change("open", open, details),
       pick(emoji: string, event?: Event) {
         context.options().onPick?.(emoji)
         change("open", false, { reason: "item-press", event })
@@ -54,7 +66,9 @@ const emojiPicker = definePrimitive({
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { open: boolean }>({ state: (state) => ({ open: state.open }) }),
+    root: slot<{}, { open: boolean }>({
+      state: (state) => ({ open: state.open }),
+    }),
     emoji: slot<{ value: string }>({
       props: { value: "string" },
       attrs: () => ({ type: "button" }),
@@ -80,13 +94,17 @@ function EmojiPicker({
         <Popover
           open={state.open}
           onOpenChange={(open, details) =>
-            picker.api.setOpen(open, { reason: details.reason, event: details.event, source: details.source })
+            picker.api.setOpen(open, {
+              reason: details.reason,
+              event: details.event,
+              source: details.source,
+            })
           }
         >
           {children}
         </Popover>
       ),
-    },
+    }
   )
 }
 
@@ -106,14 +124,16 @@ test("the picker owns open: the trigger opens it, and picking closes it with the
         <PopoverContent>
           <EmojiPickerItem value="🎉">🎉</EmojiPickerItem>
         </PopoverContent>
-      </EmojiPicker>,
-    ),
+      </EmojiPicker>
+    )
   )
   const trigger = container.querySelector("button")!
   await React.act(async () => trigger.click())
   expect(trigger.getAttribute("aria-expanded")).toBe("true")
 
-  const emoji = document.querySelector<HTMLElement>('[data-slot="emoji-picker-emoji"]')!
+  const emoji = document.querySelector<HTMLElement>(
+    '[data-slot="emoji-picker-emoji"]'
+  )!
   await React.act(async () => emoji.click())
   expect(picked).toEqual(["🎉"])
   expect(reasons).toEqual(["trigger-press", "item-press"])
@@ -131,8 +151,8 @@ test("a picker that refuses to open keeps the popover closed", async () => {
         <PopoverContent>
           <EmojiPickerItem value="🎉">🎉</EmojiPickerItem>
         </PopoverContent>
-      </EmojiPicker>,
-    ),
+      </EmojiPicker>
+    )
   )
   const trigger = container.querySelector("button")!
   await React.act(async () => trigger.click())

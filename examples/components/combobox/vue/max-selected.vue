@@ -14,7 +14,15 @@ import {
   ComboboxValue,
 } from "@ui-sdk/vue/combobox"
 
-const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const labels = [
+  "Bug",
+  "Feature",
+  "Documentation",
+  "Design",
+  "Performance",
+  "Security",
+  "Testing",
+]
 </script>
 
 <template>
@@ -23,7 +31,11 @@ const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Sec
       <ComboboxLabel>Labels (up to 3)</ComboboxLabel>
       <ComboboxChips>
         <ComboboxValue v-slot="{ value }">
-          <ComboboxChip v-for="label in value as string[]" :key="label" :value="label">
+          <ComboboxChip
+            v-for="label in value as string[]"
+            :key="label"
+            :value="label"
+          >
             {{ label }}
             <ComboboxChipRemove :aria-label="`Remove ${label}`">
               <XIcon aria-hidden="true" />
@@ -35,7 +47,12 @@ const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Sec
     </div>
     <ComboboxContent>
       <ComboboxList>
-        <ComboboxItem v-for="label in labels" v-slot="{ state }" :key="label" :value="label">
+        <ComboboxItem
+          v-for="label in labels"
+          v-slot="{ state }"
+          :key="label"
+          :value="label"
+        >
           {{ label }}
           <span v-if="state.maxReached" data-slot="hint">Limit reached</span>
           <ComboboxItemIndicator>

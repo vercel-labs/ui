@@ -28,12 +28,16 @@ function leastSquaresVelocity(
   times: ArrayLike<number>,
   positions: ArrayLike<number>,
   start = 0,
-  end = times.length,
+  end = times.length
 ) {
   const count = end - start
-  if (count < 2) return 0
+  if (count < 2) {
+    return 0
+  }
   const newest = times[end - 1]
-  if (count < 4) return linearSlope(times, positions, start, end)
+  if (count < 4) {
+    return linearSlope(times, positions, start, end)
+  }
   // Normal equations for x = a + b·t + c·t², with sums of powers of t.
   let s0 = 0,
     s1 = 0,
@@ -57,13 +61,26 @@ function leastSquaresVelocity(
     x2 += x * t2
   }
   // Cramer's rule for the b coefficient of the 3×3 system.
-  const determinant = s0 * (s2 * s4 - s3 * s3) - s1 * (s1 * s4 - s3 * s2) + s2 * (s1 * s3 - s2 * s2)
-  if (Math.abs(determinant) < 1e-9) return linearSlope(times, positions, start, end)
-  const numerator = s0 * (x1 * s4 - s3 * x2) - x0 * (s1 * s4 - s3 * s2) + s2 * (s1 * x2 - x1 * s2)
+  const determinant =
+    s0 * (s2 * s4 - s3 * s3) -
+    s1 * (s1 * s4 - s3 * s2) +
+    s2 * (s1 * s3 - s2 * s2)
+  if (Math.abs(determinant) < 1e-9) {
+    return linearSlope(times, positions, start, end)
+  }
+  const numerator =
+    s0 * (x1 * s4 - s3 * x2) -
+    x0 * (s1 * s4 - s3 * s2) +
+    s2 * (s1 * x2 - x1 * s2)
   return numerator / determinant
 }
 
-function linearSlope(times: ArrayLike<number>, positions: ArrayLike<number>, start: number, end: number) {
+function linearSlope(
+  times: ArrayLike<number>,
+  positions: ArrayLike<number>,
+  start: number,
+  end: number
+) {
   let meanTime = 0,
     meanPosition = 0
   const count = end - start
@@ -91,7 +108,10 @@ function linearSlope(times: ArrayLike<number>, positions: ArrayLike<number>, sta
  * @experimental
  */
 function createVelocityTracker(options: Partial<typeof defaults> = {}) {
-  const { horizon, staleAfter, maxSpeed, capacity } = { ...defaults, ...options }
+  const { horizon, staleAfter, maxSpeed, capacity } = {
+    ...defaults,
+    ...options,
+  }
   const times = new Float64Array(capacity)
   const positions = new Float64Array(capacity)
   const windowTimes = new Float64Array(capacity)
@@ -101,7 +121,9 @@ function createVelocityTracker(options: Partial<typeof defaults> = {}) {
 
   /** Adds a sample: a pointer's position along the axis at `time`, like a move event's `timeStamp`. */
   function add(time: number, position: number) {
-    if (count > 0 && time <= times[newestIndex]) return
+    if (count > 0 && time <= times[newestIndex]) {
+      return
+    }
     newestIndex = (newestIndex + 1) % capacity
     times[newestIndex] = time
     positions[newestIndex] = position
@@ -110,18 +132,29 @@ function createVelocityTracker(options: Partial<typeof defaults> = {}) {
 
   /** The speed at `now` from the recent samples, in px/ms, or 0 when the newest is older than `staleAfter`. */
   function velocity(now: number) {
-    if (count < 2) return 0
+    if (count < 2) {
+      return 0
+    }
     const newest = times[newestIndex]
-    if (now - newest > staleAfter) return 0
+    if (now - newest > staleAfter) {
+      return 0
+    }
     let windowCount = 0
     for (let age = count - 1; age >= 0; age--) {
       const index = (newestIndex - age + capacity) % capacity
-      if (newest - times[index] > horizon) continue
+      if (newest - times[index] > horizon) {
+        continue
+      }
       windowTimes[windowCount] = times[index]
       windowPositions[windowCount] = positions[index]
       windowCount++
     }
-    const fitted = leastSquaresVelocity(windowTimes, windowPositions, 0, windowCount)
+    const fitted = leastSquaresVelocity(
+      windowTimes,
+      windowPositions,
+      0,
+      windowCount
+    )
     return Math.max(-maxSpeed, Math.min(maxSpeed, fitted))
   }
 

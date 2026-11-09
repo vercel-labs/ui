@@ -3,8 +3,9 @@ import { describe, expect, test } from "vitest"
 import App from "./apps/toggle-ssr-app.svelte"
 
 // Svelte's server output carries hydration comments between elements and text.
-const markup = (which: "group" | "button" | "submit" | "separator" | "decorative") =>
-  render(App, { props: { which } }).body.replace(/<!--[^]*?-->/g, "")
+const markup = (
+  which: "group" | "button" | "submit" | "separator" | "decorative"
+) => render(App, { props: { which } }).body.replace(/<!--[^]*?-->/g, "")
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering toggles, buttons and separators", () => {
@@ -22,7 +23,9 @@ describe("server rendering toggles, buttons and separators", () => {
   })
 
   test("a separator renders its role and orientation", () => {
-    expect(markup("separator")).toMatch(/role="separator"[^>]*aria-orientation="vertical"/)
+    expect(markup("separator")).toMatch(
+      /role="separator"[^>]*aria-orientation="vertical"/
+    )
     expect(markup("decorative")).toContain('role="none"')
   })
 })

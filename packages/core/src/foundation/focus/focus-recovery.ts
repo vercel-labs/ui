@@ -41,8 +41,15 @@ function createFocusRecovery<Props = any>(options: {
   let holder: HTMLElement | null = null
 
   const innermost = (node: EventTarget | null) => {
-    for (let el = node instanceof Element ? node : null; el; el = el.parentElement)
-      if (bound.has(el)) return el
+    for (
+      let el = node instanceof Element ? node : null;
+      el;
+      el = el.parentElement
+    ) {
+      if (bound.has(el)) {
+        return el
+      }
+    }
     return null
   }
 
@@ -51,13 +58,21 @@ function createFocusRecovery<Props = any>(options: {
     bind(el: HTMLElement, part: { key: string; props: Props }) {
       bound.set(el, part)
       const focusin = (event: FocusEvent) => {
-        if (innermost(event.target) === el) holder = el
+        if (innermost(event.target) === el) {
+          holder = el
+        }
       }
       // Focus moving elsewhere lets go, unless the element left the page, which
       // some browsers report as a blur too.
       const focusout = () =>
         queueMicrotask(() => {
-          if (holder === el && el.isConnected && !el.contains(document.activeElement)) holder = null
+          if (
+            holder === el &&
+            el.isConnected &&
+            !el.contains(document.activeElement)
+          ) {
+            holder = null
+          }
         })
       el.addEventListener("focusin", focusin)
       el.addEventListener("focusout", focusout)
@@ -65,17 +80,33 @@ function createFocusRecovery<Props = any>(options: {
         el.removeEventListener("focusin", focusin)
         el.removeEventListener("focusout", focusout)
         bound.delete(el)
-        const active = typeof document === "undefined" ? null : document.activeElement
-        const held = el.contains(active) || (holder === el && (!active || active === document.body))
-        if (holder === el) holder = null
-        if (!held) return
+        const active =
+          typeof document === "undefined" ? null : document.activeElement
+        const held =
+          el.contains(active) ||
+          (holder === el && (!active || active === document.body))
+        if (holder === el) {
+          holder = null
+        }
+        if (!held) {
+          return
+        }
         const lost = { key: part.key, props: part.props, el }
         queueMicrotask(() => {
           const now = document.activeElement
           // Something else took focus meanwhile, like a dialog the removal opened.
-          if (now && now !== document.body && now.isConnected && !el.contains(now)) return
+          if (
+            now &&
+            now !== document.body &&
+            now.isConnected &&
+            !el.contains(now)
+          ) {
+            return
+          }
           const target = options.fallback(lost)
-          if (target?.isConnected) target.focus({ preventScroll: true })
+          if (target?.isConnected) {
+            target.focus({ preventScroll: true })
+          }
         })
       }
     },

@@ -1,10 +1,18 @@
-import { createColorScheme, createCookieStorage, createLocalStorage, createPreference } from "@ui-sdk/core"
+import {
+  createColorScheme,
+  createCookieStorage,
+  createLocalStorage,
+  createPreference,
+} from "@ui-sdk/core"
 import { usePreference } from "@ui-sdk/react/preferences"
 import * as React from "react"
 import { type Framework, frameworkIds } from "./frameworks"
 
 // "theme" is the key the site used before, so readers keep their choice.
-const colorScheme = createColorScheme({ storage: createLocalStorage("theme"), global: true })
+const colorScheme = createColorScheme({
+  storage: createLocalStorage("theme"),
+  global: true,
+})
 
 // "" until the reader picks one. The pages are static, so the server never
 // reads the cookie: `next.config.mjs` reads it instead, and serves the page
@@ -57,7 +65,7 @@ function useFramework() {
   const current = React.useSyncExternalStore(
     framework.subscribe,
     currentFramework,
-    () => rendered ?? framework.initialState.value,
+    () => rendered ?? framework.initialState.value
   )
   return [current || "react", setFramework] as const
 }

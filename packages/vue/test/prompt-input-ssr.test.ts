@@ -2,7 +2,12 @@
 import { renderToString } from "@vue/server-renderer"
 import { describe, expect, test } from "vitest"
 import { createSSRApp, h } from "vue"
-import { TokenInput, TokenInputEditor, TriggerMenu, TriggerMenuInput } from "../src"
+import {
+  TokenInput,
+  TokenInputEditor,
+  TriggerMenu,
+  TriggerMenuInput,
+} from "../src"
 
 const value = ["Explain ", { type: "file", value: "src/a.ts", label: "a.ts" }]
 
@@ -13,16 +18,21 @@ describe("server rendering a prompt input", () => {
       createSSRApp({
         render: () =>
           h(TokenInput, { defaultValue: value, name: "prompt" }, () => [
-            h(TokenInputEditor, { "aria-label": "Prompt", placeholder: "Ask anything" }),
+            h(TokenInputEditor, {
+              "aria-label": "Prompt",
+              placeholder: "Ask anything",
+            }),
             h(TriggerMenu, { triggers: [{ char: "@", items: [] }] }),
           ]),
-      }),
+      })
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="textbox"')
     expect(html).toContain('contenteditable="true"')
     expect(html).toMatch(/Explain ​<span[^>]*data-token-type="file"/)
-    expect(html).toMatch(/<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/)
+    expect(html).toMatch(
+      /<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/
+    )
   })
 
   test("a trigger menu's textarea says it autocompletes from a list, and stays a textbox", async () => {
@@ -30,11 +40,13 @@ describe("server rendering a prompt input", () => {
       createSSRApp({
         render: () =>
           h(TriggerMenu, { triggers: [{ char: "@", items: [] }] }, () =>
-            h(TriggerMenuInput, { "aria-label": "Message" }),
+            h(TriggerMenuInput, { "aria-label": "Message" })
           ),
-      }),
+      })
     )
-    expect(html).toMatch(/<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/)
+    expect(html).toMatch(
+      /<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/
+    )
     expect(html).not.toContain("aria-expanded")
   })
 })

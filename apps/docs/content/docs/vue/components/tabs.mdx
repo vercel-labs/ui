@@ -311,7 +311,10 @@ Props are the same as below, in kebab case, and callbacks are events.
 
 ### Tabs
 
-<TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsOptions" />
+<TypeTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsOptions"
+/>
 
 ### TabsList
 
@@ -319,11 +322,17 @@ The list takes no options of its own, only the attributes of the element it rend
 
 ### TabsTab
 
-<TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsTabProps" />
+<TypeTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsTabProps"
+/>
 
 ### TabsTabIcon
 
-<TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsTabIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsTabIconProps"
+/>
 
 ### TabsIndicator
 
@@ -331,7 +340,10 @@ The indicator takes no props of its own. Its [CSS variables](#styling-tabsindica
 
 ### TabsPanel
 
-<TypeTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsPanelProps" />
+<TypeTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsPanelProps"
+/>
 
 ### State
 
@@ -339,33 +351,54 @@ What render functions, state-based class names and slots receive, per part.
 
 `Tabs`:
 
-<StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsState" />
+<StateTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsState"
+/>
 
 `TabsList`:
 
-<StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsListState" />
+<StateTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsListState"
+/>
 
 `TabsTab`:
 
-<StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsTabState" />
+<StateTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsTabState"
+/>
 
 `TabsTabIcon`:
 
-<StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsTabIconState" />
+<StateTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsTabIconState"
+/>
 
 `TabsPanel`:
 
-<StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsPanelState" />
+<StateTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsPanelState"
+/>
 
 `TabsIndicator`:
 
-<StateTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsIndicatorState" />
+<StateTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsIndicatorState"
+/>
 
 ### Reasons
 
 `details.reason` says why the selection changed.
 
-<ReasonTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsValueChangeReason"
+/>
 
 ### Controller
 
@@ -373,7 +406,10 @@ Create one with `createTabsController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs `@value-change` like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/tabs/tabs.ts" name="TabsController" />
+<ControllerTable
+  path="../../packages/core/src/components/tabs/tabs.ts"
+  name="TabsController"
+/>
 
 ### Events
 
@@ -398,7 +434,13 @@ Every line below is an automated test.
 
 <SpecList
   spec="tabs"
-  only={["selection", "keyboard navigation", "manual activation", "vertical", "panels"]}
+  only={[
+    "selection",
+    "keyboard navigation",
+    "manual activation",
+    "vertical",
+    "panels",
+  ]}
 />
 
 Beyond the pattern's baseline:

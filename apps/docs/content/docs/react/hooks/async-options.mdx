@@ -18,17 +18,28 @@ Pass a loader to the hook. This example expects `/api/movies` to return an array
 "use client"
 
 import { useAsyncOptions } from "@ui-sdk/react/async-options"
-import { Combobox, ComboboxContent, ComboboxInput } from "@ui-sdk/react/combobox"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+} from "@ui-sdk/react/combobox"
 
 function MovieSearch() {
   const movies = useAsyncOptions<string>(async (query, { signal }) => {
-    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, { signal })
+    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, {
+      signal,
+    })
     if (!response.ok) throw new Error("Couldn't load movies")
     return response.json()
   })
 
   return (
-    <Combobox items={movies.items} filter={false} status={movies.status} onQueryChange={movies.setQuery}>
+    <Combobox
+      items={movies.items}
+      filter={false}
+      status={movies.status}
+      onQueryChange={movies.setQuery}
+    >
       <ComboboxInput aria-label="Movie" placeholder="Search movies…" />
       <ComboboxContent />
     </Combobox>
@@ -67,9 +78,13 @@ import { useAsyncOptions } from "@ui-sdk/react/async-options"
 
 function useMoviePages() {
   return useAsyncOptions<string>(async (query, { signal, page }) => {
-    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}&page=${page}`, { signal })
+    const response = await fetch(
+      `/api/movies?q=${encodeURIComponent(query)}&page=${page}`,
+      { signal }
+    )
     if (!response.ok) throw new Error("Couldn't load movies")
-    const data: { titles: string[]; next: number | null } = await response.json()
+    const data: { titles: string[]; next: number | null } =
+      await response.json()
     return { items: data.titles, hasMore: data.next !== null }
   })
 }

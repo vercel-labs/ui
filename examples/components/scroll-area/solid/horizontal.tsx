@@ -27,7 +27,10 @@ function Example() {
             <For each={swatches}>
               {(swatch) => (
                 <li>
-                  <div data-slot="swatch" style={{ background: swatch.color }} />
+                  <div
+                    data-slot="swatch"
+                    style={{ background: swatch.color }}
+                  />
                   {swatch.name}
                 </li>
               )}

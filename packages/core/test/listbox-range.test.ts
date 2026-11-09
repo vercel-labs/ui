@@ -24,28 +24,34 @@ describe("listbox ranges", () => {
 
   test("a range that replaces the selection is only the range", () => {
     const anchor = { key: "b", base: ["a", "f"] }
-    expect(rangeSelection(order, anchor, "d", { additive: false, selectable: everything })).toEqual([
-      "b",
-      "c",
-      "d",
-    ])
+    expect(
+      rangeSelection(order, anchor, "d", {
+        additive: false,
+        selectable: everything,
+      })
+    ).toEqual(["b", "c", "d"])
   })
 
   test("a range that adds keeps the base first, in its order", () => {
     const anchor = { key: "c", base: ["f", "a"] }
-    expect(rangeSelection(order, anchor, "e", { additive: true, selectable: everything })).toEqual([
-      "f",
-      "a",
-      "c",
-      "d",
-      "e",
-    ])
+    expect(
+      rangeSelection(order, anchor, "e", {
+        additive: true,
+        selectable: everything,
+      })
+    ).toEqual(["f", "a", "c", "d", "e"])
   })
 
   test("extending again replaces the range, not the base, so a range can shrink", () => {
     const anchor = { key: "b", base: ["f"] }
-    const wide = rangeSelection(order, anchor, "e", { additive: true, selectable: everything })
-    const narrow = rangeSelection(order, anchor, "c", { additive: true, selectable: everything })
+    const wide = rangeSelection(order, anchor, "e", {
+      additive: true,
+      selectable: everything,
+    })
+    const narrow = rangeSelection(order, anchor, "c", {
+      additive: true,
+      selectable: everything,
+    })
     expect(wide).toEqual(["f", "b", "c", "d", "e"])
     expect(narrow).toEqual(["f", "b", "c"])
   })
@@ -53,14 +59,19 @@ describe("listbox ranges", () => {
   test("a range skips keys that can't be chosen", () => {
     const anchor = { key: "a", base: [] }
     const selectable = (key: string) => key !== "c"
-    expect(rangeSelection(order, anchor, "d", { additive: false, selectable })).toEqual(["a", "b", "d"])
+    expect(
+      rangeSelection(order, anchor, "d", { additive: false, selectable })
+    ).toEqual(["a", "b", "d"])
   })
 
   test("a range from an anchor that can't be chosen starts after it", () => {
     const anchor = { key: "a", base: [] }
-    expect(rangeSelection(order, anchor, "c", { additive: false, selectable: (key) => key !== "a" })).toEqual(
-      ["b", "c"],
-    )
+    expect(
+      rangeSelection(order, anchor, "c", {
+        additive: false,
+        selectable: (key) => key !== "a",
+      })
+    ).toEqual(["b", "c"])
   })
 
   test("toggling adds a key at the end, or removes it", () => {

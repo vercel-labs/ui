@@ -45,7 +45,7 @@ function mount(root: HTMLElement) {
       ? projects
           .map(
             (name) =>
-              `<li data-slot="row">${name}<button type="button" data-size="sm" aria-label="Delete ${name}">Delete</button></li>`,
+              `<li data-slot="row">${name}<button type="button" data-size="sm" aria-label="Delete ${name}">Delete</button></li>`
           )
           .join("")
       : `<li data-slot="row">All projects deleted.</li>`
@@ -58,14 +58,20 @@ function mount(root: HTMLElement) {
   async function remove(name: string, index: number) {
     const confirmed = await confirm({
       title: `Delete ${name}?`,
-      description: "The project and its files will be deleted for everyone on your team.",
+      description:
+        "The project and its files will be deleted for everyone on your team.",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
     })
-    if (!confirmed) return
+    if (!confirmed) {
+      return
+    }
     projects = projects.filter((project) => project !== name)
     render()
-    ;(list.querySelectorAll("button")[Math.min(index, projects.length - 1)] ?? reset).focus()
+    ;(
+      list.querySelectorAll("button")[Math.min(index, projects.length - 1)] ??
+      reset
+    ).focus()
     toast.success(`${name} deleted`, { priority: "assertive" })
   }
 
@@ -75,13 +81,16 @@ function mount(root: HTMLElement) {
   })
   render()
 
-  const dialog = root.querySelector<UiAlertDialogElement<ConfirmOptions>>("ui-alert-dialog")!
+  const dialog =
+    root.querySelector<UiAlertDialogElement<ConfirmOptions>>("ui-alert-dialog")!
   const [cancel, agree] = dialog.querySelectorAll("button")
   dialog.controller = confirm.controller
   dialog.addEventListener("payloadchange", (event) => {
     const question = event.detail.value
-    dialog.querySelector("ui-alert-dialog-title")!.textContent = question?.title ?? ""
-    dialog.querySelector("ui-alert-dialog-description")!.textContent = question?.description ?? ""
+    dialog.querySelector("ui-alert-dialog-title")!.textContent =
+      question?.title ?? ""
+    dialog.querySelector("ui-alert-dialog-description")!.textContent =
+      question?.description ?? ""
     cancel.textContent = question?.cancelLabel ?? ""
     agree.textContent = question?.confirmLabel ?? ""
   })
@@ -93,7 +102,12 @@ function mount(root: HTMLElement) {
       <ui-toast-title></ui-toast-title>
     </ui-toast>
   `
-  dialog.before(Object.assign(document.createElement("ui-overlay-host"), { overlays, toast: { template } }))
+  dialog.before(
+    Object.assign(document.createElement("ui-overlay-host"), {
+      overlays,
+      toast: { template },
+    })
+  )
   return () => {
     toast.dismiss()
   }

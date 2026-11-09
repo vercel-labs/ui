@@ -10,15 +10,21 @@ import {
   test,
   transitionedIn,
 } from "../fixtures"
-import { addScroller, addShadowButton, composingEscape } from "../fixtures/popup"
+import {
+  addScroller,
+  addShadowButton,
+  composingEscape,
+} from "../fixtures/popup"
 
 // The trigger is a button that opens a dialog, following the WAI-ARIA dialog
 // pattern for focus inside it: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/
 // Non-modal popovers leave the rest of the page usable.
 
-const dialog = (page: Page) => page.getByRole("dialog", { name: "Edit profile" })
+const dialog = (page: Page) =>
+  page.getByRole("dialog", { name: "Edit profile" })
 const trigger = (page: Page) => page.getByRole("button", { name: "Profile" })
-const field = (page: Page) => page.getByRole("textbox", { name: "Display name" })
+const field = (page: Page) =>
+  page.getByRole("textbox", { name: "Display name" })
 
 async function openWithKeyboard(page: Page) {
   await trigger(page).focus()
@@ -51,7 +57,9 @@ test.describe("trigger", () => {
   })
 
   for (const key of ["Enter", " "]) {
-    test(`${key === " " ? "Space" : key} opens the popover`, async ({ page }) => {
+    test(`${key === " " ? "Space" : key} opens the popover`, async ({
+      page,
+    }) => {
       await trigger(page).focus()
       await page.keyboard.press(key)
       await expect(dialog(page)).toBeVisible()
@@ -66,7 +74,9 @@ test.describe("trigger", () => {
 })
 
 test.describe("focus", () => {
-  test("opening moves focus to the first focusable element", async ({ page }) => {
+  test("opening moves focus to the first focusable element", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await expect(field(page)).toBeFocused()
   })
@@ -80,7 +90,7 @@ test.describe("focus", () => {
       await page.keyboard.press("Escape")
       await expect(trigger(page)).toBeFocused()
       expect(await dialogNamesAtFocus(page), `open ${time}`).toEqual(
-        Array(time).fill("Edit profile / Your name appears on your posts."),
+        Array(time).fill("Edit profile / Your name appears on your posts.")
       )
     }
   })
@@ -98,7 +108,10 @@ test.describe("focus", () => {
     tab,
     fixtureOptions,
   }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet is modal by default, so focus and presses stay in it.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet is modal by default, so focus and presses stay in it."
+    )
     await openWithKeyboard(page)
     await tab({ shift: true })
     await expect(trigger(page)).toBeFocused()
@@ -109,29 +122,43 @@ test.describe("focus", () => {
     tab,
     fixtureOptions,
   }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet is modal by default, so focus and presses stay in it.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet is modal by default, so focus and presses stay in it."
+    )
     await openWithKeyboard(page)
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
     await expect(page.getByRole("button", { name: "After" })).toBeFocused()
   })
 
-  test("focus leaving the popover closes it", async ({ page, tab, fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet is modal by default, so focus and presses stay in it.")
+  test("focus leaving the popover closes it", async ({
+    page,
+    tab,
+    fixtureOptions,
+  }) => {
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet is modal by default, so focus and presses stay in it."
+    )
     await openWithKeyboard(page)
     await page.getByRole("button", { name: "Close" }).focus()
     await tab()
     await expect(dialog(page)).toBeHidden()
   })
 
-  test("Escape closes the popover and returns focus to the trigger", async ({ page }) => {
+  test("Escape closes the popover and returns focus to the trigger", async ({
+    page,
+  }) => {
     await openWithKeyboard(page)
     await page.keyboard.press("Escape")
     await expect(dialog(page)).toBeHidden()
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("Escape after a click returns focus to the trigger", async ({ page }) => {
+  test("Escape after a click returns focus to the trigger", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     await page.keyboard.press("Escape")
@@ -139,7 +166,9 @@ test.describe("focus", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("the close button closes the popover and returns focus to the trigger", async ({ page }) => {
+  test("the close button closes the popover and returns focus to the trigger", async ({
+    page,
+  }) => {
     await openWithKeyboard(page)
     await page.getByRole("button", { name: "Close" }).focus()
     await page.keyboard.press("Enter")
@@ -147,7 +176,10 @@ test.describe("focus", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("with initial focus none, opening leaves focus on the trigger", async ({ page, open }) => {
+  test("with initial focus none, opening leaves focus on the trigger", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { initialFocus: "none" })
     await trigger(page).focus()
     await page.keyboard.press("Enter")
@@ -156,7 +188,9 @@ test.describe("focus", () => {
     await expect(trigger(page)).toBeFocused()
   })
 
-  test("a virtual click from a screen reader moves focus into the popover", async ({ page }) => {
+  test("a virtual click from a screen reader moves focus into the popover", async ({
+    page,
+  }) => {
     await trigger(page).evaluate((el) => (el as HTMLElement).click())
     await expect(field(page)).toBeFocused()
   })
@@ -166,7 +200,11 @@ test.describe("focus", () => {
     framework,
     baseURL,
   }) => {
-    const context = await browser.newContext({ hasTouch: true, isMobile: true, baseURL })
+    const context = await browser.newContext({
+      hasTouch: true,
+      isMobile: true,
+      baseURL,
+    })
     const page = await context.newPage()
     await page.goto(`/?fixture=popover&framework=${framework}`)
     await page.locator("body[data-mounted]").waitFor({ state: "attached" })
@@ -187,7 +225,7 @@ test.describe("focus", () => {
       await page.keyboard.press("Escape")
       await expect(dialog(page)).toBeHidden()
       await expect(page.getByRole("button", { name: "After" })).toBeFocused()
-    },
+    }
   )
 
   test("pressing a button inside keeps the popover open", async ({ page }) => {
@@ -212,10 +250,18 @@ test.describe("dismissal", () => {
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("an outside press reaches what it hits", async ({ page, fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet is modal by default, so focus and presses stay in it.")
+  test("an outside press reaches what it hits", async ({
+    page,
+    fixtureOptions,
+  }) => {
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet is modal by default, so focus and presses stay in it."
+    )
     const after = page.getByRole("button", { name: "After" })
-    await after.evaluate((el) => el.addEventListener("click", () => (el.dataset.clicked = "")))
+    await after.evaluate((el) =>
+      el.addEventListener("click", () => (el.dataset.clicked = ""))
+    )
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     await after.click()
@@ -223,7 +269,10 @@ test.describe("dismissal", () => {
     await expect(after).toHaveAttribute("data-clicked")
   })
 
-  test("a press on empty space returns focus to the trigger", async ({ page, open }) => {
+  test("a press on empty space returns focus to the trigger", async ({
+    page,
+    open,
+  }) => {
     await open("popover")
     await trigger(page).focus()
     await page.keyboard.press("Enter")
@@ -243,10 +292,12 @@ test.describe("dismissal", () => {
       await expect(dialog(page)).toBeVisible()
       await page.keyboard.press("Escape")
       await expect(dialog(page)).toBeHidden()
-    },
+    }
   )
 
-  test("pressing a scrollbar outside the popover leaves it open", async ({ page }) => {
+  test("pressing a scrollbar outside the popover leaves it open", async ({
+    page,
+  }) => {
     const scrollbar = await addScroller(page)
     test.skip(!scrollbar, "This browser hides scrollbars in automation.")
     await trigger(page).click()
@@ -258,7 +309,9 @@ test.describe("dismissal", () => {
     await expect(dialog(page)).toBeHidden()
   })
 
-  test("pressing a button in a shadow root inside keeps the popover open", async ({ page }) => {
+  test("pressing a button in a shadow root inside keeps the popover open", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await addShadowButton(page.getByRole("button", { name: "Save" }))
     await page.getByRole("button", { name: "Shadow" }).click()
@@ -268,7 +321,10 @@ test.describe("dismissal", () => {
     await expect(dialog(page)).toBeHidden()
   })
 
-  test("Tab into a button in a shadow root inside keeps the popover open", async ({ page, tab }) => {
+  test("Tab into a button in a shadow root inside keeps the popover open", async ({
+    page,
+    tab,
+  }) => {
     await openWithKeyboard(page)
     await addShadowButton(page.getByRole("button", { name: "Save" }))
     await tab()
@@ -277,7 +333,9 @@ test.describe("dismissal", () => {
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("Escape on a button in a shadow root inside returns focus to the trigger", async ({ page }) => {
+  test("Escape on a button in a shadow root inside returns focus to the trigger", async ({
+    page,
+  }) => {
     await openWithKeyboard(page)
     await addShadowButton(page.getByRole("button", { name: "Save" }))
     await page.getByRole("button", { name: "Shadow" }).focus()
@@ -298,7 +356,10 @@ test.describe("dismissal", () => {
 
 test.describe("not dismissible", { tag: "@enhancement" }, () => {
   const log = (page: Page) =>
-    page.evaluate(() => (window as unknown as { __popoverLog?: string[] }).__popoverLog ?? [])
+    page.evaluate(
+      () =>
+        (window as unknown as { __popoverLog?: string[] }).__popoverLog ?? []
+    )
 
   test.beforeEach(async ({ open, page }) => {
     await open("popover", { dismissible: "false" })
@@ -312,7 +373,9 @@ test.describe("not dismissible", { tag: "@enhancement" }, () => {
     expect(await log(page)).toEqual(["attempt:escape-key"])
   })
 
-  test("an outside press reports an attempt and keeps it open", async ({ page }) => {
+  test("an outside press reports an attempt and keeps it open", async ({
+    page,
+  }) => {
     await page.mouse.click(5, 5)
     await expect(dialog(page)).toBeVisible()
     expect(await log(page)).toEqual(["attempt:outside-press"])
@@ -330,23 +393,36 @@ test.describe("not dismissible", { tag: "@enhancement" }, () => {
 
 test.describe("modal", () => {
   for (const modal of ["true", "trap-focus"]) {
-    test(`with modal ${modal}, Tab stays inside the popover`, async ({ page, open, tab }) => {
+    test(`with modal ${modal}, Tab stays inside the popover`, async ({
+      page,
+      open,
+      tab,
+    }) => {
       await open("popover", { modal })
       await openWithKeyboard(page)
       await page.getByRole("button", { name: "Close" }).focus()
       await tab()
       await expect(dialog(page)).toBeVisible()
       await expect
-        .poll(() => page.evaluate(() => !!document.activeElement?.closest('[role="dialog"]')))
+        .poll(() =>
+          page.evaluate(
+            () => !!document.activeElement?.closest('[role="dialog"]')
+          )
+        )
         .toBe(true)
     })
   }
 
-  test("with modal true, an outside press only closes the popover", async ({ page, open }) => {
+  test("with modal true, an outside press only closes the popover", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { modal: "true" })
     // Modal popovers hide the rest of the page from assistive technology, so find it by text.
     const after = page.locator("button", { hasText: "After" })
-    await after.evaluate((el) => el.addEventListener("click", () => (el.dataset.clicked = "")))
+    await after.evaluate((el) =>
+      el.addEventListener("click", () => (el.dataset.clicked = ""))
+    )
     const box = (await after.boundingBox())!
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
@@ -355,7 +431,10 @@ test.describe("modal", () => {
     await expect(after).not.toHaveAttribute("data-clicked")
   })
 
-  test("with modal true, the page doesn't scroll while open", async ({ page, open }) => {
+  test("with modal true, the page doesn't scroll while open", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { modal: "true", layout: "tall" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
@@ -379,15 +458,21 @@ test.describe("hover", () => {
     await open("popover", { hover: "", delay: "50", closeDelay: "50" })
   })
 
-  test("resting the pointer on the trigger opens the popover", async ({ page }) => {
+  test("resting the pointer on the trigger opens the popover", async ({
+    page,
+  }) => {
     await trigger(page).hover()
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("moving the pointer into the popover keeps it open", async ({ page }) => {
+  test("moving the pointer into the popover keeps it open", async ({
+    page,
+  }) => {
     await trigger(page).hover()
     await expect(dialog(page)).toBeVisible()
-    const box = (await page.getByRole("heading", { name: "Edit profile" }).boundingBox())!
+    const box = (await page
+      .getByRole("heading", { name: "Edit profile" })
+      .boundingBox())!
     await page.mouse.move(box.x + 10, box.y + box.height / 2, { steps: 8 })
     await page.waitForTimeout(300)
     await expect(dialog(page)).toBeVisible()
@@ -396,13 +481,21 @@ test.describe("hover", () => {
   test("moving the pointer away closes the popover", async ({ page }) => {
     await trigger(page).hover()
     await expect(dialog(page)).toBeVisible()
-    const box = (await page.getByRole("button", { name: "Before" }).boundingBox())!
+    const box = (await page
+      .getByRole("button", { name: "Before" })
+      .boundingBox())!
     await page.mouse.move(box.x + 5, box.y + 5, { steps: 4 })
     await expect(dialog(page)).toBeHidden()
   })
 
-  test("opening on hover leaves focus where it was", async ({ page, fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet is modal by default, so focus and presses stay in it.")
+  test("opening on hover leaves focus where it was", async ({
+    page,
+    fixtureOptions,
+  }) => {
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet is modal by default, so focus and presses stay in it."
+    )
     await page.getByRole("button", { name: "Before" }).focus()
     await trigger(page).hover()
     await expect(dialog(page)).toBeVisible()
@@ -410,7 +503,9 @@ test.describe("hover", () => {
     await expect(page.getByRole("button", { name: "Before" })).toBeFocused()
   })
 
-  test("keyboard focus on the trigger doesn't open the popover", async ({ page }) => {
+  test("keyboard focus on the trigger doesn't open the popover", async ({
+    page,
+  }) => {
     await trigger(page).focus()
     await page.waitForTimeout(200)
     await expect(dialog(page)).toBeHidden()
@@ -421,7 +516,10 @@ test.describe("hover", () => {
     open,
     fixtureOptions,
   }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet is modal by default, so focus and presses stay in it.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet is modal by default, so focus and presses stay in it."
+    )
     await page.getByRole("button", { name: "Before" }).focus()
     await trigger(page).hover()
     await expect(dialog(page)).toBeVisible()
@@ -439,7 +537,10 @@ test.describe("hover", () => {
 
 test.describe("positioning", () => {
   test.beforeEach(({ fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet isn't placed against its trigger.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet isn't placed against its trigger."
+    )
   })
 
   test("the popover opens below the trigger", async ({ page }) => {
@@ -450,7 +551,10 @@ test.describe("positioning", () => {
     await expect(dialog(page)).toHaveAttribute("data-side", "bottom")
   })
 
-  test("the popover flips above the trigger when there is no room below", async ({ page, open }) => {
+  test("the popover flips above the trigger when there is no room below", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { layout: "bottom" })
     await trigger(page).click()
     const popup = (await dialog(page).boundingBox())!
@@ -459,14 +563,21 @@ test.describe("positioning", () => {
     await expect(dialog(page)).toHaveAttribute("data-side", "top")
   })
 
-  test("a popover above its trigger stays against it as its content grows", async ({ page, open }) => {
+  test("a popover above its trigger stays against it as its content grows", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { layout: "bottom" })
     await trigger(page).click()
     await expect(dialog(page)).toHaveAttribute("data-side", "top")
     // Measured once the entrance has finished, which a loaded machine slows.
     await expect
       .poll(() =>
-        dialog(page).evaluate((el) => !el.hasAttribute("data-starting-style") && !el.getAnimations().length),
+        dialog(page).evaluate(
+          (el) =>
+            !el.hasAttribute("data-starting-style") &&
+            !el.getAnimations().length
+        )
       )
       .toBe(true)
     const gap = async () => {
@@ -477,9 +588,13 @@ test.describe("positioning", () => {
     const before = await gap()
     // Content added inside the popup, which positioning hears only through its size.
     await dialog(page).evaluate((el) =>
-      el.append(Object.assign(document.createElement("p"), { textContent: "More" })),
+      el.append(
+        Object.assign(document.createElement("p"), { textContent: "More" })
+      )
     )
-    await expect.poll(async () => (await dialog(page).boundingBox())!.height).toBeGreaterThan(0)
+    await expect
+      .poll(async () => (await dialog(page).boundingBox())!.height)
+      .toBeGreaterThan(0)
     await expect.poll(gap).toBe(before)
   })
 
@@ -491,7 +606,10 @@ test.describe("positioning", () => {
     expect(popup.x).toBeGreaterThanOrEqual(anchor.x + anchor.width - 1)
   })
 
-  test("the popover follows its trigger when the page scrolls", async ({ page, open }) => {
+  test("the popover follows its trigger when the page scrolls", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { layout: "tall" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
@@ -505,37 +623,58 @@ test.describe("positioning", () => {
       .toBe(8)
   })
 
-  test("the popover exposes the space it has as CSS variables", async ({ page }) => {
+  test("the popover exposes the space it has as CSS variables", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     const variables = await dialog(page).evaluate((el) =>
-      ["--available-height", "--available-width", "--anchor-width", "--transform-origin"].map((name) =>
-        getComputedStyle(el).getPropertyValue(name),
-      ),
+      [
+        "--available-height",
+        "--available-width",
+        "--anchor-width",
+        "--transform-origin",
+      ].map((name) => getComputedStyle(el).getPropertyValue(name))
     )
-    for (const value of variables) expect(value).toMatch(/\dpx/)
+    for (const value of variables) {
+      expect(value).toMatch(/\dpx/)
+    }
   })
 
   test("the arrow points at the middle of the trigger", async ({ page }) => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
-    const arrow = (await page.locator('.arrow, [data-slot="popover-arrow"]').first().boundingBox())!
+    const arrow = (await page
+      .locator('.arrow, [data-slot="popover-arrow"]')
+      .first()
+      .boundingBox())!
     const anchor = (await trigger(page).boundingBox())!
-    expect(Math.abs(arrow.x + arrow.width / 2 - (anchor.x + anchor.width / 2))).toBeLessThanOrEqual(1)
+    expect(
+      Math.abs(arrow.x + arrow.width / 2 - (anchor.x + anchor.width / 2))
+    ).toBeLessThanOrEqual(1)
   })
 
-  test("the arrow outside the popover isn't clipped, and page styles still apply", async ({ page }) => {
+  test("the arrow outside the popover isn't clipped, and page styles still apply", async ({
+    page,
+  }) => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     const style = await dialog(page).evaluate((el) => {
       const { overflow, paddingTop, borderTopWidth } = getComputedStyle(el)
       return { overflow, paddingTop, borderTopWidth }
     })
-    expect(style).toEqual({ overflow: "visible", paddingTop: "12px", borderTopWidth: "1px" })
+    expect(style).toEqual({
+      overflow: "visible",
+      paddingTop: "12px",
+      borderTopWidth: "1px",
+    })
     const arrow = page.locator('.arrow, [data-slot="popover-arrow"]').first()
     const box = (await arrow.boundingBox())!
     const tip = { x: box.x + box.width / 2, y: box.y + 1 }
-    const hit = await arrow.evaluate((el, { x, y }) => el.contains(document.elementFromPoint(x, y)), tip)
+    const hit = await arrow.evaluate(
+      (el, { x, y }) => el.contains(document.elementFromPoint(x, y)),
+      tip
+    )
     expect(hit).toBe(true)
   })
 })
@@ -545,19 +684,27 @@ test.describe("nested popovers", () => {
     await open("popover", { nested: "" })
     await trigger(page).click()
     await page.getByRole("button", { name: "More" }).click()
-    await expect(page.getByRole("dialog", { name: "More options" })).toBeVisible()
+    await expect(
+      page.getByRole("dialog", { name: "More options" })
+    ).toBeVisible()
   })
 
   test("using a nested popover keeps both open", async ({ page }) => {
     await page.getByRole("button", { name: "Archive" }).click()
     expect(await lastAction(page)).toBe("archive")
-    await expect(page.getByRole("dialog", { name: "More options" })).toBeVisible()
+    await expect(
+      page.getByRole("dialog", { name: "More options" })
+    ).toBeVisible()
     await expect(dialog(page)).toBeVisible()
   })
 
-  test("Escape closes only the nested popover and returns focus to its trigger", async ({ page }) => {
+  test("Escape closes only the nested popover and returns focus to its trigger", async ({
+    page,
+  }) => {
     await page.keyboard.press("Escape")
-    await expect(page.getByRole("dialog", { name: "More options" })).toBeHidden()
+    await expect(
+      page.getByRole("dialog", { name: "More options" })
+    ).toBeHidden()
     await expect(dialog(page)).toBeVisible()
     await expect(page.getByRole("button", { name: "More" })).toBeFocused()
   })
@@ -573,7 +720,10 @@ test.describe("a menu inside the popover", () => {
   const menu = (page: Page) => page.getByRole("menu", { name: "Actions" })
 
   for (const modal of ["false", "true"]) {
-    test(`with modal ${modal}, using the menu keeps the popover open`, async ({ page, open }) => {
+    test(`with modal ${modal}, using the menu keeps the popover open`, async ({
+      page,
+      open,
+    }) => {
       await open("popover", { menu: "", modal })
       await trigger(page).click()
       await actions(page).click()
@@ -592,14 +742,19 @@ test.describe("a menu inside the popover", () => {
     await trigger(page).click()
     await actions(page).focus()
     await page.keyboard.press("Enter")
-    await expect(page.getByRole("menuitem", { name: "Duplicate" })).toBeFocused()
+    await expect(
+      page.getByRole("menuitem", { name: "Duplicate" })
+    ).toBeFocused()
     await page.keyboard.press("Escape")
     await expect(menu(page)).toBeHidden()
     await expect(dialog(page)).toBeVisible()
     await expect(actions(page)).toBeFocused()
   })
 
-  test("clicking outside closes the menu and the popover", async ({ page, open }) => {
+  test("clicking outside closes the menu and the popover", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { menu: "" })
     await trigger(page).click()
     await actions(page).click()
@@ -611,8 +766,15 @@ test.describe("a menu inside the popover", () => {
 })
 
 test.describe("animation", () => {
-  test("the popup animates in from its starting style", async ({ page, open, fixtureOptions }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+  test("the popup animates in from its starting style", async ({
+    page,
+    open,
+    fixtureOptions,
+  }) => {
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet slides in, with no starting style to fade from."
+    )
     await open("popover", { animate: "" })
     await slowTransitions(page)
     await trigger(page).click()
@@ -625,7 +787,10 @@ test.describe("animation", () => {
     open,
     fixtureOptions,
   }) => {
-    test.skip(isSheet(fixtureOptions), "A sheet slides in, with no starting style to fade from.")
+    test.skip(
+      isSheet(fixtureOptions),
+      "A sheet slides in, with no starting style to fade from."
+    )
     await open("popover", { animate: "" })
     await slowTransitions(page)
     await page.addStyleTag({
@@ -637,17 +802,24 @@ test.describe("animation", () => {
     expect(await opacityOf(dialog(page))).toBeLessThan(0.5)
   })
 
-  test("the popup stays mounted while it animates out", async ({ page, open }) => {
+  test("the popup stays mounted while it animates out", async ({
+    page,
+    open,
+  }) => {
     await open("popover", { animate: "" })
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     await transitionedIn(dialog(page))
     await trigger(page).click()
-    await expect(page.locator('[role="dialog"][data-ending-style]')).toHaveCount(1)
+    await expect(
+      page.locator('[role="dialog"][data-ending-style]')
+    ).toHaveCount(1)
     await expect(page.getByRole("dialog")).toHaveCount(0)
   })
 
-  test("exit keyframes keyed on data-closed play before the popup unmounts", async ({ page }) => {
+  test("exit keyframes keyed on data-closed play before the popup unmounts", async ({
+    page,
+  }) => {
     await page.addStyleTag({
       content:
         '@keyframes exit { to { opacity: 0 } } [data-slot="popover-content"][data-closed], .popup[data-closed] { animation: exit 3s }',
@@ -655,16 +827,24 @@ test.describe("animation", () => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     await page.keyboard.press("Escape")
-    const exiting = page.locator('[role="dialog"][data-closed][data-ending-style]')
+    const exiting = page.locator(
+      '[role="dialog"][data-closed][data-ending-style]'
+    )
     await expect(exiting).toHaveCount(1)
     expect(
       await exiting.evaluate((el) =>
-        el.getAnimations().some((animation) => (animation as CSSAnimation).animationName === "exit"),
-      ),
+        el
+          .getAnimations()
+          .some(
+            (animation) => (animation as CSSAnimation).animationName === "exit"
+          )
+      )
     ).toBe(true)
   })
 
-  test("a popover reopened while its data-closed keyframes play shows open", async ({ page }) => {
+  test("a popover reopened while its data-closed keyframes play shows open", async ({
+    page,
+  }) => {
     await page.addStyleTag({
       content:
         '@keyframes exit { to { opacity: 0 } } [data-slot="popover-content"][data-closed], .popup[data-closed] { animation: exit 3s }',
@@ -672,19 +852,26 @@ test.describe("animation", () => {
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     await page.keyboard.press("Escape")
-    await expect(page.locator('[role="dialog"][data-ending-style]')).toHaveCount(1)
+    await expect(
+      page.locator('[role="dialog"][data-ending-style]')
+    ).toHaveCount(1)
     await trigger(page).click()
     await expect(dialog(page)).toHaveAttribute("data-open", "")
     await expect(dialog(page)).not.toHaveAttribute("data-closed")
     await expect(dialog(page)).not.toHaveAttribute("data-ending-style")
   })
 
-  test("a popover closed without animation reports closed", async ({ page, open }) => {
+  test("a popover closed without animation reports closed", async ({
+    page,
+    open,
+  }) => {
     await open("popover")
     await trigger(page).click()
     await expect(dialog(page)).toBeVisible()
     await page.keyboard.press("Escape")
-    await expect(page.locator('[data-slot="popover-content"][data-open]')).toHaveCount(0)
+    await expect(
+      page.locator('[data-slot="popover-content"][data-open]')
+    ).toHaveCount(0)
   })
 
   test(
@@ -693,7 +880,8 @@ test.describe("animation", () => {
     async ({ page, open }) => {
       await open("popover", { animate: "" })
       await page.addStyleTag({
-        content: '[data-slot="popover-content"], .popup { transition-duration: 3s !important }',
+        content:
+          '[data-slot="popover-content"], .popup { transition-duration: 3s !important }',
       })
       await trigger(page).click()
       await expect(dialog(page)).toBeVisible()
@@ -710,19 +898,27 @@ test.describe("animation", () => {
       })
       await page.keyboard.press("Escape")
       await expect(
-        page.locator('[data-slot="popover-content"][data-ending-style], .popup[data-ending-style]'),
+        page.locator(
+          '[data-slot="popover-content"][data-ending-style], .popup[data-ending-style]'
+        )
       ).toHaveCount(1)
       await page.mouse.click(point.x, point.y)
-      await expect(page.locator("button", { hasText: "Beneath" })).toHaveAttribute("data-clicked", "")
       await expect(
-        page.locator('[data-slot="popover-content"][data-ending-style], .popup[data-ending-style]'),
+        page.locator("button", { hasText: "Beneath" })
+      ).toHaveAttribute("data-clicked", "")
+      await expect(
+        page.locator(
+          '[data-slot="popover-content"][data-ending-style], .popup[data-ending-style]'
+        )
       ).toHaveCount(1)
-    },
+    }
   )
 
   test("rapid toggling ends in a consistent state", async ({ page, open }) => {
     await open("popover", { animate: "" })
-    for (let i = 0; i < 9; i++) await trigger(page).click({ delay: 0 })
+    for (let i = 0; i < 9; i++) {
+      await trigger(page).click({ delay: 0 })
+    }
     await expect(trigger(page)).toHaveAttribute("aria-expanded", "true")
     await expect(dialog(page)).toBeVisible()
     await expect(page.getByRole("dialog")).toHaveCount(1)
@@ -730,14 +926,23 @@ test.describe("animation", () => {
 })
 
 test.describe("top layer", () => {
-  test("popovers render into their container", async ({ page, open, fixtureOptions }) => {
+  test("popovers render into their container", async ({
+    page,
+    open,
+    fixtureOptions,
+  }) => {
     test.skip(!fixtureOptions.container, "Only for portal projects.")
     await open("popover", { nested: "" })
     await trigger(page).click()
-    await expect(page.locator(`#${fixtureOptions.container} > [role="dialog"]`)).toHaveCount(1)
+    await expect(
+      page.locator(`#${fixtureOptions.container} > [role="dialog"]`)
+    ).toHaveCount(1)
   })
 
-  test("without top layer support, popovers portal to the body", async ({ page, open }) => {
+  test("without top layer support, popovers portal to the body", async ({
+    page,
+    open,
+  }) => {
     // An older browser: no popover methods, and no built-in styles that hide [popover].
     await page.addInitScript(() => {
       delete (HTMLElement.prototype as Partial<HTMLElement>).showPopover
@@ -758,7 +963,7 @@ test.describe("top layer", () => {
         (el.parentElement?.matches('[data-slot$="-viewport"]')
           ? el.parentElement.parentElement
           : el.parentElement
-        )?.tagName,
+        )?.tagName
     )
     expect(parent).toMatch(/BODY|DIV/)
     await page.keyboard.press("Escape")

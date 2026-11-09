@@ -26,7 +26,9 @@ const TokenContext = React.createContext<string | null>(null)
 
 function useTokenId(part: string) {
   const id = React.useContext(TokenContext)
-  if (!id) throw new Error(`<${part}> must be used inside renderToken.`)
+  if (!id) {
+    throw new Error(`<${part}> must be used inside renderToken.`)
+  }
   return id
 }
 
@@ -78,7 +80,13 @@ function Tokens({
   return input.api.internal
     .hosts()
     .map(({ id, token, host }) =>
-      createPortal(<TokenContext.Provider value={id}>{renderToken(token)}</TokenContext.Provider>, host, id),
+      createPortal(
+        <TokenContext.Provider value={id}>
+          {renderToken(token)}
+        </TokenContext.Provider>,
+        host,
+        id
+      )
     )
 }
 
@@ -97,7 +105,8 @@ function TokenInputEditor({
   placeholder,
   render,
   ...props
-}: Omit<PartProps<"div", TokenInputEditorState>, "children"> & TokenInputEditorProps) {
+}: Omit<PartProps<"div", TokenInputEditorState>, "children"> &
+  TokenInputEditorProps) {
   const input = useHandle(tokenInput)
   // The first value as markup, so a server render shows it. React never touches it again.
   const [html] = React.useState(() => ({
@@ -129,7 +138,13 @@ function TokenInputTokenRemove(props: PartProps<"span">) {
   return usePart(tokenInput, "token-remove", { id, token: id }, props, "span")
 }
 
-export { createTokenInputController, defaultCodec, fromText, toLabel, toText } from "@ui-sdk/core/token-input"
+export {
+  createTokenInputController,
+  defaultCodec,
+  fromText,
+  toLabel,
+  toText,
+} from "@ui-sdk/core/token-input"
 export type {
   HistoryOptions,
   TextEditorAdapter,
@@ -153,4 +168,10 @@ export type {
   TokenInsert,
 } from "@ui-sdk/core/token-input"
 
-export { TokenInput, TokenInputEditor, type TokenInputProps, TokenInputToken, TokenInputTokenRemove }
+export {
+  TokenInput,
+  TokenInputEditor,
+  type TokenInputProps,
+  TokenInputToken,
+  TokenInputTokenRemove,
+}

@@ -39,7 +39,7 @@ function mount(root: HTMLElement) {
                     <span>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</span>
                   </ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>

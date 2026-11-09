@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { TooltipTriggerProps, TooltipTriggerState } from "@ui-sdk/core/tooltip"
+  import type {
+    TooltipTriggerProps,
+    TooltipTriggerState,
+  } from "@ui-sdk/core/tooltip"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import type { TooltipContext } from "./context"
@@ -10,13 +13,14 @@
     owner,
     payload,
     ...rest
-  }: PartProps<"button", TooltipTriggerState> & TooltipTriggerProps & { owner: TooltipContext } = $props()
+  }: PartProps<"button", TooltipTriggerState> &
+    TooltipTriggerProps & { owner: TooltipContext } = $props()
 
   const id = $props.id()
   const trigger = useHandlePart(
     () => owner,
     "trigger",
-    () => ({ id, payload }),
+    () => ({ id, payload })
   )
 </script>
 

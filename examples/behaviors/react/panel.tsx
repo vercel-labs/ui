@@ -7,7 +7,8 @@ type FaqState = {
   exiting: string[]
 }
 
-const without = (list: string[], value: string) => list.filter((other) => other !== value)
+const without = (list: string[], value: string) =>
+  list.filter((other) => other !== value)
 
 const faq = definePrimitive({
   name: "faq",
@@ -17,9 +18,17 @@ const faq = definePrimitive({
     return {
       toggle(value: string) {
         const { expanded, exiting } = store.get()
-        if (expanded.includes(value))
-          store.set({ expanded: without(expanded, value), exiting: [...exiting, value] })
-        else store.set({ expanded: [...expanded, value], exiting: without(exiting, value) })
+        if (expanded.includes(value)) {
+          store.set({
+            expanded: without(expanded, value),
+            exiting: [...exiting, value],
+          })
+        } else {
+          store.set({
+            expanded: [...expanded, value],
+            exiting: without(exiting, value),
+          })
+        }
       },
     }
   },
@@ -36,7 +45,8 @@ const faq = definePrimitive({
     }),
     panel: slot<{ value: string }>({
       props: { value: "string" },
-      present: (state, { key }) => state.expanded.includes(key) || state.exiting.includes(key),
+      present: (state, { key }) =>
+        state.expanded.includes(key) || state.exiting.includes(key),
       attrs: (_state, { id, key }) => ({ id: `${id}-${key}`, role: "region" }),
       bind: (el, { api, key, store }) =>
         bindPanel(el, {
@@ -49,7 +59,8 @@ const faq = definePrimitive({
           trigger: () => el.previousElementSibling as HTMLElement | undefined,
           subscribe: store.subscribe,
           settled: () => {},
-          exited: () => store.set({ exiting: without(store.get().exiting, key) }),
+          exited: () =>
+            store.set({ exiting: without(store.get().exiting, key) }),
         }),
     }),
   }),

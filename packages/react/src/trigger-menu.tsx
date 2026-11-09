@@ -21,7 +21,14 @@ import {
   type PopupContainer,
 } from "./popup"
 import { ListItems, type ListParts } from "./list-items"
-import { createParts, HandleScope, useHandle, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  HandleScope,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(triggerMenuPrimitive, {
   input: "textarea",
@@ -53,7 +60,12 @@ type TriggerMenuProps<T = string> = TriggerMenuOptions<T> & {
  * it uses that editor; otherwise render a TriggerMenuInput, or pass `editor`.
  * @stable
  */
-function TriggerMenu<T = string>({ children, container, editor, ...options }: TriggerMenuProps<T>) {
+function TriggerMenu<T = string>({
+  children,
+  container,
+  editor,
+  ...options
+}: TriggerMenuProps<T>) {
   const inherited = React.useContext(EditorContext)
   const menu = usePrimitive(triggerMenuPrimitive, {
     ...(options as TriggerMenuOptions<any>),
@@ -111,7 +123,10 @@ function TriggerMenuContent({
     keepMounted,
   }
   const body = children ?? <TriggerMenuList />
-  const element = usePart(triggerMenuPrimitive, "content", content, { ...props, children: body })
+  const element = usePart(triggerMenuPrimitive, "content", content, {
+    ...props,
+    children: body,
+  })
   return element && renderPopup(element, target)
 }
 
@@ -119,18 +134,24 @@ function TriggerMenuContent({
  * The listbox. Without children, it renders the current trigger's items, filtered.
  * @stable
  */
-function TriggerMenuList({ children = listItems, ...props }: PartProps<"div", TriggerMenuContentState>) {
+function TriggerMenuList({
+  children = listItems,
+  ...props
+}: PartProps<"div", TriggerMenuContentState>) {
   return usePart(triggerMenuPrimitive, "list", {}, { ...props, children })
 }
 
-const listItems = (state: TriggerMenuContentState) => <TriggerMenuItems items={state.items} />
+const listItems = (state: TriggerMenuContentState) => (
+  <TriggerMenuItems items={state.items} />
+)
 
 /**
  * A suggestion. Choosing it inserts it into the text.
  * @stable
  */
 const TriggerMenuItem = parts.Item as <T = string>(
-  props: Omit<PartProps<"div", TriggerMenuItemState>, Clashing> & TriggerMenuItemProps<T>,
+  props: Omit<PartProps<"div", TriggerMenuItemState>, Clashing> &
+    TriggerMenuItemProps<T>
 ) => React.ReactNode
 
 /**
@@ -162,10 +183,22 @@ const TriggerMenuSeparator = parts.Separator
  * Shown while no item matches. Rendering it keeps the menu open with no matches; without it, the menu closes until something matches.
  * @stable
  */
-function TriggerMenuEmpty({ children, ...props }: PartProps<"div", TriggerMenuEmptyState>) {
+function TriggerMenuEmpty({
+  children,
+  ...props
+}: PartProps<"div", TriggerMenuEmptyState>) {
   const content = (state: TriggerMenuEmptyState) =>
-    typeof children === "function" ? children(state) : state.empty ? children : null
-  return usePart(triggerMenuPrimitive, "empty", {}, { ...props, children: content })
+    typeof children === "function"
+      ? children(state)
+      : state.empty
+        ? children
+        : null
+  return usePart(
+    triggerMenuPrimitive,
+    "empty",
+    {},
+    { ...props, children: content }
+  )
 }
 
 /**
@@ -173,7 +206,12 @@ function TriggerMenuEmpty({ children, ...props }: PartProps<"div", TriggerMenuEm
  * @stable
  */
 function TriggerMenuStatus(props: PartProps<"div", TriggerMenuStatusState>) {
-  return usePart(triggerMenuPrimitive, "status", { text: props.children === undefined }, props)
+  return usePart(
+    triggerMenuPrimitive,
+    "status",
+    { text: props.children === undefined },
+    props
+  )
 }
 
 /**
@@ -181,7 +219,13 @@ function TriggerMenuStatus(props: PartProps<"div", TriggerMenuStatusState>) {
  * @stable
  */
 function TriggerMenuHint(props: PartProps<"span", TriggerMenuHintState>) {
-  return usePart(triggerMenuPrimitive, "hint", { text: props.children === undefined }, props, "span")
+  return usePart(
+    triggerMenuPrimitive,
+    "hint",
+    { text: props.children === undefined },
+    props,
+    "span"
+  )
 }
 
 /**
@@ -190,7 +234,13 @@ function TriggerMenuHint(props: PartProps<"span", TriggerMenuHintState>) {
  */
 function TriggerMenuItems({ items }: { items: TriggerMenuData<any> }) {
   const menu = useTriggerMenu()
-  return <ListItems items={items} parts={listParts} keyOf={menu.api.internal.keyOf} />
+  return (
+    <ListItems
+      items={items}
+      parts={listParts}
+      keyOf={menu.api.internal.keyOf}
+    />
+  )
 }
 
 const listParts: ListParts = {
@@ -200,7 +250,10 @@ const listParts: ListParts = {
   Separator: TriggerMenuSeparator,
 }
 
-export { createTriggerMenuController, textFieldAdapter } from "@ui-sdk/core/trigger-menu"
+export {
+  createTriggerMenuController,
+  textFieldAdapter,
+} from "@ui-sdk/core/trigger-menu"
 export type {
   EditorChange,
   EditorReplaceOptions,

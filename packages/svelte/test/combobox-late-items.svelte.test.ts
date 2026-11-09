@@ -6,7 +6,9 @@ import App from "./apps/combobox-late-items-app.svelte"
 
 test("a bound value set before its items load shows their label once they arrive", async () => {
   const target = document.body.appendChild(document.createElement("div"))
-  const props = $state<{ items: { value: string; label: string }[] }>({ items: [] })
+  const props = $state<{ items: { value: string; label: string }[] }>({
+    items: [],
+  })
   const app = mount(App, { target, props })
   flushSync()
   await new Promise((done) => setTimeout(done))

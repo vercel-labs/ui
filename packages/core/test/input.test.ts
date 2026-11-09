@@ -47,8 +47,13 @@ function setup() {
     hasAttribute: () => false,
   } as unknown as HTMLElement
   const instance = inputGroup({ id: "g" })
-  const bind = () => partBind(instance.part("group", {}), group, { by: "framework", attaches: "all" })
-  const watching = () => observers.filter((o) => o.target === field && !o.disconnected).length
+  const bind = () =>
+    partBind(instance.part("group", {}), group, {
+      by: "framework",
+      attaches: "all",
+    })
+  const watching = () =>
+    observers.filter((o) => o.target === field && !o.disconnected).length
   return { field, instance, bind, watching }
 }
 
@@ -82,26 +87,47 @@ describe("input group", () => {
 
   test("the clear button hides while the field is disabled or read-only", () => {
     const instance = inputGroup({ id: "g" })
-    instance.api.internal.update({ filled: true, disabled: false, readOnly: false })
+    instance.api.internal.update({
+      filled: true,
+      disabled: false,
+      readOnly: false,
+    })
     expect(present(instance.part("clear"))).toBe(true)
-    instance.api.internal.update({ filled: true, disabled: true, readOnly: false })
+    instance.api.internal.update({
+      filled: true,
+      disabled: true,
+      readOnly: false,
+    })
     expect(present(instance.part("clear"))).toBe(false)
-    instance.api.internal.update({ filled: true, disabled: false, readOnly: true })
+    instance.api.internal.update({
+      filled: true,
+      disabled: false,
+      readOnly: true,
+    })
     expect(present(instance.part("clear"))).toBe(false)
   })
 })
 
 describe("input", () => {
   test("the controller reports its changes with a reason, and a cancel keeps the value", () => {
-    const onValueChange = vi.fn((value: string, details: { reason: string; cancel: () => void }) => {
-      if (value === "nope") details.cancel()
-    })
+    const onValueChange = vi.fn(
+      (value: string, details: { reason: string; cancel: () => void }) => {
+        if (value === "nope") {
+          details.cancel()
+        }
+      }
+    )
     const { api } = input({ id: "i", defaultValue: "Ada", onValueChange })
     api.setValue("Grace")
     api.setValue("nope")
     api.clear()
     expect(api.getValue()).toBe("")
-    expect(onValueChange.mock.calls.map(([value, details]) => [value, details.reason])).toEqual([
+    expect(
+      onValueChange.mock.calls.map(([value, details]) => [
+        value,
+        details.reason,
+      ])
+    ).toEqual([
       ["Grace", "imperative"],
       ["nope", "imperative"],
       ["", "imperative"],

@@ -1,5 +1,9 @@
 import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
-import { announcePending, runAction, type ActionDetails } from "../../foundation/kernel/action"
+import {
+  announcePending,
+  runAction,
+  type ActionDetails,
+} from "../../foundation/kernel/action"
 import {
   buttonElement,
   buttonElementAttrs,
@@ -9,7 +13,11 @@ import {
   type ButtonElement,
 } from "../../foundation/platform/button"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { log } from "../../foundation/kernel/change"
 import type { ChangeSource } from "../../foundation/kernel/details"
 import { inputSource } from "../../foundation/kernel/input-source"
@@ -85,13 +93,21 @@ type State = {
   error: unknown
 }
 
-function buttonApi(context: PrimitiveContext<ButtonInternalOptions, State, string>) {
+function buttonApi(
+  context: PrimitiveContext<ButtonInternalOptions, State, string>
+) {
   const { store, options } = context
   // Tracks input from the start, so the first press already knows what made it.
   const changeSource = inputSource()
   // Through `log`, so `debug` and the devtools see the action's state.
-  const write = <Key extends "pending" | "error">(key: Key, value: State[Key], source: ChangeSource) => {
-    if (sameValue(store.get()[key], value)) return
+  const write = <Key extends "pending" | "error">(
+    key: Key,
+    value: State[Key],
+    source: ChangeSource
+  ) => {
+    if (sameValue(store.get()[key], value)) {
+      return
+    }
     store.set({ [key]: value } as Partial<State>)
     log(context, key, value, { reason: "action", source })
   }
@@ -105,10 +121,13 @@ function buttonApi(context: PrimitiveContext<ButtonInternalOptions, State, strin
       // handler its own event, like React, pass `action` themselves.
       press(
         event?: Event,
-        action: (details: ButtonActionDetails) => unknown = (details) => options().action?.(event, details),
+        action: (details: ButtonActionDetails) => unknown = (details) =>
+          options().action?.(event, details)
       ) {
         const state = store.get()
-        if (isDisabled(state) || state.pending) return event?.preventDefault()
+        if (isDisabled(state) || state.pending) {
+          return event?.preventDefault()
+        }
         const source = changeSource("action", event)
         write("error", undefined, source)
         runAction(action, source, {
@@ -157,7 +176,11 @@ const buttonPrimitive = /* @__PURE__ */ definePrimitive({
     root: slot<{}, ButtonState>({
       ...buttonRole((state: State) => state.element),
       focus: "tab-stop",
-      state: (state) => ({ disabled: isDisabled(state), pending: state.pending, error: state.error }),
+      state: (state) => ({
+        disabled: isDisabled(state),
+        pending: state.pending,
+        error: state.error,
+      }),
       attrs: (state) => ({
         ...buttonElementAttrs(state.element, {
           type: state.type,

@@ -31,7 +31,9 @@ function Example() {
             <DialogContent>
               <div data-slot="stack">
                 <DialogTitle>Change password</DialogTitle>
-                <DialogDescription>Use at least 12 characters.</DialogDescription>
+                <DialogDescription>
+                  Use at least 12 characters.
+                </DialogDescription>
               </div>
               <Field>
                 <FieldLabel>New password</FieldLabel>

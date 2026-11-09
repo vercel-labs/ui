@@ -49,7 +49,9 @@ function Tooltip({ children, container, ...options }: TooltipProps) {
   useControllerEntry(options.controller, handle)
   return (
     <HandleScope handle={handle}>
-      <ContainerContext.Provider value={container}>{children}</ContainerContext.Provider>
+      <ContainerContext.Provider value={container}>
+        {children}
+      </ContainerContext.Provider>
     </HandleScope>
   )
 }
@@ -67,10 +69,17 @@ type TriggerPartProps = Omit<
 function TooltipTrigger({ controller, ...props }: TriggerPartProps) {
   const { payload: _, render, ...rest } = props
   // Until the tooltip it names mounts, a trigger outside the tooltip is a plain button.
-  const unconnected = () => renderElement("button", { type: "button", ...rest }, render, { open: false })
+  const unconnected = () =>
+    renderElement("button", { type: "button", ...rest }, render, {
+      open: false,
+    })
   return (
     <InTriggerContext.Provider value>
-      <Connected primitive={tooltip} controller={controller} fallback={unconnected}>
+      <Connected
+        primitive={tooltip}
+        controller={controller}
+        fallback={unconnected}
+      >
         <parts.Trigger {...props} />
       </Connected>
     </InTriggerContext.Provider>
@@ -93,9 +102,22 @@ function TooltipContent<Payload = unknown>({
   ...props
 }: PartProps<"div", TooltipContentState<Payload>> & TooltipContentProps) {
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const content = { side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor }
+  const content = {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    collisionPadding,
+    arrowPadding,
+    anchor,
+  }
   // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
-  const element = usePart(tooltip, "content", content, props as PartProps<"div", TooltipContentState>)
+  const element = usePart(
+    tooltip,
+    "content",
+    content,
+    props as PartProps<"div", TooltipContentState>
+  )
   return element && renderPopup(element, target)
 }
 
@@ -111,11 +133,17 @@ const text = (state: TooltipShortcutState) => state.text
  * Shows the tooltip's shortcut, like `⌘S`, formatted for the platform.
  * @stable
  */
-function TooltipShortcut(props: PartProps<"span", TooltipShortcutState> & TooltipShortcutProps) {
+function TooltipShortcut(
+  props: PartProps<"span", TooltipShortcutState> & TooltipShortcutProps
+) {
   const inTrigger = React.useContext(InTriggerContext)
-  if (useNearest(tooltip)) return <ShortcutPart {...props} />
+  if (useNearest(tooltip)) {
+    return <ShortcutPart {...props} />
+  }
   // Inside a trigger whose tooltip hasn't mounted yet, there's no shortcut to show.
-  if (inTrigger) return null
+  if (inTrigger) {
+    return null
+  }
   throw new Error("Tooltip parts must be used inside <Tooltip>.")
 }
 
@@ -124,7 +152,13 @@ function ShortcutPart({
   children = text,
   ...props
 }: PartProps<"span", TooltipShortcutState> & TooltipShortcutProps) {
-  return usePart(tooltip, "shortcut", { shortcut }, { ...props, children }, "span")
+  return usePart(
+    tooltip,
+    "shortcut",
+    { shortcut },
+    { ...props, children },
+    "span"
+  )
 }
 
 export { createTooltipController } from "@ui-sdk/core/tooltip"
@@ -144,4 +178,11 @@ export type {
   TooltipTriggerState,
 } from "@ui-sdk/core/tooltip"
 
-export { Tooltip, TooltipArrow, TooltipContent, type TooltipProps, TooltipShortcut, TooltipTrigger }
+export {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  type TooltipProps,
+  TooltipShortcut,
+  TooltipTrigger,
+}

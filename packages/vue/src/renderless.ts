@@ -11,13 +11,21 @@ type Options = {
 // Once per component and attributes, so a list of 50 tooltips warns once.
 const warned = new Set<string>()
 
-function warnAttributes(name: string, attrs: SetupContext["attrs"], read: string[] = []) {
+function warnAttributes(
+  name: string,
+  attrs: SetupContext["attrs"],
+  read: string[] = []
+) {
   const keys = Object.keys(attrs)
     .filter((key) => !read.includes(key))
     .join(", ")
-  if (!keys || warned.has(`${name} ${keys}`)) return
+  if (!keys || warned.has(`${name} ${keys}`)) {
+    return
+  }
   warned.add(`${name} ${keys}`)
-  warn(`${name} renders no element, so it ignores ${keys}. Put them on one of its parts.`)
+  warn(
+    `${name} renders no element, so it ignores ${keys}. Put them on one of its parts.`
+  )
 }
 
 // A part that renders only other parts has no element to give attributes to.

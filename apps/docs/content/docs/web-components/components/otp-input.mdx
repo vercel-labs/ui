@@ -129,8 +129,12 @@ A typed partial code reports `tooShort`. Partial default values and controller w
 A disabled input cannot be focused, changed, or submitted. `read-only` prevents changes while keeping the input focusable and included in form data.
 
 ```html
-<ui-otp-input disabled default-value="123456" aria-label="Disabled code"> ... </ui-otp-input>
-<ui-otp-input read-only default-value="654321" aria-label="Read-only code"> ... </ui-otp-input>
+<ui-otp-input disabled default-value="123456" aria-label="Disabled code">
+  ...
+</ui-otp-input>
+<ui-otp-input read-only default-value="654321" aria-label="Read-only code">
+  ...
+</ui-otp-input>
 ```
 
 ## Controller
@@ -147,10 +151,18 @@ Use the element's `api` to read, fill, clear, or focus the input from another co
 
 ```ts
 const code = document.querySelector("ui-otp-input")!.api
-document.querySelector('[data-action="fill"]')!.addEventListener("click", () => code.setValue("123456"))
-document.querySelector('[data-action="clear"]')!.addEventListener("click", () => code.clear())
-document.querySelector('[data-action="read"]')!.addEventListener("click", () => console.log(code.getValue()))
-document.querySelector('[data-action="focus"]')!.addEventListener("click", () => code.focus())
+document
+  .querySelector('[data-action="fill"]')!
+  .addEventListener("click", () => code.setValue("123456"))
+document
+  .querySelector('[data-action="clear"]')!
+  .addEventListener("click", () => code.clear())
+document
+  .querySelector('[data-action="read"]')!
+  .addEventListener("click", () => console.log(code.getValue()))
+document
+  .querySelector('[data-action="focus"]')!
+  .addEventListener("click", () => code.focus())
 ```
 
 [Controllers](../controllers) covers an element's `api`.
@@ -190,22 +202,34 @@ preset name or the source of a regular expression. `controller` is a property. C
 
 ### OTPInput
 
-<TypeTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/otp-input/otp-input.ts"
+  name="OTPInputOptions"
+/>
 
 ### OTPInputSlot
 
-<TypeTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputSlotProps" />
+<TypeTable
+  path="../../packages/core/src/components/otp-input/otp-input.ts"
+  name="OTPInputSlotProps"
+/>
 
 ### State
 
 The same state shows as data attributes on each element. The root, groups and separators get the
 input's state.
 
-<StateTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputState" />
+<StateTable
+  path="../../packages/core/src/components/otp-input/otp-input.ts"
+  name="OTPInputState"
+/>
 
 Slots get their own:
 
-<StateTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputSlotState" />
+<StateTable
+  path="../../packages/core/src/components/otp-input/otp-input.ts"
+  name="OTPInputSlotState"
+/>
 
 ### Reasons
 
@@ -222,7 +246,10 @@ The element's `api` property has the same methods. The `value` property reads an
 
 `setValue()` and `clear()` take an optional `{ reason, event }`, and fire `valuechange` like typing.
 
-<ControllerTable path="../../packages/core/src/components/otp-input/otp-input.ts" name="OTPInputController" />
+<ControllerTable
+  path="../../packages/core/src/components/otp-input/otp-input.ts"
+  name="OTPInputController"
+/>
 
 ### Events
 

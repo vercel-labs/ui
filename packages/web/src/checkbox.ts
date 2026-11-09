@@ -36,12 +36,16 @@ function defineCheckboxElements() {
       kinds: { group: null },
       options: (el) => ({
         // Read when needed, since the group may upgrade after the checkbox.
-        group: () => instanceOf<CheckboxGroupApi>(el.parentElement?.closest("ui-checkbox-group"))?.api,
+        group: () =>
+          instanceOf<CheckboxGroupApi>(
+            el.parentElement?.closest("ui-checkbox-group")
+          )?.api,
       }),
       state: {
         checked: {
           get: (api: CheckboxApi) => api.getChecked(),
-          set: (api: CheckboxApi, checked: CheckedState) => api.setChecked(checked),
+          set: (api: CheckboxApi, checked: CheckedState) =>
+            api.setChecked(checked),
         },
       },
       api: toggleApi,
@@ -71,7 +75,8 @@ function defineCheckboxGroupElements() {
       state: {
         value: {
           get: (api: CheckboxGroupApi) => api.getValue(),
-          set: (api: CheckboxGroupApi, value: string[]) => api.setValue(value ?? []),
+          set: (api: CheckboxGroupApi, value: string[]) =>
+            api.setValue(value ?? []),
         },
       },
       api: ["getValue", "setValue", "focus"],
@@ -97,4 +102,8 @@ function defineSwitchElements() {
   })
 }
 
-export { defineCheckboxElements, defineCheckboxGroupElements, defineSwitchElements }
+export {
+  defineCheckboxElements,
+  defineCheckboxGroupElements,
+  defineSwitchElements,
+}

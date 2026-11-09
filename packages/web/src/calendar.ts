@@ -80,11 +80,21 @@ function defineCalendarElements() {
       // `unavailable` as a property takes any matcher, like `{ weekday: [0, 6] }`.
       properties: ["unavailable"],
       state: calendarLiveState,
-      api: ["getValue", "setValue", "getMonth", "setMonth", "previous", "next", "focus"],
+      api: [
+        "getValue",
+        "setValue",
+        "getMonth",
+        "setMonth",
+        "previous",
+        "next",
+        "focus",
+      ],
       render(el, instance) {
         if (!checkedForContent.has(el)) {
           checkedForContent.add(el)
-          if (!el.firstElementChild) renderDefaultCalendar(el, el)
+          if (!el.firstElementChild) {
+            renderDefaultCalendar(el, el)
+          }
         }
         return renderCalendarParts(el, instance)
       },
@@ -99,7 +109,10 @@ function defineCalendarElements() {
  * picker as `also`, or the other way around, since both have these slots.
  * Whichever runs first defines them.
  */
-function defineCalendarParts(primitive: typeof calendar | typeof datePicker, also: string) {
+function defineCalendarParts(
+  primitive: typeof calendar | typeof datePicker,
+  also: string
+) {
   const owners = [also]
   definePart(primitive, "heading", {
     tag: "ui-calendar-heading",
@@ -107,8 +120,12 @@ function defineCalendarParts(primitive: typeof calendar | typeof datePicker, als
     display: "block",
     render(el) {
       // It's the h2 the other adapters render, unless the author says otherwise.
-      if (!el.hasAttribute("role")) el.setAttribute("role", "heading")
-      if (!el.hasAttribute("aria-level")) el.setAttribute("aria-level", "2")
+      if (!el.hasAttribute("role")) {
+        el.setAttribute("role", "heading")
+      }
+      if (!el.hasAttribute("aria-level")) {
+        el.setAttribute("aria-level", "2")
+      }
       scheduleRefresh(el)
     },
   })
@@ -124,7 +141,7 @@ function defineCalendarParts(primitive: typeof calendar | typeof datePicker, als
     display: "contents",
     target: stepButton("›"),
   })
-  for (const [tag, slot] of selectParts)
+  for (const [tag, slot] of selectParts) {
     definePart(primitive, slot, {
       tag,
       owners,
@@ -132,17 +149,23 @@ function defineCalendarParts(primitive: typeof calendar | typeof datePicker, als
       target: ownSelect,
       render: scheduleRefresh,
     })
+  }
   definePart(primitive, "grid", {
     tag: "ui-calendar-grid",
     owners,
     display: "table",
     context: (el) => ({ id: String(gridOffset(el)) }),
     render(el) {
-      if (!el.firstElementChild) el.append(element("ui-calendar-weekdays"), element("ui-calendar-weeks"))
+      if (!el.firstElementChild) {
+        el.append(element("ui-calendar-weekdays"), element("ui-calendar-weeks"))
+      }
     },
     changed(el) {
-      for (const part of el.querySelectorAll<HTMLElement>("ui-calendar-weekdays, ui-calendar-weeks"))
+      for (const part of el.querySelectorAll<HTMLElement>(
+        "ui-calendar-weekdays, ui-calendar-weeks"
+      )) {
         scheduleRefresh(part)
+      }
     },
   })
   // The weekdays are a row group, like a <thead>, around the header row
@@ -165,7 +188,11 @@ function defineCalendarParts(primitive: typeof calendar | typeof datePicker, als
     context: (el) => ({ id: `${gridOffset(el)}-${el.getAttribute("index")}` }),
   })
   defineWeeksElement()
-  definePart(primitive, "week", { tag: "ui-calendar-week", owners, display: "table-row" })
+  definePart(primitive, "week", {
+    tag: "ui-calendar-week",
+    owners,
+    display: "table-row",
+  })
   definePart(primitive, "day", {
     tag: "ui-calendar-day",
     owners,
@@ -178,7 +205,9 @@ function defineCalendarParts(primitive: typeof calendar | typeof datePicker, als
 // renders. The core has no slot for it, so it's a plain element. The header
 // row and the empty cells the calendar renders get their display here too.
 function defineWeeksElement() {
-  if (!claimTag("ui-calendar-weeks")) return
+  if (!claimTag("ui-calendar-weeks")) {
+    return
+  }
   setDisplay("ui-calendar-weeks", "table-row-group")
   setDisplay("ui-calendar-weekdays > :not(template)", "table-row")
   setDisplay("ui-calendar-week > [role=gridcell]", "table-cell")
@@ -189,7 +218,7 @@ function defineWeeksElement() {
         this.setAttribute("role", "rowgroup")
         scheduleRefresh(this)
       }
-    },
+    }
   )
 }
 
@@ -218,7 +247,11 @@ const renderedKeys = new WeakMap<Element, string>()
 function renderDefaultCalendar(container: HTMLElement, calendar: HTMLElement) {
   defaultContainers.set(calendar, container)
   const header = element("div")
-  header.append(element("ui-calendar-previous"), element("ui-calendar-heading"), element("ui-calendar-next"))
+  header.append(
+    element("ui-calendar-previous"),
+    element("ui-calendar-heading"),
+    element("ui-calendar-next")
+  )
   container.append(header)
 }
 
@@ -226,7 +259,10 @@ function renderDefaultCalendar(container: HTMLElement, calendar: HTMLElement) {
  * Renders the parts of a calendar or a date picker from its state, now and on
  * every change. Returns the unsubscribe, for the owner's `render` to return.
  */
-function renderCalendarParts(calendar: HTMLElement, instance: PrimitiveInstance) {
+function renderCalendarParts(
+  calendar: HTMLElement,
+  instance: PrimitiveInstance
+) {
   const update = () => refresh(calendar)
   update()
   return instance.subscribe(update)
@@ -234,12 +270,15 @@ function renderCalendarParts(calendar: HTMLElement, instance: PrimitiveInstance)
 
 // The button a step wraps. A step written without one gets one, holding what
 // the step held, or an arrow.
-const stepButton = (arrow: string) => ownButton((button) => (button.textContent = arrow))
+const stepButton = (arrow: string) =>
+  ownButton((button) => (button.textContent = arrow))
 
 // The header row inside <ui-calendar-weekdays>, made when the author wrote none.
 function weekdaysRow(el: HTMLElement) {
   const written = el.querySelector<HTMLElement>(":scope > :not(template)")
-  if (written) return written
+  if (written) {
+    return written
+  }
   const row = element("div")
   el.append(row)
   return row
@@ -255,7 +294,9 @@ const selectParts = [
 // a new one holding what the part held, like its options.
 function ownSelect(el: HTMLElement) {
   const written = el.querySelector<HTMLSelectElement>(":scope > select")
-  if (written) return written
+  if (written) {
+    return written
+  }
   const select = element("select")
   select.append(...el.childNodes)
   el.append(select)
@@ -263,7 +304,10 @@ function ownSelect(el: HTMLElement) {
 }
 
 const gridOffset = (el: Element) => {
-  const offset = parseAttribute("number", el.closest("ui-calendar-grid")?.getAttribute("offset") ?? null)
+  const offset = parseAttribute(
+    "number",
+    el.closest("ui-calendar-grid")?.getAttribute("offset") ?? null
+  )
   return typeof offset === "number" ? offset : 0
 }
 
@@ -272,30 +316,51 @@ const gridOffset = (el: Element) => {
 const ownText = new WeakSet<Element>()
 function writeLabel(el: Element, label: () => string) {
   if (!ownText.has(el)) {
-    if (el.firstElementChild || el.textContent?.trim()) return
+    if (el.firstElementChild || el.textContent?.trim()) {
+      return
+    }
     ownText.add(el)
   }
   const text = label()
-  if (el.textContent !== text) el.textContent = text
+  if (el.textContent !== text) {
+    el.textContent = text
+  }
 }
 
 // A part for a column or a day: a copy of the part in the container's
 // <template>, for its classes and content, or a plain one.
-function templatedPart(container: Element, tagName: string, attributes: Record<string, string>) {
+function templatedPart(
+  container: Element,
+  tagName: string,
+  attributes: Record<string, string>
+) {
   const template =
-    container.querySelector<HTMLTemplateElement>(":scope > template")?.content.firstElementChild
-  const part = template?.localName === tagName ? (template.cloneNode(true) as HTMLElement) : element(tagName)
-  for (const [name, value] of Object.entries(attributes)) part.setAttribute(name, value)
+    container.querySelector<HTMLTemplateElement>(":scope > template")?.content
+      .firstElementChild
+  const part =
+    template?.localName === tagName
+      ? (template.cloneNode(true) as HTMLElement)
+      : element(tagName)
+  for (const [name, value] of Object.entries(attributes)) {
+    part.setAttribute(name, value)
+  }
   return part
 }
 
 // Puts `el` after `previous`, or first, unless it's there already: moving a
 // focused day would blur it.
 function place(parent: Element, el: Element, previous: Element | null) {
-  const current = previous ? previous.nextElementSibling : parent.firstElementChild
-  if (current === el) return
-  if (previous) previous.after(el)
-  else parent.prepend(el)
+  const current = previous
+    ? previous.nextElementSibling
+    : parent.firstElementChild
+  if (current === el) {
+    return
+  }
+  if (previous) {
+    previous.after(el)
+  } else {
+    parent.prepend(el)
+  }
 }
 
 // Parts that render from state, after their calendar's next change or once
@@ -303,11 +368,17 @@ function place(parent: Element, el: Element, previous: Element | null) {
 const scheduled = new WeakSet<Element>()
 function scheduleRefresh(part: HTMLElement) {
   const calendar = findOwner(part, owner)
-  if (!calendar) return
+  if (!calendar) {
+    return
+  }
   let parts = stateParts.get(calendar)
-  if (!parts) stateParts.set(calendar, (parts = new Set()))
+  if (!parts) {
+    stateParts.set(calendar, (parts = new Set()))
+  }
   parts.add(part)
-  if (scheduled.has(calendar)) return
+  if (scheduled.has(calendar)) {
+    return
+  }
   scheduled.add(calendar)
   queueMicrotask(() => {
     scheduled.delete(calendar)
@@ -317,10 +388,14 @@ function scheduleRefresh(part: HTMLElement) {
 
 function refresh(calendar: HTMLElement) {
   const instance = instanceOf(calendar)
-  if (!instance) return
+  if (!instance) {
+    return
+  }
   matchMonths(calendar)
   const parts = stateParts.get(calendar)
-  if (!parts) return
+  if (!parts) {
+    return
+  }
   for (const el of parts) {
     // A part that left, or moved to another calendar, renders there.
     if (!el.isConnected || findOwner(el, owner) !== calendar) {
@@ -328,7 +403,11 @@ function refresh(calendar: HTMLElement) {
       continue
     }
     if (el.localName === "ui-calendar-heading") {
-      writeLabel(el, () => (partState(instance.part("heading")) as CalendarHeadingState).label)
+      writeLabel(
+        el,
+        () =>
+          (partState(instance.part("heading")) as CalendarHeadingState).label
+      )
       continue
     }
     const select = selectParts.find(([tagName]) => tagName === el.localName)
@@ -337,9 +416,14 @@ function refresh(calendar: HTMLElement) {
       continue
     }
     const offset = gridOffset(el)
-    const grid = partState(instance.part("grid", { offset, id: String(offset) })) as CalendarGridState
-    if (el.localName === "ui-calendar-weeks") renderWeeks(el, instance, offset, grid)
-    else renderWeekdays(el, calendar, instance, offset, grid)
+    const grid = partState(
+      instance.part("grid", { offset, id: String(offset) })
+    ) as CalendarGridState
+    if (el.localName === "ui-calendar-weeks") {
+      renderWeeks(el, instance, offset, grid)
+    } else {
+      renderWeekdays(el, calendar, instance, offset, grid)
+    }
   }
 }
 
@@ -347,19 +431,31 @@ function refresh(calendar: HTMLElement) {
 // they change, like the years around the one shown. Options the author wrote stay.
 const ownOptions = new WeakSet<Element>()
 const renderedOptions = new WeakMap<Element, CalendarSelectState>()
-function renderOptions(el: HTMLElement, instance: PrimitiveInstance, slot: "month-select" | "year-select") {
+function renderOptions(
+  el: HTMLElement,
+  instance: PrimitiveInstance,
+  slot: "month-select" | "year-select"
+) {
   const select = el.querySelector<HTMLSelectElement>(":scope > select")
   const state = partState(instance.part(slot)) as CalendarSelectState
-  if (!select || renderedOptions.get(select) === state) return
+  if (!select || renderedOptions.get(select) === state) {
+    return
+  }
   renderedOptions.set(select, state)
   if (!ownOptions.has(select)) {
-    if (select.options.length) return
+    if (select.options.length) {
+      return
+    }
     ownOptions.add(select)
   }
   select.replaceChildren(
     ...state.options.map((option) =>
-      element("option", { value: String(option.value), disabled: option.disabled }, option.label),
-    ),
+      element(
+        "option",
+        { value: String(option.value), disabled: option.disabled },
+        option.label
+      )
+    )
   )
   // The core wrote the selected option before this one existed.
   select.value = String(state.value)
@@ -368,13 +464,19 @@ function renderOptions(el: HTMLElement, instance: PrimitiveInstance, slot: "mont
 // A calendar left empty shows a grid for each month.
 function matchMonths(calendar: HTMLElement) {
   const container = defaultContainers.get(calendar)
-  if (!container) return
-  const months = parseAttribute("number", calendar.getAttribute("months")) as number | undefined
+  if (!container) {
+    return
+  }
+  const months = parseAttribute("number", calendar.getAttribute("months")) as
+    number | undefined
   const count = Number.isFinite(months) ? Math.max(1, Math.floor(months!)) : 1
   const grids = container.querySelectorAll(":scope > ui-calendar-grid")
-  for (let offset = grids.length; offset < count; offset++)
+  for (let offset = grids.length; offset < count; offset++) {
     container.append(element("ui-calendar-grid", { offset: String(offset) }))
-  for (let offset = count; offset < grids.length; offset++) grids[offset]!.remove()
+  }
+  for (let offset = count; offset < grids.length; offset++) {
+    grids[offset]!.remove()
+  }
 }
 
 // Seven column headers, labeled again when the grid or the weekday format changes.
@@ -384,27 +486,37 @@ function renderWeekdays(
   calendar: HTMLElement,
   instance: PrimitiveInstance,
   offset: number,
-  grid: CalendarGridState,
+  grid: CalendarGridState
 ) {
   // The row comes with the element's upgrade, which may not have happened yet.
   const row = weekdays.querySelector(":scope > :not(template)")
   const format = calendar.getAttribute("weekday-format")
-  if (!row || (renderedGrids.get(weekdays) === grid && renderedFormats.get(weekdays) === format)) return
+  if (
+    !row ||
+    (renderedGrids.get(weekdays) === grid &&
+      renderedFormats.get(weekdays) === format)
+  ) {
+    return
+  }
   renderedGrids.set(weekdays, grid)
   renderedFormats.set(weekdays, format)
-  if (!row.firstElementChild)
+  if (!row.firstElementChild) {
     row.append(
       ...grid.weekdays.map((_, index) =>
-        templatedPart(weekdays, "ui-calendar-weekday", { index: String(index) }),
-      ),
+        templatedPart(weekdays, "ui-calendar-weekday", { index: String(index) })
+      )
     )
+  }
   for (const weekday of row.querySelectorAll(":scope > ui-calendar-weekday")) {
     const index = Number(weekday.getAttribute("index"))
     writeLabel(
       weekday,
       () =>
-        (partState(instance.part("weekday", { index, id: `${offset}-${index}` })) as CalendarWeekdayState)
-          .label,
+        (
+          partState(
+            instance.part("weekday", { index, id: `${offset}-${index}` })
+          ) as CalendarWeekdayState
+        ).label
     )
   }
 }
@@ -415,19 +527,25 @@ function renderWeeks(
   weeks: HTMLElement,
   instance: PrimitiveInstance,
   offset: number,
-  grid: CalendarGridState,
+  grid: CalendarGridState
 ) {
-  if (renderedGrids.get(weeks) === grid) return
+  if (renderedGrids.get(weeks) === grid) {
+    return
+  }
   renderedGrids.set(weeks, grid)
   const rows = new Map<string, Element>()
   const cells = new Map<string, Element>()
   for (const row of weeks.children) {
     const key = renderedKeys.get(row)
-    if (key === undefined) continue
+    if (key === undefined) {
+      continue
+    }
     rows.set(key, row)
     for (const cell of row.children) {
       const cellKey = renderedKeys.get(cell)
-      if (cellKey !== undefined) cells.set(cellKey, cell)
+      if (cellKey !== undefined) {
+        cells.set(cellKey, cell)
+      }
     }
   }
   let previousRow: Element | null = weeks.querySelector(":scope > template")
@@ -447,19 +565,32 @@ function renderWeeks(
       renderedKeys.set(el, cellKey)
       place(row, el, previousCell)
       previousCell = el
-      if (!cell.hidden) writeLabel(el, () => dayLabel(instance, cell.date, offset))
+      if (!cell.hidden) {
+        writeLabel(el, () => dayLabel(instance, cell.date, offset))
+      }
     }
   }
-  for (const cell of cells.values()) cell.remove()
-  for (const row of rows.values()) row.remove()
+  for (const cell of cells.values()) {
+    cell.remove()
+  }
+  for (const row of rows.values()) {
+    row.remove()
+  }
 }
 
 function createCell(weeks: Element, cell: CalendarGridCell) {
-  if (cell.hidden) return element("span", { role: "gridcell" })
+  if (cell.hidden) {
+    return element("span", { role: "gridcell" })
+  }
   return templatedPart(weeks, "ui-calendar-day", { value: cell.date })
 }
 
 const dayLabel = (instance: PrimitiveInstance, value: string, offset: number) =>
   (partState(instance.part("day", { value, offset })) as CalendarDayState).label
 
-export { defineCalendarElements, defineCalendarParts, renderCalendarParts, renderDefaultCalendar }
+export {
+  defineCalendarElements,
+  defineCalendarParts,
+  renderCalendarParts,
+  renderDefaultCalendar,
+}

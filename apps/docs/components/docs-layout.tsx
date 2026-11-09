@@ -11,14 +11,21 @@ import type { ReactNode } from "react"
 
 // Core's sidebar opens with an overview of the whole site: Get Started, Core's
 // introduction, the tutorial and the changelog. Core's guides follow under its name.
-const overview = ["/docs/core", "/docs/core/build-a-component", "/docs/core/changelog"]
+const overview = [
+  "/docs/core",
+  "/docs/core/build-a-component",
+  "/docs/core/changelog",
+]
 
 function withGetStarted(tree: Root): Root {
   const page = source.getPage(getStarted.slugs)
-  if (!page) return tree
-  const inOverview = (node: Node) => node.type === "page" && overview.includes(node.url)
+  if (!page) {
+    return tree
+  }
+  const inOverview = (node: Node) =>
+    node.type === "page" && overview.includes(node.url)
   const pages = overview.flatMap((url) =>
-    tree.children.filter((node) => node.type === "page" && node.url === url),
+    tree.children.filter((node) => node.type === "page" && node.url === url)
   )
   return {
     ...tree,
@@ -33,17 +40,31 @@ function withGetStarted(tree: Root): Root {
   }
 }
 
-function DocsLayout({ section, children }: { section: Section; children: ReactNode }) {
+function DocsLayout({
+  section,
+  children,
+}: {
+  section: Section
+  children: ReactNode
+}) {
   const full = sectionTree(section)
-  if (!full) notFound()
+  if (!full) {
+    notFound()
+  }
   const tree = isFramework(section)
     ? frameworkTree(full, section)
     : section === "core"
       ? withGetStarted(full)
       : full
   const tocs = Object.fromEntries([
-    ...source.getPages().flatMap((page) => (page.slugs[0] === section ? [[page.url, page.data.toc]] : [])),
-    ...(section === "core" ? [[getStarted.url, source.getPage(getStarted.slugs)?.data.toc]] : []),
+    ...source
+      .getPages()
+      .flatMap((page) =>
+        page.slugs[0] === section ? [[page.url, page.data.toc]] : []
+      ),
+    ...(section === "core"
+      ? [[getStarted.url, source.getPage(getStarted.slugs)?.data.toc]]
+      : []),
   ])
   const pages = sectionPages(section === "core" ? withGetStarted(full) : full)
   const urls = source.getPages().map((page) => page.url)
@@ -58,7 +79,12 @@ function DocsLayout({ section, children }: { section: Section; children: ReactNo
           </div>
         </aside>
         <div className="min-w-0 flex-1">
-          <MobileNav section={section} tree={tree} urls={urls} registry={process.env.NPM_REGISTRY} />
+          <MobileNav
+            section={section}
+            tree={tree}
+            urls={urls}
+            registry={process.env.NPM_REGISTRY}
+          />
           <main className="flex">{children}</main>
         </div>
       </div>

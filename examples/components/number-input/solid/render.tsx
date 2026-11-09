@@ -11,12 +11,20 @@ function Example() {
   return (
     <Field>
       <FieldLabel>Temperature</FieldLabel>
-      <NumberInput defaultValue={-2} min={-20} max={40} format={{ style: "unit", unit: "celsius" }}>
+      <NumberInput
+        defaultValue={-2}
+        min={-20}
+        max={40}
+        format={{ style: "unit", unit: "celsius" }}
+      >
         <NumberInputGroup>
           <NumberInputDecrement
             aria-label="Colder"
             render={(props, state) => (
-              <button {...props} title={state.atBound ? "As cold as it goes" : "Colder"} />
+              <button
+                {...props}
+                title={state.atBound ? "As cold as it goes" : "Colder"}
+              />
             )}
           >
             <svg

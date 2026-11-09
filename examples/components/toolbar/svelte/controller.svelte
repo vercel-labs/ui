@@ -1,7 +1,11 @@
 <script lang="ts">
   import { BoldIcon, ItalicIcon, LinkIcon } from "@lucide/svelte"
   import { useShortcut } from "@ui-sdk/svelte/shortcuts"
-  import { createToolbarController, Toolbar, ToolbarButton } from "@ui-sdk/svelte/toolbar"
+  import {
+    createToolbarController,
+    Toolbar,
+    ToolbarButton,
+  } from "@ui-sdk/svelte/toolbar"
   import { useLog } from "../../../shared/svelte/log"
 
   const actions = [
@@ -26,5 +30,6 @@
       </ToolbarButton>
     {/each}
   </Toolbar>
-  <textarea aria-label="Notes" placeholder="Type, then press Alt+F10"></textarea>
+  <textarea aria-label="Notes" placeholder="Type, then press Alt+F10"
+  ></textarea>
 </div>

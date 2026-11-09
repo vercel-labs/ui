@@ -17,7 +17,8 @@
       box-shadow var(--duration);
 
     &:hover:not([data-disabled], [data-readonly], [data-checked]) {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &[data-checked] {
@@ -96,13 +97,17 @@
     }
   }
 
-  :is([data-slot="label"], [data-slot="field-root"]):has([data-slot="switch-root"][data-disabled]) {
+  :is([data-slot="label"], [data-slot="field-root"]):has(
+    [data-slot="switch-root"][data-disabled]
+  ) {
     color: var(--line-disabled);
   }
 
   /* A switch row: its label at the start and the switch at the end, in a 20rem column. */
   :scope[data-example^="switch/"]
-    :is([data-slot="label"], [data-slot="field-root"], [data-slot="row"]):has(> [data-slot="switch-root"]) {
+    :is([data-slot="label"], [data-slot="field-root"], [data-slot="row"]):has(
+      > [data-slot="switch-root"]
+    ) {
     flex-wrap: nowrap;
     justify-content: space-between;
     gap: var(--space-4);
@@ -119,7 +124,8 @@
     width: 14rem;
   }
 
-  :scope[data-example^="switch/"] [data-slot="stack"]:has(> [data-slot="label"] > [data-slot="switch-root"]) {
+  :scope[data-example^="switch/"]
+    [data-slot="stack"]:has(> [data-slot="label"] > [data-slot="switch-root"]) {
     max-width: 100%;
   }
 
@@ -132,7 +138,9 @@
 
   /* A row with a description keeps the switch in line with the label. */
   :scope[data-example^="switch/"]
-    :is([data-slot="field-root"], [data-slot="row"]):has(> [data-slot="stack"] + [data-slot="switch-root"]) {
+    :is([data-slot="field-root"], [data-slot="row"]):has(
+      > [data-slot="stack"] + [data-slot="switch-root"]
+    ) {
     align-items: flex-start;
   }
 
@@ -148,7 +156,8 @@
     gap: var(--space-6);
   }
 
-  [data-slot="field-set"] > [data-slot="label"]:has(> [data-slot="switch-root"]) {
+  [data-slot="field-set"]
+    > [data-slot="label"]:has(> [data-slot="switch-root"]) {
     font-weight: 400;
   }
 
@@ -168,7 +177,8 @@
     }
 
     &:hover:not(:has([data-checked])) {
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
   }
 }

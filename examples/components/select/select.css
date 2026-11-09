@@ -39,7 +39,8 @@
   }
 
   /* The controls sit wider than the field, so they wrap only on a phone. */
-  :scope[data-example="select/controller"] [data-slot="stack"]:has(> [data-slot="controls"]) {
+  :scope[data-example="select/controller"]
+    [data-slot="stack"]:has(> [data-slot="controls"]) {
     width: auto;
   }
 
@@ -168,7 +169,8 @@
       max-width: none;
       max-height: 70dvh;
       margin: 0 auto;
-      padding: var(--space-2) var(--space-2) max(env(safe-area-inset-bottom), var(--space-4));
+      padding: var(--space-2) var(--space-2)
+        max(env(safe-area-inset-bottom), var(--space-4));
       border-radius: var(--radius-popup) var(--radius-popup) 0 0;
 
       & [data-slot="select-item"] {
@@ -303,7 +305,8 @@
     }
   }
 
-  [data-slot="select-content"] > [data-slot="row"]:has([data-slot="select-input"]) {
+  [data-slot="select-content"]
+    > [data-slot="row"]:has([data-slot="select-input"]) {
     flex-wrap: nowrap;
     flex-shrink: 0;
     gap: var(--space-2);

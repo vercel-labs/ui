@@ -1,7 +1,12 @@
 import { afterEach, expect, test, vi } from "vitest"
 import { field } from "../src/components/field/field"
 import { setAnnouncer } from "../src/foundation/platform/announce"
-import { attrs, partState, present, subscribe } from "../src/foundation/kernel/part"
+import {
+  attrs,
+  partState,
+  present,
+  subscribe,
+} from "../src/foundation/kernel/part"
 
 // The field reads its controls from the DOM, which this environment doesn't
 // have, so a stand-in input answers the few questions it asks.
@@ -88,7 +93,11 @@ async function reset(control: StubInput) {
 test("the browser's validation shows once a submit finds the control invalid", async () => {
   const { instance, control } = await bound()
   expect(present(instance.part("error", {}))).toBe(false)
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: false, valid: false, required: true })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: false,
+    valid: false,
+    required: true,
+  })
 
   submit(control)
   expect(present(instance.part("error", {}))).toBe(true)
@@ -96,7 +105,10 @@ test("the browser's validation shows once a submit finds the control invalid", a
     invalid: true,
     message: "Fill out this field.",
   })
-  expect(attrs(instance.part("control"))).toMatchObject({ "aria-invalid": "true", "data-invalid": "" })
+  expect(attrs(instance.part("control"))).toMatchObject({
+    "aria-invalid": "true",
+    "data-invalid": "",
+  })
   expect(present(instance.part("error", { match: "valueMissing" }))).toBe(true)
   expect(present(instance.part("error", { match: "typeMismatch" }))).toBe(false)
 })
@@ -105,14 +117,23 @@ test("edits refresh what shows, and a reset hides it again", async () => {
   const { instance, control } = await bound()
   submit(control)
   await type(control, "ada@example.com")
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: false, valid: true })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: false,
+    valid: true,
+  })
   expect(attrs(instance.part("root"))).toMatchObject({ "data-valid": "" })
 
   await type(control, "")
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: true, valid: false })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: true,
+    valid: false,
+  })
 
   await reset(control)
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: false, valid: false })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: false,
+    valid: false,
+  })
   expect(present(instance.part("error", {}))).toBe(false)
 })
 
@@ -122,7 +143,10 @@ test("an error in the page replaces the browser's message, and the control takes
   expect(submit(control).defaultPrevented).toBe(false)
 
   // An error part that never shows for this problem doesn't replace it either.
-  subscribe(instance.part("error", { id: "e", match: "typeMismatch" }), () => {})
+  subscribe(
+    instance.part("error", { id: "e", match: "typeMismatch" }),
+    () => {}
+  )
   expect(submit(control).defaultPrevented).toBe(false)
 
   instance.part("error", { id: "e" })
@@ -165,8 +189,14 @@ test("an error that stops showing, or leaves the page, gives the message back to
 test("`invalid` shows the field as invalid right away, with no element", () => {
   const instance = field({ id: "f", invalid: true })
   expect(present(instance.part("error", {}))).toBe(true)
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: true, valid: false })
-  expect(attrs(instance.part("control"))).toMatchObject({ "aria-invalid": "true", "data-invalid": "" })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: true,
+    valid: false,
+  })
+  expect(attrs(instance.part("control"))).toMatchObject({
+    "aria-invalid": "true",
+    "data-invalid": "",
+  })
   // A validity flag is the browser's own validation, which isn't what decides here.
   expect(present(instance.part("error", { match: "valueMissing" }))).toBe(false)
 })
@@ -174,7 +204,10 @@ test("`invalid` shows the field as invalid right away, with no element", () => {
 test("`invalid={false}` hides the browser's validation, and `match` still decides for itself", async () => {
   const { instance, control } = await bound({ invalid: false })
   submit(control)
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: false, valid: false })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: false,
+    valid: false,
+  })
   expect(attrs(instance.part("control"))["aria-invalid"]).toBeUndefined()
   expect(present(instance.part("error", {}))).toBe(false)
   expect(present(instance.part("error", { match: true }))).toBe(true)
@@ -185,11 +218,17 @@ test("passing `invalid`, then leaving it out, starts the browser's validation ov
   const { instance, control } = await bound()
   submit(control)
   instance.setOptions({ id: "f", invalid: true })
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: true, valid: false })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: true,
+    valid: false,
+  })
 
   instance.setOptions({ id: "f" })
   await Promise.resolve()
-  expect(partState(instance.part("root"))).toMatchObject({ invalid: false, valid: false })
+  expect(partState(instance.part("root"))).toMatchObject({
+    invalid: false,
+    valid: false,
+  })
   expect(present(instance.part("error", {}))).toBe(false)
 
   submit(control)
@@ -211,15 +250,20 @@ test("the control's own description comes before the field's", async () => {
   instance.api.internal.register("errors", "f-error")
   // Parts register a microtask after they bind.
   await Promise.resolve()
-  expect(attrs(instance.part("control", { describedBy: "hint" }))["aria-describedby"]).toBe(
-    "hint f-description f-error",
+  expect(
+    attrs(instance.part("control", { describedBy: "hint" }))["aria-describedby"]
+  ).toBe("hint f-description f-error")
+  expect(attrs(instance.part("control", {}))["aria-describedby"]).toBe(
+    "f-description f-error"
   )
-  expect(attrs(instance.part("control", {}))["aria-describedby"]).toBe("f-description f-error")
 })
 
 // Watches an error element the way the error part does, with a stand-in for
 // MutationObserver, which this environment doesn't have.
-function watchError(instance: Awaited<ReturnType<typeof bound>>["instance"], text: string) {
+function watchError(
+  instance: Awaited<ReturnType<typeof bound>>["instance"],
+  text: string
+) {
   let changed = () => {}
   vi.stubGlobal(
     "MutationObserver",
@@ -229,7 +273,7 @@ function watchError(instance: Awaited<ReturnType<typeof bound>>["instance"], tex
       }
       observe() {}
       disconnect() {}
-    },
+    }
   )
   const el = { textContent: text, isConnected: true, ownerDocument: undefined }
   const unwatch = instance.api.internal.announce(el as unknown as HTMLElement)

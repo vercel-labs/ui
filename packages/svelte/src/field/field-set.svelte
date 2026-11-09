@@ -4,10 +4,17 @@ A native <fieldset>, so `disabled` disables every control inside it.
 @stable
 -->
 <script lang="ts">
-  import { fieldSet as fieldSetPrimitive, type FieldSetState } from "@ui-sdk/core/field"
+  import {
+    fieldSet as fieldSetPrimitive,
+    type FieldSetState,
+  } from "@ui-sdk/core/field"
   import { setContext } from "svelte"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { DescribedKey, FieldSetKey } from "./context"
 
   let {

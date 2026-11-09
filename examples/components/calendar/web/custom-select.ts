@@ -16,7 +16,10 @@ const months = [
   "November",
   "December",
 ].map((label, index) => ({ value: String(index + 1).padStart(2, "0"), label }))
-const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({ value: year, label: year }))
+const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({
+  value: year,
+  label: year,
+}))
 
 const items = (options: { value: string; label: string }[]) =>
   options
@@ -26,7 +29,7 @@ const items = (options: { value: string; label: string }[]) =>
           ${option.label}
           <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
         </ui-select-item>
-      `,
+      `
     )
     .join("")
 
@@ -72,10 +75,14 @@ function mount(root: HTMLElement) {
     monthSelect.value = monthOfYear
   })
   monthSelect.addEventListener("valuechange", (event) => {
-    if (event.detail.value) calendar.month = `${calendar.month.split("-")[0]}-${event.detail.value}`
+    if (event.detail.value) {
+      calendar.month = `${calendar.month.split("-")[0]}-${event.detail.value}`
+    }
   })
   yearSelect.addEventListener("valuechange", (event) => {
-    if (event.detail.value) calendar.month = `${event.detail.value}-${calendar.month.split("-")[1]}`
+    if (event.detail.value) {
+      calendar.month = `${event.detail.value}-${calendar.month.split("-")[1]}`
+    }
   })
 }
 

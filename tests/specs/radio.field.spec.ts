@@ -7,27 +7,37 @@ import { fieldRadiosFixture as f } from "../fixtures/field"
 // names the group. The radios keep the group's one tab stop and arrow keys,
 // and a radio its field disables, or one disabled later, gives up the stop.
 
-const radio = (page: Page, name: string) => page.getByRole("radio", { name, exact: true })
+const radio = (page: Page, name: string) =>
+  page.getByRole("radio", { name, exact: true })
 
 test.describe("with every radio enabled", () => {
   test.beforeEach(async ({ open }) => {
     await open("field-radios")
   })
 
-  test("each radio is named by the label of its own field", async ({ page }) => {
-    for (const { label } of f.sizes) await expect(radio(page, label)).toBeVisible()
+  test("each radio is named by the label of its own field", async ({
+    page,
+  }) => {
+    for (const { label } of f.sizes) {
+      await expect(radio(page, label)).toBeVisible()
+    }
   })
 
   test("the field around the group still names the group", async ({ page }) => {
     await expect(page.getByRole("radiogroup", { name: f.label })).toBeVisible()
   })
 
-  test("clicking a radio's label checks it and unchecks the others", async ({ page }) => {
+  test("clicking a radio's label checks it and unchecks the others", async ({
+    page,
+  }) => {
     for (const { label } of f.sizes) {
       await page.getByText(label, { exact: true }).click()
       await expect(radio(page, label)).toBeChecked()
-      for (const other of f.sizes)
-        if (other.label !== label) await expect(radio(page, other.label)).not.toBeChecked()
+      for (const other of f.sizes) {
+        if (other.label !== label) {
+          await expect(radio(page, other.label)).not.toBeChecked()
+        }
+      }
     }
   })
 
@@ -40,7 +50,10 @@ test.describe("with every radio enabled", () => {
     await expect(page.getByRole("button", { name: "After" })).toBeFocused()
   })
 
-  test("arrow keys move between the radios and check them", async ({ page, tab }) => {
+  test("arrow keys move between the radios and check them", async ({
+    page,
+    tab,
+  }) => {
     const [small, medium, large] = f.sizes
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
@@ -83,7 +96,11 @@ test.describe("a disabled radio", () => {
     await expect(radio(page, medium.label)).toBeFocused()
   })
 
-  test("enabling the first radio again gives it back the tab stop", async ({ page, open, tab }) => {
+  test("enabling the first radio again gives it back the tab stop", async ({
+    page,
+    open,
+    tab,
+  }) => {
     const [small] = f.sizes
     await open("field-radios")
     await page.getByRole("button", { name: f.disableFirst }).click()

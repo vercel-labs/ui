@@ -17,7 +17,7 @@ async function mount(root: HTMLElement) {
               <button>Delete</button>
             </div>
           </ui-dialog-content>
-        </ui-dialog>`,
+        </ui-dialog>`
     )
     .join("")
   root.innerHTML = `<div class="fixture" style="flex-wrap: wrap"><button>Before</button>${dialogs}<button>After</button></div>`

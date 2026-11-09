@@ -25,7 +25,12 @@ const aligns = [
   { value: "end", label: "End" },
 ]
 
-const select = (name: string, label: string, options: { value: string; label: string }[], value: string) => `
+const select = (
+  name: string,
+  label: string,
+  options: { value: string; label: string }[],
+  value: string
+) => `
   <ui-select data-control="${name}" default-value="${value}">
     <ui-select-label>${label}</ui-select-label>
     <ui-select-trigger>
@@ -42,7 +47,7 @@ const select = (name: string, label: string, options: { value: string; label: st
               ${option.label}
               <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
             </ui-select-item>
-          `,
+          `
         )
         .join("")}
     </ui-select-content>
@@ -79,7 +84,7 @@ function mount(root: HTMLElement) {
                       ${framework.label}
                       <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                     </ui-combobox-item>
-                  `,
+                  `
                 )
                 .join("")}
             </ui-combobox-list>
@@ -89,14 +94,25 @@ function mount(root: HTMLElement) {
     </div>
   `
   const content = root.querySelector("ui-combobox-content")!
-  for (const control of root.querySelectorAll("ui-select"))
+  for (const control of root.querySelectorAll("ui-select")) {
     control.addEventListener("valuechange", (event) => {
-      if (event.detail.value) content.setAttribute(control.dataset.control!, String(event.detail.value))
+      if (event.detail.value) {
+        content.setAttribute(
+          control.dataset.control!,
+          String(event.detail.value)
+        )
+      }
     })
-  root.querySelector("ui-checkbox")!.addEventListener("checkedchange", (event) => {
-    if (event.detail.value === true) content.setAttribute("anchor", "#combobox-positioning-box")
-    else content.removeAttribute("anchor")
-  })
+  }
+  root
+    .querySelector("ui-checkbox")!
+    .addEventListener("checkedchange", (event) => {
+      if (event.detail.value === true) {
+        content.setAttribute("anchor", "#combobox-positioning-box")
+      } else {
+        content.removeAttribute("anchor")
+      }
+    })
 }
 
 export { mount }

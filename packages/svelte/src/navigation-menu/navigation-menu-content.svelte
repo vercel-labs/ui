@@ -13,7 +13,11 @@ a viewport, and in place while closed and kept.
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
-  import { portalTo, providePopupContainer, usePopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+  } from "../popup.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { ContainerKey, useItem, type ContainerContext } from "./context"
 
@@ -29,7 +33,8 @@ a viewport, and in place while closed and kept.
     hiddenUntilFound,
     container,
     ...rest
-  }: PartProps<"div", NavigationMenuContentState> & NavigationMenuContentProps = $props()
+  }: PartProps<"div", NavigationMenuContentState> & NavigationMenuContentProps =
+    $props()
 
   const menu = useHandle(navigationMenu)
   const value = useItem("Content")
@@ -51,7 +56,7 @@ a viewport, and in place while closed and kept.
       keepMounted,
       hiddenUntilFound,
     }),
-    portalTo(() => destination),
+    portalTo(() => destination)
   )
   // Where the content lives. Its attributes change whenever it moves between
   // its item and the viewport, so they're read here, and the element moves
@@ -60,7 +65,9 @@ a viewport, and in place while closed and kept.
   const destination = $derived.by(() => {
     content.attrs
     const viewport = menu.api.internal.viewportElement()
-    if (viewport && menu.api.internal.inViewport(value())) return viewport
+    if (viewport && menu.api.internal.inViewport(value())) {
+      return viewport
+    }
     // Kept in place next to a viewport, or its own popup without one.
     return menu.state.viewport ? false : target()
   })

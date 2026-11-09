@@ -38,7 +38,11 @@ Import the parts and put them together:
 
 ```svelte
 <script lang="ts">
-  import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
+  import {
+    Listbox,
+    ListboxItem,
+    ListboxItemIndicator,
+  } from "@ui-sdk/svelte/listbox"
 </script>
 
 <Listbox aria-label="Toppings" defaultValue="basil">
@@ -246,11 +250,17 @@ Props and callbacks are the same as below, as Svelte props. `value` can be bound
 
 ### Listbox
 
-<TypeTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxOptions" />
+<TypeTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxOptions"
+/>
 
 ### ListboxItem
 
-<TypeTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxItemProps"
+/>
 
 ### ListboxItemIndicator
 
@@ -261,7 +271,10 @@ Props and callbacks are the same as below, as Svelte props. `value` can be bound
 
 ### ListboxItemIcon
 
-<TypeTable path="../../packages/core/src/foundation/lists/item-icon.ts" name="ItemIconProps" />
+<TypeTable
+  path="../../packages/core/src/foundation/lists/item-icon.ts"
+  name="ItemIconProps"
+/>
 
 `ListboxGroup`, `ListboxGroupLabel` and `ListboxSeparator` take no props of their own.
 
@@ -271,11 +284,17 @@ What render functions, state-based class names and slots receive, per part.
 
 `Listbox`:
 
-<StateTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxState" />
+<StateTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxState"
+/>
 
 `ListboxItem`:
 
-<StateTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxItemState" />
+<StateTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxItemState"
+/>
 
 `ListboxItemIndicator`:
 
@@ -299,7 +318,10 @@ Create one with `createListboxController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, passed to `onValueChange`.
 
-<ControllerTable path="../../packages/core/src/components/listbox/listbox-root.ts" name="ListboxController" />
+<ControllerTable
+  path="../../packages/core/src/components/listbox/listbox-root.ts"
+  name="ListboxController"
+/>
 
 ### Events
 

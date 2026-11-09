@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { MinusIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/vue/otp-input"
+import {
+  OTPInput,
+  OTPInputGroup,
+  OTPInputSeparator,
+  OTPInputSlot,
+} from "@ui-sdk/vue/otp-input"
 </script>
 
 <template>

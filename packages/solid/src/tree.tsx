@@ -31,16 +31,24 @@ const CheckableContext = createContext<() => boolean>(() => false)
 // The item a part belongs to, and the parent of the items in its group. A
 // group among the item's children says it's there through `grouped`, which
 // makes the item a branch: Solid's children are lazy, so the item can't look.
-const ItemContext = createContext<{ value: () => string; grouped: (present: boolean) => void } | null>(null)
+const ItemContext = createContext<{
+  value: () => string
+  grouped: (present: boolean) => void
+} | null>(null)
 
 function useItem() {
   const item = useContext(ItemContext)
-  if (!item) throw new Error("Tree labels, indicators, checkboxes and groups must be used inside <TreeItem>.")
+  if (!item) {
+    throw new Error(
+      "Tree labels, indicators, checkboxes and groups must be used inside <TreeItem>."
+    )
+  }
   return item
 }
 
 // Element props that mean something else on a tree part.
-type Clashing = "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSelect"
+type Clashing =
+  "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSelect"
 
 /**
  * The props of `Tree`.
@@ -56,13 +64,19 @@ type TreeProps<Mode extends TreeMode = "single"> = TreeOptions<Mode> &
 function Tree<Mode extends TreeMode = "single">(props: TreeProps<Mode>) {
   // The items a data tree renders, from the props: core syncs its options
   // after rendering, so asking it would render the items it had before.
-  const data = createMemo(() => props.items ?? (props.paths && treeFromPaths(props.paths)))
+  const data = createMemo(
+    () => props.items ?? (props.paths && treeFromPaths(props.paths))
+  )
   return (
     <CheckableContext value={() => !!props.checkable}>
       <ItemContext value={null}>
         <parts.Root {...props}>
           {/* Without children, a data tree renders its items. */}
-          {props.children ?? <Show when={data()}>{(items) => <TreeItems items={items()} />}</Show>}
+          {props.children ?? (
+            <Show when={data()}>
+              {(items) => <TreeItems items={items()} />}
+            </Show>
+          )}
         </parts.Root>
       </ItemContext>
     </CheckableContext>
@@ -75,7 +89,10 @@ function Tree<Mode extends TreeMode = "single">(props: TreeProps<Mode>) {
  * load later, or whose group is inside a component of your own.
  * @stable
  */
-function TreeItem(props: Omit<PartProps<"div", TreeItemState>, Clashing> & Omit<TreeItemProps, "parent">) {
+function TreeItem(
+  props: Omit<PartProps<"div", TreeItemState>, Clashing> &
+    Omit<TreeItemProps, "parent">
+) {
   const parent = useContext(ItemContext)
   // Written by a TreeGroup among the children, while the children render.
   const [grouped, setGrouped] = createSignal(false, { ownedWrite: true })
@@ -90,21 +107,34 @@ function TreeItem(props: Omit<PartProps<"div", TreeItemState>, Clashing> & Omit<
   const context = { value: () => props.value, grouped: setGrouped }
   // In document order on the server, so the first item claims the tab stop before the items after it.
   return provided(
-    <ItemContext value={context}>{usePart(treePrimitive, "item", item, rest, "div")}</ItemContext>,
+    <ItemContext value={context}>
+      {usePart(treePrimitive, "item", item, rest, "div")}
+    </ItemContext>
   )
 }
 
 // A part inside an item, which reads the item it belongs to.
-function useItemPart(slot: "label" | "indicator" | "checkbox", props: PartProps<"span", TreeItemState>) {
+function useItemPart(
+  slot: "label" | "indicator" | "checkbox",
+  props: PartProps<"span", TreeItemState>
+) {
   const item = useItem()
-  return usePart(treePrimitive, slot, () => ({ value: item.value() }), props, "span")
+  return usePart(
+    treePrimitive,
+    slot,
+    () => ({ value: item.value() }),
+    props,
+    "span"
+  )
 }
 
 /**
  * The item's text, which names it. Render it as a link to make the item one.
  * @stable
  */
-function TreeItemLabel(props: TreeItemPartProps & PartProps<"span", TreeItemState>) {
+function TreeItemLabel(
+  props: TreeItemPartProps & PartProps<"span", TreeItemState>
+) {
   return useItemPart("label", props)
 }
 
@@ -112,7 +142,9 @@ function TreeItemLabel(props: TreeItemPartProps & PartProps<"span", TreeItemStat
  * The arrow that expands and collapses a branch. Alt or Option expands everything in it.
  * @stable
  */
-function TreeItemIndicator(props: TreeItemPartProps & PartProps<"span", TreeItemState>) {
+function TreeItemIndicator(
+  props: TreeItemPartProps & PartProps<"span", TreeItemState>
+) {
   return useItemPart("indicator", props)
 }
 
@@ -120,7 +152,9 @@ function TreeItemIndicator(props: TreeItemPartProps & PartProps<"span", TreeItem
  * The item's checkbox, with `checkable`. Screen readers hear the item's checked state instead.
  * @stable
  */
-function TreeItemCheckbox(props: TreeItemPartProps & PartProps<"span", TreeItemState>) {
+function TreeItemCheckbox(
+  props: TreeItemPartProps & PartProps<"span", TreeItemState>
+) {
   return useItemPart("checkbox", props)
 }
 
@@ -142,7 +176,13 @@ function TreeGroup(props: TreeGroupProps & PartProps<"div", TreeGroupState>) {
     keepMounted: props.keepMounted,
     hiddenUntilFound: props.hiddenUntilFound,
   })
-  return usePart(treePrimitive, "group", group, omit(props, "keepMounted", "hiddenUntilFound"), "div")
+  return usePart(
+    treePrimitive,
+    "group",
+    group,
+    omit(props, "keepMounted", "hiddenUntilFound"),
+    "div"
+  )
 }
 
 /**
@@ -154,11 +194,21 @@ function TreeItems(props: { items: TreeItemData[] }) {
   return (
     <For each={props.items}>
       {(item) => (
-        <TreeItem value={item.value} branch={item.children !== undefined} disabled={item.disabled}>
+        <TreeItem
+          value={item.value}
+          branch={item.children !== undefined}
+          disabled={item.disabled}
+        >
           <Show when={checkable()}>
             <TreeItemCheckbox />
           </Show>
-          <TreeItemLabel render={item.href ? (label) => <a {...label} href={item.href} /> : undefined}>
+          <TreeItemLabel
+            render={
+              item.href
+                ? (label) => <a {...label} href={item.href} />
+                : undefined
+            }
+          >
             {item.label}
           </TreeItemLabel>
           <Show when={item.children}>

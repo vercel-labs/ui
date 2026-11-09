@@ -2,7 +2,12 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
 import { For } from "solid-js"
 
 const folders = [
-  { value: "inbox", label: "Inbox", count: 12, content: "12 conversations, 3 of them unread." },
+  {
+    value: "inbox",
+    label: "Inbox",
+    count: 12,
+    content: "12 conversations, 3 of them unread.",
+  },
   {
     value: "unread",
     label: "Unread",
@@ -28,7 +33,9 @@ function Example() {
               render={(props) => (
                 <button {...props}>
                   {props.children}
-                  {folder.count > 0 && <span data-slot="badge">{folder.count}</span>}
+                  {folder.count > 0 && (
+                    <span data-slot="badge">{folder.count}</span>
+                  )}
                 </button>
               )}
             >
@@ -37,7 +44,11 @@ function Example() {
           )}
         </For>
       </TabsList>
-      <For each={folders}>{(folder) => <TabsPanel value={folder.value}>{folder.content}</TabsPanel>}</For>
+      <For each={folders}>
+        {(folder) => (
+          <TabsPanel value={folder.value}>{folder.content}</TabsPanel>
+        )}
+      </For>
     </Tabs>
   )
 }

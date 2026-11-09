@@ -13,7 +13,11 @@ import {
   type SheetOutlet,
 } from "../../foundation/popups/sheet"
 import type { PhysicalSide } from "../../foundation/platform/sides"
-import type { DrawerOptions, DrawerOutletProps, DrawerSnapPointChangeReason } from "./drawer"
+import type {
+  DrawerOptions,
+  DrawerOutletProps,
+  DrawerSnapPointChangeReason,
+} from "./drawer"
 import {
   findSnapIndex,
   isAtOrBelow,
@@ -45,9 +49,13 @@ function defaultSnap(options: DrawerOptions) {
 // Before the sheet is measured, whether a snap point is at or below
 // `modalAbove`, by their order in `snapPoints`, which is ascending in practice.
 function interactiveByOrder(options: DrawerOptions, point: SnapPoint | null) {
-  if (options.modalAbove === undefined || point === null) return false
+  if (options.modalAbove === undefined || point === null) {
+    return false
+  }
   const points = options.snapPoints ?? ["content"]
-  const above = points.findIndex((entry) => sameValue(entry, options.modalAbove))
+  const above = points.findIndex((entry) =>
+    sameValue(entry, options.modalAbove)
+  )
   const index = points.findIndex((entry) => sameValue(entry, point))
   return above >= 0 && index >= 0 && index <= above
 }
@@ -71,17 +79,29 @@ const shapeOf = (options: DrawerOptions) =>
 function stepSnapIndex(
   index: number,
   count: number,
-  action: "cycle" | "expand" | "collapse" | "first" | "last",
+  action: "cycle" | "expand" | "collapse" | "first" | "last"
 ) {
-  if (count === 0) return -1
-  if (action === "first") return 0
-  if (action === "last") return count - 1
-  if (action === "cycle") return (index + 1) % count
-  if (action === "expand") return Math.min(count - 1, index + 1)
+  if (count === 0) {
+    return -1
+  }
+  if (action === "first") {
+    return 0
+  }
+  if (action === "last") {
+    return count - 1
+  }
+  if (action === "cycle") {
+    return (index + 1) % count
+  }
+  if (action === "expand") {
+    return Math.min(count - 1, index + 1)
+  }
   return Math.max(0, index - 1)
 }
 
-function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>) {
+function drawerApi(
+  context: PrimitiveContext<DrawerOptions, DrawerState, string>
+) {
   const { store, options } = context
   const change = createChange(context)
   // The sheet this drawer opened from, which it pushes back while open.
@@ -96,7 +116,11 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
 
   // Drawer options are Dialog's, with a wider `onDismissAttempt` that accepts every dialog reason.
   const dialog = dialogApi(
-    context as unknown as PrimitiveContext<DialogSharedOptions, DialogState, string>,
+    context as unknown as PrimitiveContext<
+      DialogSharedOptions,
+      DialogState,
+      string
+    >,
     false,
     {
       preset: drawerPreset,
@@ -105,26 +129,38 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
         sheetLayers.set(layer, () => sheet)
         stackedOn = parentSheet(layer)
         // Web components can show content again as it unmounts; a closed drawer stays closed.
-        if (store.get().open) sheet?.open(popup.opener() !== "initial")
+        if (store.get().open) {
+          sheet?.open(popup.opener() !== "initial")
+        }
         return () => sheetLayers.delete(layer)
       },
       onOpenChange(open) {
-        if (!open) sheet?.close()
+        if (!open) {
+          sheet?.close()
+        }
       },
       // Android's back steps the drawer down a snap point before it closes it.
       intercept(reason, event) {
-        if (reason !== "back") return false
+        if (reason !== "back") {
+          return false
+        }
         const index = findSnapIndex(resolved, store.get().snapPoint)
-        if (index <= 0) return false
+        if (index <= 0) {
+          return false
+        }
         snapTo(resolved[index - 1].value, "back", event)
         return true
       },
       onRefuse: () => sheet?.nudge(),
-    },
+    }
   )
   const { popup, hide, dismissal } = dialog.internal
 
-  function snapTo(point: SnapPoint, reason: DrawerSnapPointChangeReason, event?: Event) {
+  function snapTo(
+    point: SnapPoint,
+    reason: DrawerSnapPointChangeReason,
+    event?: Event
+  ) {
     return change("snapPoint", point, { reason, event })
   }
 
@@ -132,7 +168,9 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
   // or was chosen while closed, and whether the page behind is usable there.
   function opened(state: DrawerState, given = options()) {
     const snapPoint =
-      given.snapPoint === undefined && state.snapPoint === null ? defaultSnap(given) : state.snapPoint
+      given.snapPoint === undefined && state.snapPoint === null
+        ? defaultSnap(given)
+        : state.snapPoint
     return { snapPoint, interactive: interactiveByOrder(given, snapPoint) }
   }
 
@@ -144,23 +182,44 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
   // A controlled open or close lands with what it changes, in the same pass:
   // an open starts where it starts, and a close that unmounts at once forgets
   // the snap point.
-  deriveFromOptions(context, ["snapPoint", "interactive"], (synced, state, arriving) => {
-    if (synced.open === undefined || synced.open === state.open) return
-    const next = { ...state, ...synced }
-    if (next.open) return opened(next, arriving)
-    if (!next.mounted && forgetsSnap(next, arriving)) return { snapPoint: null }
-  })
+  deriveFromOptions(
+    context,
+    ["snapPoint", "interactive"],
+    (synced, state, arriving) => {
+      if (synced.open === undefined || synced.open === state.open) {
+        return
+      }
+      const next = { ...state, ...synced }
+      if (next.open) {
+        return opened(next, arriving)
+      }
+      if (!next.mounted && forgetsSnap(next, arriving)) {
+        return { snapPoint: null }
+      }
+    }
+  )
   // An uncontrolled snap point the new snap points leave out moves to the
   // default, or to their first when they leave that out too.
-  deriveFromOptions(context, ["snapPoint"], (synced, state, arriving: DrawerOptions) => {
-    const point = synced.snapPoint ?? state.snapPoint
-    if (arriving.snapPoint !== undefined || point === null) return
-    const points = arriving.snapPoints ?? ["content"]
-    const kept = (entry: SnapPoint) => points.some((other) => sameValue(other, entry))
-    if (kept(point)) return
-    const fallback = defaultSnap(arriving)
-    return { snapPoint: kept(fallback) || !points.length ? fallback : points[0] }
-  })
+  deriveFromOptions(
+    context,
+    ["snapPoint"],
+    (synced, state, arriving: DrawerOptions) => {
+      const point = synced.snapPoint ?? state.snapPoint
+      if (arriving.snapPoint !== undefined || point === null) {
+        return
+      }
+      const points = arriving.snapPoints ?? ["content"]
+      const kept = (entry: SnapPoint) =>
+        points.some((other) => sameValue(other, entry))
+      if (kept(point)) {
+        return
+      }
+      const fallback = defaultSnap(arriving)
+      return {
+        snapPoint: kept(fallback) || !points.length ? fallback : points[0],
+      }
+    }
+  )
   // The modal setting in effect: none while the page behind is usable.
   deriveState(context, ["modal"], ({ interactive, modalSetting }) => ({
     modal: interactive ? false : modalSetting,
@@ -183,30 +242,43 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
     }
     if (state.snapPoint !== lastSnap) {
       lastSnap = state.snapPoint
-      if (!state.open) chosenWhileClosed = state.snapPoint !== null
-      else if (state.snapPoint !== null) sheet?.snapTo(state.snapPoint, "imperative")
+      if (!state.open) {
+        chosenWhileClosed = state.snapPoint !== null
+      } else if (state.snapPoint !== null) {
+        sheet?.snapTo(state.snapPoint, "imperative")
+      }
     }
     // A snap point set while closed, even during the close animation, is
     // where it opens next.
     const unmounted = wasMounted && !state.mounted
     wasMounted = state.mounted
-    if (unmounted && !state.open && !chosenWhileClosed && forgetsSnap(state)) store.set({ snapPoint: null })
+    if (unmounted && !state.open && !chosenWhileClosed && forgetsSnap(state)) {
+      store.set({ snapPoint: null })
+    }
   })
 
   // What the sheet reports.
   const events = {
     /** The resting snap point changes, at release or when a move starts. */
     snap(point: SnapPoint, reason: DrawerSnapPointChangeReason, event?: Event) {
-      if (sameValue(point, store.get().snapPoint)) return
+      if (sameValue(point, store.get().snapPoint)) {
+        return
+      }
       lastSnap = point
-      if (change("snapPoint", point, { reason, event }) || !store.get().open) return
+      if (change("snapPoint", point, { reason, event }) || !store.get().open) {
+        return
+      }
       // Refused: back to where it was.
       lastSnap = store.get().snapPoint
-      if (lastSnap !== null) sheet?.snapTo(lastSnap, "imperative")
+      if (lastSnap !== null) {
+        sheet?.snapTo(lastSnap, "imperative")
+      }
     },
     /** It came to rest. Modality follows the snap point it rests on. */
     rest(point: SnapPoint | null) {
-      if (point === null) return
+      if (point === null) {
+        return
+      }
       store.set({
         interactive: isAtOrBelow(resolved, point, options().modalAbove),
         snapIndex: findSnapIndex(resolved, point),
@@ -220,7 +292,9 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
       // the next frame, springs back.
       requestAnimationFrame(() => {
         const snap = store.get().snapPoint
-        if (store.get().open && snap !== null) sheet?.snapTo(snap, "imperative")
+        if (store.get().open && snap !== null) {
+          sheet?.snapTo(snap, "imperative")
+        }
       })
     },
     drag: (dragging: boolean) => store.set({ dragging }),
@@ -237,7 +311,11 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
 
   // Called from the content's `bind`, between the sheet and the popup layer.
   let attached: Parameters<typeof attach> | undefined
-  function attach(el: HTMLElement, host: HTMLElement, backdrop: () => HTMLElement | undefined) {
+  function attach(
+    el: HTMLElement,
+    host: HTMLElement,
+    backdrop: () => HTMLElement | undefined
+  ) {
     attached = [el, host, backdrop]
     // One sheet per drawer: a content bound again replaces the last one.
     sheet?.destroy()
@@ -258,7 +336,9 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
       themeColor: () => !!options().themeColor,
       preventEdgeSwipe: () => !!options().preventEdgeSwipe,
       // The handle is a button that drags.
-      canMouseDrag: (target) => !!target.closest('[data-slot="drawer-handle"]') || isDragSurface(target),
+      canMouseDrag: (target) =>
+        !!target.closest('[data-slot="drawer-handle"]') ||
+        isDragSurface(target),
       onSnap: events.snap,
       onRest: events.rest,
       onDismiss: events.dismiss,
@@ -266,8 +346,12 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
       onDragChange: events.drag,
       onLayout: ({ side, snapPoints }) => events.layout(side, snapPoints),
     })
-    if (dev && options().snapPoints?.length === 0)
-      warn("`snapPoints` is empty, so it rests at its own size.", { component: "drawer", id: context.id })
+    if (dev && options().snapPoints?.length === 0) {
+      warn("`snapPoints` is empty, so it rests at its own size.", {
+        component: "drawer",
+        id: context.id,
+      })
+    }
   }
 
   function detach() {
@@ -287,14 +371,22 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
     const moved = nextPoints !== points
     shape = nextShape
     points = nextPoints
-    if (!reshaped && !moved) return
+    if (!reshaped && !moved) {
+      return
+    }
     // Once the options are handed over, so the sheet's state isn't written beside them.
     queueMicrotask(() => {
-      if (!sheet || !attached) return
+      if (!sheet || !attached) {
+        return
+      }
       if (reshaped) {
         attach(...attached)
-        if (store.get().open) sheet?.open(false)
-      } else sheet.refresh()
+        if (store.get().open) {
+          sheet?.open(false)
+        }
+      } else {
+        sheet.refresh()
+      }
     })
   })
 
@@ -302,10 +394,16 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
   function stepHandle(
     action: Parameters<typeof stepSnapIndex>[2],
     reason: DrawerSnapPointChangeReason,
-    event?: Event,
+    event?: Event
   ) {
-    const index = stepSnapIndex(findSnapIndex(resolved, store.get().snapPoint), resolved.length, action)
-    if (index >= 0) snapTo(resolved[index].value, reason, event)
+    const index = stepSnapIndex(
+      findSnapIndex(resolved, store.get().snapPoint),
+      resolved.length,
+      action
+    )
+    if (index >= 0) {
+      snapTo(resolved[index].value, reason, event)
+    }
   }
 
   const api = {
@@ -313,7 +411,10 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
     getSnapPoint: () => store.get().snapPoint,
     setSnapPoint: (
       point: SnapPoint,
-      { reason = "imperative", event }: ChangeOptions<DrawerSnapPointChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: ChangeOptions<DrawerSnapPointChangeReason> = {}
     ) => snapTo(point, reason, event),
     internal: {
       ...dialog.internal,
@@ -344,4 +445,10 @@ function drawerApi(context: PrimitiveContext<DrawerOptions, DrawerState, string>
  */
 type DrawerApi = ReturnType<typeof drawerApi>
 
-export { defaultSnap, type DrawerApi, drawerApi, type DrawerState, interactiveByOrder }
+export {
+  defaultSnap,
+  type DrawerApi,
+  drawerApi,
+  type DrawerState,
+  interactiveByOrder,
+}

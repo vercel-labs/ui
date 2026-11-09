@@ -7,17 +7,23 @@ import { createParts, wrappedButton } from "./define-element"
 // button. A type that differs from the one the core wrote is the author's new one.
 const authoredTypes = new WeakMap<HTMLElement, string | null>()
 
-const isButtonType = (type: string | null | undefined): type is "button" | "submit" | "reset" =>
+const isButtonType = (
+  type: string | null | undefined
+): type is "button" | "submit" | "reset" =>
   type === "button" || type === "submit" || type === "reset"
 
 function authoredType(el: HTMLElement) {
   const inner = wrappedButton(el)
-  if (!inner) return undefined
+  if (!inner) {
+    return undefined
+  }
   const current = inner.getAttribute("type")
   const authored = authoredTypes.get(inner)
   // Anything else, like no type at all, gets the core's default, "button".
   const written = isButtonType(authored) ? authored : "button"
-  if (!authoredTypes.has(inner) || current !== written) authoredTypes.set(inner, current)
+  if (!authoredTypes.has(inner) || current !== written) {
+    authoredTypes.set(inner, current)
+  }
   const type = authoredTypes.get(inner)
   return isButtonType(type) ? type : undefined
 }

@@ -27,19 +27,30 @@ const members = ref<Member[]>([
 const newest = computed(() => members.value[members.value.length - 1])
 
 async function editNewest(event: MouseEvent) {
-  const result = await popover.open({ payload: newest.value, anchor: event.currentTarget as HTMLElement })
+  const result = await popover.open({
+    payload: newest.value,
+    anchor: event.currentTarget as HTMLElement,
+  })
   log(`Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`)
 }
 
 function onPayloadChange(payload: unknown) {
   const member = payload as Member | undefined
-  if (member) log(`Editing ${member.name}`)
+  if (member) {
+    log(`Editing ${member.name}`)
+  }
 }
 
 function save(event: SubmitEvent, member: Member | undefined) {
-  if ((event.submitter as HTMLButtonElement).value !== "save" || !member) return
-  const role = String(new FormData(event.currentTarget as HTMLFormElement).get("role"))
-  members.value = members.value.map((entry) => (entry.name === member.name ? { ...entry, role } : entry))
+  if ((event.submitter as HTMLButtonElement).value !== "save" || !member) {
+    return
+  }
+  const role = String(
+    new FormData(event.currentTarget as HTMLFormElement).get("role")
+  )
+  members.value = members.value.map((entry) =>
+    entry.name === member.name ? { ...entry, role } : entry
+  )
 }
 </script>
 
@@ -67,11 +78,21 @@ function save(event: SubmitEvent, member: Member | undefined) {
     <Popover :controller="popover" @payload-change="onPayloadChange">
       <MemberPopoverContent v-slot="{ state }" align="end" :side-offset="8">
         <PopoverTitle>{{ state.payload?.name }}</PopoverTitle>
-        <PopoverDescription>Roles decide what they can change.</PopoverDescription>
-        <form data-slot="stack" method="dialog" @submit="save($event as SubmitEvent, state.payload)">
+        <PopoverDescription
+          >Roles decide what they can change.</PopoverDescription
+        >
+        <form
+          data-slot="stack"
+          method="dialog"
+          @submit="save($event as SubmitEvent, state.payload)"
+        >
           <Field>
             <FieldLabel>Role</FieldLabel>
-            <FieldControl :key="state.payload?.name" name="role" :default-value="state.payload?.role">
+            <FieldControl
+              :key="state.payload?.name"
+              name="role"
+              :default-value="state.payload?.role"
+            >
               <template #render="{ props }">
                 <select v-bind="props">
                   <option v-for="role in roles" :key="role">{{ role }}</option>
@@ -81,7 +102,9 @@ function save(event: SubmitEvent, member: Member | undefined) {
           </Field>
           <div data-slot="row">
             <button type="submit" value="cancel" formnovalidate>Cancel</button>
-            <button type="submit" value="save" data-variant="solid">Save</button>
+            <button type="submit" value="save" data-variant="solid">
+              Save
+            </button>
           </div>
         </form>
       </MemberPopoverContent>

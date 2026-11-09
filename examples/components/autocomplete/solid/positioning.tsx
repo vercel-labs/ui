@@ -9,7 +9,14 @@ import {
 } from "@ui-sdk/solid/autocomplete"
 import { createSignal, For } from "solid-js"
 
-const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Blackberry", "Blueberry"]
+const fruits = [
+  "Apple",
+  "Apricot",
+  "Avocado",
+  "Banana",
+  "Blackberry",
+  "Blueberry",
+]
 
 function Example() {
   const [box, setBox] = createSignal<HTMLElement | null>(null)
@@ -31,7 +38,11 @@ function Example() {
         >
           <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
-            <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
+            <For each={fruits}>
+              {(fruit) => (
+                <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>
+              )}
+            </For>
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>

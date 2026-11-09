@@ -61,7 +61,8 @@ const optionalBoolean = { type: Boolean, default: undefined }
 
 // A component's main value, from its own prop or from `v-model`. `null` is a
 // value, like a navigation menu with nothing open, so only `undefined` falls back.
-const orModel = <T>(value: T | undefined, model: T | undefined) => (value === undefined ? model : value)
+const orModel = <T>(value: T | undefined, model: T | undefined) =>
+  value === undefined ? model : value
 
 type RefFunction = (el: unknown) => void
 const combined = new WeakMap<RefFunction, WeakMap<RefFunction, RefFunction>>()
@@ -69,9 +70,13 @@ const combined = new WeakMap<RefFunction, WeakMap<RefFunction, RefFunction>>()
 // One ref that calls two, the same function for the same pair, so Vue never
 // detaches and reattaches the element. Vue's mergeProps keeps only the last ref.
 function bothRefs(a: RefFunction | undefined, b: RefFunction | undefined) {
-  if (!a || !b) return a ?? b
+  if (!a || !b) {
+    return a ?? b
+  }
   let inner = combined.get(a)
-  if (!inner) combined.set(a, (inner = new WeakMap()))
+  if (!inner) {
+    combined.set(a, (inner = new WeakMap()))
+  }
   let ref = inner.get(b)
   if (!ref) {
     ref = (el) => {
@@ -91,13 +96,21 @@ const styles = new Map<string, Record<string, string>>()
 
 function styleObject(css: string) {
   let style = styles.get(css)
-  if (style) return style
+  if (style) {
+    return style
+  }
   style = {}
   for (const declaration of css.split(";")) {
     const index = declaration.indexOf(":")
-    if (index !== -1) style[declaration.slice(0, index).trim()] = declaration.slice(index + 1).trim()
+    if (index !== -1) {
+      style[declaration.slice(0, index).trim()] = declaration
+        .slice(index + 1)
+        .trim()
+    }
   }
-  if (styles.size >= 500) styles.clear()
+  if (styles.size >= 500) {
+    styles.clear()
+  }
   styles.set(css, style)
   return style
 }
@@ -106,7 +119,12 @@ function styleObject(css: string) {
 const listenerProps = new Map<string, string>()
 function listenerProp(type: string) {
   let prop = listenerProps.get(type)
-  if (!prop) listenerProps.set(type, (prop = `on${type[0].toUpperCase()}${type.slice(1)}`))
+  if (!prop) {
+    listenerProps.set(
+      type,
+      (prop = `on${type[0].toUpperCase()}${type.slice(1)}`)
+    )
+  }
   return prop
 }
 
@@ -117,10 +135,19 @@ function mergeAttrs(result: Record<string, any>, attrs: Attrs) {
   const own = yieldToAuthor(attrs, (name) => result[name] != null)
   for (const key in own) {
     const value = own[key]
-    if (value === undefined || (key === "id" && result.id != null)) continue
-    if (key === "style")
-      result.style = result.style ? normalizeStyle([result.style, styleObject(value)]) : styleObject(value)
-    else result[key] = key === "class" && result.class ? normalizeClass([result.class, value]) : value
+    if (value === undefined || (key === "id" && result.id != null)) {
+      continue
+    }
+    if (key === "style") {
+      result.style = result.style
+        ? normalizeStyle([result.style, styleObject(value)])
+        : styleObject(value)
+    } else {
+      result[key] =
+        key === "class" && result.class
+          ? normalizeClass([result.class, value])
+          : value
+    }
   }
   return result
 }
@@ -144,27 +171,34 @@ type PrimitiveHandle<P extends Primitive> = {
   slot: <S extends SlotName<P>>(
     name: S,
     props?: PropsOf<P, S>,
-    user?: Record<string, any>,
+    user?: Record<string, any>
   ) => Record<string, any>
 }
 
 // Each primitive's parts share one scope: the nearest instance, and getters
 // for the props of the parts around the one rendering, by slot, for props a
 // nested part takes from its parent, like an icon's item `value`.
-type Scope = { handle: PrimitiveHandle<Primitive>; around: Record<string, () => Record<string, unknown>> }
+type Scope = {
+  handle: PrimitiveHandle<Primitive>
+  around: Record<string, () => Record<string, unknown>>
+}
 const scopes = new WeakMap<Primitive, InjectionKey<Scope>>()
 function scopeKey(primitive: Primitive) {
   let key = scopes.get(primitive)
-  if (!key) scopes.set(primitive, (key = Symbol(primitive.name)))
+  if (!key) {
+    scopes.set(primitive, (key = Symbol(primitive.name)))
+  }
   return key
 }
 
 // "tab-icon" is "TabIcon".
-const pascal = (name: string) => name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
+const pascal = (name: string) =>
+  name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
 
 /** The nearest instance of a primitive and the props of the parts around, or null outside one. */
 function useScope<P extends Primitive>(primitive: P) {
-  return inject(scopeKey(primitive), null) as (Scope & { handle: PrimitiveHandle<P> }) | null
+  return inject(scopeKey(primitive), null) as
+    (Scope & { handle: PrimitiveHandle<P> }) | null
 }
 
 /** The nearest instance of a primitive, for a part written by hand. Throws outside one. */
@@ -179,16 +213,28 @@ function useHandle<P extends Primitive>(primitive: P) {
 
 /** Shares a handle with the parts inside, like a trigger's outside its root, connected by a controller. */
 function provideHandle<P extends Primitive>(handle: PrimitiveHandle<P>) {
-  provide(scopeKey(handle.primitive), { handle: handle as PrimitiveHandle<Primitive>, around: {} })
+  provide(scopeKey(handle.primitive), {
+    handle: handle as PrimitiveHandle<Primitive>,
+    around: {},
+  })
 }
 
 /**
  * Shares a part's props with the parts inside it, for the props they take
  * from it when they're left out, like an item's `value` for its icon.
  */
-function provideProps(primitive: Primitive, slot: string, props: () => Record<string, unknown>) {
+function provideProps(
+  primitive: Primitive,
+  slot: string,
+  props: () => Record<string, unknown>
+) {
   const scope = useScope(primitive)
-  if (scope) provide(scopeKey(primitive), { ...scope, around: { ...scope.around, [slot]: props } })
+  if (scope) {
+    provide(scopeKey(primitive), {
+      ...scope,
+      around: { ...scope.around, [slot]: props },
+    })
+  }
 }
 
 const memo = <Value>(compute: () => Value) => {
@@ -202,7 +248,10 @@ const memo = <Value>(compute: () => Value) => {
  * getter, so reactive props stay in sync. Parts inside the component use it.
  * @stable
  */
-function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsOf<P>) {
+function usePrimitive<P extends Primitive>(
+  primitive: P,
+  options: () => OptionsOf<P>
+) {
   // Prefixed so a page using ui-sdk is recognizable from its HTML. Part ids
   // stay unprefixed, since some are keys, like saved resizable layouts.
   const id = `ui-sdk-${useId()}`
@@ -210,10 +259,14 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
   // What reaches outside the instance, like its controller, starts once it
   // mounts, since a server never mounts or unmounts it: a module-level
   // controller would stay attached to one request's instance.
-  const instance = unwatched(() => primitive(snapshot({ ...options(), id }))) as ReturnType<P>
+  const instance = unwatched(() =>
+    primitive(snapshot({ ...options(), id }))
+  ) as ReturnType<P>
   onMounted(() => keep(instance))
   const version = shallowRef(renderVersion(instance))
-  onScopeDispose(instance.subscribe(() => (version.value = renderVersion(instance))))
+  onScopeDispose(
+    instance.subscribe(() => (version.value = renderVersion(instance)))
+  )
   // Leaving the page settles a pending controller `open()` and detaches the controller.
   onScopeDispose(() => instance.destroy())
   watchEffect(() => instance.setOptions(snapshot({ ...options(), id })))
@@ -223,7 +276,9 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
   // Outside a component's render, like in a watcher, every change counts.
   const track = (part: Part) => {
     const owner = getCurrentInstance()
-    if (owner) return watchPart(owner, part)
+    if (owner) {
+      return watchPart(owner, part)
+    }
     version.value
   }
 
@@ -241,20 +296,32 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
       const part = instance.part(name, props)
       const present = isPresent(part)
       const watched = track(part)
-      if (watched) watched.present = present
+      if (watched) {
+        watched.present = present
+      }
       return present
     },
     // Attributes, listeners and a ref for a slot's element. Vue binds HTML
     // attributes as-is. User listeners run first and can preventDefault().
     // Reading it inside a render tracks the part's attributes.
-    slot<S extends SlotName<P>>(name: S, props?: PropsOf<P, S>, user: Record<string, any> = {}) {
+    slot<S extends SlotName<P>>(
+      name: S,
+      props?: PropsOf<P, S>,
+      user: Record<string, any> = {}
+    ) {
       const part = instance.part(name, props)
       takeOwnId(part, user.id)
       const attrs = partAttrs(part)
       const watched = track(part)
-      if (watched) watched.attrs = attrs
+      if (watched) {
+        watched.attrs = attrs
+      }
       const result: Record<string, any> = {}
-      for (const key in user) if (key !== "ref") result[key] = user[key]
+      for (const key in user) {
+        if (key !== "ref") {
+          result[key] = user[key]
+        }
+      }
       mergeAttrs(result, attrs)
       const handlers = partHandlers(part)
       for (const type in handlers) {
@@ -265,12 +332,17 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
         // run first and can cancel.
         result[prop] = userHandler
           ? (event: Event) => {
-              for (const fn of [userHandler].flat()) fn?.(event)
+              for (const fn of [userHandler].flat()) {
+                fn?.(event)
+              }
               handler(event)
             }
           : handler
       }
-      result.ref = bothRefs(user.ref, partRef(ref(part, { by: "framework", attaches: "all" }), name))
+      result.ref = bothRefs(
+        user.ref,
+        partRef(ref(part, { by: "framework", attaches: "all" }), name)
+      )
       return result
     },
   }
@@ -313,17 +385,32 @@ function createPartWatcher(instance: ReturnType<Primitive>) {
   // a slot's `direct` attributes to the element itself, so they don't count.
   function check(part: Part, watch: PartWatch, liveOnly: boolean) {
     watch.onChange?.()
-    const moved = () => watch.present !== undefined && isPresent(part, watch.props) !== watch.present
+    const moved = () =>
+      watch.present !== undefined &&
+      isPresent(part, watch.props) !== watch.present
     // Presence may read live state, so a live change checks it alone.
     if (liveOnly) {
-      if (moved()) watch.tick.value++
+      if (moved()) {
+        watch.tick.value++
+      }
       return
     }
     const version = renderVersion(instance)
-    if (version === watch.version) return
+    if (version === watch.version) {
+      return
+    }
     watch.version = version
-    if (moved() || (watch.attrs && !sameAttrs(partAttrs(part, watch.props), watch.attrs, directNames(part))))
+    if (
+      moved() ||
+      (watch.attrs &&
+        !sameAttrs(
+          partAttrs(part, watch.props),
+          watch.attrs,
+          directNames(part)
+        ))
+    ) {
       watch.tick.value++
+    }
   }
 
   // What `owner` renders for this part, subscribed and tracked by whatever
@@ -336,7 +423,12 @@ function createPartWatcher(instance: ReturnType<Primitive>) {
       onUnmounted(() => own.forEach((watch) => watch.unsubscribe?.()), owner)
     }
     let watch = watched.get(part)
-    if (!watch) watched.set(part, (watch = { tick: shallowRef(0), props: part.props, version: 0 }))
+    if (!watch) {
+      watched.set(
+        part,
+        (watch = { tick: shallowRef(0), props: part.props, version: 0 })
+      )
+    }
     watch.props = part.props
     watch.version = renderVersion(instance)
     // A new value the part selects on needs a new subscription.
@@ -345,7 +437,9 @@ function createPartWatcher(instance: ReturnType<Primitive>) {
       const current = watch
       current.unsubscribe?.()
       current.subscription = subscription
-      current.unsubscribe = subscribe(part, (liveOnly) => check(part, current, liveOnly))
+      current.unsubscribe = subscribe(part, (liveOnly) =>
+        check(part, current, liveOnly)
+      )
     }
     watch.tick.value
     return watch
@@ -355,7 +449,10 @@ function createPartWatcher(instance: ReturnType<Primitive>) {
 // Attributes in `skip` may differ.
 function sameAttrs(a: Attrs, b: Attrs, skip: readonly string[] = []) {
   const keys = Object.keys(a)
-  return keys.length === Object.keys(b).length && keys.every((key) => a[key] === b[key] || skip.includes(key))
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every((key) => a[key] === b[key] || skip.includes(key))
+  )
 }
 
 /**
@@ -367,7 +464,9 @@ function sameAttrs(a: Attrs, b: Attrs, skip: readonly string[] = []) {
  */
 function copyProps<T extends object>(props: T) {
   const copy = {} as T
-  for (const key in toRaw(props)) copy[key as keyof T] = props[key as keyof T]
+  for (const key in toRaw(props)) {
+    copy[key as keyof T] = props[key as keyof T]
+  }
   return copy
 }
 
@@ -376,7 +475,11 @@ function copyProps<T extends object>(props: T) {
  * read, so parts that never read live state, like the highlighted item or
  * whether a scroll area is scrolling, never re-render for it.
  */
-function trackedState(instance: PrimitiveInstance, name: string, props: () => object) {
+function trackedState(
+  instance: PrimitiveInstance,
+  name: string,
+  props: () => object
+) {
   const tick = shallowRef(0)
   let last: Record<string, unknown> | undefined
   let unsubscribe: (() => void) | undefined
@@ -386,15 +489,22 @@ function trackedState(instance: PrimitiveInstance, name: string, props: () => ob
   // changes, which renders everything that read them, so a component the
   // state was passed to reads its keys again too.
   const read = new Set<string>()
-  const current = () => partState(instance.part(name, props())) as Record<string, unknown>
+  const current = () =>
+    partState(instance.part(name, props())) as Record<string, unknown>
   // A loop rather than an array, since this runs on every change that reaches the part.
   const changed = (next: Record<string, unknown>) => {
-    for (const key of read) if (!sameSlotState(next[key], last![key])) return true
+    for (const key of read) {
+      if (!sameSlotState(next[key], last![key])) {
+        return true
+      }
+    }
     return false
   }
   const listener = () => {
     const next = current()
-    if (!changed(next)) return
+    if (!changed(next)) {
+      return
+    }
     last = next
     // The render this causes reads its keys again.
     read.clear()
@@ -414,12 +524,16 @@ function trackedState(instance: PrimitiveInstance, name: string, props: () => ob
   let selected: string | undefined
   const watchPart = (part: Part) => {
     const values = selectedKeys(part)
-    if (part === subscribed && values === selected) return
+    if (part === subscribed && values === selected) {
+      return
+    }
     subscribed = part
     selected = values
     if (shared) {
       // A new key is another part, and the old one stops reporting here.
-      if (watch) watch.onChange = undefined
+      if (watch) {
+        watch.onChange = undefined
+      }
       watch = shared(component, part)
       watch.onChange = listener
       return
@@ -433,7 +547,9 @@ function trackedState(instance: PrimitiveInstance, name: string, props: () => ob
       tick.value
       const part = instance.part(name, props())
       last = partState(part) as Record<string, unknown>
-      if (typeof key === "string") read.add(key)
+      if (typeof key === "string") {
+        read.add(key)
+      }
       watchPart(part)
       return last[key as string]
     },
@@ -449,7 +565,11 @@ type StateSlotFunctions<State> = {
    * content, like a slider thumb's range input: render it inside with
    * `<component :is="children" />`.
    */
-  render?: (scope: { props: Record<string, unknown>; state: State; children: FunctionalComponent }) => VNode[]
+  render?: (scope: {
+    props: Record<string, unknown>
+    state: State
+    children: FunctionalComponent
+  }) => VNode[]
 }
 type StateSlots<State> = SlotsType<StateSlotFunctions<State>>
 
@@ -459,7 +579,9 @@ type StateSlots<State> = SlotsType<StateSlotFunctions<State>>
  * its state with the types and completion of a `createParts` part.
  * @stable
  */
-type PartSlots<P extends Primitive, S extends SlotName<P>> = StateSlots<StateOf<P, S>>
+type PartSlots<P extends Primitive, S extends SlotName<P>> = StateSlots<
+  StateOf<P, S>
+>
 
 // Renders a default slot in a component of its own, which renders again only
 // when the slot does: for a slot made anew, like one that reads a `v-for`
@@ -469,17 +591,24 @@ type PartSlots<P extends Primitive, S extends SlotName<P>> = StateSlots<StateOf<
 const SlotHost = defineComponent({
   name: "SlotHost",
   props: {
-    slot: { type: Function as PropType<(props: { state: object }) => VNode[]>, required: true },
+    slot: {
+      type: Function as PropType<(props: { state: object }) => VNode[]>,
+      required: true,
+    },
     state: { type: Object, required: true },
     fallback: Function as PropType<() => unknown>,
   },
-  setup: (props) => () => slotContent(props.slot, { state: props.state }) ?? props.fallback?.(),
+  setup: (props) => () =>
+    slotContent(props.slot, { state: props.state }) ?? props.fallback?.(),
 })
 
 // The fallback SlotHost gets, one function per part, so a new one from each
 // render of the part doesn't render the slot again. It reads the latest
 // fallback from a ref, so a slot that shows it renders again when it changes.
-const fallbacks = new WeakMap<Slots, { latest: ShallowRef<() => unknown>; fallback: () => unknown }>()
+const fallbacks = new WeakMap<
+  Slots,
+  { latest: ShallowRef<() => unknown>; fallback: () => unknown }
+>()
 
 function fallbackOf(slots: Slots, fallback: () => unknown) {
   let entry = fallbacks.get(slots)
@@ -493,8 +622,14 @@ function fallbackOf(slots: Slots, fallback: () => unknown) {
 
 /** A part's default slot, rendered apart from the part, or `fallback` when it renders nothing. */
 function defaultSlot(slots: Slots, state: object, fallback?: () => unknown) {
-  if (!slots.default) return fallback?.()
-  return h(SlotHost, { slot: slots.default, state, fallback: fallback && fallbackOf(slots, fallback) })
+  if (!slots.default) {
+    return fallback?.()
+  }
+  return h(SlotHost, {
+    slot: slots.default,
+    state,
+    fallback: fallback && fallbackOf(slots, fallback),
+  })
 }
 
 /**
@@ -518,13 +653,19 @@ type PartElement<State> = {
 // content it renders, like a focused input, stays when the part renders
 // again. It takes no props, so Vue skips it when the part renders; the part
 // hands it its latest content through a ref it reads, which renders it again.
-const contents = new WeakMap<Slots, { own: ShallowRef<() => unknown>; component: FunctionalComponent }>()
+const contents = new WeakMap<
+  Slots,
+  { own: ShallowRef<() => unknown>; component: FunctionalComponent }
+>()
 
 function contentOf(slots: Slots, own: () => unknown) {
   let content = contents.get(slots)
   if (!content) {
     const latest = shallowRef(own)
-    contents.set(slots, (content = { own: latest, component: () => latest.value() }))
+    contents.set(
+      slots,
+      (content = { own: latest, component: () => latest.value() })
+    )
   }
   content.own.value = own
   return content.component
@@ -538,13 +679,21 @@ function renderElement(
   props: Record<string, unknown>,
   slots: Slots,
   state: object | undefined,
-  element: PartElement<any>,
+  element: PartElement<any>
 ) {
   const { tag, children, hidden } = element
-  const own = children ? () => children(state) : () => slots.default?.({ state })
+  const own = children
+    ? () => children(state)
+    : () => slots.default?.({ state })
   if (slots.render) {
-    const rendered = slots.render({ props, state, children: contentOf(slots, own) })
-    if (hidden) return [...rendered, hidden()]
+    const rendered = slots.render({
+      props,
+      state,
+      children: contentOf(slots, own),
+    })
+    if (hidden) {
+      return [...rendered, hidden()]
+    }
     // One element, not a fragment, so a ref to the part's component gets it as `$el`.
     return rendered.length === 1 ? rendered[0] : rendered
   }
@@ -576,12 +725,18 @@ function usePart<P extends Primitive, S extends SlotName<P>>(
   slot: S,
   slotProps = () => ({}) as PropsOf<P, S>,
   props?: () => Record<string, unknown>,
-  element: string | PartElement<StateOf<P, S>> = "div",
+  element: string | PartElement<StateOf<P, S>> = "div"
 ) {
   const component = getCurrentInstance()
-  if (!component) throw new Error(`The ${slot} part must call usePart in its setup.`)
+  if (!component) {
+    throw new Error(`The ${slot} part must call usePart in its setup.`)
+  }
   const owner = typeof handle === "function" ? useScope(handle)?.handle : handle
-  if (!owner) throw new Error(`The ${slot} part must be used inside its primitive's root.`)
+  if (!owner) {
+    throw new Error(
+      `The ${slot} part must be used inside its primitive's root.`
+    )
+  }
   const attrs = useAttrs()
   const slots = useSlots()
   const user = props ?? (() => attrs)
@@ -590,9 +745,16 @@ function usePart<P extends Primitive, S extends SlotName<P>>(
   const render = () => {
     const current = slotProps()
     // A part that shouldn't be in the page, like an unselected tab's panel, renders nothing.
-    if (!owner.present(slot, current)) return null
+    if (!owner.present(slot, current)) {
+      return null
+    }
     const merged = owner.slot(slot, current, user())
-    return renderElement(options.extend ? options.extend(merged) : merged, slots, state, options)
+    return renderElement(
+      options.extend ? options.extend(merged) : merged,
+      slots,
+      state,
+      options
+    )
   }
   return Object.assign(render, { state })
 }

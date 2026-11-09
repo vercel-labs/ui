@@ -8,7 +8,8 @@ const lastLog = (preview: Locator) =>
     .locator('section[aria-label="Console"] li:not([aria-hidden])')
     .last()
 
-const switchNamed = (preview: Locator, name: string) => preview.getByRole("switch", { name, exact: true })
+const switchNamed = (preview: Locator, name: string) =>
+  preview.getByRole("switch", { name, exact: true })
 
 // Clicks a switch, then presses Space on it, and checks each turns it over.
 const toggles =
@@ -26,18 +27,24 @@ const toggles =
 const checks: Record<string, Check> = {
   basic: toggles("Airplane mode"),
   description: async (preview) => {
-    await expect(switchNamed(preview, "Weekly digest")).toHaveAccessibleDescription(
-      "A summary of your week, every Monday.",
-    )
+    await expect(
+      switchNamed(preview, "Weekly digest")
+    ).toHaveAccessibleDescription("A summary of your week, every Monday.")
     await toggles("Weekly digest")(preview, "")
   },
   "choice-card": async (preview) => {
     const profile = switchNamed(preview, "Public profile")
     await expect(profile).toHaveAttribute("aria-checked", "false")
     // The label covers its card, so a click anywhere on the card toggles the switch.
-    await preview.locator('[data-variant="card"]').filter({ hasText: "Public profile" }).click()
+    await preview
+      .locator('[data-variant="card"]')
+      .filter({ hasText: "Public profile" })
+      .click()
     await expect(profile).toHaveAttribute("aria-checked", "true")
-    await expect(switchNamed(preview, "Show activity status")).toHaveAttribute("aria-checked", "true")
+    await expect(switchNamed(preview, "Show activity status")).toHaveAttribute(
+      "aria-checked",
+      "true"
+    )
   },
   disabled: async (preview) => {
     await toggles("Product updates")(preview, "")
@@ -65,10 +72,18 @@ const checks: Record<string, Check> = {
   form: async (preview) => {
     await switchNamed(preview, "Product updates").click()
     await preview.getByRole("button", { name: "Save" }).click()
-    await expect(lastLog(preview)).toHaveText("Submitted updates=on&security=on&digest=weekly")
+    await expect(lastLog(preview)).toHaveText(
+      "Submitted updates=on&security=on&digest=weekly"
+    )
     await preview.getByRole("button", { name: "Reset" }).click()
-    await expect(switchNamed(preview, "Product updates")).toHaveAttribute("aria-checked", "false")
-    await expect(switchNamed(preview, "Weekly digest")).toHaveAttribute("aria-checked", "true")
+    await expect(switchNamed(preview, "Product updates")).toHaveAttribute(
+      "aria-checked",
+      "false"
+    )
+    await expect(switchNamed(preview, "Weekly digest")).toHaveAttribute(
+      "aria-checked",
+      "true"
+    )
   },
   invalid: async (preview) => {
     const twoFactor = switchNamed(preview, "Two-factor authentication")
@@ -92,7 +107,9 @@ const checks: Record<string, Check> = {
   },
   render: async (preview) => {
     await toggles("Dark mode")(preview, "")
-    await expect(preview.locator('[data-slot="switch-thumb"] svg')).toHaveCount(1)
+    await expect(preview.locator('[data-slot="switch-thumb"] svg')).toHaveCount(
+      1
+    )
   },
 }
 
@@ -100,8 +117,16 @@ const checks: Record<string, Check> = {
 const scoped = Object.fromEntries(
   Object.entries(checks).map(([name, check]): [string, Check] => [
     name,
-    (preview, framework) => check(preview.page().locator(`[data-example="switch/${name}"]`), framework),
-  ]),
+    (preview, framework) =>
+      check(
+        preview.page().locator(`[data-example="switch/${name}"]`),
+        framework
+      ),
+  ])
 )
 
-testExamples("switch", scoped, "components", [...Object.keys(checks), "rtl", "size"])
+testExamples("switch", scoped, "components", [
+  ...Object.keys(checks),
+  "rtl",
+  "size",
+])

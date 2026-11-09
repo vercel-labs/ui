@@ -31,7 +31,7 @@ const AvatarImage = withElement(
       }
       return usePart(avatar, "image", undefined, sourcesLast, "img")
     },
-  }),
+  })
 )
 
 /**

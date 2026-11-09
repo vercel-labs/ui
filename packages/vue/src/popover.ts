@@ -1,4 +1,9 @@
-import type { Anchor, ChangeDetails, DismissAttemptDetails, Side } from "@ui-sdk/core"
+import type {
+  Anchor,
+  ChangeDetails,
+  DismissAttemptDetails,
+  Side,
+} from "@ui-sdk/core"
 import {
   popover as popoverPrimitive,
   type PopoverController,
@@ -51,7 +56,8 @@ type PayloadDetails = ChangeDetails<PopoverPayloadChangeReason>
 type PopoverContext = PrimitiveHandle<typeof popoverPrimitive>
 
 // Where the popup renders. Set on <Popover> or <PopoverContent>.
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("popover-container")
+const ContainerKey: InjectionKey<() => PopupContainer> =
+  Symbol("popover-container")
 // The trigger a PopoverShortcut sits in: its shortcut, and the popover it opens. A trigger
 // connected through a controller sits outside the popover, so its popover comes from here.
 const TriggerKey: InjectionKey<{
@@ -77,7 +83,10 @@ const Popover = /* @__PURE__ */ renderless(
       open: optionalBoolean,
       modelValue: optionalBoolean,
       defaultOpen: optionalBoolean,
-      modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
+      modal: {
+        type: [Boolean, String] as PropType<boolean | "trap-focus">,
+        default: undefined,
+      },
       openOnHover: optionalBoolean,
       delay: Number,
       closeDelay: Number,
@@ -92,7 +101,8 @@ const Popover = /* @__PURE__ */ renderless(
       "update:modelValue": (_open: boolean) => true,
       openChange: (_open: boolean, _details: OpenDetails) => true,
       openChangeComplete: (_open: boolean) => true,
-      dismissAttempt: (_details: DismissAttemptDetails<PopoverDismissReason>) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<PopoverDismissReason>) =>
+        true,
       payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
     },
     setup(props, { slots, emit }) {
@@ -104,20 +114,24 @@ const Popover = /* @__PURE__ */ renderless(
         onOpenChange: (open: boolean, details: OpenDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("openChange", open, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:open", open)
           emit("update:modelValue", open)
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-        onDismissAttempt: (details: DismissAttemptDetails<PopoverDismissReason>) =>
-          emit("dismissAttempt", details),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
+        onDismissAttempt: (
+          details: DismissAttemptDetails<PopoverDismissReason>
+        ) => emit("dismissAttempt", details),
         onPayloadChange: (payload: unknown, details: PayloadDetails) =>
           emit("payloadChange", payload, details),
       }))
       useControllerEntry(() => props.controller, popover)
       return () => slots.default?.()
     },
-  }),
+  })
 )
 
 /**
@@ -139,10 +153,21 @@ const PopoverTrigger = withElement(
     },
     slots: Object as PartSlots<typeof popoverPrimitive, "trigger">,
     setup(props, { slots, attrs }) {
-      const connected = useControllerTarget(popoverPrimitive, () => props.controller)
-      provide(TriggerKey, { shortcut: () => props.shortcut, popover: connected })
+      const connected = useControllerTarget(
+        popoverPrimitive,
+        () => props.controller
+      )
+      provide(TriggerKey, {
+        shortcut: () => props.shortcut,
+        popover: connected,
+      })
       const id = useId()
-      const part = () => ({ id, disabled: props.disabled, payload: props.payload, shortcut: props.shortcut })
+      const part = () => ({
+        id,
+        disabled: props.disabled,
+        payload: props.payload,
+        shortcut: props.shortcut,
+      })
       return useConnectedPart(
         connected,
         (popover) => usePart(popover, "trigger", part, undefined, "button"),
@@ -151,11 +176,11 @@ const PopoverTrigger = withElement(
           renderUnbound(
             "button",
             { type: "button", disabled: props.disabled, ...attrs },
-            { slots, state: { open: false, disabled: !!props.disabled } },
-          ),
+            { slots, state: { open: false, disabled: !!props.disabled } }
+          )
       )
     },
-  }),
+  })
 )
 
 /**
@@ -176,7 +201,11 @@ const PopoverContent = withPayload(
         collisionPadding: Number,
         arrowPadding: Number,
         anchor: [Object, String] as PropType<Anchor | string | null>,
-        initialFocus: [String, Object, Function] as PropType<PopoverInitialFocus>,
+        initialFocus: [
+          String,
+          Object,
+          Function,
+        ] as PropType<PopoverInitialFocus>,
         finalFocus: [String, Object, Function] as PropType<PopoverFinalFocus>,
         keepMounted: optionalBoolean,
         // Renders the popup into this element instead of in place.
@@ -194,12 +223,14 @@ const PopoverContent = withPayload(
         const part = usePart(popover, "content", content)
         return () => {
           const element = part()
-          if (!element) return null
+          if (!element) {
+            return null
+          }
           return renderPopup(sheetViewport(popover, element), target())
         }
       },
-    }),
-  ),
+    })
+  )
 )
 
 /**
@@ -234,10 +265,17 @@ const ShortcutBinding = defineComponent({
     shortcut: String,
   },
   setup(props, { slots }) {
-    return usePart(props.popover, "shortcut", () => ({ shortcut: props.shortcut }), undefined, {
-      tag: "span",
-      children: (state) => slotContent(slots.default, { state }) ?? state.text,
-    })
+    return usePart(
+      props.popover,
+      "shortcut",
+      () => ({ shortcut: props.shortcut }),
+      undefined,
+      {
+        tag: "span",
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.text,
+      }
+    )
   },
 })
 
@@ -259,20 +297,29 @@ const PopoverShortcut = withElement(
     setup(props, { slots, attrs }) {
       const context = useScope(popoverPrimitive)?.handle
       const trigger = inject(TriggerKey, null)
-      if (!context && !trigger) throw new Error("Popover parts must be used inside <Popover>.")
+      if (!context && !trigger) {
+        throw new Error("Popover parts must be used inside <Popover>.")
+      }
       // A trigger outside the popover finds it through its controller only on the client.
       // Until mounted, its shortcut renders nothing, as on the server, so hydration matches.
       const mounted = ref(!!context)
       onMounted(() => (mounted.value = true))
       return () => {
-        const popover = context ?? (mounted.value ? trigger?.popover() : undefined)
+        const popover =
+          context ?? (mounted.value ? trigger?.popover() : undefined)
         // Inside a trigger whose popover hasn't mounted yet, there's no shortcut to show.
-        if (!popover) return null
+        if (!popover) {
+          return null
+        }
         const shortcut = props.shortcut ?? trigger?.shortcut()
-        return h(ShortcutBinding, { ...attrs, key: popover.instance.id, popover, shortcut }, slots)
+        return h(
+          ShortcutBinding,
+          { ...attrs, key: popover.instance.id, popover, shortcut },
+          slots
+        )
       }
     },
-  }),
+  })
 )
 
 export { createPopoverController } from "@ui-sdk/core/popover"

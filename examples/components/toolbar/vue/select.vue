@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { CheckIcon, ChevronsUpDownIcon, ZoomInIcon, ZoomOutIcon } from "@lucide/vue"
+import {
+  CheckIcon,
+  ChevronsUpDownIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "@lucide/vue"
 import {
   Select,
   SelectContent,
@@ -26,7 +31,11 @@ function change(value: string) {
 
 <template>
   <Toolbar aria-label="View">
-    <ToolbarButton aria-label="Zoom out" :disabled="index === 0" @click="change(zooms[index - 1])">
+    <ToolbarButton
+      aria-label="Zoom out"
+      :disabled="index === 0"
+      @click="change(zooms[index - 1])"
+    >
       <ZoomOutIcon aria-hidden="true" />
     </ToolbarButton>
     <Select :value="zoom" @value-change="(value) => value && change(value)">

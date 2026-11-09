@@ -16,7 +16,11 @@ type ItemContext = {
 
 function useItem() {
   const item = getContext<ItemContext | undefined>(ItemKey)
-  if (!item) throw new Error("Tree labels, indicators, checkboxes and groups must be used inside <TreeItem>.")
+  if (!item) {
+    throw new Error(
+      "Tree labels, indicators, checkboxes and groups must be used inside <TreeItem>."
+    )
+  }
   return item
 }
 

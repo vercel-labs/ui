@@ -85,7 +85,9 @@ Place `<ui-overlay-host>` near your app's root, then call `toast()` from an even
 import "@ui-sdk/web/overlays"
 import { toast } from "@ui-sdk/web"
 
-document.querySelector("#save")!.addEventListener("click", () => toast.success("Saved"))
+document
+  .querySelector("#save")!
+  .addEventListener("click", () => toast.success("Saved"))
 ```
 
 See [Toast](./components/toast) and [Alert Dialog](./components/alert-dialog) for complete examples.

@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createTypeahead, definePrimitive, elements, idPart, isTypeaheadKey } from "@ui-sdk/core"
+import {
+  createTypeahead,
+  definePrimitive,
+  elements,
+  idPart,
+  isTypeaheadKey,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type FruitPickerState = { fruit: string }
@@ -14,10 +20,16 @@ const fruitPicker = definePrimitive({
         const fruits = elements(context, "option").map((option) => option.key)
         const current = fruits.indexOf(context.store.get().fruit)
         let next = -1
-        if (event.key === "ArrowDown") next = Math.min(current + 1, fruits.length - 1)
-        else if (event.key === "ArrowUp") next = Math.max(current - 1, 0)
-        else if (isTypeaheadKey(event)) next = typeahead(event.key, fruits, current)
-        if (next === -1) return
+        if (event.key === "ArrowDown") {
+          next = Math.min(current + 1, fruits.length - 1)
+        } else if (event.key === "ArrowUp") {
+          next = Math.max(current - 1, 0)
+        } else if (isTypeaheadKey(event)) {
+          next = typeahead(event.key, fruits, current)
+        }
+        if (next === -1) {
+          return
+        }
         event.preventDefault()
         context.store.set({ fruit: fruits[next] })
       },
@@ -63,4 +75,10 @@ function Example() {
   )
 }
 
-export { Example, fruitPicker, FruitPicker, FruitPickerOption, type FruitPickerState }
+export {
+  Example,
+  fruitPicker,
+  FruitPicker,
+  FruitPickerOption,
+  type FruitPickerState,
+}

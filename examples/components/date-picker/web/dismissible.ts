@@ -44,12 +44,17 @@ function mount(root: HTMLElement) {
   const alert = root.querySelector<HTMLElement>('[role="alert"]')!
   picker.addEventListener("valuechange", (event) => {
     alert.hidden = true
-    if (event.detail.value === null) picker.setAttribute("dismissible", "false")
-    else picker.removeAttribute("dismissible")
+    if (event.detail.value === null) {
+      picker.setAttribute("dismissible", "false")
+    } else {
+      picker.removeAttribute("dismissible")
+    }
   })
   picker.addEventListener("dismissattempt", () => (alert.hidden = false))
   picker.addEventListener("openchange", (event) => {
-    if (event.detail.value) alert.hidden = true
+    if (event.detail.value) {
+      alert.hidden = true
+    }
   })
 }
 

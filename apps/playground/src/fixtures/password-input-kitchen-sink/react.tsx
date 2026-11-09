@@ -27,14 +27,25 @@ function Eye() {
   )
 }
 
-function VariantPasswordInput({ variant, env }: { variant: Variant; env: Env }) {
-  const { fieldDisabled, ...options } = (variant.options ?? {}) as Record<string, unknown>
+function VariantPasswordInput({
+  variant,
+  env,
+}: {
+  variant: Variant
+  env: Env
+}) {
+  const { fieldDisabled, ...options } = (variant.options ?? {}) as Record<
+    string,
+    unknown
+  >
   const [visible, setVisible] = React.useState(false)
   const [controller] = React.useState(() =>
-    variant.controller ? createPasswordInputController() : undefined,
+    variant.controller ? createPasswordInputController() : undefined
   )
   React.useEffect(() => {
-    if (!controller) return
+    if (!controller) {
+      return
+    }
     env.controls([
       ["toggleVisible()", () => controller.toggleVisible()],
       ["setVisible(true)", () => controller.setVisible(true)],
@@ -51,14 +62,23 @@ function VariantPasswordInput({ variant, env }: { variant: Variant; env: Env }) 
       {...options}
       {...(variant.controlled && { visible })}
       controller={controller}
-      onValueChange={(value, details) => env.log(`valueChange "${value}" (${details.reason})`)}
+      onValueChange={(value, details) =>
+        env.log(`valueChange "${value}" (${details.reason})`)
+      }
       onVisibleChange={(next, details) => {
-        if (variant.cancel) return details.cancel()
-        if (variant.controlled) setVisible(next)
+        if (variant.cancel) {
+          return details.cancel()
+        }
+        if (variant.controlled) {
+          setVisible(next)
+        }
         env.log(`visibleChange ${next} (${details.reason}, ${details.source})`)
       }}
     >
-      <PasswordInputControl className={classes.input} aria-label={variant.field ? undefined : "Password"} />
+      <PasswordInputControl
+        className={classes.input}
+        aria-label={variant.field ? undefined : "Password"}
+      />
       <PasswordInputToggle
         className={classes.toggle}
         aria-label="Show password"
@@ -74,15 +94,20 @@ function VariantPasswordInput({ variant, env }: { variant: Variant; env: Env }) 
       <p className={classes.capsLock}>Caps Lock is on</p>
     </div>
   )
-  if (variant.field)
+  if (variant.field) {
     return (
       <Field disabled={!!fieldDisabled} className="flex flex-col gap-1.5">
         <FieldLabel className={classes.label}>Password</FieldLabel>
         {input}
-        <FieldDescription className={classes.description}>At least 8 characters.</FieldDescription>
+        <FieldDescription className={classes.description}>
+          At least 8 characters.
+        </FieldDescription>
       </Field>
     )
-  if (!variant.form) return variant.id === "caps-lock" ? withCapsLock : input
+  }
+  if (!variant.form) {
+    return variant.id === "caps-lock" ? withCapsLock : input
+  }
   return (
     <form
       className="flex flex-col items-start gap-2"
@@ -109,8 +134,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantPasswordInput variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

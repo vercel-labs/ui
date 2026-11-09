@@ -8,7 +8,11 @@ import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/vue/otp-input"
     <FieldLabel>PIN</FieldLabel>
     <OTPInput :max-length="4" text-align="center">
       <OTPInputGroup>
-        <OTPInputSlot v-for="index in [0, 1, 2, 3]" :key="index" :index="index" />
+        <OTPInputSlot
+          v-for="index in [0, 1, 2, 3]"
+          :key="index"
+          :index="index"
+        />
       </OTPInputGroup>
     </OTPInput>
   </Field>

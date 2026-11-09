@@ -26,7 +26,7 @@ function mount(root: HTMLElement) {
               <div data-slot="row">
                 <span>${item.name}</span>
                 <span>${item.price}</span>
-              </div>`,
+              </div>`
           )
           .join("")}
       </ui-collapsible-panel>

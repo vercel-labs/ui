@@ -2,7 +2,12 @@ import { Checkbox } from "@ui-sdk/react/checkbox"
 import { Label } from "@ui-sdk/react/label"
 import { NumberInput, NumberInputControl } from "@ui-sdk/react/number-input"
 import { Radio, RadioGroup } from "@ui-sdk/react/radio"
-import { Slider, SliderControl, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/react/slider"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { labelFixture } from "tests/fixtures/label.ts"
@@ -12,7 +17,9 @@ const { email, plan, volume, terms, region, delivery, quantity } = labelFixture
 function Group({
   group,
   ...props
-}: { group: typeof plan | typeof region } & React.ComponentProps<typeof RadioGroup>) {
+}: { group: typeof plan | typeof region } & React.ComponentProps<
+  typeof RadioGroup
+>) {
   return (
     <RadioGroup id={group.id} className="radio-group" {...props}>
       {group.items.map((item) => (
@@ -34,7 +41,11 @@ function Fixture() {
       <Label htmlFor={plan.id}>{plan.label}</Label>
       <Group group={plan} defaultValue={plan.defaultValue} />
       <Label htmlFor={volume.id}>{volume.label}</Label>
-      <Slider id={volume.id} className="slider" defaultValue={volume.defaultValue}>
+      <Slider
+        id={volume.id}
+        className="slider"
+        defaultValue={volume.defaultValue}
+      >
         <SliderControl>
           <SliderTrack className="slider-track">
             <SliderThumb className="slider-thumb" />
@@ -66,7 +77,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

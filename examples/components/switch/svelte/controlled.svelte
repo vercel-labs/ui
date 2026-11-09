@@ -16,7 +16,8 @@
     Wi-Fi
     <Switch
       bind:checked
-      onCheckedChange={(next, details) => log(`${next ? "On" : "Off"} (${details.reason})`)}
+      onCheckedChange={(next, details) =>
+        log(`${next ? "On" : "Off"} (${details.reason})`)}
       controller={wifi}
     >
       <SwitchThumb />

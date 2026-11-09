@@ -9,7 +9,14 @@ import {
   type PopoverTriggerState,
 } from "@ui-sdk/core/popover"
 import type { JSX } from "@solidjs/web"
-import { createContext, createUniqueId, merge, omit, Show, useContext } from "solid-js"
+import {
+  createContext,
+  createUniqueId,
+  merge,
+  omit,
+  Show,
+  useContext,
+} from "solid-js"
 import {
   popupPart,
   sheetViewport,
@@ -30,7 +37,12 @@ import {
 
 type PopoverContextValue = PrimitiveHandle<typeof popoverPrimitive>
 
-const parts = createParts(popoverPrimitive, { title: "h2", description: "p", close: "button", arrow: "div" })
+const parts = createParts(popoverPrimitive, {
+  title: "h2",
+  description: "p",
+  close: "button",
+  arrow: "div",
+})
 
 // The popover, for the parts that may find it through a controller or render in a popup.
 const PopoverContext = createContext<PopoverContextValue | null>(null)
@@ -45,7 +57,9 @@ const TriggerContext = createContext<{
 
 function usePopover() {
   const context = useContext(PopoverContext)
-  if (!context) throw new Error("Popover parts must be used inside <Popover>.")
+  if (!context) {
+    throw new Error("Popover parts must be used inside <Popover>.")
+  }
   return context
 }
 
@@ -65,12 +79,17 @@ function Popover(props: PopoverProps) {
   useControllerEntry(() => props.controller, popover)
   return providePrimitive(popover, () => (
     <PopoverContext value={popover}>
-      <ContainerContext value={() => props.container}>{props.children}</ContainerContext>
+      <ContainerContext value={() => props.container}>
+        {props.children}
+      </ContainerContext>
     </PopoverContext>
   ))
 }
 
-type TriggerPartProps = Omit<PartProps<"button", PopoverTriggerState>, "value" | "onChange"> &
+type TriggerPartProps = Omit<
+  PartProps<"button", PopoverTriggerState>,
+  "value" | "onChange"
+> &
   PopoverTriggerProps
 
 /**
@@ -78,7 +97,10 @@ type TriggerPartProps = Omit<PartProps<"button", PopoverTriggerState>, "value" |
  * @stable
  */
 function PopoverTrigger(props: TriggerPartProps) {
-  const popover = useControllerTarget(() => props.controller, useContext(PopoverContext))
+  const popover = useControllerTarget(
+    () => props.controller,
+    useContext(PopoverContext)
+  )
   const rest = omit(props, "disabled", "payload", "shortcut", "controller")
   return (
     <TriggerContext value={{ shortcut: () => props.shortcut, popover }}>
@@ -88,13 +110,16 @@ function PopoverTrigger(props: TriggerPartProps) {
         // Until the popover it names mounts, a trigger outside the popover is a plain button.
         fallback={renderStatic(
           "button",
-          () => ({ attrs: {}, state: { open: false, disabled: !!props.disabled } }),
+          () => ({
+            attrs: {},
+            state: { open: false, disabled: !!props.disabled },
+          }),
           merge(rest, {
             type: "button",
             get disabled() {
               return props.disabled
             },
-          }),
+          })
         )}
       >
         {(popover) => {
@@ -117,7 +142,7 @@ function PopoverTrigger(props: TriggerPartProps) {
  * @stable
  */
 function PopoverContent<Payload = unknown>(
-  props: PartProps<"div", PopoverContentState<Payload>> & PopoverContentProps,
+  props: PartProps<"div", PopoverContentState<Payload>> & PopoverContentProps
 ) {
   const fromRoot = useContext(ContainerContext)
   const target = usePopupContainer(() => props.container ?? fromRoot())
@@ -145,9 +170,16 @@ function PopoverContent<Payload = unknown>(
     "initialFocus",
     "finalFocus",
     "keepMounted",
-    "container",
+    "container"
   )
-  return popupPart(usePopover(), "content", content, rest, target, sheetViewport)
+  return popupPart(
+    usePopover(),
+    "content",
+    content,
+    rest,
+    target,
+    sheetViewport
+  )
 }
 
 /**
@@ -178,10 +210,14 @@ const PopoverArrow = parts.Arrow
  * Shows a trigger's shortcut, like `⌘I`, inside the trigger. Hidden from screen readers, which hear `aria-keyshortcuts`.
  * @stable
  */
-function PopoverShortcut(props: PartProps<"span", PopoverShortcutState> & PopoverShortcutProps) {
+function PopoverShortcut(
+  props: PartProps<"span", PopoverShortcutState> & PopoverShortcutProps
+) {
   const trigger = useContext(TriggerContext)
   const context = useContext(PopoverContext)
-  if (!context && !trigger) throw new Error("Popover parts must be used inside <Popover>.")
+  if (!context && !trigger) {
+    throw new Error("Popover parts must be used inside <Popover>.")
+  }
   // A trigger outside the popover finds it through its controller only once
   // mounted, so inside one whose popover hasn't mounted yet, there's no
   // shortcut to show, as on the server.

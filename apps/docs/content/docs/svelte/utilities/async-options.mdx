@@ -16,19 +16,30 @@ Pass a loader to the helper. This example expects `/api/movies` to return an arr
 
 ```svelte
 <script lang="ts">
-import { useAsyncOptions } from "@ui-sdk/svelte/async-options"
-import { Combobox, ComboboxContent, ComboboxInput } from "@ui-sdk/svelte/combobox"
+  import { useAsyncOptions } from "@ui-sdk/svelte/async-options"
+  import {
+    Combobox,
+    ComboboxContent,
+    ComboboxInput,
+  } from "@ui-sdk/svelte/combobox"
 
-const movies = useAsyncOptions<string>(async (query, { signal }) => {
-  const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, { signal })
-  if (!response.ok) throw new Error("Couldn't load movies")
-  return response.json()
-})
+  const movies = useAsyncOptions<string>(async (query, { signal }) => {
+    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, {
+      signal,
+    })
+    if (!response.ok) throw new Error("Couldn't load movies")
+    return response.json()
+  })
 </script>
 
-<Combobox items={movies.state.items} filter={false} status={movies.state.status} onQueryChange={movies.setQuery}>
-<ComboboxInput aria-label="Movie" placeholder="Search movies…" />
-<ComboboxContent />
+<Combobox
+  items={movies.state.items}
+  filter={false}
+  status={movies.state.status}
+  onQueryChange={movies.setQuery}
+>
+  <ComboboxInput aria-label="Movie" placeholder="Search movies…" />
+  <ComboboxContent />
 </Combobox>
 ```
 
@@ -57,8 +68,14 @@ For paged results, the loader receives `page`, starting at `0`. Return `{ items,
 ```ts
 import type { AsyncOptionsContext } from "@ui-sdk/svelte/async-options"
 
-async function loadMoviePages(query: string, { signal, page }: AsyncOptionsContext) {
-  const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}&page=${page}`, { signal })
+async function loadMoviePages(
+  query: string,
+  { signal, page }: AsyncOptionsContext
+) {
+  const response = await fetch(
+    `/api/movies?q=${encodeURIComponent(query)}&page=${page}`,
+    { signal }
+  )
   if (!response.ok) throw new Error("Couldn't load movies")
   const data: { titles: string[]; next: number | null } = await response.json()
   return { items: data.titles, hasMore: data.next !== null }

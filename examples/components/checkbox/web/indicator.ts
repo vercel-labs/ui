@@ -21,7 +21,7 @@ function mount(root: HTMLElement) {
               </ui-checkbox>
               ${task.label}
             </label>
-          `,
+          `
         )
         .join("")}
     </div>

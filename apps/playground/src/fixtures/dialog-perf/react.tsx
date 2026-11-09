@@ -24,7 +24,9 @@ function Fixture() {
           <DialogBackdrop className="dialog-backdrop" />
           <DialogContent className="dialog">
             <DialogTitle className="title">Delete {item.label}?</DialogTitle>
-            <DialogDescription className="description">This can't be undone.</DialogDescription>
+            <DialogDescription className="description">
+              This can't be undone.
+            </DialogDescription>
             <div className="actions">
               <DialogClose>Cancel</DialogClose>
               <button>Delete</button>

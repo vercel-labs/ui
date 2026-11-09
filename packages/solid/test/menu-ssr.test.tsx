@@ -52,7 +52,10 @@ describe("server rendering a menu", () => {
 
   test("data menus render on the server", () => {
     const html = renderToString(() => (
-      <Menu defaultOpen items={[{ value: "new", label: "New file" }, { type: "separator" }]}>
+      <Menu
+        defaultOpen
+        items={[{ value: "new", label: "New file" }, { type: "separator" }]}
+      >
         <MenuTrigger>File</MenuTrigger>
       </Menu>
     ))

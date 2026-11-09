@@ -34,7 +34,10 @@ function searchMovies(query: string, { signal }: { signal: AbortSignal }) {
       resolve(
         movieTitles
           .filter((title) => title.toLowerCase().includes(needle))
-          .map((title) => ({ value: title.toLowerCase().replace(/\W+/g, "-"), label: title })),
+          .map((title) => ({
+            value: title.toLowerCase().replace(/\W+/g, "-"),
+            label: title,
+          }))
       )
     }, 500)
     signal.addEventListener("abort", () => {
@@ -73,7 +76,11 @@ function mount(root: HTMLElement) {
   const combobox = root.querySelector("ui-combobox")!
   const status = root.querySelector("ui-combobox-status")!
   const query = root.querySelector("ui-combobox-empty span")!
-  const movies = createAsyncOptions(searchMovies, { debounce: 300, query: "the", immediate: true })
+  const movies = createAsyncOptions(searchMovies, {
+    debounce: 300,
+    query: "the",
+    immediate: true,
+  })
   const update = () => {
     const { items, status: loading } = movies.getState()
     combobox.items = items

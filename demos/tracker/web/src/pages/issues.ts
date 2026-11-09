@@ -16,14 +16,16 @@ function issuesPage() {
   const issue = issueOf(current.issue)
 
   return html`<main class="flex min-h-0 flex-1 flex-col">
-    <div class="flex flex-wrap items-center gap-3 border-b border-border px-3 py-2">
+    <div
+      class="flex flex-wrap items-center gap-3 border-b border-border px-3 py-2"
+    >
       ${issueTabs(current, countByTab(db.issues))} ${issueToolbar(current)}
     </div>
     ${workspace(
       current.view === "board"
         ? issueBoard(matching, current)
         : issueList(matching, current, db.settings.pageSize),
-      issue ? keyed(issue.id, issueDetail(issue, current)) : null,
+      issue ? keyed(issue.id, issueDetail(issue, current)) : null
     )}
   </main>`
 }

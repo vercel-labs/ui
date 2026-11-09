@@ -28,7 +28,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <Checkbox checked={aligned} onCheckedChange={(next) => setAligned(next === true)}>
+          <Checkbox
+            checked={aligned}
+            onCheckedChange={(next) => setAligned(next === true)}
+          >
             <CheckboxIndicator>
               <CheckIcon />
             </CheckboxIndicator>

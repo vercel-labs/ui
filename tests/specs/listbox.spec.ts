@@ -1,12 +1,23 @@
 import { expect, lastAction, test } from "../fixtures"
-import { expectSelected, list, option, reason, submitted, tabIn } from "./listbox.helpers"
+import {
+  expectSelected,
+  list,
+  option,
+  reason,
+  submitted,
+  tabIn,
+} from "./listbox.helpers"
 
 // An always-visible listbox, following the WAI-ARIA APG listbox pattern
 // https://www.w3.org/WAI/ARIA/apg/patterns/listbox/. Options take real focus,
 // with one tab stop for the list.
 
 test.describe("focus", () => {
-  test("Tab lands on the first option when nothing is selected", async ({ page, open, tab }) => {
+  test("Tab lands on the first option when nothing is selected", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox")
     await tabIn(page, tab)
     await expect(option(page, "Basil")).toBeFocused()
@@ -18,13 +29,21 @@ test.describe("focus", () => {
     await expect(option(page, "Onion")).toBeFocused()
   })
 
-  test("Tab lands on the first selected option with multiple", async ({ page, open, tab }) => {
+  test("Tab lands on the first selected option with multiple", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox", { multiple: "", value: "pepper,garlic" })
     await tabIn(page, tab)
     await expect(option(page, "Garlic")).toBeFocused()
   })
 
-  test("the list is one tab stop: Tab leaves it from any option", async ({ page, open, tab }) => {
+  test("the list is one tab stop: Tab leaves it from any option", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox")
     await tabIn(page, tab)
     await page.keyboard.press("ArrowDown")
@@ -33,7 +52,11 @@ test.describe("focus", () => {
     await expect(page.getByRole("button", { name: "Submit" })).toBeFocused()
   })
 
-  test("Shift+Tab back into the list returns to the option focused last", async ({ page, open, tab }) => {
+  test("Shift+Tab back into the list returns to the option focused last", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox", { activation: "manual" })
     await tabIn(page, tab)
     await page.keyboard.press("End")
@@ -91,7 +114,11 @@ test.describe("focus", () => {
 })
 
 test.describe("single selection", () => {
-  test("arrow keys move focus and the selection follows", async ({ page, open, tab }) => {
+  test("arrow keys move focus and the selection follows", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox")
     await tabIn(page, tab)
     await page.keyboard.press("ArrowDown")
@@ -103,7 +130,11 @@ test.describe("single selection", () => {
     await expect(reason(page)).toHaveText("list-navigation")
   })
 
-  test("Home and End move to the first and last option", async ({ page, open, tab }) => {
+  test("Home and End move to the first and last option", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox")
     await tabIn(page, tab)
     await page.keyboard.press("End")
@@ -114,7 +145,10 @@ test.describe("single selection", () => {
     await expectSelected(page, ["Basil"])
   })
 
-  test("arrow keys wrap from the last option to the first", async ({ page, open }) => {
+  test("arrow keys wrap from the last option to the first", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { value: "tomato" })
     await option(page, "Tomato").focus()
     await page.keyboard.press("ArrowDown")
@@ -136,20 +170,30 @@ test.describe("single selection", () => {
     await expect(reason(page)).toHaveText("item-press")
   })
 
-  test("pressing the selected option keeps it selected", async ({ page, open }) => {
+  test("pressing the selected option keeps it selected", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { value: "pepper" })
     await option(page, "Pepper").click()
     await expectSelected(page, ["Pepper"])
   })
 
-  test("with deselectable, pressing the selected option unselects it", async ({ page, open }) => {
+  test("with deselectable, pressing the selected option unselects it", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { value: "pepper", deselectable: "" })
     await option(page, "Pepper").click()
     await expectSelected(page, [])
     expect(await lastAction(page)).toBe("value:")
   })
 
-  test("with manual activation, arrows only move focus and Space selects", async ({ page, open, tab }) => {
+  test("with manual activation, arrows only move focus and Space selects", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox", { activation: "manual" })
     await tabIn(page, tab)
     await page.keyboard.press("ArrowDown")
@@ -177,7 +221,11 @@ test.describe("single selection", () => {
     await expectSelected(page, ["Onion"])
   })
 
-  test("typing several letters finds the option that starts with them", async ({ page, open, tab }) => {
+  test("typing several letters finds the option that starts with them", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox", { activation: "manual" })
     await tabIn(page, tab)
     await page.keyboard.type("ga")
@@ -208,7 +256,10 @@ test.describe("multiple selection", () => {
     expect(await lastAction(page)).toBe("value:onion,garlic")
   })
 
-  test("arrow keys move focus without changing the selection", async ({ page, open }) => {
+  test("arrow keys move focus without changing the selection", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "", value: "basil" })
     await option(page, "Basil").focus()
     await page.keyboard.press("ArrowDown")
@@ -217,14 +268,20 @@ test.describe("multiple selection", () => {
     await expectSelected(page, ["Basil"])
   })
 
-  test("Shift with a press selects the range from the last option chosen", async ({ page, open }) => {
+  test("Shift with a press selects the range from the last option chosen", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "" })
     await option(page, "Cheese").click()
     await option(page, "Mushroom").click({ modifiers: ["Shift"] })
     await expectSelected(page, ["Cheese", "Garlic", "Mushroom"])
   })
 
-  test("Shift with an arrow passes over a disabled option", async ({ page, open }) => {
+  test("Shift with an arrow passes over a disabled option", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "" })
     await option(page, "Mushroom").click()
     await page.keyboard.press("Shift+ArrowDown")
@@ -247,12 +304,21 @@ test.describe("multiple selection", () => {
     await option(page, "Tomato").click()
     await option(page, "Basil").click()
     await option(page, "Mushroom").click({ modifiers: ["Shift"] })
-    await expectSelected(page, ["Basil", "Cheese", "Garlic", "Mushroom", "Tomato"])
+    await expectSelected(page, [
+      "Basil",
+      "Cheese",
+      "Garlic",
+      "Mushroom",
+      "Tomato",
+    ])
     await option(page, "Cheese").click({ modifiers: ["Shift"] })
     await expectSelected(page, ["Basil", "Cheese", "Tomato"])
   })
 
-  test("Shift with an arrow key moves focus and extends the selection", async ({ page, open }) => {
+  test("Shift with an arrow key moves focus and extends the selection", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "" })
     await option(page, "Cheese").click()
     await page.keyboard.press("Shift+ArrowDown")
@@ -264,7 +330,10 @@ test.describe("multiple selection", () => {
     await expect(reason(page)).toHaveText("list-navigation")
   })
 
-  test("Shift with Space selects from the last option chosen to the focused one", async ({ page, open }) => {
+  test("Shift with Space selects from the last option chosen to the focused one", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "" })
     await option(page, "Basil").click()
     await page.keyboard.press("ArrowDown")
@@ -273,7 +342,10 @@ test.describe("multiple selection", () => {
     await expectSelected(page, ["Basil", "Cheese", "Garlic"])
   })
 
-  test("Ctrl+Shift+End selects from the focused option to the last", async ({ page, open }) => {
+  test("Ctrl+Shift+End selects from the focused option to the last", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "" })
     await option(page, "Onion").click()
     await page.keyboard.press("ControlOrMeta+Shift+End")
@@ -281,7 +353,10 @@ test.describe("multiple selection", () => {
     await expectSelected(page, ["Onion", "Pepper", "Tomato"])
   })
 
-  test("Ctrl+Shift+Home selects from the focused option to the first", async ({ page, open }) => {
+  test("Ctrl+Shift+Home selects from the focused option to the first", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "" })
     await option(page, "Garlic").click()
     await page.keyboard.press("ControlOrMeta+Shift+Home")
@@ -289,11 +364,22 @@ test.describe("multiple selection", () => {
     await expectSelected(page, ["Basil", "Cheese", "Garlic"])
   })
 
-  test("Ctrl+A selects every enabled option, and again unselects them", async ({ page, open }) => {
+  test("Ctrl+A selects every enabled option, and again unselects them", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "" })
     await option(page, "Basil").click()
     await page.keyboard.press("ControlOrMeta+a")
-    await expectSelected(page, ["Basil", "Cheese", "Garlic", "Mushroom", "Onion", "Pepper", "Tomato"])
+    await expectSelected(page, [
+      "Basil",
+      "Cheese",
+      "Garlic",
+      "Mushroom",
+      "Onion",
+      "Pepper",
+      "Tomato",
+    ])
     await page.keyboard.press("ControlOrMeta+a")
     await expectSelected(page, [])
   })
@@ -325,7 +411,9 @@ test.describe("multiple selection with automatic activation", () => {
     await expectSelected(page, ["Onion"])
   })
 
-  test("Ctrl or Cmd with a press adds an option, and removes it again", async ({ page }) => {
+  test("Ctrl or Cmd with a press adds an option, and removes it again", async ({
+    page,
+  }) => {
     await option(page, "Cheese").click()
     await option(page, "Onion").click({ modifiers: ["ControlOrMeta"] })
     await expectSelected(page, ["Cheese", "Onion"])
@@ -333,7 +421,9 @@ test.describe("multiple selection with automatic activation", () => {
     await expectSelected(page, ["Onion"])
   })
 
-  test("Shift with a press replaces the selection with a range", async ({ page }) => {
+  test("Shift with a press replaces the selection with a range", async ({
+    page,
+  }) => {
     await option(page, "Tomato").click({ modifiers: ["ControlOrMeta"] })
     await option(page, "Basil").click({ modifiers: ["ControlOrMeta"] })
     await option(page, "Garlic").click({ modifiers: ["Shift"] })
@@ -346,7 +436,9 @@ test.describe("multiple selection with automatic activation", () => {
     await expectSelected(page, ["Garlic"])
   })
 
-  test("Ctrl or Cmd with an arrow moves focus only, and with Space toggles", async ({ page }) => {
+  test("Ctrl or Cmd with an arrow moves focus only, and with Space toggles", async ({
+    page,
+  }) => {
     await option(page, "Cheese").click()
     await page.keyboard.press("ControlOrMeta+ArrowDown")
     await page.keyboard.press("ControlOrMeta+ArrowDown")
@@ -364,7 +456,10 @@ test.describe("multiple selection with automatic activation", () => {
 })
 
 test.describe("horizontal", () => {
-  test("Left and Right move between options, and Up and Down don't", async ({ page, open }) => {
+  test("Left and Right move between options, and Up and Down don't", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { orientation: "horizontal" })
     await expect(list(page)).toHaveAttribute("aria-orientation", "horizontal")
     await option(page, "Basil").focus()
@@ -378,7 +473,10 @@ test.describe("horizontal", () => {
 })
 
 test.describe("groups", () => {
-  test("arrow keys move across groups, skipping their labels", async ({ page, open }) => {
+  test("arrow keys move across groups, skipping their labels", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { grouped: "" })
     await option(page, "Garlic").focus()
     await page.keyboard.press("ArrowDown")
@@ -428,8 +526,10 @@ test.describe("form", () => {
     // one inside a user agent shadow root on the validation anchor. The anchor
     // is the <ui-listbox> element, so its items would stop rendering.
     test.fixme(
-      browserName === "webkit" && process.platform === "linux" && framework === "web",
-      "On CI's Linux WebKit, the web listbox's items stop rendering after a blocked submit.",
+      browserName === "webkit" &&
+        process.platform === "linux" &&
+        framework === "web",
+      "On CI's Linux WebKit, the web listbox's items stop rendering after a blocked submit."
     )
     await open("listbox", { required: "" })
     await expect(list(page)).toHaveAttribute("aria-required", "true")
@@ -440,7 +540,11 @@ test.describe("form", () => {
     await expect(submitted(page)).toHaveText("toppings=basil")
   })
 
-  test("a disabled listbox can't be focused or changed, and submits nothing", async ({ page, open, tab }) => {
+  test("a disabled listbox can't be focused or changed, and submits nothing", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox", { disabled: "", value: "cheese" })
     await expect(list(page)).toHaveAttribute("aria-disabled", "true")
     await tabIn(page, tab)
@@ -451,7 +555,11 @@ test.describe("form", () => {
     await expect(submitted(page)).toHaveText("")
   })
 
-  test("a disabled fieldset disables the listbox", async ({ page, open, tab }) => {
+  test("a disabled fieldset disables the listbox", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox", { fieldset: "", value: "cheese" })
     await expect(list(page)).toHaveAttribute("data-disabled", "")
     await tabIn(page, tab)
@@ -459,7 +567,11 @@ test.describe("form", () => {
     await expect(page.locator(":focus")).not.toHaveAttribute("role", "option")
   })
 
-  test("a read-only listbox can be browsed but not changed, and submits", async ({ page, open, tab }) => {
+  test("a read-only listbox can be browsed but not changed, and submits", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("listbox", { readonly: "", value: "cheese" })
     await expect(list(page)).toHaveAttribute("aria-readonly", "true")
     await tabIn(page, tab)
@@ -481,17 +593,40 @@ test.describe("changes", () => {
     await expect(reason(page)).toHaveText("item-press")
   })
 
-  test("a controlled listbox shows the value it's given", async ({ page, open }) => {
+  test("a controlled listbox shows the value it's given", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { controlled: "", multiple: "" })
     await option(page, "Basil").click()
     await option(page, "Pepper").click({ modifiers: ["Shift"] })
-    await expectSelected(page, ["Basil", "Cheese", "Garlic", "Mushroom", "Onion", "Pepper"])
+    await expectSelected(page, [
+      "Basil",
+      "Cheese",
+      "Garlic",
+      "Mushroom",
+      "Onion",
+      "Pepper",
+    ])
   })
 
-  test("the controller clears and selects everything", async ({ page, open }) => {
+  test("the controller clears and selects everything", async ({
+    page,
+    open,
+  }) => {
     await open("listbox", { multiple: "", value: "basil" })
-    await page.getByRole("button", { name: "Select all with controller" }).click()
-    await expectSelected(page, ["Basil", "Cheese", "Garlic", "Mushroom", "Onion", "Pepper", "Tomato"])
+    await page
+      .getByRole("button", { name: "Select all with controller" })
+      .click()
+    await expectSelected(page, [
+      "Basil",
+      "Cheese",
+      "Garlic",
+      "Mushroom",
+      "Onion",
+      "Pepper",
+      "Tomato",
+    ])
     await page.getByRole("button", { name: "Clear with controller" }).click()
     await expectSelected(page, [])
     await expect(reason(page)).toHaveText("imperative")

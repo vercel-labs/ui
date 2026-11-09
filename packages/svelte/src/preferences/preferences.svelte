@@ -34,24 +34,35 @@ reads a preference, through `usePreference`, catches up after hydration.
   // values back over the ones the script put there.
   const server = $derived.by(() => {
     const shown: Record<string, string> = {}
-    if (typeof window === "undefined")
-      for (const preference of preferences)
-        if (!preference.global) shown[preference.attribute] = preference.initialState.value
+    if (typeof window === "undefined") {
+      for (const preference of preferences) {
+        if (!preference.global) {
+          shown[preference.attribute] = preference.initialState.value
+        }
+      }
+    }
     return shown
   })
 
   // Escaped, since `{@html}` writes it as it is.
-  const nonceAttribute = $derived(nonce ? ` nonce="${nonce.replace(/[&"<>]/g, (char) => `&#${char.charCodeAt(0)};`)}"` : "")
-  const script = $derived(`<script${nonceAttribute}>${preferencesScript(preferences)}<\/script>`)
+  const nonceAttribute = $derived(
+    nonce
+      ? ` nonce="${nonce.replace(/[&"<>]/g, (char) => `&#${char.charCodeAt(0)};`)}"`
+      : ""
+  )
+  const script = $derived(
+    `<script${nonceAttribute}>${preferencesScript(preferences)}<\/script>`
+  )
 
   $effect(() => {
     const list = preferences
     const write = () => {
-      for (const preference of list)
-        (preference.global ? document.documentElement : element)?.setAttribute(
+      for (const preference of list) {
+        ;(preference.global ? document.documentElement : element)?.setAttribute(
           preference.attribute,
-          preference.get().value,
+          preference.get().value
         )
+      }
     }
     // Subscribing first reads back what was saved.
     const stops = list.map((preference) => preference.subscribe(write))
@@ -61,7 +72,13 @@ reads a preference, through `usePreference`, catches up after hydration.
   })
 </script>
 
-<div {...rest} {...server} data-slot="preferences" style="display: contents" bind:this={element}>
+<div
+  {...rest}
+  {...server}
+  data-slot="preferences"
+  style="display: contents"
+  bind:this={element}
+>
   {#if !mounted}{@html script}{/if}
   {@render children?.()}
 </div>

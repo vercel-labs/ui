@@ -12,7 +12,10 @@ type CopyState = { text: string; copied: boolean }
 const copy = definePrimitive({
   name: "copy",
   options: { text: "string" },
-  state: (options: CopyOptions): CopyState => ({ text: options.text, copied: false }),
+  state: (options: CopyOptions): CopyState => ({
+    text: options.text,
+    copied: false,
+  }),
   sync: (options) => ({ text: options.text }),
   api: (context) => {
     const { store } = context
@@ -31,7 +34,10 @@ const copy = definePrimitive({
   slots: (slot) => ({
     root: slot<{}, { copied: boolean }>({
       state: (state) => ({ copied: state.copied }),
-      attrs: (state) => ({ type: "button", "data-copied": state.copied ? "" : undefined }),
+      attrs: (state) => ({
+        type: "button",
+        "data-copied": state.copied ? "" : undefined,
+      }),
       press: ({ api }) => api.copy(),
     }),
   }),
@@ -45,10 +51,18 @@ function Example() {
   return (
     <div data-slot="announce-command">
       <span>npm add @ui-sdk/core</span>
-      <CopyButton data-size="sm" text="npm add @ui-sdk/core" aria-label="Copy command">
+      <CopyButton
+        data-size="sm"
+        text="npm add @ui-sdk/core"
+        aria-label="Copy command"
+      >
         {({ copied }) => (
           <>
-            {copied ? <CheckIcon aria-hidden="true" /> : <CopyIcon aria-hidden="true" />}
+            {copied ? (
+              <CheckIcon aria-hidden="true" />
+            ) : (
+              <CopyIcon aria-hidden="true" />
+            )}
             {copied ? "Copied" : "Copy"}
           </>
         )}

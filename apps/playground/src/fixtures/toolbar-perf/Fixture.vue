@@ -10,7 +10,9 @@ const items = perfItems(perfSize())
   <div class="fixture">
     <button>Before</button>
     <Toolbar class="toolbar" aria-label="Formatting" style="flex-wrap: wrap">
-      <ToolbarButton v-for="item in items" :key="item.value">{{ item.label }}</ToolbarButton>
+      <ToolbarButton v-for="item in items" :key="item.value">{{
+        item.label
+      }}</ToolbarButton>
     </Toolbar>
     <button>After</button>
   </div>

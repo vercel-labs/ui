@@ -14,7 +14,12 @@ import {
   ComboboxTrigger,
   ComboboxValue,
 } from "@ui-sdk/vue/combobox"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 import { useLog } from "../../../shared/vue/log"
 
 const countries = [
@@ -37,7 +42,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
@@ -45,7 +51,7 @@ const log = useLog()
 
 function submit(event: Event) {
   const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-    ([name, value]) => `${name}=${value}`,
+    ([name, value]) => `${name}=${value}`
   )
   log(`Submitted ${entries.join("&")}`)
 }
@@ -89,7 +95,11 @@ function submit(event: Event) {
       <Combobox multiple :default-value="['Design']">
         <ComboboxChips>
           <ComboboxValue v-slot="{ value }">
-            <ComboboxChip v-for="interest in value as string[]" :key="interest" :value="interest">
+            <ComboboxChip
+              v-for="interest in value as string[]"
+              :key="interest"
+              :value="interest"
+            >
               {{ interest }}
               <ComboboxChipRemove :aria-label="`Remove ${interest}`">
                 <XIcon aria-hidden="true" />
@@ -100,7 +110,11 @@ function submit(event: Event) {
         </ComboboxChips>
         <ComboboxContent>
           <ComboboxList>
-            <ComboboxItem v-for="interest in interests" :key="interest" :value="interest">
+            <ComboboxItem
+              v-for="interest in interests"
+              :key="interest"
+              :value="interest"
+            >
               {{ interest }}
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />

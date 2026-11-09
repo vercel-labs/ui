@@ -18,16 +18,30 @@ const manyItems = Array.from({ length: 10_000 }, (_, index) => ({
   label: `Item ${index + 1}`,
 }))
 
-function visibleRows(scrollTop: number, height: number, count: number, row: number) {
+function visibleRows(
+  scrollTop: number,
+  height: number,
+  count: number,
+  row: number
+) {
   const start = Math.max(0, Math.floor(scrollTop / row) - 4)
   const end = Math.min(count, Math.ceil((scrollTop + height) / row) + 4)
   return { start, end }
 }
 
-function scrollForRow(index: number, scrollTop: number, height: number, row: number) {
+function scrollForRow(
+  index: number,
+  scrollTop: number,
+  height: number,
+  row: number
+) {
   const top = index * row
-  if (top < scrollTop) return top
-  if (top + row > scrollTop + height) return top + row - height
+  if (top < scrollTop) {
+    return top
+  }
+  if (top + row > scrollTop + height) {
+    return top + row - height
+  }
   return scrollTop
 }
 
@@ -43,7 +57,9 @@ function Example() {
       items={manyItems}
       onHighlight={(value, { index }) => {
         const el = scroller.current
-        if (el && index >= 0) el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
+        if (el && index >= 0) {
+          el.scrollTop = scrollForRow(index, el.scrollTop, el.clientHeight, row)
+        }
       }}
     >
       <div data-slot="stack">
@@ -57,11 +73,19 @@ function Example() {
       </div>
       <ComboboxContent>
         <ComboboxEmpty>No items found.</ComboboxEmpty>
-        <div ref={scroller} onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
+        <div
+          ref={scroller}
+          onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+        >
           <ComboboxList>
             {(state) => {
               const items = state.items as { value: string; label: string }[]
-              const { start, end } = visibleRows(scrollTop, height, items.length, row)
+              const { start, end } = visibleRows(
+                scrollTop,
+                height,
+                items.length,
+                row
+              )
               return (
                 <div style={{ height: items.length * row }}>
                   {items.slice(start, end).map((item, offset) => (

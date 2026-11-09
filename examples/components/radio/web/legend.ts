@@ -24,7 +24,7 @@ function mount(root: HTMLElement) {
                   ${period.label}
                   <span data-slot="hint">(${period.price})</span>
                 </label>
-              `,
+              `
             )
             .join("")}
         </ui-radio-group>

@@ -13,7 +13,11 @@ Layered sections of content, one shown at a time.
   } from "@ui-sdk/core/tabs"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   type Details = ChangeDetails<TabsValueChangeReason>
 
@@ -65,7 +69,9 @@ Layered sections of content, one shown at a time.
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   provideInstance(tabsPrimitive, tabs)

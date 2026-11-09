@@ -31,7 +31,10 @@ function onOpenChange(next: boolean, details: { reason: string }) {
   <div data-slot="stack">
     <div data-slot="controls">
       <label data-slot="label">
-        <Checkbox :checked="open" @checked-change="(next) => (open = next === true)">
+        <Checkbox
+          :checked="open"
+          @checked-change="(next) => (open = next === true)"
+        >
           <CheckboxIndicator>
             <CheckIcon aria-hidden="true" />
           </CheckboxIndicator>
@@ -42,7 +45,9 @@ function onOpenChange(next: boolean, details: { reason: string }) {
     <Dialog
       v-model:open="open"
       @open-change="onOpenChange"
-      @open-change-complete="(next: boolean) => log(next ? 'Finished opening' : 'Finished closing')"
+      @open-change-complete="
+        (next: boolean) => log(next ? 'Finished opening' : 'Finished closing')
+      "
     >
       <DialogTrigger>Notification Settings</DialogTrigger>
       <DialogBackdrop />

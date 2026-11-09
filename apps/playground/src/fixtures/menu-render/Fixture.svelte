@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/svelte"
+  import {
+    Menu,
+    MenuCheckboxItem,
+    MenuContent,
+    MenuItem,
+    MenuTrigger,
+  } from "@ui-sdk/svelte"
 
   // Counts updates of each custom item, so specs can check what re-renders.
   // An update is the part's props changing, which the text reads so it
@@ -8,7 +14,10 @@
   ;(window as unknown as { __renders: typeof renders }).__renders = renders
 
   let action = $state("")
-  const count = (key: "watched" | "plain", ...reads: unknown[]) => (renders[key]++, "")
+  const count = (key: "watched" | "plain", ...reads: unknown[]) => (
+    renders[key]++,
+    ""
+  )
 </script>
 
 <div class="fixture">
@@ -23,7 +32,11 @@
       </MenuItem>
       <MenuItem class="item" value="watched">
         {#snippet render({ props, state })}
-          <div {...props}>{count("watched", props, state.highlighted)}{state.highlighted ? "→ " : ""}Watched</div>
+          <div {...props}>
+            {count("watched", props, state.highlighted)}{state.highlighted
+              ? "→ "
+              : ""}Watched
+          </div>
         {/snippet}
       </MenuItem>
       <MenuItem class="item" value="plain">
@@ -33,7 +46,9 @@
       </MenuItem>
       <MenuCheckboxItem value="pinned" class="item">
         {#snippet children(state)}
-          <span class={state.checked ? "is-checked" : "is-unchecked"}>Pinned</span>
+          <span class={state.checked ? "is-checked" : "is-unchecked"}
+            >Pinned</span
+          >
         {/snippet}
       </MenuCheckboxItem>
     </MenuContent>

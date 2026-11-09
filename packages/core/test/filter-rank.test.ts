@@ -20,14 +20,21 @@ const ranked = (item: ListItem<unknown>, query: string) => {
 }
 
 function comboboxOrder(options: OptionsOf<typeof combobox>) {
-  const mounted = mount(combobox, options, "<root><input><content><list></list></content></root>")
+  const mounted = mount(
+    combobox,
+    options,
+    "<root><input><content><list></list></content></root>"
+  )
   mounts.push(mounted)
   mounted.api.internal.store.set({ open: true, dirty: true, query: "java" })
   return mounted.api.internal.listbox.entries().map((entry) => entry.value)
 }
 
 test("Combobox sorts items by a filter function's score, best first", () => {
-  expect(comboboxOrder({ items, filter: ranked })).toEqual(["Java", "JavaScript"])
+  expect(comboboxOrder({ items, filter: ranked })).toEqual([
+    "Java",
+    "JavaScript",
+  ])
 })
 
 test("Combobox keeps the source order for the built-in filters", () => {
@@ -38,9 +45,15 @@ test("Select sorts searched items by a filter function's score", () => {
   const mounted = mount(
     select,
     { items, filter: ranked },
-    "<root><trigger></trigger><content><input><list></list></content></root>",
+    "<root><trigger></trigger><content><input><list></list></content></root>"
   )
   mounts.push(mounted)
-  mounted.api.internal.store.set({ open: true, searchable: true, query: "java" })
-  expect(mounted.api.internal.listbox.entries().map((entry) => entry.value)).toEqual(["Java", "JavaScript"])
+  mounted.api.internal.store.set({
+    open: true,
+    searchable: true,
+    query: "java",
+  })
+  expect(
+    mounted.api.internal.listbox.entries().map((entry) => entry.value)
+  ).toEqual(["Java", "JavaScript"])
 })

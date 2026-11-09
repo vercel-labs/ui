@@ -14,7 +14,11 @@ type AccordionFixtureItem = {
 const accordionFixture = {
   defaultValue: ["shipping"],
   items: [
-    { value: "shipping", label: "Shipping", content: "We ship worldwide within five business days." },
+    {
+      value: "shipping",
+      label: "Shipping",
+      content: "We ship worldwide within five business days.",
+    },
     {
       value: "returns",
       label: "Returns",
@@ -27,7 +31,12 @@ const accordionFixture = {
       content: "Every product has a two year warranty.",
       disabled: true,
     },
-    { value: "support", label: "Support", content: "Write to us any time.", close: "Done" },
+    {
+      value: "support",
+      label: "Support",
+      content: "Write to us any time.",
+      close: "Done",
+    },
   ] satisfies AccordionFixtureItem[] as AccordionFixtureItem[],
 }
 

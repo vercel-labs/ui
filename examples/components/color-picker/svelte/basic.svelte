@@ -1,6 +1,10 @@
 <script lang="ts">
   import { Pipette } from "@lucide/svelte"
-  import { formatColor, parseColor, type ColorFormat } from "@ui-sdk/svelte/color"
+  import {
+    formatColor,
+    parseColor,
+    type ColorFormat,
+  } from "@ui-sdk/svelte/color"
   import {
     ColorPicker,
     ColorPickerArea,
@@ -21,7 +25,16 @@
     { label: "OKLCH", value: "oklch" },
   ]
 
-  const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+  const presets = [
+    "#ef4444",
+    "#f97316",
+    "#eab308",
+    "#22c55e",
+    "#0ea5e9",
+    "#6366f1",
+    "#a855f7",
+    "#ec4899",
+  ]
 
   let format = $state<ColorFormat>("hex")
   let value = $state("#0ea5e9")
@@ -54,7 +67,8 @@
     <select
       aria-label="Format"
       value={format}
-      onchange={(event) => changeFormat(event.currentTarget.value as ColorFormat)}
+      onchange={(event) =>
+        changeFormat(event.currentTarget.value as ColorFormat)}
     >
       {#each formats as option (option.value)}
         <option value={option.value}>{option.label}</option>

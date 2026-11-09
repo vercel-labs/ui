@@ -8,10 +8,15 @@ function FormInputs({ handle }: { handle: PrimitiveHandle<any> }) {
     <>
       <input {...input} defaultValue={value} />
       {handle.state.multiple &&
-        readIn(handle, () => handle.api.internal.serialized() as string[]).map((key) => {
-          const { value, ...hidden } = slotIn(handle, "value-input", { id: key, value: key })
-          return <input key={key} {...hidden} defaultValue={value} />
-        })}
+        readIn(handle, () => handle.api.internal.serialized() as string[]).map(
+          (key) => {
+            const { value, ...hidden } = slotIn(handle, "value-input", {
+              id: key,
+              value: key,
+            })
+            return <input key={key} {...hidden} defaultValue={value} />
+          }
+        )}
     </>
   )
   return usePart(handle, "form-input", {}, { render: inputs }, "input")

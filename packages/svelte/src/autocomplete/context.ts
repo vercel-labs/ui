@@ -10,4 +10,11 @@ const OwnContentKey = Symbol("autocomplete-own-content")
 type ContainerContext = () => PopupContainer
 type ItemContext = () => { key: string; label: string }
 
-export { type ContainerContext, ContainerKey, GroupKey, type ItemContext, ItemKey, OwnContentKey }
+export {
+  type ContainerContext,
+  ContainerKey,
+  GroupKey,
+  type ItemContext,
+  ItemKey,
+  OwnContentKey,
+}

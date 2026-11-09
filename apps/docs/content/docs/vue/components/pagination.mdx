@@ -106,7 +106,11 @@ With only a few pages, the range has no gaps, so you can write the links out and
 Pass `get-href` to map each page to a URL. Page links and steps then render as anchors.
 
 ```vue
-<Pagination aria-label="Pagination" :page-count="10" :get-href="(page) => `/posts?page=${page}`">
+<Pagination
+  aria-label="Pagination"
+  :page-count="10"
+  :get-href="(page) => `/posts?page=${page}`"
+>
   ...
 </Pagination>
 ```
@@ -128,13 +132,20 @@ const page = computed(() => Number(route.query.page ?? 1))
 </script>
 
 <template>
-  <Pagination aria-label="Pagination" :page-count="10" :page="page" :get-href="(page) => `?page=${page}`">
+  <Pagination
+    aria-label="Pagination"
+    :page-count="10"
+    :page="page"
+    :get-href="(page) => `?page=${page}`"
+  >
     <PaginationList v-slot="{ state }">
       <PaginationItem v-for="item in state.items" :key="item">
         <PaginationLink v-if="typeof item === 'number'" :page="item">
           <template #render="{ props, children }">
             <RouterLink v-slot="{ href, navigate }" :to="props.href" custom>
-              <a v-bind="props" :href="href" @click="navigate"><component :is="children" /></a>
+              <a v-bind="props" :href="href" @click="navigate"
+                ><component :is="children"
+              /></a>
             </RouterLink>
           </template>
         </PaginationLink>
@@ -155,7 +166,9 @@ const page = ref(1)
 </script>
 
 <template>
-  <Pagination v-model:page="page" aria-label="Pagination" :page-count="10"> ... </Pagination>
+  <Pagination v-model:page="page" aria-label="Pagination" :page-count="10">
+    ...
+  </Pagination>
 </template>
 ```
 
@@ -176,7 +189,12 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `siblings` is how many pages show on each side of the current one, 1 by default. Near an end, the window slides over instead of shrinking, keeping the range length stable. A gap of one page shows that page instead of an ellipsis.
 
 ```vue
-<Pagination aria-label="Pagination" :page-count="20" :default-page="10" :siblings="2">
+<Pagination
+  aria-label="Pagination"
+  :page-count="20"
+  :default-page="10"
+  :siblings="2"
+>
   ...
 </Pagination>
 ```
@@ -186,7 +204,12 @@ Every change carries a [reason](#reasons): `item-press` for a page, `previous-pr
 `boundaries` is how many pages always show at each end, 1 by default.
 
 ```vue
-<Pagination aria-label="Pagination" :page-count="20" :default-page="10" :boundaries="2">
+<Pagination
+  aria-label="Pagination"
+  :page-count="20"
+  :default-page="10"
+  :boundaries="2"
+>
   ...
 </Pagination>
 ```
@@ -202,7 +225,9 @@ const pagination = createPaginationController()
 
 <template>
   <button @click="pagination.next()">Next Page</button>
-  <Pagination aria-label="Pagination" :page-count="10" :controller="pagination"> ... </Pagination>
+  <Pagination aria-label="Pagination" :page-count="10" :controller="pagination">
+    ...
+  </Pagination>
 </template>
 ```
 
@@ -215,7 +240,12 @@ const pagination = createPaginationController()
 import { paginationRange } from "@ui-sdk/core/pagination"
 
 const items = computed(() =>
-  paginationRange({ page: slide.value, pageCount: 20, siblings: 2, boundaries: 1 }),
+  paginationRange({
+    page: slide.value,
+    pageCount: 20,
+    siblings: 2,
+    boundaries: 1,
+  })
 )
 </script>
 
@@ -277,11 +307,17 @@ Props are the same as below, and callbacks are events.
 
 ### Pagination
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationOptions" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationOptions"
+/>
 
 ### PaginationLink
 
-<TypeTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkProps" />
+<TypeTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkProps"
+/>
 
 `PaginationList`, `PaginationItem`, `PaginationPrevious`, `PaginationNext`, `PaginationFirst`, `PaginationLast` and `PaginationEllipsis` take no props of their own.
 
@@ -291,15 +327,24 @@ What render functions, state-based class names and slots receive, per part.
 
 `Pagination` and `PaginationList`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationState"
+/>
 
 `PaginationLink`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationLinkState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationLinkState"
+/>
 
 `PaginationPrevious`, `PaginationNext`, `PaginationFirst` and `PaginationLast`:
 
-<StateTable path="../../packages/core/src/components/pagination/pagination.ts" name="PaginationStepState" />
+<StateTable
+  path="../../packages/core/src/components/pagination/pagination.ts"
+  name="PaginationStepState"
+/>
 
 ### Reasons
 

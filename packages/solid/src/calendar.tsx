@@ -11,7 +11,15 @@ import {
   type CalendarWeekdayState,
 } from "@ui-sdk/core/calendar"
 import type { JSX } from "@solidjs/web"
-import { createContext, For, merge, omit, Repeat, Show, useContext } from "solid-js"
+import {
+  createContext,
+  For,
+  merge,
+  omit,
+  Repeat,
+  Show,
+  useContext,
+} from "solid-js"
 import { CalendarContext, monthCount } from "./calendar-context"
 import { usePart, usePrimitive, type PartProps } from "./use-primitive"
 
@@ -22,19 +30,28 @@ const GridContext = createContext<GridContextValue | null>(null)
 
 function useCalendar(part: string) {
   const context = useContext(CalendarContext)
-  if (!context) throw new Error(`${part} must be used inside <Calendar> or <DatePickerContent>.`)
+  if (!context) {
+    throw new Error(
+      `${part} must be used inside <Calendar> or <DatePickerContent>.`
+    )
+  }
   return context
 }
 
 function useGrid(part: string) {
   const context = useContext(GridContext)
-  if (!context) throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  }
   return context
 }
 
 // The part's props with `children` defaulting to `fallback` when it has none:
 // content, or a function of the part's state that returns it.
-function withFallback<State>(props: Record<string, any>, fallback: (state: State) => JSX.Element) {
+function withFallback<State>(
+  props: Record<string, any>,
+  fallback: (state: State) => JSX.Element
+) {
   return merge(props, {
     get children() {
       return props.children ?? fallback
@@ -44,7 +61,9 @@ function withFallback<State>(props: Record<string, any>, fallback: (state: State
 
 // Children that take the part's state are called with it, as `usePart` does.
 const ofState = (children: unknown, state: unknown) =>
-  typeof children === "function" && children.length > 0 ? children(state) : children
+  typeof children === "function" && children.length > 0
+    ? children(state)
+    : children
 
 /**
  * Months of days with one tab stop. Without children it renders a heading,
@@ -115,7 +134,7 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
     "maxDays",
     "allowUnavailable",
     "controller",
-    "debug",
+    "debug"
   )
   const fallback = () => (
     <>
@@ -124,12 +143,20 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
         <CalendarHeading />
         <CalendarNext />
       </div>
-      <Repeat count={monthCount(props.months)}>{(offset) => <CalendarGrid offset={offset} />}</Repeat>
+      <Repeat count={monthCount(props.months)}>
+        {(offset) => <CalendarGrid offset={offset} />}
+      </Repeat>
     </>
   )
   return (
     <CalendarContext value={calendar}>
-      {usePart(calendar, "root", undefined, withFallback(rest, fallback), "div")}
+      {usePart(
+        calendar,
+        "root",
+        undefined,
+        withFallback(rest, fallback),
+        "div"
+      )}
     </CalendarContext>
   )
 }
@@ -141,12 +168,22 @@ function Calendar(props: CalendarOptions & PartProps<"div", CalendarState>) {
 function CalendarHeading(props: PartProps<"h2", CalendarHeadingState>) {
   const calendar = useCalendar("CalendarHeading")
   const label = (state: CalendarHeadingState) => state.label
-  return usePart(calendar, "heading", undefined, withFallback(props, label), "h2")
+  return usePart(
+    calendar,
+    "heading",
+    undefined,
+    withFallback(props, label),
+    "h2"
+  )
 }
 
 type SelectProps = Omit<PartProps<"select", CalendarSelectState>, "value">
 
-function selectPart(name: "month-select" | "year-select", part: string, props: SelectProps) {
+function selectPart(
+  name: "month-select" | "year-select",
+  part: string,
+  props: SelectProps
+) {
   const calendar = useCalendar(part)
   const options = (state: CalendarSelectState) => (
     <For each={state.options} keyed={(option) => option.value}>
@@ -162,7 +199,13 @@ function selectPart(name: "month-select" | "year-select", part: string, props: S
       )}
     </For>
   )
-  return usePart(calendar, name, undefined, withFallback(props, options), "select")
+  return usePart(
+    calendar,
+    name,
+    undefined,
+    withFallback(props, options),
+    "select"
+  )
 }
 
 /**
@@ -191,7 +234,7 @@ function stepPart(name: "previous" | "next", part: string, props: StepProps) {
     name,
     undefined,
     withFallback(props, () => glyph),
-    "button",
+    "button"
   )
 }
 
@@ -216,9 +259,14 @@ function CalendarNext(props: StepProps) {
  * Without children it renders its weekdays and weeks.
  * @stable
  */
-function CalendarGrid(props: PartProps<"table", CalendarGridState> & { offset?: number }) {
+function CalendarGrid(
+  props: PartProps<"table", CalendarGridState> & { offset?: number }
+) {
   const calendar = useCalendar("CalendarGrid")
-  const part = () => ({ offset: props.offset ?? 0, id: String(props.offset ?? 0) })
+  const part = () => ({
+    offset: props.offset ?? 0,
+    id: String(props.offset ?? 0),
+  })
   const rest = omit(props, "offset")
   // The grid's state reaches its rows and days through context, so the
   // children render inside it, as a function of the state.
@@ -230,7 +278,11 @@ function CalendarGrid(props: PartProps<"table", CalendarGridState> & { offset?: 
       state,
     }
     // Read inside the provider: reading a JSX children getter makes its parts.
-    return <GridContext value={grid}>{ofState(props.children, state) ?? fallback()}</GridContext>
+    return (
+      <GridContext value={grid}>
+        {ofState(props.children, state) ?? fallback()}
+      </GridContext>
+    )
   }
   const fallback = () => (
     <>
@@ -238,7 +290,13 @@ function CalendarGrid(props: PartProps<"table", CalendarGridState> & { offset?: 
       <CalendarWeeks />
     </>
   )
-  return usePart(calendar, "grid", part, merge(rest, { children: content }), "table")
+  return usePart(
+    calendar,
+    "grid",
+    part,
+    merge(rest, { children: content }),
+    "table"
+  )
 }
 
 /**
@@ -248,7 +306,9 @@ function CalendarGrid(props: PartProps<"table", CalendarGridState> & { offset?: 
  * @stable
  */
 function CalendarWeekdays(
-  props: Omit<JSX.IntrinsicElements["thead"], "children"> & { children?: (index: number) => JSX.Element },
+  props: Omit<JSX.IntrinsicElements["thead"], "children"> & {
+    children?: (index: number) => JSX.Element
+  }
 ) {
   const calendar = useCalendar("CalendarWeekdays")
   const grid = useGrid("CalendarWeekdays")
@@ -259,7 +319,13 @@ function CalendarWeekdays(
     <thead {...rest}>
       <tr {...row}>
         <For each={grid.state.weekdays} keyed={false}>
-          {(_, index) => (props.children ? props.children(index) : <CalendarWeekday index={index} />)}
+          {(_, index) =>
+            props.children ? (
+              props.children(index)
+            ) : (
+              <CalendarWeekday index={index} />
+            )
+          }
         </For>
       </tr>
     </thead>
@@ -270,10 +336,15 @@ function CalendarWeekdays(
  * A weekday's column header. Shows its name in `weekdayFormat` unless it has children.
  * @stable
  */
-function CalendarWeekday(props: PartProps<"th", CalendarWeekdayState> & { index: number }) {
+function CalendarWeekday(
+  props: PartProps<"th", CalendarWeekdayState> & { index: number }
+) {
   const calendar = useCalendar("CalendarWeekday")
   const grid = useGrid("CalendarWeekday")
-  const part = () => ({ index: props.index, id: `${grid.offset}-${props.index}` })
+  const part = () => ({
+    index: props.index,
+    id: `${grid.offset}-${props.index}`,
+  })
   const rest = merge({ scope: "col" }, omit(props, "index"))
   const label = (state: CalendarWeekdayState) => state.label
   return usePart(calendar, "weekday", part, withFallback(rest, label), "th")
@@ -289,7 +360,7 @@ function CalendarWeekday(props: PartProps<"th", CalendarWeekdayState> & { index:
 function CalendarWeeks(
   props: Omit<JSX.IntrinsicElements["tbody"], "children"> & {
     children?: (cell: CalendarGridCell) => JSX.Element
-  },
+  }
 ) {
   const calendar = useCalendar("CalendarWeeks")
   const grid = useGrid("CalendarWeeks")
@@ -302,7 +373,9 @@ function CalendarWeeks(
       <For each={grid.state.weeks} keyed={(week) => week[0]!.date}>
         {(week, index) => {
           // Before the row's element, as on the server, so hydration keys line up.
-          const row = calendar.slot("week", () => ({ id: `${grid.offset}-${index()}` }))
+          const row = calendar.slot("week", () => ({
+            id: `${grid.offset}-${index()}`,
+          }))
           return (
             <tr {...row}>
               <For each={week()} keyed={(cell) => cell.date}>
@@ -324,7 +397,9 @@ function CalendarWeeks(
  * A day. Shows the day of the month unless it has children; arrow keys move between days.
  * @stable
  */
-function CalendarDay(props: PartProps<"td", CalendarDayState> & { value: string }) {
+function CalendarDay(
+  props: PartProps<"td", CalendarDayState> & { value: string }
+) {
   const calendar = useCalendar("CalendarDay")
   const grid = useContext(GridContext)
   const part = () => ({ value: props.value, offset: grid?.offset ?? 0 })

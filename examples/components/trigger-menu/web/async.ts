@@ -18,9 +18,9 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
         resolve(
           channels
             .filter((channel) => channel.includes(query.toLowerCase()))
-            .map((channel) => ({ value: channel, label: channel })),
+            .map((channel) => ({ value: channel, label: channel }))
         ),
-      600,
+      600
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -65,7 +65,9 @@ function mount(root: HTMLElement) {
     },
   ]
   menu.addEventListener("openchange", (event) => {
-    if (event.detail.value) loading()
+    if (event.detail.value) {
+      loading()
+    }
   })
   menu.addEventListener("querychange", (event) => {
     query.textContent = event.detail.value

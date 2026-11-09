@@ -11,7 +11,11 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <form class="form" aria-label="Rendering" onSubmit={(event) => event.preventDefault()}>
+      <form
+        class="form"
+        aria-label="Rendering"
+        onSubmit={(event) => event.preventDefault()}
+      >
         <label>
           <Checkbox
             class="checkbox"
@@ -24,15 +28,23 @@ function Fixture() {
         </label>
         <Checkbox
           aria-label="Render function"
-          render={(props, state) => <button {...props}>{state.checked ? "On" : "Off"}</button>}
+          render={(props, state) => (
+            <button {...props}>{state.checked ? "On" : "Off"}</button>
+          )}
         />
         <Checkbox
           aria-label="Class from state"
-          class={(state) => `checkbox ${state.checked ? "is-checked" : "is-unchecked"}`}
+          class={(state) =>
+            `checkbox ${state.checked ? "is-checked" : "is-unchecked"}`
+          }
         />
         <label>
           <Switch class="switch" defaultChecked>
-            <SwitchThumb render={(props, state) => <span {...props}>{state.checked ? "I" : "O"}</span>} />
+            <SwitchThumb
+              render={(props, state) => (
+                <span {...props}>{state.checked ? "I" : "O"}</span>
+              )}
+            />
           </Switch>
           Labelled thumb
         </label>
@@ -44,7 +56,11 @@ function Fixture() {
           <For each={["small", "large"]}>
             {(value) => (
               <label>
-                <Radio class="radio" value={value} render={(props) => <span {...props} />} />
+                <Radio
+                  class="radio"
+                  value={value}
+                  render={(props) => <span {...props} />}
+                />
                 {value === "small" ? "Small" : "Large"}
               </label>
             )}
@@ -52,7 +68,10 @@ function Fixture() {
         </RadioGroup>
         <Field>
           <FieldLabel>Nickname</FieldLabel>
-          <FieldControl value={nickname()} onInput={(event) => setNickname(event.currentTarget.value)} />
+          <FieldControl
+            value={nickname()}
+            onInput={(event) => setNickname(event.currentTarget.value)}
+          />
         </Field>
       </form>
       <button>After</button>

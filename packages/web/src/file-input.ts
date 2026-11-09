@@ -1,4 +1,9 @@
-import { fileInput, formatFileSize, relativePath, type FileInputApi } from "@ui-sdk/core/file-input"
+import {
+  fileInput,
+  formatFileSize,
+  relativePath,
+  type FileInputApi,
+} from "@ui-sdk/core/file-input"
 import { fileKey } from "@ui-sdk/core/renderer"
 import { createParts } from "./define-element"
 import { element } from "./list"
@@ -32,15 +37,29 @@ function defineFileInputElements() {
       state: {
         value: {
           get: (api: FileInputApi) => api.getValue(),
-          set: (api: FileInputApi, files: readonly File[] | null) => api.setValue(files ?? []),
+          set: (api: FileInputApi, files: readonly File[] | null) =>
+            api.setValue(files ?? []),
         },
       },
-      api: ["getValue", "setValue", "addFiles", "removeFile", "clear", "open", "focus", "isDragging"],
+      api: [
+        "getValue",
+        "setValue",
+        "addFiles",
+        "removeFile",
+        "clear",
+        "open",
+        "focus",
+        "isDragging",
+      ],
       // The picker's input is generated inside, once.
       children: {
         input: (el) => {
-          const existing = el.querySelector<HTMLInputElement>(':scope > input[type="file"]')
-          if (existing) return existing
+          const existing = el.querySelector<HTMLInputElement>(
+            ':scope > input[type="file"]'
+          )
+          if (existing) {
+            return existing
+          }
           const input = el.ownerDocument.createElement("input")
           input.type = "file"
           el.append(input)
@@ -57,7 +76,9 @@ function defineFileInputElements() {
     trigger: {
       tag: "ui-file-input-trigger",
       display: "contents",
-      target: (el) => el.querySelector<HTMLElement>("button") ?? (el.firstElementChild as HTMLElement | null),
+      target: (el) =>
+        el.querySelector<HTMLElement>("button") ??
+        (el.firstElementChild as HTMLElement | null),
     },
     // `paste-target` is "document" or a CSS selector.
     dropzone: { tag: "ui-file-input-dropzone", display: "block" },
@@ -75,7 +96,9 @@ function defineFileInputElements() {
     "item-remove": {
       tag: "ui-file-input-item-remove",
       display: "contents",
-      target: (el) => el.querySelector<HTMLElement>("button") ?? (el.firstElementChild as HTMLElement | null),
+      target: (el) =>
+        el.querySelector<HTMLElement>("button") ??
+        (el.firstElementChild as HTMLElement | null),
     },
   })
 }
@@ -95,8 +118,12 @@ const fileFields: Record<string, (file: File) => string> = {
 // name and a remove button.
 function createItem(list: Element, file: File) {
   const template = list.querySelector<HTMLTemplateElement>(":scope > template")
-  const copy = template?.content.firstElementChild?.cloneNode(true) as ItemElement | undefined
-  const item: ItemElement = copy?.localName === "ui-file-input-item" ? copy : element("ui-file-input-item")
+  const copy = template?.content.firstElementChild?.cloneNode(true) as
+    ItemElement | undefined
+  const item: ItemElement =
+    copy?.localName === "ui-file-input-item"
+      ? copy
+      : element("ui-file-input-item")
   if (item !== copy) {
     item.append(element("span", { "data-file": "name" }))
     const remove = element("ui-file-input-item-remove")
@@ -105,8 +132,9 @@ function createItem(list: Element, file: File) {
   }
   // Set before the item upgrades, so its first props have the file.
   item.file = file
-  for (const field of item.querySelectorAll<HTMLElement>("[data-file]"))
+  for (const field of item.querySelectorAll<HTMLElement>("[data-file]")) {
     field.textContent = fileFields[field.dataset.file ?? ""]?.(file) ?? ""
+  }
   return item
 }
 
@@ -115,19 +143,37 @@ function createItem(list: Element, file: File) {
 function renderLists(el: HTMLElement, api: FileInputApi) {
   const value = api.getValue()
   for (const list of el.querySelectorAll("ui-file-input-list")) {
-    if (list.closest(owner) !== el || renderedValue.get(list) === value) continue
+    if (list.closest(owner) !== el || renderedValue.get(list) === value) {
+      continue
+    }
     renderedValue.set(list, value)
     const existing = new Map<File, ItemElement>()
-    for (const item of list.querySelectorAll<ItemElement>(":scope > ui-file-input-item"))
-      if (item.file) existing.set(item.file, item)
-    for (const [file, item] of existing) if (!value.includes(file)) item.remove()
+    for (const item of list.querySelectorAll<ItemElement>(
+      ":scope > ui-file-input-item"
+    )) {
+      if (item.file) {
+        existing.set(item.file, item)
+      }
+    }
+    for (const [file, item] of existing) {
+      if (!value.includes(file)) {
+        item.remove()
+      }
+    }
     // Items already in place stay put: moving a focused one would blur it.
     let previous = list.querySelector(":scope > template")
     for (const file of value) {
       const item = existing.get(file) ?? createItem(list, file)
-      if (item.parentElement !== list || item.previousElementSibling !== previous)
-        if (previous) previous.after(item)
-        else list.prepend(item)
+      if (
+        item.parentElement !== list ||
+        item.previousElementSibling !== previous
+      ) {
+        if (previous) {
+          previous.after(item)
+        } else {
+          list.prepend(item)
+        }
+      }
       previous = item
     }
   }

@@ -1,7 +1,18 @@
 import * as React from "react"
-import { bindLayer, css, definePrimitive, keepFocus, position } from "@ui-sdk/core"
+import {
+  bindLayer,
+  css,
+  definePrimitive,
+  keepFocus,
+  position,
+} from "@ui-sdk/core"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
-import { usePart, usePrimitive, type PartProps, type PrimitiveHandle } from "@ui-sdk/react/primitive"
+import {
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "@ui-sdk/react/primitive"
 
 type Access = "view" | "comment" | "edit"
 
@@ -59,17 +70,23 @@ const share = definePrimitive({
   }),
 })
 
-const ShareContext = React.createContext<PrimitiveHandle<typeof share> | null>(null)
+const ShareContext = React.createContext<PrimitiveHandle<typeof share> | null>(
+  null
+)
 
 function useShare() {
   const context = React.useContext(ShareContext)
-  if (!context) throw new Error("Share parts must be used inside <Share>.")
+  if (!context) {
+    throw new Error("Share parts must be used inside <Share>.")
+  }
   return context
 }
 
 function Share({ children }: { children: React.ReactNode }) {
   const handle = usePrimitive(share, {})
-  return <ShareContext.Provider value={handle}>{children}</ShareContext.Provider>
+  return (
+    <ShareContext.Provider value={handle}>{children}</ShareContext.Provider>
+  )
 }
 
 function ShareTrigger(props: PartProps<"button">) {
@@ -80,7 +97,11 @@ function SharePanel(props: PartProps<"div", { access: Access }>) {
   return usePart(useShare(), "panel", {}, props, "div")
 }
 
-const labels: Record<Access, string> = { view: "Can view", comment: "Can comment", edit: "Can edit" }
+const labels: Record<Access, string> = {
+  view: "Can view",
+  comment: "Can comment",
+  edit: "Can edit",
+}
 
 function AccessMenu({ access }: { access: Access }) {
   const { api } = useShare()
@@ -114,4 +135,12 @@ function Example() {
   )
 }
 
-export { Example, share, Share, SharePanel, ShareTrigger, type Access, type ShareState }
+export {
+  Example,
+  share,
+  Share,
+  SharePanel,
+  ShareTrigger,
+  type Access,
+  type ShareState,
+}

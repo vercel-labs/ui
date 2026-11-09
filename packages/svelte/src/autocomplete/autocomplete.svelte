@@ -129,7 +129,9 @@ A text field that suggests as you type. The text is the value. Renders no elemen
     /** Runs when the highlight or scrolling reaches the last suggestion, so the next page can load. */
     onLoadMore?: () => void
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back, the screen reader's escape or a swipe. Focus or the window leaving is refused without it. */
-    onDismissAttempt?: (details: DismissAttemptDetails<AutocompleteDismissReason>) => void
+    onDismissAttempt?: (
+      details: DismissAttemptDetails<AutocompleteDismissReason>
+    ) => void
     children?: Snippet
   } = $props()
 
@@ -169,11 +171,15 @@ A text field that suggests as you type. The text is the value. Renders no elemen
     onValueChange: (next: string, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onOpenChange: (next: boolean, details: OpenDetails) => {
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onSubmit,

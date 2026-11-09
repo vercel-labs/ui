@@ -22,7 +22,9 @@
       bind:checked
       controller={updates}
       onCheckedChange={(next, details) =>
-        log(`${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`)}
+        log(
+          `${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`
+        )}
     >
       <CheckboxIndicator>
         <CheckIcon aria-hidden="true" />

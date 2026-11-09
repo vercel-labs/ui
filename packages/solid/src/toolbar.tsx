@@ -8,7 +8,13 @@ import {
 import type { JSX } from "@solidjs/web"
 import { createUniqueId, merge, omit } from "solid-js"
 import { ToolbarContext, ToolbarGroupContext } from "./toolbar-context"
-import { createParts, provided, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  provided,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(toolbar, {
   button: "button",
@@ -31,8 +37,19 @@ function Toolbar(props: ToolbarOptions & PartProps<"div", ToolbarState>) {
     controller: props.controller,
     debug: props.debug,
   }))
-  const rest = omit(props, "orientation", "loop", "disabled", "controller", "debug")
-  return <ToolbarContext value={handle}>{usePart(handle, "root", undefined, rest, "div")}</ToolbarContext>
+  const rest = omit(
+    props,
+    "orientation",
+    "loop",
+    "disabled",
+    "controller",
+    "debug"
+  )
+  return (
+    <ToolbarContext value={handle}>
+      {usePart(handle, "root", undefined, rest, "div")}
+    </ToolbarContext>
+  )
 }
 
 /**
@@ -57,7 +74,10 @@ const ToolbarInput = parts.Input
  * A group of related items in the toolbar. `disabled` disables every item in it.
  * @stable
  */
-function ToolbarGroup(props: ToolbarGroupProps & Omit<PartProps<"div", ToolbarGroupState>, "disabled">) {
+function ToolbarGroup(
+  props: ToolbarGroupProps &
+    Omit<PartProps<"div", ToolbarGroupState>, "disabled">
+) {
   const id = createUniqueId()
   // Toggles and toggle groups inside read whether the group is disabled from
   // context, in document order on the server, so its first item can claim the
@@ -71,11 +91,17 @@ function ToolbarGroup(props: ToolbarGroupProps & Omit<PartProps<"div", ToolbarGr
               ? props.children(state)
               : // A function that takes nothing is a child's accessor, which Solid renders.
                 (props.children as JSX.Element)}
-          </ToolbarGroupContext>,
+          </ToolbarGroupContext>
         )
     },
   })
-  return usePart(toolbar, "group", () => ({ id, disabled: props.disabled }), rest, "div")
+  return usePart(
+    toolbar,
+    "group",
+    () => ({ id, disabled: props.disabled }),
+    rest,
+    "div"
+  )
 }
 
 /**
@@ -102,4 +128,11 @@ export type {
   ToolbarSeparatorState,
 } from "@ui-sdk/core/toolbar"
 
-export { Toolbar, ToolbarButton, ToolbarGroup, ToolbarInput, ToolbarLink, ToolbarSeparator }
+export {
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+  ToolbarInput,
+  ToolbarLink,
+  ToolbarSeparator,
+}

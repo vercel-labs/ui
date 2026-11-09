@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { ChevronRightIcon, LoaderCircleIcon, RotateCwIcon } from "@lucide/svelte"
+  import {
+    ChevronRightIcon,
+    LoaderCircleIcon,
+    RotateCwIcon,
+  } from "@lucide/svelte"
   import {
     Tree,
     TreeGroup,
@@ -21,7 +25,10 @@
   async function fetchChildren(value: string, signal: AbortSignal) {
     await new Promise((resolve, reject) => {
       const timer = setTimeout(resolve, 800)
-      signal.addEventListener("abort", () => (clearTimeout(timer), reject(signal.reason)))
+      signal.addEventListener(
+        "abort",
+        () => (clearTimeout(timer), reject(signal.reason))
+      )
     })
     if (value === "archive" && !archiveAsked) {
       archiveAsked = true
@@ -35,7 +42,10 @@
 
   let loaded: Record<string, Node[]> = $state({})
 
-  async function loadChildren(value: string, { signal }: { signal: AbortSignal }) {
+  async function loadChildren(
+    value: string,
+    { signal }: { signal: AbortSignal }
+  ) {
     loaded[value] = await fetchChildren(value, signal)
   }
 

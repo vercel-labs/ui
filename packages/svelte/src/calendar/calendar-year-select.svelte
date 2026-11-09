@@ -18,8 +18,14 @@ A native select of the years from `min` to `max`, or 10 either side of the year 
   {#each state.options as option (option.value)}
     {@const selected = option.value === state.value}
     <!-- Selected on the server too; the core writes the select's value once it binds. -->
-    <option value={String(option.value)} disabled={option.disabled} {selected}>{option.label}</option>
+    <option value={String(option.value)} disabled={option.disabled} {selected}
+      >{option.label}</option
+    >
   {/each}
 {/snippet}
 
-<Part tag="select" part={select} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="select"
+  part={select}
+  props={{ ...rest, children: children ?? fallback }}
+/>

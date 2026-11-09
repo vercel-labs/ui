@@ -23,9 +23,16 @@ function field(value: string) {
   return input
 }
 
-function type(instance: ReturnType<typeof autocomplete>, text: string, inputType = "insertText") {
+function type(
+  instance: ReturnType<typeof autocomplete>,
+  text: string,
+  inputType = "insertText"
+) {
   const input = field(text)
-  instance.api.internal.typed(input as unknown as HTMLInputElement, { inputType } as unknown as Event)
+  instance.api.internal.typed(
+    input as unknown as HTMLInputElement,
+    { inputType } as unknown as Event
+  )
   return input
 }
 
@@ -55,7 +62,10 @@ describe("autocomplete headless", () => {
     expect(instance.api.isOpen()).toBe(true)
     instance.api.internal.onInputKeyDown(key("Enter"))
     expect(instance.api.isOpen()).toBe(false)
-    expect(onOpenChange).toHaveBeenLastCalledWith(false, expect.objectContaining({ reason: "input-commit" }))
+    expect(onOpenChange).toHaveBeenLastCalledWith(
+      false,
+      expect.objectContaining({ reason: "input-commit" })
+    )
   })
 
   test("the text is the value, and typing filters and opens the suggestions", () => {
@@ -65,20 +75,34 @@ describe("autocomplete headless", () => {
     expect(instance.api.getValue()).toBe("ap")
     expect(keys(instance)).toEqual(["Apple", "Apricot"])
     expect(instance.api.isOpen()).toBe(true)
-    expect(onValueChange).toHaveBeenLastCalledWith("ap", expect.objectContaining({ reason: "input-change" }))
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "ap",
+      expect.objectContaining({ reason: "input-change" })
+    )
   })
 
   test("inline completion fills in the first match, keeps the typed case and selects the rest", () => {
-    const instance = autocomplete({ id: "a", items: fruits, inlineComplete: true })
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      inlineComplete: true,
+    })
     const input = type(instance, "ban")
     expect(input.value).toBe("banana")
     expect([input.selectionStart, input.selectionEnd]).toEqual([3, 6])
     expect(instance.api.getValue()).toBe("banana")
-    expect(instance.get()).toMatchObject({ highlighted: "Banana", query: "ban" })
+    expect(instance.get()).toMatchObject({
+      highlighted: "Banana",
+      query: "ban",
+    })
   })
 
   test("deleting never completes again", () => {
-    const instance = autocomplete({ id: "a", items: fruits, inlineComplete: true })
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      inlineComplete: true,
+    })
     type(instance, "ban")
     const input = type(instance, "ban", "deleteContentBackward")
     expect(input.value).toBe("ban")
@@ -86,7 +110,11 @@ describe("autocomplete headless", () => {
   })
 
   test("disabled suggestions are never completed", () => {
-    const instance = autocomplete({ id: "a", items: fruits, inlineComplete: true })
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      inlineComplete: true,
+    })
     expect(type(instance, "ch").value).toBe("ch")
   })
 
@@ -96,14 +124,22 @@ describe("autocomplete headless", () => {
     type(instance, "kiwi")
     const enter = key("Enter")
     instance.api.internal.onInputKeyDown(enter)
-    expect(onSubmit).toHaveBeenCalledWith("kiwi", expect.objectContaining({ event: enter }))
+    expect(onSubmit).toHaveBeenCalledWith(
+      "kiwi",
+      expect.objectContaining({ event: enter })
+    )
     expect(instance.api.isOpen()).toBe(false)
     expect(enter.defaultPrevented).toBe(false)
   })
 
   test("Enter on a highlighted suggestion fills it in without submitting", () => {
     const onSubmit = vi.fn()
-    const instance = autocomplete({ id: "a", items: fruits, autoHighlight: true, onSubmit })
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      autoHighlight: true,
+      onSubmit,
+    })
     type(instance, "blu")
     const enter = key("Enter")
     instance.api.internal.onInputKeyDown(enter)
@@ -114,7 +150,12 @@ describe("autocomplete headless", () => {
 
   test("with submitOnSelect, choosing a suggestion submits it", () => {
     const onSubmit = vi.fn()
-    const instance = autocomplete({ id: "a", items: fruits, submitOnSelect: true, onSubmit })
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      submitOnSelect: true,
+      onSubmit,
+    })
     type(instance, "ban")
     instance.api.internal.press("Banana")
     expect(onSubmit).toHaveBeenCalledWith("Banana", expect.anything())
@@ -131,7 +172,9 @@ describe("autocomplete headless", () => {
       id: "a",
       items: fruits,
       onValueChange: (value) => {
-        if (value === "ap") instance.api.setValue("ban")
+        if (value === "ap") {
+          instance.api.setValue("ban")
+        }
       },
     })
     type(instance, "ap")
@@ -145,25 +188,39 @@ describe("autocomplete headless", () => {
     instance.api.internal.onInputKeyDown(key("ArrowDown"))
     expect(instance.get().highlighted).toBe("Apple")
     const changes: (readonly string[])[] = []
-    instance.subscribe((_liveOnly, _delivered, changed) => changes.push(changed))
+    instance.subscribe((_liveOnly, _delivered, changed) =>
+      changes.push(changed)
+    )
     instance.setOptions({ id: "a", items: ["Banana"], defaultOpen: true })
     expect(instance.get().highlighted).toBeNull()
-    expect(changes.filter((changed) => changed.includes("highlighted"))).toEqual([
-      expect.arrayContaining(["items", "highlighted"]),
-    ])
+    expect(
+      changes.filter((changed) => changed.includes("highlighted"))
+    ).toEqual([expect.arrayContaining(["items", "highlighted"])])
   })
 
   test("Escape takes an inline completion back out", () => {
     const onValueChange = vi.fn()
-    const instance = autocomplete({ id: "a", items: fruits, inlineComplete: true, onValueChange })
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      inlineComplete: true,
+      onValueChange,
+    })
     type(instance, "apr")
     instance.api.internal.onInputKeyDown(key("Escape"))
     expect(instance.api.getValue()).toBe("apr")
-    expect(onValueChange).toHaveBeenLastCalledWith("apr", expect.objectContaining({ reason: "escape-key" }))
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      "apr",
+      expect.objectContaining({ reason: "escape-key" })
+    )
   })
 
   test("ArrowRight accepts an inline completion, so Escape keeps it", () => {
-    const instance = autocomplete({ id: "a", items: fruits, inlineComplete: true })
+    const instance = autocomplete({
+      id: "a",
+      items: fruits,
+      inlineComplete: true,
+    })
     type(instance, "ba")
     expect(instance.api.getValue()).toBe("banana")
     instance.api.internal.onInputKeyDown(key("ArrowRight"))

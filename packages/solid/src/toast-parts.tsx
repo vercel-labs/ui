@@ -14,9 +14,24 @@ import {
 } from "@ui-sdk/core/toast"
 import type { ToastRegionInternalOptions } from "@ui-sdk/core/renderer"
 import type { JSX } from "@solidjs/web"
-import { createContext, createUniqueId, For, merge, omit, Show, untrack, useContext } from "solid-js"
+import {
+  createContext,
+  createUniqueId,
+  For,
+  merge,
+  omit,
+  Show,
+  untrack,
+  useContext,
+} from "solid-js"
 import { renderPopup, type PopupContainer } from "./popup"
-import { renderAs, usePart, usePrimitive, type PartProps, type PrimitiveHandle } from "./use-primitive"
+import {
+  renderAs,
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 type RegionHandle = PrimitiveHandle<typeof toastRegion>
 
@@ -25,11 +40,16 @@ type Content = JSX.Element
 
 // The region and the toast a part belongs to. The toast is a live view of the
 // region's state, so a part that reads its title follows the toast's updates.
-const ToastContext = createContext<{ region: RegionHandle; toast: ToastData<Content> } | null>(null)
+const ToastContext = createContext<{
+  region: RegionHandle
+  toast: ToastData<Content>
+} | null>(null)
 
 function useToast(part: string) {
   const context = useContext(ToastContext)
-  if (!context) throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  }
   return context
 }
 
@@ -39,13 +59,19 @@ function useToast(part: string) {
 function liveView<T extends object>(get: () => T, own: Partial<T> = {}) {
   const has = (key: PropertyKey) => key in own || key in get()
   const read = (key: PropertyKey) =>
-    key in own ? own[key as keyof T] : (get() as Record<PropertyKey, unknown>)[key]
+    key in own
+      ? own[key as keyof T]
+      : (get() as Record<PropertyKey, unknown>)[key]
   return new Proxy(own as T, {
     get: (_, key) => read(key),
     has: (_, key) => has(key),
-    ownKeys: () => [...new Set([...Reflect.ownKeys(own), ...Reflect.ownKeys(get())])],
+    ownKeys: () => [
+      ...new Set([...Reflect.ownKeys(own), ...Reflect.ownKeys(get())]),
+    ],
     getOwnPropertyDescriptor: (_, key) =>
-      has(key) ? { enumerable: true, configurable: true, get: () => read(key) } : undefined,
+      has(key)
+        ? { enumerable: true, configurable: true, get: () => read(key) }
+        : undefined,
   })
 }
 
@@ -53,14 +79,20 @@ function liveView<T extends object>(get: () => T, own: Partial<T> = {}) {
  * Props for `ToastRegion`.
  * @stable
  */
-type ToastRegionProps = Omit<PartProps<"section", ToastRegionState>, "children"> &
+type ToastRegionProps = Omit<
+  PartProps<"section", ToastRegionState>,
+  "children"
+> &
   ToastRegionOptions & {
     /**
      * Renders each toast, usually with `Toast` and its parts. Without it,
      * each toast renders its title, description, action and cancel button.
      * Both arguments are live: reading a key in JSX follows the toast's updates.
      */
-    children?: (toast: ToastData<Content>, item: ToastItem<Content>) => JSX.Element
+    children?: (
+      toast: ToastData<Content>,
+      item: ToastItem<Content>
+    ) => JSX.Element
     /** Where the region renders. Without top layer support, the body. */
     container?: PopupContainer
   }
@@ -90,7 +122,7 @@ function Region(props: ToastRegionProps & { placed?: boolean }) {
         placed: props.placed,
         // Solid lets `false` remove an attribute, which is no name.
         label: props["aria-label"] || undefined,
-      }) satisfies ToastRegionInternalOptions,
+      }) satisfies ToastRegionInternalOptions
   )
   const rest = omit(
     props,
@@ -105,7 +137,7 @@ function Region(props: ToastRegionProps & { placed?: boolean }) {
     "placed",
     "container",
     "children",
-    "aria-label",
+    "aria-label"
   )
   const list = region.slot("list")
   const user = merge(rest, {
@@ -115,11 +147,17 @@ function Region(props: ToastRegionProps & { placed?: boolean }) {
           <For each={state.toasts} keyed={(item) => item.toast.id}>
             {(item) => {
               const toast = liveView(() => item().toast as ToastData<Content>)
-              const live = liveView(() => item() as ToastItem<Content>, { toast })
+              const live = liveView(() => item() as ToastItem<Content>, {
+                toast,
+              })
               return (
                 <ToastContext value={{ region, toast }}>
                   {untrack(() =>
-                    props.children ? props.children(toast, live) : <DataToast toast={toast} />,
+                    props.children ? (
+                      props.children(toast, live)
+                    ) : (
+                      <DataToast toast={toast} />
+                    )
                   )}
                 </ToastContext>
               )
@@ -149,7 +187,9 @@ function DataToast(props: { toast: ToastData<Content> }) {
         <ToastAction />
       </Show>
       <Show when={props.toast.cancel}>
-        <ToastClose action={props.toast.cancel?.onCancel}>{props.toast.cancel?.label}</ToastClose>
+        <ToastClose action={props.toast.cancel?.onCancel}>
+          {props.toast.cancel?.label}
+        </ToastClose>
       </Show>
     </Toast>
   )
@@ -210,11 +250,19 @@ function ToastDescription(props: PartProps<"div">) {
  * handler keeps the toast open and the button pending.
  * @stable
  */
-function ToastAction(props: Omit<PartProps<"button", ToastButtonState>, "onAction"> & ToastActionProps) {
+function ToastAction(
+  props: Omit<PartProps<"button", ToastButtonState>, "onAction"> &
+    ToastActionProps
+) {
   const { region, toast } = useToast("ToastAction")
   const id = createUniqueId()
   const toastId = untrack(() => toast.id)
-  const part = () => ({ id, toast: toastId, onAction: props.onAction, dismiss: props.dismiss })
+  const part = () => ({
+    id,
+    toast: toastId,
+    onAction: props.onAction,
+    dismiss: props.dismiss,
+  })
   const rest = omit(props, "onAction", "dismiss", "children")
   const href = () => toast.action?.href
   // A link when the action has an `href`, else a button. The user's own
@@ -239,7 +287,7 @@ function ToastAction(props: Omit<PartProps<"button", ToastButtonState>, "onActio
             return props.children ?? toast.action?.label
           },
         }),
-        "button",
+        "button"
       )}
     </Show>
   )
@@ -249,13 +297,21 @@ function ToastAction(props: Omit<PartProps<"button", ToastButtonState>, "onActio
  * Closes the toast. With an `action`, runs it first, and a returned Promise keeps the toast open until it settles.
  * @stable
  */
-function ToastClose(props: Omit<PartProps<"button", ToastButtonState>, "action"> & ToastCloseProps) {
+function ToastClose(
+  props: Omit<PartProps<"button", ToastButtonState>, "action"> & ToastCloseProps
+) {
   const { region, toast } = useToast("ToastClose")
   const id = createUniqueId()
   const toastId = untrack(() => toast.id)
   const part = () => ({ id, toast: toastId, action: props.action })
   const rest = omit(props, "action")
-  return usePart(region, "close", part, merge({ type: "button" as const }, rest), "button")
+  return usePart(
+    region,
+    "close",
+    part,
+    merge({ type: "button" as const }, rest),
+    "button"
+  )
 }
 
 /**
@@ -272,7 +328,7 @@ const toast = coreToast as Toaster<Content>
  * @stable
  */
 const createToaster = createCoreToaster as <ToastContent = Content>(
-  options?: Parameters<typeof createCoreToaster>[0],
+  options?: Parameters<typeof createCoreToaster>[0]
 ) => Toaster<ToastContent>
 
 export {

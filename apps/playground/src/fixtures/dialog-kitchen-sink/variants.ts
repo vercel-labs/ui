@@ -5,7 +5,10 @@ let tries = 0
 function flakyAction() {
   tries++
   return new Promise<void>((resolve, reject) =>
-    setTimeout(() => (tries % 2 ? reject(new Error("Network error")) : resolve()), 1000),
+    setTimeout(
+      () => (tries % 2 ? reject(new Error("Network error")) : resolve()),
+      1000
+    )
   )
 }
 
@@ -110,7 +113,12 @@ const variants: Variant[] = [
     body: "dialog-form",
   },
 
-  { id: "focus-auto", section: "Focus", title: "initialFocus auto", content: { initialFocus: "auto" } },
+  {
+    id: "focus-auto",
+    section: "Focus",
+    title: "initialFocus auto",
+    content: { initialFocus: "auto" },
+  },
   {
     id: "focus-content",
     section: "Focus",
@@ -118,16 +126,32 @@ const variants: Variant[] = [
     note: "For long content: screen readers start at the top.",
     content: { initialFocus: "content" },
   },
-  { id: "focus-none", section: "Focus", title: "initialFocus none", content: { initialFocus: "none" } },
+  {
+    id: "focus-none",
+    section: "Focus",
+    title: "initialFocus none",
+    content: { initialFocus: "none" },
+  },
   {
     id: "focus-selector",
     section: "Focus",
     title: "initialFocus selector",
     content: { initialFocus: "[data-save]" },
   },
-  { id: "final-none", section: "Focus", title: "finalFocus none", content: { finalFocus: "none" } },
+  {
+    id: "final-none",
+    section: "Focus",
+    title: "finalFocus none",
+    content: { finalFocus: "none" },
+  },
 
-  { id: "long", section: "Content", title: "Long content", note: "Scrolls inside the dialog.", body: "long" },
+  {
+    id: "long",
+    section: "Content",
+    title: "Long content",
+    note: "Scrolls inside the dialog.",
+    body: "long",
+  },
   {
     id: "nested",
     section: "Content",
@@ -135,7 +159,13 @@ const variants: Variant[] = [
     note: "data-nested and data-nested-open.",
     body: "nested",
   },
-  { id: "untitled", section: "Content", title: "No title", note: "Named after its trigger.", titled: false },
+  {
+    id: "untitled",
+    section: "Content",
+    title: "No title",
+    note: "Named after its trigger.",
+    titled: false,
+  },
   {
     id: "pseudo",
     section: "Content",
@@ -143,7 +173,12 @@ const variants: Variant[] = [
     note: "Styled with backdrop:, no Backdrop part.",
     backdrop: "pseudo",
   },
-  { id: "keep-mounted", section: "Content", title: "keepMounted", content: { keepMounted: true } },
+  {
+    id: "keep-mounted",
+    section: "Content",
+    title: "keepMounted",
+    content: { keepMounted: true },
+  },
 
   {
     id: "alert",
@@ -186,7 +221,12 @@ const variants: Variant[] = [
     note: "The top layer escapes clipping.",
     place: "clip",
   },
-  { id: "transform", section: "Containers", title: "Inside a transform", place: "transform" },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Inside a transform",
+    place: "transform",
+  },
   {
     id: "table",
     section: "Containers",
@@ -196,7 +236,12 @@ const variants: Variant[] = [
   },
   { id: "rtl", section: "Containers", title: "Right to left", place: "rtl" },
 
-  { id: "animation-none", section: "Animation", title: "No animation", animation: "none" },
+  {
+    id: "animation-none",
+    section: "Animation",
+    title: "No animation",
+    animation: "none",
+  },
   {
     id: "animation-slow",
     section: "Animation",

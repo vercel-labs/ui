@@ -27,7 +27,8 @@ const sheets: Sheet[] = [
     component: "popover",
     trigger: (page) => page.getByRole("button", { name: "Profile" }),
     popup: (page) => page.getByRole("dialog", { name: "Edit profile" }),
-    keyboardFocus: (page) => page.getByRole("textbox", { name: "Display name" }),
+    keyboardFocus: (page) =>
+      page.getByRole("textbox", { name: "Display name" }),
     dimsViewport: true,
   },
   {
@@ -35,7 +36,8 @@ const sheets: Sheet[] = [
     component: "dialog",
     trigger: (page) => page.getByRole("button", { name: "Edit profile" }),
     popup: (page) => page.getByRole("dialog", { name: "Profile settings" }),
-    keyboardFocus: (page) => page.getByRole("textbox", { name: "Display name" }),
+    keyboardFocus: (page) =>
+      page.getByRole("textbox", { name: "Display name" }),
     dimsViewport: false,
   },
   {
@@ -87,7 +89,14 @@ function lastOpenChange(page: Page, component: string) {
     const history = (
       globalThis as unknown as Record<
         symbol,
-        { changes: { component: string; key: string; value: unknown; reason: string }[] }
+        {
+          changes: {
+            component: string
+            key: string
+            value: unknown
+            reason: string
+          }[]
+        }
       >
     )[Symbol.for("ui-sdk.devtools.history@1")]
     const change = history.changes
@@ -121,7 +130,7 @@ async function swipeDown(popup: Locator, distance: number) {
           buttons,
           clientX: x,
           clientY: at,
-        }),
+        })
       )
     fire("pointerdown", y, 1)
     for (let step = 1; step <= 12; step++) {
@@ -155,13 +164,17 @@ for (const sheet of sheets) {
       await open(sheet.fixture, { presentation: "sheet" })
     })
 
-    test("opens at the bottom of the screen, inside a viewport in the top layer", async ({ page }) => {
+    test("opens at the bottom of the screen, inside a viewport in the top layer", async ({
+      page,
+    }) => {
       await openWithKeyboard(page, sheet)
       await waitForStill(sheet.popup(page))
       const popup = sheet.popup(page)
       await expect(popup).toHaveAttribute("data-presentation", "sheet")
       expect(
-        await popup.evaluate((el) => el.parentElement!.matches(':popover-open[data-slot$="-viewport"]')),
+        await popup.evaluate((el) =>
+          el.parentElement!.matches(':popover-open[data-slot$="-viewport"]')
+        )
       ).toBe(true)
       const box = (await popup.boundingBox())!
       expect(Math.round(box.y + box.height)).toBe(page.viewportSize()!.height)
@@ -185,15 +198,21 @@ for (const sheet of sheets) {
       const before = (await sheet.popup(page).boundingBox())!
       await swipeDown(sheet.popup(page), 12)
       await waitForStill(sheet.popup(page))
-      expect(Math.round((await sheet.popup(page).boundingBox())!.y)).toBe(Math.round(before.y))
+      expect(Math.round((await sheet.popup(page).boundingBox())!.y)).toBe(
+        Math.round(before.y)
+      )
       await expect(sheet.popup(page)).toBeVisible()
     })
 
-    test("Escape closes it and returns focus to the trigger", async ({ page }) => {
+    test("Escape closes it and returns focus to the trigger", async ({
+      page,
+    }) => {
       await openWithKeyboard(page, sheet)
       await page.keyboard.press("Escape")
       await expect(sheet.popup(page)).toBeHidden()
-      expect(await lastOpenChange(page, sheet.component)).toBe("false:escape-key")
+      expect(await lastOpenChange(page, sheet.component)).toBe(
+        "false:escape-key"
+      )
       await expect(sheet.trigger(page)).toBeFocused()
     })
 
@@ -202,35 +221,56 @@ for (const sheet of sheets) {
       await waitForStill(sheet.popup(page))
       await page.mouse.click(8, 8)
       await expect(sheet.popup(page)).toBeHidden()
-      expect(await lastOpenChange(page, sheet.component)).toBe("false:outside-press")
+      expect(await lastOpenChange(page, sheet.component)).toBe(
+        "false:outside-press"
+      )
     })
 
-    test("a keyboard open moves focus in as the popover presentation does", async ({ page }) => {
+    test("a keyboard open moves focus in as the popover presentation does", async ({
+      page,
+    }) => {
       await openWithKeyboard(page, sheet)
     })
 
-    test("the dim is the viewport's backdrop, colored by --sheet-backdrop", async ({ page }) => {
+    test("the dim is the viewport's backdrop, colored by --sheet-backdrop", async ({
+      page,
+    }) => {
       test.skip(!sheet.dimsViewport, "A backdrop part dims instead.")
       await page.addStyleTag({
-        content: '[data-presentation="sheet"] { --sheet-backdrop: rgb(255 0 0 / 0.5) }',
+        content:
+          '[data-presentation="sheet"] { --sheet-backdrop: rgb(255 0 0 / 0.5) }',
       })
       await openWithKeyboard(page, sheet)
       const dim = await sheet
         .popup(page)
-        .evaluate((el) => getComputedStyle(el.parentElement!, "::backdrop").backgroundColor)
+        .evaluate(
+          (el) =>
+            getComputedStyle(el.parentElement!, "::backdrop").backgroundColor
+        )
       expect(dim).toBe("rgba(255, 0, 0, 0.5)")
     })
   })
 
   test.describe(`${sheet.component} with presentation auto`, () => {
     test("is a sheet on a phone", async ({ browser, baseURL, framework }) => {
-      test.skip(!hasFixture(sheet.fixture, framework), `No ${sheet.fixture} fixture for ${framework}.`)
-      test.skip(test.info().project.use.browserName === "firefox", "Firefox has no mobile emulation.")
+      test.skip(
+        !hasFixture(sheet.fixture, framework),
+        `No ${sheet.fixture} fixture for ${framework}.`
+      )
+      test.skip(
+        test.info().project.use.browserName === "firefox",
+        "Firefox has no mobile emulation."
+      )
       const { context, page } = await phone(browser, baseURL)
-      await page.goto(`/?fixture=${sheet.fixture}&framework=${framework}&presentation=auto`)
+      await page.goto(
+        `/?fixture=${sheet.fixture}&framework=${framework}&presentation=auto`
+      )
       await page.locator("body[data-mounted]").waitFor({ state: "attached" })
       await sheet.trigger(page).tap()
-      await expect(sheet.popup(page)).toHaveAttribute("data-presentation", "sheet")
+      await expect(sheet.popup(page)).toHaveAttribute(
+        "data-presentation",
+        "sheet"
+      )
       await waitForStill(sheet.popup(page))
       const box = (await sheet.popup(page).boundingBox())!
       expect(Math.round(box.y + box.height)).toBe(700)
@@ -240,19 +280,29 @@ for (const sheet of sheets) {
     test("stays a popover without a touch screen", async ({ page, open }) => {
       await open(sheet.fixture, { presentation: "auto" })
       await openWithKeyboard(page, sheet)
-      await expect(sheet.popup(page)).not.toHaveAttribute("data-presentation", "sheet")
-      expect(await sheet.popup(page).evaluate((el) => el.matches(":popover-open"))).toBe(true)
+      await expect(sheet.popup(page)).not.toHaveAttribute(
+        "data-presentation",
+        "sheet"
+      )
+      expect(
+        await sheet.popup(page).evaluate((el) => el.matches(":popover-open"))
+      ).toBe(true)
     })
   })
 }
 
 test.describe("select", () => {
-  test("choosing an option closes the sheet and shows the value", async ({ page, open }) => {
+  test("choosing an option closes the sheet and shows the value", async ({
+    page,
+    open,
+  }) => {
     await open("select", { presentation: "sheet" })
     await openSheet(page, sheets[3])
     await page.getByRole("option", { name: "Cherry" }).click()
     await expect(page.getByRole("listbox")).toBeHidden()
-    await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText("Cherry")
+    await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText(
+      "Cherry"
+    )
     await expect(page.getByRole("combobox", { name: "Fruit" })).toBeFocused()
   })
 
@@ -261,27 +311,43 @@ test.describe("select", () => {
     baseURL,
     framework,
   }) => {
-    test.skip(!hasFixture("select", framework), `No select fixture for ${framework}.`)
-    test.skip(test.info().project.use.browserName === "firefox", "Firefox has no mobile emulation.")
+    test.skip(
+      !hasFixture("select", framework),
+      `No select fixture for ${framework}.`
+    )
+    test.skip(
+      test.info().project.use.browserName === "firefox",
+      "Firefox has no mobile emulation."
+    )
     const { context, page } = await phone(browser, baseURL)
-    await page.goto(`/?fixture=select&framework=${framework}&presentation=sheet&value=orange`)
+    await page.goto(
+      `/?fixture=select&framework=${framework}&presentation=sheet&value=orange`
+    )
     await page.locator("body[data-mounted]").waitFor({ state: "attached" })
     // A short list, so the last option starts out of view.
-    await page.addStyleTag({ content: '[data-slot="select-content"] { max-height: 96px }' })
+    await page.addStyleTag({
+      content: '[data-slot="select-content"] { max-height: 96px }',
+    })
     await page.getByRole("combobox", { name: "Fruit" }).tap()
     const list = page.getByRole("listbox")
     await waitForStill(list)
-    const shown = await page.getByRole("option", { name: "Orange" }).evaluate((option) => {
-      const box = option.getBoundingClientRect()
-      const area = option.closest('[data-slot="select-content"]')!.getBoundingClientRect()
-      return box.top >= area.top - 1 && box.bottom <= area.bottom + 1
-    })
+    const shown = await page
+      .getByRole("option", { name: "Orange" })
+      .evaluate((option) => {
+        const box = option.getBoundingClientRect()
+        const area = option
+          .closest('[data-slot="select-content"]')!
+          .getBoundingClientRect()
+        return box.top >= area.top - 1 && box.bottom <= area.bottom + 1
+      })
     expect(shown).toBe(true)
     // Focus in the sheet. Chromium's tap focuses the sheet itself, and WebKit's, a click, the selected option.
     expect(
       await list.evaluate((el) =>
-        el.closest('[data-slot="select-content"]')!.contains(document.activeElement),
-      ),
+        el
+          .closest('[data-slot="select-content"]')!
+          .contains(document.activeElement)
+      )
     ).toBe(true)
     await context.close()
   })
@@ -296,17 +362,30 @@ test.describe("open from the start with presentation auto", () => {
       baseURL,
       framework,
     }) => {
-      test.skip(!framework.endsWith("-ssr"), "Only for server-rendered fixtures.")
-      test.skip(!hasFixture(sheet.fixture, framework), `No ${sheet.fixture} fixture for ${framework}.`)
+      test.skip(
+        !framework.endsWith("-ssr"),
+        "Only for server-rendered fixtures."
+      )
+      test.skip(
+        !hasFixture(sheet.fixture, framework),
+        `No ${sheet.fixture} fixture for ${framework}.`
+      )
       const { context, page } = await phone(browser, baseURL)
-      await page.goto(`/?fixture=${sheet.fixture}&framework=${framework}&presentation=auto&open`)
+      await page.goto(
+        `/?fixture=${sheet.fixture}&framework=${framework}&presentation=auto&open`
+      )
       await page.locator("body[data-mounted]").waitFor({ state: "attached" })
-      await expect(sheet.popup(page)).toHaveAttribute("data-presentation", "sheet")
+      await expect(sheet.popup(page)).toHaveAttribute(
+        "data-presentation",
+        "sheet"
+      )
       await waitForStill(sheet.popup(page))
       const box = (await sheet.popup(page).boundingBox())!
       expect(Math.round(box.y + box.height)).toBe(700)
       const errors = await page.evaluate(
-        () => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors,
+        () =>
+          (window as unknown as { __hydrationErrors: string[] })
+            .__hydrationErrors
       )
       expect(errors).toEqual([])
       await context.close()
@@ -321,11 +400,24 @@ for (const sheet of sheets.slice(4)) {
     const header = `[data-slot="${sheet.component}-header"]`
 
     // A phone, with a sheet tall enough to rest at half the screen.
-    async function tapOpen(browser: Browser, baseURL: string | undefined, framework: string, options = "") {
-      test.skip(!hasFixture(sheet.fixture, framework), `No ${sheet.fixture} fixture for ${framework}.`)
-      test.skip(test.info().project.use.browserName === "firefox", "Firefox has no mobile emulation.")
+    async function tapOpen(
+      browser: Browser,
+      baseURL: string | undefined,
+      framework: string,
+      options = ""
+    ) {
+      test.skip(
+        !hasFixture(sheet.fixture, framework),
+        `No ${sheet.fixture} fixture for ${framework}.`
+      )
+      test.skip(
+        test.info().project.use.browserName === "firefox",
+        "Firefox has no mobile emulation."
+      )
       const { context, page } = await phone(browser, baseURL)
-      await page.goto(`/?fixture=${sheet.fixture}&framework=${framework}&presentation=sheet${options}`)
+      await page.goto(
+        `/?fixture=${sheet.fixture}&framework=${framework}&presentation=sheet${options}`
+      )
       await page.locator("body[data-mounted]").waitFor({ state: "attached" })
       await page.addStyleTag({
         content: `[data-slot="${sheet.component}-content"] { height: 600px; max-height: none }`,
@@ -353,7 +445,7 @@ for (const sheet of sheets.slice(4)) {
               clearTimeout(timer)
               timer = setTimeout(() => resolve(el.scrollTop), 300)
             })
-          }),
+          })
       )
       expect(scrollTop).toBe(0)
     })
@@ -381,7 +473,11 @@ for (const sheet of sheets.slice(4)) {
       const { context, page } = await tapOpen(browser, baseURL, framework)
       await sheet.trigger(page).tap()
       await expect(sheet.trigger(page)).toBeFocused()
-      await expect.poll(async () => Math.round((await sheet.popup(page).boundingBox())!.y)).toBe(100)
+      await expect
+        .poll(async () =>
+          Math.round((await sheet.popup(page).boundingBox())!.y)
+        )
+        .toBe(100)
       await context.close()
     })
 
@@ -408,7 +504,7 @@ for (const sheet of sheets.slice(4)) {
       // tap then fires no click, sheet or not. An iPhone check in the report.
       test.skip(
         test.info().project.use.browserName === "webkit",
-        "WebKit's emulated tap fires no click here.",
+        "WebKit's emulated tap fires no click here."
       )
       const { context, page } = await tapOpen(browser, baseURL, framework)
       await page.getByRole("option").first().tap()
@@ -428,7 +524,9 @@ for (const sheet of sheets.slice(4)) {
       await expect(page.locator(header).getByRole("combobox")).toBeFocused()
       const all = await page.getByRole("option").count()
       await page.keyboard.type("a")
-      await expect.poll(() => page.getByRole("option").count()).toBeLessThan(all)
+      await expect
+        .poll(() => page.getByRole("option").count())
+        .toBeLessThan(all)
       await page.keyboard.press("Escape")
       await expect(sheet.popup(page)).toBeHidden()
       await expect(sheet.trigger(page)).toBeFocused()
@@ -445,7 +543,10 @@ for (const sheet of sheets.slice(4)) {
         .getByRole("combobox")
         .evaluate((input) => {
           const option = document.querySelector('[role="option"]')!
-          return !!(input.compareDocumentPosition(option) & Node.DOCUMENT_POSITION_FOLLOWING)
+          return !!(
+            input.compareDocumentPosition(option) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+          )
         })
       expect(first).toBe(true)
     })
@@ -460,12 +561,15 @@ for (const sheet of [sheets[0], sheets[4]]) {
     const pageBlocked = (page: Page) =>
       page.getByRole("button", { name: "Before" }).evaluate((before) => {
         const scroller = [document.documentElement, document.body].some(
-          (el) => getComputedStyle(el).overflow === "hidden",
+          (el) => getComputedStyle(el).overflow === "hidden"
         )
         return { inert: !!before.closest("[inert]"), locked: scroller }
       })
 
-    test("is modal by default: the page behind is inert and doesn't scroll", async ({ page, open }) => {
+    test("is modal by default: the page behind is inert and doesn't scroll", async ({
+      page,
+      open,
+    }) => {
       await open(sheet.fixture, { presentation: "sheet" })
       await openWithKeyboard(page, sheet)
       expect(await pageBlocked(page)).toEqual({ inert: true, locked: true })
@@ -487,7 +591,9 @@ test.describe("sheet code preload", () => {
   function sheetRequests(page: Page) {
     const urls: string[] = []
     page.on("request", (request) => {
-      if (request.url().includes("sheet-presentation")) urls.push(request.url())
+      if (request.url().includes("sheet-presentation")) {
+        urls.push(request.url())
+      }
     })
     return urls
   }
@@ -496,10 +602,17 @@ test.describe("sheet code preload", () => {
   const idle = (page: Page) =>
     page.evaluate(
       () =>
-        new Promise((resolve) => (window.requestIdleCallback ?? setTimeout)(() => setTimeout(resolve, 300))),
+        new Promise((resolve) =>
+          (window.requestIdleCallback ?? setTimeout)(() =>
+            setTimeout(resolve, 300)
+          )
+        )
     )
 
-  test("a sheet loads it after mount, once, without opening", async ({ page, open }) => {
+  test("a sheet loads it after mount, once, without opening", async ({
+    page,
+    open,
+  }) => {
     const requests = sheetRequests(page)
     await open("popover", { presentation: "sheet", lazy: "" })
     await expect.poll(() => requests.length).toBe(1)
@@ -522,12 +635,24 @@ test.describe("sheet code preload", () => {
     expect(requests).toEqual([])
   })
 
-  test('"auto" on a touch screen loads it', async ({ browser, baseURL, framework }) => {
-    test.skip(!hasFixture("popover", framework), `No popover fixture for ${framework}.`)
-    test.skip(test.info().project.use.browserName === "firefox", "Firefox has no mobile emulation.")
+  test('"auto" on a touch screen loads it', async ({
+    browser,
+    baseURL,
+    framework,
+  }) => {
+    test.skip(
+      !hasFixture("popover", framework),
+      `No popover fixture for ${framework}.`
+    )
+    test.skip(
+      test.info().project.use.browserName === "firefox",
+      "Firefox has no mobile emulation."
+    )
     const { context, page } = await phone(browser, baseURL)
     const requests = sheetRequests(page)
-    await page.goto(`/?fixture=popover&framework=${framework}&presentation=auto&lazy`)
+    await page.goto(
+      `/?fixture=popover&framework=${framework}&presentation=auto&lazy`
+    )
     await page.locator("body[data-mounted]").waitFor({ state: "attached" })
     await expect.poll(() => requests.length).toBe(1)
     await context.close()
@@ -539,12 +664,19 @@ test.describe("sheet code preload", () => {
 // code isn't loaded yet when it opens.
 test.describe("sheet code that loads late", () => {
   test.beforeEach(async ({ framework, open, page }) => {
-    test.skip(framework !== "web", "Set after mount through the web component's attribute.")
+    test.skip(
+      framework !== "web",
+      "Set after mount through the web component's attribute."
+    )
     await open("popover")
-    await page.locator(".fixture > ui-popover").evaluate((el) => el.setAttribute("presentation", "sheet"))
+    await page
+      .locator(".fixture > ui-popover")
+      .evaluate((el) => el.setAttribute("presentation", "sheet"))
   })
 
-  test("a popup that leaves the page before the code arrives never shows", async ({ page }) => {
+  test("a popup that leaves the page before the code arrives never shows", async ({
+    page,
+  }) => {
     let release!: () => void
     const held = new Promise<void>((resolve) => (release = resolve))
     await page.route("**/sheet-presentation*", async (route) => {
@@ -559,15 +691,25 @@ test.describe("sheet code that loads late", () => {
     release()
     await loaded
     await page.evaluate(() => new Promise(requestAnimationFrame))
-    expect(await page.evaluate(() => document.querySelectorAll(":popover-open").length)).toBe(0)
+    expect(
+      await page.evaluate(
+        () => document.querySelectorAll(":popover-open").length
+      )
+    ).toBe(0)
   })
 
-  test("code that fails to load shows the popup as it would be without a sheet", async ({ page }) => {
+  test("code that fails to load shows the popup as it would be without a sheet", async ({
+    page,
+  }) => {
     await page.route("**/sheet-presentation*", (route) => route.abort())
     await page.getByRole("button", { name: "Profile" }).click()
-    await expect(page.getByRole("dialog", { name: "Edit profile" })).toBeVisible()
+    await expect(
+      page.getByRole("dialog", { name: "Edit profile" })
+    ).toBeVisible()
     await page.keyboard.press("Escape")
-    await expect(page.getByRole("dialog", { name: "Edit profile" })).toBeHidden()
+    await expect(
+      page.getByRole("dialog", { name: "Edit profile" })
+    ).toBeHidden()
   })
 })
 
@@ -576,7 +718,10 @@ test.describe("combobox with multiple", () => {
     await open("combobox", { presentation: "sheet", multiple: "" })
     await openWithKeyboard(page, sheets[4])
     await page.getByRole("option", { name: "Brazil" }).click()
-    await expect(page.getByRole("option", { name: "Brazil" })).toHaveAttribute("aria-selected", "true")
+    await expect(page.getByRole("option", { name: "Brazil" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await expect(sheets[4].popup(page)).toBeVisible()
   })
 })
@@ -606,12 +751,17 @@ test.describe("menu drill-in", () => {
     // Measured together, so the sheet can't move in between.
     const gap = await menuNamed(page, "Share").evaluate((submenu) => {
       const trigger = document.querySelector(`[aria-controls="${submenu.id}"]`)!
-      return submenu.getBoundingClientRect().top - trigger.getBoundingClientRect().bottom
+      return (
+        submenu.getBoundingClientRect().top -
+        trigger.getBoundingClientRect().bottom
+      )
     })
     expect(gap).toBeGreaterThanOrEqual(-1)
   })
 
-  test("pressing the trigger again goes back, to the full height", async ({ page }) => {
+  test("pressing the trigger again goes back, to the full height", async ({
+    page,
+  }) => {
     const sheet = menuNamed(page, "File")
     const full = (await sheet.boundingBox())!
     await page.getByRole("menuitem", { name: "Share" }).click()
@@ -619,11 +769,17 @@ test.describe("menu drill-in", () => {
     await page.getByRole("menuitem", { name: "Share" }).click()
     await expect(menuNamed(page, "Share")).toBeHidden()
     await expect(page.getByRole("menuitem", { name: "New file" })).toBeVisible()
-    await expect.poll(async () => Math.round((await sheet.boundingBox())!.y)).toBe(Math.round(full.y))
-    expect(Math.round((await sheet.boundingBox())!.height)).toBe(Math.round(full.height))
+    await expect
+      .poll(async () => Math.round((await sheet.boundingBox())!.y))
+      .toBe(Math.round(full.y))
+    expect(Math.round((await sheet.boundingBox())!.height)).toBe(
+      Math.round(full.height)
+    )
   })
 
-  test("the keys go down and up a level, and focus follows", async ({ page }) => {
+  test("the keys go down and up a level, and focus follows", async ({
+    page,
+  }) => {
     const share = page.getByRole("menuitem", { name: "Share" })
     await share.focus()
     await page.keyboard.press("ArrowRight")
@@ -634,7 +790,9 @@ test.describe("menu drill-in", () => {
     await expect(page.getByRole("menuitem", { name: "New file" })).toBeVisible()
   })
 
-  test("choosing an item in a submenu closes the whole sheet", async ({ page }) => {
+  test("choosing an item in a submenu closes the whole sheet", async ({
+    page,
+  }) => {
     await page.getByRole("menuitem", { name: "Share" }).click()
     await page.getByRole("menuitem", { name: "Email" }).click()
     await expect(menuNamed(page, "File")).toBeHidden()

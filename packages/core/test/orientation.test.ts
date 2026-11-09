@@ -25,41 +25,71 @@ describe("orientation", () => {
   })
 
   test("a typo renders the default orientation in every component", () => {
-    expect(attrs(carousel({ id: "c", orientation: typo }).part("root"))["data-orientation"]).toBe(
-      "horizontal",
-    )
-    expect(attrs(menubar({ id: "m", orientation: typo }).part("root"))).toMatchObject({
+    expect(
+      attrs(carousel({ id: "c", orientation: typo }).part("root"))[
+        "data-orientation"
+      ]
+    ).toBe("horizontal")
+    expect(
+      attrs(menubar({ id: "m", orientation: typo }).part("root"))
+    ).toMatchObject({
       "aria-orientation": "horizontal",
       "data-orientation": "horizontal",
     })
-    expect(attrs(listbox({ id: "l", orientation: "Horizontal" as "horizontal" }).part("root"))).toMatchObject(
-      {
-        "aria-orientation": "vertical",
-        "data-orientation": "vertical",
-      },
-    )
-    expect(attrs(navigationMenu({ id: "n", orientation: typo }).part("root"))["data-orientation"]).toBe(
-      "horizontal",
-    )
-    expect(attrs(resizable({ id: "r", orientation: typo }).part("handle", { id: "h" }))).toMatchObject({
+    expect(
+      attrs(
+        listbox({ id: "l", orientation: "Horizontal" as "horizontal" }).part(
+          "root"
+        )
+      )
+    ).toMatchObject({
+      "aria-orientation": "vertical",
+      "data-orientation": "vertical",
+    })
+    expect(
+      attrs(navigationMenu({ id: "n", orientation: typo }).part("root"))[
+        "data-orientation"
+      ]
+    ).toBe("horizontal")
+    expect(
+      attrs(
+        resizable({ id: "r", orientation: typo }).part("handle", { id: "h" })
+      )
+    ).toMatchObject({
       "aria-orientation": "vertical",
       "data-orientation": "horizontal",
     })
     expect(
-      attrs(scrollArea({ id: "s" }).part("scrollbar", { orientation: "Horizontal" as "horizontal" }))[
-        "data-orientation"
-      ],
+      attrs(
+        scrollArea({ id: "s" }).part("scrollbar", {
+          orientation: "Horizontal" as "horizontal",
+        })
+      )["data-orientation"]
     ).toBe("vertical")
     expect(
-      attrs(numberInput({ id: "i" }).part("scrub-area", { orientation: typo }))["data-orientation"],
+      attrs(numberInput({ id: "i" }).part("scrub-area", { orientation: typo }))[
+        "data-orientation"
+      ]
     ).toBe("horizontal")
-    expect(attrs(tabs({ id: "t", orientation: typo }).part("list"))).toMatchObject({
+    expect(
+      attrs(tabs({ id: "t", orientation: typo }).part("list"))
+    ).toMatchObject({
       "data-orientation": "horizontal",
     })
-    expect(attrs(tabs({ id: "t", orientation: typo }).part("list"))["aria-orientation"]).toBeUndefined()
-    expect(attrs(slider({ id: "sl", orientation: typo }).part("root"))["data-orientation"]).toBe("horizontal")
-    expect(attrs(toggleGroup({ id: "g", orientation: typo }).part("group"))["data-orientation"]).toBe(
-      "horizontal",
-    )
+    expect(
+      attrs(tabs({ id: "t", orientation: typo }).part("list"))[
+        "aria-orientation"
+      ]
+    ).toBeUndefined()
+    expect(
+      attrs(slider({ id: "sl", orientation: typo }).part("root"))[
+        "data-orientation"
+      ]
+    ).toBe("horizontal")
+    expect(
+      attrs(toggleGroup({ id: "g", orientation: typo }).part("group"))[
+        "data-orientation"
+      ]
+    ).toBe("horizontal")
   })
 })

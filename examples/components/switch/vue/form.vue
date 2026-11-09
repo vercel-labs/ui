@@ -7,7 +7,7 @@ const log = useLog()
 
 function onSubmit(event: Event) {
   const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-    ([name, value]) => `${name}=${value}`,
+    ([name, value]) => `${name}=${value}`
   )
   log(entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
 }

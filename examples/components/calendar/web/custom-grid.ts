@@ -43,28 +43,43 @@ function mount(root: HTMLElement) {
   const previous = root.querySelector("ui-calendar-previous button")!
   const weeks = root.querySelector("ui-calendar-weeks")!
   const showPrevious = (month: string) => {
-    previous.setAttribute("title", `Show ${addMonths(`${month}-01`, -1).slice(0, 7)}`)
+    previous.setAttribute(
+      "title",
+      `Show ${addMonths(`${month}-01`, -1).slice(0, 7)}`
+    )
   }
   const numberWeeks = () => {
     for (const week of weeks.querySelectorAll("ui-calendar-week")) {
-      const date = week.querySelector("ui-calendar-day[value]")?.getAttribute("value")
-      if (!date) continue
-      let header = week.querySelector<HTMLElement>(':scope > [role="rowheader"]')
+      const date = week
+        .querySelector("ui-calendar-day[value]")
+        ?.getAttribute("value")
+      if (!date) {
+        continue
+      }
+      let header = week.querySelector<HTMLElement>(
+        ':scope > [role="rowheader"]'
+      )
       if (!header) {
         header = document.createElement("span")
         header.setAttribute("role", "rowheader")
         header.dataset.slot = "hint"
       }
-      if (week.firstElementChild !== header) week.prepend(header)
+      if (week.firstElementChild !== header) {
+        week.prepend(header)
+      }
       const number = String(isoWeek(date))
-      if (header.textContent !== number) header.textContent = number
+      if (header.textContent !== number) {
+        header.textContent = number
+      }
     }
   }
   const observer = new MutationObserver(numberWeeks)
   observer.observe(weeks, { childList: true, subtree: true })
   numberWeeks()
   showPrevious(calendar.month)
-  calendar.addEventListener("monthchange", (event) => showPrevious(event.detail.value))
+  calendar.addEventListener("monthchange", (event) =>
+    showPrevious(event.detail.value)
+  )
   return () => observer.disconnect()
 }
 

@@ -13,7 +13,11 @@ import {
 
 function Example() {
   return (
-    <ColorPicker aria-label="Accent" space="oklch" defaultValue="oklch(0.62 0.19 259)">
+    <ColorPicker
+      aria-label="Accent"
+      space="oklch"
+      defaultValue="oklch(0.62 0.19 259)"
+    >
       <ColorPickerArea>
         <ColorPickerAreaCanvas />
         <ColorPickerAreaThumb />

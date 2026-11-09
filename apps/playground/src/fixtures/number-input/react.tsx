@@ -9,17 +9,29 @@ import {
 } from "@ui-sdk/react/number-input"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { numberInputFixture as f, numberInputOptions, serialize } from "tests/fixtures/number-input.ts"
+import {
+  numberInputFixture as f,
+  numberInputOptions,
+  serialize,
+} from "tests/fixtures/number-input.ts"
 
 function Fixture() {
   const options = numberInputOptions()
   const [action, setAction] = React.useState("")
   const [commits, setCommits] = React.useState<string[]>([])
   const [submitted, setSubmitted] = React.useState("")
-  const [quantity, setQuantity] = React.useState<number | null>(options.quantity)
+  const [quantity, setQuantity] = React.useState<number | null>(
+    options.quantity
+  )
   // Records a change, or cancels it when the URL asks.
-  const report = (name: string, value: number | null, details: { cancel: () => void }) => {
-    if (options.cancel === name) return details.cancel()
+  const report = (
+    name: string,
+    value: number | null,
+    details: { cancel: () => void }
+  ) => {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     setAction(`${name}:${String(value)}`)
   }
   const commit = (name: string) => (value: number | null) =>
@@ -50,17 +62,26 @@ function Fixture() {
             min={f.quantity.min}
             max={f.quantity.max}
             required={options.required}
-            {...(options.controlled ? { value: quantity } : { defaultValue: options.quantity })}
+            {...(options.controlled
+              ? { value: quantity }
+              : { defaultValue: options.quantity })}
             onValueChange={(value, details) => {
               report(f.quantity.name, value, details)
-              if (!details.canceled) setQuantity(value)
+              if (!details.canceled) {
+                setQuantity(value)
+              }
             }}
             onValueCommit={commit(f.quantity.name)}
           >
             <NumberInputGroup className="number-input-group">
-              <NumberInputDecrement aria-label={f.quantity.decrement}>−</NumberInputDecrement>
+              <NumberInputDecrement aria-label={f.quantity.decrement}>
+                −
+              </NumberInputDecrement>
               <NumberInputControl className="number-input-control" />
-              <NumberInputIncrement aria-label={f.quantity.increment} disabled={options.disabledIncrement}>
+              <NumberInputIncrement
+                aria-label={f.quantity.increment}
+                disabled={options.disabledIncrement}
+              >
                 +
               </NumberInputIncrement>
             </NumberInputGroup>
@@ -77,14 +98,22 @@ function Fixture() {
             min={options.amountMin}
             step={f.amount.step}
             format={{ style: "currency", currency: f.amount.currency }}
-            onValueChange={(value, details) => report(f.amount.name, value, details)}
+            onValueChange={(value, details) =>
+              report(f.amount.name, value, details)
+            }
             onValueCommit={commit(f.amount.name)}
           >
-            <NumberInputScrubArea className="number-input-scrub">{f.amount.scrub}</NumberInputScrubArea>
+            <NumberInputScrubArea className="number-input-scrub">
+              {f.amount.scrub}
+            </NumberInputScrubArea>
             <NumberInputGroup className="number-input-group">
-              <NumberInputDecrement aria-label={f.amount.decrement}>−</NumberInputDecrement>
+              <NumberInputDecrement aria-label={f.amount.decrement}>
+                −
+              </NumberInputDecrement>
               <NumberInputControl className="number-input-control" />
-              <NumberInputIncrement aria-label={f.amount.increment}>+</NumberInputIncrement>
+              <NumberInputIncrement aria-label={f.amount.increment}>
+                +
+              </NumberInputIncrement>
             </NumberInputGroup>
           </NumberInput>
         </Field>
@@ -112,7 +141,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

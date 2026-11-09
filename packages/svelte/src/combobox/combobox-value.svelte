@@ -5,7 +5,11 @@ state. Without children, it shows the label. Renders no element.
 @stable
 -->
 <script lang="ts">
-  import { combobox, type ComboboxValueProps, type ComboboxValueState } from "@ui-sdk/core/combobox"
+  import {
+    combobox,
+    type ComboboxValueProps,
+    type ComboboxValueState,
+  } from "@ui-sdk/core/combobox"
   import type { Snippet } from "svelte"
   import { usePart } from "../instance"
 

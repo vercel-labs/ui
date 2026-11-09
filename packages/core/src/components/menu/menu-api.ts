@@ -1,8 +1,15 @@
 import { type Layer } from "../../foundation/platform/layers"
 import type { MenubarApi } from "../menubar/menubar"
 import { isRTL } from "../../foundation/platform/env"
-import { activeElement, composedClosest, composedContains } from "../../foundation/platform/platform"
-import { createPopup, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  activeElement,
+  composedClosest,
+  composedContains,
+} from "../../foundation/platform/platform"
+import {
+  createPopup,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { contentAnchor } from "../../foundation/popups/popup-features"
 import { menuPreset } from "../../foundation/popups/popup-presets"
 import {
@@ -14,14 +21,22 @@ import {
   type PopupResult,
 } from "../../foundation/popups/popup"
 import type { createOpenSteps } from "../../foundation/popups/popup-steps"
-import { type Anchor, type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import {
+  type Anchor,
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
 import { sheetModal } from "../../foundation/popups/presentation"
 import { announcePending, isPromise } from "../../foundation/kernel/action"
 import { createOrder } from "../../foundation/kernel/order"
 import { createSafeArea } from "../../foundation/popups/safe-area"
 import { sourceOf } from "../../foundation/kernel/modality"
 import { createTypeahead } from "../../foundation/text/typeahead"
-import { createDetails, type ChangeDetails, withSource } from "../../foundation/kernel/details"
+import {
+  createDetails,
+  type ChangeDetails,
+  withSource,
+} from "../../foundation/kernel/details"
 import { on } from "../../foundation/kernel/events"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import type { Store } from "../../foundation/kernel/store"
@@ -50,7 +65,11 @@ type Entry = {
   disabled: () => boolean
   activate: (event?: Event) => void
   // Submenu triggers only.
-  openSubmenu?: (focus: Focus, reason: MenuPayloadChangeReason, event?: Event) => void
+  openSubmenu?: (
+    focus: Focus,
+    reason: MenuPayloadChangeReason,
+    event?: Event
+  ) => void
 }
 
 type ItemProps = {
@@ -123,7 +142,10 @@ type CheckboxProps = {
    */
   defaultChecked?: boolean
   /** Runs when the item wants to toggle. `details.reason` says why, and `details.cancel()` stops it. */
-  onCheckedChange?: (checked: boolean, details: ChangeDetails<MenuCheckedChangeReason>) => void
+  onCheckedChange?: (
+    checked: boolean,
+    details: ChangeDetails<MenuCheckedChangeReason>
+  ) => void
   /**
    * Whether toggling closes the menu.
    * @defaultValue false
@@ -139,7 +161,10 @@ type RadioGroupProps<T extends string = string> = {
   /** The value selected at first, when uncontrolled. */
   defaultValue?: T | null
   /** Runs when the selection wants to change. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T, details: ChangeDetails<MenuValueChangeReason>) => void
+  onValueChange?: (
+    value: T,
+    details: ChangeDetails<MenuValueChangeReason>
+  ) => void
 }
 
 type RadioProps = {
@@ -200,19 +225,38 @@ type ContentProps = PositionProps &
     keepMounted?: boolean
   }
 
-const itemSelector = '[role="menuitem"],[role="menuitemcheckbox"],[role="menuitemradio"]'
+const itemSelector =
+  '[role="menuitem"],[role="menuitemcheckbox"],[role="menuitemradio"]'
 
-function eachShortcut(items: MenuData, run: (value: string, shortcut: string) => void) {
+function eachShortcut(
+  items: MenuData,
+  run: (value: string, shortcut: string) => void
+) {
   for (const item of items) {
-    if (typeof item === "string") continue
-    if ((item.type ?? "item") === "item" && "shortcut" in item && item.shortcut && !item.disabled)
+    if (typeof item === "string") {
+      continue
+    }
+    if (
+      (item.type ?? "item") === "item" &&
+      "shortcut" in item &&
+      item.shortcut &&
+      !item.disabled
+    ) {
       run(item.value, item.shortcut)
+    }
     // A disabled submenu's items can't run, by shortcut either.
-    if (item.type === "group" || (item.type === "submenu" && !item.disabled)) eachShortcut(item.items, run)
+    if (item.type === "group" || (item.type === "submenu" && !item.disabled)) {
+      eachShortcut(item.items, run)
+    }
   }
 }
 
-function wait(store: Store<MenuState>, key: string, pending: PromiseLike<unknown>, done: () => void) {
+function wait(
+  store: Store<MenuState>,
+  key: string,
+  pending: PromiseLike<unknown>,
+  done: () => void
+) {
   store.set({ pending: [...store.get().pending, key] })
   const settled = () => store.get().pending.filter((other) => other !== key)
   pending.then(
@@ -220,7 +264,7 @@ function wait(store: Store<MenuState>, key: string, pending: PromiseLike<unknown
       store.set({ pending: settled() })
       done()
     },
-    (reason) => store.set({ pending: settled(), error: { key, reason } }),
+    (reason) => store.set({ pending: settled(), error: { key, reason } })
   )
 }
 
@@ -229,7 +273,7 @@ function wait(store: Store<MenuState>, key: string, pending: PromiseLike<unknown
 function bindItemShortcuts(
   store: Store<MenuState>,
   layer: HTMLElement,
-  run: (value: string, event?: Event) => unknown,
+  run: (value: string, event?: Event) => unknown
 ) {
   let bound: MenuData | undefined
   let offs: (() => void)[] = []
@@ -237,20 +281,32 @@ function bindItemShortcuts(
   // since the key press happened outside the menu.
   const runShortcut = (value: string) => {
     const key = `shortcut:${value}`
-    if (store.get().pending.includes(key)) return
-    if (store.get().error?.key === key) store.set({ error: null })
+    if (store.get().pending.includes(key)) {
+      return
+    }
+    if (store.get().error?.key === key) {
+      store.set({ error: null })
+    }
     const result = run(value)
-    if (isPromise(result)) wait(store, key, result, () => {})
+    if (isPromise(result)) {
+      wait(store, key, result, () => {})
+    }
   }
   const sync = () => {
     const { shortcutItems } = store.get()
-    if (shortcutItems === bound) return
+    if (shortcutItems === bound) {
+      return
+    }
     bound = shortcutItems
     offs.forEach((off) => off())
     offs = []
-    if (!shortcutItems) return
+    if (!shortcutItems) {
+      return
+    }
     eachShortcut(shortcutItems, (value, shortcut) =>
-      offs.push(shortcutManager.register(shortcut, () => runShortcut(value), { layer })),
+      offs.push(
+        shortcutManager.register(shortcut, () => runShortcut(value), { layer })
+      )
     )
   }
   sync()
@@ -314,7 +370,10 @@ type MenuNode = {
     children: Set<MenuNode>
     safeArea: ReturnType<typeof createSafeArea>
     register: (el: HTMLElement, entry: Omit<Entry, "el">) => () => void
-    highlight: (key: string | null, options?: { focus?: boolean; scroll?: boolean }) => void
+    highlight: (
+      key: string | null,
+      options?: { focus?: boolean; scroll?: boolean }
+    ) => void
     childOpenChanged: (childId: string, open: boolean) => void
     hoverItem: (el: HTMLElement, event: PointerEvent) => void
     cancelHoverOpen: () => void
@@ -324,10 +383,14 @@ type MenuNode = {
   }
 }
 
-function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, string>) {
+function menuApi(
+  context: PrimitiveContext<MenuInternalOptions, MenuState, string>
+) {
   const { id, store, options, element, props } = context
   // A controlled close clears the highlight in the same pass.
-  deriveOpen(context, ["highlighted"], (open) => (open ? undefined : { highlighted: null }))
+  deriveOpen(context, ["highlighted"], (open) =>
+    open ? undefined : { highlighted: null }
+  )
   const parent = options().parent
   // Items by key, in document order, and by element for events.
   const entries = createOrder<Entry>()
@@ -336,7 +399,10 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   const typeahead = createTypeahead()
   const safeArea = createSafeArea()
   let pendingFocus: Focus = "none"
-  announcePending({ ...context, options: () => root().options() }, () => store.get().pending.length > 0)
+  announcePending(
+    { ...context, options: () => root().options() },
+    () => store.get().pending.length > 0
+  )
   let hoverTimer: ReturnType<typeof setTimeout> | undefined
   // NaN until the pointer first moves, so the first move always counts.
   let pointerX = NaN
@@ -350,117 +416,174 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   // The trigger that opened the menu last, a button or a context area, or the first trigger.
   function activeTrigger() {
     const key = store.get().trigger
-    if (key === null) return { el: element("trigger") ?? element("context-trigger"), context: false }
+    if (key === null) {
+      return {
+        el: element("trigger") ?? element("context-trigger"),
+        context: false,
+      }
+    }
     const button = element("trigger", key)
-    if (button) return { el: button, context: false }
+    if (button) {
+      return { el: button, context: false }
+    }
     return { el: element("context-trigger", key), context: true }
   }
   const triggerElement = () => activeTrigger().el
   // Whether a press lands on one of the menu's enabled button triggers.
   const pressesTrigger = (target: Node) =>
     elements(context, "trigger").some(
-      ({ el, props }) => el.contains(target) && !triggerDisabled(store.get(), props),
+      ({ el, props }) =>
+        el.contains(target) && !triggerDisabled(store.get(), props)
     )
 
-  const kit = createPopup(context as unknown as PrimitiveContext<MenuInternalOptions, PopupState, string>, {
-    preset: menuPreset,
-    // The root closes the whole tree when the window loses focus.
-    behavior: { blur: parent ? "never" : "always" },
-    rules: () => ({
-      trigger: triggerElement,
-      dismiss(reason, { event, focus, returnValue }) {
-        // Tab: focus moves on from the root trigger, and the whole tree closes.
-        if (reason === "focus-out") {
-          root().focusTrigger()
-          return root().hide({ reason, event, focus: false })
-        }
-        // An outside press leaves focus wherever the press put it.
-        hide({
-          reason: reason as MenuOpenChangeReason,
-          event,
-          focus: reason === "outside-press" ? false : focus === true,
-          returnValue,
-        })
-      },
-      // A context area counts as inside only for the secondary button, which
-      // moves the open menu instead of closing it.
-      contains(target, event) {
-        // Submenus close first, so focus in one rendered elsewhere still returns with this menu's.
-        if ([...children].some((child) => child.treeContains(target))) return true
-        // A press on another trigger of the menubar switches menus instead.
-        if (bar()?.internal.onTrigger(target)) return true
-        // So does a press on another trigger of this menu, which takes it over
-        // instead of closing and reopening it. Focus moving there still leaves it.
-        if (event && pressesTrigger(target)) return true
-        const { el, context } = activeTrigger()
-        if (!el?.contains(target)) return false
-        return !context || (event as MouseEvent | undefined)?.button === 2
-      },
-      // Submenus share their root's modality, and only the root hides the page.
-      modal: () => ({ ...modalTriple(root().modalSetting()), ...(parent && { inertAndLock: false }) }),
-      // A modal menu in a menubar leaves the menubar usable, so another menu can take over.
-      persistent: () => {
-        const barElement = bar()?.internal.element()
-        return barElement && root().modalSetting() === true ? [barElement] : []
-      },
-      parent: parent && (() => parent.internal.layer()),
-      // Submenus present like their root. A context menu and a menubar's menus stay popovers.
-      presentation: () =>
-        parent
-          ? parent.presentation()
-          : bar() || activeTrigger().context
-            ? "popover"
-            : options().presentation,
-      onOpenChange(open) {
-        parent?.internal.childOpenChanged(id, open)
-        bar()?.internal.openChanged(id, open)
-        if (open) return
-        clearTimeout(hoverTimer)
-        safeArea.stop()
-        children.forEach((child) => child.hide({ reason: "parent-close", focus: false }))
-        store.set({ highlighted: null })
-      },
-      // A submenu closes one level and focuses the item that opened it.
-      onEscape: parent
-        ? (event) => {
-            hide({ reason: "escape-key", event, focus: false })
+  const kit = createPopup(
+    context as unknown as PrimitiveContext<
+      MenuInternalOptions,
+      PopupState,
+      string
+    >,
+    {
+      preset: menuPreset,
+      // The root closes the whole tree when the window loses focus.
+      behavior: { blur: parent ? "never" : "always" },
+      rules: () => ({
+        trigger: triggerElement,
+        dismiss(reason, { event, focus, returnValue }) {
+          // Tab: focus moves on from the root trigger, and the whole tree closes.
+          if (reason === "focus-out") {
+            root().focusTrigger()
+            return root().hide({ reason, event, focus: false })
+          }
+          // An outside press leaves focus wherever the press put it.
+          hide({
+            reason: reason as MenuOpenChangeReason,
+            event,
+            focus: reason === "outside-press" ? false : focus === true,
+            returnValue,
+          })
+        },
+        // A context area counts as inside only for the secondary button, which
+        // moves the open menu instead of closing it.
+        contains(target, event) {
+          // Submenus close first, so focus in one rendered elsewhere still returns with this menu's.
+          if ([...children].some((child) => child.treeContains(target))) {
+            return true
+          }
+          // A press on another trigger of the menubar switches menus instead.
+          if (bar()?.internal.onTrigger(target)) {
+            return true
+          }
+          // So does a press on another trigger of this menu, which takes it over
+          // instead of closing and reopening it. Focus moving there still leaves it.
+          if (event && pressesTrigger(target)) {
+            return true
+          }
+          const { el, context } = activeTrigger()
+          if (!el?.contains(target)) {
+            return false
+          }
+          return !context || (event as MouseEvent | undefined)?.button === 2
+        },
+        // Submenus share their root's modality, and only the root hides the page.
+        modal: () => ({
+          ...modalTriple(root().modalSetting()),
+          ...(parent && { inertAndLock: false }),
+        }),
+        // A modal menu in a menubar leaves the menubar usable, so another menu can take over.
+        persistent: () => {
+          const barElement = bar()?.internal.element()
+          return barElement && root().modalSetting() === true
+            ? [barElement]
+            : []
+        },
+        parent: parent && (() => parent.internal.layer()),
+        // Submenus present like their root. A context menu and a menubar's menus stay popovers.
+        presentation: () =>
+          parent
+            ? parent.presentation()
+            : bar() || activeTrigger().context
+              ? "popover"
+              : options().presentation,
+        onOpenChange(open) {
+          parent?.internal.childOpenChanged(id, open)
+          bar()?.internal.openChanged(id, open)
+          if (open) {
+            return
+          }
+          clearTimeout(hoverTimer)
+          safeArea.stop()
+          children.forEach((child) =>
+            child.hide({ reason: "parent-close", focus: false })
+          )
+          store.set({ highlighted: null })
+        },
+        // A submenu closes one level and focuses the item that opened it.
+        onEscape: parent
+          ? (event) => {
+              hide({ reason: "escape-key", event, focus: false })
+              focusTriggerItem()
+            }
+          : undefined,
+        // A sibling, or another menu of the menubar, that refuses to close stays the open one.
+        open(request, open) {
+          const { event } = request
+          const siblings = parent ? [...parent.internal.children] : []
+          if (
+            !siblings.every(
+              (sibling) => sibling === api || closes(sibling, "submenu-switch")
+            )
+          ) {
+            return
+          }
+          if (bar()?.internal.opening(id, event) === false) {
+            return
+          }
+          pendingFocus = (request.focus as Focus | undefined) ?? "first"
+          openedByHover = request.reason === "trigger-hover"
+          open(request.by ?? openerOf(event))
+        },
+        // Another trigger takes the menu over where it's pressed, so an open
+        // again only moves focus.
+        reopen(request) {
+          pendingFocus = (request.focus as Focus | undefined) ?? "first"
+          runPendingFocus()?.focus({ preventScroll: true })
+        },
+        // Submenus close first, so one that refuses keeps its parent open. One
+        // closing with its parent moves focus to its trigger item: a portalled
+        // submenu isn't inside the parent, which then wouldn't return focus.
+        close({ reason, event }, close) {
+          const child = openChild()
+          if (
+            child &&
+            !withSource(changeSource(reason, event), () =>
+              closes(child, "parent-close")
+            )
+          ) {
+            return
+          }
+          const el = popup.element()
+          const active = el && activeElement(el.ownerDocument)
+          const held =
+            reason === "parent-close" &&
+            !!active &&
+            composedContains(el, active)
+          if (close() && held) {
             focusTriggerItem()
           }
-        : undefined,
-      // A sibling, or another menu of the menubar, that refuses to close stays the open one.
-      open(request, open) {
-        const { event } = request
-        const siblings = parent ? [...parent.internal.children] : []
-        if (!siblings.every((sibling) => sibling === api || closes(sibling, "submenu-switch"))) return
-        if (bar()?.internal.opening(id, event) === false) return
-        pendingFocus = (request.focus as Focus | undefined) ?? "first"
-        openedByHover = request.reason === "trigger-hover"
-        open(request.by ?? openerOf(event))
-      },
-      // Another trigger takes the menu over where it's pressed, so an open
-      // again only moves focus.
-      reopen(request) {
-        pendingFocus = (request.focus as Focus | undefined) ?? "first"
-        runPendingFocus()?.focus({ preventScroll: true })
-      },
-      // Submenus close first, so one that refuses keeps its parent open. One
-      // closing with its parent moves focus to its trigger item: a portalled
-      // submenu isn't inside the parent, which then wouldn't return focus.
-      close({ reason, event }, close) {
-        const child = openChild()
-        if (child && !withSource(changeSource(reason, event), () => closes(child, "parent-close"))) return
-        const el = popup.element()
-        const active = el && activeElement(el.ownerDocument)
-        const held = reason === "parent-close" && !!active && composedContains(el, active)
-        if (close() && held) focusTriggerItem()
-      },
-    }),
-  })
+        },
+      }),
+    }
+  )
   const popup = kit.internal.popup
   const presentation = kit.internal.presentation
   // The control runs on plain strings. The menu calls it with its own reasons and open options.
   const control = kit.internal.control as unknown as ReturnType<
-    typeof createOpenSteps<MenuOpenChangeReason, string, MenuOpenOptions, MenuPayloadChangeReason>
+    typeof createOpenSteps<
+      MenuOpenChangeReason,
+      string,
+      MenuOpenOptions,
+      MenuPayloadChangeReason
+    >
   >
   const { show, hide } = control
 
@@ -477,17 +600,32 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
 
   const entryOf = (el: HTMLElement) => byElement.get(el)
 
-  function highlight(key: string | null, { focus = true, scroll = false } = {}) {
+  function highlight(
+    key: string | null,
+    { focus = true, scroll = false } = {}
+  ) {
     const found = entryFor(key)
     const child = openChild()
-    if (child && found?.el !== child.triggerElement() && key !== null && !closes(child, "submenu-switch"))
+    if (
+      child &&
+      found?.el !== child.triggerElement() &&
+      key !== null &&
+      !closes(child, "submenu-switch")
+    ) {
       return
+    }
     store.set({ highlighted: key })
-    if (!focus) return
+    if (!focus) {
+      return
+    }
     if (found) {
       found.el.focus({ preventScroll: true })
-      if (scroll) found.el.scrollIntoView({ block: "nearest" })
-    } else popup.element()?.focus({ preventScroll: true })
+      if (scroll) {
+        found.el.scrollIntoView({ block: "nearest" })
+      }
+    } else {
+      popup.element()?.focus({ preventScroll: true })
+    }
   }
 
   function openChild() {
@@ -506,7 +644,9 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   let lastHighlighted: HTMLElement | undefined
   store.subscribe(() => {
     const next = entryFor(store.get().highlighted)?.el
-    if (next === lastHighlighted) return
+    if (next === lastHighlighted) {
+      return
+    }
     lastHighlighted?.removeAttribute("data-highlighted")
     next?.setAttribute("data-highlighted", "")
     lastHighlighted = next
@@ -516,7 +656,9 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   function focusTriggerItem() {
     const trigger = element("trigger")
     const key = trigger && parent?.internal.entryOf(trigger)?.key
-    if (key !== undefined && parent) parent.internal.highlight(key)
+    if (key !== undefined && parent) {
+      parent.internal.highlight(key)
+    }
   }
 
   function checkboxValue(itemProps: CheckboxProps) {
@@ -529,8 +671,11 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   }
 
   function radioValue(group: string) {
-    const groupProps = props("radio-group", group) as RadioGroupProps | undefined
-    if (groupProps?.value !== undefined) return groupProps.value
+    const groupProps = props("radio-group", group) as
+      RadioGroupProps | undefined
+    if (groupProps?.value !== undefined) {
+      return groupProps.value
+    }
     const own = store.get().values[`radio:${group}`] as string | undefined
     return own ?? groupProps?.defaultValue ?? null
   }
@@ -540,17 +685,28 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   function setCheckbox(
     itemProps: CheckboxProps,
     event?: Event,
-    reason: MenuCheckedChangeReason = "item-press",
+    reason: MenuCheckedChangeReason = "item-press"
   ) {
     const next = !checkboxValue(itemProps)
-    const details = createDetails({ reason, event }, changeSource(reason, event))
+    const details = createDetails(
+      { reason, event },
+      changeSource(reason, event)
+    )
     itemProps.onCheckedChange?.(next, details)
-    if (details.canceled) return false
-    const shared = createDetails({ reason, event, value: itemProps.value }, changeSource(reason, event))
+    if (details.canceled) {
+      return false
+    }
+    const shared = createDetails(
+      { reason, event, value: itemProps.value },
+      changeSource(reason, event)
+    )
     root().options().onCheckedChange?.(next, shared)
-    if (shared.canceled) return false
-    if (itemProps.checked === undefined)
+    if (shared.canceled) {
+      return false
+    }
+    if (itemProps.checked === undefined) {
       store.set({ values: { ...store.get().values, [itemProps.value]: next } })
+    }
     return true
   }
 
@@ -559,18 +715,34 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     group: string,
     value: string,
     event?: Event,
-    reason: MenuValueChangeReason = "item-press",
+    reason: MenuValueChangeReason = "item-press"
   ) {
-    const groupProps = props("radio-group", group) as RadioGroupProps | undefined
-    if (radioValue(group) === value) return false
-    const details = createDetails({ reason, event }, changeSource(reason, event))
+    const groupProps = props("radio-group", group) as
+      RadioGroupProps | undefined
+    if (radioValue(group) === value) {
+      return false
+    }
+    const details = createDetails(
+      { reason, event },
+      changeSource(reason, event)
+    )
     groupProps?.onValueChange?.(value, details)
-    if (details.canceled) return false
-    const shared = createDetails({ reason, event, group }, changeSource(reason, event))
+    if (details.canceled) {
+      return false
+    }
+    const shared = createDetails(
+      { reason, event, group },
+      changeSource(reason, event)
+    )
     root().options().onValueChange?.(value, shared)
-    if (shared.canceled) return false
-    if (groupProps?.value === undefined)
-      store.set({ values: { ...store.get().values, [`radio:${group}`]: value } })
+    if (shared.canceled) {
+      return false
+    }
+    if (groupProps?.value === undefined) {
+      store.set({
+        values: { ...store.get().values, [`radio:${group}`]: value },
+      })
+    }
     return true
   }
 
@@ -584,7 +756,8 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     hide,
     parentMenu: () => parent,
     popupElement: () => popup.element(),
-    itemProps: <Props extends object>(slot: string, key: string) => props<Props>(slot, key),
+    itemProps: <Props extends object>(slot: string, key: string) =>
+      props<Props>(slot, key),
     triggerElement,
     focusTriggerItem,
     checkboxValue,
@@ -596,23 +769,34 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     isMounted: () => store.get().mounted,
     // A sheet is modal unless the app says otherwise.
     modalSetting: () =>
-      sheetModal(store.get().presentation, options().modal ?? bar()?.internal.modal(), "pointer"),
+      sheetModal(
+        store.get().presentation,
+        options().modal ?? bar()?.internal.modal(),
+        "pointer"
+      ),
     menubar: bar,
     presentation: () => store.get().presentation,
     anchor: (el?: HTMLElement, setting?: Anchor | string | null) =>
-      control.anchor() ?? (el ? contentAnchor(el, setting, triggerElement) : triggerElement()),
+      control.anchor() ??
+      (el ? contentAnchor(el, setting, triggerElement) : triggerElement()),
     // Runs a plain item and closes the whole tree. Focus returns to the root
     // trigger, unless the item opened something that took it, like a dialog.
     action(value: string | undefined, event?: Event) {
       const top = root()
-      if (value !== undefined) top.runAction(value, event)
+      if (value !== undefined) {
+        top.runAction(value, event)
+      }
       top.hide({ reason: "item-press", event, focus: "unless-moved" })
     },
-    runAction: (value: string, event?: Event) => options().onAction?.(value, { event }),
-    wait: (key: string, pending: PromiseLike<unknown>, done: () => void) => wait(store, key, pending, done),
+    runAction: (value: string, event?: Event) =>
+      options().onAction?.(value, { event }),
+    wait: (key: string, pending: PromiseLike<unknown>, done: () => void) =>
+      wait(store, key, pending, done),
     isPending: (key: string) => store.get().pending.includes(key),
     clearError(key: string) {
-      if (store.get().error?.key === key) store.set({ error: null })
+      if (store.get().error?.key === key) {
+        store.set({ error: null })
+      }
     },
     focusTrigger,
     // Internal. Used by submenus and slots.
@@ -627,26 +811,37 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
         byElement.set(el, entry)
         return () => {
           remove()
-          if (byElement.get(el) === entry) byElement.delete(el)
+          if (byElement.get(el) === entry) {
+            byElement.delete(el)
+          }
         }
       },
       highlight,
       childOpenChanged(childId: string, open: boolean) {
-        if (open) store.set({ openChild: childId })
-        else if (store.get().openChild === childId) store.set({ openChild: null })
+        if (open) {
+          store.set({ openChild: childId })
+        } else if (store.get().openChild === childId) {
+          store.set({ openChild: null })
+        }
       },
       hoverItem(el: HTMLElement, event: PointerEvent) {
-        if (event.pointerType === "touch") return
+        if (event.pointerType === "touch") {
+          return
+        }
         // WebKit fires pointermove without movement when content scrolls under the pointer.
         const moved = pointerX !== event.clientX || pointerY !== event.clientY
         pointerX = event.clientX
         pointerY = event.clientY
-        if (!moved && store.get().highlighted !== null) return
+        if (!moved && store.get().highlighted !== null) {
+          return
+        }
         hover(el, event)
       },
       cancelHoverOpen: () => clearTimeout(hoverTimer),
       trackPointer(event: PointerEvent) {
-        if (event.pointerType === "touch") return
+        if (event.pointerType === "touch") {
+          return
+        }
         pointerX = event.clientX
         pointerY = event.clientY
       },
@@ -670,23 +865,45 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
 
   function hover(el: HTMLElement, event: PointerEvent) {
     const entry = entryOf(el)
-    if (!entry) return
+    if (!entry) {
+      return
+    }
     const child = openChild()
     if (child && child.triggerElement() !== el) {
       // Heading for the open submenu. Leave it open, and once the pointer
       // rests, apply where it rests, though it hasn't moved since.
-      if (safeArea.contains({ x: event.clientX, y: event.clientY }, () => hover(el, event))) return
+      if (
+        safeArea.contains({ x: event.clientX, y: event.clientY }, () =>
+          hover(el, event)
+        )
+      ) {
+        return
+      }
       safeArea.stop()
-      if (!closes(child, "submenu-switch", event)) return
+      if (!closes(child, "submenu-switch", event)) {
+        return
+      }
     }
-    if (store.get().highlighted !== entry.key || document.activeElement !== el) highlight(entry.key)
+    if (
+      store.get().highlighted !== entry.key ||
+      document.activeElement !== el
+    ) {
+      highlight(entry.key)
+    }
     clearTimeout(hoverTimer)
     // In a sheet, a submenu replaces the items, so only a press opens it.
-    if (entry.openSubmenu && !entry.disabled() && store.get().presentation !== "sheet")
+    if (
+      entry.openSubmenu &&
+      !entry.disabled() &&
+      store.get().presentation !== "sheet"
+    ) {
       hoverTimer = setTimeout(
-        () => !entry.disabled() && entry.openSubmenu!("none", "trigger-hover", event),
-        options().delay ?? 100,
+        () =>
+          !entry.disabled() &&
+          entry.openSubmenu!("none", "trigger-hover", event),
+        options().delay ?? 100
       )
+    }
   }
 
   let pressClick = false
@@ -698,43 +915,86 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   // menubar decides, so a menu outside one carries none of this.
   function barArrow(by: 1 | -1, event: KeyboardEvent) {
     const result = bar()?.internal.menuArrow(id, by, event)
-    if (result === "close") hide({ reason: "escape-key", event })
+    if (result === "close") {
+      hide({ reason: "escape-key", event })
+    }
     return !!result
   }
 
   // Keys on a trigger in a menubar. The menubar moves between triggers, and
   // says when a key opens this menu, and at which end.
-  function barKeydown(event: KeyboardEvent, el: HTMLElement, key: string, props: TriggerProps) {
-    const focus = bar()!.internal.triggerKeydown(event, id, el, triggerDisabled(store.get(), props))
-    if (focus) show({ focus, event, trigger: key, payload: props.payload })
+  function barKeydown(
+    event: KeyboardEvent,
+    el: HTMLElement,
+    key: string,
+    props: TriggerProps
+  ) {
+    const focus = bar()!.internal.triggerKeydown(
+      event,
+      id,
+      el,
+      triggerDisabled(store.get(), props)
+    )
+    if (focus) {
+      show({ focus, event, trigger: key, payload: props.payload })
+    }
   }
 
   // Opens on press. Releasing over an item after dragging selects it, like
   // native menus. A quick click never selects, even if the menu covers the trigger.
-  function pointerPress(trigger: HTMLElement, event: PointerEvent, key: string, payload: unknown) {
+  function pointerPress(
+    trigger: HTMLElement,
+    event: PointerEvent,
+    key: string,
+    payload: unknown
+  ) {
     pressClick = true
     const { open, trigger: active } = store.get()
     // Another trigger takes the open menu over. A drag from it selects, as from a press that opens.
     const opening = !open || (active !== null && active !== key)
-    if (!open) show({ focus: "popup", event, trigger: key, payload })
-    else if (opening) control.takeOver({ trigger: key, payload, reason: "trigger-press", event })
-    else if (!openedByHover) hide({ reason: "trigger-press", event })
+    if (!open) {
+      show({ focus: "popup", event, trigger: key, payload })
+    } else if (opening) {
+      control.takeOver({
+        trigger: key,
+        payload,
+        reason: "trigger-press",
+        event,
+      })
+    } else if (!openedByHover) {
+      hide({ reason: "trigger-press", event })
+    }
     openedByHover = false
-    const start = { x: event.clientX, y: event.clientY, time: performance.now() }
+    const start = {
+      x: event.clientX,
+      y: event.clientY,
+      time: performance.now(),
+    }
     const off = on(window, "pointerup", (up) => {
       off()
       // The window sees only the shadow host around a trigger in a shadow root.
       const target = up.composedPath()[0] as HTMLElement
       // A release off the trigger sends it no click, so the next click, like Enter, is a new press.
-      if (!composedContains(trigger, target)) pressClick = false
-      if (!opening) return
+      if (!composedContains(trigger, target)) {
+        pressClick = false
+      }
+      if (!opening) {
+        return
+      }
       const held = performance.now() - start.time >= 200
       const moved = Math.hypot(up.clientX - start.x, up.clientY - start.y) > 4
-      if (!held || (!moved && composedContains(trigger, target))) return
+      if (!held || (!moved && composedContains(trigger, target))) {
+        return
+      }
       const item = composedClosest<HTMLElement>(target, itemSelector)
       const entry = item && findEntry(item)
-      if (entry && !entry.entry.disabled() && !entry.entry.openSubmenu) entry.entry.activate(up)
-      else if (!item && !composedContains(trigger, target) && !root().treeContains(target)) {
+      if (entry && !entry.entry.disabled() && !entry.entry.openSubmenu) {
+        entry.entry.activate(up)
+      } else if (
+        !item &&
+        !composedContains(trigger, target) &&
+        !root().treeContains(target)
+      ) {
         hide({ reason: "trigger-release", event: up, focus: false })
       }
     })
@@ -744,30 +1004,56 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
   // press, or Shift+F10 on something inside a context area.
   function contextOpen(
     at: Anchor,
-    { event, by, key, payload }: { event?: Event; by: PopupOpener; key: string; payload: unknown },
+    {
+      event,
+      by,
+      key,
+      payload,
+    }: { event?: Event; by: PopupOpener; key: string; payload: unknown }
   ) {
     if (store.get().open) {
-      control.takeOver({ trigger: key, payload, anchor: at, reason: "trigger-press", event })
-      if (by === "keyboard") show({ focus: "first", event })
+      control.takeOver({
+        trigger: key,
+        payload,
+        anchor: at,
+        reason: "trigger-press",
+        event,
+      })
+      if (by === "keyboard") {
+        show({ focus: "first", event })
+      }
       return
     }
-    show({ focus: by === "keyboard" ? "first" : "popup", event, by, anchor: at, trigger: key, payload })
+    show({
+      focus: by === "keyboard" ? "first" : "popup",
+      event,
+      by,
+      anchor: at,
+      trigger: key,
+      payload,
+    })
   }
 
   // Finds an item's entry in this menu or any open submenu.
   function findEntry(el: HTMLElement) {
     const entry = entryOf(el)
-    if (entry) return { entry }
+    if (entry) {
+      return { entry }
+    }
     for (const child of children) {
       const found = child.internal.findEntry(el)
-      if (found) return found
+      if (found) {
+        return found
+      }
     }
   }
 
   function treeContains(target: Node) {
     // A submenu that just closed, before its parent, still holds focus until the page updates.
     const el = popup.element() ?? element("content")
-    if (el && composedContains(el, target)) return true
+    if (el && composedContains(el, target)) {
+      return true
+    }
     return [...children].some((child) => child.treeContains(target))
   }
 
@@ -776,15 +1062,21 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     const focus = pendingFocus
     pendingFocus = "none"
     const list = entries.list()
-    if (focus === "first" && list.length) highlight(list[0].key, { scroll: true })
-    else if (focus === "last" && list.length) highlight(list.at(-1)!.key, { scroll: true })
-    else if (focus === "popup") return popup.element()
+    if (focus === "first" && list.length) {
+      highlight(list[0].key, { scroll: true })
+    } else if (focus === "last" && list.length) {
+      highlight(list.at(-1)!.key, { scroll: true })
+    } else if (focus === "popup") {
+      return popup.element()
+    }
   }
 
   function onKeyDown(event: KeyboardEvent) {
     const target = event.target as HTMLElement
     // Keys from a submenu bubble through its parent's popup. Only the owner handles them.
-    if (target.closest('[role="menu"]') !== popup.element()) return
+    if (target.closest('[role="menu"]') !== popup.element()) {
+      return
+    }
     const list = entries.list()
     const focused = entryOf(document.activeElement as HTMLElement)
     const currentKey = focused?.key ?? store.get().highlighted
@@ -793,8 +1085,12 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
     const loop = options().loop ?? true
     const move = (next: number) => {
       event.preventDefault()
-      if (!list.length) return
-      const clamped = loop ? (next + list.length) % list.length : Math.max(0, Math.min(list.length - 1, next))
+      if (!list.length) {
+        return
+      }
+      const clamped = loop
+        ? (next + list.length) % list.length
+        : Math.max(0, Math.min(list.length - 1, next))
       highlight(list[clamped].key, { scroll: true })
     }
 
@@ -822,7 +1118,9 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
         if (current?.openSubmenu && !current.disabled()) {
           event.preventDefault()
           current.openSubmenu("first", "trigger-press", event)
-        } else if (root().internal.barArrow(1, event)) event.preventDefault()
+        } else if (root().internal.barArrow(1, event)) {
+          event.preventDefault()
+        }
         return
       case "ArrowLeft":
         // A submenu's close key, like Escape.
@@ -830,14 +1128,18 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
           event.preventDefault()
           hide({ reason: "escape-key", event, focus: false })
           focusTriggerItem()
-        } else if (barArrow(-1, event)) event.preventDefault()
+        } else if (barArrow(-1, event)) {
+          event.preventDefault()
+        }
         return
       case "Escape":
         event.preventDefault()
         if (parent) {
           hide({ reason: "escape-key", event, focus: false })
           focusTriggerItem()
-        } else hide({ reason: "escape-key", event })
+        } else {
+          hide({ reason: "escape-key", event })
+        }
         return
       case "Tab":
         // Lets the browser move focus on from the trigger, then closes everything.
@@ -849,7 +1151,7 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
           const found = typeahead(
             " ",
             list.map((entry) => entry.label()),
-            index,
+            index
           )
           if (found !== -1) {
             event.preventDefault()
@@ -858,14 +1160,25 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
           }
           typeahead.reset()
         }
-        if (!current || current.disabled() || current.openSubmenu || current.el.matches("a[href]")) {
+        if (
+          !current ||
+          current.disabled() ||
+          current.openSubmenu ||
+          current.el.matches("a[href]")
+        ) {
           event.preventDefault()
-          if (!current || current.disabled()) return
+          if (!current || current.disabled()) {
+            return
+          }
           const el = current.el
-          if (current.openSubmenu) current.openSubmenu("first", "trigger-press", event)
+          if (current.openSubmenu) {
+            current.openSubmenu("first", "trigger-press", event)
+          }
           // Links follow themselves, so routers, targets and modifier handling all
           // work. The click activates the item like a pointer press, and reports the key.
-          else withSource(sourceOf(event), () => el.click())
+          else {
+            withSource(sourceOf(event), () => el.click())
+          }
           return
         }
         // Activates before preventing the key's default, so `event.preventDefault()`
@@ -876,11 +1189,16 @@ function menuApi(context: PrimitiveContext<MenuInternalOptions, MenuState, strin
       }
     }
 
-    if (event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    if (
+      event.key.length === 1 &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey
+    ) {
       const found = typeahead(
         event.key,
         list.map((entry) => entry.label()),
-        index,
+        index
       )
       if (found !== -1) {
         event.preventDefault()
@@ -922,7 +1240,8 @@ type MenuState = {
   error: { key: string; reason: unknown } | null
 }
 
-const triggerDisabled = (state: MenuState, props: TriggerProps) => !!props.disabled || state.barDisabled
+const triggerDisabled = (state: MenuState, props: TriggerProps) =>
+  !!props.disabled || state.barDisabled
 
 export {
   type MenuInternalOptions,

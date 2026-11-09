@@ -44,30 +44,50 @@ const pages = [
   ["/agents/connect-an-agent/webmcp", "WebMCP"],
   ["/agents/connect-an-agent/reference", "Reference"],
   ["/agents/skills", "Skills"],
-  ...frameworks.map((framework) => [`/${framework}/rendering`, "Rendering Primitives"]),
+  ...frameworks.map((framework) => [
+    `/${framework}/rendering`,
+    "Rendering Primitives",
+  ]),
 ]
 
 for (const [slug, title] of pages) {
   test(`the ${slug} page renders`, async ({ page }) => {
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs${slug}`)
-    await expect(page.getByRole("heading", { name: title, level: 1 })).toBeVisible()
+    await expect(
+      page.getByRole("heading", { name: title, level: 1 })
+    ).toBeVisible()
     expect(errors).toEqual([])
   })
 }
 
-test("each framework's rendering guide explains its helpers", async ({ page }) => {
+test("each framework's rendering guide explains its helpers", async ({
+  page,
+}) => {
   await page.goto("/docs/react/custom-parts")
-  await expect(page.getByRole("heading", { name: "Write a Root Part" })).toBeVisible()
-  await expect(page.getByText("usePrimitive", { exact: true }).first()).toBeVisible()
+  await expect(
+    page.getByRole("heading", { name: "Write a Root Part" })
+  ).toBeVisible()
+  await expect(
+    page.getByText("usePrimitive", { exact: true }).first()
+  ).toBeVisible()
   await page.goto("/docs/web-components/rendering")
-  await expect(page.getByRole("heading", { name: "Define the Elements" })).toBeVisible()
-  await expect(page.getByText("createParts", { exact: true }).first()).toBeVisible()
+  await expect(
+    page.getByRole("heading", { name: "Define the Elements" })
+  ).toBeVisible()
+  await expect(
+    page.getByText("createParts", { exact: true }).first()
+  ).toBeVisible()
 })
 
-test("Observe lives in Core Tools and old framework URLs redirect", async ({ page }) => {
+test("Observe lives in Core Tools and old framework URLs redirect", async ({
+  page,
+}) => {
   for (const framework of frameworks) {
     const folder = framework === "react" ? "hooks" : "utilities"
     await page.goto(`/docs/${framework}/${folder}/observe`)
@@ -78,15 +98,21 @@ test("Observe lives in Core Tools and old framework URLs redirect", async ({ pag
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Observe")
   await page.goto("/docs/react/hooks/shortcuts")
   await expect(
-    page.getByRole("navigation", { name: "Docs" }).getByRole("link", { name: "Observe", exact: true }),
+    page
+      .getByRole("navigation", { name: "Docs" })
+      .getByRole("link", { name: "Observe", exact: true })
   ).toHaveCount(0)
 })
 
-test("removed Why docs lead back to their framework introduction", async ({ page }) => {
+test("removed Why docs lead back to their framework introduction", async ({
+  page,
+}) => {
   for (const framework of frameworks) {
     await page.goto(`/docs/${framework}/why`)
     await expect(page).toHaveURL(new RegExp(`/docs/${framework}$`))
-    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Introduction")
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "Introduction"
+    )
   }
 })
 
@@ -135,7 +161,12 @@ test("links from Core go to the framework read last", async ({ page }) => {
   await expect(page).toHaveURL(/\/docs\/react\/components\/field$/)
   await page.goto("/docs/vue/components/menu")
   await expect
-    .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === "framework")?.value)
+    .poll(
+      async () =>
+        (await page.context().cookies()).find(
+          (cookie) => cookie.name === "framework"
+        )?.value
+    )
     .toBe("vue")
   await page.goto("/docs/core/behaviors/popups")
   await page.getByRole("link", { name: "Popover", exact: true }).first().click()
@@ -144,19 +175,25 @@ test("links from Core go to the framework read last", async ({ page }) => {
   await expect(page).toHaveURL(/\/docs\/vue\/utilities\/shortcuts$/)
 })
 
-test("Components opens the framework read last, and the Frameworks menu keeps the page", async ({ page }) => {
+test("Components opens the framework read last, and the Frameworks menu keeps the page", async ({
+  page,
+}) => {
   await page.goto("/docs/vue")
   await expect
-    .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === "framework")?.value)
+    .poll(
+      async () =>
+        (await page.context().cookies()).find(
+          (cookie) => cookie.name === "framework"
+        )?.value
+    )
     .toBe("vue")
   await page.goto("/docs/core")
   const sections = page.getByRole("navigation", { name: "Sections" }).first()
   await sections.getByRole("link", { name: "Components", exact: true }).click()
   await expect(page).toHaveURL(/\/docs\/vue\/components$/)
-  await expect(sections.getByRole("link", { name: "Components", exact: true })).toHaveAttribute(
-    "aria-current",
-    "page",
-  )
+  await expect(
+    sections.getByRole("link", { name: "Components", exact: true })
+  ).toHaveAttribute("aria-current", "page")
 
   await page.setViewportSize({ width: 1280, height: 900 })
   await page.goto("/docs/react/hooks/shortcuts")
@@ -165,20 +202,36 @@ test("Components opens the framework read last, and the Frameworks menu keeps th
   await expect(page).toHaveURL(/\/docs\/vue\/utilities\/shortcuts$/)
 })
 
-test("Core's snippets follow the framework docs visited last", async ({ page }) => {
+test("Core's snippets follow the framework docs visited last", async ({
+  page,
+}) => {
   await page.goto("/docs/svelte")
   await expect
-    .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === "framework")?.value)
+    .poll(
+      async () =>
+        (await page.context().cookies()).find(
+          (cookie) => cookie.name === "framework"
+        )?.value
+    )
     .toBe("svelte")
   await page.goto("/docs/core/build-a-component")
-  await expect(page.getByRole("main")).toContainText("npm install @ui-sdk/svelte")
+  await expect(page.getByRole("main")).toContainText(
+    "npm install @ui-sdk/svelte"
+  )
 
   await page.goto("/docs/solid")
   await expect
-    .poll(async () => (await page.context().cookies()).find((cookie) => cookie.name === "framework")?.value)
+    .poll(
+      async () =>
+        (await page.context().cookies()).find(
+          (cookie) => cookie.name === "framework"
+        )?.value
+    )
     .toBe("solid")
   await page.goto("/docs/core/build-a-component")
-  await expect(page.getByRole("main")).toContainText("npm install @ui-sdk/solid")
+  await expect(page.getByRole("main")).toContainText(
+    "npm install @ui-sdk/solid"
+  )
 })
 
 test("Core's pages arrive in the framework read last, before any script runs", async ({
@@ -186,7 +239,9 @@ test("Core's pages arrive in the framework read last, before any script runs", a
   baseURL,
 }) => {
   const context = await browser.newContext({ javaScriptEnabled: false })
-  await context.addCookies([{ name: "framework", value: "svelte", url: baseURL }])
+  await context.addCookies([
+    { name: "framework", value: "svelte", url: baseURL },
+  ])
   const page = await context.newPage()
   await page.goto("/docs/core/build-a-component")
   const content = page.getByRole("main")
@@ -207,11 +262,16 @@ test("the reference points to focused guides", async ({ page }) => {
     ["Text", "/docs/core/text"],
     ["Testing", "/docs/core/testing"],
   ]) {
-    const link = page.getByRole("main").getByRole("link", { name, exact: true }).first()
+    const link = page
+      .getByRole("main")
+      .getByRole("link", { name, exact: true })
+      .first()
     await expect(link).toBeVisible()
     await expect(link).toHaveAttribute("href", href)
   }
-  await expect(page.getByRole("heading", { name: "Full API", exact: true })).toHaveCount(0)
+  await expect(
+    page.getByRole("heading", { name: "Full API", exact: true })
+  ).toHaveCount(0)
 })
 
 test("Core and Agents Markdown preserves the reference and every framework's examples", async ({

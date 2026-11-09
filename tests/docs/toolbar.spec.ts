@@ -38,11 +38,17 @@ function lastLog(preview: Locator) {
     .last()
 }
 
-const example = (page: Page, name: string) => page.locator(`[data-example="toolbar/${name}"]`)
+const example = (page: Page, name: string) =>
+  page.locator(`[data-example="toolbar/${name}"]`)
 
 // The toolbar is named and has one tab stop, and an arrow key moves focus from
 // that stop to the item named `next`.
-async function roves(preview: Locator, name: string, next: string, key = "ArrowRight") {
+async function roves(
+  preview: Locator,
+  name: string,
+  next: string,
+  key = "ArrowRight"
+) {
   const toolbar = preview.getByRole("toolbar", { name })
   await expect(toolbar).toBeVisible()
   const stop = toolbar.locator('[tabindex="0"]')
@@ -50,7 +56,9 @@ async function roves(preview: Locator, name: string, next: string, key = "ArrowR
   await stop.focus()
   await preview.page().keyboard.press(key)
   await expect(
-    toolbar.getByLabel(next, { exact: true }).or(toolbar.getByText(next, { exact: true })),
+    toolbar
+      .getByLabel(next, { exact: true })
+      .or(toolbar.getByText(next, { exact: true }))
   ).toBeFocused()
 }
 
@@ -58,21 +66,34 @@ for (const framework of frameworks) {
   test(`every toolbar example works in ${framework}`, async ({ page }) => {
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/toolbar`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    expect(await previews.evaluateAll((els) => els.map((el) => el.getAttribute("data-example")))).toEqual(
-      order.map((name) => `toolbar/${name}`),
-    )
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+    expect(
+      await previews.evaluateAll((els) =>
+        els.map((el) => el.getAttribute("data-example"))
+      )
+    ).toEqual(order.map((name) => `toolbar/${name}`))
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+    }
 
     // Arrows move focus without pressing; Space presses the focused toggle.
     const demo = example(page, "demo")
     await roves(demo, "Formatting", "Italic")
-    await expect(demo.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "false")
+    await expect(demo.getByRole("button", { name: "Italic" })).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    )
     await page.keyboard.press("Space")
-    await expect(demo.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "true")
+    await expect(demo.getByRole("button", { name: "Italic" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    )
     await expect(lastLog(demo)).toHaveText("Italic on")
     await demo.getByRole("button", { name: "Insert link" }).click()
     await expect(lastLog(demo)).toHaveText("Insert link")
@@ -82,7 +103,9 @@ for (const framework of frameworks) {
     await roves(groups, "Paragraph", "Align center")
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("ArrowRight")
-    await expect(groups.getByRole("button", { name: "Bulleted list" })).toBeFocused()
+    await expect(
+      groups.getByRole("button", { name: "Bulleted list" })
+    ).toBeFocused()
     await page.keyboard.press("Space")
     await expect(lastLog(groups)).toHaveText("Bulleted list")
 
@@ -91,7 +114,10 @@ for (const framework of frameworks) {
     await roves(group, "Edit", "Copy")
     await page.keyboard.press("Enter")
     await expect(lastLog(group)).toHaveText("Copy")
-    await expect(group.getByRole("button", { name: "Undo" })).toHaveAttribute("aria-disabled", "true")
+    await expect(group.getByRole("button", { name: "Undo" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("ArrowRight")
     await expect(group.getByRole("button", { name: "Undo" })).toBeFocused()
@@ -115,9 +141,13 @@ for (const framework of frameworks) {
     await select.getByRole("button", { name: "Zoom in" }).click()
     await expect(zoom).toContainText("150%")
     await expect(lastLog(select)).toHaveText("Zoom 150%")
-    for (let i = 0; i < 3; i++) await select.getByRole("button", { name: "Zoom out" }).click()
+    for (let i = 0; i < 3; i++) {
+      await select.getByRole("button", { name: "Zoom out" }).click()
+    }
     await expect(zoom).toContainText("50%")
-    await expect(select.getByRole("button", { name: "Zoom out" })).toHaveAttribute("aria-disabled", "true")
+    await expect(
+      select.getByRole("button", { name: "Zoom out" })
+    ).toHaveAttribute("aria-disabled", "true")
 
     // Up and Down step the font size; an arrow leaves a field from its end.
     const input = example(page, "input")
@@ -140,7 +170,10 @@ for (const framework of frameworks) {
     // A vertical toolbar moves with Down, and its separator runs across it.
     const vertical = example(page, "vertical")
     await roves(vertical, "Canvas", "Draw", "ArrowDown")
-    await expect(vertical.getByRole("separator")).toHaveAttribute("aria-orientation", "horizontal")
+    await expect(vertical.getByRole("separator")).toHaveAttribute(
+      "aria-orientation",
+      "horizontal"
+    )
     await page.keyboard.press("Space")
     await expect(lastLog(vertical)).toHaveText("Draw tool")
 
@@ -165,9 +198,13 @@ for (const framework of frameworks) {
     await roves(controller, "Notes formatting", "Italic")
     await controller.getByRole("textbox", { name: "Notes" }).fill("Call Hollis")
     await page.keyboard.press("Alt+F10")
-    await expect(controller.getByRole("button", { name: "Italic" })).toBeFocused()
+    await expect(
+      controller.getByRole("button", { name: "Italic" })
+    ).toBeFocused()
     await controller.getByRole("button", { name: "Focus Toolbar" }).click()
-    await expect(controller.getByRole("button", { name: "Italic" })).toBeFocused()
+    await expect(
+      controller.getByRole("button", { name: "Italic" })
+    ).toBeFocused()
     await page.keyboard.press("Enter")
     await expect(lastLog(controller)).toHaveText("Italic")
 

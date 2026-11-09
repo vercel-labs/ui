@@ -11,7 +11,12 @@ import {
 } from "@ui-sdk/core/navigation-menu"
 import * as React from "react"
 import { createPortal } from "react-dom"
-import { renderPopup, useOwnContainer, usePopupContainer, type PopupContainer } from "./popup"
+import {
+  renderPopup,
+  useOwnContainer,
+  usePopupContainer,
+  type PopupContainer,
+} from "./popup"
 import {
   createParts,
   readIn,
@@ -37,7 +42,11 @@ const ContainerContext = React.createContext<PopupContainer>(undefined)
 
 function useItem(part: string) {
   const value = React.useContext(ItemContext)
-  if (value === null) throw new Error(`<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`)
+  if (value === null) {
+    throw new Error(
+      `<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`
+    )
+  }
   return value
 }
 
@@ -86,15 +95,26 @@ function NavigationMenu<T extends string = string>({
     orientation,
     controller,
     debug,
-    parent: parentMenu && parentItem !== null ? { api: parentMenu.api, item: parentItem } : undefined,
+    parent:
+      parentMenu && parentItem !== null
+        ? { api: parentMenu.api, item: parentItem }
+        : undefined,
   } as NavigationMenuOptions
   const menu = usePrimitive(navigationMenu, options)
   const tag = parentMenu && parentItem !== null ? "div" : "nav"
   // The state holds only values of type `T`, which the primitive types as strings.
-  const element = usePart(menu, "root", {}, props as PartProps<"nav", NavigationMenuState>, tag)
+  const element = usePart(
+    menu,
+    "root",
+    {},
+    props as PartProps<"nav", NavigationMenuState>,
+    tag
+  )
   return (
     <ItemContext.Provider value={null}>
-      <ContainerContext.Provider value={container}>{element}</ContainerContext.Provider>
+      <ContainerContext.Provider value={container}>
+        {element}
+      </ContainerContext.Provider>
     </ItemContext.Provider>
   )
 }
@@ -112,7 +132,8 @@ const NavigationMenuList = parts.List
 function NavigationMenuItem({
   value,
   ...props
-}: Omit<PartProps<"li", NavigationMenuItemState>, Clashing> & NavigationMenuItemProps) {
+}: Omit<PartProps<"li", NavigationMenuItemState>, Clashing> &
+  NavigationMenuItemProps) {
   // Its value reaches a menu nested in it, and its content.
   const generated = React.useId()
   const item = { value: value ?? generated }
@@ -147,7 +168,8 @@ function NavigationMenuContent({
   container,
   render,
   ...props
-}: Omit<PartProps<"div", NavigationMenuContentState>, Clashing> & NavigationMenuContentProps) {
+}: Omit<PartProps<"div", NavigationMenuContentState>, Clashing> &
+  NavigationMenuContentProps) {
   const menu = useHandle(navigationMenu)
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
   const content = {
@@ -163,10 +185,16 @@ function NavigationMenuContent({
     hiddenUntilFound,
   }
   const element = usePart(menu, "content", content, { ...props, render })
-  if (!element) return null
+  if (!element) {
+    return null
+  }
   const viewport = menu.api.internal.viewportElement()
-  if (viewport && readIn(menu, () => menu.api.internal.inViewport(content.value)))
+  if (
+    viewport &&
+    readIn(menu, () => menu.api.internal.inViewport(content.value))
+  ) {
     return createPortal(element, viewport)
+  }
   // Kept in place next to a viewport, or its own popup without one.
   return menu.state.viewport ? element : renderPopup(element, target)
 }
@@ -198,9 +226,18 @@ function NavigationMenuViewport({
   anchor,
   container,
   ...props
-}: PartProps<"div", NavigationMenuViewportState> & NavigationMenuViewportProps) {
+}: PartProps<"div", NavigationMenuViewportState> &
+  NavigationMenuViewportProps) {
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
-  const viewport = { side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor }
+  const viewport = {
+    side,
+    align,
+    sideOffset,
+    alignOffset,
+    collisionPadding,
+    arrowPadding,
+    anchor,
+  }
   const element = usePart(navigationMenu, "viewport", viewport, props)
   return element && renderPopup(element, target)
 }

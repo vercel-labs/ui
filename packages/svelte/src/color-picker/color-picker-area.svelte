@@ -5,13 +5,21 @@ A surface for two channels, `x` and `y`. Its background comes from
 @experimental
 -->
 <script lang="ts">
-  import { colorPicker, type ColorPickerAreaProps, type ColorPickerState } from "@ui-sdk/core/color-picker"
+  import {
+    colorPicker,
+    type ColorPickerAreaProps,
+    type ColorPickerState,
+  } from "@ui-sdk/core/color-picker"
   import { usePart } from "../instance"
   import Part from "../part.svelte"
   import type { PartProps } from "../use-primitive.svelte"
   import { provideArea } from "./context"
 
-  let { x, y, ...rest }: PartProps<"div", ColorPickerState> & ColorPickerAreaProps = $props()
+  let {
+    x,
+    y,
+    ...rest
+  }: PartProps<"div", ColorPickerState> & ColorPickerAreaProps = $props()
 
   const channels = () => ({ x, y })
   provideArea(channels)

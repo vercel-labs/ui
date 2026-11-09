@@ -24,10 +24,16 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => select("2026-12-25")}>Go to Christmas</button>
+    <button type="button" onclick={() => select("2026-12-25")}
+      >Go to Christmas</button
+    >
     <button type="button" onclick={() => select(todayDate())}>Today</button>
   </div>
-  <Calendar controller={calendar} defaultValue="2026-10-16" defaultMonth="2026-10">
+  <Calendar
+    controller={calendar}
+    defaultValue="2026-10-16"
+    defaultMonth="2026-10"
+  >
     <div data-slot="row">
       <CalendarPrevious data-variant="ghost">
         <ChevronLeftIcon aria-hidden="true" />

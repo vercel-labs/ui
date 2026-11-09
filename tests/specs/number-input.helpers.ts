@@ -1,16 +1,23 @@
 import type { Page } from "@playwright/test"
 
 // Inputs are found by role and the field's label. Buttons by their own labels.
-const quantity = (page: Page) => page.getByRole("textbox", { name: "Quantity", exact: true })
-const amount = (page: Page) => page.getByRole("textbox", { name: "Amount", exact: true })
-const button = (page: Page, name: string) => page.getByRole("button", { name, exact: true })
+const quantity = (page: Page) =>
+  page.getByRole("textbox", { name: "Quantity", exact: true })
+const amount = (page: Page) =>
+  page.getByRole("textbox", { name: "Amount", exact: true })
+const button = (page: Page, name: string) =>
+  page.getByRole("button", { name, exact: true })
 
-async function status(page: Page, name: "Last action" | "Committed" | "Submitted") {
+async function status(
+  page: Page,
+  name: "Last action" | "Committed" | "Submitted"
+) {
   return page.getByRole("status", { name }).textContent()
 }
 
 // The scrub area has no role. It's found by its text.
-const scrubArea = (page: Page) => page.getByText("Drag to adjust", { exact: true })
+const scrubArea = (page: Page) =>
+  page.getByText("Drag to adjust", { exact: true })
 
 // Automation can't move a locked pointer: headless Chromium on Linux grants the
 // lock and then reports no movement, and Firefox stops taking moves. This
@@ -27,7 +34,10 @@ async function standInPointerLock(page: Page, { refuse = false } = {}) {
     let lockedElement: Element | null = null
     const announce = (type: "pointerlockchange" | "pointerlockerror") =>
       document.dispatchEvent(new Event(type))
-    Object.defineProperty(document, "pointerLockElement", { configurable: true, get: () => lockedElement })
+    Object.defineProperty(document, "pointerLockElement", {
+      configurable: true,
+      get: () => lockedElement,
+    })
 
     // Each move's distance from the one before, recorded before any page listener runs.
     const movements = new WeakMap<Event, { x: number; y: number }>()
@@ -35,14 +45,22 @@ async function standInPointerLock(page: Page, { refuse = false } = {}) {
     window.addEventListener(
       "pointermove",
       (event) => {
-        if (last) movements.set(event, { x: event.clientX - last.x, y: event.clientY - last.y })
+        if (last) {
+          movements.set(event, {
+            x: event.clientX - last.x,
+            y: event.clientY - last.y,
+          })
+        }
         last = { x: event.clientX, y: event.clientY }
       },
-      { capture: true },
+      { capture: true }
     )
     for (const axis of ["x", "y"] as const) {
       const property = axis === "x" ? "movementX" : "movementY"
-      const reported = Object.getOwnPropertyDescriptor(MouseEvent.prototype, property)!.get!
+      const reported = Object.getOwnPropertyDescriptor(
+        MouseEvent.prototype,
+        property
+      )!.get!
       Object.defineProperty(MouseEvent.prototype, property, {
         configurable: true,
         get(this: MouseEvent) {
@@ -62,7 +80,7 @@ async function standInPointerLock(page: Page, { refuse = false } = {}) {
           lockedElement = this
           announce("pointerlockchange")
           resolve()
-        }),
+        })
       )
     }
     document.exitPointerLock = () => {

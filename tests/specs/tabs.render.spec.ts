@@ -7,7 +7,10 @@ test.describe("custom rendering", () => {
     await open("tabs-render")
   })
 
-  test("a tab rendered as a link is still a tab, and the keyboard follows it", async ({ page, tab }) => {
+  test("a tab rendered as a link is still a tab, and the keyboard follows it", async ({
+    page,
+    tab,
+  }) => {
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
     await expect(tabNamed(page, "Overview")).toBeFocused()
@@ -20,35 +23,60 @@ test.describe("custom rendering", () => {
     await expect(page).toHaveURL(/#activity$/)
   })
 
-  test("an arrow key to a tab rendered as a link reports list navigation", async ({ page, tab }) => {
+  test("an arrow key to a tab rendered as a link reports list navigation", async ({
+    page,
+    tab,
+  }) => {
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
     await page.keyboard.press("ArrowRight")
-    await expect(page.getByRole("status", { name: "Reason" })).toHaveText("list-navigation")
+    await expect(page.getByRole("status", { name: "Reason" })).toHaveText(
+      "list-navigation"
+    )
     await tabNamed(page, "Overview").click()
-    await expect(page.getByRole("status", { name: "Reason" })).toHaveText("item-press")
+    await expect(page.getByRole("status", { name: "Reason" })).toHaveText(
+      "item-press"
+    )
   })
 
-  test("Space prevented by an earlier handler doesn't select a link tab", async ({ page, open, tab }) => {
+  test("Space prevented by an earlier handler doesn't select a link tab", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("tabs-render", { activation: "manual" })
     await page.evaluate(() =>
-      document.addEventListener("keydown", (event) => event.key === " " && event.preventDefault(), true),
+      document.addEventListener(
+        "keydown",
+        (event) => event.key === " " && event.preventDefault(),
+        true
+      )
     )
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press(" ")
-    await expect(tabNamed(page, "Activity")).toHaveAttribute("aria-selected", "false")
+    await expect(tabNamed(page, "Activity")).toHaveAttribute(
+      "aria-selected",
+      "false"
+    )
     await expect(page).not.toHaveURL(/#activity$/)
   })
 
   test("clicking a tab rendered as a link follows it", async ({ page }) => {
     await tabNamed(page, "Activity").click()
-    await expect(tabNamed(page, "Activity")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Activity")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await expect(page).toHaveURL(/#activity$/)
   })
 
-  test("Space selects a tab rendered as a link in manual mode", async ({ page, open, tab }) => {
+  test("Space selects a tab rendered as a link in manual mode", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("tabs-render", { activation: "manual" })
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
@@ -56,12 +84,21 @@ test.describe("custom rendering", () => {
     await expect(tabNamed(page, "Activity")).toBeFocused()
     await expect(page).not.toHaveURL(/#activity$/)
     await page.keyboard.press(" ")
-    await expect(tabNamed(page, "Activity")).toHaveAttribute("aria-selected", "true")
+    await expect(tabNamed(page, "Activity")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await expect(page).toHaveURL(/#activity$/)
   })
 
-  test("render functions receive the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+  test("render functions receive the part's state", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     const watched = tabNamed(page, "Watched")
     await expect(watched).not.toContainText("•")
     await watched.click()
@@ -71,10 +108,17 @@ test.describe("custom rendering", () => {
   })
 
   test("class names follow the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     const plain = tabNamed(page, "Plain")
-    await expect(plain.locator("css=:scope, *").and(page.locator(".is-unselected"))).toHaveCount(1)
+    await expect(
+      plain.locator("css=:scope, *").and(page.locator(".is-unselected"))
+    ).toHaveCount(1)
     await plain.click()
-    await expect(plain.locator("css=:scope, *").and(page.locator(".is-selected"))).toHaveCount(1)
+    await expect(
+      plain.locator("css=:scope, *").and(page.locator(".is-selected"))
+    ).toHaveCount(1)
   })
 })

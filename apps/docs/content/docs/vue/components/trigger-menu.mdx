@@ -50,11 +50,18 @@ import {
 
 <template>
   <TriggerMenu :triggers="[{ char: '@' }]">
-    <TriggerMenuInput aria-label="Message" placeholder="Type @ to mention someone…" />
+    <TriggerMenuInput
+      aria-label="Message"
+      placeholder="Type @ to mention someone…"
+    />
     <TriggerMenuContent>
       <TriggerMenuList>
-        <TriggerMenuItem value="hollis" label="Hollis Grant">Hollis Grant</TriggerMenuItem>
-        <TriggerMenuItem value="ines" label="Inès Moreau">Inès Moreau</TriggerMenuItem>
+        <TriggerMenuItem value="hollis" label="Hollis Grant"
+          >Hollis Grant</TriggerMenuItem
+        >
+        <TriggerMenuItem value="ines" label="Inès Moreau"
+          >Inès Moreau</TriggerMenuItem
+        >
       </TriggerMenuList>
     </TriggerMenuContent>
   </TriggerMenu>
@@ -165,7 +172,10 @@ Pass `editor` to connect the menu to a field you render yourself, or to another 
 
 An adapter for another editor reads its text and selection, measures a rectangle at an offset, replaces a range as one undo step, and reports changes. Report changes that weren't the user's with `user: false`, like a collaborator's, and the menu never opens for them.
 
-<TypeTable path="../../packages/core/src/foundation/text/text-editor.ts" name="TextEditorAdapter" />
+<TypeTable
+  path="../../packages/core/src/foundation/text/text-editor.ts"
+  name="TextEditorAdapter"
+/>
 
 ## Undo
 
@@ -215,11 +225,17 @@ Props are the same as below, and callbacks are events, except `onSelect`, which 
 
 ### TriggerMenu
 
-<TypeTable path="../../packages/core/src/components/trigger-menu/trigger-menu.ts" name="TriggerMenuOptions" />
+<TypeTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerMenuOptions"
+/>
 
 ### Triggers
 
-<TypeTable path="../../packages/core/src/components/trigger-menu/trigger-menu.ts" name="TriggerDefinition" />
+<TypeTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerDefinition"
+/>
 
 ### Items as Data
 
@@ -230,7 +246,10 @@ Props are the same as below, and callbacks are events, except `onSelect`, which 
 
 ### Arguments
 
-<TypeTable path="../../packages/core/src/components/trigger-menu/trigger-menu.ts" name="TriggerArgument" />
+<TypeTable
+  path="../../packages/core/src/components/trigger-menu/trigger-menu.ts"
+  name="TriggerArgument"
+/>
 
 ### TriggerMenuInput
 

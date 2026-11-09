@@ -96,7 +96,9 @@ function Example() {
       defaultValue="src/index.ts"
       activation="automatic"
       onAction={async (value) => {
-        if (!files.has(value)) return
+        if (!files.has(value)) {
+          return
+        }
         await new Promise((resolve) => setTimeout(resolve, 600))
         log(`Opened ${value}`)
       }}

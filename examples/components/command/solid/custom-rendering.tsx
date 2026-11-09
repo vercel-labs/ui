@@ -1,4 +1,10 @@
-import { Command, CommandInput, CommandItem, CommandItemText, CommandList } from "@ui-sdk/solid/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandItemText,
+  CommandList,
+} from "@ui-sdk/solid/command"
 import { For, Show } from "solid-js"
 
 const pages = ["Composition", "Installation", "Styling"]
@@ -10,13 +16,24 @@ function Example() {
       <CommandList>
         <For each={pages}>
           {(page) => (
-            <CommandItem value={page} render={(props) => <a {...props} href={`#${page.toLowerCase()}`} />}>
+            <CommandItem
+              value={page}
+              render={(props) => (
+                <a {...props} href={`#${page.toLowerCase()}`} />
+              )}
+            >
               {(state) => (
                 <>
                   <CommandItemText>
                     {(text) => (
                       <For each={text.segments}>
-                        {(segment) => (segment.match ? <strong>{segment.text}</strong> : segment.text)}
+                        {(segment) =>
+                          segment.match ? (
+                            <strong>{segment.text}</strong>
+                          ) : (
+                            segment.text
+                          )
+                        }
                       </For>
                     )}
                   </CommandItemText>

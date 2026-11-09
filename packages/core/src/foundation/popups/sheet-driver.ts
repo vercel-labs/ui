@@ -104,7 +104,9 @@ const reducedFade = 150
 // Sets inline styles and returns a function that puts back what was there,
 // property by property, unless something else changed it since.
 function setStyles(el: HTMLElement, styles: Record<string, string>) {
-  const restores = Object.entries(styles).map(([name, value]) => setStyle(el, name, value))
+  const restores = Object.entries(styles).map(([name, value]) =>
+    setStyle(el, name, value)
+  )
   return () => restores.forEach((restore) => restore())
 }
 

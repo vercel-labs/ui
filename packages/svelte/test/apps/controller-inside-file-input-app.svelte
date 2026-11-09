@@ -5,5 +5,8 @@
   let { other }: { other: FileInputController } = $props()
 </script>
 
-<FileInput name="around"><FileInputTrigger controller={other} id="trigger">Browse</FileInputTrigger></FileInput>
+<FileInput name="around"
+  ><FileInputTrigger controller={other} id="trigger">Browse</FileInputTrigger
+  ></FileInput
+>
 <FileInput controller={other} name="other" />

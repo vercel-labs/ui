@@ -13,7 +13,11 @@ A navigation landmark around the page links. Name it with `aria-label`.
   } from "@ui-sdk/core/pagination"
   import { setContext } from "svelte"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { PaginationKey, type PaginationContext } from "./context"
 
   type Details = ChangeDetails<PaginationPageChangeReason>
@@ -74,7 +78,9 @@ A navigation landmark around the page links. Name it with `aria-label`.
     onPageChange: (next: number, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `page` as it was.
       onPageChange?.(next, details)
-      if (!details.canceled) page = next
+      if (!details.canceled) {
+        page = next
+      }
     },
   }))
   const context: PaginationContext = {

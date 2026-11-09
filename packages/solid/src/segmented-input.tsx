@@ -12,7 +12,10 @@ import { joinField, type useFieldControl } from "./field-context"
 import { startingText } from "./text-control"
 import { usePart, type PartProps, type PrimitiveHandle } from "./use-primitive"
 
-type RootProps = Omit<PartProps<"div", DateInputState>, "defaultValue" | "onChange" | "onSelect">
+type RootProps = Omit<
+  PartProps<"div", DateInputState>,
+  "defaultValue" | "onChange" | "onSelect"
+>
 
 type SegmentProps = Omit<
   PartProps<"input", DateInputSegmentState>,
@@ -31,8 +34,9 @@ type Segmented = typeof dateInput
 function renderSegment(primitive: Segmented, props: SegmentProps) {
   const part = () => ({ segment: props.segment, id: props.segment.key })
   const rest = omit(props, "segment")
-  if (untrack(() => props.segment.editable))
+  if (untrack(() => props.segment.editable)) {
     return usePart(primitive, "segment", part, startingText(rest), "input")
+  }
   const text = merge(rest, {
     get children() {
       return props.children ?? ((state: DateInputSegmentState) => state.text)
@@ -45,7 +49,7 @@ function renderRoot(
   handle: PrimitiveHandle<Segmented>,
   field: ReturnType<typeof useFieldControl>,
   props: RootProps,
-  Segment: (props: SegmentProps) => JSX.Element,
+  Segment: (props: SegmentProps) => JSX.Element
 ) {
   const hidden = handle.slot("hidden-input")
   // `props.children` is read once: every read of a JSX children getter makes the segments again.
@@ -71,8 +75,14 @@ function renderRoot(
     "root",
     undefined,
     joinField(field, merge(props, { children: content }), "div"),
-    "div",
+    "div"
   )
 }
 
-export { renderRoot, renderSegment, type RootProps, type SegmentProps, type Segmented }
+export {
+  renderRoot,
+  renderSegment,
+  type RootProps,
+  type SegmentProps,
+  type Segmented,
+}

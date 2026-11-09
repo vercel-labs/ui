@@ -15,11 +15,17 @@ import { useLog } from "../../../shared/vue/log"
 const log = useLog()
 const value = ref<number | null>(4)
 
-function onValueChange(next: number | null, details: { reason: NumberInputValueChangeReason }) {
+function onValueChange(
+  next: number | null,
+  details: { reason: NumberInputValueChangeReason }
+) {
   log(`Value ${next ?? "empty"} (${details.reason})`)
 }
 
-function onValueCommit(next: number | null, details: { reason: NumberInputValueChangeReason }) {
+function onValueCommit(
+  next: number | null,
+  details: { reason: NumberInputValueChangeReason }
+) {
   log(`Committed ${next ?? "empty"} (${details.reason})`)
 }
 </script>

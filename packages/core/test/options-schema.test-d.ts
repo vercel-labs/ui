@@ -6,7 +6,9 @@ import { definePrimitive } from "../src/foundation/kernel/primitive"
 const counter = definePrimitive({
   name: "counter",
   state: () => ({ count: 0 }),
-  api: (context) => ({ add: () => context.store.set({ count: context.store.get().count + 1 }) }),
+  api: (context) => ({
+    add: () => context.store.set({ count: context.store.get().count + 1 }),
+  }),
   slots: (slot) => ({ root: slot({ press: ({ api }) => api.add() }) }),
 })
 counter({ id: "a" }).api.add()
@@ -15,7 +17,9 @@ counter({ id: "a" }).api.add()
 // @ts-expect-error `options` is missing.
 definePrimitive({
   name: "toggle",
-  state: (options: { defaultPressed?: boolean }) => ({ pressed: options.defaultPressed ?? false }),
+  state: (options: { defaultPressed?: boolean }) => ({
+    pressed: options.defaultPressed ?? false,
+  }),
   api: () => ({}),
   slots: (slot) => ({ root: slot({}) }),
 })

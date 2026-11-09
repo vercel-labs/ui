@@ -8,7 +8,9 @@ function Example() {
       <FieldLabel>PIN</FieldLabel>
       <OTPInput maxLength={4} textAlign="center">
         <OTPInputGroup>
-          <For each={[0, 1, 2, 3]}>{(index) => <OTPInputSlot index={index} />}</For>
+          <For each={[0, 1, 2, 3]}>
+            {(index) => <OTPInputSlot index={index} />}
+          </For>
         </OTPInputGroup>
       </OTPInput>
     </Field>

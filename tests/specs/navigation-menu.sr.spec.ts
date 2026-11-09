@@ -13,11 +13,17 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
@@ -40,12 +46,14 @@ test(
     })
     // The fixture's status line reports each change, which isn't the menu's announcement.
     // Focus stays on the trigger as it expands, so the state is read on the way back.
-    expect(log.filter((phrase) => !phrase.startsWith("polite: Last action"))).toEqual([
+    expect(
+      log.filter((phrase) => !phrase.startsWith("polite: Last action"))
+    ).toEqual([
       "document",
       "button, Before",
       "button, Products, not expanded",
       "link, Analytics",
       "button, Products, not expanded",
     ])
-  },
+  }
 )

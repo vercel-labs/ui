@@ -18,7 +18,9 @@ const justNoticeable = 0.02
 
 const clip = (color: Color) => ({
   ...color,
-  coords: color.coords.map((value) => Math.min(1, Math.max(0, value ?? 0))) as Color["coords"],
+  coords: color.coords.map((value) =>
+    Math.min(1, Math.max(0, value ?? 0))
+  ) as Color["coords"],
 })
 
 /**
@@ -27,7 +29,7 @@ const clip = (color: Color) => ({
  */
 function isInGamut(color: Color, gamut: ColorGamut = "srgb") {
   return convertColor(color, spaceOf(gamut)).coords.every(
-    (value) => (value ?? 0) >= -tolerance && (value ?? 0) <= 1 + tolerance,
+    (value) => (value ?? 0) >= -tolerance && (value ?? 0) <= 1 + tolerance
   )
 }
 
@@ -46,12 +48,21 @@ function mapToGamut(color: Color, gamut: ColorGamut) {
   const space = spaceOf(gamut)
   const origin = convertColor(color, "oklch")
   const [lightness, chroma, hue] = origin.coords
-  if ((lightness ?? 0) >= 1) return { space, coords: [1, 1, 1], alpha: color.alpha } satisfies Color
-  if ((lightness ?? 0) <= 0) return { space, coords: [0, 0, 0], alpha: color.alpha } satisfies Color
-  if (isInGamut(origin, gamut)) return color
-  const withChroma = (value: number) => ({ ...origin, coords: [lightness, value, hue] }) satisfies Color
+  if ((lightness ?? 0) >= 1) {
+    return { space, coords: [1, 1, 1], alpha: color.alpha } satisfies Color
+  }
+  if ((lightness ?? 0) <= 0) {
+    return { space, coords: [0, 0, 0], alpha: color.alpha } satisfies Color
+  }
+  if (isInGamut(origin, gamut)) {
+    return color
+  }
+  const withChroma = (value: number) =>
+    ({ ...origin, coords: [lightness, value, hue] }) satisfies Color
   let clipped = clip(convertColor(origin, space))
-  if (colorDistance(clipped, origin) < justNoticeable) return clipped
+  if (colorDistance(clipped, origin) < justNoticeable) {
+    return clipped
+  }
   let min = 0
   let max = chroma ?? 0
   let minInGamut = true
@@ -64,9 +75,11 @@ function mapToGamut(color: Color, gamut: ColorGamut) {
     }
     clipped = clip(convertColor(current, space))
     const distance = colorDistance(clipped, current)
-    if (distance >= justNoticeable) max = middle
-    else if (justNoticeable - distance < 0.0001) return clipped
-    else {
+    if (distance >= justNoticeable) {
+      max = middle
+    } else if (justNoticeable - distance < 0.0001) {
+      return clipped
+    } else {
       minInGamut = false
       min = middle
     }

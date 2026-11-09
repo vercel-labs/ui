@@ -1,4 +1,8 @@
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/solid/listbox"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -17,7 +21,9 @@ function Example() {
     <Listbox
       deselectable
       defaultValue="astro"
-      onValueChange={(value, details) => log(`${value ?? "Nothing"} (${details.reason})`)}
+      onValueChange={(value, details) =>
+        log(`${value ?? "Nothing"} (${details.reason})`)
+      }
       aria-label="Framework"
     >
       <For each={frameworks}>

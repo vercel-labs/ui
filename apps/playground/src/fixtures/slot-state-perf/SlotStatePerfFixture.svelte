@@ -1,7 +1,11 @@
 <script lang="ts">
   import { menu } from "@ui-sdk/core/menu"
   import { usePrimitive } from "@ui-sdk/svelte/primitive"
-  import { countSubscriptions, perfItems, perfSize } from "tests/fixtures/perf.ts"
+  import {
+    countSubscriptions,
+    perfItems,
+    perfSize,
+  } from "tests/fixtures/perf.ts"
   import SlotStateItem from "./SlotStateItem.svelte"
 
   // Custom parts built on `usePart`, which the specs render again and again
@@ -19,7 +23,12 @@
   <output aria-label="Renders">{renders}</output>
   <div role="menu" aria-label="Items">
     {#each items as item (item.value)}
-      <SlotStateItem {handle} value={item.value} label={item.label} round={renders} />
+      <SlotStateItem
+        {handle}
+        value={item.value}
+        label={item.label}
+        round={renders}
+      />
     {/each}
   </div>
   <button>After</button>

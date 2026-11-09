@@ -28,7 +28,9 @@ test("a number input's control inside a toolbar input keeps its data-slot when e
   expect(fontSize.getAttribute("data-slot")).toBe("number-input-control")
   expect(find.getAttribute("data-slot")).toBe("toolbar-input")
 
-  document.querySelector<HTMLButtonElement>('[aria-label="Increase font size"]')!.click()
+  document
+    .querySelector<HTMLButtonElement>('[aria-label="Increase font size"]')!
+    .click()
   await wait()
   expect(fontSize.value).toBe("15")
   expect(fontSize.getAttribute("data-slot")).toBe("number-input-control")

@@ -1,4 +1,8 @@
-import { createRatingController, Rating, RatingItem } from "@ui-sdk/solid/rating"
+import {
+  createRatingController,
+  Rating,
+  RatingItem,
+} from "@ui-sdk/solid/rating"
 import { createSignal } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 

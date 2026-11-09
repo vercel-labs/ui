@@ -22,7 +22,9 @@ function prototypeValue(el: TextControl) {
 // the button, microtasks run in between, so this waits a task.
 function afterReset(event: Event, run: () => void) {
   setTimeout(() => {
-    if (!event.defaultPrevented) run()
+    if (!event.defaultPrevented) {
+      run()
+    }
   })
 }
 
@@ -31,7 +33,9 @@ function afterReset(event: Event, run: () => void) {
 const scriptWrites = new Set<Element>()
 
 function writeFromScript(el: Element, write: () => void) {
-  if (scriptWrites.has(el)) return write()
+  if (scriptWrites.has(el)) {
+    return write()
+  }
   scriptWrites.add(el)
   try {
     write()
@@ -41,7 +45,11 @@ function writeFromScript(el: Element, write: () => void) {
 }
 
 function writingFromScript(el: Element) {
-  for (let node: Element | null = el; node; node = node.parentElement) if (scriptWrites.has(node)) return true
+  for (let node: Element | null = el; node; node = node.parentElement) {
+    if (scriptWrites.has(node)) {
+      return true
+    }
+  }
   return false
 }
 
@@ -53,11 +61,17 @@ function writingFromScript(el: Element) {
  * sees a change, then `input` fires so frameworks, form libraries and fields
  * hear it.
  */
-function writeValue(el: TextControl, value: string, options?: { asUser?: boolean }) {
+function writeValue(
+  el: TextControl,
+  value: string,
+  options?: { asUser?: boolean }
+) {
   if (options?.asUser && !writingFromScript(el)) {
     prototypeValue(el).set!.call(el, value)
     el.dispatchEvent(new Event("input", { bubbles: true, composed: true }))
-  } else if (el.value !== value) el.value = value
+  } else if (el.value !== value) {
+    el.value = value
+  }
 }
 
 function notify(el: TextControl, source: ValueSource) {
@@ -78,7 +92,9 @@ function watchValue(el: TextControl, listener: (source: ValueSource) => void) {
   listeners.add(listener)
   return () => {
     listeners.delete(listener)
-    if (listeners.size) return
+    if (listeners.size) {
+      return
+    }
     watchers.delete(el)
     release(el)
   }
@@ -105,15 +121,20 @@ function intercept(el: TextControl) {
   })
   const onInput = () => notify(el, "input")
   const onReset = (event: Event) => {
-    if (event.target === el.form) afterReset(event, () => notify(el, "reset"))
+    if (event.target === el.form) {
+      afterReset(event, () => notify(el, "reset"))
+    }
   }
   el.addEventListener("input", onInput)
   el.ownerDocument.addEventListener("reset", onReset, true)
   restores.set(el, () => {
     el.removeEventListener("input", onInput)
     el.ownerDocument.removeEventListener("reset", onReset, true)
-    if (own) Object.defineProperty(el, "value", own)
-    else delete (el as { value?: string }).value
+    if (own) {
+      Object.defineProperty(el, "value", own)
+    } else {
+      delete (el as { value?: string }).value
+    }
   })
 }
 

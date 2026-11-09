@@ -6,23 +6,34 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
-test("no axe violations with the default tab selected", async ({ page, open }) => {
+test("no axe violations with the default tab selected", async ({
+  page,
+  open,
+}) => {
   await open("tabs")
   await expect(panelNamed(page, "Account")).toBeVisible()
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with a panel that holds a field", async ({ page, open }) => {
+test("no axe violations with a panel that holds a field", async ({
+  page,
+  open,
+}) => {
   await open("tabs")
   await tabNamed(page, "Password").click()
   await expect(panelNamed(page, "Password")).toBeVisible()
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with focus on a disabled tab", async ({ page, open }) => {
+test("no axe violations with focus on a disabled tab", async ({
+  page,
+  open,
+}) => {
   await open("tabs", { activation: "manual" })
   await tabNamed(page, "Account").focus()
   await page.keyboard.press("End")
@@ -37,18 +48,26 @@ test("no axe violations in a vertical tab list", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with hidden panels kept mounted", async ({ page, open }) => {
+test("no axe violations with hidden panels kept mounted", async ({
+  page,
+  open,
+}) => {
   await open("tabs", { "keep-mounted": "" })
   await expect(panelNamed(page, "Account")).toBeVisible()
   expect(await audit(page)).toEqual([])
 })
 
-test("the tab list is named, and each panel is named by its tab", async ({ page, open }) => {
+test("the tab list is named, and each panel is named by its tab", async ({
+  page,
+  open,
+}) => {
   await open("tabs")
   await expect(page.getByRole("tablist", { name: "Settings" })).toBeVisible()
   await expect(page.getByRole("tabpanel", { name: "Account" })).toBeVisible()
   await tabNamed(page, "Notifications").click()
-  await expect(page.getByRole("tabpanel", { name: "Notifications" })).toBeVisible()
+  await expect(
+    page.getByRole("tabpanel", { name: "Notifications" })
+  ).toBeVisible()
 })
 
 // Every implementation must expose the same accessibility tree.

@@ -43,7 +43,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={sides} value={side()} onValueChange={(next) => next && setSide(next as Side)}>
+        <Select
+          items={sides}
+          value={side()}
+          onValueChange={(next) => next && setSide(next as Side)}
+        >
           <SelectLabel>Side</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -82,7 +86,11 @@ function Example() {
             </For>
           </SelectContent>
         </Select>
-        <Select items={aligns} value={align()} onValueChange={(next) => next && setAlign(next as Align)}>
+        <Select
+          items={aligns}
+          value={align()}
+          onValueChange={(next) => next && setAlign(next as Align)}
+        >
           <SelectLabel>Align</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -122,7 +130,10 @@ function Example() {
           </SelectContent>
         </Select>
         <label data-slot="label">
-          <Checkbox checked={anchored()} onCheckedChange={(next) => setAnchored(next === true)}>
+          <Checkbox
+            checked={anchored()}
+            onCheckedChange={(next) => setAnchored(next === true)}
+          >
             <CheckboxIndicator>
               <svg
                 viewBox="0 0 24 24"

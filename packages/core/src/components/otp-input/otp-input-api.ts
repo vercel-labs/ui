@@ -17,10 +17,20 @@ import {
   type OTPInputPattern,
   type Selection,
 } from "./otp-input-model"
-import { type ChangeDetails, type ChangeOptions, type CommitDetails } from "../../foundation/kernel/details"
+import {
+  type ChangeDetails,
+  type ChangeOptions,
+  type CommitDetails,
+} from "../../foundation/kernel/details"
 import { isComposing, on } from "../../foundation/kernel/events"
-import type { PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
-import { createChange, createCommit } from "../../foundation/kernel/input-source"
+import type {
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
+import {
+  createChange,
+  createCommit,
+} from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
 import type { OTPInputSlotProps } from "./otp-input"
 
@@ -29,7 +39,13 @@ import type { OTPInputSlotProps } from "./otp-input"
  * @stable
  */
 type OTPInputValueChangeReason =
-  "input-change" | "paste" | "undo" | "redo" | "reset" | "restore" | "imperative"
+  | "input-change"
+  | "paste"
+  | "undo"
+  | "redo"
+  | "reset"
+  | "restore"
+  | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -52,12 +68,18 @@ type OTPInputOptions = {
    * controller. Autofill and codes from the keyboard's suggestions are
    * `"input-change"`. `details.cancel()` keeps the code as it was.
    */
-  onValueChange?: (value: string, details: ChangeDetails<OTPInputValueChangeReason>) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<OTPInputValueChangeReason>
+  ) => void
   /**
    * Runs when a change fills every slot, with the whole code, like to verify
    * it. A controller filling it counts, so does a code that changes while full.
    */
-  onValueCommit?: (value: string, details: CommitDetails<OTPInputValueChangeReason>) => void
+  onValueCommit?: (
+    value: string,
+    details: CommitDetails<OTPInputValueChangeReason>
+  ) => void
   /**
    * How many characters the code has, one slot each.
    * @defaultValue 6
@@ -129,7 +151,9 @@ type State = {
 }
 
 const finiteLength = (maxLength: number | undefined) =>
-  maxLength !== undefined && Number.isInteger(maxLength) && maxLength > 0 ? maxLength : 6
+  maxLength !== undefined && Number.isInteger(maxLength) && maxLength > 0
+    ? maxLength
+    : 6
 
 function settings(options: OTPInputOptions) {
   return {
@@ -155,7 +179,8 @@ function cleanCode(value: string, pattern: OTPInputPattern, maxLength: number) {
 }
 
 // Password managers' own elements, which they put over inputs they can fill.
-const badges = "[data-lastpass-icon-root], com-1password-button, [data-dashlanecreated]"
+const badges =
+  "[data-lastpass-icon-root], com-1password-button, [data-dashlanecreated]"
 // How much room a badge takes beside the input.
 const badgeSpace = 40
 
@@ -164,14 +189,26 @@ const hiddenSelection = new WeakSet<Document | ShadowRoot>()
 // The input's text is transparent, but its selection and autofill colors are
 // drawn by the browser over the slots. Only a stylesheet reaches those.
 function hideNativeHighlights(root: Node) {
-  if (!(root instanceof Document || root instanceof ShadowRoot) || hiddenSelection.has(root)) return
-  if (typeof CSSStyleSheet === "undefined" || !("adoptedStyleSheets" in root)) return
+  if (
+    !(root instanceof Document || root instanceof ShadowRoot) ||
+    hiddenSelection.has(root)
+  ) {
+    return
+  }
+  if (typeof CSSStyleSheet === "undefined" || !("adoptedStyleSheets" in root)) {
+    return
+  }
   hiddenSelection.add(root)
   const input = '[data-slot="otp-input-control"]'
   const transparent =
     "background:transparent!important;color:transparent!important;-webkit-text-fill-color:transparent!important;box-shadow:none!important"
   const sheet = new CSSStyleSheet()
-  sheet.replaceSync([`${input}::selection{${transparent}}`, `${input}:autofill{${transparent}}`].join("\n"))
+  sheet.replaceSync(
+    [
+      `${input}::selection{${transparent}}`,
+      `${input}:autofill{${transparent}}`,
+    ].join("\n")
+  )
   // Engines without `:autofill` skip only that rule, not the sheet.
   try {
     sheet.insertRule(`${input}:-webkit-autofill{${transparent}}`)
@@ -180,7 +217,11 @@ function hideNativeHighlights(root: Node) {
 }
 
 function otpInputApi(
-  context: PrimitiveContext<OTPInputOptions, State, "root" | "control" | "slot" | "group" | "separator">,
+  context: PrimitiveContext<
+    OTPInputOptions,
+    State,
+    "root" | "control" | "slot" | "group" | "separator"
+  >
 ) {
   const { store, options, element } = context
   const change = createChange(context)
@@ -197,46 +238,76 @@ function otpInputApi(
   let pointerType = ""
 
   // A reset or a restored page puts a code back; nobody just entered it.
-  function complete(value: string, reason: OTPInputValueChangeReason, event?: Event) {
-    if (value.length !== store.get().maxLength || reason === "reset" || reason === "restore") return
+  function complete(
+    value: string,
+    reason: OTPInputValueChangeReason,
+    event?: Event
+  ) {
+    if (
+      value.length !== store.get().maxLength ||
+      reason === "reset" ||
+      reason === "restore"
+    ) {
+      return
+    }
     commit("value", value, { reason, event })
   }
 
   // A change asked for from outside the input: a controller, a reset. The
   // input follows unless it was canceled.
-  function write(value: string, reason: OTPInputValueChangeReason, event?: Event) {
+  function write(
+    value: string,
+    reason: OTPInputValueChangeReason,
+    event?: Event
+  ) {
     const { pattern, maxLength } = store.get()
     const code = cleanCode(value, pattern, maxLength)
     const previous = store.get().value
-    if (!change("value", code, { reason, event })) return false
-    if (!isControlled()) store.set({ value: code })
+    if (!change("value", code, { reason, event })) {
+      return false
+    }
+    if (!isControlled()) {
+      store.set({ value: code })
+    }
     syncElement()
     // A reset may leave the element's value as it was, so the browser's flag is read either way.
     checkLength()
-    if (code !== previous) complete(code, reason, event)
+    if (code !== previous) {
+      complete(code, reason, event)
+    }
     return true
   }
 
   // Follows whether the browser flags the code as too short. One read per change.
   function checkLength() {
     const el = input()
-    if (el) store.set({ tooShort: el.validity.tooShort })
+    if (el) {
+      store.set({ tooShort: el.validity.tooShort })
+    }
   }
 
   // Puts the state's value in the element, and the selection where it belongs.
   function syncElement() {
     const el = input()
     const { value, maxLength } = store.get()
-    if (!el || el.value === value) return
+    if (!el || el.value === value) {
+      return
+    }
     writing = true
     el.value = value
     writing = false
     // A value written from code is never flagged as too short.
     store.set({ tooShort: false })
-    if (isFocused(el)) select(el, focusSelection(value.length, maxLength))
+    if (isFocused(el)) {
+      select(el, focusSelection(value.length, maxLength))
+    }
   }
 
-  function select(el: HTMLInputElement, selection: Selection, direction?: "forward" | "backward") {
+  function select(
+    el: HTMLInputElement,
+    selection: Selection,
+    direction?: "forward" | "backward"
+  ) {
     el.setSelectionRange(selection.start, selection.end, direction)
     store.set({ selection: { start: selection.start, end: selection.end } })
   }
@@ -246,38 +317,61 @@ function otpInputApi(
   // After a deletion the caret stays where the character was, so typing puts
   // one back there and the characters after it keep their slots.
   function syncSelection(el: HTMLInputElement) {
-    if (!isFocused(el)) return
+    if (!isFocused(el)) {
+      return
+    }
     const current = { start: el.selectionStart ?? 0, end: el.selectionEnd ?? 0 }
     const deleted = afterDelete && current.start === current.end
     const next = deleted
       ? null
-      : slotSelection(current, store.get().selection, el.value.length, store.get().maxLength)
-    if (next) select(el, next, next.direction)
-    else store.set({ selection: current })
+      : slotSelection(
+          current,
+          store.get().selection,
+          el.value.length,
+          store.get().maxLength
+        )
+    if (next) {
+      select(el, next, next.direction)
+    } else {
+      store.set({ selection: current })
+    }
   }
 
   // The input changed: typing, deleting, undo, a paste or autofill. Anything
   // that isn't a code goes back, and so does a canceled change.
   function typed(el: HTMLInputElement, event: Event) {
-    if (writing) return
+    if (writing) {
+      return
+    }
     afterDelete = !!(event as InputEvent).inputType?.startsWith("delete")
     const { pattern, maxLength, value: previous } = store.get()
     let next = el.value
     if (next !== previous && !isValidCode(next, pattern, maxLength)) {
       // An input method owns its text until it commits; it goes back then.
-      if ((event as InputEvent).isComposing) return
+      if ((event as InputEvent).isComposing) {
+        return
+      }
       const cleaned = pastedCode(next, pattern)
       next = cleaned && cleaned.length <= maxLength ? cleaned : previous
       restore(el, next)
     }
     if (next !== previous) {
-      const { reason, event: cause } = inserting ?? { reason: reasonOf(event), event }
+      const { reason, event: cause } = inserting ?? {
+        reason: reasonOf(event),
+        event,
+      }
       if (change("value", next, { reason, event: cause })) {
-        if (!isControlled()) store.set({ value: next })
+        if (!isControlled()) {
+          store.set({ value: next })
+        }
         // A controlled input shows what its owner passes back, once the owner has rendered.
-        else queueMicrotask(syncElement)
+        else {
+          queueMicrotask(syncElement)
+        }
         complete(next, reason, cause)
-      } else restore(el, previous)
+      } else {
+        restore(el, previous)
+      }
     }
     checkLength()
     syncSelection(el)
@@ -286,7 +380,10 @@ function otpInputApi(
   // Puts a value back, keeping the caret where the rejected text began.
   function restore(el: HTMLInputElement, value: string) {
     const inserted = el.value.length - value.length
-    const caret = Math.max(0, (el.selectionStart ?? el.value.length) - Math.max(0, inserted))
+    const caret = Math.max(
+      0,
+      (el.selectionStart ?? el.value.length) - Math.max(0, inserted)
+    )
     writing = true
     el.value = value
     writing = false
@@ -296,11 +393,20 @@ function otpInputApi(
   // Replaces the whole value the way typing would, so the browser can undo it.
   // `insertText` is the only way to edit an input that keeps its undo history;
   // where it's missing, the value is set and `input` sent instead.
-  function insert(el: HTMLInputElement, value: string, reason: OTPInputValueChangeReason, event: Event) {
+  function insert(
+    el: HTMLInputElement,
+    value: string,
+    reason: OTPInputValueChangeReason,
+    event: Event
+  ) {
     inserting = { reason, event }
     try {
       el.setSelectionRange(0, el.value.length)
-      const inserted = el.ownerDocument.execCommand?.("insertText", false, value)
+      const inserted = el.ownerDocument.execCommand?.(
+        "insertText",
+        false,
+        value
+      )
       if (!inserted || el.value !== value) {
         el.value = value
         el.dispatchEvent(new Event("input", { bubbles: true }))
@@ -312,13 +418,25 @@ function otpInputApi(
 
   // Several characters at once, from a paste, a drop, autofill or a code the
   // keyboard suggests: spaces and dashes go, and a whole code replaces the value.
-  function insertMany(el: HTMLInputElement, text: string, reason: OTPInputValueChangeReason, event: Event) {
+  function insertMany(
+    el: HTMLInputElement,
+    text: string,
+    reason: OTPInputValueChangeReason,
+    event: Event
+  ) {
     const { pattern, maxLength, value } = store.get()
     const code = pastedCode(text, pattern)
-    if (!code) return
-    const selection = { start: el.selectionStart ?? value.length, end: el.selectionEnd ?? value.length }
+    if (!code) {
+      return
+    }
+    const selection = {
+      start: el.selectionStart ?? value.length,
+      end: el.selectionEnd ?? value.length,
+    }
     const next = insertCode(value, selection, code, maxLength)
-    if (next !== value) insert(el, next, reason, event)
+    if (next !== value) {
+      insert(el, next, reason, event)
+    }
   }
 
   const editable = () => !isDisabled(store.get()) && !store.get().readOnly
@@ -326,8 +444,11 @@ function otpInputApi(
   // The slot a press landed on. The input covers the slots, so the slot is
   // found under the point.
   function slotAt(el: HTMLInputElement, event: MouseEvent) {
-    const hit = el.ownerDocument.elementsFromPoint?.(event.clientX, event.clientY) ?? []
-    return elements<OTPInputSlotProps>(context, "slot").find((entry) => hit.includes(entry.el))
+    const hit =
+      el.ownerDocument.elementsFromPoint?.(event.clientX, event.clientY) ?? []
+    return elements<OTPInputSlotProps>(context, "slot").find((entry) =>
+      hit.includes(entry.el)
+    )
   }
 
   // A mouse press selects the slot under it. The browser would put the caret
@@ -337,21 +458,34 @@ function otpInputApi(
   function pressSlot(el: HTMLInputElement, event: MouseEvent) {
     afterDelete = false
     const slot = slotAt(el, event)
-    if (!slot || isDisabled(store.get())) return
+    if (!slot || isDisabled(store.get())) {
+      return
+    }
     if (event.type === "mousedown") {
       event.preventDefault()
       el.focus()
     }
-    select(el, pressSelection(slot.props?.index ?? 0, el.value.length, store.get().maxLength))
+    select(
+      el,
+      pressSelection(
+        slot.props?.index ?? 0,
+        el.value.length,
+        store.get().maxLength
+      )
+    )
   }
 
   // Password managers add their badge on focus. When one is on the page and
   // there's room, the input widens past the last slot to push it aside.
   function checkBadge(el: HTMLInputElement) {
     const root = element("root")
-    if (!root || !el.ownerDocument.querySelector(badges)) return
+    if (!root || !el.ownerDocument.querySelector(badges)) {
+      return
+    }
     const view = el.ownerDocument.defaultView
-    const room = !view || root.getBoundingClientRect().right + badgeSpace <= view.innerWidth
+    const room =
+      !view ||
+      root.getBoundingClientRect().right + badgeSpace <= view.innerWidth
     store.set({ pushBadge: room })
   }
 
@@ -359,9 +493,15 @@ function otpInputApi(
     const { value, pattern, maxLength } = store.get()
     // The browser restores what was typed when going back to a page.
     const restored =
-      !isControlled() && el.value && el.value !== value && isValidCode(el.value, pattern, maxLength)
-    if (restored) write(el.value, "restore")
-    else syncElement()
+      !isControlled() &&
+      el.value &&
+      el.value !== value &&
+      isValidCode(el.value, pattern, maxLength)
+    if (restored) {
+      write(el.value, "restore")
+    } else {
+      syncElement()
+    }
     hideNativeHighlights(el.getRootNode())
     const doc = el.ownerDocument
     const cleanups = [
@@ -371,17 +511,26 @@ function otpInputApi(
       // digit, goes through `insertMany`, which cleans it up or drops it.
       on(el, "beforeinput", (event) => {
         const type = event.inputType
-        if (inserting || !type.startsWith("insert")) return
-        if (type === "insertCompositionText" || type === "insertFromPaste") return
-        const text = event.data ?? event.dataTransfer?.getData("text/plain") ?? ""
+        if (inserting || !type.startsWith("insert")) {
+          return
+        }
+        if (type === "insertCompositionText" || type === "insertFromPaste") {
+          return
+        }
+        const text =
+          event.data ?? event.dataTransfer?.getData("text/plain") ?? ""
         // One fitting character is typing, which the browser does itself.
-        if (text.length <= 1 && fitsPattern(text, store.get().pattern)) return
+        if (text.length <= 1 && fitsPattern(text, store.get().pattern)) {
+          return
+        }
         event.preventDefault()
         insertMany(el, text, "input-change", event)
       }),
       on(el, "paste", (event) => {
         const text = event.clipboardData?.getData("text/plain")
-        if (!editable() || !text) return
+        if (!editable() || !text) {
+          return
+        }
         event.preventDefault()
         insertMany(el, text, "paste", event)
       }),
@@ -398,22 +547,40 @@ function otpInputApi(
       // the browser moves the caret, whose `selectionchange` comes too late for
       // a key typed right after. With a modifier, they extend the selection natively.
       on(el, "keydown", (event) => {
-        if (event.key !== "Backspace" && event.key !== "Delete") afterDelete = false
+        if (event.key !== "Backspace" && event.key !== "Delete") {
+          afterDelete = false
+        }
         // An input method owns the keys while it composes, like arrows choosing a candidate.
-        if (isComposing(event)) return
-        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return
+        if (isComposing(event)) {
+          return
+        }
+        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+          return
+        }
         const { selection, maxLength } = store.get()
-        const next = keySelection(event.key, selection, el.value.length, maxLength, isRTL(el))
-        if (!next) return
+        const next = keySelection(
+          event.key,
+          selection,
+          el.value.length,
+          maxLength,
+          isRTL(el)
+        )
+        if (!next) {
+          return
+        }
         event.preventDefault()
         select(el, next)
       }),
       on(el, "pointerdown", (event) => (pointerType = event.pointerType)),
       on(el, "mousedown", (event) => {
-        if (pointerType === "mouse" && event.button === 0) pressSlot(el, event)
+        if (pointerType === "mouse" && event.button === 0) {
+          pressSlot(el, event)
+        }
       }),
       on(el, "click", (event) => {
-        if (pointerType !== "mouse") pressSlot(el, event)
+        if (pointerType !== "mouse") {
+          pressSlot(el, event)
+        }
       }),
       on(el, "select", () => syncSelection(el)),
       // Selection changes fire on the input in newer engines, and on the document in all.
@@ -423,14 +590,18 @@ function otpInputApi(
         doc,
         "reset",
         (event) => {
-          if (event.target !== el.form) return
+          if (event.target !== el.form) {
+            return
+          }
           afterReset(event, () => write(store.get().initial, "reset"))
         },
-        { capture: true },
+        { capture: true }
       ),
       watchFieldsets(el, (disabled) => store.set({ formDisabled: disabled })),
     ]
-    if (isFocused(el)) store.set({ focused: true })
+    if (isFocused(el)) {
+      store.set({ focused: true })
+    }
     return () => cleanups.forEach((cleanup) => cleanup())
   }
 
@@ -438,10 +609,13 @@ function otpInputApi(
     /** The code. */
     getValue: () => store.get().value,
     /** Sets the code, as typing it would. Characters that don't fit the pattern are dropped. */
-    setValue: (value: string, { reason = "imperative", event }: OTPInputChangeOptions = {}) =>
-      write(value, reason, event),
+    setValue: (
+      value: string,
+      { reason = "imperative", event }: OTPInputChangeOptions = {}
+    ) => write(value, reason, event),
     /** Empties the code. */
-    clear: ({ reason = "imperative", event }: OTPInputChangeOptions = {}) => write("", reason, event),
+    clear: ({ reason = "imperative", event }: OTPInputChangeOptions = {}) =>
+      write("", reason, event),
     /** Moves focus to the input. */
     focus: () => input()?.focus(),
     internal: {
@@ -464,8 +638,12 @@ function isFocused(el: HTMLElement) {
 // The browser's own history moves are reported as undo and redo.
 function reasonOf(event: Event) {
   const type = (event as InputEvent).inputType
-  if (type === "historyUndo") return "undo"
-  if (type === "historyRedo") return "redo"
+  if (type === "historyUndo") {
+    return "undo"
+  }
+  if (type === "historyRedo") {
+    return "redo"
+  }
   return "input-change"
 }
 

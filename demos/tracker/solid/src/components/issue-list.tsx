@@ -37,7 +37,11 @@ import {
 import { Pagination } from "@/components/ui/pagination"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "@/components/ui/toast"
-import { Toolbar, ToolbarButton, ToolbarSeparator } from "@/components/ui/toolbar"
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSeparator,
+} from "@/components/ui/toolbar"
 import { deleteIssues, updateIssues } from "@/lib/tracker"
 
 function plural(count: number) {
@@ -49,18 +53,26 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
   const menu = createMenuController<Issue>()
   const [selected, setSelected] = createSignal<string[]>([])
   let all: HTMLButtonElement | undefined
-  const pageCount = createMemo(() => Math.max(1, Math.ceil(props.issues.length / props.pageSize)))
+  const pageCount = createMemo(() =>
+    Math.max(1, Math.ceil(props.issues.length / props.pageSize))
+  )
   const page = createMemo(() => Math.min(props.query.page, pageCount()))
-  const rows = createMemo(() => props.issues.slice((page() - 1) * props.pageSize, page() * props.pageSize))
+  const rows = createMemo(() =>
+    props.issues.slice((page() - 1) * props.pageSize, page() * props.pageSize)
+  )
   const pageHref = createMemo(() => {
     const query = props.query
     return (page: number) => href(query, { page })
   })
-  const checked = createMemo(() => selected().filter((id) => rows().some((issue) => issue.id === id)))
+  const checked = createMemo(() =>
+    selected().filter((id) => rows().some((issue) => issue.id === id))
+  )
 
   function setStatus(ids: string[], status: Status) {
     updateIssues(ids, { status })
-    toast(`${ids.length === 1 ? ids[0] : plural(ids.length)} moved to ${statusOf(status).label}`)
+    toast(
+      `${ids.length === 1 ? ids[0] : plural(ids.length)} moved to ${statusOf(status).label}`
+    )
   }
 
   function setPriority(ids: string[], priority: Priority) {
@@ -73,24 +85,33 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
       description: "Deleted issues and their comments can't be brought back.",
       confirmLabel: "Delete",
     })
-    if (!yes) return
+    if (!yes) {
+      return
+    }
     deleteIssues(ids)
     setSelected([])
-    if (props.query.issue && ids.includes(props.query.issue))
+    if (props.query.issue && ids.includes(props.query.issue)) {
       navigate(href(props.query, { issue: null }), { scroll: false })
+    }
     all?.focus()
     toast.success(`${plural(ids.length)} deleted`)
   }
 
   async function run(action: string) {
     const issue = menu.getPayload()
-    if (!issue) return
-    if (action === "open") navigate(href(props.query, { issue: issue.id }), { scroll: false })
+    if (!issue) {
+      return
+    }
+    if (action === "open") {
+      navigate(href(props.query, { issue: issue.id }), { scroll: false })
+    }
     if (action === "copy") {
       await navigator.clipboard.writeText(issue.id)
       toast(`Copied ${issue.id}`)
     }
-    if (action === "delete") remove([issue.id])
+    if (action === "delete") {
+      remove([issue.id])
+    }
   }
 
   return (
@@ -111,11 +132,19 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
           />
           <Show
             when={checked().length > 0}
-            fallback={<span class="text-sm text-muted-foreground">{plural(props.issues.length)}</span>}
+            fallback={
+              <span class="text-sm text-muted-foreground">
+                {plural(props.issues.length)}
+              </span>
+            }
           >
             <Toolbar aria-label="Selected issues" class="flex-1 gap-1">
-              <span class="me-2 text-sm font-medium">{checked().length} selected</span>
-              <Menu onAction={(status) => setStatus(checked(), status as Status)}>
+              <span class="me-2 text-sm font-medium">
+                {checked().length} selected
+              </span>
+              <Menu
+                onAction={(status) => setStatus(checked(), status as Status)}
+              >
                 <ToolbarButton
                   render={(attributes) => <MenuTrigger {...attributes} />}
                   class={buttonVariants({ size: "sm", variant: "ghost" })}
@@ -170,7 +199,10 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
                     data-current={issue().id === props.query.issue || undefined}
                     class="flex h-11 items-center gap-3 border-b border-border ps-4 pe-2 transition-colors hover:bg-muted/50 has-data-checked:bg-muted/70 data-current:bg-muted"
                   >
-                    <Checkbox value={issue().id} aria-label={`Select ${issue().id}`} />
+                    <Checkbox
+                      value={issue().id}
+                      aria-label={`Select ${issue().id}`}
+                    />
                     <PriorityIcon priority={issue().priority} label />
                     <span class="hidden w-12 shrink-0 text-xs text-muted-foreground tabular-nums @md:block">
                       {issue().id}
@@ -183,7 +215,10 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
                     >
                       {issue().title}
                     </a>
-                    <IssueLabels labels={issue().labels} class="hidden shrink-0 gap-1 @3xl:flex" />
+                    <IssueLabels
+                      labels={issue().labels}
+                      class="hidden shrink-0 gap-1 @3xl:flex"
+                    />
                     <Show when={issue().due}>
                       {(due) => (
                         <span class="hidden w-12 shrink-0 text-end text-xs text-muted-foreground @lg:block">
@@ -196,7 +231,10 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
                       controller={menu}
                       payload={issue()}
                       aria-label={`Actions for ${issue().id}`}
-                      class={buttonVariants({ size: "icon-sm", variant: "ghost" })}
+                      class={buttonVariants({
+                        size: "icon-sm",
+                        variant: "ghost",
+                      })}
                     >
                       <Ellipsis aria-hidden="true" />
                     </MenuTrigger>
@@ -209,7 +247,11 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
       </CheckboxGroup>
       <Show when={pageCount() > 1}>
         <footer class="flex shrink-0 justify-center border-t border-border p-2">
-          <Pagination page={page()} pageCount={pageCount()} getHref={pageHref()} />
+          <Pagination
+            page={page()}
+            pageCount={pageCount()}
+            getHref={pageHref()}
+          />
         </footer>
       </Show>
       <Menu controller={menu} onAction={run}>
@@ -226,10 +268,16 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
                       <MenuSubContent>
                         <MenuRadioGroup
                           value={payload().status}
-                          onValueChange={(status) => setStatus([payload().id], status as Status)}
+                          onValueChange={(status) =>
+                            setStatus([payload().id], status as Status)
+                          }
                         >
                           <For each={statuses}>
-                            {(status) => <MenuRadioItem value={status.value}>{status.label}</MenuRadioItem>}
+                            {(status) => (
+                              <MenuRadioItem value={status.value}>
+                                {status.label}
+                              </MenuRadioItem>
+                            )}
                           </For>
                         </MenuRadioGroup>
                       </MenuSubContent>
@@ -239,11 +287,15 @@ function IssueList(props: { issues: Issue[]; query: Query; pageSize: number }) {
                       <MenuSubContent>
                         <MenuRadioGroup
                           value={payload().priority}
-                          onValueChange={(priority) => setPriority([payload().id], priority as Priority)}
+                          onValueChange={(priority) =>
+                            setPriority([payload().id], priority as Priority)
+                          }
                         >
                           <For each={priorities}>
                             {(priority) => (
-                              <MenuRadioItem value={priority.value}>{priority.label}</MenuRadioItem>
+                              <MenuRadioItem value={priority.value}>
+                                {priority.label}
+                              </MenuRadioItem>
                             )}
                           </For>
                         </MenuRadioGroup>

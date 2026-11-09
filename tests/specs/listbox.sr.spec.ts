@@ -14,20 +14,31 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
 // The fixture's status regions add phrases that say nothing about the component.
-const withoutNoise = (log: string[]) => log.filter((phrase) => !phrase.startsWith("polite:"))
+const withoutNoise = (log: string[]) =>
+  log.filter((phrase) => !phrase.startsWith("polite:"))
 
 // Tabs into a single listbox, where the selection follows focus, down over a
 // disabled option it skips, and out.
-test("announcements while choosing one option with a keyboard", async ({ page, open, tab }) => {
+test("announcements while choosing one option with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("listbox", { sr: "", value: "mushroom" })
   const log = await record(page, async () => {
     await page.getByRole("button", { name: "Before" }).focus()
@@ -47,7 +58,11 @@ test("announcements while choosing one option with a keyboard", async ({ page, o
 })
 
 // Tabs into a multiple listbox, toggles an option and extends a range.
-test("announcements while choosing several options with a keyboard", async ({ page, open, tab }) => {
+test("announcements while choosing several options with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("listbox", { sr: "", multiple: "", grouped: "" })
   const log = await record(page, async () => {
     await page.getByRole("button", { name: "Before" }).focus()
@@ -56,7 +71,10 @@ test("announcements while choosing several options with a keyboard", async ({ pa
     await page.keyboard.press(" ")
     await expect(option(page, "Basil")).toHaveAttribute("aria-selected", "true")
     await page.keyboard.press("Shift+ArrowDown")
-    await expect(option(page, "Garlic")).toHaveAttribute("aria-selected", "true")
+    await expect(option(page, "Garlic")).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await page.keyboard.press("ArrowDown")
     await expect(option(page, "Mushroom")).toBeFocused()
   })

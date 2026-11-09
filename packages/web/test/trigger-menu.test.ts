@@ -29,7 +29,9 @@ test("a content with a container stays the one content, and lists the data items
   expect(contents[0].parentElement?.id).toBe("box")
   expect(contents[0].getAttribute("data-open")).not.toBeNull()
   expect(contents[0].style.position).toBe("fixed")
-  expect([...contents[0].querySelectorAll("ui-trigger-menu-item")].map((item) => item.textContent)).toEqual([
-    "Ada",
-  ])
+  expect(
+    [...contents[0].querySelectorAll("ui-trigger-menu-item")].map(
+      (item) => item.textContent
+    )
+  ).toEqual(["Ada"])
 })

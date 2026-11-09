@@ -47,7 +47,9 @@ let cached: CoreExport[] | undefined
 
 /** Every export of `@ui-sdk/core`: functions first, then types, each alphabetical. */
 function coreExports() {
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
   const file = path.join(coreSource, "index.ts")
   // Resolves `#dev` to the development module, whose exports carry the JSDoc.
   const program = ts.createProgram([file], {
@@ -64,7 +66,10 @@ function coreExports() {
   cached = checker
     .getExportsOfModule(checker.getSymbolAtLocation(source)!)
     .map((symbol) => {
-      const target = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol
+      const target =
+        symbol.flags & ts.SymbolFlags.Alias
+          ? checker.getAliasedSymbol(symbol)
+          : symbol
       const declaration = target.declarations?.[0]
       const from = declaration
         ? path
@@ -78,48 +83,84 @@ function coreExports() {
         signature: isType
           ? typeSignature(symbol.name, declaration)
           : callSignature(symbol.name, target, checker),
-        text: ts.displayPartsToString(target.getDocumentationComment(checker)).replace(/\s+/g, " ").trim(),
+        text: ts
+          .displayPartsToString(target.getDocumentationComment(checker))
+          .replace(/\s+/g, " ")
+          .trim(),
         type: isType,
-        experimental: target.getJsDocTags(checker).some((tag) => tag.name === "experimental"),
+        experimental: target
+          .getJsDocTags(checker)
+          .some((tag) => tag.name === "experimental"),
         members: isType ? membersOf(target, checker) : [],
       }
     })
-    .sort((a, b) => Number(a.type) - Number(b.type) || a.name.localeCompare(b.name))
+    .sort(
+      (a, b) => Number(a.type) - Number(b.type) || a.name.localeCompare(b.name)
+    )
   return cached
 }
 
 // The fields of an object type, like an options type's. None for unions, functions and records.
 function membersOf(symbol: ts.Symbol, checker: ts.TypeChecker) {
   const type = checker.getDeclaredTypeOfSymbol(symbol)
-  if (type.isUnion() || type.getCallSignatures().length || !(type.flags & ts.TypeFlags.Object)) return []
+  if (
+    type.isUnion() ||
+    type.getCallSignatures().length ||
+    !(type.flags & ts.TypeFlags.Object)
+  ) {
+    return []
+  }
   return checker
     .getPropertiesOfType(type)
-    .filter((property) => !property.getJsDocTags(checker).some((tag) => tag.name === "internal"))
+    .filter(
+      (property) =>
+        !property.getJsDocTags(checker).some((tag) => tag.name === "internal")
+    )
     .map((property) => {
       const optional = property.flags & ts.SymbolFlags.Optional
       const declared = checker.typeToString(
         checker.getTypeOfSymbol(property),
         undefined,
-        ts.TypeFormatFlags.NoTruncation,
+        ts.TypeFormatFlags.NoTruncation
       )
       return {
         name: `${property.name}${optional ? "?" : ""}`,
         // Without `undefined`, an optional function loses the parentheses the union needed.
-        type: optional ? declared.replace(/ \| undefined$/, "").replace(/^\((\(.*=>.*)\)$/, "$1") : declared,
-        text: ts.displayPartsToString(property.getDocumentationComment(checker)).replace(/\s+/g, " ").trim(),
+        type: optional
+          ? declared
+              .replace(/ \| undefined$/, "")
+              .replace(/^\((\(.*=>.*)\)$/, "$1")
+          : declared,
+        text: ts
+          .displayPartsToString(property.getDocumentationComment(checker))
+          .replace(/\s+/g, " ")
+          .trim(),
       }
     })
 }
 
 // `name(first, second?)`, from the first call signature.
-function callSignature(name: string, symbol: ts.Symbol, checker: ts.TypeChecker) {
-  const [signature] = checker.getSignaturesOfType(checker.getTypeOfSymbol(symbol), ts.SignatureKind.Call)
-  if (!signature) return name
+function callSignature(
+  name: string,
+  symbol: ts.Symbol,
+  checker: ts.TypeChecker
+) {
+  const [signature] = checker.getSignaturesOfType(
+    checker.getTypeOfSymbol(symbol),
+    ts.SignatureKind.Call
+  )
+  if (!signature) {
+    return name
+  }
   const parameters = signature.parameters.map((parameter) => {
-    const declaration = parameter.valueDeclaration as ts.ParameterDeclaration | undefined
+    const declaration = parameter.valueDeclaration as
+      ts.ParameterDeclaration | undefined
     const optional = declaration?.questionToken || declaration?.initializer
     // A destructured parameter has no name of its own.
-    const name = declaration && !ts.isIdentifier(declaration.name) ? "options" : parameter.name
+    const name =
+      declaration && !ts.isIdentifier(declaration.name)
+        ? "options"
+        : parameter.name
     return `${declaration?.dotDotDotToken ? "..." : ""}${name}${optional ? "?" : ""}`
   })
   return `${name}(${parameters.join(", ")})`
@@ -128,28 +169,38 @@ function callSignature(name: string, symbol: ts.Symbol, checker: ts.TypeChecker)
 // `type Name<A, B>`, without the body.
 function typeSignature(name: string, declaration: ts.Declaration | undefined) {
   const parameters =
-    declaration && (ts.isTypeAliasDeclaration(declaration) || ts.isInterfaceDeclaration(declaration))
+    declaration &&
+    (ts.isTypeAliasDeclaration(declaration) ||
+      ts.isInterfaceDeclaration(declaration))
       ? declaration.typeParameters?.map((parameter) => parameter.name.text)
       : undefined
   return `type ${name}${parameters?.length ? `<${parameters.join(", ")}>` : ""}`
 }
 
 // `drag-and-drop` reads "Drag and drop".
-const layerTitle = (layer: string) => layer[0].toUpperCase() + layer.slice(1).replaceAll("-", " ")
+const layerTitle = (layer: string) =>
+  layer[0].toUpperCase() + layer.slice(1).replaceAll("-", " ")
 
 /** The exports of one layer, or with `"other"`, of each layer `coreLayers` doesn't name. */
 function exportsByLayer(layer: string) {
   const all = coreExports()
   const layers =
     layer === "other"
-      ? [...new Set(all.map((entry) => entry.layer))].filter((name) => !coreLayers.includes(name))
+      ? [...new Set(all.map((entry) => entry.layer))].filter(
+          (name) => !coreLayers.includes(name)
+        )
       : [layer]
-  return layers.map((name) => ({ layer: name, entries: all.filter((entry) => entry.layer === name) }))
+  return layers.map((name) => ({
+    layer: name,
+    entries: all.filter((entry) => entry.layer === name),
+  }))
 }
 
 /** Every entry of `@ui-sdk/core` but `internal` and `renderer`, which are for us, with the docs page that documents it, if one does. */
 function coreEntries() {
-  const { exports } = JSON.parse(readFileSync(path.join(core, "package.json"), "utf8")) as {
+  const { exports } = JSON.parse(
+    readFileSync(path.join(core, "package.json"), "utf8")
+  ) as {
     exports: Record<string, string>
   }
   return Object.keys(exports)
@@ -181,12 +232,24 @@ function valueExports(file: string) {
   })
   const checker = program.getTypeChecker()
   return checker
-    .getExportsOfModule(checker.getSymbolAtLocation(program.getSourceFile(resolved)!)!)
+    .getExportsOfModule(
+      checker.getSymbolAtLocation(program.getSourceFile(resolved)!)!
+    )
     .filter((symbol) => {
-      const target = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol
+      const target =
+        symbol.flags & ts.SymbolFlags.Alias
+          ? checker.getAliasedSymbol(symbol)
+          : symbol
       return target.flags & ts.SymbolFlags.Value
     })
     .map((symbol) => symbol.name)
 }
 
-export { coreEntries, type CoreExport, coreExports, coreLayers, exportsByLayer, layerTitle }
+export {
+  coreEntries,
+  type CoreExport,
+  coreExports,
+  coreLayers,
+  exportsByLayer,
+  layerTitle,
+}

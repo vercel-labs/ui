@@ -23,12 +23,16 @@ function Nested() {
     <NavigationMenu orientation="vertical">
       <NavigationMenuList className="nav-list vertical">
         <NavigationMenuItem value={nested.value}>
-          <NavigationMenuTrigger className="nav-trigger">{nested.trigger}</NavigationMenuTrigger>
+          <NavigationMenuTrigger className="nav-trigger">
+            {nested.trigger}
+          </NavigationMenuTrigger>
           <NavigationMenuContent className="nav-content narrow">
             <ul>
               {nested.links.map((link) => (
                 <li key={link.href}>
-                  <NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink>
+                  <NavigationMenuLink href={link.href}>
+                    {link.label}
+                  </NavigationMenuLink>
                 </li>
               ))}
             </ul>
@@ -50,12 +54,22 @@ function Fixture() {
         {...options}
         aria-label={fixture.label}
         className="nav-menu"
-        onValueChange={(value, { reason }) => setAction(navigationMenuAction(value, reason))}
+        onValueChange={(value, { reason }) =>
+          setAction(navigationMenuAction(value, reason))
+        }
       >
-        <NavigationMenuList className={options.orientation === "vertical" ? "nav-list vertical" : "nav-list"}>
+        <NavigationMenuList
+          className={
+            options.orientation === "vertical"
+              ? "nav-list vertical"
+              : "nav-list"
+          }
+        >
           {fixture.items.map((item, index) => (
             <NavigationMenuItem key={item.value} value={item.value}>
-              <NavigationMenuTrigger className="nav-trigger">{item.trigger}</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="nav-trigger">
+                {item.trigger}
+              </NavigationMenuTrigger>
               <NavigationMenuContent
                 className={index === 0 ? "nav-content" : "nav-content narrow"}
                 keepMounted={layout.keepMounted}
@@ -65,7 +79,9 @@ function Fixture() {
                 <ul>
                   {item.links.map((link) => (
                     <li key={link.href}>
-                      <NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink>
+                      <NavigationMenuLink href={link.href}>
+                        {link.label}
+                      </NavigationMenuLink>
                     </li>
                   ))}
                 </ul>
@@ -74,13 +90,22 @@ function Fixture() {
             </NavigationMenuItem>
           ))}
           <NavigationMenuItem>
-            <NavigationMenuLink className="nav-link" href={fixture.link.href} current>
+            <NavigationMenuLink
+              className="nav-link"
+              href={fixture.link.href}
+              current
+            >
               {fixture.link.label}
             </NavigationMenuLink>
           </NavigationMenuItem>
         </NavigationMenuList>
         <NavigationMenuIndicator className="nav-indicator" />
-        {layout.viewport && <NavigationMenuViewport className="nav-viewport" {...layout.placement} />}
+        {layout.viewport && (
+          <NavigationMenuViewport
+            className="nav-viewport"
+            {...layout.placement}
+          />
+        )}
       </NavigationMenu>
       <button>After</button>
       <output role="status" aria-label="Last action">
@@ -94,7 +119,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

@@ -31,7 +31,9 @@
 <div data-slot="stack">
   <div data-slot="controls">
     <button type="button" onclick={openAndWait}>Open and Wait</button>
-    <button type="button" onclick={() => status.setValue("done")}>Mark Done</button>
+    <button type="button" onclick={() => status.setValue("done")}
+      >Mark Done</button
+    >
     <button type="button" onclick={() => status.clear()}>Clear</button>
     <button type="button" onclick={() => status.focus()}>Focus</button>
   </div>

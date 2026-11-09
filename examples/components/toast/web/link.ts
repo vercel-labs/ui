@@ -20,13 +20,15 @@ function mount(root: HTMLElement) {
   const region = root.querySelector("ui-toast-region")!
   region.toaster = toast
   region.renderToast = (item, el) => {
-    if (item.action?.href) el.querySelector("a")!.href = item.action.href
+    if (item.action?.href) {
+      el.querySelector("a")!.href = item.action.href
+    }
   }
   root.querySelector("button")!.addEventListener("click", () =>
     toast("Invoice sent", {
       description: "Hollis Grant · $240.00",
       action: { label: "View", href: "#" },
-    }),
+    })
   )
   return () => {
     toast.dismiss()

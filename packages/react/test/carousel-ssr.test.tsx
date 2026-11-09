@@ -30,7 +30,7 @@ describe("server rendering a carousel", () => {
           <CarouselIndicator page={1}>1</CarouselIndicator>
           <CarouselIndicator page={2}>2</CarouselIndicator>
         </CarouselIndicatorGroup>
-      </Carousel>,
+      </Carousel>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('aria-roledescription="carousel"')
@@ -45,13 +45,15 @@ describe("server rendering a carousel", () => {
   test("a rotating carousel renders its toggle's state and turns the live region off", () => {
     const html = renderToString(
       <Carousel aria-label="Featured" defaultPlaying>
-        <CarouselPlayToggle>{(state) => (state.playing ? "Stop" : "Start")}</CarouselPlayToggle>
+        <CarouselPlayToggle>
+          {(state) => (state.playing ? "Stop" : "Start")}
+        </CarouselPlayToggle>
         <CarouselViewport>
           <CarouselContent>
             <CarouselItem>One</CarouselItem>
           </CarouselContent>
         </CarouselViewport>
-      </Carousel>,
+      </Carousel>
     )
     expect(html).toContain(">Stop<")
     expect(html).toContain('aria-live="off"')

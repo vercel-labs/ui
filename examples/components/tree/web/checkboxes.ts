@@ -32,7 +32,7 @@ const items: TreeItemData[] = [
 
 function markup(items: TreeItemData[]) {
   let html = ""
-  for (const item of items)
+  for (const item of items) {
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
@@ -46,6 +46,7 @@ function markup(items: TreeItemData[]) {
         </ui-tree-item-label>
         ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
       </ui-tree-item>`
+  }
   return html
 }
 

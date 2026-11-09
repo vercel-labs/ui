@@ -20,11 +20,14 @@ Here's the rating's primitive. Its API has one method, `rate`:
 ```ts title="rating.ts"
 const rating = definePrimitive({
   name: "rating",
-  state: (options: { defaultValue?: number }) => ({ value: options.defaultValue ?? 0 }),
+  state: (options: { defaultValue?: number }) => ({
+    value: options.defaultValue ?? 0,
+  }),
   api: (context) => {
     const change = createChange(context)
     return {
-      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+      rate: (value: number, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
     }
   },
   slots: (slot) => ({
@@ -39,7 +42,15 @@ const rating = definePrimitive({
 With the key, the snapshot lists `rate`:
 
 ```json
-[{ "ref": "c1", "component": "rating", "actions": ["rate"], "label": "Your rating", "value": 0 }]
+[
+  {
+    "ref": "c1",
+    "component": "rating",
+    "actions": ["rate"],
+    "label": "Your rating",
+    "value": 0
+  }
+]
 ```
 
 And an agent can call it with the arguments the method takes:

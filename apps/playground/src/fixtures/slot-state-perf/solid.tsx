@@ -1,5 +1,9 @@
 import { menu, type MenuItemState } from "@ui-sdk/core/menu"
-import { usePart, usePrimitive, type PrimitiveHandle } from "@ui-sdk/solid/primitive"
+import {
+  usePart,
+  usePrimitive,
+  type PrimitiveHandle,
+} from "@ui-sdk/solid/primitive"
 import { render } from "@solidjs/web"
 import { createSignal, For, merge } from "solid-js"
 import { countSubscriptions, perfItems, perfSize } from "tests/fixtures/perf.ts"
@@ -10,14 +14,29 @@ import { countSubscriptions, perfItems, perfSize } from "tests/fixtures/perf.ts"
 // is what makes every part's spread run again.
 const items = perfItems(perfSize())
 
-function Item(props: { handle: PrimitiveHandle<typeof menu>; value: string; label: string; round: number }) {
+function Item(props: {
+  handle: PrimitiveHandle<typeof menu>
+  value: string
+  label: string
+  round: number
+}) {
   const round = {
     get "data-round"() {
       return props.round
     },
   }
-  const content = { children: (state: MenuItemState) => [state.highlighted ? "→ " : "", props.label] }
-  return usePart(props.handle, "item", () => ({ value: props.value }), merge(round, content))
+  const content = {
+    children: (state: MenuItemState) => [
+      state.highlighted ? "→ " : "",
+      props.label,
+    ],
+  }
+  return usePart(
+    props.handle,
+    "item",
+    () => ({ value: props.value }),
+    merge(round, content)
+  )
 }
 
 function Fixture() {
@@ -31,7 +50,14 @@ function Fixture() {
       <output aria-label="Renders">{renders()}</output>
       <div role="menu" aria-label="Items">
         <For each={items}>
-          {(item) => <Item handle={handle} value={item.value} label={item.label} round={renders()} />}
+          {(item) => (
+            <Item
+              handle={handle}
+              value={item.value}
+              label={item.label}
+              round={renders()}
+            />
+          )}
         </For>
       </div>
       <button>After</button>

@@ -1,4 +1,7 @@
-import { createAccordionController, type AccordionController } from "@ui-sdk/core/accordion"
+import {
+  createAccordionController,
+  type AccordionController,
+} from "@ui-sdk/core/accordion"
 import "./styles.css"
 import type { Variant } from "./variants"
 import { items, variants } from "./variants"
@@ -10,7 +13,11 @@ type Env = {
 
 type Framework = "react" | "vue" | "web"
 
-const frameworks: Record<Framework, string> = { react: "React", vue: "Vue", web: "Web Components" }
+const frameworks: Record<Framework, string> = {
+  react: "React",
+  vue: "Vue",
+  web: "Web Components",
+}
 
 // The items a variant renders.
 function itemsOf(variant: Variant) {
@@ -21,10 +28,11 @@ function itemsOf(variant: Variant) {
 function kitchenSink(
   root: HTMLElement,
   framework: Framework,
-  mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
+  mount: (slot: HTMLElement, variant: Variant, env: Env) => void
 ) {
   document.title = `Kitchen sink · ${frameworks[framework]}`
-  root.className = "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
+  root.className =
+    "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
   root.innerHTML = `
     <header class="sticky top-0 z-10 flex flex-wrap items-center gap-4 border-b border-neutral-200 bg-white/90 px-6 py-3 backdrop-blur">
       <h1 class="text-sm font-semibold">Accordion kitchen sink</h1>
@@ -33,8 +41,10 @@ function kitchenSink(
           .map(
             ([id, label]) =>
               `<a href="?fixture=accordion-kitchen-sink&framework=${id}" class="rounded-md px-2.5 py-1 ${
-                id === framework ? "bg-neutral-950 text-white" : "text-neutral-600 hover:bg-neutral-100"
-              }">${label}</a>`,
+                id === framework
+                  ? "bg-neutral-950 text-white"
+                  : "text-neutral-600 hover:bg-neutral-100"
+              }">${label}</a>`
           )
           .join("")}
       </nav>
@@ -51,7 +61,9 @@ function kitchenSink(
   `
   const main = root.querySelector("main")!
   const logList = root.querySelector<HTMLOListElement>("[data-log]")!
-  root.querySelector("[data-clear]")!.addEventListener("click", () => logList.replaceChildren())
+  root
+    .querySelector("[data-clear]")!
+    .addEventListener("click", () => logList.replaceChildren())
 
   const sections = new Map<string, HTMLElement>()
   for (const variant of variants) {
@@ -60,7 +72,8 @@ function kitchenSink(
       const section = document.createElement("section")
       section.innerHTML = `<h2 class="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">${variant.section}</h2>`
       grid = document.createElement("div")
-      grid.className = "grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] items-start gap-3"
+      grid.className =
+        "grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] items-start gap-3"
       section.append(grid)
       main.append(section)
       sections.set(variant.section, grid)
@@ -75,12 +88,14 @@ function chips(variant: Variant) {
     ...(variant.panel && { panel: variant.panel }),
     ...(variant.animation && { animation: variant.animation }),
     ...(variant.disabledItems && { disabledItems: variant.disabledItems }),
-    ...(variant.disabledTriggers && { disabledTriggers: variant.disabledTriggers }),
+    ...(variant.disabledTriggers && {
+      disabledTriggers: variant.disabledTriggers,
+    }),
   }
   return Object.entries(props)
     .map(
       ([key, value]) =>
-        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`,
+        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`
     )
     .join("")
 }
@@ -88,13 +103,16 @@ function chips(variant: Variant) {
 function card(
   variant: Variant,
   mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
-  logList: HTMLOListElement,
+  logList: HTMLOListElement
 ) {
   const el = document.createElement("article")
-  el.className = "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
+  el.className =
+    "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
   el.dataset.variant = variant.id
   // Changes in these variants are canceled on purpose.
-  if (variant.cancel || variant.itemCancel) el.dataset.cancels = variant.cancel ?? variant.itemCancel
+  if (variant.cancel || variant.itemCancel) {
+    el.dataset.cancels = variant.cancel ?? variant.itemCancel
+  }
   el.innerHTML = `
     <div>
       <div class="text-[13px] font-medium">${variant.title}</div>
@@ -118,7 +136,8 @@ function card(
   switch (variant.place) {
     case "scroll": {
       const box = document.createElement("div")
-      box.className = "h-40 w-full overflow-y-auto rounded-md border border-dashed border-neutral-300 p-3"
+      box.className =
+        "h-40 w-full overflow-y-auto rounded-md border border-dashed border-neutral-300 p-3"
       box.innerHTML = `<div class="h-16 text-xs text-neutral-400">Scroll ↓</div>`
       const inner = document.createElement("div")
       inner.className = "pb-32"
@@ -129,7 +148,8 @@ function card(
     }
     case "transform": {
       const box = document.createElement("div")
-      box.className = "w-full origin-top scale-90 rounded-md border border-dashed border-neutral-300 p-2"
+      box.className =
+        "w-full origin-top scale-90 rounded-md border border-dashed border-neutral-300 p-2"
       box.append(slot)
       stage.append(box)
       break
@@ -176,12 +196,16 @@ function card(
           ["Close b", () => controller.close("b")],
           ["Toggle c", () => controller.toggle("c")],
           ["Set a, c", () => controller.setValue(["a", "c"])],
-          ["Value?", () => env.log(`value: ${JSON.stringify(controller.getValue())}`)],
+          [
+            "Value?",
+            () => env.log(`value: ${JSON.stringify(controller.getValue())}`),
+          ],
           ["Focus", () => controller.focus()],
         ]
     for (const [label, run] of actions) {
       const button = document.createElement("button")
-      button.className = "rounded border border-neutral-200 px-2 py-1 hover:bg-neutral-50"
+      button.className =
+        "rounded border border-neutral-200 px-2 py-1 hover:bg-neutral-50"
       button.dataset.controller = ""
       button.textContent = label
       button.addEventListener("click", run)

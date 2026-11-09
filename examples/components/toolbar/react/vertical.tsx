@@ -2,7 +2,13 @@
 
 import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/react/toggle"
 import { Toolbar, ToolbarButton, ToolbarSeparator } from "@ui-sdk/react/toolbar"
-import { MousePointer2Icon, PencilIcon, SquareIcon, Trash2Icon, TypeIcon } from "lucide-react"
+import {
+  MousePointer2Icon,
+  PencilIcon,
+  SquareIcon,
+  Trash2Icon,
+  TypeIcon,
+} from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
 const tools = [
@@ -21,7 +27,9 @@ function Example() {
         deselectable={false}
         orientation="vertical"
         aria-label="Tool"
-        onValueChange={([value]) => log(`${tools.find((tool) => tool.value === value)?.label} tool`)}
+        onValueChange={([value]) =>
+          log(`${tools.find((tool) => tool.value === value)?.label} tool`)
+        }
       >
         {tools.map(({ value, label, icon: Icon }) => (
           <Toggle key={value} value={value} aria-label={label}>
@@ -32,7 +40,10 @@ function Example() {
         ))}
       </ToggleGroup>
       <ToolbarSeparator />
-      <ToolbarButton aria-label="Delete" onClick={() => log("Deleted selection")}>
+      <ToolbarButton
+        aria-label="Delete"
+        onClick={() => log("Deleted selection")}
+      >
         <Trash2Icon aria-hidden="true" />
       </ToolbarButton>
     </Toolbar>

@@ -7,16 +7,36 @@
   import { Avatar } from "#ui/avatar"
   import { Button } from "#ui/button"
   import { toast } from "#ui/toast"
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "#ui/collapsible"
-  import { TokenInput, TokenInputEditor, TokenInputToken } from "#ui/token-input"
-  import { TriggerMenu, TriggerMenuContent, TriggerMenuItem, TriggerMenuList } from "#ui/trigger-menu"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "#ui/collapsible"
+  import {
+    TokenInput,
+    TokenInputEditor,
+    TokenInputToken,
+  } from "#ui/token-input"
+  import {
+    TriggerMenu,
+    TriggerMenuContent,
+    TriggerMenuItem,
+    TriggerMenuList,
+  } from "#ui/trigger-menu"
   import { cn } from "cn"
   import { people, personOf, type Issue } from "tracker-data"
 
   let { issue }: { issue: Issue } = $props()
 
-  const mentions = people.map((person) => ({ value: person.id, label: person.name, keywords: [person.role] }))
-  const date = new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" })
+  const mentions = people.map((person) => ({
+    value: person.id,
+    label: person.name,
+    keywords: [person.role],
+  }))
+  const date = new Intl.DateTimeFormat("en", {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  })
 
   let pending = $state(false)
 
@@ -38,7 +58,9 @@
 <Collapsible defaultOpen class="grid gap-3">
   <CollapsibleTrigger class="-ms-1.5 w-fit">
     Activity
-    <span class="text-muted-foreground tabular-nums">{issue.comments.length}</span>
+    <span class="text-muted-foreground tabular-nums"
+      >{issue.comments.length}</span
+    >
   </CollapsibleTrigger>
   <CollapsiblePanel>
     <div class={cn("grid gap-5", issue.comments.length > 0 && "pt-1")}>
@@ -51,7 +73,10 @@
               <div class="grid min-w-0 flex-1 gap-1">
                 <p class="flex items-baseline gap-2">
                   <span class="font-medium">{author?.name}</span>
-                  <time datetime={comment.createdAt} class="text-xs text-muted-foreground">
+                  <time
+                    datetime={comment.createdAt}
+                    class="text-xs text-muted-foreground"
+                  >
                     {date.format(new Date(comment.createdAt))}
                   </time>
                 </p>
@@ -68,11 +93,21 @@
           {/each}
         </ul>
       {/if}
-      <form method="POST" action="?{page.url.searchParams}&/comment" use:enhance={submit} class="grid gap-2">
+      <form
+        method="POST"
+        action="?{page.url.searchParams}&/comment"
+        use:enhance={submit}
+        class="grid gap-2"
+      >
         <input type="hidden" name="id" value={issue.id} />
         <TokenInput name="body" submitShortcut="mod+enter">
-          <TokenInputEditor aria-label="Comment" placeholder="Leave a comment, type @ to mention someone" />
-          <TriggerMenu triggers={[{ char: "@", type: "mention", items: mentions }]}>
+          <TokenInputEditor
+            aria-label="Comment"
+            placeholder="Leave a comment, type @ to mention someone"
+          />
+          <TriggerMenu
+            triggers={[{ char: "@", type: "mention", items: mentions }]}
+          >
             <TriggerMenuContent>
               <TriggerMenuList>
                 {#snippet children(state)}
@@ -91,8 +126,12 @@
           {/snippet}
         </TokenInput>
         <div class="flex items-center justify-end gap-3">
-          <span class="text-xs text-muted-foreground">⌘ or Ctrl + Enter to send</span>
-          <Button type="submit" size="sm" disabled={pending}>{pending ? "Sending…" : "Comment"}</Button>
+          <span class="text-xs text-muted-foreground"
+            >⌘ or Ctrl + Enter to send</span
+          >
+          <Button type="submit" size="sm" disabled={pending}
+            >{pending ? "Sending…" : "Comment"}</Button
+          >
         </div>
       </form>
     </div>

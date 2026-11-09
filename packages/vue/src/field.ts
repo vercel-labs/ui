@@ -41,7 +41,8 @@ import { FieldKey, type FieldContext } from "./field-context"
 type FieldSetContext = PrimitiveHandle<typeof fieldSetPrimitive>
 // What a FieldDescription describes: the nearest Field, or a FieldSet when no
 // Field is closer.
-const DescribedKey: InjectionKey<FieldContext | FieldSetContext> = Symbol("field-described")
+const DescribedKey: InjectionKey<FieldContext | FieldSetContext> =
+  Symbol("field-described")
 
 // Checks a part outside a field once it's in the page. Made once, so every
 // render hands Vue the same ref.
@@ -53,12 +54,18 @@ const outsideRefs: Partial<Record<FieldOutsideSlot, (el: unknown) => void>> = {
 // A part outside any Field: a plain element with no field wiring, so a
 // FieldLabel is a native <label> that labels the control it wraps. Call it
 // in setup; it returns the render function.
-function useOutside(slot: FieldOutsideSlot, element: PartElement<FieldErrorState>, shown = () => true) {
+function useOutside(
+  slot: FieldOutsideSlot,
+  element: PartElement<FieldErrorState>,
+  shown = () => true
+) {
   const attrs = useAttrs()
   const slots = useSlots()
   const ref = outsideRefs[slot]
   return () => {
-    if (!shown()) return null
+    if (!shown()) {
+      return null
+    }
     const props = { ...fieldOutsideAttrs(slot), ...attrs, ...(ref && { ref }) }
     return renderElement(props, slots, fieldOutsideState, element)
   }
@@ -93,12 +100,16 @@ const Field = withElement(
         invalid: props.invalid,
         debug: props.debug,
       }))
-      const context = { ...field, name: () => props.name, disabled: () => props.disabled }
+      const context = {
+        ...field,
+        name: () => props.name,
+        disabled: () => props.disabled,
+      }
       provide(FieldKey, context)
       provide(DescribedKey, context)
       return usePart(field, "root")
     },
-  }),
+  })
 )
 
 /**
@@ -114,10 +125,12 @@ const FieldLabel = withElement(
     slots: Object as PartSlots<typeof fieldPrimitive, "label">,
     setup() {
       const field = inject(FieldKey, null)
-      if (!field) return useOutside("label", { tag: "label" })
+      if (!field) {
+        return useOutside("label", { tag: "label" })
+      }
       return usePart(field, "label", useIdProp(), undefined, "label")
     },
-  }),
+  })
 )
 
 /**
@@ -134,12 +147,20 @@ const FieldDescription = withElement(
     slots: Object as StateSlots<FieldDescriptionState>,
     setup() {
       const described = inject(DescribedKey, null)
-      if (!described) return useOutside("description", { tag: "p" })
+      if (!described) {
+        return useOutside("description", { tag: "p" })
+      }
       // A field set's description slot takes the same props, and its state is the
       // `disabled` that FieldDescriptionState always has.
-      return usePart(described as FieldContext, "description", useIdProp(), undefined, "p")
+      return usePart(
+        described as FieldContext,
+        "description",
+        useIdProp(),
+        undefined,
+        "p"
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -153,7 +174,10 @@ const FieldError = withElement(
     name: "FieldError",
     inheritAttrs: false,
     props: {
-      match: { type: [Boolean, String] as PropType<boolean | ValidityKey>, default: undefined },
+      match: {
+        type: [Boolean, String] as PropType<boolean | ValidityKey>,
+        default: undefined,
+      },
     },
     slots: Object as PartSlots<typeof fieldPrimitive, "error">,
     setup(props, { slots }) {
@@ -162,15 +186,28 @@ const FieldError = withElement(
       const field = inject(FieldKey, null)
       const element = {
         tag: "div",
-        children: (state: FieldErrorState) => slotContent(slots.default, { state }) ?? state.message,
+        children: (state: FieldErrorState) =>
+          slotContent(slots.default, { state }) ?? state.message,
       }
-      if (!field) return useOutside("error", element, () => fieldOutsideErrorShown({ match: props.match }))
+      if (!field) {
+        return useOutside("error", element, () =>
+          fieldOutsideErrorShown({ match: props.match })
+        )
+      }
       // Only an error with `match` needs an id of its own. One without takes the
       // field's, which the control points at before the field binds.
-      const id = () => (attrs.id as string | undefined) ?? (props.match === undefined ? undefined : made)
-      return usePart(field, "error", () => ({ id: id(), match: props.match }), undefined, element)
+      const id = () =>
+        (attrs.id as string | undefined) ??
+        (props.match === undefined ? undefined : made)
+      return usePart(
+        field,
+        "error",
+        () => ({ id: id(), match: props.match }),
+        undefined,
+        element
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -185,15 +222,23 @@ const FieldControl = withElement(
     slots: Object as PartSlots<typeof fieldPrimitive, "control">,
     setup() {
       const field = inject(FieldKey, null)
-      if (!field) return useOutside("control", { tag: "input" })
+      if (!field) {
+        return useOutside("control", { tag: "input" })
+      }
       const attrs = useAttrs()
       const control = () => ({
         id: attrs.id as string | undefined,
         describedBy: attrs["aria-describedby"] as string | undefined,
       })
-      return usePart(field, "control", control, () => ({ name: field.name(), ...attrs }), "input")
+      return usePart(
+        field,
+        "control",
+        control,
+        () => ({ name: field.name(), ...attrs }),
+        "input"
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -208,11 +253,14 @@ const FieldSet = withElement(
     props: { disabled: optionalBoolean, debug: optionalBoolean },
     slots: Object as PartSlots<typeof fieldSetPrimitive, "set">,
     setup(props) {
-      const set = usePrimitive(fieldSetPrimitive, () => ({ disabled: props.disabled, debug: props.debug }))
+      const set = usePrimitive(fieldSetPrimitive, () => ({
+        disabled: props.disabled,
+        debug: props.debug,
+      }))
       provide(DescribedKey, set)
       return usePart(set, "set", undefined, undefined, "fieldset")
     },
-  }),
+  })
 )
 
 /**
@@ -227,10 +275,12 @@ const FieldLegend = withElement(
     slots: Object as PartSlots<typeof fieldSetPrimitive, "legend">,
     setup() {
       const set = useScope(fieldSetPrimitive)?.handle
-      if (!set) throw new Error("FieldLegend must be used inside <FieldSet>.")
+      if (!set) {
+        throw new Error("FieldLegend must be used inside <FieldSet>.")
+      }
       return usePart(set, "legend", useIdProp(), undefined, "legend")
     },
-  }),
+  })
 )
 
 /**
@@ -246,15 +296,24 @@ const FieldGroup = withElement(
     setup() {
       return usePart(
         usePrimitive(fieldGroupPrimitive, () => ({})),
-        "group",
+        "group"
       )
     },
-  }),
+  })
 )
 
 export { useFieldControl } from "./field-context"
 
-export { Field, FieldControl, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldLegend, FieldSet }
+export {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+}
 
 export type {
   FieldApi,

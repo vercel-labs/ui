@@ -1,5 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
-import { createListboxController, listbox } from "../src/components/listbox/listbox-root"
+import {
+  createListboxController,
+  listbox,
+} from "../src/components/listbox/listbox-root"
 import { attachController } from "../src/foundation/kernel/controller"
 import { attrs } from "../src/foundation/kernel/part"
 
@@ -10,8 +13,11 @@ const items = [
   { value: "onion", label: "Onion" },
 ]
 
-const itemAttrs = (instance: ReturnType<typeof listbox>, value: string, disabled = false) =>
-  attrs(instance.part("item", { id: value, value, disabled }))
+const itemAttrs = (
+  instance: ReturnType<typeof listbox>,
+  value: string,
+  disabled = false
+) => attrs(instance.part("item", { id: value, value, disabled }))
 
 describe("listbox", () => {
   test("the root is a listbox that says how it selects", () => {
@@ -22,8 +28,14 @@ describe("listbox", () => {
       "aria-orientation": "vertical",
       "data-orientation": "vertical",
     })
-    expect(attrs(single.part("root", {}))["aria-multiselectable"]).toBeUndefined()
-    const multiple = listbox({ id: "l", multiple: true, orientation: "horizontal" })
+    expect(
+      attrs(single.part("root", {}))["aria-multiselectable"]
+    ).toBeUndefined()
+    const multiple = listbox({
+      id: "l",
+      multiple: true,
+      orientation: "horizontal",
+    })
     expect(attrs(multiple.part("root", {}))).toMatchObject({
       "aria-multiselectable": "true",
       "aria-orientation": "horizontal",
@@ -33,12 +45,17 @@ describe("listbox", () => {
   test("options say whether they're selected, as true or false", () => {
     const instance = listbox({ id: "l", defaultValue: "cheese" })
     expect(itemAttrs(instance, "basil")["aria-selected"]).toBe("false")
-    expect(itemAttrs(instance, "cheese")).toMatchObject({ "aria-selected": "true", "data-selected": "" })
+    expect(itemAttrs(instance, "cheese")).toMatchObject({
+      "aria-selected": "true",
+      "data-selected": "",
+    })
   })
 
   test("before options bind, the selected one claims the only tab stop", () => {
     const instance = listbox({ id: "l", defaultValue: "cheese" })
-    const stops = ["basil", "cheese", "onion"].map((value) => itemAttrs(instance, value).tabindex)
+    const stops = ["basil", "cheese", "onion"].map(
+      (value) => itemAttrs(instance, value).tabindex
+    )
     expect(stops).toEqual(["-1", "0", "-1"])
   })
 
@@ -58,14 +75,20 @@ describe("listbox", () => {
   test("a disabled listbox has no tab stop", () => {
     const instance = listbox({ id: "l", disabled: true })
     expect(itemAttrs(instance, "basil").tabindex).toBeUndefined()
-    expect(attrs(instance.part("root", {}))).toMatchObject({ "aria-disabled": "true", "data-disabled": "" })
+    expect(attrs(instance.part("root", {}))).toMatchObject({
+      "aria-disabled": "true",
+      "data-disabled": "",
+    })
     expect(attrs(instance.part("root", {})).tabindex).toBe("-1")
   })
 
   test("selection follows focus in a single list, and waits for a press with several", () => {
     expect(listbox({ id: "l" }).get().activation).toBe("automatic")
     expect(listbox({ id: "l", multiple: true }).get().activation).toBe("manual")
-    expect(listbox({ id: "l", multiple: true, activation: "automatic" }).get().activation).toBe("automatic")
+    expect(
+      listbox({ id: "l", multiple: true, activation: "automatic" }).get()
+        .activation
+    ).toBe("automatic")
   })
 
   test("a press chooses the option", () => {
@@ -80,7 +103,12 @@ describe("listbox", () => {
     const kept = listbox({ id: "l", items, defaultValue: "cheese" })
     kept.api.internal.press("cheese")
     expect(kept.api.getValue()).toBe("cheese")
-    const cleared = listbox({ id: "l", items, defaultValue: "cheese", deselectable: true })
+    const cleared = listbox({
+      id: "l",
+      items,
+      defaultValue: "cheese",
+      deselectable: true,
+    })
     cleared.api.internal.press("cheese")
     expect(cleared.api.getValue()).toBe(null)
   })
@@ -103,14 +131,23 @@ describe("listbox", () => {
   })
 
   test("a read-only listbox doesn't change", () => {
-    const instance = listbox({ id: "l", items, readOnly: true, defaultValue: "basil" })
+    const instance = listbox({
+      id: "l",
+      items,
+      readOnly: true,
+      defaultValue: "basil",
+    })
     instance.api.internal.press("cheese")
     instance.api.setValue("onion")
     expect(instance.api.getValue()).toBe("basil")
   })
 
   test("a canceled change keeps the value", () => {
-    const instance = listbox({ id: "l", items, onValueChange: (value, details) => details.cancel() })
+    const instance = listbox({
+      id: "l",
+      items,
+      onValueChange: (value, details) => details.cancel(),
+    })
     instance.api.internal.press("cheese")
     expect(instance.api.getValue()).toBe(null)
   })
@@ -118,7 +155,13 @@ describe("listbox", () => {
   test("the controller sets, clears and selects every enabled item", () => {
     const controller = createListboxController<string, true>()
     const onValueChange = vi.fn()
-    const instance = listbox({ id: "l", items, multiple: true, controller, onValueChange })
+    const instance = listbox({
+      id: "l",
+      items,
+      multiple: true,
+      controller,
+      onValueChange,
+    })
     attachController(controller, instance.api)
     controller.selectAll()
     expect(controller.getValue()).toEqual(["basil", "cheese", "onion"])
@@ -126,7 +169,11 @@ describe("listbox", () => {
     expect(controller.getValue()).toEqual([])
     controller.setValue(["onion"], { reason: "imperative" })
     expect(controller.getValue()).toEqual(["onion"])
-    expect(onValueChange.mock.calls.every(([, details]) => details.reason === "imperative")).toBe(true)
+    expect(
+      onValueChange.mock.calls.every(
+        ([, details]) => details.reason === "imperative"
+      )
+    ).toBe(true)
   })
 
   test("a form reset returns to the default value", () => {
@@ -141,7 +188,12 @@ describe("listbox", () => {
       { value: { id: "free", seats: 1 }, label: "Free" },
       { value: { id: "pro", seats: 5 }, label: "Pro" },
     ]
-    const instance = listbox({ id: "l", items: plans, multiple: true, itemToValue: (plan) => plan.id })
+    const instance = listbox({
+      id: "l",
+      items: plans,
+      multiple: true,
+      itemToValue: (plan) => plan.id,
+    })
     instance.api.internal.press("pro")
     instance.api.internal.press("free")
     expect(instance.api.getValue()).toEqual([plans[1].value, plans[0].value])
@@ -161,7 +213,8 @@ describe("listbox", () => {
       isItemEqualToValue: (plan, selected) => plan.id === selected.id,
     })
     // A web component's item has its key as a string attribute.
-    const selected = (key: string) => attrs(instance.part("item", { id: key, value: key }))["aria-selected"]
+    const selected = (key: string) =>
+      attrs(instance.part("item", { id: key, value: key }))["aria-selected"]
     expect(selected("pro")).toBe("true")
     expect(selected("free")).toBe("false")
   })
@@ -178,7 +231,9 @@ describe("listbox", () => {
       value: "basil,onion",
       "aria-hidden": "true",
     })
-    expect(attrs(instance.part("value-input", { id: "basil", value: "basil" }))).toMatchObject({
+    expect(
+      attrs(instance.part("value-input", { id: "basil", value: "basil" }))
+    ).toMatchObject({
       type: "hidden",
       name: "toppings",
       value: "basil",

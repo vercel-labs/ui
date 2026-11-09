@@ -21,10 +21,13 @@
   let nextFocused = false
   const rememberFocus = () => {
     nextFocused =
-      typeof document !== "undefined" && document.activeElement?.getAttribute("data-slot") === "carousel-next"
+      typeof document !== "undefined" &&
+      document.activeElement?.getAttribute("data-slot") === "carousel-next"
   }
   const focusIf = (link: HTMLElement) => {
-    if (nextFocused) link.focus()
+    if (nextFocused) {
+      link.focus()
+    }
   }
 </script>
 
@@ -37,7 +40,9 @@
             <div data-slot="tile">
               {photo.name}
               <span data-slot="hint">
-                {state.index + 1} / {photos.length}{state.active ? " · showing" : ""}
+                {state.index + 1} / {photos.length}{state.active
+                  ? " · showing"
+                  : ""}
               </span>
             </div>
           {/snippet}
@@ -53,10 +58,7 @@
     <CarouselNext>
       {#snippet render({ props, state })}
         {#if state.disabled}
-          <a
-            use:focusIf
-            href="https://example.com/gallery"
-          >See all photos</a>
+          <a use:focusIf href="https://example.com/gallery">See all photos</a>
         {:else}
           <button {...props}>
             Next

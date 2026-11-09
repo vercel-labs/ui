@@ -1,6 +1,13 @@
 import "@ui-sdk/web/field"
 import "@ui-sdk/web/select"
-import { Check, ChevronDown, createElement, TextAlignCenter, TextAlignEnd, TextAlignStart } from "lucide"
+import {
+  Check,
+  ChevronDown,
+  createElement,
+  TextAlignCenter,
+  TextAlignEnd,
+  TextAlignStart,
+} from "lucide"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `

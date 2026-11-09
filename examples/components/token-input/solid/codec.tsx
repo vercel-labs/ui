@@ -1,5 +1,11 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { fromText, toText, TokenInput, TokenInputEditor, type TokenCodec } from "@ui-sdk/solid/token-input"
+import {
+  fromText,
+  toText,
+  TokenInput,
+  TokenInputEditor,
+  type TokenCodec,
+} from "@ui-sdk/solid/token-input"
 import { useLog } from "../../../shared/solid/log"
 
 const chat: TokenCodec = {

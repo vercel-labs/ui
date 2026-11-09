@@ -13,14 +13,21 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/vue/date-picker"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
 
 function submit(event: Event) {
-  log(`Submitted due=${new FormData(event.currentTarget as HTMLFormElement).get("due")}`)
+  log(
+    `Submitted due=${new FormData(event.currentTarget as HTMLFormElement).get("due")}`
+  )
 }
 </script>
 

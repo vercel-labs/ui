@@ -16,14 +16,18 @@ import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 
 type SpreadsheetCells = Record<string, string>
 
-type SpreadsheetCellsChangeReason = "cell-edit" | "clear" | "paste" | "cut" | "imperative"
+type SpreadsheetCellsChangeReason =
+  "cell-edit" | "clear" | "paste" | "cut" | "imperative"
 
 type SpreadsheetOptions = {
   rows: number
   cols: number
   cells?: SpreadsheetCells
   defaultCells?: SpreadsheetCells
-  onCellsChange?: (cells: SpreadsheetCells, details: ChangeDetails<SpreadsheetCellsChangeReason>) => void
+  onCellsChange?: (
+    cells: SpreadsheetCells,
+    details: ChangeDetails<SpreadsheetCellsChangeReason>
+  ) => void
 }
 
 type SpreadsheetState = {
@@ -60,15 +64,25 @@ const parseName = (name: string): GridCell => ({
 })
 const rangeName = ({ top, left, bottom, right }: CellBounds) => {
   const start = cellName({ row: top, col: left })
-  return top === bottom && left === right ? start : `${start}:${cellName({ row: bottom, col: right })}`
+  return top === bottom && left === right
+    ? start
+    : `${start}:${cellName({ row: bottom, col: right })}`
 }
-const covers = (bounds: CellBounds | null, axis: "row" | "col", index: number) =>
+const covers = (
+  bounds: CellBounds | null,
+  axis: "row" | "col",
+  index: number
+) =>
   !!bounds &&
   (axis === "row"
     ? index >= bounds.top && index <= bounds.bottom
     : index >= bounds.left && index <= bounds.right)
 const format = (value: number | string) =>
-  typeof value === "number" ? (Number.isFinite(value) ? String(Number(value.toFixed(2))) : "#DIV/0!") : value
+  typeof value === "number"
+    ? Number.isFinite(value)
+      ? String(Number(value.toFixed(2)))
+      : "#DIV/0!"
+    : value
 
 const functions: Record<string, (values: number[]) => number> = {
   SUM: (values) => values.reduce((a, b) => a + b, 0),
@@ -81,41 +95,55 @@ const functions: Record<string, (values: number[]) => number> = {
 function evaluate(
   formula: string,
   read: (name: string) => number | string,
-  size: { rows: number; cols: number },
+  size: { rows: number; cols: number }
 ) {
-  const tokens = formula.toUpperCase().match(/\d+(\.\d+)?|[A-Z]+\d+(:[A-Z]+\d+)?|[A-Z]+|[-+*/(),]/g) ?? []
+  const tokens =
+    formula
+      .toUpperCase()
+      .match(/\d+(\.\d+)?|[A-Z]+\d+(:[A-Z]+\d+)?|[A-Z]+|[-+*/(),]/g) ?? []
   let at = 0
   const next = () => tokens[at++]
   const expect = (token: string) => {
-    if (next() !== token) throw new Error("syntax")
+    if (next() !== token) {
+      throw new Error("syntax")
+    }
   }
   const number = (value: number | string) => {
-    if (typeof value === "string" && value !== "") throw new Error("value")
+    if (typeof value === "string" && value !== "") {
+      throw new Error("value")
+    }
     return Number(value || 0)
   }
   const numbers = (token: string) => {
-    if (!token.includes(":")) return [number(read(token))]
+    if (!token.includes(":")) {
+      return [number(read(token))]
+    }
     const [from, to] = token.split(":").map(parseName)
     const values: number[] = []
     const bottom = Math.min(size.rows - 1, Math.max(from.row, to.row))
     const right = Math.min(size.cols - 1, Math.max(from.col, to.col))
-    for (let row = Math.min(from.row, to.row); row <= bottom; row++)
+    for (let row = Math.min(from.row, to.row); row <= bottom; row++) {
       for (let col = Math.min(from.col, to.col); col <= right; col++) {
         const value = read(cellName({ row, col }))
-        if (typeof value === "number") values.push(value)
+        if (typeof value === "number") {
+          values.push(value)
+        }
       }
+    }
     return values
   }
   function sum(): number {
     let value = product()
-    while (tokens[at] === "+" || tokens[at] === "-")
+    while (tokens[at] === "+" || tokens[at] === "-") {
       value = next() === "+" ? value + product() : value - product()
+    }
     return value
   }
   function product(): number {
     let value = unary()
-    while (tokens[at] === "*" || tokens[at] === "/")
+    while (tokens[at] === "*" || tokens[at] === "/") {
       value = next() === "*" ? value * unary() : value / unary()
+    }
     return value
   }
   function unary(): number {
@@ -124,31 +152,44 @@ function evaluate(
       return -unary()
     }
     const token = next()
-    if (token === undefined) throw new Error("syntax")
+    if (token === undefined) {
+      throw new Error("syntax")
+    }
     if (token === "(") {
       const value = sum()
       expect(")")
       return value
     }
-    if (/^\d/.test(token)) return Number(token)
+    if (/^\d/.test(token)) {
+      return Number(token)
+    }
     if (functions[token]) {
       expect("(")
       const values: number[] = []
       do {
         const arg = tokens[at]
-        if (/^[A-Z]+\d+/.test(arg ?? "") && (tokens[at + 1] === "," || tokens[at + 1] === ")")) {
+        if (
+          /^[A-Z]+\d+/.test(arg ?? "") &&
+          (tokens[at + 1] === "," || tokens[at + 1] === ")")
+        ) {
           next()
           values.push(...numbers(arg))
-        } else values.push(sum())
+        } else {
+          values.push(sum())
+        }
       } while (tokens[at] === "," && next())
       expect(")")
       return functions[token](values)
     }
-    if (/^[A-Z]\d+$/.test(token)) return number(read(token))
+    if (/^[A-Z]\d+$/.test(token)) {
+      return number(read(token))
+    }
     throw new Error("syntax")
   }
   const value = sum()
-  if (at !== tokens.length) throw new Error("syntax")
+  if (at !== tokens.length) {
+    throw new Error("syntax")
+  }
   return value
 }
 
@@ -167,7 +208,8 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
     range: null,
     editing: null,
   }),
-  sync: (options) => (options.cells === undefined ? {} : { cells: options.cells }),
+  sync: (options) =>
+    options.cells === undefined ? {} : { cells: options.cells },
   controlled: ["cells"],
   api: (context) => {
     const { store } = context
@@ -176,14 +218,26 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
     const cols = () => Math.min(26, context.options().cols)
 
     let cache:
-      | { cells: SpreadsheetCells; rows: number; cols: number; values: Map<string, number | string> }
+      | {
+          cells: SpreadsheetCells
+          rows: number
+          cols: number
+          values: Map<string, number | string>
+        }
       | undefined
     const valueOf = (name: string): number | string => {
       const { cells } = store.get()
-      if (cache?.cells !== cells || cache.rows !== rows() || cache.cols !== cols())
+      if (
+        cache?.cells !== cells ||
+        cache.rows !== rows() ||
+        cache.cols !== cols()
+      ) {
         cache = { cells, rows: rows(), cols: cols(), values: new Map() }
+      }
       const values = cache.values
-      if (values.has(name)) return values.get(name)!
+      if (values.has(name)) {
+        return values.get(name)!
+      }
       const raw = cells[name] ?? ""
       let value: number | string = raw
       if (raw.startsWith("=")) {
@@ -193,27 +247,38 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
             raw.slice(1),
             (ref) => {
               const result = valueOf(ref)
-              if (typeof result === "string" && result.startsWith("#")) throw new Error(result)
+              if (typeof result === "string" && result.startsWith("#")) {
+                throw new Error(result)
+              }
               return result
             },
-            { rows: rows(), cols: cols() },
+            { rows: rows(), cols: cols() }
           )
         } catch (error) {
           const message = (error as Error).message
-          value = message.startsWith("#") ? message : message === "value" ? "#VALUE!" : "#ERROR!"
+          value = message.startsWith("#")
+            ? message
+            : message === "value"
+              ? "#VALUE!"
+              : "#ERROR!"
         }
-      } else if (raw.trim() !== "" && Number.isFinite(Number(raw))) value = Number(raw)
+      } else if (raw.trim() !== "" && Number.isFinite(Number(raw))) {
+        value = Number(raw)
+      }
       values.set(name, value)
       return value
     }
     const write = (
       entries: [string, string][],
-      details: { reason: SpreadsheetCellsChangeReason; event?: Event },
+      details: { reason: SpreadsheetCellsChangeReason; event?: Event }
     ) => {
       const cells = { ...store.get().cells }
       for (const [name, raw] of entries) {
-        if (raw === "") delete cells[name]
-        else cells[name] = raw
+        if (raw === "") {
+          delete cells[name]
+        } else {
+          cells[name] = raw
+        }
       }
       return change("cells", cells, details)
     }
@@ -224,23 +289,37 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
       cols,
       pageSize: () => 10,
     })
-    const range = createCellRange<SpreadsheetState>(context, { key: "range", grid, rows, cols })
+    const range = createCellRange<SpreadsheetState>(context, {
+      key: "range",
+      grid,
+      rows,
+      cols,
+    })
     const edit = createInlineEdit<SpreadsheetState>(context, {
       key: "editing",
       value: (name) => store.get().cells[name] ?? "",
       commit: (name, text, details) =>
-        write([[name, text.trim()]], { reason: "cell-edit", event: details.event }),
+        write([[name, text.trim()]], {
+          reason: "cell-edit",
+          event: details.event,
+        }),
     })
     const selectedNames = () => {
       const bounds = range.bounds(store.get())
       const names: string[] = []
-      if (bounds)
-        for (let row = bounds.top; row <= bounds.bottom; row++)
-          for (let col = bounds.left; col <= bounds.right; col++) names.push(cellName({ row, col }))
+      if (bounds) {
+        for (let row = bounds.top; row <= bounds.bottom; row++) {
+          for (let col = bounds.left; col <= bounds.right; col++) {
+            names.push(cellName({ row, col }))
+          }
+        }
+      }
       return names
     }
     const copy = (event: ClipboardEvent) => {
-      const text = range.text(store.get(), (cell) => format(valueOf(cellName(cell))))
+      const text = range.text(store.get(), (cell) =>
+        format(valueOf(cellName(cell)))
+      )
       event.clipboardData?.setData("text/plain", text)
       event.preventDefault()
     }
@@ -252,35 +331,63 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
       rows,
       cols,
       valueOf,
-      headerPointerdown(event: PointerEvent, axis: "row" | "col", index: number) {
-        if (event.button !== 0) return
+      headerPointerdown(
+        event: PointerEvent,
+        axis: "row" | "col",
+        index: number
+      ) {
+        if (event.button !== 0) {
+          return
+        }
         event.preventDefault()
         const active = grid.active()
         const from = event.shiftKey && active ? active[axis] : index
-        if (!event.shiftKey || !active)
-          grid.focus(axis === "row" ? { row: index, col: 0 } : { row: 0, col: index })
-        if (axis === "row") range.selectRows(from, index, { reason: "item-press", event })
-        else range.selectColumns(from, index, { reason: "item-press", event })
+        if (!event.shiftKey || !active) {
+          grid.focus(
+            axis === "row" ? { row: index, col: 0 } : { row: 0, col: index }
+          )
+        }
+        if (axis === "row") {
+          range.selectRows(from, index, { reason: "item-press", event })
+        } else {
+          range.selectColumns(from, index, { reason: "item-press", event })
+        }
       },
       cellKeydown(event: KeyboardEvent, cell: GridCell) {
-        if (store.get().editing) return
-        if ((event.key === "Delete" || event.key === "Backspace") && !event.metaKey && !event.ctrlKey) {
+        if (store.get().editing) {
+          return
+        }
+        if (
+          (event.key === "Delete" || event.key === "Backspace") &&
+          !event.metaKey &&
+          !event.ctrlKey
+        ) {
           event.preventDefault()
           return write(
             selectedNames().map((name) => [name, ""]),
-            { reason: "clear", event },
+            { reason: "clear", event }
           )
         }
-        if (edit.keydown(event, cellName(cell))) return
+        if (edit.keydown(event, cellName(cell))) {
+          return
+        }
         range.keydown(event)
       },
       cellPointerdown(event: PointerEvent, cell: GridCell, name: string) {
-        if (store.get().editing !== name) range.pointerdown(event, cell)
+        if (store.get().editing !== name) {
+          range.pointerdown(event, cell)
+        }
       },
       editorKeydown(event: KeyboardEvent) {
         const active = grid.active()
         const key = event.key
-        if (!edit.inputKeydown(event) || !active || (key !== "Enter" && key !== "Tab")) return
+        if (
+          !edit.inputKeydown(event) ||
+          !active ||
+          (key !== "Enter" && key !== "Tab")
+        ) {
+          return
+        }
         const step = event.shiftKey ? -1 : 1
         const next =
           key === "Enter"
@@ -290,43 +397,64 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
         range.select(null, { reason: "list-navigation", event })
       },
       copy(event: ClipboardEvent) {
-        if (!store.get().editing) copy(event)
+        if (!store.get().editing) {
+          copy(event)
+        }
       },
       cut(event: ClipboardEvent) {
-        if (store.get().editing) return
+        if (store.get().editing) {
+          return
+        }
         copy(event)
         write(
           selectedNames().map((name) => [name, ""]),
-          { reason: "cut", event },
+          { reason: "cut", event }
         )
       },
       paste(event: ClipboardEvent) {
         const text = event.clipboardData?.getData("text/plain")
         const bounds = range.bounds(store.get())
-        if (store.get().editing || !text || !bounds) return
+        if (store.get().editing || !text || !bounds) {
+          return
+        }
         event.preventDefault()
         const pasted = textToCells(text)
         const entries: [string, string][] = []
         pasted.forEach((cells, r) =>
           cells.forEach((raw, c) => {
             const cell = { row: bounds.top + r, col: bounds.left + c }
-            if (cell.row < rows() && cell.col < cols()) entries.push([cellName(cell), raw.trim()])
-          }),
+            if (cell.row < rows() && cell.col < cols()) {
+              entries.push([cellName(cell), raw.trim()])
+            }
+          })
         )
         write(entries, { reason: "paste", event })
         const last = {
           row: Math.min(rows() - 1, bounds.top + pasted.length - 1),
-          col: Math.min(cols() - 1, bounds.left + Math.max(...pasted.map((row) => row.length)) - 1),
+          col: Math.min(
+            cols() - 1,
+            bounds.left + Math.max(...pasted.map((row) => row.length)) - 1
+          ),
         }
-        range.select({ anchor: { row: bounds.top, col: bounds.left }, end: last }, { reason: "imperative" })
+        range.select(
+          { anchor: { row: bounds.top, col: bounds.left }, end: last },
+          { reason: "imperative" }
+        )
       },
       summary(state: SpreadsheetState) {
-        if (!state.range) return { range: false, sum: 0, average: 0, count: 0 }
+        if (!state.range) {
+          return { range: false, sum: 0, average: 0, count: 0 }
+        }
         const numbers = selectedNames()
           .map(valueOf)
           .filter((value): value is number => typeof value === "number")
         const sum = numbers.reduce((a, b) => a + b, 0)
-        return { range: true, sum, average: numbers.length ? sum / numbers.length : 0, count: numbers.length }
+        return {
+          range: true,
+          sum,
+          average: numbers.length ? sum / numbers.length : 0,
+          count: numbers.length,
+        }
       },
     }
     return api
@@ -358,7 +486,11 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
       attrs: () => ({ "aria-label": "Selection" }),
     }),
     formula: slot<{}, SpreadsheetFormulaBarState>({
-      state: (state) => ({ formula: state.active ? (state.cells[cellName(state.active)] ?? "") : "" }),
+      state: (state) => ({
+        formula: state.active
+          ? (state.cells[cellName(state.active)] ?? "")
+          : "",
+      }),
       attrs: () => ({ "aria-label": "Formula" }),
     }),
     summary: slot<{}, SpreadsheetSummaryState>({
@@ -385,26 +517,40 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
     columnheader: slot<{ value: string }, SpreadsheetHeaderState>({
       props: { value: "string" },
       state: (state, { key, api }) => ({
-        selected: !!state.range && covers(api.range.bounds(state), "col", Number(key)),
+        selected:
+          !!state.range && covers(api.range.bounds(state), "col", Number(key)),
       }),
       attrs: (state, { key, api }) => ({
         role: "columnheader",
         "aria-colindex": String(Number(key) + 2),
-        "data-selected": state.range && covers(api.range.bounds(state), "col", Number(key)) ? "" : undefined,
+        "data-selected":
+          state.range && covers(api.range.bounds(state), "col", Number(key))
+            ? ""
+            : undefined,
       }),
-      on: { pointerdown: (event, { api, key }) => api.headerPointerdown(event, "col", Number(key)) },
+      on: {
+        pointerdown: (event, { api, key }) =>
+          api.headerPointerdown(event, "col", Number(key)),
+      },
     }),
     rowheader: slot<{ value: string }, SpreadsheetHeaderState>({
       props: { value: "string" },
       state: (state, { key, api }) => ({
-        selected: !!state.range && covers(api.range.bounds(state), "row", Number(key)),
+        selected:
+          !!state.range && covers(api.range.bounds(state), "row", Number(key)),
       }),
       attrs: (state, { key, api }) => ({
         role: "rowheader",
         "aria-colindex": "1",
-        "data-selected": state.range && covers(api.range.bounds(state), "row", Number(key)) ? "" : undefined,
+        "data-selected":
+          state.range && covers(api.range.bounds(state), "row", Number(key))
+            ? ""
+            : undefined,
       }),
-      on: { pointerdown: (event, { api, key }) => api.headerPointerdown(event, "row", Number(key)) },
+      on: {
+        pointerdown: (event, { api, key }) =>
+          api.headerPointerdown(event, "row", Number(key)),
+      },
     }),
     cell: slot<{ id: string; row: number; col: number }, SpreadsheetCellState>({
       props: { row: "number", col: "number" },
@@ -431,13 +577,18 @@ const spreadsheet = /* @__PURE__ */ definePrimitive({
       }),
       on: {
         keydown: (event, { api, props }) => api.cellKeydown(event, props),
-        pointerdown: (event, { api, props, key }) => api.cellPointerdown(event, props, key),
+        pointerdown: (event, { api, props, key }) =>
+          api.cellPointerdown(event, props, key),
         dblclick: (event, { api, key }) => api.edit.dblclick(event, key),
       },
       bind: (el, { api, props }) => api.range.bind(el, props),
     }),
     editor: slot({
-      attrs: () => ({ "aria-label": "Edit cell", autocomplete: "off", spellcheck: "false" }),
+      attrs: () => ({
+        "aria-label": "Edit cell",
+        autocomplete: "off",
+        spellcheck: "false",
+      }),
       on: {
         keydown: (event, { api }) => api.editorKeydown(event),
         focusout: (event, { api }) => api.edit.end("focus-out", event),
@@ -466,7 +617,10 @@ const SpreadsheetFormulaBar = parts.Formula
 
 const SpreadsheetSummary = parts.Summary
 
-function SpreadsheetRow({ value, ...props }: { value: number } & PartProps<"div">) {
+function SpreadsheetRow({
+  value,
+  ...props
+}: { value: number } & PartProps<"div">) {
   return usePart(spreadsheet, "row", { value: String(value) }, props)
 }
 
@@ -491,7 +645,12 @@ function SpreadsheetCell({
   col,
   ...props
 }: { row: number; col: number } & PartProps<"div", SpreadsheetCellState>) {
-  return usePart(spreadsheet, "cell", { id: cellName({ row, col }), row, col }, props)
+  return usePart(
+    spreadsheet,
+    "cell",
+    { id: cellName({ row, col }), row, col },
+    props
+  )
 }
 
 const SpreadsheetEditor = parts.Editor
@@ -534,8 +693,12 @@ function Example() {
     <Spreadsheet rows={ROWS} cols={COLS} defaultCells={budget}>
       <div data-slot="spreadsheet-frame">
         <div data-slot="row">
-          <SpreadsheetNameBox>{({ selection }) => selection}</SpreadsheetNameBox>
-          <SpreadsheetFormulaBar>{({ formula }) => formula}</SpreadsheetFormulaBar>
+          <SpreadsheetNameBox>
+            {({ selection }) => selection}
+          </SpreadsheetNameBox>
+          <SpreadsheetFormulaBar>
+            {({ formula }) => formula}
+          </SpreadsheetFormulaBar>
         </div>
         <SpreadsheetGrid aria-label="Budget">
           <SpreadsheetRow value={-1}>
@@ -551,7 +714,9 @@ function Example() {
               <SpreadsheetRowHeader value={row}>{row + 1}</SpreadsheetRowHeader>
               {Array.from({ length: COLS }, (_, col) => (
                 <SpreadsheetCell key={col} row={row} col={col}>
-                  {({ value, editing }) => (editing ? <SpreadsheetEditor /> : value)}
+                  {({ value, editing }) =>
+                    editing ? <SpreadsheetEditor /> : value
+                  }
                 </SpreadsheetCell>
               ))}
             </SpreadsheetRow>

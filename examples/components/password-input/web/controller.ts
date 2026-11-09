@@ -36,12 +36,17 @@ function mount(root: HTMLElement) {
     toggle: () => password.toggleVisible(),
     clear: () => password.clear(),
     read: () =>
-      log(root, `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`),
+      log(
+        root,
+        `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`
+      ),
     focus: () => password.focus(),
   }
-  root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
-    button.addEventListener("click", () => actions[button.dataset.action!]())
-  })
+  root
+    .querySelectorAll<HTMLButtonElement>("[data-action]")
+    .forEach((button) => {
+      button.addEventListener("click", () => actions[button.dataset.action!]())
+    })
 }
 
 export { mount }

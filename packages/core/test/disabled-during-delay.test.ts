@@ -20,24 +20,27 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 test.each([
   { name: "tooltip", primitive: tooltip },
   { name: "hover card", primitive: hoverCard },
-])("a $name disabled while the pointer rests on its trigger doesn't open", async ({ primitive }) => {
-  const view = mount(
-    primitive as typeof tooltip,
-    { delay: 200 },
-    `<div><trigger>Ada</trigger><content>Card</content></div>`,
-  )
-  unmounts.push(view.unmount)
-  await view.hover(view.part("trigger")!)
-  rerenderOf(view).setOptions({ disabled: true })
-  await wait(300)
-  expect(view.state.open).toBe(false)
-})
+])(
+  "a $name disabled while the pointer rests on its trigger doesn't open",
+  async ({ primitive }) => {
+    const view = mount(
+      primitive as typeof tooltip,
+      { delay: 200 },
+      `<div><trigger>Ada</trigger><content>Card</content></div>`
+    )
+    unmounts.push(view.unmount)
+    await view.hover(view.part("trigger")!)
+    rerenderOf(view).setOptions({ disabled: true })
+    await wait(300)
+    expect(view.state.open).toBe(false)
+  }
+)
 
 test("a hover card disabled while keyboard focus rests on its trigger doesn't open", async () => {
   const view = mount(
     hoverCard,
     { delay: 200 },
-    `<div><button>Before</button><trigger as="button">Ada</trigger><content>Card</content></div>`,
+    `<div><button>Before</button><trigger as="button">Ada</trigger><content>Card</content></div>`
   )
   unmounts.push(view.unmount)
   view.root.querySelector("button")!.focus()
@@ -51,7 +54,7 @@ test("a popover trigger disabled while the pointer rests on it doesn't open the 
   const view = mount(
     popover,
     { openOnHover: true, delay: 200 },
-    `<div><trigger>Share</trigger><content><button>Copy link</button></content></div>`,
+    `<div><trigger>Share</trigger><content><button>Copy link</button></content></div>`
   )
   unmounts.push(view.unmount)
   await view.hover(view.part("trigger")!)
@@ -64,12 +67,12 @@ test("a submenu trigger disabled while the pointer rests on it doesn't open the 
   const root = mount(
     menu,
     {},
-    `<div><trigger>Actions</trigger><content><item value="copy">Copy</item><div data-submenu></div></content></div>`,
+    `<div><trigger>Actions</trigger><content><item value="copy">Copy</item><div data-submenu></div></content></div>`
   )
   const sub = mount(
     menu,
     { parent: root.api, delay: 200 },
-    `<span><trigger>Share</trigger><content><item value="mail">Mail</item></content></span>`,
+    `<span><trigger>Share</trigger><content><item value="mail">Mail</item></content></span>`
   )
   unmounts.push(sub.unmount, root.unmount)
   root.part("content")!.querySelector("[data-submenu]")!.append(sub.root)
@@ -85,7 +88,7 @@ test("a navigation menu trigger disabled while the pointer rests on it doesn't o
   const view = mount(
     navigationMenu,
     { delay: 200 },
-    `<root aria-label="Main"><list><item value="products"><trigger>Products</trigger><content><link href="#a">All products</link></content></item></list></root>`,
+    `<root aria-label="Main"><list><item value="products"><trigger>Products</trigger><content><link href="#a">All products</link></content></item></list></root>`
   )
   unmounts.push(view.unmount)
   await view.hover(view.part("trigger")!)

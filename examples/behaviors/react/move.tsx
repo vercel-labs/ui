@@ -15,7 +15,11 @@ import {
 import { createParts } from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
-const emoji: Record<string, string> = { Cactus: "🌵", Lemon: "🍋", Rocket: "🚀" }
+const emoji: Record<string, string> = {
+  Cactus: "🌵",
+  Lemon: "🍋",
+  Rocket: "🚀",
+}
 
 type StickersState = {
   positions: Record<string, MovePoint>
@@ -25,7 +29,10 @@ type StickersState = {
 
 type StickersOptions = {
   defaultPositions: Record<string, MovePoint>
-  onPositionsChange?: (positions: Record<string, MovePoint>, details: ChangeDetails<MoveReason>) => void
+  onPositionsChange?: (
+    positions: Record<string, MovePoint>,
+    details: ChangeDetails<MoveReason>
+  ) => void
 }
 
 const stickers = definePrimitive({
@@ -55,23 +62,34 @@ const stickers = definePrimitive({
     }
   },
   slots: (slot) => ({
-    root: slot({ attrs: () => ({ role: "group", style: "position:relative" }) }),
+    root: slot({
+      attrs: () => ({ role: "group", style: "position:relative" }),
+    }),
     sticker: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, part) => {
         const at = state.positions[part.key] ?? { x: 0, y: 0 }
         return {
           tabindex: part.api.roving.tabIndex(state, part),
-          style: css({ position: "absolute", left: `${at.x}px`, top: `${at.y}px`, "touch-action": "none" }),
+          style: css({
+            position: "absolute",
+            left: `${at.x}px`,
+            top: `${at.y}px`,
+            "touch-action": "none",
+          }),
         }
       },
-      live: live<StickersState, any, { value: string }>((state, { api, key }) => ({
-        "data-dragging": api.move.dragging(state, key) ? "" : undefined,
-        style: api.move.style(state, key),
-      })),
+      live: live<StickersState, any, { value: string }>(
+        (state, { api, key }) => ({
+          "data-dragging": api.move.dragging(state, key) ? "" : undefined,
+          style: api.move.style(state, key),
+        })
+      ),
       on: {
-        keydown: (event, { el, api, key }) => api.move.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { el, api, key }) => api.move.pointerdown(event, key, el!),
+        keydown: (event, { el, api, key }) =>
+          api.move.keydown(event, key) || api.roving.keydown(event, el!),
+        pointerdown: (event, { el, api, key }) =>
+          api.move.pointerdown(event, key, el!),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -98,8 +116,9 @@ function Example() {
       onPositionsChange={(next, details) => {
         for (const [sticker, at] of Object.entries(next)) {
           const was = positions.current[sticker]
-          if (was.x !== at.x || was.y !== at.y)
+          if (was.x !== at.x || was.y !== at.y) {
             log(`${sticker} moved to ${at.x}, ${at.y} (${details.reason})`)
+          }
         }
         positions.current = next
       }}

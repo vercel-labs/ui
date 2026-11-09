@@ -39,14 +39,26 @@ const movieTitles = [
   "Arrival",
 ]
 
-function searchMoviePages(query: string, { signal, page }: { signal: AbortSignal; page: number }) {
-  return new Promise<{ items: { value: string; label: string }[]; hasMore: boolean }>((resolve, reject) => {
+function searchMoviePages(
+  query: string,
+  { signal, page }: { signal: AbortSignal; page: number }
+) {
+  return new Promise<{
+    items: { value: string; label: string }[]
+    hasMore: boolean
+  }>((resolve, reject) => {
     const timer = setTimeout(() => {
       const needle = query.trim().toLowerCase()
       const found = movieTitles
         .filter((title) => title.toLowerCase().includes(needle))
-        .map((title) => ({ value: title.toLowerCase().replace(/\W+/g, "-"), label: title }))
-      resolve({ items: found.slice(page * 5, page * 5 + 5), hasMore: found.length > page * 5 + 5 })
+        .map((title) => ({
+          value: title.toLowerCase().replace(/\W+/g, "-"),
+          label: title,
+        }))
+      resolve({
+        items: found.slice(page * 5, page * 5 + 5),
+        hasMore: found.length > page * 5 + 5,
+      })
     }, 500)
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -55,7 +67,11 @@ function searchMoviePages(query: string, { signal, page }: { signal: AbortSignal
   })
 }
 
-const { state: movies, setQuery, loadMore } = useAsyncOptions(searchMoviePages, { immediate: true })
+const {
+  state: movies,
+  setQuery,
+  loadMore,
+} = useAsyncOptions(searchMoviePages, { immediate: true })
 </script>
 
 <template>
@@ -77,11 +93,17 @@ const { state: movies, setQuery, loadMore } = useAsyncOptions(searchMoviePages, 
     </div>
     <ComboboxContent>
       <ComboboxEmpty v-slot="{ state }">
-        <template v-if="state.empty && !state.loading">No movies found.</template>
+        <template v-if="state.empty && !state.loading"
+          >No movies found.</template
+        >
       </ComboboxEmpty>
       <ComboboxList v-slot="{ state }">
         <ComboboxItem
-          v-for="item in state.items as { value: string; label: string; disabled?: boolean }[]"
+          v-for="item in state.items as {
+            value: string
+            label: string
+            disabled?: boolean
+          }[]"
           :key="item.value"
           :value="item.value"
           :label="item.label"
@@ -95,7 +117,11 @@ const { state: movies, setQuery, loadMore } = useAsyncOptions(searchMoviePages, 
       </ComboboxList>
       <ComboboxStatus v-slot="{ state }">
         {{
-          state.loading ? "Loading more…" : movies.hasMore ? `${state.count} loaded` : `All ${state.count}`
+          state.loading
+            ? "Loading more…"
+            : movies.hasMore
+              ? `${state.count} loaded`
+              : `All ${state.count}`
         }}
       </ComboboxStatus>
     </ComboboxContent>

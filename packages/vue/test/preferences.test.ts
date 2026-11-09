@@ -1,10 +1,21 @@
 // @vitest-environment jsdom
 // Preferences across a page load: the server's HTML, its script run the way
 // the parser would, then hydration.
-import { createColorScheme, createLocalStorage, createPreference } from "@ui-sdk/core"
+import {
+  createColorScheme,
+  createLocalStorage,
+  createPreference,
+} from "@ui-sdk/core"
 import { renderToString } from "@vue/server-renderer"
 import { afterEach, expect, test, vi } from "vitest"
-import { createApp, createSSRApp, defineComponent, h, nextTick, type App } from "vue"
+import {
+  createApp,
+  createSSRApp,
+  defineComponent,
+  h,
+  nextTick,
+  type App,
+} from "vue"
 import { Preferences, usePreference } from "../src/preferences"
 
 let app: App | undefined
@@ -15,14 +26,20 @@ afterEach(() => {
   document.body.replaceChildren()
   localStorage.clear()
   delete (window as Window & { __uiSdkStorage?: unknown }).__uiSdkStorage
-  for (const name of document.documentElement.getAttributeNames())
-    if (name.startsWith("data-")) document.documentElement.removeAttribute(name)
+  for (const name of document.documentElement.getAttributeNames()) {
+    if (name.startsWith("data-")) {
+      document.documentElement.removeAttribute(name)
+    }
+  }
 })
 
 const tones = ["default", "light", "medium", "dark"] as const
 
 function setup() {
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme"), global: true })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme"),
+    global: true,
+  })
   const skinTone = createPreference({
     values: tones,
     defaultValue: "default",
@@ -33,7 +50,8 @@ function setup() {
     const state = usePreference(skinTone)
     return () => h("p", `Tone: ${state.value.value}`)
   })
-  const root = () => h(Preferences, { preferences: [colorScheme, skinTone] }, () => [h(Label)])
+  const root = () =>
+    h(Preferences, { preferences: [colorScheme, skinTone] }, () => [h(Label)])
   return { colorScheme, skinTone, root }
 }
 
@@ -41,10 +59,16 @@ function setup() {
 function load(container: HTMLElement, html: string) {
   container.innerHTML = html
   for (const script of container.querySelectorAll("script")) {
-    Object.defineProperty(document, "currentScript", { configurable: true, value: script })
+    Object.defineProperty(document, "currentScript", {
+      configurable: true,
+      value: script,
+    })
     new Function(script.textContent!)()
   }
-  Object.defineProperty(document, "currentScript", { configurable: true, value: null })
+  Object.defineProperty(document, "currentScript", {
+    configurable: true,
+    value: null,
+  })
 }
 
 const settle = () => new Promise((done) => setTimeout(done))
@@ -52,7 +76,9 @@ const settle = () => new Promise((done) => setTimeout(done))
 test("the server renders one script first, and the defaults on its element", async () => {
   const html = await renderToString(createSSRApp(setup().root))
   expect(html.match(/<script/g)).toHaveLength(1)
-  expect(html).toMatch(/^<div data-slot="preferences" data-skin-tone="default"[^>]*><script>/)
+  expect(html).toMatch(
+    /^<div data-slot="preferences" data-skin-tone="default"[^>]*><script>/
+  )
   expect(html).toContain("Tone: default")
 })
 
@@ -62,7 +88,9 @@ test("saved values show before hydration, which then matches, and content catche
   const { root, skinTone } = setup()
   const container = document.body.appendChild(document.createElement("div"))
   load(container, await renderToString(createSSRApp(root)))
-  const element = container.querySelector<HTMLElement>('[data-slot="preferences"]')!
+  const element = container.querySelector<HTMLElement>(
+    '[data-slot="preferences"]'
+  )!
   expect(document.documentElement.dataset.colorScheme).toBe("dark")
   expect(element.dataset.skinTone).toBe("medium")
 
@@ -102,7 +130,8 @@ test("a client-only render drops the script, and still shows the saved values", 
 test("a restore that onValueChange cancels leaves the default on the attributes the script set", async () => {
   localStorage.setItem("color-scheme", "dark")
   localStorage.setItem("skin-tone", "medium")
-  const cancel = (_value: string, details: { cancel: () => void }) => details.cancel()
+  const cancel = (_value: string, details: { cancel: () => void }) =>
+    details.cancel()
   const colorScheme = createColorScheme({
     storage: createLocalStorage("color-scheme"),
     global: true,
@@ -118,7 +147,9 @@ test("a restore that onValueChange cancels leaves the default on the attributes 
   const root = () => h(Preferences, { preferences: [colorScheme, skinTone] })
   const container = document.body.appendChild(document.createElement("div"))
   load(container, await renderToString(createSSRApp(root)))
-  const element = container.querySelector<HTMLElement>('[data-slot="preferences"]')!
+  const element = container.querySelector<HTMLElement>(
+    '[data-slot="preferences"]'
+  )!
   expect(element.dataset.skinTone).toBe("medium")
   app = createSSRApp(root)
   app.mount(container)

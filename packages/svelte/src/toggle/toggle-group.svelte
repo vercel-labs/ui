@@ -15,7 +15,11 @@ Toggles that share one value, with one tab stop and arrow keys between them.
   import { setContext } from "svelte"
   import Part from "../part.svelte"
   import { useToolbarScope } from "../toolbar-context"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { ToggleGroupKey } from "./context"
 
   type Details = ChangeDetails<ToggleGroupValueChangeReason>
@@ -74,7 +78,9 @@ Toggles that share one value, with one tab stop and arrow keys between them.
     onValueChange: (next: string[], details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   setContext(ToggleGroupKey, group)

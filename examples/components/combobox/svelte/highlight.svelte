@@ -30,7 +30,11 @@
     { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
     { value: "es", label: "Spain", keywords: ["españa"] },
     { value: "se", label: "Sweden", keywords: ["sverige"] },
-    { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+    {
+      value: "ch",
+      label: "Switzerland",
+      keywords: ["schweiz", "suisse", "svizzera"],
+    },
   ]
 </script>
 
@@ -48,7 +52,11 @@
     <ComboboxEmpty>No countries found.</ComboboxEmpty>
     <ComboboxList>
       {#each countries as country (country.value)}
-        <ComboboxItem value={country.value} label={country.label} keywords={country.keywords}>
+        <ComboboxItem
+          value={country.value}
+          label={country.label}
+          keywords={country.keywords}
+        >
           <ComboboxItemText>
             {#snippet render({ props, state })}
               <span {...props}>

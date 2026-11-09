@@ -23,7 +23,9 @@ const value = ref([0.3, 0.7])
     <Field>
       <Slider
         v-model:value="value"
-        @value-change="(next, details) => log(`${next.join(' – ')} (${details.reason})`)"
+        @value-change="
+          (next, details) => log(`${next.join(' – ')} (${details.reason})`)
+        "
         :min="0"
         :max="1"
         :step="0.1"

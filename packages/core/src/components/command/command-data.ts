@@ -10,8 +10,13 @@ const asCommand = (entry: CommandDataItem | string) =>
 // Every command at one level, inside groups too, without descending into pages.
 function* commandsAt(items: CommandData) {
   for (const entry of items) {
-    if (typeof entry === "string" || !("type" in entry)) yield asCommand(entry)
-    else if (entry.type === "group") for (const child of entry.items) yield asCommand(child)
+    if (typeof entry === "string" || !("type" in entry)) {
+      yield asCommand(entry)
+    } else if (entry.type === "group") {
+      for (const child of entry.items) {
+        yield asCommand(child)
+      }
+    }
   }
 }
 
@@ -21,9 +26,15 @@ function* commandsAt(items: CommandData) {
 function pageItems(items: CommandData | undefined, pages: readonly string[]) {
   let level = items
   for (const page of pages) {
-    if (!level) return undefined
+    if (!level) {
+      return undefined
+    }
     let next: CommandData | undefined
-    for (const command of commandsAt(level)) if (command.value === page) next = command.items
+    for (const command of commandsAt(level)) {
+      if (command.value === page) {
+        next = command.items
+      }
+    }
     level = next
   }
   return level
@@ -31,12 +42,21 @@ function pageItems(items: CommandData | undefined, pages: readonly string[]) {
 
 // The command with this value anywhere in the data, pages included.
 // check-code: allow return-type recursive, so TypeScript cannot infer it.
-function findCommand(items: CommandData | undefined, value: string): CommandDataItem | undefined {
-  if (!items) return undefined
+function findCommand(
+  items: CommandData | undefined,
+  value: string
+): CommandDataItem | undefined {
+  if (!items) {
+    return undefined
+  }
   for (const command of commandsAt(items)) {
-    if (command.value === value) return command
+    if (command.value === value) {
+      return command
+    }
     const nested = findCommand(command.items, value)
-    if (nested) return nested
+    if (nested) {
+      return nested
+    }
   }
 }
 
@@ -45,12 +65,17 @@ function commandShortcuts(items: CommandData | undefined) {
   const found: { value: string; shortcut: string }[] = []
   const visit = (level: CommandData) => {
     for (const command of commandsAt(level)) {
-      if (command.shortcut && !command.disabled)
+      if (command.shortcut && !command.disabled) {
         found.push({ value: command.value, shortcut: command.shortcut })
-      if (command.items) visit(command.items)
+      }
+      if (command.items) {
+        visit(command.items)
+      }
     }
   }
-  if (items) visit(items)
+  if (items) {
+    visit(items)
+  }
   return found
 }
 

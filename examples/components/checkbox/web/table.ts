@@ -3,10 +3,30 @@ import { Check, createElement, Minus } from "lucide"
 import { log } from "../../../shared/web/log"
 
 const people = [
-  { id: "hollis", name: "Hollis Grant", email: "hollis@example.com", role: "Owner" },
-  { id: "ines", name: "Inès Moreau", email: "ines@example.com", role: "Editor" },
-  { id: "kofi", name: "Kofi Mensah", email: "kofi@example.com", role: "Viewer" },
-  { id: "wren", name: "Wren Takahashi", email: "wren@example.com", role: "Editor" },
+  {
+    id: "hollis",
+    name: "Hollis Grant",
+    email: "hollis@example.com",
+    role: "Owner",
+  },
+  {
+    id: "ines",
+    name: "Inès Moreau",
+    email: "ines@example.com",
+    role: "Editor",
+  },
+  {
+    id: "kofi",
+    name: "Kofi Mensah",
+    email: "kofi@example.com",
+    role: "Viewer",
+  },
+  {
+    id: "wren",
+    name: "Wren Takahashi",
+    email: "wren@example.com",
+    role: "Editor",
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -45,16 +65,18 @@ function mount(root: HTMLElement) {
                   <td>${person.email}</td>
                   <td>${person.role}</td>
                 </tr>
-              `,
+              `
             )
             .join("")}
         </tbody>
       </table>
     </ui-checkbox-group>
   `
-  root.querySelector("ui-checkbox-group")!.addEventListener("valuechange", (event) => {
-    log(root, `${event.detail.value.length} of ${people.length} selected`)
-  })
+  root
+    .querySelector("ui-checkbox-group")!
+    .addEventListener("valuechange", (event) => {
+      log(root, `${event.detail.value.length} of ${people.length} selected`)
+    })
 }
 
 export { mount }

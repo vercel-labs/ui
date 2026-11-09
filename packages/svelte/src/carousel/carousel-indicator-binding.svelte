@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { CarouselIndicatorProps, CarouselIndicatorState } from "@ui-sdk/core/carousel"
+  import type {
+    CarouselIndicatorProps,
+    CarouselIndicatorState,
+  } from "@ui-sdk/core/carousel"
   import { untrack } from "svelte"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
@@ -10,13 +13,14 @@
     owner,
     page,
     ...rest
-  }: PartProps<"button", CarouselIndicatorState> & CarouselIndicatorProps & { owner: CarouselContext } = $props()
+  }: PartProps<"button", CarouselIndicatorState> &
+    CarouselIndicatorProps & { owner: CarouselContext } = $props()
 
   const id = $props.id()
   const indicator = useHandlePart(
     untrack(() => owner),
     "indicator",
-    () => ({ id, page }),
+    () => ({ id, page })
   )
 </script>
 

@@ -9,7 +9,12 @@ import { setAnnouncer } from "../foundation/platform/announce"
 import { applyAttrs } from "../foundation/kernel/live"
 import { attrs, bind, present, subscribe } from "../foundation/kernel/part"
 import { schemaOf } from "../foundation/kernel/primitive"
-import type { OptionsOf, Part, Primitive, SlotName } from "../foundation/kernel/primitive-types"
+import type {
+  OptionsOf,
+  Part,
+  Primitive,
+  SlotName,
+} from "../foundation/kernel/primitive-types"
 import { listen, type ObservedChange } from "../page/observe/registry"
 
 let mounted = 0
@@ -27,14 +32,17 @@ const rerenders = new WeakMap<object, Rerender>()
 // mount hears what's announced while it's mounted, and the last one to
 // unmount gives announcements back to the page's live regions.
 const announcers = new Set<(text: string) => void>()
-const announceToMounts = (text: string) => announcers.forEach((hear) => hear(text))
+const announceToMounts = (text: string) =>
+  announcers.forEach((hear) => hear(text))
 
 function listenToAnnouncements(hear: (text: string) => void) {
   announcers.add(hear)
   setAnnouncer(announceToMounts)
   return () => {
     announcers.delete(hear)
-    if (!announcers.size) setAnnouncer(undefined)
+    if (!announcers.size) {
+      setAnnouncer(undefined)
+    }
   }
 }
 
@@ -46,21 +54,37 @@ function layOut(el: HTMLElement) {
   el.getBoundingClientRect = () => {
     const siblings = el.parentElement
       ? [...el.parentElement.children].filter(
-          (child) => child.getAttribute("data-slot") === el.getAttribute("data-slot"),
+          (child) =>
+            child.getAttribute("data-slot") === el.getAttribute("data-slot")
         )
       : [el]
     const index = Math.max(0, siblings.indexOf(el))
-    const row = el.closest('[aria-orientation="horizontal"], [data-orientation="horizontal"]')
+    const row = el.closest(
+      '[aria-orientation="horizontal"], [data-orientation="horizontal"]'
+    )
     // A row runs right to left in right to left text, as a browser lays it out.
     const rtl = el.closest("[dir]")?.getAttribute("dir") === "rtl"
     const [width, height] = row ? [100, 40] : [200, 40]
     const x = row ? (rtl ? siblings.length - 1 - index : index) * width : 0
     const y = row ? 0 : index * height
-    return { x, y, left: x, top: y, width, height, right: x + width, bottom: y + height, toJSON: () => ({}) }
+    return {
+      x,
+      y,
+      left: x,
+      top: y,
+      width,
+      height,
+      right: x + width,
+      bottom: y + height,
+      toJSON: () => ({}),
+    }
   }
   // Rendered while in the page, so what follows an element, like a popup its
   // trigger, finds it there after the first look.
-  el.getClientRects = () => (el.isConnected ? [el.getBoundingClientRect()] : []) as unknown as DOMRectList
+  el.getClientRects = () =>
+    (el.isConnected
+      ? [el.getBoundingClientRect()]
+      : []) as unknown as DOMRectList
 }
 
 // What a DOM made for tests leaves out that primitives call: animations, which
@@ -83,11 +107,17 @@ function fillGaps(doc: Document) {
   }
   // Shown unless it or an ancestor is hidden, not displayed or invisible.
   proto.checkVisibility ??= function (this: Element) {
-    if (!this.isConnected) return false
+    if (!this.isConnected) {
+      return false
+    }
     for (let node: Element | null = this; node; node = node.parentElement) {
-      if ((node as HTMLElement).hidden) return false
+      if ((node as HTMLElement).hidden) {
+        return false
+      }
       const style = getComputedStyle(node)
-      if (style.display === "none" || style.visibility === "hidden") return false
+      if (style.display === "none" || style.visibility === "hidden") {
+        return false
+      }
     }
     return true
   }
@@ -98,7 +128,8 @@ function fillGaps(doc: Document) {
         return x >= box.left && x < box.right && y >= box.top && y < box.bottom
       })
       .reverse()
-  doc.elementFromPoint ??= (x: number, y: number) => doc.elementsFromPoint(x, y)[0] ?? null
+  doc.elementFromPoint ??= (x: number, y: number) =>
+    doc.elementsFromPoint(x, y)[0] ?? null
 }
 
 /**
@@ -116,7 +147,11 @@ function fillGaps(doc: Document) {
  *
  * @experimental
  */
-function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup: string) {
+function mount<P extends Primitive>(
+  primitive: P,
+  options: OptionsOf<P>,
+  markup: string
+) {
   const schema = schemaOf(primitive)
   const doc = document
   fillGaps(doc)
@@ -132,13 +167,16 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
   // A cleanup that throws doesn't stop the rest, so nothing a mount made outlives it.
   function unmount() {
     const errors: unknown[] = []
-    for (const step of [...cleanups.splice(0), ...teardown.splice(0)])
+    for (const step of [...cleanups.splice(0), ...teardown.splice(0)]) {
       try {
         step()
       } catch (error) {
         errors.push(error)
       }
-    if (errors.length) throw errors[0]
+    }
+    if (errors.length) {
+      throw errors[0]
+    }
   }
   function unmountingOnError<T>(run: () => T) {
     try {
@@ -168,14 +206,24 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
 
   // Renders a markup node into `parent`, with the props of the parts around it
   // for props a nested part takes from its parent, like an item's `value`.
-  function render(node: MarkupNode | string, parent: Node, around: Record<string, Record<string, unknown>>) {
-    if (typeof node === "string") return parent.appendChild(doc.createTextNode(node))
+  function render(
+    node: MarkupNode | string,
+    parent: Node,
+    around: Record<string, Record<string, unknown>>
+  ) {
+    if (typeof node === "string") {
+      return parent.appendChild(doc.createTextNode(node))
+    }
     const own = schema.slots[node.tag]
     if (!own) {
       const el = doc.createElement(node.tag)
-      for (const [name, value] of node.attributes) el.setAttribute(name, value)
+      for (const [name, value] of node.attributes) {
+        el.setAttribute(name, value)
+      }
       parent.appendChild(el)
-      for (const child of node.children) render(child, el, around)
+      for (const child of node.children) {
+        render(child, el, around)
+      }
       return
     }
     const slot = node.tag
@@ -183,11 +231,13 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
       own,
       node.attributes,
       around,
-      () => `${id}-${slot}-${parts.length}`,
+      () => `${id}-${slot}-${parts.length}`
     )
     let part = instance.part(slot as SlotName<P>, props as never) as Part
     const el = doc.createElement(as ?? tagOf(attrs(part)))
-    for (const [name, value] of extra) el.setAttribute(name, value)
+    for (const [name, value] of extra) {
+      el.setAttribute(name, value)
+    }
     layOut(el)
     const placeholder = doc.createComment(slot)
     parent.appendChild(placeholder)
@@ -199,12 +249,20 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
       applyAttrs(el, attrs(part))
       const shows = present(part)
       const swaps = shows ? placeholder.parentNode : el.parentNode
-      if (shows && swaps) placeholder.replaceWith(el)
-      else if (!shows && swaps) el.replaceWith(placeholder)
-      if (!ready) return
+      if (shows && swaps) {
+        placeholder.replaceWith(el)
+      } else if (!shows && swaps) {
+        el.replaceWith(placeholder)
+      }
+      if (!ready) {
+        return
+      }
       // Nor is a part rendered inside one that isn't.
       const rendered =
-        shows && !parts.some((outer) => outer.el !== el && !outer.shows() && outer.el.contains(el))
+        shows &&
+        !parts.some(
+          (outer) => outer.el !== el && !outer.shows() && outer.el.contains(el)
+        )
       if (rendered && !unbind) {
         // Binding can change state, which calls this again before it returns.
         let cleanup: (() => void) | undefined
@@ -214,45 +272,70 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
         unbind()
         unbind = undefined
       }
-      if (swaps) for (const inner of parts) if (inner.el !== el && el.contains(inner.el)) inner.sync()
+      if (swaps) {
+        for (const inner of parts) {
+          if (inner.el !== el && el.contains(inner.el)) {
+            inner.sync()
+          }
+        }
+      }
     }
     sync()
     syncs.push(sync)
     const inherited = Object.keys(own).flatMap((key) => {
       const from = fromOf(own[key], key)
-      return from && !node.attributes.some(([name]) => camel(name) === key) ? [{ key, ...from }] : []
+      return from && !node.attributes.some(([name]) => camel(name) === key)
+        ? [{ key, ...from }]
+        : []
     })
     let unsubscribe: (() => void) | undefined
     // Props with a new key, like a new `id`, make another part, which a
     // renderer binds the element to in place of the first.
     const rerender = (next: Record<string, unknown>) => {
       const found = instance.part(slot as SlotName<P>, next as never) as Part
-      if (found === part) return
+      if (found === part) {
+        return
+      }
       unbind?.()
       unbind = undefined
       unsubscribe?.()
       part = found
       entry.key = part.key
-      if (ready) unsubscribe = subscribe(part, sync)
+      if (ready) {
+        unsubscribe = subscribe(part, sync)
+      }
     }
-    const entry = { slot, key: part.key, el, props, inherited, sync, rerender, shows: () => present(part) }
+    const entry = {
+      slot,
+      key: part.key,
+      el,
+      props,
+      inherited,
+      sync,
+      rerender,
+      shows: () => present(part),
+    }
     parts.push(entry)
     binds.push(() => {
       ready = true
       unsubscribe = subscribe(part, sync)
       cleanups.push(
         () => unsubscribe?.(),
-        () => unbind?.(),
+        () => unbind?.()
       )
       sync()
     })
-    for (const child of node.children) render(child, el, { ...around, [slot]: props })
+    for (const child of node.children) {
+      render(child, el, { ...around, [slot]: props })
+    }
   }
 
   // Parts bind once every element is in the page, parents first, as custom elements do.
   const binds: (() => void)[] = []
   unmountingOnError(() => {
-    for (const node of parseMarkup(markup)) render(node, container, {})
+    for (const node of parseMarkup(markup)) {
+      render(node, container, {})
+    }
     binds.forEach((bindPart) => bindPart())
   })
   const root = (container.firstElementChild as HTMLElement | null) ?? container
@@ -262,7 +345,10 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
     root,
     /** The element of a part, by slot and, for a slot with several parts, its key, like an item's value. */
     part: (slot: SlotName<P>, key?: string) =>
-      parts.find((entry) => entry.slot === slot && (key === undefined || entry.key === key))?.el,
+      parts.find(
+        (entry) =>
+          entry.slot === slot && (key === undefined || entry.key === key)
+      )?.el,
     /** The instance's state now. */
     get state() {
       return instance.get() as ReturnType<P>["types"]["state"]
@@ -297,14 +383,24 @@ function mount<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup:
       syncs.forEach((sync) => sync())
     },
     setProps(slot, key, patch) {
-      const entry = parts.find((found) => found.slot === slot && (key === "" || found.key === key))
-      if (!entry) throw new Error(`No ${slot} part keyed "${key}" in the markup.`)
+      const entry = parts.find(
+        (found) => found.slot === slot && (key === "" || found.key === key)
+      )
+      if (!entry) {
+        throw new Error(`No ${slot} part keyed "${key}" in the markup.`)
+      }
       entry.props = { ...entry.props, ...patch }
       entry.rerender(entry.props)
       for (const inner of parts) {
-        const taken = inner.inherited.filter((from) => from.slot === slot && from.prop in patch)
-        if (inner === entry || !taken.length || !entry.el.contains(inner.el)) continue
-        for (const from of taken) inner.props = { ...inner.props, [from.key]: patch[from.prop] }
+        const taken = inner.inherited.filter(
+          (from) => from.slot === slot && from.prop in patch
+        )
+        if (inner === entry || !taken.length || !entry.el.contains(inner.el)) {
+          continue
+        }
+        for (const from of taken) {
+          inner.props = { ...inner.props, [from.key]: patch[from.prop] }
+        }
         inner.rerender(inner.props)
       }
       syncs.forEach((sync) => sync())

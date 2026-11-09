@@ -10,7 +10,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test.beforeEach(async ({ open }) => {
@@ -30,10 +32,15 @@ test("no axe violations while scrolled and hovered", async ({ page }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("scrollbars and the corner are hidden from assistive technology", async ({ page }) => {
+test("scrollbars and the corner are hidden from assistive technology", async ({
+  page,
+}) => {
   const root = area(page, gallery.label)
-  for (const part of await root.locator(".scroll-area-scrollbar, .scroll-area-corner").all())
+  for (const part of await root
+    .locator(".scroll-area-scrollbar, .scroll-area-corner")
+    .all()) {
     await expect(part).toHaveAttribute("aria-hidden", "true")
+  }
 })
 
 // Every implementation must expose the same accessibility tree.

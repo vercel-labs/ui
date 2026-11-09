@@ -18,7 +18,9 @@
     }
   }
 
-  [data-slot="stack"]:has(> [data-slot="command-root"] [data-slot="command-input"]) {
+  [data-slot="stack"]:has(
+    > [data-slot="command-root"] [data-slot="command-input"]
+  ) {
     max-width: 24rem;
   }
 
@@ -165,7 +167,8 @@
     text-underline-offset: 3px;
   }
 
-  [data-slot="command-item"]:not([data-highlighted]) [data-slot="command-item-text"][data-matched] {
+  [data-slot="command-item"]:not([data-highlighted])
+    [data-slot="command-item-text"][data-matched] {
     color: var(--muted);
 
     & mark {

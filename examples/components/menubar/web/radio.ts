@@ -31,7 +31,7 @@ export function mount(root: HTMLElement) {
                       </ui-menu-item-indicator>
                       ${profile.label}
                     </ui-menu-radio-item>
-                  `,
+                  `
                 )
                 .join("")}
             </ui-menu-radio-group>
@@ -51,7 +51,7 @@ export function mount(root: HTMLElement) {
                       </ui-menu-item-indicator>
                       ${option.label}
                     </ui-menu-radio-item>
-                  `,
+                  `
                 )
                 .join("")}
             </ui-menu-radio-group>

@@ -8,7 +8,9 @@ import { createAgent } from "../src/page/agent/agent"
 
 test("an agent on a server hears no components", () => {
   const agent = createAgent()
-  for (let index = 0; index < 50; index++) checkbox({ id: `terms-${index}` })
+  for (let index = 0; index < 50; index++) {
+    checkbox({ id: `terms-${index}` })
+  }
   expect(watchers.add).toBeUndefined()
   expect(agent.snapshot()).toEqual([])
 })

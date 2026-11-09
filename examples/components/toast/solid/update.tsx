@@ -1,4 +1,9 @@
-import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import {
+  Toast,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -22,10 +27,14 @@ function Example() {
         id,
         done
           ? { title: "Report uploaded", type: "success" }
-          : { title: `Uploading report.pdf… ${progress}%` },
+          : { title: `Uploading report.pdf… ${progress}%` }
       )
-      if (!open) log("Upload canceled")
-      if (done || !open) clearInterval(timer)
+      if (!open) {
+        log("Upload canceled")
+      }
+      if (done || !open) {
+        clearInterval(timer)
+      }
     }, 700)
   }
 

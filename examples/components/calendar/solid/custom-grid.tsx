@@ -23,7 +23,9 @@ function Example() {
       <div data-slot="row">
         <CalendarPrevious
           data-variant="ghost"
-          render={(props, step) => <button {...props} title={`Show ${step.month}`} />}
+          render={(props, step) => (
+            <button {...props} title={`Show ${step.month}`} />
+          )}
         >
           <svg
             viewBox="0 0 24 24"
@@ -60,7 +62,9 @@ function Example() {
                 <th scope="col">
                   <abbr title="Week">Wk</abbr>
                 </th>
-                <For each={grid.weekdays}>{(_, index) => <CalendarWeekday index={index()} />}</For>
+                <For each={grid.weekdays}>
+                  {(_, index) => <CalendarWeekday index={index()} />}
+                </For>
               </tr>
             </thead>
             <tbody>

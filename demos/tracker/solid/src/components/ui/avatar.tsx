@@ -14,14 +14,19 @@ function initials(name: string) {
     .join("")
 }
 
-function Avatar(props: { name: string; size?: keyof typeof sizes; decorative?: boolean; class?: string }) {
+function Avatar(props: {
+  name: string
+  size?: keyof typeof sizes
+  decorative?: boolean
+  class?: string
+}) {
   return (
     <AvatarPrimitive
       aria-hidden={props.decorative ? "true" : undefined}
       class={cn(
         "relative flex shrink-0 rounded-full select-none",
         sizes[props.size ?? "default"],
-        props.class,
+        props.class
       )}
     >
       <AvatarFallback class="flex size-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground">

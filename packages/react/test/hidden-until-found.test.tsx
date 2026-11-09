@@ -5,8 +5,18 @@ import * as React from "react"
 import { createRoot, type Root } from "react-dom/client"
 import { afterEach, describe, expect, test } from "vitest"
 import { idle } from "../../core/test/after-mount"
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "../src/accordion"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "../src/accordion"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -28,7 +38,11 @@ afterEach(async () => {
   document.body.replaceChildren()
 })
 
-type Case = { name: string; slot: string; ui: (findable: boolean) => React.ReactNode }
+type Case = {
+  name: string
+  slot: string
+  ui: (findable: boolean) => React.ReactNode
+}
 
 const cases: Case[] = [
   {
@@ -141,14 +155,24 @@ async function hiddenAcross({ slot, ui }: Case, steps: boolean[]) {
 
 describe.each(cases)("$name", (entry) => {
   test("turned on after mount, it becomes findable", async () => {
-    expect(await hiddenAcross(entry, [false, true])).toEqual(["", "until-found"])
+    expect(await hiddenAcross(entry, [false, true])).toEqual([
+      "",
+      "until-found",
+    ])
   })
 
   test("turned on and off again, it's plainly hidden", async () => {
-    expect(await hiddenAcross(entry, [false, true, false])).toEqual(["", "until-found", ""])
+    expect(await hiddenAcross(entry, [false, true, false])).toEqual([
+      "",
+      "until-found",
+      "",
+    ])
   })
 
   test("on from the start and turned off, it's plainly hidden", async () => {
-    expect(await hiddenAcross(entry, [true, false])).toEqual(["until-found", ""])
+    expect(await hiddenAcross(entry, [true, false])).toEqual([
+      "until-found",
+      "",
+    ])
   })
 })

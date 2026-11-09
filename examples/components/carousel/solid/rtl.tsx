@@ -43,7 +43,12 @@ function Example() {
           </CarouselPrevious>
           <CarouselIndicatorGroup aria-label="اختر شريحة">
             <For each={slides}>
-              {(slide) => <CarouselIndicator page={slide} aria-label={`الشريحة ${slide}`} />}
+              {(slide) => (
+                <CarouselIndicator
+                  page={slide}
+                  aria-label={`الشريحة ${slide}`}
+                />
+              )}
             </For>
           </CarouselIndicatorGroup>
           <CarouselNext aria-label="الشريحة التالية">

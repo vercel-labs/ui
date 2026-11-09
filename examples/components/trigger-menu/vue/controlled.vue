@@ -16,7 +16,14 @@ const commands = [
   {
     value: "status",
     label: "status",
-    arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
+    arguments: [
+      {
+        name: "status",
+        hint: "<status>",
+        required: true,
+        items: ["available", "busy", "away"],
+      },
+    ],
   },
 ]
 
@@ -32,10 +39,16 @@ const open = ref(false)
       { char: '/', boundary: 'start', items: commands },
     ]"
     shortcut="ctrl+j"
-    @open-change="(next, details) => log(`${next ? 'Opening' : 'Closing'} (${details.reason})`)"
+    @open-change="
+      (next, details) =>
+        log(`${next ? 'Opening' : 'Closing'} (${details.reason})`)
+    "
     @open-change-complete="(next) => log(next ? 'Open' : 'Closed')"
     @query-change="
-      (query, details) => log(`Query “${query}”${details.argument ? ` for ${details.argument}` : ''}`)
+      (query, details) =>
+        log(
+          `Query “${query}”${details.argument ? ` for ${details.argument}` : ''}`
+        )
     "
   >
     <Field>

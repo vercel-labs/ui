@@ -1,6 +1,10 @@
 // The segmented control every implementation renders. Labels, values and
 // order are the contract the specs rely on, so change them here and nowhere else.
-type SegmentedControlFixtureItem = { value: string; label: string; disabled?: boolean }
+type SegmentedControlFixtureItem = {
+  value: string
+  label: string
+  disabled?: boolean
+}
 
 const segmentedControlFixture = {
   label: "View",

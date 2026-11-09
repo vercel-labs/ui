@@ -29,16 +29,18 @@ function mount(root: HTMLElement) {
                   ${role.label}
                   <ui-select-item-indicator keep-mounted>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>
       </ui-select>
     </ui-field>
   `
-  root.querySelector("ui-select")!.addEventListener("openchangecomplete", (event) => {
-    log(root, event.detail.value ? "Finished opening" : "Finished closing")
-  })
+  root
+    .querySelector("ui-select")!
+    .addEventListener("openchangecomplete", (event) => {
+      log(root, event.detail.value ? "Finished opening" : "Finished closing")
+    })
 }
 
 export { mount }

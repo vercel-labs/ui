@@ -38,7 +38,8 @@ import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
  * Why a date or time input's value wants to change.
  * @stable
  */
-type DateInputValueChangeReason = "input-change" | "step-key" | "paste" | "reset" | "restore" | "imperative"
+type DateInputValueChangeReason =
+  "input-change" | "step-key" | "paste" | "reset" | "restore" | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -104,23 +105,31 @@ const formatOf = (state: State) => {
 const editing = (state: State) => state.fieldsFor === keyOf(state.value)
 
 // What the segments hold: what was typed over the value, else the value's own fields.
-const shownFields = (state: State) => (editing(state) ? state.fields : fieldsOf(state.value, formatOf(state)))
+const shownFields = (state: State) =>
+  editing(state) ? state.fields : fieldsOf(state.value, formatOf(state))
 
 const segmentCache = new WeakMap<State, DateInputSegmentData[]>()
 
 function segmentsFor(state: State) {
   let segments = segmentCache.get(state)
   if (!segments) {
-    segments = segmentsOf(formatOf(state), shownFields(state), editing(state) ? state.buffer : null)
+    segments = segmentsOf(
+      formatOf(state),
+      shownFields(state),
+      editing(state) ? state.buffer : null
+    )
     segmentCache.set(state, segments)
   }
   return segments
 }
 
-const segmentFor = (state: State, key: string) => segmentsFor(state).find((segment) => segment.key === key)
+const segmentFor = (state: State, key: string) =>
+  segmentsFor(state).find((segment) => segment.key === key)
 
 function isPartial(state: State) {
-  if (state.value !== null) return false
+  if (state.value !== null) {
+    return false
+  }
   const fields = shownFields(state)
   return typesOf(formatOf(state)).some((type) => fields[type] !== null)
 }
@@ -131,20 +140,32 @@ function isPartial(state: State) {
  */
 function problemOf(state: State) {
   const { value, min, max } = state
-  if (value === null) return undefined
-  if (min !== null && compareTo(value, min) < 0) return "rangeUnderflow" as const
-  if (max !== null && compareTo(value, max) > 0) return "rangeOverflow" as const
+  if (value === null) {
+    return undefined
+  }
+  if (min !== null && compareTo(value, min) < 0) {
+    return "rangeUnderflow" as const
+  }
+  if (max !== null && compareTo(value, max) > 0) {
+    return "rangeOverflow" as const
+  }
   const date = dateOf(value)
-  if (date && matchesDate(date, state.unavailable)) return "unavailable" as const
+  if (date && matchesDate(date, state.unavailable)) {
+    return "unavailable" as const
+  }
 }
 
 const settings = (kind: Kind, options: SharedOptions) => {
-  const granularity = options.granularity ?? (kind === "date" ? "day" : "minute")
+  const granularity =
+    options.granularity ?? (kind === "date" ? "day" : "minute")
   const format = { kind, granularity, hourCycle: 24 as HourCycle }
   return {
     kind,
     granularity,
-    hourCycle: options.hourCycle === 12 || options.hourCycle === 24 ? options.hourCycle : null,
+    hourCycle:
+      options.hourCycle === 12 || options.hourCycle === 24
+        ? options.hourCycle
+        : null,
     locale: options.locale ?? null,
     min: normalizeBound(options.min, format),
     max: normalizeBound(options.max, format),
@@ -160,11 +181,20 @@ const settings = (kind: Kind, options: SharedOptions) => {
 // A bound keeps a date alone, so a date-and-time input's `max` can take a whole day.
 function normalizeBound(
   bound: string | undefined,
-  format: { kind: Kind; granularity: DateInputGranularity; hourCycle: HourCycle },
+  format: {
+    kind: Kind
+    granularity: DateInputGranularity
+    hourCycle: HourCycle
+  }
 ) {
-  if (typeof bound !== "string") return null
+  if (typeof bound !== "string") {
+    return null
+  }
   const dateAlone = format.kind === "date" && /^\d{4}-\d{2}-\d{2}$/.test(bound)
-  return normalizeValue(bound, { ...format, granularity: dateAlone ? "day" : "second" })
+  return normalizeValue(bound, {
+    ...format,
+    granularity: dateAlone ? "day" : "second",
+  })
 }
 
 const valueFor = (kind: Kind, options: SharedOptions, value: unknown) =>
@@ -177,7 +207,11 @@ const valueFor = (kind: Kind, options: SharedOptions, value: unknown) =>
 function initialDateInputState(kind: Kind, options: SharedOptions): State {
   return {
     ...settings(kind, options),
-    value: valueFor(kind, options, options.value ?? options.defaultValue ?? null),
+    value: valueFor(
+      kind,
+      options,
+      options.value ?? options.defaultValue ?? null
+    ),
     initial: valueFor(kind, options, options.defaultValue ?? null),
     fields: emptyFields(),
     fieldsFor: "",
@@ -189,8 +223,12 @@ function initialDateInputState(kind: Kind, options: SharedOptions): State {
 
 const syncDateInputState = (kind: Kind, options: SharedOptions) => ({
   ...settings(kind, options),
-  ...(options.defaultValue === undefined ? {} : { initial: valueFor(kind, options, options.defaultValue) }),
-  ...(options.value === undefined ? {} : { value: valueFor(kind, options, options.value) }),
+  ...(options.defaultValue === undefined
+    ? {}
+    : { initial: valueFor(kind, options, options.defaultValue) }),
+  ...(options.value === undefined
+    ? {}
+    : { value: valueFor(kind, options, options.value) }),
 })
 
 const optionKinds = {
@@ -219,12 +257,20 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   const format = () => formatOf(store.get())
 
   const segmentElements = () =>
-    elements<{ segment?: Pick<DateInputSegmentData, "key"> }>(context, "segment")
-      .map(({ el, props }) => ({ el, type: segmentFor(store.get(), props.segment?.key ?? "")?.type }))
+    elements<{ segment?: Pick<DateInputSegmentData, "key"> }>(
+      context,
+      "segment"
+    )
+      .map(({ el, props }) => ({
+        el,
+        type: segmentFor(store.get(), props.segment?.key ?? "")?.type,
+      }))
       .filter(
-        (item): item is { el: HTMLElement; type: EditableType } => !!item.type && item.type !== "literal",
+        (item): item is { el: HTMLElement; type: EditableType } =>
+          !!item.type && item.type !== "literal"
       )
-  const segmentElement = (type: string) => segmentElements().find((item) => item.type === type)?.el
+  const segmentElement = (type: string) =>
+    segmentElements().find((item) => item.type === type)?.el
   // The segment focus moved to once the last one was done, so the separator
   // typed next, as in 12/25, doesn't skip it.
   let advancedTo: HTMLElement | null = null
@@ -232,25 +278,45 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   // The fields after an edit, and the value they make when all are filled.
   // A segment that may take another digit holds its value back, so typing a
   // year reports 2026 once, not 2, 20 and 202 on the way.
-  function edit(fields: Fields, buffer: State["buffer"], reason: DateInputValueChangeReason, event?: Event) {
+  function edit(
+    fields: Fields,
+    buffer: State["buffer"],
+    reason: DateInputValueChangeReason,
+    event?: Event
+  ) {
     const current = store.get().value
-    if (buffer) return store.set({ fields, buffer, fieldsFor: keyOf(current) })
+    if (buffer) {
+      return store.set({ fields, buffer, fieldsFor: keyOf(current) })
+    }
     const next = valueOf(fields, format())
-    if (next !== current) change("value", next, { reason, event })
+    if (next !== current) {
+      change("value", next, { reason, event })
+    }
     store.set({ fields, buffer, fieldsFor: keyOf(next) })
   }
 
   function finish(event?: Event) {
     const state = store.get()
-    if (!state.buffer) return
-    if (!editing(state)) return store.set({ buffer: null })
+    if (!state.buffer) {
+      return
+    }
+    if (!editing(state)) {
+      return store.set({ buffer: null })
+    }
     edit(clampDay(state.fields), null, "input-change", event)
   }
 
-  function setValue(value: string | null, reason: DateInputValueChangeReason, event?: Event) {
+  function setValue(
+    value: string | null,
+    reason: DateInputValueChangeReason,
+    event?: Event
+  ) {
     const next = value === null ? null : normalizeValue(value, format())
-    if (value !== null && next === null) return false
-    const changed = next === store.get().value || change("value", next, { reason, event })
+    if (value !== null && next === null) {
+      return false
+    }
+    const changed =
+      next === store.get().value || change("value", next, { reason, event })
     store.set({ fields: emptyFields(), fieldsFor: "", buffer: null })
     return changed
   }
@@ -272,10 +338,16 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   // or the start of the day.
   function startOf(type: EditableType, direction: 1 | -1, fields: Fields) {
     const now = new Date()
-    if (type === "year") return now.getFullYear()
-    if (type === "month") return now.getMonth() + 1
+    if (type === "year") {
+      return now.getFullYear()
+    }
+    if (type === "month") {
+      return now.getMonth() + 1
+    }
     const [min, max] = boundsOf(type, fields, format().hourCycle)
-    if (type === "day") return Math.min(now.getDate(), max)
+    if (type === "day") {
+      return Math.min(now.getDate(), max)
+    }
     return direction === 1 ? min : max
   }
 
@@ -283,19 +355,30 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
     const fields = shownFields(store.get())
     const { hourCycle } = format()
     let next: Fields
-    if (key === "Home" || key === "End")
+    if (key === "Home" || key === "End") {
       next = stepToEnd(fields, type, key === "Home" ? "min" : "max", hourCycle)
-    else {
+    } else {
       const direction = key === "ArrowUp" || key === "PageUp" ? 1 : -1
       const size = key.startsWith("Page") ? pageStepOf(type) : 1
-      next = stepField(fields, type, direction * size, hourCycle, startOf(type, direction, fields))
+      next = stepField(
+        fields,
+        type,
+        direction * size,
+        hourCycle,
+        startOf(type, direction, fields)
+      )
     }
     edit(next, null, "step-key", event)
   }
 
   // Characters typed into a segment. Digits fill it, a letter picks AM or PM,
   // and a separator moves on. Once a segment is done the rest go to the next.
-  function insert(type: EditableType, el: HTMLElement, text: string, event: Event) {
+  function insert(
+    type: EditableType,
+    el: HTMLElement,
+    text: string,
+    event: Event
+  ) {
     const { hourCycle, locale } = format()
     let target = el
     let current = type
@@ -308,17 +391,29 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
       if (/\d/.test(char) && current !== "dayPeriod") {
         const typed = typeDigit(fields, buffer, current, char, hourCycle)
         edit(typed.fields, typed.buffer, "input-change", event)
-        if (typed.done && advance()) advancedTo = target
-        else if (typed.done) break
+        if (typed.done && advance()) {
+          advancedTo = target
+        } else if (typed.done) {
+          break
+        }
       } else if (separators.test(char)) {
-        if (advanced || (buffer?.type !== current && fields[current] === null)) continue
+        if (
+          advanced ||
+          (buffer?.type !== current && fields[current] === null)
+        ) {
+          continue
+        }
         finish(event)
-        if (!advance()) break
+        if (!advance()) {
+          break
+        }
       } else if (/\p{L}/u.test(char)) {
         const period = typePeriod(fields, char, locale)
         if (period && (current === "dayPeriod" || hourCycle === 12)) {
           edit(period, null, "input-change", event)
-          if (current === "dayPeriod" && !advance()) break
+          if (current === "dayPeriod" && !advance()) {
+            break
+          }
         }
       }
     }
@@ -340,47 +435,77 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
 
   // Backspace removes the last digit typed, then empties the segment, then
   // moves back. Delete empties it.
-  function remove(type: EditableType, el: HTMLElement, backward: boolean, event: Event) {
+  function remove(
+    type: EditableType,
+    el: HTMLElement,
+    backward: boolean,
+    event: Event
+  ) {
     const state = store.get()
     const fields = shownFields(state)
     const buffer = editing(state) ? state.buffer : null
     if (backward && buffer?.type === type && buffer.text.length > 1) {
       const text = buffer.text.slice(0, -1)
-      const typed = typeDigit({ ...fields, [type]: null }, null, type, text, format().hourCycle)
+      const typed = typeDigit(
+        { ...fields, [type]: null },
+        null,
+        type,
+        text,
+        format().hourCycle
+      )
       return edit(typed.fields, { type, text }, "input-change", event)
     }
-    if (fields[type] !== null || buffer?.type === type)
+    if (fields[type] !== null || buffer?.type === type) {
       return edit({ ...fields, [type]: null }, null, "input-change", event)
-    if (backward) moveFocus(el, -1)
+    }
+    if (backward) {
+      moveFocus(el, -1)
+    }
   }
 
   function paste(event: ClipboardEvent) {
     const text = event.clipboardData?.getData("text/plain")?.trim()
     event.preventDefault()
-    if (!text || !editable()) return
+    if (!text || !editable()) {
+      return
+    }
     const state = store.get()
     let value = normalizeValue(text, format())
     if (value === null && state.kind === "date") {
       const date = parseDate(text, localeOf(state))
-      if (date) value = normalizeValue(date, format())
+      if (date) {
+        value = normalizeValue(date, format())
+      }
     }
-    if (value !== null) setValue(value, "paste", event)
+    if (value !== null) {
+      setValue(value, "paste", event)
+    }
   }
 
   function keydown(event: KeyboardEvent, type: EditableType, el: HTMLElement) {
-    if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return
+    if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) {
+      return
+    }
     const { key } = event
     if (key === "ArrowLeft" || key === "ArrowRight") {
       event.preventDefault()
       moveFocus(el, (key === "ArrowRight") !== isRTL(el) ? 1 : -1)
-    } else if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(key)) {
+    } else if (
+      ["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"].includes(
+        key
+      )
+    ) {
       event.preventDefault()
-      if (editable()) step(type, key, event)
+      if (editable()) {
+        step(type, key, event)
+      }
     } else if (key === "Backspace" || key === "Delete") {
       // WebKit sends no beforeinput when a segment has nothing left to delete,
       // so a key from a keyboard is handled here, the same in every browser.
       event.preventDefault()
-      if (editable()) remove(type, el, key === "Backspace", event)
+      if (editable()) {
+        remove(type, el, key === "Backspace", event)
+      }
     } else if (key === "Enter") {
       // WebKit sends no beforeinput for Enter either, and the form submits
       // right after this key, so the digits typed so far are kept first.
@@ -391,29 +516,61 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   // Every edit goes through here, so the browser never writes the segment's text.
   // Enter keeps its default, so the form submits with what was typed.
   function beforeinput(event: InputEvent, type: EditableType, el: HTMLElement) {
-    if (event.isComposing && !event.cancelable) return
-    if (event.inputType === "insertLineBreak") return finish(event)
+    if (event.isComposing && !event.cancelable) {
+      return
+    }
+    if (event.inputType === "insertLineBreak") {
+      return finish(event)
+    }
     event.preventDefault()
-    if (!editable()) return
+    if (!editable()) {
+      return
+    }
     const kind = event.inputType
-    if (kind.startsWith("insert") && kind !== "insertFromPaste" && kind !== "insertFromDrop" && event.data)
+    if (
+      kind.startsWith("insert") &&
+      kind !== "insertFromPaste" &&
+      kind !== "insertFromDrop" &&
+      event.data
+    ) {
       insert(type, el, event.data, event)
-    else if (kind.startsWith("delete")) remove(type, el, kind.includes("Backward"), event)
+    } else if (kind.startsWith("delete")) {
+      remove(type, el, kind.includes("Backward"), event)
+    }
   }
 
   // Text the browser wrote anyway, like an input method's or typing before
   // the page ran: the digits in it fill the segment.
-  function adopt(type: EditableType, el: HTMLInputElement, text: string, event?: Event) {
+  function adopt(
+    type: EditableType,
+    el: HTMLInputElement,
+    text: string,
+    event?: Event
+  ) {
     const shown = segmentFor(store.get(), type)?.text ?? ""
-    if (text === shown) return
-    if (!editable()) return
+    if (text === shown) {
+      return
+    }
+    if (!editable()) {
+      return
+    }
     const digits = text.replace(/\D/g, "")
     if (type === "dayPeriod" || digits === "") {
       const letter = text.replace(/[^\p{L}]/gu, "").slice(-1)
-      if (letter) return insert(type, el, letter, event ?? new Event("input"))
-      return edit({ ...shownFields(store.get()), [type]: null }, null, "input-change", event)
+      if (letter) {
+        return insert(type, el, letter, event ?? new Event("input"))
+      }
+      return edit(
+        { ...shownFields(store.get()), [type]: null },
+        null,
+        "input-change",
+        event
+      )
     }
-    const added = shown && text.startsWith(shown) ? digits.slice(shown.replace(/\D/g, "").length) : digits
+    const added =
+      shown && text.startsWith(shown)
+        ? digits.slice(shown.replace(/\D/g, "").length)
+        : digits
     insert(type, el, added || digits.slice(-1), event ?? new Event("input"))
   }
 
@@ -427,14 +584,19 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
   // to the nearest segment, so the whole field takes a tap like a native one.
   function nearestSegment(event: MouseEvent) {
     const list = segmentElements()
-    if (!editable() || list.some(({ el }) => el.contains(event.target as Node))) return
+    if (
+      !editable() ||
+      list.some(({ el }) => el.contains(event.target as Node))
+    ) {
+      return
+    }
     const distance = (el: HTMLElement) => {
       const { left, right } = el.getBoundingClientRect()
       return Math.max(left - event.clientX, event.clientX - right, 0)
     }
     return list.reduce<HTMLElement | undefined>(
       (best, { el }) => (!best || distance(el) < distance(best) ? el : best),
-      undefined,
+      undefined
     )
   }
 
@@ -455,10 +617,13 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
     /** The value: an ISO date, date and time, or time, or `null` while empty or partly filled. */
     getValue: () => store.get().value,
     /** Sets the value. Returns false when it isn't one the input can show, or when canceled. */
-    setValue: (value: string | null, { reason = "imperative", event }: DateInputChangeOptions = {}) =>
-      setValue(value, reason, event),
+    setValue: (
+      value: string | null,
+      { reason = "imperative", event }: DateInputChangeOptions = {}
+    ) => setValue(value, reason, event),
     /** Empties every segment. */
-    clear: ({ reason = "imperative", event }: DateInputChangeOptions = {}) => setValue(null, reason, event),
+    clear: ({ reason = "imperative", event }: DateInputChangeOptions = {}) =>
+      setValue(null, reason, event),
     /** Focuses a segment, like `"month"`, or the first one. */
     focus: focusSegment,
     internal: {
@@ -471,7 +636,8 @@ function dateInputApi(context: PrimitiveContext<SharedOptions, State, string>) {
       restore,
       segmentElement,
       nearestSegment,
-      firstSegment: () => segmentElements()[0]?.el as HTMLInputElement | undefined,
+      firstSegment: () =>
+        segmentElements()[0]?.el as HTMLInputElement | undefined,
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
       bindRoot(el: HTMLElement) {
         bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))

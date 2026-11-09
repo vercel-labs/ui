@@ -8,7 +8,7 @@ const log = useLog()
 
 function onSubmit(event: SubmitEvent) {
   const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-    ([name, value]) => `${name}=${value}`,
+    ([name, value]) => `${name}=${value}`
   )
   log(`Submitted ${data.join(", ")}`)
 }

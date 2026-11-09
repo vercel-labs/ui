@@ -43,7 +43,11 @@ const notes = [
     date: "Aug 18",
     text: "Tooltips wait for a short delay before moving to a new trigger.",
   },
-  { version: "v1.10.0", date: "Aug 5", text: "Comboboxes can load their options while you type." },
+  {
+    version: "v1.10.0",
+    date: "Aug 5",
+    text: "Comboboxes can load their options while you type.",
+  },
 ]
 
 function Example() {

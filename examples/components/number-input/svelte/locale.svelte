@@ -54,7 +54,7 @@
           </NumberInputIncrement>
         </NumberInputGroup>
       </NumberInput>
-      <FieldDescription >Formatted for {field.locale}.</FieldDescription>
+      <FieldDescription>Formatted for {field.locale}.</FieldDescription>
     </Field>
   {/each}
 </div>

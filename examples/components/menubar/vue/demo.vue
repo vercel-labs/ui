@@ -39,7 +39,9 @@ const chose = (value: string) => log(`Chose ${value}`)
             <ChevronRightIcon aria-hidden="true" />
           </MenuSubTrigger>
           <MenuSubContent>
-            <MenuItem v-for="name in recent" :key="name" :value="name">{{ name }}</MenuItem>
+            <MenuItem v-for="name in recent" :key="name" :value="name">{{
+              name
+            }}</MenuItem>
           </MenuSubContent>
         </MenuSub>
         <MenuSeparator />
@@ -49,7 +51,11 @@ const chose = (value: string) => log(`Chose ${value}`)
             <ChevronRightIcon aria-hidden="true" />
           </MenuSubTrigger>
           <MenuSubContent>
-            <MenuItem v-for="format in formats" :key="format" :value="`Export as ${format}`">
+            <MenuItem
+              v-for="format in formats"
+              :key="format"
+              :value="`Export as ${format}`"
+            >
               {{ format }}
             </MenuItem>
           </MenuSubContent>
@@ -71,7 +77,9 @@ const chose = (value: string) => log(`Chose ${value}`)
       </MenuContent>
     </Menu>
     <Menu
-      @checked-change="(checked, details) => log(`${details.value} ${checked ? 'on' : 'off'}`)"
+      @checked-change="
+        (checked, details) => log(`${details.value} ${checked ? 'on' : 'off'}`)
+      "
       @value-change="(value) => log(`${value} appearance`)"
     >
       <MenuTrigger>View</MenuTrigger>
@@ -91,7 +99,11 @@ const chose = (value: string) => log(`Chose ${value}`)
         <MenuSeparator />
         <MenuRadioGroup default-value="System">
           <MenuGroupLabel>Appearance</MenuGroupLabel>
-          <MenuRadioItem v-for="appearance in appearances" :key="appearance" :value="appearance">
+          <MenuRadioItem
+            v-for="appearance in appearances"
+            :key="appearance"
+            :value="appearance"
+          >
             <MenuItemIndicator />
             {{ appearance }}
           </MenuRadioItem>

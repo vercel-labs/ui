@@ -33,7 +33,13 @@ const probe = definePrimitive({
 })
 
 function Probe() {
-  return usePart(usePrimitive(probe, {}), "root", {}, { children: "Probe" }, "button")
+  return usePart(
+    usePrimitive(probe, {}),
+    "root",
+    {},
+    { children: "Probe" },
+    "button"
+  )
 }
 
 test("a slot's handlers run for event types React has no prop mapping for", async () => {
@@ -43,7 +49,9 @@ test("a slot's handlers run for event types React has no prop mapping for", asyn
   const button = container.querySelector("button")!
   button.focus()
   button.dispatchEvent(new WheelEvent("wheel", { bubbles: true }))
-  button.dispatchEvent(new KeyboardEvent("keydown", { key: "a", bubbles: true }))
+  button.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "a", bubbles: true })
+  )
   button.blur()
   expect(heard).toEqual(["focus", "wheel", "keydown", "blur"])
 })

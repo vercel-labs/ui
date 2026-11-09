@@ -9,7 +9,10 @@
     NavigationMenuViewport,
   } from "../../src/navigation-menu"
 
-  let { defaultValue, keepMounted }: { defaultValue?: string; keepMounted?: boolean } = $props()
+  let {
+    defaultValue,
+    keepMounted,
+  }: { defaultValue?: string; keepMounted?: boolean } = $props()
 </script>
 
 <NavigationMenu aria-label="Main" {defaultValue}>

@@ -12,12 +12,17 @@ import {
 } from "@ui-sdk/react/pagination"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { paginationAction, paginationFixture, paginationOptions } from "tests/fixtures/pagination.ts"
+import {
+  paginationAction,
+  paginationFixture,
+  paginationOptions,
+} from "tests/fixtures/pagination.ts"
 
 const pages = createPaginationController()
 
 function Fixture() {
-  const { controlled, cancel, rekey, defaultPage, ...options } = paginationOptions()
+  const { controlled, cancel, rekey, defaultPage, ...options } =
+    paginationOptions()
   const [action, setAction] = React.useState("")
   const [page, setPage] = React.useState(defaultPage ?? 1)
   const f = paginationFixture
@@ -31,21 +36,32 @@ function Fixture() {
         {...options}
         {...(controlled ? { page } : { defaultPage })}
         onPageChange={(next, details) => {
-          if (next === cancel) return details.cancel()
+          if (next === cancel) {
+            return details.cancel()
+          }
           setPage(next)
           setAction(paginationAction(next, details.reason))
         }}
       >
-        <PaginationList className="pagination-list" key={rekey ? page : undefined}>
+        <PaginationList
+          className="pagination-list"
+          key={rekey ? page : undefined}
+        >
           {({ items }) => (
             <>
               <PaginationItem>
-                <PaginationFirst className="pagination-step" aria-label={f.first}>
+                <PaginationFirst
+                  className="pagination-step"
+                  aria-label={f.first}
+                >
                   «
                 </PaginationFirst>
               </PaginationItem>
               <PaginationItem>
-                <PaginationPrevious className="pagination-step" aria-label={f.previous}>
+                <PaginationPrevious
+                  className="pagination-step"
+                  aria-label={f.previous}
+                >
                   ‹
                 </PaginationPrevious>
               </PaginationItem>
@@ -72,7 +88,9 @@ function Fixture() {
           )}
         </PaginationList>
       </Pagination>
-      <button onClick={() => pages.setPage(f.controller.page)}>{f.controller.label}</button>
+      <button onClick={() => pages.setPage(f.controller.page)}>
+        {f.controller.label}
+      </button>
       <button>After</button>
       <output role="status" aria-label="Last action">
         {action}
@@ -85,7 +103,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

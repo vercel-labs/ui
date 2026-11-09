@@ -2,7 +2,9 @@ import { alignmentFixture, alignmentOptions } from "tests/fixtures/alignment.ts"
 
 type Popup = HTMLElement & {
   api?: {
-    open: (options?: object) => Promise<{ reason: string; returnValue?: string }>
+    open: (
+      options?: object
+    ) => Promise<{ reason: string; returnValue?: string }>
     getPayload: () => unknown
   }
   items?: unknown
@@ -75,14 +77,17 @@ const markup = `
 
 async function mount(root: HTMLElement) {
   root.innerHTML = markup
-  const output = (name: string) => root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
+  const output = (name: string) =>
+    root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
 
   // Triggers outside the menu name it with `for`, and carry their row as a property.
   const rows = root.querySelector(".rows")!
   for (const row of alignmentFixture.rows) {
     const item = document.createElement("li")
     item.textContent = `Row ${row}`
-    const trigger = Object.assign(document.createElement("ui-menu-trigger"), { payload: row })
+    const trigger = Object.assign(document.createElement("ui-menu-trigger"), {
+      payload: row,
+    })
     trigger.setAttribute("for", "row-menu")
     trigger.innerHTML = `<button aria-label="Actions for ${row}">…</button>`
     item.append(trigger)
@@ -93,29 +98,40 @@ async function mount(root: HTMLElement) {
   const details = root.querySelector<Popup>("#details")!
   const showDetails = (payload: string) =>
     details.api!.open({ payload }).then((closed) => {
-      output("Last result").textContent = `${closed.reason}:${closed.returnValue ?? ""}`
+      output("Last result").textContent =
+        `${closed.reason}:${closed.returnValue ?? ""}`
     })
 
   rowMenu.addEventListener("openchange", () => {
-    rowMenu.querySelector(".payload")!.textContent = `Row ${rowMenu.api?.getPayload()}`
+    rowMenu.querySelector(".payload")!.textContent =
+      `Row ${rowMenu.api?.getPayload()}`
   })
   rowMenu.addEventListener("openchangecomplete", (event) => {
-    output("Last complete").textContent = (event as CustomEvent<{ value: boolean }>).detail.value
+    output("Last complete").textContent = (
+      event as CustomEvent<{ value: boolean }>
+    ).detail.value
       ? "open"
       : "closed"
   })
   rowMenu.addEventListener("action", (event) => {
     const value = (event as CustomEvent<{ value: string }>).detail.value
     output("Last action").textContent = `${value}:${rowMenu.api?.getPayload()}`
-    if (value === "details") showDetails(String(rowMenu.api?.getPayload()))
+    if (value === "details") {
+      showDetails(String(rowMenu.api?.getPayload()))
+    }
   })
   details.addEventListener("openchange", () => {
-    details.querySelector(".payload")!.textContent = `Details for ${details.api?.getPayload()}`
+    details.querySelector(".payload")!.textContent =
+      `Details for ${details.api?.getPayload()}`
   })
-  root.querySelector("#show-details")!.addEventListener("click", () => showDetails("button"))
+  root
+    .querySelector("#show-details")!
+    .addEventListener("click", () => showDetails("button"))
 
   root.querySelector("#canvas-menu")!.addEventListener("action", (event) => {
-    output("Last action").textContent = (event as CustomEvent<{ value: string }>).detail.value
+    output("Last action").textContent = (
+      event as CustomEvent<{ value: string }>
+    ).detail.value
   })
 
   const data = root.querySelector<Popup>("#data-menu")!
@@ -138,7 +154,7 @@ async function mount(root: HTMLElement) {
       output("Last change").textContent =
         `checked:${value}:${(event as CustomEvent<{ value: boolean }>).detail.value}`
     },
-    { capture: true },
+    { capture: true }
   )
   data.addEventListener(
     "valuechange",
@@ -147,7 +163,7 @@ async function mount(root: HTMLElement) {
       output("Last change").textContent =
         `value:${group}:${(event as CustomEvent<{ value: string }>).detail.value}`
     },
-    { capture: true },
+    { capture: true }
   )
 
   const tabs = root.querySelector<HTMLElement & { value?: string }>("ui-tabs")!
@@ -155,7 +171,9 @@ async function mount(root: HTMLElement) {
   tabs.addEventListener("valuechange", () => {
     output("Tab changes").textContent = String(++tabChanges)
   })
-  root.querySelector("#last-section")!.addEventListener("click", () => tabs.setAttribute("value", "hotel"))
+  root
+    .querySelector("#last-section")!
+    .addEventListener("click", () => tabs.setAttribute("value", "hotel"))
 
   await import("@ui-sdk/web/menu")
   await import("@ui-sdk/web/popover")

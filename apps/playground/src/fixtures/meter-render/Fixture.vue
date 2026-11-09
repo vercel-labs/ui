@@ -11,9 +11,16 @@ const value = ref(40)
     <button>Before</button>
     <Meter :value="value" aria-label="Memory">
       <template #render="{ props, state }">
-        <section v-bind="props" :class="`gauge ${state.percent >= 80 ? 'is-high' : 'is-ok'}`">
-          <MeterValue v-slot="{ state: valueState }">{{ valueState.text }} used</MeterValue>
-          <MeterTrack class="gauge-track"><MeterIndicator class="gauge-indicator" /></MeterTrack>
+        <section
+          v-bind="props"
+          :class="`gauge ${state.percent >= 80 ? 'is-high' : 'is-ok'}`"
+        >
+          <MeterValue v-slot="{ state: valueState }"
+            >{{ valueState.text }} used</MeterValue
+          >
+          <MeterTrack class="gauge-track"
+            ><MeterIndicator class="gauge-indicator"
+          /></MeterTrack>
         </section>
       </template>
     </Meter>

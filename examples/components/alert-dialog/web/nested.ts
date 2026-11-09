@@ -44,7 +44,9 @@ function mount(root: HTMLElement) {
   `
   const [outer, inner] = root.querySelectorAll("ui-alert-dialog")
   inner.addEventListener("openchange", (event) => {
-    if (!event.detail.value && event.detail.returnValue === "confirm") outer.open = false
+    if (!event.detail.value && event.detail.returnValue === "confirm") {
+      outer.open = false
+    }
   })
 }
 

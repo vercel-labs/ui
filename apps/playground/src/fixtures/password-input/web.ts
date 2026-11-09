@@ -50,17 +50,24 @@ async function mount(root: HTMLElement) {
   const reveal = createPasswordInputController()
   field.controller = reveal
   field.addEventListener("visiblechange", (event) => {
-    if (cancel) return event.preventDefault()
-    status.textContent = passwordInputAction.visible(event.detail.value, event.detail.reason)
+    if (cancel) {
+      return event.preventDefault()
+    }
+    status.textContent = passwordInputAction.visible(
+      event.detail.value,
+      event.detail.reason
+    )
   })
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
     const input = (event.currentTarget as HTMLFormElement).elements.namedItem(
-      password.name,
+      password.name
     ) as HTMLInputElement
     status.textContent = passwordInputAction.submit(input.type)
   })
-  root.querySelector("#reveal")!.addEventListener("click", () => reveal.toggleVisible())
+  root
+    .querySelector("#reveal")!
+    .addEventListener("click", () => reveal.toggleVisible())
 }
 
 export { mount }

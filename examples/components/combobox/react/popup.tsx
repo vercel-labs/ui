@@ -34,7 +34,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function Example() {
   const [button, setButton] = React.useState<HTMLButtonElement | null>(null)
@@ -51,19 +52,29 @@ function Example() {
     >
       <ComboboxTrigger ref={setButton} aria-label="Country">
         <span>
-          <ComboboxValue>{(state) => state.label || "Select a country"}</ComboboxValue>
+          <ComboboxValue>
+            {(state) => state.label || "Select a country"}
+          </ComboboxValue>
         </span>
         <ChevronDownIcon aria-hidden="true" />
       </ComboboxTrigger>
       <ComboboxContent anchor={button}>
         <div data-slot="row">
           <SearchIcon aria-hidden="true" />
-          <ComboboxInput autoFocus aria-label="Search countries" placeholder="Search…" />
+          <ComboboxInput
+            autoFocus
+            aria-label="Search countries"
+            placeholder="Search…"
+          />
         </div>
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>
           {countries.map((country) => (
-            <ComboboxItem key={country.value} value={country.value} label={country.label}>
+            <ComboboxItem
+              key={country.value}
+              value={country.value}
+              label={country.label}
+            >
               {country.label}
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />

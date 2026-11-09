@@ -16,7 +16,7 @@ function mount(root: HTMLElement) {
         ${presets
           .map(
             (preset, index) =>
-              `<button type="button" data-size="sm" data-preset="${index}">${preset.label}</button>`,
+              `<button type="button" data-size="sm" data-preset="${index}">${preset.label}</button>`
           )
           .join("")}
       </div>

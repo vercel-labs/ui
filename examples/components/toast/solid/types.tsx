@@ -1,4 +1,9 @@
-import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import {
+  Toast,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
 
 function upload() {
@@ -16,9 +21,15 @@ function Example() {
       <div data-slot="row">
         <button onClick={() => toast("Event created")}>Default</button>
         <button onClick={() => toast.success("Changes saved")}>Success</button>
-        <button onClick={() => toast.info("A new version is available")}>Info</button>
-        <button onClick={() => toast.warning("Storage is almost full")}>Warning</button>
-        <button onClick={() => toast.error("Couldn't save changes")}>Error</button>
+        <button onClick={() => toast.info("A new version is available")}>
+          Info
+        </button>
+        <button onClick={() => toast.warning("Storage is almost full")}>
+          Warning
+        </button>
+        <button onClick={() => toast.error("Couldn't save changes")}>
+          Error
+        </button>
         <button
           onClick={() =>
             toast.promise(upload, {

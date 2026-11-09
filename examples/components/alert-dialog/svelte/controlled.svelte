@@ -19,11 +19,15 @@
     <AlertDialogContent>
       <div data-slot="stack">
         <AlertDialogTitle>Discard unsaved changes?</AlertDialogTitle>
-        <AlertDialogDescription>Your edits will be lost if you leave without saving.</AlertDialogDescription>
+        <AlertDialogDescription
+          >Your edits will be lost if you leave without saving.</AlertDialogDescription
+        >
       </div>
       <div data-slot="row">
         <AlertDialogClose>Keep Editing</AlertDialogClose>
-        <AlertDialogClose data-variant="solid" value="confirm">Discard</AlertDialogClose>
+        <AlertDialogClose data-variant="solid" value="confirm"
+          >Discard</AlertDialogClose
+        >
       </div>
     </AlertDialogContent>
   </AlertDialog>

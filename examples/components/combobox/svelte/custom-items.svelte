@@ -35,7 +35,11 @@
     <ComboboxEmpty>No people found.</ComboboxEmpty>
     <ComboboxList>
       {#each users as user (user.id)}
-        <ComboboxItem value={user.username} label={user.name} keywords={[user.username]}>
+        <ComboboxItem
+          value={user.username}
+          label={user.name}
+          keywords={[user.username]}
+        >
           <span data-slot="badge">
             {user.name.slice(0, 1)}
           </span>

@@ -44,15 +44,25 @@ const files = [
 
 const draft: TokenInputValue = [
   "Explain ",
-  { type: "file", value: "src/routes.ts", label: "routes.ts", data: { trigger: "@" } },
+  {
+    type: "file",
+    value: "src/routes.ts",
+    label: "routes.ts",
+    data: { trigger: "@" },
+  },
   " in two sentences.",
 ]
 
 const log = useLog()
 const deletion = ref<TokenDeletion>("whole")
 
-function onValueChange(value: TokenInputValue, details: TokenInputValueChangeDetails) {
-  for (const token of details.removed) log(`Removed ${token.label} (${deletion.value})`)
+function onValueChange(
+  value: TokenInputValue,
+  details: TokenInputValueChangeDetails
+) {
+  for (const token of details.removed) {
+    log(`Removed ${token.label} (${deletion.value})`)
+  }
 }
 </script>
 
@@ -70,7 +80,11 @@ function onValueChange(value: TokenInputValue, details: TokenInputValueChangeDet
           <ChevronDownIcon aria-hidden="true" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="mode in modes" :key="mode.value" :value="mode.value">
+          <SelectItem
+            v-for="mode in modes"
+            :key="mode.value"
+            :value="mode.value"
+          >
             {{ mode.label }}
             <SelectItemIndicator>
               <CheckIcon aria-hidden="true" />
@@ -81,7 +95,11 @@ function onValueChange(value: TokenInputValue, details: TokenInputValueChangeDet
     </div>
     <Field>
       <FieldLabel>Prompt</FieldLabel>
-      <TokenInput :token-deletion="deletion" :default-value="draft" @value-change="onValueChange">
+      <TokenInput
+        :token-deletion="deletion"
+        :default-value="draft"
+        @value-change="onValueChange"
+      >
         <TokenInputEditor />
         <TriggerMenu :triggers="[{ char: '@', type: 'file', items: files }]">
           <TriggerMenuContent>

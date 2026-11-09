@@ -23,11 +23,17 @@ test("a popup's Svelte outro stays visible until it ends", async ({ page }) => {
   await page.waitForTimeout(700)
   await page.keyboard.press("Escape")
   await page.waitForTimeout(100)
-  expect(await midOutro(popup)).toEqual({ visible: true, animations: 1, top: true })
+  expect(await midOutro(popup)).toEqual({
+    visible: true,
+    animations: 1,
+    top: true,
+  })
   await expect(popup).toHaveCount(0)
 })
 
-test("a popup opened again during its outro stays open, and closes again", async ({ page }) => {
+test("a popup opened again during its outro stays open, and closes again", async ({
+  page,
+}) => {
   const trigger = page.getByRole("button", { name: "Open" })
   await trigger.click()
   const popup = page.getByText("Popup content")
@@ -36,7 +42,11 @@ test("a popup opened again during its outro stays open, and closes again", async
   await page.waitForTimeout(100)
   await trigger.click()
   await page.waitForTimeout(700)
-  expect(await midOutro(popup)).toEqual({ visible: true, animations: 0, top: true })
+  expect(await midOutro(popup)).toEqual({
+    visible: true,
+    animations: 0,
+    top: true,
+  })
   await expect(trigger).toHaveAttribute("aria-expanded", "true")
   await page.keyboard.press("Escape")
   await expect(popup).toHaveCount(0)
@@ -55,7 +65,7 @@ test("a panel's Svelte outro stays visible until it ends", async ({ page }) => {
   await expect(panel).toHaveCount(0)
 })
 
-for (const layout of ["viewport", "none"])
+for (const layout of ["viewport", "none"]) {
   test(`a navigation menu content shown again during its outro still completes the close (${layout === "none" ? "no viewport" : "viewport"})`, async ({
     page,
     open,
@@ -72,19 +82,22 @@ for (const layout of ["viewport", "none"])
     await page.waitForTimeout(700)
     await press("Two")
     await page.waitForTimeout(100)
-    expect(await midOutro(page.getByText("One content"))).toMatchObject({ visible: true, animations: 1 })
+    expect(await midOutro(page.getByText("One content"))).toMatchObject({
+      visible: true,
+      animations: 1,
+    })
     await press("One")
-    await expect(page.getByRole("button", { name: "One", exact: true })).toHaveAttribute(
-      "aria-expanded",
-      "true",
-    )
+    await expect(
+      page.getByRole("button", { name: "One", exact: true })
+    ).toHaveAttribute("aria-expanded", "true")
     await page.waitForTimeout(700)
     await page.keyboard.press("Escape")
     await expect(page.getByText("One content")).toHaveCount(0)
     await expect(completed).toHaveText("true,false")
   })
+}
 
-for (const layout of ["viewport", "none"])
+for (const layout of ["viewport", "none"]) {
   test(`a navigation menu closed during its intro still completes the close (${layout === "none" ? "no viewport" : "viewport"})`, async ({
     page,
     open,
@@ -105,3 +118,4 @@ for (const layout of ["viewport", "none"])
     await page.keyboard.press("Escape")
     await expect(completed).toHaveText("false,true,false")
   })
+}

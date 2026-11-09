@@ -12,7 +12,12 @@ import {
   rangeRules,
   type CalendarModelState,
 } from "../calendar/calendar-api"
-import { isAllowedRange, normalizeValue, selectedDates, type ISOMonth } from "../calendar/calendar-model"
+import {
+  isAllowedRange,
+  normalizeValue,
+  selectedDates,
+  type ISOMonth,
+} from "../calendar/calendar-model"
 import type { CalendarOptions } from "../calendar/calendar"
 import { formatDate } from "../../foundation/date/format"
 import { parseDate } from "../../foundation/date/parse"
@@ -20,7 +25,11 @@ import { isISODate, type ISODate } from "../../foundation/date/plain-date"
 import { formInternals } from "../../foundation/forms/form"
 import { initialApple } from "../../foundation/platform/platform"
 import { deriveOpen } from "../../foundation/popups/popup"
-import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  createPopup,
+  popupState,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { datePickerPreset } from "../../foundation/popups/popup-presets"
 import { elements } from "../../foundation/kernel/elements"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
@@ -56,19 +65,30 @@ type State = PopupState &
 
 const valueKey = (value: unknown) => JSON.stringify(value ?? null)
 const shortDate = (date: ISODate, locale: string) =>
-  formatDate(date, locale, { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/[‎‏]/g, "")
+  formatDate(date, locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).replace(/[‎‏]/g, "")
 
 // The date an input holds: the value's date, or a range's end.
 function dateAt(state: State, index: number) {
-  if (state.mode !== "range") return index ? null : (state.value as ISODate | null)
-  if (state.anchor !== null) return index ? null : state.anchor
+  if (state.mode !== "range") {
+    return index ? null : (state.value as ISODate | null)
+  }
+  if (state.anchor !== null) {
+    return index ? null : state.anchor
+  }
   return (state.value as [ISODate, ISODate] | null)?.[index] ?? null
 }
 
 // What an input shows: what was typed over the current value, else the date it holds.
 function textOf(state: State, index: number) {
-  const draft = state.draftFor === valueKey(state.value) ? state.drafts[index] : null
-  if (draft !== null) return draft
+  const draft =
+    state.draftFor === valueKey(state.value) ? state.drafts[index] : null
+  if (draft !== null) {
+    return draft
+  }
   const date = dateAt(state, index)
   return date ? shortDate(date, localeOf(state)) : ""
 }
@@ -87,18 +107,24 @@ const settings = (options: DatePickerOptions) => ({
 
 // What a range's ends submit under.
 function nameAt(state: State, index: number) {
-  if (state.mode !== "range") return index ? undefined : state.name
+  if (state.mode !== "range") {
+    return index ? undefined : state.name
+  }
   return (index ? state.endName : state.startName) ?? state.name
 }
 
 function submitted(state: State) {
   const start = dateAt(state, 0)
-  if (state.mode !== "range") return start ?? ""
+  if (state.mode !== "range") {
+    return start ?? ""
+  }
   const data = new FormData()
   const value = state.value as [ISODate, ISODate] | null
   for (const index of [0, 1]) {
     const name = nameAt(state, index)
-    if (name) data.append(name, value?.[index] ?? "")
+    if (name) {
+      data.append(name, value?.[index] ?? "")
+    }
   }
   return data
 }
@@ -109,10 +135,14 @@ function submitted(state: State) {
  */
 type DatePickerApi = ReturnType<typeof datePickerApi>
 
-function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, string>) {
+function datePickerApi(
+  context: PrimitiveContext<DatePickerOptions, State, string>
+) {
   const { store, element } = context
   // A controlled open starts focus from the selected date, in the same pass.
-  deriveOpen(context, ["focused"], (open) => (open ? { focused: null } : undefined))
+  deriveOpen(context, ["focused"], (open) =>
+    open ? { focused: null } : undefined
+  )
 
   const calendar = calendarApi<
     DatePickerOptions,
@@ -121,19 +151,22 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
     DatePickerMonthChangeReason
   >(context, {
     picked(event) {
-      if (store.get().closeOnSelect) control.hide({ reason: "item-press", event })
+      if (store.get().closeOnSelect) {
+        control.hide({ reason: "item-press", event })
+      }
     },
   })
   const { setValue, setMonth, reveal } = calendar.internal
 
   // The trigger, or without one, the input that holds the start.
-  const triggerElement = () => element("trigger") ?? element("input", "start") ?? element("input")
+  const triggerElement = () =>
+    element("trigger") ?? element("input", "start") ?? element("input")
   const inputElement = () => element("input", "start") ?? element("input")
   // The first input whose text isn't a date, the start before the end.
   const invalidInput = () => {
     const state = store.get()
     return elements<DatePickerInputProps>(context, "input").find(({ props }) =>
-      invalidAt(state, props.end ? 1 : 0),
+      invalidAt(state, props.end ? 1 : 0)
     )?.el
   }
 
@@ -142,16 +175,20 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
     rules: () => ({
       trigger: triggerElement,
       // Pressing the trigger toggles the popup, and pressing an input leaves it to focus.
-      contains: (target) => elements(context, "trigger").some(({ el }) => el.contains(target)),
+      contains: (target) =>
+        elements(context, "trigger").some(({ el }) => el.contains(target)),
       onOpenChange(open) {
         // Focus starts from the selected date, not where it was left.
-        if (open) store.set({ focused: null })
+        if (open) {
+          store.set({ focused: null })
+        }
       },
     }),
   })
   const { control, popup } = kit.internal
   const presentation = kit.internal.presentation
-  const contentProps = () => kit.internal.contentProps() as DatePickerContentProps
+  const contentProps = () =>
+    kit.internal.contentProps() as DatePickerContentProps
 
   function clearDrafts() {
     store.set({ drafts: [null, null], invalid: [false, false] })
@@ -163,7 +200,11 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
     const fresh = state.draftFor === key
     const drafts: State["drafts"] = fresh ? [...state.drafts] : [null, null]
     drafts[index] = text
-    store.set({ drafts, draftFor: key, invalid: fresh ? state.invalid : [false, false] })
+    store.set({
+      drafts,
+      draftFor: key,
+      invalid: fresh ? state.invalid : [false, false],
+    })
   }
 
   function markInvalid(index: number) {
@@ -175,38 +216,59 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
   // Reads an input's text: a date, null when empty, undefined when it isn't a date.
   function read(text: string) {
     const state = store.get()
-    if (text.trim() === "") return null
-    return parseDate(text, localeOf(state), { referenceDate: state.today ?? undefined })
+    if (text.trim() === "") {
+      return null
+    }
+    return parseDate(text, localeOf(state), {
+      referenceDate: state.today ?? undefined,
+    })
   }
 
   // Enter or blur: a typed date becomes the value, or the input is marked invalid.
   function commit(index: number, event?: Event) {
     const state = store.get()
-    if (state.draftFor !== valueKey(state.value)) return
+    if (state.draftFor !== valueKey(state.value)) {
+      return
+    }
     const text = state.drafts[index]
-    if (text === null) return
+    if (text === null) {
+      return
+    }
     const parsed = read(text)
-    if (parsed === undefined || (parsed !== null && blockedDate(state, parsed))) return markInvalid(index)
+    if (
+      parsed === undefined ||
+      (parsed !== null && blockedDate(state, parsed))
+    ) {
+      return markInvalid(index)
+    }
 
     if (state.mode !== "range") {
       setValue(parsed, "input-commit", event)
       clearDrafts()
-      if (parsed) reveal(parsed, "input-commit", event)
+      if (parsed) {
+        reveal(parsed, "input-commit", event)
+      }
       return
     }
 
     const ends = [0, 1].map((at) => {
-      if (at === index) return parsed
+      if (at === index) {
+        return parsed
+      }
       const draft = state.drafts[at]
       return draft === null ? dateAt(state, at) : read(draft)
     })
     const [start, end] = ends
     if (start && end) {
-      if (start > end || !isAllowedRange(start, end, rangeRules(state))) return markInvalid(index)
+      if (start > end || !isAllowedRange(start, end, rangeRules(state))) {
+        return markInvalid(index)
+      }
       setValue([start, end], "input-commit", event)
       store.set({ anchor: null, hover: null })
       clearDrafts()
-      if (parsed) reveal(parsed, "input-commit", event)
+      if (parsed) {
+        reveal(parsed, "input-commit", event)
+      }
       return
     }
     if (start === null && end === null) {
@@ -219,7 +281,11 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
     // waits in the calendar for its end too.
     setValue(null, "input-commit", event)
     const drafts = ends.map((date, at) =>
-      date ? shortDate(date, localeOf(state)) : date === null ? "" : state.drafts[at],
+      date
+        ? shortDate(date, localeOf(state))
+        : date === null
+          ? ""
+          : state.drafts[at]
     ) as State["drafts"]
     const invalid: State["invalid"] = [false, false]
     invalid[1 - index] = state.invalid[1 - index]
@@ -230,18 +296,28 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
       draftFor: valueKey(store.get().value),
       invalid,
     })
-    if (parsed) reveal(parsed, "input-commit", event)
+    if (parsed) {
+      reveal(parsed, "input-commit", event)
+    }
   }
 
-  function pickValue(value: DatePickerValue, reason: DatePickerValueChangeReason, event?: Event) {
+  function pickValue(
+    value: DatePickerValue,
+    reason: DatePickerValueChangeReason,
+    event?: Event
+  ) {
     const state = store.get()
     const normalized = normalizeValue(state.mode, value) as DatePickerValue
-    if (!isPickable(state, normalized)) return false
+    if (!isPickable(state, normalized)) {
+      return false
+    }
     store.set({ anchor: null, hover: null })
     clearDrafts()
     const changed = setValue(normalized, reason, event)
     const first = Array.isArray(normalized) ? normalized[0] : normalized
-    if (first && isISODate(first) && reason === "preset-press") reveal(first, reason, event)
+    if (first && isISODate(first) && reason === "preset-press") {
+      reveal(first, reason, event)
+    }
     return changed
   }
 
@@ -254,7 +330,10 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
   // The browser puts a form back, like on going back to the page.
   function restore(saved: string) {
     try {
-      setValue(normalizeValue(store.get().mode, JSON.parse(saved)) as DatePickerValue, "restore")
+      setValue(
+        normalizeValue(store.get().mode, JSON.parse(saved)) as DatePickerValue,
+        "restore"
+      )
     } catch {}
   }
 
@@ -267,26 +346,45 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
     getValue: () => store.get().value as DatePickerValue,
     setValue: (
       value: DatePickerValue,
-      { reason = "imperative", event }: DatePickerChangeOptions<DatePickerValueChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: DatePickerChangeOptions<DatePickerValueChangeReason> = {}
     ) => {
-      if (!isPickable(store.get(), normalizeValue(store.get().mode, value))) return false
+      if (!isPickable(store.get(), normalizeValue(store.get().mode, value))) {
+        return false
+      }
       store.set({ anchor: null, hover: null })
       const result = setValue(value, reason, event)
       // The calendar turns to a date set from code, as it does to a typed one.
       const [first] = selectedDates(store.get().value)
-      if (first && valueKey(store.get().value) === valueKey(normalizeValue(store.get().mode, value)))
+      if (
+        first &&
+        valueKey(store.get().value) ===
+          valueKey(normalizeValue(store.get().mode, value))
+      ) {
         reveal(first, "imperative")
+      }
       return result
     },
-    clear: ({ reason = "imperative", event }: DatePickerChangeOptions<DatePickerValueChangeReason> = {}) =>
+    clear: ({
+      reason = "imperative",
+      event,
+    }: DatePickerChangeOptions<DatePickerValueChangeReason> = {}) =>
       pickValue(null, reason, event),
     getMonth: calendar.getMonth,
     setMonth: (
       month: ISOMonth,
-      { reason = "imperative", event }: DatePickerChangeOptions<DatePickerMonthChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: DatePickerChangeOptions<DatePickerMonthChangeReason> = {}
     ) => setMonth(month, reason, event),
-    previous: (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => calendar.previous(options),
-    next: (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => calendar.next(options),
+    previous: (
+      options?: DatePickerChangeOptions<DatePickerMonthChangeReason>
+    ) => calendar.previous(options),
+    next: (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) =>
+      calendar.next(options),
     focus: calendar.focus,
     internal: {
       ...calendar.internal,
@@ -316,8 +414,13 @@ function datePickerApi(context: PrimitiveContext<DatePickerOptions, State, strin
         return element("day", state.focused ?? preferredDate(state)) ?? content
       },
       inputKeydown(event: KeyboardEvent, index: number) {
-        if (event.key === "Enter") commit(index, event)
-        else if (event.key === "ArrowDown" && event.altKey && !store.get().open) {
+        if (event.key === "Enter") {
+          commit(index, event)
+        } else if (
+          event.key === "ArrowDown" &&
+          event.altKey &&
+          !store.get().open
+        ) {
           event.preventDefault()
           control.show({ event, by: "keyboard" })
         }
@@ -338,7 +441,10 @@ const initialDatePickerState = (options: DatePickerOptions): State => {
     drafts: [null, null],
     draftFor: "",
     invalid: [false, false],
-    initial: normalizeValue(calendar.mode, options.defaultValue ?? null) as DatePickerValue,
+    initial: normalizeValue(
+      calendar.mode,
+      options.defaultValue ?? null
+    ) as DatePickerValue,
     hinted: false,
   }
 }
@@ -351,7 +457,7 @@ const syncDatePickerState = (options: DatePickerOptions) => ({
     : {
         initial: normalizeValue(
           calendarSettings(options as CalendarOptions).mode,
-          options.defaultValue,
+          options.defaultValue
         ) as DatePickerValue,
       }),
   ...(options.open === undefined ? {} : { open: options.open }),

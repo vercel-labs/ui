@@ -14,7 +14,15 @@
     ComboboxValue,
   } from "@ui-sdk/svelte/combobox"
 
-  const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+  const labels = [
+    "Bug",
+    "Feature",
+    "Documentation",
+    "Design",
+    "Performance",
+    "Security",
+    "Testing",
+  ]
 </script>
 
 <Combobox multiple maxSelected={3} defaultValue={["Bug", "Design"]}>

@@ -1,5 +1,9 @@
 import "@ui-sdk/web/field"
-import { toText, type Token, type TokenInputValue } from "@ui-sdk/web/token-input"
+import {
+  toText,
+  type Token,
+  type TokenInputValue,
+} from "@ui-sdk/web/token-input"
 
 const draft: TokenInputValue = [
   "Compare ",
@@ -28,28 +32,39 @@ function mount(root: HTMLElement) {
     </div>
   `
   const prompt = root.querySelector("ui-token-input")!.api
-  const firstToken = () => prompt.getValue().find((segment): segment is Token => typeof segment !== "string")
+  const firstToken = () =>
+    prompt
+      .getValue()
+      .find((segment): segment is Token => typeof segment !== "string")
   const actions: Record<string, () => void> = {
     attach: () =>
       prompt.insert(
         { type: "file", value: "package.json", label: "package.json" },
-        { at: "end", resolve: loadFile() },
+        { at: "end", resolve: loadFile() }
       ),
     path: () => {
       const token = firstToken()
-      if (token) prompt.updateToken(token.id!, { label: token.value })
+      if (token) {
+        prompt.updateToken(token.id!, { label: token.value })
+      }
     },
     remove: () => {
       const token = firstToken()
-      if (token) prompt.removeToken(token.id!)
+      if (token) {
+        prompt.removeToken(token.id!)
+      }
     },
     undo: () => prompt.undo(),
     clear: () => prompt.clear(),
   }
-  root.querySelector("[data-slot=controls]")!.addEventListener("mousedown", (event) => event.preventDefault())
-  root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
-    button.addEventListener("click", () => actions[button.dataset.action!]())
-  })
+  root
+    .querySelector("[data-slot=controls]")!
+    .addEventListener("mousedown", (event) => event.preventDefault())
+  root
+    .querySelectorAll<HTMLButtonElement>("[data-action]")
+    .forEach((button) => {
+      button.addEventListener("click", () => actions[button.dataset.action!]())
+    })
 }
 
 export { mount }

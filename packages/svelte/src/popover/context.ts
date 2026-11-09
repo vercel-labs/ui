@@ -12,6 +12,15 @@ const ContainerKey = Symbol("popover-container")
 const TriggerKey = Symbol("popover-trigger")
 
 type ContainerContext = () => PopupContainer
-type TriggerContext = { shortcut: () => string | undefined; popover: () => PopoverContext | undefined }
+type TriggerContext = {
+  shortcut: () => string | undefined
+  popover: () => PopoverContext | undefined
+}
 
-export { type ContainerContext, ContainerKey, type PopoverContext, type TriggerContext, TriggerKey }
+export {
+  type ContainerContext,
+  ContainerKey,
+  type PopoverContext,
+  type TriggerContext,
+  TriggerKey,
+}

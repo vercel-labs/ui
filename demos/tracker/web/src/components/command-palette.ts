@@ -20,15 +20,22 @@ const commands: { value: string; label: string; icon: IconName }[] = [
 
 const item =
   "group flex min-h-8 cursor-default items-center gap-2 rounded-xl px-2 py-1.5 text-sm outline-none select-none data-highlighted:bg-accent data-highlighted:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50"
-const itemIcon = "flex text-muted-foreground group-data-highlighted:text-current [&_svg]:size-4"
-const groupLabel = "block px-2 pt-2 pb-1 text-xs font-medium text-muted-foreground"
+const itemIcon =
+  "flex text-muted-foreground group-data-highlighted:text-current [&_svg]:size-4"
+const groupLabel =
+  "block px-2 pt-2 pb-1 text-xs font-medium text-muted-foreground"
 
 function run(value: string) {
   palette.close()
-  if (value === "new-issue") newIssue.open()
-  else if (value === "settings") navigate("/settings")
-  else if (value === "list" || value === "board") navigate(href(query(), { view: value, page: 1 }))
-  else navigate(href(query(), { issue: value }))
+  if (value === "new-issue") {
+    newIssue.open()
+  } else if (value === "settings") {
+    navigate("/settings")
+  } else if (value === "list" || value === "board") {
+    navigate(href(query(), { view: value, page: 1 }))
+  } else {
+    navigate(href(query(), { issue: value }))
+  }
 }
 
 function commandPalette() {
@@ -37,7 +44,7 @@ function commandPalette() {
       <button
         class=${cn(
           button({ variant: "outline" }),
-          "w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0",
+          "w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0"
         )}
       >
         ${icon("search", "size-4 sm:hidden")}
@@ -53,7 +60,9 @@ function commandPalette() {
       class=${cn(styles.dialog, "top-[min(6rem,10dvh)] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-lg")}
     >
       <ui-dialog-title class="sr-only">Search</ui-dialog-title>
-      <ui-command @action=${(event: CustomEvent<{ value: string }>) => run(event.detail.value)}>
+      <ui-command
+        @action=${(event: CustomEvent<{ value: string }>) => run(event.detail.value)}
+      >
         <div class="flex items-center gap-2 border-b border-border px-4">
           ${icon("search", "size-4 shrink-0 text-muted-foreground")}
           <ui-command-input class="contents">
@@ -64,22 +73,32 @@ function commandPalette() {
             />
           </ui-command-input>
         </div>
-        <ui-command-empty class="block py-10 text-center text-sm text-muted-foreground empty:hidden">
+        <ui-command-empty
+          class="block py-10 text-center text-sm text-muted-foreground empty:hidden"
+        >
           No results.
         </ui-command-empty>
-        <ui-command-list class="block max-h-80 min-h-0 scroll-py-1 overflow-y-auto overscroll-contain p-1">
+        <ui-command-list
+          class="block max-h-80 min-h-0 scroll-py-1 overflow-y-auto overscroll-contain p-1"
+        >
           <ui-command-group>
-            <ui-command-group-label class=${groupLabel}>Commands</ui-command-group-label>
+            <ui-command-group-label class=${groupLabel}
+              >Commands</ui-command-group-label
+            >
             ${commands.map(
               (command) =>
                 html`<ui-command-item value=${command.value} class=${item}>
-                  <ui-command-item-icon class=${itemIcon}>${icon(command.icon)}</ui-command-item-icon>
+                  <ui-command-item-icon class=${itemIcon}
+                    >${icon(command.icon)}</ui-command-item-icon
+                  >
                   ${command.label}
-                </ui-command-item>`,
+                </ui-command-item>`
             )}
           </ui-command-group>
           <ui-command-group>
-            <ui-command-group-label class=${groupLabel}>Issues</ui-command-group-label>
+            <ui-command-group-label class=${groupLabel}
+              >Issues</ui-command-group-label
+            >
             ${repeat(
               db.issues,
               (issue) => issue.id,
@@ -90,10 +109,14 @@ function commandPalette() {
                   .keywords=${[issue.id]}
                   class=${item}
                 >
-                  <ui-command-item-icon class=${itemIcon}>${icon("circle-dot")}</ui-command-item-icon>
+                  <ui-command-item-icon class=${itemIcon}
+                    >${icon("circle-dot")}</ui-command-item-icon
+                  >
                   <span class="truncate">${issue.title}</span>
-                  <span class="ms-auto text-xs text-muted-foreground">${issue.id}</span>
-                </ui-command-item>`,
+                  <span class="ms-auto text-xs text-muted-foreground"
+                    >${issue.id}</span
+                  >
+                </ui-command-item>`
             )}
           </ui-command-group>
         </ui-command-list>

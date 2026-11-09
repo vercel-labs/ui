@@ -20,9 +20,16 @@ const portalSlots = ["backdrop", "content"]
 const ownerOptions = () => ({ container: undefined })
 
 // The parts of <ui-dialog> or <ui-alert-dialog>, named after the owner.
-function defineDialogParts(primitive: typeof dialog | typeof alertDialog, owner: string) {
+function defineDialogParts(
+  primitive: typeof dialog | typeof alertDialog,
+  owner: string
+) {
   // With `for="dialog-id"`, it opens that dialog from anywhere on the page.
-  definePart(primitive, "trigger", { tag: `${owner}-trigger`, display: "contents", target: wrappedButton })
+  definePart(primitive, "trigger", {
+    tag: `${owner}-trigger`,
+    display: "contents",
+    target: wrappedButton,
+  })
   // With an `action` attribute, pressing it fires a cancelable `action` event.
   // Pass a Promise to `event.detail.waitUntil()` to keep the dialog open, and
   // the part pending, until it settles.
@@ -30,15 +37,22 @@ function defineDialogParts(primitive: typeof dialog | typeof alertDialog, owner:
     tag: `${owner}-close`,
     display: "contents",
     target: wrappedButton,
-    context: (el) => (el.hasAttribute("action") ? { action: actionOf(el) } : {}),
+    context: (el) =>
+      el.hasAttribute("action") ? { action: actionOf(el) } : {},
   })
   // Shows the shortcut of the trigger it's in, or its own `shortcut`, when it has no text of its own.
   definePart(primitive, "shortcut", {
     tag: `${owner}-shortcut`,
-    context: (el) => ({ shortcut: el.closest(`${owner}-trigger`)?.getAttribute("shortcut") ?? undefined }),
+    context: (el) => ({
+      shortcut:
+        el.closest(`${owner}-trigger`)?.getAttribute("shortcut") ?? undefined,
+    }),
   })
   definePart(primitive, "backdrop", `${owner}-backdrop`)
-  definePart(primitive, "content", { tag: `${owner}-content`, kinds: popupKinds })
+  definePart(primitive, "content", {
+    tag: `${owner}-content`,
+    kinds: popupKinds,
+  })
   definePart(primitive, "title", {
     tag: `${owner}-title`,
     display: "block",
@@ -49,7 +63,9 @@ function defineDialogParts(primitive: typeof dialog | typeof alertDialog, owner:
     display: "block",
     // A paragraph, like the p other frameworks render.
     render(el) {
-      if (!el.hasAttribute("as-child") && !el.hasAttribute("role")) el.setAttribute("role", "paragraph")
+      if (!el.hasAttribute("as-child") && !el.hasAttribute("role")) {
+        el.setAttribute("role", "paragraph")
+      }
     },
   })
 }
@@ -70,7 +86,11 @@ function defineDialogElements() {
     root: {
       tag: "ui-dialog",
       kinds: popupKinds,
-      defaults: { modal: true, dismissible: true, closeOnOutsidePress: closesOnOutsidePress },
+      defaults: {
+        modal: true,
+        dismissible: true,
+        closeOnOutsidePress: closesOnOutsidePress,
+      },
       // Selectors of elements that stay usable while it's modal, as a property too.
       properties: ["persistentElements"],
       options: ownerOptions,

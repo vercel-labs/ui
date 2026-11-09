@@ -46,7 +46,11 @@ const folders = definePrimitive({
   }),
 })
 
-const parts = createParts(folders, { root: "div", item: "button", toggle: "button" })
+const parts = createParts(folders, {
+  root: "div",
+  item: "button",
+  toggle: "button",
+})
 
 const Folders = parts.Root
 
@@ -73,4 +77,11 @@ function Example() {
   )
 }
 
-export { Example, folders, Folders, FoldersItem, type FoldersState, FoldersToggle }
+export {
+  Example,
+  folders,
+  Folders,
+  FoldersItem,
+  type FoldersState,
+  FoldersToggle,
+}

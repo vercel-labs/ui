@@ -4,7 +4,8 @@ const iconTrigger =
   "inline-flex size-8 items-center justify-center rounded-md border border-neutral-200 bg-white text-[13px] font-semibold text-neutral-950 shadow-xs outline-none hover:bg-neutral-50 focus-visible:ring-2 focus-visible:ring-neutral-400"
 const link =
   "text-[13px] font-medium text-neutral-950 underline underline-offset-4 outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
-const toolbar = "inline-flex gap-0.5 rounded-lg border border-neutral-200 bg-white p-0.5 shadow-xs"
+const toolbar =
+  "inline-flex gap-0.5 rounded-lg border border-neutral-200 bg-white p-0.5 shadow-xs"
 const toolbarButton =
   "inline-flex size-7 items-center justify-center rounded-md text-[13px] font-semibold text-neutral-950 outline-none hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400"
 

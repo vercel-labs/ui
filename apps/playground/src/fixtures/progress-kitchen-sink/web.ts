@@ -22,10 +22,14 @@ function markup(variant: Variant) {
 }
 
 function controls(gauge: GaugeElement, variant: Variant, env: Env) {
-  if (!variant.steps) return
+  if (!variant.steps) {
+    return
+  }
   const read = () => gauge.getAttribute("value")
   const write = (value: number | null) =>
-    value === null ? gauge.removeAttribute("value") : gauge.setAttribute("value", String(value))
+    value === null
+      ? gauge.removeAttribute("value")
+      : gauge.setAttribute("value", String(value))
   env.controls(
     progressSteps.map(([label, step]) => [
       label,
@@ -35,7 +39,7 @@ function controls(gauge: GaugeElement, variant: Variant, env: Env) {
         write(next)
         env.log(`value ${next}`)
       },
-    ]),
+    ])
   )
 }
 
@@ -44,8 +48,12 @@ async function mount(root: HTMLElement) {
     slot.innerHTML = markup(variant)
     const gauge = slot.firstElementChild as GaugeElement
     // Rich options are properties, set here before the elements upgrade.
-    if (variant.format) gauge.format = formats[variant.format]
-    if (variant.valueLabel) gauge.getValueLabel = valueLabels[variant.valueLabel]
+    if (variant.format) {
+      gauge.format = formats[variant.format]
+    }
+    if (variant.valueLabel) {
+      gauge.getValueLabel = valueLabels[variant.valueLabel]
+    }
     controls(gauge, variant, env)
   })
   await import("@ui-sdk/web/progress")

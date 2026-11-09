@@ -25,7 +25,10 @@
   const log = useLog()
 
   async function openFirst(event: MouseEvent) {
-    const result = await menu.open({ payload: files[0], anchor: event.currentTarget as HTMLElement })
+    const result = await menu.open({
+      payload: files[0],
+      anchor: event.currentTarget as HTMLElement,
+    })
     log(`Closed with ${result.reason}`)
   }
 </script>
@@ -51,7 +54,10 @@
       </li>
     {/each}
   </ul>
-  <Menu controller={menu} onAction={(action) => log(`${action} ${menu.getPayload()?.name}`)}>
+  <Menu
+    controller={menu}
+    onAction={(action) => log(`${action} ${menu.getPayload()?.name}`)}
+  >
     <MenuContent align="end">
       {#snippet children(state: MenuContentState<File>)}
         <MenuGroup>

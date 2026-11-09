@@ -129,7 +129,9 @@ cropper.addEventListener("cropcommit", (event) => {
   console.log(event.detail.value, event.detail.reason)
 })
 
-document.querySelector("#zoom-in")!.addEventListener("click", () => cropper.api.setZoom(2))
+document
+  .querySelector("#zoom-in")!
+  .addEventListener("click", () => cropper.api.setZoom(2))
 ```
 
 See [State and Events](../state-and-events) for controlled state, cancellation and debugging.

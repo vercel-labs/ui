@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/vue/tabs"
 </script>
 
 <template>
@@ -11,11 +17,17 @@ import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/t
       <TabsIndicator />
     </TabsList>
     <div data-slot="stack">
-      <TabsPanel value="overview">The launch is on track for Friday, with 4 of 6 tasks done.</TabsPanel>
-      <TabsPanel value="activity"
-        >Inès Moreau deployed to production and Kofi Mensah left a review.</TabsPanel
+      <TabsPanel value="overview"
+        >The launch is on track for Friday, with 4 of 6 tasks done.</TabsPanel
       >
-      <TabsPanel value="settings">Rename the project, transfer it to another team or archive it.</TabsPanel>
+      <TabsPanel value="activity"
+        >Inès Moreau deployed to production and Kofi Mensah left a
+        review.</TabsPanel
+      >
+      <TabsPanel value="settings"
+        >Rename the project, transfer it to another team or archive
+        it.</TabsPanel
+      >
     </div>
   </Tabs>
 </template>

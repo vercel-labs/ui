@@ -4,7 +4,10 @@ A polite live region for loading and result counts. Its content is yours, from i
 @stable
 -->
 <script lang="ts">
-  import { autocomplete, type AutocompleteStatusState } from "@ui-sdk/core/autocomplete"
+  import {
+    autocomplete,
+    type AutocompleteStatusState,
+  } from "@ui-sdk/core/autocomplete"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

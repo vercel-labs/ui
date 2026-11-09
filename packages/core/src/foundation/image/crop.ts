@@ -65,14 +65,25 @@ type CropImageOptions = {
  * What `cropImage` reads: an image file, a URL, or anything a canvas draws.
  * @experimental
  */
-type ImageSource = Blob | string | HTMLImageElement | HTMLCanvasElement | ImageBitmap | OffscreenCanvas
+type ImageSource =
+  | Blob
+  | string
+  | HTMLImageElement
+  | HTMLCanvasElement
+  | ImageBitmap
+  | OffscreenCanvas
 
 type Drawable = Exclude<ImageSource, Blob | string>
 type Context = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
 
-const extensions: Record<string, string> = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }
+const extensions: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+}
 
-const isImage = (source: Drawable): source is HTMLImageElement => "naturalWidth" in source
+const isImage = (source: Drawable): source is HTMLImageElement =>
+  "naturalWidth" in source
 
 const sizeOf = (source: Drawable) =>
   isImage(source)
@@ -88,16 +99,25 @@ async function load(source: ImageSource) {
     await image.decode()
     return image
   }
-  if (source instanceof Blob) return createImageBitmap(source)
-  if (isImage(source) && !(source.complete && source.naturalWidth)) await source.decode()
+  if (source instanceof Blob) {
+    return createImageBitmap(source)
+  }
+  if (isImage(source) && !(source.complete && source.naturalWidth)) {
+    await source.decode()
+  }
   return source
 }
 
 function outputSize(crop: ImageCrop, options: CropImageOptions) {
   const ratio = crop.width / crop.height
-  const width = options.width ?? (options.height === undefined ? crop.width : options.height * ratio)
+  const width =
+    options.width ??
+    (options.height === undefined ? crop.width : options.height * ratio)
   const height = options.height ?? width / ratio
-  return { width: Math.max(1, Math.round(width)), height: Math.max(1, Math.round(height)) }
+  return {
+    width: Math.max(1, Math.round(width)),
+    height: Math.max(1, Math.round(height)),
+  }
 }
 
 function drawCrop(
@@ -105,16 +125,26 @@ function drawCrop(
   image: Drawable,
   crop: ImageCrop,
   size: { width: number; height: number },
-  circle: boolean,
+  circle: boolean
 ) {
   const natural = sizeOf(image)
   const rotation = crop.rotation ?? 0
   const turned = rotation % 180 !== 0
-  const shown = turned ? { width: natural.height, height: natural.width } : natural
+  const shown = turned
+    ? { width: natural.height, height: natural.width }
+    : natural
   context.imageSmoothingQuality = "high"
   if (circle) {
     context.beginPath()
-    context.ellipse(size.width / 2, size.height / 2, size.width / 2, size.height / 2, 0, 0, Math.PI * 2)
+    context.ellipse(
+      size.width / 2,
+      size.height / 2,
+      size.width / 2,
+      size.height / 2,
+      0,
+      0,
+      Math.PI * 2
+    )
     context.clip()
   }
   context.scale(size.width / crop.width, size.height / crop.height)
@@ -129,7 +159,7 @@ async function encode(
   height: number,
   draw: (context: Context) => void,
   type: string,
-  quality?: number,
+  quality?: number
 ) {
   if (typeof OffscreenCanvas !== "undefined") {
     const canvas = new OffscreenCanvas(width, height)
@@ -142,17 +172,25 @@ async function encode(
   draw(canvas.getContext("2d")!)
   return new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error("The image couldn't be encoded."))),
+      (blob) =>
+        blob
+          ? resolve(blob)
+          : reject(new Error("The image couldn't be encoded.")),
       type,
-      quality,
-    ),
+      quality
+    )
   )
 }
 
 function nameOf(source: ImageSource, type: string, name?: string) {
-  if (name) return name
+  if (name) {
+    return name
+  }
   const extension = extensions[type] ?? type.split("/")[1] ?? "png"
-  const base = source instanceof File && source.name ? source.name.replace(/\.[^.]*$/, "") : "image"
+  const base =
+    source instanceof File && source.name
+      ? source.name.replace(/\.[^.]*$/, "")
+      : "image"
   return `${base}.${extension}`
 }
 
@@ -169,22 +207,39 @@ function nameOf(source: ImageSource, type: string, name?: string) {
  * })
  * @experimental
  */
-async function cropImage(source: ImageSource, crop: ImageCrop, options: CropImageOptions = {}) {
-  if (!(crop.width > 0 && crop.height > 0)) throw new RangeError("A crop needs a width and a height above 0.")
+async function cropImage(
+  source: ImageSource,
+  crop: ImageCrop,
+  options: CropImageOptions = {}
+) {
+  if (!(crop.width > 0 && crop.height > 0)) {
+    throw new RangeError("A crop needs a width and a height above 0.")
+  }
   const image = await load(source)
   try {
     const size = outputSize(crop, options)
     const blob = await encode(
       size.width,
       size.height,
-      (context) => drawCrop(context, image, crop, size, options.shape === "circle"),
+      (context) =>
+        drawCrop(context, image, crop, size, options.shape === "circle"),
       options.type ?? "image/png",
-      options.quality,
+      options.quality
     )
-    return new File([blob], nameOf(source, blob.type, options.name), { type: blob.type })
+    return new File([blob], nameOf(source, blob.type, options.name), {
+      type: blob.type,
+    })
   } finally {
-    if (source instanceof Blob) (image as ImageBitmap).close()
+    if (source instanceof Blob) {
+      ;(image as ImageBitmap).close()
+    }
   }
 }
 
-export { cropImage, type CropImageOptions, type ImageCrop, type ImageRotation, type ImageSource }
+export {
+  cropImage,
+  type CropImageOptions,
+  type ImageCrop,
+  type ImageRotation,
+  type ImageSource,
+}

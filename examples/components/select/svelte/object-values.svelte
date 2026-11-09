@@ -27,7 +27,8 @@
   <FieldLabel>Assignee</FieldLabel>
   <Select
     defaultValue={{ ...members[1] }}
-    onValueChange={(member) => log(`Submits assignee=${member ? member.id : ""}`)}
+    onValueChange={(member) =>
+      log(`Submits assignee=${member ? member.id : ""}`)}
     name="assignee"
     itemToValue={(member) => String(member.id)}
     itemToLabel={(member) => member.name}

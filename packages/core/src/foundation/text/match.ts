@@ -32,7 +32,10 @@ const specialCase = /^(tr|az|lt)\b/i
  * text's length, so indexes into it are indexes into the text.
  */
 function createFolder(locale?: string) {
-  const collator = new Intl.Collator(locale, { sensitivity: "base", usage: "search" })
+  const collator = new Intl.Collator(locale, {
+    sensitivity: "base",
+    usage: "search",
+  })
   const lower = specialCase.test(locale ?? "")
     ? (text: string) => text.toLocaleLowerCase(locale)
     : (text: string) => text.toLowerCase()
@@ -42,17 +45,26 @@ function createFolder(locale?: string) {
   // One character's folded form, the same length, decided once by the collator.
   function foldChar(char: string) {
     let folded = chars.get(char)
-    if (folded !== undefined) return folded
+    if (folded !== undefined) {
+      return folded
+    }
     const lowered = lower(char)
     if (char < "\u0080") {
       chars.set(char, lowered)
       return lowered
     }
     const stripped = lower(char.normalize("NFD").replace(diacritics, ""))
-    if (stripped.length === char.length && stripped !== lowered && collator.compare(char, stripped) === 0)
+    if (
+      stripped.length === char.length &&
+      stripped !== lowered &&
+      collator.compare(char, stripped) === 0
+    ) {
       folded = stripped
-    else if (latin.test(char))
-      folded = [...latinLetters].find((letter) => collator.compare(char, letter) === 0)
+    } else if (latin.test(char)) {
+      folded = [...latinLetters].find(
+        (letter) => collator.compare(char, letter) === 0
+      )
+    }
     folded ??= lowered.length === char.length ? lowered : char
     chars.set(char, folded)
     return folded
@@ -60,14 +72,21 @@ function createFolder(locale?: string) {
 
   function fold(text: string) {
     let folded = texts.get(text)
-    if (folded !== undefined) return folded
-    if (ascii.test(text)) folded = lower(text)
-    else {
+    if (folded !== undefined) {
+      return folded
+    }
+    if (ascii.test(text)) {
+      folded = lower(text)
+    } else {
       folded = ""
-      for (const char of text) folded += foldChar(char)
+      for (const char of text) {
+        folded += foldChar(char)
+      }
     }
     // Bounded, so labels that come and go can't grow it forever.
-    if (texts.size > 50_000) texts.clear()
+    if (texts.size > 50_000) {
+      texts.clear()
+    }
     texts.set(text, folded)
     return folded
   }
@@ -86,7 +105,9 @@ function setMatchLocale(locale?: string) {
 }
 
 function userFolder() {
-  if (folder) return folder
+  if (folder) {
+    return folder
+  }
   // The user can switch languages while the page is open.
   if (!watching && typeof window !== "undefined") {
     watching = true
@@ -102,15 +123,32 @@ const foldText = (text: string) => userFolder().fold(text)
 // the indentation a label's markup may carry.
 function leadingSpaces(text: string) {
   let index = 0
-  while (index < text.length && text.charCodeAt(index) <= 32) index++
+  while (index < text.length && text.charCodeAt(index) <= 32) {
+    index++
+  }
   return index
 }
 
 // Characters that end a word, so the one after them starts the next.
-const separators = new Set([" ", "-", "_", "/", ".", ":", ",", "(", ")", "[", "]", "@", "#"])
+const separators = new Set([
+  " ",
+  "-",
+  "_",
+  "/",
+  ".",
+  ":",
+  ",",
+  "(",
+  ")",
+  "[",
+  "]",
+  "@",
+  "#",
+])
 
 // Whether a word starts at an index, after a separator or at the start.
-const startsWord = (text: string, index: number) => index === 0 || separators.has(text[index - 1])
+const startsWord = (text: string, index: number) =>
+  index === 0 || separators.has(text[index - 1])
 
 /**
  * The ranges of `text` that `query` matched, the way a filter matches:
@@ -119,14 +157,22 @@ const startsWord = (text: string, index: number) => index === 0 || separators.ha
  * Empty when nothing matched, like when only a keyword did.
  * @stable
  */
-function matchRanges(text: string, query: string, mode: "contains" | "startsWith" | "fuzzy") {
+function matchRanges(
+  text: string,
+  query: string,
+  mode: "contains" | "startsWith" | "fuzzy"
+) {
   const needle = foldText(query.trim())
-  if (!needle) return []
+  if (!needle) {
+    return []
+  }
   const haystack = foldText(text)
   const index = haystack.indexOf(needle)
   if (mode === "startsWith") {
     const start = leadingSpaces(haystack)
-    return haystack.startsWith(needle, start) ? [{ start, end: start + needle.length }] : []
+    return haystack.startsWith(needle, start)
+      ? [{ start, end: start + needle.length }]
+      : []
   }
   if (index !== -1) {
     // Fuzzy matching prefers a word start, like "push" in "Git push".
@@ -137,8 +183,15 @@ function matchRanges(text: string, query: string, mode: "contains" | "startsWith
 }
 
 function wordStart(haystack: string, needle: string, first: number) {
-  for (let index = first; index !== -1; index = haystack.indexOf(needle, index + 1))
-    if (startsWord(haystack, index)) return index
+  for (
+    let index = first;
+    index !== -1;
+    index = haystack.indexOf(needle, index + 1)
+  ) {
+    if (startsWord(haystack, index)) {
+      return index
+    }
+  }
   return first
 }
 
@@ -148,12 +201,19 @@ function letterRanges(haystack: string, needle: string) {
   const ranges: MatchRange[] = []
   let position = 0
   for (const char of needle) {
-    if (char === " ") continue
+    if (char === " ") {
+      continue
+    }
     const found = haystack.indexOf(char, position)
-    if (found === -1) return []
+    if (found === -1) {
+      return []
+    }
     const last = ranges.at(-1)
-    if (last && last.end === found) last.end = found + 1
-    else ranges.push({ start: found, end: found + 1 })
+    if (last && last.end === found) {
+      last.end = found + 1
+    } else {
+      ranges.push({ start: found, end: found + 1 })
+    }
     position = found + 1
   }
   return ranges
@@ -164,15 +224,21 @@ function letterRanges(haystack: string, needle: string) {
  * @stable
  */
 function matchSegments(text: string, ranges: MatchRange[]) {
-  if (!ranges.length) return [{ text, match: false }]
+  if (!ranges.length) {
+    return [{ text, match: false }]
+  }
   const segments: MatchSegment[] = []
   let position = 0
   for (const { start, end } of ranges) {
-    if (start > position) segments.push({ text: text.slice(position, start), match: false })
+    if (start > position) {
+      segments.push({ text: text.slice(position, start), match: false })
+    }
     segments.push({ text: text.slice(start, end), match: true })
     position = end
   }
-  if (position < text.length) segments.push({ text: text.slice(position), match: false })
+  if (position < text.length) {
+    segments.push({ text: text.slice(position), match: false })
+  }
   return segments
 }
 

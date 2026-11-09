@@ -9,7 +9,11 @@ import {
 } from "@ui-sdk/solid/tree"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
-import { describeTree, treeFixture, type TreeFixtureItem } from "tests/fixtures/tree.ts"
+import {
+  describeTree,
+  treeFixture,
+  type TreeFixtureItem,
+} from "tests/fixtures/tree.ts"
 import { treeOptions } from "tests/fixtures/page.ts"
 
 const controller = createTreeController()
@@ -27,7 +31,11 @@ function Items(props: { items: TreeFixtureItem[]; checkable: boolean }) {
           </Show>
           <TreeItemLabel
             class="tree-label"
-            render={item.href ? (label) => <a {...label} href={item.href} /> : undefined}
+            render={
+              item.href
+                ? (label) => <a {...label} href={item.href} />
+                : undefined
+            }
           >
             {item.label}
           </TreeItemLabel>
@@ -60,10 +68,18 @@ function Fixture(props: { data?: boolean }) {
         {...options}
         onValueChange={(value) => setAction(describeTree("selected", value))}
         onExpandedChange={(expanded, details) => {
-          if (cancel && expanded.includes(cancel) && !controller.isExpanded(cancel)) return details.cancel()
+          if (
+            cancel &&
+            expanded.includes(cancel) &&
+            !controller.isExpanded(cancel)
+          ) {
+            return details.cancel()
+          }
           setAction(describeTree("expanded", expanded))
         }}
-        onCheckedChange={(checked) => setAction(describeTree("checked", checked))}
+        onCheckedChange={(checked) =>
+          setAction(describeTree("checked", checked))
+        }
         onAction={(value) => {
           setAction(describeTree("action", value))
         }}
@@ -76,7 +92,9 @@ function Fixture(props: { data?: boolean }) {
       </output>
       <button onClick={() => controller.expandAll()}>Expand all</button>
       <button onClick={() => controller.collapseAll()}>Collapse all</button>
-      <button onClick={() => controller.reveal("dialog.tsx")}>Reveal dialog</button>
+      <button onClick={() => controller.reveal("dialog.tsx")}>
+        Reveal dialog
+      </button>
     </div>
   )
 }

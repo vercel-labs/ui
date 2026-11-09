@@ -1,5 +1,8 @@
 import { imageCropperOptions } from "tests/fixtures/page.ts"
-import { describeCrop, imageCropperFixture } from "tests/fixtures/image-cropper.ts"
+import {
+  describeCrop,
+  imageCropperFixture,
+} from "tests/fixtures/image-cropper.ts"
 
 const markup = () => `
   <div class="fixture">
@@ -26,39 +29,55 @@ const markup = () => `
 type Crop = Parameters<typeof describeCrop>[0]
 
 async function mount(root: HTMLElement) {
-  const { cancel, mode, shape, disabled, aspectRatio, defaultCrop } = imageCropperOptions()
+  const { cancel, mode, shape, disabled, aspectRatio, defaultCrop } =
+    imageCropperOptions()
   root.innerHTML = markup()
   const cropper = root.querySelector<
-    HTMLElement & { defaultCrop?: object; api?: { setCrop: (crop: object) => void } }
+    HTMLElement & {
+      defaultCrop?: object
+      api?: { setCrop: (crop: object) => void }
+    }
   >("ui-image-cropper")!
   cropper.setAttribute("src", imageCropperFixture.src)
   cropper.setAttribute("mode", mode)
   cropper.setAttribute("shape", shape)
-  if (disabled) cropper.setAttribute("disabled", "")
-  if (aspectRatio) cropper.setAttribute("aspect-ratio", String(aspectRatio))
-  if (defaultCrop) cropper.defaultCrop = defaultCrop
+  if (disabled) {
+    cropper.setAttribute("disabled", "")
+  }
+  if (aspectRatio) {
+    cropper.setAttribute("aspect-ratio", String(aspectRatio))
+  }
+  if (defaultCrop) {
+    cropper.defaultCrop = defaultCrop
+  }
   const [action, committed] = root.querySelectorAll("output")
   root.addEventListener(
     "cropchange",
     (event) => {
-      const detail = (event as CustomEvent<{ value: Crop; reason: string }>).detail
-      if (cancel && detail.reason !== "image-load") return event.preventDefault()
+      const detail = (event as CustomEvent<{ value: Crop; reason: string }>)
+        .detail
+      if (cancel && detail.reason !== "image-load") {
+        return event.preventDefault()
+      }
       action!.textContent = `${describeCrop(detail.value)}:${detail.reason}`
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "cropcommit",
     (event) => {
-      const detail = (event as CustomEvent<{ value: Crop; reason: string }>).detail
+      const detail = (event as CustomEvent<{ value: Crop; reason: string }>)
+        .detail
       committed!.textContent = `${describeCrop(detail.value)}:${detail.reason}`
     },
-    { capture: true },
+    { capture: true }
   )
   await import("@ui-sdk/web/image-cropper")
   root
     .querySelector("#controller")!
-    .addEventListener("click", () => cropper.api?.setCrop({ x: 0, y: 0, width: 100, height: 100 }))
+    .addEventListener("click", () =>
+      cropper.api?.setCrop({ x: 0, y: 0, width: 100, height: 100 })
+    )
 }
 
 export { mount }

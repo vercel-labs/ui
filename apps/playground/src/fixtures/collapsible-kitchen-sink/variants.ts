@@ -55,8 +55,18 @@ const tree: TreeNode = {
 }
 
 const variants: Variant[] = [
-  { id: "default", section: "Basics", title: "Default", note: "Closed at first." },
-  { id: "default-open", section: "Basics", title: "defaultOpen", options: { defaultOpen: true } },
+  {
+    id: "default",
+    section: "Basics",
+    title: "Default",
+    note: "Closed at first.",
+  },
+  {
+    id: "default-open",
+    section: "Basics",
+    title: "defaultOpen",
+    options: { defaultOpen: true },
+  },
   {
     id: "disabled",
     section: "Basics",
@@ -72,7 +82,12 @@ const variants: Variant[] = [
     options: { disabled: true, defaultOpen: true },
   },
 
-  { id: "unmount", section: "Mounting", title: "Unmounted when closed", note: "The default." },
+  {
+    id: "unmount",
+    section: "Mounting",
+    title: "Unmounted when closed",
+    note: "The default.",
+  },
   {
     id: "keep-mounted",
     section: "Mounting",
@@ -88,9 +103,24 @@ const variants: Variant[] = [
     panel: { hiddenUntilFound: true },
   },
 
-  { id: "animation-none", section: "Animation", title: "No animation", animation: "none" },
-  { id: "animation-height", section: "Animation", title: "Height transition", animation: "height" },
-  { id: "animation-slow", section: "Animation", title: "Slow, interrupt it", animation: "slow" },
+  {
+    id: "animation-none",
+    section: "Animation",
+    title: "No animation",
+    animation: "none",
+  },
+  {
+    id: "animation-height",
+    section: "Animation",
+    title: "Height transition",
+    animation: "height",
+  },
+  {
+    id: "animation-slow",
+    section: "Animation",
+    title: "Slow, interrupt it",
+    animation: "slow",
+  },
   {
     id: "animation-keyframes",
     section: "Animation",
@@ -120,7 +150,12 @@ const variants: Variant[] = [
     note: "Turn on reduced motion in your system settings. The panel then opens at once.",
     animation: "reduced",
   },
-  { id: "animation-fade", section: "Animation", title: "Fade only", animation: "fade" },
+  {
+    id: "animation-fade",
+    section: "Animation",
+    title: "Fade only",
+    animation: "fade",
+  },
 
   {
     id: "controlled",
@@ -203,10 +238,22 @@ const variants: Variant[] = [
     note: "Add lines once it's open. The panel follows.",
     body: "grow",
   },
-  { id: "tree", section: "Content", title: "Nested collapsibles", note: "A file tree.", body: "tree" },
+  {
+    id: "tree",
+    section: "Content",
+    title: "Nested collapsibles",
+    note: "A file tree.",
+    body: "tree",
+  },
 
   { id: "rtl", section: "Containers", title: "Right to left", place: "rtl" },
-  { id: "scroll", section: "Containers", title: "Scroll container", place: "scroll", body: "long" },
+  {
+    id: "scroll",
+    section: "Containers",
+    title: "Scroll container",
+    place: "scroll",
+    body: "long",
+  },
   {
     id: "clip",
     section: "Containers",
@@ -215,7 +262,12 @@ const variants: Variant[] = [
     place: "clip",
     body: "long",
   },
-  { id: "transform", section: "Containers", title: "Scaled container", place: "transform" },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Scaled container",
+    place: "transform",
+  },
 ]
 
 export { content, tree, type TreeNode, type Variant, variants }

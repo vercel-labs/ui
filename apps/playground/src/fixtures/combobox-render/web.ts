@@ -16,7 +16,7 @@ async function mount(root: HTMLElement) {
               .slice(0, 3)
               .map(
                 (item) =>
-                  `<ui-combobox-item class="item" value="${item.value}" label="${item.label}">${item.label}</ui-combobox-item>`,
+                  `<ui-combobox-item class="item" value="${item.value}" label="${item.label}">${item.label}</ui-combobox-item>`
               )
               .join("")}
           </ui-combobox-list>

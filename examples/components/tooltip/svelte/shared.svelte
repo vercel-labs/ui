@@ -19,13 +19,19 @@
 
 <div data-slot="row" role="group" aria-label="Formatting">
   {#each formats as format (format.label)}
-    <TooltipTrigger controller={tooltip} payload={format.label} aria-label={format.label}>
+    <TooltipTrigger
+      controller={tooltip}
+      payload={format.label}
+      aria-label={format.label}
+    >
       <format.icon aria-hidden="true" />
     </TooltipTrigger>
   {/each}
   <Tooltip controller={tooltip}>
     <TooltipContent>
-      {#snippet children(state: TooltipContentState<string>)}{state.payload}{/snippet}
+      {#snippet children(
+        state: TooltipContentState<string>
+      )}{state.payload}{/snippet}
     </TooltipContent>
   </Tooltip>
 </div>

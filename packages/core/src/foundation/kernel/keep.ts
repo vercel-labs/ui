@@ -57,12 +57,14 @@ function withLifecycle<T extends object>(make: () => T) {
     making = outer
   }
   lifecycles.set(instance, lifecycle)
-  if (outer)
+  if (outer) {
     outer.starts.push(() => {
       keep(instance)
       return () => release(instance)
     })
-  else if (!deferring && typeof document !== "undefined") keep(instance)
+  } else if (!deferring && typeof document !== "undefined") {
+    keep(instance)
+  }
   return instance
 }
 
@@ -87,18 +89,27 @@ function unwatched<T>(make: () => T) {
  * instance's setup calls it: outside one, nothing would ever stop the work.
  */
 function whenKept(start: Start) {
-  if (making) making.starts.push(start)
-  else if (dev) warn("`whenKept` runs only while an instance is made, so this work never starts.")
+  if (making) {
+    making.starts.push(start)
+  } else if (dev) {
+    warn(
+      "`whenKept` runs only while an instance is made, so this work never starts."
+    )
+  }
 }
 
 /** Starts what waits on the framework keeping an instance. Safe to call again. */
 function keep(instance: object) {
   const lifecycle = lifecycles.get(instance)
-  if (!lifecycle || lifecycle.stops) return
+  if (!lifecycle || lifecycle.stops) {
+    return
+  }
   const stops: (() => void)[] = (lifecycle.stops = [])
   for (const start of lifecycle.starts) {
     const stop = start()
-    if (stop) stops.push(stop)
+    if (stop) {
+      stops.push(stop)
+    }
   }
 }
 
@@ -110,7 +121,9 @@ function keep(instance: object) {
 function release(instance: object) {
   const lifecycle = lifecycles.get(instance)
   const stops = lifecycle?.stops
-  if (!stops) return
+  if (!stops) {
+    return
+  }
   lifecycle.stops = undefined
   stops.forEach((stop) => stop())
 }
@@ -121,4 +134,13 @@ function discard(instance: object) {
   lifecycles.delete(instance)
 }
 
-export { discard, isDestroying, keep, release, unwatched, whenKept, whileDestroying, withLifecycle }
+export {
+  discard,
+  isDestroying,
+  keep,
+  release,
+  unwatched,
+  whenKept,
+  whileDestroying,
+  withLifecycle,
+}

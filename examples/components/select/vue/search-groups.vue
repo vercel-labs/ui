@@ -53,16 +53,27 @@ const regions = [
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
-        <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+        <SelectInput
+          aria-label="Search countries"
+          placeholder="Search countries…"
+        />
         <SelectEmpty>No countries found.</SelectEmpty>
         <SelectList>
           <SelectGroup v-for="group in regions" :key="group.label">
             <SelectGroupLabel>{{ group.label }}</SelectGroupLabel>
-            <SelectItem v-for="item in group.items" :key="item.value" :value="item.value" :label="item.label">
+            <SelectItem
+              v-for="item in group.items"
+              :key="item.value"
+              :value="item.value"
+              :label="item.label"
+            >
               <SelectItemText>
                 <template #render="{ props, state }">
                   <span v-bind="props">
-                    <template v-for="(segment, index) in state.segments" :key="index">
+                    <template
+                      v-for="(segment, index) in state.segments"
+                      :key="index"
+                    >
                       <b v-if="segment.match">{{ segment.text }}</b>
                       <template v-else>{{ segment.text }}</template>
                     </template>

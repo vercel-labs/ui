@@ -7,11 +7,14 @@ import { createAgent } from "@ui-sdk/react/agent"
 const rating = definePrimitive({
   name: "rating",
   options: { defaultValue: "number" },
-  state: (options: { defaultValue?: number }) => ({ value: options.defaultValue ?? 0 }),
+  state: (options: { defaultValue?: number }) => ({
+    value: options.defaultValue ?? 0,
+  }),
   api: (context) => {
     const change = createChange(context)
     return {
-      rate: (value: number, event?: Event) => change("value", value, { reason: "item-press", event }),
+      rate: (value: number, event?: Event) =>
+        change("value", value, { reason: "item-press", event }),
     }
   },
   slots: (slot) => ({
@@ -55,7 +58,11 @@ function Example() {
       <div data-slot="row">
         <button
           type="button"
-          onClick={() => show(agent.snapshot().filter((entry) => entry.component === "rating"))}
+          onClick={() =>
+            show(
+              agent.snapshot().filter((entry) => entry.component === "rating")
+            )
+          }
         >
           Read the page
         </button>
@@ -63,7 +70,11 @@ function Example() {
           type="button"
           data-variant="solid"
           onClick={async () =>
-            show(await agent.act({ steps: [{ ref: "Your rating", action: "rate", args: [4] }] }))
+            show(
+              await agent.act({
+                steps: [{ ref: "Your rating", action: "rate", args: [4] }],
+              })
+            )
           }
         >
           Ask for 4 stars

@@ -22,7 +22,9 @@ const normals: Record<EdgeSide, readonly [number, number]> = {
 const round = (n: number) => Math.round(n * 100) / 100
 
 function halfway(points: { x: number; y: number }[]) {
-  const lengths = points.slice(1).map((p, i) => Math.hypot(p.x - points[i].x, p.y - points[i].y))
+  const lengths = points
+    .slice(1)
+    .map((p, i) => Math.hypot(p.x - points[i].x, p.y - points[i].y))
   let left = lengths.reduce((sum, length) => sum + length, 0) / 2
   for (const [i, length] of lengths.entries()) {
     if (left <= length && length) {
@@ -61,39 +63,56 @@ function steps(from: EdgeEnd, to: EdgeEnd, offset: number) {
           ]
     } else {
       const m = flat ? (a.y + b.y) / 2 : (a.x + b.x) / 2
-      middle = flat ? [a, { x: a.x, y: m }, { x: b.x, y: m }, b] : [a, { x: m, y: a.y }, { x: m, y: b.y }, b]
+      middle = flat
+        ? [a, { x: a.x, y: m }, { x: b.x, y: m }, b]
+        : [a, { x: m, y: a.y }, { x: m, y: b.y }, b]
     }
   } else {
     const corner = flat ? { x: to.x, y: from.y } : { x: from.x, y: to.y }
     const ahead =
       (corner.x - from.x) * ax + (corner.y - from.y) * ay > 0 &&
       (corner.x - to.x) * bx + (corner.y - to.y) * by > 0
-    middle = ahead ? [corner] : flat ? [a, { x: a.x, y: b.y }, b] : [a, { x: b.x, y: a.y }, b]
+    middle = ahead
+      ? [corner]
+      : flat
+        ? [a, { x: a.x, y: b.y }, b]
+        : [a, { x: b.x, y: a.y }, b]
   }
   const points = [from, ...middle, to].map((p) => ({ x: p.x, y: p.y }))
   return points.filter((p, i) => {
-    if (i === 0 || i === points.length - 1) return true
+    if (i === 0 || i === points.length - 1) {
+      return true
+    }
     const prev = points[i - 1]
     const next = points[i + 1]
-    if (p.x === prev.x && p.y === prev.y) return false
-    return !((prev.x === p.x && p.x === next.x) || (prev.y === p.y && p.y === next.y))
+    if (p.x === prev.x && p.y === prev.y) {
+      return false
+    }
+    return !(
+      (prev.x === p.x && p.x === next.x) ||
+      (prev.y === p.y && p.y === next.y)
+    )
   })
 }
 
 function edgePath(from: EdgeEnd, to: EdgeEnd, options: EdgePathOptions = {}) {
   const shape = options.shape ?? "curve"
-  if (shape === "straight")
+  if (shape === "straight") {
     return {
       d: `M${round(from.x)},${round(from.y)} L${round(to.x)},${round(to.y)}`,
       mid: { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 },
     }
+  }
   if (shape === "curve") {
     const [ax, ay] = normals[from.side ?? "right"]
     const [bx, by] = normals[to.side ?? "left"]
     const reach = Math.max(30, Math.hypot(to.x - from.x, to.y - from.y) / 2)
     const c1 = { x: from.x + ax * reach, y: from.y + ay * reach }
     const c2 = { x: to.x + bx * reach, y: to.y + by * reach }
-    const mid = { x: (from.x + 3 * c1.x + 3 * c2.x + to.x) / 8, y: (from.y + 3 * c1.y + 3 * c2.y + to.y) / 8 }
+    const mid = {
+      x: (from.x + 3 * c1.x + 3 * c2.x + to.x) / 8,
+      y: (from.y + 3 * c1.y + 3 * c2.y + to.y) / 8,
+    }
     return {
       d: `M${round(from.x)},${round(from.y)} C${round(c1.x)},${round(c1.y)} ${round(c2.x)},${round(c2.y)} ${round(to.x)},${round(to.y)}`,
       mid,
@@ -107,7 +126,7 @@ function edgePath(from: EdgeEnd, to: EdgeEnd, options: EdgePathOptions = {}) {
     const r = Math.min(
       radius,
       Math.hypot(p.x - prev.x, p.y - prev.y) / 2,
-      Math.hypot(next.x - p.x, next.y - p.y) / 2,
+      Math.hypot(next.x - p.x, next.y - p.y) / 2
     )
     const inX = p.x - Math.sign(p.x - prev.x) * r
     const inY = p.y - Math.sign(p.y - prev.y) * r
@@ -120,4 +139,11 @@ function edgePath(from: EdgeEnd, to: EdgeEnd, options: EdgePathOptions = {}) {
   return { d, mid: halfway(points) }
 }
 
-export { type EdgeEnd, edgePath, type EdgePath, type EdgePathOptions, type EdgeShape, type EdgeSide }
+export {
+  type EdgeEnd,
+  edgePath,
+  type EdgePath,
+  type EdgePathOptions,
+  type EdgeShape,
+  type EdgeSide,
+}

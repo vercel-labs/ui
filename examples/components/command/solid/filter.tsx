@@ -1,4 +1,10 @@
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/solid/command"
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/solid/command"
 import {
   Select,
   SelectContent,
@@ -43,7 +49,7 @@ function words(item: { label: string }, query: string) {
       item.label
         .toLowerCase()
         .split(" ")
-        .some((part) => part.startsWith(word)),
+        .some((part) => part.startsWith(word))
     )
 }
 
@@ -56,7 +62,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={modes} value={mode()} onValueChange={(next) => next && setMode(next as Mode)}>
+        <Select
+          items={modes}
+          value={mode()}
+          onValueChange={(next) => next && setMode(next as Mode)}
+        >
           <SelectLabel>Filter</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -97,7 +107,10 @@ function Example() {
         </Select>
       </div>
       <Command filter={filter()}>
-        <CommandInput aria-label="Search commands" placeholder="Try “nf”, “zo in” or “smiley”" />
+        <CommandInput
+          aria-label="Search commands"
+          placeholder="Try “nf”, “zo in” or “smiley”"
+        />
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandList>
           <For each={commands}>

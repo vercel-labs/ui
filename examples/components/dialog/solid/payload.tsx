@@ -11,7 +11,12 @@ import {
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
-type Invoice = { id: string; customer: string; amount: string; status: "Paid" | "Due" }
+type Invoice = {
+  id: string
+  customer: string
+  amount: string
+  status: "Paid" | "Due"
+}
 
 const invoices: Invoice[] = [
   { id: "INV-001", customer: "Acme", amount: "$250.00", status: "Paid" },
@@ -24,8 +29,12 @@ function Example() {
   const log = useLog()
 
   async function remindFromCode() {
-    const { reason, returnValue } = await reminder.open({ payload: invoices[2] })
-    log(returnValue === "send" ? "Reminder sent from code" : `Closed (${reason})`)
+    const { reason, returnValue } = await reminder.open({
+      payload: invoices[2],
+    })
+    log(
+      returnValue === "send" ? "Reminder sent from code" : `Closed (${reason})`
+    )
   }
 
   return (
@@ -58,7 +67,9 @@ function Example() {
       <Dialog
         controller={reminder}
         onOpenChange={(open, details) => {
-          if (!open && details.returnValue === "send") log("Reminder sent")
+          if (!open && details.returnValue === "send") {
+            log("Reminder sent")
+          }
         }}
       >
         <DialogBackdrop />
@@ -70,7 +81,8 @@ function Example() {
                 <div data-slot="stack">
                   <DialogTitle>Remind {invoice()?.customer}</DialogTitle>
                   <DialogDescription>
-                    {invoice()?.id} for {invoice()?.amount} is due. We'll email the billing contact.
+                    {invoice()?.id} for {invoice()?.amount} is due. We'll email
+                    the billing contact.
                   </DialogDescription>
                 </div>
                 <div data-slot="row">

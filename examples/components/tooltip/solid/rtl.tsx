@@ -1,4 +1,9 @@
-import { Tooltip, TooltipArrow, TooltipContent, TooltipTrigger } from "@ui-sdk/solid/tooltip"
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipTrigger,
+} from "@ui-sdk/solid/tooltip"
 import { For } from "solid-js"
 
 const sides = [

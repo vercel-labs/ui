@@ -18,7 +18,10 @@ function Fixture() {
     <div class="fixture">
       <button>Before</button>
       <div role="toolbar" aria-label={f.toolbarLabel} class="row">
-        <NumberInputScrubArea controller={controller} class="number-input-scrub">
+        <NumberInputScrubArea
+          controller={controller}
+          class="number-input-scrub"
+        >
           {f.toolbarScrub}
         </NumberInputScrubArea>
       </div>
@@ -43,16 +46,25 @@ function Fixture() {
         max={f.max}
         locale="en-US"
         onValueChange={(value) => setAction(String(value))}
-        onValueCommit={(value) => setCommits((list) => [...list, String(value)])}
+        onValueCommit={(value) =>
+          setCommits((list) => [...list, String(value)])
+        }
       >
         <NumberInputGroup class="number-input-group">
-          <NumberInputScrubArea class="number-input-scrub">{f.letterScrub}</NumberInputScrubArea>
-          <NumberInputControl aria-label={f.label} class="number-input-control" />
+          <NumberInputScrubArea class="number-input-scrub">
+            {f.letterScrub}
+          </NumberInputScrubArea>
+          <NumberInputControl
+            aria-label={f.label}
+            class="number-input-control"
+          />
         </NumberInputGroup>
         <div>
           <div>
             <div>
-              <NumberInputScrubArea class="number-input-scrub">{f.nestedScrub}</NumberInputScrubArea>
+              <NumberInputScrubArea class="number-input-scrub">
+                {f.nestedScrub}
+              </NumberInputScrubArea>
             </div>
           </div>
         </div>

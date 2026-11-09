@@ -14,7 +14,9 @@ import RouterLink from "./RouterLink.vue"
 const action = ref("")
 
 function onPageChange(page: number, details: ChangeDetails) {
-  if (page === 4) return details.cancel()
+  if (page === 4) {
+    return details.cancel()
+  }
   action.value = `page: ${page}`
 }
 </script>
@@ -41,9 +43,13 @@ function onPageChange(page: number, details: ChangeDetails) {
             <template #render="{ props, state: link }">
               <RouterLink
                 v-bind="props"
-                :class="['pagination-link', link.current ? 'is-active' : 'is-inactive']"
+                :class="[
+                  'pagination-link',
+                  link.current ? 'is-active' : 'is-inactive',
+                ]"
               >
-                {{ link.page }}<span v-if="link.current" aria-hidden="true">•</span>
+                {{ link.page
+                }}<span v-if="link.current" aria-hidden="true">•</span>
               </RouterLink>
             </template>
           </PaginationLink>

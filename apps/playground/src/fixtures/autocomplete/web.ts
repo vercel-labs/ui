@@ -11,18 +11,24 @@ import { serializeForm } from "tests/fixtures/select.ts"
 // The highlight option wraps labels in a text part that marks what matched.
 let highlight = false
 
-const item = (entry: { value: string; label: string; keywords?: string[]; disabled?: boolean }) =>
+const item = (entry: {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+}) =>
   `<ui-autocomplete-item class="item" value="${entry.value}" label="${entry.label}"${entry.keywords ? ` keywords="${entry.keywords.join(",")}"` : ""}${entry.disabled ? " disabled" : ""}>${highlight ? `<ui-autocomplete-item-text>${entry.label}</ui-autocomplete-item-text>` : entry.label}</ui-autocomplete-item>`
 
 async function render(root: HTMLElement, data = false) {
-  const { fieldset, grouped, async, container, recent, nostatus, ...options } = autocompleteOptions()
+  const { fieldset, grouped, async, container, recent, nostatus, ...options } =
+    autocompleteOptions()
   highlight = options.highlight
   const dataMode = data || async || recent
   const list = grouped
     ? f.groups
         .map(
           (group) =>
-            `<ui-autocomplete-group><ui-autocomplete-group-label class="label">${group.label}</ui-autocomplete-group-label>${group.items.map(item).join("")}</ui-autocomplete-group>`,
+            `<ui-autocomplete-group><ui-autocomplete-group-label class="label">${group.label}</ui-autocomplete-group-label>${group.items.map(item).join("")}</ui-autocomplete-group>`
         )
         .join("")
     : f.items.map(item).join("")
@@ -54,8 +60,12 @@ async function render(root: HTMLElement, data = false) {
       <output role="status" aria-label="Last action"></output>
       <output role="status" aria-label="Submitted"></output>
     </div>`
-  const autocomplete = root.querySelector<HTMLElement & Record<string, any>>("ui-autocomplete")!
-  if (options.defaultValue !== undefined) autocomplete.setAttribute("default-value", options.defaultValue)
+  const autocomplete = root.querySelector<HTMLElement & Record<string, any>>(
+    "ui-autocomplete"
+  )!
+  if (options.defaultValue !== undefined) {
+    autocomplete.setAttribute("default-value", options.defaultValue)
+  }
   for (const [option, attribute] of [
     ["inlineComplete", "inline-complete"],
     ["autoHighlight", "auto-highlight"],
@@ -64,12 +74,23 @@ async function render(root: HTMLElement, data = false) {
     ["required", "required"],
     ["readOnly", "read-only"],
     ["disabled", "disabled"],
-  ] as const)
-    if (options[option]) autocomplete.setAttribute(attribute, "")
-  if (container) autocomplete.setAttribute("container", `#${container.id}`)
-  if (options.presentation) autocomplete.setAttribute("presentation", options.presentation)
-  if (recent) autocomplete.emptyItems = f.recent
-  const output = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
+  ] as const) {
+    if (options[option]) {
+      autocomplete.setAttribute(attribute, "")
+    }
+  }
+  if (container) {
+    autocomplete.setAttribute("container", `#${container.id}`)
+  }
+  if (options.presentation) {
+    autocomplete.setAttribute("presentation", options.presentation)
+  }
+  if (recent) {
+    autocomplete.emptyItems = f.recent
+  }
+  const output = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
   const status = root.querySelector("ui-autocomplete-status")
   if (async) {
     autocomplete.setAttribute("filter", "false")
@@ -78,45 +99,59 @@ async function render(root: HTMLElement, data = false) {
       const { items, status: loading } = remote.getState()
       autocomplete.items = items
       autocomplete.setAttribute("status", loading)
-      if (status) status.textContent = loading === "loading" ? "Loading…" : ""
+      if (status) {
+        status.textContent = loading === "loading" ? "Loading…" : ""
+      }
     })
     autocomplete.addEventListener("valuechange", (event) =>
-      remote.setQuery((event as CustomEvent<{ value: string }>).detail.value),
+      remote.setQuery((event as CustomEvent<{ value: string }>).detail.value)
     )
-  } else if (dataMode)
+  } else if (dataMode) {
     autocomplete.items = grouped
-      ? f.groups.map((group) => ({ type: "group", label: group.label, items: group.items }))
+      ? f.groups.map((group) => ({
+          type: "group",
+          label: group.label,
+          items: group.items,
+        }))
       : f.items
+  }
   autocomplete.addEventListener("valuechange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: string; reason: string }>).detail
+    const { value, reason } = (
+      event as CustomEvent<{ value: string; reason: string }>
+    ).detail
     output.textContent = `value:${value}:${reason}`
   })
   autocomplete.addEventListener("submit", (event) => {
     output.textContent = `submit:${(event as unknown as CustomEvent<{ value: string }>).detail.value}`
   })
-  if (!async && !grouped)
+  if (!async && !grouped) {
     onItemsChange(changedItems, (items) => {
-      if (dataMode) return void (autocomplete.items = items)
+      if (dataMode) {
+        return void (autocomplete.items = items)
+      }
       // Moves the items that stay, so they keep their elements, and adds the new
       // ones. The list may be in a portal container, outside the autocomplete.
       const list = document.querySelector("ui-autocomplete-list")!
       const existing = new Map(
-        [...list.querySelectorAll<HTMLElement>("ui-autocomplete-item")].map((el) => [
-          el.getAttribute("value"),
-          el,
-        ]),
+        [...list.querySelectorAll<HTMLElement>("ui-autocomplete-item")].map(
+          (el) => [el.getAttribute("value"), el]
+        )
       )
       list.replaceChildren(
         ...items.map(
           (entry) =>
-            existing.get(entry.value) ?? document.createRange().createContextualFragment(item(entry)),
-        ),
+            existing.get(entry.value) ??
+            document.createRange().createContextualFragment(item(entry))
+        )
       )
     })
+  }
   const form = root.querySelector("form")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    root.querySelector<HTMLOutputElement>('output[aria-label="Submitted"]')!.textContent = serializeForm(form)
+    root.querySelector<HTMLOutputElement>(
+      'output[aria-label="Submitted"]'
+    )!.textContent = serializeForm(form)
   })
   await import("@ui-sdk/web/autocomplete")
 }

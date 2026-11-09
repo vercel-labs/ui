@@ -53,7 +53,10 @@ type MoveOptions<State extends object> = {
    * Asks for new positions and returns whether they went through. Pass the
    * primitive's change: `set: (value, details) => change("positions", value, details)`.
    */
-  set: (value: Record<string, MovePoint>, details: { reason: MoveReason; event?: Event }) => boolean
+  set: (
+    value: Record<string, MovePoint>,
+    details: { reason: MoveReason; event?: Event }
+  ) => boolean
   /** The keys that move together with the one pressed, like the selection when it holds it. Defaults to that one key. */
   group?: (key: string) => string[]
   /** The grid a dropped position lands on, and how far Alt with an arrow nudges. Defaults to 1. */
@@ -66,7 +69,9 @@ type MoveOptions<State extends object> = {
    */
   scale?: () => number
   /** Keeps positions inside a box, like the board's size minus a card's. */
-  bounds?: (key: string) => { minX: number; minY: number; maxX: number; maxY: number } | undefined
+  bounds?: (
+    key: string
+  ) => { minX: number; minY: number; maxX: number; maxY: number } | undefined
   /** Whether an item can't be moved. */
   disabled?: (key: string) => boolean
   /** The name screen readers hear for an item. */
@@ -113,22 +118,29 @@ const arrows: Record<string, readonly [number, number]> = {
  */
 function createMove<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: MoveOptions<State>,
+  options: MoveOptions<State>
 ) {
   const { store } = context
-  const positions = () => (store.get()[options.key] ?? {}) as Record<string, MovePoint>
-  const setDraft = (draft: MoveDraft | null) => store.set({ [options.draft]: draft } as Partial<State>)
+  const positions = () =>
+    (store.get()[options.key] ?? {}) as Record<string, MovePoint>
+  const setDraft = (draft: MoveDraft | null) =>
+    store.set({ [options.draft]: draft } as Partial<State>)
   const drags = createDragSession(context.onDestroy)
 
-  const group = (key: string) => (options.group?.(key) ?? [key]).filter((k) => !options.disabled?.(k))
+  const group = (key: string) =>
+    (options.group?.(key) ?? [key]).filter((k) => !options.disabled?.(k))
   const place = (key: string, x: number, y: number, round: number) => {
-    let point = { x: Math.round(x / round) * round, y: Math.round(y / round) * round }
+    let point = {
+      x: Math.round(x / round) * round,
+      y: Math.round(y / round) * round,
+    }
     const box = options.bounds?.(key)
-    if (box)
+    if (box) {
       point = {
         x: Math.min(box.maxX, Math.max(box.minX, point.x)),
         y: Math.min(box.maxY, Math.max(box.minY, point.y)),
       }
+    }
     return point
   }
 
@@ -138,7 +150,7 @@ function createMove<State extends object>(
       keys: string[],
       dx: number,
       dy: number,
-      details: { reason: MoveReason; event?: Event } = { reason: "imperative" },
+      details: { reason: MoveReason; event?: Event } = { reason: "imperative" }
     ) {
       const current = positions()
       const next = { ...current }
@@ -147,14 +159,23 @@ function createMove<State extends object>(
         const at = current[key] ?? { x: 0, y: 0 }
         next[key] = place(key, at.x + dx, at.y + dy, round)
       }
-      if (keys.every((key) => next[key].x === current[key]?.x && next[key].y === current[key]?.y))
+      if (
+        keys.every(
+          (key) =>
+            next[key].x === current[key]?.x && next[key].y === current[key]?.y
+        )
+      ) {
         return false
+      }
       const done = options.set(next, details)
       if (done && keys.length) {
         const label = options.label?.(keys[0]) ?? keys[0]
-        announce((options.message ?? moveMessage)({ keys, label, at: next[keys[0]] }), {
-          priority: "assertive",
-        })
+        announce(
+          (options.message ?? moveMessage)({ keys, label, at: next[keys[0]] }),
+          {
+            priority: "assertive",
+          }
+        )
       }
       return done
     },
@@ -162,7 +183,7 @@ function createMove<State extends object>(
     moveTo(
       key: string,
       point: MovePoint,
-      details: { reason: MoveReason; event?: Event } = { reason: "imperative" },
+      details: { reason: MoveReason; event?: Event } = { reason: "imperative" }
     ) {
       const at = positions()[key] ?? { x: 0, y: 0 }
       return api.moveBy([key], point.x - at.x, point.y - at.y, details)
@@ -170,16 +191,23 @@ function createMove<State extends object>(
     /** Alt with an arrow nudges the item's group. Returns whether it handled the key. */
     keydown(event: KeyboardEvent, key: string) {
       const direction = arrows[event.key]
-      if (!direction || !event.altKey || options.disabled?.(key)) return false
+      if (!direction || !event.altKey || options.disabled?.(key)) {
+        return false
+      }
       event.preventDefault()
       const step = options.step?.() ?? 1
       const by = event.shiftKey ? (options.largeStep?.() ?? step * 10) : step
-      api.moveBy(group(key), direction[0] * by, direction[1] * by, { reason: "move-key", event })
+      api.moveBy(group(key), direction[0] * by, direction[1] * by, {
+        reason: "move-key",
+        event,
+      })
       return true
     },
     /** Starts a drag once the pointer moves past `dragThreshold`, so a click stays a click. Escape puts the items back. */
     pointerdown(event: PointerEvent, key: string, el: HTMLElement) {
-      if (!drags.accepts(event) || options.disabled?.(key)) return
+      if (!drags.accepts(event) || options.disabled?.(key)) {
+        return
+      }
       // Offsets count from the press, so the item keeps up with the pointer past the threshold.
       const startX = event.clientX
       const startY = event.clientY
@@ -190,13 +218,23 @@ function createMove<State extends object>(
         onMove: ({ x, y }) => {
           const draft = store.get()[options.draft] as MoveDraft | null
           const scale = options.scale?.() ?? 1
-          if (draft) setDraft({ ...draft, dx: (x - startX) / scale, dy: (y - startY) / scale })
+          if (draft) {
+            setDraft({
+              ...draft,
+              dx: (x - startX) / scale,
+              dy: (y - startY) / scale,
+            })
+          }
         },
         onEnd: (end, canceled) => {
           const draft = store.get()[options.draft] as MoveDraft | null
           setDraft(null)
-          if (draft && !canceled && (draft.dx || draft.dy))
-            api.moveBy(draft.keys, draft.dx, draft.dy, { reason: "drag", event: end })
+          if (draft && !canceled && (draft.dx || draft.dy)) {
+            api.moveBy(draft.keys, draft.dx, draft.dy, {
+              reason: "drag",
+              event: end,
+            })
+          }
         },
       })
     },
@@ -207,7 +245,9 @@ function createMove<State extends object>(
     /** The dragged item's offset, as a `style` attribute for a slot's `live`, or `undefined`. */
     style(state: State, key: string) {
       const draft = state[options.draft] as MoveDraft | null
-      if (!draft?.keys.includes(key)) return undefined
+      if (!draft?.keys.includes(key)) {
+        return undefined
+      }
       return `translate:${draft.dx}px ${draft.dy}px;--move-x:${draft.dx}px;--move-y:${draft.dy}px`
     },
   }

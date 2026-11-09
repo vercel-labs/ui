@@ -35,7 +35,9 @@ async function errorsOn(page: Page) {
   const errors: string[] = []
   page.on("pageerror", (error) => errors.push(error.message))
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text())
+    if (message.type() === "error") {
+      errors.push(message.text())
+    }
   })
   return errors
 }
@@ -47,7 +49,9 @@ for (const framework of frameworks) {
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
     expect(examples.sort()).toEqual([...fixtures].sort())
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+    }
 
     for (const [index, name] of order.entries()) {
       const preview = previews.nth(index)
@@ -57,7 +61,10 @@ for (const framework of frameworks) {
         await area.scrollIntoViewIfNeeded()
         await area.click({ button: "right" })
       } else {
-        const trigger = preview.getByRole("button", { name: triggers[name], exact: true })
+        const trigger = preview.getByRole("button", {
+          name: triggers[name],
+          exact: true,
+        })
         await expect(trigger, `${name} trigger`).toBeVisible()
         await trigger.click()
       }

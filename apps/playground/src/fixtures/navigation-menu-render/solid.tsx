@@ -13,7 +13,9 @@ import { createSignal, merge, omit } from "solid-js"
 // A client-side router's link: it navigates without a page load.
 function RouterLink(props: JSX.IntrinsicElements["a"] & { to: string }) {
   const onClick: JSX.EventHandler<HTMLAnchorElement, MouseEvent> = (event) => {
-    if (typeof props.onClick === "function") props.onClick(event)
+    if (typeof props.onClick === "function") {
+      props.onClick(event)
+    }
     event.preventDefault()
     history.pushState(null, "", props.to)
   }
@@ -34,26 +36,38 @@ function Fixture() {
       <NavigationMenu
         aria-label="Docs"
         class="nav-menu"
-        onValueChange={(value, { reason }) => setAction(`${value ?? "close"}: ${reason}`)}
+        onValueChange={(value, { reason }) =>
+          setAction(`${value ?? "close"}: ${reason}`)
+        }
       >
         <NavigationMenuList class="nav-list">
           <NavigationMenuItem value="guides">
             <NavigationMenuTrigger
-              class={(state) => (state.open ? "nav-trigger is-open" : "nav-trigger is-closed")}
+              class={(state) =>
+                state.open ? "nav-trigger is-open" : "nav-trigger is-closed"
+              }
               render={(props, state) => (
                 <button {...props}>
-                  Guides <span aria-hidden="true">{state.open ? "▲" : "▼"}</span>
+                  Guides{" "}
+                  <span aria-hidden="true">{state.open ? "▲" : "▼"}</span>
                 </button>
               )}
             />
             <NavigationMenuContent
               class="nav-content"
-              render={(props) => <section {...props} aria-label="Guides panel" />}
+              render={(props) => (
+                <section {...props} aria-label="Guides panel" />
+              )}
             >
-              <NavigationMenuLink render={(props) => <RouterLink {...props} to="#intro" />} current>
+              <NavigationMenuLink
+                render={(props) => <RouterLink {...props} to="#intro" />}
+                current
+              >
                 Introduction
               </NavigationMenuLink>
-              <NavigationMenuLink render={(props) => <RouterLink {...props} to="#install" />}>
+              <NavigationMenuLink
+                render={(props) => <RouterLink {...props} to="#install" />}
+              >
                 Install
               </NavigationMenuLink>
             </NavigationMenuContent>

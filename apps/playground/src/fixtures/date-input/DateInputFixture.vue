@@ -1,7 +1,18 @@
 <script setup lang="ts">
 import type { ChangeDetails } from "@ui-sdk/core"
-import { createDateInputController, DateInput, Field, FieldError, FieldLabel, TimeInput } from "@ui-sdk/vue"
-import { dateInputAction, dateInputFixture as f, dateInputOptions } from "tests/fixtures/date-input.ts"
+import {
+  createDateInputController,
+  DateInput,
+  Field,
+  FieldError,
+  FieldLabel,
+  TimeInput,
+} from "@ui-sdk/vue"
+import {
+  dateInputAction,
+  dateInputFixture as f,
+  dateInputOptions,
+} from "tests/fixtures/date-input.ts"
 import { ref } from "vue"
 
 const controller = createDateInputController()
@@ -10,7 +21,9 @@ const action = ref("")
 const submitted = ref("")
 
 function onDateChange(value: string | null, details: ChangeDetails) {
-  if (cancel && value === cancel) return details.cancel()
+  if (cancel && value === cancel) {
+    return details.cancel()
+  }
   action.value = dateInputAction.change("date", value, details.reason)
 }
 
@@ -19,7 +32,9 @@ function onTimeChange(value: string | null, details: ChangeDetails) {
 }
 
 function onSubmit(event: SubmitEvent) {
-  submitted.value = JSON.stringify([...new FormData(event.currentTarget as HTMLFormElement)])
+  submitted.value = JSON.stringify([
+    ...new FormData(event.currentTarget as HTMLFormElement),
+  ])
 }
 </script>
 
@@ -39,7 +54,11 @@ function onSubmit(event: SubmitEvent) {
       </Field>
       <Field class="field" :name="f.time.name">
         <FieldLabel>{{ f.time.label }}</FieldLabel>
-        <TimeInput class="date-input" v-bind="{ ...time, ...shared }" @value-change="onTimeChange" />
+        <TimeInput
+          class="date-input"
+          v-bind="{ ...time, ...shared }"
+          @value-change="onTimeChange"
+        />
       </Field>
       <button type="submit">{{ f.form.submit }}</button>
       <button type="reset">{{ f.form.reset }}</button>

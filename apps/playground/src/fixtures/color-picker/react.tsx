@@ -43,10 +43,14 @@ function Fixture() {
         controller={controller}
         {...options}
         onValueChange={(value, details) => {
-          if (cancel) return details.cancel()
+          if (cancel) {
+            return details.cancel()
+          }
           setAction(`${value}:${details.reason}`)
         }}
-        onValueCommit={(value, details) => setCommitted(`${value}:${details.reason}`)}
+        onValueCommit={(value, details) =>
+          setCommitted(`${value}:${details.reason}`)
+        }
       >
         <ColorPickerArea>
           {options.space === "oklch" && <ColorPickerAreaCanvas />}
@@ -71,7 +75,10 @@ function Fixture() {
       <button type="button">After</button>
       <button type="submit">Save</button>
       <button type="reset">Reset</button>
-      <button type="button" onClick={() => controller.setValue("rebeccapurple")}>
+      <button
+        type="button"
+        onClick={() => controller.setValue("rebeccapurple")}
+      >
         Use purple
       </button>
       <output role="status" aria-label="Last action">
@@ -87,7 +94,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

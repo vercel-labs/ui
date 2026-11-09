@@ -28,7 +28,10 @@ const formats = {
   percent: { style: "percent" },
   unit: { style: "unit", unit: "celsius" },
   stars: (value: number) => `${value} of 5 stars`,
-} satisfies Record<string, Intl.NumberFormatOptions | ((value: number) => string)>
+} satisfies Record<
+  string,
+  Intl.NumberFormatOptions | ((value: number) => string)
+>
 
 // The thumbs a variant renders, one per value.
 function thumbsOf(variant: Variant) {
@@ -39,18 +42,38 @@ function thumbsOf(variant: Variant) {
 // Accessible names for the thumbs. A field names a single thumb itself.
 function thumbLabel(variant: Variant, index: number) {
   const count = thumbsOf(variant)
-  if (count === 1) return variant.place === "field" ? undefined : "Volume"
-  if (count === 2) return ["Minimum", "Maximum"][index]
+  if (count === 1) {
+    return variant.place === "field" ? undefined : "Volume"
+  }
+  if (count === 2) {
+    return ["Minimum", "Maximum"][index]
+  }
   return `Stop ${index + 1}`
 }
 
 // What a value reads as on a button.
-const describe = (value: number | number[]) => (Array.isArray(value) ? value.join("–") : String(value))
+const describe = (value: number | number[]) =>
+  Array.isArray(value) ? value.join("–") : String(value)
 
 const variants: Variant[] = [
-  { id: "single", section: "Values", title: "Single thumb", options: { name: "v", defaultValue: 50 } },
-  { id: "single-empty", section: "Values", title: "No default, starts at min", options: { name: "v" } },
-  { id: "range", section: "Values", title: "Range", options: { name: "r", defaultValue: [20, 80] } },
+  {
+    id: "single",
+    section: "Values",
+    title: "Single thumb",
+    options: { name: "v", defaultValue: 50 },
+  },
+  {
+    id: "single-empty",
+    section: "Values",
+    title: "No default, starts at min",
+    options: { name: "v" },
+  },
+  {
+    id: "range",
+    section: "Values",
+    title: "Range",
+    options: { name: "r", defaultValue: [20, 80] },
+  },
   {
     id: "three",
     section: "Values",
@@ -111,7 +134,12 @@ const variants: Variant[] = [
     id: "min-steps-three",
     section: "Range and step",
     title: "Three thumbs, step 5, 2 steps apart",
-    options: { name: "t", step: 5, minStepsBetweenThumbs: 2, defaultValue: [20, 50, 80] },
+    options: {
+      name: "t",
+      step: 5,
+      minStepsBetweenThumbs: 2,
+      defaultValue: [20, 50, 80],
+    },
   },
   {
     id: "touching",
@@ -193,14 +221,27 @@ const variants: Variant[] = [
     id: "locale-de",
     section: "Format and locale",
     title: "German locale",
-    options: { name: "v", locale: "de-DE", max: 5000, step: 0.5, defaultValue: 1234.5 },
+    options: {
+      name: "v",
+      locale: "de-DE",
+      max: 5000,
+      step: 0.5,
+      defaultValue: 1234.5,
+    },
     format: "euro",
   },
   {
     id: "locale-de-plain",
     section: "Format and locale",
     title: "German decimals, no format",
-    options: { name: "v", locale: "de-DE", min: 0, max: 1, step: 0.01, defaultValue: 0.25 },
+    options: {
+      name: "v",
+      locale: "de-DE",
+      min: 0,
+      max: 1,
+      step: 0.01,
+      defaultValue: 0.25,
+    },
   },
   {
     id: "locale-ar",

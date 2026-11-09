@@ -7,18 +7,21 @@ test("slides grouped into pages snap one by one again once a page holds one slid
   const mounted = mount(
     carousel,
     { slidesPerPage: 2 },
-    `<root aria-label="Photos"><viewport><content><item>One</item><item>Two</item><item>Three</item><item>Four</item></content></viewport></root>`,
+    `<root aria-label="Photos"><viewport><content><item>One</item><item>Two</item><item>Three</item><item>Four</item></content></viewport></root>`
   )
   await mounted.settle()
-  const slides = [...mounted.root.querySelectorAll<HTMLElement>('[data-slot="carousel-item"]')]
-  expect(slides.map((slide) => slide.style.getPropertyValue("scroll-snap-align"))).toContain("none")
+  const slides = [
+    ...mounted.root.querySelectorAll<HTMLElement>(
+      '[data-slot="carousel-item"]'
+    ),
+  ]
+  expect(
+    slides.map((slide) => slide.style.getPropertyValue("scroll-snap-align"))
+  ).toContain("none")
   rerenderOf(mounted).setOptions({ slidesPerPage: 1 })
   await mounted.settle()
-  expect(slides.map((slide) => slide.style.getPropertyValue("scroll-snap-align"))).toEqual([
-    "start",
-    "start",
-    "start",
-    "start",
-  ])
+  expect(
+    slides.map((slide) => slide.style.getPropertyValue("scroll-snap-align"))
+  ).toEqual(["start", "start", "start", "start"])
   mounted.unmount()
 })

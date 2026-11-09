@@ -21,7 +21,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -48,7 +49,7 @@ function mount(root: HTMLElement) {
                   ${country.label}
                   <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                 </ui-combobox-item>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>
@@ -59,17 +60,25 @@ function mount(root: HTMLElement) {
     query: string
     itemToLabel: (value: string) => string
   }
-  const button = root.querySelector<HTMLButtonElement>("#combobox-popup-button")!
+  const button = root.querySelector<HTMLButtonElement>(
+    "#combobox-popup-button"
+  )!
   combobox.itemToLabel = countryLabel
   combobox.addEventListener("valuechange", (event) => {
     const { value } = (event as CustomEvent<{ value: string | null }>).detail
-    button.querySelector("span")!.textContent = value ? countryLabel(value) : "Select a country"
+    button.querySelector("span")!.textContent = value
+      ? countryLabel(value)
+      : "Select a country"
   })
   combobox.addEventListener("openchange", (event) => {
-    if ((event as CustomEvent<{ value: boolean }>).detail.value) combobox.query = ""
+    if ((event as CustomEvent<{ value: boolean }>).detail.value) {
+      combobox.query = ""
+    }
   })
   combobox.addEventListener("openchangecomplete", (event) => {
-    if (!(event as CustomEvent<{ value: boolean }>).detail.value) button.focus()
+    if (!(event as CustomEvent<{ value: boolean }>).detail.value) {
+      button.focus()
+    }
   })
 }
 

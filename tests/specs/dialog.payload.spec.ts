@@ -7,15 +7,20 @@ import { expect, test } from "../fixtures"
 // a framework hears it.
 
 const lastOpen = (page: Page) => page.getByRole("status", { name: "Last open" })
-const lastPayload = (page: Page) => page.getByRole("status", { name: "Last payload" })
+const lastPayload = (page: Page) =>
+  page.getByRole("status", { name: "Last payload" })
 
 test.beforeEach(async ({ open }) => {
   await open("popup-payloads")
 })
 
-test("opening reports the trigger's payload, and the content shows it", async ({ page }) => {
+test("opening reports the trigger's payload, and the content shows it", async ({
+  page,
+}) => {
   await page.getByRole("button", { name: "Invoice 1" }).click()
-  await expect(lastPayload(page)).toHaveText("dialog payload invoice 1: Invoice 1")
+  await expect(lastPayload(page)).toHaveText(
+    "dialog payload invoice 1: Invoice 1"
+  )
   await expect(lastOpen(page)).toHaveText("dialog open: Invoice 1")
   await expect(page.getByRole("dialog")).toHaveText("Actions for invoice 1")
 })
@@ -25,8 +30,13 @@ test("pressing another trigger hands the open dialog over with its payload, with
 }) => {
   await page.getByRole("button", { name: "Invoice 1" }).click()
   await page.getByRole("button", { name: "Invoice 2" }).click()
-  await expect(lastPayload(page)).toHaveText("dialog payload invoice 2: Invoice 2")
+  await expect(lastPayload(page)).toHaveText(
+    "dialog payload invoice 2: Invoice 2"
+  )
   await expect(lastOpen(page)).toHaveText("dialog open: Invoice 1")
   await expect(page.getByRole("dialog")).toHaveText("Actions for invoice 2")
-  await expect(page.getByRole("button", { name: "Invoice 2" })).toHaveAttribute("aria-expanded", "true")
+  await expect(page.getByRole("button", { name: "Invoice 2" })).toHaveAttribute(
+    "aria-expanded",
+    "true"
+  )
 })

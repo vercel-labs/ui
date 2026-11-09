@@ -31,4 +31,17 @@ const tooltip =
 const anchor =
   "flex h-10 w-40 items-center justify-center rounded-md border border-dashed border-neutral-300 text-xs text-neutral-400"
 
-export { anchor, type Animation, arrow, avatar, bio, button, content, handle, link, name, tooltip, trigger }
+export {
+  anchor,
+  type Animation,
+  arrow,
+  avatar,
+  bio,
+  button,
+  content,
+  handle,
+  link,
+  name,
+  tooltip,
+  trigger,
+}

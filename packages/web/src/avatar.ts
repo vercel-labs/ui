@@ -18,7 +18,12 @@ function defineAvatarElements() {
       children: { image: (el) => el.querySelector(":scope > img") },
       // The fallback may upgrade after the avatar binds, so its delay comes from markup.
       options: (el) => ({
-        fallbackDelay: Number(el.querySelector(":scope > ui-avatar-fallback")?.getAttribute("delay")) || 0,
+        fallbackDelay:
+          Number(
+            el
+              .querySelector(":scope > ui-avatar-fallback")
+              ?.getAttribute("delay")
+          ) || 0,
       }),
       optionalChildren: ["image"],
       kinds: { fallbackDelay: null },

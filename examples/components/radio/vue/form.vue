@@ -14,7 +14,9 @@ const log = useLog()
 const id = useId()
 
 function submit(event: Event) {
-  log(`Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`)
+  log(
+    `Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`
+  )
 }
 </script>
 
@@ -22,7 +24,12 @@ function submit(event: Event) {
   <div data-slot="stack">
     <Field>
       <FieldLabel>Shipping speed</FieldLabel>
-      <RadioGroup name="shipping" :form="`${id}-checkout`" required default-value="standard">
+      <RadioGroup
+        name="shipping"
+        :form="`${id}-checkout`"
+        required
+        default-value="standard"
+      >
         <label v-for="speed in speeds" :key="speed.value" data-slot="label">
           <Radio :value="speed.value">
             <RadioIndicator />

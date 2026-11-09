@@ -1,4 +1,10 @@
-import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@ui-sdk/react/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@ui-sdk/react/dialog"
 import { Menu, MenuTrigger } from "@ui-sdk/react/menu"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
@@ -12,7 +18,11 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Menu items={casesData({ align, journal })} itemShortcuts={shortcuts} onAction={setAction}>
+      <Menu
+        items={casesData({ align, journal })}
+        itemShortcuts={shortcuts}
+        onAction={setAction}
+      >
         <MenuTrigger>Edit</MenuTrigger>
       </Menu>
       <button onClick={() => setAlign("right")}>Align right</button>

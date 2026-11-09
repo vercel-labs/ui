@@ -6,7 +6,11 @@
  *
  * @module
  */
-export { attrs as partAttrs, partState, present as partPresent } from "./foundation/kernel/part"
+export {
+  attrs as partAttrs,
+  partState,
+  present as partPresent,
+} from "./foundation/kernel/part"
 export { setPlatform } from "./foundation/platform/platform"
 export { checkDirection } from "./testing/check-direction"
 export { checkPattern, type Pattern } from "./testing/check-pattern"

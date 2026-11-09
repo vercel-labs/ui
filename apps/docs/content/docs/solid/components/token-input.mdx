@@ -40,9 +40,16 @@ TokenInputToken
 Import the parts and put them together:
 
 ```tsx
-import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/solid/token-input"
+import {
+  TokenInput,
+  TokenInputEditor,
+  type TokenInputValue,
+} from "@ui-sdk/solid/token-input"
 
-const draft: TokenInputValue = ["Explain ", { type: "file", value: "src/routes.ts", label: "routes.ts" }]
+const draft: TokenInputValue = [
+  "Explain ",
+  { type: "file", value: "src/routes.ts", label: "routes.ts" },
+]
 
 function Example() {
   return (
@@ -164,7 +171,10 @@ Props and callbacks are the same as below, as Solid props.
 
 ### TokenInput
 
-<TypeTable path="../../packages/core/src/components/token-input/token-input.ts" name="TokenInputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/token-input/token-input.ts"
+  name="TokenInputOptions"
+/>
 
 `renderToken` receives each token and returns its content, usually a `TokenInputToken`.
 
@@ -185,11 +195,17 @@ Removes its token when pressed and keeps focus in the editor. Renders a `span`, 
 
 ### Token
 
-<TypeTable path="../../packages/core/src/foundation/text/text-editor.ts" name="Token" />
+<TypeTable
+  path="../../packages/core/src/foundation/text/text-editor.ts"
+  name="Token"
+/>
 
 ### Codec
 
-<TypeTable path="../../packages/core/src/components/token-input/token-input-model.ts" name="TokenCodec" />
+<TypeTable
+  path="../../packages/core/src/components/token-input/token-input-model.ts"
+  name="TokenCodec"
+/>
 
 ### State
 

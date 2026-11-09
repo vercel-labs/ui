@@ -1,14 +1,20 @@
 import { createCalendarController } from "@ui-sdk/core/calendar"
 import type { UiCalendarElement } from "@ui-sdk/web"
-import { calendarAction, calendarFixture as f, calendarOptions } from "tests/fixtures/calendar.ts"
+import {
+  calendarAction,
+  calendarFixture as f,
+  calendarOptions,
+} from "tests/fixtures/calendar.ts"
 
 // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
 function setAttributes(
   el: Element,
-  attributes: Record<string, string | number | boolean | null | undefined>,
+  attributes: Record<string, string | number | boolean | null | undefined>
 ) {
   for (const [name, value] of Object.entries(attributes)) {
-    if (value === undefined || value === null || value === false) continue
+    if (value === undefined || value === null || value === false) {
+      continue
+    }
     el.setAttribute(name, value === true ? "" : String(value))
   }
 }
@@ -17,11 +23,22 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/calendar")
   // Web components have no controlled mode: the element owns its state, and
   // `value` and `month` set where it starts.
-  const { controlled, selects, lang, defaultValue, defaultMonth, unavailable, ...options } = calendarOptions()
-  const value = Array.isArray(defaultValue) ? defaultValue.join(",") : defaultValue
+  const {
+    controlled,
+    selects,
+    lang,
+    defaultValue,
+    defaultMonth,
+    unavailable,
+    ...options
+  } = calendarOptions()
+  const value = Array.isArray(defaultValue)
+    ? defaultValue.join(",")
+    : defaultValue
   const grids = Array.from(
     { length: options.months ?? 1 },
-    (_, offset) => `<ui-calendar-grid class="calendar-grid" offset="${offset}"></ui-calendar-grid>`,
+    (_, offset) =>
+      `<ui-calendar-grid class="calendar-grid" offset="${offset}"></ui-calendar-grid>`
   ).join("")
   const selectParts = selects
     ? "<ui-calendar-month-select></ui-calendar-month-select><ui-calendar-year-select></ui-calendar-year-select>"
@@ -55,7 +72,8 @@ async function mount(root: HTMLElement) {
     "page-by": options.pageBy,
     "week-starts-on": options.weekStartsOn,
     "fixed-weeks": options.fixedWeeks,
-    "show-outside-days": options.showOutsideDays === false ? "false" : undefined,
+    "show-outside-days":
+      options.showOutsideDays === false ? "false" : undefined,
     "min-days": options.minDays,
     "max-days": options.maxDays,
     "allow-unavailable": options.allowUnavailable,
@@ -67,14 +85,26 @@ async function mount(root: HTMLElement) {
   const status = root.querySelector("output")!
   const controller = createCalendarController()
   calendar.controller = controller
-  if (unavailable) calendar.unavailable = unavailable
+  if (unavailable) {
+    calendar.unavailable = unavailable
+  }
   calendar.addEventListener("valuechange", (event) => {
-    status.textContent = calendarAction("value", event.detail.value, event.detail.reason)
+    status.textContent = calendarAction(
+      "value",
+      event.detail.value,
+      event.detail.reason
+    )
   })
   calendar.addEventListener("monthchange", (event) => {
-    status.textContent = calendarAction("month", event.detail.value, event.detail.reason)
+    status.textContent = calendarAction(
+      "month",
+      event.detail.value,
+      event.detail.reason
+    )
   })
-  root.querySelector("#go")!.addEventListener("click", () => controller.focus(f.controller.date))
+  root
+    .querySelector("#go")!
+    .addEventListener("click", () => controller.focus(f.controller.date))
 }
 
 export { mount }

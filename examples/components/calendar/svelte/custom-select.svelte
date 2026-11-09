@@ -31,14 +31,25 @@
     "October",
     "November",
     "December",
-  ].map((label, index) => ({ value: String(index + 1).padStart(2, "0"), label }))
-  const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({ value: year, label: year }))
+  ].map((label, index) => ({
+    value: String(index + 1).padStart(2, "0"),
+    label,
+  }))
+  const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({
+    value: year,
+    label: year,
+  }))
 
   let month = $state("2026-10")
   const [year, monthOfYear] = $derived(month.split("-"))
 </script>
 
-<Calendar bind:month defaultValue="2026-10-16" min="2024-01-01" max="2028-12-31">
+<Calendar
+  bind:month
+  defaultValue="2026-10-16"
+  min="2024-01-01"
+  max="2028-12-31"
+>
   <div data-slot="row">
     <CalendarHeading />
     <Select
@@ -61,7 +72,11 @@
         {/each}
       </SelectContent>
     </Select>
-    <Select items={years} value={year} onValueChange={(next) => next && (month = `${next}-${monthOfYear}`)}>
+    <Select
+      items={years}
+      value={year}
+      onValueChange={(next) => next && (month = `${next}-${monthOfYear}`)}
+    >
       <SelectTrigger aria-label="Year">
         <SelectValue />
         <ChevronDownIcon />

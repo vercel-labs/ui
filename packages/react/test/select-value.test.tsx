@@ -27,15 +27,24 @@ for (const hydrate of [false, true]) {
         <React.StrictMode>
           <SelectTrigger controller={controller} aria-label="Plan">
             {callback === "className" ? (
-              <SelectValue placeholder="Choose" className={(state) => `selected-${count(state)}`} />
+              <SelectValue
+                placeholder="Choose"
+                className={(state) => `selected-${count(state)}`}
+              />
             ) : (
               <SelectValue
                 placeholder="Choose"
-                render={(props, state) => <span {...props} data-count={count(state)} />}
+                render={(props, state) => (
+                  <span {...props} data-count={count(state)} />
+                )}
               />
             )}
           </SelectTrigger>
-          <Select controller={controller} items={[{ value: "pro", label: "Pro" }]} defaultValue="pro" />
+          <Select
+            controller={controller}
+            items={[{ value: "pro", label: "Pro" }]}
+            defaultValue="pro"
+          />
         </React.StrictMode>
       )
       const container = document.body.appendChild(document.createElement("div"))
@@ -46,18 +55,36 @@ for (const hydrate of [false, true]) {
       }
       let root: Root | undefined
       try {
-        if (hydrate) container.innerHTML = renderToString(element)
+        if (hydrate) {
+          container.innerHTML = renderToString(element)
+        }
         await React.act(async () => {
-          root = hydrate ? hydrateRoot(container, element, options) : createRoot(container, options)
-          if (!hydrate) root.render(element)
+          root = hydrate
+            ? hydrateRoot(container, element, options)
+            : createRoot(container, options)
+          if (!hydrate) {
+            root.render(element)
+          }
         })
         expect(errors).toEqual([])
-        expect(states[0]).toEqual({ value: null, label: "", labels: [], placeholder: true })
-        expect(states.at(-1)).toEqual({ value: "pro", label: "Pro", labels: ["Pro"], placeholder: false })
+        expect(states[0]).toEqual({
+          value: null,
+          label: "",
+          labels: [],
+          placeholder: true,
+        })
+        expect(states.at(-1)).toEqual({
+          value: "pro",
+          label: "Pro",
+          labels: ["Pro"],
+          placeholder: false,
+        })
         const trigger = container.querySelector("button")!
         expect(trigger.textContent).toBe("Pro")
         expect(
-          trigger.querySelector("span")!.getAttribute(callback === "className" ? "class" : "data-count"),
+          trigger
+            .querySelector("span")!
+            .getAttribute(callback === "className" ? "class" : "data-count")
         ).toBe(callback === "className" ? "selected-1" : "1")
       } finally {
         await React.act(async () => root?.unmount())

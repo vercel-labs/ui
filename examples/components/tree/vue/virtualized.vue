@@ -29,16 +29,24 @@ const expanded = ref(["folder-1"])
 const rows = computed(() => visibleTreeRows(items, expanded.value))
 const visible = computed(() => {
   const start = Math.max(0, Math.floor(scrollTop.value / row) - 4)
-  const end = Math.min(rows.value.length, Math.ceil((scrollTop.value + height) / row) + 4)
+  const end = Math.min(
+    rows.value.length,
+    Math.ceil((scrollTop.value + height) / row) + 4
+  )
   return rows.value.slice(start, end)
 })
 
 function onHighlight(_value: string, { index }: ListHighlightDetails) {
   const el = scroller.value
-  if (!el) return
+  if (!el) {
+    return
+  }
   const top = index * row
-  if (top < el.scrollTop) el.scrollTop = top
-  else if (top + row > el.scrollTop + el.clientHeight - 10) el.scrollTop = top + row - el.clientHeight + 10
+  if (top < el.scrollTop) {
+    el.scrollTop = top
+  } else if (top + row > el.scrollTop + el.clientHeight - 10) {
+    el.scrollTop = top + row - el.clientHeight + 10
+  }
   scrollTop.value = el.scrollTop
 }
 </script>

@@ -13,12 +13,19 @@ type LevelOptions = {
 }
 const level = definePrimitive({
   name: "level",
-  options: { value: "string", defaultValue: "string", onValueChange: "callback" },
+  options: {
+    value: "string",
+    defaultValue: "string",
+    onValueChange: "callback",
+  },
   state: (options: LevelOptions) => ({ value: options.defaultValue ?? "low" }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   api: (context) => {
     const change = createChange(context)
-    return { set: (value: Level) => change("value", value, { reason: "press" }) }
+    return {
+      set: (value: Level) => change("value", value, { reason: "press" }),
+    }
   },
   slots: (slot) => ({
     root: slot<{ onCommit?: (value: Level) => void }>({
@@ -30,7 +37,10 @@ const level = definePrimitive({
 const { Root: LevelRoot } = createParts(level, { root: "div" })
 
 const current = ref<Level>("low")
-const changed = (value: Level, details: ChangeDetails<"press">) => [value, details.reason]
+const changed = (value: Level, details: ChangeDetails<"press">) => [
+  value,
+  details.reason,
+]
 h(LevelRoot, { value: "low", onValueChange: changed })
 </script>
 

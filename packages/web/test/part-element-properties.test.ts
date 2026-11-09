@@ -23,15 +23,23 @@ function typedParts() {
 
 // Every entry, so loading them takes longer than a hook's default timeout on a busy machine.
 beforeAll(async () => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   const entries = readdirSync(path.join(source, "entries"))
-  await Promise.all(entries.map((file) => import(/* @vite-ignore */ path.join(source, "entries", file))))
+  await Promise.all(
+    entries.map(
+      (file) => import(/* @vite-ignore */ path.join(source, "entries", file))
+    )
+  )
 }, 120_000)
 
 test("every part element in HTMLElementTagNameMap is defined", () => {
   const parts = typedParts()
   expect(parts.length).toBeGreaterThan(100)
-  expect(parts.map(({ tag }) => tag).filter((tag) => !customElements.get(tag))).toEqual([])
+  expect(
+    parts.map(({ tag }) => tag).filter((tag) => !customElements.get(tag))
+  ).toEqual([])
 })
 
 test("every typed part property exists at runtime, and every runtime one is typed", () => {
@@ -39,10 +47,19 @@ test("every typed part property exists at runtime, and every runtime one is type
   const untyped: string[] = []
   for (const { tag, names } of typedParts()) {
     const proto = Object.getPrototypeOf(document.createElement(tag))
-    for (const name of names) if (!(name in proto)) missing.push(`${tag}.${name}`)
-    for (const name of Object.getOwnPropertyNames(proto))
-      if (Object.getOwnPropertyDescriptor(proto, name)?.get && !names.includes(name))
+    for (const name of names) {
+      if (!(name in proto)) {
+        missing.push(`${tag}.${name}`)
+      }
+    }
+    for (const name of Object.getOwnPropertyNames(proto)) {
+      if (
+        Object.getOwnPropertyDescriptor(proto, name)?.get &&
+        !names.includes(name)
+      ) {
         untyped.push(`${tag}.${name}`)
+      }
+    }
   }
   expect({ missing, untyped }).toEqual({ missing: [], untyped: [] })
 })

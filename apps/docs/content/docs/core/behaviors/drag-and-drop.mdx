@@ -80,7 +80,10 @@ bindDrag(el, event, {
   lock: true,
   onStart: () => !context.options().locked,
   onMove: ({ movementX, event }) => {
-    change("value", context.store.get().value + movementX / 2, { reason: "drag", event })
+    change("value", context.store.get().value + movementX / 2, {
+      reason: "drag",
+      event,
+    })
   },
   onEnd: () => {},
 })

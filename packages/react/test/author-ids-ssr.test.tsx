@@ -2,7 +2,12 @@
 // In server HTML, the parts rendered after a part given an id point at that id.
 import { renderToString } from "react-dom/server"
 import { expect, test } from "vitest"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../src/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
 import { Field, FieldControl, FieldDescription, FieldLabel } from "../src/field"
 import { Popover, PopoverContent, PopoverTrigger } from "../src/popover"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
@@ -22,10 +27,12 @@ test("a panel is labelled by the id passed to its tab", () => {
         </TabsTab>
       </TabsList>
       <TabsPanel value="a">A</TabsPanel>
-    </Tabs>,
+    </Tabs>
   )
   expect(attribute(html, '<[^>]*role="tab"', "id")).toBe("account")
-  expect(attribute(html, '<[^>]*role="tabpanel"', "aria-labelledby")).toBe("account")
+  expect(attribute(html, '<[^>]*role="tabpanel"', "aria-labelledby")).toBe(
+    "account"
+  )
 })
 
 test("a panel is labelled by the id on the element its tab renders", () => {
@@ -37,10 +44,12 @@ test("a panel is labelled by the id on the element its tab renders", () => {
         </TabsTab>
       </TabsList>
       <TabsPanel value="a">A</TabsPanel>
-    </Tabs>,
+    </Tabs>
   )
   expect(attribute(html, '<[^>]*role="tab"', "id")).toBe("account")
-  expect(attribute(html, '<[^>]*role="tabpanel"', "aria-labelledby")).toBe("account")
+  expect(attribute(html, '<[^>]*role="tabpanel"', "aria-labelledby")).toBe(
+    "account"
+  )
 })
 
 test("an id on the element a tab renders wins over the one passed to the tab, as on the page", () => {
@@ -52,10 +61,12 @@ test("an id on the element a tab renders wins over the one passed to the tab, as
         </TabsTab>
       </TabsList>
       <TabsPanel value="a">A</TabsPanel>
-    </Tabs>,
+    </Tabs>
   )
   expect(attribute(html, '<[^>]*role="tab"', "id")).toBe("account")
-  expect(attribute(html, '<[^>]*role="tabpanel"', "aria-labelledby")).toBe("account")
+  expect(attribute(html, '<[^>]*role="tabpanel"', "aria-labelledby")).toBe(
+    "account"
+  )
 })
 
 test("a dialog's trigger keeps the id passed to it, and the dialog's references still resolve", () => {
@@ -65,12 +76,14 @@ test("a dialog's trigger keeps the id passed to it, and the dialog's references 
       <DialogContent>
         <DialogTitle>Profile</DialogTitle>
       </DialogContent>
-    </Dialog>,
+    </Dialog>
   )
   const content = attribute(html, '<[^>]*role="dialog"', "id")
   expect(attribute(html, '<[^>]*aria-controls="', "id")).toBe("mine")
   expect(attribute(html, '<[^>]*id="mine"', "aria-controls")).toBe(content)
-  expect(attribute(html, "<h2", "id")).toBe(attribute(html, '<[^>]*role="dialog"', "aria-labelledby"))
+  expect(attribute(html, "<h2", "id")).toBe(
+    attribute(html, '<[^>]*role="dialog"', "aria-labelledby")
+  )
 })
 
 test("a popover's content is labelled by the id passed to its trigger", () => {
@@ -78,7 +91,7 @@ test("a popover's content is labelled by the id passed to its trigger", () => {
     <Popover defaultOpen>
       <PopoverTrigger id="mine">Open</PopoverTrigger>
       <PopoverContent>Body</PopoverContent>
-    </Popover>,
+    </Popover>
   )
   expect(attribute(html, '<[^>]*role="dialog"', "aria-labelledby")).toBe("mine")
 })
@@ -88,7 +101,7 @@ test("a control is labelled by the id passed to its label", () => {
     <Field>
       <FieldLabel id="email-label">Email</FieldLabel>
       <FieldControl />
-    </Field>,
+    </Field>
   )
   expect(attribute(html, "<input", "aria-labelledby")).toBe("email-label")
 })
@@ -99,7 +112,7 @@ test("a control is described by the id passed to a description before it", () =>
       <FieldLabel>Email</FieldLabel>
       <FieldDescription id="email-hint">Work address.</FieldDescription>
       <FieldControl />
-    </Field>,
+    </Field>
   )
   expect(attribute(html, "<input", "aria-describedby")).toBe("email-hint")
 })
@@ -109,7 +122,7 @@ test("a label after its control points at the id passed to the control", () => {
     <Field>
       <FieldControl id="email" type="checkbox" />
       <FieldLabel>Email me</FieldLabel>
-    </Field>,
+    </Field>
   )
   expect(attribute(html, "<label", "for")).toBe("email")
 })

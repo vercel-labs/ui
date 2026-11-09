@@ -16,9 +16,13 @@ const span = <span />
 
 function VariantToggle({ variant, env }: { variant: Variant; env: Env }) {
   const [pressed, setPressed] = React.useState(false)
-  const [controller] = React.useState(() => (variant.controller ? createToggleController() : undefined))
+  const [controller] = React.useState(() =>
+    variant.controller ? createToggleController() : undefined
+  )
   React.useEffect(() => {
-    if (!controller) return
+    if (!controller) {
+      return
+    }
     env.controls([
       ["toggle()", () => controller.toggle()],
       ["setPressed(true)", () => controller.setPressed(true)],
@@ -34,8 +38,12 @@ function VariantToggle({ variant, env }: { variant: Variant; env: Env }) {
       controller={controller}
       render={variant.render === "span" ? span : undefined}
       onPressedChange={(next, details) => {
-        if (variant.cancel) return details.cancel()
-        if (variant.controlled) setPressed(next)
+        if (variant.cancel) {
+          return details.cancel()
+        }
+        if (variant.controlled) {
+          setPressed(next)
+        }
         env.log(`pressedChange ${next} (${details.reason}, ${details.source})`)
       }}
     >
@@ -46,11 +54,18 @@ function VariantToggle({ variant, env }: { variant: Variant; env: Env }) {
 
 function VariantGroup({ variant, env }: { variant: Variant; env: Env }) {
   const [value, setValue] = React.useState<string[]>([])
-  const [controller] = React.useState(() => (variant.controller ? createToggleGroupController() : undefined))
+  const [controller] = React.useState(() =>
+    variant.controller ? createToggleGroupController() : undefined
+  )
   React.useEffect(() => {
-    if (!controller) return
+    if (!controller) {
+      return
+    }
     env.controls([
-      ["setValue([bold, italic])", () => controller.setValue(["bold", "italic"])],
+      [
+        "setValue([bold, italic])",
+        () => controller.setValue(["bold", "italic"]),
+      ],
       ["toggle(underline)", () => controller.toggle("underline")],
       ["getValue()", () => controller.getValue()],
       ["focus()", () => controller.focus()],
@@ -64,8 +79,12 @@ function VariantGroup({ variant, env }: { variant: Variant; env: Env }) {
       {...(variant.controlled && { value })}
       controller={controller}
       onValueChange={(next, details) => {
-        if (variant.cancel) return details.cancel()
-        if (variant.controlled) setValue(next)
+        if (variant.cancel) {
+          return details.cancel()
+        }
+        if (variant.controlled) {
+          setValue(next)
+        }
         env.log(`valueChange [${next}] (${details.reason}, ${details.source})`)
       }}
     >
@@ -87,17 +106,23 @@ function VariantGroup({ variant, env }: { variant: Variant; env: Env }) {
 function VariantButton({ variant, env }: { variant: Variant; env: Env }) {
   const onClick = () => {
     env.log("click")
-    if (variant.action !== "resolve" && variant.action !== "reject") return
+    if (variant.action !== "resolve" && variant.action !== "reject") {
+      return
+    }
     return pendingAction(variant).then(
       () => env.log("done"),
       (error: Error) => {
         env.log(`failed: ${error.message}`)
         throw error
-      },
+      }
     )
   }
   const render =
-    variant.render === "link" ? <a href="#kitchen-sink-link" /> : variant.render === "span" ? span : undefined
+    variant.render === "link" ? (
+      <a href="#kitchen-sink-link" />
+    ) : variant.render === "span" ? (
+      span
+    ) : undefined
   const button = (
     <Button
       className={classes.button}
@@ -106,10 +131,16 @@ function VariantButton({ variant, env }: { variant: Variant; env: Env }) {
       render={render}
       onClick={variant.action ? onClick : undefined}
     >
-      {variant.form === "reset" ? "Reset" : variant.render === "link" ? "Docs" : "Save"}
+      {variant.form === "reset"
+        ? "Reset"
+        : variant.render === "link"
+          ? "Docs"
+          : "Save"}
     </Button>
   )
-  if (!variant.form) return button
+  if (!variant.form) {
+    return button
+  }
   return (
     <form
       className="flex items-center gap-2"
@@ -131,7 +162,13 @@ function VariantButton({ variant, env }: { variant: Variant; env: Env }) {
 
 function VariantSeparator({ variant }: { variant: Variant }) {
   return (
-    <div className={variant.options?.orientation === "vertical" ? classes.row : classes.column}>
+    <div
+      className={
+        variant.options?.orientation === "vertical"
+          ? classes.row
+          : classes.column
+      }
+    >
       <span>Blog</span>
       <Separator
         className={classes.separator}
@@ -144,9 +181,15 @@ function VariantSeparator({ variant }: { variant: Variant }) {
 }
 
 function VariantPart({ variant, env }: { variant: Variant; env: Env }) {
-  if (variant.section === "Toggle") return <VariantToggle variant={variant} env={env} />
-  if (variant.section === "Toggle Group") return <VariantGroup variant={variant} env={env} />
-  if (variant.section === "Button") return <VariantButton variant={variant} env={env} />
+  if (variant.section === "Toggle") {
+    return <VariantToggle variant={variant} env={env} />
+  }
+  if (variant.section === "Toggle Group") {
+    return <VariantGroup variant={variant} env={env} />
+  }
+  if (variant.section === "Button") {
+    return <VariantButton variant={variant} env={env} />
+  }
   return <VariantSeparator variant={variant} />
 }
 
@@ -155,8 +198,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantPart variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

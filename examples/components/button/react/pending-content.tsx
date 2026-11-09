@@ -9,7 +9,11 @@ function Example() {
   return (
     <Button onClick={() => wait(1500)} pendingAnnouncement="Saving">
       <ArrowDownToLineIcon data-show="idle" aria-hidden="true" />
-      <LoaderCircleIcon data-show="pending" data-slot="spinner" aria-hidden="true" />
+      <LoaderCircleIcon
+        data-show="pending"
+        data-slot="spinner"
+        aria-hidden="true"
+      />
       Save
     </Button>
   )

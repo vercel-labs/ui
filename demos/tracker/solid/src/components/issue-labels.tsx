@@ -11,7 +11,10 @@ function IssueLabels(props: { labels: string[]; class?: string }) {
             {(label) => (
               <li>
                 <Badge>
-                  <span class="size-2 rounded-full" style={{ background: label().color }} />
+                  <span
+                    class="size-2 rounded-full"
+                    style={{ background: label().color }}
+                  />
                   {label().name}
                 </Badge>
               </li>

@@ -20,7 +20,12 @@ function defineTabsElements() {
       defaults: { loop: true },
       // `value` is live: setting the property or the attribute selects a tab,
       // like a controller, and fires `valuechange`.
-      state: { value: { get: (api) => api.getValue(), set: (api, value) => api.setValue(value) } },
+      state: {
+        value: {
+          get: (api) => api.getValue(),
+          set: (api, value) => api.setValue(value),
+        },
+      },
       api: ["getValue", "setValue", "select", "focus"],
     },
     list: { tag: "ui-tabs-list", display: "block" },

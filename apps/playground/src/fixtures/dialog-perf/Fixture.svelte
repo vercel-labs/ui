@@ -23,7 +23,9 @@
       <DialogBackdrop class="dialog-backdrop" />
       <DialogContent class="dialog">
         <DialogTitle class="title">Delete {item.label}?</DialogTitle>
-        <DialogDescription class="description">This can't be undone.</DialogDescription>
+        <DialogDescription class="description"
+          >This can't be undone.</DialogDescription
+        >
         <div class="actions">
           <DialogClose>Cancel</DialogClose>
           <button>Delete</button>

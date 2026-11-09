@@ -10,7 +10,11 @@ const items: TreeItemData[] = [
       { value: "old-setup", label: "Old setup", disabled: true },
     ],
   },
-  { value: "guides", label: "Guides", children: [{ value: "theming", label: "Theming", href: "#theming" }] },
+  {
+    value: "guides",
+    label: "Guides",
+    children: [{ value: "theming", label: "Theming", href: "#theming" }],
+  },
   { value: "faq", label: "FAQ", href: "#faq" },
 ]
 
@@ -19,7 +23,9 @@ function Example() {
   const rows = visibleTreeRows(items, expanded)
   const toggle = (value: string) =>
     setExpanded((current) =>
-      current.includes(value) ? current.filter((other) => other !== value) : [...current, value],
+      current.includes(value)
+        ? current.filter((other) => other !== value)
+        : [...current, value]
     )
   return (
     <div data-slot="tree-behavior-list">
@@ -44,12 +50,22 @@ function Example() {
             {note}
           </button>
         ) : item.href ? (
-          <a key={item.value} href={item.href} data-slot="tree-behavior-row" style={style}>
+          <a
+            key={item.value}
+            href={item.href}
+            data-slot="tree-behavior-row"
+            style={style}
+          >
             {item.label}
             {note}
           </a>
         ) : (
-          <span key={item.value} aria-disabled={item.disabled} data-slot="tree-behavior-row" style={style}>
+          <span
+            key={item.value}
+            aria-disabled={item.disabled}
+            data-slot="tree-behavior-row"
+            style={style}
+          >
             {item.label}
             {note}
           </span>

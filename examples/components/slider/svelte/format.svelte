@@ -17,14 +17,27 @@
       step: 1,
       format: { style: "currency", currency: "USD", maximumFractionDigits: 0 },
     },
-    { label: "Opacity", defaultValue: 0.6, max: 1, step: 0.01, format: { style: "percent" } },
-    { label: "Weight", defaultValue: 20, max: 50, step: 0.5, format: { style: "unit", unit: "kilogram" } },
+    {
+      label: "Opacity",
+      defaultValue: 0.6,
+      max: 1,
+      step: 0.01,
+      format: { style: "percent" },
+    },
+    {
+      label: "Weight",
+      defaultValue: 20,
+      max: 50,
+      step: 0.5,
+      format: { style: "unit", unit: "kilogram" },
+    },
     {
       label: "Duration",
       defaultValue: 90,
       max: 600,
       step: 15,
-      format: (seconds: number) => `${Math.floor(seconds / 60)} min ${seconds % 60} s`,
+      format: (seconds: number) =>
+        `${Math.floor(seconds / 60)} min ${seconds % 60} s`,
     },
     {
       label: "Preis",

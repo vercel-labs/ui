@@ -25,7 +25,11 @@ function defineCollapsibleElements() {
       api: ["isOpen", "setOpen", "open", "close", "toggle", "focus"],
     },
     // A wrapper, so the trigger stays a real button with its built-in behavior.
-    trigger: { tag: "ui-collapsible-trigger", display: "contents", target: wrappedButton },
+    trigger: {
+      tag: "ui-collapsible-trigger",
+      display: "contents",
+      target: wrappedButton,
+    },
     panel: { tag: "ui-collapsible-panel", display: "block" },
   })
 }

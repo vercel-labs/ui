@@ -9,6 +9,11 @@ const log = useLog()
   <Toolbar aria-label="Message">
     <ToolbarButton @click="log('Reply')">Reply</ToolbarButton>
     <ToolbarButton disabled @click="log('Archive')">Archive</ToolbarButton>
-    <ToolbarButton disabled :focusable-when-disabled="false" @click="log('Delete')">Delete</ToolbarButton>
+    <ToolbarButton
+      disabled
+      :focusable-when-disabled="false"
+      @click="log('Delete')"
+      >Delete</ToolbarButton
+    >
   </Toolbar>
 </template>

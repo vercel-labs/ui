@@ -3,7 +3,8 @@ import { bindAvoidKeyboard } from "@ui-sdk/core"
 
 const groceries = "Groceries\n- oat milk\n- lemons"
 
-const count = (text: string) => text.split("\n").filter((line) => line.startsWith("-")).length
+const count = (text: string) =>
+  text.split("\n").filter((line) => line.startsWith("-")).length
 
 function Example() {
   const [items, setItems] = React.useState(count(groceries))
@@ -17,7 +18,9 @@ function Example() {
         defaultValue={groceries}
         onChange={(event) => setItems(count(event.target.value))}
       />
-      <p data-slot="hint">On a phone, tap the list, then scroll the page with the keyboard open.</p>
+      <p data-slot="hint">
+        On a phone, tap the list, then scroll the page with the keyboard open.
+      </p>
       <div ref={lift} data-slot="groceries-lift">
         <p aria-live="polite" data-slot="groceries-pill">
           {items === 1 ? "1 item" : `${items} items`} · Saved

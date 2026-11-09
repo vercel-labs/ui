@@ -1,11 +1,22 @@
 // The menu every implementation renders. Labels, order and values are the contract
 // the specs rely on, so change them here and nowhere else.
 type MenuFixtureItem =
-  | { type: "item"; value: string; label: string; shortcut?: string; disabled?: boolean }
+  | {
+      type: "item"
+      value: string
+      label: string
+      shortcut?: string
+      disabled?: boolean
+    }
   | { type: "separator" }
   | { type: "group"; label: string; items: MenuFixtureItem[] }
   | { type: "checkbox"; value: string; label: string; defaultChecked?: boolean }
-  | { type: "radio-group"; label: string; defaultValue: string; items: { value: string; label: string }[] }
+  | {
+      type: "radio-group"
+      label: string
+      defaultValue: string
+      items: { value: string; label: string }[]
+    }
   | { type: "submenu"; label: string; items: MenuFixtureItem[] }
 
 const menuFixture = {
@@ -19,7 +30,12 @@ const menuFixture = {
       type: "group",
       label: "View",
       items: [
-        { type: "checkbox", value: "sidebar", label: "Show sidebar", defaultChecked: true },
+        {
+          type: "checkbox",
+          value: "sidebar",
+          label: "Show sidebar",
+          defaultChecked: true,
+        },
         { type: "checkbox", value: "statusbar", label: "Show status bar" },
       ],
     },

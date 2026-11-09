@@ -35,7 +35,9 @@ const fruit = createAutocompleteController()
   <div data-slot="stack">
     <div data-slot="controls">
       <button type="button" data-size="sm" @click="fruit.open()">Open</button>
-      <button type="button" data-size="sm" @click="fruit.setValue('Pea')">Type “Pea”</button>
+      <button type="button" data-size="sm" @click="fruit.setValue('Pea')">
+        Type “Pea”
+      </button>
       <button type="button" data-size="sm" @click="fruit.clear()">Clear</button>
       <button type="button" data-size="sm" @click="fruit.focus()">Focus</button>
     </div>
@@ -45,7 +47,9 @@ const fruit = createAutocompleteController()
       <AutocompleteContent>
         <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
-          <AutocompleteItem v-for="item in fruits" :key="item" :value="item">{{ item }}</AutocompleteItem>
+          <AutocompleteItem v-for="item in fruits" :key="item" :value="item">{{
+            item
+          }}</AutocompleteItem>
         </AutocompleteList>
       </AutocompleteContent>
     </Autocomplete>

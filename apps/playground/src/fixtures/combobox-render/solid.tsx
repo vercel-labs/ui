@@ -18,7 +18,9 @@ function Fixture() {
       <button>Before</button>
       <Combobox name={f.name}>
         <ComboboxLabel class="label">{f.label}</ComboboxLabel>
-        <ComboboxInput class={(state) => `input ${state.open ? "is-open" : "is-closed"}`} />
+        <ComboboxInput
+          class={(state) => `input ${state.open ? "is-open" : "is-closed"}`}
+        />
         <ComboboxTrigger aria-label={f.trigger}>▾</ComboboxTrigger>
         <ComboboxContent class="popup list-popup">
           <ComboboxList>

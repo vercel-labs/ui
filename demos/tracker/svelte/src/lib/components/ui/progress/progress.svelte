@@ -24,10 +24,19 @@
   } = $props()
 </script>
 
-<ProgressPrimitive {value} {max} {format} class={cn("flex w-full flex-wrap items-center gap-x-3 gap-y-1.5", className)}>
-  <ProgressLabel class="text-xs font-medium text-muted-foreground">{label}</ProgressLabel>
+<ProgressPrimitive
+  {value}
+  {max}
+  {format}
+  class={cn("flex w-full flex-wrap items-center gap-x-3 gap-y-1.5", className)}
+>
+  <ProgressLabel class="text-xs font-medium text-muted-foreground"
+    >{label}</ProgressLabel
+  >
   <ProgressValue class="ms-auto text-xs text-muted-foreground tabular-nums" />
   <ProgressTrack class="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-    <ProgressIndicator class="h-full bg-primary transition-[width] motion-reduce:transition-none" />
+    <ProgressIndicator
+      class="h-full bg-primary transition-[width] motion-reduce:transition-none"
+    />
   </ProgressTrack>
 </ProgressPrimitive>

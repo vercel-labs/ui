@@ -125,7 +125,11 @@ Bind `bind:pressed`, or pass `pressed` and handle `onPressedChange`, to own the 
 ```svelte
 <script lang="ts">
   import { StarIcon } from "@lucide/svelte"
-  import { createToggleController, Toggle, ToggleIcon } from "@ui-sdk/svelte/toggle"
+  import {
+    createToggleController,
+    Toggle,
+    ToggleIcon,
+  } from "@ui-sdk/svelte/toggle"
 
   let starred = $state(false)
   const star = createToggleController()
@@ -147,17 +151,28 @@ Bind `bind:value`, or pass `value` and handle `onValueChange`, to own the group'
 
 ```svelte
 <script lang="ts">
-  import { createToggleGroupController, Toggle, ToggleGroup } from "@ui-sdk/svelte/toggle"
+  import {
+    createToggleGroupController,
+    Toggle,
+    ToggleGroup,
+  } from "@ui-sdk/svelte/toggle"
 
   let formats = $state(["bold"])
   const editor = createToggleGroupController()
 </script>
 
-<ToggleGroup multiple aria-label="Text formatting" bind:value={formats} controller={editor}>
+<ToggleGroup
+  multiple
+  aria-label="Text formatting"
+  bind:value={formats}
+  controller={editor}
+>
   <Toggle value="bold">Bold</Toggle>
   <Toggle value="italic">Italic</Toggle>
 </ToggleGroup>
-<button type="button" onclick={() => editor.setValue([])}>Clear Formatting</button>
+<button type="button" onclick={() => editor.setValue([])}
+  >Clear Formatting</button
+>
 ```
 
 See [State and Events](../state-and-events) for controlled state, cancellation and debugging.
@@ -167,9 +182,7 @@ See [State and Events](../state-and-events) for controlled state, cancellation a
 Set `orientation="vertical"` to move with Up and Down instead of Left and Right. The group and its toggles get `data-orientation`.
 
 ```svelte
-<ToggleGroup orientation="vertical" aria-label="Tool">
-  ...
-</ToggleGroup>
+<ToggleGroup orientation="vertical" aria-label="Tool">...</ToggleGroup>
 ```
 
 ## Loop
@@ -221,35 +234,56 @@ Props and callbacks are the same as below, as Svelte props. `pressed`, and a gro
 
 ### Toggle
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleOptions"
+/>
 
 ### ToggleIcon
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconProps"
+/>
 
 ### ToggleGroup
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupOptions"
+/>
 
 ### State
 
 What `render` and `children` snippets receive.
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleState"
+/>
 
 In a group, a toggle's `disabled` includes the group's. The group:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupState"
+/>
 
 `ToggleIcon`:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconState"
+/>
 
 ### Reasons
 
 `details.reason` says why the toggle was pressed or unpressed.
 
-<ReasonTable path="../../packages/core/src/components/toggle/toggle.ts" name="TogglePressedChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="TogglePressedChangeReason"
+/>
 
 For a group, it says why the pressed toggles changed.
 
@@ -264,7 +298,10 @@ Create one with `createToggleController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleController" />
+<ControllerTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleController"
+/>
 
 ### ToggleGroup Controller
 

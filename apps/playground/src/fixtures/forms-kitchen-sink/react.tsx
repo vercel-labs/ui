@@ -1,7 +1,17 @@
 import { createCheckboxController } from "@ui-sdk/core/checkbox"
 import { createRadioGroupController } from "@ui-sdk/core/radio"
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/react/checkbox"
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/react/checkbox"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import * as React from "react"
@@ -12,13 +22,25 @@ import type { Variant } from "./variants"
 function Indicator({ variant, radio }: { variant: Variant; radio?: boolean }) {
   const className = `${radio ? c.dot : c.indicator} ${variant.indicator === "animated" ? c.animated : ""} ${variant.indicator === "kept" ? c.kept : ""}`
   return radio ? (
-    <RadioIndicator className={className} keepMounted={variant.indicator === "kept"} />
+    <RadioIndicator
+      className={className}
+      keepMounted={variant.indicator === "kept"}
+    />
   ) : (
-    <CheckboxIndicator className={className} keepMounted={variant.indicator === "kept"} />
+    <CheckboxIndicator
+      className={className}
+      keepMounted={variant.indicator === "kept"}
+    />
   )
 }
 
-function Control({ variant, log }: { variant: Variant; log: (text: string) => void }) {
+function Control({
+  variant,
+  log,
+}: {
+  variant: Variant
+  log: (text: string) => void
+}) {
   const [checked, setChecked] = React.useState<boolean | "indeterminate">(false)
   const [value, setValue] = React.useState<string | null>(null)
   const [values, setValues] = React.useState<string[]>([])
@@ -28,7 +50,7 @@ function Control({ variant, log }: { variant: Variant; log: (text: string) => vo
   const report = (value: unknown, details: { reason: string }) =>
     log(`${JSON.stringify(value)} (${details.reason})`)
 
-  if (variant.kind === "checkbox")
+  if (variant.kind === "checkbox") {
     return (
       <>
         <label className={c.row}>
@@ -49,13 +71,18 @@ function Control({ variant, log }: { variant: Variant; log: (text: string) => vo
         </label>
         {variant.controlled && <span>checked: {String(checked)}</span>}
         {variant.controller && (
-          <button type="button" className={c.button} onClick={() => checkbox.toggle()}>
+          <button
+            type="button"
+            className={c.button}
+            onClick={() => checkbox.toggle()}
+          >
             Toggle from outside
           </button>
         )}
       </>
     )
-  if (variant.kind === "switch")
+  }
+  if (variant.kind === "switch") {
     return (
       <label className={c.row}>
         <Switch
@@ -72,7 +99,8 @@ function Control({ variant, log }: { variant: Variant; log: (text: string) => vo
         Wi-Fi
       </label>
     )
-  if (variant.kind === "radio")
+  }
+  if (variant.kind === "radio") {
     return (
       <>
         <RadioGroup
@@ -97,13 +125,18 @@ function Control({ variant, log }: { variant: Variant; log: (text: string) => vo
         </RadioGroup>
         {variant.controlled && <span>value: {String(value)}</span>}
         {variant.controller && (
-          <button type="button" className={c.button} onClick={() => radio.setValue("enterprise")}>
+          <button
+            type="button"
+            className={c.button}
+            onClick={() => radio.setValue("enterprise")}
+          >
             Choose Enterprise
           </button>
         )}
       </>
     )
-  if (variant.kind === "checkbox-group")
+  }
+  if (variant.kind === "checkbox-group") {
     return (
       <>
         <CheckboxGroup
@@ -136,13 +169,24 @@ function Control({ variant, log }: { variant: Variant; log: (text: string) => vo
         {variant.controlled && <span>value: {values.join(", ")}</span>}
       </>
     )
+  }
   return <FieldControl className={c.input} type="email" name="email" required />
 }
 
-function Card({ variant, log }: { variant: Variant; log: (text: string) => void }) {
+function Card({
+  variant,
+  log,
+}: {
+  variant: Variant
+  log: (text: string) => void
+}) {
   const control = <Control variant={variant} log={log} />
   const field = variant.field && (
-    <Field className={c.form} invalid={variant.field.invalid} disabled={variant.field.disabled}>
+    <Field
+      className={c.form}
+      invalid={variant.field.invalid}
+      disabled={variant.field.disabled}
+    >
       <FieldLabel>Label</FieldLabel>
       {control}
       <FieldDescription className={c.description}>Description</FieldDescription>
@@ -175,7 +219,9 @@ function Card({ variant, log }: { variant: Variant; log: (text: string) => void 
 }
 
 function mount(root: HTMLElement) {
-  renderShell(root, (slot, variant, log) => createRoot(slot).render(<Card variant={variant} log={log} />))
+  renderShell(root, (slot, variant, log) =>
+    createRoot(slot).render(<Card variant={variant} log={log} />)
+  )
 }
 
 export { mount }

@@ -35,16 +35,24 @@ const cityMap = definePrimitive({
         .filter((other) => other !== city)
         .map((other) => ({ key: other, rect: box(other) }))
       const next = nearestInDirection(box(city), others, direction)
-      if (next) context.store.set({ city: next })
+      if (next) {
+        context.store.set({ city: next })
+      }
     },
   }),
   slots: (slot) => ({
     map: slot({
-      attrs: (state) => ({ role: "img", tabindex: "0", "aria-label": `Map, ${state.city} chosen` }),
+      attrs: (state) => ({
+        role: "img",
+        tabindex: "0",
+        "aria-label": `Map, ${state.city} chosen`,
+      }),
       on: {
         keydown: (event, { api }) => {
           const direction = directions[event.key]
-          if (!direction) return
+          if (!direction) {
+            return
+          }
           event.preventDefault()
           api.go(direction)
         },
@@ -52,7 +60,9 @@ const cityMap = definePrimitive({
     }),
     city: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (state, part) => ({ "data-chosen": state.city === part.key ? "" : undefined }),
+      attrs: (state, part) => ({
+        "data-chosen": state.city === part.key ? "" : undefined,
+      }),
     }),
     arrow: slot<{ value: string }>({
       props: { value: "string" },
@@ -62,7 +72,11 @@ const cityMap = definePrimitive({
   }),
 })
 
-const parts = createParts(cityMap, { map: "div", city: "span", arrow: "button" })
+const parts = createParts(cityMap, {
+  map: "div",
+  city: "span",
+  arrow: "button",
+})
 
 const CityMap = parts.Root
 
@@ -72,7 +86,12 @@ const CityMapCity = parts.City
 
 const CityMapArrow = parts.Arrow
 
-const labels = { ArrowUp: "North", ArrowLeft: "West", ArrowRight: "East", ArrowDown: "South" }
+const labels = {
+  ArrowUp: "North",
+  ArrowLeft: "West",
+  ArrowRight: "East",
+  ArrowDown: "South",
+}
 
 function Example() {
   return (
@@ -87,7 +106,12 @@ function Example() {
         </div>
         <CityMapMap>
           {Object.entries(cities).map(([city, { x, y }]) => (
-            <CityMapCity key={city} value={city} aria-hidden="true" style={{ left: `${x}%`, top: `${y}%` }}>
+            <CityMapCity
+              key={city}
+              value={city}
+              aria-hidden="true"
+              style={{ left: `${x}%`, top: `${y}%` }}
+            >
               {city}
             </CityMapCity>
           ))}
@@ -97,4 +121,12 @@ function Example() {
   )
 }
 
-export { CityMap, CityMapArrow, CityMapCity, CityMapMap, cityMap, type CityMapState, Example }
+export {
+  CityMap,
+  CityMapArrow,
+  CityMapCity,
+  CityMapMap,
+  cityMap,
+  type CityMapState,
+  Example,
+}

@@ -19,7 +19,8 @@
         align-self: flex-start;
       }
 
-      &:not([data-orientation="vertical"]) > [data-slot="segmented-control-item"] {
+      &:not([data-orientation="vertical"])
+        > [data-slot="segmented-control-item"] {
         flex: 1;
       }
     }

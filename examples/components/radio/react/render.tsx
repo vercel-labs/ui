@@ -6,8 +6,16 @@ import { CheckIcon } from "lucide-react"
 import * as React from "react"
 
 const options = [
-  { value: "all", label: "Everything", description: "Every message and update." },
-  { value: "mentions", label: "Mentions", description: "Only when someone mentions you." },
+  {
+    value: "all",
+    label: "Everything",
+    description: "Every message and update.",
+  },
+  {
+    value: "mentions",
+    label: "Mentions",
+    description: "Only when someone mentions you.",
+  },
   { value: "none", label: "Nothing", description: "Turn notifications off." },
 ]
 
@@ -27,11 +35,17 @@ function Example() {
               <button {...props}>
                 <span data-slot="stack">
                   <span id={`${id}-${option.value}-label`}>{option.label}</span>
-                  <span data-slot="hint" id={`${id}-${option.value}-description`}>
+                  <span
+                    data-slot="hint"
+                    id={`${id}-${option.value}-description`}
+                  >
                     {option.description}
                   </span>
                 </span>
-                <CheckIcon aria-hidden="true" data-checked={state.checked ? "" : undefined} />
+                <CheckIcon
+                  aria-hidden="true"
+                  data-checked={state.checked ? "" : undefined}
+                />
               </button>
             )}
           />

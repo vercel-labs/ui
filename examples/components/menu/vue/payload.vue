@@ -25,7 +25,10 @@ const FileMenuContent = MenuContent<File>
 const log = useLog()
 
 async function openFirst(event: MouseEvent) {
-  const result = await menu.open({ payload: files[0], anchor: event.currentTarget as HTMLElement })
+  const result = await menu.open({
+    payload: files[0],
+    anchor: event.currentTarget as HTMLElement,
+  })
   log(`Closed with ${result.reason}`)
 }
 </script>
@@ -50,7 +53,10 @@ async function openFirst(event: MouseEvent) {
         </MenuTrigger>
       </li>
     </ul>
-    <Menu :controller="menu" @action="(action) => log(`${action} ${menu.getPayload()?.name}`)">
+    <Menu
+      :controller="menu"
+      @action="(action) => log(`${action} ${menu.getPayload()?.name}`)"
+    >
       <FileMenuContent v-slot="{ state }" align="end">
         <MenuGroup>
           <MenuGroupLabel>{{ state.payload?.name }}</MenuGroupLabel>

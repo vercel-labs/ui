@@ -6,17 +6,35 @@ import {
   type RatingState,
   type RatingValueChangeReason,
 } from "@ui-sdk/core/rating"
-import { defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
+import {
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { withElement } from "./create-parts"
 import { useFieldControl } from "./field-context"
 import { readOnlyOf } from "./text-control"
-import { optionalBoolean, orModel, usePart, usePrimitive, useScope, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  usePart,
+  usePrimitive,
+  useScope,
+  type PartSlots,
+} from "./use-primitive"
 
-const ItemKey: InjectionKey<{ index: number; step: number }> = Symbol("rating-item")
+const ItemKey: InjectionKey<{ index: number; step: number }> =
+  Symbol("rating-item")
 
 const ItemScope = defineComponent({
   name: "RatingItemScope",
-  props: { index: { type: Number, required: true }, step: { type: Number, required: true } },
+  props: {
+    index: { type: Number, required: true },
+    step: { type: Number, required: true },
+  },
   setup(props, { slots }) {
     provide(ItemKey, props)
     return () => slots.default?.()
@@ -35,8 +53,14 @@ const Rating = withElement(
     inheritAttrs: false,
     props: {
       value: { type: Number as PropType<number | null>, default: undefined },
-      modelValue: { type: Number as PropType<number | null>, default: undefined },
-      defaultValue: { type: Number as PropType<number | null>, default: undefined },
+      modelValue: {
+        type: Number as PropType<number | null>,
+        default: undefined,
+      },
+      defaultValue: {
+        type: Number as PropType<number | null>,
+        default: undefined,
+      },
       max: { type: Number, default: 5 },
       step: { type: Number, default: 1 },
       deselectable: optionalBoolean,
@@ -46,14 +70,19 @@ const Rating = withElement(
       name: String,
       form: String,
       loop: optionalBoolean,
-      getValueLabel: Function as PropType<(value: number, max: number) => string>,
+      getValueLabel: Function as PropType<
+        (value: number, max: number) => string
+      >,
       controller: Object as PropType<RatingController>,
       debug: optionalBoolean,
     },
     emits: {
       "update:value": (_value: number | null) => true,
       "update:modelValue": (_value: number | null) => true,
-      valueChange: (_value: number | null, _details: ChangeDetails<RatingValueChangeReason>) => true,
+      valueChange: (
+        _value: number | null,
+        _details: ChangeDetails<RatingValueChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof rating, "root">,
     setup(props, { attrs, emit, slots }) {
@@ -73,10 +102,15 @@ const Rating = withElement(
         getValueLabel: props.getValueLabel,
         controller: props.controller,
         debug: props.debug,
-        onValueChange: (value: number | null, details: ChangeDetails<RatingValueChangeReason>) => {
+        onValueChange: (
+          value: number | null,
+          details: ChangeDetails<RatingValueChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
@@ -86,8 +120,8 @@ const Rating = withElement(
           h(
             ItemScope,
             { key: at, index: at + 1, step: props.step },
-            () => slots.default?.({ state }) ?? h(RatingItem),
-          ),
+            () => slots.default?.({ state }) ?? h(RatingItem)
+          )
         )
       return usePart(control, "root", undefined, undefined, {
         tag: "div",
@@ -95,7 +129,7 @@ const Rating = withElement(
         children: stars,
       })
     },
-  }),
+  })
 )
 
 const RatingRadio = defineComponent({
@@ -122,17 +156,19 @@ const RatingItem = withElement(
     slots: Object as PartSlots<typeof rating, "item">,
     setup(_, { slots }) {
       const item = inject(ItemKey, null)
-      if (!item) throw new Error("RatingItem must be used inside <Rating>.")
+      if (!item) {
+        throw new Error("RatingItem must be used inside <Rating>.")
+      }
       const radios = () =>
         ratingItemValues(item.index, item.step).map((score) =>
-          h(RatingRadio, { key: score, value: String(score) }),
+          h(RatingRadio, { key: score, value: String(score) })
         )
       return usePart(rating, "item", () => ({ index: item.index }), undefined, {
         tag: "span",
         children: (state) => [slots.default?.({ state }), radios()],
       })
     },
-  }),
+  })
 )
 
 export { createRatingController } from "@ui-sdk/core/rating"

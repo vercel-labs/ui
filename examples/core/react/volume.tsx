@@ -24,8 +24,14 @@ const clamp = (value: number) => Math.round(Math.min(100, Math.max(0, value)))
 
 const volume = definePrimitive({
   name: "volume",
-  options: { defaultValue: "number", onValueChange: "callback", onValueCommit: "callback" },
-  state: (options: VolumeOptions): VolumeState => ({ value: options.defaultValue ?? 50 }),
+  options: {
+    defaultValue: "number",
+    onValueChange: "callback",
+    onValueCommit: "callback",
+  },
+  state: (options: VolumeOptions): VolumeState => ({
+    value: options.defaultValue ?? 50,
+  }),
   commits: ["value"],
   api: (context) => {
     const change = createChange(context)
@@ -39,15 +45,23 @@ const volume = definePrimitive({
         change("value", valueAt(event, track), { reason: "track-press", event })
       },
       release(event: PointerEvent) {
-        commit("value", context.store.get().value, { reason: "track-press", event })
+        commit("value", context.store.get().value, {
+          reason: "track-press",
+          event,
+        })
       },
       step(event: KeyboardEvent) {
-        const by = { ArrowRight: 5, ArrowUp: 5, ArrowLeft: -5, ArrowDown: -5 }[event.key]
-        if (by === undefined) return
+        const by = { ArrowRight: 5, ArrowUp: 5, ArrowLeft: -5, ArrowDown: -5 }[
+          event.key
+        ]
+        if (by === undefined) {
+          return
+        }
         event.preventDefault()
         const value = clamp(context.store.get().value + by)
-        if (change("value", value, { reason: "step-key", event }))
+        if (change("value", value, { reason: "step-key", event })) {
           commit("value", value, { reason: "step-key", event })
+        }
       },
     }
   },
@@ -55,18 +69,24 @@ const volume = definePrimitive({
     track: slot({
       on: {
         pointerdown: (event, { el, api }) => {
-          if (!el) return
+          if (!el) {
+            return
+          }
           el.setPointerCapture(event.pointerId)
           el.querySelector<HTMLElement>("[role=slider]")?.focus()
           api.drag(event, el)
         },
         pointermove: (event, { el, api }) => {
-          if (el?.hasPointerCapture(event.pointerId)) api.drag(event, el)
+          if (el?.hasPointerCapture(event.pointerId)) {
+            api.drag(event, el)
+          }
         },
         pointerup: (event, { api }) => api.release(event),
       },
     }),
-    fill: slot({ attrs: (state) => ({ style: css({ width: `${state.value}%` }) }) }),
+    fill: slot({
+      attrs: (state) => ({ style: css({ width: `${state.value}%` }) }),
+    }),
     thumb: slot({
       attrs: (state) => ({
         role: "slider",
@@ -100,7 +120,10 @@ function Example() {
         <span>Volume</span>
         <span data-value>{value}</span>
       </p>
-      <Volume onValueChange={setValue} onValueCommit={(saved) => log(`Saved ${saved}`)}>
+      <Volume
+        onValueChange={setValue}
+        onValueCommit={(saved) => log(`Saved ${saved}`)}
+      >
         <VolumeTrack>
           <div data-slot="volume-rail">
             <VolumeFill />
@@ -112,4 +135,13 @@ function Example() {
   )
 }
 
-export { Example, volume, Volume, VolumeFill, VolumeThumb, VolumeTrack, type VolumeOptions, type VolumeState }
+export {
+  Example,
+  volume,
+  Volume,
+  VolumeFill,
+  VolumeThumb,
+  VolumeTrack,
+  type VolumeOptions,
+  type VolumeState,
+}

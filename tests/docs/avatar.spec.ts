@@ -12,5 +12,5 @@ testExamples(
     },
   },
   "components",
-  ["basic", "rtl"],
+  ["basic", "rtl"]
 )

@@ -16,7 +16,11 @@
     ToolbarSeparator,
     createToolbarController,
   } from "@ui-sdk/svelte"
-  import { toolbarFixture as f, toolbarLocked, toolbarOptions } from "tests/fixtures/toolbar.ts"
+  import {
+    toolbarFixture as f,
+    toolbarLocked,
+    toolbarOptions,
+  } from "tests/fixtures/toolbar.ts"
 
   let action = $state("")
   const controller = createToolbarController()
@@ -32,7 +36,11 @@
 
 <!-- Declared outside the toolbar: a snippet inside a component's tag becomes one of its props. -->
 {#snippet spellcheckToggle()}
-  <Toggle class="toggle" onPressedChange={(pressed) => (action = `spellcheck: ${pressed ? "on" : "off"}`)}>
+  <Toggle
+    class="toggle"
+    onPressedChange={(pressed) =>
+      (action = `spellcheck: ${pressed ? "on" : "off"}`)}
+  >
     {f.spellcheck.label}
   </Toggle>
 {/snippet}
@@ -50,17 +58,24 @@
           aria-label={group.label}
           multiple={group.multiple}
           defaultValue={group.defaultValue}
-          onValueChange={(value) => (action = `${group.label}: ${value.join(", ") || "none"}`)}
+          onValueChange={(value) =>
+            (action = `${group.label}: ${value.join(", ") || "none"}`)}
         >
           {#each group.items as item (item.value)}
-            <Toggle class="toggle" value={item.value} disabled={(item as { disabled?: boolean }).disabled}>
+            <Toggle
+              class="toggle"
+              value={item.value}
+              disabled={(item as { disabled?: boolean }).disabled}
+            >
               {item.label}
             </Toggle>
           {/each}
         </ToggleGroup>
       {/snippet}
       {#if lockable && index === 0}
-        <ToolbarGroup aria-label="Locked style" disabled={locked}>{@render toggles()}</ToolbarGroup>
+        <ToolbarGroup aria-label="Locked style" disabled={locked}
+          >{@render toggles()}</ToolbarGroup
+        >
       {:else}
         {@render toggles()}
       {/if}
@@ -80,7 +95,10 @@
         {/each}
       </MenuContent>
     </Menu>
-    <NumberInput defaultValue={f.size.defaultValue} onValueChange={(value) => (action = `size: ${value}`)}>
+    <NumberInput
+      defaultValue={f.size.defaultValue}
+      onValueChange={(value) => (action = `size: ${value}`)}
+    >
       <ToolbarInput aria-label={f.size.label}>
         {#snippet render({ props })}
           <NumberInputControl {...props} />
@@ -88,7 +106,11 @@
       </ToolbarInput>
     </NumberInput>
     <ToolbarInput aria-label={f.comment.label} value={f.comment.defaultValue} />
-    <ToolbarGroup class="toolbar-group" aria-label={f.history.label} disabled={lockable && locked}>
+    <ToolbarGroup
+      class="toolbar-group"
+      aria-label={f.history.label}
+      disabled={lockable && locked}
+    >
       {#each f.history.items as item (item.label)}
         <ToolbarButton
           disabled={(item as { disabled?: boolean }).disabled}
@@ -99,12 +121,16 @@
       {/each}
     </ToolbarGroup>
     {#if lockable}
-      <ToolbarGroup aria-label="Locked proofing" disabled={locked}>{@render spellcheckToggle()}</ToolbarGroup>
+      <ToolbarGroup aria-label="Locked proofing" disabled={locked}
+        >{@render spellcheckToggle()}</ToolbarGroup
+      >
     {:else}
       {@render spellcheckToggle()}
     {/if}
     {#if lockable}
-      <ToolbarGroup aria-label="Locked help" disabled={locked}>{@render helpLink()}</ToolbarGroup>
+      <ToolbarGroup aria-label="Locked help" disabled={locked}
+        >{@render helpLink()}</ToolbarGroup
+      >
     {:else}
       {@render helpLink()}
     {/if}

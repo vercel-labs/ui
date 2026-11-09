@@ -3,7 +3,9 @@ import { createSignal } from "solid-js"
 
 export function Example() {
   const [text, setText] = createSignal("")
-  const [status, setStatus] = createSignal("Focus the note to turn on its shortcuts.")
+  const [status, setStatus] = createSignal(
+    "Focus the note to turn on its shortcuts."
+  )
 
   useShortcut(
     "mod+enter",
@@ -14,7 +16,7 @@ export function Example() {
       scope: "note",
       when: () => text().trim() !== "",
       description: "Save the note",
-    },
+    }
   )
   useShortcut(
     "escape",
@@ -22,7 +24,7 @@ export function Example() {
       setText("")
       setStatus("Cleared")
     },
-    { scope: "note", allowInInput: true, description: "Clear the note" },
+    { scope: "note", allowInInput: true, description: "Clear the note" }
   )
 
   return (

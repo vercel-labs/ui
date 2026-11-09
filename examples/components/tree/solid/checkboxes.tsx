@@ -84,7 +84,9 @@ function Example() {
       mode="none"
       checkStrategy="trunk"
       defaultChecked={["react", "postgres"]}
-      onCheckedChange={(checked) => log(`Checked ${checked.join(", ") || "nothing"}`)}
+      onCheckedChange={(checked) =>
+        log(`Checked ${checked.join(", ") || "nothing"}`)
+      }
       defaultExpanded={["frontend", "backend", "databases"]}
     >
       <Items items={items} />

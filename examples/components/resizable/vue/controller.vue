@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { createResizableController, Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizable"
+import {
+  createResizableController,
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/vue/resizable"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
@@ -7,7 +12,7 @@ const editor = createResizableController()
 
 function read() {
   log(
-    `Layout ${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed("controller-sidebar") ? ", collapsed" : ""}`,
+    `Layout ${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed("controller-sidebar") ? ", collapsed" : ""}`
   )
 }
 </script>
@@ -15,13 +20,27 @@ function read() {
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <button type="button" @click="editor.collapse('controller-sidebar')">Collapse</button>
-      <button type="button" @click="editor.expand('controller-sidebar')">Expand</button>
-      <button type="button" @click="editor.resize('controller-sidebar', '240px')">240px</button>
+      <button type="button" @click="editor.collapse('controller-sidebar')">
+        Collapse
+      </button>
+      <button type="button" @click="editor.expand('controller-sidebar')">
+        Expand
+      </button>
+      <button
+        type="button"
+        @click="editor.resize('controller-sidebar', '240px')"
+      >
+        240px
+      </button>
       <button type="button" @click="read">Read</button>
     </div>
     <Resizable :controller="editor">
-      <ResizablePanel id="controller-sidebar" :default-size="30" :min-size="20" collapsible>
+      <ResizablePanel
+        id="controller-sidebar"
+        :default-size="30"
+        :min-size="20"
+        collapsible
+      >
         <h3>Files</h3>
         <ul>
           <li>page.tsx</li>

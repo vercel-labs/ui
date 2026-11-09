@@ -7,7 +7,9 @@ import { defineTabsElements } from "../src/tabs"
 const wait = () => new Promise((resolve) => setTimeout(resolve, 20))
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   defineTabsElements()
 })
 

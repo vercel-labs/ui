@@ -5,7 +5,12 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/react/date-picker"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import {
@@ -27,10 +32,18 @@ function Fixture() {
           setSubmitted(JSON.stringify([...new FormData(event.currentTarget)]))
         }}
       >
-        <Field className="field" name={datePickerFixture.name} disabled={disabled}>
+        <Field
+          className="field"
+          name={datePickerFixture.name}
+          disabled={disabled}
+        >
           <FieldLabel>{f.label}</FieldLabel>
           {shown && (
-            <DatePicker className="date-picker" today={datePickerFixture.today} required={required}>
+            <DatePicker
+              className="date-picker"
+              today={datePickerFixture.today}
+              required={required}
+            >
               <DatePickerInput />
               <DatePickerTrigger />
               <DatePickerHint className="date-picker-hint" />
@@ -56,7 +69,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

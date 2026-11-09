@@ -16,7 +16,9 @@ const command: TriggerRule = { char: "/", boundary: "start" }
 // The match for text that ends at the caret, as `query@start` or null.
 function match(text: string, rules: TriggerRule[] = [mention], offset = 0) {
   const found = findTriggerMatch(text, offset, rules)
-  return found ? `${found.match.trigger}${found.match.query}@${found.match.start}` : null
+  return found
+    ? `${found.match.trigger}${found.match.query}@${found.match.start}`
+    : null
 }
 
 describe("findTriggerMatch", () => {
@@ -71,11 +73,15 @@ describe("findTriggerMatch", () => {
   })
 
   test("boundary anywhere matches mid-word", () => {
-    expect(match("mail@al", [{ char: "@", boundary: "anywhere" }])).toBe("@al@4")
+    expect(match("mail@al", [{ char: "@", boundary: "anywhere" }])).toBe(
+      "@al@4"
+    )
   })
 
   test("spaces allow phrases, and a number caps the words", () => {
-    expect(match("@next wed", [{ char: "@", spaces: true }])).toBe("@next wed@0")
+    expect(match("@next wed", [{ char: "@", spaces: true }])).toBe(
+      "@next wed@0"
+    )
     expect(match("@next ", [{ char: "@", spaces: true }])).toBe("@next @0")
     expect(match("@a  b", [{ char: "@", spaces: true }])).toBeNull()
     expect(match("@a b", [{ char: "@", spaces: 2 }])).toBe("@a b@0")
@@ -141,13 +147,29 @@ describe("mapDismissed", () => {
   const dismissed: DismissedMatch = { trigger: "@", start: 3, end: 6 }
 
   test("an edit before shifts it", () => {
-    expect(mapDismissed(dismissed, { start: 0, end: 0 }, 2)).toEqual({ trigger: "@", start: 5, end: 8 })
-    expect(mapDismissed(dismissed, { start: 0, end: 2 }, 0)).toEqual({ trigger: "@", start: 1, end: 4 })
+    expect(mapDismissed(dismissed, { start: 0, end: 0 }, 2)).toEqual({
+      trigger: "@",
+      start: 5,
+      end: 8,
+    })
+    expect(mapDismissed(dismissed, { start: 0, end: 2 }, 0)).toEqual({
+      trigger: "@",
+      start: 1,
+      end: 4,
+    })
   })
 
   test("typing at its end or inside grows it", () => {
-    expect(mapDismissed(dismissed, { start: 6, end: 6 }, 3)).toEqual({ trigger: "@", start: 3, end: 9 })
-    expect(mapDismissed(dismissed, { start: 5, end: 6 }, 0)).toEqual({ trigger: "@", start: 3, end: 5 })
+    expect(mapDismissed(dismissed, { start: 6, end: 6 }, 3)).toEqual({
+      trigger: "@",
+      start: 3,
+      end: 9,
+    })
+    expect(mapDismissed(dismissed, { start: 5, end: 6 }, 0)).toEqual({
+      trigger: "@",
+      start: 3,
+      end: 5,
+    })
   })
 
   test("deleting or replacing the trigger clears it", () => {
@@ -161,14 +183,19 @@ describe("mapDismissed", () => {
 
   test("random edits never leave a range that ends before its trigger", () => {
     let seed = 7
-    const random = () => (seed = (seed * 1103515245 + 12345) % 2 ** 31) / 2 ** 31
+    const random = () =>
+      (seed = (seed * 1103515245 + 12345) % 2 ** 31) / 2 ** 31
     for (let run = 0; run < 2000; run++) {
       let range: DismissedMatch | null = { trigger: "@", start: 5, end: 9 }
       for (let step = 0; step < 10 && range; step++) {
         const start = Math.floor(random() * 20)
         const end = start + Math.floor(random() * 4)
         range = mapDismissed(range, { start, end }, Math.floor(random() * 4))
-        if (range) expect(range.end).toBeGreaterThanOrEqual(range.start + range.trigger.length)
+        if (range) {
+          expect(range.end).toBeGreaterThanOrEqual(
+            range.start + range.trigger.length
+          )
+        }
       }
     }
   })

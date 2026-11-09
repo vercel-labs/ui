@@ -60,8 +60,12 @@ function Example() {
       <CalendarHeading />
       <CalendarNext />
       <CalendarGrid>
-        <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-        <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+        <CalendarWeekdays>
+          {(index) => <CalendarWeekday index={index} />}
+        </CalendarWeekdays>
+        <CalendarWeeks>
+          {(cell) => <CalendarDay value={cell.date} />}
+        </CalendarWeeks>
       </CalendarGrid>
     </Calendar>
   )
@@ -318,7 +322,10 @@ Props and callbacks are the same as below, as React props.
 
 ### Calendar
 
-<TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarOptions" />
+<TypeTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarOptions"
+/>
 
 ### CalendarPrevious
 
@@ -342,7 +349,10 @@ A native `select` of the years from `min` to `max`, or 10 either side of the yea
 
 ### CalendarGrid
 
-<TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarGridProps" />
+<TypeTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarGridProps"
+/>
 
 ### CalendarWeekdays
 
@@ -350,7 +360,10 @@ Renders the header row. Its children are a function that receives each weekday's
 
 ### CalendarWeekday
 
-<TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarWeekdayProps" />
+<TypeTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarWeekdayProps"
+/>
 
 ### CalendarWeeks
 
@@ -358,7 +371,10 @@ Renders the week rows. Its children are a function that receives each cell, with
 
 ### CalendarDay
 
-<TypeTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarDayProps" />
+<TypeTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarDayProps"
+/>
 
 ### State
 
@@ -366,31 +382,52 @@ What render functions, state-based class names and children functions receive, p
 
 `Calendar`:
 
-<StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarState" />
+<StateTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarState"
+/>
 
 `CalendarHeading`:
 
-<StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarHeadingState" />
+<StateTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarHeadingState"
+/>
 
 `CalendarMonthSelect` and `CalendarYearSelect`:
 
-<StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarSelectState" />
+<StateTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarSelectState"
+/>
 
 `CalendarPrevious` and `CalendarNext`:
 
-<StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarStepState" />
+<StateTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarStepState"
+/>
 
 `CalendarGrid`:
 
-<StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarGridState" />
+<StateTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarGridState"
+/>
 
 `CalendarWeekday`:
 
-<StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarWeekdayState" />
+<StateTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarWeekdayState"
+/>
 
 `CalendarDay`:
 
-<StateTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarDayState" />
+<StateTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarDayState"
+/>
 
 ### Reasons
 
@@ -426,7 +463,10 @@ And why a range's start changed:
 
 Create one with `createCalendarController()` and pass it as `controller`. Every write method takes an optional `{ reason, event }` and returns `false` when the change is canceled, there's nowhere to go, or the calendar is disabled or read-only.
 
-<ControllerTable path="../../packages/core/src/components/calendar/calendar.ts" name="CalendarController" />
+<ControllerTable
+  path="../../packages/core/src/components/calendar/calendar.ts"
+  name="CalendarController"
+/>
 
 ### Events
 

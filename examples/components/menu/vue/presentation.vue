@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { ChevronRightIcon, DownloadIcon, LinkIcon, ShareIcon, TrashIcon } from "@lucide/vue"
+import {
+  ChevronRightIcon,
+  DownloadIcon,
+  LinkIcon,
+  ShareIcon,
+  TrashIcon,
+} from "@lucide/vue"
 import {
   Menu,
   MenuContent,

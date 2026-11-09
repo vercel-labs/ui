@@ -18,11 +18,18 @@ function Fixture() {
       <button>Before</button>
       <Autocomplete name={f.name}>
         <AutocompleteLabel className="label">{f.label}</AutocompleteLabel>
-        <AutocompleteInput className={(state) => `input ${state.open ? "is-open" : "is-closed"}`} />
+        <AutocompleteInput
+          className={(state) => `input ${state.open ? "is-open" : "is-closed"}`}
+        />
         <AutocompleteTrigger aria-label={f.trigger}>▾</AutocompleteTrigger>
         <AutocompleteContent className="popup list-popup">
           <AutocompleteList>
-            <AutocompleteItem className="item" value="docs" label="Docs" render={<a href="#docs" />}>
+            <AutocompleteItem
+              className="item"
+              value="docs"
+              label="Docs"
+              render={<a href="#docs" />}
+            >
               Docs
             </AutocompleteItem>
             {f.items.slice(0, 3).map((item) => (
@@ -51,7 +58,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

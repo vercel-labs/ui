@@ -45,17 +45,29 @@ const span = (start: number, end: number) =>
  * ```
  * @stable
  */
-function paginationRange({ page, pageCount, siblings, boundaries }: PaginationRangeOptions) {
+function paginationRange({
+  page,
+  pageCount,
+  siblings,
+  boundaries,
+}: PaginationRangeOptions) {
   const total = count(pageCount, 0)
   const around = count(siblings, 1)
   const ends = count(boundaries, 1)
-  if (total === 0) return [] as PaginationRangeItem[]
+  if (total === 0) {
+    return [] as PaginationRangeItem[]
+  }
   const current = clampPage(page, total)
   // Both ends, the current page with its siblings, and two gaps.
   const slots = 2 * ends + 2 * around + 3
-  if (total <= slots) return span(1, total) as PaginationRangeItem[]
+  if (total <= slots) {
+    return span(1, total) as PaginationRangeItem[]
+  }
   // The window around the current page slides to stay clear of the ends, so the length never changes.
-  const start = Math.min(Math.max(current - around, ends + 2), total - ends - 1 - 2 * around)
+  const start = Math.min(
+    Math.max(current - around, ends + 2),
+    total - ends - 1 - 2 * around
+  )
   const end = start + 2 * around
   return [
     ...span(1, ends),
@@ -68,14 +80,24 @@ function paginationRange({ page, pageCount, siblings, boundaries }: PaginationRa
 
 /** A page number brought within 1 and `pageCount`. Anything that isn't a number is page 1. */
 function clampPage(page: number, pageCount: number) {
-  if (!Number.isFinite(page)) return 1
+  if (!Number.isFinite(page)) {
+    return 1
+  }
   return Math.min(Math.max(Math.round(page), 1), Math.max(1, pageCount))
 }
 
 /** How many pages `total` items fill, `pageSize` to a page. Never less than 1. */
 function pageCountOf(total: number, pageSize: number) {
-  if (!Number.isFinite(total) || !Number.isFinite(pageSize) || pageSize <= 0) return 1
+  if (!Number.isFinite(total) || !Number.isFinite(pageSize) || pageSize <= 0) {
+    return 1
+  }
   return Math.max(1, Math.ceil(total / pageSize))
 }
 
-export { clampPage, pageCountOf, paginationRange, type PaginationRangeItem, type PaginationRangeOptions }
+export {
+  clampPage,
+  pageCountOf,
+  paginationRange,
+  type PaginationRangeItem,
+  type PaginationRangeOptions,
+}

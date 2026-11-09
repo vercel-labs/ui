@@ -2,7 +2,10 @@ import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { fieldRadiosFixture as f, fieldRadiosOptions } from "tests/fixtures/field.ts"
+import {
+  fieldRadiosFixture as f,
+  fieldRadiosOptions,
+} from "tests/fixtures/field.ts"
 
 function Fixture() {
   const { disabledField } = fieldRadiosOptions()
@@ -14,8 +17,16 @@ function Fixture() {
         <FieldLabel>{f.label}</FieldLabel>
         <RadioGroup className="form" name={f.name}>
           {f.sizes.map((size, index) => (
-            <Field key={size.value} className="row" disabled={index === 0 && disabledField}>
-              <Radio className="radio" value={size.value} disabled={index === 0 && firstDisabled}>
+            <Field
+              key={size.value}
+              className="row"
+              disabled={index === 0 && disabledField}
+            >
+              <Radio
+                className="radio"
+                value={size.value}
+                disabled={index === 0 && firstDisabled}
+              >
                 <RadioIndicator className="radio-indicator" />
               </Radio>
               <FieldLabel>{size.label}</FieldLabel>
@@ -24,7 +35,9 @@ function Fixture() {
         </RadioGroup>
       </Field>
       <button>After</button>
-      <button onClick={() => setFirstDisabled((disabled) => !disabled)}>{f.disableFirst}</button>
+      <button onClick={() => setFirstDisabled((disabled) => !disabled)}>
+        {f.disableFirst}
+      </button>
     </div>
   )
 }
@@ -33,7 +46,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

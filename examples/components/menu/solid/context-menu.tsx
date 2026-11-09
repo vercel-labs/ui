@@ -1,4 +1,10 @@
-import { Menu, MenuContent, MenuContextTrigger, MenuItem, MenuSeparator } from "@ui-sdk/solid/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuContextTrigger,
+  MenuItem,
+  MenuSeparator,
+} from "@ui-sdk/solid/menu"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
@@ -6,7 +12,9 @@ function Example() {
 
   return (
     <Menu onAction={(value) => log(`Chose ${value}`)}>
-      <MenuContextTrigger tabindex={0}>Right-click or long-press here</MenuContextTrigger>
+      <MenuContextTrigger tabindex={0}>
+        Right-click or long-press here
+      </MenuContextTrigger>
       <MenuContent>
         <MenuItem value="back">Back</MenuItem>
         <MenuItem value="forward" disabled>

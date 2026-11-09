@@ -2,7 +2,12 @@
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
 
 const folders = [
-  { value: "inbox", label: "Inbox", count: 12, content: "12 conversations, 3 of them unread." },
+  {
+    value: "inbox",
+    label: "Inbox",
+    count: 12,
+    content: "12 conversations, 3 of them unread.",
+  },
   {
     value: "unread",
     label: "Unread",
@@ -21,17 +26,27 @@ const folders = [
 <template>
   <Tabs default-value="inbox">
     <TabsList aria-label="Mail">
-      <TabsTab v-for="folder in folders" :key="folder.value" :value="folder.value">
+      <TabsTab
+        v-for="folder in folders"
+        :key="folder.value"
+        :value="folder.value"
+      >
         <template #render="{ props, children }">
           <button v-bind="props">
             <component :is="children" />
-            <span v-if="folder.count > 0" data-slot="badge">{{ folder.count }}</span>
+            <span v-if="folder.count > 0" data-slot="badge">{{
+              folder.count
+            }}</span>
           </button>
         </template>
         {{ folder.label }}
       </TabsTab>
     </TabsList>
-    <TabsPanel v-for="folder in folders" :key="folder.value" :value="folder.value">
+    <TabsPanel
+      v-for="folder in folders"
+      :key="folder.value"
+      :value="folder.value"
+    >
       {{ folder.content }}
     </TabsPanel>
   </Tabs>

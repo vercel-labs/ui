@@ -24,7 +24,11 @@ import {
   type MenuTriggerProps,
   type MenuTriggerState,
 } from "@ui-sdk/core/menu"
-import { menuCheckable, menuContextTrigger, menuItemIcons } from "@ui-sdk/core/renderer"
+import {
+  menuCheckable,
+  menuContextTrigger,
+  menuItemIcons,
+} from "@ui-sdk/core/renderer"
 import * as React from "react"
 import { hasChild, Placed, usePlaceContent, usePlacedContent } from "./children"
 import { MenubarContext } from "./menubar-context"
@@ -50,7 +54,11 @@ import {
   type PartProps,
 } from "./use-primitive"
 
-const parts = createParts(menuPrimitive, { trigger: "button", shortcut: "span", separator: "div" })
+const parts = createParts(menuPrimitive, {
+  trigger: "button",
+  shortcut: "span",
+  separator: "div",
+})
 // Radio items take their group's name, and read its value as it renders.
 sharesProps(menuPrimitive, "radio-group")
 
@@ -74,7 +82,8 @@ function useRadioGroup() {
 }
 
 // Element props that mean something else on a menu part.
-type Clashing = "value" | "defaultValue" | "onChange" | "onSelect" | "defaultChecked"
+type Clashing =
+  "value" | "defaultValue" | "onChange" | "onSelect" | "defaultChecked"
 
 /**
  * The props of `Menu`.
@@ -138,7 +147,11 @@ function MenuTrigger({
       disabled: !!disabled,
     })
   return (
-    <Connected primitive={menuPrimitive} controller={controller} fallback={unconnected}>
+    <Connected
+      primitive={menuPrimitive}
+      controller={controller}
+      fallback={unconnected}
+    >
       <parts.Trigger {...props} />
     </Connected>
   )
@@ -153,9 +166,14 @@ function MenuContextTrigger({
   ...props
 }: PartProps<"div", MenuContextTriggerState> & MenuContextTriggerProps) {
   const { disabled, payload: _, render, ...rest } = props
-  const unconnected = () => renderElement("div", rest, render, { open: false, disabled: !!disabled })
+  const unconnected = () =>
+    renderElement("div", rest, render, { open: false, disabled: !!disabled })
   return (
-    <Connected primitive={menuPrimitive} controller={controller} fallback={unconnected}>
+    <Connected
+      primitive={menuPrimitive}
+      controller={controller}
+      fallback={unconnected}
+    >
       <ContextTriggerPart {...props} />
     </Connected>
   )
@@ -168,7 +186,12 @@ function ContextTriggerPart({
 }: PartProps<"div", MenuContextTriggerState> & MenuContextTriggerProps) {
   const menu = useMenu()
   menu.instance.use(menuContextTrigger)
-  return usePart(menu, "context-trigger", { id: React.useId(), disabled, payload }, props)
+  return usePart(
+    menu,
+    "context-trigger",
+    { id: React.useId(), disabled, payload },
+    props
+  )
 }
 
 /**
@@ -204,10 +227,10 @@ function MenuContent<Payload = unknown>({
   // Submenus render inside their parent's popup.
   const nested = menu.api.root() !== menu.api
   // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
-  const partProps = { ...props, render: nested ? render : sheetViewport(menu, render) } as PartProps<
-    "div",
-    MenuContentState
-  >
+  const partProps = {
+    ...props,
+    render: nested ? render : sheetViewport(menu, render),
+  } as PartProps<"div", MenuContentState>
   const element = usePart(menu, "content", content, partProps)
   return element && (nested ? element : renderPopup(element, target))
 }
@@ -230,11 +253,24 @@ function MenuItem({
 }: Omit<PartProps<"div", MenuItemState>, Clashing> & MenuItemProps) {
   const menu = useMenu()
   const id = React.useId()
-  const item = { id, value, label, disabled, shortcut, closeOnSelect, destructive, onSelect }
+  const item = {
+    id,
+    value,
+    label,
+    disabled,
+    shortcut,
+    closeOnSelect,
+    destructive,
+    onSelect,
+  }
   const content = (state: MenuItemState) => (
     <>
       {typeof children === "function" ? children(state) : children}
-      {shortcut && <MenuShortcut>{formatShortcut(shortcut, menu.state.apple)}</MenuShortcut>}
+      {shortcut && (
+        <MenuShortcut>
+          {formatShortcut(shortcut, menu.state.apple)}
+        </MenuShortcut>
+      )}
     </>
   )
   return usePart(menu, "item", item, { ...props, children: content, render })
@@ -260,11 +296,23 @@ function MenuCheckboxItem({
   closeOnSelect,
   render,
   ...props
-}: Omit<PartProps<"div", MenuCheckboxItemState>, Clashing> & MenuCheckboxItemProps) {
+}: Omit<PartProps<"div", MenuCheckboxItemState>, Clashing> &
+  MenuCheckboxItemProps) {
   const menu = useMenu()
   menu.instance.use(menuCheckable)
-  const item = { value, label, disabled, checked, defaultChecked, onCheckedChange, closeOnSelect }
-  const indicator = React.useMemo(() => ({ item: "checkbox-item" as const, itemKey: value }), [value])
+  const item = {
+    value,
+    label,
+    disabled,
+    checked,
+    defaultChecked,
+    onCheckedChange,
+    closeOnSelect,
+  }
+  const indicator = React.useMemo(
+    () => ({ item: "checkbox-item" as const, itemKey: value }),
+    [value]
+  )
   return (
     <ItemContext.Provider value={indicator}>
       {usePart(menu, "checkbox-item", item, { ...props, render })}
@@ -283,7 +331,8 @@ function MenuRadioGroup<T extends string = string>({
   onValueChange,
   render,
   ...props
-}: Omit<PartProps<"div", MenuRadioGroupState>, Clashing> & MenuRadioGroupProps<T>) {
+}: Omit<PartProps<"div", MenuRadioGroupState>, Clashing> &
+  MenuRadioGroupProps<T>) {
   const menu = useMenu()
   menu.instance.use(menuCheckable)
   const generated = React.useId()
@@ -316,9 +365,11 @@ function MenuRadioItem({
   const item = { group: group ?? "", value, label, disabled, closeOnSelect }
   const indicator = React.useMemo(
     () => ({ item: "radio-item" as const, itemKey: value, group: group ?? "" }),
-    [value, group],
+    [value, group]
   )
-  if (!group) throw new Error("<MenuRadioItem> must be used inside <MenuRadioGroup>.")
+  if (!group) {
+    throw new Error("<MenuRadioItem> must be used inside <MenuRadioGroup>.")
+  }
   return (
     <ItemContext.Provider value={indicator}>
       {usePart(menu, "radio-item", item, { ...props, render })}
@@ -339,9 +390,19 @@ function MenuItemIndicator({
   menu.instance.use(menuCheckable)
   const id = React.useId()
   const item = React.useContext(ItemContext)
-  if (!item) throw new Error("<MenuItemIndicator> must be used inside a checkbox or radio item.")
+  if (!item) {
+    throw new Error(
+      "<MenuItemIndicator> must be used inside a checkbox or radio item."
+    )
+  }
   const indicator = { id, ...item, keepMounted }
-  return usePart(menu, "item-indicator", indicator, { ...props, render }, "span")
+  return usePart(
+    menu,
+    "item-indicator",
+    indicator,
+    { ...props, render },
+    "span"
+  )
 }
 
 /**
@@ -368,7 +429,9 @@ function MenuGroup(props: PartProps<"div">) {
   const id = React.useId()
   // It's named by its label once the label is in the page.
   return (
-    <GroupContext.Provider value={id}>{usePart(useMenu(), "group", { id }, props)}</GroupContext.Provider>
+    <GroupContext.Provider value={id}>
+      {usePart(useMenu(), "group", { id }, props)}
+    </GroupContext.Provider>
   )
 }
 
@@ -381,8 +444,18 @@ function MenuGroupLabel({ render, ...props }: PartProps<"div">) {
   const radioGroup = useRadioGroup()
   const plainGroup = React.useContext(GroupContext)
   const group = radioGroup ?? plainGroup
-  if (!group) throw new Error("<MenuGroupLabel> must be used inside <MenuGroup> or <MenuRadioGroup>.")
-  return usePart(menu, "group-label", { id: group, group }, { ...props, render }, "div")
+  if (!group) {
+    throw new Error(
+      "<MenuGroupLabel> must be used inside <MenuGroup> or <MenuRadioGroup>."
+    )
+  }
+  return usePart(
+    menu,
+    "group-label",
+    { id: group, group },
+    { ...props, render },
+    "div"
+  )
 }
 
 /**
@@ -397,7 +470,14 @@ const MenuSeparator = parts.Separator
  */
 type MenuSubProps = Pick<
   MenuOptions,
-  "open" | "defaultOpen" | "onOpenChange" | "onOpenChangeComplete" | "loop" | "delay" | "controller" | "debug"
+  | "open"
+  | "defaultOpen"
+  | "onOpenChange"
+  | "onOpenChangeComplete"
+  | "loop"
+  | "delay"
+  | "controller"
+  | "debug"
 > & { children?: React.ReactNode }
 
 /**
@@ -434,7 +514,8 @@ const MenuSubContent = MenuContent
  */
 function MenuItems({ items }: { items: MenuData }) {
   return items.map((entry, index) => {
-    const item: MenuDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+    const item: MenuDataItem =
+      typeof entry === "string" ? { value: entry, label: entry } : entry
     switch (item.type) {
       case undefined:
       case "item":
@@ -482,7 +563,11 @@ function MenuItems({ items }: { items: MenuData }) {
           >
             {item.label && <MenuGroupLabel>{item.label}</MenuGroupLabel>}
             {item.items.map((radio) => (
-              <MenuRadioItem key={radio.value} value={radio.value} disabled={radio.disabled}>
+              <MenuRadioItem
+                key={radio.value}
+                value={radio.value}
+                disabled={radio.disabled}
+              >
                 {radio.label}
               </MenuRadioItem>
             ))}
@@ -491,7 +576,9 @@ function MenuItems({ items }: { items: MenuData }) {
       case "submenu":
         return (
           <MenuSub key={`submenu-${index}`}>
-            <MenuSubTrigger disabled={item.disabled}>{item.label}</MenuSubTrigger>
+            <MenuSubTrigger disabled={item.disabled}>
+              {item.label}
+            </MenuSubTrigger>
             <MenuSubContent>
               <MenuItems items={item.items} />
             </MenuSubContent>

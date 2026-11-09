@@ -25,5 +25,5 @@ test.each(components)(
   ({ name, source }) => {
     const entry = readFileSync(path.join(entries, `${name}.ts`), "utf8")
     expect(controllers(entry)).toEqual(controllers(source))
-  },
+  }
 )

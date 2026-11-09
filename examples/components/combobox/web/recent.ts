@@ -18,11 +18,19 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 const recentCountries = [
-  { type: "group" as const, label: "Recent", items: [countries[9], countries[12], countries[15]] },
+  {
+    type: "group" as const,
+    label: "Recent",
+    items: [countries[9], countries[12], countries[15]],
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -56,7 +64,8 @@ function mount(root: HTMLElement) {
   `
   const combobox = root.querySelector("ui-combobox")!
   combobox.emptyItems = recentCountries
-  combobox.announcement = (change) => (change.type === "results" ? `${change.count} countries match` : null)
+  combobox.announcement = (change) =>
+    change.type === "results" ? `${change.count} countries match` : null
   combobox.items = countries
 }
 

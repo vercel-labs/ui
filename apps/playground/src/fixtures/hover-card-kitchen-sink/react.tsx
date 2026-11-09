@@ -1,4 +1,9 @@
-import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@ui-sdk/react/hover-card"
+import {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/react/hover-card"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
@@ -18,15 +23,20 @@ function Body({ variant, name }: { variant: Variant; name: string }) {
       </div>
     </div>
   )
-  const bio = <p className={classes.bio}>{variant.note ?? "Writes about headless components."}</p>
-  if (variant.body === "text")
+  const bio = (
+    <p className={classes.bio}>
+      {variant.note ?? "Writes about headless components."}
+    </p>
+  )
+  if (variant.body === "text") {
     return (
       <>
         {heading}
         {bio}
       </>
     )
-  if (variant.body === "long")
+  }
+  if (variant.body === "long") {
     return (
       <>
         {heading}
@@ -35,7 +45,8 @@ function Body({ variant, name }: { variant: Variant; name: string }) {
         ))}
       </>
     )
-  if (variant.body === "tooltip")
+  }
+  if (variant.body === "tooltip") {
     return (
       <>
         {heading}
@@ -50,6 +61,7 @@ function Body({ variant, name }: { variant: Variant; name: string }) {
         </div>
       </>
     )
+  }
   return (
     <>
       {heading}
@@ -74,10 +86,16 @@ function Content({ variant, env }: { variant: Variant; env: Env }) {
     >
       {(state) => (
         <>
-          {variant.arrow !== false && <HoverCardArrow className={classes.arrow} />}
+          {variant.arrow !== false && (
+            <HoverCardArrow className={classes.arrow} />
+          )}
           <Body
             variant={variant}
-            name={variant.controller ? String(state.payload ?? "nobody") : variant.id}
+            name={
+              variant.controller
+                ? String(state.payload ?? "nobody")
+                : variant.id
+            }
           />
         </>
       )}
@@ -92,13 +110,16 @@ function VariantHoverCard({ variant, env }: { variant: Variant; env: Env }) {
     container: env.container,
     ...(variant.controlled && { open }),
     onOpenChange: (next: boolean, details: { reason: string }) => {
-      if (variant.controlled) setOpen(next)
+      if (variant.controlled) {
+        setOpen(next)
+      }
       env.log(`openChange ${next} (${details.reason})`)
     },
-    onOpenChangeComplete: (next: boolean) => env.log(`openChangeComplete ${next}`),
+    onOpenChangeComplete: (next: boolean) =>
+      env.log(`openChangeComplete ${next}`),
   }
 
-  if (variant.controller)
+  if (variant.controller) {
     return (
       <div className="flex gap-3">
         {authors.map((author) => (
@@ -117,6 +138,7 @@ function VariantHoverCard({ variant, env }: { variant: Variant; env: Env }) {
         </HoverCard>
       </div>
     )
+  }
 
   return (
     <div className="flex items-center gap-3">
@@ -128,7 +150,11 @@ function VariantHoverCard({ variant, env }: { variant: Variant; env: Env }) {
       </HoverCard>
       {variant.controlled && (
         <label className="flex items-center gap-1.5 text-xs text-neutral-600">
-          <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={open}
+            onChange={(event) => setOpen(event.target.checked)}
+          />
           open
         </label>
       )}
@@ -141,8 +167,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantHoverCard variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

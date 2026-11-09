@@ -1,12 +1,19 @@
 <script lang="ts">
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "@ui-sdk/svelte"
 
   let action = $state("")
 </script>
 
 <div class="fixture">
   <button>Before</button>
-  <Collapsible class="collapsible" onOpenChange={(open) => (action = open ? "open" : "closed")}>
+  <Collapsible
+    class="collapsible"
+    onOpenChange={(open) => (action = open ? "open" : "closed")}
+  >
     {#snippet children(state)}
       <span class={state.open ? "is-open" : "is-closed"} hidden></span>
       <CollapsibleTrigger class="collapsible-trigger">

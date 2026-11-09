@@ -1,4 +1,9 @@
-import { formatShortcut, type Anchor, type ChangeDetails, type DismissAttemptDetails } from "@ui-sdk/core"
+import {
+  formatShortcut,
+  type Anchor,
+  type ChangeDetails,
+  type DismissAttemptDetails,
+} from "@ui-sdk/core"
 import {
   menu as menuPrimitive,
   type MenuActionDetails,
@@ -14,9 +19,28 @@ import {
   type MenuValueChangeReason,
 } from "@ui-sdk/core/menu"
 import type { Side } from "@ui-sdk/core"
-import { menuCheckable, menuContextTrigger, menuItemIcons, type Feature } from "@ui-sdk/core/renderer"
-import { defineComponent, h, inject, provide, useId, type InjectionKey, type PropType, type VNode } from "vue"
-import { hasChild, NotPlaced, usePlaceContent, usePlacedContent } from "./children"
+import {
+  menuCheckable,
+  menuContextTrigger,
+  menuItemIcons,
+  type Feature,
+} from "@ui-sdk/core/renderer"
+import {
+  defineComponent,
+  h,
+  inject,
+  provide,
+  useId,
+  type InjectionKey,
+  type PropType,
+  type VNode,
+} from "vue"
+import {
+  hasChild,
+  NotPlaced,
+  usePlaceContent,
+  usePlacedContent,
+} from "./children"
 import { defineItemIcon } from "./item-icon"
 import { MenubarKey } from "./menubar-context"
 import {
@@ -45,10 +69,16 @@ import {
 import { renderless } from "./renderless"
 
 // Where root popups render. Set on <Menu> or <MenuContent>.
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("menu-container")
+const ContainerKey: InjectionKey<() => PopupContainer> =
+  Symbol("menu-container")
 // The checkbox or radio item an indicator belongs to.
-const ItemKey: InjectionKey<() => { item: "checkbox-item" | "radio-item"; itemKey: string; group?: string }> =
-  Symbol("menu-item")
+const ItemKey: InjectionKey<
+  () => {
+    item: "checkbox-item" | "radio-item"
+    itemKey: string
+    group?: string
+  }
+> = Symbol("menu-item")
 
 type OpenDetails = ChangeDetails<MenuOpenChangeReason>
 type PayloadDetails = ChangeDetails<MenuPayloadChangeReason>
@@ -58,7 +88,8 @@ const useMenu = () => useHandle(menuPrimitive)
 // The id of the group a label names: its radio group's name, or its group's id.
 const useGroup = () => {
   const around = useScope(menuPrimitive)?.around
-  return (around?.["radio-group"]?.().name ?? around?.group?.().id) as string | undefined
+  return (around?.["radio-group"]?.().name ?? around?.group?.().id) as
+    string | undefined
 }
 
 const parts = createParts(menuPrimitive, { shortcut: "span", separator: "div" })
@@ -79,23 +110,30 @@ const Menu = /* @__PURE__ */ renderless(
       loop: optionalBoolean,
       delay: Number,
       presentation: String as PropType<"auto" | "popover" | "sheet">,
-      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      modal: {
+        type: [Boolean, String] as PropType<boolean | "pointer">,
+        default: undefined,
+      },
       controller: Object as PropType<MenuController<any>>,
       dismissible: optionalBoolean,
       pendingAnnouncement: String,
       debug: optionalBoolean,
       container: containerProp,
       // A function prop beside the emits, so a returned Promise marks the item pending.
-      onAction: Function as PropType<(value: string, details: MenuActionDetails) => unknown>,
+      onAction: Function as PropType<
+        (value: string, details: MenuActionDetails) => unknown
+      >,
     },
     emits: {
       "update:open": (_open: boolean) => true,
       "update:modelValue": (_open: boolean) => true,
       openChange: (_open: boolean, _details: OpenDetails) => true,
       openChangeComplete: (_open: boolean) => true,
-      dismissAttempt: (_details: DismissAttemptDetails<MenuDismissReason>) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<MenuDismissReason>) =>
+        true,
       payloadChange: (_payload: unknown, _details: PayloadDetails) => true,
-      checkedChange: (_checked: boolean, _details: MenuCheckedChangeDetails) => true,
+      checkedChange: (_checked: boolean, _details: MenuCheckedChangeDetails) =>
+        true,
       valueChange: (_value: string, _details: MenuValueChangeDetails) => true,
     },
     setup(props, { slots, emit }) {
@@ -111,17 +149,22 @@ const Menu = /* @__PURE__ */ renderless(
         onOpenChange: (open: boolean, details: OpenDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("openChange", open, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:open", open)
           emit("update:modelValue", open)
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
         onDismissAttempt: (details: DismissAttemptDetails<MenuDismissReason>) =>
           emit("dismissAttempt", details),
         onPayloadChange: (payload: unknown, details: PayloadDetails) =>
           emit("payloadChange", payload, details),
-        onCheckedChange: (checked: boolean, details: MenuCheckedChangeDetails) =>
-          emit("checkedChange", checked, details),
+        onCheckedChange: (
+          checked: boolean,
+          details: MenuCheckedChangeDetails
+        ) => emit("checkedChange", checked, details),
         onValueChange: (value: string, details: MenuValueChangeDetails) =>
           emit("valueChange", value, details),
       }))
@@ -136,20 +179,20 @@ const Menu = /* @__PURE__ */ renderless(
           children,
           props.items &&
             !own &&
-            h(NotPlaced, () => h(MenuContent, null, () => h(MenuItems, { items: props.items! }))),
+            h(NotPlaced, () =>
+              h(MenuContent, null, () => h(MenuItems, { items: props.items! }))
+            ),
         ]
       }
     },
-  }),
+  })
 )
 
 // A trigger, inside the menu or anywhere a controller connects it.
-function triggerPart<S extends "trigger" | "context-trigger", Tag extends string>(
-  name: string,
-  slot: S,
-  tag: Tag,
-  feature?: Feature,
-) {
+function triggerPart<
+  S extends "trigger" | "context-trigger",
+  Tag extends string,
+>(name: string, slot: S, tag: Tag, feature?: Feature) {
   return withElement(
     tag,
     defineComponent({
@@ -165,7 +208,10 @@ function triggerPart<S extends "trigger" | "context-trigger", Tag extends string
       },
       slots: Object as PartSlots<typeof menuPrimitive, S>,
       setup(props, { slots, attrs }) {
-        const connected = useControllerTarget(menuPrimitive, () => props.controller)
+        const connected = useControllerTarget(
+          menuPrimitive,
+          () => props.controller
+        )
         const id = useId()
         const part = () => ({
           id,
@@ -176,7 +222,9 @@ function triggerPart<S extends "trigger" | "context-trigger", Tag extends string
         return useConnectedPart(
           connected,
           (menu) => {
-            if (feature) menu.instance.use(feature)
+            if (feature) {
+              menu.instance.use(feature)
+            }
             return usePart(menu, slot as "trigger", part, undefined, tag)
           },
           // Until the menu it names mounts, a trigger outside the menu is a plain element.
@@ -184,11 +232,11 @@ function triggerPart<S extends "trigger" | "context-trigger", Tag extends string
             renderUnbound(
               tag,
               { ...(tag === "button" && { type: "button" }), ...attrs },
-              { slots, state: { open: false, disabled: !!props.disabled } },
-            ),
+              { slots, state: { open: false, disabled: !!props.disabled } }
+            )
         )
       },
-    }),
+    })
   )
 }
 
@@ -205,7 +253,7 @@ const MenuContextTrigger = /* @__PURE__ */ triggerPart(
   "MenuContextTrigger",
   "context-trigger",
   "div",
-  menuContextTrigger,
+  menuContextTrigger
 )
 
 /**
@@ -244,13 +292,17 @@ const MenuContent = withPayload(
         const part = usePart(menu, "content", position)
         return () => {
           const element = part()
-          if (!element) return null
+          if (!element) {
+            return null
+          }
           // Submenus render inside their parent's popup.
-          return menu.api.root() !== menu.api ? element : renderPopup(sheetViewport(menu, element), target())
+          return menu.api.root() !== menu.api
+            ? element
+            : renderPopup(sheetViewport(menu, element), target())
         }
       },
-    }),
-  ),
+    })
+  )
 )
 
 /**
@@ -288,11 +340,14 @@ const MenuItem = withElement(
         tag: "div",
         children: (state) => [
           slots.default?.({ state }),
-          props.shortcut && h(MenuShortcut, null, () => formatShortcut(props.shortcut!, menu.state.apple)),
+          props.shortcut &&
+            h(MenuShortcut, null, () =>
+              formatShortcut(props.shortcut!, menu.state.apple)
+            ),
         ],
       })
     },
-  }),
+  })
 )
 
 /**
@@ -316,7 +371,10 @@ const MenuCheckboxItem = /* @__PURE__ */ withElement(
     emits: {
       "update:checked": (_checked: boolean) => true,
       "update:modelValue": (_checked: boolean) => true,
-      checkedChange: (_checked: boolean, _details: ChangeDetails<MenuCheckedChangeReason>) => true,
+      checkedChange: (
+        _checked: boolean,
+        _details: ChangeDetails<MenuCheckedChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof menuPrimitive, "checkbox-item">,
     setup(props, { emit }) {
@@ -326,17 +384,22 @@ const MenuCheckboxItem = /* @__PURE__ */ withElement(
       const item = () => ({
         ...props,
         checked: orModel(props.checked, props.modelValue),
-        onCheckedChange: (checked: boolean, details: ChangeDetails<MenuCheckedChangeReason>) => {
+        onCheckedChange: (
+          checked: boolean,
+          details: ChangeDetails<MenuCheckedChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("checkedChange", checked, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:checked", checked)
           emit("update:modelValue", checked)
         },
       })
       return usePart(menu, "checkbox-item", item)
     },
-  }),
+  })
 )
 
 /**
@@ -352,13 +415,22 @@ const MenuRadioGroup = /* @__PURE__ */ withElement(
       // Identifies the group in the menu's `valueChange`. Defaults to a generated id.
       name: String,
       value: { type: String as PropType<string | null>, default: undefined },
-      modelValue: { type: String as PropType<string | null>, default: undefined },
-      defaultValue: { type: String as PropType<string | null>, default: undefined },
+      modelValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
+      defaultValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
     },
     emits: {
       "update:value": (_value: string) => true,
       "update:modelValue": (_value: string) => true,
-      valueChange: (_value: string, _details: ChangeDetails<MenuValueChangeReason>) => true,
+      valueChange: (
+        _value: string,
+        _details: ChangeDetails<MenuValueChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof menuPrimitive, "radio-group">,
     setup(props, { emit }) {
@@ -373,17 +445,22 @@ const MenuRadioGroup = /* @__PURE__ */ withElement(
         defaultValue: props.defaultValue,
         id: name,
         name,
-        onValueChange: (value: string, details: ChangeDetails<MenuValueChangeReason>) => {
+        onValueChange: (
+          value: string,
+          details: ChangeDetails<MenuValueChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
       })
       return usePart(menu, "radio-group", group)
     },
-  }),
+  })
 )
 
 /**
@@ -405,13 +482,20 @@ const MenuRadioItem = /* @__PURE__ */ withElement(
     setup(props) {
       const menu = useMenu()
       menu.instance.use(menuCheckable)
-      const group = useScope(menuPrimitive)?.around["radio-group"]?.().name as string | undefined
-      if (!group) throw new Error("<MenuRadioItem> must be used inside <MenuRadioGroup>.")
-      provide(ItemKey, () => ({ item: "radio-item", itemKey: props.value, group }))
+      const group = useScope(menuPrimitive)?.around["radio-group"]?.().name as
+        string | undefined
+      if (!group) {
+        throw new Error("<MenuRadioItem> must be used inside <MenuRadioGroup>.")
+      }
+      provide(ItemKey, () => ({
+        item: "radio-item",
+        itemKey: props.value,
+        group,
+      }))
       const item = () => ({ ...props, group })
       return usePart(menu, "radio-item", item)
     },
-  }),
+  })
 )
 
 /**
@@ -431,11 +515,19 @@ const MenuItemIndicator = /* @__PURE__ */ withElement(
       menu.instance.use(menuCheckable)
       const id = useId()
       const item = inject(ItemKey, null)
-      if (!item) throw new Error("<MenuItemIndicator> must be used inside a checkbox or radio item.")
-      const indicator = () => ({ id, ...item(), keepMounted: props.keepMounted })
+      if (!item) {
+        throw new Error(
+          "<MenuItemIndicator> must be used inside a checkbox or radio item."
+        )
+      }
+      const indicator = () => ({
+        id,
+        ...item(),
+        keepMounted: props.keepMounted,
+      })
       return usePart(menu, "item-indicator", indicator, undefined, "span")
     },
-  }),
+  })
 )
 
 /**
@@ -443,7 +535,12 @@ const MenuItemIndicator = /* @__PURE__ */ withElement(
  * skip it, and `mirror` flips it in right-to-left text.
  * @stable
  */
-const MenuItemIcon = /* @__PURE__ */ defineItemIcon("MenuItemIcon", menuPrimitive, "item-icon", menuItemIcons)
+const MenuItemIcon = /* @__PURE__ */ defineItemIcon(
+  "MenuItemIcon",
+  menuPrimitive,
+  "item-icon",
+  menuItemIcons
+)
 
 /**
  * A group of items, named by its `MenuGroupLabel`.
@@ -461,7 +558,7 @@ const MenuGroup = withElement(
       provideProps(menuPrimitive, "group", () => ({ id }))
       return usePart(menuPrimitive, "group", () => ({ id }))
     },
-  }),
+  })
 )
 
 /**
@@ -476,11 +573,15 @@ const MenuGroupLabel = withElement(
     slots: Object as PartSlots<typeof menuPrimitive, "group-label">,
     setup() {
       const group = useGroup()
-      if (!group) throw new Error("<MenuGroupLabel> must be used inside <MenuGroup> or <MenuRadioGroup>.")
+      if (!group) {
+        throw new Error(
+          "<MenuGroupLabel> must be used inside <MenuGroup> or <MenuRadioGroup>."
+        )
+      }
       // Keyed by its group, so each group's label is a part of its own.
       return usePart(menuPrimitive, "group-label", () => ({ id: group, group }))
     },
-  }),
+  })
 )
 
 /**
@@ -521,15 +622,18 @@ const MenuSub = /* @__PURE__ */ renderless(
         onOpenChange: (open: boolean, details: OpenDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("openChange", open, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:open", open)
           emit("update:modelValue", open)
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
       }))
       return () => slots.default?.()
     },
-  }),
+  })
 )
 
 /**
@@ -544,9 +648,11 @@ const MenuSubTrigger = withElement(
     props: { disabled: optionalBoolean },
     slots: Object as PartSlots<typeof menuPrimitive, "trigger">,
     setup(props) {
-      return usePart(menuPrimitive, "trigger", () => ({ disabled: props.disabled }))
+      return usePart(menuPrimitive, "trigger", () => ({
+        disabled: props.disabled,
+      }))
     },
-  }),
+  })
 )
 
 /**
@@ -570,7 +676,8 @@ const MenuItems = /* @__PURE__ */ renderless(
       // check-code: allow return-type recursive, so TypeScript cannot infer it.
       const render = (items: MenuData): VNode[] =>
         items.map((entry, index) => {
-          const item: MenuDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+          const item: MenuDataItem =
+            typeof entry === "string" ? { value: entry, label: entry } : entry
           switch (item.type) {
             case undefined:
             case "item":
@@ -584,7 +691,7 @@ const MenuItems = /* @__PURE__ */ renderless(
                   closeOnSelect: item.closeOnSelect,
                   destructive: item.destructive,
                 },
-                () => item.label,
+                () => item.label
               )
             case "separator":
               return h(MenuSeparator, { key: `separator-${index}` })
@@ -604,33 +711,46 @@ const MenuItems = /* @__PURE__ */ renderless(
                   defaultChecked: item.defaultChecked,
                   closeOnSelect: item.closeOnSelect,
                 },
-                () => item.label,
+                () => item.label
               )
             case "radio-group":
               return h(
                 MenuRadioGroup,
-                { key: item.name, name: item.name, value: item.value, defaultValue: item.defaultValue },
+                {
+                  key: item.name,
+                  name: item.name,
+                  value: item.value,
+                  defaultValue: item.defaultValue,
+                },
                 () => [
                   item.label && h(MenuGroupLabel, null, () => item.label),
                   ...item.items.map((radio) =>
                     h(
                       MenuRadioItem,
-                      { key: radio.value, value: radio.value, disabled: radio.disabled },
-                      () => radio.label,
-                    ),
+                      {
+                        key: radio.value,
+                        value: radio.value,
+                        disabled: radio.disabled,
+                      },
+                      () => radio.label
+                    )
                   ),
-                ],
+                ]
               )
             case "submenu":
               return h(MenuSub, { key: `submenu-${index}` }, () => [
-                h(MenuSubTrigger, { disabled: item.disabled }, () => item.label),
+                h(
+                  MenuSubTrigger,
+                  { disabled: item.disabled },
+                  () => item.label
+                ),
                 h(MenuSubContent, null, () => render(item.items)),
               ])
           }
         })
       return () => render(props.items)
     },
-  }),
+  })
 )
 
 export { createMenuController } from "@ui-sdk/core/menu"

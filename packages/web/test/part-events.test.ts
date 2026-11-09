@@ -6,7 +6,15 @@
 import path from "node:path"
 import type { AccordionValueChangeReason } from "@ui-sdk/core/accordion"
 import ts from "typescript"
-import { afterAll, afterEach, beforeAll, expect, expectTypeOf, test, vi } from "vitest"
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  expect,
+  expectTypeOf,
+  test,
+  vi,
+} from "vitest"
 import { defineAccordionElements } from "../src/accordion"
 import { defineComboboxElements } from "../src/combobox"
 import { defineCommandElements } from "../src/command"
@@ -43,27 +51,40 @@ function typedPartEvents() {
   const config = ts.getParsedCommandLineOfConfigFile(
     path.resolve(import.meta.dirname, "../tsconfig.json"),
     {},
-    { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => {} },
+    { ...ts.sys, onUnRecoverableConfigFileDiagnostic: () => {} }
   )!
   const program = ts.createProgram([events], config.options)
   const checker = program.getTypeChecker()
   const tagMap = program
     .getSourceFile(events)!
     .statements.filter(ts.isModuleDeclaration)
-    .flatMap((node) => (node.body && ts.isModuleBlock(node.body) ? node.body.statements : []))
+    .flatMap((node) =>
+      node.body && ts.isModuleBlock(node.body) ? node.body.statements : []
+    )
     .find(
       (node): node is ts.InterfaceDeclaration =>
-        ts.isInterfaceDeclaration(node) && node.name.text === "HTMLElementTagNameMap",
+        ts.isInterfaceDeclaration(node) &&
+        node.name.text === "HTMLElementTagNameMap"
     )!
   const typed = new Map<string, string[]>()
   for (const member of tagMap.members) {
-    if (!ts.isPropertySignature(member) || !member.type || !ts.isTypeReferenceNode(member.type)) continue
-    if (member.type.typeName.getText() !== "UiPartElement") continue
+    if (
+      !ts.isPropertySignature(member) ||
+      !member.type ||
+      !ts.isTypeReferenceNode(member.type)
+    ) {
+      continue
+    }
+    if (member.type.typeName.getText() !== "UiPartElement") {
+      continue
+    }
     const element = checker.getTypeFromTypeNode(member.type)
     const base = (element.isIntersection() ? element.types : [element]).find(
-      (type) => type.symbol?.name === "UiElement",
+      (type) => type.symbol?.name === "UiElement"
     ) as ts.TypeReference
-    const names = checker.getPropertiesOfType(checker.getTypeArguments(base)[0]).map(({ name }) => name)
+    const names = checker
+      .getPropertiesOfType(checker.getTypeArguments(base)[0])
+      .map(({ name }) => name)
     typed.set((member.name as ts.StringLiteral).text, names.sort())
   }
   return typed
@@ -99,9 +120,20 @@ beforeAll(() => {
   defineAlertDialogElements()
   defineDrawerElements()
   defineToastElements()
-  EventTarget.prototype.dispatchEvent = function (this: EventTarget, event: Event) {
-    if (event instanceof CustomEvent && this instanceof Element && typed.has(this.localName))
-      fired.set(this.localName, (fired.get(this.localName) ?? new Set()).add(event.type))
+  EventTarget.prototype.dispatchEvent = function (
+    this: EventTarget,
+    event: Event
+  ) {
+    if (
+      event instanceof CustomEvent &&
+      this instanceof Element &&
+      typed.has(this.localName)
+    ) {
+      fired.set(
+        this.localName,
+        (fired.get(this.localName) ?? new Set()).add(event.type)
+      )
+    }
     return dispatchEvent.call(this, event)
   }
 }, 120_000)
@@ -116,9 +148,11 @@ afterEach(() => {
 })
 
 const pressable = (name: string) =>
-  [...document.querySelectorAll<HTMLElement>("button, [role^=menuitem], [role=option]")].find(
-    (el) => el.textContent?.trim() === name,
-  )!
+  [
+    ...document.querySelectorAll<HTMLElement>(
+      "button, [role^=menuitem], [role=option]"
+    ),
+  ].find((el) => el.textContent?.trim() === name)!
 
 function expectFires(tag: (typeof pressed)[number]) {
   expect([...(fired.get(tag) ?? [])].sort(), tag).toEqual(typed.get(tag))
@@ -127,7 +161,8 @@ function expectFires(tag: (typeof pressed)[number]) {
 test("every part whose type lists events is pressed here", () => {
   expect(typed.size).toBeGreaterThan(100)
   const untested = [...typed].filter(
-    ([tag, names]) => names.length && !(pressed as readonly string[]).includes(tag),
+    ([tag, names]) =>
+      names.length && !(pressed as readonly string[]).includes(tag)
   )
   expect(untested).toEqual([])
 })
@@ -136,20 +171,32 @@ test("a part's event listener gets its typed detail", () => {
   const item = document.createElement("ui-accordion-item")
   item.addEventListener("openchange", (event) => {
     expectTypeOf(event.detail.value).toEqualTypeOf<boolean>()
-    expectTypeOf(event.detail.reason).toEqualTypeOf<AccordionValueChangeReason>()
+    expectTypeOf(
+      event.detail.reason
+    ).toEqualTypeOf<AccordionValueChangeReason>()
   })
   document.createElement("ui-menu-item").addEventListener("select", (event) => {
     expectTypeOf(event.detail.value).toEqualTypeOf<Event>()
   })
-  document.createElement("ui-command-item").addEventListener("select", (event) => {
-    expectTypeOf(event.detail.waitUntil).toEqualTypeOf<(promise: Promise<unknown>) => void>()
-  })
-  document.createElement("ui-trigger-menu").addEventListener("itemselect", (event) => {
-    expectTypeOf(event.detail.value).toEqualTypeOf<string>()
-  })
-  document.createElement("ui-dialog-close").addEventListener("action", (event) => {
-    expectTypeOf(event.detail.waitUntil).toEqualTypeOf<(promise: Promise<unknown>) => void>()
-  })
+  document
+    .createElement("ui-command-item")
+    .addEventListener("select", (event) => {
+      expectTypeOf(event.detail.waitUntil).toEqualTypeOf<
+        (promise: Promise<unknown>) => void
+      >()
+    })
+  document
+    .createElement("ui-trigger-menu")
+    .addEventListener("itemselect", (event) => {
+      expectTypeOf(event.detail.value).toEqualTypeOf<string>()
+    })
+  document
+    .createElement("ui-dialog-close")
+    .addEventListener("action", (event) => {
+      expectTypeOf(event.detail.waitUntil).toEqualTypeOf<
+        (promise: Promise<unknown>) => void
+      >()
+    })
 })
 
 test("an accordion item fires openchange and openchangecomplete", async () => {
@@ -178,7 +225,9 @@ test("a menu's items fire select, checkedchange and valuechange", async () => {
       </ui-menu-content>
     </ui-menu>`
   await wait()
-  for (const name of ["New", "Wrap", "Small"]) pressable(name).click()
+  for (const name of ["New", "Wrap", "Small"]) {
+    pressable(name).click()
+  }
   await wait()
   expectFires("ui-menu-item")
   expectFires("ui-menu-checkbox-item")
@@ -216,7 +265,9 @@ test("a trigger menu item fires nothing itself", async () => {
   await wait()
   // The browser's own `select`, for selected text, bubbles up from the field.
   document.querySelector("textarea")!.select()
-  expect(selected).toEqual([expect.objectContaining({ value: "ada", trigger: "@" })])
+  expect(selected).toEqual([
+    expect.objectContaining({ value: "ada", trigger: "@" }),
+  ])
   expectFires("ui-trigger-menu-item")
 })
 
@@ -234,7 +285,9 @@ test("a combobox's create part fires nothing itself", async () => {
   const combobox = document.querySelector("ui-combobox")!
   await wait()
   const created: string[] = []
-  combobox.addEventListener("create", (event) => created.push(event.detail.value))
+  combobox.addEventListener("create", (event) =>
+    created.push(event.detail.value)
+  )
   const input = document.querySelector("input")!
   input.value = "kiwi"
   input.dispatchEvent(new Event("input", { bubbles: true }))
@@ -254,11 +307,13 @@ test("a dialog's, an alert dialog's and a drawer's close fire action", async () 
             <ui-${name}-title>Draft</ui-${name}-title>
             <ui-${name}-close action><button>Save ${name}</button></ui-${name}-close>
           </ui-${name}-content>
-        </ui-${name}>`,
+        </ui-${name}>`
     )
     .join("")
   await wait()
-  for (const name of ["dialog", "alert-dialog", "drawer"]) pressable(`Save ${name}`).click()
+  for (const name of ["dialog", "alert-dialog", "drawer"]) {
+    pressable(`Save ${name}`).click()
+  }
   await wait()
   expectFires("ui-dialog-close")
   expectFires("ui-alert-dialog-close")
@@ -277,9 +332,14 @@ test("a toast's action and close fire action", async () => {
       </template>
     </ui-toast-region>`
   const toaster = createToaster()
-  const region = document.querySelector("ui-toast-region") as UiToastRegionElement
+  const region = document.querySelector(
+    "ui-toast-region"
+  ) as UiToastRegionElement
   region.toaster = toaster
-  toaster("Deleted", { duration: Infinity, action: { label: "Undo", onAction: () => {} } })
+  toaster("Deleted", {
+    duration: Infinity,
+    action: { label: "Undo", onAction: () => {} },
+  })
   await wait()
   const [undo, dismiss] = [pressable("Undo"), pressable("Dismiss")]
   undo.click()

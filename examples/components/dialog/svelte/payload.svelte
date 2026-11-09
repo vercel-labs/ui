@@ -12,7 +12,12 @@
   } from "@ui-sdk/svelte/dialog"
   import { useLog } from "../../../shared/svelte/log"
 
-  type Invoice = { id: string; customer: string; amount: string; status: "Paid" | "Due" }
+  type Invoice = {
+    id: string
+    customer: string
+    amount: string
+    status: "Paid" | "Due"
+  }
 
   const invoices: Invoice[] = [
     { id: "INV-001", customer: "Acme", amount: "$250.00", status: "Paid" },
@@ -24,8 +29,12 @@
   const log = useLog()
 
   async function remindFromCode() {
-    const { reason, returnValue } = await reminder.open({ payload: invoices[2] })
-    log(returnValue === "send" ? "Reminder sent from code" : `Closed (${reason})`)
+    const { reason, returnValue } = await reminder.open({
+      payload: invoices[2],
+    })
+    log(
+      returnValue === "send" ? "Reminder sent from code" : `Closed (${reason})`
+    )
   }
 </script>
 
@@ -52,7 +61,9 @@
   <Dialog
     controller={reminder}
     onOpenChange={(open, details) => {
-      if (!open && details.returnValue === "send") log("Reminder sent")
+      if (!open && details.returnValue === "send") {
+        log("Reminder sent")
+      }
     }}
   >
     <DialogBackdrop />
@@ -61,12 +72,15 @@
         <div data-slot="stack">
           <DialogTitle>Remind {state.payload?.customer}</DialogTitle>
           <DialogDescription>
-            {state.payload?.id} for {state.payload?.amount} is due. We'll email the billing contact.
+            {state.payload?.id} for {state.payload?.amount} is due. We'll email the
+            billing contact.
           </DialogDescription>
         </div>
         <div data-slot="row">
           <DialogClose>Cancel</DialogClose>
-          <DialogClose data-variant="solid" value="send">Send reminder</DialogClose>
+          <DialogClose data-variant="solid" value="send"
+            >Send reminder</DialogClose
+          >
         </div>
       {/snippet}
     </DialogContent>

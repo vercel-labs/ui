@@ -9,7 +9,9 @@ import { defineSelectElements } from "../src/select"
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   ElementInternals.prototype.setFormValue ??= () => {}
   ElementInternals.prototype.setValidity ??= () => {}
   defineSelectElements()
@@ -36,8 +38,13 @@ test("the trigger's and clear's slots are on the buttons inside their wrappers",
 
 test("select.css never reaches the trigger or clear through a child combinator", () => {
   const css = readFileSync(
-    path.resolve(import.meta.dirname, "../../../examples/components/select/select.css"),
-    "utf8",
+    path.resolve(
+      import.meta.dirname,
+      "../../../examples/components/select/select.css"
+    ),
+    "utf8"
   )
-  for (const slot of wrapped) expect(css).not.toMatch(new RegExp(`>\\s*\\[data-slot="${slot}"\\]`))
+  for (const slot of wrapped) {
+    expect(css).not.toMatch(new RegExp(`>\\s*\\[data-slot="${slot}"\\]`))
+  }
 })

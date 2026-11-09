@@ -19,12 +19,20 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 function fuzzy(item: { label: string }, query: string) {
   let at = 0
-  for (const char of item.label.toLowerCase()) if (char === query[at]?.toLowerCase()) at++
+  for (const char of item.label.toLowerCase()) {
+    if (char === query[at]?.toLowerCase()) {
+      at++
+    }
+  }
   return at === query.length
 }
 
@@ -54,7 +62,7 @@ function mount(root: HTMLElement) {
                     ${option.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -82,7 +90,7 @@ function mount(root: HTMLElement) {
                     ${country.label}
                     <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                   </ui-combobox-item>
-                `,
+                `
               )
               .join("")}
           </ui-combobox-list>
@@ -93,9 +101,12 @@ function mount(root: HTMLElement) {
   const combobox = root.querySelector("ui-combobox")!
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
     const mode = event.detail.value
-    if (!mode) return
-    if (mode === "fuzzy") combobox.filter = fuzzy
-    else {
+    if (!mode) {
+      return
+    }
+    if (mode === "fuzzy") {
+      combobox.filter = fuzzy
+    } else {
       combobox.filter = undefined
       combobox.setAttribute("filter", String(mode))
     }

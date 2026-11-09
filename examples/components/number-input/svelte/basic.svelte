@@ -16,7 +16,11 @@
 </script>
 
 <Field>
-  <NumberInput defaultValue={1} min={1} onValueCommit={(value) => log(`Quantity ${value ?? "empty"}`)}>
+  <NumberInput
+    defaultValue={1}
+    min={1}
+    onValueCommit={(value) => log(`Quantity ${value ?? "empty"}`)}
+  >
     <NumberInputScrubArea pixelsPerStep={4}>
       <FieldLabel>Quantity</FieldLabel>
       <NumberInputScrubAreaCursor>

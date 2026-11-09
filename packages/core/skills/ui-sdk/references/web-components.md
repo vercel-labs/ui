@@ -41,7 +41,9 @@ createParts(clearableInput, {
     tag: "ui-clearable-input",
     display: "block",
     // Read lazily: elements inside may upgrade after this one.
-    options: (el) => ({ input: () => el.querySelector<UiInputElement>("ui-input")?.api }),
+    options: (el) => ({
+      input: () => el.querySelector<UiInputElement>("ui-input")?.api,
+    }),
   },
 })
 ```
@@ -60,6 +62,10 @@ createParts(clearableInput, {
 Import the module that defines your elements in `beforeAll`, mount markup with `innerHTML`, and wait a tick before asserting, since parts register and sync after they connect. Dispatch real events with `bubbles: true`:
 
 ```ts
-const event = new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true })
+const event = new KeyboardEvent("keydown", {
+  key: "Escape",
+  bubbles: true,
+  cancelable: true,
+})
 field.dispatchEvent(event)
 ```

@@ -19,9 +19,14 @@ function mount(root: HTMLElement) {
       </ui-resizable-panel>
     </ui-resizable>
   `
-  root.querySelector("ui-resizable")!.addEventListener("layoutcommit", (event) => {
-    log(root, `Saved ${event.detail.value.map(Math.round).join(" / ")} (${event.detail.reason})`)
-  })
+  root
+    .querySelector("ui-resizable")!
+    .addEventListener("layoutcommit", (event) => {
+      log(
+        root,
+        `Saved ${event.detail.value.map(Math.round).join(" / ")} (${event.detail.reason})`
+      )
+    })
 }
 
 export { mount }

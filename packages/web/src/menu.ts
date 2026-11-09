@@ -1,7 +1,17 @@
 import { formatShortcut } from "@ui-sdk/core"
 import { menu, type MenuData, type MenuDataItem } from "@ui-sdk/core/menu"
-import { menuCheckable, menuContextTrigger, menuItemIcons } from "@ui-sdk/core/renderer"
-import { autoId, definePart, findOwner, instanceOf, wrappedButton } from "./define-element"
+import {
+  menuCheckable,
+  menuContextTrigger,
+  menuItemIcons,
+} from "@ui-sdk/core/renderer"
+import {
+  autoId,
+  definePart,
+  findOwner,
+  instanceOf,
+  wrappedButton,
+} from "./define-element"
 import { copy, element, templateOf } from "./list"
 import { menubarOf } from "./menubar"
 import { popupApi, popupKinds, popupState, sheetPortal } from "./popup"
@@ -61,7 +71,9 @@ function defineMenuElements() {
         return
       }
       // Markup content wins over data.
-      if (el.querySelector(":scope > ui-menu-content")) return
+      if (el.querySelector(":scope > ui-menu-content")) {
+        return
+      }
       const created = copy(template, "ui-menu-content", false)
       created.append(...renderMenuItems(items, template))
       generated.set(el, created)
@@ -89,7 +101,9 @@ function defineMenuElements() {
       parent: null,
       menubar: null,
     },
-    options: (el) => ({ parent: instanceOf(findOwner(el, owner))?.api as never }),
+    options: (el) => ({
+      parent: instanceOf(findOwner(el, owner))?.api as never,
+    }),
     state: popupState,
     api: popupApi,
   })
@@ -143,7 +157,9 @@ function defineMenuElements() {
     tag: "ui-menu-radio-item",
     feature: menuCheckable,
     display: "block",
-    context: (el) => ({ group: groupName(el.closest("ui-menu-radio-group") ?? el) }),
+    context: (el) => ({
+      group: groupName(el.closest("ui-menu-radio-group") ?? el),
+    }),
   })
   // The check or dot inside a checkbox or radio item.
   definePart(menu, "item-indicator", {
@@ -153,7 +169,9 @@ function defineMenuElements() {
     kinds: { item: null, itemKey: null, group: null },
     context: (el) => {
       const item = el.closest("ui-menu-checkbox-item, ui-menu-radio-item")
-      if (!item) return {}
+      if (!item) {
+        return {}
+      }
       const radio = item.localName === "ui-menu-radio-item"
       const group = item.closest("ui-menu-radio-group")
       return {
@@ -170,13 +188,21 @@ function defineMenuElements() {
     kinds: { group: null },
     context: (el) => {
       const group = el.closest("ui-menu-group, ui-menu-radio-group") ?? el
-      return { group: group.localName === "ui-menu-radio-group" ? groupName(group) : autoId(group) }
+      return {
+        group:
+          group.localName === "ui-menu-radio-group"
+            ? groupName(group)
+            : autoId(group),
+      }
     },
   })
   definePart(menu, "separator", { tag: "ui-menu-separator", display: "block" })
   definePart(menu, "shortcut", "ui-menu-shortcut")
   // An icon inside an item. Screen readers and typeahead skip it.
-  definePart(menu, "item-icon", { tag: "ui-menu-item-icon", feature: menuItemIcons })
+  definePart(menu, "item-icon", {
+    tag: "ui-menu-item-icon",
+    feature: menuItemIcons,
+  })
 }
 
 // Shortcut glyphs the element added to items, which follow the item's
@@ -187,15 +213,22 @@ function renderShortcut(item: HTMLElement) {
   const shortcut = item.getAttribute("shortcut")
   const glyph = item.querySelector(":scope > ui-menu-shortcut")
   if (!glyph) {
-    if (!shortcut || item.querySelector("ui-menu-shortcut")) return
+    if (!shortcut || item.querySelector("ui-menu-shortcut")) {
+      return
+    }
     const added = element("ui-menu-shortcut", {}, formatShortcut(shortcut))
     generatedShortcuts.add(added)
     item.append(added)
     return
   }
-  if (!generatedShortcuts.has(glyph)) return
-  if (shortcut) glyph.textContent = formatShortcut(shortcut)
-  else glyph.remove()
+  if (!generatedShortcuts.has(glyph)) {
+    return
+  }
+  if (shortcut) {
+    glyph.textContent = formatShortcut(shortcut)
+  } else {
+    glyph.remove()
+  }
 }
 
 // A radio group's key: its `name`, or a generated one.
@@ -205,21 +238,28 @@ function groupName(el: Element) {
 
 // Builds the parts for a data menu's items, as copies of the parts in
 // `template`, when given.
-function renderMenuItems(items: MenuData, template?: HTMLTemplateElement | null) {
+function renderMenuItems(
+  items: MenuData,
+  template?: HTMLTemplateElement | null
+) {
   // An item, whose copied shortcut glyph follows its `shortcut` like one the element adds.
   const option = (
     tagName: string,
     attributes: Record<string, string | boolean | undefined>,
-    label: string,
+    label: string
   ) => {
     const el = element(tagName, attributes, label, template)
     const glyph = el.querySelector(":scope > ui-menu-shortcut")
-    if (glyph) generatedShortcuts.add(glyph)
+    if (glyph) {
+      generatedShortcuts.add(glyph)
+    }
     return el
   }
-  const closeOnSelect = (value?: boolean) => (value === undefined ? undefined : String(value))
+  const closeOnSelect = (value?: boolean) =>
+    value === undefined ? undefined : String(value)
   return items.map((entry) => {
-    const item: MenuDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+    const item: MenuDataItem =
+      typeof entry === "string" ? { value: entry, label: entry } : entry
     switch (item.type) {
       case undefined:
       case "item":
@@ -232,13 +272,15 @@ function renderMenuItems(items: MenuData, template?: HTMLTemplateElement | null)
             destructive: item.destructive,
             "close-on-select": closeOnSelect(item.closeOnSelect),
           },
-          item.label,
+          item.label
         )
       case "separator":
         return element("ui-menu-separator", {}, "", template)
       case "group": {
         const el = copy(template, "ui-menu-group", false)
-        if (item.label) el.append(element("ui-menu-group-label", {}, item.label, template))
+        if (item.label) {
+          el.append(element("ui-menu-group-label", {}, item.label, template))
+        }
         el.append(...renderMenuItems(item.items, template))
         return el
       }
@@ -248,30 +290,50 @@ function renderMenuItems(items: MenuData, template?: HTMLTemplateElement | null)
           {
             value: item.value,
             disabled: item.disabled,
-            checked: item.checked === undefined ? undefined : String(item.checked),
+            checked:
+              item.checked === undefined ? undefined : String(item.checked),
             "default-checked": item.defaultChecked,
             "close-on-select": closeOnSelect(item.closeOnSelect),
           },
-          item.label,
+          item.label
         )
       case "radio-group": {
         const el = copy(template, "ui-menu-radio-group", false)
-        if (item.name) el.setAttribute("name", item.name)
-        if (item.value != null) el.setAttribute("value", item.value)
-        if (item.defaultValue != null) el.setAttribute("default-value", item.defaultValue)
+        if (item.name) {
+          el.setAttribute("name", item.name)
+        }
+        if (item.value != null) {
+          el.setAttribute("value", item.value)
+        }
+        if (item.defaultValue != null) {
+          el.setAttribute("default-value", item.defaultValue)
+        }
         // Controlled with nothing selected, like React and Vue.
-        if (item.value === null) Object.assign(el, { value: null })
-        if (item.label) el.append(element("ui-menu-group-label", {}, item.label, template))
+        if (item.value === null) {
+          Object.assign(el, { value: null })
+        }
+        if (item.label) {
+          el.append(element("ui-menu-group-label", {}, item.label, template))
+        }
         el.append(
           ...item.items.map((radio) =>
-            option("ui-menu-radio-item", { value: radio.value, disabled: radio.disabled }, radio.label),
-          ),
+            option(
+              "ui-menu-radio-item",
+              { value: radio.value, disabled: radio.disabled },
+              radio.label
+            )
+          )
         )
         return el
       }
       case "submenu": {
         const sub = copy(template, "ui-menu-sub", false)
-        const trigger = element("ui-menu-sub-trigger", { disabled: item.disabled }, item.label, template)
+        const trigger = element(
+          "ui-menu-sub-trigger",
+          { disabled: item.disabled },
+          item.label,
+          template
+        )
         const content = copy(template, "ui-menu-sub-content", false)
         content.append(...renderMenuItems(item.items, template))
         sub.append(trigger, content)

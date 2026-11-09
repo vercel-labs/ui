@@ -1,4 +1,8 @@
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/react/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/react/checkbox"
 import { CheckIcon, MinusIcon } from "lucide-react"
 
 const toppings = [

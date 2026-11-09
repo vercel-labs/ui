@@ -1,4 +1,8 @@
-import { combobox, type ComboboxApi, type ComboboxOptions } from "@ui-sdk/core/combobox"
+import {
+  combobox,
+  type ComboboxApi,
+  type ComboboxOptions,
+} from "@ui-sdk/core/combobox"
 import {
   comboboxChips,
   comboboxCreate,
@@ -24,7 +28,10 @@ const owner = "ui-combobox"
 
 // The properties rich values are set through.
 type ComboboxElement = HTMLElement &
-  Pick<ComboboxOptions<unknown>, "items" | "filter" | "itemToValue" | "itemToLabel" | "isItemEqualToValue">
+  Pick<
+    ComboboxOptions<unknown>,
+    "items" | "filter" | "itemToValue" | "itemToLabel" | "isItemEqualToValue"
+  >
 
 const generated = new WeakMap<HTMLElement, HTMLElement>()
 // The chips the element rendered, so it can tell them from chips the page renders.
@@ -62,19 +69,26 @@ function defineComboboxElements() {
       properties: ["filter"],
       options: (el) => {
         const data = el as ComboboxElement
-        const multiple = el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
-        const start = el.getAttribute("default-value") ?? el.getAttribute("value")
+        const multiple =
+          el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
+        const start =
+          el.getAttribute("default-value") ?? el.getAttribute("value")
         const items = data.items
-        const toValues = (keys: string[]) => valuesOf(keys, items, data.itemToValue)
+        const toValues = (keys: string[]) =>
+          valuesOf(keys, items, data.itemToValue)
         return {
           items,
-          ...((typeof data.filter === "function" || data.filter === false) && { filter: data.filter }),
+          ...((typeof data.filter === "function" || data.filter === false) && {
+            filter: data.filter,
+          }),
           itemToValue: data.itemToValue,
           itemToLabel: data.itemToLabel,
           isItemEqualToValue: data.isItemEqualToValue,
           container: undefined,
           ...(start !== null && {
-            defaultValue: multiple ? toValues(listAttribute(start)) : toValues([start])[0],
+            defaultValue: multiple
+              ? toValues(listAttribute(start))
+              : toValues([start])[0],
           }),
         }
       },
@@ -83,15 +97,24 @@ function defineComboboxElements() {
           get: (api: ComboboxApi) => api.getValue(),
           // A string names items by key, comma-separated with multiple.
           set: (api: ComboboxApi, value: unknown) => {
-            if (typeof value !== "string") return api.setValue(value)
-            const keys = api.internal.options().multiple ? listAttribute(value) : [value]
-            const found = keys.map((key) => api.internal.listbox.valueOf(key) ?? key)
-            api.setValue(api.internal.options().multiple ? found : (found[0] ?? null))
+            if (typeof value !== "string") {
+              return api.setValue(value)
+            }
+            const keys = api.internal.options().multiple
+              ? listAttribute(value)
+              : [value]
+            const found = keys.map(
+              (key) => api.internal.listbox.valueOf(key) ?? key
+            )
+            api.setValue(
+              api.internal.options().multiple ? found : (found[0] ?? null)
+            )
           },
         },
         query: {
           get: (api: ComboboxApi) => api.getQuery(),
-          set: (api: ComboboxApi, query: string | null) => api.setQuery(query ?? ""),
+          set: (api: ComboboxApi, query: string | null) =>
+            api.setQuery(query ?? ""),
         },
         ...popupState,
       },
@@ -127,9 +150,21 @@ function defineComboboxElements() {
     },
     label: { tag: "ui-combobox-label", display: "block" },
     // A wrapper, so the input stays a real input.
-    input: { tag: "ui-combobox-input", display: "contents", target: wrappedChild("input") },
-    trigger: { tag: "ui-combobox-trigger", display: "contents", target: wrappedChild("button") },
-    clear: { tag: "ui-combobox-clear", display: "contents", target: wrappedChild("button") },
+    input: {
+      tag: "ui-combobox-input",
+      display: "contents",
+      target: wrappedChild("input"),
+    },
+    trigger: {
+      tag: "ui-combobox-trigger",
+      display: "contents",
+      target: wrappedChild("button"),
+    },
+    clear: {
+      tag: "ui-combobox-clear",
+      display: "contents",
+      target: wrappedChild("button"),
+    },
     content: { tag: "ui-combobox-content", kinds: popupKinds },
     list: { tag: "ui-combobox-list", display: "block" },
     item: { tag: "ui-combobox-item", display: "block" },
@@ -147,10 +182,15 @@ function defineComboboxElements() {
       display: "block",
       feature: comboboxCreate,
       render(el) {
-        if (!el.childNodes.length) automaticCreate.add(el)
+        if (!el.childNodes.length) {
+          automaticCreate.add(el)
+        }
       },
       kinds: { text: null },
-      context: (el) => ({ onCreate: (query: string) => created(el, query), text: automaticCreate.has(el) }),
+      context: (el) => ({
+        onCreate: (query: string) => created(el, query),
+        text: automaticCreate.has(el),
+      }),
     },
     empty: { tag: "ui-combobox-empty", ...stashedEmpty },
     status: { tag: "ui-combobox-status", display: "block" },
@@ -165,7 +205,9 @@ function defineComboboxElements() {
       tag: "ui-combobox-chips-overflow",
       feature: comboboxChips,
       render(el) {
-        if (!el.childNodes.length) automaticOverflow.add(el)
+        if (!el.childNodes.length) {
+          automaticOverflow.add(el)
+        }
       },
       context: (el) => ({ text: automaticOverflow.has(el) }),
       kinds: { text: null },
@@ -187,7 +229,9 @@ function defineComboboxElements() {
       feature: comboboxChips,
       display: "contents",
       target: wrappedChild("button"),
-      context: (el) => ({ value: el.closest("ui-combobox-chip")?.getAttribute("value") ?? "" }),
+      context: (el) => ({
+        value: el.closest("ui-combobox-chip")?.getAttribute("value") ?? "",
+      }),
     },
     arrow: { tag: "ui-combobox-arrow", display: "block" },
   })
@@ -200,8 +244,11 @@ function created(el: HTMLElement, query: string) {
   ;(findOwner(el, owner) ?? el).dispatchEvent(
     new CustomEvent("create", {
       composed: true,
-      detail: { value: query, waitUntil: (promise: Promise<unknown>) => (pending = promise) },
-    }),
+      detail: {
+        value: query,
+        waitUntil: (promise: Promise<unknown>) => (pending = promise),
+      },
+    })
   )
   return pending
 }
@@ -213,13 +260,25 @@ const renderedChips = new WeakMap<Element, { value: unknown; labels: string }>()
 // One chip per value, with a remove button named after it, until the page
 // renders chips of its own. The page's chips go in before the state commits,
 // from the change event, so the element's never show beside them.
-function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false, settled = false } = {}) {
+function renderChips(
+  el: ComboboxElement,
+  api: ComboboxApi,
+  { force = false, settled = false } = {}
+) {
   const chips = el.querySelector("ui-combobox-chips")
-  if (!chips) return
+  if (!chips) {
+    return
+  }
   // The page's chips can sit in a wrapper of their own; the element's are children.
-  const all = Array.from(chips.querySelectorAll<HTMLElement>("ui-combobox-chip"))
+  const all = Array.from(
+    chips.querySelectorAll<HTMLElement>("ui-combobox-chip")
+  )
   if (all.some((chip) => !renderedChip.has(chip))) {
-    for (const chip of all) if (renderedChip.has(chip)) chip.remove()
+    for (const chip of all) {
+      if (renderedChip.has(chip)) {
+        chip.remove()
+      }
+    }
     renderedChips.delete(chips)
     return
   }
@@ -231,20 +290,32 @@ function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false, set
   // A label learned after the value, like once the items load, renders the chips again too.
   const last = renderedChips.get(chips)
   const joined = labels.join("\n")
-  if (!force && last && last.value === value && last.labels === joined) return
+  if (!force && last && last.value === value && last.labels === joined) {
+    return
+  }
   const keys = selection.keys()
   const kept = new Set(keys)
-  const existing = new Map(children.map((chip) => [chip.getAttribute("value"), chip]))
+  const existing = new Map(
+    children.map((chip) => [chip.getAttribute("value"), chip])
+  )
   // A page that sets `value` quietly, like lit, renders its own chips after.
   // New chips wait a microtask for them.
-  if (!settled && keys.some((key) => !existing.has(key)))
-    return void queueMicrotask(() => renderChips(el, api, { force, settled: true }))
+  if (!settled && keys.some((key) => !existing.has(key))) {
+    return void queueMicrotask(() =>
+      renderChips(el, api, { force, settled: true })
+    )
+  }
   renderedChips.set(chips, { value, labels: joined })
   // Chips that stay keep their element, so focus on one survives a neighbour's removal.
-  for (const [key, chip] of existing) if (!kept.has(key ?? "")) chip.remove()
+  for (const [key, chip] of existing) {
+    if (!kept.has(key ?? "")) {
+      chip.remove()
+    }
+  }
   // Chips go before the overflow part, if there is one, and the input.
   const input =
-    chips.querySelector(":scope > ui-combobox-chips-overflow") ?? chips.querySelector("ui-combobox-input")
+    chips.querySelector(":scope > ui-combobox-chips-overflow") ??
+    chips.querySelector("ui-combobox-input")
   for (const [index, key] of keys.entries()) {
     let chip = existing.get(key)
     if (!chip) {
@@ -262,7 +333,9 @@ function renderChips(el: ComboboxElement, api: ComboboxApi, { force = false, set
     // Labels that change after the chips rendered reach them too.
     const label = labels[index]
     const text = chip.firstChild
-    if (text?.nodeType === Node.TEXT_NODE && text.textContent !== label) text.textContent = label
+    if (text?.nodeType === Node.TEXT_NODE && text.textContent !== label) {
+      text.textContent = label
+    }
     chip
       .querySelector(":scope > ui-combobox-chip-remove > button")
       ?.setAttribute("aria-label", `Remove ${label}`)
@@ -289,26 +362,43 @@ function renderData(el: ComboboxElement, api: ComboboxApi) {
   // Markup content wins over data, but a list in it without items of its own
   // renders them. Remembered, since a container may move the content away.
   const markup = [...el.querySelectorAll("ui-combobox-content")].find(
-    (found) => found !== content && found.closest("ui-combobox") === el,
+    (found) => found !== content && found.closest("ui-combobox") === el
   )
-  if (markup && !markupLists.has(el)) markupLists.set(el, markup.querySelector("ui-combobox-list"))
+  if (markup && !markupLists.has(el)) {
+    markupLists.set(el, markup.querySelector("ui-combobox-list"))
+  }
   const list = markupLists.has(el)
     ? (markupLists.get(el) ?? null)
     : (content?.querySelector("ui-combobox-list") ?? null)
-  if (markupLists.has(el) && !list) return
+  if (markupLists.has(el) && !list) {
+    return
+  }
   if (list) {
-    if (!markup && !content && !list.isConnected) return
+    if (!markup && !content && !list.isConnected) {
+      return
+    }
     const own = Array.from(list.children).some(
-      (child) => child.localName === "ui-combobox-item" && !generatedItems.has(child),
+      (child) =>
+        child.localName === "ui-combobox-item" && !generatedItems.has(child)
     )
-    if (own || rendered.get(list) === visible) return
+    if (own || rendered.get(list) === visible) {
+      return
+    }
     rendered.set(list, visible)
-    for (const child of Array.from(list.children)) if (generatedItems.has(child)) child.remove()
+    for (const child of Array.from(list.children)) {
+      if (generatedItems.has(child)) {
+        child.remove()
+      }
+    }
     const fresh = renderListItems("ui-combobox", visible, toKey, templateOf(el))
     fresh.forEach((item) => generatedItems.add(item))
     // After any select-all option, which comes first.
-    const after = Array.from(list.children).find((child) => child.localName !== "ui-combobox-select-all")
-    for (const item of fresh) list.insertBefore(item, after ?? null)
+    const after = Array.from(list.children).find(
+      (child) => child.localName !== "ui-combobox-select-all"
+    )
+    for (const item of fresh) {
+      list.insertBefore(item, after ?? null)
+    }
     return
   }
   const template = templateOf(el)

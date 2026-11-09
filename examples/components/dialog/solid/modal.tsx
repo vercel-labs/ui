@@ -29,18 +29,25 @@ type Mode = "true" | "trap-focus" | "false"
 
 const notes = {
   true: "The rest of the page is inert and doesn't scroll.",
-  "trap-focus": "Tab stays inside, and the page still scrolls and takes clicks.",
-  false: "The page stays usable. Tab leaves the notes, and Escape closes them while focus is inside.",
+  "trap-focus":
+    "Tab stays inside, and the page still scrolls and takes clicks.",
+  false:
+    "The page stays usable. Tab leaves the notes, and Escape closes them while focus is inside.",
 }
 
 function Example() {
   const [mode, setMode] = createSignal<Mode>("false")
   const [outside, setOutside] = createSignal(false)
-  const modal = () => (mode() === "true" ? true : mode() === "false" ? false : "trap-focus")
+  const modal = () =>
+    mode() === "true" ? true : mode() === "false" ? false : "trap-focus"
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={modes} value={mode()} onValueChange={(next) => next && setMode(next as Mode)}>
+        <Select
+          items={modes}
+          value={mode()}
+          onValueChange={(next) => next && setMode(next as Mode)}
+        >
           <SelectLabel>Modal</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -80,7 +87,10 @@ function Example() {
           </SelectContent>
         </Select>
         <label data-slot="label">
-          <Checkbox checked={outside()} onCheckedChange={(next) => setOutside(next === true)}>
+          <Checkbox
+            checked={outside()}
+            onCheckedChange={(next) => setOutside(next === true)}
+          >
             <CheckboxIndicator>
               <svg
                 viewBox="0 0 24 24"
@@ -108,7 +118,10 @@ function Example() {
             <DialogTitle>Notes</DialogTitle>
             <DialogDescription>{notes[mode()]}</DialogDescription>
           </div>
-          <textarea aria-label="Notes" value="Call the printer about the proofs." />
+          <textarea
+            aria-label="Notes"
+            value="Call the printer about the proofs."
+          />
           <div data-slot="row">
             <DialogClose data-variant="solid">Done</DialogClose>
           </div>

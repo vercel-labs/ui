@@ -5,7 +5,11 @@ A submenu. Put its `MenuSubTrigger` and `MenuSubContent` inside, in a menu's con
 -->
 <script lang="ts">
   import type { ChangeDetails } from "@ui-sdk/core"
-  import { menu as menuPrimitive, type MenuController, type MenuOpenChangeReason } from "@ui-sdk/core/menu"
+  import {
+    menu as menuPrimitive,
+    type MenuController,
+    type MenuOpenChangeReason,
+  } from "@ui-sdk/core/menu"
   import type { Snippet } from "svelte"
   import { provideInstance, useHandle } from "../instance"
   import { usePrimitive } from "../use-primitive.svelte"
@@ -58,7 +62,9 @@ A submenu. Put its `MenuSubTrigger` and `MenuSubContent` inside, in a menu's con
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
   }))

@@ -18,7 +18,9 @@ function suggest() {
 }
 
 function read() {
-  log(`${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`)
+  log(
+    `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`
+  )
 }
 </script>
 

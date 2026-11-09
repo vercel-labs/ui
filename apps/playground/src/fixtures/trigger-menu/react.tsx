@@ -36,7 +36,9 @@ function Composer({
       triggers={triggers}
       autoHighlight={autoHighlight}
       onOpenChange={(open, details) => onOpen(`${open}:${details.reason}`)}
-      onSelect={(value, details) => onAction(selectAction(value, details.arguments))}
+      onSelect={(value, details) =>
+        onAction(selectAction(value, details.arguments))
+      }
     >
       <label className="label" htmlFor={id}>
         {name}
@@ -45,12 +47,16 @@ function Composer({
         id={id}
         name="message"
         className="input"
-        render={input ? <input /> : textarea ? <Textarea autoResize /> : undefined}
+        render={
+          input ? <input /> : textarea ? <Textarea autoResize /> : undefined
+        }
       />
       <TriggerMenuHint className="hint" />
       <TriggerMenuStatus className="status" />
       <TriggerMenuContent className="popup list-popup">
-        {empty && <TriggerMenuEmpty className="empty">{f.empty}</TriggerMenuEmpty>}
+        {empty && (
+          <TriggerMenuEmpty className="empty">{f.empty}</TriggerMenuEmpty>
+        )}
         <TriggerMenuList>
           {(state) =>
             (state.items as TriggerMenuDataItem[]).map((item) => (
@@ -88,7 +94,9 @@ function Fixture() {
         }}
       >
         <Composer name={f.label} onAction={setAction} onOpen={setOpen} />
-        {twice && <Composer name="Second" onAction={setAction} onOpen={setOpen} />}
+        {twice && (
+          <Composer name="Second" onAction={setAction} onOpen={setOpen} />
+        )}
         <button type="submit">{f.submit}</button>
       </form>
       <button>After</button>
@@ -109,7 +117,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

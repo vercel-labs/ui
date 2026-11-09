@@ -7,16 +7,23 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("a value with tokens shows in the server markup and hydrates without mismatches", async ({
   page,
   open,
 }) => {
-  await open("token-input", { value: "Summarize [@a.ts](file:src/a.ts) please" })
+  await open("token-input", {
+    value: "Summarize [@a.ts](file:src/a.ts) please",
+  })
   const editor = page.getByRole("textbox", { name: "Prompt" })
   await expect(editor).toContainText("Summarize")
-  await expect(page.locator("[data-slot='token-input-token']")).toHaveText(["a.ts ×"])
+  await expect(page.locator("[data-slot='token-input-token']")).toHaveText([
+    "a.ts ×",
+  ])
   await editor.focus()
   await page.keyboard.press("ControlOrMeta+End")
   await page.keyboard.type(" @b")

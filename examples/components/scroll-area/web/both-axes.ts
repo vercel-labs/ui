@@ -126,7 +126,7 @@ function mount(root: HTMLElement) {
                       <td>${release.downloads}</td>
                       <td>${release.size}</td>
                       <td>${release.node}</td>
-                    </tr>`,
+                    </tr>`
                 )
                 .join("")}
             </tbody>

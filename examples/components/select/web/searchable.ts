@@ -30,7 +30,11 @@ const countries = [
 ]
 
 const popularCountries = [
-  { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
+  {
+    type: "group" as const,
+    label: "Popular",
+    items: [countries[5], countries[11], countries[16]],
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -66,7 +70,9 @@ function mount(root: HTMLElement) {
   const select = root.querySelector("ui-select")!
   select.emptyItems = popularCountries
   select.announcement = (change) =>
-    change.type === "results" ? `${change.count} ${change.count === 1 ? "country" : "countries"} found` : null
+    change.type === "results"
+      ? `${change.count} ${change.count === 1 ? "country" : "countries"} found`
+      : null
   select.items = countries
 }
 

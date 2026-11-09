@@ -38,7 +38,9 @@ function Example() {
     >
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type @ and a first name…" />} />
+        <FieldControl
+          render={<TriggerMenuInput placeholder="Type @ and a first name…" />}
+        />
       </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
@@ -52,7 +54,9 @@ function Example() {
                 disabled={person.disabled}
               >
                 {person.label}
-                <span data-slot="hint">{person.disabled ? "Deactivated" : `@${person.value}`}</span>
+                <span data-slot="hint">
+                  {person.disabled ? "Deactivated" : `@${person.value}`}
+                </span>
               </TriggerMenuItem>
             ))}
           </TriggerMenuGroup>

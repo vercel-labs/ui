@@ -5,7 +5,10 @@ import { Fixture } from "./solid"
 // recorded, and the server's markup is kept for specs that read it.
 async function mount(root: HTMLElement) {
   await hydrateFixture(root, "menubar", () => <Fixture />)
-  const page = window as unknown as { __serverHtml: string; __serverMarkup: string }
+  const page = window as unknown as {
+    __serverHtml: string
+    __serverMarkup: string
+  }
   page.__serverMarkup = page.__serverHtml
 }
 

@@ -5,7 +5,9 @@ import { createParts, ownButton } from "./define-element"
 function own(tag: "input" | "canvas") {
   return (el: HTMLElement) => {
     const written = el.querySelector(tag)
-    if (written) return written
+    if (written) {
+      return written
+    }
     const made = el.ownerDocument.createElement(tag)
     el.append(made)
     return made
@@ -31,15 +33,35 @@ function defineColorPickerElements() {
     },
     area: { tag: "ui-color-picker-area", display: "block" },
     "area-thumb": { tag: "ui-color-picker-area-thumb", display: "block" },
-    "area-canvas": { tag: "ui-color-picker-area-canvas", display: "contents", target: own("canvas") },
+    "area-canvas": {
+      tag: "ui-color-picker-area-canvas",
+      display: "contents",
+      target: own("canvas"),
+    },
     slider: { tag: "ui-color-picker-slider", display: "block" },
     "slider-thumb": { tag: "ui-color-picker-slider-thumb", display: "block" },
-    input: { tag: "ui-color-picker-input", display: "contents", target: own("input") },
-    "channel-input": { tag: "ui-color-picker-channel-input", display: "contents", target: own("input") },
+    input: {
+      tag: "ui-color-picker-input",
+      display: "contents",
+      target: own("input"),
+    },
+    "channel-input": {
+      tag: "ui-color-picker-channel-input",
+      display: "contents",
+      target: own("input"),
+    },
     swatch: { tag: "ui-color-picker-swatch", display: "block" },
-    "eye-dropper": { tag: "ui-color-picker-eye-dropper", display: "contents", target: ownButton() },
+    "eye-dropper": {
+      tag: "ui-color-picker-eye-dropper",
+      display: "contents",
+      target: ownButton(),
+    },
     swatches: { tag: "ui-color-picker-swatches", display: "block" },
-    "swatch-item": { tag: "ui-color-picker-swatch-item", display: "contents", target: ownButton() },
+    "swatch-item": {
+      tag: "ui-color-picker-swatch-item",
+      display: "contents",
+      target: ownButton(),
+    },
   })
 }
 

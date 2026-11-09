@@ -1,7 +1,11 @@
 import { createEffect, createSignal, flush, Show } from "solid-js"
 import { render } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
 
 function mount(code: () => any) {
   const root = document.createElement("div")
@@ -15,7 +19,10 @@ describe("collapsible", () => {
   test("opens on press and renders its panel", async () => {
     const log: string[] = []
     const { root, dispose } = mount(() => (
-      <Collapsible class="c" onOpenChange={(open, details) => log.push(`${open}:${details.reason}`)}>
+      <Collapsible
+        class="c"
+        onOpenChange={(open, details) => log.push(`${open}:${details.reason}`)}
+      >
         <CollapsibleTrigger
           class={(state) => (state.open ? "is-open" : "is-closed")}
           onClick={() => log.push("user click")}
@@ -32,13 +39,17 @@ describe("collapsible", () => {
     expect(trigger.className).toBe("is-closed")
     expect(root.querySelector(".panel")).toBeNull()
     trigger.click()
-    for (let i = 0; i < 3; i++) await Promise.resolve()
+    for (let i = 0; i < 3; i++) {
+      await Promise.resolve()
+    }
     flush()
     expect(log).toEqual(["user click", "true:trigger-press"])
     expect(trigger.getAttribute("aria-expanded")).toBe("true")
     expect(trigger.className).toBe("is-open")
     expect(root.querySelector(".panel")?.textContent).toBe("open")
-    expect(trigger.getAttribute("aria-controls")).toBe(root.querySelector(".panel")!.id)
+    expect(trigger.getAttribute("aria-controls")).toBe(
+      root.querySelector(".panel")!.id
+    )
     dispose()
   })
 
@@ -49,7 +60,9 @@ describe("collapsible", () => {
     const seen: string[] = []
     function Watch() {
       createEffect(open, () => {
-        seen.push(`${!!document.querySelector(".panel")} ${!!document.querySelector(".own")}`)
+        seen.push(
+          `${!!document.querySelector(".panel")} ${!!document.querySelector(".own")}`
+        )
       })
       return null
     }

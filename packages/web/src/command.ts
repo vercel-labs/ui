@@ -1,7 +1,19 @@
-import { command, type CommandApi, type CommandData } from "@ui-sdk/core/command"
+import {
+  command,
+  type CommandApi,
+  type CommandData,
+} from "@ui-sdk/core/command"
 import { pageItems } from "@ui-sdk/core/renderer"
 import { createParts, wrappedChild } from "./define-element"
-import { copy, isGenerated, itemText, listAttribute, renderData, stashedEmpty, templateOf } from "./list"
+import {
+  copy,
+  isGenerated,
+  itemText,
+  listAttribute,
+  renderData,
+  stashedEmpty,
+  templateOf,
+} from "./list"
 
 // The properties rich values are set through.
 type CommandElement = HTMLElement & {
@@ -44,16 +56,20 @@ function defineCommandElements() {
       state: {
         value: {
           get: (api: CommandApi) => api.getValue(),
-          set: (api: CommandApi, value: string | null) => api.setValue(value || null),
+          set: (api: CommandApi, value: string | null) =>
+            api.setValue(value || null),
         },
         query: {
           get: (api: CommandApi) => api.getQuery(),
-          set: (api: CommandApi, query: string | null) => api.setQuery(query ?? ""),
+          set: (api: CommandApi, query: string | null) =>
+            api.setQuery(query ?? ""),
         },
         pages: {
           get: (api: CommandApi) => api.getPages(),
           set: (api: CommandApi, pages: string | string[] | null) =>
-            api.setPages(typeof pages === "string" ? listAttribute(pages) : (pages ?? [])),
+            api.setPages(
+              typeof pages === "string" ? listAttribute(pages) : (pages ?? [])
+            ),
         },
       },
       api: [
@@ -91,7 +107,10 @@ function defineCommandElements() {
       // without a value, the first one.
       context: (el) => {
         const page = el.closest("ui-command-page")
-        return { data: isGenerated(el), ...(page && { inPage: page.getAttribute("value") }) }
+        return {
+          data: isGenerated(el),
+          ...(page && { inPage: page.getAttribute("value") }),
+        }
       },
       kinds: { data: null, inPage: null },
     },
@@ -114,14 +133,19 @@ function defineCommandElements() {
 
 // The current page's data commands, in the list part, or one the element adds.
 function renderCommands(el: CommandElement, api: CommandApi) {
-  if (!el.items) return
+  if (!el.items) {
+    return
+  }
   const template = templateOf(el)
   let list = el.querySelector(":scope > ui-command-list")
   if (!list) {
     list = copy(template, "ui-command-list", false)
     el.append(list)
   }
-  const visible = api.internal.listbox.visibleData()?.list ?? pageItems(el.items, api.getPages()) ?? []
+  const visible =
+    api.internal.listbox.visibleData()?.list ??
+    pageItems(el.items, api.getPages()) ??
+    []
   renderData(list, "ui-command", visible as CommandData, template)
 }
 

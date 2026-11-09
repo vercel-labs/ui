@@ -53,13 +53,23 @@ function rootState(state: ListboxStore, api: ListboxApi) {
 // data item's value comes from the data, where `isItemEqualToValue` expects it.
 function valueOfItem(key: string, props: ItemProps, api: ListboxApi) {
   const { listbox } = api.internal
-  return listbox.dataItems() ? (listbox.valueOf(key) ?? props.value) : props.value
+  return listbox.dataItems()
+    ? (listbox.valueOf(key) ?? props.value)
+    : props.value
 }
 
-function itemState(state: ListboxStore, key: string, props: ItemProps, api: ListboxApi) {
+function itemState(
+  state: ListboxStore,
+  key: string,
+  props: ItemProps,
+  api: ListboxApi
+) {
   return {
     highlighted: state.highlighted === key,
-    selected: api.internal.selection.isSelected(key, valueOfItem(key, props, api)),
+    selected: api.internal.selection.isSelected(
+      key,
+      valueOfItem(key, props, api)
+    ),
     disabled: !!props.disabled || isDisabled(state),
   }
 }
@@ -67,8 +77,15 @@ function itemState(state: ListboxStore, key: string, props: ItemProps, api: List
 // Whether an item holds the list's one tab stop. Before items bind, like on
 // the server, the first selected item claims it, or with nothing selected,
 // the first enabled one.
-function isStop(state: ListboxStore, key: string, props: ItemProps, api: ListboxApi) {
-  if (state.stop !== null) return state.stop === key
+function isStop(
+  state: ListboxStore,
+  key: string,
+  props: ItemProps,
+  api: ListboxApi
+) {
+  if (state.stop !== null) {
+    return state.stop === key
+  }
   const eligible = api.internal.selection.keys().length
     ? api.internal.selection.isSelected(key, valueOfItem(key, props, api))
     : !props.disabled
@@ -80,7 +97,9 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
   root: slot<{}, ListboxState>({
     role: "listbox",
     keys: (state) => [
-      ...(state.orientation === "horizontal" ? ["ArrowLeft", "ArrowRight"] : ["ArrowUp", "ArrowDown"]),
+      ...(state.orientation === "horizontal"
+        ? ["ArrowLeft", "ArrowRight"]
+        : ["ArrowUp", "ArrowDown"]),
       "Home",
       "End",
       "Enter",
@@ -107,24 +126,29 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
     on: {
       keydown: (event, { api, el }) => el && api.internal.onKeyDown(event, el),
       focusin(event, { api, el }) {
-        if (event.target === el) api.internal.focusStop()
+        if (event.target === el) {
+          api.internal.focusStop()
+        }
       },
       focusout(event, { api, el }) {
-        if (!el?.contains(event.relatedTarget as Node | null)) api.internal.blurred(event)
+        if (!el?.contains(event.relatedTarget as Node | null)) {
+          api.internal.blurred(event)
+        }
       },
     },
     bind(el, context) {
       const { id } = context
       const unbind = bindFormRoot(el, context, { focusOnSelfClick: false })
-      if (dev)
+      if (dev) {
         warnIfUnnamed(
           el,
           "The listbox has no accessible name. Add a Field label, an aria-label or aria-labelledby.",
           {
             component: "listbox",
             id,
-          },
+          }
         )
+      }
       return unbind
     },
   }),
@@ -141,13 +165,20 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
       group: { kind: "string", from: "group.id" },
     },
     // Without a stop yet, the first eligible item claims it, so every item hears that change.
-    selects: selects({ highlighted: ({ key }) => [key], stop: ({ key }) => [key, null] }),
+    selects: selects({
+      highlighted: ({ key }) => [key],
+      stop: ({ key }) => [key, null],
+    }),
     state: (state, { key, props, api }) => itemState(state, key, props, api),
     attrs: (state, { id, key, props, api }) => {
       const { selected, disabled } = itemState(state, key, props, api)
       return {
         id: `${id}-option-${idPart(key)}`,
-        tabindex: isDisabled(state) ? undefined : isStop(state, key, props, api) ? "0" : "-1",
+        tabindex: isDisabled(state)
+          ? undefined
+          : isStop(state, key, props, api)
+            ? "0"
+            : "-1",
         "aria-selected": String(selected),
         "aria-disabled": disabled ? "true" : undefined,
         ...positionAttrs(props.index, api.internal.listbox),
@@ -155,12 +186,16 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
         "data-disabled": disabled ? "" : undefined,
       }
     },
-    live: live((state, { key }) => ({ "data-highlighted": state.highlighted === key ? "" : undefined })),
+    live: live((state, { key }) => ({
+      "data-highlighted": state.highlighted === key ? "" : undefined,
+    })),
     on: {
       focusin: (event, { api, key }) => api.internal.focused(key),
       // Shift with a press selects a range, not the page's text.
       mousedown(event, { store }) {
-        if (event.shiftKey && store.get().multiple) event.preventDefault()
+        if (event.shiftKey && store.get().multiple) {
+          event.preventDefault()
+        }
       },
     },
     press: ({ api, key }, event) => api.internal.press(key, event),
@@ -168,18 +203,25 @@ const listboxSlots = (slot: SlotFactory<ListboxStore, ListboxApi>) => ({
   }),
 
   "item-indicator": slot<IndicatorProps, ListboxItemIndicatorState>(
-    itemIndicatorPart<ListboxStore, ListboxApi>(),
+    itemIndicatorPart<ListboxStore, ListboxApi>()
   ),
 
   // An icon inside an item. Screen readers and typeahead skip it.
-  "item-icon": slot(itemIconPart<ListboxStore, ListboxApi>({ component: "listbox", ...optionIcon })),
+  "item-icon": slot(
+    itemIconPart<ListboxStore, ListboxApi>({
+      component: "listbox",
+      ...optionIcon,
+    })
+  ),
 
   // A group of items, named by its label. Nothing filters a listbox, so it never hides.
   group: slot({
     role: "group",
     // Its id is made for it, and names the group its items and label are in.
     props: { id: "id" },
-    attrs: (state, { id, key }) => ({ "aria-labelledby": groupLabelledBy(state, id, key) }),
+    attrs: (state, { id, key }) => ({
+      "aria-labelledby": groupLabelledBy(state, id, key),
+    }),
   }),
 
   "group-label": slot(groupLabelPart<ListboxStore, ListboxApi>()),

@@ -28,7 +28,10 @@ function mount(root: HTMLElement) {
           </ui-command-page>
           <ui-command-page value="theme">
             ${themes
-              .map((theme) => `<ui-command-item value="${theme.value}">${theme.label}</ui-command-item>`)
+              .map(
+                (theme) =>
+                  `<ui-command-item value="${theme.value}">${theme.label}</ui-command-item>`
+              )
               .join("")}
           </ui-command-page>
         </ui-command-list>
@@ -45,9 +48,12 @@ function mount(root: HTMLElement) {
     run: () => palette.run(),
     focus: () => palette.focus(),
   }
-  for (const button of root.querySelectorAll<HTMLElement>("[data-action]"))
+  for (const button of root.querySelectorAll<HTMLElement>("[data-action]")) {
     button.addEventListener("click", () => actions[button.dataset.action!]())
-  command.addEventListener("action", (event) => log(root, `Ran ${event.detail.value}`))
+  }
+  command.addEventListener("action", (event) =>
+    log(root, `Ran ${event.detail.value}`)
+  )
 }
 
 export { mount }

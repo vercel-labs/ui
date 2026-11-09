@@ -33,7 +33,7 @@ function mount(root: HTMLElement) {
                 (place) => `<li>
                   <div>${place.name}</div>
                   <div data-slot="hint">${place.detail}</div>
-                </li>`,
+                </li>`
               )
               .join("")}
           </ul>

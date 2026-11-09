@@ -49,7 +49,10 @@ createCheckboxGroupController().setValue(["a"], { reason: "imperative", event })
 createCollapsibleController().setOpen(true, { reason: "imperative", event })
 createComboboxController().setQuery("a", { reason: "imperative", event })
 createCommandController().push("a", { reason: "imperative", event })
-createDatePickerController().setValue("2026-10-16", { reason: "imperative", event })
+createDatePickerController().setValue("2026-10-16", {
+  reason: "imperative",
+  event,
+})
 createDrawerController().setSnapPoint(1, { reason: "imperative", event })
 createFileInputController().clear({ reason: "imperative", event })
 createInputController().setValue("a", { reason: "imperative", event })
@@ -59,7 +62,10 @@ createNavigationMenuController().setValue("a", { reason: "imperative", event })
 createNumberInputController().setValue(1, { reason: "imperative", event })
 createOTPInputController().setValue("1", { reason: "imperative", event })
 createPaginationController().setPage(1, { reason: "imperative", event })
-createPasswordInputController().setVisible(true, { reason: "imperative", event })
+createPasswordInputController().setVisible(true, {
+  reason: "imperative",
+  event,
+})
 createPopoverController().close({ reason: "imperative", event })
 createRadioGroupController().setValue("a", { reason: "imperative", event })
 createResizableController().setLayout([50, 50], { reason: "imperative", event })

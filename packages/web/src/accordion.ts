@@ -26,10 +26,21 @@ function defineAccordionElements() {
       state: {
         value: {
           get: (api: AccordionApi) => api.getValue(),
-          set: (api: AccordionApi, value: string[]) => api.setValue(value ?? []),
+          set: (api: AccordionApi, value: string[]) =>
+            api.setValue(value ?? []),
         },
       },
-      api: ["getValue", "setValue", "isOpen", "open", "close", "toggle", "openAll", "closeAll", "focus"],
+      api: [
+        "getValue",
+        "setValue",
+        "isOpen",
+        "open",
+        "close",
+        "toggle",
+        "openAll",
+        "closeAll",
+        "focus",
+      ],
     },
     // Fires `openchange` and `openchangecomplete` with the item's open state.
     item: { tag: "ui-accordion-item", display: "block" },
@@ -39,13 +50,21 @@ function defineAccordionElements() {
       display: "block",
       target: (el) => el.querySelector<HTMLElement>(heading) ?? el,
       render(el) {
-        if (el.querySelector(heading)) return
+        if (el.querySelector(heading)) {
+          return
+        }
         el.setAttribute("role", "heading")
-        if (!el.hasAttribute("aria-level")) el.setAttribute("aria-level", "3")
+        if (!el.hasAttribute("aria-level")) {
+          el.setAttribute("aria-level", "3")
+        }
       },
     },
     // A wrapper, so the trigger stays a real button with its built-in behavior.
-    trigger: { tag: "ui-accordion-trigger", display: "contents", target: wrappedButton },
+    trigger: {
+      tag: "ui-accordion-trigger",
+      display: "contents",
+      target: wrappedButton,
+    },
     panel: { tag: "ui-accordion-panel", display: "block" },
   })
 }

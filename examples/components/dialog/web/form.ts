@@ -32,7 +32,9 @@ function mount(root: HTMLElement) {
   `
   root.querySelector("ui-dialog")!.addEventListener("openchange", (event) => {
     const { value, reason, returnValue } = event.detail
-    if (!value) log(root, returnValue ? `Saved as ${returnValue}` : `Closed (${reason})`)
+    if (!value) {
+      log(root, returnValue ? `Saved as ${returnValue}` : `Closed (${reason})`)
+    }
   })
 }
 

@@ -42,14 +42,27 @@ function SettingsForm({ settings }: { settings: Settings }) {
       <Field className="flex-row items-center justify-between gap-6">
         <div className="grid gap-1.5">
           <FieldLabel>Email notifications</FieldLabel>
-          <FieldDescription>Get an email when someone mentions you or assigns you an issue.</FieldDescription>
+          <FieldDescription>
+            Get an email when someone mentions you or assigns you an issue.
+          </FieldDescription>
         </div>
-        <Switch name="emailNotifications" defaultChecked={settings.emailNotifications} />
+        <Switch
+          name="emailNotifications"
+          defaultChecked={settings.emailNotifications}
+        />
       </Field>
       <Field>
         <FieldLabel>Issues per page</FieldLabel>
-        <NumberInput name="pageSize" defaultValue={settings.pageSize} min={5} max={50} step={5} />
-        <FieldDescription>How many issues the list shows before it splits into pages.</FieldDescription>
+        <NumberInput
+          name="pageSize"
+          defaultValue={settings.pageSize}
+          min={5}
+          max={50}
+          step={5}
+        />
+        <FieldDescription>
+          How many issues the list shows before it splits into pages.
+        </FieldDescription>
       </Field>
       <Field>
         <Slider
@@ -65,15 +78,20 @@ function SettingsForm({ settings }: { settings: Settings }) {
               <Popover>
                 <PopoverTrigger
                   aria-label="About stale issues"
-                  className={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+                  className={buttonVariants({
+                    variant: "ghost",
+                    size: "icon-sm",
+                  })}
                 >
                   <Info aria-hidden="true" />
                 </PopoverTrigger>
                 <PopoverContent>
-                  <PopoverTitle className="font-medium">Stale issues</PopoverTitle>
+                  <PopoverTitle className="font-medium">
+                    Stale issues
+                  </PopoverTitle>
                   <PopoverDescription className="text-muted-foreground">
-                    An open issue with no comments or changes for this long moves to Canceled. Its assignee
-                    gets an email first.
+                    An open issue with no comments or changes for this long
+                    moves to Canceled. Its assignee gets an email first.
                   </PopoverDescription>
                 </PopoverContent>
               </Popover>

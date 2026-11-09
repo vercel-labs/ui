@@ -10,7 +10,12 @@
   ]
 </script>
 
-<Listbox orientation="horizontal" loop={false} defaultValue="m" aria-label="Size">
+<Listbox
+  orientation="horizontal"
+  loop={false}
+  defaultValue="m"
+  aria-label="Size"
+>
   {#each sizes as size (size.value)}
     <ListboxItem value={size.value} disabled={size.disabled}>
       {size.label}

@@ -31,7 +31,7 @@ function mount(root: HTMLElement) {
                   </ui-checkbox>
                   ${item.label}
                 </label>
-              `,
+              `
             )
             .join("")}
         </ui-checkbox-group>
@@ -64,7 +64,7 @@ function mount(root: HTMLElement) {
                     </ui-checkbox>
                     ${item.label}
                   </label>
-                `,
+                `
               )
               .join("")}
           </div>

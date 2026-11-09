@@ -1,5 +1,11 @@
 import * as React from "react"
-import { formatNumber, fractionOf, scrubTo, stepBy, stepFromKey } from "@ui-sdk/core/number"
+import {
+  formatNumber,
+  fractionOf,
+  scrubTo,
+  stepBy,
+  stepFromKey,
+} from "@ui-sdk/core/number"
 
 const sections = [
   { at: 0, label: "Intro" },
@@ -53,7 +59,9 @@ function Example() {
       <input
         type="range"
         aria-label="Playhead"
-        aria-valuetext={section ? `${clock(time)}, ${section.label}` : clock(time)}
+        aria-valuetext={
+          section ? `${clock(time)}, ${section.label}` : clock(time)
+        }
         min={range.min}
         max={range.max}
         step={range.step}
@@ -61,13 +69,22 @@ function Example() {
         onPointerDown={track}
         onPointerMove={track}
         onChange={(event) =>
-          setTime(scrubTo(Number(event.target.value), range, { snap: !free.current }).value)
+          setTime(
+            scrubTo(Number(event.target.value), range, { snap: !free.current })
+              .value
+          )
         }
         onKeyDown={(event) => {
           const move = stepFromKey(event)
-          if (!move) return
+          if (!move) {
+            return
+          }
           event.preventDefault()
-          setTime(stepBy(time, move, range, { snap: !(event.metaKey || event.ctrlKey) }))
+          setTime(
+            stepBy(time, move, range, {
+              snap: !(event.metaKey || event.ctrlKey),
+            })
+          )
         }}
       />
       <p data-slot="scrubber-readout">

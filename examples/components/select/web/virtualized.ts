@@ -7,16 +7,30 @@ const manyItems = Array.from({ length: 10_000 }, (_, index) => ({
   label: `Item ${index + 1}`,
 }))
 
-function visibleRows(scrollTop: number, height: number, count: number, row: number) {
+function visibleRows(
+  scrollTop: number,
+  height: number,
+  count: number,
+  row: number
+) {
   const start = Math.max(0, Math.floor(scrollTop / row) - 4)
   const end = Math.min(count, Math.ceil((scrollTop + height) / row) + 4)
   return { start, end }
 }
 
-function scrollForRow(index: number, scrollTop: number, height: number, row: number) {
+function scrollForRow(
+  index: number,
+  scrollTop: number,
+  height: number,
+  row: number
+) {
   const top = index * row
-  if (top < scrollTop) return top
-  if (top + row > scrollTop + height) return top + row - height
+  if (top < scrollTop) {
+    return top
+  }
+  if (top + row > scrollTop + height) {
+    return top + row - height
+  }
   return scrollTop
 }
 
@@ -50,18 +64,27 @@ function mount(root: HTMLElement) {
 
   const rendered = new Map<number, Element>()
   const render = () => {
-    const { start, end } = visibleRows(scroller.scrollTop, height, manyItems.length, row)
+    const { start, end } = visibleRows(
+      scroller.scrollTop,
+      height,
+      manyItems.length,
+      row
+    )
     for (const [index, el] of rendered) {
-      if (index >= start && index < end) continue
+      if (index >= start && index < end) {
+        continue
+      }
       el.remove()
       rendered.delete(index)
     }
     for (let index = start; index < end; index++) {
-      if (rendered.has(index)) continue
+      if (rendered.has(index)) {
+        continue
+      }
       const item = manyItems[index]
       rows.insertAdjacentHTML(
         "beforeend",
-        `<ui-select-item value="${item.value}" label="${item.label}" index="${index}" style="top: ${index * row}px; height: ${row}px">${item.label}</ui-select-item>`,
+        `<ui-select-item value="${item.value}" label="${item.label}" index="${index}" style="top: ${index * row}px; height: ${row}px">${item.label}</ui-select-item>`
       )
       rendered.set(index, rows.lastElementChild!)
     }
@@ -71,8 +94,15 @@ function mount(root: HTMLElement) {
   scroller.addEventListener("scroll", render)
   select.addEventListener("highlight", (event) => {
     const { index } = event.detail
-    if (index < 0) return
-    scroller.scrollTop = scrollForRow(index, scroller.scrollTop, scroller.clientHeight, row)
+    if (index < 0) {
+      return
+    }
+    scroller.scrollTop = scrollForRow(
+      index,
+      scroller.scrollTop,
+      scroller.clientHeight,
+      row
+    )
     render()
   })
 }

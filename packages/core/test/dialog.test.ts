@@ -1,5 +1,10 @@
 import { describe, expect, test, vi } from "vitest"
-import { alertDialog, createConfirm, createDialogController, dialog } from "../src/components/dialog/dialog"
+import {
+  alertDialog,
+  createConfirm,
+  createDialogController,
+  dialog,
+} from "../src/components/dialog/dialog"
 import { dialogRefusal } from "../src/components/dialog/dialog-api"
 import { outsideBox } from "../src/foundation/popups/popup"
 import { attachController } from "../src/foundation/kernel/controller"
@@ -29,7 +34,9 @@ describe("labelling", () => {
   })
 
   test("an alert dialog has its own role", () => {
-    expect(attrs(alertDialog({ id: "a", defaultOpen: true }).part("content")).role).toBe("alertdialog")
+    expect(
+      attrs(alertDialog({ id: "a", defaultOpen: true }).part("content")).role
+    ).toBe("alertdialog")
   })
 })
 
@@ -41,20 +48,31 @@ describe("modality", () => {
   })
 
   test("trap-focus and false aren't marked modal, since the page stays usable", () => {
-    for (const modal of [false, "trap-focus"] as const)
+    for (const modal of [false, "trap-focus"] as const) {
       expect(
-        attrs(dialog({ id: "d", defaultOpen: true, modal }).part("content"))["aria-modal"],
+        attrs(dialog({ id: "d", defaultOpen: true, modal }).part("content"))[
+          "aria-modal"
+        ]
       ).toBeUndefined()
+    }
   })
 
   test("an alert dialog is always modal", () => {
-    const instance = alertDialog({ id: "a", defaultOpen: true, modal: false } as never)
+    const instance = alertDialog({
+      id: "a",
+      defaultOpen: true,
+      modal: false,
+    } as never)
     expect(attrs(instance.part("content"))["aria-modal"]).toBe("true")
   })
 
   test("a modal dialog's trigger has no aria-expanded, and a non-modal one's does", () => {
-    expect(attrs(dialog({ id: "d" }).part("trigger"))["aria-expanded"]).toBeUndefined()
-    expect(attrs(dialog({ id: "d", modal: false }).part("trigger"))["aria-expanded"]).toBe("false")
+    expect(
+      attrs(dialog({ id: "d" }).part("trigger"))["aria-expanded"]
+    ).toBeUndefined()
+    expect(
+      attrs(dialog({ id: "d", modal: false }).part("trigger"))["aria-expanded"]
+    ).toBe("false")
   })
 
   test("changing modal after mount re-renders with the new value", () => {
@@ -71,7 +89,8 @@ describe("closing", () => {
     const instance = dialog({
       id: "d",
       defaultOpen: true,
-      onOpenChange: (open, details) => changes.push([open, details.reason, details.returnValue]),
+      onOpenChange: (open, details) =>
+        changes.push([open, details.reason, details.returnValue]),
     })
     press(instance.part("close", { value: "save" }))?.()
     expect(changes).toEqual([[false, "close-press", "save"]])
@@ -80,15 +99,27 @@ describe("closing", () => {
 
   test("an outside press never closes an alert dialog", () => {
     const instance = alertDialog({ id: "a", defaultOpen: true })
-    ;(instance.api as { internal: { hide: (close: { reason: string }) => void } }).internal.hide({
+    ;(
+      instance.api as {
+        internal: { hide: (close: { reason: string }) => void }
+      }
+    ).internal.hide({
       reason: "outside-press",
     })
     expect(instance.get()).toMatchObject({ open: true })
   })
 
   test("closeOnOutsidePress false keeps a dialog open on an outside press, and Escape still closes it", () => {
-    const instance = dialog({ id: "d", defaultOpen: true, closeOnOutsidePress: false })
-    const hide = (instance.api as { internal: { hide: (close: { reason: string }) => void } }).internal.hide
+    const instance = dialog({
+      id: "d",
+      defaultOpen: true,
+      closeOnOutsidePress: false,
+    })
+    const hide = (
+      instance.api as {
+        internal: { hide: (close: { reason: string }) => void }
+      }
+    ).internal.hide
     hide({ reason: "outside-press" })
     expect(instance.get()).toMatchObject({ open: true })
     hide({ reason: "escape-key" })
@@ -97,13 +128,21 @@ describe("closing", () => {
 
   test("a non-modal dialog doesn't close on an outside press by default", () => {
     const instance = dialog({ id: "d", defaultOpen: true, modal: false })
-    const hide = (instance.api as { internal: { hide: (close: { reason: string }) => void } }).internal.hide
+    const hide = (
+      instance.api as {
+        internal: { hide: (close: { reason: string }) => void }
+      }
+    ).internal.hide
     hide({ reason: "outside-press" })
     expect(instance.get()).toMatchObject({ open: true })
   })
 
   test("canceling the close keeps it open", () => {
-    const instance = dialog({ id: "d", defaultOpen: true, onOpenChange: (_, details) => details.cancel() })
+    const instance = dialog({
+      id: "d",
+      defaultOpen: true,
+      onOpenChange: (_, details) => details.cancel(),
+    })
     press(instance.part("close"))?.()
     expect(instance.get()).toMatchObject({ open: true })
   })
@@ -115,7 +154,10 @@ describe("confirm", () => {
     const instance = alertDialog({ id: "a", controller: confirm.controller })
     attachController(confirm.controller, instance.api)
     const yes = confirm({ name: "Acme" })
-    expect(instance.get()).toMatchObject({ open: true, payload: { name: "Acme" } })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      payload: { name: "Acme" },
+    })
     press(instance.part("close", { value: "confirm" }))?.()
     expect(await yes).toBe(true)
     const no = confirm({ name: "Acme" })
@@ -125,29 +167,50 @@ describe("confirm", () => {
 })
 
 describe("dismissal policy", () => {
-  const open = { dismissible: true, outsidePress: true, pending: false, beside: false }
+  const open = {
+    dismissible: true,
+    outsidePress: true,
+    pending: false,
+    beside: false,
+  }
 
   test("dismissals close unless dismissible is false, which makes them attempts", () => {
     for (const reason of ["escape-key", "outside-press", "back"]) {
       expect(dialogRefusal(reason, open)).toBeUndefined()
-      expect(dialogRefusal(reason, { ...open, dismissible: false })).toBe("attempt")
+      expect(dialogRefusal(reason, { ...open, dismissible: false })).toBe(
+        "attempt"
+      )
     }
   })
 
   test("Close parts, triggers and the controller close a non-dismissible dialog", () => {
-    for (const reason of ["close-press", "trigger-press", "imperative", "action"])
-      expect(dialogRefusal(reason, { ...open, dismissible: false })).toBeUndefined()
+    for (const reason of [
+      "close-press",
+      "trigger-press",
+      "imperative",
+      "action",
+    ]) {
+      expect(
+        dialogRefusal(reason, { ...open, dismissible: false })
+      ).toBeUndefined()
+    }
   })
 
   test("an outside press is an attempt when outside presses don't close", () => {
-    expect(dialogRefusal("outside-press", { ...open, outsidePress: false })).toBe("attempt")
-    expect(dialogRefusal("escape-key", { ...open, outsidePress: false })).toBeUndefined()
+    expect(
+      dialogRefusal("outside-press", { ...open, outsidePress: false })
+    ).toBe("attempt")
+    expect(
+      dialogRefusal("escape-key", { ...open, outsidePress: false })
+    ).toBeUndefined()
   })
 
   test("a refused press beside a non-modal dialog is the page's, not an attempt", () => {
     const beside = { ...open, outsidePress: false, beside: true }
     expect(dialogRefusal("outside-press", beside)).toBe("silent")
-    expect(dialogRefusal("escape-key", { ...beside, dismissible: false })).toBe("attempt")
+    expect(dialogRefusal("escape-key", { ...beside, dismissible: false })).toBe(
+      "attempt"
+    )
   })
 
   test("a running action blocks everything but the controller", () => {
@@ -168,7 +231,11 @@ describe("dismissal policy", () => {
       onDismissAttempt: ({ reason }) => attempts.push(reason),
       onOpenChange: (_, { reason }) => changes.push(reason),
     })
-    const hide = (instance.api as { internal: { hide: (close: { reason: string }) => void } }).internal.hide
+    const hide = (
+      instance.api as {
+        internal: { hide: (close: { reason: string }) => void }
+      }
+    ).internal.hide
     hide({ reason: "escape-key" })
     hide({ reason: "back" })
     expect(attempts).toEqual(["escape-key", "back"])
@@ -185,7 +252,11 @@ describe("dismissal policy", () => {
       modal: false,
       onDismissAttempt: ({ reason }) => attempts.push(reason),
     })
-    ;(instance.api as { internal: { hide: (close: { reason: string }) => void } }).internal.hide({
+    ;(
+      instance.api as {
+        internal: { hide: (close: { reason: string }) => void }
+      }
+    ).internal.hide({
       reason: "outside-press",
     })
     expect(attempts).toEqual([])
@@ -199,7 +270,8 @@ describe("actions", () => {
     const instance = alertDialog({
       id: "a",
       defaultOpen: true,
-      onOpenChange: (open, details) => changes.push([open, details.reason, details.returnValue]),
+      onOpenChange: (open, details) =>
+        changes.push([open, details.reason, details.returnValue]),
     })
     const action = () => new Promise<void>((resolve) => (finish = resolve))
     const props = { id: "delete", value: "confirm", action }
@@ -221,13 +293,20 @@ describe("actions", () => {
 
   test("a rejected action keeps the dialog open and shows the error until the next press", async () => {
     const instance = alertDialog({ id: "a", defaultOpen: true })
-    const props = { id: "delete", action: () => Promise.reject(new Error("Offline")) }
+    const props = {
+      id: "delete",
+      action: () => Promise.reject(new Error("Offline")),
+    }
     press(instance.part("close", props))?.()
     await new Promise((resolve) => setTimeout(resolve))
     expect(instance.get()).toMatchObject({ open: true, pending: null })
-    expect((partState(instance.part("close", props)).error as Error).message).toBe("Offline")
+    expect(
+      (partState(instance.part("close", props)).error as Error).message
+    ).toBe("Offline")
     expect(attrs(instance.part("close", props))["data-pending"]).toBeUndefined()
-    expect(attrs(instance.part("close", props))["aria-disabled"]).toBeUndefined()
+    expect(
+      attrs(instance.part("close", props))["aria-disabled"]
+    ).toBeUndefined()
     press(instance.part("close", { ...props, action: () => undefined }))?.()
     expect(instance.get()).toMatchObject({ open: false })
   })
@@ -241,7 +320,9 @@ describe("actions", () => {
     const action = () => new Promise<void>((resolve) => (finish = resolve))
     const rejected = () => new Promise<void>((_, reject) => (fail = reject))
     controller.open()
-    press(instance.part("close", { id: "delete", value: "confirm", action }))?.()
+    press(
+      instance.part("close", { id: "delete", value: "confirm", action })
+    )?.()
     controller.close()
     const second = controller.open()
     expect(instance.get()).toMatchObject({ open: true, pending: null })
@@ -251,7 +332,11 @@ describe("actions", () => {
     finish()
     fail(new Error("Offline"))
     await new Promise((resolve) => setTimeout(resolve))
-    expect(instance.get()).toMatchObject({ open: true, pending: null, errors: {} })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      pending: null,
+      errors: {},
+    })
     controller.close({ returnValue: "cancel" })
     expect((await second).reason).toBe("imperative")
   })
@@ -273,7 +358,11 @@ describe("typed results", () => {
     const changes: string[] = []
     const controller = createDialogController()
     const instance = kept(
-      dialog({ id: "d", controller, onOpenChange: (_, { reason }) => changes.push(reason) }),
+      dialog({
+        id: "d",
+        controller,
+        onOpenChange: (_, { reason }) => changes.push(reason),
+      })
     )
     const result = controller.open()
     instance.destroy()
@@ -296,13 +385,19 @@ describe("typed results", () => {
 
   test("an aborted signal closes the dialog with reason imperative, and resolves once", async () => {
     const reasons: string[] = []
-    const instance = dialog({ id: "s", onOpenChange: (_, { reason }) => reasons.push(reason) })
+    const instance = dialog({
+      id: "s",
+      onOpenChange: (_, { reason }) => reasons.push(reason),
+    })
     const abort = new AbortController()
     const result = instance.api.open({ signal: abort.signal })
     expect(instance.api.isOpen()).toBe(true)
     abort.abort()
     expect(instance.api.isOpen()).toBe(false)
-    expect(await result).toEqual({ reason: "imperative", source: "programmatic" })
+    expect(await result).toEqual({
+      reason: "imperative",
+      source: "programmatic",
+    })
     expect(reasons).toEqual(["imperative", "imperative"])
   })
 
@@ -329,9 +424,13 @@ describe("debug", () => {
   test("a Close action going pending and failing logs, like a change", async () => {
     const log = vi.spyOn(console, "debug").mockImplementation(() => {})
     const instance = dialog({ id: "d", debug: true, defaultOpen: true })
-    instance.api.internal.closePress("close", { action: () => Promise.reject("offline") })
+    instance.api.internal.closePress("close", {
+      action: () => Promise.reject("offline"),
+    })
     await new Promise((resolve) => setTimeout(resolve))
-    const lines = log.mock.calls.map(([line]) => String(line)).filter((line) => !line.includes(" open:"))
+    const lines = log.mock.calls
+      .map(([line]) => String(line))
+      .filter((line) => !line.includes(" open:"))
     expect(lines).toEqual([
       expect.stringContaining("dialog#d pending: true (action"),
       expect.stringContaining("dialog#d pending: false (action"),

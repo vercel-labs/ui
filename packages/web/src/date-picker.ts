@@ -1,8 +1,17 @@
 import type { PrimitiveInstance } from "@ui-sdk/core"
 import { datePicker, type DatePickerHintState } from "@ui-sdk/core/date-picker"
 import { partState } from "@ui-sdk/core/renderer"
-import { defineCalendarParts, renderCalendarParts, renderDefaultCalendar } from "./calendar"
-import { createParts, findOwner, ownButton, parseAttribute } from "./define-element"
+import {
+  defineCalendarParts,
+  renderCalendarParts,
+  renderDefaultCalendar,
+} from "./calendar"
+import {
+  createParts,
+  findOwner,
+  ownButton,
+  parseAttribute,
+} from "./define-element"
 import { showDefaultText } from "./default-text"
 import { element } from "./list"
 import { popupKinds, popupState, sheetPortal } from "./popup"
@@ -40,7 +49,11 @@ function defineDatePickerElements() {
   createParts(datePicker, {
     root: {
       tag: owner,
-      defaults: { showOutsideDays: true, closeOnSelect: true, dismissible: true },
+      defaults: {
+        showOutsideDays: true,
+        closeOnSelect: true,
+        dismissible: true,
+      },
       display: "block",
       formAssociated: true,
       kinds: popupKinds,
@@ -51,12 +64,20 @@ function defineDatePickerElements() {
       // disabled Field does in the other frameworks.
       options: (el) => ({
         container: undefined,
-        ...(el.closest("ui-field")?.hasAttribute("disabled") && { disabled: true }),
+        ...(el.closest("ui-field")?.hasAttribute("disabled") && {
+          disabled: true,
+        }),
       }),
       // The live `value` and `month` properties, as on a calendar.
       state: {
-        value: { get: (api) => api.getValue(), set: (api, value) => api.setValue(value) },
-        month: { get: (api) => api.getMonth(), set: (api, month) => api.setMonth(month) },
+        value: {
+          get: (api) => api.getValue(),
+          set: (api, value) => api.setValue(value),
+        },
+        month: {
+          get: (api) => api.getMonth(),
+          set: (api, month) => api.setMonth(month),
+        },
         ...popupState,
       },
       api: [
@@ -79,7 +100,9 @@ function defineDatePickerElements() {
       render(picker, instance) {
         if (!checkedForContent.has(picker)) {
           checkedForContent.add(picker)
-          if (!picker.firstElementChild) renderDefaultContent(picker)
+          if (!picker.firstElementChild) {
+            renderDefaultContent(picker)
+          }
         }
         const cleanups = [
           renderCalendarParts(picker, instance),
@@ -87,7 +110,9 @@ function defineDatePickerElements() {
             picker,
             instance,
             "ui-date-picker-hint",
-            () => (partState(instance.part("hint", {})) as DatePickerHintState).placeholder,
+            () =>
+              (partState(instance.part("hint", {})) as DatePickerHintState)
+                .placeholder
           ),
         ]
         if (hasDefaultContent.has(picker)) {
@@ -102,7 +127,9 @@ function defineDatePickerElements() {
       tag: "ui-date-picker-input",
       display: "contents",
       target: textInput,
-      context: (el) => ({ id: parseAttribute("boolean", el.getAttribute("end")) ? "end" : "start" }),
+      context: (el) => ({
+        id: parseAttribute("boolean", el.getAttribute("end")) ? "end" : "start",
+      }),
       // The input's binding reads which end it holds once.
       rebind: ["end"],
     },
@@ -117,11 +144,17 @@ function defineDatePickerElements() {
       kinds: popupKinds,
       render(el) {
         const picker = findOwner(el, owner)
-        if (picker && !el.firstElementChild) renderDefaultCalendar(el, picker)
+        if (picker && !el.firstElementChild) {
+          renderDefaultCalendar(el, picker)
+        }
       },
     },
     hint: "ui-date-picker-hint",
-    clear: { tag: "ui-date-picker-clear", display: "contents", target: ownButton() },
+    clear: {
+      tag: "ui-date-picker-clear",
+      display: "contents",
+      target: ownButton(),
+    },
     // `value` is a date, or a range's two dates separated by a comma.
     preset: {
       tag: "ui-date-picker-preset",
@@ -151,7 +184,7 @@ function renderDefaultContent(picker: HTMLElement) {
   picker.append(
     element("ui-date-picker-input"),
     element("ui-date-picker-trigger"),
-    element("ui-date-picker-content"),
+    element("ui-date-picker-content")
   )
 }
 
@@ -159,20 +192,27 @@ function renderDefaultContent(picker: HTMLElement) {
 function matchInputs(picker: HTMLElement, instance: PrimitiveInstance) {
   // The mode is in state, which `get()` types loosely.
   const { mode } = instance.get() as { mode: string }
-  if (renderedModes.get(picker) === mode) return
+  if (renderedModes.get(picker) === mode) {
+    return
+  }
   renderedModes.set(picker, mode)
   const end = picker.querySelector(":scope > ui-date-picker-input[end]")
-  if (mode !== "range") return end?.remove()
-  if (!end)
+  if (mode !== "range") {
+    return end?.remove()
+  }
+  if (!end) {
     picker
       .querySelector(":scope > ui-date-picker-input")
       ?.after(element("ui-date-picker-input", { end: true }))
+  }
 }
 
 // The <input> an input part wraps, made when the author wrote none.
 function textInput(el: HTMLElement) {
   const written = el.querySelector("input")
-  if (written) return written
+  if (written) {
+    return written
+  }
   const input = element("input")
   el.append(input)
   return input

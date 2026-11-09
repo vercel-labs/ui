@@ -2,18 +2,42 @@ import { cn } from "cn"
 import { Poster } from "./home-posters"
 
 const behaviors = [
-  { name: "createRovingFocus", group: "Focus", body: "Arrow keys move through a list, with one Tab stop." },
-  { name: "createTypeahead", group: "Focus", body: "Type a few letters to jump to an item." },
-  { name: "createPopup", group: "Popups", body: "Opens next to its button and stays on screen." },
+  {
+    name: "createRovingFocus",
+    group: "Focus",
+    body: "Arrow keys move through a list, with one Tab stop.",
+  },
+  {
+    name: "createTypeahead",
+    group: "Focus",
+    body: "Type a few letters to jump to an item.",
+  },
+  {
+    name: "createPopup",
+    group: "Popups",
+    body: "Opens next to its button and stays on screen.",
+  },
   {
     name: "createSelection",
     group: "Selection",
     body: "Pick one or many, with Shift and Ctrl like a file manager.",
   },
-  { name: "createReorder", group: "Drag and drop", body: "Sort a list with a pointer or the keyboard." },
-  { name: "createResize", group: "Moving and resizing", body: "Resize boxes from their handles." },
+  {
+    name: "createReorder",
+    group: "Drag and drop",
+    body: "Sort a list with a pointer or the keyboard.",
+  },
+  {
+    name: "createResize",
+    group: "Moving and resizing",
+    body: "Resize boxes from their handles.",
+  },
   { name: "createViewport", group: "Canvas", body: "Pan and zoom a canvas." },
-  { name: "createVirtualizer", group: "Lists", body: "Renders only the rows you can see." },
+  {
+    name: "createVirtualizer",
+    group: "Lists",
+    body: "Renders only the rows you can see.",
+  },
 ]
 
 function BehaviorsPoster({ fig }: { fig?: string }) {
@@ -32,7 +56,7 @@ function BehaviorsPoster({ fig }: { fig?: string }) {
             key={behavior.name}
             className={cn(
               "grid grid-cols-[1.75rem_minmax(0,1fr)] gap-x-2 border-b border-foreground/15 py-4 @[40rem]:pe-6 @[72rem]:py-5",
-              index > 3 && "@max-[40rem]:hidden",
+              index > 3 && "@max-[40rem]:hidden"
             )}
           >
             <span
@@ -45,8 +69,12 @@ function BehaviorsPoster({ fig }: { fig?: string }) {
               <span className="font-mono text-[10px] tracking-[0.06em] text-muted-foreground uppercase">
                 {behavior.group}
               </span>
-              <code className="truncate font-mono text-[15px] leading-tight">{behavior.name}</code>
-              <span className="text-sm leading-snug text-pretty text-muted-foreground">{behavior.body}</span>
+              <code className="truncate font-mono text-[15px] leading-tight">
+                {behavior.name}
+              </code>
+              <span className="text-sm leading-snug text-pretty text-muted-foreground">
+                {behavior.body}
+              </span>
             </span>
           </li>
         ))}

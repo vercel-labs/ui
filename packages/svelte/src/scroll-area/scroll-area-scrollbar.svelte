@@ -18,7 +18,8 @@ A scrollbar for one axis, over the viewport's edge.
   let {
     orientation = "vertical",
     ...rest
-  }: PartProps<"div", ScrollAreaScrollbarState> & ScrollAreaScrollbarProps = $props()
+  }: PartProps<"div", ScrollAreaScrollbarState> & ScrollAreaScrollbarProps =
+    $props()
 
   setContext<OrientationContext>(OrientationKey, () => orientation)
   const scrollbar = usePart(scrollArea, "scrollbar", () => ({

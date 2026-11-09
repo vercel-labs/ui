@@ -7,7 +7,11 @@ import {
   OTPInputSeparator,
   OTPInputSlot,
 } from "@ui-sdk/vue"
-import { otpInputAction, otpInputFixture, otpInputOptions } from "tests/fixtures/otp-input.ts"
+import {
+  otpInputAction,
+  otpInputFixture,
+  otpInputOptions,
+} from "tests/fixtures/otp-input.ts"
 import { ref } from "vue"
 
 const controller = createOTPInputController()
@@ -16,10 +20,14 @@ const { code, recovery, form } = otpInputFixture
 const action = ref("")
 const submitted = ref("")
 // The first index of each group.
-const starts = code.groups.map((_, group) => code.groups.slice(0, group).reduce((sum, size) => sum + size, 0))
+const starts = code.groups.map((_, group) =>
+  code.groups.slice(0, group).reduce((sum, size) => sum + size, 0)
+)
 
 function onValueChange(value: string, details: ChangeDetails) {
-  if (cancel && value.includes(cancel)) return details.cancel()
+  if (cancel && value.includes(cancel)) {
+    return details.cancel()
+  }
   action.value = otpInputAction.change(value, details.reason)
 }
 
@@ -28,7 +36,9 @@ function onValueCommit(value: string) {
 }
 
 function onSubmit(event: SubmitEvent) {
-  submitted.value = String(new FormData(event.currentTarget as HTMLFormElement).get(code.name))
+  submitted.value = String(
+    new FormData(event.currentTarget as HTMLFormElement).get(code.name)
+  )
 }
 </script>
 
@@ -47,7 +57,9 @@ function onSubmit(event: SubmitEvent) {
         @value-commit="onValueCommit"
       >
         <template v-for="(size, group) in code.groups" :key="group">
-          <OTPInputSeparator v-if="group > 0" class="otp-separator">-</OTPInputSeparator>
+          <OTPInputSeparator v-if="group > 0" class="otp-separator"
+            >-</OTPInputSeparator
+          >
           <OTPInputGroup class="otp-group">
             <OTPInputSlot
               v-for="slot in size"
@@ -61,12 +73,24 @@ function onSubmit(event: SubmitEvent) {
       <button type="submit">{{ form.submit }}</button>
       <button type="reset">{{ form.reset }}</button>
     </form>
-    <OTPInput class="otp" :aria-label="recovery.label" :max-length="recovery.length" pattern="alphanumeric">
+    <OTPInput
+      class="otp"
+      :aria-label="recovery.label"
+      :max-length="recovery.length"
+      pattern="alphanumeric"
+    >
       <OTPInputGroup class="otp-group">
-        <OTPInputSlot v-for="slot in recovery.length" :key="slot" :index="slot - 1" class="otp-slot" />
+        <OTPInputSlot
+          v-for="slot in recovery.length"
+          :key="slot"
+          :index="slot - 1"
+          class="otp-slot"
+        />
       </OTPInputGroup>
     </OTPInput>
-    <button @click="controller.setValue(otpInputFixture.filled)">Fill code</button>
+    <button @click="controller.setValue(otpInputFixture.filled)">
+      Fill code
+    </button>
     <button @click="controller.clear()">Clear code</button>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>

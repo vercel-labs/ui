@@ -10,7 +10,11 @@ function Example() {
   return (
     <Field>
       <FieldLabel>Verification code</FieldLabel>
-      <OTPInput onValueCommit={(value, details) => log(`Checking ${value} (${details.reason})`)}>
+      <OTPInput
+        onValueCommit={(value, details) =>
+          log(`Checking ${value} (${details.reason})`)
+        }
+      >
         <OTPInputGroup>
           {[0, 1, 2, 3, 4, 5].map((index) => (
             <OTPInputSlot key={index} index={index} />

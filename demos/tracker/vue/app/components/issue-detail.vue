@@ -47,7 +47,11 @@ import {
   SelectTrigger,
 } from "~/components/ui/select"
 import { Textarea } from "~/components/ui/textarea"
-import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { updateIssues } from "~/composables/issues"
 
 const props = defineProps<{ issue: Issue; query: Query }>()
@@ -58,23 +62,33 @@ function save(patch: IssuePatch) {
 
 function saveTitle(event: FocusEvent) {
   const title = (event.currentTarget as HTMLInputElement).value.trim()
-  if (title && title !== props.issue.title) save({ title })
+  if (title && title !== props.issue.title) {
+    save({ title })
+  }
 }
 
 function saveDescription(event: FocusEvent) {
   const description = (event.currentTarget as HTMLTextAreaElement).value
-  if (description !== props.issue.description) save({ description })
+  if (description !== props.issue.description) {
+    save({ description })
+  }
 }
 </script>
 
 <template>
   <article aria-labelledby="issue-title" class="flex min-h-0 flex-1 flex-col">
-    <div class="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2">
-      <span class="text-sm text-muted-foreground tabular-nums">{{ issue.id }}</span>
+    <div
+      class="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2"
+    >
+      <span class="text-sm text-muted-foreground tabular-nums">{{
+        issue.id
+      }}</span>
       <Tooltip>
         <TooltipTrigger
           aria-label="Close issue"
-          :class="cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'ms-auto')"
+          :class="
+            cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'ms-auto')
+          "
         >
           <template #render="{ props: trigger }">
             <NuxtLink v-bind="trigger" :to="href(query, { issue: null })">
@@ -110,15 +124,24 @@ function saveDescription(event: FocusEvent) {
           <Select
             :items="statuses"
             :value="issue.status"
-            @value-change="(status: string | null) => status && save({ status: status as Status })"
+            @value-change="
+              (status: string | null) =>
+                status && save({ status: status as Status })
+            "
           >
             <div class="grid gap-2">
               <SelectLabel>Status</SelectLabel>
               <SelectTrigger icon />
             </div>
             <SelectContent>
-              <SelectItem v-for="status in statuses" :key="status.value" :value="status.value">
-                <SelectItemIcon><StatusIcon :status="status.value" /></SelectItemIcon>
+              <SelectItem
+                v-for="status in statuses"
+                :key="status.value"
+                :value="status.value"
+              >
+                <SelectItemIcon
+                  ><StatusIcon :status="status.value"
+                /></SelectItemIcon>
                 {{ status.label }}
               </SelectItem>
             </SelectContent>
@@ -155,7 +178,10 @@ function saveDescription(event: FocusEvent) {
           </Combobox>
           <Field>
             <FieldLabel>Due date</FieldLabel>
-            <DatePicker :value="issue.due" @value-change="(due: string | null) => save({ due })" />
+            <DatePicker
+              :value="issue.due"
+              @value-change="(due: string | null) => save({ due })"
+            />
           </Field>
           <Combobox
             multiple
@@ -173,18 +199,31 @@ function saveDescription(event: FocusEvent) {
                     :value="id"
                     :label="state.labels[index]"
                   >
-                    <span class="size-2 rounded-full" :style="{ background: labelOf(id)?.color }"></span>
+                    <span
+                      class="size-2 rounded-full"
+                      :style="{ background: labelOf(id)?.color }"
+                    ></span>
                   </ComboboxChip>
                 </ComboboxValue>
-                <ComboboxInput :placeholder="issue.labels.length ? '' : 'Add a label'" />
+                <ComboboxInput
+                  :placeholder="issue.labels.length ? '' : 'Add a label'"
+                />
                 <ComboboxTrigger aria-label="Show labels" />
               </ComboboxChips>
             </div>
             <ComboboxContent>
               <ComboboxEmpty>No labels match.</ComboboxEmpty>
               <ComboboxList>
-                <ComboboxItem v-for="label in labels" :key="label.id" :value="label.id" :label="label.name">
-                  <span class="size-2 rounded-full" :style="{ background: label.color }"></span>
+                <ComboboxItem
+                  v-for="label in labels"
+                  :key="label.id"
+                  :value="label.id"
+                  :label="label.name"
+                >
+                  <span
+                    class="size-2 rounded-full"
+                    :style="{ background: label.color }"
+                  ></span>
                   {{ label.name }}
                 </ComboboxItem>
               </ComboboxList>
@@ -195,11 +234,19 @@ function saveDescription(event: FocusEvent) {
           aria-labelledby="priority-label"
           :value="issue.priority"
           class="grid gap-2"
-          @value-change="(priority: string) => save({ priority: priority as Priority })"
+          @value-change="
+            (priority: string) => save({ priority: priority as Priority })
+          "
         >
-          <span id="priority-label" class="text-sm leading-none font-medium">Priority</span>
+          <span id="priority-label" class="text-sm leading-none font-medium"
+            >Priority</span
+          >
           <div class="flex flex-wrap gap-x-4 gap-y-2">
-            <label v-for="priority in priorities" :key="priority.value" class="flex items-center gap-2">
+            <label
+              v-for="priority in priorities"
+              :key="priority.value"
+              class="flex items-center gap-2"
+            >
               <Radio :value="priority.value" />
               <PriorityIcon :priority="priority.value" />
               {{ priority.label }}

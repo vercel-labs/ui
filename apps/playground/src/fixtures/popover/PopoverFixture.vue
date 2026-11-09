@@ -43,8 +43,12 @@ const triggerShown = ref(true)
       </PopoverTrigger>
       <PopoverContent class="popup" :side-offset="8" v-bind="content">
         <PopoverArrow class="arrow" />
-        <PopoverTitle v-if="parts.title" class="title">{{ popoverFixture.title }}</PopoverTitle>
-        <PopoverDescription class="description">{{ popoverFixture.description }}</PopoverDescription>
+        <PopoverTitle v-if="parts.title" class="title">{{
+          popoverFixture.title
+        }}</PopoverTitle>
+        <PopoverDescription class="description">{{
+          popoverFixture.description
+        }}</PopoverDescription>
         <label class="field">
           {{ popoverFixture.field }}
           <input :value="popoverFixture.defaultValue" />
@@ -52,12 +56,21 @@ const triggerShown = ref(true)
         <div class="actions">
           <button @click="action = 'save'">
             {{ popoverFixture.action }}
-            <PopoverShortcut v-if="parts.shortcut" :shortcut="popoverFixture.shortcut.save" />
+            <PopoverShortcut
+              v-if="parts.shortcut"
+              :shortcut="popoverFixture.shortcut.save"
+            />
           </button>
           <PopoverClose>{{ popoverFixture.close }}</PopoverClose>
-          <button v-if="parts.removable" @click="triggerShown = false">{{ popoverFixture.remove }}</button>
+          <button v-if="parts.removable" @click="triggerShown = false">
+            {{ popoverFixture.remove }}
+          </button>
         </div>
-        <Menu v-if="parts.menu" :container="options.container" @action="(value: string) => (action = value)">
+        <Menu
+          v-if="parts.menu"
+          :container="options.container"
+          @action="(value: string) => (action = value)"
+        >
           <MenuTrigger>{{ popoverFixture.menu.trigger }}</MenuTrigger>
           <MenuContent class="popup">
             <MenuItem
@@ -73,8 +86,12 @@ const triggerShown = ref(true)
         <Popover v-if="parts.nested">
           <PopoverTrigger>{{ popoverFixture.nested.trigger }}</PopoverTrigger>
           <PopoverContent class="popup">
-            <PopoverTitle class="title">{{ popoverFixture.nested.title }}</PopoverTitle>
-            <button @click="action = 'archive'">{{ popoverFixture.nested.action }}</button>
+            <PopoverTitle class="title">{{
+              popoverFixture.nested.title
+            }}</PopoverTitle>
+            <button @click="action = 'archive'">
+              {{ popoverFixture.nested.action }}
+            </button>
           </PopoverContent>
         </Popover>
       </PopoverContent>

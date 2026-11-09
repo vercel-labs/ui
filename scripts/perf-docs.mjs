@@ -23,7 +23,9 @@ const end = "<!-- catalog:end -->"
 // The example port in run commands. Every server command sets its own.
 const port = 5310
 
-const { values: flags } = parseArgs({ options: { check: { type: "boolean", default: false } } })
+const { values: flags } = parseArgs({
+  options: { check: { type: "boolean", default: false } },
+})
 
 const budgets = await load(budgetsFile, "budgets")
 const budgetSource = readFileSync(budgetsFile, "utf8")
@@ -40,12 +42,14 @@ const entries = Object.entries(budgets).map(([key, budget]) => ({
 for (const { key, budget, readers } of entries) {
   for (const field of ["measures", "why"]) {
     if (typeof budget[field] !== "string" || !budget[field].trim()) {
-      problems.push(`budgets["${key}"] has no \`${field}\`. Add one to tests/perf/budgets.ts.`)
+      problems.push(
+        `budgets["${key}"] has no \`${field}\`. Add one to tests/perf/budgets.ts.`
+      )
     }
   }
   if (!readers.length) {
     problems.push(
-      `No test reads budgets["${key}"]. Read it in a count gate in tests/specs/<name>.counts.spec.ts or a unit test in packages/*/test, or remove it from tests/perf/budgets.ts.`,
+      `No test reads budgets["${key}"]. Read it in a count gate in tests/specs/<name>.counts.spec.ts or a unit test in packages/*/test, or remove it from tests/perf/budgets.ts.`
     )
   }
 }
@@ -54,7 +58,7 @@ const anchors = new Map()
 for (const { key, anchor } of entries) {
   if (anchors.has(anchor)) {
     problems.push(
-      `budgets["${key}"] and budgets["${anchors.get(anchor)}"] share the anchor #${anchor}. Rename one.`,
+      `budgets["${key}"] and budgets["${anchors.get(anchor)}"] share the anchor #${anchor}. Rename one.`
     )
   }
   anchors.set(anchor, key)
@@ -62,10 +66,12 @@ for (const { key, anchor } of entries) {
 
 // Assertion messages link to catalog entries, so each link must name one.
 for (const file of testFiles) {
-  for (const [, anchor] of file.source.matchAll(/tests\/perf\/README\.md#([\w-]+?)\.?["'`\s]/g)) {
+  for (const [, anchor] of file.source.matchAll(
+    /tests\/perf\/README\.md#([\w-]+?)\.?["'`\s]/g
+  )) {
     if (!anchors.has(anchor)) {
       problems.push(
-        `${file.relative} links to tests/perf/README.md#${anchor}, which no budget has. Link to the budget's key with its dots as dashes.`,
+        `${file.relative} links to tests/perf/README.md#${anchor}, which no budget has. Link to the budget's key with its dots as dashes.`
       )
     }
   }
@@ -83,16 +89,18 @@ const next = hasMarkers
 if (flags.check) {
   if (!hasMarkers) {
     problems.unshift(
-      `tests/perf/README.md has no ${start} and ${end} markers. Add them where the catalog goes, then run \`pnpm docs:perf\`.`,
+      `tests/perf/README.md has no ${start} and ${end} markers. Add them where the catalog goes, then run \`pnpm docs:perf\`.`
     )
   } else if (next !== readme) {
     problems.unshift(
-      "The catalog in tests/perf/README.md is stale. Run `pnpm docs:perf` and commit tests/perf/README.md.",
+      "The catalog in tests/perf/README.md is stale. Run `pnpm docs:perf` and commit tests/perf/README.md."
     )
   }
 } else if (next !== readme) {
   writeFileSync(readmeFile, next)
-  console.log(`Wrote the catalog in tests/perf/README.md: ${entries.length} budgets.`)
+  console.log(
+    `Wrote the catalog in tests/perf/README.md: ${entries.length} budgets.`
+  )
 } else {
   console.log("The catalog in tests/perf/README.md is up to date.")
 }
@@ -102,7 +110,7 @@ if (problems.length) {
   process.exitCode = 1
 } else if (flags.check) {
   console.log(
-    `The perf catalog matches tests/perf/budgets.ts: ${entries.length} budgets, each read by a test.`,
+    `The perf catalog matches tests/perf/budgets.ts: ${entries.length} budgets, each read by a test.`
   )
 }
 
@@ -140,12 +148,19 @@ function findTestFiles() {
       return []
     }
     return readdirSync(dir, { recursive: true })
-      .filter((file) => /\.test\.tsx?$/.test(file) && !file.includes("node_modules"))
+      .filter(
+        (file) => /\.test\.tsx?$/.test(file) && !file.includes("node_modules")
+      )
       .map((file) => path.join(dir, file))
   })
   return [...specs, ...units].sort().map((file) => {
     const source = readFileSync(file, "utf8")
-    return { file, relative: path.relative(root, file), source, tests: findTests(source) }
+    return {
+      file,
+      relative: path.relative(root, file),
+      source,
+      tests: findTests(source),
+    }
   })
 }
 
@@ -186,8 +201,14 @@ function readersOf(key) {
       // Read before any test, like `const budget = budgets["menu.open"]`:
       // the tests that use that name read it.
       const before = file.source.slice(0, match.index)
-      const name = before.match(/(?:const|let)\s+(\w+)\s*=\s*budgets\s*\[\s*$/)?.[1]
-      const users = name ? file.tests.filter(({ body }) => new RegExp(`\\b${name}\\b`).test(body)) : []
+      const name = before.match(
+        /(?:const|let)\s+(\w+)\s*=\s*budgets\s*\[\s*$/
+      )?.[1]
+      const users = name
+        ? file.tests.filter(({ body }) =>
+            new RegExp(`\\b${name}\\b`).test(body)
+          )
+        : []
       for (const user of users.length ? users : file.tests) {
         titles.add(user.title)
       }
@@ -195,8 +216,16 @@ function readersOf(key) {
     if (!titles.size) {
       return []
     }
-    const failing = file.tests.filter(({ title, body }) => titles.has(title) && /\btest\.fail\b/.test(body))
-    return [{ file, titles: [...titles], failing: new Set(failing.map(({ title }) => title)) }]
+    const failing = file.tests.filter(
+      ({ title, body }) => titles.has(title) && /\btest\.fail\b/.test(body)
+    )
+    return [
+      {
+        file,
+        titles: [...titles],
+        failing: new Set(failing.map(({ title }) => title)),
+      },
+    ]
   })
 }
 
@@ -234,7 +263,10 @@ function renderBudget({ key, budget, anchor, readers }) {
     field("Notes", notes)
   }
   if (!readers.length) {
-    field("Tests", "_None. `pnpm docs:perf --check` fails until a test reads this budget._")
+    field(
+      "Tests",
+      "_None. `pnpm docs:perf --check` fails until a test reads this budget._"
+    )
     return lines
   }
   lines.push("**Tests:**", "")
@@ -266,7 +298,10 @@ function describeNumbers(budget) {
       "element restyled per style recalculation",
       "elements restyled per style recalculation",
     ],
-    sorts: ["sort of the items in document order", "sorts of the items in document order"],
+    sorts: [
+      "sort of the items in document order",
+      "sorts of the items in document order",
+    ],
     subscriptions: ["new subscription", "new subscriptions"],
     writes: ["attribute or style write", "attribute and style writes"],
   }
@@ -283,16 +318,22 @@ function describeNumbers(budget) {
     .filter(([name]) => !["measures", "why", "hypothesis"].includes(name))
     .flatMap(([name, value]) => {
       if (name === "checkEvery" && typeof value === "number") {
-        return [`Positioning checks for unreported moves every ${number(value)} ms.`]
+        return [
+          `Positioning checks for unreported moves every ${number(value)} ms.`,
+        ]
       }
       if (typeof value === "number" && nouns[name]) {
         return [`${atMost(value, nouns[name])}.`]
       }
       if (value && typeof value === "object" && groups[name]) {
-        return Object.entries(value).map(([part, most]) => `${atMost(most, groups[name](part))}.`)
+        return Object.entries(value).map(
+          ([part, most]) => `${atMost(most, groups[name](part))}.`
+        )
       }
       if (value && typeof value === "object") {
-        const fields = Object.entries(value).map(([part, setting]) => `\`${part}\` ${plain(setting)}`)
+        const fields = Object.entries(value).map(
+          ([part, setting]) => `\`${part}\` ${plain(setting)}`
+        )
         return [`\`${name}\`: ${fields.join(", ")}.`]
       }
       return [`\`${name}\`: ${plain(value)}.`]
@@ -307,17 +348,23 @@ function atMost(value, [one, many]) {
 }
 
 function number(value) {
-  return typeof value === "number" ? value.toLocaleString("en-US") : String(value)
+  return typeof value === "number"
+    ? value.toLocaleString("en-US")
+    : String(value)
 }
 
 function plain(value) {
-  return typeof value === "object" ? `\`${JSON.stringify(value)}\`` : number(value)
+  return typeof value === "object"
+    ? `\`${JSON.stringify(value)}\``
+    : number(value)
 }
 
 // The comments inside a budget's entry in budgets.ts, which say how its
 // numbers were chosen.
 function notesOf(key) {
-  const match = new RegExp(`(["'])${escapeRegExp(key)}\\1\\s*:\\s*\\{`).exec(budgetSource)
+  const match = new RegExp(`(["'])${escapeRegExp(key)}\\1\\s*:\\s*\\{`).exec(
+    budgetSource
+  )
   if (!match) {
     return ""
   }
@@ -354,9 +401,13 @@ function notesOf(key) {
 function runCommand({ file, titles }) {
   // Single quotes keep the shell out of the title. A quote in it matches any character.
   const grep = (flag) =>
-    titles.length === 1 ? ` ${flag} '${escapeRegExp(titles[0]).replace(/'/g, ".")}'` : ""
+    titles.length === 1
+      ? ` ${flag} '${escapeRegExp(titles[0]).replace(/'/g, ".")}'`
+      : ""
   if (file.relative.startsWith("tests/specs/")) {
-    const spec = file.relative.replace(/^tests\//, "").replace(/\.spec\.ts$/, "")
+    const spec = file.relative
+      .replace(/^tests\//, "")
+      .replace(/\.spec\.ts$/, "")
     return `cd tests && PLAYGROUND_PORT=${port} ../scripts/test-slot.sh npx playwright test ${spec} --project react${grep("-g")}`
   }
   const [, pkg, rest] = file.relative.match(/^(packages\/[^/]+)\/(.+)$/)

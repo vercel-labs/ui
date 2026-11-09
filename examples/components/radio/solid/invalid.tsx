@@ -1,4 +1,9 @@
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
@@ -22,7 +27,9 @@ function Example() {
     >
       <Field>
         <FieldLabel>Order updates</FieldLabel>
-        <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+        <FieldDescription>
+          Choose how we tell you about your orders.
+        </FieldDescription>
         <RadioGroup name="updates" required>
           <For each={channels}>
             {(channel) => (

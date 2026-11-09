@@ -3,7 +3,9 @@ import { Textarea } from "@ui-sdk/solid/textarea"
 import { createSignal } from "solid-js"
 
 function Example() {
-  const [bio, setBio] = createSignal("Product designer in Lisbon. I write about type and interfaces.")
+  const [bio, setBio] = createSignal(
+    "Product designer in Lisbon. I write about type and interfaces."
+  )
   return (
     <Field name="bio">
       <FieldLabel>Bio</FieldLabel>

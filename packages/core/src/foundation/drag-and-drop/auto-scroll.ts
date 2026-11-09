@@ -22,15 +22,27 @@ const scrollable = (el: Element, axis: "x" | "y") => {
   const overflow = axis === "x" ? style.overflowX : style.overflowY
   return (
     /auto|scroll|overlay/.test(overflow) &&
-    (axis === "x" ? el.scrollWidth > el.clientWidth : el.scrollHeight > el.clientHeight)
+    (axis === "x"
+      ? el.scrollWidth > el.clientWidth
+      : el.scrollHeight > el.clientHeight)
   )
 }
 
 // How fast to go along one axis: negative toward the start, by how deep into the edge band the pointer is.
-function velocity(at: number, start: number, end: number, edge: number, speed: number) {
+function velocity(
+  at: number,
+  start: number,
+  end: number,
+  edge: number,
+  speed: number
+) {
   const band = Math.min(edge, (end - start) / 3)
-  if (at < start + band) return -speed * Math.min(1, (start + band - at) / band)
-  if (at > end - band) return speed * Math.min(1, (at - (end - band)) / band)
+  if (at < start + band) {
+    return -speed * Math.min(1, (start + band - at) / band)
+  }
+  if (at > end - band) {
+    return speed * Math.min(1, (at - (end - band)) / band)
+  }
   return 0
 }
 
@@ -52,26 +64,37 @@ function createAutoScroll(options: AutoScrollOptions = {}) {
 
   function tick() {
     frame = 0
-    if (!point || typeof document === "undefined") return
+    if (!point || typeof document === "undefined") {
+      return
+    }
     const edge = options.edge ?? 48
     const speed = options.speed ?? 18
     let moved = false
     const ignored = options.ignore?.()
     let el: Element | null =
-      document.elementsFromPoint(point.x, point.y).find((hit) => !ignored?.contains(hit)) ?? null
+      document
+        .elementsFromPoint(point.x, point.y)
+        .find((hit) => !ignored?.contains(hit)) ?? null
     const done = { x: false, y: false }
     while (el && !(done.x && done.y)) {
       const rect = el.getBoundingClientRect()
       for (const axis of ["x", "y"] as const) {
-        if (done[axis] || !scrollable(el, axis)) continue
+        if (done[axis] || !scrollable(el, axis)) {
+          continue
+        }
         const v =
           axis === "x"
             ? velocity(point.x, rect.left, rect.right, edge, speed)
             : velocity(point.y, rect.top, rect.bottom, edge, speed)
-        if (!v) continue
+        if (!v) {
+          continue
+        }
         const before = axis === "x" ? el.scrollLeft : el.scrollTop
-        if (axis === "x") el.scrollLeft += v
-        else el.scrollTop += v
+        if (axis === "x") {
+          el.scrollLeft += v
+        } else {
+          el.scrollTop += v
+        }
         if ((axis === "x" ? el.scrollLeft : el.scrollTop) !== before) {
           done[axis] = moved = true
         }
@@ -82,8 +105,12 @@ function createAutoScroll(options: AutoScrollOptions = {}) {
     if (view && !done.y) {
       const v = velocity(point.y, 0, view.innerHeight, edge, speed)
       const before = view.scrollY
-      if (v) view.scrollBy(0, v)
-      if (view.scrollY !== before) moved = true
+      if (v) {
+        view.scrollBy(0, v)
+      }
+      if (view.scrollY !== before) {
+        moved = true
+      }
     }
     if (moved) {
       options.onScroll?.()
@@ -95,12 +122,16 @@ function createAutoScroll(options: AutoScrollOptions = {}) {
     /** The pointer moved to `x`, `y` in viewport pixels. Starts scrolling if it's near an edge. */
     update(x: number, y: number) {
       point = { x, y }
-      if (!frame) frame = requestAnimationFrame(tick)
+      if (!frame) {
+        frame = requestAnimationFrame(tick)
+      }
     },
     /** Stops scrolling, like when the drag ends. */
     stop() {
       point = null
-      if (frame) cancelAnimationFrame(frame)
+      if (frame) {
+        cancelAnimationFrame(frame)
+      }
       frame = 0
     },
   }

@@ -23,14 +23,19 @@ function render() {
   const log: string[] = []
   const toaster = createToaster<string>()
   const target = document.body.appendChild(document.createElement("div"))
-  const app = mount(App, { target, props: { log: (entry: string) => log.push(entry), toaster } })
+  const app = mount(App, {
+    target,
+    props: { log: (entry: string) => log.push(entry), toaster },
+  })
   cleanup = () => unmount(app)
   flushSync()
   return { log, toaster }
 }
 
 const buttonNamed = (name: string) =>
-  [...document.querySelectorAll("button")].find((button) => button.textContent?.trim() === name)!
+  [...document.querySelectorAll("button")].find(
+    (button) => button.textContent?.trim() === name
+  )!
 
 test("a dialog's Close action hears how it was pressed", () => {
   const { log } = render()
@@ -42,11 +47,17 @@ test("a toast's action and cancel buttons hear how they were pressed", () => {
   const { log, toaster } = render()
   toaster("Deleted", {
     duration: Infinity,
-    action: { label: "Undo", onAction: (_event, { source }) => log.push(`undo:${source}`) },
+    action: {
+      label: "Undo",
+      onAction: (_event, { source }) => log.push(`undo:${source}`),
+    },
   })
   toaster("Saved", {
     duration: Infinity,
-    cancel: { label: "Keep", onCancel: (_event, { source }) => log.push(`keep:${source}`) },
+    cancel: {
+      label: "Keep",
+      onCancel: (_event, { source }) => log.push(`keep:${source}`),
+    },
   })
   flushSync()
   withSource("agent", () => buttonNamed("Undo").click())

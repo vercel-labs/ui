@@ -22,7 +22,8 @@ function defineProgressElements() {
     root: {
       tag: "ui-progress",
       display: "block",
-      render: (el, instance) => showDefaultText(el, instance, "ui-progress-value", valueText),
+      render: (el, instance) =>
+        showDefaultText(el, instance, "ui-progress-value", valueText),
     },
     track: { tag: "ui-progress-track", display: "block" },
     indicator: { tag: "ui-progress-indicator", display: "block" },

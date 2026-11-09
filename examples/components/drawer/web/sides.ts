@@ -1,10 +1,30 @@
 import "@ui-sdk/web/drawer"
 
 const sides = [
-  { side: "top", label: "Top", title: "Notifications", description: "You're all caught up." },
-  { side: "right", label: "Right", title: "Cart", description: "2 items, $84.00." },
-  { side: "bottom", label: "Bottom", title: "Share", description: "Send this page to your team." },
-  { side: "left", label: "Left", title: "Menu", description: "Jump to a section of the docs." },
+  {
+    side: "top",
+    label: "Top",
+    title: "Notifications",
+    description: "You're all caught up.",
+  },
+  {
+    side: "right",
+    label: "Right",
+    title: "Cart",
+    description: "2 items, $84.00.",
+  },
+  {
+    side: "bottom",
+    label: "Bottom",
+    title: "Share",
+    description: "Send this page to your team.",
+  },
+  {
+    side: "left",
+    label: "Left",
+    title: "Menu",
+    description: "Jump to a section of the docs.",
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -27,7 +47,7 @@ function mount(root: HTMLElement) {
               </div>
               <ui-drawer-close><button data-variant="solid">Close</button></ui-drawer-close>
             </ui-drawer-content>
-          </ui-drawer>`,
+          </ui-drawer>`
         )
         .join("")}
     </div>

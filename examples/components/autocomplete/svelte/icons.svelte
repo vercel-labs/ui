@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { ArchiveIcon, ClockIcon, FileIcon, PencilIcon, ReplyIcon, StarIcon } from "@lucide/svelte"
+  import {
+    ArchiveIcon,
+    ClockIcon,
+    FileIcon,
+    PencilIcon,
+    ReplyIcon,
+    StarIcon,
+  } from "@lucide/svelte"
   import {
     Autocomplete,
     AutocompleteContent,
@@ -21,11 +28,13 @@
 </script>
 
 <Autocomplete>
-  <AutocompleteInput type="search" aria-label="Search mail" placeholder="Search mail…" />
+  <AutocompleteInput
+    type="search"
+    aria-label="Search mail"
+    placeholder="Search mail…"
+  />
   <AutocompleteContent>
-    <AutocompleteEmpty>
-      No searches found.
-    </AutocompleteEmpty>
+    <AutocompleteEmpty>No searches found.</AutocompleteEmpty>
     <AutocompleteList>
       {#each mailSearches as search (search.value)}
         <AutocompleteItem value={search.value}>

@@ -14,7 +14,9 @@ it, and `mirror` flips it in right-to-left text.
   import ItemIcon from "../item-icon.svelte"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let { ...rest }: PartProps<"span", CommandItemIconState> & CommandItemIconProps = $props()
+  let {
+    ...rest
+  }: PartProps<"span", CommandItemIconState> & CommandItemIconProps = $props()
 
   const command = useHandle(commandPrimitive)
 </script>

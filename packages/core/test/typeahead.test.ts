@@ -6,7 +6,9 @@ const type = (labels: string[], keys: string, current = -1) => {
   let index = current
   for (const key of keys) {
     const found = search(key, labels, index)
-    if (found !== -1) index = found
+    if (found !== -1) {
+      index = found
+    }
   }
   return labels[index]
 }

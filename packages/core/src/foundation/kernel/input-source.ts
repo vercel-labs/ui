@@ -4,7 +4,12 @@
 import { dev, emit } from "#dev"
 import { sourceOf, trackInput } from "./modality"
 import { changeFrom } from "./change"
-import { createDetails, resolveSource, withSource, type ChangeSource } from "./details"
+import {
+  createDetails,
+  resolveSource,
+  withSource,
+  type ChangeSource,
+} from "./details"
 import { isDestroying } from "./keep"
 import { callbackName } from "./option-names"
 import type { PrimitiveContext, ReasonFor } from "./primitive-types"
@@ -37,7 +42,7 @@ function inputSource() {
  */
 function createChange<Options, State extends object>(
   context: PrimitiveContext<Options, State, any>,
-  source: (reason: string, event?: Event) => ChangeSource = inputSource(),
+  source: (reason: string, event?: Event) => ChangeSource = inputSource()
 ) {
   return changeFrom(context, source)
 }
@@ -59,26 +64,40 @@ function createChange<Options, State extends object>(
  */
 function createCommit<Options, State extends object>(
   context: PrimitiveContext<Options, State, any>,
-  source: (reason: string, event?: Event) => ChangeSource = inputSource(),
+  source: (reason: string, event?: Event) => ChangeSource = inputSource()
 ) {
   return <
     Key extends {
-      [Name in keyof State & string]: `on${Capitalize<Name>}Commit` extends keyof Options ? Name : never
+      [
+        Name in keyof State & string
+      ]: `on${Capitalize<Name>}Commit` extends keyof Options ? Name : never
     }[keyof State & string],
   >(
     key: Key,
     value: State[Key],
-    details: { reason: ReasonFor<Options, Key, "Commit">; event?: Event; [extra: string]: unknown },
+    details: {
+      reason: ReasonFor<Options, Key, "Commit">
+      event?: Event
+      [extra: string]: unknown
+    }
   ) => {
-    if (isDestroying()) return
-    const commitDetails = createDetails(details, source(details.reason, details.event), false)
+    if (isDestroying()) {
+      return
+    }
+    const commitDetails = createDetails(
+      details,
+      source(details.reason, details.event),
+      false
+    )
     const callbacks = context.options() as Record<
       string,
       ((value: unknown, details: object) => void) | undefined
     >
     const callback = callbacks[callbackName(key, "Commit")]
-    if (callback) withSource(commitDetails.source, () => callback(value, commitDetails))
-    if (dev)
+    if (callback) {
+      withSource(commitDetails.source, () => callback(value, commitDetails))
+    }
+    if (dev) {
       emit({
         type: "commit",
         component: context.label,
@@ -88,6 +107,7 @@ function createCommit<Options, State extends object>(
         reason: details.reason,
         source: commitDetails.source,
       })
+    }
     watchers.commit?.(context.id, key, value, commitDetails)
   }
 }
@@ -107,17 +127,26 @@ function dispatch<Value>(
   context: { options: () => unknown },
   name: `on${string}`,
   value: Value,
-  details: { reason: string; event?: Event; source?: ChangeSource; [extra: string]: unknown },
+  details: {
+    reason: string
+    event?: Event
+    source?: ChangeSource
+    [extra: string]: unknown
+  }
 ) {
   const callbackDetails = createDetails(
     details,
-    details.source ?? changeSource(details.reason, details.event),
+    details.source ?? changeSource(details.reason, details.event)
   )
   const callback = (context.options() as Record<string, unknown>)[name]
-  if (typeof callback === "function")
+  if (typeof callback === "function") {
     withSource(callbackDetails.source, () =>
-      (callback as (value: Value, details: unknown) => void)(value, callbackDetails),
+      (callback as (value: Value, details: unknown) => void)(
+        value,
+        callbackDetails
+      )
     )
+  }
   return callbackDetails.canceled
 }
 

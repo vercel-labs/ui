@@ -1,5 +1,9 @@
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/react/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
@@ -19,7 +23,13 @@ function Example() {
       >
         <PasswordInputControl />
         <PasswordInputToggle aria-label="Show password">
-          {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
+          {(state) =>
+            state.visible ? (
+              <EyeOffIcon aria-hidden="true" />
+            ) : (
+              <EyeIcon aria-hidden="true" />
+            )
+          }
         </PasswordInputToggle>
       </PasswordInput>
     </Field>

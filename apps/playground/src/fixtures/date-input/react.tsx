@@ -3,7 +3,11 @@ import { Field, FieldError, FieldLabel } from "@ui-sdk/react/field"
 import { TimeInput } from "@ui-sdk/react/time-input"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { dateInputAction, dateInputFixture, dateInputOptions } from "tests/fixtures/date-input.ts"
+import {
+  dateInputAction,
+  dateInputFixture,
+  dateInputOptions,
+} from "tests/fixtures/date-input.ts"
 
 const controller = createDateInputController()
 
@@ -30,7 +34,9 @@ function Fixture() {
             {...date}
             {...shared}
             onValueChange={(value, details) => {
-              if (cancel && value === cancel) return details.cancel()
+              if (cancel && value === cancel) {
+                return details.cancel()
+              }
               setAction(dateInputAction.change("date", value, details.reason))
             }}
           />
@@ -65,7 +71,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

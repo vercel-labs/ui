@@ -10,14 +10,24 @@
     ComboboxList,
     ComboboxTrigger,
   } from "#ui/combobox"
-  import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from "#ui/select"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+  } from "#ui/select"
   import { people, personOf, priorities, type Query } from "tracker-data"
 
   let {
     query,
     onChange,
     stacked = false,
-  }: { query: Query; onChange: (patch: Partial<Query>) => void; stacked?: boolean } = $props()
+  }: {
+    query: Query
+    onChange: (patch: Partial<Query>) => void
+    stacked?: boolean
+  } = $props()
 
   const priorityItems = [{ value: "any", label: "Any priority" }, ...priorities]
   const label = $derived(stacked ? undefined : "sr-only")
@@ -28,10 +38,15 @@
     items={priorityItems}
     value={query.priority ?? "any"}
     onValueChange={(value) =>
-      onChange({ priority: value === "any" ? null : (value as Query["priority"]), page: 1 })}
+      onChange({
+        priority: value === "any" ? null : (value as Query["priority"]),
+        page: 1,
+      })}
   >
     <div class="grid gap-2">
-      <SelectLabel class={label}>{stacked ? "Priority" : "Filter by priority"}</SelectLabel>
+      <SelectLabel class={label}
+        >{stacked ? "Priority" : "Filter by priority"}</SelectLabel
+      >
       <SelectTrigger class={stacked ? undefined : "w-36"} />
     </div>
     <SelectContent>
@@ -42,11 +57,14 @@
   </Select>
   <Combobox
     value={query.assignee}
-    onValueChange={(value) => onChange({ assignee: value as string | null, page: 1 })}
+    onValueChange={(value) =>
+      onChange({ assignee: value as string | null, page: 1 })}
     itemToLabel={(id: string) => personOf(id)?.name ?? ""}
   >
     <div class="grid gap-2">
-      <ComboboxLabel class={label}>{stacked ? "Assignee" : "Filter by assignee"}</ComboboxLabel>
+      <ComboboxLabel class={label}
+        >{stacked ? "Assignee" : "Filter by assignee"}</ComboboxLabel
+      >
       <div class={stacked ? "relative" : "relative w-40"}>
         <ComboboxInput
           placeholder="Anyone"

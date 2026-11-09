@@ -7,9 +7,15 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
-test("a date hydrates without mismatches and takes typing", async ({ page, open }) => {
+test("a date hydrates without mismatches and takes typing", async ({
+  page,
+  open,
+}) => {
   await open("date-input", { date: "2026-11-02", time: "14:30" })
   await page.waitForLoadState("networkidle")
   expect(await shown(page)).toBe("11/02/2026")

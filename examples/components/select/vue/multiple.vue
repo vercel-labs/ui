@@ -45,7 +45,11 @@ const log = useLog()
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem v-for="language in languages" :key="language.value" :value="language.value">
+        <SelectItem
+          v-for="language in languages"
+          :key="language.value"
+          :value="language.value"
+        >
           {{ language.label }}
           <SelectItemIndicator>
             <CheckIcon />

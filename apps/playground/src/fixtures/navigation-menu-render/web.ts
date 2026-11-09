@@ -21,16 +21,24 @@ async function mount(root: HTMLElement) {
     </div>
   `
   // A client-side router: links navigate without a page load.
-  for (const link of root.querySelectorAll<HTMLAnchorElement>("a[data-router]"))
+  for (const link of root.querySelectorAll<HTMLAnchorElement>(
+    "a[data-router]"
+  )) {
     link.addEventListener("click", (event) => {
       event.preventDefault()
       history.pushState(null, "", link.getAttribute("href"))
     })
+  }
   await import("@ui-sdk/web/navigation-menu")
-  root.querySelector("ui-navigation-menu")!.addEventListener("valuechange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: string | null; reason: string }>).detail
-    root.querySelector("output")!.textContent = `${value ?? "close"}: ${reason}`
-  })
+  root
+    .querySelector("ui-navigation-menu")!
+    .addEventListener("valuechange", (event) => {
+      const { value, reason } = (
+        event as CustomEvent<{ value: string | null; reason: string }>
+      ).detail
+      root.querySelector("output")!.textContent =
+        `${value ?? "close"}: ${reason}`
+    })
 }
 
 export { mount }

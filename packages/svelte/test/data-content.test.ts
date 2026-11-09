@@ -12,12 +12,17 @@ const settle = async () => {
 }
 
 const texts = (target: Element, selector: string) =>
-  [...target.ownerDocument.querySelectorAll(selector)].map((element) => element.textContent?.trim())
+  [...target.ownerDocument.querySelectorAll(selector)].map((element) =>
+    element.textContent?.trim()
+  )
 
 test("a data select renders its items once the app's SelectContent is removed", async () => {
   const target = document.body.appendChild(document.createElement("div"))
   const select = createSelectController<string>()
-  const app = mount(App, { target, props: { select, menu: createMenuController() } })
+  const app = mount(App, {
+    target,
+    props: { select, menu: createMenuController() },
+  })
   await settle()
   app.dropOwn()
   await settle()
@@ -31,7 +36,10 @@ test("a data select renders its items once the app's SelectContent is removed", 
 test("a data menu renders its items once the app's MenuContent is removed", async () => {
   const target = document.body.appendChild(document.createElement("div"))
   const menu = createMenuController()
-  const app = mount(App, { target, props: { select: createSelectController<string>(), menu } })
+  const app = mount(App, {
+    target,
+    props: { select: createSelectController<string>(), menu },
+  })
   await settle()
   app.dropOwn()
   await settle()

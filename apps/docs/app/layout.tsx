@@ -9,7 +9,10 @@ import { SpeedInsights } from "@vercel/speed-insights/next"
 import "./global.css"
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist" })
-const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" })
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+})
 
 const DESCRIPTION =
   "An open source library of behaviors that an agent can use to build components. Written in TypeScript. Available for all frameworks."
@@ -31,7 +34,11 @@ export default function Layout({ children }: LayoutProps<"/">) {
   const urls = source.getPages().map((page) => page.url)
 
   return (
-    <html lang="en" className={`${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={`${geist.variable} ${geistMono.variable}`}
+      suppressHydrationWarning
+    >
       <body className="flex min-h-dvh flex-col bg-canvas font-sans text-foreground">
         <SitePreferences>
           <SiteHeader urls={urls} />

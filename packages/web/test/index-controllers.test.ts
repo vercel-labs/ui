@@ -7,7 +7,10 @@ import * as index from "../src/index"
 const entries = new URL("../src/entries/", import.meta.url)
 const controllers = readdirSync(entries)
   .flatMap(
-    (file) => readFileSync(new URL(file, entries), "utf8").match(/\bcreate[A-Z]\w*Controller\b/g) ?? [],
+    (file) =>
+      readFileSync(new URL(file, entries), "utf8").match(
+        /\bcreate[A-Z]\w*Controller\b/g
+      ) ?? []
   )
   .filter((name, at, all) => all.indexOf(name) === at)
   .sort()
@@ -15,6 +18,8 @@ const controllers = readdirSync(entries)
 test("the index exports every component's controller", () => {
   expect(controllers.length).toBeGreaterThan(30)
   expect(
-    controllers.filter((name) => typeof (index as Record<string, unknown>)[name] !== "function"),
+    controllers.filter(
+      (name) => typeof (index as Record<string, unknown>)[name] !== "function"
+    )
   ).toEqual([])
 })

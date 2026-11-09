@@ -20,14 +20,23 @@ is checked, or always with `keepMounted`.
   let {
     keepMounted,
     ...rest
-  }: PartProps<"span", MenuItemIndicatorState> & MenuItemIndicatorProps = $props()
+  }: PartProps<"span", MenuItemIndicatorState> & MenuItemIndicatorProps =
+    $props()
 
   const menu = useHandle(menuPrimitive)
   menu.instance.use(menuCheckable)
   const id = $props.id()
   const item = getContext<ItemContext | undefined>(ItemKey)
-  if (!item) throw new Error("<MenuItemIndicator> must be used inside a checkbox or radio item.")
-  const indicator = useHandlePart(menu, "item-indicator", () => ({ id, ...item(), keepMounted }))
+  if (!item) {
+    throw new Error(
+      "<MenuItemIndicator> must be used inside a checkbox or radio item."
+    )
+  }
+  const indicator = useHandlePart(menu, "item-indicator", () => ({
+    id,
+    ...item(),
+    keepMounted,
+  }))
 </script>
 
 {#if indicator.present}

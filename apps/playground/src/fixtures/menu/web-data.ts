@@ -11,27 +11,41 @@ async function mount(root: HTMLElement) {
     <button id="controller">Open with controller</button>
     </div>
   `
-  const menu = document.createElement("ui-menu") as HTMLElement & { items: unknown }
+  const menu = document.createElement("ui-menu") as HTMLElement & {
+    items: unknown
+  }
   menu.items = menuData
   menu.innerHTML = `<ui-menu-trigger><button>File</button></ui-menu-trigger>`
   const options = menuOptions()
-  if (options.defaultOpen) menu.setAttribute("default-open", "")
-  if (options.modal !== undefined) menu.setAttribute("modal", String(options.modal))
-  if (options.presentation) menu.setAttribute("presentation", options.presentation)
-  if (options.container) menu.setAttribute("container", `#${options.container.id}`)
+  if (options.defaultOpen) {
+    menu.setAttribute("default-open", "")
+  }
+  if (options.modal !== undefined) {
+    menu.setAttribute("modal", String(options.modal))
+  }
+  if (options.presentation) {
+    menu.setAttribute("presentation", options.presentation)
+  }
+  if (options.container) {
+    menu.setAttribute("container", `#${options.container.id}`)
+  }
   root.querySelector("#slot")!.replaceWith(menu)
   await import("@ui-sdk/web/menu")
   root
     .querySelector("#controller")!
     .addEventListener("click", () =>
-      (menu as unknown as { api?: { open: (options: object) => void } }).api?.open({ focus: "first" }),
+      (
+        menu as unknown as { api?: { open: (options: object) => void } }
+      ).api?.open({ focus: "first" })
     )
   root.addEventListener(
     "action",
     (event) => {
-      root.querySelector("output")!.textContent = (event as CustomEvent<{ value: string }>).detail.value
+      root.querySelector("output")!.textContent = (
+        event as CustomEvent<{ value: string }>
+      ).detail.value
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

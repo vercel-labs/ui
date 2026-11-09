@@ -30,7 +30,11 @@ const priorityIcons = {
   none: Minus,
 }
 
-function StatusIcon(props: { status: Status; label?: boolean; class?: string }) {
+function StatusIcon(props: {
+  status: Status
+  label?: boolean
+  class?: string
+}) {
   const Icon = dynamicComponent(() => statusIcons[props.status])
   return (
     <Icon
@@ -41,13 +45,17 @@ function StatusIcon(props: { status: Status; label?: boolean; class?: string }) 
         "size-4 shrink-0 text-muted-foreground",
         props.status === "in-progress" && "text-amber-500",
         props.status === "done" && "text-emerald-600 dark:text-emerald-400",
-        props.class,
+        props.class
       )}
     />
   )
 }
 
-function PriorityIcon(props: { priority: Priority; label?: boolean; class?: string }) {
+function PriorityIcon(props: {
+  priority: Priority
+  label?: boolean
+  class?: string
+}) {
   const Icon = dynamicComponent(() => priorityIcons[props.priority])
   return (
     <Icon
@@ -57,7 +65,7 @@ function PriorityIcon(props: { priority: Priority; label?: boolean; class?: stri
       class={cn(
         "size-4 shrink-0 text-muted-foreground",
         props.priority === "urgent" && "text-destructive",
-        props.class,
+        props.class
       )}
     />
   )

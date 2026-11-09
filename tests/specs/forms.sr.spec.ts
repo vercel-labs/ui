@@ -14,19 +14,30 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
 // The fixture's status regions add phrases that say nothing about the controls.
 // The virtual screen reader announces focus moves, not state changes in place.
-const withoutNoise = (log: string[]) => log.filter((phrase) => !phrase.startsWith("polite:"))
+const withoutNoise = (log: string[]) =>
+  log.filter((phrase) => !phrase.startsWith("polite:"))
 
-test("announcements while checking boxes with a keyboard", async ({ page, open, tab }) => {
+test("announcements while checking boxes with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("forms", { sr: "" })
   const log = await record(page, async () => {
     await page.getByRole("button", { name: "Before" }).focus()
@@ -47,7 +58,10 @@ test("announcements while checking boxes with a keyboard", async ({ page, open, 
   ])
 })
 
-test("announcements while choosing a radio with a keyboard", async ({ page, open }) => {
+test("announcements while choosing a radio with a keyboard", async ({
+  page,
+  open,
+}) => {
   await open("forms", { sr: "", plan: "free" })
   const log = await record(page, async () => {
     await radio(page, "Free").focus()

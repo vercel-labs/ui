@@ -26,15 +26,20 @@ function mount(root: HTMLElement) {
   const region = root.querySelector("ui-toast-region")!
   region.toaster = toast
   region.renderToast = (item, el) => {
-    el.querySelector("[data-slot='media']")!.textContent = (item.data as { initials: string }).initials
+    el.querySelector("[data-slot='media']")!.textContent = (
+      item.data as { initials: string }
+    ).initials
   }
   root.querySelector("button")!.addEventListener("click", () =>
     toast({
       title: "Hollis Grant",
       description: "Can you review the draft?",
       data: { initials: "HG" },
-      action: { label: "Reply", onAction: () => log(root, "Replying to Hollis Grant") },
-    }),
+      action: {
+        label: "Reply",
+        onAction: () => log(root, "Replying to Hollis Grant"),
+      },
+    })
   )
   return () => {
     toast.dismiss()

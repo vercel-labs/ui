@@ -15,7 +15,13 @@ function Example() {
   return (
     <Dialog
       onOpenChange={(open, details) => {
-        if (!open) log(details.returnValue ? `Saved as ${details.returnValue}` : `Closed (${details.reason})`)
+        if (!open) {
+          log(
+            details.returnValue
+              ? `Saved as ${details.returnValue}`
+              : `Closed (${details.reason})`
+          )
+        }
       }}
     >
       <DialogTrigger>New Article</DialogTrigger>
@@ -23,7 +29,9 @@ function Example() {
       <DialogContent>
         <div data-slot="stack">
           <DialogTitle>New article</DialogTitle>
-          <DialogDescription>Save it as a draft or publish it now.</DialogDescription>
+          <DialogDescription>
+            Save it as a draft or publish it now.
+          </DialogDescription>
         </div>
         <form data-slot="stack" method="dialog">
           <Field>

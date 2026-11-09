@@ -20,7 +20,7 @@ function mount(root: HTMLElement) {
                 <ui-toggle-icon>${createElement(style.icon, { "aria-hidden": "true" }).outerHTML}</ui-toggle-icon>
               </button>
             </ui-toggle>
-          `,
+          `
         )
         .join("")}
       <ui-toolbar-separator></ui-toolbar-separator>
@@ -34,10 +34,12 @@ function mount(root: HTMLElement) {
   root.querySelectorAll("ui-toggle").forEach((toggle, index) => {
     const { label } = styles[index]
     toggle.addEventListener("pressedchange", (event) =>
-      log(root, `${label} ${event.detail.value ? "on" : "off"}`),
+      log(root, `${label} ${event.detail.value ? "on" : "off"}`)
     )
   })
-  root.querySelector('[aria-label="Insert link"]')!.addEventListener("click", () => log(root, "Insert link"))
+  root
+    .querySelector('[aria-label="Insert link"]')!
+    .addEventListener("click", () => log(root, "Insert link"))
 }
 
 export { mount }

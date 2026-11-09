@@ -84,7 +84,10 @@ export { VolumeSlider }
 
 Pass an array for a range, then render one thumb per number. Give each thumb its `index`, from 0, and its own name, like "Minimum price". The indicator fills the space between the first and the last thumb, and the `FieldLabel` names the group.
 
-<ComponentExample name="slider/range" caption="Move either end of Price. The thumbs stay in order." />
+<ComponentExample
+  name="slider/range"
+  caption="Move either end of Price. The thumbs stay in order."
+/>
 
 ## Multiple Thumbs
 
@@ -135,7 +138,10 @@ Pass `value` and `onValueChange` to control the slider. The value keeps its shap
 
 `min` and `max` set the bounds, 0 and 100 by default, and `step` sets how far one step moves, counted from `min`. Decimal steps avoid floating-point drift, so a 0.1 step can reach 0.3 cleanly. When the steps from `min` don't land on `max`, the highest step below it is the end.
 
-<ComponentExample name="slider/step" caption="Move Year in steps of five, and Opacity in steps of 0.05." />
+<ComponentExample
+  name="slider/step"
+  caption="Move Year in steps of five, and Opacity in steps of 0.05."
+/>
 
 ## Large Step
 
@@ -275,31 +281,49 @@ Props and callbacks are the same as below, as React props.
 
 ### Slider
 
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderOptions" />
+<TypeTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderOptions"
+/>
 
 ### SliderThumb
 
-<TypeTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbProps" />
+<TypeTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderThumbProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive. Every part gets the slider's state.
 
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderState" />
+<StateTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderState"
+/>
 
 Thumbs add their own fields, and have their own value, `thumbValue`, in place of the whole `value`, so a thumb renders only when its own value moves:
 
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderThumbState" />
+<StateTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderThumbState"
+/>
 
 `SliderValue` adds the formatted text:
 
-<StateTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueState" />
+<StateTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderValueState"
+/>
 
 ### Reasons
 
 `details.reason` says why the value changed.
 
-<ReasonTable path="../../packages/core/src/components/slider/slider.ts" name="SliderValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderValueChangeReason"
+/>
 
 ### Controller
 
@@ -307,7 +331,10 @@ Create one with `createSliderController()` and pass it as `controller`.
 
 `setValue()` takes an optional `{ reason, event }`, runs the change callback like a drag, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/slider/slider.ts" name="SliderController" />
+<ControllerTable
+  path="../../packages/core/src/components/slider/slider.ts"
+  name="SliderController"
+/>
 
 ### Events
 

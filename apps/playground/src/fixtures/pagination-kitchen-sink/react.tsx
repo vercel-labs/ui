@@ -18,9 +18,13 @@ import type { Variant } from "./variants"
 
 function VariantPagination({ variant, env }: { variant: Variant; env: Env }) {
   const [page, setPage] = React.useState(1)
-  const [controller] = React.useState(() => (variant.controller ? createPaginationController() : undefined))
+  const [controller] = React.useState(() =>
+    variant.controller ? createPaginationController() : undefined
+  )
   React.useEffect(() => {
-    if (!controller) return
+    if (!controller) {
+      return
+    }
     env.controls([
       ["next()", () => controller.next()],
       ["previous()", () => controller.previous()],
@@ -37,11 +41,19 @@ function VariantPagination({ variant, env }: { variant: Variant; env: Env }) {
       aria-label={variant.title}
       {...variant.options}
       {...(variant.controlled && { page })}
-      getHref={variant.links ? (target) => `#kitchen-${variant.id}-${target}` : undefined}
+      getHref={
+        variant.links
+          ? (target) => `#kitchen-${variant.id}-${target}`
+          : undefined
+      }
       controller={controller}
       onPageChange={(next, details) => {
-        if (variant.cancel) return details.cancel()
-        if (variant.controlled) setPage(next)
+        if (variant.cancel) {
+          return details.cancel()
+        }
+        if (variant.controlled) {
+          setPage(next)
+        }
         env.log(`pageChange ${next} (${details.reason}, ${details.source})`)
       }}
     >
@@ -50,13 +62,19 @@ function VariantPagination({ variant, env }: { variant: Variant; env: Env }) {
           <>
             {!text && (
               <PaginationItem>
-                <PaginationFirst className={classes.step} aria-label="First page">
+                <PaginationFirst
+                  className={classes.step}
+                  aria-label="First page"
+                >
                   «
                 </PaginationFirst>
               </PaginationItem>
             )}
             <PaginationItem>
-              <PaginationPrevious className={classes.step} aria-label={text ? undefined : "Previous page"}>
+              <PaginationPrevious
+                className={classes.step}
+                aria-label={text ? undefined : "Previous page"}
+              >
                 {text ? "‹ Previous" : "‹"}
               </PaginationPrevious>
             </PaginationItem>
@@ -70,7 +88,10 @@ function VariantPagination({ variant, env }: { variant: Variant; env: Env }) {
               </PaginationItem>
             ))}
             <PaginationItem>
-              <PaginationNext className={classes.step} aria-label={text ? undefined : "Next page"}>
+              <PaginationNext
+                className={classes.step}
+                aria-label={text ? undefined : "Next page"}
+              >
                 {text ? "Next ›" : "›"}
               </PaginationNext>
             </PaginationItem>
@@ -93,8 +114,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantPagination variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

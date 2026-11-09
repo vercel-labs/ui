@@ -30,15 +30,20 @@ function issueBoard(issues: Issue[], query: Query) {
         aria-labelledby=${`column-${status}`}
         class="flex w-72 shrink-0 flex-col gap-2 rounded-3xl bg-muted/60 p-2"
       >
-        <h2 id=${`column-${status}`} class="flex items-center gap-2 px-2 py-1 font-medium">
+        <h2
+          id=${`column-${status}`}
+          class="flex items-center gap-2 px-2 py-1 font-medium"
+        >
           ${statusIcon(status)} ${statusOf(status).label}
-          <span class="text-muted-foreground tabular-nums">${cards.length}</span>
+          <span class="text-muted-foreground tabular-nums"
+            >${cards.length}</span
+          >
         </h2>
         <ul class="flex min-h-0 flex-col gap-2 overflow-y-auto">
           ${repeat(
             cards,
             (issue) => issue.id,
-            (issue) => card(issue, query),
+            (issue) => card(issue, query)
           )}
         </ul>
       </section>`

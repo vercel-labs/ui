@@ -9,7 +9,12 @@ import {
 } from "@ui-sdk/core/renderer"
 import { getContext } from "svelte"
 import { createAttachmentKey } from "svelte/attachments"
-import { plainPart, useHandlePart, type PrimitiveHandle, type SlotAttributes } from "../use-primitive.svelte"
+import {
+  plainPart,
+  useHandlePart,
+  type PrimitiveHandle,
+  type SlotAttributes,
+} from "../use-primitive.svelte"
 
 type FieldContext = PrimitiveHandle<typeof field> & {
   name: () => string | undefined
@@ -30,15 +35,25 @@ const useField = () => getContext<FieldContext | undefined>(FieldKey)
 // Checks a part outside a field once it's in the page. Made once, so Svelte
 // attaches each element once, and in a pure call, so a control that only
 // imports useFieldControl doesn't bundle the checks.
-const outsideChecks: Partial<Record<FieldOutsideSlot, SlotAttributes>> = /* @__PURE__ */ (() => ({
-  label: { [createAttachmentKey()]: (el: HTMLElement) => checkFieldOutside(el, "label") },
-  control: { [createAttachmentKey()]: (el: HTMLElement) => checkFieldOutside(el, "control") },
-}))()
+const outsideChecks: Partial<Record<FieldOutsideSlot, SlotAttributes>> =
+  /* @__PURE__ */ (() => ({
+    label: {
+      [createAttachmentKey()]: (el: HTMLElement) =>
+        checkFieldOutside(el, "label"),
+    },
+    control: {
+      [createAttachmentKey()]: (el: HTMLElement) =>
+        checkFieldOutside(el, "control"),
+    },
+  }))()
 
 // A part outside any Field: a plain element with no field wiring, so a
 // FieldLabel is a native <label> that labels the control it wraps.
 const outsidePart = (slot: FieldOutsideSlot) =>
-  plainPart(fieldOutsideState, { ...fieldOutsideAttrs(slot), ...outsideChecks[slot] })
+  plainPart(fieldOutsideState, {
+    ...fieldOutsideAttrs(slot),
+    ...outsideChecks[slot],
+  })
 
 /**
  * Controls inside a field take its name and disabled state, and its ids and
@@ -49,7 +64,9 @@ const outsidePart = (slot: FieldOutsideSlot) =>
  */
 function useFieldControl() {
   const field = getContext<FieldContext | undefined>(FieldKey)
-  if (!field) return null
+  if (!field) {
+    return null
+  }
   return {
     name: field.name,
     disabled: field.disabled,
@@ -60,7 +77,10 @@ function useFieldControl() {
     // control's props, which stays its own part for styling, and the field
     // decides the id. `describedBy` is the control's own description, which
     // stays ahead of the field's.
-    control(id: () => string | null | undefined, describedBy?: () => string | null | undefined) {
+    control(
+      id: () => string | null | undefined,
+      describedBy?: () => string | null | undefined
+    ) {
       const part = useHandlePart(field, "control", () => ({
         id: id() ?? undefined,
         describedBy: describedBy?.() ?? undefined,

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "@lucide/vue"
 import {
   Carousel,
   CarouselContent,
@@ -41,14 +46,22 @@ const align = ref<Align>("center")
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <Select :items="alignments" :value="align" @value-change="(next) => next && (align = next as Align)">
+      <Select
+        :items="alignments"
+        :value="align"
+        @value-change="(next) => next && (align = next as Align)"
+      >
         <SelectLabel>Align</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in alignments" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in alignments"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon />

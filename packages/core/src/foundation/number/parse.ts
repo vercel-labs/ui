@@ -24,10 +24,15 @@ type Symbols = {
 const symbolCache = new Map<string, Symbols>()
 
 // What a locale's formatted numbers are made of, learned from Intl itself.
-function symbolsOf(locale: string | undefined, options: Intl.NumberFormatOptions) {
+function symbolsOf(
+  locale: string | undefined,
+  options: Intl.NumberFormatOptions
+) {
   const key = `${locale ?? ""}|${JSON.stringify(options)}`
   const cached = symbolCache.get(key)
-  if (cached) return cached
+  if (cached) {
+    return cached
+  }
   const formatter = numberFormatter(locale, options)
   const parts = [
     ...formatter.formatToParts(-12345.6),
@@ -46,12 +51,21 @@ function symbolsOf(locale: string | undefined, options: Intl.NumberFormatOptions
   const separator = (type: "group" | "decimal") =>
     find(type) ?? separators.find((part) => part.type === type)?.value
   const strip = parts
-    .filter((part) => ["currency", "percentSign", "unit", "literal", "plusSign"].includes(part.type))
+    .filter((part) =>
+      ["currency", "percentSign", "unit", "literal", "plusSign"].includes(
+        part.type
+      )
+    )
     .map((part) => part.value.trim())
     .filter(Boolean)
-  const digitFormatter = numberFormatter(locale, { useGrouping: false, numberingSystem: numbering })
+  const digitFormatter = numberFormatter(locale, {
+    useGrouping: false,
+    numberingSystem: numbering,
+  })
   const digits = new Map<string, string>()
-  for (let digit = 0; digit < 10; digit++) digits.set(digitFormatter.format(digit), String(digit))
+  for (let digit = 0; digit < 10; digit++) {
+    digits.set(digitFormatter.format(digit), String(digit))
+  }
   const symbols: Symbols = {
     group: separator("group") ?? ",",
     decimal: separator("decimal") ?? ".",
@@ -69,23 +83,36 @@ const parenthesized = /^\s*\(.*\)\s*$/
 
 // Text reduced to ASCII digits, one "-", and "." as the decimal separator.
 function normalize(text: string, symbols: Symbols) {
-  let result = text.replace(formatCharacters, "").replace(minusSigns, "-").replace(plusSigns, "+")
+  let result = text
+    .replace(formatCharacters, "")
+    .replace(minusSigns, "-")
+    .replace(plusSigns, "+")
   const negative = parenthesized.test(result)
-  result = Array.from(result, (char) => symbols.digits.get(char) ?? char).join("")
-  for (const symbol of symbols.strip) result = result.split(symbol).join("")
+  result = Array.from(result, (char) => symbols.digits.get(char) ?? char).join(
+    ""
+  )
+  for (const symbol of symbols.strip) {
+    result = result.split(symbol).join("")
+  }
   const groupIsSpace = symbols.group.trim() === ""
   result = groupIsSpace
     ? result.replace(spaces, "")
     : result.split(symbols.group).join("").replace(spaces, "")
   // Swiss numbers group with an apostrophe, typed either straight or curly.
-  if (symbols.group === "'" || symbols.group === "\u2019") result = result.replace(apostrophes, "")
+  if (symbols.group === "'" || symbols.group === "\u2019") {
+    result = result.replace(apostrophes, "")
+  }
   if (symbols.decimal !== ".") {
     // "." can only be a decimal point when the locale doesn't use it to group.
-    if (symbols.group === ".") result = result.split(".").join("")
+    if (symbols.group === ".") {
+      result = result.split(".").join("")
+    }
     result = result.split(symbols.decimal).join(".")
   }
   // Accounting formats and some locales put the sign last.
-  if (/^\d.*-$/.test(result)) result = `-${result.slice(0, -1)}`
+  if (/^\d.*-$/.test(result)) {
+    result = `-${result.slice(0, -1)}`
+  }
   result = result.replace(/^\+/, "")
   return negative ? `-${result.replace(/[()]/g, "")}` : result
 }
@@ -99,12 +126,20 @@ const partial = /^-?\d*\.?\d*$/
  * formats divide by 100. Returns null for text that isn't a number.
  * @experimental
  */
-function parseNumber(text: string, locale?: string, format?: Intl.NumberFormatOptions) {
+function parseNumber(
+  text: string,
+  locale?: string,
+  format?: Intl.NumberFormatOptions
+) {
   const symbols = symbolsOf(locale, format ?? {})
   const normalized = normalize(text, symbols)
-  if (!complete.test(normalized)) return null
+  if (!complete.test(normalized)) {
+    return null
+  }
   const value = Number(normalized) / symbols.divisor
-  return Number.isFinite(value) ? roundTo(value, decimalsOf(Number(normalized)) + 2) : null
+  return Number.isFinite(value)
+    ? roundTo(value, decimalsOf(Number(normalized)) + 2)
+    : null
 }
 
 /**
@@ -116,16 +151,20 @@ function isPartialNumber(
   text: string,
   locale?: string,
   format?: Intl.NumberFormatOptions,
-  { allowNegative = true } = {},
+  { allowNegative = true } = {}
 ) {
   const normalized = normalize(text, symbolsOf(locale, format ?? {}))
-  if (!partial.test(normalized)) return false
+  if (!partial.test(normalized)) {
+    return false
+  }
   return allowNegative || !normalized.startsWith("-")
 }
 
 /** The numbers in a `"start/end"` string, or null when any part isn't one. */
 function parseRange(value: string) {
-  const parts = value.split("/").map((part) => (part.trim() === "" ? NaN : Number(part)))
+  const parts = value
+    .split("/")
+    .map((part) => (part.trim() === "" ? NaN : Number(part)))
   return parts.every(Number.isFinite) ? parts : null
 }
 

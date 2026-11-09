@@ -13,7 +13,13 @@ import {
 <template>
   <div data-slot="stack">
     <Field>
-      <Slider :default-value="2010" :min="1990" :max="2030" :step="5" :format="{ useGrouping: false }">
+      <Slider
+        :default-value="2010"
+        :min="1990"
+        :max="2030"
+        :step="5"
+        :format="{ useGrouping: false }"
+      >
         <div data-slot="row">
           <FieldLabel>Year</FieldLabel>
           <SliderValue />

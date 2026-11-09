@@ -1,5 +1,10 @@
 import { defineConfig } from "@playwright/test"
-import { countGates, kitchenSinks, leakSpecs, specsThatSkip } from "./fixture-files"
+import {
+  countGates,
+  kitchenSinks,
+  leakSpecs,
+  specsThatSkip,
+} from "./fixture-files"
 
 // Each session can run its own playground with PLAYGROUND_PORT, so parallel work never shares a server.
 const port = process.env.PLAYGROUND_PORT ?? "5300"
@@ -34,9 +39,14 @@ const built = isCI || process.env.PLAYGROUND_BUILD === "1"
 // The popups that can present as a sheet run their shared specs once more as
 // one, through ?presentation=sheet. Specs that measure placement against the
 // trigger skip themselves there (see `isSheet` in fixtures.ts).
-const sheetSpecs = ["menu", "popover", "dialog", "select", "combobox", "autocomplete"].map(
-  (component) => `**/${component}.spec.ts`,
-)
+const sheetSpecs = [
+  "menu",
+  "popover",
+  "dialog",
+  "select",
+  "combobox",
+  "autocomplete",
+].map((component) => `**/${component}.spec.ts`)
 
 // Only popups move into a portal container, so the portal project runs the
 // specs of components that open one. Every other spec would repeat its react
@@ -72,7 +82,10 @@ const portalSpecs = [
 const browsers = [
   { name: "webkit", use: { browserName: "webkit" as const } },
   { name: "firefox", use: { browserName: "firefox" as const } },
-].filter(({ name }) => !process.env.BROWSERS || process.env.BROWSERS.split(",").includes(name))
+].filter(
+  ({ name }) =>
+    !process.env.BROWSERS || process.env.BROWSERS.split(",").includes(name)
+)
 
 export default defineConfig<{ playground: boolean }>({
   testDir: "specs",
@@ -81,7 +94,11 @@ export default defineConfig<{ playground: boolean }>({
   retries: isCI ? 2 : 0,
   workers: isCI ? 2 : undefined,
   reporter: isCI ? [["blob"], ["github"], ["dot"]] : [["list"]],
-  use: { baseURL: `http://localhost:${port}`, trace: isCI ? "on-first-retry" : "off", playground: true },
+  use: {
+    baseURL: `http://localhost:${port}`,
+    trace: isCI ? "on-first-retry" : "off",
+    playground: true,
+  },
   projects: [
     // Specs that would only skip stay out of a project, since shards split by test count.
     ...frameworks.map((framework) => ({
@@ -95,13 +112,21 @@ export default defineConfig<{ playground: boolean }>({
     // they'd only run again. Count gates measure work, which a portal doesn't change.
     ...["react"].map((framework) => ({
       name: `${framework}-portal`,
-      use: { browserName: "chromium" as const, framework, fixtureOptions: { container: "portal-root" } },
+      use: {
+        browserName: "chromium" as const,
+        framework,
+        fixtureOptions: { container: "portal-root" },
+      },
       testMatch: portalSpecs,
       testIgnore: [kitchenSinks, countGates, ...specsThatSkip(framework)],
     })),
     ...["react", "vue", "web", "svelte", "solid"].map((framework) => ({
       name: `${framework}-sheet`,
-      use: { browserName: "chromium" as const, framework, fixtureOptions: { presentation: "sheet" } },
+      use: {
+        browserName: "chromium" as const,
+        framework,
+        fixtureOptions: { presentation: "sheet" },
+      },
       testMatch: sheetSpecs,
       testIgnore: specsThatSkip(framework),
     })),

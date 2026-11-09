@@ -68,8 +68,12 @@ const leakFrameworks = ["react", "vue", "web"]
 /** A framework's Chromium projects, as tests/playwright.config.ts names them. */
 function chromiumProjects(framework) {
   const projects = [framework, `${framework}-data`, `${framework}-sheet`]
-  if (framework !== "web") projects.push(`${framework}-ssr`)
-  if (framework === "react") projects.push("react-portal")
+  if (framework !== "web") {
+    projects.push(`${framework}-ssr`)
+  }
+  if (framework === "react") {
+    projects.push("react-portal")
+  }
   return projects
 }
 
@@ -98,14 +102,18 @@ const { values: flags } = parseArgs({
 })
 
 // Components are the spec prefixes: `menu` for menu.spec.ts and menu.a11y.spec.ts.
-const specFiles = readdirSync(specRoot).filter((file) => file.endsWith(".spec.ts"))
-const components = [...new Set(specFiles.map((file) => file.split(".")[0]))].sort(
-  (a, b) => b.length - a.length,
+const specFiles = readdirSync(specRoot).filter((file) =>
+  file.endsWith(".spec.ts")
 )
+const components = [
+  ...new Set(specFiles.map((file) => file.split(".")[0])),
+].sort((a, b) => b.length - a.length)
 
 /** The component a file name belongs to: the longest prefix, so `menubar-context` is `menubar`, not `menu`. */
 function componentOf(name) {
-  return components.find((component) => name === component || name.startsWith(`${component}-`))
+  return components.find(
+    (component) => name === component || name.startsWith(`${component}-`)
+  )
 }
 
 /**
@@ -115,25 +123,44 @@ function componentOf(name) {
  */
 function frameworksOf(file) {
   const parts = file.split("/")
-  if (parts[0] === "packages" && frameworks.includes(parts[1])) return [parts[1]]
+  if (parts[0] === "packages" && frameworks.includes(parts[1])) {
+    return [parts[1]]
+  }
   if (file.startsWith("apps/playground/src/fixtures/")) {
     const name = parts[5] ?? ""
-    const own = frameworks.find((framework) => name === framework || name.startsWith(`${framework}-`))
-    if (own) return [own]
-    if (name.endsWith(".vue")) return ["vue"]
-    if (name.endsWith(".svelte")) return ["svelte"]
+    const own = frameworks.find(
+      (framework) => name === framework || name.startsWith(`${framework}-`)
+    )
+    if (own) {
+      return [own]
+    }
+    if (name.endsWith(".vue")) {
+      return ["vue"]
+    }
+    if (name.endsWith(".svelte")) {
+      return ["svelte"]
+    }
   }
-  if (file === "apps/playground/solid-ssr.ts") return ["solid"]
+  if (file === "apps/playground/solid-ssr.ts") {
+    return ["solid"]
+  }
   return frameworks
 }
 
 function changedFiles() {
   const git = (...args) =>
-    execFileSync("git", args, { cwd: root, encoding: "utf8" }).split("\n").filter(Boolean)
+    execFileSync("git", args, { cwd: root, encoding: "utf8" })
+      .split("\n")
+      .filter(Boolean)
   const base = git("merge-base", flags.base, "HEAD")[0]
-  const files = [...git("diff", "--name-only", base), ...git("ls-files", "--others", "--exclude-standard")]
+  const files = [
+    ...git("diff", "--name-only", base),
+    ...git("ls-files", "--others", "--exclude-standard"),
+  ]
   const skipped = [...new Set(files)].filter((file) => commentsOnly(file, base))
-  if (skipped.length > 0) console.log(`Comments only, so left out:\n  ${skipped.join("\n  ")}`)
+  if (skipped.length > 0) {
+    console.log(`Comments only, so left out:\n  ${skipped.join("\n  ")}`)
+  }
   return [...new Set(files)].filter((file) => !skipped.includes(file))
 }
 
@@ -141,7 +168,12 @@ const printer = ts.createPrinter({ removeComments: true })
 
 /** Whether a TypeScript file reads the same as at `base` once its comments and formatting are gone. */
 function commentsOnly(file, base) {
-  if (!/\.(ts|tsx|mts|js|mjs)$/.test(file) || !existsSync(path.join(root, file))) return false
+  if (
+    !/\.(ts|tsx|mts|js|mjs)$/.test(file) ||
+    !existsSync(path.join(root, file))
+  ) {
+    return false
+  }
   const print = (text) =>
     printer.printFile(
       ts.createSourceFile(
@@ -149,8 +181,8 @@ function commentsOnly(file, base) {
         text,
         ts.ScriptTarget.Latest,
         false,
-        file.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
-      ),
+        file.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS
+      )
     )
   try {
     const before = execFileSync("git", ["show", `${base}:${file}`], {
@@ -171,16 +203,26 @@ function packageImporters() {
     .map((file) => path.join("packages", file))
     .filter(
       (file) =>
-        file.split(path.sep)[2] === "src" && sourcePattern.test(file) && !file.includes("node_modules"),
+        file.split(path.sep)[2] === "src" &&
+        sourcePattern.test(file) &&
+        !file.includes("node_modules")
     )
-  const coreExports = JSON.parse(readFileSync(path.join(root, "packages/core/package.json"), "utf8")).exports
+  const coreExports = JSON.parse(
+    readFileSync(path.join(root, "packages/core/package.json"), "utf8")
+  ).exports
   const importers = new Map()
   for (const file of files) {
     const text = readFileSync(path.join(root, file), "utf8")
-    for (const [, specifier] of text.matchAll(/(?:from|import)\s*\(?\s*"([^"]+)"/g)) {
+    for (const [, specifier] of text.matchAll(
+      /(?:from|import)\s*\(?\s*"([^"]+)"/g
+    )) {
       const target = resolve(file, specifier, coreExports)
-      if (!target) continue
-      if (!importers.has(target)) importers.set(target, new Set())
+      if (!target) {
+        continue
+      }
+      if (!importers.has(target)) {
+        importers.set(target, new Set())
+      }
       importers.get(target).add(file)
     }
   }
@@ -189,13 +231,18 @@ function packageImporters() {
 
 function resolve(file, specifier, coreExports) {
   let base
-  if (specifier.startsWith(".")) base = path.join(path.dirname(file), specifier)
-  else if (specifier.startsWith("@ui-sdk/core")) {
+  if (specifier.startsWith(".")) {
+    base = path.join(path.dirname(file), specifier)
+  } else if (specifier.startsWith("@ui-sdk/core")) {
     const key = `.${specifier.slice("@ui-sdk/core".length)}`
     const target =
-      coreExports[key] ?? (key.startsWith("./internal/") && `./src/${key.slice("./internal/".length)}.ts`)
+      coreExports[key] ??
+      (key.startsWith("./internal/") &&
+        `./src/${key.slice("./internal/".length)}.ts`)
     return target && path.join("packages/core", target)
-  } else return
+  } else {
+    return
+  }
   const candidates = [
     base,
     `${base}.ts`,
@@ -204,13 +251,17 @@ function resolve(file, specifier, coreExports) {
     path.join(base, "index.ts"),
   ]
   return candidates.find(
-    (candidate) => existsSync(path.join(root, candidate)) && statSync(path.join(root, candidate)).isFile(),
+    (candidate) =>
+      existsSync(path.join(root, candidate)) &&
+      statSync(path.join(root, candidate)).isFile()
   )
 }
 
 /** Components a package file belongs to: by its name, or by its folder for Svelte's per-component folders. */
 function packageComponents(file) {
-  const name = path.basename(file).replace(/\.(svelte\.ts|ts|tsx|vue|svelte)$/, "")
+  const name = path
+    .basename(file)
+    .replace(/\.(svelte\.ts|ts|tsx|vue|svelte)$/, "")
   const folder = path.basename(path.dirname(file))
   return [componentOf(name), componentOf(folder)].filter(Boolean)
 }
@@ -221,7 +272,9 @@ function importingComponents(file, importers) {
   const queue = [file]
   while (queue.length > 0) {
     for (const importer of importers.get(queue.pop()) ?? []) {
-      if (seen.has(importer)) continue
+      if (seen.has(importer)) {
+        continue
+      }
       seen.add(importer)
       queue.push(importer)
     }
@@ -232,8 +285,12 @@ function importingComponents(file, importers) {
 /** Components whose specs open a fixture folder, like `menu-cases` for menu.cases.spec.ts. */
 function fixtureComponents(folder) {
   const opens = new RegExp(`open\\(\\s*"${folder}"|fixture=${folder}\\b`)
-  const owners = specFiles.filter((file) => opens.test(readFileSync(path.join(specRoot, file), "utf8")))
-  return owners.length > 0 ? owners.map((file) => file.split(".")[0]) : [componentOf(folder)].filter(Boolean)
+  const owners = specFiles.filter((file) =>
+    opens.test(readFileSync(path.join(specRoot, file), "utf8"))
+  )
+  return owners.length > 0
+    ? owners.map((file) => file.split(".")[0])
+    : [componentOf(folder)].filter(Boolean)
 }
 
 /** Each touched component with the frameworks it runs on, and each framework shared code reaches. */
@@ -241,8 +298,12 @@ function plan(files) {
   const touched = new Map()
   const shared = new Map()
   const touch = (component, reach) => {
-    if (!touched.has(component)) touched.set(component, new Set())
-    for (const framework of reach) touched.get(component).add(framework)
+    if (!touched.has(component)) {
+      touched.set(component, new Set())
+    }
+    for (const framework of reach) {
+      touched.get(component).add(framework)
+    }
   }
   const share = (file, reach) => shared.set(file, reach)
   let importers
@@ -251,26 +312,42 @@ function plan(files) {
     const reach = frameworksOf(file)
     if (file.startsWith("tests/specs/")) {
       const component = componentOf(parts[2].split(".")[0])
-      if (component) touch(component, reach)
-      else share(file, reach)
+      if (component) {
+        touch(component, reach)
+      } else {
+        share(file, reach)
+      }
     } else if (file.startsWith("apps/playground/src/fixtures/")) {
-      for (const component of fixtureComponents(parts[4])) touch(component, reach)
+      for (const component of fixtureComponents(parts[4])) {
+        touch(component, reach)
+      }
     } else if (file.startsWith("tests/fixtures/")) {
       // The shared fixture data every framework's fixture for a component imports.
       const component = componentOf(path.basename(file).replace(/\.\w+$/, ""))
-      if (component) touch(component, reach)
-      else share(file, reach)
+      if (component) {
+        touch(component, reach)
+      } else {
+        share(file, reach)
+      }
     } else if (sharedPaths.some((prefix) => file.startsWith(prefix))) {
       share(file, reach)
-    } else if (parts[0] === "packages" && parts[2] === "src" && /\.(ts|tsx|vue|svelte)$/.test(file)) {
+    } else if (
+      parts[0] === "packages" &&
+      parts[2] === "src" &&
+      /\.(ts|tsx|vue|svelte)$/.test(file)
+    ) {
       importers ??= packageImporters()
       const own = packageComponents(file)
       const reached = importingComponents(file, importers)
-      if (own.length > 0 && reached.size <= sharedThreshold)
-        for (const component of reached) touch(component, reach)
-      else {
+      if (own.length > 0 && reached.size <= sharedThreshold) {
+        for (const component of reached) {
+          touch(component, reach)
+        }
+      } else {
         share(file, reach)
-        for (const component of own) touch(component, reach)
+        for (const component of own) {
+          touch(component, reach)
+        }
       }
     }
   }
@@ -280,12 +357,15 @@ function plan(files) {
 /** The frameworks shared code runs whole: `react` for code every framework runs, else the adapters it's in. */
 function sharedFrameworks(shared) {
   const reach = new Set([...shared.values()].flat())
-  if (frameworks.every((framework) => reach.has(framework))) return ["react"]
+  if (frameworks.every((framework) => reach.has(framework))) {
+    return ["react"]
+  }
   return frameworks.filter((framework) => reach.has(framework))
 }
 
 function commands({ touched, shared }) {
-  const projectArgs = (projects) => projects.flatMap((project) => ["--project", project])
+  const projectArgs = (projects) =>
+    projects.flatMap((project) => ["--project", project])
   const runs = []
   // Base projects that run whole, which the touched specs needn't repeat.
   const whole = shared.size > 0 ? sharedFrameworks(shared) : []
@@ -293,25 +373,52 @@ function commands({ touched, shared }) {
   const groups = new Map()
   for (const [component, reach] of touched) {
     const key = frameworks.filter((framework) => reach.has(framework)).join(",")
-    if (!groups.has(key)) groups.set(key, [])
+    if (!groups.has(key)) {
+      groups.set(key, [])
+    }
     groups.get(key).push(component)
   }
   for (const [key, group] of groups) {
     const reach = key.split(",")
-    const projects = reach.flatMap(chromiumProjects).filter((project) => !whole.includes(project))
-    if (flags.engines && reach.includes("web")) projects.push(...engineProjects)
+    const projects = reach
+      .flatMap(chromiumProjects)
+      .filter((project) => !whole.includes(project))
+    if (flags.engines && reach.includes("web")) {
+      projects.push(...engineProjects)
+    }
     // A spec can run on none of them, like web-lifecycle's while the web project runs whole.
-    if (projects.length > 0)
-      runs.push([`specs/(${group.sort().join("|")})\\.`, ...projectArgs(projects), "--pass-with-no-tests"])
+    if (projects.length > 0) {
+      runs.push([
+        `specs/(${group.sort().join("|")})\\.`,
+        ...projectArgs(projects),
+        "--pass-with-no-tests",
+      ])
+    }
   }
-  const reached = new Set([...touched.values(), ...shared.values()].flatMap((reach) => [...reach]))
-  const leaks = leakFrameworks.filter((framework) => reached.has(framework) && !whole.includes(framework))
+  const reached = new Set(
+    [...touched.values(), ...shared.values()].flatMap((reach) => [...reach])
+  )
+  const leaks = leakFrameworks.filter(
+    (framework) => reached.has(framework) && !whole.includes(framework)
+  )
   // Leak tests are named by component in words: "a scroll area" for scroll-area.
-  const named = [...touched.keys()].map((component) => component.replaceAll("-", " "))
-  const grep = shared.size > 0 ? [] : ["--grep", `\\b(${named.join("|")})\\b`, "--pass-with-no-tests"]
-  if (leaks.length > 0 && !touched.has("leaks") && (shared.size > 0 || named.length > 0))
+  const named = [...touched.keys()].map((component) =>
+    component.replaceAll("-", " ")
+  )
+  const grep =
+    shared.size > 0
+      ? []
+      : ["--grep", `\\b(${named.join("|")})\\b`, "--pass-with-no-tests"]
+  if (
+    leaks.length > 0 &&
+    !touched.has("leaks") &&
+    (shared.size > 0 || named.length > 0)
+  ) {
     runs.push(["specs/leaks.spec.ts", ...projectArgs(leaks), ...grep])
-  if (whole.length > 0) runs.push(projectArgs(whole))
+  }
+  if (whole.length > 0) {
+    runs.push(projectArgs(whole))
+  }
   return runs
 }
 
@@ -330,14 +437,19 @@ function shardCount(runs) {
       console.error(list.error ?? "", list.stdout, list.stderr)
       process.exit(1)
     }
-    for (const [, project, file] of list.stdout.matchAll(/^\s+\[(.+?)\] › (\S+?):\d+:\d+ › /gm)) {
+    for (const [, project, file] of list.stdout.matchAll(
+      /^\s+\[(.+?)\] › (\S+?):\d+:\d+ › /gm
+    )) {
       const weight =
-        (file === "leaks.spec.ts" ? leakWeight : 1) * (/-(webkit|firefox)$/.test(project) ? engineWeight : 1)
+        (file === "leaks.spec.ts" ? leakWeight : 1) *
+        (/-(webkit|firefox)$/.test(project) ? engineWeight : 1)
       seconds += testSeconds * weight
     }
   }
   const minutes = seconds / 60
-  console.log(`Estimated time on one runner: ${Math.max(1, Math.round(minutes))} min.`)
+  console.log(
+    `Estimated time on one runner: ${Math.max(1, Math.round(minutes))} min.`
+  )
   return Math.min(maxShards, Math.ceil(minutes / shardMinutes))
 }
 
@@ -354,8 +466,14 @@ function freePort() {
 /** Builds the playground and serves it with `vite preview` on `port`, resolving once it answers. */
 async function servePlayground(port) {
   const env = { ...process.env, PLAYGROUND_PORT: port }
-  const build = spawnSync("pnpm", ["--filter", "playground", "build"], { cwd: root, stdio: "inherit", env })
-  if (build.status !== 0) process.exit(1)
+  const build = spawnSync("pnpm", ["--filter", "playground", "build"], {
+    cwd: root,
+    stdio: "inherit",
+    env,
+  })
+  if (build.status !== 0) {
+    process.exit(1)
+  }
   // Its own process group, so stopping it stops the Vite process pnpm starts too.
   const server = spawn("pnpm", ["--filter", "playground", "preview"], {
     cwd: root,
@@ -367,9 +485,11 @@ async function servePlayground(port) {
   for (let i = 0; i < 100; i++) {
     const up = await fetch(`http://localhost:${port}/`).then(
       (response) => response.ok,
-      () => false,
+      () => false
     )
-    if (up) return { stop }
+    if (up) {
+      return { stop }
+    }
     await new Promise((done) => setTimeout(done, 100))
   }
   stop()
@@ -383,20 +503,26 @@ if (!flags.all) {
   runs = commands(changes)
   const touched = [...changes.touched].map(
     ([component, reach]) =>
-      `${component}${reach.size < frameworks.length ? ` (${[...reach].join(", ")})` : ""}`,
+      `${component}${reach.size < frameworks.length ? ` (${[...reach].join(", ")})` : ""}`
   )
   console.log(`Touched components: ${touched.sort().join(", ") || "none"}`)
-  if (changes.shared.size > 0)
+  if (changes.shared.size > 0) {
     console.log(
-      `Shared code changed, so the whole ${sharedFrameworks(changes.shared).join(", ")} project runs:\n  ${[...changes.shared.keys()].join("\n  ")}`,
+      `Shared code changed, so the whole ${sharedFrameworks(changes.shared).join(", ")} project runs:\n  ${[...changes.shared.keys()].join("\n  ")}`
     )
+  }
 }
-for (const args of runs)
+for (const args of runs) {
   console.log(
-    `  npx playwright test ${args.map((arg) => (/[*|()\\]/.test(arg) ? `'${arg}'` : arg)).join(" ")}`,
+    `  npx playwright test ${args.map((arg) => (/[*|()\\]/.test(arg) ? `'${arg}'` : arg)).join(" ")}`
   )
-if (flags.shards) console.log(`shards=${runs.length > 0 ? shardCount(runs) : 0}`)
-if (flags.dry || flags.shards || runs.length === 0) process.exit(0)
+}
+if (flags.shards) {
+  console.log(`shards=${runs.length > 0 ? shardCount(runs) : 0}`)
+}
+if (flags.dry || flags.shards || runs.length === 0) {
+  process.exit(0)
+}
 
 const port = process.env.PLAYGROUND_PORT ?? (await freePort())
 const server = flags.dev ? undefined : await servePlayground(port)
@@ -407,12 +533,22 @@ for (const args of runs) {
   const count = flags.workers ?? (process.env.CI ? undefined : "75%")
   const workers = count ? ["--workers", count] : []
   const shard = flags.shard ? ["--shard", flags.shard] : []
-  const { status } = spawnSync("npx", ["playwright", "test", ...args, ...workers, ...shard], {
-    cwd: path.join(root, "tests"),
-    stdio: "inherit",
-    env: { ...process.env, PLAYGROUND_PORT: port, ...(server && { PLAYGROUND_SERVED: "1" }) },
-  })
-  if (status !== 0) failed = true
+  const { status } = spawnSync(
+    "npx",
+    ["playwright", "test", ...args, ...workers, ...shard],
+    {
+      cwd: path.join(root, "tests"),
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        PLAYGROUND_PORT: port,
+        ...(server && { PLAYGROUND_SERVED: "1" }),
+      },
+    }
+  )
+  if (status !== 0) {
+    failed = true
+  }
 }
 server?.stop()
 process.exit(failed ? 1 : 0)

@@ -1,7 +1,11 @@
 "use client"
 
 import { Field, FieldControl, FieldLabel } from "@ui-sdk/react/field"
-import { type TriggerDefinition, TriggerMenu, TriggerMenuInput } from "@ui-sdk/react/trigger-menu"
+import {
+  type TriggerDefinition,
+  TriggerMenu,
+  TriggerMenuInput,
+} from "@ui-sdk/react/trigger-menu"
 
 const people = [
   { value: "hollis", label: "Hollis Grant" },
@@ -26,8 +30,11 @@ const channels = [
 function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
   return new Promise<string[]>((resolve, reject) => {
     const timer = setTimeout(
-      () => resolve(channels.filter((channel) => channel.includes(query.toLowerCase()))),
-      400,
+      () =>
+        resolve(
+          channels.filter((channel) => channel.includes(query.toLowerCase()))
+        ),
+      400
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -47,7 +54,9 @@ function Example() {
     <TriggerMenu triggers={triggers}>
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type @, / or #…" />} />
+        <FieldControl
+          render={<TriggerMenuInput placeholder="Type @, / or #…" />}
+        />
       </Field>
     </TriggerMenu>
   )

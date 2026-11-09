@@ -16,7 +16,11 @@ import {
   type ChangeDetails,
   type MovePoint,
 } from "../src/index"
-import { createVelocityTracker, projectDistance, solveSpring } from "../src/foundation/motion/gesture"
+import {
+  createVelocityTracker,
+  projectDistance,
+  solveSpring,
+} from "../src/foundation/motion/gesture"
 import { bind } from "../src/foundation/kernel/part"
 import { elementOf, observe } from "../src/page/observe/observe"
 
@@ -24,7 +28,12 @@ afterEach(() => {
   document.body.innerHTML = ""
 })
 
-const box = (left: number, top: number, size = 10) => ({ left, top, right: left + size, bottom: top + size })
+const box = (left: number, top: number, size = 10) => ({
+  left,
+  top,
+  right: left + size,
+  bottom: top + size,
+})
 
 describe("nearestInDirection", () => {
   const cards = [
@@ -48,8 +57,8 @@ describe("nearestInDirection", () => {
           { key: "a", rect: box(40, 60) },
           { key: "b", rect: box(5, 120) },
         ],
-        [0, 1],
-      ),
+        [0, 1]
+      )
     ).toBe("b")
   })
 
@@ -59,7 +68,11 @@ describe("nearestInDirection", () => {
 })
 
 // A board: items placed in 2D, spatial arrows, Alt nudges.
-type BoardState = { positions: Record<string, MovePoint>; focused: string | null; moving: null }
+type BoardState = {
+  positions: Record<string, MovePoint>
+  focused: string | null
+  moving: null
+}
 const board = definePrimitive({
   name: "board",
   options: { defaultPositions: "value", onPositionsChange: "callback" },
@@ -67,9 +80,13 @@ const board = definePrimitive({
     defaultPositions: Record<string, MovePoint>
     onPositionsChange?: (
       value: Record<string, MovePoint>,
-      details: ChangeDetails<"drag" | "move-key" | "imperative">,
+      details: ChangeDetails<"drag" | "move-key" | "imperative">
     ) => void
-  }): BoardState => ({ positions: options.defaultPositions, focused: null, moving: null }),
+  }): BoardState => ({
+    positions: options.defaultPositions,
+    focused: null,
+    moving: null,
+  }),
   live: ["moving"],
   api: (context) => {
     const change = createChange(context)
@@ -90,9 +107,12 @@ const board = definePrimitive({
   slots: (slot) => ({
     card: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (state, part) => ({ tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: {
-        keydown: (event, { el, api, key }) => api.move.keydown(event, key) || api.roving.keydown(event, el!),
+        keydown: (event, { el, api, key }) =>
+          api.move.keydown(event, key) || api.roving.keydown(event, el!),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -102,20 +122,35 @@ const board = definePrimitive({
 describe("spatialMove and createMove", () => {
   function setup() {
     const onPositionsChange = vi.fn()
-    const positions = { a: { x: 0, y: 0 }, b: { x: 200, y: 0 }, c: { x: 20, y: 150 } }
-    const instance = board({ id: "b", defaultPositions: positions, onPositionsChange })
+    const positions = {
+      a: { x: 0, y: 0 },
+      b: { x: 200, y: 0 },
+      c: { x: 20, y: 150 },
+    }
+    const instance = board({
+      id: "b",
+      defaultPositions: positions,
+      onPositionsChange,
+    })
     const els = Object.fromEntries(
       Object.keys(positions).map((key) => {
         const el = document.createElement("div")
         el.tabIndex = -1
         el.getBoundingClientRect = () => {
           const at = instance.get().positions[key]
-          return { ...box(at.x, at.y, 50), x: at.x, y: at.y, width: 50, height: 50, toJSON() {} } as DOMRect
+          return {
+            ...box(at.x, at.y, 50),
+            x: at.x,
+            y: at.y,
+            width: 50,
+            height: 50,
+            toJSON() {},
+          } as DOMRect
         }
         document.body.append(el)
         bind(instance.part("card", { value: key }), el)
         return [key, el]
-      }),
+      })
     )
     return { instance, els, onPositionsChange }
   }
@@ -124,20 +159,35 @@ describe("spatialMove and createMove", () => {
     const { els } = setup()
     await Promise.resolve()
     els.a.focus()
-    els.a.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }))
+    els.a.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
+    )
     await new Promise((resolve) => setTimeout(resolve))
     expect(document.activeElement).toBe(els.c)
-    els.c.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }))
+    els.c.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true })
+    )
     await new Promise((resolve) => setTimeout(resolve))
     expect(document.activeElement).toBe(els.b)
   })
 
   test("Alt with an arrow nudges the card a step, Shift a large step, in one change each", () => {
     const { instance, els, onPositionsChange } = setup()
-    els.a.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", altKey: true, bubbles: true }))
+    els.a.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "ArrowRight",
+        altKey: true,
+        bubbles: true,
+      })
+    )
     expect(instance.get().positions.a).toEqual({ x: 10, y: 0 })
     els.a.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "ArrowDown", altKey: true, shiftKey: true, bubbles: true }),
+      new KeyboardEvent("keydown", {
+        key: "ArrowDown",
+        altKey: true,
+        shiftKey: true,
+        bubbles: true,
+      })
     )
     expect(instance.get().positions.a).toEqual({ x: 10, y: 50 })
     expect(onPositionsChange).toHaveBeenCalledTimes(2)
@@ -158,7 +208,13 @@ describe("spatialMove and createMove", () => {
   test("a drag follows the pointer from the press, threshold included, and commits once", () => {
     const { instance, els, onPositionsChange } = setup()
     const pointer = (type: string, clientX: number, clientY: number) =>
-      new PointerEvent(type, { clientX, clientY, button: 0, isPrimary: true, bubbles: true })
+      new PointerEvent(type, {
+        clientX,
+        clientY,
+        button: 0,
+        isPrimary: true,
+        bubbles: true,
+      })
     instance.api.move.pointerdown(pointer("pointerdown", 10, 10), "a", els.a)
     document.dispatchEvent(pointer("pointermove", 60, 30))
     document.dispatchEvent(pointer("pointerup", 60, 30))
@@ -169,7 +225,12 @@ describe("spatialMove and createMove", () => {
 
   test("a second finger pressing another card mid-drag leaves the first card following the first finger", async () => {
     const { instance, els, onPositionsChange } = setup()
-    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+    const touch = (
+      type: string,
+      clientX: number,
+      clientY: number,
+      pointerId: number
+    ) =>
       new PointerEvent(type, {
         clientX,
         clientY,
@@ -194,7 +255,12 @@ describe("spatialMove and createMove", () => {
 
   test("a second finger landing before the first has moved past the threshold leaves the card to the first finger", async () => {
     const { instance, els } = setup()
-    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+    const touch = (
+      type: string,
+      clientX: number,
+      clientY: number,
+      pointerId: number
+    ) =>
       new PointerEvent(type, {
         clientX,
         clientY,
@@ -214,7 +280,10 @@ describe("spatialMove and createMove", () => {
 
   test("style gives dragged items their offset", () => {
     const { instance } = setup()
-    const state = { ...instance.get(), moving: { keys: ["a"], dx: 4, dy: 6 } } as never
+    const state = {
+      ...instance.get(),
+      moving: { keys: ["a"], dx: 4, dy: 6 },
+    } as never
     expect(instance.api.move.style(state, "a")).toContain("translate:4px 6px")
     expect(instance.api.move.style(state, "b")).toBeUndefined()
   })
@@ -222,12 +291,23 @@ describe("spatialMove and createMove", () => {
 
 describe("dispatch", () => {
   test("calls the option with change details, and reports a cancel", () => {
-    const onAction = vi.fn((_value: string, details: ChangeDetails<"item-press">) => details.cancel())
+    const onAction = vi.fn(
+      (_value: string, details: ChangeDetails<"item-press">) => details.cancel()
+    )
     const context = { options: () => ({ onAction }) }
-    expect(dispatch(context, "onAction", "share", { reason: "item-press" })).toBe(true)
+    expect(
+      dispatch(context, "onAction", "share", { reason: "item-press" })
+    ).toBe(true)
     expect(onAction.mock.calls[0][0]).toBe("share")
-    expect(onAction.mock.calls[0][1]).toMatchObject({ reason: "item-press", source: "programmatic" })
-    expect(dispatch({ options: () => ({}) }, "onAction", "x", { reason: "item-press" })).toBe(false)
+    expect(onAction.mock.calls[0][1]).toMatchObject({
+      reason: "item-press",
+      source: "programmatic",
+    })
+    expect(
+      dispatch({ options: () => ({}) }, "onAction", "x", {
+        reason: "item-press",
+      })
+    ).toBe(false)
   })
 })
 
@@ -242,10 +322,15 @@ describe("bindLayer", () => {
     const offOuter = bindLayer(outer, { onDismiss: closeOuter })
     const offInner = bindLayer(inner, { onDismiss: closeInner })
     document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))
-    expect(closeInner).toHaveBeenCalledWith("escape-key", expect.any(KeyboardEvent))
+    expect(closeInner).toHaveBeenCalledWith(
+      "escape-key",
+      expect.any(KeyboardEvent)
+    )
     expect(closeOuter).not.toHaveBeenCalled()
     offInner()
-    outside.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true }))
+    outside.dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true, composed: true })
+    )
     expect(closeOuter).toHaveBeenCalledWith("outside-press", expect.anything())
     offOuter()
   })
@@ -257,17 +342,40 @@ describe("bindLayer", () => {
     outside.addEventListener("click", clicked)
     document.body.append(panel, outside)
     // Closing removes the layer at once, as a framework unmounting it does.
-    const off: () => void = bindLayer(panel, { modal: true, onDismiss: () => off() })
+    const off: () => void = bindLayer(panel, {
+      modal: true,
+      onDismiss: () => off(),
+    })
     outside.dispatchEvent(
-      new PointerEvent("pointerdown", { bubbles: true, composed: true, cancelable: true }),
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      })
     )
-    outside.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, cancelable: true }))
+    outside.dispatchEvent(
+      new MouseEvent("click", {
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      })
+    )
     expect(clicked).not.toHaveBeenCalled()
     // The next press is the page's again.
     outside.dispatchEvent(
-      new PointerEvent("pointerdown", { bubbles: true, composed: true, cancelable: true }),
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      })
     )
-    outside.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, cancelable: true }))
+    outside.dispatchEvent(
+      new MouseEvent("click", {
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      })
+    )
     expect(clicked).toHaveBeenCalledOnce()
   })
 
@@ -280,8 +388,12 @@ describe("bindLayer", () => {
     const view = frame.contentWindow as typeof window
     const dismissed = vi.fn()
     const off = bindLayer(panel, { onDismiss: (reason) => dismissed(reason) })
-    panel.dispatchEvent(new view.KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
-    outside.dispatchEvent(new view.PointerEvent("pointerdown", { bubbles: true, composed: true }))
+    panel.dispatchEvent(
+      new view.KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
+    outside.dispatchEvent(
+      new view.PointerEvent("pointerdown", { bubbles: true, composed: true })
+    )
     expect(dismissed.mock.calls).toEqual([["escape-key"], ["outside-press"]])
     off()
   })
@@ -291,14 +403,24 @@ describe("observe", () => {
   const toggle = definePrimitive({
     name: "toggle",
     options: { onPressedChange: "callback" },
-    state: (_options: { onPressedChange?: (pressed: boolean, details: ChangeDetails<"press">) => void }) => ({
+    state: (_options: {
+      onPressedChange?: (
+        pressed: boolean,
+        details: ChangeDetails<"press">
+      ) => void
+    }) => ({
       pressed: false,
     }),
     api: (context) => {
       const change = createChange(context)
-      return { press: () => change("pressed", !context.store.get().pressed, { reason: "press" }) }
+      return {
+        press: () =>
+          change("pressed", !context.store.get().pressed, { reason: "press" }),
+      }
     },
-    slots: (slot) => ({ root: slot({ attrs: () => ({ "aria-label": "Bold" }) }) }),
+    slots: (slot) => ({
+      root: slot({ attrs: () => ({ "aria-label": "Bold" }) }),
+    }),
   })
 
   test("reports the value before, scopes to an element, and finds a component's element", () => {
@@ -318,7 +440,11 @@ describe("observe", () => {
     a.api.press()
     b.api.press()
     expect(all).toHaveBeenCalledTimes(2)
-    expect(all.mock.calls[0][0]).toMatchObject({ key: "pressed", value: true, previous: false })
+    expect(all.mock.calls[0][0]).toMatchObject({
+      key: "pressed",
+      value: true,
+      previous: false,
+    })
     expect(inPanel).toHaveBeenCalledTimes(1)
     expect(elementOf(all.mock.calls[0][0].ref)).toBe(elA)
     stopAll()
@@ -329,7 +455,9 @@ describe("observe", () => {
 describe("gesture", () => {
   test("a flick has velocity, a stop before release has none", () => {
     const tracker = createVelocityTracker()
-    for (let t = 0; t <= 50; t += 10) tracker.add(t, t * 2)
+    for (let t = 0; t <= 50; t += 10) {
+      tracker.add(t, t * 2)
+    }
     expect(tracker.velocity(50)).toBeCloseTo(2, 1)
     expect(tracker.velocity(200)).toBe(0)
   })

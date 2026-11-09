@@ -20,8 +20,13 @@ function defineMenubarElements() {
       // Menus that upgraded first, like when the menubar loads later, bound as
       // menus of their own. They join it now.
       render(el, { api }) {
-        for (const menu of el.querySelectorAll<HTMLElement & { rebind?: () => void }>("ui-menu"))
-          if (instanceOf(menu) && menubarOf(menu) === api) menu.rebind?.()
+        for (const menu of el.querySelectorAll<
+          HTMLElement & { rebind?: () => void }
+        >("ui-menu")) {
+          if (instanceOf(menu) && menubarOf(menu) === api) {
+            menu.rebind?.()
+          }
+        }
       },
     },
   })
@@ -30,7 +35,9 @@ function defineMenubarElements() {
 // The menubar a menu sits in, unless it sits inside another menu first.
 function menubarOf(el: HTMLElement) {
   const found = el.parentElement?.closest("ui-menubar, ui-menu")
-  return found?.localName === "ui-menubar" ? instanceOf<MenubarApi>(found)?.api : undefined
+  return found?.localName === "ui-menubar"
+    ? instanceOf<MenubarApi>(found)?.api
+    : undefined
 }
 
 export { defineMenubarElements, menubarOf }

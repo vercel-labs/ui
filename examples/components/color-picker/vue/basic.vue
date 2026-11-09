@@ -22,7 +22,16 @@ const formats: { label: string; value: ColorFormat }[] = [
   { label: "OKLCH", value: "oklch" },
 ]
 
-const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+const presets = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#0ea5e9",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+]
 
 const format = ref<ColorFormat>("hex")
 const value = ref("#0ea5e9")
@@ -56,16 +65,28 @@ function changeFormat(next: ColorFormat) {
       <select
         aria-label="Format"
         :value="format"
-        @change="changeFormat(($event.target as HTMLSelectElement).value as ColorFormat)"
+        @change="
+          changeFormat(
+            ($event.target as HTMLSelectElement).value as ColorFormat
+          )
+        "
       >
-        <option v-for="option in formats" :key="option.value" :value="option.value">
+        <option
+          v-for="option in formats"
+          :key="option.value"
+          :value="option.value"
+        >
           {{ option.label }}
         </option>
       </select>
       <ColorPickerInput aria-label="Color" />
     </div>
     <ColorPickerSwatches aria-label="Presets">
-      <ColorPickerSwatchItem v-for="preset in presets" :key="preset" :value="preset" />
+      <ColorPickerSwatchItem
+        v-for="preset in presets"
+        :key="preset"
+        :value="preset"
+      />
     </ColorPickerSwatches>
   </ColorPicker>
 </template>

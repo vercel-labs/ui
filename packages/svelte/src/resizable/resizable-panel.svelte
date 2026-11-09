@@ -5,7 +5,11 @@ drag, so it never renders for a resize unless its snippet reads `size`.
 @stable
 -->
 <script lang="ts">
-  import { resizable, type ResizablePanelProps, type ResizablePanelState } from "@ui-sdk/core/resizable"
+  import {
+    resizable,
+    type ResizablePanelProps,
+    type ResizablePanelState,
+  } from "@ui-sdk/core/resizable"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

@@ -44,7 +44,10 @@ A command. Pressing it, or Enter while it's highlighted, runs it, with its `valu
   const inPage = getContext<PageContext | undefined>(PageKey)
   const data = getContext<boolean | undefined>(DataKey) ?? false
   setContext<ItemShortcutContext>(ItemShortcutKey, () => shortcut)
-  setContext<ItemContext>(ItemKey, () => ({ key: value ?? generated, label: label ?? value }))
+  setContext<ItemContext>(ItemKey, () => ({
+    key: value ?? generated,
+    label: label ?? value,
+  }))
   const item = useHandlePart(command, "item", () => {
     const key = value ?? generated
     return {

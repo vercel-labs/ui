@@ -1,4 +1,9 @@
-import { Accordion, AccordionHeader, AccordionItem, AccordionTrigger } from "../src/accordion"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionTrigger,
+} from "../src/accordion"
 
 // `T` comes from `value`, and reaches `onValueChange` and the root's state.
 ;<Accordion

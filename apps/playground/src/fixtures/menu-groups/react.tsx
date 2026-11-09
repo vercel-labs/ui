@@ -1,4 +1,11 @@
-import { Menu, MenuContent, MenuGroup, MenuGroupLabel, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuGroup,
+  MenuGroupLabel,
+  MenuItem,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { onItemsChange } from "tests/fixtures/items.ts"

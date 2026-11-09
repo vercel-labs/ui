@@ -14,10 +14,19 @@
     DatePickerInput,
     DatePickerTrigger,
   } from "@ui-sdk/svelte/date-picker"
-  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import {
+    CalendarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+  } from "@lucide/svelte"
 </script>
 
-<DatePicker min="2026-10-05" max="2026-11-20" unavailable={[{ weekday: [0, 6] }]} defaultValue="2026-10-16">
+<DatePicker
+  min="2026-10-05"
+  max="2026-11-20"
+  unavailable={[{ weekday: [0, 6] }]}
+  defaultValue="2026-10-16"
+>
   <div data-slot="row">
     <DatePickerInput aria-label="Delivery date" />
     <DatePickerTrigger data-variant="ghost">

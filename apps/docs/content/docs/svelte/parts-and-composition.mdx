@@ -11,7 +11,13 @@ Import the parts you need and nest them as shown in the component's Composition:
 
 ```svelte
 <script lang="ts">
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/svelte/popover"
+  import {
+    Popover,
+    PopoverClose,
+    PopoverContent,
+    PopoverTitle,
+    PopoverTrigger,
+  } from "@ui-sdk/svelte/popover"
 </script>
 
 <Popover>
@@ -32,18 +38,18 @@ Render a menu item as a link:
 
 ```svelte
 <script lang="ts">
-import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/svelte/menu"
+  import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/svelte/menu"
 </script>
 
 <Menu>
-<MenuTrigger>Account</MenuTrigger>
-<MenuContent>
-<MenuItem>
-  {#snippet render({ props })}
-    <a {...props} href="/settings">Settings</a>
-  {/snippet}
-</MenuItem>
-</MenuContent>
+  <MenuTrigger>Account</MenuTrigger>
+  <MenuContent>
+    <MenuItem>
+      {#snippet render({ props })}
+        <a {...props} href="/settings">Settings</a>
+      {/snippet}
+    </MenuItem>
+  </MenuContent>
 </Menu>
 ```
 
@@ -57,7 +63,7 @@ The part can pass its state to its content:
 
 ```svelte
 <script lang="ts">
-import { Toggle } from "@ui-sdk/svelte/toggle"
+  import { Toggle } from "@ui-sdk/svelte/toggle"
 </script>
 
 <Toggle aria-label="Mute">

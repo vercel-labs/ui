@@ -16,10 +16,15 @@ let version = $state(0)
  * trigger inside one dialog that names another's controller opens the other,
  * once that one mounts. Reading it in a template tracks it.
  */
-function useControllerTarget<T>(controller: () => object | undefined, nearest: T | undefined) {
+function useControllerTarget<T>(
+  controller: () => object | undefined,
+  nearest: T | undefined
+) {
   return () => {
     const current = controller()
-    if (!current) return nearest
+    if (!current) {
+      return nearest
+    }
     version
     return (controlled.get(current) as T | undefined) ?? nearest
   }
@@ -31,15 +36,22 @@ function useControllerTarget<T>(controller: () => object | undefined, nearest: T
  * client render stays the plain button the server rendered, and hydration
  * matches before the trigger binds.
  */
-function useControllerEntry(controller: () => object | undefined, value: unknown) {
+function useControllerEntry(
+  controller: () => object | undefined,
+  value: unknown
+) {
   $effect(() => {
     const current = controller()
-    if (!current) return
+    if (!current) {
+      return
+    }
     controlled.set(current, value)
     // Untracked, so the effect doesn't run again for its own write.
     untrack(() => version++)
     return () => {
-      if (controlled.get(current) !== value) return
+      if (controlled.get(current) !== value) {
+        return
+      }
       controlled.delete(current)
       untrack(() => version++)
     }

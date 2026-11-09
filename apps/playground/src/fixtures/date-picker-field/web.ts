@@ -5,7 +5,10 @@ import {
 } from "tests/fixtures/date-picker.ts"
 
 async function mount(root: HTMLElement) {
-  await Promise.all([import("@ui-sdk/web/field"), import("@ui-sdk/web/date-picker")])
+  await Promise.all([
+    import("@ui-sdk/web/field"),
+    import("@ui-sdk/web/date-picker"),
+  ])
   const { required, disabled } = datePickerFieldOptions()
   root.innerHTML = `
     <div class="fixture">
@@ -31,7 +34,9 @@ async function mount(root: HTMLElement) {
   const submitted = root.querySelector("output")!
   root
     .querySelector(".remove")!
-    .addEventListener("click", () => root.querySelector("ui-date-picker")?.remove())
+    .addEventListener("click", () =>
+      root.querySelector("ui-date-picker")?.remove()
+    )
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     submitted.textContent = JSON.stringify([...new FormData(form)])

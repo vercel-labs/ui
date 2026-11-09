@@ -1,5 +1,9 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { toLabel, TokenInput, TokenInputEditor } from "@ui-sdk/solid/token-input"
+import {
+  toLabel,
+  TokenInput,
+  TokenInputEditor,
+} from "@ui-sdk/solid/token-input"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
@@ -8,7 +12,10 @@ function Example() {
   return (
     <Field>
       <FieldLabel>Message</FieldLabel>
-      <TokenInput submitShortcut="mod+enter" onSubmit={(value) => log(`Sent ${toLabel(value)}`)}>
+      <TokenInput
+        submitShortcut="mod+enter"
+        onSubmit={(value) => log(`Sent ${toLabel(value)}`)}
+      >
         <TokenInputEditor placeholder="Write a message…" />
       </TokenInput>
     </Field>

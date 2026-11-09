@@ -27,7 +27,8 @@ as --viewport-width and --viewport-height, and moves to the open trigger.
     anchor,
     container,
     ...rest
-  }: PartProps<"div", NavigationMenuViewportState> & NavigationMenuViewportProps = $props()
+  }: PartProps<"div", NavigationMenuViewportState> &
+    NavigationMenuViewportProps = $props()
 
   const menu = useHandle(navigationMenu)
   const fromRoot = getContext<ContainerContext | undefined>(ContainerKey)
@@ -35,8 +36,16 @@ as --viewport-width and --viewport-height, and moves to the open trigger.
   const viewport = useHandlePart(
     menu,
     "viewport",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor }),
-    portalTo(target),
+    () => ({
+      side,
+      align,
+      sideOffset,
+      alignOffset,
+      collisionPadding,
+      arrowPadding,
+      anchor,
+    }),
+    portalTo(target)
   )
 </script>
 

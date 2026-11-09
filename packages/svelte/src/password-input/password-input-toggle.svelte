@@ -12,7 +12,10 @@ it's a toggle button, and `aria-pressed` says whether the password is shown.
 
   let props: PartProps<"button", PasswordInputState> = $props()
 
-  const toggle = useHandlePart(usePasswordInput("PasswordInputToggle"), "toggle")
+  const toggle = useHandlePart(
+    usePasswordInput("PasswordInputToggle"),
+    "toggle"
+  )
 </script>
 
 <Part tag="button" part={toggle} {props} />

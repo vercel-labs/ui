@@ -14,12 +14,14 @@ const settle = async () => {
   flushSync()
 }
 
-for (const viewport of [true, false])
+for (const viewport of [true, false]) {
   test(`a bound value opens, switches and closes it (${viewport ? "viewport" : "no viewport"})`, async () => {
     const target = document.body.appendChild(document.createElement("div"))
     const app = mount(App, { target, props: { viewport } })
     const expanded = () =>
-      [...target.querySelectorAll('[aria-expanded="true"]')].map((trigger) => trigger.textContent?.trim())
+      [...target.querySelectorAll('[aria-expanded="true"]')].map((trigger) =>
+        trigger.textContent?.trim()
+      )
     await settle()
     for (const value of ["a", "b", null, "b", null]) {
       app.set(value)
@@ -29,3 +31,4 @@ for (const viewport of [true, false])
     unmount(app)
     target.remove()
   })
+}

@@ -16,7 +16,11 @@ The root, and the hidden input that submits the number as is.
   import { useFieldControl, useFieldControlId } from "../field/context"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { NumberInputKey, type NumberInputContext } from "./context"
 
   type Value = number | null
@@ -73,10 +77,15 @@ The root, and the hidden input that submits the number as is.
     controller,
     debug,
     controlId,
-    onValueChange: (next: Value, details: ChangeDetails<NumberInputValueChangeReason>) => {
+    onValueChange: (
+      next: Value,
+      details: ChangeDetails<NumberInputValueChangeReason>
+    ) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onValueCommit,
   }))

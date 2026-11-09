@@ -1,13 +1,21 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/solid/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/solid/password-input"
 import { createSignal, For } from "solid-js"
 
 const rules = [
-  { label: "At least 8 characters", test: (password: string) => password.length >= 8 },
+  {
+    label: "At least 8 characters",
+    test: (password: string) => password.length >= 8,
+  },
   { label: "A number", test: (password: string) => /\d/.test(password) },
   {
     label: "An uppercase and a lowercase letter",
-    test: (password: string) => /[a-z]/.test(password) && /[A-Z]/.test(password),
+    test: (password: string) =>
+      /[a-z]/.test(password) && /[A-Z]/.test(password),
   },
 ]
 

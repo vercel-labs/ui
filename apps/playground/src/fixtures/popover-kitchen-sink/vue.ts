@@ -13,9 +13,13 @@ import { kitchenSink, type Env } from "./shell"
 import type { Variant } from "./variants"
 
 function body(variant: Variant) {
-  if (variant.body === "text") return []
-  if (variant.body === "long") return Array.from({ length: 30 }, (_, index) => h("p", `Line ${index + 1}`))
-  if (variant.body === "nested")
+  if (variant.body === "text") {
+    return []
+  }
+  if (variant.body === "long") {
+    return Array.from({ length: 30 }, (_, index) => h("p", `Line ${index + 1}`))
+  }
+  if (variant.body === "nested") {
     return [
       h(Popover, null, () => [
         h(PopoverTrigger, { class: classes.trigger }, () => "More"),
@@ -26,6 +30,7 @@ function body(variant: Variant) {
         ]),
       ]),
     ]
+  }
   return [
     h("label", { class: "mb-3 flex flex-col gap-1" }, [
       "Name",
@@ -51,13 +56,19 @@ const VariantPopover = defineComponent({
             container: env.container,
             ...(variant.controlled && { open: open.value }),
             "onUpdate:open": (next: boolean) => {
-              if (variant.controlled) open.value = next
+              if (variant.controlled) {
+                open.value = next
+              }
             },
             onOpenChange: (next: boolean, details: { reason: string }) =>
               env.log(`openChange ${next} (${details.reason})`),
           },
           () => [
-            h(PopoverTrigger, { class: classes.trigger }, () => variant.trigger ?? "Open"),
+            h(
+              PopoverTrigger,
+              { class: classes.trigger },
+              () => variant.trigger ?? "Open"
+            ),
             h(
               PopoverContent,
               {
@@ -67,37 +78,58 @@ const VariantPopover = defineComponent({
                 anchor: env.anchor,
               },
               () => [
-                variant.arrow !== false && h(PopoverArrow, { class: classes.arrow }),
-                variant.titled !== false && h(PopoverTitle, { class: classes.title }, () => variant.title),
-                h(PopoverDescription, { class: classes.description }, () => variant.note ?? "A popover."),
+                variant.arrow !== false &&
+                  h(PopoverArrow, { class: classes.arrow }),
+                variant.titled !== false &&
+                  h(
+                    PopoverTitle,
+                    { class: classes.title },
+                    () => variant.title
+                  ),
+                h(
+                  PopoverDescription,
+                  { class: classes.description },
+                  () => variant.note ?? "A popover."
+                ),
                 ...body(variant),
                 h("div", { class: "flex gap-2" }, [
                   h(
                     "button",
-                    { class: classes.button, "data-save": "", onClick: () => env.log("save") },
-                    "Save",
+                    {
+                      class: classes.button,
+                      "data-save": "",
+                      onClick: () => env.log("save"),
+                    },
+                    "Save"
                   ),
                   h(PopoverClose, { class: classes.button }, () => "Close"),
                 ]),
-              ],
+              ]
             ),
-          ],
+          ]
         ),
         variant.controlled &&
-          h("label", { class: "flex items-center gap-1.5 text-xs text-neutral-600" }, [
-            h("input", {
-              type: "checkbox",
-              checked: open.value,
-              onChange: (event: Event) => (open.value = (event.target as HTMLInputElement).checked),
-            }),
-            "open",
-          ]),
+          h(
+            "label",
+            { class: "flex items-center gap-1.5 text-xs text-neutral-600" },
+            [
+              h("input", {
+                type: "checkbox",
+                checked: open.value,
+                onChange: (event: Event) =>
+                  (open.value = (event.target as HTMLInputElement).checked),
+              }),
+              "open",
+            ]
+          ),
       ])
   },
 })
 
 function mount(root: HTMLElement) {
-  kitchenSink(root, "vue", (slot, variant, env) => createApp(VariantPopover, { variant, env }).mount(slot))
+  kitchenSink(root, "vue", (slot, variant, env) =>
+    createApp(VariantPopover, { variant, env }).mount(slot)
+  )
 }
 
 export { mount }

@@ -1,8 +1,20 @@
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
 import { createRoot } from "react-dom/client"
-import { countRender, mountWhenAsked, perfItems, perfOptions, perfSize } from "tests/fixtures/perf.ts"
+import {
+  countRender,
+  mountWhenAsked,
+  perfItems,
+  perfOptions,
+  perfSize,
+} from "tests/fixtures/perf.ts"
 
 // Rows like a table's, each with a closed menu, select and tooltip, for the
 // counts specs. Every part counts its renders by kind, so specs
@@ -97,7 +109,10 @@ function Row({ label }: { label: string }) {
 
 function Fixture() {
   return (
-    <div className="fixture" style={{ flexDirection: "column", alignItems: "start" }}>
+    <div
+      className="fixture"
+      style={{ flexDirection: "column", alignItems: "start" }}
+    >
       <button>Before</button>
       {rows.map((row) => (
         <Row key={row.value} label={row.label.slice(5)} />

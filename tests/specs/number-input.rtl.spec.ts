@@ -3,7 +3,10 @@ import { amount, quantity } from "./number-input.helpers"
 
 // Right to left, numbers keep their keys: Up increases, Down decreases.
 
-test("ArrowUp increases it and ArrowDown decreases it", async ({ page, open }) => {
+test("ArrowUp increases it and ArrowDown decreases it", async ({
+  page,
+  open,
+}) => {
   await open("number-input", { dir: "rtl" })
   await quantity(page).focus()
   await page.keyboard.press("ArrowUp")

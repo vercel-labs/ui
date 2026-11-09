@@ -27,11 +27,18 @@ function Example() {
           </CalendarNext>
         </div>
         <CalendarGrid>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-          <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} />}
+          </CalendarWeekdays>
+          <CalendarWeeks>
+            {(cell) => <CalendarDay value={cell.date} />}
+          </CalendarWeeks>
         </CalendarGrid>
       </Calendar>
-      <p data-slot="hint">Today is marked as it is in Kiritimati, the first place to see each new day.</p>
+      <p data-slot="hint">
+        Today is marked as it is in Kiritimati, the first place to see each new
+        day.
+      </p>
     </div>
   )
 }

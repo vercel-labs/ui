@@ -1,5 +1,8 @@
 import "@ui-sdk/web/scroll-area"
-import { scrollAreaFixture, scrollAreaOptions } from "tests/fixtures/scroll-area.ts"
+import {
+  scrollAreaFixture,
+  scrollAreaOptions,
+} from "tests/fixtures/scroll-area.ts"
 
 const { tags, gallery, short, chat } = scrollAreaFixture
 
@@ -13,7 +16,8 @@ const viewport = (label: string, content: string, contentClass = "") => `
     <ui-scroll-area-content class="${contentClass}">${content}</ui-scroll-area-content>
   </ui-scroll-area-viewport>`
 
-const items = (list: string[]) => list.map((item) => `<p class="scroll-area-item">${item}</p>`).join("")
+const items = (list: string[]) =>
+  list.map((item) => `<p class="scroll-area-item">${item}</p>`).join("")
 const message = (text: string) => `<p class="scroll-area-message">${text}</p>`
 
 function mount(root: HTMLElement) {
@@ -52,23 +56,35 @@ function mount(root: HTMLElement) {
   `
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
   for (const area of template.content.querySelectorAll("ui-scroll-area")) {
-    if (type) area.setAttribute("type", type)
-    if (scrollHideDelay !== undefined) area.setAttribute("scroll-hide-delay", String(scrollHideDelay))
+    if (type) {
+      area.setAttribute("type", type)
+    }
+    if (scrollHideDelay !== undefined) {
+      area.setAttribute("scroll-hide-delay", String(scrollHideDelay))
+    }
   }
   root.replaceChildren(template.content)
-  const content = root.querySelector(`[aria-label="${chat.label}"] ui-scroll-area-content`)!
-  const button = (id: string) => root.querySelector<HTMLButtonElement>(`#${id}`)!
+  const content = root.querySelector(
+    `[aria-label="${chat.label}"] ui-scroll-area-content`
+  )!
+  const button = (id: string) =>
+    root.querySelector<HTMLButtonElement>(`#${id}`)!
   const add = (html: string) => content.insertAdjacentHTML("beforeend", html)
-  button("add").addEventListener("click", () => add(message(`Message ${content.children.length + 1}`)))
-  button("stream").addEventListener("click", () => content.lastElementChild!.append(chat.streamed))
+  button("add").addEventListener("click", () =>
+    add(message(`Message ${content.children.length + 1}`))
+  )
+  button("stream").addEventListener("click", () =>
+    content.lastElementChild!.append(chat.streamed)
+  )
   button("image").addEventListener("click", () =>
     add(
-      `<p class="scroll-area-message">Message ${content.children.length + 1}<span role="img" aria-label="Image" style="display:block;height:0"></span></p>`,
-    ),
+      `<p class="scroll-area-message">Message ${content.children.length + 1}<span role="img" aria-label="Image" style="display:block;height:0"></span></p>`
+    )
   )
   button("load").addEventListener("click", () => {
-    for (const image of content.querySelectorAll<HTMLElement>('[role="img"]'))
+    for (const image of content.querySelectorAll<HTMLElement>('[role="img"]')) {
       image.style.height = `${chat.imageHeight}px`
+    }
   })
 }
 

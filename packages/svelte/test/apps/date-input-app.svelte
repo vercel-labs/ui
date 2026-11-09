@@ -6,13 +6,21 @@
   let {
     which,
     onValueChange,
-  }: { which: "date" | "time" | "field" | "children" | "readonly"; onValueChange?: (value: string | null) => void } = $props()
+  }: {
+    which: "date" | "time" | "field" | "children" | "readonly"
+    onValueChange?: (value: string | null) => void
+  } = $props()
 
   let time = $state<string | null>("09:30")
 </script>
 
 {#if which === "date"}
-  <DateInput name="start" defaultValue="2026-11-02" locale="en-US" onValueChange={(value) => onValueChange?.(value)} />
+  <DateInput
+    name="start"
+    defaultValue="2026-11-02"
+    locale="en-US"
+    onValueChange={(value) => onValueChange?.(value)}
+  />
 {:else if which === "time"}
   <TimeInput bind:value={time} hourCycle={24} locale="en-US" />
   <output>{time}</output>

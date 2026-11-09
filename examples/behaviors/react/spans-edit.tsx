@@ -20,7 +20,8 @@ type RoomOptions = {
   onNote?: (note: string) => void
 }
 
-const hour = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
+const hour = (minutes: number) =>
+  `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
 
 let lunches = 0
 
@@ -29,8 +30,20 @@ const room = definePrimitive({
   options: { onBookingsChange: "callback", onNote: "callback" },
   state: (_options: RoomOptions): RoomState => ({
     bookings: [
-      { id: "standup", track: "Atlas", start: 9 * 60 + 30, end: 11 * 60, title: "Standup" },
-      { id: "board", track: "Atlas", start: 14 * 60, end: 16 * 60, title: "Board meeting" },
+      {
+        id: "standup",
+        track: "Atlas",
+        start: 9 * 60 + 30,
+        end: 11 * 60,
+        title: "Standup",
+      },
+      {
+        id: "board",
+        track: "Atlas",
+        start: 14 * 60,
+        end: 16 * 60,
+        title: "Board meeting",
+      },
     ],
     draft: null,
   }),
@@ -47,21 +60,30 @@ const room = definePrimitive({
       step: () => 30,
       overlap: false,
       disabled: (booking) => booking.id === "board",
-      label: (booking) => `${booking.title}, ${hour(booking.start)} to ${hour(booking.end)}`,
+      label: (booking) =>
+        `${booking.title}, ${hour(booking.start)} to ${hour(booking.end)}`,
       message: (message) =>
-        message.type === "delete" ? `${message.span.title} is cancelled.` : spansMessage(message),
+        message.type === "delete"
+          ? `${message.span.title} is cancelled.`
+          : spansMessage(message),
       createAutoScroll: false,
     })
-    const standup = () => store.get().bookings.find((booking) => booking.id === "standup")
+    const standup = () =>
+      store.get().bookings.find((booking) => booking.id === "standup")
     return {
       spans,
       act(action: string) {
         const booking = standup()
-        if (action === "later" && booking)
-          spans.update("standup", { start: booking.start + 30, end: booking.end + 30 })
-        else if (action === "longer" && booking) spans.update("standup", { end: booking.end + 30 })
-        else if (action === "delete") spans.remove("standup")
-        else if (action === "noon") {
+        if (action === "later" && booking) {
+          spans.update("standup", {
+            start: booking.start + 30,
+            end: booking.end + 30,
+          })
+        } else if (action === "longer" && booking) {
+          spans.update("standup", { end: booking.end + 30 })
+        } else if (action === "delete") {
+          spans.remove("standup")
+        } else if (action === "noon") {
           const noon: Booking = {
             id: `lunch-${++lunches}`,
             track: "Atlas",
@@ -71,7 +93,11 @@ const room = definePrimitive({
           }
           const free = isSpanFree(store.get().bookings, noon)
           context.options().onNote?.(free ? "Booked noon" : "Noon is taken")
-          if (free) change("bookings", [...store.get().bookings, noon], { reason: "imperative" })
+          if (free) {
+            change("bookings", [...store.get().bookings, noon], {
+              reason: "imperative",
+            })
+          }
         }
       },
     }
@@ -82,7 +108,10 @@ const room = definePrimitive({
     }),
     track: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: () => ({ role: "group", style: "position:relative;touch-action:none;user-select:none" }),
+      attrs: () => ({
+        role: "group",
+        style: "position:relative;touch-action:none;user-select:none",
+      }),
       bind: (el, { api, key }) => {
         const unbind = api.spans.bindTrack(el, key)
         const view = el.ownerDocument.defaultView!
@@ -108,7 +137,8 @@ const room = definePrimitive({
         }
       },
       on: {
-        pointerdown: (event, { api, key }) => api.spans.spanPointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.spans.spanPointerdown(event, key),
         keydown: (event, { api, key }) => api.spans.keydown(event, key),
       },
       bind: (el, { api, key }) => api.spans.bindSpan(el, key),
@@ -121,7 +151,12 @@ const room = definePrimitive({
   }),
 })
 
-const parts = createParts(room, { root: "div", track: "div", booking: "div", action: "button" })
+const parts = createParts(room, {
+  root: "div",
+  track: "div",
+  booking: "div",
+  action: "button",
+})
 
 const Room = parts.Root
 
@@ -138,8 +173,11 @@ function Example() {
       onBookingsChange={(bookings) =>
         log(
           bookings
-            .map((booking) => `${booking.title} ${hour(booking.start)}–${hour(booking.end)}`)
-            .join(" · "),
+            .map(
+              (booking) =>
+                `${booking.title} ${hour(booking.start)}–${hour(booking.end)}`
+            )
+            .join(" · ")
         )
       }
       onNote={log}

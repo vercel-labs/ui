@@ -23,21 +23,24 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/switch")
   await import("@ui-sdk/web/radio")
   const output = root.querySelector("output")!
-  root.querySelector("form")!.addEventListener("submit", (event) => event.preventDefault())
+  root
+    .querySelector("form")!
+    .addEventListener("submit", (event) => event.preventDefault())
   root.addEventListener(
     "checkedchange",
     (event) => {
-      if ((event.target as Element).localName === "ui-checkbox")
+      if ((event.target as Element).localName === "ui-checkbox") {
         output.textContent = `span:${(event as CustomEvent).detail.value}`
+      }
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuechange",
     (event) => {
       output.textContent = `size:${(event as CustomEvent).detail.value}`
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

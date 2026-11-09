@@ -67,7 +67,10 @@ Import the parts and put them together:
 
 `orientation="vertical"` scrolls up and down. Give the viewport a height. Up and down arrows page it, not left and right.
 
-<ComponentExample name="carousel/vertical" caption="Scroll vertically, or use the up and down controls." />
+<ComponentExample
+  name="carousel/vertical"
+  caption="Scroll vertically, or use the up and down controls."
+/>
 
 ## Loop
 
@@ -75,7 +78,10 @@ Import the parts and put them together:
 
 The slides take turns at the ends of the content with CSS `order` while the carousel rests, so the current page always has slides on both sides. They keep their place in the document, so screen readers and Tab follow the slides' own order. The content needs to lay its slides out in a row with even gaps, as flex and grid do, and hold a page of slides to either side of the current one. With fewer, like two slides one to a view, Next on the last page scrolls back to the first instead.
 
-<ComponentExample name="carousel/loop" caption="Keep moving forward or backward to wrap around the slides." />
+<ComponentExample
+  name="carousel/loop"
+  caption="Keep moving forward or backward to wrap around the slides."
+/>
 
 ## Align
 
@@ -113,7 +119,10 @@ fit. An indicator's `page` is inferred from their order; pass it to render the s
 many. `"auto"` fits as many as show. Pages that can't reach the start, like the last few slides, merge into
 the last page. With three slides in view, five slides make three pages at one slide per page, or two pages at three per page.
 
-<ComponentExample name="carousel/pages" caption="Move through groups of slides using the page controls." />
+<ComponentExample
+  name="carousel/pages"
+  caption="Move through groups of slides using the page controls."
+/>
 
 ## Thumbnails
 
@@ -244,7 +253,10 @@ numbers are numbers. `controller` is a property. `page` and `playing` are live p
 
 ### Carousel
 
-<TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselOptions" />
+<TypeTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselOptions"
+/>
 
 ### CarouselViewport
 
@@ -260,7 +272,10 @@ One slide. `<ui-carousel-item>` has the group role, named by its position, like 
 
 ### CarouselPrevious
 
-<TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselControlProps" />
+<TypeTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselControlProps"
+/>
 
 ### CarouselNext
 
@@ -272,7 +287,10 @@ Groups the indicators. `<ui-carousel-indicator-group>` has the tablist role, and
 
 ### CarouselIndicator
 
-<TypeTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselIndicatorProps" />
+<TypeTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselIndicatorProps"
+/>
 
 ### CarouselPlayToggle
 
@@ -284,23 +302,38 @@ The same state shows as attributes on each part.
 
 `Carousel`:
 
-<StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselState" />
+<StateTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselState"
+/>
 
 `CarouselViewport`:
 
-<StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselViewportState" />
+<StateTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselViewportState"
+/>
 
 `CarouselContent`:
 
-<StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselContentState" />
+<StateTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselContentState"
+/>
 
 `CarouselItem`:
 
-<StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselItemState" />
+<StateTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselItemState"
+/>
 
 `CarouselPrevious` and `CarouselNext`:
 
-<StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselStepState" />
+<StateTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselStepState"
+/>
 
 `CarouselIndicatorGroup`:
 
@@ -311,17 +344,26 @@ The same state shows as attributes on each part.
 
 `CarouselIndicator`:
 
-<StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselIndicatorState" />
+<StateTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselIndicatorState"
+/>
 
 `CarouselPlayToggle`:
 
-<StateTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPlayToggleState" />
+<StateTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselPlayToggleState"
+/>
 
 ### Reasons
 
 `event.detail.reason` says why the page changed.
 
-<ReasonTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselPageChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselPageChangeReason"
+/>
 
 And why rotation started or stopped.
 
@@ -336,7 +378,10 @@ The element's `api` property has the same methods.
 
 Every write method takes an optional `{ reason, event }`, which the change event carries, and returns `false` when the change is canceled or there's nowhere to go.
 
-<ControllerTable path="../../packages/core/src/components/carousel/carousel.ts" name="CarouselController" />
+<ControllerTable
+  path="../../packages/core/src/components/carousel/carousel.ts"
+  name="CarouselController"
+/>
 
 ### Events
 

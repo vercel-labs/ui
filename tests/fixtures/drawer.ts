@@ -16,7 +16,10 @@ const drawerFixture = {
   page: "Page action",
   controller: "Open with controller",
   // A list long enough to scroll inside the drawer, with ?scroll.
-  scroll: { label: "Activity", items: Array.from({ length: 40 }, (_, index) => `Day ${index + 1}`) },
+  scroll: {
+    label: "Activity",
+    items: Array.from({ length: 40 }, (_, index) => `Day ${index + 1}`),
+  },
   // A text field, with ?field.
   field: "Goal",
   // A drawer opened from inside the drawer, with ?nested.
@@ -43,17 +46,25 @@ function drawerOptions() {
   const driver = params.get("driver")
   const container = params.get("container")
   const modal = params.get("modal")
-  const point = (value: string) => (/^[\d.]+$/.test(value) ? Number(value) : value) as number
+  const point = (value: string) =>
+    (/^[\d.]+$/.test(value) ? Number(value) : value) as number
   return {
     ...(params.has("open") && { defaultOpen: true }),
     ...(snap && { snapPoints: snap.split(",").map(point) }),
     ...(defaultSnap && { defaultSnapPoint: point(defaultSnap) }),
-    ...(side && { side: side as "bottom" | "top" | "left" | "right" | "start" | "end" }),
+    ...(side && {
+      side: side as "bottom" | "top" | "left" | "right" | "start" | "end",
+    }),
     ...(modalAbove && { modalAbove: point(modalAbove) }),
     ...(params.get("dismissible") === "false" && { dismissible: false }),
-    ...(params.get("expand-on-scroll") === "false" && { expandOnScroll: false }),
+    ...(params.get("expand-on-scroll") === "false" && {
+      expandOnScroll: false,
+    }),
     ...(driver && { driver: driver as "pointer" | "scroll-snap" }),
-    ...(modal && { modal: modal === "trap-focus" ? ("trap-focus" as const) : modal === "true" }),
+    ...(modal && {
+      modal:
+        modal === "trap-focus" ? ("trap-focus" as const) : modal === "true",
+    }),
     ...(container && { container: document.getElementById(container) }),
     ...(params.has("theme-color") && { themeColor: true }),
   }
@@ -100,4 +111,10 @@ function recordDrawer(entry: string) {
   ;((window as unknown as Window).__drawerLog ??= []).push(entry)
 }
 
-export { drawerFixture, drawerOptions, drawerParts, exposeDrawerFixture, recordDrawer }
+export {
+  drawerFixture,
+  drawerOptions,
+  drawerParts,
+  exposeDrawerFixture,
+  recordDrawer,
+}

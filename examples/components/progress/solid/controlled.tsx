@@ -15,7 +15,9 @@ function Example() {
   const [uploaded, setUploaded] = createSignal(1)
 
   function uploadNext() {
-    if (uploaded() >= total) return
+    if (uploaded() >= total) {
+      return
+    }
     const next = uploaded() + 1
     setUploaded(next)
     log(`Uploaded ${next} of ${total} photos`)
@@ -29,7 +31,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <button type="button" aria-disabled={uploaded() >= total ? "true" : "false"} onClick={uploadNext}>
+        <button
+          type="button"
+          aria-disabled={uploaded() >= total ? "true" : "false"}
+          onClick={uploadNext}
+        >
           Upload Next
         </button>
         <button type="button" onClick={reset}>

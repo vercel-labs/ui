@@ -7,7 +7,11 @@ export { default as AlertDialogTitle } from "./dialog/dialog-title.svelte"
 export { default as AlertDialogDescription } from "./dialog/dialog-description.svelte"
 export { default as AlertDialogClose } from "./dialog/dialog-close.svelte"
 export { default as AlertDialogShortcut } from "./dialog/dialog-shortcut.svelte"
-export { confirm, createAlertDialogController, createConfirm } from "@ui-sdk/core/alert-dialog"
+export {
+  confirm,
+  createAlertDialogController,
+  createConfirm,
+} from "@ui-sdk/core/alert-dialog"
 export type {
   AlertDialogBackdropState,
   AlertDialogCloseActionDetails,

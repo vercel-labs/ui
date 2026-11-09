@@ -1,4 +1,9 @@
-import { coreEntries, exportsByLayer, layerTitle, type CoreExport } from "@/lib/core-exports"
+import {
+  coreEntries,
+  exportsByLayer,
+  layerTitle,
+  type CoreExport,
+} from "@/lib/core-exports"
 import { FrameworkLink } from "./site-preferences"
 import { Rows } from "./type-tables"
 import { Frame } from "./frame"
@@ -9,7 +14,9 @@ import { Frame } from "./frame"
  */
 function CoreExports({ layer }: { layer: string }) {
   const groups = exportsByLayer(layer)
-  if (layer !== "other") return <ExportRows label={layerTitle(layer)} entries={groups[0].entries} />
+  if (layer !== "other") {
+    return <ExportRows label={layerTitle(layer)} entries={groups[0].entries} />
+  }
   return groups.map((group) => (
     <section key={group.layer}>
       <h3 className="mt-10 mb-3 text-[15px] leading-snug font-medium text-foreground">
@@ -20,8 +27,16 @@ function CoreExports({ layer }: { layer: string }) {
   ))
 }
 
-function ExportRows({ label, entries }: { label: string; entries: CoreExport[] }) {
-  if (!entries.length) return null
+function ExportRows({
+  label,
+  entries,
+}: {
+  label: string
+  entries: CoreExport[]
+}) {
+  if (!entries.length) {
+    return null
+  }
   return (
     <Rows
       label={label}
@@ -51,7 +66,9 @@ function CoreEntries() {
           {coreEntries().map(({ entry, page, href, names }) => (
             <tr key={entry}>
               <td className={td}>
-                <code className="font-mono text-[13px] text-foreground">{entry}</code>
+                <code className="font-mono text-[13px] text-foreground">
+                  {entry}
+                </code>
               </td>
               <td className={td}>
                 {page ? (

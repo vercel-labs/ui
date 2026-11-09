@@ -11,10 +11,15 @@ import {
   createCalendarController,
   type CalendarValue,
 } from "@ui-sdk/vue/calendar"
-import { calendarAction, calendarFixture as f, calendarOptions } from "tests/fixtures/calendar.ts"
+import {
+  calendarAction,
+  calendarFixture as f,
+  calendarOptions,
+} from "tests/fixtures/calendar.ts"
 import { ref } from "vue"
 
-const { controlled, selects, lang, defaultValue, defaultMonth, ...options } = calendarOptions()
+const { controlled, selects, lang, defaultValue, defaultMonth, ...options } =
+  calendarOptions()
 const controller = createCalendarController()
 const action = ref("")
 const value = ref<CalendarValue>(defaultValue)
@@ -64,7 +69,9 @@ function onMonthChange(next: string, details: ChangeDetails) {
         />
       </div>
     </Calendar>
-    <button @click="controller.focus(f.controller.date)">{{ f.controller.label }}</button>
+    <button @click="controller.focus(f.controller.date)">
+      {{ f.controller.label }}
+    </button>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
   </div>

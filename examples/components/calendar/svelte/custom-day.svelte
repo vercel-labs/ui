@@ -30,7 +30,12 @@
       {#snippet children(index)}
         <CalendarWeekday {index}>
           {#snippet children(state)}
-            <abbr title={state.name} data-weekend={state.weekday === 0 || state.weekday === 6 || undefined}>
+            <abbr
+              title={state.name}
+              data-weekend={state.weekday === 0 ||
+                state.weekday === 6 ||
+                undefined}
+            >
               {state.label}
             </abbr>
           {/snippet}

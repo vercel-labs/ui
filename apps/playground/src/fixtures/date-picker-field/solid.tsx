@@ -5,7 +5,12 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/solid/date-picker"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { render } from "@solidjs/web"
 import { createSignal, Show } from "solid-js"
 import {
@@ -30,7 +35,11 @@ function Fixture() {
         <Field class="field" name={datePickerFixture.name} disabled={disabled}>
           <FieldLabel>{f.label}</FieldLabel>
           <Show when={shown()}>
-            <DatePicker class="date-picker" today={datePickerFixture.today} required={required}>
+            <DatePicker
+              class="date-picker"
+              today={datePickerFixture.today}
+              required={required}
+            >
               <DatePickerInput />
               <DatePickerTrigger />
               <DatePickerHint class="date-picker-hint" />

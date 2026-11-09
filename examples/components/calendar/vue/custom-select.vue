@@ -33,7 +33,10 @@ const months = [
   "November",
   "December",
 ].map((label, index) => ({ value: String(index + 1).padStart(2, "0"), label }))
-const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({ value: year, label: year }))
+const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({
+  value: year,
+  label: year,
+}))
 
 const month = ref("2026-10")
 const year = computed(() => month.value.split("-")[0])
@@ -41,7 +44,12 @@ const monthOfYear = computed(() => month.value.split("-")[1])
 </script>
 
 <template>
-  <Calendar v-model:month="month" default-value="2026-10-16" min="2024-01-01" max="2028-12-31">
+  <Calendar
+    v-model:month="month"
+    default-value="2026-10-16"
+    min="2024-01-01"
+    max="2028-12-31"
+  >
     <div data-slot="row">
       <CalendarHeading />
       <Select
@@ -54,7 +62,11 @@ const monthOfYear = computed(() => month.value.split("-")[1])
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in months" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in months"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon />
@@ -72,7 +84,11 @@ const monthOfYear = computed(() => month.value.split("-")[1])
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in years" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in years"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon />

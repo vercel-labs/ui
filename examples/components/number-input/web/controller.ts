@@ -48,9 +48,11 @@ function mount(root: HTMLElement) {
     read: () => log(root, `Zoom is ${zoom.getValue()}%`),
     focus: () => zoom.focus(),
   }
-  root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
-    button.addEventListener("click", () => actions[button.dataset.action!]())
-  })
+  root
+    .querySelectorAll<HTMLButtonElement>("[data-action]")
+    .forEach((button) => {
+      button.addEventListener("click", () => actions[button.dataset.action!]())
+    })
 }
 
 export { mount }

@@ -24,12 +24,16 @@
     >
       Suggest
     </button>
-    <button type="button" onclick={() => password.toggleVisible()}>Toggle</button>
+    <button type="button" onclick={() => password.toggleVisible()}
+      >Toggle</button
+    >
     <button type="button" onclick={() => password.clear()}>Clear</button>
     <button
       type="button"
       onclick={() =>
-        log(`${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`)}
+        log(
+          `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`
+        )}
     >
       Read
     </button>

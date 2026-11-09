@@ -18,7 +18,11 @@ const docs = defineDocs({
       rehypeCodeOptions: {
         themes: { light: "github-light-default", dark: "github-dark-default" },
         // Fumadocs' own, for `// [!code highlight]`, `[!code ++]`, `[!code word:x]` and `[!code focus]`.
-        transformers: [...(rehypeCodeDefaultOptions.transformers ?? []), highlightLines, textBlocks],
+        transformers: [
+          ...(rehypeCodeDefaultOptions.transformers ?? []),
+          highlightLines,
+          textBlocks,
+        ],
       },
       remarkPlugins: (plugins) => [remarkInstall, ...plugins],
       remarkNpmOptions: { persist: { id: "package-manager" } },

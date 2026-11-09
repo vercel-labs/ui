@@ -1,4 +1,10 @@
-import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import {
+  Toast,
+  ToastAction,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -13,7 +19,9 @@ function Example() {
     <>
       <button
         onClick={() =>
-          toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })
+          toast("Message sent", {
+            action: { label: "Undo", onAction: () => log("Message unsent") },
+          })
         }
       >
         Send Message

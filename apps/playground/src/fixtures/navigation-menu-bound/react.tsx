@@ -35,12 +35,16 @@ function Fixture() {
         <NavigationMenuList className="nav-list">
           {fixture.items.map((item) => (
             <NavigationMenuItem key={item.value} value={item.value}>
-              <NavigationMenuTrigger className="nav-trigger">{item.trigger}</NavigationMenuTrigger>
+              <NavigationMenuTrigger className="nav-trigger">
+                {item.trigger}
+              </NavigationMenuTrigger>
               <NavigationMenuContent className="nav-content">
                 <ul>
                   {item.links.map((link) => (
                     <li key={link.href}>
-                      <NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink>
+                      <NavigationMenuLink href={link.href}>
+                        {link.label}
+                      </NavigationMenuLink>
                     </li>
                   ))}
                 </ul>
@@ -62,7 +66,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

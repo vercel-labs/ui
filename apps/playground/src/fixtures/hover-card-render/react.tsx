@@ -1,4 +1,8 @@
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui-sdk/react/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/react/hover-card"
 import { createRoot } from "react-dom/client"
 
 function Fixture() {
@@ -15,7 +19,10 @@ function Fixture() {
             </a>
           )}
         />
-        <HoverCardContent className="hover-card" render={<section aria-label="Repository" />}>
+        <HoverCardContent
+          className="hover-card"
+          render={<section aria-label="Repository" />}
+        >
           A headless UI kit.
         </HoverCardContent>
       </HoverCard>

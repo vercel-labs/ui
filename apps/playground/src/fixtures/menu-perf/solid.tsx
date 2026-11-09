@@ -22,7 +22,10 @@ function Fixture() {
       <button>Before</button>
       <Menu>
         <MenuTrigger>File</MenuTrigger>
-        <MenuContent class="popup" style={{ "max-height": "320px", overflow: "auto" }}>
+        <MenuContent
+          class="popup"
+          style={{ "max-height": "320px", overflow: "auto" }}
+        >
           <For each={items}>
             {(item, index) =>
               // The list never reorders, so a row reads its place once.

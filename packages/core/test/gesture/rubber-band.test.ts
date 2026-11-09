@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest"
-import { rubberBand, rubberBandInverse, rubberBandSlope } from "../../src/foundation/motion/rubber-band"
+import {
+  rubberBand,
+  rubberBandInverse,
+  rubberBandSlope,
+} from "../../src/foundation/motion/rubber-band"
 
 describe("rubber band", () => {
   test("matches UIScrollView's curve with c = 0.55 and d = 800", () => {
@@ -13,13 +17,19 @@ describe("rubber band", () => {
   })
 
   test("the inverse returns the travel that shows a given overshoot", () => {
-    for (const travel of [1, 50, 300, 2000])
-      expect(rubberBandInverse(rubberBand(travel, 800), 800)).toBeCloseTo(travel, 6)
+    for (const travel of [1, 50, 300, 2000]) {
+      expect(rubberBandInverse(rubberBand(travel, 800), 800)).toBeCloseTo(
+        travel,
+        6
+      )
+    }
   })
 
   test("the slope is the curve's derivative", () => {
     for (const travel of [0.001, 40, 400]) {
-      const numeric = (rubberBand(travel + 0.01, 800) - rubberBand(travel - 0.001, 800)) / 0.011
+      const numeric =
+        (rubberBand(travel + 0.01, 800) - rubberBand(travel - 0.001, 800)) /
+        0.011
       expect(rubberBandSlope(travel, 800)).toBeCloseTo(numeric, 3)
     }
   })

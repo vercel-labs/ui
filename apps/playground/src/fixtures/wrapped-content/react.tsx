@@ -4,8 +4,19 @@ import {
   AutocompleteInput,
   AutocompleteLabel,
 } from "@ui-sdk/react/autocomplete"
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxLabel } from "@ui-sdk/react/combobox"
-import { Select, SelectContent, SelectLabel, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxLabel,
+} from "@ui-sdk/react/combobox"
+import {
+  Select,
+  SelectContent,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
 import {
   TriggerMenu,
   TriggerMenuContent,
@@ -61,7 +72,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

@@ -1,7 +1,11 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
   import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
-  import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
+  import {
+    Listbox,
+    ListboxItem,
+    ListboxItemIndicator,
+  } from "@ui-sdk/svelte/listbox"
 
   const topics = [
     { value: "comments", label: "Comments" },
@@ -24,5 +28,7 @@
       </ListboxItem>
     {/each}
   </Listbox>
-  <FieldDescription>Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription>
+  <FieldDescription
+    >Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription
+  >
 </Field>

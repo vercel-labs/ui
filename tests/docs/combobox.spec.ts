@@ -5,7 +5,10 @@ import path from "node:path"
 
 const frameworks = ["react", "vue", "svelte", "web-components", "solid"]
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/components/combobox")
+const root = path.join(
+  import.meta.dirname,
+  "../../examples/components/combobox"
+)
 const folders = ["react", "vue", "svelte", "web", "solid"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -80,7 +83,10 @@ for (const framework of frameworks) {
     test.setTimeout(120_000)
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/combobox`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
@@ -93,26 +99,35 @@ for (const framework of frameworks) {
           ? preview.getByRole("button", { name: "Country" })
           : preview
               .locator(
-                '[role="combobox"]:not([disabled]):not([aria-disabled="true"]):not([readonly]):not([aria-readonly="true"])',
+                '[role="combobox"]:not([disabled]):not([aria-disabled="true"]):not([readonly]):not([aria-readonly="true"])'
               )
               .first()
       await trigger.scrollIntoViewIfNeeded()
       await trigger.click()
       const list = page.getByRole("listbox").first()
       await expect(list, `${name} list`).toBeVisible()
-      await expect(list.getByRole("option").first(), `${name} items`).toBeVisible()
+      await expect(
+        list.getByRole("option").first(),
+        `${name} items`
+      ).toBeVisible()
       await page.keyboard.press("Escape")
       await expect(page.getByRole("listbox"), `${name} closes`).toHaveCount(0)
     }
 
     expect(errors).toEqual([])
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtureNames].sort())
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual(
+        [...fixtureNames].sort()
+      )
+    }
   })
 }
 
 // Typing filters the list, and choosing an item shows its label.
 for (const framework of frameworks) {
-  test(`typing filters and choosing shows the label in ${framework}`, async ({ page }) => {
+  test(`typing filters and choosing shows the label in ${framework}`, async ({
+    page,
+  }) => {
     test.setTimeout(120_000)
     await page.goto(`/docs/${framework}/components/combobox`)
     const preview = page.locator("[data-example]").first()
@@ -129,10 +144,14 @@ for (const framework of frameworks) {
 // A group whose items are all filtered out goes with them, label and all,
 // and the group left is named by its label.
 for (const framework of frameworks) {
-  test(`filtering hides empty groups and keeps the rest named in ${framework}`, async ({ page }) => {
+  test(`filtering hides empty groups and keeps the rest named in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/combobox`)
     await page.waitForLoadState("networkidle")
-    const trigger = page.locator(`[data-example="combobox/groups"]`).getByRole("combobox")
+    const trigger = page
+      .locator(`[data-example="combobox/groups"]`)
+      .getByRole("combobox")
     await trigger.click()
     await trigger.pressSequentially("chic")
     const list = page.getByRole("listbox")

@@ -4,8 +4,19 @@ import {
   AutocompleteInput,
   AutocompleteLabel,
 } from "@ui-sdk/solid/autocomplete"
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxLabel } from "@ui-sdk/solid/combobox"
-import { Select, SelectContent, SelectLabel, SelectTrigger, SelectValue } from "@ui-sdk/solid/select"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxLabel,
+} from "@ui-sdk/solid/combobox"
+import {
+  Select,
+  SelectContent,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
 import {
   TriggerMenu,
   TriggerMenuContent,

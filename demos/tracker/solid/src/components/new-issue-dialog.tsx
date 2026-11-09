@@ -1,6 +1,12 @@
 import { useNavigate } from "@solidjs/router"
 import { createSignal, For, Show } from "solid-js"
-import { people, personOf, priorities, readNewIssue, statuses } from "tracker-data"
+import {
+  people,
+  personOf,
+  priorities,
+  readNewIssue,
+  statuses,
+} from "tracker-data"
 import { Plus } from "@/components/icons"
 import { Avatar } from "@/components/ui/avatar"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -23,11 +29,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Field, FieldControl, FieldError, FieldLabel } from "@/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select"
+import {
+  Field,
+  FieldControl,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/toast"
-import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { createIssue } from "@/lib/tracker"
 
 const newIssue = createDialogController()
@@ -38,8 +60,12 @@ function NewIssueForm() {
 
   function submit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    const input = readNewIssue(Object.fromEntries(new FormData(event.currentTarget)))
-    if ("error" in input) return setError(input.error)
+    const input = readNewIssue(
+      Object.fromEntries(new FormData(event.currentTarget))
+    )
+    if ("error" in input) {
+      return setError(input.error)
+    }
     const id = createIssue(input)
     newIssue.close()
     toast.success(`${id} created`)
@@ -73,7 +99,9 @@ function NewIssueForm() {
           </div>
           <SelectContent>
             <For each={statuses}>
-              {(status) => <SelectItem value={status.value}>{status.label}</SelectItem>}
+              {(status) => (
+                <SelectItem value={status.value}>{status.label}</SelectItem>
+              )}
             </For>
           </SelectContent>
         </Select>
@@ -84,11 +112,16 @@ function NewIssueForm() {
           </div>
           <SelectContent>
             <For each={priorities}>
-              {(priority) => <SelectItem value={priority.value}>{priority.label}</SelectItem>}
+              {(priority) => (
+                <SelectItem value={priority.value}>{priority.label}</SelectItem>
+              )}
             </For>
           </SelectContent>
         </Select>
-        <Combobox name="assignee" itemToLabel={(id: string) => personOf(id)?.name ?? ""}>
+        <Combobox
+          name="assignee"
+          itemToLabel={(id: string) => personOf(id)?.name ?? ""}
+        >
           <div class="grid gap-2">
             <ComboboxLabel>Assignee</ComboboxLabel>
             <div class="relative">
@@ -115,7 +148,9 @@ function NewIssueForm() {
         </Combobox>
       </div>
       <div class="flex justify-end gap-2">
-        <DialogClose class={buttonVariants({ variant: "ghost" })}>Cancel</DialogClose>
+        <DialogClose class={buttonVariants({ variant: "ghost" })}>
+          Cancel
+        </DialogClose>
         <Button type="submit" variant="primary">
           Create issue
         </Button>

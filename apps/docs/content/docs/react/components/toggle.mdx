@@ -136,7 +136,11 @@ Pass `pressed` and update it in `onPressedChange`. Call `details.cancel()` in th
 "use client"
 
 import * as React from "react"
-import { createToggleController, Toggle, ToggleIcon } from "@ui-sdk/react/toggle"
+import {
+  createToggleController,
+  Toggle,
+  ToggleIcon,
+} from "@ui-sdk/react/toggle"
 import { StarIcon } from "lucide-react"
 
 function StarButton() {
@@ -145,7 +149,12 @@ function StarButton() {
 
   return (
     <>
-      <Toggle aria-label="Star" pressed={starred} onPressedChange={setStarred} controller={star}>
+      <Toggle
+        aria-label="Star"
+        pressed={starred}
+        onPressedChange={setStarred}
+        controller={star}
+      >
         <ToggleIcon>
           <StarIcon />
         </ToggleIcon>
@@ -170,7 +179,11 @@ Pass `value` and update it in `onValueChange` to own the group's value, or to sh
 "use client"
 
 import * as React from "react"
-import { createToggleGroupController, Toggle, ToggleGroup } from "@ui-sdk/react/toggle"
+import {
+  createToggleGroupController,
+  Toggle,
+  ToggleGroup,
+} from "@ui-sdk/react/toggle"
 
 function Formatting() {
   const [formats, setFormats] = React.useState(["bold"])
@@ -259,35 +272,56 @@ Props and callbacks are the same as below, as React props.
 
 ### Toggle
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleOptions"
+/>
 
 ### ToggleIcon
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconProps"
+/>
 
 ### ToggleGroup
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupOptions"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive.
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleState"
+/>
 
 In a group, a toggle's `disabled` includes the group's. The group:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupState"
+/>
 
 `ToggleIcon`:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconState"
+/>
 
 ### Reasons
 
 `details.reason` says why the toggle was pressed or unpressed.
 
-<ReasonTable path="../../packages/core/src/components/toggle/toggle.ts" name="TogglePressedChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="TogglePressedChangeReason"
+/>
 
 For a group, it says why the pressed toggles changed.
 
@@ -302,7 +336,10 @@ Create one with `createToggleController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleController" />
+<ControllerTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleController"
+/>
 
 ### ToggleGroup Controller
 

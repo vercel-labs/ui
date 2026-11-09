@@ -1,7 +1,18 @@
 <script lang="ts">
-  import { Select, SelectContent, SelectItem, SelectItemIndicator, SelectItemText, SelectLabel, SelectTrigger } from "../../src/select"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectItemIndicator,
+    SelectItemText,
+    SelectLabel,
+    SelectTrigger,
+  } from "../../src/select"
 
-  let { data = false, itemToLabel }: { data?: boolean; itemToLabel?: (value: string) => string } = $props()
+  let {
+    data = false,
+    itemToLabel,
+  }: { data?: boolean; itemToLabel?: (value: string) => string } = $props()
 
   const plans = [
     { value: "basic", label: "Basic" },

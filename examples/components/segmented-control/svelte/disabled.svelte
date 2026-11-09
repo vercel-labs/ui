@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { SegmentedControl, SegmentedControlIndicator, SegmentedControlItem } from "@ui-sdk/svelte/segmented-control"
+  import {
+    SegmentedControl,
+    SegmentedControlIndicator,
+    SegmentedControlItem,
+  } from "@ui-sdk/svelte/segmented-control"
 </script>
 
 <div data-slot="stack">
@@ -13,6 +17,8 @@
     <SegmentedControlIndicator />
     <SegmentedControlItem value="monthly">Monthly</SegmentedControlItem>
     <SegmentedControlItem value="yearly">Yearly</SegmentedControlItem>
-    <SegmentedControlItem value="lifetime" disabled>Lifetime</SegmentedControlItem>
+    <SegmentedControlItem value="lifetime" disabled
+      >Lifetime</SegmentedControlItem
+    >
   </SegmentedControl>
 </div>

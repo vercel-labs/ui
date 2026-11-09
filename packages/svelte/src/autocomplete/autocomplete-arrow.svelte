@@ -4,7 +4,10 @@ An arrow on the popup's edge that points at the field.
 @stable
 -->
 <script lang="ts">
-  import { autocomplete, type AutocompleteArrowState } from "@ui-sdk/core/autocomplete"
+  import {
+    autocomplete,
+    type AutocompleteArrowState,
+  } from "@ui-sdk/core/autocomplete"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

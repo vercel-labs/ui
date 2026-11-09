@@ -10,7 +10,8 @@ type HoverCardElement = HTMLElement & {
   api?: { open: () => void; close: () => void; getPayload: () => unknown }
 }
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 const attributes = (record: Record<string, unknown>) =>
   Object.entries(record)
@@ -29,10 +30,18 @@ function body(variant: Variant, name: string) {
       </div>
     </div>`
   const bio = `<p class="${classes.bio}">${variant.note ?? "Writes about headless components."}</p>`
-  if (variant.body === "text") return heading + bio
-  if (variant.body === "long")
-    return heading + Array.from({ length: 30 }, (_, index) => `<p>Line ${index + 1}</p>`).join("")
-  if (variant.body === "tooltip")
+  if (variant.body === "text") {
+    return heading + bio
+  }
+  if (variant.body === "long") {
+    return (
+      heading +
+      Array.from({ length: 30 }, (_, index) => `<p>Line ${index + 1}</p>`).join(
+        ""
+      )
+    )
+  }
+  if (variant.body === "tooltip") {
     return `${heading}${bio}
       <div class="mt-3">
         <ui-tooltip delay="100">
@@ -40,6 +49,7 @@ function body(variant: Variant, name: string) {
           <ui-tooltip-content class="${classes.tooltip}" side-offset="6">Get updates from @${name}</ui-tooltip-content>
         </ui-tooltip>
       </div>`
+  }
   return `${heading}${bio}
     <div class="mt-3 flex items-center gap-3">
       <a href="#${name}" class="${classes.link}">View profile</a>
@@ -64,17 +74,18 @@ function markup(variant: Variant, env: Env) {
     </ui-hover-card-content>`
 
   // The card comes first, so links that name it with `for` find it.
-  if (variant.controller)
+  if (variant.controller) {
     return `
       <div class="flex gap-3">
         <ui-hover-card id="hover-card-${variant.id}" ${root}>${card("nobody")}</ui-hover-card>
         ${authors
           .map(
             (author) =>
-              `<ui-hover-card-trigger for="hover-card-${variant.id}" data-author="${author}"><a href="#${author}" class="${classes.trigger}">@${author}</a></ui-hover-card-trigger>`,
+              `<ui-hover-card-trigger for="hover-card-${variant.id}" data-author="${author}"><a href="#${author}" class="${classes.trigger}">@${author}</a></ui-hover-card-trigger>`
           )
           .join("")}
       </div>`
+  }
 
   return `
     <ui-hover-card ${root}>
@@ -85,45 +96,72 @@ function markup(variant: Variant, env: Env) {
 
 function mount(root: HTMLElement) {
   kitchenSink(root, "web", (slot, variant, env) => {
-    if (env.anchor) env.anchor.id = `anchor-${variant.id}`
-    const wrapper = Object.assign(document.createElement("div"), { className: "flex items-center gap-3" })
+    if (env.anchor) {
+      env.anchor.id = `anchor-${variant.id}`
+    }
+    const wrapper = Object.assign(document.createElement("div"), {
+      className: "flex items-center gap-3",
+    })
     wrapper.innerHTML = markup(variant, env)
     slot.append(wrapper)
     const card = wrapper.querySelector<HoverCardElement>("ui-hover-card")!
 
     // Shows the payload of the link that opened the card last.
     const showPayload = () => {
-      if (!variant.controller) return
+      if (!variant.controller) {
+        return
+      }
       const name = String(card.api?.getPayload() ?? "nobody")
-      for (const el of card.querySelectorAll<HTMLElement>("[data-name]"))
+      for (const el of card.querySelectorAll<HTMLElement>("[data-name]")) {
         el.textContent =
           el.dataset.name === "initial"
             ? name.slice(0, 1).toUpperCase()
             : el.dataset.name === "handle"
               ? `@${name}`
               : name
+      }
     }
 
     // Callbacks are DOM events on the element. A nested tooltip's bubble through it.
     card.addEventListener("openchange", (event) => {
-      if (event.target !== card) return
-      const { value, reason } = (event as CustomEvent<{ value: boolean; reason: string }>).detail
+      if (event.target !== card) {
+        return
+      }
+      const { value, reason } = (
+        event as CustomEvent<{ value: boolean; reason: string }>
+      ).detail
       env.log(`openChange ${value} (${reason})`)
       showPayload()
-      if (variant.controlled) checkbox.checked = value
+      if (variant.controlled) {
+        checkbox.checked = value
+      }
     })
     card.addEventListener("openchangecomplete", (event) => {
-      if (event.target !== card) return
-      env.log(`openChangeComplete ${(event as CustomEvent<{ value: boolean }>).detail.value}`)
+      if (event.target !== card) {
+        return
+      }
+      env.log(
+        `openChangeComplete ${(event as CustomEvent<{ value: boolean }>).detail.value}`
+      )
     })
     // Moving to another link while open hands the card over with a payload change, and no open change.
-    card.addEventListener("payloadchange", (event) => event.target === card && showPayload())
-    if (env.controller) card.controller = env.controller
-    for (const link of wrapper.querySelectorAll<HTMLElement & { payload?: string }>("[data-author]"))
+    card.addEventListener(
+      "payloadchange",
+      (event) => event.target === card && showPayload()
+    )
+    if (env.controller) {
+      card.controller = env.controller
+    }
+    for (const link of wrapper.querySelectorAll<
+      HTMLElement & { payload?: string }
+    >("[data-author]")) {
       link.payload = link.dataset.author
+    }
 
     // Web components have no controlled prop. The checkbox drives the element's api instead.
-    const checkbox = Object.assign(document.createElement("input"), { type: "checkbox" })
+    const checkbox = Object.assign(document.createElement("input"), {
+      type: "checkbox",
+    })
     if (variant.controlled) {
       const label = Object.assign(document.createElement("label"), {
         className: "flex items-center gap-1.5 text-xs text-neutral-600",
@@ -131,8 +169,11 @@ function mount(root: HTMLElement) {
       label.append(checkbox, "open")
       wrapper.append(label)
       checkbox.addEventListener("change", () => {
-        if (checkbox.checked) card.api?.open()
-        else card.api?.close()
+        if (checkbox.checked) {
+          card.api?.open()
+        } else {
+          card.api?.close()
+        }
       })
     }
   })

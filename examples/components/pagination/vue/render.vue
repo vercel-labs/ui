@@ -17,15 +17,24 @@ import {
       <PaginationItem>
         <PaginationPrevious aria-label="Previous page">
           <template #render="{ props, state: step }">
-            <button v-bind="props" :title="step.disabled ? undefined : `Go to page ${step.page}`">
+            <button
+              v-bind="props"
+              :title="step.disabled ? undefined : `Go to page ${step.page}`"
+            >
               <ArrowLeftIcon aria-hidden="true" />
-              <span v-if="!step.disabled" aria-hidden="true">{{ step.page }}</span>
+              <span v-if="!step.disabled" aria-hidden="true">{{
+                step.page
+              }}</span>
             </button>
           </template>
         </PaginationPrevious>
       </PaginationItem>
       <PaginationItem v-for="item in state.items" :key="item">
-        <PaginationLink v-if="typeof item === 'number'" v-slot="{ state: link }" :page="item">
+        <PaginationLink
+          v-if="typeof item === 'number'"
+          v-slot="{ state: link }"
+          :page="item"
+        >
           {{ link.current ? `Page ${link.page}` : link.page }}
         </PaginationLink>
         <PaginationEllipsis v-else />
@@ -33,8 +42,13 @@ import {
       <PaginationItem>
         <PaginationNext aria-label="Next page">
           <template #render="{ props, state: step }">
-            <button v-bind="props" :title="step.disabled ? undefined : `Go to page ${step.page}`">
-              <span v-if="!step.disabled" aria-hidden="true">{{ step.page }}</span>
+            <button
+              v-bind="props"
+              :title="step.disabled ? undefined : `Go to page ${step.page}`"
+            >
+              <span v-if="!step.disabled" aria-hidden="true">{{
+                step.page
+              }}</span>
               <ArrowRightIcon aria-hidden="true" />
             </button>
           </template>

@@ -9,7 +9,9 @@ import { IssueList, IssueListSkeleton } from "@/components/issue-list"
 import { Workspace } from "@/components/workspace"
 import { countByTab, filterIssues, parseQuery, savedSizes } from "tracker-data"
 
-async function IssueWorkspace({ searchParams }: Pick<PageProps<"/">, "searchParams">) {
+async function IssueWorkspace({
+  searchParams,
+}: Pick<PageProps<"/">, "searchParams">) {
   const query = parseQuery(await searchParams)
   const [issues, issue, settings, cookieStore] = await Promise.all([
     listIssues(),
@@ -18,14 +20,25 @@ async function IssueWorkspace({ searchParams }: Pick<PageProps<"/">, "searchPara
     cookies(),
   ])
   const matching = filterIssues(issues, query)
-  const sizes = savedSizes(cookieStore.get(resizableStorageKey("tracker"))?.value)
+  const sizes = savedSizes(
+    cookieStore.get(resizableStorageKey("tracker"))?.value
+  )
 
   return (
-    <Workspace sizes={sizes} detail={issue && <IssueDetail key={issue.id} issue={issue} query={query} />}>
+    <Workspace
+      sizes={sizes}
+      detail={
+        issue && <IssueDetail key={issue.id} issue={issue} query={query} />
+      }
+    >
       {query.view === "board" ? (
         <IssueBoard issues={matching} query={query} />
       ) : (
-        <IssueList issues={matching} query={query} pageSize={settings.pageSize} />
+        <IssueList
+          issues={matching}
+          query={query}
+          pageSize={settings.pageSize}
+        />
       )}
     </Workspace>
   )

@@ -33,7 +33,12 @@ import * as React from "react"
 const commands = [
   { value: "calendar", label: "Calendar", icon: CalendarIcon },
   { value: "emoji", label: "Search Emoji", icon: SmileIcon },
-  { value: "calculator", label: "Calculator", icon: CalculatorIcon, disabled: true },
+  {
+    value: "calculator",
+    label: "Calculator",
+    icon: CalculatorIcon,
+    disabled: true,
+  },
   { value: "profile", label: "Profile", icon: UserIcon },
   { value: "billing", label: "Billing", icon: CreditCardIcon },
   { value: "settings", label: "Settings", icon: SettingsIcon },
@@ -60,14 +65,21 @@ function Example() {
           >
             <div data-slot="row">
               <SearchIcon aria-hidden="true" />
-              <CommandInput aria-label="Search commands" placeholder="Type a command or search…" />
+              <CommandInput
+                aria-label="Search commands"
+                placeholder="Type a command or search…"
+              />
             </div>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandList>
               <CommandGroup>
                 <CommandGroupLabel>Suggestions</CommandGroupLabel>
                 {commands.map((item) => (
-                  <CommandItem key={item.value} value={item.value} disabled={item.disabled}>
+                  <CommandItem
+                    key={item.value}
+                    value={item.value}
+                    disabled={item.disabled}
+                  >
                     <CommandItemIcon>
                       <item.icon />
                     </CommandItemIcon>

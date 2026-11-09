@@ -23,7 +23,10 @@
         </ListboxItem>
         <ListboxItem value="star">
           {#snippet render({ props, state })}
-            <li {...props} class={["item", state.selected ? "is-selected" : "is-unselected"]}>
+            <li
+              {...props}
+              class={["item", state.selected ? "is-selected" : "is-unselected"]}
+            >
               {state.selected ? "★" : "☆"} Star
             </li>
           {/snippet}

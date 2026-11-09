@@ -27,8 +27,19 @@ describe("createTreeCollection", () => {
     expect(tree.position("src/lib")).toEqual({ index: 2, size: 2 })
     expect(tree.position("docs")).toEqual({ index: 3, size: 3 })
     expect(tree.ancestors("src/lib/b.ts")).toEqual(["src", "src/lib"])
-    expect(tree.descendants("src")).toEqual(["src/a.ts", "src/lib", "src/lib/b.ts"])
-    expect(tree.keys()).toEqual(["src", "src/a.ts", "src/lib", "src/lib/b.ts", "README.md", "docs"])
+    expect(tree.descendants("src")).toEqual([
+      "src/a.ts",
+      "src/lib",
+      "src/lib/b.ts",
+    ])
+    expect(tree.keys()).toEqual([
+      "src",
+      "src/a.ts",
+      "src/lib",
+      "src/lib/b.ts",
+      "README.md",
+      "docs",
+    ])
   })
 
   test("a node listed as a branch is one before its children are known", () => {
@@ -52,7 +63,13 @@ describe("createTreeCollection", () => {
   test("only expanded branches show their children, and the answer is kept for the same list", () => {
     const tree = createTreeCollection(nodes)
     const expanded = ["src"]
-    expect(tree.visible(expanded)).toEqual(["src", "src/a.ts", "src/lib", "README.md", "docs"])
+    expect(tree.visible(expanded)).toEqual([
+      "src",
+      "src/a.ts",
+      "src/lib",
+      "README.md",
+      "docs",
+    ])
     expect(tree.visible(expanded)).toBe(tree.visible(expanded))
     // A branch under a collapsed one stays hidden, even when it's expanded.
     expect(tree.visible(["src/lib"])).toEqual(["src", "README.md", "docs"])
@@ -92,7 +109,9 @@ describe("tree data", () => {
 
   test("lists the rows that show with their levels, for a flat rendering", () => {
     const rows = visibleTreeRows(items, ["a"])
-    expect(rows.map((row) => [row.item.value, row.parent, row.level, row.index])).toEqual([
+    expect(
+      rows.map((row) => [row.item.value, row.parent, row.level, row.index])
+    ).toEqual([
       ["a", null, 1, 0],
       ["a1", "a", 2, 1],
       ["b", null, 1, 2],
@@ -103,16 +122,34 @@ describe("tree data", () => {
 
 describe("treeFromPaths", () => {
   test("builds folders first, with full paths as values", () => {
-    const items = treeFromPaths(["README.md", "src/index.ts", "src/lib/util.ts", "docs/", "src/app.ts"])
-    expect(items.map((item) => item.value)).toEqual(["src", "docs", "README.md"])
+    const items = treeFromPaths([
+      "README.md",
+      "src/index.ts",
+      "src/lib/util.ts",
+      "docs/",
+      "src/app.ts",
+    ])
+    expect(items.map((item) => item.value)).toEqual([
+      "src",
+      "docs",
+      "README.md",
+    ])
     const src = items[0]
     expect(src.label).toBe("src")
-    expect(src.children!.map((item) => item.value)).toEqual(["src/lib", "src/index.ts", "src/app.ts"])
-    expect(src.children![0].children).toEqual([{ value: "src/lib/util.ts", label: "util.ts" }])
+    expect(src.children!.map((item) => item.value)).toEqual([
+      "src/lib",
+      "src/index.ts",
+      "src/app.ts",
+    ])
+    expect(src.children![0].children).toEqual([
+      { value: "src/lib/util.ts", label: "util.ts" },
+    ])
     expect(items[1]).toEqual({ value: "docs", label: "docs", children: [] })
   })
 
   test("a path listed twice is one item", () => {
-    expect(treeFromPaths(["a.ts", "a.ts"])).toEqual([{ value: "a.ts", label: "a.ts" }])
+    expect(treeFromPaths(["a.ts", "a.ts"])).toEqual([
+      { value: "a.ts", label: "a.ts" },
+    ])
   })
 })

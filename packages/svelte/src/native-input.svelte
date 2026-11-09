@@ -13,7 +13,9 @@
     props,
     state,
   }: {
-    render?: Snippet<[{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]>
+    render?: Snippet<
+      [{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]
+    >
     children?: Snippet<[State]>
     props: SlotAttributes
     state: State
@@ -21,7 +23,11 @@
 </script>
 
 {#if render}
-  <Part tag="input" part={plainPart(state)} props={{ ...props, render, children }} />
+  <Part
+    tag="input"
+    part={plainPart(state)}
+    props={{ ...props, render, children }}
+  />
 {:else}
   <input {...props} />
 {/if}

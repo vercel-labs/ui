@@ -57,7 +57,11 @@
     TooltipContent,
     TooltipTrigger,
   } from "@ui-sdk/svelte"
-  import { leakComponent, leakTreeItems, perfItems } from "tests/fixtures/perf.ts"
+  import {
+    leakComponent,
+    leakTreeItems,
+    perfItems,
+  } from "tests/fixtures/perf.ts"
 
   // One component for the leak specs, picked with ?component=, and a button
   // that mounts and unmounts it. The scroll area hides its scrollbars soon
@@ -88,7 +92,9 @@
         </SelectTrigger>
         <SelectContent class="popup list-popup">
           {#each items as item (item.value)}
-            <SelectItem class="item" value={item.value} label={item.label}>{item.label}</SelectItem>
+            <SelectItem class="item" value={item.value} label={item.label}
+              >{item.label}</SelectItem
+            >
           {/each}
         </SelectContent>
       </Select>
@@ -98,7 +104,9 @@
         <ComboboxContent class="popup list-popup">
           <ComboboxList>
             {#each items as item (item.value)}
-              <ComboboxItem class="item" value={item.value} label={item.label}>{item.label}</ComboboxItem>
+              <ComboboxItem class="item" value={item.value} label={item.label}
+                >{item.label}</ComboboxItem
+              >
             {/each}
           </ComboboxList>
         </ComboboxContent>
@@ -116,7 +124,9 @@
         <DialogTrigger>Open</DialogTrigger>
         <DialogContent class="dialog">
           <DialogTitle class="title">Delete it?</DialogTitle>
-          <DialogDescription class="description">This can't be undone.</DialogDescription>
+          <DialogDescription class="description"
+            >This can't be undone.</DialogDescription
+          >
           <DialogClose>Cancel</DialogClose>
         </DialogContent>
       </Dialog>
@@ -139,9 +149,12 @@
         </AccordionItem>
         <AccordionItem value="second">
           <AccordionHeader>
-            <AccordionTrigger class="accordion-trigger">Second</AccordionTrigger>
+            <AccordionTrigger class="accordion-trigger">Second</AccordionTrigger
+            >
           </AccordionHeader>
-          <AccordionPanel class="accordion-panel">Another answer.</AccordionPanel>
+          <AccordionPanel class="accordion-panel"
+            >Another answer.</AccordionPanel
+          >
         </AccordionItem>
       </Accordion>
     {:else if component === "collapsible"}
@@ -158,7 +171,9 @@
           <TabsIndicator class="indicator" />
         </TabsList>
         {#each items as item (item.value)}
-          <TabsPanel class="panel" value={item.value}>{item.label} content.</TabsPanel>
+          <TabsPanel class="panel" value={item.value}
+            >{item.label} content.</TabsPanel
+          >
         {/each}
       </Tabs>
     {:else if component === "toolbar"}
@@ -177,7 +192,11 @@
       </Resizable>
     {:else if component === "scroll-area"}
       <ScrollArea class="scroll-area" scrollHideDelay={50}>
-        <ScrollAreaViewport class="scroll-area-viewport" role="region" aria-label="Items">
+        <ScrollAreaViewport
+          class="scroll-area-viewport"
+          role="region"
+          aria-label="Items"
+        >
           <ScrollAreaContent>
             {#each lines as line (line.value)}
               <p class="scroll-area-item">{line.label}</p>

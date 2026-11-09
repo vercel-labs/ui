@@ -38,7 +38,10 @@ const muteButton = definePrimitive({
   }),
   slots: (slot) => ({
     root: slot({
-      attrs: (state) => ({ type: "button", "aria-pressed": String(state.muted) }),
+      attrs: (state) => ({
+        type: "button",
+        "aria-pressed": String(state.muted),
+      }),
       press: ({ api }) => api.toggle(),
     }),
   }),
@@ -269,7 +272,10 @@ Parts render without styles. Here's a complete look for the button, with hover, 
 <FrameworkContent value="svelte">
 
 ```svelte
-<MuteButton class="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white">Mute</MuteButton>
+<MuteButton
+  class="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-sm hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 aria-pressed:bg-neutral-900 aria-pressed:text-white"
+  >Mute</MuteButton
+>
 ```
 
 </FrameworkContent>

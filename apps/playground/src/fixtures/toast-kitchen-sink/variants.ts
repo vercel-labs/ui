@@ -10,28 +10,59 @@ type Variant = {
 
 const wait = (ms: number, fail = false) =>
   new Promise((resolve, reject) =>
-    setTimeout(() => (fail ? reject(new Error("Failed")) : resolve("done")), ms),
+    setTimeout(() => (fail ? reject(new Error("Failed")) : resolve("done")), ms)
   )
 
-const logged = (log: (line: string) => void): Pick<ToastOptions<unknown>, "onDismiss"> => ({
+const logged = (
+  log: (line: string) => void
+): Pick<ToastOptions<unknown>, "onDismiss"> => ({
   onDismiss: ({ reason }) => log(`dismiss: ${reason}`),
 })
 
 const variants: Variant[] = [
-  { section: "Types", label: "Default", show: (toast, log) => toast("Event created", logged(log)) },
-  { section: "Types", label: "Success", show: (toast, log) => toast.success("Saved", logged(log)) },
-  { section: "Types", label: "Info", show: (toast, log) => toast.info("Heads up", logged(log)) },
-  { section: "Types", label: "Warning", show: (toast, log) => toast.warning("Careful", logged(log)) },
+  {
+    section: "Types",
+    label: "Default",
+    show: (toast, log) => toast("Event created", logged(log)),
+  },
+  {
+    section: "Types",
+    label: "Success",
+    show: (toast, log) => toast.success("Saved", logged(log)),
+  },
+  {
+    section: "Types",
+    label: "Info",
+    show: (toast, log) => toast.info("Heads up", logged(log)),
+  },
+  {
+    section: "Types",
+    label: "Warning",
+    show: (toast, log) => toast.warning("Careful", logged(log)),
+  },
   {
     section: "Types",
     label: "Error",
-    show: (toast, log) => toast.error("Upload failed", { description: "Too large.", ...logged(log) }),
+    show: (toast, log) =>
+      toast.error("Upload failed", {
+        description: "Too large.",
+        ...logged(log),
+      }),
   },
-  { section: "Types", label: "Loading", show: (toast, log) => toast.loading("Working…", logged(log)) },
+  {
+    section: "Types",
+    label: "Loading",
+    show: (toast, log) => toast.loading("Working…", logged(log)),
+  },
   {
     section: "Content",
     label: "Description",
-    show: (toast, log) => toast({ title: "Event created", description: "Sunday at 9:00", ...logged(log) }),
+    show: (toast, log) =>
+      toast({
+        title: "Event created",
+        description: "Sunday at 9:00",
+        ...logged(log),
+      }),
   },
   {
     section: "Content",
@@ -47,20 +78,28 @@ const variants: Variant[] = [
   {
     section: "Content",
     label: "Data",
-    show: (toast, log) => toast({ title: "With data", data: { avatar: "AL" }, ...logged(log) }),
+    show: (toast, log) =>
+      toast({ title: "With data", data: { avatar: "AL" }, ...logged(log) }),
   },
   {
     section: "Actions",
     label: "Action",
     show: (toast, log) =>
-      toast("Archived", { action: { label: "Undo", onAction: () => log("action: undo") }, ...logged(log) }),
+      toast("Archived", {
+        action: { label: "Undo", onAction: () => log("action: undo") },
+        ...logged(log),
+      }),
   },
   {
     section: "Actions",
     label: "Action kept open",
     show: (toast, log) =>
       toast("Archived", {
-        action: { label: "Undo", dismiss: false, onAction: () => log("action: kept") },
+        action: {
+          label: "Undo",
+          dismiss: false,
+          onAction: () => log("action: kept"),
+        },
         ...logged(log),
       }),
   },
@@ -68,25 +107,37 @@ const variants: Variant[] = [
     section: "Actions",
     label: "Pending action",
     show: (toast, log) =>
-      toast("Deleted", { action: { label: "Restore", onAction: () => wait(1500) }, ...logged(log) }),
+      toast("Deleted", {
+        action: { label: "Restore", onAction: () => wait(1500) },
+        ...logged(log),
+      }),
   },
   {
     section: "Actions",
     label: "Failing action",
     show: (toast, log) =>
-      toast("Deleted", { action: { label: "Restore", onAction: () => wait(800, true) }, ...logged(log) }),
+      toast("Deleted", {
+        action: { label: "Restore", onAction: () => wait(800, true) },
+        ...logged(log),
+      }),
   },
   {
     section: "Actions",
     label: "Cancel",
     show: (toast, log) =>
-      toast("Delete file?", { cancel: { label: "Keep", onCancel: () => log("cancel") }, ...logged(log) }),
+      toast("Delete file?", {
+        cancel: { label: "Keep", onCancel: () => log("cancel") },
+        ...logged(log),
+      }),
   },
   {
     section: "Actions",
     label: "Link",
     show: (toast, log) =>
-      toast("Invoice created", { action: { label: "View", href: "#invoice" }, ...logged(log) }),
+      toast("Invoice created", {
+        action: { label: "View", href: "#invoice" },
+        ...logged(log),
+      }),
   },
   {
     section: "Timing",
@@ -96,22 +147,30 @@ const variants: Variant[] = [
   {
     section: "Timing",
     label: "Infinity",
-    show: (toast, log) => toast("Stays", { duration: Infinity, ...logged(log) }),
+    show: (toast, log) =>
+      toast("Stays", { duration: Infinity, ...logged(log) }),
   },
   {
     section: "Timing",
     label: "Not dismissible",
-    show: (toast, log) => toast("Required", { dismissible: false, duration: 2000, ...logged(log) }),
+    show: (toast, log) =>
+      toast("Required", { dismissible: false, duration: 2000, ...logged(log) }),
   },
   {
     section: "Timing",
     label: "Assertive",
-    show: (toast, log) => toast("Urgent", { priority: "assertive", ...logged(log) }),
+    show: (toast, log) =>
+      toast("Urgent", { priority: "assertive", ...logged(log) }),
   },
   {
     section: "Promises",
     label: "Promise resolves",
-    show: (toast) => toast.promise(wait(1200), { loading: "Saving…", success: "Saved", error: "Failed" }),
+    show: (toast) =>
+      toast.promise(wait(1200), {
+        loading: "Saving…",
+        success: "Saved",
+        error: "Failed",
+      }),
   },
   {
     section: "Promises",
@@ -127,7 +186,10 @@ const variants: Variant[] = [
     section: "Ids",
     label: "Same id",
     show: (toast, log) =>
-      toast(`Updated at ${new Date().toLocaleTimeString()}`, { id: "same", ...logged(log) }),
+      toast(`Updated at ${new Date().toLocaleTimeString()}`, {
+        id: "same",
+        ...logged(log),
+      }),
   },
   {
     section: "Ids",

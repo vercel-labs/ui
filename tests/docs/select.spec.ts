@@ -59,7 +59,8 @@ function lastLog(preview: Locator) {
     .last()
 }
 
-const example = (page: Page, name: string) => page.locator(`[data-example="select/${name}"]`)
+const example = (page: Page, name: string) =>
+  page.locator(`[data-example="select/${name}"]`)
 
 async function open(page: Page, name: string) {
   const preview = example(page, name)
@@ -74,38 +75,55 @@ for (const framework of frameworks) {
     test.setTimeout(120_000)
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/select`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    expect(await previews.evaluateAll((els) => els.map((el) => el.getAttribute("data-example")))).toEqual(
-      order.map((name) => `select/${name}`),
-    )
+    expect(
+      await previews.evaluateAll((els) =>
+        els.map((el) => el.getAttribute("data-example"))
+      )
+    ).toEqual(order.map((name) => `select/${name}`))
 
     for (const name of order) {
       // The last trigger that can open: Disabled shows a disabled and a read-only one first.
       // A closed web select keeps its search field, hidden, in the page.
       const trigger = example(page, name)
-        .locator('[role="combobox"]:not([disabled]):not([aria-disabled="true"]):not([aria-readonly="true"])')
+        .locator(
+          '[role="combobox"]:not([disabled]):not([aria-disabled="true"]):not([aria-readonly="true"])'
+        )
         .filter({ visible: true })
         .last()
       await trigger.scrollIntoViewIfNeeded()
       await trigger.click()
       const list = page.getByRole("listbox").first()
       await expect(list, `${name} list`).toBeVisible()
-      await expect(list.getByRole("option").first(), `${name} items`).toBeVisible()
+      await expect(
+        list.getByRole("option").first(),
+        `${name} items`
+      ).toBeVisible()
       await page.keyboard.press("Escape")
       await expect(page.getByRole("listbox"), `${name} closes`).toHaveCount(0)
     }
 
     expect(errors).toEqual([])
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtureNames].sort())
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual(
+        [...fixtureNames].sort()
+      )
+    }
   })
 
   test(`choosing an item shows its label in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/select`)
     const preview = await open(page, "demo")
-    await page.getByRole("listbox").getByRole("option", { name: "Editor" }).click()
+    await page
+      .getByRole("listbox")
+      .getByRole("option", { name: "Editor" })
+      .click()
     await expect(page.getByRole("listbox")).toHaveCount(0)
     await expect(preview.getByRole("combobox")).toContainText("Editor")
   })
@@ -113,19 +131,30 @@ for (const framework of frameworks) {
   test(`groups are named by their labels in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/select`)
     await open(page, "groups")
-    await expect(page.getByRole("listbox").getByRole("group", { name: "Sans serif" })).toBeVisible()
+    await expect(
+      page.getByRole("listbox").getByRole("group", { name: "Sans serif" })
+    ).toBeVisible()
   })
 
   test(`disabled items are skipped in ${framework}`, async ({ page }) => {
     await page.goto(`/docs/${framework}/components/select`)
     const preview = example(page, "disabled")
     await expect(preview.getByRole("combobox").nth(0)).toBeDisabled()
-    await expect(preview.getByRole("combobox").nth(1)).toHaveAttribute("aria-readonly", "true")
+    await expect(preview.getByRole("combobox").nth(1)).toHaveAttribute(
+      "aria-readonly",
+      "true"
+    )
     await preview.getByRole("combobox").nth(2).click()
     await page.keyboard.press("Home")
-    await expect(page.getByRole("option", { name: "Canada" })).toHaveAttribute("data-highlighted", "")
+    await expect(page.getByRole("option", { name: "Canada" })).toHaveAttribute(
+      "data-highlighted",
+      ""
+    )
     await page.keyboard.press("ArrowDown")
-    await expect(page.getByRole("option", { name: "France" })).toHaveAttribute("data-highlighted", "")
+    await expect(page.getByRole("option", { name: "France" })).toHaveAttribute(
+      "data-highlighted",
+      ""
+    )
   })
 
   test(`clearing logs null in ${framework}`, async ({ page }) => {
@@ -142,11 +171,15 @@ for (const framework of frameworks) {
     const preview = await open(page, "multiple")
     await page.getByRole("option", { name: "French" }).click()
     await expect(page.getByRole("listbox")).toBeVisible()
-    await expect(preview.getByRole("combobox")).toContainText("English and 2 more")
+    await expect(preview.getByRole("combobox")).toContainText(
+      "English and 2 more"
+    )
     await expect(lastLog(preview)).toHaveText('value: ["en","ja","fr"]')
   })
 
-  test(`select all keeps the trigger and list in place in ${framework}`, async ({ page }) => {
+  test(`select all keeps the trigger and list in place in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/select`)
     const preview = await open(page, "select-all")
     const trigger = preview.getByRole("combobox")
@@ -154,21 +187,31 @@ for (const framework of frameworks) {
     const before = [await trigger.boundingBox(), await list.boundingBox()]
     await list.getByRole("option", { name: "Select all" }).click()
     await expect(trigger).toContainText("3 more")
-    expect([await trigger.boundingBox(), await list.boundingBox()]).toEqual(before)
+    expect([await trigger.boundingBox(), await list.boundingBox()]).toEqual(
+      before
+    )
     await list.getByRole("option", { name: "Select all" }).click()
     await expect(trigger).toContainText("Select regions")
-    expect([await trigger.boundingBox(), await list.boundingBox()]).toEqual(before)
+    expect([await trigger.boundingBox(), await list.boundingBox()]).toEqual(
+      before
+    )
   })
 
-  test(`object values log the submitted id in ${framework}`, async ({ page }) => {
+  test(`object values log the submitted id in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/select`)
     const preview = await open(page, "object-values")
-    await expect(page.getByRole("option", { name: /Inès Moreau/ })).toHaveAttribute("aria-selected", "true")
+    await expect(
+      page.getByRole("option", { name: /Inès Moreau/ })
+    ).toHaveAttribute("aria-selected", "true")
     await page.getByRole("option", { name: /Kofi Mensah/ }).click()
     await expect(lastLog(preview)).toHaveText("Submits assignee=3")
   })
 
-  test(`the selected item lands on the trigger in ${framework}`, async ({ page }) => {
+  test(`the selected item lands on the trigger in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/select`)
     const preview = await open(page, "align-item")
     const text = (selector: string) =>
@@ -179,8 +222,14 @@ for (const framework of frameworks) {
         return [Math.round(box.x), Math.round(box.y)]
       })
     expect(
-      await text('[data-slot="select-content"][data-open] [data-slot="select-item"][data-selected]'),
-    ).toEqual(await text('[data-example="select/align-item"] [data-slot="select-value"]'))
+      await text(
+        '[data-slot="select-content"][data-open] [data-slot="select-item"][data-selected]'
+      )
+    ).toEqual(
+      await text(
+        '[data-example="select/align-item"] [data-slot="select-value"]'
+      )
+    )
     await page.keyboard.press("Escape")
     await preview.getByRole("checkbox").click()
     await preview.getByRole("combobox").click()
@@ -189,12 +238,17 @@ for (const framework of frameworks) {
     expect(list!.y).toBeGreaterThan(trigger!.y + trigger!.height)
   })
 
-  test(`an invalid submission shows the error in ${framework}`, async ({ page }) => {
+  test(`an invalid submission shows the error in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/select`)
     const preview = example(page, "invalid")
     await preview.getByRole("button", { name: "Continue" }).click()
     await expect(preview.getByText("Choose a shipping method.")).toBeVisible()
-    await expect(preview.getByRole("combobox")).toHaveAttribute("aria-invalid", "true")
+    await expect(preview.getByRole("combobox")).toHaveAttribute(
+      "aria-invalid",
+      "true"
+    )
     await preview.getByRole("combobox").click()
     await page.getByRole("option", { name: "Express" }).click()
     await preview.getByRole("button", { name: "Continue" }).click()
@@ -207,10 +261,14 @@ for (const framework of frameworks) {
     await preview.getByRole("combobox").first().click()
     await page.getByRole("option", { name: "Japan" }).click()
     await preview.getByRole("button", { name: "Save" }).click()
-    await expect(lastLog(preview)).toHaveText("Submitted country=jp&topics=Design&frequency=Weekly")
+    await expect(lastLog(preview)).toHaveText(
+      "Submitted country=jp&topics=Design&frequency=Weekly"
+    )
   })
 
-  test(`the presentation opens a bottom sheet in ${framework}`, async ({ page }) => {
+  test(`the presentation opens a bottom sheet in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/select`)
     const preview = await open(page, "presentation")
     const sheet = page.getByRole("listbox")

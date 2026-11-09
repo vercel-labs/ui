@@ -9,9 +9,19 @@ type MarkupNode = {
   children: (MarkupNode | string)[]
 }
 
-const entities: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", "#39": "'" }
+const entities: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  apos: "'",
+  "#39": "'",
+}
 const decode = (text: string) =>
-  text.replace(/&(amp|lt|gt|quot|apos|#39);/g, (_, name: string) => entities[name])
+  text.replace(
+    /&(amp|lt|gt|quot|apos|#39);/g,
+    (_, name: string) => entities[name]
+  )
 
 const voids = new Set([
   "area",
@@ -35,23 +45,36 @@ function parseMarkup(markup: string) {
   const open = [root]
   const token =
     /<\/([\w-]+)\s*>|<([\w-]+)((?:\s+[\w:-]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?)*)\s*(\/?)>|([^<]+)/g
-  for (const [, close, tag, attributes, selfClosing, text] of markup.matchAll(token)) {
+  for (const [, close, tag, attributes, selfClosing, text] of markup.matchAll(
+    token
+  )) {
     const parent = open.at(-1)!
     if (text !== undefined) {
-      if (text.trim()) parent.children.push(decode(text))
+      if (text.trim()) {
+        parent.children.push(decode(text))
+      }
       continue
     }
     if (close) {
-      if (open.length > 1 && open.at(-1)!.tag === close.toLowerCase()) open.pop()
+      if (open.length > 1 && open.at(-1)!.tag === close.toLowerCase()) {
+        open.pop()
+      }
       continue
     }
-    const node: MarkupNode = { tag: tag.toLowerCase(), attributes: [], children: [] }
+    const node: MarkupNode = {
+      tag: tag.toLowerCase(),
+      attributes: [],
+      children: [],
+    }
     for (const [, name, quoted, single, bare] of attributes.matchAll(
-      /([\w:-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g,
-    ))
+      /([\w:-]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g
+    )) {
       node.attributes.push([name, decode(quoted ?? single ?? bare ?? "")])
+    }
     parent.children.push(node)
-    if (!selfClosing && !voids.has(node.tag)) open.push(node)
+    if (!selfClosing && !voids.has(node.tag)) {
+      open.push(node)
+    }
   }
   return root.children
 }

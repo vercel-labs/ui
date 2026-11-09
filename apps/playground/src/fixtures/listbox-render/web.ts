@@ -11,7 +11,8 @@ async function mount(root: HTMLElement) {
         ${f.items
           .slice(0, 3)
           .map(
-            (item) => `<ui-listbox-item class="item" value="${item.value}">${item.label}</ui-listbox-item>`,
+            (item) =>
+              `<ui-listbox-item class="item" value="${item.value}">${item.label}</ui-listbox-item>`
           )
           .join("")}
       </ui-listbox>
@@ -20,7 +21,7 @@ async function mount(root: HTMLElement) {
     </div>`
   root.querySelector("ui-listbox")!.addEventListener("valuechange", (event) => {
     root.querySelector("output")!.textContent = listboxAction(
-      (event as CustomEvent<{ value: unknown }>).detail.value,
+      (event as CustomEvent<{ value: unknown }>).detail.value
     )
   })
   await import("@ui-sdk/web/listbox")

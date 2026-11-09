@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations at rest", async ({ page, open }) => {
@@ -15,28 +17,39 @@ test("no axe violations at rest", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with a menu open", { tag: "@enhancement" }, async ({ page, open, tab }) => {
-  await open("menubar")
-  await enter(page, tab)
-  await page.keyboard.press("ArrowDown")
-  await expectFocus(page, "New Tab")
-  expect(await audit(page)).toEqual([])
-})
+test(
+  "no axe violations with a menu open",
+  { tag: "@enhancement" },
+  async ({ page, open, tab }) => {
+    await open("menubar")
+    await enter(page, tab)
+    await page.keyboard.press("ArrowDown")
+    await expectFocus(page, "New Tab")
+    expect(await audit(page)).toEqual([])
+  }
+)
 
-test("no axe violations with a submenu open", { tag: "@enhancement" }, async ({ page, open }) => {
-  await open("menubar")
-  await trigger(page, "File").click()
-  await page.getByRole("menuitem", { name: "Share" }).click()
-  await expect(menuNamed(page, "Share")).toBeVisible()
-  expect(await audit(page)).toEqual([])
-})
+test(
+  "no axe violations with a submenu open",
+  { tag: "@enhancement" },
+  async ({ page, open }) => {
+    await open("menubar")
+    await trigger(page, "File").click()
+    await page.getByRole("menuitem", { name: "Share" }).click()
+    await expect(menuNamed(page, "Share")).toBeVisible()
+    expect(await audit(page)).toEqual([])
+  }
+)
 
 test("no axe violations in a vertical menubar", async ({ page, open }) => {
   await open("menubar", { orientation: "vertical" })
   expect(await audit(page)).toEqual([])
 })
 
-test("an open menu is named by its trigger, which says it's expanded", async ({ page, open }) => {
+test("an open menu is named by its trigger, which says it's expanded", async ({
+  page,
+  open,
+}) => {
   await open("menubar")
   await trigger(page, "View").click()
   await expect(menuNamed(page, "View")).toBeVisible()

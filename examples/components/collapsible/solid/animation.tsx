@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -13,7 +17,9 @@ function Example() {
   return (
     <Collapsible
       data-variant="card"
-      onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+      onOpenChangeComplete={(open) =>
+        log(open ? "Finished opening" : "Finished closing")
+      }
     >
       <CollapsibleTrigger>
         <span data-slot="stack">

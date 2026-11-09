@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@ui-sdk/svelte"
+  import {
+    Popover,
+    PopoverClose,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@ui-sdk/svelte"
   import { perfItems, perfSize } from "tests/fixtures/perf.ts"
 
   // Many popovers on one page, like a row action in every row of a table, for

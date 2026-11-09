@@ -33,7 +33,8 @@
     { value: "ch", label: "Switzerland" },
   ]
 
-  const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+  const countryLabel = (value: string) =>
+    countries.find((country) => country.value === value)?.label ?? value
 
   let value = $state<string | null>("fr")
   let query = $state("France")
@@ -43,12 +44,8 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => (value = "jp")}>
-      Choose Japan
-    </button>
-    <button type="button" onclick={() => (open = true)}>
-      Open
-    </button>
+    <button type="button" onclick={() => (value = "jp")}> Choose Japan </button>
+    <button type="button" onclick={() => (open = true)}> Open </button>
   </div>
   <Combobox
     bind:value
@@ -57,7 +54,8 @@
     itemToLabel={countryLabel}
     debug
     onValueChange={(next, details) => log(`value: ${next} (${details.reason})`)}
-    onQueryChange={(next, details) => log(`query: “${next}” (${details.reason})`)}
+    onQueryChange={(next, details) =>
+      log(`query: “${next}” (${details.reason})`)}
     onOpenChange={(next, details) => log(`open: ${next} (${details.reason})`)}
   >
     <div data-slot="stack">

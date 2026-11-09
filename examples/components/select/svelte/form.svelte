@@ -30,9 +30,9 @@
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
-    const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-      ([name, value]) => `${name}=${value}`,
-    )
+    const entries = [
+      ...new FormData(event.currentTarget as HTMLFormElement),
+    ].map(([name, value]) => `${name}=${value}`)
     log(`Submitted ${entries.join("&")}`)
   }
 </script>
@@ -41,7 +41,12 @@
   <form id="select-newsletter" data-slot="stack" onsubmit={submit}>
     <Field>
       <FieldLabel>Country</FieldLabel>
-      <Select name="country" autoComplete="country" required placeholder="Select a country">
+      <Select
+        name="country"
+        autoComplete="country"
+        required
+        placeholder="Select a country"
+      >
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
@@ -98,7 +103,9 @@
     </Select>
   </Field>
   <div data-slot="row">
-    <button type="submit" form="select-newsletter" data-variant="solid">Save</button>
+    <button type="submit" form="select-newsletter" data-variant="solid"
+      >Save</button
+    >
     <button type="reset" form="select-newsletter">Reset</button>
   </div>
 </div>

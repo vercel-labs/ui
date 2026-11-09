@@ -7,7 +7,12 @@ import {
 import * as React from "react"
 import { controlRender, useFieldControl } from "./field-context"
 import { renderElement } from "./render-element"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(colorPicker, {
   area: "div",
@@ -21,15 +26,26 @@ const parts = createParts(colorPicker, {
   "swatch-item": "button",
 })
 
-type DivProps<State> = Omit<PartProps<"div", State>, "defaultValue" | "onChange" | "onSelect">
+type DivProps<State> = Omit<
+  PartProps<"div", State>,
+  "defaultValue" | "onChange" | "onSelect"
+>
 
-type InputProps<State> = Omit<PartProps<"input", State>, "value" | "defaultValue" | "children" | "readOnly">
+type InputProps<State> = Omit<
+  PartProps<"input", State>,
+  "value" | "defaultValue" | "children" | "readOnly"
+>
 
 // The core writes an input's text as it changes, so React only renders where it starts.
 function startsAt(render: InputProps<ColorPickerState>["render"]) {
   return (merged: Record<string, any>, state: ColorPickerState) => {
     const { value, ...rest } = merged
-    return renderElement("input", { ...rest, defaultValue: value }, render, state)
+    return renderElement(
+      "input",
+      { ...rest, defaultValue: value },
+      render,
+      state
+    )
   }
 }
 
@@ -128,7 +144,13 @@ const ColorPickerSliderThumb = parts.SliderThumb
  * @experimental
  */
 function ColorPickerInput({ render, ...props }: InputProps<ColorPickerState>) {
-  return usePart(colorPicker, "input", {}, { ...props, render: startsAt(render) }, "input")
+  return usePart(
+    colorPicker,
+    "input",
+    {},
+    { ...props, render: startsAt(render) },
+    "input"
+  )
 }
 
 /**
@@ -146,7 +168,7 @@ function ColorPickerChannelInput({
     "channel-input",
     { id, channel },
     { ...props, render: startsAt(render) },
-    "input",
+    "input"
   )
 }
 

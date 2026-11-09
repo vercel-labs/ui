@@ -1,5 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
-import { createResizableController, resizable } from "../src/components/resizable/resizable"
+import {
+  createResizableController,
+  resizable,
+} from "../src/components/resizable/resizable"
 import {
   allHandleBounds,
   carryLayout,
@@ -17,10 +20,16 @@ import {
   toggleTarget,
   type PanelConstraints,
 } from "../src/components/resizable/resizable-layout"
-import { loadLayout, saveLayout, type ResizableStorage } from "../src/components/resizable/resizable-storage"
+import {
+  loadLayout,
+  saveLayout,
+  type ResizableStorage,
+} from "../src/components/resizable/resizable-storage"
 import { kept } from "./kept"
 
-const panel = (overrides: Partial<PanelConstraints> = {}): PanelConstraints => ({
+const panel = (
+  overrides: Partial<PanelConstraints> = {}
+): PanelConstraints => ({
   min: 0,
   max: 100,
   collapsible: false,
@@ -29,7 +38,8 @@ const panel = (overrides: Partial<PanelConstraints> = {}): PanelConstraints => (
   ...overrides,
 })
 
-const round = (layout: readonly number[]) => layout.map((size) => Math.round(size * 1000) / 1000)
+const round = (layout: readonly number[]) =>
+  layout.map((size) => Math.round(size * 1000) / 1000)
 
 describe("sizes", () => {
   test("numbers are percentages, and pixel and rem sizes resolve against the space", () => {
@@ -45,7 +55,9 @@ describe("sizes", () => {
   })
 
   test("constraints keep collapsed at most the minimum and the maximum at least the minimum", () => {
-    expect(constraintsOf({ minSize: 30, maxSize: 20, collapsedSize: 40 }, 1000)).toEqual({
+    expect(
+      constraintsOf({ minSize: 30, maxSize: 20, collapsedSize: 40 }, 1000)
+    ).toEqual({
       min: 30,
       max: 30,
       collapsible: false,
@@ -100,22 +112,33 @@ describe("moving a handle", () => {
     const panels = [panel(), panel({ min: 20 }), panel(), panel({ min: 10 })]
     const layout = [20, 30, 30, 20]
     // Handle 1 is disabled: moving handle 0 forward shrinks panel 1 only.
-    expect(resizeAt(layout, panels, 0, 30, 0.5, [false, true])).toEqual([30, 20, 30, 20])
+    expect(resizeAt(layout, panels, 0, 30, 0.5, [false, true])).toEqual([
+      30, 20, 30, 20,
+    ])
     // Moving handle 2 back shrinks panel 2 only, never panels 1 or 0.
-    expect(resizeAt(layout, panels, 2, -40, 0.5, [false, true])).toEqual([20, 30, 0, 50])
-    expect(resizeAt([20, 30, 0, 50], panels, 2, -5, 0.5, [false, true])).toEqual([20, 30, 0, 50])
+    expect(resizeAt(layout, panels, 2, -40, 0.5, [false, true])).toEqual([
+      20, 30, 0, 50,
+    ])
+    expect(
+      resizeAt([20, 30, 0, 50], panels, 2, -5, 0.5, [false, true])
+    ).toEqual([20, 30, 0, 50])
     // Without it, the move passes on.
     expect(resizeAt(layout, panels, 0, 30)).toEqual([50, 20, 10, 20])
   })
 
   test("a handle's bounds stop at a disabled handle", () => {
     const panels = [panel(), panel({ min: 20 }), panel()]
-    expect(handleBounds([20, 30, 50], panels, 0, [false, true])).toEqual({ min: 0, max: 30 })
+    expect(handleBounds([20, 30, 50], panels, 0, [false, true])).toEqual({
+      min: 0,
+      max: 30,
+    })
     expect(handleBounds([20, 30, 50], panels, 0)).toEqual({ min: 0, max: 80 })
   })
 
   test("the growing panel stops at its maximum", () => {
-    expect(resizeAt([20, 80], [panel({ max: 40 }), panel()], 0, 50)).toEqual([40, 60])
+    expect(resizeAt([20, 80], [panel({ max: 40 }), panel()], 0, 50)).toEqual([
+      40, 60,
+    ])
   })
 
   test("a shrinking panel collapses past half the way, and the other takes all it frees", () => {
@@ -141,9 +164,14 @@ describe("moving a handle", () => {
   })
 
   test("Home and End go as far as the panels allow", () => {
-    const panels = [panel({ min: 10, max: 60, collapsible: true }), panel({ min: 30 })]
+    const panels = [
+      panel({ min: 10, max: 60, collapsible: true }),
+      panel({ min: 30 }),
+    ]
     expect(handleBounds([30, 70], panels, 0)).toEqual({ min: 0, max: 60 })
-    expect(handleBounds([30, 70], [panel({ min: 10 }), panel({ min: 50 })], 0)).toEqual({ min: 10, max: 50 })
+    expect(
+      handleBounds([30, 70], [panel({ min: 10 }), panel({ min: 50 })], 0)
+    ).toEqual({ min: 10, max: 50 })
   })
 
   test("every handle's bounds at once match each handle's own", () => {
@@ -151,7 +179,8 @@ describe("moving a handle", () => {
     let seed = 7
     const random = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646
     // A bound in whole percent, or a fraction of one, like a pixel size.
-    const bound = (most: number) => (random() < 0.5 ? Math.round(random() * most) : random() * most)
+    const bound = (most: number) =>
+      random() < 0.5 ? Math.round(random() * most) : random() * most
     let onePass = 0
     for (let run = 0; run < 500; run++) {
       const count = 2 + Math.floor(random() * 7)
@@ -168,30 +197,56 @@ describe("moving a handle", () => {
       })
       let layout: readonly number[] = fitLayout(
         panels.map(() => random() * 100),
-        panels,
+        panels
       )
       // Some handles pushed to an end, so panels sit at their minimum or maximum.
       for (let handle = 0; handle < count - 1; handle++) {
         const pick = random()
-        if (pick < 0.15) layout = resizeAt(layout, panels, handle, homeDelta(layout, panels, handle), 1)
-        else if (pick < 0.3) layout = resizeAt(layout, panels, handle, endDelta(layout, panels, handle), 1)
+        if (pick < 0.15) {
+          layout = resizeAt(
+            layout,
+            panels,
+            handle,
+            homeDelta(layout, panels, handle),
+            1
+          )
+        } else if (pick < 0.3) {
+          layout = resizeAt(
+            layout,
+            panels,
+            handle,
+            endDelta(layout, panels, handle),
+            1
+          )
+        }
       }
       // Now and then a layout the panels don't allow, like one saved before their bounds changed.
-      if (run % 10 === 5) layout = panels.map(() => 100 / count)
+      if (run % 10 === 5) {
+        layout = panels.map(() => 100 / count)
+      }
       if (
         panels.every(
           (one, index) =>
-            !one.collapsible && layout[index] >= one.min - 1e-6 && layout[index] <= one.max + 1e-6,
+            !one.collapsible &&
+            layout[index] >= one.min - 1e-6 &&
+            layout[index] <= one.max + 1e-6
         )
-      )
+      ) {
         onePass++
+      }
       const locked = panels.map(() => random() < 0.2)
       const all = allHandleBounds(layout, panels, locked)
       expect(all).toHaveLength(count - 1)
       all.forEach((bounds, handle) => {
         const one = handleBounds(layout, panels, handle, locked)
-        expect(bounds.min, `run ${run}, handle ${handle}`).toBeCloseTo(one.min, 9)
-        expect(bounds.max, `run ${run}, handle ${handle}`).toBeCloseTo(one.max, 9)
+        expect(bounds.min, `run ${run}, handle ${handle}`).toBeCloseTo(
+          one.min,
+          9
+        )
+        expect(bounds.max, `run ${run}, handle ${handle}`).toBeCloseTo(
+          one.max,
+          9
+        )
       })
     }
     // Most runs take the one pass, so it's what's checked, not the fallback.
@@ -201,7 +256,9 @@ describe("moving a handle", () => {
   test("every handle's bounds at once work each handle out alone when a panel can collapse or is out of its bounds", () => {
     // Home collapses the first panel, so its handle goes down to 0, not to its minimum.
     const collapsible = [panel({ min: 20, collapsible: true }), panel()]
-    expect(allHandleBounds([30, 70], collapsible)).toEqual([{ min: 0, max: 100 }])
+    expect(allHandleBounds([30, 70], collapsible)).toEqual([
+      { min: 0, max: 100 },
+    ])
     // A panel under its minimum, from a layout saved before its bounds changed, goes up to it.
     const under = [panel({ min: 10 }), panel()]
     expect(allHandleBounds([5, 95], under)).toEqual([{ min: 10, max: 100 }])
@@ -219,14 +276,21 @@ describe("fitting a layout", () => {
   })
 
   test("collapsed panels stay collapsed", () => {
-    expect(fitLayout([0, 50, 50], [panel({ min: 20, collapsible: true }), panel(), panel()])).toEqual([
-      0, 50, 50,
-    ])
+    expect(
+      fitLayout(
+        [0, 50, 50],
+        [panel({ min: 20, collapsible: true }), panel(), panel()]
+      )
+    ).toEqual([0, 50, 50])
   })
 
   test("panels without a default share what's left evenly", () => {
-    expect(initialLayout([panel({ initial: 40 }), panel(), panel()])).toEqual([40, 30, 30])
-    expect(round(initialLayout([panel(), panel(), panel()]))).toEqual([33.333, 33.333, 33.333])
+    expect(initialLayout([panel({ initial: 40 }), panel(), panel()])).toEqual([
+      40, 30, 30,
+    ])
+    expect(round(initialLayout([panel(), panel(), panel()]))).toEqual([
+      33.333, 33.333, 33.333,
+    ])
   })
 
   test("panels that stay keep their sizes relative to each other when one comes", () => {
@@ -234,7 +298,11 @@ describe("fitting a layout", () => {
     const panels = [panel(), panel(), panel({ initial: 20 })]
     expect(carryLayout(previous, ["a", "b", "c"], panels)).toEqual([20, 60, 20])
     expect(
-      carryLayout({ ids: ["a", "b", "c"], layout: [20, 60, 20] }, ["a", "b"], [panel(), panel()]),
+      carryLayout(
+        { ids: ["a", "b", "c"], layout: [20, 60, 20] },
+        ["a", "b"],
+        [panel(), panel()]
+      )
     ).toEqual([25, 75])
   })
 })
@@ -253,12 +321,20 @@ describe("panels and keys", () => {
   })
 
   test("arrows follow the axis, and swap right to left", () => {
-    const keys = { vertical: false, rtl: false, step: 1, largeStep: 10, shiftKey: false }
+    const keys = {
+      vertical: false,
+      rtl: false,
+      step: 1,
+      largeStep: 10,
+      shiftKey: false,
+    }
     expect(keyDelta("ArrowRight", keys)).toBe(1)
     expect(keyDelta("ArrowRight", { ...keys, rtl: true })).toBe(-1)
     expect(keyDelta("ArrowDown", keys)).toBeNull()
     expect(keyDelta("ArrowDown", { ...keys, vertical: true })).toBe(1)
-    expect(keyDelta("ArrowUp", { ...keys, vertical: true, shiftKey: true })).toBe(-10)
+    expect(
+      keyDelta("ArrowUp", { ...keys, vertical: true, shiftKey: true })
+    ).toBe(-10)
   })
 })
 
@@ -302,7 +378,7 @@ describe("the primitive without a DOM", () => {
     const instance = resizable(options)
     instance.api.internal.setPanels(
       ["sidebar", "main"],
-      [{ defaultSize: 30, minSize: 20, collapsible: true }, {}],
+      [{ defaultSize: 30, minSize: 20, collapsible: true }, {}]
     )
     instance.api.internal.setSpace(1000)
     return instance
@@ -323,7 +399,12 @@ describe("the primitive without a DOM", () => {
     instance.api.internal.dragBy(5)
     instance.api.internal.dragBy(10)
     instance.api.internal.endDrag()
-    expect(onLayoutChange.mock.calls.map(([layout, details]) => [layout, details.reason])).toEqual([
+    expect(
+      onLayoutChange.mock.calls.map(([layout, details]) => [
+        layout,
+        details.reason,
+      ])
+    ).toEqual([
       [[35, 65], "drag"],
       [[40, 60], "drag"],
     ])
@@ -358,7 +439,9 @@ describe("the primitive without a DOM", () => {
     await Promise.resolve()
     expect(onLayoutCommit).not.toHaveBeenCalled()
     instance.setOptions(options())
-    expect(onLayoutCommit.mock.calls.map(([layout]) => layout)).toEqual([[40, 60]])
+    expect(onLayoutCommit.mock.calls.map(([layout]) => layout)).toEqual([
+      [40, 60],
+    ])
     expect(loadLayout("s", ["sidebar", "main"], storage)).toEqual([40, 60])
   })
 
@@ -392,19 +475,32 @@ describe("the primitive without a DOM", () => {
     const instance = group({ id: "g" })
     instance.api.internal.setHandles({ h: 0 })
     const press = (init: Partial<KeyboardEvent>) => {
-      const event = { key: "ArrowRight", shiftKey: false, preventDefault: vi.fn(), ...init }
-      instance.api.internal.keydown(event as unknown as KeyboardEvent, "h", {} as HTMLElement)
+      const event = {
+        key: "ArrowRight",
+        shiftKey: false,
+        preventDefault: vi.fn(),
+        ...init,
+      }
+      instance.api.internal.keydown(
+        event as unknown as KeyboardEvent,
+        "h",
+        {} as HTMLElement
+      )
       return event.preventDefault
     }
-    for (const modifier of ["altKey", "ctrlKey", "metaKey"])
+    for (const modifier of ["altKey", "ctrlKey", "metaKey"]) {
       expect(press({ [modifier]: true }), modifier).not.toHaveBeenCalled()
+    }
     expect(instance.api.getLayout()).toEqual([30, 70])
     expect(press({})).toHaveBeenCalled()
     expect(instance.api.getLayout()).toEqual([31, 69])
   })
 
   test("a canceled change keeps the layout", () => {
-    const instance = group({ id: "g", onLayoutChange: (_, details) => details.cancel() })
+    const instance = group({
+      id: "g",
+      onLayoutChange: (_, details) => details.cancel(),
+    })
     instance.api.resize("sidebar", 50)
     expect(instance.api.getLayout()).toEqual([30, 70])
   })
@@ -435,7 +531,10 @@ describe("the primitive without a DOM", () => {
     const onLayoutChange = vi.fn()
     const instance = resizable({ id: "g", onLayoutChange })
     instance.api.internal.setSpace(1000)
-    instance.api.internal.setPanels(["a", "b"], [{ defaultSize: 30, minSize: "300px" }, {}])
+    instance.api.internal.setPanels(
+      ["a", "b"],
+      [{ defaultSize: 30, minSize: "300px" }, {}]
+    )
     instance.api.internal.setSpace(600)
     expect(instance.api.getLayout()).toEqual([50, 50])
     expect(onLayoutChange.mock.calls[0][1].reason).toBe("resize")

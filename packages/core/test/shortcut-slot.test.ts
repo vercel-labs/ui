@@ -13,14 +13,23 @@ import { attrs, bind, partState } from "../src/foundation/kernel/part"
 const hint = definePrimitive({
   name: "hint",
   options: { shortcut: "string" },
-  state: (options: { shortcut?: string }) => ({ apple: false, shortcut: options.shortcut }),
+  state: (options: { shortcut?: string }) => ({
+    apple: false,
+    shortcut: options.shortcut,
+  }),
   api: () => ({}),
-  slots: (slot) => ({ shortcut: shortcutSlot(slot, (state) => state.shortcut) }),
+  slots: (slot) => ({
+    shortcut: shortcutSlot(slot, (state) => state.shortcut),
+  }),
 })
 
 // The parts of an element the slot touches, without a DOM.
 const element = (text = "") =>
-  ({ childNodes: text ? [text] : [], textContent: text, isConnected: true }) as unknown as HTMLElement
+  ({
+    childNodes: text ? [text] : [],
+    textContent: text,
+    isConnected: true,
+  }) as unknown as HTMLElement
 
 const microtask = () => new Promise<void>((resolve) => queueMicrotask(resolve))
 
@@ -36,7 +45,9 @@ describe("shortcut slot", () => {
 
   test("a part's own shortcut wins over the one it inherits", () => {
     const instance = hint({ id: "h", shortcut: "mod+k" })
-    expect(partState(instance.part("shortcut", { shortcut: "mod+s" })).text).toBe("⁦Ctrl+S⁩")
+    expect(
+      partState(instance.part("shortcut", { shortcut: "mod+s" })).text
+    ).toBe("⁦Ctrl+S⁩")
   })
 
   test("shows nothing without keys", () => {
@@ -75,12 +86,15 @@ describe("shortcut slot", () => {
 // from, so the Shortcut part does it.
 describe("a popup with no trigger", () => {
   const popups = { dialog, drawer, popover, tooltip }
-  for (const [name, primitive] of Object.entries(popups))
+  for (const [name, primitive] of Object.entries(popups)) {
     test(`a ${name}'s Shortcut part switches to the client's platform`, async () => {
       const instance: PrimitiveInstance = primitive({ id: name })
       setPlatform("apple")
       bind(instance.part("shortcut", { shortcut: "mod+s" }), element())
       await microtask()
-      expect(partState(instance.part("shortcut", { shortcut: "mod+s" })).text).toBe("⁦⌘S⁩")
+      expect(
+        partState(instance.part("shortcut", { shortcut: "mod+s" })).text
+      ).toBe("⁦⌘S⁩")
     })
+  }
 })

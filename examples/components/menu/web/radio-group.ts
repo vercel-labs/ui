@@ -17,7 +17,7 @@ function mount(root: HTMLElement) {
                   <ui-menu-item-indicator></ui-menu-item-indicator>
                   ${option}
                 </ui-menu-radio-item>
-              `,
+              `
             )
             .join("")}
         </ui-menu-radio-group>
@@ -31,7 +31,7 @@ function mount(root: HTMLElement) {
                   <ui-menu-item-indicator></ui-menu-item-indicator>
                   ${option}
                 </ui-menu-radio-item>
-              `,
+              `
             )
             .join("")}
         </ui-menu-radio-group>
@@ -39,8 +39,12 @@ function mount(root: HTMLElement) {
     </ui-menu>
   `
   const [position, density] = root.querySelectorAll("ui-menu-radio-group")
-  position.addEventListener("valuechange", (event) => log(root, `Panel at the ${event.detail.value}`))
-  density.addEventListener("valuechange", (event) => log(root, `${event.detail.value} density`))
+  position.addEventListener("valuechange", (event) =>
+    log(root, `Panel at the ${event.detail.value}`)
+  )
+  density.addEventListener("valuechange", (event) =>
+    log(root, `${event.detail.value} density`)
+  )
 }
 
 export { mount }

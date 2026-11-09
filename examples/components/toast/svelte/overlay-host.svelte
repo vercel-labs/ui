@@ -27,13 +27,18 @@
   async function remove(name: string, button: HTMLButtonElement) {
     const confirmed = await confirm({
       title: `Delete ${name}?`,
-      description: "The project and its files will be deleted for everyone on your team.",
+      description:
+        "The project and its files will be deleted for everyone on your team.",
       confirmLabel: "Delete",
       cancelLabel: "Cancel",
     })
-    if (!confirmed) return
+    if (!confirmed) {
+      return
+    }
     const row = button.closest("li")
-    const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+    const next = (
+      row?.nextElementSibling ?? row?.previousElementSibling
+    )?.querySelector("button")
     ;(next ?? reset)?.focus()
     projects = projects.filter((project) => project !== name)
     toast.success(`${name} deleted`, { priority: "assertive" })
@@ -49,7 +54,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" bind:this={reset} onclick={() => (projects = ["Acme", "Globex", "Initech"])}>
+    <button
+      type="button"
+      bind:this={reset}
+      onclick={() => (projects = ["Acme", "Globex", "Initech"])}
+    >
       Reset Projects
     </button>
   </div>
@@ -77,7 +86,9 @@
       {#snippet children(state: DialogContentState<ConfirmOptions>)}
         <div data-slot="stack">
           <AlertDialogTitle>{state.payload?.title}</AlertDialogTitle>
-          <AlertDialogDescription>{state.payload?.description}</AlertDialogDescription>
+          <AlertDialogDescription
+            >{state.payload?.description}</AlertDialogDescription
+          >
         </div>
         <div data-slot="row">
           <AlertDialogClose>{state.payload?.cancelLabel}</AlertDialogClose>

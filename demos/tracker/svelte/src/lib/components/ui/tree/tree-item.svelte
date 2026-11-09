@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { TreeItemCheckbox, TreeItemLabel, TreeItem as TreeItemPrimitive } from "@ui-sdk/svelte/tree"
+  import {
+    TreeItemCheckbox,
+    TreeItemLabel,
+    TreeItem as TreeItemPrimitive,
+  } from "@ui-sdk/svelte/tree"
   import { cn } from "cn"
   import type { Snippet } from "svelte"
   import TreeGroup from "./tree-group.svelte"
@@ -9,10 +13,19 @@
     label,
     class: className,
     children,
-  }: { value: string; label: string; class?: string; children?: Snippet } = $props()
+  }: {
+    value: string
+    label: string
+    class?: string
+    children?: Snippet
+  } = $props()
 </script>
 
-<TreeItemPrimitive {value} branch={children !== undefined} class={cn("flex flex-wrap items-center outline-none", className)}>
+<TreeItemPrimitive
+  {value}
+  branch={children !== undefined}
+  class={cn("flex flex-wrap items-center outline-none", className)}
+>
   <TreeItemCheckbox
     class="relative ms-2 flex size-4 shrink-0 cursor-default items-center justify-center rounded-[5px] bg-input/90 after:text-[10px] after:leading-none after:text-primary-foreground data-checked:bg-primary data-checked:after:content-['✓'] data-indeterminate:bg-primary data-indeterminate:after:content-['–']"
   />

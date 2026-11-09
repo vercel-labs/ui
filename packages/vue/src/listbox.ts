@@ -12,8 +12,20 @@ import { defineComponent, h, type PropType } from "vue"
 import { slotContent } from "./children"
 import { useFieldControl } from "./field-context"
 import { ListItems, type ListParts } from "./list-items"
-import { createParts, type RenderableWith, type RootInstanceOf, type RootPropsOf } from "./create-parts"
-import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  createParts,
+  type RenderableWith,
+  type RootInstanceOf,
+  type RootPropsOf,
+} from "./create-parts"
+import {
+  optionalBoolean,
+  orModel,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 import { FormInputs } from "./form-inputs"
 import { readOnlyOf } from "./text-control"
 
@@ -36,18 +48,24 @@ const anyValue = { type: null as unknown as PropType<unknown> }
 // Generic over the value, like React's `Listbox<T>`: `v-model`, `@value-change`
 // and the items share `T`. One shape per `multiple`, so the value is a list
 // only with it, and a `multiple` known only at run time takes either.
-type ListboxProps<T, Multiple extends boolean | undefined> = ListboxOptions<T, Multiple> & {
+type ListboxProps<T, Multiple extends boolean | undefined> = ListboxOptions<
+  T,
+  Multiple
+> & {
   multiple?: Multiple
 }
 type ListboxComponent = {
   new <T = string>(
-    props: RootPropsOf<ListboxProps<T, false>, "div">,
+    props: RootPropsOf<ListboxProps<T, false>, "div">
   ): RootInstanceOf<ListboxProps<T, false>, ListboxState, "div">
   new <T = string>(
-    props: RootPropsOf<ListboxProps<T, true>, "div">,
+    props: RootPropsOf<ListboxProps<T, true>, "div">
   ): RootInstanceOf<ListboxProps<T, true>, ListboxState, "div">
   new <T = string, Multiple extends boolean | undefined = boolean>(
-    props: RootPropsOf<ListboxProps<T, Multiple> & { multiple: Multiple }, "div">,
+    props: RootPropsOf<
+      ListboxProps<T, Multiple> & { multiple: Multiple },
+      "div"
+    >
   ): RootInstanceOf<ListboxProps<T, Multiple>, ListboxState, "div">
 } & RenderableWith<ListboxProps<any, boolean | undefined>, ListboxState, "div">
 
@@ -69,7 +87,9 @@ const Listbox = defineComponent({
     loop: optionalBoolean,
     items: Array as PropType<ListData<any>>,
     itemToValue: Function as PropType<(value: any) => string>,
-    isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
+    isItemEqualToValue: Function as PropType<
+      (itemValue: any, value: any) => boolean
+    >,
     disabled: optionalBoolean,
     readOnly: optionalBoolean,
     required: optionalBoolean,
@@ -96,17 +116,21 @@ const Listbox = defineComponent({
       onValueChange: (value: unknown, details: ValueDetails) => {
         // The change event runs first, so canceling it also keeps v-model as it was.
         emit("valueChange", value, details)
-        if (details.canceled) return
+        if (details.canceled) {
+          return
+        }
         emit("update:value", value)
         emit("update:modelValue", value)
       },
-      onHighlight: (value: unknown, details: ListHighlightDetails) => emit("highlight", value, details),
+      onHighlight: (value: unknown, details: ListHighlightDetails) =>
+        emit("highlight", value, details),
     }))
     const root = usePart(listbox, "root", undefined, undefined, {
       tag: "div",
       // Without content, a data listbox renders its items.
       children: (state) =>
-        slotContent(slots.default, { state }) ?? (props.items && h(ListboxItems, { items: state.items })),
+        slotContent(slots.default, { state }) ??
+        (props.items && h(ListboxItems, { items: state.items })),
       extend: field?.props,
     })
     return () => [root(), h(FormInputs, { handle: listbox })]

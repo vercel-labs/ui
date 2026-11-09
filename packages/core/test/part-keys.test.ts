@@ -42,7 +42,9 @@ test("parts valued 1 and 2 are two parts, and a press reads its own part's props
 test("a value that isn't a string keys its part by its text", () => {
   const instance = list({ id: "l" })
   expect(instance.part("item", { value: 1 }).key).toBe("1")
-  expect(instance.part("item", { value: ["2026-01-01", "2026-01-07"] }).key).toBe("2026-01-01,2026-01-07")
+  expect(
+    instance.part("item", { value: ["2026-01-01", "2026-01-07"] }).key
+  ).toBe("2026-01-01,2026-01-07")
   expect(instance.part("item", { value: false }).key).toBe("false")
   expect(instance.part("item", {}).key).toBe("")
 })
@@ -55,7 +57,7 @@ test("two elements in the page binding parts of one key warn", async () => {
   await settle()
   expect(warn).toHaveBeenCalledOnce()
   expect(warn.mock.calls[0][0]).toContain(
-    'two "item" parts share the key "a". Give each an id or a unique value.',
+    'two "item" parts share the key "a". Give each an id or a unique value.'
   )
 })
 

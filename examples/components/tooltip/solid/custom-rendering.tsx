@@ -5,7 +5,9 @@ function Example() {
     <Tooltip>
       <TooltipTrigger
         data-variant="link"
-        render={(props) => <a {...props} href="https://example.com/changelog" />}
+        render={(props) => (
+          <a {...props} href="https://example.com/changelog" />
+        )}
       >
         Changelog
       </TooltipTrigger>

@@ -14,12 +14,23 @@ import type { AccordionGeneric } from "./accordion-generic"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
-import { createDetails, type ChangeDetails, type ChangeOptions } from "../../foundation/kernel/details"
+import {
+  createDetails,
+  type ChangeDetails,
+  type ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveContext, PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveContext,
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
 import { live } from "../../foundation/kernel/live"
-import { changeSource, createChange } from "../../foundation/kernel/input-source"
+import {
+  changeSource,
+  createChange,
+} from "../../foundation/kernel/input-source"
 import { elements } from "../../foundation/kernel/elements"
 
 /**
@@ -27,7 +38,8 @@ import { elements } from "../../foundation/kernel/elements"
  * text in a closed panel, or a controller or `api` call changed them.
  * @stable
  */
-type AccordionValueChangeReason = "trigger-press" | "find-in-page" | "imperative"
+type AccordionValueChangeReason =
+  "trigger-press" | "find-in-page" | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -68,7 +80,9 @@ function createAccordionController<T extends string = string>() {
  * option.
  * @stable
  */
-type AccordionController<T extends string = string> = ReturnType<typeof createAccordionController<T>>
+type AccordionController<T extends string = string> = ReturnType<
+  typeof createAccordionController<T>
+>
 
 /**
  * The options `accordion` takes. A component takes them as props on its root.
@@ -83,7 +97,10 @@ type AccordionOptions<T extends string = string> = {
    */
   defaultValue?: T[]
   /** Runs when items want to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T[], details: ChangeDetails<AccordionValueChangeReason>) => void
+  onValueChange?: (
+    value: T[],
+    details: ChangeDetails<AccordionValueChangeReason>
+  ) => void
   /**
    * Whether several items can be open at once. Otherwise opening one closes the others.
    * @defaultValue false
@@ -124,7 +141,10 @@ type ItemProps = {
    */
   disabled?: boolean
   /** Runs before the item opens or closes, before the accordion's `onValueChange`. `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<AccordionValueChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<AccordionValueChangeReason>
+  ) => void
   /** Runs once the item's panel has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
 }
@@ -158,7 +178,10 @@ type PanelProps = {
  * The props the `item` slot of `accordion` takes.
  * @stable
  */
-type AccordionItemProps<T extends string = string> = Omit<ItemProps, "value"> & {
+type AccordionItemProps<T extends string = string> = Omit<
+  ItemProps,
+  "value"
+> & {
   /** Identifies the item. The accordion's value lists the open items' values. Defaults to a generated id. */
   value?: T
 }
@@ -241,9 +264,18 @@ type AccordionStore = {
   items: string[]
 }
 
-function nextValue(value: string[], key: string, open: boolean, multiple: boolean) {
-  if (!open) return value.filter((item) => item !== key)
-  if (value.includes(key)) return value
+function nextValue(
+  value: string[],
+  key: string,
+  open: boolean,
+  multiple: boolean
+) {
+  if (!open) {
+    return value.filter((item) => item !== key)
+  }
+  if (value.includes(key)) {
+    return value
+  }
   return multiple ? [...value, key] : [key]
 }
 
@@ -261,7 +293,9 @@ type Cause = AccordionChangeOptions
  */
 type AccordionApi = ReturnType<typeof accordionApi>
 
-function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore, string>) {
+function accordionApi(
+  context: PrimitiveContext<AccordionOptions, AccordionStore, string>
+) {
   const { id, store, options, element, props } = context
   const change = createChange(context)
   const panels = new Set<string>()
@@ -274,46 +308,73 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
 
   const isOpen = (key: string) => store.get().value.includes(key)
   const itemProps = (key: string) => props("item", key) as ItemProps | undefined
-  const itemDisabled = (key: string) => isDisabled(store.get()) || !!itemProps(key)?.disabled
+  const itemDisabled = (key: string) =>
+    isDisabled(store.get()) || !!itemProps(key)?.disabled
 
   // Every item's open callback hears first, and any of them can stop the change.
-  function setValue(value: string[], { reason: why = "imperative", event }: Cause = {}) {
+  function setValue(
+    value: string[],
+    { reason: why = "imperative", event }: Cause = {}
+  ) {
     const state = store.get()
     const next = state.multiple ? value : value.slice(0, 1)
     for (const key of new Set([...state.value, ...next])) {
       const open = next.includes(key)
-      if (open === state.value.includes(key)) continue
+      if (open === state.value.includes(key)) {
+        continue
+      }
       const onOpenChange = itemProps(key)?.onOpenChange
-      if (!onOpenChange) continue
-      const details = createDetails({ reason: why, event }, changeSource(why, event))
+      if (!onOpenChange) {
+        continue
+      }
+      const details = createDetails(
+        { reason: why, event },
+        changeSource(why, event)
+      )
       onOpenChange(open, details)
-      if (details.canceled) return false
+      if (details.canceled) {
+        return false
+      }
     }
     reason.set(why)
     const changed = change("value", next, { reason: why, event })
-    if (!changed) reason.take()
+    if (!changed) {
+      reason.take()
+    }
     return changed
   }
 
   function setOpen(key: string, open: boolean, cause: Cause = {}) {
     const state = store.get()
-    if (isOpen(key) === open) return false
-    if (!open && locked(state, key)) return false
+    if (isOpen(key) === open) {
+      return false
+    }
+    if (!open && locked(state, key)) {
+      return false
+    }
     return setValue(nextValue(state.value, key, open, state.multiple), cause)
   }
 
   // The panels animating out once `value` replaces `from`: the ones it
   // closes, and the ones already leaving that it doesn't open again.
   function exitingAfter(from: string[], value: string[], exiting: string[]) {
-    const closed = from.filter((key) => !value.includes(key) && panels.has(key) && !exiting.includes(key))
+    const closed = from.filter(
+      (key) => !value.includes(key) && panels.has(key) && !exiting.includes(key)
+    )
     return [...exiting.filter((key) => !value.includes(key)), ...closed]
   }
 
   // A closing panel animates out in the same pass as a controlled `value`.
   deriveFromOptions(context, ["exiting"], (synced, state) =>
     "value" in synced && synced.value !== state.value
-      ? { exiting: exitingAfter(state.value, synced.value as string[], state.exiting) }
-      : undefined,
+      ? {
+          exiting: exitingAfter(
+            state.value,
+            synced.value as string[],
+            state.exiting
+          ),
+        }
+      : undefined
   )
 
   // Reacts to value changes from any source: a press, find in page, a
@@ -321,12 +382,22 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
   let previous = store.get().value
   store.subscribe(() => {
     const { value, exiting } = store.get()
-    if (value === previous) return
+    if (value === previous) {
+      return
+    }
     const from = previous
     // A later value from options, like a controlled "Expand all", isn't this change.
     const why = reason.take()
-    for (const key of value) if (!from.includes(key)) opened.set(key, why)
-    for (const key of from) if (!value.includes(key)) opened.delete(key)
+    for (const key of value) {
+      if (!from.includes(key)) {
+        opened.set(key, why)
+      }
+    }
+    for (const key of from) {
+      if (!value.includes(key)) {
+        opened.delete(key)
+      }
+    }
     previous = value
     store.set({ exiting: exitingAfter(from, value, exiting) })
   })
@@ -337,7 +408,9 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
     const inPage = elements(context, "item")
       .map((entry) => entry.key)
       .filter((key) => items.has(key))
-    store.set({ items: [...inPage, ...[...items].filter((key) => !inPage.includes(key))] })
+    store.set({
+      items: [...inPage, ...[...items].filter((key) => !inPage.includes(key))],
+    })
   }
 
   // Items and panels mount one by one, so the lists of them are written once
@@ -347,12 +420,16 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
   let itemsChanged = false
   function queueSync(items = false) {
     itemsChanged ||= items
-    if (syncQueued) return
+    if (syncQueued) {
+      return
+    }
     syncQueued = true
     queueMicrotask(() => {
       syncQueued = false
       store.set({ panels: [...panels] })
-      if (itemsChanged) syncItems()
+      if (itemsChanged) {
+        syncItems()
+      }
     })
   }
 
@@ -364,13 +441,19 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
     isOpen,
     open: (value: string, cause?: Cause) => setOpen(value, true, cause),
     close: (value: string, cause?: Cause) => setOpen(value, false, cause),
-    toggle: (value: string, cause?: Cause) => setOpen(value, !isOpen(value), cause),
+    toggle: (value: string, cause?: Cause) =>
+      setOpen(value, !isOpen(value), cause),
     openAll(cause?: Cause) {
       if (!store.get().multiple) {
-        warn("openAll() needs an accordion with `multiple`.", { component: "accordion", id })
+        warn("openAll() needs an accordion with `multiple`.", {
+          component: "accordion",
+          id,
+        })
         return false
       }
-      if (itemsChanged) syncItems()
+      if (itemsChanged) {
+        syncItems()
+      }
       const enabled = store.get().items.filter((key) => !itemDisabled(key))
       return setValue([...new Set([...store.get().value, ...enabled])], cause)
     },
@@ -378,11 +461,14 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
       const state = store.get()
       return setValue(
         state.value.filter((key) => locked(state, key) || itemDisabled(key)),
-        cause,
+        cause
       )
     },
     focus(value?: string) {
-      const trigger = value === undefined ? elements(context, "trigger")[0]?.el : element("trigger", value)
+      const trigger =
+        value === undefined
+          ? elements(context, "trigger")[0]?.el
+          : element("trigger", value)
       trigger?.focus()
     },
     internal: {
@@ -393,8 +479,12 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
       // page shows its match at once.
       opening: (key: string) => {
         const why = opened.get(key)
-        if (why === undefined) return "mount" as const
-        return why === "find-in-page" ? ("instant" as const) : ("animate" as const)
+        if (why === undefined) {
+          return "mount" as const
+        }
+        return why === "find-in-page"
+          ? ("instant" as const)
+          : ("animate" as const)
       },
       settled(key: string, open: boolean) {
         opened.delete(key)
@@ -413,8 +503,11 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
       // Whether a change in the page happened inside an item, like its panel
       // mounting, which leaves the items' order as it was.
       insideItem(node: Node | null, root: Element) {
-        for (; node && node !== root; node = node.parentNode)
-          if (itemElements.has(node as Element)) return true
+        for (; node && node !== root; node = node.parentNode) {
+          if (itemElements.has(node as Element)) {
+            return true
+          }
+        }
         return false
       },
       registerPanel(key: string) {
@@ -424,11 +517,15 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
           panels.delete(key)
           queueSync()
           const { exiting } = store.get()
-          if (exiting.includes(key)) store.set({ exiting: exiting.filter((value) => value !== key) })
+          if (exiting.includes(key)) {
+            store.set({ exiting: exiting.filter((value) => value !== key) })
+          }
         }
       },
       finishExit(key: string) {
-        store.set({ exiting: store.get().exiting.filter((value) => value !== key) })
+        store.set({
+          exiting: store.get().exiting.filter((value) => value !== key),
+        })
       },
     },
   }
@@ -436,15 +533,25 @@ function accordionApi(context: PrimitiveContext<AccordionOptions, AccordionStore
   return api
 }
 
-const disabledOf = (state: AccordionStore, key: string, api: AccordionApi, own?: boolean) =>
-  !!own || isDisabled(state) || api.internal.itemDisabled(key)
+const disabledOf = (
+  state: AccordionStore,
+  key: string,
+  api: AccordionApi,
+  own?: boolean
+) => !!own || isDisabled(state) || api.internal.itemDisabled(key)
 
-const keepsMounted = (state: AccordionStore, props: PanelProps) => props.keepMounted ?? state.keepMounted
+const keepsMounted = (state: AccordionStore, props: PanelProps) =>
+  props.keepMounted ?? state.keepMounted
 const findable = (state: AccordionStore, props: PanelProps) =>
   props.hiddenUntilFound ?? state.hiddenUntilFound
 
 // The state every part of an item shares.
-const itemState = (state: AccordionStore, key: string, api: AccordionApi, own?: boolean) => ({
+const itemState = (
+  state: AccordionStore,
+  key: string,
+  api: AccordionApi,
+  own?: boolean
+) => ({
   open: state.value.includes(key),
   disabled: disabledOf(state, key, api, own),
   index: state.items.indexOf(key),
@@ -487,14 +594,28 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
   api: accordionApi,
   slots: (slot) => ({
     root: slot<{}, AccordionState>({
-      state: (state) => ({ value: state.value, disabled: isDisabled(state), multiple: state.multiple }),
-      attrs: (state) => ({ "data-disabled": isDisabled(state) ? "" : undefined }),
+      state: (state) => ({
+        value: state.value,
+        disabled: isDisabled(state),
+        multiple: state.multiple,
+      }),
+      attrs: (state) => ({
+        "data-disabled": isDisabled(state) ? "" : undefined,
+      }),
       bind(el, { api, store }) {
         const unwatch = watchFormDisabled(el, store)
-        if (typeof MutationObserver === "undefined") return unwatch
+        if (typeof MutationObserver === "undefined") {
+          return unwatch
+        }
         // Items moved in the page, like a sorted list, change their index without registering again.
         const observer = new MutationObserver((records) => {
-          if (records.some((record) => !api.internal.insideItem(record.target, el))) api.internal.syncItems()
+          if (
+            records.some(
+              (record) => !api.internal.insideItem(record.target, el)
+            )
+          ) {
+            api.internal.syncItems()
+          }
         })
         observer.observe(el, { childList: true, subtree: true })
         return () => {
@@ -507,12 +628,20 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
     // Parts of an item read the open items, the exiting panels and the panels
     // in the page only for their own item, so an open reaches that item's parts.
     item: slot<ItemProps, AccordionItemState>({
-      props: { value: "id", disabled: "boolean", onOpenChange: "callback", onOpenChangeComplete: "callback" },
+      props: {
+        value: "id",
+        disabled: "boolean",
+        onOpenChange: "callback",
+        onOpenChangeComplete: "callback",
+      },
       selects: selects({ value: ({ key }) => [key], exiting: [], panels: [] }),
-      state: (state, { key, props, api }) => itemState(state, key, api, props.disabled),
+      state: (state, { key, props, api }) =>
+        itemState(state, key, api, props.disabled),
       attrs: (state, { key, props, api }) => ({
         ...openAttrs(state.value.includes(key)),
-        "data-disabled": disabledOf(state, key, api, props.disabled) ? "" : undefined,
+        "data-disabled": disabledOf(state, key, api, props.disabled)
+          ? ""
+          : undefined,
       }),
       live: live((state, { key }) => {
         const index = state.items.indexOf(key)
@@ -533,8 +662,13 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
 
     trigger: slot<TriggerProps, AccordionTriggerState>({
       props: { value: { kind: "string", from: "item" }, disabled: "boolean" },
-      selects: selects({ value: ({ key }) => [key], exiting: [], panels: ({ key }) => [key] }),
-      state: (state, { key, props, api }) => itemState(state, key, api, props.disabled),
+      selects: selects({
+        value: ({ key }) => [key],
+        exiting: [],
+        panels: ({ key }) => [key],
+      }),
+      state: (state, { key, props, api }) =>
+        itemState(state, key, api, props.disabled),
       attrs: (state, { id, key, props, api }) => {
         const open = state.value.includes(key)
         const disabled = disabledOf(state, key, api, props.disabled)
@@ -550,7 +684,9 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
       },
       // Only panels in the page can be pointed at.
       live: live((state, { id, key }) => ({
-        "aria-controls": state.panels.includes(key) ? `${id}-panel-${idPart(key)}` : undefined,
+        "aria-controls": state.panels.includes(key)
+          ? `${id}-panel-${idPart(key)}`
+          : undefined,
       })),
       press({ api, el, key, props, store }, event) {
         if (disabledOf(store.get(), key, api, props.disabled)) {
@@ -567,8 +703,16 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
 
     panel: slot<PanelProps, AccordionPanelState>({
       role: "region",
-      props: { value: { kind: "string", from: "item" }, keepMounted: "boolean", hiddenUntilFound: "boolean" },
-      selects: selects({ value: ({ key }) => [key], exiting: ({ key }) => [key], panels: [] }),
+      props: {
+        value: { kind: "string", from: "item" },
+        keepMounted: "boolean",
+        hiddenUntilFound: "boolean",
+      },
+      selects: selects({
+        value: ({ key }) => [key],
+        exiting: ({ key }) => [key],
+        panels: [],
+      }),
       present: (state, { key, props }) =>
         state.value.includes(key) ||
         state.exiting.includes(key) ||
@@ -580,7 +724,10 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
         return {
           id: `${id}-panel-${idPart(key)}`,
           "aria-labelledby": `${id}-trigger-${idPart(key)}`,
-          ...hiddenAttrs(open || state.exiting.includes(key), findable(state, props)),
+          ...hiddenAttrs(
+            open || state.exiting.includes(key),
+            findable(state, props)
+          ),
           ...openAttrs(open),
           "data-disabled": disabledOf(state, key, api) ? "" : undefined,
         }
@@ -620,7 +767,10 @@ const accordionPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `accordion`.
  * @stable
  */
-interface AccordionPrimitive extends WithGeneric<typeof accordionPrimitive, AccordionGeneric> {}
+interface AccordionPrimitive extends WithGeneric<
+  typeof accordionPrimitive,
+  AccordionGeneric
+> {}
 
 /**
  * The accordion primitive, with the slots `root`, `item`, `header`, `trigger`,

@@ -17,7 +17,12 @@ in the body, so transformed ancestors can't move it.
   // A scrub area outside its number input renders before that mounts, with no cursor yet.
   const numberInput = getContext<NumberInputContext | undefined>(NumberInputKey)
   const cursor = numberInput
-    ? useHandlePart(numberInput, "scrub-area-cursor", undefined, portalTo(() => document.body))
+    ? useHandlePart(
+        numberInput,
+        "scrub-area-cursor",
+        undefined,
+        portalTo(() => document.body)
+      )
     : undefined
 </script>
 

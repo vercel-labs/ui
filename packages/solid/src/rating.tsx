@@ -12,7 +12,9 @@ import { createParts, usePart, type PartProps } from "./use-primitive"
 
 const parts = createParts(rating, {})
 
-const ItemContext = createContext<{ index: number; step: () => number } | null>(null)
+const ItemContext = createContext<{ index: number; step: () => number } | null>(
+  null
+)
 
 /**
  * A score picked from a row of stars, a radio per star or half star, with a
@@ -21,7 +23,10 @@ const ItemContext = createContext<{ index: number; step: () => number } | null>(
  */
 function Rating(
   props: RatingOptions &
-    Omit<PartProps<"div", RatingState>, "onChange" | "onSelect" | "children"> & { children?: JSX.Element },
+    Omit<
+      PartProps<"div", RatingState>,
+      "onChange" | "onSelect" | "children"
+    > & { children?: JSX.Element }
 ) {
   const field = useFieldControl()
   const rest = omit(
@@ -41,19 +46,27 @@ function Rating(
     "getValueLabel",
     "controller",
     "debug",
-    "children",
+    "children"
   )
   const stars = () => Array.from({ length: props.max ?? 5 }, (_, at) => at + 1)
   const step = () => props.step ?? 1
   const root = merge(joinField(field, rest, "div"), {
     children: () => (
       <For each={stars()}>
-        {(index) => <ItemContext value={{ index, step }}>{props.children ?? <RatingItem />}</ItemContext>}
+        {(index) => (
+          <ItemContext value={{ index, step }}>
+            {props.children ?? <RatingItem />}
+          </ItemContext>
+        )}
       </For>
     ),
   })
   return (
-    <parts.Root {...props} disabled={props.disabled || field?.disabled()} name={props.name ?? field?.name()}>
+    <parts.Root
+      {...props}
+      disabled={props.disabled || field?.disabled()}
+      name={props.name ?? field?.name()}
+    >
       {usePart(rating, "root", undefined, root, "div")}
     </parts.Root>
   )
@@ -76,7 +89,9 @@ function RatingRadio(props: { value: string }) {
  */
 function RatingItem(props: PartProps<"span", RatingItemState>) {
   const item = useContext(ItemContext)
-  if (!item) throw new Error("RatingItem must be used inside <Rating>.")
+  if (!item) {
+    throw new Error("RatingItem must be used inside <Rating>.")
+  }
   const rest = omit(props, "children")
   const radios = (
     <For each={ratingItemValues(item.index, item.step())}>
@@ -90,7 +105,13 @@ function RatingItem(props: PartProps<"span", RatingItemState>) {
         : props.children,
       radios,
     ] as JSX.Element
-  return usePart(rating, "item", () => ({ index: item.index }), merge(rest, { children: content }), "span")
+  return usePart(
+    rating,
+    "item",
+    () => ({ index: item.index }),
+    merge(rest, { children: content }),
+    "span"
+  )
 }
 
 export { createRatingController } from "@ui-sdk/core/rating"

@@ -11,7 +11,10 @@ const muteButton = definePrimitive({
   }),
   slots: (slot) => ({
     root: slot({
-      attrs: (state) => ({ type: "button", "aria-pressed": String(state.muted) }),
+      attrs: (state) => ({
+        type: "button",
+        "aria-pressed": String(state.muted),
+      }),
       press: ({ api }) => api.toggle(),
     }),
   }),

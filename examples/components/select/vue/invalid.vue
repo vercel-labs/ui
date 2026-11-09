@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 import {
   Select,
   SelectContent,
@@ -20,7 +25,9 @@ const methods = [
 const log = useLog()
 
 function submit(event: Event) {
-  log(`Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`)
+  log(
+    `Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`
+  )
 }
 </script>
 
@@ -34,7 +41,11 @@ function submit(event: Event) {
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="method in methods" :key="method.value" :value="method.value">
+          <SelectItem
+            v-for="method in methods"
+            :key="method.value"
+            :value="method.value"
+          >
             {{ method.label }}
             <SelectItemIndicator>
               <CheckIcon />

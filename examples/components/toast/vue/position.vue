@@ -9,7 +9,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/vue/select"
-import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
+import {
+  Toast,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/vue/toast"
 import { onUnmounted, ref } from "vue"
 
 const sides = [
@@ -35,14 +41,22 @@ onUnmounted(() => {
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <Select :items="sides" :value="side" @value-change="(next) => next && (side = next as Side)">
+      <Select
+        :items="sides"
+        :value="side"
+        @value-change="(next) => next && (side = next as Side)"
+      >
         <SelectLabel>Side</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon aria-hidden="true" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in sides" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in sides"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon aria-hidden="true" />
@@ -50,14 +64,22 @@ onUnmounted(() => {
           </SelectItem>
         </SelectContent>
       </Select>
-      <Select :items="aligns" :value="align" @value-change="(next) => next && (align = next as Align)">
+      <Select
+        :items="aligns"
+        :value="align"
+        @value-change="(next) => next && (align = next as Align)"
+      >
         <SelectLabel>Align</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon aria-hidden="true" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in aligns" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in aligns"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon aria-hidden="true" />
@@ -66,7 +88,11 @@ onUnmounted(() => {
         </SelectContent>
       </Select>
     </div>
-    <button @click="toast('Event created', { description: 'Friday, June 12 at 10:00 AM' })">
+    <button
+      @click="
+        toast('Event created', { description: 'Friday, June 12 at 10:00 AM' })
+      "
+    >
       Create Event
     </button>
     <ToastRegion :toaster="toast" :side="side" :align="align">

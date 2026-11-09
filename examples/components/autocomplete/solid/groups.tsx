@@ -13,8 +13,14 @@ import {
 import { For, Show } from "solid-js"
 
 const fruitGroups = [
-  { label: "Tree fruits", items: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"] },
-  { label: "Berries", items: ["Blackberry", "Blueberry", "Grape", "Strawberry"] },
+  {
+    label: "Tree fruits",
+    items: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"],
+  },
+  {
+    label: "Berries",
+    items: ["Blackberry", "Blueberry", "Grape", "Strawberry"],
+  },
   { label: "Tropical", items: ["Avocado", "Banana", "Mango", "Pineapple"] },
 ]
 
@@ -37,7 +43,9 @@ function Example() {
                 <AutocompleteGroup>
                   <AutocompleteGroupLabel>{group.label}</AutocompleteGroupLabel>
                   <For each={group.items}>
-                    {(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}
+                    {(fruit) => (
+                      <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>
+                    )}
                   </For>
                 </AutocompleteGroup>
               </>

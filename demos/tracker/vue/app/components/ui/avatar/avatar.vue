@@ -10,22 +10,33 @@ const sizes = {
 }
 
 const props = withDefaults(
-  defineProps<{ name: string; size?: keyof typeof sizes; decorative?: boolean; class?: string }>(),
-  { size: "default" },
+  defineProps<{
+    name: string
+    size?: keyof typeof sizes
+    decorative?: boolean
+    class?: string
+  }>(),
+  { size: "default" }
 )
 
 const initials = computed(() =>
   props.name
     .split(" ")
     .map((part) => part[0])
-    .join(""),
+    .join("")
 )
 </script>
 
 <template>
   <AvatarPrimitive
     :aria-hidden="decorative || undefined"
-    :class="cn('relative flex shrink-0 rounded-full select-none', sizes[props.size], props.class)"
+    :class="
+      cn(
+        'relative flex shrink-0 rounded-full select-none',
+        sizes[props.size],
+        props.class
+      )
+    "
   >
     <AvatarFallback
       class="flex size-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground"

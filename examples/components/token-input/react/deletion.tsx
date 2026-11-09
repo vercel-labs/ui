@@ -42,7 +42,12 @@ const files = [
 
 const draft: TokenInputValue = [
   "Explain ",
-  { type: "file", value: "src/routes.ts", label: "routes.ts", data: { trigger: "@" } },
+  {
+    type: "file",
+    value: "src/routes.ts",
+    label: "routes.ts",
+    data: { trigger: "@" },
+  },
   " in two sentences.",
 ]
 
@@ -87,7 +92,9 @@ function Example() {
             </TokenInputToken>
           )}
           onValueChange={(value, details) => {
-            for (const token of details.removed) log(`Removed ${token.label} (${deletion})`)
+            for (const token of details.removed) {
+              log(`Removed ${token.label} (${deletion})`)
+            }
           }}
         >
           <TokenInputEditor />
@@ -96,7 +103,11 @@ function Example() {
               <TriggerMenuList>
                 {(state) =>
                   (state.items as TriggerMenuDataItem[]).map((item) => (
-                    <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+                    <TriggerMenuItem
+                      key={item.value}
+                      value={item.value}
+                      label={item.label}
+                    >
                       {item.label}
                     </TriggerMenuItem>
                   ))

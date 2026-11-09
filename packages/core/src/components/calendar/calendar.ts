@@ -3,12 +3,23 @@
 // asks. It selects one date, any number, or a range, as ISO strings, with no
 // date library: `@ui-sdk/core/date` does the arithmetic and `Intl` the names.
 import { watchFormDisabled } from "../../foundation/forms/form"
-import type { CalendarMode, CalendarValue, DateMatchers, ISOMonth } from "./calendar-model"
+import type {
+  CalendarMode,
+  CalendarValue,
+  DateMatchers,
+  ISOMonth,
+} from "./calendar-model"
 import type { ISODate } from "../../foundation/date/plain-date"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import {
   calendarApi,
   calendarSlots,
@@ -29,13 +40,19 @@ type CalendarValueChangeReason = "item-press" | "imperative"
  * @stable
  */
 type CalendarMonthChangeReason =
-  "previous-press" | "next-press" | "list-navigation" | "item-press" | "select-change" | "imperative"
+  | "previous-press"
+  | "next-press"
+  | "list-navigation"
+  | "item-press"
+  | "select-change"
+  | "imperative"
 
 /**
  * Why focus wants to move to another day.
  * @stable
  */
-type CalendarFocusedChangeReason = "list-navigation" | "item-press" | "focus-in" | "imperative"
+type CalendarFocusedChangeReason =
+  "list-navigation" | "item-press" | "focus-in" | "imperative"
 
 /**
  * Why a range's start wants to change.
@@ -47,7 +64,8 @@ type CalendarAnchorChangeReason = "item-press" | "escape-key"
  * Options for every write method on a controller.
  * @stable
  */
-type CalendarChangeOptions<Reason extends string = string> = ChangeOptions<Reason>
+type CalendarChangeOptions<Reason extends string = string> =
+  ChangeOptions<Reason>
 
 /**
  * Drives a calendar from anywhere. Pass it as the `controller` option.
@@ -58,15 +76,25 @@ function createCalendarController() {
     /** The selected value: an ISO date, a list of them, or a `[start, end]` range. */
     getValue: () => CalendarValue
     /** Selects a value. Returns false when canceled, unchanged, disabled, read-only, or holding a date people can't pick, like one past `max`. */
-    setValue: (value: CalendarValue, options?: CalendarChangeOptions<CalendarValueChangeReason>) => boolean
+    setValue: (
+      value: CalendarValue,
+      options?: CalendarChangeOptions<CalendarValueChangeReason>
+    ) => boolean
     /** The first month shown, like `"2026-10"`. */
     getMonth: () => ISOMonth
     /** Shows a month first. Returns false when canceled or unchanged. */
-    setMonth: (month: ISOMonth, options?: CalendarChangeOptions<CalendarMonthChangeReason>) => boolean
+    setMonth: (
+      month: ISOMonth,
+      options?: CalendarChangeOptions<CalendarMonthChangeReason>
+    ) => boolean
     /** Shows the months before, as the Previous part does. */
-    previous: (options?: CalendarChangeOptions<CalendarMonthChangeReason>) => boolean
+    previous: (
+      options?: CalendarChangeOptions<CalendarMonthChangeReason>
+    ) => boolean
     /** Shows the months after, as the Next part does. */
-    next: (options?: CalendarChangeOptions<CalendarMonthChangeReason>) => boolean
+    next: (
+      options?: CalendarChangeOptions<CalendarMonthChangeReason>
+    ) => boolean
     /** Focuses a date, turning the months to show it, or the date with the tab stop. */
     focus: (date?: ISODate) => void
   }>()
@@ -97,13 +125,19 @@ type CalendarOptions = {
    * a controller sets the value (`"imperative"`). A range changes once both
    * ends are picked. `details.cancel()` keeps the value.
    */
-  onValueChange?: (value: CalendarValue, details: ChangeDetails<CalendarValueChangeReason>) => void
+  onValueChange?: (
+    value: CalendarValue,
+    details: ChangeDetails<CalendarValueChangeReason>
+  ) => void
   /** The first month shown, like `"2026-10"`. Pass it to control the calendar. */
   month?: ISOMonth
   /** The first month it shows, when uncontrolled. Defaults to the selected date's month, else today's. */
   defaultMonth?: ISOMonth
   /** Runs when the months shown want to change: Previous or Next, a key moving focus to another month, a press on a day of another month, or a controller. */
-  onMonthChange?: (month: ISOMonth, details: ChangeDetails<CalendarMonthChangeReason>) => void
+  onMonthChange?: (
+    month: ISOMonth,
+    details: ChangeDetails<CalendarMonthChangeReason>
+  ) => void
   /** The earliest date that can be picked. Keys stop there, and Previous stops at its month. */
   min?: ISODate
   /** The latest date that can be picked. */
@@ -125,9 +159,15 @@ type CalendarOptions = {
    */
   deselectable?: boolean
   /** Runs before keys, a press or `focus()` move focus to another day. Canceling keeps focus where it was. */
-  onFocusedChange?: (date: ISODate, details: ChangeDetails<CalendarFocusedChangeReason>) => void
+  onFocusedChange?: (
+    date: ISODate,
+    details: ChangeDetails<CalendarFocusedChangeReason>
+  ) => void
   /** Runs before a press starts a range, or ends it or Escape drops it, with `null`. Canceling keeps the start as it was. */
-  onAnchorChange?: (anchor: ISODate | null, details: ChangeDetails<CalendarAnchorChangeReason>) => void
+  onAnchorChange?: (
+    anchor: ISODate | null,
+    details: ChangeDetails<CalendarAnchorChangeReason>
+  ) => void
   /**
    * How many months show side by side, each in its own grid.
    * @defaultValue 1
@@ -353,7 +393,9 @@ type CalendarDayProps = {
  * `calendar`'s api, which its slots and controller call. Adapters expose it as `api`.
  * @stable
  */
-type CalendarApi = ReturnType<typeof calendarApi<CalendarOptions, CalendarModelState>>
+type CalendarApi = ReturnType<
+  typeof calendarApi<CalendarOptions, CalendarModelState>
+>
 
 const calendarPrimitive = /* @__PURE__ */ definePrimitive({
   name: "calendar",
@@ -409,7 +451,10 @@ const calendarPrimitive = /* @__PURE__ */ definePrimitive({
         "data-readonly": state.readOnly ? "" : undefined,
       }),
       bind(el, { api, store }) {
-        const cleanups = [watchFormDisabled(el, store), api.internal.bindRoot(el)]
+        const cleanups = [
+          watchFormDisabled(el, store),
+          api.internal.bindRoot(el),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup?.())
       },
     }),
@@ -459,4 +504,10 @@ export {
   type CalendarWeekdayState,
   createCalendarController,
 }
-export type { CalendarMode, CalendarValue, DateMatcher, DateMatchers, ISOMonth } from "./calendar-model"
+export type {
+  CalendarMode,
+  CalendarValue,
+  DateMatcher,
+  DateMatchers,
+  ISOMonth,
+} from "./calendar-model"

@@ -2,7 +2,10 @@
 import { afterEach, describe, expect, test, vi } from "vitest"
 import { numberInput } from "../src/components/number-input/number-input"
 import { slider } from "../src/components/slider/slider"
-import { createScrollbarInput, type ScrollbarHost } from "../src/components/scroll-area/scroll-area-pointer"
+import {
+  createScrollbarInput,
+  type ScrollbarHost,
+} from "../src/components/scroll-area/scroll-area-pointer"
 import { createArea, definePrimitive } from "../src/index"
 import { createDragSession } from "../src/foundation/drag-and-drop/pointer"
 import { mount, rerenderOf } from "../src/testing/mount"
@@ -30,7 +33,9 @@ function session() {
   const drags = createDragSession((cleanup) => destroy.push(cleanup))
   const drag = (down: PointerEvent, onStart?: () => boolean | void) => {
     const onEnd = vi.fn()
-    if (!drags.accepts(down)) return undefined
+    if (!drags.accepts(down)) {
+      return undefined
+    }
     drags.start(el, down, { onStart, onMove: () => {}, onEnd })
     return onEnd
   }
@@ -41,7 +46,9 @@ describe("createDragSession", () => {
   test("ignores a second finger while one drags, and takes the next press once it lifts", () => {
     const { drag } = session()
     const first = drag(press("pointerdown"))!
-    expect(drag(press("pointerdown", { pointerId: 2, isPrimary: false }))).toBeUndefined()
+    expect(
+      drag(press("pointerdown", { pointerId: 2, isPrimary: false }))
+    ).toBeUndefined()
     document.dispatchEvent(press("pointerup"))
     expect(first).toHaveBeenCalledWith(expect.anything(), false)
     expect(drag(press("pointerdown", { pointerId: 3 }))).toBeDefined()
@@ -49,7 +56,9 @@ describe("createDragSession", () => {
 
   test("ignores a press with another button", () => {
     const { drag } = session()
-    expect(drag(press("pointerdown", { pointerType: "mouse", button: 2 }))).toBeUndefined()
+    expect(
+      drag(press("pointerdown", { pointerType: "mouse", button: 2 }))
+    ).toBeUndefined()
   })
 
   test("ends a drag as canceled when its component goes away", () => {
@@ -72,14 +81,20 @@ describe("createDragSession", () => {
   test("a drag that refuses to start leaves the way clear for the next press", () => {
     const { drag } = session()
     drag(press("pointerdown", { pointerType: "mouse" }), () => false)
-    document.dispatchEvent(press("pointermove", { pointerType: "mouse", clientX: 20 }))
-    expect(drag(press("pointerdown", { pointerType: "mouse", pointerId: 2 }))).toBeDefined()
+    document.dispatchEvent(
+      press("pointermove", { pointerType: "mouse", clientX: 20 })
+    )
+    expect(
+      drag(press("pointerdown", { pointerType: "mouse", pointerId: 2 }))
+    ).toBeDefined()
   })
 
   test("a new press of the same kind ends a drag that missed its release", () => {
     const { drag } = session()
     const stale = drag(press("pointerdown", { pointerType: "mouse" }))!
-    const next = drag(press("pointerdown", { pointerType: "mouse", pointerId: 2 }))
+    const next = drag(
+      press("pointerdown", { pointerType: "mouse", pointerId: 2 })
+    )
     expect(stale).toHaveBeenCalledWith(expect.anything(), true)
     expect(next).toBeDefined()
   })
@@ -90,7 +105,12 @@ describe("createDragSession", () => {
     const onEnd = vi.fn()
     const down = press("pointerdown")
     drags.accepts(down)
-    drags.startOnMove(el, down, { pick: () => undefined, onTap, onMove: () => {}, onEnd })
+    drags.startOnMove(el, down, {
+      pick: () => undefined,
+      onTap,
+      onMove: () => {},
+      onEnd,
+    })
     document.dispatchEvent(press("pointermove", { clientX: 4 }))
     document.dispatchEvent(press("pointerup"))
     expect(onTap).toHaveBeenCalledTimes(1)
@@ -104,7 +124,9 @@ describe("createDragSession", () => {
     const down = press("pointerdown")
     drags.accepts(down)
     drags.startOnMove(el, down, { pick: () => false, onMove: () => {}, onEnd })
-    expect(drags.accepts(press("pointerdown", { pointerId: 2, isPrimary: false }))).toBe(false)
+    expect(
+      drags.accepts(press("pointerdown", { pointerId: 2, isPrimary: false }))
+    ).toBe(false)
     document.dispatchEvent(press("pointermove", { clientY: 20 }))
     expect(onEnd).not.toHaveBeenCalled()
     expect(drags.accepts(press("pointerdown", { pointerId: 2 }))).toBe(true)
@@ -117,9 +139,11 @@ test("a held stepper stops stepping once its number input leaves the page", () =
     const input = mount(
       numberInput,
       { defaultValue: 0 },
-      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`,
+      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`
     )
-    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
+    input
+      .part("increment")!
+      .dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
     expect(input.state.value).toBe(1)
     input.unmount()
     vi.advanceTimersByTime(2000)
@@ -135,16 +159,19 @@ function mountSlider(options: object) {
   const mounted = mount(
     slider,
     { defaultValue: 0, ...options },
-    `<root><control><track></track></control></root>`,
+    `<root><control><track></track></control></root>`
   )
-  mounted.part("track")!.getBoundingClientRect = () => new DOMRect(0, 0, 100, 10)
+  mounted.part("track")!.getBoundingClientRect = () =>
+    new DOMRect(0, 0, 100, 10)
   return mounted
 }
 
 test("a slider that leaves the page mid-drag commits nothing", async () => {
   const onValueCommit = vi.fn()
   const mounted = mountSlider({ onValueCommit })
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
   document.dispatchEvent(press("pointermove", { clientX: 60, clientY: 5 }))
   await frame()
   expect(mounted.state.value).toBe(60)
@@ -156,12 +183,20 @@ test("a new press on a slider ends a drag that missed its release, and takes ove
   const onValueCommit = vi.fn()
   const mounted = mountSlider({ onValueCommit })
   destroy.push(mounted.unmount)
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
   expect(mounted.state.value).toBe(10)
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(
+      press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 })
+    )
   expect(mounted.state.value).toBe(80)
   expect(onValueCommit).toHaveBeenCalledTimes(1)
-  document.dispatchEvent(press("pointerup", { pointerId: 2, clientX: 80, clientY: 5 }))
+  document.dispatchEvent(
+    press("pointerup", { pointerId: 2, clientX: 80, clientY: 5 })
+  )
   expect(onValueCommit).toHaveBeenCalledTimes(2)
 })
 
@@ -172,9 +207,11 @@ test("a held stepper commits nothing when its number input leaves the page", () 
     const input = mount(
       numberInput,
       { defaultValue: 0, onValueCommit },
-      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`,
+      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`
     )
-    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
+    input
+      .part("increment")!
+      .dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
     expect(input.state.value).toBe(1)
     input.unmount()
     expect(onValueCommit).not.toHaveBeenCalled()
@@ -201,7 +238,10 @@ test("an area that leaves the page mid-drag commits nothing", async () => {
   const instance = board({ id: "b" })
   const el = document.body.appendChild(document.createElement("div"))
   el.getBoundingClientRect = () => new DOMRect(0, 0, 100, 100)
-  instance.api.area.pointerdown(press("pointerdown", { clientX: 10, clientY: 10, cancelable: true }), el)
+  instance.api.area.pointerdown(
+    press("pointerdown", { clientX: 10, clientY: 10, cancelable: true }),
+    el
+  )
   document.dispatchEvent(press("pointermove", { clientX: 60, clientY: 60 }))
   await frame()
   expect(instance.get().value.x).toBeCloseTo(0.6)
@@ -213,7 +253,9 @@ test("a slider made read-only mid-drag stops following the pointer, and commits 
   const onValueCommit = vi.fn()
   const mounted = mountSlider({ onValueCommit })
   destroy.push(mounted.unmount)
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
   document.dispatchEvent(press("pointermove", { clientX: 40, clientY: 5 }))
   await frame()
   rerenderOf(mounted).setOptions({ readOnly: true })
@@ -231,7 +273,10 @@ test("an area disabled mid-drag stops following the pointer, and commits where i
   const board = definePrimitive({
     name: "board",
     options: { disabled: "boolean" },
-    state: (options: { disabled?: boolean }) => ({ value: { x: 0, y: 0 }, disabled: !!options.disabled }),
+    state: (options: { disabled?: boolean }) => ({
+      value: { x: 0, y: 0 },
+      disabled: !!options.disabled,
+    }),
     sync: (options) => ({ disabled: !!options.disabled }),
     api: (context) => ({
       area: createArea(context, {
@@ -247,7 +292,10 @@ test("an area disabled mid-drag stops following the pointer, and commits where i
   destroy.push(instance.destroy)
   const el = document.body.appendChild(document.createElement("div"))
   el.getBoundingClientRect = () => new DOMRect(0, 0, 100, 100)
-  instance.api.area.pointerdown(press("pointerdown", { clientX: 10, clientY: 10, cancelable: true }), el)
+  instance.api.area.pointerdown(
+    press("pointerdown", { clientX: 10, clientY: 10, cancelable: true }),
+    el
+  )
   document.dispatchEvent(press("pointermove", { clientX: 60, clientY: 60 }))
   await frame()
   instance.setOptions({ id: "b", disabled: true })
@@ -262,11 +310,25 @@ test("an area disabled mid-drag stops following the pointer, and commits where i
 test("a second finger on a slider mid-drag leaves the value to the first", async () => {
   const mounted = mountSlider({})
   destroy.push(mounted.unmount)
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
   mounted
     .part("control")!
-    .dispatchEvent(press("pointerdown", { pointerId: 2, isPrimary: false, clientX: 80, clientY: 5 }))
-  document.dispatchEvent(press("pointermove", { pointerId: 2, isPrimary: false, clientX: 90, clientY: 5 }))
+    .dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted.part("control")!.dispatchEvent(
+    press("pointerdown", {
+      pointerId: 2,
+      isPrimary: false,
+      clientX: 80,
+      clientY: 5,
+    })
+  )
+  document.dispatchEvent(
+    press("pointermove", {
+      pointerId: 2,
+      isPrimary: false,
+      clientX: 90,
+      clientY: 5,
+    })
+  )
   await frame()
   expect(mounted.state.value).toBe(10)
 })
@@ -278,9 +340,11 @@ test("a held stepper that leaves the page stops for good, and its release commit
     const input = mount(
       numberInput,
       { defaultValue: 0, onValueCommit },
-      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`,
+      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`
     )
-    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
+    input
+      .part("increment")!
+      .dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
     vi.advanceTimersByTime(1000)
     const held = input.state.value
     const removed = vi.spyOn(document, "removeEventListener")
@@ -302,8 +366,14 @@ test("a touch press while a mouse drags a slider leaves the drag to the mouse", 
   destroy.push(mounted.unmount)
   mounted
     .part("control")!
-    .dispatchEvent(press("pointerdown", { pointerType: "mouse", clientX: 10, clientY: 5 }))
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 }))
+    .dispatchEvent(
+      press("pointerdown", { pointerType: "mouse", clientX: 10, clientY: 5 })
+    )
+  mounted
+    .part("control")!
+    .dispatchEvent(
+      press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 })
+    )
   expect(mounted.state.value).toBe(10)
 })
 
@@ -327,8 +397,12 @@ function scrollbar() {
     readDirection() {},
   }
   const unbind = createScrollbarInput(host).bindThumb(thumb, "y")
-  thumb.dispatchEvent(press("pointerdown", { pointerType: "mouse", clientY: 10 }))
-  document.dispatchEvent(press("pointermove", { pointerType: "mouse", clientY: 50 }))
+  thumb.dispatchEvent(
+    press("pointerdown", { pointerType: "mouse", clientY: 10 })
+  )
+  document.dispatchEvent(
+    press("pointermove", { pointerType: "mouse", clientY: 50 })
+  )
   return { metrics, unbind, thumb }
 }
 
@@ -345,7 +419,13 @@ test("Escape mid-drag still puts a scrollbar's content back where the drag began
   const { metrics, unbind } = scrollbar()
   destroy.push(unbind)
   await frame()
-  document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+  document.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "Escape",
+      bubbles: true,
+      cancelable: true,
+    })
+  )
   expect(metrics.y.position).toBe(100)
 })
 
@@ -354,7 +434,9 @@ test("a new press on a scrollbar's thumb after a missed release leaves the conte
   destroy.push(unbind)
   await frame()
   const dragged = metrics.y.position
-  thumb.dispatchEvent(press("pointerdown", { pointerType: "mouse", pointerId: 2, clientY: 50 }))
+  thumb.dispatchEvent(
+    press("pointerdown", { pointerType: "mouse", pointerId: 2, clientY: 50 })
+  )
   expect(metrics.y.position).toBe(dragged)
 })
 
@@ -371,7 +453,9 @@ test("a slider drag the browser cancels still commits where it got to", async ()
   const onValueCommit = vi.fn()
   const mounted = mountSlider({ onValueCommit })
   destroy.push(mounted.unmount)
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
   document.dispatchEvent(press("pointermove", { clientX: 40, clientY: 5 }))
   await frame()
   document.dispatchEvent(press("pointercancel", { clientX: 40, clientY: 5 }))
@@ -380,10 +464,18 @@ test("a slider drag the browser cancels still commits where it got to", async ()
 })
 
 test("a new press on a slider that the old drag's commit disabled, like through a fieldset, changes nothing", () => {
-  const mounted = mountSlider({ onValueCommit: () => mounted.api.internal.setFormDisabled(true) })
+  const mounted = mountSlider({
+    onValueCommit: () => mounted.api.internal.setFormDisabled(true),
+  })
   destroy.push(mounted.unmount)
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
-  mounted.part("control")!.dispatchEvent(press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(press("pointerdown", { clientX: 10, clientY: 5 }))
+  mounted
+    .part("control")!
+    .dispatchEvent(
+      press("pointerdown", { pointerId: 2, clientX: 80, clientY: 5 })
+    )
   expect(mounted.state.value).toBe(10)
 })
 
@@ -392,13 +484,22 @@ test("a new press on a stepper that the old hold's commit disabled steps nothing
   try {
     const input = mount(
       numberInput,
-      { defaultValue: 0, onValueCommit: () => input.api.internal.setFormDisabled(true) },
-      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`,
+      {
+        defaultValue: 0,
+        onValueCommit: () => input.api.internal.setFormDisabled(true),
+      },
+      `<root><group><control as="input" aria-label="Quantity"></control><increment>More</increment></group></root>`
     )
     destroy.push(input.unmount)
-    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
+    input
+      .part("increment")!
+      .dispatchEvent(press("pointerdown", { pointerType: "mouse" }))
     expect(input.state.value).toBe(1)
-    input.part("increment")!.dispatchEvent(press("pointerdown", { pointerType: "mouse", pointerId: 2 }))
+    input
+      .part("increment")!
+      .dispatchEvent(
+        press("pointerdown", { pointerType: "mouse", pointerId: 2 })
+      )
     expect(input.state.value).toBe(1)
   } finally {
     vi.useRealTimers()
@@ -418,8 +519,14 @@ test("a swipe startOnMove picks swallows the click its release sends, like any d
     onMove: () => {},
     onEnd: () => {},
   })
-  document.dispatchEvent(press("pointermove", { pointerType: "mouse", clientX: 10 }))
-  document.dispatchEvent(press("pointerup", { pointerType: "mouse", clientX: 11 }))
-  button.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }))
+  document.dispatchEvent(
+    press("pointermove", { pointerType: "mouse", clientX: 10 })
+  )
+  document.dispatchEvent(
+    press("pointerup", { pointerType: "mouse", clientX: 11 })
+  )
+  button.dispatchEvent(
+    new MouseEvent("click", { bubbles: true, cancelable: true })
+  )
   expect(clicked).not.toHaveBeenCalled()
 })

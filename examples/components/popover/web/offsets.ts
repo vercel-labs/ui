@@ -3,9 +3,24 @@ import "@ui-sdk/web/select"
 import { Check, ChevronDown, createElement } from "lucide"
 
 const choices = [
-  { attribute: "side-offset", label: "Side offset", value: "8", values: ["4", "8", "16", "24"] },
-  { attribute: "align-offset", label: "Align offset", value: "0", values: ["-16", "0", "16"] },
-  { attribute: "collision-padding", label: "Collision padding", value: "8", values: ["8", "24", "48"] },
+  {
+    attribute: "side-offset",
+    label: "Side offset",
+    value: "8",
+    values: ["4", "8", "16", "24"],
+  },
+  {
+    attribute: "align-offset",
+    label: "Align offset",
+    value: "0",
+    values: ["-16", "0", "16"],
+  },
+  {
+    attribute: "collision-padding",
+    label: "Collision padding",
+    value: "8",
+    values: ["8", "24", "48"],
+  },
 ]
 
 const check = createElement(Check, { "aria-hidden": "true" }).outerHTML
@@ -34,12 +49,12 @@ function mount(root: HTMLElement) {
                           ${value}px
                           <ui-select-item-indicator>${check}</ui-select-item-indicator>
                         </ui-select-item>
-                      `,
+                      `
                     )
                     .join("")}
                 </ui-select-content>
               </ui-select>
-            `,
+            `
           )
           .join("")}
       </div>
@@ -55,11 +70,14 @@ function mount(root: HTMLElement) {
     </div>
   `
   const content = root.querySelector("ui-popover-content")!
-  for (const control of root.querySelectorAll("ui-select"))
+  for (const control of root.querySelectorAll("ui-select")) {
     control.addEventListener("valuechange", (event) => {
       const value = event.detail.value
-      if (typeof value === "string") content.setAttribute(control.dataset.attribute!, value)
+      if (typeof value === "string") {
+        content.setAttribute(control.dataset.attribute!, value)
+      }
     })
+  }
 }
 
 export { mount }

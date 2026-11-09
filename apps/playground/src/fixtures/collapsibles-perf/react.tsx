@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import { createRoot } from "react-dom/client"
 import { mountWhenAsked, perfSize } from "tests/fixtures/perf.ts"
 
@@ -9,12 +13,20 @@ const found = new URLSearchParams(location.search).has("found")
 
 function Fixture() {
   return (
-    <div className="fixture" style={{ flexDirection: "column", alignItems: "start" }}>
+    <div
+      className="fixture"
+      style={{ flexDirection: "column", alignItems: "start" }}
+    >
       <button>Before</button>
       {items.map((index) => (
         <Collapsible key={index} className="collapsible-row">
-          <CollapsibleTrigger className="collapsible-trigger">Folder {index + 1}</CollapsibleTrigger>
-          <CollapsiblePanel className="collapsible-panel" hiddenUntilFound={found}>
+          <CollapsibleTrigger className="collapsible-trigger">
+            Folder {index + 1}
+          </CollapsibleTrigger>
+          <CollapsiblePanel
+            className="collapsible-panel"
+            hiddenUntilFound={found}
+          >
             Files {index + 1}
           </CollapsiblePanel>
         </Collapsible>

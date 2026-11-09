@@ -19,7 +19,11 @@ const people = [
 
 function Example() {
   return (
-    <TriggerMenu triggers={[{ char: "@", items: people }]} autoHighlight={false} loop={false}>
+    <TriggerMenu
+      triggers={[{ char: "@", items: people }]}
+      autoHighlight={false}
+      loop={false}
+    >
       <Field>
         <FieldLabel>Task</FieldLabel>
         <FieldControl

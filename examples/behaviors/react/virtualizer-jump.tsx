@@ -1,15 +1,30 @@
 import * as React from "react"
-import { createVirtualizer, css, definePrimitive, type VirtualItem } from "@ui-sdk/core"
+import {
+  createVirtualizer,
+  css,
+  definePrimitive,
+  type VirtualItem,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type ContactsState = { count: number; focused: number | null; items: VirtualItem[]; size: number }
+type ContactsState = {
+  count: number
+  focused: number | null
+  items: VirtualItem[]
+  size: number
+}
 
 const rowHeight = 32
 const headerHeight = 32
 
 const contacts = definePrimitive({
   name: "contacts",
-  state: (): ContactsState => ({ count: 100, focused: null, items: [], size: 0 }),
+  state: (): ContactsState => ({
+    count: 100,
+    focused: null,
+    items: [],
+    size: 0,
+  }),
   api: (context) => {
     const { store } = context
     const virtual = createVirtualizer({
@@ -29,16 +44,25 @@ const contacts = definePrimitive({
       },
       endThreshold: 5,
     })
-    context.onDestroy(virtual.subscribe(() => store.set({ items: virtual.items(), size: virtual.size() })))
+    context.onDestroy(
+      virtual.subscribe(() =>
+        store.set({ items: virtual.items(), size: virtual.size() })
+      )
+    )
     return {
       virtual,
       focus: (index: number) => store.set({ focused: index }),
       act(action: string) {
         const { count } = store.get()
-        if (action === "first") virtual.scrollToIndex(0, { align: "start" })
-        else if (action === "middle") virtual.scrollToIndex(49, { align: "center" })
-        else if (action === "last") virtual.scrollToIndex(count - 1, { align: "end" })
-        else if (action === "eighty") virtual.scrollToIndex(79)
+        if (action === "first") {
+          virtual.scrollToIndex(0, { align: "start" })
+        } else if (action === "middle") {
+          virtual.scrollToIndex(49, { align: "center" })
+        } else if (action === "last") {
+          virtual.scrollToIndex(count - 1, { align: "end" })
+        } else if (action === "eighty") {
+          virtual.scrollToIndex(79)
+        }
       },
     }
   },
@@ -51,7 +75,10 @@ const contacts = definePrimitive({
       bind: (el, { api }) => api.virtual.connect(el),
     }),
     body: slot({
-      attrs: (state) => ({ role: "list", style: css({ position: "relative", height: `${state.size}px` }) }),
+      attrs: (state) => ({
+        role: "list",
+        style: css({ position: "relative", height: `${state.size}px` }),
+      }),
     }),
     row: slot<{ value: string; index: number; start: number }>({
       props: { value: "string", index: "number", start: "number" },
@@ -120,7 +147,12 @@ function Example() {
             <div data-slot="virtualizer-header">{count} contacts</div>
             <ContactsBody aria-label="Contacts">
               {items.map((item) => (
-                <ContactsRow key={item.key} value={item.key} index={item.index} start={item.start}>
+                <ContactsRow
+                  key={item.key}
+                  value={item.key}
+                  index={item.index}
+                  start={item.start}
+                >
                   {names[item.index % names.length]} {item.index + 1}
                 </ContactsRow>
               ))}

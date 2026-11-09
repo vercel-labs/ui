@@ -152,8 +152,12 @@ describe("month grids", () => {
   })
 
   test("weeks start on the locale's day", () => {
-    expect(monthGrid("2026-10-01", { weekStartsOn: 1 })[0]![0]).toBe("2026-09-28")
-    expect(monthGrid("2026-11-01", { weekStartsOn: 1 })[0]![0]).toBe("2026-10-26")
+    expect(monthGrid("2026-10-01", { weekStartsOn: 1 })[0]![0]).toBe(
+      "2026-09-28"
+    )
+    expect(monthGrid("2026-11-01", { weekStartsOn: 1 })[0]![0]).toBe(
+      "2026-10-26"
+    )
   })
 
   test("without fixed weeks, a grid has only the weeks the month touches", () => {
@@ -180,8 +184,11 @@ describe("first day of the week", () => {
   test("engines without week info fall back to CLDR's regions", () => {
     const original = Object.getOwnPropertyDescriptors(Intl.Locale.prototype)
     // Firefox before 153 has neither getWeekInfo nor weekInfo.
-    for (const key of ["getWeekInfo", "weekInfo"])
-      if (key in Intl.Locale.prototype) Reflect.deleteProperty(Intl.Locale.prototype, key)
+    for (const key of ["getWeekInfo", "weekInfo"]) {
+      if (key in Intl.Locale.prototype) {
+        Reflect.deleteProperty(Intl.Locale.prototype, key)
+      }
+    }
     try {
       expect(firstDayOfWeek("en-CA")).toBe(0)
       expect(firstDayOfWeek("fr-FR")).toBe(1)
@@ -210,18 +217,36 @@ describe("names and labels", () => {
   })
 
   test("a locale on another calendar labels the Gregorian grid it shows", () => {
-    expect(formatDate("2026-10-16", "fa-IR", { month: "numeric", numberingSystem: "latn" })).toBe("10")
-    expect(formatDate("2026-10-16", "th-TH", { year: "numeric", numberingSystem: "latn" })).toContain("2569")
+    expect(
+      formatDate("2026-10-16", "fa-IR", {
+        month: "numeric",
+        numberingSystem: "latn",
+      })
+    ).toBe("10")
+    expect(
+      formatDate("2026-10-16", "th-TH", {
+        year: "numeric",
+        numberingSystem: "latn",
+      })
+    ).toContain("2569")
   })
 
   test("ranges read as one phrase, with the same spaces on every ICU", () => {
-    expect(formatDateRange("2026-10-16", "2026-10-20", "en-US")).toBe("Oct 16 – 20, 2026")
-    expect(formatDateRange("2026-10-01", "2026-11-01", "en-US", { month: "long", year: "numeric" })).toBe(
-      "October – November 2026",
+    expect(formatDateRange("2026-10-16", "2026-10-20", "en-US")).toBe(
+      "Oct 16 – 20, 2026"
     )
-    expect(formatDateRange("2026-10-01", "2026-11-01", "ru-RU", { month: "long", year: "numeric" })).toBe(
-      "октябрь 2026 г. – ноябрь 2026 г.",
-    )
+    expect(
+      formatDateRange("2026-10-01", "2026-11-01", "en-US", {
+        month: "long",
+        year: "numeric",
+      })
+    ).toBe("October – November 2026")
+    expect(
+      formatDateRange("2026-10-01", "2026-11-01", "ru-RU", {
+        month: "long",
+        year: "numeric",
+      })
+    ).toBe("октябрь 2026 г. – ноябрь 2026 г.")
   })
 
   test("month names stand alone, as a heading or a select shows them", () => {
@@ -231,9 +256,25 @@ describe("names and labels", () => {
   })
 
   test("weekday names start on the day asked for", () => {
-    expect(weekdayNames("en-US")).toEqual(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+    expect(weekdayNames("en-US")).toEqual([
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+      "Sat",
+    ])
     expect(weekdayNames("en-US", "long", 1)[0]).toBe("Monday")
-    expect(weekdayNames("en-US", "narrow", 6)).toEqual(["S", "S", "M", "T", "W", "T", "F"])
+    expect(weekdayNames("en-US", "narrow", 6)).toEqual([
+      "S",
+      "S",
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+    ])
   })
 
   test("today is the date in the time zone asked for", () => {
@@ -247,9 +288,18 @@ describe("names and labels", () => {
 
 describe("typing a date", () => {
   test("each locale's numeric order and separator", () => {
-    expect(datePattern("en-US")).toMatchObject({ fields: ["month", "day", "year"], separator: "/" })
-    expect(datePattern("de")).toMatchObject({ fields: ["day", "month", "year"], separator: "." })
-    expect(datePattern("ja")).toMatchObject({ fields: ["year", "month", "day"], separator: "/" })
+    expect(datePattern("en-US")).toMatchObject({
+      fields: ["month", "day", "year"],
+      separator: "/",
+    })
+    expect(datePattern("de")).toMatchObject({
+      fields: ["day", "month", "year"],
+      separator: ".",
+    })
+    expect(datePattern("ja")).toMatchObject({
+      fields: ["year", "month", "day"],
+      separator: "/",
+    })
   })
 
   test("placeholders use the locale's own letters where its script has capitals", () => {
@@ -280,18 +330,30 @@ describe("typing a date", () => {
   test("reads digits alone, as a phone's number pad types them", () => {
     expect(parseDate("10162026", "en-US")).toBe("2026-10-16")
     expect(parseDate("16102026", "de")).toBe("2026-10-16")
-    expect(parseDate("161026", "de", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
+    expect(parseDate("161026", "de", { referenceDate: "2026-01-01" })).toBe(
+      "2026-10-16"
+    )
   })
 
   test("two-digit years land near the reference year", () => {
-    expect(parseDate("10/16/26", "en-US", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
-    expect(parseDate("3/4/70", "en-US", { referenceDate: "2026-01-01" })).toBe("1970-03-04")
-    expect(parseDate("3/4/46", "en-US", { referenceDate: "2026-01-01" })).toBe("2046-03-04")
+    expect(
+      parseDate("10/16/26", "en-US", { referenceDate: "2026-01-01" })
+    ).toBe("2026-10-16")
+    expect(parseDate("3/4/70", "en-US", { referenceDate: "2026-01-01" })).toBe(
+      "1970-03-04"
+    )
+    expect(parseDate("3/4/46", "en-US", { referenceDate: "2026-01-01" })).toBe(
+      "2046-03-04"
+    )
   })
 
   test("a missing year is the reference year", () => {
-    expect(parseDate("10/16", "en-US", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
-    expect(parseDate("16.10.", "de", { referenceDate: "2027-05-01" })).toBe("2027-10-16")
+    expect(parseDate("10/16", "en-US", { referenceDate: "2026-01-01" })).toBe(
+      "2026-10-16"
+    )
+    expect(parseDate("16.10.", "de", { referenceDate: "2027-05-01" })).toBe(
+      "2027-10-16"
+    )
   })
 
   test("reads month names, short or long, in the locale", () => {
@@ -300,7 +362,9 @@ describe("typing a date", () => {
     expect(parseDate("16 oct. 2026", "fr")).toBe("2026-10-16")
     expect(parseDate("16 января 2026", "ru")).toBe("2026-01-16")
     expect(parseDate("16 de octubre de 2026", "es")).toBe("2026-10-16")
-    expect(parseDate("octo 16", "en-US", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
+    expect(parseDate("octo 16", "en-US", { referenceDate: "2026-01-01" })).toBe(
+      "2026-10-16"
+    )
   })
 
   test("reads a pasted label with its weekday", () => {
@@ -313,11 +377,19 @@ describe("typing a date", () => {
   })
 
   test("reads years in the calendar the locale writes them in", () => {
-    const shown = formatDate("2026-10-16", "th-TH", { year: "numeric", month: "2-digit", day: "2-digit" })
+    const shown = formatDate("2026-10-16", "th-TH", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
     expect(parseDate(shown, "th-TH")).toBe("2026-10-16")
     expect(parseDate("16/10/2569", "th-TH")).toBe("2026-10-16")
-    expect(parseDate("16/10/69", "th-TH", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
-    expect(parseDate("16/10", "th-TH", { referenceDate: "2026-01-01" })).toBe("2026-10-16")
+    expect(
+      parseDate("16/10/69", "th-TH", { referenceDate: "2026-01-01" })
+    ).toBe("2026-10-16")
+    expect(parseDate("16/10", "th-TH", { referenceDate: "2026-01-01" })).toBe(
+      "2026-10-16"
+    )
     expect(parseDate("10/16/2569", "en-US-u-ca-buddhist")).toBe("2026-10-16")
     expect(parseDate("115/10/16", "zh-TW-u-ca-roc")).toBe("2026-10-16")
     expect(parseDate("2026/10/16", "ja-JP-u-ca-japanese")).toBe("2026-10-16")

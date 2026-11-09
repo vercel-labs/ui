@@ -1,11 +1,18 @@
-import type { DrawerKeyframes, DrawerOptions, SnapPoint } from "@ui-sdk/core/drawer"
+import type {
+  DrawerKeyframes,
+  DrawerOptions,
+  SnapPoint,
+} from "@ui-sdk/core/drawer"
 
 // The async Close action variants run: a second's wait that fails every other time.
 let tries = 0
 function flakyAction() {
   tries++
   return new Promise<void>((resolve, reject) =>
-    setTimeout(() => (tries % 2 ? reject(new Error("Network error")) : resolve()), 1000),
+    setTimeout(
+      () => (tries % 2 ? reject(new Error("Network error")) : resolve()),
+      1000
+    )
   )
 }
 
@@ -283,7 +290,12 @@ const variants: Variant[] = [
     body: "scroll",
     size: "full",
   },
-  { id: "keep-mounted", section: "Behavior", title: "keepMounted", content: { keepMounted: true } },
+  {
+    id: "keep-mounted",
+    section: "Behavior",
+    title: "keepMounted",
+    content: { keepMounted: true },
+  },
 
   {
     id: "scroll",
@@ -307,7 +319,13 @@ const variants: Variant[] = [
     body: "tall",
     size: "unbounded",
   },
-  { id: "short", section: "Content", title: "Very short", note: "One line.", body: "short" },
+  {
+    id: "short",
+    section: "Content",
+    title: "Very short",
+    note: "One line.",
+    body: "short",
+  },
   {
     id: "action",
     section: "Content",
@@ -333,7 +351,12 @@ const variants: Variant[] = [
     nested: 1,
   },
 
-  { id: "driver-pointer", section: "Drivers", title: 'driver "pointer"', options: { driver: "pointer" } },
+  {
+    id: "driver-pointer",
+    section: "Drivers",
+    title: 'driver "pointer"',
+    options: { driver: "pointer" },
+  },
   {
     id: "driver-scroll-snap",
     section: "Drivers",
@@ -396,7 +419,10 @@ const variants: Variant[] = [
     section: "Effects",
     title: "A soft spring",
     note: "Overshoots when it settles.",
-    options: { physics: { response: 0.6, dampingRatio: 0.7 }, snapPoints: fractions },
+    options: {
+      physics: { response: 0.6, dampingRatio: 0.7 },
+      snapPoints: fractions,
+    },
     size: "full",
   },
   {
@@ -404,7 +430,10 @@ const variants: Variant[] = [
     section: "Effects",
     title: "No skipping",
     note: "A fast fling stops at the next snap point.",
-    options: { physics: { skipSnapPoints: false }, snapPoints: [0.25, 0.5, 0.75, 1] },
+    options: {
+      physics: { skipSnapPoints: false },
+      snapPoints: [0.25, 0.5, 0.75, 1],
+    },
     size: "full",
   },
 
@@ -415,7 +444,12 @@ const variants: Variant[] = [
     note: "Renders into a container outside the card.",
     portal: true,
   },
-  { id: "transform", section: "Containers", title: "Inside a transform", place: "transform" },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Inside a transform",
+    place: "transform",
+  },
   {
     id: "transform-snaps",
     section: "Containers",

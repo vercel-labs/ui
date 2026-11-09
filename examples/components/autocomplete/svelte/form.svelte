@@ -7,7 +7,12 @@
     AutocompleteItem,
     AutocompleteList,
   } from "@ui-sdk/svelte/autocomplete"
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
   import { useLog } from "../../../shared/svelte/log"
 
   const fruits = [
@@ -33,7 +38,7 @@
   function submit(event: SubmitEvent) {
     event.preventDefault()
     const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-      ([name, value]) => `${name}=${value}`,
+      ([name, value]) => `${name}=${value}`
     )
     log(`Submitted ${data.join("&")}`)
   }
@@ -59,11 +64,7 @@
     <div><FieldError /></div>
   </Field>
   <div data-slot="row">
-    <button type="submit" data-variant="solid">
-      Submit
-    </button>
-    <button type="reset">
-      Reset
-    </button>
+    <button type="submit" data-variant="solid"> Submit </button>
+    <button type="reset"> Reset </button>
   </div>
 </form>

@@ -19,7 +19,10 @@ test.describe("focus @enhancement", () => {
     await open("carousel")
   })
 
-  test("Next keeps focus when it reaches the last slide @enhancement", async ({ page, tab }) => {
+  test("Next keeps focus when it reaches the last slide @enhancement", async ({
+    page,
+    tab,
+  }) => {
     await nextButton(page).focus()
     for (let index = 1; index < carouselFixture.slides.length; index++) {
       await page.keyboard.press("Enter")
@@ -31,7 +34,10 @@ test.describe("focus @enhancement", () => {
     await expect(previousButton(page)).toBeFocused()
   })
 
-  test("Tab reaches only the slides in view @enhancement", async ({ page, tab }) => {
+  test("Tab reaches only the slides in view @enhancement", async ({
+    page,
+    tab,
+  }) => {
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
     await expect(slideLink(page, 0)).toBeFocused()
@@ -44,14 +50,20 @@ test.describe("focus @enhancement", () => {
     await expect(slideLink(page, 1)).toBeFocused()
   })
 
-  test("slides out of view are hidden from assistive technology @enhancement", async ({ page }) => {
+  test("slides out of view are hidden from assistive technology @enhancement", async ({
+    page,
+  }) => {
     await expect(page.getByRole("link")).toHaveCount(1)
-    await expect(page.getByRole("link", { name: carouselFixture.slides[0].link })).toBeVisible()
+    await expect(
+      page.getByRole("link", { name: carouselFixture.slides[0].link })
+    ).toBeVisible()
     await expect(page.getByRole("group", { name: "1 of 5" })).toBeVisible()
     await expect(page.getByRole("group", { name: "2 of 5" })).toHaveCount(0)
   })
 
-  test("arrow keys bring the next slide in and move focus to it @enhancement", async ({ page }) => {
+  test("arrow keys bring the next slide in and move focus to it @enhancement", async ({
+    page,
+  }) => {
     await slideLink(page, 0).focus()
     await page.keyboard.press("ArrowRight")
     await expectShown(page, 1)
@@ -61,7 +73,9 @@ test.describe("focus @enhancement", () => {
     await expect(page.getByRole("group", { name: "3 of 5" })).toBeFocused()
   })
 
-  test("a text field in a slide keeps its arrow keys @enhancement", async ({ page }) => {
+  test("a text field in a slide keeps its arrow keys @enhancement", async ({
+    page,
+  }) => {
     // Next rather than an indicator, which some carousels don't have.
     await nextButton(page).click()
     await nextButton(page).click()
@@ -82,7 +96,9 @@ test.describe("focus @enhancement", () => {
     await expect(field).toBeFocused()
   })
 
-  test("Home and End go to the first and last slide @enhancement", async ({ page }) => {
+  test("Home and End go to the first and last slide @enhancement", async ({
+    page,
+  }) => {
     await slideLink(page, 0).focus()
     await page.keyboard.press("End")
     await expectShown(page, 4)
@@ -92,7 +108,10 @@ test.describe("focus @enhancement", () => {
 })
 
 test.describe("orientation @enhancement", () => {
-  test("a vertical carousel pages with ArrowDown and ArrowUp @enhancement", async ({ page, open }) => {
+  test("a vertical carousel pages with ArrowDown and ArrowUp @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { orientation: "vertical" })
     await slideLink(page, 0).focus()
     await page.keyboard.press("ArrowDown")
@@ -110,22 +129,31 @@ test.describe("indicators @enhancement", () => {
     await open("carousel")
   })
 
-  test("indicators are a tablist with the current page selected @enhancement", async ({ page }) => {
-    await expect(page.getByRole("tablist", { name: carouselFixture.indicators })).toBeVisible()
+  test("indicators are a tablist with the current page selected @enhancement", async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole("tablist", { name: carouselFixture.indicators })
+    ).toBeVisible()
     await expect(indicator(page, 1)).toHaveAttribute("aria-selected", "true")
     await nextButton(page).click()
     await expect(indicator(page, 2)).toHaveAttribute("aria-selected", "true")
     await expect(indicator(page, 1)).toHaveAttribute("aria-selected", "false")
   })
 
-  test("pressing an indicator shows its page @enhancement", async ({ page }) => {
+  test("pressing an indicator shows its page @enhancement", async ({
+    page,
+  }) => {
     await indicator(page, 4).click()
     await expectShown(page, 3)
     expect(await lastAction(page)).toBe("4")
     expect(await lastReason(page)).toBe("item-press")
   })
 
-  test("arrow keys move between indicators and show their page @enhancement", async ({ page, tab }) => {
+  test("arrow keys move between indicators and show their page @enhancement", async ({
+    page,
+    tab,
+  }) => {
     await nextButton(page).focus()
     await tab()
     await expect(indicator(page, 1)).toBeFocused()
@@ -141,7 +169,10 @@ test.describe("indicators @enhancement", () => {
     await expectShown(page, 0)
   })
 
-  test("the indicators are one tab stop, on the current page @enhancement", async ({ page, tab }) => {
+  test("the indicators are one tab stop, on the current page @enhancement", async ({
+    page,
+    tab,
+  }) => {
     await indicator(page, 3).click()
     await expectShown(page, 2)
     await nextButton(page).focus()
@@ -151,13 +182,20 @@ test.describe("indicators @enhancement", () => {
     await expect(page.getByRole("button", { name: "After" })).toBeFocused()
   })
 
-  test("an indicator controls the slides of its page @enhancement", async ({ page }) => {
+  test("an indicator controls the slides of its page @enhancement", async ({
+    page,
+  }) => {
     const controls = await indicator(page, 2).getAttribute("aria-controls")
-    const slide = slideLink(page, 1).locator("xpath=ancestor::*[@role='group'][1]")
+    const slide = slideLink(page, 1).locator(
+      "xpath=ancestor::*[@role='group'][1]"
+    )
     expect(controls).toBe(await slide.getAttribute("id"))
   })
 
-  test("indicators past the page count hide themselves @enhancement", async ({ page, open }) => {
+  test("indicators past the page count hide themselves @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { "per-view": "3" })
     await expect(page.getByRole("tab")).toHaveCount(3)
     await expect(indicator(page, 4)).toHaveCount(0)
@@ -200,7 +238,10 @@ test.describe("changes @enhancement", () => {
     expect(await lastReason(page)).toBe("imperative")
   })
 
-  test("a horizontal wheel scrolls to the next slide @enhancement", async ({ page, open }) => {
+  test("a horizontal wheel scrolls to the next slide @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel")
     const box = await slideLink(page, 0).boundingBox()
     await page.mouse.move(box!.x, box!.y)
@@ -231,7 +272,9 @@ test.describe("changes @enhancement", () => {
     await open("carousel")
     const region = page.getByRole("region", { name: carouselFixture.label })
     const progress = () =>
-      region.evaluate((el) => getComputedStyle(el).getPropertyValue("--carousel-progress"))
+      region.evaluate((el) =>
+        getComputedStyle(el).getPropertyValue("--carousel-progress")
+      )
     await expect.poll(progress).toBe("0.0000")
     await nextButton(page).click()
     await expectShown(page, 1)
@@ -247,14 +290,19 @@ test.describe("changes @enhancement", () => {
     await open("carousel", { loop: "" })
     const region = page.getByRole("region", { name: carouselFixture.label })
     const progress = () =>
-      region.evaluate((el) => getComputedStyle(el).getPropertyValue("--carousel-progress"))
+      region.evaluate((el) =>
+        getComputedStyle(el).getPropertyValue("--carousel-progress")
+      )
     await expect.poll(progress).toBe("0.0000")
     await previousButton(page).click()
     await expectShown(page, 4)
     await expect.poll(progress).toBe("0.8000")
   })
 
-  test("Next outside the carousel works through its controller @enhancement", async ({ page, open }) => {
+  test("Next outside the carousel works through its controller @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel")
     await page.getByRole("button", { name: "Next from outside" }).click()
     await expectShown(page, 1)
@@ -263,7 +311,10 @@ test.describe("changes @enhancement", () => {
 })
 
 test.describe("rotation @enhancement", () => {
-  test("it rotates on its own, past the last slide to the first @enhancement", async ({ page, open }) => {
+  test("it rotates on its own, past the last slide to the first @enhancement", async ({
+    page,
+    open,
+  }) => {
     // Long enough for each page to come to rest before the next.
     await open("carousel", { playing: "", interval: "800" })
     // Every page it moves to, numbered from 1, since a page shows for less
@@ -272,17 +323,20 @@ test.describe("rotation @enhancement", () => {
       const output = document.querySelector("output[aria-label='Last action']")!
       const pages: string[] = []
       Object.assign(window, { pages })
-      new MutationObserver(() => pages.push(output.textContent ?? "")).observe(output, {
-        childList: true,
-        characterData: true,
-        subtree: true,
-      })
+      new MutationObserver(() => pages.push(output.textContent ?? "")).observe(
+        output,
+        {
+          childList: true,
+          characterData: true,
+          subtree: true,
+        }
+      )
     })
     const pages = () =>
       page.evaluate(() =>
         (window as unknown as { pages: string[] }).pages
           .filter((value, index, all) => value !== all[index - 1])
-          .join(","),
+          .join(",")
       )
     await expect.poll(pages, { timeout: 15_000 }).toContain("3,4,5,1")
     expect(await lastReason(page)).toBe("timeout")
@@ -322,10 +376,15 @@ test.describe("rotation @enhancement", () => {
     expect(await lastAction(page)).toBe(stoppedAt)
   })
 
-  test("hovering pauses rotation, and leaving resumes it @enhancement", async ({ page, open }) => {
+  test("hovering pauses rotation, and leaving resumes it @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { playing: "", interval: "300" })
     await page.getByRole("region", { name: carouselFixture.label }).hover()
-    await expect(page.getByRole("region", { name: carouselFixture.label })).toHaveAttribute("data-paused", "")
+    await expect(
+      page.getByRole("region", { name: carouselFixture.label })
+    ).toHaveAttribute("data-paused", "")
     const pausedAt = await lastAction(page)
     await page.waitForTimeout(700)
     expect(await lastAction(page)).toBe(pausedAt)
@@ -340,9 +399,14 @@ test.describe("rotation @enhancement", () => {
     await expect(playToggle(page, false)).toBeVisible()
   })
 
-  test("the slides are a live region only while not rotating @enhancement", async ({ page, open }) => {
+  test("the slides are a live region only while not rotating @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { playing: "", interval: "5000" })
-    const content = slideLink(page, 0).locator("xpath=ancestor::*[@aria-live][1]")
+    const content = slideLink(page, 0).locator(
+      "xpath=ancestor::*[@aria-live][1]"
+    )
     await expect(content).toHaveAttribute("aria-live", "off")
     await playToggle(page, true).click()
     await expect(content).toHaveAttribute("aria-live", "polite")
@@ -359,7 +423,10 @@ test.describe("rotation @enhancement", () => {
     expect(await lastAction(page)).toBe("")
   })
 
-  test("reduced motion pages without animating @enhancement", async ({ page, open }) => {
+  test("reduced motion pages without animating @enhancement", async ({
+    page,
+    open,
+  }) => {
     await page.emulateMedia({ reducedMotion: "reduce" })
     await open("carousel")
     await nextButton(page).click()
@@ -371,11 +438,16 @@ test.describe("rotation @enhancement", () => {
 })
 
 test.describe("pages @enhancement", () => {
-  test("indicators follow a change in size @enhancement", async ({ page, open }) => {
+  test("indicators follow a change in size @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { "per-view": "3" })
     await expect(page.getByRole("tab")).toHaveCount(3)
     // A stylesheet, since frameworks write their own inline styles back.
-    await page.addStyleTag({ content: ".carousel-slide { flex-basis: 100% !important }" })
+    await page.addStyleTag({
+      content: ".carousel-slide { flex-basis: 100% !important }",
+    })
     await expect(page.getByRole("tab")).toHaveCount(5)
   })
 })

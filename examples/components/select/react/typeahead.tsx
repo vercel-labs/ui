@@ -40,7 +40,11 @@ function Example() {
         </SelectTrigger>
         <SelectContent>
           {countries.map((country) => (
-            <SelectItem key={country.value} value={country.value} label={country.label}>
+            <SelectItem
+              key={country.value}
+              value={country.value}
+              label={country.label}
+            >
               {country.label}
               <span data-slot="hint">{country.code}</span>
               <SelectItemIndicator>

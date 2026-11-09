@@ -1,6 +1,11 @@
 <script lang="ts">
   import { MinusIcon } from "@lucide/svelte"
-  import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
+  import {
+    OTPInput,
+    OTPInputGroup,
+    OTPInputSeparator,
+    OTPInputSlot,
+  } from "@ui-sdk/svelte/otp-input"
 </script>
 
 <OTPInput maxLength={6} aria-label="Verification code">

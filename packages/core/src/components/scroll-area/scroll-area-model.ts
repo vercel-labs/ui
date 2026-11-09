@@ -34,7 +34,13 @@ const pageFraction = 0.875
  * The axis a scroll area's start and end refer to: the vertical one, or the
  * horizontal one when only that overflows, like a carousel.
  */
-function mainAxis({ overflowX, overflowY }: { overflowX: boolean; overflowY: boolean }) {
+function mainAxis({
+  overflowX,
+  overflowY,
+}: {
+  overflowX: boolean
+  overflowY: boolean
+}) {
   return overflowX && !overflowY ? "x" : "y"
 }
 
@@ -68,19 +74,32 @@ function edgesOf(metrics: AxisMetrics) {
 
 /** The thumb's length and its offset from the start of the track, in pixels. */
 function thumbGeometry(metrics: AxisMetrics, track: number) {
-  if (track <= 0 || metrics.scroll <= 0) return { size: 0, offset: 0 }
-  const size = Math.min(track, Math.max(minThumbSize, (track * metrics.client) / metrics.scroll))
+  if (track <= 0 || metrics.scroll <= 0) {
+    return { size: 0, offset: 0 }
+  }
+  const size = Math.min(
+    track,
+    Math.max(minThumbSize, (track * metrics.client) / metrics.scroll)
+  )
   const max = maxScroll(metrics)
-  const offset = max <= 0 ? 0 : ((track - size) * clampedPosition(metrics)) / max
+  const offset =
+    max <= 0 ? 0 : ((track - size) * clampedPosition(metrics)) / max
   return { size, offset }
 }
 
 /** The scroll position for a thumb dragged `delta` pixels along a track, from where the drag started. */
-function draggedPosition(start: number, delta: number, metrics: AxisMetrics, track: number) {
+function draggedPosition(
+  start: number,
+  delta: number,
+  metrics: AxisMetrics,
+  track: number
+) {
   const { size } = thumbGeometry(metrics, track)
   const travel = track - size
   // A thumb as long as its track can't move, and dividing by zero would jump.
-  if (travel <= 0) return start
+  if (travel <= 0) {
+    return start
+  }
   const max = maxScroll(metrics)
   return Math.min(Math.max(start + (delta / travel) * max, 0), max)
 }
@@ -89,7 +108,9 @@ function draggedPosition(start: number, delta: number, metrics: AxisMetrics, tra
 function positionAt(point: number, metrics: AxisMetrics, track: number) {
   const { size } = thumbGeometry(metrics, track)
   const travel = track - size
-  if (travel <= 0) return 0
+  if (travel <= 0) {
+    return 0
+  }
   const ratio = Math.min(Math.max((point - size / 2) / travel, 0), 1)
   return ratio * maxScroll(metrics)
 }
@@ -100,8 +121,12 @@ function positionAt(point: number, metrics: AxisMetrics, track: number) {
  * the track, from its start.
  */
 function pageDirection(point: number, thumb: { size: number; offset: number }) {
-  if (point < thumb.offset) return -1
-  if (point > thumb.offset + thumb.size) return 1
+  if (point < thumb.offset) {
+    return -1
+  }
+  if (point > thumb.offset + thumb.size) {
+    return 1
+  }
   return 0
 }
 
@@ -115,9 +140,18 @@ function pageLength(client: number) {
  * devices in pages, so a wheel forwarded from a scrollbar scrolls as far as
  * it would over the content.
  */
-function wheelPixels(delta: number, mode: number, lineHeight: number, page: number) {
-  if (mode === 1) return delta * lineHeight
-  if (mode === 2) return delta * page
+function wheelPixels(
+  delta: number,
+  mode: number,
+  lineHeight: number,
+  page: number
+) {
+  if (mode === 1) {
+    return delta * lineHeight
+  }
+  if (mode === 2) {
+    return delta * page
+  }
   return delta
 }
 
@@ -135,9 +169,15 @@ type ScrollbarSignals = {
  * scrolling, and "hover" while the pointer is over the scroll area too.
  */
 function scrollbarShown(type: ScrollAreaType, signals: ScrollbarSignals) {
-  if (type === "always") return true
-  if (!signals.overflow) return false
-  if (type === "auto" || signals.dragging || signals.scrolling) return true
+  if (type === "always") {
+    return true
+  }
+  if (!signals.overflow) {
+    return false
+  }
+  if (type === "auto" || signals.dragging || signals.scrolling) {
+    return true
+  }
   return type === "hover" && signals.hovering
 }
 
@@ -148,9 +188,14 @@ function scrollbarShown(type: ScrollAreaType, signals: ScrollbarSignals) {
  * the end while moving toward it follows again. Content growing or shrinking
  * scrolls nothing toward the start and changes nothing.
  */
-function followsEnd(following: boolean, scroll: { delta: number; after: number }) {
+function followsEnd(
+  following: boolean,
+  scroll: { delta: number; after: number }
+) {
   const atEnd = scroll.after < edgeTolerance
-  if (following) return atEnd || scroll.delta >= 0
+  if (following) {
+    return atEnd || scroll.delta >= 0
+  }
   return atEnd && scroll.delta > 0
 }
 
@@ -160,7 +205,9 @@ const startwardKeys = new Set(["ArrowUp", "PageUp", "Home"])
 
 /** Whether a key pressed in the viewport asks to scroll toward the start, which lets go of the end. */
 function scrollsTowardStart(key: string, shiftKey: boolean, editing: boolean) {
-  if (editing) return false
+  if (editing) {
+    return false
+  }
   return startwardKeys.has(key) || (key === " " && shiftKey)
 }
 

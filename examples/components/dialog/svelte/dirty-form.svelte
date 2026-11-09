@@ -41,9 +41,12 @@
     </div>
     <Field>
       <FieldLabel>Post</FieldLabel>
-      <FieldControl oninput={(event) => (dirty = event.currentTarget.value !== "")}>
+      <FieldControl
+        oninput={(event) => (dirty = event.currentTarget.value !== "")}
+      >
         {#snippet render({ props })}
-          <textarea bind:this={post} {...props} placeholder="What's new?"></textarea>
+          <textarea bind:this={post} {...props} placeholder="What's new?"
+          ></textarea>
         {/snippet}
       </FieldControl>
     </Field>
@@ -52,7 +55,9 @@
         Discard your changes?
         <div data-slot="row">
           <button type="button" onclick={keepEditing}>Keep Editing</button>
-          <button data-variant="solid" type="button" onclick={close}>Discard</button>
+          <button data-variant="solid" type="button" onclick={close}
+            >Discard</button
+          >
         </div>
       </div>
     {:else}

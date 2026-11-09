@@ -2,8 +2,14 @@
 // Date Input and Time Input through a small adapter that renders like a
 // framework does: a microtask after a change, a part for each segment.
 import { afterEach, describe, expect, test, vi } from "vitest"
-import { dateInput, type DateInputOptions } from "../src/components/date-input/date-input"
-import { timeInput, type TimeInputOptions } from "../src/components/date-input/time-input"
+import {
+  dateInput,
+  type DateInputOptions,
+} from "../src/components/date-input/date-input"
+import {
+  timeInput,
+  type TimeInputOptions,
+} from "../src/components/date-input/time-input"
 import {
   compareTo,
   emptyFields,
@@ -30,7 +36,7 @@ const order = (
   locale: string,
   kind: "date" | "time",
   granularity: "day" | "minute" | "second",
-  hourCycle: 12 | 24,
+  hourCycle: 12 | 24
 ) =>
   layoutOf({ kind, granularity, hourCycle, locale })
     .map((item) => (item.type === "literal" ? item.text : item.type))
@@ -42,22 +48,37 @@ describe("segments", () => {
     expect(order("en-US", "date", "day", 12)).toBe("month / day / year")
     expect(order("de-DE", "date", "day", 24)).toBe("day . month . year")
     expect(order("ja-JP", "date", "day", 24)).toBe("year / month / day")
-    expect(order("en-US", "date", "minute", 12)).toBe("month / day / year ,  hour : minute   dayPeriod")
-    expect(order("ko-KR", "time", "minute", 12)).toBe("dayPeriod   hour : minute")
+    expect(order("en-US", "date", "minute", 12)).toBe(
+      "month / day / year ,  hour : minute   dayPeriod"
+    )
+    expect(order("ko-KR", "time", "minute", 12)).toBe(
+      "dayPeriod   hour : minute"
+    )
     expect(order("en-GB", "time", "second", 24)).toBe("hour : minute : second")
   })
 
   test("a digit that leaves no room for another finishes its segment", () => {
     const one = typeDigit(emptyFields(), null, "month", "1", 12)
-    expect(one).toMatchObject({ done: false, buffer: { type: "month", text: "1" } })
+    expect(one).toMatchObject({
+      done: false,
+      buffer: { type: "month", text: "1" },
+    })
     expect(one.fields.month).toBe(1)
     const twelve = typeDigit(one.fields, one.buffer, "month", "2", 12)
     expect(twelve).toMatchObject({ done: true, buffer: null })
     expect(twelve.fields.month).toBe(12)
-    expect(typeDigit(emptyFields(), null, "month", "4", 12)).toMatchObject({ done: true })
-    expect(typeDigit(emptyFields(), null, "hour", "3", 24)).toMatchObject({ done: true })
-    expect(typeDigit(emptyFields(), null, "hour", "2", 24)).toMatchObject({ done: false })
-    expect(typeDigit(emptyFields(), null, "hour", "2", 12)).toMatchObject({ done: true })
+    expect(typeDigit(emptyFields(), null, "month", "4", 12)).toMatchObject({
+      done: true,
+    })
+    expect(typeDigit(emptyFields(), null, "hour", "3", 24)).toMatchObject({
+      done: true,
+    })
+    expect(typeDigit(emptyFields(), null, "hour", "2", 24)).toMatchObject({
+      done: false,
+    })
+    expect(typeDigit(emptyFields(), null, "hour", "2", 12)).toMatchObject({
+      done: true,
+    })
   })
 
   test("a digit that doesn't fit starts the segment over", () => {
@@ -71,43 +92,88 @@ describe("segments", () => {
     const zero = typeDigit(emptyFields(), null, "day", "0", 12)
     expect(zero.fields.day).toBeNull()
     expect(zero.done).toBe(false)
-    expect(typeDigit(zero.fields, zero.buffer, "day", "7", 12).fields.day).toBe(7)
+    expect(typeDigit(zero.fields, zero.buffer, "day", "7", 12).fields.day).toBe(
+      7
+    )
   })
 
   test("arrow keys wrap within a segment and leave the others alone", () => {
-    const fields = fieldsOf("2026-12-31T23:59", { kind: "date", granularity: "minute", hourCycle: 24 })
+    const fields = fieldsOf("2026-12-31T23:59", {
+      kind: "date",
+      granularity: "minute",
+      hourCycle: 24,
+    })
     const minute = stepField(fields, "minute", 1, 24, 0)
     expect(minute).toMatchObject({ minute: 0, hour: 23, day: 31 })
-    expect(stepField(fields, "month", 1, 24, 0)).toMatchObject({ month: 1, year: 2026 })
+    expect(stepField(fields, "month", 1, 24, 0)).toMatchObject({
+      month: 1,
+      year: 2026,
+    })
   })
 
   test("a day past its month's end becomes the month's last day", () => {
-    const fields = fieldsOf("2026-01-31", { kind: "date", granularity: "day", hourCycle: 24 })
-    expect(stepField(fields, "month", 1, 24, 0)).toMatchObject({ month: 2, day: 28 })
-    const leap = fieldsOf("2028-01-31", { kind: "date", granularity: "day", hourCycle: 24 })
-    expect(stepField(leap, "month", 1, 24, 0)).toMatchObject({ month: 2, day: 29 })
+    const fields = fieldsOf("2026-01-31", {
+      kind: "date",
+      granularity: "day",
+      hourCycle: 24,
+    })
+    expect(stepField(fields, "month", 1, 24, 0)).toMatchObject({
+      month: 2,
+      day: 28,
+    })
+    const leap = fieldsOf("2028-01-31", {
+      kind: "date",
+      granularity: "day",
+      hourCycle: 24,
+    })
+    expect(stepField(leap, "month", 1, 24, 0)).toMatchObject({
+      month: 2,
+      day: 29,
+    })
   })
 
   test("a 12 hour clock keeps AM and PM apart from the hour", () => {
-    const format = { kind: "time", granularity: "minute", hourCycle: 12 } as const
+    const format = {
+      kind: "time",
+      granularity: "minute",
+      hourCycle: 12,
+    } as const
     expect(fieldsOf("00:30", format)).toMatchObject({ hour: 12, dayPeriod: 0 })
     expect(fieldsOf("12:30", format)).toMatchObject({ hour: 12, dayPeriod: 1 })
     expect(valueOf({ ...fieldsOf("13:05", format) }, format)).toBe("13:05")
-    expect(valueOf({ ...emptyFields(), hour: 12, minute: 0, dayPeriod: 0 }, format)).toBe("00:00")
-    expect(valueOf({ ...emptyFields(), hour: 7, minute: 0, dayPeriod: null }, format)).toBeNull()
+    expect(
+      valueOf({ ...emptyFields(), hour: 12, minute: 0, dayPeriod: 0 }, format)
+    ).toBe("00:00")
+    expect(
+      valueOf({ ...emptyFields(), hour: 7, minute: 0, dayPeriod: null }, format)
+    ).toBeNull()
   })
 
   test("values take the input's shape", () => {
     const date = { kind: "date", granularity: "day", hourCycle: 24 } as const
-    const minute = { kind: "date", granularity: "minute", hourCycle: 24 } as const
+    const minute = {
+      kind: "date",
+      granularity: "minute",
+      hourCycle: 24,
+    } as const
     expect(normalizeValue("2026-11-02", date)).toBe("2026-11-02")
     expect(normalizeValue("2026-11-02T14:30:15", date)).toBe("2026-11-02")
     expect(normalizeValue("2026-11-02", minute)).toBe("2026-11-02T00:00")
     expect(normalizeValue("2026-02-30", date)).toBeNull()
-    expect(normalizeValue("14:30:15", { kind: "time", granularity: "second", hourCycle: 24 })).toBe(
-      "14:30:15",
-    )
-    expect(normalizeValue("25:00", { kind: "time", granularity: "minute", hourCycle: 24 })).toBeNull()
+    expect(
+      normalizeValue("14:30:15", {
+        kind: "time",
+        granularity: "second",
+        hourCycle: 24,
+      })
+    ).toBe("14:30:15")
+    expect(
+      normalizeValue("25:00", {
+        kind: "time",
+        granularity: "minute",
+        hourCycle: 24,
+      })
+    ).toBeNull()
   })
 
   test("a bound with a date alone takes the whole day", () => {
@@ -125,7 +191,7 @@ type Instance = Omit<PrimitiveInstance, "get"> & {
 function mount(
   make: typeof dateInput | typeof timeInput,
   options: DateInputOptions | TimeInputOptions,
-  { lang, dir }: { lang?: string; dir?: string } = {},
+  { lang, dir }: { lang?: string; dir?: string } = {}
 ) {
   const instance = (make as typeof dateInput)({
     id: "d",
@@ -133,12 +199,22 @@ function mount(
     ...(options as DateInputOptions),
   }) as unknown as Instance
   const container = document.createElement("div")
-  if (lang) container.lang = lang
-  if (dir) container.dir = dir
+  if (lang) {
+    container.lang = lang
+  }
+  if (dir) {
+    container.dir = dir
+  }
   document.body.append(container)
   const mounted = new Map<string, { el: HTMLElement; unbind: () => void }>()
 
-  function el(key: string, slot: string, props: Record<string, unknown>, tag: string, parent: HTMLElement) {
+  function el(
+    key: string,
+    slot: string,
+    props: Record<string, unknown>,
+    tag: string,
+    parent: HTMLElement
+  ) {
     const part = instance.part(slot as never, props as never)
     let entry = mounted.get(key)
     if (!entry) {
@@ -146,29 +222,41 @@ function mount(
       parent.append(created)
       entry = { el: created, unbind: () => {} }
       mounted.set(key, entry)
-      for (const [name, value] of Object.entries(attrs(part, props)))
-        if (value !== undefined) created.setAttribute(name, value)
+      for (const [name, value] of Object.entries(attrs(part, props))) {
+        if (value !== undefined) {
+          created.setAttribute(name, value)
+        }
+      }
       entry.unbind = bind(part, created)
     }
-    for (const [name, value] of Object.entries(attrs(part, props)))
-      if (name === "value") continue
-      else if (value === undefined) entry.el.removeAttribute(name)
-      else entry.el.setAttribute(name, value)
+    for (const [name, value] of Object.entries(attrs(part, props))) {
+      if (name === "value") {
+        continue
+      } else if (value === undefined) {
+        entry.el.removeAttribute(name)
+      } else {
+        entry.el.setAttribute(name, value)
+      }
+    }
     return entry.el
   }
 
   function render() {
     const root = el("root", "root", {}, "div", container)
-    const { segments } = partState(instance.part("root" as never)) as DateInputState
+    const { segments } = partState(
+      instance.part("root" as never)
+    ) as DateInputState
     for (const segment of segments) {
       const node = el(
         segment.key,
         "segment",
         { segment, id: segment.key },
         segment.editable ? "input" : "span",
-        root,
+        root
       )
-      if (!segment.editable) node.textContent = segment.text
+      if (!segment.editable) {
+        node.textContent = segment.text
+      }
     }
     el("hidden", "hidden-input", {}, "input", root)
   }
@@ -176,18 +264,21 @@ function mount(
   let queued = false
   cleanups.push(
     instance.subscribe(() => {
-      if (queued) return
+      if (queued) {
+        return
+      }
       queued = true
       queueMicrotask(() => {
         queued = false
         render()
       })
-    }),
+    })
   )
   render()
   cleanups.push(() => mounted.forEach((entry) => entry.unbind()))
 
-  const segment = (type: string) => container.querySelector<HTMLInputElement>(`input[data-type="${type}"]`)!
+  const segment = (type: string) =>
+    container.querySelector<HTMLInputElement>(`input[data-type="${type}"]`)!
   const type = (text: string) => {
     for (const char of text) {
       const target = document.activeElement as HTMLInputElement
@@ -197,22 +288,40 @@ function mount(
           data: char,
           bubbles: true,
           cancelable: true,
-        }),
+        })
       )
     }
   }
   const key = (name: string) =>
     (document.activeElement as HTMLElement).dispatchEvent(
-      new KeyboardEvent("keydown", { key: name, bubbles: true, cancelable: true }),
+      new KeyboardEvent("keydown", {
+        key: name,
+        bubbles: true,
+        cancelable: true,
+      })
     )
   const backspace = () =>
     (document.activeElement as HTMLElement).dispatchEvent(
-      new InputEvent("beforeinput", { inputType: "deleteContentBackward", bubbles: true, cancelable: true }),
+      new InputEvent("beforeinput", {
+        inputType: "deleteContentBackward",
+        bubbles: true,
+        cancelable: true,
+      })
     )
   const text = () =>
-    [...container.querySelector('[data-slot="date-input-root"],[data-slot="time-input-root"]')!.children]
-      .filter((node) => !(node instanceof HTMLInputElement && node.type === "hidden"))
-      .map((node) => (node instanceof HTMLInputElement ? node.value || node.placeholder : node.textContent))
+    [
+      ...container.querySelector(
+        '[data-slot="date-input-root"],[data-slot="time-input-root"]'
+      )!.children,
+    ]
+      .filter(
+        (node) => !(node instanceof HTMLInputElement && node.type === "hidden")
+      )
+      .map((node) =>
+        node instanceof HTMLInputElement
+          ? node.value || node.placeholder
+          : node.textContent
+      )
       .join("")
       .replace(/\s/g, " ")
   const focused = () => document.activeElement?.getAttribute("data-type")
@@ -221,9 +330,14 @@ function mount(
 
 describe("date input", () => {
   test("shows its value in the locale's segments and submits the ISO date", () => {
-    const { text, container } = mount(dateInput, { defaultValue: "2026-11-02", name: "start" })
+    const { text, container } = mount(dateInput, {
+      defaultValue: "2026-11-02",
+      name: "start",
+    })
     expect(text()).toBe("11/02/2026")
-    expect(container.querySelector<HTMLInputElement>('input[type="hidden"]')!.value).toBe("2026-11-02")
+    expect(
+      container.querySelector<HTMLInputElement>('input[type="hidden"]')!.value
+    ).toBe("2026-11-02")
   })
 
   test("each segment is a spin button named by its unit", () => {
@@ -237,7 +351,9 @@ describe("date input", () => {
 
   test("typing fills a segment and moves on once it's done", async () => {
     const onValueChange = vi.fn()
-    const { segment, type, focused, instance, text } = mount(dateInput, { onValueChange })
+    const { segment, type, focused, instance, text } = mount(dateInput, {
+      onValueChange,
+    })
     segment("month").focus()
     type("1")
     expect(focused()).toBe("month")
@@ -249,9 +365,9 @@ describe("date input", () => {
     expect(instance.get().value).toBe("2026-11-04")
     await tick()
     expect(text()).toBe("11/04/2026")
-    expect(onValueChange.mock.calls.map(([value, { reason }]) => [value, reason])).toEqual([
-      ["2026-11-04", "input-change"],
-    ])
+    expect(
+      onValueChange.mock.calls.map(([value, { reason }]) => [value, reason])
+    ).toEqual([["2026-11-04", "input-change"]])
   })
 
   test("a separator moves on from a segment with a digit in it", () => {
@@ -262,7 +378,9 @@ describe("date input", () => {
   })
 
   test("arrow keys step the segment, and left and right move between segments", () => {
-    const { segment, key, focused, instance } = mount(dateInput, { defaultValue: "2026-11-02" })
+    const { segment, key, focused, instance } = mount(dateInput, {
+      defaultValue: "2026-11-02",
+    })
     segment("day").focus()
     key("ArrowUp")
     expect(instance.get().value).toBe("2026-11-03")
@@ -278,7 +396,11 @@ describe("date input", () => {
   })
 
   test("left and right follow the page's direction", () => {
-    const { segment, key, focused } = mount(dateInput, { defaultValue: "2026-11-02" }, { dir: "rtl" })
+    const { segment, key, focused } = mount(
+      dateInput,
+      { defaultValue: "2026-11-02" },
+      { dir: "rtl" }
+    )
     segment("day").focus()
     key("ArrowLeft")
     expect(focused()).toBe("year")
@@ -301,7 +423,9 @@ describe("date input", () => {
   })
 
   test("Backspace works from the key alone, as WebKit sends no beforeinput on an empty segment", async () => {
-    const { segment, key, focused, instance } = mount(dateInput, { defaultValue: "2026-11-02" })
+    const { segment, key, focused, instance } = mount(dateInput, {
+      defaultValue: "2026-11-02",
+    })
     segment("day").focus()
     key("Backspace")
     expect(instance.get().value).toBeNull()
@@ -327,13 +451,20 @@ describe("date input", () => {
     expect(container.firstElementChild!.hasAttribute("data-invalid")).toBe(true)
     expect(segment("month").getAttribute("aria-invalid")).toBe("true")
     instance.api.setValue("2026-11-06")
-    expect((partState(instance.part("root" as never)) as DateInputState).invalid).toBe(false)
+    expect(
+      (partState(instance.part("root" as never)) as DateInputState).invalid
+    ).toBe(false)
     instance.api.setValue("2026-11-10")
-    expect((partState(instance.part("root" as never)) as DateInputState).invalid).toBe(true)
+    expect(
+      (partState(instance.part("root" as never)) as DateInputState).invalid
+    ).toBe(true)
   })
 
   test("a controlled value that's turned down puts the segments back", async () => {
-    const { segment, type, text } = mount(dateInput, { value: "2026-11-02", onValueChange: () => {} })
+    const { segment, type, text } = mount(dateInput, {
+      value: "2026-11-02",
+      onValueChange: () => {},
+    })
     segment("day").focus()
     type("05")
     await tick()
@@ -362,22 +493,36 @@ describe("date input", () => {
   })
 
   test("the page's language orders the segments", () => {
-    const { text } = mount(dateInput, { defaultValue: "2026-11-02", locale: undefined }, { lang: "de-DE" })
+    const { text } = mount(
+      dateInput,
+      { defaultValue: "2026-11-02", locale: undefined },
+      { lang: "de-DE" }
+    )
     expect(text()).toBe("02.11.2026")
   })
 
   test("pasting a whole date sets it", () => {
     const { segment, instance } = mount(dateInput, {})
-    const event = new Event("paste", { bubbles: true, cancelable: true }) as ClipboardEvent
-    Object.defineProperty(event, "clipboardData", { value: { getData: () => "12/25/2026" } })
+    const event = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+    }) as ClipboardEvent
+    Object.defineProperty(event, "clipboardData", {
+      value: { getData: () => "12/25/2026" },
+    })
     segment("day").dispatchEvent(event)
     expect(instance.get().value).toBe("2026-12-25")
   })
 
   test("pasting a date in the locale's order sets it", () => {
     const { segment, instance } = mount(dateInput, { locale: "en-GB" })
-    const event = new Event("paste", { bubbles: true, cancelable: true }) as ClipboardEvent
-    Object.defineProperty(event, "clipboardData", { value: { getData: () => "25/12/2026" } })
+    const event = new Event("paste", {
+      bubbles: true,
+      cancelable: true,
+    }) as ClipboardEvent
+    Object.defineProperty(event, "clipboardData", {
+      value: { getData: () => "25/12/2026" },
+    })
     segment("day").dispatchEvent(event)
     expect(instance.get().value).toBe("2026-12-25")
   })
@@ -393,26 +538,36 @@ describe("date input", () => {
       type(digits!)
       expect(instance.get().value).toBe(value)
     }
-    const { segment, type, instance } = mount(dateInput, { defaultValue: "2028-02-29" })
+    const { segment, type, instance } = mount(dateInput, {
+      defaultValue: "2028-02-29",
+    })
     segment("year").focus()
     type("2032")
     expect(instance.get().value).toBe("2032-02-29")
   })
 
   test("an input outside its form still stops that form submitting", async () => {
-    const form = Object.assign(document.createElement("form"), { id: "outside" })
+    const form = Object.assign(document.createElement("form"), {
+      id: "outside",
+    })
     document.body.append(form)
     const required = mount(dateInput, { form: "outside", required: true })
     expect(form.checkValidity()).toBe(false)
     cleanups.splice(0).forEach((cleanup) => cleanup())
     required.container.remove()
-    mount(dateInput, { form: "outside", defaultValue: "2026-11-02", min: "2026-11-05" })
+    mount(dateInput, {
+      form: "outside",
+      defaultValue: "2026-11-02",
+      min: "2026-11-05",
+    })
     await tick()
     expect(form.checkValidity()).toBe(false)
   })
 
   test("a form reset goes back to the default value", async () => {
-    const { segment, key, instance } = mount(dateInput, { defaultValue: "2026-11-02" })
+    const { segment, key, instance } = mount(dateInput, {
+      defaultValue: "2026-11-02",
+    })
     segment("day").focus()
     key("ArrowUp")
     instance.api.internal.reset()
@@ -423,10 +578,16 @@ describe("date input", () => {
 describe("time input", () => {
   test("shows hours and minutes on the locale's clock", () => {
     expect(mount(timeInput, { defaultValue: "14:30" }).text()).toBe("02:30 PM")
-    expect(mount(timeInput, { defaultValue: "14:30", hourCycle: 24 }).text()).toBe("14:30")
-    expect(mount(timeInput, { defaultValue: "14:30:15", granularity: "second", hourCycle: 24 }).text()).toBe(
-      "14:30:15",
-    )
+    expect(
+      mount(timeInput, { defaultValue: "14:30", hourCycle: 24 }).text()
+    ).toBe("14:30")
+    expect(
+      mount(timeInput, {
+        defaultValue: "14:30:15",
+        granularity: "second",
+        hourCycle: 24,
+      }).text()
+    ).toBe("14:30:15")
   })
 
   test("typing a time on a 24 hour clock", () => {
@@ -437,7 +598,10 @@ describe("time input", () => {
   })
 
   test("Enter keeps a digit still waiting for the next, before the form submits", () => {
-    const { segment, type, key, instance } = mount(timeInput, { defaultValue: "09:30", hourCycle: 24 })
+    const { segment, type, key, instance } = mount(timeInput, {
+      defaultValue: "09:30",
+      hourCycle: 24,
+    })
     segment("minute").focus()
     type("4")
     expect(instance.get().value).toBe("09:30")
@@ -446,7 +610,10 @@ describe("time input", () => {
   })
 
   test("arrow keys wrap minutes without moving the hour", () => {
-    const { segment, key, instance } = mount(timeInput, { defaultValue: "09:59", hourCycle: 24 })
+    const { segment, key, instance } = mount(timeInput, {
+      defaultValue: "09:59",
+      hourCycle: 24,
+    })
     segment("minute").focus()
     key("ArrowUp")
     expect(instance.get().value).toBe("09:00")
@@ -460,7 +627,10 @@ describe("time input", () => {
   })
 
   test("a time after max is invalid", () => {
-    const { container } = mount(timeInput, { defaultValue: "18:00", max: "17:30" })
+    const { container } = mount(timeInput, {
+      defaultValue: "18:00",
+      max: "17:30",
+    })
     expect(container.firstElementChild!.hasAttribute("data-invalid")).toBe(true)
   })
 })

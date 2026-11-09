@@ -10,7 +10,12 @@ import {
   type OTPInputOptions as Options,
   type State,
 } from "./otp-input-api"
-import { inputModeFor, patternAttribute, slotsOf, type OTPInputSlotData } from "./otp-input-model"
+import {
+  inputModeFor,
+  patternAttribute,
+  slotsOf,
+  type OTPInputSlotData,
+} from "./otp-input-model"
 import { createController } from "../../foundation/kernel/controller"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type { Named } from "../../foundation/kernel/primitive-types"
@@ -47,14 +52,25 @@ type OTPInputController = ReturnType<typeof createOTPInputController>
 // character must match, like "[A-F0-9]". One that doesn't compile falls back
 // to digits rather than break the element.
 function readPattern(attribute: string | null) {
-  if (attribute === null) return undefined
-  if (attribute === "digits" || attribute === "letters" || attribute === "alphanumeric") return attribute
+  if (attribute === null) {
+    return undefined
+  }
+  if (
+    attribute === "digits" ||
+    attribute === "letters" ||
+    attribute === "alphanumeric"
+  ) {
+    return attribute
+  }
   try {
     return new RegExp(attribute)
   } catch {
-    warn(`pattern "${attribute}" isn't a valid regular expression, so it takes digits.`, {
-      component: "otp-input",
-    })
+    warn(
+      `pattern "${attribute}" isn't a valid regular expression, so it takes digits.`,
+      {
+        component: "otp-input",
+      }
+    )
     return "digits"
   }
 }
@@ -114,7 +130,11 @@ const slotCache = new WeakMap<State, OTPInputSlotData[]>()
 function slotsFor(state: State) {
   let slots = slotCache.get(state)
   if (!slots) {
-    slots = slotsOf(state.value, state.maxLength, state.focused ? state.selection : null)
+    slots = slotsOf(
+      state.value,
+      state.maxLength,
+      state.focused ? state.selection : null
+    )
     slotCache.set(state, slots)
   }
   return slots
@@ -189,8 +209,16 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
     const base = settings(options)
     return {
       ...base,
-      value: cleanCode(options.value ?? options.defaultValue ?? "", base.pattern, base.maxLength),
-      initial: cleanCode(options.defaultValue ?? "", base.pattern, base.maxLength),
+      value: cleanCode(
+        options.value ?? options.defaultValue ?? "",
+        base.pattern,
+        base.maxLength
+      ),
+      initial: cleanCode(
+        options.defaultValue ?? "",
+        base.pattern,
+        base.maxLength
+      ),
       formDisabled: false,
       tooShort: false,
       focused: false,
@@ -204,7 +232,13 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
       ...base,
       ...(options.defaultValue === undefined
         ? {}
-        : { initial: cleanCode(options.defaultValue, base.pattern, base.maxLength) }),
+        : {
+            initial: cleanCode(
+              options.defaultValue,
+              base.pattern,
+              base.maxLength
+            ),
+          }),
       ...(options.value === undefined
         ? {}
         : { value: cleanCode(options.value, base.pattern, base.maxLength) }),
@@ -227,7 +261,11 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
         maxlength: String(state.maxLength),
         // A partial code is too short to submit.
         minlength: String(state.maxLength),
-        pattern: patternAttribute(state.pattern, state.maxLength, state.tooShort),
+        pattern: patternAttribute(
+          state.pattern,
+          state.maxLength,
+          state.tooShort
+        ),
         inputmode: state.inputMode ?? inputModeFor(state.pattern),
         autocomplete: state.autoComplete,
         autocorrect: "off",
@@ -255,7 +293,11 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state, { props }) => {
         const index = props.index ?? 0
         return {
-          ...(slotsFor(state)[index] ?? { char: null, active: false, hasFakeCaret: false }),
+          ...(slotsFor(state)[index] ?? {
+            char: null,
+            active: false,
+            hasFakeCaret: false,
+          }),
           index,
           focused: state.focused,
           disabled: isDisabled(state),
@@ -276,7 +318,10 @@ const otpInputPrimitive = /* @__PURE__ */ definePrimitive({
     // Drawn between groups, like a dash.
     separator: slot<{}, OTPInputState>({
       state: rootState,
-      attrs: (state) => ({ "aria-hidden": "true", "data-disabled": isDisabled(state) ? "" : undefined }),
+      attrs: (state) => ({
+        "aria-hidden": "true",
+        "data-disabled": isDisabled(state) ? "" : undefined,
+      }),
     }),
   }),
   agent: { actions: ["setValue", "clear"], secret: true },
@@ -307,5 +352,9 @@ export {
   type OTPInputSlotState,
   type OTPInputState,
 }
-export type { OTPInputApi, OTPInputChangeOptions, OTPInputValueChangeReason } from "./otp-input-api"
+export type {
+  OTPInputApi,
+  OTPInputChangeOptions,
+  OTPInputValueChangeReason,
+} from "./otp-input-api"
 export type { OTPInputPattern, OTPInputSlotData } from "./otp-input-model"

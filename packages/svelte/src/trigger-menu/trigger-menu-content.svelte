@@ -13,7 +13,12 @@ The popup that holds the suggestions, anchored at the caret.
   import { claimOwnPart } from "../own-part.svelte"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
-  import { portalTo, providePopupContainer, usePopupContainer, type PopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+    type PopupContainer,
+  } from "../popup.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { ContainerKey, OwnContentKey, type ContainerContext } from "./context"
   import TriggerMenuList from "./trigger-menu-list.svelte"
@@ -42,15 +47,26 @@ The popup that holds the suggestions, anchored at the caret.
   const menu = useHandle(triggerMenu)
   // The root renders its own content when the app gives none, so one in the
   // app's children says it's there.
-  if (!untrack(() => fromRoot)) claimOwnPart(OwnContentKey)
+  if (!untrack(() => fromRoot)) {
+    claimOwnPart(OwnContentKey)
+  }
   const inherited = getContext<ContainerContext | undefined>(ContainerKey)
   const target = usePopupContainer(() => container ?? inherited?.())
   providePopupContainer(target)
   const content = useHandlePart(
     menu,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, keepMounted }),
-    portalTo(target),
+    () => ({
+      side,
+      align,
+      sideOffset,
+      alignOffset,
+      collisionPadding,
+      arrowPadding,
+      anchor,
+      keepMounted,
+    }),
+    portalTo(target)
   )
 </script>
 
@@ -60,5 +76,9 @@ The popup that holds the suggestions, anchored at the caret.
 {/snippet}
 
 {#if content.present}
-  <Part tag="div" part={content} props={{ ...rest, children: children ?? list }} />
+  <Part
+    tag="div"
+    part={content}
+    props={{ ...rest, children: children ?? list }}
+  />
 {/if}

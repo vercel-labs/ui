@@ -15,7 +15,11 @@ import {
  * Returns a function that unregisters it.
  * @stable
  */
-function registerShortcut(keys: ShortcutKeys, handler: ShortcutHandler, options?: ShortcutOptions) {
+function registerShortcut(
+  keys: ShortcutKeys,
+  handler: ShortcutHandler,
+  options?: ShortcutOptions
+) {
   return shortcuts.register(keys, handler, options)
 }
 
@@ -30,8 +34,9 @@ type Shortcuts = ReturnType<typeof createShortcuts>
  * when two copies of the package load. It listens only once something registers.
  * @stable
  */
-const shortcuts: Shortcuts = ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.shortcuts@1")] ??=
-  createShortcuts()) as Shortcuts
+const shortcuts: Shortcuts = ((globalThis as Record<symbol, unknown>)[
+  Symbol.for("ui-sdk.shortcuts@1")
+] ??= createShortcuts()) as Shortcuts
 
 // `__UI_SDK__.shortcuts()` lists them in development.
 exposeShortcuts(() => shortcuts.list())

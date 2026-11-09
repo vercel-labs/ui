@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { Menu, MenuContent, MenuGroup, MenuGroupLabel, MenuItem, MenuTrigger } from "@ui-sdk/svelte"
+  import {
+    Menu,
+    MenuContent,
+    MenuGroup,
+    MenuGroupLabel,
+    MenuItem,
+    MenuTrigger,
+  } from "@ui-sdk/svelte"
   import { onItemsChange } from "tests/fixtures/items.ts"
   import { changedMenuGroups, menuGroups } from "tests/fixtures/menu-groups.ts"
 

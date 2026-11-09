@@ -3,7 +3,13 @@
 // like Button's handler, for the changes they make after an `await`.
 import { afterEach, expect, test } from "vitest"
 import { createApp, h, nextTick, type App } from "vue"
-import { Dialog, DialogClose, DialogContent, DialogTitle, type DialogCloseActionDetails } from "../src/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  type DialogCloseActionDetails,
+} from "../src/dialog"
 import { withSource } from "../src/observe"
 import { createToaster, ToastRegion } from "../src/toast"
 
@@ -30,7 +36,9 @@ function mount(render: () => ReturnType<typeof h>) {
 }
 
 const buttonNamed = (name: string) =>
-  [...document.querySelectorAll("button")].find((button) => button.textContent === name)!
+  [...document.querySelectorAll("button")].find(
+    (button) => button.textContent === name
+  )!
 
 test("a dialog's Close action, bound with @action, hears how it was pressed", async () => {
   const sources: string[] = []
@@ -41,13 +49,15 @@ test("a dialog's Close action, bound with @action, hears how it was pressed", as
         h(
           DialogClose,
           {
-            onAction: (_event: Event | undefined, { source }: DialogCloseActionDetails) =>
-              sources.push(source),
+            onAction: (
+              _event: Event | undefined,
+              { source }: DialogCloseActionDetails
+            ) => sources.push(source),
           },
-          () => "Save",
+          () => "Save"
         ),
-      ]),
-    ),
+      ])
+    )
   )
   await nextTick()
   withSource("agent", () => buttonNamed("Save").click())
@@ -60,11 +70,17 @@ test("a toast's action and cancel buttons hear how they were pressed", async () 
   mount(() => h(ToastRegion, { toaster }))
   toaster("Deleted", {
     duration: Infinity,
-    action: { label: "Undo", onAction: (_event, { source }) => sources.push(`undo:${source}`) },
+    action: {
+      label: "Undo",
+      onAction: (_event, { source }) => sources.push(`undo:${source}`),
+    },
   })
   toaster("Saved", {
     duration: Infinity,
-    cancel: { label: "Keep", onCancel: (_event, { source }) => sources.push(`keep:${source}`) },
+    cancel: {
+      label: "Keep",
+      onCancel: (_event, { source }) => sources.push(`keep:${source}`),
+    },
   })
   await nextTick()
   withSource("agent", () => buttonNamed("Undo").click())

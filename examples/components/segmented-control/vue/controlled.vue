@@ -22,7 +22,9 @@ const value = ref<string | null>("week")
       v-model:value="value"
       aria-label="Range"
       :controller="range"
-      @value-change="(next, details) => log(`value: ${next} (${details.reason})`)"
+      @value-change="
+        (next, details) => log(`value: ${next} (${details.reason})`)
+      "
     >
       <SegmentedControlIndicator />
       <SegmentedControlItem value="day">Day</SegmentedControlItem>

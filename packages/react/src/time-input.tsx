@@ -54,7 +54,13 @@ function TimeInput({
     controller,
     debug,
   })
-  return useSegmentedRoot(primitive, instance as never, field, props, TimeInputSegment)
+  return useSegmentedRoot(
+    primitive,
+    instance as never,
+    field,
+    props,
+    TimeInputSegment
+  )
 }
 
 /**

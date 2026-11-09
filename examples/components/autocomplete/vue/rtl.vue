@@ -20,7 +20,9 @@ const cities = ["القاهرة", "القدس", "الرباط", "الرياض", 
       </div>
       <AutocompleteContent>
         <AutocompleteList>
-          <AutocompleteItem v-for="city in cities" :key="city" :value="city">{{ city }}</AutocompleteItem>
+          <AutocompleteItem v-for="city in cities" :key="city" :value="city">{{
+            city
+          }}</AutocompleteItem>
         </AutocompleteList>
       </AutocompleteContent>
     </Autocomplete>

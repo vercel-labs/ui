@@ -13,7 +13,10 @@ const hoverPopupsFixture = {
 // What a callback reports, with the text of its event's target: "tooltip open: Mon",
 // or "tooltip payload tue: Tue" when the Tue trigger hands the tooltip its payload.
 function describeChange(component: string, change: string, event?: Event) {
-  const target = event?.target instanceof Element ? event.target.textContent?.trim() : "no target"
+  const target =
+    event?.target instanceof Element
+      ? event.target.textContent?.trim()
+      : "no target"
   return `${component} ${change}: ${target}`
 }
 

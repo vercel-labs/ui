@@ -15,8 +15,13 @@ The group's heading, which names the group.
 
   const listbox = useHandle(listboxPrimitive)
   const group = getContext<string | undefined>(GroupKey)
-  if (!group) throw new Error("<ListboxGroupLabel> must be used inside <ListboxGroup>.")
-  const label = useHandlePart(listbox, "group-label", () => ({ id: group, group }))
+  if (!group) {
+    throw new Error("<ListboxGroupLabel> must be used inside <ListboxGroup>.")
+  }
+  const label = useHandlePart(listbox, "group-label", () => ({
+    id: group,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={label} {props} />

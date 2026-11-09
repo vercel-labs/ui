@@ -24,7 +24,13 @@ type ColorMixOptions = {
   hue?: ColorHueInterpolation
 }
 
-const hueIndex: Partial<Record<ColorSpace, number>> = { hsl: 0, hsv: 0, hwb: 0, lch: 2, oklch: 2 }
+const hueIndex: Partial<Record<ColorSpace, number>> = {
+  hsl: 0,
+  hsv: 0,
+  hwb: 0,
+  lch: 2,
+  oklch: 2,
+}
 
 const normalize = (hue: number) => ((hue % 360) + 360) % 360
 
@@ -32,14 +38,24 @@ const normalize = (hue: number) => ((hue % 360) + 360) % 360
 function fixHues(first: number, second: number, method: ColorHueInterpolation) {
   const delta = second - first
   if (method === "shorter") {
-    if (delta > 180) first += 360
-    else if (delta < -180) second += 360
+    if (delta > 180) {
+      first += 360
+    } else if (delta < -180) {
+      second += 360
+    }
   } else if (method === "longer") {
-    if (delta > 0 && delta < 180) first += 360
-    else if (delta > -180 && delta <= 0) second += 360
+    if (delta > 0 && delta < 180) {
+      first += 360
+    } else if (delta > -180 && delta <= 0) {
+      second += 360
+    }
   } else if (method === "increasing") {
-    if (delta < 0) second += 360
-  } else if (delta > 0) first += 360
+    if (delta < 0) {
+      second += 360
+    }
+  } else if (delta > 0) {
+    first += 360
+  }
   return [first, second]
 }
 
@@ -49,7 +65,12 @@ function fixHues(first: number, second: number, method: ColorHueInterpolation) {
  * missing from one color takes the other's.
  * @experimental
  */
-function mixColor(first: Color, second: Color, amount = 0.5, options: ColorMixOptions = {}) {
+function mixColor(
+  first: Color,
+  second: Color,
+  amount = 0.5,
+  options: ColorMixOptions = {}
+) {
   const space = options.space ?? "oklab"
   const hue = hueIndex[space]
   const weight = Math.min(1, Math.max(0, amount))
@@ -57,10 +78,16 @@ function mixColor(first: Color, second: Color, amount = 0.5, options: ColorMixOp
   const alpha = a.alpha + (b.alpha - a.alpha) * weight
   const coords = a.coords.map((own, index) => {
     const other = b.coords[index]
-    if (own === null && other === null) return null
+    if (own === null && other === null) {
+      return null
+    }
     const [from, to] = [own ?? other!, other ?? own!]
     if (index === hue) {
-      const [start, end] = fixHues(normalize(from), normalize(to), options.hue ?? "shorter")
+      const [start, end] = fixHues(
+        normalize(from),
+        normalize(to),
+        options.hue ?? "shorter"
+      )
       return normalize(start + (end - start) * weight)
     }
     const mixed = from * a.alpha + (to * b.alpha - from * a.alpha) * weight

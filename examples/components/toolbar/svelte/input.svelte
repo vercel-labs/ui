@@ -7,7 +7,11 @@
     NumberInputGroup,
     NumberInputIncrement,
   } from "@ui-sdk/svelte/number-input"
-  import { Toolbar, ToolbarInput, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import {
+    Toolbar,
+    ToolbarInput,
+    ToolbarSeparator,
+  } from "@ui-sdk/svelte/toolbar"
 </script>
 
 <Toolbar aria-label="Text">

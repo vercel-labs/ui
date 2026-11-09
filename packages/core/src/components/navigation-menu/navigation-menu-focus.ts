@@ -6,7 +6,12 @@ import { documentOrder, isAfter } from "../../foundation/kernel/order"
 import { isRTL } from "../../foundation/platform/env"
 import { nextTabbable, tabbables } from "../../foundation/focus/tabbable"
 import { ownsEvent } from "../../foundation/popups/popup-elements"
-import { isModified, listKey, panelKey, stepIndex } from "./navigation-menu-keyboard"
+import {
+  isModified,
+  listKey,
+  panelKey,
+  stepIndex,
+} from "./navigation-menu-keyboard"
 
 // Fields in a panel, like a search box, keep the keys that move their caret or
 // value. The browser decides what's editable, since contenteditable inherits.
@@ -17,7 +22,11 @@ function createFocus(config: {
   orientation: () => "horizontal" | "vertical"
   value: () => string | null
   list: () => HTMLElement | undefined
-  triggers: () => { el: HTMLElement; key: string; props?: { disabled?: boolean } }[]
+  triggers: () => {
+    el: HTMLElement
+    key: string
+    props?: { disabled?: boolean }
+  }[]
   links: () => HTMLElement[]
   trigger: (key: string) => HTMLElement | undefined
   content: (key: string) => HTMLElement | undefined
@@ -35,7 +44,9 @@ function createFocus(config: {
     if (content && config.value() === key && !content.hidden) {
       pending = null
       tabbables(content)[0]?.focus()
-    } else pending = key
+    } else {
+      pending = key
+    }
   }
 
   // Top-level triggers and links in this menu's list, in document order:
@@ -43,11 +54,17 @@ function createFocus(config: {
   // place hold links too, and a nested menu's list holds its own.
   function topLevel() {
     const list = config.list()
-    if (!list) return []
+    if (!list) {
+      return []
+    }
     return [...config.triggers().map((entry) => entry.el), ...config.links()]
       .filter((el) => {
         const panel = el.closest('[data-slot="navigation-menu-content"]')
-        return list.contains(el) && !(panel && list.contains(panel)) && !el.matches(":disabled")
+        return (
+          list.contains(el) &&
+          !(panel && list.contains(panel)) &&
+          !el.matches(":disabled")
+        )
       })
       .sort(documentOrder)
   }
@@ -57,19 +74,31 @@ function createFocus(config: {
 
     listKeydown(event: KeyboardEvent, list: HTMLElement) {
       const target = event.target as HTMLElement
-      if (isModified(event) || !ownsEvent(list, event)) return
+      if (isModified(event) || !ownsEvent(list, event)) {
+        return
+      }
       const items = topLevel()
-      const index = items.findIndex((item) => item === target || item.contains(target))
-      if (index === -1) return
+      const index = items.findIndex(
+        (item) => item === target || item.contains(target)
+      )
+      if (index === -1) {
+        return
+      }
       const step = listKey(event.key, config.orientation(), isRTL(list))
-      if (step === undefined) return
+      if (step === undefined) {
+        return
+      }
       if (step !== "enter") {
         event.preventDefault()
         items[stepIndex(index, step, items.length)]?.focus()
         return
       }
-      const trigger = config.triggers().find((entry) => entry.el === items[index])
-      if (!trigger || trigger.props?.disabled) return
+      const trigger = config
+        .triggers()
+        .find((entry) => entry.el === items[index])
+      if (!trigger || trigger.props?.disabled) {
+        return
+      }
       event.preventDefault()
       config.open(trigger.key, event)
       enterPanel(trigger.key)
@@ -82,12 +111,20 @@ function createFocus(config: {
       const origin = target.shadowRoot ? event.composedPath()[0] : target
       const field = origin instanceof HTMLElement ? origin : target
       const inField = field.isContentEditable || field.matches(fields)
-      if (isModified(event) || !ownsEvent(panel, event) || inField) return
+      if (isModified(event) || !ownsEvent(panel, event) || inField) {
+        return
+      }
       const step = panelKey(event.key, isRTL(panel))
-      if (step === undefined) return
+      if (step === undefined) {
+        return
+      }
       const links = tabbables(panel)
-      const index = links.findIndex((link) => link === target || link.contains(target))
-      if (index === -1) return
+      const index = links.findIndex(
+        (link) => link === target || link.contains(target)
+      )
+      if (index === -1) {
+        return
+      }
       event.preventDefault()
       links[stepIndex(index, step, links.length)]?.focus()
     },
@@ -96,23 +133,35 @@ function createFocus(config: {
     // as it would if the panel sat right after its trigger in the page.
     rootKeydown(event: KeyboardEvent) {
       const value = config.value()
-      if (event.key !== "Tab" || !event.shiftKey || value === null) return
+      if (event.key !== "Tab" || !event.shiftKey || value === null) {
+        return
+      }
       const panel = config.panel()
       const trigger = config.trigger(value)
       const target = event.target as HTMLElement
-      if (!panel || !trigger || panel.contains(target)) return
+      if (!panel || !trigger || panel.contains(target)) {
+        return
+      }
       // Already between the trigger and here, the browser gets there on its own.
-      if (isAfter(trigger, panel) && isAfter(panel, target)) return
-      if (nextTabbable(trigger, panel) !== target) return
+      if (isAfter(trigger, panel) && isAfter(panel, target)) {
+        return
+      }
+      if (nextTabbable(trigger, panel) !== target) {
+        return
+      }
       const last = tabbables(panel).at(-1)
-      if (!last) return
+      if (!last) {
+        return
+      }
       event.preventDefault()
       last.focus()
     },
 
     // A content bound: focus moves in if an arrow key opened its item.
     contentBound(key: string, el: HTMLElement) {
-      if (pending !== key || config.value() !== key) return
+      if (pending !== key || config.value() !== key) {
+        return
+      }
       pending = null
       queueMicrotask(() => tabbables(el)[0]?.focus())
     },

@@ -8,7 +8,8 @@ import * as React from "react"
 import { createRoot } from "react-dom/client"
 
 const notes = Array.from({ length: 40 }, (_, index) => `Note ${index + 1}`)
-const renders = ((window as unknown as { renders: { root: number } }).renders = { root: 0 })
+const renders = ((window as unknown as { renders: { root: number } }).renders =
+  { root: 0 })
 
 // The root rendered as a section, whose content is a function of its state.
 // It counts its renders, which only an edge flipping should cause.
@@ -21,7 +22,9 @@ function Fixture() {
           renders.root++
           return (
             <>
-              <p className="render-status">{state.atEnd ? "At end" : "Reading"}</p>
+              <p className="render-status">
+                {state.atEnd ? "At end" : "Reading"}
+              </p>
               <ScrollAreaViewport
                 render={<article />}
                 className="scroll-area-viewport"
@@ -51,7 +54,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

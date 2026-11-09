@@ -1,5 +1,13 @@
 import "@ui-sdk/web/combobox"
-import { ArrowRight, Check, ChevronDown, Circle, CircleCheck, CircleX, createElement } from "lucide"
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Circle,
+  CircleCheck,
+  CircleX,
+  createElement,
+} from "lucide"
 
 function mount(root: HTMLElement) {
   root.innerHTML = `

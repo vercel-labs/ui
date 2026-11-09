@@ -14,13 +14,17 @@ const renderers = {
 }
 
 // Fields a renderer has no use for, with the reason.
-const keywords = { "item.keywords": "Menus don't filter. Keywords come with data shared with Command." }
+const keywords = {
+  "item.keywords":
+    "Menus don't filter. Keywords come with data shared with Command.",
+}
 const unused: Record<string, Record<string, string>> = {
   react: keywords,
   vue: keywords,
   web: {
     ...keywords,
-    "radio-group.name": "Web components key a group by its element, so the name has nothing to key.",
+    "radio-group.name":
+      "Web components key a group by its element, so the name has nothing to key.",
   },
 }
 
@@ -36,16 +40,24 @@ function dataFields() {
   const union = checker.getDeclaredTypeOfSymbol(symbol)
   const fields: Record<string, { item: string[]; radio: string[] }> = {}
   for (const member of union.isUnion() ? union.types : [union]) {
-    const names = checker.getPropertiesOfType(member).map((property) => property.name)
+    const names = checker
+      .getPropertiesOfType(member)
+      .map((property) => property.name)
     const typeProperty = checker.getPropertyOfType(member, "type")!
     const typeOf = checker.getTypeOfSymbol(typeProperty)
-    const literal = (typeOf.isUnion() ? typeOf.types : [typeOf]).find((type) => type.isStringLiteral())
+    const literal = (typeOf.isUnion() ? typeOf.types : [typeOf]).find((type) =>
+      type.isStringLiteral()
+    )
     const type = (literal as ts.StringLiteralType).value
     let radio: string[] = []
     if (type === "radio-group") {
-      const items = checker.getTypeOfSymbol(checker.getPropertyOfType(member, "items")!)
+      const items = checker.getTypeOfSymbol(
+        checker.getPropertyOfType(member, "items")!
+      )
       const element = checker.getIndexTypeOfType(items, ts.IndexKind.Number)!
-      radio = checker.getPropertiesOfType(element).map((property) => property.name)
+      radio = checker
+        .getPropertiesOfType(element)
+        .map((property) => property.name)
     }
     fields[type] = { item: names.filter((name) => name !== "type"), radio }
   }
@@ -58,7 +70,10 @@ function caseBlocks(code: string, types: string[]) {
     .map((type) => ({ type, index: code.indexOf(`case "${type}":`) }))
     .sort((a, b) => a.index - b.index)
   return Object.fromEntries(
-    starts.map(({ type, index }, i) => [type, code.slice(index, starts[i + 1]?.index ?? code.length)]),
+    starts.map(({ type, index }, i) => [
+      type,
+      code.slice(index, starts[i + 1]?.index ?? code.length),
+    ])
   )
 }
 
@@ -84,10 +99,16 @@ describe("data menu renderers", () => {
       const missing: string[] = []
       for (const [type, { item, radio }] of Object.entries(fields)) {
         expect(blocks[type], `${name} renders ${type}`).toBeDefined()
-        for (const field of item)
-          if (!blocks[type].includes(`item.${field}`)) missing.push(`${type}.${field}`)
-        for (const field of radio)
-          if (!blocks[type].includes(`radio.${field}`)) missing.push(`${type}.items[].${field}`)
+        for (const field of item) {
+          if (!blocks[type].includes(`item.${field}`)) {
+            missing.push(`${type}.${field}`)
+          }
+        }
+        for (const field of radio) {
+          if (!blocks[type].includes(`radio.${field}`)) {
+            missing.push(`${type}.items[].${field}`)
+          }
+        }
       }
       expect(missing.filter((field) => !unused[name]?.[field])).toEqual([])
     })

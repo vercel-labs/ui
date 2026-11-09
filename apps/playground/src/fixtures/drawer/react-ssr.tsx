@@ -6,7 +6,8 @@ import { Fixture } from "./react"
 // Server renders, then the client hydrates. Every mismatch React reports is recorded.
 function mount(root: HTMLElement) {
   const errors: string[] = []
-  ;(window as unknown as { __hydrationErrors: string[] }).__hydrationErrors = errors
+  ;(window as unknown as { __hydrationErrors: string[] }).__hydrationErrors =
+    errors
   const app = (
     <React.StrictMode>
       <Fixture />
@@ -14,7 +15,9 @@ function mount(root: HTMLElement) {
   )
   root.innerHTML = renderToString(app)
   // Whether open content shows before any script runs on it, as server HTML would.
-  ;(window as unknown as { __visibleBeforeHydration: boolean }).__visibleBeforeHydration = !!root
+  ;(
+    window as unknown as { __visibleBeforeHydration: boolean }
+  ).__visibleBeforeHydration = !!root
     .querySelector<HTMLElement>('[data-slot="drawer-content"]')
     ?.checkVisibility()
   const error = console.error
@@ -22,7 +25,9 @@ function mount(root: HTMLElement) {
     errors.push(args.map(String).join(" "))
     error(...args)
   }
-  hydrateRoot(root, app, { onRecoverableError: (cause) => errors.push(String(cause)) })
+  hydrateRoot(root, app, {
+    onRecoverableError: (cause) => errors.push(String(cause)),
+  })
 }
 
 export { mount }

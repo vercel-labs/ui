@@ -19,7 +19,13 @@ import {
   NumberInputScrubAreaCursor,
 } from "@ui-sdk/react/number-input"
 import { createParts } from "@ui-sdk/react/primitive"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/react/slider"
 import { Toggle, ToggleGroup } from "@ui-sdk/react/toggle"
 import { cn } from "cn"
 import {
@@ -41,10 +47,13 @@ const label = "font-mono text-[10px] tracking-[0.06em] uppercase"
 const press = cn(
   "inline-flex h-7 min-w-7 shrink-0 cursor-default items-center justify-center gap-1.5 bg-background px-2 font-mono text-[10px] tracking-[0.06em] uppercase select-none hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-3.5",
   ink,
-  ring,
+  ring
 )
 
-type BoardState = { boxes: Record<string, ResizeBox>; draft: ResizeDraft | null }
+type BoardState = {
+  boxes: Record<string, ResizeBox>
+  draft: ResizeDraft | null
+}
 
 type BoardOptions = {
   boxes?: Record<string, ResizeBox>
@@ -73,7 +82,8 @@ const board = definePrimitive({
     boxes: options.boxes ?? options.defaultBoxes,
     draft: null,
   }),
-  sync: (options) => (options.boxes === undefined ? {} : { boxes: options.boxes }),
+  sync: (options) =>
+    options.boxes === undefined ? {} : { boxes: options.boxes },
   live: ["draft"],
   api: (context) => {
     const change = createChange(context)
@@ -82,23 +92,33 @@ const board = definePrimitive({
         boxes: (state) => state.boxes,
         draft: "draft",
         set: (value, details) => change("boxes", value, details),
-        min: () => ({ width: context.options().min ?? 40, height: context.options().min ?? 40 }),
-        bounds: () => ({ left: 0, top: 0, right: context.options().width, bottom: context.options().height }),
+        min: () => ({
+          width: context.options().min ?? 40,
+          height: context.options().min ?? 40,
+        }),
+        bounds: () => ({
+          left: 0,
+          top: 0,
+          right: context.options().width,
+          bottom: context.options().height,
+        }),
         step: () => context.options().step ?? 4,
         scale: () => context.options().scale ?? 1,
       }),
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { boxes: Record<string, ResizeBox>; active: string | null }>({
-      state: (state) => ({
-        boxes:
-          state.draft && state.draft.handle !== "move"
-            ? { ...state.boxes, [state.draft.key]: state.draft.box }
-            : state.boxes,
-        active: state.draft?.key ?? null,
-      }),
-    }),
+    root: slot<{}, { boxes: Record<string, ResizeBox>; active: string | null }>(
+      {
+        state: (state) => ({
+          boxes:
+            state.draft && state.draft.handle !== "move"
+              ? { ...state.boxes, [state.draft.key]: state.draft.box }
+              : state.boxes,
+          active: state.draft?.key ?? null,
+        }),
+      }
+    ),
     box: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, { api, key }) => ({
@@ -112,8 +132,10 @@ const board = definePrimitive({
         style: api.resize.style(state, key),
       })),
       on: {
-        pointerdown: (event, { el, api, key }) => api.resize.pointerdown(event, key, "move", el!),
-        keydown: (event, { api, key }) => api.resize.keydown(event, key, "move"),
+        pointerdown: (event, { el, api, key }) =>
+          api.resize.pointerdown(event, key, "move", el!),
+        keydown: (event, { api, key }) =>
+          api.resize.keydown(event, key, "move"),
       },
     }),
     handle: slot<{ value: string }>({
@@ -133,7 +155,11 @@ const board = definePrimitive({
   }),
 })
 
-const boardParts = createParts(board, { root: "div", box: "div", handle: "button" })
+const boardParts = createParts(board, {
+  root: "div",
+  box: "div",
+  handle: "button",
+})
 const Board = boardParts.Root
 const BoardBox = boardParts.Box
 const BoardHandle = boardParts.Handle
@@ -143,8 +169,12 @@ function useFit(width: number) {
   const [scale, setScale] = React.useState(1)
   React.useEffect(() => {
     const element = ref.current
-    if (!element) return
-    const observer = new ResizeObserver(([entry]) => setScale(entry.contentRect.width / width))
+    if (!element) {
+      return
+    }
+    const observer = new ResizeObserver(([entry]) =>
+      setScale(entry.contentRect.width / width)
+    )
     observer.observe(element)
     return () => observer.disconnect()
   }, [width])
@@ -164,7 +194,7 @@ function Handles({ box }: { box: string }) {
         handle === "nw" && "-start-[5px] -top-[5px]",
         handle === "ne" && "-end-[5px] -top-[5px]",
         handle === "se" && "-end-[5px] -bottom-[5px]",
-        handle === "sw" && "-start-[5px] -bottom-[5px]",
+        handle === "sw" && "-start-[5px] -bottom-[5px]"
       )}
     />
   ))
@@ -212,8 +242,9 @@ const Shape = React.memo(function Shape({
       onFocus={() => onSelect(layer.value)}
       className={cn(
         "group/box cursor-move outline-none",
-        selected && "z-10 outline-1 outline-offset-0 outline-foreground [outline-style:dashed]",
-        "focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#006bff]",
+        selected &&
+          "z-10 outline-1 outline-offset-0 outline-foreground [outline-style:dashed]",
+        "focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#006bff]"
       )}
       style={{ opacity: opacity / 100 }}
     >
@@ -223,7 +254,7 @@ const Shape = React.memo(function Shape({
             "flex size-full items-center px-3 text-[40px] leading-none font-[450] tracking-[-0.05em]",
             fill === "ink" && "bg-foreground text-background",
             fill === "gray" && "bg-foreground/15",
-            fill === "hatch" && fills[3].className,
+            fill === "hatch" && fills[3].className
           )}
         >
           Behaviors.
@@ -234,7 +265,7 @@ const Shape = React.memo(function Shape({
           className={cn(
             "block size-full border border-foreground",
             layer.value === "circle" && "rounded-full",
-            fills.find((entry) => entry.value === fill)?.className,
+            fills.find((entry) => entry.value === fill)?.className
           )}
         />
       )}
@@ -266,7 +297,7 @@ const CanvasLayers = React.memo(function CanvasLayers({
             value={layer.value}
             className={cn(
               "flex h-8 cursor-default items-center gap-2 px-2.5 text-[13px] select-none hover:bg-foreground/[0.06] data-pressed:bg-foreground data-pressed:text-background [&_svg]:size-3.5",
-              ring,
+              ring
             )}
           >
             <layer.icon aria-hidden="true" />
@@ -298,7 +329,10 @@ const CanvasStyle = React.memo(function CanvasStyle({
         <ToggleGroup
           aria-label="Fill"
           value={[fill[selected]]}
-          onValueChange={(value) => value[0] && setFill((current) => ({ ...current, [selected]: value[0] }))}
+          onValueChange={(value) =>
+            value[0] &&
+            setFill((current) => ({ ...current, [selected]: value[0] }))
+          }
           className="flex gap-1.5"
         >
           {fills.map((entry) => (
@@ -309,26 +343,39 @@ const CanvasStyle = React.memo(function CanvasStyle({
               className={cn(
                 "size-7 border border-foreground data-pressed:outline-2 data-pressed:outline-offset-2 data-pressed:outline-foreground",
                 entry.className,
-                ring,
+                ring
               )}
             />
           ))}
         </ToggleGroup>
       </div>
       <div className="flex flex-col gap-2">
-        <span className={cn(label, "flex justify-between text-muted-foreground tabular-nums")}>
+        <span
+          className={cn(
+            label,
+            "flex justify-between text-muted-foreground tabular-nums"
+          )}
+        >
           Opacity <span>{opacity[selected]}%</span>
         </span>
         <Slider
           value={opacity[selected]}
-          onValueChange={(value) => setOpacity((current) => ({ ...current, [selected]: value as number }))}
+          onValueChange={(value) =>
+            setOpacity((current) => ({
+              ...current,
+              [selected]: value as number,
+            }))
+          }
           min={10}
           max={100}
         >
           <SliderControl className="flex h-5 items-center">
             <SliderTrack className="relative h-px w-full bg-foreground/25">
               <SliderIndicator className="h-0.5 -translate-y-[0.5px] bg-foreground" />
-              <SliderThumb aria-label="Opacity" className={cn("size-3.5 bg-background", ink, ring)} />
+              <SliderThumb
+                aria-label="Opacity"
+                className={cn("size-3.5 bg-background", ink, ring)}
+              />
             </SliderTrack>
           </SliderControl>
         </Slider>
@@ -345,7 +392,11 @@ function CanvasTile({ className, fig }: { className?: string; fig?: string }) {
     circle: "ink",
     text: "white",
   })
-  const [opacity, setOpacity] = React.useState<Record<string, number>>({ frame: 100, circle: 100, text: 100 })
+  const [opacity, setOpacity] = React.useState<Record<string, number>>({
+    frame: 100,
+    circle: 100,
+    text: 100,
+  })
   const [boxes, setBoxes] = React.useState(shapes)
   return (
     <Poster
@@ -371,7 +422,11 @@ function CanvasTile({ className, fig }: { className?: string; fig?: string }) {
           const box = live[selected]
           return (
             <div className="grid gap-4 @[40rem]:grid-cols-[1fr_11rem]">
-              <div ref={ref} className={cn("relative bg-background", ink)} style={{ height: 312 * scale }}>
+              <div
+                ref={ref}
+                className={cn("relative bg-background", ink)}
+                style={{ height: 312 * scale }}
+              >
                 <div
                   className="absolute start-0 top-0 h-[312px] w-[460px] origin-top-left rtl:origin-top-right"
                   style={{ transform: `scale(${scale})` }}
@@ -412,7 +467,10 @@ function CanvasTile({ className, fig }: { className?: string; fig?: string }) {
                       >
                         {key[0]}
                         <NumberInputScrubAreaCursor className="text-foreground">
-                          <MoveHorizontalIcon aria-hidden="true" className="size-4" />
+                          <MoveHorizontalIcon
+                            aria-hidden="true"
+                            className="size-4"
+                          />
                         </NumberInputScrubAreaCursor>
                       </NumberInputScrubArea>
                       <NumberInputControl
@@ -453,7 +511,10 @@ function timecode(frame: number) {
 const reel = definePrimitive({
   name: "reel",
   options: { defaultClips: "value" },
-  state: (options: ReelOptions): ReelState => ({ clips: options.defaultClips, draft: null }),
+  state: (options: ReelOptions): ReelState => ({
+    clips: options.defaultClips,
+    draft: null,
+  }),
   api: (context) => {
     const change = createChange(context)
     return {
@@ -466,7 +527,8 @@ const reel = definePrimitive({
         max: () => length,
         step: () => fps / 4,
         overlap: false,
-        label: (clip) => `${clip.title}, ${timecode(clip.start)} to ${timecode(clip.end)}`,
+        label: (clip) =>
+          `${clip.title}, ${timecode(clip.start)} to ${timecode(clip.end)}`,
         createAutoScroll: false,
       }),
     }
@@ -477,7 +539,10 @@ const reel = definePrimitive({
     }),
     track: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: () => ({ role: "group", style: "position:relative;touch-action:none;user-select:none" }),
+      attrs: () => ({
+        role: "group",
+        style: "position:relative;touch-action:none;user-select:none",
+      }),
       bind: (el, { api, key }) => {
         const unbind = api.spans.bindTrack(el, key)
         const view = el.ownerDocument.defaultView!
@@ -494,13 +559,16 @@ const reel = definePrimitive({
         const clip = api.spans.spans(state).find((other) => other.id === key)
         return {
           tabindex: "0",
-          "aria-label": clip ? `${clip.title}, ${timecode(clip.start)} to ${timecode(clip.end)}` : undefined,
+          "aria-label": clip
+            ? `${clip.title}, ${timecode(clip.start)} to ${timecode(clip.end)}`
+            : undefined,
           ...api.spans.spanAttrs(state, key),
           style: clip ? api.spans.spanStyle(clip) : undefined,
         }
       },
       on: {
-        pointerdown: (event, { api, key }) => api.spans.spanPointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.spans.spanPointerdown(event, key),
         keydown: (event, { api, key }) => api.spans.keydown(event, key),
       },
       bind: (el, { api, key }) => api.spans.bindSpan(el, key),
@@ -517,8 +585,20 @@ const clips: Clip[] = [
   { id: "open", track: "v1", start: 0, end: 6 * fps, title: "Open" },
   { id: "street", track: "v1", start: 6 * fps, end: 13 * fps, title: "Street" },
   { id: "close", track: "v1", start: 14 * fps, end: 20 * fps, title: "Close" },
-  { id: "title", track: "v2", start: 1 * fps, end: 5 * fps, title: "Title card" },
-  { id: "lower", track: "v2", start: 9 * fps, end: 12 * fps, title: "Lower third" },
+  {
+    id: "title",
+    track: "v2",
+    start: 1 * fps,
+    end: 5 * fps,
+    title: "Title card",
+  },
+  {
+    id: "lower",
+    track: "v2",
+    start: 9 * fps,
+    end: 12 * fps,
+    title: "Lower third",
+  },
   { id: "score", track: "a1", start: 0, end: 16 * fps, title: "Score" },
   { id: "voice", track: "a2", start: 3 * fps, end: 11 * fps, title: "Voice" },
 ]
@@ -537,12 +617,20 @@ function wave(id: string) {
   })
 }
 
-function TimelineTile({ className, fig }: { className?: string; fig?: string }) {
+function TimelineTile({
+  className,
+  fig,
+}: {
+  className?: string
+  fig?: string
+}) {
   const [frame, setFrame] = React.useState(5 * fps)
   const [playing, setPlaying] = React.useState(false)
   const [hidden, setHidden] = React.useState<string[]>([])
   React.useEffect(() => {
-    if (!playing) return
+    if (!playing) {
+      return
+    }
     let last = performance.now()
     let id = 0
     const loop = (now: number) => {
@@ -567,7 +655,12 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
           const at = (track: string) =>
             hidden.includes(track)
               ? undefined
-              : live.find((clip) => clip.track === track && clip.start <= frame && frame < clip.end)
+              : live.find(
+                  (clip) =>
+                    clip.track === track &&
+                    clip.start <= frame &&
+                    frame < clip.end
+                )
           const shot = at("v1")
           const overlay = at("v2")
           return (
@@ -576,14 +669,16 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
                 <Title id="timeline" max={6.5} className="-ms-[0.05em]">
                   Timeline.
                 </Title>
-                <Numeral className="text-[length:clamp(2rem,6cqi,3.5rem)]">{timecode(frame)}</Numeral>
+                <Numeral className="text-[length:clamp(2rem,6cqi,3.5rem)]">
+                  {timecode(frame)}
+                </Numeral>
               </div>
               <div className="flex flex-col gap-4">
                 <div
                   className={cn(
                     "relative flex aspect-video items-center justify-center overflow-hidden @[36rem]:aspect-[2.4/1]",
                     ink,
-                    shot ? "bg-foreground text-background" : "bg-background",
+                    shot ? "bg-foreground text-background" : "bg-background"
                   )}
                 >
                   {shot ? (
@@ -591,7 +686,9 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
                       {shot.title}.
                     </span>
                   ) : (
-                    <span className={cn(label, "text-muted-foreground")}>No signal</span>
+                    <span className={cn(label, "text-muted-foreground")}>
+                      No signal
+                    </span>
                   )}
                   {overlay && (
                     <span className="absolute start-3 bottom-3 border border-current px-2 py-1 font-mono text-[10px] tracking-[0.06em] uppercase">
@@ -619,9 +716,18 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
                       onPressedChange={setPlaying}
                       className={press}
                     >
-                      {playing ? <PauseIcon aria-hidden="true" /> : <PlayIcon aria-hidden="true" />}
+                      {playing ? (
+                        <PauseIcon aria-hidden="true" />
+                      ) : (
+                        <PlayIcon aria-hidden="true" />
+                      )}
                     </Toggle>
-                    <span className={cn(label, "ms-auto text-muted-foreground tabular-nums")}>
+                    <span
+                      className={cn(
+                        label,
+                        "ms-auto text-muted-foreground tabular-nums"
+                      )}
+                    >
                       {live.length} clips · 24 fps
                     </span>
                   </div>
@@ -642,9 +748,19 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
                           className="absolute inset-x-0 bottom-0 flex h-full justify-between font-mono text-[9px] text-muted-foreground"
                         >
                           {Array.from({ length: 11 }, (_, index) => (
-                            <span key={index} className="flex w-0 flex-col items-center justify-end gap-0.5">
-                              {index % 2 === 0 && index < 10 && <span>{index * 2}s</span>}
-                              <span className={cn("w-px bg-foreground/40", index % 2 ? "h-1.5" : "h-2.5")} />
+                            <span
+                              key={index}
+                              className="flex w-0 flex-col items-center justify-end gap-0.5"
+                            >
+                              {index % 2 === 0 && index < 10 && (
+                                <span>{index * 2}s</span>
+                              )}
+                              <span
+                                className={cn(
+                                  "w-px bg-foreground/40",
+                                  index % 2 ? "h-1.5" : "h-2.5"
+                                )}
+                              />
                             </span>
                           ))}
                         </div>
@@ -653,7 +769,7 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
                             aria-label="Playhead"
                             className={cn(
                               "top-auto! bottom-0 h-3 w-2.5 translate-y-0! bg-foreground [clip-path:polygon(0_0,100%_0,100%_60%,50%_100%,0_60%)]",
-                              ring,
+                              ring
                             )}
                           />
                         </SliderTrack>
@@ -673,12 +789,14 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
                             setHidden((current) =>
                               pressed
                                 ? [...current, track.value]
-                                : current.filter((value) => value !== track.value),
+                                : current.filter(
+                                    (value) => value !== track.value
+                                  )
                             )
                           }
                           className={cn(
                             "border-e border-foreground/20 font-mono text-[10px] select-none hover:bg-foreground/[0.06] data-pressed:text-muted-foreground data-pressed:line-through",
-                            ring,
+                            ring
                           )}
                         >
                           {track.label}
@@ -699,7 +817,7 @@ function TimelineTile({ className, fig }: { className?: string; fig?: string }) 
                                   track.value.startsWith("v")
                                     ? "bg-foreground text-background"
                                     : "bg-background",
-                                  hidden.includes(track.value) && "opacity-40",
+                                  hidden.includes(track.value) && "opacity-40"
                                 )}
                               >
                                 {track.value.startsWith("a") && (

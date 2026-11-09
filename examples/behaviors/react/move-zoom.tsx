@@ -11,7 +11,11 @@ import {
 import { createParts } from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
-type CanvasState = { positions: Record<string, MovePoint>; zoom: number; moving: MoveDraft | null }
+type CanvasState = {
+  positions: Record<string, MovePoint>
+  zoom: number
+  moving: MoveDraft | null
+}
 
 type CanvasOptions = {
   zoom?: number
@@ -40,8 +44,11 @@ const canvas = definePrimitive({
     return {
       move,
       act(action: string) {
-        if (action === "center") move.moveTo("circle", { x: 112, y: 64 })
-        else if (action === "nudge") move.moveBy(["circle"], 10, 0)
+        if (action === "center") {
+          move.moveTo("circle", { x: 112, y: 64 })
+        } else if (action === "nudge") {
+          move.moveBy(["circle"], 10, 0)
+        }
       },
     }
   },
@@ -64,15 +71,23 @@ const canvas = definePrimitive({
         const at = state.positions[key]
         return {
           tabindex: "0",
-          style: css({ position: "absolute", left: `${at.x}px`, top: `${at.y}px`, "touch-action": "none" }),
+          style: css({
+            position: "absolute",
+            left: `${at.x}px`,
+            top: `${at.y}px`,
+            "touch-action": "none",
+          }),
         }
       },
-      live: live<CanvasState, any, { value: string }>((state, { api, key }) => ({
-        style: api.move.style(state, key),
-      })),
+      live: live<CanvasState, any, { value: string }>(
+        (state, { api, key }) => ({
+          style: api.move.style(state, key),
+        })
+      ),
       on: {
         keydown: (event, { api, key }) => api.move.keydown(event, key),
-        pointerdown: (event, { el, api, key }) => api.move.pointerdown(event, key, el!),
+        pointerdown: (event, { el, api, key }) =>
+          api.move.pointerdown(event, key, el!),
       },
     }),
     action: slot<{ value: string }>({
@@ -83,7 +98,12 @@ const canvas = definePrimitive({
   }),
 })
 
-const parts = createParts(canvas, { root: "div", surface: "div", shape: "div", action: "button" })
+const parts = createParts(canvas, {
+  root: "div",
+  surface: "div",
+  shape: "div",
+  action: "button",
+})
 
 const Canvas = parts.Root
 
@@ -101,7 +121,9 @@ function Example() {
       aria-label="Canvas"
       zoom={zoom}
       onPositionsChange={({ circle, square }) =>
-        log(`Circle at ${circle.x}, ${circle.y} · Square at ${square.x}, ${square.y}`)
+        log(
+          `Circle at ${circle.x}, ${circle.y} · Square at ${square.x}, ${square.y}`
+        )
       }
     >
       <div data-slot="controls">

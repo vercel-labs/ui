@@ -46,7 +46,11 @@ type StickToBottomOptions = {
  * @experimental
  */
 function createStickToBottom(options: StickToBottomOptions = {}) {
-  let state: StickToBottomState = { following: options.initial ?? true, atBottom: true, unseen: false }
+  let state: StickToBottomState = {
+    following: options.initial ?? true,
+    atBottom: true,
+    unseen: false,
+  }
   const listeners = new Set<() => void>()
   let scroller: HTMLElement | undefined
   // The scroll position this module set last, so its own scrolls don't read as the reader's.
@@ -57,32 +61,43 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
   let anchor: number | null = null
 
   const threshold = () => options.threshold ?? 24
-  const distance = (el: HTMLElement) => el.scrollHeight - el.clientHeight - el.scrollTop
+  const distance = (el: HTMLElement) =>
+    el.scrollHeight - el.clientHeight - el.scrollTop
 
   function set(next: Partial<StickToBottomState>) {
     const merged = { ...state, ...next }
-    if (merged.atBottom) merged.unseen = false
+    if (merged.atBottom) {
+      merged.unseen = false
+    }
     if (
       merged.following === state.following &&
       merged.atBottom === state.atBottom &&
       merged.unseen === state.unseen
-    )
+    ) {
       return
+    }
     state = merged
     options.onChange?.(state)
-    for (const listener of [...listeners]) listener()
+    for (const listener of [...listeners]) {
+      listener()
+    }
   }
 
   function toEnd(el: HTMLElement, behavior?: ScrollBehavior) {
     const top = el.scrollHeight - el.clientHeight
     ours = Math.max(0, Math.round(top))
-    if (behavior === "smooth") el.scrollTo({ top, behavior })
-    else el.scrollTop = top
+    if (behavior === "smooth") {
+      el.scrollTo({ top, behavior })
+    } else {
+      el.scrollTop = top
+    }
   }
 
   function resized() {
     const el = scroller
-    if (!el) return
+    if (!el) {
+      return
+    }
     const grew = el.scrollHeight > lastHeight
     let unseen = false
     if (anchor !== null && el.scrollHeight !== lastHeight) {
@@ -90,8 +105,11 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
       ours = Math.round(el.scrollHeight - el.clientHeight - anchor)
       el.scrollTop = ours
       anchor = null
-    } else if (state.following) toEnd(el)
-    else unseen = grew
+    } else if (state.following) {
+      toEnd(el)
+    } else {
+      unseen = grew
+    }
     lastHeight = el.scrollHeight
     lastTop = el.scrollTop
     // One change, so content that pushes the end out of view stays unseen.
@@ -100,15 +118,22 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
 
   function scrolled() {
     const el = scroller
-    if (!el) return
+    if (!el) {
+      return
+    }
     const top = el.scrollTop
     const atBottom = distance(el) <= threshold()
     const mine = ours !== null && Math.abs(top - ours) <= 1
     if (mine) {
       // Our own scroll, or the browser finishing it smoothly.
-      if (atBottom) ours = null
-    } else if (top < lastTop - 1 && !atBottom) set({ following: false })
-    else if (atBottom) set({ following: true })
+      if (atBottom) {
+        ours = null
+      }
+    } else if (top < lastTop - 1 && !atBottom) {
+      set({ following: false })
+    } else if (atBottom) {
+      set({ following: true })
+    }
     lastTop = top
     set({ atBottom })
   }
@@ -130,11 +155,15 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
       scroller = el
       el.style.setProperty("overflow-anchor", "none")
       const view = el.ownerDocument.defaultView
-      const sizes = view?.ResizeObserver ? new view.ResizeObserver(resized) : undefined
+      const sizes = view?.ResizeObserver
+        ? new view.ResizeObserver(resized)
+        : undefined
       const watch = () => {
         sizes?.disconnect()
         sizes?.observe(el)
-        for (const child of el.children) sizes?.observe(child)
+        for (const child of el.children) {
+          sizes?.observe(child)
+        }
       }
       watch()
       // Children come and go; each new one is watched as it arrives.
@@ -151,11 +180,15 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
           event.type === "wheel"
             ? (event as WheelEvent).deltaY < 0
             : event.type === "keydown"
-              ? ["ArrowUp", "PageUp", "Home"].includes((event as KeyboardEvent).key)
+              ? ["ArrowUp", "PageUp", "Home"].includes(
+                  (event as KeyboardEvent).key
+                )
               : true
         if (up && el.scrollHeight > el.clientHeight) {
           ours = null
-          if (event.type !== "touchmove") set({ following: false })
+          if (event.type !== "touchmove") {
+            set({ following: false })
+          }
         }
       }
       el.addEventListener("scroll", scrolled, { passive: true })
@@ -163,7 +196,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
       el.addEventListener("touchmove", intent, { passive: true })
       el.addEventListener("keydown", intent)
       lastHeight = el.scrollHeight
-      if (state.following) toEnd(el)
+      if (state.following) {
+        toEnd(el)
+      }
       lastTop = el.scrollTop
       return () => {
         sizes?.disconnect()
@@ -172,13 +207,17 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
         el.removeEventListener("wheel", intent)
         el.removeEventListener("touchmove", intent)
         el.removeEventListener("keydown", intent)
-        if (scroller === el) scroller = undefined
+        if (scroller === el) {
+          scroller = undefined
+        }
       }
     },
     /** Scrolls to the end and follows again. */
     scrollToBottom({ behavior }: { behavior?: ScrollBehavior } = {}) {
       set({ following: true })
-      if (scroller) toEnd(scroller, behavior)
+      if (scroller) {
+        toEnd(scroller, behavior)
+      }
     },
     /** Stops following, as if the reader scrolled up. */
     release() {
@@ -189,7 +228,10 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
      * growth keeps what's in view where it is instead of pushing it down.
      */
     prepend() {
-      if (scroller) anchor = scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop
+      if (scroller) {
+        anchor =
+          scroller.scrollHeight - scroller.clientHeight - scroller.scrollTop
+      }
     },
   }
   return api
@@ -201,4 +243,9 @@ function createStickToBottom(options: StickToBottomOptions = {}) {
  */
 type StickToBottom = ReturnType<typeof createStickToBottom>
 
-export { createStickToBottom, type StickToBottom, type StickToBottomOptions, type StickToBottomState }
+export {
+  createStickToBottom,
+  type StickToBottom,
+  type StickToBottomOptions,
+  type StickToBottomState,
+}

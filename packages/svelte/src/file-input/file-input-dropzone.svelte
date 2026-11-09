@@ -18,10 +18,15 @@ keyboard and screen reader users choose files.
     target,
     pasteTarget,
     ...rest
-  }: PartProps<"div", FileInputDropzoneState> & FileInputDropzoneProps = $props()
+  }: PartProps<"div", FileInputDropzoneState> & FileInputDropzoneProps =
+    $props()
 
   const id = $props.id()
-  const zone = usePart(fileInput, "dropzone", () => ({ id, target, pasteTarget }))
+  const zone = usePart(fileInput, "dropzone", () => ({
+    id,
+    target,
+    pasteTarget,
+  }))
 </script>
 
 <Part tag="div" part={zone} props={rest} />

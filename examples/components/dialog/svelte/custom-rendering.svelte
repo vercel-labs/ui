@@ -32,7 +32,9 @@
           {/snippet}
         </DialogTitle>
         <DialogDescription>
-          {state.nested ? "Opened from another dialog." : "Quarterly report, updated today."}
+          {state.nested
+            ? "Opened from another dialog."
+            : "Quarterly report, updated today."}
         </DialogDescription>
       </div>
       <div data-slot="row">

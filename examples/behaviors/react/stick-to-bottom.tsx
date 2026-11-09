@@ -1,5 +1,10 @@
 import * as React from "react"
-import { createStickToBottom, css, definePrimitive, type StickToBottomState } from "@ui-sdk/core"
+import {
+  createStickToBottom,
+  css,
+  definePrimitive,
+  type StickToBottomState,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type BuildLogJumpState = {
@@ -9,19 +14,32 @@ type BuildLogJumpState = {
 
 const buildLog = definePrimitive({
   name: "build-log",
-  state: (): StickToBottomState => ({ following: true, unseen: false, atBottom: true }),
+  state: (): StickToBottomState => ({
+    following: true,
+    unseen: false,
+    atBottom: true,
+  }),
   api: (context) => {
-    const stick = createStickToBottom({ onChange: (state) => context.store.set(state) })
+    const stick = createStickToBottom({
+      onChange: (state) => context.store.set(state),
+    })
     return { stick }
   },
   slots: (slot) => ({
     root: slot({}),
     log: slot({
-      attrs: () => ({ role: "log", tabindex: "0", style: css({ overflow: "auto" }) }),
+      attrs: () => ({
+        role: "log",
+        tabindex: "0",
+        style: css({ overflow: "auto" }),
+      }),
       bind: (el, { api }) => api.stick.connect(el),
     }),
     jump: slot<{}, BuildLogJumpState>({
-      state: (state) => ({ away: !state.following && !state.atBottom, unseen: state.unseen }),
+      state: (state) => ({
+        away: !state.following && !state.atBottom,
+        unseen: state.unseen,
+      }),
       attrs: (state) => ({
         type: "button",
         hidden: !state.following && !state.atBottom ? undefined : "",
@@ -40,7 +58,13 @@ const BuildLogLines = parts.Log
 
 const BuildLogJump = parts.Jump
 
-const steps = ["Resolving packages", "Compiling", "Bundling", "Checking types", "Running tests"]
+const steps = [
+  "Resolving packages",
+  "Compiling",
+  "Bundling",
+  "Checking types",
+  "Running tests",
+]
 
 function Example() {
   const [lines, setLines] = React.useState<string[]>([])
@@ -51,7 +75,10 @@ function Example() {
           clearInterval(timer)
           return [...current, "Done in 24s."]
         }
-        return [...current, `${steps[current.length % steps.length]} (${current.length + 1}/80)`]
+        return [
+          ...current,
+          `${steps[current.length % steps.length]} (${current.length + 1}/80)`,
+        ]
       })
     }, 250)
     return () => clearInterval(timer)
@@ -68,4 +95,11 @@ function Example() {
   )
 }
 
-export { buildLog, BuildLog, BuildLogJump, BuildLogLines, Example, type BuildLogJumpState }
+export {
+  buildLog,
+  BuildLog,
+  BuildLogJump,
+  BuildLogLines,
+  Example,
+  type BuildLogJumpState,
+}

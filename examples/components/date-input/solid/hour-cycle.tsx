@@ -14,7 +14,11 @@ function Example() {
       </Field>
       <Field>
         <FieldLabel>With seconds</FieldLabel>
-        <TimeInput granularity="second" hourCycle={24} defaultValue="18:45:30" />
+        <TimeInput
+          granularity="second"
+          hourCycle={24}
+          defaultValue="18:45:30"
+        />
       </Field>
     </div>
   )

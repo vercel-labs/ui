@@ -1,4 +1,10 @@
-import { Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/solid/menu"
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuItem,
+  MenuTrigger,
+} from "@ui-sdk/solid/menu"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
 
@@ -14,7 +20,11 @@ function Fixture() {
       <Menu onAction={setAction}>
         <MenuTrigger>File</MenuTrigger>
         <MenuContent class="popup">
-          <MenuItem class="item" value="docs" render={(props) => <a {...props} href="#docs" />}>
+          <MenuItem
+            class="item"
+            value="docs"
+            render={(props) => <a {...props} href="#docs" />}
+          >
             Docs
           </MenuItem>
           <MenuItem
@@ -44,7 +54,9 @@ function Fixture() {
           </MenuItem>
           <MenuCheckboxItem
             value="pinned"
-            class={(state) => `item ${state.checked ? "is-checked" : "is-unchecked"}`}
+            class={(state) =>
+              `item ${state.checked ? "is-checked" : "is-unchecked"}`
+            }
           >
             Pinned
           </MenuCheckboxItem>

@@ -14,26 +14,50 @@ import {
   type ISOMonth,
 } from "@ui-sdk/core/calendar"
 import type { ISODate } from "@ui-sdk/core/date"
-import { defineComponent, Fragment, h, inject, provide, type PropType, type SlotsType, type VNode } from "vue"
+import {
+  defineComponent,
+  Fragment,
+  h,
+  inject,
+  provide,
+  type PropType,
+  type SlotsType,
+  type VNode,
+} from "vue"
 import { CalendarKey, GridKey } from "./calendar-context"
 import { slotContent } from "./children"
 import { withElement } from "./create-parts"
-import { optionalBoolean, orModel, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 import { readOnlyOf } from "./text-control"
 
 function useCalendar(part: string) {
   const context = inject(CalendarKey)
-  if (!context) throw new Error(`${part} must be used inside <Calendar> or <DatePickerContent>.`)
+  if (!context) {
+    throw new Error(
+      `${part} must be used inside <Calendar> or <DatePickerContent>.`
+    )
+  }
   return context
 }
 
 function useGrid(part: string) {
   const context = inject(GridKey)
-  if (!context) throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  }
   return context
 }
 
-const calendarValue = { type: null as unknown as PropType<CalendarValue>, default: undefined }
+const calendarValue = {
+  type: null as unknown as PropType<CalendarValue>,
+  default: undefined,
+}
 
 /**
  * Months of days with one tab stop. Without content it renders Previous, the
@@ -77,11 +101,23 @@ const Calendar = withElement(
     emits: {
       "update:value": (_value: CalendarValue) => true,
       "update:modelValue": (_value: CalendarValue) => true,
-      valueChange: (_value: CalendarValue, _details: ChangeDetails<CalendarValueChangeReason>) => true,
+      valueChange: (
+        _value: CalendarValue,
+        _details: ChangeDetails<CalendarValueChangeReason>
+      ) => true,
       "update:month": (_month: ISOMonth) => true,
-      monthChange: (_month: ISOMonth, _details: ChangeDetails<CalendarMonthChangeReason>) => true,
-      focusedChange: (_date: ISODate, _details: ChangeDetails<CalendarFocusedChangeReason>) => true,
-      anchorChange: (_anchor: ISODate | null, _details: ChangeDetails<CalendarAnchorChangeReason>) => true,
+      monthChange: (
+        _month: ISOMonth,
+        _details: ChangeDetails<CalendarMonthChangeReason>
+      ) => true,
+      focusedChange: (
+        _date: ISODate,
+        _details: ChangeDetails<CalendarFocusedChangeReason>
+      ) => true,
+      anchorChange: (
+        _anchor: ISODate | null,
+        _details: ChangeDetails<CalendarAnchorChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof calendarPrimitive, "root">,
     setup(props, { slots, attrs, emit }) {
@@ -97,10 +133,14 @@ const Calendar = withElement(
         disabled: props.disabled,
         readOnly: readOnlyOf(props, attrs),
         deselectable: props.deselectable,
-        onFocusedChange: (date: ISODate, details: ChangeDetails<CalendarFocusedChangeReason>) =>
-          emit("focusedChange", date, details),
-        onAnchorChange: (anchor: ISODate | null, details: ChangeDetails<CalendarAnchorChangeReason>) =>
-          emit("anchorChange", anchor, details),
+        onFocusedChange: (
+          date: ISODate,
+          details: ChangeDetails<CalendarFocusedChangeReason>
+        ) => emit("focusedChange", date, details),
+        onAnchorChange: (
+          anchor: ISODate | null,
+          details: ChangeDetails<CalendarAnchorChangeReason>
+        ) => emit("anchorChange", anchor, details),
         months: props.months,
         pageBy: props.pageBy,
         locale: props.locale,
@@ -117,30 +157,42 @@ const Calendar = withElement(
         controller: props.controller,
         debug: props.debug,
         // The change events run first, so canceling one also keeps v-model as it was.
-        onValueChange: (value: CalendarValue, details: ChangeDetails<CalendarValueChangeReason>) => {
+        onValueChange: (
+          value: CalendarValue,
+          details: ChangeDetails<CalendarValueChangeReason>
+        ) => {
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onMonthChange: (month: ISOMonth, details: ChangeDetails<CalendarMonthChangeReason>) => {
+        onMonthChange: (
+          month: ISOMonth,
+          details: ChangeDetails<CalendarMonthChangeReason>
+        ) => {
           emit("monthChange", month, details)
-          if (!details.canceled) emit("update:month", month)
+          if (!details.canceled) {
+            emit("update:month", month)
+          }
         },
       }))
       provide(CalendarKey, calendar)
       const defaultContent = () => [
         h("div", [h(CalendarPrevious), h(CalendarHeading), h(CalendarNext)]),
-        ...Array.from({ length: Math.max(1, Math.floor(props.months ?? 1) || 1) }, (_, offset) =>
-          h(CalendarGrid, { key: offset, offset }),
+        ...Array.from(
+          { length: Math.max(1, Math.floor(props.months ?? 1) || 1) },
+          (_, offset) => h(CalendarGrid, { key: offset, offset })
         ),
       ]
       return usePart(calendar, "root", undefined, undefined, {
         tag: "div",
-        children: (state) => slotContent(slots.default, { state }) ?? defaultContent(),
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? defaultContent(),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -157,13 +209,17 @@ const CalendarHeading = withElement(
       const calendar = useCalendar("CalendarHeading")
       return usePart(calendar, "heading", undefined, undefined, {
         tag: "h2",
-        children: (state) => slotContent(slots.default, { state }) ?? state.label,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.label,
       })
     },
-  }),
+  })
 )
 
-function selectPart<S extends "month-select" | "year-select">(name: string, slot: S) {
+function selectPart<S extends "month-select" | "year-select">(
+  name: string,
+  slot: S
+) {
   return withElement(
     "select",
     defineComponent({
@@ -184,17 +240,18 @@ function selectPart<S extends "month-select" | "year-select">(name: string, slot
                 disabled: option.disabled,
                 selected: option.value === state.value,
               },
-              option.label,
-            ),
+              option.label
+            )
           )
         return usePart(calendar, slot, undefined, undefined, {
           tag: "select",
-          children: (state) => slotContent(slots.default, { state }) ?? options(state),
+          children: (state) =>
+            slotContent(slots.default, { state }) ?? options(state),
           // The selected option carries the value, not the select.
           extend: ({ value: _, ...part }) => part,
         })
       },
-    }),
+    })
   )
 }
 
@@ -209,7 +266,11 @@ const CalendarMonthSelect = selectPart("CalendarMonthSelect", "month-select")
  */
 const CalendarYearSelect = selectPart("CalendarYearSelect", "year-select")
 
-function stepPart<S extends "previous" | "next">(name: string, slot: S, text: string) {
+function stepPart<S extends "previous" | "next">(
+  name: string,
+  slot: S,
+  text: string
+) {
   return withElement(
     "button",
     defineComponent({
@@ -223,7 +284,7 @@ function stepPart<S extends "previous" | "next">(name: string, slot: S, text: st
           children: (state) => slotContent(slots.default, { state }) ?? text,
         })
       },
-    }),
+    })
   )
 }
 
@@ -255,12 +316,16 @@ const CalendarGrid = withElement(
       const part = () => ({ offset: props.offset, id: String(props.offset) })
       const grid = usePart(calendar, "grid", part, undefined, {
         tag: "table",
-        children: (state) => slotContent(slots.default, { state }) ?? [h(CalendarWeekdays), h(CalendarWeeks)],
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? [
+            h(CalendarWeekdays),
+            h(CalendarWeeks),
+          ],
       })
       provide(GridKey, { offset: () => props.offset, state: grid.state })
       return grid
     },
-  }),
+  })
 )
 
 /**
@@ -274,7 +339,9 @@ const CalendarWeekdays = withElement(
   defineComponent({
     name: "CalendarWeekdays",
     inheritAttrs: false,
-    slots: Object as SlotsType<{ default?: (scope: { index: number }) => VNode[] }>,
+    slots: Object as SlotsType<{
+      default?: (scope: { index: number }) => VNode[]
+    }>,
     setup(_, { slots, attrs }) {
       const calendar = useCalendar("CalendarWeekdays")
       const grid = useGrid("CalendarWeekdays")
@@ -288,12 +355,12 @@ const CalendarWeekdays = withElement(
             grid.state.weekdays.map((weekday, index) =>
               slots.default
                 ? h(Fragment, { key: weekday }, slots.default({ index }))
-                : h(CalendarWeekday, { key: weekday, index }),
-            ),
-          ),
+                : h(CalendarWeekday, { key: weekday, index })
+            )
+          )
         )
     },
-  }),
+  })
 )
 
 /**
@@ -310,13 +377,23 @@ const CalendarWeekday = withElement(
     setup(props, { slots, attrs }) {
       const calendar = useCalendar("CalendarWeekday")
       const grid = useGrid("CalendarWeekday")
-      const part = () => ({ index: props.index, id: `${grid.offset()}-${props.index}` })
-      return usePart(calendar, "weekday", part, () => ({ scope: "col", ...attrs }), {
-        tag: "th",
-        children: (state) => slotContent(slots.default, { state }) ?? state.label,
+      const part = () => ({
+        index: props.index,
+        id: `${grid.offset()}-${props.index}`,
       })
+      return usePart(
+        calendar,
+        "weekday",
+        part,
+        () => ({ scope: "col", ...attrs }),
+        {
+          tag: "th",
+          children: (state) =>
+            slotContent(slots.default, { state }) ?? state.label,
+        }
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -331,7 +408,9 @@ const CalendarWeeks = withElement(
   defineComponent({
     name: "CalendarWeeks",
     inheritAttrs: false,
-    slots: Object as SlotsType<{ default?: (scope: { cell: CalendarGridCell }) => VNode[] }>,
+    slots: Object as SlotsType<{
+      default?: (scope: { cell: CalendarGridCell }) => VNode[]
+    }>,
     setup(_, { slots, attrs }) {
       const calendar = useCalendar("CalendarWeeks")
       const grid = useGrid("CalendarWeeks")
@@ -343,20 +422,23 @@ const CalendarWeeks = withElement(
           grid.state.weeks.map((week, index) =>
             h(
               "tr",
-              { key: week[0]!.date, ...calendar.slot("week", { id: `${offset}-${index}` }) },
+              {
+                key: week[0]!.date,
+                ...calendar.slot("week", { id: `${offset}-${index}` }),
+              },
               week.map((cell) =>
                 cell.hidden
                   ? h("td", { key: cell.date })
                   : slots.default
                     ? h(Fragment, { key: cell.date }, slots.default({ cell }))
-                    : h(CalendarDay, { key: cell.date, value: cell.date }),
-              ),
-            ),
-          ),
+                    : h(CalendarDay, { key: cell.date, value: cell.date })
+              )
+            )
+          )
         )
       }
     },
-  }),
+  })
 )
 
 /**
@@ -376,10 +458,11 @@ const CalendarDay = withElement(
       const part = () => ({ value: props.value, offset: grid?.offset() ?? 0 })
       return usePart(calendar, "day", part, undefined, {
         tag: "td",
-        children: (state) => slotContent(slots.default, { state }) ?? state.label,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.label,
       })
     },
-  }),
+  })
 )
 
 export { createCalendarController } from "@ui-sdk/core/calendar"

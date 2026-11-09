@@ -29,11 +29,21 @@ import {
 import { withElement } from "./create-parts"
 import { EditorKey } from "./editor-context"
 import { useFieldControl } from "./field-context"
-import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 import { renderless } from "./renderless"
 import { readOnlyOf } from "./text-control"
 
-type ValueDetails = ChangeDetails<TokenInputValueChangeReason> & { inputType?: string; removed: Token[] }
+type ValueDetails = ChangeDetails<TokenInputValueChangeReason> & {
+  inputType?: string
+  removed: Token[]
+}
 
 const TokenKey: InjectionKey<string> = Symbol("token-input-token")
 
@@ -49,7 +59,9 @@ function given(list: TokenInputValue | undefined) {
 
 function useTokenId(part: string) {
   const id = inject(TokenKey, null)
-  if (!id) throw new Error(`<${part}> must be used inside the token slot.`)
+  if (!id) {
+    throw new Error(`<${part}> must be used inside the token slot.`)
+  }
   return id
 }
 
@@ -78,7 +90,9 @@ const TokenInput = /* @__PURE__ */ renderless(
       controller: Object as PropType<TokenInputController>,
       debug: optionalBoolean,
       // A function prop, so `@submit` binds to it, and without one the shortcut submits the form.
-      onSubmit: Function as PropType<(value: TokenInputValue, details: TokenInputSubmitDetails) => void>,
+      onSubmit: Function as PropType<
+        (value: TokenInputValue, details: TokenInputSubmitDetails) => void
+      >,
     },
     emits: {
       "update:value": (_value: TokenInputValue) => true,
@@ -101,7 +115,9 @@ const TokenInput = /* @__PURE__ */ renderless(
         readOnly: readOnlyOf(props, attrs),
         onValueChange: (value: TokenInputValue, details: ValueDetails) => {
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
@@ -109,7 +125,11 @@ const TokenInput = /* @__PURE__ */ renderless(
       provide(EditorKey, () => input.api.editor)
       // Re-renders tokens when hosts come and go, and when tokens change.
       const version = shallowRef(renderVersion(input.instance))
-      onScopeDispose(input.instance.subscribe(() => (version.value = renderVersion(input.instance))))
+      onScopeDispose(
+        input.instance.subscribe(
+          () => (version.value = renderVersion(input.instance))
+        )
+      )
       // Slots aren't reactive: a `token` slot added or removed later is seen
       // before the render it causes.
       input.api.internal.setCustom(!!slots.token)
@@ -122,13 +142,15 @@ const TokenInput = /* @__PURE__ */ renderless(
             input.api.internal
               .hosts()
               .map(({ id, token, host }) =>
-                h(Teleport, { key: id, to: host }, [h(TokenScope, { id }, () => slots.token!({ token }))]),
+                h(Teleport, { key: id, to: host }, [
+                  h(TokenScope, { id }, () => slots.token!({ token })),
+                ])
               ),
           h(FormInput),
         ]
       }
     },
-  }),
+  })
 )
 
 // Gives a token's parts their token.
@@ -145,7 +167,8 @@ const FormInput = defineComponent({
   name: "TokenInputFormInput",
   setup() {
     const input = useTokenInput()
-    return () => (input.state.name ? h("textarea", input.slot("form-input")) : null)
+    return () =>
+      input.state.name ? h("textarea", input.slot("form-input")) : null
   },
 })
 
@@ -164,18 +187,27 @@ const TokenInputEditor = withElement(
       const input = useTokenInput()
       const field = useFieldControl(attrs)
       // The first value as markup, so a server render shows it. Vue never touches it again.
-      const html = renderStaticHtml(input.api.getValue(), input.api.internal.describe)
-      return usePart(input, "editor", () => ({ placeholder: props.placeholder }), undefined, {
-        tag: "div",
-        // The core owns the content.
-        children: () => undefined,
-        extend: (editor) => {
-          const own = { ...editor, innerHTML: html }
-          return field ? field.props(own) : own
-        },
-      })
+      const html = renderStaticHtml(
+        input.api.getValue(),
+        input.api.internal.describe
+      )
+      return usePart(
+        input,
+        "editor",
+        () => ({ placeholder: props.placeholder }),
+        undefined,
+        {
+          tag: "div",
+          // The core owns the content.
+          children: () => undefined,
+          extend: (editor) => {
+            const own = { ...editor, innerHTML: html }
+            return field ? field.props(own) : own
+          },
+        }
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -190,9 +222,15 @@ const TokenInputToken = withElement(
     slots: Object as PartSlots<typeof tokenInputPrimitive, "token">,
     setup() {
       const id = useTokenId("TokenInputToken")
-      return usePart(useTokenInput(), "token", () => ({ id, token: id }), undefined, "span")
+      return usePart(
+        useTokenInput(),
+        "token",
+        () => ({ id, token: id }),
+        undefined,
+        "span"
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -207,12 +245,24 @@ const TokenInputTokenRemove = withElement(
     slots: Object as PartSlots<typeof tokenInputPrimitive, "token-remove">,
     setup() {
       const id = useTokenId("TokenInputTokenRemove")
-      return usePart(useTokenInput(), "token-remove", () => ({ id, token: id }), undefined, "span")
+      return usePart(
+        useTokenInput(),
+        "token-remove",
+        () => ({ id, token: id }),
+        undefined,
+        "span"
+      )
     },
-  }),
+  })
 )
 
-export { createTokenInputController, defaultCodec, fromText, toLabel, toText } from "@ui-sdk/core/token-input"
+export {
+  createTokenInputController,
+  defaultCodec,
+  fromText,
+  toLabel,
+  toText,
+} from "@ui-sdk/core/token-input"
 export type {
   HistoryOptions,
   TextEditorAdapter,

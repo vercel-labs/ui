@@ -24,13 +24,28 @@ import {
 const suggestions = [
   { value: "calendar", label: "Calendar", icon: CalendarIcon },
   { value: "emoji", label: "Search Emoji", icon: SmileIcon },
-  { value: "calculator", label: "Calculator", icon: CalculatorIcon, disabled: true },
+  {
+    value: "calculator",
+    label: "Calculator",
+    icon: CalculatorIcon,
+    disabled: true,
+  },
 ]
 
 const settings = [
   { value: "profile", label: "Profile", icon: UserIcon, shortcut: "mod+p" },
-  { value: "billing", label: "Billing", icon: CreditCardIcon, shortcut: "mod+b" },
-  { value: "settings", label: "Settings", icon: SettingsIcon, shortcut: "mod+s" },
+  {
+    value: "billing",
+    label: "Billing",
+    icon: CreditCardIcon,
+    shortcut: "mod+b",
+  },
+  {
+    value: "settings",
+    label: "Settings",
+    icon: SettingsIcon,
+    shortcut: "mod+s",
+  },
 ]
 </script>
 
@@ -38,7 +53,10 @@ const settings = [
   <Command>
     <div data-slot="row">
       <SearchIcon aria-hidden="true" />
-      <CommandInput aria-label="Search commands" placeholder="Type a command or search…" />
+      <CommandInput
+        aria-label="Search commands"
+        placeholder="Type a command or search…"
+      />
     </div>
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandList>
@@ -59,7 +77,12 @@ const settings = [
       <CommandSeparator />
       <CommandGroup>
         <CommandGroupLabel>Settings</CommandGroupLabel>
-        <CommandItem v-for="item in settings" :key="item.value" :value="item.value" :shortcut="item.shortcut">
+        <CommandItem
+          v-for="item in settings"
+          :key="item.value"
+          :value="item.value"
+          :shortcut="item.shortcut"
+        >
           <CommandItemIcon>
             <component :is="item.icon" />
           </CommandItemIcon>

@@ -1,4 +1,8 @@
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/solid/resizable"
 import { createSignal } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -20,7 +24,9 @@ function Example() {
       <Resizable
         layout={layout()}
         onLayoutChange={(next, details) => {
-          if (format(next) !== format(layout())) log(`${format(next)} (${details.reason})`)
+          if (format(next) !== format(layout())) {
+            log(`${format(next)} (${details.reason})`)
+          }
           setLayout(next)
         }}
       >

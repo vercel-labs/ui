@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { ImageCropper, ImageCropperImage, ImageCropperSelection, ImageCropperViewport } from "../../src/image-cropper"
+  import {
+    ImageCropper,
+    ImageCropperImage,
+    ImageCropperSelection,
+    ImageCropperViewport,
+  } from "../../src/image-cropper"
 
   let crop = $state({ x: 10, y: 10, width: 100, height: 100 })
   let disabled = $state(false)

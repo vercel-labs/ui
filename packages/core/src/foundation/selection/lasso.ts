@@ -12,7 +12,13 @@ import { createDragSession, dragThreshold } from "../drag-and-drop/pointer"
  * The rectangle being drawn, relative to the surface, and what it selects so far.
  * @experimental
  */
-type LassoDraft = { left: number; top: number; right: number; bottom: number; keys: string[] }
+type LassoDraft = {
+  left: number
+  top: number
+  right: number
+  bottom: number
+  keys: string[]
+}
 
 /**
  * How `createLasso` finds items and changes the selection.
@@ -33,7 +39,10 @@ type LassoOptions<State extends object> = {
   message?: (count: number) => string
 }
 
-const touches = (a: LassoDraft, b: { left: number; top: number; right: number; bottom: number }) =>
+const touches = (
+  a: LassoDraft,
+  b: { left: number; top: number; right: number; bottom: number }
+) =>
   a.left < b.right && a.right > b.left && a.top < b.bottom && a.bottom > b.top
 
 /**
@@ -55,17 +64,23 @@ const touches = (a: LassoDraft, b: { left: number; top: number; right: number; b
  * @experimental
  */
 function createLasso<State extends object>(
-  context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy" | "parts">,
-  options: LassoOptions<State>,
+  context: Pick<
+    PrimitiveContext<any, State, any>,
+    "store" | "onDestroy" | "parts"
+  >,
+  options: LassoOptions<State>
 ) {
   const { store } = context
-  const setDraft = (draft: LassoDraft | null) => store.set({ [options.draft]: draft } as Partial<State>)
+  const setDraft = (draft: LassoDraft | null) =>
+    store.set({ [options.draft]: draft } as Partial<State>)
   const drags = createDragSession(context.onDestroy)
 
   return {
     /** Starts a rectangle on `surface` once the pointer moves past `dragThreshold`. Escape lets go without selecting. */
     pointerdown(event: PointerEvent, surface: HTMLElement) {
-      if (!drags.accepts(event)) return
+      if (!drags.accepts(event)) {
+        return
+      }
       const box = surface.getBoundingClientRect()
       const x0 = event.clientX - box.left
       const y0 = event.clientY - box.top
@@ -97,18 +112,23 @@ function createLasso<State extends object>(
             bottom: Math.max(y0, y1),
             keys: [],
           }
-          const hit = items.filter((item) => touches(rect, item.rect)).map((item) => item.key)
+          const hit = items
+            .filter((item) => touches(rect, item.rect))
+            .map((item) => item.key)
           setDraft({ ...rect, keys: [...new Set([...base, ...hit])] })
         },
         onEnd: (end, canceled) => {
           const draft = store.get()[options.draft] as LassoDraft | null
           setDraft(null)
-          if (!draft || canceled) return
-          if (options.set(draft.keys, { reason: "lasso", event: end }))
+          if (!draft || canceled) {
+            return
+          }
+          if (options.set(draft.keys, { reason: "lasso", event: end })) {
             announce(
               options.message?.(draft.keys.length) ??
-                `${draft.keys.length} ${draft.keys.length === 1 ? "item" : "items"} selected.`,
+                `${draft.keys.length} ${draft.keys.length === 1 ? "item" : "items"} selected.`
             )
+          }
         },
       })
     },
@@ -119,7 +139,9 @@ function createLasso<State extends object>(
     /** The rectangle as a `style` attribute for its part, hidden while none is drawn. */
     style(state: State) {
       const draft = state[options.draft] as LassoDraft | null
-      if (!draft) return "display:none"
+      if (!draft) {
+        return "display:none"
+      }
       return `position:absolute;pointer-events:none;left:${draft.left}px;top:${draft.top}px;width:${draft.right - draft.left}px;height:${draft.bottom - draft.top}px`
     },
   }

@@ -1,10 +1,21 @@
-import { Toolbar, ToolbarButton, ToolbarLink, ToolbarSeparator } from "@ui-sdk/solid/toolbar"
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarLink,
+  ToolbarSeparator,
+} from "@ui-sdk/solid/toolbar"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
   const log = useLog()
   const follow = (event: MouseEvent & { currentTarget: HTMLAnchorElement }) => {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
       return
     }
     event.preventDefault()

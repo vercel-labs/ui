@@ -2,7 +2,11 @@ import { attribution } from "solid-js/attribution"
 import { render } from "@solidjs/web"
 import { createSignal, flush, OBSERVE } from "solid-js"
 import { afterEach, expect, test, vi } from "vitest"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
 import { Switch } from "../src/switch"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
 
@@ -22,7 +26,11 @@ test("controlled components raise none of Solid's diagnostics", () => {
   vi.spyOn(console, "warn").mockImplementation(() => {})
   const codes = new Set<string>()
   const off = OBSERVE!.diagnostics.subscribe((event) => codes.add(event.code))
-  release = attribution.enable({ log: false, hotTime: false, wastedRecompute: false })
+  release = attribution.enable({
+    log: false,
+    hotTime: false,
+    wastedRecompute: false,
+  })
   const [open, setOpen] = createSignal(false)
   const [tab, setTab] = createSignal("account")
   const [on, setOn] = createSignal(false)
@@ -45,7 +53,7 @@ test("controlled components raise none of Solid's diagnostics", () => {
         <Switch checked={on()} onCheckedChange={setOn} />
       </>
     ),
-    root,
+    root
   )
   flush()
   for (let i = 0; i < 6; i++) {
@@ -55,7 +63,9 @@ test("controlled components raise none of Solid's diagnostics", () => {
     flush()
   }
   for (let i = 0; i < 4; i++) {
-    root.querySelector<HTMLElement>('[data-slot="collapsible-trigger"]')!.click()
+    root
+      .querySelector<HTMLElement>('[data-slot="collapsible-trigger"]')!
+      .click()
     root.querySelectorAll<HTMLElement>('[role="tab"]')[i % 2].click()
     root.querySelector<HTMLElement>('[role="switch"]')!.click()
     flush()

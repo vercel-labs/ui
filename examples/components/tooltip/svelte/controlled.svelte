@@ -1,7 +1,11 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
   import { Checkbox, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
-  import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -25,7 +29,9 @@
     onOpenChange={(next, details) => {
       const target = details.event?.target
       const inControls = target instanceof Node && controls?.contains(target)
-      if (inControls && details.reason !== "escape-key") return details.cancel()
+      if (inControls && details.reason !== "escape-key") {
+        return details.cancel()
+      }
       log(`${next ? "Opened" : "Closed"} (${details.reason})`)
     }}
   >

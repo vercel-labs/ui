@@ -19,11 +19,18 @@ function Fixture() {
     <div class="fixture">
       <button>Before</button>
       <Toolbar class="toolbar" aria-label="Tools">
-        <ToolbarButton render={(props) => <span {...props} />} onClick={() => setAction("span")}>
+        <ToolbarButton
+          render={(props) => <span {...props} />}
+          onClick={() => setAction("span")}
+        >
           {counted("Span tool")}
         </ToolbarButton>
-        <ToolbarButton onClick={() => setAction("cut")}>{counted("Cut")}</ToolbarButton>
-        <ToolbarButton onClick={() => setAction("copy")}>{counted("Copy")}</ToolbarButton>
+        <ToolbarButton onClick={() => setAction("cut")}>
+          {counted("Cut")}
+        </ToolbarButton>
+        <ToolbarButton onClick={() => setAction("copy")}>
+          {counted("Copy")}
+        </ToolbarButton>
         <ToolbarSeparator class="rule" render={(props) => <hr {...props} />} />
         <ToolbarButton
           disabled

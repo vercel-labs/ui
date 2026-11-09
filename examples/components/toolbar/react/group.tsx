@@ -1,7 +1,18 @@
 "use client"
 
-import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator } from "@ui-sdk/react/toolbar"
-import { ClipboardIcon, CopyIcon, RedoIcon, ScissorsIcon, UndoIcon } from "lucide-react"
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+  ToolbarSeparator,
+} from "@ui-sdk/react/toolbar"
+import {
+  ClipboardIcon,
+  CopyIcon,
+  RedoIcon,
+  ScissorsIcon,
+  UndoIcon,
+} from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
 const clipboard = [
@@ -16,7 +27,11 @@ function Example() {
     <Toolbar aria-label="Edit">
       <ToolbarGroup aria-label="Clipboard">
         {clipboard.map(({ label, icon: Icon }) => (
-          <ToolbarButton key={label} aria-label={label} onClick={() => log(label)}>
+          <ToolbarButton
+            key={label}
+            aria-label={label}
+            onClick={() => log(label)}
+          >
             <Icon aria-hidden="true" />
           </ToolbarButton>
         ))}

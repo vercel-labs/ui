@@ -1,4 +1,8 @@
-import { textarea as textareaPrimitive, type TextareaOptions, type TextareaState } from "@ui-sdk/core/input"
+import {
+  textarea as textareaPrimitive,
+  type TextareaOptions,
+  type TextareaState,
+} from "@ui-sdk/core/input"
 import { omit } from "solid-js"
 import { joinField, useFieldControl } from "./field-context"
 import { controlProps, elementProps, type Native } from "./text-control"
@@ -8,7 +12,9 @@ import { usePart, usePrimitive } from "./use-primitive"
  * A native <textarea>, wired to the Field it's in, that can grow with its text.
  * @stable
  */
-function Textarea(props: TextareaOptions & Omit<Native<"textarea", TextareaState>, "onSubmit">) {
+function Textarea(
+  props: TextareaOptions & Omit<Native<"textarea", TextareaState>, "onSubmit">
+) {
   const field = useFieldControl()
   const textarea = usePrimitive(textareaPrimitive, () => ({
     value: props.value,
@@ -29,20 +35,20 @@ function Textarea(props: TextareaOptions & Omit<Native<"textarea", TextareaState
     "debug",
     "autoResize",
     "onSubmit",
-    "submitShortcut",
+    "submitShortcut"
   )
   const element = elementProps(
     rest,
     field,
     () => props.value,
-    () => props.defaultValue,
+    () => props.defaultValue
   )
   return usePart(
     textarea,
     "root",
     controlProps(props, field),
     joinField(field, element, "textarea"),
-    "textarea",
+    "textarea"
   )
 }
 

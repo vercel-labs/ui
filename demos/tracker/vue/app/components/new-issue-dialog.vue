@@ -23,11 +23,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "~/components/ui/dialog"
-import { Field, FieldControl, FieldError, FieldLabel } from "~/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from "~/components/ui/select"
+import {
+  Field,
+  FieldControl,
+  FieldError,
+  FieldLabel,
+} from "~/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "~/components/ui/select"
 import { Textarea } from "~/components/ui/textarea"
 import { toast } from "~/components/ui/toast"
-import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "~/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "~/components/ui/tooltip"
 import { createIssue } from "~/composables/issues"
 import { useTracker } from "~/composables/tracker"
 
@@ -38,14 +54,17 @@ const pending = ref(false)
 async function submit(event: SubmitEvent) {
   pending.value = true
   try {
-    const issue = await createIssue(new FormData(event.currentTarget as HTMLFormElement))
+    const issue = await createIssue(
+      new FormData(event.currentTarget as HTMLFormElement)
+    )
     error.value = null
     tracker.newIssue.close()
     toast.success(`${issue.id} created`)
     await navigateTo(`/?issue=${issue.id}`)
   } catch (failure) {
     error.value =
-      (failure as { data?: { message?: string } }).data?.message ?? "The issue couldn't be created."
+      (failure as { data?: { message?: string } }).data?.message ??
+      "The issue couldn't be created."
   } finally {
     pending.value = false
   }
@@ -55,7 +74,10 @@ async function submit(event: SubmitEvent) {
 <template>
   <Dialog :controller="tracker.newIssue">
     <Tooltip shortcut="c">
-      <TooltipTrigger aria-label="New issue" :class="buttonVariants({ variant: 'primary', size: 'icon' })">
+      <TooltipTrigger
+        aria-label="New issue"
+        :class="buttonVariants({ variant: 'primary', size: 'icon' })"
+      >
         <template #render="{ props }">
           <DialogTrigger v-bind="props" shortcut="c">
             <Plus aria-hidden="true" />
@@ -73,7 +95,12 @@ async function submit(event: SubmitEvent) {
       <form class="grid gap-5" @submit.prevent="submit">
         <Field name="title" :invalid="error ? true : undefined">
           <FieldLabel>Title</FieldLabel>
-          <FieldControl required autocomplete="off" placeholder="What needs doing?" @input="error = null" />
+          <FieldControl
+            required
+            autocomplete="off"
+            placeholder="What needs doing?"
+            @input="error = null"
+          />
           <FieldError match="valueMissing">Give the issue a title.</FieldError>
           <FieldError v-if="error" :match="true">{{ error }}</FieldError>
         </Field>
@@ -88,7 +115,11 @@ async function submit(event: SubmitEvent) {
               <SelectTrigger />
             </div>
             <SelectContent>
-              <SelectItem v-for="status in statuses" :key="status.value" :value="status.value">
+              <SelectItem
+                v-for="status in statuses"
+                :key="status.value"
+                :value="status.value"
+              >
                 {{ status.label }}
               </SelectItem>
             </SelectContent>
@@ -99,12 +130,19 @@ async function submit(event: SubmitEvent) {
               <SelectTrigger />
             </div>
             <SelectContent>
-              <SelectItem v-for="priority in priorities" :key="priority.value" :value="priority.value">
+              <SelectItem
+                v-for="priority in priorities"
+                :key="priority.value"
+                :value="priority.value"
+              >
                 {{ priority.label }}
               </SelectItem>
             </SelectContent>
           </Select>
-          <Combobox name="assignee" :item-to-label="(id: string) => personOf(id)?.name ?? ''">
+          <Combobox
+            name="assignee"
+            :item-to-label="(id: string) => personOf(id)?.name ?? ''"
+          >
             <div class="grid gap-2">
               <ComboboxLabel>Assignee</ComboboxLabel>
               <div class="relative">
@@ -132,7 +170,9 @@ async function submit(event: SubmitEvent) {
           </Combobox>
         </div>
         <div class="flex justify-end gap-2">
-          <DialogClose :class="buttonVariants({ variant: 'ghost' })">Cancel</DialogClose>
+          <DialogClose :class="buttonVariants({ variant: 'ghost' })"
+            >Cancel</DialogClose
+          >
           <Button type="submit" variant="primary" :disabled="pending">
             {{ pending ? "Creating…" : "Create issue" }}
           </Button>

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/vue/command"
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/vue/command"
 
 const commands = [
   { value: "calendar", label: "التقويم" },
@@ -15,7 +21,12 @@ const commands = [
       <CommandInput aria-label="ابحث عن أمر" placeholder="ابحث…" />
       <CommandEmpty>لا توجد نتائج.</CommandEmpty>
       <CommandList>
-        <CommandItem v-for="item in commands" :key="item.value" :value="item.value" :label="item.label">
+        <CommandItem
+          v-for="item in commands"
+          :key="item.value"
+          :value="item.value"
+          :label="item.label"
+        >
           {{ item.label }}
         </CommandItem>
       </CommandList>

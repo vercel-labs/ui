@@ -1,7 +1,16 @@
-import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@ui-sdk/react/hover-card"
+import {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/react/hover-card"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { hoverCardContentOptions, hoverCardFixture, hoverCardOptions } from "tests/fixtures/hover-card.ts"
+import {
+  hoverCardContentOptions,
+  hoverCardFixture,
+  hoverCardOptions,
+} from "tests/fixtures/hover-card.ts"
 
 function Fixture() {
   const [action, setAction] = React.useState("")
@@ -11,9 +20,13 @@ function Fixture() {
       <button>Before</button>
       <HoverCard
         {...hoverCardOptions()}
-        onOpenChange={(open, { reason }) => setAction(`${open ? "open" : "close"}: ${reason}`)}
+        onOpenChange={(open, { reason }) =>
+          setAction(`${open ? "open" : "close"}: ${reason}`)
+        }
       >
-        <HoverCardTrigger href={fixture.href}>{fixture.trigger}</HoverCardTrigger>
+        <HoverCardTrigger href={fixture.href}>
+          {fixture.trigger}
+        </HoverCardTrigger>
         <HoverCardContent className="hover-card" {...hoverCardContentOptions()}>
           <HoverCardArrow className="arrow" />
           <p>
@@ -35,7 +48,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

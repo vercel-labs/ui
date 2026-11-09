@@ -12,7 +12,12 @@ import {
   ComboboxTrigger,
   ComboboxValue,
 } from "@ui-sdk/solid/combobox"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -36,7 +41,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
@@ -48,7 +54,9 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        const entries = [...new FormData(event.currentTarget)].map(
+          ([name, value]) => `${name}=${value}`
+        )
         log(`Submitted ${entries.join("&")}`)
       }}
     >

@@ -2,7 +2,15 @@
 import { renderToString } from "@vue/server-renderer"
 import { describe, expect, test } from "vitest"
 import { createSSRApp, h } from "vue"
-import { Menu, MenuContent, MenuItem, MenuSub, MenuSubContent, MenuSubTrigger, MenuTrigger } from "../src"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuSub,
+  MenuSubContent,
+  MenuSubTrigger,
+  MenuTrigger,
+} from "../src"
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering", () => {
@@ -11,9 +19,11 @@ describe("server rendering", () => {
       createSSRApp(() =>
         h(Menu, null, () => [
           h(MenuTrigger, null, () => "File"),
-          h(MenuContent, null, () => h(MenuItem, { value: "new" }, () => "New file")),
-        ]),
-      ),
+          h(MenuContent, null, () =>
+            h(MenuItem, { value: "new" }, () => "New file")
+          ),
+        ])
+      )
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('aria-haspopup="menu"')
@@ -30,11 +40,13 @@ describe("server rendering", () => {
             h(MenuItem, { value: "new", shortcut: "mod+n" }, () => "New file"),
             h(MenuSub, null, () => [
               h(MenuSubTrigger, null, () => "Share"),
-              h(MenuSubContent, null, () => h(MenuItem, { value: "email" }, () => "Email")),
+              h(MenuSubContent, null, () =>
+                h(MenuItem, { value: "email" }, () => "Email")
+              ),
             ]),
           ]),
-        ]),
-      ),
+        ])
+      )
     )
     expect(html).toContain('role="menu"')
     expect(html).toContain('aria-keyshortcuts="Control+N"')
@@ -46,10 +58,13 @@ describe("server rendering", () => {
       createSSRApp(() =>
         h(
           Menu,
-          { defaultOpen: true, items: [{ value: "new", label: "New file" }, { type: "separator" }] },
-          () => h(MenuTrigger, null, () => "File"),
-        ),
-      ),
+          {
+            defaultOpen: true,
+            items: [{ value: "new", label: "New file" }, { type: "separator" }],
+          },
+          () => h(MenuTrigger, null, () => "File")
+        )
+      )
     )
     expect(html).toContain('role="menuitem"')
     expect(html).toContain('role="separator"')

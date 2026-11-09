@@ -35,14 +35,18 @@ function mount(root: HTMLElement) {
   `
   const bars = root.querySelectorAll('[data-slot="strength"] > div')
   const output = root.querySelector("output")!
-  root.querySelector("ui-password-input")!.addEventListener("valuechange", (event) => {
-    const value = event.detail.value
-    const score = strength(value)
-    bars.forEach((bar, index) => bar.toggleAttribute("data-on", score > index))
-    output.textContent = value
-      ? `Strength: ${["Weak", "Weak", "Fair", "Good", "Strong"][score]} (${value.length} characters)`
-      : "Type a password to rate it."
-  })
+  root
+    .querySelector("ui-password-input")!
+    .addEventListener("valuechange", (event) => {
+      const value = event.detail.value
+      const score = strength(value)
+      bars.forEach((bar, index) =>
+        bar.toggleAttribute("data-on", score > index)
+      )
+      output.textContent = value
+        ? `Strength: ${["Weak", "Weak", "Fair", "Good", "Strong"][score]} (${value.length} characters)`
+        : "Type a password to rate it."
+    })
 }
 
 export { mount }

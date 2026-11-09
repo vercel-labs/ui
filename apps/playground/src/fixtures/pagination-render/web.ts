@@ -20,13 +20,17 @@ async function mount(root: HTMLElement) {
   const pagination = root.querySelector<UiPaginationElement>("ui-pagination")!
   pagination.getHref = (page) => `#results-${page}`
   pagination.addEventListener("pagechange", (event) => {
-    if (event.detail.value === 4) return event.preventDefault()
+    if (event.detail.value === 4) {
+      return event.preventDefault()
+    }
     root.querySelector("output")!.textContent = `page: ${event.detail.value}`
   })
   // A client-side router: links navigate without a page load.
   root.addEventListener("click", (event) => {
     const link = (event.target as Element).closest("a[href]")
-    if (!link || event.defaultPrevented) return
+    if (!link || event.defaultPrevented) {
+      return
+    }
     event.preventDefault()
     history.pushState(null, "", link.getAttribute("href"))
   })

@@ -1,12 +1,21 @@
 "use client"
 
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 import { FolderIcon, SearchIcon, SettingsIcon } from "lucide-react"
 
 function Example() {
   return (
     <Resizable>
-      <ResizablePanel defaultSize={30} minSize={25} collapsible collapsedSize="48px">
+      <ResizablePanel
+        defaultSize={30}
+        minSize={25}
+        collapsible
+        collapsedSize="48px"
+      >
         <ul>
           <li data-slot="row">
             <FolderIcon aria-hidden="true" />

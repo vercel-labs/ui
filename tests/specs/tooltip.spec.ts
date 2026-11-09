@@ -1,5 +1,13 @@
 import type { Page } from "@playwright/test"
-import { entered, expect, lastAction, opacityOf, pageNow, slowTransitions, test } from "../fixtures"
+import {
+  entered,
+  expect,
+  lastAction,
+  opacityOf,
+  pageNow,
+  slowTransitions,
+  test,
+} from "../fixtures"
 
 // A tooltip shows a short text about its trigger while the pointer rests on
 // it or keyboard focus is on it, following the WAI-ARIA tooltip pattern:
@@ -8,11 +16,13 @@ import { entered, expect, lastAction, opacityOf, pageNow, slowTransitions, test 
 // (WCAG 1.4.13). Tooltips are found by their text, which works
 // whether or not they have a role.
 
-const save = (page: Page) => page.getByRole("button", { name: "Save", exact: true })
+const save = (page: Page) =>
+  page.getByRole("button", { name: "Save", exact: true })
 const saveTip = (page: Page) => page.getByText("Save your changes")
 const before = (page: Page) => page.getByRole("button", { name: "Before" })
 const profile = (page: Page) => page.getByRole("button", { name: "Profile" })
-const popover = (page: Page) => page.getByRole("dialog", { name: "Profile settings" })
+const popover = (page: Page) =>
+  page.getByRole("dialog", { name: "Profile settings" })
 
 // Moves the pointer onto an element, without the instant jump that skips pointerenter in some engines.
 async function hover(page: Page, name: string) {
@@ -28,8 +38,13 @@ async function moveAway(page: Page) {
 async function tabTo(page: Page, tab: () => Promise<void>, name: string) {
   for (let step = 0; step < 12; step++) {
     await tab()
-    if (await page.getByRole("button", { name, exact: true }).evaluate((el) => el === document.activeElement))
+    if (
+      await page
+        .getByRole("button", { name, exact: true })
+        .evaluate((el) => el === document.activeElement)
+    ) {
       return
+    }
   }
   throw new Error(`Tab never reached ${name}.`)
 }
@@ -41,12 +56,17 @@ test.beforeEach(async ({ page, open }) => {
 })
 
 test.describe("pointer", () => {
-  test("resting the pointer on the trigger opens the tooltip", async ({ page }) => {
+  test("resting the pointer on the trigger opens the tooltip", async ({
+    page,
+  }) => {
     await hover(page, "Save")
     await expect(saveTip(page)).toBeVisible()
   })
 
-  test("the tooltip waits for its delay before opening", async ({ page, open }) => {
+  test("the tooltip waits for its delay before opening", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { delay: "400" })
     const start = await pageNow(page)
     await hover(page, "Save")
@@ -54,7 +74,10 @@ test.describe("pointer", () => {
     expect((await pageNow(page)) - start).toBeGreaterThanOrEqual(400)
   })
 
-  test("leaving the trigger before the delay keeps the tooltip closed", async ({ page, open }) => {
+  test("leaving the trigger before the delay keeps the tooltip closed", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { delay: "300" })
     await hover(page, "Save")
     await moveAway(page)
@@ -69,7 +92,9 @@ test.describe("pointer", () => {
     await expect(saveTip(page)).toBeHidden()
   })
 
-  test("the pointer can move onto the tooltip without closing it", async ({ page }) => {
+  test("the pointer can move onto the tooltip without closing it", async ({
+    page,
+  }) => {
     await hover(page, "Save")
     await expect(saveTip(page)).toBeVisible()
     const box = (await saveTip(page).boundingBox())!
@@ -85,15 +110,21 @@ test.describe("pointer", () => {
     await expect(before(page)).toBeFocused()
   })
 
-  test("pressing the trigger closes the tooltip and runs the button", async ({ page }) => {
+  test("pressing the trigger closes the tooltip and runs the button", async ({
+    page,
+  }) => {
     await hover(page, "Save")
     await expect(saveTip(page)).toBeVisible()
     await save(page).click()
     await expect(saveTip(page)).toBeHidden()
-    await expect(page.getByRole("status", { name: "Last action" })).toHaveText("save")
+    await expect(page.getByRole("status", { name: "Last action" })).toHaveText(
+      "save"
+    )
   })
 
-  test("after a press, the tooltip stays closed until the pointer comes back", async ({ page }) => {
+  test("after a press, the tooltip stays closed until the pointer comes back", async ({
+    page,
+  }) => {
     await hover(page, "Save")
     await expect(saveTip(page)).toBeVisible()
     await save(page).click()
@@ -109,13 +140,19 @@ test.describe("pointer", () => {
 })
 
 test.describe("keyboard", () => {
-  test("keyboard focus on the trigger opens the tooltip", async ({ page, tab }) => {
+  test("keyboard focus on the trigger opens the tooltip", async ({
+    page,
+    tab,
+  }) => {
     await before(page).focus()
     await tabTo(page, tab, "Save")
     await expect(saveTip(page)).toBeVisible()
   })
 
-  test("focus leaving the trigger closes the tooltip", async ({ page, tab }) => {
+  test("focus leaving the trigger closes the tooltip", async ({
+    page,
+    tab,
+  }) => {
     await before(page).focus()
     await tabTo(page, tab, "Save")
     await expect(saveTip(page)).toBeVisible()
@@ -123,7 +160,10 @@ test.describe("keyboard", () => {
     await expect(saveTip(page)).toBeHidden()
   })
 
-  test("Escape closes the tooltip and leaves focus on the trigger", async ({ page, tab }) => {
+  test("Escape closes the tooltip and leaves focus on the trigger", async ({
+    page,
+    tab,
+  }) => {
     await before(page).focus()
     await tabTo(page, tab, "Save")
     await expect(saveTip(page)).toBeVisible()
@@ -139,7 +179,10 @@ test.describe("keyboard", () => {
     await expect(saveTip(page)).toBeHidden()
   })
 
-  test("Tab through the toolbar shows each tooltip in turn", async ({ page, tab }) => {
+  test("Tab through the toolbar shows each tooltip in turn", async ({
+    page,
+    tab,
+  }) => {
     await save(page).focus()
     await tab()
     await tab()
@@ -147,7 +190,10 @@ test.describe("keyboard", () => {
     await expect(page.locator(".tooltip:visible")).toHaveCount(1)
   })
 
-  test("a click that focuses the trigger doesn't open the tooltip from focus", async ({ page, open }) => {
+  test("a click that focuses the trigger doesn't open the tooltip from focus", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { delay: "2000" })
     await save(page).click()
     await page.clock.runFor(200)
@@ -164,7 +210,10 @@ test.describe("several tooltips", () => {
     await expect(page.getByText("Bold", { exact: true })).toBeHidden()
   })
 
-  test("once the pointer has been away a while, the delay applies again", async ({ page, open }) => {
+  test("once the pointer has been away a while, the delay applies again", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { delay: "600" })
     await hover(page, "Bold")
     await expect(page.getByText("Bold", { exact: true })).toBeVisible()
@@ -186,7 +235,10 @@ test.describe("positioning", () => {
     expect(tip.y + tip.height).toBeLessThanOrEqual(anchor.y + 1)
   })
 
-  test("the tooltip flips below the trigger when there is no room above", async ({ page, open }) => {
+  test("the tooltip flips below the trigger when there is no room above", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { layout: "top" })
     await hover(page, "Save")
     await expect(saveTip(page)).toBeVisible()
@@ -209,7 +261,9 @@ test.describe("positioning", () => {
     await expect(saveTip(page)).toBeVisible()
     const arrow = (await page.locator(".tooltip .arrow").boundingBox())!
     const anchor = (await save(page).boundingBox())!
-    expect(Math.abs(arrow.x + arrow.width / 2 - (anchor.x + anchor.width / 2))).toBeLessThanOrEqual(1)
+    expect(
+      Math.abs(arrow.x + arrow.width / 2 - (anchor.x + anchor.width / 2))
+    ).toBeLessThanOrEqual(1)
   })
 })
 
@@ -217,22 +271,32 @@ test.describe("a tooltip on a popover trigger", () => {
   const profile = (page: Page) => page.getByRole("button", { name: "Profile" })
   const profileTip = (page: Page) => page.getByText("Edit your profile")
 
-  test("hovering shows the tooltip, and pressing opens the popover instead", async ({ page }) => {
+  test("hovering shows the tooltip, and pressing opens the popover instead", async ({
+    page,
+  }) => {
     await hover(page, "Profile")
     await expect(profileTip(page)).toBeVisible()
     await profile(page).click()
-    await expect(page.getByRole("dialog", { name: "Profile settings" })).toBeVisible()
+    await expect(
+      page.getByRole("dialog", { name: "Profile settings" })
+    ).toBeVisible()
     await expect(profileTip(page)).toBeHidden()
   })
 
-  test("Escape closes the tooltip and leaves the popover open", async ({ page }) => {
+  test("Escape closes the tooltip and leaves the popover open", async ({
+    page,
+  }) => {
     await profile(page).click()
-    await expect(page.getByRole("dialog", { name: "Profile settings" })).toBeVisible()
+    await expect(
+      page.getByRole("dialog", { name: "Profile settings" })
+    ).toBeVisible()
     await hover(page, "Help")
     await expect(page.getByText("Opens the help center")).toBeVisible()
     await page.keyboard.press("Escape")
     await expect(page.getByText("Opens the help center")).toBeHidden()
-    await expect(page.getByRole("dialog", { name: "Profile settings" })).toBeVisible()
+    await expect(
+      page.getByRole("dialog", { name: "Profile settings" })
+    ).toBeVisible()
   })
 })
 
@@ -244,11 +308,18 @@ test.describe("disabled buttons", () => {
       const button = document.createElement("button")
       button.disabled = true
       button.textContent = "Disabled"
-      button.style.cssText = "position: fixed; left: 300px; top: 300px; width: 80px; height: 30px"
+      button.style.cssText =
+        "position: fixed; left: 300px; top: 300px; width: 80px; height: 30px"
       document.body.append(button)
       const seen: string[] = []
-      for (const type of ["pointerenter", "pointerleave", "mouseenter", "click"])
+      for (const type of [
+        "pointerenter",
+        "pointerleave",
+        "mouseenter",
+        "click",
+      ]) {
         button.addEventListener(type, () => seen.push(type))
+      }
       ;(window as unknown as { seen: string[] }).seen = seen
       return seen
     })
@@ -257,7 +328,9 @@ test.describe("disabled buttons", () => {
     await page.mouse.down()
     await page.mouse.up()
     await page.mouse.move(5, 5, { steps: 4 })
-    const seen = await page.evaluate(() => (window as unknown as { seen: string[] }).seen)
+    const seen = await page.evaluate(
+      () => (window as unknown as { seen: string[] }).seen
+    )
     expect(seen).toEqual(["pointerenter", "mouseenter", "pointerleave"])
   })
 
@@ -271,7 +344,9 @@ test.describe("disabled buttons", () => {
     await hover(page, "Publish")
     await expect(page.getByText("Add a title to publish")).toBeVisible()
     await publish.click({ force: true })
-    await expect(page.getByRole("status", { name: "Last action" })).toHaveText("")
+    await expect(page.getByRole("status", { name: "Last action" })).toHaveText(
+      ""
+    )
     await moveAway(page)
     await page.getByRole("button", { name: "About billing" }).focus()
     await tabTo(page, tab, "Publish")
@@ -280,7 +355,10 @@ test.describe("disabled buttons", () => {
 })
 
 test.describe("animation", () => {
-  test("the tooltip animates in from its starting style", async ({ page, open }) => {
+  test("the tooltip animates in from its starting style", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { animate: "" })
     await slowTransitions(page)
     await hover(page, "Save")
@@ -288,7 +366,10 @@ test.describe("animation", () => {
     expect(await opacityOf(page.locator(".tooltip:visible"))).toBeLessThan(0.5)
   })
 
-  test("the tooltip stays in the page while it animates out", async ({ page, open }) => {
+  test("the tooltip stays in the page while it animates out", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { animate: "" })
     await hover(page, "Save")
     await expect(saveTip(page)).toBeVisible()
@@ -300,7 +381,9 @@ test.describe("animation", () => {
 })
 
 test.describe("hidden while closed", () => {
-  test("a class that sets display on the content doesn't show it while closed", async ({ page }) => {
+  test("a class that sets display on the content doesn't show it while closed", async ({
+    page,
+  }) => {
     await page.addStyleTag({ content: ".tooltip { display: flex }" })
     await expect(saveTip(page)).toBeHidden()
     await hover(page, "Save")
@@ -312,7 +395,10 @@ test.describe("hidden while closed", () => {
 })
 
 test.describe("options and dismissal", () => {
-  test("Escape closes only a tooltip that keyboard focus opened inside a popover", async ({ page, tab }) => {
+  test("Escape closes only a tooltip that keyboard focus opened inside a popover", async ({
+    page,
+    tab,
+  }) => {
     await profile(page).click()
     await expect(popover(page)).toBeVisible()
     await page.getByRole("button", { name: "Help" }).focus()
@@ -325,7 +411,9 @@ test.describe("options and dismissal", () => {
     await expect(popover(page)).toBeVisible()
   })
 
-  test("the pointer can leave the trigger sideways on its way to the tooltip", async ({ page }) => {
+  test("the pointer can leave the trigger sideways on its way to the tooltip", async ({
+    page,
+  }) => {
     await save(page).hover()
     await expect(saveTip(page)).toBeVisible()
     const trigger = (await save(page).boundingBox())!
@@ -337,7 +425,10 @@ test.describe("options and dismissal", () => {
     await expect(saveTip(page)).toBeVisible()
   })
 
-  test("with closeOnPress false, pressing the trigger keeps the tooltip open", async ({ page, open }) => {
+  test("with closeOnPress false, pressing the trigger keeps the tooltip open", async ({
+    page,
+    open,
+  }) => {
     await open("tooltip", { closeOnPress: "false" })
     await save(page).hover()
     await expect(saveTip(page)).toBeVisible()
@@ -356,8 +447,16 @@ test.describe("options and dismissal", () => {
     await expect(saveTip(page)).toBeHidden()
   })
 
-  test("a tap on a plain tooltip's trigger only presses it", async ({ browser, framework, baseURL }) => {
-    const context = await browser.newContext({ hasTouch: true, isMobile: true, baseURL })
+  test("a tap on a plain tooltip's trigger only presses it", async ({
+    browser,
+    framework,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({
+      hasTouch: true,
+      isMobile: true,
+      baseURL,
+    })
     const page = await context.newPage()
     await page.clock.install()
     await page.goto(`/?fixture=tooltip&framework=${framework}&delay=0`)

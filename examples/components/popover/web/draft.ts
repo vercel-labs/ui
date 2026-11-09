@@ -34,7 +34,9 @@ function mount(root: HTMLElement) {
   const popover = root.querySelector("ui-popover")!
   const note = root.querySelector("textarea")!
   const alert = root.querySelector<HTMLElement>('[role="alert"]')!
-  const actions = root.querySelector<HTMLElement>('ui-popover-content > [data-slot="row"]:not([role])')!
+  const actions = root.querySelector<HTMLElement>(
+    'ui-popover-content > [data-slot="row"]:not([role])'
+  )!
   const [keep, discard] = alert.querySelectorAll("button")
   const ask = (asking: boolean) => {
     alert.hidden = !asking
@@ -50,8 +52,11 @@ function mount(root: HTMLElement) {
     popover.open = false
   }
   note.addEventListener("input", () => {
-    if (note.value) popover.setAttribute("dismissible", "false")
-    else popover.removeAttribute("dismissible")
+    if (note.value) {
+      popover.setAttribute("dismissible", "false")
+    } else {
+      popover.removeAttribute("dismissible")
+    }
   })
   popover.addEventListener("dismissattempt", (event) => {
     log(root, `Kept open (${event.detail.reason})`)
@@ -65,12 +70,16 @@ function mount(root: HTMLElement) {
     log(root, "Discarded the note")
     close()
   })
-  actions.querySelector("[data-variant=solid]")!.addEventListener("click", () => {
-    log(root, note.value ? "Saved the note" : "Nothing to save")
-    close()
-  })
+  actions
+    .querySelector("[data-variant=solid]")!
+    .addEventListener("click", () => {
+      log(root, note.value ? "Saved the note" : "Nothing to save")
+      close()
+    })
   popover.addEventListener("openchange", (event) => {
-    if (!event.detail.value) reset()
+    if (!event.detail.value) {
+      reset()
+    }
   })
 }
 

@@ -53,7 +53,8 @@ Wrap the input in a [Field](./field) to give it a visible label, a description a
 <Field name="username">
   <FieldLabel>Username</FieldLabel>
   <Input autocomplete="username" />
-  <FieldDescription>Choose a unique username for your account.</FieldDescription>
+  <FieldDescription>Choose a unique username for your account.</FieldDescription
+  >
 </Field>
 ```
 
@@ -184,13 +185,22 @@ Props and callbacks are the same as below, as Svelte props, plus every native in
 
 ### Input
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="InputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputOptions"
+/>
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="InputProps" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputProps"
+/>
 
 ### InputGroup
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="InputGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputGroupOptions"
+/>
 
 ### InputClear
 
@@ -198,21 +208,33 @@ A `<button>` that empties the input in its group and focuses it. It renders only
 
 ### State
 
-<StateTable path="../../packages/core/src/components/input/input.ts" name="InputState" />
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputState"
+/>
 
 `InputGroup` and `InputClear` receive the state of the input inside the group.
 
-<StateTable path="../../packages/core/src/components/input/input.ts" name="InputGroupState" />
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputGroupState"
+/>
 
 ### Reasons
 
-<ReasonTable path="../../packages/core/src/components/input/input.ts" name="InputValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputValueChangeReason"
+/>
 
 ### Controller
 
 Create one with `createInputController()` and pass it as `controller`.
 
-<ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
+<ControllerTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputController"
+/>
 
 ## Accessibility
 

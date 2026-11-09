@@ -12,10 +12,17 @@ on its text and icons focus the field.
   } from "@ui-sdk/core/input"
   import { setContext } from "svelte"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { InputGroupKey } from "./context"
 
-  let { debug, ...rest }: PartProps<"div", InputGroupState> & InputGroupOptions = $props()
+  let {
+    debug,
+    ...rest
+  }: PartProps<"div", InputGroupState> & InputGroupOptions = $props()
 
   const id = $props.id()
   const group = usePrimitive(inputGroupPrimitive, () => ({ id, debug }))

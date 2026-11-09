@@ -10,9 +10,10 @@ async function readExampleSources(name: string, framework: Framework) {
   const directory = path.join(exampleFolder(component), example)
   const filename = `${base}.${ext}`
   // Source files are read to show them, never bundled, so Turbopack skips tracing these paths.
-  const code = await readFile(path.join(/* turbopackIgnore: true */ directory, filename), "utf8").catch(
-    () => null,
-  )
+  const code = await readFile(
+    path.join(/* turbopackIgnore: true */ directory, filename),
+    "utf8"
+  ).catch(() => null)
   if (!code) {
     return null
   }
@@ -22,17 +23,38 @@ async function readExampleSources(name: string, framework: Framework) {
   // examples/shared show beside the example, imported from the same folder, so copying both works.
   const files = [{ name: filename, lang, code: code.trimEnd() }]
   const log = /from "(?:\.\.\/)+shared\/[^"]+\/log"/.test(code)
-  if (log) files[0].code = files[0].code.replace(/from "(?:\.\.\/)+shared\/[^"]+\/log"/, 'from "./log"')
-  const shared = [...files[0].code.matchAll(/from "((?:\.\.\/)+shared\/[^"]+)"/g)].map((match) => match[1])
-  for (const specifier of new Set(shared.filter((specifier) => !specifier.endsWith("/log")))) {
-    const resolved = path.resolve(/* turbopackIgnore: true */ directory, specifier)
-    const sharedFile = [`${resolved}.${ext}`, `${resolved}.ts`, resolved].find((file) => existsSync(file))
-    if (!sharedFile) continue
-    files[0].code = files[0].code.replaceAll(`"${specifier}"`, `"./${path.basename(specifier)}"`)
+  if (log) {
+    files[0].code = files[0].code.replace(
+      /from "(?:\.\.\/)+shared\/[^"]+\/log"/,
+      'from "./log"'
+    )
+  }
+  const shared = [
+    ...files[0].code.matchAll(/from "((?:\.\.\/)+shared\/[^"]+)"/g),
+  ].map((match) => match[1])
+  for (const specifier of new Set(
+    shared.filter((specifier) => !specifier.endsWith("/log"))
+  )) {
+    const resolved = path.resolve(
+      /* turbopackIgnore: true */ directory,
+      specifier
+    )
+    const sharedFile = [`${resolved}.${ext}`, `${resolved}.ts`, resolved].find(
+      (file) => existsSync(file)
+    )
+    if (!sharedFile) {
+      continue
+    }
+    files[0].code = files[0].code.replaceAll(
+      `"${specifier}"`,
+      `"./${path.basename(specifier)}"`
+    )
     files.push({
       name: path.basename(sharedFile),
       lang,
-      code: (await readFile(/* turbopackIgnore: true */ sharedFile, "utf8")).trimEnd(),
+      code: (
+        await readFile(/* turbopackIgnore: true */ sharedFile, "utf8")
+      ).trimEnd(),
     })
   }
 

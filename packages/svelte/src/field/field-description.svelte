@@ -9,15 +9,24 @@ describes the group, so screen readers say it as focus enters the group.
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
-  import { DescribedKey, outsidePart, type FieldContext, type FieldSetContext } from "./context"
+  import {
+    DescribedKey,
+    outsidePart,
+    type FieldContext,
+    type FieldSetContext,
+  } from "./context"
 
   let rest: PartProps<"p", FieldDescriptionState> = $props()
 
-  const described = getContext<FieldContext | FieldSetContext | undefined>(DescribedKey)
+  const described = getContext<FieldContext | FieldSetContext | undefined>(
+    DescribedKey
+  )
   // A field set's description slot takes the same props, and its state is the
   // `disabled` that FieldDescriptionState always has.
   const description = described
-    ? useHandlePart(described as FieldContext, "description", () => ({ id: rest.id }))
+    ? useHandlePart(described as FieldContext, "description", () => ({
+        id: rest.id,
+      }))
     : outsidePart("description")
 </script>
 

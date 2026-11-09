@@ -8,7 +8,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("file inputs hydrate without mismatches", async ({ page, open }) => {
   await open("file-input")
@@ -24,7 +27,9 @@ test(
   async ({ page, open }) => {
     await open("file-input", { hydrate: "manual", required: "" })
     const input = await page.evaluate(() => {
-      const el = document.querySelector<HTMLInputElement>(`input[type="file"][name="attachments"]`)!
+      const el = document.querySelector<HTMLInputElement>(
+        `input[type="file"][name="attachments"]`
+      )!
       return {
         accept: el.accept,
         multiple: el.multiple,
@@ -32,6 +37,11 @@ test(
         valid: el.form!.checkValidity(),
       }
     })
-    expect(input).toEqual({ accept: f.attachments.accept, multiple: true, required: true, valid: false })
-  },
+    expect(input).toEqual({
+      accept: f.attachments.accept,
+      multiple: true,
+      required: true,
+      valid: false,
+    })
+  }
 )

@@ -17,7 +17,12 @@ The control and the hidden native input that takes part in the form.
   import Part from "../part.svelte"
   import type { ToggleProps } from "../toggle-props"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { CheckboxKey, useCheckboxGroup } from "./context"
 
   type Details = ChangeDetails<CheckboxCheckedChangeReason>
@@ -73,7 +78,9 @@ The control and the hidden native input that takes part in the form.
     onCheckedChange: (next: CheckedState, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `checked` as it was.
       onCheckedChange?.(next, details)
-      if (!details.canceled) checked = next
+      if (!details.canceled) {
+        checked = next
+      }
     },
   }))
   setContext(CheckboxKey, checkbox)
@@ -81,7 +88,7 @@ The control and the hidden native input that takes part in the form.
   const input = useHandlePart(checkbox, "input")
   const control = field?.control(
     () => rest.id,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
 </script>
 

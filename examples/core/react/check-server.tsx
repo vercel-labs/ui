@@ -16,7 +16,11 @@ function run(broken: boolean) {
   try {
     const html = broken
       ? checkServer(clock, {}, `<root>Now</root>`)
-      : checkServer(readMore, {}, `<root><trigger>Read more</trigger><panel>More</panel></root>`)
+      : checkServer(
+          readMore,
+          {},
+          `<root><trigger>Read more</trigger><panel>More</panel></root>`
+        )
     return { ok: true, text: html }
   } catch (error) {
     return { ok: false, text: (error as Error).message }
@@ -25,11 +29,18 @@ function run(broken: boolean) {
 
 function Example() {
   const [broken, setBroken] = React.useState(false)
-  const [result, setResult] = React.useState<{ ok: boolean; text: string } | null>(null)
+  const [result, setResult] = React.useState<{
+    ok: boolean
+    text: string
+  } | null>(null)
   return (
     <div data-slot="check">
       <div data-slot="row">
-        <button type="button" data-variant="solid" onClick={() => setResult(run(broken))}>
+        <button
+          type="button"
+          data-variant="solid"
+          onClick={() => setResult(run(broken))}
+        >
           Check the Server HTML
         </button>
         <label data-slot="label">
@@ -45,7 +56,11 @@ function Example() {
         </label>
       </div>
       {result && (
-        <pre role="status" data-slot="check-result" data-status={result.ok ? "pass" : "fail"}>
+        <pre
+          role="status"
+          data-slot="check-result"
+          data-status={result.ok ? "pass" : "fail"}
+        >
           {result.text}
         </pre>
       )}

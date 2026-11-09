@@ -3,7 +3,10 @@
 // match and its levels live in trigger-menu-levels.ts, and choosing in
 // trigger-menu-select.ts.
 import { isComposing } from "../../foundation/kernel/events"
-import { createAsyncOptions, type AsyncOptionsStatus } from "../../foundation/lists/async-options"
+import {
+  createAsyncOptions,
+  type AsyncOptionsStatus,
+} from "../../foundation/lists/async-options"
 import { createDetails } from "../../foundation/kernel/details"
 import { changeSource } from "../../foundation/kernel/input-source"
 import { announce } from "../../foundation/platform/announce"
@@ -13,18 +16,33 @@ import {
   type PopupOpener,
   type PopupResult,
 } from "../../foundation/popups/popup"
-import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  createPopup,
+  popupState,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { unopened } from "../../foundation/popups/popup-steps"
 import { triggerMenuPreset } from "../../foundation/popups/popup-presets"
 import { matchesShortcut } from "../../foundation/platform/platform"
-import { createListbox, itemKey, type ListData } from "../../foundation/lists/listbox"
-import { keepListing, noListing, type Listing } from "../../foundation/lists/listbox-listing"
+import {
+  createListbox,
+  itemKey,
+  type ListData,
+} from "../../foundation/lists/listbox"
+import {
+  keepListing,
+  noListing,
+  type Listing,
+} from "../../foundation/lists/listbox-listing"
 import { whenKept } from "../../foundation/kernel/keep"
 import { aliasReferences } from "../../foundation/kernel/part"
 import { idPart } from "../../foundation/kernel/attrs"
 import { applyAttrs } from "../../foundation/kernel/live"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
-import type { TextEditorAdapter, TokenInsert } from "../../foundation/text/text-editor"
+import type {
+  TextEditorAdapter,
+  TokenInsert,
+} from "../../foundation/text/text-editor"
 import type {
   TriggerItemsLoader,
   TriggerMenuChangeOptions,
@@ -35,7 +53,11 @@ import type {
   TriggerMenuQueryChangeReason,
 } from "./trigger-menu"
 import { createTriggerMenuKeyboard } from "./trigger-menu-keyboard"
-import { argumentOf, createTriggerLevels, type TriggerLevel } from "./trigger-menu-levels"
+import {
+  argumentOf,
+  createTriggerLevels,
+  type TriggerLevel,
+} from "./trigger-menu-levels"
 import { createTriggerSelect } from "./trigger-menu-select"
 import type { TextProps } from "./trigger-menu-parts"
 import { announcePending } from "../../foundation/kernel/action"
@@ -70,7 +92,9 @@ type TriggerMenuState = PopupState & {
 
 type ItemMeta = TriggerMenuItemProps<unknown> & { group?: string }
 
-function initialTriggerMenuState(options: TriggerMenuOptions<any>): TriggerMenuState {
+function initialTriggerMenuState(
+  options: TriggerMenuOptions<any>
+): TriggerMenuState {
   return {
     // It opens only once a trigger is typed.
     ...popupState({}),
@@ -94,15 +118,21 @@ function initialTriggerMenuState(options: TriggerMenuOptions<any>): TriggerMenuS
 }
 
 function syncTriggerMenuState(options: TriggerMenuOptions<any>) {
-  return { editor: options.editor, ...(options.open === undefined ? {} : { open: options.open }) }
+  return {
+    editor: options.editor,
+    ...(options.open === undefined ? {} : { open: options.open }),
+  }
 }
 
-const isLoader = (items: unknown): items is TriggerItemsLoader<unknown> => typeof items === "function"
+const isLoader = (items: unknown): items is TriggerItemsLoader<unknown> =>
+  typeof items === "function"
 
 // The arguments' hints still to type, like "<name> <effort>".
 function hintFor(level: TriggerLevel, query: string) {
   const list = level.item?.arguments
-  if (!list) return ""
+  if (!list) {
+    return ""
+  }
   const index = level.starts.length - 1
   return list
     .slice(query ? index + 1 : index)
@@ -117,11 +147,13 @@ const sameLevel = (a: TriggerLevel | null, b: TriggerLevel) =>
   a.starts.length === b.starts.length &&
   a.queryStart === b.queryStart
 
-function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, TriggerMenuState, string>) {
+function triggerMenuApi(
+  context: PrimitiveContext<TriggerMenuOptions<any>, TriggerMenuState, string>
+) {
   const { id, store, options, element } = context
   // A controlled close clears the highlight in the same pass.
   deriveOpen(context, ["highlighted", "navigated"], (open) =>
-    open ? undefined : { highlighted: null, navigated: false },
+    open ? undefined : { highlighted: null, navigated: false }
   )
   // The editor a TriggerMenuInput built. It wins over the `editor` option.
   let ownEditor: TextEditorAdapter | undefined
@@ -141,7 +173,11 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   // What the current level lists: an argument's items, else the trigger's.
   const levelItems = () => {
     const level = levels.current()
-    return level?.item ? argumentOf(level)?.items : level ? rules()[level.rule]?.items : undefined
+    return level?.item
+      ? argumentOf(level)?.items
+      : level
+        ? rules()[level.rule]?.items
+        : undefined
   }
   // A free-text argument shows no list.
   const isFreeText = () => {
@@ -156,7 +192,9 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     toKey,
     filter: () => {
       const level = levels.current()
-      return isLoader(levelItems()) ? false : ((level && rules()[level.rule]?.filter) ?? "contains")
+      return isLoader(levelItems())
+        ? false
+        : ((level && rules()[level.rule]?.filter) ?? "contains")
     },
     query: () => store.get().query,
     loop: () => options().loop ?? true,
@@ -164,7 +202,9 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     container: () => element("list") ?? popup.element() ?? element("content"),
     scrollRoot: () => popup.element() ?? element("content"),
     onRegister() {
-      if (mountsQueued) return
+      if (mountsQueued) {
+        return
+      }
       mountsQueued = true
       queueMicrotask(() => {
         mountsQueued = false
@@ -177,15 +217,26 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   const loader = createAsyncOptions<unknown>(
     async (query, loadContext) => {
       const items = levelItems()
-      return isLoader(items) ? ((await items(query, loadContext)) as unknown[]) : []
+      return isLoader(items)
+        ? ((await items(query, loadContext)) as unknown[])
+        : []
     },
-    { debounce: 150 },
+    { debounce: 150 }
   )
   loader.subscribe(() => {
     const state = loader.getState()
     // Results for a level or query that's gone never land.
-    if (!levels.current() || state.query !== requested || state.status === "loading") return
-    store.set({ items: state.items as ListData<unknown>, loading: state.status })
+    if (
+      !levels.current() ||
+      state.query !== requested ||
+      state.status === "loading"
+    ) {
+      return
+    }
+    store.set({
+      items: state.items as ListData<unknown>,
+      loading: state.status,
+    })
     settle("input-change")
   })
 
@@ -197,15 +248,21 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       contains: (target) => !!editor()?.element?.contains(target),
       // Without a sheet or a close watcher, it never closes for a swipe or Back.
       dismiss(reason, { event }) {
-        levels.end(reason as Exclude<PopupCloseReason, "swipe" | "back">, event, {
-          dismiss: reason === "escape-key",
-        })
+        levels.end(
+          reason as Exclude<PopupCloseReason, "swipe" | "back">,
+          event,
+          {
+            dismiss: reason === "escape-key",
+          }
+        )
       },
       // Focus stays in the editor.
       returnFocus: false,
       details: () => ({ trigger: store.get().trigger }),
       onOpenChange(open) {
-        if (!open) store.set({ highlighted: null, navigated: false })
+        if (!open) {
+          store.set({ highlighted: null, navigated: false })
+        }
       },
     }),
   }).internal
@@ -214,8 +271,14 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   // The controller's writes reach the popup through the match levels, so they read the outcome here.
   let moved = false
 
-  function show(reason: TriggerMenuOpenChangeReason, event?: Event, by: PopupOpener = "keyboard") {
-    if (!store.get().open) moved = control.attempt({ reason, event, by }).opened
+  function show(
+    reason: TriggerMenuOpenChangeReason,
+    event?: Event,
+    by: PopupOpener = "keyboard"
+  ) {
+    if (!store.get().open) {
+      moved = control.attempt({ reason, event, by }).opened
+    }
   }
 
   function hide(reason: TriggerMenuOpenChangeReason, event?: Event) {
@@ -228,18 +291,30 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     return moved
   }
 
-  function setQuery(query: string, reason: TriggerMenuQueryChangeReason, event?: Event) {
-    if (store.get().query === query) return
+  function setQuery(
+    query: string,
+    reason: TriggerMenuQueryChangeReason,
+    event?: Event
+  ) {
+    if (store.get().query === query) {
+      return
+    }
     store.set({ query })
     const level = levels.current()
-    if (level)
+    if (level) {
       options().onQueryChange?.(
         query,
         createDetails(
-          { reason, event, trigger: level.match.trigger, argument: argumentOf(level)?.name },
-          changeSource(reason, event),
-        ),
+          {
+            reason,
+            event,
+            trigger: level.match.trigger,
+            argument: argumentOf(level)?.name,
+          },
+          changeSource(reason, event)
+        )
       )
+    }
   }
 
   // What a level lists. Data shows at once; a loader starts loading, keeping
@@ -277,7 +352,9 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
         navigated: false,
       })
       setQuery(query, reason, event)
-      if (levelChanged || isLoader(levelItems())) loadLevel(query, levelChanged)
+      if (levelChanged || isLoader(levelItems())) {
+        loadLevel(query, levelChanged)
+      }
       settle(open, event)
     },
     close(reason, event) {
@@ -287,7 +364,14 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       hide(reason, event)
       // The query empties without `onQueryChange`, which reports only while a
       // level is current, and the level has ended.
-      store.set({ trigger: null, argument: null, hint: "", navigated: false, loading: "idle", query: "" })
+      store.set({
+        trigger: null,
+        argument: null,
+        hint: "",
+        navigated: false,
+        loading: "idle",
+        query: "",
+      })
       announceState()
     },
   })
@@ -313,7 +397,9 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   // are unknown, so they count as there.
   function hasEntries() {
     const state = store.get()
-    if (!state.items && !listbox.entries().length && !state.settled) return true
+    if (!state.items && !listbox.entries().length && !state.settled) {
+      return true
+    }
     return listbox.entries().length > 0
   }
 
@@ -324,8 +410,11 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       !!levels.current() &&
       !isFreeText() &&
       (hasEntries() || loadingStatus() === "loading" || store.get().hasEmpty)
-    if (visible) show(reason, event)
-    else hide(reason, event)
+    if (visible) {
+      show(reason, event)
+    } else {
+      hide(reason, event)
+    }
     settleHighlight()
     announceState()
   }
@@ -334,25 +423,40 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   function settleHighlight() {
     const list = listbox.entries()
     const current = store.get().highlighted
-    const present = current !== null && list.some((entry) => entry.key === current)
+    const present =
+      current !== null && list.some((entry) => entry.key === current)
     if ((options().autoHighlight ?? true) && list.length) {
-      if (present && store.get().navigated) return
+      if (present && store.get().navigated) {
+        return
+      }
       const first = list.find((entry) => !listbox.disabled(entry)) ?? list[0]
-      if (first.key !== current) listbox.highlight(first.key)
+      if (first.key !== current) {
+        listbox.highlight(first.key)
+      }
       return
     }
-    if (current !== null && !present) listbox.highlight(null)
+    if (current !== null && !present) {
+      listbox.highlight(null)
+    }
   }
 
   // What screen readers hear now: the count and the keys, loading, nothing
   // matching, or the argument being typed.
   function statusMessage() {
     const state = store.get()
-    if (!state.open && !levels.current()) return ""
-    if (loadingStatus() === "loading") return "Loading"
-    if (!state.open) return state.argument ? `${state.argument}. ${state.hint}`.trim() : ""
+    if (!state.open && !levels.current()) {
+      return ""
+    }
+    if (loadingStatus() === "loading") {
+      return "Loading"
+    }
+    if (!state.open) {
+      return state.argument ? `${state.argument}. ${state.hint}`.trim() : ""
+    }
     const count = listbox.entries().length
-    if (!count) return "No matches"
+    if (!count) {
+      return "No matches"
+    }
     const next = levels.current()?.item ? ", Tab for the next" : ""
     return `${count} ${count === 1 ? "suggestion" : "suggestions"}. Up and Down to choose, Enter to insert${next}`
   }
@@ -364,13 +468,22 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   function announceState() {
     const message = statusMessage()
     const region = element("status")
-    if (!region) return announce(message)
-    if (!(elements<TextProps>(context, "status")[0]?.props ?? context.props<TextProps>("status"))?.text)
+    if (!region) {
+      return announce(message)
+    }
+    if (
+      !(
+        elements<TextProps>(context, "status")[0]?.props ??
+        context.props<TextProps>("status")
+      )?.text
+    ) {
       return
+    }
     clearTimeout(statusTimer)
     statusTimer = setTimeout(() => {
       // The same message again is changed a little, so it's said again.
-      region.textContent = message && region.textContent === message ? `${message}\u00a0` : message
+      region.textContent =
+        message && region.textContent === message ? `${message}\u00a0` : message
     }, 350)
   }
 
@@ -386,10 +499,14 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   })
 
   function onKeyDown(event: KeyboardEvent) {
-    if (event.defaultPrevented || isComposing(event)) return
+    if (event.defaultPrevented || isComposing(event)) {
+      return
+    }
     const shortcut = options().shortcut ?? "ctrl+space"
     if (shortcut && matchesShortcut(event, shortcut)) {
-      if (levels.reopen("shortcut", event)) event.preventDefault()
+      if (levels.reopen("shortcut", event)) {
+        event.preventDefault()
+      }
       return
     }
     keyboard.onKeyDown(event)
@@ -402,17 +519,26 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
 
   // Follows an editor: its edits and caret moves, and for editors without a
   // part of their own, its keys and ARIA.
-  function connect(next: TextEditorAdapter | undefined, { ownKeys = false } = {}) {
-    if (connected?.editor === next) return
+  function connect(
+    next: TextEditorAdapter | undefined,
+    { ownKeys = false } = {}
+  ) {
+    if (connected?.editor === next) {
+      return
+    }
     disconnect()
-    if (!next) return
+    if (!next) {
+      return
+    }
     const cleanups = [next.subscribe(levels.onEditorChange)]
     if (!ownKeys && typeof document !== "undefined") {
       // In the capture phase, so an open menu's keys win over the editor's
       // own, like Enter submitting a prompt.
       const onKey = (event: KeyboardEvent) => {
         const target = event.target as Node | null
-        if (target && next.element?.contains(target)) onKeyDown(event)
+        if (target && next.element?.contains(target)) {
+          onKeyDown(event)
+        }
       }
       document.addEventListener("keydown", onKey, true)
       cleanups.push(() => document.removeEventListener("keydown", onKey, true))
@@ -422,19 +548,24 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
         applyAttrs(
           next.element,
           aliasReferences(context, fieldAttrs(store.get(), "multiline")),
-          "trigger-menu",
+          "trigger-menu"
         )
       writeAttrs()
       cleanups.push(store.subscribe(writeAttrs), next.subscribe(writeAttrs))
     }
-    connected = { editor: next, cleanup: () => cleanups.forEach((cleanup) => cleanup()) }
+    connected = {
+      editor: next,
+      cleanup: () => cleanups.forEach((cleanup) => cleanup()),
+    }
   }
 
   // The editor a TriggerMenuInput built, else the `editor` option. Followed
   // while the framework keeps the instance, so one React makes and throws
   // away, or hides, never listens to the editor.
   const follow = () => {
-    if (kept) connect(editor(), { ownKeys: !!ownEditor })
+    if (kept) {
+      connect(editor(), { ownKeys: !!ownEditor })
+    }
   }
   whenKept(() => {
     kept = true
@@ -447,7 +578,9 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   let lastEditor = store.get().editor
   store.subscribe(() => {
     const { editor: option } = store.get()
-    if (option === lastEditor) return
+    if (option === lastEditor) {
+      return
+    }
     lastEditor = option
     follow()
   })
@@ -457,7 +590,9 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   let lastItems = store.get().items
   store.subscribe(() => {
     const { mounts, items } = store.get()
-    if (mounts === lastMounts && items === lastItems) return
+    if (mounts === lastMounts && items === lastItems) {
+      return
+    }
     lastMounts = mounts
     lastItems = items
     settleHighlight()
@@ -466,8 +601,12 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
   // The id the field's aria-activedescendant points at, after an arrow key.
   function activeDescendant(state: TriggerMenuState) {
     const { highlighted } = state
-    if (!state.open || !state.navigated || highlighted === null) return undefined
-    if (!listbox.element(highlighted)?.isConnected) return undefined
+    if (!state.open || !state.navigated || highlighted === null) {
+      return undefined
+    }
+    if (!listbox.element(highlighted)?.isConnected) {
+      return undefined
+    }
     return `${id}-option-${idPart(highlighted)}`
   }
 
@@ -478,7 +617,9 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       "aria-expanded": field === "input" ? String(state.open) : undefined,
       "aria-autocomplete": "list",
       "aria-haspopup": "listbox",
-      "aria-controls": state.open ? `${id}-${state.listed ? "list" : "content"}` : undefined,
+      "aria-controls": state.open
+        ? `${id}-${state.listed ? "list" : "content"}`
+        : undefined,
       "aria-activedescendant": activeDescendant(state),
     }
   }
@@ -488,12 +629,19 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     isOpen: () => store.get().open,
     setOpen(
       open: boolean,
-      { reason = "imperative", event }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {}
     ) {
-      if (!open) return moving(() => levels.end(reason, event))
+      if (!open) {
+        return moving(() => levels.end(reason, event))
+      }
       // A match that close() ended is still in the text, so it opens again.
       return moving(() =>
-        levels.current() ? show(reason, event, "imperative") : levels.reopen(reason, event),
+        levels.current()
+          ? show(reason, event, "imperative")
+          : levels.reopen(reason, event)
       )
     },
     open({
@@ -507,33 +655,53 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
     } = {}) {
       const target = editor()
       const char = trigger ?? rules()[0]?.char
-      if (signal?.aborted || !target || !char)
+      if (signal?.aborted || !target || !char) {
         return unopened<TriggerMenuOpenChangeReason, never>(reason, event)
-      if (levels.caret() === null) target.element?.focus()
+      }
+      if (levels.caret() === null) {
+        target.element?.focus()
+      }
       // Types the trigger at the caret, unless a match for it is there already.
       if (levels.matchAtCaret()?.match.trigger !== char) {
         const at = levels.caret()
-        if (at === null) return unopened<TriggerMenuOpenChangeReason, never>(reason, event)
+        if (at === null) {
+          return unopened<TriggerMenuOpenChangeReason, never>(reason, event)
+        }
         select.write({ start: at, end: at }, char)
       }
-      if (!levels.reopen(reason, event)) return unopened<TriggerMenuOpenChangeReason, never>(reason, event)
-      return control.result(signal) as Promise<PopupResult<TriggerMenuOpenChangeReason, never>>
+      if (!levels.reopen(reason, event)) {
+        return unopened<TriggerMenuOpenChangeReason, never>(reason, event)
+      }
+      return control.result(signal) as Promise<
+        PopupResult<TriggerMenuOpenChangeReason, never>
+      >
     },
-    close: ({ reason = "imperative", event }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {}) =>
+    close: ({
+      reason = "imperative",
+      event,
+    }: TriggerMenuChangeOptions<TriggerMenuOpenChangeReason> = {}) =>
       moving(() => levels.end(reason, event)),
     getQuery: () => store.get().query,
     getMatch() {
       const level = levels.current()
       return level
-        ? { ...level.match, end: levels.caret() ?? level.match.end, query: store.get().query }
+        ? {
+            ...level.match,
+            end: levels.caret() ?? level.match.end,
+            query: store.get().query,
+          }
         : null
     },
     insert(content: string | TokenInsert) {
       const at = levels.caret()
-      if (at === null) return
+      if (at === null) {
+        return
+      }
       const level = levels.current()
       select.write({ start: level ? level.match.start : at, end: at }, content)
-      if (level) levels.end("item-press")
+      if (level) {
+        levels.end("item-press")
+      }
     },
     focus: () => editor()?.element?.focus(),
     // Internal. Used by slots and adapters.
@@ -551,29 +719,45 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
       // Not by the field itself, whose name as a reference would be its text.
       listLabel() {
         const el = editor()?.element
-        if (!el) return {}
+        if (!el) {
+          return {}
+        }
         const labelledBy = el.getAttribute("aria-labelledby")
-        if (labelledBy) return { "aria-labelledby": labelledBy }
+        if (labelledBy) {
+          return { "aria-labelledby": labelledBy }
+        }
         const labels = Array.from((el as HTMLTextAreaElement).labels ?? [])
-        if (labels.length)
+        if (labels.length) {
           return {
-            "aria-labelledby": labels.map((label, index) => (label.id ||= `${id}-label-${index}`)).join(" "),
+            "aria-labelledby": labels
+              .map((label, index) => (label.id ||= `${id}-label-${index}`))
+              .join(" "),
           }
+        }
         const label = el.getAttribute("aria-label")
         return label ? { "aria-label": label } : {}
       },
       // The list opens at the trigger, or at an argument's start, and stays there as the query grows.
       anchorRect() {
         const level = levels.current()
-        if (!level) return null
-        return editor()?.rectAt(level.item || level.continued ? level.queryStart : level.match.start) ?? null
+        if (!level) {
+          return null
+        }
+        return (
+          editor()?.rectAt(
+            level.item || level.continued ? level.queryStart : level.match.start
+          ) ?? null
+        )
       },
       caretRect() {
         const at = levels.caret()
         return at === null ? null : (editor()?.rectAt(at) ?? null)
       },
       // TriggerMenuInput builds the editor for its field.
-      setOwnEditor(next: TextEditorAdapter | undefined, field: "input" | "multiline" = "multiline") {
+      setOwnEditor(
+        next: TextEditorAdapter | undefined,
+        field: "input" | "multiline" = "multiline"
+      ) {
         ownEditor = next
         store.set({ field })
         follow()
@@ -586,7 +770,8 @@ function triggerMenuApi(context: PrimitiveContext<TriggerMenuOptions<any>, Trigg
         (!!state.items || state.settled) &&
         !listbox.entries().length,
       itemProps: (key: string) => context.props<ItemMeta>("item", key),
-      contentProps: (key?: string) => contentProps(key) as TriggerMenuContentProps,
+      contentProps: (key?: string) =>
+        contentProps(key) as TriggerMenuContentProps,
     },
   }
 }

@@ -22,7 +22,8 @@ function defineMeterElements() {
     root: {
       tag: "ui-meter",
       display: "block",
-      render: (el, instance) => showDefaultText(el, instance, "ui-meter-value", valueText),
+      render: (el, instance) =>
+        showDefaultText(el, instance, "ui-meter-value", valueText),
     },
     track: { tag: "ui-meter-track", display: "block" },
     indicator: { tag: "ui-meter-indicator", display: "block" },

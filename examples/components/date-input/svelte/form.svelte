@@ -8,7 +8,9 @@
 
   function onsubmit(event: SubmitEvent) {
     event.preventDefault()
-    const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(([name, value]) => `${name}=${value}`)
+    const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
+      ([name, value]) => `${name}=${value}`
+    )
     log(`Submitted ${data.join(", ")}`)
   }
 </script>

@@ -24,6 +24,8 @@
     >
       Publish
     </Button>
-    <p id={hint} data-slot="hint">{ready ? "Ready to publish." : "Add a title to publish."}</p>
+    <p id={hint} data-slot="hint">
+      {ready ? "Ready to publish." : "Add a title to publish."}
+    </p>
   </div>
 </div>

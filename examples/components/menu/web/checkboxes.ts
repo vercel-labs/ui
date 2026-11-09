@@ -40,10 +40,11 @@ function mount(root: HTMLElement) {
       </ui-menu-content>
     </ui-menu>
   `
-  for (const item of root.querySelectorAll("ui-menu-checkbox-item"))
+  for (const item of root.querySelectorAll("ui-menu-checkbox-item")) {
     item.addEventListener("checkedchange", (event) => {
       log(root, `${item.value} ${event.detail.value ? "on" : "off"}`)
     })
+  }
 }
 
 export { mount }

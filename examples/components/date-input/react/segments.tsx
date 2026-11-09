@@ -16,7 +16,7 @@ function Example() {
               <DateInputSegment key={segment.key} segment={segment}>
                 –
               </DateInputSegment>
-            ),
+            )
           )
         }
       </DateInput>

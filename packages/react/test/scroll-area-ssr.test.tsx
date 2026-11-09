@@ -21,21 +21,27 @@ describe("server rendering a scroll area", () => {
         <ScrollAreaThumb />
       </ScrollAreaScrollbar>
       <ScrollAreaScrollToEnd>Jump to latest</ScrollAreaScrollToEnd>
-    </ScrollArea>,
+    </ScrollArea>
   )
 
   test("the viewport scrolls and hides native scrollbars already, so they never flash", () => {
     expect(typeof window).toBe("undefined")
-    expect(html).toMatch(/data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none"/)
+    expect(html).toMatch(
+      /data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none"/
+    )
   })
 
   test("the scrollbar is hidden from screen readers, and from view until the content is measured", () => {
-    expect(html).toMatch(/data-slot="scroll-area-scrollbar"[^>]*aria-hidden="true"/)
+    expect(html).toMatch(
+      /data-slot="scroll-area-scrollbar"[^>]*aria-hidden="true"/
+    )
     expect(html).toMatch(/data-slot="scroll-area-scrollbar"[^>]*display:none/)
   })
 
   test("the content resets the per-frame variables, and the button is a button", () => {
     expect(html).toContain("--scroll-area-overflow-y-start:initial")
-    expect(html).toMatch(/<button[^>]*type="button"[^>]*>Jump to latest<\/button>/)
+    expect(html).toMatch(
+      /<button[^>]*type="button"[^>]*>Jump to latest<\/button>/
+    )
   })
 })

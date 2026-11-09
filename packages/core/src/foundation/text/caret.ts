@@ -42,7 +42,9 @@ function measureInMirror(field: TextField, offset: number) {
   const style = getComputedStyle(field)
   const mirror = doc.createElement("div")
   const target = mirror.style
-  for (const name of mirrored) target[name] = style[name]
+  for (const name of mirrored) {
+    target[name] = style[name]
+  }
   const multiline = field.localName === "textarea"
   target.position = "absolute"
   target.visibility = "hidden"
@@ -69,14 +71,21 @@ function measureInMirror(field: TextField, offset: number) {
 
 // Chromium's live value ranges, where they exist, measure a field's text without a mirror.
 type ValueRangeField = TextField & {
-  createValueRange?: (start: number, end: number) => { getBoundingClientRect: () => DOMRect }
+  createValueRange?: (
+    start: number,
+    end: number
+  ) => { getBoundingClientRect: () => DOMRect }
 }
 
 function nativeRect(field: ValueRangeField, offset: number) {
-  if (typeof field.createValueRange !== "function") return null
+  if (typeof field.createValueRange !== "function") {
+    return null
+  }
   try {
     const rect = field.createValueRange(offset, offset).getBoundingClientRect()
-    if (rect.height === 0 && rect.width === 0 && rect.x === 0 && rect.y === 0) return null
+    if (rect.height === 0 && rect.width === 0 && rect.x === 0 && rect.y === 0) {
+      return null
+    }
     return { x: rect.x, y: rect.y, width: 0, height: rect.height }
   } catch {
     return null
@@ -94,12 +103,27 @@ function createCaretRects(field: TextField) {
     rect: ReturnType<typeof measureInMirror>
   } | null = null
   return (offset: number) => {
-    if (!field.isConnected) return null
+    if (!field.isConnected) {
+      return null
+    }
     const native = nativeRect(field, offset)
-    if (native) return native
+    if (native) {
+      return native
+    }
     const width = field.clientWidth
-    if (!cache || cache.value !== field.value || cache.offset !== offset || cache.width !== width)
-      cache = { value: field.value, offset, width, rect: measureInMirror(field, offset) }
+    if (
+      !cache ||
+      cache.value !== field.value ||
+      cache.offset !== offset ||
+      cache.width !== width
+    ) {
+      cache = {
+        value: field.value,
+        offset,
+        width,
+        rect: measureInMirror(field, offset),
+      }
+    }
     const box = field.getBoundingClientRect()
     return {
       x: box.left + cache.rect.x - field.scrollLeft,
@@ -114,9 +138,16 @@ function createCaretRects(field: TextField) {
 function textDiff(before: string, after: string) {
   let start = 0
   const shortest = Math.min(before.length, after.length)
-  while (start < shortest && before[start] === after[start]) start++
+  while (start < shortest && before[start] === after[start]) {
+    start++
+  }
   let end = 0
-  while (end < shortest - start && before[before.length - 1 - end] === after[after.length - 1 - end]) end++
+  while (
+    end < shortest - start &&
+    before[before.length - 1 - end] === after[after.length - 1 - end]
+  ) {
+    end++
+  }
   return {
     range: { start, end: before.length - end },
     inserted: after.slice(start, after.length - end),
@@ -128,7 +159,9 @@ function textDiff(before: string, after: string) {
 // included. `execCommand` is the only path all three engines can undo; where
 // it's refused, setRangeText is the fallback.
 function insertText(field: TextField, range: TextRange, text: string) {
-  if (field.ownerDocument.activeElement !== field) field.focus({ preventScroll: true })
+  if (field.ownerDocument.activeElement !== field) {
+    field.focus({ preventScroll: true })
+  }
   field.setSelectionRange(range.start, range.end)
   let inserted = false
   try {
@@ -137,9 +170,17 @@ function insertText(field: TextField, range: TextRange, text: string) {
         ? field.ownerDocument.execCommand("delete", false)
         : field.ownerDocument.execCommand("insertText", false, text)
   } catch {}
-  if (inserted) return
+  if (inserted) {
+    return
+  }
   field.setRangeText(text, range.start, range.end, "end")
-  field.dispatchEvent(new InputEvent("input", { bubbles: true, inputType: "insertText", data: text }))
+  field.dispatchEvent(
+    new InputEvent("input", {
+      bubbles: true,
+      inputType: "insertText",
+      data: text,
+    })
+  )
 }
 
 /**
@@ -157,7 +198,8 @@ function textFieldAdapter(field: TextField) {
   let programmatic = false
   let lastSelection = ""
 
-  const emit = (change: EditorChange) => listeners.forEach((listener) => listener(change))
+  const emit = (change: EditorChange) =>
+    listeners.forEach((listener) => listener(change))
   const focused = () => field.ownerDocument.activeElement === field
 
   function onBeforeInput() {
@@ -170,15 +212,26 @@ function textFieldAdapter(field: TextField) {
     previous = value
     // An input event outside a composition means any composition is over,
     // even when the browser dropped its compositionend.
-    if (!(event as InputEvent).isComposing) composing = false
-    if (composing) return
-    emit({ type: "input", range, inserted, user: !programmatic && trusted(event) })
+    if (!(event as InputEvent).isComposing) {
+      composing = false
+    }
+    if (composing) {
+      return
+    }
+    emit({
+      type: "input",
+      range,
+      inserted,
+      user: !programmatic && trusted(event),
+    })
     noteSelection()
   }
 
   function noteSelection() {
     const key = `${field.selectionStart}:${field.selectionEnd}`
-    if (key === lastSelection) return
+    if (key === lastSelection) {
+      return
+    }
     lastSelection = key
     emit({ type: "selection" })
   }
@@ -195,12 +248,19 @@ function textFieldAdapter(field: TextField) {
     const { range, inserted } = textDiff(previous, value)
     previous = value
     emit({ type: "compositionend" })
-    if (range.start !== range.end || inserted) emit({ type: "input", range, inserted, user: true })
+    if (range.start !== range.end || inserted) {
+      emit({ type: "input", range, inserted, user: true })
+    }
   }
 
   // Selection changes fire on the field itself in current engines. Key and
   // pointer releases catch older ones.
-  const selectionEvents = ["selectionchange", "keyup", "pointerup", "focus"] as const
+  const selectionEvents = [
+    "selectionchange",
+    "keyup",
+    "pointerup",
+    "focus",
+  ] as const
   const onBlur = () => {
     composing = false
     lastSelection = ""
@@ -213,7 +273,9 @@ function textFieldAdapter(field: TextField) {
     field.addEventListener("compositionstart", onCompositionStart)
     field.addEventListener("compositionend", onCompositionEnd)
     field.addEventListener("blur", onBlur)
-    for (const type of selectionEvents) field.addEventListener(type, noteSelection)
+    for (const type of selectionEvents) {
+      field.addEventListener(type, noteSelection)
+    }
   }
 
   function detach() {
@@ -222,20 +284,27 @@ function textFieldAdapter(field: TextField) {
     field.removeEventListener("compositionstart", onCompositionStart)
     field.removeEventListener("compositionend", onCompositionEnd)
     field.removeEventListener("blur", onBlur)
-    for (const type of selectionEvents) field.removeEventListener(type, noteSelection)
+    for (const type of selectionEvents) {
+      field.removeEventListener(type, noteSelection)
+    }
   }
 
   return {
     element: field,
     textBefore(length) {
-      if (!focused()) return null
+      if (!focused()) {
+        return null
+      }
       const caret = field.selectionEnd ?? 0
       const offset = Math.max(0, caret - length)
       return { text: field.value.slice(offset, caret), offset }
     },
     selection: () =>
       focused() && field.selectionStart !== null
-        ? { start: field.selectionStart, end: field.selectionEnd ?? field.selectionStart }
+        ? {
+            start: field.selectionStart,
+            end: field.selectionEnd ?? field.selectionStart,
+          }
         : null,
     rectAt,
     replace(range, content) {
@@ -249,11 +318,15 @@ function textFieldAdapter(field: TextField) {
       previous = field.value
     },
     subscribe(listener) {
-      if (!listeners.size) attach()
+      if (!listeners.size) {
+        attach()
+      }
       listeners.add(listener)
       return () => {
         listeners.delete(listener)
-        if (!listeners.size) detach()
+        if (!listeners.size) {
+          detach()
+        }
       }
     },
     composing: () => composing,

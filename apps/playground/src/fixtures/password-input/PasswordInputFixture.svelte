@@ -22,14 +22,18 @@
   let visible = $state(!!options.defaultVisible)
 
   function onVisibleChange(next: boolean, details: ChangeDetails) {
-    if (cancel) return details.cancel()
+    if (cancel) {
+      return details.cancel()
+    }
     visible = next
     action = passwordInputAction.visible(next, details.reason)
   }
 
   function onSubmit(event: SubmitEvent) {
     event.preventDefault()
-    const field = (event.currentTarget as HTMLFormElement).elements.namedItem(password.name) as HTMLInputElement
+    const field = (event.currentTarget as HTMLFormElement).elements.namedItem(
+      password.name
+    ) as HTMLInputElement
     action = passwordInputAction.submit(field.type)
   }
 </script>
@@ -40,7 +44,8 @@
     <fieldset>
       <legend>{form.account}</legend>
       <label>
-        {email.label} <input class="input" name={email.name} value={email.defaultValue} />
+        {email.label}
+        <input class="input" name={email.name} value={email.defaultValue} />
       </label>
       <Field>
         <FieldLabel>{password.label}</FieldLabel>
@@ -54,7 +59,10 @@
           {onVisibleChange}
         >
           <PasswordInputControl class="input" />
-          <PasswordInputToggle class="password-toggle" aria-label={password.toggle}>
+          <PasswordInputToggle
+            class="password-toggle"
+            aria-label={password.toggle}
+          >
             <span aria-hidden="true">👁</span>
           </PasswordInputToggle>
         </PasswordInput>
@@ -65,7 +73,9 @@
     <button type="submit">{form.submit}</button>
     <button type="reset">{form.reset}</button>
   </form>
-  <button onclick={() => reveal.toggleVisible()}>{passwordInputFixture.controller}</button>
+  <button onclick={() => reveal.toggleVisible()}
+    >{passwordInputFixture.controller}</button
+  >
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>
 </div>

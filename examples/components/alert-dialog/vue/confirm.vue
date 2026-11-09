@@ -16,9 +16,13 @@ const projects = ref(["Acme", "Globex", "Initech"])
 const reset = useTemplateRef<HTMLButtonElement>("reset")
 
 async function remove(name: string, button: HTMLButtonElement) {
-  if (!(await confirm({ name }))) return
+  if (!(await confirm({ name }))) {
+    return
+  }
   const row = button.closest("li")
-  const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+  const next = (
+    row?.nextElementSibling ?? row?.previousElementSibling
+  )?.querySelector("button")
   const target = next ?? reset.value
   target?.focus()
   projects.value = projects.value.filter((project) => project !== name)
@@ -28,7 +32,11 @@ async function remove(name: string, button: HTMLButtonElement) {
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <button ref="reset" type="button" @click="projects = ['Acme', 'Globex', 'Initech']">
+      <button
+        ref="reset"
+        type="button"
+        @click="projects = ['Acme', 'Globex', 'Initech']"
+      >
         Reset Projects
       </button>
     </div>
@@ -44,7 +52,9 @@ async function remove(name: string, button: HTMLButtonElement) {
           Delete
         </button>
       </li>
-      <li v-if="projects.length === 0" data-slot="row">All projects deleted.</li>
+      <li v-if="projects.length === 0" data-slot="row">
+        All projects deleted.
+      </li>
     </ul>
     <AlertDialog :controller="confirm.controller">
       <AlertDialogBackdrop />
@@ -57,7 +67,9 @@ async function remove(name: string, button: HTMLButtonElement) {
         </div>
         <div data-slot="row">
           <AlertDialogClose>Cancel</AlertDialogClose>
-          <AlertDialogClose data-variant="solid" value="confirm">Delete</AlertDialogClose>
+          <AlertDialogClose data-variant="solid" value="confirm"
+            >Delete</AlertDialogClose
+          >
         </div>
       </ProjectAlertDialogContent>
     </AlertDialog>

@@ -25,7 +25,9 @@ function Example() {
     <TriggerMenu triggers={[{ char: "@", items: people }]}>
       <Field ref={setField}>
         <FieldLabel>Comment</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type @ to mention someone…" />} />
+        <FieldControl
+          render={<TriggerMenuInput placeholder="Type @ to mention someone…" />}
+        />
       </Field>
       <TriggerMenuContent
         side="top"
@@ -40,7 +42,11 @@ function Example() {
         <TriggerMenuList>
           {(state) =>
             (state.items as TriggerMenuDataItem[]).map((item) => (
-              <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+              <TriggerMenuItem
+                key={item.value}
+                value={item.value}
+                label={item.label}
+              >
                 {item.label}
               </TriggerMenuItem>
             ))

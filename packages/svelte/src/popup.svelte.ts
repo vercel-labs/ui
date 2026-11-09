@@ -8,7 +8,9 @@ const InheritedContainer = Symbol("popup-container")
 
 /** A getter for a popup's container: its own, else the one the popup around it renders into. */
 function usePopupContainer(own: () => PopupContainer) {
-  const inherited = getContext<(() => PopupContainer) | undefined>(InheritedContainer)
+  const inherited = getContext<(() => PopupContainer) | undefined>(
+    InheritedContainer
+  )
   return () => own() ?? inherited?.()
 }
 
@@ -22,7 +24,9 @@ function providePopupContainer(container: () => PopupContainer) {
 // the outro in the top layer and leaves it when Svelte removes it.
 function keepShown(event: Event) {
   const host = (event.target as Element).closest<HTMLElement>("[popover]")
-  if (!host || host.matches(":popover-open")) return
+  if (!host || host.matches(":popover-open")) {
+    return
+  }
   try {
     host.showPopover()
   } catch {}
@@ -43,19 +47,32 @@ function portalTo(container: () => PopupContainer | false) {
     el.addEventListener("outrostart", keepShown, true)
     const current = container()
     const target = current === false ? null : portalTarget(current)
-    if (!target || el.parentNode === target) return
+    if (!target || el.parentNode === target) {
+      return
+    }
     const home = el.ownerDocument.createComment("")
     el.before(home)
     target.append(el)
     return () => {
-      if (home.isConnected) home.before(el)
-      else el.remove()
+      if (home.isConnected) {
+        home.before(el)
+      } else {
+        el.remove()
+      }
       home.remove()
     }
   }
   return portal
 }
 
-export { useControllerEntry, useControllerTarget } from "./controller-target.svelte"
+export {
+  useControllerEntry,
+  useControllerTarget,
+} from "./controller-target.svelte"
 
-export { type PopupContainer, portalTo, providePopupContainer, usePopupContainer }
+export {
+  type PopupContainer,
+  portalTo,
+  providePopupContainer,
+  usePopupContainer,
+}

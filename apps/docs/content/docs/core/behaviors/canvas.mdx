@@ -65,7 +65,10 @@ Give the frame a visible size and an accessible name in your component. One tran
 Use `fit` to show a rectangle in full. Its coordinates are in canvas units:
 
 ```ts
-viewport.fit({ left: 0, top: 0, right: 800, bottom: 600 }, { padding: 16, maxZoom: 1 })
+viewport.fit(
+  { left: 0, top: 0, right: 800, bottom: 600 },
+  { padding: 16, maxZoom: 1 }
+)
 viewport.zoomBy(1.25)
 viewport.panBy(80, 0)
 ```
@@ -167,7 +170,8 @@ const connect = createConnect(context, {
   draft: "connecting",
   canConnect: (from, to) => from.endsWith(":out") && to.endsWith(":in"),
   point: (x, y) => viewport.toCanvas(x, y),
-  connect: (from, to, details) => change("edges", [...context.store.get().edges, { from, to }], details),
+  connect: (from, to, details) =>
+    change("edges", [...context.store.get().edges, { from, to }], details),
 })
 ```
 

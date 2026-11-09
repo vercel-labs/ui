@@ -22,7 +22,12 @@ const files = [
 
 const draft: TokenInputValue = [
   "Explain ",
-  { type: "file", value: "src/routes.ts", label: "routes.ts", data: { trigger: "@" } },
+  {
+    type: "file",
+    value: "src/routes.ts",
+    label: "routes.ts",
+    data: { trigger: "@" },
+  },
   " in two sentences.",
 ]
 
@@ -46,7 +51,7 @@ function mount(root: HTMLElement) {
                     ${mode.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -75,12 +80,18 @@ function mount(root: HTMLElement) {
     </ui-trigger-menu>
   `
   root.querySelector("ui-field")!.append(prompt)
-  root.querySelector("ui-trigger-menu")!.triggers = [{ char: "@", type: "file", items: files }]
+  root.querySelector("ui-trigger-menu")!.triggers = [
+    { char: "@", type: "file", items: files },
+  ]
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
-    if (event.detail.value) prompt.tokenDeletion = event.detail.value as TokenDeletion
+    if (event.detail.value) {
+      prompt.tokenDeletion = event.detail.value as TokenDeletion
+    }
   })
   prompt.addEventListener("valuechange", (event) => {
-    for (const token of event.detail.removed) log(root, `Removed ${token.label} (${prompt.tokenDeletion})`)
+    for (const token of event.detail.removed) {
+      log(root, `Removed ${token.label} (${prompt.tokenDeletion})`)
+    }
   })
 }
 

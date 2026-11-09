@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { CheckIcon, ChevronDownIcon, ChevronUpIcon, SearchIcon } from "@lucide/svelte"
+  import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    SearchIcon,
+  } from "@lucide/svelte"
   import {
     Combobox,
     ComboboxContent,
@@ -47,7 +52,11 @@
     <ComboboxEmpty>No one by that name.</ComboboxEmpty>
     <ComboboxList>
       {#each users as user (user.id)}
-        <ComboboxItem value={user.username} label={user.name} keywords={[user.username]}>
+        <ComboboxItem
+          value={user.username}
+          label={user.name}
+          keywords={[user.username]}
+        >
           {#snippet children(state)}
             <span data-slot="badge">{user.name.slice(0, 1)}</span>
             <span data-slot="stack">

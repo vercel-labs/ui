@@ -12,6 +12,7 @@ const popup =
   "min-w-40 rounded-lg border border-neutral-200 bg-white p-1 text-[13px] shadow-lg outline-none transition-[opacity,scale] duration-150 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0"
 const menuItem =
   "flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 outline-none data-disabled:opacity-50 data-highlighted:bg-neutral-100 data-open:bg-neutral-100"
-const control = "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
+const control =
+  "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
 
 export { bar, control, group, input, item, menuItem, popup, separator }

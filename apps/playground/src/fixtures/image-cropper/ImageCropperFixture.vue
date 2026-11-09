@@ -14,7 +14,10 @@ import {
   type ImageCropperCropCommitDetails,
 } from "@ui-sdk/vue"
 import { imageCropperOptions } from "tests/fixtures/page.ts"
-import { describeCrop, imageCropperFixture } from "tests/fixtures/image-cropper.ts"
+import {
+  describeCrop,
+  imageCropperFixture,
+} from "tests/fixtures/image-cropper.ts"
 import { ref } from "vue"
 
 const controller = createImageCropperController()
@@ -23,12 +26,20 @@ const { cancel, ...options } = imageCropperOptions()
 const action = ref("")
 const committed = ref("")
 
-function onCropChange(crop: Parameters<typeof describeCrop>[0], details: ImageCropperCropChangeDetails) {
-  if (cancel && details.reason !== "image-load") return details.cancel()
+function onCropChange(
+  crop: Parameters<typeof describeCrop>[0],
+  details: ImageCropperCropChangeDetails
+) {
+  if (cancel && details.reason !== "image-load") {
+    return details.cancel()
+  }
   action.value = `${describeCrop(crop)}:${details.reason}`
 }
 
-function onCropCommit(crop: Parameters<typeof describeCrop>[0], details: ImageCropperCropCommitDetails) {
+function onCropCommit(
+  crop: Parameters<typeof describeCrop>[0],
+  details: ImageCropperCropCommitDetails
+) {
   committed.value = `${describeCrop(crop)}:${details.reason}`
 }
 </script>
@@ -60,7 +71,10 @@ function onCropCommit(crop: Parameters<typeof describeCrop>[0], details: ImageCr
       <ImageCropperFlip>Flip</ImageCropperFlip>
     </ImageCropper>
     <button type="button">After</button>
-    <button type="button" @click="controller.setCrop({ x: 0, y: 0, width: 100, height: 100 })">
+    <button
+      type="button"
+      @click="controller.setCrop({ x: 0, y: 0, width: 100, height: 100 })"
+    >
       Use corner
     </button>
     <output role="status" aria-label="Last action">{{ action }}</output>

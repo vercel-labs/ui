@@ -28,7 +28,10 @@ function usePopupContainer(own: PopupContainer) {
 }
 
 // A popup's own container: the content's, else its root's.
-function useOwnContainer(own: PopupContainer, root: React.Context<PopupContainer>) {
+function useOwnContainer(
+  own: PopupContainer,
+  root: React.Context<PopupContainer>
+) {
   const fromRoot = React.useContext(root)
   return own ?? fromRoot
 }
@@ -39,7 +42,13 @@ function renderPopup(element: React.ReactElement, container: PopupContainer) {
   return <Popup element={element} container={container} />
 }
 
-function Popup({ element, container }: { element: React.ReactElement; container: PopupContainer }) {
+function Popup({
+  element,
+  container,
+}: {
+  element: React.ReactElement
+  container: PopupContainer
+}) {
   const target = portalTarget(container)
   const [tree] = React.useState(followTree)
   // A tree React renders hidden, like an <Activity> rendering a page ahead,
@@ -49,13 +58,19 @@ function Popup({ element, container }: { element: React.ReactElement; container:
   // there and hides unless its tree shows. The popup renders at once, so the
   // render that opens it shows it.
   React.useInsertionEffect(() => {
-    if (target) tree.placed(target)
+    if (target) {
+      tree.placed(target)
+    }
   }, [tree, target])
   // A part's element carries the part's ref in its props, joined here by the one that follows the tree.
   const part = element as React.ReactElement<{ ref?: React.Ref<unknown> }>
-  const tracked = React.cloneElement(part, { ref: mergeRefs(part.props.ref ?? null, tree.track) })
+  const tracked = React.cloneElement(part, {
+    ref: mergeRefs(part.props.ref ?? null, tree.track),
+  })
   const content = container ? (
-    <InheritedContainer.Provider value={container}>{tracked}</InheritedContainer.Provider>
+    <InheritedContainer.Provider value={container}>
+      {tracked}
+    </InheritedContainer.Provider>
   ) : (
     tracked
   )
@@ -83,13 +98,18 @@ function followTree() {
   // A microtask later, so StrictMode's cleanup and run again in one go don't count.
   const hideLater = () =>
     queueMicrotask(() => {
-      if (isShown || show) return
+      if (isShown || show) {
+        return
+      }
       const shows = els.filter((el) => el.isConnected).map(hide)
-      if (shows.length) show = () => shows.forEach((run) => run())
+      if (shows.length) {
+        show = () => shows.forEach((run) => run())
+      }
     })
   const track = (next: unknown) => {
-    if (next instanceof HTMLElement && !els.includes(next))
+    if (next instanceof HTMLElement && !els.includes(next)) {
       els = [...els.filter((el) => el.isConnected), next]
+    }
   }
   return {
     // The ref for the popup's element. React lets go of it while the tree is hidden, so it's kept.
@@ -102,15 +122,21 @@ function followTree() {
     // any. A render that waits a commit to render an element adds none, and
     // the last node then belongs to someone else. They hide unless the tree shows.
     placed(target: Element | DocumentFragment) {
-      if (target.lastChild === lastBefore) return
+      if (target.lastChild === lastBefore) {
+        return
+      }
       // A node that left in the same commit no longer marks where they start, so the last one stands for them.
       const first = !lastBefore
         ? target.firstChild
         : lastBefore.parentNode === target
           ? lastBefore.nextSibling
           : target.lastChild
-      for (let node = first; node; node = node.nextSibling) track(node)
-      if (!isShown) hideLater()
+      for (let node = first; node; node = node.nextSibling) {
+        track(node)
+      }
+      if (!isShown) {
+        hideLater()
+      }
     },
     shown() {
       isShown = true
@@ -136,7 +162,9 @@ function TreeEffect({
   target: Element | DocumentFragment | null
 }) {
   React.useInsertionEffect(() => {
-    if (target) tree.placing(target)
+    if (target) {
+      tree.placing(target)
+    }
   }, [tree, target])
   React.useLayoutEffect(() => {
     tree.shown()
@@ -151,13 +179,21 @@ function TreeEffect({
 // popup opened. Returns what shows it again.
 function hide(el: HTMLElement) {
   const doc = el.ownerDocument
-  if (el.contains(doc.activeElement)) (doc.activeElement as HTMLElement).blur()
-  for (const popover of [el, ...el.querySelectorAll<HTMLElement>("[popover]")])
+  if (el.contains(doc.activeElement)) {
+    ;(doc.activeElement as HTMLElement).blur()
+  }
+  for (const popover of [
+    el,
+    ...el.querySelectorAll<HTMLElement>("[popover]"),
+  ]) {
     try {
       popover.hidePopover()
     } catch {}
+  }
   const { style } = el
-  if (style.display === "none") return () => {}
+  if (style.display === "none") {
+    return () => {}
+  }
   const value = style.getPropertyValue("display")
   const priority = style.getPropertyPriority("display")
   style.setProperty("display", "none", "important")
@@ -171,10 +207,17 @@ function hide(el: HTMLElement) {
  * into the top layer. Its attributes are a subset of the content's, so the
  * content's render keeps it current.
  */
-function sheetViewport<State>(popup: PrimitiveHandle<Primitive>, render?: RenderProp<State>) {
+function sheetViewport<State>(
+  popup: PrimitiveHandle<Primitive>,
+  render?: RenderProp<State>
+) {
   return (props: Record<string, any>, state: State) => {
     const element = renderElement("div", props, render, state)
-    return presentIn(popup, "viewport") ? <div {...slotIn(popup, "viewport", {})}>{element}</div> : element
+    return presentIn(popup, "viewport") ? (
+      <div {...slotIn(popup, "viewport", {})}>{element}</div>
+    ) : (
+      element
+    )
   }
 }
 
@@ -189,12 +232,20 @@ const SheetHeaderContext = /* @__PURE__ */ React.createContext<
 >([null, () => {}])
 
 /** The header at the top of a sheet's content, while the popup's `header` slot is present. */
-function sheetHeader(popup: PrimitiveHandle<Primitive>, setHeader: (header: HTMLElement | null) => void) {
-  return presentIn(popup, "header") ? <div {...slotIn(popup, "header", {}, { ref: setHeader })} /> : null
+function sheetHeader(
+  popup: PrimitiveHandle<Primitive>,
+  setHeader: (header: HTMLElement | null) => void
+) {
+  return presentIn(popup, "header") ? (
+    <div {...slotIn(popup, "header", {}, { ref: setHeader })} />
+  ) : null
 }
 
 /** Renders an input into the sheet's header while there is one. */
-function inSheetHeader(element: React.ReactElement, header: HTMLElement | null) {
+function inSheetHeader(
+  element: React.ReactElement,
+  header: HTMLElement | null
+) {
   return header ? createPortal(element, header) : element
 }
 
@@ -218,10 +269,16 @@ function Connected({
 }) {
   const nearest = useNearest(primitive)
   const handle = useControllerTarget(controller, nearest)
-  if (!handle) return fallback()
+  if (!handle) {
+    return fallback()
+  }
   // Always in a scope of its own with a controller, so its element stays when
   // that controller's instance takes over from the nearest one.
-  return controller ? <HandleScope handle={handle}>{children}</HandleScope> : children
+  return controller ? (
+    <HandleScope handle={handle}>{children}</HandleScope>
+  ) : (
+    children
+  )
 }
 
 export { useControllerEntry, useControllerTarget } from "./controller-target"

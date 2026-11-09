@@ -15,7 +15,12 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/vue/date-picker"
-import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon, XIcon } from "@lucide/vue"
+import {
+  CalendarIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  XIcon,
+} from "@lucide/vue"
 </script>
 
 <template>

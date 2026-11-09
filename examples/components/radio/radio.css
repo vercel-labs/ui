@@ -5,15 +5,17 @@
   }
 
   :scope[data-example^="radio/"]
-    :is([data-slot="field-root"], fieldset, [data-slot="stack"]):has([data-slot="radio-group"]):not(
-      :has([data-slot="card"], [data-slot="radio-group"] > button)
-    ) {
+    :is([data-slot="field-root"], fieldset, [data-slot="stack"]):has(
+      [data-slot="radio-group"]
+    ):not(:has([data-slot="card"], [data-slot="radio-group"] > button)) {
     width: max-content;
     max-width: 100%;
   }
 
   /* The check keeps its space on every card, so moving it never rewraps the text. */
-  :scope[data-example="radio/render"] [data-slot="radio-root"] > svg:not([data-checked]) {
+  :scope[data-example="radio/render"]
+    [data-slot="radio-root"]
+    > svg:not([data-checked]) {
     visibility: hidden;
   }
 
@@ -95,7 +97,8 @@
     transition: box-shadow var(--duration);
 
     &:hover:not([data-disabled], [data-readonly], [data-checked]) {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &[data-checked] {
@@ -183,7 +186,8 @@
     text-align: start;
 
     &:hover:not([data-disabled], [data-checked]) {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &[data-checked] {

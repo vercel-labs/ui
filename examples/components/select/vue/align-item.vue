@@ -27,7 +27,10 @@ const aligned = ref(true)
   <div data-slot="stack">
     <div data-slot="controls">
       <label data-slot="label">
-        <Checkbox :checked="aligned" @checked-change="(next) => (aligned = next === true)">
+        <Checkbox
+          :checked="aligned"
+          @checked-change="(next) => (aligned = next === true)"
+        >
           <CheckboxIndicator>
             <CheckIcon />
           </CheckboxIndicator>
@@ -43,7 +46,11 @@ const aligned = ref(true)
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent :align-item-with-trigger="aligned">
-          <SelectItem v-for="priority in priorities" :key="priority.value" :value="priority.value">
+          <SelectItem
+            v-for="priority in priorities"
+            :key="priority.value"
+            :value="priority.value"
+          >
             {{ priority.label }}
             <SelectItemIndicator>
               <CheckIcon />

@@ -11,17 +11,29 @@ function Fixture() {
     <div class="fixture">
       <button>Before</button>
       <FieldSet class="form">
-        <FieldLegend render={(props) => <div {...props} />}>Legend as a div</FieldLegend>
+        <FieldLegend render={(props) => <div {...props} />}>
+          Legend as a div
+        </FieldLegend>
         <Field>
           <FieldLabel>Render function</FieldLabel>
           <Input
             class="input"
-            render={(props, state) => <input {...props} data-state={state.filled ? "filled" : "empty"} />}
+            render={(props, state) => (
+              <input
+                {...props}
+                data-state={state.filled ? "filled" : "empty"}
+              />
+            )}
           />
         </Field>
         <Field>
           <FieldLabel>Class from state</FieldLabel>
-          <Textarea autoResize class={(state) => `textarea ${state.filled ? "is-filled" : "is-empty"}`} />
+          <Textarea
+            autoResize
+            class={(state) =>
+              `textarea ${state.filled ? "is-filled" : "is-empty"}`
+            }
+          />
         </Field>
         <InputGroup class="input-group">
           <Input class="input" aria-label="Search" />

@@ -16,7 +16,9 @@ function Example() {
         <PopoverTrigger>Rename</PopoverTrigger>
         <PopoverContent>
           <PopoverTitle>Rename file</PopoverTitle>
-          <PopoverDescription>Focus starts in the first field.</PopoverDescription>
+          <PopoverDescription>
+            Focus starts in the first field.
+          </PopoverDescription>
           <Field>
             <FieldLabel>Name</FieldLabel>
             <Input defaultValue="Q3 roadmap.pdf" />
@@ -31,7 +33,9 @@ function Example() {
         <PopoverTrigger>Publish</PopoverTrigger>
         <PopoverContent initialFocus="[data-autofocus]">
           <PopoverTitle>Publish changes?</PopoverTitle>
-          <PopoverDescription>Focus starts on Publish, not Cancel.</PopoverDescription>
+          <PopoverDescription>
+            Focus starts on Publish, not Cancel.
+          </PopoverDescription>
           <div data-slot="row">
             <PopoverClose>Cancel</PopoverClose>
             <PopoverClose data-autofocus="" data-variant="solid">

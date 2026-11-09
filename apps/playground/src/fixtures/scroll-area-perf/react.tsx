@@ -6,7 +6,12 @@ import {
   ScrollAreaViewport,
 } from "@ui-sdk/react/scroll-area"
 import { createRoot } from "react-dom/client"
-import { countRender, mountWhenAsked, perfItems, perfSize } from "tests/fixtures/perf.ts"
+import {
+  countRender,
+  mountWhenAsked,
+  perfItems,
+  perfSize,
+} from "tests/fixtures/perf.ts"
 
 // A scroll area of N items for the counts specs, with its
 // scrollbar always shown. The content, the thumb and every item count their
@@ -23,7 +28,11 @@ function Fixture() {
     <div className="fixture scroll-fixture">
       <button>Before</button>
       <ScrollArea className="scroll-area" type="always">
-        <ScrollAreaViewport className="scroll-area-viewport" role="region" aria-label="Items">
+        <ScrollAreaViewport
+          className="scroll-area-viewport"
+          role="region"
+          aria-label="Items"
+        >
           <ScrollAreaContent
             render={(props) => {
               countRender("content")

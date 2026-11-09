@@ -1,6 +1,10 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
-  import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
+  import {
+    Listbox,
+    ListboxItem,
+    ListboxItemIndicator,
+  } from "@ui-sdk/svelte/listbox"
 
   const toppings = [
     { value: "basil", label: "Basil" },

@@ -20,7 +20,9 @@ import { toastFixture, toastOptions, usesHost } from "tests/fixtures/toast.ts"
 import { createFixtureToasts } from "./shared"
 
 const action = ref("")
-const toasts = createFixtureToasts<ToastContent>((value) => (action.value = value))
+const toasts = createFixtureToasts<ToastContent>(
+  (value) => (action.value = value)
+)
 const host = usesHost()
 const options = toastOptions()
 
@@ -61,7 +63,12 @@ async function ask() {
         </Toast>
       </template>
     </OverlayHost>
-    <ToastRegion v-else :toaster="toasts.toast" class="toast-region" v-bind="options">
+    <ToastRegion
+      v-else
+      :toaster="toasts.toast"
+      class="toast-region"
+      v-bind="options"
+    >
       <Toast class="toast">
         <ToastTitle class="toast-title" />
         <ToastDescription class="toast-description" />

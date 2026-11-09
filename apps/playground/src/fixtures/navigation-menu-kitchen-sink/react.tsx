@@ -12,12 +12,30 @@ import * as React from "react"
 import { createRoot } from "react-dom/client"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
-import { hasViewport, href, items, moreLinks, nestedLinks, type Item, type Variant } from "./variants"
+import {
+  hasViewport,
+  href,
+  items,
+  moreLinks,
+  nestedLinks,
+  type Item,
+  type Variant,
+} from "./variants"
 
 function Chevron() {
   return (
-    <svg className={classes.chevron} viewBox="0 0 12 12" fill="none" aria-hidden="true">
-      <path d="M3 4.5 6 7.5l3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    <svg
+      className={classes.chevron}
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M3 4.5 6 7.5l3-3"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   )
 }
@@ -35,9 +53,15 @@ function Link({
 }) {
   return (
     <li>
-      <NavigationMenuLink className={classes.link} href={href(variant, label)} closeOnSelect={closeOnSelect}>
+      <NavigationMenuLink
+        className={classes.link}
+        href={href(variant, label)}
+        closeOnSelect={closeOnSelect}
+      >
         <span className={classes.linkTitle}>{label}</span>
-        {description && <span className={classes.linkDescription}>{description}</span>}
+        {description && (
+          <span className={classes.linkDescription}>{description}</span>
+        )}
       </NavigationMenuLink>
     </li>
   )
@@ -49,7 +73,9 @@ function Nested({ variant, env }: { variant: Variant; env: Env }) {
     <NavigationMenu
       orientation="vertical"
       className={classes.nestedRoot}
-      onValueChange={(value, { reason }) => env.log(`nested valueChange ${value} (${reason})`)}
+      onValueChange={(value, { reason }) =>
+        env.log(`nested valueChange ${value} (${reason})`)
+      }
     >
       <NavigationMenuList className={classes.list}>
         <NavigationMenuItem value="learn">
@@ -69,13 +95,24 @@ function Nested({ variant, env }: { variant: Variant; env: Env }) {
   )
 }
 
-function Panel({ variant, env, item }: { variant: Variant; env: Env; item: Item }) {
+function Panel({
+  variant,
+  env,
+  item,
+}: {
+  variant: Variant
+  env: Env
+  item: Item
+}) {
   const [grown, setGrown] = React.useState(false)
   const first = item.value === "products"
   const menuCloses = variant.options?.closeOnSelect ?? true
   const links =
     first && variant.body === "long"
-      ? Array.from({ length: 30 }, (_, index) => ({ label: `Product ${index + 1}`, description: "" }))
+      ? Array.from({ length: 30 }, (_, index) => ({
+          label: `Product ${index + 1}`,
+          description: "",
+        }))
       : item.links
   return (
     <NavigationMenuContent
@@ -90,17 +127,24 @@ function Panel({ variant, env, item }: { variant: Variant; env: Env; item: Item 
             variant={variant}
             label={link.label}
             description={link.description}
-            closeOnSelect={variant.linkCloseOnSelect && index === 0 ? !menuCloses : undefined}
+            closeOnSelect={
+              variant.linkCloseOnSelect && index === 0 ? !menuCloses : undefined
+            }
           />
         ))}
-        {grown && moreLinks.map((label) => <Link key={label} variant={variant} label={label} />)}
+        {grown &&
+          moreLinks.map((label) => (
+            <Link key={label} variant={variant} label={label} />
+          ))}
       </ul>
       {first && variant.body === "dynamic" && (
         <button className={classes.more} onClick={() => setGrown(!grown)}>
           {grown ? "Show less" : "Show more"}
         </button>
       )}
-      {first && variant.body === "nested" && <Nested variant={variant} env={env} />}
+      {first && variant.body === "nested" && (
+        <Nested variant={variant} env={env} />
+      )}
     </NavigationMenuContent>
   )
 }
@@ -111,13 +155,17 @@ function VariantMenu({ variant, env }: { variant: Variant; env: Env }) {
   // The select outside the menu shares the controlled value.
   React.useEffect(() => {
     const select = env.select
-    if (!select) return
+    if (!select) {
+      return
+    }
     const change = () => setValue(select.value || null)
     select.addEventListener("change", change)
     return () => select.removeEventListener("change", change)
   }, [env.select])
   React.useEffect(() => {
-    if (env.select) env.select.value = value ?? ""
+    if (env.select) {
+      env.select.value = value ?? ""
+    }
   }, [env.select, value])
 
   return (
@@ -131,14 +179,19 @@ function VariantMenu({ variant, env }: { variant: Variant; env: Env }) {
       controller={env.controller}
       onValueChange={(next, details) => {
         env.log(`valueChange ${next} (${details.reason})`)
-        if (variant.controlled && !details.canceled) setValue(next)
+        if (variant.controlled && !details.canceled) {
+          setValue(next)
+        }
       }}
       onOpenChangeComplete={(open) => env.log(`openChangeComplete ${open}`)}
     >
       <NavigationMenuList className={classes.list}>
         {items.map((item) => (
           <NavigationMenuItem key={item.value} value={item.value}>
-            <NavigationMenuTrigger className={classes.trigger} disabled={variant.disabled === item.value}>
+            <NavigationMenuTrigger
+              className={classes.trigger}
+              disabled={variant.disabled === item.value}
+            >
               {item.label} <Chevron />
             </NavigationMenuTrigger>
             <Panel variant={variant} env={env} item={item} />
@@ -171,8 +224,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantMenu variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

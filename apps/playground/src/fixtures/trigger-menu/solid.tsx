@@ -31,8 +31,12 @@ function Composer(props: {
     <TriggerMenu
       triggers={triggers}
       autoHighlight={autoHighlight}
-      onOpenChange={(open, details) => props.onOpen(`${open}:${details.reason}`)}
-      onSelect={(value, details) => props.onAction(selectAction(value, details.arguments))}
+      onOpenChange={(open, details) =>
+        props.onOpen(`${open}:${details.reason}`)
+      }
+      onSelect={(value, details) =>
+        props.onAction(selectAction(value, details.arguments))
+      }
     >
       <label class="label" for={id}>
         {props.name}
@@ -59,7 +63,12 @@ function Composer(props: {
           {(state) => (
             <For each={state.items as TriggerMenuDataItem[]}>
               {(item) => (
-                <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled} class="item">
+                <TriggerMenuItem
+                  value={item.value}
+                  label={item.label}
+                  disabled={item.disabled}
+                  class="item"
+                >
                   {item.label}
                 </TriggerMenuItem>
               )}

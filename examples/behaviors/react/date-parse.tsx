@@ -1,6 +1,11 @@
 import * as React from "react"
 import { datePattern, formatDate, parseDate } from "@ui-sdk/core/date"
-import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { useLog } from "../../shared/react/log"
 
 const locales = [
@@ -16,10 +21,18 @@ function Example() {
   const [text, setText] = React.useState("10/16/26")
   const [reference, setReference] = React.useState("2026-10-16")
   const pattern = datePattern(locale)
-  const read = (next: { locale?: string; text?: string; reference?: string }) => {
+  const read = (next: {
+    locale?: string
+    text?: string
+    reference?: string
+  }) => {
     const options = { locale, text, reference, ...next }
-    const date = parseDate(options.text, options.locale, { referenceDate: options.reference })
-    log(`“${options.text}”: ${date ? `${date}, ${formatDate(date, options.locale)}` : "not a date"}`)
+    const date = parseDate(options.text, options.locale, {
+      referenceDate: options.reference,
+    })
+    log(
+      `“${options.text}”: ${date ? `${date}, ${formatDate(date, options.locale)}` : "not a date"}`
+    )
   }
   return (
     <div data-slot="stack">
@@ -59,7 +72,9 @@ function Example() {
             read({ text: event.target.value })
           }}
         />
-        <FieldDescription data-pattern>{pattern.fields.join(` ${pattern.separator} `)}</FieldDescription>
+        <FieldDescription data-pattern>
+          {pattern.fields.join(` ${pattern.separator} `)}
+        </FieldDescription>
       </Field>
     </div>
   )

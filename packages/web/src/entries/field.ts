@@ -17,4 +17,8 @@ export type {
   FieldState,
   ValidityKey,
 } from "@ui-sdk/core/field"
-export type { UiFieldElement, UiFieldGroupElement, UiFieldSetElement } from "../events"
+export type {
+  UiFieldElement,
+  UiFieldGroupElement,
+  UiFieldSetElement,
+} from "../events"

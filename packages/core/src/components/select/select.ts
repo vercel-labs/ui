@@ -6,7 +6,10 @@
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import {
   filterAttribute,
@@ -16,14 +19,32 @@ import {
   type ListHighlightDetails,
   type ListStatusState,
 } from "../../foundation/lists/listbox"
-import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { type ListAnnouncement, type ListItemTextState } from "../../foundation/lists/listbox-search"
+import {
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
+import {
+  type ListAnnouncement,
+  type ListItemTextState,
+} from "../../foundation/lists/listbox-search"
 import { type ListSelectAllState } from "../../foundation/lists/listbox-select-all"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, DismissAttemptReason } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  DismissAttemptReason,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithFeatures, WithGeneric } from "../../foundation/kernel/primitive-types"
-import { selectSlots, type selectItemIcons, type selectSelectAll } from "./select-parts"
+import type {
+  PrimitiveOptions,
+  WithFeatures,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
+import {
+  selectSlots,
+  type selectItemIcons,
+  type selectSelectAll,
+} from "./select-parts"
 import { initialSelectState, selectApi, syncSelectState } from "./select-api"
 import type { SelectGeneric } from "./select-generic"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
@@ -33,7 +54,12 @@ import { type DismissOptions } from "../../foundation/popups/dismissal"
  * @stable
  */
 type SelectValueChangeReason =
-  "item-press" | "list-navigation" | "clear-press" | "reset" | "restore" | "imperative"
+  | "item-press"
+  | "list-navigation"
+  | "clear-press"
+  | "reset"
+  | "restore"
+  | "imperative"
 
 /**
  * Why the text in a select's search field wants to change. Closing the list empties it, with the reason it closed.
@@ -78,9 +104,10 @@ type SelectDismissReason = Extract<SelectOpenChangeReason, DismissAttemptReason>
  * The value of a select: one item's value or `null`, or a list with `multiple`.
  * @stable
  */
-type SelectValue<T = string, Multiple extends boolean | undefined = false> = Multiple extends true
-  ? T[]
-  : T | null
+type SelectValue<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = Multiple extends true ? T[] : T | null
 
 /**
  * Options for every write method on a select controller.
@@ -93,12 +120,18 @@ type SelectChangeOptions<Reason extends string> = ChangeOptions<Reason>
  * test, or a trigger outside the select. Pass it as the `controller` option.
  * @stable
  */
-function createSelectController<T = string, Multiple extends boolean | undefined = false>() {
+function createSelectController<
+  T = string,
+  Multiple extends boolean | undefined = false,
+>() {
   return createController<{
     /** Whether the list is open. */
     isOpen: () => boolean
     /** Opens or closes the list. Returns false when the change was canceled or it was already open or closed. */
-    setOpen: (open: boolean, options?: SelectChangeOptions<SelectOpenChangeReason>) => boolean
+    setOpen: (
+      open: boolean,
+      options?: SelectChangeOptions<SelectOpenChangeReason>
+    ) => boolean
     /**
      * Opens the list, and resolves once it closes, with why and how. Resolves exactly once and never
      * rejects: on the next close from any source, when `signal` aborts, or with reason `"unmount"`
@@ -108,7 +141,7 @@ function createSelectController<T = string, Multiple extends boolean | undefined
       options?: SelectChangeOptions<SelectOpenChangeReason> & {
         /** Closes the list, with reason `"imperative"`, when it aborts. An already aborted signal never opens it. */
         signal?: AbortSignal
-      },
+      }
     ) => Promise<PopupResult<SelectOpenChangeReason, never>>
     /** Closes the list. Returns false when the close was canceled or it was already closed. */
     close: (options?: SelectChangeOptions<SelectOpenChangeReason>) => boolean
@@ -122,14 +155,17 @@ function createSelectController<T = string, Multiple extends boolean | undefined
      */
     setValue: (
       value: SelectValue<T, Multiple>,
-      options?: SelectChangeOptions<SelectValueChangeReason>,
+      options?: SelectChangeOptions<SelectValueChangeReason>
     ) => boolean
     /** Selects nothing: `null`, or an empty list with `multiple`. Returns false when nothing changed. */
     clear: (options?: SelectChangeOptions<SelectValueChangeReason>) => boolean
     /** The text in the search field. */
     getQuery: () => string
     /** Changes the text in the search field, which filters the list. Returns false when nothing changed. */
-    setQuery: (query: string, options?: SelectChangeOptions<SelectQueryChangeReason>) => boolean
+    setQuery: (
+      query: string,
+      options?: SelectChangeOptions<SelectQueryChangeReason>
+    ) => boolean
     /** Moves focus to the trigger. */
     focus: () => void
   }>()
@@ -140,9 +176,10 @@ function createSelectController<T = string, Multiple extends boolean | undefined
  * option.
  * @stable
  */
-type SelectController<T = string, Multiple extends boolean | undefined = false> = ReturnType<
-  typeof createSelectController<T, Multiple>
->
+type SelectController<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = ReturnType<typeof createSelectController<T, Multiple>>
 
 /**
  * The options `select` takes. A component takes them as props on its root.
@@ -152,8 +189,15 @@ type SelectController<T = string, Multiple extends boolean | undefined = false> 
 // A union on `multiple`, so TypeScript infers `T` through it. The multiple side
 // comes first, so a list in a variable infers `T` as its items. A value that is
 // itself a list takes `items` or the type: `<Select<number[]>>`.
-type SelectOptions<T = string, Multiple extends boolean | undefined = false> = SelectSharedOptions<T> &
-  (SelectMultipleOptions<T, Multiple> | SelectSingleOptions<T, Multiple> | SelectEitherOptions<T, Multiple>)
+type SelectOptions<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = SelectSharedOptions<T> &
+  (
+    | SelectMultipleOptions<T, Multiple>
+    | SelectSingleOptions<T, Multiple>
+    | SelectEitherOptions<T, Multiple>
+  )
 
 /** The value options of a select that selects one item. `Multiple` true or `boolean` rules them out. */
 type SelectSingleOptions<T, Multiple> = {
@@ -170,8 +214,15 @@ type SelectSingleOptions<T, Multiple> = {
   // state setter would make `T` a list here. `NoInfer` leaves `T` to the
   // value, the items and the multiple side's callback.
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: NoInfer<T> | null, details: ChangeDetails<SelectValueChangeReason>) => void
-} & (boolean extends Multiple ? never : [Multiple] extends [true] ? never : unknown)
+  onValueChange?: (
+    value: NoInfer<T> | null,
+    details: ChangeDetails<SelectValueChangeReason>
+  ) => void
+} & (boolean extends Multiple
+  ? never
+  : [Multiple] extends [true]
+    ? never
+    : unknown)
 
 /** The value options of a select that selects several items. `Multiple` `boolean` rules them out. */
 type SelectMultipleOptions<T, Multiple> = {
@@ -182,7 +233,10 @@ type SelectMultipleOptions<T, Multiple> = {
   /** The values selected at first, when uncontrolled. A form reset returns to them. */
   defaultValue?: T[]
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T[], details: ChangeDetails<SelectValueChangeReason>) => void
+  onValueChange?: (
+    value: T[],
+    details: ChangeDetails<SelectValueChangeReason>
+  ) => void
 } & (boolean extends Multiple ? never : unknown)
 
 // Only when `Multiple` is `boolean`, like `<Select<string, boolean>>`, so
@@ -201,7 +255,7 @@ type SelectEitherOptions<T, Multiple> = {
   /** Runs when a user, a form reset or a controller wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
   onValueChange?: (
     value: NoInfer<T> | NoInfer<T>[] | null,
-    details: ChangeDetails<SelectValueChangeReason>,
+    details: ChangeDetails<SelectValueChangeReason>
   ) => void
 } & (boolean extends Multiple ? unknown : never)
 
@@ -215,7 +269,10 @@ type SelectSharedOptions<T> = PortalProps & {
    */
   defaultOpen?: boolean
   /** Runs when the list wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<SelectOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<SelectOpenChangeReason>
+  ) => void
   /** Runs once the list has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /** The items as data. Renders the list for you, and lets the trigger show labels and find items by typing before the list has ever opened. */
@@ -227,7 +284,10 @@ type SelectSharedOptions<T> = PortalProps & {
   /** The search field's text at first, when uncontrolled. */
   defaultQuery?: string
   /** Runs when the search field's text wants to change: typing, or closing the list, which empties it. */
-  onQueryChange?: (query: string, details: ChangeDetails<SelectQueryChangeReason>) => void
+  onQueryChange?: (
+    query: string,
+    details: ChangeDetails<SelectQueryChangeReason>
+  ) => void
   /**
    * How a `SelectInput` narrows the list: `"contains"`, `"startsWith"`, a function of the item and the text, whose numeric result also sorts data items, or `false` to keep every item, for results a server already filtered.
    * @defaultValue "contains"
@@ -579,7 +639,10 @@ const selectPrimitive = /* @__PURE__ */ definePrimitive({
   api: selectApi,
   // An arrow function, so TypeScript infers the slot names before it checks the parts.
   slots: (slot) => selectSlots(slot),
-  agent: { actions: ["setOpen", "setValue", "clear", "setQuery"], closed: true },
+  agent: {
+    actions: ["setOpen", "setValue", "clear", "setQuery"],
+    closed: true,
+  },
 })
 
 /**
@@ -587,7 +650,10 @@ const selectPrimitive = /* @__PURE__ */ definePrimitive({
  * @stable
  */
 interface SelectPrimitive extends WithGeneric<
-  WithFeatures<typeof selectPrimitive, typeof selectSelectAll | typeof selectItemIcons>,
+  WithFeatures<
+    typeof selectPrimitive,
+    typeof selectSelectAll | typeof selectItemIcons
+  >,
   SelectGeneric
 > {}
 

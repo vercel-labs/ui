@@ -11,7 +11,9 @@ function Example() {
   return (
     <div dir="rtl">
       <ToggleGroup defaultValue={["list"]} aria-label="العرض">
-        <For each={views}>{(item) => <Toggle value={item.value}>{item.label}</Toggle>}</For>
+        <For each={views}>
+          {(item) => <Toggle value={item.value}>{item.label}</Toggle>}
+        </For>
       </ToggleGroup>
     </div>
   )

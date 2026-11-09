@@ -4,12 +4,13 @@
 
   // One hidden input per selected value of a list with `multiple`, keyed by
   // the value. `owner` is read once.
-  let { owner, value }: { owner: PrimitiveHandle<any>; value: string } = $props()
+  let { owner, value }: { owner: PrimitiveHandle<any>; value: string } =
+    $props()
 
   const input = useHandlePart<any, string>(
     untrack(() => owner),
     "value-input",
-    () => ({ id: value, value }),
+    () => ({ id: value, value })
   )
 </script>
 

@@ -38,11 +38,16 @@ const popoverRoot = document.getElementById("popover-root")
 useShortcut(f.pageShortcut, () => (action.value = "page shortcut"))
 useShortcut(f.slashShortcut, () => (action.value = "slash"))
 // Belongs to the dialog, so it runs while the dialog is open and modal.
-useShortcut(f.rename.save, () => (action.value = "saved"), { layer: field, allowInInput: true })
+useShortcut(f.rename.save, () => (action.value = "saved"), {
+  layer: field,
+  allowInInput: true,
+})
 
 function onRenameChange(open: boolean, details: { reason: string }) {
   recordOpenChange("rename", open, details)
-  if (!open) dirty.value = false
+  if (!open) {
+    dirty.value = false
+  }
 }
 </script>
 
@@ -50,9 +55,13 @@ function onRenameChange(open: boolean, details: { reason: string }) {
   <div class="fixture">
     <button>Before</button>
     <Menu>
-      <MenuTrigger :shortcut="f.menu.shortcut">{{ f.menu.trigger }}</MenuTrigger>
+      <MenuTrigger :shortcut="f.menu.shortcut">{{
+        f.menu.trigger
+      }}</MenuTrigger>
       <MenuContent>
-        <MenuItem value="rename" @select="rename.open()">{{ f.menu.rename }}</MenuItem>
+        <MenuItem value="rename" @select="rename.open()">{{
+          f.menu.rename
+        }}</MenuItem>
         <MenuItem value="close">{{ f.menu.close }}</MenuItem>
       </MenuContent>
     </Menu>
@@ -60,7 +69,9 @@ function onRenameChange(open: boolean, details: { reason: string }) {
       :controller="rename"
       :dismissible="!dirty"
       :persistent-elements="['#chat']"
-      @dismiss-attempt="(details: { reason: string }) => (action = `attempt:${details.reason}`)"
+      @dismiss-attempt="
+        (details: { reason: string }) => (action = `attempt:${details.reason}`)
+      "
       @open-change="onRenameChange"
     >
       <DialogTrigger :shortcut="f.rename.shortcut">
@@ -71,21 +82,32 @@ function onRenameChange(open: boolean, details: { reason: string }) {
         <DialogTitle class="title">{{ f.rename.title }}</DialogTitle>
         <label class="field">
           {{ f.rename.field }}
-          <input ref="field" :value="f.rename.defaultValue" @input="dirty = true" />
+          <input
+            ref="field"
+            :value="f.rename.defaultValue"
+            @input="dirty = true"
+          />
         </label>
         <DialogClose>{{ f.rename.cancel }}</DialogClose>
       </DialogContent>
     </Dialog>
     <AlertDialog
-      @open-change="(open: boolean, details: { reason: string }) => recordOpenChange('delete', open, details)"
+      @open-change="
+        (open: boolean, details: { reason: string }) =>
+          recordOpenChange('delete', open, details)
+      "
     >
       <AlertDialogTrigger>{{ f.remove.trigger }}</AlertDialogTrigger>
       <AlertDialogBackdrop class="dialog-backdrop" />
       <AlertDialogContent class="dialog">
         <AlertDialogTitle class="title">{{ f.remove.title }}</AlertDialogTitle>
-        <AlertDialogDescription class="description">{{ f.remove.description }}</AlertDialogDescription>
+        <AlertDialogDescription class="description">{{
+          f.remove.description
+        }}</AlertDialogDescription>
         <AlertDialogClose>{{ f.remove.cancel }}</AlertDialogClose>
-        <AlertDialogClose value="confirm" @action="pendingAction">{{ f.remove.action }}</AlertDialogClose>
+        <AlertDialogClose value="confirm" @action="pendingAction">{{
+          f.remove.action
+        }}</AlertDialogClose>
       </AlertDialogContent>
     </AlertDialog>
     <label>
@@ -94,7 +116,9 @@ function onRenameChange(open: boolean, details: { reason: string }) {
     </label>
     <button id="chat" @click="action = 'chat'">{{ f.chat }}</button>
     <Popover :container="popoverRoot">
-      <PopoverTrigger :shortcut="f.share.shortcut">{{ f.share.trigger }}</PopoverTrigger>
+      <PopoverTrigger :shortcut="f.share.shortcut">{{
+        f.share.trigger
+      }}</PopoverTrigger>
       <PopoverContent>
         <PopoverTitle>{{ f.share.title }}</PopoverTitle>
         <Menu>

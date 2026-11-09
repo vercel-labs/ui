@@ -13,14 +13,22 @@ function shortcutOrder(
   layer: ShortcutOptions["layer"],
   find: (el: Element) => { order?: number } | undefined,
   persistent: (el: Element) => boolean = () => false,
-  inPopup: (el: Element) => boolean = () => false,
+  inPopup: (el: Element) => boolean = () => false
 ) {
-  if (!layer) return 0
+  if (!layer) {
+    return 0
+  }
   const el = typeof layer === "function" ? layer() : layer
-  if (!el || !el.isConnected) return null
-  if (persistent(el)) return Infinity
+  if (!el || !el.isConnected) {
+    return null
+  }
+  if (persistent(el)) {
+    return Infinity
+  }
   const open = find(el)
-  if (open) return open.order ?? 0
+  if (open) {
+    return open.order ?? 0
+  }
   return inPopup(el) ? null : 0
 }
 
@@ -30,19 +38,31 @@ function shortcutOrder(
  * layers opened after it run. The page's and those of layers beneath pause.
  */
 function isShortcutAllowed(order: number | null, blocking: number | undefined) {
-  if (order === null) return false
+  if (order === null) {
+    return false
+  }
   return blocking === undefined || order >= blocking
 }
 
 /** Whether a key press happened while typing text, where letters are text. */
 function isTypingIn(target: EventTarget | null | undefined) {
-  if (!target || !(target as Element).tagName) return false
+  if (!target || !(target as Element).tagName) {
+    return false
+  }
   const el = target as HTMLElement
-  if (el.isContentEditable) return true
-  if (el.tagName === "TEXTAREA" || el.tagName === "SELECT") return true
-  if (el.tagName !== "INPUT") return false
+  if (el.isContentEditable) {
+    return true
+  }
+  if (el.tagName === "TEXTAREA" || el.tagName === "SELECT") {
+    return true
+  }
+  if (el.tagName !== "INPUT") {
+    return false
+  }
   const type = (el as HTMLInputElement).type
-  return !/^(button|checkbox|radio|submit|reset|range|color|file|image)$/.test(type)
+  return !/^(button|checkbox|radio|submit|reset|range|color|file|image)$/.test(
+    type
+  )
 }
 
 export { isShortcutAllowed, isTypingIn, shortcutOrder }

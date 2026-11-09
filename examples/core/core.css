@@ -21,7 +21,8 @@
     width: 20rem;
     max-width: 100%;
 
-    &:has([data-slot="bold-text-toggle"][aria-pressed="true"]) [data-slot="bold-text-text"] {
+    &:has([data-slot="bold-text-toggle"][aria-pressed="true"])
+      [data-slot="bold-text-text"] {
       font-weight: 700;
     }
   }
@@ -773,7 +774,8 @@
     }
 
     &:hover {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &:focus-visible {
@@ -809,7 +811,8 @@
   /* ─── Core: Rating ────────────────────────────────────────────────── */
 
   /* The readout sits centered over the stars. */
-  :scope[data-example^="core/rating"] [data-slot="stack"]:has(> [data-slot="rating-readout"]) {
+  :scope[data-example^="core/rating"]
+    [data-slot="stack"]:has(> [data-slot="rating-readout"]) {
     align-items: center;
   }
 
@@ -951,7 +954,8 @@
     box-shadow: inset 0 0 0 1px var(--line);
 
     &:hover {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &:has(input:focus-visible) {
@@ -1351,7 +1355,8 @@
   }
 
   /* History: a grid of pixel buttons under the undo and redo controls. */
-  :scope[data-example="behaviors/history"] [data-slot="pixels-cell"]:not([data-painted]) {
+  :scope[data-example="behaviors/history"]
+    [data-slot="pixels-cell"]:not([data-painted]) {
     box-shadow: inset 0 0 0 1px var(--line);
 
     &:hover {
@@ -1447,7 +1452,8 @@
   }
 
   /* Contrast: a sample line on the picked background, as wide as a field. */
-  :scope[data-example="behaviors/color-contrast"] [data-slot="contrast-preview"] {
+  :scope[data-example="behaviors/color-contrast"]
+    [data-slot="contrast-preview"] {
     box-sizing: border-box;
     width: 20rem;
     max-width: 100%;
@@ -1464,7 +1470,8 @@
   }
 
   /* Pointer kind: a button over details that keep their line while closed. */
-  :scope[data-example="behaviors/pointer-kind"] [data-slot="pointer-kind-root"] {
+  :scope[data-example="behaviors/pointer-kind"]
+    [data-slot="pointer-kind-root"] {
     display: flex;
     flex-direction: column;
     align-items: center;

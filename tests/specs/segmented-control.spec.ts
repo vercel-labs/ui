@@ -6,8 +6,10 @@ import { expect, lastAction, test } from "../fixtures"
 // https://www.w3.org/WAI/ARIA/apg/patterns/radio/
 
 const control = (page: Page) => page.getByRole("radiogroup", { name: "View" })
-const item = (page: Page, name: string) => page.getByRole("radio", { name, exact: true })
-const indicator = (page: Page) => page.locator('[data-slot="segmented-control-indicator"]')
+const item = (page: Page, name: string) =>
+  page.getByRole("radio", { name, exact: true })
+const indicator = (page: Page) =>
+  page.locator('[data-slot="segmented-control-indicator"]')
 const submitted = async (page: Page) => {
   await page.getByRole("button", { name: "Save" }).click()
   return page.getByRole("status", { name: "Submitted" }).textContent()
@@ -17,15 +19,24 @@ const submitted = async (page: Page) => {
 async function coversItem(page: Page, name: string) {
   const box = await indicator(page).boundingBox()
   const target = await item(page, name).boundingBox()
-  if (!box || !target) return false
-  return (["x", "y", "width", "height"] as const).every((key) => Math.abs(box[key] - target[key]) <= 1)
+  if (!box || !target) {
+    return false
+  }
+  return (["x", "y", "width", "height"] as const).every(
+    (key) => Math.abs(box[key] - target[key]) <= 1
+  )
 }
 
 test.describe("selection", () => {
-  test("the default item is checked, and only that one", async ({ page, open }) => {
+  test("the default item is checked, and only that one", async ({
+    page,
+    open,
+  }) => {
     await open("segmented-control")
     await expect(item(page, "List")).toBeChecked()
-    for (const name of ["Grid", "Board", "Calendar"]) await expect(item(page, name)).not.toBeChecked()
+    for (const name of ["Grid", "Board", "Calendar"]) {
+      await expect(item(page, name)).not.toBeChecked()
+    }
   })
 
   test("clicking an item checks it and says why", async ({ page, open }) => {
@@ -57,7 +68,11 @@ test.describe("selection", () => {
 })
 
 test.describe("keyboard", () => {
-  test("Tab lands on the checked item, and the next Tab leaves", async ({ page, open, tab }) => {
+  test("Tab lands on the checked item, and the next Tab leaves", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("segmented-control", { default: "grid" })
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
@@ -66,7 +81,10 @@ test.describe("keyboard", () => {
     await expect(page.getByRole("button", { name: "After" })).toBeFocused()
   })
 
-  test("arrow keys on both axes check the next item, skip disabled ones and wrap", async ({ page, open }) => {
+  test("arrow keys on both axes check the next item, skip disabled ones and wrap", async ({
+    page,
+    open,
+  }) => {
     await open("segmented-control")
     await item(page, "List").focus()
     await page.keyboard.press("ArrowRight")
@@ -83,17 +101,32 @@ test.describe("keyboard", () => {
 })
 
 test.describe("orientation", () => {
-  test("a segmented control is horizontal unless it says otherwise", async ({ page, open }) => {
+  test("a segmented control is horizontal unless it says otherwise", async ({
+    page,
+    open,
+  }) => {
     await open("segmented-control")
-    await expect(control(page)).toHaveAttribute("aria-orientation", "horizontal")
-    await expect(control(page)).toHaveAttribute("data-orientation", "horizontal")
-    await expect(indicator(page)).toHaveAttribute("data-orientation", "horizontal")
+    await expect(control(page)).toHaveAttribute(
+      "aria-orientation",
+      "horizontal"
+    )
+    await expect(control(page)).toHaveAttribute(
+      "data-orientation",
+      "horizontal"
+    )
+    await expect(indicator(page)).toHaveAttribute(
+      "data-orientation",
+      "horizontal"
+    )
   })
 
   test("a vertical segmented control reports it", async ({ page, open }) => {
     await open("segmented-control", { orientation: "vertical" })
     await expect(control(page)).toHaveAttribute("aria-orientation", "vertical")
-    await expect(indicator(page)).toHaveAttribute("data-orientation", "vertical")
+    await expect(indicator(page)).toHaveAttribute(
+      "data-orientation",
+      "vertical"
+    )
   })
 })
 
@@ -109,18 +142,26 @@ test.describe("indicator", () => {
     await expect.poll(() => coversItem(page, "Calendar")).toBe(true)
   })
 
-  test("the indicator covers the checked item in a vertical control", async ({ page, open }) => {
+  test("the indicator covers the checked item in a vertical control", async ({
+    page,
+    open,
+  }) => {
     await open("segmented-control", { orientation: "vertical" })
     await item(page, "Grid").click()
     await expect.poll(() => coversItem(page, "Grid")).toBe(true)
   })
 
-  test("with nothing checked, the indicator has no box", async ({ page, open }) => {
+  test("with nothing checked, the indicator has no box", async ({
+    page,
+    open,
+  }) => {
     await open("segmented-control", { default: "none" })
     await expect(item(page, "List")).not.toBeChecked()
     await expect
       .poll(() =>
-        indicator(page).evaluate((el) => el.style.getPropertyValue("--segmented-control-indicator-width")),
+        indicator(page).evaluate((el) =>
+          el.style.getPropertyValue("--segmented-control-indicator-width")
+        )
       )
       .toBe("")
     await item(page, "Grid").click()
@@ -129,7 +170,10 @@ test.describe("indicator", () => {
 })
 
 test.describe("forms", () => {
-  test("the checked value submits under the control's name", async ({ page, open }) => {
+  test("the checked value submits under the control's name", async ({
+    page,
+    open,
+  }) => {
     await open("segmented-control")
     await item(page, "Grid").click()
     expect(await submitted(page)).toBe("view=grid")

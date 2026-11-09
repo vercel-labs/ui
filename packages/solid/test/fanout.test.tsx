@@ -25,9 +25,12 @@ for (const n of [10, 500]) {
           // Half the items read the highlight, like an item that shows an arrow beside it.
           class:
             i % 2
-              ? (state) => (renders.watched++, state.highlighted ? "highlighted" : "")
+              ? (state) => (
+                  renders.watched++,
+                  state.highlighted ? "highlighted" : ""
+                )
               : (state) => (renders.plain++, state.disabled ? "disabled" : ""),
-        }),
+        })
       )
     }, root)
     flush()
@@ -35,11 +38,15 @@ for (const n of [10, 500]) {
     flush()
     renders.watched = renders.plain = 0
     for (let step = 0; step < 10; step++) {
-      instance.api.internal.highlight(`item-${(3 + step * 2) % n}`, { focus: false })
+      instance.api.internal.highlight(`item-${(3 + step * 2) % n}`, {
+        focus: false,
+      })
       flush()
     }
     expect(renders.plain).toBe(budgets["menu.arrow-key"].renders.plain)
-    expect(renders.watched).toBeLessThanOrEqual(budgets["menu.arrow-key"].renders.watched)
+    expect(renders.watched).toBeLessThanOrEqual(
+      budgets["menu.arrow-key"].renders.watched
+    )
     dispose()
   })
 
@@ -56,18 +63,35 @@ for (const n of [10, 500]) {
         usePart(handle, slot as "item", () => props as { value: string }, {
           // Reads every key, like a render function that shows them all.
           class: (state) => {
-            for (const key of ["checked", "highlighted", "disabled", "open", "selected"])
+            for (const key of [
+              "checked",
+              "highlighted",
+              "disabled",
+              "open",
+              "selected",
+            ]) {
               void (state as Record<string, unknown>)[key]
+            }
             rendered.add(`${slot} ${JSON.stringify(props)}`)
             return ""
           },
         })
       return [
-        ...Array.from({ length: n }, (_, i) => watch("item", { value: `item-${i}` })),
+        ...Array.from({ length: n }, (_, i) =>
+          watch("item", { value: `item-${i}` })
+        ),
         watch("checkbox-item", { value: "wrap" }),
-        watch("item-indicator", { id: "wrap-check", item: "checkbox-item", itemKey: "wrap" }),
+        watch("item-indicator", {
+          id: "wrap-check",
+          item: "checkbox-item",
+          itemKey: "wrap",
+        }),
         watch("checkbox-item", { value: "minimap" }),
-        watch("item-indicator", { id: "minimap-check", item: "checkbox-item", itemKey: "minimap" }),
+        watch("item-indicator", {
+          id: "minimap-check",
+          item: "checkbox-item",
+          itemKey: "minimap",
+        }),
       ]
     }, root)
     flush()

@@ -27,14 +27,27 @@
   let action = $state("")
 
   function publishPress(event: MouseEvent) {
-    if ((event.currentTarget as HTMLElement).getAttribute("aria-disabled") !== "true") action = publish.action
+    if (
+      (event.currentTarget as HTMLElement).getAttribute("aria-disabled") !==
+      "true"
+    ) {
+      action = publish.action
+    }
   }
 </script>
 
 <div class="fixture tooltip-page">
   <button>Before</button>
-  <Tooltip {...options} {controller} defaultOpen={parts.open} shortcut={save.shortcut}>
-    <TooltipTrigger disabled={parts.nativeDisabled || undefined} onclick={() => (action = "save")}>
+  <Tooltip
+    {...options}
+    {controller}
+    defaultOpen={parts.open}
+    shortcut={save.shortcut}
+  >
+    <TooltipTrigger
+      disabled={parts.nativeDisabled || undefined}
+      onclick={() => (action = "save")}
+    >
       {save.trigger}
     </TooltipTrigger>
     <TooltipContent class="tooltip" {...content}>
@@ -67,7 +80,8 @@
       <div class="actions">
         <Tooltip {...options}>
           <TooltipTrigger>{profile.help.trigger}</TooltipTrigger>
-          <TooltipContent class="tooltip">{profile.help.content}</TooltipContent>
+          <TooltipContent class="tooltip">{profile.help.content}</TooltipContent
+          >
         </Tooltip>
         <PopoverClose>{profile.close}</PopoverClose>
       </div>
@@ -81,7 +95,9 @@
   </Tooltip>
   {#if parts.disabled}
     <Tooltip {...options}>
-      <TooltipTrigger aria-disabled="true" onclick={publishPress}>{publish.trigger}</TooltipTrigger>
+      <TooltipTrigger aria-disabled="true" onclick={publishPress}
+        >{publish.trigger}</TooltipTrigger
+      >
       <TooltipContent class="tooltip">{publish.content}</TooltipContent>
     </Tooltip>
   {/if}

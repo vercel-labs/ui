@@ -13,7 +13,10 @@ import { useLog } from "../../shared/react/log"
 type PlansState = { value: string[]; focused: string | null }
 
 type PlansOptions = {
-  onValueChange?: (value: string[], details: ChangeDetails<"item-press">) => void
+  onValueChange?: (
+    value: string[],
+    details: ChangeDetails<"item-press">
+  ) => void
   onContinue?: (plan: string) => void
 }
 
@@ -40,8 +43,11 @@ const plans = definePrimitive({
         if (event.key === " ") {
           event.preventDefault()
           selection.toggle(key, { reason: "item-press", event })
-        } else if (event.key === "Enter" && selection.isSelected(key)) context.options().onContinue?.(key)
-        else roving.keydown(event, el)
+        } else if (event.key === "Enter" && selection.isSelected(key)) {
+          context.options().onContinue?.(key)
+        } else {
+          roving.keydown(event, el)
+        }
       },
     }
   },
@@ -57,7 +63,8 @@ const plans = definePrimitive({
       }),
       on: {
         keydown: (event, { el, api, key }) => api.keydown(event, el!, key),
-        pointerdown: (event, { api, key }) => api.selection.choose(key, { reason: "item-press", event }),
+        pointerdown: (event, { api, key }) =>
+          api.selection.choose(key, { reason: "item-press", event }),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -81,7 +88,9 @@ function Example() {
   return (
     <Plans
       aria-label="Plan"
-      onValueChange={(value: string[]) => log(value.length ? `Chose ${value[0]}` : "Cleared the plan")}
+      onValueChange={(value: string[]) =>
+        log(value.length ? `Chose ${value[0]}` : "Cleared the plan")
+      }
       onContinue={(plan: string) => log(`Continuing with ${plan}`)}
     >
       {options.map(({ name, price }) => (

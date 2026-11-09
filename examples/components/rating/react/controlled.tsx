@@ -1,6 +1,10 @@
 "use client"
 
-import { createRatingController, Rating, RatingItem } from "@ui-sdk/react/rating"
+import {
+  createRatingController,
+  Rating,
+  RatingItem,
+} from "@ui-sdk/react/rating"
 import { StarIcon } from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"

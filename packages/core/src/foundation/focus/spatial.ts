@@ -27,7 +27,7 @@ const arrows: Record<string, readonly [number, number]> = {
 function nearestInDirection(
   from: SpatialRect,
   candidates: readonly { key: string; rect: SpatialRect }[],
-  direction: readonly [number, number],
+  direction: readonly [number, number]
 ) {
   const [dx, dy] = direction
   const cx = (from.left + from.right) / 2
@@ -37,12 +37,19 @@ function nearestInDirection(
     const x = (rect.left + rect.right) / 2 - cx
     const y = (rect.top + rect.bottom) / 2 - cy
     const ahead = x * dx + y * dy
-    if (ahead <= 0) continue
+    if (ahead <= 0) {
+      continue
+    }
     const aside = Math.abs(dx ? y : x)
     const cone = aside <= ahead
     const score = ahead + aside * 2
-    if (!best || (cone && !best.cone) || (cone === best.cone && score < best.score))
+    if (
+      !best ||
+      (cone && !best.cone) ||
+      (cone === best.cone && score < best.score)
+    ) {
       best = { key, score, cone }
+    }
   }
   return best?.key
 }
@@ -63,15 +70,24 @@ function spatialMove(
   options: {
     /** Where an item is on screen. Defaults to its element's `getBoundingClientRect()`. */
     rect?: (el: HTMLElement, key: string) => SpatialRect
-  } = {},
+  } = {}
 ) {
-  const rectOf = options.rect ?? ((el: HTMLElement) => el.getBoundingClientRect())
+  const rectOf =
+    options.rect ?? ((el: HTMLElement) => el.getBoundingClientRect())
   return (event: KeyboardEvent, { from, items }: RovingFocusMoveContext) => {
-    if (event.altKey || event.ctrlKey || event.metaKey) return undefined
-    if (event.key === "Home") return items[0]?.key
-    if (event.key === "End") return items[items.length - 1]?.key
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+      return undefined
+    }
+    if (event.key === "Home") {
+      return items[0]?.key
+    }
+    if (event.key === "End") {
+      return items[items.length - 1]?.key
+    }
     const direction = arrows[event.key]
-    if (!direction) return undefined
+    if (!direction) {
+      return undefined
+    }
     const candidates = items
       .filter((item) => item.key !== from.key)
       .map((item) => ({ key: item.key, rect: rectOf(item.el, item.key) }))

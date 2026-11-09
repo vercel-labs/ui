@@ -1,6 +1,10 @@
 <script lang="ts">
   import { CheckIcon, MinusIcon } from "@lucide/svelte"
-  import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/svelte/checkbox"
+  import {
+    Checkbox,
+    CheckboxGroup,
+    CheckboxIndicator,
+  } from "@ui-sdk/svelte/checkbox"
 
   const backups = [
     { value: "photos", label: "Photos" },
@@ -19,7 +23,11 @@
   <div data-slot="stack">
     <h3 id="disabled-backups">Backups</h3>
     <p data-slot="hint">Managed by your organization.</p>
-    <CheckboxGroup aria-labelledby="disabled-backups" defaultValue={["photos", "documents"]} disabled>
+    <CheckboxGroup
+      aria-labelledby="disabled-backups"
+      defaultValue={["photos", "documents"]}
+      disabled
+    >
       {#each backups as item (item.value)}
         <label data-slot="label">
           <Checkbox value={item.value}>

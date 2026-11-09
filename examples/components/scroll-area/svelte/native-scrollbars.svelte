@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { ScrollArea, ScrollAreaContent, ScrollAreaViewport } from "@ui-sdk/svelte/scroll-area"
+  import {
+    ScrollArea,
+    ScrollAreaContent,
+    ScrollAreaViewport,
+  } from "@ui-sdk/svelte/scroll-area"
 
   const messages = [
     { from: "Hollis Grant", subject: "Launch checklist for Thursday" },

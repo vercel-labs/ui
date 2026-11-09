@@ -12,9 +12,9 @@ if (typeof Element !== "undefined") {
 // which Svelte's docs say not to do. Core's development build records those
 // writes as relays, and every test fails on one.
 afterEach(() => {
-  const history = (globalThis as Record<symbol, { relays?: unknown[] } | undefined>)[
-    Symbol.for("ui-sdk.devtools.history@1")
-  ]
+  const history = (
+    globalThis as Record<symbol, { relays?: unknown[] } | undefined>
+  )[Symbol.for("ui-sdk.devtools.history@1")]
   const relays = history?.relays?.splice(0) ?? []
   expect(relays, "state written while options were handed over").toEqual([])
 })

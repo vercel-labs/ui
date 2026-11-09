@@ -30,7 +30,11 @@ const popoverFixture = {
   // With ?shortcut: the trigger's keys, shown by a Shortcut part inside it, keys
   // the Save button shows with a Shortcut part of its own, and a trigger outside
   // the popover, connected through the controller, with its own keys and part.
-  shortcut: { trigger: "mod+i", save: "mod+s", remote: { trigger: "Share", keys: "mod+e" } },
+  shortcut: {
+    trigger: "mod+i",
+    save: "mod+s",
+    remote: { trigger: "Share", keys: "mod+e" },
+  },
 }
 
 // Parts a spec can leave out or add through the URL: ?untitled drops the
@@ -55,17 +59,22 @@ function popoverOptions() {
   const params = new URLSearchParams(location.search)
   const modal = params.get("modal")
   const container = params.get("container")
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   return {
     ...(params.has("open") && { defaultOpen: true }),
-    ...(modal && { modal: modal === "trap-focus" ? ("trap-focus" as const) : modal === "true" }),
+    ...(modal && {
+      modal:
+        modal === "trap-focus" ? ("trap-focus" as const) : modal === "true",
+    }),
     ...(params.has("hover") && { openOnHover: true }),
     ...(params.has("delay") && { delay: number("delay") }),
     ...(params.has("closeDelay") && { closeDelay: number("closeDelay") }),
     ...(container && { container: document.getElementById(container) }),
     ...(params.get("dismissible") === "false" && {
       dismissible: false,
-      onDismissAttempt: (details: { reason: string }) => recordPopover(`attempt:${details.reason}`),
+      onDismissAttempt: (details: { reason: string }) =>
+        recordPopover(`attempt:${details.reason}`),
     }),
     ...presentationOption(),
   }
@@ -73,7 +82,8 @@ function popoverOptions() {
 
 // What the popover reported, read by specs through `window.__popoverLog`.
 function recordPopover(entry: string) {
-  ;((window as unknown as { __popoverLog?: string[] }).__popoverLog ??= []).push(entry)
+  ;((window as unknown as { __popoverLog?: string[] }).__popoverLog ??=
+    []).push(entry)
 }
 
 // Positioning and focus options for the content part: ?side=top&align=start&initialFocus=none.
@@ -89,4 +99,10 @@ function popoverContentOptions() {
   }
 }
 
-export { popoverContentOptions, popoverFixture, popoverOptions, popoverParts, recordPopover }
+export {
+  popoverContentOptions,
+  popoverFixture,
+  popoverOptions,
+  popoverParts,
+  recordPopover,
+}

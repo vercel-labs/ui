@@ -10,14 +10,22 @@
   let action = $state("")
   let submitted = $state("")
 
-  function onValueChange(score: number | null, details: { reason: string; cancel: () => void }) {
-    if (score === cancel) return details.cancel()
+  function onValueChange(
+    score: number | null,
+    details: { reason: string; cancel: () => void }
+  ) {
+    if (score === cancel) {
+      return details.cancel()
+    }
     action = `${score}:${details.reason}`
   }
 
   function onsubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    submitted = Array.from(new FormData(event.currentTarget), ([key, entry]) => `${key}=${entry}`).join("&")
+    submitted = Array.from(
+      new FormData(event.currentTarget),
+      ([key, entry]) => `${key}=${entry}`
+    ).join("&")
   }
 </script>
 
@@ -38,11 +46,21 @@
     </RatingItem>
   </Rating>
   <button type="button">After</button>
-  <Rating aria-label={value.label} name={value.name} step={value.step} deselectable />
-  <Rating value={average.value} getValueLabel={average.getValueLabel} readOnly />
+  <Rating
+    aria-label={value.label}
+    name={value.name}
+    step={value.step}
+    deselectable
+  />
+  <Rating
+    value={average.value}
+    getValueLabel={average.getValueLabel}
+    readOnly
+  />
   <button type="submit">Save</button>
   <button type="reset">Reset</button>
-  <button type="button" onclick={() => controller.setValue(5)}>Rate five</button>
+  <button type="button" onclick={() => controller.setValue(5)}>Rate five</button
+  >
   <output role="status" aria-label="Last action">{action}</output>
   <output aria-label="Submitted">{submitted}</output>
 </form>

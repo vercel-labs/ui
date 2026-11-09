@@ -59,10 +59,14 @@ describe("drawer server rendering", () => {
             <DrawerContent>
               <DrawerTitle>Move goal</DrawerTitle>
             </DrawerContent>
-          </Drawer>,
+          </Drawer>
         )
-        const content = html.match(/<div[^>]*data-slot="drawer-content"[^>]*>/)?.[0]
-        const backdrop = html.match(/<div[^>]*data-slot="drawer-backdrop"[^>]*>/)?.[0]
+        const content = html.match(
+          /<div[^>]*data-slot="drawer-content"[^>]*>/
+        )?.[0]
+        const backdrop = html.match(
+          /<div[^>]*data-slot="drawer-backdrop"[^>]*>/
+        )?.[0]
         expect(content).toBeDefined()
         expect(backdrop).toBeDefined()
         expect(content).toContain('role="dialog"')
@@ -90,10 +94,12 @@ describe("drawer server rendering", () => {
         <DrawerTrigger shortcut="mod+g">
           Move goal <DrawerShortcut />
         </DrawerTrigger>
-      </Drawer>,
+      </Drawer>
     )
     expect(html).toContain('aria-keyshortcuts="Control+G"')
-    expect(html).toMatch(/<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+G\u2069<\/span>/)
+    expect(html).toMatch(
+      /<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+G\u2069<\/span>/
+    )
   })
 
   test("a shortcut inside a trigger connected through a controller renders nothing until the client finds the drawer", () => {
@@ -108,7 +114,7 @@ describe("drawer server rendering", () => {
             <DrawerTitle>Move goal</DrawerTitle>
           </DrawerContent>
         </Drawer>
-      </>,
+      </>
     )
     expect(html).toContain("Move goal")
     expect(html).not.toContain('data-slot="drawer-shortcut"')

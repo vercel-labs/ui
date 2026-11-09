@@ -19,13 +19,17 @@ describe("server rendering a file input", () => {
         <FileInputDropzone>
           <FileInputTrigger>Browse files</FileInputTrigger>
         </FileInputDropzone>
-      </FileInput>,
+      </FileInput>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('data-slot="file-input-dropzone"')
     const [button] = html.match(/<button[^>]*>Browse files<\/button>/) ?? []
-    for (const attribute of ['type="button"', 'data-slot="file-input-trigger"'])
+    for (const attribute of [
+      'type="button"',
+      'data-slot="file-input-trigger"',
+    ]) {
       expect(button).toContain(attribute)
+    }
     const [input] = html.match(/<input[^>]*>/g) ?? []
     for (const attribute of [
       'type="file"',
@@ -35,8 +39,9 @@ describe("server rendering a file input", () => {
       'required=""',
       'aria-hidden="true"',
       'tabindex="-1"',
-    ])
+    ]) {
       expect(input).toContain(attribute)
+    }
   })
 
   test("capture and directory reach the input", () => {
@@ -48,7 +53,7 @@ describe("server rendering a file input", () => {
         <FileInput directory>
           <FileInputTrigger>Folder</FileInputTrigger>
         </FileInput>
-      </>,
+      </>
     )
     expect(html).toContain('capture="environment"')
     expect(html).toMatch(/webkitdirectory=""/)
@@ -58,7 +63,7 @@ describe("server rendering a file input", () => {
     const html = renderToString(
       <FileInput disabled>
         <FileInputTrigger>Browse</FileInputTrigger>
-      </FileInput>,
+      </FileInput>
     )
     expect(html).toContain("data-disabled")
     expect(html).toMatch(/<button[^>]*disabled=""/)
@@ -71,7 +76,7 @@ describe("server rendering a file input", () => {
         <FileInput>
           <FileInputTrigger>Upload</FileInputTrigger>
         </FileInput>
-      </Field>,
+      </Field>
     )
     // Before hydration, a native label names it. After, the label and its own text do.
     const id = html.match(/<button[^>]*id="([^"]+)"/)?.[1]
@@ -92,7 +97,7 @@ describe("server rendering a file input", () => {
             )}
           </FileInputItem>
         </FileInputList>
-      </FileInput>,
+      </FileInput>
     )
     expect(html).toContain('role="list"')
     expect(html.match(/role="listitem"/g)).toHaveLength(2)

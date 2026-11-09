@@ -14,17 +14,27 @@ import { measured } from "#dev"
 function animateIn(el: HTMLElement, done?: () => void) {
   // An element already shown would transition to its starting style and back,
   // so it jumps there, unless a transition is under way. jsdom has no getAnimations.
-  const settled = el.getAnimations?.().every((animation) => !isTransition(animation))
+  const settled = el
+    .getAnimations?.()
+    .every((animation) => !isTransition(animation))
   el.setAttribute("data-starting-style", "")
-  if (settled) for (const animation of el.getAnimations()) if (isTransition(animation)) animation.finish()
+  if (settled) {
+    for (const animation of el.getAnimations()) {
+      if (isTransition(animation)) {
+        animation.finish()
+      }
+    }
+  }
   let stopWaiting: (() => void) | undefined
   let timer: ReturnType<typeof setTimeout> | undefined
   const frame = requestAnimationFrame(
     () =>
       (timer = setTimeout(() => {
         el.removeAttribute("data-starting-style")
-        if (done) stopWaiting = whenFinished(el, done)
-      })),
+        if (done) {
+          stopWaiting = whenFinished(el, done)
+        }
+      }))
   )
   return () => {
     cancelAnimationFrame(frame)
@@ -46,22 +56,33 @@ function seconds(value: string) {
 // The longest transition or one iteration of the longest animation, in ms,
 // on the element or its ::backdrop, which a popup in the top layer animates too.
 function longest(el: HTMLElement) {
-  return Math.max(durationOf(getComputedStyle(el)), durationOf(getComputedStyle(el, "::backdrop")))
+  return Math.max(
+    durationOf(getComputedStyle(el)),
+    durationOf(getComputedStyle(el, "::backdrop"))
+  )
 }
 
 function durationOf(style: CSSStyleDeclaration) {
   const pairs = (durations: string, delays: string, iterations = "1") => {
     const d = seconds(durations)
     const l = seconds(delays)
-    const n = iterations.split(",").map((part) => (part.trim() === "infinite" ? 1 : parseFloat(part) || 1))
+    const n = iterations
+      .split(",")
+      .map((part) => (part.trim() === "infinite" ? 1 : parseFloat(part) || 1))
     return d.map(
-      (duration, index) => (duration * (n[index % n.length] ?? 1) + (l[index % l.length] ?? 0)) * 1000,
+      (duration, index) =>
+        (duration * (n[index % n.length] ?? 1) + (l[index % l.length] ?? 0)) *
+        1000
     )
   }
   return Math.max(
     0,
     ...pairs(style.transitionDuration, style.transitionDelay),
-    ...pairs(style.animationDuration, style.animationDelay, style.animationIterationCount),
+    ...pairs(
+      style.animationDuration,
+      style.animationDelay,
+      style.animationIterationCount
+    )
   )
 }
 
@@ -73,7 +94,9 @@ function remaining(animations: Animation[]) {
   for (const animation of animations) {
     const timing = animation.effect?.getComputedTiming()
     const end = Number(timing?.endTime)
-    if (!timing || !Number.isFinite(end)) continue
+    if (!timing || !Number.isFinite(end)) {
+      continue
+    }
     longestLeft = Math.max(longestLeft, end - (Number(timing.localTime) || 0))
   }
   return longestLeft
@@ -84,7 +107,9 @@ function whenFinished(el: HTMLElement, done: () => void) {
   // Reading animations flushes styles, so transitions just triggered are included.
   const animations = el.getAnimations({ subtree: true })
   const finish = () => {
-    if (finished) return
+    if (finished) {
+      return
+    }
     finished = true
     clearTimeout(timer)
     done()
@@ -92,8 +117,13 @@ function whenFinished(el: HTMLElement, done: () => void) {
   const timer = animations.length
     ? setTimeout(finish, Math.max(longest(el), remaining(animations)) + 50)
     : undefined
-  if (!animations.length) measured(finish)
-  else Promise.allSettled(animations.map((animation) => animation.finished)).then(finish)
+  if (!animations.length) {
+    measured(finish)
+  } else {
+    Promise.allSettled(animations.map((animation) => animation.finished)).then(
+      finish
+    )
+  }
   return () => {
     finished = true
     clearTimeout(timer)

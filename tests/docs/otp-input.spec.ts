@@ -30,16 +30,22 @@ const checks: Record<string, Check> = {
     await expect(await type(preview, "PIN", "12345")).toHaveValue("1235")
   },
   alphanumeric: async (preview) => {
-    await expect(await type(preview, "Recovery code", "ab12-cd34")).toHaveValue("ab12cd34")
+    await expect(await type(preview, "Recovery code", "ab12-cd34")).toHaveValue(
+      "ab12cd34"
+    )
   },
   pattern: async (preview) => {
-    await expect(await type(preview, "Device code", "12zzab")).toHaveValue("12ab")
+    await expect(await type(preview, "Device code", "12zzab")).toHaveValue(
+      "12ab"
+    )
   },
   invalid: async (preview) => {
     const input = preview.getByRole("textbox", { name: "Verification code" })
     await expect(input).toHaveValue("482913")
     await expect(input).toHaveAttribute("aria-invalid", "true")
-    await expect(input).toHaveAccessibleDescription("That code has expired. Request a new one.")
+    await expect(input).toHaveAccessibleDescription(
+      "That code has expired. Request a new one."
+    )
     // Editing the code clears the error.
     await input.focus()
     await input.press("Backspace")
@@ -58,9 +64,13 @@ const checks: Record<string, Check> = {
   form: async (preview) => {
     await type(preview, "Verification code", "123456")
     await preview.getByRole("button", { name: "Verify" }).click()
-    await expect(lastLog(preview)).toHaveText("Submitted code=123456, recovery=")
+    await expect(lastLog(preview)).toHaveText(
+      "Submitted code=123456, recovery="
+    )
     await preview.getByRole("button", { name: "Reset" }).click()
-    await expect(preview.getByRole("textbox", { name: "Verification code" })).toHaveValue("")
+    await expect(
+      preview.getByRole("textbox", { name: "Verification code" })
+    ).toHaveValue("")
   },
 }
 
@@ -68,8 +78,17 @@ const checks: Record<string, Check> = {
 const scoped = Object.fromEntries(
   Object.entries(checks).map(([name, check]): [string, Check] => [
     name,
-    (preview, framework) => check(preview.page().locator(`[data-example="otp-input/${name}"]`), framework),
-  ]),
+    (preview, framework) =>
+      check(
+        preview.page().locator(`[data-example="otp-input/${name}"]`),
+        framework
+      ),
+  ])
 )
 
-testExamples("otp-input", scoped, "components", [...Object.keys(checks), "render", "rtl", "separator"])
+testExamples("otp-input", scoped, "components", [
+  ...Object.keys(checks),
+  "render",
+  "rtl",
+  "separator",
+])

@@ -1,4 +1,10 @@
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem, ComboboxList } from "@ui-sdk/solid/combobox"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@ui-sdk/solid/combobox"
 import { render } from "@solidjs/web"
 import { For, untrack } from "solid-js"
 import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"

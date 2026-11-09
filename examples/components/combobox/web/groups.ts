@@ -62,11 +62,11 @@ function mount(root: HTMLElement) {
                           ${item.label}
                           <ui-combobox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-combobox-item-indicator>
                         </ui-combobox-item>
-                      `,
+                      `
                     )
                     .join("")}
                 </ui-combobox-group>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>

@@ -19,9 +19,14 @@ function usePopupContainer(own: () => PopupContainer) {
 
 // Renders a popup in place, in the top layer, or into its container. Without
 // top layer support, it goes to the body. Popups inside inherit the container.
-function renderPopup(element: () => JSX.Element, container: () => PopupContainer) {
+function renderPopup(
+  element: () => JSX.Element,
+  container: () => PopupContainer
+) {
   const target = createMemo(() => portalTarget(container()))
-  const content = () => <InheritedContainer value={container}>{element()}</InheritedContainer>
+  const content = () => (
+    <InheritedContainer value={container}>{element()}</InheritedContainer>
+  )
   return (
     <Show when={target()} fallback={content()}>
       {(mount) => <Portal mount={mount() as Element}>{content()}</Portal>}
@@ -40,12 +45,15 @@ function popupPart<P extends Primitive, S extends SlotName<P>>(
   part: () => PropsOf<P, S>,
   props: Record<string, any>,
   container: () => PopupContainer,
-  viewport?: typeof sheetViewport,
+  viewport?: typeof sheetViewport
 ) {
   const element = () => usePart(popup, slot, part, props, "div")
   return (
     <Show when={popup.present(slot, part)}>
-      {renderPopup(viewport ? () => viewport(popup, element) : element, container)}
+      {renderPopup(
+        viewport ? () => viewport(popup, element) : element,
+        container
+      )}
     </Show>
   )
 }
@@ -56,7 +64,10 @@ function popupPart<P extends Primitive, S extends SlotName<P>>(
  * it presents as a sheet. The viewport is what goes into the top layer. Its
  * attributes are a subset of the content's, so the content's render keeps it current.
  */
-function sheetViewport(popup: PrimitiveHandle<Primitive>, element: () => JSX.Element) {
+function sheetViewport(
+  popup: PrimitiveHandle<Primitive>,
+  element: () => JSX.Element
+) {
   const viewport = popup.slot("viewport")
   return (
     <Show when={popup.present("viewport")} fallback={element()}>
@@ -67,4 +78,10 @@ function sheetViewport(popup: PrimitiveHandle<Primitive>, element: () => JSX.Ele
 
 export { useControllerEntry, useControllerTarget } from "./controller-target"
 
-export { type PopupContainer, popupPart, renderPopup, sheetViewport, usePopupContainer }
+export {
+  type PopupContainer,
+  popupPart,
+  renderPopup,
+  sheetViewport,
+  usePopupContainer,
+}

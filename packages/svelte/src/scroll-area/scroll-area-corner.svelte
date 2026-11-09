@@ -14,4 +14,4 @@ Where the two scrollbars meet.
   const part = usePart(scrollArea, "corner")
 </script>
 
-<Part tag="div" part={part} {props} />
+<Part tag="div" {part} {props} />

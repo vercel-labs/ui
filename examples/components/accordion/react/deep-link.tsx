@@ -26,9 +26,12 @@ function Example() {
           </AccordionHeader>
           <AccordionPanel>
             <div data-slot="stack">
-              <p>Return any unused item in its original packaging within 30 days.</p>
+              <p>
+                Return any unused item in its original packaging within 30 days.
+              </p>
               <p id="return-label">
-                To print a return label, open the order and choose Return. The label is free.
+                To print a return label, open the order and choose Return. The
+                label is free.
               </p>
             </div>
           </AccordionPanel>
@@ -44,8 +47,8 @@ function Example() {
             <div data-slot="stack">
               <p>Refunds go back to the card you paid with.</p>
               <p id="refund-timeline">
-                Timeline: we inspect the item within 2 days of receiving it, and your bank shows the refund 5
-                to 7 business days later.
+                Timeline: we inspect the item within 2 days of receiving it, and
+                your bank shows the refund 5 to 7 business days later.
               </p>
             </div>
           </AccordionPanel>
@@ -59,7 +62,10 @@ function Example() {
           </AccordionHeader>
           <AccordionPanel>
             <div data-slot="stack">
-              <p>Start a return, choose Exchange and pick the new size. Shipping both ways is free.</p>
+              <p>
+                Start a return, choose Exchange and pick the new size. Shipping
+                both ways is free.
+              </p>
             </div>
           </AccordionPanel>
         </AccordionItem>

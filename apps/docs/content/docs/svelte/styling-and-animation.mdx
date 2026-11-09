@@ -11,10 +11,13 @@ Every part has a `data-slot` attribute. State adds attributes such as `data-pres
 
 ```svelte
 <script lang="ts">
-import { Toggle } from "@ui-sdk/svelte/toggle"
+  import { Toggle } from "@ui-sdk/svelte/toggle"
 </script>
 
-<Toggle class="rounded-md border border-neutral-300 px-2.5 py-1.5 text-sm data-pressed:bg-neutral-100 data-disabled:opacity-50">Bold</Toggle>
+<Toggle
+  class="rounded-md border border-neutral-300 px-2.5 py-1.5 text-sm data-pressed:bg-neutral-100 data-disabled:opacity-50"
+  >Bold</Toggle
+>
 ```
 
 Most state attributes are present or absent. Others have values, such as `data-side="top"`. Each component's Styling section lists its attributes and CSS variables. Use those rather than generated IDs.
@@ -25,8 +28,8 @@ Import a CSS Module and pass its class to the part. State selectors work the sam
 
 ```svelte
 <script lang="ts">
-import { Toggle } from "@ui-sdk/svelte/toggle"
-import styles from "./toggle.module.css"
+  import { Toggle } from "@ui-sdk/svelte/toggle"
+  import styles from "./toggle.module.css"
 </script>
 
 <Toggle class={styles.toggle}>Bold</Toggle>
@@ -66,12 +69,20 @@ Popup content gets `data-starting-style` before it enters and `data-ending-style
 
 ```svelte
 <script lang="ts">
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/svelte/popover"
+  import {
+    Popover,
+    PopoverClose,
+    PopoverContent,
+    PopoverTitle,
+    PopoverTrigger,
+  } from "@ui-sdk/svelte/popover"
 </script>
 
 <Popover>
   <PopoverTrigger>Details</PopoverTrigger>
-  <PopoverContent class="origin-(--transform-origin) transition-[opacity,scale] duration-150 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0 motion-reduce:transition-none">
+  <PopoverContent
+    class="origin-(--transform-origin) transition-[opacity,scale] duration-150 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0 motion-reduce:transition-none"
+  >
     <PopoverTitle>Project Details</PopoverTitle>
     <p>Last updated today.</p>
     <PopoverClose>Done</PopoverClose>
@@ -87,15 +98,21 @@ Svelte's own transitions work too. Put one on the element you render, with `|glo
 
 ```svelte
 <script lang="ts">
-import { Popover, PopoverContent, PopoverTrigger } from "@ui-sdk/svelte/popover"
-import { fade } from "svelte/transition"
+  import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+  } from "@ui-sdk/svelte/popover"
+  import { fade } from "svelte/transition"
 </script>
 
 <Popover>
   <PopoverTrigger>Details</PopoverTrigger>
   <PopoverContent aria-label="Project details">
     {#snippet render({ props })}
-      <div {...props} transition:fade|global={{ duration: 150 }}>Last updated today.</div>
+      <div {...props} transition:fade|global={{ duration: 150 }}>
+        Last updated today.
+      </div>
     {/snippet}
   </PopoverContent>
 </Popover>

@@ -1,6 +1,10 @@
 "use client"
 
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import { ChevronDownIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
@@ -15,7 +19,9 @@ function Example() {
   return (
     <Collapsible
       data-variant="card"
-      onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+      onOpenChangeComplete={(open) =>
+        log(open ? "Finished opening" : "Finished closing")
+      }
     >
       <CollapsibleTrigger>
         <span data-slot="stack">

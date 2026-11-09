@@ -26,7 +26,7 @@ type UseShortcutOptions = Omit<ShortcutOptions, "layer"> & {
 function useShortcut(
   keys: string | null | undefined,
   handler: ShortcutHandler,
-  options: UseShortcutOptions = {},
+  options: UseShortcutOptions = {}
 ) {
   const latest = React.useRef({ handler, options })
   // After the commit, so a render React discards never runs.
@@ -39,17 +39,25 @@ function useShortcut(
   const conditional = !!options.when
   const layered = !!options.layer
   React.useEffect(() => {
-    if (!keys) return
+    if (!keys) {
+      return
+    }
     return shortcuts.register(keys, (event) => latest.current.handler(event), {
       scope,
       allowInInput,
       description,
-      when: conditional ? () => latest.current.options.when?.() ?? true : undefined,
+      when: conditional
+        ? () => latest.current.options.when?.() ?? true
+        : undefined,
       layer: layered
         ? () => {
             const layer = latest.current.options.layer
-            if (!layer) return null
-            if (typeof layer === "function") return layer()
+            if (!layer) {
+              return null
+            }
+            if (typeof layer === "function") {
+              return layer()
+            }
             return "current" in layer ? layer.current : layer
           }
         : undefined,
@@ -68,10 +76,18 @@ function useShortcut(
 function useShortcutHint(keys: string) {
   const [apple, setApple] = React.useState(initialApple)
   React.useEffect(() => setApple(isApple()), [])
-  return { text: formatShortcut(keys, apple), ariaKeyshortcuts: ariaKeyshortcuts(keys, apple) }
+  return {
+    text: formatShortcut(keys, apple),
+    ariaKeyshortcuts: ariaKeyshortcuts(keys, apple),
+  }
 }
 
-export { ariaKeyshortcuts, formatShortcut, registerShortcut, shortcuts } from "@ui-sdk/core/shortcuts"
+export {
+  ariaKeyshortcuts,
+  formatShortcut,
+  registerShortcut,
+  shortcuts,
+} from "@ui-sdk/core/shortcuts"
 export type {
   ShortcutHandler,
   ShortcutInfo,

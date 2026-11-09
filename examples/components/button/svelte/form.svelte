@@ -8,7 +8,9 @@
 
   function onSubmit(event: SubmitEvent) {
     event.preventDefault()
-    const email = String(new FormData(event.currentTarget as HTMLFormElement).get("email"))
+    const email = String(
+      new FormData(event.currentTarget as HTMLFormElement).get("email")
+    )
     log(`Subscribed ${email}`)
   }
 </script>

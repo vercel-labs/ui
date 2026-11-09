@@ -36,13 +36,17 @@ let pending = false
 
 async function onSubmit(event: SubmitEvent) {
   event.preventDefault()
-  if (pending) return
+  if (pending) {
+    return
+  }
   const data = new FormData(event.currentTarget as HTMLFormElement)
   pending = true
   try {
     const result = await save(data, options.action)
     errors.value = result
-    if (!result) submitted.value = serializeData(data)
+    if (!result) {
+      submitted.value = serializeData(data)
+    }
   } catch {
     // The fake server failed. The page keeps what it showed.
   } finally {
@@ -50,14 +54,22 @@ async function onSubmit(event: SubmitEvent) {
   }
 }
 
-function onUsername(value: string, details: ChangeDetails<InputValueChangeReason>) {
-  if (options.noDigits && /\d/.test(value)) return details.cancel()
+function onUsername(
+  value: string,
+  details: ChangeDetails<InputValueChangeReason>
+) {
+  if (options.noDigits && /\d/.test(value)) {
+    return details.cancel()
+  }
   action.value = `${f.username.name}:${value}:${details.reason}`
   username.value = value
   errors.value = without(errors.value, f.username.name)
 }
 
-function onWebsite(value: string, details: ChangeDetails<InputValueChangeReason>) {
+function onWebsite(
+  value: string,
+  details: ChangeDetails<InputValueChangeReason>
+) {
   action.value = `${f.website.name}:${value}:${details.reason}`
 }
 </script>
@@ -65,11 +77,19 @@ function onWebsite(value: string, details: ChangeDetails<InputValueChangeReason>
 <template>
   <div class="fixture">
     <button>Before</button>
-    <form class="form" :aria-label="f.formLabel" @submit="onSubmit" @reset="errors = undefined">
+    <form
+      class="form"
+      :aria-label="f.formLabel"
+      @submit="onSubmit"
+      @reset="errors = undefined"
+    >
       <FieldSet class="form" :disabled="options.disabled || undefined">
         <FieldLegend>{{ f.profile.legend }}</FieldLegend>
         <FieldDescription>{{ f.profile.description }}</FieldDescription>
-        <Field :name="f.username.name" :invalid="invalidOf(errors, f.username.name)">
+        <Field
+          :name="f.username.name"
+          :invalid="invalidOf(errors, f.username.name)"
+        >
           <FieldLabel class="label">{{ f.username.label }}</FieldLabel>
           <Input
             class="input"
@@ -85,7 +105,11 @@ function onWebsite(value: string, details: ChangeDetails<InputValueChangeReason>
         </Field>
         <Field :name="f.bio.name" :invalid="invalidOf(errors, f.bio.name)">
           <FieldLabel class="label">{{ f.bio.label }}</FieldLabel>
-          <Textarea class="textarea" auto-resize :submit-shortcut="options.submitShortcut" />
+          <Textarea
+            class="textarea"
+            auto-resize
+            :submit-shortcut="options.submitShortcut"
+          />
           <FieldDescription>{{ f.bio.description }}</FieldDescription>
           <FieldError v-slot="{ state }" class="field-error">
             {{ messageOf(errors, f.bio.name) || state.message }}
@@ -120,7 +144,9 @@ function onWebsite(value: string, details: ChangeDetails<InputValueChangeReason>
         <button type="reset">Reset</button>
       </div>
     </form>
-    <button type="button" @click="contactDisabled = !contactDisabled">Toggle contact</button>
+    <button type="button" @click="contactDisabled = !contactDisabled">
+      Toggle contact
+    </button>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
     <output role="status" aria-label="Submitted">{{ submitted }}</output>

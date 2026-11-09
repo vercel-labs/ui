@@ -8,7 +8,11 @@ import {
   type CheckboxState,
 } from "@ui-sdk/core/checkbox"
 import { createContext, omit, useContext } from "solid-js"
-import { joinField, useFieldControl, type ButtonControlProps } from "./field-context"
+import {
+  joinField,
+  useFieldControl,
+  type ButtonControlProps,
+} from "./field-context"
 import {
   createParts,
   provided,
@@ -21,13 +25,17 @@ import {
 const parts = createParts(checkbox, { indicator: "span" })
 
 // The group's own context, so a checkbox can join a group without bundling it.
-const CheckboxGroupContext = createContext<PrimitiveHandle<typeof checkboxGroupPrimitive> | null>(null)
+const CheckboxGroupContext = createContext<PrimitiveHandle<
+  typeof checkboxGroupPrimitive
+> | null>(null)
 
 /**
  * The control and the hidden native input that takes part in the form.
  * @stable
  */
-function Checkbox(props: Omit<CheckboxOptions, "group"> & ButtonControlProps<CheckboxState>) {
+function Checkbox(
+  props: Omit<CheckboxOptions, "group"> & ButtonControlProps<CheckboxState>
+) {
   const group = useContext(CheckboxGroupContext)
   // Inside a group, the group is the field's control.
   const field = useFieldControl()
@@ -63,12 +71,18 @@ function Checkbox(props: Omit<CheckboxOptions, "group"> & ButtonControlProps<Che
     "form",
     "parent",
     "controller",
-    "debug",
+    "debug"
   )
   const input = handle.slot("input")
   return (
     <>
-      {usePart(handle, "root", undefined, joinField(fieldControl, rest, "button"), "button")}
+      {usePart(
+        handle,
+        "root",
+        undefined,
+        joinField(fieldControl, rest, "button"),
+        "button"
+      )}
       <input {...input} />
     </>
   )
@@ -87,7 +101,8 @@ const CheckboxIndicator = parts.Indicator
  * @stable
  */
 function CheckboxGroup<T extends string = string>(
-  props: CheckboxGroupOptions<T> & Omit<PartProps<"div", CheckboxGroupState>, "onChange" | "onSelect">,
+  props: CheckboxGroupOptions<T> &
+    Omit<PartProps<"div", CheckboxGroupState>, "onChange" | "onSelect">
 ) {
   const field = useFieldControl()
   const group = usePrimitive(checkboxGroupPrimitive, () => ({
@@ -115,17 +130,20 @@ function CheckboxGroup<T extends string = string>(
     "name",
     "form",
     "controller",
-    "debug",
+    "debug"
   )
   return provided(
     <CheckboxGroupContext value={group}>
       {usePart(group, "group", undefined, joinField(field, rest, "div"), "div")}
       {usePart(group, "group-input", undefined, {}, "input")}
-    </CheckboxGroupContext>,
+    </CheckboxGroupContext>
   )
 }
 
-export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
+export {
+  createCheckboxController,
+  createCheckboxGroupController,
+} from "@ui-sdk/core/checkbox"
 export type {
   CheckboxApi,
   CheckboxChangeOptions,

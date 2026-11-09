@@ -15,7 +15,13 @@
 <div data-slot="stack">
   <Button onclick={save}>
     {#snippet render({ props, state })}
-      <button {...props}>{state.pending ? "Saving…" : state.error ? "Try Again" : "Save Changes"}</button>
+      <button {...props}
+        >{state.pending
+          ? "Saving…"
+          : state.error
+            ? "Try Again"
+            : "Save Changes"}</button
+      >
     {/snippet}
   </Button>
 </div>

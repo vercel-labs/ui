@@ -9,7 +9,14 @@ import {
 } from "@ui-sdk/react/autocomplete"
 import * as React from "react"
 
-const fruits = ["Apple", "Apricot", "Avocado", "Banana", "Blackberry", "Blueberry"]
+const fruits = [
+  "Apple",
+  "Apricot",
+  "Avocado",
+  "Banana",
+  "Blackberry",
+  "Blueberry",
+]
 
 export function Example() {
   const [box, setBox] = React.useState<HTMLElement | null>(null)

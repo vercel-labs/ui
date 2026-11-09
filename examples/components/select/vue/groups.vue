@@ -51,7 +51,11 @@ const fonts = [
           <SelectSeparator v-if="index > 0" />
           <SelectGroup>
             <SelectGroupLabel>{{ group.label }}</SelectGroupLabel>
-            <SelectItem v-for="item in group.items" :key="item.value" :value="item.value">
+            <SelectItem
+              v-for="item in group.items"
+              :key="item.value"
+              :value="item.value"
+            >
               {{ item.label }}
               <SelectItemIndicator>
                 <CheckIcon />

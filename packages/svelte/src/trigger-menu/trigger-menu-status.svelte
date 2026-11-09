@@ -4,7 +4,10 @@ A polite status, outside the popup. Without children, it says the count and the 
 @stable
 -->
 <script lang="ts">
-  import { triggerMenu, type TriggerMenuStatusState } from "@ui-sdk/core/trigger-menu"
+  import {
+    triggerMenu,
+    type TriggerMenuStatusState,
+  } from "@ui-sdk/core/trigger-menu"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

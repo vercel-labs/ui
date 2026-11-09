@@ -13,8 +13,14 @@ import {
 } from "@ui-sdk/vue/autocomplete"
 
 const fruitGroups = [
-  { label: "Tree fruits", fruits: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"] },
-  { label: "Berries", fruits: ["Blackberry", "Blueberry", "Grape", "Strawberry"] },
+  {
+    label: "Tree fruits",
+    fruits: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"],
+  },
+  {
+    label: "Berries",
+    fruits: ["Blackberry", "Blueberry", "Grape", "Strawberry"],
+  },
   { label: "Tropical", fruits: ["Avocado", "Banana", "Mango", "Pineapple"] },
 ]
 </script>
@@ -32,7 +38,11 @@ const fruitGroups = [
           <AutocompleteSeparator v-if="index > 0" />
           <AutocompleteGroup>
             <AutocompleteGroupLabel>{{ group.label }}</AutocompleteGroupLabel>
-            <AutocompleteItem v-for="fruit in group.fruits" :key="fruit" :value="fruit">
+            <AutocompleteItem
+              v-for="fruit in group.fruits"
+              :key="fruit"
+              :value="fruit"
+            >
               {{ fruit }}
             </AutocompleteItem>
           </AutocompleteGroup>

@@ -25,7 +25,10 @@ function Example() {
       <div data-slot="grid">
         <For each={fields}>
           {({ label, handle, ...options }) => (
-            <NumberInput {...options} onValueCommit={(value) => log(`${label} ${value ?? "empty"}`)}>
+            <NumberInput
+              {...options}
+              onValueCommit={(value) => log(`${label} ${value ?? "empty"}`)}
+            >
               <NumberInputGroup>
                 <NumberInputScrubArea pixelsPerStep={1}>
                   <span aria-hidden="true">{handle}</span>

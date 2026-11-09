@@ -8,8 +8,10 @@ const lastLog = (preview: Locator) =>
     .locator('section[aria-label="Console"] li:not([aria-hidden])')
     .last()
 
-const editorIn = (preview: Locator) => preview.locator('[data-slot="token-input-editor"]')
-const tokensIn = (preview: Locator) => editorIn(preview).locator("[data-token-id]")
+const editorIn = (preview: Locator) =>
+  preview.locator('[data-slot="token-input-editor"]')
+const tokensIn = (preview: Locator) =>
+  editorIn(preview).locator("[data-token-id]")
 
 // Puts the caret just after the first token, past the anchor that follows it.
 const caretAfterFirstToken = (preview: Locator) =>
@@ -48,7 +50,10 @@ testExamples("token-input", {
     await page.keyboard.press("Backspace")
     await page.keyboard.press("Backspace")
     await expect(tokensIn(preview)).toHaveCount(2)
-    await preview.locator('[data-slot="token-input-token-remove"]').first().click()
+    await preview
+      .locator('[data-slot="token-input-token-remove"]')
+      .first()
+      .click()
     await expect(tokensIn(preview)).toHaveCount(1)
     await expect(tokensIn(preview)).toContainText("Inès Moreau")
     await expect(editor).toBeFocused()
@@ -62,7 +67,9 @@ testExamples("token-input", {
     await expect(tokensIn(preview)).toHaveCount(1)
     await expect(tokensIn(preview).first()).not.toHaveAttribute("data-pending")
     await page.keyboard.press("Enter")
-    await expect(lastLog(preview)).toHaveText("Sent [@routes.ts](file:src/routes.ts)")
+    await expect(lastLog(preview)).toHaveText(
+      "Sent [@routes.ts](file:src/routes.ts)"
+    )
     await expect(tokensIn(preview)).toHaveCount(0)
   }),
   deletion: example("deletion", async (preview) => {
@@ -91,19 +98,26 @@ testExamples("token-input", {
     await editorIn(preview).click()
     await page.keyboard.press("ControlOrMeta+End")
     await page.keyboard.type("!")
-    await expect(lastLog(preview)).toHaveText("Ping <@hollis> and <@ines> about the launch!")
+    await expect(lastLog(preview)).toHaveText(
+      "Ping <@hollis> and <@ines> about the launch!"
+    )
   }),
   form: example("form", async (preview) => {
     const page = preview.page()
-    await expect(preview.locator("form [data-slot='token-input-editor']")).toHaveCount(0)
-    const submitted = "Submitted Explain [@routes.ts](file:src/routes.ts) in two sentences."
+    await expect(
+      preview.locator("form [data-slot='token-input-editor']")
+    ).toHaveCount(0)
+    const submitted =
+      "Submitted Explain [@routes.ts](file:src/routes.ts) in two sentences."
     await preview.getByRole("button", { name: "Submit" }).click()
     await expect(lastLog(preview)).toHaveText(submitted)
     await preview.getByRole("textbox", { name: "Prompt" }).click()
     await page.keyboard.press("ControlOrMeta+End")
     await page.keyboard.type(" Keep it short.")
     await page.keyboard.press("Enter")
-    await expect(lastLog(preview)).toHaveText(submitted.replace("sentences.", "sentences. Keep it short."))
+    await expect(lastLog(preview)).toHaveText(
+      submitted.replace("sentences.", "sentences. Keep it short.")
+    )
   }),
   controlled: example("controlled", async (preview) => {
     const page = preview.page()
@@ -113,7 +127,9 @@ testExamples("token-input", {
     await expect(page.getByRole("listbox").last()).toBeVisible()
     await page.keyboard.press("Enter")
     await expect(tokensIn(preview)).toHaveCount(2)
-    await expect(lastLog(preview)).toContainText("[@app.tsx](file:src/app.tsx) (item-press)")
+    await expect(lastLog(preview)).toContainText(
+      "[@app.tsx](file:src/app.tsx) (item-press)"
+    )
   }),
   controller: example("controller", async (preview) => {
     await preview.getByRole("button", { name: "Attach File" }).click()
@@ -135,6 +151,8 @@ testExamples("token-input", {
     await page.keyboard.press("Enter")
     await page.keyboard.type("Hollis is booking.")
     await page.keyboard.press("ControlOrMeta+Enter")
-    await expect(lastLog(preview)).toHaveText(/^Sent Lunch at noon\?\s+Hollis is booking\.$/)
+    await expect(lastLog(preview)).toHaveText(
+      /^Sent Lunch at noon\?\s+Hollis is booking\.$/
+    )
   }),
 })

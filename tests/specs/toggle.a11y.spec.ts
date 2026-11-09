@@ -6,7 +6,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations at rest", async ({ page, open }) => {
@@ -18,7 +20,10 @@ test("no axe violations with toggles pressed", async ({ page, open }) => {
   await open("toggle")
   await buttonNamed(page, "Bookmark").click()
   await buttonNamed(page, "Italic").click()
-  await expect(buttonNamed(page, "Italic")).toHaveAttribute("aria-pressed", "true")
+  await expect(buttonNamed(page, "Italic")).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
   expect(await audit(page)).toEqual([])
 })
 
@@ -32,30 +37,42 @@ test("no axe violations in a disabled group", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with focus on a disabled toggle", async ({ page, open }) => {
+test("no axe violations with focus on a disabled toggle", async ({
+  page,
+  open,
+}) => {
   await open("toggle")
   await buttonNamed(page, "Bold").focus()
   await page.keyboard.press("End")
   expect(await audit(page)).toEqual([])
 })
 
-test("groups are named, and toggles are named by their text", async ({ page, open }) => {
+test("groups are named, and toggles are named by their text", async ({
+  page,
+  open,
+}) => {
   await open("toggle")
-  await expect(page.getByRole("group", { name: "Text alignment" })).toBeVisible()
-  await expect(page.getByRole("group", { name: "Text formatting" })).toBeVisible()
+  await expect(
+    page.getByRole("group", { name: "Text alignment" })
+  ).toBeVisible()
+  await expect(
+    page.getByRole("group", { name: "Text formatting" })
+  ).toBeVisible()
   await expect(buttonNamed(page, "Bookmark")).toBeVisible()
 })
 
 // Every implementation must expose the same accessibility tree.
 test("accessibility tree", async ({ page, open }) => {
   await open("toggle")
-  await expect(page.getByRole("group", { name: "Text alignment" })).toMatchAriaSnapshot(`
+  await expect(page.getByRole("group", { name: "Text alignment" }))
+    .toMatchAriaSnapshot(`
     - group "Text alignment":
       - button "Left" [pressed]
       - button "Center"
       - button "Right"
   `)
-  await expect(page.getByRole("group", { name: "Text formatting" })).toMatchAriaSnapshot(`
+  await expect(page.getByRole("group", { name: "Text formatting" }))
+    .toMatchAriaSnapshot(`
     - group "Text formatting":
       - button "Bold" [pressed]
       - button "Italic"

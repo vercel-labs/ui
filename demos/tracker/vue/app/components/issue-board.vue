@@ -11,7 +11,10 @@ const props = defineProps<{ issues: Issue[]; query: Query }>()
 const columns = computed(() =>
   tabs
     .find((tab) => tab.value === props.query.tab)!
-    .statuses.map((status) => ({ status, cards: props.issues.filter((issue) => issue.status === status) })),
+    .statuses.map((status) => ({
+      status,
+      cards: props.issues.filter((issue) => issue.status === status),
+    }))
 )
 </script>
 
@@ -23,10 +26,15 @@ const columns = computed(() =>
       :aria-labelledby="`column-${status}`"
       class="flex w-72 shrink-0 flex-col gap-2 rounded-3xl bg-muted/60 p-2"
     >
-      <h2 :id="`column-${status}`" class="flex items-center gap-2 px-2 py-1 font-medium">
+      <h2
+        :id="`column-${status}`"
+        class="flex items-center gap-2 px-2 py-1 font-medium"
+      >
         <StatusIcon :status="status" />
         {{ statusOf(status).label }}
-        <span class="text-muted-foreground tabular-nums">{{ cards.length }}</span>
+        <span class="text-muted-foreground tabular-nums">{{
+          cards.length
+        }}</span>
       </h2>
       <ul class="flex min-h-0 flex-col gap-2 overflow-y-auto">
         <li v-for="issue in cards" :key="issue.id">
@@ -42,7 +50,11 @@ const columns = computed(() =>
               <span class="ms-auto"><Assignee :id="issue.assignee" /></span>
             </span>
             <span class="font-medium">{{ issue.title }}</span>
-            <IssueLabels v-if="issue.labels.length > 0" :labels="issue.labels" class="flex flex-wrap gap-1" />
+            <IssueLabels
+              v-if="issue.labels.length > 0"
+              :labels="issue.labels"
+              class="flex flex-wrap gap-1"
+            />
           </NuxtLink>
         </li>
       </ul>

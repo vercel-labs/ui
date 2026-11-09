@@ -9,7 +9,13 @@ import { dateParts, type ISODate } from "./plain-date"
 // in Thai (Buddhist) or Japanese (era) years. A locale that defaults to
 // another calendar, like `fa-IR` (Persian), is formatted in the Gregorian one,
 // or the heading would name a different month than the grid shows.
-const gregorianMonths = new Set(["gregory", "iso8601", "buddhist", "japanese", "roc"])
+const gregorianMonths = new Set([
+  "gregory",
+  "iso8601",
+  "buddhist",
+  "japanese",
+  "roc",
+])
 
 // Making a formatter costs about 25 times more than using one, and a month
 // grid formats dozens of labels, so each is made once.
@@ -19,13 +25,21 @@ const formatters = new Map<string, Intl.DateTimeFormat>()
  * A cached `Intl.DateTimeFormat` for calendar dates in a locale: UTC, and in a calendar whose months match the Gregorian ones.
  * @stable
  */
-function dateFormatter(locale?: string, options: Intl.DateTimeFormatOptions = {}) {
+function dateFormatter(
+  locale?: string,
+  options: Intl.DateTimeFormatOptions = {}
+) {
   const key = `${locale ?? ""}|${JSON.stringify(options)}`
   let formatter = formatters.get(key)
   if (!formatter) {
     formatter = new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" })
-    if (!gregorianMonths.has(formatter.resolvedOptions().calendar))
-      formatter = new Intl.DateTimeFormat(locale, { ...options, calendar: "gregory", timeZone: "UTC" })
+    if (!gregorianMonths.has(formatter.resolvedOptions().calendar)) {
+      formatter = new Intl.DateTimeFormat(locale, {
+        ...options,
+        calendar: "gregory",
+        timeZone: "UTC",
+      })
+    }
     formatters.set(key, formatter)
   }
   return formatter
@@ -34,7 +48,9 @@ function dateFormatter(locale?: string, options: Intl.DateTimeFormatOptions = {}
 /** The time `Intl` formats for an ISO date: its UTC midnight. */
 function utc(date: ISODate) {
   const parts = dateParts(date)
-  if (!parts) throw new RangeError(`"${date}" is not an ISO date (YYYY-MM-DD).`)
+  if (!parts) {
+    throw new RangeError(`"${date}" is not an ISO date (YYYY-MM-DD).`)
+  }
   const time = new Date(0)
   // `setUTCFullYear` keeps years below 100 as they are, which `Date.UTC` doesn't.
   time.setUTCFullYear(parts.year, parts.month - 1, parts.day)
@@ -47,7 +63,11 @@ function utc(date: ISODate) {
  * locale's long date, the label a calendar's day cells use.
  * @stable
  */
-function formatDate(date: ISODate, locale?: string, options: Intl.DateTimeFormatOptions = longDate) {
+function formatDate(
+  date: ISODate,
+  locale?: string,
+  options: Intl.DateTimeFormatOptions = longDate
+) {
   return dateFormatter(locale, options).format(utc(date))
 }
 
@@ -59,18 +79,24 @@ function formatDateRange(
   start: ISODate,
   end: ISODate,
   locale?: string,
-  options: Intl.DateTimeFormatOptions = mediumDate,
+  options: Intl.DateTimeFormatOptions = mediumDate
 ) {
   // Browsers write plain spaces where Node's ICU writes thin ones, so a label
   // rendered on the server wouldn't match the one the browser hydrates.
-  return dateFormatter(locale, options).formatRange(utc(start), utc(end)).replace(thinSpaces, " ")
+  return dateFormatter(locale, options)
+    .formatRange(utc(start), utc(end))
+    .replace(thinSpaces, " ")
 }
 
 /**
  * The parts `Intl` formats an ISO date into, for building a label of your own.
  * @stable
  */
-function formatDateToParts(date: ISODate, locale?: string, options: Intl.DateTimeFormatOptions = longDate) {
+function formatDateToParts(
+  date: ISODate,
+  locale?: string,
+  options: Intl.DateTimeFormatOptions = longDate
+) {
   return dateFormatter(locale, options).formatToParts(utc(date))
 }
 
@@ -80,20 +106,29 @@ function formatDateToParts(date: ISODate, locale?: string, options: Intl.DateTim
  * of "16 января".
  * @stable
  */
-function monthNames(locale?: string, width: "long" | "short" | "narrow" = "long") {
+function monthNames(
+  locale?: string,
+  width: "long" | "short" | "narrow" = "long"
+) {
   const formatter = dateFormatter(locale, { month: width })
-  return Array.from({ length: 12 }, (_, index) => formatter.format(Date.UTC(2026, index, 1)))
+  return Array.from({ length: 12 }, (_, index) =>
+    formatter.format(Date.UTC(2026, index, 1))
+  )
 }
 
 /**
  * The seven weekday names in a locale, starting on `weekStartsOn` (0 for Sunday).
  * @stable
  */
-function weekdayNames(locale?: string, width: "long" | "short" | "narrow" = "short", weekStartsOn = 0) {
+function weekdayNames(
+  locale?: string,
+  width: "long" | "short" | "narrow" = "short",
+  weekStartsOn = 0
+) {
   const formatter = dateFormatter(locale, { weekday: width })
   // January 4 2026 was a Sunday.
   return Array.from({ length: 7 }, (_, index) =>
-    formatter.format(Date.UTC(2026, 0, 4 + ((weekStartsOn + index) % 7))),
+    formatter.format(Date.UTC(2026, 0, 4 + ((weekStartsOn + index) % 7)))
   )
 }
 
@@ -133,7 +168,19 @@ const longDate: Intl.DateTimeFormatOptions = {
   month: "long",
   day: "numeric",
 }
-const mediumDate: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" }
+const mediumDate: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+}
 const thinSpaces = /[\u2009\u202F]/g
 
-export { dateFormatter, formatDate, formatDateRange, formatDateToParts, monthNames, todayDate, weekdayNames }
+export {
+  dateFormatter,
+  formatDate,
+  formatDateRange,
+  formatDateToParts,
+  monthNames,
+  todayDate,
+  weekdayNames,
+}

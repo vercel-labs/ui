@@ -90,15 +90,20 @@ const eventProps: Record<string, string> = {
   wheel: "onWheel",
 }
 
-const propOf = (type: string) => eventProps[type] ?? `on${type[0].toUpperCase()}${type.slice(1)}`
+const propOf = (type: string) =>
+  eventProps[type] ?? `on${type[0].toUpperCase()}${type.slice(1)}`
 
 // Calls a user's event handler prop the way Solid calls one on an element: a
 // function with the event, or the bound form, `[handler, data]`, with its data
 // first. `extra` follows the event, and what the handler returns comes back,
 // so a Button gets its action's Promise.
 function callHandler(handler: unknown, event: Event, ...extra: unknown[]) {
-  if (Array.isArray(handler)) return handler[0](handler[1], event, ...extra) as unknown
-  if (typeof handler === "function") return handler(event, ...extra) as unknown
+  if (Array.isArray(handler)) {
+    return handler[0](handler[1], event, ...extra) as unknown
+  }
+  if (typeof handler === "function") {
+    return handler(event, ...extra) as unknown
+  }
 }
 
 /**
@@ -113,10 +118,16 @@ function callHandler(handler: unknown, event: Event, ...extra: unknown[]) {
 function toSolidProps(attrs: Attrs) {
   const props: Record<string, unknown> = {}
   for (const [name, value] of Object.entries(attrs)) {
-    if (value === undefined) continue
-    if (name === "checked") props[isServer ? "checked" : "defaultChecked"] = true
-    else if (name === "style") props.style = styleObject(value)
-    else props[name] = value
+    if (value === undefined) {
+      continue
+    }
+    if (name === "checked") {
+      props[isServer ? "checked" : "defaultChecked"] = true
+    } else if (name === "style") {
+      props.style = styleObject(value)
+    } else {
+      props[name] = value
+    }
   }
   return props
 }
@@ -126,7 +137,11 @@ function styleObject(css: string) {
   const style: Record<string, string> = {}
   for (const declaration of css.split(";")) {
     const index = declaration.indexOf(":")
-    if (index > 0) style[declaration.slice(0, index).trim()] = declaration.slice(index + 1).trim()
+    if (index > 0) {
+      style[declaration.slice(0, index).trim()] = declaration
+        .slice(index + 1)
+        .trim()
+    }
   }
   return style
 }
@@ -136,10 +151,14 @@ function styleObject(css: string) {
 // row's `top`.
 function mergeStyles(user: unknown, part: Record<string, string>) {
   const combine = (style: unknown) => ({
-    ...(typeof style === "string" ? styleObject(style) : (style as Record<string, string> | undefined)),
+    ...(typeof style === "string"
+      ? styleObject(style)
+      : (style as Record<string, string> | undefined)),
     ...part,
   })
-  return typeof user === "function" ? (state: unknown) => combine(user(state)) : combine(user)
+  return typeof user === "function"
+    ? (state: unknown) => combine(user(state))
+    : combine(user)
 }
 
 // One part's subscription to its instance, shared by every scope rendering
@@ -162,7 +181,10 @@ const trackers = new WeakMap<object, Tracker>()
 // its primitive's slots.
 const deliveries = new WeakMap<
   object,
-  { track: (part: Part) => void; slots: Record<string, Record<string, unknown>> | undefined }
+  {
+    track: (part: Part) => void
+    slots: Record<string, Record<string, unknown>> | undefined
+  }
 >()
 
 // Reads a part from its instance, tracking what it reads of the props'
@@ -170,10 +192,17 @@ const deliveries = new WeakMap<
 // like a `getHref` that reads a signal, renders it again when that signal
 // changes. A read its slot doesn't define, like the attributes of a part
 // without `attrs`, reads no state and tracks none of the delivery.
-function readPart<T>(instance: object, part: Part, defines: "present" | "attrs" | "state", read: () => T) {
+function readPart<T>(
+  instance: object,
+  part: Part,
+  defines: "present" | "attrs" | "state",
+  read: () => T
+) {
   const delivery = deliveries.get(instance)
   const slot = delivery?.slots?.[part.slot]
-  if (!slot || slot[defines]) delivery?.track(part)
+  if (!slot || slot[defines]) {
+    delivery?.track(part)
+  }
   return read()
 }
 
@@ -181,7 +210,10 @@ function readPart<T>(instance: object, part: Part, defines: "present" | "attrs" 
 // keeps its readers from running again.
 function sameRecord(a: Record<string, unknown>, b: Record<string, unknown>) {
   const keys = Object.keys(a)
-  return keys.length === Object.keys(b).length && keys.every((key) => key in b && sameValue(a[key], b[key]))
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every((key) => key in b && sameValue(a[key], b[key]))
+  )
 }
 
 // Subscribes a part once, and keeps it for as long as any scope renders it.
@@ -196,15 +228,20 @@ function createTracker(instance: ReturnType<Primitive>) {
   return (name: string, props: () => unknown) => {
     const part = untrack(() => instance.part(name, props()))
     let entry = entries.get(part)
-    if (!entry) entries.set(part, (entry = createTracked(instance, owner, name, props)))
+    if (!entry) {
+      entries.set(part, (entry = createTracked(instance, owner, name, props)))
+    }
     entry.users++
     const current = entry
-    if (getOwner())
+    if (getOwner()) {
       onCleanup(() => {
-        if (--current.users > 0 || entries.get(part) !== current) return
+        if (--current.users > 0 || entries.get(part) !== current) {
+          return
+        }
         current.dispose()
         entries.delete(part)
       })
+    }
     return entry
   }
 }
@@ -213,20 +250,30 @@ function createTracked(
   instance: ReturnType<Primitive>,
   owner: Owner | null,
   name: string,
-  props: () => unknown,
+  props: () => unknown
 ) {
   // Written from core's listeners, which fire wherever core's lifecycle runs:
   // a part's unbind writes the store, and a cleanup can run inside another
   // computation, like a `For` disposing the component, where Solid refuses an
   // ordinary write and halts.
-  const [tick, setTick] = createSignal(0, { ownedWrite: true, name: `${name} tick` })
-  const [attrsTick, setAttrsTick] = createSignal(0, { ownedWrite: true, name: `${name} attrs tick` })
+  const [tick, setTick] = createSignal(0, {
+    ownedWrite: true,
+    name: `${name} tick`,
+  })
+  const [attrsTick, setAttrsTick] = createSignal(0, {
+    ownedWrite: true,
+    name: `${name} attrs tick`,
+  })
   // Keys the props deliver reach the part through Solid (`usePrimitive`),
   // not from the effect that hands them to the instance.
   const notify = (liveOnly: boolean, delivered: boolean) => {
-    if (delivered) return
+    if (delivered) {
+      return
+    }
     setTick((count) => count + 1)
-    if (!liveOnly) setAttrsTick((count) => count + 1)
+    if (!liveOnly) {
+      setAttrsTick((count) => count + 1)
+    }
   }
   const dispose = runWithOwner(owner, () =>
     createRoot((dispose) => {
@@ -241,23 +288,32 @@ function createTracked(
         () => {
           const current = props()
           const part = instance.part(name, current)
-          return { part, props: current, selected: selectedKeys(part), seen: writes(part.store) }
+          return {
+            part,
+            props: current,
+            selected: selectedKeys(part),
+            seen: writes(part.store),
+          }
         },
         ({ part, props, selected: values, seen }) => {
-          if (part === subscribed && values === selected) return
+          if (part === subscribed && values === selected) {
+            return
+          }
           subscribed = part
           selected = values
           unsubscribe()
           unsubscribe = subscribe(part, notify, props)
           // The part's readers ran in this flush. A change since, like an
           // effect writing state before this one, reaches them now.
-          if (writes(part.store) !== seen) notify(false, false)
+          if (writes(part.store) !== seen) {
+            notify(false, false)
+          }
         },
-        { name: `${name} subscription` },
+        { name: `${name} subscription` }
       )
       onCleanup(() => unsubscribe())
       return dispose
-    }),
+    })
   )!
   return { tick, attrsTick, users: 0, dispose }
 }
@@ -275,29 +331,48 @@ function slotProps(
   user: Record<string, any>,
   skipped: Set<string>,
   own: Record<string, unknown>,
-  attrs: () => Record<string, unknown>,
+  attrs: () => Record<string, unknown>
 ) {
-  const has = (key: string) => key in own || key in untrack(attrs) || (!skipped.has(key) && key in user)
+  const has = (key: string) =>
+    key in own || key in untrack(attrs) || (!skipped.has(key) && key in user)
   const get = (key: string) => {
-    if (key in own) return own[key]
-    if (key === "id" && user.id != null) return user.id
-    if (key === "style" && key in untrack(attrs) && user.style != null)
+    if (key in own) {
+      return own[key]
+    }
+    if (key === "id" && user.id != null) {
+      return user.id
+    }
+    if (key === "style" && key in untrack(attrs) && user.style != null) {
       return mergeStyles(user.style, attrs().style as Record<string, string>)
-    if (key in untrack(attrs)) return attrs()[key]
-    if (skipped.has(key)) return undefined
+    }
+    if (key in untrack(attrs)) {
+      return attrs()[key]
+    }
+    if (skipped.has(key)) {
+      return undefined
+    }
     return key in user || key === "children" ? user[key] : attrs()[key]
   }
   const proxy: Record<string, any> = new Proxy({} as Record<string, any>, {
-    get: (_, key) => (typeof key === "string" ? get(key) : key === $PROXY ? proxy : undefined),
+    get: (_, key) =>
+      typeof key === "string" ? get(key) : key === $PROXY ? proxy : undefined,
     has: (_, key) => (typeof key === "string" ? has(key) : key === $PROXY),
     ownKeys() {
       const keys = new Set<string>(Object.keys(attrs()))
-      for (const key of Object.keys(own)) keys.add(key)
-      for (const key of Reflect.ownKeys(user)) if (typeof key === "string" && !skipped.has(key)) keys.add(key)
+      for (const key of Object.keys(own)) {
+        keys.add(key)
+      }
+      for (const key of Reflect.ownKeys(user)) {
+        if (typeof key === "string" && !skipped.has(key)) {
+          keys.add(key)
+        }
+      }
       return [...keys]
     },
     getOwnPropertyDescriptor(_, key) {
-      if (typeof key !== "string" || !has(key)) return undefined
+      if (typeof key !== "string" || !has(key)) {
+        return undefined
+      }
       return { enumerable: true, configurable: true, get: () => get(key) }
     },
   })
@@ -318,7 +393,10 @@ type PrimitiveHandle<P extends Primitive> = {
   /** The methods its definition declares, like Tabs' `setValue`. */
   api: TypesOf<P>["api"]
   /** Whether a slot's element should exist. Reading it in a tracking scope, like a `Show` condition, tracks it. */
-  present: <S extends SlotName<P>>(name: S, props?: () => PropsOf<P, S>) => boolean
+  present: <S extends SlotName<P>>(
+    name: S,
+    props?: () => PropsOf<P, S>
+  ) => boolean
   /**
    * Props for a slot's element: its attributes, listeners and ref, merged
    * with the user's props, whose handlers run first. Call it in the part's
@@ -327,7 +405,7 @@ type PrimitiveHandle<P extends Primitive> = {
   slot: <S extends SlotName<P>>(
     name: S,
     props?: () => PropsOf<P, S>,
-    user?: Record<string, any>,
+    user?: Record<string, any>
   ) => Record<string, any>
 }
 
@@ -339,21 +417,31 @@ const noProps = () => ({})
  * getter, so reactive props stay in sync. Provide the handle to the parts.
  * @stable
  */
-function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsOf<P>) {
+function usePrimitive<P extends Primitive>(
+  primitive: P,
+  options: () => OptionsOf<P>
+) {
   // Prefixed so a page using ui-sdk is recognizable from its HTML. Part ids
   // stay unprefixed, since some are keys, like saved resizable layouts.
   const id = `ui-sdk-${createUniqueId()}`
   // Each data list's memo has no owner, so the options memo running again
   // keeps it, and it goes once nothing reads it.
-  const snapshot = createListSnapshots(primitive, (compute) => runWithOwner(null, () => createMemo(compute)))
+  const snapshot = createListSnapshots(primitive, (compute) =>
+    runWithOwner(null, () => createMemo(compute))
+  )
   // Made without tracking, the options and what the primitive's first state
   // calls, like an `itemToLabel` that reads a signal: the effect below keeps
   // the options fresh.
-  const instance = untrack(() => primitive(snapshot({ ...options(), id }))) as ReturnType<P>
+  const instance = untrack(() =>
+    primitive(snapshot({ ...options(), id }))
+  ) as ReturnType<P>
   // Leaving the page settles a pending controller `open()` and detaches the controller.
   onCleanup(() => instance.destroy())
   // The options, made again only when a prop changes to another value.
-  const current = createMemo(() => snapshot({ ...options(), id }), { equals: sameRecord, name: "options" })
+  const current = createMemo(() => snapshot({ ...options(), id }), {
+    equals: sameRecord,
+    name: "options",
+  })
   // The instance's state reads what the props deliver, like a controlled
   // `open`, from here: a read sees it in the same flush as the app's own
   // signals, before the effect below hands it over.
@@ -373,14 +461,19 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
   }, {})
   deliveries.set(instance, {
     track(part) {
-      for (const name of followed(part, untrack(delivered), part.props)) void marks[name]
+      for (const name of followed(part, untrack(delivered), part.props)) {
+        void marks[name]
+      }
     },
-    slots: primitive.slots as Record<string, Record<string, unknown>> | undefined,
+    slots: primitive.slots as
+      Record<string, Record<string, unknown>> | undefined,
   })
   // Keeps callbacks fresh and hands the options to the instance, for its
   // own listeners. Parts already read what they deliver, so they skip it.
   // Untracked, since the instance reads a store's items as it takes a new list.
-  createEffect(current, (next) => untrack(() => instance.setOptions(next)), { name: "options" })
+  createEffect(current, (next) => untrack(() => instance.setOptions(next)), {
+    name: "options",
+  })
   const track = createTracker(instance)
   trackers.set(instance, track)
 
@@ -396,21 +489,29 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
       // Presence may read live state, so every change counts.
       tracked.tick()
       const part = instance.part(name, props())
-      return readPart(instance, part, "present", () => isPresent(part, part.props))
+      return readPart(instance, part, "present", () =>
+        isPresent(part, part.props)
+      )
     },
     slot(name, props = noProps as never, user = {}) {
       const tracked = track(name, props)
       // Stable handlers, so the spread never re-attaches them. User handlers
       // run first and can call preventDefault() to skip the built-in behavior.
       const handlers: Record<string, (event: Event) => void> = {}
-      for (const type of Object.keys(partHandlers(untrack(() => instance.part(name, props()))))) {
+      for (const type of Object.keys(
+        partHandlers(untrack(() => instance.part(name, props())))
+      )) {
         const prop = propOf(type)
         handlers[prop] = (event) => {
           callHandler(user[prop], event)
-          if (!event.defaultPrevented)
-            (partHandlers(instance.part(name, props())) as Record<string, (event: Event) => void>)[type]?.(
-              event,
-            )
+          if (!event.defaultPrevented) {
+            ;(
+              partHandlers(instance.part(name, props())) as Record<
+                string,
+                (event: Event) => void
+              >
+            )[type]?.(event)
+          }
         }
       }
       // Solid runs refs before the element is in the document, and parts
@@ -424,7 +525,7 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
       let attached: HTMLElement | null = null
       let bound = ref(
         untrack(() => instance.part(name, props())),
-        { by: "framework", attaches: "all" },
+        { by: "framework", attaches: "all" }
       )
       const attach = (el: HTMLElement) => {
         attached = el
@@ -439,18 +540,26 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
       const settled = (el: HTMLElement) => el.isConnected && !isHydrating()
       const bind = (el: HTMLElement) => {
         element = el
-        if (settled(el)) return attach(el)
+        if (settled(el)) {
+          return attach(el)
+        }
         // Unowned, so it runs once, with the flush's own effects.
         runWithOwner(null, () =>
           onSettled(() => {
-            if (element !== el || attached === el) return
-            if (settled(el)) return attach(el)
+            if (element !== el || attached === el) {
+              return
+            }
+            if (settled(el)) {
+              return attach(el)
+            }
             // Still outside the document, like in a container inserted later, or
             // still hydrating: wait a task.
             queueMicrotask(() => {
-              if (element === el && attached !== el) attach(el)
+              if (element === el && attached !== el) {
+                attach(el)
+              }
             })
-          }),
+          })
         )
       }
       // A new key is a new part, which takes over the element.
@@ -458,15 +567,21 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
         () => instance.part(name, props()),
         (part) => {
           const next = ref(part, { by: "framework", attaches: "all" })
-          if (next === bound) return
+          if (next === bound) {
+            return
+          }
           bound(null)
           bound = next
-          if (attached) bound(attached)
+          if (attached) {
+            bound(attached)
+          }
         },
-        { name: `${name} rebind` },
+        { name: `${name} rebind` }
       )
       onCleanup(() => {
-        if (attached) bound(null)
+        if (attached) {
+          bound(null)
+        }
         element = attached = null
       })
       const userRef = untrack(() => user.ref)
@@ -480,10 +595,12 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
           tracked.attrsTick()
           const part = instance.part(name, props())
           takeOwnId(part, user.id)
-          const own = readPart(instance, part, "attrs", () => partAttrs(part, part.props))
+          const own = readPart(instance, part, "attrs", () =>
+            partAttrs(part, part.props)
+          )
           return toSolidProps(yieldToAuthor(own, (name) => user[name] != null))
         },
-        { lazy: isServer, equals: sameRecord, name: `${name} attrs` },
+        { lazy: isServer, equals: sameRecord, name: `${name} attrs` }
       )
       return slotProps(user, new Set(Object.keys(own)), own, attrs)
     },
@@ -496,7 +613,11 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
  * key is a memo, so a part re-renders for a key only when its value changes:
  * one that never reads `highlighted` never renders for it.
  */
-function slotState(instance: PrimitiveInstance, name: string, props: () => unknown) {
+function slotState(
+  instance: PrimitiveInstance,
+  name: string,
+  props: () => unknown
+) {
   const track = trackers.get(instance)!
   const tracked = track(name, props)
   // The keys' memos live under a root made now, for the same reason parts do.
@@ -505,20 +626,27 @@ function slotState(instance: PrimitiveInstance, name: string, props: () => unkno
     () => {
       tracked.tick()
       const part = instance.part(name, props() as never)
-      return readPart(instance, part, "state", () => partState(part, part.props)) as Record<string, unknown>
+      return readPart(instance, part, "state", () =>
+        partState(part, part.props)
+      ) as Record<string, unknown>
     },
-    { equals: sameSlotState, name: `${name} state` },
+    { equals: sameSlotState, name: `${name} state` }
   )
   const keys = new Map<string, () => unknown>()
   return new Proxy({} as Record<string, unknown>, {
     get(_, key) {
-      if (typeof key !== "string") return undefined
+      if (typeof key !== "string") {
+        return undefined
+      }
       let memo = keys.get(key)
       if (!memo) {
         // Owned by the part's root, not by whatever memo reads the key first.
         memo = runWithOwner(owner, () =>
           // A list rebuilt with the same items, like a calendar's weekdays, is the same value.
-          createMemo(() => all()[key], { equals: sameSlotState, name: `${name} state.${key}` }),
+          createMemo(() => all()[key], {
+            equals: sameSlotState,
+            name: `${name} state.${key}`,
+          })
         )!
         keys.set(key, memo)
       }
@@ -531,7 +659,10 @@ function slotState(instance: PrimitiveInstance, name: string, props: () => unkno
  * A custom element for a part: its props, which spread onto an element, and its state.
  * @stable
  */
-type RenderProp<State = {}> = (props: Record<string, any>, state: State) => JSX.Element
+type RenderProp<State = {}> = (
+  props: Record<string, any>,
+  state: State
+) => JSX.Element
 
 /**
  * Props every part takes: its element's props, `render`, and class names,
@@ -545,14 +676,18 @@ type PartProps<Tag extends keyof JSX.IntrinsicElements, State = {}> = Omit<
   /** Class names, or a function of the part's state that returns them. */
   class?: JSX.ClassValue | ((state: State) => JSX.ClassValue)
   /** Styles, or a function of the part's state that returns them. */
-  style?: JSX.CSSProperties | string | ((state: State) => JSX.CSSProperties | string | undefined)
+  style?:
+    | JSX.CSSProperties
+    | string
+    | ((state: State) => JSX.CSSProperties | string | undefined)
   /** Renders your own element: a function of the props to spread and the part's state. */
   render?: RenderProp<State>
   /** Content, or a function of the part's state that returns it. */
   children?: JSX.Element | ((state: State) => JSX.Element)
 }
 
-const resolve = (value: unknown, state: unknown) => (typeof value === "function" ? value(state) : value)
+const resolve = (value: unknown, state: unknown) =>
+  typeof value === "function" ? value(state) : value
 
 // Children that take the part's state are called with it. A function that
 // takes nothing is what a child component compiles to: its accessor, read by
@@ -565,7 +700,11 @@ const resolveChildren = (value: unknown, state: unknown) =>
 // The `render` function with its props and state, or the default tag. Class names, styles and children that are
 // functions resolve against the part's state, and run again when the keys
 // they read change.
-function renderElement(tag: string, props: Record<string, any>, state: unknown) {
+function renderElement(
+  tag: string,
+  props: Record<string, any>,
+  state: unknown
+) {
   const resolved = merge(omit(props, "render"), {
     get class() {
       return resolve(props.class, state)
@@ -580,8 +719,11 @@ function renderElement(tag: string, props: Record<string, any>, state: unknown) 
   const render = untrack(() => props.render)
   // Lazy on the server for the same reason as a part's attributes: the render
   // function reads them.
-  if (typeof render === "function")
-    return createMemo(() => render(resolved, state), { lazy: isServer }) as unknown as JSX.Element
+  if (typeof render === "function") {
+    return createMemo(() => render(resolved, state), {
+      lazy: isServer,
+    }) as unknown as JSX.Element
+  }
   const Tag = dynamic(() => tag)
   return <Tag {...resolved} />
 }
@@ -603,11 +745,13 @@ function renderAs(tag: () => ValidComponent) {
 function renderStatic<State extends object>(
   tag: string,
   view: () => { attrs: Attrs; state: State },
-  user: Record<string, any>,
+  user: Record<string, any>
 ) {
   const current = createMemo(view)
   const attrs = createMemo(() => toSolidProps(current().attrs))
-  const state = new Proxy({} as State, { get: (_, key) => current().state[key as keyof State] })
+  const state = new Proxy({} as State, {
+    get: (_, key) => current().state[key as keyof State],
+  })
   return renderElement(tag, slotProps(user, new Set(), {}, attrs), state)
 }
 
@@ -620,28 +764,41 @@ function renderStatic<State extends object>(
  * whose parts claim something, like a roving tab stop.
  */
 function provided(element: JSX.Element) {
-  if (isServer && typeof element === "function") (element as () => unknown)()
+  if (isServer && typeof element === "function") {
+    ;(element as () => unknown)()
+  }
   return element
 }
 
 // Each primitive's parts share one context: the handle, and getters of the
 // props of the parts around the one rendering, by slot, for props a nested
 // part takes from its parent, like a handle's item `value`.
-type Scope = { handle: PrimitiveHandle<Primitive>; around: Record<string, () => Record<string, unknown>> }
+type Scope = {
+  handle: PrimitiveHandle<Primitive>
+  around: Record<string, () => Record<string, unknown>>
+}
 const scopes = new WeakMap<Primitive, Context<Scope | null>>()
 function scopeOf(primitive: Primitive) {
   let context = scopes.get(primitive)
-  if (!context) scopes.set(primitive, (context = createContext<Scope | null>(null)))
+  if (!context) {
+    scopes.set(primitive, (context = createContext<Scope | null>(null)))
+  }
   return context
 }
 
 // A parser function reads an attribute, which only custom elements have.
 const kindOf = (spec: PropSpec) =>
-  typeof spec === "string" ? spec : typeof spec === "object" ? spec.kind : "value"
+  typeof spec === "string"
+    ? spec
+    : typeof spec === "object"
+      ? spec.kind
+      : "value"
 // Where a prop comes from when it's left out: the slot, and that slot's prop,
 // which `"group.id"` names and `"item"` leaves to the prop's own name.
 const fromOf = (spec: PropSpec, key: string) => {
-  if (typeof spec !== "object") return undefined
+  if (typeof spec !== "object") {
+    return undefined
+  }
   const [slot, prop = key] = spec.from.split(".")
   return { slot, prop }
 }
@@ -654,8 +811,10 @@ function providersOf(primitive: Primitive) {
     const schema = schemaOf(primitive)
     slots = new Set(
       Object.values(schema.slots).flatMap((props) =>
-        Object.entries(props).flatMap(([key, spec]) => fromOf(spec, key)?.slot ?? []),
-      ),
+        Object.entries(props).flatMap(
+          ([key, spec]) => fromOf(spec, key)?.slot ?? []
+        )
+      )
     )
     providers.set(primitive, slots)
   }
@@ -671,8 +830,10 @@ function keyedOf(primitive: Primitive) {
     const schema = schemaOf(primitive)
     slots = new Set(
       Object.entries(schema.slots).flatMap(([slot, props]) =>
-        Object.values(props).some((spec) => kindOf(spec) === "key") ? [slot] : [],
-      ),
+        Object.values(props).some((spec) => kindOf(spec) === "key")
+          ? [slot]
+          : []
+      )
     )
     keyedSlots.set(primitive, slots)
   }
@@ -683,7 +844,8 @@ function keyedOf(primitive: Primitive) {
 type ListApi = { internal: { keyOf: (value: unknown) => string } }
 
 // "tab-icon" is "TabIcon".
-const pascal = (name: string) => name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
+const pascal = (name: string) =>
+  name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
 
 // The props `schema` names, read from a component's props: each read tracks,
 // so call it from a getter. What's left out stays out.
@@ -691,14 +853,18 @@ function pick(props: Record<string, any>, schema: Record<string, PropSpec>) {
   const named: Record<string, unknown> = {}
   for (const key in schema) {
     const value = props[key]
-    if (value !== undefined) named[key] = value
+    if (value !== undefined) {
+      named[key] = value
+    }
   }
   return named
 }
 
 // The element's own props: every prop no schema names, kept reactive.
-const elementProps = (props: Record<string, any>, ...schemas: Record<string, PropSpec>[]) =>
-  omit(props, (key) => schemas.some((schema) => key in schema))
+const elementProps = (
+  props: Record<string, any>,
+  ...schemas: Record<string, PropSpec>[]
+) => omit(props, (key) => schemas.some((schema) => key in schema))
 
 // A part's element with its slot's attributes over `props`, or nothing while
 // the slot says it isn't present. A slot that's always present skips the
@@ -708,13 +874,19 @@ function renderSlot(
   slot: string,
   part: () => Record<string, unknown>,
   props: Record<string, any>,
-  tag: string,
+  tag: string
 ) {
   const state = slotState(owner.instance, slot, part)
-  const definition = (owner.primitive.slots as Record<string, { present?: unknown }> | undefined)?.[slot]
-  if (definition && !definition.present) return renderElement(tag, owner.slot(slot, part, props), state)
+  const definition = (
+    owner.primitive.slots as Record<string, { present?: unknown }> | undefined
+  )?.[slot]
+  if (definition && !definition.present) {
+    return renderElement(tag, owner.slot(slot, part, props), state)
+  }
   return (
-    <Show when={owner.present(slot, part)}>{renderElement(tag, owner.slot(slot, part, props), state)}</Show>
+    <Show when={owner.present(slot, part)}>
+      {renderElement(tag, owner.slot(slot, part, props), state)}
+    </Show>
   )
 }
 
@@ -745,17 +917,24 @@ function usePart<
   slot: S,
   part: () => PropsOf<P, S> = noProps as never,
   props: PartProps<T, State> = {} as PartProps<T, State>,
-  tag: T = "div" as T,
+  tag: T = "div" as T
 ) {
-  const primitive: Primitive = typeof handle === "function" ? handle : handle.primitive
+  const primitive: Primitive =
+    typeof handle === "function" ? handle : handle.primitive
   const Scope = scopeOf(primitive)
   const scope = useContext(Scope)
   const owner = (typeof handle === "function" ? scope?.handle : handle) as
     PrimitiveHandle<Primitive> | undefined
-  if (!owner) throw new Error(`The ${slot} part must be used inside its primitive's root.`)
+  if (!owner) {
+    throw new Error(
+      `The ${slot} part must be used inside its primitive's root.`
+    )
+  }
   const slotProps = part as () => Record<string, unknown>
   const provides = providersOf(primitive).has(slot)
-  if (owner === scope?.handle && !provides) return renderSlot(owner, slot, slotProps, props, tag)
+  if (owner === scope?.handle && !provides) {
+    return renderSlot(owner, slot, slotProps, props, tag)
+  }
   // A root written by hand shares its instance with the parts inside it, and
   // a part whose props nested parts take, like an item's value, provides them.
   // Rendered inside the provider, so the parts in it find them, and in
@@ -768,7 +947,9 @@ function usePart<
     : slotProps
   const around = provides ? { ...inherited, [slot]: aroundProps } : inherited
   return provided(
-    <Scope value={{ handle: owner, around }}>{renderSlot(owner, slot, slotProps, props, tag)}</Scope>,
+    <Scope value={{ handle: owner, around }}>
+      {renderSlot(owner, slot, slotProps, props, tag)}
+    </Scope>
   )
 }
 
@@ -780,22 +961,31 @@ function useAround<P extends Primitive>(primitive: P, slot: SlotName<P>) {
 
 // The nearest instance of a primitive, or undefined outside its root, like a toggle's group.
 function useNearest<P extends Primitive>(primitive: P) {
-  return useContext(scopeOf(primitive))?.handle as PrimitiveHandle<P> | undefined
+  return useContext(scopeOf(primitive))?.handle as
+    PrimitiveHandle<P> | undefined
 }
 
 // The nearest instance of a primitive, for a part written by hand that calls its api.
 function useHandle<P extends Primitive>(primitive: P) {
   const handle = useNearest(primitive)
-  if (!handle) throw new Error(`A ${primitive.name} part must be used inside its root.`)
+  if (!handle) {
+    throw new Error(`A ${primitive.name} part must be used inside its root.`)
+  }
   return handle
 }
 
 // Shares an instance from `usePrimitive` with the parts inside a root written
 // by hand that renders no element of its own, like a dialog's. A root with an
 // element shares it through `usePart`.
-function providePrimitive<P extends Primitive>(handle: PrimitiveHandle<P>, children: () => JSX.Element) {
+function providePrimitive<P extends Primitive>(
+  handle: PrimitiveHandle<P>,
+  children: () => JSX.Element
+) {
   const Scope = scopeOf(handle.primitive)
-  const scope: Scope = { handle: handle as unknown as PrimitiveHandle<Primitive>, around: {} }
+  const scope: Scope = {
+    handle: handle as unknown as PrimitiveHandle<Primitive>,
+    around: {},
+  }
   return provided(<Scope value={scope}>{children()}</Scope>)
 }
 
@@ -807,7 +997,10 @@ type Pascal<Name extends string> = Name extends `${infer Head}-${infer Tail}`
 type Tag = keyof JSX.IntrinsicElements
 
 // A part's element props, without the ones its slot or options name.
-type ElementProps<T extends Tag, State, Named> = Omit<PartProps<T, State>, keyof Named>
+type ElementProps<T extends Tag, State, Named> = Omit<
+  PartProps<T, State>,
+  keyof Named
+>
 
 // A part's props: what its slot and, for a root, the options name, and its element's.
 type Props<Named, State, T extends Tag> = Named & ElementProps<T, State, Named>
@@ -820,12 +1013,19 @@ type Known<X> = 0 extends 1 & X ? {} : X
 
 // A slot's props as a part takes them. Its `id` is the element's, which the
 // slot reads only when its schema names it.
-type NamedProps<P extends Primitive, S extends SlotName<P>> = Omit<Known<PropsOf<P, S>>, "id">
+type NamedProps<P extends Primitive, S extends SlotName<P>> = Omit<
+  Known<PropsOf<P, S>>,
+  "id"
+>
 
 // A generic primitive's types for parameters `T` and `U`, or the primitive's own without one.
-type GenericOf<P> = P extends { generic?: infer G extends PrimitiveGeneric } ? G : never
+type GenericOf<P> = P extends { generic?: infer G extends PrimitiveGeneric }
+  ? G
+  : never
 type Applied<G, T, U> = G & { T: T; U: U }
-type DefaultOf<G extends PrimitiveGeneric, K extends "T" | "U"> = G extends { defaults: Record<K, infer D> }
+type DefaultOf<G extends PrimitiveGeneric, K extends "T" | "U"> = G extends {
+  defaults: Record<K, infer D>
+}
   ? D & G[K]
   : G[K]
 // A generic's options never include `id`, and an `Omit` there would stop TypeScript inferring its parameters.
@@ -835,25 +1035,31 @@ type OptionsIn<P extends Primitive, A> = [A] extends [never]
   : A extends { options: infer O }
     ? O
     : OptionsOf<P>
-type StateIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [never]
+type StateIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [
+  never,
+]
   ? Known<StateOf<P, S>>
   : A extends { state: Record<S, infer State> }
     ? State
     : Known<StateOf<P, S>>
-type PropsIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [never]
+type PropsIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [
+  never,
+]
   ? NamedProps<P, S>
   : A extends { props: Record<S, infer Named> }
     ? Named
     : NamedProps<P, S>
 
 // The root's component: generic over the primitive's parameters when it has them.
-type RootOf<P extends Primitive, T extends Tag | undefined> = [GenericOf<P>] extends [never]
+type RootOf<P extends Primitive, T extends Tag | undefined> = [
+  GenericOf<P>,
+] extends [never]
   ? (props: RootPropsIn<P, never, T>) => JSX.Element
   : <
       A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">,
       B extends GenericOf<P>["U"] = DefaultOf<GenericOf<P>, "U">,
     >(
-      props: GenericRootProps<P, Applied<GenericOf<P>, A, B>, T>,
+      props: GenericRootProps<P, Applied<GenericOf<P>, A, B>, T>
     ) => JSX.Element
 // Indexed, not matched with a conditional, so TypeScript infers the parameters from the props.
 type GenericRootProps<
@@ -861,14 +1067,28 @@ type GenericRootProps<
   A extends PrimitiveGeneric,
   T extends Tag | undefined,
 > = T extends Tag
-  ? Props<A["options"] & NamedProps<P, RootSlot<P>>, StateIn<P, RootSlot<P>, A>, T>
+  ? Props<
+      A["options"] & NamedProps<P, RootSlot<P>>,
+      StateIn<P, RootSlot<P>, A>,
+      T
+    >
   : A["options"] & { children?: JSX.Element }
-type RootPropsIn<P extends Primitive, A, T extends Tag | undefined> = T extends Tag
-  ? Props<OptionsIn<P, A> & PropsIn<P, RootSlot<P>, A>, StateIn<P, RootSlot<P>, A>, T>
+type RootPropsIn<
+  P extends Primitive,
+  A,
+  T extends Tag | undefined,
+> = T extends Tag
+  ? Props<
+      OptionsIn<P, A> & PropsIn<P, RootSlot<P>, A>,
+      StateIn<P, RootSlot<P>, A>,
+      T
+    >
   : OptionsIn<P, A> & { children?: JSX.Element }
 
 // A part's component: generic when the primitive's parameters reach its props or state.
-type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [GenericOf<P>] extends [never]
+type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [
+  GenericOf<P>,
+] extends [never]
   ? (props: Props<NamedProps<P, S>, Known<StateOf<P, S>>, T>) => JSX.Element
   : GenericOf<P> extends { props: Record<S, unknown> }
     ? <A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">>(
@@ -876,9 +1096,11 @@ type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [Generi
           (Applied<GenericOf<P>, A, unknown>["props"] & Record<S, unknown>)[S],
           StateIn<P, S, Applied<GenericOf<P>, A, unknown>>,
           T
-        >,
+        >
       ) => JSX.Element
-    : (props: Props<NamedProps<P, S>, StateIn<P, S, GenericOf<P>>, T>) => JSX.Element
+    : (
+        props: Props<NamedProps<P, S>, StateIn<P, S, GenericOf<P>>, T>
+      ) => JSX.Element
 
 /**
  * The components `createParts` makes: `Root`, and one per tagged slot, named in Pascal case.
@@ -888,7 +1110,10 @@ type Parts<P extends Primitive, Tags extends { [S in SlotName<P>]?: Tag }> = {
   Root: RootOf<P, Tags extends { root: Tag } ? Tags["root"] : undefined>
 } & {
   [
-    S in keyof TypesOf<P>["slots"] as S extends Exclude<keyof Tags, "root"> & string ? Pascal<S> : never
+    S in keyof TypesOf<P>["slots"] as S extends Exclude<keyof Tags, "root"> &
+      string
+      ? Pascal<S>
+      : never
   ]: PartOf<P, S & SlotName<P>, NonNullable<Tags[S & keyof Tags]> & Tag>
 }
 
@@ -904,10 +1129,10 @@ type Parts<P extends Primitive, Tags extends { [S in SlotName<P>]?: Tag }> = {
  * const { Root: Playlist, Track: PlaylistTrack } = createParts(playlist, { root: "ul", track: "li" })
  * @stable
  */
-function createParts<P extends Primitive, Tags extends { [S in SlotName<P>]?: Tag }>(
-  primitive: P,
-  tags: Tags,
-) {
+function createParts<
+  P extends Primitive,
+  Tags extends { [S in SlotName<P>]?: Tag },
+>(primitive: P, tags: Tags) {
   const schema = schemaOf(primitive)
   const Scope = scopeOf(primitive)
   const name = pascal(primitive.name)
@@ -916,41 +1141,76 @@ function createParts<P extends Primitive, Tags extends { [S in SlotName<P>]?: Ta
   const rootTag = (tags as Record<string, Tag>).root
   const rootProps = schema.slots.root ?? {}
   parts.Root = (props) => {
-    const handle = usePrimitive(primitive, () => pick(props, schema.options) as OptionsOf<P>)
+    const handle = usePrimitive(
+      primitive,
+      () => pick(props, schema.options) as OptionsOf<P>
+    )
     if (rootTag) {
       const rest = elementProps(props, schema.options, rootProps)
-      return usePart(handle, "root" as never, () => pick(props, rootProps) as never, rest, rootTag)
+      return usePart(
+        handle,
+        "root" as never,
+        () => pick(props, rootProps) as never,
+        rest,
+        rootTag
+      )
     }
     return providePrimitive(handle, () => props.children)
   }
 
   for (const [slot, tag] of Object.entries(tags as Record<string, Tag>)) {
-    if (slot === "root") continue
+    if (slot === "root") {
+      continue
+    }
     const propsSchema = schema.slots[slot] ?? {}
-    const ids = Object.keys(propsSchema).filter((key) => kindOf(propsSchema[key]) === "id")
-    const key = Object.keys(propsSchema).find((key) => kindOf(propsSchema[key]) === "key")
+    const ids = Object.keys(propsSchema).filter(
+      (key) => kindOf(propsSchema[key]) === "id"
+    )
+    const key = Object.keys(propsSchema).find(
+      (key) => kindOf(propsSchema[key]) === "key"
+    )
     const required = Object.entries(propsSchema).flatMap(([key, spec]) =>
-      typeof spec === "object" && spec.required ? (fromOf(spec, key)?.slot ?? []) : [],
+      typeof spec === "object" && spec.required
+        ? (fromOf(spec, key)?.slot ?? [])
+        : []
     )
     parts[pascal(slot)] = (props) => {
       const scope = useContext(Scope)
-      if (!scope) throw new Error(`<${name}${pascal(slot)}> must be used inside <${name}>.`)
-      for (const parent of required)
-        if (!scope.around[parent])
-          throw new Error(`<${name}${pascal(slot)}> must be used inside <${name}${pascal(parent)}>.`)
+      if (!scope) {
+        throw new Error(
+          `<${name}${pascal(slot)}> must be used inside <${name}>.`
+        )
+      }
+      for (const parent of required) {
+        if (!scope.around[parent]) {
+          throw new Error(
+            `<${name}${pascal(slot)}> must be used inside <${name}${pascal(parent)}>.`
+          )
+        }
+      }
       // Unique ids for `id` props left out, made once.
       const made: Record<string, string> = {}
-      for (const key of ids) made[key] = createUniqueId()
+      for (const key of ids) {
+        made[key] = createUniqueId()
+      }
       const part = () => {
         const named = pick(props, propsSchema)
         for (const key in propsSchema) {
-          if (named[key] !== undefined) continue
+          if (named[key] !== undefined) {
+            continue
+          }
           const from = fromOf(propsSchema[key], key)
-          const value = made[key] ?? (from ? scope.around[from.slot]?.()[from.prop] : undefined)
-          if (value !== undefined) named[key] = value
+          const value =
+            made[key] ??
+            (from ? scope.around[from.slot]?.()[from.prop] : undefined)
+          if (value !== undefined) {
+            named[key] = value
+          }
         }
         // A list item is keyed by its value's key, which may be an object.
-        if (key) named.id = (scope.handle.api as ListApi).internal.keyOf(named[key])
+        if (key) {
+          named.id = (scope.handle.api as ListApi).internal.keyOf(named[key])
+        }
         return named
       }
       // An `id` the slot reads, like a toolbar item's key, is the element's own too.

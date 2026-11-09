@@ -48,7 +48,11 @@ const offsets = reactive<Record<Name, string>>({
           <ChevronDownIcon aria-hidden="true" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="value in choice.values" :key="value" :value="value">
+          <SelectItem
+            v-for="value in choice.values"
+            :key="value"
+            :value="value"
+          >
             {{ value }}px
             <SelectItemIndicator>
               <CheckIcon aria-hidden="true" />
@@ -66,7 +70,9 @@ const offsets = reactive<Record<Name, string>>({
         :collision-padding="Number(offsets.collisionPadding)"
       >
         <PopoverTitle>Delivery window</PopoverTitle>
-        <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
+        <PopoverDescription
+          >Arrives Tuesday between 9 AM and noon.</PopoverDescription
+        >
       </PopoverContent>
     </Popover>
   </div>

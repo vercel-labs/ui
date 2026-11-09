@@ -31,12 +31,19 @@ function mount(root: HTMLElement) {
   let layout = [30, 70]
   group.addEventListener("layoutchange", (event) => {
     const { value, reason } = event.detail
-    if (format(value) !== format(layout)) log(root, `${format(value)} (${reason})`)
+    if (format(value) !== format(layout)) {
+      log(root, `${format(value)} (${reason})`)
+    }
     layout = value
   })
-  root.querySelectorAll<HTMLButtonElement>("[data-layout]").forEach((button) => {
-    button.addEventListener("click", () => (group.layout = button.dataset.layout!.split(",").map(Number)))
-  })
+  root
+    .querySelectorAll<HTMLButtonElement>("[data-layout]")
+    .forEach((button) => {
+      button.addEventListener(
+        "click",
+        () => (group.layout = button.dataset.layout!.split(",").map(Number))
+      )
+    })
 }
 
 export { mount }

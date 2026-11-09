@@ -11,7 +11,11 @@ const frameworks = [
 
 function Example() {
   return (
-    <Listbox defaultValue="next" activation="manual" aria-label="Framework docs">
+    <Listbox
+      defaultValue="next"
+      activation="manual"
+      aria-label="Framework docs"
+    >
       <For each={frameworks}>
         {(framework) => (
           <ListboxItem

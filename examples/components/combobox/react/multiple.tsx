@@ -32,7 +32,11 @@ const frameworkLabel = (value: string) =>
 
 function Example() {
   return (
-    <Combobox multiple defaultValue={["next", "astro"]} itemToLabel={frameworkLabel}>
+    <Combobox
+      multiple
+      defaultValue={["next", "astro"]}
+      itemToLabel={frameworkLabel}
+    >
       <div data-slot="stack">
         <ComboboxLabel>Frameworks</ComboboxLabel>
         <div data-slot="row">
@@ -42,7 +46,9 @@ function Example() {
                 (state.value as string[]).map((value, index) => (
                   <ComboboxChip key={value} value={value}>
                     {state.labels[index]}
-                    <ComboboxChipRemove aria-label={`Remove ${state.labels[index]}`}>
+                    <ComboboxChipRemove
+                      aria-label={`Remove ${state.labels[index]}`}
+                    >
                       <XIcon aria-hidden="true" />
                     </ComboboxChipRemove>
                   </ComboboxChip>
@@ -60,7 +66,11 @@ function Example() {
         <ComboboxEmpty>No frameworks found.</ComboboxEmpty>
         <ComboboxList>
           {frameworks.map((framework) => (
-            <ComboboxItem key={framework.value} value={framework.value} label={framework.label}>
+            <ComboboxItem
+              key={framework.value}
+              value={framework.value}
+              label={framework.label}
+            >
               {framework.label}
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />

@@ -9,7 +9,8 @@
  * `"content"` is the sheet's own size. None can be larger than the sheet.
  * @stable
  */
-type SnapPoint = number | `${number}px` | `${number}rem` | `${number}%` | "content"
+type SnapPoint =
+  number | `${number}px` | `${number}rem` | `${number}%` | "content"
 
 /** A snap point resolved to an extent. Points within 1px of each other share one entry. */
 type ResolvedSnapPoint = {
@@ -30,14 +31,24 @@ function snapPointId(point: SnapPoint) {
 // The extent of one snap point, or NaN when it can't be read.
 function snapPointExtent(
   point: SnapPoint,
-  context: { container: number; content: number; rootFontSize: number },
+  context: { container: number; content: number; rootFontSize: number }
 ) {
-  if (typeof point === "number") return point <= 1 ? point * context.container : point
-  if (point === "content") return context.content
+  if (typeof point === "number") {
+    return point <= 1 ? point * context.container : point
+  }
+  if (point === "content") {
+    return context.content
+  }
   const amount = parseFloat(point)
-  if (point.endsWith("rem")) return amount * context.rootFontSize
-  if (point.endsWith("%")) return (amount / 100) * context.container
-  if (point.endsWith("px")) return amount
+  if (point.endsWith("rem")) {
+    return amount * context.rootFontSize
+  }
+  if (point.endsWith("%")) {
+    return (amount / 100) * context.container
+  }
+  if (point.endsWith("px")) {
+    return amount
+  }
   return NaN
 }
 
@@ -50,7 +61,7 @@ function snapPointExtent(
  */
 function resolveSnapPoints(
   points: readonly SnapPoint[],
-  context: { container: number; content: number; rootFontSize: number },
+  context: { container: number; content: number; rootFontSize: number }
 ) {
   const measured = points
     .map((value, index) => ({
@@ -66,8 +77,9 @@ function resolveSnapPoints(
     const previous = resolved[resolved.length - 1]
     if (previous && point.extent - previous.extent < 1) {
       previous.ids.push(id)
-      if (point.index > previous.index)
+      if (point.index > previous.index) {
         Object.assign(previous, { id, value: point.value, index: point.index })
+      }
       previous.extent = Math.max(previous.extent, point.extent)
       continue
     }
@@ -83,8 +95,13 @@ function resolveSnapPoints(
 }
 
 /** The index of the resolved entry a snap point merged into, or -1. */
-function findSnapIndex(resolved: readonly ResolvedSnapPoint[], point: SnapPoint | string | null | undefined) {
-  if (point === null || point === undefined) return -1
+function findSnapIndex(
+  resolved: readonly ResolvedSnapPoint[],
+  point: SnapPoint | string | null | undefined
+) {
+  if (point === null || point === undefined) {
+    return -1
+  }
   const id = String(point)
   return resolved.findIndex((entry) => entry.ids.includes(id))
 }
@@ -93,11 +110,17 @@ function findSnapIndex(resolved: readonly ResolvedSnapPoint[], point: SnapPoint 
 function isAtOrBelow(
   resolved: readonly ResolvedSnapPoint[],
   point: SnapPoint | string | null | undefined,
-  limit: SnapPoint | string | null | undefined,
+  limit: SnapPoint | string | null | undefined
 ) {
   const below = findSnapIndex(resolved, limit)
   const index = findSnapIndex(resolved, point)
   return below >= 0 && index >= 0 && index <= below
 }
 
-export { findSnapIndex, isAtOrBelow, type ResolvedSnapPoint, resolveSnapPoints, type SnapPoint }
+export {
+  findSnapIndex,
+  isAtOrBelow,
+  type ResolvedSnapPoint,
+  resolveSnapPoints,
+  type SnapPoint,
+}

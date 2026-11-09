@@ -8,9 +8,15 @@ const templateOf = (el: Element | null | undefined) =>
 
 // A new part, or a copy of the template's part with the same tag. A container,
 // like a group, copies only itself.
-function copy(template: HTMLTemplateElement | null | undefined, tagName: string, deep = true) {
+function copy(
+  template: HTMLTemplateElement | null | undefined,
+  tagName: string,
+  deep = true
+) {
   const model = template?.content.querySelector(tagName)
-  return model ? (model.cloneNode(deep) as HTMLElement) : document.createElement(tagName)
+  return model
+    ? (model.cloneNode(deep) as HTMLElement)
+    : document.createElement(tagName)
 }
 
 // A part with attributes and text. The text goes in its text part, like
@@ -19,17 +25,22 @@ function element(
   tagName: string,
   attributes: Record<string, string | boolean | undefined> = {},
   text?: string,
-  template?: HTMLTemplateElement | null,
+  template?: HTMLTemplateElement | null
 ) {
   const el = copy(template, tagName)
   for (const [name, value] of Object.entries(attributes)) {
-    if (value === undefined || value === false) continue
+    if (value === undefined || value === false) {
+      continue
+    }
     el.setAttribute(name, value === true ? "" : value)
   }
   if (text) {
     const slot = el.querySelector(`${tagName}-text`)
-    if (slot) slot.textContent = text
-    else el.prepend(text)
+    if (slot) {
+      slot.textContent = text
+    } else {
+      el.prepend(text)
+    }
   }
   return el
 }
@@ -50,24 +61,46 @@ const itemText = {
 }
 
 // An empty part, kept out of the page while the list has matches.
-const stashedEmpty = { display: "block" as const, context: () => ({ stash: true }), kinds: { stash: null } }
+const stashedEmpty = {
+  display: "block" as const,
+  context: () => ({ stash: true }),
+  kinds: { stash: null },
+}
 
 // The parts for data items, like <ui-select-item> and <ui-select-group>, copied
 // from the template's. Values that aren't strings need `itemToValue` and are
 // written as their key.
 function renderListItems(
-  prefix: "ui-select" | "ui-combobox" | "ui-trigger-menu" | "ui-autocomplete" | "ui-command" | "ui-listbox",
+  prefix:
+    | "ui-select"
+    | "ui-combobox"
+    | "ui-trigger-menu"
+    | "ui-autocomplete"
+    | "ui-command"
+    | "ui-listbox",
   items: ListData<any>,
   toKey: (value: unknown) => string = (value) => String(value),
-  template?: HTMLTemplateElement | null,
+  template?: HTMLTemplateElement | null
 ) {
   return items.map((entry) => {
-    if (typeof entry === "string")
-      return element(`${prefix}-item`, { value: entry, label: entry }, entry, template)
-    if ("type" in entry && entry.type === "separator") return element(`${prefix}-separator`, {}, "", template)
+    if (typeof entry === "string") {
+      return element(
+        `${prefix}-item`,
+        { value: entry, label: entry },
+        entry,
+        template
+      )
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return element(`${prefix}-separator`, {}, "", template)
+    }
     if ("type" in entry && entry.type === "group") {
       const group = copy(template, `${prefix}-group`, false)
-      if (entry.label) group.append(element(`${prefix}-group-label`, {}, entry.label, template))
+      if (entry.label) {
+        group.append(
+          element(`${prefix}-group-label`, {}, entry.label, template)
+        )
+      }
       group.append(...renderListItems(prefix, entry.items, toKey, template))
       return group
     }
@@ -82,10 +115,14 @@ function renderListItems(
       `${prefix}-item`,
       { value: toKey(data.value), label: data.label, disabled: data.disabled },
       data.label,
-      template,
+      template
     )
-    if (data.keywords) el.setAttribute("keywords", data.keywords.join(","))
-    if (data.shortcut) el.setAttribute("shortcut", data.shortcut)
+    if (data.keywords) {
+      el.setAttribute("keywords", data.keywords.join(","))
+    }
+    if (data.shortcut) {
+      el.setAttribute("shortcut", data.shortcut)
+    }
     return el
   })
 }
@@ -94,11 +131,16 @@ function renderListItems(
 function valuesOf(
   keys: string[],
   items: ListData<unknown> | undefined,
-  itemToValue?: (value: unknown) => string,
+  itemToValue?: (value: unknown) => string
 ) {
-  if (!items) return keys
+  if (!items) {
+    return keys
+  }
   const byKey = new Map(
-    flattenData(items, (value) => itemKey(value, itemToValue)).map((entry) => [entry.key, entry]),
+    flattenData(items, (value) => itemKey(value, itemToValue)).map((entry) => [
+      entry.key,
+      entry,
+    ])
   )
   return keys.map((key) => byKey.get(key)?.value ?? key)
 }
@@ -118,11 +160,14 @@ function adoptDefaultValue(
           options: () => { itemToValue?: (value: any) => string }
         }
       }
-    | undefined,
+    | undefined
 ) {
   const start = el.getAttribute("default-value") ?? el.getAttribute("value")
-  if (start === null || !items || !api) return
-  const multiple = el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
+  if (start === null || !items || !api) {
+    return
+  }
+  const multiple =
+    el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
   const keys = multiple ? listAttribute(start) : [start]
   const current = api.getValue()
   const named = multiple
@@ -130,9 +175,13 @@ function adoptDefaultValue(
       current.length === keys.length &&
       current.every((value, index) => value === keys[index])
     : current === keys[0]
-  if (!named) return
+  if (!named) {
+    return
+  }
   const values = valuesOf(keys, items, api.internal.options().itemToValue)
-  if (values.every((value, index) => value === keys[index])) return
+  if (values.every((value, index) => value === keys[index])) {
+    return
+  }
   api.internal.adoptValue(multiple ? values : values[0])
 }
 
@@ -151,11 +200,19 @@ function renderData(
   prefix: "ui-select" | "ui-autocomplete" | "ui-command",
   visible: ListData<any>,
   template: HTMLTemplateElement | null,
-  toKey?: (value: unknown) => string,
+  toKey?: (value: unknown) => string
 ) {
-  const own = Array.from(list.querySelectorAll(`${prefix}-item`)).some((item) => !generatedItems.has(item))
-  if (!own && renderedData.get(list) === visible) return
-  for (const child of Array.from(list.children)) if (generatedItems.has(child)) child.remove()
+  const own = Array.from(list.querySelectorAll(`${prefix}-item`)).some(
+    (item) => !generatedItems.has(item)
+  )
+  if (!own && renderedData.get(list) === visible) {
+    return
+  }
+  for (const child of Array.from(list.children)) {
+    if (generatedItems.has(child)) {
+      child.remove()
+    }
+  }
   if (own) {
     renderedData.delete(list)
     return
@@ -164,11 +221,19 @@ function renderData(
   const fresh = renderListItems(prefix, visible, toKey, template)
   for (const el of fresh) {
     generatedItems.add(el)
-    el.querySelectorAll(`${prefix}-item`).forEach((item) => generatedItems.add(item))
-    if (el.localName === `${prefix}-item`) generatedItems.add(el)
+    el.querySelectorAll(`${prefix}-item`).forEach((item) =>
+      generatedItems.add(item)
+    )
+    if (el.localName === `${prefix}-item`) {
+      generatedItems.add(el)
+    }
   }
-  const after = Array.from(list.children).find((child) => child.localName !== `${prefix}-select-all`)
-  for (const el of fresh) list.insertBefore(el, after ?? null)
+  const after = Array.from(list.children).find(
+    (child) => child.localName !== `${prefix}-select-all`
+  )
+  for (const el of fresh) {
+    list.insertBefore(el, after ?? null)
+  }
 }
 
 export {

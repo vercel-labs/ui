@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, expectTypeOf, test, vi } from "vitest"
 import { createAsyncOptions } from "../src/foundation/lists/async-options"
-import { combobox, type ComboboxValueChangeReason } from "../src/components/combobox/combobox"
+import {
+  combobox,
+  type ComboboxValueChangeReason,
+} from "../src/components/combobox/combobox"
 import {
   createListbox,
   filterData,
@@ -12,7 +15,11 @@ import {
 } from "../src/foundation/lists/listbox"
 import type { ChangeDetails } from "../src/foundation/kernel/details"
 import { createStore } from "../src/foundation/kernel/store"
-import { createSelectController, select, type SelectOpenChangeReason } from "../src/components/select/select"
+import {
+  createSelectController,
+  select,
+  type SelectOpenChangeReason,
+} from "../src/components/select/select"
 
 const fruits: ListData = [
   { value: "apple", label: "Apple" },
@@ -34,7 +41,9 @@ describe("item keys", () => {
     expect(itemKey("pro")).toBe("pro")
     expect(itemKey({ value: "pro", label: "Pro" })).toBe("pro")
     expect(itemKey({ id: 42, name: "Ada" })).toBe("42")
-    expect(itemKey({ email: "a@b.c" }, (user) => (user as { email: string }).email)).toBe("a@b.c")
+    expect(
+      itemKey({ email: "a@b.c" }, (user) => (user as { email: string }).email)
+    ).toBe("a@b.c")
     expect(itemKey(null)).toBe("")
   })
 })
@@ -47,19 +56,33 @@ describe("filtering", () => {
   })
 
   test("keywords match too", () => {
-    expect(itemMatches({ value: "banana", label: "Banana", keywords: ["yellow"] }, "yell", "contains")).toBe(
-      true,
-    )
+    expect(
+      itemMatches(
+        { value: "banana", label: "Banana", keywords: ["yellow"] },
+        "yell",
+        "contains"
+      )
+    ).toBe(true)
   })
 
   test("false keeps everything, and a function decides for itself", () => {
     expect(itemMatches({ value: "a", label: "Apple" }, "zzz", false)).toBe(true)
-    expect(itemMatches({ value: "a", label: "Apple" }, "zzz", (item, query) => query === "zzz")).toBe(true)
+    expect(
+      itemMatches(
+        { value: "a", label: "Apple" },
+        "zzz",
+        (item, query) => query === "zzz"
+      )
+    ).toBe(true)
   })
 
   test("groups keep only matching items, and drop when empty", () => {
     expect(filterData(fruits, "blue", "contains")).toEqual([
-      { type: "group", label: "Berries", items: [{ value: "blueberry", label: "Blueberry" }] },
+      {
+        type: "group",
+        label: "Berries",
+        items: [{ value: "blueberry", label: "Blueberry" }],
+      },
     ])
   })
 
@@ -73,13 +96,29 @@ describe("filtering", () => {
     const separator = { type: "separator" } as const
     const fruit: ListData = ["Apple", separator, "Banana", separator, "Cherry"]
     expect(filterData(fruit, "apple", "contains")).toEqual(["Apple"])
-    const doubled: ListData = [separator, "Apple", separator, separator, "Avocado"]
-    expect(filterData(doubled, "a", "contains")).toEqual(["Apple", separator, "Avocado"])
+    const doubled: ListData = [
+      separator,
+      "Apple",
+      separator,
+      separator,
+      "Avocado",
+    ]
+    expect(filterData(doubled, "a", "contains")).toEqual([
+      "Apple",
+      separator,
+      "Avocado",
+    ])
   })
 
   test("flattening keeps order and each item's group", () => {
     const flat = flattenData(fruits, (value) => itemKey(value))
-    expect(flat.map((entry) => entry.key)).toEqual(["apple", "banana", "blueberry", "cherry", "Éclair"])
+    expect(flat.map((entry) => entry.key)).toEqual([
+      "apple",
+      "banana",
+      "blueberry",
+      "cherry",
+      "Éclair",
+    ])
     expect(flat[2].group).toBe(flat[3].group)
     expect(flat[3].disabled).toBe(true)
   })
@@ -88,10 +127,16 @@ describe("filtering", () => {
 describe("composed items", () => {
   // The fields the engine reads from an item's element.
   const element = () =>
-    ({ isConnected: true, parentNode: null, compareDocumentPosition: () => 4 }) as unknown as HTMLElement
+    ({
+      isConnected: true,
+      parentNode: null,
+      compareDocumentPosition: () => 4,
+    }) as unknown as HTMLElement
 
   test("a list whose items all unmounted counts none, even when nothing filters", () => {
-    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
     const listbox = createListbox({
       store,
       focus: "virtual",
@@ -103,7 +148,7 @@ describe("composed items", () => {
       active: () => true,
     })
     const unregister = ["a", "b"].map((key) =>
-      listbox.register(key, element(), () => ({ label: key, value: key })),
+      listbox.register(key, element(), () => ({ label: key, value: key }))
     )
     expect(listbox.count()).toBe(2)
     unregister.forEach((off) => off())
@@ -113,7 +158,9 @@ describe("composed items", () => {
 
 describe("navigation over data", () => {
   const make = (loop = true, query = "", skipDisabled = false) => {
-    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
     const listbox = createListbox({
       store,
       focus: "virtual",
@@ -168,7 +215,9 @@ describe("navigation over data", () => {
   })
 
   test("with skipDisabled and nothing enabled, steps land nowhere", () => {
-    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
     const listbox = createListbox({
       store,
       focus: "virtual",
@@ -190,7 +239,9 @@ describe("navigation over data", () => {
   })
 
   test("with skipDisabled, the last enabled item counts as the end of the page", () => {
-    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
     let reached = 0
     const listbox = createListbox({
       store,
@@ -228,7 +279,9 @@ describe("navigation over data", () => {
   })
 
   test("typeahead from a disabled item finds the next match after it", () => {
-    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
     const listbox = createListbox({
       store,
       focus: "virtual",
@@ -288,7 +341,9 @@ describe("navigation over data", () => {
       label: `Item ${index}`,
     }))
     let query = ""
-    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
     const listbox = createListbox({
       store,
       focus: "virtual",
@@ -301,7 +356,9 @@ describe("navigation over data", () => {
     })
     listbox.entries()
     let start = performance.now()
-    for (let step = 0; step < 100; step++) listbox.move(1)
+    for (let step = 0; step < 100; step++) {
+      listbox.move(1)
+    }
     const move = (performance.now() - start) / 100
     start = performance.now()
     query = "99"
@@ -317,14 +374,22 @@ describe("select and combobox headless", () => {
   test("a select opens, chooses an item and closes with reasons", () => {
     const onValueChange = vi.fn()
     const onOpenChange = vi.fn()
-    const instance = select({ id: "s", items: fruits, onValueChange, onOpenChange })
+    const instance = select({
+      id: "s",
+      items: fruits,
+      onValueChange,
+      onOpenChange,
+    })
     const api = instance.api
     api.open()
-    expect(onOpenChange).toHaveBeenLastCalledWith(true, expect.objectContaining({ reason: "imperative" }))
+    expect(onOpenChange).toHaveBeenLastCalledWith(
+      true,
+      expect.objectContaining({ reason: "imperative" })
+    )
     api.internal.choose("banana")
     expect(onValueChange).toHaveBeenLastCalledWith(
       "banana",
-      expect.objectContaining({ reason: "item-press" }),
+      expect.objectContaining({ reason: "item-press" })
     )
     expect(api.isOpen()).toBe(false)
     expect(api.internal.labels()).toEqual(["Banana"])
@@ -366,14 +431,16 @@ describe("select and combobox headless", () => {
     const instance = combobox({ id: "c", items: fruits, onQueryChange })
     const api = instance.api
     api.setQuery("bl")
-    expect(api.internal.listbox.entries().map((entry) => entry.key)).toEqual(["blueberry"])
+    expect(api.internal.listbox.entries().map((entry) => entry.key)).toEqual([
+      "blueberry",
+    ])
     api.open()
     api.internal.choose("blueberry")
     expect(api.getValue()).toBe("blueberry")
     expect(api.getQuery()).toBe("Blueberry")
     expect(onQueryChange).toHaveBeenLastCalledWith(
       "Blueberry",
-      expect.objectContaining({ reason: "item-press" }),
+      expect.objectContaining({ reason: "item-press" })
     )
     // The chosen label shows every item until the user types again.
     expect(api.internal.listbox.entries()).toHaveLength(5)
@@ -381,16 +448,26 @@ describe("select and combobox headless", () => {
 
   test("a controlled value shows its label as the options land, and onQueryChange still hears it", () => {
     const onQueryChange = vi.fn()
-    const instance = combobox({ id: "c", items: fruits, value: "apple", onQueryChange })
+    const instance = combobox({
+      id: "c",
+      items: fruits,
+      value: "apple",
+      onQueryChange,
+    })
     const queries: string[] = []
     instance.subscribe(() => queries.push(instance.api.getQuery()))
-    instance.setOptions({ id: "c", items: fruits, value: "blueberry", onQueryChange })
+    instance.setOptions({
+      id: "c",
+      items: fruits,
+      value: "blueberry",
+      onQueryChange,
+    })
     expect(instance.api.getQuery()).toBe("Blueberry")
     expect(queries.every((query) => query === "Blueberry")).toBe(true)
     expect(onQueryChange).toHaveBeenCalledOnce()
     expect(onQueryChange).toHaveBeenLastCalledWith(
       "Blueberry",
-      expect.objectContaining({ reason: "imperative" }),
+      expect.objectContaining({ reason: "imperative" })
     )
   })
 
@@ -404,17 +481,27 @@ describe("select and combobox headless", () => {
       { value: "a", label: "Apricot" },
       { value: "b", label: "Blackberry" },
     ]
-    const instance = combobox({ id: "c", items: before, value: "a", onQueryChange })
+    const instance = combobox({
+      id: "c",
+      items: before,
+      value: "a",
+      onQueryChange,
+    })
     instance.setOptions({ id: "c", items: after, value: "b", onQueryChange })
     expect(instance.api.getQuery()).toBe("Blackberry")
     expect(onQueryChange).toHaveBeenLastCalledWith(
       "Blackberry",
-      expect.objectContaining({ reason: "imperative" }),
+      expect.objectContaining({ reason: "imperative" })
     )
   })
 
   test("a multiple combobox empties its text after each choice and respects maxSelected", () => {
-    const instance = combobox({ id: "c", items: fruits, multiple: true, maxSelected: 2 })
+    const instance = combobox({
+      id: "c",
+      items: fruits,
+      multiple: true,
+      maxSelected: 2,
+    })
     const api = instance.api
     api.open()
     api.setQuery("a")
@@ -444,7 +531,8 @@ describe("select and combobox headless", () => {
   test("the create option hides on an exact match and respects minLength", () => {
     const instance = combobox({ id: "c", items: fruits })
     const api = instance.api
-    const state = () => instance.get() as Parameters<typeof api.internal.createShown>[0]
+    const state = () =>
+      instance.get() as Parameters<typeof api.internal.createShown>[0]
     api.setQuery("apple")
     expect(api.internal.createShown(state())).toBe(false)
     api.setQuery("kiwi")
@@ -457,12 +545,19 @@ describe("select and combobox controller results", () => {
     const instance = select({ id: "s", items: fruits })
     const result = instance.api.open()
     instance.api.internal.choose("apple")
-    expect(await result).toEqual({ reason: "item-press", source: "programmatic" })
+    expect(await result).toEqual({
+      reason: "item-press",
+      source: "programmatic",
+    })
   })
 
   test("a pending open() resolves with reason unmount when the select leaves the page", async () => {
     const reasons: string[] = []
-    const instance = select({ id: "s", items: fruits, onOpenChange: (_, { reason }) => reasons.push(reason) })
+    const instance = select({
+      id: "s",
+      items: fruits,
+      onOpenChange: (_, { reason }) => reasons.push(reason),
+    })
     const result = instance.api.open()
     instance.destroy()
     expect(await result).toEqual({ reason: "unmount", source: "programmatic" })
@@ -487,7 +582,11 @@ describe("select and combobox controller results", () => {
   })
 
   test("a refused open resolves at once with the reason it asked with", async () => {
-    const instance = select({ id: "s", items: fruits, onOpenChange: (_, details) => details.cancel() })
+    const instance = select({
+      id: "s",
+      items: fruits,
+      onOpenChange: (_, details) => details.cancel(),
+    })
     expect(await instance.api.open({ reason: "trigger-press" })).toEqual({
       reason: "trigger-press",
       source: "programmatic",
@@ -497,10 +596,15 @@ describe("select and combobox controller results", () => {
   test("results and details are typed by the component's reasons", () => {
     const controller = createSelectController()
     type Result = Awaited<ReturnType<typeof controller.open>>
-    expectTypeOf<Result["reason"]>().toEqualTypeOf<SelectOpenChangeReason | "unmount">()
+    expectTypeOf<Result["reason"]>().toEqualTypeOf<
+      SelectOpenChangeReason | "unmount"
+    >()
     const check = (details: ChangeDetails<ComboboxValueChangeReason>) => {
-      if (details.reason === "remove-press")
-        expectTypeOf(details.event).toEqualTypeOf<MouseEvent | KeyboardEvent | undefined>()
+      if (details.reason === "remove-press") {
+        expectTypeOf(details.event).toEqualTypeOf<
+          MouseEvent | KeyboardEvent | undefined
+        >()
+      }
     }
     expect(check).toBeTypeOf("function")
   })
@@ -511,7 +615,11 @@ describe("select and combobox controller results", () => {
     instance.api.setValue("apple")
     expect(onValueChange).toHaveBeenLastCalledWith(
       "apple",
-      expect.objectContaining({ reason: "imperative", source: "programmatic", canceled: false }),
+      expect.objectContaining({
+        reason: "imperative",
+        source: "programmatic",
+        canceled: false,
+      })
     )
   })
 })
@@ -528,10 +636,13 @@ describe("async options", () => {
       (query, { signal }) =>
         new Promise<string[]>((resolve) => {
           calls.push(query)
-          const timer = setTimeout(() => resolve([`${query}-result`]), query === "a" ? 500 : 100)
+          const timer = setTimeout(
+            () => resolve([`${query}-result`]),
+            query === "a" ? 500 : 100
+          )
           signal.addEventListener("abort", () => clearTimeout(timer))
         }),
-      { debounce: 200 },
+      { debounce: 200 }
     )
     options.setQuery("a")
     await vi.advanceTimersByTimeAsync(250)
@@ -541,12 +652,18 @@ describe("async options", () => {
     options.setQuery("abc")
     await vi.advanceTimersByTimeAsync(400)
     expect(calls).toEqual(["a", "abc"])
-    expect(options.getState()).toMatchObject({ query: "abc", items: ["abc-result"], status: "idle" })
+    expect(options.getState()).toMatchObject({
+      query: "abc",
+      items: ["abc-result"],
+      status: "idle",
+    })
   })
 
   test("reports loading while typing pauses, before the load starts", async () => {
     vi.useFakeTimers()
-    const options = createAsyncOptions(async (query) => [query], { debounce: 200 })
+    const options = createAsyncOptions(async (query) => [query], {
+      debounce: 200,
+    })
     options.setQuery("b")
     expect(options.getState().status).toBe("loading")
     await vi.advanceTimersByTimeAsync(250)
@@ -561,17 +678,22 @@ describe("async options", () => {
     let fail = false
     const options = createAsyncOptions(
       async (query, { page }) => {
-        if (fail) throw new Error("offline")
+        if (fail) {
+          throw new Error("offline")
+        }
         return { items: [`${query}-${page}`], hasMore: page < 1 }
       },
-      { debounce: 0 },
+      { debounce: 0 }
     )
     options.setQuery("x")
     await vi.advanceTimersByTimeAsync(1)
     expect(options.getState().items).toEqual(["x-0"])
     options.loadMore()
     await vi.advanceTimersByTimeAsync(1)
-    expect(options.getState()).toMatchObject({ items: ["x-0", "x-1"], hasMore: false })
+    expect(options.getState()).toMatchObject({
+      items: ["x-0", "x-1"],
+      hasMore: false,
+    })
     fail = true
     options.setQuery("y")
     await vi.advanceTimersByTimeAsync(0)

@@ -23,7 +23,14 @@ type CanvasRect = { left: number; top: number; right: number; bottom: number }
  * Why the viewport moved.
  * @experimental
  */
-type ViewportReason = "wheel" | "drag" | "pinch" | "zoom-key" | "focus-in" | "find-in-page" | "imperative"
+type ViewportReason =
+  | "wheel"
+  | "drag"
+  | "pinch"
+  | "zoom-key"
+  | "focus-in"
+  | "find-in-page"
+  | "imperative"
 
 /**
  * How `createViewport` keeps the viewport.
@@ -35,7 +42,10 @@ type ViewportOptions<State extends object> = {
   /** The element that clips the canvas and takes the gestures. */
   surface: () => HTMLElement | null | undefined
   /** Asks for a new viewport. Defaults to setting the state key; pass the primitive's change to make it controllable. */
-  set?: (value: Viewport, details: { reason: ViewportReason; event?: Event }) => boolean
+  set?: (
+    value: Viewport,
+    details: { reason: ViewportReason; event?: Event }
+  ) => boolean
   /** @defaultValue 0.1 */
   minZoom?: () => number
   /** @defaultValue 4 */
@@ -74,27 +84,43 @@ const wheelUnit = (event: WheelEvent, surface: HTMLElement) =>
  */
 function createViewport<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: ViewportOptions<State>,
+  options: ViewportOptions<State>
 ) {
   const { store } = context
   const minZoom = () => options.minZoom?.() ?? 0.1
   const maxZoom = () => options.maxZoom?.() ?? 4
-  const clampZoom = (zoom: number) => Math.min(maxZoom(), Math.max(minZoom(), zoom))
-  const set = (value: Viewport, details: { reason: ViewportReason; event?: Event }) =>
-    options.set ? options.set(value, details) : (store.set({ [options.key]: value } as Partial<State>), true)
+  const clampZoom = (zoom: number) =>
+    Math.min(maxZoom(), Math.max(minZoom(), zoom))
+  const set = (
+    value: Viewport,
+    details: { reason: ViewportReason; event?: Event }
+  ) =>
+    options.set
+      ? options.set(value, details)
+      : (store.set({ [options.key]: value } as Partial<State>), true)
   const origin = () => {
     const box = options.surface()?.getBoundingClientRect()
-    return { left: box?.left ?? 0, top: box?.top ?? 0, width: box?.width ?? 0, height: box?.height ?? 0 }
+    return {
+      left: box?.left ?? 0,
+      top: box?.top ?? 0,
+      width: box?.width ?? 0,
+      height: box?.height ?? 0,
+    }
   }
   // Pointers pressed on the surface, for drag and pinch.
   const pointers = new Map<number, { x: number; y: number }>()
-  let gesture: { center: { x: number; y: number }; distance: number; view: Viewport } | null = null
+  let gesture: {
+    center: { x: number; y: number }
+    distance: number
+    view: Viewport
+  } | null = null
   let stop: (() => void) | undefined
   context.onDestroy(() => stop?.())
   // The pane `bindFindable` keeps at rest, and where it rests, which the world's `style` offsets by.
   let findable: HTMLElement | undefined
   let rested = { x: 0, y: 0 }
-  const restyle = () => store.set({ [options.key]: { ...api.get() } } as Partial<State>)
+  const restyle = () =>
+    store.set({ [options.key]: { ...api.get() } } as Partial<State>)
 
   const api = {
     /** The viewport now. */
@@ -105,13 +131,19 @@ function createViewport<State extends object>(
     toCanvas(clientX: number, clientY: number) {
       const { x, y, zoom } = api.get()
       const box = origin()
-      return { x: (clientX - box.left - x) / zoom, y: (clientY - box.top - y) / zoom }
+      return {
+        x: (clientX - box.left - x) / zoom,
+        y: (clientY - box.top - y) / zoom,
+      }
     },
     /** A canvas point on screen, in client pixels. */
     toScreen(point: { x: number; y: number }) {
       const { x, y, zoom } = api.get()
       const box = origin()
-      return { x: point.x * zoom + x + box.left, y: point.y * zoom + y + box.top }
+      return {
+        x: point.x * zoom + x + box.left,
+        y: point.y * zoom + y + box.top,
+      }
     },
     /** Where an element is on the canvas, like a port inside a node, from its box on screen. */
     rectOf(el: Element) {
@@ -134,18 +166,24 @@ function createViewport<State extends object>(
     /** Moves to a viewport, keeping the zoom within bounds. */
     setViewport(
       value: Viewport,
-      details: { reason: ViewportReason; event?: Event } = { reason: "imperative" },
+      details: { reason: ViewportReason; event?: Event } = {
+        reason: "imperative",
+      }
     ) {
       const next = { x: value.x, y: value.y, zoom: clampZoom(value.zoom) }
       const now = api.get()
-      if (next.x === now.x && next.y === now.y && next.zoom === now.zoom) return false
+      if (next.x === now.x && next.y === now.y && next.zoom === now.zoom) {
+        return false
+      }
       return set(next, details)
     },
     /** Pans by screen pixels. */
     panBy(
       dx: number,
       dy: number,
-      details: { reason: ViewportReason; event?: Event } = { reason: "imperative" },
+      details: { reason: ViewportReason; event?: Event } = {
+        reason: "imperative",
+      }
     ) {
       const { x, y, zoom } = api.get()
       return api.setViewport({ x: x + dx, y: y + dy, zoom }, details)
@@ -154,7 +192,9 @@ function createViewport<State extends object>(
     zoomTo(
       zoom: number,
       at?: { x: number; y: number },
-      details: { reason: ViewportReason; event?: Event } = { reason: "imperative" },
+      details: { reason: ViewportReason; event?: Event } = {
+        reason: "imperative",
+      }
     ) {
       const view = api.get()
       const box = origin()
@@ -162,13 +202,18 @@ function createViewport<State extends object>(
       const py = (at?.y ?? box.top + box.height / 2) - box.top
       const next = clampZoom(zoom)
       const k = next / view.zoom
-      return api.setViewport({ x: px - (px - view.x) * k, y: py - (py - view.y) * k, zoom: next }, details)
+      return api.setViewport(
+        { x: px - (px - view.x) * k, y: py - (py - view.y) * k, zoom: next },
+        details
+      )
     },
     /** Zooms by a factor, like `1.2` in and `1 / 1.2` out. */
     zoomBy(
       factor: number,
       at?: { x: number; y: number },
-      details: { reason: ViewportReason; event?: Event } = { reason: "imperative" },
+      details: { reason: ViewportReason; event?: Event } = {
+        reason: "imperative",
+      }
     ) {
       return api.zoomTo(api.get().zoom * factor, at, details)
     },
@@ -176,7 +221,9 @@ function createViewport<State extends object>(
     fit(
       rect: CanvasRect,
       fitOptions: { padding?: number; maxZoom?: number } = {},
-      details: { reason: ViewportReason; event?: Event } = { reason: "imperative" },
+      details: { reason: ViewportReason; event?: Event } = {
+        reason: "imperative",
+      }
     ) {
       const box = origin()
       const padding = fitOptions.padding ?? 32
@@ -186,8 +233,8 @@ function createViewport<State extends object>(
         Math.min(
           (box.width - padding * 2) / width,
           (box.height - padding * 2) / height,
-          fitOptions.maxZoom ?? 1,
-        ),
+          fitOptions.maxZoom ?? 1
+        )
       )
       return api.setViewport(
         {
@@ -195,14 +242,16 @@ function createViewport<State extends object>(
           y: box.height / 2 - (rect.top + height / 2) * zoom,
           zoom,
         },
-        details,
+        details
       )
     },
     /** Pans the least distance that brings a canvas box into view, with `padding` screen pixels around it. */
     reveal(
       rect: CanvasRect,
       revealOptions: { padding?: number } = {},
-      details: { reason: ViewportReason; event?: Event } = { reason: "focus-in" },
+      details: { reason: ViewportReason; event?: Event } = {
+        reason: "focus-in",
+      }
     ) {
       const { zoom } = api.get()
       const seen = api.visible()
@@ -222,7 +271,9 @@ function createViewport<State extends object>(
     /** Pans with the wheel or a two finger scroll; zooms at the pointer with Ctrl or ⌘, and with a trackpad pinch, which browsers send as Ctrl. */
     wheel(event: WheelEvent) {
       const surface = options.surface()
-      if (!surface) return
+      if (!surface) {
+        return
+      }
       event.preventDefault()
       const unit = wheelUnit(event, surface)
       if (event.ctrlKey || event.metaKey) {
@@ -230,14 +281,26 @@ function createViewport<State extends object>(
         api.zoomBy(
           Math.exp(-delta * 0.01),
           { x: event.clientX, y: event.clientY },
-          { reason: "wheel", event },
+          { reason: "wheel", event }
         )
-      } else api.panBy(-event.deltaX * unit, -event.deltaY * unit, { reason: "wheel", event })
+      } else {
+        api.panBy(-event.deltaX * unit, -event.deltaY * unit, {
+          reason: "wheel",
+          event,
+        })
+      }
     },
     /** Pans while one pointer drags the surface, and pinches with two. Call it for presses on empty space. */
     pointerdown(event: PointerEvent) {
       const surface = options.surface()
-      if (!surface || (event.pointerType === "mouse" && event.button !== 0 && event.button !== 1)) return
+      if (
+        !surface ||
+        (event.pointerType === "mouse" &&
+          event.button !== 0 &&
+          event.button !== 1)
+      ) {
+        return
+      }
       event.preventDefault()
       try {
         surface.setPointerCapture(event.pointerId)
@@ -252,13 +315,19 @@ function createViewport<State extends object>(
           y: points.reduce((s, p) => s + p.y, 0) / points.length,
         }
         const distance =
-          points.length > 1 ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y) : 0
+          points.length > 1
+            ? Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y)
+            : 0
         gesture = { center, distance, view: api.get() }
       }
       begin()
-      if (pointers.size > 1) return
+      if (pointers.size > 1) {
+        return
+      }
       const move = (e: PointerEvent) => {
-        if (!pointers.has(e.pointerId) || !gesture) return
+        if (!pointers.has(e.pointerId) || !gesture) {
+          return
+        }
         pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
         const points = [...pointers.values()]
         const center = {
@@ -267,30 +336,41 @@ function createViewport<State extends object>(
         }
         const { view } = gesture
         if (points.length > 1 && gesture.distance) {
-          const distance = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y)
+          const distance = Math.hypot(
+            points[0].x - points[1].x,
+            points[0].y - points[1].y
+          )
           const zoom = clampZoom(view.zoom * (distance / gesture.distance))
           const box = origin()
           // The canvas point under the fingers' first center follows the center.
           const cx = (gesture.center.x - box.left - view.x) / view.zoom
           const cy = (gesture.center.y - box.top - view.y) / view.zoom
           api.setViewport(
-            { x: center.x - box.left - cx * zoom, y: center.y - box.top - cy * zoom, zoom },
-            { reason: "pinch", event: e },
+            {
+              x: center.x - box.left - cx * zoom,
+              y: center.y - box.top - cy * zoom,
+              zoom,
+            },
+            { reason: "pinch", event: e }
           )
-        } else
+        } else {
           api.setViewport(
             {
               x: view.x + center.x - gesture.center.x,
               y: view.y + center.y - gesture.center.y,
               zoom: view.zoom,
             },
-            { reason: "drag", event: e },
+            { reason: "drag", event: e }
           )
+        }
       }
       const up = (e: PointerEvent) => {
         pointers.delete(e.pointerId)
-        if (pointers.size) begin()
-        else end()
+        if (pointers.size) {
+          begin()
+        } else {
+          end()
+        }
       }
       const end = () => {
         pointers.clear()
@@ -307,7 +387,9 @@ function createViewport<State extends object>(
     },
     /** `+` and `-` zoom at the center, `0` goes back to 100%. Returns whether it handled the key. */
     keydown(event: KeyboardEvent, at?: { x: number; y: number }) {
-      if (event.altKey || event.ctrlKey || event.metaKey) return false
+      if (event.altKey || event.ctrlKey || event.metaKey) {
+        return false
+      }
       const factor =
         event.key === "+" || event.key === "="
           ? 1.25
@@ -316,17 +398,28 @@ function createViewport<State extends object>(
             : event.key === "0"
               ? 0
               : undefined
-      if (factor === undefined) return false
+      if (factor === undefined) {
+        return false
+      }
       event.preventDefault()
       const done = factor
         ? api.zoomBy(factor, at, { reason: "zoom-key", event })
         : api.zoomTo(1, at, { reason: "zoom-key", event })
-      if (done) announce(options.message?.(api.get().zoom) ?? `Zoom ${Math.round(api.get().zoom * 100)}%`)
+      if (done) {
+        announce(
+          options.message?.(api.get().zoom) ??
+            `Zoom ${Math.round(api.get().zoom * 100)}%`
+        )
+      }
       return true
     },
     /** The world element's `style`: one transform for every item, so panning lays nothing out. */
     style(state: State) {
-      const { x, y, zoom } = (state[options.key] ?? { x: 0, y: 0, zoom: 1 }) as Viewport
+      const { x, y, zoom } = (state[options.key] ?? {
+        x: 0,
+        y: 0,
+        zoom: 1,
+      }) as Viewport
       const at = findable ? rested : { x: 0, y: 0 }
       return `transform:translate(${x + at.x}px,${y + at.y}px) scale(${zoom});transform-origin:0 0;--canvas-zoom:${zoom}`
     },
@@ -356,13 +449,20 @@ function createViewport<State extends object>(
       let bound = true
       let frame = 0
       const settle = () => {
-        if (!bound) return
-        if (!spacer.isConnected) el.append(spacer)
-        const rtl = el.ownerDocument.defaultView?.getComputedStyle(el).direction === "rtl"
+        if (!bound) {
+          return
+        }
+        if (!spacer.isConnected) {
+          el.append(spacer)
+        }
+        const rtl =
+          el.ownerDocument.defaultView?.getComputedStyle(el).direction === "rtl"
         el.scrollLeft = rtl ? -rest : rest
         el.scrollTop = rest
         const at = { x: el.scrollLeft, y: el.scrollTop }
-        if (at.x === rested.x && at.y === rested.y) return
+        if (at.x === rested.x && at.y === rested.y) {
+          return
+        }
         rested = at
         restyle()
       }
@@ -375,12 +475,19 @@ function createViewport<State extends object>(
       const onScroll = (event: Event) => {
         // Without the spacer, like after a framework replaced the children, or
         // back at the origin, like after the pane was hidden, the rest was lost.
-        if (!spacer.isConnected || (!el.scrollLeft && !el.scrollTop)) return settle()
+        if (!spacer.isConnected || (!el.scrollLeft && !el.scrollTop)) {
+          return settle()
+        }
         const dx = el.scrollLeft - rested.x
         const dy = el.scrollTop - rested.y
-        if (!dx && !dy) return
+        if (!dx && !dy) {
+          return
+        }
         settle()
-        api.panBy(-dx, -dy, { reason: focusing ? "focus-in" : "find-in-page", event })
+        api.panBy(-dx, -dy, {
+          reason: focusing ? "focus-in" : "find-in-page",
+          event,
+        })
         // Chrome ignores the reset during a find in page scroll; the rest takes it, and goes back once the scroll is done.
         cancelAnimationFrame(frame)
         frame = requestAnimationFrame(settle)
@@ -392,7 +499,9 @@ function createViewport<State extends object>(
       el.addEventListener("focusin", onFocusIn)
       // A hidden pane, like in a closed tab or dialog, can't scroll: it rests once it shows, before it paints.
       const view = el.ownerDocument.defaultView
-      const sized = view?.ResizeObserver ? new view.ResizeObserver(settle) : undefined
+      const sized = view?.ResizeObserver
+        ? new view.ResizeObserver(settle)
+        : undefined
       sized?.observe(el)
       return () => {
         bound = false
@@ -401,7 +510,9 @@ function createViewport<State extends object>(
         el.removeEventListener("scroll", onScroll)
         el.removeEventListener("focusin", onFocusIn)
         spacer.remove()
-        if (findable !== el) return
+        if (findable !== el) {
+          return
+        }
         findable = undefined
         rested = { x: 0, y: 0 }
         el.scrollLeft = 0
@@ -413,4 +524,10 @@ function createViewport<State extends object>(
   return api
 }
 
-export { type CanvasRect, createViewport, type Viewport, type ViewportOptions, type ViewportReason }
+export {
+  type CanvasRect,
+  createViewport,
+  type Viewport,
+  type ViewportOptions,
+  type ViewportReason,
+}

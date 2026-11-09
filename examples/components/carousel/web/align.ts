@@ -1,6 +1,12 @@
 import "@ui-sdk/web/carousel"
 import "@ui-sdk/web/select"
-import { Check, ChevronDown, ChevronLeft, ChevronRight, createElement } from "lucide"
+import {
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  createElement,
+} from "lucide"
 
 const photos = [
   { name: "Dunes" },
@@ -36,7 +42,7 @@ function mount(root: HTMLElement) {
                     ${option.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -61,7 +67,9 @@ function mount(root: HTMLElement) {
   `
   const carousel = root.querySelector("ui-carousel")!
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
-    if (event.detail.value) carousel.setAttribute("align", String(event.detail.value))
+    if (event.detail.value) {
+      carousel.setAttribute("align", String(event.detail.value))
+    }
   })
 }
 

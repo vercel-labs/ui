@@ -113,7 +113,11 @@ async function mount(root: HTMLElement) {
         { value: "full", label: "Full size" },
       ],
     },
-    { type: "submenu", label: "Panels", items: [{ value: "layers", label: "Layers" }] },
+    {
+      type: "submenu",
+      label: "Panels",
+      items: [{ value: "layers", label: "Layers" }],
+    },
   ]
 
   root.querySelector("ui-tree")!.items = [
@@ -132,16 +136,30 @@ async function mount(root: HTMLElement) {
   // The host renders its toasts from `toast.template`.
   const template = document.createElement("template")
   template.innerHTML = `<ui-toast class="host-toast"><ui-toast-title class="host-toast-title"></ui-toast-title></ui-toast>`
-  root.append(Object.assign(document.createElement("ui-overlay-host"), { overlays, toast: { template } }))
+  root.append(
+    Object.assign(document.createElement("ui-overlay-host"), {
+      overlays,
+      toast: { template },
+    })
+  )
 
   root.addEventListener("click", (event) => {
-    const kind = (event.target as Element).closest<HTMLElement>("[data-toast]")?.dataset.toast
-    if (kind === "cancel")
+    const kind = (event.target as Element).closest<HTMLElement>("[data-toast]")
+      ?.dataset.toast
+    if (kind === "cancel") {
       toaster("Draft deleted", {
-        cancel: { label: "Undo", onCancel: () => (output.textContent = "cancel") },
+        cancel: {
+          label: "Undo",
+          onCancel: () => (output.textContent = "cancel"),
+        },
       })
-    if (kind === "plain") toaster("Draft saved")
-    if (kind === "host") hostToaster("Synced")
+    }
+    if (kind === "plain") {
+      toaster("Draft saved")
+    }
+    if (kind === "host") {
+      hostToaster("Synced")
+    }
   })
 }
 

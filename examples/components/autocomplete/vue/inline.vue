@@ -37,7 +37,9 @@ const fruits = [
     <AutocompleteContent>
       <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
       <AutocompleteList>
-        <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit">{{ fruit }}</AutocompleteItem>
+        <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit">{{
+          fruit
+        }}</AutocompleteItem>
       </AutocompleteList>
     </AutocompleteContent>
   </Autocomplete>

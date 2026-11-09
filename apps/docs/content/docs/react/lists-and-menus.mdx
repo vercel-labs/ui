@@ -10,7 +10,12 @@ Select, Combobox, Autocomplete, Listbox, and Trigger Menu accept items as data. 
 Give a Select an array and render its trigger and content:
 
 ```tsx
-import { Select, SelectContent, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
 
 function Example() {
   return (
@@ -137,7 +142,11 @@ import { Menu, MenuTrigger, type MenuData } from "@ui-sdk/react/menu"
 const actions: MenuData = [
   { value: "open", label: "Open", shortcut: "mod+o" },
   { type: "separator" },
-  { type: "submenu", label: "Share", items: [{ value: "email", label: "Email" }] },
+  {
+    type: "submenu",
+    label: "Share",
+    items: [{ value: "email", label: "Email" }],
+  },
 ]
 
 function Example() {

@@ -14,18 +14,29 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
 // The fixture's status regions add phrases that say nothing about the sliders.
-const withoutNoise = (log: string[]) => log.filter((phrase) => !phrase.startsWith("polite:"))
+const withoutNoise = (log: string[]) =>
+  log.filter((phrase) => !phrase.startsWith("polite:"))
 
-test("announcements while moving to a slider with a keyboard", async ({ page, open, tab }) => {
+test("announcements while moving to a slider with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("slider", { sr: "", percent: "" })
   const log = await record(page, async () => {
     await page.getByRole("button", { name: "Before" }).focus()
@@ -54,5 +65,5 @@ test(
       "document",
       "slider, Minimum price, orientated horizontally, max value 80, min value 0, current value €20.00",
     ])
-  },
+  }
 )

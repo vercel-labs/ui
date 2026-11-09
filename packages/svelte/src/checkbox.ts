@@ -1,7 +1,10 @@
 export { default as Checkbox } from "./checkbox/checkbox.svelte"
 export { default as CheckboxGroup } from "./checkbox/checkbox-group.svelte"
 export { default as CheckboxIndicator } from "./checkbox/checkbox-indicator.svelte"
-export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
+export {
+  createCheckboxController,
+  createCheckboxGroupController,
+} from "@ui-sdk/core/checkbox"
 export type {
   CheckboxApi,
   CheckboxChangeOptions,

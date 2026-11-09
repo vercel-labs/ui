@@ -49,10 +49,17 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/toast"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
-  const [issue, apply] = useOptimistic(saved, (issue, patch: IssuePatch) => ({ ...issue, ...patch }))
+  const [issue, apply] = useOptimistic(saved, (issue, patch: IssuePatch) => ({
+    ...issue,
+    ...patch,
+  }))
 
   function save(patch: IssuePatch) {
     startTransition(async () => {
@@ -66,14 +73,22 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
   }
 
   return (
-    <article aria-labelledby="issue-title" className="flex min-h-0 flex-1 flex-col">
+    <article
+      aria-labelledby="issue-title"
+      className="flex min-h-0 flex-1 flex-col"
+    >
       <div className="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2">
-        <span className="text-sm text-muted-foreground tabular-nums">{issue.id}</span>
+        <span className="text-sm text-muted-foreground tabular-nums">
+          {issue.id}
+        </span>
         <Tooltip>
           <TooltipTrigger
             render={<Link href={href(query, { issue: null })} scroll={false} />}
             aria-label="Close issue"
-            className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "ms-auto")}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+              "ms-auto"
+            )}
           >
             <X aria-hidden="true" />
           </TooltipTrigger>
@@ -93,7 +108,9 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
               className="h-auto bg-transparent px-1.5 py-1 text-lg font-semibold md:text-lg"
               onBlur={(event) => {
                 const title = event.currentTarget.value.trim()
-                if (title && title !== issue.title) save({ title })
+                if (title && title !== issue.title) {
+                  save({ title })
+                }
               }}
             />
           </Field>
@@ -105,7 +122,9 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
               className="bg-transparent px-1.5"
               onBlur={(event) => {
                 const description = event.currentTarget.value
-                if (description !== issue.description) save({ description })
+                if (description !== issue.description) {
+                  save({ description })
+                }
               }}
             />
           </Field>
@@ -113,7 +132,9 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
             <Select
               items={statuses}
               value={issue.status}
-              onValueChange={(status) => status && save({ status: status as Issue["status"] })}
+              onValueChange={(status) =>
+                status && save({ status: status as Issue["status"] })
+              }
             >
               <div className="grid gap-2">
                 <SelectLabel>Status</SelectLabel>
@@ -132,7 +153,9 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
             </Select>
             <Combobox
               value={issue.assignee}
-              onValueChange={(assignee) => save({ assignee: assignee as string | null })}
+              onValueChange={(assignee) =>
+                save({ assignee: assignee as string | null })
+              }
               itemToLabel={(id: string) => personOf(id)?.name ?? ""}
             >
               <div className="grid gap-2">
@@ -149,7 +172,11 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
                 <ComboboxEmpty>Nobody matches.</ComboboxEmpty>
                 <ComboboxList>
                   {people.map((person) => (
-                    <ComboboxItem key={person.id} value={person.id} label={person.name}>
+                    <ComboboxItem
+                      key={person.id}
+                      value={person.id}
+                      label={person.name}
+                    >
                       <Avatar name={person.name} size="sm" decorative />
                       {person.name}
                     </ComboboxItem>
@@ -159,7 +186,10 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
             </Combobox>
             <Field>
               <FieldLabel>Due date</FieldLabel>
-              <DatePicker value={issue.due} onValueChange={(due) => save({ due: due as string | null })} />
+              <DatePicker
+                value={issue.due}
+                onValueChange={(due) => save({ due: due as string | null })}
+              />
             </Field>
             <Combobox
               multiple
@@ -173,13 +203,22 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
                   <ComboboxValue>
                     {(state) =>
                       (state.value as string[]).map((id, index) => (
-                        <ComboboxChip key={id} value={id} label={state.labels[index]}>
-                          <span className="size-2 rounded-full" style={{ background: labelOf(id)?.color }} />
+                        <ComboboxChip
+                          key={id}
+                          value={id}
+                          label={state.labels[index]}
+                        >
+                          <span
+                            className="size-2 rounded-full"
+                            style={{ background: labelOf(id)?.color }}
+                          />
                         </ComboboxChip>
                       ))
                     }
                   </ComboboxValue>
-                  <ComboboxInput placeholder={issue.labels.length ? "" : "Add a label"} />
+                  <ComboboxInput
+                    placeholder={issue.labels.length ? "" : "Add a label"}
+                  />
                   <ComboboxTrigger aria-label="Show labels" />
                 </ComboboxChips>
               </div>
@@ -187,8 +226,15 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
                 <ComboboxEmpty>No labels match.</ComboboxEmpty>
                 <ComboboxList>
                   {labels.map((label) => (
-                    <ComboboxItem key={label.id} value={label.id} label={label.name}>
-                      <span className="size-2 rounded-full" style={{ background: label.color }} />
+                    <ComboboxItem
+                      key={label.id}
+                      value={label.id}
+                      label={label.name}
+                    >
+                      <span
+                        className="size-2 rounded-full"
+                        style={{ background: label.color }}
+                      />
                       {label.name}
                     </ComboboxItem>
                   ))}
@@ -199,10 +245,15 @@ function IssueDetail({ issue: saved, query }: { issue: Issue; query: Query }) {
           <RadioGroup
             aria-labelledby="priority-label"
             value={issue.priority}
-            onValueChange={(priority) => save({ priority: priority as Issue["priority"] })}
+            onValueChange={(priority) =>
+              save({ priority: priority as Issue["priority"] })
+            }
             className="grid gap-2"
           >
-            <span id="priority-label" className="text-sm leading-none font-medium">
+            <span
+              id="priority-label"
+              className="text-sm leading-none font-medium"
+            >
               Priority
             </span>
             <div className="flex flex-wrap gap-x-4 gap-y-2">

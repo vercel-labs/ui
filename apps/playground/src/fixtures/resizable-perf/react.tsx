@@ -1,4 +1,8 @@
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 import { Fragment } from "react"
 import { createRoot } from "react-dom/client"
 import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"

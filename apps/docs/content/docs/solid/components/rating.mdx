@@ -5,7 +5,10 @@ description: Pick a score from a row of stars, whole or half, with a preview as 
 
 Use a rating to collect a score, like how a stay went, or to show one, like an average. Each star is a radio, so it works like a radio group, with one value and a single tab stop.
 
-<ComponentExample name="rating/basic" caption="Choose a star, then use the arrow keys to change the score." />
+<ComponentExample
+  name="rating/basic"
+  caption="Choose a star, then use the arrow keys to change the score."
+/>
 
 ## Installation
 
@@ -35,7 +38,13 @@ function Example() {
   return (
     <Rating aria-label="Rating" defaultValue={3}>
       <RatingItem>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          aria-hidden="true"
+        >
           <path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z" />
         </svg>
       </RatingItem>
@@ -99,7 +108,10 @@ While a pointer moves over the stars, they show the score under it: `--rating-fi
 
 Set `deselectable` to let people clear their score: a press on the checked star, or Space on it, sets the score back to `null`.
 
-<ComponentExample name="rating/deselectable" caption="Press the fourth star. The score clears." />
+<ComponentExample
+  name="rating/deselectable"
+  caption="Press the fourth star. The score clears."
+/>
 
 ## Read-Only
 
@@ -107,7 +119,10 @@ Set `readOnly` to show a score that can't change, like an average. Any score sho
 
 Name a read-only rating with `getValueLabel`, so its name includes the score. An `aria-label` would replace it.
 
-<ComponentExample name="rating/read-only" caption="An average of 4.2, named Rated 4.2 out of 5." />
+<ComponentExample
+  name="rating/read-only"
+  caption="An average of 4.2, named Rated 4.2 out of 5."
+/>
 
 ## Disabled
 
@@ -143,7 +158,12 @@ Each radio renders a hidden native radio, so the rating takes part in forms. Set
 Set `max` for the number of stars, and `loop` to let the arrow keys wrap from the last star to the first. Each radio is named by `getValueLabel`, which gets the score and `max` and says "1 star" or "3 stars" by default.
 
 ```tsx
-<Rating aria-label="Difficulty" max={10} loop getValueLabel={(value, max) => `${value} of ${max}`}>
+<Rating
+  aria-label="Difficulty"
+  max={10}
+  loop
+  getValueLabel={(value, max) => `${value} of ${max}`}
+>
   <RatingItem />
 </Rating>
 ```
@@ -174,21 +194,33 @@ Props and callbacks are the same as below, as Solid props.
 
 ### Rating
 
-<TypeTable path="../../packages/core/src/components/rating/rating.ts" name="RatingOptions" />
+<TypeTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingOptions"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive.
 
-<StateTable path="../../packages/core/src/components/rating/rating.ts" name="RatingState" />
+<StateTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingState"
+/>
 
-<StateTable path="../../packages/core/src/components/rating/rating.ts" name="RatingItemState" />
+<StateTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingItemState"
+/>
 
 ### Reasons
 
 `details.reason` says why the score changed.
 
-<ReasonTable path="../../packages/core/src/components/rating/rating.ts" name="RatingValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingValueChangeReason"
+/>
 
 ### Controller
 
@@ -196,7 +228,10 @@ Create one with `createRatingController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/rating/rating.ts" name="RatingController" />
+<ControllerTable
+  path="../../packages/core/src/components/rating/rating.ts"
+  name="RatingController"
+/>
 
 ### Events
 

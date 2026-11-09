@@ -36,10 +36,20 @@ function Item(props: ListboxFixtureItem) {
 }
 
 // The items, or the groups with ?grouped.
-function Items(props: { grouped: boolean; long: boolean; list: ListboxFixtureItem[] }) {
+function Items(props: {
+  grouped: boolean
+  long: boolean
+  list: ListboxFixtureItem[]
+}) {
   return (
-    <Show when={!props.long} fallback={<For each={longToppings()}>{(item) => <Item {...item} />}</For>}>
-      <Show when={props.grouped} fallback={<For each={props.list}>{(item) => <Item {...item} />}</For>}>
+    <Show
+      when={!props.long}
+      fallback={<For each={longToppings()}>{(item) => <Item {...item} />}</For>}
+    >
+      <Show
+        when={props.grouped}
+        fallback={<For each={props.list}>{(item) => <Item {...item} />}</For>}
+      >
         <For each={f.groups}>
           {(group, index) => (
             <>
@@ -47,7 +57,9 @@ function Items(props: { grouped: boolean; long: boolean; list: ListboxFixtureIte
                 <ListboxSeparator class="separator" />
               </Show>
               <ListboxGroup class="group">
-                <ListboxGroupLabel class="label">{group.label}</ListboxGroupLabel>
+                <ListboxGroupLabel class="label">
+                  {group.label}
+                </ListboxGroupLabel>
                 <For each={group.items}>{(item) => <Item {...item} />}</For>
               </ListboxGroup>
             </>
@@ -59,7 +71,15 @@ function Items(props: { grouped: boolean; long: boolean; list: ListboxFixtureIte
 }
 
 function Fixture(props: { data?: boolean }) {
-  const { fieldset, grouped, cancel, long, controlled, defaultValue, ...options } = listboxOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    long,
+    controlled,
+    defaultValue,
+    ...options
+  } = listboxOptions()
   const [action, setAction] = createSignal("")
   const [reason, setReason] = createSignal("")
   const [submitted, setSubmitted] = createSignal("")
@@ -67,10 +87,10 @@ function Fixture(props: { data?: boolean }) {
   // Listens on the client only, in an effect: the server has no document.
   createEffect(
     () => 0,
-    () => onItemsChange(changedToppings, setList),
+    () => onItemsChange(changedToppings, setList)
   )
   const [value, setValue] = createSignal<string | string[] | null>(
-    defaultValue ?? (options.multiple ? [] : null),
+    defaultValue ?? (options.multiple ? [] : null)
   )
   return (
     <div class="fixture">
@@ -92,10 +112,20 @@ function Fixture(props: { data?: boolean }) {
             aria-label={f.label}
             name={f.name}
             controller={controller}
-            items={props.data ? (long ? longToppings() : grouped ? listboxData(true) : list()) : undefined}
+            items={
+              props.data
+                ? long
+                  ? longToppings()
+                  : grouped
+                    ? listboxData(true)
+                    : list()
+                : undefined
+            }
             onValueChange={(next, details) => {
               setReason(details.reason)
-              if (cancel) return details.cancel()
+              if (cancel) {
+                return details.cancel()
+              }
               setValue(next)
               setAction(listboxAction(next))
             }}

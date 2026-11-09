@@ -33,11 +33,19 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 const recentCountries = [
-  { type: "group" as const, label: "Recent", items: [countries[9], countries[12], countries[15]] },
+  {
+    type: "group" as const,
+    label: "Recent",
+    items: [countries[9], countries[12], countries[15]],
+  },
 ]
 
 function Example() {
@@ -45,7 +53,9 @@ function Example() {
     <Combobox
       items={countries}
       emptyItems={recentCountries}
-      announcement={(change) => (change.type === "results" ? `${change.count} countries match` : null)}
+      announcement={(change) =>
+        change.type === "results" ? `${change.count} countries match` : null
+      }
     >
       <div data-slot="stack">
         <ComboboxLabel>Country</ComboboxLabel>
@@ -60,12 +70,20 @@ function Example() {
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>
           {(state) =>
-            (state.items as ((typeof countries)[number] | (typeof recentCountries)[number])[]).map((entry) =>
+            (
+              state.items as (
+                (typeof countries)[number] | (typeof recentCountries)[number]
+              )[]
+            ).map((entry) =>
               "items" in entry ? (
                 <ComboboxGroup key={entry.label}>
                   <ComboboxGroupLabel>{entry.label}</ComboboxGroupLabel>
                   {entry.items.map((country) => (
-                    <ComboboxItem key={country.value} value={country.value} label={country.label}>
+                    <ComboboxItem
+                      key={country.value}
+                      value={country.value}
+                      label={country.label}
+                    >
                       <ComboboxItemText />
                       <ComboboxItemIndicator>
                         <CheckIcon aria-hidden="true" />
@@ -74,13 +92,17 @@ function Example() {
                   ))}
                 </ComboboxGroup>
               ) : (
-                <ComboboxItem key={entry.value} value={entry.value} label={entry.label}>
+                <ComboboxItem
+                  key={entry.value}
+                  value={entry.value}
+                  label={entry.label}
+                >
                   <ComboboxItemText />
                   <ComboboxItemIndicator>
                     <CheckIcon aria-hidden="true" />
                   </ComboboxItemIndicator>
                 </ComboboxItem>
-              ),
+              )
             )
           }
         </ComboboxList>

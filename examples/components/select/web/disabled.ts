@@ -45,13 +45,13 @@ function mount(root: HTMLElement) {
                           ${country.label}
                           <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                         </ui-select-item>
-                      `,
+                      `
                     )
                     .join("")}
                 </ui-select-content>
               </ui-select>
             </ui-field>
-          `,
+          `
         )
         .join("")}
     </div>

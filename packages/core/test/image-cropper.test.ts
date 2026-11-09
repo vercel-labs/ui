@@ -1,13 +1,20 @@
 // @vitest-environment jsdom
 import { describe, expect, test, vi } from "vitest"
-import { imageCropper, type ImageCropperOptions } from "../src/components/image-cropper/image-cropper"
+import {
+  imageCropper,
+  type ImageCropperOptions,
+} from "../src/components/image-cropper/image-cropper"
 import { layoutOf } from "../src/components/image-cropper/image-cropper-geometry"
 import { attrs, bind, liveAttrs } from "../src/foundation/kernel/part"
 
-const make = (options: ImageCropperOptions = {}) => imageCropper({ id: "c", src: "photo.png", ...options })
+const make = (options: ImageCropperOptions = {}) =>
+  imageCropper({ id: "c", src: "photo.png", ...options })
 
 const load = (cropper: ReturnType<typeof make>, width = 400, height = 300) =>
-  cropper.api.internal.loaded({ naturalWidth: width, naturalHeight: height } as HTMLImageElement)
+  cropper.api.internal.loaded({
+    naturalWidth: width,
+    naturalHeight: height,
+  } as HTMLImageElement)
 
 const key = (key: string, shiftKey = false) =>
   new KeyboardEvent("keydown", { key, shiftKey, cancelable: true })
@@ -19,7 +26,10 @@ describe("image cropper", () => {
     const onCropChange = vi.fn()
     const onCropCommit = vi.fn()
     const cropper = make({ aspectRatio: 1, onCropChange, onCropCommit })
-    expect(attrs(cropper.part("root", {}))).toMatchObject({ "aria-busy": "true", "data-loading": "" })
+    expect(attrs(cropper.part("root", {}))).toMatchObject({
+      "aria-busy": "true",
+      "data-loading": "",
+    })
     expect(attrs(cropper.part("selection", {}))).toMatchObject({ hidden: "" })
     expect(cropper.api.getCrop()).toBe(null)
     load(cropper)
@@ -27,8 +37,14 @@ describe("image cropper", () => {
     expect(cropper.api.getCrop()).toEqual(crop)
     expect(onCropChange).toHaveBeenCalledOnce()
     expect(onCropChange.mock.lastCall![1].reason).toBe("image-load")
-    expect(onCropCommit).toHaveBeenCalledWith(crop, expect.objectContaining({ reason: "image-load" }))
-    expect(attrs(cropper.part("selection", {}))).toMatchObject({ role: "slider", tabindex: "0" })
+    expect(onCropCommit).toHaveBeenCalledWith(
+      crop,
+      expect.objectContaining({ reason: "image-load" })
+    )
+    expect(attrs(cropper.part("selection", {}))).toMatchObject({
+      role: "slider",
+      tabindex: "0",
+    })
     expect(liveAttrs(cropper.part("selection", {}))).toMatchObject({
       "aria-valuenow": "80",
       "aria-valuemax": "160",
@@ -39,7 +55,13 @@ describe("image cropper", () => {
   test("a frame starts with the largest crop, and a box never below its minimum", () => {
     const frame = make({ mode: "frame", aspectRatio: 1 })
     load(frame)
-    expect(frame.api.getCrop()).toEqual({ x: 50, y: 0, width: 300, height: 300, ...plain })
+    expect(frame.api.getCrop()).toEqual({
+      x: 50,
+      y: 0,
+      width: 300,
+      height: 300,
+      ...plain,
+    })
     const box = make({ minWidth: 380 })
     load(box)
     expect(box.api.getCrop()).toMatchObject({ width: 380, height: 285 })
@@ -47,7 +69,10 @@ describe("image cropper", () => {
 
   test("arrows move the crop inside the image, ten times as far with Shift, and commit each press", () => {
     const onCropCommit = vi.fn()
-    const cropper = make({ defaultCrop: { x: 10, y: 10, width: 100, height: 100 }, onCropCommit })
+    const cropper = make({
+      defaultCrop: { x: 10, y: 10, width: 100, height: 100 },
+      onCropCommit,
+    })
     load(cropper)
     cropper.api.internal.keydown(key("ArrowRight"), "move")
     cropper.api.internal.keydown(key("ArrowDown", true), "move")
@@ -59,16 +84,31 @@ describe("image cropper", () => {
   })
 
   test("arrows on a handle move its edges, and a ratio holds", () => {
-    const cropper = make({ defaultCrop: { x: 100, y: 100, width: 100, height: 100 } })
+    const cropper = make({
+      defaultCrop: { x: 100, y: 100, width: 100, height: 100 },
+    })
     load(cropper)
     cropper.api.internal.keydown(key("ArrowRight", true), "se")
-    expect(cropper.api.getCrop()).toMatchObject({ x: 100, y: 100, width: 110, height: 100 })
+    expect(cropper.api.getCrop()).toMatchObject({
+      x: 100,
+      y: 100,
+      width: 110,
+      height: 100,
+    })
     cropper.api.internal.keydown(key("ArrowUp"), "e")
     expect(cropper.api.getCrop()).toMatchObject({ width: 110, height: 100 })
-    const square = make({ aspectRatio: 1, defaultCrop: { x: 100, y: 100, width: 100, height: 100 } })
+    const square = make({
+      aspectRatio: 1,
+      defaultCrop: { x: 100, y: 100, width: 100, height: 100 },
+    })
     load(square)
     square.api.internal.keydown(key("ArrowLeft", true), "nw")
-    expect(square.api.getCrop()).toMatchObject({ x: 90, y: 90, width: 110, height: 110 })
+    expect(square.api.getCrop()).toMatchObject({
+      x: 90,
+      y: 90,
+      width: 110,
+      height: 110,
+    })
   })
 
   test("zoom shrinks the crop about its middle, from 1 to maxZoom", () => {
@@ -76,7 +116,12 @@ describe("image cropper", () => {
     load(cropper)
     expect(cropper.api.getZoom()).toBe(1.25)
     cropper.api.setZoom(2)
-    expect(cropper.api.getCrop()).toMatchObject({ x: 125, y: 75, width: 150, height: 150 })
+    expect(cropper.api.getCrop()).toMatchObject({
+      x: 125,
+      y: 75,
+      width: 150,
+      height: 150,
+    })
     cropper.api.setZoom(8)
     expect(cropper.api.getCrop()).toMatchObject({ width: 100, height: 100 })
     cropper.api.internal.keydown(key("-"), "move")
@@ -86,7 +131,9 @@ describe("image cropper", () => {
   })
 
   test("a quarter turn turns the crop with the image and swaps the flips", () => {
-    const cropper = make({ defaultCrop: { x: 0, y: 0, width: 100, height: 50, flipX: true } })
+    const cropper = make({
+      defaultCrop: { x: 0, y: 0, width: 100, height: 50, flipX: true },
+    })
     load(cropper)
     cropper.api.rotate()
     expect(cropper.api.getCrop()).toEqual({
@@ -128,7 +175,9 @@ describe("image cropper", () => {
   })
 
   test("a flip mirrors the crop across the image", () => {
-    const cropper = make({ defaultCrop: { x: 10, y: 20, width: 100, height: 50 } })
+    const cropper = make({
+      defaultCrop: { x: 10, y: 20, width: 100, height: 50 },
+    })
     load(cropper)
     cropper.api.flip()
     expect(cropper.api.getCrop()).toMatchObject({ x: 290, y: 20, flipX: true })
@@ -162,19 +211,39 @@ describe("image cropper", () => {
     const onCropChange = vi.fn()
     const cropper = make({ onCropChange })
     load(cropper)
-    cropper.setOptions({ id: "c", src: "photo.png", onCropChange, aspectRatio: 1 })
+    cropper.setOptions({
+      id: "c",
+      src: "photo.png",
+      onCropChange,
+      aspectRatio: 1,
+    })
     await Promise.resolve()
-    expect(cropper.api.getCrop()).toMatchObject({ x: 80, y: 30, width: 240, height: 240 })
+    expect(cropper.api.getCrop()).toMatchObject({
+      x: 80,
+      y: 30,
+      width: 240,
+      height: 240,
+    })
     expect(onCropChange.mock.lastCall![1].reason).toBe("aspect-ratio-change")
   })
 
   test("a new image loads again and starts its own crop", () => {
-    const cropper = make({ defaultCrop: { x: 10, y: 10, width: 50, height: 50 } })
+    const cropper = make({
+      defaultCrop: { x: 10, y: 10, width: 50, height: 50 },
+    })
     load(cropper)
     cropper.setOptions({ id: "c", src: "other.png" })
-    expect(attrs(cropper.part("root", {}))).toMatchObject({ "data-loading": "" })
+    expect(attrs(cropper.part("root", {}))).toMatchObject({
+      "data-loading": "",
+    })
     load(cropper, 200, 100)
-    expect(cropper.api.getCrop()).toEqual({ x: 20, y: 10, width: 160, height: 80, ...plain })
+    expect(cropper.api.getCrop()).toEqual({
+      x: 20,
+      y: 10,
+      width: 160,
+      height: 80,
+      ...plain,
+    })
   })
 
   test("nothing changes while disabled, and the buttons are disabled", () => {
@@ -203,21 +272,42 @@ describe("image cropper", () => {
     const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
     for (const mode of ["box", "frame"] as const) {
       const onCropCommit = vi.fn()
-      const options = { mode, defaultCrop: { x: 100, y: 100, width: 100, height: 100 }, onCropCommit }
+      const options = {
+        mode,
+        defaultCrop: { x: 100, y: 100, width: 100, height: 100 },
+        onCropCommit,
+      }
       const cropper = make(options)
       const viewport = document.body.appendChild(document.createElement("div"))
-      Object.defineProperties(viewport, { clientWidth: { value: 400 }, clientHeight: { value: 300 } })
+      Object.defineProperties(viewport, {
+        clientWidth: { value: 400 },
+        clientHeight: { value: 300 },
+      })
       viewport.getBoundingClientRect = () => new DOMRect(0, 0, 400, 300)
       const unbind = bind(cropper.part("viewport", {}), viewport)
       load(cropper)
-      if (mode === "box")
-        cropper.api.internal.selectionPointerdown(pointer("pointerdown", 150), viewport, "move")
-      else cropper.api.internal.viewportPointerdown(pointer("pointerdown", 150), viewport)
+      if (mode === "box") {
+        cropper.api.internal.selectionPointerdown(
+          pointer("pointerdown", 150),
+          viewport,
+          "move"
+        )
+      } else {
+        cropper.api.internal.viewportPointerdown(
+          pointer("pointerdown", 150),
+          viewport
+        )
+      }
       viewport.dispatchEvent(pointer("pointermove", 170))
       await frame()
       const held = cropper.api.getCrop()
       expect(held!.x).not.toBe(100)
-      cropper.setOptions({ id: "c", src: "photo.png", ...options, disabled: true })
+      cropper.setOptions({
+        id: "c",
+        src: "photo.png",
+        ...options,
+        disabled: true,
+      })
       expect(onCropCommit).toHaveBeenCalledTimes(1)
       viewport.dispatchEvent(pointer("pointermove", 220))
       await frame()
@@ -232,13 +322,29 @@ describe("image cropper", () => {
   test("a box shows the whole image, and a frame shows the crop as large as it fits", () => {
     const crop = { x: 100, y: 50, width: 200, height: 200, ...plain }
     const box = { left: 10, top: 10, width: 400, height: 400 }
-    const inBox = layoutOf(crop, { width: 400, height: 200 }, box, "box", undefined)
+    const inBox = layoutOf(
+      crop,
+      { width: 400, height: 200 },
+      box,
+      "box",
+      undefined
+    )
     expect(inBox.scale).toBe(1)
     expect(inBox.image).toEqual({ left: 10, top: 110, width: 400, height: 200 })
-    expect(inBox.selection).toEqual({ left: 110, top: 160, width: 200, height: 200 })
+    expect(inBox.selection).toEqual({
+      left: 110,
+      top: 160,
+      width: 200,
+      height: 200,
+    })
     const inFrame = layoutOf(crop, { width: 400, height: 200 }, box, "frame", 1)
     expect(inFrame.scale).toBe(2)
-    expect(inFrame.selection).toEqual({ left: 10, top: 10, width: 400, height: 400 })
+    expect(inFrame.selection).toEqual({
+      left: 10,
+      top: 10,
+      width: 400,
+      height: 400,
+    })
     expect(inFrame.image).toMatchObject({ left: -190, top: -90 })
   })
 })

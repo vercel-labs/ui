@@ -27,18 +27,24 @@ function mount(root: HTMLElement) {
       action: {
         label: "Undo",
         onAction: async (event) => {
-          const button = (event?.target as Element | undefined)?.closest("button")
-          if (button) button.textContent = "Restoring…"
+          const button = (event?.target as Element | undefined)?.closest(
+            "button"
+          )
+          if (button) {
+            button.textContent = "Restoring…"
+          }
           try {
             await restore()
           } catch (error) {
-            if (button) button.textContent = "Retry"
+            if (button) {
+              button.textContent = "Retry"
+            }
             throw error
           }
           log(root, "Q3 report.pdf restored")
         },
       },
-    }),
+    })
   )
   return () => {
     toast.dismiss()

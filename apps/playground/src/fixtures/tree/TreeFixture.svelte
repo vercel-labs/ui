@@ -13,8 +13,13 @@
 
   let action = $state("")
 
-  function onExpandedChange(expanded: string[], details: { cancel: () => void }) {
-    if (cancel && expanded.includes(cancel) && !controller.isExpanded(cancel)) return details.cancel()
+  function onExpandedChange(
+    expanded: string[],
+    details: { cancel: () => void }
+  ) {
+    if (cancel && expanded.includes(cancel) && !controller.isExpanded(cancel)) {
+      return details.cancel()
+    }
     action = describeTree("expanded", expanded)
   }
 </script>

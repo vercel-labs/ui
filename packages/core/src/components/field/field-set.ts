@@ -1,6 +1,9 @@
 import { watchFieldsets } from "../../foundation/forms/form"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 // A field set groups related fields under a legend. It renders a native
 // <fieldset>, so `disabled` disables every control inside it the way the
@@ -42,9 +45,13 @@ type State = {
 function registerById(el: HTMLElement, register: (id: string) => () => void) {
   let id = el.id
   let unregister = register(id)
-  if (typeof MutationObserver === "undefined") return () => unregister()
+  if (typeof MutationObserver === "undefined") {
+    return () => unregister()
+  }
   const observer = new MutationObserver(() => {
-    if (el.id === id) return
+    if (el.id === id) {
+      return
+    }
     id = el.id
     unregister()
     unregister = register(id)
@@ -56,7 +63,9 @@ function registerById(el: HTMLElement, register: (id: string) => () => void) {
   }
 }
 
-const fieldSetState = (state: State) => ({ disabled: state.disabled || state.inherited })
+const fieldSetState = (state: State) => ({
+  disabled: state.disabled || state.inherited,
+})
 
 const disabledAttrs = (state: State) => ({
   "data-disabled": state.disabled || state.inherited ? "" : undefined,
@@ -77,11 +86,22 @@ const fieldSetPrimitive = /* @__PURE__ */ definePrimitive({
     register(list: "legends" | "descriptions", partId: string) {
       let active = true
       queueMicrotask(() => {
-        if (active) store.set({ [list]: [...store.get()[list].filter((item) => item !== partId), partId] })
+        if (active) {
+          store.set({
+            [list]: [
+              ...store.get()[list].filter((item) => item !== partId),
+              partId,
+            ],
+          })
+        }
       })
       return () => {
         active = false
-        queueMicrotask(() => store.set({ [list]: store.get()[list].filter((item) => item !== partId) }))
+        queueMicrotask(() =>
+          store.set({
+            [list]: store.get()[list].filter((item) => item !== partId),
+          })
+        )
       }
     },
   }),
@@ -92,24 +112,37 @@ const fieldSetPrimitive = /* @__PURE__ */ definePrimitive({
         disabled: state.disabled ? "" : undefined,
         // A <legend> that's the first child names it natively, before scripts
         // run. This also covers a legend rendered as another element.
-        "aria-labelledby": state.legends.length ? state.legends.join(" ") : undefined,
-        "aria-describedby": state.descriptions.length ? state.descriptions.join(" ") : undefined,
+        "aria-labelledby": state.legends.length
+          ? state.legends.join(" ")
+          : undefined,
+        "aria-describedby": state.descriptions.length
+          ? state.descriptions.join(" ")
+          : undefined,
         ...disabledAttrs(state),
       }),
-      bind: (el, { store }) => watchFieldsets(el, (inherited) => store.set({ inherited })),
+      bind: (el, { store }) =>
+        watchFieldsets(el, (inherited) => store.set({ inherited })),
     }),
     legend: slot<{}, FieldSetState>({
       props: { id: "string" },
       state: fieldSetState,
-      attrs: (state, { id, props }) => ({ id: props.id ?? `${id}-legend`, ...disabledAttrs(state) }),
-      bind: (el, { api }) => registerById(el, (id) => api.register("legends", id)),
+      attrs: (state, { id, props }) => ({
+        id: props.id ?? `${id}-legend`,
+        ...disabledAttrs(state),
+      }),
+      bind: (el, { api }) =>
+        registerById(el, (id) => api.register("legends", id)),
     }),
     // A FieldDescription right inside a FieldSet, outside any Field, describes the group.
     description: slot<{}, FieldSetState>({
       props: { id: "string" },
       state: fieldSetState,
-      attrs: (state, { id, props }) => ({ id: props.id ?? `${id}-description`, ...disabledAttrs(state) }),
-      bind: (el, { api }) => registerById(el, (id) => api.register("descriptions", id)),
+      attrs: (state, { id, props }) => ({
+        id: props.id ?? `${id}-description`,
+        ...disabledAttrs(state),
+      }),
+      bind: (el, { api }) =>
+        registerById(el, (id) => api.register("descriptions", id)),
     }),
   }),
   agent: { shown: () => false },

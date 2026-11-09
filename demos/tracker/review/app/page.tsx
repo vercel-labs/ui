@@ -9,8 +9,10 @@ type SearchParams = Record<string, string | string[] | undefined>
 async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const params = await searchParams
   const available = availableFrameworks()
-  const framework = available.find((name) => name === params.fw) ?? available[0] ?? "svelte"
-  const file = typeof params.file === "string" ? params.file : frameworks[framework].start
+  const framework =
+    available.find((name) => name === params.fw) ?? available[0] ?? "svelte"
+  const file =
+    typeof params.file === "string" ? params.file : frameworks[framework].start
   const [{ roots, files }, source, comments] = await Promise.all([
     listFiles(framework),
     readSource(framework, file),
@@ -25,7 +27,12 @@ async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
       files={files}
       file={file}
       comments={comments.filter((comment) => comment.framework === framework)}
-      source={source && { path: source.repoPath, html: await highlight(source.code, file) }}
+      source={
+        source && {
+          path: source.repoPath,
+          html: await highlight(source.code, file),
+        }
+      }
     />
   )
 }

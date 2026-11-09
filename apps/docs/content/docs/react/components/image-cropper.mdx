@@ -80,7 +80,11 @@ export { CoverPhoto }
 Name the cropper with `aria-label`. Until the image loads, the root has `data-loading` and `aria-busy`, and the selection is hidden. The crop then starts in the middle at `aspectRatio`, four fifths as large as the image allows so its edges show, or as large as it allows in a frame, unless you pass `defaultCrop`:
 
 ```tsx
-<ImageCropper aria-label="Photo" src={src} defaultCrop={{ x: 40, y: 40, width: 320, height: 240 }}>
+<ImageCropper
+  aria-label="Photo"
+  src={src}
+  defaultCrop={{ x: 40, y: 40, width: 320, height: 240 }}
+>
   {/* … */}
 </ImageCropper>
 ```

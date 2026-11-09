@@ -15,17 +15,26 @@ const items = [
 describe("createDismissal", () => {
   test("allows every close while dismissible", () => {
     const { allows } = createDismissal(() => ({}))
-    for (const reason of ["escape-key", "outside-press", "focus-out", "close-press"])
+    for (const reason of [
+      "escape-key",
+      "outside-press",
+      "focus-out",
+      "close-press",
+    ]) {
       expect(allows(reason)).toBe(true)
+    }
   })
 
   test("refuses dismissals, and reports only the ones made on purpose", () => {
     const attempts: string[] = []
     const { allows } = createDismissal(() => ({
       dismissible: false,
-      onDismissAttempt: ({ reason }: { reason: string }) => attempts.push(reason),
+      onDismissAttempt: ({ reason }: { reason: string }) =>
+        attempts.push(reason),
     }))
-    for (const reason of ["escape-key", "outside-press", "back", "swipe"]) expect(allows(reason)).toBe(false)
+    for (const reason of ["escape-key", "outside-press", "back", "swipe"]) {
+      expect(allows(reason)).toBe(false)
+    }
     expect(allows("focus-out")).toBe(false)
     expect(allows("window-blur")).toBe(false)
     expect(attempts).toEqual(["escape-key", "outside-press", "back", "swipe"])
@@ -33,20 +42,34 @@ describe("createDismissal", () => {
 
   test("never refuses triggers, Close parts or the controller", () => {
     const { allows } = createDismissal(() => ({ dismissible: false }))
-    for (const reason of ["trigger-press", "close-press", "item-press", "imperative", "parent-close"])
+    for (const reason of [
+      "trigger-press",
+      "close-press",
+      "item-press",
+      "imperative",
+      "parent-close",
+    ]) {
       expect(allows(reason)).toBe(true)
+    }
   })
 
   test("a refusal rule refuses closes beyond dismissible, telling the app only of attempts", () => {
     const attempts: string[] = []
     const refused: string[] = []
     const { allows } = createDismissal(
-      () => ({ onDismissAttempt: ({ reason }: { reason: string }) => attempts.push(reason) }),
+      () => ({
+        onDismissAttempt: ({ reason }: { reason: string }) =>
+          attempts.push(reason),
+      }),
       {
         refusal: (reason) =>
-          reason === "outside-press" ? "attempt" : reason === "close-press" ? "silent" : undefined,
+          reason === "outside-press"
+            ? "attempt"
+            : reason === "close-press"
+              ? "silent"
+              : undefined,
         refused: (reason) => refused.push(reason),
-      },
+      }
     )
     expect(allows("outside-press")).toBe(false)
     expect(allows("close-press")).toBe(false)
@@ -56,7 +79,9 @@ describe("createDismissal", () => {
   })
 
   test("without a verdict from its rule, dismissible decides", () => {
-    const { allows } = createDismissal(() => ({ dismissible: false }), { refusal: () => undefined })
+    const { allows } = createDismissal(() => ({ dismissible: false }), {
+      refusal: () => undefined,
+    })
     expect(allows("escape-key")).toBe(false)
     expect(allows("trigger-press")).toBe(true)
   })
@@ -65,7 +90,8 @@ describe("createDismissal", () => {
     const attempts: string[] = []
     const { sheet } = createDismissal(() => ({
       dismissible: false,
-      onDismissAttempt: ({ reason }: { reason: string }) => attempts.push(reason),
+      onDismissAttempt: ({ reason }: { reason: string }) =>
+        attempts.push(reason),
     }))
     expect(sheet.dismissible()).toBe(false)
     sheet.onDismissAttempt()
@@ -79,12 +105,29 @@ type Layer = {
 }
 
 const layers: [string, (options: Record<string, unknown>) => Layer][] = [
-  ["popover", (options) => popover({ id: "p", ...options }).api as unknown as Layer],
+  [
+    "popover",
+    (options) => popover({ id: "p", ...options }).api as unknown as Layer,
+  ],
   ["menu", (options) => menu({ id: "m", ...options }).api as unknown as Layer],
-  ["select", (options) => select({ id: "s", items, ...options }).api as unknown as Layer],
-  ["combobox", (options) => combobox({ id: "c", items, ...options }).api as unknown as Layer],
-  ["autocomplete", (options) => autocomplete({ id: "a", items, ...options }).api as unknown as Layer],
-  ["date picker", (options) => datePicker({ id: "d", ...options }).api as unknown as Layer],
+  [
+    "select",
+    (options) => select({ id: "s", items, ...options }).api as unknown as Layer,
+  ],
+  [
+    "combobox",
+    (options) =>
+      combobox({ id: "c", items, ...options }).api as unknown as Layer,
+  ],
+  [
+    "autocomplete",
+    (options) =>
+      autocomplete({ id: "a", items, ...options }).api as unknown as Layer,
+  ],
+  [
+    "date picker",
+    (options) => datePicker({ id: "d", ...options }).api as unknown as Layer,
+  ],
 ]
 
 describe.each(layers)("%s dismissible", (_, create) => {
@@ -94,8 +137,10 @@ describe.each(layers)("%s dismissible", (_, create) => {
     const api = create({
       defaultOpen: true,
       dismissible: false,
-      onDismissAttempt: ({ reason }: { reason: string }) => attempts.push(reason),
-      onOpenChange: (_open: boolean, { reason }: { reason: string }) => changes.push(reason),
+      onDismissAttempt: ({ reason }: { reason: string }) =>
+        attempts.push(reason),
+      onOpenChange: (_open: boolean, { reason }: { reason: string }) =>
+        changes.push(reason),
     })
     api.setOpen(false, { reason: "escape-key" })
     api.setOpen(false, { reason: "outside-press" })

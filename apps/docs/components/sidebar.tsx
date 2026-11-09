@@ -2,7 +2,11 @@
 
 import { cn } from "cn"
 import type * as PageTree from "fumadocs-core/page-tree"
-import { AnchorProvider, useActiveAnchor, type TableOfContents } from "fumadocs-core/toc"
+import {
+  AnchorProvider,
+  useActiveAnchor,
+  type TableOfContents,
+} from "fumadocs-core/toc"
 import Link from "next/link"
 import * as React from "react"
 import { BetaCard } from "./beta-card"
@@ -12,16 +16,26 @@ import { useCurrentUrl } from "./section-nav"
 // It runs as an inline script too, so it uses nothing from outside its own body.
 function revealCurrent(list: Element) {
   const link = list.querySelector('[aria-current="page"]')
-  if (!link) return
+  if (!link) {
+    return
+  }
   const box = list.getBoundingClientRect()
   const item = link.getBoundingClientRect()
-  if (item.top >= box.top && item.bottom <= box.bottom) return
+  if (item.top >= box.top && item.bottom <= box.bottom) {
+    return
+  }
   list.scrollTop += item.top - box.top - (box.height - item.height) / 2
 }
 
 const noSubscribe = () => () => {}
 
-function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, TableOfContents> }) {
+function Sidebar({
+  tree,
+  tocs,
+}: {
+  tree: PageTree.Root
+  tocs: Record<string, TableOfContents>
+}) {
   const current = useCurrentUrl(tree)
   const scroller = React.useRef<HTMLDivElement>(null)
   // The script below only belongs in the server's HTML. A script React adds in the browser
@@ -29,11 +43,13 @@ function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, Tab
   const hydrated = React.useSyncExternalStore(
     noSubscribe,
     () => true,
-    () => false,
+    () => false
   )
 
   React.useLayoutEffect(() => {
-    if (scroller.current) revealCurrent(scroller.current)
+    if (scroller.current) {
+      revealCurrent(scroller.current)
+    }
   }, [current])
 
   return (
@@ -48,7 +64,9 @@ function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, Tab
         {/* Runs as the HTML arrives, so the list is already in place when the page first paints. */}
         {!hydrated && (
           <script
-            dangerouslySetInnerHTML={{ __html: `(${revealCurrent})(document.currentScript.parentElement)` }}
+            dangerouslySetInnerHTML={{
+              __html: `(${revealCurrent})(document.currentScript.parentElement)`,
+            }}
           />
         )}
         {/* The page's own column shows it from xl, beside the contents. */}
@@ -58,7 +76,8 @@ function Sidebar({ tree, tocs }: { tree: PageTree.Root; tocs: Record<string, Tab
   )
 }
 
-const groupLabel = "mb-2.5 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase"
+const groupLabel =
+  "mb-2.5 font-mono text-[11px] tracking-[0.06em] text-muted-foreground uppercase"
 
 function Nodes({
   nodes,
@@ -72,21 +91,27 @@ function Nodes({
   return (
     <ul className="flex flex-col">
       {nodes.map((node, index) => {
-        if (node.type === "separator")
+        if (node.type === "separator") {
           return (
             <li key={index} className={cn(groupLabel, "mt-8 first:mt-0")}>
               {node.name}
             </li>
           )
-        if (node.type === "folder")
+        }
+        if (node.type === "folder") {
           return (
             <li key={index}>
               <Folder folder={node} tocs={tocs} current={current} />
             </li>
           )
+        }
         return (
           <li key={node.url}>
-            <PageLink page={node} toc={tocs[node.url]} active={node.url === current} />
+            <PageLink
+              page={node}
+              toc={tocs[node.url]}
+              active={node.url === current}
+            />
           </li>
         )
       })}
@@ -111,7 +136,7 @@ function Folder({
           aria-current={folder.index.url === current ? "page" : undefined}
           className={cn(
             groupLabel,
-            "block w-fit rounded-md underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/30",
+            "block w-fit rounded-md underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/30"
           )}
         >
           {folder.name}
@@ -124,7 +149,15 @@ function Folder({
   )
 }
 
-function PageLink({ page, toc, active }: { page: PageTree.Item; toc?: TableOfContents; active: boolean }) {
+function PageLink({
+  page,
+  toc,
+  active,
+}: {
+  page: PageTree.Item
+  toc?: TableOfContents
+  active: boolean
+}) {
   const items = toc?.filter((item) => item.depth <= 2) ?? []
 
   return (
@@ -134,7 +167,9 @@ function PageLink({ page, toc, active }: { page: PageTree.Item; toc?: TableOfCon
         aria-current={active ? "page" : undefined}
         className={cn(
           "block rounded-md py-1 text-sm outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-          active ? "text-foreground font-medium" : "text-subtle hover:text-foreground",
+          active
+            ? "text-foreground font-medium"
+            : "text-subtle hover:text-foreground"
         )}
       >
         {page.name}
@@ -152,7 +187,9 @@ function PageLink({ page, toc, active }: { page: PageTree.Item; toc?: TableOfCon
 
 function Toc({ items }: { items: TableOfContents }) {
   const active = useActiveAnchor()
-  if (items.length < 2) return null
+  if (items.length < 2) {
+    return null
+  }
 
   return (
     <ul className="mt-0.5 mb-2 ms-1 flex flex-col border-s border-foreground/10">
@@ -165,7 +202,9 @@ function Toc({ items }: { items: TableOfContents }) {
               aria-current={current ? "location" : undefined}
               className={cn(
                 "relative -ms-px block border-s py-[3px] ps-3 text-[13px] leading-5 outline-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30",
-                current ? "border-brand text-brand" : "border-transparent text-subtle hover:text-foreground",
+                current
+                  ? "border-brand text-brand"
+                  : "border-transparent text-subtle hover:text-foreground"
               )}
             >
               {item.title}

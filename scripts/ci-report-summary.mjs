@@ -26,7 +26,9 @@ function* testsIn(suite, describes = []) {
       }
     }
   }
-  for (const child of suite.suites ?? []) yield* testsIn(child, [...describes, child.title])
+  for (const child of suite.suites ?? []) {
+    yield* testsIn(child, [...describes, child.title])
+  }
 }
 
 const tests = report.suites.flatMap((suite) => [...testsIn(suite)])
@@ -34,10 +36,14 @@ const failed = tests.filter((test) => test.status === "unexpected")
 const flaky = tests.filter((test) => test.status === "flaky")
 
 function section(title, tests) {
-  if (!tests.length) return []
+  if (!tests.length) {
+    return []
+  }
   const listed = tests.slice(0, maxListed).map((test) => `- \`${test.name}\``)
   const more =
-    tests.length > maxListed ? [`…and ${tests.length - maxListed} more in the HTML report.`, ""] : []
+    tests.length > maxListed
+      ? [`…and ${tests.length - maxListed} more in the HTML report.`, ""]
+      : []
   return [`### ${title} (${tests.length})`, "", ...listed, "", ...more]
 }
 
@@ -54,7 +60,10 @@ function slowest(tests, count = 5) {
   const rows = [...byFile]
     .sort(([, a], [, b]) => b - a)
     .slice(0, count)
-    .map(([file, time]) => `| \`${file}\` | ${minutes(time)} | ${Math.round((time / total) * 100)}% |`)
+    .map(
+      ([file, time]) =>
+        `| \`${file}\` | ${minutes(time)} | ${Math.round((time / total) * 100)}% |`
+    )
   return [
     `### Slowest spec files (${minutes(total)} of tests in all)`,
     "",
@@ -77,8 +86,13 @@ const summary = [
 ].join("\n")
 
 for (const test of flaky) {
-  console.log(`::warning file=tests/specs/${test.file},line=${test.line},title=Flaky test::${test.name}`)
+  console.log(
+    `::warning file=tests/specs/${test.file},line=${test.line},title=Flaky test::${test.name}`
+  )
 }
 
-if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + "\n")
-else console.log(summary)
+if (process.env.GITHUB_STEP_SUMMARY) {
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + "\n")
+} else {
+  console.log(summary)
+}

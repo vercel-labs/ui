@@ -1,11 +1,19 @@
 import * as React from "react"
-import { createChange, definePrimitive, isDismissal, type ChangeDetails } from "@ui-sdk/core"
+import {
+  createChange,
+  definePrimitive,
+  isDismissal,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
 type NoticeOptions = {
   defaultOpen?: boolean
-  onOpenChange?: (open: boolean, details: ChangeDetails<"close-press" | "escape-key">) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<"close-press" | "escape-key">
+  ) => void
 }
 
 type NoticeState = { open: boolean }
@@ -13,12 +21,16 @@ type NoticeState = { open: boolean }
 const notice = definePrimitive({
   name: "notice",
   options: { defaultOpen: "boolean", onOpenChange: "callback" },
-  state: (options: NoticeOptions): NoticeState => ({ open: options.defaultOpen ?? true }),
+  state: (options: NoticeOptions): NoticeState => ({
+    open: options.defaultOpen ?? true,
+  }),
   api: (context) => {
     const change = createChange(context)
     return {
       close: (
-        details: { reason: "close-press"; event?: Event } | { reason: "escape-key"; event: KeyboardEvent },
+        details:
+          | { reason: "close-press"; event?: Event }
+          | { reason: "escape-key"; event: KeyboardEvent }
       ) => change("open", false, details),
     }
   },
@@ -28,7 +40,9 @@ const notice = definePrimitive({
       attrs: () => ({ role: "region" }),
       on: {
         keydown: (event, { api }) => {
-          if (event.key === "Escape") api.close({ reason: "escape-key", event })
+          if (event.key === "Escape") {
+            api.close({ reason: "escape-key", event })
+          }
         },
       },
     }),
@@ -53,7 +67,11 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={strict} onChange={(event) => setStrict(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={strict}
+            onChange={(event) => setStrict(event.target.checked)}
+          />
           Close only with the button
         </label>
         <button type="button" onClick={() => setRound((count) => count + 1)}>
@@ -64,7 +82,9 @@ function Example() {
         key={round}
         aria-label="Tip"
         onOpenChange={(_open, details) => {
-          if (strict && isDismissal(details.reason)) details.cancel()
+          if (strict && isDismissal(details.reason)) {
+            details.cancel()
+          }
           log(`Close: ${details.reason}${details.canceled ? ", canceled" : ""}`)
         }}
       >
@@ -75,4 +95,11 @@ function Example() {
   )
 }
 
-export { Example, notice, Notice, NoticeClose, type NoticeOptions, type NoticeState }
+export {
+  Example,
+  notice,
+  Notice,
+  NoticeClose,
+  type NoticeOptions,
+  type NoticeState,
+}

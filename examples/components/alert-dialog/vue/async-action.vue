@@ -13,7 +13,9 @@ let attempts = 0
 
 async function deleteProject() {
   await new Promise((resolve) => setTimeout(resolve, 1200))
-  if (attempts++ === 0) throw new Error("Couldn't delete the project.")
+  if (attempts++ === 0) {
+    throw new Error("Couldn't delete the project.")
+  }
 }
 </script>
 
@@ -26,11 +28,15 @@ async function deleteProject() {
         <div data-slot="stack">
           <AlertDialogTitle>Delete project?</AlertDialogTitle>
           <AlertDialogDescription>
-            This permanently deletes the project, its files and its deployment history for everyone on your
-            team.
+            This permanently deletes the project, its files and its deployment
+            history for everyone on your team.
           </AlertDialogDescription>
         </div>
-        <AlertDialogClose data-variant="solid" value="confirm" @action="deleteProject">
+        <AlertDialogClose
+          data-variant="solid"
+          value="confirm"
+          @action="deleteProject"
+        >
           <template #render="{ props, state }">
             <div data-slot="stack">
               <p data-slot="hint" role="alert">
@@ -39,7 +45,13 @@ async function deleteProject() {
               <div data-slot="row">
                 <AlertDialogClose>Cancel</AlertDialogClose>
                 <button v-bind="props">
-                  {{ state.pending ? "Deleting…" : state.error ? "Try Again" : "Delete" }}
+                  {{
+                    state.pending
+                      ? "Deleting…"
+                      : state.error
+                        ? "Try Again"
+                        : "Delete"
+                  }}
                 </button>
               </div>
             </div>

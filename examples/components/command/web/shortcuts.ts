@@ -26,7 +26,7 @@ function mount(root: HTMLElement) {
                     <span>${item.label}</span>
                     <ui-command-shortcut></ui-command-shortcut>
                   </ui-command-item>
-                `,
+                `
               )
               .join("")}
           </ui-command-group>
@@ -36,7 +36,9 @@ function mount(root: HTMLElement) {
   `
   root
     .querySelector("ui-command")!
-    .addEventListener("action", (event) => log(root, `Ran ${event.detail.value}`))
+    .addEventListener("action", (event) =>
+      log(root, `Ran ${event.detail.value}`)
+    )
 }
 
 export { mount }

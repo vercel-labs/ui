@@ -56,10 +56,14 @@ function menubarOptions() {
   const orientation = params.get("orientation")
   const modal = params.get("modal")
   return {
-    ...(orientation && { orientation: orientation as "horizontal" | "vertical" }),
+    ...(orientation && {
+      orientation: orientation as "horizontal" | "vertical",
+    }),
     ...(params.get("loop") === "false" && { loop: false }),
     ...(params.has("disabled") && { disabled: true }),
-    ...(modal && { modal: modal === "pointer" ? ("pointer" as const) : modal === "true" }),
+    ...(modal && {
+      modal: modal === "pointer" ? ("pointer" as const) : modal === "true",
+    }),
   }
 }
 

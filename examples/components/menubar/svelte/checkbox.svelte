@@ -1,6 +1,12 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
-  import { Menu, MenuCheckboxItem, MenuContent, MenuItemIndicator, MenuTrigger } from "@ui-sdk/svelte/menu"
+  import {
+    Menu,
+    MenuCheckboxItem,
+    MenuContent,
+    MenuItemIndicator,
+    MenuTrigger,
+  } from "@ui-sdk/svelte/menu"
   import { Menubar } from "@ui-sdk/svelte/menubar"
 
   let statusBar = $state(true)
@@ -43,5 +49,6 @@
       </MenuContent>
     </Menu>
   </Menubar>
-  <output data-slot="output">Status bar {statusBar ? "shown" : "hidden"}</output>
+  <output data-slot="output">Status bar {statusBar ? "shown" : "hidden"}</output
+  >
 </div>

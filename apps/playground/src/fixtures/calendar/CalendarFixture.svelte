@@ -11,11 +11,19 @@
     createCalendarController,
     type CalendarValue,
   } from "@ui-sdk/svelte/calendar"
-  import { calendarAction, calendarFixture as f, calendarOptions } from "tests/fixtures/calendar.ts"
+  import {
+    calendarAction,
+    calendarFixture as f,
+    calendarOptions,
+  } from "tests/fixtures/calendar.ts"
 
-  const { controlled, selects, lang, defaultValue, defaultMonth, ...options } = calendarOptions()
+  const { controlled, selects, lang, defaultValue, defaultMonth, ...options } =
+    calendarOptions()
   const controller = createCalendarController()
-  const offsets = Array.from({ length: options.months ?? 1 }, (_, offset) => offset)
+  const offsets = Array.from(
+    { length: options.months ?? 1 },
+    (_, offset) => offset
+  )
   let action = $state("")
   let value = $state<CalendarValue>(defaultValue)
   let month = $state(defaultMonth ?? f.today.slice(0, 7))
@@ -60,7 +68,9 @@
       {/each}
     </div>
   </Calendar>
-  <button onclick={() => controller.focus(f.controller.date)}>{f.controller.label}</button>
+  <button onclick={() => controller.focus(f.controller.date)}
+    >{f.controller.label}</button
+  >
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>
 </div>

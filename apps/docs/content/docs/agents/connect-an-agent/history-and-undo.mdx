@@ -117,7 +117,9 @@ Call `timeline.clear()` to forget the history and keep the controls as they are.
 ```ts
 import { stageChanges } from "@ui-sdk/react/timeline"
 
-const staged = await stageChanges(agent, [{ ref: "Region", value: "north-america" }])
+const staged = await stageChanges(agent, [
+  { ref: "Region", value: "north-america" },
+])
 ```
 
 Each change is `{ ref, key?, value }`. `key` defaults to `"value"`; use `"checked"` for a checkbox. The component must be mounted, expose that key in its snapshot, and advertise the matching `set<Key>` action.

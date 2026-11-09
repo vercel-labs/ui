@@ -32,10 +32,15 @@ const plans = [
 describe("server rendering a select", () => {
   test("a data select renders its label, its value's label and a hidden input that submits it", () => {
     const html = renderToString(
-      <Select items={plans} name="plan" defaultValue="pro" placeholder="Choose a plan">
+      <Select
+        items={plans}
+        name="plan"
+        defaultValue="pro"
+        placeholder="Choose a plan"
+      >
         <SelectLabel>Plan</SelectLabel>
         <SelectTrigger />
-      </Select>,
+      </Select>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="combobox"')
@@ -50,7 +55,7 @@ describe("server rendering a select", () => {
     const html = renderToString(
       <Select items={plans} placeholder="Choose a plan" required name="plan">
         <SelectTrigger />
-      </Select>,
+      </Select>
     )
     expect(html).toContain("data-placeholder")
     expect(html).toContain("Choose a plan")
@@ -59,9 +64,14 @@ describe("server rendering a select", () => {
 
   test("several values render one hidden input each", () => {
     const html = renderToString(
-      <Select items={plans} name="plan" multiple defaultValue={["basic", "pro"]}>
+      <Select
+        items={plans}
+        name="plan"
+        multiple
+        defaultValue={["basic", "pro"]}
+      >
         <SelectTrigger />
-      </Select>,
+      </Select>
     )
     expect(html.match(/type="hidden"[^>]*name="plan"/g)).toHaveLength(2)
     expect(html).toContain("Basic, Pro")
@@ -77,7 +87,7 @@ describe("server rendering a select with composed items, before they mount", () 
           <SelectItem value="basic" label="Basic" />
           <SelectItem value="pro" label="Pro" />
         </SelectContent>
-      </Select>,
+      </Select>
     )
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
   })
@@ -94,7 +104,7 @@ describe("server rendering a select with composed items, before they mount", () 
             </SelectItem>
           ))}
         </SelectContent>
-      </Select>,
+      </Select>
     )
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
   })
@@ -113,7 +123,7 @@ describe("server rendering a select with composed items, before they mount", () 
             <Plan key={plan.value} {...plan} />
           ))}
         </SelectContent>
-      </Select>,
+      </Select>
     )
     expect(html).toContain("Basic, Pro")
   })
@@ -121,7 +131,10 @@ describe("server rendering a select with composed items, before they mount", () 
   test("an element with its own value, like an input, isn't taken for an item", () => {
     const objects = plans.map((plan) => ({ id: plan.value, name: plan.label }))
     const html = renderToString(
-      <Select defaultValue={objects[1]} itemToValue={(plan) => plan.id.toString()}>
+      <Select
+        defaultValue={objects[1]}
+        itemToValue={(plan) => plan.id.toString()}
+      >
         <SelectTrigger />
         <SelectContent>
           <input value="pro" readOnly />
@@ -132,7 +145,7 @@ describe("server rendering a select with composed items, before they mount", () 
           ))}
           <data value="pro">Pro, $10</data>
         </SelectContent>
-      </Select>,
+      </Select>
     )
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
   })
@@ -145,7 +158,7 @@ describe("server rendering a combobox", () => {
         <ComboboxLabel>Plan</ComboboxLabel>
         <ComboboxInput />
         <ComboboxContent />
-      </Combobox>,
+      </Combobox>
     )
     expect(html).toMatch(/<input[^>]*role="combobox"[^>]*value="Pro"/)
     expect(html).toContain('aria-autocomplete="list"')
@@ -166,7 +179,7 @@ describe("server rendering a combobox", () => {
             ))}
           </ComboboxList>
         </ComboboxContent>
-      </Combobox>,
+      </Combobox>
     )
     expect(html).toMatch(/<input[^>]*role="combobox"[^>]*value="Pro"/)
   })
@@ -176,11 +189,15 @@ describe("server rendering a combobox", () => {
       <Combobox items={plans} multiple defaultValue={["basic", "pro"]}>
         <ComboboxChips>
           <ComboboxValue>
-            {({ value }) => (value as string[]).map((item) => <ComboboxChip key={item} value={item} />)}
+            {({ value }) =>
+              (value as string[]).map((item) => (
+                <ComboboxChip key={item} value={item} />
+              ))
+            }
           </ComboboxValue>
           <ComboboxInput />
         </ComboboxChips>
-      </Combobox>,
+      </Combobox>
     )
     expect(html.match(/data-slot="combobox-chip"/g)).toHaveLength(2)
     expect(html).toContain(">Basic<")

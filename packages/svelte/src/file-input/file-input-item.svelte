@@ -23,7 +23,10 @@ keys move between items, and Backspace or Delete removes the focused one.
 
   const fileOf = useItemFile("FileInputItem", () => file)
   setContext(FileKey, fileOf)
-  const item = usePart(fileInput, "item", () => ({ file: fileOf(), value: fileKey(fileOf()) }))
+  const item = usePart(fileInput, "item", () => ({
+    file: fileOf(),
+    value: fileKey(fileOf()),
+  }))
 </script>
 
 <Part tag="div" part={item} props={rest} />

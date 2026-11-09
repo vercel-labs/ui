@@ -44,6 +44,7 @@ export function mount(root: HTMLElement) {
   statusBar.addEventListener("checkedchange", (event) => {
     const { value } = (event as CustomEvent<{ value: boolean }>).detail
     statusBar.setAttribute("checked", String(value))
-    root.querySelector("output")!.textContent = `Status bar ${value ? "shown" : "hidden"}`
+    root.querySelector("output")!.textContent =
+      `Status bar ${value ? "shown" : "hidden"}`
   })
 }

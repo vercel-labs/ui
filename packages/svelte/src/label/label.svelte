@@ -6,9 +6,16 @@ its name, and a press on the label activates it.
 @experimental
 -->
 <script lang="ts">
-  import { label as labelPrimitive, type LabelOptions } from "@ui-sdk/core/label"
+  import {
+    label as labelPrimitive,
+    type LabelOptions,
+  } from "@ui-sdk/core/label"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let { debug, ...rest }: PartProps<"label"> & LabelOptions = $props()
 

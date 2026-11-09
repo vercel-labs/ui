@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest"
-import { definePrimitive, renderVersion } from "../src/foundation/kernel/primitive"
+import {
+  definePrimitive,
+  renderVersion,
+} from "../src/foundation/kernel/primitive"
 import {
   createStore,
   markChangedInPlace,
@@ -10,7 +13,10 @@ import { select } from "../src/foundation/kernel/selects"
 
 describe("the store", () => {
   test("setting a value the state already has reaches no listener", () => {
-    const store = createStore({ open: false, highlighted: null as string | null }, [])
+    const store = createStore(
+      { open: false, highlighted: null as string | null },
+      []
+    )
     let runs = 0
     store.subscribe(() => runs++)
     store.set({ open: true, highlighted: null })
@@ -19,7 +25,9 @@ describe("the store", () => {
   })
 
   test("a selected listener runs only when the key takes or leaves its value", () => {
-    const store = createStore({ highlighted: null as string | null }, ["highlighted"])
+    const store = createStore({ highlighted: null as string | null }, [
+      "highlighted",
+    ])
     const runs = { a: 0, b: 0 }
     select(store, "highlighted", "a", () => runs.a++)
     select(store, "highlighted", "b", () => runs.b++)
@@ -32,7 +40,9 @@ describe("the store", () => {
   test("a selected listener on an array runs when its value joins or leaves it", () => {
     const store = createStore({ panels: [] as string[] }, [])
     const runs: Record<string, number> = { a: 0, b: 0, c: 0, d: 0 }
-    for (const value of Object.keys(runs)) select(store, "panels", value, () => runs[value]++)
+    for (const value of Object.keys(runs)) {
+      select(store, "panels", value, () => runs[value]++)
+    }
     store.set({ panels: ["a", "b", "c"] })
     store.set({ panels: ["a", "c"] })
     store.set({ panels: ["a", "d", "c"] })
@@ -43,7 +53,9 @@ describe("the store", () => {
     const store = createStore({ panels: [] as string[] }, [])
     const values = ["a", "b", "c", "x"]
     const heard = new Set<string>()
-    for (const value of values) select(store, "panels", value, () => heard.add(value))
+    for (const value of values) {
+      select(store, "panels", value, () => heard.add(value))
+    }
     // Reorders, duplicates, and values that leave and come back in one change.
     const changes = [
       ["a", "b", "c"],
@@ -58,28 +70,55 @@ describe("the store", () => {
       const before = store.get().panels
       heard.clear()
       store.set({ panels })
-      for (const value of values.filter((value) => before.includes(value) !== panels.includes(value)))
-        expect(heard.has(value), `${value} joined or left [${panels}] unheard.`).toBe(true)
+      for (const value of values.filter(
+        (value) => before.includes(value) !== panels.includes(value)
+      )) {
+        expect(
+          heard.has(value),
+          `${value} joined or left [${panels}] unheard.`
+        ).toBe(true)
+      }
     }
   })
 
   test("a selected listener on a record runs when its entry is added, removed or changed", () => {
-    const before = { kept: true, changed: false, removed: true, unset: undefined }
+    const before = {
+      kept: true,
+      changed: false,
+      removed: true,
+      unset: undefined,
+    }
     const store = createStore({ values: before as Record<string, unknown> }, [])
     const names = ["kept", "changed", "removed", "unset", "added", "absent"]
-    const runs: Record<string, number> = Object.fromEntries(names.map((name) => [name, 0]))
-    for (const name of names) select(store, "values", name, () => runs[name]++)
+    const runs: Record<string, number> = Object.fromEntries(
+      names.map((name) => [name, 0])
+    )
+    for (const name of names) {
+      select(store, "values", name, () => runs[name]++)
+    }
     // One write adds, removes and changes entries at once. An entry holding
     // undefined that's removed counts too.
     store.set({ values: { kept: true, changed: true, added: "x" } })
-    expect(runs).toEqual({ kept: 0, changed: 1, removed: 1, unset: 1, added: 1, absent: 0 })
+    expect(runs).toEqual({
+      kept: 0,
+      changed: 1,
+      removed: 1,
+      unset: 1,
+      added: 1,
+      absent: 0,
+    })
   })
 
   test("a new record with the same entries reaches no selected listener", () => {
-    const store = createStore({ values: { a: true, b: false } as Record<string, unknown> }, [])
+    const store = createStore(
+      { values: { a: true, b: false } as Record<string, unknown> },
+      []
+    )
     let selected = 0
     let every = 0
-    for (const name of ["a", "b", "c"]) select(store, "values", name, () => selected++)
+    for (const name of ["a", "b", "c"]) {
+      select(store, "values", name, () => selected++)
+    }
     store.subscribe(() => every++)
     store.set({ values: { b: false, a: true } })
     expect(selected).toBe(0)
@@ -90,7 +129,9 @@ describe("the store", () => {
   test("entries named like Object's own properties are diffed as entries", () => {
     const store = createStore({ values: {} as Record<string, unknown> }, [])
     const runs: Record<string, number> = { constructor: 0, toString: 0 }
-    for (const name of Object.keys(runs)) select(store, "values", name, () => runs[name]++)
+    for (const name of Object.keys(runs)) {
+      select(store, "values", name, () => runs[name]++)
+    }
     store.set({ values: { constructor: true } })
     store.set({ values: { toString: true } })
     expect(runs).toEqual({ constructor: 2, toString: 1 })
@@ -107,7 +148,10 @@ describe("the store", () => {
   })
 
   test("a selected listener on a record hears its entry added when the record was undefined", () => {
-    const store = createStore({ values: undefined as Record<string, boolean> | undefined }, [])
+    const store = createStore(
+      { values: undefined as Record<string, boolean> | undefined },
+      []
+    )
     const runs = { x: 0, y: 0 }
     select(store, "values", "x", () => runs.x++)
     select(store, "values", "y", () => runs.y++)
@@ -126,7 +170,10 @@ describe("the store", () => {
   })
 
   test("listeners that skip keys hear a key named like an Object.prototype member", () => {
-    const store = createStore({ constructor: 0, other: 0 } as { constructor: number; other: number }, [])
+    const store = createStore(
+      { constructor: 0, other: 0 } as { constructor: number; other: number },
+      []
+    )
     let runs = 0
     subscribeSkipping(store, { other: true }, () => runs++)
     store.set({ constructor: 1 })
@@ -138,12 +185,17 @@ describe("the store", () => {
     // A framework delivers `open: true` ahead of `set`.
     store.follow(() => ({ open: true }))
     // A render previews a query the store doesn't hold, and something it reads writes.
-    store.view({ open: true, query: "preview" }, () => store.set({ open: true }))
+    store.view({ open: true, query: "preview" }, () =>
+      store.set({ open: true })
+    )
     expect(store.get()).toEqual({ open: true, query: "" })
   })
 
   test("listeners that skip keys miss only changes to those keys", () => {
-    const store = createStore({ open: false, highlighted: null as string | null }, [])
+    const store = createStore(
+      { open: false, highlighted: null as string | null },
+      []
+    )
     const skip = { highlighted: true }
     let runs = 0
     subscribeSkipping(store, skip, () => runs++)
@@ -154,7 +206,10 @@ describe("the store", () => {
   })
 
   test("listeners that hear every change run before those that skip or select", () => {
-    const store = createStore({ open: false, highlighted: null as string | null }, [])
+    const store = createStore(
+      { open: false, highlighted: null as string | null },
+      []
+    )
     const order: string[] = []
     select(store, "highlighted", "a", () => order.push("selected"))
     subscribeSkipping(store, { open: true }, () => order.push("skipping"))
@@ -164,10 +219,15 @@ describe("the store", () => {
   })
 
   test("listeners hear whether a change touched only live keys", () => {
-    const store = createStore({ open: false, highlighted: null as string | null }, ["highlighted"])
+    const store = createStore(
+      { open: false, highlighted: null as string | null },
+      ["highlighted"]
+    )
     const heard: boolean[] = []
     select(store, "highlighted", "a", (liveOnly) => heard.push(liveOnly))
-    subscribeSkipping(store, { highlighted: true }, (liveOnly) => heard.push(liveOnly))
+    subscribeSkipping(store, { highlighted: true }, (liveOnly) =>
+      heard.push(liveOnly)
+    )
     store.set({ highlighted: "a" })
     store.set({ open: true, highlighted: null })
     expect(heard).toEqual([true, false, false])
@@ -191,9 +251,10 @@ describe("the store", () => {
       }
     } as SetConstructor
     try {
-      const store = createStore({ highlighted: null as string | null, panels: [] as string[] }, [
-        "highlighted",
-      ])
+      const store = createStore(
+        { highlighted: null as string | null, panels: [] as string[] },
+        ["highlighted"]
+      )
       const skip = { highlighted: true }
       // Every part subscribes before any leaves, like a long list mounting.
       const cleanups = Array.from({ length: 100 }, (_, index) => {
@@ -212,7 +273,9 @@ describe("the store", () => {
     }
     // A listener, or a group kept once it's empty, would still be in one of them.
     const holding = made.filter((collection) =>
-      [...collection.values()].some((value) => typeof value === "function" || value instanceof BaseSet),
+      [...collection.values()].some(
+        (value) => typeof value === "function" || value instanceof BaseSet
+      )
     )
     expect(made.length).toBeGreaterThan(0)
     expect(holding).toEqual([])
@@ -225,7 +288,8 @@ describe("the render version", () => {
     state: () => ({ open: false, highlighted: null as string | null }),
     live: ["highlighted"],
     api: (context) => ({
-      set: (patch: { open?: boolean; highlighted?: string | null }) => context.store.set(patch),
+      set: (patch: { open?: boolean; highlighted?: string | null }) =>
+        context.store.set(patch),
     }),
     slots: (slot) => ({ root: slot({}) }),
   })
@@ -243,7 +307,10 @@ describe("the render version", () => {
 describe("slot state comparison", () => {
   test("plain objects and arrays with the same values are the same, however deep", () => {
     expect(
-      sameSlotState({ point: { x: 1 }, points: [{ x: 1 }] }, { point: { x: 1 }, points: [{ x: 1 }] }),
+      sameSlotState(
+        { point: { x: 1 }, points: [{ x: 1 }] },
+        { point: { x: 1 }, points: [{ x: 1 }] }
+      )
     ).toBe(true)
     expect(sameSlotState({ point: { x: 1 } }, { point: { x: 2 } })).toBe(false)
     expect(sameSlotState([{ x: 1 }], [{ x: 1 }, { x: 2 }])).toBe(false)

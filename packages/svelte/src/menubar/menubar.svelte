@@ -14,7 +14,11 @@ triggers and between open menus. Each `Menu` inside joins it.
   import { setContext } from "svelte"
   import { MenubarKey, type MenubarContext } from "../menubar-context"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     orientation,

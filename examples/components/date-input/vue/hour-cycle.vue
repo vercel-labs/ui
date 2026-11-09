@@ -15,7 +15,11 @@ import { TimeInput } from "@ui-sdk/vue/time-input"
     </Field>
     <Field>
       <FieldLabel>With seconds</FieldLabel>
-      <TimeInput granularity="second" :hour-cycle="24" default-value="18:45:30" />
+      <TimeInput
+        granularity="second"
+        :hour-cycle="24"
+        default-value="18:45:30"
+      />
     </Field>
   </div>
 </template>

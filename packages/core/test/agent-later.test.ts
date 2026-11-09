@@ -18,7 +18,9 @@ test("an agent created later finds the components already on the page", () => {
   document.body.append(label)
   const unbind = bind(instance.part("root"), el)
   const agent = createAgent()
-  expect(agent.snapshot()).toEqual([expect.objectContaining({ component: "checkbox", label: "Subscribe" })])
+  expect(agent.snapshot()).toEqual([
+    expect.objectContaining({ component: "checkbox", label: "Subscribe" }),
+  ])
   unbind()
   instance.destroy()
 })

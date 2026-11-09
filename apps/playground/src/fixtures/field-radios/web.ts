@@ -1,4 +1,7 @@
-import { fieldRadiosFixture as f, fieldRadiosOptions } from "tests/fixtures/field.ts"
+import {
+  fieldRadiosFixture as f,
+  fieldRadiosOptions,
+} from "tests/fixtures/field.ts"
 
 async function mount(root: HTMLElement) {
   await Promise.all([import("@ui-sdk/web/field"), import("@ui-sdk/web/radio")])
@@ -9,7 +12,7 @@ async function mount(root: HTMLElement) {
         <ui-field class="row"${index === 0 && disabledField ? " disabled" : ""}>
           <ui-radio class="radio" value="${size.value}"><ui-radio-indicator class="radio-indicator"></ui-radio-indicator></ui-radio>
           <ui-field-label>${size.label}</ui-field-label>
-        </ui-field>`,
+        </ui-field>`
     )
     .join("")
   root.innerHTML = `
@@ -23,7 +26,9 @@ async function mount(root: HTMLElement) {
       <button id="disable-first">${f.disableFirst}</button>
     </div>`
   const first = root.querySelector("ui-radio")!
-  root.querySelector("#disable-first")!.addEventListener("click", () => first.toggleAttribute("disabled"))
+  root
+    .querySelector("#disable-first")!
+    .addEventListener("click", () => first.toggleAttribute("disabled"))
 }
 
 export { mount }

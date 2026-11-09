@@ -12,17 +12,27 @@ const commandSearch = definePrimitive({
     search: (query: string) => context.store.set({ query }),
   }),
   slots: (slot) => ({
-    root: slot<{}, CommandSearchState>({ state: (state) => ({ query: state.query }) }),
+    root: slot<{}, CommandSearchState>({
+      state: (state) => ({ query: state.query }),
+    }),
     input: slot({
       attrs: (state) => ({ type: "search", value: state.query }),
-      on: { input: (event, { api }) => api.search((event.target as HTMLInputElement).value) },
+      on: {
+        input: (event, { api }) =>
+          api.search((event.target as HTMLInputElement).value),
+      },
     }),
     list: slot({ attrs: () => ({ role: "list" }) }),
     command: slot({ attrs: () => ({ role: "listitem" }) }),
   }),
 })
 
-const parts = createParts(commandSearch, { root: "div", input: "input", list: "ul", command: "li" })
+const parts = createParts(commandSearch, {
+  root: "div",
+  input: "input",
+  list: "ul",
+  command: "li",
+})
 
 const CommandSearch = parts.Root
 
@@ -54,7 +64,10 @@ function Example() {
     <CommandSearch>
       {({ query }) => (
         <>
-          <CommandSearchInput aria-label="Search commands" placeholder="Search commands…" />
+          <CommandSearchInput
+            aria-label="Search commands"
+            placeholder="Search commands…"
+          />
           <CommandSearchList>
             {rank(query).map(({ command, score }) => (
               <CommandSearchCommand key={command}>

@@ -10,7 +10,9 @@ const props = defineProps<{ value: string; class?: string }>()
 <template>
   <MenuRadioItem :value="props.value" :class="cn(item, 'pe-8', props.class)">
     <slot />
-    <MenuItemIndicator class="absolute end-2 flex size-4 items-center justify-center">
+    <MenuItemIndicator
+      class="absolute end-2 flex size-4 items-center justify-center"
+    >
       <Check aria-hidden="true" class="size-4" />
     </MenuItemIndicator>
   </MenuRadioItem>

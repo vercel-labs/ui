@@ -4,7 +4,10 @@ The listbox. Without children, it renders the combobox's `items`, filtered.
 @stable
 -->
 <script lang="ts">
-  import { combobox as comboboxPrimitive, type ComboboxContentState } from "@ui-sdk/core/combobox"
+  import {
+    combobox as comboboxPrimitive,
+    type ComboboxContentState,
+  } from "@ui-sdk/core/combobox"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"

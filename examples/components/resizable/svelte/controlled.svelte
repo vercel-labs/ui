@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/svelte/resizable"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+  } from "@ui-sdk/svelte/resizable"
   import { useLog } from "../../../shared/svelte/log"
 
   const format = (layout: number[]) => layout.map(Math.round).join(" / ")
@@ -10,13 +14,17 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => (layout = [50, 50])}>Split Evenly</button>
+    <button type="button" onclick={() => (layout = [50, 50])}
+      >Split Evenly</button
+    >
     <button type="button" onclick={() => (layout = [30, 70])}>Reset</button>
   </div>
   <Resizable
     bind:layout
     onLayoutChange={(next, details) => {
-      if (format(next) !== format(layout)) log(`${format(next)} (${details.reason})`)
+      if (format(next) !== format(layout)) {
+        log(`${format(next)} (${details.reason})`)
+      }
     }}
   >
     <ResizablePanel minSize={20}>

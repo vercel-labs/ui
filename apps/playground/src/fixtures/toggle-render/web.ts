@@ -18,23 +18,33 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/toggle")
   await import("@ui-sdk/web/button")
   await import("@ui-sdk/web/separator")
-  const say = (text: string) => (root.querySelector("output")!.textContent = text)
+  const say = (text: string) =>
+    (root.querySelector("output")!.textContent = text)
   root.addEventListener(
     "action",
     (event) => {
       const action = (event.target as HTMLElement).dataset.action
-      if (action) say(action)
+      if (action) {
+        say(action)
+      }
     },
-    { capture: true },
+    { capture: true }
   )
   root.querySelector("#star")!.addEventListener("pressedchange", (event) => {
-    if (event.target !== event.currentTarget) return
-    say((event as CustomEvent<{ value: boolean }>).detail.value ? "star" : "unstar")
+    if (event.target !== event.currentTarget) {
+      return
+    }
+    say(
+      (event as CustomEvent<{ value: boolean }>).detail.value
+        ? "star"
+        : "unstar"
+    )
   })
   root.addEventListener(
     "valuechange",
-    (event) => say((event as CustomEvent<{ value: string[] }>).detail.value.join(", ")),
-    { capture: true },
+    (event) =>
+      say((event as CustomEvent<{ value: string[] }>).detail.value.join(", ")),
+    { capture: true }
   )
 }
 

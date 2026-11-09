@@ -1,8 +1,14 @@
-import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/solid/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/solid/command"
 import { Show } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
-const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+const wait = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 const Spinner = () => (
   <svg
@@ -24,7 +30,10 @@ function Example() {
   return (
     <div data-slot="stack">
       <Command>
-        <CommandInput aria-label="Search actions" placeholder="Search actions…" />
+        <CommandInput
+          aria-label="Search actions"
+          placeholder="Search actions…"
+        />
         <CommandList>
           <CommandItem
             value="deploy"

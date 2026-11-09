@@ -63,7 +63,12 @@ function Example() {
           Focusable when disabled
         </label>
       </div>
-      <Tree aria-label="Plans" items={items} defaultExpanded={["plans"]} focusableWhenDisabled={focusable}>
+      <Tree
+        aria-label="Plans"
+        items={items}
+        defaultExpanded={["plans"]}
+        focusableWhenDisabled={focusable}
+      >
         <Items items={items} />
       </Tree>
     </div>

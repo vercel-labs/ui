@@ -1,4 +1,10 @@
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/react/command"
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/react/command"
 
 const commands = [
   { value: "calendar", label: "التقويم" },

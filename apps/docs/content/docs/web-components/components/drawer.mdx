@@ -112,8 +112,14 @@ Set the element’s `open` and `snapPoint` properties, and listen for `openchang
 
 <script type="module">
   const drawer = document.querySelector("ui-drawer")
-  drawer.addEventListener("openchange", (event) => (open.checked = event.detail.value))
-  drawer.addEventListener("snappointchange", (event) => (size.value = String(event.detail.value)))
+  drawer.addEventListener(
+    "openchange",
+    (event) => (open.checked = event.detail.value)
+  )
+  drawer.addEventListener(
+    "snappointchange",
+    (event) => (size.value = String(event.detail.value))
+  )
   drawer.open = true
   drawer.snapPoint = 1
 </script>
@@ -128,7 +134,9 @@ With `dismissible="false"`, Escape, outside presses, back gestures, and swipes l
   <ui-drawer-trigger><button>Write a Post</button></ui-drawer-trigger>
   <ui-drawer-backdrop hidden></ui-drawer-backdrop>
   <ui-drawer-content hidden>
-    <ui-drawer-close id="discard" hidden><button>Discard</button></ui-drawer-close>
+    <ui-drawer-close id="discard" hidden
+      ><button>Discard</button></ui-drawer-close
+    >
     <ui-drawer-close value="post"><button>Post</button></ui-drawer-close>
   </ui-drawer-content>
 </ui-drawer>
@@ -180,7 +188,7 @@ A Close part with the `action` attribute fires an `action` event; pass a Promise
     event.detail.waitUntil(saving)
     saving.then(
       () => (button.textContent = "Save Changes"),
-      () => (button.textContent = "Try Again"),
+      () => (button.textContent = "Try Again")
     )
   })
 </script>
@@ -202,7 +210,9 @@ Give the drawer an `id`, connect external triggers with `for`, and assign each t
 Calling `open({ payload })` on the drawer’s `api` returns a Promise with the closing `reason` and `returnValue`. `getSnapPoint()` and `setSnapPoint()` also let code read or move the sheet. The [controller guide](../controllers) covers the shared result and payload flow.
 
 ```html
-<ui-drawer-trigger for="share" disabled><button>Share</button></ui-drawer-trigger>
+<ui-drawer-trigger for="share" disabled
+  ><button>Share</button></ui-drawer-trigger
+>
 
 <ui-drawer id="share">
   <ui-drawer-backdrop hidden></ui-drawer-backdrop>
@@ -215,7 +225,8 @@ Calling `open({ payload })` on the drawer’s `api` returns a Promise with the c
   const drawer = document.querySelector("#share")
   document.querySelector("ui-drawer-trigger").payload = file
   drawer.addEventListener("payloadchange", (event) => {
-    drawer.querySelector("ui-drawer-title").textContent = `Share ${event.detail.value?.name}`
+    drawer.querySelector("ui-drawer-title").textContent =
+      `Share ${event.detail.value?.name}`
   })
 
   const { reason, returnValue } = await drawer.api.open({ payload: roadmap })
@@ -270,7 +281,10 @@ Override part of `sheetPhysics.ios` with the `physics` property to tune the poin
 <ui-drawer driver="pointer"></ui-drawer>
 
 <script type="module">
-  document.querySelector("ui-drawer").physics = { response: 0.3, dampingRatio: 0.9 }
+  document.querySelector("ui-drawer").physics = {
+    response: 0.3,
+    dampingRatio: 0.9,
+  }
 </script>
 ```
 
@@ -281,7 +295,11 @@ Override part of `sheetPhysics.ios` with the `physics` property to tune the poin
 Drawers render in place and use the top layer. `container` takes a selector and moves the backdrop and viewport there, for example into a shadow root or out of a surrounding form. See the shared [popup guide](../popups#hidden-content-and-containers).
 
 ```html
-<ui-drawer theme-color persistent-elements="#chat-launcher" container="#drawer-host"></ui-drawer>
+<ui-drawer
+  theme-color
+  persistent-elements="#chat-launcher"
+  container="#drawer-host"
+></ui-drawer>
 ```
 
 ## Custom Rendering
@@ -290,11 +308,15 @@ Elements have no render functions. Trigger, Close, and Handle parts wrap your na
 
 ```html
 <ui-drawer>
-  <ui-drawer-trigger shortcut="mod+j"><button>View Details</button></ui-drawer-trigger>
+  <ui-drawer-trigger shortcut="mod+j"
+    ><button>View Details</button></ui-drawer-trigger
+  >
   <ui-drawer-content hidden>
     <ui-drawer-title as-child><h3>Quarterly report</h3></ui-drawer-title>
     <ui-drawer-description>Drag up to see more.</ui-drawer-description>
-    <ui-drawer-close><a href="/reports/q3">Open the Full Page</a></ui-drawer-close>
+    <ui-drawer-close
+      ><a href="/reports/q3">Open the Full Page</a></ui-drawer-close
+    >
   </ui-drawer-content>
 </ui-drawer>
 
@@ -302,14 +324,16 @@ Elements have no render functions. Trigger, Close, and Handle parts wrap your na
   const drawer = document.querySelector("ui-drawer")
   const content = drawer.querySelector("ui-drawer-content")
   drawer.addEventListener("openchange", (event) => {
-    drawer.querySelector("ui-drawer-trigger button").textContent = event.detail.value
+    drawer.querySelector("ui-drawer-trigger button").textContent = event.detail
+      .value
       ? "Viewing"
       : "View Details"
   })
   new MutationObserver(() => {
-    content.querySelector("ui-drawer-description").textContent = content.hasAttribute("data-expanded")
-      ? "Showing all of it."
-      : "Drag up to see more."
+    content.querySelector("ui-drawer-description").textContent =
+      content.hasAttribute("data-expanded")
+        ? "Showing all of it."
+        : "Drag up to see more."
   }).observe(content, { attributeFilter: ["data-expanded"] })
 </script>
 ```
@@ -371,13 +395,19 @@ Callbacks are DOM events.
 
 ### Drawer
 
-<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOptions" />
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOptions"
+/>
 
 ### DrawerTrigger
 
 A trigger outside the drawer names it with `for="drawer-id"`, and takes `payload` as a property.
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerProps"
+/>
 
 ### DrawerBackdrop
 
@@ -385,7 +415,10 @@ Dims the page behind a modal drawer, which manages its opacity. `<ui-drawer-back
 
 ### DrawerContent
 
-<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerContentProps"
+/>
 
 ### DrawerHandle
 
@@ -401,17 +434,26 @@ Describes the drawer while it's rendered. `<ui-drawer-description>` is a paragra
 
 ### DrawerClose
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogCloseProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseProps"
+/>
 
 ### DrawerShortcut
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogShortcutProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogShortcutProps"
+/>
 
 ### DrawerOutlet
 
 An outlet outside the drawer names it with `for="drawer-id"`.
 
-<TypeTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletProps" />
+<TypeTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOutletProps"
+/>
 
 ### State
 
@@ -419,45 +461,75 @@ The same state shows as data attributes on each element.
 
 `DrawerTrigger`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerState"
+/>
 
 `DrawerBackdrop`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerBackdropState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerBackdropState"
+/>
 
 `DrawerContent`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerContentState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerContentState"
+/>
 
 `DrawerHandle`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerHandleState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerHandleState"
+/>
 
 `DrawerClose`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogCloseState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseState"
+/>
 
 `DrawerOutlet`:
 
-<StateTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOutletState" />
+<StateTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOutletState"
+/>
 
 ### Reasons
 
 `event.detail.reason` says why the drawer opened or closed.
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerOpenChangeReason"
+/>
 
 For a payload change, it says what opened the drawer or took it over.
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerPayloadChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerPayloadChangeReason"
+/>
 
 Why it moved to another snap point:
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerSnapPointChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerSnapPointChangeReason"
+/>
 
 The dismissals `dismissible` can refuse:
 
-<ReasonTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerDismissReason" />
+<ReasonTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerDismissReason"
+/>
 
 ### Controller
 
@@ -467,7 +539,10 @@ element's `controller` property. The root element's `api` property has the same 
 
 Every write method takes an optional `{ reason, event }`, which the events carry. Closing with a controller always works, even when the drawer isn't dismissible or an action is running.
 
-<ControllerTable path="../../packages/core/src/components/drawer/drawer.ts" name="DrawerController" />
+<ControllerTable
+  path="../../packages/core/src/components/drawer/drawer.ts"
+  name="DrawerController"
+/>
 
 ### Events
 

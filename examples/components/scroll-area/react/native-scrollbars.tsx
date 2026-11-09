@@ -1,6 +1,10 @@
 "use client"
 
-import { ScrollArea, ScrollAreaContent, ScrollAreaViewport } from "@ui-sdk/react/scroll-area"
+import {
+  ScrollArea,
+  ScrollAreaContent,
+  ScrollAreaViewport,
+} from "@ui-sdk/react/scroll-area"
 
 const messages = [
   { from: "Hollis Grant", subject: "Launch checklist for Thursday" },

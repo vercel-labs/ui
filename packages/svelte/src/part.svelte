@@ -19,7 +19,9 @@ with the part's attributes, so most parts need no more than
     tag: string
     part: PartBinding<State>
     props: {
-      render?: Snippet<[{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]>
+      render?: Snippet<
+        [{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]
+      >
       children?: Snippet<[State]>
       [attribute: string]: unknown
     }
@@ -29,9 +31,15 @@ with the part's attributes, so most parts need no more than
 </script>
 
 {#if props.render}
-  {@render props.render({ props: attributes, state: part.state, children: props.children })}
+  {@render props.render({
+    props: attributes,
+    state: part.state,
+    children: props.children,
+  })}
 {:else if props.children}
-  <svelte:element this={tag} {...attributes}>{@render props.children(part.state)}</svelte:element>
+  <svelte:element this={tag} {...attributes}
+    >{@render props.children(part.state)}</svelte:element
+  >
 {:else}
   <svelte:element this={tag} {...attributes} />
 {/if}

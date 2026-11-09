@@ -1,5 +1,11 @@
 import { confirm } from "@ui-sdk/solid/alert-dialog"
-import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@ui-sdk/solid/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@ui-sdk/solid/dialog"
 import { OverlayHost } from "@ui-sdk/solid/overlays"
 import {
   createToaster,
@@ -12,7 +18,12 @@ import {
 } from "@ui-sdk/solid/toast"
 import { isServer, render, type JSX } from "@solidjs/web"
 import { createSignal, Show } from "solid-js"
-import { toastDuration, toastFixture, toastOptions, usesHost } from "tests/fixtures/toast.ts"
+import {
+  toastDuration,
+  toastFixture,
+  toastOptions,
+  usesHost,
+} from "tests/fixtures/toast.ts"
 import { createFixtureToasts } from "./shared"
 
 function Fixture() {
@@ -25,7 +36,9 @@ function Fixture() {
     : createFixtureToasts<JSX.Element>((action) => setAction(action))
   const host = usesHost()
   const show = (kind: "basic" | "success" | "error" | "promise") => () => {
-    if ("basic" in toasts) toasts[kind]()
+    if ("basic" in toasts) {
+      toasts[kind]()
+    }
   }
   return (
     <div class="fixture">
@@ -45,8 +58,16 @@ function Fixture() {
       <Show when={host}>
         <button
           onClick={async () => {
-            const { title, confirm: confirmLabel, cancel } = toastFixture.confirm
-            const yes = await confirm({ title, confirmLabel, cancelLabel: cancel })
+            const {
+              title,
+              confirm: confirmLabel,
+              cancel,
+            } = toastFixture.confirm
+            const yes = await confirm({
+              title,
+              confirmLabel,
+              cancelLabel: cancel,
+            })
             setAction(yes ? "confirmed" : "declined")
           }}
         >
@@ -60,13 +81,19 @@ function Fixture() {
       <Show
         when={host}
         fallback={
-          <ToastRegion toaster={toasts.toast} class="toast-region" {...toastOptions()}>
+          <ToastRegion
+            toaster={toasts.toast}
+            class="toast-region"
+            {...toastOptions()}
+          >
             {() => (
               <Toast class="toast">
                 <ToastTitle class="toast-title" />
                 <ToastDescription class="toast-description" />
                 <ToastAction class="toast-action" />
-                <ToastClose class="toast-close">{toastFixture.dismiss}</ToastClose>
+                <ToastClose class="toast-close">
+                  {toastFixture.dismiss}
+                </ToastClose>
               </Toast>
             )}
           </ToastRegion>
@@ -82,7 +109,11 @@ function Fixture() {
                 <ToastDescription />
                 <ToastAction />
                 <Show when={toast.cancel}>
-                  {(cancel) => <ToastClose action={cancel().onCancel}>{cancel().label}</ToastClose>}
+                  {(cancel) => (
+                    <ToastClose action={cancel().onCancel}>
+                      {cancel().label}
+                    </ToastClose>
+                  )}
                 </Show>
               </Toast>
             ),

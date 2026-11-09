@@ -11,7 +11,11 @@ Without content it renders its weekdays and weeks.
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import CalendarWeekdays from "./calendar-weekdays.svelte"
   import CalendarWeeks from "./calendar-weeks.svelte"
-  import { CalendarGridKey, useCalendar, type CalendarGridContext } from "./context"
+  import {
+    CalendarGridKey,
+    useCalendar,
+    type CalendarGridContext,
+  } from "./context"
 
   let {
     offset = 0,
@@ -22,7 +26,10 @@ Without content it renders its weekdays and weeks.
     offset?: number
   } = $props()
 
-  const grid = useHandlePart(useCalendar("CalendarGrid"), "grid", () => ({ offset, id: String(offset) }))
+  const grid = useHandlePart(useCalendar("CalendarGrid"), "grid", () => ({
+    offset,
+    id: String(offset),
+  }))
   const context: CalendarGridContext = {
     get offset() {
       return offset
@@ -39,4 +46,8 @@ Without content it renders its weekdays and weeks.
   <CalendarWeeks />
 {/snippet}
 
-<Part tag="table" part={grid} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="table"
+  part={grid}
+  props={{ ...rest, children: children ?? fallback }}
+/>

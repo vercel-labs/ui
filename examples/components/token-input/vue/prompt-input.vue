@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ArrowUpIcon, CheckIcon, ClockIcon, CodeIcon, FileIcon, XIcon } from "@lucide/vue"
+import {
+  ArrowUpIcon,
+  CheckIcon,
+  ClockIcon,
+  CodeIcon,
+  FileIcon,
+  XIcon,
+} from "@lucide/vue"
 import {
   createTokenInputController,
   toText,
@@ -31,7 +38,11 @@ const files = [
 ]
 
 const skills = [
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+  {
+    value: "search",
+    label: "search",
+    arguments: [{ name: "query", hint: "<query>", required: true }],
+  },
   { value: "review", label: "review" },
   { value: "summarize", label: "summarize" },
 ]
@@ -46,14 +57,24 @@ let sendTimer: ReturnType<typeof setTimeout> | undefined
 onBeforeUnmount(() => clearTimeout(sendTimer))
 
 function send(value: TokenInputValue) {
-  if (running.value || !prompt.getLabel().trim()) return
+  if (running.value || !prompt.getLabel().trim()) {
+    return
+  }
   running.value = true
-  const skillTokens = value.filter((segment) => typeof segment !== "string" && segment.type === "skill")
-  for (const skill of skillTokens)
-    if (typeof skill !== "string") prompt.updateToken(skill.id!, { data: { ...skill.data, run: "running" } })
+  const skillTokens = value.filter(
+    (segment) => typeof segment !== "string" && segment.type === "skill"
+  )
+  for (const skill of skillTokens) {
+    if (typeof skill !== "string") {
+      prompt.updateToken(skill.id!, { data: { ...skill.data, run: "running" } })
+    }
+  }
   sendTimer = setTimeout(() => {
-    for (const skill of skillTokens)
-      if (typeof skill !== "string") prompt.updateToken(skill.id!, { data: { ...skill.data, run: "done" } })
+    for (const skill of skillTokens) {
+      if (typeof skill !== "string") {
+        prompt.updateToken(skill.id!, { data: { ...skill.data, run: "done" } })
+      }
+    }
     log(`Sent ${toText(prompt.getValue())}`)
     prompt.clear()
     running.value = false
@@ -65,16 +86,29 @@ function onSelect(value: string, details: TriggerMenuSelectDetails<string>) {
 }
 
 function attachReadme() {
-  prompt.insert({ type: "file", value: "README.md", label: "README.md" }, { resolve: loadFile() })
+  prompt.insert(
+    { type: "file", value: "README.md", label: "README.md" },
+    { resolve: loadFile() }
+  )
 }
 </script>
 
 <template>
   <TokenInput :controller="prompt" @submit="send">
     <div data-slot="card">
-      <TokenInputEditor aria-label="Prompt" placeholder="Ask anything. Type @ or /" />
+      <TokenInputEditor
+        aria-label="Prompt"
+        placeholder="Ask anything. Type @ or /"
+      />
       <div data-slot="row">
-        <button type="button" data-size="sm" @mousedown.prevent @click="attachReadme">Attach README</button>
+        <button
+          type="button"
+          data-size="sm"
+          @mousedown.prevent
+          @click="attachReadme"
+        >
+          Attach README
+        </button>
         <button
           type="button"
           data-variant="solid"

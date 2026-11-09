@@ -26,9 +26,13 @@ function Example() {
         defaultOpen={false}
         presentation="auto"
         container={container()}
-        onOpenChange={(open, details) => log(`${open ? "Opened" : "Closed"} (${details.reason})`)}
+        onOpenChange={(open, details) =>
+          log(`${open ? "Opened" : "Closed"} (${details.reason})`)
+        }
         onOpenChangeComplete={(open) => open || log("Finished closing")}
-        onMonthChange={(month, details) => log(`Showing ${month} (${details.reason})`)}
+        onMonthChange={(month, details) =>
+          log(`Showing ${month} (${details.reason})`)
+        }
       >
         <div data-slot="row" ref={setAnchor}>
           <DatePickerInput aria-label="Due date" />
@@ -50,7 +54,12 @@ function Example() {
           </DatePickerTrigger>
         </div>
         <DatePickerHint />
-        <DatePickerContent anchor={anchor()} sideOffset={6} collisionPadding={16} keepMounted>
+        <DatePickerContent
+          anchor={anchor()}
+          sideOffset={6}
+          collisionPadding={16}
+          keepMounted
+        >
           <div data-slot="row">
             <CalendarPrevious data-variant="ghost">
               <svg
@@ -81,8 +90,12 @@ function Example() {
             </CalendarNext>
           </div>
           <CalendarGrid>
-            <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-            <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+            <CalendarWeekdays>
+              {(index) => <CalendarWeekday index={index} />}
+            </CalendarWeekdays>
+            <CalendarWeeks>
+              {(cell) => <CalendarDay value={cell.date} />}
+            </CalendarWeeks>
           </CalendarGrid>
         </DatePickerContent>
       </DatePicker>

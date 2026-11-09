@@ -22,7 +22,10 @@ type Store = {
   remove: (id: string) => Promise<void>
 }
 
-const file = path.join(/* turbopackIgnore: true */ process.cwd(), "comments.json")
+const file = path.join(
+  /* turbopackIgnore: true */ process.cwd(),
+  "comments.json"
+)
 
 async function readFileComments(): Promise<Comment[]> {
   try {
@@ -42,7 +45,9 @@ async function writeFileComments(comments: Comment[]) {
 let writes = Promise.resolve()
 
 function queueWrite(change: (comments: Comment[]) => Comment[]) {
-  const next = writes.then(async () => writeFileComments(change(await readFileComments())))
+  const next = writes.then(async () =>
+    writeFileComments(change(await readFileComments()))
+  )
   writes = next.catch(() => {})
   return next
 }
@@ -50,7 +55,8 @@ function queueWrite(change: (comments: Comment[]) => Comment[]) {
 const fileStore: Store = {
   read: readFileComments,
   save: (comment) => queueWrite((comments) => [...comments, comment]),
-  remove: (id) => queueWrite((comments) => comments.filter((comment) => comment.id !== id)),
+  remove: (id) =>
+    queueWrite((comments) => comments.filter((comment) => comment.id !== id)),
 }
 
 // One blob per comment, so two people saving at once never overwrite each other.
@@ -58,7 +64,9 @@ const prefix = "review-comments/"
 
 async function readBlob(pathname: string) {
   const result = await get(pathname, { access: "private", useCache: false })
-  if (result?.statusCode !== 200) return null
+  if (result?.statusCode !== 200) {
+    return null
+  }
   return JSON.parse(await new Response(result.stream).text()) as Comment
 }
 
@@ -90,7 +98,9 @@ const blobStore: Store = {
 
 // A connected store sets one or the other. Vercel's file system is read-only, so
 // there comments need the store.
-const blobConnected = Boolean(process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID)
+const blobConnected = Boolean(
+  process.env.BLOB_READ_WRITE_TOKEN || process.env.BLOB_STORE_ID
+)
 const store = blobConnected ? blobStore : process.env.VERCEL ? null : fileStore
 
 export { store }

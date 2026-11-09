@@ -4,7 +4,11 @@ export { default as FileInputItem } from "./file-input/file-input-item.svelte"
 export { default as FileInputItemRemove } from "./file-input/file-input-item-remove.svelte"
 export { default as FileInputList } from "./file-input/file-input-list.svelte"
 export { default as FileInputTrigger } from "./file-input/file-input-trigger.svelte"
-export { createFileInputController, formatFileSize, relativePath } from "@ui-sdk/core/file-input"
+export {
+  createFileInputController,
+  formatFileSize,
+  relativePath,
+} from "@ui-sdk/core/file-input"
 export type {
   FileInputApi,
   FileInputChange,

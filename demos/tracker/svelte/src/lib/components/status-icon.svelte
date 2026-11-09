@@ -1,5 +1,11 @@
 <script lang="ts" module>
-  import { Circle, CircleCheck, CircleDashed, CircleDotDashed, CircleX } from "@lucide/svelte"
+  import {
+    Circle,
+    CircleCheck,
+    CircleDashed,
+    CircleDotDashed,
+    CircleX,
+  } from "@lucide/svelte"
 
   const icons = {
     backlog: CircleDashed,
@@ -24,11 +30,13 @@
 </script>
 
 <Icon
-  {...label ? { role: "img", "aria-label": statusOf(status).label } : { "aria-hidden": true }}
+  {...label
+    ? { role: "img", "aria-label": statusOf(status).label }
+    : { "aria-hidden": true }}
   class={cn(
     "size-4 shrink-0 text-muted-foreground",
     status === "in-progress" && "text-amber-500",
     status === "done" && "text-emerald-600 dark:text-emerald-400",
-    className,
+    className
   )}
 />

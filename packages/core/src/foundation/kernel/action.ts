@@ -28,11 +28,16 @@ type ActionDetails = {
 // What a popup controller's `open()` returned. A handler like `() => dialog.open()`
 // opens something; it isn't a wait, so its part doesn't go pending.
 const popupResults = new WeakSet<object>()
-const popupResult = <T extends object>(promise: T) => (popupResults.add(promise), promise)
+const popupResult = <T extends object>(promise: T) => (
+  popupResults.add(promise),
+  promise
+)
 
 // Whether a handler returned a Promise, which marks its part pending.
 const isPromise = (value: unknown): value is PromiseLike<unknown> =>
-  !!value && typeof (value as PromiseLike<unknown>).then === "function" && !popupResults.has(value)
+  !!value &&
+  typeof (value as PromiseLike<unknown>).then === "function" &&
+  !popupResults.has(value)
 
 // What an action handler returns when it was canceled, like a web component's
 // `action` event a listener prevented: nothing more happens, so the dialog a
@@ -51,10 +56,18 @@ const canceledAction = Symbol("canceled action")
 function runAction(
   action: (details: ActionDetails) => unknown,
   source: ChangeSource,
-  handlers: { pending: (pending: boolean) => void; done: () => void; failed: (error: unknown) => void },
+  handlers: {
+    pending: (pending: boolean) => void
+    done: () => void
+    failed: (error: unknown) => void
+  }
 ) {
   const failed = (error: unknown) => {
-    note("an action failed. The error is in its part's `error` state.", undefined, error)
+    note(
+      "an action failed. The error is in its part's `error` state.",
+      undefined,
+      error
+    )
     handlers.failed(error)
   }
   const done = () => withSource(source, handlers.done)
@@ -64,8 +77,12 @@ function runAction(
   } catch (error) {
     return failed(error)
   }
-  if (result === canceledAction) return
-  if (!isPromise(result)) return done()
+  if (result === canceledAction) {
+    return
+  }
+  if (!isPromise(result)) {
+    return done()
+  }
   handlers.pending(true)
   result.then(
     () => {
@@ -75,7 +92,7 @@ function runAction(
     (error) => {
       handlers.pending(false)
       failed(error)
-    },
+    }
   )
 }
 
@@ -91,23 +108,28 @@ function announcePending(
     options: () => { pendingAnnouncement?: string }
     onDestroy: (cleanup: () => void) => void
   },
-  isPending: () => boolean,
+  isPending: () => boolean
 ) {
   const say = () => {
-    const text = context.options().pendingAnnouncement ?? DEFAULT_PENDING_ANNOUNCEMENT
+    const text =
+      context.options().pendingAnnouncement ?? DEFAULT_PENDING_ANNOUNCEMENT
     import("../platform/announce").then(
       ({ announce }) => wasPending && announce(text),
-      () => {},
+      () => {}
     )
   }
   let timer: ReturnType<typeof setTimeout> | undefined
   let wasPending = false
   const unsubscribe = context.store.subscribe(() => {
     const pending = isPending()
-    if (pending === wasPending) return
+    if (pending === wasPending) {
+      return
+    }
     wasPending = pending
     clearTimeout(timer)
-    if (pending) timer = setTimeout(say, PENDING_ANNOUNCE_DELAY)
+    if (pending) {
+      timer = setTimeout(say, PENDING_ANNOUNCE_DELAY)
+    }
   })
   context.onDestroy(() => {
     wasPending = false
@@ -116,4 +138,11 @@ function announcePending(
   })
 }
 
-export { type ActionDetails, announcePending, canceledAction, isPromise, popupResult, runAction }
+export {
+  type ActionDetails,
+  announcePending,
+  canceledAction,
+  isPromise,
+  popupResult,
+  runAction,
+}

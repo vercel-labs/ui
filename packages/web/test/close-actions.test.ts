@@ -22,12 +22,16 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 afterEach(() => document.body.replaceChildren())
 
 const buttonNamed = (name: string) =>
-  [...document.querySelectorAll("button")].find((button) => button.textContent === name)!
+  [...document.querySelectorAll("button")].find(
+    (button) => button.textContent === name
+  )!
 
 // Records the source of each `action` event `el` fires, which doesn't bubble.
 function listen(el: Element, sources: string[]) {
   el.addEventListener("action", (event) => {
-    sources.push(`${el.localName}:${(event as CustomEvent<UiActionDetail>).detail.source}`)
+    sources.push(
+      `${el.localName}:${(event as CustomEvent<UiActionDetail>).detail.source}`
+    )
   })
 }
 
@@ -61,11 +65,16 @@ test("a toast's action event and its cancel say how they were pressed", async ()
     </ui-toast-region>`
   const sources: string[] = []
   const toaster = createToaster()
-  const region = document.querySelector("ui-toast-region") as UiToastRegionElement
+  const region = document.querySelector(
+    "ui-toast-region"
+  ) as UiToastRegionElement
   region.toaster = toaster
   toaster("Deleted", {
     duration: Infinity,
-    cancel: { label: "Keep", onCancel: (_event, { source }) => sources.push(`cancel:${source}`) },
+    cancel: {
+      label: "Keep",
+      onCancel: (_event, { source }) => sources.push(`cancel:${source}`),
+    },
   })
   await wait()
   listen(region.querySelector("ol ui-toast-action")!, sources)

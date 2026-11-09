@@ -14,7 +14,9 @@ function Example() {
   return (
     <FieldSet>
       <FieldLegend id={`${id}-legend`}>Billing period</FieldLegend>
-      <FieldDescription id={`${id}-description`}>Yearly billing gets you two months free.</FieldDescription>
+      <FieldDescription id={`${id}-description`}>
+        Yearly billing gets you two months free.
+      </FieldDescription>
       <RadioGroup
         defaultValue="monthly"
         aria-labelledby={`${id}-legend`}

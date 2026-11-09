@@ -2,7 +2,10 @@
 // a virtual highlight through the list, keys in the list when a screen reader
 // moved real focus there, and keys on chips, which move between them and
 // remove them.
-import type { ComboboxOpenChangeReason, ComboboxQueryChangeReason } from "./combobox"
+import type {
+  ComboboxOpenChangeReason,
+  ComboboxQueryChangeReason,
+} from "./combobox"
 import type { ComboboxState } from "./combobox-api"
 import { isRTL } from "../../foundation/platform/env"
 import { isApple } from "../../foundation/platform/platform"
@@ -38,7 +41,10 @@ function createComboboxKeyboard({
   choose: (key: string, event?: Event) => void
   create: (event?: Event) => void
   remove: (value: unknown, event?: Event) => void
-  itemLabelled: (query: string, candidates: ListEntry[]) => ListEntry | undefined
+  itemLabelled: (
+    query: string,
+    candidates: ListEntry[]
+  ) => ListEntry | undefined
   commitCustom: (reason: ComboboxQueryChangeReason, event?: Event) => boolean
   hasCreate: () => boolean
   allowCustomValue: () => boolean
@@ -65,13 +71,19 @@ function createComboboxKeyboard({
       return
     }
     const step = listStep(event, { apple: isApple() })
-    if (step !== undefined) return moveHighlight(event, step, open)
+    if (step !== undefined) {
+      return moveHighlight(event, step, open)
+    }
     switch (event.key) {
       case "Enter":
-        if (open) onEnter(event)
+        if (open) {
+          onEnter(event)
+        }
         return
       case "Tab":
-        if (open) hide({ reason: "focus-out", event })
+        if (open) {
+          hide({ reason: "focus-out", event })
+        }
         return
       case "Backspace":
         // Backspace in an empty input removes the last chip.
@@ -94,12 +106,18 @@ function createComboboxKeyboard({
 
   // Moves the highlight through the open list. A step to the next or previous
   // item opens a closed one at its first or last item, once it has mounted.
-  function moveHighlight(event: KeyboardEvent, step: number | "first" | "last", open: boolean) {
+  function moveHighlight(
+    event: KeyboardEvent,
+    step: number | "first" | "last",
+    open: boolean
+  ) {
     if (open) {
       event.preventDefault()
       return listbox.move(step, event)
     }
-    if (step !== 1 && step !== -1) return
+    if (step !== 1 && step !== -1) {
+      return
+    }
     event.preventDefault()
     highlightOnOpen(step === -1 ? "last" : "first")
     show({ event, by: "keyboard" })
@@ -113,36 +131,62 @@ function createComboboxKeyboard({
     if (highlighted !== null) {
       const el = listbox.element(highlighted)
       // Links follow themselves, so routers and modifier keys work.
-      if (el?.matches("a[href]")) return el.click()
+      if (el?.matches("a[href]")) {
+        return el.click()
+      }
       return choose(highlighted, event)
     }
     const text = query.trim()
     const exact = text ? itemLabelled(text, listbox.entries()) : undefined
-    if (exact) return choose(exact.key, event)
-    if (hasCreate()) return create(event)
-    if (allowCustomValue() && commitCustom("input-change", event) && !multiple)
+    if (exact) {
+      return choose(exact.key, event)
+    }
+    if (hasCreate()) {
+      return create(event)
+    }
+    if (
+      allowCustomValue() &&
+      commitCustom("input-change", event) &&
+      !multiple
+    ) {
       hide({ reason: "item-press", event })
+    }
   }
 
   // Keys in the list, when a screen reader's tap moved real focus there.
   function onListKeyDown(event: KeyboardEvent) {
-    if (!store.get().focusInList || event.target === inputElement()) return
-    listKeyDown(event, { listbox, highlighted: store.get().highlighted, choose, focusInput })
+    if (!store.get().focusInList || event.target === inputElement()) {
+      return
+    }
+    listKeyDown(event, {
+      listbox,
+      highlighted: store.get().highlighted,
+      choose,
+      focusInput,
+    })
   }
 
   // The arrow toward the chips, with the caret at the input's start, moves to the last chip.
   function focusLastChip(event: KeyboardEvent, input: HTMLInputElement) {
     const back = (event.key === "ArrowLeft") !== isRTL(input)
-    if (!back || input.selectionStart !== 0 || input.selectionEnd !== 0) return
+    if (!back || input.selectionStart !== 0 || input.selectionEnd !== 0) {
+      return
+    }
     const last = chips().at(-1)
-    if (!last) return
+    if (!last) {
+      return
+    }
     event.preventDefault()
     last.focus()
   }
 
   // Arrows move between chips and back to the input. Backspace and Delete
   // remove a chip and move to its neighbour, and Escape returns to the input.
-  function onChipKeyDown(event: KeyboardEvent, el: HTMLElement, value: unknown) {
+  function onChipKeyDown(
+    event: KeyboardEvent,
+    el: HTMLElement,
+    value: unknown
+  ) {
     const list = chips()
     const index = list.indexOf(el)
     const input = inputElement()
@@ -152,8 +196,11 @@ function createComboboxKeyboard({
         event.preventDefault()
         const previous = (event.key === "ArrowLeft") !== isRTL(el)
         const next = list[index + (previous ? -1 : 1)]
-        if (next) next.focus()
-        else if (!previous) input?.focus()
+        if (next) {
+          next.focus()
+        } else if (!previous) {
+          input?.focus()
+        }
         return
       }
       case "Backspace":
@@ -174,7 +221,12 @@ function createComboboxKeyboard({
   // Like a select's button, ArrowDown and ArrowUp on the trigger open the list
   // at its first or last item. Enter and Space press it.
   function onTriggerKeyDown(event: KeyboardEvent) {
-    if (store.get().open || (event.key !== "ArrowDown" && event.key !== "ArrowUp")) return
+    if (
+      store.get().open ||
+      (event.key !== "ArrowDown" && event.key !== "ArrowUp")
+    ) {
+      return
+    }
     event.preventDefault()
     highlightOnOpen(event.key === "ArrowUp" ? "last" : "first")
     show({ event, by: "keyboard" })

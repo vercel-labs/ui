@@ -3,7 +3,12 @@
 // strict templates still report the ones it doesn't.
 import { Dialog, DialogContent, DialogTitle } from "../../src/dialog"
 import { Listbox } from "../../src/listbox"
-import { Select, SelectContent, SelectItem, SelectTrigger } from "../../src/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+} from "../../src/select"
 import { Slider, SliderValue } from "../../src/slider"
 import { Tabs, TabsList, TabsTab } from "../../src/tabs"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../src/tooltip"
@@ -31,12 +36,22 @@ function onClick(event: MouseEvent) {
   </Tabs>
   <Tooltip>
     <TooltipTrigger data-foo="1" @click="onClick" />
-    <TooltipContent data-foo="1" @pointerdown="(event: PointerEvent) => event.pointerId" />
-    <DayTooltipContent v-slot="{ state }" data-foo="1">{{ state.payload?.date }}</DayTooltipContent>
+    <TooltipContent
+      data-foo="1"
+      @pointerdown="(event: PointerEvent) => event.pointerId"
+    />
+    <DayTooltipContent v-slot="{ state }" data-foo="1">{{
+      state.payload?.date
+    }}</DayTooltipContent>
   </Tooltip>
   <Select>
-    <SelectTrigger data-foo="1" @keydown="(event: KeyboardEvent) => event.key" />
-    <SelectContent data-foo="1"><SelectItem value="a" data-foo="1" @click="onClick" /></SelectContent>
+    <SelectTrigger
+      data-foo="1"
+      @keydown="(event: KeyboardEvent) => event.key"
+    />
+    <SelectContent data-foo="1"
+      ><SelectItem value="a" data-foo="1" @click="onClick"
+    /></SelectContent>
   </Select>
   <Listbox :items="['a']" data-foo="1" @click="onClick" />
   <Slider :default-value="2" data-foo="1"><SliderValue data-foo="1" /></Slider>

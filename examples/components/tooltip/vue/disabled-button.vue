@@ -10,7 +10,9 @@ const title = ref("")
 const blocked = computed(() => !title.value.trim())
 
 function publish() {
-  if (!blocked.value) log(`Published “${title.value.trim()}”`)
+  if (!blocked.value) {
+    log(`Published “${title.value.trim()}”`)
+  }
 }
 </script>
 
@@ -21,7 +23,11 @@ function publish() {
       <Input v-model:value="title" />
     </Field>
     <Tooltip :disabled="!blocked">
-      <TooltipTrigger data-variant="solid" :aria-disabled="blocked || undefined" @click="publish">
+      <TooltipTrigger
+        data-variant="solid"
+        :aria-disabled="blocked || undefined"
+        @click="publish"
+      >
         Publish
       </TooltipTrigger>
       <TooltipContent side="right">Add a title to publish</TooltipContent>

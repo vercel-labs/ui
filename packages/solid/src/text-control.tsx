@@ -10,13 +10,17 @@ type Native<Tag extends "input" | "textarea", State> = Omit<
 >
 
 // A boolean attribute as Solid types it: `true` and `""` set it.
-const isSet = (value: unknown) => value !== undefined && value !== null && value !== false
+const isSet = (value: unknown) =>
+  value !== undefined && value !== null && value !== false
 
 // The native props a text field's state follows, in Solid's casing.
 type TextProps = { disabled?: unknown; readonly?: unknown; required?: unknown }
 
 // The states a text field's attributes follow, from its own props and its field's.
-function controlProps(props: TextProps, field: ReturnType<typeof useFieldControl>) {
+function controlProps(
+  props: TextProps,
+  field: ReturnType<typeof useFieldControl>
+) {
   return () => ({
     disabled: isSet(props.disabled) || !!field?.disabled(),
     readOnly: isSet(props.readonly),
@@ -30,10 +34,17 @@ function controlProps(props: TextProps, field: ReturnType<typeof useFieldControl
 // what a form reset returns to and what the server renders: `defaultValue`
 // on the client, and the `value` attribute on the server, which only knows
 // attributes. A textarea's default is its text either way.
-function valueProps(value: () => string | undefined, defaultValue: () => string | undefined) {
+function valueProps(
+  value: () => string | undefined,
+  defaultValue: () => string | undefined
+) {
   return () => {
-    if (isServer) return { value: value() ?? defaultValue() }
-    return value() === undefined ? { defaultValue: defaultValue() } : { value: value() }
+    if (isServer) {
+      return { value: value() ?? defaultValue() }
+    }
+    return value() === undefined
+      ? { defaultValue: defaultValue() }
+      : { value: value() }
   }
 }
 
@@ -42,7 +53,7 @@ function elementProps(
   props: Record<string, any>,
   field: ReturnType<typeof useFieldControl>,
   value: () => string | undefined,
-  defaultValue: () => string | undefined,
+  defaultValue: () => string | undefined
 ) {
   return merge(
     props,
@@ -51,7 +62,7 @@ function elementProps(
         return props.name ?? field?.name()
       },
     },
-    valueProps(value, defaultValue),
+    valueProps(value, defaultValue)
   )
 }
 
@@ -60,8 +71,13 @@ function elementProps(
 // On the client, Solid would write it as the live value on every render, over
 // what the user typed since, so it becomes `defaultValue`: the `value`
 // attribute, which a form reset returns to.
-function defaultValueProps(props: Record<string, any>, initial: () => unknown = () => props.value) {
-  if (isServer) return props
+function defaultValueProps(
+  props: Record<string, any>,
+  initial: () => unknown = () => props.value
+) {
+  if (isServer) {
+    return props
+  }
   return merge(omit(props, "value"), {
     get defaultValue() {
       return initial()
@@ -80,10 +96,19 @@ function startingText(props: Record<string, any>) {
   return merge(props, {
     render: (merged: Record<string, any>, state: unknown) => {
       const element = defaultValueProps(merged)
-      if (typeof render === "function") return render(element, state)
+      if (typeof render === "function") {
+        return render(element, state)
+      }
       return <input {...element} />
     },
   })
 }
 
-export { controlProps, defaultValueProps, elementProps, type Native, startingText, valueProps }
+export {
+  controlProps,
+  defaultValueProps,
+  elementProps,
+  type Native,
+  startingText,
+  valueProps,
+}

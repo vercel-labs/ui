@@ -52,11 +52,17 @@ function onSize(value: string | null) {
       </Checkbox>
       <label>
         <Switch class="switch" default-checked>
-          <SwitchThumb v-slot="{ state }">{{ state.checked ? "I" : "O" }}</SwitchThumb>
+          <SwitchThumb v-slot="{ state }">{{
+            state.checked ? "I" : "O"
+          }}</SwitchThumb>
         </Switch>
         Labelled thumb
       </label>
-      <RadioGroup aria-label="Size" default-value="small" @value-change="onSize">
+      <RadioGroup
+        aria-label="Size"
+        default-value="small"
+        @value-change="onSize"
+      >
         <label v-for="value in ['small', 'large']" :key="value">
           <Radio class="radio" :value="value">
             <template #render="{ props }">

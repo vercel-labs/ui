@@ -21,7 +21,10 @@
 <div data-slot="stack">
   <div data-slot="controls" bind:this={controls}>
     <label data-slot="label">
-      <Checkbox checked={open} onCheckedChange={(next) => (open = next === true)}>
+      <Checkbox
+        checked={open}
+        onCheckedChange={(next) => (open = next === true)}
+      >
         <CheckboxIndicator>
           <CheckIcon aria-hidden="true" />
         </CheckboxIndicator>
@@ -34,14 +37,18 @@
     onOpenChange={(next, details) => {
       const target = details.event?.target
       const inControls = target instanceof Node && controls?.contains(target)
-      if (inControls && details.reason !== "escape-key") return details.cancel()
+      if (inControls && details.reason !== "escape-key") {
+        return details.cancel()
+      }
       log(`${next ? "Opened" : "Closed"} (${details.reason})`)
     }}
   >
     <PopoverTrigger>Set Status</PopoverTrigger>
     <PopoverContent>
       <PopoverTitle>Set a status</PopoverTitle>
-      <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
+      <PopoverDescription
+        >Your team sees it next to your name.</PopoverDescription
+      >
       <Field>
         <FieldLabel>Status</FieldLabel>
         <Input defaultValue="In a meeting" />

@@ -8,7 +8,13 @@ import {
   type ToggleGroupValueChangeReason,
   type TogglePressedChangeReason,
 } from "@ui-sdk/core/toggle"
-import { defineComponent, inject, provide, type InjectionKey, type PropType } from "vue"
+import {
+  defineComponent,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { useToolbarScope } from "./toolbar-context"
 import { createParts, withElement } from "./create-parts"
 import {
@@ -23,7 +29,9 @@ import {
 const parts = createParts(togglePrimitive, { icon: "span" })
 
 // The group's own key, so a toggle can join a group without bundling it.
-const ToggleGroupKey: InjectionKey<PrimitiveHandle<typeof toggleGroupPrimitive>> = Symbol("toggle-group")
+const ToggleGroupKey: InjectionKey<
+  PrimitiveHandle<typeof toggleGroupPrimitive>
+> = Symbol("toggle-group")
 
 /**
  * A button that stays pressed. Inside a ToggleGroup, the group decides whether it's pressed.
@@ -47,7 +55,10 @@ const Toggle = withElement(
     emits: {
       "update:pressed": (_pressed: boolean) => true,
       "update:modelValue": (_pressed: boolean) => true,
-      pressedChange: (_pressed: boolean, _details: ChangeDetails<TogglePressedChangeReason>) => true,
+      pressedChange: (
+        _pressed: boolean,
+        _details: ChangeDetails<TogglePressedChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof togglePrimitive, "root">,
     setup(props, { emit }) {
@@ -63,17 +74,22 @@ const Toggle = withElement(
         toolbar: toolbar.value,
         controller: props.controller,
         debug: props.debug,
-        onPressedChange: (pressed: boolean, details: ChangeDetails<TogglePressedChangeReason>) => {
+        onPressedChange: (
+          pressed: boolean,
+          details: ChangeDetails<TogglePressedChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("pressedChange", pressed, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:pressed", pressed)
           emit("update:modelValue", pressed)
         },
       }))
       return usePart(toggle, "root", undefined, undefined, "button")
     },
-  }),
+  })
 )
 
 /**
@@ -107,7 +123,10 @@ const ToggleGroup = /* @__PURE__ */ withElement(
     emits: {
       "update:value": (_value: string[]) => true,
       "update:modelValue": (_value: string[]) => true,
-      valueChange: (_value: string[], _details: ChangeDetails<ToggleGroupValueChangeReason>) => true,
+      valueChange: (
+        _value: string[],
+        _details: ChangeDetails<ToggleGroupValueChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof toggleGroupPrimitive, "group">,
     setup(props, { emit }) {
@@ -123,10 +142,15 @@ const ToggleGroup = /* @__PURE__ */ withElement(
         loop: props.loop,
         controller: props.controller,
         debug: props.debug,
-        onValueChange: (value: string[], details: ChangeDetails<ToggleGroupValueChangeReason>) => {
+        onValueChange: (
+          value: string[],
+          details: ChangeDetails<ToggleGroupValueChangeReason>
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
@@ -134,10 +158,13 @@ const ToggleGroup = /* @__PURE__ */ withElement(
       provide(ToggleGroupKey, group)
       return usePart(group, "group", undefined, undefined, "div")
     },
-  }),
+  })
 )
 
-export { createToggleController, createToggleGroupController } from "@ui-sdk/core/toggle"
+export {
+  createToggleController,
+  createToggleGroupController,
+} from "@ui-sdk/core/toggle"
 export type {
   ToggleApi,
   ToggleChangeOptions,

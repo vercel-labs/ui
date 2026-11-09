@@ -18,11 +18,24 @@ const markup = (trigger: string, content: string) =>
   `<div><button>Before</button><trigger>${trigger}</trigger><content>${content}</content><button>After</button></div>`
 
 const popups = [
-  { name: "menu", mount: () => mount(menu, {}, markup("Actions", `<item value="copy">Copy</item>`)) },
-  { name: "popover", mount: () => mount(popover, {}, markup("Share", `<button>Copy link</button>`)) },
+  {
+    name: "menu",
+    mount: () =>
+      mount(menu, {}, markup("Actions", `<item value="copy">Copy</item>`)),
+  },
+  {
+    name: "popover",
+    mount: () =>
+      mount(popover, {}, markup("Share", `<button>Copy link</button>`)),
+  },
   {
     name: "dialog",
-    mount: () => mount(dialog, {}, markup("Rename", `<title>Rename</title><close>Cancel</close>`)),
+    mount: () =>
+      mount(
+        dialog,
+        {},
+        markup("Rename", `<title>Rename</title><close>Cancel</close>`)
+      ),
   },
 ]
 
@@ -36,19 +49,24 @@ describe.each(popups)("$name", (popup) => {
       await view.keys("Enter")
       expect(view.state.open).toBe(true)
       rerenderOf(view).setProps("trigger", "", { disabled: true })
-      if (how === "Escape") await view.keys("Escape")
-      else {
+      if (how === "Escape") {
+        await view.keys("Escape")
+      } else {
         rerenderOf(view).setOptions({ open: false })
         await view.settle()
       }
       expect(view.state.open).toBe(false)
       expect(document.activeElement?.textContent).toBe("After")
-    },
+    }
   )
 })
 
 test("a select disabled while open gives focus to what follows its trigger when it closes", async () => {
-  const view = mount(select, {}, markup("Fruit", `<list><item value="apple">Apple</item></list>`))
+  const view = mount(
+    select,
+    {},
+    markup("Fruit", `<list><item value="apple">Apple</item></list>`)
+  )
   unmounts.push(view.unmount)
   view.part("trigger")!.focus()
   await view.keys("Enter")

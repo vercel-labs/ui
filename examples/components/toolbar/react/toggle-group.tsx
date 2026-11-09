@@ -2,7 +2,13 @@
 
 import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/react/toggle"
 import { Toolbar, ToolbarSeparator } from "@ui-sdk/react/toolbar"
-import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, ListIcon, ListOrderedIcon } from "lucide-react"
+import {
+  AlignCenterIcon,
+  AlignLeftIcon,
+  AlignRightIcon,
+  ListIcon,
+  ListOrderedIcon,
+} from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
 const alignments = [
@@ -37,7 +43,9 @@ function Example() {
       <ToolbarSeparator />
       <ToggleGroup
         aria-label="List"
-        onValueChange={([value]) => log(lists.find((list) => list.value === value)?.label ?? "No list")}
+        onValueChange={([value]) =>
+          log(lists.find((list) => list.value === value)?.label ?? "No list")
+        }
       >
         {lists.map(({ value, label, icon: Icon }) => (
           <Toggle key={value} value={value} aria-label={label}>

@@ -35,7 +35,7 @@ function mount(root: HTMLElement) {
                     ${role.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -56,8 +56,12 @@ function mount(root: HTMLElement) {
   select.addEventListener("openchange", (event) => {
     log(root, `open: ${event.detail.value} (${event.detail.reason})`)
   })
-  root.querySelector("[data-action=editor]")!.addEventListener("click", () => (select.value = "editor"))
-  root.querySelector("[data-action=open]")!.addEventListener("click", () => (select.open = true))
+  root
+    .querySelector("[data-action=editor]")!
+    .addEventListener("click", () => (select.value = "editor"))
+  root
+    .querySelector("[data-action=open]")!
+    .addEventListener("click", () => (select.open = true))
 }
 
 export { mount }

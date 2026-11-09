@@ -80,7 +80,11 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
 ```
 
 ```html
-<ui-segmented-control aria-label="View" default-value="list" class="relative isolate inline-flex">
+<ui-segmented-control
+  aria-label="View"
+  default-value="list"
+  class="relative isolate inline-flex"
+>
   <ui-segmented-control-indicator
     class="absolute -z-1 top-(--segmented-control-indicator-top) left-(--segmented-control-indicator-left) w-(--segmented-control-indicator-width) h-(--segmented-control-indicator-height) transition-[top,left,width,height] duration-200"
   ></ui-segmented-control-indicator>
@@ -138,7 +142,9 @@ Set `read-only` to keep the value while still letting people focus the items. Ar
 Arrow keys wrap from the last item to the first. Set `loop` to `false` to stop at the ends.
 
 ```html
-<ui-segmented-control aria-label="View" default-value="list" loop="false"> ... </ui-segmented-control>
+<ui-segmented-control aria-label="View" default-value="list" loop="false">
+  ...
+</ui-segmented-control>
 ```
 
 ## Styling

@@ -16,7 +16,11 @@ renders a <div> and closes with its parent.
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
   import type { PopupContainer } from "../popup.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import {
     ContainerKey,
     ItemKey,
@@ -69,9 +73,14 @@ renders a <div> and closes with its parent.
   } = $props()
 
   const id = $props.id()
-  const parentMenu = getContext<NavigationMenuContext | undefined>(navigationMenuPrimitive)
+  const parentMenu = getContext<NavigationMenuContext | undefined>(
+    navigationMenuPrimitive
+  )
   const parentItem = getContext<ItemContext | undefined>(ItemKey)?.() ?? null
-  const parent = parentMenu && parentItem !== null ? { api: parentMenu.api, item: parentItem } : undefined
+  const parent =
+    parentMenu && parentItem !== null
+      ? { api: parentMenu.api, item: parentItem }
+      : undefined
   const menu = usePrimitive(navigationMenuPrimitive, () => ({
     id,
     get value() {
@@ -89,7 +98,9 @@ renders a <div> and closes with its parent.
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onOpenChangeComplete,
   }))

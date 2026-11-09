@@ -1,4 +1,7 @@
-import { createNavigationMenuController, type NavigationMenuController } from "@ui-sdk/core/navigation-menu"
+import {
+  createNavigationMenuController,
+  type NavigationMenuController,
+} from "@ui-sdk/core/navigation-menu"
 import "./styles.css"
 import type { Variant } from "./variants"
 import { items, variants } from "./variants"
@@ -18,16 +21,21 @@ type Env = {
 
 type Framework = "react" | "vue" | "web"
 
-const frameworks: Record<Framework, string> = { react: "React", vue: "Vue", web: "Web Components" }
+const frameworks: Record<Framework, string> = {
+  react: "React",
+  vue: "Vue",
+  web: "Web Components",
+}
 
 // Builds the page in plain DOM and asks the framework to mount one navigation menu per card.
 function kitchenSink(
   root: HTMLElement,
   framework: Framework,
-  mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
+  mount: (slot: HTMLElement, variant: Variant, env: Env) => void
 ) {
   document.title = `Navigation menu kitchen sink · ${frameworks[framework]}`
-  root.className = "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
+  root.className =
+    "min-h-screen bg-neutral-50 pb-80 font-sans text-neutral-950 antialiased"
   root.innerHTML = `
     <header class="sticky top-0 z-10 flex flex-wrap items-center gap-4 border-b border-neutral-200 bg-white/90 px-6 py-3 backdrop-blur">
       <h1 class="text-sm font-semibold">Navigation menu kitchen sink</h1>
@@ -36,8 +44,10 @@ function kitchenSink(
           .map(
             ([id, label]) =>
               `<a href="?fixture=navigation-menu-kitchen-sink&framework=${id}" class="rounded-md px-2.5 py-1 ${
-                id === framework ? "bg-neutral-950 text-white" : "text-neutral-600 hover:bg-neutral-100"
-              }">${label}</a>`,
+                id === framework
+                  ? "bg-neutral-950 text-white"
+                  : "text-neutral-600 hover:bg-neutral-100"
+              }">${label}</a>`
           )
           .join("")}
       </nav>
@@ -54,7 +64,9 @@ function kitchenSink(
   `
   const main = root.querySelector("main")!
   const logList = root.querySelector<HTMLOListElement>("[data-log]")!
-  root.querySelector("[data-clear]")!.addEventListener("click", () => logList.replaceChildren())
+  root
+    .querySelector("[data-clear]")!
+    .addEventListener("click", () => logList.replaceChildren())
 
   const sections = new Map<string, HTMLElement>()
   const pinned = new Map<string, number>()
@@ -64,7 +76,8 @@ function kitchenSink(
       const section = document.createElement("section")
       section.innerHTML = `<h2 class="mb-3 text-xs font-semibold tracking-wide text-neutral-500 uppercase">${variant.section}</h2>`
       grid = document.createElement("div")
-      grid.className = "grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-3"
+      grid.className =
+        "grid grid-cols-[repeat(auto-fill,minmax(380px,1fr))] gap-3"
       section.append(grid)
       main.append(section)
       sections.set(variant.section, grid)
@@ -81,19 +94,24 @@ function chips(variant: Variant) {
     ...(variant.body && { body: variant.body }),
     ...(variant.anchorNav && { anchor: "nav" }),
     ...(variant.disabled && { disabled: variant.disabled }),
-    ...(variant.linkCloseOnSelect && { "link closeOnSelect": !(variant.options?.closeOnSelect ?? true) }),
+    ...(variant.linkCloseOnSelect && {
+      "link closeOnSelect": !(variant.options?.closeOnSelect ?? true),
+    }),
     ...(variant.animation && { animation: variant.animation }),
   }
   return Object.entries(props)
     .map(
       ([key, value]) =>
-        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`,
+        `<code class="rounded bg-neutral-100 px-1.5 py-0.5 text-[11px] text-neutral-600">${key}=${JSON.stringify(value)}</code>`
     )
     .join("")
 }
 
 // Pinned navigations stack down from the top corners and up from the bottom ones.
-const corners: Record<string, { vertical: "top" | "bottom"; horizontal: "left" | "right"; start: number }> = {
+const corners: Record<
+  string,
+  { vertical: "top" | "bottom"; horizontal: "left" | "right"; start: number }
+> = {
   "top-left": { vertical: "top", horizontal: "left", start: 64 },
   "top-right": { vertical: "top", horizontal: "right", start: 64 },
   "bottom-left": { vertical: "bottom", horizontal: "left", start: 16 },
@@ -105,10 +123,11 @@ function card(
   variant: Variant,
   mount: (slot: HTMLElement, variant: Variant, env: Env) => void,
   logList: HTMLOListElement,
-  pinned: Map<string, number>,
+  pinned: Map<string, number>
 ) {
   const el = document.createElement("article")
-  el.className = "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
+  el.className =
+    "flex flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-4"
   el.innerHTML = `
     <div>
       <div class="text-[13px] font-medium">${variant.title}</div>
@@ -131,7 +150,9 @@ function card(
       logList.prepend(row)
     },
   }
-  if (variant.anchorNav) env.anchor = `#${env.navId}`
+  if (variant.anchorNav) {
+    env.anchor = `#${env.navId}`
+  }
 
   switch (variant.place) {
     case "top-left":
@@ -142,9 +163,11 @@ function card(
       const index = pinned.get(variant.place) ?? 0
       pinned.set(variant.place, index + 1)
       const fixed = document.createElement("div")
-      fixed.className = "fixed z-10 rounded-lg border border-neutral-200 bg-white p-1 shadow-sm"
+      fixed.className =
+        "fixed z-10 rounded-lg border border-neutral-200 bg-white p-1 shadow-sm"
       fixed.style[corner.vertical] = `${corner.start + index * 48}px`
-      fixed.style[corner.horizontal] = variant.place === "bottom-right" ? "25rem" : "16px"
+      fixed.style[corner.horizontal] =
+        variant.place === "bottom-right" ? "25rem" : "16px"
       fixed.append(slot)
       document.body.append(fixed)
       stage.innerHTML = `<span class="text-xs text-neutral-500">The navigation is pinned to the ${variant.place.replace("-", " ")} of the window.</span>`
@@ -152,7 +175,8 @@ function card(
     }
     case "scroll": {
       const box = document.createElement("div")
-      box.className = "h-32 w-full overflow-y-auto rounded-md border border-dashed border-neutral-300 p-3"
+      box.className =
+        "h-32 w-full overflow-y-auto rounded-md border border-dashed border-neutral-300 p-3"
       box.innerHTML = `<div class="h-12 text-xs text-neutral-400">Scroll ↓</div>`
       const inner = document.createElement("div")
       inner.className = "pb-32"
@@ -163,7 +187,8 @@ function card(
     }
     case "clip": {
       const box = document.createElement("div")
-      box.className = "h-12 w-full overflow-hidden rounded-md border border-dashed border-neutral-300 p-1.5"
+      box.className =
+        "h-12 w-full overflow-hidden rounded-md border border-dashed border-neutral-300 p-1.5"
       box.append(slot)
       stage.append(box)
       break
@@ -201,7 +226,8 @@ function card(
     const label = document.createElement("label")
     label.className = "flex items-center gap-2 text-xs text-neutral-600"
     const select = document.createElement("select")
-    select.className = "h-7 rounded border border-neutral-200 bg-white px-1.5 text-xs"
+    select.className =
+      "h-7 rounded border border-neutral-200 bg-white px-1.5 text-xs"
     select.setAttribute("aria-label", "Open item")
     select.innerHTML = `<option value="">None</option>${items
       .map((item) => `<option value="${item.value}">${item.label}</option>`)
@@ -225,7 +251,8 @@ function card(
       ["Value?", () => env.log(`value: ${controller.getValue()}`)],
     ] as const) {
       const button = document.createElement("button")
-      button.className = "rounded border border-neutral-200 px-2 py-1 hover:bg-neutral-50"
+      button.className =
+        "rounded border border-neutral-200 px-2 py-1 hover:bg-neutral-50"
       button.textContent = label
       button.addEventListener("click", run)
       buttons.append(button)

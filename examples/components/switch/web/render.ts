@@ -13,9 +13,13 @@ function mount(root: HTMLElement) {
   const darkMode = root.querySelector("ui-switch")!
   const thumb = root.querySelector("ui-switch-thumb")!
   const render = (checked: boolean) =>
-    thumb.replaceChildren(createElement(checked ? Moon : Sun, { "aria-hidden": "true" }))
+    thumb.replaceChildren(
+      createElement(checked ? Moon : Sun, { "aria-hidden": "true" })
+    )
   render(darkMode.checked)
-  darkMode.addEventListener("checkedchange", (event) => render(event.detail.value))
+  darkMode.addEventListener("checkedchange", (event) =>
+    render(event.detail.value)
+  )
 }
 
 export { mount }

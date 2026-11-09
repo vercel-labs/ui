@@ -10,7 +10,11 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={handled} onChange={(event) => setHandled(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={handled}
+            onChange={(event) => setHandled(event.target.checked)}
+          />
           Wait for the input method
         </label>
       </div>
@@ -20,9 +24,13 @@ function Example() {
           type="search"
           placeholder="Type a city…"
           onChange={(event) => {
-            if (!handled || !isComposing(event)) log(`Search “${event.target.value}”`)
+            if (!handled || !isComposing(event)) {
+              log(`Search “${event.target.value}”`)
+            }
           }}
-          onCompositionEnd={(event) => handled && log(`Search “${event.currentTarget.value}”`)}
+          onCompositionEnd={(event) =>
+            handled && log(`Search “${event.currentTarget.value}”`)
+          }
         />
       </Field>
     </div>

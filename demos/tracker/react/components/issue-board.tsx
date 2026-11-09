@@ -16,10 +16,15 @@ function IssueBoard({ issues, query }: { issues: Issue[]; query: Query }) {
             aria-labelledby={`column-${status}`}
             className="flex w-72 shrink-0 flex-col gap-2 rounded-3xl bg-muted/60 p-2"
           >
-            <h2 id={`column-${status}`} className="flex items-center gap-2 px-2 py-1 font-medium">
+            <h2
+              id={`column-${status}`}
+              className="flex items-center gap-2 px-2 py-1 font-medium"
+            >
               <StatusIcon status={status} />
               {statusOf(status).label}
-              <span className="text-muted-foreground tabular-nums">{cards.length}</span>
+              <span className="text-muted-foreground tabular-nums">
+                {cards.length}
+              </span>
             </h2>
             <ul className="flex min-h-0 flex-col gap-2 overflow-y-auto">
               {cards.map((issue) => (
@@ -40,7 +45,10 @@ function IssueBoard({ issues, query }: { issues: Issue[]; query: Query }) {
                     </span>
                     <span className="font-medium">{issue.title}</span>
                     {issue.labels.length > 0 && (
-                      <IssueLabels labels={issue.labels} className="flex flex-wrap gap-1" />
+                      <IssueLabels
+                        labels={issue.labels}
+                        className="flex flex-wrap gap-1"
+                      />
                     )}
                   </Link>
                 </li>

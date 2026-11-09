@@ -12,7 +12,9 @@
 
 <FieldSet>
   <FieldLegend>Address</FieldLegend>
-  <FieldDescription>We need your address to deliver your order.</FieldDescription>
+  <FieldDescription
+    >We need your address to deliver your order.</FieldDescription
+  >
   <FieldGroup>
     <Field name="street">
       <FieldLabel>Street address</FieldLabel>

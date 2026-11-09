@@ -15,7 +15,8 @@ const hoverCardFixture = {
 // Hover card options a spec can set through the URL: ?delay=0&closeDelay=0&open&container=id.
 function hoverCardOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   const container = params.get("container")
   return {
     delay: number("delay") ?? 100,

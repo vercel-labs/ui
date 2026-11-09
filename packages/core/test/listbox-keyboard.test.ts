@@ -11,7 +11,12 @@ const fruits = [
   { value: "date", label: "Date" },
 ]
 
-type Modifiers = { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean }
+type Modifiers = {
+  altKey?: boolean
+  ctrlKey?: boolean
+  metaKey?: boolean
+  shiftKey?: boolean
+}
 
 function key(name: string, modifiers: Modifiers = {}) {
   const event = {
@@ -55,12 +60,18 @@ describe("listStep", () => {
   test("Ctrl+N and Ctrl+P step by one item on Apple platforms only", () => {
     expect(listStep(key("n", { ctrlKey: true }), apple)).toBe(1)
     expect(listStep(key("p", { ctrlKey: true }), apple)).toBe(-1)
-    expect(listStep(key("n", { ctrlKey: true }), { apple: false })).toBeUndefined()
+    expect(
+      listStep(key("n", { ctrlKey: true }), { apple: false })
+    ).toBeUndefined()
   })
 
   test("Ctrl+N with another modifier, and N alone, are no step", () => {
-    expect(listStep(key("n", { ctrlKey: true, shiftKey: true }), apple)).toBeUndefined()
-    expect(listStep(key("n", { ctrlKey: true, altKey: true }), apple)).toBeUndefined()
+    expect(
+      listStep(key("n", { ctrlKey: true, shiftKey: true }), apple)
+    ).toBeUndefined()
+    expect(
+      listStep(key("n", { ctrlKey: true, altKey: true }), apple)
+    ).toBeUndefined()
     expect(listStep(key("n"), apple)).toBeUndefined()
   })
 
@@ -77,7 +88,8 @@ describe("select list keys", () => {
     instance.api.open()
     return instance
   }
-  const highlighted = (instance: ReturnType<typeof select>) => instance.get().highlighted
+  const highlighted = (instance: ReturnType<typeof select>) =>
+    instance.get().highlighted
 
   test("Ctrl+N and Ctrl+P move the highlight on Apple platforms", () => {
     setPlatform("apple")
@@ -121,7 +133,8 @@ describe("combobox list keys", () => {
     instance.api.open()
     return instance
   }
-  const highlighted = (instance: ReturnType<typeof combobox>) => instance.get().highlighted
+  const highlighted = (instance: ReturnType<typeof combobox>) =>
+    instance.get().highlighted
 
   test("Ctrl+N and Ctrl+P move the highlight on Apple platforms", () => {
     setPlatform("apple")

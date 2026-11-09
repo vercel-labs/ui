@@ -27,7 +27,9 @@ function provideSheetHeader() {
     record: (el) => {
       element = el
       return () => {
-        if (element === el) element = null
+        if (element === el) {
+          element = null
+        }
       }
     },
   })
@@ -35,7 +37,9 @@ function provideSheetHeader() {
 
 /** Call in the content's script. The attachment for the header's element. */
 function useSheetHeader() {
-  return getContext<SheetHeader | undefined>(SheetHeaderKey)?.record ?? (() => {})
+  return (
+    getContext<SheetHeader | undefined>(SheetHeaderKey)?.record ?? (() => {})
+  )
 }
 
 /**

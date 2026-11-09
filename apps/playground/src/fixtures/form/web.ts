@@ -67,12 +67,16 @@ function markup(options: ReturnType<typeof formOptions>) {
 // `invalid`, and gives the others back to the browser's own validation. An
 // error with text of its own keeps it; an empty one shows the browser's message.
 function showErrors(root: HTMLElement, errors: FormErrors | undefined) {
-  for (const field of Array.from(root.querySelectorAll<HTMLElement>("ui-field"))) {
+  for (const field of Array.from(
+    root.querySelectorAll<HTMLElement>("ui-field")
+  )) {
     const name = field.getAttribute("name")!
     const message = messageOf(errors, name)
     field.toggleAttribute("invalid", !!message)
     const error = field.querySelector<HTMLElement>("ui-field-error")
-    if (!error) continue
+    if (!error) {
+      continue
+    }
     if (message) {
       delete error.dataset.message
       error.textContent = message
@@ -90,8 +94,11 @@ async function mount(root: HTMLElement) {
   const template = document.createElement("template")
   template.innerHTML = markup(options)
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
-  if (options.submitShortcut)
-    template.content.querySelector("ui-textarea")!.setAttribute("submit-shortcut", options.submitShortcut)
+  if (options.submitShortcut) {
+    template.content
+      .querySelector("ui-textarea")!
+      .setAttribute("submit-shortcut", options.submitShortcut)
+  }
   root.replaceChildren(template.content)
   const form = root.querySelector("form")!
   const [lastAction, submitted] = Array.from(root.querySelectorAll("output"))
@@ -105,13 +112,17 @@ async function mount(root: HTMLElement) {
   let pending = false
   form.addEventListener("submit", async (event) => {
     event.preventDefault()
-    if (pending) return
+    if (pending) {
+      return
+    }
     const data = new FormData(form)
     pending = true
     try {
       const result = await save(data, options.action)
       setErrors(result)
-      if (!result) submitted.textContent = serializeData(data)
+      if (!result) {
+        submitted.textContent = serializeData(data)
+      }
     } catch {
       // The fake server failed. The page keeps what it showed.
     } finally {
@@ -121,17 +132,27 @@ async function mount(root: HTMLElement) {
   form.addEventListener("reset", () => setErrors(undefined))
 
   const report = (name: string) => (event: Event) => {
-    const { value, reason } = (event as CustomEvent<{ value: string; reason: string }>).detail
-    if (name === f.username.name && options.noDigits && /\d/.test(value)) return event.preventDefault()
+    const { value, reason } = (
+      event as CustomEvent<{ value: string; reason: string }>
+    ).detail
+    if (name === f.username.name && options.noDigits && /\d/.test(value)) {
+      return event.preventDefault()
+    }
     lastAction.textContent = `${name}:${value}:${reason}`
     setErrors(without(errors, name))
   }
   ;(root.querySelector("#username") as UiInputElement).addEventListener(
     "valuechange",
-    report(f.username.name),
+    report(f.username.name)
   )
-  ;(root.querySelector("#email") as UiInputElement).addEventListener("valuechange", report(f.email.name))
-  ;(root.querySelector("#website") as UiInputElement).addEventListener("valuechange", report(f.website.name))
+  ;(root.querySelector("#email") as UiInputElement).addEventListener(
+    "valuechange",
+    report(f.email.name)
+  )
+  ;(root.querySelector("#website") as UiInputElement).addEventListener(
+    "valuechange",
+    report(f.website.name)
+  )
   root.querySelector("#toggle-contact")!.addEventListener("click", () => {
     root.querySelector("#contact")!.toggleAttribute("disabled")
   })

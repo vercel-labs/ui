@@ -17,7 +17,8 @@ import {
       <DialogTrigger>
         <template #render="{ props, state }">
           <button v-bind="props" :class="state.open ? 'is-open' : 'is-closed'">
-            Shipping <span aria-hidden="true">{{ state.open ? "▲" : "▼" }}</span>
+            Shipping
+            <span aria-hidden="true">{{ state.open ? "▲" : "▼" }}</span>
           </button>
         </template>
       </DialogTrigger>

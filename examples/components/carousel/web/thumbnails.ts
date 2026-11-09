@@ -29,14 +29,27 @@ function mount(root: HTMLElement) {
     </div>
   `
   const gallery = root.querySelector("ui-carousel")!
-  const thumbnails = [...root.querySelectorAll<HTMLButtonElement>("button[data-page]")]
+  const thumbnails = [
+    ...root.querySelectorAll<HTMLButtonElement>("button[data-page]"),
+  ]
   const show = (page: number) => {
-    for (const thumbnail of thumbnails)
-      thumbnail.setAttribute("aria-pressed", String(thumbnail.dataset.page === String(page)))
-    thumbnails[page - 1]?.scrollIntoView({ block: "nearest", inline: "nearest" })
+    for (const thumbnail of thumbnails) {
+      thumbnail.setAttribute(
+        "aria-pressed",
+        String(thumbnail.dataset.page === String(page))
+      )
+    }
+    thumbnails[page - 1]?.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+    })
   }
-  for (const thumbnail of thumbnails)
-    thumbnail.addEventListener("click", () => (gallery.page = Number(thumbnail.dataset.page)))
+  for (const thumbnail of thumbnails) {
+    thumbnail.addEventListener(
+      "click",
+      () => (gallery.page = Number(thumbnail.dataset.page))
+    )
+  }
   gallery.addEventListener("pagechange", (event) => show(event.detail.value))
 }
 

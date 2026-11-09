@@ -17,7 +17,9 @@ function Example() {
   const [uploaded, setUploaded] = React.useState(1)
 
   function uploadNext() {
-    if (uploaded >= total) return
+    if (uploaded >= total) {
+      return
+    }
     setUploaded(uploaded + 1)
     log(`Uploaded ${uploaded + 1} of ${total} photos`)
   }
@@ -30,7 +32,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <button type="button" aria-disabled={uploaded >= total} onClick={uploadNext}>
+        <button
+          type="button"
+          aria-disabled={uploaded >= total}
+          onClick={uploadNext}
+        >
           Upload Next
         </button>
         <button type="button" onClick={reset}>

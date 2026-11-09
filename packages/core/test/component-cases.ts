@@ -119,7 +119,11 @@ const componentCases: ComponentCase[] = [
     primitive: switchPrimitive,
     markup: `<root aria-label="Wi-Fi"><thumb></thumb></root><input></input>`,
   },
-  { name: "toggle", primitive: toggle, markup: `<root aria-label="Bold">B</root>` },
+  {
+    name: "toggle",
+    primitive: toggle,
+    markup: `<root aria-label="Bold">B</root>`,
+  },
   {
     name: "token input",
     primitive: tokenInput,

@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@ui-sdk/vue"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "@ui-sdk/vue"
 import { perfItems, perfSize } from "tests/fixtures/perf.ts"
 
 // Many popovers on one page, like a row action in every row of a table, for

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Command, CommandInput, CommandItem, CommandList, CommandPage } from "@ui-sdk/vue/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandPage,
+} from "@ui-sdk/vue/command"
 import { ref } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
@@ -24,9 +30,13 @@ const log = useLog()
       (next: string | null, details: { reason: string }) =>
         log(`Highlighted ${next ?? 'nothing'} (${details.reason})`)
     "
-    @query-change="(next: string, details: { reason: string }) => log(`Query “${next}” (${details.reason})`)"
+    @query-change="
+      (next: string, details: { reason: string }) =>
+        log(`Query “${next}” (${details.reason})`)
+    "
     @pages-change="
-      (next: string[], details: { reason: string }) => log(`Pages [${next.join(', ')}] (${details.reason})`)
+      (next: string[], details: { reason: string }) =>
+        log(`Pages [${next.join(', ')}] (${details.reason})`)
     "
     @action="(next: string) => log(`Ran ${next}`)"
   >
@@ -36,7 +46,11 @@ const log = useLog()
         <CommandItem value="theme" page="theme">Change theme…</CommandItem>
       </CommandPage>
       <CommandPage value="theme">
-        <CommandItem v-for="theme in themes" :key="theme.value" :value="theme.value">
+        <CommandItem
+          v-for="theme in themes"
+          :key="theme.value"
+          :value="theme.value"
+        >
           {{ theme.label }}
         </CommandItem>
       </CommandPage>

@@ -1,5 +1,12 @@
 import * as React from "react"
-import { FlameIcon, FrownIcon, HeartIcon, LaughIcon, PartyPopperIcon, ThumbsUpIcon } from "lucide-react"
+import {
+  FlameIcon,
+  FrownIcon,
+  HeartIcon,
+  LaughIcon,
+  PartyPopperIcon,
+  ThumbsUpIcon,
+} from "lucide-react"
 import { bindDrag, css, definePrimitive } from "@ui-sdk/core"
 import { sectorOf } from "@ui-sdk/core/gesture"
 import { createParts } from "@ui-sdk/react/primitive"
@@ -19,7 +26,10 @@ const start = 1 / 12
 
 function sectorPoint(index: number, count: number, radius: number, start = 0) {
   const angle = (index / Math.max(count, 1) + start) * 2 * Math.PI
-  return { x: Math.round(Math.sin(angle) * radius), y: Math.round(-Math.cos(angle) * radius) }
+  return {
+    x: Math.round(Math.sin(angle) * radius),
+    y: Math.round(-Math.cos(angle) * radius),
+  }
 }
 
 type ReactState = {
@@ -35,23 +45,33 @@ const react = definePrimitive({
     let stop: (() => void) | undefined
     context.onDestroy(() => stop?.())
     return {
-      pick: (index: number) => store.set({ picked: reactions[index], pointing: -1 }),
+      pick: (index: number) =>
+        store.set({ picked: reactions[index], pointing: -1 }),
       pointerdown(event: PointerEvent, el: HTMLElement) {
-        if (event.button !== 0) return
+        if (event.button !== 0) {
+          return
+        }
         event.preventDefault()
         stop = bindDrag(el, event, {
           cancelOnEscape: true,
           onMove: ({ x, y }) =>
             store.set({
-              pointing: sectorOf(x - event.clientX, y - event.clientY, reactions.length, {
-                deadZone: 24,
-                start,
-              }),
+              pointing: sectorOf(
+                x - event.clientX,
+                y - event.clientY,
+                reactions.length,
+                {
+                  deadZone: 24,
+                  start,
+                }
+              ),
             }),
           onEnd: (_end, canceled) => {
             stop = undefined
             const { pointing } = store.get()
-            if (!canceled && pointing !== -1) store.set({ picked: reactions[pointing] })
+            if (!canceled && pointing !== -1) {
+              store.set({ picked: reactions[pointing] })
+            }
             store.set({ pointing: -1 })
           },
         })
@@ -64,7 +84,10 @@ const react = definePrimitive({
       attrs: () => ({ style: css({ position: "relative" }) }),
     }),
     handle: slot({
-      attrs: () => ({ "aria-hidden": "true", style: css({ "touch-action": "none" }) }),
+      attrs: () => ({
+        "aria-hidden": "true",
+        style: css({ "touch-action": "none" }),
+      }),
       on: { pointerdown: (event, { el, api }) => api.pointerdown(event, el!) },
     }),
     reaction: slot<{ value: string }>({
@@ -77,15 +100,25 @@ const react = definePrimitive({
           "aria-label": props.value,
           "aria-pressed": String(state.picked === props.value),
           "data-pointing": state.pointing === index ? "" : undefined,
-          style: css({ position: "absolute", left: "50%", top: "50%", translate: `${x}px ${y}px` }),
+          style: css({
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            translate: `${x}px ${y}px`,
+          }),
         }
       },
-      press: ({ api, props }) => api.pick(reactions.indexOf(props.value as keyof typeof icons)),
+      press: ({ api, props }) =>
+        api.pick(reactions.indexOf(props.value as keyof typeof icons)),
     }),
   }),
 })
 
-const parts = createParts(react, { root: "div", handle: "div", reaction: "button" })
+const parts = createParts(react, {
+  root: "div",
+  handle: "div",
+  reaction: "button",
+})
 
 const ReactionRing = parts.Root
 
@@ -100,7 +133,9 @@ function Example() {
         const Picked = picked ? icons[picked as keyof typeof icons] : null
         return (
           <>
-            <ReactionHandle>{Picked ? <Picked aria-hidden="true" /> : null}</ReactionHandle>
+            <ReactionHandle>
+              {Picked ? <Picked aria-hidden="true" /> : null}
+            </ReactionHandle>
             {reactions.map((reaction) => {
               const Icon = icons[reaction]
               return (
@@ -116,4 +151,11 @@ function Example() {
   )
 }
 
-export { Example, react, Reaction, ReactionHandle, ReactionRing, type ReactState }
+export {
+  Example,
+  react,
+  Reaction,
+  ReactionHandle,
+  ReactionRing,
+  type ReactState,
+}

@@ -3,4 +3,10 @@
 // Nothing imports this file, so bundles don't pay for it.
 export { createArea, type Area } from "./area"
 export { bindHold } from "./hold"
-export { resizeBox, type ResizeBox, resizeCursors, type ResizeHandle, type ResizeLimits } from "./resize"
+export {
+  resizeBox,
+  type ResizeBox,
+  resizeCursors,
+  type ResizeHandle,
+  type ResizeLimits,
+} from "./resize"

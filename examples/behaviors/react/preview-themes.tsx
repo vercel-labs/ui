@@ -1,10 +1,25 @@
 import * as React from "react"
-import { createChange, createPreview, createRovingFocus, definePrimitive, selects } from "@ui-sdk/core"
+import {
+  createChange,
+  createPreview,
+  createRovingFocus,
+  definePrimitive,
+  selects,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type ThemesState = { value: string; preview: string | null; focused: string | null }
+type ThemesState = {
+  value: string
+  preview: string | null
+  focused: string | null
+}
 
-const names: Record<string, string> = { light: "Light", dark: "Dark", sepia: "Sepia", contrast: "Contrast" }
+const names: Record<string, string> = {
+  light: "Light",
+  dark: "Dark",
+  sepia: "Sepia",
+  contrast: "Contrast",
+}
 
 const themes = definePrimitive({
   name: "themes",
@@ -13,7 +28,10 @@ const themes = definePrimitive({
     const { store } = context
     const change = createChange(context)
     return {
-      roving: createRovingFocus<ThemesState, { value: string }>(context, { slot: "theme", key: "focused" }),
+      roving: createRovingFocus<ThemesState, { value: string }>(context, {
+        slot: "theme",
+        key: "focused",
+      }),
       preview: createPreview<ThemesState>(context, {
         key: "preview",
         slot: "theme",
@@ -21,17 +39,22 @@ const themes = definePrimitive({
         choose: (key, details) => change("value", key, details),
         disabled: (key) => key === "contrast",
         label: (key) => `the ${names[key]} theme`,
-        message: (label) => `Trying ${label}. Enter keeps it, Escape puts it back.`,
+        message: (label) =>
+          `Trying ${label}. Enter keeps it, Escape puts it back.`,
       }),
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { shown: string }>({ state: (state) => ({ shown: state.preview ?? state.value }) }),
+    root: slot<{}, { shown: string }>({
+      state: (state) => ({ shown: state.preview ?? state.value }),
+    }),
     list: slot({
       attrs: () => ({ role: "radiogroup" }),
       on: {
         focusout: (event, { el, api }) => {
-          if (!el?.contains(event.relatedTarget as Node)) api.preview.clear({ reason: "focus-out", event })
+          if (!el?.contains(event.relatedTarget as Node)) {
+            api.preview.clear({ reason: "focus-out", event })
+          }
         },
       },
     }),
@@ -47,13 +70,19 @@ const themes = definePrimitive({
         "data-previewing": state.preview === part.key ? "" : undefined,
       }),
       on: {
-        pointerenter: (event, { api, key }) => api.preview.show(key, { reason: "item-hover", event }),
-        pointerleave: (event, { api }) => api.preview.clear({ reason: "item-hover", event }),
+        pointerenter: (event, { api, key }) =>
+          api.preview.show(key, { reason: "item-hover", event }),
+        pointerleave: (event, { api }) =>
+          api.preview.clear({ reason: "item-hover", event }),
         click: (event, { api, key }) => api.preview.choose(key, { event }),
         keydown: (event, { el, api, key }) => {
-          if (api.preview.keydown(event, key)) return
+          if (api.preview.keydown(event, key)) {
+            return
+          }
           const moved = api.roving.keydown(event, el!)
-          if (moved) api.preview.show(moved.key, { reason: "list-navigation", event })
+          if (moved) {
+            api.preview.show(moved.key, { reason: "list-navigation", event })
+          }
         },
       },
       bind: (el, part) => part.api.roving.bind(el, part),

@@ -54,7 +54,11 @@ import type { JSX } from "@solidjs/web"
 import { colorScheme, skinTone } from "./preferences"
 
 function App(props: { children: JSX.Element }) {
-  return <Preferences preferences={[colorScheme, skinTone]}>{props.children}</Preferences>
+  return (
+    <Preferences preferences={[colorScheme, skinTone]}>
+      {props.children}
+    </Preferences>
+  )
 }
 
 export { App }
@@ -108,7 +112,10 @@ import { isServer, type JSX } from "@solidjs/web"
 import { createEffect, createSignal } from "solid-js"
 
 const density = createLocalStorage("density")
-const script = density.script({ attribute: "data-density", values: ["comfortable", "compact"] })
+const script = density.script({
+  attribute: "data-density",
+  values: ["comfortable", "compact"],
+})
 
 function Toolbar(props: { children: JSX.Element }) {
   let element: HTMLDivElement | undefined
@@ -117,9 +124,12 @@ function Toolbar(props: { children: JSX.Element }) {
   createEffect(
     () => 0,
     () => {
-      element?.setAttribute("data-density", density.get() === "compact" ? "compact" : "comfortable")
+      element?.setAttribute(
+        "data-density",
+        density.get() === "compact" ? "compact" : "comfortable"
+      )
       setMounted(true)
-    },
+    }
   )
   return (
     <>

@@ -1,4 +1,9 @@
-import { createListboxController, Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
+import {
+  createListboxController,
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/solid/listbox"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -31,7 +36,9 @@ function Example() {
       <Listbox
         multiple
         controller={controller}
-        onValueChange={(value, details) => log(`${value.length} selected (${details.reason})`)}
+        onValueChange={(value, details) =>
+          log(`${value.length} selected (${details.reason})`)
+        }
         aria-label="Toppings"
       >
         <For each={toppings}>

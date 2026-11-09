@@ -4,22 +4,36 @@ import { expect, test } from "../fixtures"
 // steps the animated ones. The page is for
 // manual testing, so this only proves every variant renders and responds
 // without errors. Checks are soft, so one run lists every variant that misbehaves.
-test("every progress kitchen sink variant renders its value", async ({ page, framework }) => {
-  test.skip(!["react", "vue", "web"].includes(framework), "Composition frameworks only.")
+test("every progress kitchen sink variant renders its value", async ({
+  page,
+  framework,
+}) => {
+  test.skip(
+    !["react", "vue", "web"].includes(framework),
+    "Composition frameworks only."
+  )
   test.setTimeout(120_000)
   const errors: string[] = []
   page.on("pageerror", (error) => errors.push(error.message))
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+  page.on(
+    "console",
+    (message) => message.type() === "error" && errors.push(message.text())
+  )
 
   await page.goto(`/?fixture=progress-kitchen-sink&framework=${framework}`)
   await page.locator("body[data-mounted]").waitFor({ state: "attached" })
   const cards = page.locator("[data-variant]")
   await expect(cards.first()).toBeVisible()
   // Each card mounts its own root, so wait for all of them.
-  await expect.poll(() => page.locator("[data-variant]:not(:has([data-slot$='-root']))").count()).toBe(0)
+  await expect
+    .poll(() =>
+      page.locator("[data-variant]:not(:has([data-slot$='-root']))").count()
+    )
+    .toBe(0)
 
   // Intl separates numbers from units with no-break spaces.
-  const normalize = (text: string | null) => (text ?? "").replace(/\s/g, " ").trim()
+  const normalize = (text: string | null) =>
+    (text ?? "").replace(/\s/g, " ").trim()
   for (const card of await cards.all()) {
     const id = await card.getAttribute("data-variant")
     const root = card.locator("[data-slot$='-root']")
@@ -28,19 +42,24 @@ test("every progress kitchen sink variant renders its value", async ({ page, fra
     await expect.soft(root, `${id} renders`).toBeVisible()
     await expect.soft(root, `${id} has a name`).toHaveAccessibleName(/\S/)
     const text = await card.getAttribute("data-text")
-    if (text !== null)
-      await expect.poll(async () => normalize(await value.textContent()), `${id} reads`).toBe(text)
-    else await expect.soft(value, `${id} shows a value`).not.toBeEmpty()
+    if (text !== null) {
+      await expect
+        .poll(async () => normalize(await value.textContent()), `${id} reads`)
+        .toBe(text)
+    } else {
+      await expect.soft(value, `${id} shows a value`).not.toBeEmpty()
+    }
   }
 
   // An indeterminate bar has no current value.
-  const indeterminate = page.locator('[data-variant="progress-indeterminate"] [role="progressbar"]')
+  const indeterminate = page.locator(
+    '[data-variant="progress-indeterminate"] [role="progressbar"]'
+  )
   await expect(indeterminate).toHaveAttribute("data-indeterminate", "")
   await expect(indeterminate).not.toHaveAttribute("aria-valuenow", /./)
-  await expect(page.locator('[data-variant="format-value-label"] [role="progressbar"]')).toHaveAttribute(
-    "aria-valuetext",
-    "3 of 12 files",
-  )
+  await expect(
+    page.locator('[data-variant="format-value-label"] [role="progressbar"]')
+  ).toHaveAttribute("aria-valuetext", "3 of 12 files")
 
   // The step buttons move the value and its status.
   const progress = page.locator('[data-variant="progress-steps"]')

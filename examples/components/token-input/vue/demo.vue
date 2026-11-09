@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { XIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { TokenInput, TokenInputEditor, TokenInputToken, TokenInputTokenRemove } from "@ui-sdk/vue/token-input"
+import {
+  TokenInput,
+  TokenInputEditor,
+  TokenInputToken,
+  TokenInputTokenRemove,
+} from "@ui-sdk/vue/token-input"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,

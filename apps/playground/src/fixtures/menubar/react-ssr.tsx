@@ -7,7 +7,10 @@ import { Fixture } from "./react"
 // recorded, and the server's markup is kept for specs that read it.
 function mount(root: HTMLElement) {
   const errors: string[] = []
-  const page = window as unknown as { __hydrationErrors: string[]; __serverMarkup: string }
+  const page = window as unknown as {
+    __hydrationErrors: string[]
+    __serverMarkup: string
+  }
   page.__hydrationErrors = errors
   const app = (
     <React.StrictMode>
@@ -20,7 +23,9 @@ function mount(root: HTMLElement) {
     errors.push(args.map(String).join(" "))
     error(...args)
   }
-  hydrateRoot(root, app, { onRecoverableError: (cause) => errors.push(String(cause)) })
+  hydrateRoot(root, app, {
+    onRecoverableError: (cause) => errors.push(String(cause)),
+  })
 }
 
 export { mount }

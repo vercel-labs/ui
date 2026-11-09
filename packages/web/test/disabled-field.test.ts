@@ -28,7 +28,9 @@ beforeAll(() => {
   ElementInternals.prototype.setValidity = function (flags = {}) {
     problems.set(
       owners.get(this)!,
-      Object.keys(flags).filter((flag) => flags[flag as keyof ValidityStateFlags]),
+      Object.keys(flags).filter(
+        (flag) => flags[flag as keyof ValidityStateFlags]
+      )
     )
   }
   defineFieldElements()
@@ -47,8 +49,12 @@ afterEach(() => document.body.replaceChildren())
 
 function submitted(el: HTMLElement) {
   const value = formValues.get(el)
-  if (value instanceof FormData) return [...value.entries()]
-  return value === null || value === undefined ? [] : [[el.getAttribute("name"), value]]
+  if (value instanceof FormData) {
+    return [...value.entries()]
+  }
+  return value === null || value === undefined
+    ? []
+    : [[el.getAttribute("name"), value]]
 }
 
 const components = {
@@ -72,19 +78,23 @@ const components = {
   },
 }
 
-for (const [name, { tag, markup, controls, entries }] of Object.entries(components)) {
+for (const [name, { tag, markup, controls, entries }] of Object.entries(
+  components
+)) {
   async function mount(html: string) {
     document.body.innerHTML = html
     await wait()
     const el = document.querySelector<HTMLElement>(tag)!
     const disabled = () =>
-      [...el.querySelectorAll<HTMLButtonElement>(controls)].map((control) => control.disabled)
+      [...el.querySelectorAll<HTMLButtonElement>(controls)].map(
+        (control) => control.disabled
+      )
     return { el, disabled }
   }
 
   test(`a disabled field disables the whole ${name} inside it, which then submits and requires nothing`, async () => {
     const { el, disabled } = await mount(
-      `<ui-field disabled><ui-field-label>Value</ui-field-label>${markup}</ui-field>`,
+      `<ui-field disabled><ui-field-label>Value</ui-field-label>${markup}</ui-field>`
     )
     const field = document.querySelector("ui-field")!
     expect(disabled().length).toBeGreaterThan(1)
@@ -108,7 +118,7 @@ for (const [name, { tag, markup, controls, entries }] of Object.entries(componen
 
   test(`a ${name} moved out of a disabled field and back follows it`, async () => {
     const { el, disabled } = await mount(
-      `<ui-field id="disabled" disabled>${markup}</ui-field><ui-field id="enabled"></ui-field>`,
+      `<ui-field id="disabled" disabled>${markup}</ui-field><ui-field id="enabled"></ui-field>`
     )
     expect(disabled().every(Boolean)).toBe(true)
     expect(submitted(el)).toEqual([])

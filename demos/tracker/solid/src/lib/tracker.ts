@@ -39,25 +39,34 @@ function createIssue(input: NewIssue) {
 function updateIssues(ids: string[], patch: IssuePatch) {
   setDb((draft) => {
     for (const issue of draft.issues) {
-      if (!ids.includes(issue.id)) continue
+      if (!ids.includes(issue.id)) {
+        continue
+      }
       const { labels, ...rest } = patch
       Object.assign(issue, rest)
-      if (labels) issue.labels.splice(0, issue.labels.length, ...labels)
+      if (labels) {
+        issue.labels.splice(0, issue.labels.length, ...labels)
+      }
     }
   })
 }
 
 function deleteIssues(ids: string[]) {
   setDb((draft) => {
-    for (let index = draft.issues.length - 1; index >= 0; index--)
-      if (ids.includes(draft.issues[index].id)) draft.issues.splice(index, 1)
+    for (let index = draft.issues.length - 1; index >= 0; index--) {
+      if (ids.includes(draft.issues[index].id)) {
+        draft.issues.splice(index, 1)
+      }
+    }
   })
 }
 
 function setSubtasksDone(id: string, done: string[]) {
   setDb((draft) => {
     const issue = draft.issues.find((issue) => issue.id === id)
-    if (issue) reconcile(markSubtasks(issue.subtasks, done), "id")(issue.subtasks)
+    if (issue) {
+      reconcile(markSubtasks(issue.subtasks, done), "id")(issue.subtasks)
+    }
   })
 }
 
@@ -80,4 +89,13 @@ function saveSettings(settings: Settings) {
   })
 }
 
-export { addComment, createIssue, db, deleteIssues, getIssue, saveSettings, setSubtasksDone, updateIssues }
+export {
+  addComment,
+  createIssue,
+  db,
+  deleteIssues,
+  getIssue,
+  saveSettings,
+  setSubtasksDone,
+  updateIssues,
+}

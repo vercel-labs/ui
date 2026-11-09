@@ -101,7 +101,10 @@ Pass image attributes such as `srcset`, `crossorigin`, and `referrerpolicy` to t
 <ui-avatar>
   <img
     src="https://github.com/shadcn.png"
-    srcset="https://github.com/shadcn.png?size=80 1x, https://github.com/shadcn.png?size=160 2x"
+    srcset="
+      https://github.com/shadcn.png?size=80  1x,
+      https://github.com/shadcn.png?size=160 2x
+    "
     alt="shadcn"
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
@@ -181,7 +184,10 @@ Props are attributes in kebab case, like `delay` on `<ui-avatar-fallback>`. Call
 
 ### Avatar
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarOptions" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarOptions"
+/>
 
 ### AvatarImage
 
@@ -189,13 +195,19 @@ The image. A real `img`, a direct child of `ui-avatar`, so the browser can fetch
 
 ### AvatarFallback
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarFallbackProps" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarFallbackProps"
+/>
 
 ### State
 
 The same state shows as data attributes on each element.
 
-<StateTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarState" />
+<StateTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarState"
+/>
 
 ### Reasons
 

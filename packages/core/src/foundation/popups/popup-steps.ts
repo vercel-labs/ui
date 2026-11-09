@@ -22,7 +22,10 @@ import type { Anchor } from "../platform/position"
 
 // A request to open, from a trigger, a hover, a key or a controller. Passed,
 // even as `undefined`, `payload` replaces the payload. Left out, it stays.
-type ShowRequest<Reason extends string, Extra extends object> = PopupOpenOptions<unknown, Reason> &
+type ShowRequest<
+  Reason extends string,
+  Extra extends object,
+> = PopupOpenOptions<unknown, Reason> &
   Partial<Extra> & {
     // How it opens, which decides where focus goes. The `open` rule may decide instead.
     by?: PopupOpener
@@ -38,9 +41,15 @@ type HideRequest<Reason extends string, Result> = ChangeOptions<Reason> & {
 }
 
 // What `open()` resolves with when nothing opened: refused, or given an aborted signal.
-function unopened<Reason extends string, Result = string>(reason: Reason, event?: Event) {
+function unopened<Reason extends string, Result = string>(
+  reason: Reason,
+  event?: Event
+) {
   return popupResult(
-    Promise.resolve<PopupResult<Reason, Result>>({ reason, source: changeSource(reason, event) }),
+    Promise.resolve<PopupResult<Reason, Result>>({
+      reason,
+      source: changeSource(reason, event),
+    })
   )
 }
 
@@ -54,7 +63,10 @@ function createOpenSteps<
   popup: Popup<Reason>
   store: Pick<Store<{ open: boolean }>, "get">
   // Fires `onOpenChange` and writes `open` unless controlled. False when refused.
-  change: (open: boolean, details: { reason: Reason; event?: Event; returnValue?: Result }) => boolean
+  change: (
+    open: boolean,
+    details: { reason: Reason; event?: Event; returnValue?: Result }
+  ) => boolean
   // Leaving the page settles a pending `open()` with "unmount".
   onDestroy: (cleanup: () => void) => void
   // For popups whose triggers hand their content a payload.
@@ -69,20 +81,29 @@ function createOpenSteps<
     // change went through, with the payload already put back when it didn't.
     // Returning without calling it refuses, like a disabled select.
     open?: (
-      request: ShowRequest<Reason, Extra> & { reason: Reason; payloadReason: PayloadReason },
-      open: (by?: PopupOpener) => boolean,
+      request: ShowRequest<Reason, Extra> & {
+        reason: Reason
+        payloadReason: PayloadReason
+      },
+      open: (by?: PopupOpener) => boolean
     ) => void
     // An open popup is asked to open again, after a controller's payload and
     // anchor applied. Call `open` to open it anew, like a panel that stays
     // open while another item takes it over.
     reopen?: (
-      request: ShowRequest<Reason, Extra> & { reason: Reason; payloadReason: PayloadReason },
-      open: (by?: PopupOpener) => boolean,
+      request: ShowRequest<Reason, Extra> & {
+        reason: Reason
+        payloadReason: PayloadReason
+      },
+      open: (by?: PopupOpener) => boolean
     ) => void
     // An open popup is asked to close. Call `close` to ask for the change. It
     // returns whether the change went through, with focus return already reset
     // when it didn't. Returning without calling it keeps the popup open.
-    close?: (request: HideRequest<Reason, Result> & { reason: Reason }, close: () => boolean) => void
+    close?: (
+      request: HideRequest<Reason, Result> & { reason: Reason },
+      close: () => boolean
+    ) => void
   }
 }) {
   const { popup, store, rules = {} } = config
@@ -98,9 +119,13 @@ function createOpenSteps<
   let openAnchor: Anchor | undefined
 
   popup.observe((open) => {
-    const closed = open ? undefined : (requested ?? { reason: imperative, source: "programmatic" })
+    const closed = open
+      ? undefined
+      : (requested ?? { reason: imperative, source: "programmatic" })
     requested = undefined
-    if (!closed) return
+    if (!closed) {
+      return
+    }
     pending?.resolve(closed)
     pending = undefined
     return closed
@@ -113,7 +138,9 @@ function createOpenSteps<
   function result(signal?: AbortSignal) {
     if (!pending) {
       let resolve!: (result: PopupResult<Reason, Result>) => void
-      const promise = popupResult(new Promise<PopupResult<Reason, Result>>((done) => (resolve = done)))
+      const promise = popupResult(
+        new Promise<PopupResult<Reason, Result>>((done) => (resolve = done))
+      )
       pending = { promise, resolve }
     }
     if (signal && !signal.aborted) {
@@ -125,50 +152,76 @@ function createOpenSteps<
   }
 
   // `setOpen` and `toggle` pass their reason as `openReason`.
-  function show(request: ShowRequest<PayloadReason, Extra> = {}, openReason?: Reason) {
+  function show(
+    request: ShowRequest<PayloadReason, Extra> = {},
+    openReason?: Reason
+  ) {
     return attempt(request, openReason).result
   }
 
-  function attempt(request: ShowRequest<PayloadReason, Extra>, openReason?: Reason) {
+  function attempt(
+    request: ShowRequest<PayloadReason, Extra>,
+    openReason?: Reason
+  ) {
     const { event, signal } = request
-    if (signal?.aborted) return { opened: false, result: unopened<Reason, Result>(imperative) }
+    if (signal?.aborted) {
+      return { opened: false, result: unopened<Reason, Result>(imperative) }
+    }
     const payloadReason = request.reason ?? (event ? triggerPress : imperative)
     const reason: Reason = openReason ?? payloadReason
     const settled = { ...request, reason, payloadReason }
     let opened = false
     const open = (by = request.by ?? "imperative") => {
       openAnchor = request.anchor
-      const restorePayload = config.payload?.opening(request.trigger, request.payload, {
-        reason: payloadReason,
-        event,
-      })
+      const restorePayload = config.payload?.opening(
+        request.trigger,
+        request.payload,
+        {
+          reason: payloadReason,
+          event,
+        }
+      )
       popup.opening(by, event)
       opened = config.change(true, { reason, event })
-      if (!opened) restorePayload?.()
+      if (!opened) {
+        restorePayload?.()
+      }
       return opened
     }
     if (store.get().open) {
-      if (popup.opener() === "hover" && request.by !== "hover")
+      if (popup.opener() === "hover" && request.by !== "hover") {
         popup.opening(request.by ?? "imperative", event)
+      }
       if (
         request.trigger === undefined &&
         config.payload?.reopening(request, { reason: payloadReason }) &&
         request.anchor
-      )
+      ) {
         openAnchor = request.anchor
+      }
       rules.reopen?.(settled, open)
       return { opened, result: result(signal) }
     }
-    if (rules.open) rules.open(settled, open)
-    else open()
-    return { opened, result: opened ? result(signal) : unopened<Reason, Result>(reason, event) }
+    if (rules.open) {
+      rules.open(settled, open)
+    } else {
+      open()
+    }
+    return {
+      opened,
+      result: opened ? result(signal) : unopened<Reason, Result>(reason, event),
+    }
   }
 
   function hide(request: HideRequest<Reason, Result> = {}) {
-    if (!store.get().open) return false
+    if (!store.get().open) {
+      return false
+    }
     const { event, returnValue } = request
     const reason = request.reason ?? imperative
-    if (config.dismissal && !config.dismissal.allows(reason, event)) return false
+    if (config.dismissal && !config.dismissal.allows(reason, event)) {
+      return false
+    }
     let closed = false
     const close = () => {
       requested = { reason, source: changeSource(reason, event), returnValue }
@@ -185,8 +238,11 @@ function createOpenSteps<
       closed = changed
       return changed
     }
-    if (rules.close) rules.close({ ...request, reason }, close)
-    else close()
+    if (rules.close) {
+      rules.close({ ...request, reason }, close)
+    } else {
+      close()
+    }
     return closed
   }
 
@@ -213,18 +269,28 @@ function createOpenSteps<
   // payload, so the payload hears "imperative", event or not. Every field of
   // `Extra` is optional, which a generic `Partial<Extra>` can't show.
   const showFor = (reason?: Reason, event?: Event) =>
-    attempt({ reason: imperative, event } as ShowRequest<PayloadReason, Extra>, reason).opened
+    attempt(
+      { reason: imperative, event } as ShowRequest<PayloadReason, Extra>,
+      reason
+    ).opened
 
   return {
     // The controller's methods. Components add `focus` and `getPayload` themselves, so lists don't expose a payload.
     api: {
       isOpen: () => store.get().open,
-      setOpen: (open: boolean, { reason, event }: ChangeOptions<Reason> = {}) =>
-        open ? showFor(reason, event) : hide({ reason, event }),
+      setOpen: (
+        open: boolean,
+        { reason, event }: ChangeOptions<Reason> = {}
+      ) => (open ? showFor(reason, event) : hide({ reason, event })),
       // An app's event is no trigger's, so the reason stays "imperative" unless it names one.
-      open: (options: PopupOpenOptions<unknown, PayloadReason> & Partial<Extra> = {}) =>
-        show({ ...options, reason: options.reason ?? imperative }),
-      close: ({ reason, event, returnValue }: ChangeOptions<Reason> & { returnValue?: Result } = {}) =>
+      open: (
+        options: PopupOpenOptions<unknown, PayloadReason> & Partial<Extra> = {}
+      ) => show({ ...options, reason: options.reason ?? imperative }),
+      close: ({
+        reason,
+        event,
+        returnValue,
+      }: ChangeOptions<Reason> & { returnValue?: Result } = {}) =>
         hide({ reason, event, returnValue }),
       toggle: ({ reason, event }: ChangeOptions<Reason> = {}) =>
         store.get().open ? hide({ reason, event }) : showFor(reason, event),
@@ -248,10 +314,13 @@ function createSteppedPopup<
   Reason extends string = string,
 >(
   layer: Parameters<typeof createPopupLayer<State, Reason>>[0],
-  steps: Omit<Parameters<typeof createOpenSteps<Reason>>[0], "popup" | "store">,
+  steps: Omit<Parameters<typeof createOpenSteps<Reason>>[0], "popup" | "store">
 ) {
   const popup = createPopupLayer<State, Reason>(layer)
-  return { popup, steps: createOpenSteps<Reason>({ ...steps, popup, store: layer.store }) }
+  return {
+    popup,
+    steps: createOpenSteps<Reason>({ ...steps, popup, store: layer.store }),
+  }
 }
 
 export { createOpenSteps, createSteppedPopup, unopened }

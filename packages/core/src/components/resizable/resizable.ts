@@ -1,11 +1,24 @@
 import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { css } from "../../foundation/kernel/inline-style"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  CommitDetails,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { resizableApi, settings, type State } from "./resizable-api"
-import { isCollapsed, sameSize, toCSS, type PanelSizes, type ResizableSize } from "./resizable-layout"
+import {
+  isCollapsed,
+  sameSize,
+  toCSS,
+  type PanelSizes,
+  type ResizableSize,
+} from "./resizable-layout"
 import type { ResizableStorage } from "./resizable-storage"
 import { selects } from "../../foundation/kernel/selects"
 import { live } from "../../foundation/kernel/live"
@@ -14,7 +27,8 @@ import { live } from "../../foundation/kernel/live"
  * Why a group's layout wants to change.
  * @stable
  */
-type ResizableLayoutChangeReason = "drag" | "step-key" | "collapse" | "resize" | "imperative"
+type ResizableLayoutChangeReason =
+  "drag" | "step-key" | "collapse" | "resize" | "imperative"
 
 /**
  * What `onLayoutChange` receives after the layout.
@@ -45,11 +59,21 @@ function createResizableController() {
     /** Sets every panel's size at once, in percent. It's fitted to the panels' bounds and adds up to 100. Returns whether anything changed. */
     setLayout: (layout: number[], options?: ResizableChangeOptions) => boolean
     /** Collapses a collapsible panel, by its id or its index. Returns whether it collapsed. */
-    collapse: (panel: string | number, options?: ResizableChangeOptions) => boolean
+    collapse: (
+      panel: string | number,
+      options?: ResizableChangeOptions
+    ) => boolean
     /** Expands a collapsed panel to the size it had before it collapsed, or its minimum. Returns whether it expanded. */
-    expand: (panel: string | number, options?: ResizableChangeOptions) => boolean
+    expand: (
+      panel: string | number,
+      options?: ResizableChangeOptions
+    ) => boolean
     /** Resizes one panel, by its id or its index, like `resize("sidebar", "240px")`. Its neighbours give or take the difference. */
-    resize: (panel: string | number, size: ResizableSize, options?: ResizableChangeOptions) => boolean
+    resize: (
+      panel: string | number,
+      size: ResizableSize,
+      options?: ResizableChangeOptions
+    ) => boolean
     /** Whether a panel is collapsed. */
     isCollapsed: (panel: string | number) => boolean
   }>()
@@ -72,9 +96,15 @@ type ResizableOptions = {
   /** The layout at first, when uncontrolled. Panels' own `defaultSize` is what a server renders, so prefer that with server rendering. */
   defaultLayout?: number[]
   /** Runs while the layout changes: on every frame of a drag and every key. `details.cancel()` keeps the layout. */
-  onLayoutChange?: (layout: number[], details: ResizableLayoutChangeDetails) => void
+  onLayoutChange?: (
+    layout: number[],
+    details: ResizableLayoutChangeDetails
+  ) => void
   /** Runs once an interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel collapses. For saving. */
-  onLayoutCommit?: (layout: number[], details: ResizableLayoutCommitDetails) => void
+  onLayoutCommit?: (
+    layout: number[],
+    details: ResizableLayoutCommitDetails
+  ) => void
   /**
    * The direction panels are laid out in. Horizontal panels sit side by side, vertical ones stack.
    * @defaultValue "horizontal"
@@ -104,12 +134,15 @@ type ResizableOptions = {
 } & PrimitiveOptions
 
 // Reads a `layout` or `default-layout` attribute: "25,75" is one percentage per panel.
-const layoutAttribute = (attribute: string | null) => attribute?.split(",").map(Number)
+const layoutAttribute = (attribute: string | null) =>
+  attribute?.split(",").map(Number)
 
 // Reads a panel's size attribute: "30" is 30 percent, like the number, and
 // "240px" and "16rem" keep their unit.
 function sizeAttribute(attribute: string | null) {
-  if (attribute === null) return undefined
+  if (attribute === null) {
+    return undefined
+  }
   return /^\s*-?[\d.]+\s*$/.test(attribute) ? Number(attribute) : attribute
 }
 
@@ -197,7 +230,9 @@ type ResizableHandleState = {
   hovering: boolean
 }
 
-const orientationAttrs = (state: State) => ({ "data-orientation": state.orientation })
+const orientationAttrs = (state: State) => ({
+  "data-orientation": state.orientation,
+})
 
 function panelIndex(state: State, key: string) {
   const index = state.ids.indexOf(key)
@@ -247,8 +282,20 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
     sizes: {},
     handleValues: {},
   }),
-  live: ["layout", "controlledLayout", "ids", "constraints", "handles", "hovering", "sizes", "handleValues"],
-  sync: (options) => ({ ...settings(options), controlledLayout: options.layout }),
+  live: [
+    "layout",
+    "controlledLayout",
+    "ids",
+    "constraints",
+    "handles",
+    "hovering",
+    "sizes",
+    "handleValues",
+  ],
+  sync: (options) => ({
+    ...settings(options),
+    controlledLayout: options.layout,
+  }),
   controlled: ["layout"],
   commits: ["layout"],
   api: resizableApi,
@@ -270,7 +317,10 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
         }),
       }),
       bind(el, { api, store }) {
-        const cleanups = [watchFormDisabled(el, store), api.internal.bindRoot(el)]
+        const cleanups = [
+          watchFormDisabled(el, store),
+          api.internal.bindRoot(el),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup?.())
       },
     }),
@@ -296,7 +346,8 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
       state: (state, { key, props }) => {
         const index = panelIndex(state, key)
         const size = index === null ? 0 : state.sizes[key]
-        const constraints = index === null ? undefined : state.constraints[index]
+        const constraints =
+          index === null ? undefined : state.constraints[index]
         return {
           orientation: state.orientation,
           size,
@@ -311,7 +362,9 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
       }),
       live: live((state, { key }) => {
         const index = panelIndex(state, key)
-        if (index === null) return {}
+        if (index === null) {
+          return {}
+        }
         const size = state.sizes[key]
         const constraints = state.constraints[index]
         const collapsed = !!constraints && isCollapsed(constraints, size)
@@ -361,11 +414,16 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
         return {
           tabindex: disabled ? undefined : "0",
           "aria-disabled": disabled ? "true" : undefined,
-          "aria-orientation": state.orientation === "horizontal" ? "vertical" : "horizontal",
+          "aria-orientation":
+            state.orientation === "horizontal" ? "vertical" : "horizontal",
           ...orientationAttrs(state),
           "data-disabled": disabled ? "" : undefined,
           "data-dragging": state.dragging === key ? "" : undefined,
-          style: css({ flex: "none", "touch-action": "none", "user-select": "none" }),
+          style: css({
+            flex: "none",
+            "touch-action": "none",
+            "user-select": "none",
+          }),
         }
       },
       live: live((state, { key }) => {
@@ -379,7 +437,8 @@ const resizablePrimitive = /* @__PURE__ */ definePrimitive({
         }
       }),
       on: {
-        keydown: (event, { api, el, key }) => el && api.internal.keydown(event, key, el),
+        keydown: (event, { api, el, key }) =>
+          el && api.internal.keydown(event, key, el),
         keyup: (event, { api }) => api.internal.commitKeys(event),
         focusout: (_, { api }) => api.internal.commitKeys(),
         dblclick: (event, { api, key }) => api.internal.toggle(key, event),

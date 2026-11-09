@@ -13,6 +13,9 @@
   </div>
   <Field>
     <FieldLabel>Due date</FieldLabel>
-    <DateInput bind:value onValueChange={(next) => log(`Due date ${next ?? "empty"}`)} />
+    <DateInput
+      bind:value
+      onValueChange={(next) => log(`Due date ${next ?? "empty"}`)}
+    />
   </Field>
 </div>

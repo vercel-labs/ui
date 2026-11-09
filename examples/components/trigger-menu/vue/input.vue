@@ -19,12 +19,19 @@ const people = [
 </script>
 
 <template>
-  <TriggerMenu :triggers="[{ char: '@', items: people }]" :auto-highlight="false" :loop="false">
+  <TriggerMenu
+    :triggers="[{ char: '@', items: people }]"
+    :auto-highlight="false"
+    :loop="false"
+  >
     <Field>
       <FieldLabel>Task</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type @ to assign someone…">
+          <TriggerMenuInput
+            v-bind="props"
+            placeholder="Type @ to assign someone…"
+          >
             <template #render="{ props: inputProps }">
               <input v-bind="inputProps" />
             </template>

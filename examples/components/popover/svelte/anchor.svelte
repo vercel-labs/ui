@@ -20,7 +20,12 @@
 </script>
 
 <div data-slot="row">
-  <input bind:this={anchor} type="search" placeholder="Search files…" aria-label="Search files" />
+  <input
+    bind:this={anchor}
+    type="search"
+    placeholder="Search files…"
+    aria-label="Search files"
+  />
   <Popover>
     <PopoverTrigger aria-label="Search filters">
       <SlidersHorizontalIcon aria-hidden="true" />

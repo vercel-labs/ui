@@ -20,7 +20,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -33,12 +34,14 @@ const components = [
   {
     title: "Alert Dialog",
     href: "#",
-    description: "Asks for a decision before anything else on the page can be used.",
+    description:
+      "Asks for a decision before anything else on the page can be used.",
   },
   {
     title: "Hover Card",
     href: "#",
-    description: "A preview of what a link points to, for people who pause on it.",
+    description:
+      "A preview of what a link points to, for people who pause on it.",
   },
   {
     title: "Progress",
@@ -53,12 +56,14 @@ const components = [
   {
     title: "Tabs",
     href: "#",
-    description: "Shows one panel of content at a time, picked from a list of tabs.",
+    description:
+      "Shows one panel of content at a time, picked from a list of tabs.",
   },
   {
     title: "Tooltip",
     href: "#",
-    description: "A short label for a control, shown on hover or keyboard focus.",
+    description:
+      "A short label for a control, shown on hover or keyboard focus.",
   },
 ]
 
@@ -81,7 +86,7 @@ const CircleQuestionMark = () =>
       <circle cx="12" cy="12" r="10" />
       <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
       <path d="M12 17h.01" />
-    </>,
+    </>
   )
 const Circle = () => icon(<circle cx="12" cy="12" r="10" />)
 const CircleCheck = () =>
@@ -89,14 +94,14 @@ const CircleCheck = () =>
     <>
       <circle cx="12" cy="12" r="10" />
       <path d="m16 9-5.5 5.5L8 12" />
-    </>,
+    </>
   )
 const ArrowRight = () =>
   icon(
     <>
       <path d="M5 12h14" />
       <path d="m12 5 7 7-7 7" />
-    </>,
+    </>
   )
 
 const statuses = [
@@ -131,7 +136,8 @@ function Example() {
                 <NavigationMenuLink href="#" data-variant="featured">
                   <span>ui-sdk</span>
                   <span data-slot="hint">
-                    Accessible components for React, Vue, Svelte, Solid and Web Components.
+                    Accessible components for React, Vue, Svelte, Solid and Web
+                    Components.
                   </span>
                 </NavigationMenuLink>
               </li>

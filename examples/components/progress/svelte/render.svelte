@@ -20,7 +20,12 @@
       <span {...props}>
         <ProgressIndicator>
           {#snippet render({ props, state })}
-            <div {...props} data-variant={(state.percent ?? 0) < 20 ? "destructive" : undefined}></div>
+            <div
+              {...props}
+              data-variant={(state.percent ?? 0) < 20
+                ? "destructive"
+                : undefined}
+            ></div>
           {/snippet}
         </ProgressIndicator>
       </span>

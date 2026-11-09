@@ -31,7 +31,10 @@ const months = [
   "November",
   "December",
 ].map((label, index) => ({ value: String(index + 1).padStart(2, "0"), label }))
-const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({ value: year, label: year }))
+const years = ["2024", "2025", "2026", "2027", "2028"].map((year) => ({
+  value: year,
+  label: year,
+}))
 
 function Example() {
   const [month, setMonth] = createSignal("2026-10")
@@ -134,8 +137,12 @@ function Example() {
         </Select>
       </div>
       <CalendarGrid>
-        <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-        <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+        <CalendarWeekdays>
+          {(index) => <CalendarWeekday index={index} />}
+        </CalendarWeekdays>
+        <CalendarWeeks>
+          {(cell) => <CalendarDay value={cell.date} />}
+        </CalendarWeeks>
       </CalendarGrid>
     </Calendar>
   )

@@ -1,6 +1,12 @@
 <script lang="ts">
   import { confirm } from "@ui-sdk/svelte/alert-dialog"
-  import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@ui-sdk/svelte/dialog"
+  import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogTitle,
+    DialogTrigger,
+  } from "@ui-sdk/svelte/dialog"
   import { OverlayHost } from "@ui-sdk/svelte/overlays"
   import {
     Toast,
@@ -38,7 +44,9 @@
     <ToastDescription />
     <ToastAction />
     {#if toast.cancel}
-      <ToastClose action={toast.cancel.onCancel}>{toast.cancel.label}</ToastClose>
+      <ToastClose action={toast.cancel.onCancel}
+        >{toast.cancel.label}</ToastClose
+      >
     {/if}
   </Toast>
 {/snippet}
@@ -46,14 +54,20 @@
 <div class="fixture">
   <button>Before</button>
   <button onclick={() => toasts?.basic()}>{toastFixture.basic.trigger}</button>
-  <button onclick={() => toasts?.success()}>{toastFixture.success.trigger}</button>
+  <button onclick={() => toasts?.success()}
+    >{toastFixture.success.trigger}</button
+  >
   <button onclick={() => toasts?.error()}>{toastFixture.error.trigger}</button>
-  <button onclick={() => toasts?.promise()}>{toastFixture.promise.trigger}</button>
+  <button onclick={() => toasts?.promise()}
+    >{toastFixture.promise.trigger}</button
+  >
   <Dialog>
     <DialogTrigger>{toastFixture.dialog.trigger}</DialogTrigger>
     <DialogContent class="dialog">
       <DialogTitle class="title">{toastFixture.dialog.title}</DialogTitle>
-      <button onclick={() => toasts?.basic()}>{toastFixture.dialog.toast}</button>
+      <button onclick={() => toasts?.basic()}
+        >{toastFixture.dialog.toast}</button
+      >
       <DialogClose>{toastFixture.dialog.close}</DialogClose>
     </DialogContent>
   </Dialog>
@@ -61,7 +75,9 @@
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>
   {#if host}
-    <OverlayHost toast={{ ...options, class: "toast-region", children: hostedToast }} />
+    <OverlayHost
+      toast={{ ...options, class: "toast-region", children: hostedToast }}
+    />
   {:else}
     <ToastRegion toaster={toasts?.toast} class="toast-region" {...options}>
       <Toast class="toast">

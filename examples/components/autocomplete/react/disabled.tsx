@@ -50,7 +50,11 @@ function Example() {
         <AutocompleteContent>
           <AutocompleteList>
             {fruits.map((fruit, index) => (
-              <AutocompleteItem key={fruit} value={fruit} disabled={index % 3 === 0}>
+              <AutocompleteItem
+                key={fruit}
+                value={fruit}
+                disabled={index % 3 === 0}
+              >
                 {fruit}
               </AutocompleteItem>
             ))}

@@ -27,14 +27,14 @@ function mount(root: HTMLElement) {
             (policy) => `
               <ui-tabs-tab value="${policy.value}">
                 <button type="button">${policy.label}</button>
-              </ui-tabs-tab>`,
+              </ui-tabs-tab>`
           )
           .join("")}
       </ui-tabs-list>
       ${policies
         .map(
           (policy, index) =>
-            `<ui-tabs-panel value="${policy.value}"${index > 0 ? ' hidden="until-found"' : ""}>${policy.text}</ui-tabs-panel>`,
+            `<ui-tabs-panel value="${policy.value}"${index > 0 ? ' hidden="until-found"' : ""}>${policy.text}</ui-tabs-panel>`
         )
         .join("")}
     </ui-tabs>

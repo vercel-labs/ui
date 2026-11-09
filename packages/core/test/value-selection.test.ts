@@ -5,7 +5,10 @@ import { expect, test } from "vitest"
 import { listbox } from "../src/components/listbox/listbox-root"
 import { attrs } from "../src/foundation/kernel/part"
 
-const items = ["basil", "cheese", "olive"].map((value) => ({ value, label: value }))
+const items = ["basil", "cheese", "olive"].map((value) => ({
+  value,
+  label: value,
+}))
 
 function selectedList(value: string[]) {
   const options = { id: "l", items, multiple: true, value }
@@ -13,7 +16,8 @@ function selectedList(value: string[]) {
   return {
     selection: instance.api.internal.selection,
     selected: (key: string) =>
-      attrs(instance.part("item", { id: key, value: key }))["aria-selected"] === "true",
+      attrs(instance.part("item", { id: key, value: key }))["aria-selected"] ===
+      "true",
     // A new options object with the same array.
     handOver: () => instance.setOptions({ ...options }),
   }
@@ -60,7 +64,8 @@ test("an object pushed into the selected list matches its item through isItemEqu
     multiple: true,
     value,
     itemToValue: (plan: { id: string }) => plan.id,
-    isItemEqualToValue: (plan: { id: string }, selected: { id: string }) => plan.id === selected.id,
+    isItemEqualToValue: (plan: { id: string }, selected: { id: string }) =>
+      plan.id === selected.id,
   }
   const instance = listbox(options)
   const { selection } = instance.api.internal

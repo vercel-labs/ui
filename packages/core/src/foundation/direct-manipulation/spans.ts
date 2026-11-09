@@ -10,7 +10,10 @@ import { deriveState } from "../kernel/derive"
 import { settleDraft } from "../kernel/draft"
 import type { PrimitiveContext } from "../kernel/primitive-types"
 import { announce } from "../platform/announce"
-import { createAutoScroll, type AutoScrollOptions } from "../drag-and-drop/auto-scroll"
+import {
+  createAutoScroll,
+  type AutoScrollOptions,
+} from "../drag-and-drop/auto-scroll"
 import { isRTL } from "../platform/env"
 import { keepFocus } from "../focus/keep-focus"
 import { documentOrder } from "../kernel/order"
@@ -75,7 +78,12 @@ type SpansOptions<State extends object, S extends Span = Span> = {
    */
   set: (
     value: S[],
-    details: { reason: SpansReason; event?: Event; id: string; action: SpanAction },
+    details: {
+      reason: SpansReason
+      event?: Event
+      id: string
+      action: SpanAction
+    }
   ) => boolean
   /** Where tracks start, in their units. @defaultValue 0 */
   min?: () => number
@@ -116,9 +124,15 @@ type SpansOptions<State extends object, S extends Span = Span> = {
  * @experimental
  */
 function spansMessage({ type, label }: SpansMessage) {
-  if (type === "draw") return `Added ${label}.`
-  if (type === "delete") return `Deleted ${label}.`
-  if (type === "cancel") return `Put back ${label}.`
+  if (type === "draw") {
+    return `Added ${label}.`
+  }
+  if (type === "delete") {
+    return `Deleted ${label}.`
+  }
+  if (type === "cancel") {
+    return `Put back ${label}.`
+  }
   return `${label}.`
 }
 
@@ -131,7 +145,9 @@ function spansMessage({ type, label }: SpansMessage) {
 function stackSpans(spans: readonly Span[]) {
   const result = new Map<string, { lane: number; lanes: number }>()
   const byTrack = new Map<string, Span[]>()
-  for (const span of spans) byTrack.set(span.track, [...(byTrack.get(span.track) ?? []), span])
+  for (const span of spans) {
+    byTrack.set(span.track, [...(byTrack.get(span.track) ?? []), span])
+  }
   for (const track of byTrack.values()) {
     track.sort((a, b) => a.start - b.start || b.end - a.end)
     // Spans that overlap one another, directly or through others, share a lane count.
@@ -139,18 +155,28 @@ function stackSpans(spans: readonly Span[]) {
     let lanes: number[] = []
     let groupEnd = -Infinity
     const close = () => {
-      for (const span of group) result.get(span.id)!.lanes = lanes.length
+      for (const span of group) {
+        result.get(span.id)!.lanes = lanes.length
+      }
       group = []
       lanes = []
     }
     for (const span of track) {
-      if (span.start >= groupEnd) close()
+      if (span.start >= groupEnd) {
+        close()
+      }
       let lane = lanes.findIndex((end) => end <= span.start)
-      if (lane === -1) lane = lanes.push(span.end) - 1
-      else lanes[lane] = span.end
+      if (lane === -1) {
+        lane = lanes.push(span.end) - 1
+      } else {
+        lanes[lane] = span.end
+      }
       result.set(span.id, { lane, lanes: 0 })
       group.push(span)
-      groupEnd = Math.max(groupEnd === -Infinity ? span.end : groupEnd, span.end)
+      groupEnd = Math.max(
+        groupEnd === -Infinity ? span.end : groupEnd,
+        span.end
+      )
     }
     close()
   }
@@ -167,7 +193,7 @@ function isSpanFree(spans: readonly Span[], span: Span) {
       other.id === span.id ||
       other.track !== span.track ||
       other.end <= span.start ||
-      other.start >= span.end,
+      other.start >= span.end
   )
 }
 
@@ -198,14 +224,15 @@ function isSpanFree(spans: readonly Span[], span: Span) {
  */
 function createSpans<State extends object, S extends Span = Span>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: SpansOptions<State, S>,
+  options: SpansOptions<State, S>
 ) {
   const { store } = context
   const tracks = new Map<string, HTMLElement>()
   const elements = new Map<string, HTMLElement>()
   const value = () => store.get()[options.key] as S[]
   const draft = () => store.get()[options.draft] as SpansDraft<S> | null
-  const setDraft = (next: SpansDraft<S> | null) => store.set({ [options.draft]: next } as Partial<State>)
+  const setDraft = (next: SpansDraft<S> | null) =>
+    store.set({ [options.draft]: next } as Partial<State>)
   const min = () => options.min?.() ?? 0
   const max = () => options.max?.() ?? 100
   const step = () => options.step?.() ?? 1
@@ -225,18 +252,26 @@ function createSpans<State extends object, S extends Span = Span>(
       const size = end - start
       start = Math.min(Math.max(start, lo), hi - size)
       end = start + size
-    } else if (keep === "start") end = Math.min(hi, start + longest, Math.max(end, start + minSize()))
-    else start = Math.max(lo, end - longest, Math.min(start, end - minSize()))
+    } else if (keep === "start") {
+      end = Math.min(hi, start + longest, Math.max(end, start + minSize()))
+    } else {
+      start = Math.max(lo, end - longest, Math.min(start, end - minSize()))
+    }
     return { ...span, start, end } as S
   }
 
-  const label = (span: S) => options.label?.(span) ?? `${span.track}, ${span.start} to ${span.end}`
+  const label = (span: S) =>
+    options.label?.(span) ?? `${span.track}, ${span.start} to ${span.end}`
   const say = (type: SpansMessage["type"], span: S) =>
-    announce((options.message ?? spansMessage)({ type, span, label: label(span) }))
+    announce(
+      (options.message ?? spansMessage)({ type, span, label: label(span) })
+    )
 
   const order = () => {
     const given = options.tracks?.()
-    if (given) return given
+    if (given) {
+      return given
+    }
     return [...tracks.entries()]
       .filter(([, el]) => el.isConnected)
       .sort(([, a], [, b]) => documentOrder(a, b))
@@ -246,7 +281,9 @@ function createSpans<State extends object, S extends Span = Span>(
   // The value under a point on a track, along its axis, unsnapped.
   function valueAt(track: string, x: number, y: number) {
     const el = tracks.get(track)
-    if (!el) return min()
+    if (!el) {
+      return min()
+    }
     const rect = el.getBoundingClientRect()
     let fraction =
       axis() === "y"
@@ -256,7 +293,9 @@ function createSpans<State extends object, S extends Span = Span>(
         : rect.width
           ? (x - rect.left) / rect.width
           : 0
-    if (axis() === "x" && isRTL(el)) fraction = 1 - fraction
+    if (axis() === "x" && isRTL(el)) {
+      fraction = 1 - fraction
+    }
     return min() + Math.min(1, Math.max(0, fraction)) * (max() - min())
   }
 
@@ -264,11 +303,16 @@ function createSpans<State extends object, S extends Span = Span>(
   function trackAt(x: number, y: number) {
     let best: { track: string; distance: number } | undefined
     for (const [track, el] of tracks) {
-      if (!el.isConnected) continue
+      if (!el.isConnected) {
+        continue
+      }
       const rect = el.getBoundingClientRect()
-      const [at, from, to] = axis() === "y" ? [x, rect.left, rect.right] : [y, rect.top, rect.bottom]
+      const [at, from, to] =
+        axis() === "y" ? [x, rect.left, rect.right] : [y, rect.top, rect.bottom]
       const distance = at < from ? from - at : at > to ? at - to : 0
-      if (!best || distance < best.distance) best = { track, distance }
+      if (!best || distance < best.distance) {
+        best = { track, distance }
+      }
     }
     return best?.track
   }
@@ -279,19 +323,30 @@ function createSpans<State extends object, S extends Span = Span>(
       ? spans.map((other) => (other.id === span.id ? span : other))
       : [...spans, span]
 
-  const allowed = (spans: S[], span: S) => options.overlap !== false || isSpanFree(spans, span)
+  const allowed = (spans: S[], span: S) =>
+    options.overlap !== false || isSpanFree(spans, span)
 
   // A span that moves to another track renders as a new element there; focus follows it.
   const focusLater = (id: string) => keepFocus(() => elements.get(id))
 
   function commit(
     spans: S[],
-    details: { reason: SpansReason; event?: Event; id: string; action: SpanAction },
+    details: {
+      reason: SpansReason
+      event?: Event
+      id: string
+      action: SpanAction
+    }
   ) {
     const span =
-      spans.find((other) => other.id === details.id) ?? value().find((other) => other.id === details.id)
-    if (!options.set(spans, details)) return false
-    if (span) say(details.action, span)
+      spans.find((other) => other.id === details.id) ??
+      value().find((other) => other.id === details.id)
+    if (!options.set(spans, details)) {
+      return false
+    }
+    if (span) {
+      say(details.action, span)
+    }
     return true
   }
 
@@ -304,13 +359,28 @@ function createSpans<State extends object, S extends Span = Span>(
   deriveState(context, [options.draft], (state) => {
     const current = state[options.draft] as SpansDraft<S> | null
     const now = state[options.key] as S[]
-    if (!current || !held) return
-    if (current.action !== "draw" && !now.some((span) => span.id === current.id))
+    if (!current || !held) {
+      return
+    }
+    if (
+      current.action !== "draw" &&
+      !now.some((span) => span.id === current.id)
+    ) {
       return { [options.draft]: null } as Partial<State>
-    const span = moved ? current.spans.find((other) => other.id === current.id) : undefined
+    }
+    const span = moved
+      ? current.spans.find((other) => other.id === current.id)
+      : undefined
     const spans = span ? replaced(now, span) : now
-    if (span && !allowed(spans, span)) return { [options.draft]: null } as Partial<State>
-    if (spans.length === current.spans.length && spans.every((other, i) => other === current.spans[i])) return
+    if (span && !allowed(spans, span)) {
+      return { [options.draft]: null } as Partial<State>
+    }
+    if (
+      spans.length === current.spans.length &&
+      spans.every((other, i) => other === current.spans[i])
+    ) {
+      return
+    }
     return { [options.draft]: { ...current, spans } } as Partial<State>
   })
 
@@ -323,7 +393,7 @@ function createSpans<State extends object, S extends Span = Span>(
     id: string,
     action: SpanAction,
     next: (x: number, y: number) => S | undefined,
-    click?: () => void,
+    click?: () => void
   ) {
     const before = value()
     let dragging = false
@@ -332,21 +402,31 @@ function createSpans<State extends object, S extends Span = Span>(
     const update = () => {
       const span = next(point.x, point.y)
       const current = draft()
-      if (!span || !current) return
+      if (!span || !current) {
+        return
+      }
       const spans = replaced(current.spans, span)
-      if (!allowed(spans, span)) return
+      if (!allowed(spans, span)) {
+        return
+      }
       moved = true
       setDraft({ id, action, spans })
     }
     const scroller =
       options.createAutoScroll === false
         ? undefined
-        : createAutoScroll({ ...options.createAutoScroll, ignore: () => elements.get(id), onScroll: update })
+        : createAutoScroll({
+            ...options.createAutoScroll,
+            ignore: () => elements.get(id),
+            onScroll: update,
+          })
     drags.start(el, event, {
       threshold: dragThreshold,
       cancelOnEscape: true,
       onStart: () => {
-        if (draft()) return false
+        if (draft()) {
+          return false
+        }
         dragging = true
         held = true
         moved = false
@@ -364,20 +444,38 @@ function createSpans<State extends object, S extends Span = Span>(
         scroller?.stop()
         dragging = false
         held = false
-        if (!dragged) return canceled ? undefined : click?.()
+        if (!dragged) {
+          return canceled ? undefined : click?.()
+        }
         const current = draft()
         if (canceled && action !== "draw") {
           const span = before.find((other) => other.id === id)
-          if (span) say("cancel", span)
+          if (span) {
+            say("cancel", span)
+          }
         }
-        if (!current || canceled || !moved) return setDraft(null)
+        if (!current || canceled || !moved) {
+          return setDraft(null)
+        }
         const base = value()
-        if (!commit(current.spans, { reason: "drag", event: last ?? endEvent, id, action })) setDraft(null)
-        // Keeps the draft until a controlled value's new spans arrive.
-        else
-          settleDraft(store, value, base, () => {
-            if (draft() === current) setDraft(null)
+        if (
+          !commit(current.spans, {
+            reason: "drag",
+            event: last ?? endEvent,
+            id,
+            action,
           })
+        ) {
+          setDraft(null)
+        }
+        // Keeps the draft until a controlled value's new spans arrive.
+        else {
+          settleDraft(store, value, base, () => {
+            if (draft() === current) {
+              setDraft(null)
+            }
+          })
+        }
       },
     })
   }
@@ -387,19 +485,26 @@ function createSpans<State extends object, S extends Span = Span>(
     bindTrack(el: HTMLElement, track: string) {
       tracks.set(track, el)
       return () => {
-        if (tracks.get(track) === el) tracks.delete(track)
+        if (tracks.get(track) === el) {
+          tracks.delete(track)
+        }
       }
     },
     /** Joins a span's element. Return its cleanup from the span slot's `bind`. */
     bindSpan(el: HTMLElement, id: string) {
       elements.set(id, el)
       return () => {
-        if (elements.get(id) === el) elements.delete(id)
+        if (elements.get(id) === el) {
+          elements.delete(id)
+        }
       }
     },
     /** The spans to render: the draft's while a pointer drags, else the value. Pure, so `state` and `attrs` can call it. */
     spans(state: State) {
-      return (state[options.draft] as SpansDraft<S> | null)?.spans ?? (state[options.key] as S[])
+      return (
+        (state[options.draft] as SpansDraft<S> | null)?.spans ??
+        (state[options.key] as S[])
+      )
     },
     /** One track's spans, from `spans(state)`. */
     spansOn(state: State, track: string) {
@@ -440,7 +545,8 @@ function createSpans<State extends object, S extends Span = Span>(
       }
     },
     /** The value under a point on a track, snapped. For a hover line or a "new event at" menu. */
-    valueAt: (track: string, x: number, y: number) => snap(valueAt(track, x, y)),
+    valueAt: (track: string, x: number, y: number) =>
+      snap(valueAt(track, x, y)),
     /**
      * Draws a span from where a track was pressed, once the pointer moves a
      * few pixels; a click makes one `size` long, if `size` is set. Presses
@@ -449,11 +555,26 @@ function createSpans<State extends object, S extends Span = Span>(
     trackPointerdown(event: PointerEvent, track: string) {
       const el = tracks.get(track)
       const target = event.target as Element | null
-      if (!el || !drags.accepts(event) || !options.create || target?.closest("[data-span-id]")) return
+      if (
+        !el ||
+        !drags.accepts(event) ||
+        !options.create ||
+        target?.closest("[data-span-id]")
+      ) {
+        return
+      }
       const at = snap(valueAt(track, event.clientX, event.clientY), Math.floor)
-      const base = options.create({ id: "", track, start: at, end: at + step() })
-      if (!base) return
-      const made = (start: number, end: number) => fit({ ...base, track, start, end } as S, "start")
+      const base = options.create({
+        id: "",
+        track,
+        start: at,
+        end: at + step(),
+      })
+      if (!base) {
+        return
+      }
+      const made = (start: number, end: number) =>
+        fit({ ...base, track, start, end } as S, "start")
       drag(
         el,
         event,
@@ -463,15 +584,22 @@ function createSpans<State extends object, S extends Span = Span>(
           const v = valueAt(track, x, y)
           return v >= at
             ? made(at, snap(v, Math.ceil))
-            : fit({ ...base, start: snap(v, Math.floor), end: at + step() }, "end")
+            : fit(
+                { ...base, start: snap(v, Math.floor), end: at + step() },
+                "end"
+              )
         },
         () => {
           const size = options.size?.()
-          if (size === undefined) return
+          if (size === undefined) {
+            return
+          }
           const span = fit({ ...base, start: at, end: at + size }, "size")
           const next = replaced(value(), span)
-          if (allowed(next, span)) commit(next, { reason: "drag", event, id: span.id, action: "draw" })
-        },
+          if (allowed(next, span)) {
+            commit(next, { reason: "drag", event, id: span.id, action: "draw" })
+          }
+        }
       )
       event.preventDefault()
     },
@@ -482,21 +610,31 @@ function createSpans<State extends object, S extends Span = Span>(
     spanPointerdown(event: PointerEvent, id: string) {
       const el = elements.get(id)
       const span = value().find((other) => other.id === id)
-      if (!el || !span || !drags.accepts(event) || options.disabled?.(span)) return
-      const edge = (event.target as Element | null)?.closest<HTMLElement>("[data-span-edge]")?.dataset
-        .spanEdge
-      const grabbed = valueAt(span.track, event.clientX, event.clientY) - span.start
-      if (edge === "start" || edge === "end")
+      if (!el || !span || !drags.accepts(event) || options.disabled?.(span)) {
+        return
+      }
+      const edge = (event.target as Element | null)?.closest<HTMLElement>(
+        "[data-span-edge]"
+      )?.dataset.spanEdge
+      const grabbed =
+        valueAt(span.track, event.clientX, event.clientY) - span.start
+      if (edge === "start" || edge === "end") {
         drag(el, event, id, "resize", (x, y) => {
           const v = snap(valueAt(span.track, x, y))
-          return edge === "start" ? fit({ ...span, start: v }, "end") : fit({ ...span, end: v }, "start")
+          return edge === "start"
+            ? fit({ ...span, start: v }, "end")
+            : fit({ ...span, end: v }, "start")
         })
-      else
+      } else {
         drag(el, event, id, "move", (x, y) => {
           const track = trackAt(x, y) ?? span.track
           const start = snap(valueAt(track, x, y) - grabbed)
-          return fit({ ...span, track, start, end: start + span.end - span.start }, "size")
+          return fit(
+            { ...span, track, start, end: start + span.end - span.start },
+            "size"
+          )
         })
+      }
     },
     /**
      * Handles a key on a span and returns whether it did. Arrows along the
@@ -506,16 +644,25 @@ function createSpans<State extends object, S extends Span = Span>(
      */
     keydown(event: KeyboardEvent, id: string) {
       const span = value().find((other) => other.id === id)
-      if (!span || event.defaultPrevented || draft() || event.altKey || event.ctrlKey || event.metaKey)
+      if (
+        !span ||
+        event.defaultPrevented ||
+        draft() ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey
+      ) {
         return false
+      }
       // Keys typed in a field inside the span, like its title, are the field's.
       const target = event.target as HTMLElement | null
       if (
         options.disabled?.(span) ||
         target?.isContentEditable ||
         /^(INPUT|TEXTAREA|SELECT)$/.test(target?.tagName ?? "")
-      )
+      ) {
         return false
+      }
       const rtl = event.target instanceof Element && isRTL(event.target)
       const keys =
         axis() === "y"
@@ -537,46 +684,78 @@ function createSpans<State extends object, S extends Span = Span>(
         event.preventDefault()
         return commit(
           value().filter((other) => other.id !== id),
-          { reason: "remove-press", event, id, action: "delete" },
+          { reason: "remove-press", event, id, action: "delete" }
         )
       } else if (event.key === keys.back || event.key === keys.forward) {
         const by = event.key === keys.forward ? step() : -step()
         if (event.shiftKey) {
           action = "resize"
           next = fit({ ...span, end: span.end + by }, "start")
-        } else next = fit({ ...span, start: span.start + by, end: span.end + by }, "size")
-      } else if ((event.key === keys.before || event.key === keys.after) && !event.shiftKey) {
+        } else {
+          next = fit(
+            { ...span, start: span.start + by, end: span.end + by },
+            "size"
+          )
+        }
+      } else if (
+        (event.key === keys.before || event.key === keys.after) &&
+        !event.shiftKey
+      ) {
         const names = order()
-        const track = names[names.indexOf(span.track) + (event.key === keys.after ? 1 : -1)]
-        if (track !== undefined) next = { ...span, track }
+        const track =
+          names[names.indexOf(span.track) + (event.key === keys.after ? 1 : -1)]
+        if (track !== undefined) {
+          next = { ...span, track }
+        }
       }
-      if (!next) return false
+      if (!next) {
+        return false
+      }
       event.preventDefault()
       const result = replaced(value(), next)
-      if (next.start === span.start && next.end === span.end && next.track === span.track) return true
+      if (
+        next.start === span.start &&
+        next.end === span.end &&
+        next.track === span.track
+      ) {
+        return true
+      }
       if (
         allowed(result, next) &&
         commit(result, { reason: "move-key", event, id, action }) &&
         next.track !== span.track
-      )
+      ) {
         focusLater(id)
+      }
       return true
     },
     /** Changes a span at once, like from a form. Returns whether it went through. */
     update(id: string, patch: Partial<Omit<S, "id">>) {
       const span = value().find((other) => other.id === id)
-      if (!span) return false
-      const keep = patch.start === undefined ? "start" : patch.end === undefined ? "end" : "size"
+      if (!span) {
+        return false
+      }
+      const keep =
+        patch.start === undefined
+          ? "start"
+          : patch.end === undefined
+            ? "end"
+            : "size"
       const next = fit({ ...span, ...patch }, keep)
       const result = replaced(value(), next)
-      return allowed(result, next) && commit(result, { reason: "imperative", id, action: "move" })
+      return (
+        allowed(result, next) &&
+        commit(result, { reason: "imperative", id, action: "move" })
+      )
     },
     /** Deletes a span. Returns whether it went through. */
     remove(id: string) {
-      if (!value().some((other) => other.id === id)) return false
+      if (!value().some((other) => other.id === id)) {
+        return false
+      }
       return commit(
         value().filter((other) => other.id !== id),
-        { reason: "imperative", id, action: "delete" },
+        { reason: "imperative", id, action: "delete" }
       )
     },
     /** Ends a pointer drag and puts its span back. */

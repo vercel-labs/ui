@@ -8,7 +8,8 @@ const ratingFixture = {
   // An average that only shows, named by its label.
   average: {
     value: 4.2,
-    getValueLabel: (value: number, max: number) => `Average rating: ${value} out of ${max}`,
+    getValueLabel: (value: number, max: number) =>
+      `Average rating: ${value} out of ${max}`,
   },
 }
 

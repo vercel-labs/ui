@@ -15,7 +15,12 @@ each checkbox, sits in a field.
   import { setContext } from "svelte"
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { CheckboxGroupKey } from "./context"
 
   type Details = ChangeDetails<CheckboxGroupValueChangeReason>
@@ -77,7 +82,9 @@ each checkbox, sits in a field.
     onValueChange: (next: string[], details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   setContext(CheckboxGroupKey, group)
@@ -85,7 +92,7 @@ each checkbox, sits in a field.
   const input = useHandlePart(group, "group-input")
   const control = field?.control(
     () => rest.id,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
 </script>
 

@@ -1,4 +1,10 @@
-import { Toast, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import {
+  Toast,
+  ToastClose,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { onCleanup } from "solid-js"
 
 function Example() {
@@ -10,7 +16,9 @@ function Example() {
   return (
     <>
       <div data-slot="row">
-        <button onClick={() => toast("Link copied", { duration: 1000 })}>1 Second</button>
+        <button onClick={() => toast("Link copied", { duration: 1000 })}>
+          1 Second
+        </button>
         <button onClick={() => toast("Changes saved")}>5 Seconds</button>
         <button
           onClick={() =>

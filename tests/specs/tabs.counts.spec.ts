@@ -1,11 +1,20 @@
 import { expect, test } from "../fixtures"
 import { budgets } from "../perf/budgets"
-import { countCalls, readCounts, report, resetCounts, sizes } from "../perf/init"
+import {
+  countCalls,
+  readCounts,
+  report,
+  resetCounts,
+  sizes,
+} from "../perf/init"
 
 // Count gates for roving focus. See tests/perf/budgets.ts.
 test.describe("work per interaction in a long tab list", () => {
   for (const n of sizes) {
-    test(`arrow keys do no work that grows with the tab count (n=${n})`, async ({ page, open }) => {
+    test(`arrow keys do no work that grows with the tab count (n=${n})`, async ({
+      page,
+      open,
+    }) => {
       const budget = budgets["tabs.arrow-key"]
       await countCalls(page)
       await open("tabs-perf", { n: String(n) })
@@ -28,15 +37,15 @@ test.describe("work per interaction in a long tab list", () => {
       report("tabs.arrow-key", n, result)
       expect(
         result.counts.compareDocumentPosition ?? 0,
-        "See tests/perf/README.md#tabs-arrow-key.",
+        "See tests/perf/README.md#tabs-arrow-key."
       ).toBeLessThanOrEqual(budget.counts.compareDocumentPosition)
       expect(
         result.counts.getAttribute ?? 0,
-        "Parts a switch doesn't change heard about it. See tests/perf/README.md#tabs-arrow-key.",
+        "Parts a switch doesn't change heard about it. See tests/perf/README.md#tabs-arrow-key."
       ).toBeLessThanOrEqual(budget.counts.getAttribute)
       expect(
         result.counts.requestAnimationFrame ?? 0,
-        "A switch asked for more than its panel's first frame. See tests/perf/README.md#tabs-arrow-key.",
+        "A switch asked for more than its panel's first frame. See tests/perf/README.md#tabs-arrow-key."
       ).toBeLessThanOrEqual(budget.counts.requestAnimationFrame)
     })
   }

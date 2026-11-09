@@ -13,7 +13,11 @@ import { ChevronLeft, ChevronRight, Ellipsis } from "@/components/icons"
 const step =
   "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl border border-transparent text-sm font-medium text-foreground outline-none select-none transition-colors focus-visible:ring-3 focus-visible:ring-ring/30 not-data-disabled:hover:bg-muted data-disabled:opacity-50 aria-[current=page]:border-border aria-[current=page]:bg-background motion-reduce:transition-none"
 
-function Pagination(props: { page: number; pageCount: number; getHref: (page: number) => string }) {
+function Pagination(props: {
+  page: number
+  pageCount: number
+  getHref: (page: number) => string
+}) {
   return (
     <PaginationPrimitive
       aria-label="Pages"
@@ -46,7 +50,10 @@ function Pagination(props: { page: number; pageCount: number; getHref: (page: nu
             <PaginationItem>
               <PaginationNext class={step}>
                 <span class="sr-only">Next</span>
-                <ChevronRight aria-hidden="true" class="size-4 rtl:rotate-180" />
+                <ChevronRight
+                  aria-hidden="true"
+                  class="size-4 rtl:rotate-180"
+                />
               </PaginationNext>
             </PaginationItem>
           </>

@@ -3,7 +3,13 @@
 // grid selects. Listbox runs on `createKeySelection`; `createSelection` is the
 // same model for a custom primitive's own state key.
 import type { PrimitiveContext, ReasonFor } from "../kernel/primitive-types"
-import { allToggled, rangeSelection, isSameKeys, toggledKeys, type RangeAnchor } from "./listbox-range"
+import {
+  allToggled,
+  rangeSelection,
+  isSameKeys,
+  toggledKeys,
+  type RangeAnchor,
+} from "./listbox-range"
 
 // Why a selection changed, passed on to the change it asks for.
 type Why<Reason extends string> = { reason: Reason; event?: Event }
@@ -22,26 +28,44 @@ function createKeySelection<Reason extends string>(config: {
 
   return {
     toggle(key: string, why: Why<Reason>) {
-      if (!selectable(key)) return
+      if (!selectable(key)) {
+        return
+      }
       const next = toggledKeys(keys(), key)
-      if (set(next, why)) anchor = { key, base: next }
+      if (set(next, why)) {
+        anchor = { key, base: next }
+      }
     },
     replace(key: string, why: Why<Reason>) {
-      if (!selectable(key)) return
-      if (!isSameKeys(keys(), [key]) && !set([key], why)) return
+      if (!selectable(key)) {
+        return
+      }
+      if (!isSameKeys(keys(), [key]) && !set([key], why)) {
+        return
+      }
       anchor = { key, base: [key] }
     },
     // Selects from the anchor to `to`. Without an anchor, the range starts at
     // `from`, the item focus was on, or at `to` itself.
-    extend(to: string, { from, additive }: { from: string | null; additive: boolean }, why: Why<Reason>) {
+    extend(
+      to: string,
+      { from, additive }: { from: string | null; additive: boolean },
+      why: Why<Reason>
+    ) {
       const list = order()
-      if (!anchor || !list.includes(anchor.key)) anchor = { key: from ?? to, base: keys() }
+      if (!anchor || !list.includes(anchor.key)) {
+        anchor = { key: from ?? to, base: keys() }
+      }
       const next = rangeSelection(list, anchor, to, { additive, selectable })
-      if (!isSameKeys(next, keys())) set(next, why)
+      if (!isSameKeys(next, keys())) {
+        set(next, why)
+      }
     },
     toggleAll(why: Why<Reason>) {
       const next = allToggled(keys(), order().filter(selectable))
-      if (!isSameKeys(next, keys())) set(next, why)
+      if (!isSameKeys(next, keys())) {
+        set(next, why)
+      }
     },
     anchor: () => anchor?.key ?? null,
     resetAnchor() {
@@ -99,11 +123,15 @@ function createSelection<
   // Typed from the options' `on<Key>Change`, so `set` passes the reasons straight to `change`.
   Reason extends string = ReasonFor<Options, Key>,
 >(
-  context: Pick<PrimitiveContext<Options, State, any>, "store" | "options" | "onDestroy">,
-  options: SelectionOptions<Key, Reason>,
+  context: Pick<
+    PrimitiveContext<Options, State, any>,
+    "store" | "options" | "onDestroy"
+  >,
+  options: SelectionOptions<Key, Reason>
 ) {
   const { store } = context
-  const keys = () => (store.get()[options.key] as readonly string[] | undefined) ?? []
+  const keys = () =>
+    (store.get()[options.key] as readonly string[] | undefined) ?? []
   const multiple = () => options.multiple?.() ?? false
   const selectable = (key: string) => options.selectable?.(key) ?? true
   // The keys this selection last asked for, so a controlled value coming back is known as its own.
@@ -115,7 +143,9 @@ function createSelection<
     set(next, why) {
       requested = next
       const done = options.set(next, why)
-      if (!done) requested = null
+      if (!done) {
+        requested = null
+      }
       return done
     },
   })
@@ -124,12 +154,16 @@ function createSelection<
   context.onDestroy(
     store.subscribe(() => {
       const current = keys()
-      if (current === previous) return
+      if (current === previous) {
+        return
+      }
       previous = current
       const own = requested !== null && isSameKeys(requested, current)
       requested = null
-      if (!own || !current.length) model.resetAnchor()
-    }),
+      if (!own || !current.length) {
+        model.resetAnchor()
+      }
+    })
   )
 
   return {
@@ -139,10 +173,17 @@ function createSelection<
     choose: (key: string, why: Why<Reason>) => model.replace(key, why),
     /** Adds or removes one item, and starts the next range there. In single mode, selects it or clears it. */
     toggle(key: string, why: Why<Reason>) {
-      if (multiple()) return model.toggle(key, why)
-      if (!selectable(key)) return
-      if (isSameKeys(keys(), [key])) model.toggle(key, why)
-      else model.replace(key, why)
+      if (multiple()) {
+        return model.toggle(key, why)
+      }
+      if (!selectable(key)) {
+        return
+      }
+      if (isSameKeys(keys(), [key])) {
+        model.toggle(key, why)
+      } else {
+        model.replace(key, why)
+      }
     },
     /**
      * Selects the range from the anchor to `key`, keeping what was selected
@@ -150,13 +191,24 @@ function createSelection<
      * like the item focus was on. `additive: false` drops what was selected
      * before. In single mode, chooses `key`.
      */
-    extend(key: string, why: Why<Reason> & { from?: string | null; additive?: boolean }) {
-      if (!multiple()) return model.replace(key, why)
-      model.extend(key, { from: why.from ?? null, additive: why.additive ?? true }, why)
+    extend(
+      key: string,
+      why: Why<Reason> & { from?: string | null; additive?: boolean }
+    ) {
+      if (!multiple()) {
+        return model.replace(key, why)
+      }
+      model.extend(
+        key,
+        { from: why.from ?? null, additive: why.additive ?? true },
+        why
+      )
     },
     /** Selects every selectable item in `order`, or none once they all are, like Ctrl+A. Only in multiple mode. */
     toggleAll(why: Why<Reason>) {
-      if (multiple()) model.toggleAll(why)
+      if (multiple()) {
+        model.toggleAll(why)
+      }
     },
     /** The key ranges start from, or `null`. */
     anchor: model.anchor,
@@ -169,4 +221,9 @@ function createSelection<
  */
 type SelectionModel = ReturnType<typeof createSelection>
 
-export { createKeySelection, createSelection, type SelectionModel, type SelectionOptions }
+export {
+  createKeySelection,
+  createSelection,
+  type SelectionModel,
+  type SelectionOptions,
+}

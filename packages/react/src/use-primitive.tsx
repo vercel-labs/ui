@@ -32,12 +32,19 @@ import {
   type PrimitiveGeneric,
 } from "@ui-sdk/core/renderer"
 import * as React from "react"
-import { mergeProps, mergeRefs, renderElement, type RenderProp } from "./render-element"
+import {
+  mergeProps,
+  mergeRefs,
+  renderElement,
+  type RenderProp,
+} from "./render-element"
 
 // Names React spells in camel case, by their lowercase DOM name, like
 // `tabindex: "tabIndex"`, with `prefix` before each.
 const camelCase = (names: string, prefix = "") =>
-  Object.fromEntries(names.split(" ").map((name) => [name.toLowerCase(), prefix + name]))
+  Object.fromEntries(
+    names.split(" ").map((name) => [name.toLowerCase(), prefix + name])
+  )
 
 // The attribute translations React needs: names it spells in camel case, and
 // the `checked` attribute, which is the default checkedness in HTML and which
@@ -47,10 +54,18 @@ const propNames: Record<string, string> = {
   for: "htmlFor",
   checked: "defaultChecked",
   .../* @__PURE__ */ camelCase(
-    "tabIndex readOnly inputMode enterKeyHint autoComplete autoCapitalize autoCorrect spellCheck contentEditable maxLength minLength",
+    "tabIndex readOnly inputMode enterKeyHint autoComplete autoCapitalize autoCorrect spellCheck contentEditable maxLength minLength"
   ),
 }
-const booleans = new Set(["hidden", "disabled", "readonly", "required", "inert", "checked", "multiple"])
+const booleans = new Set([
+  "hidden",
+  "disabled",
+  "readonly",
+  "required",
+  "inert",
+  "checked",
+  "multiple",
+])
 
 // "position:absolute;margin:-1px" becomes { position: "absolute", margin: "-1px" }.
 // Parts render the same few styles again and again, so each text is parsed
@@ -60,16 +75,25 @@ const styles = new Map<string, Record<string, string>>()
 
 function styleObject(css: string) {
   let style = styles.get(css)
-  if (style) return style
+  if (style) {
+    return style
+  }
   style = {}
   for (const declaration of css.split(";")) {
     const index = declaration.indexOf(":")
-    if (index === -1) continue
+    if (index === -1) {
+      continue
+    }
     const name = declaration.slice(0, index).trim()
-    style[name.startsWith("--") ? name : name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())] =
-      declaration.slice(index + 1).trim()
+    style[
+      name.startsWith("--")
+        ? name
+        : name.replace(/-(\w)/g, (_, char: string) => char.toUpperCase())
+    ] = declaration.slice(index + 1).trim()
   }
-  if (styles.size >= 500) styles.clear()
+  if (styles.size >= 500) {
+    styles.clear()
+  }
   styles.set(css, style)
   return style
 }
@@ -79,7 +103,7 @@ function styleObject(css: string) {
 const eventProps: Record<string, string> = /* @__PURE__ */ Object.assign(
   /* @__PURE__ */ camelCase(
     "Click KeyDown KeyUp ContextMenu PointerDown MouseDown PointerUp PointerMove",
-    "on",
+    "on"
   ),
   {
     dblclick: "onDoubleClick",
@@ -87,7 +111,7 @@ const eventProps: Record<string, string> = /* @__PURE__ */ Object.assign(
     focusout: "onBlur",
     input: "onChange",
     submit: "onSubmit",
-  },
+  }
 )
 
 // Every other type is the element's own listener, which core attaches, so a
@@ -98,14 +122,23 @@ const eventProps: Record<string, string> = /* @__PURE__ */ Object.assign(
 // target is the trigger the pointer left. Core hears the real events, as in
 // Vue and web components. A user's React handler can't skip these with
 // preventDefault(), since core doesn't wait for it.
-const host = { by: "framework", attaches: /* @__PURE__ */ Object.keys(eventProps) } as const
+const host = {
+  by: "framework",
+  attaches: /* @__PURE__ */ Object.keys(eventProps),
+} as const
 
 function toReactProps(attrs: Attrs) {
   const props: Record<string, unknown> = {}
   for (const name in attrs) {
     const value = attrs[name]
-    if (value === undefined) continue
-    props[propNames[name] ?? name] = booleans.has(name) ? true : name === "style" ? styleObject(value) : value
+    if (value === undefined) {
+      continue
+    }
+    props[propNames[name] ?? name] = booleans.has(name)
+      ? true
+      : name === "style"
+        ? styleObject(value)
+        : value
   }
   return props
 }
@@ -137,7 +170,10 @@ type PrimitiveHandle<P extends Primitive> = {
  * }
  * @stable
  */
-function usePrimitive<P extends Primitive>(primitive: P, options: OptionsOf<P>) {
+function usePrimitive<P extends Primitive>(
+  primitive: P,
+  options: OptionsOf<P>
+) {
   // Prefixed so a page using ui-sdk is recognizable from its HTML. Part ids
   // stay unprefixed, since some are keys, like saved resizable layouts.
   const id = `ui-sdk-${React.useId()}`
@@ -145,7 +181,15 @@ function usePrimitive<P extends Primitive>(primitive: P, options: OptionsOf<P>) 
   // like a transition that suspended, never takes the controller from the
   // instance on the page.
   const create = (from: object = {}) =>
-    unwatched(() => primitive({ ...options, ...from, controller: undefined, id }) as ReturnType<P>)
+    unwatched(
+      () =>
+        primitive({
+          ...options,
+          ...from,
+          controller: undefined,
+          id,
+        }) as ReturnType<P>
+    )
   // Kept once React commits it: only then do the agent and `observe` hear
   // it, its controller attach and its work outside itself start, so
   // StrictMode's second initializer call, which React throws away, never does.
@@ -197,15 +241,21 @@ function usePrimitive<P extends Primitive>(primitive: P, options: OptionsOf<P>) 
     return () => {
       own.mounted--
       queueMicrotask(() => {
-        if (own.mounted || own.destroyed) return
+        if (own.mounted || own.destroyed) {
+          return
+        }
         release(instance)
         const leave = () => {
           own.destroyed = true
           instance.destroy()
         }
-        if (!anchors.has(instance)) owners?.register(own, instance, own)
-        else if (inPage(instance)) hide(instance, leave)
-        else leave()
+        if (!anchors.has(instance)) {
+          owners?.register(own, instance, own)
+        } else if (inPage(instance)) {
+          hide(instance, leave)
+        } else {
+          leave()
+        }
       })
     }
   }, [instance])
@@ -224,7 +274,9 @@ function usePrimitive<P extends Primitive>(primitive: P, options: OptionsOf<P>) 
     return handle
   }, [instance])
 
-  if (!preview) return stable
+  if (!preview) {
+    return stable
+  }
   const previewing = extendHandle(stable, {})
   previews.set(previewing, preview)
   return previewing
@@ -261,9 +313,11 @@ function handOver(
   instance: PrimitiveInstance,
   options: object,
   preview: Preview | undefined,
-  outers: Outer[] | undefined,
+  outers: Outer[] | undefined
 ) {
-  if (preview) preview.handed = true
+  if (preview) {
+    preview.handed = true
+  }
   const outer = handing
   handing = preview
   try {
@@ -284,7 +338,10 @@ const readers = new WeakMap<object, Outer>()
 // `group`. The primitive it's passed to renders and takes its options
 // reading that instance as `handle`'s render shows it, so a group's new
 // value reaches its items in the render that changes it.
-function reading<F extends (...args: never[]) => unknown>(handle: Outer, read: F) {
+function reading<F extends (...args: never[]) => unknown>(
+  handle: Outer,
+  read: F
+) {
   readers.set(read, handle)
   return read
 }
@@ -294,14 +351,18 @@ function outersOf(options: Record<string, unknown>) {
   let outers: Outer[] | undefined
   for (const key in options) {
     const outer = readers.get(options[key] as object)
-    if (outer) (outers ??= []).push(outer)
+    if (outer) {
+      ;(outers ??= []).push(outer)
+    }
   }
   return outers
 }
 
 // Runs `read` with each instance in `outers` reading as its render shows it.
 function within<T>(outers: Outer[] | undefined, read: () => T) {
-  if (!outers) return read()
+  if (!outers) {
+    return read()
+  }
   let run = read
   for (const outer of outers) {
     const inner = run
@@ -312,7 +373,10 @@ function within<T>(outers: Outer[] | undefined, read: () => T) {
 
 // A copy of a handle with `extra` keys, like a context that adds the field
 // around it. A plain spread would freeze `state` and lose the preview.
-function extendHandle<H extends { instance: PrimitiveInstance }, E extends object>(handle: H, extra: E) {
+function extendHandle<
+  H extends { instance: PrimitiveInstance },
+  E extends object,
+>(handle: H, extra: E) {
   const copy: H & E = {
     ...handle,
     ...extra,
@@ -321,7 +385,9 @@ function extendHandle<H extends { instance: PrimitiveInstance }, E extends objec
     },
   }
   const preview = previews.get(handle)
-  if (preview) previews.set(copy, preview)
+  if (preview) {
+    previews.set(copy, preview)
+  }
   return copy
 }
 
@@ -331,7 +397,7 @@ function extendHandle<H extends { instance: PrimitiveInstance }, E extends objec
 function presentIn<P extends Primitive, S extends SlotName<P>>(
   handle: PrimitiveHandle<P>,
   name: S,
-  props?: PropsOf<P, S>,
+  props?: PropsOf<P, S>
 ) {
   const part = handle.instance.part(name, props)
   return readIn(handle, (showing) => present(part, part.props, showing))
@@ -343,10 +409,12 @@ function slotIn<P extends Primitive, S extends SlotName<P>>(
   handle: PrimitiveHandle<P>,
   name: S,
   props?: PropsOf<P, S>,
-  user: Record<string, any> = {},
+  user: Record<string, any> = {}
 ) {
   const part = handle.instance.part(name, props)
-  return readIn(handle, (showing) => elementProps(part, part.props, user, showing)) as Record<string, any>
+  return readIn(handle, (showing) =>
+    elementProps(part, part.props, user, showing)
+  ) as Record<string, any>
 }
 
 // The state a handle's render shows: its preview until it's handed over, made
@@ -357,10 +425,14 @@ function stateIn<I extends PrimitiveInstance>(handle: { instance: I }) {
   const { instance } = handle
   const current = instance.get()
   const preview = previews.get(handle)
-  if (!preview || preview.handed) return current as I["types"]["state"]
+  if (!preview || preview.handed) {
+    return current as I["types"]["state"]
+  }
   if (preview.base !== current) {
     preview.base = current
-    preview.state = within(preview.outers, () => instance.preview(preview.options))
+    preview.state = within(preview.outers, () =>
+      instance.preview(preview.options)
+    )
   }
   return (preview.state ?? current) as I["types"]["state"]
 }
@@ -372,24 +444,29 @@ function stateIn<I extends PrimitiveInstance>(handle: { instance: I }) {
 function readIn<I extends PrimitiveInstance, T>(
   handle: { instance: I },
   read: (state: I["types"]["state"]) => T,
-  around?: Record<string, object>,
+  around?: Record<string, object>
 ) {
   const state = stateIn(handle)
-  if (state === handle.instance.get() && !around) return read(state)
+  if (state === handle.instance.get() && !around) {
+    return read(state)
+  }
   return handle.instance.view(state, () => read(state), around)
 }
 
 // One element of each instance's that's in the page, as its parts commit.
 // React keeps it there while hiding a component, and removes it with it.
 const anchors = new WeakMap<PrimitiveInstance, Element>()
-const inPage = (instance: PrimitiveInstance) => !!anchors.get(instance)?.isConnected
+const inPage = (instance: PrimitiveInstance) =>
+  !!anchors.get(instance)?.isConnected
 
 // Destroys an instance hidden or gone without an element in the page once
 // React lets go of the component that made it, whose `life` ref goes with it.
 const owners =
   typeof FinalizationRegistry === "undefined"
     ? undefined
-    : new FinalizationRegistry<PrimitiveInstance>((instance) => instance.destroy())
+    : new FinalizationRegistry<PrimitiveInstance>((instance) =>
+        instance.destroy()
+      )
 
 // Instances hidden with an element in the page, each with how it leaves once
 // that element does, like a hidden `<Activity>` removed with it.
@@ -400,11 +477,15 @@ function hide(instance: PrimitiveInstance, leave: () => void) {
   hidden.set(instance, leave)
   sweeping ??= setInterval(() => {
     for (const [instance, leave] of hidden) {
-      if (inPage(instance)) continue
+      if (inPage(instance)) {
+        continue
+      }
       hidden.delete(instance)
       leave()
     }
-    if (hidden.size) return
+    if (hidden.size) {
+      return
+    }
     clearInterval(sweeping)
     sweeping = undefined
   }, 1000)
@@ -412,13 +493,19 @@ function hide(instance: PrimitiveInstance, leave: () => void) {
 
 // A destroyed instance's state, as the defaults a new one starts from, for
 // each option with a default the parent didn't control.
-function carried(primitive: Primitive, instance: PrimitiveInstance, options: Record<string, any>) {
+function carried(
+  primitive: Primitive,
+  instance: PrimitiveInstance,
+  options: Record<string, any>
+) {
   const schema = schemaOf(primitive).options
   const state = instance.get() as Record<string, unknown>
   const defaults: Record<string, unknown> = {}
   for (const key in state) {
     const fallback = `default${key[0].toUpperCase()}${key.slice(1)}`
-    if (fallback in schema && options[key] === undefined) defaults[fallback] = state[key]
+    if (fallback in schema && options[key] === undefined) {
+      defaults[fallback] = state[key]
+    }
   }
   return defaults
 }
@@ -430,14 +517,20 @@ const heldRefs = new WeakMap<Part, (el: HTMLElement | null) => void>()
 // microtask later, unless it attached again by then.
 function heldRef(part: Part) {
   let held = heldRefs.get(part)
-  if (held) return held
+  if (held) {
+    return held
+  }
   const bindTo = ref(part, host)
   let releasing = false
   held = (el) => {
     releasing = !el
-    if (el) return bindTo(el)
+    if (el) {
+      return bindTo(el)
+    }
     queueMicrotask(() => {
-      if (releasing) bindTo(null)
+      if (releasing) {
+        bindTo(null)
+      }
     })
   }
   heldRefs.set(part, held)
@@ -447,21 +540,30 @@ function heldRef(part: Part) {
 // The slot's attributes win over the user's props, but for an `id` and what
 // `yieldToAuthor` leaves to the user. The user's handlers run first and can
 // call preventDefault() to skip the built-in behavior.
-function elementProps(part: Part, props: unknown, user: Record<string, any>, state: object) {
+function elementProps(
+  part: Part,
+  props: unknown,
+  user: Record<string, any>,
+  state: object
+) {
   takeOwnId(part, user.id)
   const handlers: Record<string, (event: React.SyntheticEvent) => void> = {}
   for (const [type, handler] of Object.entries(partHandlers(part))) {
     const prop = eventProps[type]
-    if (!prop) continue
+    if (!prop) {
+      continue
+    }
     handlers[prop] = (event) => {
       handler!(event.nativeEvent)
       // A handler that ran after ours, like a router link's own onClick, reads React's event.
-      if (event.nativeEvent.defaultPrevented && !event.isDefaultPrevented()) event.preventDefault()
+      if (event.nativeEvent.defaultPrevented && !event.isDefaultPrevented()) {
+        event.preventDefault()
+      }
     }
   }
   const own = yieldToAuthor(
     attrs(part, props as never, state),
-    (name) => user[propNames[name] ?? name] != null,
+    (name) => user[propNames[name] ?? name] != null
   )
   return mergeProps(handlers, user, toReactProps(own), {
     id: user.id,
@@ -474,14 +576,15 @@ function elementProps(part: Part, props: unknown, user: Record<string, any>, sta
  * styles that may be functions of the part's state.
  * @stable
  */
-type PartProps<Tag extends keyof React.JSX.IntrinsicElements, State = {}> = Omit<
-  React.ComponentProps<Tag>,
-  "className" | "style" | "children"
-> & {
+type PartProps<
+  Tag extends keyof React.JSX.IntrinsicElements,
+  State = {},
+> = Omit<React.ComponentProps<Tag>, "className" | "style" | "children"> & {
   /** Class names, or a function of the part's state that returns them. */
   className?: string | ((state: State) => string | undefined)
   /** Styles, or a function of the part's state that returns them. */
-  style?: React.CSSProperties | ((state: State) => React.CSSProperties | undefined)
+  style?:
+    React.CSSProperties | ((state: State) => React.CSSProperties | undefined)
   /** Renders your own element: one that receives the part's props, or a function of the props and the state. */
   render?: RenderProp<State>
   /** Content, or a function of the part's state that returns it. */
@@ -489,9 +592,16 @@ type PartProps<Tag extends keyof React.JSX.IntrinsicElements, State = {}> = Omit
 }
 
 // Attributes in `skip` may differ.
-function sameAttrs(a: Record<string, unknown>, b: Record<string, unknown>, skip: readonly string[] = []) {
+function sameAttrs(
+  a: Record<string, unknown>,
+  b: Record<string, unknown>,
+  skip: readonly string[] = []
+) {
   const keys = Object.keys(a)
-  return keys.length === Object.keys(b).length && keys.every((key) => a[key] === b[key] || skip.includes(key))
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every((key) => a[key] === b[key] || skip.includes(key))
+  )
 }
 
 // Each instance's mounted parts, to check again when a part commits new values.
@@ -499,10 +609,17 @@ const rechecks = new WeakMap<PrimitiveInstance, Set<() => void>>()
 
 // Whether committing `after` changes a value other parts may read. Callbacks
 // are new on most renders, so a new one doesn't count.
-function changesValues(before: Record<string, unknown>, after: Record<string, unknown>) {
+function changesValues(
+  before: Record<string, unknown>,
+  after: Record<string, unknown>
+) {
   for (const key in { ...before, ...after }) {
-    if (typeof before[key] === "function" && typeof after[key] === "function") continue
-    if (!sameValue(before[key], after[key])) return true
+    if (typeof before[key] === "function" && typeof after[key] === "function") {
+      continue
+    }
+    if (!sameValue(before[key], after[key])) {
+      return true
+    }
   }
   return false
 }
@@ -519,7 +636,7 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
   handle: Pick<PrimitiveHandle<P>, "instance">,
   name: S,
   props: PropsOf<P, S>,
-  around?: Record<string, object>,
+  around?: Record<string, object>
 ) {
   const { instance } = handle
   const [, rerender] = React.useReducer((count: number) => count + 1, 0)
@@ -532,18 +649,21 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
       handle,
       around,
       props,
-      snapshot: partState(part, props, showing) as StateOf<P, S> & Record<string, unknown>,
+      snapshot: partState(part, props, showing) as StateOf<P, S> &
+        Record<string, unknown>,
       // The keys this render read, filled in as it reads them.
       read: new Set<string>(),
       attrs: attrs(part, props, showing),
       present: present(part, props, showing),
       version: renderVersion(instance),
     }),
-    around,
+    around
   )
   const state = new Proxy(rendered.snapshot, {
     get(target, key) {
-      if (typeof key === "string") rendered.read.add(key)
+      if (typeof key === "string") {
+        rendered.read.add(key)
+      }
       return target[key as string]
     },
   })
@@ -555,7 +675,9 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
   // may have discarded since.
   const last = React.useRef(rendered)
   const preview = previews.get(handle)
-  if (preview && !preview.handed) preview.pending.add(last)
+  if (preview && !preview.handed) {
+    preview.pending.add(last)
+  }
   // `full` compares the attributes core writes itself too, after a commit,
   // whose render may have read state older than what core last wrote, and
   // `props` compares them though the state didn't change, after another
@@ -567,9 +689,15 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
         shown.handle,
         (now) => {
           if (shown.read.size) {
-            const next = partState(part, shown.props, now) as typeof shown.snapshot
+            const next = partState(
+              part,
+              shown.props,
+              now
+            ) as typeof shown.snapshot
             for (const key of shown.read) {
-              if (sameSlotState(next[key], shown.snapshot[key])) continue
+              if (sameSlotState(next[key], shown.snapshot[key])) {
+                continue
+              }
               shown.snapshot = next
               return true
             }
@@ -577,34 +705,48 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
           // Presence may read live state, which changes no version, so it is
           // checked on every change.
           const shows = present(part, shown.props, now)
-          if (shows !== shown.present) return true
-          if (renderVersion(instance) === shown.version && !props) return false
+          if (shows !== shown.present) {
+            return true
+          }
+          if (renderVersion(instance) === shown.version && !props) {
+            return false
+          }
           shown.version = renderVersion(instance)
           // A part that isn't in the page has no attributes to keep current,
           // like a closed popup's content learning its trigger's id.
           return (
             shows &&
-            !sameAttrs(attrs(part, shown.props, now), shown.attrs, full ? undefined : directNames(part))
+            !sameAttrs(
+              attrs(part, shown.props, now),
+              shown.attrs,
+              full ? undefined : directNames(part)
+            )
           )
         },
-        shown.around,
+        shown.around
       )
-      if (outdated) rerender()
+      if (outdated) {
+        rerender()
+      }
     },
-    [instance, part],
+    [instance, part]
   )
 
   React.useLayoutEffect(() => {
     const changed = part.props !== props && changesValues(part.props, props)
     commit(part, props)
     preview?.pending.delete(last)
-    if (part.el && !inPage(instance)) anchors.set(instance, part.el)
+    if (part.el && !inPage(instance)) {
+      anchors.set(instance, part.el)
+    }
     last.current = rendered
     // Changes between the render and now, like another part binding, count too.
     check(true)
     // Children commit first, and so do parts elsewhere that read this one's
     // committed props, which check again now.
-    if (changed) rechecks.get(instance)?.forEach((recheck) => recheck())
+    if (changed) {
+      rechecks.get(instance)?.forEach((recheck) => recheck())
+    }
   })
 
   // A new key is a new part, and a new value the part selects on needs a new subscription.
@@ -612,14 +754,18 @@ function usePartState<P extends Primitive, S extends SlotName<P>>(
   React.useLayoutEffect(() => {
     const recheck = () => check(true, true)
     let all = rechecks.get(instance)
-    if (!all) rechecks.set(instance, (all = new Set()))
+    if (!all) {
+      rechecks.set(instance, (all = new Set()))
+    }
     all.add(recheck)
     const unsubscribe = subscribe(
       part,
       () => {
-        if (!handing?.pending.has(last)) check(false)
+        if (!handing?.pending.has(last)) {
+          check(false)
+        }
       },
-      last.current.props,
+      last.current.props
     )
     return () => {
       all.delete(recheck)
@@ -638,19 +784,24 @@ const kindOf = (spec: PropSpec) => (typeof spec === "object" ? spec.kind : spec)
 // Where a prop comes from when it's left out: the slot, and that slot's prop,
 // which `"group.id"` names and `"item"` leaves to the prop's own name.
 const fromOf = (spec: PropSpec, key: string) => {
-  if (typeof spec !== "object") return undefined
+  if (typeof spec !== "object") {
+    return undefined
+  }
   const [slot, prop = key] = spec.from.split(".")
   return { slot, prop }
 }
 
 // "tab-icon" is "TabIcon".
-const pascal = (name: string) => name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
+const pascal = (name: string) =>
+  name.replace(/(^|-)(\w)/g, (_, _dash, char: string) => char.toUpperCase())
 
 // Splits a component's props into those the schema names and the element's own.
 function split(props: Record<string, any>, schema: Record<string, PropSpec>) {
   const named: Record<string, any> = {}
   const rest: Record<string, any> = {}
-  for (const key in props) (key in schema ? named : rest)[key] = props[key]
+  for (const key in props) {
+    ;(key in schema ? named : rest)[key] = props[key]
+  }
   return [named, rest] as const
 }
 
@@ -666,15 +817,24 @@ type Scope = {
   around: Record<string, Record<string, unknown>>
   shown?: Record<string, object>
 }
-type Scopes = { context: React.Context<Scope | null>; provides: Set<string>; keyed: Set<string> }
+type Scopes = {
+  context: React.Context<Scope | null>
+  provides: Set<string>
+  keyed: Set<string>
+}
 const scopes = new WeakMap<Primitive, Scopes>()
 function scopeOf(primitive: Primitive) {
   let scope = scopes.get(primitive)
-  if (!scope)
+  if (!scope) {
     scopes.set(
       primitive,
-      (scope = { context: React.createContext<Scope | null>(null), provides: new Set(), keyed: new Set() }),
+      (scope = {
+        context: React.createContext<Scope | null>(null),
+        provides: new Set(),
+        keyed: new Set(),
+      })
     )
+  }
   return scope
 }
 
@@ -696,13 +856,18 @@ function HandleScope({
 
 /** The nearest instance of a primitive, or undefined outside its root, like a toggle's group. */
 function useNearest<P extends Primitive>(primitive: P) {
-  return React.useContext(scopeOf(primitive).context)?.handle as PrimitiveHandle<P> | undefined
+  return React.useContext(scopeOf(primitive).context)?.handle as
+    PrimitiveHandle<P> | undefined
 }
 
 /** The nearest instance of a primitive, for a part written by hand that calls its api. */
 function useHandle<P extends Primitive>(primitive: P) {
   const handle = useNearest(primitive)
-  if (!handle) throw new Error(`The ${primitive.name} parts must be used inside their root.`)
+  if (!handle) {
+    throw new Error(
+      `The ${primitive.name} parts must be used inside their root.`
+    )
+  }
   return handle
 }
 
@@ -724,24 +889,39 @@ type PartState<P extends Primitive, S extends SlotName<P>> =
  * }
  * @stable
  */
-function usePart<P extends Primitive, S extends SlotName<P>, T extends Tag = "div">(
+function usePart<
+  P extends Primitive,
+  S extends SlotName<P>,
+  T extends Tag = "div",
+>(
   handle: P | PrimitiveHandle<P>,
   slot: S,
   slotProps: PropsOf<P, S>,
   props: PartProps<T, PartState<P, S>> = {} as PartProps<T, PartState<P, S>>,
-  tag = "div" as T,
+  tag = "div" as T
 ) {
   const primitive = typeof handle === "function" ? handle : handle.primitive
   const { context, provides, keyed } = scopeOf(primitive)
   const scope = React.useContext(context)
-  const owner = (typeof handle === "function" ? scope?.handle : handle) as PrimitiveHandle<Primitive>
-  if (!owner) throw new Error(`The ${primitive.name} ${slot} part must be used inside its root.`)
+  const owner = (
+    typeof handle === "function" ? scope?.handle : handle
+  ) as PrimitiveHandle<Primitive>
+  if (!owner) {
+    throw new Error(
+      `The ${primitive.name} ${slot} part must be used inside its root.`
+    )
+  }
   const { render, ...rest } = props
   // An instance a part renders with its handle, like a root's, reaches the parts inside it.
-  const own = React.useMemo<Scope>(() => ({ handle: owner, around: {} }), [owner])
+  const own = React.useMemo<Scope>(
+    () => ({ handle: owner, around: {} }),
+    [owner]
+  )
   const inside = scope?.handle === owner ? scope : own
   // The parts inside a keyed item take its key as its value, as every adapter's do.
-  const around = keyed.has(slot) ? { ...slotProps, value: (slotProps as { id?: string }).id } : slotProps
+  const around = keyed.has(slot)
+    ? { ...slotProps, value: (slotProps as { id?: string }).id }
+    : slotProps
   const provided: Scope = provides.has(slot)
     ? {
         handle: owner,
@@ -749,23 +929,34 @@ function usePart<P extends Primitive, S extends SlotName<P>, T extends Tag = "di
         shown: { ...inside.shown, [slot]: slotProps as object },
       }
     : inside
-  const state = usePartState(owner, slot as never, slotProps as never, provided.shown)
+  const state = usePartState(
+    owner,
+    slot as never,
+    slotProps as never,
+    provided.shown
+  )
   // A part that shouldn't be in the page, like an unselected tab's panel, renders nothing.
   const part = owner.instance.part(slot, slotProps, true)
   // Removed with its component, a part lets go in this commit, not a microtask later.
   React.useLayoutEffect(() => () => ref(part, host)(null), [part])
   // An id on a `render` element wins its merge, so the part takes that one as
   // it renders. A render function's can't be read until it runs.
-  const renderId = React.isValidElement<{ id?: string }>(render) ? render.props.id : undefined
+  const renderId = React.isValidElement<{ id?: string }>(render)
+    ? render.props.id
+    : undefined
   const user = renderId === undefined ? rest : { ...rest, id: renderId }
   const merged = readIn(
     owner,
     (showing) =>
-      present(part, slotProps, showing) ? elementProps(part, slotProps, user, showing) : undefined,
-    provided.shown,
+      present(part, slotProps, showing)
+        ? elementProps(part, slotProps, user, showing)
+        : undefined,
+    provided.shown
   )
   const element = merged ? renderElement(tag, merged, render, state) : null
-  if (provided === scope) return element
+  if (provided === scope) {
+    return element
+  }
   return <context.Provider value={provided}>{element}</context.Provider>
 }
 
@@ -777,7 +968,10 @@ type Pascal<Name extends string> = Name extends `${infer Head}-${infer Tail}`
 type Tag = keyof React.JSX.IntrinsicElements
 
 // A part's element props, without the ones its slot or options name.
-type ElementProps<T extends Tag, State, Named> = Omit<PartProps<T, State>, keyof Named>
+type ElementProps<T extends Tag, State, Named> = Omit<
+  PartProps<T, State>,
+  keyof Named
+>
 
 // A part's props: what its slot and, for a root, the options name, and its element's.
 type Props<Named, State, T extends Tag> = Named & ElementProps<T, State, Named>
@@ -785,9 +979,13 @@ type Props<Named, State, T extends Tag> = Named & ElementProps<T, State, Named>
 type RootSlot<P extends Primitive> = "root" & SlotName<P>
 
 // A generic primitive's types for parameters `T` and `U`, or the primitive's own without one.
-type GenericOf<P> = P extends { generic?: infer G extends PrimitiveGeneric } ? G : never
+type GenericOf<P> = P extends { generic?: infer G extends PrimitiveGeneric }
+  ? G
+  : never
 type Applied<G, T, U> = G & { T: T; U: U }
-type DefaultOf<G extends PrimitiveGeneric, K extends "T" | "U"> = G extends { defaults: Record<K, infer D> }
+type DefaultOf<G extends PrimitiveGeneric, K extends "T" | "U"> = G extends {
+  defaults: Record<K, infer D>
+}
   ? D & G[K]
   : G[K]
 // A generic's options never include `id`, and an `Omit` there would stop
@@ -798,25 +996,31 @@ type OptionsIn<P extends Primitive, A> = [A] extends [never]
   : A extends { options: infer O }
     ? O
     : OptionsOf<P>
-type StateIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [never]
+type StateIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [
+  never,
+]
   ? StateOf<P, S>
   : A extends { state: Record<S, infer State> }
     ? State
     : StateOf<P, S>
-type PropsIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [never]
+type PropsIn<P extends Primitive, S extends SlotName<P>, A> = [A] extends [
+  never,
+]
   ? PropsOf<P, S>
   : A extends { props: Record<S, infer Named> }
     ? Named
     : PropsOf<P, S>
 
 // The root's component: generic over the primitive's parameters when it has them.
-type RootOf<P extends Primitive, T extends Tag | undefined> = [GenericOf<P>] extends [never]
+type RootOf<P extends Primitive, T extends Tag | undefined> = [
+  GenericOf<P>,
+] extends [never]
   ? (props: RootPropsIn<P, never, T>) => React.ReactElement | null
   : <
       A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">,
       B extends GenericOf<P>["U"] = DefaultOf<GenericOf<P>, "U">,
     >(
-      props: GenericRootProps<P, Applied<GenericOf<P>, A, B>, T>,
+      props: GenericRootProps<P, Applied<GenericOf<P>, A, B>, T>
     ) => React.ReactElement | null
 // Indexed, not matched with a conditional, so TypeScript infers the parameters from the props.
 type GenericRootProps<
@@ -826,12 +1030,22 @@ type GenericRootProps<
 > = T extends Tag
   ? Props<A["options"] & PropsOf<P, RootSlot<P>>, StateIn<P, RootSlot<P>, A>, T>
   : A["options"] & { children?: React.ReactNode }
-type RootPropsIn<P extends Primitive, A, T extends Tag | undefined> = T extends Tag
-  ? Props<OptionsIn<P, A> & PropsIn<P, RootSlot<P>, A>, StateIn<P, RootSlot<P>, A>, T>
+type RootPropsIn<
+  P extends Primitive,
+  A,
+  T extends Tag | undefined,
+> = T extends Tag
+  ? Props<
+      OptionsIn<P, A> & PropsIn<P, RootSlot<P>, A>,
+      StateIn<P, RootSlot<P>, A>,
+      T
+    >
   : OptionsIn<P, A> & { children?: React.ReactNode }
 
 // A part's component: generic when the primitive's parameters reach its props or state.
-type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [GenericOf<P>] extends [never]
+type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [
+  GenericOf<P>,
+] extends [never]
   ? (props: Props<PropsOf<P, S>, StateOf<P, S>, T>) => React.ReactElement | null
   : GenericOf<P> extends { props: Record<S, unknown> }
     ? <A extends GenericOf<P>["T"] = DefaultOf<GenericOf<P>, "T">>(
@@ -839,9 +1053,11 @@ type PartOf<P extends Primitive, S extends SlotName<P>, T extends Tag> = [Generi
           (Applied<GenericOf<P>, A, unknown>["props"] & Record<S, unknown>)[S],
           StateIn<P, S, Applied<GenericOf<P>, A, unknown>>,
           T
-        >,
+        >
       ) => React.ReactElement | null
-    : (props: Props<PropsOf<P, S>, StateIn<P, S, GenericOf<P>>, T>) => React.ReactElement | null
+    : (
+        props: Props<PropsOf<P, S>, StateIn<P, S, GenericOf<P>>, T>
+      ) => React.ReactElement | null
 
 /**
  * The components `createParts` makes: `Root`, and one per tagged slot, named in Pascal case.
@@ -851,7 +1067,10 @@ type Parts<P extends Primitive, Tags extends { [S in SlotName<P>]?: Tag }> = {
   Root: RootOf<P, Tags extends { root: Tag } ? Tags["root"] : undefined>
 } & {
   [
-    S in keyof TypesOf<P>["slots"] as S extends Exclude<keyof Tags, "root"> & string ? Pascal<S> : never
+    S in keyof TypesOf<P>["slots"] as S extends Exclude<keyof Tags, "root"> &
+      string
+      ? Pascal<S>
+      : never
   ]: PartOf<P, S & SlotName<P>, NonNullable<Tags[S & keyof Tags]> & Tag>
 }
 
@@ -867,57 +1086,92 @@ type Parts<P extends Primitive, Tags extends { [S in SlotName<P>]?: Tag }> = {
  * const { Root: Playlist, Track: PlaylistTrack } = createParts(playlist, { root: "ul", track: "li" })
  * @stable
  */
-function createParts<P extends Primitive, Tags extends { [S in SlotName<P>]?: Tag }>(
-  primitive: P,
-  tags: Tags,
-) {
+function createParts<
+  P extends Primitive,
+  Tags extends { [S in SlotName<P>]?: Tag },
+>(primitive: P, tags: Tags) {
   const schema = schemaOf(primitive)
   const { context, provides, keyed } = scopeOf(primitive)
-  for (const [slot, props] of Object.entries(schema.slots))
+  for (const [slot, props] of Object.entries(schema.slots)) {
     for (const key in props) {
       const from = fromOf(props[key], key)
-      if (from) provides.add(from.slot)
-      if (kindOf(props[key]) === "key") keyed.add(slot)
+      if (from) {
+        provides.add(from.slot)
+      }
+      if (kindOf(props[key]) === "key") {
+        keyed.add(slot)
+      }
     }
+  }
   const name = pascal(primitive.name ?? "")
-  const parts: Record<string, (props: Record<string, any>) => React.ReactNode> = {}
+  const parts: Record<string, (props: Record<string, any>) => React.ReactNode> =
+    {}
 
   function Root(props: Record<string, any>) {
     const [options, rest] = split(props, schema.options)
-    const handle = usePrimitive(primitive, options as OptionsOf<P>) as unknown as PrimitiveHandle<Primitive>
+    const handle = usePrimitive(
+      primitive,
+      options as OptionsOf<P>
+    ) as unknown as PrimitiveHandle<Primitive>
     // Whether there's a root tag never changes, so the hooks stay in order.
-    if (tags.root) return usePart(handle, "root", ...split(rest, schema.slots.root ?? {}), tags.root)
+    if (tags.root) {
+      return usePart(
+        handle,
+        "root",
+        ...split(rest, schema.slots.root ?? {}),
+        tags.root
+      )
+    }
     return <HandleScope handle={handle}>{props.children}</HandleScope>
   }
   Root.displayName = name
   parts.Root = Root
 
   for (const [slot, tag] of Object.entries(tags as Record<string, Tag>)) {
-    if (slot === "root") continue
+    if (slot === "root") {
+      continue
+    }
     const own = schema.slots[slot] ?? {}
     const ids = Object.keys(own).filter((key) => kindOf(own[key]) === "id")
     const key = Object.keys(own).find((key) => kindOf(own[key]) === "key")
     const Part = (props: Record<string, any>) => {
       const [slotProps, rest] = split(props, own)
       // An `id` the slot reads, like a trigger's key, is the element's own too.
-      if (props.id !== undefined) rest.id = props.id
+      if (props.id !== undefined) {
+        rest.id = props.id
+      }
       // Unique ids for `id` props left out. Always made, so the hooks stay in order.
       for (const key of ids) {
         const id = React.useId()
         slotProps[key] ??= id
       }
       const scope = React.useContext(context)
-      if (key) slotProps.id ??= (scope?.handle.api as ListApi | undefined)?.internal.keyOf(slotProps[key])
+      if (key) {
+        slotProps.id ??= (
+          scope?.handle.api as ListApi | undefined
+        )?.internal.keyOf(slotProps[key])
+      }
       for (const prop in own) {
         const spec = own[prop]
         const from = fromOf(spec, prop)
-        if (!from || slotProps[prop] !== undefined) continue
+        if (!from || slotProps[prop] !== undefined) {
+          continue
+        }
         const around = scope?.around[from.slot]
-        if (!around && (spec as { required?: boolean }).required)
-          throw new Error(`<${Part.displayName}> must be used inside <${name}${pascal(from.slot)}>.`)
+        if (!around && (spec as { required?: boolean }).required) {
+          throw new Error(
+            `<${Part.displayName}> must be used inside <${name}${pascal(from.slot)}>.`
+          )
+        }
         slotProps[prop] = around?.[from.prop]
       }
-      return usePart(primitive, slot as SlotName<P>, slotProps as never, rest, tag)
+      return usePart(
+        primitive,
+        slot as SlotName<P>,
+        slotProps as never,
+        rest,
+        tag
+      )
     }
     Part.displayName = name + pascal(slot)
     parts[pascal(slot)] = Part

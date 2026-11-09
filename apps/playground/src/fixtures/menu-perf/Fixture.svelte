@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuItemIndicator, MenuTrigger } from "@ui-sdk/svelte"
+  import {
+    Menu,
+    MenuCheckboxItem,
+    MenuContent,
+    MenuItem,
+    MenuItemIndicator,
+    MenuTrigger,
+  } from "@ui-sdk/svelte"
   import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"
 
   // A long menu for the counts specs. Every other item reads `highlighted` in
@@ -8,7 +15,10 @@
   // counts them, or a state key it read. A checkbox item at the end changes
   // state that only it and its indicator show.
   const items = perfItems(perfSize())
-  const count = (kind: "watched" | "plain" | "checkbox", ...reads: unknown[]) => (countRender(kind), "")
+  const count = (
+    kind: "watched" | "plain" | "checkbox",
+    ...reads: unknown[]
+  ) => (countRender(kind), "")
 </script>
 
 <div class="fixture">
@@ -21,7 +31,9 @@
           <MenuItem class="item" value={item.value}>
             {#snippet render({ props, state })}
               <div {...props}>
-                {count("watched", props, state.highlighted)}{state.highlighted ? "→ " : ""}{item.label}
+                {count("watched", props, state.highlighted)}{state.highlighted
+                  ? "→ "
+                  : ""}{item.label}
               </div>
             {/snippet}
           </MenuItem>
@@ -35,7 +47,10 @@
       {/each}
       <MenuCheckboxItem class="item" value="wrap">
         {#snippet render({ props })}
-          <div {...props}>{count("checkbox", props)}<MenuItemIndicator>✓</MenuItemIndicator>Wrap lines</div>
+          <div {...props}>
+            {count("checkbox", props)}<MenuItemIndicator>✓</MenuItemIndicator
+            >Wrap lines
+          </div>
         {/snippet}
       </MenuCheckboxItem>
     </MenuContent>

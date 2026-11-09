@@ -5,27 +5,42 @@ import { variants, type Variant } from "./variants"
 // mount one variant into each slot.
 function renderShell(
   root: HTMLElement,
-  mount: (slot: HTMLElement, variant: Variant, log: (text: string) => void) => void,
+  mount: (
+    slot: HTMLElement,
+    variant: Variant,
+    log: (text: string) => void
+  ) => void
 ) {
   root.innerHTML = ""
   const page = document.createElement("div")
-  page.className = "mx-auto flex max-w-5xl flex-col gap-8 p-6 font-sans text-sm text-neutral-900"
+  page.className =
+    "mx-auto flex max-w-5xl flex-col gap-8 p-6 font-sans text-sm text-neutral-900"
   page.innerHTML = `<h1 class="text-xl font-semibold">FileInput kitchen sink</h1>`
-  for (const section of [...new Set(variants.map((variant) => variant.section))]) {
+  for (const section of [
+    ...new Set(variants.map((variant) => variant.section)),
+  ]) {
     const block = document.createElement("section")
     block.innerHTML = `<h2 class="mb-3 text-base font-semibold">${section}</h2>`
     const grid = document.createElement("div")
     grid.className = "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
     for (const variant of variants.filter((item) => item.section === section)) {
       const card = document.createElement("div")
-      card.className = "flex flex-col gap-2 rounded-lg border border-neutral-200 p-3"
+      card.className =
+        "flex flex-col gap-2 rounded-lg border border-neutral-200 p-3"
       card.dataset.variant = variant.id
-      const parts = ["trigger", "dropzone", "list"].filter((part) => variant[part as keyof Variant])
+      const parts = ["trigger", "dropzone", "list"].filter(
+        (part) => variant[part as keyof Variant]
+      )
       const chips = [
-        ...Object.entries(variant.props).map(([key, value]) => `${key}=${JSON.stringify(value)}`),
+        ...Object.entries(variant.props).map(
+          ([key, value]) => `${key}=${JSON.stringify(value)}`
+        ),
         ...parts,
       ]
-        .map((chip) => `<code class="rounded bg-neutral-100 px-1 text-xs">${chip}</code>`)
+        .map(
+          (chip) =>
+            `<code class="rounded bg-neutral-100 px-1 text-xs">${chip}</code>`
+        )
         .join(" ")
       card.innerHTML = `
         <div class="font-medium">${variant.title}</div>
@@ -35,15 +50,18 @@ function renderShell(
         <div class="text-xs text-neutral-500">Submitted: <span data-submitted>nothing yet</span></div>
       `
       grid.append(card)
-      const log = (text: string) => (card.querySelector("[data-log]")!.textContent = text)
+      const log = (text: string) =>
+        (card.querySelector("[data-log]")!.textContent = text)
       mount(card.querySelector<HTMLElement>("[data-slot-host]")!, variant, log)
       // Every variant sits in a form. Submitting shows what it would send.
       card.addEventListener("submit", (event) => {
         event.preventDefault()
         const entries = [...new FormData(event.target as HTMLFormElement)].map(
-          ([name, value]) => `${name}=${typeof value === "string" ? value : value.name || "(empty file)"}`,
+          ([name, value]) =>
+            `${name}=${typeof value === "string" ? value : value.name || "(empty file)"}`
         )
-        card.querySelector("[data-submitted]")!.textContent = entries.join("&") || "(empty)"
+        card.querySelector("[data-submitted]")!.textContent =
+          entries.join("&") || "(empty)"
       })
     }
     block.append(grid)

@@ -11,9 +11,9 @@ Create it once in your component and pass it to the root:
 
 ```svelte
 <script lang="ts">
-import { createToggleController, Toggle } from "@ui-sdk/svelte/toggle"
+  import { createToggleController, Toggle } from "@ui-sdk/svelte/toggle"
 
-const toggle = createToggleController()
+  const toggle = createToggleController()
 </script>
 
 <button onclick={() => toggle.toggle()}>Toggle Bold</button>
@@ -32,19 +32,25 @@ External triggers can use the same controller. A `payload` tells the content whi
 
 ```svelte
 <script lang="ts">
-import { createPopoverController, Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/svelte/popover"
+  import {
+    createPopoverController,
+    Popover,
+    PopoverContent,
+    PopoverTitle,
+    PopoverTrigger,
+  } from "@ui-sdk/svelte/popover"
 
-const editor = createPopoverController<string>()
+  const editor = createPopoverController<string>()
 </script>
 
 <PopoverTrigger controller={editor} payload="Notes">Edit Notes</PopoverTrigger>
 <PopoverTrigger controller={editor} payload="Tasks">Edit Tasks</PopoverTrigger>
 <Popover controller={editor}>
-<PopoverContent>
-{#snippet children(state)}
-<PopoverTitle>Edit {String(state.payload ?? "")}</PopoverTitle>
-{/snippet}
-</PopoverContent>
+  <PopoverContent>
+    {#snippet children(state)}
+      <PopoverTitle>Edit {String(state.payload ?? "")}</PopoverTitle>
+    {/snippet}
+  </PopoverContent>
 </Popover>
 ```
 

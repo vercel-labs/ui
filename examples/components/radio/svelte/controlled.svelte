@@ -1,6 +1,11 @@
 <script lang="ts">
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
-  import { createRadioGroupController, Radio, RadioGroup, RadioIndicator } from "@ui-sdk/svelte/radio"
+  import {
+    createRadioGroupController,
+    Radio,
+    RadioGroup,
+    RadioIndicator,
+  } from "@ui-sdk/svelte/radio"
   import { useLog } from "../../../shared/svelte/log"
 
   const plans = [
@@ -16,14 +21,18 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => planGroup.setValue("team")}>Choose Team</button>
+    <button type="button" onclick={() => planGroup.setValue("team")}
+      >Choose Team</button
+    >
   </div>
   <Field>
     <FieldLabel>Plan</FieldLabel>
     <RadioGroup
       bind:value
       onValueChange={(next, details) =>
-        log(`${plans.find((plan) => plan.value === next)?.label ?? "None"} (${details.reason})`)}
+        log(
+          `${plans.find((plan) => plan.value === next)?.label ?? "None"} (${details.reason})`
+        )}
       controller={planGroup}
     >
       {#each plans as plan (plan.value)}

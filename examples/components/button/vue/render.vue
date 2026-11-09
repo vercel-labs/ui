@@ -17,7 +17,13 @@ async function save() {
     <Button @click="save">
       <template #render="{ props, state }">
         <button v-bind="props">
-          {{ state.pending ? "Saving…" : state.error ? "Try Again" : "Save Changes" }}
+          {{
+            state.pending
+              ? "Saving…"
+              : state.error
+                ? "Try Again"
+                : "Save Changes"
+          }}
         </button>
       </template>
     </Button>

@@ -91,7 +91,9 @@ A short label or hint that appears when the pointer rests on its trigger or keyb
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onPayloadChange,

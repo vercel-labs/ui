@@ -15,7 +15,13 @@ import {
 } from "@ui-sdk/vue"
 import { createApp, defineComponent, h, ref, type PropType } from "vue"
 import { classes as c, renderShell } from "./shell"
-import { announcementFor, describe, sampleFile, validateName, type Variant } from "./variants"
+import {
+  announcementFor,
+  describe,
+  sampleFile,
+  validateName,
+  type Variant,
+} from "./variants"
 
 const Card = defineComponent({
   props: {
@@ -31,7 +37,9 @@ const Card = defineComponent({
     return () => {
       const variant = props.variant
       const page = typeof variant.dropzone === "object"
-      const trigger = () => variant.trigger && h(FileInputTrigger, { class: c.button }, () => "Choose files")
+      const trigger = () =>
+        variant.trigger &&
+        h(FileInputTrigger, { class: c.button }, () => "Choose files")
       const zone = () =>
         h(
           FileInputDropzone,
@@ -47,12 +55,15 @@ const Card = defineComponent({
               h(
                 FileInput,
                 {
-                  onValueChange: (_: File[], details: FileInputValueChangeDetails) =>
-                    props.log(`inner ${describe(details)}`),
+                  onValueChange: (
+                    _: File[],
+                    details: FileInputValueChangeDetails
+                  ) => props.log(`inner ${describe(details)}`),
                 },
-                () => h(FileInputDropzone, { class: c.zone }, () => "Inner zone"),
+                () =>
+                  h(FileInputDropzone, { class: c.zone }, () => "Inner zone")
               ),
-          ],
+          ]
         )
       const list = () =>
         h(FileInputList, { class: c.list, "aria-label": "Files" }, () =>
@@ -64,8 +75,8 @@ const Card = defineComponent({
                 state.file.name,
                 h(FileInputItemRemove, { class: c.remove }, () => "×"),
               ],
-            },
-          ),
+            }
+          )
         )
       const input = h(
         FileInput,
@@ -76,14 +87,17 @@ const Card = defineComponent({
           validate: variant.validate ? validateName : undefined,
           announcement: announcementFor(variant),
           controller: variant.controller ? controller : undefined,
-          onValueChange: (value: File[], details: FileInputValueChangeDetails) => {
+          onValueChange: (
+            value: File[],
+            details: FileInputValueChangeDetails
+          ) => {
             props.log(describe(details))
             files.value = value
           },
           onReject: (rejected: FileRejection[], details: { reason: string }) =>
             props.log(describe({ ...details, rejected })),
         },
-        () => [variant.dropzone ? zone() : trigger(), variant.list && list()],
+        () => [variant.dropzone ? zone() : trigger(), variant.list && list()]
       )
       return h("form", { class: c.form }, [
         page && h("span", "Drag files over the window."),
@@ -95,10 +109,17 @@ const Card = defineComponent({
               h(FieldError, { class: c.error }),
             ])
           : input,
-        variant.pasteTarget && h("textarea", { ref: note, class: c.note, "aria-label": "Paste here" }),
+        variant.pasteTarget &&
+          h("textarea", {
+            ref: note,
+            class: c.note,
+            "aria-label": "Paste here",
+          }),
         variant.controller &&
           h("div", { class: "flex gap-2" }, [
-            button("Add a sample file", () => controller.addFiles([sampleFile()])),
+            button("Add a sample file", () =>
+              controller.addFiles([sampleFile()])
+            ),
             button("Open the picker", () => controller.open()),
             button("Clear", () => controller.clear()),
           ]),
@@ -112,7 +133,9 @@ const Card = defineComponent({
 })
 
 function mount(root: HTMLElement) {
-  renderShell(root, (slot, variant, log) => createApp(Card, { variant, log }).mount(slot))
+  renderShell(root, (slot, variant, log) =>
+    createApp(Card, { variant, log }).mount(slot)
+  )
 }
 
 export { mount }

@@ -11,7 +11,12 @@ const meterFixture = {
     valueLabel: (value: number) => `${value} of 1000 requests`,
   },
   // A unit instead of a percent.
-  disk: { label: "Disk", value: 128, max: 512, format: { style: "unit", unit: "gigabyte" } as const },
+  disk: {
+    label: "Disk",
+    value: 128,
+    max: 512,
+    format: { style: "unit", unit: "gigabyte" } as const,
+  },
   // Bounds other than 0 and 100: 3 of 1 to 5 is half way.
   score: { label: "Score", value: 3, min: 1, max: 5 },
 }

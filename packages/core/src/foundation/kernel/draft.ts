@@ -13,9 +13,11 @@ function settleDraft(
   store: { subscribe: (listener: () => void) => () => void },
   value: () => unknown,
   before: unknown,
-  clear: () => void,
+  clear: () => void
 ) {
-  if (value() !== before) return clear()
+  if (value() !== before) {
+    return clear()
+  }
   const done = () => {
     unsubscribe()
     clearTimeout(timer)

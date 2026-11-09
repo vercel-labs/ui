@@ -11,15 +11,22 @@ export function generateStaticParams() {
 }
 
 // One page as Markdown, served at its own URL plus `.md`; see `rewrites` in `next.config.mjs`.
-export async function GET(_: Request, { params }: { params: Promise<{ slug: string[] }> }) {
+export async function GET(
+  _: Request,
+  { params }: { params: Promise<{ slug: string[] }> }
+) {
   const { slug } = await params
   const page = docPage(slug)
-  if (!page) notFound()
+  if (!page) {
+    notFound()
+  }
   const [section] = slug
   const text = await pageMarkdown(
     page.file,
     isFramework(section) ? section : undefined,
-    ({ slugs, hash }) => `/docs/${slugs.join("/")}${hash ? `#${hash}` : ""}`,
+    ({ slugs, hash }) => `/docs/${slugs.join("/")}${hash ? `#${hash}` : ""}`
   )
-  return new Response(text, { headers: { "Content-Type": "text/markdown; charset=utf-8" } })
+  return new Response(text, {
+    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+  })
 }

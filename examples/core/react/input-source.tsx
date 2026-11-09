@@ -22,7 +22,10 @@ const saveBar = definePrimitive({
     save: slot({
       attrs: () => ({ type: "button" }),
       press: ({ api }, event) => api.save(event),
-      on: { focus: (_event, { api }) => api.focus(), blur: (_event, { api }) => api.blur() },
+      on: {
+        focus: (_event, { api }) => api.focus(),
+        blur: (_event, { api }) => api.blur(),
+      },
     }),
     hint: slot({ present: (state) => state.hint }),
   }),
@@ -48,4 +51,12 @@ function Example() {
   )
 }
 
-export { Example, saveBar, SaveBar, SaveBarButton, SaveBarHint, type SaveBarOptions, type SaveBarState }
+export {
+  Example,
+  saveBar,
+  SaveBar,
+  SaveBarButton,
+  SaveBarHint,
+  type SaveBarOptions,
+  type SaveBarState,
+}

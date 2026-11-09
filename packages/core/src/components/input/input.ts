@@ -1,9 +1,16 @@
-import { watchValue, writeValue, type TextControl } from "../../foundation/forms/value"
+import {
+  watchValue,
+  writeValue,
+  type TextControl,
+} from "../../foundation/forms/value"
 import { watchFieldsets } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeOptions } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import {
   focusFromSurroundings,
   initialText,
@@ -30,7 +37,10 @@ function createInputController() {
      * Sets the value as if the user typed it, so `input` fires.
      * Returns false when the change was canceled or nothing changed.
      */
-    setValue: (value: string, options?: ChangeOptions<InputValueChangeReason>) => boolean
+    setValue: (
+      value: string,
+      options?: ChangeOptions<InputValueChangeReason>
+    ) => boolean
     /**
      * Empties the field, as if the user deleted the text, so `input` fires.
      * Returns false when the change was canceled or nothing changed.
@@ -208,7 +218,9 @@ function fitContent(el: HTMLTextAreaElement) {
     typeof ResizeObserver === "undefined"
       ? undefined
       : new ResizeObserver(([entry]) => {
-          if (entry.contentRect.width === width) return
+          if (entry.contentRect.width === width) {
+            return
+          }
           width = entry.contentRect.width
           fit()
         })
@@ -232,24 +244,42 @@ const textareaPrimitive = /* @__PURE__ */ definePrimitive({
     submitShortcut: "string",
   },
   // `autoResize` is state, so turning it on or off after mount reaches the bound root.
-  state: (options: TextareaOptions) => ({ ...initialText(options), autoResize: !!options.autoResize }),
+  state: (options: TextareaOptions) => ({
+    ...initialText(options),
+    autoResize: !!options.autoResize,
+  }),
   live: ["value"],
-  sync: (options) => ({ ...syncText(options), autoResize: !!options.autoResize }),
+  sync: (options) => ({
+    ...syncText(options),
+    autoResize: !!options.autoResize,
+  }),
   api: (context) => {
     const field = textFieldApi(context, createChange(context), "root")
     const { options, store, element } = context
     function submitKey(event: KeyboardEvent) {
       const shortcut = options().submitShortcut
-      if (!shortcut || event.key !== "Enter") return
+      if (!shortcut || event.key !== "Enter") {
+        return
+      }
       const mod = isApple() ? event.metaKey : event.ctrlKey
-      const submits = shortcut === "enter" ? !event.shiftKey && !mod && !event.altKey : mod && !event.shiftKey
-      if (!submits) return
+      const submits =
+        shortcut === "enter"
+          ? !event.shiftKey && !mod && !event.altKey
+          : mod && !event.shiftKey
+      if (!submits) {
+        return
+      }
       const { onSubmit } = options()
       const form = (element("root") as HTMLTextAreaElement | undefined)?.form
-      if (!onSubmit && !form) return
+      if (!onSubmit && !form) {
+        return
+      }
       event.preventDefault()
-      if (onSubmit) onSubmit(store.get().value, { event })
-      else form?.requestSubmit()
+      if (onSubmit) {
+        onSubmit(store.get().value, { event })
+      } else {
+        form?.requestSubmit()
+      }
     }
     return { ...field, internal: { ...field.internal, submitKey } }
   },
@@ -264,8 +294,9 @@ const textareaPrimitive = /* @__PURE__ */ definePrimitive({
         let unfit: (() => void) | undefined
         const follow = () => {
           const { autoResize } = store.get()
-          if (autoResize && !unfit) unfit = fitContent(el as HTMLTextAreaElement)
-          else if (!autoResize && unfit) {
+          if (autoResize && !unfit) {
+            unfit = fitContent(el as HTMLTextAreaElement)
+          } else if (!autoResize && unfit) {
             unfit()
             unfit = undefined
           }
@@ -329,20 +360,30 @@ function groupAttrs(state: InputGroupState) {
 const inputGroupPrimitive = /* @__PURE__ */ definePrimitive({
   // Its parts are `input-group` and `input-clear`.
   name: "input",
-  state: (_options: InputGroupOptions) => ({ filled: false, disabled: false, readOnly: false }),
+  state: (_options: InputGroupOptions) => ({
+    filled: false,
+    disabled: false,
+    readOnly: false,
+  }),
   api: ({ store, element }) => {
     // A clear press is input the field's change reports.
     inputSource()
-    const control = () => element("group")?.querySelector<TextControl>(fieldSelector) ?? undefined
+    const control = () =>
+      element("group")?.querySelector<TextControl>(fieldSelector) ?? undefined
     return {
       control,
       // Empties the field the way typing would, then returns focus to it.
       clear(event?: Event) {
         const el = control()
-        if (!el || store.get().disabled || store.get().readOnly) return
+        if (!el || store.get().disabled || store.get().readOnly) {
+          return
+        }
         const field = textFields.get(el)
-        if (field) field.internal.clearPress(event)
-        else writeValue(el, "", { asUser: true })
+        if (field) {
+          field.internal.clearPress(event)
+        } else {
+          writeValue(el, "", { asUser: true })
+        }
         el.focus()
       },
       internal: {
@@ -356,14 +397,17 @@ const inputGroupPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state) => state,
       attrs: (state) => groupAttrs(state),
       // Presses on the group's own text and icons focus the field, like a label would.
-      press: ({ api, el }, event) => focusFromSurroundings(event, el, api.control()),
+      press: ({ api, el }, event) =>
+        focusFromSurroundings(event, el, api.control()),
       bind: (el, { store, api }) => {
         let field: TextControl | undefined
         let fieldsetDisabled = false
         let cleanups: (() => void)[] = []
         let active = true
         const update = () => {
-          if (!field) return
+          if (!field) {
+            return
+          }
           store.set({
             filled: field.value !== "",
             disabled: field.disabled || fieldsetDisabled,
@@ -373,13 +417,19 @@ const inputGroupPrimitive = /* @__PURE__ */ definePrimitive({
         // Frameworks may render the field after the group binds, or swap it.
         const find = () => {
           // The first find waits a microtask, which may run after an unbind.
-          if (!active) return
+          if (!active) {
+            return
+          }
           const next = api.control()
-          if (next === field) return
+          if (next === field) {
+            return
+          }
           cleanups.forEach((cleanup) => cleanup())
           cleanups = []
           field = next
-          if (!field) return
+          if (!field) {
+            return
+          }
           const observer = new MutationObserver(update)
           observer.observe(field, { attributeFilter: ["disabled", "readonly"] })
           cleanups = [

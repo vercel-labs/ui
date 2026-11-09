@@ -19,7 +19,7 @@ const files = new Set(paths.filter((path) => !path.endsWith("/")))
 
 function markup(items: TreeItemData[]) {
   let html = ""
-  for (const item of items)
+  for (const item of items) {
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
@@ -33,6 +33,7 @@ function markup(items: TreeItemData[]) {
         </ui-tree-item-label>
         ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
       </ui-tree-item>`
+  }
   return html
 }
 
@@ -46,8 +47,14 @@ function mount(root: HTMLElement) {
   tree.paths = paths
   tree.addEventListener("action", (event) => {
     const { value, waitUntil } = event.detail
-    if (!files.has(value)) return
-    waitUntil(new Promise((resolve) => setTimeout(resolve, 600)).then(() => log(root, `Opened ${value}`)))
+    if (!files.has(value)) {
+      return
+    }
+    waitUntil(
+      new Promise((resolve) => setTimeout(resolve, 600)).then(() =>
+        log(root, `Opened ${value}`)
+      )
+    )
   })
 }
 

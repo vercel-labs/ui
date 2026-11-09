@@ -1,7 +1,16 @@
-import { createSliderController, type SliderController } from "@ui-sdk/core/slider"
+import {
+  createSliderController,
+  type SliderController,
+} from "@ui-sdk/core/slider"
 import { classes as c } from "./classes"
 import { renderShell } from "./shell"
-import { describe, formats, thumbLabel, thumbsOf, type Variant } from "./variants"
+import {
+  describe,
+  formats,
+  thumbLabel,
+  thumbsOf,
+  type Variant,
+} from "./variants"
 
 type SliderElement = HTMLElement & {
   value: number | number[]
@@ -9,13 +18,16 @@ type SliderElement = HTMLElement & {
   controller?: SliderController
 }
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 // Options as attributes, in kebab case. A range is "start/end", like the value it submits.
 function attributes(options: Record<string, unknown> = {}) {
   return Object.entries(options)
     .map(([key, value]) => {
-      if (value === true) return ` ${kebab(key)}`
+      if (value === true) {
+        return ` ${kebab(key)}`
+      }
       return ` ${kebab(key)}="${Array.isArray(value) ? value.join("/") : value}"`
     })
     .join("")
@@ -24,7 +36,9 @@ function attributes(options: Record<string, unknown> = {}) {
 function control(variant: Variant) {
   const thumbs = Array.from({ length: thumbsOf(variant) }, (_, index) => {
     const label = thumbLabel(variant, index)
-    const bubble = variant.custom ? `<span class="${c.bubble}" data-bubble></span>` : ""
+    const bubble = variant.custom
+      ? `<span class="${c.bubble}" data-bubble></span>`
+      : ""
     return `<ui-slider-thumb class="${c.thumb}"${label ? ` aria-label="${label}"` : ""}>${bubble}</ui-slider-thumb>`
   }).join("")
   const outside = variant.place === "outside" ? ` form="${variant.id}"` : ""
@@ -34,10 +48,10 @@ function control(variant: Variant) {
     ? `<div class="${c.row}">${variant.presets
         .map(
           (preset, index) =>
-            `<button type="button" class="${c.button}" data-preset="${index}">Set ${describe(preset)}</button>`,
+            `<button type="button" class="${c.button}" data-preset="${index}">Set ${describe(preset)}</button>`
         )
         .join(
-          "",
+          ""
         )}${variant.controller ? `<button type="button" class="${c.button}" data-focus>Focus last thumb</button>` : ""}</div>`
     : ""
   return `<ui-slider class="${c.root}"${attributes(variant.options)}${outside}>
@@ -53,14 +67,21 @@ function control(variant: Variant) {
 
 function card(variant: Variant) {
   let body = control(variant)
-  if (variant.place === "field")
+  if (variant.place === "field") {
     body = `<ui-field class="${c.form}" name="level">
       <ui-field-label class="${c.label}">Level</ui-field-label>${body}
       <ui-field-description class="${c.description}">Where the level sits.</ui-field-description>
     </ui-field>`
-  if (variant.place === "fieldset") body = `<fieldset disabled>${body}</fieldset>`
-  if (variant.place === "rtl") body = `<div dir="rtl">${body}</div>`
-  if (variant.place === "transformed") body = `<div class="${c.transformed}">${body}</div>`
+  }
+  if (variant.place === "fieldset") {
+    body = `<fieldset disabled>${body}</fieldset>`
+  }
+  if (variant.place === "rtl") {
+    body = `<div dir="rtl">${body}</div>`
+  }
+  if (variant.place === "transformed") {
+    body = `<div class="${c.transformed}">${body}</div>`
+  }
   const buttons = `<div class="${c.row}"><button class="${c.button}">Save</button><button type="reset" class="${c.button}">Reset</button></div>`
   return variant.place === "outside"
     ? `<form id="${variant.id}" class="${c.form}">${buttons}</form>${body}`
@@ -73,7 +94,8 @@ function writeCustom(slider: SliderElement, value: number | number[]) {
   slider
     .querySelectorAll("[data-bubble]")
     .forEach((bubble, index) => (bubble.textContent = String(values[index])))
-  slider.querySelector("ui-slider-value")!.textContent = `Between ${values.join(" – ")}`
+  slider.querySelector("ui-slider-value")!.textContent =
+    `Between ${values.join(" – ")}`
 }
 
 async function mount(root: HTMLElement) {
@@ -81,38 +103,63 @@ async function mount(root: HTMLElement) {
     slot.innerHTML = card(variant)
     const slider = slot.querySelector<SliderElement>("ui-slider")!
     // Rich options are properties, set here before the elements upgrade.
-    if (variant.format) slider.format = formats[variant.format]
+    if (variant.format) {
+      slider.format = formats[variant.format]
+    }
     const controller = variant.controller ? createSliderController() : undefined
-    if (controller) slider.controller = controller
+    if (controller) {
+      slider.controller = controller
+    }
 
     // Callbacks are DOM events: valuechange while it moves, valuecommit when it settles.
     slider.addEventListener("valuechange", (event) => {
       const { value, reason, thumb } = (
-        event as CustomEvent<{ value: number | number[]; reason: string; thumb: number | null }>
+        event as CustomEvent<{
+          value: number | number[]
+          reason: string
+          thumb: number | null
+        }>
       ).detail
       log.change(`${describe(value)} (${reason}, thumb ${thumb})`)
-      if (variant.controlled) slot.querySelector("[data-live]")!.textContent = `value: ${describe(value)}`
-      if (variant.custom) writeCustom(slider, value)
+      if (variant.controlled) {
+        slot.querySelector("[data-live]")!.textContent =
+          `value: ${describe(value)}`
+      }
+      if (variant.custom) {
+        writeCustom(slider, value)
+      }
     })
     slider.addEventListener("valuecommit", (event) => {
-      const { value, reason } = (event as CustomEvent<{ value: number | number[]; reason: string }>).detail
+      const { value, reason } = (
+        event as CustomEvent<{ value: number | number[]; reason: string }>
+      ).detail
       log.commit(`${describe(value)} (${reason})`)
     })
     // Web components are uncontrolled. Controlled variants set the live `value` property instead.
     slot.querySelectorAll<HTMLElement>("[data-preset]").forEach((button) =>
       button.addEventListener("click", () => {
         const preset = variant.presets![Number(button.dataset.preset)]
-        if (controller) controller.setValue(preset)
-        else slider.value = preset
-      }),
+        if (controller) {
+          controller.setValue(preset)
+        } else {
+          slider.value = preset
+        }
+      })
     )
     slot
       .querySelector("[data-focus]")
-      ?.addEventListener("click", () => controller!.focus(thumbsOf(variant) - 1))
+      ?.addEventListener("click", () =>
+        controller!.focus(thumbsOf(variant) - 1)
+      )
     // The value at first, before any event.
     const initial = (variant.options?.defaultValue ?? 0) as number | number[]
-    if (variant.controlled) slot.querySelector("[data-live]")!.textContent = `value: ${describe(initial)}`
-    if (variant.custom) writeCustom(slider, initial)
+    if (variant.controlled) {
+      slot.querySelector("[data-live]")!.textContent =
+        `value: ${describe(initial)}`
+    }
+    if (variant.custom) {
+      writeCustom(slider, initial)
+    }
   })
   await import("@ui-sdk/web/slider")
   await import("@ui-sdk/web/field")

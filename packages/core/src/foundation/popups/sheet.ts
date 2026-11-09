@@ -21,7 +21,13 @@ import { on } from "../kernel/events"
 import type { Layer } from "../platform/layers"
 import { trackKeyboard } from "../platform/keyboard"
 import { isIOS } from "../platform/env"
-import { isVertical, resolveSide, scrollAreaAt, sizeAlong, type SheetSide } from "./sheet-axis"
+import {
+  isVertical,
+  resolveSide,
+  scrollAreaAt,
+  sizeAlong,
+  type SheetSide,
+} from "./sheet-axis"
 import type { PhysicalSide } from "../platform/sides"
 import {
   closedExtentFor,
@@ -30,7 +36,11 @@ import {
   type SheetDriver,
   type SheetDriverName,
 } from "./sheet-driver"
-import { createSheetEffects, type SheetMotion, type SheetOutlet } from "./sheet-effects"
+import {
+  createSheetEffects,
+  type SheetMotion,
+  type SheetOutlet,
+} from "./sheet-effects"
 import { createPointerDriver } from "./sheet-pointer"
 import { createScrollSnapDriver } from "./sheet-scroll-snap"
 import { dimThemeColor } from "./theme-color"
@@ -79,7 +89,10 @@ type SheetOptions = {
   onDismissAttempt?: (event?: Event) => void
   onDragChange?: (dragging: boolean) => void
   /** The geometry changed: the resolved side and snap points. */
-  onLayout?: (layout: { side: PhysicalSide; snapPoints: readonly ResolvedSnapPoint[] }) => void
+  onLayout?: (layout: {
+    side: PhysicalSide
+    snapPoints: readonly ResolvedSnapPoint[]
+  }) => void
 }
 
 const controls =
@@ -119,7 +132,9 @@ function withDefaults(options: SheetOptions) {
 }
 
 function withoutUndefined<T extends object>(object: T) {
-  return Object.fromEntries(Object.entries(object).filter(([, value]) => value !== undefined)) as T
+  return Object.fromEntries(
+    Object.entries(object).filter(([, value]) => value !== undefined)
+  ) as T
 }
 
 /** A sheet attached to an element, for the component that owns it. */
@@ -155,13 +170,17 @@ const sheetLayers = new WeakMap<Layer, () => Sheet | undefined>()
 function parentSheet(layer: Layer) {
   for (let up = layer.parent; up; up = up.parent) {
     const sheet = sheetLayers.get(up)
-    if (sheet) return sheet
+    if (sheet) {
+      return sheet
+    }
   }
 }
 
 function sheetAt(target: EventTarget | null) {
   for (let node = target instanceof Element ? target : null; node;) {
-    if (sheets.has(node)) return node
+    if (sheets.has(node)) {
+      return node
+    }
     const root = node.getRootNode()
     node = node.parentElement ?? (root instanceof ShadowRoot ? root.host : null)
   }
@@ -180,9 +199,14 @@ const edgeZone = 24
 // does a sheet the page stays usable beside, since WebKit can drop touches on
 // a scroller that lets presses through (bug 183870), and one whose content
 // scrolls before it grows, which only the pointer driver can hand off.
-function usesScrollSnap(view: Window, options: ReturnType<typeof withDefaults>) {
+function usesScrollSnap(
+  view: Window,
+  options: ReturnType<typeof withDefaults>
+) {
   const driver = options.driver()
-  if (driver !== "auto") return driver === "scroll-snap"
+  if (driver !== "auto") {
+    return driver === "scroll-snap"
+  }
   return (
     options.modalAbove() === undefined &&
     options.expandOnScroll() &&
@@ -192,7 +216,10 @@ function usesScrollSnap(view: Window, options: ReturnType<typeof withDefaults>) 
 
 // How the iOS keyboard slides: 250ms on UIKit's keyboard curve, as commonly
 // measured. A sheet riding on it moves the same way.
-const keyboardMotion = { duration: 250, easing: "cubic-bezier(0.38, 0.7, 0.125, 1)" }
+const keyboardMotion = {
+  duration: 250,
+  easing: "cubic-bezier(0.38, 0.7, 0.125, 1)",
+}
 
 function attachSheet(el: HTMLElement, input: SheetOptions) {
   const options = withDefaults(input)
@@ -251,17 +278,31 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     }
     // The scroll-snap host reaches below the screen, under Safari's toolbar.
     const container =
-      (isVertical(side) ? host.clientHeight : host.clientWidth) - (scrollSnap ? toolbarBleed : 0)
+      (isVertical(side) ? host.clientHeight : host.clientWidth) -
+      (scrollSnap ? toolbarBleed : 0)
     size = sizeAlong(el, side)
-    const rootFontSize = parseFloat(view.getComputedStyle(doc.documentElement).fontSize) || 16
-    const next = resolveSnapPoints(options.snapPoints(), { container, content: size, rootFontSize })
-    if (!next.length) next.push({ id: "content", value: "content", extent: size, ids: ["content"] })
+    const rootFontSize =
+      parseFloat(view.getComputedStyle(doc.documentElement).fontSize) || 16
+    const next = resolveSnapPoints(options.snapPoints(), {
+      container,
+      content: size,
+      rootFontSize,
+    })
+    if (!next.length) {
+      next.push({
+        id: "content",
+        value: "content",
+        extent: size,
+        ids: ["content"],
+      })
+    }
     const changed =
       container !== config.dimension ||
       next.length !== resolved.length ||
       next.some(
         (point, index) =>
-          point.id !== resolved[index].id || Math.abs(point.extent - resolved[index].extent) >= 0.5,
+          point.id !== resolved[index].id ||
+          Math.abs(point.extent - resolved[index].extent) >= 0.5
       )
     resolved = next
     config.dimension = container
@@ -270,14 +311,18 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
       snapExtents: config.snapPoints.map((point) => point.extent),
       undimmedIndex: findSnapIndex(resolved, options.modalAbove()),
     })
-    if (changed) reportLayout()
+    if (changed) {
+      reportLayout()
+    }
     return changed
   }
 
   let destroyed = false
 
   const valueOf = (id: string | null) =>
-    id === null ? null : (resolved.find((point) => point.id === id)?.value ?? null)
+    id === null
+      ? null
+      : (resolved.find((point) => point.id === id)?.value ?? null)
 
   const driverOptions = {
     sheet: el,
@@ -291,14 +336,20 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     canMouseDrag: options.canMouseDrag,
     onSnap: (id: string, reason: SheetSnapReason, event?: Event) => {
       const value = valueOf(id)
-      if (value !== null) options.onSnap(value, reason, event)
+      if (value !== null) {
+        options.onSnap(value, reason, event)
+      }
     },
     onRest(id: string | null) {
-      if (destroyed) return
+      if (destroyed) {
+        return
+      }
       const point = resolved.find((entry) => entry.id === id)
       effects.apply(point?.extent ?? closedExtentFor(side), { rest: true })
       options.onRest(valueOf(id))
-      if (revealAtRest && id !== null) revealFocused()
+      if (revealAtRest && id !== null) {
+        revealFocused()
+      }
       revealAtRest = false
     },
     onDismiss: options.onDismiss,
@@ -312,8 +363,12 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
 
   let attaching = true
   function reportLayout() {
-    if (!attaching) return options.onLayout({ side, snapPoints: resolved })
-    queueMicrotask(() => destroyed || options.onLayout({ side, snapPoints: resolved }))
+    if (!attaching) {
+      return options.onLayout({ side, snapPoints: resolved })
+    }
+    queueMicrotask(
+      () => destroyed || options.onLayout({ side, snapPoints: resolved })
+    )
   }
 
   measure()
@@ -341,9 +396,21 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     // A listener that can cancel touches makes the browser wait for script
     // before it scrolls, so it's added only for a sheet that asks for it.
     ...(options.preventEdgeSwipe()
-      ? [on(doc, "touchstart", preventEdgeSwipe, { capture: true, passive: false })]
+      ? [
+          on(doc, "touchstart", preventEdgeSwipe, {
+            capture: true,
+            passive: false,
+          }),
+        ]
       : []),
-    ...(isIOS() ? [on(doc, "touchend", focusWithoutScrolling, { capture: true, passive: false })] : []),
+    ...(isIOS()
+      ? [
+          on(doc, "touchend", focusWithoutScrolling, {
+            capture: true,
+            passive: false,
+          }),
+        ]
+      : []),
     on(el, "focusin", revealWhenStill),
   ]
 
@@ -359,22 +426,41 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     relayout(true)
     revealFocused()
     const height = view.visualViewport?.height
-    if (height === viewportHeight) return
+    if (height === viewportHeight) {
+      return
+    }
     viewportHeight = height
     keyboardSlide?.cancel()
     keyboardSlide = null
     const shift = keyboardFrom - el.getBoundingClientRect().top
-    if (Math.abs(shift) < 1 || reducedMotion?.matches) return
-    keyboardSlide = host.animate({ translate: [`0 ${shift}px`, "0 0"] }, keyboardMotion)
+    if (Math.abs(shift) < 1 || reducedMotion?.matches) {
+      return
+    }
+    keyboardSlide = host.animate(
+      { translate: [`0 ${shift}px`, "0 0"] },
+      keyboardMotion
+    )
   }
 
   // Keeps iOS Safari's back swipe from starting on the sheet or its backdrop.
   function preventEdgeSwipe(event: TouchEvent) {
-    if (!event.cancelable) return
+    if (!event.cancelable) {
+      return
+    }
     const touch = event.touches[0]
-    if (!touch || (touch.clientX > edgeZone && touch.clientX < view.innerWidth - edgeZone)) return
+    if (
+      !touch ||
+      (touch.clientX > edgeZone && touch.clientX < view.innerWidth - edgeZone)
+    ) {
+      return
+    }
     const target = event.target as Node | null
-    if (target && (host.contains(target) || options.backdrop()?.contains(target))) event.preventDefault()
+    if (
+      target &&
+      (host.contains(target) || options.backdrop()?.contains(target))
+    ) {
+      event.preventDefault()
+    }
   }
 
   // iOS scrolls the whole page to show a field a tap focuses, even inside a
@@ -382,29 +468,52 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
   // inset then moves the sheet, and `revealFocused` scrolls only inside it.
   function focusWithoutScrolling(event: TouchEvent) {
     const target = event.target
-    if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement)) return
-    if (!el.contains(target) || target === doc.activeElement || driver.isMoving() || !event.cancelable) return
+    if (!(
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement
+    )) {
+      return
+    }
+    if (
+      !el.contains(target) ||
+      target === doc.activeElement ||
+      driver.isMoving() ||
+      !event.cancelable
+    ) {
+      return
+    }
     event.preventDefault()
     target.focus({ preventScroll: true })
   }
 
   let revealAtRest = false
   function revealWhenStill() {
-    if (driver.isMoving()) revealAtRest = true
-    else revealFocused()
+    if (driver.isMoving()) {
+      revealAtRest = true
+    } else {
+      revealFocused()
+    }
   }
 
   function revealFocused() {
     const field = doc.activeElement
-    if (!(field instanceof HTMLElement) || !el.contains(field) || field === el) return
+    if (
+      !(field instanceof HTMLElement) ||
+      !el.contains(field) ||
+      field === el
+    ) {
+      return
+    }
     const area = scrollAreaAt(field, el, "bottom")
-    if (!area) return
+    if (!area) {
+      return
+    }
     // In layout viewport coordinates, like the boxes: Safari can pan the visual
     // viewport down to show the field, and the page under it doesn't move.
     const visual = view.visualViewport
     const visibleBottom = Math.min(
       area.getBoundingClientRect().bottom,
-      visual ? visual.offsetTop + visual.height : view.innerHeight,
+      visual ? visual.offsetTop + visual.height : view.innerHeight
     )
     const { top, bottom } = field.getBoundingClientRect()
     const margin = 16
@@ -415,13 +524,23 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
         : top - margin < areaTop
           ? top - margin - areaTop
           : 0
-    if (delta) area.scrollBy({ top: delta, behavior: reducedMotion?.matches ? "instant" : "smooth" })
+    if (delta) {
+      area.scrollBy({
+        top: delta,
+        behavior: reducedMotion?.matches ? "instant" : "smooth",
+      })
+    }
   }
 
   // A snap point the owner moved to as the resting one left, like a drawer
   // whose new snap points drop it, wins over the nearest.
   function relayout(immediate: boolean) {
-    if (measure()) driver.relayout(immediate, resolved[findSnapIndex(resolved, options.snapPoint())]?.id)
+    if (measure()) {
+      driver.relayout(
+        immediate,
+        resolved[findSnapIndex(resolved, options.snapPoint())]?.id
+      )
+    }
   }
 
   function idOf(point: SnapPoint | null) {
@@ -433,29 +552,41 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
     element: el,
     parent: options.parent,
     open(animate) {
-      if (destroyed) return
+      if (destroyed) {
+        return
+      }
       ancestors = []
-      for (let parent = options.parent(); parent; parent = parent.parent()) ancestors.push(parent.element)
+      for (let parent = options.parent(); parent; parent = parent.parent()) {
+        ancestors.push(parent.element)
+      }
       measure()
       readConfig()
-      if (options.themeColor()) theme ??= dimThemeColor(doc, physics.dim)
-      if (animate) effects.apply(closedExtentFor(side))
+      if (options.themeColor()) {
+        theme ??= dimThemeColor(doc, physics.dim)
+      }
+      if (animate) {
+        effects.apply(closedExtentFor(side))
+      }
       // The backdrop gets its own layer before the first frame, as the sheet has, so
       // neither is promoted mid-motion.
       restoreBackdrop?.()
       const backdrop = options.backdrop()
-      restoreBackdrop = backdrop && setStyles(backdrop, { "will-change": "opacity" })
+      restoreBackdrop =
+        backdrop && setStyles(backdrop, { "will-change": "opacity" })
       driver.open(idOf(options.snapPoint()), animate)
     },
     close: () => destroyed || driver.close(),
     snapTo(point, reason) {
       const index = findSnapIndex(resolved, point)
-      if (index >= 0 && resolved[index].id !== driver.target()) driver.snapTo(resolved[index].id, reason)
+      if (index >= 0 && resolved[index].id !== driver.target()) {
+        driver.snapTo(resolved[index].id, reason)
+      }
     },
     nudge: () => driver.nudge(),
     snapPoints: () => resolved,
     target: () => valueOf(driver.target()),
-    isInteractiveAt: (point) => isAtOrBelow(resolved, point, options.modalAbove()),
+    isInteractiveAt: (point) =>
+      isAtOrBelow(resolved, point, options.modalAbove()),
     refresh() {
       relayout(false)
     },
@@ -478,7 +609,8 @@ function attachSheet(el: HTMLElement, input: SheetOptions) {
 
 function styleHost(host: HTMLElement, side: PhysicalSide, sheet: HTMLElement) {
   const vertical = isVertical(side)
-  const rtl = sheet.ownerDocument.defaultView?.getComputedStyle(host).direction === "rtl"
+  const rtl =
+    sheet.ownerDocument.defaultView?.getComputedStyle(host).direction === "rtl"
   const atEnd = side === "bottom" || (side === "right") !== rtl
   return setStyles(host, {
     position: "fixed",
@@ -508,7 +640,14 @@ function styleSheet(sheet: HTMLElement) {
   })
 }
 
-export { attachSheet, isDragSurface, parentSheet, type Sheet, sheetLayers, type SheetOptions }
+export {
+  attachSheet,
+  isDragSurface,
+  parentSheet,
+  type Sheet,
+  sheetLayers,
+  type SheetOptions,
+}
 export type { SheetDriverName } from "./sheet-driver"
 export type { SheetKeyframes, SheetOutlet } from "./sheet-effects"
 export type { SheetSide } from "./sheet-axis"

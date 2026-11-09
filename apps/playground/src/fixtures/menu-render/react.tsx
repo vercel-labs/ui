@@ -1,4 +1,10 @@
-import { Menu, MenuCheckboxItem, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuItem,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 
@@ -44,7 +50,9 @@ function Fixture() {
           </MenuItem>
           <MenuCheckboxItem
             value="pinned"
-            className={(state) => `item ${state.checked ? "is-checked" : "is-unchecked"}`}
+            className={(state) =>
+              `item ${state.checked ? "is-checked" : "is-unchecked"}`
+            }
           >
             Pinned
           </MenuCheckboxItem>

@@ -23,11 +23,19 @@ const policies = [
 <template>
   <Tabs default-value="shipping" hidden-until-found>
     <TabsList aria-label="Policies">
-      <TabsTab v-for="policy in policies" :key="policy.value" :value="policy.value">
+      <TabsTab
+        v-for="policy in policies"
+        :key="policy.value"
+        :value="policy.value"
+      >
         {{ policy.label }}
       </TabsTab>
     </TabsList>
-    <TabsPanel v-for="policy in policies" :key="policy.value" :value="policy.value">
+    <TabsPanel
+      v-for="policy in policies"
+      :key="policy.value"
+      :value="policy.value"
+    >
       {{ policy.text }}
     </TabsPanel>
   </Tabs>

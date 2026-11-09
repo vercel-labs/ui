@@ -58,7 +58,10 @@ function Example() {
         <CarouselIndicatorGroup aria-label="Choose a page">
           {(state) =>
             Array.from({ length: state.pageCount ?? 3 }, (_, index) => (
-              <CarouselIndicator page={index + 1} aria-label={`Page ${index + 1}`} />
+              <CarouselIndicator
+                page={index + 1}
+                aria-label={`Page ${index + 1}`}
+              />
             ))
           }
         </CarouselIndicatorGroup>

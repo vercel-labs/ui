@@ -38,7 +38,9 @@ function TonePicker() {
       aria-label="Preferred default emoji skin tone"
       value={value}
       onValueChange={(next, details) => {
-        if (next) skinTone.set(next, { reason: "item-press", event: details.event })
+        if (next) {
+          skinTone.set(next, { reason: "item-press", event: details.event })
+        }
       }}
     >
       {tones.map((tone) => (
@@ -61,7 +63,9 @@ function Example() {
           <Wave />
           <div data-slot="stack">
             <span data-slot="label">Welcome back</span>
-            <span data-slot="hint">Emoji in your messages use your skin tone.</span>
+            <span data-slot="hint">
+              Emoji in your messages use your skin tone.
+            </span>
           </div>
         </div>
         <div data-slot="stack">

@@ -48,10 +48,12 @@ type PayloadDetails = ChangeDetails<TooltipPayloadChangeReason>
 type TooltipContext = PrimitiveHandle<typeof tooltipPrimitive>
 
 // Where the popup renders. Set on <Tooltip> or <TooltipContent>.
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("tooltip-container")
+const ContainerKey: InjectionKey<() => PopupContainer> =
+  Symbol("tooltip-container")
 // The tooltip of the trigger a TooltipShortcut sits in. A trigger connected through a
 // controller sits outside the tooltip, so its tooltip comes from here.
-const TriggerKey: InjectionKey<() => TooltipContext | undefined> = Symbol("tooltip-trigger")
+const TriggerKey: InjectionKey<() => TooltipContext | undefined> =
+  Symbol("tooltip-trigger")
 
 const parts = createParts(tooltipPrimitive, { arrow: "div" })
 
@@ -93,18 +95,21 @@ const Tooltip = /* @__PURE__ */ renderless(
         onOpenChange: (open: boolean, details: OpenDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("openChange", open, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:open", open)
           emit("update:modelValue", open)
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
         onPayloadChange: (payload: unknown, details: PayloadDetails) =>
           emit("payloadChange", payload, details),
       }))
       useControllerEntry(() => props.controller, tooltip)
       return () => slots.default?.()
     },
-  }),
+  })
 )
 
 /**
@@ -123,17 +128,32 @@ const TooltipTrigger = withElement(
     },
     slots: Object as PartSlots<typeof tooltipPrimitive, "trigger">,
     setup(props, { slots, attrs }) {
-      const connected = useControllerTarget(tooltipPrimitive, () => props.controller)
+      const connected = useControllerTarget(
+        tooltipPrimitive,
+        () => props.controller
+      )
       provide(TriggerKey, connected)
       const id = useId()
       return useConnectedPart(
         connected,
-        (tooltip) => usePart(tooltip, "trigger", () => ({ id, payload: props.payload }), undefined, "button"),
+        (tooltip) =>
+          usePart(
+            tooltip,
+            "trigger",
+            () => ({ id, payload: props.payload }),
+            undefined,
+            "button"
+          ),
         // Until the tooltip it names mounts, a trigger outside the tooltip is a plain button.
-        () => renderUnbound("button", { type: "button", ...attrs }, { slots, state: { open: false } }),
+        () =>
+          renderUnbound(
+            "button",
+            { type: "button", ...attrs },
+            { slots, state: { open: false } }
+          )
       )
     },
-  }),
+  })
 )
 
 /**
@@ -172,8 +192,8 @@ const TooltipContent = withPayload(
           return element && renderPopup(element, target())
         }
       },
-    }),
-  ),
+    })
+  )
 )
 
 /**
@@ -192,10 +212,17 @@ const ShortcutBinding = defineComponent({
     shortcut: String,
   },
   setup(props, { slots }) {
-    return usePart(props.tooltip, "shortcut", () => ({ shortcut: props.shortcut }), undefined, {
-      tag: "span",
-      children: (state) => slotContent(slots.default, { state }) ?? state.text,
-    })
+    return usePart(
+      props.tooltip,
+      "shortcut",
+      () => ({ shortcut: props.shortcut }),
+      undefined,
+      {
+        tag: "span",
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.text,
+      }
+    )
   },
 })
 
@@ -216,7 +243,9 @@ const TooltipShortcut = withElement(
     setup(props, { slots, attrs }) {
       const context = useScope(tooltipPrimitive)?.handle
       const trigger = inject(TriggerKey, null)
-      if (!context && !trigger) throw new Error("Tooltip parts must be used inside <Tooltip>.")
+      if (!context && !trigger) {
+        throw new Error("Tooltip parts must be used inside <Tooltip>.")
+      }
       // A trigger outside the tooltip finds it through its controller only on the client.
       // Until mounted, its shortcut renders nothing, as on the server, so hydration matches.
       const mounted = ref(!!context)
@@ -224,15 +253,22 @@ const TooltipShortcut = withElement(
       return () => {
         const tooltip = context ?? (mounted.value ? trigger?.() : undefined)
         // Inside a trigger whose tooltip hasn't mounted yet, there's no shortcut to show.
-        if (!tooltip) return null
+        if (!tooltip) {
+          return null
+        }
         return h(
           ShortcutBinding,
-          { ...attrs, key: tooltip.instance.id, tooltip, shortcut: props.shortcut },
-          slots,
+          {
+            ...attrs,
+            key: tooltip.instance.id,
+            tooltip,
+            shortcut: props.shortcut,
+          },
+          slots
         )
       }
     },
-  }),
+  })
 )
 
 export { createTooltipController } from "@ui-sdk/core/tooltip"
@@ -252,4 +288,10 @@ export type {
   TooltipTriggerState,
 } from "@ui-sdk/core/tooltip"
 
-export { Tooltip, TooltipArrow, TooltipContent, TooltipShortcut, TooltipTrigger }
+export {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+}

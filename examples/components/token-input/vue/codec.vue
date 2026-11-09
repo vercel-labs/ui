@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { fromText, toText, TokenInput, TokenInputEditor, type TokenCodec } from "@ui-sdk/vue/token-input"
+import {
+  fromText,
+  toText,
+  TokenInput,
+  TokenInputEditor,
+  type TokenCodec,
+} from "@ui-sdk/vue/token-input"
 import { useLog } from "../../../shared/vue/log"
 
 const chat: TokenCodec = {

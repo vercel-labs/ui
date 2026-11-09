@@ -18,7 +18,11 @@ function mount(root: HTMLElement) {
       shell.onChange(() => setOptions(shell.options()))
     }, [])
     return (
-      <ToastRegion toaster={shell.toast} {...options} className={classes.region}>
+      <ToastRegion
+        toaster={shell.toast}
+        {...options}
+        className={classes.region}
+      >
         {(toast) => (
           <Toast className={classes.toast}>
             <div className={classes.content}>
@@ -27,11 +31,18 @@ function mount(root: HTMLElement) {
             </div>
             <ToastAction className={classes.action}>
               {(state) =>
-                state.pending ? "…" : state.error ? "Retry" : (toast.action?.label as React.ReactNode)
+                state.pending
+                  ? "…"
+                  : state.error
+                    ? "Retry"
+                    : (toast.action?.label as React.ReactNode)
               }
             </ToastAction>
             {toast.cancel && (
-              <ToastClose className={classes.close} action={toast.cancel.onCancel}>
+              <ToastClose
+                className={classes.close}
+                action={toast.cancel.onCancel}
+              >
                 {toast.cancel.label as React.ReactNode}
               </ToastClose>
             )}
@@ -46,7 +57,7 @@ function mount(root: HTMLElement) {
   createRoot(shell.slot).render(
     <React.StrictMode>
       <Region />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

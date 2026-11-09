@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
   import { Input } from "@ui-sdk/svelte/input"
   import { useLog } from "../../../shared/svelte/log"
 
@@ -7,7 +12,9 @@
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
-    log(`Subscribed ${new FormData(event.currentTarget as HTMLFormElement).get("email")}`)
+    log(
+      `Subscribed ${new FormData(event.currentTarget as HTMLFormElement).get("email")}`
+    )
   }
 </script>
 
@@ -21,7 +28,9 @@
       {/snippet}
     </FieldDescription>
     <FieldError match="valueMissing">Enter your email address.</FieldError>
-    <FieldError match="typeMismatch">Enter an email address like hollis@example.com.</FieldError>
+    <FieldError match="typeMismatch"
+      >Enter an email address like hollis@example.com.</FieldError
+    >
   </Field>
   <Field name="website">
     <FieldLabel>Website</FieldLabel>

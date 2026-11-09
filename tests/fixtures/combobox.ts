@@ -101,7 +101,9 @@ function comboboxOptions() {
     pages: params.has("pages"),
     nostatus: params.has("nostatus"),
     ...(summary && { summary: Number(summary) }),
-    ...(value !== null && { defaultValue: multiple ? value.split(",").filter(Boolean) : value }),
+    ...(value !== null && {
+      defaultValue: multiple ? value.split(",").filter(Boolean) : value,
+    }),
     ...(max && { maxSelected: Number(max) }),
     grouped: params.has("grouped"),
     create: params.has("create"),
@@ -134,7 +136,11 @@ function searchCountries(query: string, { signal }: { signal: AbortSignal }) {
   return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
     const timer = setTimeout(() => {
       const needle = query.trim().toLowerCase()
-      resolve(comboboxFixture.items.filter((item) => item.label.toLowerCase().includes(needle)))
+      resolve(
+        comboboxFixture.items.filter((item) =>
+          item.label.toLowerCase().includes(needle)
+        )
+      )
     }, 150)
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -145,7 +151,10 @@ function searchCountries(query: string, { signal }: { signal: AbortSignal }) {
 
 // A fake server that answers four countries at a time, after 150ms, so a
 // list can load the next page when its end is reached.
-function searchCountryPages(query: string, { signal, page }: { signal: AbortSignal; page: number }) {
+function searchCountryPages(
+  query: string,
+  { signal, page }: { signal: AbortSignal; page: number }
+) {
   return searchCountries(query, { signal }).then((found) => ({
     items: found.slice(page * 4, page * 4 + 4),
     hasMore: found.length > page * 4 + 4,
@@ -154,7 +163,9 @@ function searchCountryPages(query: string, { signal, page }: { signal: AbortSign
 
 // A create handler: resolves after 300ms with ?slow, at once without.
 function createDelay(slow: boolean) {
-  return slow ? new Promise<void>((resolve) => setTimeout(resolve, 300)) : undefined
+  return slow
+    ? new Promise<void>((resolve) => setTimeout(resolve, 300))
+    : undefined
 }
 
 // The items a spec swaps in while the list is open, with `changeItems`.

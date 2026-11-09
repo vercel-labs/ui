@@ -1,7 +1,13 @@
 <script lang="ts">
   import { untrack } from "svelte"
   import { Listbox, ListboxItem, ListboxItemIndicator } from "../../src/listbox"
-  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../src/select"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "../../src/select"
 
   // A long list whose items count their updates: an update is the part's
   // props changing, or a state key its snippet read changing. Odd items read
@@ -11,9 +17,20 @@
     kind,
     items: given,
     updated,
-  }: { n: number; kind: "select" | "listbox" | "data"; items?: string[]; updated: (key: string) => void } = $props()
+  }: {
+    n: number
+    kind: "select" | "listbox" | "data"
+    items?: string[]
+    updated: (key: string) => void
+  } = $props()
 
-  const items = $derived(given ?? Array.from({ length: untrack(() => n) }, (_, index) => `item-${index + 1}`))
+  const items = $derived(
+    given ??
+      Array.from(
+        { length: untrack(() => n) },
+        (_, index) => `item-${index + 1}`
+      )
+  )
   const count = (key: string, ...reads: unknown[]) => (updated(key), "")
 </script>
 
@@ -43,7 +60,10 @@
     </SelectContent>
   </Select>
 {:else if kind === "data"}
-  <Select items={items.map((value) => ({ value, label: value }))} defaultValue={items[0]}>
+  <Select
+    items={items.map((value) => ({ value, label: value }))}
+    defaultValue={items[0]}
+  >
     <SelectTrigger aria-label="Pick"><SelectValue /></SelectTrigger>
   </Select>
 {:else}
@@ -51,7 +71,11 @@
     {#each items as value (value)}
       <ListboxItem {value}>
         {#snippet render({ props })}
-          <div {...props}>{count(value, props)}{value}<ListboxItemIndicator>✓</ListboxItemIndicator></div>
+          <div {...props}>
+            {count(value, props)}{value}<ListboxItemIndicator
+              >✓</ListboxItemIndicator
+            >
+          </div>
         {/snippet}
       </ListboxItem>
     {/each}

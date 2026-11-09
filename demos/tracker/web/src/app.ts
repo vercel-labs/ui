@@ -8,7 +8,8 @@ import { route } from "./lib/router"
 function app() {
   const settings = route() === "settings"
   document.title = settings ? "Settings · Tracker" : "Tracker"
-  return html`${header()} ${settings ? settingsPage() : issuesPage()} ${overlays()}`
+  return html`${header()} ${settings ? settingsPage() : issuesPage()}
+  ${overlays()}`
 }
 
 export { app }

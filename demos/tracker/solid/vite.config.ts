@@ -8,11 +8,17 @@ const sourceLocations: Plugin = {
   name: "review-source-locations",
   enforce: "pre",
   transform(code, id) {
-    if (id.endsWith(".tsx")) return jsxLocations(code, id, import.meta.dirname)
+    if (id.endsWith(".tsx")) {
+      return jsxLocations(code, id, import.meta.dirname)
+    }
   },
 }
 
 export default defineConfig({
-  plugins: [...(process.env.TRACKER_REVIEW ? [sourceLocations] : []), solid(), tailwindcss()],
+  plugins: [
+    ...(process.env.TRACKER_REVIEW ? [sourceLocations] : []),
+    solid(),
+    tailwindcss(),
+  ],
   resolve: { alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) } },
 })

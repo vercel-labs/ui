@@ -16,7 +16,14 @@ import * as React from "react"
 import { hasChild, Placed, usePlaceContent, usePlacedContent } from "./children"
 import { useControllerEntry } from "./controller-target"
 import { markSegments, textToMark } from "./list-text"
-import { createParts, useAround, useHandle, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  useAround,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(commandPrimitive, {
   input: "input",
@@ -42,7 +49,8 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * The props of `Command`.
  * @stable
  */
-type CommandProps = CommandOptions & Omit<PartProps<"div", CommandState>, Clashing>
+type CommandProps = CommandOptions &
+  Omit<PartProps<"div", CommandState>, Clashing>
 
 /**
  * A search field over an always-open list of commands. Renders a `div` around them.
@@ -99,8 +107,11 @@ function Command({
   useControllerEntry(controller, command)
   // A data command renders its list, unless the app placed a CommandList: in
   // the markup, or inside a component of its own.
-  const found = typeof children !== "function" && hasChild(children, CommandList)
-  const [placed, place] = usePlacedContent(typeof children !== "function" && !!items && !found)
+  const found =
+    typeof children !== "function" && hasChild(children, CommandList)
+  const [placed, place] = usePlacedContent(
+    typeof children !== "function" && !!items && !found
+  )
   const own = placed || found
   const content = (state: CommandState) =>
     typeof children === "function" ? (
@@ -124,13 +135,17 @@ const CommandInput = parts.Input
  * The listbox. Without children, it renders the command's `items`, ranked as the user types.
  * @stable
  */
-function CommandList({ children, ...props }: PartProps<"div", CommandListState>) {
+function CommandList({
+  children,
+  ...props
+}: PartProps<"div", CommandListState>) {
   usePlaceContent()
   const command = useCommand()
   const content = (state: CommandListState) =>
     typeof children === "function"
       ? children(state)
-      : (children ?? (command.state.items ? <CommandItems items={state.items} /> : null))
+      : (children ??
+        (command.state.items ? <CommandItems items={state.items} /> : null))
   return usePart(command, "list", {}, { ...props, children: content })
 }
 
@@ -179,14 +194,27 @@ function CommandItem({
  * The command's text, with the part the search matched in `<mark>`. Without string content, it shows the command's label.
  * @stable
  */
-function CommandItemText({ children, ...props }: PartProps<"span", CommandItemTextState>) {
+function CommandItemText({
+  children,
+  ...props
+}: PartProps<"span", CommandItemTextState>) {
   const item = useAround(commandPrimitive, "item")
-  if (!item) throw new Error("<CommandItemText> must be used inside <CommandItem>.")
+  if (!item) {
+    throw new Error("<CommandItemText> must be used inside <CommandItem>.")
+  }
   const label = (item.label as string | undefined) ?? (item.value as string)
   const part = { id: item.value as string, text: textToMark(children, label) }
   const content =
-    typeof children === "function" ? children : (state: CommandItemTextState) => markSegments(state.segments)
-  return usePart(commandPrimitive, "item-text", part, { ...props, children: content }, "span")
+    typeof children === "function"
+      ? children
+      : (state: CommandItemTextState) => markSegments(state.segments)
+  return usePart(
+    commandPrimitive,
+    "item-text",
+    part,
+    { ...props, children: content },
+    "span"
+  )
 }
 
 /**
@@ -205,13 +233,14 @@ function CommandShortcut({
   children = text,
   ...props
 }: PartProps<"span", CommandShortcutState> & CommandShortcutProps) {
-  const inherited = useAround(commandPrimitive, "item")?.shortcut as string | undefined
+  const inherited = useAround(commandPrimitive, "item")?.shortcut as
+    string | undefined
   return usePart(
     commandPrimitive,
     "shortcut",
     { shortcut: shortcut ?? inherited },
     { ...props, children },
-    "span",
+    "span"
   )
 }
 
@@ -221,9 +250,16 @@ const text = (state: CommandShortcutState) => state.text
  * Commands shown while this page is on top. Without `value`, it's the first page. Renders no element.
  * @stable
  */
-function CommandPage({ value, children }: CommandPageProps & { children?: React.ReactNode }) {
+function CommandPage({
+  value,
+  children,
+}: CommandPageProps & { children?: React.ReactNode }) {
   // Its presence, without an element.
-  const page = () => <PageContext.Provider value={value ?? null}>{children}</PageContext.Provider>
+  const page = () => (
+    <PageContext.Provider value={value ?? null}>
+      {children}
+    </PageContext.Provider>
+  )
   return usePart(commandPrimitive, "page", { value }, { render: page })
 }
 
@@ -249,9 +285,16 @@ const CommandSeparator = parts.Separator
  * Shown while no command matches. Its message is announced when it appears. Place it outside the list.
  * @stable
  */
-function CommandEmpty({ children, ...props }: PartProps<"div", CommandEmptyState>) {
+function CommandEmpty({
+  children,
+  ...props
+}: PartProps<"div", CommandEmptyState>) {
   const content = (state: CommandEmptyState) =>
-    typeof children === "function" ? children(state) : state.empty ? children : null
+    typeof children === "function"
+      ? children(state)
+      : state.empty
+        ? children
+        : null
   return usePart(commandPrimitive, "empty", {}, { ...props, children: content })
 }
 
@@ -269,21 +312,26 @@ function CommandItems({ items }: { items: CommandData }) {
   return (
     <DataContext.Provider value={true}>
       {items.map((entry, index) => {
-        if (typeof entry === "string")
+        if (typeof entry === "string") {
           return (
             <CommandItem key={entry} value={entry}>
               {entry}
             </CommandItem>
           )
-        if ("type" in entry && entry.type === "separator")
+        }
+        if ("type" in entry && entry.type === "separator") {
           return <CommandSeparator key={`separator-${index}`} />
-        if ("type" in entry && entry.type === "group")
+        }
+        if ("type" in entry && entry.type === "group") {
           return (
             <CommandGroup key={`group-${entry.label ?? index}`}>
-              {entry.label && <CommandGroupLabel>{entry.label}</CommandGroupLabel>}
+              {entry.label && (
+                <CommandGroupLabel>{entry.label}</CommandGroupLabel>
+              )}
               <CommandItems items={entry.items} />
             </CommandGroup>
           )
+        }
         return (
           <CommandItem
             key={entry.value}

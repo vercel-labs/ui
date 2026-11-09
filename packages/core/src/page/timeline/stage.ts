@@ -26,9 +26,14 @@ type StagedChange = { ref: string; key?: string; value: unknown }
  * ```
  * @experimental
  */
-async function stageChanges(agent: ReturnType<typeof createAgent>, changes: readonly StagedChange[]) {
+async function stageChanges(
+  agent: ReturnType<typeof createAgent>,
+  changes: readonly StagedChange[]
+) {
   const onPage = (list: AgentComponent[] | { error: string }) =>
-    Array.isArray(list) ? list.filter((c) => !c.offPage && c.component !== "more") : []
+    Array.isArray(list)
+      ? list.filter((c) => !c.offPage && c.component !== "more")
+      : []
   const components = onPage(agent.snapshot())
   // A long page's snapshot stops at its limit, so a control past it is looked up by name.
   const find = async (ref: string) => {
@@ -36,23 +41,46 @@ async function stageChanges(agent: ReturnType<typeof createAgent>, changes: read
       list.find((c) => c.ref === ref) ?? list.find((c) => c.label === ref)
     return match(components) ?? match(onPage(await agent.query({ text: ref })))
   }
-  const applied: { ref: string; key: string; before: unknown; value: unknown }[] = []
+  const applied: {
+    ref: string
+    key: string
+    before: unknown
+    value: unknown
+  }[] = []
   for (const change of changes) {
     const component = await find(change.ref)
     const key = change.key ?? "value"
-    if (!component || !component.actions.includes(setterOf(key))) continue
+    if (!component || !component.actions.includes(setterOf(key))) {
+      continue
+    }
     const result = await agent.act({
-      steps: [{ ref: component.ref, action: setterOf(key), args: [change.value] }],
+      steps: [
+        { ref: component.ref, action: setterOf(key), args: [change.value] },
+      ],
     })
-    if (result.ok) applied.push({ ref: component.ref, key, before: component[key], value: change.value })
+    if (result.ok) {
+      applied.push({
+        ref: component.ref,
+        key,
+        before: component[key],
+        value: change.value,
+      })
+    }
   }
   let reverted = false
   return {
     /** The changes that went on, each with the value it replaced. */
-    applied: applied as readonly { ref: string; key: string; before: unknown; value: unknown }[],
+    applied: applied as readonly {
+      ref: string
+      key: string
+      before: unknown
+      value: unknown
+    }[],
     /** Puts back what each control had, and resolves with the changes it couldn't. Runs once. */
     async revert() {
-      if (reverted) return []
+      if (reverted) {
+        return []
+      }
       reverted = true
       const failed: typeof applied = []
       for (const change of [...applied].reverse()) {
@@ -60,8 +88,15 @@ async function stageChanges(agent: ReturnType<typeof createAgent>, changes: read
         // A secret field's value before is hidden, and "[redacted]" would land in it.
         const hidden = before === "[redacted]" && !!registered.get(ref)?.secret
         const done =
-          !hidden && (await agent.act({ steps: [{ ref, action: setterOf(key), args: [before] }] })).ok
-        if (!done) failed.push(change)
+          !hidden &&
+          (
+            await agent.act({
+              steps: [{ ref, action: setterOf(key), args: [before] }],
+            })
+          ).ok
+        if (!done) {
+          failed.push(change)
+        }
       }
       return failed
     },

@@ -28,18 +28,34 @@ afterEach(() => {
 
 const tick = () => new Promise((resolve) => setTimeout(resolve))
 
-function mount(options: CalendarOptions = {}, { lang, dir }: { lang?: string; dir?: string } = {}) {
-  const instance = calendar({ id: "c", today: "2026-10-16", ...options }) as ReturnType<typeof calendar> &
-    PrimitiveInstance
+function mount(
+  options: CalendarOptions = {},
+  { lang, dir }: { lang?: string; dir?: string } = {}
+) {
+  const instance = calendar({
+    id: "c",
+    today: "2026-10-16",
+    ...options,
+  }) as ReturnType<typeof calendar> & PrimitiveInstance
   const container = document.createElement("div")
-  if (lang) container.lang = lang
-  if (dir) container.dir = dir
+  if (lang) {
+    container.lang = lang
+  }
+  if (dir) {
+    container.dir = dir
+  }
   document.body.append(container)
   const mounted = new Map<string, { el: HTMLElement; unbind: () => void }>()
   let seen = new Set<string>()
 
   // The element for a part under `parent`, made and bound the first time, its attributes written every render.
-  function el(key: string, slot: string, props: Record<string, unknown>, tag: string, parent: HTMLElement) {
+  function el(
+    key: string,
+    slot: string,
+    props: Record<string, unknown>,
+    tag: string,
+    parent: HTMLElement
+  ) {
     seen.add(key)
     const part = instance.part(slot as never, props as never)
     let entry = mounted.get(key)
@@ -49,9 +65,13 @@ function mount(options: CalendarOptions = {}, { lang, dir }: { lang?: string; di
       entry = { el: created, unbind: bind(part, created) }
       mounted.set(key, entry)
     }
-    for (const [name, value] of Object.entries(attrs(part, props)))
-      if (value === undefined) entry.el.removeAttribute(name)
-      else entry.el.setAttribute(name, value)
+    for (const [name, value] of Object.entries(attrs(part, props))) {
+      if (value === undefined) {
+        entry.el.removeAttribute(name)
+      } else {
+        entry.el.setAttribute(name, value)
+      }
+    }
     return { el: entry.el, part }
   }
 
@@ -59,73 +79,126 @@ function mount(options: CalendarOptions = {}, { lang, dir }: { lang?: string; di
     seen = new Set()
     const root = el("root", "root", {}, "div", container).el
     const heading = el("heading", "heading", {}, "h2", root)
-    const headingState = partState(heading.part) as { label: string; month: string }
+    const headingState = partState(heading.part) as {
+      label: string
+      month: string
+    }
     heading.el.textContent = headingState.label
     heading.el.dataset.month = headingState.month
     el("previous", "previous", {}, "button", root)
     el("next", "next", {}, "button", root)
     const { months } = instance.get() as { months: number }
     for (let offset = 0; offset < months; offset++) {
-      const grid = el(`grid:${offset}`, "grid", { offset, id: String(offset) }, "table", root)
+      const grid = el(
+        `grid:${offset}`,
+        "grid",
+        { offset, id: String(offset) },
+        "table",
+        root
+      )
       const state = partState(grid.part) as CalendarGridState
-      const head = el(`weekdays:${offset}`, "weekdays", { id: String(offset) }, "tr", grid.el).el
+      const head = el(
+        `weekdays:${offset}`,
+        "weekdays",
+        { id: String(offset) },
+        "tr",
+        grid.el
+      ).el
       state.weekdays.forEach((_, index) => {
         const id = `${offset}-${index}`
-        const weekday = el(`weekday:${id}`, "weekday", { index, id }, "th", head)
-        weekday.el.textContent = (partState(weekday.part) as { label: string }).label
+        const weekday = el(
+          `weekday:${id}`,
+          "weekday",
+          { index, id },
+          "th",
+          head
+        )
+        weekday.el.textContent = (
+          partState(weekday.part) as { label: string }
+        ).label
       })
       state.weeks.forEach((week, index) => {
-        const row = el(`week:${offset}:${index}`, "week", { id: `${offset}-${index}` }, "tr", grid.el).el
+        const row = el(
+          `week:${offset}:${index}`,
+          "week",
+          { id: `${offset}-${index}` },
+          "tr",
+          grid.el
+        ).el
         for (const cell of week) {
-          if (cell.hidden) continue
+          if (cell.hidden) {
+            continue
+          }
           const day = el(
             `day:${offset}:${index}:${cell.date}`,
             "day",
             { value: cell.date, offset },
             "td",
-            row,
+            row
           )
           day.el.textContent = (partState(day.part) as { label: string }).label
         }
       })
     }
-    for (const [key, entry] of mounted)
+    for (const [key, entry] of mounted) {
       if (!seen.has(key)) {
         entry.unbind()
         entry.el.remove()
         mounted.delete(key)
       }
+    }
   }
 
   let queued = false
   cleanups.push(
     instance.subscribe(() => {
-      if (queued) return
+      if (queued) {
+        return
+      }
       queued = true
       queueMicrotask(() => {
         queued = false
         render()
       })
-    }),
+    })
   )
   render()
   cleanups.push(() => mounted.forEach((entry) => entry.unbind()))
 
   const day = (date: string) =>
-    container.querySelector<HTMLElement>(`[data-value="${date}"]:not([data-outside])`)!
+    container.querySelector<HTMLElement>(
+      `[data-value="${date}"]:not([data-outside])`
+    )!
   const press = (key: string, init: KeyboardEventInit = {}) =>
     (document.activeElement as HTMLElement).dispatchEvent(
-      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...init }),
+      new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      })
     )
-  const focused = () => (document.activeElement as HTMLElement).getAttribute("data-value")
+  const focused = () =>
+    (document.activeElement as HTMLElement).getAttribute("data-value")
   const stops = () =>
     [...container.querySelectorAll("[data-value]")]
       .filter((cell) => cell.getAttribute("tabindex") === "0")
       .map((cell) => cell.getAttribute("data-value"))
   // Intl puts thin spaces around a range's dash.
-  const heading = () => container.querySelector("h2")!.textContent!.replace(/\s/g, " ")
+  const heading = () =>
+    container.querySelector("h2")!.textContent!.replace(/\s/g, " ")
   const button = (name: "previous" | "next") => mounted.get(name)!.el
-  return { instance, container, day, press, focused, stops, heading, button, render }
+  return {
+    instance,
+    container,
+    day,
+    press,
+    focused,
+    stops,
+    heading,
+    button,
+    render,
+  }
 }
 
 describe("the calendar model", () => {
@@ -148,14 +221,31 @@ describe("the calendar model", () => {
 
   test("keys move by day, week, month and year, and stop at min and max", () => {
     const options = { rtl: false, weekStartsOn: 0 }
-    expect(moveDate({ key: "ArrowRight" }, "2026-10-31", options)).toBe("2026-11-01")
-    expect(moveDate({ key: "ArrowLeft" }, "2026-10-31", { ...options, rtl: true })).toBe("2026-11-01")
-    expect(moveDate({ key: "ArrowUp" }, "2026-10-01", options)).toBe("2026-09-24")
+    expect(moveDate({ key: "ArrowRight" }, "2026-10-31", options)).toBe(
+      "2026-11-01"
+    )
+    expect(
+      moveDate({ key: "ArrowLeft" }, "2026-10-31", { ...options, rtl: true })
+    ).toBe("2026-11-01")
+    expect(moveDate({ key: "ArrowUp" }, "2026-10-01", options)).toBe(
+      "2026-09-24"
+    )
     expect(moveDate({ key: "Home" }, "2026-10-16", options)).toBe("2026-10-11")
-    expect(moveDate({ key: "End" }, "2026-10-16", { ...options, weekStartsOn: 1 })).toBe("2026-10-18")
-    expect(moveDate({ key: "PageDown" }, "2026-01-31", options)).toBe("2026-02-28")
-    expect(moveDate({ key: "PageUp", shiftKey: true }, "2028-02-29", options)).toBe("2027-02-28")
-    expect(moveDate({ key: "ArrowDown" }, "2026-10-28", { ...options, max: "2026-10-30" })).toBe("2026-10-30")
+    expect(
+      moveDate({ key: "End" }, "2026-10-16", { ...options, weekStartsOn: 1 })
+    ).toBe("2026-10-18")
+    expect(moveDate({ key: "PageDown" }, "2026-01-31", options)).toBe(
+      "2026-02-28"
+    )
+    expect(
+      moveDate({ key: "PageUp", shiftKey: true }, "2028-02-29", options)
+    ).toBe("2027-02-28")
+    expect(
+      moveDate({ key: "ArrowDown" }, "2026-10-28", {
+        ...options,
+        max: "2026-10-30",
+      })
+    ).toBe("2026-10-30")
     expect(moveDate({ key: "a" }, "2026-10-28", options)).toBeUndefined()
   })
 
@@ -173,7 +263,10 @@ describe("the calendar model", () => {
       isUnavailable: (date: string) => date === "2026-10-20",
       minDays: 2,
     }
-    expect(pressRange(null, "2026-10-16", rules)).toEqual({ anchor: "2026-10-16", value: undefined })
+    expect(pressRange(null, "2026-10-16", rules)).toEqual({
+      anchor: "2026-10-16",
+      value: undefined,
+    })
     expect(pressRange("2026-10-16", "2026-10-18", rules)).toEqual({
       anchor: null,
       value: ["2026-10-16", "2026-10-18"],
@@ -182,25 +275,48 @@ describe("the calendar model", () => {
       anchor: null,
       value: ["2026-10-14", "2026-10-16"],
     })
-    expect(pressRange("2026-10-16", "2026-10-16", rules)).toEqual({ anchor: "2026-10-16", value: undefined })
-    expect(pressRange("2026-10-16", "2026-10-22", rules)).toEqual({ anchor: "2026-10-16", value: undefined })
-    expect(pressRange("2026-10-16", "2026-10-22", { ...rules, allowUnavailable: true }).value).toEqual([
-      "2026-10-16",
-      "2026-10-22",
-    ])
+    expect(pressRange("2026-10-16", "2026-10-16", rules)).toEqual({
+      anchor: "2026-10-16",
+      value: undefined,
+    })
+    expect(pressRange("2026-10-16", "2026-10-22", rules)).toEqual({
+      anchor: "2026-10-16",
+      value: undefined,
+    })
+    expect(
+      pressRange("2026-10-16", "2026-10-22", {
+        ...rules,
+        allowUnavailable: true,
+      }).value
+    ).toEqual(["2026-10-16", "2026-10-22"])
   })
 
   test("outside days show only at the outer edges of the months shown", () => {
-    const options = { weekStartsOn: 0, fixedWeeks: false, showOutsideDays: true }
+    const options = {
+      weekStartsOn: 0,
+      fixedWeeks: false,
+      showOutsideDays: true,
+    }
     const first = gridWeeks("2026-10", { ...options, first: true, last: false })
     const last = gridWeeks("2026-11", { ...options, first: false, last: true })
-    expect(first[0]!.slice(0, 4).map((cell) => cell.hidden)).toEqual([false, false, false, false])
-    expect(first[0]![0]).toEqual({ date: "2026-09-27", outside: true, hidden: false })
-    expect(last.at(-1)!.filter((cell) => cell.outside && !cell.hidden).length).toBe(5)
+    expect(first[0]!.slice(0, 4).map((cell) => cell.hidden)).toEqual([
+      false,
+      false,
+      false,
+      false,
+    ])
+    expect(first[0]![0]).toEqual({
+      date: "2026-09-27",
+      outside: true,
+      hidden: false,
+    })
+    expect(
+      last.at(-1)!.filter((cell) => cell.outside && !cell.hidden).length
+    ).toBe(5)
     expect(
       gridWeeks("2026-11", { ...options, first: false, last: false })
         .at(-1)!
-        .at(-1)!.hidden,
+        .at(-1)!.hidden
     ).toBe(true)
   })
 })
@@ -209,33 +325,50 @@ describe("calendar", () => {
   test("renders a month with its weekdays, heading and labels", () => {
     const { container, heading, day } = mount({ defaultMonth: "2026-10" })
     expect(heading()).toBe("October 2026")
-    expect([...container.querySelectorAll("th")].map((th) => th.textContent)).toEqual([
-      "Sun",
-      "Mon",
-      "Tue",
-      "Wed",
-      "Thu",
-      "Fri",
-      "Sat",
-    ])
-    expect(container.querySelector("th")!.getAttribute("aria-label")).toBe("Sunday")
+    expect(
+      [...container.querySelectorAll("th")].map((th) => th.textContent)
+    ).toEqual(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"])
+    expect(container.querySelector("th")!.getAttribute("aria-label")).toBe(
+      "Sunday"
+    )
     expect(container.querySelector("table")!.getAttribute("role")).toBe("grid")
-    expect(container.querySelector("table")!.getAttribute("aria-label")).toBe("October 2026")
+    expect(container.querySelector("table")!.getAttribute("aria-label")).toBe(
+      "October 2026"
+    )
     expect(container.querySelectorAll("[role=row]").length).toBe(6)
-    expect(day("2026-10-16").getAttribute("aria-label")).toBe("Friday, October 16, 2026")
+    expect(day("2026-10-16").getAttribute("aria-label")).toBe(
+      "Friday, October 16, 2026"
+    )
     expect(day("2026-10-16").textContent).toBe("16")
     expect(day("2026-10-16").getAttribute("aria-current")).toBe("date")
-    expect(container.querySelector('[data-value="2026-09-27"]')!.hasAttribute("data-outside")).toBe(true)
-    expect(container.querySelector('[data-value="2026-09-27"]')!.hasAttribute("tabindex")).toBe(false)
+    expect(
+      container
+        .querySelector('[data-value="2026-09-27"]')!
+        .hasAttribute("data-outside")
+    ).toBe(true)
+    expect(
+      container
+        .querySelector('[data-value="2026-09-27"]')!
+        .hasAttribute("tabindex")
+    ).toBe(false)
   })
 
   test("monthFormat writes the heading's month names, while the grid keeps the full name", () => {
-    const { container, heading } = mount({ defaultMonth: "2026-10", monthFormat: "short" })
+    const { container, heading } = mount({
+      defaultMonth: "2026-10",
+      monthFormat: "short",
+    })
     expect(heading()).toBe("Oct 2026")
-    expect(container.querySelector("table")!.getAttribute("aria-label")).toBe("October 2026")
-    expect(mount({ defaultMonth: "2026-10", months: 2, monthFormat: "short" }).heading()).toMatch(
-      /^Oct . Nov 2026$/,
+    expect(container.querySelector("table")!.getAttribute("aria-label")).toBe(
+      "October 2026"
     )
+    expect(
+      mount({
+        defaultMonth: "2026-10",
+        months: 2,
+        monthFormat: "short",
+      }).heading()
+    ).toMatch(/^Oct . Nov 2026$/)
   })
 
   test("the heading's state has the first month shown, to format it yourself", () => {
@@ -244,33 +377,50 @@ describe("calendar", () => {
   })
 
   test("the page's language sets the names and the first day of the week", async () => {
-    const { container, heading } = mount({ defaultMonth: "2026-10" }, { lang: "de-DE" })
+    const { container, heading } = mount(
+      { defaultMonth: "2026-10" },
+      { lang: "de-DE" }
+    )
     await tick()
     expect(heading()).toBe("Oktober 2026")
     expect(container.querySelector("th")!.textContent).toBe("Mo")
-    expect(container.querySelector("[data-value]")!.getAttribute("data-value")).toBe("2026-09-28")
+    expect(
+      container.querySelector("[data-value]")!.getAttribute("data-value")
+    ).toBe("2026-09-28")
   })
 
   test("the tab stop starts on the selection, else today, else the first date that can be picked", async () => {
-    expect(mount({ defaultValue: "2026-10-20" }).stops()).toEqual(["2026-10-20"])
+    expect(mount({ defaultValue: "2026-10-20" }).stops()).toEqual([
+      "2026-10-20",
+    ])
     document.body.replaceChildren()
     expect(mount({}).stops()).toEqual(["2026-10-16"])
     document.body.replaceChildren()
-    expect(mount({ defaultMonth: "2026-11", min: "2026-11-03" }).stops()).toEqual(["2026-11-03"])
+    expect(
+      mount({ defaultMonth: "2026-11", min: "2026-11-03" }).stops()
+    ).toEqual(["2026-11-03"])
   })
 
   test("server markup has one tab stop and no today, which waits for the client", () => {
-    const instance = calendar({ id: "s", defaultMonth: "2026-10" }) as PrimitiveInstance
+    const instance = calendar({
+      id: "s",
+      defaultMonth: "2026-10",
+    }) as PrimitiveInstance
     const stops = ["2026-10-01", "2026-10-16", "2026-10-31"].map(
-      (value) => attrs(instance.part("day", { value })).tabindex,
+      (value) => attrs(instance.part("day", { value })).tabindex
     )
     expect(stops).toEqual(["0", "-1", "-1"])
-    expect(attrs(instance.part("day", { value: "2026-10-16" }))["aria-current"]).toBeUndefined()
+    expect(
+      attrs(instance.part("day", { value: "2026-10-16" }))["aria-current"]
+    ).toBeUndefined()
   })
 
   test("arrow keys move by day and week, into the next month as it renders", async () => {
     const onMonthChange = vi.fn()
-    const { day, press, focused, heading, stops } = mount({ defaultValue: "2026-10-30", onMonthChange })
+    const { day, press, focused, heading, stops } = mount({
+      defaultValue: "2026-10-30",
+      onMonthChange,
+    })
     await tick()
     day("2026-10-30").focus()
     press("ArrowRight")
@@ -282,7 +432,7 @@ describe("calendar", () => {
     expect(stops()).toEqual(["2026-11-01"])
     expect(onMonthChange).toHaveBeenCalledWith(
       "2026-11",
-      expect.objectContaining({ reason: "list-navigation" }),
+      expect.objectContaining({ reason: "list-navigation" })
     )
     press("ArrowUp")
     await tick()
@@ -291,7 +441,9 @@ describe("calendar", () => {
   })
 
   test("Page Up and Down turn months, with Shift years, and Home and End go to the week's ends", async () => {
-    const { day, press, focused, heading } = mount({ defaultValue: "2026-10-16" })
+    const { day, press, focused, heading } = mount({
+      defaultValue: "2026-10-16",
+    })
     await tick()
     day("2026-10-16").focus()
     press("PageDown")
@@ -307,7 +459,10 @@ describe("calendar", () => {
   })
 
   test("Left and Right swap in a right-to-left page", async () => {
-    const { day, press, focused } = mount({ defaultValue: "2026-10-16" }, { dir: "rtl" })
+    const { day, press, focused } = mount(
+      { defaultValue: "2026-10-16" },
+      { dir: "rtl" }
+    )
     await tick()
     day("2026-10-16").focus()
     press("ArrowLeft")
@@ -333,12 +488,18 @@ describe("calendar", () => {
 
   test("Previous and Next turn the month and keep the tab stop in the grid", async () => {
     const onMonthChange = vi.fn()
-    const { button, heading, stops } = mount({ defaultMonth: "2026-10", onMonthChange })
+    const { button, heading, stops } = mount({
+      defaultMonth: "2026-10",
+      onMonthChange,
+    })
     await tick()
     button("next").click()
     await tick()
     expect(heading()).toBe("November 2026")
-    expect(onMonthChange).toHaveBeenCalledWith("2026-11", expect.objectContaining({ reason: "next-press" }))
+    expect(onMonthChange).toHaveBeenCalledWith(
+      "2026-11",
+      expect.objectContaining({ reason: "next-press" })
+    )
     expect(stops()).toEqual(["2026-11-01"])
     button("previous").click()
     await tick()
@@ -353,7 +514,7 @@ describe("calendar", () => {
     day("2026-10-20").click()
     expect(onValueChange).toHaveBeenLastCalledWith(
       "2026-10-20",
-      expect.objectContaining({ reason: "item-press" }),
+      expect.objectContaining({ reason: "item-press" })
     )
     await tick()
     expect(day("2026-10-20").getAttribute("aria-selected")).toBe("true")
@@ -366,7 +527,9 @@ describe("calendar", () => {
   test("multiple mode toggles dates and keeps them sorted", async () => {
     const { day, container, instance } = mount({ mode: "multiple" })
     await tick()
-    expect(container.querySelector("table")!.getAttribute("aria-multiselectable")).toBe("true")
+    expect(
+      container.querySelector("table")!.getAttribute("aria-multiselectable")
+    ).toBe("true")
     day("2026-10-20").click()
     day("2026-10-02").click()
     expect(instance.api.getValue()).toEqual(["2026-10-02", "2026-10-20"])
@@ -386,7 +549,10 @@ describe("calendar", () => {
     expect(day("2026-10-19").hasAttribute("data-range-end")).toBe(true)
     expect(day("2026-10-17").hasAttribute("data-preview")).toBe(true)
     day("2026-10-19").click()
-    expect(onValueChange).toHaveBeenLastCalledWith(["2026-10-16", "2026-10-19"], expect.anything())
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      ["2026-10-16", "2026-10-19"],
+      expect.anything()
+    )
     await tick()
     expect(day("2026-10-17").getAttribute("aria-selected")).toBe("true")
     expect(day("2026-10-17").hasAttribute("data-preview")).toBe(false)
@@ -396,11 +562,19 @@ describe("calendar", () => {
     press("ArrowRight")
     expect(instance.get()).toMatchObject({ hover: "2026-10-20" })
     press("Escape")
-    expect(instance.get()).toMatchObject({ anchor: null, value: ["2026-10-16", "2026-10-19"] })
+    expect(instance.get()).toMatchObject({
+      anchor: null,
+      value: ["2026-10-16", "2026-10-19"],
+    })
   })
 
   test("a range keeps to minDays, maxDays and unavailable dates, keeping its start through an end they refuse", () => {
-    const { day, instance } = mount({ mode: "range", minDays: 3, maxDays: 5, unavailable: "2026-10-21" })
+    const { day, instance } = mount({
+      mode: "range",
+      minDays: 3,
+      maxDays: 5,
+      unavailable: "2026-10-21",
+    })
     day("2026-10-16").click()
     day("2026-10-17").click()
     expect(instance.get()).toMatchObject({ anchor: "2026-10-16", value: null })
@@ -410,17 +584,30 @@ describe("calendar", () => {
     expect(instance.api.getValue()).toEqual(["2026-10-16", "2026-10-18"])
     day("2026-10-19").click()
     day("2026-10-23").click()
-    expect(instance.get()).toMatchObject({ anchor: "2026-10-19", value: ["2026-10-16", "2026-10-18"] })
+    expect(instance.get()).toMatchObject({
+      anchor: "2026-10-19",
+      value: ["2026-10-16", "2026-10-18"],
+    })
   })
 
   test("while a range is picked, the days that can't end it read as disabled", async () => {
-    const { day } = mount({ mode: "range", minDays: 3, maxDays: 5, unavailable: "2026-10-21" })
+    const { day } = mount({
+      mode: "range",
+      minDays: 3,
+      maxDays: 5,
+      unavailable: "2026-10-21",
+    })
     await tick()
     day("2026-10-16").click()
     await tick()
-    const disabled = (date: string) => day(date).getAttribute("aria-disabled") === "true"
-    expect(["2026-10-16", "2026-10-18", "2026-10-20"].some(disabled)).toBe(false)
-    expect(["2026-10-15", "2026-10-17", "2026-10-22"].every(disabled)).toBe(true)
+    const disabled = (date: string) =>
+      day(date).getAttribute("aria-disabled") === "true"
+    expect(["2026-10-16", "2026-10-18", "2026-10-20"].some(disabled)).toBe(
+      false
+    )
+    expect(["2026-10-15", "2026-10-17", "2026-10-22"].every(disabled)).toBe(
+      true
+    )
     day("2026-10-18").click()
     await tick()
     expect(disabled("2026-10-17")).toBe(false)
@@ -442,7 +629,11 @@ describe("calendar", () => {
   test("the root state and its events follow the tab stop and a range's start", async () => {
     const onFocusedChange = vi.fn()
     const onAnchorChange = vi.fn()
-    const { day, press, instance } = mount({ mode: "range", onFocusedChange, onAnchorChange })
+    const { day, press, instance } = mount({
+      mode: "range",
+      onFocusedChange,
+      onAnchorChange,
+    })
     await tick()
     instance.api.setMonth("2026-12")
     await tick()
@@ -454,36 +645,41 @@ describe("calendar", () => {
     day("2026-10-15").focus()
     expect(onFocusedChange).toHaveBeenLastCalledWith(
       "2026-10-15",
-      expect.objectContaining({ reason: "focus-in" }),
+      expect.objectContaining({ reason: "focus-in" })
     )
     press("ArrowRight")
     expect(onFocusedChange).toHaveBeenLastCalledWith(
       "2026-10-16",
-      expect.objectContaining({ reason: "list-navigation" }),
+      expect.objectContaining({ reason: "list-navigation" })
     )
     instance.api.focus("2026-10-20")
     expect(onFocusedChange).toHaveBeenLastCalledWith(
       "2026-10-20",
-      expect.objectContaining({ reason: "imperative" }),
+      expect.objectContaining({ reason: "imperative" })
     )
     press("Enter")
     expect(onAnchorChange).toHaveBeenLastCalledWith(
       "2026-10-20",
-      expect.objectContaining({ reason: "item-press" }),
+      expect.objectContaining({ reason: "item-press" })
     )
     expect(partState(instance.part("root", {}))).toMatchObject({
       focused: "2026-10-20",
       anchor: "2026-10-20",
     })
     press("Escape")
-    expect(onAnchorChange).toHaveBeenLastCalledWith(null, expect.objectContaining({ reason: "escape-key" }))
+    expect(onAnchorChange).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({ reason: "escape-key" })
+    )
     expect(onFocusedChange).toHaveBeenCalledTimes(3)
   })
 
   test("canceling a focus change keeps focus on the day it was on", async () => {
     const { day, press, focused, instance } = mount({
       onFocusedChange: (date, details) => {
-        if (date !== "2026-10-16") details.cancel()
+        if (date !== "2026-10-16") {
+          details.cancel()
+        }
       },
     })
     await tick()
@@ -501,16 +697,23 @@ describe("calendar", () => {
     const { container, day, focused, instance } = mount({ min: "2026-10-01" })
     await tick()
     day("2026-10-16").focus()
-    container.querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!.click()
+    container
+      .querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!
+      .click()
     await tick()
     expect(instance.api.getMonth()).toBe("2026-10")
     expect(focused()).toBe("2026-10-16")
   })
 
   test("pressing another month's day after max keeps the month", async () => {
-    const { container, instance } = mount({ defaultMonth: "2026-11", max: "2026-11-30" })
+    const { container, instance } = mount({
+      defaultMonth: "2026-11",
+      max: "2026-11-30",
+    })
     await tick()
-    container.querySelector<HTMLElement>('[data-value="2026-12-02"][data-outside]')!.click()
+    container
+      .querySelector<HTMLElement>('[data-value="2026-12-02"][data-outside]')!
+      .click()
     await tick()
     expect(instance.api.getMonth()).toBe("2026-11")
   })
@@ -518,35 +721,50 @@ describe("calendar", () => {
   test("pressing another month's day before a min in the middle of that month keeps the month", async () => {
     const { container, instance } = mount({ min: "2026-09-29" })
     await tick()
-    container.querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!.click()
+    container
+      .querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!
+      .click()
     await tick()
     expect(instance.api.getMonth()).toBe("2026-10")
   })
 
   test("pressing another month's unavailable day within min and max still shows its month, picking nothing", async () => {
     const onValueChange = vi.fn()
-    const { container, instance } = mount({ unavailable: ["2026-09-28"], onValueChange })
+    const { container, instance } = mount({
+      unavailable: ["2026-09-28"],
+      onValueChange,
+    })
     await tick()
-    container.querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!.click()
+    container
+      .querySelector<HTMLElement>('[data-value="2026-09-28"][data-outside]')!
+      .click()
     await tick()
     expect(instance.api.getMonth()).toBe("2026-09")
     expect(onValueChange).not.toHaveBeenCalled()
   })
 
   test("a press whose focus change is canceled asks once, as a press", async () => {
-    const onFocusedChange = vi.fn((_date: string, details: { cancel: () => void }) => details.cancel())
+    const onFocusedChange = vi.fn(
+      (_date: string, details: { cancel: () => void }) => details.cancel()
+    )
     const { day, focused } = mount({ onFocusedChange })
     await tick()
     day("2026-10-16").focus()
-    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    day("2026-10-20").dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true })
+    )
     day("2026-10-20").focus()
-    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
-    day("2026-10-20").dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))
+    day("2026-10-20").dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true })
+    )
+    day("2026-10-20").dispatchEvent(
+      new MouseEvent("click", { bubbles: true, detail: 1 })
+    )
     expect(focused()).toBe("2026-10-16")
     expect(onFocusedChange).toHaveBeenCalledOnce()
     expect(onFocusedChange).toHaveBeenCalledWith(
       "2026-10-20",
-      expect.objectContaining({ reason: "item-press" }),
+      expect.objectContaining({ reason: "item-press" })
     )
   })
 
@@ -566,7 +784,7 @@ describe("calendar", () => {
     expect(focused()).toBe("2026-10-20")
     expect(onFocusedChange).toHaveBeenCalledWith(
       "2026-10-20",
-      expect.objectContaining({ reason: "item-press" }),
+      expect.objectContaining({ reason: "item-press" })
     )
   })
 
@@ -574,15 +792,23 @@ describe("calendar", () => {
     let cancel = true
     const { day, focused } = mount({
       onFocusedChange: (_date, details) => {
-        if (cancel) details.cancel()
+        if (cancel) {
+          details.cancel()
+        }
       },
     })
     await tick()
     day("2026-10-16").focus()
-    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    day("2026-10-20").dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true })
+    )
     day("2026-10-20").focus()
-    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
-    day("2026-10-20").dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))
+    day("2026-10-20").dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true })
+    )
+    day("2026-10-20").dispatchEvent(
+      new MouseEvent("click", { bubbles: true, detail: 1 })
+    )
     expect(focused()).toBe("2026-10-16")
     cancel = false
     safariPress(day("2026-10-20"))
@@ -593,14 +819,20 @@ describe("calendar", () => {
     let cancel = true
     const { day, focused } = mount({
       onFocusedChange: (_date, details) => {
-        if (cancel) details.cancel()
+        if (cancel) {
+          details.cancel()
+        }
       },
     })
     await tick()
     day("2026-10-16").focus()
-    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }))
+    day("2026-10-20").dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true })
+    )
     day("2026-10-20").focus()
-    day("2026-10-16").dispatchEvent(new PointerEvent("pointerup", { bubbles: true }))
+    day("2026-10-16").dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true })
+    )
     cancel = false
     day("2026-10-20").click()
     expect(focused()).toBe("2026-10-20")
@@ -610,14 +842,20 @@ describe("calendar", () => {
     let cancel = true
     const { day, focused } = mount({
       onFocusedChange: (_date, details) => {
-        if (cancel) details.cancel()
+        if (cancel) {
+          details.cancel()
+        }
       },
     })
     await tick()
     day("2026-10-16").focus()
-    day("2026-10-20").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, button: 2 }))
+    day("2026-10-20").dispatchEvent(
+      new PointerEvent("pointerdown", { bubbles: true, button: 2 })
+    )
     day("2026-10-20").focus()
-    day("2026-10-20").dispatchEvent(new PointerEvent("pointerup", { bubbles: true, button: 2 }))
+    day("2026-10-20").dispatchEvent(
+      new PointerEvent("pointerup", { bubbles: true, button: 2 })
+    )
     cancel = false
     day("2026-10-20").click()
     expect(focused()).toBe("2026-10-20")
@@ -628,22 +866,33 @@ describe("calendar", () => {
     const { day, instance } = mount({
       mode: "range",
       onAnchorChange: (_anchor, details) => {
-        if (cancel) details.cancel()
+        if (cancel) {
+          details.cancel()
+        }
       },
     })
     day("2026-10-16").click()
     cancel = true
     day("2026-10-20").click()
     expect(instance.api.getValue()).toBeNull()
-    expect(partState(instance.part("root", {}))).toMatchObject({ anchor: "2026-10-16" })
+    expect(partState(instance.part("root", {}))).toMatchObject({
+      anchor: "2026-10-16",
+    })
   })
 
   test("deselectable clears the selected date when it's pressed again", () => {
     const onValueChange = vi.fn()
-    const { day, instance } = mount({ defaultValue: "2026-10-16", deselectable: true, onValueChange })
+    const { day, instance } = mount({
+      defaultValue: "2026-10-16",
+      deselectable: true,
+      onValueChange,
+    })
     day("2026-10-16").click()
     expect(instance.api.getValue()).toBeNull()
-    expect(onValueChange).toHaveBeenLastCalledWith(null, expect.objectContaining({ reason: "item-press" }))
+    expect(onValueChange).toHaveBeenLastCalledWith(
+      null,
+      expect.objectContaining({ reason: "item-press" })
+    )
     day("2026-10-16").click()
     expect(instance.api.getValue()).toBe("2026-10-16")
   })
@@ -667,12 +916,19 @@ describe("calendar", () => {
   })
 
   test("two months show side by side, with outside days only at the edges", async () => {
-    const { container, day, press, focused, heading } = mount({ months: 2, defaultMonth: "2026-10" })
+    const { container, day, press, focused, heading } = mount({
+      months: 2,
+      defaultMonth: "2026-10",
+    })
     await tick()
     expect(heading()).toBe("October – November 2026")
     expect(container.querySelectorAll("table").length).toBe(2)
-    expect(container.querySelectorAll('[data-value="2026-10-31"]').length).toBe(1)
-    expect(container.querySelectorAll('[data-value="2026-11-01"]').length).toBe(1)
+    expect(container.querySelectorAll('[data-value="2026-10-31"]').length).toBe(
+      1
+    )
+    expect(container.querySelectorAll('[data-value="2026-11-01"]').length).toBe(
+      1
+    )
     day("2026-10-31").focus()
     press("ArrowRight")
     expect(focused()).toBe("2026-11-01")
@@ -684,9 +940,13 @@ describe("calendar", () => {
   })
 
   test("pressing a day of the next month selects it and turns to it", async () => {
-    const { container, instance, heading, focused } = mount({ defaultMonth: "2026-09" })
+    const { container, instance, heading, focused } = mount({
+      defaultMonth: "2026-09",
+    })
     await tick()
-    const cell = container.querySelector<HTMLElement>('[data-value="2026-10-01"][data-outside]')!
+    const cell = container.querySelector<HTMLElement>(
+      '[data-value="2026-10-01"][data-outside]'
+    )!
     cell.click()
     expect(instance.api.getValue()).toBe("2026-10-01")
     await tick()
@@ -708,7 +968,12 @@ describe("calendar", () => {
     expect(onMonthChange).toHaveBeenCalledWith("2026-11", expect.anything())
     expect(instance.api.getMonth()).toBe("2026-10")
     press("ArrowRight")
-    instance.setOptions({ month: "2026-11", defaultValue: "2026-10-31", onMonthChange, today: "2026-10-16" })
+    instance.setOptions({
+      month: "2026-11",
+      defaultValue: "2026-10-31",
+      onMonthChange,
+      today: "2026-10-16",
+    })
     await tick()
     expect(focused()).toBe("2026-11-01")
   })
@@ -727,7 +992,10 @@ describe("calendar", () => {
   })
 
   test("a controller can't select a date people can't pick", () => {
-    const { instance } = mount({ min: "2026-10-05", unavailable: ["2026-10-24"] })
+    const { instance } = mount({
+      min: "2026-10-05",
+      unavailable: ["2026-10-24"],
+    })
     expect(instance.api.setValue("2026-10-01")).toBe(false)
     expect(instance.api.setValue("2026-10-24")).toBe(false)
     expect(instance.api.getValue()).toBeNull()
@@ -757,11 +1025,19 @@ describe("calendar", () => {
   })
 
   test("a value of the wrong shape for its mode reads as nothing selected", () => {
-    expect(mount({ mode: "range", defaultValue: "2026-10-16" }).instance.api.getValue()).toBeNull()
+    expect(
+      mount({
+        mode: "range",
+        defaultValue: "2026-10-16",
+      }).instance.api.getValue()
+    ).toBeNull()
     document.body.replaceChildren()
-    expect(mount({ mode: "multiple", defaultValue: "2026-10-16" }).instance.api.getValue()).toEqual([
-      "2026-10-16",
-    ])
+    expect(
+      mount({
+        mode: "multiple",
+        defaultValue: "2026-10-16",
+      }).instance.api.getValue()
+    ).toEqual(["2026-10-16"])
   })
 
   test("days hear only the changes that can affect them", async () => {
@@ -771,17 +1047,27 @@ describe("calendar", () => {
       defaultMonth: "2026-10",
       today: "2026-10-16",
     }) as ReturnType<typeof calendar> & PrimitiveInstance
-    const days: Part[] = ["2026-10-15", "2026-10-16", "2026-10-17", "2026-10-30"].map((value) => ({
+    const days: Part[] = [
+      "2026-10-15",
+      "2026-10-16",
+      "2026-10-17",
+      "2026-10-30",
+    ].map((value) => ({
       slot: "day",
       props: { value },
     }))
     const store = (
-      instance as unknown as { api: { internal: { roving: { remember: (key: string) => void } } } }
+      instance as unknown as {
+        api: { internal: { roving: { remember: (key: string) => void } } }
+      }
     ).api.internal.roving
     const heard = await expectNoMissedUpdates(instance, days, [
       ["move the stop", () => store.remember("2026-10-16")],
       ["move it again", () => store.remember("2026-10-17")],
-      ["select a range", () => instance.api.setValue(["2026-10-15", "2026-10-17"])],
+      [
+        "select a range",
+        () => instance.api.setValue(["2026-10-15", "2026-10-17"]),
+      ],
       ["turn the month", () => instance.api.next()],
     ])
     expect(heard["move it again"]).toBe(2)
@@ -794,27 +1080,52 @@ describe("calendar", () => {
       min: "2024-03-10",
       max: "2026-11-02",
     }) as PrimitiveInstance
-    const month = partState(instance.part("month-select")) as CalendarSelectState
+    const month = partState(
+      instance.part("month-select")
+    ) as CalendarSelectState
     expect(month.value).toBe(10)
-    expect(month.options.map((option) => option.label).slice(0, 2)).toEqual(["January", "February"])
-    expect(month.options.filter((option) => option.disabled).map((option) => option.value)).toEqual([12])
+    expect(month.options.map((option) => option.label).slice(0, 2)).toEqual([
+      "January",
+      "February",
+    ])
+    expect(
+      month.options
+        .filter((option) => option.disabled)
+        .map((option) => option.value)
+    ).toEqual([12])
     const year = partState(instance.part("year-select")) as CalendarSelectState
     expect(year.value).toBe(2026)
-    expect(year.options.map((option) => option.value)).toEqual([2024, 2025, 2026])
-    expect(attrs(instance.part("year-select"))).toMatchObject({ value: "2026", "aria-label": "Year" })
+    expect(year.options.map((option) => option.value)).toEqual([
+      2024, 2025, 2026,
+    ])
+    expect(attrs(instance.part("year-select"))).toMatchObject({
+      value: "2026",
+      "aria-label": "Year",
+    })
     // Without min and max, the years run 10 either side of the year shown.
-    const open = calendar({ id: "o", defaultMonth: "1990-06" }) as PrimitiveInstance
-    const years = (partState(open.part("year-select")) as CalendarSelectState).options
+    const open = calendar({
+      id: "o",
+      defaultMonth: "1990-06",
+    }) as PrimitiveInstance
+    const years = (partState(open.part("year-select")) as CalendarSelectState)
+      .options
     expect([years[0].value, years.at(-1)!.value]).toEqual([1980, 2000])
   })
 
   test("picking a month or a year turns the calendar there, kept between min and max", async () => {
     const onMonthChange = vi.fn()
-    const { instance, heading } = mount({ defaultMonth: "2026-10", max: "2027-03-31", onMonthChange })
+    const { instance, heading } = mount({
+      defaultMonth: "2026-10",
+      max: "2027-03-31",
+      onMonthChange,
+    })
     const pick = (slot: "month-select" | "year-select", value: string) => {
       const select = document.createElement("select")
-      for (const option of (partState(instance.part(slot)) as CalendarSelectState).options)
+      for (const option of (
+        partState(instance.part(slot)) as CalendarSelectState
+      ).options) {
         select.append(new Option(option.label, String(option.value)))
+      }
       document.body.append(select)
       const unbind = bind(instance.part(slot), select)
       select.value = value
@@ -827,7 +1138,7 @@ describe("calendar", () => {
     expect(heading()).toBe("February 2026")
     expect(onMonthChange).toHaveBeenLastCalledWith(
       "2026-02",
-      expect.objectContaining({ reason: "select-change" }),
+      expect.objectContaining({ reason: "select-change" })
     )
     pick("year-select", "2027")
     await tick()
@@ -840,6 +1151,9 @@ describe("calendar", () => {
 })
 
 test("months that aren't a finite number show one month", () => {
-  for (const months of [Infinity, Number.NaN, -2])
-    expect((calendar({ id: "c", months }) as unknown as PrimitiveInstance).get()).toMatchObject({ months: 1 })
+  for (const months of [Infinity, Number.NaN, -2]) {
+    expect(
+      (calendar({ id: "c", months }) as unknown as PrimitiveInstance).get()
+    ).toMatchObject({ months: 1 })
+  }
 })

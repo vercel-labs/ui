@@ -1,7 +1,13 @@
 import { timeInput, type TimeInputGranularity } from "@ui-sdk/core/time-input"
 import { defineComponent, type PropType } from "vue"
 import { withElement } from "./create-parts"
-import { defineSegment, rootEmits, rootProps, setupRoot, type Segmented } from "./segmented-input"
+import {
+  defineSegment,
+  rootEmits,
+  rootProps,
+  setupRoot,
+  type Segmented,
+} from "./segmented-input"
 import type { PartSlots } from "./use-primitive"
 
 // Time Input has Date Input's slots and state.
@@ -31,8 +37,9 @@ const TimeInput = withElement(
     },
     emits: rootEmits,
     slots: Object as PartSlots<Segmented, "root">,
-    setup: (props, context) => setupRoot(primitive, TimeInputSegment, props, context),
-  }),
+    setup: (props, context) =>
+      setupRoot(primitive, TimeInputSegment, props, context),
+  })
 )
 
 export { createTimeInputController } from "@ui-sdk/core/time-input"

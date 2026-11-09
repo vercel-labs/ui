@@ -1,6 +1,10 @@
 import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "../src/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../src/hover-card"
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a hover card", () => {

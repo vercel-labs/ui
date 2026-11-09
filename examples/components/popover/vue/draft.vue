@@ -64,15 +64,27 @@ function save() {
         <FieldLabel>Note</FieldLabel>
         <FieldControl :value="note" @input="onInput">
           <template #render="{ props }">
-            <textarea v-bind="props" placeholder="Call the printer about the proofs." />
+            <textarea
+              v-bind="props"
+              placeholder="Call the printer about the proofs."
+            />
           </template>
         </FieldControl>
       </Field>
       <div v-if="asking" data-slot="row" role="alert">
         Discard your note?
         <div data-slot="row">
-          <button type="button" data-size="sm" @click="keepEditing">Keep Editing</button>
-          <button type="button" data-size="sm" data-variant="solid" @click="discard">Discard</button>
+          <button type="button" data-size="sm" @click="keepEditing">
+            Keep Editing
+          </button>
+          <button
+            type="button"
+            data-size="sm"
+            data-variant="solid"
+            @click="discard"
+          >
+            Discard
+          </button>
         </div>
       </div>
       <div v-else data-slot="row">

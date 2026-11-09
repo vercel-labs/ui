@@ -7,7 +7,12 @@ import { createRoot, type Root } from "react-dom/client"
 import { renderToString } from "react-dom/server"
 import { afterEach, expect, test, vi } from "vitest"
 import { useAsyncOptions } from "../src/async-options"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../src/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
 import { Field } from "../src/field"
 import { Input } from "../src/input"
 import { Popover, PopoverContent, PopoverTrigger } from "../src/popover"
@@ -53,14 +58,16 @@ const wait = (ms: number) => new Promise((done) => setTimeout(done, ms))
 
 test("StrictMode's thrown-away instance is never observed, so scope and secrets hold", async () => {
   const changes: ObservedChange[] = []
-  cleanups.push(observe((change) => changes.push(change), { within: document.body }))
+  cleanups.push(
+    observe((change) => changes.push(change), { within: document.body })
+  )
   const view = await render(
     <React.StrictMode>
       <Toggle>Bold</Toggle>
       <div data-agent-secret="">
         <Input aria-label="Recovery code" />
       </div>
-    </React.StrictMode>,
+    </React.StrictMode>
   )
   await React.act(async () => view.querySelector("button")!.click())
   const input = view.querySelector("input")!
@@ -68,7 +75,9 @@ test("StrictMode's thrown-away instance is never observed, so scope and secrets 
     input.value = "review-secret"
     input.dispatchEvent(new Event("input", { bubbles: true }))
   })
-  expect(changes).toContainEqual(expect.objectContaining({ component: "toggle", value: true }))
+  expect(changes).toContainEqual(
+    expect.objectContaining({ component: "toggle", value: true })
+  )
   expect(JSON.stringify(changes)).not.toContain("review-secret")
 })
 
@@ -89,7 +98,7 @@ test("StrictMode's thrown-away TriggerMenu never follows the editor", async () =
         triggers={[{ char: "@", items: [{ value: "ada", label: "Ada" }] }]}
         onOpenChange={onOpenChange}
       />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
   await React.act(async () => editor.type("hi @"))
   expect(onOpenChange.mock.calls.map(([open]) => open)).toEqual([true])
@@ -101,7 +110,9 @@ test("StrictMode's thrown-away TriggerMenu never follows the editor", async () =
 const counter = definePrimitive({
   name: "counter",
   state: (_options: {}) => ({ count: 0 }),
-  api: ({ store }) => ({ increment: () => store.set({ count: store.get().count + 1 }) }),
+  api: ({ store }) => ({
+    increment: () => store.set({ count: store.get().count + 1 }),
+  }),
   slots: (slot) => ({
     root: slot<{}, { count: number }>({
       state: ({ count }) => ({ count }),
@@ -112,19 +123,35 @@ const counter = definePrimitive({
 
 function Counter() {
   const handle = usePrimitive(counter, {})
-  return usePart(handle, "root", {}, { children: (state: { count: number }) => state.count }, "button")
+  return usePart(
+    handle,
+    "root",
+    {},
+    { children: (state: { count: number }) => state.count },
+    "button"
+  )
 }
 
-function Hideable({ mode, children }: { mode: "visible" | "hidden"; children: React.ReactNode }) {
+function Hideable({
+  mode,
+  children,
+}: {
+  mode: "visible" | "hidden"
+  children: React.ReactNode
+}) {
   return <React.Activity mode={mode}>{children}</React.Activity>
 }
 
 test("<Activity> hid and showed again keeps state that has no default option", async () => {
   const view = await render(<Hideable mode="visible">{<Counter />}</Hideable>)
   await React.act(async () => view.querySelector("button")!.click())
-  await React.act(async () => root!.render(<Hideable mode="hidden">{<Counter />}</Hideable>))
+  await React.act(async () =>
+    root!.render(<Hideable mode="hidden">{<Counter />}</Hideable>)
+  )
   await wait(5)
-  await React.act(async () => root!.render(<Hideable mode="visible">{<Counter />}</Hideable>))
+  await React.act(async () =>
+    root!.render(<Hideable mode="visible">{<Counter />}</Hideable>)
+  )
   expect(view.querySelector("button")!.textContent).toBe("1")
   await React.act(async () => view.querySelector("button")!.click())
   expect(view.querySelector("button")!.textContent).toBe("2")
@@ -136,16 +163,27 @@ let textCounter: PrimitiveHandle<typeof counter> | undefined
 // whether React hid it or removed it.
 function TextCounter() {
   textCounter = usePrimitive(counter, {})
-  return usePart(textCounter, "root", {}, { render: (_props, state) => <>{state.count}</> })
+  return usePart(
+    textCounter,
+    "root",
+    {},
+    { render: (_props, state) => <>{state.count}</> }
+  )
 }
 
 test("<Activity> hid and showed again keeps the state of a primitive that binds no element", async () => {
-  const view = await render(<Hideable mode="visible">{<TextCounter />}</Hideable>)
+  const view = await render(
+    <Hideable mode="visible">{<TextCounter />}</Hideable>
+  )
   await React.act(async () => textCounter!.api.increment())
   expect(view.textContent).toBe("1")
-  await React.act(async () => root!.render(<Hideable mode="hidden">{<TextCounter />}</Hideable>))
+  await React.act(async () =>
+    root!.render(<Hideable mode="hidden">{<TextCounter />}</Hideable>)
+  )
   await wait(5)
-  await React.act(async () => root!.render(<Hideable mode="visible">{<TextCounter />}</Hideable>))
+  await React.act(async () =>
+    root!.render(<Hideable mode="visible">{<TextCounter />}</Hideable>)
+  )
   expect(view.textContent).toBe("1")
 })
 
@@ -156,24 +194,37 @@ const lamp = definePrimitive({
   options: { controller: "value" },
   state: (_options: { controller?: LampController }) => ({ on: false }),
   api: (context) => ({ switchOn: () => context.store.set({ on: true }) }),
-  slots: (slot) => ({ root: slot<{}, { on: boolean }>({ state: ({ on }) => ({ on }) }) }),
+  slots: (slot) => ({
+    root: slot<{}, { on: boolean }>({ state: ({ on }) => ({ on }) }),
+  }),
 })
 
 function Lamp({ controller }: { controller: LampController }) {
   const handle = usePrimitive(lamp, { controller })
-  return usePart(handle, "root", {}, { render: (_props, state) => <>{state.on ? "on" : "off"}</> })
+  return usePart(
+    handle,
+    "root",
+    {},
+    { render: (_props, state) => <>{state.on ? "on" : "off"}</> }
+  )
 }
 
 test("a primitive that binds no element lets its controller go while hidden, and when it leaves", async () => {
   const controller = createController<LampController>()
-  const view = await render(<Hideable mode="visible">{<Lamp controller={controller} />}</Hideable>)
+  const view = await render(
+    <Hideable mode="visible">{<Lamp controller={controller} />}</Hideable>
+  )
   await React.act(async () =>
-    root!.render(<Hideable mode="hidden">{<Lamp controller={controller} />}</Hideable>),
+    root!.render(
+      <Hideable mode="hidden">{<Lamp controller={controller} />}</Hideable>
+    )
   )
   await wait(5)
   expect("switchOn" in controller).toBe(false)
   await React.act(async () =>
-    root!.render(<Hideable mode="visible">{<Lamp controller={controller} />}</Hideable>),
+    root!.render(
+      <Hideable mode="visible">{<Lamp controller={controller} />}</Hideable>
+    )
   )
   await React.act(async () => controller.switchOn())
   expect(view.textContent).toBe("on")
@@ -212,7 +263,9 @@ test("an instance hidden and then removed with its elements is destroyed", async
     return usePart(usePrimitive(watched, {}), "root", {}, {}, "div")
   }
   await render(<Hideable mode="visible">{<Watched />}</Hideable>)
-  await React.act(async () => root!.render(<Hideable mode="hidden">{<Watched />}</Hideable>))
+  await React.act(async () =>
+    root!.render(<Hideable mode="hidden">{<Watched />}</Hideable>)
+  )
   await wait(5)
   expect(destroy).not.toHaveBeenCalled()
   await React.act(async () => root!.render(null))
@@ -230,7 +283,11 @@ const placements = [
 const dialog = () => document.querySelector<HTMLElement>('[role="dialog"]')
 // Shown unless it or an element around it has `display: none`, as React and a hidden popup write it.
 const rendered = (el: HTMLElement | null) => {
-  for (let node = el; node; node = node.parentElement) if (node.style.display === "none") return false
+  for (let node = el; node; node = node.parentElement) {
+    if (node.style.display === "none") {
+      return false
+    }
+  }
   return !!el
 }
 // Whether the dialog shows, is in the top layer, and locks the page's scroll.
@@ -262,10 +319,16 @@ function SettingsPage({
 }
 
 // Renders the page in a mode and lets its effects settle.
-async function showPage(mode: "visible" | "hidden", options: React.ComponentProps<typeof Dialog>) {
+async function showPage(
+  mode: "visible" | "hidden",
+  options: React.ComponentProps<typeof Dialog>
+) {
   const page = <SettingsPage mode={mode} {...options} />
-  if (root) await React.act(async () => root!.render(page))
-  else await render(page)
+  if (root) {
+    await React.act(async () => root!.render(page))
+  } else {
+    await render(page)
+  }
   await wait(5)
 }
 
@@ -281,7 +344,7 @@ test.each(placements)(
       await showPage("visible", options)
       expect(effects(), `visible ${cycle}`).toEqual(shown)
     }
-  },
+  }
 )
 
 test.each(placements)(
@@ -295,7 +358,7 @@ test.each(placements)(
     expect(effects()).toEqual(gone)
     await showPage("visible", { ...options, open: true })
     expect(effects()).toEqual(shown)
-  },
+  }
 )
 
 test.each(placements)(
@@ -306,7 +369,7 @@ test.each(placements)(
     expect(effects()).toEqual(gone)
     await showPage("visible", options)
     expect(effects()).toEqual(shown)
-  },
+  }
 )
 
 // Renders nothing until it has mounted, and its effects never run while its <Activity> hides.
@@ -331,10 +394,12 @@ test("a hidden dialog whose content renders nothing yet leaves an open popover i
           </DialogContent>
         </Dialog>
       </Hideable>
-    </>,
+    </>
   )
   await wait(5)
-  const popover = portals.querySelector<HTMLElement>("[data-slot=popover-content]")
+  const popover = portals.querySelector<HTMLElement>(
+    "[data-slot=popover-content]"
+  )
   expect(rendered(popover)).toBe(true)
   expect(popover!.hasAttribute("data-top-layer")).toBe(true)
 })
@@ -347,7 +412,7 @@ test("a hidden dialog in the body whose content renders nothing yet leaves the p
           <DialogTitle>Settings</DialogTitle>
         </DialogContent>
       </Dialog>
-    </Hideable>,
+    </Hideable>
   )
   await wait(5)
   expect(rendered(view)).toBe(true)
@@ -373,7 +438,7 @@ test("an open dialog in the body whose content renders an element after it hides
           </DialogContent>
         </Dialog>
       </main>
-    </Hideable>,
+    </Hideable>
   )
   await wait(5)
   expect(effects()).toEqual(gone)
@@ -459,7 +524,7 @@ test("an open dialog rendered into a container stays shown through StrictMode's 
   await render(
     <React.StrictMode>
       <SettingsPage mode="visible" defaultOpen container={document.body} />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
   await wait(5)
   expect(effects()).toEqual(shown)
@@ -473,7 +538,7 @@ test("a field inside a form leaves submitting to the form's own onSubmit", async
         <input defaultValue="Draft" />
       </Field>
       <button type="submit">Submit</button>
-    </form>,
+    </form>
   )
   await React.act(async () => view.querySelector("button")!.click())
   expect(submit).toHaveBeenCalledTimes(1)
@@ -497,7 +562,7 @@ test("useAsyncOptions loads once React mounts, not while rendering, and cancels 
   const view = await render(
     <React.StrictMode>
       <Options />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
   expect(view.textContent).toBe("loading")
   expect(signals).toHaveLength(1)
@@ -510,11 +575,15 @@ test("useAsyncOptions loads once React mounts, not while rendering, and cancels 
 const choice = definePrimitive({
   name: "choice",
   state: (_options: {}) => ({ selected: "" }),
-  api: ({ store }) => ({ select: (selected: string) => store.set({ selected }) }),
+  api: ({ store }) => ({
+    select: (selected: string) => store.set({ selected }),
+  }),
   slots: (slot) => ({
     option: slot<{ target: string }, { selected: boolean }>({
       props: { target: "string" },
-      state: (state, { props }) => ({ selected: state.selected === props.target }),
+      state: (state, { props }) => ({
+        selected: state.selected === props.target,
+      }),
       selects: selects({ selected: ({ props }) => [props.target] }),
     }),
   }),
@@ -530,7 +599,7 @@ function Choice({ target }: { target: string }) {
         "option",
         { target },
         { children: (state: { selected: boolean }) => String(state.selected) },
-        "span",
+        "span"
       )}
     </>
   )
@@ -559,14 +628,20 @@ test("a dialog whose content takes an inline ref leaves Escape to the popover op
     )
   }
   const view = await render(<Settings />)
-  await React.act(async () => view.querySelector<HTMLElement>('[aria-haspopup="dialog"]')!.click())
+  await React.act(async () =>
+    view.querySelector<HTMLElement>('[aria-haspopup="dialog"]')!.click()
+  )
   await React.act(() => wait(5))
   await React.act(async () => {
-    document.activeElement!.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }))
+    document.activeElement!.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", bubbles: true })
+    )
   })
   await React.act(() => wait(5))
   expect(view.textContent).not.toContain("Filter list")
-  expect(view.querySelector('[role="dialog"]')?.hasAttribute("data-open")).toBe(true)
+  expect(view.querySelector('[role="dialog"]')?.hasAttribute("data-open")).toBe(
+    true
+  )
 })
 
 test("unmounting an open dialog lets the page go in the same commit", async () => {
@@ -588,7 +663,8 @@ test("unmounting an open dialog lets the page go in the same commit", async () =
     )
   }
   const view = await render(<App />)
-  const inert = (el: HTMLElement | null): boolean => !!el && (el.inert || inert(el.parentElement))
+  const inert = (el: HTMLElement | null): boolean =>
+    !!el && (el.inert || inert(el.parentElement))
   const outside = view.querySelector("input")!
   await React.act(() => wait(5))
   expect(inert(outside)).toBe(true)

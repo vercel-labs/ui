@@ -14,14 +14,22 @@
   let action = $state("")
   let submitted = $state("")
 
-  function onValueChange(value: string | null, details: { reason: string; cancel: () => void }) {
-    if (value === cancel) return details.cancel()
+  function onValueChange(
+    value: string | null,
+    details: { reason: string; cancel: () => void }
+  ) {
+    if (value === cancel) {
+      return details.cancel()
+    }
     action = `${value}:${details.reason}`
   }
 
   function onsubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    submitted = Array.from(new FormData(event.currentTarget), ([key, value]) => `${key}=${value}`).join("&")
+    submitted = Array.from(
+      new FormData(event.currentTarget),
+      ([key, value]) => `${key}=${value}`
+    ).join("&")
   }
 </script>
 
@@ -36,13 +44,17 @@
   >
     <SegmentedControlIndicator />
     {#each segmentedControlFixture.items as item (item.value)}
-      <SegmentedControlItem value={item.value} disabled={item.disabled}>{item.label}</SegmentedControlItem>
+      <SegmentedControlItem value={item.value} disabled={item.disabled}
+        >{item.label}</SegmentedControlItem
+      >
     {/each}
   </SegmentedControl>
   <button type="button">After</button>
   <button type="submit">Save</button>
   <button type="reset">Reset</button>
-  <button type="button" onclick={() => controller.setValue("calendar")}>Show calendar</button>
+  <button type="button" onclick={() => controller.setValue("calendar")}
+    >Show calendar</button
+  >
   <output role="status" aria-label="Last action">{action}</output>
   <output aria-label="Submitted">{submitted}</output>
 </form>

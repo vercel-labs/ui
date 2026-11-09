@@ -37,7 +37,9 @@ const confirm = createConfirm()
 function Fixture() {
   // Read here, not at module level, so the server reads each request's URL,
   // and the window is only touched where there is one.
-  if (!isServer) exposeDialogFixture(controller, confirm)
+  if (!isServer) {
+    exposeDialogFixture(controller, confirm)
+  }
   const parts = dialogParts()
   const [action, setAction] = createSignal("")
   const [triggerShown, setTriggerShown] = createSignal(true)
@@ -49,7 +51,9 @@ function Fixture() {
         {...dialogOptions()}
         onOpenChange={(open, details) => {
           recordOpenChange("dialog", open, details)
-          if (!open && details.returnValue) setAction(details.returnValue)
+          if (!open && details.returnValue) {
+            setAction(details.returnValue)
+          }
         }}
       >
         <Show when={triggerShown()}>
@@ -62,7 +66,9 @@ function Fixture() {
           <Show when={parts.title}>
             <DialogTitle class="title">{dialogFixture.title}</DialogTitle>
           </Show>
-          <DialogDescription class="description">{dialogFixture.description}</DialogDescription>
+          <DialogDescription class="description">
+            {dialogFixture.description}
+          </DialogDescription>
           <label class="field">
             {dialogFixture.field}
             <input value={dialogFixture.defaultValue} />
@@ -71,25 +77,37 @@ function Fixture() {
             <p class="long">{dialogFixture.long}</p>
           </Show>
           <div class="actions">
-            <button onClick={() => setAction("save")}>{dialogFixture.action}</button>
+            <button onClick={() => setAction("save")}>
+              {dialogFixture.action}
+            </button>
             <DialogClose>{dialogFixture.close}</DialogClose>
             <Show when={parts.removable}>
-              <button onClick={() => setTriggerShown(false)}>{dialogFixture.remove}</button>
+              <button onClick={() => setTriggerShown(false)}>
+                {dialogFixture.remove}
+              </button>
             </Show>
           </div>
           <Show when={parts.form}>
             <form method="dialog">
-              <button value={dialogFixture.form.value}>{dialogFixture.form.label}</button>
+              <button value={dialogFixture.form.value}>
+                {dialogFixture.form.label}
+              </button>
             </form>
           </Show>
           <Show when={parts.nested}>
-            <Dialog onOpenChange={(open, details) => recordOpenChange("nested", open, details)}>
+            <Dialog
+              onOpenChange={(open, details) =>
+                recordOpenChange("nested", open, details)
+              }
+            >
               <DialogTrigger>{dialogFixture.nested.trigger}</DialogTrigger>
               <Show when={parts.backdrop}>
                 <DialogBackdrop class="dialog-backdrop" />
               </Show>
               <DialogContent class="dialog">
-                <DialogTitle class="title">{dialogFixture.nested.title}</DialogTitle>
+                <DialogTitle class="title">
+                  {dialogFixture.nested.title}
+                </DialogTitle>
                 <DialogClose>{dialogFixture.nested.close}</DialogClose>
               </DialogContent>
             </Dialog>
@@ -102,13 +120,18 @@ function Fixture() {
           <AlertDialogBackdrop class="dialog-backdrop" />
         </Show>
         <AlertDialogContent class="dialog">
-          <AlertDialogTitle class="title">{alertDialogFixture.title}</AlertDialogTitle>
+          <AlertDialogTitle class="title">
+            {alertDialogFixture.title}
+          </AlertDialogTitle>
           <AlertDialogDescription class="description">
             {alertDialogFixture.description}
           </AlertDialogDescription>
           <div class="actions">
             <AlertDialogClose>{alertDialogFixture.cancel}</AlertDialogClose>
-            <AlertDialogClose value="confirm" onClick={() => setAction("delete")}>
+            <AlertDialogClose
+              value="confirm"
+              onClick={() => setAction("delete")}
+            >
               {alertDialogFixture.action}
             </AlertDialogClose>
           </div>
@@ -120,7 +143,10 @@ function Fixture() {
       </output>
       <button onClick={() => controller.open()}>Open with controller</button>
       <Show when={parts.shortcut}>
-        <DialogTrigger controller={controller} shortcut={dialogFixture.shortcut.keys}>
+        <DialogTrigger
+          controller={controller}
+          shortcut={dialogFixture.shortcut.keys}
+        >
           {dialogFixture.shortcut.trigger} <DialogShortcut />
         </DialogTrigger>
       </Show>

@@ -34,25 +34,41 @@ function createPendingReason<Reason extends string>(none: Reason) {
 
 // Triggers rendered as something other than a button still need to be one.
 function bindTriggerElement(el: HTMLElement) {
-  if (el.tagName === "BUTTON") return
-  if (!el.hasAttribute("role")) el.setAttribute("role", "button")
-  if (!el.matches("a[href]") && !el.hasAttribute("tabindex")) el.setAttribute("tabindex", "0")
+  if (el.tagName === "BUTTON") {
+    return
+  }
+  if (!el.hasAttribute("role")) {
+    el.setAttribute("role", "button")
+  }
+  if (!el.matches("a[href]") && !el.hasAttribute("tabindex")) {
+    el.setAttribute("tabindex", "0")
+  }
 }
 
 // Buttons and links activate themselves. Anything else needs a click on Enter
 // and Space, and so does Space on a link that says it's a button.
 function triggerKeydown(event: KeyboardEvent, el: HTMLElement | undefined) {
-  if (!el || el.tagName === "BUTTON" || event.target !== el) return
-  if (el.matches("a[href]") && (event.key !== " " || el.getAttribute("role") !== "button")) return
-  if (event.key !== "Enter" && event.key !== " ") return
+  if (!el || el.tagName === "BUTTON" || event.target !== el) {
+    return
+  }
+  if (
+    el.matches("a[href]") &&
+    (event.key !== " " || el.getAttribute("role") !== "button")
+  ) {
+    return
+  }
+  if (event.key !== "Enter" && event.key !== " ") {
+    return
+  }
   event.preventDefault()
   el.click()
 }
 
 // Safari doesn't focus buttons on click, so the next Tab would start from the page.
 function focusPressedTrigger(el: HTMLElement | undefined) {
-  if (el && typeof document !== "undefined" && document.activeElement !== el)
+  if (el && typeof document !== "undefined" && document.activeElement !== el) {
     el.focus({ preventScroll: true })
+  }
 }
 
 export {

@@ -1,4 +1,8 @@
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/solid/listbox"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -50,7 +54,9 @@ function Example() {
         data-slot="row"
         onSubmit={(event) => {
           event.preventDefault()
-          log(`Ordered ${new FormData(event.currentTarget).getAll("toppings").join(", ")}`)
+          log(
+            `Ordered ${new FormData(event.currentTarget).getAll("toppings").join(", ")}`
+          )
         }}
       >
         <button type="reset">Reset</button>

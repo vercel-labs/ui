@@ -22,7 +22,9 @@ function VariantProgress({ variant, env }: { variant: Variant; env: Env }) {
   // Only the step buttons change the value, so they keep the latest one here.
   const latest = React.useRef(value)
   React.useEffect(() => {
-    if (!variant.steps) return
+    if (!variant.steps) {
+      return
+    }
     env.controls(
       progressSteps.map(([label, step]) => [
         label,
@@ -31,14 +33,21 @@ function VariantProgress({ variant, env }: { variant: Variant; env: Env }) {
           setValue(latest.current)
           env.log(`value ${latest.current}`)
         },
-      ]),
+      ])
     )
   }, [variant, env])
   return (
-    <Progress className={classes.root} {...variant.options} {...rich(variant)} value={value}>
+    <Progress
+      className={classes.root}
+      {...variant.options}
+      {...rich(variant)}
+      value={value}
+    >
       <ProgressLabel className={classes.label}>{variant.label}</ProgressLabel>
       <ProgressValue className={classes.value}>
-        {variant.render ? (state) => `${state.text || "…"} · ${state.status}` : undefined}
+        {variant.render
+          ? (state) => `${state.text || "…"} · ${state.status}`
+          : undefined}
       </ProgressValue>
       <ProgressTrack className={classes.track}>
         <ProgressIndicator className={classes.progressIndicator} />
@@ -52,8 +61,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantProgress variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

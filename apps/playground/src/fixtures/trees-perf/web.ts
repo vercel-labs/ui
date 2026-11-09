@@ -13,7 +13,7 @@ function mount(root: HTMLElement) {
         <ui-tree-item class="tree-item" value="folder-${index + 1}">
           <ui-tree-item-label class="tree-label">Folder ${index + 1}</ui-tree-item-label>
           <ui-tree-group class="tree-group">${file(index + 1, "a")}${file(index + 1, "b")}</ui-tree-group>
-        </ui-tree-item>`,
+        </ui-tree-item>`
     ).join("")
     target.innerHTML = `
       <div class="fixture" style="flex-direction: column; align-items: start">

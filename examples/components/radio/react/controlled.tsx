@@ -1,7 +1,12 @@
 "use client"
 
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { createRadioGroupController, Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
+import {
+  createRadioGroupController,
+  Radio,
+  RadioGroup,
+  RadioIndicator,
+} from "@ui-sdk/react/radio"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
 
@@ -31,7 +36,9 @@ function Example() {
           value={value}
           onValueChange={(next, details) => {
             setValue(next)
-            log(`${plans.find((plan) => plan.value === next)?.label ?? "None"} (${details.reason})`)
+            log(
+              `${plans.find((plan) => plan.value === next)?.label ?? "None"} (${details.reason})`
+            )
           }}
           controller={planGroup}
         >

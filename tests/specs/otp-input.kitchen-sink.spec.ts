@@ -4,19 +4,30 @@ import { expect, test } from "../fixtures"
 // holds and the slots drawn from it. The page is for manual testing, so this
 // only proves every variant renders and responds without errors. Checks are
 // soft, so one run lists every variant that misbehaves.
-test("every OTP input kitchen sink variant takes a code", async ({ page, framework }) => {
-  test.skip(!["react", "vue", "web"].includes(framework), "Composition frameworks only.")
+test("every OTP input kitchen sink variant takes a code", async ({
+  page,
+  framework,
+}) => {
+  test.skip(
+    !["react", "vue", "web"].includes(framework),
+    "Composition frameworks only."
+  )
   test.setTimeout(120_000)
   const errors: string[] = []
   page.on("pageerror", (error) => errors.push(error.message))
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+  page.on(
+    "console",
+    (message) => message.type() === "error" && errors.push(message.text())
+  )
 
   await page.goto(`/?fixture=otp-input-kitchen-sink&framework=${framework}`)
   await page.locator("body[data-mounted]").waitFor({ state: "attached" })
   const cards = page.locator("[data-variant]")
   await expect(cards.first()).toBeVisible()
   // Each card mounts its own root, so wait for all of them.
-  await expect.poll(() => page.locator("[data-variant]:not(:has(input))").count()).toBe(0)
+  await expect
+    .poll(() => page.locator("[data-variant]:not(:has(input))").count())
+    .toBe(0)
 
   for (const card of await cards.all()) {
     const id = await card.getAttribute("data-variant")
@@ -25,18 +36,32 @@ test("every OTP input kitchen sink variant takes a code", async ({ page, framewo
     const input = card.locator("input")
     await card.scrollIntoViewIfNeeded()
     // Keys go to the focused element, so nothing stays focused from the last card.
-    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+    await page.evaluate(() =>
+      (document.activeElement as HTMLElement | null)?.blur()
+    )
     if (typed && (await input.isEnabled())) {
       await input.focus()
       await page.keyboard.type(typed)
     }
     await expect.soft(input, `${id} holds its code`).toHaveValue(expected)
-    if ((await card.getAttribute("data-masked")) === null || framework === "web")
+    if (
+      (await card.getAttribute("data-masked")) === null ||
+      framework === "web"
+    ) {
       await expect
-        .poll(async () => (await card.locator('[data-slot="otp-input-slot"]').allTextContents()).join(""), {
-          message: `${id} draws its code`,
-        })
+        .poll(
+          async () =>
+            (
+              await card
+                .locator('[data-slot="otp-input-slot"]')
+                .allTextContents()
+            ).join(""),
+          {
+            message: `${id} draws its code`,
+          }
+        )
         .toBe(expected)
+    }
   }
 
   const log = page.locator("[data-log]")
@@ -44,7 +69,10 @@ test("every OTP input kitchen sink variant takes a code", async ({ page, framewo
   await expect(log).not.toContainText('canceled valueChange "19')
 
   // A wrong code turns the verified variant invalid.
-  await expect(page.locator('[data-variant="verify"] input')).toHaveAttribute("aria-invalid", "true")
+  await expect(page.locator('[data-variant="verify"] input')).toHaveAttribute(
+    "aria-invalid",
+    "true"
+  )
 
   // The controller and controlled buttons set and clear the code.
   const controller = page.locator('[data-variant="controller"]')

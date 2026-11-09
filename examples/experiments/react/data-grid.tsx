@@ -28,19 +28,29 @@ type DataGridColumn = {
   numeric?: boolean
 }
 
-type DataGridSort = { col: number; direction: "ascending" | "descending" } | null
+type DataGridSort = {
+  col: number
+  direction: "ascending" | "descending"
+} | null
 
 type DataGridRowsChangeReason = "cell-edit" | "imperative"
-type DataGridSelectedChangeReason = "item-press" | "list-navigation" | "imperative"
+type DataGridSelectedChangeReason =
+  "item-press" | "list-navigation" | "imperative"
 
 type DataGridOptions = {
   columns: DataGridColumn[]
   rows?: DataGridRowData[]
   defaultRows?: DataGridRowData[]
-  onRowsChange?: (rows: DataGridRowData[], details: ChangeDetails<DataGridRowsChangeReason>) => void
+  onRowsChange?: (
+    rows: DataGridRowData[],
+    details: ChangeDetails<DataGridRowsChangeReason>
+  ) => void
   selected?: string[]
   defaultSelected?: string[]
-  onSelectedChange?: (selected: string[], details: ChangeDetails<DataGridSelectedChangeReason>) => void
+  onSelectedChange?: (
+    selected: string[],
+    details: ChangeDetails<DataGridSelectedChangeReason>
+  ) => void
   rowHeight?: number
 }
 
@@ -59,7 +69,10 @@ type DataGridRootState = {
   selected: number
   editing: string | null
 }
-type DataGridColumnHeaderState = { sort: "ascending" | "descending" | undefined; active: boolean }
+type DataGridColumnHeaderState = {
+  sort: "ascending" | "descending" | undefined
+  active: boolean
+}
 type DataGridRowState = { row: DataGridRowData; selected: boolean }
 type DataGridCellState = { value: unknown; active: boolean; editing: boolean }
 
@@ -95,10 +108,18 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
     const columns = () => context.options().columns
     const rowHeight = () => context.options().rowHeight ?? 36
 
-    let cache: { rows: DataGridRowData[]; sort: DataGridSort; sorted: DataGridRowData[] } | undefined
+    let cache:
+      | {
+          rows: DataGridRowData[]
+          sort: DataGridSort
+          sorted: DataGridRowData[]
+        }
+      | undefined
     const sorted = () => {
       const { rows, sort } = store.get()
-      if (cache?.rows === rows && cache.sort === sort) return cache.sorted
+      if (cache?.rows === rows && cache.sort === sort) {
+        return cache.sorted
+      }
       let next = rows
       if (sort) {
         const { key, numeric } = columns()[sort.col]
@@ -106,16 +127,20 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
         next = [...rows].sort((a, b) =>
           numeric
             ? (Number(a[key]) - Number(b[key])) * sign
-            : String(a[key]).localeCompare(String(b[key])) * sign,
+            : String(a[key]).localeCompare(String(b[key])) * sign
         )
       }
       cache = { rows, sort, sorted: next }
       return next
     }
-    let index: { rows: DataGridRowData[]; byId: Map<string, DataGridRowData> } | undefined
+    let index:
+      | { rows: DataGridRowData[]; byId: Map<string, DataGridRowData> }
+      | undefined
     const rowById = (id: string) => {
       const { rows } = store.get()
-      if (index?.rows !== rows) index = { rows, byId: new Map(rows.map((row) => [row.id, row])) }
+      if (index?.rows !== rows) {
+        index = { rows, byId: new Map(rows.map((row) => [row.id, row])) }
+      }
       return index.byId.get(id)
     }
     let scroller: HTMLElement | undefined
@@ -141,16 +166,28 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
       key: "active",
       rows: () => sorted().length + 1,
       cols: () => columns().length,
-      pageSize: () => Math.max(1, Math.floor((scroller?.clientHeight ?? 360) / rowHeight()) - 2),
-      reveal: (cell) => (cell.row > 0 ? virtual.scrollToIndex(cell.row - 1) : undefined),
+      pageSize: () =>
+        Math.max(
+          1,
+          Math.floor((scroller?.clientHeight ?? 360) / rowHeight()) - 2
+        ),
+      reveal: (cell) =>
+        cell.row > 0 ? virtual.scrollToIndex(cell.row - 1) : undefined,
       onMove: (cell, { from, shift, event }) => {
         virtual.refresh()
-        if (shift && cell.row > 0 && from && from.row > 0 && cell.row !== from.row)
+        if (
+          shift &&
+          cell.row > 0 &&
+          from &&
+          from.row > 0 &&
+          cell.row !== from.row
+        ) {
           selection.extend(sorted()[cell.row - 1].id, {
             reason: "list-navigation",
             event,
             from: sorted()[from.row - 1].id,
           })
+        }
       },
     })
     const parse = (id: string) => {
@@ -167,10 +204,21 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
       commit: (id, text, details) => {
         const { rowId, col } = parse(id)
         const column = columns()[col]
-        const value = column.numeric ? Number(text.replace(/[$,\s]/g, "")) : text.trim()
-        if (column.numeric ? !Number.isFinite(value) : !value) return false
-        const rows = store.get().rows.map((row) => (row.id === rowId ? { ...row, [column.key]: value } : row))
-        return change("rows", rows, { reason: "cell-edit", event: details.event })
+        const value = column.numeric
+          ? Number(text.replace(/[$,\s]/g, ""))
+          : text.trim()
+        if (column.numeric ? !Number.isFinite(value) : !value) {
+          return false
+        }
+        const rows = store
+          .get()
+          .rows.map((row) =>
+            row.id === rowId ? { ...row, [column.key]: value } : row
+          )
+        return change("rows", rows, {
+          reason: "cell-edit",
+          event: details.event,
+        })
       },
       disabled: (id) => !columns()[parse(id).col].editable,
     })
@@ -204,39 +252,59 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
         }
       },
       cellKeydown(event: KeyboardEvent, cell: GridCell) {
-        if (store.get().editing) return
+        if (store.get().editing) {
+          return
+        }
         const rowId = api.rowAt(cell.row)
         if (cell.row === 0 && (event.key === "Enter" || event.key === " ")) {
           event.preventDefault()
           return api.sortBy(cell.col)
         }
-        if (rowId && edit.keydown(event, cellId(rowId, cell.col))) return
+        if (rowId && edit.keydown(event, cellId(rowId, cell.col))) {
+          return
+        }
         if (rowId && event.key === " ") {
           event.preventDefault()
           return selection.toggle(rowId, { reason: "item-press", event })
         }
-        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
+        if (
+          (event.metaKey || event.ctrlKey) &&
+          event.key.toLowerCase() === "a"
+        ) {
           event.preventDefault()
           return selection.toggleAll({ reason: "list-navigation", event })
         }
         grid.keydown(event)
       },
       cellPointerdown(event: PointerEvent, cell: GridCell) {
-        if (event.button !== 0 || store.get().editing) return
+        if (event.button !== 0 || store.get().editing) {
+          return
+        }
         const rowId = api.rowAt(cell.row)
         if (rowId && event.shiftKey) {
           const from = store.get().active
-          selection.extend(rowId, { reason: "item-press", event, from: api.rowAt(from?.row ?? 0) ?? null })
-        } else if (rowId && (event.metaKey || event.ctrlKey))
+          selection.extend(rowId, {
+            reason: "item-press",
+            event,
+            from: api.rowAt(from?.row ?? 0) ?? null,
+          })
+        } else if (rowId && (event.metaKey || event.ctrlKey)) {
           selection.toggle(rowId, { reason: "item-press", event })
+        }
         grid.focus(cell, { reason: "item-press", event })
       },
       inputKeydown(event: KeyboardEvent) {
         const active = store.get().active
-        if (!edit.inputKeydown(event) || event.key !== "Tab" || !active) return
+        if (!edit.inputKeydown(event) || event.key !== "Tab" || !active) {
+          return
+        }
         const col = active.col + (event.shiftKey ? -1 : 1)
-        if (col >= 0 && col < columns().length)
-          grid.focus({ row: active.row, col }, { reason: "list-navigation", event })
+        if (col >= 0 && col < columns().length) {
+          grid.focus(
+            { row: active.row, col },
+            { reason: "list-navigation", event }
+          )
+        }
       },
     }
     return api
@@ -262,10 +330,18 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
       attrs: (_state, { api }) => ({
         role: "row",
         "aria-rowindex": "1",
-        style: css({ position: "sticky", top: "0", "z-index": "1", height: `${api.rowHeight()}px` }),
+        style: css({
+          position: "sticky",
+          top: "0",
+          "z-index": "1",
+          height: `${api.rowHeight()}px`,
+        }),
       }),
     }),
-    columnheader: slot<{ value: string; col: number }, DataGridColumnHeaderState>({
+    columnheader: slot<
+      { value: string; col: number },
+      DataGridColumnHeaderState
+    >({
       props: { value: "string", col: "number" },
       state: (state, { props, api }) => ({
         sort: state.sort?.col === props.col ? state.sort.direction : undefined,
@@ -276,25 +352,35 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
         return {
           role: "columnheader",
           "aria-colindex": String(props.col + 1),
-          "aria-sort": state.sort?.col === props.col ? state.sort.direction : "none",
+          "aria-sort":
+            state.sort?.col === props.col ? state.sort.direction : "none",
           tabindex: api.grid.tabIndex(state, cell),
           "data-active": api.grid.isActive(state, cell) ? "" : undefined,
         }
       },
       on: {
-        keydown: (event, { api, props }) => api.cellKeydown(event, { row: 0, col: props.col }),
-        pointerdown: (event, { api, props }) => api.cellPointerdown(event, { row: 0, col: props.col }),
+        keydown: (event, { api, props }) =>
+          api.cellKeydown(event, { row: 0, col: props.col }),
+        pointerdown: (event, { api, props }) =>
+          api.cellPointerdown(event, { row: 0, col: props.col }),
         click: (_event, { api, props }) => api.sortBy(props.col),
       },
-      bind: (el, { api, props }) => api.grid.bind(el, { row: 0, col: props.col }),
+      bind: (el, { api, props }) =>
+        api.grid.bind(el, { row: 0, col: props.col }),
     }),
     body: slot({
       attrs: (state, { api }) => ({
         role: "rowgroup",
-        style: css({ position: "relative", height: `${state.rows.length * api.rowHeight()}px` }),
+        style: css({
+          position: "relative",
+          height: `${state.rows.length * api.rowHeight()}px`,
+        }),
       }),
     }),
-    row: slot<{ value: string; index: number; start: number }, DataGridRowState>({
+    row: slot<
+      { value: string; index: number; start: number },
+      DataGridRowState
+    >({
       props: { value: "string", index: "number", start: "number" },
       state: (state, { key, props, api }) => ({
         row: api.sorted()[props.index],
@@ -315,11 +401,15 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
         }),
       }),
     }),
-    cell: slot<{ value: string; row: number; col: number; rowId: string }, DataGridCellState>({
+    cell: slot<
+      { value: string; row: number; col: number; rowId: string },
+      DataGridCellState
+    >({
       props: { value: "string", row: "number", col: "number", rowId: "string" },
       state: (state, { props, api }) => ({
         value: api.rowById(props.rowId)?.[api.columns()[props.col].key],
-        active: state.active?.row === props.row && state.active.col === props.col,
+        active:
+          state.active?.row === props.row && state.active.col === props.col,
         editing: state.editing === cellId(props.rowId, props.col),
       }),
       attrs: (state, { props, api }) => {
@@ -327,16 +417,21 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
         return {
           role: "gridcell",
           "aria-colindex": String(props.col + 1),
-          "aria-readonly": api.columns()[props.col].editable ? undefined : "true",
+          "aria-readonly": api.columns()[props.col].editable
+            ? undefined
+            : "true",
           tabindex: api.grid.tabIndex(state, cell),
           "data-active": api.grid.isActive(state, cell) ? "" : undefined,
-          "data-editing": state.editing === cellId(props.rowId, props.col) ? "" : undefined,
+          "data-editing":
+            state.editing === cellId(props.rowId, props.col) ? "" : undefined,
         }
       },
       on: {
         keydown: (event, { api, props }) => api.cellKeydown(event, props),
-        pointerdown: (event, { api, props }) => api.cellPointerdown(event, props),
-        dblclick: (event, { api, props }) => api.edit.dblclick(event, cellId(props.rowId, props.col)),
+        pointerdown: (event, { api, props }) =>
+          api.cellPointerdown(event, props),
+        dblclick: (event, { api, props }) =>
+          api.edit.dblclick(event, cellId(props.rowId, props.col)),
       },
       bind: (el, { api, props }) => api.grid.bind(el, props),
     }),
@@ -351,9 +446,16 @@ const dataGrid = /* @__PURE__ */ definePrimitive({
   }),
 })
 
-const parts = createParts(dataGrid, { header: "div", body: "div", editor: "input" })
+const parts = createParts(dataGrid, {
+  header: "div",
+  body: "div",
+  editor: "input",
+})
 
-const DataGridRowContext = React.createContext<{ rowId: string; index: number } | null>(null)
+const DataGridRowContext = React.createContext<{
+  rowId: string
+  index: number
+} | null>(null)
 
 function DataGrid({
   columns,
@@ -381,7 +483,11 @@ function DataGrid({
     rowHeight,
   })
   const { virtual } = handle.api
-  const items = React.useSyncExternalStore(virtual.subscribe, virtual.items, virtual.items)
+  const items = React.useSyncExternalStore(
+    virtual.subscribe,
+    virtual.items,
+    virtual.items
+  )
   const own = { className, style, children }
   return usePart(
     handle,
@@ -389,8 +495,12 @@ function DataGrid({
     {},
     {
       ...props,
-      render: (merged, state) => renderElement("div", mergeProps(own, merged), render, { ...state, items }),
-    },
+      render: (merged, state) =>
+        renderElement("div", mergeProps(own, merged), render, {
+          ...state,
+          items,
+        }),
+    }
   )
 }
 
@@ -405,43 +515,89 @@ function DataGridColumnHeader({
 
 const DataGridBody = parts.Body
 
-function DataGridRow({ item, ...props }: { item: VirtualItem } & PartProps<"div", DataGridRowState>) {
-  const row = React.useMemo(() => ({ rowId: item.key, index: item.index }), [item.key, item.index])
+function DataGridRow({
+  item,
+  ...props
+}: { item: VirtualItem } & PartProps<"div", DataGridRowState>) {
+  const row = React.useMemo(
+    () => ({ rowId: item.key, index: item.index }),
+    [item.key, item.index]
+  )
   return (
     <DataGridRowContext.Provider value={row}>
-      {usePart(dataGrid, "row", { value: item.key, index: item.index, start: item.start }, props)}
+      {usePart(
+        dataGrid,
+        "row",
+        { value: item.key, index: item.index, start: item.start },
+        props
+      )}
     </DataGridRowContext.Provider>
   )
 }
 
-function DataGridCell({ col, ...props }: { col: number } & PartProps<"div", DataGridCellState>) {
+function DataGridCell({
+  col,
+  ...props
+}: { col: number } & PartProps<"div", DataGridCellState>) {
   const row = React.useContext(DataGridRowContext)
-  if (!row) throw new Error("DataGridCell must be used inside <DataGridRow>.")
-  const part = { value: cellId(row.rowId, col), row: row.index + 1, col, rowId: row.rowId }
+  if (!row) {
+    throw new Error("DataGridCell must be used inside <DataGridRow>.")
+  }
+  const part = {
+    value: cellId(row.rowId, col),
+    row: row.index + 1,
+    col,
+    rowId: row.rowId,
+  }
   return usePart(dataGrid, "cell", part, props)
 }
 
 const DataGridEditor = parts.Editor
 
-type Person = { id: string; name: string; email: string; role: string; status: string; spend: number }
+type Person = {
+  id: string
+  name: string
+  email: string
+  role: string
+  status: string
+  spend: number
+}
 
 const columns: (DataGridColumn & { label: string; width: string })[] = [
   { key: "name", label: "Name", editable: true, width: "minmax(10rem,1.4fr)" },
   { key: "email", label: "Email", editable: true, width: "minmax(12rem,2fr)" },
   { key: "role", label: "Role", width: "minmax(6rem,0.8fr)" },
   { key: "status", label: "Status", width: "minmax(6rem,0.8fr)" },
-  { key: "spend", label: "Spend", editable: true, numeric: true, width: "minmax(6rem,0.8fr)" },
+  {
+    key: "spend",
+    label: "Spend",
+    editable: true,
+    numeric: true,
+    width: "minmax(6rem,0.8fr)",
+  },
 ]
 
 const template = columns.map((column) => column.width).join(" ")
-const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 })
+const money = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+})
 const tones: Record<string, string> = { Active: "#10b981", Invited: "#f59e0b" }
 
-const PersonRow = React.memo(function PersonRow({ item }: { item: VirtualItem }) {
+const PersonRow = React.memo(function PersonRow({
+  item,
+}: {
+  item: VirtualItem
+}) {
   return (
     <DataGridRow item={item}>
       {columns.map((column, col) => (
-        <DataGridCell key={column.key} col={col} data-numeric={column.numeric ? "" : undefined}>
+        <DataGridCell
+          key={column.key}
+          col={col}
+          data-numeric={column.numeric ? "" : undefined}
+        >
           {({ value, editing }) =>
             editing ? (
               <DataGridEditor />
@@ -450,12 +606,16 @@ const PersonRow = React.memo(function PersonRow({ item }: { item: VirtualItem })
                 <span
                   data-slot="swatch"
                   aria-hidden="true"
-                  style={{ background: tones[value as string] ?? "var(--muted)" }}
+                  style={{
+                    background: tones[value as string] ?? "var(--muted)",
+                  }}
                 />
                 {value as string}
               </span>
             ) : (
-              <span>{column.numeric ? money.format(value as number) : String(value)}</span>
+              <span>
+                {column.numeric ? money.format(value as number) : String(value)}
+              </span>
             )
           }
         </DataGridCell>
@@ -542,7 +702,11 @@ function Example() {
                 >
                   {column.label}
                   <span data-slot="data-grid-sort" aria-hidden="true">
-                    {sort?.col === col ? (sort.direction === "ascending" ? "↑" : "↓") : ""}
+                    {sort?.col === col
+                      ? sort.direction === "ascending"
+                        ? "↑"
+                        : "↓"
+                      : ""}
                   </span>
                 </DataGridColumnHeader>
               ))}
@@ -557,8 +721,10 @@ function Example() {
       </DataGrid>
       <p data-slot="output">
         {rows.length.toLocaleString()} people.{" "}
-        {selected.length ? `${selected.length.toLocaleString()} selected.` : "Space selects a row."} Enter, F2
-        or typing edits Name, Email and Spend.
+        {selected.length
+          ? `${selected.length.toLocaleString()} selected.`
+          : "Space selects a row."}{" "}
+        Enter, F2 or typing edits Name, Email and Spend.
       </p>
     </div>
   )

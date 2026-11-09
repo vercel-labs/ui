@@ -21,9 +21,16 @@
   let reason = $state("")
   let rested = $state("")
 
-  function onPageChange(next: number, details: { reason: string; cancel: () => void }) {
-    if (next === cancel) return details.cancel()
-    if (controlled) page = next
+  function onPageChange(
+    next: number,
+    details: { reason: string; cancel: () => void }
+  ) {
+    if (next === cancel) {
+      return details.cancel()
+    }
+    if (controlled) {
+      page = next
+    }
     action = String(next)
     reason = details.reason
   }
@@ -62,12 +69,20 @@
       </CarouselContent>
     </CarouselViewport>
     <div class="carousel-controls">
-      <CarouselPrevious class="carousel-step">{carouselFixture.previous}</CarouselPrevious>
+      <CarouselPrevious class="carousel-step"
+        >{carouselFixture.previous}</CarouselPrevious
+      >
       <CarouselNext class="carousel-step">{carouselFixture.next}</CarouselNext>
     </div>
-    <CarouselIndicatorGroup class="carousel-controls" aria-label={carouselFixture.indicators}>
+    <CarouselIndicatorGroup
+      class="carousel-controls"
+      aria-label={carouselFixture.indicators}
+    >
       {#each carouselFixture.slides as slide, index (slide.title)}
-        <CarouselIndicator class="carousel-indicator" aria-label={carouselFixture.indicator(index + 1)}>
+        <CarouselIndicator
+          class="carousel-indicator"
+          aria-label={carouselFixture.indicator(index + 1)}
+        >
           {index + 1}
         </CarouselIndicator>
       {/each}

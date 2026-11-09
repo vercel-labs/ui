@@ -1,4 +1,8 @@
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui-sdk/solid/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/solid/hover-card"
 import { render } from "@solidjs/web"
 
 function Fixture() {

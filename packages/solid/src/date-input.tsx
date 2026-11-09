@@ -1,7 +1,12 @@
 import { dateInput, type DateInputOptions } from "@ui-sdk/core/date-input"
 import { omit } from "solid-js"
 import { useFieldControl } from "./field-context"
-import { renderRoot, renderSegment, type RootProps, type SegmentProps } from "./segmented-input"
+import {
+  renderRoot,
+  renderSegment,
+  type RootProps,
+  type SegmentProps,
+} from "./segmented-input"
 import { usePrimitive } from "./use-primitive"
 
 /**
@@ -48,7 +53,7 @@ function DateInput(props: DateInputOptions & RootProps) {
     "name",
     "form",
     "controller",
-    "debug",
+    "debug"
   )
   return renderRoot(handle, field, rest, DateInputSegment)
 }

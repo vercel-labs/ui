@@ -1,5 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { toText, TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/react/token-input"
+import {
+  toText,
+  TokenInput,
+  TokenInputEditor,
+  type TokenInputValue,
+} from "@ui-sdk/react/token-input"
 import {
   type TriggerMenuDataItem,
   TriggerMenu,
@@ -36,10 +41,14 @@ function Example() {
         onValueChange={(next, details) => {
           setValue(next)
           const removed = details.removed.map((token) => token.label).join(", ")
-          log(`${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`)
+          log(
+            `${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`
+          )
         }}
         history={{ limit: 50, groupDelay: 1000 }}
-        getTokenDescription={(token) => (token.type === "file" ? "attached file" : token.type)}
+        getTokenDescription={(token) =>
+          token.type === "file" ? "attached file" : token.type
+        }
       >
         <TokenInputEditor />
         <TriggerMenu triggers={[{ char: "@", type: "file", items: files }]}>
@@ -47,7 +56,11 @@ function Example() {
             <TriggerMenuList>
               {(state) =>
                 (state.items as TriggerMenuDataItem[]).map((item) => (
-                  <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+                  <TriggerMenuItem
+                    key={item.value}
+                    value={item.value}
+                    label={item.label}
+                  >
                     {item.label}
                   </TriggerMenuItem>
                 ))

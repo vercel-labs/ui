@@ -9,8 +9,11 @@ const calendarFixture = {
 }
 
 // What the "Last action" status says after a change.
-const calendarAction = (key: "value" | "month", value: unknown, reason: string) =>
-  `${key}: ${JSON.stringify(value)} (${reason})`
+const calendarAction = (
+  key: "value" | "month",
+  value: unknown,
+  reason: string
+) => `${key}: ${JSON.stringify(value)} (${reason})`
 
 // Options a spec can set through the URL: ?mode=multiple|range,
 // ?value=<date>[,<date>] (the default value), ?month=<YYYY-MM>, ?min, ?max,
@@ -22,12 +25,19 @@ const calendarAction = (key: "value" | "month", value: unknown, reason: string) 
 // ?selects (month and year selects in the header).
 function calendarOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   const string = (name: string) => params.get(name) ?? undefined
   const mode = (string("mode") ?? "single") as "single" | "multiple" | "range"
   const dates = params.get("value")?.split(",").filter(Boolean) ?? []
   const value =
-    mode === "single" ? (dates[0] ?? null) : mode === "range" ? (dates.length === 2 ? dates : null) : dates
+    mode === "single"
+      ? (dates[0] ?? null)
+      : mode === "range"
+        ? dates.length === 2
+          ? dates
+          : null
+        : dates
   const unavailable = params.get("unavailable")
   return {
     mode,
@@ -38,7 +48,11 @@ function calendarOptions() {
     months: number("months"),
     pageBy: params.has("page") ? ("page" as const) : undefined,
     unavailable:
-      unavailable === "weekends" ? { weekday: [0, 6] } : unavailable ? unavailable.split(",") : undefined,
+      unavailable === "weekends"
+        ? { weekday: [0, 6] }
+        : unavailable
+          ? unavailable.split(",")
+          : undefined,
     weekStartsOn: number("weekStart"),
     fixedWeeks: params.has("fixed") || undefined,
     showOutsideDays: params.has("hideOutside") ? false : undefined,

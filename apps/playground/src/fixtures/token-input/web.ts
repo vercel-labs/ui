@@ -9,8 +9,17 @@ import {
 async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/token-input")
   await import("@ui-sdk/web/trigger-menu")
-  const { value, pending, fail, tokenDeletion, submitShortcut, copy, disabled, readOnly, otherForm } =
-    tokenInputOptions()
+  const {
+    value,
+    pending,
+    fail,
+    tokenDeletion,
+    submitShortcut,
+    copy,
+    disabled,
+    readOnly,
+    otherForm,
+  } = tokenInputOptions()
   const template = document.createElement("template")
   template.innerHTML = `
     <div class="fixture">
@@ -38,18 +47,29 @@ async function mount(root: HTMLElement) {
     </div>`
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
   const tokens = template.content.querySelector("ui-token-input")!
-  if (tokenDeletion) tokens.setAttribute("token-deletion", tokenDeletion)
-  if (submitShortcut) tokens.setAttribute("submit-shortcut", submitShortcut)
-  if (copy) tokens.setAttribute("copy", copy)
+  if (tokenDeletion) {
+    tokens.setAttribute("token-deletion", tokenDeletion)
+  }
+  if (submitShortcut) {
+    tokens.setAttribute("submit-shortcut", submitShortcut)
+  }
+  if (copy) {
+    tokens.setAttribute("copy", copy)
+  }
   root.replaceChildren(template.content)
   const input = root.querySelector("ui-token-input")!
-  if (value) input.setAttribute("value", value)
+  if (value) {
+    input.setAttribute("value", value)
+  }
   const menu = root.querySelector("ui-trigger-menu")!
   menu.triggers = tokenTriggers()
   menu.addEventListener("itemselect", (event) => {
-    if (pending && event.detail.trigger === "@") event.detail.waitUntil(pendingSelect({ fail }))
+    if (pending && event.detail.trigger === "@") {
+      event.detail.waitUntil(pendingSelect({ fail }))
+    }
   })
-  const output = (name: string) => root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
+  const output = (name: string) =>
+    root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
   input.addEventListener("valuechange", (event) => {
     output("Last action").textContent =
       `${event.detail.reason}:${toText(event.detail.value as TokenInputValue)}`

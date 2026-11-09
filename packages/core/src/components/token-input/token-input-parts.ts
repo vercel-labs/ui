@@ -23,11 +23,17 @@ import { live } from "../../foundation/kernel/live"
 import { writeStyle } from "../../foundation/platform/style"
 
 function editorState(state: TokenInputState) {
-  return { empty: valueLength(state.value) === 0, disabled: isDisabled(state), readOnly: state.readOnly }
+  return {
+    empty: valueLength(state.value) === 0,
+    disabled: isDisabled(state),
+    readOnly: state.readOnly,
+  }
 }
 
 function tokenState(state: TokenInputState, props: TokenInputTokenProps) {
-  const token = tokensOf(state.value).find((candidate) => candidate.id === props.token) ?? {
+  const token = tokensOf(state.value).find(
+    (candidate) => candidate.id === props.token
+  ) ?? {
     type: "",
     value: "",
     label: "",
@@ -42,7 +48,8 @@ function tokenState(state: TokenInputState, props: TokenInputTokenProps) {
   }
 }
 
-const isSelected = (state: TokenInputState, id: string) => !!id && ` ${state.selected} `.includes(` ${id} `)
+const isSelected = (state: TokenInputState, id: string) =>
+  !!id && ` ${state.selected} `.includes(` ${id} `)
 
 // The editor keeps white space and new lines as typed. In the lowest cascade
 // layer, so any class wins.
@@ -50,22 +57,29 @@ function editorStyles(doc: Document) {
   writeStyle(
     doc,
     "ui-sdk-token-input",
-    '@layer ui-sdk { :where([data-slot="token-input-editor"]) { white-space: pre-wrap; overflow-wrap: anywhere } :where([data-slot="token-input-host"]) { user-select: all } }',
+    '@layer ui-sdk { :where([data-slot="token-input-editor"]) { white-space: pre-wrap; overflow-wrap: anywhere } :where([data-slot="token-input-host"]) { user-select: all } }'
   )
 }
 
-const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => ({
+const tokenInputSlots = (
+  slot: SlotFactory<TokenInputState, TokenInputApi>
+) => ({
   // Web components only: the element takes part in forms with the codec text.
   // A field can disable it without the `disabled` attribute the browser leaves
   // a control out of the form by, so disabled it submits and validates nothing.
   root: slot({
     bind: (el, { api, store }) =>
       bindInternals(el, {
-        value: () => (store.get().name && !isDisabled(store.get()) ? api.internal.text() : null),
+        value: () =>
+          store.get().name && !isDisabled(store.get())
+            ? api.internal.text()
+            : null,
         state: api.internal.text,
         restore: api.internal.restore,
         valueMissing: () =>
-          store.get().required && !isDisabled(store.get()) && valueLength(store.get().value) === 0,
+          store.get().required &&
+          !isDisabled(store.get()) &&
+          valueLength(store.get().value) === 0,
         message: () => valueMissingMessage("text"),
         anchor: () => api.editor.element,
         focus: () => api.focus(),
@@ -102,7 +116,8 @@ const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => (
         describe: api.internal.describe,
         customContent: () => store.get().custom,
         // The hosts count what the editor holds now, which the page decides.
-        onHosts: () => measured(() => store.set({ hosts: store.get().hosts + 1 })),
+        onHosts: () =>
+          measured(() => store.set({ hosts: store.get().hosts + 1 })),
       })
       api.internal.setView(view)
       const unbind = bindTokenEditing(el, view, api)
@@ -110,15 +125,22 @@ const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => (
       let selected = ""
       const writeSelected = () => {
         const state = store.get()
-        if (state.selected === selected) return
+        if (state.selected === selected) {
+          return
+        }
         selected = state.selected
-        for (const token of tokensOf(state.value))
-          view.hostElement(token.id!)?.toggleAttribute("data-selected", isSelected(state, token.id!))
+        for (const token of tokensOf(state.value)) {
+          view
+            .hostElement(token.id!)
+            ?.toggleAttribute("data-selected", isSelected(state, token.id!))
+        }
       }
       // A framework can turn custom content on after the hosts exist, or off.
       let custom = store.get().custom
       const writeLabels = () => {
-        if (store.get().custom === custom) return
+        if (store.get().custom === custom) {
+          return
+        }
         custom = store.get().custom
         view.showLabels()
       }
@@ -141,7 +163,10 @@ const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => (
     props: { token: "string" },
     state: (state, { props }) => tokenState(state, props),
     attrs: (state, { props }) => {
-      const { token, pending, unresolved, disabled, readOnly } = tokenState(state, props)
+      const { token, pending, unresolved, disabled, readOnly } = tokenState(
+        state,
+        props
+      )
       return {
         "data-token-type": token.type,
         "data-pending": pending ? "" : undefined,
@@ -150,7 +175,9 @@ const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => (
         "data-readonly": readOnly ? "" : undefined,
       }
     },
-    live: live((state, { props }) => ({ "data-selected": isSelected(state, props.token) ? "" : undefined })),
+    live: live((state, { props }) => ({
+      "data-selected": isSelected(state, props.token) ? "" : undefined,
+    })),
   }),
 
   // Removes its token. For pointers only: the keyboard's way is Backspace.
@@ -166,7 +193,9 @@ const tokenInputSlots = (slot: SlotFactory<TokenInputState, TokenInputApi>) => (
     // Pressing it keeps focus and the caret in the editor.
     on: pressKeepsFocus,
     press: ({ api, props }, event) => {
-      if (api.internal.editable()) api.internal.removeToken(props.token, { reason: "remove-press", event })
+      if (api.internal.editable()) {
+        api.internal.removeToken(props.token, { reason: "remove-press", event })
+      }
     },
   }),
 

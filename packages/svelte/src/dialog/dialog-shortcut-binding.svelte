@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { DialogShortcutProps, DialogShortcutState } from "@ui-sdk/core/dialog"
+  import type {
+    DialogShortcutProps,
+    DialogShortcutState,
+  } from "@ui-sdk/core/dialog"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import type { DialogContext } from "./context"
@@ -10,12 +13,13 @@
     shortcut,
     children,
     ...rest
-  }: PartProps<"span", DialogShortcutState> & DialogShortcutProps & { owner: DialogContext } = $props()
+  }: PartProps<"span", DialogShortcutState> &
+    DialogShortcutProps & { owner: DialogContext } = $props()
 
   const part = useHandlePart(
     () => owner.handle,
     "shortcut",
-    () => ({ shortcut }),
+    () => ({ shortcut })
   )
 </script>
 

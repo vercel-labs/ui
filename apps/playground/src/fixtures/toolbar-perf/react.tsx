@@ -9,7 +9,11 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Toolbar className="toolbar" aria-label="Formatting" style={{ flexWrap: "wrap" }}>
+      <Toolbar
+        className="toolbar"
+        aria-label="Formatting"
+        style={{ flexWrap: "wrap" }}
+      >
         {items.map((item) => (
           <ToolbarButton key={item.value}>{item.label}</ToolbarButton>
         ))}

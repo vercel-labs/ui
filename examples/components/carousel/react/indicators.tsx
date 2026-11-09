@@ -32,7 +32,11 @@ function Example() {
       </CarouselViewport>
       <CarouselIndicatorGroup aria-label="Choose a photo">
         {photos.map((photo, index) => (
-          <CarouselIndicator key={photo.name} page={index + 1} aria-label={photo.name} />
+          <CarouselIndicator
+            key={photo.name}
+            page={index + 1}
+            aria-label={photo.name}
+          />
         ))}
       </CarouselIndicatorGroup>
     </Carousel>

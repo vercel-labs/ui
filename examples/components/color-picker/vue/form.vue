@@ -13,7 +13,9 @@ import { useLog } from "../../../shared/vue/log"
 const log = useLog()
 
 function onSubmit(event: SubmitEvent) {
-  log(`Submitted brand=${new FormData(event.currentTarget as HTMLFormElement).get("brand")}`)
+  log(
+    `Submitted brand=${new FormData(event.currentTarget as HTMLFormElement).get("brand")}`
+  )
 }
 </script>
 

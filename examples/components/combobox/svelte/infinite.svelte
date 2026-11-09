@@ -39,14 +39,26 @@
     "Arrival",
   ]
 
-  function searchMoviePages(query: string, { signal, page }: { signal: AbortSignal; page: number }) {
-    return new Promise<{ items: { value: string; label: string }[]; hasMore: boolean }>((resolve, reject) => {
+  function searchMoviePages(
+    query: string,
+    { signal, page }: { signal: AbortSignal; page: number }
+  ) {
+    return new Promise<{
+      items: { value: string; label: string }[]
+      hasMore: boolean
+    }>((resolve, reject) => {
       const timer = setTimeout(() => {
         const needle = query.trim().toLowerCase()
         const found = movieTitles
           .filter((title) => title.toLowerCase().includes(needle))
-          .map((title) => ({ value: title.toLowerCase().replace(/\W+/g, "-"), label: title }))
-        resolve({ items: found.slice(page * 5, page * 5 + 5), hasMore: found.length > page * 5 + 5 })
+          .map((title) => ({
+            value: title.toLowerCase().replace(/\W+/g, "-"),
+            label: title,
+          }))
+        resolve({
+          items: found.slice(page * 5, page * 5 + 5),
+          hasMore: found.length > page * 5 + 5,
+        })
       }, 500)
       signal.addEventListener("abort", () => {
         clearTimeout(timer)
@@ -82,8 +94,12 @@
     </ComboboxEmpty>
     <ComboboxList>
       {#snippet children(state)}
-        {#each (state.items as { value: string; label: string; disabled?: boolean }[]) as item (item.value)}
-          <ComboboxItem value={item.value} label={item.label} disabled={item.disabled}>
+        {#each state.items as { value: string; label: string; disabled?: boolean }[] as item (item.value)}
+          <ComboboxItem
+            value={item.value}
+            label={item.label}
+            disabled={item.disabled}
+          >
             {item.label}
             <ComboboxItemIndicator>
               <CheckIcon aria-hidden="true" />
@@ -94,7 +110,11 @@
     </ComboboxList>
     <ComboboxStatus>
       {#snippet children(state)}
-        {state.loading ? "Loading more…" : movies.state.hasMore ? `${state.count} loaded` : `All ${state.count}`}
+        {state.loading
+          ? "Loading more…"
+          : movies.state.hasMore
+            ? `${state.count} loaded`
+            : `All ${state.count}`}
       {/snippet}
     </ComboboxStatus>
   </ComboboxContent>

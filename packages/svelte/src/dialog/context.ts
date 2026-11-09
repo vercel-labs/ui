@@ -26,12 +26,26 @@ const DialogKey = Symbol("dialog")
 // dialog comes from here.
 const TriggerKey = Symbol("dialog-trigger")
 
-type TriggerContext = { shortcut: () => string | undefined; dialog: () => DialogContext | undefined }
+type TriggerContext = {
+  shortcut: () => string | undefined
+  dialog: () => DialogContext | undefined
+}
 
 function useDialog() {
   const context = getContext<DialogContext | undefined>(DialogKey)
-  if (!context) throw new Error("Dialog parts must be used inside <Dialog> or <AlertDialog>.")
+  if (!context) {
+    throw new Error(
+      "Dialog parts must be used inside <Dialog> or <AlertDialog>."
+    )
+  }
   return context
 }
 
-export { type DialogContext, type DialogHandle, DialogKey, type TriggerContext, TriggerKey, useDialog }
+export {
+  type DialogContext,
+  type DialogHandle,
+  DialogKey,
+  type TriggerContext,
+  TriggerKey,
+  useDialog,
+}

@@ -14,7 +14,9 @@ const id = useId()
 <template>
   <FieldSet>
     <FieldLegend :id="`${id}-legend`">Billing period</FieldLegend>
-    <FieldDescription :id="`${id}-description`">Yearly billing gets you two months free.</FieldDescription>
+    <FieldDescription :id="`${id}-description`"
+      >Yearly billing gets you two months free.</FieldDescription
+    >
     <RadioGroup
       default-value="monthly"
       :aria-labelledby="`${id}-legend`"

@@ -2,7 +2,11 @@ import { Rating, RatingItem } from "@ui-sdk/solid/rating"
 
 function Example() {
   return (
-    <Rating value={4.2} readOnly getValueLabel={(value, max) => `Rated ${value} out of ${max}`}>
+    <Rating
+      value={4.2}
+      readOnly
+      getValueLabel={(value, max) => `Rated ${value} out of ${max}`}
+    >
       <RatingItem>
         <svg
           viewBox="0 0 24 24"

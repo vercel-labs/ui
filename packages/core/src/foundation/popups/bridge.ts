@@ -18,7 +18,9 @@ function bridgeBetween(trigger: Box, popup: Box, padding = 4) {
     for (let index = 0; index < hull.length; index++) {
       const from = hull[index]
       const to = hull[(index + 1) % hull.length]
-      if ((to.x - from.x) * (y - from.y) - (to.y - from.y) * (x - from.x) < 0) return false
+      if ((to.x - from.x) * (y - from.y) - (to.y - from.y) * (x - from.x) < 0) {
+        return false
+      }
     }
     return true
   }
@@ -33,8 +35,12 @@ function convexHull(points: Point[]) {
   const half = (list: Point[]) => {
     const chain: Point[] = []
     for (const point of list) {
-      while (chain.length >= 2 && cross(chain[chain.length - 2], chain[chain.length - 1], point) <= 0)
+      while (
+        chain.length >= 2 &&
+        cross(chain[chain.length - 2], chain[chain.length - 1], point) <= 0
+      ) {
         chain.pop()
+      }
       chain.push(point)
     }
     chain.pop()

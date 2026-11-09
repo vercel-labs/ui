@@ -19,7 +19,7 @@ export function mount(root: HTMLElement) {
           ${commands
             .map(
               (item) =>
-                `<ui-command-item value="${item.value}" label="${item.label}">${item.label}</ui-command-item>`,
+                `<ui-command-item value="${item.value}" label="${item.label}">${item.label}</ui-command-item>`
             )
             .join("")}
         </ui-command-list>

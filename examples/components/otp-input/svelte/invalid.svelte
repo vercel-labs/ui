@@ -1,6 +1,10 @@
 <script lang="ts">
   import { Field, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
-  import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
+  import {
+    OTPInput,
+    OTPInputGroup,
+    OTPInputSlot,
+  } from "@ui-sdk/svelte/otp-input"
 
   let invalid = $state(true)
 </script>

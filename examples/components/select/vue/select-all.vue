@@ -24,9 +24,16 @@ const regions = [
 <template>
   <Field>
     <FieldLabel>Regions</FieldLabel>
-    <Select multiple :default-value="['us-east', 'europe', 'asia-pacific']" placeholder="Select regions">
+    <Select
+      multiple
+      :default-value="['us-east', 'europe', 'asia-pacific']"
+      placeholder="Select regions"
+    >
       <SelectTrigger>
-        <SelectValue :max-labels="2" :get-more-label="(count: number) => `${count} more`" />
+        <SelectValue
+          :max-labels="2"
+          :get-more-label="(count: number) => `${count} more`"
+        />
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
@@ -36,7 +43,11 @@ const regions = [
           <MinusIcon v-if="state.indeterminate" />
         </SelectSelectAll>
         <SelectSeparator />
-        <SelectItem v-for="region in regions" :key="region.value" :value="region.value">
+        <SelectItem
+          v-for="region in regions"
+          :key="region.value"
+          :value="region.value"
+        >
           {{ region.label }}
           <SelectItemIndicator>
             <CheckIcon />

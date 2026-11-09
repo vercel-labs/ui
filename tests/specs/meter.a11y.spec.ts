@@ -6,7 +6,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations at rest", async ({ page, open }) => {
@@ -14,10 +16,18 @@ test("no axe violations at rest", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with a value past the maximum", async ({ page, open }) => {
+test("no axe violations with a value past the maximum", async ({
+  page,
+  open,
+}) => {
   await open("meter")
-  for (let step = 0; step < 3; step++) await page.getByRole("button", { name: "Fill" }).click()
-  await expect(page.getByRole("meter", { name: "Storage" })).toHaveAttribute("aria-valuenow", "100")
+  for (let step = 0; step < 3; step++) {
+    await page.getByRole("button", { name: "Fill" }).click()
+  }
+  await expect(page.getByRole("meter", { name: "Storage" })).toHaveAttribute(
+    "aria-valuenow",
+    "100"
+  )
   expect(await audit(page)).toEqual([])
 })
 
@@ -41,16 +51,23 @@ test("only a meter without a label or aria-label warns in development, whatever 
 }) => {
   test.skip(!framework.startsWith("web"), "Adds meters through the DOM.")
   const printed: string[] = []
-  page.on("console", (message) => message.type() === "warning" && printed.push(message.text()))
+  page.on(
+    "console",
+    (message) => message.type() === "warning" && printed.push(message.text())
+  )
   await open("meter")
   await page.evaluate(() => {
     const meter = (attributes: string) =>
       `<ui-meter ${attributes} value="30"><ui-meter-value></ui-meter-value></ui-meter>`
     document
       .querySelector(".fixture")!
-      .insertAdjacentHTML("beforeend", meter('id="unnamed"') + meter('aria-label="Named"'))
+      .insertAdjacentHTML(
+        "beforeend",
+        meter('id="unnamed"') + meter('aria-label="Named"')
+      )
   })
-  const missing = () => printed.filter((text) => text.includes("Meter has no accessible name"))
+  const missing = () =>
+    printed.filter((text) => text.includes("Meter has no accessible name"))
   await expect.poll(() => missing().length).toBe(1)
   expect(missing()[0]).toContain("meter#unnamed")
 })

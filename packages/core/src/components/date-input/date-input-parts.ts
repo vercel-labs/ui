@@ -72,7 +72,9 @@ const empty: DateInputSegmentData = {
 
 // A segment as it stands now, so a part rendered from an older list stays current.
 const currentSegment = (state: State, props: Partial<DateInputSegmentProps>) =>
-  (props.segment && segmentFor(state, props.segment.key)) ?? props.segment ?? empty
+  (props.segment && segmentFor(state, props.segment.key)) ??
+  props.segment ??
+  empty
 
 // English, like Date Picker's, for what the browser has no message of its own.
 const badInputMessage = (state: State) =>
@@ -83,12 +85,24 @@ const nativeMessages = new Map<string, string>()
 
 // The browser's own message for a value before `min` or after `max`, in the
 // user's language, read from a detached native input of the same kind.
-function rangeMessage(state: State, problem: "rangeUnderflow" | "rangeOverflow") {
+function rangeMessage(
+  state: State,
+  problem: "rangeUnderflow" | "rangeOverflow"
+) {
   const bound = (problem === "rangeUnderflow" ? state.min : state.max) ?? ""
   const fallback =
-    problem === "rangeUnderflow" ? `Value must be ${bound} or later.` : `Value must be ${bound} or earlier.`
-  if (typeof document === "undefined") return fallback
-  const type = state.kind === "time" ? "time" : state.granularity === "day" ? "date" : "datetime-local"
+    problem === "rangeUnderflow"
+      ? `Value must be ${bound} or later.`
+      : `Value must be ${bound} or earlier.`
+  if (typeof document === "undefined") {
+    return fallback
+  }
+  const type =
+    state.kind === "time"
+      ? "time"
+      : state.granularity === "day"
+        ? "date"
+        : "datetime-local"
   const key = `${type}|${problem}|${bound}`
   let message = nativeMessages.get(key)
   if (message === undefined) {
@@ -99,10 +113,20 @@ function rangeMessage(state: State, problem: "rangeUnderflow" | "rangeOverflow")
         : bound
     if (problem === "rangeUnderflow") {
       input.min = native
-      input.value = type === "time" ? "00:00" : type === "date" ? "0001-01-01" : "0001-01-01T00:00"
+      input.value =
+        type === "time"
+          ? "00:00"
+          : type === "date"
+            ? "0001-01-01"
+            : "0001-01-01T00:00"
     } else {
       input.max = native
-      input.value = type === "time" ? "23:59" : type === "date" ? "9999-12-31" : "9999-12-31T23:59"
+      input.value =
+        type === "time"
+          ? "23:59"
+          : type === "date"
+            ? "9999-12-31"
+            : "9999-12-31T23:59"
     }
     message = input.validationMessage || fallback
     nativeMessages.set(key, message)
@@ -111,9 +135,13 @@ function rangeMessage(state: State, problem: "rangeUnderflow" | "rangeOverflow")
 }
 
 function problemMessage(state: State) {
-  if (isPartial(state)) return badInputMessage(state)
+  if (isPartial(state)) {
+    return badInputMessage(state)
+  }
   const problem = problemOf(state)
-  if (problem === "unavailable") return unavailableMessage
+  if (problem === "unavailable") {
+    return unavailableMessage
+  }
   return problem ? rangeMessage(state, problem) : ""
 }
 
@@ -141,41 +169,64 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
     on: {
       // Keeps focus in the field until the click below picks a segment.
       mousedown(event, { api }) {
-        if (api.internal.nearestSegment(event)) event.preventDefault()
+        if (api.internal.nearestSegment(event)) {
+          event.preventDefault()
+        }
       },
-      click: (event, { api }) => api.internal.nearestSegment(event)?.focus({ preventScroll: true }),
+      click: (event, { api }) =>
+        api.internal.nearestSegment(event)?.focus({ preventScroll: true }),
     },
     bind(el, { api, store }) {
       // A native segment carries the input's problems, unless the root reports them itself.
       let carrier: HTMLInputElement | undefined
       const validate = () => {
-        if (formInternals(el)) return
+        if (formInternals(el)) {
+          return
+        }
         const first = api.internal.firstSegment()
-        if (carrier && carrier !== first) setComponentValidity(carrier, "")
+        if (carrier && carrier !== first) {
+          setComponentValidity(carrier, "")
+        }
         carrier = first
-        if (first) setComponentValidity(first, problemMessage(store.get()))
+        if (first) {
+          setComponentValidity(first, problemMessage(store.get()))
+        }
       }
       queueMicrotask(validate)
       const cleanups = [
         api.internal.bindRoot(el),
         store.subscribe(validate),
-        () => carrier?.isConnected === false && setComponentValidity(carrier, ""),
+        () =>
+          carrier?.isConnected === false && setComponentValidity(carrier, ""),
         bindInternals(el, {
           value: () => store.get().value ?? "",
           state: () => store.get().value ?? "",
           restore: api.internal.restore,
           valueMissing: () => {
             const state = store.get()
-            return state.required && !state.readOnly && state.value === null && !isPartial(state)
+            return (
+              state.required &&
+              !state.readOnly &&
+              state.value === null &&
+              !isPartial(state)
+            )
           },
           message: () => valueMissingMessage("text"),
           invalid: () => {
             const state = store.get()
             // A read-only control is barred from validation, like a native one.
-            const problem = state.readOnly ? undefined : isPartial(state) ? "badInput" : problemOf(state)
-            if (!problem) return undefined
+            const problem = state.readOnly
+              ? undefined
+              : isPartial(state)
+                ? "badInput"
+                : problemOf(state)
+            if (!problem) {
+              return undefined
+            }
             return {
-              flags: { [problem === "unavailable" ? "customError" : problem]: true },
+              flags: {
+                [problem === "unavailable" ? "customError" : problem]: true,
+              },
               message: problemMessage(state),
               anchor: api.internal.firstSegment(),
             }
@@ -195,13 +246,23 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
   // from assistive technology, which hears each segment's name instead.
   segment: slot<DateInputSegmentProps, DateInputSegmentState>({
     props: { segment: "value" },
-    role: (state, { props }) => (currentSegment(state, props).editable ? "spinbutton" : undefined),
+    role: (state, { props }) =>
+      currentSegment(state, props).editable ? "spinbutton" : undefined,
     roles: ["spinbutton"],
     focus: (state, { props }) =>
       currentSegment(state, props).editable
         ? "native"
         : { none: "The text between segments is hidden and never focused." },
-    keys: ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End"],
+    keys: [
+      "ArrowLeft",
+      "ArrowRight",
+      "ArrowUp",
+      "ArrowDown",
+      "PageUp",
+      "PageDown",
+      "Home",
+      "End",
+    ],
     state: (state, { props }) => ({
       ...currentSegment(state, props),
       disabled: isDisabled(state),
@@ -210,14 +271,21 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
     }),
     attrs: (state, { props }) => {
       const segment = currentSegment(state, props)
-      if (!segment.editable) return { "aria-hidden": "true", "data-type": "literal", ...disabledAttrs(state) }
+      if (!segment.editable) {
+        return {
+          "aria-hidden": "true",
+          "data-type": "literal",
+          ...disabledAttrs(state),
+        }
+      }
       const invalid = !!problemOf(state)
       return {
         type: "text",
         value: segment.text,
         inputmode: segment.type === "dayPeriod" ? "text" : "numeric",
         "aria-label": segment.label,
-        "aria-valuenow": segment.value === null ? undefined : String(segment.value),
+        "aria-valuenow":
+          segment.value === null ? undefined : String(segment.value),
         "aria-valuemin": String(segment.min),
         "aria-valuemax": String(segment.max),
         "aria-valuetext": segment.empty ? "Empty" : segment.text,
@@ -240,16 +308,22 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
     on: {
       keydown(event, { api, el, props, store }) {
         const segment = currentSegment(store.get(), props)
-        if (el && segment.editable) api.internal.keydown(event, segment.type as EditableType, el)
+        if (el && segment.editable) {
+          api.internal.keydown(event, segment.type as EditableType, el)
+        }
       },
       paste(event, { api, props, store }) {
-        if (currentSegment(store.get(), props).editable) api.internal.paste(event)
+        if (currentSegment(store.get(), props).editable) {
+          api.internal.paste(event)
+        }
       },
       focusout: (event, { api }) => api.internal.blur(event),
     },
     bind(el, { api, store, props }) {
       const segment = currentSegment(store.get(), props)
-      if (!segment.editable || !(el instanceof HTMLInputElement)) return
+      if (!segment.editable || !(el instanceof HTMLInputElement)) {
+        return
+      }
       const type = segment.type as EditableType
       const input = el
       // iOS scrolls the page to the top when a segment selects its text while
@@ -257,23 +331,33 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
       let frame = 0
       const select = () => {
         cancelAnimationFrame(frame)
-        frame = requestAnimationFrame(() => input.matches(":focus") && input.select())
+        frame = requestAnimationFrame(
+          () => input.matches(":focus") && input.select()
+        )
       }
       // The text is written here, so the framework never fights the caret.
       const write = () => {
         const text = segmentFor(store.get(), type)?.text ?? ""
-        if (input.value !== text) input.value = text
-        if (input.matches(":focus")) select()
+        if (input.value !== text) {
+          input.value = text
+        }
+        if (input.matches(":focus")) {
+          select()
+        }
       }
       // Digits typed before the page ran fill the segment.
       api.internal.adopt(type, input, input.value)
       write()
       // React's beforeinput isn't the native event, so the segment listens itself.
       const onBeforeInput = (event: InputEvent) => {
-        if (!event.defaultPrevented) api.internal.beforeinput(event, type, input)
+        if (!event.defaultPrevented) {
+          api.internal.beforeinput(event, type, input)
+        }
       }
       const onInput = (event: Event) => {
-        if ((event as InputEvent).isComposing) return
+        if ((event as InputEvent).isComposing) {
+          return
+        }
         api.internal.adopt(type, input, input.value, event)
         write()
       }
@@ -311,4 +395,9 @@ const dateInputSlots = (slot: SlotFactory<State, DateInputApi>) => ({
   }),
 })
 
-export { dateInputSlots, type DateInputSegmentProps, type DateInputSegmentState, type DateInputState }
+export {
+  dateInputSlots,
+  type DateInputSegmentProps,
+  type DateInputSegmentState,
+  type DateInputState,
+}

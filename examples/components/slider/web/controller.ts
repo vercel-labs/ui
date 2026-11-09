@@ -35,9 +35,11 @@ function mount(root: HTMLElement) {
     read: () => log(root, `Volume is ${volume.getValue()}`),
     focus: () => volume.focus(),
   }
-  root.querySelectorAll<HTMLButtonElement>("[data-action]").forEach((button) => {
-    button.addEventListener("click", () => actions[button.dataset.action!]())
-  })
+  root
+    .querySelectorAll<HTMLButtonElement>("[data-action]")
+    .forEach((button) => {
+      button.addEventListener("click", () => actions[button.dataset.action!]())
+    })
   slider.addEventListener("valuechange", (event) => {
     const { value, reason } = event.detail
     log(root, `Volume ${value} (${reason})`)

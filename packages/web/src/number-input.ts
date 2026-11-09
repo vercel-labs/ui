@@ -10,8 +10,12 @@ const authoredDisabled = new WeakMap<HTMLElement, boolean>()
 
 function stepButtonProps(el: HTMLElement) {
   const inner = el.querySelector("button")
-  if (!inner) return {}
-  if (!authoredDisabled.has(inner)) authoredDisabled.set(inner, inner.hasAttribute("disabled"))
+  if (!inner) {
+    return {}
+  }
+  if (!authoredDisabled.has(inner)) {
+    authoredDisabled.set(inner, inner.hasAttribute("disabled"))
+  }
   return authoredDisabled.get(inner) ? { disabled: true } : {}
 }
 
@@ -35,11 +39,16 @@ function defineNumberInputElements() {
       kinds: { controlId: null },
       // A disabled <ui-field> around it disables it, as a disabled Field does
       // in the other frameworks.
-      options: (el) => ({ ...(el.closest("ui-field")?.hasAttribute("disabled") && { disabled: true }) }),
+      options: (el) => ({
+        ...(el.closest("ui-field")?.hasAttribute("disabled") && {
+          disabled: true,
+        }),
+      }),
       state: {
         value: {
           get: (api: NumberInputApi) => api.getValue(),
-          set: (api: NumberInputApi, value: number | null) => api.setValue(value),
+          set: (api: NumberInputApi, value: number | null) =>
+            api.setValue(value),
         },
       },
       api: ["getValue", "setValue", "increment", "decrement", "focus"],
@@ -70,7 +79,10 @@ function defineNumberInputElements() {
     // Any number of scrub areas, anywhere inside, or anywhere on the page with
     // `for="<number input id>"`, like an icon in a toolbar.
     "scrub-area": "ui-number-input-scrub-area",
-    "scrub-area-cursor": { tag: "ui-number-input-scrub-area-cursor", display: "block" },
+    "scrub-area-cursor": {
+      tag: "ui-number-input-scrub-area-cursor",
+      display: "block",
+    },
   })
 }
 

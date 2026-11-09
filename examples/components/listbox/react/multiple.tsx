@@ -1,6 +1,10 @@
 "use client"
 
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/react/listbox"
 import { CheckIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
@@ -20,7 +24,9 @@ function Example() {
     <Listbox
       multiple
       defaultValue={["cheese", "onion"]}
-      onValueChange={(value, details) => log(`${value.join(", ") || "Nothing"} (${details.reason})`)}
+      onValueChange={(value, details) =>
+        log(`${value.join(", ") || "Nothing"} (${details.reason})`)
+      }
       aria-label="Toppings"
     >
       {toppings.map((topping) => (

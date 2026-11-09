@@ -1,4 +1,10 @@
-import { Meter, MeterIndicator, MeterLabel, MeterTrack, MeterValue } from "@ui-sdk/react/meter"
+import {
+  Meter,
+  MeterIndicator,
+  MeterLabel,
+  MeterTrack,
+  MeterValue,
+} from "@ui-sdk/react/meter"
 
 export function Example() {
   return (
@@ -8,7 +14,10 @@ export function Example() {
       <MeterTrack render={<span />}>
         <MeterIndicator
           render={(props, state) => (
-            <div {...props} data-variant={state.percent >= 90 ? "destructive" : undefined} />
+            <div
+              {...props}
+              data-variant={state.percent >= 90 ? "destructive" : undefined}
+            />
           )}
         />
       </MeterTrack>

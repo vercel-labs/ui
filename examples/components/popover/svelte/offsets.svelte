@@ -66,7 +66,9 @@
       collisionPadding={Number(offsets.collisionPadding)}
     >
       <PopoverTitle>Delivery window</PopoverTitle>
-      <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
+      <PopoverDescription
+        >Arrives Tuesday between 9 AM and noon.</PopoverDescription
+      >
     </PopoverContent>
   </Popover>
 </div>

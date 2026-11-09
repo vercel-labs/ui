@@ -75,7 +75,11 @@ test("an error removed in the same task no longer replaces the browser's message
   const input = document.querySelector("input")!
   document.querySelector("ui-field-error")!.remove()
   let prevented: boolean | undefined
-  input.addEventListener("invalid", (event) => (prevented = event.defaultPrevented), { once: true })
+  input.addEventListener(
+    "invalid",
+    (event) => (prevented = event.defaultPrevented),
+    { once: true }
+  )
   expect(input.reportValidity()).toBe(false)
   expect(prevented).toBe(false)
 })
@@ -133,7 +137,9 @@ test("the invalid property writes the attribute, three ways", async () => {
   field.invalid = true
   expect(field.getAttribute("invalid")).toBe("")
   await wait()
-  expect(document.querySelector("input")!.getAttribute("aria-invalid")).toBe("true")
+  expect(document.querySelector("input")!.getAttribute("aria-invalid")).toBe(
+    "true"
+  )
 })
 
 test("a native input whose id is removed keeps its label", async () => {

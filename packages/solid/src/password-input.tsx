@@ -6,7 +6,12 @@ import {
 import { createContext, merge, omit, useContext } from "solid-js"
 import { joinField, useFieldControl, useFieldControlId } from "./field-context"
 import { valueProps } from "./text-control"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 // The field the control joins and the value it shows, which stay Solid's.
 type PasswordInputContextValue = {
@@ -15,13 +20,17 @@ type PasswordInputContextValue = {
   defaultValue: () => string | undefined
 }
 
-const PasswordInputContext = createContext<PasswordInputContextValue | null>(null)
+const PasswordInputContext = createContext<PasswordInputContextValue | null>(
+  null
+)
 
 const parts = createParts(passwordInputPrimitive, { toggle: "button" })
 
 function usePasswordInput(part: string) {
   const context = useContext(PasswordInputContext)
-  if (!context) throw new Error(`${part} must be used inside <PasswordInput>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <PasswordInput>.`)
+  }
   return context
 }
 
@@ -31,7 +40,10 @@ function usePasswordInput(part: string) {
  */
 function PasswordInput(
   props: PasswordInputOptions &
-    Omit<PartProps<"div", PasswordInputState>, "defaultValue" | "onChange" | "onSelect">,
+    Omit<
+      PartProps<"div", PasswordInputState>,
+      "defaultValue" | "onChange" | "onSelect"
+    >
 ) {
   const field = useFieldControl()
   const controlId = useFieldControlId()
@@ -67,7 +79,7 @@ function PasswordInput(
     "disabled",
     "readOnly",
     "controller",
-    "debug",
+    "debug"
   )
   const context: PasswordInputContextValue = {
     field,
@@ -100,17 +112,20 @@ function PasswordInputControl(
     | "readonly"
     | "autocomplete"
     | "onSelect"
-  >,
+  >
 ) {
   const passwordInput = usePasswordInput("PasswordInputControl")
   // The value stays Solid's, so the field is a native controlled or uncontrolled input.
-  const control = merge(props, valueProps(passwordInput.value, passwordInput.defaultValue))
+  const control = merge(
+    props,
+    valueProps(passwordInput.value, passwordInput.defaultValue)
+  )
   return usePart(
     passwordInputPrimitive,
     "control",
     () => ({ id: props.id as string | undefined }),
     joinField(passwordInput.field, control, "input"),
-    "input",
+    "input"
   )
 }
 

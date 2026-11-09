@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ChevronRightIcon } from "@lucide/vue"
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/vue/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/vue/tree"
 import { h, type FunctionalComponent } from "vue"
 
 type Node = { value: string; label: string; children?: Node[] }
@@ -29,11 +35,14 @@ const Items: FunctionalComponent<{ items: Node[] }> = ({ items }) =>
   items.map(({ value, label, children }) =>
     h(TreeItem, { key: value, value }, () => [
       h(TreeItemLabel, {}, () => [
-        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        children &&
+          h(TreeItemIndicator, {}, () =>
+            h(ChevronRightIcon, { "aria-hidden": "true" })
+          ),
         label,
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
-    ]),
+    ])
   )
 </script>
 

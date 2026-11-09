@@ -8,10 +8,14 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 // Get Started, at /docs, once per framework like Core's pages.
-export default async function GetStartedPage(props: PageProps<"/for/[framework]/docs">) {
+export default async function GetStartedPage(
+  props: PageProps<"/for/[framework]/docs">
+) {
   const { framework } = await props.params
   const page = source.getPage(getStarted.slugs)
-  if (!page || !isFramework(framework)) notFound()
+  if (!page || !isFramework(framework)) {
+    notFound()
+  }
   const MDX = page.data.body
 
   return (

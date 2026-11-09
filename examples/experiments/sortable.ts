@@ -16,15 +16,22 @@ import {
 } from "@ui-sdk/core"
 import { createFlip } from "./flip"
 
-type SortableSelectedChangeReason = "item-press" | "list-navigation" | "escape-key"
+type SortableSelectedChangeReason =
+  "item-press" | "list-navigation" | "escape-key"
 
 type SortableOptions = {
   value?: string[]
   defaultValue?: string[]
-  onValueChange?: (value: string[], details: ChangeDetails<ReorderReason>) => void
+  onValueChange?: (
+    value: string[],
+    details: ChangeDetails<ReorderReason>
+  ) => void
   selected?: string[]
   defaultSelected?: string[]
-  onSelectedChange?: (selected: string[], details: ChangeDetails<SortableSelectedChangeReason>) => void
+  onSelectedChange?: (
+    selected: string[],
+    details: ChangeDetails<SortableSelectedChangeReason>
+  ) => void
   orientation?: ReorderOrientation
 }
 
@@ -42,7 +49,11 @@ type SortableRootState = {
   moving: boolean
   selected: number
 }
-type SortableItemState = { selected: boolean; moving: boolean; dragging: boolean }
+type SortableItemState = {
+  selected: boolean
+  moving: boolean
+  dragging: boolean
+}
 type SortableHandleState = { dragging: boolean }
 
 const sortable = /* @__PURE__ */ definePrimitive({
@@ -75,12 +86,16 @@ const sortable = /* @__PURE__ */ definePrimitive({
     const change = createChange(context)
     const orientation = () => store.get().orientation
     const spatial = spatialMove()
-    const roving = createRovingFocus<SortableState, { value: string }>(context, {
-      slot: "item",
-      key: "focused",
-      orientation: () => (orientation() === "horizontal" ? "horizontal" : "vertical"),
-      move: spatial,
-    })
+    const roving = createRovingFocus<SortableState, { value: string }>(
+      context,
+      {
+        slot: "item",
+        key: "focused",
+        orientation: () =>
+          orientation() === "horizontal" ? "horizontal" : "vertical",
+        move: spatial,
+      }
+    )
     const selection = createSelection(context, {
       key: "selected",
       set: (value, details) => change("selected", value, details),
@@ -93,10 +108,13 @@ const sortable = /* @__PURE__ */ definePrimitive({
       draft: "moving",
       set: (value, details) => change("value", value, details),
       orientation,
-      group: (key) => (store.get().selected.includes(key) ? store.get().selected : [key]),
+      group: (key) =>
+        store.get().selected.includes(key) ? store.get().selected : [key],
       preview: true,
     })
-    const flip = createFlip<SortableState>(context, { watch: (state) => reorder.order(state) })
+    const flip = createFlip<SortableState>(context, {
+      watch: (state) => reorder.order(state),
+    })
     let down: { key: string; x: number; y: number } | null = null
 
     const api = {
@@ -106,10 +124,13 @@ const sortable = /* @__PURE__ */ definePrimitive({
       move: (key: string, index: number) => reorder.move(key, index),
       bindHandle(key: string) {
         store.set({ handled: [...store.get().handled, key] })
-        return () => store.set({ handled: store.get().handled.filter((k) => k !== key) })
+        return () =>
+          store.set({ handled: store.get().handled.filter((k) => k !== key) })
       },
       itemKeydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (reorder.keydown(event, key)) return
+        if (reorder.keydown(event, key)) {
+          return
+        }
         if (matchesShortcut(event, "mod+a")) {
           event.preventDefault()
           selection.toggleAll({ reason: "list-navigation", event })
@@ -117,25 +138,49 @@ const sortable = /* @__PURE__ */ definePrimitive({
           change("selected", [], { reason: "escape-key", event })
         } else {
           const moved = roving.keydown(event, el)
-          if (moved?.shift)
-            selection.extend(moved.key, { reason: "list-navigation", event, from: moved.from })
+          if (moved?.shift) {
+            selection.extend(moved.key, {
+              reason: "list-navigation",
+              event,
+              from: moved.from,
+            })
+          }
         }
       },
       press(event: PointerEvent, key: string) {
         down = null
-        if (event.button !== 0) return
-        if (event.shiftKey) selection.extend(key, { reason: "item-press", event, from: store.get().focused })
-        else if (event.metaKey || event.ctrlKey) selection.toggle(key, { reason: "item-press", event })
-        else if (!store.get().selected.includes(key)) selection.choose(key, { reason: "item-press", event })
-        else down = { key, x: event.clientX, y: event.clientY }
-        if (!store.get().handled.includes(key)) reorder.pointerdown(event, key)
+        if (event.button !== 0) {
+          return
+        }
+        if (event.shiftKey) {
+          selection.extend(key, {
+            reason: "item-press",
+            event,
+            from: store.get().focused,
+          })
+        } else if (event.metaKey || event.ctrlKey) {
+          selection.toggle(key, { reason: "item-press", event })
+        } else if (!store.get().selected.includes(key)) {
+          selection.choose(key, { reason: "item-press", event })
+        } else {
+          down = { key, x: event.clientX, y: event.clientY }
+        }
+        if (!store.get().handled.includes(key)) {
+          reorder.pointerdown(event, key)
+        }
       },
       click(event: MouseEvent, key: string) {
         const pressed = down
         down = null
-        if (pressed?.key !== key) return
-        if (Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) < dragThreshold)
+        if (pressed?.key !== key) {
+          return
+        }
+        if (
+          Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) <
+          dragThreshold
+        ) {
           selection.choose(key, { reason: "item-press", event })
+        }
       },
     }
     return api
@@ -150,7 +195,8 @@ const sortable = /* @__PURE__ */ definePrimitive({
       attrs: (state, { id }) => ({
         role: "listbox",
         "aria-multiselectable": "true",
-        "aria-orientation": state.orientation === "horizontal" ? "horizontal" : undefined,
+        "aria-orientation":
+          state.orientation === "horizontal" ? "horizontal" : undefined,
         "aria-describedby": `${id}-instructions`,
         "data-orientation": state.orientation,
         "data-moving": state.moving ? "" : undefined,
@@ -169,12 +215,19 @@ const sortable = /* @__PURE__ */ definePrimitive({
         "aria-selected": state.selected.includes(part.key) ? "true" : "false",
         tabindex: part.api.roving.tabIndex(state, part),
         "data-selected": state.selected.includes(part.key) ? "" : undefined,
-        "data-moving": part.api.reorder.moving(state, part.key) ? "" : undefined,
-        "data-dragging": part.api.reorder.dragging(state, part.key) ? "" : undefined,
-        style: state.handled.includes(part.key) ? undefined : css({ "touch-action": "none" }),
+        "data-moving": part.api.reorder.moving(state, part.key)
+          ? ""
+          : undefined,
+        "data-dragging": part.api.reorder.dragging(state, part.key)
+          ? ""
+          : undefined,
+        style: state.handled.includes(part.key)
+          ? undefined
+          : css({ "touch-action": "none" }),
       }),
       on: {
-        keydown: (event, { el, api, key }) => el && api.itemKeydown(event, el, key),
+        keydown: (event, { el, api, key }) =>
+          el && api.itemKeydown(event, el, key),
         pointerdown: (event, { api, key }) => api.press(event, key),
         click: (event, { api, key }) => api.click(event, key),
       },
@@ -189,14 +242,22 @@ const sortable = /* @__PURE__ */ definePrimitive({
     }),
     handle: slot<{ value?: string }, SortableHandleState>({
       props: { value: { kind: "string", from: "item" } },
-      state: (state, { key, api }) => ({ dragging: api.reorder.dragging(state, key) }),
-      attrs: () => ({ "aria-hidden": "true", style: css({ "touch-action": "none" }) }),
+      state: (state, { key, api }) => ({
+        dragging: api.reorder.dragging(state, key),
+      }),
+      attrs: () => ({
+        "aria-hidden": "true",
+        style: css({ "touch-action": "none" }),
+      }),
       on: {
-        pointerdown: (event, { api, key }) => api.reorder.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.reorder.pointerdown(event, key),
       },
       bind: (_el, { api, key }) => api.bindHandle(key),
     }),
-    instructions: slot({ attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }) }),
+    instructions: slot({
+      attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }),
+    }),
   }),
 })
 

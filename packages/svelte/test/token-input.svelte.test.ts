@@ -17,7 +17,8 @@ test("a token input's tokens follow a new token snippet", () => {
     target.remove()
   }
   flushSync()
-  const shown = () => [...target.querySelectorAll("[data-content]")].map((el) => el.textContent)
+  const shown = () =>
+    [...target.querySelectorAll("[data-content]")].map((el) => el.textContent)
   expect(shown()).toEqual(["Ada"])
   props.loud = true
   flushSync()
@@ -34,7 +35,9 @@ test("a token input's tokens show only their snippet, or their label without one
   }
   flushSync()
   const hosts = () =>
-    [...target.querySelectorAll("[data-slot='token-input-host']")].map((host) => host.textContent)
+    [...target.querySelectorAll("[data-slot='token-input-host']")].map(
+      (host) => host.textContent
+    )
   expect(hosts()).toEqual(["Ada person"])
   props.plain = true
   flushSync()

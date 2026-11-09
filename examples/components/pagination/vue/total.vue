@@ -28,7 +28,12 @@ function onPageSizeChange(event: Event) {
 <template>
   <div data-slot="stack">
     <div data-slot="row">
-      <p>Showing {{ (page - 1) * pageSize + 1 }}–{{ Math.min(page * pageSize, total) }} of {{ total }}</p>
+      <p>
+        Showing {{ (page - 1) * pageSize + 1 }}–{{
+          Math.min(page * pageSize, total)
+        }}
+        of {{ total }}
+      </p>
       <label data-slot="label">
         Rows per page
         <select :value="pageSize" @change="onPageSizeChange">
@@ -53,7 +58,11 @@ function onPageSizeChange(event: Event) {
           </PaginationPrevious>
         </PaginationItem>
         <PaginationItem v-for="item in state.items" :key="item">
-          <PaginationLink v-if="typeof item === 'number'" data-variant="ghost" :page="item" />
+          <PaginationLink
+            v-if="typeof item === 'number'"
+            data-variant="ghost"
+            :page="item"
+          />
           <PaginationEllipsis v-else>
             <EllipsisIcon />
           </PaginationEllipsis>

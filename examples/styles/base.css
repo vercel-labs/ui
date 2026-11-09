@@ -179,7 +179,13 @@
       display: none;
     }
 
-    &:is([data-checked], [data-indeterminate], [data-visible], [data-met], [data-open]) {
+    &:is(
+      [data-checked],
+      [data-indeterminate],
+      [data-visible],
+      [data-met],
+      [data-open]
+    ) {
       & > svg:has(+ svg) {
         display: none;
       }
@@ -205,13 +211,15 @@
     gap: var(--space-3);
   }
 
-  :is([data-slot="card"], [data-slot="field-root"], button, label) [data-slot="stack"] {
+  :is([data-slot="card"], [data-slot="field-root"], button, label)
+    [data-slot="stack"] {
     align-items: flex-start;
     text-align: start;
   }
 
   [data-slot="stack"]:has(
-    > :is([data-slot="stack"], [data-slot="grid"]) > [data-slot="row"][role="group"],
+    > :is([data-slot="stack"], [data-slot="grid"])
+      > [data-slot="row"][role="group"],
     > [data-slot="stack"] > [data-slot="grid"] > [data-slot="row"][role="group"]
   ) {
     gap: var(--space-8);
@@ -223,7 +231,13 @@
       [data-slot="field-set"],
       [data-slot="card"],
       [data-variant="card"],
-      input:not([type="checkbox"], [type="radio"], [type="hidden"], [type="file"], [hidden]),
+      input:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="hidden"],
+        [type="file"],
+        [hidden]
+      ),
       textarea,
       select
     )
@@ -339,7 +353,9 @@
     font-weight: 500;
   }
 
-  [data-slot="label"]:has(> input:not([type="checkbox"], [type="radio"], [type="color"])) {
+  [data-slot="label"]:has(
+    > input:not([type="checkbox"], [type="radio"], [type="color"])
+  ) {
     flex-direction: column;
     align-items: stretch;
     gap: var(--space-1);
@@ -406,7 +422,8 @@
     box-shadow: var(--shadow-1);
 
     &:is(label, a, button):hover {
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &:has([data-checked]) {
@@ -538,7 +555,8 @@
 
     &[data-variant="destructive"] {
       background: var(--danger-tint);
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--danger) 40%, transparent);
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--danger) 40%, transparent);
       color: var(--danger);
     }
   }
@@ -580,7 +598,13 @@
 
   :is(
     [data-slot="input-root"],
-    :where([data-slot="field-control"]:not([type="checkbox"], [type="radio"], [type="range"])),
+    :where(
+      [data-slot="field-control"]:not(
+        [type="checkbox"],
+        [type="radio"],
+        [type="range"]
+      )
+    ),
     [data-slot="textarea-root"],
     [data-slot="combobox-input"],
     [data-slot="autocomplete-input"],
@@ -635,7 +659,8 @@
         [data-invalid],
         [aria-invalid="true"]
       ) {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &:is([readonly], [data-readonly]) {
@@ -648,7 +673,11 @@
       box-shadow: inset 0 0 0 1px var(--ink);
     }
 
-    &:is([data-invalid], [aria-invalid="true"], :has(input[aria-invalid="true"])) {
+    &:is(
+      [data-invalid],
+      [aria-invalid="true"],
+      :has(input[aria-invalid="true"])
+    ) {
       box-shadow: inset 0 0 0 1px var(--danger);
 
       &:is(:focus-visible, :has(input:focus-visible)) {
@@ -732,7 +761,11 @@
     }
   }
 
-  :is([data-slot="input-clear"], [data-slot="password-input-toggle"], [data-slot="input-group"] > button) {
+  :is(
+    [data-slot="input-clear"],
+    [data-slot="password-input-toggle"],
+    [data-slot="input-group"] > button
+  ) {
     display: inline-grid;
     flex-shrink: 0;
     place-items: center;
@@ -1024,7 +1057,8 @@
       color: var(--paper);
     }
 
-    &:is([aria-pressed="true"], [data-copied], [data-variant="solid"]) [data-slot="hint"] {
+    &:is([aria-pressed="true"], [data-copied], [data-variant="solid"])
+      [data-slot="hint"] {
       color: inherit;
       opacity: 0.8;
     }
@@ -1150,7 +1184,11 @@
     }
   }
 
-  :is([data-slot="alert-dialog-backdrop"], [data-slot="dialog-backdrop"], [data-slot="drawer-backdrop"]) {
+  :is(
+    [data-slot="alert-dialog-backdrop"],
+    [data-slot="dialog-backdrop"],
+    [data-slot="drawer-backdrop"]
+  ) {
     position: fixed;
     inset: 0;
     z-index: 50;
@@ -1286,12 +1324,17 @@
     }
   }
 
-  :where([data-slot="menu-content"]) [data-slot="menu-trigger"] > svg:last-child {
+  :where([data-slot="menu-content"])
+    [data-slot="menu-trigger"]
+    > svg:last-child {
     margin-inline-start: auto;
     opacity: 0.7;
   }
 
-  :is([data-slot="select-item-indicator"], [data-slot="listbox-item-indicator"]) {
+  :is(
+    [data-slot="select-item-indicator"],
+    [data-slot="listbox-item-indicator"]
+  ) {
     order: 1;
     margin-inline-start: auto;
     padding-inline-start: var(--space-4);

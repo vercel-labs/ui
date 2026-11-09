@@ -1,7 +1,10 @@
 // Where a crop sits on the image and the image on screen. Crops count in the
 // image's own pixels, from the top left of the image as it shows after it's
 // turned and flipped, as `cropImage` reads them.
-import { resizeBox, type ResizeHandle } from "../../foundation/direct-manipulation/resize"
+import {
+  resizeBox,
+  type ResizeHandle,
+} from "../../foundation/direct-manipulation/resize"
 import type { ImageCrop, ImageRotation } from "../../foundation/image/crop"
 import { clamp } from "../../foundation/number/steps"
 
@@ -11,7 +14,12 @@ type Rect = { left: number; top: number; width: number; height: number }
 
 type Crop = Required<ImageCrop>
 
-type Limits = { aspect: number | undefined; minWidth: number; minHeight: number; maxZoom: number }
+type Limits = {
+  aspect: number | undefined
+  minWidth: number
+  minHeight: number
+  maxZoom: number
+}
 
 const turned = (rotation: number) => rotation % 180 !== 0
 
@@ -54,7 +62,9 @@ const zoomOf = (crop: Crop, natural: Size) => {
 
 // The largest box at `ratio` inside `shown`, which zoom 1 crops.
 function largest(shown: Size, ratio: number | undefined) {
-  if (!ratio) return { width: shown.width, height: shown.height }
+  if (!ratio) {
+    return { width: shown.width, height: shown.height }
+  }
   const width = Math.min(shown.width, shown.height * ratio)
   return { width, height: width / ratio }
 }
@@ -62,20 +72,33 @@ function largest(shown: Size, ratio: number | undefined) {
 // The smallest a crop gets, from the minimum size and the zoom limit.
 function smallest(shown: Size, limits: Limits) {
   const { aspect, minWidth, minHeight, maxZoom } = limits
-  if (!aspect)
+  if (!aspect) {
     return {
       width: Math.max(minWidth, shown.width / maxZoom),
       height: Math.max(minHeight, shown.height / maxZoom),
     }
-  const width = Math.max(minWidth, minHeight * aspect, largest(shown, aspect).width / maxZoom)
+  }
+  const width = Math.max(
+    minWidth,
+    minHeight * aspect,
+    largest(shown, aspect).width / maxZoom
+  )
   return { width, height: width / aspect }
 }
 
 // A box of `size` centered on a point, kept inside the image.
 function centered(size: Size, center: { x: number; y: number }, shown: Size) {
   return {
-    x: clamp(center.x - size.width / 2, 0, Math.max(0, shown.width - size.width)),
-    y: clamp(center.y - size.height / 2, 0, Math.max(0, shown.height - size.height)),
+    x: clamp(
+      center.x - size.width / 2,
+      0,
+      Math.max(0, shown.width - size.width)
+    ),
+    y: clamp(
+      center.y - size.height / 2,
+      0,
+      Math.max(0, shown.height - size.height)
+    ),
     width: size.width,
     height: size.height,
   }
@@ -89,9 +112,18 @@ function initialCrop(natural: Size, limits: Limits, mode: "box" | "frame") {
   const full = largest(natural, limits.aspect)
   const min = smallest(natural, limits)
   const inset =
-    mode === "frame" ? 1 : Math.min(1, Math.max(0.8, min.width / full.width, min.height / full.height))
+    mode === "frame"
+      ? 1
+      : Math.min(
+          1,
+          Math.max(0.8, min.width / full.width, min.height / full.height)
+        )
   const size = { width: full.width * inset, height: full.height * inset }
-  const box = centered(size, { x: natural.width / 2, y: natural.height / 2 }, natural)
+  const box = centered(
+    size,
+    { x: natural.width / 2, y: natural.height / 2 },
+    natural
+  )
   return round({ ...box, rotation: 0, flipX: false, flipY: false })
 }
 
@@ -103,10 +135,11 @@ function resizeCrop(
   dx: number,
   dy: number,
   limits: Limits,
-  keepRatio = false,
+  keepRatio = false
 ) {
   const shown = shownSize(natural, crop.rotation)
-  const aspect = limits.aspect ?? (keepRatio ? crop.width / crop.height : undefined)
+  const aspect =
+    limits.aspect ?? (keepRatio ? crop.width / crop.height : undefined)
   const box = resizeBox(crop, handle, dx, dy, {
     bounds: { left: 0, top: 0, right: shown.width, bottom: shown.height },
     min: smallest(shown, { ...limits, aspect }),
@@ -119,20 +152,36 @@ function resizeCrop(
  * The crop at a zoom, keeping the image point `at` where it is, or the
  * crop's middle. Its ratio stays.
  */
-function zoomCrop(crop: Crop, natural: Size, zoom: number, limits: Limits, at?: { x: number; y: number }) {
+function zoomCrop(
+  crop: Crop,
+  natural: Size,
+  zoom: number,
+  limits: Limits,
+  at?: { x: number; y: number }
+) {
   const shown = shownSize(natural, crop.rotation)
   const ratio = limits.aspect ?? crop.width / crop.height
   const full = largest(shown, ratio)
   const least = smallest(shown, { ...limits, aspect: ratio })
-  const most = Math.max(1, Math.min(full.width / least.width, full.height / least.height))
+  const most = Math.max(
+    1,
+    Math.min(full.width / least.width, full.height / least.height)
+  )
   const next = clamp(zoom, 1, most)
   const width = full.width / next
   const height = full.height / next
-  const point = at ?? { x: crop.x + crop.width / 2, y: crop.y + crop.height / 2 }
+  const point = at ?? {
+    x: crop.x + crop.width / 2,
+    y: crop.y + crop.height / 2,
+  }
   const k = width / crop.width
   const box = {
     x: clamp(point.x - (point.x - crop.x) * k, 0, shown.width - width),
-    y: clamp(point.y - (point.y - crop.y) * (height / crop.height), 0, shown.height - height),
+    y: clamp(
+      point.y - (point.y - crop.y) * (height / crop.height),
+      0,
+      shown.height - height
+    ),
     width,
     height,
   }
@@ -144,25 +193,50 @@ function zoomCrop(crop: Crop, natural: Size, zoom: number, limits: Limits, at?: 
  * `-1`. The crop turns with it; at a fixed ratio it keeps its zoom instead.
  * A flip on one axis is on the other once turned.
  */
-function rotateCrop(crop: Crop, natural: Size, direction: 1 | -1, limits: Limits) {
+function rotateCrop(
+  crop: Crop,
+  natural: Size,
+  direction: 1 | -1,
+  limits: Limits
+) {
   const shown = shownSize(natural, crop.rotation)
   const box =
     direction === 1
-      ? { x: shown.height - crop.y - crop.height, y: crop.x, width: crop.height, height: crop.width }
-      : { x: crop.y, y: shown.width - crop.x - crop.width, width: crop.height, height: crop.width }
-  const rotation = ((crop.rotation + (direction === 1 ? 90 : 270)) % 360) as ImageRotation
+      ? {
+          x: shown.height - crop.y - crop.height,
+          y: crop.x,
+          width: crop.height,
+          height: crop.width,
+        }
+      : {
+          x: crop.y,
+          y: shown.width - crop.x - crop.width,
+          width: crop.height,
+          height: crop.width,
+        }
+  const rotation = ((crop.rotation + (direction === 1 ? 90 : 270)) %
+    360) as ImageRotation
   const next = { ...box, rotation, flipX: crop.flipY, flipY: crop.flipX }
-  if (!limits.aspect) return round(next)
+  if (!limits.aspect) {
+    return round(next)
+  }
   const turnedShown = shownSize(natural, rotation)
   const full = largest(turnedShown, limits.aspect)
-  const zoom = Math.min(zoomOf(crop, natural), full.width / smallest(turnedShown, limits).width)
+  const zoom = Math.min(
+    zoomOf(crop, natural),
+    full.width / smallest(turnedShown, limits).width
+  )
   const size = { width: full.width / zoom, height: full.height / zoom }
   const center = { x: box.x + box.width / 2, y: box.y + box.height / 2 }
   return round({ ...next, ...centered(size, center, turnedShown) })
 }
 
 /** The crop after the image mirrors left to right, or top to bottom. */
-function flipCrop(crop: Crop, natural: Size, direction: "horizontal" | "vertical") {
+function flipCrop(
+  crop: Crop,
+  natural: Size,
+  direction: "horizontal" | "vertical"
+) {
   const shown = shownSize(natural, crop.rotation)
   return direction === "horizontal"
     ? { ...crop, x: shown.width - crop.x - crop.width, flipX: !crop.flipX }
@@ -172,14 +246,23 @@ function flipCrop(crop: Crop, natural: Size, direction: "horizontal" | "vertical
 /** The crop at a new ratio, as large as it was, about its middle. */
 function fitCrop(crop: Crop, natural: Size, limits: Limits) {
   const { aspect } = limits
-  if (!aspect || Math.abs(crop.width / aspect - crop.height) <= 1) return crop
+  if (!aspect || Math.abs(crop.width / aspect - crop.height) <= 1) {
+    return crop
+  }
   const shown = shownSize(natural, crop.rotation)
   const full = largest(shown, aspect)
-  const zoom = Math.min(zoomOf(crop, natural), full.width / smallest(shown, limits).width)
+  const zoom = Math.min(
+    zoomOf(crop, natural),
+    full.width / smallest(shown, limits).width
+  )
   const size = { width: full.width / zoom, height: full.height / zoom }
   return round({
     ...crop,
-    ...centered(size, { x: crop.x + crop.width / 2, y: crop.y + crop.height / 2 }, shown),
+    ...centered(
+      size,
+      { x: crop.x + crop.width / 2, y: crop.y + crop.height / 2 },
+      shown
+    ),
   })
 }
 
@@ -189,7 +272,13 @@ function fitCrop(crop: Crop, natural: Size, limits: Limits) {
  * image and the crop on it; a frame shows the crop as large as it fits, with
  * the image around it.
  */
-function layoutOf(crop: Crop, natural: Size, box: Rect, mode: "box" | "frame", aspect: number | undefined) {
+function layoutOf(
+  crop: Crop,
+  natural: Size,
+  box: Rect,
+  mode: "box" | "frame",
+  aspect: number | undefined
+) {
   const shown = shownSize(natural, crop.rotation)
   if (mode === "frame") {
     const ratio = aspect ?? crop.width / crop.height

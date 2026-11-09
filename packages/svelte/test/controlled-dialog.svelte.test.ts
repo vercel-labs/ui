@@ -20,18 +20,21 @@ const settle = async () => {
   flushSync()
 }
 
-for (const kind of ["dialog", "alert dialog"] as const)
+for (const kind of ["dialog", "alert dialog"] as const) {
   test(`an untitled ${kind} opened through its prop is named after its trigger`, async () => {
     const target = document.body.appendChild(document.createElement("div"))
     const app = mount(App, { target, props: { kind } })
     flushSync()
     app.set(true)
     await settle()
-    const content = target.querySelector('[role="dialog"], [role="alertdialog"]')!
+    const content = target.querySelector(
+      '[role="dialog"], [role="alertdialog"]'
+    )!
     expect(content.getAttribute("aria-label")).toBe("Edit profile")
     unmount(app)
     target.remove()
   })
+}
 
 test("a drawer opened through its prop opens at its default snap point each time", async () => {
   const target = document.body.appendChild(document.createElement("div"))
@@ -40,7 +43,9 @@ test("a drawer opened through its prop opens at its default snap point each time
   for (const _ of [1, 2]) {
     app.set(true)
     await settle()
-    expect(target.querySelector('[role="dialog"]')!.getAttribute("data-snap-point")).toBe("content")
+    expect(
+      target.querySelector('[role="dialog"]')!.getAttribute("data-snap-point")
+    ).toBe("content")
     app.set(false)
     await settle()
   }

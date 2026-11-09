@@ -17,7 +17,9 @@ const copyButton = definePrimitive({
     let timer: ReturnType<typeof setTimeout> | undefined
     let text = context.options().text
     context.onOptions((options) => {
-      if (options.text === text) return
+      if (options.text === text) {
+        return
+      }
       text = options.text
       clearTimeout(timer)
       context.store.set({ copied: false })
@@ -37,7 +39,10 @@ const copyButton = definePrimitive({
   slots: (slot) => ({
     root: slot<{}, { copied: boolean }>({
       state: (state) => ({ copied: state.copied }),
-      attrs: (state) => ({ type: "button", "data-copied": state.copied ? "" : undefined }),
+      attrs: (state) => ({
+        type: "button",
+        "data-copied": state.copied ? "" : undefined,
+      }),
       press: ({ api }) => api.copy(),
     }),
   }),
@@ -51,9 +56,17 @@ function Example() {
   return (
     <div data-slot="row">
       <code data-slot="copy-command">npm install @ui-sdk/core</code>
-      <CopyButton text="npm install @ui-sdk/core">{({ copied }) => (copied ? "Copied" : "Copy")}</CopyButton>
+      <CopyButton text="npm install @ui-sdk/core">
+        {({ copied }) => (copied ? "Copied" : "Copy")}
+      </CopyButton>
     </div>
   )
 }
 
-export { copyButton, CopyButton, type CopyButtonOptions, type CopyButtonState, Example }
+export {
+  copyButton,
+  CopyButton,
+  type CopyButtonOptions,
+  type CopyButtonState,
+  Example,
+}

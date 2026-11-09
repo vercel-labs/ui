@@ -15,14 +15,22 @@ const { cancel, ...options } = segmentedControlOptions()
 const action = ref("")
 const submitted = ref("")
 
-function onValueChange(value: string | null, details: { reason: string; cancel: () => void }) {
-  if (value === cancel) return details.cancel()
+function onValueChange(
+  value: string | null,
+  details: { reason: string; cancel: () => void }
+) {
+  if (value === cancel) {
+    return details.cancel()
+  }
   action.value = `${value}:${details.reason}`
 }
 
 function onSubmit(event: SubmitEvent) {
   const form = event.currentTarget as HTMLFormElement
-  submitted.value = Array.from(new FormData(form), ([key, value]) => `${key}=${value}`).join("&")
+  submitted.value = Array.from(
+    new FormData(form),
+    ([key, value]) => `${key}=${value}`
+  ).join("&")
 }
 </script>
 
@@ -49,7 +57,9 @@ function onSubmit(event: SubmitEvent) {
     <button type="button">After</button>
     <button type="submit">Save</button>
     <button type="reset">Reset</button>
-    <button type="button" @click="controller.setValue('calendar')">Show calendar</button>
+    <button type="button" @click="controller.setValue('calendar')">
+      Show calendar
+    </button>
     <output role="status" aria-label="Last action">{{ action }}</output>
     <output aria-label="Submitted">{{ submitted }}</output>
   </form>

@@ -18,7 +18,12 @@
 //   and a new swipe down from their top chains into the sheet.
 // - An IntersectionObserver dismisses the sheet once it's scrolled out of view.
 // - Effects follow a ScrollTimeline of the scroller where there is one.
-import { initialState, next, type SheetSnapReason, type SheetState } from "../motion/machine"
+import {
+  initialState,
+  next,
+  type SheetSnapReason,
+  type SheetState,
+} from "../motion/machine"
 import { nearestIndex } from "../motion/projection"
 import { settleTime, solveSpring, springLinearEasing } from "../motion/spring"
 import { on } from "../kernel/events"
@@ -75,11 +80,18 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     "overscroll-behavior": "contain",
     "pointer-events": "auto",
   })
-  const restoreSheet = setStyles(sheet, { position: "absolute", left: "0", right: "0" })
+  const restoreSheet = setStyles(sheet, {
+    position: "absolute",
+    left: "0",
+    right: "0",
+  })
   const supportsScrollEnd = "onscrollend" in host
   const Timeline = (
     view as unknown as {
-      ScrollTimeline?: new (options: { source: Element; axis: string }) => AnimationTimeline
+      ScrollTimeline?: new (options: {
+        source: Element
+        axis: string
+      }) => AnimationTimeline
     }
   ).ScrollTimeline
 
@@ -92,9 +104,11 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       () => {
         touching = true
         restMissed = false
-        if (flip && !closing) catchFlip()
+        if (flip && !closing) {
+          catchFlip()
+        }
       },
-      { passive: true },
+      { passive: true }
     ),
     on(host, "touchend", onTouchEnd, { passive: true }),
     on(host, "touchcancel", onTouchEnd, { passive: true }),
@@ -111,13 +125,18 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   const container = () => options.config().dimension
   const largestExtent = () => options.config().snapPoints.at(-1)?.extent ?? 0
   const maxScroll = () => largestExtent() + overscrollRoom - extentAtTop
-  const scrollExtent = () => Math.min(host.scrollTop + extentAtTop, largestExtent())
+  const scrollExtent = () =>
+    Math.min(host.scrollTop + extentAtTop, largestExtent())
 
   function layout() {
     const config = options.config()
-    extentAtTop = config.dismissible ? -toolbarBleed : config.snapPoints[0].extent
+    extentAtTop = config.dismissible
+      ? -toolbarBleed
+      : config.snapPoints[0].extent
     sheet.style.top = `${container() - extentAtTop}px`
-    for (const marker of markers) marker.remove()
+    for (const marker of markers) {
+      marker.remove()
+    }
     const extents = config.snapPoints.map((point) => point.extent)
     const targets = config.dismissible ? [extentAtTop, ...extents] : extents
     markers = targets.map((extent) => marker(extent - extentAtTop, "start"))
@@ -134,12 +153,22 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
   }
 
   function onScroll() {
-    if (flip || closing) return
-    if (caught && touching && Math.abs(host.scrollTop - caught.offsetTop) > 1) releaseCatch()
-    if (touching && !dragging) setDragging(true)
-    if (!Timeline) frame ||= view.requestAnimationFrame(followScroll)
+    if (flip || closing) {
+      return
+    }
+    if (caught && touching && Math.abs(host.scrollTop - caught.offsetTop) > 1) {
+      releaseCatch()
+    }
+    if (touching && !dragging) {
+      setDragging(true)
+    }
+    if (!Timeline) {
+      frame ||= view.requestAnimationFrame(followScroll)
+    }
     view.clearTimeout(restTimer)
-    if (!supportsScrollEnd && !touching) restTimer = view.setTimeout(onRest, restTimeout)
+    if (!supportsScrollEnd && !touching) {
+      restTimer = view.setTimeout(onRest, restTimeout)
+    }
   }
 
   function followScroll() {
@@ -155,20 +184,26 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       const points = options.config().snapPoints
       const index = nearestIndex(
         points.map((point) => point.extent),
-        scrollExtent(),
+        scrollExtent()
       )
       return moveTo(points[index].id, "swipe")
     }
     // The native bounce past the smallest snap point is the only sign of a refused swipe.
-    if (!options.config().dismissible && host.scrollTop < -2) options.onDismissAttempt()
+    if (!options.config().dismissible && host.scrollTop < -2) {
+      options.onDismissAttempt()
+    }
     // A passive `touchend` can reach the page after `scrollend`, so a rest missed while the
     // finger was down is checked once the scroll stays still, like browsers without `scrollend`.
-    if (restMissed || !supportsScrollEnd) restTimer = view.setTimeout(onRest, restTimeout)
+    if (restMissed || !supportsScrollEnd) {
+      restTimer = view.setTimeout(onRest, restTimeout)
+    }
     restMissed = false
   }
 
   function setDragging(value: boolean) {
-    if (dragging === value) return
+    if (dragging === value) {
+      return
+    }
     dragging = value
     options.onDragChange(value)
   }
@@ -178,7 +213,9 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       restMissed = true
       return
     }
-    if (flip || closing) return
+    if (flip || closing) {
+      return
+    }
     const config = options.config()
     const result = next(state, { type: "rest", extent: scrollExtent() }, config)
     state = result.state
@@ -188,20 +225,35 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
         options.onSnap(effect.id, effect.reason)
       }
     }
-    if (state.restingIndex >= 0) settle(config.snapPoints[state.restingIndex].id)
+    if (state.restingIndex >= 0) {
+      settle(config.snapPoints[state.restingIndex].id)
+    }
   }
 
   function onVisibility(entries: IntersectionObserverEntry[]) {
     const entry = entries[entries.length - 1]
-    if (entry.isIntersecting || flip || closing || targetId === null || !options.config().dismissible) return
+    if (
+      entry.isIntersecting ||
+      flip ||
+      closing ||
+      targetId === null ||
+      !options.config().dismissible
+    ) {
+      return
+    }
     closing = "swipe"
     targetId = null
     options.onDismiss()
   }
 
   function catchFlip() {
-    if (!flip) return
-    const scroll = Math.max(0, flip.extentAt(performance.now() - flip.startTime) - extentAtTop)
+    if (!flip) {
+      return
+    }
+    const scroll = Math.max(
+      0,
+      flip.extentAt(performance.now() - flip.startTime) - extentAtTop
+    )
     stopFlip()
     caught = marker(scroll, "start")
     host.append(caught)
@@ -215,25 +267,40 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     caught = null
   }
 
-  function animateTo(target: number, from: number, startTime: number, onFinish: () => void) {
+  function animateTo(
+    target: number,
+    from: number,
+    startTime: number,
+    onFinish: () => void
+  ) {
     stopFlip()
     const physics = options.config().physics
-    const solver = solveSpring(physics.response, physics.dampingRatio, from - target, 0)
+    const solver = solveSpring(
+      physics.response,
+      physics.dampingRatio,
+      from - target,
+      0
+    )
     const duration = Math.max(1, settleTime(solver))
     const scrolled = Math.max(extentAtTop, target)
     host.scrollTop = scrolled - extentAtTop
-    const extentAt = (elapsed: number) => target + solver.position(Math.max(0, elapsed))
+    const extentAt = (elapsed: number) =>
+      target + solver.position(Math.max(0, elapsed))
     const easing =
-      Math.abs(target - from) < 0.5 ? "linear" : springLinearEasing(solver, from, target, duration)
+      Math.abs(target - from) < 0.5
+        ? "linear"
+        : springLinearEasing(solver, from, target, duration)
     const animation = sheet.animate(
       { translate: [`0 ${scrolled - from}px`, `0 ${scrolled - target}px`] },
-      { duration, easing, fill: "both" },
+      { duration, easing, fill: "both" }
     )
     animation.startTime = startTime
     flip = { animation, to: target, extentAt, startTime }
     options.onMotion({ type: "settle", extentAt, startTime, duration })
     animation.onfinish = () => {
-      if (flip?.animation !== animation) return
+      if (flip?.animation !== animation) {
+        return
+      }
       flip = null
       onFinish()
       animation.cancel()
@@ -252,31 +319,40 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     targetId = id
     host.style.pointerEvents = options.isInteractive(id) ? "none" : "auto"
     const atLargest = index === config.snapPoints.length - 1
-    for (const area of scrollAreas) area.style.overflowY = atLargest ? "" : "hidden"
+    for (const area of scrollAreas) {
+      area.style.overflowY = atLargest ? "" : "hidden"
+    }
     options.onRest(id)
     trackScroll()
   }
 
   function trackScroll() {
-    if (!Timeline) return
+    if (!Timeline) {
+      return
+    }
     const max = maxScroll()
     const timeline = new Timeline({ source: host, axis: "block" })
     options.onMotion({
       type: "timeline",
       timeline,
-      extentAt: (progress) => Math.min(largestExtent(), progress * max + extentAtTop),
+      extentAt: (progress) =>
+        Math.min(largestExtent(), progress * max + extentAtTop),
     })
   }
 
   function moveTo(id: string, reason: SheetSnapReason) {
     const point = options.config().snapPoints.find((entry) => entry.id === id)
-    if (!point || closing === "close") return
+    if (!point || closing === "close") {
+      return
+    }
     closing = null
     if (id !== targetId) {
       targetId = id
       options.onSnap(id, reason)
     }
-    const from = flip ? flip.extentAt(performance.now() - flip.startTime) : scrollExtent()
+    const from = flip
+      ? flip.extentAt(performance.now() - flip.startTime)
+      : scrollExtent()
     animateTo(point.extent, from, performance.now(), () => settle(id))
   }
 
@@ -286,15 +362,21 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       targetId = id
       layout()
       const point = options.config().snapPoints.find((entry) => entry.id === id)
-      if (!point) return
+      if (!point) {
+        return
+      }
       if (!animate) {
         host.scrollTop = point.extent - extentAtTop
         return settle(id)
       }
-      animateTo(point.extent, -toolbarBleed, performance.now() + openHold, () => settle(id))
+      animateTo(point.extent, -toolbarBleed, performance.now() + openHold, () =>
+        settle(id)
+      )
       const opening = flip
       afterFirstFrame(view, (frameTime) => {
-        if (!opening || flip !== opening) return
+        if (!opening || flip !== opening) {
+          return
+        }
         opening.animation.startTime = frameTime
         opening.startTime = frameTime
         options.onMotionStart(frameTime)
@@ -303,19 +385,35 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
     close() {
       const wasClosing = closing
       closing = "close"
-      if (wasClosing) return
+      if (wasClosing) {
+        return
+      }
       targetId = null
-      const from = flip ? flip.extentAt(performance.now() - flip.startTime) : scrollExtent()
-      animateTo(-toolbarBleed, from, performance.now(), () => options.onRest(null))
+      const from = flip
+        ? flip.extentAt(performance.now() - flip.startTime)
+        : scrollExtent()
+      animateTo(-toolbarBleed, from, performance.now(), () =>
+        options.onRest(null)
+      )
     },
     snapTo: moveTo,
     nudge() {
-      if (closing || options.reducedMotion() || targetId === null) return
-      const point = options.config().snapPoints.find((entry) => entry.id === targetId)
-      if (point) animateTo(point.extent, point.extent - 20, performance.now(), () => settle(point.id))
+      if (closing || options.reducedMotion() || targetId === null) {
+        return
+      }
+      const point = options
+        .config()
+        .snapPoints.find((entry) => entry.id === targetId)
+      if (point) {
+        animateTo(point.extent, point.extent - 20, performance.now(), () =>
+          settle(point.id)
+        )
+      }
     },
     relayout(_immediate, fallback) {
-      if (closing || touching) return
+      if (closing || touching) {
+        return
+      }
       const points = options.config().snapPoints
       const kept = points.findIndex((point) => point.id === targetId)
       const wanted = points.findIndex((point) => point.id === fallback)
@@ -326,7 +424,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
             ? wanted
             : nearestIndex(
                 points.map((point) => point.extent),
-                scrollExtent(),
+                scrollExtent()
               )
       layout()
       // Safari and Firefox don't always re-snap after the markers move, so the position is set.
@@ -344,12 +442,20 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
       stopFlip()
       releaseCatch()
       view.clearTimeout(restTimer)
-      if (frame) view.cancelAnimationFrame(frame)
+      if (frame) {
+        view.cancelAnimationFrame(frame)
+      }
       visibility.disconnect()
       offs.forEach((off) => off())
-      for (const marker of markers) marker.remove()
-      for (const area of scrollAreas) area.style.removeProperty("overflow-y")
-      if (dragging) options.onDragChange(false)
+      for (const marker of markers) {
+        marker.remove()
+      }
+      for (const area of scrollAreas) {
+        area.style.removeProperty("overflow-y")
+      }
+      if (dragging) {
+        options.onDragChange(false)
+      }
       sheet.style.removeProperty("top")
       restoreSheet()
       restoreHost()
@@ -360,7 +466,7 @@ function createScrollSnapDriver(options: SheetDriverOptions) {
 function findScrollAreas(sheet: HTMLElement) {
   const view = sheet.ownerDocument.defaultView ?? window
   return Array.from(sheet.querySelectorAll<HTMLElement>("*")).filter((el) =>
-    /auto|scroll/.test(view.getComputedStyle(el).overflowY),
+    /auto|scroll/.test(view.getComputedStyle(el).overflowY)
   )
 }
 

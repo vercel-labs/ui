@@ -7,7 +7,10 @@ test("two copies of the package on one page keep each other's default rules", as
   vi.resetModules()
   const second = await import("../src/tabs")
   second.defineTabsElements()
-  const rules = Array.from(document.head.querySelectorAll("style"), (style) => style.textContent).join("\n")
+  const rules = Array.from(
+    document.head.querySelectorAll("style"),
+    (style) => style.textContent
+  ).join("\n")
   expect(rules).toContain("ui-field")
   expect(rules).toContain("ui-tabs")
 })

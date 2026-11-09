@@ -5,7 +5,9 @@ import { readMore } from "./read-more"
 function read(open: boolean) {
   const instance = readMore({ id: "more" })
   try {
-    if (open) instance.api.toggle()
+    if (open) {
+      instance.api.toggle()
+    }
     const trigger = instance.part("trigger", {})
     const panel = instance.part("panel", {})
     return {
@@ -24,7 +26,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <label data-slot="label">
-        <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+        <input
+          type="checkbox"
+          checked={open}
+          onChange={(event) => setOpen(event.target.checked)}
+        />
         Open it
       </label>
       <dl data-slot="read-parts-list">

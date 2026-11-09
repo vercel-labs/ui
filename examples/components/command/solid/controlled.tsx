@@ -1,4 +1,10 @@
-import { Command, CommandInput, CommandItem, CommandList, CommandPage } from "@ui-sdk/solid/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandPage,
+} from "@ui-sdk/solid/command"
 import { createSignal, For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -40,7 +46,11 @@ function Example() {
           </CommandItem>
         </CommandPage>
         <CommandPage value="theme">
-          <For each={themes}>{(theme) => <CommandItem value={theme.value}>{theme.label}</CommandItem>}</For>
+          <For each={themes}>
+            {(theme) => (
+              <CommandItem value={theme.value}>{theme.label}</CommandItem>
+            )}
+          </For>
         </CommandPage>
       </CommandList>
     </Command>

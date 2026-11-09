@@ -10,7 +10,13 @@ import {
   MenuSubTrigger,
   MenuTrigger,
 } from "@ui-sdk/react/menu"
-import { ChevronRightIcon, DownloadIcon, LinkIcon, ShareIcon, TrashIcon } from "lucide-react"
+import {
+  ChevronRightIcon,
+  DownloadIcon,
+  LinkIcon,
+  ShareIcon,
+  TrashIcon,
+} from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {

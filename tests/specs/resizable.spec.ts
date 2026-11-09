@@ -19,7 +19,9 @@ test.describe("keyboard", () => {
     await open("resizable")
   })
 
-  test("starts at each panel's default size, and panels without one share the rest", async ({ page }) => {
+  test("starts at each panel's default size, and panels without one share the rest", async ({
+    page,
+  }) => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
     await expect(previewHandle(page)).toHaveAttribute("aria-valuenow", "50")
     await expect(terminalHandle(page)).toHaveAttribute("aria-valuenow", "70")
@@ -39,11 +41,15 @@ test.describe("keyboard", () => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "24")
   })
 
-  test("Shift with an arrow key moves by the large step", { tag: "@enhancement" }, async ({ page }) => {
-    await sidebarHandle(page).focus()
-    await page.keyboard.press("Shift+ArrowRight")
-    await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "35")
-  })
+  test(
+    "Shift with an arrow key moves by the large step",
+    { tag: "@enhancement" },
+    async ({ page }) => {
+      await sidebarHandle(page).focus()
+      await page.keyboard.press("Shift+ArrowRight")
+      await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "35")
+    }
+  )
 
   test("arrows across the group's axis do nothing", async ({ page }) => {
     await sidebarHandle(page).focus()
@@ -52,7 +58,9 @@ test.describe("keyboard", () => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
   })
 
-  test("ArrowDown and ArrowUp move a vertical group's handle", async ({ page }) => {
+  test("ArrowDown and ArrowUp move a vertical group's handle", async ({
+    page,
+  }) => {
     await terminalHandle(page).focus()
     await page.keyboard.press("ArrowDown")
     await expect(terminalHandle(page)).toHaveAttribute("aria-valuenow", "71")
@@ -61,7 +69,9 @@ test.describe("keyboard", () => {
     await expect(terminalHandle(page)).toHaveAttribute("aria-valuenow", "69")
   })
 
-  test("Home collapses a collapsible panel, and End grows it to its maximum", async ({ page }) => {
+  test("Home collapses a collapsible panel, and End grows it to its maximum", async ({
+    page,
+  }) => {
     await sidebarHandle(page).focus()
     await page.keyboard.press("Home")
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "0")
@@ -69,13 +79,17 @@ test.describe("keyboard", () => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "40")
   })
 
-  test("Home stops at the minimum of a panel that can't collapse", async ({ page }) => {
+  test("Home stops at the minimum of a panel that can't collapse", async ({
+    page,
+  }) => {
     await previewHandle(page).focus()
     await page.keyboard.press("Home")
     await expect(previewHandle(page)).toHaveAttribute("aria-valuenow", "30")
   })
 
-  test("Enter collapses the panel before the handle, and restores its size", async ({ page }) => {
+  test("Enter collapses the panel before the handle, and restores its size", async ({
+    page,
+  }) => {
     await sidebarHandle(page).focus()
     await page.keyboard.press("Shift+ArrowRight")
     await page.keyboard.press("Enter")
@@ -85,7 +99,9 @@ test.describe("keyboard", () => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "35")
   })
 
-  test("Enter collapses the panel after the handle when only that one can collapse", async ({ page }) => {
+  test("Enter collapses the panel after the handle when only that one can collapse", async ({
+    page,
+  }) => {
     await terminalHandle(page).focus()
     await page.keyboard.press("Enter")
     await expect(terminalHandle(page)).toHaveAttribute("aria-valuenow", "100")
@@ -93,7 +109,10 @@ test.describe("keyboard", () => {
     await expect(terminalHandle(page)).toHaveAttribute("aria-valuenow", "70")
   })
 
-  test("one step past a collapsible panel's minimum collapses it", async ({ page, open }) => {
+  test("one step past a collapsible panel's minimum collapses it", async ({
+    page,
+    open,
+  }) => {
     await open("resizable", { "default-layout": "15,60,25" })
     await sidebarHandle(page).focus()
     await page.keyboard.press("ArrowLeft")
@@ -102,9 +121,13 @@ test.describe("keyboard", () => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "15")
   })
 
-  test("a panel at its minimum passes the rest on to the next one", async ({ page }) => {
+  test("a panel at its minimum passes the rest on to the next one", async ({
+    page,
+  }) => {
     await previewHandle(page).focus()
-    for (let index = 0; index < 3; index++) await page.keyboard.press("Shift+ArrowLeft")
+    for (let index = 0; index < 3; index++) {
+      await page.keyboard.press("Shift+ArrowLeft")
+    }
     await expect(previewHandle(page)).toHaveAttribute("aria-valuenow", "30")
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "15")
   })
@@ -118,7 +141,9 @@ test.describe("keyboard", () => {
 
   test("keys pressed without waiting all land", async ({ page }) => {
     await sidebarHandle(page).focus()
-    for (let index = 0; index < 5; index++) await page.keyboard.press("ArrowRight")
+    for (let index = 0; index < 5; index++) {
+      await page.keyboard.press("ArrowRight")
+    }
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "30")
   })
 
@@ -130,14 +155,18 @@ test.describe("keyboard", () => {
     expect(await status(page, "Committed")).toBe("editor:27,48,25:step-key")
   })
 
-  test("step and large step set how far keys move", { tag: "@enhancement" }, async ({ page, open }) => {
-    await open("resizable", { step: "5", "large-step": "12" })
-    await sidebarHandle(page).focus()
-    await page.keyboard.press("ArrowRight")
-    await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "30")
-    await page.keyboard.press("Shift+ArrowLeft")
-    await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "18")
-  })
+  test(
+    "step and large step set how far keys move",
+    { tag: "@enhancement" },
+    async ({ page, open }) => {
+      await open("resizable", { step: "5", "large-step": "12" })
+      await sidebarHandle(page).focus()
+      await page.keyboard.press("ArrowRight")
+      await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "30")
+      await page.keyboard.press("Shift+ArrowLeft")
+      await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "18")
+    }
+  )
 
   test("a canceled change keeps the layout", async ({ page, open }) => {
     await open("resizable", { cancel: "" })
@@ -158,10 +187,14 @@ test.describe("keyboard", () => {
     expect(await status(page, "Committed")).toContain("editor:0,75,25:collapse")
   })
 
-  test("a controlled group that ignores a change completes nothing", async ({ page, open, framework }) => {
+  test("a controlled group that ignores a change completes nothing", async ({
+    page,
+    open,
+    framework,
+  }) => {
     test.skip(
       framework.startsWith("web"),
-      "A web group's layout attribute sets its state, so it's never controlled.",
+      "A web group's layout attribute sets its state, so it's never controlled."
     )
     await open("resizable", { ignore: "" })
     await sidebarHandle(page).focus()
@@ -178,7 +211,9 @@ test.describe("keyboard", () => {
     await open("resizable", { locked: "" })
     await expect(previewHandle(page)).toHaveAttribute("aria-valuemin", "30")
     await previewHandle(page).focus()
-    for (let press = 0; press < 4; press++) await page.keyboard.press("Shift+ArrowLeft")
+    for (let press = 0; press < 4; press++) {
+      await page.keyboard.press("Shift+ArrowLeft")
+    }
     await expect(previewHandle(page)).toHaveAttribute("aria-valuenow", "30")
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
   })
@@ -189,12 +224,18 @@ test.describe("keyboard", () => {
     await expect(previewHandle(page)).toHaveAttribute("aria-valuenow", "50")
   })
 
-  test("a disabled group's handles leave the tab order and ignore drags", async ({ page, open, tab }) => {
+  test("a disabled group's handles leave the tab order and ignore drags", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("resizable", { disabled: "" })
     await expect(sidebarHandle(page)).not.toHaveAttribute("tabindex")
     await page.getByRole("button", { name: "Before" }).focus()
     await tab()
-    await expect(page.getByRole("button", { name: "Sidebar action" })).toBeFocused()
+    await expect(
+      page.getByRole("button", { name: "Sidebar action" })
+    ).toBeFocused()
     await drag(page, await center(sidebarHandle(page)), { x: 80 })
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
   })
@@ -209,26 +250,43 @@ test.describe("pointer", () => {
     const before = await sizeOf(panel(page, "Sidebar"))
     await drag(page, await center(sidebarHandle(page)), { x: 60 })
     expect(await sizeOf(panel(page, "Sidebar"))).toBeCloseTo(before + 60, 0)
-    expect(await sizeOf(panel(page, "Main"))).toBeCloseTo(editorSpace / 2 - 60, 0)
+    expect(await sizeOf(panel(page, "Main"))).toBeCloseTo(
+      editorSpace / 2 - 60,
+      0
+    )
   })
 
-  test("a drag reports its moves with the drag reason and completes once", async ({ page }) => {
-    await drag(page, await center(sidebarHandle(page)), { x: Math.round(editorSpace / 10) })
+  test("a drag reports its moves with the drag reason and completes once", async ({
+    page,
+  }) => {
+    await drag(page, await center(sidebarHandle(page)), {
+      x: Math.round(editorSpace / 10),
+    })
     expect(await status(page, "Last action")).toBe("editor:35,40,25:drag")
     expect(await status(page, "Committed")).toBe("editor:35,40,25:drag")
   })
 
-  test("dragging past a disabled handle moves nothing beyond it", async ({ page, open }) => {
+  test("dragging past a disabled handle moves nothing beyond it", async ({
+    page,
+    open,
+  }) => {
     await open("resizable", { locked: "" })
-    await drag(page, await center(previewHandle(page)), { x: -Math.round(editorSpace / 2) })
+    await drag(page, await center(previewHandle(page)), {
+      x: -Math.round(editorSpace / 2),
+    })
     await expect(previewHandle(page)).toHaveAttribute("aria-valuenow", "30")
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
   })
 
-  test("dragging a vertical group's handle moves it up and down", async ({ page }) => {
+  test("dragging a vertical group's handle moves it up and down", async ({
+    page,
+  }) => {
     const before = await sizeOf(panel(page, "Code"), "height")
     await drag(page, await center(terminalHandle(page)), { y: -40 })
-    expect(await sizeOf(panel(page, "Code"), "height")).toBeCloseTo(before - 40, 0)
+    expect(await sizeOf(panel(page, "Code"), "height")).toBeCloseTo(
+      before - 40,
+      0
+    )
   })
 
   test("dragging past half a collapsible panel's minimum collapses it, and back opens it", async ({
@@ -253,7 +311,9 @@ test.describe("pointer", () => {
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "40")
   })
 
-  test("a double-click on a handle collapses its panel, and another restores it", async ({ page }) => {
+  test("a double-click on a handle collapses its panel, and another restores it", async ({
+    page,
+  }) => {
     const point = await center(sidebarHandle(page))
     await page.mouse.dblclick(point.x, point.y)
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "0")
@@ -266,7 +326,10 @@ test.describe("pointer", () => {
   test("a press just beside the thin handle drags it", async ({ page }) => {
     const box = (await sidebarHandle(page).boundingBox())!
     await drag(page, { x: box.x + box.width + 3, y: box.y + 100 }, { x: 40 })
-    expect(await sizeOf(panel(page, "Sidebar"))).toBeCloseTo(editorSpace / 4 + 40, 0)
+    expect(await sizeOf(panel(page, "Sidebar"))).toBeCloseTo(
+      editorSpace / 4 + 40,
+      0
+    )
   })
 
   test("a press farther from the handle doesn't drag", async ({ page }) => {
@@ -280,14 +343,26 @@ test.describe("pointer", () => {
     const inner = (await terminalHandle(page).boundingBox())!
     const sidebar = await sizeOf(panel(page, "Sidebar"))
     const code = await sizeOf(panel(page, "Code"), "height")
-    await drag(page, { x: outer.x + outer.width / 2, y: inner.y + inner.height / 2 }, { x: 30, y: 30 })
+    await drag(
+      page,
+      { x: outer.x + outer.width / 2, y: inner.y + inner.height / 2 },
+      { x: 30, y: 30 }
+    )
     expect(await sizeOf(panel(page, "Sidebar"))).toBeCloseTo(sidebar + 30, 0)
-    expect(await sizeOf(panel(page, "Code"), "height")).toBeCloseTo(code + 30, 0)
+    expect(await sizeOf(panel(page, "Code"), "height")).toBeCloseTo(
+      code + 30,
+      0
+    )
   })
 
-  test("a drag shows the axis cursor over the whole page until it ends", async ({ page }) => {
+  test("a drag shows the axis cursor over the whole page until it ends", async ({
+    page,
+  }) => {
     const point = await center(sidebarHandle(page))
-    const cursor = () => page.evaluate(() => getComputedStyle(document.querySelector("output")!).cursor)
+    const cursor = () =>
+      page.evaluate(
+        () => getComputedStyle(document.querySelector("output")!).cursor
+      )
     await page.mouse.move(point.x, point.y)
     await page.mouse.down()
     await page.mouse.move(point.x + 20, point.y, { steps: 2 })
@@ -303,7 +378,9 @@ test.describe("controller", () => {
     await open("resizable")
   })
 
-  test("collapses and expands a panel, with the imperative reason", async ({ page }) => {
+  test("collapses and expands a panel, with the imperative reason", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: "Collapse sidebar" }).click()
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "0")
     expect(await status(page, "Last action")).toBe("editor:0,75,25:imperative")
@@ -318,13 +395,18 @@ test.describe("controller", () => {
 })
 
 test.describe("container", () => {
-  test("a panel with a minimum in pixels keeps it as the group shrinks", async ({ page, open }) => {
+  test("a panel with a minimum in pixels keeps it as the group shrinks", async ({
+    page,
+    open,
+  }) => {
     await open("resizable")
     await previewHandle(page).focus()
     await page.keyboard.press("End")
     expect(await sizeOf(panel(page, "Preview"))).toBeCloseTo(120, 0)
     await page.evaluate(() => {
-      document.querySelector<HTMLElement>('[data-slot="resizable-root"]')!.style.width = "600px"
+      document.querySelector<HTMLElement>(
+        '[data-slot="resizable-root"]'
+      )!.style.width = "600px"
     })
     await expect.poll(() => sizeOf(panel(page, "Preview"))).toBeCloseTo(120, 0)
     expect(await status(page, "Last action")).toMatch(/:resize$/)
@@ -333,9 +415,13 @@ test.describe("container", () => {
   test("panels keep their share as the group grows", async ({ page, open }) => {
     await open("resizable")
     await page.evaluate(() => {
-      document.querySelector<HTMLElement>('[data-slot="resizable-root"]')!.style.width = "1000px"
+      document.querySelector<HTMLElement>(
+        '[data-slot="resizable-root"]'
+      )!.style.width = "1000px"
     })
-    await expect.poll(() => sizeOf(panel(page, "Sidebar"))).toBeCloseTo((1000 - 6) / 4, 0)
+    await expect
+      .poll(() => sizeOf(panel(page, "Sidebar")))
+      .toBeCloseTo((1000 - 6) / 4, 0)
   })
 })
 
@@ -347,28 +433,38 @@ test.describe("pages around a group", () => {
   test("a layer above a handle keeps its presses", async ({ page }) => {
     await page.evaluate(() => {
       const layer = document.createElement("div")
-      layer.style.cssText = "position:fixed;inset:0;z-index:10;background:rgb(0 0 0 / 0.1)"
+      layer.style.cssText =
+        "position:fixed;inset:0;z-index:10;background:rgb(0 0 0 / 0.1)"
       document.body.append(layer)
     })
     await drag(page, await center(sidebarHandle(page)), { x: 40 })
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "25")
   })
 
-  test("a press beside a handle doesn't click what's under it", async ({ page }) => {
+  test("a press beside a handle doesn't click what's under it", async ({
+    page,
+  }) => {
     await page.evaluate(() => {
       const main = document.querySelector<HTMLElement>('[aria-label="Main"]')!
       main.style.position = "relative"
       const button = document.createElement("button")
       button.textContent = "Edge"
-      button.style.cssText = "position:absolute;left:0;top:0;width:20px;height:200px;z-index:1"
+      button.style.cssText =
+        "position:absolute;left:0;top:0;width:20px;height:200px;z-index:1"
       button.addEventListener("click", () => (button.dataset.clicked = ""))
       main.append(button)
     })
     const box = (await sidebarHandle(page).boundingBox())!
     await page.mouse.click(box.x + box.width + 3, box.y + 50)
-    await expect(page.getByRole("button", { name: "Edge" })).not.toHaveAttribute("data-clicked")
-    await page.getByRole("button", { name: "Edge" }).click({ position: { x: 15, y: 50 } })
-    await expect(page.getByRole("button", { name: "Edge" })).toHaveAttribute("data-clicked")
+    await expect(
+      page.getByRole("button", { name: "Edge" })
+    ).not.toHaveAttribute("data-clicked")
+    await page
+      .getByRole("button", { name: "Edge" })
+      .click({ position: { x: 15, y: 50 } })
+    await expect(page.getByRole("button", { name: "Edge" })).toHaveAttribute(
+      "data-clicked"
+    )
   })
 
   test("only the main button drags", async ({ page }) => {
@@ -391,23 +487,33 @@ test.describe("pages around a group", () => {
       document.querySelector('[aria-label="Code"]')!.append(frame)
     })
     await drag(page, await center(sidebarHandle(page)), { x: 100 })
-    expect(await sizeOf(panel(page, "Sidebar"))).toBeCloseTo(editorSpace / 4 + 100, 0)
+    expect(await sizeOf(panel(page, "Sidebar"))).toBeCloseTo(
+      editorSpace / 4 + 100,
+      0
+    )
   })
 
-  test("at a limit, the cursor points the only way a handle can go", async ({ page }) => {
+  test("at a limit, the cursor points the only way a handle can go", async ({
+    page,
+  }) => {
     await sidebarHandle(page).focus()
     await page.keyboard.press("End")
     const point = await center(sidebarHandle(page))
     await page.mouse.move(point.x, point.y)
-    const cursor = () => page.evaluate(() => getComputedStyle(document.body).cursor)
+    const cursor = () =>
+      page.evaluate(() => getComputedStyle(document.body).cursor)
     await expect.poll(cursor).toBe("w-resize")
     await expect(sidebarHandle(page)).toHaveAttribute("data-hovering")
   })
 
-  test("a saved layout is there on the first paint", async ({ page, open, framework }) => {
+  test("a saved layout is there on the first paint", async ({
+    page,
+    open,
+    framework,
+  }) => {
     test.skip(
       framework.endsWith("-ssr"),
-      "A server can't read localStorage. The docs' cookie recipe covers it.",
+      "A server can't read localStorage. The docs' cookie recipe covers it."
     )
     await open("resizable", { autosave: "spec" })
     await sidebarHandle(page).focus()
@@ -417,11 +523,15 @@ test.describe("pages around a group", () => {
     await page.addInitScript(() => {
       new MutationObserver((_, observer) => {
         const sidebar = document.querySelector('[aria-label="Sidebar"]')
-        if (!sidebar) return
+        if (!sidebar) {
+          return
+        }
         observer.disconnect()
         new ResizeObserver(([entry], resize) => {
           resize.disconnect()
-          Object.assign(window, { firstWidth: entry.borderBoxSize[0].inlineSize })
+          Object.assign(window, {
+            firstWidth: entry.borderBoxSize[0].inlineSize,
+          })
         }).observe(sidebar)
       }).observe(document, { childList: true, subtree: true })
     })
@@ -429,7 +539,9 @@ test.describe("pages around a group", () => {
     await page.locator("body[data-mounted]").waitFor({ state: "attached" })
     await expect(sidebarHandle(page)).toHaveAttribute("aria-valuenow", "35")
     await page.waitForFunction(() => "firstWidth" in window)
-    const first = await page.evaluate(() => (window as unknown as { firstWidth: number }).firstWidth)
+    const first = await page.evaluate(
+      () => (window as unknown as { firstWidth: number }).firstWidth
+    )
     expect(first).toBeCloseTo(editorSpace * 0.35, 0)
   })
 })

@@ -8,7 +8,9 @@ import { setStyle, writeStyle } from "../platform/style"
 // at once, so each holder is tracked and only what was changed is put back,
 // one style property at a time.
 
-const shared = ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.modal@2")] ??= {
+const shared = ((globalThis as Record<symbol, unknown>)[
+  Symbol.for("ui-sdk.modal@2")
+] ??= {
   holders: new WeakMap(),
   thaw: new WeakMap(),
   inert: new WeakMap(),
@@ -27,14 +29,22 @@ const shared = ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.modal
 function lockScroll(doc = document, modal?: HTMLElement) {
   const token = {}
   let tokens = shared.holders.get(doc)
-  if (!tokens) shared.holders.set(doc, (tokens = new Set()))
-  if (!tokens.size) shared.thaw.set(doc, freezeScroller(doc))
+  if (!tokens) {
+    shared.holders.set(doc, (tokens = new Set()))
+  }
+  if (!tokens.size) {
+    shared.thaw.set(doc, freezeScroller(doc))
+  }
   tokens.add(token)
   const unguard = modal && isIOS() ? guardTouch(modal) : undefined
   return () => {
-    if (!tokens.delete(token)) return
+    if (!tokens.delete(token)) {
+      return
+    }
     unguard?.()
-    if (tokens.size) return
+    if (tokens.size) {
+      return
+    }
     shared.thaw.get(doc)?.()
     shared.thaw.delete(doc)
   }
@@ -58,8 +68,11 @@ function scrollLockStyles({
     "scroll-behavior": "auto",
   }
   if (scrollbar > 0) {
-    if (gutter) styles["scrollbar-gutter"] = "stable"
-    else styles["padding-right"] = `${padding + scrollbar}px`
+    if (gutter) {
+      styles["scrollbar-gutter"] = "stable"
+    } else {
+      styles["padding-right"] = `${padding + scrollbar}px`
+    }
   }
   return styles
 }
@@ -68,12 +81,21 @@ function freezeScroller(doc: Document) {
   const { scroller, gutter, padding } = early.get(doc) ?? measureScroller(doc)
   const styles = scrollLockStyles({
     scrollbar: gutter,
-    gutter: typeof CSS !== "undefined" && CSS.supports("scrollbar-gutter", "stable"),
+    gutter:
+      typeof CSS !== "undefined" && CSS.supports("scrollbar-gutter", "stable"),
     padding,
   })
-  const restores = Object.entries(styles).map(([name, value]) => setStyle(scroller, name, value))
+  const restores = Object.entries(styles).map(([name, value]) =>
+    setStyle(scroller, name, value)
+  )
   // A public styling hook: fixed elements, like a header, can pad themselves by it.
-  restores.push(setStyle(doc.documentElement, "--scrollbar-width", `${Math.max(0, gutter)}px`))
+  restores.push(
+    setStyle(
+      doc.documentElement,
+      "--scrollbar-width",
+      `${Math.max(0, gutter)}px`
+    )
+  )
   return () => restores.forEach((restore) => restore())
 }
 
@@ -87,7 +109,9 @@ const early = new WeakMap<Document, ReturnType<typeof measureScroller>>()
  * page in the middle of the task, on top of the layout the next frame does.
  */
 function measureScrollerEarly(doc: Document) {
-  if (early.has(doc)) return
+  if (early.has(doc)) {
+    return
+  }
   early.set(doc, measureScroller(doc))
   setTimeout(() => early.delete(doc))
 }
@@ -107,22 +131,35 @@ function measureScroller(doc: Document) {
 // that clips, scrolls the rest.
 function documentScroller(doc: Document, view: Window) {
   const { body, documentElement: root } = doc
-  if (!body || view.getComputedStyle(root).overflowY === "visible") return root
+  if (!body || view.getComputedStyle(root).overflowY === "visible") {
+    return root
+  }
   return /auto|scroll/.test(view.getComputedStyle(body).overflowY) ? body : root
 }
 
 // The room a classic scrollbar takes beside the scroller's content. Overlay
 // scrollbars take none.
-function gutterWidth(scroller: HTMLElement, doc: Document, view: Window, computed: CSSStyleDeclaration) {
-  if (scroller === doc.documentElement) return view.innerWidth - scroller.clientWidth
-  const borders = (parseFloat(computed.borderLeftWidth) || 0) + (parseFloat(computed.borderRightWidth) || 0)
+function gutterWidth(
+  scroller: HTMLElement,
+  doc: Document,
+  view: Window,
+  computed: CSSStyleDeclaration
+) {
+  if (scroller === doc.documentElement) {
+    return view.innerWidth - scroller.clientWidth
+  }
+  const borders =
+    (parseFloat(computed.borderLeftWidth) || 0) +
+    (parseFloat(computed.borderRightWidth) || 0)
   return scroller.offsetWidth - scroller.clientWidth - borders
 }
 
 function canScroll(el: Element, view: Window) {
   const style = view.getComputedStyle(el)
-  const vertical = /auto|scroll/.test(style.overflowY) && el.scrollHeight > el.clientHeight
-  const horizontal = /auto|scroll/.test(style.overflowX) && el.scrollWidth > el.clientWidth
+  const vertical =
+    /auto|scroll/.test(style.overflowY) && el.scrollHeight > el.clientHeight
+  const horizontal =
+    /auto|scroll/.test(style.overflowX) && el.scrollWidth > el.clientWidth
   return vertical || horizontal
 }
 
@@ -132,8 +169,11 @@ function insideScroller(el: Element, view: Window) {
     let node: Element | null = el;
     node && node !== body && node !== documentElement;
     node = node.parentElement
-  )
-    if (canScroll(node, view)) return true
+  ) {
+    if (canScroll(node, view)) {
+      return true
+    }
+  }
   return false
 }
 
@@ -151,8 +191,12 @@ function touchOwner(start: {
   slider: boolean
   selecting: boolean
 }) {
-  if (start.fingers > 1 || start.zoomed) return "browser"
-  if (start.scroller || start.slider || start.selecting) return "element"
+  if (start.fingers > 1 || start.zoomed) {
+    return "browser"
+  }
+  if (start.scroller || start.slider || start.selecting) {
+    return "element"
+  }
   return "page"
 }
 
@@ -170,7 +214,9 @@ function guardTouch(modal: HTMLElement) {
   const view = doc.defaultView ?? window
   writeStyle(doc, "ui-sdk-scroll-guard", guardRule)
   const marked = !modal.hasAttribute("data-scroll-guard")
-  if (marked) modal.setAttribute("data-scroll-guard", "")
+  if (marked) {
+    modal.setAttribute("data-scroll-guard", "")
+  }
 
   let owner: ReturnType<typeof touchOwner> = "browser"
   const offStart = on(
@@ -186,24 +232,29 @@ function guardTouch(modal: HTMLElement) {
         selecting: doc.getSelection()?.type === "Range",
       })
     },
-    { capture: true, passive: true },
+    { capture: true, passive: true }
   )
   const offMove = on(
     doc,
     "touchmove",
     (event) => {
-      if (owner === "page" && event.cancelable) event.preventDefault()
+      if (owner === "page" && event.cancelable) {
+        event.preventDefault()
+      }
     },
-    { passive: false },
+    { passive: false }
   )
   return () => {
     offStart()
     offMove()
-    if (marked) modal.removeAttribute("data-scroll-guard")
+    if (marked) {
+      modal.removeAttribute("data-scroll-guard")
+    }
   }
 }
 
-const liveRegions = '[aria-live]:not([aria-live="off"]),[role="status"],[role="alert"],[role="log"],output'
+const liveRegions =
+  '[aria-live]:not([aria-live="off"]),[role="status"],[role="alert"],[role="log"],output'
 
 function parentOf(node: Node) {
   const parent = node.parentNode
@@ -212,19 +263,42 @@ function parentOf(node: Node) {
 
 function applyInert(keep: Element[]) {
   const doc = keep[0]?.ownerDocument ?? document
-  const all = [...keep, ...Array.from(doc.querySelectorAll(liveRegions)), ...persistentLayers()]
-  const targets = all.filter((el) => !all.some((other) => other !== el && other.contains(el)))
+  const all = [
+    ...keep,
+    ...Array.from(doc.querySelectorAll(liveRegions)),
+    ...persistentLayers(),
+  ]
+  const targets = all.filter(
+    (el) => !all.some((other) => other !== el && other.contains(el))
+  )
   const keepSet = new Set<Node>()
-  for (const el of targets) for (let node: Node | null = el; node; node = parentOf(node)) keepSet.add(node)
+  for (const el of targets) {
+    for (let node: Node | null = el; node; node = parentOf(node)) {
+      keepSet.add(node)
+    }
+  }
   const changed: HTMLElement[] = []
   for (const el of targets) {
-    for (let node: Node | null = el; node && node !== doc.body; node = parentOf(node)) {
+    for (
+      let node: Node | null = el;
+      node && node !== doc.body;
+      node = parentOf(node)
+    ) {
       // Siblings live in the parent, or in the shadow root the node sits in.
-      for (const sibling of Array.from((node.parentNode as ParentNode | null)?.children ?? [])) {
-        if (keepSet.has(sibling) || !(sibling instanceof HTMLElement)) continue
-        const count = shared.inert.get(sibling) ?? (sibling.inert ? Infinity : 0)
-        if (count === 0) sibling.inert = true
-        if (count !== Infinity) shared.inert.set(sibling, count + 1)
+      for (const sibling of Array.from(
+        (node.parentNode as ParentNode | null)?.children ?? []
+      )) {
+        if (keepSet.has(sibling) || !(sibling instanceof HTMLElement)) {
+          continue
+        }
+        const count =
+          shared.inert.get(sibling) ?? (sibling.inert ? Infinity : 0)
+        if (count === 0) {
+          sibling.inert = true
+        }
+        if (count !== Infinity) {
+          shared.inert.set(sibling, count + 1)
+        }
         changed.push(sibling)
       }
     }
@@ -232,11 +306,15 @@ function applyInert(keep: Element[]) {
   return () => {
     for (const el of changed) {
       const count = shared.inert.get(el)
-      if (count === undefined) continue
+      if (count === undefined) {
+        continue
+      }
       if (count <= 1) {
         el.inert = false
         shared.inert.delete(el)
-      } else shared.inert.set(el, count - 1)
+      } else {
+        shared.inert.set(el, count - 1)
+      }
     }
   }
 }
@@ -257,20 +335,32 @@ function inertOutside(keep: HTMLElement[]) {
   }
   return Object.assign(
     () => {
-      if (done) return
+      if (done) {
+        return
+      }
       done = true
       release()
     },
     {
       keep(el: HTMLElement) {
-        if (done) return () => {}
+        if (done) {
+          return () => {}
+        }
         swap([...current, el])
         return () => {
-          if (!done) swap(current.filter((node) => node !== el))
+          if (!done) {
+            swap(current.filter((node) => node !== el))
+          }
         }
       },
-    },
+    }
   )
 }
 
-export { inertOutside, lockScroll, measureScrollerEarly, scrollLockStyles, touchOwner }
+export {
+  inertOutside,
+  lockScroll,
+  measureScrollerEarly,
+  scrollLockStyles,
+  touchOwner,
+}

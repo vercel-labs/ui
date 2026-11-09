@@ -7,10 +7,14 @@ const muteButton = definePrimitive({
   name: "mute-button",
   options: { muted: "boolean", onMutedChange: "callback" },
   controlled: ["muted"],
-  state: (options: { muted?: boolean; onMutedChange?: (muted: boolean) => void }) => ({
+  state: (options: {
+    muted?: boolean
+    onMutedChange?: (muted: boolean) => void
+  }) => ({
     muted: options.muted ?? false,
   }),
-  sync: (options) => (options.muted === undefined ? {} : { muted: options.muted }),
+  sync: (options) =>
+    options.muted === undefined ? {} : { muted: options.muted },
   api: (context) => {
     const change = createChange(context)
 
@@ -22,7 +26,10 @@ const muteButton = definePrimitive({
   },
   slots: (slot) => ({
     root: slot({
-      attrs: (state) => ({ type: "button", "aria-pressed": String(state.muted) }),
+      attrs: (state) => ({
+        type: "button",
+        "aria-pressed": String(state.muted),
+      }),
       press: ({ api }, event) => api.toggle(event),
     }),
   }),
@@ -35,7 +42,11 @@ function Example() {
 
   return (
     <MuteButton muted={muted} onMutedChange={setMuted}>
-      {muted ? <VolumeOffIcon aria-hidden="true" /> : <Volume2Icon aria-hidden="true" />}
+      {muted ? (
+        <VolumeOffIcon aria-hidden="true" />
+      ) : (
+        <Volume2Icon aria-hidden="true" />
+      )}
       {muted ? "Unmute" : "Mute"}
     </MuteButton>
   )

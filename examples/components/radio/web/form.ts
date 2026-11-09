@@ -25,7 +25,7 @@ function mount(root: HTMLElement) {
                   ${speed.label}
                   <span data-slot="hint">(${speed.detail})</span>
                 </label>
-              `,
+              `
             )
             .join("")}
         </ui-radio-group>

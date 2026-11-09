@@ -12,10 +12,13 @@ test("a press hands the @click handler its event and how the button was pressed"
       setup: () => () =>
         h(
           Button,
-          { onClick: (event: MouseEvent, { source }) => calls.push([event.type, source]) },
-          () => "Save",
+          {
+            onClick: (event: MouseEvent, { source }) =>
+              calls.push([event.type, source]),
+          },
+          () => "Save"
         ),
-    }),
+    })
   )
   app.mount(el)
   withSource("agent", () => el.querySelector("button")!.click())

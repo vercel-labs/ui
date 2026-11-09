@@ -31,7 +31,11 @@ type SheetMotion =
       startTime: number
       duration: number
     }
-  | { type: "timeline"; timeline: AnimationTimeline; extentAt: (progress: number) => number }
+  | {
+      type: "timeline"
+      timeline: AnimationTimeline
+      extentAt: (progress: number) => number
+    }
 
 type Values = { dim: number; progress: number; expand: number }
 
@@ -39,17 +43,29 @@ const sampleStep = 1000 / 60
 
 // Registered as numbers that don't inherit, so WAAPI can animate them and a
 // change restyles only the element that has them.
-const variables = ["--drawer-progress", "--drawer-dim", "--drawer-expand", "--drawer-stack"]
+const variables = [
+  "--drawer-progress",
+  "--drawer-dim",
+  "--drawer-expand",
+  "--drawer-stack",
+]
 
 const registered = new WeakSet<Document>()
 
 function registerVariables(doc: Document) {
   const css = doc.defaultView?.CSS
-  if (registered.has(doc) || !css?.registerProperty) return
+  if (registered.has(doc) || !css?.registerProperty) {
+    return
+  }
   registered.add(doc)
   for (const name of variables) {
     try {
-      css.registerProperty({ name, syntax: "<number>", inherits: false, initialValue: "0" })
+      css.registerProperty({
+        name,
+        syntax: "<number>",
+        inherits: false,
+        initialValue: "0",
+      })
     } catch {
       // Already registered, by another copy of the package or the app's own @property.
     }
@@ -57,7 +73,8 @@ function registerVariables(doc: Document) {
 }
 
 const supportsLinear = () =>
-  typeof CSS !== "undefined" && CSS.supports("animation-timing-function", "linear(0, 1)")
+  typeof CSS !== "undefined" &&
+  CSS.supports("animation-timing-function", "linear(0, 1)")
 
 const round = (value: number) => Math.round(value * 10_000) / 10_000
 
@@ -84,7 +101,10 @@ function createSheetEffects(targets: {
   // element, it sits beneath every settle that plays over it.
   let dimHold: Animation | undefined
 
-  function configure(next: { snapExtents: readonly number[]; undimmedIndex: number }) {
+  function configure(next: {
+    snapExtents: readonly number[]
+    undimmedIndex: number
+  }) {
     snapExtents = next.snapExtents.length ? next.snapExtents : [1]
     undimmedIndex = next.undimmedIndex
   }
@@ -99,7 +119,9 @@ function createSheetEffects(targets: {
   let destroyed = false
 
   function apply(extent: number, { rest = false } = {}) {
-    if (destroyed) return
+    if (destroyed) {
+      return
+    }
     stopRunning()
     compute(extent)
     writeDim(values.dim)
@@ -107,21 +129,34 @@ function createSheetEffects(targets: {
     writeStack(values.progress)
     for (const outlet of targets.outlets()) {
       writeVariables(outlet.el, values)
-      if (outlet.keyframes) seekOutlet(outlet, values.expand, rest)
+      if (outlet.keyframes) {
+        seekOutlet(outlet, values.expand, rest)
+      }
     }
-    if (rest) targets.themeColor?.(values.dim)
+    if (rest) {
+      targets.themeColor?.(values.dim)
+    }
   }
 
   function writeDim(dim: number) {
     const backdrop = targets.backdrop()
-    if (backdrop) backdrop.style.opacity = String(dim)
+    if (backdrop) {
+      backdrop.style.opacity = String(dim)
+    }
     const hold = holdDim()
-    if (hold) hold.currentTime = dim * 1000
+    if (hold) {
+      hold.currentTime = dim * 1000
+    }
   }
 
   function holdDim() {
-    if (!targets.dimmed || dimHold) return dimHold
-    dimHold = targets.dimmed.animate({ opacity: [0, 1] }, { ...backdropDim, duration: 1000, fill: "both" })
+    if (!targets.dimmed || dimHold) {
+      return dimHold
+    }
+    dimHold = targets.dimmed.animate(
+      { opacity: [0, 1] },
+      { ...backdropDim, duration: 1000, fill: "both" }
+    )
     dimHold.pause()
     dimHold.currentTime = 0
     return dimHold
@@ -129,8 +164,12 @@ function createSheetEffects(targets: {
 
   function writeStack(progress: number) {
     const ancestors = targets.ancestors()
-    for (let depth = 0; depth < ancestors.length; depth++)
-      ancestors[depth].style.setProperty("--drawer-stack", String(depth + progress))
+    for (let depth = 0; depth < ancestors.length; depth++) {
+      ancestors[depth].style.setProperty(
+        "--drawer-stack",
+        String(depth + progress)
+      )
+    }
   }
 
   function writeVariables(el: HTMLElement, { dim, progress, expand }: Values) {
@@ -142,23 +181,34 @@ function createSheetEffects(targets: {
   function seekOutlet(outlet: SheetOutlet, amount: number, rest: boolean) {
     let animation = seeking.get(outlet.el)
     if (!animation) {
-      animation = outlet.el.animate(asKeyframes(outlet.keyframes!), { duration: 1000, fill: "both" })
+      animation = outlet.el.animate(asKeyframes(outlet.keyframes!), {
+        duration: 1000,
+        fill: "both",
+      })
       animation.pause()
       seeking.set(outlet.el, animation)
     }
     animation.currentTime = amount * 1000
-    if (!rest) return
+    if (!rest) {
+      return
+    }
     animation.commitStyles?.()
     animation.cancel()
     seeking.delete(outlet.el)
   }
 
   function play(motion: SheetMotion) {
-    if (destroyed) return
+    if (destroyed) {
+      return
+    }
     stopRunning()
     stopSeeking()
-    if (!supportsLinear())
-      return apply(motion.type === "settle" ? motion.extentAt(motion.duration) : 0, { rest: true })
+    if (!supportsLinear()) {
+      return apply(
+        motion.type === "settle" ? motion.extentAt(motion.duration) : 0,
+        { rest: true }
+      )
+    }
     const samples = sampleCurves(motion)
     holdDim()
     const timing =
@@ -169,34 +219,56 @@ function createSheetEffects(targets: {
       el: HTMLElement,
       keyframes: Keyframe[] | PropertyIndexedKeyframes,
       curve: number[],
-      pseudo?: typeof backdropDim,
+      pseudo?: typeof backdropDim
     ) => {
-      const animation = el.animate(keyframes, { ...timing, ...pseudo, easing: easing(curve) })
-      if (motion.type === "settle") animation.startTime = motion.startTime
+      const animation = el.animate(keyframes, {
+        ...timing,
+        ...pseudo,
+        easing: easing(curve),
+      })
+      if (motion.type === "settle") {
+        animation.startTime = motion.startTime
+      }
       running.push(animation)
     }
     const backdrop = targets.backdrop()
-    if (backdrop) animate(backdrop, { opacity: [0, 1] }, samples.dim)
-    if (targets.dimmed) animate(targets.dimmed, { opacity: [0, 1] }, samples.dim, backdropDim)
+    if (backdrop) {
+      animate(backdrop, { opacity: [0, 1] }, samples.dim)
+    }
+    if (targets.dimmed) {
+      animate(targets.dimmed, { opacity: [0, 1] }, samples.dim, backdropDim)
+    }
     animateVariables(targets.sheet, samples, animate)
     targets
       .ancestors()
-      .forEach((el, depth) => animate(el, { "--drawer-stack": [depth, depth + 1] }, samples.progress))
+      .forEach((el, depth) =>
+        animate(el, { "--drawer-stack": [depth, depth + 1] }, samples.progress)
+      )
     for (const outlet of targets.outlets()) {
       animateVariables(outlet.el, samples, animate)
-      if (outlet.keyframes) animate(outlet.el, asKeyframes(outlet.keyframes), samples.expand)
+      if (outlet.keyframes) {
+        animate(outlet.el, asKeyframes(outlet.keyframes), samples.expand)
+      }
     }
-    if (motion.type !== "settle") return
+    if (motion.type !== "settle") {
+      return
+    }
     const end = motion.extentAt(motion.duration)
     writeRest(end)
     const batch = running
-    if (batch[0]) batch[0].onfinish = () => running === batch && stopRunning()
+    if (batch[0]) {
+      batch[0].onfinish = () => running === batch && stopRunning()
+    }
   }
 
   function animateVariables(
     el: HTMLElement,
     samples: Record<keyof Values, number[]>,
-    animate: (el: HTMLElement, keyframes: PropertyIndexedKeyframes, curve: number[]) => void,
+    animate: (
+      el: HTMLElement,
+      keyframes: PropertyIndexedKeyframes,
+      curve: number[]
+    ) => void
   ) {
     animate(el, { "--drawer-progress": [0, 1] }, samples.progress)
     animate(el, { "--drawer-dim": [0, 1] }, samples.dim)
@@ -210,7 +282,9 @@ function createSheetEffects(targets: {
     writeStack(end.progress)
     for (const outlet of targets.outlets()) {
       writeVariables(outlet.el, end)
-      if (!outlet.keyframes) continue
+      if (!outlet.keyframes) {
+        continue
+      }
       for (const [property, frames] of Object.entries(outlet.keyframes)) {
         const value = frames[end.expand >= 0.5 ? frames.length - 1 : 0]
         outlet.el.style.setProperty(cssName(property), String(value))
@@ -220,9 +294,16 @@ function createSheetEffects(targets: {
   }
 
   function sampleCurves(motion: SheetMotion) {
-    const curves = { dim: [] as number[], progress: [] as number[], expand: [] as number[] }
+    const curves = {
+      dim: [] as number[],
+      progress: [] as number[],
+      expand: [] as number[],
+    }
     const point: Values = { dim: 0, progress: 0, expand: 0 }
-    const count = motion.type === "settle" ? Math.max(2, Math.ceil(motion.duration / sampleStep) + 1) : 61
+    const count =
+      motion.type === "settle"
+        ? Math.max(2, Math.ceil(motion.duration / sampleStep) + 1)
+        : 61
     for (let index = 0; index < count; index++) {
       const at = index / (count - 1)
       const extent =
@@ -239,17 +320,25 @@ function createSheetEffects(targets: {
 
   // An open moved to the sheet's first drawn frame: every effect starts with it.
   function sync(startTime: number) {
-    for (const animation of running) animation.startTime = startTime
+    for (const animation of running) {
+      animation.startTime = startTime
+    }
   }
 
   function stopRunning() {
-    if (!running.length) return
-    for (const animation of running) animation.cancel()
+    if (!running.length) {
+      return
+    }
+    for (const animation of running) {
+      animation.cancel()
+    }
     running = []
   }
 
   function stopSeeking() {
-    for (const animation of seeking.values()) animation.cancel()
+    for (const animation of seeking.values()) {
+      animation.cancel()
+    }
     seeking.clear()
   }
 
@@ -260,15 +349,29 @@ function createSheetEffects(targets: {
     stopSeeking()
     targets.backdrop()?.style.removeProperty("opacity")
     dimHold?.cancel()
-    for (const name of variables.slice(0, 3)) targets.sheet.style.removeProperty(name)
+    for (const name of variables.slice(0, 3)) {
+      targets.sheet.style.removeProperty(name)
+    }
     for (const outlet of targets.outlets()) {
-      for (const name of variables.slice(0, 3)) outlet.el.style.removeProperty(name)
-      for (const property of Object.keys(outlet.keyframes ?? {}))
+      for (const name of variables.slice(0, 3)) {
+        outlet.el.style.removeProperty(name)
+      }
+      for (const property of Object.keys(outlet.keyframes ?? {})) {
         outlet.el.style.removeProperty(cssName(property))
+      }
     }
   }
 
-  return { configure, compute, apply, play, sync, follow: play, stop: stopRunning, destroy }
+  return {
+    configure,
+    compute,
+    apply,
+    play,
+    sync,
+    follow: play,
+    stop: stopRunning,
+    destroy,
+  }
 }
 
 type SheetEffects = ReturnType<typeof createSheetEffects>
@@ -279,7 +382,8 @@ function easing(curve: number[]) {
   return `linear(${curve.map(round).join(", ")})`
 }
 
-const asKeyframes = (keyframes: SheetKeyframes) => keyframes as PropertyIndexedKeyframes
+const asKeyframes = (keyframes: SheetKeyframes) =>
+  keyframes as PropertyIndexedKeyframes
 
 function cssName(property: string) {
   return property.startsWith("--")
@@ -287,4 +391,10 @@ function cssName(property: string) {
     : property.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)
 }
 
-export { createSheetEffects, type SheetEffects, type SheetKeyframes, type SheetMotion, type SheetOutlet }
+export {
+  createSheetEffects,
+  type SheetEffects,
+  type SheetKeyframes,
+  type SheetMotion,
+  type SheetOutlet,
+}

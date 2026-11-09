@@ -51,7 +51,9 @@ import ts from "typescript"
 
 const root = path.resolve(import.meta.dirname, "..")
 const consumersDir = path.join(root, "scripts/package-consumers")
-const { values: flags } = parseArgs({ options: { build: { type: "boolean", default: false } } })
+const { values: flags } = parseArgs({
+  options: { build: { type: "boolean", default: false } },
+})
 
 // What the emitted declarations import besides @ui-sdk. Each links to the
 // workspace's copy, and TypeScript follows the link, so their own
@@ -91,26 +93,35 @@ const frameworkOptions = {
   solid: { jsx: "preserve", jsxImportSource: "@solidjs/web" },
 }
 
-if (flags.build)
+if (flags.build) {
   for (const script of ["build", "docs:packages"]) {
     const run = spawnSync("pnpm", [script], { cwd: root, stdio: "inherit" })
-    if (run.status !== 0) process.exit(run.status ?? 1)
+    if (run.status !== 0) {
+      process.exit(run.status ?? 1)
+    }
   }
+}
 
 const names = readdirSync(path.join(root, "packages")).filter((name) =>
-  existsSync(path.join(root, "packages", name, "package.json")),
+  existsSync(path.join(root, "packages", name, "package.json"))
 )
-const unbuilt = names.filter((name) => !existsSync(path.join(root, "packages", name, "dist")))
+const unbuilt = names.filter(
+  (name) => !existsSync(path.join(root, "packages", name, "dist"))
+)
 if (unbuilt.length) {
   console.error(
-    `No dist in ${unbuilt.map((name) => `packages/${name}`).join(", ")}. Run \`pnpm build\`, or pass --build.`,
+    `No dist in ${unbuilt.map((name) => `packages/${name}`).join(", ")}. Run \`pnpm build\`, or pass --build.`
   )
   process.exit(1)
 }
 // A missing peer would become a dangling link and a confusing TS2307.
-const uninstalled = peers.filter((peer) => !existsSync(path.join(root, "node_modules", peer)))
+const uninstalled = peers.filter(
+  (peer) => !existsSync(path.join(root, "node_modules", peer))
+)
 if (uninstalled.length) {
-  console.error(`No ${uninstalled.join(", ")} in node_modules. Run \`pnpm install\`.`)
+  console.error(
+    `No ${uninstalled.join(", ")} in node_modules. Run \`pnpm install\`.`
+  )
   process.exit(1)
 }
 
@@ -153,14 +164,26 @@ console.log("\nEvery packed entry typechecks.")
 // Packs a package as it's published and unpacks it into the app's node_modules.
 function install(name) {
   const packageDir = path.join(root, "packages", name)
-  const output = execFileSync("pnpm", ["pack", "--pack-destination", path.join(app, "tarballs")], {
-    cwd: packageDir,
-    encoding: "utf8",
-  })
-  const { name: packageName } = JSON.parse(readFileSync(path.join(packageDir, "package.json"), "utf8"))
+  const output = execFileSync(
+    "pnpm",
+    ["pack", "--pack-destination", path.join(app, "tarballs")],
+    {
+      cwd: packageDir,
+      encoding: "utf8",
+    }
+  )
+  const { name: packageName } = JSON.parse(
+    readFileSync(path.join(packageDir, "package.json"), "utf8")
+  )
   const target = path.join(app, "node_modules", packageName)
   mkdirSync(target, { recursive: true })
-  execFileSync("tar", ["-xzf", output.trim().split("\n").at(-1), "-C", target, "--strip-components=1"])
+  execFileSync("tar", [
+    "-xzf",
+    output.trim().split("\n").at(-1),
+    "-C",
+    target,
+    "--strip-components=1",
+  ])
   return JSON.parse(readFileSync(path.join(target, "package.json"), "utf8"))
 }
 
@@ -177,18 +200,27 @@ function checkPackage(name, manifest, manifests, reported) {
     ...findBundledSiblings(name, manifest),
     ...findUnpublishedImports(name, manifest, manifests),
   ]
-  const checks = [writeEntryImports(name, manifest.name, subpaths, "entries.ts"), ...consumers].map((file) =>
-    typecheck(name, file),
-  )
-  if (tools.length) checks.push(typecheckTool(writeEntryImports(name, manifest.name, tools, "tools.ts")))
+  const checks = [
+    writeEntryImports(name, manifest.name, subpaths, "entries.ts"),
+    ...consumers,
+  ].map((file) => typecheck(name, file))
+  if (tools.length) {
+    checks.push(
+      typecheckTool(writeEntryImports(name, manifest.name, tools, "tools.ts"))
+    )
+  }
   let repeated = 0
-  for (const diagnostics of checks)
+  for (const diagnostics of checks) {
     for (const diagnostic of diagnostics) {
       const key = `${diagnostic.file?.fileName}:${diagnostic.start}:${diagnostic.code}`
-      if (reported.has(key)) repeated++
-      else errors.push(describe(diagnostic))
+      if (reported.has(key)) {
+        repeated++
+      } else {
+        errors.push(describe(diagnostic))
+      }
       reported.add(key)
     }
+  }
 
   const checked = [
     `${listed.length + missing.length} entries`,
@@ -202,11 +234,15 @@ function checkPackage(name, manifest, manifests, reported) {
   console.log(`${manifest.name}: ${checked.join(", ")}. ${found.join(", ")}.`)
   if (missing.length) {
     console.log(
-      "  Declarations missing from the packed package (a build that stopped, or a wrong publishConfig.exports path):",
+      "  Declarations missing from the packed package (a build that stopped, or a wrong publishConfig.exports path):"
     )
-    for (const { subpath, types } of missing) console.log(`    ${subpath}: ${types}`)
+    for (const { subpath, types } of missing) {
+      console.log(`    ${subpath}: ${types}`)
+    }
   }
-  for (const error of errors) console.log(`  ${error}`)
+  for (const error of errors) {
+    console.log(`  ${error}`)
+  }
   return { errors: errors.length, missing: missing.length }
 }
 
@@ -217,18 +253,36 @@ function listEntries(manifest) {
   const subpaths = []
   const missing = []
   for (const [subpath, target] of Object.entries(manifest.exports)) {
-    if (subpath === "./package.json" || subpath.endsWith(".css") || subpath.includes("*")) continue
+    if (
+      subpath === "./package.json" ||
+      subpath.endsWith(".css") ||
+      subpath.includes("*")
+    ) {
+      continue
+    }
     // An entry with no `types` at all is imported anyway, so TypeScript says what's wrong.
     const types = typeof target === "string" ? target : target.types
-    if (!types || existsSync(path.join(app, "node_modules", manifest.name, types))) subpaths.push(subpath)
-    else missing.push({ subpath, types })
+    if (
+      !types ||
+      existsSync(path.join(app, "node_modules", manifest.name, types))
+    ) {
+      subpaths.push(subpath)
+    } else {
+      missing.push({ subpath, types })
+    }
   }
   return { subpaths, missing }
 }
 
 function findMissingDocs(name, manifest) {
-  if (existsSync(path.join(app, "node_modules", manifest.name, "docs/llms.txt"))) return []
-  return [`packages/${name} packs no docs/llms.txt. Run \`pnpm docs:packages\`.`]
+  if (
+    existsSync(path.join(app, "node_modules", manifest.name, "docs/llms.txt"))
+  ) {
+    return []
+  }
+  return [
+    `packages/${name} packs no docs/llms.txt. Run \`pnpm docs:packages\`.`,
+  ]
 }
 
 // Each `@ui-sdk` package the packed manifest lists as a dependency, which
@@ -236,31 +290,50 @@ function findMissingDocs(name, manifest) {
 function findBundledSiblings(name, manifest) {
   return Object.keys(manifest.dependencies ?? {})
     .filter((dependency) => dependency.startsWith("@ui-sdk/"))
-    .map((dependency) => `packages/${name}/package.json lists ${dependency} in dependencies; make it a peer.`)
+    .map(
+      (dependency) =>
+        `packages/${name}/package.json lists ${dependency} in dependencies; make it a peer.`
+    )
 }
 
 // Each `@ui-sdk` module the package's declarations import that isn't an entry
 // of its package, once per file.
 function findUnpublishedImports(name, manifest, manifests) {
-  const entries = new Map([...manifests.values()].map((packed) => [packed.name, Object.keys(packed.exports)]))
-  const packageImport = /(?:\bfrom\s*|\bimport\s*\(\s*)["'](@ui-sdk\/[^/"']+)(\/[^"']+)?["']/g
+  const entries = new Map(
+    [...manifests.values()].map((packed) => [
+      packed.name,
+      Object.keys(packed.exports),
+    ])
+  )
+  const packageImport =
+    /(?:\bfrom\s*|\bimport\s*\(\s*)["'](@ui-sdk\/[^/"']+)(\/[^"']+)?["']/g
   const packageDir = path.join(app, "node_modules", manifest.name)
   const problems = new Set()
   for (const file of readdirSync(packageDir, { recursive: true })) {
-    if (!file.endsWith(".d.ts")) continue
+    if (!file.endsWith(".d.ts")) {
+      continue
+    }
     const source = readFileSync(path.join(packageDir, file), "utf8")
-    for (const [, target, subpath = ""] of source.matchAll(packageImport))
-      if (!entries.get(target)?.includes(`.${subpath}`))
-        problems.add(`packages/${name}/${file} imports ${target}${subpath}, which ${target} doesn't publish.`)
+    for (const [, target, subpath = ""] of source.matchAll(packageImport)) {
+      if (!entries.get(target)?.includes(`.${subpath}`)) {
+        problems.add(
+          `packages/${name}/${file} imports ${target}${subpath}, which ${target} doesn't publish.`
+        )
+      }
+    }
   }
   return [...problems]
 }
 
 // The subpaths whose source in the workspace's manifest is outside `src`.
 function toolEntries(name) {
-  const { exports } = JSON.parse(readFileSync(path.join(root, "packages", name, "package.json"), "utf8"))
+  const { exports } = JSON.parse(
+    readFileSync(path.join(root, "packages", name, "package.json"), "utf8")
+  )
   return Object.entries(exports)
-    .filter(([, target]) => typeof target === "string" && !target.startsWith("./src/"))
+    .filter(
+      ([, target]) => typeof target === "string" && !target.startsWith("./src/")
+    )
     .map(([subpath]) => subpath)
 }
 
@@ -269,9 +342,12 @@ function toolEntries(name) {
 function writeEntryImports(name, packageName, subpaths, fileName) {
   const file = path.join(app, name, fileName)
   const lines = subpaths.map(
-    (subpath, index) => `import * as entry${index} from "${path.posix.join(packageName, subpath)}"`,
+    (subpath, index) =>
+      `import * as entry${index} from "${path.posix.join(packageName, subpath)}"`
   )
-  lines.push(`export const entries = [${subpaths.map((_, index) => `entry${index}`).join(", ")}]`)
+  lines.push(
+    `export const entries = [${subpaths.map((_, index) => `entry${index}`).join(", ")}]`
+  )
   mkdirSync(path.dirname(file), { recursive: true })
   writeFileSync(file, `${lines.join("\n")}\n`)
   return file
@@ -281,7 +357,9 @@ function writeEntryImports(name, packageName, subpaths, fileName) {
 // they import the packed package, not the workspace's sources.
 function copyConsumers(name) {
   const source = path.join(consumersDir, name)
-  if (!existsSync(source)) return []
+  if (!existsSync(source)) {
+    return []
+  }
   cpSync(source, path.join(app, name), { recursive: true })
   return readdirSync(source, { recursive: true })
     .filter((file) => /\.tsx?$/.test(file))
@@ -292,16 +370,26 @@ function copyConsumers(name) {
 function typecheck(name, file) {
   const { options, errors } = ts.convertCompilerOptionsFromJson(
     { ...compilerOptions, ...frameworkOptions[name] },
-    app,
+    app
   )
-  return [...errors, ...ts.getPreEmitDiagnostics(ts.createProgram([file], options))]
+  return [
+    ...errors,
+    ...ts.getPreEmitDiagnostics(ts.createProgram([file], options)),
+  ]
 }
 
 function typecheckTool(file) {
-  const { options, errors } = ts.convertCompilerOptionsFromJson(toolOptions, app)
+  const { options, errors } = ts.convertCompilerOptionsFromJson(
+    toolOptions,
+    app
+  )
   const ours = path.join(app, "node_modules/@ui-sdk/")
-  return [...errors, ...ts.getPreEmitDiagnostics(ts.createProgram([file], options))].filter(
-    ({ file: source }) => !source || source.fileName === file || source.fileName.startsWith(ours),
+  return [
+    ...errors,
+    ...ts.getPreEmitDiagnostics(ts.createProgram([file], options)),
+  ].filter(
+    ({ file: source }) =>
+      !source || source.fileName === file || source.fileName.startsWith(ours)
   )
 }
 
@@ -309,8 +397,12 @@ function describe(diagnostic) {
   const message = ts
     .flattenDiagnosticMessageText(diagnostic.messageText, "\n    ")
     .replace(appPaths, (file) => repoPath(file))
-  if (!diagnostic.file) return `error TS${diagnostic.code}: ${message}`
-  const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start ?? 0)
+  if (!diagnostic.file) {
+    return `error TS${diagnostic.code}: ${message}`
+  }
+  const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(
+    diagnostic.start ?? 0
+  )
   return `${repoPath(diagnostic.file.fileName)}:${line + 1}:${character + 1} - error TS${diagnostic.code}: ${message}`
 }
 
@@ -318,10 +410,16 @@ function describe(diagnostic) {
 // and a copied consumer the one in `scripts/package-consumers`.
 function repoPath(file) {
   const inApp = path.relative(app, file)
-  if (inApp.startsWith("..")) return path.relative(root, file)
+  if (inApp.startsWith("..")) {
+    return path.relative(root, file)
+  }
   const packed = inApp.match(/^node_modules\/@ui-sdk\/([^/]+)\/(.+)$/)
-  if (packed) return path.join("packages", packed[1], packed[2])
-  if (["entries.ts", "tools.ts"].includes(path.basename(inApp))) return `${inApp} (generated)`
+  if (packed) {
+    return path.join("packages", packed[1], packed[2])
+  }
+  if (["entries.ts", "tools.ts"].includes(path.basename(inApp))) {
+    return `${inApp} (generated)`
+  }
   return path.join(path.relative(root, consumersDir), inApp)
 }
 

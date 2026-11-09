@@ -11,7 +11,13 @@ Import the parts you need and nest them as shown in the component's Composition:
 
 ```vue
 <script setup lang="ts">
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/vue/popover"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/vue/popover"
 </script>
 
 <template>
@@ -65,7 +71,9 @@ import { Toggle } from "@ui-sdk/vue/toggle"
 </script>
 
 <template>
-  <Toggle v-slot="{ state }" aria-label="Mute">{{ state.pressed ? "Mute on" : "Mute off" }}</Toggle>
+  <Toggle v-slot="{ state }" aria-label="Mute">{{
+    state.pressed ? "Mute on" : "Mute off"
+  }}</Toggle>
 </template>
 ```
 

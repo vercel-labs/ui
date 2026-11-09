@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { BoldIcon, ItalicIcon, LinkIcon } from "@lucide/vue"
 import { useShortcut } from "@ui-sdk/vue/shortcuts"
-import { createToolbarController, Toolbar, ToolbarButton } from "@ui-sdk/vue/toolbar"
+import {
+  createToolbarController,
+  Toolbar,
+  ToolbarButton,
+} from "@ui-sdk/vue/toolbar"
 import { useLog } from "../../../shared/vue/log"
 
 const actions = [

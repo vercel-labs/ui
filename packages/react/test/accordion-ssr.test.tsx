@@ -1,7 +1,13 @@
 // @vitest-environment node
 import { renderToString } from "react-dom/server"
 import { describe, expect, test } from "vitest"
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "../src/accordion"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "../src/accordion"
 
 function Items({ keepMounted }: { keepMounted?: boolean }) {
   return ["a", "b"].map((value) => (
@@ -9,7 +15,9 @@ function Items({ keepMounted }: { keepMounted?: boolean }) {
       <AccordionHeader>
         <AccordionTrigger>{`Trigger ${value}`}</AccordionTrigger>
       </AccordionHeader>
-      <AccordionPanel keepMounted={keepMounted}>{`Panel ${value}`}</AccordionPanel>
+      <AccordionPanel
+        keepMounted={keepMounted}
+      >{`Panel ${value}`}</AccordionPanel>
     </AccordionItem>
   ))
 }
@@ -20,7 +28,7 @@ describe("server rendering an accordion", () => {
     const html = renderToString(
       <Accordion defaultValue={["b"]}>
         <Items />
-      </Accordion>,
+      </Accordion>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain("<h3")
@@ -35,13 +43,13 @@ describe("server rendering an accordion", () => {
     const kept = renderToString(
       <Accordion defaultValue={["b"]}>
         <Items keepMounted />
-      </Accordion>,
+      </Accordion>
     )
     expect(kept).toMatch(/<div[^>]*hidden=""[^>]*>Panel a/)
     const findable = renderToString(
       <Accordion defaultValue={["b"]} hiddenUntilFound>
         <Items />
-      </Accordion>,
+      </Accordion>
     )
     // React can only render hidden as a boolean. The panel makes it until-found once bound.
     expect(findable).toMatch(/<div[^>]*hidden=""[^>]*>Panel a/)

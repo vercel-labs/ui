@@ -39,7 +39,11 @@ const ProgressLabel = parts.Label
  * @stable
  */
 function ProgressValue(props: ComponentProps<typeof parts.Value>) {
-  return <parts.Value {...props}>{props.children ?? ((state: ProgressValueState) => state.text)}</parts.Value>
+  return (
+    <parts.Value {...props}>
+      {props.children ?? ((state: ProgressValueState) => state.text)}
+    </parts.Value>
+  )
 }
 
 export type {
@@ -52,4 +56,10 @@ export type {
   ProgressValueState,
 } from "@ui-sdk/core/progress"
 
-export { Progress, ProgressIndicator, ProgressLabel, ProgressTrack, ProgressValue }
+export {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+  ProgressValue,
+}

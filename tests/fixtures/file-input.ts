@@ -35,11 +35,19 @@ const fileInputFixture = {
     maxSize: 1000,
     minSize: 1,
   },
-  zone: { label: "Attachments drop zone", text: "Drop files here", dragging: "Release to add" },
+  zone: {
+    label: "Attachments drop zone",
+    text: "Drop files here",
+    dragging: "Release to add",
+  },
   trigger: { label: "Browse files" },
   list: { label: "Attached files" },
   note: { label: "Note", name: "note" },
-  avatar: { label: "Upload avatar", accept: "image/*", capture: "user" as const },
+  avatar: {
+    label: "Upload avatar",
+    accept: "image/*",
+    capture: "user" as const,
+  },
   folder: { label: "Upload folder" },
   page: { label: "Drop anywhere", text: "Drop to attach" },
 }
@@ -55,7 +63,10 @@ function fileInputOptions() {
   return {
     disabled: params.has("disabled"),
     multiple: !params.has("single"),
-    maxFiles: maxFiles === null ? fileInputFixture.attachments.maxFiles : Number(maxFiles),
+    maxFiles:
+      maxFiles === null
+        ? fileInputFixture.attachments.maxFiles
+        : Number(maxFiles),
     page: params.has("page"),
     cancel: params.has("cancel"),
     required: params.has("required"),
@@ -79,20 +90,25 @@ function describeChange(
     added?: readonly Named[]
     removed?: readonly Named[]
     rejected?: readonly Rejection[]
-  },
+  }
 ) {
   const files = [
     ...(details.added ?? []).map((file) => file.name),
     ...(details.removed ?? []).map((file) => `-${file.name}`),
   ]
-  const rejected = (details.rejected ?? []).map(({ file, reasons }) => `${file.name}(${reasons.join("+")})`)
+  const rejected = (details.rejected ?? []).map(
+    ({ file, reasons }) => `${file.name}(${reasons.join("+")})`
+  )
   return `${kind}:${details.reason}:${files.join(",")}|${rejected.join(",")}`
 }
 
 // What a form would submit, with file names for files.
 function serializeFiles(form: HTMLFormElement) {
   return [...new FormData(form)]
-    .map(([name, value]) => `${name}=${typeof value === "string" ? value : value.name}`)
+    .map(
+      ([name, value]) =>
+        `${name}=${typeof value === "string" ? value : value.name}`
+    )
     .join("&")
 }
 

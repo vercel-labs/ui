@@ -1,5 +1,11 @@
 import { expect, lastAction, test } from "../fixtures"
-import { checkbox, fillRequired, formData, save, submitted } from "./forms.helpers"
+import {
+  checkbox,
+  fillRequired,
+  formData,
+  save,
+  submitted,
+} from "./forms.helpers"
 
 // Checkboxes that share a name, with a parent that checks them all, like the
 // mixed checkbox in the WAI-ARIA checkbox pattern:
@@ -12,7 +18,9 @@ test.beforeEach(async ({ open }) => {
 })
 
 test("the group is named by its label", async ({ page }) => {
-  await expect(page.getByRole("group", { name: "Toppings", exact: true }).last()).toBeVisible()
+  await expect(
+    page.getByRole("group", { name: "Toppings", exact: true }).last()
+  ).toBeVisible()
 })
 
 test("starts on its default value", async ({ page }) => {
@@ -29,20 +37,31 @@ test("checking a checkbox adds its value to the group", async ({ page }) => {
   await expect.poll(() => lastAction(page)).toBe("toppings:olives")
 })
 
-test("every checked value submits under the group's name, in order", async ({ page }) => {
+test("every checked value submits under the group's name, in order", async ({
+  page,
+}) => {
   await checkbox(page, "Olives").click()
   await checkbox(page, "Mushrooms").click()
-  await expect.poll(() => formData(page)).toContain("toppings=cheese&toppings=mushrooms&toppings=olives")
+  await expect
+    .poll(() => formData(page))
+    .toContain("toppings=cheese&toppings=mushrooms&toppings=olives")
 })
 
-test("a reset returns to the default value", { tag: "@enhancement" }, async ({ page }) => {
-  await checkbox(page, "Cheese").click()
-  await checkbox(page, "Olives").click()
-  await page.getByRole("button", { name: "Reset" }).click()
-  await expect(checkbox(page, "Cheese")).toBeChecked()
-  await expect(checkbox(page, "Olives")).not.toBeChecked()
-  await expect(checkbox(page, "All toppings")).toHaveAttribute("aria-checked", "mixed")
-})
+test(
+  "a reset returns to the default value",
+  { tag: "@enhancement" },
+  async ({ page }) => {
+    await checkbox(page, "Cheese").click()
+    await checkbox(page, "Olives").click()
+    await page.getByRole("button", { name: "Reset" }).click()
+    await expect(checkbox(page, "Cheese")).toBeChecked()
+    await expect(checkbox(page, "Olives")).not.toBeChecked()
+    await expect(checkbox(page, "All toppings")).toHaveAttribute(
+      "aria-checked",
+      "mixed"
+    )
+  }
+)
 
 test.describe("parent checkbox", () => {
   test("is mixed while some checkboxes are checked", async ({ page }) => {
@@ -54,20 +73,29 @@ test.describe("parent checkbox", () => {
     await expect(parent).toHaveAttribute("aria-checked", "mixed")
   })
 
-  test("checks every checkbox from mixed, then unchecks them all", async ({ page }) => {
+  test("checks every checkbox from mixed, then unchecks them all", async ({
+    page,
+  }) => {
     const parent = checkbox(page, "All toppings")
     await parent.click()
     await expect(parent).toHaveAttribute("aria-checked", "true")
-    for (const name of children) await expect(checkbox(page, name)).toBeChecked()
+    for (const name of children) {
+      await expect(checkbox(page, name)).toBeChecked()
+    }
     await parent.click()
     await expect(parent).toHaveAttribute("aria-checked", "false")
-    for (const name of children) await expect(checkbox(page, name)).not.toBeChecked()
+    for (const name of children) {
+      await expect(checkbox(page, name)).not.toBeChecked()
+    }
   })
 
   test("is checked once every checkbox is", async ({ page }) => {
     await checkbox(page, "Mushrooms").click()
     await checkbox(page, "Olives").click()
-    await expect(checkbox(page, "All toppings")).toHaveAttribute("aria-checked", "true")
+    await expect(checkbox(page, "All toppings")).toHaveAttribute(
+      "aria-checked",
+      "true"
+    )
   })
 
   test("submits nothing itself", async ({ page }) => {
@@ -98,5 +126,5 @@ test(
     await expect(olives).toBeChecked()
     await page.keyboard.press("Enter")
     await expect.poll(() => submitted(page)).toContain("toppings=olives")
-  },
+  }
 )

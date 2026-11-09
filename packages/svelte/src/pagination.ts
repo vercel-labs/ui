@@ -7,7 +7,10 @@ export { default as PaginationLink } from "./pagination/pagination-link.svelte"
 export { default as PaginationList } from "./pagination/pagination-list.svelte"
 export { default as PaginationNext } from "./pagination/pagination-next.svelte"
 export { default as PaginationPrevious } from "./pagination/pagination-previous.svelte"
-export { createPaginationController, paginationRange } from "@ui-sdk/core/pagination"
+export {
+  createPaginationController,
+  paginationRange,
+} from "@ui-sdk/core/pagination"
 export type {
   PaginationChangeOptions,
   PaginationController,

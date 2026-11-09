@@ -9,12 +9,20 @@ import type {
   ToastRegionState,
   ToastState,
 } from "./toast"
-import { findItem, hasToasts, isExpanded, type ToastRegionApi, type ToastRegionStoreState } from "./toast-api"
+import {
+  findItem,
+  hasToasts,
+  isExpanded,
+  type ToastRegionApi,
+  type ToastRegionStoreState,
+} from "./toast-api"
 
 // Renderers fill `toast` from the toast around the part, so it's set by now.
 type ToastPart = { toast?: string }
 
-const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) => ({
+const toastSlots = (
+  slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>
+) => ({
   region: slot<{}, ToastRegionState>({
     // A landmark only while there's something in it.
     role: (state) => (hasToasts(state.items) ? "region" : undefined),
@@ -23,7 +31,8 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
       const open = hasToasts(state.items)
       return {
         "aria-label": open ? (state.label ?? "Notifications") : undefined,
-        "aria-keyshortcuts": open && state.shortcut ? ariaKeyshortcuts(state.shortcut) : undefined,
+        "aria-keyshortcuts":
+          open && state.shortcut ? ariaKeyshortcuts(state.shortcut) : undefined,
         "data-side": state.side,
         "data-align": state.align,
         "data-expanded": isExpanded(state) ? "" : undefined,
@@ -35,7 +44,10 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
       expanded: isExpanded(state),
       toasts: state.items,
     }),
-    on: { keydown: (event, { el, api }) => el && api.internal.regionKeydown(event, el) },
+    on: {
+      keydown: (event, { el, api }) =>
+        el && api.internal.regionKeydown(event, el),
+    },
     bind: (el, { api }) => api.internal.bindRegion(el),
   }),
   list: slot({}),
@@ -43,7 +55,9 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
     present: (state, { key }) => !!findItem(state.items, key),
     attrs: (state, { key }) => {
       const item = findItem(state.items, key)
-      if (!item) return {}
+      if (!item) {
+        return {}
+      }
       return {
         tabindex: "0",
         "data-type": item.toast.type,
@@ -51,7 +65,8 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
         "data-front": item.index === 0 ? "" : undefined,
         "data-expanded": isExpanded(state) ? "" : undefined,
         // Swipes are the toast's, not the page's.
-        style: item.toast.dismissible === false ? undefined : "touch-action:none",
+        style:
+          item.toast.dismissible === false ? undefined : "touch-action:none",
       }
     },
     state: (state, { key }) => {
@@ -67,12 +82,16 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
     },
     on: {
       keydown: (event, { key, api }) => {
-        if (event.key !== "Escape") return
+        if (event.key !== "Escape") {
+          return
+        }
         const toast = api.internal
           .toaster()
           .toasts()
           .find((item) => item.id === key)
-        if (!toast || toast.dismissible === false) return
+        if (!toast || toast.dismissible === false) {
+          return
+        }
         // Handled here, so a modal dialog beneath stays open.
         event.preventDefault()
         api.internal.close(key, "escape-key", event)
@@ -97,9 +116,17 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
     },
   }),
   action: slot<ToastPart & ToastActionProps, ToastButtonState>({
-    props: { id: "id", toast: { kind: "string", from: "root.id" }, onAction: "action", dismiss: "boolean" },
+    props: {
+      id: "id",
+      toast: { kind: "string", from: "root.id" },
+      onAction: "action",
+      dismiss: "boolean",
+    },
     attrs: (state, { key }) => buttonAttrs(state.buttons[key]),
-    state: (state, { key }) => ({ pending: !!state.buttons[key]?.pending, error: state.buttons[key]?.error }),
+    state: (state, { key }) => ({
+      pending: !!state.buttons[key]?.pending,
+      error: state.buttons[key]?.error,
+    }),
     press: ({ key, props, api }, event) => {
       const action = api.internal
         .toaster()
@@ -111,16 +138,30 @@ const toastSlots = (slot: SlotFactory<ToastRegionStoreState, ToastRegionApi>) =>
         props.onAction ?? action?.onAction,
         props.dismiss ?? action?.dismiss ?? true,
         "action",
-        event,
+        event
       )
     },
   }),
   close: slot<ToastPart & ToastCloseProps, ToastButtonState>({
-    props: { id: "id", toast: { kind: "string", from: "root.id" }, action: "action" },
+    props: {
+      id: "id",
+      toast: { kind: "string", from: "root.id" },
+      action: "action",
+    },
     attrs: (state, { key }) => buttonAttrs(state.buttons[key]),
-    state: (state, { key }) => ({ pending: !!state.buttons[key]?.pending, error: state.buttons[key]?.error }),
+    state: (state, { key }) => ({
+      pending: !!state.buttons[key]?.pending,
+      error: state.buttons[key]?.error,
+    }),
     press: ({ key, props, api }, event) =>
-      api.internal.press(key, props.toast!, props.action, true, "close-press", event),
+      api.internal.press(
+        key,
+        props.toast!,
+        props.action,
+        true,
+        "close-press",
+        event
+      ),
   }),
 })
 

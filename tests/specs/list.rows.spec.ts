@@ -6,30 +6,46 @@ import { expect, lastAction, test } from "../fixtures"
 // "+N more", a value text that counts the rest, and the next page loading
 // when the end of the list is reached.
 
-const option = (page: Page, name: string) => page.getByRole("option", { name, exact: true })
+const option = (page: Page, name: string) =>
+  page.getByRole("option", { name, exact: true })
 const listbox = (page: Page) => page.getByRole("listbox")
-const optionTexts = (page: Page) => listbox(page).getByRole("option").allInnerTexts()
+const optionTexts = (page: Page) =>
+  listbox(page).getByRole("option").allInnerTexts()
 
-test.describe("items shown while nothing is typed", { tag: "@enhancement" }, () => {
-  test("a combobox shows its recent items, as a group, until the user types", async ({ page, open }) => {
-    await open("combobox", { recent: "" })
-    const input = page.getByRole("combobox", { name: "Country" })
-    await input.click()
-    await expect(page.getByRole("group", { name: "Recent" })).toBeVisible()
-    await expect.poll(() => optionTexts(page)).toEqual(["France", "Chile"])
-    await input.pressSequentially("au")
-    await expect.poll(() => optionTexts(page)).toEqual(["Australia", "Austria"])
-    await input.fill("")
-    await expect.poll(() => optionTexts(page)).toEqual(["France", "Chile"])
-  })
+test.describe(
+  "items shown while nothing is typed",
+  { tag: "@enhancement" },
+  () => {
+    test("a combobox shows its recent items, as a group, until the user types", async ({
+      page,
+      open,
+    }) => {
+      await open("combobox", { recent: "" })
+      const input = page.getByRole("combobox", { name: "Country" })
+      await input.click()
+      await expect(page.getByRole("group", { name: "Recent" })).toBeVisible()
+      await expect.poll(() => optionTexts(page)).toEqual(["France", "Chile"])
+      await input.pressSequentially("au")
+      await expect
+        .poll(() => optionTexts(page))
+        .toEqual(["Australia", "Austria"])
+      await input.fill("")
+      await expect.poll(() => optionTexts(page)).toEqual(["France", "Chile"])
+    })
 
-  test("an autocomplete shows recent searches while the field is empty", async ({ page, open }) => {
-    await open("autocomplete", { recent: "", focus: "" })
-    await page.getByRole("combobox", { name: "Fruit" }).focus()
-    await expect(page.getByRole("group", { name: "Recent searches" })).toBeVisible()
-    await expect.poll(() => optionTexts(page)).toEqual(["Lemon", "Mango"])
-  })
-})
+    test("an autocomplete shows recent searches while the field is empty", async ({
+      page,
+      open,
+    }) => {
+      await open("autocomplete", { recent: "", focus: "" })
+      await page.getByRole("combobox", { name: "Fruit" }).focus()
+      await expect(
+        page.getByRole("group", { name: "Recent searches" })
+      ).toBeVisible()
+      await expect.poll(() => optionTexts(page)).toEqual(["Lemon", "Mango"])
+    })
+  }
+)
 
 test.describe("select all", { tag: "@enhancement" }, () => {
   const selectAll = (page: Page, name = "Select all") => option(page, name)
@@ -58,13 +74,20 @@ test.describe("select all", { tag: "@enhancement" }, () => {
 
   test("covers only the items the text matches", async ({ page, open }) => {
     await open("combobox", { multiple: "", "select-all": "" })
-    await page.getByRole("combobox", { name: "Country" }).pressSequentially("au")
-    await expect.poll(() => optionTexts(page)).toEqual(["Select all", "Australia", "Austria"])
+    await page
+      .getByRole("combobox", { name: "Country" })
+      .pressSequentially("au")
+    await expect
+      .poll(() => optionTexts(page))
+      .toEqual(["Select all", "Australia", "Austria"])
     await selectAll(page).click()
     expect(await lastAction(page)).toBe("value:au,at")
   })
 
-  test("is reached with the arrow keys and chosen with Enter", async ({ page, open }) => {
+  test("is reached with the arrow keys and chosen with Enter", async ({
+    page,
+    open,
+  }) => {
     await open("combobox", { multiple: "", "select-all": "" })
     const input = page.getByRole("combobox", { name: "Country" })
     await input.focus()
@@ -75,13 +98,23 @@ test.describe("select all", { tag: "@enhancement" }, () => {
     await expect(selectAll(page)).toHaveAttribute("aria-checked", "true")
   })
 
-  test("in a group, it covers that group", async ({ page, open, framework }) => {
-    test.skip(framework.includes("data"), "Data groups render no select-all option; the composed ones do.")
+  test("in a group, it covers that group", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(
+      framework.includes("data"),
+      "Data groups render no select-all option; the composed ones do."
+    )
     await open("combobox", { multiple: "", "select-all": "", grouped: "" })
     await page.getByRole("combobox", { name: "Country" }).click()
     await option(page, "Select all Europe").click()
     expect(await lastAction(page)).toBe("value:at,fr,de")
-    await expect(option(page, "Select all Americas")).toHaveAttribute("aria-checked", "false")
+    await expect(option(page, "Select all Americas")).toHaveAttribute(
+      "aria-checked",
+      "false"
+    )
   })
 
   test("a select's works the same, with real focus", async ({ page, open }) => {
@@ -93,18 +126,30 @@ test.describe("select all", { tag: "@enhancement" }, () => {
     await expect(selectAll(page)).toBeFocused()
     await expect(selectAll(page)).toHaveAttribute("aria-checked", "mixed")
     await page.keyboard.press("Enter")
-    expect(await lastAction(page)).toBe("value:apple,banana,blueberry,cherry,lemon,mango,orange")
+    expect(await lastAction(page)).toBe(
+      "value:apple,banana,blueberry,cherry,lemon,mango,orange"
+    )
   })
 })
 
 test.describe("chips that collapse", { tag: "@enhancement" }, () => {
   // A chip is seen through its remove button, which hides with it.
-  const chip = (page: Page, name: string) => page.getByRole("button", { name: `Remove ${name}` })
+  const chip = (page: Page, name: string) =>
+    page.getByRole("button", { name: `Remove ${name}` })
 
-  test("chips past the line hide, and a count says how many", async ({ page, open }) => {
-    await open("combobox", { multiple: "", overflow: "", value: "ar,au,at,be,br,ca" })
+  test("chips past the line hide, and a count says how many", async ({
+    page,
+    open,
+  }) => {
+    await open("combobox", {
+      multiple: "",
+      overflow: "",
+      value: "ar,au,at,be,br,ca",
+    })
     await expect(page.getByText(/^\+\d more$/)).toBeVisible()
-    const hidden = Number((await page.getByText(/^\+\d more$/).innerText()).match(/\d/)![0])
+    const hidden = Number(
+      (await page.getByText(/^\+\d more$/).innerText()).match(/\d/)![0]
+    )
     expect(hidden).toBeGreaterThan(0)
     await expect(chip(page, "Argentina")).toBeVisible()
     await expect(chip(page, "Canada")).toBeHidden()
@@ -114,12 +159,17 @@ test.describe("chips that collapse", { tag: "@enhancement" }, () => {
     expect(count.x + count.width).toBeLessThanOrEqual(box.x + box.width)
   })
 
-  test("removing chips brings the hidden ones back, and the count goes", async ({ page, open }) => {
+  test("removing chips brings the hidden ones back, and the count goes", async ({
+    page,
+    open,
+  }) => {
     await open("combobox", { multiple: "", overflow: "", value: "ar,au,at,be" })
     await expect(page.getByText(/^\+\d more$/)).toBeVisible()
     const input = page.getByRole("combobox", { name: "Country" })
     await input.focus()
-    for (let step = 0; step < 3; step++) await page.keyboard.press("Backspace")
+    for (let step = 0; step < 3; step++) {
+      await page.keyboard.press("Backspace")
+    }
     await expect(chip(page, "Argentina")).toBeVisible()
     await expect(page.getByText(/^\+\d more$/)).toBeHidden()
   })
@@ -129,33 +179,63 @@ test.describe("chips that collapse", { tag: "@enhancement" }, () => {
     open,
     framework,
   }) => {
-    test.skip(framework.startsWith("web"), "Web components render chips, not a value text.")
+    test.skip(
+      framework.startsWith("web"),
+      "Web components render chips, not a value text."
+    )
     await open("combobox", { multiple: "", summary: "2", value: "fr,cl,de,at" })
-    await expect(page.getByRole("status", { name: "Summary" })).toHaveText("France, Chile, and 2 more")
+    await expect(page.getByRole("status", { name: "Summary" })).toHaveText(
+      "France, Chile, and 2 more"
+    )
   })
 
-  test("a select's value lists two labels and counts the rest", async ({ page, open }) => {
-    await open("select", { multiple: "", max: "2", value: "apple,banana,cherry,lemon" })
-    await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText("Apple, Banana, and 2 more")
+  test("a select's value lists two labels and counts the rest", async ({
+    page,
+    open,
+  }) => {
+    await open("select", {
+      multiple: "",
+      max: "2",
+      value: "apple,banana,cherry,lemon",
+    })
+    await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText(
+      "Apple, Banana, and 2 more"
+    )
   })
 
-  test("a web select value takes getMoreLabel as a property", async ({ page, open, framework }) => {
-    test.skip(!framework.startsWith("web"), "React and Vue pass getMoreLabel as a prop.")
-    await open("select", { multiple: "", max: "2", value: "apple,banana,cherry,lemon" })
+  test("a web select value takes getMoreLabel as a property", async ({
+    page,
+    open,
+    framework,
+  }) => {
+    test.skip(
+      !framework.startsWith("web"),
+      "React and Vue pass getMoreLabel as a prop."
+    )
+    await open("select", {
+      multiple: "",
+      max: "2",
+      value: "apple,banana,cherry,lemon",
+    })
     await page
       .locator("ui-select-value")
       .evaluate(
         (el: HTMLElement & { getMoreLabel?: unknown }) =>
-          (el.getMoreLabel = (count: number) => `${count} others`),
+          (el.getMoreLabel = (count: number) => `${count} others`)
       )
-    await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText("Apple, Banana, and 2 others")
+    await expect(page.getByRole("combobox", { name: "Fruit" })).toContainText(
+      "Apple, Banana, and 2 others"
+    )
   })
 })
 
 test.describe("loading more", { tag: "@enhancement" }, () => {
   const input = (page: Page) => page.getByRole("combobox", { name: "Country" })
 
-  test("reaching the last item with the keyboard loads the next page", async ({ page, open }) => {
+  test("reaching the last item with the keyboard loads the next page", async ({
+    page,
+    open,
+  }) => {
     await open("combobox", { pages: "" })
     await input(page).focus()
     await page.keyboard.press("ArrowDown")
@@ -164,11 +244,14 @@ test.describe("loading more", { tag: "@enhancement" }, () => {
     await expect(listbox(page).getByRole("option")).toHaveCount(8)
     await expect(
       option(page, "Belgium"),
-      "the highlight stays where it was while the page arrives",
+      "the highlight stays where it was while the page arrives"
     ).toHaveAttribute("data-highlighted", "")
   })
 
-  test("scrolling to the end loads the next page, with a status while it does", async ({ page, open }) => {
+  test("scrolling to the end loads the next page, with a status while it does", async ({
+    page,
+    open,
+  }) => {
     await open("combobox", { pages: "" })
     await input(page).click()
     await expect(listbox(page).getByRole("option")).toHaveCount(4)
@@ -181,11 +264,18 @@ test.describe("loading more", { tag: "@enhancement" }, () => {
   test("the last page loads no more", async ({ page, open }) => {
     await open("combobox", { pages: "" })
     await input(page).pressSequentially("r")
-    await expect.poll(() => optionTexts(page)).toEqual(["Argentina", "Australia", "Austria", "Brazil"])
+    await expect
+      .poll(() => optionTexts(page))
+      .toEqual(["Argentina", "Australia", "Austria", "Brazil"])
     await page.keyboard.press("ArrowUp")
     await expect(listbox(page).getByRole("option")).toHaveCount(7)
-    for (let step = 0; step < 2; step++) await page.keyboard.press("ArrowDown")
-    await expect(option(page, "Germany")).toHaveAttribute("data-highlighted", "")
+    for (let step = 0; step < 2; step++) {
+      await page.keyboard.press("ArrowDown")
+    }
+    await expect(option(page, "Germany")).toHaveAttribute(
+      "data-highlighted",
+      ""
+    )
     await expect(page.getByText("Loading more…")).toBeHidden()
     await expect(listbox(page).getByRole("option")).toHaveCount(7)
   })
@@ -196,7 +286,9 @@ test.describe("rows", () => {
     await open("combobox", { recent: "" })
     await page.getByRole("combobox", { name: "Country" }).click()
     await option(page, "Chile").click()
-    await expect(page.getByRole("combobox", { name: "Country" })).toHaveValue("Chile")
+    await expect(page.getByRole("combobox", { name: "Country" })).toHaveValue(
+      "Chile"
+    )
     expect(await lastAction(page)).toBe("value:cl")
   })
 

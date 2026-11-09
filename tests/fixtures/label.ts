@@ -37,7 +37,12 @@ const labelFixture = {
     ],
   },
   // A number input that renders after its label, once "Show quantity" is pressed.
-  quantity: { id: "quantity", label: "Quantity", show: "Show quantity", defaultValue: 1 },
+  quantity: {
+    id: "quantity",
+    label: "Quantity",
+    show: "Show quantity",
+    defaultValue: 1,
+  },
 }
 
 export { labelFixture }

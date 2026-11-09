@@ -62,7 +62,10 @@ function Example() {
           </svg>
         </SelectTrigger>
         <SelectContent>
-          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectInput
+            aria-label="Search countries"
+            placeholder="Search countries…"
+          />
           <SelectEmpty>No countries found.</SelectEmpty>
           <SelectList>
             <For each={regions}>
@@ -75,7 +78,13 @@ function Example() {
                         <SelectItemText>
                           {(state) => (
                             <For each={state.segments}>
-                              {(segment) => (segment.match ? <b>{segment.text}</b> : segment.text)}
+                              {(segment) =>
+                                segment.match ? (
+                                  <b>{segment.text}</b>
+                                ) : (
+                                  segment.text
+                                )
+                              }
                             </For>
                           )}
                         </SelectItemText>

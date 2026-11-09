@@ -14,7 +14,13 @@ import * as React from "react"
 import { createRoot } from "react-dom/client"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
-import { describe, groups, toppings, variantData, type Variant } from "./variants"
+import {
+  describe,
+  groups,
+  toppings,
+  variantData,
+  type Variant,
+} from "./variants"
 
 function Leaf() {
   return (
@@ -53,19 +59,26 @@ function Item({
         <Leaf />
       </ListboxItemIcon>
       {label}
-      <ListboxItemIndicator className={classes.indicator}>✓</ListboxItemIndicator>
+      <ListboxItemIndicator className={classes.indicator}>
+        ✓
+      </ListboxItemIndicator>
     </ListboxItem>
   )
 }
 
 function Items({ variant }: { variant: Variant }) {
-  if (variant.items !== "grouped")
-    return toppings.map((item) => <Item key={item.value} {...item} link={variant.links} />)
+  if (variant.items !== "grouped") {
+    return toppings.map((item) => (
+      <Item key={item.value} {...item} link={variant.links} />
+    ))
+  }
   return groups.map((group, index) => (
     <React.Fragment key={group.label}>
       {index > 0 && <ListboxSeparator className={classes.separator} />}
       <ListboxGroup className={classes.group}>
-        <ListboxGroupLabel className={classes.groupLabel}>{group.label}</ListboxGroupLabel>
+        <ListboxGroupLabel className={classes.groupLabel}>
+          {group.label}
+        </ListboxGroupLabel>
         {group.items.map((item) => (
           <Item key={item.value} {...item} />
         ))}
@@ -77,28 +90,46 @@ function Items({ variant }: { variant: Variant }) {
 // A data listbox's items, from its state. Keyed by label, since values may be objects.
 function DataItems({ list }: { list: ListData<any> }) {
   return list.map((entry, index) => {
-    if (typeof entry === "string") return <Item key={entry} value={entry} label={entry} />
-    if ("type" in entry && entry.type === "separator")
-      return <ListboxSeparator key={`separator-${index}`} className={classes.separator} />
-    if ("type" in entry && entry.type === "group")
+    if (typeof entry === "string") {
+      return <Item key={entry} value={entry} label={entry} />
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return (
+        <ListboxSeparator
+          key={`separator-${index}`}
+          className={classes.separator}
+        />
+      )
+    }
+    if ("type" in entry && entry.type === "group") {
       return (
         <ListboxGroup key={entry.label} className={classes.group}>
-          <ListboxGroupLabel className={classes.groupLabel}>{entry.label}</ListboxGroupLabel>
+          <ListboxGroupLabel className={classes.groupLabel}>
+            {entry.label}
+          </ListboxGroupLabel>
           <DataItems list={entry.items} />
         </ListboxGroup>
       )
+    }
     return <Item key={entry.label} {...entry} />
   })
 }
 
 function VariantListbox({ variant, env }: { variant: Variant; env: Env }) {
-  const { fieldDisabled, ...options } = (variant.options ?? {}) as Record<string, any>
-  const [value, setValue] = React.useState<unknown>(options.multiple ? [] : null)
+  const { fieldDisabled, ...options } = (variant.options ?? {}) as Record<
+    string,
+    any
+  >
+  const [value, setValue] = React.useState<unknown>(
+    options.multiple ? [] : null
+  )
   const [controller] = React.useState(() =>
-    variant.controller ? createListboxController<string, true>() : undefined,
+    variant.controller ? createListboxController<string, true>() : undefined
   )
   React.useEffect(() => {
-    if (!controller) return
+    if (!controller) {
+      return
+    }
     env.controls([
       ["selectAll()", () => controller.selectAll()],
       ["clear()", () => controller.clear()],
@@ -116,9 +147,15 @@ function VariantListbox({ variant, env }: { variant: Variant; env: Env }) {
       controller={controller}
       items={variant.data ? variantData(variant) : undefined}
       onValueChange={(next, details) => {
-        if (variant.cancel) return details.cancel()
-        if (variant.controlled) setValue(next)
-        env.log(`valueChange ${describe(next)} (${details.reason}, ${details.source})`)
+        if (variant.cancel) {
+          return details.cancel()
+        }
+        if (variant.controlled) {
+          setValue(next)
+        }
+        env.log(
+          `valueChange ${describe(next)} (${details.reason}, ${details.source})`
+        )
       }}
     >
       {variant.data ? (
@@ -128,21 +165,28 @@ function VariantListbox({ variant, env }: { variant: Variant; env: Env }) {
       )}
     </Listbox>
   )
-  if (variant.field)
+  if (variant.field) {
     return (
       <Field disabled={!!fieldDisabled} className="flex flex-col gap-1.5">
         <FieldLabel className={classes.label}>Toppings</FieldLabel>
         {listbox}
-        <FieldDescription className={classes.description}>Pick what goes on top.</FieldDescription>
+        <FieldDescription className={classes.description}>
+          Pick what goes on top.
+        </FieldDescription>
       </Field>
     )
-  if (!variant.form) return listbox
+  }
+  if (!variant.form) {
+    return listbox
+  }
   return (
     <form
       className="flex flex-col items-start gap-2"
       onSubmit={(event) => {
         event.preventDefault()
-        env.log(`submit ${new URLSearchParams(new FormData(event.currentTarget) as never).toString()}`)
+        env.log(
+          `submit ${new URLSearchParams(new FormData(event.currentTarget) as never).toString()}`
+        )
       }}
       onReset={() => env.log("reset")}
     >
@@ -162,8 +206,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantListbox variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

@@ -18,7 +18,9 @@ function Example() {
         }}
       >
         <OTPInputGroup>
-          <For each={[0, 1, 2, 3, 4, 5]}>{(index) => <OTPInputSlot index={index} />}</For>
+          <For each={[0, 1, 2, 3, 4, 5]}>
+            {(index) => <OTPInputSlot index={index} />}
+          </For>
         </OTPInputGroup>
       </OTPInput>
     </Field>

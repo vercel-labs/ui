@@ -13,7 +13,13 @@ import { toggle, toggleGroup } from "../src/components/toggle/toggle"
 import { toolbar } from "../src/components/toolbar/toolbar"
 import { triggerMenu } from "../src/components/trigger-menu/trigger-menu"
 import { fakeEditor } from "./fake-editor"
-import { animatingElement, expectNoMissedUpdates, fakeElement, type Part, type Step } from "./selects"
+import {
+  animatingElement,
+  expectNoMissedUpdates,
+  fakeElement,
+  type Part,
+  type Step,
+} from "./selects"
 import { attrs, bind, press as partPress } from "../src/foundation/kernel/part"
 import type { PrimitiveInstance } from "../src/foundation/kernel/primitive-types"
 import { kept } from "./kept"
@@ -26,7 +32,13 @@ import { kept } from "./kept"
 describe("menu items select on the highlighted item and on their checked entry", () => {
   const indicator = (id: string, itemKey: string, group?: string) => ({
     slot: "item-indicator",
-    props: { id, item: group ? "radio-item" : "checkbox-item", itemKey, group, keepMounted: true },
+    props: {
+      id,
+      item: group ? "radio-item" : "checkbox-item",
+      itemKey,
+      group,
+      keepMounted: true,
+    },
   })
   const parts: Part[] = [
     { slot: "trigger", props: {} },
@@ -41,14 +53,20 @@ describe("menu items select on the highlighted item and on their checked entry",
     { slot: "item-icon", props: { id: "icon" } },
     { slot: "checkbox-item", props: { value: "sidebar" } },
     indicator("sidebar-check", "sidebar"),
-    { slot: "checkbox-item", props: { value: "statusbar", defaultChecked: true } },
+    {
+      slot: "checkbox-item",
+      props: { value: "statusbar", defaultChecked: true },
+    },
     indicator("statusbar-check", "statusbar"),
     // Controlled: a toggle asks, and only a new `checked` would change it.
     { slot: "checkbox-item", props: { value: "minimap", checked: true } },
     indicator("minimap-check", "minimap"),
     // Mounts later, so its entry is added by its first toggle.
     { slot: "checkbox-item", props: { value: "rulers" } },
-    { slot: "radio-group", props: { id: "sort", name: "sort", defaultValue: "name" } },
+    {
+      slot: "radio-group",
+      props: { id: "sort", name: "sort", defaultValue: "name" },
+    },
     { slot: "radio-item", props: { group: "sort", value: "name" } },
     indicator("sort-name", "name", "sort"),
     { slot: "radio-item", props: { group: "sort", value: "date" } },
@@ -58,7 +76,10 @@ describe("menu items select on the highlighted item and on their checked entry",
     { slot: "radio-item", props: { group: "order", value: "name" } },
     indicator("order-name", "name", "order"),
     // A controlled group: choosing asks, and only a new `value` would change it.
-    { slot: "radio-group", props: { id: "theme", name: "theme", value: "dark" } },
+    {
+      slot: "radio-group",
+      props: { id: "theme", name: "theme", value: "dark" },
+    },
     { slot: "radio-item", props: { group: "theme", value: "light" } },
     indicator("theme-light", "light", "theme"),
   ]
@@ -66,7 +87,8 @@ describe("menu items select on the highlighted item and on their checked entry",
   test("no part misses a change", async () => {
     const instance = menu({ id: "m" })
     const { api } = instance
-    const highlight = (key: string | null) => () => api.internal.highlight(key, { focus: false })
+    const highlight = (key: string | null) => () =>
+      api.internal.highlight(key, { focus: false })
     const press = (slot: string, props: Record<string, unknown>) => () =>
       partPress((instance as PrimitiveInstance).part(slot, props))?.()
     const unbind: Record<string, () => void> = {}
@@ -86,16 +108,35 @@ describe("menu items select on the highlighted item and on their checked entry",
         "toggle an item checked by default",
         press("checkbox-item", { value: "statusbar", defaultChecked: true }),
       ],
-      ["toggle a controlled item", press("checkbox-item", { value: "minimap", checked: true })],
+      [
+        "toggle a controlled item",
+        press("checkbox-item", { value: "minimap", checked: true }),
+      ],
       [
         "an item mounts",
-        () => (unbind.rulers = bind(instance.part("checkbox-item", { value: "rulers" }), fakeElement(1))),
+        () =>
+          (unbind.rulers = bind(
+            instance.part("checkbox-item", { value: "rulers" }),
+            fakeElement(1)
+          )),
       ],
-      ["toggle the item that mounted", press("checkbox-item", { value: "rulers" })],
+      [
+        "toggle the item that mounted",
+        press("checkbox-item", { value: "rulers" }),
+      ],
       ["it unmounts", () => unbind.rulers()],
-      ["choose a radio item", press("radio-item", { group: "sort", value: "date" })],
-      ["choose in another group", press("radio-item", { group: "order", value: "name" })],
-      ["choose in a controlled group", press("radio-item", { group: "theme", value: "light" })],
+      [
+        "choose a radio item",
+        press("radio-item", { group: "sort", value: "date" }),
+      ],
+      [
+        "choose in another group",
+        press("radio-item", { group: "order", value: "name" }),
+      ],
+      [
+        "choose in a controlled group",
+        press("radio-item", { group: "theme", value: "light" }),
+      ],
       ["close", () => api.close()],
     ])
     // A toggle reaches the item and its indicator, and no other part.
@@ -105,8 +146,12 @@ describe("menu items select on the highlighted item and on their checked entry",
     expect(heard["choose a radio item"]).toBe(5)
     // Items select on the highlight, so moving it between two of them reaches
     // those two and the parts that don't select on it.
-    const items = parts.filter((part) => ["item", "checkbox-item", "radio-item"].includes(part.slot))
-    expect(heard["highlight another item"]).toBe(parts.length - items.length + 2)
+    const items = parts.filter((part) =>
+      ["item", "checkbox-item", "radio-item"].includes(part.slot)
+    )
+    expect(heard["highlight another item"]).toBe(
+      parts.length - items.length + 2
+    )
   })
 })
 
@@ -116,12 +161,20 @@ const fruits = [
   { value: "banana", label: "Banana" },
   { value: "cherry", label: "Cherry", disabled: true },
 ]
-const itemParts = (props: (value: string) => Record<string, unknown> = (value) => ({ value })) =>
-  fruits.map((fruit) => ({ slot: "item", props: { ...props(fruit.value), disabled: fruit.disabled } }))
+const itemParts = (
+  props: (value: string) => Record<string, unknown> = (value) => ({ value })
+) =>
+  fruits.map((fruit) => ({
+    slot: "item",
+    props: { ...props(fruit.value), disabled: fruit.disabled },
+  }))
 
 // Moves the highlight through every kind of change.
-function highlightSteps(engine: { highlight: (key: string | null, options?: { focus?: boolean }) => void }) {
-  const highlight = (key: string | null) => () => engine.highlight(key, { focus: false })
+function highlightSteps(engine: {
+  highlight: (key: string | null, options?: { focus?: boolean }) => void
+}) {
+  const highlight = (key: string | null) => () =>
+    engine.highlight(key, { focus: false })
   return [
     ["highlight an item", highlight("apple")],
     ["highlight another item", highlight("banana")],
@@ -144,7 +197,7 @@ describe("listbox items select on the highlight", () => {
         ...highlightSteps(api.internal.listbox),
         ["choose a value", () => api.setValue("banana")],
         ["close", () => api.setOpen(false)],
-      ],
+      ]
     )
     expect(heard["highlight another item"]).toBe(3)
   })
@@ -160,7 +213,7 @@ describe("listbox items select on the highlight", () => {
         ...highlightSteps(api.internal.listbox),
         ["choose a value", () => api.setValue("banana")],
         ["close", () => api.setOpen(false)],
-      ],
+      ]
     )
     expect(heard["highlight another item"]).toBe(3)
   })
@@ -176,7 +229,7 @@ describe("listbox items select on the highlight", () => {
         ...highlightSteps(api.internal.listbox),
         ["type", () => api.setValue("b")],
         ["close", () => api.setOpen(false)],
-      ],
+      ]
     )
     expect(heard["highlight another item"]).toBe(3)
   })
@@ -191,13 +244,16 @@ describe("listbox items select on the highlight", () => {
         ...highlightSteps(api.internal.listbox),
         ["choose a value", () => api.setValue("banana")],
         ["type", () => api.setQuery("ch")],
-      ],
+      ]
     )
     expect(heard["highlight another item"]).toBe(3)
   })
 
   test("trigger menu", async () => {
-    const instance = triggerMenu({ id: "t", triggers: [{ char: "@", items: fruits }] })
+    const instance = triggerMenu({
+      id: "t",
+      triggers: [{ char: "@", items: fruits }],
+    })
     const { api } = instance
     const heard = await expectNoMissedUpdates(
       instance,
@@ -206,7 +262,7 @@ describe("listbox items select on the highlight", () => {
         ["open", () => api.setOpen(true)],
         ...highlightSteps(api.internal.listbox),
         ["close", () => api.setOpen(false)],
-      ],
+      ]
     )
     expect(heard["highlight another item"]).toBe(3)
   })
@@ -223,7 +279,7 @@ describe("listbox items select on the highlight", () => {
         ["focus another item", () => api.internal.focused("apple")],
         ["choose a value", () => api.setValue("banana")],
         ["clear the value", () => api.clear()],
-      ],
+      ]
     )
     expect(heard["highlight another item"]).toBe(3)
   })
@@ -245,11 +301,16 @@ describe("listbox items hear only the options they change", () => {
     }))
   // Registers an item the way a mounted one does.
   const mount = (listbox: Listbox) => () =>
-    produce.forEach((item, index) => listbox.register(item.value, fakeElement(index), () => item))
+    produce.forEach((item, index) =>
+      listbox.register(item.value, fakeElement(index), () => item)
+    )
   // A step that mounts mango and types in the same turn, before the list's
   // microtask learns mango mounted.
   const mountWhileTyping = (listbox: Listbox, type: () => unknown) => () => {
-    listbox.register("mango", fakeElement(3), () => ({ value: "mango", label: "Mango" }))
+    listbox.register("mango", fakeElement(3), () => ({
+      value: "mango",
+      label: "Mango",
+    }))
     type()
   }
   // "a" is in every label, "an" only in Banana and Mango, "p" in Apple and Grape.
@@ -268,7 +329,10 @@ describe("listbox items hear only the options they change", () => {
     const heard = await expectNoMissedUpdates(instance, composedParts(), [
       ["mount the items", mount(api.internal.listbox)],
       ["open", () => api.setOpen(true)],
-      ["the search field binds", () => api.internal.store.set({ searchable: true })],
+      [
+        "the search field binds",
+        () => api.internal.store.set({ searchable: true }),
+      ],
       ...highlightSteps(api.internal.listbox),
       ...typingSteps(api.setQuery),
       ["choose a value", () => api.setValue("banana")],
@@ -315,11 +379,18 @@ describe("listbox items hear only the options they change", () => {
         "mount the items",
         () =>
           parts.forEach(({ props }, index) =>
-            api.internal.listbox.register(props.value, fakeElement(index), () => props),
+            api.internal.listbox.register(
+              props.value,
+              fakeElement(index),
+              () => props
+            )
           ),
       ],
       ["open", () => api.setOpen(true)],
-      ["the search field binds", () => api.internal.store.set({ searchable: true })],
+      [
+        "the search field binds",
+        () => api.internal.store.set({ searchable: true }),
+      ],
       ...typingSteps(api.setQuery),
     ])
     // The highlight moves to the first match.
@@ -334,7 +405,11 @@ describe("listbox items hear only the options they change", () => {
     const row = (index: number) => {
       const props = { ...produce[index], index }
       api.internal.listbox.matches(props.value, props)
-      return api.internal.listbox.register(props.value, fakeElement(index), () => props)
+      return api.internal.listbox.register(
+        props.value,
+        fakeElement(index),
+        () => props
+      )
     }
     const leave = row(0)
     row(1)
@@ -359,7 +434,10 @@ describe("listbox items hear only the options they change", () => {
       ...highlightSteps(api.internal.listbox),
       ...typingSteps(api.setQuery),
       ["choose an item", () => api.internal.choose("apple")],
-      ["choose a second, which fills the selection", () => api.internal.choose("banana")],
+      [
+        "choose a second, which fills the selection",
+        () => api.internal.choose("banana"),
+      ],
       ["unchoose one", () => api.internal.choose("apple")],
       [
         "an item mounts while the text changes",
@@ -399,14 +477,20 @@ describe("listbox items hear only the options they change", () => {
 
   test("command, whose items also show whether they're running", async () => {
     let finish = () => {}
-    const instance = command({ id: "c", onAction: () => new Promise<void>((resolve) => (finish = resolve)) })
+    const instance = command({
+      id: "c",
+      onAction: () => new Promise<void>((resolve) => (finish = resolve)),
+    })
     const { api } = instance
     const banana = composedParts()[1].props
     const heard = await expectNoMissedUpdates(instance, composedParts(), [
       ["mount the items", mount(api.internal.listbox)],
       ...highlightSteps(api.internal.listbox),
       ...typingSteps(api.setQuery),
-      ["run a command whose action returns a Promise", () => partPress(instance.part("item", banana))?.()],
+      [
+        "run a command whose action returns a Promise",
+        () => partPress(instance.part("item", banana))?.(),
+      ],
       ["the action finishes", () => finish()],
       ["the Promise settles", () => {}],
       [
@@ -421,7 +505,9 @@ describe("listbox items hear only the options they change", () => {
 
   test("trigger menu", async () => {
     const editor = fakeEditor()
-    const instance = kept(triggerMenu({ id: "t", triggers: [{ char: "@" }], editor }))
+    const instance = kept(
+      triggerMenu({ id: "t", triggers: [{ char: "@" }], editor })
+    )
     const { api } = instance
     const heard = await expectNoMissedUpdates(instance, composedParts(), [
       ["mount the items", mount(api.internal.listbox)],
@@ -443,14 +529,21 @@ describe("roving items select on the tab stop", () => {
   test("tabs select on the selected tab too", async () => {
     const instance = tabs({ id: "t" })
     const { api } = instance
-    const tab = (value: string, disabled = false) => ({ slot: "tab", props: { value, disabled } })
+    const tab = (value: string, disabled = false) => ({
+      slot: "tab",
+      props: { value, disabled },
+    })
     const panel = (value: string) => ({ slot: "panel", props: { value } })
     const tabParts = [tab("a"), tab("b", true), tab("c"), tab("d")]
     const unbind: (() => void)[] = []
     const unmount = new Map<string, () => void>()
     const heard = await expectNoMissedUpdates(
       instance,
-      [{ slot: "list", props: {} }, ...tabParts, ...["a", "b", "c", "d"].map(panel)],
+      [
+        { slot: "list", props: {} },
+        ...tabParts,
+        ...["a", "b", "c", "d"].map(panel),
+      ],
       [
         // Before any binds, the selected tab holds the stop, and with none
         // selected, the first enabled one claims it.
@@ -460,25 +553,36 @@ describe("roving items select on the tab stop", () => {
           "bind the tabs",
           () =>
             tabParts.forEach((part, index) =>
-              unbind.push(bind(instance.part("tab", part.props), fakeElement(index))),
+              unbind.push(
+                bind(instance.part("tab", part.props), fakeElement(index))
+              )
             ),
         ],
         [
           "mount the panels",
-          () => ["a", "b", "c", "d"].forEach((key) => unmount.set(key, api.internal.registerPanel(key))),
+          () =>
+            ["a", "b", "c", "d"].forEach((key) =>
+              unmount.set(key, api.internal.registerPanel(key))
+            ),
         ],
         ["select a tab", () => api.select("c")],
         ["select the next tab", () => api.select("d")],
         ["a panel finishes leaving", () => api.internal.finishExit("c")],
         // Tabs point only at panels in the page, and a panel that leaves stops exiting.
         ["a panel leaves the page", () => unmount.get("b")!()],
-        ["it comes back", () => unmount.set("b", api.internal.registerPanel("b"))],
-        ["a panel leaves while it exits", () => (api.select("a"), unmount.get("d")!())],
+        [
+          "it comes back",
+          () => unmount.set("b", api.internal.registerPanel("b")),
+        ],
+        [
+          "a panel leaves while it exits",
+          () => (api.select("a"), unmount.get("d")!()),
+        ],
         ["select nothing", () => api.select(null)],
         ["select a tab from nothing", () => api.select("a")],
         ["select a tab no part has", () => api.select("gone")],
         ["unbind a tab", () => unbind[3]()],
-      ],
+      ]
     )
     // The list, the two tabs and their two panels, since the one left behind
     // starts exiting. Other tabs and panels hear nothing.
@@ -497,7 +601,10 @@ describe("roving items select on the tab stop", () => {
       instance,
       [
         { slot: "group", props: {} },
-        ...values.map((value) => ({ slot: "root", props: { value, disabled: value === "b" } })),
+        ...values.map((value) => ({
+          slot: "root",
+          props: { value, disabled: value === "b" },
+        })),
         ...values.map((value) => ({ slot: "indicator", props: { value } })),
       ],
       [
@@ -509,21 +616,27 @@ describe("roving items select on the tab stop", () => {
               unregister.push(
                 api.internal.roving.bind(
                   fakeElement(index),
-                  instance.part("root", { value, disabled: value === "b" }),
-                ),
-              ),
+                  instance.part("root", { value, disabled: value === "b" })
+                )
+              )
             ),
         ],
         [
           "bind the indicators",
           () =>
             values.forEach((value, index) =>
-              bind(instance.part("indicator", { value }), animatingElement(index + 3)),
+              bind(
+                instance.part("indicator", { value }),
+                animatingElement(index + 3)
+              )
             ),
         ],
         // The indicator left behind exits until its animation finishes.
         ["check another item", () => api.setValue("a")],
-        ["the old indicator finishes leaving", () => api.internal.finishExit("c")],
+        [
+          "the old indicator finishes leaving",
+          () => api.internal.finishExit("c"),
+        ],
         ["check nothing", () => api.setValue(null)],
         ["check an item from nothing", () => api.setValue("c")],
         // Disabled radios can't take focus, so the tab stop is gone.
@@ -532,9 +645,12 @@ describe("roving items select on the tab stop", () => {
           () => instance.setOptions({ id: "r", disabled: true }),
           () => expect(instance.get().stop).toBe(null),
         ],
-        ["enable the group", () => instance.setOptions({ id: "r", disabled: false })],
+        [
+          "enable the group",
+          () => instance.setOptions({ id: "r", disabled: false }),
+        ],
         ["unbind an item", () => unregister[2]()],
-      ],
+      ]
     )
     // The group, and the items and indicators of the two values.
     expect(heard["check another item"]).toBe(5)
@@ -553,7 +669,9 @@ describe("roving items select on the tab stop", () => {
     ]
     // A button rendered as another element, like a link or a div.
     const rendered = (index: number, link: boolean) =>
-      Object.assign(fakeElement(index, link ? "A" : "DIV"), { matches: () => link })
+      Object.assign(fakeElement(index, link ? "A" : "DIV"), {
+        matches: () => link,
+      })
     const leave: (() => void)[] = []
     const els = parts.map((_, index) => fakeElement(index))
     const heard = await expectNoMissedUpdates(
@@ -569,21 +687,42 @@ describe("roving items select on the tab stop", () => {
           "join the items",
           () =>
             parts.forEach((part, index) => {
-              const item = (instance as PrimitiveInstance).part(part.slot, part.props)
+              const item = (instance as PrimitiveInstance).part(
+                part.slot,
+                part.props
+              )
               attrs(item)
               leave.push(api.internal.join(item, els[index]))
             }),
         ],
         ["focus an item", () => els[2].focus()],
         ["focus another item", () => els[3].focus()],
-        ["a button renders as a div", () => api.internal.setElement("a", rendered(0, false))],
-        ["another renders as a link", () => api.internal.setElement("b", rendered(1, true))],
-        ["the first renders as a link", () => api.internal.setElement("a", rendered(0, true))],
-        ["it renders as a button again", () => api.internal.setElement("a", fakeElement(0))],
-        ["disable the toolbar", () => instance.setOptions({ id: "t", disabled: true })],
-        ["enable the toolbar", () => instance.setOptions({ id: "t", disabled: false })],
+        [
+          "a button renders as a div",
+          () => api.internal.setElement("a", rendered(0, false)),
+        ],
+        [
+          "another renders as a link",
+          () => api.internal.setElement("b", rendered(1, true)),
+        ],
+        [
+          "the first renders as a link",
+          () => api.internal.setElement("a", rendered(0, true)),
+        ],
+        [
+          "it renders as a button again",
+          () => api.internal.setElement("a", fakeElement(0)),
+        ],
+        [
+          "disable the toolbar",
+          () => instance.setOptions({ id: "t", disabled: true }),
+        ],
+        [
+          "enable the toolbar",
+          () => instance.setOptions({ id: "t", disabled: false }),
+        ],
         ["an item leaves", () => leave[3]()],
-      ],
+      ]
     )
     // The root, the group and the separator, which hear every stop move, and
     // the items that lose and take the stop.
@@ -609,7 +748,10 @@ describe("roving items select on the tab stop", () => {
           "join the items",
           () =>
             parts.forEach((part, index) => {
-              const item = (instance as PrimitiveInstance).part(part.slot, part.props)
+              const item = (instance as PrimitiveInstance).part(
+                part.slot,
+                part.props
+              )
               attrs(item)
               api.internal.join(item, els[index])
             }),
@@ -626,7 +768,7 @@ describe("roving items select on the tab stop", () => {
           () => instance.setOptions({ id: "t", disabled: false }),
           () => expect(instance.get().stop).toBe("b"),
         ],
-      ],
+      ]
     )
   })
 })
@@ -641,14 +783,16 @@ describe("toggles follow only the stop moves that reach them", () => {
     // Counts every time a toggle hears the toolbar.
     const counted = {
       ...scope,
-      follow: (key: string, listener: () => void) => scope.follow(key, () => (heard++, listener())),
+      follow: (key: string, listener: () => void) =>
+        scope.follow(key, () => (heard++, listener())),
     }
     const keys = ["a", "b", "c", "d"]
     const toggles = keys.map((id) => toggle({ id, toolbar: () => counted }))
     const els = keys.map((_, index) => fakeElement(index))
     toggles.forEach((instance, index) => instance.api.internal.join(els[index]))
     await Promise.resolve()
-    const stops = () => toggles.map((instance) => attrs(instance.part("root")).tabindex)
+    const stops = () =>
+      toggles.map((instance) => attrs(instance.part("root")).tabindex)
     expect(stops()).toEqual(["0", "-1", "-1", "-1"])
     heard = 0
     els[2].focus()
@@ -663,13 +807,18 @@ describe("toggles follow only the stop moves that reach them", () => {
 
   test("the toggle that claimed the stop gives it up when the first check moves it", async () => {
     const owner = toggleGroup({ id: "g" })
-    const toggles = ["a", "b", "c"].map((value) => toggle({ id: value, value, group: () => owner.api }))
-    const stops = () => toggles.map((instance) => attrs(instance.part("root")).tabindex)
+    const toggles = ["a", "b", "c"].map((value) =>
+      toggle({ id: value, value, group: () => owner.api })
+    )
+    const stops = () =>
+      toggles.map((instance) => attrs(instance.part("root")).tabindex)
     // Before anything binds, the first toggle claims the stop.
     expect(stops()).toEqual(["0", "-1", "-1"])
     // With the last one pressed, the first check moves the stop from null to it.
     owner.api.setValue(["c"])
-    toggles.forEach((instance, index) => instance.api.internal.join(fakeElement(index)))
+    toggles.forEach((instance, index) =>
+      instance.api.internal.join(fakeElement(index))
+    )
     await Promise.resolve()
     expect(stops()).toEqual(["-1", "-1", "0"])
   })
@@ -687,7 +836,10 @@ describe("accordion parts select on their own item", () => {
       [
         { slot: "root", props: {} },
         ...values.flatMap((value) =>
-          ["item", "header", "trigger", "panel"].map((slot) => ({ slot, props: { value } })),
+          ["item", "header", "trigger", "panel"].map((slot) => ({
+            slot,
+            props: { value },
+          }))
         ),
       ],
       [
@@ -696,12 +848,17 @@ describe("accordion parts select on their own item", () => {
           "bind the items",
           () =>
             values.forEach((value, index) =>
-              unbind.push(bind(instance.part("item", { value }), fakeElement(index))),
+              unbind.push(
+                bind(instance.part("item", { value }), fakeElement(index))
+              )
             ),
         ],
         [
           "mount the panels",
-          () => values.forEach((value) => unmount.set(value, api.internal.registerPanel(value))),
+          () =>
+            values.forEach((value) =>
+              unmount.set(value, api.internal.registerPanel(value))
+            ),
         ],
         // The panel left behind exits until its animation finishes.
         ["open another item", () => api.open("a")],
@@ -709,14 +866,30 @@ describe("accordion parts select on their own item", () => {
         ["close it", () => api.close("a")],
         // Triggers point only at panels in the page, and a panel that leaves stops exiting.
         ["a panel leaves the page", () => unmount.get("b")!()],
-        ["it comes back", () => unmount.set("b", api.internal.registerPanel("b"))],
-        ["a panel leaves while it exits", () => (api.open("b"), api.close("b"), unmount.get("b")!())],
-        ["open several", () => (instance.setOptions({ id: "a", multiple: true }), api.openAll())],
+        [
+          "it comes back",
+          () => unmount.set("b", api.internal.registerPanel("b")),
+        ],
+        [
+          "a panel leaves while it exits",
+          () => (api.open("b"), api.close("b"), unmount.get("b")!()),
+        ],
+        [
+          "open several",
+          () => (
+            instance.setOptions({ id: "a", multiple: true }),
+            api.openAll()
+          ),
+        ],
         ["close them all", () => api.closeAll()],
         ["open an item no part has", () => api.open("gone")],
-        ["disable the accordion", () => instance.setOptions({ id: "a", multiple: true, disabled: true })],
+        [
+          "disable the accordion",
+          () =>
+            instance.setOptions({ id: "a", multiple: true, disabled: true }),
+        ],
         ["unbind an item", () => unbind[0]()],
-      ],
+      ]
     )
     // The root, which shows the value, and the four parts of the item that
     // opens and of the one that closes.

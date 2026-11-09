@@ -7,7 +7,9 @@ test.describe("custom rendering", () => {
     await open("menu-render")
   })
 
-  test("an item rendered as a link is still a menu item, and Enter follows it", async ({ page }) => {
+  test("an item rendered as a link is still a menu item, and Enter follows it", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: "File" }).focus()
     await page.keyboard.press("Enter")
     const docs = page.getByRole("menuitem", { name: "Docs" })
@@ -27,28 +29,45 @@ test.describe("custom rendering", () => {
     await expect(page).toHaveURL(/#docs$/)
   })
 
-  test("render functions receive the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+  test("render functions receive the part's state", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     await page.getByRole("button", { name: "File" }).focus()
     await page.keyboard.press("Enter")
     await page.keyboard.press("ArrowDown")
-    await expect(page.getByRole("menuitem", { name: "Watched" })).toContainText("→")
+    await expect(page.getByRole("menuitem", { name: "Watched" })).toContainText(
+      "→"
+    )
     await page.keyboard.press("ArrowDown")
-    await expect(page.getByRole("menuitem", { name: "Watched" })).not.toContainText("→")
+    await expect(
+      page.getByRole("menuitem", { name: "Watched" })
+    ).not.toContainText("→")
   })
 
   test("a part re-renders only for the state its render function reads @enhancement", async ({
     page,
     framework,
   }) => {
-    test.skip(framework.startsWith("web"), "Web components have no render functions.")
+    test.skip(
+      framework.startsWith("web"),
+      "Web components have no render functions."
+    )
     // The test above shows the arrow follows the highlight there: the expression
     // that reads it updates on its own, so the function's call count stays at one.
-    test.skip(framework.startsWith("solid"), "Solid runs a render function once.")
+    test.skip(
+      framework.startsWith("solid"),
+      "Solid runs a render function once."
+    )
     await page.getByRole("button", { name: "File" }).focus()
     await page.keyboard.press("Enter")
     await expect(page.getByRole("menuitem", { name: "Docs" })).toBeFocused()
-    const renders = () => page.evaluate(() => ({ ...(window as any).__renders }))
+    const renders = () =>
+      page.evaluate(() => ({ ...(window as any).__renders }))
     const before = await renders()
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press("ArrowDown")
@@ -63,11 +82,18 @@ test.describe("custom rendering", () => {
   })
 
   test("class names follow the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     await page.getByRole("button", { name: "File" }).click()
     const pinned = page.getByRole("menuitemcheckbox", { name: "Pinned" })
-    await expect(pinned.locator("css=:scope, *").and(page.locator(".is-unchecked"))).toHaveCount(1)
+    await expect(
+      pinned.locator("css=:scope, *").and(page.locator(".is-unchecked"))
+    ).toHaveCount(1)
     await pinned.click()
-    await expect(pinned.locator("css=:scope, *").and(page.locator(".is-checked"))).toHaveCount(1)
+    await expect(
+      pinned.locator("css=:scope, *").and(page.locator(".is-checked"))
+    ).toHaveCount(1)
   })
 })

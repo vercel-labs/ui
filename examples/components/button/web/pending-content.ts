@@ -13,7 +13,9 @@ function mount(root: HTMLElement) {
       </button>
     </ui-button>
   `
-  root.querySelector("ui-button")!.addEventListener("action", (event) => event.detail.waitUntil(wait(1500)))
+  root
+    .querySelector("ui-button")!
+    .addEventListener("action", (event) => event.detail.waitUntil(wait(1500)))
 }
 
 export { mount }

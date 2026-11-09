@@ -10,7 +10,7 @@ const props = defineProps<{ class?: string }>()
     :class="
       cn(
         'relative inline-flex h-5 w-8 shrink-0 cursor-default items-center rounded-2xl border-2 border-transparent bg-input/90 outline-none transition-colors after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:ring-3 focus-visible:ring-ring/30 data-checked:bg-primary data-disabled:opacity-50 motion-reduce:transition-none',
-        props.class,
+        props.class
       )
     "
   >

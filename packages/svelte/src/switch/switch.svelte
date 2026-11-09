@@ -16,7 +16,12 @@ A control that turns a setting on or off, with the hidden native input that take
   import Part from "../part.svelte"
   import type { ToggleProps } from "../toggle-props"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { SwitchKey } from "./context"
 
   type Details = ChangeDetails<SwitchCheckedChangeReason>
@@ -65,7 +70,9 @@ A control that turns a setting on or off, with the hidden native input that take
     onCheckedChange: (next: boolean, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `checked` as it was.
       onCheckedChange?.(next, details)
-      if (!details.canceled) checked = next
+      if (!details.canceled) {
+        checked = next
+      }
     },
   }))
   setContext(SwitchKey, control)
@@ -73,7 +80,7 @@ A control that turns a setting on or off, with the hidden native input that take
   const input = useHandlePart(control, "input")
   const inField = field?.control(
     () => rest.id,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
 </script>
 

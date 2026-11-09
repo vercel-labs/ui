@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/vue/radio"
 import { useLog } from "../../../shared/vue/log"
 
@@ -12,7 +17,9 @@ const channels = [
 const log = useLog()
 
 function submit(event: Event) {
-  log(`Saved updates=${new FormData(event.currentTarget as HTMLFormElement).get("updates")}`)
+  log(
+    `Saved updates=${new FormData(event.currentTarget as HTMLFormElement).get("updates")}`
+  )
 }
 </script>
 
@@ -20,9 +27,15 @@ function submit(event: Event) {
   <form data-slot="stack" @submit.prevent="submit">
     <Field>
       <FieldLabel>Order updates</FieldLabel>
-      <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+      <FieldDescription
+        >Choose how we tell you about your orders.</FieldDescription
+      >
       <RadioGroup name="updates" required>
-        <label v-for="channel in channels" :key="channel.value" data-slot="label">
+        <label
+          v-for="channel in channels"
+          :key="channel.value"
+          data-slot="label"
+        >
           <Radio :value="channel.value">
             <RadioIndicator />
           </Radio>

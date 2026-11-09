@@ -12,10 +12,21 @@ import {
   type DatePickerValue,
 } from "@ui-sdk/core/date-picker"
 import * as React from "react"
-import { CalendarHeading, CalendarGrid, CalendarNext, CalendarPrevious } from "./calendar"
+import {
+  CalendarHeading,
+  CalendarGrid,
+  CalendarNext,
+  CalendarPrevious,
+} from "./calendar"
 import { CalendarContext, type CalendarHandle } from "./calendar-context"
 import { ownDescription, useFieldControl } from "./field-context"
-import { renderPopup, sheetViewport, useOwnContainer, usePopupContainer, type PopupContainer } from "./popup"
+import {
+  renderPopup,
+  sheetViewport,
+  useOwnContainer,
+  usePopupContainer,
+  type PopupContainer,
+} from "./popup"
 import {
   createParts,
   extendHandle,
@@ -33,13 +44,17 @@ type DatePickerContextValue = PrimitiveHandle<typeof datePickerPrimitive> & {
   field: ReturnType<typeof useFieldControl>
 }
 
-const DatePickerContext = React.createContext<DatePickerContextValue | null>(null)
+const DatePickerContext = React.createContext<DatePickerContextValue | null>(
+  null
+)
 // Where the popup renders. Set on <DatePicker> or <DatePickerContent>.
 const ContainerContext = React.createContext<PopupContainer>(undefined)
 
 function useDatePicker(part: string) {
   const context = React.useContext(DatePickerContext)
-  if (!context) throw new Error(`${part} must be used inside <DatePicker>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <DatePicker>.`)
+  }
   return context
 }
 
@@ -92,7 +107,8 @@ function DatePicker({
   debug,
   children,
   ...props
-}: DatePickerOptions & Omit<PartProps<"div", DatePickerState>, "defaultValue" | "onChange">) {
+}: DatePickerOptions &
+  Omit<PartProps<"div", DatePickerState>, "defaultValue" | "onChange">) {
   const field = useFieldControl()
   const picker = usePrimitive(datePickerPrimitive, {
     mode,
@@ -136,10 +152,15 @@ function DatePicker({
     controller,
     debug,
   })
-  const context = React.useMemo(() => extendHandle(picker, { field }), [picker, field])
+  const context = React.useMemo(
+    () => extendHandle(picker, { field }),
+    [picker, field]
+  )
   const content = (state: DatePickerState) => {
     const range = state.mode === "range"
-    const submitsStart = range ? (startName ?? name ?? field?.name) : (name ?? field?.name)
+    const submitsStart = range
+      ? (startName ?? name ?? field?.name)
+      : (name ?? field?.name)
     const submitsEnd = range && (endName ?? name ?? field?.name)
     return (
       <>
@@ -155,8 +176,14 @@ function DatePicker({
         ) : (
           children
         )}
-        {submitsStart && <input {...slotIn(picker, "hidden-input", { id: "start" })} />}
-        {submitsEnd && <input {...slotIn(picker, "hidden-input", { end: true, id: "end" })} />}
+        {submitsStart && (
+          <input {...slotIn(picker, "hidden-input", { id: "start" })} />
+        )}
+        {submitsEnd && (
+          <input
+            {...slotIn(picker, "hidden-input", { end: true, id: "end" })}
+          />
+        )}
       </>
     )
   }
@@ -180,21 +207,46 @@ function DatePickerInput({
   end,
   render,
   ...props
-}: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children" | "readOnly"> &
+}: Omit<
+  PartProps<"input", DatePickerInputState>,
+  "value" | "defaultValue" | "children" | "readOnly"
+> &
   DatePickerInputProps) {
   const picker = useDatePicker("DatePickerInput")
   // Field names the first input. The core writes the text as it changes, so React only renders where it starts.
   const input = (merged: Record<string, any>, state: DatePickerInputState) => {
     const field = picker.field && !end ? picker.field : undefined
-    const [own, element] = field ? ownDescription(merged, render) : [merged, render]
-    const { value, ...rest }: Record<string, any> = field ? field.props(own) : own
-    return renderElement("input", { ...rest, defaultValue: value }, element, state)
+    const [own, element] = field
+      ? ownDescription(merged, render)
+      : [merged, render]
+    const { value, ...rest }: Record<string, any> = field
+      ? field.props(own)
+      : own
+    return renderElement(
+      "input",
+      { ...rest, defaultValue: value },
+      element,
+      state
+    )
   }
-  return usePart(picker, "input", { end, id: end ? "end" : "start" }, { ...props, render: input }, "input")
+  return usePart(
+    picker,
+    "input",
+    { end, id: end ? "end" : "start" },
+    { ...props, render: input },
+    "input"
+  )
 }
 
 const calendarIcon = (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    aria-hidden="true"
+  >
     <rect x="2" y="3" width="12" height="11" rx="1.5" />
     <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" />
   </svg>
@@ -207,8 +259,17 @@ const calendarIcon = (
 function DatePickerTrigger({
   children = calendarIcon,
   ...props
-}: Omit<PartProps<"button", DatePickerTriggerState>, "value" | "defaultValue" | "onChange">) {
-  return usePart(useDatePicker("DatePickerTrigger"), "trigger", {}, { ...props, children }, "button")
+}: Omit<
+  PartProps<"button", DatePickerTriggerState>,
+  "value" | "defaultValue" | "onChange"
+>) {
+  return usePart(
+    useDatePicker("DatePickerTrigger"),
+    "trigger",
+    {},
+    { ...props, children },
+    "button"
+  )
 }
 
 /**
@@ -272,8 +333,17 @@ function DatePickerContent({
  * The format to type, like "MM/DD/YYYY". The inputs are described by it.
  * @stable
  */
-function DatePickerHint({ children = placeholder, ...props }: PartProps<"span", DatePickerHintState>) {
-  return usePart(useDatePicker("DatePickerHint"), "hint", {}, { ...props, children }, "span")
+function DatePickerHint({
+  children = placeholder,
+  ...props
+}: PartProps<"span", DatePickerHintState>) {
+  return usePart(
+    useDatePicker("DatePickerHint"),
+    "hint",
+    {},
+    { ...props, children },
+    "span"
+  )
 }
 
 const placeholder = (state: DatePickerHintState) => state.placeholder
@@ -291,11 +361,20 @@ const DatePickerClear = parts.Clear
 function DatePickerPreset({
   value,
   ...props
-}: Omit<PartProps<"button", DatePickerPresetState>, "value" | "defaultValue" | "onChange"> & {
+}: Omit<
+  PartProps<"button", DatePickerPresetState>,
+  "value" | "defaultValue" | "onChange"
+> & {
   value: DatePickerValue
 }) {
   // Presets are told apart by their value.
-  return usePart(datePickerPrimitive, "preset", { value, id: JSON.stringify(value) }, props, "button")
+  return usePart(
+    datePickerPrimitive,
+    "preset",
+    { value, id: JSON.stringify(value) },
+    props,
+    "button"
+  )
 }
 
 export {

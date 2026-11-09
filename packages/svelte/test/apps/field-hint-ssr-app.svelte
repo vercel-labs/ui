@@ -1,6 +1,10 @@
 <script lang="ts">
   import { Checkbox } from "../../src/checkbox"
-  import { DatePicker, DatePickerHint, DatePickerInput } from "../../src/date-picker"
+  import {
+    DatePicker,
+    DatePickerHint,
+    DatePickerInput,
+  } from "../../src/date-picker"
   import { Field, FieldControl, FieldDescription } from "../../src/field"
   import { Input } from "../../src/input"
   import { Slider, SliderControl, SliderThumb } from "../../src/slider"
@@ -8,7 +12,15 @@
 
   let {
     control,
-  }: { control: "field-control" | "input" | "textarea" | "checkbox" | "slider" | "date-picker" } = $props()
+  }: {
+    control:
+      | "field-control"
+      | "input"
+      | "textarea"
+      | "checkbox"
+      | "slider"
+      | "date-picker"
+  } = $props()
 </script>
 
 <Field>

@@ -1,5 +1,12 @@
 import * as React from "react"
-import { createTypeahead, definePrimitive, elements, idPart, isTypeaheadKey, labelOf } from "@ui-sdk/core"
+import {
+  createTypeahead,
+  definePrimitive,
+  elements,
+  idPart,
+  isTypeaheadKey,
+  labelOf,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 import { Trash2Icon } from "lucide-react"
 
@@ -12,15 +19,21 @@ const commandList = definePrimitive({
     const typeahead = createTypeahead()
     return {
       keydown(event: KeyboardEvent) {
-        if (!isTypeaheadKey(event)) return
+        if (!isTypeaheadKey(event)) {
+          return
+        }
         const commands = elements(context, "command")
-        const current = commands.findIndex((command) => command.key === context.store.get().command)
+        const current = commands.findIndex(
+          (command) => command.key === context.store.get().command
+        )
         const next = typeahead(
           event.key,
           commands.map((command) => labelOf(command.el)),
-          current,
+          current
         )
-        if (next === -1) return
+        if (next === -1) {
+          return
+        }
         event.preventDefault()
         context.store.set({ command: commands[next].key })
       },
@@ -80,4 +93,10 @@ function Example() {
   )
 }
 
-export { CommandList, CommandListCommand, commandList, type CommandListState, Example }
+export {
+  CommandList,
+  CommandListCommand,
+  commandList,
+  type CommandListState,
+  Example,
+}

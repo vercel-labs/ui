@@ -26,13 +26,16 @@ describe("dialog server rendering", () => {
   const app = (open: boolean) =>
     createSSRApp(() =>
       h(Dialog, { defaultOpen: open }, () => [
-        h(DialogTrigger, { shortcut: "mod+k" }, () => ["Edit profile", h(DialogShortcut)]),
+        h(DialogTrigger, { shortcut: "mod+k" }, () => [
+          "Edit profile",
+          h(DialogShortcut),
+        ]),
         h(DialogContent, null, () => [
           h(DialogTitle, null, () => "Profile settings"),
           h(DialogDescription, null, () => "Make changes to your profile."),
           h(DialogClose, null, () => "Close"),
         ]),
-      ]),
+      ])
     )
 
   test("a closed dialog renders its trigger only, with its shortcut", async () => {
@@ -55,11 +58,14 @@ describe("dialog server rendering", () => {
     const search = createDialogController()
     const html = await renderToString(
       createSSRApp(() => [
-        h(DialogTrigger, { controller: search, shortcut: "mod+k" }, () => ["Search", h(DialogShortcut)]),
+        h(DialogTrigger, { controller: search, shortcut: "mod+k" }, () => [
+          "Search",
+          h(DialogShortcut),
+        ]),
         h(Dialog, { controller: search }, () =>
-          h(DialogContent, null, () => h(DialogTitle, null, () => "Search")),
+          h(DialogContent, null, () => h(DialogTitle, null, () => "Search"))
         ),
-      ]),
+      ])
     )
     expect(html).toContain("Search")
     expect(html).not.toContain('data-slot="dialog-shortcut"')
@@ -69,21 +75,28 @@ describe("dialog server rendering", () => {
     const search = createDialogController()
     const html = await renderToString(
       createSSRApp(() => [
-        h(DialogTrigger, { controller: search }, ({ state }: { state: { open: boolean } }) =>
-          state.open ? "Close" : "Open",
+        h(
+          DialogTrigger,
+          { controller: search },
+          ({ state }: { state: { open: boolean } }) =>
+            state.open ? "Close" : "Open"
         ),
         h(
           DialogTrigger,
           { controller: search },
           {
             default: () => "Search",
-            render: ({ props, children }: { props: object; children: Component }) => [
-              h("a", props, [h(children)]),
-            ],
-          },
+            render: ({
+              props,
+              children,
+            }: {
+              props: object
+              children: Component
+            }) => [h("a", props, [h(children)])],
+          }
         ),
         h(Dialog, { controller: search }),
-      ]),
+      ])
     )
     expect(html).toMatch(/<button[^>]*>Open<\/button>/)
     expect(html).toMatch(/<a[^>]*>(<!--\[-->)?Search(<!--]-->)?<\/a>/)
@@ -92,8 +105,10 @@ describe("dialog server rendering", () => {
   test("a controller made once for every request reaches no dialog the server rendered", async () => {
     const html = await renderToString(
       createSSRApp(() =>
-        h(Dialog, { controller: shared, defaultOpen: true }, () => h(DialogContent, null, () => "Hi")),
-      ),
+        h(Dialog, { controller: shared, defaultOpen: true }, () =>
+          h(DialogContent, null, () => "Hi")
+        )
+      )
     )
     expect(html).toContain("Hi")
     expect("isOpen" in shared).toBe(false)
@@ -109,8 +124,8 @@ describe("dialog server rendering", () => {
             h(AlertDialogDescription, null, () => "It can't be undone."),
             h(AlertDialogClose, null, () => "Cancel"),
           ]),
-        ]),
-      ),
+        ])
+      )
     )
     expect(html).toContain('role="alertdialog"')
   })
@@ -118,12 +133,14 @@ describe("dialog server rendering", () => {
 
 describe("alert dialog props", () => {
   test("takes none of the props only a dialog has", () => {
-    const props = Object.keys((AlertDialog as unknown as { props: object }).props)
+    const props = Object.keys(
+      (AlertDialog as unknown as { props: object }).props
+    )
     expect(props).not.toContain("modal")
     expect(props).not.toContain("closeOnOutsidePress")
     expect(props).not.toContain("presentation")
     expect(Object.keys((Dialog as unknown as { props: object }).props)).toEqual(
-      expect.arrayContaining(["modal", "closeOnOutsidePress", "presentation"]),
+      expect.arrayContaining(["modal", "closeOnOutsidePress", "presentation"])
     )
   })
 })

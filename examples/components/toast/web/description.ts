@@ -20,9 +20,10 @@ export function mount(root: HTMLElement) {
   Object.assign(root.querySelector("ui-toast-region")!, {
     toaster: toast,
   })
-  root
-    .querySelector("button")!
-    .addEventListener("click", () =>
-      toast({ title: "Event has been created", description: "Monday, January 3rd at 6:00pm" }),
-    )
+  root.querySelector("button")!.addEventListener("click", () =>
+    toast({
+      title: "Event has been created",
+      description: "Monday, January 3rd at 6:00pm",
+    })
+  )
 }

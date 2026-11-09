@@ -12,10 +12,15 @@ const languageTag = definePrimitive({
     change: (tag: string) => context.store.set({ tag }),
   }),
   slots: (slot) => ({
-    root: slot<{}, { locale: string | undefined }>({ state: (state) => ({ locale: toLocale(state.tag) }) }),
+    root: slot<{}, { locale: string | undefined }>({
+      state: (state) => ({ locale: toLocale(state.tag) }),
+    }),
     input: slot({
       attrs: (state) => ({ value: state.tag, spellcheck: "false" }),
-      on: { input: (event, { api }) => api.change((event.target as HTMLInputElement).value) },
+      on: {
+        input: (event, { api }) =>
+          api.change((event.target as HTMLInputElement).value),
+      },
     }),
   }),
 })
@@ -37,9 +42,14 @@ function Example() {
             <FieldLabel>Language tag</FieldLabel>
             <FieldControl render={<LanguageTagInput />} />
           </Field>
-          <p data-locale>{locale ? `Intl reads ${locale}` : "Not a language tag"}</p>
+          <p data-locale>
+            {locale ? `Intl reads ${locale}` : "Not a language tag"}
+          </p>
           <p data-date data-slot="hint">
-            {new Intl.DateTimeFormat(locale, { dateStyle: "long", timeZone: "UTC" }).format(date)}
+            {new Intl.DateTimeFormat(locale, {
+              dateStyle: "long",
+              timeZone: "UTC",
+            }).format(date)}
           </p>
         </>
       )}
@@ -47,4 +57,10 @@ function Example() {
   )
 }
 
-export { Example, languageTag, LanguageTag, LanguageTagInput, type LanguageTagState }
+export {
+  Example,
+  languageTag,
+  LanguageTag,
+  LanguageTagInput,
+  type LanguageTagState,
+}

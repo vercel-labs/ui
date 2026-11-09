@@ -12,7 +12,9 @@ function lastLog(preview: Locator) {
 testExamples("preferences", {
   basic: async (preview) => {
     const page = preview.page()
-    await page.evaluate(() => localStorage.removeItem("ui-sdk-preferences-view"))
+    await page.evaluate(() =>
+      localStorage.removeItem("ui-sdk-preferences-view")
+    )
     const grid = preview.getByRole("button", { name: "Grid", exact: true })
     await grid.click()
     await expect(grid).toHaveAttribute("aria-pressed", "true")

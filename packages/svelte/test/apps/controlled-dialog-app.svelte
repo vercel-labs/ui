@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { AlertDialog, AlertDialogContent, AlertDialogTrigger } from "../../src/alert-dialog"
+  import {
+    AlertDialog,
+    AlertDialogContent,
+    AlertDialogTrigger,
+  } from "../../src/alert-dialog"
   import { Dialog, DialogContent, DialogTrigger } from "../../src/dialog"
   import { Drawer, DrawerContent, DrawerTrigger } from "../../src/drawer"
 

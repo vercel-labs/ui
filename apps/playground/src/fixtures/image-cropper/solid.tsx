@@ -13,7 +13,10 @@ import {
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
 import { imageCropperOptions } from "tests/fixtures/page.ts"
-import { describeCrop, imageCropperFixture } from "tests/fixtures/image-cropper.ts"
+import {
+  describeCrop,
+  imageCropperFixture,
+} from "tests/fixtures/image-cropper.ts"
 
 const controller = createImageCropperController()
 
@@ -30,10 +33,14 @@ function Fixture() {
         controller={controller}
         {...options}
         onCropChange={(crop, details) => {
-          if (cancel && details.reason !== "image-load") return details.cancel()
+          if (cancel && details.reason !== "image-load") {
+            return details.cancel()
+          }
           setAction(`${describeCrop(crop)}:${details.reason}`)
         }}
-        onCropCommit={(crop, details) => setCommitted(`${describeCrop(crop)}:${details.reason}`)}
+        onCropCommit={(crop, details) =>
+          setCommitted(`${describeCrop(crop)}:${details.reason}`)
+        }
       >
         <ImageCropperViewport>
           <ImageCropperImage alt={imageCropperFixture.alt} />
@@ -49,7 +56,12 @@ function Fixture() {
         <ImageCropperFlip>Flip</ImageCropperFlip>
       </ImageCropper>
       <button type="button">After</button>
-      <button type="button" onClick={() => controller.setCrop({ x: 0, y: 0, width: 100, height: 100 })}>
+      <button
+        type="button"
+        onClick={() =>
+          controller.setCrop({ x: 0, y: 0, width: 100, height: 100 })
+        }
+      >
         Use corner
       </button>
       <output role="status" aria-label="Last action">

@@ -23,13 +23,17 @@ const action = ref("")
 const visible = ref(!!options.defaultVisible)
 
 function onVisibleChange(next: boolean, details: ChangeDetails) {
-  if (cancel) return details.cancel()
+  if (cancel) {
+    return details.cancel()
+  }
   visible.value = next
   action.value = passwordInputAction.visible(next, details.reason)
 }
 
 function onSubmit(event: Event) {
-  const field = (event.currentTarget as HTMLFormElement).elements.namedItem(password.name) as HTMLInputElement
+  const field = (event.currentTarget as HTMLFormElement).elements.namedItem(
+    password.name
+  ) as HTMLInputElement
   action.value = passwordInputAction.submit(field.type)
 }
 </script>
@@ -37,11 +41,16 @@ function onSubmit(event: Event) {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <form :aria-label="form.label" class="password-form" @submit.prevent="onSubmit">
+    <form
+      :aria-label="form.label"
+      class="password-form"
+      @submit.prevent="onSubmit"
+    >
       <fieldset>
         <legend>{{ form.account }}</legend>
         <label>
-          {{ email.label }} <input class="input" :name="email.name" :value="email.defaultValue" />
+          {{ email.label }}
+          <input class="input" :name="email.name" :value="email.defaultValue" />
         </label>
         <Field>
           <FieldLabel>{{ password.label }}</FieldLabel>
@@ -55,7 +64,10 @@ function onSubmit(event: Event) {
             @visible-change="onVisibleChange"
           >
             <PasswordInputControl class="input" />
-            <PasswordInputToggle class="password-toggle" :aria-label="password.toggle">
+            <PasswordInputToggle
+              class="password-toggle"
+              :aria-label="password.toggle"
+            >
               <span aria-hidden="true">👁</span>
             </PasswordInputToggle>
           </PasswordInput>
@@ -66,7 +78,9 @@ function onSubmit(event: Event) {
       <button type="submit">{{ form.submit }}</button>
       <button type="reset">{{ form.reset }}</button>
     </form>
-    <button @click="reveal.toggleVisible()">{{ passwordInputFixture.controller }}</button>
+    <button @click="reveal.toggleVisible()">
+      {{ passwordInputFixture.controller }}
+    </button>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
   </div>

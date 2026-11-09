@@ -10,7 +10,11 @@
     SliderTrack,
     SliderValue,
   } from "@ui-sdk/svelte"
-  import { serialize, sliderFixture as f, sliderOptions } from "tests/fixtures/slider.ts"
+  import {
+    serialize,
+    sliderFixture as f,
+    sliderOptions,
+  } from "tests/fixtures/slider.ts"
 
   const options = sliderOptions()
   let action = $state("")
@@ -25,8 +29,14 @@
   }
 
   // Records a change, or cancels it when the URL asks.
-  function report(name: string, value: number | number[], details: { cancel: () => void }) {
-    if (options.cancel === name) return details.cancel()
+  function report(
+    name: string,
+    value: number | number[],
+    details: { cancel: () => void }
+  ) {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     action = `${name}:${String(value)}`
   }
 
@@ -34,9 +44,14 @@
     commits = [...commits, `${name}:${String(value)}`]
   }
 
-  function onVolume(value: number | number[], details: { cancel: () => void; canceled: boolean }) {
+  function onVolume(
+    value: number | number[],
+    details: { cancel: () => void; canceled: boolean }
+  ) {
     report(f.volume.name, value, details)
-    if (!details.canceled) volume = value
+    if (!details.canceled) {
+      volume = value
+    }
   }
 
   function onPrice(value: number | number[], details: { cancel: () => void }) {

@@ -1,4 +1,7 @@
-import { createConfirm, type UiAlertDialogElement } from "@ui-sdk/web/alert-dialog"
+import {
+  createConfirm,
+  type UiAlertDialogElement,
+} from "@ui-sdk/web/alert-dialog"
 
 const names = ["Acme", "Globex", "Initech"]
 
@@ -31,7 +34,10 @@ function mount(root: HTMLElement) {
     </div>
   `
   const confirm = createConfirm<{ name: string }>()
-  const dialog = root.querySelector<UiAlertDialogElement<{ name: string }>>("ui-alert-dialog")!
+  const dialog =
+    root.querySelector<UiAlertDialogElement<{ name: string }>>(
+      "ui-alert-dialog"
+    )!
   const title = root.querySelector("ui-alert-dialog-title")!
   const list = root.querySelector("ul")!
   const reset = root.querySelector("button")!
@@ -44,18 +50,24 @@ function mount(root: HTMLElement) {
     list.innerHTML = names
       .map(
         (name) =>
-          `<li data-slot="row">${name}<button type="button" data-size="sm" aria-label="Delete ${name}">Delete</button></li>`,
+          `<li data-slot="row">${name}<button type="button" data-size="sm" aria-label="Delete ${name}">Delete</button></li>`
       )
       .join("")
     for (const [index, row] of list.querySelectorAll("li").entries()) {
       const name = names[index]
       row.querySelector("button")!.addEventListener("click", async () => {
-        if (!(await confirm({ name }))) return
-        const next = (row.nextElementSibling ?? row.previousElementSibling)?.querySelector("button")
+        if (!(await confirm({ name }))) {
+          return
+        }
+        const next = (
+          row.nextElementSibling ?? row.previousElementSibling
+        )?.querySelector("button")
         const target = next ?? reset
         target.focus()
         row.remove()
-        if (!list.children.length) list.innerHTML = `<li data-slot="row">All projects deleted.</li>`
+        if (!list.children.length) {
+          list.innerHTML = `<li data-slot="row">All projects deleted.</li>`
+        }
       })
     }
   }

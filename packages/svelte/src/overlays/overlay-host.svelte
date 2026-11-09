@@ -7,7 +7,11 @@ Renders what `toast()` and `confirm()` open, from anywhere in the app. Mount it 
 <script lang="ts">
   import type { ConfirmEntry } from "@ui-sdk/core/dialog"
   import type { Toaster } from "@ui-sdk/core/renderer"
-  import { overlays as sharedOverlays, type OverlayEntry, type Overlays } from "@ui-sdk/core/overlays"
+  import {
+    overlays as sharedOverlays,
+    type OverlayEntry,
+    type Overlays,
+  } from "@ui-sdk/core/overlays"
   import HostedConfirm from "./hosted-confirm.svelte"
   import HostedToaster from "./hosted-toaster.svelte"
   import type { OverlayHostToastProps } from "./types"
@@ -45,7 +49,10 @@ Renders what `toast()` and `confirm()` open, from anywhere in the app. Mount it 
 
 {#each entries as entry (entry.id)}
   {#if entry.type === "toaster"}
-    <HostedToaster toaster={(entry.data as { toaster: Toaster }).toaster} regionProps={toast} />
+    <HostedToaster
+      toaster={(entry.data as { toaster: Toaster }).toaster}
+      regionProps={toast}
+    />
   {:else if entry.type === "confirm"}
     <HostedConfirm entry={entry.data as ConfirmEntry} />
   {/if}

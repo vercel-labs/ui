@@ -49,9 +49,14 @@
         debug,
         placed,
         label: label ?? undefined,
-      }) satisfies ToastRegionInternalOptions & { id: string },
+      }) satisfies ToastRegionInternalOptions & { id: string }
   )
-  const part = useHandlePart(region, "region", () => ({}), portalTo(() => container))
+  const part = useHandlePart(
+    region,
+    "region",
+    () => ({}),
+    portalTo(() => container)
+  )
   const list = useHandlePart(region, "list")
 </script>
 

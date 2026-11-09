@@ -31,10 +31,14 @@
     <PopoverTrigger>Publish</PopoverTrigger>
     <PopoverContent initialFocus="[data-autofocus]">
       <PopoverTitle>Publish changes?</PopoverTitle>
-      <PopoverDescription>Focus starts on Publish, not Cancel.</PopoverDescription>
+      <PopoverDescription
+        >Focus starts on Publish, not Cancel.</PopoverDescription
+      >
       <div data-slot="row">
         <PopoverClose>Cancel</PopoverClose>
-        <PopoverClose data-autofocus="" data-variant="solid">Publish</PopoverClose>
+        <PopoverClose data-autofocus="" data-variant="solid"
+          >Publish</PopoverClose
+        >
       </div>
     </PopoverContent>
   </Popover>

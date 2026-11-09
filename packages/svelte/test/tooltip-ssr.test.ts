@@ -3,7 +3,8 @@ import { describe, expect, test } from "vitest"
 import HoverCardApp from "./apps/hover-card-ssr-app.svelte"
 import TooltipApp from "./apps/tooltip-ssr-app.svelte"
 
-const tooltip = (variant: "shortcut" | "remote" | "label") => render(TooltipApp, { props: { variant } }).body
+const tooltip = (variant: "shortcut" | "remote" | "label") =>
+  render(TooltipApp, { props: { variant } }).body
 const card = (open: boolean) => render(HoverCardApp, { props: { open } }).body
 
 // Runs with no DOM: any access to window or document during render throws.

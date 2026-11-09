@@ -1,5 +1,9 @@
 import { createCheckboxGroupController } from "@ui-sdk/core/checkbox"
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/solid/checkbox"
 import { createSignal, For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -38,7 +42,9 @@ function Example() {
         value={value()}
         onValueChange={(next, details) => {
           setValue(next)
-          const names = days.filter((day) => next.includes(day.value)).map((day) => day.label)
+          const names = days
+            .filter((day) => next.includes(day.value))
+            .map((day) => day.label)
           log(`${names.join(", ") || "No days"} (${details.reason})`)
         }}
         controller={schedule}

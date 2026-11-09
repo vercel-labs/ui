@@ -9,7 +9,10 @@ import {
   type ColorSchemeState,
   type ColorSchemeValue,
 } from "../src/foundation/preferences/color-scheme"
-import { createCookieStorage, createLocalStorage } from "../src/foundation/storage/storage"
+import {
+  createCookieStorage,
+  createLocalStorage,
+} from "../src/foundation/storage/storage"
 
 let cleanups: (() => void)[] = []
 afterEach(() => {
@@ -27,8 +30,10 @@ function fakeWindow(dark = false, { supported = true } = {}) {
     get matches() {
       return supported && dark
     },
-    addEventListener: (_type: string, listener: () => void) => listeners.add(listener),
-    removeEventListener: (_type: string, listener: () => void) => listeners.delete(listener),
+    addEventListener: (_type: string, listener: () => void) =>
+      listeners.add(listener),
+    removeEventListener: (_type: string, listener: () => void) =>
+      listeners.delete(listener),
   }
   const view = {
     matchMedia: () => {
@@ -56,7 +61,8 @@ function fakeStore(initial: ColorSchemeState) {
   let state = { colorScheme: initial }
   return {
     get: () => state,
-    set: (partial: { colorScheme: ColorSchemeState }) => (state = { ...state, ...partial }),
+    set: (partial: { colorScheme: ColorSchemeState }) =>
+      (state = { ...state, ...partial }),
   }
 }
 
@@ -65,15 +71,30 @@ const tick = () => new Promise<void>((resolve) => queueMicrotask(resolve))
 test("system follows the browser's preference, and shows it", () => {
   const page = fakeWindow(true)
   const colorScheme = createColorScheme({ view: page.view })
-  expect(colorScheme.get()).toEqual({ value: "system", system: "dark", resolved: "dark" })
+  expect(colorScheme.get()).toEqual({
+    value: "system",
+    system: "dark",
+    resolved: "dark",
+  })
   page.setDark(false)
-  expect(colorScheme.get()).toEqual({ value: "system", system: "light", resolved: "light" })
+  expect(colorScheme.get()).toEqual({
+    value: "system",
+    system: "light",
+    resolved: "light",
+  })
 })
 
 test("a chosen scheme shows whatever the browser prefers", () => {
   const page = fakeWindow(true)
-  const colorScheme = createColorScheme({ view: page.view, defaultValue: "light" })
-  expect(colorScheme.get()).toEqual({ value: "light", system: "dark", resolved: "light" })
+  const colorScheme = createColorScheme({
+    view: page.view,
+    defaultValue: "light",
+  })
+  expect(colorScheme.get()).toEqual({
+    value: "light",
+    system: "dark",
+    resolved: "light",
+  })
 })
 
 test("get returns the same object until something changes", () => {
@@ -90,7 +111,8 @@ test("set changes the scheme through onValueChange, with its reason", () => {
   const changes: [ColorSchemeValue, string, string][] = []
   const colorScheme = createColorScheme({
     view: page.view,
-    onValueChange: (value, details) => changes.push([value, details.reason, details.source]),
+    onValueChange: (value, details) =>
+      changes.push([value, details.reason, details.source]),
   })
   const heard: ColorSchemeState[] = []
   cleanups.push(colorScheme.subscribe((state) => heard.push(state)))
@@ -105,7 +127,9 @@ test("set changes the scheme through onValueChange, with its reason", () => {
 })
 
 test("a canceled change keeps the scheme", () => {
-  const colorScheme = createColorScheme({ onValueChange: (_value, details) => details.cancel() })
+  const colorScheme = createColorScheme({
+    onValueChange: (_value, details) => details.cancel(),
+  })
   expect(colorScheme.set("dark")).toBe(false)
   expect(colorScheme.get().value).toBe("system")
 })
@@ -130,7 +154,11 @@ test("color schemes on one window share one query and one change listener", () =
   const page = fakeWindow()
   const first = createColorScheme({ view: page.view })
   const second = createColorScheme({ view: page.view, defaultValue: "dark" })
-  const stops = [first.subscribe(() => {}), first.subscribe(() => {}), second.subscribe(() => {})]
+  const stops = [
+    first.subscribe(() => {}),
+    first.subscribe(() => {}),
+    second.subscribe(() => {}),
+  ]
   expect(page.queries).toBe(1)
   expect(page.listeners).toBe(1)
   stops.forEach((stop) => stop())
@@ -154,13 +182,21 @@ test("a browser without prefers-color-scheme keeps the initial preference, with 
   const page = fakeWindow(true, { supported: false })
   const colorScheme = createColorScheme({ view: page.view })
   cleanups.push(colorScheme.subscribe(() => {}))
-  expect(colorScheme.get()).toEqual({ value: "system", system: "unknown", resolved: "unknown" })
+  expect(colorScheme.get()).toEqual({
+    value: "system",
+    system: "unknown",
+    resolved: "unknown",
+  })
   expect(page.listeners).toBe(0)
 })
 
 test("reads its initial preference without a matchMedia, as jsdom has none", () => {
   const colorScheme = createColorScheme({ initial: "dark" })
-  expect(colorScheme.get()).toEqual({ value: "system", system: "dark", resolved: "dark" })
+  expect(colorScheme.get()).toEqual({
+    value: "system",
+    system: "dark",
+    resolved: "dark",
+  })
   expect(colorScheme.subscribe(() => {})).toBeTypeOf("function")
 })
 
@@ -169,13 +205,21 @@ test("follow keeps the initial state until a microtask after it starts", async (
   const colorScheme = createColorScheme({ view: page.view })
   const store = fakeStore(colorScheme.initialState)
   cleanups.push(colorScheme.follow(store, "colorScheme"))
-  expect(store.get().colorScheme).toEqual({ value: "system", system: "unknown", resolved: "unknown" })
+  expect(store.get().colorScheme).toEqual({
+    value: "system",
+    system: "unknown",
+    resolved: "unknown",
+  })
   await tick()
   expect(store.get().colorScheme.resolved).toBe("dark")
   page.setDark(false)
   expect(store.get().colorScheme.resolved).toBe("light")
   colorScheme.set("dark")
-  expect(store.get().colorScheme).toEqual({ value: "dark", system: "light", resolved: "dark" })
+  expect(store.get().colorScheme).toEqual({
+    value: "dark",
+    system: "light",
+    resolved: "dark",
+  })
 })
 
 test("follow stopped before its microtask never subscribes", async () => {
@@ -204,9 +248,13 @@ test("primitives render the preseeded state, then follow the color scheme once a
   })
   const instances = [themed({ id: "a" }), themed({ id: "b" })]
   for (const instance of instances) {
-    cleanups.push(bind(instance.part("root"), document.createElement("div")), () => instance.destroy())
+    cleanups.push(
+      bind(instance.part("root"), document.createElement("div")),
+      () => instance.destroy()
+    )
   }
-  const resolved = () => instances.map((instance) => instance.get().colorScheme.resolved)
+  const resolved = () =>
+    instances.map((instance) => instance.get().colorScheme.resolved)
   expect(resolved()).toEqual(["dark", "dark"])
   await tick()
   expect(resolved()).toEqual(["light", "light"])
@@ -252,15 +300,21 @@ test("saves each choice, and hears another storage with the same ID", () => {
 test("ignores a saved value that isn't a scheme", () => {
   localStorage.setItem("color-scheme-bad", "sepia")
   cleanups.push(() => localStorage.clear())
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme-bad") })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme-bad"),
+  })
   cleanups.push(colorScheme.subscribe(() => {}))
   expect(colorScheme.get().value).toBe("system")
 })
 
 test("a cookie starts the choice right away, since the server reads it too", () => {
   document.cookie = "color-scheme-cookie=light; path=/"
-  cleanups.push(() => (document.cookie = "color-scheme-cookie=; path=/; max-age=0"))
-  const colorScheme = createColorScheme({ storage: createCookieStorage("color-scheme-cookie") })
+  cleanups.push(
+    () => (document.cookie = "color-scheme-cookie=; path=/; max-age=0")
+  )
+  const colorScheme = createColorScheme({
+    storage: createCookieStorage("color-scheme-cookie"),
+  })
   expect(colorScheme.initialState.value).toBe("light")
 })
 
@@ -282,7 +336,9 @@ test("a choice removed while nothing subscribes goes back to the default on the 
 
 test("a choice saved elsewhere while nothing subscribes comes back on the next subscribe", () => {
   cleanups.push(() => localStorage.clear())
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme-elsewhere") })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme-elsewhere"),
+  })
   const stop = colorScheme.subscribe(() => {})
   colorScheme.set("dark")
   stop()
@@ -293,7 +349,9 @@ test("a choice saved elsewhere while nothing subscribes comes back on the next s
 
 test("a choice that couldn't be saved survives subscribing again", () => {
   const storage = createLocalStorage("color-scheme-unsaved")
-  const colorScheme = createColorScheme({ storage: { ...storage, set: () => false } })
+  const colorScheme = createColorScheme({
+    storage: { ...storage, set: () => false },
+  })
   const stop = colorScheme.subscribe(() => {})
   colorScheme.set("dark")
   stop()

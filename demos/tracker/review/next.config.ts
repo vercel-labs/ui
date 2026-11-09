@@ -1,6 +1,11 @@
 import type { NextConfig } from "next"
 import path from "node:path"
-import { availableFrameworks, frameworkCookie, trackerOrigin, type Framework } from "./lib/frameworks"
+import {
+  availableFrameworks,
+  frameworkCookie,
+  trackerOrigin,
+  type Framework,
+} from "./lib/frameworks"
 
 const tracker = (framework: Framework) => ({
   source: "/:path*",
@@ -40,7 +45,9 @@ const config: NextConfig = {
       fallback: [
         ...available.map((framework) => ({
           ...tracker(framework),
-          has: [{ type: "cookie" as const, key: frameworkCookie, value: framework }],
+          has: [
+            { type: "cookie" as const, key: frameworkCookie, value: framework },
+          ],
         })),
         tracker(available[0] ?? "svelte"),
       ],

@@ -24,9 +24,12 @@ const searchField = definePrimitive({
     input: slot({
       attrs: (state) => ({ type: "search", value: state.query }),
       on: {
-        input: (event, { api }) => api.search((event.target as HTMLInputElement).value),
+        input: (event, { api }) =>
+          api.search((event.target as HTMLInputElement).value),
         keydown: (event, { api }) => {
-          if (event.key !== "Escape") return
+          if (event.key !== "Escape") {
+            return
+          }
           event.preventDefault()
           api.search("")
         },
@@ -40,7 +43,11 @@ const searchField = definePrimitive({
   }),
 })
 
-const parts = createParts(searchField, { root: "div", input: "input", clear: "button" })
+const parts = createParts(searchField, {
+  root: "div",
+  input: "input",
+  clear: "button",
+})
 
 const SearchField = parts.Root
 
@@ -48,15 +55,30 @@ const SearchFieldInput = parts.Input
 
 const SearchFieldClear = parts.Clear
 
-const fruits = ["Apple", "Apricot", "Banana", "Cherry", "Grape", "Mango", "Peach", "Pear", "Plum"]
+const fruits = [
+  "Apple",
+  "Apricot",
+  "Banana",
+  "Cherry",
+  "Grape",
+  "Mango",
+  "Peach",
+  "Pear",
+  "Plum",
+]
 
 function Example() {
   const [query, setQuery] = React.useState("")
-  const matches = fruits.filter((fruit) => fruit.toLowerCase().includes(query.toLowerCase()))
+  const matches = fruits.filter((fruit) =>
+    fruit.toLowerCase().includes(query.toLowerCase())
+  )
   return (
     <div data-slot="stack">
       <SearchField onQueryChange={setQuery}>
-        <SearchFieldInput aria-label="Search fruit" placeholder="Search fruit…" />
+        <SearchFieldInput
+          aria-label="Search fruit"
+          placeholder="Search fruit…"
+        />
         <SearchFieldClear>
           <XIcon aria-hidden="true" />
         </SearchFieldClear>

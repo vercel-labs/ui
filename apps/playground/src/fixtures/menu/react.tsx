@@ -22,7 +22,8 @@ const controller = createMenuController()
 
 // Counts React commits inside the menu, so specs can check highlight changes skip rendering.
 const counter = { commits: 0 }
-;(window as unknown as { __menuCommits: typeof counter }).__menuCommits = counter
+;(window as unknown as { __menuCommits: typeof counter }).__menuCommits =
+  counter
 
 function Fixture() {
   const [action, setAction] = React.useState("")
@@ -95,7 +96,9 @@ function Fixture() {
       <output role="status" aria-label="Last action">
         {action}
       </output>
-      <button onClick={() => controller.open({ focus: "first" })}>Open with controller</button>
+      <button onClick={() => controller.open({ focus: "first" })}>
+        Open with controller
+      </button>
     </div>
   )
 }
@@ -104,7 +107,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

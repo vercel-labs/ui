@@ -49,7 +49,9 @@ function mount(root: HTMLElement) {
   root
     .querySelector('[data-action="christmas"]')!
     .addEventListener("click", () => controller.setValue("2026-12-25"))
-  root.querySelector('[data-action="open"]')!.addEventListener("click", () => controller.open())
+  root
+    .querySelector('[data-action="open"]')!
+    .addEventListener("click", () => controller.open())
 }
 
 export { mount }

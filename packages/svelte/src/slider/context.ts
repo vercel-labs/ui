@@ -12,7 +12,9 @@ const SliderKey = Symbol("slider")
 
 function useSlider(part: string) {
   const context = getContext<SliderContext | undefined>(SliderKey)
-  if (!context) throw new Error(`${part} must be used inside <Slider>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Slider>.`)
+  }
   return context
 }
 

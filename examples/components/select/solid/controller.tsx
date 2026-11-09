@@ -62,7 +62,11 @@ function Example() {
           </svg>
         </SelectTrigger>
       </Field>
-      <Select controller={status} items={statuses} placeholder="Select a status">
+      <Select
+        controller={status}
+        items={statuses}
+        placeholder="Select a status"
+      >
         <SelectContent>
           <For each={statuses}>
             {(item) => (

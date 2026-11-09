@@ -1,4 +1,5 @@
-const isBrowser = typeof window !== "undefined" && typeof document !== "undefined"
+const isBrowser =
+  typeof window !== "undefined" && typeof document !== "undefined"
 
 // iPhone and iPad, including iPads that report a Mac.
 function isIOS() {

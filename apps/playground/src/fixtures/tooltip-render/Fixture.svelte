@@ -22,7 +22,9 @@
     </TooltipTrigger>
     <TooltipContent>
       {#snippet render({ props, state })}
-        <div {...props} class={state.open ? "tooltip is-open" : "tooltip"}>All systems normal</div>
+        <div {...props} class={state.open ? "tooltip is-open" : "tooltip"}>
+          All systems normal
+        </div>
       {/snippet}
     </TooltipContent>
   </Tooltip>

@@ -4,7 +4,10 @@ The dot inside the radio. Rendered while it's checked, or always with `keepMount
 @stable
 -->
 <script lang="ts">
-  import type { RadioIndicatorProps, RadioIndicatorState } from "@ui-sdk/core/radio"
+  import type {
+    RadioIndicatorProps,
+    RadioIndicatorState,
+  } from "@ui-sdk/core/radio"
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
@@ -17,8 +20,13 @@ The dot inside the radio. Rendered while it's checked, or always with `keepMount
 
   const group = useRadioGroup()
   const value = getContext<(() => string) | undefined>(RadioKey)
-  if (!value) throw new Error("RadioIndicator must be used inside <Radio>.")
-  const indicator = useHandlePart(group, "indicator", () => ({ value: value(), keepMounted }))
+  if (!value) {
+    throw new Error("RadioIndicator must be used inside <Radio>.")
+  }
+  const indicator = useHandlePart(group, "indicator", () => ({
+    value: value(),
+    keepMounted,
+  }))
 </script>
 
 {#if indicator.present}

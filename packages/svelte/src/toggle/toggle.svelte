@@ -14,7 +14,11 @@ A button that stays pressed. Inside a ToggleGroup, the group decides whether it'
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
   import { useToolbarScope } from "../toolbar-context"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { useToggleGroup } from "./context"
 
   type Details = ChangeDetails<TogglePressedChangeReason>
@@ -67,7 +71,9 @@ A button that stays pressed. Inside a ToggleGroup, the group decides whether it'
     onPressedChange: (next: boolean, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `pressed` as it was.
       onPressedChange?.(next, details)
-      if (!details.canceled) pressed = next
+      if (!details.canceled) {
+        pressed = next
+      }
     },
   }))
   provideInstance(togglePrimitive, toggle)

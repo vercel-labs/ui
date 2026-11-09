@@ -4,7 +4,10 @@ A button in the toolbar. Arrow keys move between it and the toolbar's other item
 @stable
 -->
 <script lang="ts">
-  import type { ToolbarButtonProps, ToolbarButtonState } from "@ui-sdk/core/toolbar"
+  import type {
+    ToolbarButtonProps,
+    ToolbarButtonState,
+  } from "@ui-sdk/core/toolbar"
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { ToolbarGroupKey } from "../toolbar-context"
@@ -18,7 +21,8 @@ A button in the toolbar. Arrow keys move between it and the toolbar's other item
   }: PartProps<"button", ToolbarButtonState> & ToolbarButtonProps = $props()
 
   const id = $props.id()
-  const groupDisabled = getContext<(() => boolean) | undefined>(ToolbarGroupKey) ?? (() => false)
+  const groupDisabled =
+    getContext<(() => boolean) | undefined>(ToolbarGroupKey) ?? (() => false)
   const button = useHandlePart(useToolbar(), "button", () => ({
     id,
     disabled,

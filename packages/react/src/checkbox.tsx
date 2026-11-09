@@ -8,7 +8,11 @@ import {
   type CheckboxState,
 } from "@ui-sdk/core/checkbox"
 import * as React from "react"
-import { controlRender, useFieldControl, type ButtonControlProps } from "./field-context"
+import {
+  controlRender,
+  useFieldControl,
+  type ButtonControlProps,
+} from "./field-context"
 import {
   createParts,
   reading,
@@ -21,7 +25,9 @@ import {
 const parts = createParts(checkbox, { root: "button", indicator: "span" })
 
 // The group's own context, so a checkbox can join a group without bundling it.
-const CheckboxGroupContext = React.createContext<PrimitiveHandle<typeof checkboxGroup> | null>(null)
+const CheckboxGroupContext = React.createContext<PrimitiveHandle<
+  typeof checkboxGroup
+> | null>(null)
 
 // The hidden native inputs that take part in the form.
 function CheckboxInput() {
@@ -84,7 +90,10 @@ function CheckboxGroup<T extends string = string>({
   render,
   ...props
 }: CheckboxGroupOptions<T> &
-  Omit<PartProps<"div", CheckboxGroupState>, "defaultValue" | "onChange" | "onSelect">) {
+  Omit<
+    PartProps<"div", CheckboxGroupState>,
+    "defaultValue" | "onChange" | "onSelect"
+  >) {
   const field = useFieldControl()
   const group = usePrimitive(checkboxGroup, {
     value,
@@ -105,14 +114,20 @@ function CheckboxGroup<T extends string = string>({
         group,
         "group",
         {},
-        { ...props, render: controlRender(field, "div", render, <GroupInput />) },
-        "div",
+        {
+          ...props,
+          render: controlRender(field, "div", render, <GroupInput />),
+        },
+        "div"
       )}
     </CheckboxGroupContext>
   )
 }
 
-export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
+export {
+  createCheckboxController,
+  createCheckboxGroupController,
+} from "@ui-sdk/core/checkbox"
 export type {
   CheckboxApi,
   CheckboxChangeOptions,

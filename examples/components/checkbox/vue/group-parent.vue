@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { CheckIcon, MinusIcon } from "@lucide/vue"
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/vue/checkbox"
 
 const toppings = [
   { value: "cheese", label: "Cheese" },
@@ -28,7 +32,11 @@ const toppings = [
         Select all
       </label>
       <div data-slot="stack">
-        <label data-slot="label" v-for="topping in toppings" :key="topping.value">
+        <label
+          data-slot="label"
+          v-for="topping in toppings"
+          :key="topping.value"
+        >
           <Checkbox :value="topping.value">
             <CheckboxIndicator>
               <CheckIcon aria-hidden="true" />

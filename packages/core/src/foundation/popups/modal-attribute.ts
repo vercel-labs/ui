@@ -9,9 +9,15 @@
  * the component's default applies.
  */
 function modalAttribute(attribute: string | null) {
-  if (attribute === null) return undefined
-  if (attribute === "false") return false
-  if (attribute === "pointer" || attribute === "trap-focus") return attribute
+  if (attribute === null) {
+    return undefined
+  }
+  if (attribute === "false") {
+    return false
+  }
+  if (attribute === "pointer" || attribute === "trap-focus") {
+    return attribute
+  }
   return true
 }
 
@@ -20,9 +26,15 @@ function modalAttribute(attribute: string | null) {
  * Select, Combobox and Autocomplete: it reads as a bare `modal`.
  */
 function pointerModalAttribute(attribute: string | null) {
-  if (attribute === null) return undefined
-  if (attribute === "false") return false
-  if (attribute === "pointer") return "pointer"
+  if (attribute === null) {
+    return undefined
+  }
+  if (attribute === "false") {
+    return false
+  }
+  if (attribute === "pointer") {
+    return "pointer"
+  }
   return true
 }
 

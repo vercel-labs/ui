@@ -1,6 +1,17 @@
 <script setup lang="ts">
-import { ChevronRightIcon, FileIcon, FolderIcon, FolderOpenIcon } from "@lucide/vue"
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/vue/tree"
+import {
+  ChevronRightIcon,
+  FileIcon,
+  FolderIcon,
+  FolderOpenIcon,
+} from "@lucide/vue"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/vue/tree"
 import { h, type FunctionalComponent } from "vue"
 
 type Node = { value: string; label: string; children?: Node[] }
@@ -38,7 +49,9 @@ const Items: FunctionalComponent<{ items: Node[] }> = ({ items }) =>
       h(TreeItemLabel, {}, () => [
         ...(children
           ? [
-              h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+              h(TreeItemIndicator, {}, () =>
+                h(ChevronRightIcon, { "aria-hidden": "true" })
+              ),
               h(FolderIcon, { "aria-hidden": "true" }),
               h(FolderOpenIcon, { "aria-hidden": "true" }),
             ]
@@ -46,12 +59,16 @@ const Items: FunctionalComponent<{ items: Node[] }> = ({ items }) =>
         h("span", {}, label),
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
-    ]),
+    ])
   )
 </script>
 
 <template>
-  <Tree aria-label="Files" :default-expanded="['app']" default-value="app/page.tsx">
+  <Tree
+    aria-label="Files"
+    :default-expanded="['app']"
+    default-value="app/page.tsx"
+  >
     <Items :items="files" />
   </Tree>
 </template>

@@ -46,7 +46,9 @@ async function tabTo(page: Page, preview: Locator, control: Locator) {
   await preview.click({ position: { x: 2, y: 2 } })
   for (let step = 0; step < 30; step++) {
     await page.keyboard.press("Tab")
-    if (await control.evaluate((el) => el === document.activeElement)) return
+    if (await control.evaluate((el) => el === document.activeElement)) {
+      return
+    }
   }
   throw new Error("Tab never reached the control.")
 }
@@ -54,7 +56,9 @@ async function tabTo(page: Page, preview: Locator, control: Locator) {
 // Waits for any opening animation to finish first, since a tooltip scales in.
 const box = async (locator: Locator) => {
   await locator.evaluate((el) =>
-    Promise.all(el.getAnimations({ subtree: true }).map((animation) => animation.finished)),
+    Promise.all(
+      el.getAnimations({ subtree: true }).map((animation) => animation.finished)
+    )
   )
   return (await locator.boundingBox())!
 }
@@ -85,7 +89,9 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
 
   async side({ page, preview, tooltip }) {
     for (const side of ["top", "left", "right", "bottom"]) {
-      await preview.getByRole("button", { name: side[0].toUpperCase() + side.slice(1) }).hover()
+      await preview
+        .getByRole("button", { name: side[0].toUpperCase() + side.slice(1) })
+        .hover()
       await expect(tooltip).toHaveAttribute("data-side", side)
     }
     await away(page)
@@ -94,11 +100,17 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
 
   async anchor({ preview, tooltip }) {
     const help = preview.getByRole("button", { name: "About webhooks" })
-    await expect(help).toHaveAccessibleDescription("We send a POST request here for every new order.")
+    await expect(help).toHaveAccessibleDescription(
+      "We send a POST request here for every new order."
+    )
     await help.hover()
-    await expect(tooltip).toHaveText("We send a POST request here for every new order.")
+    await expect(tooltip).toHaveText(
+      "We send a POST request here for every new order."
+    )
     // Below the whole field, lined up with its start rather than the small button.
-    const field = await box(preview.getByRole("textbox", { name: "Webhook URL" }).locator(".."))
+    const field = await box(
+      preview.getByRole("textbox", { name: "Webhook URL" }).locator("..")
+    )
     const content = await box(tooltip)
     expect(Math.abs(content.x - field.x)).toBeLessThan(2)
     expect(content.y).toBeGreaterThan(field.y + field.height)
@@ -108,11 +120,19 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
     // The keys are announced through aria-keyshortcuts, so they stay out of the name.
     const save = preview.getByRole("button", { name: "Save", exact: true })
     const share = preview.getByRole("button", { name: "Share" })
-    await expect(save).toHaveAttribute("aria-keyshortcuts", /^(Meta|Control)\+S$/)
-    await expect(share).toHaveAttribute("aria-keyshortcuts", /^(Meta|Control)\+Shift\+E$/)
+    await expect(save).toHaveAttribute(
+      "aria-keyshortcuts",
+      /^(Meta|Control)\+S$/
+    )
+    await expect(share).toHaveAttribute(
+      "aria-keyshortcuts",
+      /^(Meta|Control)\+Shift\+E$/
+    )
     await save.hover()
     await expect(tooltip).toContainText("Save")
-    await expect(tooltip.locator("[data-slot=tooltip-shortcut]")).toHaveText(/^\W*(⌘S|Ctrl\+S)\W*$/)
+    await expect(tooltip.locator("[data-slot=tooltip-shortcut]")).toHaveText(
+      /^\W*(⌘S|Ctrl\+S)\W*$/
+    )
     // The registered shortcuts run the same actions as the buttons.
     await page.keyboard.press("ControlOrMeta+s")
     await expect(lastLog(preview)).toHaveText("Saved")
@@ -187,7 +207,9 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
   async truncated({ page, preview, tooltip }) {
     const long = preview.getByRole("button", { name: /^Quarterly report/ })
     await long.hover()
-    await expect(tooltip).toHaveText("Quarterly report, final revised version for the board.pdf")
+    await expect(tooltip).toHaveText(
+      "Quarterly report, final revised version for the board.pdf"
+    )
     // A name that fits gets no tooltip, by pointer or by keyboard.
     const short = preview.getByRole("button", { name: "Notes.txt" })
     await short.hover()
@@ -235,7 +257,9 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
       await expect(trigger).toHaveAccessibleDescription(label)
     }
     // Only the active trigger is described.
-    await expect(preview.getByRole("button", { name: "Bold", exact: true })).toHaveAccessibleDescription("")
+    await expect(
+      preview.getByRole("button", { name: "Bold", exact: true })
+    ).toHaveAccessibleDescription("")
   },
 
   async animation({ page, preview, tooltip }) {
@@ -265,8 +289,11 @@ const checks: Record<string, (context: Context) => Promise<void>> = {
 }
 
 test("every framework has the same tooltip examples", () => {
-  for (const folder of folders)
-    expect(examplesIn(folder).sort(), folder).toEqual([...order, ...fixtures].sort())
+  for (const folder of folders) {
+    expect(examplesIn(folder).sort(), folder).toEqual(
+      [...order, ...fixtures].sort()
+    )
+  }
 })
 
 for (const framework of frameworks) {
@@ -274,9 +301,14 @@ for (const framework of frameworks) {
     test.setTimeout(300_000)
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     // The shared dev server can take a while to compile the page.
-    await page.goto(`/docs/${framework}/components/tooltip`, { timeout: 120_000 })
+    await page.goto(`/docs/${framework}/components/tooltip`, {
+      timeout: 120_000,
+    })
     await page.waitForLoadState("networkidle")
     await expect(page.locator("[data-example]")).toHaveCount(order.length)
     // A closing tooltip stays in the page while it animates out, so only the open one counts.
@@ -286,12 +318,16 @@ for (const framework of frameworks) {
       await test.step(name, async () => {
         const preview = page.locator(`[data-example="tooltip/${name}"]`)
         await preview.scrollIntoViewIfNeeded()
-        await expect(preview.getByRole("button").or(preview.getByRole("link")).first()).toBeVisible()
+        await expect(
+          preview.getByRole("button").or(preview.getByRole("link")).first()
+        ).toBeVisible()
         await checks[name]({ page, preview, tooltip })
         // Leave nothing open for the next example.
         await away(page)
         await page.keyboard.press("Escape")
-        await expect(page.getByRole("tooltip").and(page.locator("[data-open]"))).toHaveCount(0)
+        await expect(
+          page.getByRole("tooltip").and(page.locator("[data-open]"))
+        ).toHaveCount(0)
       })
     }
 

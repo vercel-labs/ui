@@ -12,27 +12,48 @@ import { useIssues } from "~/composables/issues"
 import { useSettings } from "~/composables/settings"
 
 const route = useRoute()
-const [{ data: issues }, { data: settings }] = await Promise.all([useIssues(), useSettings()])
+const [{ data: issues }, { data: settings }] = await Promise.all([
+  useIssues(),
+  useSettings(),
+])
 
 const query = computed(() => parseQuery(route.query))
 const matching = computed(() => filterIssues(issues.value, query.value))
 const counts = computed(() => countByTab(issues.value))
-const issue = computed(() => issues.value.find((issue) => issue.id === query.value.issue) ?? null)
+const issue = computed(
+  () => issues.value.find((issue) => issue.id === query.value.issue) ?? null
+)
 </script>
 
 <template>
   <main class="flex min-h-0 flex-1 flex-col">
-    <div class="flex flex-wrap items-center gap-3 border-b border-border px-3 py-2">
+    <div
+      class="flex flex-wrap items-center gap-3 border-b border-border px-3 py-2"
+    >
       <IssueTabs :query="query" :counts="counts" />
       <IssueToolbar :query="query" />
     </div>
     <Workspace :open="issue !== null">
       <template #list>
-        <IssueBoard v-if="query.view === 'board'" :issues="matching" :query="query" />
-        <IssueList v-else :issues="matching" :query="query" :page-size="settings?.pageSize ?? 10" />
+        <IssueBoard
+          v-if="query.view === 'board'"
+          :issues="matching"
+          :query="query"
+        />
+        <IssueList
+          v-else
+          :issues="matching"
+          :query="query"
+          :page-size="settings?.pageSize ?? 10"
+        />
       </template>
       <template #detail>
-        <IssueDetail v-if="issue" :key="issue.id" :issue="issue" :query="query" />
+        <IssueDetail
+          v-if="issue"
+          :key="issue.id"
+          :issue="issue"
+          :query="query"
+        />
       </template>
     </Workspace>
   </main>

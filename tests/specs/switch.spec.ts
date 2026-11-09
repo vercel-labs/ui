@@ -10,8 +10,14 @@ test.beforeEach(async ({ open }) => {
 })
 
 test("starts in its default state", async ({ page }) => {
-  await expect(switchNamed(page, "Wi-Fi")).toHaveAttribute("aria-checked", "true")
-  await expect(switchNamed(page, "Airplane mode")).toHaveAttribute("aria-checked", "false")
+  await expect(switchNamed(page, "Wi-Fi")).toHaveAttribute(
+    "aria-checked",
+    "true"
+  )
+  await expect(switchNamed(page, "Airplane mode")).toHaveAttribute(
+    "aria-checked",
+    "false"
+  )
 })
 
 test("clicking toggles it", async ({ page }) => {
@@ -36,14 +42,18 @@ test("Space toggles it", async ({ page }) => {
 })
 
 // Native switches (<input type="checkbox" switch>) submit on Enter, like checkboxes.
-test("Enter submits the form and never toggles it", { tag: "@enhancement" }, async ({ page }) => {
-  await fillRequired(page)
-  const airplane = switchNamed(page, "Airplane mode")
-  await airplane.focus()
-  await page.keyboard.press("Enter")
-  await expect(airplane).not.toBeChecked()
-  await expect.poll(() => submitted(page)).toContain("wifi=on")
-})
+test(
+  "Enter submits the form and never toggles it",
+  { tag: "@enhancement" },
+  async ({ page }) => {
+    await fillRequired(page)
+    const airplane = switchNamed(page, "Airplane mode")
+    await airplane.focus()
+    await page.keyboard.press("Enter")
+    await expect(airplane).not.toBeChecked()
+    await expect.poll(() => submitted(page)).toContain("wifi=on")
+  }
+)
 
 test("the thumb follows the state", async ({ page }) => {
   const thumb = switchNamed(page, "Airplane mode").locator(".switch-thumb")
@@ -55,7 +65,8 @@ test("the thumb follows the state", async ({ page }) => {
 // Nothing on the page has seen a key or a pointer before these presses, so
 // their source shows the input listeners were in place before the first one.
 test.describe("the first input on a page", { tag: "@enhancement" }, () => {
-  const source = (page: Page) => page.locator('output[aria-label="Last source"]')
+  const source = (page: Page) =>
+    page.locator('output[aria-label="Last source"]')
 
   test("the first Space reports keyboard", async ({ page }) => {
     const airplane = switchNamed(page, "Airplane mode")
@@ -69,7 +80,10 @@ test.describe("the first input on a page", { tag: "@enhancement" }, () => {
     test.use({ hasTouch: true })
 
     test("the first tap reports touch", async ({ page, browserName }) => {
-      test.skip(browserName === "firefox", "Firefox doesn't support touch emulation.")
+      test.skip(
+        browserName === "firefox",
+        "Firefox doesn't support touch emulation."
+      )
       const airplane = switchNamed(page, "Airplane mode")
       await airplane.tap()
       await expect(airplane).toBeChecked()

@@ -45,7 +45,10 @@ function searchMovies(query: string, { signal }: { signal: AbortSignal }) {
       resolve(
         movieTitles
           .filter((title) => title.toLowerCase().includes(needle))
-          .map((title) => ({ value: title.toLowerCase().replace(/\W+/g, "-"), label: title })),
+          .map((title) => ({
+            value: title.toLowerCase().replace(/\W+/g, "-"),
+            label: title,
+          }))
       )
     }, 500)
     signal.addEventListener("abort", () => {
@@ -56,7 +59,11 @@ function searchMovies(query: string, { signal }: { signal: AbortSignal }) {
 }
 
 function Example() {
-  const movies = useAsyncOptions(searchMovies, { debounce: 300, query: "the", immediate: true })
+  const movies = useAsyncOptions(searchMovies, {
+    debounce: 300,
+    query: "the",
+    immediate: true,
+  })
 
   return (
     <Combobox
@@ -96,13 +103,29 @@ function Example() {
           }
         </ComboboxStatus>
         <ComboboxEmpty>
-          {(state) => (state.empty && !state.loading ? `No movies match “${state.query}”.` : null)}
+          {(state) =>
+            state.empty && !state.loading
+              ? `No movies match “${state.query}”.`
+              : null
+          }
         </ComboboxEmpty>
         <ComboboxList>
           {(state) => (
-            <For each={state.items as { value: string; label: string; disabled?: boolean }[]}>
+            <For
+              each={
+                state.items as {
+                  value: string
+                  label: string
+                  disabled?: boolean
+                }[]
+              }
+            >
               {(item) => (
-                <ComboboxItem value={item.value} label={item.label} disabled={item.disabled}>
+                <ComboboxItem
+                  value={item.value}
+                  label={item.label}
+                  disabled={item.disabled}
+                >
                   {item.label}
                   <ComboboxItemIndicator>
                     <svg

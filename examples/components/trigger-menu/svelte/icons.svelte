@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { ClockIcon, ReplyIcon, SearchIcon, ShareIcon, TrashIcon } from "@lucide/svelte"
+  import {
+    ClockIcon,
+    ReplyIcon,
+    SearchIcon,
+    ShareIcon,
+    TrashIcon,
+  } from "@lucide/svelte"
   import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
   import {
     TriggerMenu,

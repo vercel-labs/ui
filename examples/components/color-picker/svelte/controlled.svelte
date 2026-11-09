@@ -17,12 +17,15 @@
 
 <div>
   <div data-slot="controls">
-    <button type="button" onclick={() => picker.setValue("#663399")}>Use Purple</button>
+    <button type="button" onclick={() => picker.setValue("#663399")}
+      >Use Purple</button
+    >
   </div>
   <ColorPicker
     aria-label="Theme color"
     bind:value
-    onValueCommit={(next, details) => log(`committed: ${next} (${details.reason})`)}
+    onValueCommit={(next, details) =>
+      log(`committed: ${next} (${details.reason})`)}
     controller={picker}
   >
     <ColorPickerArea>

@@ -29,7 +29,9 @@ function isoWeek(date: string) {
           </button>
         </template>
       </CalendarPrevious>
-      <CalendarHeading v-slot="{ state: heading }">{{ heading.label }}</CalendarHeading>
+      <CalendarHeading v-slot="{ state: heading }">{{
+        heading.label
+      }}</CalendarHeading>
       <CalendarNext data-variant="ghost">
         <ChevronRightIcon />
       </CalendarNext>
@@ -40,7 +42,11 @@ function isoWeek(date: string) {
           <th scope="col">
             <abbr title="Week">Wk</abbr>
           </th>
-          <CalendarWeekday v-for="(weekday, index) in grid.weekdays" :key="weekday" :index="index" />
+          <CalendarWeekday
+            v-for="(weekday, index) in grid.weekdays"
+            :key="weekday"
+            :index="index"
+          />
         </tr>
       </thead>
       <tbody>

@@ -5,7 +5,11 @@ An action. Pressing it runs its `onSelect` and closes the menu, unless `closeOnS
 -->
 <script lang="ts">
   import { formatShortcut } from "@ui-sdk/core"
-  import { menu as menuPrimitive, type MenuItemProps, type MenuItemState } from "@ui-sdk/core/menu"
+  import {
+    menu as menuPrimitive,
+    type MenuItemProps,
+    type MenuItemState,
+  } from "@ui-sdk/core/menu"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
@@ -42,7 +46,8 @@ An action. Pressing it runs its `onSelect` and closes the menu, unless `closeOnS
 
 {#snippet content(state: MenuItemState)}
   {@render children?.(state)}
-  {#if shortcut}<MenuShortcut>{formatShortcut(shortcut, apple)}</MenuShortcut>{/if}
+  {#if shortcut}<MenuShortcut>{formatShortcut(shortcut, apple)}</MenuShortcut
+    >{/if}
 {/snippet}
 
 <Part tag="div" part={item} props={{ ...rest, children: content }} />

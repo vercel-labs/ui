@@ -17,12 +17,16 @@ testExamples(
       await preview.getByRole("button", { name: "Clear website" }).click()
       await expect(website).toHaveValue("")
       await expect(website).toBeFocused()
-      await expect(preview.getByRole("button", { name: "Clear website" })).toBeHidden()
+      await expect(
+        preview.getByRole("button", { name: "Clear website" })
+      ).toBeHidden()
       await expect(lastLog(preview)).toHaveText("Empty (clear-press)")
       await website.pressSequentially("hollis.dev")
-      await expect(preview.getByRole("button", { name: "Clear website" })).toBeVisible()
+      await expect(
+        preview.getByRole("button", { name: "Clear website" })
+      ).toBeVisible()
     },
   },
   "components",
-  ["basic", "rtl"],
+  ["basic", "rtl"]
 )

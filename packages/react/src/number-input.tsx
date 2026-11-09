@@ -7,7 +7,11 @@ import {
 import * as React from "react"
 import { createPortal } from "react-dom"
 import { useControllerEntry, useControllerTarget } from "./controller-target"
-import { ownDescription, useFieldControl, useFieldControlId } from "./field-context"
+import {
+  ownDescription,
+  useFieldControl,
+  useFieldControlId,
+} from "./field-context"
 import {
   createParts,
   extendHandle,
@@ -18,21 +22,32 @@ import {
   type PrimitiveHandle,
 } from "./use-primitive"
 
-const parts = createParts(numberInputPrimitive, { group: "div", increment: "button", decrement: "button" })
+const parts = createParts(numberInputPrimitive, {
+  group: "div",
+  increment: "button",
+  decrement: "button",
+})
 
 type NumberInputContextValue = PrimitiveHandle<typeof numberInputPrimitive> & {
   field: ReturnType<typeof useFieldControl>
 }
 
-const NumberInputContext = React.createContext<NumberInputContextValue | null>(null)
+const NumberInputContext = React.createContext<NumberInputContextValue | null>(
+  null
+)
 
 function useNumberInput(part: string) {
   const context = React.useContext(NumberInputContext)
-  if (!context) throw new Error(`${part} must be used inside <NumberInput>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <NumberInput>.`)
+  }
   return context
 }
 
-type DivProps = Omit<PartProps<"div", NumberInputState>, "defaultValue" | "onChange" | "onSelect">
+type DivProps = Omit<
+  PartProps<"div", NumberInputState>,
+  "defaultValue" | "onChange" | "onSelect"
+>
 
 /**
  * The root, and the hidden input that submits the number as is.
@@ -85,7 +100,10 @@ function NumberInput({
     debug,
     controlId,
   })
-  const context = React.useMemo(() => extendHandle(numberInput, { field }), [numberInput, field])
+  const context = React.useMemo(
+    () => extendHandle(numberInput, { field }),
+    [numberInput, field]
+  )
   useControllerEntry(controller, context)
   const content = (current: NumberInputState) => (
     <>
@@ -118,16 +136,34 @@ const NumberInputGroup = parts.Group
 function NumberInputControl({
   render,
   ...props
-}: Omit<PartProps<"input", NumberInputState>, "value" | "defaultValue" | "children" | "readOnly">) {
+}: Omit<
+  PartProps<"input", NumberInputState>,
+  "value" | "defaultValue" | "children" | "readOnly"
+>) {
   const numberInput = useNumberInput("NumberInputControl")
   // The core writes the text as it changes, so React only renders where it starts.
   const control = (input: Record<string, any>, state: NumberInputState) => {
     const { field } = numberInput
-    const [own, element] = field ? ownDescription(input, render) : [input, render]
-    const { value, ...rest }: Record<string, any> = field ? field.props(own) : own
-    return renderElement("input", { ...rest, defaultValue: value }, element, state)
+    const [own, element] = field
+      ? ownDescription(input, render)
+      : [input, render]
+    const { value, ...rest }: Record<string, any> = field
+      ? field.props(own)
+      : own
+    return renderElement(
+      "input",
+      { ...rest, defaultValue: value },
+      element,
+      state
+    )
   }
-  return usePart(numberInput, "control", {}, { ...props, render: control }, "input")
+  return usePart(
+    numberInput,
+    "control",
+    {},
+    { ...props, render: control },
+    "input"
+  )
 }
 
 /**
@@ -163,9 +199,14 @@ function NumberInputScrubArea({
   render,
   ...props
 }: PartProps<"span", NumberInputState> & NumberInputScrubAreaProps) {
-  const numberInput = useControllerTarget(controller, React.useContext(NumberInputContext))
+  const numberInput = useControllerTarget(
+    controller,
+    React.useContext(NumberInputContext)
+  )
   // Until the number input it names mounts, a scrub area outside it is a plain span.
-  if (!numberInput) return renderElement("span", props, render, unconnected)
+  if (!numberInput) {
+    return renderElement("span", props, render, unconnected)
+  }
   return (
     <NumberInputContext.Provider value={numberInput}>
       <ScrubAreaPart
@@ -197,16 +238,22 @@ function ScrubAreaPart({
  * the body, so transformed ancestors can't move it.
  * @stable
  */
-function NumberInputScrubAreaCursor(props: PartProps<"span", NumberInputState>) {
+function NumberInputScrubAreaCursor(
+  props: PartProps<"span", NumberInputState>
+) {
   const numberInput = React.useContext(NumberInputContext)
   // A scrub area outside its number input renders before that mounts, with no cursor yet.
-  return numberInput ? <CursorPart numberInput={numberInput} {...props} /> : null
+  return numberInput ? (
+    <CursorPart numberInput={numberInput} {...props} />
+  ) : null
 }
 
 function CursorPart({
   numberInput,
   ...props
-}: PartProps<"span", NumberInputState> & { numberInput: NumberInputContextValue }) {
+}: PartProps<"span", NumberInputState> & {
+  numberInput: NumberInputContextValue
+}) {
   const cursor = usePart(numberInput, "scrub-area-cursor", {}, props, "span")
   return cursor && createPortal(cursor, document.body)
 }

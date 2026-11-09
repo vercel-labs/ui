@@ -12,7 +12,12 @@
 // Status "Last action", status "Committed", status "Submitted"
 const sliderFixture = {
   formLabel: "Booking",
-  volume: { label: "Volume", name: "volume", defaultValue: 50, description: "How loud the room is." },
+  volume: {
+    label: "Volume",
+    name: "volume",
+    defaultValue: 50,
+    description: "How loud the room is.",
+  },
   price: {
     label: "Price",
     name: "price",
@@ -29,17 +34,25 @@ const sliderFixture = {
 // changes to that slider, ?controlled controls the volume.
 function sliderOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   const price = params.get("price")
   return {
-    orientation: (params.get("orientation") ?? undefined) as "horizontal" | "vertical" | undefined,
+    orientation: (params.get("orientation") ?? undefined) as
+      "horizontal" | "vertical" | undefined,
     disabled: params.has("disabled"),
     volume: number("volume") ?? sliderFixture.volume.defaultValue,
-    price: price ? price.split(",").map(Number) : sliderFixture.price.defaultValue,
+    price: price
+      ? price.split(",").map(Number)
+      : sliderFixture.price.defaultValue,
     minSteps: number("min-steps"),
     largeStep: number("large-step"),
-    format: params.has("currency") ? { style: "currency" as const, currency: "EUR" } : undefined,
-    volumeFormat: params.has("percent") ? { style: "unit" as const, unit: "percent" } : undefined,
+    format: params.has("currency")
+      ? { style: "currency" as const, currency: "EUR" }
+      : undefined,
+    volumeFormat: params.has("percent")
+      ? { style: "unit" as const, unit: "percent" }
+      : undefined,
     locale: params.get("locale") ?? undefined,
     cancel: params.get("cancel"),
     controlled: params.has("controlled"),
@@ -48,7 +61,9 @@ function sliderOptions() {
 
 // What a form would submit, as a query string.
 function serialize(form: HTMLFormElement) {
-  return new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString()
+  return new URLSearchParams(
+    new FormData(form) as unknown as Record<string, string>
+  ).toString()
 }
 
 export { serialize, sliderFixture, sliderOptions }

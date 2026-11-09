@@ -18,7 +18,12 @@ type MonthOptions = {
   locale: string
 }
 
-type MonthState = { value: ISODate; month: ISODate; focused: string | null; locale: string }
+type MonthState = {
+  value: ISODate
+  month: ISODate
+  focused: string | null
+  locale: string
+}
 
 type MonthRootState = {
   title: string
@@ -26,7 +31,12 @@ type MonthRootState = {
   weeks: ISODate[][]
 }
 
-const steps: Record<string, number> = { ArrowUp: -7, ArrowDown: 7, ArrowLeft: -1, ArrowRight: 1 }
+const steps: Record<string, number> = {
+  ArrowUp: -7,
+  ArrowDown: 7,
+  ArrowLeft: -1,
+  ArrowRight: 1,
+}
 
 const month = definePrimitive({
   name: "month",
@@ -48,7 +58,9 @@ const month = definePrimitive({
       claims: (state, day) => day.key === state.value,
       move: (event, { from, rtl }) => {
         const by = steps[event.key]
-        return by === undefined ? undefined : addDays(from.key, rtl && Math.abs(by) === 1 ? -by : by)
+        return by === undefined
+          ? undefined
+          : addDays(from.key, rtl && Math.abs(by) === 1 ? -by : by)
       },
     })
     let view: (MonthRootState & { month: ISODate; locale: string }) | undefined
@@ -58,7 +70,10 @@ const month = definePrimitive({
         view = {
           month: state.month,
           locale: state.locale,
-          title: formatDate(state.month, state.locale, { month: "long", year: "numeric" }),
+          title: formatDate(state.month, state.locale, {
+            month: "long",
+            year: "numeric",
+          }),
           weekdays: weekdayNames(state.locale, "short", weekStartsOn),
           weeks: monthGrid(state.month, { weekStartsOn }),
         }
@@ -69,10 +84,13 @@ const month = definePrimitive({
       roving,
       viewOf,
       select: (date: ISODate) => store.set({ value: date }),
-      turn: (by: number) => store.set({ month: addMonths(store.get().month, by) }),
+      turn: (by: number) =>
+        store.set({ month: addMonths(store.get().month, by) }),
       keydown(event: KeyboardEvent, el: HTMLElement) {
         const moved = roving.keydown(event, el)
-        if (moved && !isSameMonth(moved.key, store.get().month)) store.set({ month: startOfMonth(moved.key) })
+        if (moved && !isSameMonth(moved.key, store.get().month)) {
+          store.set({ month: startOfMonth(moved.key) })
+        }
       },
     }
   },
@@ -87,7 +105,10 @@ const month = definePrimitive({
     day: slot<{ value: string }, { selected: boolean; outside: boolean }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      state: (state, { key }) => ({ selected: key === state.value, outside: !isSameMonth(key, state.month) }),
+      state: (state, { key }) => ({
+        selected: key === state.value,
+        outside: !isSameMonth(key, state.month),
+      }),
       attrs: (state, part) => ({
         type: "button",
         role: "gridcell",
@@ -134,7 +155,11 @@ function Example() {
   const [locale, setLocale] = React.useState("en-US")
   return (
     <div data-slot="stack">
-      <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
+      <select
+        aria-label="Locale"
+        value={locale}
+        onChange={(event) => setLocale(event.target.value)}
+      >
         <option value="en-US">English (US)</option>
         <option value="de-DE">Deutsch</option>
       </select>

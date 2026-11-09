@@ -73,7 +73,10 @@ type ReorderOptions<State extends object, Props = any> = {
    * primitive's change, so `on<Key>Change`, `cancel()` and controlled values
    * work: `set: (value, details) => change("value", value, details)`.
    */
-  set: (value: string[], details: { reason: ReorderReason; event?: Event }) => boolean
+  set: (
+    value: string[],
+    details: { reason: ReorderReason; event?: Event }
+  ) => boolean
   /**
    * Whether the items run top to bottom, along a line, or wrap in rows like a
    * grid of photos, which picks the arrows and how a drag finds its place.
@@ -108,12 +111,24 @@ type ReorderOrientation = "horizontal" | "vertical" | "grid"
  * The English messages `createReorder` announces unless you pass `message`.
  * @stable
  */
-function reorderMessage({ type, label: name, count, position, total }: ReorderMessage) {
+function reorderMessage({
+  type,
+  label: name,
+  count,
+  position,
+  total,
+}: ReorderMessage) {
   const at = `position ${position} of ${total}`
   const label = count > 1 ? `${count} items` : name
-  if (type === "grab") return `Picked up ${label}, ${at}.`
-  if (type === "move") return `${label}, ${at}.`
-  if (type === "drop") return `Dropped ${label} at ${at}.`
+  if (type === "grab") {
+    return `Picked up ${label}, ${at}.`
+  }
+  if (type === "move") {
+    return `${label}, ${at}.`
+  }
+  if (type === "drop") {
+    return `Dropped ${label} at ${at}.`
+  }
   return `Moved ${label} back to ${at}.`
 }
 
@@ -122,10 +137,14 @@ function reorderMessage({ type, label: name, count, position, total }: ReorderMe
 function dropIndex(
   middles: readonly number[],
   pointer: number,
-  { reversed = false }: { reversed?: boolean } = {},
+  { reversed = false }: { reversed?: boolean } = {}
 ) {
   let index = 0
-  for (const middle of middles) if (reversed ? middle > pointer : middle < pointer) index++
+  for (const middle of middles) {
+    if (reversed ? middle > pointer : middle < pointer) {
+      index++
+    }
+  }
   return index
 }
 
@@ -133,15 +152,22 @@ function dropIndex(
 // in rows: after every item on a row above the pointer, and every item on the
 // pointer's row whose middle it has passed. Pure, so it's tested without layout.
 function gridDropIndex(
-  rects: readonly { left: number; top: number; right: number; bottom: number }[],
+  rects: readonly {
+    left: number
+    top: number
+    right: number
+    bottom: number
+  }[],
   point: { x: number; y: number },
-  { reversed = false }: { reversed?: boolean } = {},
+  { reversed = false }: { reversed?: boolean } = {}
 ) {
   let index = 0
   for (const rect of rects) {
     const middle = (rect.left + rect.right) / 2
     const passed = reversed ? point.x < middle : point.x > middle
-    if (point.y > rect.bottom || (point.y >= rect.top && passed)) index++
+    if (point.y > rect.bottom || (point.y >= rect.top && passed)) {
+      index++
+    }
   }
   return index
 }
@@ -149,24 +175,39 @@ function gridDropIndex(
 // How many items the first row of a grid holds, from their tops.
 function columnsOf(tops: readonly number[]) {
   let count = 0
-  while (count < tops.length && Math.abs(tops[count] - tops[0]) < 1) count++
+  while (count < tops.length && Math.abs(tops[count] - tops[0]) < 1) {
+    count++
+  }
   return Math.max(1, count)
 }
 
 // The order with `key`, or every key in `key`, moved to `index` among the
 // rest, as one block in list order. The same array when it's already there.
-function movedTo(order: readonly string[], key: string | readonly string[], index: number) {
-  const keys = typeof key === "string" ? [key] : order.filter((item) => key.includes(item))
+function movedTo(
+  order: readonly string[],
+  key: string | readonly string[],
+  index: number
+) {
+  const keys =
+    typeof key === "string" ? [key] : order.filter((item) => key.includes(item))
   const rest = order.filter((item) => !keys.includes(item))
   const to = Math.max(0, Math.min(rest.length, index))
-  if (keys.every((item, i) => order[to + i] === item)) return order as string[]
+  if (keys.every((item, i) => order[to + i] === item)) {
+    return order as string[]
+  }
   rest.splice(to, 0, ...keys)
   return rest
 }
 
 // The order with `keys` gathered into one block where `key` is.
-function gathered(order: readonly string[], key: string, keys: readonly string[]) {
-  const before = order.slice(0, order.indexOf(key)).filter((k) => !keys.includes(k)).length
+function gathered(
+  order: readonly string[],
+  key: string,
+  keys: readonly string[]
+) {
+  const before = order
+    .slice(0, order.indexOf(key))
+    .filter((k) => !keys.includes(k)).length
   return keys.length > 1 ? movedTo(order, keys, before) : [...order]
 }
 
@@ -196,12 +237,13 @@ function gathered(order: readonly string[], key: string, keys: readonly string[]
  */
 function createReorder<State extends object, Props = any>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: ReorderOptions<State, Props>,
+  options: ReorderOptions<State, Props>
 ) {
   const { store } = context
   const items = createOrder<{ key: string; el: HTMLElement; props: Props }>()
   const orientation = () => options.orientation?.() ?? "vertical"
-  const element = (key: string) => items.list().find((item) => item.key === key)?.el
+  const element = (key: string) =>
+    items.list().find((item) => item.key === key)?.el
   const { draft, value, setDraft, focusLater, drop, cancel } = createDraftMove({
     store,
     draft: options.draft,
@@ -209,24 +251,45 @@ function createReorder<State extends object, Props = any>(
     shown: (current: ReorderDraft) => current.order,
     same: isSameKeys,
     rebase(current, now, moved) {
-      if (!now.includes(current.key)) return null
+      if (!now.includes(current.key)) {
+        return null
+      }
       const keys = now.filter((key) => current.keys.includes(key))
       const order = gathered(now, current.key, keys)
-      if (!moved) return { ...current, keys, order }
+      if (!moved) {
+        return { ...current, keys, order }
+      }
       const at = current.order.indexOf(current.keys[0])
-      const index = current.order.slice(0, at).filter((key) => now.includes(key)).length
+      const index = current.order
+        .slice(0, at)
+        .filter((key) => now.includes(key)).length
       return { ...current, keys, order: movedTo(order, keys, index) }
     },
     commit: (current, details) => options.set(current.order, details),
-    say: (type, current, order) => say(type, current.key, order, current.keys.length),
+    say: (type, current, order) =>
+      say(type, current.key, order, current.keys.length),
     element,
   })
 
-  function say(type: ReorderMessage["type"], key: string, order: readonly string[], count = 1) {
+  function say(
+    type: ReorderMessage["type"],
+    key: string,
+    order: readonly string[],
+    count = 1
+  ) {
     const el = element(key)
     const label = options.label?.(key) ?? (el ? labelOf(el) : key)
-    const message = { type, key, label, count, position: order.indexOf(key) + 1, total: order.length }
-    announce((options.message ?? reorderMessage)(message), { priority: "assertive" })
+    const message = {
+      type,
+      key,
+      label,
+      count,
+      position: order.indexOf(key) + 1,
+      total: order.length,
+    }
+    announce((options.message ?? reorderMessage)(message), {
+      priority: "assertive",
+    })
   }
 
   const isDisabled = (key: string) => {
@@ -237,33 +300,51 @@ function createReorder<State extends object, Props = any>(
   // Picks up an item and its group, gathered into one block where the item is.
   function grab(key: string, pointer: boolean) {
     const current = value()
-    if (draft() || !current.includes(key) || isDisabled(key)) return false
+    if (draft() || !current.includes(key) || isDisabled(key)) {
+      return false
+    }
     const group = new Set(options.group?.(key) ?? [])
-    const keys = current.filter((k) => k === key || (group.has(k) && !isDisabled(k)))
+    const keys = current.filter(
+      (k) => k === key || (group.has(k) && !isDisabled(k))
+    )
     const order = gathered(current, key, keys)
     setDraft({ key, keys, order, pointer })
     say("grab", key, order, keys.length)
-    if (!pointer && keys.length > 1) focusLater(key)
+    if (!pointer && keys.length > 1) {
+      focusLater(key)
+    }
     return true
   }
 
   function moveTo(index: number) {
     const current = draft()
-    if (!current) return
+    if (!current) {
+      return
+    }
     const order = movedTo(current.order, current.keys, index)
-    if (order === current.order) return
+    if (order === current.order) {
+      return
+    }
     setDraft({ ...current, order })
     say("move", current.key, order, current.keys.length)
-    if (!current.pointer) focusLater(current.key)
+    if (!current.pointer) {
+      focusLater(current.key)
+    }
   }
 
   // How far a key moves the picked-up block: along the line, or in a grid,
   // Left and Right by one and Up and Down by a row.
   function stepOf(key: string, rtl: boolean) {
     const kind = orientation()
-    if (kind !== "grid") return stepFor(key, kind, rtl)
-    if (key !== "ArrowUp" && key !== "ArrowDown") return stepFor(key, "horizontal", rtl)
-    const columns = columnsOf(items.list().map(({ el }) => el.getBoundingClientRect().top))
+    if (kind !== "grid") {
+      return stepFor(key, kind, rtl)
+    }
+    if (key !== "ArrowUp" && key !== "ArrowDown") {
+      return stepFor(key, "horizontal", rtl)
+    }
+    const columns = columnsOf(
+      items.list().map(({ el }) => el.getBoundingClientRect().top)
+    )
     return key === "ArrowUp" ? -columns : columns
   }
 
@@ -274,9 +355,13 @@ function createReorder<State extends object, Props = any>(
     const rects = others.map(({ el }) => el.getBoundingClientRect())
     const kind = orientation()
     const reversed = kind !== "vertical" && !!others[0] && isRTL(others[0].el)
-    if (kind === "grid") return gridDropIndex(rects, { x, y }, { reversed })
+    if (kind === "grid") {
+      return gridDropIndex(rects, { x, y }, { reversed })
+    }
     const vertical = kind === "vertical"
-    const middles = rects.map((rect) => (vertical ? rect.top + rect.height / 2 : rect.left + rect.width / 2))
+    const middles = rects.map((rect) =>
+      vertical ? rect.top + rect.height / 2 : rect.left + rect.width / 2
+    )
     return dropIndex(middles, vertical ? y : x, { reversed })
   }
 
@@ -286,14 +371,25 @@ function createReorder<State extends object, Props = any>(
   // Puts a dragged item where the pointer is, and keeps its element under the
   // pointer while the list moves it. Layout offsets ignore transforms, so the
   // translate doesn't count itself, whether or not the styles apply it.
-  function follow(key: string, start: { x: number; y: number; left: number; top: number }) {
+  function follow(
+    key: string,
+    start: { x: number; y: number; left: number; top: number }
+  ) {
     let x = start.x
     let y = start.y
     const place = () => {
       const el = element(key)
-      if (!el) return
-      el.style.setProperty("--drag-x", `${x - start.x - (el.offsetLeft - start.left)}px`)
-      el.style.setProperty("--drag-y", `${y - start.y - (el.offsetTop - start.top)}px`)
+      if (!el) {
+        return
+      }
+      el.style.setProperty(
+        "--drag-x",
+        `${x - start.x - (el.offsetLeft - start.left)}px`
+      )
+      el.style.setProperty(
+        "--drag-y",
+        `${y - start.y - (el.offsetTop - start.top)}px`
+      )
     }
     const track = (pointerX: number, pointerY: number) => {
       x = pointerX
@@ -305,11 +401,15 @@ function createReorder<State extends object, Props = any>(
     const view = element(key)?.ownerDocument.defaultView
     let frame = 0
     const unsubscribe = store.subscribe(() => {
-      if (view && !frame) frame = view.requestAnimationFrame(() => ((frame = 0), place()))
+      if (view && !frame) {
+        frame = view.requestAnimationFrame(() => ((frame = 0), place()))
+      }
     })
     const stop = () => {
       unsubscribe()
-      if (frame) view?.cancelAnimationFrame(frame)
+      if (frame) {
+        view?.cancelAnimationFrame(frame)
+      }
       const el = element(key)
       el?.style.removeProperty("--drag-x")
       el?.style.removeProperty("--drag-y")
@@ -319,7 +419,11 @@ function createReorder<State extends object, Props = any>(
 
   // Drags a copy of the item above the page, while the item itself stays
   // where it would drop and a drag near a scroller's edge scrolls it.
-  function float(key: string, el: HTMLElement, start: { x: number; y: number }) {
+  function float(
+    key: string,
+    el: HTMLElement,
+    start: { x: number; y: number }
+  ) {
     let x = start.x
     let y = start.y
     const preview: DragPreview = bindDragPreview(el, start)
@@ -355,9 +459,17 @@ function createReorder<State extends object, Props = any>(
 
   function pointerdown(event: PointerEvent, key: string) {
     const el = element(key)
-    if (!el || !drags.accepts(event) || draft()) return
-    const start = { x: event.clientX, y: event.clientY, left: el.offsetLeft, top: el.offsetTop }
-    let drag: { track: (x: number, y: number) => void; stop: () => void } | undefined
+    if (!el || !drags.accepts(event) || draft()) {
+      return
+    }
+    const start = {
+      x: event.clientX,
+      y: event.clientY,
+      left: el.offsetLeft,
+      top: el.offsetTop,
+    }
+    let drag:
+      { track: (x: number, y: number) => void; stop: () => void } | undefined
     // The drop reports the move that placed the item: a pointerup's zero
     // pressure reads as a screen reader's pointer to `details.source`.
     let lastMove: PointerEvent | undefined
@@ -365,7 +477,9 @@ function createReorder<State extends object, Props = any>(
       threshold: dragThreshold,
       cancelOnEscape: true,
       onStart: () => {
-        if (!grab(key, true)) return false
+        if (!grab(key, true)) {
+          return false
+        }
         drag = options.preview ? float(key, el, start) : follow(key, start)
       },
       onMove: ({ x, y, event: moveEvent }) => {
@@ -374,11 +488,16 @@ function createReorder<State extends object, Props = any>(
         drag?.track(x, y)
       },
       onEnd: (endEvent, canceled) => {
-        if (!drag) return
+        if (!drag) {
+          return
+        }
         drag.stop()
         drag = undefined
-        if (canceled) cancel()
-        else drop("drag", lastMove ?? endEvent)
+        if (canceled) {
+          cancel()
+        } else {
+          drop("drag", lastMove ?? endEvent)
+        }
       },
     })
   }
@@ -390,7 +509,10 @@ function createReorder<State extends object, Props = any>(
     },
     /** The order to render: the draft's while an item moves, else the value. Pure, so `state` and `attrs` can call it. */
     order(state: State) {
-      return (state[options.draft] as ReorderDraft | null)?.order ?? (state[options.key] as string[])
+      return (
+        (state[options.draft] as ReorderDraft | null)?.order ??
+        (state[options.key] as string[])
+      )
     },
     /** Whether an item is picked up, by itself or with its group. */
     moving(state: State, key: string) {
@@ -410,10 +532,18 @@ function createReorder<State extends object, Props = any>(
      */
     keydown(event: KeyboardEvent, key: string) {
       const current = draft()
-      if (event.defaultPrevented || current?.pointer) return !!current
+      if (event.defaultPrevented || current?.pointer) {
+        return !!current
+      }
       const modified = event.altKey || event.ctrlKey || event.metaKey
       if (!current) {
-        if (modified || (event.key !== " " && event.key !== "Enter") || !grab(key, false)) return false
+        if (
+          modified ||
+          (event.key !== " " && event.key !== "Enter") ||
+          !grab(key, false)
+        ) {
+          return false
+        }
         event.preventDefault()
         return true
       }
@@ -421,8 +551,11 @@ function createReorder<State extends object, Props = any>(
         cancel(false)
         return true
       }
-      const target = event.target instanceof HTMLElement ? event.target : undefined
-      const step = modified ? undefined : stepOf(event.key, !!target && isRTL(target))
+      const target =
+        event.target instanceof HTMLElement ? event.target : undefined
+      const step = modified
+        ? undefined
+        : stepOf(event.key, !!target && isRTL(target))
       if (step !== undefined) {
         event.preventDefault()
         // The block's place among the other items, and how many places there are.
@@ -430,8 +563,12 @@ function createReorder<State extends object, Props = any>(
         const count = current.order.length - current.keys.length + 1
         // A row up or down from the first or last row stays put.
         const off =
-          typeof step === "number" && Math.abs(step) > 1 && (index + step < 0 || index + step >= count)
-        if (!off) moveTo(moveIndex(index, step, count, false))
+          typeof step === "number" &&
+          Math.abs(step) > 1 &&
+          (index + step < 0 || index + step >= count)
+        if (!off) {
+          moveTo(moveIndex(index, step, count, false))
+        }
       } else if (event.key === " " || event.key === "Enter") {
         event.preventDefault()
         drop("move-key", event)
@@ -456,10 +593,16 @@ function createReorder<State extends object, Props = any>(
     /** Moves an item to `index` at once, like a "Move to top" menu item. Returns whether it went through. */
     move(key: string, index: number) {
       const order = value()
-      if (!order.includes(key)) return false
+      if (!order.includes(key)) {
+        return false
+      }
       const next = movedTo(order, key, index)
-      if (next === order) return false
-      if (!options.set(next, { reason: "imperative" })) return false
+      if (next === order) {
+        return false
+      }
+      if (!options.set(next, { reason: "imperative" })) {
+        return false
+      }
       say("drop", key, next)
       return true
     },

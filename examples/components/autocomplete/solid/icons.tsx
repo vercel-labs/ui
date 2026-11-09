@@ -80,7 +80,11 @@ const mailSearches = [
 function Example() {
   return (
     <Autocomplete>
-      <AutocompleteInput type="search" aria-label="Search mail" placeholder="Search mail…" />
+      <AutocompleteInput
+        type="search"
+        aria-label="Search mail"
+        placeholder="Search mail…"
+      />
       <AutocompleteContent>
         <AutocompleteEmpty>No searches found.</AutocompleteEmpty>
         <AutocompleteList>

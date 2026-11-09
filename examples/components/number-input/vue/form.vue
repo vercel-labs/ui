@@ -16,7 +16,7 @@ const form = useId()
 
 function onSubmit(event: Event) {
   const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-    ([name, value]) => `${name}=${value}`,
+    ([name, value]) => `${name}=${value}`
   )
   log(`Submitted ${data.join(", ")}`)
 }

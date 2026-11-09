@@ -30,7 +30,9 @@ function createSafeArea({ restTimeout = 300 } = {}) {
     // True when the move should be ignored.
     // `onRest` runs if the pointer stops inside the area.
     contains(point: Point, onRest: () => void) {
-      if (!apex || !popup || expired) return false
+      if (!apex || !popup || expired) {
+        return false
+      }
       const rect = popup.getBoundingClientRect()
       const near =
         axis === "x"
@@ -42,12 +44,25 @@ function createSafeArea({ restTimeout = 300 } = {}) {
             : rect.bottom
       const inside =
         axis === "x"
-          ? inTriangle(point, apex, { x: near, y: rect.top - 8 }, { x: near, y: rect.bottom + 8 })
-          : inTriangle(point, apex, { x: rect.left - 8, y: near }, { x: rect.right + 8, y: near })
-      const progressing = !last || Math.abs(near - point[axis]) <= Math.abs(near - last[axis]) + 1
+          ? inTriangle(
+              point,
+              apex,
+              { x: near, y: rect.top - 8 },
+              { x: near, y: rect.bottom + 8 }
+            )
+          : inTriangle(
+              point,
+              apex,
+              { x: rect.left - 8, y: near },
+              { x: rect.right + 8, y: near }
+            )
+      const progressing =
+        !last || Math.abs(near - point[axis]) <= Math.abs(near - last[axis]) + 1
       last = point
       clearTimeout(restTimer)
-      if (!inside || !progressing) return false
+      if (!inside || !progressing) {
+        return false
+      }
       restTimer = setTimeout(() => {
         expired = true
         onRest()

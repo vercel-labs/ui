@@ -52,7 +52,9 @@ function FileTree({
   onOpen: (file: string) => void
 }) {
   const items = useMemo(() => {
-    const byName = new Map(treeFromPaths(files).map((item) => [item.value, item]))
+    const byName = new Map(
+      treeFromPaths(files).map((item) => [item.value, item])
+    )
     return roots.flatMap((root) => {
       const item = byName.get(root.name)
       return item ? [{ ...item, label: root.label }] : []
@@ -75,7 +77,9 @@ function FileTree({
       items={items}
       value={selected}
       onValueChange={(value) => {
-        if (!value || !known.has(value)) return
+        if (!value || !known.has(value)) {
+          return
+        }
         setSelected(value)
         onOpen(value)
       }}

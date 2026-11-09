@@ -1,5 +1,11 @@
 import * as React from "react"
-import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import {
+  Toast,
+  ToastAction,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/react/toast"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {
@@ -9,14 +15,16 @@ function Example() {
     () => () => {
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   return (
     <>
       <button
         onClick={() =>
-          toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })
+          toast("Message sent", {
+            action: { label: "Undo", onAction: () => log("Message unsent") },
+          })
         }
       >
         Send Message

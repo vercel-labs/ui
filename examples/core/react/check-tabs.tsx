@@ -5,13 +5,19 @@ import { Tabs, TabsList, TabsPanel, TabsTab } from "./tabs"
 function Example() {
   const root = React.useRef<HTMLDivElement>(null)
   const [named, setNamed] = React.useState(true)
-  const [result, setResult] = React.useState<{ ok: boolean; text: string } | null>(null)
+  const [result, setResult] = React.useState<{
+    ok: boolean
+    text: string
+  } | null>(null)
 
   async function check() {
     setResult(null)
     try {
       await checkPattern(root.current!, "tabs")
-      setResult({ ok: true, text: "Passes: roles, states, names, one tab stop, the arrows, Home and End." })
+      setResult({
+        ok: true,
+        text: "Passes: roles, states, names, one tab stop, the arrows, Home and End.",
+      })
     } catch (error) {
       setResult({ ok: false, text: (error as Error).message })
     }
@@ -41,12 +47,22 @@ function Example() {
           <TabsTab value="activity">Activity</TabsTab>
           <TabsTab value="files">Files</TabsTab>
         </TabsList>
-        <TabsPanel value="overview">The project plan and upcoming milestones.</TabsPanel>
-        <TabsPanel value="activity">Recent updates from the project team.</TabsPanel>
-        <TabsPanel value="files">Briefs, mockups and other project files.</TabsPanel>
+        <TabsPanel value="overview">
+          The project plan and upcoming milestones.
+        </TabsPanel>
+        <TabsPanel value="activity">
+          Recent updates from the project team.
+        </TabsPanel>
+        <TabsPanel value="files">
+          Briefs, mockups and other project files.
+        </TabsPanel>
       </Tabs>
       {result && (
-        <p role="status" data-slot="check-result" data-status={result.ok ? "pass" : "fail"}>
+        <p
+          role="status"
+          data-slot="check-result"
+          data-status={result.ok ? "pass" : "fail"}
+        >
           {result.text}
         </p>
       )}

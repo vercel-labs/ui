@@ -20,9 +20,16 @@ const log = useLog()
     multiple
     :default-value="['cheese', 'onion']"
     aria-label="Toppings"
-    @value-change="(value, details) => log(`${value.join(', ') || 'Nothing'} (${details.reason})`)"
+    @value-change="
+      (value, details) =>
+        log(`${value.join(', ') || 'Nothing'} (${details.reason})`)
+    "
   >
-    <ListboxItem v-for="topping in toppings" :key="topping.value" :value="topping.value">
+    <ListboxItem
+      v-for="topping in toppings"
+      :key="topping.value"
+      :value="topping.value"
+    >
       {{ topping.label }}
       <ListboxItemIndicator>
         <CheckIcon aria-hidden="true" />

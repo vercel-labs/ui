@@ -71,11 +71,11 @@ function mount(root: HTMLElement) {
                           </span>
                           ${zone.label}
                         </ui-combobox-item>
-                      `,
+                      `
                     )
                     .join("")}
                 </ui-combobox-group>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>

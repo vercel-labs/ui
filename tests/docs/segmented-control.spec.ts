@@ -11,10 +11,9 @@ testExamples("segmented-control", {
     await expect(preview.getByRole("radio", { name: "Board" })).toBeChecked()
   },
   vertical: async (preview) => {
-    await expect(preview.getByRole("radiogroup", { name: "Vertical alignment" })).toHaveAttribute(
-      "aria-orientation",
-      "vertical",
-    )
+    await expect(
+      preview.getByRole("radiogroup", { name: "Vertical alignment" })
+    ).toHaveAttribute("aria-orientation", "vertical")
     await preview.getByRole("radio", { name: "Bottom" }).click()
     await preview.getByRole("radio", { name: "Bottom" }).press("ArrowUp")
     await expect(preview.getByRole("radio", { name: "Middle" })).toBeChecked()
@@ -30,11 +29,15 @@ testExamples("segmented-control", {
     await expect(preview.getByRole("radio", { name: "Month" })).toBeChecked()
   },
   form: async (preview) => {
-    await expect(preview.getByRole("radiogroup", { name: "Theme" })).toBeVisible()
+    await expect(
+      preview.getByRole("radiogroup", { name: "Theme" })
+    ).toBeVisible()
     await preview.getByRole("radio", { name: "Dark" }).click()
     await preview.getByRole("radio", { name: "Compact" }).click()
     await preview.getByRole("button", { name: "Reset" }).click()
     await expect(preview.getByRole("radio", { name: "System" })).toBeChecked()
-    await expect(preview.getByRole("radio", { name: "Comfortable" })).toBeChecked()
+    await expect(
+      preview.getByRole("radio", { name: "Comfortable" })
+    ).toBeChecked()
   },
 })

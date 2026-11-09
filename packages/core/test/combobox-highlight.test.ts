@@ -29,7 +29,11 @@ function view(options: OptionsOf<typeof combobox>) {
 const settle = () => new Promise((resolve) => setTimeout(resolve, 20))
 
 test('"always" highlights the selected item when the list opens, and arrows move from it', async () => {
-  const combo = view({ items: ["Backlog", "Todo", "Done"], defaultValue: "Todo", autoHighlight: "always" })
+  const combo = view({
+    items: ["Backlog", "Todo", "Done"],
+    defaultValue: "Todo",
+    autoHighlight: "always",
+  })
   await combo.keys("ArrowDown")
   await settle()
   expect(combo.state.highlighted).toBe("Todo")
@@ -38,7 +42,10 @@ test('"always" highlights the selected item when the list opens, and arrows move
 })
 
 test('"always" highlights the first item when nothing is selected', async () => {
-  const combo = view({ items: ["Backlog", "Todo", "Done"], autoHighlight: "always" })
+  const combo = view({
+    items: ["Backlog", "Todo", "Done"],
+    autoHighlight: "always",
+  })
   await combo.keys("ArrowDown")
   await settle()
   expect(combo.state.highlighted).toBe("Backlog")
@@ -59,7 +66,9 @@ test("items appended while open leave a highlight the user moved", async () => {
   await settle()
   await combo.keys("ArrowDown")
   expect(combo.state.highlighted).toBe("Blueberry")
-  combo.api.internal.store.set({ items: ["Banana", "Blueberry", "Boysenberry"] })
+  combo.api.internal.store.set({
+    items: ["Banana", "Blueberry", "Boysenberry"],
+  })
   await settle()
   expect(combo.state.highlighted).toBe("Blueberry")
 })
@@ -87,7 +96,10 @@ test("a highlight the user moved back to the first match stays as results arrive
 })
 
 test("turning autoHighlight on after typing highlights the best match", async () => {
-  const combo = view({ items: ["Apple", "Banana", "Blueberry"], autoHighlight: false })
+  const combo = view({
+    items: ["Apple", "Banana", "Blueberry"],
+    autoHighlight: false,
+  })
   await combo.type("b")
   await settle()
   expect(combo.state.highlighted).toBeNull()

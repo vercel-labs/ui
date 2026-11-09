@@ -10,7 +10,8 @@ const users = [
 ]
 
 const chevron = (open: boolean) =>
-  createElement(open ? ChevronUp : ChevronDown, { "aria-hidden": "true" }).outerHTML
+  createElement(open ? ChevronUp : ChevronDown, { "aria-hidden": "true" })
+    .outerHTML
 
 const mark = (item: Element) =>
   item.hasAttribute("data-selected")
@@ -49,7 +50,7 @@ function mount(root: HTMLElement) {
                     <span data-slot="hint">@${user.username}</span>
                   </span>
                 </ui-combobox-item>
-              `,
+              `
             )
             .join("")}
         </ui-combobox-list>
@@ -57,13 +58,17 @@ function mount(root: HTMLElement) {
     </ui-combobox>
   `
   const update = (el: Element) => {
-    if (el.localName === "button") el.innerHTML = chevron(el.hasAttribute("data-open"))
-    if (el.localName !== "ui-combobox-item") return
+    if (el.localName === "button") {
+      el.innerHTML = chevron(el.hasAttribute("data-open"))
+    }
+    if (el.localName !== "ui-combobox-item") {
+      return
+    }
     el.querySelector(":scope > svg, :scope > kbd")?.remove()
     el.insertAdjacentHTML("beforeend", mark(el))
   }
   const observer = new MutationObserver((records) =>
-    records.forEach((record) => update(record.target as Element)),
+    records.forEach((record) => update(record.target as Element))
   )
   observer.observe(root.querySelector("ui-combobox-trigger")!, {
     subtree: true,

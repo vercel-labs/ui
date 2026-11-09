@@ -29,7 +29,13 @@ import {
   CommandItemText,
   CommandList,
 } from "@ui-sdk/solid/command"
-import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuTrigger } from "@ui-sdk/solid/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuItemIcon,
+  MenuTrigger,
+} from "@ui-sdk/solid/menu"
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -51,11 +57,22 @@ import { Tabs, TabsList, TabsTab, TabsTabIcon } from "@ui-sdk/solid/tabs"
 import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/solid/toggle"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
-import { icons, iconsFixture as f, iconsOptions, type IconName } from "tests/fixtures/item-icons.ts"
+import {
+  icons,
+  iconsFixture as f,
+  iconsOptions,
+  type IconName,
+} from "tests/fixtures/item-icons.ts"
 
 function Svg(props: { name: IconName }) {
   return (
-    <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor">
+    <svg
+      viewBox="0 0 16 16"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+    >
       <title>{icons[props.name].title}</title>
       <path d={icons[props.name].path} />
     </svg>
@@ -66,7 +83,8 @@ function Svg(props: { name: IconName }) {
 const glyph = (entry: { icon?: IconName; emoji?: string }) =>
   entry.icon ? <Svg name={entry.icon} /> : entry.emoji
 
-const hasIcon = (entry: { icon?: IconName; emoji?: string }) => !!(entry.icon || entry.emoji)
+const hasIcon = (entry: { icon?: IconName; emoji?: string }) =>
+  !!(entry.icon || entry.emoji)
 
 function Fixture() {
   const [action, setAction] = createSignal("")
@@ -83,13 +101,18 @@ function Fixture() {
             {(item) => (
               <MenuItem value={item.value}>
                 <Show when={hasIcon(item)}>
-                  <MenuItemIcon mirror={item.mirror}>{glyph(item)}</MenuItemIcon>
+                  <MenuItemIcon mirror={item.mirror}>
+                    {glyph(item)}
+                  </MenuItemIcon>
                 </Show>
                 {item.label}
               </MenuItem>
             )}
           </For>
-          <MenuItem value={f.menu.iconOnly.value} aria-label={f.menu.iconOnly.label}>
+          <MenuItem
+            value={f.menu.iconOnly.value}
+            aria-label={f.menu.iconOnly.label}
+          >
             <MenuItemIcon>{glyph(f.menu.iconOnly)}</MenuItemIcon>
           </MenuItem>
           <Show when={unnamed}>
@@ -126,7 +149,10 @@ function Fixture() {
         </SelectContent>
       </Select>
 
-      <Combobox<string> defaultValue={combobox} onValueChange={(value) => setAction(`combobox:${value}`)}>
+      <Combobox<string>
+        defaultValue={combobox}
+        onValueChange={(value) => setAction(`combobox:${value}`)}
+      >
         <ComboboxLabel class="label">{f.combobox.label}</ComboboxLabel>
         <ComboboxValueIcon class="value-icon" />
         <ComboboxInput class="input" />
@@ -147,7 +173,9 @@ function Fixture() {
       </Combobox>
 
       <Autocomplete>
-        <AutocompleteLabel class="label">{f.autocomplete.label}</AutocompleteLabel>
+        <AutocompleteLabel class="label">
+          {f.autocomplete.label}
+        </AutocompleteLabel>
         <AutocompleteInput class="input" />
         <AutocompleteContent class="popup list-popup">
           <AutocompleteEmpty class="empty">No results</AutocompleteEmpty>
@@ -196,7 +224,11 @@ function Fixture() {
               </TabsTab>
             )}
           </For>
-          <TabsTab class="tab" value={f.tabs.iconOnly.value} aria-label={f.tabs.iconOnly.label}>
+          <TabsTab
+            class="tab"
+            value={f.tabs.iconOnly.value}
+            aria-label={f.tabs.iconOnly.label}
+          >
             <TabsTabIcon>{glyph(f.tabs.iconOnly)}</TabsTabIcon>
           </TabsTab>
         </TabsList>
@@ -207,7 +239,11 @@ function Fixture() {
           <ToggleIcon>{glyph(f.toggles.bold)}</ToggleIcon>
           {f.toggles.bold.label}
         </Toggle>
-        <Toggle class="toggle" value={f.toggles.iconOnly.value} aria-label={f.toggles.iconOnly.label}>
+        <Toggle
+          class="toggle"
+          value={f.toggles.iconOnly.value}
+          aria-label={f.toggles.iconOnly.label}
+        >
           <ToggleIcon>{glyph(f.toggles.iconOnly)}</ToggleIcon>
         </Toggle>
       </ToggleGroup>
@@ -218,7 +254,9 @@ function Fixture() {
             {(link) => (
               <NavigationMenuItem value={link.value}>
                 <NavigationMenuLink href={`#${link.value}`} class="nav-link">
-                  <NavigationMenuLinkIcon mirror={link.mirror}>{glyph(link)}</NavigationMenuLinkIcon>
+                  <NavigationMenuLinkIcon mirror={link.mirror}>
+                    {glyph(link)}
+                  </NavigationMenuLinkIcon>
                   {link.label}
                 </NavigationMenuLink>
               </NavigationMenuItem>

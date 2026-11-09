@@ -2,7 +2,14 @@ import { useNavigate, useSearchParams } from "@solidjs/router"
 import { cn } from "cn"
 import { createMemo, createSignal, For } from "solid-js"
 import { href, parseQuery } from "tracker-data"
-import { CircleDot, Columns3, List, Plus, Search, Settings } from "@/components/icons"
+import {
+  CircleDot,
+  Columns3,
+  List,
+  Plus,
+  Search,
+  Settings,
+} from "@/components/icons"
 import { newIssue } from "@/components/new-issue-dialog"
 import { buttonVariants } from "@/components/ui/button"
 import {
@@ -33,10 +40,15 @@ function CommandPalette() {
 
   function run(value: string) {
     setOpen(false)
-    if (value === "new-issue") newIssue.open()
-    else if (value === "settings") navigate("/settings")
-    else if (value === "list" || value === "board") navigate(href(query(), { view: value, page: 1 }))
-    else navigate(href(query(), { issue: value }))
+    if (value === "new-issue") {
+      newIssue.open()
+    } else if (value === "settings") {
+      navigate("/settings")
+    } else if (value === "list" || value === "board") {
+      navigate(href(query(), { view: value, page: 1 }))
+    } else {
+      navigate(href(query(), { issue: value }))
+    }
   }
 
   return (
@@ -45,7 +57,7 @@ function CommandPalette() {
         shortcut="mod+k"
         class={cn(
           buttonVariants({ variant: "outline" }),
-          "w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0",
+          "w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0"
         )}
       >
         <Search aria-hidden="true" class="sm:hidden" />
@@ -93,12 +105,18 @@ function CommandPalette() {
               <CommandGroupLabel>Issues</CommandGroupLabel>
               <For each={db.issues}>
                 {(issue) => (
-                  <CommandItem value={issue.id} label={issue.title} keywords={[issue.id]}>
+                  <CommandItem
+                    value={issue.id}
+                    label={issue.title}
+                    keywords={[issue.id]}
+                  >
                     <CommandItemIcon>
                       <CircleDot />
                     </CommandItemIcon>
                     <span class="truncate">{issue.title}</span>
-                    <span class="ms-auto text-xs text-muted-foreground">{issue.id}</span>
+                    <span class="ms-auto text-xs text-muted-foreground">
+                      {issue.id}
+                    </span>
                   </CommandItem>
                 )}
               </For>

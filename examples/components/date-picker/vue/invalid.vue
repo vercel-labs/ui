@@ -44,6 +44,8 @@ import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
         </CalendarWeeks>
       </CalendarGrid>
     </DatePickerContent>
-    <DatePickerHint v-slot="{ state: hint }"> Like {{ hint.example }} </DatePickerHint>
+    <DatePickerHint v-slot="{ state: hint }">
+      Like {{ hint.example }}
+    </DatePickerHint>
   </DatePicker>
 </template>

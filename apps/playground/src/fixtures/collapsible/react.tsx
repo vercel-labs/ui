@@ -1,5 +1,9 @@
 import { createCollapsibleController } from "@ui-sdk/core/collapsible"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { collapsibleFixture as fixture } from "tests/fixtures/collapsible.ts"
@@ -12,7 +16,8 @@ function Fixture() {
   const [reason, setReason] = React.useState("")
   const [source, setSource] = React.useState("")
   const [complete, setComplete] = React.useState("")
-  const { cancel, keepMounted, hiddenUntilFound, ...options } = collapsibleOptions()
+  const { cancel, keepMounted, hiddenUntilFound, ...options } =
+    collapsibleOptions()
   return (
     <div className="fixture">
       <button>Before</button>
@@ -21,14 +26,18 @@ function Fixture() {
         controller={controller}
         {...options}
         onOpenChange={(open, details) => {
-          if (cancel === (open ? "open" : "close")) return details.cancel()
+          if (cancel === (open ? "open" : "close")) {
+            return details.cancel()
+          }
           setAction(open ? "open" : "closed")
           setReason(details.reason)
           setSource(details.source)
         }}
         onOpenChangeComplete={(open) => setComplete(open ? "open" : "closed")}
       >
-        <CollapsibleTrigger className="collapsible-trigger">{fixture.trigger}</CollapsibleTrigger>
+        <CollapsibleTrigger className="collapsible-trigger">
+          {fixture.trigger}
+        </CollapsibleTrigger>
         <CollapsiblePanel
           className="collapsible-panel"
           keepMounted={keepMounted}
@@ -57,7 +66,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

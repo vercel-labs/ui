@@ -13,8 +13,14 @@
   } from "@ui-sdk/svelte/autocomplete"
 
   const fruitGroups = [
-    { label: "Tree fruits", items: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"] },
-    { label: "Berries", items: ["Blackberry", "Blueberry", "Grape", "Strawberry"] },
+    {
+      label: "Tree fruits",
+      items: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"],
+    },
+    {
+      label: "Berries",
+      items: ["Blackberry", "Blueberry", "Grape", "Strawberry"],
+    },
     { label: "Tropical", items: ["Avocado", "Banana", "Mango", "Pineapple"] },
   ]
 </script>
@@ -25,9 +31,7 @@
     <AutocompleteInput placeholder="e.g. Pear" />
   </div>
   <AutocompleteContent>
-    <AutocompleteEmpty>
-      No fruits found.
-    </AutocompleteEmpty>
+    <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
     <AutocompleteList>
       {#each fruitGroups as group, index (group.label)}
         {#if index > 0}<AutocompleteSeparator />{/if}

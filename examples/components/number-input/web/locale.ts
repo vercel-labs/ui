@@ -51,13 +51,15 @@ function mount(root: HTMLElement) {
                 </ui-number-input-group>
               </ui-number-input>
               <ui-field-description>Formatted for ${field.locale}.</ui-field-description>
-            </ui-field>`,
+            </ui-field>`
         )
         .join("")}
     </div>
   `
   root
-    .querySelectorAll<HTMLElement & { format: Intl.NumberFormatOptions }>("ui-number-input")
+    .querySelectorAll<HTMLElement & { format: Intl.NumberFormatOptions }>(
+      "ui-number-input"
+    )
     .forEach((el, index) => {
       el.format = fields[index].format
     })

@@ -14,7 +14,9 @@
 
 <div>
   <div data-slot="controls">
-    <button type="button" onclick={() => range.setValue("month")}>Show Month</button>
+    <button type="button" onclick={() => range.setValue("month")}
+      >Show Month</button
+    >
   </div>
   <SegmentedControl
     aria-label="Range"

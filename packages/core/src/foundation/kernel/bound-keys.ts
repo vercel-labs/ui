@@ -15,15 +15,22 @@ type Draft = Record<string, unknown>
 // parts bound and unbound.
 const queued = new WeakMap<object, ((draft: Draft) => void)[]>()
 
-function later<State extends object>(store: Store<State>, edit: (draft: Draft) => void) {
+function later<State extends object>(
+  store: Store<State>,
+  edit: (draft: Draft) => void
+) {
   const waiting = queued.get(store)
-  if (waiting) return void waiting.push(edit)
+  if (waiting) {
+    return void waiting.push(edit)
+  }
   const edits = [edit]
   queued.set(store, edits)
   queueMicrotask(() => {
     queued.delete(store)
     const draft: Draft = {}
-    for (const run of edits) run(draft)
+    for (const run of edits) {
+      run(draft)
+    }
     // The draft holds only the fields the edits name.
     store.set(draft as Partial<State>)
   })
@@ -32,23 +39,29 @@ function later<State extends object>(store: Store<State>, edit: (draft: Draft) =
 function keyWhileBound<Field extends string>(
   store: Store<Record<NoInfer<Field>, readonly string[]>>,
   field: Field,
-  key: string,
+  key: string
 ) {
   const edit = (change: (keys: readonly string[]) => readonly string[]) =>
     later(store, (draft) => {
-      draft[field] = change((draft[field] as readonly string[] | undefined) ?? store.get()[field])
+      draft[field] = change(
+        (draft[field] as readonly string[] | undefined) ?? store.get()[field]
+      )
     })
   let bound = true
   let added = false
   edit((keys) => {
-    if (!bound) return keys
+    if (!bound) {
+      return keys
+    }
     added = true
     return [...keys, key]
   })
   return () => {
     bound = false
     edit((keys) => {
-      if (!added) return keys
+      if (!added) {
+        return keys
+      }
       // Only this bind's entry, so a part bound again before this cleanup, like under StrictMode, stays listed.
       const index = keys.indexOf(key)
       return index === -1 ? keys : keys.filter((_, at) => at !== index)
@@ -67,10 +80,12 @@ function keyWhileBound<Field extends string>(
 function flagWhileBound<Key extends string>(
   store: Store<Record<NoInfer<Key>, boolean | null>>,
   key: Key,
-  { now = false } = {},
+  { now = false } = {}
 ) {
   const flag = (value: boolean) =>
-    now ? store.set({ [key]: value } as Record<Key, boolean>) : later(store, (draft) => (draft[key] = value))
+    now
+      ? store.set({ [key]: value } as Record<Key, boolean>)
+      : later(store, (draft) => (draft[key] = value))
   flag(true)
   return () => flag(false)
 }
@@ -80,9 +95,14 @@ function flagWhileBound<Key extends string>(
  * false once they have without its part. Call it as the part that needs the
  * answer binds: parts bound with it have set the flag by the time it settles.
  */
-function settleFlag<Key extends string>(store: Store<Record<NoInfer<Key>, boolean | null>>, key: Key) {
+function settleFlag<Key extends string>(
+  store: Store<Record<NoInfer<Key>, boolean | null>>,
+  key: Key
+) {
   later(store, (draft) => {
-    if (draft[key] === undefined && store.get()[key] === null) draft[key] = false
+    if (draft[key] === undefined && store.get()[key] === null) {
+      draft[key] = false
+    }
   })
 }
 

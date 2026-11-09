@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { DateInput } from "@ui-sdk/vue/date-input"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 </script>
 
 <template>

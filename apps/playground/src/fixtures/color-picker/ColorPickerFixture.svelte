@@ -24,8 +24,13 @@
   let committed = $state("")
   let submitted = $state("")
 
-  function onValueChange(value: string, details: { reason: string; cancel: () => void }) {
-    if (cancel) return details.cancel()
+  function onValueChange(
+    value: string,
+    details: { reason: string; cancel: () => void }
+  ) {
+    if (cancel) {
+      return details.cancel()
+    }
     action = `${value}:${details.reason}`
   }
 
@@ -35,7 +40,10 @@
 
   function onsubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    submitted = Array.from(new FormData(event.currentTarget), ([key, value]) => `${key}=${value}`).join("&")
+    submitted = Array.from(
+      new FormData(event.currentTarget),
+      ([key, value]) => `${key}=${value}`
+    ).join("&")
   }
 </script>
 
@@ -74,7 +82,9 @@
   <button type="button">After</button>
   <button type="submit">Save</button>
   <button type="reset">Reset</button>
-  <button type="button" onclick={() => controller.setValue("rebeccapurple")}>Use purple</button>
+  <button type="button" onclick={() => controller.setValue("rebeccapurple")}
+    >Use purple</button
+  >
   <output role="status" aria-label="Last action">{action}</output>
   <output aria-label="Committed">{committed}</output>
   <output aria-label="Submitted">{submitted}</output>

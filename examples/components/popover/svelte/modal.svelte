@@ -35,12 +35,18 @@
   }
 
   let mode = $state<Mode>("false")
-  const modal = $derived(mode === "true" ? true : mode === "false" ? false : "trap-focus")
+  const modal = $derived(
+    mode === "true" ? true : mode === "false" ? false : "trap-focus"
+  )
 </script>
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={modes} value={mode} onValueChange={(next) => next && (mode = next as Mode)}>
+    <Select
+      items={modes}
+      value={mode}
+      onValueChange={(next) => next && (mode = next as Mode)}
+    >
       <SelectLabel>Modal</SelectLabel>
       <SelectTrigger>
         <SelectValue />

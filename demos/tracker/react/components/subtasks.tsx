@@ -27,9 +27,11 @@ function Items({ subtasks }: { subtasks: Subtask[] }) {
 function Subtasks({ issue }: { issue: Issue }) {
   const all = leaves(issue.subtasks)
   const [checked, setChecked] = useOptimistic(
-    all.filter((subtask) => subtask.done).map((subtask) => subtask.id),
+    all.filter((subtask) => subtask.done).map((subtask) => subtask.id)
   )
-  if (all.length === 0) return null
+  if (all.length === 0) {
+    return null
+  }
 
   return (
     <section aria-labelledby="subtasks-label" className="grid gap-3">
@@ -59,7 +61,9 @@ function Subtasks({ issue }: { issue: Issue }) {
             }
           })
         }
-        defaultExpanded={issue.subtasks.filter((subtask) => subtask.subtasks).map((subtask) => subtask.id)}
+        defaultExpanded={issue.subtasks
+          .filter((subtask) => subtask.subtasks)
+          .map((subtask) => subtask.id)}
         className="flex flex-col rounded-2xl border border-border p-1"
       >
         <Items subtasks={issue.subtasks} />

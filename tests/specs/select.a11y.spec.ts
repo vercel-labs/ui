@@ -10,7 +10,9 @@ async function audit(page: Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations while closed", async ({ page, open }) => {
@@ -33,7 +35,10 @@ test.describe("while open", { tag: "@enhancement" }, () => {
     expect(await audit(page)).toEqual([])
   })
 
-  test("no axe violations while open with multiple selection", async ({ page, open }) => {
+  test("no axe violations while open with multiple selection", async ({
+    page,
+    open,
+  }) => {
     await open("select", { multiple: "", value: "apple,mango" })
     await trigger(page).click()
     await expect(listbox(page)).toBeVisible()
@@ -51,7 +56,9 @@ test("accessibility tree", async ({ page, open }) => {
   await open("select", { value: "banana" })
   await trigger(page).click()
   await expect(listbox(page)).toBeVisible()
-  await expect(trigger(page)).toMatchAriaSnapshot(`- combobox "Fruit" [expanded]: Banana`)
+  await expect(trigger(page)).toMatchAriaSnapshot(
+    `- combobox "Fruit" [expanded]: Banana`
+  )
   await expect(listbox(page)).toMatchAriaSnapshot(`
     - listbox:
       - option "Apple"

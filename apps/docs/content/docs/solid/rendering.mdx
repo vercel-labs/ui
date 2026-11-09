@@ -13,7 +13,10 @@ This page renders the rating from [Compose Behaviors](../core/compose-behaviors)
 import { createParts } from "@ui-sdk/solid/primitive"
 import { rating } from "./rating"
 
-const { Root: RatingRoot, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+const { Root: RatingRoot, Star: RatingStar } = createParts(rating, {
+  root: "div",
+  star: "button",
+})
 
 export { RatingRoot, RatingStar }
 ```

@@ -8,7 +8,12 @@ Select, Combobox, Autocomplete, Listbox, and Trigger Menu accept items as data. 
 ## Start with Strings
 
 ```tsx
-import { Select, SelectContent, SelectTrigger, SelectValue } from "@ui-sdk/solid/select"
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
 
 function Example() {
   return (
@@ -104,7 +109,10 @@ Items that only exist in state, like results from a server, render from the list
   {(state) => (
     <For each={state.items as { value: string; label: string }[]}>
       {(item) => (
-        <ComboboxItem value={item.value} class="rounded-xl px-2 py-1.5 data-highlighted:bg-neutral-100">
+        <ComboboxItem
+          value={item.value}
+          class="rounded-xl px-2 py-1.5 data-highlighted:bg-neutral-100"
+        >
           {item.label}
         </ComboboxItem>
       )}
@@ -130,7 +138,11 @@ function Example() {
   const actions: MenuData = [
     { value: "open", label: "Open", shortcut: "mod+o" },
     { type: "separator" },
-    { type: "submenu", label: "Share", items: [{ value: "email", label: "Email" }] },
+    {
+      type: "submenu",
+      label: "Share",
+      items: [{ value: "email", label: "Email" }],
+    },
   ]
 
   return (

@@ -13,8 +13,10 @@ type Mode = "true" | "trap-focus" | "false"
 
 const notes = {
   true: "The rest of the page is inert and doesn't scroll.",
-  "trap-focus": "Tab stays inside, and the page still scrolls and takes clicks.",
-  false: "The page stays usable. Tab leaves the notes, and Escape closes them while focus is inside.",
+  "trap-focus":
+    "Tab stays inside, and the page still scrolls and takes clicks.",
+  false:
+    "The page stays usable. Tab leaves the notes, and Escape closes them while focus is inside.",
 }
 
 const check = createElement(Check, { "aria-hidden": "true" }).outerHTML
@@ -39,7 +41,7 @@ function mount(root: HTMLElement) {
                     ${option.label}
                     <ui-select-item-indicator>${check}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -76,15 +78,25 @@ function mount(root: HTMLElement) {
   const backdrop = document.createElement("ui-dialog-backdrop")
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
     const mode = event.detail.value as Mode | null
-    if (!mode) return
+    if (!mode) {
+      return
+    }
     dialog.setAttribute("modal", mode)
-    if (mode === "true") trigger.after(backdrop)
-    else backdrop.remove()
+    if (mode === "true") {
+      trigger.after(backdrop)
+    } else {
+      backdrop.remove()
+    }
     description.textContent = notes[mode]
   })
-  root.querySelector("ui-checkbox")!.addEventListener("checkedchange", (event) => {
-    dialog.setAttribute("close-on-outside-press", String(event.detail.value === true))
-  })
+  root
+    .querySelector("ui-checkbox")!
+    .addEventListener("checkedchange", (event) => {
+      dialog.setAttribute(
+        "close-on-outside-press",
+        String(event.detail.value === true)
+      )
+    })
 }
 
 export { mount }

@@ -1,11 +1,16 @@
-import type { EditorChange, TextEditorAdapter, TokenInsert } from "../src/foundation/text/text-editor"
+import type {
+  EditorChange,
+  TextEditorAdapter,
+  TokenInsert,
+} from "../src/foundation/text/text-editor"
 
 // A plain-text editor with a caret, driven by the test like a user would type.
 function fakeEditor() {
   let text = ""
   let caret = 0
   const listeners = new Set<(change: EditorChange) => void>()
-  const emit = (change: EditorChange) => listeners.forEach((listener) => listener(change))
+  const emit = (change: EditorChange) =>
+    listeners.forEach((listener) => listener(change))
   const replaced: (string | TokenInsert)[] = []
   const editor: TextEditorAdapter & {
     type: (chars: string, options?: { user?: boolean }) => void

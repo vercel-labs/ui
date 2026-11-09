@@ -4,8 +4,21 @@
 // is collected and thrown in one error. Keysmash's invariants, without the
 // fuzzer.
 import { createContext, stopped, type PatternContext } from "./pattern-context"
-import { accordion, checkbox, disclosure, slider, switchPattern } from "./pattern-controls"
-import { listbox, menubar, radioGroup, tabs, toolbar, tree } from "./pattern-lists"
+import {
+  accordion,
+  checkbox,
+  disclosure,
+  slider,
+  switchPattern,
+} from "./pattern-controls"
+import {
+  listbox,
+  menubar,
+  radioGroup,
+  tabs,
+  toolbar,
+  tree,
+} from "./pattern-lists"
 import { alertdialog, combobox, dialog, menu } from "./pattern-popups"
 
 /**
@@ -29,7 +42,9 @@ type Pattern =
   | "switch"
   | "checkbox"
 
-const checks: Partial<Record<Pattern, (context: PatternContext) => Promise<void>>> = {
+const checks: Partial<
+  Record<Pattern, (context: PatternContext) => Promise<void>>
+> = {
   listbox,
   menu,
   menubar,
@@ -75,22 +90,27 @@ const checks: Partial<Record<Pattern, (context: PatternContext) => Promise<void>
  */
 async function checkPattern(root: Element, pattern: Pattern) {
   const check = checks[pattern]
-  if (!check)
+  if (!check) {
     throw new Error(
-      `checkPattern doesn't support "${pattern}" yet. It supports ${Object.keys(checks).join(", ")}.`,
+      `checkPattern doesn't support "${pattern}" yet. It supports ${Object.keys(checks).join(", ")}.`
     )
+  }
   const context = createContext(root)
   context.checkReferences()
   try {
     await check(context)
   } catch (error) {
-    if (error !== stopped) throw error
+    if (error !== stopped) {
+      throw error
+    }
   }
   const problems = [...context.problems]
-  if (!problems.length) return
+  if (!problems.length) {
+    return
+  }
   const count = `${problems.length} problem${problems.length === 1 ? "" : "s"}`
   throw new Error(
-    `checkPattern found ${count} with the ${pattern} pattern:\n${problems.map((problem) => `- ${problem}`).join("\n")}`,
+    `checkPattern found ${count} with the ${pattern} pattern:\n${problems.map((problem) => `- ${problem}`).join("\n")}`
   )
 }
 

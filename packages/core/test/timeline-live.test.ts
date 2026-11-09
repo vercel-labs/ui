@@ -49,22 +49,33 @@ for (const operation of ["undo", "seek"] as const) {
         () => instance.destroy(),
         timeline.destroy,
         stop,
-        permission.resolve,
+        permission.resolve
       )
 
-      expect((await agent.act({ steps: [{ ref: "Count", action: "setValue", args: [2] }] })).ok).toBe(true)
+      expect(
+        (
+          await agent.act({
+            steps: [{ ref: "Count", action: "setValue", args: [2] }],
+          })
+        ).ok
+      ).toBe(true)
       waiting = true
-      const work = operation === "undo" ? timeline.undoSource("agent") : timeline.seek(0)
+      const work =
+        operation === "undo" ? timeline.undoSource("agent") : timeline.seek(0)
       await started.promise
       if (edited) {
         withSource("keyboard", () =>
           instance.api.setValue(3, {
             reason: "step-key",
             event: new KeyboardEvent("keydown", { key: "ArrowUp" }),
-          }),
+          })
         )
         expect(instance.get().value).toBe(3)
-        expect(changes.at(-1)).toMatchObject({ source: "keyboard", key: "value", value: 3 })
+        expect(changes.at(-1)).toMatchObject({
+          source: "keyboard",
+          key: "value",
+          value: 3,
+        })
         expect(timeline.entries()).toHaveLength(1)
       }
       permission.resolve()
@@ -75,8 +86,14 @@ for (const operation of ["undo", "seek"] as const) {
       } else {
         expect(timeline.position()).toBe(edited ? 1 : 0)
       }
-      expect((await agent.act({ steps: [{ ref: "Count", action: "setValue", args: [4] }] })).ok).toBe(true)
+      expect(
+        (
+          await agent.act({
+            steps: [{ ref: "Count", action: "setValue", args: [4] }],
+          })
+        ).ok
+      ).toBe(true)
       expect(instance.get().value).toBe(4)
-    },
+    }
   )
 }

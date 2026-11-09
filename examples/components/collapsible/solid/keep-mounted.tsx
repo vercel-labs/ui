@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { Textarea } from "@ui-sdk/solid/textarea"
 

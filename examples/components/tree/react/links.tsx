@@ -36,7 +36,7 @@ const links = new Set(
   pages
     .flatMap((page) => [page, ...(page.children ?? [])])
     .filter((page) => page.href)
-    .map((page) => page.value),
+    .map((page) => page.value)
 )
 
 function Items({ items }: { items: TreeItemData[] }) {
@@ -68,7 +68,9 @@ function Example() {
       mode="none"
       current={current}
       onAction={(value, { event }) => {
-        if (!links.has(value)) return
+        if (!links.has(value)) {
+          return
+        }
         event?.preventDefault()
         setCurrent(value)
       }}

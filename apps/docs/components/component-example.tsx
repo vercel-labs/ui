@@ -1,4 +1,10 @@
-import { Tabs, TabsList, TabsPanel, TabsStackedPanel, TabsTab } from "@/components/ui/tabs"
+import {
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsStackedPanel,
+  TabsTab,
+} from "@/components/ui/tabs"
 import { cn } from "cn"
 import type { Framework } from "@/lib/frameworks"
 import { readExampleModules } from "@/lib/example-modules"
@@ -34,7 +40,9 @@ async function ComponentExample({
     readExampleSources(name, framework),
     readExampleModules(name, framework),
   ])
-  if (!sources) return null
+  if (!sources) {
+    return null
+  }
   modules?.preload.forEach((url) => preloadModule(url))
 
   const preview = (
@@ -51,13 +59,21 @@ async function ComponentExample({
   const single = sources.files.length === 1
   // Several files show one at a time, so the code panel stays as tall as one file.
   const source = single ? (
-    <CodeBlock code={sources.files[0].code} lang={sources.files[0].lang} copy={false} />
+    <CodeBlock
+      code={sources.files[0].code}
+      lang={sources.files[0].lang}
+      copy={false}
+    />
   ) : (
     <Tabs defaultValue={sources.files[0].name}>
       <TabBar>
         <TabsList aria-label="Files">
           {sources.files.map((file) => (
-            <TabsTab key={file.name} value={file.name} className="text-xs tracking-normal normal-case">
+            <TabsTab
+              key={file.name}
+              value={file.name}
+              className="text-xs tracking-normal normal-case"
+            >
               {file.name}
             </TabsTab>
           ))}
@@ -79,11 +95,19 @@ async function ComponentExample({
       {hideCode || hideTabs ? (
         <Frame className="flex flex-col overflow-hidden">
           {preview}
-          {!hideCode && <div className={cn("border-t border-border/60", flat)}>{source}</div>}
+          {!hideCode && (
+            <div className={cn("border-t border-border/60", flat)}>
+              {source}
+            </div>
+          )}
         </Frame>
       ) : (
         <Frame>
-          <Tabs data-copy-scope="" defaultValue="preview" className="group/example flex flex-col">
+          <Tabs
+            data-copy-scope=""
+            defaultValue="preview"
+            className="group/example flex flex-col"
+          >
             <TabBar>
               <TabsList aria-label="Example">
                 <TabsTab value="preview">Preview</TabsTab>
@@ -115,7 +139,10 @@ async function ComponentExample({
               <TabsStackedPanel
                 value="code"
                 keepMounted
-                className={cn("overflow-hidden rounded-b-frame outline-none", flat)}
+                className={cn(
+                  "overflow-hidden rounded-b-frame outline-none",
+                  flat
+                )}
               >
                 {source}
               </TabsStackedPanel>

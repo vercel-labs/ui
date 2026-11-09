@@ -9,7 +9,9 @@ const list = definePrimitive({
   state: (options: { order?: string[] }) => ({ order: options.order ?? [] }),
   api: () => ({}),
   slots: (slot) => ({
-    root: slot<{}, { order: string[] }>({ state: (state) => ({ order: state.order }) }),
+    root: slot<{}, { order: string[] }>({
+      state: (state) => ({ order: state.order }),
+    }),
     item: slot<{ value: string }>({ props: { value: "string" } }),
   }),
 })

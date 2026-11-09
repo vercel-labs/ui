@@ -22,4 +22,3 @@ jobs:
   suite:
     name: Full suite
     uses: ./.github/workflows/ci.yml
-

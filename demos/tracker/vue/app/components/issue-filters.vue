@@ -11,7 +11,13 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from "~/components/ui/combobox"
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from "~/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "~/components/ui/select"
 
 defineProps<{ query: Query; stacked?: boolean }>()
 
@@ -27,7 +33,10 @@ const priorityItems = [{ value: "any", label: "Any priority" }, ...priorities]
       :value="query.priority ?? 'any'"
       @value-change="
         (value: string | null) =>
-          emit('change', { priority: value === 'any' ? null : (value as Query['priority']), page: 1 })
+          emit('change', {
+            priority: value === 'any' ? null : (value as Query['priority']),
+            page: 1,
+          })
       "
     >
       <div class="grid gap-2">
@@ -37,7 +46,11 @@ const priorityItems = [{ value: "any", label: "Any priority" }, ...priorities]
         <SelectTrigger :class="stacked ? undefined : 'w-36'" />
       </div>
       <SelectContent>
-        <SelectItem v-for="priority in priorityItems" :key="priority.value" :value="priority.value">
+        <SelectItem
+          v-for="priority in priorityItems"
+          :key="priority.value"
+          :value="priority.value"
+        >
           {{ priority.label }}
         </SelectItem>
       </SelectContent>
@@ -45,7 +58,9 @@ const priorityItems = [{ value: "any", label: "Any priority" }, ...priorities]
     <Combobox
       :value="query.assignee"
       :item-to-label="(id: string) => personOf(id)?.name ?? ''"
-      @value-change="(value: string | null) => emit('change', { assignee: value, page: 1 })"
+      @value-change="
+        (value: string | null) => emit('change', { assignee: value, page: 1 })
+      "
     >
       <div class="grid gap-2">
         <ComboboxLabel :class="stacked ? undefined : 'sr-only'">{{
@@ -62,7 +77,12 @@ const priorityItems = [{ value: "any", label: "Any priority" }, ...priorities]
       <ComboboxContent>
         <ComboboxEmpty>Nobody matches.</ComboboxEmpty>
         <ComboboxList>
-          <ComboboxItem v-for="person in people" :key="person.id" :value="person.id" :label="person.name">
+          <ComboboxItem
+            v-for="person in people"
+            :key="person.id"
+            :value="person.id"
+            :label="person.name"
+          >
             <Avatar :name="person.name" size="sm" decorative />
             {{ person.name }}
           </ComboboxItem>

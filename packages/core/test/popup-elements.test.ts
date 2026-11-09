@@ -1,8 +1,12 @@
 import { describe, expect, test } from "vitest"
-import { inPopupElement, registerPopupElement } from "../src/foundation/popups/popup-elements"
+import {
+  inPopupElement,
+  registerPopupElement,
+} from "../src/foundation/popups/popup-elements"
 
 // The shape of a node that the ancestor walk reads.
-const node = (parentNode: Node | null = null) => ({ parentNode }) as unknown as Element
+const node = (parentNode: Node | null = null) =>
+  ({ parentNode }) as unknown as Element
 
 describe("popup elements", () => {
   test("a node inside a registered popup element is in a popup", () => {

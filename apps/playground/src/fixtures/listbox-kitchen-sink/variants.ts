@@ -35,10 +35,15 @@ const toppings = [
 ]
 
 const groups = [
-  { label: "Herbs", items: toppings.filter((item) => ["basil", "garlic"].includes(item.value)) },
+  {
+    label: "Herbs",
+    items: toppings.filter((item) => ["basil", "garlic"].includes(item.value)),
+  },
   {
     label: "Vegetables",
-    items: toppings.filter((item) => ["mushroom", "onion", "pepper"].includes(item.value)),
+    items: toppings.filter((item) =>
+      ["mushroom", "onion", "pepper"].includes(item.value)
+    ),
   },
 ]
 
@@ -55,26 +60,50 @@ const longList = Array.from({ length: 500 }, (_, index) => ({
 
 // The items of a variant, as data.
 function variantData(variant: Variant) {
-  if (variant.items === "long") return longList
-  if (variant.items === "objects") return plans
-  if (variant.items === "grouped")
+  if (variant.items === "long") {
+    return longList
+  }
+  if (variant.items === "objects") {
+    return plans
+  }
+  if (variant.items === "grouped") {
     return [
-      { type: "group" as const, label: groups[0].label, items: groups[0].items },
+      {
+        type: "group" as const,
+        label: groups[0].label,
+        items: groups[0].items,
+      },
       { type: "separator" as const },
-      { type: "group" as const, label: groups[1].label, items: groups[1].items },
+      {
+        type: "group" as const,
+        label: groups[1].label,
+        items: groups[1].items,
+      },
     ]
+  }
   return toppings
 }
 
 // A value for the log: keys of object values, joined.
 function describe(value: unknown) {
   const key = (item: unknown) =>
-    typeof item === "object" && item !== null ? (item as { id: string }).id : String(item)
-  return Array.isArray(value) ? `[${value.map(key).join(", ")}]` : value === null ? "null" : key(value)
+    typeof item === "object" && item !== null
+      ? (item as { id: string }).id
+      : String(item)
+  return Array.isArray(value)
+    ? `[${value.map(key).join(", ")}]`
+    : value === null
+      ? "null"
+      : key(value)
 }
 
 const variants: Variant[] = [
-  { id: "single", section: "Selection", title: "Single", note: "Selection follows focus." },
+  {
+    id: "single",
+    section: "Selection",
+    title: "Single",
+    note: "Selection follows focus.",
+  },
   {
     id: "single-manual",
     section: "Selection",
@@ -102,8 +131,19 @@ const variants: Variant[] = [
     note: "A press or an arrow replaces. Ctrl or ⌘ adds. Taps toggle.",
     options: { multiple: true, activation: "automatic" },
   },
-  { id: "no-loop", section: "Selection", title: "loop false", options: { loop: false } },
-  { id: "grouped", section: "Layout", title: "Groups", items: "grouped", options: { multiple: true } },
+  {
+    id: "no-loop",
+    section: "Selection",
+    title: "loop false",
+    options: { loop: false },
+  },
+  {
+    id: "grouped",
+    section: "Layout",
+    title: "Groups",
+    items: "grouped",
+    options: { multiple: true },
+  },
   {
     id: "horizontal",
     section: "Layout",
@@ -127,7 +167,13 @@ const variants: Variant[] = [
     data: true,
     options: { defaultValue: "topping-320" },
   },
-  { id: "data", section: "Layout", title: "Data items", data: true, items: "grouped" },
+  {
+    id: "data",
+    section: "Layout",
+    title: "Data items",
+    data: true,
+    items: "grouped",
+  },
   {
     id: "objects",
     section: "Layout",
@@ -153,7 +199,12 @@ const variants: Variant[] = [
     field: true,
     options: { fieldDisabled: true },
   },
-  { id: "disabled", section: "Form", title: "disabled", options: { disabled: true, defaultValue: "garlic" } },
+  {
+    id: "disabled",
+    section: "Form",
+    title: "disabled",
+    options: { disabled: true, defaultValue: "garlic" },
+  },
   {
     id: "read-only",
     section: "Form",
@@ -167,9 +218,24 @@ const variants: Variant[] = [
     controlled: true,
     options: { multiple: true },
   },
-  { id: "controller", section: "State", title: "Controller", controller: true, options: { multiple: true } },
+  {
+    id: "controller",
+    section: "State",
+    title: "Controller",
+    controller: true,
+    options: { multiple: true },
+  },
   { id: "cancel", section: "State", title: "Canceled changes", cancel: true },
   { id: "links", section: "Rendering", title: "Items as links", links: true },
 ]
 
-export { describe, groups, longList, plans, toppings, type Variant, variantData, variants }
+export {
+  describe,
+  groups,
+  longList,
+  plans,
+  toppings,
+  type Variant,
+  variantData,
+  variants,
+}

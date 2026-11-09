@@ -3,7 +3,10 @@
 // the way the browser's parser would: with the script as currentScript.
 import { afterEach, expect, test } from "vitest"
 import { createColorScheme } from "../src/foundation/preferences/color-scheme"
-import { createPreference, preferencesScript } from "../src/foundation/preferences/preference"
+import {
+  createPreference,
+  preferencesScript,
+} from "../src/foundation/preferences/preference"
 import {
   createCookieStorage,
   createLocalStorage,
@@ -21,26 +24,43 @@ afterEach(() => {
   document.cookie = "skin-tone=; path=/; max-age=0"
   delete (window as Window & { __uiSdkStorage?: unknown }).__uiSdkStorage
   document.body.replaceChildren()
-  for (const name of document.documentElement.getAttributeNames())
-    if (name.startsWith("data-")) document.documentElement.removeAttribute(name)
+  for (const name of document.documentElement.getAttributeNames()) {
+    if (name.startsWith("data-")) {
+      document.documentElement.removeAttribute(name)
+    }
+  }
 })
 
 // Server HTML for a `Preferences` element: the script is its first child.
 function load(script: string, attributes = "") {
   document.body.innerHTML = `<div data-slot="preferences" ${attributes}><script>${script}</script><p>App</p></div>`
   const element = document.body.querySelector("script")!
-  Object.defineProperty(document, "currentScript", { configurable: true, value: element })
+  Object.defineProperty(document, "currentScript", {
+    configurable: true,
+    value: element,
+  })
   new Function(element.textContent!)()
-  Object.defineProperty(document, "currentScript", { configurable: true, value: null })
+  Object.defineProperty(document, "currentScript", {
+    configurable: true,
+    value: null,
+  })
   return document.body.querySelector<HTMLElement>('[data-slot="preferences"]')!
 }
 
 test("needs a data attribute and a default among its values", () => {
   expect(() =>
-    createPreference({ values: tones, defaultValue: "default", attribute: "class" as `data-${string}` }),
+    createPreference({
+      values: tones,
+      defaultValue: "default",
+      attribute: "class" as `data-${string}`,
+    })
   ).toThrow(/data-\*/)
   expect(() =>
-    createPreference({ values: tones, defaultValue: "sepia" as "default", attribute: "data-skin-tone" }),
+    createPreference({
+      values: tones,
+      defaultValue: "sepia" as "default",
+      attribute: "data-skin-tone",
+    })
   ).toThrow(/isn't one/)
 })
 
@@ -95,14 +115,20 @@ test("a cookie starts the value right away, as the server's does", () => {
 test("the script puts global preferences on <html> and the rest on its own element", () => {
   localStorage.setItem("color-scheme", "dark")
   sessionStorage.setItem("skin-tone", "medium")
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme"), global: true })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme"),
+    global: true,
+  })
   const skinTone = createPreference({
     values: tones,
     defaultValue: "default",
     attribute: "data-skin-tone",
     storage: createSessionStorage("skin-tone"),
   })
-  const element = load(preferencesScript([colorScheme, skinTone]), 'data-skin-tone="default"')
+  const element = load(
+    preferencesScript([colorScheme, skinTone]),
+    'data-skin-tone="default"'
+  )
   expect(document.documentElement.dataset.colorScheme).toBe("dark")
   expect(element.dataset.colorScheme).toBeUndefined()
   expect(element.dataset.skinTone).toBe("medium")
@@ -152,7 +178,10 @@ test("follow keeps a primitive's key in step after a microtask", async () => {
     storage: createLocalStorage("skin-tone"),
   })
   let state = { skinTone: skinTone.initialState }
-  const store = { get: () => state, set: (partial: typeof state) => (state = { ...state, ...partial }) }
+  const store = {
+    get: () => state,
+    set: (partial: typeof state) => (state = { ...state, ...partial }),
+  }
   cleanups.push(skinTone.follow(store, "skinTone"))
   expect(state.skinTone.value).toBe("default")
   await new Promise<void>((resolve) => queueMicrotask(resolve))

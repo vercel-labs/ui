@@ -1,6 +1,11 @@
 "use client"
 
-import { Toolbar, ToolbarButton, ToolbarLink, ToolbarSeparator } from "@ui-sdk/react/toolbar"
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarLink,
+  ToolbarSeparator,
+} from "@ui-sdk/react/toolbar"
 import { CheckIcon, MessageSquareIcon } from "lucide-react"
 import type * as React from "react"
 import { useLog } from "../../../shared/react/log"
@@ -8,7 +13,13 @@ import { useLog } from "../../../shared/react/log"
 function Example() {
   const log = useLog()
   const follow = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
       return
     }
     event.preventDefault()

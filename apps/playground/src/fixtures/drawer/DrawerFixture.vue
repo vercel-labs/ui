@@ -37,8 +37,12 @@ const more = ref(false)
     <Drawer
       :controller="controller"
       v-bind="options"
-      @open-change="(open, details) => recordDrawer(`drawer:${open}:${details.reason}`)"
-      @snap-point-change="(snapPoint, details) => recordDrawer(`${snapPoint}:${details.reason}`)"
+      @open-change="
+        (open, details) => recordDrawer(`drawer:${open}:${details.reason}`)
+      "
+      @snap-point-change="
+        (snapPoint, details) => recordDrawer(`${snapPoint}:${details.reason}`)
+      "
       @dismiss-attempt="(details) => recordDrawer(`attempt:${details.reason}`)"
     >
       <DrawerTrigger>{{ drawerFixture.trigger }}</DrawerTrigger>
@@ -46,13 +50,22 @@ const more = ref(false)
       <DrawerContent class="drawer">
         <DrawerHandle class="handle" :aria-label="drawerFixture.handle" />
         <DrawerTitle class="title">{{ drawerFixture.title }}</DrawerTitle>
-        <DrawerDescription class="description">{{ drawerFixture.description }}</DrawerDescription>
+        <DrawerDescription class="description">{{
+          drawerFixture.description
+        }}</DrawerDescription>
         <label v-if="parts.field" class="field">
           {{ drawerFixture.field }}
           <input />
         </label>
-        <ul v-if="parts.scroll" class="scroll" :aria-label="drawerFixture.scroll.label" tabindex="0">
-          <li v-for="item in drawerFixture.scroll.items" :key="item">{{ item }}</li>
+        <ul
+          v-if="parts.scroll"
+          class="scroll"
+          :aria-label="drawerFixture.scroll.label"
+          tabindex="0"
+        >
+          <li v-for="item in drawerFixture.scroll.items" :key="item">
+            {{ item }}
+          </li>
         </ul>
         <template v-if="parts.grow">
           <button @click="more = true">{{ drawerFixture.grow.button }}</button>
@@ -64,12 +77,16 @@ const more = ref(false)
         </div>
         <Drawer
           v-if="parts.nested"
-          @open-change="(open, details) => recordDrawer(`nested:${open}:${details.reason}`)"
+          @open-change="
+            (open, details) => recordDrawer(`nested:${open}:${details.reason}`)
+          "
         >
           <DrawerTrigger>{{ drawerFixture.nested.trigger }}</DrawerTrigger>
           <DrawerBackdrop v-if="parts.backdrop" class="drawer-backdrop" />
           <DrawerContent class="drawer">
-            <DrawerTitle class="title">{{ drawerFixture.nested.title }}</DrawerTitle>
+            <DrawerTitle class="title">{{
+              drawerFixture.nested.title
+            }}</DrawerTitle>
             <DrawerClose>{{ drawerFixture.nested.close }}</DrawerClose>
           </DrawerContent>
         </Drawer>
@@ -79,7 +96,11 @@ const more = ref(false)
     <output role="status" aria-label="Last action">{{ action }}</output>
     <button @click="controller.open()">{{ drawerFixture.controller }}</button>
     <button @click="action = 'page'">{{ drawerFixture.page }}</button>
-    <DrawerTrigger v-if="parts.shortcut" :controller="controller" :shortcut="drawerFixture.shortcut.keys">
+    <DrawerTrigger
+      v-if="parts.shortcut"
+      :controller="controller"
+      :shortcut="drawerFixture.shortcut.keys"
+    >
       {{ drawerFixture.shortcut.trigger }}
       <DrawerShortcut />
     </DrawerTrigger>

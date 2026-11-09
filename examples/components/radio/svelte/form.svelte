@@ -14,14 +14,21 @@
 
   function onSubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    log(`Submitted shipping=${new FormData(event.currentTarget).get("shipping")}`)
+    log(
+      `Submitted shipping=${new FormData(event.currentTarget).get("shipping")}`
+    )
   }
 </script>
 
 <div data-slot="stack">
   <Field>
     <FieldLabel>Shipping speed</FieldLabel>
-    <RadioGroup name="shipping" form={`${id}-checkout`} required defaultValue="standard">
+    <RadioGroup
+      name="shipping"
+      form={`${id}-checkout`}
+      required
+      defaultValue="standard"
+    >
       {#each speeds as speed (speed.value)}
         <label data-slot="label">
           <Radio value={speed.value}>

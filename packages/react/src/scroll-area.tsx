@@ -16,7 +16,9 @@ const parts = createParts(scrollArea, {
 })
 
 // The scrollbar a thumb sits in.
-const OrientationContext = React.createContext<"vertical" | "horizontal">("vertical")
+const OrientationContext = React.createContext<"vertical" | "horizontal">(
+  "vertical"
+)
 
 /**
  * Groups the parts. The scrollbars are placed against it.
@@ -48,7 +50,12 @@ function ScrollAreaScrollbar({
 }: ScrollAreaScrollbarProps & PartProps<"div", ScrollAreaScrollbarState>) {
   return (
     <OrientationContext.Provider value={orientation}>
-      {usePart(scrollArea, "scrollbar", { id: orientation, orientation }, props)}
+      {usePart(
+        scrollArea,
+        "scrollbar",
+        { id: orientation, orientation },
+        props
+      )}
     </OrientationContext.Provider>
   )
 }

@@ -11,7 +11,10 @@ import {
   createCarouselController,
 } from "@ui-sdk/vue"
 import type { ChangeDetails } from "@ui-sdk/core"
-import type { CarouselController, CarouselPlayToggleState } from "@ui-sdk/core/carousel"
+import type {
+  CarouselController,
+  CarouselPlayToggleState,
+} from "@ui-sdk/core/carousel"
 import { createApp, defineComponent, h, ref, type PropType } from "vue"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
@@ -31,21 +34,24 @@ function controls(variant: Variant, controller?: CarouselController) {
         {
           default: ({ state }: { state: CarouselPlayToggleState }) =>
             state.playing ? "Stop rotation" : "Start rotation",
-        },
+        }
       ),
-    h(CarouselIndicatorGroup, { class: classes.indicators, "aria-label": "Choose a slide", controller }, () =>
-      slides.map((slide) =>
-        h(
-          CarouselIndicator,
-          {
-            key: slide,
-            class: classes.indicator,
-            "aria-label": `Slide ${slide}`,
-            ...(variant.links && { href: `#kitchen-${variant.id}-${slide}` }),
-          },
-          renderAs(variant.links ? "a" : undefined),
-        ),
-      ),
+    h(
+      CarouselIndicatorGroup,
+      { class: classes.indicators, "aria-label": "Choose a slide", controller },
+      () =>
+        slides.map((slide) =>
+          h(
+            CarouselIndicator,
+            {
+              key: slide,
+              class: classes.indicator,
+              "aria-label": `Slide ${slide}`,
+              ...(variant.links && { href: `#kitchen-${variant.id}-${slide}` }),
+            },
+            renderAs(variant.links ? "a" : undefined)
+          )
+        )
     ),
   ])
 }
@@ -57,8 +63,11 @@ const VariantCarousel = defineComponent({
   },
   setup({ variant, env }) {
     const page = ref(1)
-    const controller = variant.controller || variant.outside ? createCarouselController() : undefined
-    if (controller && variant.controller)
+    const controller =
+      variant.controller || variant.outside
+        ? createCarouselController()
+        : undefined
+    if (controller && variant.controller) {
       env.controls([
         ["next()", () => controller.next()],
         ["previous()", () => controller.previous()],
@@ -68,6 +77,7 @@ const VariantCarousel = defineComponent({
         ["getPage()", () => controller.getPage()],
         ["getPageCount()", () => controller.getPageCount()],
       ])
+    }
     return () => [
       h(
         Carousel,
@@ -78,8 +88,12 @@ const VariantCarousel = defineComponent({
           ...(variant.controlled && { page: page.value }),
           controller,
           onPageChange: (next: number, details: ChangeDetails) => {
-            if (variant.cancel) return details.cancel()
-            if (variant.controlled) page.value = next
+            if (variant.cancel) {
+              return details.cancel()
+            }
+            if (variant.controlled) {
+              page.value = next
+            }
             env.log(`pageChange ${next} (${details.reason}, ${details.source})`)
           },
           onPlayingChange: (playing: boolean, details: ChangeDetails) =>
@@ -91,14 +105,18 @@ const VariantCarousel = defineComponent({
               slides.map((slide, index) =>
                 h(
                   CarouselItem,
-                  { key: slide, class: classes.slide, style: { flexBasis: slideBasis(variant, index) } },
-                  () => String(slide),
-                ),
-              ),
-            ),
+                  {
+                    key: slide,
+                    class: classes.slide,
+                    style: { flexBasis: slideBasis(variant, index) },
+                  },
+                  () => String(slide)
+                )
+              )
+            )
           ),
           !variant.outside && controls(variant),
-        ],
+        ]
       ),
       variant.outside && controls(variant, controller),
     ]
@@ -106,7 +124,9 @@ const VariantCarousel = defineComponent({
 })
 
 function mount(root: HTMLElement) {
-  kitchenSink(root, "vue", (slot, variant, env) => createApp(VariantCarousel, { variant, env }).mount(slot))
+  kitchenSink(root, "vue", (slot, variant, env) =>
+    createApp(VariantCarousel, { variant, env }).mount(slot)
+  )
 }
 
 export { mount }

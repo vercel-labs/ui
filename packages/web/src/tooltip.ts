@@ -33,7 +33,8 @@ function defineTooltipElements() {
       tag: "ui-tooltip-trigger",
       display: "contents",
       target: (el) =>
-        el.querySelector<HTMLElement>("button, a[href]") ?? (el.firstElementChild as HTMLElement),
+        el.querySelector<HTMLElement>("button, a[href]") ??
+        (el.firstElementChild as HTMLElement),
     },
     content: { tag: "ui-tooltip-content", kinds: popupKinds },
     arrow: { tag: "ui-tooltip-arrow", display: "block" },

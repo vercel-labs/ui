@@ -38,15 +38,19 @@ type RovingScope = {
 }
 
 // How a group whose items are members reads them.
-const memberDisabled = (item: RovingFocusItem<RovingMember>) => !!item.props.disabled?.()
-const memberFocusable = (item: RovingFocusItem<RovingMember>) => item.props.focusable?.() ?? true
+const memberDisabled = (item: RovingFocusItem<RovingMember>) =>
+  !!item.props.disabled?.()
+const memberFocusable = (item: RovingFocusItem<RovingMember>) =>
+  item.props.focusable?.() ?? true
 
 // Runs `run` once, a microtask after the first call since it last ran, so
 // many members changing at once check the stop once.
 function queued(run: () => void) {
   let waiting = false
   return () => {
-    if (waiting) return
+    if (waiting) {
+      return
+    }
     waiting = true
     queueMicrotask(() => {
       waiting = false
@@ -63,7 +67,11 @@ const stopOnly = { stop: true }
  * first check. An arrow key then reaches the two items it moves the stop
  * between, not every item.
  */
-function followStop(store: Store<{ stop: string | null }>, key: string, listener: () => void) {
+function followStop(
+  store: Store<{ stop: string | null }>,
+  key: string,
+  listener: () => void
+) {
   const cleanups = [
     subscribeSkipping(store, stopOnly, listener),
     select(store, "stop", key, listener),
@@ -72,4 +80,11 @@ function followStop(store: Store<{ stop: string | null }>, key: string, listener
   return () => cleanups.forEach((cleanup) => cleanup())
 }
 
-export { followStop, memberDisabled, memberFocusable, queued, type RovingMember, type RovingScope }
+export {
+  followStop,
+  memberDisabled,
+  memberFocusable,
+  queued,
+  type RovingMember,
+  type RovingScope,
+}

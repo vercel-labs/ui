@@ -1,7 +1,13 @@
 import { createSignal, flush } from "solid-js"
 import { render } from "@solidjs/web"
 import { afterEach, expect, test } from "vitest"
-import { fromText, type Token, TokenInput, TokenInputEditor, TokenInputToken } from "../src/token-input"
+import {
+  fromText,
+  type Token,
+  TokenInput,
+  TokenInputEditor,
+  TokenInputToken,
+} from "../src/token-input"
 
 let dispose: (() => void) | undefined
 afterEach(() => {
@@ -19,23 +25,29 @@ test("a token input named after mount renders the textarea its form submits", as
         </TokenInput>
       </form>
     ),
-    document.body,
+    document.body
   )
   flush()
   await new Promise((resolve) => setTimeout(resolve))
   setName("prompt")
   flush()
   await new Promise((resolve) => setTimeout(resolve))
-  expect(new FormData(document.querySelector("form")!).get("prompt")).toBe("Hello")
+  expect(new FormData(document.querySelector("form")!).get("prompt")).toBe(
+    "Hello"
+  )
 })
 
 // What each token's host shows: its content, then its kind.
 const hosts = () =>
-  [...document.querySelectorAll("[data-slot='token-input-host']")].map((host) => host.textContent)
+  [...document.querySelectorAll("[data-slot='token-input-host']")].map(
+    (host) => host.textContent
+  )
 
 test("tokens a token input starts with show only what renderToken renders, or their label without it", async () => {
   const [custom, setCustom] = createSignal(true)
-  const renderToken = (token: Token) => <TokenInputToken>{token.label}</TokenInputToken>
+  const renderToken = (token: Token) => (
+    <TokenInputToken>{token.label}</TokenInputToken>
+  )
   dispose = render(
     () => (
       <TokenInput
@@ -45,12 +57,14 @@ test("tokens a token input starts with show only what renderToken renders, or th
         <TokenInputEditor aria-label="Prompt" />
       </TokenInput>
     ),
-    document.body,
+    document.body
   )
   flush()
   await new Promise((resolve) => setTimeout(resolve))
   expect(hosts()).toEqual(["routes.ts file"])
-  expect(document.querySelectorAll("[data-slot='token-input-token']")).toHaveLength(1)
+  expect(
+    document.querySelectorAll("[data-slot='token-input-token']")
+  ).toHaveLength(1)
   setCustom(false)
   flush()
   expect(hosts()).toEqual(["routes.ts file"])
@@ -59,5 +73,7 @@ test("tokens a token input starts with show only what renderToken renders, or th
   flush()
   await new Promise((resolve) => setTimeout(resolve))
   expect(hosts()).toEqual(["routes.ts file"])
-  expect(document.querySelectorAll("[data-slot='token-input-token']")).toHaveLength(1)
+  expect(
+    document.querySelectorAll("[data-slot='token-input-token']")
+  ).toHaveLength(1)
 })

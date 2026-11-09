@@ -5,5 +5,7 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 // role="status">`, so its accessibility lint stays quiet here.
 export default {
   preprocess: vitePreprocess(),
-  compilerOptions: { warningFilter: (warning) => !warning.code.startsWith("a11y_") },
+  compilerOptions: {
+    warningFilter: (warning) => !warning.code.startsWith("a11y_"),
+  },
 }

@@ -10,7 +10,9 @@ function Example() {
       <FieldLabel>Verification code</FieldLabel>
       <OTPInput defaultValue="482913" onValueChange={() => setInvalid(false)}>
         <OTPInputGroup>
-          <For each={[0, 1, 2, 3, 4, 5]}>{(index) => <OTPInputSlot index={index} />}</For>
+          <For each={[0, 1, 2, 3, 4, 5]}>
+            {(index) => <OTPInputSlot index={index} />}
+          </For>
         </OTPInputGroup>
       </OTPInput>
       <FieldError>That code has expired. Request a new one.</FieldError>

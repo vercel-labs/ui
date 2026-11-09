@@ -7,9 +7,16 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
-test("the menubar hydrates without mismatches and works", async ({ page, open, tab }) => {
+test("the menubar hydrates without mismatches and works", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("menubar")
   await page.waitForLoadState("networkidle")
   await enter(page, tab)
@@ -25,11 +32,12 @@ test("the server renders exactly one tab stop in the menubar, on its first trigg
 }) => {
   await open("menubar")
   const stops = await page.evaluate(() => {
-    const markup = (window as unknown as { __serverMarkup: string }).__serverMarkup
+    const markup = (window as unknown as { __serverMarkup: string })
+      .__serverMarkup
     const doc = new DOMParser().parseFromString(markup, "text/html")
-    return Array.from(doc.querySelectorAll('[role="menubar"] [tabindex="0"]')).map((el) =>
-      el.textContent?.trim(),
-    )
+    return Array.from(
+      doc.querySelectorAll('[role="menubar"] [tabindex="0"]')
+    ).map((el) => el.textContent?.trim())
   })
   expect(stops).toEqual(["File"])
 })

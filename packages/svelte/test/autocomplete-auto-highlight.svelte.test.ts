@@ -6,7 +6,9 @@ import App from "./apps/autocomplete-auto-highlight-app.svelte"
 
 let app: ReturnType<typeof mount> | undefined
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
 })
@@ -17,7 +19,13 @@ test("turning autoHighlight on after typing highlights the best match", async ()
   flushSync()
   const input = document.querySelector<HTMLInputElement>('[role="combobox"]')!
   input.value = "b"
-  input.dispatchEvent(new InputEvent("input", { bubbles: true, data: "b", inputType: "insertText" }))
+  input.dispatchEvent(
+    new InputEvent("input", {
+      bubbles: true,
+      data: "b",
+      inputType: "insertText",
+    })
+  )
   flushSync()
   expect(input.getAttribute("aria-activedescendant")).toBeNull()
   props.autoHighlight = true

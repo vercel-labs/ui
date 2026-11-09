@@ -6,7 +6,14 @@ const props = defineProps<{ class?: string }>()
 </script>
 
 <template>
-  <FieldLabel :class="cn('text-sm leading-none font-medium data-disabled:opacity-50', props.class)">
+  <FieldLabel
+    :class="
+      cn(
+        'text-sm leading-none font-medium data-disabled:opacity-50',
+        props.class
+      )
+    "
+  >
     <template v-for="(_, name) in $slots" #[name]="scope">
       <slot :name="name" v-bind="scope ?? {}" />
     </template>

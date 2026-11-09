@@ -11,10 +11,16 @@
     week,
     index,
     day,
-  }: { week: CalendarGridCell[]; index: number; day?: Snippet<[CalendarGridCell]> } = $props()
+  }: {
+    week: CalendarGridCell[]
+    index: number
+    day?: Snippet<[CalendarGridCell]>
+  } = $props()
 
   const grid = useCalendarGrid("CalendarWeeks")
-  const row = useHandlePart(useCalendar("CalendarWeeks"), "week", () => ({ id: `${grid.offset}-${index}` }))
+  const row = useHandlePart(useCalendar("CalendarWeeks"), "week", () => ({
+    id: `${grid.offset}-${index}`,
+  }))
 </script>
 
 {#snippet cells()}

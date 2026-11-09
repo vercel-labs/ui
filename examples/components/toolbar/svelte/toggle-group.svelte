@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { AlignCenterIcon, AlignLeftIcon, AlignRightIcon, ListIcon, ListOrderedIcon } from "@lucide/svelte"
+  import {
+    AlignCenterIcon,
+    AlignLeftIcon,
+    AlignRightIcon,
+    ListIcon,
+    ListOrderedIcon,
+  } from "@lucide/svelte"
   import { Toggle, ToggleGroup, ToggleIcon } from "@ui-sdk/svelte/toggle"
   import { Toolbar, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
   import { useLog } from "../../../shared/svelte/log"
@@ -36,7 +42,8 @@
   <ToolbarSeparator />
   <ToggleGroup
     aria-label="List"
-    onValueChange={([value]) => log(lists.find((list) => list.value === value)?.label ?? "No list")}
+    onValueChange={([value]) =>
+      log(lists.find((list) => list.value === value)?.label ?? "No list")}
   >
     {#each lists as { value, label, icon: Icon } (value)}
       <Toggle {value} aria-label={label}>

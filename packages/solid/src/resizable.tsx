@@ -1,7 +1,11 @@
 import { resizable } from "@ui-sdk/core/resizable"
 import { createParts } from "./use-primitive"
 
-const parts = createParts(resizable, { root: "div", panel: "div", handle: "div" })
+const parts = createParts(resizable, {
+  root: "div",
+  panel: "div",
+  handle: "div",
+})
 
 /**
  * The group: lays its panels out along its orientation.
@@ -22,7 +26,10 @@ const ResizablePanel = parts.Panel
  */
 const ResizableHandle = parts.Handle
 
-export { createResizableController, resizableStorageKey } from "@ui-sdk/core/resizable"
+export {
+  createResizableController,
+  resizableStorageKey,
+} from "@ui-sdk/core/resizable"
 export type {
   ResizableApi,
   ResizableChangeOptions,

@@ -1,6 +1,10 @@
 import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
-import { TokenInput, TokenInputEditor, TokenInputToken } from "../src/token-input"
+import {
+  TokenInput,
+  TokenInputEditor,
+  TokenInputToken,
+} from "../src/token-input"
 import { TriggerMenu, TriggerMenuInput } from "../src/trigger-menu"
 
 const value = ["Explain ", { type: "file", value: "src/a.ts", label: "a.ts" }]
@@ -19,7 +23,9 @@ describe("server rendering a prompt input", () => {
     expect(html).toContain('contenteditable="true"')
     expect(html).toContain('aria-placeholder="Ask anything"')
     expect(html).toMatch(/Explain ​<span[^>]*data-token-type="file"/)
-    expect(html).toMatch(/<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/)
+    expect(html).toMatch(
+      /<textarea[^>]*name="prompt"[^>]*>Explain \[@a\.ts\]\(file:src\/a\.ts\)<\/textarea>/
+    )
     // The list isn't in the page while closed.
     expect(html).not.toContain('role="listbox"')
   })
@@ -28,7 +34,9 @@ describe("server rendering a prompt input", () => {
     const html = renderToString(() => (
       <TokenInput
         defaultValue={value}
-        renderToken={(token) => <TokenInputToken>{token.label}</TokenInputToken>}
+        renderToken={(token) => (
+          <TokenInputToken>{token.label}</TokenInputToken>
+        )}
       >
         <TokenInputEditor aria-label="Prompt" />
       </TokenInput>
@@ -43,7 +51,9 @@ describe("server rendering a prompt input", () => {
         <TriggerMenuInput aria-label="Message" />
       </TriggerMenu>
     ))
-    expect(html).toMatch(/<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/)
+    expect(html).toMatch(
+      /<textarea[^>]*aria-autocomplete="list"[^>]*aria-haspopup="listbox"/
+    )
     expect(html).not.toContain("aria-expanded")
   })
 })

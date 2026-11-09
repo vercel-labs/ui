@@ -8,7 +8,14 @@ afterEach(() => {
   cleanup = undefined
 })
 
-test.each(["field-control", "input", "textarea", "checkbox", "slider", "date-picker"] as const)(
+test.each([
+  "field-control",
+  "input",
+  "textarea",
+  "checkbox",
+  "slider",
+  "date-picker",
+] as const)(
   "a mounted %s keeps its own description ahead of the field's",
   async (control) => {
     const target = document.body.appendChild(document.createElement("div"))
@@ -20,7 +27,9 @@ test.each(["field-control", "input", "textarea", "checkbox", "slider", "date-pic
     flushSync()
     await tick()
     flushSync()
-    const description = target.querySelector('[data-slot="field-description"]')!.id
+    const description = target.querySelector(
+      '[data-slot="field-description"]'
+    )!.id
     const ids = target
       .querySelector('[aria-describedby^="hint"]')
       ?.getAttribute("aria-describedby")
@@ -29,6 +38,8 @@ test.each(["field-control", "input", "textarea", "checkbox", "slider", "date-pic
     expect(ids).toContain(description)
     // A date picker's format hint describes it too.
     const hint = target.querySelector('[data-slot="date-picker-hint"]')
-    if (hint) expect(ids).toContain(hint.id)
-  },
+    if (hint) {
+      expect(ids).toContain(hint.id)
+    }
+  }
 )

@@ -34,11 +34,18 @@ import { expect, test } from "vitest"
 import { stepper } from "./stepper"
 
 test("arrows move between steps and Enter opens one", async () => {
-  const view = mount(stepper, {}, `<root><step value="a">A</step><step value="b">B</step></root>`)
+  const view = mount(
+    stepper,
+    {},
+    `<root><step value="a">A</step><step value="b">B</step></root>`
+  )
   try {
     await view.keys("Tab", "ArrowRight", "Enter")
     expect(view.state.value).toBe("b")
-    expect(view.changes.at(-1)).toMatchObject({ key: "value", source: "keyboard" })
+    expect(view.changes.at(-1)).toMatchObject({
+      key: "value",
+      source: "keyboard",
+    })
   } finally {
     view.unmount()
   }
@@ -46,7 +53,11 @@ test("arrows move between steps and Enter opens one", async () => {
 
 test("renders on the server and works in both directions", async () => {
   checkServer(stepper, {}, `<root><step value="a">A</step></root>`)
-  await checkDirection(stepper, {}, `<root><step value="a">A</step><step value="b">B</step></root>`)
+  await checkDirection(
+    stepper,
+    {},
+    `<root><step value="a">A</step><step value="b">B</step></root>`
+  )
 })
 ```
 
@@ -80,7 +91,9 @@ globalThis.ResizeObserver ??= class {
   disconnect() {}
 }
 document.head.append(
-  Object.assign(document.createElement("style"), { textContent: "[popover] { display: block !important }" }),
+  Object.assign(document.createElement("style"), {
+    textContent: "[popover] { display: block !important }",
+  })
 )
 ```
 

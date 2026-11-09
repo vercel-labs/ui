@@ -13,15 +13,26 @@
     DatePickerInput,
     DatePickerTrigger,
   } from "@ui-sdk/svelte/date-picker"
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
-  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
+  import {
+    CalendarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+  } from "@lucide/svelte"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
-    log(`Submitted due=${new FormData(event.currentTarget as HTMLFormElement).get("due")}`)
+    log(
+      `Submitted due=${new FormData(event.currentTarget as HTMLFormElement).get("due")}`
+    )
   }
 </script>
 

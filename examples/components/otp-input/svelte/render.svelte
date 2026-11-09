@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
+  import {
+    OTPInput,
+    OTPInputGroup,
+    OTPInputSlot,
+  } from "@ui-sdk/svelte/otp-input"
 </script>
 
 <OTPInput maxLength={5} aria-label="Invite code">

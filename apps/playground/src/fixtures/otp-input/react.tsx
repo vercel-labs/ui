@@ -7,7 +7,11 @@ import {
 } from "@ui-sdk/react/otp-input"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { otpInputAction, otpInputFixture, otpInputOptions } from "tests/fixtures/otp-input.ts"
+import {
+  otpInputAction,
+  otpInputFixture,
+  otpInputOptions,
+} from "tests/fixtures/otp-input.ts"
 
 const controller = createOTPInputController()
 
@@ -35,17 +39,27 @@ function Fixture() {
           controller={controller}
           {...options}
           onValueChange={(value, details) => {
-            if (cancel && value.includes(cancel)) return details.cancel()
+            if (cancel && value.includes(cancel)) {
+              return details.cancel()
+            }
             setAction(otpInputAction.change(value, details.reason))
           }}
           onValueCommit={(value) => setAction(otpInputAction.complete(value))}
         >
           {code.groups.map((size, group) => (
             <React.Fragment key={group}>
-              {group > 0 && <OTPInputSeparator className="otp-separator">-</OTPInputSeparator>}
+              {group > 0 && (
+                <OTPInputSeparator className="otp-separator">
+                  -
+                </OTPInputSeparator>
+              )}
               <OTPInputGroup className="otp-group">
                 {Array.from({ length: size }, () => (
-                  <OTPInputSlot key={index} index={index++} className="otp-slot" />
+                  <OTPInputSlot
+                    key={index}
+                    index={index++}
+                    className="otp-slot"
+                  />
                 ))}
               </OTPInputGroup>
             </React.Fragment>
@@ -66,7 +80,9 @@ function Fixture() {
           ))}
         </OTPInputGroup>
       </OTPInput>
-      <button onClick={() => controller.setValue(otpInputFixture.filled)}>Fill code</button>
+      <button onClick={() => controller.setValue(otpInputFixture.filled)}>
+        Fill code
+      </button>
       <button onClick={() => controller.clear()}>Clear code</button>
       <button>After</button>
       <output role="status" aria-label="Last action">
@@ -81,7 +97,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

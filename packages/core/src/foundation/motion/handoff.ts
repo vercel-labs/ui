@@ -13,7 +13,9 @@ function handoff(input: {
   /** Dragging up on scrollable content first expands the sheet. */
   expandOnScroll: boolean
 }) {
-  if (!input.towardMore) return input.scrollAtStart ? "sheet" : "scroll"
+  if (!input.towardMore) {
+    return input.scrollAtStart ? "sheet" : "scroll"
+  }
   return !input.atLargest && input.expandOnScroll ? "sheet" : "scroll"
 }
 

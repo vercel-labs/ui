@@ -14,12 +14,13 @@ test("clicking a button runs its handler", async ({ page }) => {
   expect(await lastAction(page)).toBe("save")
 })
 
-for (const key of [" ", "Enter"])
+for (const key of [" ", "Enter"]) {
   test(`${key} presses a focused button`, async ({ page }) => {
     await buttonNamed(page, "Save").focus()
     await page.keyboard.press(key)
     expect(await lastAction(page)).toBe("save")
   })
+}
 
 test("a submit button submits its form", async ({ page }) => {
   await buttonNamed(page, "Submit").click()
@@ -61,17 +62,20 @@ test.describe("focusable when disabled", () => {
     await expect(submissions(page)).toHaveText("0")
   })
 
-  for (const key of [" ", "Enter"])
+  for (const key of [" ", "Enter"]) {
     test(`${key} on it runs nothing and submits nothing`, async ({ page }) => {
       await buttonNamed(page, "Archive").focus()
       await page.keyboard.press(key)
       expect(await lastAction(page)).toBe("")
       await expect(submissions(page)).toHaveText("0")
     })
+  }
 })
 
 test.describe("pending", () => {
-  test("a returned Promise makes it busy, and it keeps focus until the Promise settles", async ({ page }) => {
+  test("a returned Promise makes it busy, and it keeps focus until the Promise settles", async ({
+    page,
+  }) => {
     const publish = buttonNamed(page, "Publish")
     await publish.focus()
     await page.keyboard.press("Enter")
@@ -84,7 +88,9 @@ test.describe("pending", () => {
     expect(await lastAction(page)).toBe("published")
   })
 
-  test("while pending, it says it's unavailable with aria-disabled and keeps focus", async ({ page }) => {
+  test("while pending, it says it's unavailable with aria-disabled and keeps focus", async ({
+    page,
+  }) => {
     const publish = buttonNamed(page, "Publish")
     await expect(publish).not.toHaveAttribute("aria-disabled")
     await publish.focus()
@@ -96,9 +102,13 @@ test.describe("pending", () => {
     await expect(publish).not.toHaveAttribute("aria-disabled")
   })
 
-  test("still pending after a second, it tells screen readers it's loading", async ({ page }) => {
+  test("still pending after a second, it tells screen readers it's loading", async ({
+    page,
+  }) => {
     await buttonNamed(page, "Publish").click()
-    await expect(page.locator('[data-ui-sdk-announcer=""]')).toHaveText("Loading")
+    await expect(page.locator('[data-ui-sdk-announcer=""]')).toHaveText(
+      "Loading"
+    )
   })
 
   test("a rejected Promise ends the pending state", async ({ page }) => {

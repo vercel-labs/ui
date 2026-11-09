@@ -1,7 +1,12 @@
 "use client"
 
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/react/otp-input"
+import {
+  OTPInput,
+  OTPInputGroup,
+  OTPInputSeparator,
+  OTPInputSlot,
+} from "@ui-sdk/react/otp-input"
 import { MinusIcon } from "lucide-react"
 
 function Example() {

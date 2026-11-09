@@ -3,7 +3,10 @@ import { colorPickerFixture } from "tests/fixtures/color-picker.ts"
 
 function markup(oklch: boolean) {
   const swatches = colorPickerFixture.swatches
-    .map((swatch) => `<ui-color-picker-swatch-item value="${swatch}"></ui-color-picker-swatch-item>`)
+    .map(
+      (swatch) =>
+        `<ui-color-picker-swatch-item value="${swatch}"></ui-color-picker-swatch-item>`
+    )
     .join("")
   return `
     <form class="fixture">
@@ -33,41 +36,61 @@ function markup(oklch: boolean) {
 }
 
 async function mount(root: HTMLElement) {
-  const { cancel, defaultValue, disabled, readOnly, space, format, gamut } = colorPickerOptions()
+  const { cancel, defaultValue, disabled, readOnly, space, format, gamut } =
+    colorPickerOptions()
   root.innerHTML = markup(space === "oklch")
-  const picker = root.querySelector<HTMLElement & { api?: { setValue: (value: string) => void } }>(
-    "ui-color-picker",
-  )!
+  const picker = root.querySelector<
+    HTMLElement & { api?: { setValue: (value: string) => void } }
+  >("ui-color-picker")!
   picker.setAttribute("default-value", defaultValue)
-  if (disabled) picker.setAttribute("disabled", "")
-  if (readOnly) picker.setAttribute("read-only", "")
-  if (space) picker.setAttribute("space", space)
-  if (format) picker.setAttribute("format", format)
-  if (gamut !== undefined) picker.setAttribute("gamut", String(gamut))
+  if (disabled) {
+    picker.setAttribute("disabled", "")
+  }
+  if (readOnly) {
+    picker.setAttribute("read-only", "")
+  }
+  if (space) {
+    picker.setAttribute("space", space)
+  }
+  if (format) {
+    picker.setAttribute("format", format)
+  }
+  if (gamut !== undefined) {
+    picker.setAttribute("gamut", String(gamut))
+  }
   await import("@ui-sdk/web/color-picker")
   const form = root.querySelector("form")!
   const [action, committed, submitted] = root.querySelectorAll("output")
-  root.querySelector("#controller")!.addEventListener("click", () => picker.api?.setValue("rebeccapurple"))
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => picker.api?.setValue("rebeccapurple"))
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    submitted!.textContent = Array.from(new FormData(form), ([key, value]) => `${key}=${value}`).join("&")
+    submitted!.textContent = Array.from(
+      new FormData(form),
+      ([key, value]) => `${key}=${value}`
+    ).join("&")
   })
   root.addEventListener(
     "valuechange",
     (event) => {
-      const detail = (event as CustomEvent<{ value: string; reason: string }>).detail
-      if (cancel) return event.preventDefault()
+      const detail = (event as CustomEvent<{ value: string; reason: string }>)
+        .detail
+      if (cancel) {
+        return event.preventDefault()
+      }
       action!.textContent = `${detail.value}:${detail.reason}`
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuecommit",
     (event) => {
-      const detail = (event as CustomEvent<{ value: string; reason: string }>).detail
+      const detail = (event as CustomEvent<{ value: string; reason: string }>)
+        .detail
       committed!.textContent = `${detail.value}:${detail.reason}`
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

@@ -8,7 +8,9 @@ const InputGroupKey = Symbol("input-group")
 
 function useInputGroup(part: string) {
   const context = getContext<InputGroupContext | undefined>(InputGroupKey)
-  if (!context) throw new Error(`${part} must be used inside <InputGroup>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <InputGroup>.`)
+  }
   return context
 }
 

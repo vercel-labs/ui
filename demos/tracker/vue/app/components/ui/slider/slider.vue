@@ -18,7 +18,9 @@ const props = defineProps<{ class?: string }>()
       <slot name="label" />
       <SliderValue class="text-muted-foreground tabular-nums" />
     </div>
-    <SliderControl class="flex w-full items-center py-2 select-none data-disabled:opacity-50">
+    <SliderControl
+      class="flex w-full items-center py-2 select-none data-disabled:opacity-50"
+    >
       <SliderTrack class="h-1 w-full rounded-2xl bg-input/90">
         <SliderIndicator class="rounded-2xl bg-primary" />
         <SliderThumb

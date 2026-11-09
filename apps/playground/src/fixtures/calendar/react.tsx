@@ -11,15 +11,22 @@ import {
 } from "@ui-sdk/react/calendar"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { calendarAction, calendarFixture, calendarOptions } from "tests/fixtures/calendar.ts"
+import {
+  calendarAction,
+  calendarFixture,
+  calendarOptions,
+} from "tests/fixtures/calendar.ts"
 
 const controller = createCalendarController()
 
 function Fixture() {
-  const { controlled, selects, lang, defaultValue, defaultMonth, ...options } = calendarOptions()
+  const { controlled, selects, lang, defaultValue, defaultMonth, ...options } =
+    calendarOptions()
   const [action, setAction] = React.useState("")
   const [value, setValue] = React.useState<CalendarValue>(defaultValue)
-  const [month, setMonth] = React.useState(defaultMonth ?? calendarFixture.today.slice(0, 7))
+  const [month, setMonth] = React.useState(
+    defaultMonth ?? calendarFixture.today.slice(0, 7)
+  )
   const f = calendarFixture
   return (
     <div className="fixture" lang={lang}>
@@ -52,11 +59,17 @@ function Fixture() {
         </div>
         <div className="calendar-months">
           {Array.from({ length: options.months ?? 1 }, (_, offset) => (
-            <CalendarGrid key={offset} offset={offset} className="calendar-grid" />
+            <CalendarGrid
+              key={offset}
+              offset={offset}
+              className="calendar-grid"
+            />
           ))}
         </div>
       </Calendar>
-      <button onClick={() => controller.focus(f.controller.date)}>{f.controller.label}</button>
+      <button onClick={() => controller.focus(f.controller.date)}>
+        {f.controller.label}
+      </button>
       <button>After</button>
       <output role="status" aria-label="Last action">
         {action}
@@ -69,7 +82,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

@@ -1,4 +1,9 @@
-import type { Anchor, ChangeDetails, DismissAttemptDetails, Side } from "@ui-sdk/core"
+import type {
+  Anchor,
+  ChangeDetails,
+  DismissAttemptDetails,
+  Side,
+} from "@ui-sdk/core"
 import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
 import {
   autocomplete as autocompletePrimitive,
@@ -12,8 +17,22 @@ import {
   type SearchFilter,
   type ListHighlightDetails,
 } from "@ui-sdk/core/autocomplete"
-import { defineComponent, h, inject, provide, type InjectionKey, type PropType, type VNode } from "vue"
-import { hasChild, NotPlaced, slotContent, usePlaceContent, usePlacedContent } from "./children"
+import {
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+  type VNode,
+} from "vue"
+import {
+  hasChild,
+  NotPlaced,
+  slotContent,
+  usePlaceContent,
+  usePlacedContent,
+} from "./children"
 import { useFieldControl } from "./field-context"
 import { markSegments, slotText } from "./list-text"
 import {
@@ -41,7 +60,9 @@ import {
 import { renderless } from "./renderless"
 import { readOnlyOf } from "./text-control"
 
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("autocomplete-container")
+const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(
+  "autocomplete-container"
+)
 
 type ValueDetails = ChangeDetails<AutocompleteValueChangeReason>
 type OpenDetails = ChangeDetails<AutocompleteOpenChangeReason>
@@ -76,15 +97,23 @@ const Autocomplete = /* @__PURE__ */ renderless(
       defaultOpen: optionalBoolean,
       items: Array as PropType<ListData<string>>,
       emptyItems: Array as PropType<ListData<string>>,
-      announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
-      filter: { type: [String, Boolean, Function] as PropType<SearchFilter<string>>, default: undefined },
+      announcement: Function as PropType<
+        (change: ListAnnouncement) => string | null | undefined
+      >,
+      filter: {
+        type: [String, Boolean, Function] as PropType<SearchFilter<string>>,
+        default: undefined,
+      },
       inlineComplete: optionalBoolean,
       autoHighlight: optionalBoolean,
       openOnFocus: optionalBoolean,
       submitOnSelect: optionalBoolean,
       status: String as PropType<AsyncOptionsStatus>,
       loop: optionalBoolean,
-      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      modal: {
+        type: [Boolean, String] as PropType<boolean | "pointer">,
+        default: undefined,
+      },
       presentation: String as PropType<"auto" | "popover" | "sheet">,
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
@@ -103,9 +132,12 @@ const Autocomplete = /* @__PURE__ */ renderless(
       "update:open": (_open: boolean) => true,
       openChange: (_open: boolean, _details: OpenDetails) => true,
       openChangeComplete: (_open: boolean) => true,
-      dismissAttempt: (_details: DismissAttemptDetails<AutocompleteDismissReason>) => true,
+      dismissAttempt: (
+        _details: DismissAttemptDetails<AutocompleteDismissReason>
+      ) => true,
       submit: (_value: string, _details: AutocompleteSubmitDetails) => true,
-      highlight: (_value: string | null, _details: ListHighlightDetails) => true,
+      highlight: (_value: string | null, _details: ListHighlightDetails) =>
+        true,
       loadMore: () => true,
     },
     setup(props, { slots, attrs, emit }) {
@@ -121,18 +153,25 @@ const Autocomplete = /* @__PURE__ */ renderless(
         onValueChange: (value: string, details: ValueDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
         onOpenChange: (open: boolean, details: OpenDetails) => {
           emit("openChange", open, details)
-          if (!details.canceled) emit("update:open", open)
+          if (!details.canceled) {
+            emit("update:open", open)
+          }
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-        onDismissAttempt: (details: DismissAttemptDetails<AutocompleteDismissReason>) =>
-          emit("dismissAttempt", details),
-        onSubmit: (value: string, details: AutocompleteSubmitDetails) => emit("submit", value, details),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
+        onDismissAttempt: (
+          details: DismissAttemptDetails<AutocompleteDismissReason>
+        ) => emit("dismissAttempt", details),
+        onSubmit: (value: string, details: AutocompleteSubmitDetails) =>
+          emit("submit", value, details),
         onHighlight: (value: string | null, details: ListHighlightDetails) =>
           emit("highlight", value, details),
         onLoadMore: () => emit("loadMore"),
@@ -145,11 +184,15 @@ const Autocomplete = /* @__PURE__ */ renderless(
         // A data autocomplete renders its list, unless the app placed an
         // AutocompleteContent: in the markup, or inside a component of its own.
         // Only a data one asks, so a composed one never renders again when its content mounts.
-        const own = !props.items || placed() || hasChild(children, AutocompleteContent)
-        return [children, props.items && !own && h(NotPlaced, () => h(AutocompleteContent))]
+        const own =
+          !props.items || placed() || hasChild(children, AutocompleteContent)
+        return [
+          children,
+          props.items && !own && h(NotPlaced, () => h(AutocompleteContent)),
+        ]
       }
     },
-  }),
+  })
 )
 
 /**
@@ -176,16 +219,22 @@ const AutocompleteInput = withElement(
     setup(_, { attrs }) {
       const field = useFieldControl(attrs)
       const inHeader = useInSheetHeader()
-      const part = usePart(autocompletePrimitive, "input", undefined, undefined, {
-        tag: "input",
-        extend: field?.props,
-      })
+      const part = usePart(
+        autocompletePrimitive,
+        "input",
+        undefined,
+        undefined,
+        {
+          tag: "input",
+          extend: field?.props,
+        }
+      )
       return () => {
         const element = part()
         return element && inHeader(element)
       }
     },
-  }),
+  })
 )
 
 /**
@@ -234,16 +283,25 @@ const AutocompleteContent = withElement(
         tag: "div",
         children: (state) => [
           header(),
-          defaultSlot(slots, state, () => autocomplete.state.items && h(AutocompleteList)),
+          defaultSlot(
+            slots,
+            state,
+            () => autocomplete.state.items && h(AutocompleteList)
+          ),
         ],
       })
       return () => {
         const element = part()
-        if (!element) return null
-        return renderPopup(sheetViewport(autocomplete, element), props.container ?? inherited())
+        if (!element) {
+          return null
+        }
+        return renderPopup(
+          sheetViewport(autocomplete, element),
+          props.container ?? inherited()
+        )
       }
     },
-  }),
+  })
 )
 
 /**
@@ -264,11 +322,13 @@ const AutocompleteList = withElement(
           defaultSlot(
             slots,
             state,
-            () => autocomplete.state.items && h(AutocompleteItems, { items: state.items }),
+            () =>
+              autocomplete.state.items &&
+              h(AutocompleteItems, { items: state.items })
           ),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -290,7 +350,11 @@ const AutocompleteItemText = withElement(
     setup(_, { slots }) {
       const item = useScope(autocompletePrimitive)?.around.item as
         (() => { value: string; label?: string }) | undefined
-      if (!item) throw new Error("<AutocompleteItemText> must be used inside <AutocompleteItem>.")
+      if (!item) {
+        throw new Error(
+          "<AutocompleteItemText> must be used inside <AutocompleteItem>."
+        )
+      }
       // The text it marks, read from its content as it renders.
       let text = ""
       let own: VNode[] | undefined
@@ -302,8 +366,9 @@ const AutocompleteItemText = withElement(
         undefined,
         {
           tag: "span",
-          children: (state) => (own && ownText === undefined ? own : markSegments(state.segments)),
-        },
+          children: (state) =>
+            own && ownText === undefined ? own : markSegments(state.segments),
+        }
       )
       return () => {
         own = slotContent(slots.default, { state: part.state })
@@ -312,7 +377,7 @@ const AutocompleteItemText = withElement(
         return part()
       }
     },
-  }),
+  })
 )
 
 /**
@@ -350,7 +415,7 @@ const AutocompleteEmpty = withElement(
         children: (state) => (state.empty ? slots.default?.({ state }) : null),
       })
     },
-  }),
+  })
 )
 
 /**

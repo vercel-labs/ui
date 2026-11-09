@@ -16,7 +16,9 @@ test("a popup in a shadow root renders into a container outside it when its own 
   const shadow = document.getElementById("host")!.attachShadow({ mode: "open" })
   shadow.innerHTML = `<ui-popover container="#outside"></ui-popover>`
   const popover = shadow.querySelector<HTMLElement>("ui-popover")!
-  expect(popupPortal.container(popover)).toBe(document.getElementById("outside"))
+  expect(popupPortal.container(popover)).toBe(
+    document.getElementById("outside")
+  )
 })
 
 test("a container selector that matches nothing warns and renders the popup in place", () => {
@@ -24,6 +26,8 @@ test("a container selector that matches nothing warns and renders the popup in p
   const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
   const popover = document.querySelector<HTMLElement>("ui-popover")!
   expect(popupPortal.container(popover)).toBe(null)
-  expect(warn).toHaveBeenCalledWith(expect.stringContaining('container="#missing" matches no element yet'))
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining('container="#missing" matches no element yet')
+  )
   warn.mockRestore()
 })

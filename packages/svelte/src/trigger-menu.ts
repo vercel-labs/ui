@@ -11,7 +11,10 @@ export { default as TriggerMenuItems } from "./trigger-menu/trigger-menu-items.s
 export { default as TriggerMenuList } from "./trigger-menu/trigger-menu-list.svelte"
 export { default as TriggerMenuSeparator } from "./trigger-menu/trigger-menu-separator.svelte"
 export { default as TriggerMenuStatus } from "./trigger-menu/trigger-menu-status.svelte"
-export { createTriggerMenuController, textFieldAdapter } from "@ui-sdk/core/trigger-menu"
+export {
+  createTriggerMenuController,
+  textFieldAdapter,
+} from "@ui-sdk/core/trigger-menu"
 export type {
   EditorChange,
   EditorReplaceOptions,

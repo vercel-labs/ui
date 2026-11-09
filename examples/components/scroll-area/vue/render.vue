@@ -7,7 +7,10 @@ import {
   ScrollAreaViewport,
 } from "@ui-sdk/vue/scroll-area"
 
-const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}`)
+const tags = Array.from(
+  { length: 50 },
+  (_, index) => `v1.2.0-beta.${50 - index}`
+)
 </script>
 
 <template>
@@ -27,7 +30,9 @@ const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}
         </ScrollAreaContent>
       </ScrollAreaViewport>
       <p data-slot="hint" aria-hidden="true">
-        {{ state.atStart ? "Scroll for older releases" : "More releases below" }}
+        {{
+          state.atStart ? "Scroll for older releases" : "More releases below"
+        }}
       </p>
       <ScrollAreaScrollbar>
         <ScrollAreaThumb />

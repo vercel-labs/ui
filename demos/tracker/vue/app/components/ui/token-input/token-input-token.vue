@@ -10,7 +10,7 @@ const props = defineProps<{ class?: string }>()
     :class="
       cn(
         'inline-flex items-center rounded-2xl bg-input px-1.5 align-baseline font-medium data-selected:ring-3 data-selected:ring-ring/30 dark:bg-input/60',
-        props.class,
+        props.class
       )
     "
   >

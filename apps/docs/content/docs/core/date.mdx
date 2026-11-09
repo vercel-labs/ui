@@ -83,7 +83,12 @@ addYears("2028-02-29", 1) // "2029-02-28"
 For boundaries, use `startOfWeek` and `endOfWeek`, or `startOfMonth` and `endOfMonth`. The week helpers take the first weekday, with 0 for Sunday:
 
 ```ts
-import { daysInMonth, endOfMonth, isSameMonth, startOfWeek } from "@ui-sdk/core/date"
+import {
+  daysInMonth,
+  endOfMonth,
+  isSameMonth,
+  startOfWeek,
+} from "@ui-sdk/core/date"
 
 startOfWeek("2026-10-16", 1) // "2026-10-12": Monday.
 endOfMonth("2026-02-10") // "2026-02-28"

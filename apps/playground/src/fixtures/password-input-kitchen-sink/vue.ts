@@ -28,7 +28,7 @@ const eye = () =>
     [
       h("path", { d: "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" }),
       h("circle", { cx: "12", cy: "12", r: "3" }),
-    ],
+    ]
   )
 
 const VariantPasswordInput = defineComponent({
@@ -37,10 +37,15 @@ const VariantPasswordInput = defineComponent({
     env: { type: Object as PropType<Env>, required: true as const },
   },
   setup({ variant, env }) {
-    const { fieldDisabled, ...options } = (variant.options ?? {}) as Record<string, unknown>
+    const { fieldDisabled, ...options } = (variant.options ?? {}) as Record<
+      string,
+      unknown
+    >
     const visible = ref(false)
-    const controller = variant.controller ? createPasswordInputController() : undefined
-    if (controller)
+    const controller = variant.controller
+      ? createPasswordInputController()
+      : undefined
+    if (controller) {
       env.controls([
         ["toggleVisible()", () => controller.toggleVisible()],
         ["setVisible(true)", () => controller.setVisible(true)],
@@ -50,6 +55,7 @@ const VariantPasswordInput = defineComponent({
         ["clear()", () => controller.clear()],
         ["focus()", () => controller.focus()],
       ])
+    }
     const input = () =>
       h(
         PasswordInput,
@@ -61,9 +67,15 @@ const VariantPasswordInput = defineComponent({
           onValueChange: (value: string, details: ChangeDetails) =>
             env.log(`valueChange "${value}" (${details.reason})`),
           onVisibleChange: (next: boolean, details: ChangeDetails) => {
-            if (variant.cancel) return details.cancel()
-            if (variant.controlled) visible.value = next
-            env.log(`visibleChange ${next} (${details.reason}, ${details.source})`)
+            if (variant.cancel) {
+              return details.cancel()
+            }
+            if (variant.controlled) {
+              visible.value = next
+            }
+            env.log(
+              `visibleChange ${next} (${details.reason}, ${details.source})`
+            )
           },
         },
         () => [
@@ -77,23 +89,35 @@ const VariantPasswordInput = defineComponent({
               class: classes.toggle,
               "aria-label": "Show password",
             },
-            renderAs(variant.render === "span" ? "span" : undefined, eye),
+            renderAs(variant.render === "span" ? "span" : undefined, eye)
           ),
-        ],
+        ]
       )
     return () => {
-      if (variant.field)
-        return h(Field, { disabled: !!fieldDisabled, class: "flex flex-col gap-1.5" }, () => [
-          h(FieldLabel, { class: classes.label }, () => "Password"),
-          input(),
-          h(FieldDescription, { class: classes.description }, () => "At least 8 characters."),
-        ])
-      if (variant.id === "caps-lock")
+      if (variant.field) {
+        return h(
+          Field,
+          { disabled: !!fieldDisabled, class: "flex flex-col gap-1.5" },
+          () => [
+            h(FieldLabel, { class: classes.label }, () => "Password"),
+            input(),
+            h(
+              FieldDescription,
+              { class: classes.description },
+              () => "At least 8 characters."
+            ),
+          ]
+        )
+      }
+      if (variant.id === "caps-lock") {
         return h("div", { class: "group flex flex-col gap-1" }, [
           input(),
           h("p", { class: classes.capsLock }, "Caps Lock is on"),
         ])
-      if (!variant.form) return input()
+      }
+      if (!variant.form) {
+        return input()
+      }
       return h(
         "form",
         {
@@ -111,7 +135,7 @@ const VariantPasswordInput = defineComponent({
             h("button", { class: classes.button }, "Submit"),
             h("button", { type: "reset", class: classes.control }, "Reset"),
           ]),
-        ],
+        ]
       )
     }
   },
@@ -119,7 +143,7 @@ const VariantPasswordInput = defineComponent({
 
 function mount(root: HTMLElement) {
   kitchenSink(root, "vue", (slot, variant, env) =>
-    createApp(VariantPasswordInput, { variant, env }).mount(slot),
+    createApp(VariantPasswordInput, { variant, env }).mount(slot)
   )
 }
 

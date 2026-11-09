@@ -26,7 +26,13 @@ import {
 } from "@ui-sdk/react/menu"
 import { Input } from "@ui-sdk/react/input"
 import { NumberInput, NumberInputControl } from "@ui-sdk/react/number-input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
 import { Toggle, ToggleGroup } from "@ui-sdk/react/toggle"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
@@ -35,13 +41,22 @@ import { kitchenSink, type Env } from "./shell"
 import { menus, type Variant } from "./variants"
 
 function ToolbarVariant({ variant, env }: { variant: Variant; env: Env }) {
-  const [controller] = React.useState(() => (variant.controller ? createToolbarController() : undefined))
+  const [controller] = React.useState(() =>
+    variant.controller ? createToolbarController() : undefined
+  )
   React.useEffect(() => {
-    if (controller) env.controls([["focus()", () => controller.focus()]])
+    if (controller) {
+      env.controls([["focus()", () => controller.focus()]])
+    }
   }, [controller, env])
   const log = (message: string) => () => env.log(message)
   return (
-    <Toolbar className={classes.bar} aria-label={variant.title} controller={controller} {...variant.options}>
+    <Toolbar
+      className={classes.bar}
+      aria-label={variant.title}
+      controller={controller}
+      {...variant.options}
+    >
       {variant.content === "basic" && (
         <>
           <ToggleGroup
@@ -88,22 +103,42 @@ function ToolbarVariant({ variant, env }: { variant: Variant; env: Env }) {
               ))}
             </MenuContent>
           </Menu>
-          <Select defaultValue="100" onValueChange={(value) => env.log(`zoom ${value}`)}>
-            <ToolbarButton className={classes.item} aria-label="Zoom" render={<SelectTrigger />}>
+          <Select
+            defaultValue="100"
+            onValueChange={(value) => env.log(`zoom ${value}`)}
+          >
+            <ToolbarButton
+              className={classes.item}
+              aria-label="Zoom"
+              render={<SelectTrigger />}
+            >
               <SelectValue />
             </ToolbarButton>
             <SelectContent className={classes.popup}>
               {["50", "100", "200"].map((zoom) => (
-                <SelectItem key={zoom} className={classes.menuItem} value={zoom}>
+                <SelectItem
+                  key={zoom}
+                  className={classes.menuItem}
+                  value={zoom}
+                >
                   {zoom}%
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <NumberInput defaultValue={14} onValueChange={(value) => env.log(`size ${value}`)}>
-            <ToolbarInput className={classes.input} render={<NumberInputControl aria-label="Size" />} />
+          <NumberInput
+            defaultValue={14}
+            onValueChange={(value) => env.log(`size ${value}`)}
+          >
+            <ToolbarInput
+              className={classes.input}
+              render={<NumberInputControl aria-label="Size" />}
+            />
           </NumberInput>
-          <ToolbarInput className={classes.input} render={<Input aria-label="Find" placeholder="Find" />} />
+          <ToolbarInput
+            className={classes.input}
+            render={<Input aria-label="Find" placeholder="Find" />}
+          />
         </>
       )}
       {variant.content === "groups" && (
@@ -125,7 +160,10 @@ function ToolbarVariant({ variant, env }: { variant: Variant; env: Env }) {
               Redo
             </ToolbarButton>
           </ToolbarGroup>
-          <Toggle className={classes.item} onPressedChange={(pressed) => env.log(`wrap ${pressed}`)}>
+          <Toggle
+            className={classes.item}
+            onPressedChange={(pressed) => env.log(`wrap ${pressed}`)}
+          >
             Wrap
           </Toggle>
         </>
@@ -140,7 +178,11 @@ const { file, edit, view, profiles } = menus
 const data: MenuData[] = [
   [
     ...file.items,
-    { type: "submenu", label: "Share", items: file.share.map((label) => ({ value: label, label })) },
+    {
+      type: "submenu",
+      label: "Share",
+      items: file.share.map((label) => ({ value: label, label })),
+    },
   ],
   edit.items!,
   view.checkboxes.map((item) => ({ type: "checkbox" as const, ...item })),
@@ -157,7 +199,8 @@ const data: MenuData[] = [
 // A data menu's items as parts, the same way at every level.
 function Entries({ items }: { items: MenuData }) {
   return items.map((entry, index) => {
-    const item: MenuDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+    const item: MenuDataItem =
+      typeof entry === "string" ? { value: entry, label: entry } : entry
     switch (item.type) {
       case undefined:
       case "item":
@@ -173,7 +216,12 @@ function Entries({ items }: { items: MenuData }) {
           </MenuItem>
         )
       case "separator":
-        return <MenuSeparator key={`separator-${index}`} className={classes.separator} />
+        return (
+          <MenuSeparator
+            key={`separator-${index}`}
+            className={classes.separator}
+          />
+        )
       case "group":
         return (
           <MenuGroup key={`group-${index}`}>
@@ -182,15 +230,27 @@ function Entries({ items }: { items: MenuData }) {
         )
       case "checkbox":
         return (
-          <MenuCheckboxItem key={item.value} className={classes.menuItem} value={item.value}>
+          <MenuCheckboxItem
+            key={item.value}
+            className={classes.menuItem}
+            value={item.value}
+          >
             {item.label}
           </MenuCheckboxItem>
         )
       case "radio-group":
         return (
-          <MenuRadioGroup key={item.name} name={item.name} defaultValue={item.defaultValue}>
+          <MenuRadioGroup
+            key={item.name}
+            name={item.name}
+            defaultValue={item.defaultValue}
+          >
             {item.items.map((radio) => (
-              <MenuRadioItem key={radio.value} className={classes.menuItem} value={radio.value}>
+              <MenuRadioItem
+                key={radio.value}
+                className={classes.menuItem}
+                value={radio.value}
+              >
                 {radio.label}
               </MenuRadioItem>
             ))}
@@ -199,7 +259,9 @@ function Entries({ items }: { items: MenuData }) {
       case "submenu":
         return (
           <MenuSub key={`submenu-${index}`}>
-            <MenuSubTrigger className={classes.menuItem}>{item.label}</MenuSubTrigger>
+            <MenuSubTrigger className={classes.menuItem}>
+              {item.label}
+            </MenuSubTrigger>
             <MenuSubContent className={classes.popup}>
               <Entries items={item.items} />
             </MenuSubContent>
@@ -210,9 +272,13 @@ function Entries({ items }: { items: MenuData }) {
 }
 
 function MenubarVariant({ variant, env }: { variant: Variant; env: Env }) {
-  const [controller] = React.useState(() => (variant.controller ? createMenubarController() : undefined))
+  const [controller] = React.useState(() =>
+    variant.controller ? createMenubarController() : undefined
+  )
   React.useEffect(() => {
-    if (!controller) return
+    if (!controller) {
+      return
+    }
     env.controls([
       ["focus()", () => controller.focus()],
       ["isOpen()", () => controller.isOpen()],
@@ -221,12 +287,15 @@ function MenubarVariant({ variant, env }: { variant: Variant; env: Env }) {
   }, [controller, env])
   const menuProps = {
     onAction: (value: string) => env.log(`action ${value}`),
-    onOpenChange: (open: boolean, details: { reason: string; source: string }) =>
-      env.log(`openChange ${open} (${details.reason}, ${details.source})`),
-    onCheckedChange: (checked: boolean, details: { value: string }) => env.log(`${details.value} ${checked}`),
+    onOpenChange: (
+      open: boolean,
+      details: { reason: string; source: string }
+    ) => env.log(`openChange ${open} (${details.reason}, ${details.source})`),
+    onCheckedChange: (checked: boolean, details: { value: string }) =>
+      env.log(`${details.value} ${checked}`),
     onValueChange: (value: string) => env.log(`profile ${value}`),
   }
-  if (variant.data)
+  if (variant.data) {
     return (
       <Menubar
         className={classes.bar}
@@ -244,8 +313,14 @@ function MenubarVariant({ variant, env }: { variant: Variant; env: Env }) {
         ))}
       </Menubar>
     )
+  }
   return (
-    <Menubar className={classes.bar} aria-label={variant.title} controller={controller} {...variant.options}>
+    <Menubar
+      className={classes.bar}
+      aria-label={variant.title}
+      controller={controller}
+      {...variant.options}
+    >
       <Menu {...menuProps}>
         <MenuTrigger className={classes.item}>{file.trigger}</MenuTrigger>
         <MenuContent className={classes.popup}>
@@ -264,7 +339,11 @@ function MenubarVariant({ variant, env }: { variant: Variant; env: Env }) {
             <MenuSubTrigger className={classes.menuItem}>Share</MenuSubTrigger>
             <MenuSubContent className={classes.popup}>
               {file.share.map((label) => (
-                <MenuItem key={label} className={classes.menuItem} value={label}>
+                <MenuItem
+                  key={label}
+                  className={classes.menuItem}
+                  value={label}
+                >
                   {label}
                 </MenuItem>
               ))}
@@ -276,7 +355,11 @@ function MenubarVariant({ variant, env }: { variant: Variant; env: Env }) {
         <MenuTrigger className={classes.item}>{edit.trigger}</MenuTrigger>
         <MenuContent className={classes.popup}>
           {edit.items.map((item) => (
-            <MenuItem key={item.value} className={classes.menuItem} value={item.value}>
+            <MenuItem
+              key={item.value}
+              className={classes.menuItem}
+              value={item.value}
+            >
               {item.label}
             </MenuItem>
           ))}
@@ -286,7 +369,11 @@ function MenubarVariant({ variant, env }: { variant: Variant; env: Env }) {
         <MenuTrigger className={classes.item}>{view.trigger}</MenuTrigger>
         <MenuContent className={classes.popup}>
           {view.checkboxes.map((item) => (
-            <MenuCheckboxItem key={item.value} className={classes.menuItem} value={item.value}>
+            <MenuCheckboxItem
+              key={item.value}
+              className={classes.menuItem}
+              value={item.value}
+            >
               {item.label}
             </MenuCheckboxItem>
           ))}
@@ -295,9 +382,16 @@ function MenubarVariant({ variant, env }: { variant: Variant; env: Env }) {
       <Menu {...menuProps}>
         <MenuTrigger className={classes.item}>{profiles.trigger}</MenuTrigger>
         <MenuContent className={classes.popup}>
-          <MenuRadioGroup defaultValue="Benoit" onValueChange={(value) => env.log(`profile ${value}`)}>
+          <MenuRadioGroup
+            defaultValue="Benoit"
+            onValueChange={(value) => env.log(`profile ${value}`)}
+          >
             {profiles.radios.map((label) => (
-              <MenuRadioItem key={label} className={classes.menuItem} value={label}>
+              <MenuRadioItem
+                key={label}
+                className={classes.menuItem}
+                value={label}
+              >
                 {label}
               </MenuRadioItem>
             ))}
@@ -321,8 +415,8 @@ function mount(root: HTMLElement) {
         ) : (
           <MenubarVariant variant={variant} env={env} />
         )}
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

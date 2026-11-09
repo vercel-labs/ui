@@ -5,7 +5,10 @@ import path from "node:path"
 
 const frameworks = ["react", "vue", "svelte", "solid", "web-components"]
 // Every framework folder must have the same examples.
-const root = path.join(import.meta.dirname, "../../examples/components/navigation-menu")
+const root = path.join(
+  import.meta.dirname,
+  "../../examples/components/navigation-menu"
+)
 const folders = ["react", "vue", "svelte", "solid", "web"]
 const examplesIn = (folder: string) =>
   readdirSync(path.join(root, folder), { withFileTypes: true })
@@ -52,25 +55,39 @@ function triggerIn(page: Page, name: string) {
 // Hover, or a press for click-only menus.
 async function open(trigger: Locator, press?: boolean) {
   await trigger.scrollIntoViewIfNeeded()
-  if (press) await trigger.click()
-  else await trigger.hover()
+  if (press) {
+    await trigger.click()
+  } else {
+    await trigger.hover()
+  }
 }
 
 async function close(page: Page, keys?: boolean) {
-  if (keys) await page.keyboard.press("Escape")
-  else await page.mouse.move(0, 0)
+  if (keys) {
+    await page.keyboard.press("Escape")
+  } else {
+    await page.mouse.move(0, 0)
+  }
 }
 
 for (const framework of frameworks) {
-  test(`every navigation menu example works in ${framework}`, async ({ page }) => {
+  test(`every navigation menu example works in ${framework}`, async ({
+    page,
+  }) => {
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/navigation-menu`)
     await page.waitForLoadState("networkidle")
     await expect(page.locator("[data-example]")).toHaveCount(order.length)
-    for (const folder of folders)
-      expect(examplesIn(folder).sort(), folder).toEqual([...order, ...fixtures].sort())
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual(
+        [...order, ...fixtures].sort()
+      )
+    }
 
     for (const name of order) {
       const { press } = triggers[name]
@@ -87,7 +104,9 @@ for (const framework of frameworks) {
 
 // Routers call preventDefault() on a link's click, and the menu still closes.
 for (const framework of frameworks) {
-  test(`a router link closes the menu and marks the current page in ${framework}`, async ({ page }) => {
+  test(`a router link closes the menu and marks the current page in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/navigation-menu`)
     await page.waitForLoadState("networkidle")
     const preview = example(page, "link-component")
@@ -103,18 +122,24 @@ for (const framework of frameworks) {
 
 // A menu inside another menu's content opens its own panel beside its trigger.
 for (const framework of frameworks) {
-  test(`a nested menu opens its own panel in ${framework}`, async ({ page }) => {
+  test(`a nested menu opens its own panel in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/navigation-menu`)
     await page.waitForLoadState("networkidle")
     await open(triggerIn(page, "nested"))
     await page.getByRole("button", { name: "Forms", exact: true }).hover()
-    await expect(panels(page).getByRole("link", { name: "Select" })).toBeVisible()
+    await expect(
+      panels(page).getByRole("link", { name: "Select" })
+    ).toBeVisible()
   })
 }
 
 // Switching items logs the new one, and closing logs once the animation ends.
 for (const framework of frameworks) {
-  test(`the animated menu reports when it finishes in ${framework}`, async ({ page }) => {
+  test(`the animated menu reports when it finishes in ${framework}`, async ({
+    page,
+  }) => {
     await page.goto(`/docs/${framework}/components/navigation-menu`)
     await page.waitForLoadState("networkidle")
     const preview = example(page, "animation")

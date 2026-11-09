@@ -75,7 +75,9 @@ function Example() {
       items={items}
       mode="multiple"
       defaultValue={["updates", "website"]}
-      onValueChange={(value) => log(`${value.length} selected: ${value.join(", ")}`)}
+      onValueChange={(value) =>
+        log(`${value.length} selected: ${value.join(", ")}`)
+      }
       expandOnPress={false}
       defaultExpanded={["inbox", "projects"]}
     >

@@ -2,7 +2,11 @@ import { describe, expect, test } from "vitest"
 import { computeArrow } from "../src/foundation/platform/position"
 import { bridgeBetween } from "../src/foundation/popups/bridge"
 import { popover } from "../src/components/popover/popover"
-import { attrs as partAttrs, partState, press } from "../src/foundation/kernel/part"
+import {
+  attrs as partAttrs,
+  partState,
+  press,
+} from "../src/foundation/kernel/part"
 
 describe("arrow", () => {
   const arrow = { width: 12, height: 6 }
@@ -10,19 +14,27 @@ describe("arrow", () => {
   test("points at the anchor's center", () => {
     const anchor = { x: 100, y: 0, width: 60, height: 30 }
     const popup = { x: 50, y: 40, width: 200, height: 100 }
-    expect(computeArrow(anchor, popup, arrow, "bottom", 6)).toEqual({ offset: 74, clamped: false })
+    expect(computeArrow(anchor, popup, arrow, "bottom", 6)).toEqual({
+      offset: 74,
+      clamped: false,
+    })
   })
 
   test("stops short of the corners and says so", () => {
     const anchor = { x: 0, y: 0, width: 10, height: 30 }
     const popup = { x: 40, y: 40, width: 200, height: 100 }
-    expect(computeArrow(anchor, popup, arrow, "bottom", 6)).toEqual({ offset: 6, clamped: true })
+    expect(computeArrow(anchor, popup, arrow, "bottom", 6)).toEqual({
+      offset: 6,
+      clamped: true,
+    })
   })
 
   test("runs along the vertical edge for side placements", () => {
     const anchor = { x: 0, y: 100, width: 30, height: 40 }
     const popup = { x: 40, y: 60, width: 200, height: 100 }
-    expect(computeArrow(anchor, popup, { width: 6, height: 12 }, "right", 6).offset).toBe(54)
+    expect(
+      computeArrow(anchor, popup, { width: 6, height: 12 }, "right", 6).offset
+    ).toBe(54)
   })
 })
 
@@ -53,29 +65,50 @@ describe("hover bridge", () => {
 describe("state", () => {
   test("before its parts bind, a popover is named by its trigger and described by nothing", () => {
     const instance = popover({ id: "p", defaultOpen: true })
-    expect(partAttrs(instance.part("content"))["aria-labelledby"]).toBe("p-trigger")
-    expect(partAttrs(instance.part("content"))["aria-describedby"]).toBeUndefined()
+    expect(partAttrs(instance.part("content"))["aria-labelledby"]).toBe(
+      "p-trigger"
+    )
+    expect(
+      partAttrs(instance.part("content"))["aria-describedby"]
+    ).toBeUndefined()
   })
 
   test("only modal popovers are marked modal", () => {
-    expect(partAttrs(popover({ id: "p", defaultOpen: true }).part("content"))["aria-modal"]).toBeUndefined()
     expect(
-      partAttrs(popover({ id: "p", defaultOpen: true, modal: true }).part("content"))["aria-modal"],
+      partAttrs(popover({ id: "p", defaultOpen: true }).part("content"))[
+        "aria-modal"
+      ]
+    ).toBeUndefined()
+    expect(
+      partAttrs(
+        popover({ id: "p", defaultOpen: true, modal: true }).part("content")
+      )["aria-modal"]
     ).toBe("true")
     expect(
-      partAttrs(popover({ id: "p", defaultOpen: true, modal: "trap-focus" }).part("content"))["aria-modal"],
+      partAttrs(
+        popover({ id: "p", defaultOpen: true, modal: "trap-focus" }).part(
+          "content"
+        )
+      )["aria-modal"]
     ).toBeUndefined()
   })
 
   test("a cancelled change keeps the popover closed", () => {
-    const instance = popover({ id: "p", onOpenChange: (open, details) => details.cancel() })
+    const instance = popover({
+      id: "p",
+      onOpenChange: (open, details) => details.cancel(),
+    })
     instance.api.open()
     expect(instance.get()).toMatchObject({ open: false, mounted: false })
   })
 
   test("a controlled popover reports changes without applying them", () => {
     const changes: boolean[] = []
-    const instance = popover({ id: "p", open: false, onOpenChange: (open) => changes.push(open) })
+    const instance = popover({
+      id: "p",
+      open: false,
+      onOpenChange: (open) => changes.push(open),
+    })
     instance.api.open()
     expect(changes).toEqual([true])
     expect(instance.get()).toMatchObject({ open: false })
@@ -89,7 +122,11 @@ describe("state", () => {
     instance.api.open({ anchor: point })
     expect(instance.api.internal.control.anchor()).toBe(point)
     press(instance.part("trigger", { id: "b", payload: "row b" }))?.()
-    expect(instance.get()).toMatchObject({ open: true, trigger: "b", payload: "row b" })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      trigger: "b",
+      payload: "row b",
+    })
     expect(instance.api.internal.control.anchor()).not.toBe(point)
   })
 
@@ -110,22 +147,30 @@ describe("state", () => {
 
 describe("shortcut", () => {
   test("the trigger's shortcut reaches it as aria-keyshortcuts, in neutral names until the client binds", () => {
-    const attrs = partAttrs(popover({ id: "p" }).part("trigger", { id: "a", shortcut: "mod+i" }))
+    const attrs = partAttrs(
+      popover({ id: "p" }).part("trigger", { id: "a", shortcut: "mod+i" })
+    )
     expect(attrs["aria-keyshortcuts"]).toBe("Control+I")
   })
 
   test("the shortcut part shows the keys in neutral names until the client binds", () => {
     const instance = popover({ id: "p" })
-    expect(partState(instance.part("shortcut", { shortcut: "mod+i" }))).toEqual({ text: "⁦Ctrl+I⁩" })
-  })
-
-  test("the shortcut part is hidden from screen readers, which hear aria-keyshortcuts", () => {
-    expect(partAttrs(popover({ id: "p" }).part("shortcut", { shortcut: "mod+i" }))["aria-hidden"]).toBe(
-      "true",
+    expect(partState(instance.part("shortcut", { shortcut: "mod+i" }))).toEqual(
+      { text: "⁦Ctrl+I⁩" }
     )
   })
 
+  test("the shortcut part is hidden from screen readers, which hear aria-keyshortcuts", () => {
+    expect(
+      partAttrs(popover({ id: "p" }).part("shortcut", { shortcut: "mod+i" }))[
+        "aria-hidden"
+      ]
+    ).toBe("true")
+  })
+
   test("a shortcut part without a shortcut is empty", () => {
-    expect(partState(popover({ id: "p" }).part("shortcut", {}))).toEqual({ text: "" })
+    expect(partState(popover({ id: "p" }).part("shortcut", {}))).toEqual({
+      text: "",
+    })
   })
 })

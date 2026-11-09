@@ -1,14 +1,23 @@
 import "@ui-sdk/web/resizable"
 import type { UiResizableElement } from "@ui-sdk/web"
-import { formatLayout, resizableFixture as f, resizableOptions } from "tests/fixtures/resizable.ts"
+import {
+  formatLayout,
+  resizableFixture as f,
+  resizableOptions,
+} from "tests/fixtures/resizable.ts"
 
 const { sidebar, main, preview } = f.editor.panels
 const { code, terminal } = f.main.panels
 
 // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
-function setAttributes(el: Element, attributes: Record<string, string | number | boolean | undefined>) {
+function setAttributes(
+  el: Element,
+  attributes: Record<string, string | number | boolean | undefined>
+) {
   for (const [name, value] of Object.entries(attributes)) {
-    if (value === undefined || value === false) continue
+    if (value === undefined || value === false) {
+      continue
+    }
     el.setAttribute(name, value === true ? "" : String(value))
   }
 }
@@ -60,42 +69,60 @@ function mount(root: HTMLElement) {
   })
   root.replaceChildren(template.content)
   const editor = root.querySelector<UiResizableElement>(`#${f.editor.id}`)!
-  const action = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
-  const committed = root.querySelector<HTMLOutputElement>('output[aria-label="Committed"]')!
+  const action = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
+  const committed = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Committed"]'
+  )!
 
   // The element's api is its controller.
   root
     .querySelector('[data-action="collapse"]')!
     .addEventListener("click", () => editor.api.collapse(sidebar.id))
-  root.querySelector('[data-action="expand"]')!.addEventListener("click", () => editor.api.expand(sidebar.id))
+  root
+    .querySelector('[data-action="expand"]')!
+    .addEventListener("click", () => editor.api.expand(sidebar.id))
   root
     .querySelector('[data-action="resize"]')!
-    .addEventListener("click", () => editor.api.resize(preview.id, f.previewSize))
+    .addEventListener("click", () =>
+      editor.api.resize(preview.id, f.previewSize)
+    )
 
   // Callbacks are DOM events: layoutchange while it moves, layoutcommit when it settles.
   root.addEventListener(
     "layoutchange",
     (event) => {
       const group = (event.target as HTMLElement).id
-      const { value, reason } = (event as CustomEvent<{ value: number[]; reason: string }>).detail
-      if (group === f.editor.id && options.cancel) return event.preventDefault()
+      const { value, reason } = (
+        event as CustomEvent<{ value: number[]; reason: string }>
+      ).detail
+      if (group === f.editor.id && options.cancel) {
+        return event.preventDefault()
+      }
       action.textContent = formatLayout(group, value, reason)
       // A controlled group takes the layout back, like a framework passing it down.
-      if (group === f.editor.id && options.controlled && !options.ignore)
+      if (group === f.editor.id && options.controlled && !options.ignore) {
         editor.setAttribute("layout", value.join(","))
+      }
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "layoutcommit",
     (event) => {
-      const { value, reason } = (event as CustomEvent<{ value: number[]; reason: string }>).detail
+      const { value, reason } = (
+        event as CustomEvent<{ value: number[]; reason: string }>
+      ).detail
       const group = (event.target as HTMLElement).id
-      committed.textContent = [committed.textContent, formatLayout(group, value, reason)]
+      committed.textContent = [
+        committed.textContent,
+        formatLayout(group, value, reason),
+      ]
         .filter(Boolean)
         .join(" ")
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

@@ -10,7 +10,8 @@ import {
   SliderValue,
 } from "@ui-sdk/react/slider"
 
-const time = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
+const time = (minutes: number) =>
+  `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
 
 function Example() {
   return (

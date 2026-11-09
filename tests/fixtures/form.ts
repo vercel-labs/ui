@@ -30,9 +30,17 @@ const formFixture = {
   bio: { label: "Bio", name: "bio", description: "A few words about you." },
   contact: { legend: "Contact" },
   email: { label: "Email", name: "email", defaultValue: "ada@example.com" },
-  website: { label: "Website", name: "website", prefix: "https://", clear: "Clear website" },
+  website: {
+    label: "Website",
+    name: "website",
+    prefix: "https://",
+    clear: "Clear website",
+  },
   // Errors passed at first render with ?errors, like a server-rendered page after a failed post.
-  initialErrors: { email: "This email bounced.", bio: ["Too long.", "No links allowed."] },
+  initialErrors: {
+    email: "This email bounced.",
+    bio: ["Too long.", "No links allowed."],
+  },
 }
 
 // Options a spec can set through the URL:
@@ -44,11 +52,14 @@ function formOptions() {
   const params = new URLSearchParams(location.search)
   return {
     action: (params.get("action") ?? "async") as "async" | "sync" | "reject",
-    errors: params.has("errors") ? (formFixture.initialErrors as FormErrors) : undefined,
+    errors: params.has("errors")
+      ? (formFixture.initialErrors as FormErrors)
+      : undefined,
     disabled: params.has("disabled"),
     controlled: params.has("controlled"),
     noDigits: params.has("no-digits"),
-    submitShortcut: (params.get("submit-shortcut") ?? undefined) as "enter" | "mod+enter" | undefined,
+    submitShortcut: (params.get("submit-shortcut") ?? undefined) as
+      "enter" | "mod+enter" | undefined,
   }
 }
 
@@ -68,20 +79,29 @@ function save(data: FormData, action: "async" | "sync" | "reject") {
   page.formSaves = (page.formSaves ?? 0) + 1
   const errors =
     data.get(formFixture.username.name) === formFixture.username.taken
-      ? ({ [formFixture.username.name]: formFixture.username.takenError } as FormErrors)
+      ? ({
+          [formFixture.username.name]: formFixture.username.takenError,
+        } as FormErrors)
       : undefined
-  if (action === "sync") return errors
+  if (action === "sync") {
+    return errors
+  }
   return new Promise<typeof errors>((resolve, reject) =>
     setTimeout(
-      () => (action === "reject" ? reject(new Error("Network down")) : resolve(errors)),
-      actionDelay,
-    ),
+      () =>
+        action === "reject"
+          ? reject(new Error("Network down"))
+          : resolve(errors),
+      actionDelay
+    )
   )
 }
 
 // What the form submitted, as a query string.
 function serializeData(data: FormData) {
-  return new URLSearchParams(data as unknown as Record<string, string>).toString()
+  return new URLSearchParams(
+    data as unknown as Record<string, string>
+  ).toString()
 }
 
 // The server's message for a field, several joined, or "" when it has none.
@@ -98,7 +118,9 @@ function invalidOf(errors: FormErrors | undefined, name: string) {
 
 // The errors without a field's, once the person changes it.
 function without(errors: FormErrors | undefined, name: string) {
-  if (!errors?.[name]) return errors
+  if (!errors?.[name]) {
+    return errors
+  }
   const { [name]: _removed, ...rest } = errors
   return rest
 }

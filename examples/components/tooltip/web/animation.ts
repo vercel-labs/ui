@@ -12,8 +12,12 @@ function mount(root: HTMLElement) {
     </ui-tooltip>
   `
   const tooltip = root.querySelector("ui-tooltip")!
-  tooltip.addEventListener("openchange", (event) => log(root, event.detail.value ? "Opening" : "Closing"))
-  tooltip.addEventListener("openchangecomplete", (event) => log(root, event.detail.value ? "Open" : "Closed"))
+  tooltip.addEventListener("openchange", (event) =>
+    log(root, event.detail.value ? "Opening" : "Closing")
+  )
+  tooltip.addEventListener("openchangecomplete", (event) =>
+    log(root, event.detail.value ? "Open" : "Closed")
+  )
 }
 
 export { mount }

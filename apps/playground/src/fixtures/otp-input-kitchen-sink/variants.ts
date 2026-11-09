@@ -63,11 +63,14 @@ const presets = {
   ],
 } satisfies Record<string, [string, string][]>
 
-const maxLengthOf = (variant: Variant) => variant.groups.reduce((sum, size) => sum + size, 0)
+const maxLengthOf = (variant: Variant) =>
+  variant.groups.reduce((sum, size) => sum + size, 0)
 
 // The first slot index of each group.
 const groupStarts = (variant: Variant) =>
-  variant.groups.map((_, group) => variant.groups.slice(0, group).reduce((sum, size) => sum + size, 0))
+  variant.groups.map((_, group) =>
+    variant.groups.slice(0, group).reduce((sum, size) => sum + size, 0)
+  )
 
 // What the props chips show.
 function chipsOf(variant: Variant) {
@@ -86,7 +89,14 @@ function chipsOf(variant: Variant) {
 }
 
 const variants: Variant[] = [
-  { id: "length-4", section: "Length", title: "maxLength={4}", groups: [4], type: "1234", expect: "1234" },
+  {
+    id: "length-4",
+    section: "Length",
+    title: "maxLength={4}",
+    groups: [4],
+    type: "1234",
+    expect: "1234",
+  },
   {
     id: "length-6",
     section: "Length",
@@ -385,4 +395,13 @@ const variants: Variant[] = [
   },
 ]
 
-export { chipsOf, groupStarts, maxLengthOf, patternAttribute, patterns, presets, type Variant, variants }
+export {
+  chipsOf,
+  groupStarts,
+  maxLengthOf,
+  patternAttribute,
+  patterns,
+  presets,
+  type Variant,
+  variants,
+}

@@ -41,7 +41,12 @@ function Example() {
           type="button"
           onMouseDown={(event) => event.preventDefault()}
           onClick={() =>
-            menu.insert(new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" }))
+            menu.insert(
+              new Date().toLocaleDateString("en-US", {
+                month: "long",
+                day: "numeric",
+              })
+            )
           }
         >
           Insert Date
@@ -50,13 +55,19 @@ function Example() {
       <TriggerMenu controller={menu} triggers={[{ char: "@", items: people }]}>
         <Field>
           <FieldLabel>Message</FieldLabel>
-          <FieldControl render={<TriggerMenuInput placeholder="Write a message…" />} />
+          <FieldControl
+            render={<TriggerMenuInput placeholder="Write a message…" />}
+          />
         </Field>
         <TriggerMenuContent>
           <TriggerMenuList>
             {(state) =>
               (state.items as TriggerMenuDataItem[]).map((item) => (
-                <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+                <TriggerMenuItem
+                  key={item.value}
+                  value={item.value}
+                  label={item.label}
+                >
                   {item.label}
                 </TriggerMenuItem>
               ))

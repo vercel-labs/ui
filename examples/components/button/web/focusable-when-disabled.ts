@@ -29,7 +29,9 @@ function mount(root: HTMLElement) {
     publish.disabled = !ready
     hint.textContent = ready ? "Ready to publish." : "Add a title to publish."
   })
-  publish.addEventListener("action", () => log(root, `Published “${title.value}”`))
+  publish.addEventListener("action", () =>
+    log(root, `Published “${title.value}”`)
+  )
 }
 
 export { mount }

@@ -24,7 +24,10 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await closed(page, "Edit")
   })
 
-  test("Right on an item in a submenu moves to the next menu at its first item", async ({ page, tab }) => {
+  test("Right on an item in a submenu moves to the next menu at its first item", async ({
+    page,
+    tab,
+  }) => {
     await enter(page, tab)
     await page.keyboard.press("ArrowDown")
     await page.keyboard.press("ArrowDown")
@@ -42,13 +45,19 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await closed(page, "Share")
   })
 
-  test("ArrowUp opens a menu and focuses its last item", async ({ page, tab }) => {
+  test("ArrowUp opens a menu and focuses its last item", async ({
+    page,
+    tab,
+  }) => {
     await enter(page, tab)
     await page.keyboard.press("ArrowUp")
     await expectFocus(page, "Print…")
   })
 
-  test("Shift+Tab in an open menu closes it and moves before the menubar", async ({ page, tab }) => {
+  test("Shift+Tab in an open menu closes it and moves before the menubar", async ({
+    page,
+    tab,
+  }) => {
     await enter(page, tab)
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("ArrowDown")
@@ -58,7 +67,9 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expectFocus(page, "Before")
   })
 
-  test("pointing at another trigger and pressing it keeps its menu open", async ({ page }) => {
+  test("pointing at another trigger and pressing it keeps its menu open", async ({
+    page,
+  }) => {
     await trigger(page, "File").click()
     await trigger(page, "Edit").click()
     await expect(menuNamed(page, "Edit")).toBeVisible()
@@ -67,7 +78,10 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await closed(page, "Edit")
   })
 
-  test("a disabled trigger stays focusable, says it's disabled and opens nothing", async ({ page, tab }) => {
+  test("a disabled trigger stays focusable, says it's disabled and opens nothing", async ({
+    page,
+    tab,
+  }) => {
     await enter(page, tab)
     await page.keyboard.press("ArrowLeft")
     await expectFocus(page, "Help")
@@ -89,7 +103,11 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("menu")).toHaveCount(0)
   })
 
-  test("a disabled menubar keeps its tab stop and opens nothing", async ({ page, open, tab }) => {
+  test("a disabled menubar keeps its tab stop and opens nothing", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("menubar", { disabled: "" })
     await enter(page, tab)
     await expect(trigger(page, "File")).toHaveAttribute("aria-disabled", "true")
@@ -99,7 +117,10 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("menu")).toHaveCount(0)
   })
 
-  test("a disabled menubar ignores its triggers' shortcuts", async ({ page, open }) => {
+  test("a disabled menubar ignores its triggers' shortcuts", async ({
+    page,
+    open,
+  }) => {
     await open("menubar", { disabled: "" })
     await page.getByRole("button", { name: "Before" }).focus()
     await page.keyboard.press("Alt+Shift+V")
@@ -113,7 +134,11 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(menuNamed(page, "View")).toBeVisible()
   })
 
-  test("menus defined before the menubar join it once it upgrades", async ({ page, open, tab }) => {
+  test("menus defined before the menubar join it once it upgrades", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("menubar", { "menus-first": "" })
     await enter(page, tab)
     await page.keyboard.press("ArrowRight")
@@ -121,7 +146,10 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(trigger(page, "Edit")).toHaveAttribute("tabindex", "0")
   })
 
-  test("typing a letter focuses the next trigger that starts with it", async ({ page, tab }) => {
+  test("typing a letter focuses the next trigger that starts with it", async ({
+    page,
+    tab,
+  }) => {
     await enter(page, tab)
     await page.keyboard.press("p")
     await expectFocus(page, "Profiles")
@@ -141,14 +169,21 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expectFocus(page, "File")
   })
 
-  test("a controller focuses the menubar and closes its open menu", async ({ page, tab }) => {
+  test("a controller focuses the menubar and closes its open menu", async ({
+    page,
+    tab,
+  }) => {
     await enter(page, tab)
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("ArrowDown")
     await expectFocus(page, "Undo")
     // The fixture puts its controller on the window, since a press outside would close the menu itself.
     const controller = () =>
-      (window as unknown as { __menubar: { close: () => void; focus: () => void } }).__menubar
+      (
+        window as unknown as {
+          __menubar: { close: () => void; focus: () => void }
+        }
+      ).__menubar
     await page.evaluate(`(${controller})().close()`)
     await closed(page, "Edit")
     await page.getByRole("button", { name: "Before" }).focus()

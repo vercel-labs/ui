@@ -15,12 +15,13 @@ export function mount(root: HTMLElement) {
   const offs = [
     registerShortcut(
       "mod+enter",
-      () => (output.textContent = `Characters saved: ${textarea.value.trim().length}`),
+      () =>
+        (output.textContent = `Characters saved: ${textarea.value.trim().length}`),
       {
         scope: "note",
         when: () => textarea.value.trim() !== "",
         description: "Save the note",
-      },
+      }
     ),
     registerShortcut(
       "escape",
@@ -28,7 +29,7 @@ export function mount(root: HTMLElement) {
         textarea.value = ""
         output.textContent = "Cleared"
       },
-      { scope: "note", allowInInput: true, description: "Clear the note" },
+      { scope: "note", allowInInput: true, description: "Clear the note" }
     ),
   ]
   return () => {

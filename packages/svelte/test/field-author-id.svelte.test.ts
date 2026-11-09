@@ -17,7 +17,9 @@ async function mountField(kind: ComponentProps<typeof App>["kind"]) {
 }
 
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
 })
@@ -27,7 +29,9 @@ test("a number input's control keeps the id passed to it, and its label and step
   expect(document.getElementById("mine")?.localName).toBe("input")
   expect(document.querySelector("label")?.htmlFor).toBe("mine")
   const buttons = [...document.querySelectorAll("button")]
-  expect(buttons.map((button) => button.getAttribute("aria-controls"))).toEqual(["mine", "mine"])
+  expect(buttons.map((button) => button.getAttribute("aria-controls"))).toEqual(
+    ["mine", "mine"]
+  )
 })
 
 test.each([
@@ -40,14 +44,18 @@ test.each([
   "segmented-control",
   "color-picker",
   "range-slider",
-] as const)("a %s in a field keeps the id passed to it, and the field's label names it", async (kind) => {
-  await mountField(kind)
-  const control = document.getElementById("mine")
-  const label = document.querySelector("label")!
-  expect(control).not.toBeNull()
-  const named =
-    label.htmlFor === "mine" || !!control?.getAttribute("aria-labelledby")?.split(" ").includes(label.id)
-  expect(named).toBe(true)
-  const ids = [...document.querySelectorAll("[id]")].map((el) => el.id)
-  expect(ids.filter((id, index) => ids.indexOf(id) !== index)).toEqual([])
-})
+] as const)(
+  "a %s in a field keeps the id passed to it, and the field's label names it",
+  async (kind) => {
+    await mountField(kind)
+    const control = document.getElementById("mine")
+    const label = document.querySelector("label")!
+    expect(control).not.toBeNull()
+    const named =
+      label.htmlFor === "mine" ||
+      !!control?.getAttribute("aria-labelledby")?.split(" ").includes(label.id)
+    expect(named).toBe(true)
+    const ids = [...document.querySelectorAll("[id]")].map((el) => el.id)
+    expect(ids.filter((id, index) => ids.indexOf(id) !== index)).toEqual([])
+  }
+)

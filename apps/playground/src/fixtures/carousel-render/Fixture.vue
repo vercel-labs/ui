@@ -17,17 +17,30 @@ const action = ref("")
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Carousel class="carousel" aria-label="Photos" @page-change="(page: number) => (action = String(page))">
+    <Carousel
+      class="carousel"
+      aria-label="Photos"
+      @page-change="(page: number) => (action = String(page))"
+    >
       <CarouselViewport class="carousel-viewport">
         <CarouselContent>
-          <CarouselItem v-for="slide in slides" :key="slide" v-slot="{ state }" class="carousel-slide">
-            <span :class="state.active ? 'is-active' : 'is-inactive'">{{ slide }}</span>
+          <CarouselItem
+            v-for="slide in slides"
+            :key="slide"
+            v-slot="{ state }"
+            class="carousel-slide"
+          >
+            <span :class="state.active ? 'is-active' : 'is-inactive'">{{
+              slide
+            }}</span>
           </CarouselItem>
         </CarouselContent>
       </CarouselViewport>
       <CarouselNext>
         <template #render="{ props, state }">
-          <button v-bind="props">{{ state.disabled ? "No more photos" : "Next photo" }}</button>
+          <button v-bind="props">
+            {{ state.disabled ? "No more photos" : "Next photo" }}
+          </button>
         </template>
       </CarouselNext>
       <CarouselIndicatorGroup aria-label="Choose a photo">

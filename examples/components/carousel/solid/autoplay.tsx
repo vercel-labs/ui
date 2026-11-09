@@ -26,10 +26,14 @@ function Example() {
       aria-label="Photos"
       defaultPlaying
       interval={4000}
-      onPlayingChange={(playing, details) => log(`${playing ? "Playing" : "Stopped"} (${details.reason})`)}
+      onPlayingChange={(playing, details) =>
+        log(`${playing ? "Playing" : "Stopped"} (${details.reason})`)
+      }
     >
       <div data-slot="controls">
-        <CarouselPlayToggle>{(state) => (state.playing ? "Pause" : "Play")}</CarouselPlayToggle>
+        <CarouselPlayToggle>
+          {(state) => (state.playing ? "Pause" : "Play")}
+        </CarouselPlayToggle>
       </div>
       <div data-slot="row">
         <CarouselPrevious aria-label="Previous slide">

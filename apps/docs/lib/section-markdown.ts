@@ -13,7 +13,7 @@ function withFolders(folder: string): DocPage[] {
   return docPages(folder).flatMap((page) =>
     page.slugs.length > depth && page.file.endsWith("/index.mdx")
       ? withFolders(page.slugs.join("/"))
-      : [page],
+      : [page]
   )
 }
 
@@ -25,11 +25,13 @@ async function sectionMarkdown(
   section: keyof typeof sharedSections,
   link: (slugs: string[], hash?: string) => string | null = (slugs, hash) =>
     `/docs/${slugs.join("/")}${hash ? `#${hash}` : ""}`,
-  intro = `<!-- ui-sdk ${sharedSections[section]} docs, as one file. Pages: /docs/${section}. -->`,
+  intro = `<!-- ui-sdk ${sharedSections[section]} docs, as one file. Pages: /docs/${section}. -->`
 ) {
   const all = [section].flatMap(withFolders)
   const pages = await Promise.all(
-    all.map((page) => pageMarkdown(page.file, undefined, ({ slugs, hash }) => link(slugs, hash))),
+    all.map((page) =>
+      pageMarkdown(page.file, undefined, ({ slugs, hash }) => link(slugs, hash))
+    )
   )
   return [intro, ...pages].join("\n\n")
 }

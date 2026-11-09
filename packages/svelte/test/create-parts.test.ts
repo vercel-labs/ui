@@ -11,8 +11,14 @@ function setup(props: Record<string, unknown>) {
   const app = mount(App, { target: document.body, props })
   flushSync()
   const button = (name: string) =>
-    [...document.querySelectorAll("button")].find((el) => el.textContent?.startsWith(name))!
-  return { app, button, output: () => document.querySelector("output")!.textContent }
+    [...document.querySelectorAll("button")].find((el) =>
+      el.textContent?.startsWith(name)
+    )!
+  return {
+    app,
+    button,
+    output: () => document.querySelector("output")!.textContent,
+  }
 }
 
 describe("parts from createParts", () => {
@@ -43,7 +49,10 @@ describe("parts from createParts", () => {
   })
 
   test("an option passed without bind: changes locally, like a bindable prop", () => {
-    const app = mount(ControlledApp, { target: document.body, props: { value: "apple" } })
+    const app = mount(ControlledApp, {
+      target: document.body,
+      props: { value: "apple" },
+    })
     flushSync()
     document.querySelector("button")!.click()
     flushSync()
@@ -71,14 +80,16 @@ describe("parts from createParts", () => {
     expect(new Set(options.map((option) => option.id)).size).toBe(2)
     options[1].click()
     flushSync()
-    expect(options.map((option) => option.getAttribute("aria-selected"))).toEqual(["false", "true"])
+    expect(
+      options.map((option) => option.getAttribute("aria-selected"))
+    ).toEqual(["false", "true"])
     unmount(app)
   })
 
   test("a required part outside the part it needs throws", () => {
-    expect(() => mount(ListboxApp, { target: document.body, props: { stray: true } })).toThrow(
-      "A listbox item-indicator part must be used inside its item.",
-    )
+    expect(() =>
+      mount(ListboxApp, { target: document.body, props: { stray: true } })
+    ).toThrow("A listbox item-indicator part must be used inside its item.")
   })
 
   test("generated ids are unique per part", () => {

@@ -5,12 +5,14 @@ async function mount(root: HTMLElement) {
   const items = perfItems(perfSize())
   const tabs = items
     .map(
-      (item) => `<ui-tabs-tab value="${item.value}"><button class="tab">${item.label}</button></ui-tabs-tab>`,
+      (item) =>
+        `<ui-tabs-tab value="${item.value}"><button class="tab">${item.label}</button></ui-tabs-tab>`
     )
     .join("")
   const panels = items
     .map(
-      (item) => `<ui-tabs-panel class="panel" value="${item.value}">${item.label} content.</ui-tabs-panel>`,
+      (item) =>
+        `<ui-tabs-panel class="panel" value="${item.value}">${item.label} content.</ui-tabs-panel>`
     )
     .join("")
   root.innerHTML = `

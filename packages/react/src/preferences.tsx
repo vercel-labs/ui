@@ -22,7 +22,9 @@ function useStable(preferences: readonly PreferenceLike[]) {
   const same =
     ref.current.length === preferences.length &&
     ref.current.every((preference, index) => preference === preferences[index])
-  if (!same) ref.current = preferences
+  if (!same) {
+    ref.current = preferences
+  }
   return ref.current
 }
 
@@ -35,7 +37,14 @@ function useStable(preferences: readonly PreferenceLike[]) {
  * `usePreference`, catches up after hydration.
  * @experimental
  */
-function Preferences({ preferences, nonce, children, style, ref, ...props }: PreferencesProps) {
+function Preferences({
+  preferences,
+  nonce,
+  children,
+  style,
+  ref,
+  ...props
+}: PreferencesProps) {
   const list = useStable(preferences)
   const element = React.useRef<HTMLDivElement>(null)
   // True on the server and while hydrating, when the script is in the HTML. A
@@ -43,20 +52,21 @@ function Preferences({ preferences, nonce, children, style, ref, ...props }: Pre
   const fromServer = React.useSyncExternalStore(
     noSubscribe,
     () => false,
-    () => true,
+    () => true
   )
   const subscribe = React.useCallback(
     (listener: () => void) => {
       const stops = list.map((preference) => preference.subscribe(listener))
       return () => stops.forEach((stop) => stop())
     },
-    [list],
+    [list]
   )
   // One string, so the snapshot compares equal until a value changes.
   const values = React.useSyncExternalStore(
     subscribe,
     () => JSON.stringify(list.map((preference) => preference.get().value)),
-    () => JSON.stringify(list.map((preference) => preference.initialState.value)),
+    () =>
+      JSON.stringify(list.map((preference) => preference.initialState.value))
   )
   React.useEffect(() => {
     // The current values, not the render's: right after hydration the render
@@ -64,16 +74,19 @@ function Preferences({ preferences, nonce, children, style, ref, ...props }: Pre
     // place. Written to its own element too, since a restore that
     // `onValueChange` canceled leaves the render's value as it was, and React
     // wouldn't touch the attribute the script set.
-    for (const preference of list)
-      (preference.global ? document.documentElement : element.current)?.setAttribute(
-        preference.attribute,
-        preference.get().value,
-      )
+    for (const preference of list) {
+      ;(preference.global
+        ? document.documentElement
+        : element.current
+      )?.setAttribute(preference.attribute, preference.get().value)
+    }
   }, [list, values])
   const shown = JSON.parse(values) as string[]
   const attributes: Record<string, string> = {}
   list.forEach((preference, index) => {
-    if (!preference.global) attributes[preference.attribute] = shown[index]
+    if (!preference.global) {
+      attributes[preference.attribute] = shown[index]
+    }
   })
   return (
     // The script changes these attributes before hydration, so they may differ from the server's HTML.
@@ -109,7 +122,11 @@ function usePreference<State>(preference: {
   initialState: State
   subscribe: (listener: () => void) => () => void
 }) {
-  return React.useSyncExternalStore(preference.subscribe, preference.get, () => preference.initialState)
+  return React.useSyncExternalStore(
+    preference.subscribe,
+    preference.get,
+    () => preference.initialState
+  )
 }
 
 export { Preferences, type PreferencesProps, usePreference }

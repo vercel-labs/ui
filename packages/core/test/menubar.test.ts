@@ -1,11 +1,23 @@
 import { describe, expect, test } from "vitest"
 import { menu } from "../src/components/menu/menu"
-import { createMenubarController, menubar } from "../src/components/menubar/menubar"
+import {
+  createMenubarController,
+  menubar,
+} from "../src/components/menubar/menubar"
 import { attrs } from "../src/foundation/kernel/part"
 import { kept } from "./kept"
 
-const trigger = (bar: ReturnType<typeof menubar>, id: string, disabled = false) =>
-  attrs(menu({ id, menubar: () => bar.api }).part("trigger", { id: `${id}-t`, disabled }))
+const trigger = (
+  bar: ReturnType<typeof menubar>,
+  id: string,
+  disabled = false
+) =>
+  attrs(
+    menu({ id, menubar: () => bar.api }).part("trigger", {
+      id: `${id}-t`,
+      disabled,
+    })
+  )
 
 describe("menubar", () => {
   test("the root is a horizontal menubar by default", () => {
@@ -16,7 +28,13 @@ describe("menubar", () => {
       "data-disabled": undefined,
       "data-open": undefined,
     })
-    expect(attrs(menubar({ id: "m", orientation: "vertical", disabled: true }).part("root"))).toMatchObject({
+    expect(
+      attrs(
+        menubar({ id: "m", orientation: "vertical", disabled: true }).part(
+          "root"
+        )
+      )
+    ).toMatchObject({
       "aria-orientation": "vertical",
       "data-disabled": "",
     })
@@ -24,8 +42,15 @@ describe("menubar", () => {
 
   test("a disabled menubar still renders one tab stop, on its first trigger", () => {
     const bar = menubar({ id: "m", disabled: true })
-    expect(trigger(bar, "a")).toMatchObject({ tabindex: "0", "aria-disabled": "true", "data-disabled": "" })
-    expect(trigger(bar, "b")).toMatchObject({ tabindex: "-1", "aria-disabled": "true" })
+    expect(trigger(bar, "a")).toMatchObject({
+      tabindex: "0",
+      "aria-disabled": "true",
+      "data-disabled": "",
+    })
+    expect(trigger(bar, "b")).toMatchObject({
+      tabindex: "-1",
+      "aria-disabled": "true",
+    })
   })
 
   test("it tracks the open menu, and a stale close leaves another menu open", () => {

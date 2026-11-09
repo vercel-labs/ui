@@ -8,7 +8,10 @@ const folders = Array.from({ length: perfSize(200) }, (_, index) => index + 1)
 
 function Fixture() {
   return (
-    <div className="fixture" style={{ flexDirection: "column", alignItems: "start" }}>
+    <div
+      className="fixture"
+      style={{ flexDirection: "column", alignItems: "start" }}
+    >
       <button>Before</button>
       <Tree className="tree" aria-label="Folders">
         {folders.map((n) => (

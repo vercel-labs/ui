@@ -30,11 +30,21 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onmousedown={(event) => event.preventDefault()} onclick={mention}>Mention</button>
     <button
       type="button"
       onmousedown={(event) => event.preventDefault()}
-      onclick={() => menu.insert(new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" }))}
+      onclick={mention}>Mention</button
+    >
+    <button
+      type="button"
+      onmousedown={(event) => event.preventDefault()}
+      onclick={() =>
+        menu.insert(
+          new Date().toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+          })
+        )}
     >
       Insert Date
     </button>
@@ -51,7 +61,7 @@
     <TriggerMenuContent>
       <TriggerMenuList>
         {#snippet children(state)}
-          {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+          {#each state.items as TriggerMenuDataItem[] as item (item.value)}
             <TriggerMenuItem value={item.value} label={item.label}>
               {item.label}
             </TriggerMenuItem>

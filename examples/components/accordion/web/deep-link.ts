@@ -49,7 +49,7 @@ function mount(root: HTMLElement) {
                 <ui-accordion-panel hidden="until-found">
                   <div data-slot="stack">${item.content}</div>
                 </ui-accordion-panel>
-              </ui-accordion-item>`,
+              </ui-accordion-item>`
           )
           .join("")}
       </ui-accordion>

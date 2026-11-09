@@ -185,7 +185,9 @@ The indicator has `data-starting-style` as it appears and `data-ending-style` wh
 ```
 
 ```svelte
-<CheckboxIndicator class="transition-[opacity,scale] duration-150 data-starting-style:scale-50 data-starting-style:opacity-0 data-ending-style:scale-50 data-ending-style:opacity-0" />
+<CheckboxIndicator
+  class="transition-[opacity,scale] duration-150 data-starting-style:scale-50 data-starting-style:opacity-0 data-ending-style:scale-50 data-ending-style:opacity-0"
+/>
 ```
 
 </StyleTabs>
@@ -233,29 +235,47 @@ with `bind:checked` and `bind:value`.
 
 ### Checkbox
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxOptions" />
+<TypeTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxOptions"
+/>
 
 ### CheckboxIndicator
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorProps" />
+<TypeTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxIndicatorProps"
+/>
 
 ### CheckboxGroup
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/checkbox/checkbox-group.ts"
+  name="CheckboxGroupOptions"
+/>
 
 ### State
 
 What `render` and `children` snippets receive.
 
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxState" />
+<StateTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxState"
+/>
 
 The indicator receives the same state.
 
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorState" />
+<StateTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxIndicatorState"
+/>
 
 The group:
 
-<StateTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupState" />
+<StateTable
+  path="../../packages/core/src/components/checkbox/checkbox-group.ts"
+  name="CheckboxGroupState"
+/>
 
 ### Reasons
 
@@ -279,7 +299,10 @@ Create one with `createCheckboxController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxController" />
+<ControllerTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxController"
+/>
 
 ### CheckboxGroup Controller
 

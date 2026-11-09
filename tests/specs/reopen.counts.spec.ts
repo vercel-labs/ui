@@ -26,43 +26,66 @@ async function framesToReopen(page: Page, trigger: Locator, popup: string) {
 
 test.describe("frames to reopen a popup", () => {
   for (const n of sizes) {
-    test(`a menu settles in the frame it reopens (n=${n})`, async ({ page, open }) => {
+    test(`a menu settles in the frame it reopens (n=${n})`, async ({
+      page,
+      open,
+    }) => {
       const budget = budgets["popup.reopen"]
       await open("menu-perf", { n: String(n) })
-      const frames = await framesToReopen(page, page.getByRole("button", { name: "File" }), '[role="menu"]')
-      expect(frames, "The menu settled late. See tests/perf/README.md#popup-reopen.").toBeLessThanOrEqual(
-        budget.frames,
+      const frames = await framesToReopen(
+        page,
+        page.getByRole("button", { name: "File" }),
+        '[role="menu"]'
       )
+      expect(
+        frames,
+        "The menu settled late. See tests/perf/README.md#popup-reopen."
+      ).toBeLessThanOrEqual(budget.frames)
     })
 
-    test(`a select settles in the frame it reopens (n=${n})`, async ({ page, open }) => {
+    test(`a select settles in the frame it reopens (n=${n})`, async ({
+      page,
+      open,
+    }) => {
       const budget = budgets["popup.reopen"]
       await open("select-perf", { n: String(n) })
       const trigger = page.getByRole("combobox", { name: "Pick" })
       const frames = await framesToReopen(page, trigger, '[role="listbox"]')
-      expect(frames, "The list settled late. See tests/perf/README.md#popup-reopen.").toBeLessThanOrEqual(
-        budget.frames,
-      )
+      expect(
+        frames,
+        "The list settled late. See tests/perf/README.md#popup-reopen."
+      ).toBeLessThanOrEqual(budget.frames)
     })
 
-    test(`a popover settles in the frame it reopens (n=${n})`, async ({ page, open }) => {
+    test(`a popover settles in the frame it reopens (n=${n})`, async ({
+      page,
+      open,
+    }) => {
       const budget = budgets["popup.reopen"]
       await open("popover-perf", { n: String(n) })
       const trigger = page.getByRole("button", { name: "Item 1", exact: true })
       const frames = await framesToReopen(page, trigger, '[role="dialog"]')
-      expect(frames, "The popover settled late. See tests/perf/README.md#popup-reopen.").toBeLessThanOrEqual(
-        budget.frames,
-      )
+      expect(
+        frames,
+        "The popover settled late. See tests/perf/README.md#popup-reopen."
+      ).toBeLessThanOrEqual(budget.frames)
     })
 
-    test(`a dialog settles in the frame it reopens (n=${n})`, async ({ page, open }) => {
+    test(`a dialog settles in the frame it reopens (n=${n})`, async ({
+      page,
+      open,
+    }) => {
       const budget = budgets["popup.reopen"]
       await open("dialog-perf", { n: String(n) })
-      const trigger = page.getByRole("button", { name: "Delete Item 1", exact: true })
+      const trigger = page.getByRole("button", {
+        name: "Delete Item 1",
+        exact: true,
+      })
       const frames = await framesToReopen(page, trigger, '[role="dialog"]')
-      expect(frames, "The dialog settled late. See tests/perf/README.md#popup-reopen.").toBeLessThanOrEqual(
-        budget.frames,
-      )
+      expect(
+        frames,
+        "The dialog settled late. See tests/perf/README.md#popup-reopen."
+      ).toBeLessThanOrEqual(budget.frames)
     })
   }
 })

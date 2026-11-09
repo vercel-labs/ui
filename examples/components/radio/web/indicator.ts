@@ -21,7 +21,7 @@ function mount(root: HTMLElement) {
                 </ui-radio>
                 ${theme.label}
               </label>
-            `,
+            `
           )
           .join("")}
       </ui-radio-group>

@@ -10,7 +10,11 @@ const step =
 
 function submit(event: SubmitEvent) {
   event.preventDefault()
-  saveSettings(readSettings(Object.fromEntries(new FormData(event.currentTarget as HTMLFormElement))))
+  saveSettings(
+    readSettings(
+      Object.fromEntries(new FormData(event.currentTarget as HTMLFormElement))
+    )
+  )
   toast.success("Settings saved")
 }
 
@@ -18,7 +22,9 @@ function settingsForm(settings: Settings) {
   return html`<form @submit=${submit} class="grid gap-8">
     <ui-field class="flex min-w-0 flex-row items-center justify-between gap-6">
       <div class="grid gap-1.5">
-        <ui-field-label class=${styles.label}>Email notifications</ui-field-label>
+        <ui-field-label class=${styles.label}
+          >Email notifications</ui-field-label
+        >
         <ui-field-description class=${styles.description}>
           Get an email when someone mentions you or assigns you an issue.
         </ui-field-description>
@@ -35,12 +41,20 @@ function settingsForm(settings: Settings) {
     </ui-field>
     <ui-field class="flex min-w-0 flex-col gap-2">
       <ui-field-label class=${styles.label}>Issues per page</ui-field-label>
-      <ui-number-input name="pageSize" default-value=${settings.pageSize} min="5" max="50" step="5">
+      <ui-number-input
+        name="pageSize"
+        default-value=${settings.pageSize}
+        min="5"
+        max="50"
+        step="5"
+      >
         <ui-number-input-group
           class="flex h-8 w-32 items-center gap-0.5 rounded-2xl border border-transparent bg-input/50 px-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 motion-reduce:transition-none"
         >
           <ui-number-input-decrement
-            ><button aria-label="Decrease" class=${step}>${icon("minus")}</button></ui-number-input-decrement
+            ><button aria-label="Decrease" class=${step}>
+              ${icon("minus")}
+            </button></ui-number-input-decrement
           >
           <ui-number-input-control class="contents">
             <input
@@ -48,7 +62,9 @@ function settingsForm(settings: Settings) {
             />
           </ui-number-input-control>
           <ui-number-input-increment
-            ><button aria-label="Increase" class=${step}>${icon("plus")}</button></ui-number-input-increment
+            ><button aria-label="Increase" class=${step}>
+              ${icon("plus")}
+            </button></ui-number-input-increment
           >
         </ui-number-input-group>
       </ui-number-input>
@@ -68,7 +84,9 @@ function settingsForm(settings: Settings) {
       >
         <div class="flex items-center justify-between text-sm">
           <span class="flex items-center gap-1">
-            <ui-field-label class=${styles.label}>Close stale issues after</ui-field-label>
+            <ui-field-label class=${styles.label}
+              >Close stale issues after</ui-field-label
+            >
             <ui-popover>
               <ui-popover-trigger>
                 <button
@@ -79,19 +97,27 @@ function settingsForm(settings: Settings) {
                 </button>
               </ui-popover-trigger>
               <ui-popover-content side-offset="8" class=${styles.popover}>
-                <ui-popover-title class="font-medium">Stale issues</ui-popover-title>
+                <ui-popover-title class="font-medium"
+                  >Stale issues</ui-popover-title
+                >
                 <ui-popover-description class="text-muted-foreground">
-                  An open issue with no comments or changes for this long moves to Canceled. Its assignee gets
-                  an email first.
+                  An open issue with no comments or changes for this long moves
+                  to Canceled. Its assignee gets an email first.
                 </ui-popover-description>
               </ui-popover-content>
             </ui-popover>
           </span>
-          <ui-slider-value class="text-muted-foreground tabular-nums"></ui-slider-value>
+          <ui-slider-value
+            class="text-muted-foreground tabular-nums"
+          ></ui-slider-value>
         </div>
-        <ui-slider-control class="flex w-full items-center py-2 select-none data-disabled:opacity-50">
+        <ui-slider-control
+          class="flex w-full items-center py-2 select-none data-disabled:opacity-50"
+        >
           <ui-slider-track class="block h-1 w-full rounded-2xl bg-input/90">
-            <ui-slider-indicator class="block rounded-2xl bg-primary"></ui-slider-indicator>
+            <ui-slider-indicator
+              class="block rounded-2xl bg-primary"
+            ></ui-slider-indicator>
             <ui-slider-thumb
               class="block size-4 shrink-0 cursor-default rounded-2xl bg-white shadow-md ring-1 ring-black/10 transition-shadow duration-200 hover:ring-4 hover:ring-ring/30 has-focus-visible:ring-4 has-focus-visible:ring-ring/30 data-dragging:ring-4 data-dragging:ring-ring/30 motion-reduce:transition-none"
             ></ui-slider-thumb>
@@ -100,7 +126,9 @@ function settingsForm(settings: Settings) {
       </ui-slider>
     </ui-field>
     <div class="flex justify-end">
-      <button type="submit" class=${button({ variant: "primary" })}>Save changes</button>
+      <button type="submit" class=${button({ variant: "primary" })}>
+        Save changes
+      </button>
     </div>
   </form>`
 }

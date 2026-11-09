@@ -1,4 +1,10 @@
-import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@ui-sdk/solid/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@ui-sdk/solid/dialog"
 import { Menu, MenuTrigger } from "@ui-sdk/solid/menu"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"

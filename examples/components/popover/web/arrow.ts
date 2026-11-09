@@ -15,7 +15,7 @@ function mount(root: HTMLElement) {
         ${sides
           .map(
             (option) =>
-              `<button type="button" data-size="sm" value="${option.value}" aria-pressed="${option.value === "bottom"}">${option.label}</button>`,
+              `<button type="button" data-size="sm" value="${option.value}" aria-pressed="${option.value === "bottom"}">${option.label}</button>`
           )
           .join("")}
       </div>
@@ -35,15 +35,21 @@ function mount(root: HTMLElement) {
   const content = root.querySelector("ui-popover-content")!
   controls.addEventListener("click", (event) => {
     const button = (event.target as HTMLElement).closest("button")
-    if (!button) return
+    if (!button) {
+      return
+    }
     content.setAttribute("side", button.value)
-    for (const other of controls.querySelectorAll("button"))
+    for (const other of controls.querySelectorAll("button")) {
       other.setAttribute("aria-pressed", String(other === button))
+    }
   })
   root.querySelector("ui-popover")!.addEventListener("openchange", (event) => {
     const { reason, event: cause } = event.detail
-    const inControls = cause?.target instanceof Node && controls.contains(cause.target)
-    if (inControls && reason !== "escape-key") event.preventDefault()
+    const inControls =
+      cause?.target instanceof Node && controls.contains(cause.target)
+    if (inControls && reason !== "escape-key") {
+      event.preventDefault()
+    }
   })
 }
 

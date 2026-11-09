@@ -18,9 +18,16 @@ const log = useLog()
     <PopoverContent :side-offset="8">
       <PopoverArrow />
       <PopoverTitle>Kofi Mensah</PopoverTitle>
-      <PopoverDescription>Engineering manager, platform team.</PopoverDescription>
+      <PopoverDescription
+        >Engineering manager, platform team.</PopoverDescription
+      >
       <div data-slot="row">
-        <button type="button" data-size="sm" data-variant="solid" @click="log('Followed @kofi')">
+        <button
+          type="button"
+          data-size="sm"
+          data-variant="solid"
+          @click="log('Followed @kofi')"
+        >
           Follow
         </button>
       </div>

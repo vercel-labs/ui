@@ -16,7 +16,9 @@ const parts = createParts(scrollArea, {
 })
 
 // The scrollbar a thumb sits in.
-const OrientationContext = createContext<() => "vertical" | "horizontal">(() => "vertical")
+const OrientationContext = createContext<() => "vertical" | "horizontal">(
+  () => "vertical"
+)
 
 /**
  * Groups the parts. The scrollbars are placed against it.
@@ -46,7 +48,9 @@ const keyedBy = (orientation: () => "vertical" | "horizontal") => () => ({
  * A scrollbar for one axis, over the viewport's edge.
  * @stable
  */
-function ScrollAreaScrollbar(props: ScrollAreaScrollbarProps & PartProps<"div", ScrollAreaScrollbarState>) {
+function ScrollAreaScrollbar(
+  props: ScrollAreaScrollbarProps & PartProps<"div", ScrollAreaScrollbarState>
+) {
   const orientation = () => props.orientation ?? "vertical"
   const rest = omit(props, "orientation")
   return (
@@ -61,7 +65,13 @@ function ScrollAreaScrollbar(props: ScrollAreaScrollbarProps & PartProps<"div", 
  * @stable
  */
 function ScrollAreaThumb(props: PartProps<"div", ScrollAreaThumbState>) {
-  return usePart(scrollArea, "thumb", keyedBy(useContext(OrientationContext)), props, "div")
+  return usePart(
+    scrollArea,
+    "thumb",
+    keyedBy(useContext(OrientationContext)),
+    props,
+    "div"
+  )
 }
 
 /**

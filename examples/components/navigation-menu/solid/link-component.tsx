@@ -20,7 +20,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#installation",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -29,7 +30,12 @@ const gettingStarted = [
   },
 ]
 
-function Link(props: JSX.IntrinsicElements["a"] & { href: string; onNavigate: (href: string) => void }) {
+function Link(
+  props: JSX.IntrinsicElements["a"] & {
+    href: string
+    onNavigate: (href: string) => void
+  }
+) {
   const onClick: JSX.EventHandler<HTMLAnchorElement, MouseEvent> = (event) => {
     if (typeof props.onClick === "function") {
       props.onClick(event)
@@ -78,7 +84,13 @@ function Example() {
                 {(page) => (
                   <li>
                     <NavigationMenuLink
-                      render={(props) => <Link {...props} href={page.href} onNavigate={navigate} />}
+                      render={(props) => (
+                        <Link
+                          {...props}
+                          href={page.href}
+                          onNavigate={navigate}
+                        />
+                      )}
                       current={route() === page.href}
                     >
                       <span>{page.title}</span>
@@ -92,7 +104,9 @@ function Example() {
         </NavigationMenuItem>
         <NavigationMenuItem>
           <NavigationMenuLink
-            render={(props) => <Link {...props} href="#components" onNavigate={navigate} />}
+            render={(props) => (
+              <Link {...props} href="#components" onNavigate={navigate} />
+            )}
             current={route() === "#components"}
           >
             Components

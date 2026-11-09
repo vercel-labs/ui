@@ -26,7 +26,10 @@ function searchIssues(query: string, { signal }: { signal: AbortSignal }) {
       resolve(
         issues
           .filter((issue) => issue.toLowerCase().includes(needle))
-          .map((issue) => ({ value: issue.toLowerCase().replaceAll(" ", "-"), label: issue })),
+          .map((issue) => ({
+            value: issue.toLowerCase().replaceAll(" ", "-"),
+            label: issue,
+          }))
       )
     }, 400)
     signal.addEventListener("abort", () => {
@@ -52,13 +55,24 @@ const {
   >
     <CommandInput aria-label="Search issues" placeholder="Search issues…" />
     <CommandStatus v-slot="{ state }">
-      {{ state.loading ? "Searching…" : `${state.count} ${state.count === 1 ? "issue" : "issues"}` }}
+      {{
+        state.loading
+          ? "Searching…"
+          : `${state.count} ${state.count === 1 ? "issue" : "issues"}`
+      }}
     </CommandStatus>
     <CommandEmpty v-slot="{ state }">
-      <template v-if="state.empty && !state.loading">No issues match “{{ state.query }}”.</template>
+      <template v-if="state.empty && !state.loading"
+        >No issues match “{{ state.query }}”.</template
+      >
     </CommandEmpty>
     <CommandList>
-      <CommandItem v-for="issue in issues.items" :key="issue.value" :value="issue.value" :label="issue.label">
+      <CommandItem
+        v-for="issue in issues.items"
+        :key="issue.value"
+        :value="issue.value"
+        :label="issue.label"
+      >
         {{ issue.label }}
       </CommandItem>
     </CommandList>

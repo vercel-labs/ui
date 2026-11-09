@@ -51,20 +51,27 @@ type TimelineOptions = {
   coalesce?: boolean
 }
 
-const idOf = (change: { ref: string; key: string }) => `${change.ref}:${change.key}`
+const idOf = (change: { ref: string; key: string }) =>
+  `${change.ref}:${change.key}`
 
 // A component's value for a key now, like a checkbox's `checked`.
 const current = ({ ref, key }: { ref: string; key: string }) =>
-  (registered.get(ref)?.instance.deref()?.get() as Record<string, unknown> | undefined)?.[key]
+  (
+    registered.get(ref)?.instance.deref()?.get() as
+      Record<string, unknown> | undefined
+  )?.[key]
 // check-code: allow return-type recursive, so TypeScript cannot infer it.
 const round = (value: unknown): unknown =>
   typeof value === "number"
     ? Math.round(value * 100) / 100
     : value && typeof value === "object" && !Array.isArray(value)
-      ? Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, round(inner)]))
+      ? Object.fromEntries(
+          Object.entries(value).map(([key, inner]) => [key, round(inner)])
+        )
       : value
 // Whether two values are the same, like a date range a setter copied.
-const same = (a: unknown, b: unknown) => sameValue(a, b) || JSON.stringify(a) === JSON.stringify(b)
+const same = (a: unknown, b: unknown) =>
+  sameValue(a, b) || JSON.stringify(a) === JSON.stringify(b)
 const show = (value: unknown) =>
   Array.isArray(value)
     ? value.join(", ") || "none"
@@ -81,15 +88,27 @@ function describeEntry(entry: TimelineEntry) {
 }
 
 // A key's value after the first `position` entries, skipping reverted ones.
-function valueAt(entries: readonly TimelineEntry[], position: number, id: string) {
+function valueAt(
+  entries: readonly TimelineEntry[],
+  position: number,
+  id: string
+) {
   let value: unknown
   let seen = false
   for (const [index, entry] of entries.entries()) {
-    if (idOf(entry) !== id) continue
-    if (!seen) value = entry.previous
+    if (idOf(entry) !== id) {
+      continue
+    }
+    if (!seen) {
+      value = entry.previous
+    }
     seen = true
-    if (index >= position) break
-    if (!entry.reverted) value = entry.value
+    if (index >= position) {
+      break
+    }
+    if (!entry.reverted) {
+      value = entry.value
+    }
   }
   return value
 }
@@ -108,10 +127,15 @@ function valueAt(entries: readonly TimelineEntry[], position: number, id: string
  * ```
  * @experimental
  */
-function createTimeline(agent: ReturnType<typeof createAgent>, options: TimelineOptions = {}) {
+function createTimeline(
+  agent: ReturnType<typeof createAgent>,
+  options: TimelineOptions = {}
+) {
   const act = guardedActions.get(agent.act)
   if (!act) {
-    throw new Error("createTimeline requires an agent with the original act method returned by createAgent.")
+    throw new Error(
+      "createTimeline requires an agent with the original act method returned by createAgent."
+    )
   }
   const keys = options.keys ?? ["value", "checked", "pressed"]
   let entries: TimelineEntry[] = []
@@ -128,10 +152,14 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
   }
 
   const heard = (observed: ObservedChange) => {
-    if (!keys.includes(observed.key)) return
+    if (!keys.includes(observed.key)) {
+      return
+    }
     const id = idOf(observed)
     // The agent changing a key being put back is the timeline's own write.
-    if (observed.source === "agent" && restoring.has(id)) return
+    if (observed.source === "agent" && restoring.has(id)) {
+      return
+    }
     // Anyone else's change is later than the restore, so it stays and the restore leaves that key.
     restoring.delete(id)
     const entry: TimelineEntry = {
@@ -144,7 +172,9 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
       source: observed.source,
       reason: observed.reason,
     }
-    if (registered.get(observed.ref)?.secret) entry.redacted = true
+    if (registered.get(observed.ref)?.secret) {
+      entry.redacted = true
+    }
     // A change made from the past drops the future it replaces.
     const kept = entries.slice(0, position)
     const last = kept[kept.length - 1]
@@ -158,17 +188,26 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
       last.reason === entry.reason &&
       entry.reason !== "item-press" &&
       entry.reason !== "imperative"
-    )
-      return update([...kept.slice(0, -1), { ...last, value: entry.value }], kept.length)
+    ) {
+      return update(
+        [...kept.slice(0, -1), { ...last, value: entry.value }],
+        kept.length
+      )
+    }
     update([...kept, entry], kept.length + 1)
   }
   // A drag that commits arrives settled, as one change, unless every step is wanted.
-  const stop = observe(heard, { within: options.within, live: options.coalesce === false })
+  const stop = observe(heard, {
+    within: options.within,
+    live: options.coalesce === false,
+  })
 
   // One act per key, so one that's refused or left the page doesn't stop the
   // rest. Resolves with the ones that didn't go back. A redacted key never
   // does: its values read "[redacted]", which would land in the field.
-  const restore = async (steps: { ref: string; key: string; value: unknown }[]) => {
+  const restore = async (
+    steps: { ref: string; key: string; value: unknown }[]
+  ) => {
     restoring = new Set(steps.map(idOf))
     // An in-progress edit must supersede restoration before its coalesced history entry commits.
     const stopGuard = observe(
@@ -177,9 +216,11 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
           restoring.delete(idOf(change))
         }
       },
-      { within: options.within, live: true },
+      { within: options.within, live: true }
     )
-    const redacted = new Set(entries.filter((entry) => entry.redacted).map(idOf))
+    const redacted = new Set(
+      entries.filter((entry) => entry.redacted).map(idOf)
+    )
     const failed: typeof steps = []
     try {
       for (const step of steps) {
@@ -188,13 +229,22 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
           !redacted.has(idOf(step)) &&
           restoring.has(idOf(step)) &&
           (
-            await act([{ ref: step.ref, action: setterOf(step.key), args: [step.value] }], () =>
-              restoring.has(idOf(step)),
+            await act(
+              [
+                {
+                  ref: step.ref,
+                  action: setterOf(step.key),
+                  args: [step.value],
+                },
+              ],
+              () => restoring.has(idOf(step))
             )
           ).ok &&
           // A change callback or a controlled owner can refuse a write the agent still calls done.
           same(current(step), step.value)
-        if (!done) failed.push(step)
+        if (!done) {
+          failed.push(step)
+        }
       }
     } finally {
       stopGuard()
@@ -229,20 +279,31 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
     seek: (to: number) =>
       inTurn(async () => {
         const target = Math.max(0, Math.min(entries.length, to))
-        if (target === position) return []
+        if (target === position) {
+          return []
+        }
         const from = position
         const before = entries
         // Every key the skipped stretch touched goes to its value at the target.
         const touched = new Map<string, { ref: string; key: string }>()
-        for (const entry of entries.slice(Math.min(target, from), Math.max(target, from)))
+        for (const entry of entries.slice(
+          Math.min(target, from),
+          Math.max(target, from)
+        )) {
           touched.set(idOf(entry), { ref: entry.ref, key: entry.key })
+        }
         // At the target while it writes, so a change made meanwhile drops the future it replaces.
         update(entries, target)
         const failed = await restore(
-          [...touched].map(([id, step]) => ({ ...step, value: valueAt(entries, target, id) })),
+          [...touched].map(([id, step]) => ({
+            ...step,
+            value: valueAt(entries, target, id),
+          }))
         )
         // Nothing went back and nothing new was recorded, so the page is still where it was.
-        if (failed.length === touched.size && entries === before) update(entries, from)
+        if (failed.length === touched.size && entries === before) {
+          update(entries, from)
+        }
         return failed
       }),
     /**
@@ -256,25 +317,36 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
         const values = new Map<string, unknown>()
         entries.slice(0, position).forEach((entry) => {
           const id = idOf(entry)
-          if (!values.has(id)) values.set(id, entry.previous)
-          if (entry.reverted) return
-          if (entry.source === source) undone.add(entry)
-          else values.set(id, entry.value)
+          if (!values.has(id)) {
+            values.set(id, entry.previous)
+          }
+          if (entry.reverted) {
+            return
+          }
+          if (entry.source === source) {
+            undone.add(entry)
+          } else {
+            values.set(id, entry.value)
+          }
         })
         const touched = new Set([...undone].map(idOf))
-        if (!touched.size) return []
+        if (!touched.size) {
+          return []
+        }
         const failed = await restore(
           [...touched].map((id) => {
             const [ref, key] = id.split(":")
             return { ref, key, value: values.get(id) }
-          }),
+          })
         )
         const stayed = new Set(failed.map(idOf))
         update(
           entries.map((entry) =>
-            undone.has(entry) && !stayed.has(idOf(entry)) ? { ...entry, reverted: true } : entry,
+            undone.has(entry) && !stayed.has(idOf(entry))
+              ? { ...entry, reverted: true }
+              : entry
           ),
-          position,
+          position
         )
         return failed
       }),
@@ -292,4 +364,9 @@ function createTimeline(agent: ReturnType<typeof createAgent>, options: Timeline
 
 export { stageChanges, type StagedChange } from "./stage"
 
-export { createTimeline, describeEntry, type TimelineEntry, type TimelineOptions }
+export {
+  createTimeline,
+  describeEntry,
+  type TimelineEntry,
+  type TimelineOptions,
+}

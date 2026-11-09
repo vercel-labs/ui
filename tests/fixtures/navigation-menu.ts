@@ -46,13 +46,17 @@ const navigationMenuFixture = {
 // orientation=vertical&hover=false&close-on-select=false&container=id.
 function navigationMenuOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   const container = params.get("container")
-  const orientation = params.get("orientation") as "horizontal" | "vertical" | null
+  const orientation = params.get("orientation") as
+    "horizontal" | "vertical" | null
   return {
     delay: number("delay") ?? 50,
     closeDelay: number("closeDelay") ?? 50,
-    ...(params.has("open") && { defaultValue: params.get("open") || "products" }),
+    ...(params.has("open") && {
+      defaultValue: params.get("open") || "products",
+    }),
     ...(orientation && { orientation }),
     ...(params.get("hover") === "false" && { openOnHover: false }),
     ...(params.get("close-on-select") === "false" && { closeOnSelect: false }),

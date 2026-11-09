@@ -30,7 +30,7 @@ const toaster = createToaster()
 useShortcut(
   "k",
   () => presses.value++,
-  () => ({ allowInInput: armed.value }),
+  () => ({ allowInInput: armed.value })
 )
 </script>
 

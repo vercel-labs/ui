@@ -23,7 +23,10 @@ import { useLog } from "../../../shared/vue/log"
 const value = ref<DatePickerValue>("2026-10-16")
 const log = useLog()
 
-function onValueChange(next: DatePickerValue, details: { reason: DatePickerValueChangeReason }) {
+function onValueChange(
+  next: DatePickerValue,
+  details: { reason: DatePickerValueChangeReason }
+) {
   log(`${next ?? "No date"} (${details.reason})`)
 }
 </script>

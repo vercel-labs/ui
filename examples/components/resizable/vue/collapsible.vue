@@ -1,11 +1,20 @@
 <script setup lang="ts">
 import { FolderIcon, SearchIcon, SettingsIcon } from "@lucide/vue"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/vue/resizable"
 </script>
 
 <template>
   <Resizable>
-    <ResizablePanel :default-size="30" :min-size="25" collapsible collapsed-size="48px">
+    <ResizablePanel
+      :default-size="30"
+      :min-size="25"
+      collapsible
+      collapsed-size="48px"
+    >
       <ul>
         <li data-slot="row">
           <FolderIcon aria-hidden="true" />

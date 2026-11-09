@@ -15,13 +15,19 @@ const action = ref("")
 const align = ref("left")
 const journal = ref(false)
 const shortcuts = ref(true)
-const items = computed(() => casesData({ align: align.value, journal: journal.value }))
+const items = computed(() =>
+  casesData({ align: align.value, journal: journal.value })
+)
 </script>
 
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Menu :items="items" :item-shortcuts="shortcuts" @action="(value: string) => (action = value)">
+    <Menu
+      :items="items"
+      :item-shortcuts="shortcuts"
+      @action="(value: string) => (action = value)"
+    >
       <MenuTrigger>Edit</MenuTrigger>
     </Menu>
     <button @click="align = 'right'">Align right</button>

@@ -4,8 +4,21 @@ import {
   type NavigationMenuController,
   type NavigationMenuValueChangeReason,
 } from "@ui-sdk/core/navigation-menu"
-import { Teleport, defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
-import { containerProp, renderPopup, usePopupContainer, type PopupContainer } from "./popup"
+import {
+  Teleport,
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
+import {
+  containerProp,
+  renderPopup,
+  usePopupContainer,
+  type PopupContainer,
+} from "./popup"
 import { createParts, withElement } from "./create-parts"
 import {
   optionalBoolean,
@@ -20,7 +33,9 @@ import {
 type Details = ChangeDetails<NavigationMenuValueChangeReason>
 
 // Where popups render. Set on <NavigationMenu>, or on the part.
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("navigation-menu-container")
+const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(
+  "navigation-menu-container"
+)
 
 const useNavigationMenu = () => useHandle(navigationMenuPrimitive)
 
@@ -34,7 +49,11 @@ const useItemValue = () => {
 
 function useItem(part: string) {
   const value = useItemValue()
-  if (value() == null) throw new Error(`<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`)
+  if (value() == null) {
+    throw new Error(
+      `<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`
+    )
+  }
   return value as () => string
 }
 
@@ -71,8 +90,14 @@ const NavigationMenu = withElement(
     inheritAttrs: false,
     props: {
       value: { type: String as PropType<string | null>, default: undefined },
-      modelValue: { type: String as PropType<string | null>, default: undefined },
-      defaultValue: { type: String as PropType<string | null>, default: undefined },
+      modelValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
+      defaultValue: {
+        type: String as PropType<string | null>,
+        default: undefined,
+      },
       delay: Number,
       closeDelay: Number,
       openOnHover: optionalBoolean,
@@ -92,7 +117,10 @@ const NavigationMenu = withElement(
     setup(props, { emit }) {
       const parentMenu = useScope(navigationMenuPrimitive)?.handle
       const parentItem = useItemValue()() ?? null
-      const parent = parentMenu && parentItem !== null ? { api: parentMenu.api, item: parentItem } : undefined
+      const parent =
+        parentMenu && parentItem !== null
+          ? { api: parentMenu.api, item: parentItem }
+          : undefined
       const menu = usePrimitive(navigationMenuPrimitive, () => ({
         value: orModel(props.value, props.modelValue),
         defaultValue: props.defaultValue,
@@ -107,16 +135,19 @@ const NavigationMenu = withElement(
         onValueChange: (value: string | null, details: Details) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
       }))
       provide(ContainerKey, () => props.container)
       return usePart(menu, "root", undefined, undefined, parent ? "div" : "nav")
     },
-  }),
+  })
 )
 
 /**
@@ -147,7 +178,11 @@ const NavigationMenuContent = withElement(
   defineComponent({
     name: "NavigationMenuContent",
     inheritAttrs: false,
-    props: { ...placementProps, keepMounted: optionalBoolean, hiddenUntilFound: optionalBoolean },
+    props: {
+      ...placementProps,
+      keepMounted: optionalBoolean,
+      hiddenUntilFound: optionalBoolean,
+    },
     slots: Object as PartSlots<typeof navigationMenuPrimitive, "content">,
     setup(props) {
       const menu = useNavigationMenu()
@@ -161,15 +196,19 @@ const NavigationMenuContent = withElement(
       const part = usePart(menu, "content", content)
       return () => {
         const element = part()
-        if (!element) return null
+        if (!element) {
+          return null
+        }
         const viewport = menu.api.internal.viewportElement()
         // A Teleport and an element are different nodes, so moving between them
         // mounts the content again, and it binds for where it is.
-        if (viewport && menu.api.internal.inViewport(value())) return h(Teleport, { to: viewport }, [element])
+        if (viewport && menu.api.internal.inViewport(value())) {
+          return h(Teleport, { to: viewport }, [element])
+        }
         return menu.state.viewport ? element : renderPopup(element, target())
       }
     },
-  }),
+  })
 )
 
 /**
@@ -208,7 +247,7 @@ const NavigationMenuViewport = withElement(
       // The viewport is always present, so the part always renders.
       return () => renderPopup(part()!, target())
     },
-  }),
+  })
 )
 
 /**

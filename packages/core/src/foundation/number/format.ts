@@ -15,7 +15,10 @@ const formatters = new Map<string, Intl.NumberFormat>()
  * since formatters are slow to build.
  * @experimental
  */
-function numberFormatter(locale?: string, options: Intl.NumberFormatOptions = {}) {
+function numberFormatter(
+  locale?: string,
+  options: Intl.NumberFormatOptions = {}
+) {
   const key = `${locale ?? ""}|${JSON.stringify(options)}`
   let formatter = formatters.get(key)
   if (!formatter) {
@@ -42,14 +45,20 @@ function intlDecimals(format: Intl.NumberFormatOptions | undefined) {
 // Intl shows at most three decimals by default, which would show 0.0001 as 0.
 // Without your own maximum, a value shows its step's decimals, and never fewer
 // than Intl would, so yen stay whole and dollars show cents.
-function displayOptions(format: Intl.NumberFormatOptions | undefined, step: number) {
+function displayOptions(
+  format: Intl.NumberFormatOptions | undefined,
+  step: number
+) {
   const options = { ...format }
-  if (options.maximumFractionDigits === undefined && options.maximumSignificantDigits === undefined) {
+  if (
+    options.maximumFractionDigits === undefined &&
+    options.maximumSignificantDigits === undefined
+  ) {
     const decimals = decimalsOf(step) + (options.style === "percent" ? -2 : 0)
     options.maximumFractionDigits = Math.max(
       options.minimumFractionDigits ?? 0,
       decimals,
-      intlDecimals(format),
+      intlDecimals(format)
     )
   }
   return options
@@ -60,9 +69,17 @@ function displayOptions(format: Intl.NumberFormatOptions | undefined, step: numb
  * the locale, like "$1,234.50", "45%" or "1.2K". Empty for null and non-finite values.
  * @experimental
  */
-function formatNumber(value: number | null, locale?: string, format?: NumberFormat) {
-  if (value === null || !Number.isFinite(value)) return ""
-  if (typeof format === "function") return format(value)
+function formatNumber(
+  value: number | null,
+  locale?: string,
+  format?: NumberFormat
+) {
+  if (value === null || !Number.isFinite(value)) {
+    return ""
+  }
+  if (typeof format === "function") {
+    return format(value)
+  }
   return numberFormatter(locale, format).format(value)
 }
 
@@ -71,9 +88,18 @@ function formatNumber(value: number | null, locale?: string, format?: NumberForm
  * both ends share written once. A format function joins its two texts with a dash.
  * @experimental
  */
-function formatNumberRange(start: number, end: number, locale?: string, format?: NumberFormat) {
-  if (!Number.isFinite(start) || !Number.isFinite(end)) return ""
-  if (typeof format === "function") return `${format(start)} – ${format(end)}`
+function formatNumberRange(
+  start: number,
+  end: number,
+  locale?: string,
+  format?: NumberFormat
+) {
+  if (!Number.isFinite(start) || !Number.isFinite(end)) {
+    return ""
+  }
+  if (typeof format === "function") {
+    return `${format(start)} – ${format(end)}`
+  }
   // `formatRange` is newer than the ES2022 types, and older engines lack it.
   const formatter = numberFormatter(locale, format) as Intl.NumberFormat & {
     formatRange?: (start: number, end: number) => string
@@ -89,10 +115,19 @@ function formatNumberRange(start: number, end: number, locale?: string, format?:
  * like an odometer. A format function's text is one literal part.
  * @experimental
  */
-function formatNumberToParts(value: number | null, locale?: string, format?: NumberFormat) {
-  if (value === null || !Number.isFinite(value)) return [] as Intl.NumberFormatPart[]
-  if (typeof format === "function")
-    return [{ type: "literal", value: format(value) }] as Intl.NumberFormatPart[]
+function formatNumberToParts(
+  value: number | null,
+  locale?: string,
+  format?: NumberFormat
+) {
+  if (value === null || !Number.isFinite(value)) {
+    return [] as Intl.NumberFormatPart[]
+  }
+  if (typeof format === "function") {
+    return [
+      { type: "literal", value: format(value) },
+    ] as Intl.NumberFormatPart[]
+  }
   return numberFormatter(locale, format).formatToParts(value)
 }
 

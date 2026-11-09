@@ -19,7 +19,9 @@ function Failed(props: { retry: () => void }) {
   return (
     <main class="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
       <h1 class="text-base font-semibold">Something went wrong</h1>
-      <p class="text-muted-foreground">The tracker couldn't load. Try again in a moment.</p>
+      <p class="text-muted-foreground">
+        The tracker couldn't load. Try again in a moment.
+      </p>
       <Button onClick={props.retry}>Try again</Button>
     </main>
   )
@@ -32,7 +34,9 @@ function App() {
       {(props) => (
         <>
           <Header />
-          <Errored fallback={(_, reset) => <Failed retry={reset} />}>{props.children}</Errored>
+          <Errored fallback={(_, reset) => <Failed retry={reset} />}>
+            {props.children}
+          </Errored>
           <Toaster />
           <Confirmer />
         </>

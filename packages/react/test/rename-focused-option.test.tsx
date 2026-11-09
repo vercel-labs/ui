@@ -32,11 +32,13 @@ test("the focused option keeps the tab stop and arrow keys when its value change
   const container = document.body.appendChild(document.createElement("div"))
   root = createRoot(container)
   await React.act(async () => root!.render(<App />))
-  const options = [...container.querySelectorAll<HTMLElement>('[role="option"]')]
+  const options = [
+    ...container.querySelectorAll<HTMLElement>('[role="option"]'),
+  ]
   const press = (key: string) =>
     React.act(async () => {
       document.activeElement!.dispatchEvent(
-        new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }),
+        new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
       )
     })
   await React.act(async () => options[0].focus())

@@ -40,7 +40,10 @@ const triggers: TriggerDefinition[] = [
       <FieldLabel>Message</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type @ and a first name…" />
+          <TriggerMenuInput
+            v-bind="props"
+            placeholder="Type @ and a first name…"
+          />
         </template>
       </FieldControl>
     </Field>
@@ -56,7 +59,9 @@ const triggers: TriggerDefinition[] = [
             :disabled="person.disabled"
           >
             {{ person.label }}
-            <span data-slot="hint">{{ person.disabled ? "Deactivated" : `@${person.value}` }}</span>
+            <span data-slot="hint">{{
+              person.disabled ? "Deactivated" : `@${person.value}`
+            }}</span>
           </TriggerMenuItem>
         </TriggerMenuGroup>
         <TriggerMenuSeparator />

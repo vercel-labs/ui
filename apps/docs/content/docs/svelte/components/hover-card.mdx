@@ -37,7 +37,11 @@ Import the parts and put them together:
 
 ```svelte
 <script lang="ts">
-  import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui-sdk/svelte/hover-card"
+  import {
+    HoverCard,
+    HoverCardContent,
+    HoverCardTrigger,
+  } from "@ui-sdk/svelte/hover-card"
 </script>
 
 <HoverCard>
@@ -63,7 +67,13 @@ Import the parts and put them together:
 `sideOffset` is the gap to the link, 4 pixels by default. `alignOffset` shifts the card along it, and `collisionPadding` is the space kept from the edges of the window. `anchor` positions the card against something other than the link: an element, a CSS selector, a point like `{ x, y }`, or anything with `getBoundingClientRect()`.
 
 ```svelte
-<HoverCardContent side="right" align="start" sideOffset={8} collisionPadding={16} anchor={row} />
+<HoverCardContent
+  side="right"
+  align="start"
+  sideOffset={8}
+  collisionPadding={16}
+  anchor={row}
+/>
 ```
 
 ## Delays
@@ -144,7 +154,9 @@ The content has `data-starting-style` while it opens and `data-ending-style` whi
 ```
 
 ```svelte
-<HoverCardContent class="origin-(--transform-origin) transition-[opacity,scale] duration-150 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0" />
+<HoverCardContent
+  class="origin-(--transform-origin) transition-[opacity,scale] duration-150 data-starting-style:scale-96 data-starting-style:opacity-0 data-ending-style:scale-96 data-ending-style:opacity-0"
+/>
 ```
 
 </StyleTabs>
@@ -194,17 +206,26 @@ Props and callbacks are the same as below, as Svelte props. `open` can be bound 
 
 ### HoverCard
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardOptions" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardOptions"
+/>
 
 ### HoverCardTrigger
 
 A trigger outside the card also takes `controller`.
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerProps"
+/>
 
 ### HoverCardContent
 
-<TypeTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentProps"
+/>
 
 ### HoverCardArrow
 
@@ -216,15 +237,24 @@ What `render` and `children` snippets receive, per part.
 
 `HoverCardTrigger`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardTriggerState"
+/>
 
 `HoverCardContent`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardContentState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardContentState"
+/>
 
 `HoverCardArrow`:
 
-<StateTable path="../../packages/core/src/components/hover-card/hover-card.ts" name="HoverCardArrowState" />
+<StateTable
+  path="../../packages/core/src/components/hover-card/hover-card.ts"
+  name="HoverCardArrowState"
+/>
 
 ### Reasons
 

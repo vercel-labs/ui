@@ -28,7 +28,11 @@ Renders data items. Used by data selects, and available for custom layouts.
       <Self items={entry.items} />
     </SelectGroup>
   {:else}
-    <SelectItem value={entry.value} label={entry.label} disabled={entry.disabled}>
+    <SelectItem
+      value={entry.value}
+      label={entry.label}
+      disabled={entry.disabled}
+    >
       {entry.label}
     </SelectItem>
   {/if}

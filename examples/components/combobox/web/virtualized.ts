@@ -6,16 +6,30 @@ const manyItems = Array.from({ length: 10_000 }, (_, index) => ({
   label: `Item ${index + 1}`,
 }))
 
-function visibleRows(scrollTop: number, height: number, count: number, row: number) {
+function visibleRows(
+  scrollTop: number,
+  height: number,
+  count: number,
+  row: number
+) {
   const start = Math.max(0, Math.floor(scrollTop / row) - 4)
   const end = Math.min(count, Math.ceil((scrollTop + height) / row) + 4)
   return { start, end }
 }
 
-function scrollForRow(index: number, scrollTop: number, height: number, row: number) {
+function scrollForRow(
+  index: number,
+  scrollTop: number,
+  height: number,
+  row: number
+) {
   const top = index * row
-  if (top < scrollTop) return top
-  if (top + row > scrollTop + height) return top + row - height
+  if (top < scrollTop) {
+    return top
+  }
+  if (top + row > scrollTop + height) {
+    return top + row - height
+  }
   return scrollTop
 }
 
@@ -44,23 +58,38 @@ function mount(root: HTMLElement) {
       </ui-combobox-content>
     </ui-combobox>
   `
-  const combobox = root.querySelector("ui-combobox") as HTMLElement & { items: typeof manyItems }
+  const combobox = root.querySelector("ui-combobox") as HTMLElement & {
+    items: typeof manyItems
+  }
   const scroller = root.querySelector<HTMLElement>("ui-combobox-content > div")!
   const list = root.querySelector<HTMLElement>("ui-combobox-list")!
 
   let matches = manyItems
   const filter = (text: string) => {
     const needle = text.trim().toLowerCase()
-    matches = needle ? manyItems.filter((item) => item.label.toLowerCase().includes(needle)) : manyItems
+    matches = needle
+      ? manyItems.filter((item) => item.label.toLowerCase().includes(needle))
+      : manyItems
   }
 
   const rendered = new Map<string, HTMLElement>()
   const render = () => {
     list.style.height = `${matches.length * row}px`
-    const { start, end } = visibleRows(scroller.scrollTop, height, matches.length, row)
-    const visible = new Map(matches.slice(start, end).map((item, offset) => [item.value, start + offset]))
+    const { start, end } = visibleRows(
+      scroller.scrollTop,
+      height,
+      matches.length,
+      row
+    )
+    const visible = new Map(
+      matches
+        .slice(start, end)
+        .map((item, offset) => [item.value, start + offset])
+    )
     for (const [value, el] of rendered) {
-      if (visible.has(value)) continue
+      if (visible.has(value)) {
+        continue
+      }
       el.remove()
       rendered.delete(value)
     }
@@ -74,7 +103,7 @@ function mount(root: HTMLElement) {
       const item = matches[index]
       list.insertAdjacentHTML(
         "beforeend",
-        `<ui-combobox-item value="${item.value}" label="${item.label}" index="${index}" style="top: ${index * row}px; height: ${row}px">${item.label}</ui-combobox-item>`,
+        `<ui-combobox-item value="${item.value}" label="${item.label}" index="${index}" style="top: ${index * row}px; height: ${row}px">${item.label}</ui-combobox-item>`
       )
       rendered.set(value, list.lastElementChild as HTMLElement)
     }
@@ -83,14 +112,25 @@ function mount(root: HTMLElement) {
   combobox.items = manyItems
   scroller.addEventListener("scroll", render)
   combobox.addEventListener("querychange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: string; reason: string }>).detail
+    const { value, reason } = (
+      event as CustomEvent<{ value: string; reason: string }>
+    ).detail
     filter(reason === "input-change" ? value : "")
     render()
   })
   combobox.addEventListener("highlight", (event) => {
-    const { index } = (event as CustomEvent<{ value: string | null; index: number }>).detail
-    if (index < 0) return
-    scroller.scrollTop = scrollForRow(index, scroller.scrollTop, scroller.clientHeight, row)
+    const { index } = (
+      event as CustomEvent<{ value: string | null; index: number }>
+    ).detail
+    if (index < 0) {
+      return
+    }
+    scroller.scrollTop = scrollForRow(
+      index,
+      scroller.scrollTop,
+      scroller.clientHeight,
+      row
+    )
     render()
   })
 }

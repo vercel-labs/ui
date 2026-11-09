@@ -16,7 +16,9 @@ function mount(root: HTMLElement) {
     </div>
   `
   const wifi = root.querySelector("ui-switch")!
-  root.querySelector("button")!.addEventListener("click", () => wifi.api.toggle())
+  root
+    .querySelector("button")!
+    .addEventListener("click", () => wifi.api.toggle())
   wifi.addEventListener("checkedchange", (event) => {
     const { value, reason } = event.detail
     log(root, `${value ? "On" : "Off"} (${reason})`)

@@ -19,7 +19,8 @@
   multiple
   activation="automatic"
   defaultValue={["readme"]}
-  onValueChange={(value, details) => log(`${value.length} selected (${details.reason})`)}
+  onValueChange={(value, details) =>
+    log(`${value.length} selected (${details.reason})`)}
   aria-label="Files"
 >
   {#each files as file (file.value)}

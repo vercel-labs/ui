@@ -2,10 +2,14 @@ import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
 import App from "./apps/file-input-ssr-app.svelte"
 
-type Props = { which: "named" | "disabled" | "list" | "render" | "forwarded" | "remove"; files?: File[] }
+type Props = {
+  which: "named" | "disabled" | "list" | "render" | "forwarded" | "remove"
+  files?: File[]
+}
 
 // Svelte's server output carries hydration comments between elements and text.
-const markup = (props: Props) => render(App, { props }).body.replace(/<!--[^]*?-->/g, "")
+const markup = (props: Props) =>
+  render(App, { props }).body.replace(/<!--[^]*?-->/g, "")
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a file input", () => {
@@ -14,7 +18,7 @@ describe("server rendering a file input", () => {
     expect(typeof window).toBe("undefined")
     expect(html).toContain('data-slot="file-input-dropzone"')
     expect(html).toMatch(
-      /<input[^>]*type="file"[^>]*accept="image\/\*"[^>]*multiple[^>]*name="files"[^>]*required/,
+      /<input[^>]*type="file"[^>]*accept="image\/\*"[^>]*multiple[^>]*name="files"[^>]*required/
     )
   })
 
@@ -44,6 +48,8 @@ describe("server rendering a file input", () => {
 
   test("a remove button given a file removes that file outside an item", () => {
     const file = new File(["x"], "a.png", { type: "image/png" })
-    expect(markup({ which: "remove", files: [file] })).toContain('aria-label="Remove a.png"')
+    expect(markup({ which: "remove", files: [file] })).toContain(
+      'aria-label="Remove a.png"'
+    )
   })
 })

@@ -27,6 +27,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **Button-like parts render `type`, `disabled` and `aria-disabled` together until they bind**, and no role, so server HTML is right for a `<button>` and an `<a>`. On an `<a>` or `<span>`, `type` and `disabled` are invalid but inert until then, and a disabled link still navigates before hydration, since only script can stop the click. Before bind they don't write `tabindex`, so a web component's author tabindex survives the first pass (PR 326, 2026-11-09).
 
 ## Known and open (don't report again, check whether fixed)
+
 - **Before the elements upgrade, closed popup content and inactive panels show inline**, then collapse. Writing `hidden` on content parts avoids it; the popover and menu `basic` examples don't (PR 321).
 - **Core's popover reset (`resetPopoverStyles`) is written to the document only**, so a popup in a user's shadow root keeps the browser's `[popover]` styles for anything the page doesn't set. `web.css` now resets its backdrops itself (PR 321).
 - **`@ui-sdk/web` ships `browser/web.css` but doesn't export `./web.css`**; bundler users import it from `@ui-sdk/core` (PR 321).

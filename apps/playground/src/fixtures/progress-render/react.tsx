@@ -1,6 +1,11 @@
 import { Avatar, AvatarFallback } from "@ui-sdk/react/avatar"
 import { OTPInput, OTPInputSlot } from "@ui-sdk/react/otp-input"
-import { Progress, ProgressIndicator, ProgressTrack, ProgressValue } from "@ui-sdk/react/progress"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressTrack,
+  ProgressValue,
+} from "@ui-sdk/react/progress"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 
@@ -23,9 +28,18 @@ function Fixture() {
         </ProgressTrack>
       </Progress>
       <Avatar className="avatar" render={<div />}>
-        <AvatarFallback className={(state) => `avatar-fallback is-${state.loadingStatus}`}>RF</AvatarFallback>
+        <AvatarFallback
+          className={(state) => `avatar-fallback is-${state.loadingStatus}`}
+        >
+          RF
+        </AvatarFallback>
       </Avatar>
-      <OTPInput aria-label="PIN" maxLength={4} className="otp" render={<section />}>
+      <OTPInput
+        aria-label="PIN"
+        maxLength={4}
+        className="otp"
+        render={<section />}
+      >
         {[0, 1, 2, 3].map((index) => (
           <OTPInputSlot
             key={index}
@@ -47,7 +61,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

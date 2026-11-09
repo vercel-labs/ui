@@ -21,7 +21,9 @@ function Fixture() {
       >
         <AccordionItem
           value="overview"
-          className={(state) => `accordion-item ${state.open ? "is-open" : "is-closed"}`}
+          className={(state) =>
+            `accordion-item ${state.open ? "is-open" : "is-closed"}`
+          }
         >
           <AccordionHeader className="accordion-header" render={<h2 />}>
             <AccordionTrigger
@@ -49,7 +51,9 @@ function Fixture() {
               Details
             </AccordionTrigger>
           </AccordionHeader>
-          <AccordionPanel className="accordion-panel">The details panel.</AccordionPanel>
+          <AccordionPanel className="accordion-panel">
+            The details panel.
+          </AccordionPanel>
         </AccordionItem>
       </Accordion>
       <button>After</button>

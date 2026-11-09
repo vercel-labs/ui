@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { CheckIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import {
+    CheckIcon,
+    ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+  } from "@lucide/svelte"
   import {
     Carousel,
     CarouselContent,
@@ -39,7 +44,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={alignments} value={align} onValueChange={(next) => next && (align = next as Align)}>
+    <Select
+      items={alignments}
+      value={align}
+      onValueChange={(next) => next && (align = next as Align)}
+    >
       <SelectLabel>Align</SelectLabel>
       <SelectTrigger>
         <SelectValue />

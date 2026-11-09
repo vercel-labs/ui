@@ -40,7 +40,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={sides} value={side} onValueChange={(next) => next && setSide(next as Side)}>
+        <Select
+          items={sides}
+          value={side}
+          onValueChange={(next) => next && setSide(next as Side)}
+        >
           <SelectLabel>Side</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -57,7 +61,11 @@ function Example() {
             ))}
           </SelectContent>
         </Select>
-        <Select items={aligns} value={align} onValueChange={(next) => next && setAlign(next as Align)}>
+        <Select
+          items={aligns}
+          value={align}
+          onValueChange={(next) => next && setAlign(next as Align)}
+        >
           <SelectLabel>Align</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -79,7 +87,9 @@ function Example() {
         <PopoverTrigger>Delivery</PopoverTrigger>
         <PopoverContent side={side} align={align} sideOffset={8}>
           <PopoverTitle>Delivery window</PopoverTitle>
-          <PopoverDescription>Arrives Tuesday between 9 AM and noon.</PopoverDescription>
+          <PopoverDescription>
+            Arrives Tuesday between 9 AM and noon.
+          </PopoverDescription>
         </PopoverContent>
       </Popover>
     </div>

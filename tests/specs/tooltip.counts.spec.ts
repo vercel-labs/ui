@@ -19,13 +19,19 @@ test.describe("work per focus move across many tooltip triggers", () => {
       // after it closes one and opens the next.
       const result = await countKeys(page, tabKey(browserName), {
         afterEach: async (press) => {
-          await expect(page.getByRole("button", { name: `Tip ${press}`, exact: true })).toBeFocused()
-          await expect(page.getByText(`Hint ${press}`, { exact: true })).toBeVisible()
+          await expect(
+            page.getByRole("button", { name: `Tip ${press}`, exact: true })
+          ).toBeFocused()
+          await expect(
+            page.getByText(`Hint ${press}`, { exact: true })
+          ).toBeVisible()
           await expect(page.locator(".tooltip:visible")).toHaveCount(1)
         },
       })
       report("tooltip.focus", n, result)
-      expectWithin(result, budget, { see: "See tests/perf/README.md#tooltip-focus." })
+      expectWithin(result, budget, {
+        see: "See tests/perf/README.md#tooltip-focus.",
+      })
     })
   }
 })

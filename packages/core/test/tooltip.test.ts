@@ -4,7 +4,8 @@ import { hoverCard } from "../src/components/hover-card/hover-card"
 import { tooltip } from "../src/components/tooltip/tooltip"
 import { attrs as partAttrs, present } from "../src/foundation/kernel/part"
 
-const pointer = (pointerType = "mouse") => ({ pointerType, clientX: 0, clientY: 0 }) as PointerEvent
+const pointer = (pointerType = "mouse") =>
+  ({ pointerType, clientX: 0, clientY: 0 }) as PointerEvent
 
 describe("tooltip labelling", () => {
   test("a tooltip describes its trigger, from the first render", () => {
@@ -14,7 +15,9 @@ describe("tooltip labelling", () => {
   })
 
   test("type label names the trigger instead", () => {
-    const attrs = partAttrs(tooltip({ id: "t", type: "label" }).part("trigger", { id: "a" }))
+    const attrs = partAttrs(
+      tooltip({ id: "t", type: "label" }).part("trigger", { id: "a" })
+    )
     expect(attrs["aria-labelledby"]).toBe("t-content")
     expect(attrs["aria-describedby"]).toBeUndefined()
   })
@@ -22,13 +25,18 @@ describe("tooltip labelling", () => {
   test("the content is always present, hidden while closed, so the reference resolves", () => {
     const instance = tooltip({ id: "t" })
     expect(present(instance.part("content", {}))).toBe(true)
-    expect(partAttrs(instance.part("content", {}))).toMatchObject({ role: "tooltip", hidden: "" })
+    expect(partAttrs(instance.part("content", {}))).toMatchObject({
+      role: "tooltip",
+      hidden: "",
+    })
     instance.api.open()
     expect(partAttrs(instance.part("content", {})).hidden).toBeUndefined()
   })
 
   test("a shortcut hint reaches the trigger as aria-keyshortcuts", () => {
-    const attrs = partAttrs(tooltip({ id: "t", shortcut: "mod+s" }).part("trigger", { id: "a" }))
+    const attrs = partAttrs(
+      tooltip({ id: "t", shortcut: "mod+s" }).part("trigger", { id: "a" })
+    )
     expect(attrs["aria-keyshortcuts"]).toMatch(/^(Meta|Control)\+S$/)
   })
 
@@ -150,7 +158,10 @@ describe("hover card", () => {
   })
 
   test("a canceled change keeps the card closed", () => {
-    const instance = hoverCard({ id: "h", onOpenChange: (open, details) => details.cancel() })
+    const instance = hoverCard({
+      id: "h",
+      onOpenChange: (open, details) => details.cancel(),
+    })
     instance.api.open()
     expect(instance.get()).toMatchObject({ open: false, mounted: false })
   })
@@ -161,22 +172,31 @@ describe("payload changes", () => {
   test("a tooltip reports the payload it opens with, then each trigger that takes it over, with no open change", () => {
     const onOpenChange = vi.fn()
     const onPayloadChange = vi.fn()
-    const instance = tooltip({ id: "t", delay: 0, onOpenChange, onPayloadChange })
+    const instance = tooltip({
+      id: "t",
+      delay: 0,
+      onOpenChange,
+      onPayloadChange,
+    })
     const first = pointer()
     instance.api.internal.enter(first, "mon", "Mon")
     expect(onPayloadChange).toHaveBeenLastCalledWith(
       "Mon",
-      expect.objectContaining({ reason: "trigger-hover", event: first }),
+      expect.objectContaining({ reason: "trigger-hover", event: first })
     )
     const next = pointer()
     instance.api.internal.enter(next, "tue", "Tue")
     expect(onPayloadChange).toHaveBeenLastCalledWith(
       "Tue",
-      expect.objectContaining({ reason: "trigger-hover", event: next }),
+      expect.objectContaining({ reason: "trigger-hover", event: next })
     )
     expect(onPayloadChange).toHaveBeenCalledTimes(2)
     expect(onOpenChange).toHaveBeenCalledOnce()
-    expect(instance.get()).toMatchObject({ open: true, trigger: "tue", payload: "Tue" })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      trigger: "tue",
+      payload: "Tue",
+    })
     instance.api.close()
   })
 
@@ -199,7 +219,10 @@ describe("payload changes", () => {
     instance.api.close()
     instance.api.open({ payload: "Mon" })
     expect(onPayloadChange).toHaveBeenCalledOnce()
-    expect(onPayloadChange).toHaveBeenLastCalledWith("Mon", expect.objectContaining({ reason: "imperative" }))
+    expect(onPayloadChange).toHaveBeenLastCalledWith(
+      "Mon",
+      expect.objectContaining({ reason: "imperative" })
+    )
     instance.api.close()
   })
 
@@ -207,21 +230,34 @@ describe("payload changes", () => {
     const instance = tooltip({
       id: "t",
       delay: 0,
-      onPayloadChange: (payload, details) => payload === "Tue" && details.cancel(),
+      onPayloadChange: (payload, details) =>
+        payload === "Tue" && details.cancel(),
     })
     instance.api.internal.enter(pointer(), "mon", "Mon")
     instance.api.internal.enter(pointer(), "tue", "Tue")
-    expect(instance.get()).toMatchObject({ open: true, trigger: "tue", payload: "Mon" })
+    expect(instance.get()).toMatchObject({
+      open: true,
+      trigger: "tue",
+      payload: "Mon",
+    })
     instance.api.close()
   })
 
   test("a hover card reports each link that takes it over", () => {
     const onOpenChange = vi.fn()
     const onPayloadChange = vi.fn()
-    const instance = hoverCard({ id: "h", delay: 0, onOpenChange, onPayloadChange })
+    const instance = hoverCard({
+      id: "h",
+      delay: 0,
+      onOpenChange,
+      onPayloadChange,
+    })
     instance.api.internal.hover!.enter(pointer(), "ada", "Ada")
     instance.api.internal.hover!.enter(pointer(), "grace", "Grace")
-    expect(onPayloadChange.mock.calls.map(([payload]) => payload)).toEqual(["Ada", "Grace"])
+    expect(onPayloadChange.mock.calls.map(([payload]) => payload)).toEqual([
+      "Ada",
+      "Grace",
+    ])
     expect(onOpenChange).toHaveBeenCalledOnce()
     instance.api.close()
   })

@@ -21,7 +21,10 @@ test.describe("off Apple platforms", () => {
     open,
   }) => {
     await open("dialog", { shortcut: "" })
-    const trigger = page.getByRole("button", { name: dialogFixture.shortcut.trigger, exact: true })
+    const trigger = page.getByRole("button", {
+      name: dialogFixture.shortcut.trigger,
+      exact: true,
+    })
     await expect(trigger).toHaveAttribute("aria-keyshortcuts", "Control+E")
   })
 
@@ -30,7 +33,10 @@ test.describe("off Apple platforms", () => {
     open,
   }) => {
     await open("drawer", { shortcut: "" })
-    const trigger = page.getByRole("button", { name: drawerFixture.shortcut.trigger, exact: true })
+    const trigger = page.getByRole("button", {
+      name: drawerFixture.shortcut.trigger,
+      exact: true,
+    })
     await expect(trigger).toHaveAttribute("aria-keyshortcuts", "Control+G")
   })
 
@@ -39,7 +45,10 @@ test.describe("off Apple platforms", () => {
     open,
   }) => {
     await open("popover", { shortcut: "" })
-    const trigger = page.getByRole("button", { name: popoverFixture.shortcut.remote.trigger, exact: true })
+    const trigger = page.getByRole("button", {
+      name: popoverFixture.shortcut.remote.trigger,
+      exact: true,
+    })
     await expect(trigger).toHaveAttribute("aria-keyshortcuts", "Control+E")
   })
 
@@ -48,7 +57,10 @@ test.describe("off Apple platforms", () => {
     open,
   }) => {
     await open("tooltip", { shortcut: "" })
-    const trigger = page.getByRole("button", { name: tooltipFixture.shortcut.trigger, exact: true })
+    const trigger = page.getByRole("button", {
+      name: tooltipFixture.shortcut.trigger,
+      exact: true,
+    })
     await expect(trigger).toHaveAttribute("aria-keyshortcuts", "Control+S")
   })
 })

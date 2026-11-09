@@ -15,5 +15,5 @@ test(
     await page.getByRole("button", { name: "Clear website" }).click()
     await expect(textbox(page, "Website")).toHaveValue("")
     await expect(textbox(page, "Website")).toBeFocused()
-  },
+  }
 )

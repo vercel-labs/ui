@@ -1,5 +1,12 @@
 import "@ui-sdk/web/menu"
-import { ChevronRight, createElement, Download, Link, Share, Trash } from "lucide"
+import {
+  ChevronRight,
+  createElement,
+  Download,
+  Link,
+  Share,
+  Trash,
+} from "lucide"
 import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
@@ -38,7 +45,9 @@ function mount(root: HTMLElement) {
   `
   root
     .querySelector("ui-menu")!
-    .addEventListener("action", (event) => log(root, `Chose ${event.detail.value}`))
+    .addEventListener("action", (event) =>
+      log(root, `Chose ${event.detail.value}`)
+    )
 }
 
 export { mount }

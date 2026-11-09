@@ -42,6 +42,8 @@
       </InputClear>
     </InputGroup>
   </FieldSet>
-  <button type="button" onclick={() => renders++}>Render again ({renders})</button>
+  <button type="button" onclick={() => renders++}
+    >Render again ({renders})</button
+  >
   <button>After</button>
 </div>

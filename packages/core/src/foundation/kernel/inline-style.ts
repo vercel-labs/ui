@@ -9,7 +9,9 @@ function css(declarations: Record<string, string | number | undefined>) {
   let text = ""
   for (const property in declarations) {
     const value = declarations[property]
-    if (value !== undefined) text += `${text ? ";" : ""}${property}:${value}`
+    if (value !== undefined) {
+      text += `${text ? ";" : ""}${property}:${value}`
+    }
   }
   return text
 }

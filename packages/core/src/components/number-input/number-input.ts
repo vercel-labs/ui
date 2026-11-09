@@ -10,9 +10,16 @@ import {
   type State,
 } from "./number-input-api"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  CommitDetails,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { orientationOf } from "../../foundation/focus/collection"
 import { bindPageLocale } from "../../foundation/text/locale"
 import { live } from "../../foundation/kernel/live"
@@ -48,11 +55,18 @@ function createNumberInputController() {
     /** The value, or null when the field is empty. */
     getValue: () => number | null
     /** Sets the value, as a user would. It's clamped and snapped to the step. */
-    setValue: (value: number | null, options?: NumberInputChangeOptions) => boolean
+    setValue: (
+      value: number | null,
+      options?: NumberInputChangeOptions
+    ) => boolean
     /** Steps the value up, by `largeStep` with `{ large: true }`. */
-    increment: (options?: NumberInputChangeOptions & { large?: boolean }) => boolean
+    increment: (
+      options?: NumberInputChangeOptions & { large?: boolean }
+    ) => boolean
     /** Steps the value down, by `largeStep` with `{ large: true }`. */
-    decrement: (options?: NumberInputChangeOptions & { large?: boolean }) => boolean
+    decrement: (
+      options?: NumberInputChangeOptions & { large?: boolean }
+    ) => boolean
     /** Moves focus to the input. */
     focus: () => void
   }>()
@@ -68,7 +82,9 @@ type NumberInputController = ReturnType<typeof createNumberInputController>
 // Reads a `value` or `default-value` attribute. An empty attribute, or one
 // that isn't a number, is an empty field.
 function valueAttribute(attribute: string | null) {
-  if (attribute === null) return undefined
+  if (attribute === null) {
+    return undefined
+  }
   const number = attribute.trim() === "" ? NaN : Number(attribute)
   return Number.isFinite(number) ? number : null
 }
@@ -87,9 +103,15 @@ type NumberInputOptions = {
    */
   defaultValue?: number | null
   /** Runs when the value changes: as a typed number becomes valid, and on every step. `details.cancel()` stops it. */
-  onValueChange?: (value: number | null, details: ChangeDetails<NumberInputValueChangeReason>) => void
+  onValueChange?: (
+    value: number | null,
+    details: ChangeDetails<NumberInputValueChangeReason>
+  ) => void
   /** Runs once an interaction that changed the value ends: typing is committed, a key or a button is released, or a scrub ends. For saving. */
-  onValueCommit?: (value: number | null, details: CommitDetails<NumberInputValueChangeReason>) => void
+  onValueCommit?: (
+    value: number | null,
+    details: CommitDetails<NumberInputValueChangeReason>
+  ) => void
   /** The lowest value. Typed values below it are raised to it when committed. */
   min?: number
   /** The highest value. Typed values above it are lowered to it when committed. */
@@ -224,10 +246,15 @@ function dataAttrs(state: State) {
   }
 }
 
-const controlIdOf = (state: State, id: string) => state.controlId ?? `${id}-control`
+const controlIdOf = (state: State, id: string) =>
+  state.controlId ?? `${id}-control`
 
 // Whether a step button can't step: it's disabled itself, or the field can't step that way.
-function isBlocked(state: State, props: NumberInputButtonProps, direction: number) {
+function isBlocked(
+  state: State,
+  props: NumberInputButtonProps,
+  direction: number
+) {
   return !!props.disabled || !canStep(state, direction)
 }
 
@@ -238,19 +265,24 @@ function button(direction: number) {
       disabled: isBlocked(state, props, direction),
       atBound: atBound(state, direction),
     }),
-    attrs: (state: State, { id, props }: { id: string; props: NumberInputButtonProps }) => {
+    attrs: (
+      state: State,
+      { id, props }: { id: string; props: NumberInputButtonProps }
+    ) => {
       const blocked = isBlocked(state, props, direction)
       return {
         type: "button",
         tabindex: "-1",
         "aria-controls": controlIdOf(state, id),
         // Read-only buttons stay in the page as they were, but do nothing.
-        disabled: props.disabled || (blocked && !state.readOnly) ? "" : undefined,
+        disabled:
+          props.disabled || (blocked && !state.readOnly) ? "" : undefined,
         "aria-disabled": blocked ? "true" : undefined,
         ...dataAttrs(state),
         "data-disabled": blocked ? "" : undefined,
         "data-at-bound": atBound(state, direction) ? "" : undefined,
-        style: "user-select:none;-webkit-user-select:none;touch-action:manipulation",
+        style:
+          "user-select:none;-webkit-user-select:none;touch-action:manipulation",
       }
     },
   }
@@ -281,7 +313,10 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
     controlId: "string",
   },
   state: (options: NumberInputInternalOptions): State => {
-    const value = options.value !== undefined ? options.value : (options.defaultValue ?? null)
+    const value =
+      options.value !== undefined
+        ? options.value
+        : (options.defaultValue ?? null)
     const base = { ...settings(options), pageLocale: null }
     return {
       ...base,
@@ -298,9 +333,13 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
   live: ["cursor"],
   sync: (options) => ({
     ...settings(options),
-    ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: options.defaultValue }),
     ...(options.value === undefined ? {} : { value: options.value }),
-    ...(options.controlId === undefined ? {} : { controlId: options.controlId }),
+    ...(options.controlId === undefined
+      ? {}
+      : { controlId: options.controlId }),
   }),
   commits: ["value"],
   api: numberInputApi,
@@ -313,7 +352,8 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
         return bindInternals(el, {
           // A field can disable it without the `disabled` attribute the browser
           // leaves a control out of the form by, so disabled it submits nothing.
-          value: () => (isDisabled(store.get()) ? null : api.internal.submitted()),
+          value: () =>
+            isDisabled(store.get()) ? null : api.internal.submitted(),
           state: () => String(store.get().value ?? ""),
           restore: api.internal.restore,
           // The input inside validates itself, so the field reports only its value.
@@ -350,7 +390,8 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
         ...dataAttrs(state),
       }),
       on: {
-        input: (event, { api, el }) => el && api.internal.type((el as HTMLInputElement).value, event),
+        input: (event, { api, el }) =>
+          el && api.internal.type((el as HTMLInputElement).value, event),
         keydown: (event, { api }) => api.internal.keydown(event),
         keyup: (event, { api }) => api.internal.keyup(event),
         focusout: (event, { api }) => api.internal.commitText(event),
@@ -360,14 +401,18 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
         api.internal.readPlatform()
         // The text is written here, so the framework never fights the caret.
         const write = () => {
-          if (input.value !== store.get().text) input.value = store.get().text
+          if (input.value !== store.get().text) {
+            input.value = store.get().text
+          }
         }
         write()
         // React's wheel listeners are passive, and its beforeinput isn't the
         // native event, so the field listens itself.
         const onWheel = (event: WheelEvent) => api.internal.wheel(event, input)
         const onBeforeInput = (event: InputEvent) => {
-          if (!event.defaultPrevented) api.internal.beforeinput(event, input)
+          if (!event.defaultPrevented) {
+            api.internal.beforeinput(event, input)
+          }
         }
         input.addEventListener("wheel", onWheel, { passive: false })
         input.addEventListener("beforeinput", onBeforeInput)
@@ -384,25 +429,32 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       props: { disabled: "boolean" },
       ...button(1),
       on: {
-        click: (event, { api, props }) => !props.disabled && api.internal.clickButton(event, 1),
+        click: (event, { api, props }) =>
+          !props.disabled && api.internal.clickButton(event, 1),
       },
-      bind: (el, part) => part.api.internal.bindButton(el, 1, () => !!part.props.disabled),
+      bind: (el, part) =>
+        part.api.internal.bindButton(el, 1, () => !!part.props.disabled),
     }),
 
     decrement: slot<NumberInputButtonProps, NumberInputButtonState>({
       props: { disabled: "boolean" },
       ...button(-1),
       on: {
-        click: (event, { api, props }) => !props.disabled && api.internal.clickButton(event, -1),
+        click: (event, { api, props }) =>
+          !props.disabled && api.internal.clickButton(event, -1),
       },
-      bind: (el, part) => part.api.internal.bindButton(el, -1, () => !!part.props.disabled),
+      bind: (el, part) =>
+        part.api.internal.bindButton(el, -1, () => !!part.props.disabled),
     }),
 
     // Drag across it to change the value, like a label in a design tool. The
     // mouse is locked once the press becomes a drag, where the browser allows
     // it, so the drag never runs out of screen. Any number of them, anywhere
     // inside the root or connected from outside it, drive one input.
-    "scrub-area": slot<Omit<NumberInputScrubAreaProps, "controller">, NumberInputState>({
+    "scrub-area": slot<
+      Omit<NumberInputScrubAreaProps, "controller">,
+      NumberInputState
+    >({
       props: { orientation: "string", pixelsPerStep: "number" },
       state: fieldState,
       attrs: (state, { props }) => ({
@@ -410,7 +462,10 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
         "data-orientation": orientationOf(props.orientation, "horizontal"),
         style: "touch-action:none;user-select:none;-webkit-user-select:none",
       }),
-      on: { pointerdown: (event, { api, el, props }) => el && api.internal.scrub(event, el, props) },
+      on: {
+        pointerdown: (event, { api, el, props }) =>
+          el && api.internal.scrub(event, el, props),
+      },
     }),
 
     // Stands in for the mouse cursor while the pointer is locked.
@@ -436,7 +491,8 @@ const numberInputPrimitive = /* @__PURE__ */ definePrimitive({
       }),
       bind: (el, { api, store }) =>
         bindValueInput(el as HTMLInputElement, {
-          value: () => (store.get().value === null ? "" : String(store.get().value)),
+          value: () =>
+            store.get().value === null ? "" : String(store.get().value),
           subscribe: store.subscribe,
           focus: api.focus,
           reset: api.internal.reset,

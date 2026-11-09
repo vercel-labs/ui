@@ -19,7 +19,9 @@ function useOwnPart(key: symbol) {
 function claimOwnPart(key: symbol) {
   // Untracked, so the root's block that renders this part doesn't depend on the count.
   const release = untrack(() => getContext<Claim | undefined>(key)?.())
-  if (release) onDestroy(release)
+  if (release) {
+    onDestroy(release)
+  }
 }
 
 export { claimOwnPart, useOwnPart }

@@ -18,10 +18,12 @@ function mount(root: HTMLElement) {
       </ui-password-input>
     </ui-field>
   `
-  root.querySelector("ui-password-input")!.addEventListener("visiblechange", (event) => {
-    const { value, reason } = event.detail
-    log(root, `${value ? "Shown" : "Hidden"} (${reason})`)
-  })
+  root
+    .querySelector("ui-password-input")!
+    .addEventListener("visiblechange", (event) => {
+      const { value, reason } = event.detail
+      log(root, `${value ? "Shown" : "Hidden"} (${reason})`)
+    })
 }
 
 export { mount }

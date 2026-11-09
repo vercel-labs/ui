@@ -1,8 +1,15 @@
 import "@ui-sdk/web/autocomplete"
 
 const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
-const topics = [...recent, "react server components", "tailwind colors", "vue router"]
-const recentSearches = [{ type: "group" as const, label: "Recent searches", items: recent }]
+const topics = [
+  ...recent,
+  "react server components",
+  "tailwind colors",
+  "vue router",
+]
+const recentSearches = [
+  { type: "group" as const, label: "Recent searches", items: recent },
+]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -26,7 +33,9 @@ function mount(root: HTMLElement) {
   `
   const autocomplete = root.querySelector("ui-autocomplete")!
   autocomplete.announcement = (change) =>
-    change.type === "results" ? `${change.count} ${change.count === 1 ? "topic" : "topics"}` : null
+    change.type === "results"
+      ? `${change.count} ${change.count === 1 ? "topic" : "topics"}`
+      : null
   autocomplete.emptyItems = recentSearches
   autocomplete.items = topics
 }

@@ -17,7 +17,10 @@ const loadFile = () => new Promise<void>((resolve) => setTimeout(resolve, 800))
 
 function Example() {
   const prompt = createTokenInputController()
-  const firstToken = () => prompt.getValue().find((segment): segment is Token => typeof segment !== "string")
+  const firstToken = () =>
+    prompt
+      .getValue()
+      .find((segment): segment is Token => typeof segment !== "string")
 
   return (
     <div data-slot="stack">
@@ -27,7 +30,7 @@ function Example() {
           onClick={() =>
             prompt.insert(
               { type: "file", value: "package.json", label: "package.json" },
-              { at: "end", resolve: loadFile() },
+              { at: "end", resolve: loadFile() }
             )
           }
         >
@@ -37,7 +40,9 @@ function Example() {
           type="button"
           onClick={() => {
             const token = firstToken()
-            if (token) prompt.updateToken(token.id!, { label: token.value })
+            if (token) {
+              prompt.updateToken(token.id!, { label: token.value })
+            }
           }}
         >
           Show Path
@@ -46,7 +51,9 @@ function Example() {
           type="button"
           onClick={() => {
             const token = firstToken()
-            if (token) prompt.removeToken(token.id!)
+            if (token) {
+              prompt.removeToken(token.id!)
+            }
           }}
         >
           Remove First

@@ -15,7 +15,9 @@ const members: Member[] = [
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   ElementInternals.prototype.setFormValue ??= () => {}
   ElementInternals.prototype.setValidity ??= () => {}
   defineSelectElements()
@@ -34,7 +36,8 @@ async function mount() {
   const items = Array.from(document.querySelectorAll("ui-select-item"))
   select.itemToValue = (member) => String((member as Member).id)
   select.itemToLabel = (member) => (member as Member).name
-  select.isItemEqualToValue = (item, value) => (item as Member).id === (value as Member).id
+  select.isItemEqualToValue = (item, value) =>
+    (item as Member).id === (value as Member).id
   items.forEach((item, index) => (item.value = members[index]))
   await wait()
   return { select, items, button: document.querySelector("button")! }
@@ -44,15 +47,24 @@ test("an item holding an object matches an equal value through isItemEqualToValu
   const { select, items, button } = await mount()
   select.value = { ...members[1] }
   await wait()
-  expect(items.map((item) => item.getAttribute("aria-selected"))).toEqual(["false", "true"])
-  expect(items[1].querySelector("ui-select-item-indicator")!.hasAttribute("data-selected")).toBe(true)
+  expect(items.map((item) => item.getAttribute("aria-selected"))).toEqual([
+    "false",
+    "true",
+  ])
+  expect(
+    items[1]
+      .querySelector("ui-select-item-indicator")!
+      .hasAttribute("data-selected")
+  ).toBe(true)
   expect(button.textContent).toBe("Inès Moreau")
 })
 
 test("choosing an item holding an object sets that object as the value", async () => {
   const { select, items, button } = await mount()
   const values: unknown[] = []
-  select.addEventListener("valuechange", (event) => values.push(event.detail.value))
+  select.addEventListener("valuechange", (event) =>
+    values.push(event.detail.value)
+  )
   button.click()
   await wait()
   items[0].click()

@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@ui-sdk/vue"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/vue"
 import { selectFixture as f } from "tests/fixtures/select.ts"
 </script>
 
@@ -11,7 +18,10 @@ import { selectFixture as f } from "tests/fixtures/select.ts"
       <SelectLabel class="label">{{ f.label }}</SelectLabel>
       <SelectTrigger>
         <template #render="{ props, state }">
-          <button v-bind="props" :class="['trigger', state.open ? 'is-open' : 'is-closed']">
+          <button
+            v-bind="props"
+            :class="['trigger', state.open ? 'is-open' : 'is-closed']"
+          >
             <SelectValue />
             <span aria-hidden="true">{{ state.open ? "▲" : "▼" }}</span>
           </button>
@@ -23,7 +33,12 @@ import { selectFixture as f } from "tests/fixtures/select.ts"
             <a v-bind="props">Docs</a>
           </template>
         </SelectItem>
-        <SelectItem v-for="item in f.items.slice(0, 3)" :key="item.value" class="item" :value="item.value">
+        <SelectItem
+          v-for="item in f.items.slice(0, 3)"
+          :key="item.value"
+          class="item"
+          :value="item.value"
+        >
           {{ item.label }}
         </SelectItem>
       </SelectContent>

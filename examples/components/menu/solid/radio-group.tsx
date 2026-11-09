@@ -34,7 +34,10 @@ function Example() {
           </For>
         </MenuRadioGroup>
         <MenuSeparator />
-        <MenuRadioGroup defaultValue="comfortable" onValueChange={(value) => log(`${value} density`)}>
+        <MenuRadioGroup
+          defaultValue="comfortable"
+          onValueChange={(value) => log(`${value} density`)}
+        >
           <MenuGroupLabel>Density</MenuGroupLabel>
           <For each={["Compact", "Comfortable"]}>
             {(option) => (

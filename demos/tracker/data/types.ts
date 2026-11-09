@@ -48,4 +48,13 @@ type Settings = {
   autoCloseDays: number
 }
 
-export type { Comment, Issue, Label, Person, Priority, Settings, Status, Subtask }
+export type {
+  Comment,
+  Issue,
+  Label,
+  Person,
+  Priority,
+  Settings,
+  Status,
+  Subtask,
+}

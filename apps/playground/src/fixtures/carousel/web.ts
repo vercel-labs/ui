@@ -1,22 +1,26 @@
 import { carouselFixture, carouselOptions } from "tests/fixtures/carousel.ts"
 
-const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
+const escape = (text: string) =>
+  text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;")
 
-const attribute = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const attribute = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 function markup(playToggle: boolean) {
   const slides = carouselFixture.slides
     .map(
       (slide, index) =>
         `<ui-carousel-item class="carousel-slide"><p>${escape(slide.title)}</p><a href="?product=${index + 1}">${escape(slide.link)}</a>${
-          index === 2 ? `<label> ${escape(carouselFixture.field)} <input></label>` : ""
-        }</ui-carousel-item>`,
+          index === 2
+            ? `<label> ${escape(carouselFixture.field)} <input></label>`
+            : ""
+        }</ui-carousel-item>`
     )
     .join("")
   const indicators = carouselFixture.slides
     .map(
       (_, index) =>
-        `<ui-carousel-indicator><button class="carousel-indicator" aria-label="${carouselFixture.indicator(index + 1)}">${index + 1}</button></ui-carousel-indicator>`,
+        `<ui-carousel-indicator><button class="carousel-indicator" aria-label="${carouselFixture.indicator(index + 1)}">${index + 1}</button></ui-carousel-indicator>`
     )
     .join("")
   // The toggle's label switches with CSS on the button's `data-playing`.
@@ -54,33 +58,38 @@ function markup(playToggle: boolean) {
 async function mount(root: HTMLElement) {
   const { perView, cancel, playToggle, options } = carouselOptions()
   root.innerHTML = markup(playToggle)
-  const carousel = root.querySelector<HTMLElement & { api?: { setPage: (page: number) => void } }>(
-    "ui-carousel",
-  )!
+  const carousel = root.querySelector<
+    HTMLElement & { api?: { setPage: (page: number) => void } }
+  >("ui-carousel")!
   carousel.style.setProperty("--per-view", String(perView))
-  for (const [name, value] of Object.entries(options))
+  for (const [name, value] of Object.entries(options)) {
     carousel.setAttribute(attribute(name), value === true ? "" : String(value))
+  }
   await import("@ui-sdk/web/carousel")
-  root.querySelector("#controller")!.addEventListener("click", () => carousel.api?.setPage(4))
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => carousel.api?.setPage(4))
   root.addEventListener(
     "pagechange",
     (event) => {
-      const detail = (event as CustomEvent<{ value: number; reason: string }>).detail
-      if (detail.value === cancel) return event.preventDefault()
+      const detail = (event as CustomEvent<{ value: number; reason: string }>)
+        .detail
+      if (detail.value === cancel) {
+        return event.preventDefault()
+      }
       const [action, reason] = root.querySelectorAll("output")
       action.textContent = String(detail.value)
       reason.textContent = detail.reason
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "pagechangecomplete",
     (event) => {
-      root.querySelector("output[aria-label='Rested on']")!.textContent = String(
-        (event as CustomEvent<{ value: number }>).detail.value,
-      )
+      root.querySelector("output[aria-label='Rested on']")!.textContent =
+        String((event as CustomEvent<{ value: number }>).detail.value)
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

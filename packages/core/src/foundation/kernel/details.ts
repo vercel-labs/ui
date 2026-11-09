@@ -6,7 +6,8 @@
  * How the user caused a change.
  * @stable
  */
-type ChangeSource = "mouse" | "touch" | "pen" | "keyboard" | "virtual" | "programmatic" | "agent"
+type ChangeSource =
+  "mouse" | "touch" | "pen" | "keyboard" | "virtual" | "programmatic" | "agent"
 
 /**
  * Every reason a change can report, what it means, and the DOM event behind
@@ -156,7 +157,9 @@ type ReasonVocabulary = {
 type ChangeReason = keyof ReasonVocabulary
 
 /** The DOM event a reason reports, from the vocabulary. Any `Event` for reasons outside it. */
-type EventOf<Reason extends string> = Reason extends ChangeReason ? ReasonVocabulary[Reason] : Event
+type EventOf<Reason extends string> = Reason extends ChangeReason
+  ? ReasonVocabulary[Reason]
+  : Event
 
 /**
  * What every `on<Key>Change` callback receives after the new value. One
@@ -228,22 +231,26 @@ type DismissReason = (typeof dismissReasons)[number]
  * The dismissals a person makes on purpose, which `onDismissAttempt` hears about when `dismissible` refuses them.
  * @stable
  */
-type DismissAttemptReason = Extract<DismissReason, "escape-key" | "outside-press" | "back" | "swipe">
+type DismissAttemptReason = Extract<
+  DismissReason,
+  "escape-key" | "outside-press" | "back" | "swipe"
+>
 
 /**
  * What `onDismissAttempt` receives when `dismissible` refused a dismissal.
  * Checking `reason` narrows `event`.
  * @stable
  */
-type DismissAttemptDetails<Reason extends DismissAttemptReason = DismissAttemptReason> =
-  Reason extends unknown
-    ? {
-        /** How the user tried to dismiss it, like `"escape-key"`. */
-        reason: Reason
-        /** The DOM event behind it. */
-        event?: EventOf<Reason>
-      }
-    : never
+type DismissAttemptDetails<
+  Reason extends DismissAttemptReason = DismissAttemptReason,
+> = Reason extends unknown
+  ? {
+      /** How the user tried to dismiss it, like `"escape-key"`. */
+      reason: Reason
+      /** The DOM event behind it. */
+      event?: EventOf<Reason>
+    }
+  : never
 
 /**
  * Whether a reason dismissed a layer: Escape, an outside press, focus or the
@@ -280,8 +287,12 @@ let cause: ChangeSource | undefined
  */
 function resolveSource(reason: string, eventSource?: () => ChangeSource) {
   // An agent's call, and every change it causes, reports the agent.
-  if (cause === "agent") return cause
-  if (programmaticReasons.has(reason)) return "programmatic"
+  if (cause === "agent") {
+    return cause
+  }
+  if (programmaticReasons.has(reason)) {
+    return "programmatic"
+  }
   if (eventSource) {
     const source = eventSource()
     // An `el.click()` core makes for a key, like Enter on a link item, keeps the key's source.
@@ -324,12 +335,20 @@ function withSource<T>(source: ChangeSource | undefined, run: () => T) {
 function createDetails<
   const Given extends { reason: string; event?: Event },
   Cancelable extends boolean = true,
->(given: Given, source: ChangeSource, cancelable: Cancelable = true as Cancelable) {
-  type Kind = Cancelable extends true ? ChangeDetails<Given["reason"]> : CommitDetails<Given["reason"]>
+>(
+  given: Given,
+  source: ChangeSource,
+  cancelable: Cancelable = true as Cancelable
+) {
+  type Kind = Cancelable extends true
+    ? ChangeDetails<Given["reason"]>
+    : CommitDetails<Given["reason"]>
   type Details = Kind & Omit<Given, "reason" | "event" | "source">
   // One object for every reason. The per-reason union only narrows for readers,
   // so it can't be built from a generic reason, and the cast happens once, here.
-  if (!cancelable) return { ...given, source } as unknown as Details
+  if (!cancelable) {
+    return { ...given, source } as unknown as Details
+  }
   let canceled = false
   return {
     ...given,

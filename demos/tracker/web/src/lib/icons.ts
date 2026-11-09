@@ -68,14 +68,16 @@ type IconName = keyof typeof icons
 function shapes(node: IconNode) {
   return node
     .map(([tag, attributes]) => {
-      const pairs = Object.entries(attributes).map(([name, value]) => `${name}="${value}"`)
+      const pairs = Object.entries(attributes).map(
+        ([name, value]) => `${name}="${value}"`
+      )
       return `<${tag} ${pairs.join(" ")}/>`
     })
     .join("")
 }
 
 const markup = Object.fromEntries(
-  Object.entries(icons).map(([name, node]) => [name, shapes(node)]),
+  Object.entries(icons).map(([name, node]) => [name, shapes(node)])
 ) as Record<IconName, string>
 
 function iconMarkup(name: IconName, className = "size-4") {

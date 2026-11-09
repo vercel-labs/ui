@@ -5,7 +5,9 @@ import { Fixture } from "./solid"
 // recorded. With ?hydrate=manual, the page stays server markup until
 // window.hydrate() runs, so specs can use the fields before hydration.
 function mount(root: HTMLElement) {
-  return hydrateFixture(root, "number-input", () => <Fixture />, { manual: true })
+  return hydrateFixture(root, "number-input", () => <Fixture />, {
+    manual: true,
+  })
 }
 
 export { mount }

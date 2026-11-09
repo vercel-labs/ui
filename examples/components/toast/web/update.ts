@@ -18,10 +18,14 @@ function mount(root: HTMLElement) {
         id,
         done
           ? { title: "Report uploaded", type: "success" }
-          : { title: `Uploading report.pdf… ${progress}%` },
+          : { title: `Uploading report.pdf… ${progress}%` }
       )
-      if (!open) log(root, "Upload canceled")
-      if (done || !open) clearInterval(timer)
+      if (!open) {
+        log(root, "Upload canceled")
+      }
+      if (done || !open) {
+        clearInterval(timer)
+      }
     }, 700)
   }
 

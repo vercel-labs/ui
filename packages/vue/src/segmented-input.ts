@@ -9,12 +9,25 @@ import type {
   DateMatchers,
   HourCycle,
 } from "@ui-sdk/core/date-input"
-import { defineComponent, h, type ExtractPropTypes, type PropType, type SetupContext } from "vue"
+import {
+  defineComponent,
+  h,
+  type ExtractPropTypes,
+  type PropType,
+  type SetupContext,
+} from "vue"
 import { slotContent } from "./children"
 import { useFieldControl } from "./field-context"
 import { withElement } from "./create-parts"
 import { readOnlyOf } from "./text-control"
-import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 
 // Time Input's primitive has the same slots and state.
 type Segmented = typeof dateInput
@@ -41,16 +54,25 @@ const rootProps = {
 const rootEmits = {
   "update:value": (_value: string | null) => true,
   "update:modelValue": (_value: string | null) => true,
-  valueChange: (_value: string | null, _details: ChangeDetails<DateInputValueChangeReason>) => true,
+  valueChange: (
+    _value: string | null,
+    _details: ChangeDetails<DateInputValueChangeReason>
+  ) => true,
 }
 
-type RootProps = ExtractPropTypes<typeof rootProps> & { unavailable?: DateMatchers }
+type RootProps = ExtractPropTypes<typeof rootProps> & {
+  unavailable?: DateMatchers
+}
 
 function setupRoot(
   primitive: Segmented,
   Segment: ReturnType<typeof defineSegment>,
   props: RootProps,
-  { attrs, slots, emit }: SetupContext<typeof rootEmits, PartSlots<Segmented, "root">>,
+  {
+    attrs,
+    slots,
+    emit,
+  }: SetupContext<typeof rootEmits, PartSlots<Segmented, "root">>
 ) {
   const field = useFieldControl()
   const handle = usePrimitive(primitive, () => ({
@@ -69,10 +91,15 @@ function setupRoot(
     form: props.form,
     controller: props.controller,
     debug: props.debug,
-    onValueChange: (value: string | null, details: ChangeDetails<DateInputValueChangeReason>) => {
+    onValueChange: (
+      value: string | null,
+      details: ChangeDetails<DateInputValueChangeReason>
+    ) => {
       // The change event runs first, so canceling it also keeps v-model as it was.
       emit("valueChange", value, details)
-      if (details.canceled) return
+      if (details.canceled) {
+        return
+      }
       emit("update:value", value)
       emit("update:modelValue", value)
     },
@@ -82,7 +109,9 @@ function setupRoot(
     tag: "div",
     children: (state) => [
       slotContent(slots.default, { state }) ??
-        state.segments.map((segment) => h(Segment, { key: segment.key, segment })),
+        state.segments.map((segment) =>
+          h(Segment, { key: segment.key, segment })
+        ),
       hidden(),
     ],
     extend: (root) => (field ? field.props(root) : root),
@@ -96,19 +125,28 @@ function defineSegment(primitive: Segmented, name: string) {
     defineComponent({
       name,
       inheritAttrs: false,
-      props: { segment: { type: Object as PropType<DateInputSegmentData>, required: true } },
+      props: {
+        segment: {
+          type: Object as PropType<DateInputSegmentData>,
+          required: true,
+        },
+      },
       slots: Object as PartSlots<Segmented, "segment">,
       setup(props, { slots }) {
         const part = () => ({ segment: props.segment, id: props.segment.key })
         // A segment's key, and so whether it's typed in, never changes.
-        if (props.segment.editable)
-          return usePart(useHandle(primitive), "segment", part, undefined, { tag: "input" })
+        if (props.segment.editable) {
+          return usePart(useHandle(primitive), "segment", part, undefined, {
+            tag: "input",
+          })
+        }
         return usePart(useHandle(primitive), "segment", part, undefined, {
           tag: "span",
-          children: (state) => slotContent(slots.default, { state }) ?? state.text,
+          children: (state) =>
+            slotContent(slots.default, { state }) ?? state.text,
         })
       },
-    }),
+    })
   )
 }
 

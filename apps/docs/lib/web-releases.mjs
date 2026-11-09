@@ -14,7 +14,9 @@ const exact = "web@\\d+\\.\\d+\\.\\d+[^/]*"
 function releasesIn(publicDir, extension = ".js") {
   return readdirSync(publicDir).flatMap((file) => {
     const version =
-      file.startsWith("web@") && file.endsWith(extension) ? file.slice(4, -extension.length) : ""
+      file.startsWith("web@") && file.endsWith(extension)
+        ? file.slice(4, -extension.length)
+        : ""
     return /^\d+\.\d+\.\d+/.test(version) ? [version] : []
   })
 }
@@ -39,14 +41,19 @@ function newestByMajor(versions) {
   const newest = new Map()
   for (const version of versions) {
     const major = version.split(".")[0]
-    if (isNewer(version, newest.get(major))) newest.set(major, version)
+    if (isNewer(version, newest.get(major))) {
+      newest.set(major, version)
+    }
   }
   return newest
 }
 
 /** The newest version of all, by the same rule, for `/web.js`. */
 function newestRelease(versions) {
-  return versions.reduce((newest, version) => (isNewer(version, newest) ? version : newest), undefined)
+  return versions.reduce(
+    (newest, version) => (isNewer(version, newest) ? version : newest),
+    undefined
+  )
 }
 
 const isNewer = (version, current) =>
@@ -64,7 +71,9 @@ function compareVersions(a, b) {
   const [bRelease, bPre] = splitVersion(b)
   return (
     compareIdentifiers(aRelease, bRelease) ||
-    (!aPre.length || !bPre.length ? bPre.length - aPre.length : compareIdentifiers(aPre, bPre))
+    (!aPre.length || !bPre.length
+      ? bPre.length - aPre.length
+      : compareIdentifiers(aPre, bPre))
   )
 }
 
@@ -75,12 +84,24 @@ function splitVersion(version) {
 
 function compareIdentifiers(a, b) {
   for (let index = 0; index < Math.max(a.length, b.length); index++) {
-    if (a[index] === undefined || b[index] === undefined) return a[index] === undefined ? -1 : 1
+    if (a[index] === undefined || b[index] === undefined) {
+      return a[index] === undefined ? -1 : 1
+    }
     const numeric = /^\d+$/.test(a[index]) && /^\d+$/.test(b[index])
-    if (numeric && Number(a[index]) !== Number(b[index])) return Number(a[index]) < Number(b[index]) ? -1 : 1
-    if (!numeric && a[index] !== b[index]) return a[index] < b[index] ? -1 : 1
+    if (numeric && Number(a[index]) !== Number(b[index])) {
+      return Number(a[index]) < Number(b[index]) ? -1 : 1
+    }
+    if (!numeric && a[index] !== b[index]) {
+      return a[index] < b[index] ? -1 : 1
+    }
   }
   return 0
 }
 
-export { compareVersions, newestByMajor, newestRelease, releasesIn, webReleaseHeaders }
+export {
+  compareVersions,
+  newestByMajor,
+  newestRelease,
+  releasesIn,
+  webReleaseHeaders,
+}

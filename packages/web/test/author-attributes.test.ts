@@ -35,12 +35,16 @@ test("a copied calendar's grid label follows its month", async () => {
   defineCalendarElements()
   document.body.innerHTML = `<ui-calendar month="2026-10"><ui-calendar-next><button>›</button></ui-calendar-next><ui-calendar-grid></ui-calendar-grid></ui-calendar>`
   await wait()
-  const copy = document.querySelector("ui-calendar")!.cloneNode(true) as HTMLElement
+  const copy = document
+    .querySelector("ui-calendar")!
+    .cloneNode(true) as HTMLElement
   document.body.replaceChildren(copy)
   await wait()
   copy.querySelector("button")!.click()
   await wait()
-  expect(copy.querySelector('[role="grid"]')!.getAttribute("aria-label")).toBe("November 2026")
+  expect(copy.querySelector('[role="grid"]')!.getAttribute("aria-label")).toBe(
+    "November 2026"
+  )
 })
 
 test("a combobox input keeps the autocomplete written on it, and its role", async () => {
@@ -61,5 +65,7 @@ test("a combobox input inside a labelled field keeps the label reference written
   defineComboboxElements()
   document.body.innerHTML = `<ui-field><ui-field-label>Fruit</ui-field-label><ui-combobox><ui-combobox-label>Pick one</ui-combobox-label><ui-combobox-input><input aria-labelledby="mine"></ui-combobox-input></ui-combobox></ui-field>`
   await wait()
-  expect(document.querySelector("input")!.getAttribute("aria-labelledby")).toBe("mine")
+  expect(document.querySelector("input")!.getAttribute("aria-labelledby")).toBe(
+    "mine"
+  )
 })

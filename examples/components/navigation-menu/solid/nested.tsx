@@ -18,7 +18,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -122,7 +123,9 @@ function Example() {
                           <For each={group.links}>
                             {(link) => (
                               <li>
-                                <NavigationMenuLink href={link.href}>{link.title}</NavigationMenuLink>
+                                <NavigationMenuLink href={link.href}>
+                                  {link.title}
+                                </NavigationMenuLink>
                               </li>
                             )}
                           </For>

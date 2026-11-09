@@ -1,10 +1,21 @@
 import * as React from "react"
-import { createVirtualizer, css, definePrimitive, type VirtualItem } from "@ui-sdk/core"
+import {
+  createVirtualizer,
+  css,
+  definePrimitive,
+  type VirtualItem,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type Note = { id: string; text: string }
 
-type NotesState = { notes: Note[]; newest: boolean; large: boolean; items: VirtualItem[]; size: number }
+type NotesState = {
+  notes: Note[]
+  newest: boolean
+  large: boolean
+  items: VirtualItem[]
+  size: number
+}
 
 const sentences = [
   "Moved the launch review to Thursday.",
@@ -22,7 +33,13 @@ const notes: Note[] = Array.from({ length: 500 }, (_, index) => ({
 
 const notebook = definePrimitive({
   name: "notebook",
-  state: (): NotesState => ({ notes, newest: false, large: false, items: [], size: 0 }),
+  state: (): NotesState => ({
+    notes,
+    newest: false,
+    large: false,
+    items: [],
+    size: 0,
+  }),
   api: (context) => {
     const { store } = context
     let order = notes
@@ -32,7 +49,8 @@ const notebook = definePrimitive({
       key: (index) => order[index].id,
       overscan: 2,
     })
-    const sync = () => store.set({ items: virtual.items(), size: virtual.size() })
+    const sync = () =>
+      store.set({ items: virtual.items(), size: virtual.size() })
     context.onDestroy(virtual.subscribe(sync))
     return {
       virtual,
@@ -51,7 +69,11 @@ const notebook = definePrimitive({
   },
   slots: (slot) => ({
     root: slot<{}, { items: VirtualItem[]; newest: boolean; large: boolean }>({
-      state: (state) => ({ items: state.items, newest: state.newest, large: state.large }),
+      state: (state) => ({
+        items: state.items,
+        newest: state.newest,
+        large: state.large,
+      }),
     }),
     scroller: slot({
       attrs: () => ({ tabindex: "0", style: css({ overflow: "auto" }) }),
@@ -64,9 +86,14 @@ const notebook = definePrimitive({
         style: css({ position: "relative", height: `${state.size}px` }),
       }),
     }),
-    row: slot<{ value: string; index: number; start: number }, { text: string }>({
+    row: slot<
+      { value: string; index: number; start: number },
+      { text: string }
+    >({
       props: { value: "string", index: "number", start: "number" },
-      state: (_state, { api, props }) => ({ text: api.note(props.index)?.text ?? "" }),
+      state: (_state, { api, props }) => ({
+        text: api.note(props.index)?.text ?? "",
+      }),
       attrs: (state, { props }) => ({
         role: "listitem",
         "aria-setsize": String(state.notes.length),
@@ -121,9 +148,17 @@ function Example() {
             </NotebookAction>
           </div>
           <NotebookScroller>
-            <NotebookBody aria-label="Notes" data-large={large ? "" : undefined}>
+            <NotebookBody
+              aria-label="Notes"
+              data-large={large ? "" : undefined}
+            >
               {items.map((item) => (
-                <NotebookRow key={item.index} value={item.key} index={item.index} start={item.start}>
+                <NotebookRow
+                  key={item.index}
+                  value={item.key}
+                  index={item.index}
+                  start={item.start}
+                >
                   {({ text }) => text}
                 </NotebookRow>
               ))}

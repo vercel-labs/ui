@@ -13,7 +13,9 @@ test.describe("one pressed at a time", () => {
     await open("toggle")
   })
 
-  test("the group is named and its default toggle is pressed", async ({ page }) => {
+  test("the group is named and its default toggle is pressed", async ({
+    page,
+  }) => {
     await expect(groupNamed(page, "Text alignment")).toBeVisible()
     await pressed(page, "Left")
     await unpressed(page, "Center")
@@ -80,7 +82,10 @@ test.describe("keyboard", () => {
     await expect(buttonNamed(page, "Left")).toBeFocused()
   })
 
-  test("Tab moves into the group once, and out of it", async ({ page, tab }) => {
+  test("Tab moves into the group once, and out of it", async ({
+    page,
+    tab,
+  }) => {
     await tab()
     await expect(buttonNamed(page, "Bold")).toBeFocused()
     await tab({ shift: true })
@@ -92,7 +97,9 @@ test.describe("keyboard", () => {
     await expect(stops).toHaveCount(1)
   })
 
-  test("ArrowRight and ArrowLeft move focus without pressing", async ({ page }) => {
+  test("ArrowRight and ArrowLeft move focus without pressing", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowRight")
     await expect(buttonNamed(page, "Center")).toBeFocused()
     await unpressed(page, "Center")
@@ -115,13 +122,15 @@ test.describe("keyboard", () => {
     await expect(buttonNamed(page, "Left")).toBeFocused()
   })
 
-  test("ArrowUp and ArrowDown do nothing in a horizontal group", async ({ page }) => {
+  test("ArrowUp and ArrowDown do nothing in a horizontal group", async ({
+    page,
+  }) => {
     await page.keyboard.press("ArrowDown")
     await page.keyboard.press("ArrowUp")
     await expect(buttonNamed(page, "Left")).toBeFocused()
   })
 
-  for (const key of [" ", "Enter"])
+  for (const key of [" ", "Enter"]) {
     test(`${key} presses the focused toggle`, async ({ page }) => {
       await page.keyboard.press("ArrowRight")
       await expect(buttonNamed(page, "Center")).toBeFocused()
@@ -129,6 +138,7 @@ test.describe("keyboard", () => {
       await pressed(page, "Center")
       await unpressed(page, "Left")
     })
+  }
 
   test("Tab returns to the toggle focused last", async ({ page, tab }) => {
     await page.keyboard.press("ArrowRight")
@@ -140,17 +150,25 @@ test.describe("keyboard", () => {
   })
 
   test("the group itself is never a tab stop", async ({ page }) => {
-    await expect(groupNamed(page, "Text alignment")).not.toHaveAttribute("tabindex", /.*/)
+    await expect(groupNamed(page, "Text alignment")).not.toHaveAttribute(
+      "tabindex",
+      /.*/
+    )
   })
 
   test("keys pressed without waiting still land", async ({ page }) => {
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press(" ")
-    await expect(buttonNamed(page, "Right")).toHaveAttribute("aria-pressed", "true")
+    await expect(buttonNamed(page, "Right")).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    )
   })
 
-  test("arrow keys with a modifier are left to the browser", async ({ page }) => {
+  test("arrow keys with a modifier are left to the browser", async ({
+    page,
+  }) => {
     await page.keyboard.press("Alt+ArrowRight")
     await expect(buttonNamed(page, "Left")).toBeFocused()
   })
@@ -167,7 +185,10 @@ test.describe("options", () => {
     await expect(buttonNamed(page, "Right")).toBeFocused()
   })
 
-  test("a vertical group moves with ArrowDown and ArrowUp", async ({ page, open }) => {
+  test("a vertical group moves with ArrowDown and ArrowUp", async ({
+    page,
+    open,
+  }) => {
     await open("toggle", { orientation: "vertical" })
     await buttonNamed(page, "Left").focus()
     await page.keyboard.press("ArrowRight")
@@ -180,6 +201,9 @@ test.describe("options", () => {
 
   test("the group carries its orientation", async ({ page, open }) => {
     await open("toggle", { orientation: "vertical" })
-    await expect(groupNamed(page, "Text alignment")).toHaveAttribute("data-orientation", "vertical")
+    await expect(groupNamed(page, "Text alignment")).toHaveAttribute(
+      "data-orientation",
+      "vertical"
+    )
   })
 })

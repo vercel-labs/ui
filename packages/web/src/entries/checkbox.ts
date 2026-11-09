@@ -1,5 +1,8 @@
 // Importing this defines <ui-checkbox>, <ui-checkbox-group> and their parts. On the server it does nothing.
-import { defineCheckboxElements, defineCheckboxGroupElements } from "../checkbox"
+import {
+  defineCheckboxElements,
+  defineCheckboxGroupElements,
+} from "../checkbox"
 
 defineCheckboxElements()
 defineCheckboxGroupElements()
@@ -29,4 +32,7 @@ export type {
   UiCheckboxElement,
   UiCheckboxGroupElement,
 } from "../events"
-export { createCheckboxController, createCheckboxGroupController } from "@ui-sdk/core/checkbox"
+export {
+  createCheckboxController,
+  createCheckboxGroupController,
+} from "@ui-sdk/core/checkbox"

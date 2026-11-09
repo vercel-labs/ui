@@ -14,7 +14,14 @@ const commands = [
   {
     value: "status",
     label: "status",
-    arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
+    arguments: [
+      {
+        name: "status",
+        hint: "<status>",
+        required: true,
+        items: ["available", "busy", "away"],
+      },
+    ],
   },
 ]
 
@@ -38,7 +45,9 @@ function mount(root: HTMLElement) {
     const { value, reason } = event.detail
     log(root, `${value ? "Opening" : "Closing"} (${reason})`)
   })
-  menu.addEventListener("openchangecomplete", (event) => log(root, event.detail.value ? "Open" : "Closed"))
+  menu.addEventListener("openchangecomplete", (event) =>
+    log(root, event.detail.value ? "Open" : "Closed")
+  )
   menu.addEventListener("querychange", (event) => {
     const { value, argument } = event.detail
     log(root, `Query “${value}”${argument ? ` for ${argument}` : ""}`)

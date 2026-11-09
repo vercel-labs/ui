@@ -4,7 +4,10 @@ An element that follows the drawer, like the page behind it. Outside the drawer,
 @stable
 -->
 <script lang="ts">
-  import type { DrawerOutletProps, DrawerOutletState } from "@ui-sdk/core/drawer"
+  import type {
+    DrawerOutletProps,
+    DrawerOutletState,
+  } from "@ui-sdk/core/drawer"
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { useControllerTarget } from "../popup.svelte"
@@ -16,10 +19,12 @@ An element that follows the drawer, like the page behind it. Outside the drawer,
     keyframes,
     controller,
     ...rest
-  }: PartProps<"div", DrawerOutletState> &
-    DrawerOutletProps = $props()
+  }: PartProps<"div", DrawerOutletState> & DrawerOutletProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<DrawerContext | undefined>(DrawerKey))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<DrawerContext | undefined>(DrawerKey)
+  )
   const drawer = $derived(connected())
 </script>
 

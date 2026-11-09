@@ -9,7 +9,9 @@ import { defineMenuElements } from "../src/menu"
 import { defineTabsElements } from "../src/tabs"
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   defineTabsElements()
   defineMenuElements()
   defineDialogElements()
@@ -41,7 +43,9 @@ test("a dialog trigger's `payload` is a property of any value", () => {
 })
 
 test("a popup content's `container` is the selector its attribute holds", () => {
-  expectTypeOf(document.createElement("ui-dialog-content").container).toEqualTypeOf<string | undefined>()
+  expectTypeOf(
+    document.createElement("ui-dialog-content").container
+  ).toEqualTypeOf<string | undefined>()
 })
 
 test("a field error's `match` is a boolean or a validity flag, as its attribute reads", () => {

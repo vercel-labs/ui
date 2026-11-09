@@ -17,7 +17,12 @@ The root: a group around the picker's parts, and the hidden input the form submi
   import { useFieldControl } from "../field/context"
   import { provideInstance } from "../instance"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     value = $bindable(),
@@ -61,9 +66,15 @@ The root: a group around the picker's parts, and the hidden input the form submi
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs while the value changes. `details.cancel()` stops it. */
-    onValueChange?: (value: string, details: ColorPickerValueChangeDetails) => void
+    onValueChange?: (
+      value: string,
+      details: ColorPickerValueChangeDetails
+    ) => void
     /** Runs once an interaction that changed the value ends. For saving. */
-    onValueCommit?: (value: string, details: ColorPickerValueCommitDetails) => void
+    onValueCommit?: (
+      value: string,
+      details: ColorPickerValueCommitDetails
+    ) => void
   } = $props()
 
   const id = $props.id()
@@ -87,7 +98,9 @@ The root: a group around the picker's parts, and the hidden input the form submi
     onValueChange: (next: string, details: ColorPickerValueChangeDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onValueCommit,
   }))
@@ -97,7 +110,7 @@ The root: a group around the picker's parts, and the hidden input the form submi
   const input = useHandlePart(picker, "hidden-input")
   const fieldControl = field?.control(
     () => rest.id,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
 </script>
 

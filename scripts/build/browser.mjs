@@ -32,13 +32,20 @@ await write(
   {
     input: {
       ...Object.fromEntries(
-        entries.map((entry) => [entry, path.join(packageDir, "src/entries", `${entry}.ts`)]),
+        entries.map((entry) => [
+          entry,
+          path.join(packageDir, "src/entries", `${entry}.ts`),
+        ])
       ),
       // Built with the components, so a page using both shares one kernel.
       core: path.join(packageDir, "src/browser-core.ts"),
     },
   },
-  { dir: path.join(outDir, "web"), entryFileNames: "[name].js", chunkFileNames: "chunks/[hash].js" },
+  {
+    dir: path.join(outDir, "web"),
+    entryFileNames: "[name].js",
+    chunkFileNames: "chunks/[hash].js",
+  }
 )
 
 const loader = "\0ui-sdk-loader"
@@ -59,16 +66,23 @@ await write(
       },
     ],
   },
-  { file: path.join(outDir, "web.js") },
+  { file: path.join(outDir, "web.js") }
 )
 
 cpSync(
-  createRequire(path.join(packageDir, "package.json")).resolve("@ui-sdk/core/web.css"),
-  path.join(outDir, "web.css"),
+  createRequire(path.join(packageDir, "package.json")).resolve(
+    "@ui-sdk/core/web.css"
+  ),
+  path.join(outDir, "web.css")
 )
 
 async function write(input, output) {
-  const bundle = await rolldown({ cwd: packageDir, platform: "browser", logLevel: "warn", ...input })
+  const bundle = await rolldown({
+    cwd: packageDir,
+    platform: "browser",
+    logLevel: "warn",
+    ...input,
+  })
   await bundle.write({ format: "esm", minify: true, ...output })
   await bundle.close()
 }

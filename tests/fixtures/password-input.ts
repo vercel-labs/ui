@@ -3,7 +3,12 @@
 const passwordInputFixture = {
   // A sign-in form, named by its aria-label, with the field in a Field.
   // Its fields are in a fieldset, which a spec disables.
-  form: { label: "Sign in", account: "Account", submit: "Sign in", reset: "Reset" },
+  form: {
+    label: "Sign in",
+    account: "Account",
+    submit: "Sign in",
+    reset: "Reset",
+  },
   email: { label: "Email", name: "email", defaultValue: "ada@example.com" },
   password: {
     label: "Password",
@@ -19,7 +24,8 @@ const passwordInputFixture = {
 
 // What the "Last action" status says after a change.
 const passwordInputAction = {
-  visible: (visible: boolean, reason: string) => `visible: ${visible} (${reason})`,
+  visible: (visible: boolean, reason: string) =>
+    `visible: ${visible} (${reason})`,
   submit: (type: string) => `submitted as ${type}`,
 }
 
@@ -32,7 +38,9 @@ function passwordInputOptions() {
     defaultVisible: params.has("default-visible") || undefined,
     disabled: params.has("disabled") || undefined,
     readOnly: params.has("read-only") || undefined,
-    autoComplete: params.has("new-password") ? ("new-password" as const) : undefined,
+    autoComplete: params.has("new-password")
+      ? ("new-password" as const)
+      : undefined,
     controlled: params.has("controlled"),
     cancel: params.has("cancel"),
   }

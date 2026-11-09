@@ -37,12 +37,18 @@
     </SelectTrigger>
     <SelectContent>
       {#each members as member (member.value)}
-        <SelectItem value={member.value} label={member.name} disabled={member.value === "wren"}>
+        <SelectItem
+          value={member.value}
+          label={member.name}
+          disabled={member.value === "wren"}
+        >
           {#snippet children(state)}
             <span data-slot="badge">{member.name.slice(0, 1)}</span>
             <span data-slot="stack">
               {member.name}
-              <span data-slot="hint">{state.disabled ? "Out of office" : member.email}</span>
+              <span data-slot="hint"
+                >{state.disabled ? "Out of office" : member.email}</span
+              >
             </span>
             <SelectItemIndicator>
               {#snippet render({ props, state: indicator })}

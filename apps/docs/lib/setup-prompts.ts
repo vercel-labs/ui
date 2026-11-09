@@ -22,8 +22,16 @@ const stacks = [
     needs: "It needs React 19 or newer.",
     projects: [
       { id: "next", name: "Next.js", create: "npx create-next-app@latest ." },
-      { id: "vite", name: "Vite", create: "npm create vite@latest . -- --template react-ts" },
-      { id: "start", name: "TanStack Start", create: "npx @tanstack/cli@latest create . --framework react" },
+      {
+        id: "vite",
+        name: "Vite",
+        create: "npm create vite@latest . -- --template react-ts",
+      },
+      {
+        id: "start",
+        name: "TanStack Start",
+        create: "npx @tanstack/cli@latest create . --framework react",
+      },
     ],
   },
   {
@@ -33,7 +41,11 @@ const stacks = [
     needs: "It needs Vue 3.5 or newer.",
     projects: [
       { id: "nuxt", name: "Nuxt", create: "npm create nuxt@latest ." },
-      { id: "vite", name: "Vite", create: "npm create vite@latest . -- --template vue-ts" },
+      {
+        id: "vite",
+        name: "Vite",
+        create: "npm create vite@latest . -- --template vue-ts",
+      },
     ],
   },
   {
@@ -43,7 +55,11 @@ const stacks = [
     needs: "It needs Svelte 5.33 or newer.",
     projects: [
       { id: "sveltekit", name: "SvelteKit", create: "npx sv create ." },
-      { id: "vite", name: "Vite", create: "npm create vite@latest . -- --template svelte-ts" },
+      {
+        id: "vite",
+        name: "Vite",
+        create: "npm create vite@latest . -- --template svelte-ts",
+      },
     ],
   },
   {
@@ -52,7 +68,11 @@ const stacks = [
     pkg: "solid",
     needs: "It needs Solid 2: solid-js and @solidjs/web 2.0.0-rc.14 or newer.",
     projects: [
-      { id: "vite", name: "Vite", create: "npm create vite@latest . -- --template solid-ts" },
+      {
+        id: "vite",
+        name: "Vite",
+        create: "npm create vite@latest . -- --template solid-ts",
+      },
       {
         id: "start",
         name: "TanStack Start",
@@ -68,9 +88,14 @@ const stacks = [
     id: "web-components",
     name: "Web Components",
     pkg: "web",
-    needs: "Each component registers its tags when you import its entry, like @ui-sdk/web/dialog.",
+    needs:
+      "Each component registers its tags when you import its entry, like @ui-sdk/web/dialog.",
     projects: [
-      { id: "vite", name: "Vite", create: "npm create vite@latest . -- --template vanilla-ts" },
+      {
+        id: "vite",
+        name: "Vite",
+        create: "npm create vite@latest . -- --template vanilla-ts",
+      },
       { id: "html", name: "HTML" },
     ],
   },
@@ -84,7 +109,8 @@ const stacks = [
 
 type StackId = (typeof stacks)[number]["id"]
 
-const skillStep = "If you support skills, run: npx skills add vercel-labs/ui --skill ui-sdk"
+const skillStep =
+  "If you support skills, run: npx skills add vercel-labs/ui --skill ui-sdk"
 const closing = "When you're done, ask me what I'd like to build."
 
 function findStack(id: string) {
@@ -113,7 +139,9 @@ function installStep(pkg: string) {
 /** The Quick Start prompt for a framework, as content/shared/setup-prompt has it. */
 function quickStartPrompt(stackId: StackId) {
   const stack = findStack(stackId)
-  if (!stack.pkg) return ""
+  if (!stack.pkg) {
+    return ""
+  }
   return `Set up ui-sdk in this ${stack.name} project. ${stack.needs}
 
 ${steps([installStep(stack.pkg), agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`, { withCore: true }), skillStep])}`
@@ -139,18 +167,22 @@ ${steps([
 ])}`
 }
 
-function projectPrompt(stack: Stack & { pkg: string }, project: Project, registry: string) {
+function projectPrompt(
+  stack: Stack & { pkg: string },
+  project: Project,
+  registry: string
+) {
   const list = []
   if (registry) {
     list.push(
-      `Add this line to .npmrc in the project root, creating it if needed:\n   @ui-sdk:registry=${registry}/`,
+      `Add this line to .npmrc in the project root, creating it if needed:\n   @ui-sdk:registry=${registry}/`
     )
   }
   list.push(
     installStep(stack.pkg),
     `Import the default styles once at the app's entry, before your own CSS: import "@ui-sdk/core/web.css"`,
     agentsStep(`node_modules/@ui-sdk/${stack.pkg}/docs`, { withCore: true }),
-    skillStep,
+    skillStep
   )
   return `Set up ui-sdk in this ${stack.name} project with ${project.name}. ${project.needs ?? stack.needs}
 If the folder is empty, create the project first: ${project.create}
@@ -176,7 +208,8 @@ function setupPrompt({
   const stack = findStack(stackId)
   const siteUrl = site.replace(/\/+$/, "")
   const registryUrl = registry.replace(/\/+$/, "")
-  const project = stack.projects.find((item) => item.id === projectId) ?? stack.projects[0]
+  const project =
+    stack.projects.find((item) => item.id === projectId) ?? stack.projects[0]
   const body = !stack.pkg
     ? artifactPrompt(siteUrl, registryUrl || siteUrl)
     : project.id === "html"

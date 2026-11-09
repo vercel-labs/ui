@@ -16,14 +16,25 @@ const log = useLog()
 
 <template>
   <form role="search" data-slot="stack" @submit.prevent>
-    <Autocomplete submit-on-select name="q" @submit="(value: string) => log(`Searched “${value}”`)">
-      <AutocompleteInput type="search" aria-label="Search" placeholder="Search…" />
+    <Autocomplete
+      submit-on-select
+      name="q"
+      @submit="(value: string) => log(`Searched “${value}”`)"
+    >
+      <AutocompleteInput
+        type="search"
+        aria-label="Search"
+        placeholder="Search…"
+      />
       <AutocompleteContent>
         <AutocompleteEmpty>No results.</AutocompleteEmpty>
         <AutocompleteList>
-          <AutocompleteItem v-for="search in recent" :key="search" :value="search">{{
-            search
-          }}</AutocompleteItem>
+          <AutocompleteItem
+            v-for="search in recent"
+            :key="search"
+            :value="search"
+            >{{ search }}</AutocompleteItem
+          >
         </AutocompleteList>
       </AutocompleteContent>
     </Autocomplete>

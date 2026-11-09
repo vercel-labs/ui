@@ -1,4 +1,9 @@
-import { Progress, ProgressIndicator, ProgressLabel, ProgressTrack } from "@ui-sdk/react/progress"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+} from "@ui-sdk/react/progress"
 
 function Example() {
   return (

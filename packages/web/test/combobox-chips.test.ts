@@ -8,7 +8,9 @@ import type { UiComboboxElement } from "../src/events"
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   ElementInternals.prototype.setFormValue ??= () => {}
   ElementInternals.prototype.setValidity ??= () => {}
   defineComboboxElements()
@@ -29,7 +31,9 @@ async function mount() {
   await wait()
   const combobox = document.querySelector("ui-combobox") as UiComboboxElement
   const chips = () =>
-    Array.from(combobox.querySelectorAll("ui-combobox-chip")).map((chip) => chip.textContent)
+    Array.from(combobox.querySelectorAll("ui-combobox-chip")).map(
+      (chip) => chip.textContent
+    )
   return { combobox, chips }
 }
 
@@ -44,7 +48,9 @@ test("the page's own chips stay as the page rendered them, though its list start
   const { combobox, chips } = await mount()
   const part = combobox.querySelector("ui-combobox-chips")!
   combobox.addEventListener("valuechange", (event) => {
-    for (const chip of part.querySelectorAll(".page")) chip.remove()
+    for (const chip of part.querySelectorAll(".page")) {
+      chip.remove()
+    }
     for (const value of event.detail.value as string[]) {
       const chip = document.createElement("ui-combobox-chip")
       chip.className = "page"
@@ -71,7 +77,7 @@ test("the page's own chips inside a wrapper stay as the page rendered them", asy
         chip.setAttribute("value", value)
         chip.textContent = `#${value}`
         return chip
-      }),
+      })
     )
   })
   combobox.api.setValue(["bug"])

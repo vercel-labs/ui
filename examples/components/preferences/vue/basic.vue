@@ -31,8 +31,16 @@ function choose(next: "list" | "grid", event: MouseEvent) {
   <Preferences :preferences="[view]">
     <div data-slot="stack">
       <div data-slot="controls" role="group" aria-label="View">
-        <Button :aria-pressed="state.value === 'list'" @click="choose('list', $event)">List</Button>
-        <Button :aria-pressed="state.value === 'grid'" @click="choose('grid', $event)">Grid</Button>
+        <Button
+          :aria-pressed="state.value === 'list'"
+          @click="choose('list', $event)"
+          >List</Button
+        >
+        <Button
+          :aria-pressed="state.value === 'grid'"
+          @click="choose('grid', $event)"
+          >Grid</Button
+        >
       </div>
       <ul data-slot="files" aria-label="Files">
         <li v-for="file in files" :key="file.name">

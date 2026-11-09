@@ -20,7 +20,16 @@ const formats: { label: string; value: ColorFormat }[] = [
   { label: "OKLCH", value: "oklch" },
 ]
 
-const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+const presets = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#0ea5e9",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+]
 
 function Example() {
   const [format, setFormat] = createSignal<ColorFormat>("hex")
@@ -71,14 +80,20 @@ function Example() {
         <select
           aria-label="Format"
           value={format()}
-          onChange={(event) => changeFormat(event.currentTarget.value as ColorFormat)}
+          onChange={(event) =>
+            changeFormat(event.currentTarget.value as ColorFormat)
+          }
         >
-          <For each={formats}>{(option) => <option value={option.value}>{option.label}</option>}</For>
+          <For each={formats}>
+            {(option) => <option value={option.value}>{option.label}</option>}
+          </For>
         </select>
         <ColorPickerInput aria-label="Color" />
       </div>
       <ColorPickerSwatches aria-label="Presets">
-        <For each={presets}>{(preset) => <ColorPickerSwatchItem value={preset} />}</For>
+        <For each={presets}>
+          {(preset) => <ColorPickerSwatchItem value={preset} />}
+        </For>
       </ColorPickerSwatches>
     </ColorPicker>
   )

@@ -1,11 +1,16 @@
 import { createPaginationController } from "@ui-sdk/core/pagination"
 import type { UiPaginationElement } from "@ui-sdk/web"
-import { paginationAction, paginationFixture as f, paginationOptions } from "tests/fixtures/pagination.ts"
+import {
+  paginationAction,
+  paginationFixture as f,
+  paginationOptions,
+} from "tests/fixtures/pagination.ts"
 
 async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/pagination")
   // Web components have no controlled mode: the element owns its state.
-  const { cancel, defaultPage, pageCount, siblings, boundaries, getHref } = paginationOptions()
+  const { cancel, defaultPage, pageCount, siblings, boundaries, getHref } =
+    paginationOptions()
   const tag = getHref ? "a" : "button"
   const attributes = [
     `page-count="${pageCount}"`,
@@ -38,12 +43,21 @@ async function mount(root: HTMLElement) {
   const status = root.querySelector("output")!
   const pages = createPaginationController()
   pagination.controller = pages
-  if (getHref) pagination.getHref = getHref
+  if (getHref) {
+    pagination.getHref = getHref
+  }
   pagination.addEventListener("pagechange", (event) => {
-    if (event.detail.value === cancel) return event.preventDefault()
-    status.textContent = paginationAction(event.detail.value, event.detail.reason)
+    if (event.detail.value === cancel) {
+      return event.preventDefault()
+    }
+    status.textContent = paginationAction(
+      event.detail.value,
+      event.detail.reason
+    )
   })
-  root.querySelector("#go")!.addEventListener("click", () => pages.setPage(f.controller.page))
+  root
+    .querySelector("#go")!
+    .addEventListener("click", () => pages.setPage(f.controller.page))
 }
 
 export { mount }

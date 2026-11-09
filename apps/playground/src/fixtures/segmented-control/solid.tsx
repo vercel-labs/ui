@@ -33,7 +33,9 @@ function Fixture() {
         controller={controller}
         {...options}
         onValueChange={(value, details) => {
-          if (value === cancel) return details.cancel()
+          if (value === cancel) {
+            return details.cancel()
+          }
           setAction(`${value}:${details.reason}`)
         }}
       >

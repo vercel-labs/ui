@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations at first", async ({ page, open }) => {
@@ -31,12 +33,16 @@ test("no axe violations with everything checked", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations in a disabled fieldset", { tag: "@enhancement" }, async ({ page, open }) => {
-  await open("forms")
-  await page.getByRole("button", { name: "Toggle shipping" }).click()
-  await expect(checkbox(page, "Gift wrap")).toBeDisabled()
-  expect(await audit(page)).toEqual([])
-})
+test(
+  "no axe violations in a disabled fieldset",
+  { tag: "@enhancement" },
+  async ({ page, open }) => {
+    await open("forms")
+    await page.getByRole("button", { name: "Toggle shipping" }).click()
+    await expect(checkbox(page, "Gift wrap")).toBeDisabled()
+    expect(await audit(page)).toEqual([])
+  }
+)
 
 test("no axe violations when read-only or disabled", async ({ page, open }) => {
   await open("forms", { readonly: "" })
@@ -49,8 +55,9 @@ test("no axe violations when read-only or disabled", async ({ page, open }) => {
 
 test("disabled controls are announced as disabled", async ({ page, open }) => {
   await open("forms", { disabled: "" })
-  for (const name of ["Free", "Pro", "Team", "Enterprise"])
+  for (const name of ["Free", "Pro", "Team", "Enterprise"]) {
     await expect(page.getByRole("radio", { name, exact: true })).toBeDisabled()
+  }
 })
 
 test(
@@ -60,20 +67,31 @@ test(
     await open("forms")
     await page.getByRole("button", { name: "Toggle shipping" }).click()
     await expect(checkbox(page, "Gift wrap")).toBeDisabled()
-    await expect(checkbox(page, "Gift wrap")).toHaveAttribute("data-disabled", "")
-  },
+    await expect(checkbox(page, "Gift wrap")).toHaveAttribute(
+      "data-disabled",
+      ""
+    )
+  }
 )
 
 test("required controls are announced as required", async ({ page, open }) => {
   await open("forms")
-  await expect(checkbox(page, "Accept the terms")).toHaveAttribute("aria-required", "true")
-  await expect(page.getByRole("radiogroup", { name: "Plan" })).toHaveAttribute("aria-required", "true")
+  await expect(checkbox(page, "Accept the terms")).toHaveAttribute(
+    "aria-required",
+    "true"
+  )
+  await expect(page.getByRole("radiogroup", { name: "Plan" })).toHaveAttribute(
+    "aria-required",
+    "true"
+  )
 })
 
 // Every implementation must expose the same accessibility tree.
 test("accessibility tree", async ({ page, open }) => {
   await open("forms")
-  await expect(page.getByRole("group", { name: "Toppings", exact: true }).last()).toMatchAriaSnapshot(`
+  await expect(
+    page.getByRole("group", { name: "Toppings", exact: true }).last()
+  ).toMatchAriaSnapshot(`
     - group "Toppings":
       - checkbox "All toppings" [checked=mixed]
       - text: All toppings
@@ -95,6 +113,10 @@ test("accessibility tree", async ({ page, open }) => {
       - radio "Enterprise"
       - text: Enterprise
   `)
-  await expect(page.getByRole("switch", { name: "Wi-Fi" })).toMatchAriaSnapshot(`- switch "Wi-Fi" [checked]`)
-  await expect(checkbox(page, "Accept the terms")).toMatchAriaSnapshot(`- checkbox "Accept the terms"`)
+  await expect(page.getByRole("switch", { name: "Wi-Fi" })).toMatchAriaSnapshot(
+    `- switch "Wi-Fi" [checked]`
+  )
+  await expect(checkbox(page, "Accept the terms")).toMatchAriaSnapshot(
+    `- checkbox "Accept the terms"`
+  )
 })

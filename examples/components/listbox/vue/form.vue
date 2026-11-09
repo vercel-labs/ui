@@ -15,7 +15,9 @@ const toppings = [
 const log = useLog()
 
 function onSubmit(event: Event) {
-  log(`Ordered ${new FormData(event.currentTarget as HTMLFormElement).getAll("toppings").join(", ")}`)
+  log(
+    `Ordered ${new FormData(event.currentTarget as HTMLFormElement).getAll("toppings").join(", ")}`
+  )
 }
 </script>
 
@@ -29,7 +31,11 @@ function onSubmit(event: Event) {
       :default-value="['cheese']"
       aria-label="Toppings"
     >
-      <ListboxItem v-for="topping in toppings" :key="topping.value" :value="topping.value">
+      <ListboxItem
+        v-for="topping in toppings"
+        :key="topping.value"
+        :value="topping.value"
+      >
         {{ topping.label }}
         <ListboxItemIndicator>
           <CheckIcon aria-hidden="true" />

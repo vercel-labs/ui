@@ -68,7 +68,11 @@ function Example() {
       <AutocompleteContent>
         <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
         <AutocompleteList>
-          <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
+          <For each={fruits}>
+            {(fruit) => (
+              <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>
+            )}
+          </For>
         </AutocompleteList>
       </AutocompleteContent>
     </Autocomplete>

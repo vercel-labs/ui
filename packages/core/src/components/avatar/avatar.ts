@@ -1,8 +1,14 @@
 import { css } from "../../foundation/kernel/inline-style"
-import { type ChangeDetails, resolveSource } from "../../foundation/kernel/details"
+import {
+  type ChangeDetails,
+  resolveSource,
+} from "../../foundation/kernel/details"
 import { on } from "../../foundation/kernel/events"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { changeFrom } from "../../foundation/kernel/change"
 import { imageStatus } from "./image-status"
 
@@ -24,7 +30,8 @@ type AvatarLoadingStatus = "idle" | "loading" | "loaded" | "error"
  * Why the image's loading status changed.
  * @stable
  */
-type AvatarLoadingStatusChangeReason = "image-load" | "image-error" | "src-change"
+type AvatarLoadingStatusChangeReason =
+  "image-load" | "image-error" | "src-change"
 
 /**
  * The options `avatar` takes. A component takes them as props on its root.
@@ -40,7 +47,7 @@ type AvatarOptions = {
    */
   onLoadingStatusChange?: (
     status: AvatarLoadingStatus,
-    details: ChangeDetails<AvatarLoadingStatusChangeReason>,
+    details: ChangeDetails<AvatarLoadingStatusChangeReason>
   ) => void
 } & PrimitiveOptions
 
@@ -106,18 +113,28 @@ const avatarPrimitive = /* @__PURE__ */ definePrimitive({
     // Internal: passed by renderers.
     fallbackDelay: "number",
   },
-  state: (_options: AvatarInternalOptions): State => ({ loadingStatus: "idle", delayElapsed: false }),
+  state: (_options: AvatarInternalOptions): State => ({
+    loadingStatus: "idle",
+    delayElapsed: false,
+  }),
   controlled: [],
   api: (context) => {
     const { store, props, element, options } = context
     // A load or an error is never the user's doing, so no change reads input.
-    const change = changeFrom(context, (reason: string) => resolveSource(reason))
-    const report = (status: AvatarLoadingStatus, reason: AvatarLoadingStatusChangeReason, event?: Event) =>
-      change("loadingStatus", status, { reason, event })
+    const change = changeFrom(context, (reason: string) =>
+      resolveSource(reason)
+    )
+    const report = (
+      status: AvatarLoadingStatus,
+      reason: AvatarLoadingStatusChangeReason,
+      event?: Event
+    ) => change("loadingStatus", status, { reason, event })
     // A loaded image keeps showing while its next source loads, as browsers
     // draw it, so a new source never flashes the fallback.
     const startLoading = () => {
-      if (store.get().loadingStatus !== "loaded") report("loading", "src-change")
+      if (store.get().loadingStatus !== "loaded") {
+        report("loading", "src-change")
+      }
     }
 
     return {
@@ -127,12 +144,17 @@ const avatarPrimitive = /* @__PURE__ */ definePrimitive({
         watchImage(img: HTMLImageElement) {
           const check = () => {
             const status = imageStatus(img, hasSource(img))
-            if (status === "loading") startLoading()
-            else report(status, status === "loaded" ? "image-load" : "image-error")
+            if (status === "loading") {
+              startLoading()
+            } else {
+              report(status, status === "loaded" ? "image-load" : "image-error")
+            }
           }
           check()
           const observer = new MutationObserver(check)
-          observer.observe(img, { attributeFilter: ["src", "srcset", "sizes", "crossorigin"] })
+          observer.observe(img, {
+            attributeFilter: ["src", "srcset", "sizes", "crossorigin"],
+          })
           const cleanups = [
             on(img, "load", (event) => report("loaded", "image-load", event)),
             on(img, "error", (event) => report("error", "image-error", event)),
@@ -142,7 +164,9 @@ const avatarPrimitive = /* @__PURE__ */ definePrimitive({
             cleanups.forEach((cleanup) => cleanup())
             // React's StrictMode and moved elements bind again in the same task.
             queueMicrotask(() => {
-              if (!element("image")) report("idle", "src-change")
+              if (!element("image")) {
+                report("idle", "src-change")
+              }
             })
           }
         },
@@ -150,7 +174,9 @@ const avatarPrimitive = /* @__PURE__ */ definePrimitive({
         // which nothing unbinds, takes its status with it.
         watchImageRemoval(root: HTMLElement) {
           const observer = new MutationObserver(() => {
-            if (store.get().loadingStatus !== "idle" && !element("image")) report("idle", "src-change")
+            if (store.get().loadingStatus !== "idle" && !element("image")) {
+              report("idle", "src-change")
+            }
           })
           observer.observe(root, { childList: true, subtree: true })
           return () => observer.disconnect()
@@ -161,10 +187,16 @@ const avatarPrimitive = /* @__PURE__ */ definePrimitive({
           let timer: ReturnType<typeof setTimeout> | undefined
           let active = true
           queueMicrotask(() => {
-            if (!active) return
+            if (!active) {
+              return
+            }
             const delay =
-              (props("fallback") as AvatarFallbackProps | undefined)?.delay ?? options().fallbackDelay ?? 0
-            if (delay > 0) timer = setTimeout(() => store.set({ delayElapsed: true }), delay)
+              (props("fallback") as AvatarFallbackProps | undefined)?.delay ??
+              options().fallbackDelay ??
+              0
+            if (delay > 0) {
+              timer = setTimeout(() => store.set({ delayElapsed: true }), delay)
+            }
           })
           return () => {
             active = false
@@ -179,7 +211,10 @@ const avatarPrimitive = /* @__PURE__ */ definePrimitive({
       state: (state) => ({ loadingStatus: state.loadingStatus }),
       attrs: statusAttrs,
       bind: (el, { api }) => {
-        const cleanups = [api.internal.startDelay(), api.internal.watchImageRemoval(el)]
+        const cleanups = [
+          api.internal.startDelay(),
+          api.internal.watchImageRemoval(el),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -199,7 +234,8 @@ const avatarPrimitive = /* @__PURE__ */ definePrimitive({
     fallback: slot<AvatarFallbackProps, AvatarState>({
       props: { delay: "number" },
       present: (state, { props }) =>
-        state.loadingStatus !== "loaded" && (!(props.delay && props.delay > 0) || state.delayElapsed),
+        state.loadingStatus !== "loaded" &&
+        (!(props.delay && props.delay > 0) || state.delayElapsed),
       state: (state) => ({ loadingStatus: state.loadingStatus }),
       attrs: statusAttrs,
     }),

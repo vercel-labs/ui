@@ -14,7 +14,11 @@
 {:else if view === "combobox"}
   <Combobox>
     <ComboboxLabel>Email</ComboboxLabel>
-    <ComboboxInput autocomplete="email" aria-label="Work email" role="textbox" />
+    <ComboboxInput
+      autocomplete="email"
+      aria-label="Work email"
+      role="textbox"
+    />
   </Combobox>
 {:else if view === "field"}
   <Field>

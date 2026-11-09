@@ -26,9 +26,14 @@ function Example() {
   const [expanded, setExpanded] = createSignal(["folder-1"])
   const rows = createMemo(() => visibleTreeRows(items, expanded()))
   const start = () => Math.max(0, Math.floor(scrollTop() / row) - 4)
-  const end = () => Math.min(rows().length, Math.ceil((scrollTop() + height) / row) + 4)
+  const end = () =>
+    Math.min(rows().length, Math.ceil((scrollTop() + height) / row) + 4)
   return (
-    <div data-slot="scroll" ref={scroller} onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}>
+    <div
+      data-slot="scroll"
+      ref={scroller}
+      onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+    >
       <Tree
         aria-label="Archive"
         items={items}
@@ -36,18 +41,28 @@ function Example() {
         onExpandedChange={setExpanded}
         onHighlight={(_value, { index }) => {
           const el = scroller
-          if (!el) return
+          if (!el) {
+            return
+          }
           const top = index * row
-          if (top < el.scrollTop) el.scrollTop = top
-          else if (top + row > el.scrollTop + el.clientHeight - 10)
+          if (top < el.scrollTop) {
+            el.scrollTop = top
+          } else if (top + row > el.scrollTop + el.clientHeight - 10) {
             el.scrollTop = top + row - el.clientHeight + 10
+          }
           setScrollTop(el.scrollTop)
         }}
         style={{ height: `${rows().length * row}px` }}
       >
-        <For each={rows().slice(start(), end())} keyed={(visible) => visible.item.value}>
+        <For
+          each={rows().slice(start(), end())}
+          keyed={(visible) => visible.item.value}
+        >
           {(visible) => (
-            <TreeItem value={visible().item.value} style={{ top: `${visible().index * row}px` }}>
+            <TreeItem
+              value={visible().item.value}
+              style={{ top: `${visible().index * row}px` }}
+            >
               <TreeItemLabel>
                 <Show when={visible().item.children}>
                   <TreeItemIndicator>

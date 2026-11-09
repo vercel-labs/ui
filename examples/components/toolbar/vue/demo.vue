@@ -19,7 +19,9 @@ const log = useLog()
       v-for="style in styles"
       :key="style.label"
       :aria-label="style.label"
-      @pressed-change="(pressed) => log(`${style.label} ${pressed ? 'on' : 'off'}`)"
+      @pressed-change="
+        (pressed) => log(`${style.label} ${pressed ? 'on' : 'off'}`)
+      "
     >
       <ToggleIcon>
         <component :is="style.icon" />

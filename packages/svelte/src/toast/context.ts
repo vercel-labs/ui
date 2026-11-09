@@ -36,14 +36,26 @@ type ToastRegionProps = Omit<SvelteHTMLElements["section"], "children"> & {
   }
 
 // The region and the toast a part belongs to.
-type ToastContext = { region: RegionHandle; toast: () => ToastData<ToastContent> }
+type ToastContext = {
+  region: RegionHandle
+  toast: () => ToastData<ToastContent>
+}
 
 const ToastKey = Symbol("toast")
 
 function useToast(part: string) {
   const context = getContext<ToastContext | undefined>(ToastKey)
-  if (!context) throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  }
   return context
 }
 
-export { type RegionHandle, type ToastContent, type ToastContext, ToastKey, type ToastRegionProps, useToast }
+export {
+  type RegionHandle,
+  type ToastContent,
+  type ToastContext,
+  ToastKey,
+  type ToastRegionProps,
+  useToast,
+}

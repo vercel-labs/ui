@@ -24,7 +24,13 @@ import {
 import { slotContent } from "./children"
 import { withElement } from "./create-parts"
 import { containerProp, renderPopup } from "./popup"
-import { optionalBoolean, usePart, usePrimitive, type PrimitiveHandle, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  usePart,
+  usePrimitive,
+  type PrimitiveHandle,
+  type PartSlots,
+} from "./use-primitive"
 
 /**
  * What toasts can say in Vue: text, or a VNode.
@@ -38,11 +44,16 @@ type RegionHandle = PrimitiveHandle<typeof toastRegion>
 type ButtonAction = NonNullable<ToastCloseProps["action"]>
 
 // The region and the toast a part belongs to: the toast's data, beside its id.
-const ToastKey: InjectionKey<{ region: RegionHandle; toast: () => ToastData<ToastContent> }> = Symbol("toast")
+const ToastKey: InjectionKey<{
+  region: RegionHandle
+  toast: () => ToastData<ToastContent>
+}> = Symbol("toast")
 
 function useToast(part: string) {
   const context = inject(ToastKey, null)
-  if (!context) throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Toast>, in a <ToastRegion>.`)
+  }
   return context
 }
 
@@ -51,7 +62,10 @@ const ToastScope = defineComponent({
   name: "ToastScope",
   props: {
     region: { type: Object as PropType<RegionHandle>, required: true },
-    toast: { type: Object as PropType<ToastData<ToastContent>>, required: true },
+    toast: {
+      type: Object as PropType<ToastData<ToastContent>>,
+      required: true,
+    },
   },
   setup(props, { slots }) {
     provide(ToastKey, { region: props.region, toast: () => props.toast })
@@ -90,7 +104,9 @@ function createRegion(placed: boolean) {
         // `attrs` aren't reactive, so the name the region announces follows
         // them through a ref, updated before each render a new name causes.
         const label = shallowRef(attrs["aria-label"] as string | undefined)
-        onBeforeUpdate(() => (label.value = attrs["aria-label"] as string | undefined))
+        onBeforeUpdate(
+          () => (label.value = attrs["aria-label"] as string | undefined)
+        )
         const region = usePrimitive(
           toastRegion,
           () =>
@@ -105,7 +121,7 @@ function createRegion(placed: boolean) {
               debug: props.debug,
               placed,
               label: label.value,
-            }) satisfies ToastRegionInternalOptions,
+            }) satisfies ToastRegionInternalOptions
         )
         // The list of toasts, built as the region renders, so it reads the toasts.
         let list: VNode | undefined
@@ -117,7 +133,7 @@ function createRegion(placed: boolean) {
             const { "aria-label": _, ...rest } = attrs
             return rest
           },
-          { tag: "section", children: () => list },
+          { tag: "section", children: () => list }
         )
         return () => {
           const toasts = part.state.toasts as readonly ToastItem<ToastContent>[]
@@ -125,18 +141,21 @@ function createRegion(placed: boolean) {
             "ol",
             region.slot("list"),
             toasts.map((item) =>
-              h(ToastScope, { key: item.toast.id, region, toast: item.toast }, () =>
-                slots.default
-                  ? slots.default({ toast: item.toast, item })
-                  : h(DataToast, { toast: item.toast }),
-              ),
-            ),
+              h(
+                ToastScope,
+                { key: item.toast.id, region, toast: item.toast },
+                () =>
+                  slots.default
+                    ? slots.default({ toast: item.toast, item })
+                    : h(DataToast, { toast: item.toast })
+              )
+            )
           )
           const element = part()
           return element && renderPopup(element, props.container)
         }
       },
-    }),
+    })
   )
 }
 
@@ -153,7 +172,10 @@ const HostedToastRegion = createRegion(false)
 const DataToast = defineComponent({
   name: "DataToast",
   props: {
-    toast: { type: Object as PropType<ToastData<ToastContent>>, required: true },
+    toast: {
+      type: Object as PropType<ToastData<ToastContent>>,
+      required: true,
+    },
   },
   setup(props) {
     return () => {
@@ -164,7 +186,13 @@ const DataToast = defineComponent({
           toast.description != null ? h(ToastDescription) : null,
         ]),
         toast.action ? h(ToastAction) : null,
-        toast.cancel ? h(ToastClose, { action: toast.cancel.onCancel }, () => toast.cancel!.label) : null,
+        toast.cancel
+          ? h(
+              ToastClose,
+              { action: toast.cancel.onCancel },
+              () => toast.cancel!.label
+            )
+          : null,
       ])
     }
   },
@@ -182,9 +210,15 @@ const Toast = withElement(
     slots: Object as PartSlots<typeof toastRegion, "root">,
     setup() {
       const { region, toast } = useToast("Toast")
-      return usePart(region, "root", () => ({ id: toast().id }), undefined, "li")
+      return usePart(
+        region,
+        "root",
+        () => ({ id: toast().id }),
+        undefined,
+        "li"
+      )
     },
-  }),
+  })
 )
 
 // Title and description render the toast's own content when they have none.
@@ -198,16 +232,23 @@ function contentPart(name: string, slot: "title" | "description") {
       setup(_, { slots }) {
         const { region, toast } = useToast(name)
         let content: unknown
-        const part = usePart(region, slot, () => ({ id: toast().id }), undefined, {
-          tag: "div",
-          children: () => content,
-        })
+        const part = usePart(
+          region,
+          slot,
+          () => ({ id: toast().id }),
+          undefined,
+          {
+            tag: "div",
+            children: () => content,
+          }
+        )
         return () => {
-          content = slotContent(slots.default, { state: part.state }) ?? toast()[slot]
+          content =
+            slotContent(slots.default, { state: part.state }) ?? toast()[slot]
           return content == null ? null : part()
         }
       },
-    }),
+    })
   )
 }
 
@@ -244,7 +285,12 @@ const ToastAction = withElement(
     setup(props, { slots, attrs }) {
       const { region, toast } = useToast("ToastAction")
       const id = useId()
-      const part = () => ({ id, toast: toast().id, onAction: props.onAction, dismiss: props.dismiss })
+      const part = () => ({
+        id,
+        toast: toast().id,
+        onAction: props.onAction,
+        dismiss: props.dismiss,
+      })
       // A link when the action has an `href`.
       const element = () => {
         const href = toast().action?.href
@@ -254,11 +300,12 @@ const ToastAction = withElement(
         get tag() {
           return toast().action?.href ? "a" : "button"
         },
-        children: (state) => slotContent(slots.default, { state }) ?? toast().action?.label,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? toast().action?.label,
       })
       return () => (!toast().action && !props.onAction ? null : render())
     },
-  }),
+  })
 )
 
 /**
@@ -280,10 +327,20 @@ const ToastClose = withElement(
     setup(props, { attrs }) {
       const { region, toast } = useToast("ToastClose")
       const id = useId()
-      const part = () => ({ id, toast: toast().id, action: props.action ?? props.onAction })
-      return usePart(region, "close", part, () => ({ type: "button", ...attrs }), "button")
+      const part = () => ({
+        id,
+        toast: toast().id,
+        action: props.action ?? props.onAction,
+      })
+      return usePart(
+        region,
+        "close",
+        part,
+        () => ({ type: "button", ...attrs }),
+        "button"
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -299,7 +356,7 @@ const toast = coreToast as Toaster<ToastContent>
  * @stable
  */
 const createToaster = createCoreToaster as <Content = ToastContent>(
-  options?: Parameters<typeof createCoreToaster>[0],
+  options?: Parameters<typeof createCoreToaster>[0]
 ) => Toaster<Content>
 
 export {

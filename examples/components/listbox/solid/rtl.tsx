@@ -11,7 +11,9 @@ export function Example() {
   return (
     <div dir="rtl">
       <Listbox orientation="horizontal" defaultValue="day" aria-label="תצוגה">
-        <For each={views}>{(view) => <ListboxItem value={view.value}>{view.label}</ListboxItem>}</For>
+        <For each={views}>
+          {(view) => <ListboxItem value={view.value}>{view.label}</ListboxItem>}
+        </For>
       </Listbox>
     </div>
   )

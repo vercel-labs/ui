@@ -18,11 +18,36 @@ type Variant = {
 }
 
 const variants: Variant[] = [
-  { id: "default", section: "Range", title: "Default", options: { pageCount: 10 } },
-  { id: "default-page", section: "Range", title: "defaultPage", options: { pageCount: 10, defaultPage: 5 } },
-  { id: "one-page", section: "Range", title: "One page", options: { pageCount: 1 } },
-  { id: "few-pages", section: "Range", title: "Few pages", options: { pageCount: 3 } },
-  { id: "many-pages", section: "Range", title: "Many pages", options: { pageCount: 100, defaultPage: 50 } },
+  {
+    id: "default",
+    section: "Range",
+    title: "Default",
+    options: { pageCount: 10 },
+  },
+  {
+    id: "default-page",
+    section: "Range",
+    title: "defaultPage",
+    options: { pageCount: 10, defaultPage: 5 },
+  },
+  {
+    id: "one-page",
+    section: "Range",
+    title: "One page",
+    options: { pageCount: 1 },
+  },
+  {
+    id: "few-pages",
+    section: "Range",
+    title: "Few pages",
+    options: { pageCount: 3 },
+  },
+  {
+    id: "many-pages",
+    section: "Range",
+    title: "Many pages",
+    options: { pageCount: 100, defaultPage: 50 },
+  },
   {
     id: "siblings-0",
     section: "Range",
@@ -54,7 +79,13 @@ const variants: Variant[] = [
     note: "95 items, 20 to a page.",
     options: { total: 95, pageSize: 20 },
   },
-  { id: "links", section: "Links", title: "getHref", links: true, options: { pageCount: 10 } },
+  {
+    id: "links",
+    section: "Links",
+    title: "getHref",
+    links: true,
+    options: { pageCount: 10 },
+  },
   {
     id: "links-end",
     section: "Links",
@@ -62,9 +93,27 @@ const variants: Variant[] = [
     links: true,
     options: { pageCount: 10, defaultPage: 10 },
   },
-  { id: "controlled", section: "State", title: "Controlled", controlled: true, options: { pageCount: 10 } },
-  { id: "controller", section: "State", title: "Controller", controller: true, options: { pageCount: 10 } },
-  { id: "cancel", section: "State", title: "Canceled changes", cancel: true, options: { pageCount: 10 } },
+  {
+    id: "controlled",
+    section: "State",
+    title: "Controlled",
+    controlled: true,
+    options: { pageCount: 10 },
+  },
+  {
+    id: "controller",
+    section: "State",
+    title: "Controller",
+    controller: true,
+    options: { pageCount: 10 },
+  },
+  {
+    id: "cancel",
+    section: "State",
+    title: "Canceled changes",
+    cancel: true,
+    options: { pageCount: 10 },
+  },
   {
     id: "rtl",
     section: "Parts",

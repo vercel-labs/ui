@@ -3,9 +3,16 @@
 // image-cropper-api.ts, and parts in image-cropper-parts.ts.
 import type { ImageCrop } from "../../foundation/image/crop"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, CommitDetails } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  CommitDetails,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { imageCropperApi, initialState, syncState } from "./image-cropper-api"
 import { imageCropperSlots } from "./image-cropper-parts"
 
@@ -69,7 +76,8 @@ type ImageCropperFlipDirection = "horizontal" | "vertical"
  * The edge or corner a handle resizes, by compass point.
  * @experimental
  */
-type ImageCropperHandlePosition = "n" | "e" | "s" | "w" | "ne" | "nw" | "se" | "sw"
+type ImageCropperHandlePosition =
+  "n" | "e" | "s" | "w" | "ne" | "nw" | "se" | "sw"
 
 /**
  * Sets and inspects an image cropper from outside it. Pass it as the `controller` option.
@@ -84,7 +92,10 @@ function createImageCropperController() {
     /** Turns the image a quarter clockwise, or counterclockwise with `-1`. */
     rotate: (direction?: 1 | -1, options?: ImageCropperChangeOptions) => boolean
     /** Mirrors the image left to right, or top to bottom with `"vertical"`. */
-    flip: (direction?: ImageCropperFlipDirection, options?: ImageCropperChangeOptions) => boolean
+    flip: (
+      direction?: ImageCropperFlipDirection,
+      options?: ImageCropperChangeOptions
+    ) => boolean
     /** How far the crop magnifies: 1 when it's as large as the image allows at its ratio. */
     getZoom: () => number
     /** Zooms to a level, about the crop's middle, within 1 and `maxZoom`. */
@@ -119,9 +130,15 @@ type ImageCropperOptions = {
    */
   defaultCrop?: ImageCrop
   /** Runs while the crop changes: on every step of a drag, a key or the wheel, and once an image loads. `details.cancel()` stops it. */
-  onCropChange?: (crop: Required<ImageCrop>, details: ImageCropperCropChangeDetails) => void
+  onCropChange?: (
+    crop: Required<ImageCrop>,
+    details: ImageCropperCropChangeDetails
+  ) => void
   /** Runs once an interaction that changed the crop ends: the pointer lifts, a key is pressed, the wheel pauses. For saving. */
-  onCropCommit?: (crop: Required<ImageCrop>, details: ImageCropperCropCommitDetails) => void
+  onCropCommit?: (
+    crop: Required<ImageCrop>,
+    details: ImageCropperCropCommitDetails
+  ) => void
   /**
    * `"box"` moves and resizes a selection over the whole image. `"frame"`
    * keeps the selection still and as large as it fits, and pans and zooms

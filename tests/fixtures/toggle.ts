@@ -40,7 +40,8 @@ const toggleFixture = {
 // What the "Last action" status says after a change.
 const toggleAction = {
   toggle: (pressed: boolean) => `bookmark: ${pressed ? "on" : "off"}`,
-  group: (name: string, value: string[]) => `${name}: ${value.join(", ") || "none"}`,
+  group: (name: string, value: string[]) =>
+    `${name}: ${value.join(", ") || "none"}`,
 }
 
 export { toggleAction, toggleFixture, type ToggleFixtureItem }

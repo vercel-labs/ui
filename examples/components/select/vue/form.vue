@@ -30,7 +30,7 @@ const log = useLog()
 
 function submit(event: Event) {
   const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-    ([name, value]) => `${name}=${value}`,
+    ([name, value]) => `${name}=${value}`
   )
   log(`Submitted ${entries.join("&")}`)
 }
@@ -41,13 +41,22 @@ function submit(event: Event) {
     <form id="select-newsletter" data-slot="stack" @submit.prevent="submit">
       <Field>
         <FieldLabel>Country</FieldLabel>
-        <Select name="country" auto-complete="country" required placeholder="Select a country">
+        <Select
+          name="country"
+          auto-complete="country"
+          required
+          placeholder="Select a country"
+        >
           <SelectTrigger>
             <SelectValue />
             <ChevronDownIcon />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem v-for="country in countries" :key="country.value" :value="country.value">
+            <SelectItem
+              v-for="country in countries"
+              :key="country.value"
+              :value="country.value"
+            >
               {{ country.label }}
               <SelectItemIndicator>
                 <CheckIcon />
@@ -82,7 +91,11 @@ function submit(event: Event) {
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="frequency in frequencies" :key="frequency" :value="frequency">
+          <SelectItem
+            v-for="frequency in frequencies"
+            :key="frequency"
+            :value="frequency"
+          >
             {{ frequency }}
             <SelectItemIndicator>
               <CheckIcon />
@@ -92,7 +105,9 @@ function submit(event: Event) {
       </Select>
     </Field>
     <div data-slot="row">
-      <button type="submit" form="select-newsletter" data-variant="solid">Save</button>
+      <button type="submit" form="select-newsletter" data-variant="solid">
+        Save
+      </button>
       <button type="reset" form="select-newsletter">Reset</button>
     </div>
   </div>

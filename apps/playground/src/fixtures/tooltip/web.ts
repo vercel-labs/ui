@@ -26,7 +26,7 @@ const markup = `
         <ui-tooltip>
           <ui-tooltip-trigger><button><span aria-hidden="true">${item.icon}</span></button></ui-tooltip-trigger>
           <ui-tooltip-content class="tooltip">${item.content}</ui-tooltip-content>
-        </ui-tooltip>`,
+        </ui-tooltip>`
         )
         .join("")}
     </div>
@@ -90,7 +90,8 @@ const markup = `
   </div>
 `
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 async function mount(root: HTMLElement) {
   // Defined before the markup goes in, so nested triggers upgrade inner first,
@@ -101,24 +102,45 @@ async function mount(root: HTMLElement) {
   const options = tooltipOptions()
   for (const tooltip of root.querySelectorAll("ui-tooltip")) {
     for (const [name, value] of Object.entries(options)) {
-      if (name === "container") tooltip.setAttribute("container", `#${(value as HTMLElement).id}`)
-      else tooltip.setAttribute(kebab(name), String(value))
+      if (name === "container") {
+        tooltip.setAttribute("container", `#${(value as HTMLElement).id}`)
+      } else {
+        tooltip.setAttribute(kebab(name), String(value))
+      }
     }
   }
-  if (options.container)
-    root.querySelector("ui-popover")!.setAttribute("container", `#${options.container.id}`)
-  const saveTooltip = root.querySelector<HTMLElement & { api?: { open: () => void } }>("#save")!
-  if (parts.open) saveTooltip.setAttribute("default-open", "")
-  if (parts.nativeDisabled) root.querySelector("#save-button")!.setAttribute("disabled", "")
-  for (const [name, value] of Object.entries(tooltipContentOptions()))
+  if (options.container) {
+    root
+      .querySelector("ui-popover")!
+      .setAttribute("container", `#${options.container.id}`)
+  }
+  const saveTooltip = root.querySelector<
+    HTMLElement & { api?: { open: () => void } }
+  >("#save")!
+  if (parts.open) {
+    saveTooltip.setAttribute("default-open", "")
+  }
+  if (parts.nativeDisabled) {
+    root.querySelector("#save-button")!.setAttribute("disabled", "")
+  }
+  for (const [name, value] of Object.entries(tooltipContentOptions())) {
     saveTooltip.querySelector("ui-tooltip-content")!.setAttribute(name, value)
+  }
   const output = root.querySelector("output")!
-  root.querySelector("#save-button")!.addEventListener("click", () => (output.textContent = "save"))
+  root
+    .querySelector("#save-button")!
+    .addEventListener("click", () => (output.textContent = "save"))
   root.querySelector("#publish")?.addEventListener("click", (event) => {
-    if ((event.currentTarget as HTMLElement).getAttribute("aria-disabled") !== "true")
+    if (
+      (event.currentTarget as HTMLElement).getAttribute("aria-disabled") !==
+      "true"
+    ) {
       output.textContent = publish.action
+    }
   })
-  root.querySelector("#controller")!.addEventListener("click", () => saveTooltip.api?.open())
+  root
+    .querySelector("#controller")!
+    .addEventListener("click", () => saveTooltip.api?.open())
 }
 
 export { mount }

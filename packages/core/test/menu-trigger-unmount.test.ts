@@ -18,7 +18,10 @@ function setup() {
     return { part, el, unbind: bind(part, el) }
   })
   const content = instance.part("content")
-  const unbindContent = bind(content, document.body.appendChild(document.createElement("div")))
+  const unbindContent = bind(
+    content,
+    document.body.appendChild(document.createElement("div"))
+  )
   return { instance, triggers, unbindContent }
 }
 
@@ -49,7 +52,9 @@ describe("a menu whose trigger leaves the page", () => {
     await settle()
     press(triggers[0].part)?.()
     triggers[0].unbind()
-    queueMicrotask(() => queueMicrotask(() => bind(triggers[0].part, triggers[0].el)))
+    queueMicrotask(() =>
+      queueMicrotask(() => bind(triggers[0].part, triggers[0].el))
+    )
     await settle()
     expect(instance.get().open).toBe(true)
   })

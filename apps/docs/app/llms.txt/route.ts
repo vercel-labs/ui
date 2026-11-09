@@ -20,9 +20,11 @@ To build something ui-sdk doesn't ship, read Core: build a component, compose be
 ${frameworkIds
   .map(
     (id) =>
-      `- [${frameworks[id].label}](/docs/${id}/llms.txt): its Rendering page, then every component's reference, in one file. Pages: [Rendering](/docs/${id}/rendering), [Components](/docs/${id}/components)`,
+      `- [${frameworks[id].label}](/docs/${id}/llms.txt): its Rendering page, then every component's reference, in one file. Pages: [Rendering](/docs/${id}/rendering), [Components](/docs/${id}/components)`
   )
   .join("\n")}
 `
-  return new Response(text, { headers: { "Content-Type": "text/markdown; charset=utf-8" } })
+  return new Response(text, {
+    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+  })
 }

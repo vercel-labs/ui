@@ -61,7 +61,10 @@ type ListData<T = string, Item extends ListItem<T> = ListItem<T>> = (
  * @stable
  */
 type ListFilter<T = string> =
-  "contains" | "startsWith" | false | ((item: ListItem<T>, query: string) => boolean | number)
+  | "contains"
+  | "startsWith"
+  | false
+  | ((item: ListItem<T>, query: string) => boolean | number)
 
 // An item the engine can navigate, from data or from a mounted part.
 type ListEntry = {
@@ -79,19 +82,31 @@ type ListEntry = {
 // A string for any value: ids, form values and lookups use it. Strings pass
 // through, objects use their `value` or `id`, unless `itemToValue` says otherwise.
 function itemKey(value: unknown, itemToValue?: (value: unknown) => string) {
-  if (value === null || value === undefined) return ""
-  if (itemToValue) return itemToValue(value)
-  if (typeof value === "string") return value
+  if (value === null || value === undefined) {
+    return ""
+  }
+  if (itemToValue) {
+    return itemToValue(value)
+  }
+  if (typeof value === "string") {
+    return value
+  }
   if (typeof value === "object") {
-    const own = (value as { value?: unknown; id?: unknown }).value ?? (value as { id?: unknown }).id
-    if (own !== undefined && own !== null && typeof own !== "object") return String(own)
+    const own =
+      (value as { value?: unknown; id?: unknown }).value ??
+      (value as { id?: unknown }).id
+    if (own !== undefined && own !== null && typeof own !== "object") {
+      return String(own)
+    }
   }
   return String(value)
 }
 
 // An item as data, from a plain string or an item object.
 function toListItem<T>(entry: ListItem<T> | (T & string)) {
-  return typeof entry === "string" ? ({ value: entry, label: entry } as ListItem<T>) : entry
+  return typeof entry === "string"
+    ? ({ value: entry, label: entry } as ListItem<T>)
+    : entry
 }
 
 const isGroup = <T>(entry: ListData<T>[number]): entry is ListGroup<T> =>
@@ -103,9 +118,13 @@ const isSeparator = <T>(entry: ListData<T>[number]): entry is ListSeparator =>
 function flattenData<T>(data: ListData<T>, toKey: (value: unknown) => string) {
   const entries: ListEntry[] = []
   data.forEach((entry, index) => {
-    if (isSeparator(entry)) return
+    if (isSeparator(entry)) {
+      return
+    }
     if (isGroup(entry)) {
-      for (const child of entry.items) entries.push(entryOf(toListItem(child), toKey, `group-${index}`))
+      for (const child of entry.items) {
+        entries.push(entryOf(toListItem(child), toKey, `group-${index}`))
+      }
       return
     }
     entries.push(entryOf(toListItem(entry), toKey))
@@ -113,7 +132,11 @@ function flattenData<T>(data: ListData<T>, toKey: (value: unknown) => string) {
   return entries
 }
 
-function entryOf<T>(item: ListItem<T>, toKey: (value: unknown) => string, group?: string) {
+function entryOf<T>(
+  item: ListItem<T>,
+  toKey: (value: unknown) => string,
+  group?: string
+) {
   return {
     key: toKey(item.value),
     value: item.value,
@@ -130,18 +153,35 @@ function entryOf<T>(item: ListItem<T>, toKey: (value: unknown) => string, group?
 function revealInList(el: HTMLElement, stop: HTMLElement | undefined) {
   for (let node = el.parentElement; node; node = node.parentElement) {
     const style = getComputedStyle(node)
-    if (/(auto|scroll)/.test(style.overflowY) && node.scrollHeight > node.clientHeight) {
+    if (
+      /(auto|scroll)/.test(style.overflowY) &&
+      node.scrollHeight > node.clientHeight
+    ) {
       const top =
-        el.getBoundingClientRect().top - node.getBoundingClientRect().top - node.clientTop + node.scrollTop
+        el.getBoundingClientRect().top -
+        node.getBoundingClientRect().top -
+        node.clientTop +
+        node.scrollTop
       const before = parseFloat(style.scrollPaddingTop) || 0
       const after = parseFloat(style.scrollPaddingBottom) || 0
-      const shown = scrollToShow(node.scrollTop, node.clientHeight, top, el.offsetHeight, before, after)
+      const shown = scrollToShow(
+        node.scrollTop,
+        node.clientHeight,
+        top,
+        el.offsetHeight,
+        before,
+        after
+      )
       // The last option's padding asks past the end, which would write on every move.
       const scrollTop = Math.min(shown, node.scrollHeight - node.clientHeight)
-      if (scrollTop !== node.scrollTop) node.scrollTop = scrollTop
+      if (scrollTop !== node.scrollTop) {
+        node.scrollTop = scrollTop
+      }
       return
     }
-    if (node === stop) return
+    if (node === stop) {
+      return
+    }
   }
 }
 
@@ -162,7 +202,12 @@ type ItemMeta = {
 type Registered = { key: string; el: HTMLElement; meta: () => ItemMeta }
 
 // A label the engine remembers, after its item unmounts too.
-type KnownItem = { label: string; value: unknown; keywords?: string[]; group?: string }
+type KnownItem = {
+  label: string
+  value: unknown
+  keywords?: string[]
+  group?: string
+}
 
 /** What the empty part of a filtered list receives: whether it shows, and why. */
 type ListEmptyState = {
@@ -202,10 +247,14 @@ type ListFiltering = {
     data: ListData<unknown>,
     query: string,
     filter: ListFilter<unknown> | undefined,
-    options: { rank: boolean },
+    options: { rank: boolean }
   ) => ListData<unknown>
   // Whether an item shows for a query.
-  matches: (item: ListItem<unknown>, query: string, filter: ListFilter<unknown> | undefined) => boolean
+  matches: (
+    item: ListItem<unknown>,
+    query: string,
+    filter: ListFilter<unknown> | undefined
+  ) => boolean
 }
 
 function createListboxEngine(
@@ -247,11 +296,13 @@ function createListboxEngine(
     // Runs when the highlight reaches the last item, so the next page can load.
     onLastReached?: () => void
   },
-  filtering: ListFiltering,
+  filtering: ListFiltering
 ) {
   const { store } = config
   const focusMode =
-    typeof config.focus === "function" ? config.focus : () => config.focus as "real" | "virtual"
+    typeof config.focus === "function"
+      ? config.focus
+      : () => config.focus as "real" | "virtual"
   // Mounted items by key, in document order.
   const registry = createOrder<Registered>()
   // Every label seen, kept after its item unmounts, so a chosen item's label
@@ -260,7 +311,11 @@ function createListboxEngine(
   const typeahead = createTypeahead()
   // Keys of entries that are never filtered, like a create option.
   const pinned = new Set<string>()
-  type DataMemo = { data: ListData<unknown>; flat: ListEntry[]; byKey: Map<string, ListEntry> }
+  type DataMemo = {
+    data: ListData<unknown>
+    flat: ListEntry[]
+    byKey: Map<string, ListEntry>
+  }
   let dataMemo: DataMemo | undefined
   let emptyMemo: DataMemo | undefined
   let visibleMemo:
@@ -274,20 +329,35 @@ function createListboxEngine(
       }
     | undefined
   let composedMemo:
-    { order: unknown; query: string; filter: unknown; version: number; list: ListEntry[] } | undefined
+    | {
+        order: unknown
+        query: string
+        filter: unknown
+        version: number
+        list: ListEntry[]
+      }
+    | undefined
   let labelsVersion = 0
   // Counts items mounting and leaving, so the listing knows when to look again.
   let mountsVersion = 0
 
   const memoOf = (items: ListData<unknown>, memo: DataMemo | undefined) => {
-    if (memo?.data === items) return memo
+    if (memo?.data === items) {
+      return memo
+    }
     const flat = flattenData(items, config.toKey)
-    return { data: items, flat, byKey: new Map(flat.map((entry) => [entry.key, entry])) }
+    return {
+      data: items,
+      flat,
+      byKey: new Map(flat.map((entry) => [entry.key, entry])),
+    }
   }
 
   function data() {
     const items = config.items()
-    if (!items) return undefined
+    if (!items) {
+      return undefined
+    }
     return (dataMemo = memoOf(items, dataMemo))
   }
 
@@ -298,7 +368,9 @@ function createListboxEngine(
 
   // The data shown while the query is empty, when there's any. It needs `items` too.
   function emptyData() {
-    if (!config.items() || !(config.showEmpty?.() ?? !config.query().trim())) return undefined
+    if (!config.items() || !(config.showEmpty?.() ?? !config.query().trim())) {
+      return undefined
+    }
     return emptySource()
   }
 
@@ -311,7 +383,9 @@ function createListboxEngine(
   // shown while it's empty.
   function visibleData() {
     const source = emptyData() ?? data()
-    if (!source) return undefined
+    if (!source) {
+      return undefined
+    }
     const query = config.query()
     const filter = config.filter()
     const rank = config.rank?.() ?? false
@@ -322,7 +396,14 @@ function createListboxEngine(
       visibleMemo.rank !== rank
     ) {
       const list = filtering.data(source.data, query, filter, { rank })
-      visibleMemo = { data: source.data, query, filter, rank, list, flat: flattenData(list, config.toKey) }
+      visibleMemo = {
+        data: source.data,
+        query,
+        filter,
+        rank,
+        list,
+        flat: flattenData(list, config.toKey),
+      }
     }
     return visibleMemo
   }
@@ -331,11 +412,13 @@ function createListboxEngine(
   // arrow keys skip one, and Enter or a press can reach the other.
   function warnIfShared(key: string, el: HTMLElement) {
     const other = registry.get(key)?.el
-    if (!other || other === el || !other.isConnected) return
+    if (!other || other === el || !other.isConnected) {
+      return
+    }
     const slot = el.getAttribute("data-slot") ?? ""
     warn(
       `Two items have the value "${key}". Give each item its own value, or arrow keys skip one and choosing it picks the other.`,
-      { component: slot.replace(/-item$/, "") || "listbox" },
+      { component: slot.replace(/-item$/, "") || "listbox" }
     )
   }
 
@@ -345,7 +428,9 @@ function createListboxEngine(
     const meta = registered.meta()
     const label = meta.label ?? labelOf(registered.el)
     // Pinned entries, like a create option, aren't items to remember.
-    if (meta.pinned) return label
+    if (meta.pinned) {
+      return label
+    }
     const previous = known.get(key)
     if (previous?.label !== label) {
       known.set(key, { ...previous, label, value: meta.value })
@@ -377,7 +462,8 @@ function createListboxEngine(
   const asked = new Map<string, ItemMeta>()
 
   // Whether an item shows for the current query. Data items that don't aren't rendered.
-  const shows = (key: string, meta: ItemMeta) => !!data() || composedMatches(key, meta)
+  const shows = (key: string, meta: ItemMeta) =>
+    !!data() || composedMatches(key, meta)
 
   function matches(key: string, meta: ItemMeta) {
     asked.set(key, meta)
@@ -395,7 +481,7 @@ function createListboxEngine(
     return filtering.matches(
       { value: meta.value, label, keywords: meta.keywords },
       config.query(),
-      config.filter(),
+      config.filter()
     )
   }
 
@@ -403,13 +489,17 @@ function createListboxEngine(
   // they sit: before the items, like a select-all option, or after them, like
   // a create option.
   function dataEntries(flat: ListEntry[]) {
-    if (!pinned.size) return flat
+    if (!pinned.size) {
+      return flat
+    }
     const first = flat.length ? registry.get(flat[0].key)?.el : undefined
     const before: ListEntry[] = []
     const after: ListEntry[] = []
     for (const key of pinned) {
       const registered = registry.get(key)
-      if (!registered?.el.isConnected) continue
+      if (!registered?.el.isConnected) {
+        continue
+      }
       const precedes = !!first?.isConnected && isAfter(registered.el, first)
       ;(precedes ? before : after).push(registeredEntry(key, registered))
     }
@@ -426,12 +516,22 @@ function createListboxEngine(
       composedMemo.query === query &&
       composedMemo.filter === filter &&
       composedMemo.version === labelsVersion
-    )
+    ) {
       return composedMemo.list
+    }
     const result = list
       .map((registered) => registeredEntry(registered.key, registered))
-      .filter((entry, index) => list[index].meta().pinned || composedMatches(entry.key, entry))
-    composedMemo = { order: list, query, filter, version: labelsVersion, list: result }
+      .filter(
+        (entry, index) =>
+          list[index].meta().pinned || composedMatches(entry.key, entry)
+      )
+    composedMemo = {
+      order: list,
+      query,
+      filter,
+      version: labelsVersion,
+      list: result,
+    }
     return result
   }
 
@@ -439,59 +539,104 @@ function createListboxEngine(
   // mounted items that match.
   function entries() {
     const visible = visibleData()
-    if (visible) return dataEntries(visible.flat)
+    if (visible) {
+      return dataEntries(visible.flat)
+    }
     return composedEntries()
   }
 
-  const disabled = (entry: ListEntry) => entry.disabled || !!config.blocked?.(entry)
+  const disabled = (entry: ListEntry) =>
+    entry.disabled || !!config.blocked?.(entry)
 
   // An item by key: from data, a mounted item, or one whose label was remembered,
   // like a chosen item that left the list.
   function find(key: string | null) {
-    if (key === null) return undefined
+    if (key === null) {
+      return undefined
+    }
     const fromData = dataEntry(key)
-    if (fromData) return fromData
+    if (fromData) {
+      return fromData
+    }
     const registered = registry.get(key)
-    if (registered) return registeredEntry(key, registered)
+    if (registered) {
+      return registeredEntry(key, registered)
+    }
     const remembered = known.get(key)
-    if (remembered) return { key, value: remembered.value, label: remembered.label, disabled: false }
+    if (remembered) {
+      return {
+        key,
+        value: remembered.value,
+        label: remembered.label,
+        disabled: false,
+      }
+    }
   }
 
   // Focuses a mounted item, or only scrolls it into view with virtual focus.
   function reveal(el: HTMLElement, focus: boolean) {
-    if (focusMode() === "real" && focus && config.active()) el.focus({ preventScroll: true })
+    if (focusMode() === "real" && focus && config.active()) {
+      el.focus({ preventScroll: true })
+    }
     revealInList(el, (config.scrollRoot ?? config.container)?.())
   }
 
-  function highlight(key: string | null, { focus = true, event }: { focus?: boolean; event?: Event } = {}) {
+  function highlight(
+    key: string | null,
+    { focus = true, event }: { focus?: boolean; event?: Event } = {}
+  ) {
     store.set({ highlighted: key })
     const list = entries()
-    const index = key === null ? -1 : list.findIndex((entry) => entry.key === key)
+    const index =
+      key === null ? -1 : list.findIndex((entry) => entry.key === key)
     config.onHighlight?.(key, index, event)
     // Skipped items at the end can't be reached, so the last one left counts.
     let last = list.length - 1
-    if (config.skipDisabled) while (last > 0 && list[last].disabled) last--
-    if (index !== -1 && index === last) config.onLastReached?.()
-    if (key === null) return
+    if (config.skipDisabled) {
+      while (last > 0 && list[last].disabled) {
+        last--
+      }
+    }
+    if (index !== -1 && index === last) {
+      config.onLastReached?.()
+    }
+    if (key === null) {
+      return
+    }
     const el = registry.get(key)?.el
-    if (el?.isConnected) reveal(el, focus)
+    if (el?.isConnected) {
+      reveal(el, focus)
+    }
   }
 
   // The key a step from the highlight lands on, or the first or last item's,
   // without moving there. Undefined for an empty list, or one where every
   // item is disabled while it skips them.
-  function stepKey(step: number | "first" | "last", { loop = config.loop() } = {}) {
+  function stepKey(
+    step: number | "first" | "last",
+    { loop = config.loop() } = {}
+  ) {
     const all = entries()
-    const list = config.skipDisabled ? all.filter((entry) => !entry.disabled) : all
-    if (!list.length) return undefined
+    const list = config.skipDisabled
+      ? all.filter((entry) => !entry.disabled)
+      : all
+    if (!list.length) {
+      return undefined
+    }
     const current = store.get().highlighted
     const index = list.findIndex((entry) => entry.key === current)
-    if (index !== -1 || typeof step !== "number") return list[moveIndex(index, step, list.length, loop)].key
+    if (index !== -1 || typeof step !== "number") {
+      return list[moveIndex(index, step, list.length, loop)].key
+    }
     // From a skipped item, like one a press focused, a step counts from where it sits.
     const skipped = all.findIndex((entry) => entry.key === current)
     if (skipped !== -1) {
-      const before = all.slice(0, skipped).filter((entry) => !entry.disabled).length
-      return list[moveIndex(step > 0 ? before - 1 : before, step, list.length, loop)].key
+      const before = all
+        .slice(0, skipped)
+        .filter((entry) => !entry.disabled).length
+      return list[
+        moveIndex(step > 0 ? before - 1 : before, step, list.length, loop)
+      ].key
     }
     // From no highlight, a step forward lands on the first item and a step back on the last.
     return list[step > 0 ? 0 : list.length - 1].key
@@ -499,7 +644,9 @@ function createListboxEngine(
 
   function move(step: number | "first" | "last", event?: Event) {
     const key = stepKey(step)
-    if (key !== undefined) highlight(key, { event })
+    if (key !== undefined) {
+      highlight(key, { event })
+    }
   }
 
   // The next enabled item whose label starts with what the user typed, after `from`.
@@ -508,7 +655,7 @@ function createListboxEngine(
     const found = typeahead(
       char,
       list.map((entry) => (disabled(entry) ? "" : entry.label)),
-      list.findIndex((entry) => entry.key === from),
+      list.findIndex((entry) => entry.key === from)
     )
     return found === -1 ? undefined : list[found]
   }
@@ -523,34 +670,52 @@ function createListboxEngine(
   // item, which lost focus on the way, takes it back. The registry drops its
   // order itself. Watched from the moment items are in the page, since data
   // lists never read the registry's order.
-  const moves = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(moved)
+  const moves =
+    typeof MutationObserver === "undefined"
+      ? undefined
+      : new MutationObserver(moved)
 
   function moved() {
     const key = store.get().highlighted
     const el = key === null ? undefined : registry.get(key)?.el
-    if (el?.isConnected && focusLost(el)) reveal(el, true)
+    if (el?.isConnected && focusLost(el)) {
+      reveal(el, true)
+    }
   }
 
   // A highlighted item that mounts late, like in a virtualized list, takes focus.
   function focusWhenMounted(key: string, el: HTMLElement) {
     const shouldFocus = () => store.get().highlighted === key && config.active()
-    if (focusMode() !== "real" || !shouldFocus() || el.ownerDocument.activeElement === el) return
+    if (
+      focusMode() !== "real" ||
+      !shouldFocus() ||
+      el.ownerDocument.activeElement === el
+    ) {
+      return
+    }
     queueMicrotask(() => {
-      if (shouldFocus() && el.isConnected) reveal(el, true)
+      if (shouldFocus() && el.isConnected) {
+        reveal(el, true)
+      }
     })
   }
 
   function register(key: string, el: HTMLElement, meta: () => ItemMeta) {
     mountsVersion++
-    if (dev) warnIfShared(key, el)
+    if (dev) {
+      warnIfShared(key, el)
+    }
     const entry = { key, el, meta }
     const remove = registry.add(entry)
     const current = meta()
-    if (current.pinned) pinned.add(key)
-    else {
+    if (current.pinned) {
+      pinned.add(key)
+    } else {
       // A label the item gives itself is known at once.
       const previous = known.get(key)
-      if (current.label !== undefined && previous?.label !== current.label) labelsVersion++
+      if (current.label !== undefined && previous?.label !== current.label) {
+        labelsVersion++
+      }
       known.set(key, {
         ...previous,
         label: current.label ?? previous?.label ?? "",
@@ -561,19 +726,27 @@ function createListboxEngine(
     }
     // The text is read once the item's own parts have bound, like an indicator that hides itself.
     queueMicrotask(() => {
-      if (registry.get(key) !== entry || !entry.el.isConnected) return
+      if (registry.get(key) !== entry || !entry.el.isConnected) {
+        return
+      }
       liveLabel(key, entry)
       // Watched once it's in the page: Vue registers items before it inserts them.
-      if (entry.el.parentNode) moves?.observe(entry.el.parentNode, { childList: true })
+      if (entry.el.parentNode) {
+        moves?.observe(entry.el.parentNode, { childList: true })
+      }
     })
     config.onRegister?.(key)
     focusWhenMounted(key, el)
     return () => {
-      if (registry.get(key) !== entry) return
+      if (registry.get(key) !== entry) {
+        return
+      }
       remove()
       mountsVersion++
       pinned.delete(key)
-      if (!registry.size()) moves?.disconnect()
+      if (!registry.size()) {
+        moves?.disconnect()
+      }
       config.onRegister?.(key)
       queueMicrotask(() => left(key, el))
     }
@@ -584,10 +757,17 @@ function createListboxEngine(
   // list, so the keys keep working and the list stays open. An item still in
   // the data only scrolled out of a virtualized list, and stays highlighted.
   function left(key: string, el: HTMLElement) {
-    if (registry.get(key) || dataEntry(key) || store.get().highlighted !== key) return
+    if (
+      registry.get(key) ||
+      dataEntry(key) ||
+      store.get().highlighted !== key
+    ) {
+      return
+    }
     store.set({ highlighted: null })
-    if (focusMode() === "real" && config.active() && focusLost(el))
+    if (focusMode() === "real" && config.active() && focusLost(el)) {
       config.container?.()?.focus({ preventScroll: true })
+    }
   }
 
   return {
@@ -604,7 +784,8 @@ function createListboxEngine(
     move,
     stepKey,
     // The first item that can be chosen, for highlighting the best match.
-    firstEnabled: () => entries().find((entry) => !entry.pinned && !disabled(entry))?.key,
+    firstEnabled: () =>
+      entries().find((entry) => !entry.pinned && !disabled(entry))?.key,
     search,
     register,
     typing: () => typeahead.active(),
@@ -612,14 +793,20 @@ function createListboxEngine(
     // The label of an item, from data, a mounted item, or one that was mounted before.
     labelOf(key: string) {
       const fromData = dataEntry(key)
-      if (fromData) return fromData.label
+      if (fromData) {
+        return fromData.label
+      }
       const registered = registry.get(key)
-      if (registered) return liveLabel(key, registered)
+      if (registered) {
+        return liveLabel(key, registered)
+      }
       return known.get(key)?.label
     },
     valueOf(key: string) {
       const fromData = dataEntry(key)
-      if (fromData) return fromData.value
+      if (fromData) {
+        return fromData.value
+      }
       return registry.get(key)?.meta().value ?? known.get(key)?.value
     },
     matches,
@@ -635,25 +822,43 @@ function createListboxEngine(
       // the items in the page for the highlight, so only items that aren't,
       // like one that rendered and hasn't mounted, need checking.
       const filtering = !data() && !!config.query().trim()
-      const shown = filtering ? new Set(composedEntries().map((entry) => entry.key)) : undefined
+      const shown = filtering
+        ? new Set(composedEntries().map((entry) => entry.key))
+        : undefined
       // `latest` says `item` holds the props the item last rendered with, so
       // its registration needn't be asked for them again.
       const add = (key: string, item: ItemMeta, latest: boolean) => {
         // Entries are strings, unlike inherited properties named like `constructor`.
-        if (typeof listing[key] === "string") return
+        if (typeof listing[key] === "string") {
+          return
+        }
         const registered = registry.get(key)
         const meta = latest ? item : (registered?.meta() ?? item)
         const matched =
-          !shown || shown.has(key) || (!registered?.el.isConnected && composedMatches(key, meta))
+          !shown ||
+          shown.has(key) ||
+          (!registered?.el.isConnected && composedMatches(key, meta))
         let entry = matched ? "" : "-"
-        if (meta.index !== undefined) entry += size ??= entries().length
-        if (more) entry += more(key, meta.value)
+        if (meta.index !== undefined) {
+          entry += size ??= entries().length
+        }
+        if (more) {
+          entry += more(key, meta.value)
+        }
         listing[key] = entry
       }
-      for (const [key, item] of asked) add(key, item, true)
-      for (const [key, item] of known) add(key, item, false)
-      for (const entry of data()?.flat ?? []) add(entry.key, entry, false)
-      for (const entry of emptySource()?.flat ?? []) add(entry.key, entry, false)
+      for (const [key, item] of asked) {
+        add(key, item, true)
+      }
+      for (const [key, item] of known) {
+        add(key, item, false)
+      }
+      for (const entry of data()?.flat ?? []) {
+        add(entry.key, entry, false)
+      }
+      for (const entry of emptySource()?.flat ?? []) {
+        add(entry.key, entry, false)
+      }
       return listing
     },
     // Everything the listing depends on besides a component's own state, like
@@ -677,8 +882,15 @@ function createListboxEngine(
       const keys: string[] = []
       for (const entry of entries()) {
         // Its own disabled state, not a full selection, which choosing all would exceed anyway.
-        if (entry.pinned || entry.disabled) continue
-        if (group !== undefined && (registry.get(entry.key)?.meta().group ?? entry.group) !== group) continue
+        if (entry.pinned || entry.disabled) {
+          continue
+        }
+        if (
+          group !== undefined &&
+          (registry.get(entry.key)?.meta().group ?? entry.group) !== group
+        ) {
+          continue
+        }
         keys.push(entry.key)
       }
       return keys
@@ -686,17 +898,24 @@ function createListboxEngine(
     // How many items match, leaving out pinned entries like a create option.
     count() {
       let count = 0
-      for (const entry of entries()) if (!entry.pinned) count++
+      for (const entry of entries()) {
+        if (!entry.pinned) {
+          count++
+        }
+      }
       return count
     },
     // Whether any item of a composed group matches.
     groupMatches(group: string) {
-      if (data()) return true
+      if (data()) {
+        return true
+      }
       return registry
         .list()
         .some(
           (registered) =>
-            registered.meta().group === group && composedMatches(registered.key, registered.meta()),
+            registered.meta().group === group &&
+            composedMatches(registered.key, registered.meta())
         )
     },
     element: (key: string) => registry.get(key)?.el,
@@ -709,13 +928,21 @@ function createListboxEngine(
       const sameText =
         current?.label === label &&
         (!keywords ||
-          (words?.length === keywords.length && keywords.every((word, index) => word === words[index])))
+          (words?.length === keywords.length &&
+            keywords.every((word, index) => word === words[index])))
       // A new value under the same key and text, like an object made again, still replaces the old one.
       if (current && sameText) {
-        if (current.value !== value) known.set(key, { ...current, value })
+        if (current.value !== value) {
+          known.set(key, { ...current, value })
+        }
         return
       }
-      known.set(key, { ...current, label, value, ...(keywords && { keywords }) })
+      known.set(key, {
+        ...current,
+        label,
+        value,
+        ...(keywords && { keywords }),
+      })
       labelsVersion++
     },
   }

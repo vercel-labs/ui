@@ -1,11 +1,26 @@
 import { createPopupController } from "../../foundation/popups/popup"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
-import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
+import {
+  createPopup,
+  popupState,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { hoverCardPreset } from "../../foundation/popups/popup-hover-presets"
-import { popupArrow, popupContent, popupTrigger } from "../../foundation/popups/popup-slots"
+import {
+  popupArrow,
+  popupContent,
+  popupTrigger,
+} from "../../foundation/popups/popup-slots"
 import type { ChangeDetails } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Why a hover card opened or closed.
@@ -27,7 +42,8 @@ type HoverCardOpenChangeReason =
  * Why the card's payload changed: a trigger opened it, another trigger took it over while open, or a controller opened it or gave the open one another payload.
  * @stable
  */
-type HoverCardPayloadChangeReason = "trigger-hover" | "trigger-focus" | "trigger-press" | "imperative"
+type HoverCardPayloadChangeReason =
+  "trigger-hover" | "trigger-focus" | "trigger-press" | "imperative"
 
 /**
  * Opens, closes and inspects a hover card from outside it, and connects
@@ -37,7 +53,13 @@ type HoverCardPayloadChangeReason = "trigger-hover" | "trigger-focus" | "trigger
  * @stable
  */
 function createHoverCardController<Payload = unknown>() {
-  return createPopupController<Payload, HoverCardOpenChangeReason, {}, string, HoverCardPayloadChangeReason>()
+  return createPopupController<
+    Payload,
+    HoverCardOpenChangeReason,
+    {},
+    string,
+    HoverCardPayloadChangeReason
+  >()
 }
 
 /**
@@ -45,7 +67,9 @@ function createHoverCardController<Payload = unknown>() {
  * option.
  * @stable
  */
-type HoverCardController<Payload = unknown> = ReturnType<typeof createHoverCardController<Payload>>
+type HoverCardController<Payload = unknown> = ReturnType<
+  typeof createHoverCardController<Payload>
+>
 
 /**
  * The options `hoverCard` takes. A component takes them as props on its root.
@@ -60,7 +84,10 @@ type HoverCardOptions = PortalProps & {
    */
   defaultOpen?: boolean
   /** Runs when the card wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<HoverCardOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<HoverCardOpenChangeReason>
+  ) => void
   /** Runs once the card has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /**
@@ -68,7 +95,10 @@ type HoverCardOptions = PortalProps & {
    * card, or takes the open card over, which fires no `onOpenChange`, and so does a controller's
    * `open({ payload })` on the open card. `details.cancel()` keeps the previous payload.
    */
-  onPayloadChange?: (payload: unknown, details: ChangeDetails<HoverCardPayloadChangeReason>) => void
+  onPayloadChange?: (
+    payload: unknown,
+    details: ChangeDetails<HoverCardPayloadChangeReason>
+  ) => void
   /**
    * Milliseconds the pointer rests on the trigger, or keyboard focus stays on it, before the card opens.
    * @defaultValue 600
@@ -177,7 +207,9 @@ type HoverCardArrowState = {
 type HoverCardApi = ReturnType<typeof hoverCardApi>
 
 // A hover card is `createPopup` with `hoverCardPreset`, and nothing of its own.
-function hoverCardApi(context: PrimitiveContext<HoverCardOptions, PopupState, string>) {
+function hoverCardApi(
+  context: PrimitiveContext<HoverCardOptions, PopupState, string>
+) {
   return createPopup(context, { preset: hoverCardPreset })
 }
 

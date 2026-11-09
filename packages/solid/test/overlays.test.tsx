@@ -31,6 +31,8 @@ test("an overlay host unmounted before its confirm opens answers it with no, and
   const next = mountHost(overlays)
   confirm({ title: "Discard the draft?" })
   await wait()
-  expect(document.querySelector('[role="alertdialog"]')?.textContent).toContain("Discard the draft?")
+  expect(document.querySelector('[role="alertdialog"]')?.textContent).toContain(
+    "Discard the draft?"
+  )
   next()
 })

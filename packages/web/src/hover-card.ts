@@ -31,7 +31,8 @@ function defineHoverCardElements() {
       tag: "ui-hover-card-trigger",
       display: "contents",
       target: (el) =>
-        el.querySelector<HTMLElement>("a[href], button") ?? (el.firstElementChild as HTMLElement),
+        el.querySelector<HTMLElement>("a[href], button") ??
+        (el.firstElementChild as HTMLElement),
     },
     content: { tag: "ui-hover-card-content", kinds: popupKinds },
     arrow: { tag: "ui-hover-card-arrow", display: "block" },

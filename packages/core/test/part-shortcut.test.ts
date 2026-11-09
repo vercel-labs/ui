@@ -17,7 +17,7 @@ const trigger = definePrimitive({
           () => part.props.shortcut,
           () => {},
           { layer: el },
-          (listener) => onProps(part, listener),
+          (listener) => onProps(part, listener)
         ),
     }),
   }),
@@ -49,7 +49,10 @@ describe("a part's shortcut", () => {
     expect(register.mock.calls.map(([keys]) => keys)).toEqual(["mod+k"])
     attrs(instance.part("trigger", { shortcut: "mod+j" }))
     expect(off).toHaveBeenCalledTimes(1)
-    expect(register.mock.calls.map(([keys]) => keys)).toEqual(["mod+k", "mod+j"])
+    expect(register.mock.calls.map(([keys]) => keys)).toEqual([
+      "mod+k",
+      "mod+j",
+    ])
     attrs(instance.part("trigger", {}))
     expect(off).toHaveBeenCalledTimes(2)
     expect(register).toHaveBeenCalledTimes(2)
@@ -59,7 +62,9 @@ describe("a part's shortcut", () => {
     const off = vi.fn()
     const register = vi.spyOn(shortcuts, "register").mockReturnValue(off)
     const instance = trigger({ id: "t" })
-    const ref = partRef(instance.part("trigger", { shortcut: "mod+k" }), { by: "core" })
+    const ref = partRef(instance.part("trigger", { shortcut: "mod+k" }), {
+      by: "core",
+    })
     ref(element())
     ref(null)
     expect(off).toHaveBeenCalledTimes(1)

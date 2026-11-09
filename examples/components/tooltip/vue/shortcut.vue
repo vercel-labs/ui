@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { SaveIcon } from "@lucide/vue"
 import { registerShortcut } from "@ui-sdk/core/shortcuts"
-import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/vue/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "@ui-sdk/vue/tooltip"
 import { onMounted, onUnmounted } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
@@ -11,7 +16,7 @@ const offs: (() => void)[] = []
 onMounted(() => {
   offs.push(
     registerShortcut("mod+s", () => log("Saved")),
-    registerShortcut("mod+shift+e", () => log("Shared")),
+    registerShortcut("mod+shift+e", () => log("Shared"))
   )
 })
 onUnmounted(() => offs.forEach((off) => off()))

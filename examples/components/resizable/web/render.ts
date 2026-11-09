@@ -15,11 +15,14 @@ function mount(root: HTMLElement) {
     </ui-resizable>
   `
   const [files, editor] = root.querySelectorAll("[data-slot=hint]")
-  root.querySelector("ui-resizable")!.addEventListener("layoutchange", (event) => {
-    const [filesSize, editorSize] = event.detail.value
-    files.textContent = filesSize === 0 ? "Collapsed" : `${Math.round(filesSize)}%`
-    editor.textContent = `${Math.round(editorSize)}%`
-  })
+  root
+    .querySelector("ui-resizable")!
+    .addEventListener("layoutchange", (event) => {
+      const [filesSize, editorSize] = event.detail.value
+      files.textContent =
+        filesSize === 0 ? "Collapsed" : `${Math.round(filesSize)}%`
+      editor.textContent = `${Math.round(editorSize)}%`
+    })
 }
 
 export { mount }

@@ -16,7 +16,9 @@ Write the combobox, then connect its query events to a loader. This example expe
 
 ```html
 <ui-combobox filter="false">
-  <ui-combobox-input><input aria-label="Movie" placeholder="Search movies…" /></ui-combobox-input>
+  <ui-combobox-input
+    ><input aria-label="Movie" placeholder="Search movies…"
+  /></ui-combobox-input>
   <ui-combobox-content>
     <ui-combobox-list></ui-combobox-list>
   </ui-combobox-content>
@@ -30,7 +32,9 @@ import type { UiComboboxElement } from "@ui-sdk/web"
 
 function connectMovies(combobox: UiComboboxElement) {
   const movies = createAsyncOptions<string>(async (query, { signal }) => {
-    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, { signal })
+    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, {
+      signal,
+    })
     if (!response.ok) throw new Error("Couldn't load movies")
     return response.json()
   })
@@ -42,10 +46,16 @@ function connectMovies(combobox: UiComboboxElement) {
   const unsubscribe = movies.subscribe(update)
   update()
   const events = new AbortController()
-  combobox.addEventListener("querychange", (event) => movies.setQuery(event.detail.value), {
+  combobox.addEventListener(
+    "querychange",
+    (event) => movies.setQuery(event.detail.value),
+    {
+      signal: events.signal,
+    }
+  )
+  combobox.addEventListener("loadmore", () => movies.loadMore(), {
     signal: events.signal,
   })
-  combobox.addEventListener("loadmore", () => movies.loadMore(), { signal: events.signal })
 
   return () => {
     events.abort()
@@ -82,8 +92,14 @@ For paged results, return `{ items, hasMore }`. The page number starts at `0`:
 ```ts
 import type { AsyncOptionsContext } from "@ui-sdk/core/async-options"
 
-async function loadMoviePages(query: string, { signal, page }: AsyncOptionsContext) {
-  const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}&page=${page}`, { signal })
+async function loadMoviePages(
+  query: string,
+  { signal, page }: AsyncOptionsContext
+) {
+  const response = await fetch(
+    `/api/movies?q=${encodeURIComponent(query)}&page=${page}`,
+    { signal }
+  )
   if (!response.ok) throw new Error("Couldn't load movies")
   const data: { titles: string[]; next: number | null } = await response.json()
   return { items: data.titles, hasMore: data.next !== null }

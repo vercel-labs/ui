@@ -16,7 +16,7 @@ const props = defineProps<{ class?: string }>()
       :class="
         cn(
           'h-12 w-full min-w-0 bg-transparent text-base outline-none placeholder:text-muted-foreground md:text-sm',
-          props.class,
+          props.class
         )
       "
     />

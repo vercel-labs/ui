@@ -15,7 +15,9 @@ import { useLog } from "../../../shared/react/log"
 type PhotoAction = "share" | "duplicate" | "delete" | "cancel"
 
 function Example() {
-  const [photoActions] = React.useState(() => createDrawerController<undefined, PhotoAction>())
+  const [photoActions] = React.useState(() =>
+    createDrawerController<undefined, PhotoAction>()
+  )
   const log = useLog()
 
   async function choose() {

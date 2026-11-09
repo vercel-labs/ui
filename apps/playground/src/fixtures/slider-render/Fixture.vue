@@ -20,8 +20,13 @@ const action = ref("")
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Slider :default-value="40" @value-change="(value) => (action = `brightness:${value}`)">
-      <SliderValue class="slider-value" v-slot="{ state }">Brightness {{ state.text }}</SliderValue>
+    <Slider
+      :default-value="40"
+      @value-change="(value) => (action = `brightness:${value}`)"
+    >
+      <SliderValue class="slider-value" v-slot="{ state }"
+        >Brightness {{ state.text }}</SliderValue
+      >
       <SliderControl class="slider-control">
         <SliderTrack class="slider-track">
           <SliderIndicator class="slider-indicator" />

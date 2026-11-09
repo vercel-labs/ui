@@ -1,6 +1,12 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
 import { Textarea } from "@ui-sdk/solid/textarea"
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/solid/tabs"
 
 function Example() {
   return (

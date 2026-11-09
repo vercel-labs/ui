@@ -59,4 +59,10 @@ export type {
   AccordionValueChangeReason,
 } from "@ui-sdk/core/accordion"
 
-export { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger }
+export {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+}

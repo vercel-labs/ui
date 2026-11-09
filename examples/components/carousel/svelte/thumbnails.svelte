@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Carousel, CarouselContent, CarouselItem, CarouselViewport } from "@ui-sdk/svelte/carousel"
+  import {
+    Carousel,
+    CarouselContent,
+    CarouselItem,
+    CarouselViewport,
+  } from "@ui-sdk/svelte/carousel"
 
   const photos = [
     { name: "Dunes" },
@@ -13,7 +18,9 @@
   let page = $state(1)
   let block: HTMLElement | undefined = $state()
   const follow = (next: number) =>
-    block?.querySelectorAll("button")[next - 1]?.scrollIntoView({ block: "nearest", inline: "nearest" })
+    block
+      ?.querySelectorAll("button")
+      [next - 1]?.scrollIntoView({ block: "nearest", inline: "nearest" })
 </script>
 
 <div data-slot="stack" bind:this={block}>
@@ -35,7 +42,11 @@
       <CarouselContent>
         {#each photos as photo, index (photo.name)}
           <CarouselItem aria-label={photo.name}>
-            <button type="button" aria-pressed={page === index + 1} onclick={() => (page = index + 1)}>
+            <button
+              type="button"
+              aria-pressed={page === index + 1}
+              onclick={() => (page = index + 1)}
+            >
               {photo.name}
             </button>
           </CarouselItem>

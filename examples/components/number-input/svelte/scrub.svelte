@@ -24,7 +24,10 @@
   <h3 id={title}>Frame</h3>
   <div data-slot="grid">
     {#each fields as { label, handle, ...options } (label)}
-      <NumberInput {...options} onValueCommit={(value) => log(`${label} ${value ?? "empty"}`)}>
+      <NumberInput
+        {...options}
+        onValueCommit={(value) => log(`${label} ${value ?? "empty"}`)}
+      >
         <NumberInputGroup>
           <NumberInputScrubArea pixelsPerStep={1}>
             <span aria-hidden="true">{handle}</span>

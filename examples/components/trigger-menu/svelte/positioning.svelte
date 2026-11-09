@@ -45,7 +45,7 @@
   >
     <TriggerMenuList>
       {#snippet children(state)}
-        {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+        {#each state.items as TriggerMenuDataItem[] as item (item.value)}
           <TriggerMenuItem value={item.value} label={item.label}>
             {item.label}
           </TriggerMenuItem>

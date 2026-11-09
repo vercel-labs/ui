@@ -15,23 +15,40 @@
 import { get, put } from "@vercel/blob"
 import { execFileSync } from "node:child_process"
 import { createHash } from "node:crypto"
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs"
 import { tmpdir } from "node:os"
 import path from "node:path"
 import { parseArgs } from "node:util"
 
 const { values: flags } = parseArgs({ options: { dir: { type: "string" } } })
 const envFile = path.join(import.meta.dirname, "../.env.local")
-if (existsSync(envFile)) process.loadEnvFile(envFile)
+if (existsSync(envFile)) {
+  process.loadEnvFile(envFile)
+}
 
 const root = path.resolve(import.meta.dirname, "../../..")
 const store = flags.dir ? folderStore(path.resolve(flags.dir)) : blobStore()
 
 const run = (command, args, cwd = root) =>
-  execFileSync(command, args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "inherit"] }).trim()
+  execFileSync(command, args, {
+    cwd,
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "inherit"],
+  }).trim()
 
-if (!flags.dir && run("git", ["status", "--porcelain", "--", "packages"]))
-  throw new Error("packages/ has uncommitted changes. Commit or stash them so the release matches a commit.")
+if (!flags.dir && run("git", ["status", "--porcelain", "--", "packages"])) {
+  throw new Error(
+    "packages/ has uncommitted changes. Commit or stash them so the release matches a commit."
+  )
+}
 
 const stamp = new Date().toISOString().replace(/\D/g, "").slice(0, 14)
 const version = `0.0.0-${stamp}.g${run("git", ["rev-parse", "--short=8", "HEAD"])}`
@@ -39,7 +56,10 @@ const names = readdirSync(path.join(root, "packages"))
 
 execFileSync("pnpm", ["build"], { cwd: root, stdio: "inherit" })
 // Every package ships the docs as Markdown, since the site isn't public.
-execFileSync("node", ["scripts/package-docs.mjs"], { cwd: root, stdio: "inherit" })
+execFileSync("node", ["scripts/package-docs.mjs"], {
+  cwd: root,
+  stdio: "inherit",
+})
 // A declaration that fails in a consumer's typecheck stops the release before anything uploads.
 execFileSync("pnpm", ["check:packages"], { cwd: root, stdio: "inherit" })
 
@@ -47,16 +67,26 @@ const work = mkdtempSync(path.join(tmpdir(), "ui-sdk-release-"))
 try {
   // Every tarball goes up before any index points at it.
   const releases = names.map((name) => packRelease(name))
-  for (const release of releases) await store.write(release.pathname, release.tarball, false)
-  for (const release of releases) await addToIndex(release)
+  for (const release of releases) {
+    await store.write(release.pathname, release.tarball, false)
+  }
+  for (const release of releases) {
+    await addToIndex(release)
+  }
 } finally {
   rmSync(work, { recursive: true, force: true })
 }
-console.log(`\nReleased ${names.map((name) => `@ui-sdk/${name}`).join(", ")} at ${version}.`)
+console.log(
+  `\nReleased ${names.map((name) => `@ui-sdk/${name}`).join(", ")} at ${version}.`
+)
 
 // Packs a package as `pnpm pack` publishes it, then stamps the release version on it.
 function packRelease(name) {
-  const tarball = run("pnpm", ["pack", "--pack-destination", work], path.join(root, "packages", name))
+  const tarball = run(
+    "pnpm",
+    ["pack", "--pack-destination", work],
+    path.join(root, "packages", name)
+  )
     .split("\n")
     .at(-1)
   const dir = path.join(work, name)
@@ -68,9 +98,13 @@ function packRelease(name) {
   manifest.version = version
   delete manifest.scripts
   delete manifest.devDependencies
-  for (const field of ["dependencies", "peerDependencies"])
-    for (const dependency of Object.keys(manifest[field] ?? {}))
-      if (dependency.startsWith("@ui-sdk/")) manifest[field][dependency] = version
+  for (const field of ["dependencies", "peerDependencies"]) {
+    for (const dependency of Object.keys(manifest[field] ?? {})) {
+      if (dependency.startsWith("@ui-sdk/")) {
+        manifest[field][dependency] = version
+      }
+    }
+  }
   writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`)
 
   const file = path.join(work, `${name}-${version}.tgz`)
@@ -89,7 +123,9 @@ function packRelease(name) {
 
 async function addToIndex({ manifest, pathname, dist }) {
   const indexPath = `packages/${manifest.name}/index.json`
-  const index = JSON.parse((await store.read(indexPath)) ?? `{"versions":{},"time":{}}`)
+  const index = JSON.parse(
+    (await store.read(indexPath)) ?? `{"versions":{},"time":{}}`
+  )
   index.name = manifest.name
   // Installers resolve from these fields; the rest of the manifest is in the tarball.
   index.versions[version] = {
@@ -99,7 +135,10 @@ async function addToIndex({ manifest, pathname, dist }) {
     dependencies: manifest.dependencies,
     peerDependencies: manifest.peerDependencies,
     peerDependenciesMeta: manifest.peerDependenciesMeta,
-    dist: { ...dist, tarball: pathname.replace(/^packages\/(.+)\/([^/]+)$/, "$1/-/$2") },
+    dist: {
+      ...dist,
+      tarball: pathname.replace(/^packages\/(.+)\/([^/]+)$/, "$1/-/$2"),
+    },
   }
   index["dist-tags"] = { ...index["dist-tags"], latest: version }
   index.time[version] = new Date().toISOString()
@@ -109,17 +148,24 @@ async function addToIndex({ manifest, pathname, dist }) {
 
 function blobStore() {
   // Stores connected with OIDC get BLOB_STORE_ID and VERCEL_OIDC_TOKEN, older ones BLOB_READ_WRITE_TOKEN.
-  if (!process.env.BLOB_STORE_ID && !process.env.BLOB_READ_WRITE_TOKEN)
+  if (!process.env.BLOB_STORE_ID && !process.env.BLOB_READ_WRITE_TOKEN) {
     throw new Error(
-      `No Blob store credentials in ${envFile}. Run \`vercel env pull .env.local\` in apps/registry, after connecting the store to the project's Development environment.`,
+      `No Blob store credentials in ${envFile}. Run \`vercel env pull .env.local\` in apps/registry, after connecting the store to the project's Development environment.`
     )
+  }
   return {
     async read(pathname) {
       const result = await get(pathname, { access: "private", useCache: false })
-      return result?.statusCode === 200 ? new Response(result.stream).text() : null
+      return result?.statusCode === 200
+        ? new Response(result.stream).text()
+        : null
     },
     async write(pathname, body, allowOverwrite) {
-      await put(pathname, body, { access: "private", addRandomSuffix: false, allowOverwrite })
+      await put(pathname, body, {
+        access: "private",
+        addRandomSuffix: false,
+        allowOverwrite,
+      })
     },
   }
 }

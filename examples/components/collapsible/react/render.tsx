@@ -1,6 +1,10 @@
 "use client"
 
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import { ChevronDownIcon } from "lucide-react"
 
 const updates = [
@@ -23,7 +27,9 @@ function Example() {
           <>
             <span data-slot="stack">
               <span>Track parcel</span>
-              <span data-slot="hint">{state.open ? "3 updates" : "Arrives Thursday"}</span>
+              <span data-slot="hint">
+                {state.open ? "3 updates" : "Arrives Thursday"}
+              </span>
             </span>
             <ChevronDownIcon />
           </>

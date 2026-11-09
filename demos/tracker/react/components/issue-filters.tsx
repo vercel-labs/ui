@@ -12,7 +12,13 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from "@/components/ui/combobox"
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "@/components/ui/select"
 
 const priorityItems = [{ value: "any", label: "Any priority" }, ...priorities]
 
@@ -32,11 +38,16 @@ function IssueFilters({
         items={priorityItems}
         value={query.priority ?? "any"}
         onValueChange={(value) =>
-          onChange({ priority: value === "any" ? null : (value as Query["priority"]), page: 1 })
+          onChange({
+            priority: value === "any" ? null : (value as Query["priority"]),
+            page: 1,
+          })
         }
       >
         <div className="grid gap-2">
-          <SelectLabel className={label}>{stacked ? "Priority" : "Filter by priority"}</SelectLabel>
+          <SelectLabel className={label}>
+            {stacked ? "Priority" : "Filter by priority"}
+          </SelectLabel>
           <SelectTrigger className={stacked ? undefined : "w-36"} />
         </div>
         <SelectContent>
@@ -49,11 +60,15 @@ function IssueFilters({
       </Select>
       <Combobox
         value={query.assignee}
-        onValueChange={(value) => onChange({ assignee: value as string | null, page: 1 })}
+        onValueChange={(value) =>
+          onChange({ assignee: value as string | null, page: 1 })
+        }
         itemToLabel={(id: string) => personOf(id)?.name ?? ""}
       >
         <div className="grid gap-2">
-          <ComboboxLabel className={label}>{stacked ? "Assignee" : "Filter by assignee"}</ComboboxLabel>
+          <ComboboxLabel className={label}>
+            {stacked ? "Assignee" : "Filter by assignee"}
+          </ComboboxLabel>
           <div className={stacked ? "relative" : "relative w-40"}>
             <ComboboxInput
               placeholder="Anyone"
@@ -66,7 +81,11 @@ function IssueFilters({
           <ComboboxEmpty>Nobody matches.</ComboboxEmpty>
           <ComboboxList>
             {people.map((person) => (
-              <ComboboxItem key={person.id} value={person.id} label={person.name}>
+              <ComboboxItem
+                key={person.id}
+                value={person.id}
+                label={person.name}
+              >
                 <Avatar name={person.name} size="sm" decorative />
                 {person.name}
               </ComboboxItem>

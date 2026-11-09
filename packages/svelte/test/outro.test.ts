@@ -6,11 +6,23 @@ import App from "./apps/outro-app.svelte"
 // its delay, then one for its keyframes, which finish when the test says so.
 const running: { onfinish: (() => void) | null }[] = []
 const finishAnimations = () => {
-  for (let animation = running.shift(); animation; animation = running.shift()) animation.onfinish?.()
+  for (
+    let animation = running.shift();
+    animation;
+    animation = running.shift()
+  ) {
+    animation.onfinish?.()
+  }
 }
 beforeAll(() => {
   Element.prototype.animate = function () {
-    const animation = { onfinish: null, cancel() {}, currentTime: 0, playState: "running", effect: null }
+    const animation = {
+      onfinish: null,
+      cancel() {},
+      currentTime: 0,
+      playState: "running",
+      effect: null,
+    }
     running.push(animation)
     return animation as unknown as Animation
   }
@@ -28,7 +40,10 @@ test("a popup reports its close complete once its Svelte outro ends", async () =
   const completed: boolean[] = []
   const target = document.createElement("div")
   document.body.append(target)
-  const app = mount(App, { target, props: { onOpenChangeComplete: (open: boolean) => completed.push(open) } })
+  const app = mount(App, {
+    target,
+    props: { onOpenChangeComplete: (open: boolean) => completed.push(open) },
+  })
   flushSync()
   const trigger = target.querySelector("button")!
   trigger.click()

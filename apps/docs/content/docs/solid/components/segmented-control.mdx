@@ -81,7 +81,11 @@ Name the control with `aria-label`, or put it in a [Field](./field) whose label 
 ```
 
 ```tsx
-<SegmentedControl aria-label="View" defaultValue="list" class="relative isolate inline-flex">
+<SegmentedControl
+  aria-label="View"
+  defaultValue="list"
+  class="relative isolate inline-flex"
+>
   <SegmentedControlIndicator class="absolute -z-1 top-(--segmented-control-indicator-top) left-(--segmented-control-indicator-left) w-(--segmented-control-indicator-width) h-(--segmented-control-indicator-height) transition-[top,left,width,height] duration-200" />
   <SegmentedControlItem value="list">List</SegmentedControlItem>
   <SegmentedControlItem value="grid">Grid</SegmentedControlItem>

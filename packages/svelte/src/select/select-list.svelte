@@ -5,7 +5,10 @@ Without children, it renders the select's `items` that match.
 @stable
 -->
 <script lang="ts">
-  import { select as selectPrimitive, type SelectContentState } from "@ui-sdk/core/select"
+  import {
+    select as selectPrimitive,
+    type SelectContentState,
+  } from "@ui-sdk/core/select"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"

@@ -18,7 +18,7 @@ function mount(root: HTMLElement) {
             <ui-tooltip-trigger for="${id}">
               <button aria-label="${format.label}">${createElement(format.icon, { "aria-hidden": "true" }).outerHTML}</button>
             </ui-tooltip-trigger>
-          `,
+          `
         )
         .join("")}
       <ui-tooltip id="${id}">

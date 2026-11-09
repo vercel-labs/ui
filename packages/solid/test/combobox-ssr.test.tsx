@@ -24,7 +24,8 @@ const plans = [
 ]
 
 const inputs = (html: string) => html.match(/<input[^>]*>/g) ?? []
-const field = (html: string) => inputs(html).find((input) => input.includes('role="combobox"'))!
+const field = (html: string) =>
+  inputs(html).find((input) => input.includes('role="combobox"'))!
 
 describe("server rendering a combobox", () => {
   test("the input holds the value's label", () => {
@@ -38,7 +39,9 @@ describe("server rendering a combobox", () => {
     expect(typeof window).toBe("undefined")
     expect(field(html)).toContain('value="Pro"')
     expect(field(html)).toContain('aria-autocomplete="list"')
-    expect(inputs(html).find((input) => input.includes('name="plan"'))).toContain('value="pro"')
+    expect(
+      inputs(html).find((input) => input.includes('name="plan"'))
+    ).toContain('value="pro"')
     // The list isn't in the page while closed.
     expect(html).not.toContain('role="listbox"')
   })
@@ -46,7 +49,11 @@ describe("server rendering a combobox", () => {
   test("composed items give the input its label through itemToLabel, since Solid can't read items before they render", () => {
     const labels = new Map(plans.map((plan) => [plan.value, plan.label]))
     const html = renderToString(() => (
-      <Combobox name="plan" defaultValue="pro" itemToLabel={(value) => labels.get(value) ?? value}>
+      <Combobox
+        name="plan"
+        defaultValue="pro"
+        itemToLabel={(value) => labels.get(value) ?? value}
+      >
         <ComboboxInput />
         <ComboboxContent>
           <ComboboxList>
@@ -71,7 +78,11 @@ describe("server rendering a combobox", () => {
         <ComboboxInput />
         <ComboboxContent>
           <ComboboxList>
-            <For each={plans}>{(plan) => <ComboboxItem value={plan.value}>{plan.label}</ComboboxItem>}</For>
+            <For each={plans}>
+              {(plan) => (
+                <ComboboxItem value={plan.value}>{plan.label}</ComboboxItem>
+              )}
+            </For>
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
@@ -84,7 +95,11 @@ describe("server rendering a combobox", () => {
       <Combobox items={plans} multiple defaultValue={["basic", "pro"]}>
         <ComboboxChips>
           <ComboboxValue>
-            {(state) => <For each={state.value as string[]}>{(item) => <ComboboxChip value={item} />}</For>}
+            {(state) => (
+              <For each={state.value as string[]}>
+                {(item) => <ComboboxChip value={item} />}
+              </For>
+            )}
           </ComboboxValue>
           <ComboboxInput />
         </ComboboxChips>

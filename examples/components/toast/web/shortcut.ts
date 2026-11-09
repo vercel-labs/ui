@@ -16,11 +16,11 @@ function mount(root: HTMLElement) {
     </ui-toast-region>
   `
   root.querySelector("ui-toast-region")!.toaster = toast
-  root
-    .querySelector("button")!
-    .addEventListener("click", () =>
-      toast("Message sent", { action: { label: "Undo", onAction: () => log(root, "Message unsent") } }),
-    )
+  root.querySelector("button")!.addEventListener("click", () =>
+    toast("Message sent", {
+      action: { label: "Undo", onAction: () => log(root, "Message unsent") },
+    })
+  )
   return () => {
     toast.dismiss()
   }

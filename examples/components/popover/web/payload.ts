@@ -52,7 +52,10 @@ function mount(root: HTMLElement) {
     const item = document.createElement("li")
     item.dataset.slot = "row"
     item.innerHTML = `${member.name}<span data-slot="hint">${member.role}</span>`
-    const trigger = Object.assign(document.createElement("ui-popover-trigger"), { payload: member })
+    const trigger = Object.assign(
+      document.createElement("ui-popover-trigger"),
+      { payload: member }
+    )
     trigger.setAttribute("for", id)
     trigger.toggleAttribute("disabled", member.role === "Owner")
     trigger.innerHTML = `<button aria-label="Edit ${member.name}" data-size="sm" data-variant="ghost">Edit</button>`
@@ -68,22 +71,36 @@ function mount(root: HTMLElement) {
   popover.addEventListener("payloadchange", (event) => {
     const member = event.detail.value
     show(member)
-    if (member) log(root, `Editing ${member.name}`)
+    if (member) {
+      log(root, `Editing ${member.name}`)
+    }
   })
   popover.addEventListener("openchange", (event) => {
-    if (event.detail.value) show(popover.api.getPayload())
+    if (event.detail.value) {
+      show(popover.api.getPayload())
+    }
   })
   form.addEventListener("submit", (event) => {
     const member = popover.api.getPayload()
-    if ((event.submitter as HTMLButtonElement).value !== "save" || !member) return
+    if ((event.submitter as HTMLButtonElement).value !== "save" || !member) {
+      return
+    }
     member.role = String(new FormData(form).get("role"))
     rows.get(member)!.querySelector("span")!.textContent = member.role
   })
 
-  const opener = root.querySelector<HTMLButtonElement>("[data-slot=controls] button")!
+  const opener = root.querySelector<HTMLButtonElement>(
+    "[data-slot=controls] button"
+  )!
   opener.addEventListener("click", async () => {
-    const result = await popover.api.open({ payload: members[members.length - 1], anchor: opener })
-    log(root, `Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`)
+    const result = await popover.api.open({
+      payload: members[members.length - 1],
+      anchor: opener,
+    })
+    log(
+      root,
+      `Closed (${result.reason}), returned ${result.returnValue ?? "nothing"}`
+    )
   })
 }
 

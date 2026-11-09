@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Meter, MeterIndicator, MeterLabel, MeterTrack, MeterValue } from "@ui-sdk/svelte/meter"
+  import {
+    Meter,
+    MeterIndicator,
+    MeterLabel,
+    MeterTrack,
+    MeterValue,
+  } from "@ui-sdk/svelte/meter"
 </script>
 
 <Meter value={91}>
@@ -14,7 +20,10 @@
       <span {...props}>
         <MeterIndicator>
           {#snippet render({ props, state })}
-            <div {...props} data-variant={state.percent >= 90 ? "destructive" : undefined}></div>
+            <div
+              {...props}
+              data-variant={state.percent >= 90 ? "destructive" : undefined}
+            ></div>
           {/snippet}
         </MeterIndicator>
       </span>

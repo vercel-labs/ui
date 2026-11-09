@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { EyeIcon, EyeOffIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/vue/password-input"
 import { computed, ref } from "vue"
 
 const value = ref("")
@@ -13,7 +17,7 @@ const score = computed(
       value.value.length >= 12,
       /[a-z]/.test(value.value) && /[A-Z]/.test(value.value),
       /\d/.test(value.value) && /[^a-zA-Z\d]/.test(value.value),
-    ].filter(Boolean).length,
+    ].filter(Boolean).length
 )
 </script>
 
@@ -28,7 +32,11 @@ const score = computed(
       </PasswordInputToggle>
     </PasswordInput>
     <div data-slot="strength" aria-hidden="true">
-      <div v-for="level in [1, 2, 3, 4]" :key="level" :data-on="score >= level || undefined" />
+      <div
+        v-for="level in [1, 2, 3, 4]"
+        :key="level"
+        :data-on="score >= level || undefined"
+      />
     </div>
     <output data-slot="output">
       {{

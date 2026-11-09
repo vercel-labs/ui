@@ -22,7 +22,10 @@ button's own text. Outside the file input, it connects through `controller`.
     ...rest
   }: PartProps<"button", FileInputState> & FileInputTriggerProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<FileInputContext | undefined>(fileInputPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<FileInputContext | undefined>(fileInputPrimitive)
+  )
   const fileInput = $derived(connected())
 </script>
 
@@ -32,7 +35,10 @@ button's own text. Outside the file input, it connects through `controller`.
   <!-- Until the file input it names mounts, a trigger outside it is a plain button. -->
   <Part
     tag="button"
-    part={plainPart({ value: [], disabled: false, required: false, dragging: false }, { type: "button" })}
+    part={plainPart(
+      { value: [], disabled: false, required: false, dragging: false },
+      { type: "button" }
+    )}
     props={rest}
   />
 {/if}

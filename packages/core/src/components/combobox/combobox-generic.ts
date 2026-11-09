@@ -1,5 +1,9 @@
 import type { PrimitiveGeneric } from "../../foundation/kernel/primitive-types"
-import type { ComboboxChipProps, ComboboxItemProps, ComboboxOptions } from "./combobox"
+import type {
+  ComboboxChipProps,
+  ComboboxItemProps,
+  ComboboxOptions,
+} from "./combobox"
 
 // Combobox's types as functions of its value type `T`, so every renderer's
 // `Combobox` infers `T` from its value, items or callbacks. The options'
@@ -10,6 +14,9 @@ interface ComboboxGeneric extends PrimitiveGeneric {
   options: ComboboxOptions<this["T"]>
   props: ComboboxPartProps<this["T"]>
 }
-type ComboboxPartProps<T> = { item: ComboboxItemProps<T>; chip: ComboboxChipProps<T> }
+type ComboboxPartProps<T> = {
+  item: ComboboxItemProps<T>
+  chip: ComboboxChipProps<T>
+}
 
 export type { ComboboxGeneric }

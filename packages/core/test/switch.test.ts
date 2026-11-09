@@ -4,7 +4,12 @@ import { attrs, partState } from "../src/foundation/kernel/part"
 
 describe("switch", () => {
   test("the thumb carries the switch's state attributes, and never indeterminate", () => {
-    const on = switchPrimitive({ id: "s", defaultChecked: true, readOnly: true, required: true })
+    const on = switchPrimitive({
+      id: "s",
+      defaultChecked: true,
+      readOnly: true,
+      required: true,
+    })
     expect(attrs(on.part("root"))).toMatchObject({
       role: "switch",
       "aria-checked": "true",
@@ -35,7 +40,11 @@ describe("switch", () => {
     expect(readOnly.api.toggle({ reason: "press" })).toBe(false)
     expect(readOnly.api.getChecked()).toBe(false)
 
-    const disabled = switchPrimitive({ id: "s", defaultChecked: true, disabled: true })
+    const disabled = switchPrimitive({
+      id: "s",
+      defaultChecked: true,
+      disabled: true,
+    })
     expect(disabled.api.setChecked(false)).toBe(false)
     expect(disabled.api.getChecked()).toBe(true)
   })
@@ -46,7 +55,9 @@ describe("switch", () => {
       id: "s",
       onCheckedChange: (_checked, details) => {
         reasons.push(details.reason)
-        if (details.reason !== "imperative") details.cancel()
+        if (details.reason !== "imperative") {
+          details.cancel()
+        }
       },
     })
     expect(control.api.toggle({ reason: "press" })).toBe(false)

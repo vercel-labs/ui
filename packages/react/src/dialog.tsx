@@ -1,4 +1,8 @@
-import { dialog as dialogPrimitive, type DialogOptions, type DialogTriggerProps } from "@ui-sdk/core/dialog"
+import {
+  dialog as dialogPrimitive,
+  type DialogOptions,
+  type DialogTriggerProps,
+} from "@ui-sdk/core/dialog"
 import * as React from "react"
 import { dialogParts, type TriggerPartProps } from "./dialog-parts"
 import { sheetViewport } from "./popup"
@@ -22,7 +26,9 @@ const Dialog = parts.Root
  * `controller`.
  * @stable
  */
-function DialogTrigger(props: TriggerPartProps & Pick<DialogTriggerProps, "controller">) {
+function DialogTrigger(
+  props: TriggerPartProps & Pick<DialogTriggerProps, "controller">
+) {
   return <parts.Trigger {...props} />
 }
 

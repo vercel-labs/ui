@@ -1,6 +1,18 @@
 import * as React from "react"
-import { ArrowLeftIcon, ArrowRightIcon, MapPinIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
-import { createViewport, css, definePrimitive, live, type Viewport } from "@ui-sdk/core"
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  MapPinIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "lucide-react"
+import {
+  createViewport,
+  css,
+  definePrimitive,
+  live,
+  type Viewport,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type Sight = { value: string; label: string; x: number; y: number }
@@ -42,12 +54,19 @@ const map = definePrimitive({
     return {
       viewport,
       act(action: string) {
-        if (action === "fit") viewport.fit(bounds(), { padding: 16, maxZoom: 1 })
-        else if (action === "in") viewport.zoomBy(1.25)
-        else if (action === "out") viewport.zoomBy(1 / 1.25)
-        else if (action === "reset") viewport.zoomTo(1)
-        else if (action === "left") viewport.panBy(80, 0)
-        else if (action === "right") viewport.panBy(-80, 0)
+        if (action === "fit") {
+          viewport.fit(bounds(), { padding: 16, maxZoom: 1 })
+        } else if (action === "in") {
+          viewport.zoomBy(1.25)
+        } else if (action === "out") {
+          viewport.zoomBy(1 / 1.25)
+        } else if (action === "reset") {
+          viewport.zoomTo(1)
+        } else if (action === "left") {
+          viewport.panBy(80, 0)
+        } else if (action === "right") {
+          viewport.panBy(-80, 0)
+        }
       },
     }
   },
@@ -57,17 +76,26 @@ const map = definePrimitive({
       attrs: () => ({
         tabindex: "0",
         "aria-roledescription": "map",
-        style: css({ position: "relative", overflow: "clip", "touch-action": "none" }),
+        style: css({
+          position: "relative",
+          overflow: "clip",
+          "touch-action": "none",
+        }),
       }),
       on: {
         wheel: (event, { api }) => api.viewport.wheel(event),
-        pointerdown: (event, { el, api }) => event.target === el && api.viewport.pointerdown(event),
+        pointerdown: (event, { el, api }) =>
+          event.target === el && api.viewport.pointerdown(event),
         keydown: (event, { api }) => api.viewport.keydown(event),
       },
     }),
     world: slot({
-      attrs: () => ({ style: css({ position: "absolute", left: "0", top: "0" }) }),
-      live: live<MapState, any, {}>((state, { api }) => ({ style: api.viewport.style(state) })),
+      attrs: () => ({
+        style: css({ position: "absolute", left: "0", top: "0" }),
+      }),
+      live: live<MapState, any, {}>((state, { api }) => ({
+        style: api.viewport.style(state),
+      })),
     }),
     sight: slot<{ value: string }>({
       props: { value: "string" },
@@ -84,7 +112,10 @@ const map = definePrimitive({
           }),
         }
       },
-      on: { focus: (_event, { el, api }) => api.viewport.reveal(api.viewport.rectOf(el!), { padding: 16 }) },
+      on: {
+        focus: (_event, { el, api }) =>
+          api.viewport.reveal(api.viewport.rectOf(el!), { padding: 16 }),
+      },
     }),
     zoom: slot({
       live: live<MapState, any, {}>((state) => ({

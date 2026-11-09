@@ -8,7 +8,11 @@ defineProps<{ subtasks: Subtask[] }>()
 
 <template>
   <template v-for="subtask in subtasks" :key="subtask.id">
-    <TreeItem v-if="subtask.subtasks" :value="subtask.id" :label="subtask.title">
+    <TreeItem
+      v-if="subtask.subtasks"
+      :value="subtask.id"
+      :label="subtask.title"
+    >
       <SubtaskItems :subtasks="subtask.subtasks" />
     </TreeItem>
     <TreeItem v-else :value="subtask.id" :label="subtask.title" />

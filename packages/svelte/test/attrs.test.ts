@@ -45,10 +45,10 @@ const slotNames: string[] = [
       .filter((file) => file.endsWith(".ts"))
       .flatMap((file) => [
         ...readFileSync(path.join(coreSource, file), "utf8").matchAll(
-          /^\s+"?([\w-]+)"?:\s*(?:slot|\w+Part)[<(]/gm,
+          /^\s+"?([\w-]+)"?:\s*(?:slot|\w+Part)[<(]/gm
         ),
       ])
-      .map(([, name]) => name),
+      .map(([, name]) => name)
   ),
 ]
 
@@ -65,9 +65,17 @@ const samples: [string, Primitive, Record<string, unknown>[]][] = [
       { disabled: true, readOnly: true },
     ],
   ],
-  ["checkbox group", checkboxGroup, [{ defaultValue: ["a"], allValues: ["a", "b"], name: "g" }]],
+  [
+    "checkbox group",
+    checkboxGroup,
+    [{ defaultValue: ["a"], allValues: ["a", "b"], name: "g" }],
+  ],
   ["switch", switchPrimitive, [{}, { defaultChecked: true, name: "s" }]],
-  ["radio group", radioGroup, [{ name: "r" }, { defaultValue: "a", required: true }]],
+  [
+    "radio group",
+    radioGroup,
+    [{ name: "r" }, { defaultValue: "a", required: true }],
+  ],
   ["field", field, [{}, { invalid: true, disabled: true }]],
   ["field set", fieldSet, [{}, { disabled: true }]],
   ["popover", popover, [{}, { defaultOpen: true, modal: true }]],
@@ -81,17 +89,36 @@ const samples: [string, Primitive, Record<string, unknown>[]][] = [
       { disabled: true },
     ],
   ],
-  ["listbox", listbox, [{ defaultValue: "a" }, { multiple: true, defaultValue: ["a", "b"], name: "l" }]],
+  [
+    "listbox",
+    listbox,
+    [
+      { defaultValue: "a" },
+      { multiple: true, defaultValue: ["a", "b"], name: "l" },
+    ],
+  ],
   ["menu", menu, [{}, { defaultOpen: true }]],
   ["dialog", dialog, [{}, { defaultOpen: true }]],
   ["alert dialog", alertDialog, [{ defaultOpen: true }]],
   ["tooltip", tooltip, [{}, { defaultOpen: true }]],
   ["hover card", hoverCard, [{ defaultOpen: true }]],
-  ["tabs", tabs, [{ defaultValue: "a" }, { defaultValue: "a", orientation: "vertical" }]],
-  ["accordion", accordion, [{ defaultValue: ["a"] }, { multiple: true, disabled: true }]],
+  [
+    "tabs",
+    tabs,
+    [{ defaultValue: "a" }, { defaultValue: "a", orientation: "vertical" }],
+  ],
+  [
+    "accordion",
+    accordion,
+    [{ defaultValue: ["a"] }, { multiple: true, disabled: true }],
+  ],
   ["toggle", toggle, [{}, { defaultPressed: true, disabled: true }]],
   ["toggle group", toggleGroup, [{ defaultValue: ["a"] }]],
-  ["slider", slider, [{ defaultValue: [50] }, { defaultValue: [20, 80], disabled: true }]],
+  [
+    "slider",
+    slider,
+    [{ defaultValue: [50] }, { defaultValue: [20, 80], disabled: true }],
+  ],
   ["progress", progress, [{ value: 40 }, { value: null }]],
   ["meter", meter, [{ value: 40 }, { value: 3, min: 1, max: 5 }]],
   ["avatar", avatar, [{}]],
@@ -106,7 +133,8 @@ const samples: [string, Primitive, Record<string, unknown>[]][] = [
 const keyed = { id: "a", value: "a", item: "a", itemKey: "a" }
 
 // Inputs take `value` as a property, so the tag matters for form slots.
-const tagFor = (slot: string) => (slot.includes("input") || slot === "control" ? "input" : "div")
+const tagFor = (slot: string) =>
+  slot.includes("input") || slot === "control" ? "input" : "div"
 
 // What an element shows: its attributes, with inputs' live value in place
 // of the `value` attribute, since Svelte sets an input's value as a
@@ -115,9 +143,12 @@ const tagFor = (slot: string) => (slot.includes("input") || slot === "control" ?
 // another order.
 function shown(el: HTMLElement) {
   const result: Record<string, string> = {}
-  for (const { name, value } of el.attributes)
+  for (const { name, value } of el.attributes) {
     result[name] =
-      name === "style" ? value.replace(/\s+/g, "").split(";").filter(Boolean).sort().join(";") : value
+      name === "style"
+        ? value.replace(/\s+/g, "").split(";").filter(Boolean).sort().join(";")
+        : value
+  }
   if (el instanceof HTMLInputElement) {
     delete result.value
     result.$value = el.value
@@ -147,7 +178,12 @@ describe("attributes spread by the adapter match applyAttrs", () => {
           const app = mount(Spread, {
             target,
             props: {
-              handle: { instance, api: instance.api, state: instance.get(), controls: () => false },
+              handle: {
+                instance,
+                api: instance.api,
+                state: instance.get(),
+                controls: () => false,
+              },
               name: slot,
               props: keyed,
               tag,
@@ -155,7 +191,10 @@ describe("attributes spread by the adapter match applyAttrs", () => {
           })
           flushSync()
           const spread = target.firstElementChild as HTMLElement
-          expect(shown(spread), `${name} ${slot} with ${JSON.stringify(options)}`).toEqual(shown(plain))
+          expect(
+            shown(spread),
+            `${name} ${slot} with ${JSON.stringify(options)}`
+          ).toEqual(shown(plain))
           unmount(app)
           target.remove()
           covered++

@@ -2,9 +2,21 @@ import "@ui-sdk/web/accordion"
 import { ChevronDown, createElement } from "lucide"
 
 const items = [
-  { value: "account", label: "Account", content: "Your name, email address and profile photo." },
-  { value: "security", label: "Security", content: "Your password, passkeys and two-factor authentication." },
-  { value: "sessions", label: "Sessions", content: "Devices signed in to your account in the last 30 days." },
+  {
+    value: "account",
+    label: "Account",
+    content: "Your name, email address and profile photo.",
+  },
+  {
+    value: "security",
+    label: "Security",
+    content: "Your password, passkeys and two-factor authentication.",
+  },
+  {
+    value: "sessions",
+    label: "Sessions",
+    content: "Devices signed in to your account in the last 30 days.",
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -31,7 +43,7 @@ function mount(root: HTMLElement) {
                 <ui-accordion-panel${item.value === "account" ? "" : " hidden"}>
                   ${item.content}
                 </ui-accordion-panel>
-              </ui-accordion-item>`,
+              </ui-accordion-item>`
           )
           .join("")}
       </ui-accordion>
@@ -46,10 +58,15 @@ function mount(root: HTMLElement) {
     (event) => {
       const open = (event as CustomEvent<{ value: boolean }>).detail.value
       const item = (event.target as HTMLElement).getAttribute("value")
-      if (!open && item === "security" && !window.confirm("Close the security settings?"))
+      if (
+        !open &&
+        item === "security" &&
+        !window.confirm("Close the security settings?")
+      ) {
         event.preventDefault()
+      }
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

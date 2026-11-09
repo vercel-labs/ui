@@ -18,12 +18,19 @@ The check inside a selected item. Rendered while it's selected, or always with `
   let {
     keepMounted,
     ...rest
-  }: PartProps<"span", ListboxItemIndicatorState> & ListboxItemIndicatorProps = $props()
+  }: PartProps<"span", ListboxItemIndicatorState> & ListboxItemIndicatorProps =
+    $props()
 
   const listbox = useHandle(listboxPrimitive)
   const item = getContext<ItemContext | undefined>(ItemKey)
-  if (!item) throw new Error("<ListboxItemIndicator> must be used inside <ListboxItem>.")
-  const indicator = useHandlePart(listbox, "item-indicator", () => ({ id: item().key, item: item().key, keepMounted }))
+  if (!item) {
+    throw new Error("<ListboxItemIndicator> must be used inside <ListboxItem>.")
+  }
+  const indicator = useHandlePart(listbox, "item-indicator", () => ({
+    id: item().key,
+    item: item().key,
+    keepMounted,
+  }))
 </script>
 
 {#if indicator.present}

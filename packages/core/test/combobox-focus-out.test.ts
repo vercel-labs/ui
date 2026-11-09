@@ -11,7 +11,11 @@ afterEach(() => {
 })
 
 function view(options: OptionsOf<typeof combobox>) {
-  const mounted = mount(combobox, options, `<root><input><content><list></list></content></root>`)
+  const mounted = mount(
+    combobox,
+    options,
+    `<root><input><content><list></list></content></root>`
+  )
   mounts.push(mounted)
   ;(mounted.part("input") as HTMLElement).focus()
   return mounted
@@ -39,7 +43,9 @@ test("canceling a focus-out close keeps the list open", async () => {
   const combo = view({
     items: ["Backlog", "Done"],
     onOpenChange: (open, details) => {
-      if (!open && details.reason === "focus-out") details.cancel()
+      if (!open && details.reason === "focus-out") {
+        details.cancel()
+      }
     },
   })
   await combo.keys("ArrowDown")

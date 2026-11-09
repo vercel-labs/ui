@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
-import { Menu, MenuCheckboxItem, MenuContent, MenuItemIndicator, MenuTrigger } from "@ui-sdk/vue/menu"
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuItemIndicator,
+  MenuTrigger,
+} from "@ui-sdk/vue/menu"
 import { Menubar } from "@ui-sdk/vue/menubar"
 import { ref } from "vue"
 
@@ -45,6 +51,8 @@ const statusBar = ref(true)
         </MenuContent>
       </Menu>
     </Menubar>
-    <output data-slot="output">Status bar {{ statusBar ? "shown" : "hidden" }}</output>
+    <output data-slot="output"
+      >Status bar {{ statusBar ? "shown" : "hidden" }}</output
+    >
   </div>
 </template>

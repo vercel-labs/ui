@@ -49,7 +49,9 @@ An item that checks and unchecks an option.
     onCheckedChange: (next: boolean, details: CheckedDetails) => {
       // The callback runs first, so canceling there also keeps a bound `checked` as it was.
       onCheckedChange?.(next, details)
-      if (!details.canceled) checked = next
+      if (!details.canceled) {
+        checked = next
+      }
     },
   }))
 </script>

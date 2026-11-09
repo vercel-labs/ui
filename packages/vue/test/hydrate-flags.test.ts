@@ -8,8 +8,19 @@
 import { renderToString } from "@vue/server-renderer"
 import { afterEach, expect, test } from "vitest"
 import { createSSRApp, h, type VNodeChild } from "vue"
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "../src/dialog"
-import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "../src/popover"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "../src/popover"
 import { Select, SelectLabel, SelectTrigger } from "../src/select"
 
 afterEach(() => document.body.replaceChildren())
@@ -27,10 +38,12 @@ test("a select's label names its trigger once hydrated", async () => {
     h(Select, { items: [{ value: "pro", label: "Pro" }] }, () => [
       h(SelectLabel, null, () => "Plan"),
       h(SelectTrigger),
-    ]),
+    ])
   )
   const label = document.querySelector('[data-slot="select-label"]')!
-  expect(document.querySelector('[role="combobox"]')!.getAttribute("aria-labelledby")).toContain(label.id)
+  expect(
+    document.querySelector('[role="combobox"]')!.getAttribute("aria-labelledby")
+  ).toContain(label.id)
 })
 
 test("an open dialog's description describes it once hydrated", async () => {
@@ -41,10 +54,14 @@ test("an open dialog's description describes it once hydrated", async () => {
         h(DialogTitle, null, () => "Profile"),
         h(DialogDescription, null, () => "Who you are."),
       ]),
-    ]),
+    ])
   )
-  const description = document.querySelector('[data-slot="dialog-description"]')!
-  expect(document.querySelector('[role="dialog"]')!.getAttribute("aria-describedby")).toBe(description.id)
+  const description = document.querySelector(
+    '[data-slot="dialog-description"]'
+  )!
+  expect(
+    document.querySelector('[role="dialog"]')!.getAttribute("aria-describedby")
+  ).toBe(description.id)
 })
 
 test("an open popover's title labels it once hydrated", async () => {
@@ -52,10 +69,12 @@ test("an open popover's title labels it once hydrated", async () => {
     h(Popover, { defaultOpen: true }, () => [
       h(PopoverTrigger, null, () => "More"),
       h(PopoverContent, null, () => [h(PopoverTitle, null, () => "Details")]),
-    ]),
+    ])
   )
   const title = document.querySelector('[data-slot="popover-title"]')!
-  expect(document.querySelector('[data-slot="popover-content"]')!.getAttribute("aria-labelledby")).toBe(
-    title.id,
-  )
+  expect(
+    document
+      .querySelector('[data-slot="popover-content"]')!
+      .getAttribute("aria-labelledby")
+  ).toBe(title.id)
 })

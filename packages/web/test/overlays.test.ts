@@ -10,7 +10,9 @@ const wait = () => new Promise((resolve) => setTimeout(resolve, 50))
 afterEach(() => document.body.replaceChildren())
 
 function mountHost(overlays = createOverlays()) {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   HTMLElement.prototype.showPopover ??= function () {}
   HTMLElement.prototype.hidePopover ??= function () {}
   defineOverlayHostElements()
@@ -23,9 +25,15 @@ function mountHost(overlays = createOverlays()) {
 async function hostAsking() {
   const { host, overlays } = mountHost()
   let answer: boolean | undefined
-  createConfirm({ overlays })({ title: "Delete the file?" }).then((value) => (answer = value))
+  createConfirm({ overlays })({ title: "Delete the file?" }).then(
+    (value) => (answer = value)
+  )
   await wait()
-  return { host, dialog: host.querySelector("ui-alert-dialog"), answer: () => answer }
+  return {
+    host,
+    dialog: host.querySelector("ui-alert-dialog"),
+    answer: () => answer,
+  }
 }
 
 test("an overlay host moved in one go keeps its open confirm waiting for its answer", async () => {
@@ -56,7 +64,9 @@ test("an overlay host taken off the page before its confirm opens answers it wit
   const next = mountHost(overlays).host
   confirm({ title: "Discard the draft?" })
   await wait()
-  expect(next.querySelector("ui-alert-dialog")?.textContent).toContain("Discard the draft?")
+  expect(next.querySelector("ui-alert-dialog")?.textContent).toContain(
+    "Discard the draft?"
+  )
 })
 
 test("an overlay host given other overlays as it moves in one go renders theirs", async () => {
@@ -66,5 +76,7 @@ test("an overlay host given other overlays as it moves in one go renders theirs"
   document.body.appendChild(document.createElement("main")).append(host)
   createConfirm({ overlays: other })({ title: "Discard the draft?" })
   await wait()
-  expect(host.querySelector("ui-alert-dialog")?.textContent).toContain("Discard the draft?")
+  expect(host.querySelector("ui-alert-dialog")?.textContent).toContain(
+    "Discard the draft?"
+  )
 })

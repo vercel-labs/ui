@@ -18,7 +18,9 @@ import {
       <SegmentedControlIndicator />
       <SegmentedControlItem value="monthly">Monthly</SegmentedControlItem>
       <SegmentedControlItem value="yearly">Yearly</SegmentedControlItem>
-      <SegmentedControlItem value="lifetime" disabled>Lifetime</SegmentedControlItem>
+      <SegmentedControlItem value="lifetime" disabled
+        >Lifetime</SegmentedControlItem
+      >
     </SegmentedControl>
   </div>
 </template>

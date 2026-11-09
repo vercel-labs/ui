@@ -23,7 +23,9 @@ export function Example() {
       <div data-slot="row">
         <CalendarPrevious
           data-variant="ghost"
-          render={(props, step) => <button {...props} title={`Show ${step.month}`} />}
+          render={(props, step) => (
+            <button {...props} title={`Show ${step.month}`} />
+          )}
         >
           <ChevronLeftIcon />
         </CalendarPrevious>
@@ -52,7 +54,11 @@ export function Example() {
                     {isoWeek(week[0]!.date)}
                   </th>
                   {week.map((cell) =>
-                    cell.hidden ? <td key={cell.date} /> : <CalendarDay key={cell.date} value={cell.date} />,
+                    cell.hidden ? (
+                      <td key={cell.date} />
+                    ) : (
+                      <CalendarDay key={cell.date} value={cell.date} />
+                    )
                   )}
                 </tr>
               ))}

@@ -19,7 +19,10 @@ const toolbar = definePrimitive({
     item: slot<{ value: string }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      attrs: (state, part) => ({ type: "button", tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        type: "button",
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: { keydown: (event, { el, api }) => api.roving.keydown(event, el!) },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),

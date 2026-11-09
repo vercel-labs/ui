@@ -1,7 +1,12 @@
 "use client"
 
 import { registerShortcut } from "@ui-sdk/core/shortcuts"
-import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/react/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "@ui-sdk/react/tooltip"
 import { SaveIcon } from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"

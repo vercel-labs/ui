@@ -15,8 +15,16 @@ import { createStore } from "../src/foundation/kernel/store"
 
 describe("modal", () => {
   test("true and false mean all or none of the three effects", () => {
-    expect(modalTriple(true)).toEqual({ consumeOutsidePress: true, trapFocus: true, inertAndLock: true })
-    expect(modalTriple(false)).toEqual({ consumeOutsidePress: false, trapFocus: false, inertAndLock: false })
+    expect(modalTriple(true)).toEqual({
+      consumeOutsidePress: true,
+      trapFocus: true,
+      inertAndLock: true,
+    })
+    expect(modalTriple(false)).toEqual({
+      consumeOutsidePress: false,
+      trapFocus: false,
+      inertAndLock: false,
+    })
   })
 
   test("pointer only consumes the outside press, like a menu's default", () => {
@@ -55,17 +63,35 @@ describe("openers", () => {
 
   test("a pointerdown is a pointer open, even though its detail is 0", () => {
     expect(
-      openerOf(event("pointerdown", { pointerType: "mouse", width: 1, height: 1, pressure: 0.5, detail: 0 })),
+      openerOf(
+        event("pointerdown", {
+          pointerType: "mouse",
+          width: 1,
+          height: 1,
+          pressure: 0.5,
+          detail: 0,
+        })
+      )
     ).toBe("pointer")
   })
 
   test("touch is told apart from other pointers", () => {
-    expect(openerOf(event("pointerdown", { pointerType: "touch", width: 20, height: 20 }))).toBe("touch")
-    expect(openerOf(event("pointerdown", { pointerType: "pen", width: 1, height: 1 }))).toBe("pointer")
+    expect(
+      openerOf(
+        event("pointerdown", { pointerType: "touch", width: 20, height: 20 })
+      )
+    ).toBe("touch")
+    expect(
+      openerOf(
+        event("pointerdown", { pointerType: "pen", width: 1, height: 1 })
+      )
+    ).toBe("pointer")
   })
 
   test("a click a script sent is an imperative open", () => {
-    expect(openerOf(event("click", { isTrusted: false, detail: 0 }))).toBe("imperative")
+    expect(openerOf(event("click", { isTrusted: false, detail: 0 }))).toBe(
+      "imperative"
+    )
   })
 })
 
@@ -80,35 +106,59 @@ describe("initial focus", () => {
   })
 
   test("everything else asks the component", () => {
-    for (const opener of ["pointer", "keyboard", "imperative"] as const)
+    for (const opener of ["pointer", "keyboard", "imperative"] as const) {
       expect(initialFocusPlan(opener)).toBe("auto")
+    }
   })
 })
 
 describe("focus after an outside press", () => {
   test("stays on a focusable element the press reached", () => {
-    expect(outsidePressFocus({ type: "pointerdown", focusable: true, consumed: false })).toBe(false)
+    expect(
+      outsidePressFocus({
+        type: "pointerdown",
+        focusable: true,
+        consumed: false,
+      })
+    ).toBe(false)
   })
 
   test("a mouse press on empty space returns focus once the press is over", () => {
-    expect(outsidePressFocus({ type: "pointerdown", focusable: false, consumed: false })).toBe("later")
+    expect(
+      outsidePressFocus({
+        type: "pointerdown",
+        focusable: false,
+        consumed: false,
+      })
+    ).toBe("later")
   })
 
   test("a tap returns focus at once, since it dismisses on click", () => {
-    expect(outsidePressFocus({ type: "click", focusable: false, consumed: false })).toBe(true)
+    expect(
+      outsidePressFocus({ type: "click", focusable: false, consumed: false })
+    ).toBe(true)
   })
 
   test("a consumed press never reached its target, so focus returns", () => {
-    expect(outsidePressFocus({ type: "pointerdown", focusable: true, consumed: true })).toBe("later")
+    expect(
+      outsidePressFocus({
+        type: "pointerdown",
+        focusable: true,
+        consumed: true,
+      })
+    ).toBe("later")
   })
 })
 
 describe("focus return chain", () => {
   test("takes the first candidate that exists and is usable", () => {
     const usable = (value: string) => value !== "inert"
-    expect(firstUsable([() => undefined, () => "inert", () => "before", () => "neighbour"], usable)).toBe(
-      "before",
-    )
+    expect(
+      firstUsable(
+        [() => undefined, () => "inert", () => "before", () => "neighbour"],
+        usable
+      )
+    ).toBe("before")
     expect(firstUsable([() => null, () => "inert"], usable)).toBeUndefined()
   })
 
@@ -116,7 +166,7 @@ describe("focus return chain", () => {
     const seen: string[] = []
     firstUsable(
       ["trigger", "before"].map((name) => () => (seen.push(name), name)),
-      () => true,
+      () => true
     )
     expect(seen).toEqual(["trigger"])
   })
@@ -149,13 +199,17 @@ describe("scrollbar presses", () => {
   })
 
   test("an element without scrollbars has none to press", () => {
-    expect(onScrollbar({ x: 190, y: 50 }, { ...box, clientWidth: 198 })).toBe(false)
+    expect(onScrollbar({ x: 190, y: 50 }, { ...box, clientWidth: 198 })).toBe(
+      false
+    )
   })
 })
 
 describe("scroll lock", () => {
   test("a classic scrollbar keeps its gutter, so the page doesn't shift", () => {
-    expect(scrollLockStyles({ scrollbar: 15, gutter: true, padding: 0 })).toEqual({
+    expect(
+      scrollLockStyles({ scrollbar: 15, gutter: true, padding: 0 })
+    ).toEqual({
       overflow: "hidden",
       "scroll-behavior": "auto",
       "scrollbar-gutter": "stable",
@@ -163,18 +217,30 @@ describe("scroll lock", () => {
   })
 
   test("without scrollbar-gutter support, padding takes the scrollbar's place", () => {
-    expect(scrollLockStyles({ scrollbar: 15, gutter: false, padding: 10 })["padding-right"]).toBe("25px")
+    expect(
+      scrollLockStyles({ scrollbar: 15, gutter: false, padding: 10 })[
+        "padding-right"
+      ]
+    ).toBe("25px")
   })
 
   test("overlay scrollbars reserve nothing, so a short page gains no gutter", () => {
-    expect(scrollLockStyles({ scrollbar: 0, gutter: true, padding: 0 })).toEqual({
+    expect(
+      scrollLockStyles({ scrollbar: 0, gutter: true, padding: 0 })
+    ).toEqual({
       overflow: "hidden",
       "scroll-behavior": "auto",
     })
   })
 
   test("on iOS, a one-finger drag that nothing under it can take is the page's, and stopped", () => {
-    const start = { fingers: 1, zoomed: false, scroller: false, slider: false, selecting: false }
+    const start = {
+      fingers: 1,
+      zoomed: false,
+      scroller: false,
+      slider: false,
+      selecting: false,
+    }
     expect(touchOwner(start)).toBe("page")
     expect(touchOwner({ ...start, fingers: 2 })).toBe("browser")
     expect(touchOwner({ ...start, zoomed: true })).toBe("browser")
@@ -217,15 +283,30 @@ describe("without a DOM", () => {
   })
 
   test("trigger ARIA only points at the popup while it's mounted", () => {
-    expect(popupTriggerAttrs({ open: false, mounted: false }, "x", "menu")["aria-controls"]).toBeUndefined()
-    expect(popupTriggerAttrs({ open: false, mounted: true }, "x", "menu")["aria-controls"]).toBe("x-content")
+    expect(
+      popupTriggerAttrs({ open: false, mounted: false }, "x", "menu")[
+        "aria-controls"
+      ]
+    ).toBeUndefined()
+    expect(
+      popupTriggerAttrs({ open: false, mounted: true }, "x", "menu")[
+        "aria-controls"
+      ]
+    ).toBe("x-content")
   })
 })
 
 describe("presets", () => {
   test("each kind of popup starts from its preset, and options passed beside it win", () => {
-    expect(resolveBehavior("menu", {})).toMatchObject({ tab: "close", blur: "always", shield: false })
-    expect(resolveBehavior("popover", {})).toMatchObject({ blur: "iframe", dismissOnFocusLoss: true })
+    expect(resolveBehavior("menu", {})).toMatchObject({
+      tab: "close",
+      blur: "always",
+      shield: false,
+    })
+    expect(resolveBehavior("popover", {})).toMatchObject({
+      blur: "iframe",
+      dismissOnFocusLoss: true,
+    })
     expect(resolveBehavior("dialog", {})).toMatchObject({
       blur: "never",
       outsidePress: "click",
@@ -235,7 +316,9 @@ describe("presets", () => {
       dismissOnFocusLoss: false,
       closeWatcher: true,
     })
-    expect(resolveBehavior("menu", { blur: "never", shield: undefined }).blur).toBe("never")
+    expect(
+      resolveBehavior("menu", { blur: "never", shield: undefined }).blur
+    ).toBe("never")
     expect(resolveBehavior("dialog", { shield: undefined }).shield).toBe(true)
   })
 
@@ -243,14 +326,18 @@ describe("presets", () => {
     const { tab, blocking } = resolveBehavior("dialog", {})
     const trap = modalTriple(true)
     const none = modalTriple(false)
-    expect(typeof tab === "function" && [tab(trap), tab(none), tab(modalTriple("trap-focus"))]).toEqual([
-      "trap",
-      "flow",
-      "trap",
-    ])
-    expect(typeof blocking === "function" && [blocking(trap), blocking(modalTriple("trap-focus"))]).toEqual([
-      true,
-      false,
-    ])
+    expect(
+      typeof tab === "function" && [
+        tab(trap),
+        tab(none),
+        tab(modalTriple("trap-focus")),
+      ]
+    ).toEqual(["trap", "flow", "trap"])
+    expect(
+      typeof blocking === "function" && [
+        blocking(trap),
+        blocking(modalTriple("trap-focus")),
+      ]
+    ).toEqual([true, false])
   })
 })

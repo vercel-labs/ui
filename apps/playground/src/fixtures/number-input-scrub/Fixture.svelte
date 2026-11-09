@@ -16,7 +16,9 @@
 <div class="fixture">
   <button>Before</button>
   <div role="toolbar" aria-label={f.toolbarLabel} class="row">
-    <NumberInputScrubArea {controller} class="number-input-scrub">{f.toolbarScrub}</NumberInputScrubArea>
+    <NumberInputScrubArea {controller} class="number-input-scrub"
+      >{f.toolbarScrub}</NumberInputScrubArea
+    >
   </div>
   <table>
     <thead>
@@ -40,13 +42,17 @@
     onValueCommit={(value) => (commits = [...commits, String(value)])}
   >
     <NumberInputGroup class="number-input-group">
-      <NumberInputScrubArea class="number-input-scrub">{f.letterScrub}</NumberInputScrubArea>
+      <NumberInputScrubArea class="number-input-scrub"
+        >{f.letterScrub}</NumberInputScrubArea
+      >
       <NumberInputControl aria-label={f.label} class="number-input-control" />
     </NumberInputGroup>
     <div>
       <div>
         <div>
-          <NumberInputScrubArea class="number-input-scrub">{f.nestedScrub}</NumberInputScrubArea>
+          <NumberInputScrubArea class="number-input-scrub"
+            >{f.nestedScrub}</NumberInputScrubArea
+          >
         </div>
       </div>
     </div>

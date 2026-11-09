@@ -6,7 +6,8 @@ import { idPart } from "../kernel/attrs"
 // Select-all keys in the highlight. Never a real item's.
 const SELECT_ALL = "\u0000select-all"
 
-const selectAllKey = (group?: string) => (group === undefined ? SELECT_ALL : `${SELECT_ALL}:${group}`)
+const selectAllKey = (group?: string) =>
+  group === undefined ? SELECT_ALL : `${SELECT_ALL}:${group}`
 const isSelectAll = (key: string) => key.startsWith(SELECT_ALL)
 
 /**
@@ -14,7 +15,9 @@ const isSelectAll = (key: string) => key.startsWith(SELECT_ALL)
  * option's, like a create or select-all option, from its name.
  */
 function optionId(id: string, key: string) {
-  if (!key.startsWith("\u0000")) return `${id}-option-${idPart(key)}`
+  if (!key.startsWith("\u0000")) {
+    return `${id}-option-${idPart(key)}`
+  }
   return `${id}-${key.slice(1).replace(/[^\w-]/g, "-")}`
 }
 

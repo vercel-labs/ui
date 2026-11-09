@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 const states: [string, Record<string, string>][] = [
@@ -28,14 +30,20 @@ for (const [name, options] of states) {
   })
 }
 
-test("no axe violations with focus on a disabled option", async ({ page, open }) => {
+test("no axe violations with focus on a disabled option", async ({
+  page,
+  open,
+}) => {
   await open("listbox")
   await option(page, "Olive").click({ force: true })
   await expect(option(page, "Olive")).toBeFocused()
   expect(await audit(page)).toEqual([])
 })
 
-test("the listbox is named, and says it holds several with multiple", async ({ page, open }) => {
+test("the listbox is named, and says it holds several with multiple", async ({
+  page,
+  open,
+}) => {
   await open("listbox", { multiple: "" })
   await expect(list(page)).toHaveAttribute("aria-multiselectable", "true")
   await expect(list(page)).toHaveAttribute("aria-orientation", "vertical")
@@ -53,9 +61,14 @@ test("groups are named by their labels", async ({ page, open }) => {
   await expect(page.getByRole("group", { name: "Vegetables" })).toBeVisible()
 })
 
-test("icons and checks stay out of the options' names", async ({ page, open }) => {
+test("icons and checks stay out of the options' names", async ({
+  page,
+  open,
+}) => {
   await open("listbox", { value: "basil" })
-  await expect(page.getByRole("option", { name: "Basil", exact: true })).toBeVisible()
+  await expect(
+    page.getByRole("option", { name: "Basil", exact: true })
+  ).toBeVisible()
 })
 
 // Every implementation must expose the same accessibility tree.

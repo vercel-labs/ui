@@ -9,14 +9,24 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Button class="button" render={(props) => <span {...props} />} onClick={() => setAction("span")}>
+      <Button
+        class="button"
+        render={(props) => <span {...props} />}
+        onClick={() => setAction("span")}
+      >
         Span button
       </Button>
-      <Button class="button" disabled render={(props) => <a {...props} href="#old" />}>
+      <Button
+        class="button"
+        disabled
+        render={(props) => <a {...props} href="#old" />}
+      >
         Old docs
       </Button>
       <Toggle
-        class={(state) => `toggle ${state.pressed ? "is-pressed" : "is-unpressed"}`}
+        class={(state) =>
+          `toggle ${state.pressed ? "is-pressed" : "is-unpressed"}`
+        }
         onPressedChange={(pressed) => setAction(pressed ? "star" : "unstar")}
       >
         {(state) => (
@@ -31,10 +41,18 @@ function Fixture() {
         defaultValue={["grid"]}
         onValueChange={(value) => setAction(value.join(", "))}
       >
-        <Toggle class="toggle" value="grid" render={(props) => <span {...props} />}>
+        <Toggle
+          class="toggle"
+          value="grid"
+          render={(props) => <span {...props} />}
+        >
           Grid
         </Toggle>
-        <Toggle class="toggle" value="list" render={(props) => <span {...props} />}>
+        <Toggle
+          class="toggle"
+          value="list"
+          render={(props) => <span {...props} />}
+        >
           List
         </Toggle>
       </ToggleGroup>

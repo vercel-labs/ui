@@ -3,15 +3,27 @@
 import { orientationOf } from "../../foundation/focus/collection"
 import { createDragSession } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
-import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
-import { displayOptions, formatNumber, type NumberFormat } from "../../foundation/number/format"
+import {
+  dispatchChange,
+  formInternals,
+  isDisabled,
+} from "../../foundation/forms/form"
+import {
+  displayOptions,
+  formatNumber,
+  type NumberFormat,
+} from "../../foundation/number/format"
 import { parseRange } from "../../foundation/number/parse"
 import { clamp } from "../../foundation/number/steps"
 import { localeOf } from "../../foundation/text/locale"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { heldState, sameValue } from "../../foundation/kernel/store"
 import { deriveFromOptions, deriveState } from "../../foundation/kernel/derive"
-import type { SliderChangeOptions, SliderOptions, SliderValueChangeReason } from "./slider"
+import type {
+  SliderChangeOptions,
+  SliderOptions,
+  SliderValueChangeReason,
+} from "./slider"
 import {
   fractionAlong,
   keyTarget,
@@ -23,7 +35,10 @@ import {
   thumbForPress,
   valueAt,
 } from "./slider-values"
-import { createChange, createCommit } from "../../foundation/kernel/input-source"
+import {
+  createChange,
+  createCommit,
+} from "../../foundation/kernel/input-source"
 
 type State = {
   value: number | number[]
@@ -57,21 +72,28 @@ type State = {
 }
 
 const isLocked = (state: State) => isDisabled(state) || state.readOnly
-const valuesOf = (value: number | number[]) => (Array.isArray(value) ? value : [value])
+const valuesOf = (value: number | number[]) =>
+  Array.isArray(value) ? value : [value]
 function thumbValuesOf(value: number | number[]) {
   const record: Record<string, number> = {}
   valuesOf(value).forEach((item, index) => (record[index] = item))
   return record
 }
-function holdsValue(thumbValues: Record<string, number>, value: number | number[]) {
-  if (!Array.isArray(value)) return Object.is(thumbValues[0], value) && thumbValues[1] === undefined
+function holdsValue(
+  thumbValues: Record<string, number>,
+  value: number | number[]
+) {
+  if (!Array.isArray(value)) {
+    return Object.is(thumbValues[0], value) && thumbValues[1] === undefined
+  }
   return (
     thumbValues[value.length] === undefined &&
     value.every((item, index) => Object.is(thumbValues[index], item))
   )
 }
 // Keeps a single value a number, so `onValueChange` gets back what it was given.
-const shaped = (values: number[], like: number | number[]) => (Array.isArray(like) ? values : values[0])
+const shaped = (values: number[], like: number | number[]) =>
+  Array.isArray(like) ? values : values[0]
 
 function rangeOf(state: State) {
   return {
@@ -93,7 +115,9 @@ function bounds(options: SliderOptions) {
 // Values from outside are clamped and sorted for drawing. A controlled value isn't rewritten.
 function normalized(value: number | number[], options: SliderOptions) {
   const range = bounds(options)
-  return Array.isArray(value) ? normalizeValues(value, range) : clamp(value, range.min, range.max)
+  return Array.isArray(value)
+    ? normalizeValues(value, range)
+    : clamp(value, range.min, range.max)
 }
 
 function settings(options: SliderOptions) {
@@ -116,7 +140,10 @@ function settings(options: SliderOptions) {
 // Intl options show at least as many decimals as the step, so a step of 0.001
 // never reads as 0. A function formats the value as it likes.
 function formatValue(value: number, state: State) {
-  const format = typeof state.format === "function" ? state.format : displayOptions(state.format, state.step)
+  const format =
+    typeof state.format === "function"
+      ? state.format
+      : displayOptions(state.format, state.step)
   return formatNumber(value, localeOf(state), format)
 }
 
@@ -127,7 +154,9 @@ function formatRange(values: readonly (number | string)[]) {
 
 // What the form submits: the number, or `"start/end"` for a range (G12).
 function submitted(state: State) {
-  return Array.isArray(state.value) ? formatRange(state.value) : String(state.value)
+  return Array.isArray(state.value)
+    ? formatRange(state.value)
+    : String(state.value)
 }
 
 type Gesture = {
@@ -149,7 +178,9 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   const drags = createDragSession(context.onDestroy)
   let gesture: Gesture | undefined
   // Keys commit when they come up, so holding one commits once.
-  let keys: { start: number | number[]; thumb: number; event?: KeyboardEvent } | undefined
+  let keys:
+    | { start: number | number[]; thumb: number; event?: KeyboardEvent }
+    | undefined
 
   const range = () => rangeOf(store.get())
   const values = () => valuesOf(store.get().value)
@@ -166,15 +197,25 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     reason: SliderValueChangeReason,
     event: Event | undefined,
     thumb: number | null,
-    notify = true,
+    notify = true
   ) {
-    if (next === values()) return false
+    if (next === values()) {
+      return false
+    }
     // `moveThumb` returns a new array whenever a thumb moved, so it's ours to hand over.
-    const done = change("value", shaped(next as number[], store.get().value), { reason, event, thumb })
+    const done = change("value", shaped(next as number[], store.get().value), {
+      reason,
+      event,
+      thumb,
+    })
     if (done) {
-      if (thumb !== null) store.set({ last: thumb })
+      if (thumb !== null) {
+        store.set({ last: thumb })
+      }
       // `change` waits for the commit, like a native range's.
-      if (notify) dispatchChange(formElement(), ["input"])
+      if (notify) {
+        dispatchChange(formElement(), ["input"])
+      }
     }
     return done
   }
@@ -184,52 +225,78 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
     reason: SliderValueChangeReason,
     event?: Event,
     thumb: number | null = null,
-    notify = true,
+    notify = true
   ) {
     const value = store.get().value
-    if (sameValue(start, value)) return
+    if (sameValue(start, value)) {
+      return
+    }
     commitValue("value", value, { reason, event, thumb })
-    if (notify) dispatchChange(formElement(), ["change"])
+    if (notify) {
+      dispatchChange(formElement(), ["change"])
+    }
   }
 
-  const thumbInput = (index: number) => element("thumb-input", String(index)) as HTMLInputElement | undefined
+  const thumbInput = (index: number) =>
+    element("thumb-input", String(index)) as HTMLInputElement | undefined
 
-  function setValue(value: number | number[], reason: SliderValueChangeReason, event?: Event) {
+  function setValue(
+    value: number | number[],
+    reason: SliderValueChangeReason,
+    event?: Event
+  ) {
     // Sorted first, then each thumb snapped and kept from its neighbours.
     const sorted = valuesOf(normalized(value, options()))
     const next = sorted.reduce<readonly number[]>(
       (result, item, index) => moveThumb(result, index, item, range()),
-      sorted,
+      sorted
     )
-    if (sameValue(next, values())) return false
-    return change("value", shaped(next.slice(), store.get().value), { reason, event, thumb: null })
+    if (sameValue(next, values())) {
+      return false
+    }
+    return change("value", shaped(next.slice(), store.get().value), {
+      reason,
+      event,
+      thumb: null,
+    })
   }
 
   const api = {
     getValue: () => store.get().value,
-    setValue: (value: number | number[], { reason = "imperative", event }: SliderChangeOptions = {}) =>
-      !isLocked(store.get()) && setValue(value, reason, event),
+    setValue: (
+      value: number | number[],
+      { reason = "imperative", event }: SliderChangeOptions = {}
+    ) => !isLocked(store.get()) && setValue(value, reason, event),
     focus: (thumb = 0) => thumbInput(thumb)?.focus(),
     internal: {
       // A press on the web: the track's box is read once, so moves never read layout.
       press(event: PointerEvent, control: HTMLElement) {
-        if (!drags.accepts(event) || isLocked(store.get()) || gesture) return
+        if (!drags.accepts(event) || isLocked(store.get()) || gesture) {
+          return
+        }
         const rect = (element("track") ?? control).getBoundingClientRect()
         const rtl = isRTL(control)
         const vertical = store.get().orientation === "vertical"
         const at = (x: number, y: number) =>
           valueAt(fractionAlong({ x, y }, rect, { rtl, vertical }), range())
-        const pressedThumb = (event.target as Element).closest<HTMLElement>('[data-slot="slider-thumb"]')
+        const pressedThumb = (event.target as Element).closest<HTMLElement>(
+          '[data-slot="slider-thumb"]'
+        )
         const thumb =
           pressedThumb && control.contains(pressedThumb)
             ? Number(pressedThumb.getAttribute("data-index") ?? 0)
             : null
         // No text selection, and no native focus that would land elsewhere.
         event.preventDefault()
-        const focused = api.internal.begin(at(event.clientX, event.clientY), thumb, event)
+        const focused = api.internal.begin(
+          at(event.clientX, event.clientY),
+          thumb,
+          event
+        )
         thumbInput(focused)?.focus({ preventScroll: true })
         drags.start(control, event, {
-          onMove: (sample) => api.internal.move(at(sample.x, sample.y), sample.event),
+          onMove: (sample) =>
+            api.internal.move(at(sample.x, sample.y), sample.event),
           onEnd: (end) => api.internal.end(end),
         })
       },
@@ -247,8 +314,14 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
           offset = pressed - values()[thumb]
         } else {
           ;({ index, stack } = thumbForPress(values(), pressed))
-          if (index !== null)
-            setValues(moveThumb(values(), index, pressed, range()), "track-press", event, index)
+          if (index !== null) {
+            setValues(
+              moveThumb(values(), index, pressed, range()),
+              "track-press",
+              event,
+              index
+            )
+          }
         }
         const focused = index ?? stack[0]
         gesture = { index, stack, offset, start, reason: "track-press", event }
@@ -256,17 +329,28 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
         return focused
       },
       move(pressed: number, event?: Event) {
-        if (!gesture) return
+        if (!gesture) {
+          return
+        }
         const target = pressed - gesture.offset
         if (gesture.index === null) {
           // Stacked thumbs: the direction of the first move picks one.
           const direction = Math.sign(target - values()[gesture.stack[0]])
-          if (direction === 0) return
+          if (direction === 0) {
+            return
+          }
           gesture.index = thumbForDirection(gesture.stack, direction)
           thumbInput(gesture.index)?.focus({ preventScroll: true })
           store.set({ active: gesture.index })
         }
-        if (setValues(moveThumb(values(), gesture.index, target, range()), "drag", event, gesture.index)) {
+        if (
+          setValues(
+            moveThumb(values(), gesture.index, target, range()),
+            "drag",
+            event,
+            gesture.index
+          )
+        ) {
           gesture.reason = "drag"
           gesture.event = event
         }
@@ -275,40 +359,67 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
         const ended = gesture
         gesture = undefined
         store.set({ active: null })
-        if (ended) commit(ended.start, ended.reason, event, ended.index)
+        if (ended) {
+          commit(ended.start, ended.reason, event, ended.index)
+        }
       },
       // A screen reader's adjustment through the thumb's native range input,
       // like a swipe on iOS. It commits at once.
       adjust(index: number, target: number, event: Event) {
-        if (store.get().readOnly) return
+        if (store.get().readOnly) {
+          return
+        }
         const start = store.get().value
         // The thumb's range input fired `input`, and fires `change`, which
         // bubble to the form already, so the slider adds none of its own.
-        setValues(moveThumb(values(), index, target, range()), "accessibility-adjust", event, index, false)
+        setValues(
+          moveThumb(values(), index, target, range()),
+          "accessibility-adjust",
+          event,
+          index,
+          false
+        )
         commit(start, "accessibility-adjust", event, index, false)
       },
       keydown(event: KeyboardEvent, index: number, input: HTMLElement) {
         const state = store.get()
-        if (isDisabled(state)) return
+        if (isDisabled(state)) {
+          return
+        }
         const current = values()[index] ?? state.min
         const target = keyTarget(
           event.key,
-          { shiftKey: event.shiftKey, rtl: isRTL(input), orientation: state.orientation },
+          {
+            shiftKey: event.shiftKey,
+            rtl: isRTL(input),
+            orientation: state.orientation,
+          },
           current,
           thumbBounds(values(), index, range()),
-          range(),
+          range()
         )
-        if (target === null) return
+        if (target === null) {
+          return
+        }
         event.preventDefault()
-        if (state.readOnly) return
+        if (state.readOnly) {
+          return
+        }
         keys ??= { start: state.value, thumb: index }
         keys.event = event
-        setValues(moveThumb(values(), index, target, range()), "step-key", event, index)
+        setValues(
+          moveThumb(values(), index, target, range()),
+          "step-key",
+          event,
+          index
+        )
       },
       // The key came up, or focus left while it was down, so its keyup goes
       // elsewhere and the last keydown stands for it.
       commitKeys(event?: KeyboardEvent) {
-        if (!keys) return
+        if (!keys) {
+          return
+        }
         const { start, thumb, event: last } = keys
         keys = undefined
         commit(start, "step-key", event ?? last, thumb)
@@ -319,12 +430,15 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
       // The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {
         const parsed = parseRange(saved)
-        if (parsed) setValue(shaped(parsed, store.get().value), "restore")
+        if (parsed) {
+          setValue(shaped(parsed, store.get().value), "restore")
+        }
       },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
       },
-      submitted: () => (store.get().name === undefined ? null : submitted(store.get())),
+      submitted: () =>
+        store.get().name === undefined ? null : submitted(store.get()),
       // Writes what the framework's attributes would, before they render, so
       // a native range never clamps a value to stale bounds. Only what
       // changed, since every write is a mutation the page restyles for.
@@ -333,9 +447,15 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
         const min = String(lower)
         const max = String(upper)
         const value = String(values()[index] ?? store.get().min)
-        if (input.min !== min) input.min = min
-        if (input.max !== max) input.max = max
-        if (input.value !== value) input.value = value
+        if (input.min !== min) {
+          input.min = min
+        }
+        if (input.max !== max) {
+          input.max = max
+        }
+        if (input.value !== value) {
+          input.value = value
+        }
       },
     },
   }
@@ -343,9 +463,13 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   // New bounds clamp an uncontrolled value, without a change event, like a native range.
   deriveFromOptions(context, ["value"], (synced, state, arriving) => {
     const { min, max } = bounds(arriving)
-    if (arriving.value !== undefined || !(min <= max)) return
+    if (arriving.value !== undefined || !(min <= max)) {
+      return
+    }
     const value = normalized(state.value, arriving)
-    if (!sameValue(value, state.value)) return { value }
+    if (!sameValue(value, state.value)) {
+      return { value }
+    }
   })
 
   // The same value makes the same record, so a render and its handover agree. A dropped
@@ -353,13 +477,19 @@ function sliderApi(context: PrimitiveContext<SliderOptions, State, string>) {
   // rendered isn't written yet, and a thumb's input hears only writes.
   let made = { value: store.get().value, thumbValues: store.get().thumbValues }
   deriveState(context, ["thumbValues"], ({ value }) => {
-    if (holdsValue(heldState(store).thumbValues, value)) return
-    if (!sameValue(value, made.value)) made = { value, thumbValues: thumbValuesOf(value) }
+    if (holdsValue(heldState(store).thumbValues, value)) {
+      return
+    }
+    if (!sameValue(value, made.value)) {
+      made = { value, thumbValues: thumbValuesOf(value) }
+    }
     return { thumbValues: made.thumbValues }
   })
   // Disabling it or making it read-only mid-drag ends the drag.
   store.subscribe(() => {
-    if (!gesture || !isLocked(store.get())) return
+    if (!gesture || !isLocked(store.get())) {
+      return
+    }
     drags.cancel()
     api.internal.end()
   })

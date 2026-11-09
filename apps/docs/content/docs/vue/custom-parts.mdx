@@ -15,7 +15,10 @@ import { defineComponent, type HTMLAttributes } from "vue"
 import { rating } from "./rating"
 
 const RatingRoot = defineComponent(
-  (props: { value?: number; defaultValue?: number } & HTMLAttributes, { emit }) => {
+  (
+    props: { value?: number; defaultValue?: number } & HTMLAttributes,
+    { emit }
+  ) => {
     const handle = usePrimitive(rating, () => ({
       value: props.value,
       defaultValue: props.defaultValue,
@@ -33,7 +36,7 @@ const RatingRoot = defineComponent(
     props: ["value", "defaultValue"],
     emits: ["value-change", "update:value"],
     slots: Object as PartSlots<typeof rating, "root">,
-  },
+  }
 )
 
 export { RatingRoot }
@@ -56,13 +59,19 @@ import { rating } from "./rating"
 
 const RatingStar = defineComponent(
   (props: { value: string } & Omit<ButtonHTMLAttributes, "value">) => {
-    return usePart(rating, "star", () => ({ value: props.value }), undefined, "button")
+    return usePart(
+      rating,
+      "star",
+      () => ({ value: props.value }),
+      undefined,
+      "button"
+    )
   },
   {
     inheritAttrs: false,
     props: ["value"],
     slots: Object as PartSlots<typeof rating, "star">,
-  },
+  }
 )
 
 export { RatingStar }

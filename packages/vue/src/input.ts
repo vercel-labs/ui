@@ -1,9 +1,23 @@
-import { input as inputPrimitive, inputGroup as inputGroupPrimitive } from "@ui-sdk/core/input"
+import {
+  input as inputPrimitive,
+  inputGroup as inputGroupPrimitive,
+} from "@ui-sdk/core/input"
 import { defineComponent } from "vue"
 import { useFieldControl } from "./field-context"
-import { elementProps, readOnlyOf, textEmits, textOptions, textProps } from "./text-control"
+import {
+  elementProps,
+  readOnlyOf,
+  textEmits,
+  textOptions,
+  textProps,
+} from "./text-control"
 import { createParts, withElement } from "./create-parts"
-import { optionalBoolean, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 
 const groupParts = createParts(inputGroupPrimitive, { clear: "button" })
 
@@ -27,12 +41,18 @@ const Input = withElement(
         readOnly: readOnlyOf(props, attrs),
         required: props.required,
       })
-      return usePart(input, "root", part, () => elementProps(props, field, attrs, "input"), {
-        tag: "input",
-        extend: field?.props,
-      })
+      return usePart(
+        input,
+        "root",
+        part,
+        () => elementProps(props, field, attrs, "input"),
+        {
+          tag: "input",
+          extend: field?.props,
+        }
+      )
     },
-  }),
+  })
 )
 
 /**
@@ -48,10 +68,12 @@ const InputGroup = withElement(
     props: { debug: optionalBoolean },
     slots: Object as PartSlots<typeof inputGroupPrimitive, "group">,
     setup(props) {
-      const group = usePrimitive(inputGroupPrimitive, () => ({ debug: props.debug }))
+      const group = usePrimitive(inputGroupPrimitive, () => ({
+        debug: props.debug,
+      }))
       return usePart(group, "group")
     },
-  }),
+  })
 )
 
 /**

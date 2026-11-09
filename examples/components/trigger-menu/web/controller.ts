@@ -34,13 +34,17 @@ function mount(root: HTMLElement) {
   const menu = element.api
   element.triggers = [{ char: "@", items: people }]
   const [mention, date] = root.querySelectorAll("button")
-  root.querySelector("[data-slot=controls]")!.addEventListener("mousedown", (event) => event.preventDefault())
+  root
+    .querySelector("[data-slot=controls]")!
+    .addEventListener("mousedown", (event) => event.preventDefault())
   mention.addEventListener("click", async () => {
     const closed = await menu.open({ trigger: "@" })
     log(root, `Closed (${closed.reason})`)
   })
   date.addEventListener("click", () =>
-    menu.insert(new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" })),
+    menu.insert(
+      new Date().toLocaleDateString("en-US", { month: "long", day: "numeric" })
+    )
   )
 }
 

@@ -5,12 +5,17 @@ import { beforeAll, expect, test } from "vitest"
 import type { UiSelectElement } from "../src/events"
 import { defineSelectElements } from "../src/select"
 
-const items = Array.from({ length: 50 }, (_, index) => ({ value: `item-${index}`, label: `Item ${index}` }))
+const items = Array.from({ length: 50 }, (_, index) => ({
+  value: `item-${index}`,
+  label: `Item ${index}`,
+}))
 
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 beforeAll(() => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   ElementInternals.prototype.setFormValue ??= () => {}
   ElementInternals.prototype.setValidity ??= () => {}
   defineSelectElements()
@@ -27,11 +32,12 @@ function mount() {
   const select = document.querySelector("ui-select") as UiSelectElement
   const rows = document.querySelector("ui-select-list > div")!
   const renderRows = () => {
-    for (const [index, item] of items.slice(0, 5).entries())
+    for (const [index, item] of items.slice(0, 5).entries()) {
       rows.insertAdjacentHTML(
         "beforeend",
-        `<ui-select-item value="${item.value}" label="${item.label}" index="${index}">${item.label}</ui-select-item>`,
+        `<ui-select-item value="${item.value}" label="${item.label}" index="${index}">${item.label}</ui-select-item>`
       )
+    }
   }
   const options = () => Array.from(document.querySelectorAll("ui-select-item"))
   return { select, renderRows, options }

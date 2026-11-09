@@ -18,8 +18,15 @@ type ContainerContext = () => PopupContainer
 // A group's name, and its controlled value as a getter: the core reads a
 // controlled value from what the group last rendered, not from state it
 // notifies, so the items read it too and render again when it changes.
-type RadioGroupContext = { name: string; value: () => string | null | undefined }
-type ItemContext = () => { item: "checkbox-item" | "radio-item"; itemKey: string; group?: string }
+type RadioGroupContext = {
+  name: string
+  value: () => string | null | undefined
+}
+type ItemContext = () => {
+  item: "checkbox-item" | "radio-item"
+  itemKey: string
+  group?: string
+}
 
 export {
   type ContainerContext,

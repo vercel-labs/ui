@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "@lucide/vue"
-import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/vue/tooltip"
+import {
+  createTooltipController,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@ui-sdk/vue/tooltip"
 
 const formats = [
   { icon: BoldIcon, label: "Bold" },
@@ -24,7 +29,9 @@ const LabelTooltipContent = TooltipContent<string>
       <component :is="format.icon" aria-hidden="true" />
     </TooltipTrigger>
     <Tooltip :controller="tooltip">
-      <LabelTooltipContent v-slot="{ state }">{{ state.payload }}</LabelTooltipContent>
+      <LabelTooltipContent v-slot="{ state }">{{
+        state.payload
+      }}</LabelTooltipContent>
     </Tooltip>
   </div>
 </template>

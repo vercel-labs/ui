@@ -1,5 +1,15 @@
 import { countFormEvents, expect, formEventCounts, test } from "../fixtures"
-import { center, drag, maximum, minimum, pressAt, status, thumbBox, track, volume } from "./slider.helpers"
+import {
+  center,
+  drag,
+  maximum,
+  minimum,
+  pressAt,
+  status,
+  thumbBox,
+  track,
+  volume,
+} from "./slider.helpers"
 
 // Behavior follows the WAI-ARIA slider patterns:
 // https://www.w3.org/WAI/ARIA/apg/patterns/slider/
@@ -76,7 +86,9 @@ test.describe("keyboard", () => {
     await expect(maximum(page)).toBeFocused()
   })
 
-  test("Home and End move a range thumb as far as its neighbour", async ({ page }) => {
+  test("Home and End move a range thumb as far as its neighbour", async ({
+    page,
+  }) => {
     await maximum(page).focus()
     await page.keyboard.press("Home")
     await expect(maximum(page)).toHaveValue("20")
@@ -90,7 +102,9 @@ test.describe("keyboard", () => {
   test("a range thumb stops at its neighbour", async ({ page, open }) => {
     await open("slider", { price: "49,51" })
     await minimum(page).focus()
-    for (let index = 0; index < 4; index++) await page.keyboard.press("ArrowRight")
+    for (let index = 0; index < 4; index++) {
+      await page.keyboard.press("ArrowRight")
+    }
     await expect(minimum(page)).toHaveValue("51")
     await expect(maximum(page)).toHaveValue("51")
   })
@@ -166,7 +180,10 @@ test.describe("pointer", () => {
     await page.mouse.up()
   })
 
-  test("dragging right from stacked thumbs moves the upper one", async ({ page, open }) => {
+  test("dragging right from stacked thumbs moves the upper one", async ({
+    page,
+    open,
+  }) => {
     await open("slider", { price: "50,50" })
     const from = await center(thumbBox(page, minimum(page)))
     await drag(page, from, { x: 40 })
@@ -185,7 +202,9 @@ test.describe("pointer", () => {
     await expect.poll(() => status(page, "Committed")).toBe("volume:70")
   })
 
-  test("a screen reader's adjustment reaches the form as one input and one change", async ({ page }) => {
+  test("a screen reader's adjustment reaches the form as one input and one change", async ({
+    page,
+  }) => {
     await countFormEvents(page)
     // A screen reader sets the range input's value and fires its native events.
     await volume(page).evaluate((el) => {
@@ -199,13 +218,17 @@ test.describe("pointer", () => {
     expect(await formEventCounts(page)).toEqual({ input: 1, change: 1 })
   })
 
-  test("a drag sends input as it moves, and change once when the pointer lifts", async ({ page }) => {
+  test("a drag sends input as it moves, and change once when the pointer lifts", async ({
+    page,
+  }) => {
     await countFormEvents(page)
     const from = await center(thumbBox(page, volume(page)))
     await page.mouse.move(from.x, from.y)
     await page.mouse.down()
     await page.mouse.move(from.x + 40, from.y, { steps: 8 })
-    await expect.poll(async () => (await formEventCounts(page)).input).toBeGreaterThan(0)
+    await expect
+      .poll(async () => (await formEventCounts(page)).input)
+      .toBeGreaterThan(0)
     expect((await formEventCounts(page)).change).toBe(0)
     await page.mouse.up()
     await expect.poll(async () => (await formEventCounts(page)).change).toBe(1)
@@ -263,7 +286,10 @@ test.describe("vertical", () => {
 })
 
 test.describe("value and state", () => {
-  test("the value part shows the value, and a range joined with a dash", async ({ page, open }) => {
+  test("the value part shows the value, and a range joined with a dash", async ({
+    page,
+    open,
+  }) => {
     await open("slider")
     await expect(page.locator(".slider-value").nth(0)).toHaveText("50")
     await expect(page.locator(".slider-value").nth(1)).toHaveText("20 – 80")
@@ -272,13 +298,21 @@ test.describe("value and state", () => {
     await expect(page.locator(".slider-value").nth(0)).toHaveText("51")
   })
 
-  test("the value reads in the format and the locale", async ({ page, open }) => {
+  test("the value reads in the format and the locale", async ({
+    page,
+    open,
+  }) => {
     await open("slider", { currency: "", locale: "de-DE" })
     await expect(minimum(page)).toHaveAttribute("aria-valuetext", /^20,00\s€/)
-    await expect(page.locator(".slider-value").nth(1)).toHaveText(/^20,00\s€ – 80,00\s€$/)
+    await expect(page.locator(".slider-value").nth(1)).toHaveText(
+      /^20,00\s€ – 80,00\s€$/
+    )
   })
 
-  test("a disabled slider can't be focused or changed", async ({ page, open }) => {
+  test("a disabled slider can't be focused or changed", async ({
+    page,
+    open,
+  }) => {
     await open("slider", { disabled: "" })
     await expect(volume(page)).toBeDisabled()
     await pressAt(page, track(page, 0), 0.9)
@@ -297,7 +331,10 @@ test.describe("value and state", () => {
     await expect(box).not.toHaveAttribute("data-dragging", "")
   })
 
-  test("a single slider submits its value under its name", async ({ page, open }) => {
+  test("a single slider submits its value under its name", async ({
+    page,
+    open,
+  }) => {
     await open("slider")
     await volume(page).focus()
     await page.keyboard.press("ArrowRight")

@@ -6,7 +6,9 @@ const load: PageServerLoad = () => ({ settings: db.getSettings() })
 
 const actions: Actions = {
   default: async ({ request }) => {
-    db.updateSettings(readSettings(Object.fromEntries(await request.formData())))
+    db.updateSettings(
+      readSettings(Object.fromEntries(await request.formData()))
+    )
   },
 }
 

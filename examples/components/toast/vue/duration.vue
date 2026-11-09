@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Toast, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/vue/toast"
+import {
+  Toast,
+  ToastClose,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/vue/toast"
 import { onUnmounted } from "vue"
 
 const toast = createToaster()
@@ -26,7 +32,11 @@ function untilDismissed() {
     <template #default="{ toast: item }">
       <Toast>
         <ToastTitle />
-        <ToastClose v-if="item.cancel" data-variant="solid" :action="item.cancel.onCancel">
+        <ToastClose
+          v-if="item.cancel"
+          data-variant="solid"
+          :action="item.cancel.onCancel"
+        >
           {{ item.cancel.label }}
         </ToastClose>
       </Toast>

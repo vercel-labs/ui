@@ -32,7 +32,11 @@ const theme = ref("system")
         <MenuTrigger>Profiles</MenuTrigger>
         <MenuContent>
           <MenuRadioGroup default-value="ines">
-            <MenuRadioItem v-for="profile in profiles" :key="profile.value" :value="profile.value">
+            <MenuRadioItem
+              v-for="profile in profiles"
+              :key="profile.value"
+              :value="profile.value"
+            >
               <MenuItemIndicator />
               {{ profile.label }}
             </MenuRadioItem>
@@ -43,7 +47,11 @@ const theme = ref("system")
         <MenuTrigger>Theme</MenuTrigger>
         <MenuContent>
           <MenuRadioGroup v-model:value="theme">
-            <MenuRadioItem v-for="option in themes" :key="option.value" :value="option.value">
+            <MenuRadioItem
+              v-for="option in themes"
+              :key="option.value"
+              :value="option.value"
+            >
               <MenuItemIndicator />
               {{ option.label }}
             </MenuRadioItem>

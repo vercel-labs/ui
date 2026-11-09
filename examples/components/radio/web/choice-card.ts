@@ -2,9 +2,21 @@ import "@ui-sdk/web/field"
 import "@ui-sdk/web/radio"
 
 const plans = [
-  { value: "hobby", label: "Hobby", description: "Free for personal projects." },
-  { value: "pro", label: "Pro", description: "$20 per month for growing teams." },
-  { value: "enterprise", label: "Enterprise", description: "Custom pricing and support." },
+  {
+    value: "hobby",
+    label: "Hobby",
+    description: "Free for personal projects.",
+  },
+  {
+    value: "pro",
+    label: "Pro",
+    description: "$20 per month for growing teams.",
+  },
+  {
+    value: "enterprise",
+    label: "Enterprise",
+    description: "Custom pricing and support.",
+  },
 ]
 
 function mount(root: HTMLElement) {
@@ -24,7 +36,7 @@ function mount(root: HTMLElement) {
                   <ui-radio-indicator></ui-radio-indicator>
                 </ui-radio>
               </label>
-            `,
+            `
           )
           .join("")}
       </ui-radio-group>

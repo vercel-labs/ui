@@ -8,5 +8,8 @@
     <p data-slot="hint">hollis@example.com</p>
   </div>
   <Separator />
-  <p>Designs the billing and onboarding flows, and reviews every new pricing page.</p>
+  <p>
+    Designs the billing and onboarding flows, and reviews every new pricing
+    page.
+  </p>
 </div>

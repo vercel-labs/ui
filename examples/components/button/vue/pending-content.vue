@@ -8,7 +8,11 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 <template>
   <Button @click="() => wait(1500)" pending-announcement="Saving">
     <ArrowDownToLineIcon data-show="idle" aria-hidden="true" />
-    <LoaderCircleIcon data-show="pending" data-slot="spinner" aria-hidden="true" />
+    <LoaderCircleIcon
+      data-show="pending"
+      data-slot="spinner"
+      aria-hidden="true"
+    />
     Save
   </Button>
 </template>

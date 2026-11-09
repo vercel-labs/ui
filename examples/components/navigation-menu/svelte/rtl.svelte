@@ -80,9 +80,7 @@
         </NavigationMenuItem>
       {/each}
       <NavigationMenuItem>
-        <NavigationMenuLink href="#">
-          المستندات
-        </NavigationMenuLink>
+        <NavigationMenuLink href="#">المستندات</NavigationMenuLink>
       </NavigationMenuItem>
     </NavigationMenuList>
     <NavigationMenuViewport sideOffset={8} />

@@ -4,7 +4,12 @@ import {
   type TriggerDefinition,
   type TriggerMenuApi,
 } from "@ui-sdk/core/trigger-menu"
-import { createParts, findOwner, instanceOf, wrappedChild } from "./define-element"
+import {
+  createParts,
+  findOwner,
+  instanceOf,
+  wrappedChild,
+} from "./define-element"
 import { copy, renderListItems, stashedEmpty, templateOf } from "./list"
 import { popupKinds, popupPortal, popupState } from "./popup"
 
@@ -36,7 +41,9 @@ const automatic = new WeakSet<Element>()
 // Parts that show the core's text when they have none of their own.
 const automaticText = {
   render(el: HTMLElement) {
-    if (!el.childNodes.length) automatic.add(el)
+    if (!el.childNodes.length) {
+      automatic.add(el)
+    }
   },
   context: (el: HTMLElement) => ({ text: automatic.has(el) }),
   kinds: { text: null },
@@ -59,7 +66,16 @@ function defineTriggerMenuElements() {
         }
       },
       state: popupState,
-      api: ["isOpen", "setOpen", "open", "close", "getQuery", "getMatch", "insert", "focus"],
+      api: [
+        "isOpen",
+        "setOpen",
+        "open",
+        "close",
+        "getQuery",
+        "getMatch",
+        "insert",
+        "focus",
+      ],
       // The field's own `select`, for selected text, bubbles up here.
       events: { onSelect: "itemselect" },
       portal: popupPortal,
@@ -70,7 +86,11 @@ function defineTriggerMenuElements() {
       },
     },
     // A wrapper, so the field stays a real textarea or input.
-    input: { tag: "ui-trigger-menu-input", display: "contents", target: wrappedChild("textarea, input") },
+    input: {
+      tag: "ui-trigger-menu-input",
+      display: "contents",
+      target: wrappedChild("textarea, input"),
+    },
     content: { tag: "ui-trigger-menu-content", kinds: popupKinds },
     list: { tag: "ui-trigger-menu-list", display: "block" },
     item: { tag: "ui-trigger-menu-item", display: "block" },
@@ -81,7 +101,11 @@ function defineTriggerMenuElements() {
     separator: { tag: "ui-trigger-menu-separator", display: "block" },
     empty: { tag: "ui-trigger-menu-empty", ...stashedEmpty },
     // Without content, the status says the count and the keys.
-    status: { tag: "ui-trigger-menu-status", display: "block", ...automaticText },
+    status: {
+      tag: "ui-trigger-menu-status",
+      display: "block",
+      ...automaticText,
+    },
     // Without content, the hint shows the arguments to type.
     hint: { tag: "ui-trigger-menu-hint", ...automaticText },
   })
@@ -90,7 +114,9 @@ function defineTriggerMenuElements() {
 // The editor of the token input around a menu, if any. A token input that
 // upgrades later hands it over itself.
 function tokenInputEditor(el: HTMLElement) {
-  return instanceOf<{ editor: TextEditorAdapter }>(findOwner(el, "ui-token-input"))?.api.editor
+  return instanceOf<{ editor: TextEditorAdapter }>(
+    findOwner(el, "ui-token-input")
+  )?.api.editor
 }
 
 // Items a data menu rendered, and the data each list last rendered.
@@ -103,7 +129,8 @@ const contents = new WeakMap<HTMLElement, Element>()
 // menu without content gets one.
 function renderData(el: HTMLElement, api: TriggerMenuApi) {
   const template = templateOf(el)
-  let content = el.querySelector(":scope > ui-trigger-menu-content") ?? contents.get(el)
+  let content =
+    el.querySelector(":scope > ui-trigger-menu-content") ?? contents.get(el)
   if (!content) {
     content = copy(template, "ui-trigger-menu-content", false)
     content.append(copy(template, "ui-trigger-menu-list", false))
@@ -111,17 +138,32 @@ function renderData(el: HTMLElement, api: TriggerMenuApi) {
   }
   contents.set(el, content)
   const list = content.querySelector("ui-trigger-menu-list")
-  if (!list) return
+  if (!list) {
+    return
+  }
   // Items of its own, in groups too, keep a list from rendering data.
-  const own = Array.from(list.querySelectorAll("ui-trigger-menu-item")).some((item) => {
-    const group = item.closest("ui-trigger-menu-group")
-    return !generatedItems.has(item) && !(group && generatedItems.has(group))
-  })
+  const own = Array.from(list.querySelectorAll("ui-trigger-menu-item")).some(
+    (item) => {
+      const group = item.closest("ui-trigger-menu-group")
+      return !generatedItems.has(item) && !(group && generatedItems.has(group))
+    }
+  )
   const visible = api.internal.listbox.visibleData()?.list ?? []
-  if (own || rendered.get(list) === visible) return
+  if (own || rendered.get(list) === visible) {
+    return
+  }
   rendered.set(list, visible)
-  for (const child of Array.from(list.children)) if (generatedItems.has(child)) child.remove()
-  const fresh = renderListItems("ui-trigger-menu", visible, api.internal.keyOf, template)
+  for (const child of Array.from(list.children)) {
+    if (generatedItems.has(child)) {
+      child.remove()
+    }
+  }
+  const fresh = renderListItems(
+    "ui-trigger-menu",
+    visible,
+    api.internal.keyOf,
+    template
+  )
   fresh.forEach((item) => generatedItems.add(item))
   list.prepend(...fresh)
 }

@@ -19,21 +19,28 @@ function mount(code: () => any) {
 }
 
 const settle = async () => {
-  for (let i = 0; i < 3; i++) await Promise.resolve()
+  for (let i = 0; i < 3; i++) {
+    await Promise.resolve()
+  }
   flush()
 }
 
 test("a press hands the handler how the button was pressed", () => {
   const sources: string[] = []
-  const el = mount(() => <Button onClick={(_event, { source }) => sources.push(source)}>Save</Button>)
+  const el = mount(() => (
+    <Button onClick={(_event, { source }) => sources.push(source)}>Save</Button>
+  ))
   withSource("agent", () => el.click())
   expect(sources).toEqual(["agent"])
 })
 
 test("Solid's bound form runs with its data, the event on the button and how it was pressed", () => {
   const calls: unknown[] = []
-  const handler = (data: string, event: MouseEvent, details: { source: string }) =>
-    calls.push(data, event.currentTarget, details.source)
+  const handler = (
+    data: string,
+    event: MouseEvent,
+    details: { source: string }
+  ) => calls.push(data, event.currentTarget, details.source)
   const el = mount(() => <Button onClick={[handler, "saved"]}>Save</Button>)
   withSource("keyboard", () => el.click())
   expect(calls).toEqual(["saved", el, "keyboard"])

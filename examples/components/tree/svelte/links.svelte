@@ -34,7 +34,7 @@
     pages
       .flatMap((page) => [page, ...(page.children ?? [])])
       .filter((page) => page.href)
-      .map((page) => page.value),
+      .map((page) => page.value)
   )
 
   let current = $state("tree")
@@ -69,7 +69,9 @@
   mode="none"
   {current}
   onAction={(value, { event }) => {
-    if (!links.has(value)) return
+    if (!links.has(value)) {
+      return
+    }
     event?.preventDefault()
     current = value
   }}

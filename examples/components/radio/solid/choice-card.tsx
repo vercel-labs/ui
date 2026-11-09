@@ -3,9 +3,21 @@ import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
 import { For } from "solid-js"
 
 const plans = [
-  { value: "hobby", label: "Hobby", description: "Free for personal projects." },
-  { value: "pro", label: "Pro", description: "$20 per month for growing teams." },
-  { value: "enterprise", label: "Enterprise", description: "Custom pricing and support." },
+  {
+    value: "hobby",
+    label: "Hobby",
+    description: "Free for personal projects.",
+  },
+  {
+    value: "pro",
+    label: "Pro",
+    description: "$20 per month for growing teams.",
+  },
+  {
+    value: "enterprise",
+    label: "Enterprise",
+    description: "Custom pricing and support.",
+  },
 ]
 
 function Example() {

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem, ComboboxList } from "@ui-sdk/vue"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@ui-sdk/vue"
 import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"
 
 // A long combobox for the counts specs. Every other option
@@ -17,14 +23,25 @@ const count = (kind: "watched" | "plain") => (countRender(kind), "")
       <ComboboxContent class="popup list-popup">
         <ComboboxList>
           <template v-for="(item, index) in items" :key="item.value">
-            <ComboboxItem v-if="index % 2" class="item" :value="item.value" :label="item.label">
+            <ComboboxItem
+              v-if="index % 2"
+              class="item"
+              :value="item.value"
+              :label="item.label"
+            >
               <template #render="{ props, state }">
                 <div v-bind="props">
-                  {{ count("watched") }}{{ state.highlighted ? "→ " : "" }}{{ item.label }}
+                  {{ count("watched") }}{{ state.highlighted ? "→ " : ""
+                  }}{{ item.label }}
                 </div>
               </template>
             </ComboboxItem>
-            <ComboboxItem v-else class="item" :value="item.value" :label="item.label">
+            <ComboboxItem
+              v-else
+              class="item"
+              :value="item.value"
+              :label="item.label"
+            >
               <template #render="{ props }">
                 <div v-bind="props">{{ count("plain") }}{{ item.label }}</div>
               </template>

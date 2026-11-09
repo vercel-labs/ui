@@ -1,4 +1,8 @@
-import { serialize, sliderFixture as f, sliderOptions } from "tests/fixtures/slider.ts"
+import {
+  serialize,
+  sliderFixture as f,
+  sliderOptions,
+} from "tests/fixtures/slider.ts"
 
 function markup(options: ReturnType<typeof sliderOptions>) {
   const shared = [
@@ -7,7 +11,10 @@ function markup(options: ReturnType<typeof sliderOptions>) {
   ]
     .filter(Boolean)
     .join("")
-  const minSteps = options.minSteps === undefined ? "" : ` min-steps-between-thumbs="${options.minSteps}"`
+  const minSteps =
+    options.minSteps === undefined
+      ? ""
+      : ` min-steps-between-thumbs="${options.minSteps}"`
   const track = (thumbs: string) => `
     <ui-slider-control class="slider-control">
       <ui-slider-track class="slider-track">
@@ -35,9 +42,10 @@ function markup(options: ReturnType<typeof sliderOptions>) {
             ${track(
               f.price.thumbs
                 .map(
-                  (label) => `<ui-slider-thumb class="slider-thumb" aria-label="${label}"></ui-slider-thumb>`,
+                  (label) =>
+                    `<ui-slider-thumb class="slider-thumb" aria-label="${label}"></ui-slider-thumb>`
                 )
-                .join(""),
+                .join("")
             )}
           </ui-slider>
         </ui-field>
@@ -61,21 +69,33 @@ async function mount(root: HTMLElement) {
   template.innerHTML = markup(options)
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
   for (const slider of template.content.querySelectorAll("ui-slider")) {
-    if (options.orientation) slider.setAttribute("orientation", options.orientation)
-    if (options.locale) slider.setAttribute("locale", options.locale)
+    if (options.orientation) {
+      slider.setAttribute("orientation", options.orientation)
+    }
+    if (options.locale) {
+      slider.setAttribute("locale", options.locale)
+    }
   }
   root.replaceChildren(template.content)
   // Rich options are properties, set before the elements upgrade.
-  const volume = root.querySelector("#volume") as HTMLElement & { format?: unknown }
-  const price = root.querySelector("#price") as HTMLElement & { format?: unknown }
+  const volume = root.querySelector("#volume") as HTMLElement & {
+    format?: unknown
+  }
+  const price = root.querySelector("#price") as HTMLElement & {
+    format?: unknown
+  }
   volume.format = options.volumeFormat
   price.format = options.format
   await import("@ui-sdk/web/slider")
   await import("@ui-sdk/web/field")
 
   const form = root.querySelector("form")!
-  const action = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
-  const committed = root.querySelector<HTMLOutputElement>('output[aria-label="Committed"]')!
+  const action = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
+  const committed = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Committed"]'
+  )!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     root.querySelector("#submitted")!.textContent = serialize(form)
@@ -86,19 +106,25 @@ async function mount(root: HTMLElement) {
     "valuechange",
     (event) => {
       const name = (event.target as HTMLElement).getAttribute("name") ?? ""
-      if (options.cancel === name) return event.preventDefault()
+      if (options.cancel === name) {
+        return event.preventDefault()
+      }
       action.textContent = `${name}:${String((event as CustomEvent<{ value: number | number[] }>).detail.value)}`
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuecommit",
     (event) => {
       const name = (event.target as HTMLElement).getAttribute("name") ?? ""
-      const value = String((event as CustomEvent<{ value: number | number[] }>).detail.value)
-      committed.textContent = [committed.textContent, `${name}:${value}`].filter(Boolean).join(" ")
+      const value = String(
+        (event as CustomEvent<{ value: number | number[] }>).detail.value
+      )
+      committed.textContent = [committed.textContent, `${name}:${value}`]
+        .filter(Boolean)
+        .join(" ")
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

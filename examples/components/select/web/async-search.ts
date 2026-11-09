@@ -30,18 +30,28 @@ const countryList = [
   { value: "ch", label: "Switzerland" },
 ]
 
-function searchCountries(query: string, { signal, page }: { signal: AbortSignal; page: number }) {
-  return new Promise<{ items: typeof countryList; hasMore: boolean }>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      const needle = query.trim().toLowerCase()
-      const found = countryList.filter((country) => country.label.toLowerCase().includes(needle))
-      resolve({ items: found.slice(page * 6, page * 6 + 6), hasMore: found.length > page * 6 + 6 })
-    }, 400)
-    signal.addEventListener("abort", () => {
-      clearTimeout(timer)
-      reject(signal.reason)
-    })
-  })
+function searchCountries(
+  query: string,
+  { signal, page }: { signal: AbortSignal; page: number }
+) {
+  return new Promise<{ items: typeof countryList; hasMore: boolean }>(
+    (resolve, reject) => {
+      const timer = setTimeout(() => {
+        const needle = query.trim().toLowerCase()
+        const found = countryList.filter((country) =>
+          country.label.toLowerCase().includes(needle)
+        )
+        resolve({
+          items: found.slice(page * 6, page * 6 + 6),
+          hasMore: found.length > page * 6 + 6,
+        })
+      }, 400)
+      signal.addEventListener("abort", () => {
+        clearTimeout(timer)
+        reject(signal.reason)
+      })
+    }
+  )
 }
 
 function mount(root: HTMLElement) {
@@ -80,7 +90,8 @@ function mount(root: HTMLElement) {
     const { items, status: loading } = results.getState()
     select.items = items
     select.setAttribute("status", loading)
-    empty.textContent = loading === "loading" ? "" : `No countries match “${query}”.`
+    empty.textContent =
+      loading === "loading" ? "" : `No countries match “${query}”.`
     status.textContent =
       loading === "loading"
         ? "Loading…"

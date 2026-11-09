@@ -6,7 +6,9 @@ function Fixture() {
     <div class="fixture tooltip-page">
       <button>Before</button>
       <Tooltip delay={100}>
-        <TooltipTrigger render={(props) => <a {...props} href="#docs" />}>Docs</TooltipTrigger>
+        <TooltipTrigger render={(props) => <a {...props} href="#docs" />}>
+          Docs
+        </TooltipTrigger>
         <TooltipContent class="tooltip">Read the docs</TooltipContent>
       </Tooltip>
       <Tooltip delay={100}>
@@ -18,7 +20,9 @@ function Fixture() {
             </button>
           )}
         />
-        <TooltipContent class={(state) => (state.open ? "tooltip is-open" : "tooltip")}>
+        <TooltipContent
+          class={(state) => (state.open ? "tooltip is-open" : "tooltip")}
+        >
           All systems normal
         </TooltipContent>
       </Tooltip>

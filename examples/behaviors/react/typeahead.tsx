@@ -15,15 +15,22 @@ const fruitList = definePrimitive({
   name: "fruit-list",
   state: (): FruitListState => ({ focused: null }),
   api: (context) => {
-    const roving = createRovingFocus<FruitListState, { value: string }>(context, {
-      slot: "item",
-      key: "focused",
-    })
+    const roving = createRovingFocus<FruitListState, { value: string }>(
+      context,
+      {
+        slot: "item",
+        key: "focused",
+      }
+    )
     const typeahead = createTypeahead()
     return {
       roving,
       keydown(event: KeyboardEvent, el: HTMLElement) {
-        if (event.defaultPrevented || roving.keydown(event, el) || !isTypeaheadKey(event)) {
+        if (
+          event.defaultPrevented ||
+          roving.keydown(event, el) ||
+          !isTypeaheadKey(event)
+        ) {
           return
         }
         if (event.key === " " && typeahead.active()) {
@@ -33,7 +40,7 @@ const fruitList = definePrimitive({
         const index = typeahead(
           event.key,
           items.map((item) => labelOf(item.el)),
-          items.findIndex((item) => item.el === el),
+          items.findIndex((item) => item.el === el)
         )
         if (index !== -1) {
           roving.focus(items[index].key)
@@ -46,7 +53,10 @@ const fruitList = definePrimitive({
     item: slot<{ value: string }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      attrs: (state, part) => ({ role: "option", tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        role: "option",
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: { keydown: (event, { el, api }) => api.keydown(event, el!) },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),

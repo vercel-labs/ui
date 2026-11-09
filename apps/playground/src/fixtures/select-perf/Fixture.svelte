@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/svelte"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte"
   import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"
 
   // A long select for the counts specs. Every other option
@@ -7,7 +13,10 @@
   // options' updates from watched ones. An update is the part's props
   // changing, which the text reads so it counts them, or a state key it read.
   const items = perfItems(perfSize())
-  const count = (kind: "watched" | "plain", ...reads: unknown[]) => (countRender(kind), "")
+  const count = (kind: "watched" | "plain", ...reads: unknown[]) => (
+    countRender(kind),
+    ""
+  )
 </script>
 
 <div class="fixture">
@@ -22,7 +31,9 @@
           <SelectItem class="item" value={item.value} label={item.label}>
             {#snippet render({ props, state })}
               <div {...props}>
-                {count("watched", props, state.highlighted)}{state.highlighted ? "→ " : ""}{item.label}
+                {count("watched", props, state.highlighted)}{state.highlighted
+                  ? "→ "
+                  : ""}{item.label}
               </div>
             {/snippet}
           </SelectItem>

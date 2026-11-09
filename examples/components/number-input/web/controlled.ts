@@ -37,7 +37,10 @@ function mount(root: HTMLElement) {
     log(root, `Value ${event.detail.value ?? "empty"} (${event.detail.reason})`)
   })
   field.addEventListener("valuecommit", (event) => {
-    log(root, `Committed ${event.detail.value ?? "empty"} (${event.detail.reason})`)
+    log(
+      root,
+      `Committed ${event.detail.value ?? "empty"} (${event.detail.reason})`
+    )
   })
   root.querySelectorAll<HTMLButtonElement>("[data-value]").forEach((button) => {
     button.addEventListener("click", () => {

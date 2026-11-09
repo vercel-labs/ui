@@ -1,4 +1,10 @@
-import { Field, FieldDescription, FieldLabel, FieldLegend, FieldSet } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@ui-sdk/react/field"
 import { Input } from "@ui-sdk/react/input"
 
 function Example() {

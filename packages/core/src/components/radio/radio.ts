@@ -1,12 +1,24 @@
 import { animateIn, animateOut } from "../../foundation/motion/presence"
 import { isDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
 import { subscribe } from "../../foundation/kernel/part"
-import { itemData, itemState, radioGroupApi, radioGroupState, syncRadioGroup } from "./radio-api"
+import {
+  itemData,
+  itemState,
+  radioGroupApi,
+  radioGroupState,
+  syncRadioGroup,
+} from "./radio-api"
 import { radioSlots } from "./radio-parts"
 import type { RadioGroupGeneric } from "./radio-generic"
 
@@ -14,7 +26,8 @@ import type { RadioGroupGeneric } from "./radio-generic"
  * Why a radio group's value wants to change.
  * @stable
  */
-type RadioGroupValueChangeReason = "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
+type RadioGroupValueChangeReason =
+  "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -44,7 +57,9 @@ function createRadioGroupController<T extends string = string>() {
  * `controller` option.
  * @stable
  */
-type RadioGroupController<T extends string = string> = ReturnType<typeof createRadioGroupController<T>>
+type RadioGroupController<T extends string = string> = ReturnType<
+  typeof createRadioGroupController<T>
+>
 
 /**
  * The options `radioGroup` takes. A component takes them as props on its root.
@@ -56,7 +71,10 @@ type RadioGroupOptions<T extends string = string> = {
   /** The radio checked at first, when uncontrolled. A form reset returns to it. */
   defaultValue?: T | null
   /** Runs when a user or a form reset wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T | null, details: ChangeDetails<RadioGroupValueChangeReason>) => void
+  onValueChange?: (
+    value: T | null,
+    details: ChangeDetails<RadioGroupValueChangeReason>
+  ) => void
   /** Disables every radio like native ones: they can't be focused or changed, and the value isn't submitted. */
   disabled?: boolean
   /** Keeps the items focusable and the value submitted, but stops changes. */
@@ -176,7 +194,10 @@ const radioGroupPrimitive = /* @__PURE__ */ definePrimitive({
       root: item,
       input,
       indicator: slot<IndicatorProps, RadioIndicatorState>({
-        props: { value: { kind: "string", from: "root" }, keepMounted: "boolean" },
+        props: {
+          value: { kind: "string", from: "root" },
+          keepMounted: "boolean",
+        },
         // Every renderer fills the value from the item around it. Indicators skip
         // the tab stop, which moves with every arrow key, and only ask whether
         // their own value is exiting.
@@ -186,30 +207,40 @@ const radioGroupPrimitive = /* @__PURE__ */ definePrimitive({
           exiting: ({ props }) => [props.value!],
         }),
         present: (state, { props: { value, keepMounted } }) =>
-          !!keepMounted || state.value === value || state.exiting.includes(value!),
-        state: (state, { props: { value }, api }) => itemState(state, value!, api.internal.itemProps(value!)),
-        attrs: (state, { props: { value }, api }) => itemData(state, value!, api.internal.itemProps(value!)),
+          !!keepMounted ||
+          state.value === value ||
+          state.exiting.includes(value!),
+        state: (state, { props: { value }, api }) =>
+          itemState(state, value!, api.internal.itemProps(value!)),
+        attrs: (state, { props: { value }, api }) =>
+          itemData(state, value!, api.internal.itemProps(value!)),
         bind(el, part) {
           const { api, store, props } = part
           const key = props.value!
           let stop: (() => void) | undefined
           let shown = store.get().value === key
-          if (shown && api.isChanged()) stop = animateIn(el)
+          if (shown && api.isChanged()) {
+            stop = animateIn(el)
+          }
           const unsubscribe = subscribe(part, () => {
             const { value, exiting } = store.get()
-            if ((value === key) === shown) return
+            if ((value === key) === shown) {
+              return
+            }
             shown = value === key
             stop?.()
             stop = undefined
             // Ahead of the render, for exit keyframes keyed on the state.
             el.toggleAttribute("data-checked", shown)
             el.toggleAttribute("data-unchecked", !shown)
-            if (shown) stop = animateIn(el)
-            else if (exiting.includes(key) || props.keepMounted)
+            if (shown) {
+              stop = animateIn(el)
+            } else if (exiting.includes(key) || props.keepMounted) {
               stop = animateOut(el, () => {
                 stop = undefined
                 api.internal.finishExit(key)
               })
+            }
           })
           return () => {
             unsubscribe()
@@ -225,7 +256,10 @@ const radioGroupPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `radioGroup`.
  * @stable
  */
-interface RadioGroupPrimitive extends WithGeneric<typeof radioGroupPrimitive, RadioGroupGeneric> {}
+interface RadioGroupPrimitive extends WithGeneric<
+  typeof radioGroupPrimitive,
+  RadioGroupGeneric
+> {}
 
 /**
  * The radio group primitive, with the slots `group`, `root`, `input`,

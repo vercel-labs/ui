@@ -1,5 +1,12 @@
 import "@ui-sdk/web/tree"
-import { ChevronRight, createElement, File, Folder, FolderOpen, type IconNode } from "lucide"
+import {
+  ChevronRight,
+  createElement,
+  File,
+  Folder,
+  FolderOpen,
+  type IconNode,
+} from "lucide"
 
 type Node = { value: string; label: string; children?: Node[] }
 
@@ -30,11 +37,12 @@ const files: Node[] = [
   { value: "README.md", label: "README.md" },
 ]
 
-const icon = (node: IconNode) => createElement(node, { "aria-hidden": "true" }).outerHTML
+const icon = (node: IconNode) =>
+  createElement(node, { "aria-hidden": "true" }).outerHTML
 
 function markup(items: Node[]) {
   let html = ""
-  for (const item of items)
+  for (const item of items) {
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
@@ -49,6 +57,7 @@ function markup(items: Node[]) {
         </ui-tree-item-label>
         ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
       </ui-tree-item>`
+  }
   return html
 }
 

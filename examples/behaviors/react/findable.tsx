@@ -1,5 +1,10 @@
 import * as React from "react"
-import { bindFindable, definePrimitive, hiddenAttrs, supportsHiddenUntilFound } from "@ui-sdk/core"
+import {
+  bindFindable,
+  definePrimitive,
+  hiddenAttrs,
+  supportsHiddenUntilFound,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type RecipeState = { shown: boolean }
@@ -13,7 +18,10 @@ const recipe = definePrimitive({
   }),
   slots: (slot) => ({
     root: slot<{}, { shown: boolean; findable: boolean }>({
-      state: (state) => ({ shown: state.shown, findable: supportsHiddenUntilFound() }),
+      state: (state) => ({
+        shown: state.shown,
+        findable: supportsHiddenUntilFound(),
+      }),
     }),
     toggle: slot({
       attrs: (state, { id }) => ({
@@ -24,7 +32,10 @@ const recipe = definePrimitive({
       press: ({ api }) => api.toggle(),
     }),
     method: slot({
-      attrs: (state, { id }) => ({ id: `${id}-method`, ...hiddenAttrs(state.shown, true) }),
+      attrs: (state, { id }) => ({
+        id: `${id}-method`,
+        ...hiddenAttrs(state.shown, true),
+      }),
       bind: (el, { api, store }) => {
         const findable = bindFindable(el, {
           shown: () => store.get().shown,
@@ -41,7 +52,11 @@ const recipe = definePrimitive({
   }),
 })
 
-const parts = createParts(recipe, { root: "div", toggle: "button", method: "div" })
+const parts = createParts(recipe, {
+  root: "div",
+  toggle: "button",
+  method: "div",
+})
 
 const Recipe = parts.Root
 
@@ -55,15 +70,19 @@ function Example() {
       {({ shown, findable }) => (
         <>
           <p data-slot="label">Tomato soup</p>
-          <RecipeToggle data-size="sm">{shown ? "Hide Method" : "Show Method"}</RecipeToggle>
+          <RecipeToggle data-size="sm">
+            {shown ? "Hide Method" : "Show Method"}
+          </RecipeToggle>
           <div data-slot="findable-method">
             <RecipeMethod>
-              Soften the onion in butter, add the tomatoes and stock, and simmer for twenty minutes. Blend
-              until smooth.
+              Soften the onion in butter, add the tomatoes and stock, and simmer
+              for twenty minutes. Blend until smooth.
             </RecipeMethod>
           </div>
           <p data-findable data-slot="hint">
-            {findable ? "Find in page can show the method." : "This browser can't find hidden text."}
+            {findable
+              ? "Find in page can show the method."
+              : "This browser can't find hidden text."}
           </p>
         </>
       )}

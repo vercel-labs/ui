@@ -1,7 +1,11 @@
 // `dismissible` and `onDismissAttempt`, shared by every layer a person can
 // dismiss: whether Escape, an outside press, focus leaving, back and a swipe
 // may close it, and what the app hears when one is refused.
-import { isDismissal, type DismissAttemptDetails, type DismissAttemptReason } from "../kernel/details"
+import {
+  isDismissal,
+  type DismissAttemptDetails,
+  type DismissAttemptReason,
+} from "../kernel/details"
 
 /** The options a dismissable layer takes, for the dismissals its `Reason` lists. */
 type DismissOptions<Reason extends string> = {
@@ -16,7 +20,9 @@ type DismissOptions<Reason extends string> = {
    * Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back or
    * a swipe. Focus or the window leaving is refused without it. Ask "Discard changes?" here.
    */
-  onDismissAttempt?: (details: DismissAttemptDetails<Extract<Reason, DismissAttemptReason>>) => void
+  onDismissAttempt?: (
+    details: DismissAttemptDetails<Extract<Reason, DismissAttemptReason>>
+  ) => void
 }
 
 /**
@@ -39,29 +45,45 @@ type DismissRules = {
  * presentation takes.
  */
 function createDismissal(
-  options: () => { dismissible?: boolean; onDismissAttempt?: (details: never) => void },
-  rules: DismissRules = {},
+  options: () => {
+    dismissible?: boolean
+    onDismissAttempt?: (details: never) => void
+  },
+  rules: DismissRules = {}
 ) {
   const dismissible = () => options().dismissible !== false
   // Each layer lists its own reasons, and core reports only those.
   const attempt = (reason: DismissAttemptReason, event?: Event) =>
-    (options().onDismissAttempt as ((details: DismissAttemptDetails) => void) | undefined)?.({
+    (
+      options().onDismissAttempt as
+        ((details: DismissAttemptDetails) => void) | undefined
+    )?.({
       reason,
       event,
     } as DismissAttemptDetails)
   return {
     allows(reason: string, event?: Event) {
       const refused =
-        rules.refusal?.(reason) ?? (isDismissal(reason) && !dismissible() ? "attempt" : undefined)
-      if (!refused) return true
+        rules.refusal?.(reason) ??
+        (isDismissal(reason) && !dismissible() ? "attempt" : undefined)
+      if (!refused) {
+        return true
+      }
       // Focus or the window leaving isn't a try to dismiss it.
-      if (refused === "attempt" && reason !== "focus-out" && reason !== "window-blur") {
+      if (
+        refused === "attempt" &&
+        reason !== "focus-out" &&
+        reason !== "window-blur"
+      ) {
         attempt(reason as DismissAttemptReason, event)
         rules.refused?.(reason as DismissAttemptReason)
       }
       return false
     },
-    sheet: { dismissible, onDismissAttempt: (event?: Event) => attempt("swipe", event) },
+    sheet: {
+      dismissible,
+      onDismissAttempt: (event?: Event) => attempt("swipe", event),
+    },
   }
 }
 

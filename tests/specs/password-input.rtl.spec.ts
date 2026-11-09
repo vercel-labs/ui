@@ -5,7 +5,10 @@ import { passwordInputFixture } from "../fixtures/password-input"
 
 const { password } = passwordInputFixture
 
-test("showing the password keeps the caret in a right-to-left page @enhancement", async ({ page, open }) => {
+test("showing the password keeps the caret in a right-to-left page @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("password-input", { dir: "rtl" })
   const field = page.getByLabel(password.label, { exact: true })
   await field.fill("שלום עולם")
@@ -18,7 +21,7 @@ test("showing the password keeps the caret in a right-to-left page @enhancement"
       field.evaluate((el) => [
         (el as HTMLInputElement).selectionStart,
         (el as HTMLInputElement).selectionEnd,
-      ]),
+      ])
     )
     .toEqual([4, 4])
 })

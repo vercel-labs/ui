@@ -18,7 +18,10 @@ function Grow() {
       {Array.from({ length: lines }, (_, index) => (
         <p key={index}>Line {index + 1}</p>
       ))}
-      <button className={`${classes.button} self-start`} onClick={() => setLines((count) => count + 1)}>
+      <button
+        className={`${classes.button} self-start`}
+        onClick={() => setLines((count) => count + 1)}
+      >
         Add a line
       </button>
     </div>
@@ -26,15 +29,27 @@ function Grow() {
 }
 
 // An accordion in every item, two levels deep. Events are logged with the item's path.
-function Nested({ env, path, depth = 1 }: { env: Env; path: string; depth?: number }) {
+function Nested({
+  env,
+  path,
+  depth = 1,
+}: {
+  env: Env
+  path: string
+  depth?: number
+}) {
   return (
     <Accordion className={classes.root} multiple>
       {["One", "Two"].map((label) => (
         <AccordionItem
           key={label}
           value={label}
-          onOpenChange={(open) => env.log(`${path}/${label} openChange ${open}`)}
-          onOpenChangeComplete={(open) => env.log(`${path}/${label} openChangeComplete ${open}`)}
+          onOpenChange={(open) =>
+            env.log(`${path}/${label} openChange ${open}`)
+          }
+          onOpenChangeComplete={(open) =>
+            env.log(`${path}/${label} openChangeComplete ${open}`)
+          }
         >
           <AccordionHeader className={classes.header}>
             <AccordionTrigger className={classes.trigger}>
@@ -57,23 +72,37 @@ function Nested({ env, path, depth = 1 }: { env: Env; path: string; depth?: numb
 }
 
 // What the second item's panel holds.
-function Body({ variant, content, env }: { variant: Variant; content: string; env: Env }) {
-  if (variant.body === "long")
-    return Array.from({ length: 20 }, (_, index) => <p key={index}>Line {index + 1}</p>)
-  if (variant.body === "form")
+function Body({
+  variant,
+  content,
+  env,
+}: {
+  variant: Variant
+  content: string
+  env: Env
+}) {
+  if (variant.body === "long") {
+    return Array.from({ length: 20 }, (_, index) => (
+      <p key={index}>Line {index + 1}</p>
+    ))
+  }
+  if (variant.body === "form") {
     return (
       <label className="flex flex-col">
         {content}
         <input className={classes.input} defaultValue="Ada" aria-label="Name" />
       </label>
     )
-  if (variant.body === "nested")
+  }
+  if (variant.body === "nested") {
     return (
       <Accordion className={classes.root}>
         {["Nested one", "Nested two"].map((label) => (
           <AccordionItem key={label} value={label}>
             <AccordionHeader className={classes.header}>
-              <AccordionTrigger className={classes.trigger}>{label}</AccordionTrigger>
+              <AccordionTrigger className={classes.trigger}>
+                {label}
+              </AccordionTrigger>
             </AccordionHeader>
             <AccordionPanel className={classes.panel()}>
               <div className={classes.inner}>Inside {label.toLowerCase()}.</div>
@@ -82,14 +111,21 @@ function Body({ variant, content, env }: { variant: Variant; content: string; en
         ))}
       </Accordion>
     )
-  if (variant.body === "nested-deep") return <Nested env={env} path="b" />
-  if (variant.body === "grow") return <Grow />
+  }
+  if (variant.body === "nested-deep") {
+    return <Nested env={env} path="b" />
+  }
+  if (variant.body === "grow") {
+    return <Grow />
+  }
   return content
 }
 
 function VariantAccordion({ variant, env }: { variant: Variant; env: Env }) {
   const [list, setList] = React.useState(() => itemsOf(variant))
-  const [value, setValue] = React.useState<string[]>(variant.options?.defaultValue ?? [])
+  const [value, setValue] = React.useState<string[]>(
+    variant.options?.defaultValue ?? []
+  )
   return (
     <div className="flex flex-col gap-2">
       <Accordion
@@ -103,7 +139,9 @@ function VariantAccordion({ variant, env }: { variant: Variant; env: Env }) {
             env.log(`valueChange ${JSON.stringify(next)} canceled`)
             return
           }
-          if (variant.controlled) setValue(next)
+          if (variant.controlled) {
+            setValue(next)
+          }
           env.log(`valueChange ${JSON.stringify(next)} (${details.reason})`)
         }}
       >
@@ -114,10 +152,16 @@ function VariantAccordion({ variant, env }: { variant: Variant; env: Env }) {
             value={item.value}
             disabled={variant.disabledItems?.includes(item.value)}
             onOpenChange={(open, details) => {
-              if (variant.itemCancel === item.value) details.cancel()
-              env.log(`${item.value} openChange ${open}${details.canceled ? " canceled" : ""}`)
+              if (variant.itemCancel === item.value) {
+                details.cancel()
+              }
+              env.log(
+                `${item.value} openChange ${open}${details.canceled ? " canceled" : ""}`
+              )
             }}
-            onOpenChangeComplete={(open) => env.log(`${item.value} openChangeComplete ${open}`)}
+            onOpenChangeComplete={(open) =>
+              env.log(`${item.value} openChangeComplete ${open}`)
+            }
           >
             <AccordionHeader className={classes.header}>
               <AccordionTrigger
@@ -144,9 +188,16 @@ function VariantAccordion({ variant, env }: { variant: Variant; env: Env }) {
                 </span>
               </AccordionTrigger>
             </AccordionHeader>
-            <AccordionPanel className={classes.panel(variant.animation)} {...(index === 1 && variant.panel)}>
+            <AccordionPanel
+              className={classes.panel(variant.animation)}
+              {...(index === 1 && variant.panel)}
+            >
               <div className={classes.inner}>
-                {index === 1 ? <Body variant={variant} content={item.content} env={env} /> : item.content}
+                {index === 1 ? (
+                  <Body variant={variant} content={item.content} env={env} />
+                ) : (
+                  item.content
+                )}
               </div>
             </AccordionPanel>
           </AccordionItem>
@@ -163,7 +214,10 @@ function VariantAccordion({ variant, env }: { variant: Variant; env: Env }) {
       {variant.controlled && (
         <div className="flex items-center gap-2 text-xs">
           <code className="text-neutral-500">{JSON.stringify(value)}</code>
-          <button className="rounded border border-neutral-200 px-2 py-1" onClick={() => setValue([])}>
+          <button
+            className="rounded border border-neutral-200 px-2 py-1"
+            onClick={() => setValue([])}
+          >
             Collapse all
           </button>
           <button
@@ -183,8 +237,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantAccordion variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

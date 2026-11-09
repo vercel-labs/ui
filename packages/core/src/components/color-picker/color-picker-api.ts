@@ -1,17 +1,31 @@
 // A color picker's state and what it does. The value is a CSS color string;
 // the parts edit a color held in the picker's space, so a hue survives
 // dragging to gray and back. Parts and attributes are in color-picker-parts.ts.
-import { createArea, type Area } from "../../foundation/direct-manipulation/area"
+import {
+  createArea,
+  type Area,
+} from "../../foundation/direct-manipulation/area"
 import { createDragSession } from "../../foundation/drag-and-drop/pointer"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { moveIndex, radioStep } from "../../foundation/focus/collection"
 import { colorDistance } from "../../foundation/color/compare"
 import type { Color } from "../../foundation/color/convert"
 import { formatColor, type ColorFormat } from "../../foundation/color/format"
-import { isInGamut, toGamut, type ColorGamut } from "../../foundation/color/gamut"
-import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
+import {
+  isInGamut,
+  toGamut,
+  type ColorGamut,
+} from "../../foundation/color/gamut"
+import {
+  dispatchChange,
+  formInternals,
+  isDisabled,
+} from "../../foundation/forms/form"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
-import { createChange, createCommit } from "../../foundation/kernel/input-source"
+import {
+  createChange,
+  createCommit,
+} from "../../foundation/kernel/input-source"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
 import { snapToStep } from "../../foundation/number/steps"
 import { isRTL } from "../../foundation/platform/env"
@@ -89,7 +103,8 @@ const output = (color: Color, state: Pick<State, "format" | "gamut">) =>
 function initialState(options: ColorPickerOptions): State {
   const base = settings(options)
   const given = options.value ?? options.defaultValue
-  const color = (given !== undefined && colorIn(given, base.space)) || black(base.space)
+  const color =
+    (given !== undefined && colorIn(given, base.space)) || black(base.space)
   const value = given ?? output(color, base)
   return {
     ...base,
@@ -107,7 +122,9 @@ function initialState(options: ColorPickerOptions): State {
 function syncState(options: ColorPickerOptions) {
   return {
     ...settings(options),
-    ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: options.defaultValue }),
     ...(options.value === undefined ? {} : { value: options.value }),
   }
 }
@@ -116,13 +133,18 @@ const isLocked = (state: State) => isDisabled(state) || state.readOnly
 
 // Two colors are the same swatch when they look alike, whatever they're written in.
 const isSameColor = (first: Color, second: Color) =>
-  colorDistance(first, second) < 0.002 && Math.abs(first.alpha - second.alpha) < 0.005
+  colorDistance(first, second) < 0.002 &&
+  Math.abs(first.alpha - second.alpha) < 0.005
 
 type EyeDropperWindow = Window & {
-  EyeDropper?: new () => { open: (options?: { signal?: AbortSignal }) => Promise<{ sRGBHex: string }> }
+  EyeDropper?: new () => {
+    open: (options?: { signal?: AbortSignal }) => Promise<{ sRGBHex: string }>
+  }
 }
 
-function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, string>) {
+function colorPickerApi(
+  context: PrimitiveContext<ColorPickerOptions, State, string>
+) {
   const { store, element } = context
   const change = createChange(context)
   const commitValue = createCommit(context)
@@ -139,7 +161,8 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
     changed = undefined
   }
 
-  const channel = (name: ColorChannel | undefined) => channelOf(store.get().space, name)
+  const channel = (name: ColorChannel | undefined) =>
+    channelOf(store.get().space, name)
 
   const formElement = () => {
     const root = element("root")
@@ -155,12 +178,20 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
     const value = output(color, state)
     const before = state.color
     store.set({ color })
-    if (value === state.value) return true
-    const done = change("value", value, { ...details, color: publicColor(color) })
-    if (!done) store.set({ color: before })
-    else {
+    if (value === state.value) {
+      return true
+    }
+    const done = change("value", value, {
+      ...details,
+      color: publicColor(color),
+    })
+    if (!done) {
+      store.set({ color: before })
+    } else {
       changed = value
-      if (notify) dispatchChange(formElement(), ["input"])
+      if (notify) {
+        dispatchChange(formElement(), ["input"])
+      }
     }
     return done
   }
@@ -171,18 +202,26 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
     const from = start
     start = undefined
     const state = store.get()
-    if (state.gamut && !isInGamut(state.color, state.gamut))
+    if (state.gamut && !isInGamut(state.color, state.gamut)) {
       store.set({ color: toGamut(state.color, state.gamut) })
+    }
     const value = changed ?? store.get().value
     changed = undefined
-    if (from === undefined || from === value) return
-    commitValue("value", value, { ...details, color: publicColor(store.get().color) })
+    if (from === undefined || from === value) {
+      return
+    }
+    commitValue("value", value, {
+      ...details,
+      color: publicColor(store.get().color),
+    })
     dispatchChange(formElement(), ["change"])
   }
 
   // A change made in one go, like a swatch press, which commits at once.
   function choose(color: Color, details: Details) {
-    if (isLocked(store.get())) return false
+    if (isLocked(store.get())) {
+      return false
+    }
     begin()
     const done = setColor(color, details)
     commit(details)
@@ -192,7 +231,9 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
   function area(x: ColorChannel | undefined, y: ColorChannel | undefined) {
     const key = `${x}/${y}`
     let made = areas.get(key)
-    if (made) return made
+    if (made) {
+      return made
+    }
     const axes = () => {
       const { space } = store.get()
       return {
@@ -200,15 +241,26 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
         y: channelOf(space, y ?? defaultAxes[space].y),
       }
     }
-    const axis = (spec: Channel) => ({ min: 0, max: spec.max, step: spec.step, label: spec.label })
+    const axis = (spec: Channel) => ({
+      min: 0,
+      max: spec.max,
+      step: spec.step,
+      label: spec.label,
+    })
     made = createArea(context, {
       value: (state) => {
         const { x, y } = axes()
-        return { x: readChannel(state.color, x), y: readChannel(state.color, y) }
+        return {
+          x: readChannel(state.color, x),
+          y: readChannel(state.color, y),
+        }
       },
       set: (value, details) => {
         const { x, y } = axes()
-        return setColor(withChannel(withChannel(store.get().color, x, value.x), y, value.y), details)
+        return setColor(
+          withChannel(withChannel(store.get().color, x, value.x), y, value.y),
+          details
+        )
       },
       x: () => axis(axes().x),
       y: () => axis(axes().y),
@@ -225,7 +277,9 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
 
   function isSelected(value: string | undefined) {
     const color = value === undefined ? null : colorIn(value, store.get().space)
-    return !!color && isSameColor(publicColor(color), publicColor(store.get().color))
+    return (
+      !!color && isSameColor(publicColor(color), publicColor(store.get().color))
+    )
   }
 
   const roving = createRovingFocus<State, { value: string }>(context, {
@@ -235,33 +289,58 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
     disabled: () => isLocked(store.get()),
     preferred: (item) => isSelected(item.props?.value),
     move(event, { from, items, rtl }) {
-      if (event.shiftKey) return
+      if (event.shiftKey) {
+        return
+      }
       const step = radioStep(event.key, rtl)
-      if (step !== undefined) return items[moveIndex(items.indexOf(from), step, items.length, false)].key
-      if (event.key === "Home") return items[0]?.key
-      if (event.key === "End") return items[items.length - 1]?.key
+      if (step !== undefined) {
+        return items[moveIndex(items.indexOf(from), step, items.length, false)]
+          .key
+      }
+      if (event.key === "Home") {
+        return items[0]?.key
+      }
+      if (event.key === "End") {
+        return items[items.length - 1]?.key
+      }
     },
   })
 
   const sliderValue = (channelName: ColorChannel | undefined) =>
     readChannel(store.get().color, channel(channelName))
 
-  function setChannel(channelName: ColorChannel | undefined, value: number, details: Details) {
+  function setChannel(
+    channelName: ColorChannel | undefined,
+    value: number,
+    details: Details
+  ) {
     const spec = channel(channelName)
-    const snapped = snapToStep(value, { min: 0, max: spec.max, step: spec.step })
-    if (snapped === sliderValue(channelName)) return false
+    const snapped = snapToStep(value, {
+      min: 0,
+      max: spec.max,
+      step: spec.step,
+    })
+    if (snapped === sliderValue(channelName)) {
+      return false
+    }
     return setColor(withChannel(store.get().color, spec, snapped), details)
   }
 
   const api = {
     getValue: () => store.get().value,
-    setValue(value: string, { reason = "imperative", event }: ColorPickerChangeOptions = {}) {
+    setValue(
+      value: string,
+      { reason = "imperative", event }: ColorPickerChangeOptions = {}
+    ) {
       const color = colorIn(value, store.get().space)
-      if (!color) return false
+      if (!color) {
+        return false
+      }
       return setColor(color, { reason, event }, false)
     },
     focus() {
-      const target = element("area-thumb") ?? element("slider-thumb") ?? element("input")
+      const target =
+        element("area-thumb") ?? element("slider-thumb") ?? element("input")
       target?.focus()
     },
     internal: {
@@ -272,7 +351,12 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
       output: (color: Color) => output(color, store.get()),
       isSelected,
       setRTL: (el: HTMLElement) => store.set({ rtl: isRTL(el) }),
-      areaPointerdown(event: PointerEvent, el: HTMLElement, x?: ColorChannel, y?: ColorChannel) {
+      areaPointerdown(
+        event: PointerEvent,
+        el: HTMLElement,
+        x?: ColorChannel,
+        y?: ColorChannel
+      ) {
         begin()
         area(x, y).pointerdown(event, el)
       },
@@ -285,28 +369,44 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
         event: PointerEvent,
         el: HTMLElement,
         name?: ColorChannel,
-        orientation?: Orientation,
+        orientation?: Orientation
       ) {
-        if (!drags.accepts(event) || isLocked(store.get())) return
+        if (!drags.accepts(event) || isLocked(store.get())) {
+          return
+        }
         event.preventDefault()
         const vertical = orientation === "vertical"
         const rtl = isRTL(el)
         const rect = el.getBoundingClientRect()
         const at = (x: number, y: number) => {
           const length = vertical ? rect.height : rect.width
-          let fraction = length ? (vertical ? rect.bottom - y : x - rect.left) / length : 0
-          if (!vertical && rtl) fraction = 1 - fraction
+          let fraction = length
+            ? (vertical ? rect.bottom - y : x - rect.left) / length
+            : 0
+          if (!vertical && rtl) {
+            fraction = 1 - fraction
+          }
           return Math.min(1, Math.max(0, fraction)) * channel(name).max
         }
         begin()
         let reason: "track-press" | "drag" = "track-press"
         setChannel(name, at(event.clientX, event.clientY), { reason, event })
-        el.querySelector<HTMLElement>('[role="slider"]')?.focus({ preventScroll: true })
-        const unsubscribe = store.subscribe(() => isLocked(store.get()) && drags.cancel())
+        el.querySelector<HTMLElement>('[role="slider"]')?.focus({
+          preventScroll: true,
+        })
+        const unsubscribe = store.subscribe(
+          () => isLocked(store.get()) && drags.cancel()
+        )
         drags.start(el, event, {
           onMove: (sample) => {
-            if (setChannel(name, at(sample.x, sample.y), { reason: "drag", event: sample.event }))
+            if (
+              setChannel(name, at(sample.x, sample.y), {
+                reason: "drag",
+                event: sample.event,
+              })
+            ) {
               reason = "drag"
+            }
           },
           onEnd: (end) => {
             unsubscribe()
@@ -317,7 +417,14 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
       // Arrows step, Shift ten steps, Page Up and Page Down a tenth of the
       // range, Home and End jump to the ends, as on a slider.
       sliderKeydown(event: KeyboardEvent, name?: ColorChannel) {
-        if (event.altKey || event.ctrlKey || event.metaKey || isLocked(store.get())) return
+        if (
+          event.altKey ||
+          event.ctrlKey ||
+          event.metaKey ||
+          isLocked(store.get())
+        ) {
+          return
+        }
         const spec = channel(name)
         const current = sliderValue(name)
         const rtl = event.target instanceof Element && isRTL(event.target)
@@ -332,14 +439,22 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
           Home: 0,
           End: spec.max,
         }
-        if (!(event.key in keys)) return
+        if (!(event.key in keys)) {
+          return
+        }
         event.preventDefault()
         begin()
         setChannel(name, keys[event.key], { reason: "step-key", event })
         commit({ reason: "step-key", event })
       },
-      setChannelValue(name: ColorChannel | undefined, value: number, event: Event) {
-        if (isLocked(store.get()) || !Number.isFinite(value)) return
+      setChannelValue(
+        name: ColorChannel | undefined,
+        value: number,
+        event: Event
+      ) {
+        if (isLocked(store.get()) || !Number.isFinite(value)) {
+          return
+        }
         begin()
         setChannel(name, value, { reason: "input-commit", event })
         commit({ reason: "input-commit", event })
@@ -350,9 +465,13 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
       // Reads the text typed into the input. Text that isn't a color goes back to the value.
       commitText(event?: Event) {
         const { text, space } = store.get()
-        if (text === null) return
+        if (text === null) {
+          return
+        }
         const color = colorIn(text, space)
-        if (color && !isLocked(store.get())) choose(color, { reason: "input-commit", event })
+        if (color && !isLocked(store.get())) {
+          choose(color, { reason: "input-commit", event })
+        }
         store.set({ text: null })
       },
       revertText() {
@@ -363,19 +482,31 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
         return !!color && choose(color, details)
       },
       setEyeDropper: (el: HTMLElement) =>
-        store.set({ eyeDropper: !!(el.ownerDocument.defaultView as EyeDropperWindow | null)?.EyeDropper }),
+        store.set({
+          eyeDropper: !!(
+            el.ownerDocument.defaultView as EyeDropperWindow | null
+          )?.EyeDropper,
+        }),
       // The browser's EyeDropper, where it has one. Escape cancels it, which changes nothing.
       pickFromScreen(el: HTMLElement | undefined, event?: Event) {
-        const EyeDropper = (el?.ownerDocument.defaultView as EyeDropperWindow | null)?.EyeDropper
-        if (!EyeDropper || isLocked(store.get())) return
+        const EyeDropper = (
+          el?.ownerDocument.defaultView as EyeDropperWindow | null
+        )?.EyeDropper
+        if (!EyeDropper || isLocked(store.get())) {
+          return
+        }
         new EyeDropper()
           .open()
-          .then(({ sRGBHex }) => api.internal.choose(sRGBHex, { reason: "eye-dropper-pick", event }))
+          .then(({ sRGBHex }) =>
+            api.internal.choose(sRGBHex, { reason: "eye-dropper-pick", event })
+          )
           .catch(() => {})
       },
       reset() {
         const color = colorIn(store.get().initial, store.get().space)
-        if (color) setColor(color, { reason: "reset" }, false)
+        if (color) {
+          setColor(color, { reason: "reset" }, false)
+        }
       },
       restore(saved: string) {
         api.setValue(saved, { reason: "restore" })
@@ -383,7 +514,8 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
       },
-      submitted: () => (store.get().name === undefined ? null : store.get().value),
+      submitted: () =>
+        store.get().name === undefined ? null : store.get().value,
     },
   }
 
@@ -391,9 +523,16 @@ function colorPickerApi(context: PrimitiveContext<ColorPickerOptions, State, str
   // color, with its hue. Any other reads anew, in the space that arrives.
   deriveFromOptions(context, ["color"], (synced, state) => {
     const next = { ...state, ...synced }
-    const kept = next.space === state.space ? state.color : inSpace(state.color, next.space)
-    if (next.value === state.value) return kept === state.color ? undefined : { color: kept }
-    if (next.value === output(kept, next)) return { color: kept }
+    const kept =
+      next.space === state.space
+        ? state.color
+        : inSpace(state.color, next.space)
+    if (next.value === state.value) {
+      return kept === state.color ? undefined : { color: kept }
+    }
+    if (next.value === output(kept, next)) {
+      return { color: kept }
+    }
     return { color: colorIn(next.value, next.space) ?? kept }
   })
 

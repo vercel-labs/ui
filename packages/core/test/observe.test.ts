@@ -7,9 +7,16 @@ import { createAgent } from "../src/page/agent/agent"
 import { checkbox } from "../src/components/checkbox/checkbox"
 import { input } from "../src/components/input/input"
 import { slider } from "../src/components/slider/slider"
-import { createChange, createCommit } from "../src/foundation/kernel/input-source"
+import {
+  createChange,
+  createCommit,
+} from "../src/foundation/kernel/input-source"
 import { bind } from "../src/foundation/kernel/part"
-import { type ChangeDetails, type CommitDetails, withSource } from "../src/foundation/kernel/details"
+import {
+  type ChangeDetails,
+  type CommitDetails,
+  withSource,
+} from "../src/foundation/kernel/details"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 import { observe } from "../src/page/observe/observe"
 
@@ -21,7 +28,10 @@ afterEach(() => {
 })
 
 // A checkbox in a label, bound the way an adapter binds it.
-function mountCheckbox(options: Parameters<typeof checkbox>[0], text = "Send a weekly digest") {
+function mountCheckbox(
+  options: Parameters<typeof checkbox>[0],
+  text = "Send a weekly digest"
+) {
   const instance = checkbox(options)
   const label = document.createElement("label")
   const el = document.createElement("button")
@@ -44,8 +54,14 @@ function listen(live?: boolean) {
 // A dial whose `value` a drag changes in steps and commits on release, and
 // whose `turns` change without commits.
 type DialOptions = {
-  onValueChange?: (value: number, details: ChangeDetails<"drag" | "imperative">) => void
-  onValueCommit?: (value: number, details: CommitDetails<"drag"> & { handle: string }) => void
+  onValueChange?: (
+    value: number,
+    details: ChangeDetails<"drag" | "imperative">
+  ) => void
+  onValueCommit?: (
+    value: number,
+    details: CommitDetails<"drag"> & { handle: string }
+  ) => void
 }
 const dial = definePrimitive({
   name: "dial",
@@ -57,9 +73,15 @@ const dial = definePrimitive({
     const commit = createCommit(context)
     return {
       drag: (value: number) => change("value", value, { reason: "drag" }),
-      release: () => commit("value", context.store.get().value, { reason: "drag", handle: "outer" }),
-      setValue: (value: number) => change("value", value, { reason: "imperative" }),
-      turn: () => change("turns", context.store.get().turns + 1, { reason: "drag" }),
+      release: () =>
+        commit("value", context.store.get().value, {
+          reason: "drag",
+          handle: "outer",
+        }),
+      setValue: (value: number) =>
+        change("value", value, { reason: "imperative" }),
+      turn: () =>
+        change("turns", context.store.get().turns + 1, { reason: "drag" }),
     }
   },
   slots: (slot) => ({ root: slot({}) }),
@@ -99,20 +121,36 @@ describe("observe", () => {
     const agent = createAgent()
     mountCheckbox({ id: "digest" })
     const [{ ref }] = agent.snapshot().filter((component) => !component.offPage)
-    await agent.act({ steps: [{ ref: "Send a weekly digest", action: "setChecked", args: [true] }] })
-    expect(changes).toEqual([expect.objectContaining({ ref, key: "checked", value: true, source: "agent" })])
+    await agent.act({
+      steps: [
+        { ref: "Send a weekly digest", action: "setChecked", args: [true] },
+      ],
+    })
+    expect(changes).toEqual([
+      expect.objectContaining({
+        ref,
+        key: "checked",
+        value: true,
+        source: "agent",
+      }),
+    ])
   })
 
   test("reports a controlled component's change when it's asked for, before the owner passes it back", () => {
     const changes = listen()
     const { el } = mountCheckbox({ id: "digest", checked: false })
     el.click()
-    expect(changes).toEqual([expect.objectContaining({ key: "checked", value: true })])
+    expect(changes).toEqual([
+      expect.objectContaining({ key: "checked", value: true }),
+    ])
   })
 
   test("leaves out a change the app canceled", () => {
     const changes = listen()
-    const { el } = mountCheckbox({ id: "digest", onCheckedChange: (_checked, details) => details.cancel() })
+    const { el } = mountCheckbox({
+      id: "digest",
+      onCheckedChange: (_checked, details) => details.cancel(),
+    })
     el.click()
     expect(changes).toEqual([])
   })
@@ -127,7 +165,11 @@ describe("observe", () => {
     cleanups.push(bind(instance.part("root"), el), () => instance.destroy())
     instance.api.setValue("hunter2")
     expect(changes).toEqual([
-      expect.objectContaining({ label: "Password", key: "value", value: "[redacted]" }),
+      expect.objectContaining({
+        label: "Password",
+        key: "value",
+        value: "[redacted]",
+      }),
     ])
   })
 
@@ -171,7 +213,13 @@ describe("observe", () => {
       volume.release()
     })
     expect(changes).toEqual([
-      expect.objectContaining({ key: "value", value: 30, previous: 0, reason: "drag", source: "mouse" }),
+      expect.objectContaining({
+        key: "value",
+        value: 30,
+        previous: 0,
+        reason: "drag",
+        source: "mouse",
+      }),
       expect.objectContaining({ key: "value", value: 40, previous: 30 }),
     ])
   })
@@ -202,7 +250,12 @@ describe("observe", () => {
     })
     expect(changes).toEqual([
       expect.objectContaining({ value: 50, previous: 0, reason: "imperative" }),
-      expect.objectContaining({ value: 60, previous: 50, reason: "drag", source: "mouse" }),
+      expect.objectContaining({
+        value: 60,
+        previous: 50,
+        reason: "drag",
+        source: "mouse",
+      }),
     ])
   })
 
@@ -231,9 +284,18 @@ describe("observe", () => {
       instance.api.internal.end()
     })
     expect(changes).toEqual([
-      expect.objectContaining({ component: "slider", key: "value", value: 40, previous: 0, reason: "drag" }),
+      expect.objectContaining({
+        component: "slider",
+        key: "value",
+        value: 40,
+        previous: 0,
+        reason: "drag",
+      }),
     ])
-    expect(onValueCommit).toHaveBeenCalledWith(40, expect.objectContaining({ reason: "drag", thumb: 0 }))
+    expect(onValueCommit).toHaveBeenCalledWith(
+      40,
+      expect.objectContaining({ reason: "drag", thumb: 0 })
+    )
   })
 
   test("agent.subscribe hears the same changes", () => {

@@ -1,13 +1,26 @@
 import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
 import { fileInputFixture as f } from "../fixtures/file-input"
-import { browse, drop, item, lastAction, list, pdf, png, submitted, txt, zone } from "./file-input.helpers"
+import {
+  browse,
+  drop,
+  item,
+  lastAction,
+  list,
+  pdf,
+  png,
+  submitted,
+  txt,
+  zone,
+} from "./file-input.helpers"
 
 // The attachments list: an item per file, removal by pointer and keyboard,
 // and a controlled value.
 
-const announcer = (page: Page) => page.locator('[aria-live="polite"]:not(output)')
-const remove = (page: Page, name: string) => page.getByRole("button", { name: `Remove ${name}`, exact: true })
+const announcer = (page: Page) =>
+  page.locator('[aria-live="polite"]:not(output)')
+const remove = (page: Page, name: string) =>
+  page.getByRole("button", { name: `Remove ${name}`, exact: true })
 const names = (page: Page) => list(page).getByRole("listitem").allTextContents()
 
 test.beforeEach(async ({ open }) => {
@@ -17,10 +30,14 @@ test.beforeEach(async ({ open }) => {
 test("each file shows as an item in the list, in order", async ({ page }) => {
   await drop(zone(page), [png, txt, pdf])
   await expect(list(page).getByRole("listitem")).toHaveCount(2)
-  expect((await names(page)).map((text) => text.replace("×", "").trim())).toEqual(["a.png", "b.pdf"])
+  expect(
+    (await names(page)).map((text) => text.replace("×", "").trim())
+  ).toEqual(["a.png", "b.pdf"])
 })
 
-test("a remove button is named after its file, and removes it", async ({ page }) => {
+test("a remove button is named after its file, and removes it", async ({
+  page,
+}) => {
   await drop(zone(page), [png, pdf])
   await remove(page, "a.png").click()
   await expect(item(page, "a.png")).toHaveCount(0)
@@ -29,7 +46,10 @@ test("a remove button is named after its file, and removes it", async ({ page })
   await expect(submitted(page)).toHaveText("attachments=b.pdf&note=")
 })
 
-test("the list is one tab stop, and arrow keys, Home and End move between items", async ({ page, tab }) => {
+test("the list is one tab stop, and arrow keys, Home and End move between items", async ({
+  page,
+  tab,
+}) => {
   await drop(zone(page), [png, pdf, { ...png, name: "c.png" }])
   await browse(page).focus()
   await tab()
@@ -51,7 +71,9 @@ test("the list is one tab stop, and arrow keys, Home and End move between items"
   await expect(item(page, "b.pdf")).toBeFocused()
 })
 
-test("Backspace on a focused item removes it and focuses the next one", async ({ page }) => {
+test("Backspace on a focused item removes it and focuses the next one", async ({
+  page,
+}) => {
   await drop(zone(page), [png, pdf])
   await item(page, "a.png").focus()
   await page.keyboard.press("Backspace")
@@ -64,12 +86,16 @@ test("Backspace on a focused item removes it and focuses the next one", async ({
   await expect(browse(page)).toBeFocused()
 })
 
-test("a removal is announced politely", { tag: "@enhancement" }, async ({ page }) => {
-  await drop(zone(page), [png])
-  await expect(announcer(page)).toHaveText("1 file accepted.")
-  await remove(page, "a.png").click()
-  await expect(announcer(page)).toHaveText("a.png removed.")
-})
+test(
+  "a removal is announced politely",
+  { tag: "@enhancement" },
+  async ({ page }) => {
+    await drop(zone(page), [png])
+    await expect(announcer(page)).toHaveText("1 file accepted.")
+    await remove(page, "a.png").click()
+    await expect(announcer(page)).toHaveText("a.png removed.")
+  }
+)
 
 test("a canceled change leaves the list as it was", async ({ page, open }) => {
   await open("file-input", { cancel: "" })
@@ -85,8 +111,15 @@ test("a form reset empties the list", async ({ page }) => {
   await expect(list(page).getByRole("listitem")).toHaveCount(0)
 })
 
-test("a controlled file input shows the value it's given", async ({ page, open, framework }) => {
-  test.skip(framework.startsWith("web"), "Web components set the value property instead.")
+test("a controlled file input shows the value it's given", async ({
+  page,
+  open,
+  framework,
+}) => {
+  test.skip(
+    framework.startsWith("web"),
+    "Web components set the value property instead."
+  )
   await open("file-input", { controlled: "" })
   await drop(zone(page), [png, pdf])
   await expect(list(page).getByRole("listitem")).toHaveCount(2)
@@ -101,7 +134,10 @@ test("a removal a controlled owner ignores keeps the item and its focus", async 
   open,
   framework,
 }) => {
-  test.skip(framework.startsWith("web"), "Web components set the value property instead.")
+  test.skip(
+    framework.startsWith("web"),
+    "Web components set the value property instead."
+  )
   await open("file-input", { controlled: "", "ignore-removals": "" })
   await drop(zone(page), [png, pdf])
   await item(page, "a.png").focus()
@@ -114,7 +150,10 @@ test("the value property sets the files quietly on web components, and the api r
   page,
   framework,
 }) => {
-  test.skip(!framework.startsWith("web"), "Only web components have the value property.")
+  test.skip(
+    !framework.startsWith("web"),
+    "Only web components have the value property."
+  )
   const input = page.locator("ui-file-input").first()
   const before = await lastAction(page).textContent()
   await input.evaluate((el: HTMLElement & { value: File[] }) => {
@@ -122,10 +161,13 @@ test("the value property sets the files quietly on web components, and the api r
   })
   await expect(item(page, "set.png")).toHaveCount(1)
   await expect(lastAction(page)).toHaveText(before ?? "")
-  await input.evaluate((el: HTMLElement & { api: { setValue: (files: File[]) => void } }) =>
-    el.api.setValue([new File(["y"], "api.png", { type: "image/png" })]),
+  await input.evaluate(
+    (el: HTMLElement & { api: { setValue: (files: File[]) => void } }) =>
+      el.api.setValue([new File(["y"], "api.png", { type: "image/png" })])
   )
-  await expect(lastAction(page)).toHaveText("attachments:imperative:api.png,-set.png|")
+  await expect(lastAction(page)).toHaveText(
+    "attachments:imperative:api.png,-set.png|"
+  )
 })
 
 test("the remove buttons are out of the tab order", async ({ page }) => {

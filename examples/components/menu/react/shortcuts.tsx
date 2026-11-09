@@ -1,6 +1,12 @@
 "use client"
 
-import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@ui-sdk/react/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {

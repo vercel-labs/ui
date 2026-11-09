@@ -13,7 +13,9 @@ const languages = [
 ]
 
 function summary(value: string[]) {
-  const labels = value.map((key) => languages.find((language) => language.value === key)?.label ?? key)
+  const labels = value.map(
+    (key) => languages.find((language) => language.value === key)?.label ?? key
+  )
   return labels.length === 0
     ? "Select languages"
     : labels.length > 2
@@ -40,7 +42,7 @@ function mount(root: HTMLElement) {
                   ${language.label}
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>

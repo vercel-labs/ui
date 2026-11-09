@@ -10,10 +10,15 @@ describe("server rendering", () => {
     const html = await renderToString(
       createSSRApp({
         render: () =>
-          h(Command, { items: ["Settings", "Calendar", "Reset settings"], defaultQuery: "set" }, () => [
-            h(CommandInput, { "aria-label": "Search commands" }),
-          ]),
-      }),
+          h(
+            Command,
+            {
+              items: ["Settings", "Calendar", "Reset settings"],
+              defaultQuery: "set",
+            },
+            () => [h(CommandInput, { "aria-label": "Search commands" })]
+          ),
+      })
     )
     expect(typeof window).toBe("undefined")
     expect(html).toMatch(/<input[^>]*role="combobox"[^>]*value="set"/)
@@ -24,8 +29,11 @@ describe("server rendering", () => {
   test("an autocomplete's field holds the text and submits it under its name", async () => {
     const html = await renderToString(
       createSSRApp({
-        render: () => h(Autocomplete, { name: "fruit", defaultValue: "Mango" }, () => [h(AutocompleteInput)]),
-      }),
+        render: () =>
+          h(Autocomplete, { name: "fruit", defaultValue: "Mango" }, () => [
+            h(AutocompleteInput),
+          ]),
+      })
     )
     expect(html).toMatch(/<input[^>]*value="Mango"/)
     expect(html).toMatch(/<input[^>]*name="fruit"/)

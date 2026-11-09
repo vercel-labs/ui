@@ -1,7 +1,12 @@
 "use client"
 
 import { DateInput } from "@ui-sdk/react/date-input"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 
 function Example() {
   return (

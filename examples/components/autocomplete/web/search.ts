@@ -19,7 +19,9 @@ function mount(root: HTMLElement) {
       </ui-autocomplete>
     </form>
   `
-  root.querySelector("form")!.addEventListener("submit", (event) => event.preventDefault())
+  root
+    .querySelector("form")!
+    .addEventListener("submit", (event) => event.preventDefault())
   root.querySelector("ui-autocomplete")!.addEventListener("submit", (event) => {
     log(root, `Searched “${event.detail.value}”`)
   })

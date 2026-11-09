@@ -11,31 +11,51 @@ test.beforeEach(async ({ framework, open }) => {
 
 type Toggle = HTMLElement & { pressed: boolean }
 
-test("a state property set before connecting is where the element starts", async ({ page }) => {
+test("a state property set before connecting is where the element starts", async ({
+  page,
+}) => {
   const result = await page.evaluate(() => {
     const toggle = document.createElement("ui-toggle") as Toggle
-    toggle.append(Object.assign(document.createElement("button"), { textContent: "Bold" }))
+    toggle.append(
+      Object.assign(document.createElement("button"), { textContent: "Bold" })
+    )
     toggle.pressed = true
     document.querySelector("#stage")!.append(toggle)
     return { property: toggle.pressed }
   })
   expect(result).toEqual({ property: true })
-  await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-pressed", "true")
+  await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
   await page.getByRole("button", { name: "Bold" }).click()
-  await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute("aria-pressed", "false")
+  await expect(page.getByRole("button", { name: "Bold" })).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  )
 })
 
-test("a state property set before upgrading is where the element starts", async ({ page }) => {
+test("a state property set before upgrading is where the element starts", async ({
+  page,
+}) => {
   const result = await page.evaluate(() => {
     // An element from a document without the definitions isn't upgraded yet.
-    const toggle = document.implementation.createHTMLDocument().createElement("ui-toggle") as Toggle
+    const toggle = document.implementation
+      .createHTMLDocument()
+      .createElement("ui-toggle") as Toggle
     toggle.innerHTML = "<button>Italic</button>"
     toggle.pressed = true
     document.querySelector("#stage")!.append(document.adoptNode(toggle))
-    return { own: Object.prototype.hasOwnProperty.call(toggle, "pressed"), property: toggle.pressed }
+    return {
+      own: Object.prototype.hasOwnProperty.call(toggle, "pressed"),
+      property: toggle.pressed,
+    }
   })
   expect(result).toEqual({ own: false, property: true })
-  await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute("aria-pressed", "true")
+  await expect(page.getByRole("button", { name: "Italic" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
 })
 
 const tabs = `
@@ -53,7 +73,9 @@ test("a part whose button arrives later binds it", async ({ page }) => {
     const tab = document.createElement("ui-tabs-tab")
     tab.setAttribute("value", "b")
     document.querySelector("ui-tabs-list")!.append(tab)
-    tab.append(Object.assign(document.createElement("button"), { textContent: "B" }))
+    tab.append(
+      Object.assign(document.createElement("button"), { textContent: "B" })
+    )
   }, tabs)
   await expect(page.getByRole("tab", { name: "B" })).toBeVisible()
   await page.getByRole("tab", { name: "B" }).click()
@@ -64,23 +86,33 @@ test("a part whose button is replaced binds the new one", async ({ page }) => {
   await page.evaluate((markup) => {
     document.querySelector("#stage")!.innerHTML = markup.replace(
       "</ui-tabs-list>",
-      '<ui-tabs-tab value="b"><button>Old</button></ui-tabs-tab></ui-tabs-list>',
+      '<ui-tabs-tab value="b"><button>Old</button></ui-tabs-tab></ui-tabs-list>'
     )
   }, tabs)
   await expect(page.getByRole("tab", { name: "Old" })).toBeVisible()
   await page.evaluate(() => {
     const tab = document.querySelector('ui-tabs-tab[value="b"]')!
-    tab.replaceChildren(Object.assign(document.createElement("button"), { textContent: "B" }))
+    tab.replaceChildren(
+      Object.assign(document.createElement("button"), { textContent: "B" })
+    )
   })
   await page.getByRole("tab", { name: "B" }).click()
   await expect(page.getByRole("tabpanel")).toHaveText("B panel")
 })
 
-test("a button moved out of its tab is a plain button again", async ({ page }) => {
+test("a button moved out of its tab is a plain button again", async ({
+  page,
+}) => {
   await page.evaluate((markup) => {
     document.querySelector("#stage")!.innerHTML = markup
-      .replace("</ui-tabs-list>", '<ui-tabs-tab value="b"><button>B</button></ui-tabs-tab></ui-tabs-list>')
-      .replace('<ui-tabs-panel value="b">', '<ui-tabs-panel value="b" keep-mounted>')
+      .replace(
+        "</ui-tabs-list>",
+        '<ui-tabs-tab value="b"><button>B</button></ui-tabs-tab></ui-tabs-list>'
+      )
+      .replace(
+        '<ui-tabs-panel value="b">',
+        '<ui-tabs-panel value="b" keep-mounted>'
+      )
   }, tabs)
   const tab = page.getByRole("tab", { name: "B" })
   await expect(tab).toHaveAttribute("tabindex", "-1")
@@ -109,22 +141,31 @@ test("inside a shadow root, hidden parts stay hidden, `for` finds its owner and 
       <ui-toggle><button>Mute</button></ui-toggle>`
     ;(window as unknown as { heard: string[] }).heard = []
     host.addEventListener("pressedchange", (event) =>
-      (window as unknown as { heard: string[] }).heard.push(String((event as CustomEvent).detail.value)),
+      (window as unknown as { heard: string[] }).heard.push(
+        String((event as CustomEvent).detail.value)
+      )
     )
   }, tabs)
   await expect(page.getByText("B panel")).toBeHidden()
   await page.getByRole("button", { name: "Open" }).click()
-  await expect(page.getByRole("button", { name: "Open" })).toHaveAttribute("aria-expanded", "true")
+  await expect(page.getByRole("button", { name: "Open" })).toHaveAttribute(
+    "aria-expanded",
+    "true"
+  )
   await page.keyboard.press("Escape")
   await page.getByRole("button", { name: "Mute" }).click()
-  expect(await page.evaluate(() => (window as unknown as { heard: string[] }).heard)).toEqual(["true"])
+  expect(
+    await page.evaluate(() => (window as unknown as { heard: string[] }).heard)
+  ).toEqual(["true"])
 })
 
 for (const [change, target] of [
   ["names no popover", "missing"],
   ["is removed", null],
 ] as const) {
-  test(`a trigger whose \`for\` ${change} lets go of its popover`, async ({ page }) => {
+  test(`a trigger whose \`for\` ${change} lets go of its popover`, async ({
+    page,
+  }) => {
     await page.evaluate(() => {
       document.querySelector("#stage")!.innerHTML = `
         <ui-popover id="profile"><ui-popover-content>Popup</ui-popover-content></ui-popover>
@@ -134,8 +175,11 @@ for (const [change, target] of [
     await expect(button).toHaveAttribute("aria-expanded", "false")
     await page.evaluate((target) => {
       const trigger = document.querySelector("ui-popover-trigger")!
-      if (target) trigger.setAttribute("for", target)
-      else trigger.removeAttribute("for")
+      if (target) {
+        trigger.setAttribute("for", target)
+      } else {
+        trigger.removeAttribute("for")
+      }
     }, target)
     await expect(button).not.toHaveAttribute("aria-expanded")
     await button.click()
@@ -143,9 +187,13 @@ for (const [change, target] of [
   })
 }
 
-test("a popover in a shadow root stays open when focus moves into it from outside", async ({ page }) => {
+test("a popover in a shadow root stays open when focus moves into it from outside", async ({
+  page,
+}) => {
   await page.evaluate(() => {
-    const host = document.querySelector("#stage")!.appendChild(document.createElement("div"))
+    const host = document
+      .querySelector("#stage")!
+      .appendChild(document.createElement("div"))
     host.attachShadow({ mode: "open" }).innerHTML = `
       <ui-popover>
         <ui-popover-trigger><button>Open</button></ui-popover-trigger>
@@ -155,10 +203,15 @@ test("a popover in a shadow root stays open when focus moves into it from outsid
   // A click event alone leaves focus on the body, as a click in Safari does.
   await page.getByRole("button", { name: "Open" }).dispatchEvent("click")
   await expect(page.getByRole("dialog")).toBeFocused()
-  await expect(page.getByRole("button", { name: "Open" })).toHaveAttribute("aria-expanded", "true")
+  await expect(page.getByRole("button", { name: "Open" })).toHaveAttribute(
+    "aria-expanded",
+    "true"
+  )
 })
 
-test("an open sheet taken off the page takes its viewport with it", async ({ page }) => {
+test("an open sheet taken off the page takes its viewport with it", async ({
+  page,
+}) => {
   await page.evaluate(() => {
     const stage = document.querySelector("#stage")!
     stage.innerHTML = `
@@ -176,10 +229,17 @@ test("an open sheet taken off the page takes its viewport with it", async ({ pag
 
 // Like Lit, which replaces a root's sheets when its styles change, or a page
 // that changes them in place.
-for (const change of ["replaces its shadow root's sheets", "changes its shadow root's sheets in place"]) {
-  test(`a closed popup is hidden again at its next change after the page ${change}`, async ({ page }) => {
+for (const change of [
+  "replaces its shadow root's sheets",
+  "changes its shadow root's sheets in place",
+]) {
+  test(`a closed popup is hidden again at its next change after the page ${change}`, async ({
+    page,
+  }) => {
     await page.evaluate(() => {
-      const host = document.querySelector("#stage")!.appendChild(document.createElement("div"))
+      const host = document
+        .querySelector("#stage")!
+        .appendChild(document.createElement("div"))
       host.attachShadow({ mode: "open" }).innerHTML = `
         <ui-popover>
           <ui-popover-trigger><button>Open</button></ui-popover-trigger>
@@ -191,9 +251,19 @@ for (const change of ["replaces its shadow root's sheets", "changes its shadow r
       const root = document.querySelector("#stage > div")!.shadowRoot!
       const styles = new CSSStyleSheet()
       styles.replaceSync(".popup { display: block }")
-      if (change.startsWith("replaces")) root.adoptedStyleSheets = [styles]
-      else root.adoptedStyleSheets.splice(0, root.adoptedStyleSheets.length, styles)
-      return root.adoptedStyleSheets.length === 1 && root.adoptedStyleSheets[0] === styles
+      if (change.startsWith("replaces")) {
+        root.adoptedStyleSheets = [styles]
+      } else {
+        root.adoptedStyleSheets.splice(
+          0,
+          root.adoptedStyleSheets.length,
+          styles
+        )
+      }
+      return (
+        root.adoptedStyleSheets.length === 1 &&
+        root.adoptedStyleSheets[0] === styles
+      )
     }, change)
     // What the page sets is what it reads back.
     expect(readBack).toBe(true)
@@ -217,16 +287,25 @@ test("an element moved into a shadow root or an iframe in one task keeps its def
     const inShadowRoot = getComputedStyle(toggle).display
     const frame = stage.appendChild(document.createElement("iframe"))
     frame.contentDocument!.body.append(toggle)
-    return { inShadowRoot, inFrame: frame.contentWindow!.getComputedStyle(toggle).display }
+    return {
+      inShadowRoot,
+      inFrame: frame.contentWindow!.getComputedStyle(toggle).display,
+    }
   })
   expect(display).toEqual({ inShadowRoot: "contents", inFrame: "contents" })
 })
 
-test("an element moved into a shadow root in an iframe keeps its default display", async ({ page }) => {
+test("an element moved into a shadow root in an iframe keeps its default display", async ({
+  page,
+}) => {
   const display = await page.evaluate(async () => {
-    const frame = document.querySelector("#stage")!.appendChild(document.createElement("iframe"))
+    const frame = document
+      .querySelector("#stage")!
+      .appendChild(document.createElement("iframe"))
     const doc = frame.contentDocument!
-    const root = doc.body.appendChild(doc.createElement("div")).attachShadow({ mode: "open" })
+    const root = doc.body
+      .appendChild(doc.createElement("div"))
+      .attachShadow({ mode: "open" })
     const toggle = document.createElement("ui-toggle")
     toggle.innerHTML = "<button>Bold</button>"
     root.append(toggle)
@@ -235,9 +314,13 @@ test("an element moved into a shadow root in an iframe keeps its default display
   expect(display).toBe("contents")
 })
 
-test("a popover moved into an iframe closes on Escape there", async ({ page }) => {
+test("a popover moved into an iframe closes on Escape there", async ({
+  page,
+}) => {
   await page.evaluate(() => {
-    const frame = document.querySelector("#stage")!.appendChild(document.createElement("iframe"))
+    const frame = document
+      .querySelector("#stage")!
+      .appendChild(document.createElement("iframe"))
     // Built in this document, where the elements are defined.
     const holder = document.createElement("div")
     holder.innerHTML = `
@@ -254,7 +337,9 @@ test("a popover moved into an iframe closes on Escape there", async ({ page }) =
   await expect(frame.getByRole("dialog")).toBeHidden()
 })
 
-test("Escape closes the topmost layer of the document it was pressed in", async ({ page }) => {
+test("Escape closes the topmost layer of the document it was pressed in", async ({
+  page,
+}) => {
   await page.evaluate(() => {
     // Pinned top left: unstyled popover content sits at its static position,
     // which WebKit and Firefox resolve over the iframe's button.
@@ -291,7 +376,9 @@ test("reconnecting keeps a checkbox's reset default", async ({ page }) => {
     form.innerHTML = `<ui-checkbox name="custom"></ui-checkbox><input type="checkbox" name="native">`
     document.querySelector("#stage")!.append(form)
     await new Promise((done) => setTimeout(done))
-    const custom = form.querySelector("ui-checkbox") as HTMLElement & { checked: boolean }
+    const custom = form.querySelector("ui-checkbox") as HTMLElement & {
+      checked: boolean
+    }
     const native = form.querySelector("input")!
     custom.checked = true
     native.checked = true
@@ -302,7 +389,10 @@ test("reconnecting keeps a checkbox's reset default", async ({ page }) => {
     const connected = { custom: custom.checked, native: native.checked }
     form.reset()
     await new Promise((done) => setTimeout(done))
-    return { connected, reset: { custom: custom.checked, native: native.checked } }
+    return {
+      connected,
+      reset: { custom: custom.checked, native: native.checked },
+    }
   })
   expect(result).toEqual({
     connected: { custom: true, native: true },
@@ -310,7 +400,9 @@ test("reconnecting keeps a checkbox's reset default", async ({ page }) => {
   })
 })
 
-test("a checkbox and a radio group put back on the page fire no input or change events", async ({ page }) => {
+test("a checkbox and a radio group put back on the page fire no input or change events", async ({
+  page,
+}) => {
   await page.evaluate(() => {
     document.querySelector("#stage")!.innerHTML = `
       <form>
@@ -330,8 +422,11 @@ test("a checkbox and a radio group put back on the page fire no input or change 
     const stage = document.querySelector("#stage")!
     const form = stage.querySelector("form")!
     const heard: string[] = []
-    for (const type of ["input", "change"])
-      form.addEventListener(type, (event) => heard.push(`${type} ${(event.target as Element).localName}`))
+    for (const type of ["input", "change"]) {
+      form.addEventListener(type, (event) =>
+        heard.push(`${type} ${(event.target as Element).localName}`)
+      )
+    }
     await tick()
     form.remove()
     await tick()
@@ -368,12 +463,21 @@ test("state set from script fires no input or change events, like a native contr
       checked: boolean
       api: { toggle: () => void }
     }
-    const select = form.querySelector("ui-select") as HTMLElement & { value: string }
-    const note = form.querySelector("ui-input") as HTMLElement & { value: string }
-    const upload = form.querySelector("ui-file-input") as HTMLElement & { value: File[] }
+    const select = form.querySelector("ui-select") as HTMLElement & {
+      value: string
+    }
+    const note = form.querySelector("ui-input") as HTMLElement & {
+      value: string
+    }
+    const upload = form.querySelector("ui-file-input") as HTMLElement & {
+      value: File[]
+    }
     const heard: string[] = []
-    for (const type of ["input", "change"])
-      form.addEventListener(type, (event) => heard.push(`${type} ${(event.target as Element).localName}`))
+    for (const type of ["input", "change"]) {
+      form.addEventListener(type, (event) =>
+        heard.push(`${type} ${(event.target as Element).localName}`)
+      )
+    }
     checkbox.checked = true
     select.value = "banana"
     select.setAttribute("value", "apple")
@@ -401,16 +505,26 @@ test("state set from script fires no input or change events, like a native contr
 
 // Writes `markup` into the stage, when given, then sets properties on the
 // element there. Names in `files` become a `value` of files.
-async function set(page: Page, properties: Record<string, unknown>, markup?: string) {
+async function set(
+  page: Page,
+  properties: Record<string, unknown>,
+  markup?: string
+) {
   await page.evaluate(
     ({ properties: { files, ...properties }, markup }) => {
       const stage = document.querySelector("#stage")!
-      if (markup) stage.innerHTML = markup
+      if (markup) {
+        stage.innerHTML = markup
+      }
       const el = stage.firstElementChild!
       Object.assign(el, properties)
-      if (files) Object.assign(el, { value: (files as string[]).map((name) => new File([name], name)) })
+      if (files) {
+        Object.assign(el, {
+          value: (files as string[]).map((name) => new File([name], name)),
+        })
+      }
     },
-    { properties, markup },
+    { properties, markup }
   )
 }
 
@@ -495,10 +609,15 @@ const rendering = [
   },
 ]
 
-for (const { name, markup, shown, start, changes, shows } of rendering)
-  test(`a ${name} put back on the page renders from its state again`, async ({ page }) => {
+for (const { name, markup, shown, start, changes, shows } of rendering) {
+  test(`a ${name} put back on the page renders from its state again`, async ({
+    page,
+  }) => {
     const warnings: string[] = []
-    page.on("console", (message) => message.type() === "warning" && warnings.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "warning" && warnings.push(message.text())
+    )
     const content = page.locator(`#stage ${shown}`)
     await set(page, start, markup)
     await set(page, changes[0])
@@ -507,16 +626,26 @@ for (const { name, markup, shown, start, changes, shows } of rendering)
     await set(page, changes[1])
     await expect(content).toHaveText(shows[1])
     // Its parts find it again, so none warns that it's missing.
-    expect(warnings.filter((text) => text.includes("must be inside"))).toEqual([])
+    expect(warnings.filter((text) => text.includes("must be inside"))).toEqual(
+      []
+    )
   })
+}
 
-test("a checked property set while detached isn't a checkbox's reset default", async ({ page }) => {
+test("a checked property set while detached isn't a checkbox's reset default", async ({
+  page,
+}) => {
   const result = await page.evaluate(async () => {
     const tick = () => new Promise((done) => setTimeout(done))
     const stage = document.querySelector("#stage")!
     const form = document.createElement("form")
-    const custom = Object.assign(document.createElement("ui-checkbox"), { checked: true })
-    const native = Object.assign(document.createElement("input"), { type: "checkbox", checked: true })
+    const custom = Object.assign(document.createElement("ui-checkbox"), {
+      checked: true,
+    })
+    const native = Object.assign(document.createElement("input"), {
+      type: "checkbox",
+      checked: true,
+    })
     const checked = () => [custom.checked, native.checked]
     form.append(custom, native)
     stage.append(form)
@@ -544,7 +673,9 @@ test("a checked property set while detached isn't a checkbox's reset default", a
   })
 })
 
-test("a custom validity message stays through connecting and resets, like a native one", async ({ page }) => {
+test("a custom validity message stays through connecting and resets, like a native one", async ({
+  page,
+}) => {
   const result = await page.evaluate(async () => {
     const tick = () => new Promise((done) => setTimeout(done))
     const stage = document.querySelector("#stage")!
@@ -553,7 +684,9 @@ test("a custom validity message stays through connecting and resets, like a nati
       validationMessage: string
       setCustomValidity: (message: string) => void
     }
-    const native = Object.assign(document.createElement("input"), { type: "checkbox" })
+    const native = Object.assign(document.createElement("input"), {
+      type: "checkbox",
+    })
     const messages = () => [custom.validationMessage, native.validationMessage]
     custom.setCustomValidity("No")
     native.setCustomValidity("No")
@@ -570,10 +703,16 @@ test("a custom validity message stays through connecting and resets, like a nati
     await tick()
     return { connected, reset, reconnected: messages() }
   })
-  expect(result).toEqual({ connected: ["No", "No"], reset: ["No", "No"], reconnected: ["No", "No"] })
+  expect(result).toEqual({
+    connected: ["No", "No"],
+    reset: ["No", "No"],
+    reconnected: ["No", "No"],
+  })
 })
 
-test('disabled="false" disables and required="false" requires, like on native controls', async ({ page }) => {
+test('disabled="false" disables and required="false" requires, like on native controls', async ({
+  page,
+}) => {
   const result = await page.evaluate(async () => {
     const form = document.createElement("form")
     form.innerHTML = `
@@ -589,7 +728,12 @@ test('disabled="false" disables and required="false" requires, like on native co
       valid: form.checkValidity(),
     }
   })
-  expect(result).toEqual({ ariaDisabled: "true", matches: true, value: null, valid: false })
+  expect(result).toEqual({
+    ariaDisabled: "true",
+    matches: true,
+    value: null,
+    valid: false,
+  })
 })
 
 test("a checkbox group submits only its checked checkboxes that aren't disabled, like native ones", async ({
@@ -604,10 +748,15 @@ test("a checkbox group submits only its checked checkboxes that aren't disabled,
       </ui-checkbox-group>`
     document.querySelector("#stage")!.append(form)
     const tick = () => new Promise((done) => setTimeout(done))
-    const read = () => ({ submitted: new FormData(form).getAll("toppings"), valid: form.checkValidity() })
+    const read = () => ({
+      submitted: new FormData(form).getAll("toppings"),
+      valid: form.checkValidity(),
+    })
     await tick()
     const start = read()
-    form.querySelector<HTMLElement & { value: string[] }>("ui-checkbox-group")!.value = ["olives"]
+    form.querySelector<HTMLElement & { value: string[] }>(
+      "ui-checkbox-group"
+    )!.value = ["olives"]
     await tick()
     const disabledOnly = read()
     form.querySelector("ui-checkbox[value=olives]")!.removeAttribute("disabled")
@@ -621,7 +770,9 @@ test("a checkbox group submits only its checked checkboxes that aren't disabled,
   })
 })
 
-test("a checkbox group disabled at the start and enabled later enables its checkboxes", async ({ page }) => {
+test("a checkbox group disabled at the start and enabled later enables its checkboxes", async ({
+  page,
+}) => {
   const result = await page.evaluate(async () => {
     const form = document.createElement("form")
     form.innerHTML = `
@@ -632,7 +783,11 @@ test("a checkbox group disabled at the start and enabled later enables its check
     document.querySelector("#stage")!.append(form)
     const tick = () => new Promise((done) => setTimeout(done))
     const boxes = [...form.querySelectorAll("ui-checkbox")]
-    const disabled = () => boxes.map((box) => [box.getAttribute("aria-disabled"), box.matches(":disabled")])
+    const disabled = () =>
+      boxes.map((box) => [
+        box.getAttribute("aria-disabled"),
+        box.matches(":disabled"),
+      ])
     await tick()
     const start = disabled()
     form.querySelector("ui-checkbox-group")!.removeAttribute("disabled")
@@ -660,20 +815,28 @@ test("a checkbox group disabled at the start and enabled later enables its check
   await expect(page.getByRole("checkbox", { name: "Olives" })).toBeChecked()
 })
 
-for (const disabledBy of ["its attribute", "its property", "a fieldset"] as const)
+for (const disabledBy of [
+  "its attribute",
+  "its property",
+  "a fieldset",
+] as const) {
   for (const author of [
     'disabled=""',
     'disabled="disabled"',
     'disabled="" while its group is disabled',
-  ] as const)
-    for (const removed of ["checkbox", "group", "form"] as const)
+  ] as const) {
+    for (const removed of ["checkbox", "group", "form"] as const) {
       test(`a checkbox its author gives ${author} stays disabled when its group, disabled by ${disabledBy}, is enabled after the ${removed} is put back`, async ({
         page,
       }) => {
         const result = await page.evaluate(
           async ({ disabledBy, author, removed }) => {
             const authored =
-              author === 'disabled="disabled"' ? author : author === 'disabled=""' ? "disabled" : ""
+              author === 'disabled="disabled"'
+                ? author
+                : author === 'disabled=""'
+                  ? "disabled"
+                  : ""
             const form = document.createElement("form")
             form.innerHTML = `
               <fieldset>
@@ -684,19 +847,30 @@ for (const disabledBy of ["its attribute", "its property", "a fieldset"] as cons
             document.querySelector("#stage")!.append(form)
             const tick = () => new Promise((done) => setTimeout(done))
             const fieldset = form.querySelector("fieldset")!
-            const group = form.querySelector("ui-checkbox-group") as HTMLElement & { disabled: boolean }
-            const box = form.querySelector("ui-checkbox") as HTMLElement & { disabled: boolean }
+            const group = form.querySelector(
+              "ui-checkbox-group"
+            ) as HTMLElement & { disabled: boolean }
+            const box = form.querySelector("ui-checkbox") as HTMLElement & {
+              disabled: boolean
+            }
             const setDisabled = (disabled: boolean) => {
-              if (disabledBy === "a fieldset") fieldset.disabled = disabled
-              else if (disabledBy === "its property") group.disabled = disabled
-              else group.toggleAttribute("disabled", disabled)
+              if (disabledBy === "a fieldset") {
+                fieldset.disabled = disabled
+              } else if (disabledBy === "its property") {
+                group.disabled = disabled
+              } else {
+                group.toggleAttribute("disabled", disabled)
+              }
             }
             await tick()
             setDisabled(true)
             await tick()
             if (author === 'disabled="" while its group is disabled') {
-              if (disabledBy === "its property") box.disabled = true
-              else box.setAttribute("disabled", "")
+              if (disabledBy === "its property") {
+                box.disabled = true
+              } else {
+                box.setAttribute("disabled", "")
+              }
               await tick()
             }
             const target = { checkbox: box, group, form }[removed]
@@ -707,14 +881,21 @@ for (const disabledBy of ["its attribute", "its property", "a fieldset"] as cons
             await tick()
             setDisabled(false)
             await tick()
-            return [box.getAttribute("aria-disabled"), box.hasAttribute("disabled"), box.matches(":disabled")]
+            return [
+              box.getAttribute("aria-disabled"),
+              box.hasAttribute("disabled"),
+              box.matches(":disabled"),
+            ]
           },
-          { disabledBy, author, removed },
+          { disabledBy, author, removed }
         )
         expect(result).toEqual(["true", true, true])
       })
+    }
+  }
+}
 
-for (const removed of ["checkbox", "group"] as const)
+for (const removed of ["checkbox", "group"] as const) {
   test(`a checkbox disabled by its author stays disabled when the fieldset that disabled its group while its ${removed} was off the page enables it again`, async ({
     page,
   }) => {
@@ -730,7 +911,10 @@ for (const removed of ["checkbox", "group"] as const)
       const tick = () => new Promise((done) => setTimeout(done))
       const fieldset = document.querySelector("fieldset")!
       const box = document.querySelector("ui-checkbox")!
-      const target = removed === "checkbox" ? box : document.querySelector("ui-checkbox-group")!
+      const target =
+        removed === "checkbox"
+          ? box
+          : document.querySelector("ui-checkbox-group")!
       const parent = target.parentNode!
       await tick()
       target.remove()
@@ -740,10 +924,15 @@ for (const removed of ["checkbox", "group"] as const)
       await tick()
       fieldset.disabled = false
       await tick()
-      return [box.getAttribute("aria-disabled"), box.hasAttribute("disabled"), box.matches(":disabled")]
+      return [
+        box.getAttribute("aria-disabled"),
+        box.hasAttribute("disabled"),
+        box.matches(":disabled"),
+      ]
     }, removed)
     expect(result).toEqual(["true", true, true])
   })
+}
 
 test("a checkbox taken off the page keeps the disabled, role and aria-disabled written on it", async ({
   page,
@@ -756,12 +945,16 @@ test("a checkbox taken off the page keeps the disabled, role and aria-disabled w
     await tick()
     box.remove()
     await tick()
-    return [box.getAttribute("disabled"), box.getAttribute("role"), box.getAttribute("aria-disabled")]
+    return [
+      box.getAttribute("disabled"),
+      box.getAttribute("role"),
+      box.getAttribute("aria-disabled"),
+    ]
   })
   expect(result).toEqual(["", "checkbox", "true"])
 })
 
-for (const tag of ["ui-checkbox", "ui-switch"])
+for (const tag of ["ui-checkbox", "ui-switch"]) {
   test(`a ${tag} disabled by its author is still disabled when it's put back on the page`, async ({
     page,
   }) => {
@@ -776,19 +969,24 @@ for (const tag of ["ui-checkbox", "ui-switch"])
       await tick()
       form.append(box)
       await tick()
-      return [box.getAttribute("disabled"), box.getAttribute("aria-disabled"), box.matches(":disabled")]
+      return [
+        box.getAttribute("disabled"),
+        box.getAttribute("aria-disabled"),
+        box.matches(":disabled"),
+      ]
     }, tag)
     expect(result).toEqual(["", "true", true])
   })
+}
 
 const rendered = { "ui-checkbox": "checkbox", "ui-switch": "switch" } as const
 
-for (const tag of ["ui-checkbox", "ui-switch"] as const)
+for (const tag of ["ui-checkbox", "ui-switch"] as const) {
   for (const [name, same, other] of [
     ["role", rendered[tag], "button"],
     ["aria-disabled", "true", "false"],
-  ] as const)
-    for (const value of [same, other])
+  ] as const) {
+    for (const value of [same, other]) {
       test(`a ${tag} taken off the page keeps the ${name}="${value}" its author gave it after it rendered`, async ({
         page,
       }) => {
@@ -804,13 +1002,16 @@ for (const tag of ["ui-checkbox", "ui-switch"] as const)
             await tick()
             return control.getAttribute(name)
           },
-          { tag, name, value },
+          { tag, name, value }
         )
         expect(result).toBe(value)
       })
+    }
+  }
+}
 
-for (const tag of ["ui-checkbox", "ui-switch"] as const)
-  for (const name of ["role", "aria-disabled"] as const)
+for (const tag of ["ui-checkbox", "ui-switch"] as const) {
+  for (const name of ["role", "aria-disabled"] as const) {
     test(`a ${tag} taken off the page doesn't get back the ${name} its author removed before it rendered again`, async ({
       page,
     }) => {
@@ -828,12 +1029,14 @@ for (const tag of ["ui-checkbox", "ui-switch"] as const)
           await tick()
           return control.getAttribute(name)
         },
-        { tag, name },
+        { tag, name }
       )
       expect(result).toBe(null)
     })
+  }
+}
 
-for (const tag of ["ui-checkbox", "ui-switch"] as const)
+for (const tag of ["ui-checkbox", "ui-switch"] as const) {
   test(`a ${tag} its author gives disabled="ui-sdk-disabled" is still disabled when it's put back on the page`, async ({
     page,
   }) => {
@@ -856,6 +1059,7 @@ for (const tag of ["ui-checkbox", "ui-switch"] as const)
     }, tag)
     expect(result).toEqual([true, "true", true])
   })
+}
 
 test("a checkbox its group disabled keeps only its own attributes and id when it's taken off the page", async ({
   page,
@@ -872,8 +1076,22 @@ test("a checkbox its group disabled keeps only its own attributes and id when it
     const before = box.getAttributeNames()
     box.remove()
     await tick()
-    return { before, after: box.getAttributeNames().sort(), disabled: box.matches(":disabled") }
+    return {
+      before,
+      after: box.getAttributeNames().sort(),
+      disabled: box.matches(":disabled"),
+    }
   })
-  expect(result.before).toEqual(expect.arrayContaining(["disabled", "role", "aria-disabled", "aria-checked"]))
-  expect(result).toMatchObject({ after: ["aria-label", "id", "value"], disabled: false })
+  expect(result.before).toEqual(
+    expect.arrayContaining([
+      "disabled",
+      "role",
+      "aria-disabled",
+      "aria-checked",
+    ])
+  )
+  expect(result).toMatchObject({
+    after: ["aria-label", "id", "value"],
+    disabled: false,
+  })
 })

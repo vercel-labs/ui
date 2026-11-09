@@ -1,5 +1,10 @@
 import { registerShortcut } from "@ui-sdk/core/shortcuts"
-import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/solid/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "@ui-sdk/solid/tooltip"
 import { onSettled } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 

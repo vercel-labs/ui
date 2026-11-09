@@ -1,7 +1,11 @@
 import { avatar } from "@ui-sdk/core/avatar"
 import { createParts } from "./use-primitive"
 
-const parts = createParts(avatar, { root: "span", image: "img", fallback: "span" })
+const parts = createParts(avatar, {
+  root: "span",
+  image: "img",
+  fallback: "span",
+})
 
 /**
  * The root: a box for the image and its fallback.

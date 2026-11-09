@@ -158,7 +158,15 @@ const ariaSupport = {
     "treegrid",
   ],
   "aria-autocomplete": ["combobox", "searchbox", "textbox"],
-  "aria-checked": ["checkbox", "menuitemcheckbox", "menuitemradio", "option", "radio", "switch", "treeitem"],
+  "aria-checked": [
+    "checkbox",
+    "menuitemcheckbox",
+    "menuitemradio",
+    "option",
+    "radio",
+    "switch",
+    "treeitem",
+  ],
   "aria-colcount": ["grid", "table", "treegrid"],
   "aria-colindex": ["cell", "columnheader", "gridcell", "row", "rowheader"],
   "aria-colspan": ["cell", "columnheader", "gridcell", "rowheader"],
@@ -246,7 +254,15 @@ const ariaSupport = {
   "aria-rowcount": ["grid", "table", "treegrid"],
   "aria-rowindex": ["cell", "columnheader", "gridcell", "row", "rowheader"],
   "aria-rowspan": ["cell", "columnheader", "gridcell", "rowheader"],
-  "aria-selected": ["columnheader", "gridcell", "option", "row", "rowheader", "tab", "treeitem"],
+  "aria-selected": [
+    "columnheader",
+    "gridcell",
+    "option",
+    "row",
+    "rowheader",
+    "tab",
+    "treeitem",
+  ],
   "aria-setsize": [
     "article",
     "listitem",
@@ -260,10 +276,38 @@ const ariaSupport = {
     "treeitem",
   ],
   "aria-sort": ["columnheader", "rowheader"],
-  "aria-valuemax": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
-  "aria-valuemin": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
-  "aria-valuenow": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
-  "aria-valuetext": ["meter", "progressbar", "scrollbar", "separator", "slider", "spinbutton"],
+  "aria-valuemax": [
+    "meter",
+    "progressbar",
+    "scrollbar",
+    "separator",
+    "slider",
+    "spinbutton",
+  ],
+  "aria-valuemin": [
+    "meter",
+    "progressbar",
+    "scrollbar",
+    "separator",
+    "slider",
+    "spinbutton",
+  ],
+  "aria-valuenow": [
+    "meter",
+    "progressbar",
+    "scrollbar",
+    "separator",
+    "slider",
+    "spinbutton",
+  ],
+  "aria-valuetext": [
+    "meter",
+    "progressbar",
+    "scrollbar",
+    "separator",
+    "slider",
+    "spinbutton",
+  ],
 } as const satisfies Record<string, readonly (typeof roles)[number][]>
 
 // Roles that can't be named: an `aria-label` on them is ignored.
@@ -294,7 +338,9 @@ const requiredStates = {
   slider: ["aria-valuenow"],
   switch: ["aria-checked"],
   tab: ["aria-selected"],
-} as const satisfies Partial<Record<(typeof roles)[number], readonly (keyof typeof ariaSupport)[]>>
+} as const satisfies Partial<
+  Record<(typeof roles)[number], readonly (keyof typeof ariaSupport)[]>
+>
 
 /**
  * A WAI-ARIA role a part can declare with its slot's `role`.
@@ -304,8 +350,12 @@ type Role = (typeof roles)[number]
 type RoleAria = keyof typeof ariaSupport
 
 // The role-specific attributes a role takes, and the states it requires.
-type AriaOf<R> = { [K in RoleAria]: R extends (typeof ariaSupport)[K][number] ? K : never }[RoleAria]
-type RequiredAria<R> = R extends keyof typeof requiredStates ? (typeof requiredStates)[R][number] : never
+type AriaOf<R> = {
+  [K in RoleAria]: R extends (typeof ariaSupport)[K][number] ? K : never
+}[RoleAria]
+type RequiredAria<R> = R extends keyof typeof requiredStates
+  ? (typeof requiredStates)[R][number]
+  : never
 type NamelessRole = (typeof namelessRoles)[number]
 
 type FocusableRole = (typeof focusableRoles)[number]
@@ -358,14 +408,29 @@ const keyed = new Set<string>(keyedRoles)
  */
 function unmetNeeds(
   role: string,
-  slot: { focus?: unknown; press?: unknown; keys?: unknown; on?: { keydown?: unknown } },
+  slot: {
+    focus?: unknown
+    press?: unknown
+    keys?: unknown
+    on?: { keydown?: unknown }
+  }
 ) {
   const unmet: ("focus" | "press" | "keys" | "keydown")[] = []
-  if (focusable.has(role) && !slot.focus) unmet.push("focus")
-  if (pressable.has(role) && !slot.press) unmet.push("press")
-  if (keyed.has(role) && !slot.keys) unmet.push("keys")
-  if ((Array.isArray(slot.keys) || typeof slot.keys === "function") && !slot.on?.keydown)
+  if (focusable.has(role) && !slot.focus) {
+    unmet.push("focus")
+  }
+  if (pressable.has(role) && !slot.press) {
+    unmet.push("press")
+  }
+  if (keyed.has(role) && !slot.keys) {
+    unmet.push("keys")
+  }
+  if (
+    (Array.isArray(slot.keys) || typeof slot.keys === "function") &&
+    !slot.on?.keydown
+  ) {
     unmet.push("keydown")
+  }
   return unmet
 }
 
@@ -388,16 +453,29 @@ const nativeStates: Record<string, readonly string[]> = {
 function ariaProblems(role: string, attrs: Record<string, unknown>) {
   const notAllowed: string[] = []
   for (const [name, value] of Object.entries(attrs)) {
-    if (value === undefined) continue
+    if (value === undefined) {
+      continue
+    }
     const supported = (ariaSupport as Record<string, readonly string[]>)[name]
-    if (supported && !supported.includes(role)) notAllowed.push(name)
-    if (naming.includes(name) && (namelessRoles as readonly string[]).includes(role)) notAllowed.push(name)
+    if (supported && !supported.includes(role)) {
+      notAllowed.push(name)
+    }
+    if (
+      naming.includes(name) &&
+      (namelessRoles as readonly string[]).includes(role)
+    ) {
+      notAllowed.push(name)
+    }
   }
-  const required = (requiredStates as Record<string, readonly string[] | undefined>)[role] ?? []
+  const required =
+    (requiredStates as Record<string, readonly string[] | undefined>)[role] ??
+    []
   const native = nativeStates[attrs.type as string] ?? []
   return {
     notAllowed,
-    missing: required.filter((name) => attrs[name] === undefined && !native.includes(name)),
+    missing: required.filter(
+      (name) => attrs[name] === undefined && !native.includes(name)
+    ),
   }
 }
 

@@ -24,22 +24,32 @@ async function mount(root: HTMLElement) {
     </div>
   `
   await import("@ui-sdk/web/number-input")
-  const action = root.querySelector<HTMLOutputElement>('output[aria-label="Last action"]')!
-  const committed = root.querySelector<HTMLOutputElement>('output[aria-label="Committed"]')!
+  const action = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Last action"]'
+  )!
+  const committed = root.querySelector<HTMLOutputElement>(
+    'output[aria-label="Committed"]'
+  )!
   root.addEventListener(
     "valuechange",
     (event) => {
-      action.textContent = String((event as CustomEvent<{ value: number | null }>).detail.value)
+      action.textContent = String(
+        (event as CustomEvent<{ value: number | null }>).detail.value
+      )
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuecommit",
     (event) => {
-      const value = String((event as CustomEvent<{ value: number | null }>).detail.value)
-      committed.textContent = [committed.textContent, value].filter(Boolean).join(" ")
+      const value = String(
+        (event as CustomEvent<{ value: number | null }>).detail.value
+      )
+      committed.textContent = [committed.textContent, value]
+        .filter(Boolean)
+        .join(" ")
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

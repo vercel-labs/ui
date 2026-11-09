@@ -7,7 +7,8 @@ import { Fixture } from "./react"
 // Server renders, then the client hydrates. Every mismatch React reports is recorded.
 function mount(root: HTMLElement) {
   const errors: string[] = []
-  ;(window as unknown as { __hydrationErrors: string[] }).__hydrationErrors = errors
+  ;(window as unknown as { __hydrationErrors: string[] }).__hydrationErrors =
+    errors
   // ?data renders the same combobox from `items`.
   const app = (
     <React.StrictMode>
@@ -19,13 +20,17 @@ function mount(root: HTMLElement) {
   ;(window as unknown as { __serverHtml: string }).__serverHtml = root.innerHTML
   // What the server markup submits before any script runs on it.
   const form = root.querySelector("form")
-  ;(window as unknown as { __serverForm: string }).__serverForm = form ? serializeForm(form) : ""
+  ;(window as unknown as { __serverForm: string }).__serverForm = form
+    ? serializeForm(form)
+    : ""
   const error = console.error
   console.error = (...args: unknown[]) => {
     errors.push(args.map(String).join(" "))
     error(...args)
   }
-  hydrateRoot(root, app, { onRecoverableError: (cause) => errors.push(String(cause)) })
+  hydrateRoot(root, app, {
+    onRecoverableError: (cause) => errors.push(String(cause)),
+  })
 }
 
 export { mount }

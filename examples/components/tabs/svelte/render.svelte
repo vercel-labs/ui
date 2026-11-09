@@ -2,7 +2,12 @@
   import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/svelte/tabs"
 
   const folders = [
-    { value: "inbox", label: "Inbox", count: 12, content: "12 conversations, 3 of them unread." },
+    {
+      value: "inbox",
+      label: "Inbox",
+      count: 12,
+      content: "12 conversations, 3 of them unread.",
+    },
     {
       value: "unread",
       label: "Unread",

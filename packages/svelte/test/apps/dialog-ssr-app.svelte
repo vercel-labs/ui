@@ -22,8 +22,12 @@
     remote = false,
     alert = false,
     presentation,
-  }: { open?: boolean; remote?: boolean; alert?: boolean; presentation?: "auto" | "dialog" | "sheet" } =
-    $props()
+  }: {
+    open?: boolean
+    remote?: boolean
+    alert?: boolean
+    presentation?: "auto" | "dialog" | "sheet"
+  } = $props()
 
   const search = createDialogController()
 </script>
@@ -37,11 +41,17 @@
     </AlertDialogContent>
   </AlertDialog>
 {:else if remote}
-  <DialogTrigger controller={search} shortcut="mod+k">Search<DialogShortcut /></DialogTrigger>
-  <Dialog controller={search}><DialogContent><DialogTitle>Search</DialogTitle></DialogContent></Dialog>
+  <DialogTrigger controller={search} shortcut="mod+k"
+    >Search<DialogShortcut /></DialogTrigger
+  >
+  <Dialog controller={search}
+    ><DialogContent><DialogTitle>Search</DialogTitle></DialogContent></Dialog
+  >
 {:else}
   <Dialog defaultOpen={open} {presentation}>
-    <DialogTrigger shortcut="mod+k">Edit profile<DialogShortcut /></DialogTrigger>
+    <DialogTrigger shortcut="mod+k"
+      >Edit profile<DialogShortcut /></DialogTrigger
+    >
     <DialogContent>
       <DialogTitle>Profile settings</DialogTitle>
       <DialogDescription>Make changes to your profile.</DialogDescription>

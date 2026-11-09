@@ -18,15 +18,23 @@ test("a calendar's Previous takes the label passed to it, and Next keeps its own
       <CalendarNext data-slot="next" />
     </Calendar>
   ))
-  expect(attribute(html, '<button[^>]*data-slot="calendar-previous"', "aria-label")).toBe("Mois précédent")
-  expect(attribute(html, '<button[^>]*data-slot="calendar-next"', "aria-label")).toBe("Next month")
+  expect(
+    attribute(html, '<button[^>]*data-slot="calendar-previous"', "aria-label")
+  ).toBe("Mois précédent")
+  expect(
+    attribute(html, '<button[^>]*data-slot="calendar-next"', "aria-label")
+  ).toBe("Next month")
 })
 
 test("a combobox input takes the autocomplete and label passed to it, and keeps its role", () => {
   const html = renderToString(() => (
     <Combobox>
       <ComboboxLabel>Email</ComboboxLabel>
-      <ComboboxInput autocomplete="email" aria-label="Work email" role="textbox" />
+      <ComboboxInput
+        autocomplete="email"
+        aria-label="Work email"
+        role="textbox"
+      />
     </Combobox>
   ))
   expect(attribute(html, "<input", "autocomplete")).toBe("email")

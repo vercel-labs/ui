@@ -18,7 +18,7 @@ function mount(root: HTMLElement) {
             <ui-listbox-item value="${view.value}">
               <ui-listbox-item-icon${view.icon === ArrowRight ? " mirror" : ""}>${createElement(view.icon, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-icon>
               ${view.label}
-            </ui-listbox-item>`,
+            </ui-listbox-item>`
         )
         .join("")}
     </ui-listbox>

@@ -23,7 +23,9 @@
 
 <Drawer>
   <div>
-    <DrawerOutlet keyframes={{ scale: [1, 0.94], borderRadius: ["0px", "24px"] }}>
+    <DrawerOutlet
+      keyframes={{ scale: [1, 0.94], borderRadius: ["0px", "24px"] }}
+    >
       <div data-slot="row">
         <span>Inbox</span>
         <DrawerTrigger data-variant="solid">Compose</DrawerTrigger>

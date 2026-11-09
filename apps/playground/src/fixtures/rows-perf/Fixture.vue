@@ -13,7 +13,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@ui-sdk/vue"
-import { countRender, perfItems, perfOptions, perfSize } from "tests/fixtures/perf.ts"
+import {
+  countRender,
+  perfItems,
+  perfOptions,
+  perfSize,
+} from "tests/fixtures/perf.ts"
 
 // Rows like a table's, each with a closed menu, select and tooltip, for the
 // counts specs. Every part counts its renders by kind, so specs
@@ -21,21 +26,35 @@ import { countRender, perfItems, perfOptions, perfSize } from "tests/fixtures/pe
 const rows = perfItems(perfSize(200)).map((row) => row.label.slice(5))
 const options = perfItems(perfOptions())
 const actions = ["Rename", "Duplicate", "Delete"]
-const count = (kind: "trigger" | "menuItem" | "value" | "option" | "tooltip") => (countRender(kind), "")
+const count = (
+  kind: "trigger" | "menuItem" | "value" | "option" | "tooltip"
+) => (countRender(kind), "")
 </script>
 
 <template>
   <div class="fixture" style="flex-direction: column; align-items: start">
     <button>Before</button>
-    <div v-for="label in rows" :key="label" class="row" style="display: flex; gap: 8px">
+    <div
+      v-for="label in rows"
+      :key="label"
+      class="row"
+      style="display: flex; gap: 8px"
+    >
       <Menu>
         <MenuTrigger>
           <template #render="{ props }">
-            <button v-bind="props">{{ count("trigger") }}Menu {{ label }}</button>
+            <button v-bind="props">
+              {{ count("trigger") }}Menu {{ label }}
+            </button>
           </template>
         </MenuTrigger>
         <MenuContent class="popup">
-          <MenuItem v-for="action in actions" :key="action" class="item" :value="action">
+          <MenuItem
+            v-for="action in actions"
+            :key="action"
+            class="item"
+            :value="action"
+          >
             <template #render="{ props }">
               <div v-bind="props">{{ count("menuItem") }}{{ action }}</div>
             </template>
@@ -49,7 +68,9 @@ const count = (kind: "trigger" | "menuItem" | "value" | "option" | "tooltip") =>
               {{ count("trigger") }}
               <SelectValue>
                 <template #render="{ props: valueProps, state }">
-                  <span v-bind="valueProps">{{ count("value") }}{{ state.label }}</span>
+                  <span v-bind="valueProps"
+                    >{{ count("value") }}{{ state.label }}</span
+                  >
                 </template>
               </SelectValue>
             </button>
@@ -72,7 +93,9 @@ const count = (kind: "trigger" | "menuItem" | "value" | "option" | "tooltip") =>
       <Tooltip>
         <TooltipTrigger>
           <template #render="{ props }">
-            <button v-bind="props">{{ count("trigger") }}Tip {{ label }}</button>
+            <button v-bind="props">
+              {{ count("trigger") }}Tip {{ label }}
+            </button>
           </template>
         </TooltipTrigger>
         <TooltipContent class="tooltip">

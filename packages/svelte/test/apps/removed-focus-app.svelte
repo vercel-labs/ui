@@ -1,8 +1,23 @@
 <script lang="ts">
-  import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem } from "../../src/combobox"
-  import { DatePicker, DatePickerContent, DatePickerInput, CalendarGrid } from "../../src/date-picker"
+  import {
+    Combobox,
+    ComboboxContent,
+    ComboboxInput,
+    ComboboxItem,
+  } from "../../src/combobox"
+  import {
+    DatePicker,
+    DatePickerContent,
+    DatePickerInput,
+    CalendarGrid,
+  } from "../../src/date-picker"
   import { Field, FieldLabel } from "../../src/field"
-  import { TriggerMenu, TriggerMenuContent, TriggerMenuInput, TriggerMenuItem } from "../../src/trigger-menu"
+  import {
+    TriggerMenu,
+    TriggerMenuContent,
+    TriggerMenuInput,
+    TriggerMenuItem,
+  } from "../../src/trigger-menu"
 
   let { kind }: { kind: string } = $props()
 
@@ -18,7 +33,9 @@
     {#if kind === "combobox"}
       <Combobox bind:open>
         <ComboboxInput />
-        <ComboboxContent><ComboboxItem value="apple">Apple</ComboboxItem></ComboboxContent>
+        <ComboboxContent
+          ><ComboboxItem value="apple">Apple</ComboboxItem></ComboboxContent
+        >
       </Combobox>
     {:else if kind === "date-picker"}
       <DatePicker bind:open>
@@ -28,7 +45,10 @@
     {:else}
       <TriggerMenu {triggers} bind:open>
         <TriggerMenuInput />
-        <TriggerMenuContent><TriggerMenuItem value="ben">Ben</TriggerMenuItem></TriggerMenuContent>
+        <TriggerMenuContent
+          ><TriggerMenuItem value="ben">Ben</TriggerMenuItem
+          ></TriggerMenuContent
+        >
       </TriggerMenu>
     {/if}
   </Field>

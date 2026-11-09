@@ -3,7 +3,11 @@ import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import { onProps } from "../../foundation/kernel/part"
-import type { Named, Part, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  Part,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { mainAxis, type ScrollAreaType } from "./scroll-area-model"
 import {
   createScrollView,
@@ -145,13 +149,19 @@ const axisOf = (orientation: ScrollAreaScrollbarProps["orientation"]) =>
   orientation === "horizontal" ? ("x" as const) : ("y" as const)
 
 function alongAxis(
-  part: Part<any, any, { orientation?: ScrollAreaScrollbarProps["orientation"] }>,
-  bindAxis: (axis: "x" | "y") => () => void,
+  part: Part<
+    any,
+    any,
+    { orientation?: ScrollAreaScrollbarProps["orientation"] }
+  >,
+  bindAxis: (axis: "x" | "y") => () => void
 ) {
   let axis = axisOf(part.props.orientation)
   let unbind = bindAxis(axis)
   const unwatch = onProps(part, () => {
-    if (axisOf(part.props.orientation) === axis) return
+    if (axisOf(part.props.orientation) === axis) {
+      return
+    }
     unbind()
     axis = axisOf(part.props.orientation)
     unbind = bindAxis(axis)
@@ -162,11 +172,15 @@ function alongAxis(
   }
 }
 
-const atStart = (state: State) => (mainAxis(state) === "x" ? state.atXStart : state.atYStart)
-const atEnd = (state: State) => (mainAxis(state) === "x" ? state.atXEnd : state.atYEnd)
-const hasScrollbars = (state: State) => state.scrollbarsX + state.scrollbarsY > 0
+const atStart = (state: State) =>
+  mainAxis(state) === "x" ? state.atXStart : state.atYStart
+const atEnd = (state: State) =>
+  mainAxis(state) === "x" ? state.atXEnd : state.atYEnd
+const hasScrollbars = (state: State) =>
+  state.scrollbarsX + state.scrollbarsY > 0
 // The scroll-to-end button hides at the end, and as soon as the view heads there.
-const endButtonShown = (state: State) => !atEnd(state) && !(state.stickToEnd && state.sticking)
+const endButtonShown = (state: State) =>
+  !atEnd(state) && !(state.stickToEnd && state.sticking)
 
 const flag = (value: boolean) => (value ? "" : undefined)
 
@@ -204,11 +218,12 @@ const scrollAttrs = (state: State) => ({
 // content for a page that registered them to inherit. They don't otherwise.
 const contentShield = Object.fromEntries(
   ["x", "y"].flatMap((axis) =>
-    ["overflow-" + axis + "-start", "overflow-" + axis + "-end", "progress-" + axis].map((name) => [
-      `--scroll-area-${name}`,
-      "initial",
-    ]),
-  ),
+    [
+      "overflow-" + axis + "-start",
+      "overflow-" + axis + "-end",
+      "progress-" + axis,
+    ].map((name) => [`--scroll-area-${name}`, "initial"])
+  )
 )
 
 const settings = (options: ScrollAreaOptions) => ({
@@ -256,7 +271,7 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
     deriveFromOptions(context, ["sticking"], (synced, state) =>
       synced.stickToEnd === undefined || synced.stickToEnd === state.stickToEnd
         ? undefined
-        : { sticking: synced.stickToEnd },
+        : { sticking: synced.stickToEnd }
     )
     let { stickToEnd, type, scrollHideDelay } = store.get()
     let destroyed = false
@@ -268,16 +283,19 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
           state.stickToEnd === stickToEnd &&
           state.type === type &&
           state.scrollHideDelay === scrollHideDelay
-        )
+        ) {
           return
+        }
         ;({ stickToEnd, type, scrollHideDelay } = state)
         // Once the options are handed over, so what it measures isn't written beside them.
         queueMicrotask(() => destroyed || view.refresh())
-      }),
+      })
     )
     return {
-      scrollToEnd: (options?: ScrollAreaScrollOptions) => view.scrollToEdge("end", options),
-      scrollToStart: (options?: ScrollAreaScrollOptions) => view.scrollToEdge("start", options),
+      scrollToEnd: (options?: ScrollAreaScrollOptions) =>
+        view.scrollToEdge("end", options),
+      scrollToStart: (options?: ScrollAreaScrollOptions) =>
+        view.scrollToEdge("start", options),
       isAtEnd: () => view.isAt("end") ?? atEnd(store.get()),
       isAtStart: () => view.isAt("start") ?? atStart(store.get()),
       isSticking: () => store.get().stickToEnd && store.get().sticking,
@@ -288,7 +306,10 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
     // Positions the scrollbars, which sit over the viewport's edges.
     root: slot<{}, ScrollAreaState>({
       state: areaState,
-      attrs: (state) => ({ ...overflowAttrs(state), style: "position:relative" }),
+      attrs: (state) => ({
+        ...overflowAttrs(state),
+        style: "position:relative",
+      }),
       live: live(scrollAttrs),
       bind: (el, { api }) => api.internal.bindRoot(el),
     }),
@@ -301,7 +322,8 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
         ...overflowAttrs(state),
         style: css({
           overflow: "auto",
-          "scrollbar-width": !state.counted || hasScrollbars(state) ? "none" : undefined,
+          "scrollbar-width":
+            !state.counted || hasScrollbars(state) ? "none" : undefined,
         }),
       }),
       live: live(scrollAttrs),
@@ -351,7 +373,11 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
             "user-select": "none",
             "-webkit-user-select": "none",
             ...(axis === "y"
-              ? { top: 0, bottom: "var(--scroll-area-corner-height,0px)", "inset-inline-end": 0 }
+              ? {
+                  top: 0,
+                  bottom: "var(--scroll-area-corner-height,0px)",
+                  "inset-inline-end": 0,
+                }
               : {
                   bottom: 0,
                   "inset-inline-start": 0,
@@ -366,14 +392,17 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
         const visible = axis === "x" ? state.visibleX : state.visibleY
         return {
           "data-visible": flag(visible),
-          "data-scrolling": flag(axis === "x" ? state.scrollingX : state.scrollingY),
+          "data-scrolling": flag(
+            axis === "x" ? state.scrollingX : state.scrollingY
+          ),
           "data-hovering": flag(state.hovering),
           "data-dragging": flag(state.dragging === axis),
           // A hidden scrollbar must not catch presses meant for the content under it.
           style: visible ? undefined : "pointer-events:none",
         }
       }),
-      bind: (el, part) => alongAxis(part, (axis) => part.api.internal.bindScrollbar(el, axis)),
+      bind: (el, part) =>
+        alongAxis(part, (axis) => part.api.internal.bindScrollbar(el, axis)),
     }),
 
     // Sized and moved by CSS variables its scrollbar writes once per frame.
@@ -392,21 +421,24 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
             axis === "y"
               ? {
                   height: "var(--scroll-area-thumb-height)",
-                  transform: "translate3d(0,var(--scroll-area-thumb-offset,0px),0)",
+                  transform:
+                    "translate3d(0,var(--scroll-area-thumb-offset,0px),0)",
                   display: overflow ? undefined : "none",
                 }
               : {
                   width: "var(--scroll-area-thumb-width)",
-                  transform: "translate3d(var(--scroll-area-thumb-offset,0px),0,0)",
+                  transform:
+                    "translate3d(var(--scroll-area-thumb-offset,0px),0,0)",
                   display: overflow ? undefined : "none",
-                },
+                }
           ),
         }
       },
       live: live((state, { props }) => ({
         "data-dragging": flag(state.dragging === axisOf(props.orientation)),
       })),
-      bind: (el, part) => alongAxis(part, (axis) => part.api.internal.bindThumb(el, axis)),
+      bind: (el, part) =>
+        alongAxis(part, (axis) => part.api.internal.bindThumb(el, axis)),
     }),
 
     // Where the two scrollbars meet. Only there while both show.
@@ -420,7 +452,10 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
           width: "var(--scroll-area-corner-width)",
           height: "var(--scroll-area-corner-height)",
           display:
-            state.overflowX && state.overflowY && state.scrollbarsX > 0 && state.scrollbarsY > 0
+            state.overflowX &&
+            state.overflowY &&
+            state.scrollbarsX > 0 &&
+            state.scrollbarsY > 0
               ? undefined
               : "none",
         }),
@@ -438,7 +473,9 @@ const scrollAreaPrimitive = /* @__PURE__ */ definePrimitive({
       })),
       press: ({ api, el }, event) => {
         // The button goes inert at the end, which would drop focus on the page.
-        if (el && el.ownerDocument.activeElement === el) api.internal.focusViewport()
+        if (el && el.ownerDocument.activeElement === el) {
+          api.internal.focusViewport()
+        }
         api.scrollToEnd()
         event?.preventDefault()
       },

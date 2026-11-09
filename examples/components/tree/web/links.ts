@@ -27,7 +27,7 @@ const links = new Set(
   pages
     .flatMap((page) => [page, ...(page.children ?? [])])
     .filter((page) => page.href)
-    .map((page) => page.value),
+    .map((page) => page.value)
 )
 
 function markup(items: TreeItemData[]) {
@@ -63,7 +63,9 @@ function mount(root: HTMLElement) {
   tree.items = pages
   tree.addEventListener("action", (event) => {
     const { value, event: trigger } = event.detail
-    if (!links.has(value)) return
+    if (!links.has(value)) {
+      return
+    }
     trigger?.preventDefault()
     tree.setAttribute("current", value)
   })

@@ -34,7 +34,7 @@ function mount(root: HTMLElement) {
                 </ui-checkbox>
                 ${day.label}
               </label>
-            `,
+            `
           )
           .join("")}
       </ui-checkbox-group>
@@ -44,10 +44,14 @@ function mount(root: HTMLElement) {
   root
     .querySelector('[data-action="weekdays"]')!
     .addEventListener("click", () => schedule.api.setValue(weekdays))
-  root.querySelector('[data-action="clear"]')!.addEventListener("click", () => schedule.api.setValue([]))
+  root
+    .querySelector('[data-action="clear"]')!
+    .addEventListener("click", () => schedule.api.setValue([]))
   schedule.addEventListener("valuechange", (event) => {
     const { value, reason } = event.detail
-    const names = days.filter((day) => value.includes(day.value)).map((day) => day.label)
+    const names = days
+      .filter((day) => value.includes(day.value))
+      .map((day) => day.label)
     log(root, `${names.join(", ") || "No days"} (${reason})`)
   })
 }

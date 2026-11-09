@@ -27,7 +27,11 @@ function Fixture() {
           )}
         />
         <SelectContent class="popup list-popup">
-          <SelectItem class="item" value="docs" render={(props) => <a {...props} href="#docs" />}>
+          <SelectItem
+            class="item"
+            value="docs"
+            render={(props) => <a {...props} href="#docs" />}
+          >
             Docs
           </SelectItem>
           <For each={f.items.slice(0, 3)}>

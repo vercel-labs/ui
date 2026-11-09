@@ -13,7 +13,12 @@ import {
   type InjectionKey,
   type Slots,
 } from "vue"
-import { renderElement, useHandle, useScope, type PrimitiveHandle } from "./use-primitive"
+import {
+  renderElement,
+  useHandle,
+  useScope,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
 // Instances driven by a controller, so parts outside the component, like a
 // trigger in a table row, can find them.
@@ -21,7 +26,9 @@ const controlled = new WeakMap<object, ReturnType<typeof shallowRef<unknown>>>()
 
 function controlledRef(controller: object) {
   let current = controlled.get(controller)
-  if (!current) controlled.set(controller, (current = shallowRef<unknown>(undefined)))
+  if (!current) {
+    controlled.set(controller, (current = shallowRef<unknown>(undefined)))
+  }
   return current
 }
 
@@ -32,11 +39,18 @@ function controlledRef(controller: object) {
  * once that one mounts. Reading it in a render tracks it, so a part renders
  * again once the component mounts. Call in `setup`.
  */
-function useControllerTarget<P extends Primitive>(primitive: P, controller: () => object | undefined) {
+function useControllerTarget<P extends Primitive>(
+  primitive: P,
+  controller: () => object | undefined
+) {
   const nearest = useScope(primitive)?.handle
   return () => {
     const current = controller()
-    return (current && (controlledRef(current).value as PrimitiveHandle<P> | undefined)) ?? nearest
+    return (
+      (current &&
+        (controlledRef(current).value as PrimitiveHandle<P> | undefined)) ??
+      nearest
+    )
   }
 }
 
@@ -44,24 +58,36 @@ function useControllerTarget<P extends Primitive>(primitive: P, controller: () =
 // It registers after mount, like React's layout effect: the server never runs
 // it, so a trigger's first client render stays the plain button the server
 // rendered, and hydration matches before the trigger binds.
-function useControllerEntry(controller: () => object | undefined, value: unknown) {
+function useControllerEntry(
+  controller: () => object | undefined,
+  value: unknown
+) {
   watchPostEffect((onCleanup) => {
     const current = controller()
-    if (!current) return
+    if (!current) {
+      return
+    }
     const entry = controlledRef(current)
     entry.value = value
     onCleanup(() => {
-      if (entry.value === value) entry.value = undefined
+      if (entry.value === value) {
+        entry.value = undefined
+      }
     })
   })
 }
 
 // The component a trigger outside it connects to, for the parts inside the trigger.
-const connectedKeys = new WeakMap<Primitive, InjectionKey<() => PrimitiveHandle<Primitive> | undefined>>()
+const connectedKeys = new WeakMap<
+  Primitive,
+  InjectionKey<() => PrimitiveHandle<Primitive> | undefined>
+>()
 
 function connectedKey(primitive: Primitive) {
   let key = connectedKeys.get(primitive)
-  if (!key) connectedKeys.set(primitive, (key = Symbol(`${primitive.name}-connected`)))
+  if (!key) {
+    connectedKeys.set(primitive, (key = Symbol(`${primitive.name}-connected`)))
+  }
   return key
 }
 
@@ -70,8 +96,14 @@ function connectedKey(primitive: Primitive) {
  * parts inside the trigger, like a select's value, in its default slot or its
  * `render` slot. Call in the trigger's `setup`.
  */
-function provideConnected<P extends Primitive>(primitive: P, handle: () => PrimitiveHandle<P> | undefined) {
-  provide(connectedKey(primitive), handle as () => PrimitiveHandle<Primitive> | undefined)
+function provideConnected<P extends Primitive>(
+  primitive: P,
+  handle: () => PrimitiveHandle<P> | undefined
+) {
+  provide(
+    connectedKey(primitive),
+    handle as () => PrimitiveHandle<Primitive> | undefined
+  )
 }
 
 /**
@@ -81,7 +113,9 @@ function provideConnected<P extends Primitive>(primitive: P, handle: () => Primi
  */
 function useConnectedHandle<P extends Primitive>(primitive: P) {
   const connected = inject(connectedKey(primitive), null)
-  if (connected) return connected as () => PrimitiveHandle<P> | undefined
+  if (connected) {
+    return connected as () => PrimitiveHandle<P> | undefined
+  }
   const handle = useHandle(primitive)
   return () => handle
 }
@@ -95,7 +129,11 @@ function useConnectedHandle<P extends Primitive>(primitive: P) {
 function renderUnbound<State extends object>(
   tag: string,
   props: Record<string, unknown>,
-  { slots, state, children }: { slots: Slots; state: State; children?: (state: State) => unknown },
+  {
+    slots,
+    state,
+    children,
+  }: { slots: Slots; state: State; children?: (state: State) => unknown }
 ) {
   return renderElement(props, slots, state, { tag, children })
 }
@@ -125,10 +163,12 @@ function watchedRefs<H extends PrimitiveHandle<Primitive>>(handle: H) {
 function useConnectedPart<H extends PrimitiveHandle<Primitive>>(
   handle: () => H | undefined,
   bind: (handle: H) => () => unknown,
-  unbound: () => unknown,
+  unbound: () => unknown
 ) {
   let current: H | undefined
-  let bound: { scope: EffectScope; render: () => unknown; release: () => void } | undefined
+  let bound:
+    | { scope: EffectScope; render: () => unknown; release: () => void }
+    | undefined
   onScopeDispose(() => bound?.scope.stop())
   return () => {
     const next = handle()
@@ -144,7 +184,10 @@ function useConnectedPart<H extends PrimitiveHandle<Primitive>>(
 
 // Makes `bind`'s render in a scope of its own, which stops when the component
 // changes, so the part's subscriptions end with it.
-function bindTo<H extends PrimitiveHandle<Primitive>>(handle: H, bind: (handle: H) => () => unknown) {
+function bindTo<H extends PrimitiveHandle<Primitive>>(
+  handle: H,
+  bind: (handle: H) => () => unknown
+) {
   const scope = effectScope(true)
   const watched = watchedRefs(handle)
   const render = scope.run(() => bind(watched.handle))!

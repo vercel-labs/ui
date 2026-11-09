@@ -58,11 +58,11 @@ function mount(root: HTMLElement) {
                             <ui-select-item-text>${item.label}</ui-select-item-text>
                             <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                           </ui-select-item>
-                        `,
+                        `
                       )
                       .join("")}
                   </ui-select-group>
-                `,
+                `
               )
               .join("")}
           </ui-select-list>

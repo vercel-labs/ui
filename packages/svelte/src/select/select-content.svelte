@@ -13,7 +13,12 @@ The popup that holds the items, positioned against the trigger.
   import { claimOwnPart } from "../own-part.svelte"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
-  import { portalTo, providePopupContainer, usePopupContainer, type PopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+    type PopupContainer,
+  } from "../popup.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { ContainerKey, OwnContentKey, type ContainerContext } from "./context"
   import SelectItems from "./select-items.svelte"
@@ -43,18 +48,35 @@ The popup that holds the items, positioned against the trigger.
   const select = useHandle(selectPrimitive)
   // The root renders its own content when the app gives none, so one in the
   // app's children says it's there.
-  if (!untrack(() => fromRoot)) claimOwnPart(OwnContentKey)
+  if (!untrack(() => fromRoot)) {
+    claimOwnPart(OwnContentKey)
+  }
   const inherited = getContext<ContainerContext | undefined>(ContainerKey)
   const target = usePopupContainer(() => container ?? inherited?.())
   providePopupContainer(target)
   // Presented as a sheet, the content sits in a full-screen viewport, which is
   // what moves into the container and the top layer.
-  const viewport = useHandlePart(select, "viewport", () => ({}), portalTo(target))
+  const viewport = useHandlePart(
+    select,
+    "viewport",
+    () => ({}),
+    portalTo(target)
+  )
   const content = useHandlePart(
     select,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, alignItemWithTrigger, keepMounted }),
-    portalTo(() => (viewport.present ? false : target())),
+    () => ({
+      side,
+      align,
+      sideOffset,
+      alignOffset,
+      collisionPadding,
+      arrowPadding,
+      anchor,
+      alignItemWithTrigger,
+      keepMounted,
+    }),
+    portalTo(() => (viewport.present ? false : target()))
   )
 </script>
 
@@ -64,7 +86,11 @@ The popup that holds the items, positioned against the trigger.
 {/snippet}
 
 {#snippet popup()}
-  <Part tag="div" part={content} props={{ ...rest, children: children ?? data }} />
+  <Part
+    tag="div"
+    part={content}
+    props={{ ...rest, children: children ?? data }}
+  />
 {/snippet}
 
 {#if content.present}

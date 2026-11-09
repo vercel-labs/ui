@@ -13,7 +13,9 @@ const controls = ref<HTMLElement | null>(null)
 function onOpenChange(next: boolean, details: ChangeDetails) {
   const target = details.event?.target
   const inControls = target instanceof Node && controls.value?.contains(target)
-  if (inControls && details.reason !== "escape-key") return details.cancel()
+  if (inControls && details.reason !== "escape-key") {
+    return details.cancel()
+  }
   log(`${next ? "Opened" : "Closed"} (${details.reason})`)
 }
 </script>

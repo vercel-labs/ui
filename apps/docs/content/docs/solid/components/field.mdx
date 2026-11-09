@@ -5,7 +5,10 @@ description: Connect a form control to its label, description, and validation er
 
 A field connects a form control to its label, its description and the errors it shows, and wires up `id`, `for` and `aria-describedby` for you.
 
-<ComponentExample name="field/input" caption="Press Username to focus the input, then type a name." />
+<ComponentExample
+  name="field/input"
+  caption="Press Username to focus the input, then type a name."
+/>
 
 ## Installation
 
@@ -28,7 +31,12 @@ Field
 ## Usage
 
 ```tsx
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { Input } from "@ui-sdk/solid/input"
 
 function UsernameField() {
@@ -213,7 +221,9 @@ Every part takes `render`, to render a different element or component in its pla
 ```tsx
 <FieldDescription
   render={(props, state) => (
-    <p {...props}>{state.invalid ? "Use letters and numbers only." : "Letters and numbers."}</p>
+    <p {...props}>
+      {state.invalid ? "Use letters and numbers only." : "Letters and numbers."}
+    </p>
   )}
 />
 ```
@@ -248,7 +258,7 @@ export function PhoneInput(props: JSX.InputHTMLAttributes<HTMLInputElement>) {
       },
     },
     props,
-    { "data-slot": "phone-input" },
+    { "data-slot": "phone-input" }
   )
   const control = field ? field.props(input) : input
   return <input {...control} />
@@ -317,29 +327,50 @@ A field has no change events. Read its state from the parts' data attributes, or
 
 ### Field
 
-<TypeTable path="../../packages/core/src/components/field/field.ts" name="FieldOptions" />
+<TypeTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldOptions"
+/>
 
 ### FieldError
 
-<TypeTable path="../../packages/core/src/components/field/field.ts" name="FieldErrorProps" />
+<TypeTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldErrorProps"
+/>
 
 ### FieldSet
 
-<TypeTable path="../../packages/core/src/components/field/field-set.ts" name="FieldSetOptions" />
+<TypeTable
+  path="../../packages/core/src/components/field/field-set.ts"
+  name="FieldSetOptions"
+/>
 
 ### State
 
-<StateTable path="../../packages/core/src/components/field/field.ts" name="FieldState" />
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldState"
+/>
 
-<StateTable path="../../packages/core/src/components/field/field.ts" name="FieldErrorState" />
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldErrorState"
+/>
 
 A `FieldDescription` receives the field's state, or only `disabled` when it describes a field set.
 
-<StateTable path="../../packages/core/src/components/field/field.ts" name="FieldDescriptionState" />
+<StateTable
+  path="../../packages/core/src/components/field/field.ts"
+  name="FieldDescriptionState"
+/>
 
 Every part of a field set receives the same state.
 
-<StateTable path="../../packages/core/src/components/field/field-set.ts" name="FieldSetState" />
+<StateTable
+  path="../../packages/core/src/components/field/field-set.ts"
+  name="FieldSetState"
+/>
 
 ## Accessibility
 

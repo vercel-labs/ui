@@ -1,5 +1,9 @@
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/solid/listbox"
 import { For } from "solid-js"
 
 const topics = [
@@ -36,7 +40,9 @@ function Example() {
           )}
         </For>
       </Listbox>
-      <FieldDescription>Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription>
+      <FieldDescription>
+        Hold Shift to select a range, or Ctrl or ⌘ to add one.
+      </FieldDescription>
     </Field>
   )
 }

@@ -20,7 +20,7 @@ function mount(root: HTMLElement) {
                   ${createElement(action.icon, { "aria-hidden": "true" }).outerHTML}
                 </button>
               </ui-toolbar-button>
-            `,
+            `
           )
           .join("")}
       </ui-toolbar-group>
@@ -39,9 +39,11 @@ function mount(root: HTMLElement) {
       </ui-toolbar-group>
     </ui-toolbar>
   `
-  root.querySelectorAll('[aria-label="Clipboard"] button').forEach((button, index) => {
-    button.addEventListener("click", () => log(root, clipboard[index].label))
-  })
+  root
+    .querySelectorAll('[aria-label="Clipboard"] button')
+    .forEach((button, index) => {
+      button.addEventListener("click", () => log(root, clipboard[index].label))
+    })
 }
 
 export { mount }

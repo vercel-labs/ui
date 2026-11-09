@@ -14,7 +14,7 @@ function mount(root: HTMLElement) {
               <ui-slider-thumb class="slider-thumb" aria-label="Slider ${index + 1}"></ui-slider-thumb>
             </ui-slider-track>
           </ui-slider-control>
-        </ui-slider>`,
+        </ui-slider>`
     ).join("")
     target.innerHTML = `
       <div class="fixture" style="flex-direction: column; align-items: start">

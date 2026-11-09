@@ -1,6 +1,20 @@
 <script lang="ts">
-  import { CodeIcon, DownloadIcon, LinkIcon, MailIcon, ReplyIcon, ShareIcon } from "@lucide/svelte"
-  import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/svelte/menu"
+  import {
+    CodeIcon,
+    DownloadIcon,
+    LinkIcon,
+    MailIcon,
+    ReplyIcon,
+    ShareIcon,
+  } from "@lucide/svelte"
+  import {
+    Menu,
+    MenuContent,
+    MenuItem,
+    MenuItemIcon,
+    MenuSeparator,
+    MenuTrigger,
+  } from "@ui-sdk/svelte/menu"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()

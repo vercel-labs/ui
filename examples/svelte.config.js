@@ -5,5 +5,7 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 // accessibility lint calls redundant, so that one rule stays quiet here.
 export default {
   preprocess: vitePreprocess(),
-  compilerOptions: { warningFilter: (warning) => warning.code !== "a11y_no_redundant_roles" },
+  compilerOptions: {
+    warningFilter: (warning) => warning.code !== "a11y_no_redundant_roles",
+  },
 }

@@ -5,8 +5,18 @@ import {
   AccordionPanel,
   AccordionTrigger,
 } from "@ui-sdk/react/accordion"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem, ComboboxList } from "@ui-sdk/react/combobox"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@ui-sdk/react/combobox"
 import {
   Dialog,
   DialogClose,
@@ -16,8 +26,17 @@ import {
   DialogTrigger,
 } from "@ui-sdk/react/dialog"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "@ui-sdk/react/menu"
-import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from "@ui-sdk/react/popover"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTrigger,
+} from "@ui-sdk/react/popover"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -25,15 +44,38 @@ import {
   ScrollAreaThumb,
   ScrollAreaViewport,
 } from "@ui-sdk/react/scroll-area"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/react/slider"
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/react/slider"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/react/tabs"
 import { Toolbar, ToolbarButton } from "@ui-sdk/react/toolbar"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
 import { Tree } from "@ui-sdk/react/tree"
 import { useState } from "react"
 import { createRoot } from "react-dom/client"
-import { exposeLayers, leakComponent, leakTreeItems, perfItems } from "tests/fixtures/perf.ts"
+import {
+  exposeLayers,
+  leakComponent,
+  leakTreeItems,
+  perfItems,
+} from "tests/fixtures/perf.ts"
 
 // One component for the leak specs, picked with ?component=, and a button
 // that mounts and unmounts it. The scroll area hides its scrollbars soon after
@@ -61,7 +103,12 @@ const components = {
       </SelectTrigger>
       <SelectContent className="popup list-popup">
         {items.map((item) => (
-          <SelectItem key={item.value} className="item" value={item.value} label={item.label}>
+          <SelectItem
+            key={item.value}
+            className="item"
+            value={item.value}
+            label={item.label}
+          >
             {item.label}
           </SelectItem>
         ))}
@@ -74,7 +121,12 @@ const components = {
       <ComboboxContent className="popup list-popup">
         <ComboboxList>
           {items.map((item) => (
-            <ComboboxItem key={item.value} className="item" value={item.value} label={item.label}>
+            <ComboboxItem
+              key={item.value}
+              className="item"
+              value={item.value}
+              label={item.label}
+            >
               {item.label}
             </ComboboxItem>
           ))}
@@ -96,7 +148,9 @@ const components = {
       <DialogTrigger>Open</DialogTrigger>
       <DialogContent className="dialog">
         <DialogTitle className="title">Delete it?</DialogTitle>
-        <DialogDescription className="description">This can't be undone.</DialogDescription>
+        <DialogDescription className="description">
+          This can't be undone.
+        </DialogDescription>
         <DialogClose>Cancel</DialogClose>
       </DialogContent>
     </Dialog>
@@ -121,22 +175,30 @@ const components = {
     <Accordion>
       <AccordionItem value="first">
         <AccordionHeader>
-          <AccordionTrigger className="accordion-trigger">Open</AccordionTrigger>
+          <AccordionTrigger className="accordion-trigger">
+            Open
+          </AccordionTrigger>
         </AccordionHeader>
         <AccordionPanel className="accordion-panel">An answer.</AccordionPanel>
       </AccordionItem>
       <AccordionItem value="second">
         <AccordionHeader>
-          <AccordionTrigger className="accordion-trigger">Second</AccordionTrigger>
+          <AccordionTrigger className="accordion-trigger">
+            Second
+          </AccordionTrigger>
         </AccordionHeader>
-        <AccordionPanel className="accordion-panel">Another answer.</AccordionPanel>
+        <AccordionPanel className="accordion-panel">
+          Another answer.
+        </AccordionPanel>
       </AccordionItem>
     </Accordion>
   ),
   collapsible: () => (
     <Collapsible>
       <CollapsibleTrigger>Open</CollapsibleTrigger>
-      <CollapsiblePanel className="collapsible-panel">Details.</CollapsiblePanel>
+      <CollapsiblePanel className="collapsible-panel">
+        Details.
+      </CollapsiblePanel>
     </Collapsible>
   ),
   tabs: () => (
@@ -163,17 +225,27 @@ const components = {
       ))}
     </Toolbar>
   ),
-  tree: () => <Tree className="tree" aria-label="Files" items={leakTreeItems()} />,
+  tree: () => (
+    <Tree className="tree" aria-label="Files" items={leakTreeItems()} />
+  ),
   resizable: () => (
     <Resizable className="resizable">
       <ResizablePanel id="first" defaultSize={50} className="resizable-panel" />
       <ResizableHandle className="resizable-handle" aria-label="Handle" />
-      <ResizablePanel id="second" defaultSize={50} className="resizable-panel" />
+      <ResizablePanel
+        id="second"
+        defaultSize={50}
+        className="resizable-panel"
+      />
     </Resizable>
   ),
   "scroll-area": () => (
     <ScrollArea className="scroll-area" scrollHideDelay={50}>
-      <ScrollAreaViewport className="scroll-area-viewport" role="region" aria-label="Items">
+      <ScrollAreaViewport
+        className="scroll-area-viewport"
+        role="region"
+        aria-label="Items"
+      >
         <ScrollAreaContent>
           {lines.map((line) => (
             <p key={line.value} className="scroll-area-item">

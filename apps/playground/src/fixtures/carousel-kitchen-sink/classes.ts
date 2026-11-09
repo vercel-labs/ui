@@ -13,6 +13,18 @@ const indicator =
   "size-2.5 rounded-full bg-neutral-300 outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 aria-selected:bg-neutral-900"
 const toggle =
   "inline-flex h-8 items-center rounded-md border border-neutral-200 px-2.5 text-[13px] outline-none hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400"
-const control = "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
+const control =
+  "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
 
-export { content, control, controls, indicator, indicators, root, slide, step, toggle, viewport }
+export {
+  content,
+  control,
+  controls,
+  indicator,
+  indicators,
+  root,
+  slide,
+  step,
+  toggle,
+  viewport,
+}

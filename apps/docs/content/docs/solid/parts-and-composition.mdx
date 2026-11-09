@@ -10,7 +10,13 @@ A component can have several parts. A Popover has a root to hold its state, a tr
 Import the parts you need and nest them as shown in the component's Composition:
 
 ```tsx
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/solid/popover"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/solid/popover"
 
 function Example() {
   return (
@@ -69,7 +75,11 @@ The part can pass its state to its content:
 import { Toggle } from "@ui-sdk/solid/toggle"
 
 function Example() {
-  return <Toggle aria-label="Mute">{(state) => (state.pressed ? "Mute on" : "Mute off")}</Toggle>
+  return (
+    <Toggle aria-label="Mute">
+      {(state) => (state.pressed ? "Mute on" : "Mute off")}
+    </Toggle>
+  )
 }
 
 export { Example }

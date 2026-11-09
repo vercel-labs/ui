@@ -10,7 +10,11 @@ A line between groups of content, announced as a separator unless it's `decorati
     type SeparatorState,
   } from "@ui-sdk/core/separator"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     orientation,
@@ -20,7 +24,12 @@ A line between groups of content, announced as a separator unless it's `decorati
   }: PartProps<"div", SeparatorState> & SeparatorOptions = $props()
 
   const id = $props.id()
-  const separator = usePrimitive(separatorPrimitive, () => ({ id, orientation, decorative, debug }))
+  const separator = usePrimitive(separatorPrimitive, () => ({
+    id,
+    orientation,
+    decorative,
+    debug,
+  }))
   const root = useHandlePart(separator, "root")
 </script>
 

@@ -12,8 +12,16 @@ const GroupFieldKey = Symbol("radio-group-field")
 
 function useRadioGroup() {
   const context = getContext<RadioGroupContext | undefined>(RadioGroupKey)
-  if (!context) throw new Error("Radio group parts must be used inside <RadioGroup>.")
+  if (!context) {
+    throw new Error("Radio group parts must be used inside <RadioGroup>.")
+  }
   return context
 }
 
-export { GroupFieldKey, type RadioGroupContext, RadioGroupKey, RadioKey, useRadioGroup }
+export {
+  GroupFieldKey,
+  type RadioGroupContext,
+  RadioGroupKey,
+  RadioKey,
+  useRadioGroup,
+}

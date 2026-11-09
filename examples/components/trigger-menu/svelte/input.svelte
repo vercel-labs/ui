@@ -18,7 +18,11 @@
   ]
 </script>
 
-<TriggerMenu triggers={[{ char: "@", items: people }]} autoHighlight={false} loop={false}>
+<TriggerMenu
+  triggers={[{ char: "@", items: people }]}
+  autoHighlight={false}
+  loop={false}
+>
   <Field>
     <FieldLabel>Task</FieldLabel>
     <FieldControl>
@@ -34,7 +38,7 @@
   <TriggerMenuContent>
     <TriggerMenuList>
       {#snippet children(state)}
-        {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+        {#each state.items as TriggerMenuDataItem[] as item (item.value)}
           <TriggerMenuItem value={item.value} label={item.label}>
             {item.label}
           </TriggerMenuItem>

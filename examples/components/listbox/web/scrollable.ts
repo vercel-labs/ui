@@ -17,14 +17,19 @@ function mount(root: HTMLElement) {
             <ui-listbox-item value="${zone.value}" index="${index}">
               ${zone.label}
               <ui-listbox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
-            </ui-listbox-item>`,
+            </ui-listbox-item>`
         )
         .join("")}
     </ui-listbox>
   `
   root.querySelector("ui-listbox")!.addEventListener("highlight", (event) => {
     const { value, index } = event.detail
-    if (value) log(root, `Focused ${timezones[index].label} (${index + 1} of ${timezones.length})`)
+    if (value) {
+      log(
+        root,
+        `Focused ${timezones[index].label} (${index + 1} of ${timezones.length})`
+      )
+    }
   })
 }
 

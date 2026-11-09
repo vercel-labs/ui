@@ -35,12 +35,17 @@ const notes = {
 
 function Example() {
   const [mode, setMode] = createSignal<Mode>("false")
-  const modal = () => (mode() === "true" ? true : mode() === "false" ? false : "trap-focus")
+  const modal = () =>
+    mode() === "true" ? true : mode() === "false" ? false : "trap-focus"
 
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={modes} value={mode()} onValueChange={(next) => next && setMode(next as Mode)}>
+        <Select
+          items={modes}
+          value={mode()}
+          onValueChange={(next) => next && setMode(next as Mode)}
+        >
           <SelectLabel>Modal</SelectLabel>
           <SelectTrigger>
             <SelectValue />

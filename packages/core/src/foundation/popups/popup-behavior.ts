@@ -102,14 +102,25 @@ type PopupBehaviorName = keyof typeof popupPresets
 
 // The preset's behavior, with any option passed beside it winning. Undefined
 // options leave the preset's value.
-function resolveBehavior(preset: PopupBehaviorName, overrides: Partial<PopupBehavior>) {
+function resolveBehavior(
+  preset: PopupBehaviorName,
+  overrides: Partial<PopupBehavior>
+) {
   const behavior: PopupBehavior = { ...popupPresets[preset] }
   for (const key of Object.keys(plain) as (keyof PopupBehavior)[]) {
     const value = overrides[key]
     // Each key copies its own value, which TypeScript can't follow through a loop.
-    if (value !== undefined) Object.assign(behavior, { [key]: value })
+    if (value !== undefined) {
+      Object.assign(behavior, { [key]: value })
+    }
   }
   return behavior
 }
 
-export { type PopupBehavior, type PopupBehaviorName, popupPresets, type PopupTab, resolveBehavior }
+export {
+  type PopupBehavior,
+  type PopupBehaviorName,
+  popupPresets,
+  type PopupTab,
+  resolveBehavior,
+}

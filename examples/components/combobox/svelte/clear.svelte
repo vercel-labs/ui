@@ -33,7 +33,8 @@
 
 <Combobox
   bind:value
-  onValueChange={(next, details) => log(`${next ? frameworkLabel(next) : "Cleared"} (${details.reason})`)}
+  onValueChange={(next, details) =>
+    log(`${next ? frameworkLabel(next) : "Cleared"} (${details.reason})`)}
   itemToLabel={frameworkLabel}
 >
   <div data-slot="stack">

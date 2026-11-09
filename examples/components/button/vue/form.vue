@@ -7,7 +7,9 @@ import { useLog } from "../../../shared/vue/log"
 const log = useLog()
 
 function onSubmit(event: Event) {
-  const email = String(new FormData(event.currentTarget as HTMLFormElement).get("email"))
+  const email = String(
+    new FormData(event.currentTarget as HTMLFormElement).get("email")
+  )
   log(`Subscribed ${email}`)
 }
 </script>

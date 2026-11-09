@@ -68,7 +68,9 @@ type FileRules<F extends FileLike = File> = {
 
 /** The tokens of an `accept` list: lowercase, trimmed, without empty ones. */
 function parseAccept(accept: string | readonly string[] | undefined) {
-  if (!accept) return []
+  if (!accept) {
+    return []
+  }
   const list = typeof accept === "string" ? accept.split(",") : accept
   return list.map((token) => token.trim().toLowerCase()).filter(Boolean)
 }
@@ -79,9 +81,15 @@ const isAny = (token: string) => token === "*" || token === "*/*"
 const essence = (type: string) => type.split(";")[0].trim().toLowerCase()
 
 function matchesType(type: string, token: string) {
-  if (isAny(token)) return true
-  if (!type) return false
-  if (token.endsWith("/*")) return type.startsWith(token.slice(0, -1))
+  if (isAny(token)) {
+    return true
+  }
+  if (!type) {
+    return false
+  }
+  if (token.endsWith("/*")) {
+    return type.startsWith(token.slice(0, -1))
+  }
   return type === token
 }
 
@@ -91,10 +99,14 @@ function matchesType(type: string, token: string) {
  * platform has no MIME type for, still matches `".csv"`.
  */
 function acceptsFile(file: FileLike, tokens: readonly string[]) {
-  if (!tokens.length) return true
+  if (!tokens.length) {
+    return true
+  }
   const name = file.name.toLowerCase()
   const type = essence(file.type)
-  return tokens.some((token) => (isExtension(token) ? name.endsWith(token) : matchesType(type, token)))
+  return tokens.some((token) =>
+    isExtension(token) ? name.endsWith(token) : matchesType(type, token)
+  )
 }
 
 // The MIME types common extensions arrive with, so a drag can be judged
@@ -123,19 +135,31 @@ const extensionTypes: Record<string, string[]> = {
  * could tell, or when the platform reports no type. Callers treat that as accepted.
  */
 function acceptsType(type: string, tokens: readonly string[]) {
-  if (!tokens.length) return true
+  if (!tokens.length) {
+    return true
+  }
   const mime = essence(type)
-  if (!mime) return undefined
+  if (!mime) {
+    return undefined
+  }
   const matches = tokens.some((token) =>
-    isExtension(token) ? extensionTypes[token]?.includes(mime) : matchesType(mime, token),
+    isExtension(token)
+      ? extensionTypes[token]?.includes(mime)
+      : matchesType(mime, token)
   )
-  if (matches) return true
-  return tokens.some((token) => isExtension(token) && !extensionTypes[token]) ? undefined : false
+  if (matches) {
+    return true
+  }
+  return tokens.some((token) => isExtension(token) && !extensionTypes[token])
+    ? undefined
+    : false
 }
 
 /** How many files the rules accept at a time. */
 function fileLimit(rules: Pick<FileRules<FileLike>, "multiple" | "maxFiles">) {
-  if (rules.multiple === false) return Math.min(1, rules.maxFiles ?? 1)
+  if (rules.multiple === false) {
+    return Math.min(1, rules.maxFiles ?? 1)
+  }
   return rules.maxFiles ?? Infinity
 }
 
@@ -144,22 +168,38 @@ function fileLimit(rules: Pick<FileRules<FileLike>, "multiple" | "maxFiles">) {
  * each failed. Files keep their order. When there are too many, the first ones
  * that pass the other checks are accepted.
  */
-function validateFiles<F extends FileLike>(files: readonly F[], rules: FileRules<F>) {
+function validateFiles<F extends FileLike>(
+  files: readonly F[],
+  rules: FileRules<F>
+) {
   const tokens = parseAccept(rules.accept)
   const limit = fileLimit(rules)
   const accepted: F[] = []
   const rejected: FileRejection<F>[] = []
   for (const file of files) {
     const reasons: FileRejection<F>["reasons"] = []
-    if (!acceptsFile(file, tokens)) reasons.push("file-type")
-    if (rules.maxSize !== undefined && file.size > rules.maxSize) reasons.push("file-too-large")
-    if (rules.minSize !== undefined && file.size < rules.minSize) reasons.push("file-too-small")
+    if (!acceptsFile(file, tokens)) {
+      reasons.push("file-type")
+    }
+    if (rules.maxSize !== undefined && file.size > rules.maxSize) {
+      reasons.push("file-too-large")
+    }
+    if (rules.minSize !== undefined && file.size < rules.minSize) {
+      reasons.push("file-too-small")
+    }
     // Your check runs only on files that passed ours, so it can be costly.
     const custom = reasons.length ? undefined : rules.validate?.(file)
-    if (custom) reasons.push(custom)
-    if (!reasons.length && accepted.length >= limit) reasons.push("too-many-files")
-    if (reasons.length) rejected.push({ file, reasons })
-    else accepted.push(file)
+    if (custom) {
+      reasons.push(custom)
+    }
+    if (!reasons.length && accepted.length >= limit) {
+      reasons.push("too-many-files")
+    }
+    if (reasons.length) {
+      rejected.push({ file, reasons })
+    } else {
+      accepted.push(file)
+    }
   }
   return { accepted, rejected }
 }
@@ -172,14 +212,24 @@ function validateFiles<F extends FileLike>(files: readonly F[], rules: FileRules
  */
 function dragStatus(
   types: readonly string[],
-  rules: Pick<FileRules<FileLike>, "accept" | "multiple" | "maxFiles">,
+  rules: Pick<FileRules<FileLike>, "accept" | "multiple" | "maxFiles">
 ) {
-  if (types.length > fileLimit(rules)) return "reject"
+  if (types.length > fileLimit(rules)) {
+    return "reject"
+  }
   const tokens = parseAccept(rules.accept)
-  return types.some((type) => acceptsType(type, tokens) === false) ? "reject" : "accept"
+  return types.some((type) => acceptsType(type, tokens) === false)
+    ? "reject"
+    : "accept"
 }
 
-const sizeUnits = ["byte", "kilobyte", "megabyte", "gigabyte", "terabyte"] as const
+const sizeUnits = [
+  "byte",
+  "kilobyte",
+  "megabyte",
+  "gigabyte",
+  "terabyte",
+] as const
 
 /**
  * A file size for people, in the locale: 1536 bytes reads "1.5 kB".
@@ -213,7 +263,11 @@ function setRelativePath(file: object, path: string) {
  * @stable
  */
 function relativePath(file: FileLike) {
-  return paths.get(file) || (file as { webkitRelativePath?: string }).webkitRelativePath || file.name
+  return (
+    paths.get(file) ||
+    (file as { webkitRelativePath?: string }).webkitRelativePath ||
+    file.name
+  )
 }
 
 export {

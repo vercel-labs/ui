@@ -1,4 +1,10 @@
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/solid/popover"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/solid/popover"
 import { render } from "@solidjs/web"
 
 function Fixture() {
@@ -15,8 +21,12 @@ function Fixture() {
           )}
         />
         <PopoverContent class="popup">
-          <PopoverTitle render={(props) => <h3 {...props} />}>Shipping</PopoverTitle>
-          <PopoverClose render={(props) => <a {...props} href="#done" />}>Done</PopoverClose>
+          <PopoverTitle render={(props) => <h3 {...props} />}>
+            Shipping
+          </PopoverTitle>
+          <PopoverClose render={(props) => <a {...props} href="#done" />}>
+            Done
+          </PopoverClose>
         </PopoverContent>
       </Popover>
       <button>After</button>

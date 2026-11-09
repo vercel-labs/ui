@@ -13,11 +13,20 @@
  * 1 for no bounce, below 1 to bounce.
  * @experimental
  */
-function solveSpring(response: number, dampingRatio: number, displacement: number, velocity: number) {
+function solveSpring(
+  response: number,
+  dampingRatio: number,
+  displacement: number,
+  velocity: number
+) {
   const omega = (2 * Math.PI) / (response * 1000)
   const zeta = dampingRatio
-  if (Math.abs(zeta - 1) < 1e-6) return criticallyDamped(omega, displacement, velocity)
-  if (zeta < 1) return underdamped(omega, zeta, displacement, velocity)
+  if (Math.abs(zeta - 1) < 1e-6) {
+    return criticallyDamped(omega, displacement, velocity)
+  }
+  if (zeta < 1) {
+    return underdamped(omega, zeta, displacement, velocity)
+  }
   return overdamped(omega, zeta, displacement, velocity)
 }
 
@@ -26,11 +35,16 @@ function underdamped(omega: number, zeta: number, x0: number, v0: number) {
   const damped = omega * Math.sqrt(1 - zeta * zeta)
   const b = (v0 + decay * x0) / damped
   return {
-    position: (t: number) => Math.exp(-decay * t) * (x0 * Math.cos(damped * t) + b * Math.sin(damped * t)),
+    position: (t: number) =>
+      Math.exp(-decay * t) *
+      (x0 * Math.cos(damped * t) + b * Math.sin(damped * t)),
     velocity: (t: number) => {
       const cos = Math.cos(damped * t)
       const sin = Math.sin(damped * t)
-      return Math.exp(-decay * t) * ((b * damped - decay * x0) * cos - (x0 * damped + decay * b) * sin)
+      return (
+        Math.exp(-decay * t) *
+        ((b * damped - decay * x0) * cos - (x0 * damped + decay * b) * sin)
+      )
     },
   }
 }
@@ -50,8 +64,11 @@ function overdamped(omega: number, zeta: number, x0: number, v0: number) {
   const slowWeight = (v0 - fast * x0) / (slow - fast)
   const fastWeight = x0 - slowWeight
   return {
-    position: (t: number) => slowWeight * Math.exp(slow * t) + fastWeight * Math.exp(fast * t),
-    velocity: (t: number) => slowWeight * slow * Math.exp(slow * t) + fastWeight * fast * Math.exp(fast * t),
+    position: (t: number) =>
+      slowWeight * Math.exp(slow * t) + fastWeight * Math.exp(fast * t),
+    velocity: (t: number) =>
+      slowWeight * slow * Math.exp(slow * t) +
+      fastWeight * fast * Math.exp(fast * t),
   }
 }
 
@@ -60,7 +77,12 @@ function overdamped(omega: number, zeta: number, x0: number, v0: number) {
 // crossings of an underdamped spring, where it passes the target at speed.
 function settleTime(
   solver: ReturnType<typeof solveSpring>,
-  { positionTolerance = 0.5, velocityTolerance = 0.02, step = 1, limit = 10_000 } = {},
+  {
+    positionTolerance = 0.5,
+    velocityTolerance = 0.02,
+    step = 1,
+    limit = 10_000,
+  } = {}
 ) {
   for (let t = 0; t <= limit; t += step) {
     if (
@@ -81,11 +103,13 @@ function springLinearEasing(
   from: number,
   to: number,
   duration: number,
-  step = 1000 / 120,
+  step = 1000 / 120
 ) {
   const distance = to - from
   // No distance, no progress to ease. Callers sample positions instead.
-  if (Math.abs(distance) < 1e-6) return "linear"
+  if (Math.abs(distance) < 1e-6) {
+    return "linear"
+  }
   const stops: string[] = []
   for (let t = 0; t < duration; t += step) {
     stops.push(round(1 + solver.position(t) / distance))

@@ -16,7 +16,12 @@ function Example() {
 
   return (
     <Field>
-      <Slider defaultValue={50} onValueCommit={(value, details) => log(`Saved ${value} (${details.reason})`)}>
+      <Slider
+        defaultValue={50}
+        onValueCommit={(value, details) =>
+          log(`Saved ${value} (${details.reason})`)
+        }
+      >
         <div data-slot="row">
           <FieldLabel>Brightness</FieldLabel>
           <SliderValue />

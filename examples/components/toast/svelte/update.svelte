@@ -1,7 +1,12 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
   import { CircleCheckIcon, LoaderCircleIcon } from "@lucide/svelte"
-  import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import {
+    Toast,
+    ToastRegion,
+    ToastTitle,
+    createToaster,
+  } from "@ui-sdk/svelte/toast"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -21,10 +26,16 @@
       const done = progress >= 100
       const open = toast.update(
         id,
-        done ? { title: "Report uploaded", type: "success" } : { title: `Uploading report.pdf… ${progress}%` },
+        done
+          ? { title: "Report uploaded", type: "success" }
+          : { title: `Uploading report.pdf… ${progress}%` }
       )
-      if (!open) log("Upload canceled")
-      if (done || !open) clearInterval(timer)
+      if (!open) {
+        log("Upload canceled")
+      }
+      if (done || !open) {
+        clearInterval(timer)
+      }
     }, 700)
   }
 </script>

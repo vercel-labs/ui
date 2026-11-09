@@ -25,8 +25,13 @@ const action = ref("")
 const committed = ref("")
 const submitted = ref("")
 
-function onValueChange(value: string, details: { reason: string; cancel: () => void }) {
-  if (cancel) return details.cancel()
+function onValueChange(
+  value: string,
+  details: { reason: string; cancel: () => void }
+) {
+  if (cancel) {
+    return details.cancel()
+  }
   action.value = `${value}:${details.reason}`
 }
 
@@ -36,7 +41,10 @@ function onValueCommit(value: string, details: { reason: string }) {
 
 function onSubmit(event: SubmitEvent) {
   const form = event.currentTarget as HTMLFormElement
-  submitted.value = Array.from(new FormData(form), ([key, value]) => `${key}=${value}`).join("&")
+  submitted.value = Array.from(
+    new FormData(form),
+    ([key, value]) => `${key}=${value}`
+  ).join("&")
 }
 </script>
 
@@ -66,13 +74,19 @@ function onSubmit(event: SubmitEvent) {
       <ColorPickerSwatch />
       <ColorPickerEyeDropper>Pick from screen</ColorPickerEyeDropper>
       <ColorPickerSwatches aria-label="Presets">
-        <ColorPickerSwatchItem v-for="swatch in colorPickerFixture.swatches" :key="swatch" :value="swatch" />
+        <ColorPickerSwatchItem
+          v-for="swatch in colorPickerFixture.swatches"
+          :key="swatch"
+          :value="swatch"
+        />
       </ColorPickerSwatches>
     </ColorPicker>
     <button type="button">After</button>
     <button type="submit">Save</button>
     <button type="reset">Reset</button>
-    <button type="button" @click="controller.setValue('rebeccapurple')">Use purple</button>
+    <button type="button" @click="controller.setValue('rebeccapurple')">
+      Use purple
+    </button>
     <output role="status" aria-label="Last action">{{ action }}</output>
     <output aria-label="Committed">{{ committed }}</output>
     <output aria-label="Submitted">{{ submitted }}</output>

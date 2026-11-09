@@ -13,21 +13,33 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
 // The fixture's status region and an explicit aria-disabled="false" add phrases
 // that say nothing about the tabs.
 const withoutNoise = (log: string[]) =>
-  log.filter((phrase) => !phrase.startsWith("polite:")).map((phrase) => phrase.replace(", not disabled", ""))
+  log
+    .filter((phrase) => !phrase.startsWith("polite:"))
+    .map((phrase) => phrase.replace(", not disabled", ""))
 
 // Tabs into the list, walks every tab, then moves into the selected panel and back.
-test("announcements while using the tabs with a keyboard", async ({ page, open, tab }) => {
+test("announcements while using the tabs with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("tabs", { sr: "" })
   const log = await record(page, async () => {
     await page.getByRole("button", { name: "Before" }).focus()

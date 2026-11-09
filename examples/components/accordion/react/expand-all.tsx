@@ -15,27 +15,32 @@ const weeks = [
   {
     value: "week-1",
     label: "Week 1: Foundations",
-    content: "Set up your editor, meet the command line and write your first script.",
+    content:
+      "Set up your editor, meet the command line and write your first script.",
   },
   {
     value: "week-2",
     label: "Week 2: Data and types",
-    content: "Strings, numbers, lists and objects, and how to tell them apart when a program runs.",
+    content:
+      "Strings, numbers, lists and objects, and how to tell them apart when a program runs.",
   },
   {
     value: "week-3",
     label: "Week 3: Control flow",
-    content: "Conditions, loops and functions. The project this week is a small text adventure.",
+    content:
+      "Conditions, loops and functions. The project this week is a small text adventure.",
   },
   {
     value: "week-4",
     label: "Week 4: Working with files",
-    content: "Read and write files, parse CSV and JSON, and handle the errors that come with them.",
+    content:
+      "Read and write files, parse CSV and JSON, and handle the errors that come with them.",
   },
   {
     value: "week-5",
     label: "Week 5: Final project",
-    content: "Build a tool you'll use yourself, then present it to the group in a five-minute demo.",
+    content:
+      "Build a tool you'll use yourself, then present it to the group in a five-minute demo.",
   },
 ]
 
@@ -74,7 +79,9 @@ function Week({ week }: { week: (typeof weeks)[number] }) {
         pressed.current = open && details.reason === "trigger-press"
       }}
       onOpenChangeComplete={(open) => {
-        if (open && pressed.current) item.current?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+        if (open && pressed.current) {
+          item.current?.scrollIntoView({ block: "nearest", behavior: "smooth" })
+        }
       }}
     >
       <AccordionHeader>

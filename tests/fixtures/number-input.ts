@@ -61,7 +61,9 @@ function numberInputOptions() {
     disabledIncrement: params.has("disabled-increment"),
     disabledIncrementButton: params.get("disabled-increment") === "button",
     locale: params.get("locale") ?? "en-US",
-    amountMin: params.has("negative") ? undefined : numberInputFixture.amount.min,
+    amountMin: params.has("negative")
+      ? undefined
+      : numberInputFixture.amount.min,
     cancel: params.get("cancel"),
     controlled: params.has("controlled"),
   }

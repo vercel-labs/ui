@@ -38,12 +38,17 @@ const PaginationContext = createContext<PaginationContextValue | null>(null)
 
 function usePagination(part: string) {
   const context = useContext(PaginationContext)
-  if (!context) throw new Error(`${part} must be used inside <Pagination>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Pagination>.`)
+  }
   return context
 }
 
 // The part's element, unless the user renders their own: a link or a button, as the pagination decides.
-function tagged(pagination: PaginationContextValue, props: Record<string, any>) {
+function tagged(
+  pagination: PaginationContextValue,
+  props: Record<string, any>
+) {
   return merge(props, {
     get render() {
       return props.render ?? renderAs(pagination.tag)
@@ -55,7 +60,9 @@ function tagged(pagination: PaginationContextValue, props: Record<string, any>) 
  * A navigation landmark around the page links. Name it with `aria-label`.
  * @stable
  */
-function Pagination(props: PaginationOptions & PartProps<"nav", PaginationState>) {
+function Pagination(
+  props: PaginationOptions & PartProps<"nav", PaginationState>
+) {
   const pagination = usePrimitive(paginationPrimitive, () => ({
     page: props.page,
     defaultPage: props.defaultPage,
@@ -81,10 +88,12 @@ function Pagination(props: PaginationOptions & PartProps<"nav", PaginationState>
     "boundaries",
     "getHref",
     "controller",
-    "debug",
+    "debug"
   )
   // Merged, not spread: the handle's `state` is a getter.
-  const context = merge(pagination, { tag: () => (props.getHref ? ("a" as const) : ("button" as const)) })
+  const context = merge(pagination, {
+    tag: () => (props.getHref ? ("a" as const) : ("button" as const)),
+  })
   return (
     <PaginationContext value={context}>
       {usePart(pagination, "root", undefined, rest, "nav")}
@@ -109,19 +118,32 @@ function PaginationList(props: PartProps<"ul", PaginationState>) {
   // previous range. Made once, under the list, the first time its children
   // render.
   const withItems = (state: PaginationState) => {
-    if (view) return view
-    const items = runWithOwner(owner, () => createProjection<PaginationRangeItem[]>(() => state.items, []))
+    if (view) {
+      return view
+    }
+    const items = runWithOwner(owner, () =>
+      createProjection<PaginationRangeItem[]>(() => state.items, [])
+    )
     return (view = new Proxy(state, {
-      get: (target, key) => (key === "items" ? items : target[key as keyof PaginationState]),
+      get: (target, key) =>
+        key === "items" ? items : target[key as keyof PaginationState],
     }))
   }
   const children = (state: PaginationState) => {
     const content = props.children
-    if (typeof content === "function" && content.length > 0) return content(withItems(state))
+    if (typeof content === "function" && content.length > 0) {
+      return content(withItems(state))
+    }
     // A function that takes nothing is a child component's accessor, which renders as it is.
     return content as JSX.Element
   }
-  return usePart(pagination, "list", undefined, merge(props, { children }), "ul")
+  return usePart(
+    pagination,
+    "list",
+    undefined,
+    merge(props, { children }),
+    "ul"
+  )
 }
 
 /**
@@ -134,7 +156,9 @@ const PaginationItem = parts.Item
  * A page. The current one has `aria-current="page"`. Shows its number unless it has children.
  * @stable
  */
-function PaginationLink(props: PartProps<"a", PaginationLinkState> & PaginationLinkProps) {
+function PaginationLink(
+  props: PartProps<"a", PaginationLinkState> & PaginationLinkProps
+) {
   const pagination = usePagination("PaginationLink")
   // Keyed by its page, which isn't a string value.
   const part = () => ({ page: props.page, id: String(props.page) })
@@ -148,9 +172,19 @@ function PaginationLink(props: PartProps<"a", PaginationLinkState> & PaginationL
 
 type StepProps = PartProps<"a", PaginationStepState>
 
-function stepPart(name: "previous" | "next" | "first" | "last", part: string, props: StepProps) {
+function stepPart(
+  name: "previous" | "next" | "first" | "last",
+  part: string,
+  props: StepProps
+) {
   const pagination = usePagination(part)
-  return usePart(pagination, name, undefined, tagged(pagination, props), "button")
+  return usePart(
+    pagination,
+    name,
+    undefined,
+    tagged(pagination, props),
+    "button"
+  )
 }
 
 /**
@@ -194,7 +228,10 @@ function PaginationEllipsis(props: ComponentProps<typeof parts.Ellipsis>) {
   return <parts.Ellipsis {...props}>{props.children ?? "…"}</parts.Ellipsis>
 }
 
-export { createPaginationController, paginationRange } from "@ui-sdk/core/pagination"
+export {
+  createPaginationController,
+  paginationRange,
+} from "@ui-sdk/core/pagination"
 export type {
   PaginationChangeOptions,
   PaginationController,

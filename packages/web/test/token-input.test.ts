@@ -21,7 +21,8 @@ function tokenInputs(count: number) {
   const inputs = [...document.querySelectorAll("ui-token-input")]
   const menu = document.querySelector("ui-trigger-menu")!
   // The editor a token input has now, and the one its trigger menu suggests into.
-  const editorOf = (input: Element) => instanceOf<{ editor: object }>(input)?.api.editor
+  const editorOf = (input: Element) =>
+    instanceOf<{ editor: object }>(input)?.api.editor
   const used = () => instanceOf(menu)?.get() as { editor?: object } | undefined
   return { inputs, menu, editor: editorOf, used }
 }
@@ -51,7 +52,9 @@ test("a trigger menu moved into another token input suggests into that one's edi
 
 // What each token's host shows: its content, then its kind.
 const hosts = () =>
-  [...document.querySelectorAll("[data-slot='token-input-host']")].map((host) => host.textContent)
+  [...document.querySelectorAll("[data-slot='token-input-host']")].map(
+    (host) => host.textContent
+  )
 
 test("tokens a token input starts with show only their template", async () => {
   tokenInputs(1)
@@ -94,11 +97,14 @@ test("a new renderToken renders into the nodes the last one left, for renderers 
     renderToken?: (token: { label: string }, host: HTMLElement) => void
   }
   const nodes = new WeakMap<HTMLElement, Text>()
-  const renderWith = (prefix: string) => (token: { label: string }, host: HTMLElement) => {
-    let node = nodes.get(host)
-    if (!node) nodes.set(host, (node = host.appendChild(document.createTextNode(""))))
-    node.textContent = `${prefix} ${token.label}`
-  }
+  const renderWith =
+    (prefix: string) => (token: { label: string }, host: HTMLElement) => {
+      let node = nodes.get(host)
+      if (!node) {
+        nodes.set(host, (node = host.appendChild(document.createTextNode(""))))
+      }
+      node.textContent = `${prefix} ${token.label}`
+    }
   input.renderToken = renderWith("First")
   await wait()
   expect(hosts()).toEqual(["First routes.ts file"])

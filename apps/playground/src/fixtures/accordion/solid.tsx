@@ -26,8 +26,13 @@ function Fixture() {
         controller={controller}
         {...options}
         onValueChange={(value, details) => {
-          if (cancel && value.includes(cancel) && !controller.getValue().includes(cancel))
+          if (
+            cancel &&
+            value.includes(cancel) &&
+            !controller.getValue().includes(cancel)
+          ) {
             return details.cancel()
+          }
           setAction(describeValue(value))
         }}
       >
@@ -37,10 +42,14 @@ function Fixture() {
               class="accordion-item"
               value={item.value}
               disabled={item.disabled && !warrantyEnabled()}
-              onOpenChangeComplete={(open) => setComplete(`${item.value} ${open ? "open" : "closed"}`)}
+              onOpenChangeComplete={(open) =>
+                setComplete(`${item.value} ${open ? "open" : "closed"}`)
+              }
             >
               <AccordionHeader class="accordion-header">
-                <AccordionTrigger class="accordion-trigger">{item.label}</AccordionTrigger>
+                <AccordionTrigger class="accordion-trigger">
+                  {item.label}
+                </AccordionTrigger>
               </AccordionHeader>
               <AccordionPanel class="accordion-panel">
                 {item.content}
@@ -51,7 +60,9 @@ function Fixture() {
                   </label>
                 </Show>
                 <Show when={item.close}>
-                  <button onClick={() => controller.close(item.value)}>{item.close}</button>
+                  <button onClick={() => controller.close(item.value)}>
+                    {item.close}
+                  </button>
                 </Show>
               </AccordionPanel>
             </AccordionItem>
@@ -64,7 +75,9 @@ function Fixture() {
       </output>
       <output aria-label="Last completed">{complete()}</output>
       <button onClick={() => controller.open("support")}>Show support</button>
-      <button onClick={() => setWarrantyEnabled((enabled) => !enabled)}>Toggle warranty</button>
+      <button onClick={() => setWarrantyEnabled((enabled) => !enabled)}>
+        Toggle warranty
+      </button>
     </div>
   )
 }

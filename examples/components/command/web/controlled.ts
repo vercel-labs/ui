@@ -19,7 +19,10 @@ function mount(root: HTMLElement) {
         </ui-command-page>
         <ui-command-page value="theme">
           ${themes
-            .map((theme) => `<ui-command-item value="${theme.value}">${theme.label}</ui-command-item>`)
+            .map(
+              (theme) =>
+                `<ui-command-item value="${theme.value}">${theme.label}</ui-command-item>`
+            )
             .join("")}
         </ui-command-page>
       </ui-command-list>
@@ -27,15 +30,23 @@ function mount(root: HTMLElement) {
   `
   const command = root.querySelector("ui-command")!
   command.addEventListener("valuechange", (event) =>
-    log(root, `Highlighted ${event.detail.value ?? "nothing"} (${event.detail.reason})`),
+    log(
+      root,
+      `Highlighted ${event.detail.value ?? "nothing"} (${event.detail.reason})`
+    )
   )
   command.addEventListener("querychange", (event) =>
-    log(root, `Query “${event.detail.value}” (${event.detail.reason})`),
+    log(root, `Query “${event.detail.value}” (${event.detail.reason})`)
   )
   command.addEventListener("pageschange", (event) =>
-    log(root, `Pages [${event.detail.value.join(", ")}] (${event.detail.reason})`),
+    log(
+      root,
+      `Pages [${event.detail.value.join(", ")}] (${event.detail.reason})`
+    )
   )
-  command.addEventListener("action", (event) => log(root, `Ran ${event.detail.value}`))
+  command.addEventListener("action", (event) =>
+    log(root, `Ran ${event.detail.value}`)
+  )
 }
 
 export { mount }

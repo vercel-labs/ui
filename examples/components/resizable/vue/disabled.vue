@@ -1,7 +1,15 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
-import { Checkbox, CheckboxIndicator, type CheckedState } from "@ui-sdk/vue/checkbox"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/vue/resizable"
+import {
+  Checkbox,
+  CheckboxIndicator,
+  type CheckedState,
+} from "@ui-sdk/vue/checkbox"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/vue/resizable"
 import { ref } from "vue"
 
 const locked = ref<CheckedState>(false)

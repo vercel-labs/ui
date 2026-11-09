@@ -15,7 +15,9 @@ afterEach(() => {
   sessionStorage.clear()
   for (const pair of document.cookie.split(";")) {
     const name = pair.split("=")[0]?.trim()
-    if (name) document.cookie = `${name}=; path=/; max-age=0`
+    if (name) {
+      document.cookie = `${name}=; path=/; max-age=0`
+    }
   }
 })
 
@@ -45,9 +47,15 @@ test("localStorage and sessionStorage keep separate values", () => {
 test("storages with the same ID hear each other's writes, and others don't", () => {
   const heard: (string | null)[] = []
   const other: (string | null)[] = []
-  cleanups.push(createLocalStorage("color-scheme").subscribe((value) => heard.push(value)))
-  cleanups.push(createLocalStorage("density").subscribe((value) => other.push(value)))
-  cleanups.push(createSessionStorage("color-scheme").subscribe((value) => other.push(value)))
+  cleanups.push(
+    createLocalStorage("color-scheme").subscribe((value) => heard.push(value))
+  )
+  cleanups.push(
+    createLocalStorage("density").subscribe((value) => other.push(value))
+  )
+  cleanups.push(
+    createSessionStorage("color-scheme").subscribe((value) => other.push(value))
+  )
   const writer = createLocalStorage("color-scheme")
   writer.set("dark")
   writer.remove()
@@ -57,11 +65,25 @@ test("storages with the same ID hear each other's writes, and others don't", () 
 
 test("hears another tab's write through the storage event", () => {
   const heard: (string | null)[] = []
-  cleanups.push(createLocalStorage("color-scheme").subscribe((value) => heard.push(value)))
+  cleanups.push(
+    createLocalStorage("color-scheme").subscribe((value) => heard.push(value))
+  )
   localStorage.setItem("color-scheme", "light")
-  window.dispatchEvent(new StorageEvent("storage", { key: "color-scheme", storageArea: localStorage }))
-  window.dispatchEvent(new StorageEvent("storage", { key: "density", storageArea: localStorage }))
-  window.dispatchEvent(new StorageEvent("storage", { key: "color-scheme", storageArea: sessionStorage }))
+  window.dispatchEvent(
+    new StorageEvent("storage", {
+      key: "color-scheme",
+      storageArea: localStorage,
+    })
+  )
+  window.dispatchEvent(
+    new StorageEvent("storage", { key: "density", storageArea: localStorage })
+  )
+  window.dispatchEvent(
+    new StorageEvent("storage", {
+      key: "color-scheme",
+      storageArea: sessionStorage,
+    })
+  )
   expect(heard).toEqual(["light"])
 })
 
@@ -84,12 +106,17 @@ test("a full storage reports the write failed", () => {
   const full = {
     getItem: () => null,
     setItem: (key: string) => {
-      if (key !== "__ui-sdk-storage__") throw new DOMException("Full", "QuotaExceededError")
+      if (key !== "__ui-sdk-storage__") {
+        throw new DOMException("Full", "QuotaExceededError")
+      }
     },
     removeItem: () => {},
   }
   const real = Object.getOwnPropertyDescriptor(window, "sessionStorage")!
-  Object.defineProperty(window, "sessionStorage", { configurable: true, get: () => full })
+  Object.defineProperty(window, "sessionStorage", {
+    configurable: true,
+    get: () => full,
+  })
   cleanups.push(() => Object.defineProperty(window, "sessionStorage", real))
   expect(createSessionStorage("color-scheme").set("dark")).toBe(false)
 })
@@ -111,13 +138,18 @@ test("a storage that was full takes writes again once space frees up, and reads 
   const area = {
     getItem: (key: string) => items.get(key) ?? null,
     setItem: (key: string, value: string) => {
-      if (full) throw new DOMException("Full", "QuotaExceededError")
+      if (full) {
+        throw new DOMException("Full", "QuotaExceededError")
+      }
       items.set(key, value)
     },
     removeItem: (key: string) => items.delete(key),
   }
   const real = Object.getOwnPropertyDescriptor(window, "sessionStorage")!
-  Object.defineProperty(window, "sessionStorage", { configurable: true, get: () => area })
+  Object.defineProperty(window, "sessionStorage", {
+    configurable: true,
+    get: () => area,
+  })
   cleanups.push(() => Object.defineProperty(window, "sessionStorage", real))
   const storage = createSessionStorage("color-scheme")
   expect(storage.available()).toBe(false)

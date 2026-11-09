@@ -15,8 +15,14 @@ import {
 import * as React from "react"
 
 const fruitGroups = [
-  { label: "Tree fruits", fruits: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"] },
-  { label: "Berries", fruits: ["Blackberry", "Blueberry", "Grape", "Strawberry"] },
+  {
+    label: "Tree fruits",
+    fruits: ["Apple", "Apricot", "Cherry", "Lemon", "Peach", "Pear"],
+  },
+  {
+    label: "Berries",
+    fruits: ["Blackberry", "Blueberry", "Grape", "Strawberry"],
+  },
   { label: "Tropical", fruits: ["Avocado", "Banana", "Mango", "Pineapple"] },
 ]
 

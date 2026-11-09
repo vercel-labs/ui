@@ -1,5 +1,11 @@
 import { confirm } from "@ui-sdk/react/alert-dialog"
-import { Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger } from "@ui-sdk/react/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@ui-sdk/react/dialog"
 import { OverlayHost } from "@ui-sdk/react/overlays"
 import {
   Toast,
@@ -31,7 +37,9 @@ function Fixture() {
       <Dialog>
         <DialogTrigger>{toastFixture.dialog.trigger}</DialogTrigger>
         <DialogContent className="dialog">
-          <DialogTitle className="title">{toastFixture.dialog.title}</DialogTitle>
+          <DialogTitle className="title">
+            {toastFixture.dialog.title}
+          </DialogTitle>
           <button onClick={toasts.basic}>{toastFixture.dialog.toast}</button>
           <DialogClose>{toastFixture.dialog.close}</DialogClose>
         </DialogContent>
@@ -39,8 +47,16 @@ function Fixture() {
       {host && (
         <button
           onClick={async () => {
-            const { title, confirm: confirmLabel, cancel } = toastFixture.confirm
-            const yes = await confirm({ title, confirmLabel, cancelLabel: cancel })
+            const {
+              title,
+              confirm: confirmLabel,
+              cancel,
+            } = toastFixture.confirm
+            const yes = await confirm({
+              title,
+              confirmLabel,
+              cancelLabel: cancel,
+            })
             setAction(yes ? "confirmed" : "declined")
           }}
         >
@@ -61,19 +77,29 @@ function Fixture() {
                 <ToastTitle />
                 <ToastDescription />
                 <ToastAction />
-                {toast.cancel && <ToastClose action={toast.cancel.onCancel}>{toast.cancel.label}</ToastClose>}
+                {toast.cancel && (
+                  <ToastClose action={toast.cancel.onCancel}>
+                    {toast.cancel.label}
+                  </ToastClose>
+                )}
               </Toast>
             ),
           }}
         />
       ) : (
-        <ToastRegion toaster={toasts.toast} className="toast-region" {...toastOptions()}>
+        <ToastRegion
+          toaster={toasts.toast}
+          className="toast-region"
+          {...toastOptions()}
+        >
           {() => (
             <Toast className="toast">
               <ToastTitle className="toast-title" />
               <ToastDescription className="toast-description" />
               <ToastAction className="toast-action" />
-              <ToastClose className="toast-close">{toastFixture.dismiss}</ToastClose>
+              <ToastClose className="toast-close">
+                {toastFixture.dismiss}
+              </ToastClose>
             </Toast>
           )}
         </ToastRegion>
@@ -86,7 +112,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

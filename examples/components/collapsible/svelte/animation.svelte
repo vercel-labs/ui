@@ -1,6 +1,10 @@
 <script lang="ts">
   import { ChevronDownIcon } from "@lucide/svelte"
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/svelte/collapsible"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "@ui-sdk/svelte/collapsible"
   import { useLog } from "../../../shared/svelte/log"
 
   const notes = [
@@ -14,7 +18,8 @@
 
 <Collapsible
   data-variant="card"
-  onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+  onOpenChangeComplete={(open) =>
+    log(open ? "Finished opening" : "Finished closing")}
 >
   <CollapsibleTrigger>
     <span data-slot="stack">

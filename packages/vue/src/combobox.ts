@@ -1,4 +1,10 @@
-import type { Anchor, ChangeDetails, DismissAttemptDetails, Side, StateOf } from "@ui-sdk/core"
+import type {
+  Anchor,
+  ChangeDetails,
+  DismissAttemptDetails,
+  Side,
+  StateOf,
+} from "@ui-sdk/core"
 import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
 import {
   combobox as comboboxPrimitive,
@@ -75,7 +81,8 @@ import { FormInputs } from "./form-inputs"
 import { renderless } from "./renderless"
 import { readOnlyOf } from "./text-control"
 
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("combobox-container")
+const ContainerKey: InjectionKey<() => PopupContainer> =
+  Symbol("combobox-container")
 
 type ValueDetails = ChangeDetails<ComboboxValueChangeReason>
 type QueryDetails = ChangeDetails<ComboboxQueryChangeReason>
@@ -101,14 +108,21 @@ const anyValue = { type: null as unknown as PropType<unknown> }
 // Generic over the value, like React's `Combobox<T>`: `v-model`, `@value-change`
 // and the items share `T`. One shape per `multiple`, so the value is a list
 // only with it, and a `multiple` known only at run time takes either.
-type ComboboxProps<T, Multiple extends boolean | undefined> = ComboboxOptions<T, Multiple> & {
+type ComboboxProps<T, Multiple extends boolean | undefined> = ComboboxOptions<
+  T,
+  Multiple
+> & {
   multiple?: Multiple
 }
 type ComboboxComponent = {
-  new <T = string>(props: RootPropsOf<ComboboxProps<T, false>>): RootInstanceOf<ComboboxProps<T, false>>
-  new <T = string>(props: RootPropsOf<ComboboxProps<T, true>>): RootInstanceOf<ComboboxProps<T, true>>
+  new <T = string>(
+    props: RootPropsOf<ComboboxProps<T, false>>
+  ): RootInstanceOf<ComboboxProps<T, false>>
+  new <T = string>(
+    props: RootPropsOf<ComboboxProps<T, true>>
+  ): RootInstanceOf<ComboboxProps<T, true>>
   new <T = string, Multiple extends boolean | undefined = boolean>(
-    props: RootPropsOf<ComboboxProps<T, Multiple> & { multiple: Multiple }>,
+    props: RootPropsOf<ComboboxProps<T, Multiple> & { multiple: Multiple }>
   ): RootInstanceOf<ComboboxProps<T, Multiple>>
 } & RenderableWith<ComboboxProps<any, boolean | undefined>>
 
@@ -131,18 +145,31 @@ const Combobox = /* @__PURE__ */ renderless(
       maxSelected: Number,
       items: Array as PropType<ListData<any>>,
       emptyItems: Array as PropType<ListData<any>>,
-      filter: { type: [String, Boolean, Function] as PropType<ListFilter<any>>, default: undefined },
-      announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
+      filter: {
+        type: [String, Boolean, Function] as PropType<ListFilter<any>>,
+        default: undefined,
+      },
+      announcement: Function as PropType<
+        (change: ListAnnouncement) => string | null | undefined
+      >,
       itemToValue: Function as PropType<(value: any) => string>,
       itemToLabel: Function as PropType<(value: any) => string>,
-      isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
-      autoHighlight: { type: [Boolean, String] as PropType<boolean | "always">, default: undefined },
+      isItemEqualToValue: Function as PropType<
+        (itemValue: any, value: any) => boolean
+      >,
+      autoHighlight: {
+        type: [Boolean, String] as PropType<boolean | "always">,
+        default: undefined,
+      },
       keepQuery: optionalBoolean,
       pendingAnnouncement: String,
       allowCustomValue: optionalBoolean,
       status: String as PropType<AsyncOptionsStatus>,
       loop: optionalBoolean,
-      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      modal: {
+        type: [Boolean, String] as PropType<boolean | "pointer">,
+        default: undefined,
+      },
       presentation: String as PropType<"auto" | "popover" | "sheet">,
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
@@ -163,7 +190,9 @@ const Combobox = /* @__PURE__ */ renderless(
       "update:open": (_open: boolean) => true,
       openChange: (_open: boolean, _details: OpenDetails) => true,
       openChangeComplete: (_open: boolean) => true,
-      dismissAttempt: (_details: DismissAttemptDetails<ComboboxDismissReason>) => true,
+      dismissAttempt: (
+        _details: DismissAttemptDetails<ComboboxDismissReason>
+      ) => true,
       highlight: (_value: unknown, _details: ListHighlightDetails) => true,
       loadMore: () => true,
     },
@@ -180,22 +209,31 @@ const Combobox = /* @__PURE__ */ renderless(
         onValueChange: (value: unknown, details: ValueDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
         onQueryChange: (query: string, details: QueryDetails) => {
           emit("queryChange", query, details)
-          if (!details.canceled) emit("update:query", query)
+          if (!details.canceled) {
+            emit("update:query", query)
+          }
         },
         onOpenChange: (open: boolean, details: OpenDetails) => {
           emit("openChange", open, details)
-          if (!details.canceled) emit("update:open", open)
+          if (!details.canceled) {
+            emit("update:open", open)
+          }
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-        onDismissAttempt: (details: DismissAttemptDetails<ComboboxDismissReason>) =>
-          emit("dismissAttempt", details),
-        onHighlight: (value: unknown, details: ListHighlightDetails) => emit("highlight", value, details),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
+        onDismissAttempt: (
+          details: DismissAttemptDetails<ComboboxDismissReason>
+        ) => emit("dismissAttempt", details),
+        onHighlight: (value: unknown, details: ListHighlightDetails) =>
+          emit("highlight", value, details),
         onLoadMore: () => emit("loadMore"),
       }))
       useControllerEntry(() => props.controller, combobox)
@@ -207,7 +245,8 @@ const Combobox = /* @__PURE__ */ renderless(
         // A data combobox renders its list, unless the app placed a ComboboxContent:
         // in the markup, or inside a component of its own.
         // Only a data one asks, so a composed one never renders again when its content mounts.
-        const own = !props.items || placed() || hasChild(children, ComboboxContent)
+        const own =
+          !props.items || placed() || hasChild(children, ComboboxContent)
         return [
           children,
           props.items && !own && h(NotPlaced, () => h(ComboboxContent)),
@@ -215,7 +254,7 @@ const Combobox = /* @__PURE__ */ renderless(
         ]
       }
     },
-  }),
+  })
 ) as unknown as ComboboxComponent
 
 /**
@@ -239,7 +278,7 @@ const ComboboxChips = /* @__PURE__ */ withElement(
       combobox.instance.use(comboboxChips)
       return usePart(combobox, "chips")
     },
-  }),
+  })
 )
 
 /**
@@ -257,10 +296,11 @@ const ComboboxChipsOverflow = /* @__PURE__ */ withElement(
       combobox.instance.use(comboboxChips)
       return usePart(combobox, "chips-overflow", undefined, undefined, {
         tag: "span",
-        children: (state) => slotContent(slots.default, { state }) ?? `+${state.count} more`,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? `+${state.count} more`,
       })
     },
-  }),
+  })
 )
 
 /**
@@ -285,7 +325,7 @@ const ComboboxInput = withElement(
         return element && inHeader(element)
       }
     },
-  }),
+  })
 )
 
 /**
@@ -328,16 +368,25 @@ const ComboboxContent = withElement(
         tag: "div",
         children: (state) => [
           header(),
-          defaultSlot(slots, state, () => combobox.state.items && h(ComboboxList)),
+          defaultSlot(
+            slots,
+            state,
+            () => combobox.state.items && h(ComboboxList)
+          ),
         ],
       })
       return () => {
         const element = part()
-        if (!element) return null
-        return renderPopup(sheetViewport(combobox, element), props.container ?? inherited())
+        if (!element) {
+          return null
+        }
+        return renderPopup(
+          sheetViewport(combobox, element),
+          props.container ?? inherited()
+        )
       }
     },
-  }),
+  })
 )
 
 /**
@@ -355,10 +404,15 @@ const ComboboxList = withElement(
       return usePart(combobox, "list", undefined, undefined, {
         tag: "div",
         children: (state) =>
-          defaultSlot(slots, state, () => combobox.state.items && h(ComboboxItems, { items: state.items })),
+          defaultSlot(
+            slots,
+            state,
+            () =>
+              combobox.state.items && h(ComboboxItems, { items: state.items })
+          ),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -385,7 +439,11 @@ const ComboboxItemText = withElement(
     slots: Object as PartSlots<typeof comboboxPrimitive, "item-text">,
     setup(_, { slots }) {
       const item = useScope(comboboxPrimitive)?.around.item
-      if (!item) throw new Error("<ComboboxItemText> must be used inside <ComboboxItem>.")
+      if (!item) {
+        throw new Error(
+          "<ComboboxItemText> must be used inside <ComboboxItem>."
+        )
+      }
       // The text it marks, read from its content as it renders.
       let text = ""
       let own: VNode[] | undefined
@@ -397,8 +455,9 @@ const ComboboxItemText = withElement(
         undefined,
         {
           tag: "span",
-          children: (state) => (own && ownText === undefined ? own : markSegments(state.segments)),
-        },
+          children: (state) =>
+            own && ownText === undefined ? own : markSegments(state.segments),
+        }
       )
       return () => {
         own = slotContent(slots.default, { state: part.state })
@@ -407,7 +466,7 @@ const ComboboxItemText = withElement(
         return part()
       }
     },
-  }),
+  })
 )
 
 /**
@@ -424,11 +483,13 @@ const ComboboxSelectAll = /* @__PURE__ */ withElement(
       const combobox = useCombobox()
       combobox.instance.use(comboboxSelectAll)
       const part = {
-        id: selectAllKey(useScope(comboboxPrimitive)?.around.group?.().id as string | undefined),
+        id: selectAllKey(
+          useScope(comboboxPrimitive)?.around.group?.().id as string | undefined
+        ),
       }
       return usePart(combobox, "select-all", () => part)
     },
-  }),
+  })
 )
 
 /**
@@ -438,7 +499,12 @@ const ComboboxSelectAll = /* @__PURE__ */ withElement(
  * @stable
  */
 const ComboboxItemIcon = /* @__PURE__ */ notLabel(
-  /* @__PURE__ */ defineItemIcon("ComboboxItemIcon", comboboxPrimitive, "item-icon", comboboxItemIcons),
+  /* @__PURE__ */ defineItemIcon(
+    "ComboboxItemIcon",
+    comboboxPrimitive,
+    "item-icon",
+    comboboxItemIcons
+  )
 )
 
 // Parts inside an item that aren't its label, beside those marked with `notLabel`.
@@ -452,7 +518,7 @@ const itemDecorations = new Set<unknown>([ComboboxItemIndicator])
 const ComboboxValueIcon = /* @__PURE__ */ defineValueIcon(
   "ComboboxValueIcon",
   comboboxPrimitive,
-  comboboxItemIcons,
+  comboboxItemIcons
 )
 
 /**
@@ -493,13 +559,17 @@ const ComboboxCreate = /* @__PURE__ */ (() =>
       setup(props, { slots }) {
         const combobox = useCombobox()
         combobox.instance.use(comboboxCreate)
-        const part = () => ({ onCreate: props.onCreate, minLength: props.minLength })
+        const part = () => ({
+          onCreate: props.onCreate,
+          minLength: props.minLength,
+        })
         return usePart(combobox, "create", part, undefined, {
           tag: "div",
-          children: (state) => slotContent(slots.default, { state }) ?? `Create “${state.query}”`,
+          children: (state) =>
+            slotContent(slots.default, { state }) ?? `Create “${state.query}”`,
         })
       },
-    }),
+    })
   ))()
 
 /**
@@ -518,7 +588,7 @@ const ComboboxEmpty = withElement(
         children: (state) => (state.empty ? slots.default?.({ state }) : null),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -542,10 +612,16 @@ type ValueState = StateOf<typeof comboboxPrimitive, "value">
 const ComboboxValue = /* @__PURE__ */ renderless(
   defineComponent({
     name: "ComboboxValue",
-    props: { maxLabels: Number, getMoreLabel: Function as PropType<(count: number) => string> },
+    props: {
+      maxLabels: Number,
+      getMoreLabel: Function as PropType<(count: number) => string>,
+    },
     slots: Object as SlotsType<{
       /** Renders the value from the part's state, and the value itself as `value`. */
-      default?: (scope: { state: ValueState; value: ValueState["value"] }) => VNode[]
+      default?: (scope: {
+        state: ValueState
+        value: ValueState["value"]
+      }) => VNode[]
     }>,
     setup(props, { slots }) {
       // Only its state: the part renders no element.
@@ -555,9 +631,11 @@ const ComboboxValue = /* @__PURE__ */ renderless(
       }))
       // Nothing selected renders nothing, not an empty text: the server leaves
       // that out, and hydration would match the next node against it.
-      return () => slotContent(slots.default, { state, value: state.value }) ?? (state.label || null)
+      return () =>
+        slotContent(slots.default, { state, value: state.value }) ??
+        (state.label || null)
     },
-  }),
+  })
 )
 
 /**
@@ -571,19 +649,25 @@ const ComboboxChip = /* @__PURE__ */ (() =>
     defineComponent({
       name: "ComboboxChip",
       inheritAttrs: false,
-      props: { value: { type: null as unknown as PropType<unknown>, required: true } },
+      props: {
+        value: { type: null as unknown as PropType<unknown>, required: true },
+      },
       slots: Object as PartSlots<typeof comboboxPrimitive, "chip">,
       setup(props, { slots }) {
         const combobox = useCombobox()
         combobox.instance.use(comboboxChips)
         provideProps(comboboxPrimitive, "chip", () => ({ value: props.value }))
-        const part = () => ({ id: combobox.api.internal.keyOf(props.value), value: props.value })
+        const part = () => ({
+          id: combobox.api.internal.keyOf(props.value),
+          value: props.value,
+        })
         return usePart(combobox, "chip", part, undefined, {
           tag: "div",
-          children: (state) => slotContent(slots.default, { state }) ?? state.label,
+          children: (state) =>
+            slotContent(slots.default, { state }) ?? state.label,
         })
       },
-    }),
+    })
   ))()
 
 /**
@@ -600,12 +684,19 @@ const ComboboxChipRemove = /* @__PURE__ */ withElement(
       const combobox = useCombobox()
       combobox.instance.use(comboboxChips)
       const chip = useScope(comboboxPrimitive)?.around.chip
-      if (!chip) throw new Error("<ComboboxChipRemove> must be used inside <ComboboxChip>.")
+      if (!chip) {
+        throw new Error(
+          "<ComboboxChipRemove> must be used inside <ComboboxChip>."
+        )
+      }
       const value = () => chip().value
-      const part = () => ({ id: combobox.api.internal.keyOf(value()), value: value() })
+      const part = () => ({
+        id: combobox.api.internal.keyOf(value()),
+        value: value(),
+      })
       return usePart(combobox, "chip-remove", part, undefined, "button")
     },
-  }),
+  })
 )
 
 /**

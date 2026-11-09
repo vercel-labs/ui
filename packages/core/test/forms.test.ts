@@ -1,5 +1,9 @@
 import { describe, expect, test, vi } from "vitest"
-import { checkbox, checkboxGroup, createCheckboxController } from "../src/components/checkbox/checkbox"
+import {
+  checkbox,
+  checkboxGroup,
+  createCheckboxController,
+} from "../src/components/checkbox/checkbox"
 import { groupChecked } from "../src/components/checkbox/checkbox-group"
 import { field } from "../src/components/field/field"
 import { switchPrimitive } from "../src/components/switch/switch"
@@ -18,7 +22,10 @@ describe("checkbox", () => {
       tabindex: "0",
     })
     const mixed = checkbox({ id: "c", defaultChecked: "indeterminate" })
-    expect(attrs(mixed.part("root"))).toMatchObject({ "aria-checked": "mixed", "data-indeterminate": "" })
+    expect(attrs(mixed.part("root"))).toMatchObject({
+      "aria-checked": "mixed",
+      "data-indeterminate": "",
+    })
     expect(partState(mixed.part("root"))).toEqual({
       checked: false,
       indeterminate: true,
@@ -30,12 +37,21 @@ describe("checkbox", () => {
 
   test("an indeterminate checkbox becomes checked, then toggles", () => {
     const onCheckedChange = vi.fn()
-    const instance = checkbox({ id: "c", defaultChecked: "indeterminate", onCheckedChange })
+    const instance = checkbox({
+      id: "c",
+      defaultChecked: "indeterminate",
+      onCheckedChange,
+    })
     instance.api.toggle()
     expect(instance.get().checked).toBe(true)
     instance.api.toggle()
     expect(instance.get().checked).toBe(false)
-    expect(onCheckedChange.mock.calls.map(([value, details]) => [value, details.reason])).toEqual([
+    expect(
+      onCheckedChange.mock.calls.map(([value, details]) => [
+        value,
+        details.reason,
+      ])
+    ).toEqual([
       [true, "imperative"],
       [false, "imperative"],
     ])
@@ -47,8 +63,12 @@ describe("checkbox", () => {
       instance.api.toggle()
       expect(instance.get().checked).toBe(false)
     }
-    expect(attrs(checkbox({ id: "c", readOnly: true }).part("root"))["aria-readonly"]).toBe("true")
-    expect(attrs(checkbox({ id: "c", disabled: true }).part("root"))).toMatchObject({
+    expect(
+      attrs(checkbox({ id: "c", readOnly: true }).part("root"))["aria-readonly"]
+    ).toBe("true")
+    expect(
+      attrs(checkbox({ id: "c", disabled: true }).part("root"))
+    ).toMatchObject({
       disabled: "",
       tabindex: undefined,
     })
@@ -65,13 +85,22 @@ describe("checkbox", () => {
   })
 
   test("a change can be cancelled", () => {
-    const instance = checkbox({ id: "c", onCheckedChange: (_, details) => details.cancel() })
+    const instance = checkbox({
+      id: "c",
+      onCheckedChange: (_, details) => details.cancel(),
+    })
     instance.api.toggle()
     expect(instance.get().checked).toBe(false)
   })
 
   test("the hidden input renders the default checkedness for the server and resets", () => {
-    const instance = checkbox({ id: "c", defaultChecked: true, name: "terms", value: "yes", required: true })
+    const instance = checkbox({
+      id: "c",
+      defaultChecked: true,
+      name: "terms",
+      value: "yes",
+      required: true,
+    })
     expect(attrs(instance.part("input"))).toMatchObject({
       type: "checkbox",
       name: "terms",
@@ -98,7 +127,9 @@ describe("checkbox", () => {
   test("the indicator shows while checked or indeterminate, or when kept mounted", () => {
     const instance = checkbox({ id: "c" })
     expect(present(instance.part("indicator", {}))).toBe(false)
-    expect(present(instance.part("indicator", { keepMounted: true }))).toBe(true)
+    expect(present(instance.part("indicator", { keepMounted: true }))).toBe(
+      true
+    )
     instance.api.setChecked("indeterminate")
     expect(present(instance.part("indicator", {}))).toBe(true)
   })
@@ -124,10 +155,15 @@ describe("checkbox", () => {
 describe("switch", () => {
   test("is a switch with a thumb that follows it", () => {
     const instance = switchPrimitive({ id: "s", defaultChecked: true })
-    expect(attrs(instance.part("root"))).toMatchObject({ role: "switch", "aria-checked": "true" })
+    expect(attrs(instance.part("root"))).toMatchObject({
+      role: "switch",
+      "aria-checked": "true",
+    })
     expect(attrs(instance.part("thumb"))).toMatchObject({ "data-checked": "" })
     instance.api.toggle()
-    expect(attrs(instance.part("thumb"))).toMatchObject({ "data-unchecked": "" })
+    expect(attrs(instance.part("thumb"))).toMatchObject({
+      "data-unchecked": "",
+    })
     expect(attrs(instance.part("thumb"))["data-state"]).toBeUndefined()
   })
 })
@@ -158,7 +194,9 @@ describe("radio group", () => {
 
   test("with nothing checked, the server renders one tab stop on the first enabled item", () => {
     const instance = radioGroup({ id: "r" })
-    expect(attrs(instance.part("root", { value: "a", disabled: true })).tabindex).toBeUndefined()
+    expect(
+      attrs(instance.part("root", { value: "a", disabled: true })).tabindex
+    ).toBeUndefined()
     expect(attrs(instance.part("root", { value: "b" })).tabindex).toBe("0")
     expect(attrs(instance.part("root", { value: "c" })).tabindex).toBe("-1")
   })
@@ -187,15 +225,24 @@ describe("radio group", () => {
   })
 
   test("required radios without a name still validate as one group", () => {
-    expect(attrs(radioGroup({ id: "r", required: true }).part("input", { value: "a" })).name).toBe("r")
-    expect(attrs(radioGroup({ id: "r" }).part("input", { value: "a" })).name).toBeUndefined()
+    expect(
+      attrs(
+        radioGroup({ id: "r", required: true }).part("input", { value: "a" })
+      ).name
+    ).toBe("r")
+    expect(
+      attrs(radioGroup({ id: "r" }).part("input", { value: "a" })).name
+    ).toBeUndefined()
   })
 })
 
 describe("field", () => {
   test("ties the label and control together by id", () => {
     const instance = field({ id: "f" })
-    expect(attrs(instance.part("label"))).toMatchObject({ id: "f-label", for: "f-control" })
+    expect(attrs(instance.part("label"))).toMatchObject({
+      id: "f-label",
+      for: "f-control",
+    })
     expect(attrs(instance.part("control"))).toMatchObject({ id: "f-control" })
   })
 
@@ -205,11 +252,16 @@ describe("field", () => {
     expect(present(instance.part("error", { match: true }))).toBe(true)
     const forced = field({ id: "f", invalid: true })
     expect(present(forced.part("error", {}))).toBe(true)
-    expect(attrs(forced.part("control"))).toMatchObject({ "aria-invalid": "true", "data-invalid": "" })
+    expect(attrs(forced.part("control"))).toMatchObject({
+      "aria-invalid": "true",
+      "data-invalid": "",
+    })
   })
 
   test("a disabled field disables its control", () => {
-    expect(attrs(field({ id: "f", disabled: true }).part("control"))).toMatchObject({
+    expect(
+      attrs(field({ id: "f", disabled: true }).part("control"))
+    ).toMatchObject({
       disabled: "",
       "data-disabled": "",
     })
@@ -218,7 +270,12 @@ describe("field", () => {
 
 describe("checkbox group", () => {
   test("children follow the group's value, and a parent follows the children", () => {
-    const group = checkboxGroup({ id: "g", defaultValue: ["a"], allValues: ["a", "b", "c"], name: "letters" })
+    const group = checkboxGroup({
+      id: "g",
+      defaultValue: ["a"],
+      allValues: ["a", "b", "c"],
+      name: "letters",
+    })
     const child = checkbox({ id: "c", value: "b", group: () => group.api })
     const parent = checkbox({ id: "p", parent: true, group: () => group.api })
     expect(child.get().checked).toBe(false)
@@ -231,7 +288,12 @@ describe("checkbox group", () => {
 
   test("a parent checks every value, then none", () => {
     const onValueChange = vi.fn()
-    const group = checkboxGroup({ id: "g", defaultValue: ["b"], allValues: ["a", "b", "c"], onValueChange })
+    const group = checkboxGroup({
+      id: "g",
+      defaultValue: ["b"],
+      allValues: ["a", "b", "c"],
+      onValueChange,
+    })
     const parent = checkbox({ id: "p", parent: true, group: () => group.api })
     parent.api.toggle()
     expect(group.get().value).toEqual(["a", "b", "c"])
@@ -258,10 +320,15 @@ describe("checkbox group", () => {
 
   test("a required group validates through one unnamed input", () => {
     const group = checkboxGroup({ id: "g", required: true, name: "letters" })
-    expect(attrs(group.part("group-input"))).toMatchObject({ type: "checkbox", required: "" })
+    expect(attrs(group.part("group-input"))).toMatchObject({
+      type: "checkbox",
+      required: "",
+    })
     expect(attrs(group.part("group-input")).name).toBeUndefined()
     // Its own slot, apart from the checkboxes' inputs.
-    expect(attrs(group.part("group-input"))["data-slot"]).toBe("checkbox-group-input")
+    expect(attrs(group.part("group-input"))["data-slot"]).toBe(
+      "checkbox-group-input"
+    )
     expect(attrs(group.part("group")).role).toBe("group")
   })
 

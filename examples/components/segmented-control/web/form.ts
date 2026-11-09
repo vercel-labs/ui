@@ -33,7 +33,10 @@ function mount(root: HTMLElement) {
   form.addEventListener("submit", (event) => {
     event.preventDefault()
     const data = new FormData(form)
-    log(root, `Saved theme=${data.get("theme")}, density=${data.get("density")}`)
+    log(
+      root,
+      `Saved theme=${data.get("theme")}, density=${data.get("density")}`
+    )
   })
 }
 

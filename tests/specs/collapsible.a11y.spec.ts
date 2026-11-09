@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 const states: [string, Record<string, string>][] = [
@@ -21,7 +23,9 @@ const states: [string, Record<string, string>][] = [
 for (const [name, options] of states) {
   test(`no axe violations ${name}`, async ({ page, open }) => {
     await open("collapsible", options)
-    await expect(page.getByRole("button", { name: fixture.trigger })).toBeVisible()
+    await expect(
+      page.getByRole("button", { name: fixture.trigger })
+    ).toBeVisible()
     expect(await audit(page)).toEqual([])
   })
 }

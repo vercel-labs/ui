@@ -14,20 +14,28 @@ import {
 
 const menu = (props: { defaultValue?: string; keepMounted?: boolean } = {}) =>
   createSSRApp(() =>
-    h(NavigationMenu, { "aria-label": "Main", defaultValue: props.defaultValue }, () => [
-      h(NavigationMenuList, () => [
-        h(NavigationMenuItem, { value: "products" }, () => [
-          h(NavigationMenuTrigger, () => "Products"),
-          h(NavigationMenuContent, { keepMounted: props.keepMounted }, () => [
-            h(NavigationMenuLink, { href: "/analytics" }, () => "Analytics"),
+    h(
+      NavigationMenu,
+      { "aria-label": "Main", defaultValue: props.defaultValue },
+      () => [
+        h(NavigationMenuList, () => [
+          h(NavigationMenuItem, { value: "products" }, () => [
+            h(NavigationMenuTrigger, () => "Products"),
+            h(NavigationMenuContent, { keepMounted: props.keepMounted }, () => [
+              h(NavigationMenuLink, { href: "/analytics" }, () => "Analytics"),
+            ]),
+          ]),
+          h(NavigationMenuItem, () => [
+            h(
+              NavigationMenuLink,
+              { href: "/pricing", current: true },
+              () => "Pricing"
+            ),
           ]),
         ]),
-        h(NavigationMenuItem, () => [
-          h(NavigationMenuLink, { href: "/pricing", current: true }, () => "Pricing"),
-        ]),
-      ]),
-      h(NavigationMenuViewport),
-    ]),
+        h(NavigationMenuViewport),
+      ]
+    )
   )
 
 // Runs with no DOM: any access to window or document during render throws.

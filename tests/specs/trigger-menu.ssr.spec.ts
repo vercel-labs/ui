@@ -7,9 +7,15 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
-test("the field hydrates without mismatches and opens the menu", async ({ page, open }) => {
+test("the field hydrates without mismatches and opens the menu", async ({
+  page,
+  open,
+}) => {
   await open("trigger-menu")
   const field = page.getByRole("textbox", { name: "Message" })
   await expect(field).toHaveAttribute("aria-autocomplete", "list")

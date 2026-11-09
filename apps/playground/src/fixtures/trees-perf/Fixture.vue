@@ -11,7 +11,12 @@ const folders = Array.from({ length: perfSize(200) }, (_, index) => index + 1)
   <div class="fixture" style="flex-direction: column; align-items: start">
     <button>Before</button>
     <Tree class="tree" aria-label="Folders">
-      <TreeItem v-for="n in folders" :key="n" class="tree-item" :value="`folder-${n}`">
+      <TreeItem
+        v-for="n in folders"
+        :key="n"
+        class="tree-item"
+        :value="`folder-${n}`"
+      >
         <TreeItemLabel class="tree-label">Folder {{ n }}</TreeItemLabel>
         <TreeGroup class="tree-group">
           <TreeItem class="tree-item" :value="`folder-${n}/a`">

@@ -19,16 +19,25 @@ The indicators, as a tablist with one tab stop. Its children get `pageCount` in 
   let {
     controller,
     ...rest
-  }: PartProps<"div", CarouselIndicatorGroupState> & CarouselControlProps = $props()
+  }: PartProps<"div", CarouselIndicatorGroupState> & CarouselControlProps =
+    $props()
 
-  const connected = useControllerTarget(() => controller, getContext<CarouselContext | undefined>(carouselPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<CarouselContext | undefined>(carouselPrimitive)
+  )
   const carousel = $derived(connected())
 </script>
 
 {#if carousel}
   <!-- A new carousel needs a new part, bound to its instance. -->
   {#key carousel.instance.id}
-    <Connected owner={carousel} partName="indicator-group" tag="div" {...rest} />
+    <Connected
+      owner={carousel}
+      partName="indicator-group"
+      tag="div"
+      {...rest}
+    />
   {/key}
 {:else}
   <!-- Until the carousel it names mounts, a control outside the carousel is a plain element. -->

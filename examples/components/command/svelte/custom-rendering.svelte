@@ -1,6 +1,12 @@
 <script lang="ts">
   import { CornerDownLeftIcon } from "@lucide/svelte"
-  import { Command, CommandInput, CommandItem, CommandItemText, CommandList } from "@ui-sdk/svelte/command"
+  import {
+    Command,
+    CommandInput,
+    CommandItem,
+    CommandItemText,
+    CommandList,
+  } from "@ui-sdk/svelte/command"
 
   const pages = ["Composition", "Installation", "Styling"]
 </script>
@@ -11,14 +17,17 @@
     {#each pages as page (page)}
       <CommandItem value={page}>
         {#snippet render({ props, state, children })}
-          <a {...props} href="#{page.toLowerCase()}">{@render children?.(state)}</a>
+          <a {...props} href="#{page.toLowerCase()}"
+            >{@render children?.(state)}</a
+          >
         {/snippet}
         {#snippet children(state)}
           <CommandItemText>
             {#snippet render({ props, state: text })}
               <span {...props}>
                 {#each text.segments as segment, index (index)}
-                  {#if segment.match}<strong>{segment.text}</strong>{:else}{segment.text}{/if}
+                  {#if segment.match}<strong>{segment.text}</strong
+                    >{:else}{segment.text}{/if}
                 {/each}
               </span>
             {/snippet}

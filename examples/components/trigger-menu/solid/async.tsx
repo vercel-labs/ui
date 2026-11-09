@@ -28,9 +28,9 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
         resolve(
           channels
             .filter((channel) => channel.includes(query.toLowerCase()))
-            .map((channel) => ({ value: channel, label: channel })),
+            .map((channel) => ({ value: channel, label: channel }))
         ),
-      600,
+      600
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -41,11 +41,18 @@ function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
 
 function Example() {
   return (
-    <TriggerMenu triggers={[{ char: "#", type: "channel", items: searchChannels }]}>
+    <TriggerMenu
+      triggers={[{ char: "#", type: "channel", items: searchChannels }]}
+    >
       <Field>
         <FieldLabel>Message</FieldLabel>
         <FieldControl
-          render={(props) => <TriggerMenuInput {...props} placeholder="Type # to link a channel…" />}
+          render={(props) => (
+            <TriggerMenuInput
+              {...props}
+              placeholder="Type # to link a channel…"
+            />
+          )}
         />
       </Field>
       <TriggerMenuContent>
@@ -59,7 +66,11 @@ function Example() {
           }
         </TriggerMenuStatus>
         <TriggerMenuEmpty>
-          {(state) => (state.empty && !state.loading ? `No channels match “${state.query}”` : null)}
+          {(state) =>
+            state.empty && !state.loading
+              ? `No channels match “${state.query}”`
+              : null
+          }
         </TriggerMenuEmpty>
         <TriggerMenuList>
           {(state) => (

@@ -1,18 +1,25 @@
 import * as React from "react"
-import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import {
+  Toast,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/react/toast"
 import { CircleCheckIcon, LoaderCircleIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {
   const log = useLog()
   const [toast] = React.useState(() => createToaster())
-  const timer = React.useRef<ReturnType<typeof setInterval> | undefined>(undefined)
+  const timer = React.useRef<ReturnType<typeof setInterval> | undefined>(
+    undefined
+  )
   React.useEffect(
     () => () => {
       clearInterval(timer.current)
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   function upload() {
@@ -26,10 +33,14 @@ function Example() {
         id,
         done
           ? { title: "Report uploaded", type: "success" }
-          : { title: `Uploading report.pdf… ${progress}%` },
+          : { title: `Uploading report.pdf… ${progress}%` }
       )
-      if (!open) log("Upload canceled")
-      if (done || !open) clearInterval(timer.current)
+      if (!open) {
+        log("Upload canceled")
+      }
+      if (done || !open) {
+        clearInterval(timer.current)
+      }
     }, 700)
   }
 

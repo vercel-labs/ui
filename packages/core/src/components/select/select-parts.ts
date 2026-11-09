@@ -1,7 +1,10 @@
 // Select's parts and the attributes they carry.
 import { dev } from "#dev"
 import { popupContentAttrs } from "../../foundation/popups/popup"
-import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
+import {
+  ownsEvent,
+  registerPopupElement,
+} from "../../foundation/popups/popup-elements"
 import { bindListContent } from "../../foundation/lists/listbox-popup"
 import { holdFocus } from "../../foundation/focus/press-keeps-focus"
 import {
@@ -25,8 +28,15 @@ import {
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
 import { flagWhileBound, settleFlag } from "../../foundation/kernel/bound-keys"
-import { itemIconsFeature, optionIcon, rememberIcon } from "../../foundation/lists/item-icon"
-import { itemTextPart, type ListItemTextProps } from "../../foundation/lists/listbox-search"
+import {
+  itemIconsFeature,
+  optionIcon,
+  rememberIcon,
+} from "../../foundation/lists/item-icon"
+import {
+  itemTextPart,
+  type ListItemTextProps,
+} from "../../foundation/lists/listbox-search"
 import { selectAllFeature } from "../../foundation/lists/listbox-select-all"
 import { idPart, openAttrs } from "../../foundation/kernel/attrs"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
@@ -82,7 +92,12 @@ function triggerState(state: SelectState, props: TriggerProps) {
   }
 }
 
-function itemState(state: SelectState, key: string, props: ItemProps, api: SelectApi) {
+function itemState(
+  state: SelectState,
+  key: string,
+  props: ItemProps,
+  api: SelectApi
+) {
   return {
     highlighted: state.highlighted === key,
     selected: api.internal.selection.isSelected(key, props.value),
@@ -136,7 +151,10 @@ const unreadByItems = {
   titled: [],
   described: [],
   modal: [],
-} satisfies Record<Exclude<keyof SelectState, "highlighted" | "listing">, readonly never[]>
+} satisfies Record<
+  Exclude<keyof SelectState, "highlighted" | "listing">,
+  readonly never[]
+>
 
 // Focus stays in the search field while there is one, unless a touch screen reader moved it into the list.
 const searching = (state: SelectState) => state.searchable && !state.focusInList
@@ -168,10 +186,14 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         type: "button",
         "aria-haspopup": "listbox",
         "aria-expanded": String(state.open),
-        "aria-controls": state.mounted ? `${id}-${state.listed ? "list" : "content"}` : undefined,
+        "aria-controls": state.mounted
+          ? `${id}-${state.listed ? "list" : "content"}`
+          : undefined,
         // Until a SelectLabel is known to be missing, it names the trigger, unless something else does.
         "aria-labelledby":
-          state.labeled || (state.labeled === null && !props.named) ? `${id}-label` : undefined,
+          state.labeled || (state.labeled === null && !props.named)
+            ? `${id}-label`
+            : undefined,
         "aria-readonly": state.readOnly ? "true" : undefined,
         "aria-required": state.required ? "true" : undefined,
         disabled: disabled ? "" : undefined,
@@ -186,8 +208,16 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
     on: {
       keydown: (event, { api, el }) => api.internal.onTriggerKeyDown(event, el),
       pointerdown(event, { api, el, props, store }) {
-        if (event.button !== 0 || event.pointerType === "touch" || props.disabled) return
-        if (isDisabled(store.get())) return
+        if (
+          event.button !== 0 ||
+          event.pointerType === "touch" ||
+          props.disabled
+        ) {
+          return
+        }
+        if (isDisabled(store.get())) {
+          return
+        }
         // Mouse and pen open on press, like native selects. The click that follows is ignored.
         api.internal.pointerPress(el!, event)
       },
@@ -195,31 +225,45 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       focusin: (event, { api }) => api.internal.prepare(),
     },
     press({ api, props, store }, event) {
-      if (props.disabled || api.internal.consumePressClick()) return
-      if (store.get().open) api.internal.hide({ reason: "trigger-press", event })
-      else api.internal.show({ event, reason: "trigger-press" })
+      if (props.disabled || api.internal.consumePressClick()) {
+        return
+      }
+      if (store.get().open) {
+        api.internal.hide({ reason: "trigger-press", event })
+      } else {
+        api.internal.show({ event, reason: "trigger-press" })
+      }
     },
     bind(el, { api, id, store }) {
       settleFlag(store, "labeled")
       // A value whose label or icon only its item knows: render the list
       // hidden so the item registers, once the parts that render now have.
-      if (!store.get().items && !api.internal.options().itemToLabel)
+      if (!store.get().items && !api.internal.options().itemToLabel) {
         queueMicrotask(
-          () => api.internal.selection.needsItems(api.internal.hasValueIcon()) && api.internal.prepare(),
+          () =>
+            api.internal.selection.needsItems(api.internal.hasValueIcon()) &&
+            api.internal.prepare()
         )
-      if (dev)
+      }
+      if (dev) {
         warnIfUnnamed(
           el,
           "The trigger has no accessible name. Add a SelectLabel, a Field label or an aria-label.",
           { component: "select", id },
-          () => !!store.get().labeled,
+          () => !!store.get().labeled
         )
+      }
     },
   }),
 
   value: slot<ValueProps, SelectValueState>({
     // `text` is internal: passed by renderers.
-    props: { placeholder: "string", maxLabels: "number", getMoreLabel: "value", text: "boolean" },
+    props: {
+      placeholder: "string",
+      maxLabels: "number",
+      getMoreLabel: "value",
+      text: "boolean",
+    },
     state: (state, { api, props }) => {
       const labels = api.internal.selection.labels()
       return {
@@ -234,14 +278,18 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       "data-placeholder": hasValue(state) ? undefined : "",
     }),
     bind(el, { api, store, props }) {
-      if (!props.text) return
+      if (!props.text) {
+        return
+      }
       // Web components without their own content show the label, or the placeholder.
       const write = () => {
         const labels = api.internal.selection.labels()
         const text = labels.length
           ? formatLabels(labels, props)
           : (props.placeholder ?? store.get().placeholder ?? "")
-        if (el.textContent !== text) el.textContent = text
+        if (el.textContent !== text) {
+          el.textContent = text
+        }
       }
       write()
       return store.subscribe(write)
@@ -263,7 +311,8 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
     },
     connect: registerPopupElement,
     state: contentState,
-    present: (state, { props }) => state.mounted || !!props.keepMounted || state.prepared,
+    present: (state, { props }) =>
+      state.mounted || !!props.keepMounted || state.prepared,
     role: (state) => (state.listed ? undefined : "listbox"),
     roles: ["listbox"],
     // The search field keeps Home, End, Space and typed text for its own editing.
@@ -273,15 +322,23 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         : [...listStepKeys, "Home", "End", "Enter", " ", "Tab", "typeahead"],
     attrs: (state, { id }) => ({
       ...popupContentAttrs(state, id),
-      "aria-multiselectable": !state.listed && state.multiple ? "true" : undefined,
-      "aria-labelledby": state.listed ? undefined : state.labeled ? `${id}-label` : `${id}-trigger`,
-      "aria-busy": !state.listed && state.status === "loading" ? "true" : undefined,
+      "aria-multiselectable":
+        !state.listed && state.multiple ? "true" : undefined,
+      "aria-labelledby": state.listed
+        ? undefined
+        : state.labeled
+          ? `${id}-label`
+          : `${id}-trigger`,
+      "aria-busy":
+        !state.listed && state.status === "loading" ? "true" : undefined,
       "data-presentation": state.presentation,
     }),
     on: {
       keydown(event, { api, el }) {
         // Keys from a popup nested inside bubble through. Only the owner handles them.
-        if (ownsEvent(el!, event)) api.internal.onContentKeyDown(event)
+        if (ownsEvent(el!, event)) {
+          api.internal.onContentKeyDown(event)
+        }
       },
     },
     bind(el, part) {
@@ -290,7 +347,9 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
         part,
         anchor: internal.triggerElement,
         // The selected item over the trigger, when the content asks and it fits.
-        aligned: () => !!internal.contentProps(part.key).alignItemWithTrigger && internal.alignedAnchor(el),
+        aligned: () =>
+          !!internal.contentProps(part.key).alignItemWithTrigger &&
+          internal.alignedAnchor(el),
       })
     },
   }),
@@ -318,7 +377,9 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
   input: slot<{}, SelectInputState>({
     role: "combobox",
     focus: "native",
-    keys: { none: "The content around it handles them as they bubble from the field." },
+    keys: {
+      none: "The content around it handles them as they bubble from the field.",
+    },
     state: (state) => ({ open: state.open, disabled: isDisabled(state) }),
     attrs: (state, { id }) => ({
       id: `${id}-input`,
@@ -332,7 +393,9 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       "aria-controls": `${id}-list`,
       disabled: isDisabled(state) ? "" : undefined,
     }),
-    live: live((state, { api }) => ({ "aria-activedescendant": api.internal.activeDescendant(state) })),
+    live: live((state, { api }) => ({
+      "aria-activedescendant": api.internal.activeDescendant(state),
+    })),
     on: { input: (event, { api }) => api.internal.typed(event) },
     bind(el, { api, id, store }) {
       // At once, since focus moves in a microtask after the list binds, and it must find the field.
@@ -340,18 +403,28 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       // The DOM property, since an input's value attribute stops applying once someone types.
       const input = el as HTMLInputElement
       const write = () => {
-        if (input.value !== store.get().query) input.value = store.get().query
+        if (input.value !== store.get().query) {
+          input.value = store.get().query
+        }
       }
       write()
-      if (dev)
-        warnIfUnnamed(el, "The search field has no accessible name. Add an aria-label.", {
-          component: "select",
-          id,
-        })
+      if (dev) {
+        warnIfUnnamed(
+          el,
+          "The search field has no accessible name. Add an aria-label.",
+          {
+            component: "select",
+            id,
+          }
+        )
+      }
       const unsubscribe = store.subscribe(write)
       return () => {
         unsubscribe()
-        queueMicrotask(() => !api.internal.searchElement() && store.set({ searchable: false }))
+        queueMicrotask(
+          () =>
+            !api.internal.searchElement() && store.set({ searchable: false })
+        )
       }
     },
   }),
@@ -367,7 +440,11 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
       // Internal: passed by renderers, from the group it's inside.
       group: { kind: "string", from: "group.id" },
     },
-    selects: selects({ highlighted: ({ key }) => [key], listing: ({ key }) => [key], ...unreadByItems }),
+    selects: selects({
+      highlighted: ({ key }) => [key],
+      listing: ({ key }) => [key],
+      ...unreadByItems,
+    }),
     state: (state, { key, props, api }) => itemState(state, key, props, api),
     attrs: (state, { id, key, props, api }) => {
       const { selected, disabled } = itemState(state, key, props, api)
@@ -384,12 +461,16 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
     },
     // Typing hides options without rendering them.
     direct: direct(["hidden"]),
-    live: live((state, { key }) => ({ "data-highlighted": state.highlighted === key ? "" : undefined })),
+    live: live((state, { key }) => ({
+      "data-highlighted": state.highlighted === key ? "" : undefined,
+    })),
     on: {
       pointermove: (event, { api, key }) => api.internal.hover(key, event),
       // Presses keep focus in the search field, so typing goes on.
-      pointerdown: (event, context) => searching(context.store.get()) && holdFocus(event, context),
-      mousedown: (event, context) => searching(context.store.get()) && holdFocus(event, context),
+      pointerdown: (event, context) =>
+        searching(context.store.get()) && holdFocus(event, context),
+      mousedown: (event, context) =>
+        searching(context.store.get()) && holdFocus(event, context),
     },
     press: ({ api, key }, event) => api.internal.choose(key, event),
     bind(el, context) {
@@ -398,10 +479,12 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
   }),
 
   // The item's text, with what the search matched in `<mark>`.
-  "item-text": slot<ListItemTextProps, SelectItemTextState>(itemTextPart<SelectState, SelectApi>()),
+  "item-text": slot<ListItemTextProps, SelectItemTextState>(
+    itemTextPart<SelectState, SelectApi>()
+  ),
 
   "item-indicator": slot<IndicatorProps, SelectItemIndicatorState>(
-    itemIndicatorPart<SelectState, SelectApi>(),
+    itemIndicatorPart<SelectState, SelectApi>()
   ),
 
   group: slot(optionGroupPart<SelectState, SelectApi>()),
@@ -416,7 +499,8 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
 
   clear: slot<SelectClearProps, SelectClearState>({
     props: { keepMounted: "boolean" },
-    present: (state, { props }) => !!props.keepMounted || (hasValue(state) && !isLocked(state)),
+    present: (state, { props }) =>
+      !!props.keepMounted || (hasValue(state) && !isLocked(state)),
     state: (state) => ({ disabled: isLocked(state) }),
     attrs: (state) => ({
       type: "button",
@@ -440,13 +524,20 @@ const selectSlots = (slot: SlotFactory<SelectState, SelectApi>) => ({
 // feature with `use` before it reads a slot.
 
 /** An option that selects every item that matches, in its group or in the whole list, with `multiple`. */
-const selectSelectAll = /* @__PURE__ */ selectAllFeature<SelectState, SelectApi>({ focus: "roving" })
+const selectSelectAll = /* @__PURE__ */ selectAllFeature<
+  SelectState,
+  SelectApi
+>({ focus: "roving" })
 
 /**
  * An icon inside an item, and the selected item's icon for the trigger. In a
  * function, since bundlers keep a spread argument even of a pure call.
  */
 const selectItemIcons = /* @__PURE__ */ (() =>
-  itemIconsFeature<SelectState, SelectApi>({ component: "select", ...optionIcon, register: rememberIcon }))()
+  itemIconsFeature<SelectState, SelectApi>({
+    component: "select",
+    ...optionIcon,
+    register: rememberIcon,
+  }))()
 
 export { selectItemIcons, selectSelectAll, selectSlots }

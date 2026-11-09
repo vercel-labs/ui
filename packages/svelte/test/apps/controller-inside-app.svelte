@@ -16,7 +16,9 @@
   } = $props()
 </script>
 
-<Root controller={around}><Trigger controller={other} id="trigger">Open</Trigger></Root>
+<Root controller={around}
+  ><Trigger controller={other} id="trigger">Open</Trigger></Root
+>
 {#if other !== around}
   <Root controller={other}>
     {#if Content}<Content id="other-content" />{/if}

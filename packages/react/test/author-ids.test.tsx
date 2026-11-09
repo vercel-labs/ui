@@ -4,7 +4,13 @@ import * as React from "react"
 import { createRoot, hydrateRoot, type Root } from "react-dom/client"
 import { renderToString } from "react-dom/server"
 import { afterEach, expect, test, vi } from "vitest"
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "../src/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
 import { Toolbar, ToolbarLink } from "../src/toolbar"
 
@@ -36,7 +42,7 @@ test("a dialog's parts keep the ids passed to them, and the dialog points at the
         <DialogTitle id="heading">Profile</DialogTitle>
         <DialogDescription id="hint">Change it.</DialogDescription>
       </DialogContent>
-    </Dialog>,
+    </Dialog>
   )
   const trigger = view.querySelector("button")!
   const content = document.querySelector<HTMLElement>('[role="dialog"]')!
@@ -55,9 +61,11 @@ test("a dialog's content is labelled by the id passed to its title, which render
       <DialogContent>
         <DialogTitle id="heading">Profile</DialogTitle>
       </DialogContent>
-    </Dialog>,
+    </Dialog>
   )
-  expect(document.querySelector('[role="dialog"]')!.getAttribute("aria-labelledby")).toBe("heading")
+  expect(
+    document.querySelector('[role="dialog"]')!.getAttribute("aria-labelledby")
+  ).toBe("heading")
 })
 
 test("a tab keeps the id passed to it, and its panel is labelled by it", async () => {
@@ -69,7 +77,7 @@ test("a tab keeps the id passed to it, and its panel is labelled by it", async (
         </TabsTab>
       </TabsList>
       <TabsPanel value="a">A</TabsPanel>
-    </Tabs>,
+    </Tabs>
   )
   const tab = view.querySelector<HTMLElement>('[role="tab"]')!
   const panel = view.querySelector<HTMLElement>('[role="tabpanel"]')!
@@ -84,7 +92,7 @@ test("a part whose key is its id keeps the id on its element", async () => {
       <ToolbarLink id="docs" href="#docs">
         Docs
       </ToolbarLink>
-    </Toolbar>,
+    </Toolbar>
   )
   expect(view.querySelector("a")!.id).toBe("docs")
 })
@@ -129,12 +137,22 @@ test("a dialog hydrated from server HTML matches it, then points at the ids pass
   errors.mockRestore()
   expect(errors).not.toHaveBeenCalled()
   const content = document.querySelector<HTMLElement>('[role="dialog"]')!
-  expect(container.querySelector("button")!.getAttribute("aria-controls")).toBe("sheet")
+  expect(container.querySelector("button")!.getAttribute("aria-controls")).toBe(
+    "sheet"
+  )
   expect(content.getAttribute("aria-labelledby")).toBe("heading")
 })
 
-function HydratesLater({ until, children }: { until?: Promise<void>; children: React.ReactNode }) {
-  if (until) React.use(until)
+function HydratesLater({
+  until,
+  children,
+}: {
+  until?: Promise<void>
+  children: React.ReactNode
+}) {
+  if (until) {
+    React.use(until)
+  }
   return children
 }
 
@@ -164,5 +182,9 @@ test("a tab and its panel in one Suspense boundary that hydrates late match the 
   await React.act(async () => resolve())
   errors.mockRestore()
   expect(errors).not.toHaveBeenCalled()
-  expect(container.querySelector('[role="tabpanel"]')!.getAttribute("aria-labelledby")).toBe("account")
+  expect(
+    container
+      .querySelector('[role="tabpanel"]')!
+      .getAttribute("aria-labelledby")
+  ).toBe("account")
 })

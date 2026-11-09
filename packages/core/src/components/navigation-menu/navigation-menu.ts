@@ -1,7 +1,17 @@
 import { triggerKeydown } from "../../foundation/disclosure/disclosure"
-import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
-import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
+import {
+  ownsEvent,
+  registerPopupElement,
+} from "../../foundation/popups/popup-elements"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
+import {
+  itemIconPart,
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
 import { motionOf, type NavigationMenuMotion } from "./navigation-menu-keyboard"
 import {
   isShown,
@@ -13,9 +23,15 @@ import {
 import type { NavigationMenuGeneric } from "./navigation-menu-generic"
 import { idPart, openAttrs } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import { orientationOf } from "../../foundation/focus/collection"
 
 /**
@@ -38,7 +54,8 @@ type NavigationMenuValueChangeReason =
  * Options every write method on a navigation menu controller takes.
  * @stable
  */
-type NavigationMenuChangeOptions = ChangeOptions<NavigationMenuValueChangeReason>
+type NavigationMenuChangeOptions =
+  ChangeOptions<NavigationMenuValueChangeReason>
 
 /**
  * Opens, closes and inspects a navigation menu from outside it, like a button
@@ -50,7 +67,10 @@ function createNavigationMenuController<T extends string = string>() {
     /** The open item's value, or null when every panel is closed. */
     getValue: () => T | null
     /** Opens an item's panel, or closes the open one with `null`. Returns false when canceled. */
-    setValue: (value: T | null, options?: NavigationMenuChangeOptions) => boolean
+    setValue: (
+      value: T | null,
+      options?: NavigationMenuChangeOptions
+    ) => boolean
     /** Whether a panel is open. */
     isOpen: () => boolean
     /** Closes the open panel. Returns false when canceled or already closed. */
@@ -89,7 +109,10 @@ type NavigationMenuOptions<T extends string = string> = PortalProps & {
    */
   defaultValue?: T | null
   /** Runs when an item wants to open or the open one to close. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T | null, details: ChangeDetails<NavigationMenuValueChangeReason>) => void
+  onValueChange?: (
+    value: T | null,
+    details: ChangeDetails<NavigationMenuValueChangeReason>
+  ) => void
   /** Runs once the menu has finished opening or closing, after any animation. Switching items doesn't count. */
   onOpenChangeComplete?: (open: boolean) => void
   /**
@@ -334,7 +357,9 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
     // Internal: passed by renderers.
     parent: "value",
   },
-  state: (options: NavigationMenuOptions & NavigationMenuInternalOptions): NavigationMenuStoreState => {
+  state: (
+    options: NavigationMenuOptions & NavigationMenuInternalOptions
+  ): NavigationMenuStoreState => {
     const value = options.value ?? options.defaultValue ?? null
     return {
       value,
@@ -371,9 +396,14 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     list: slot<{}, NavigationMenuListState>({
-      state: (state) => ({ open: state.value !== null, orientation: state.orientation }),
+      state: (state) => ({
+        open: state.value !== null,
+        orientation: state.orientation,
+      }),
       attrs: (state) => ({ "data-orientation": state.orientation }),
-      on: { keydown: (event, { api, el }) => api.internal.listKeydown(event, el!) },
+      on: {
+        keydown: (event, { api, el }) => api.internal.listKeydown(event, el!),
+      },
     }),
 
     item: slot<ItemProps, NavigationMenuItemState>({
@@ -386,7 +416,10 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
     // A button that opens and closes its item's panel, like a disclosure.
     trigger: slot<TriggerProps, NavigationMenuTriggerState>({
       props: { value: { kind: "string", from: "item" }, disabled: "boolean" },
-      state: (state, { key, props }) => ({ open: state.value === key, disabled: !!props.disabled }),
+      state: (state, { key, props }) => ({
+        open: state.value === key,
+        disabled: !!props.disabled,
+      }),
       attrs: (state, { id, key, props }) => ({
         id: `${id}-trigger-${idPart(key)}`,
         type: "button",
@@ -397,17 +430,24 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         ...openAttrs(state.value === key),
       }),
       on: {
-        pointerenter: (event, { api, key, props }) => api.internal.hoverEnter(event, key, props.disabled),
-        pointermove: (event, { api, key, props }) => api.internal.hoverMove(event, key, props.disabled),
-        pointerleave: (event, { api, key }) => api.internal.leaveTrigger(event, key),
+        pointerenter: (event, { api, key, props }) =>
+          api.internal.hoverEnter(event, key, props.disabled),
+        pointermove: (event, { api, key, props }) =>
+          api.internal.hoverMove(event, key, props.disabled),
+        pointerleave: (event, { api, key }) =>
+          api.internal.leaveTrigger(event, key),
         keydown(event, { api, el, key, store }) {
           triggerKeydown(event, el)
           // Tab from the open trigger moves into its panel, wherever it renders.
-          if (store.get().value === key) api.internal.surface().triggerKeydown(event)
+          if (store.get().value === key) {
+            api.internal.surface().triggerKeydown(event)
+          }
         },
       },
       press(context, event) {
-        if (!context.props.disabled) context.api.internal.triggerPress(context.key, context.el, event)
+        if (!context.props.disabled) {
+          context.api.internal.triggerPress(context.key, context.el, event)
+        }
       },
       bind: (el, { api, key }) => api.internal.ensureSurface(key),
     }),
@@ -440,7 +480,11 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
           id: contentId(id, key),
           // Without a viewport, the content is a popup that touch can focus.
           tabindex: state.viewport ? undefined : "-1",
-          hidden: shown ? undefined : props.hiddenUntilFound ? "until-found" : "",
+          hidden: shown
+            ? undefined
+            : props.hiddenUntilFound
+              ? "until-found"
+              : "",
           "data-motion": motionOf(key, state),
           "data-orientation": state.orientation,
           ...openAttrs(state.value === key),
@@ -450,16 +494,23 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         keydown(event, { api, el, store }) {
           api.internal.panelKeydown(event, el!)
           // Without a viewport, Tab flows out of the content back to the page after its trigger.
-          if (ownsEvent(el!, event) && !store.get().viewport) api.internal.surface().keydown(event)
+          if (ownsEvent(el!, event) && !store.get().viewport) {
+            api.internal.surface().keydown(event)
+          }
         },
         pointerenter(event, { api, store }) {
-          if (!store.get().viewport) api.internal.enterPanel(event)
+          if (!store.get().viewport) {
+            api.internal.enterPanel(event)
+          }
         },
         pointerleave(event, { api, store }) {
-          if (!store.get().viewport) api.internal.leavePanel(event)
+          if (!store.get().viewport) {
+            api.internal.leavePanel(event)
+          }
         },
       },
-      bind: (el, part) => part.api.internal.bindContent(el, part.key, part.props, part),
+      bind: (el, part) =>
+        part.api.internal.bindContent(el, part.key, part.props, part),
     }),
 
     link: slot<LinkProps, NavigationMenuLinkState>({
@@ -477,7 +528,7 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         component: "navigation-menu",
         item: '[data-slot="navigation-menu-link"]',
         list: '[data-slot="navigation-menu-content"], [data-slot="navigation-menu-list"]',
-      }),
+      })
     ),
 
     // The one popup every content renders into, sized to the open one.
@@ -492,7 +543,10 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
         anchor: "string",
         container: "value",
       },
-      state: (state) => ({ open: state.value !== null, orientation: state.orientation }),
+      state: (state) => ({
+        open: state.value !== null,
+        orientation: state.orientation,
+      }),
       attrs: (state, { id }) => ({
         id: `${id}-viewport`,
         tabindex: "-1",
@@ -505,7 +559,10 @@ const navigationMenuPrimitive = /* @__PURE__ */ definePrimitive({
 
     // Covers the open trigger, or the current page's link while closed.
     indicator: slot<{}, NavigationMenuIndicatorState>({
-      state: (state) => ({ open: state.value !== null, orientation: state.orientation }),
+      state: (state) => ({
+        open: state.value !== null,
+        orientation: state.orientation,
+      }),
       attrs: (state) => ({
         "aria-hidden": "true",
         "data-orientation": state.orientation,

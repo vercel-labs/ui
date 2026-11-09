@@ -1,6 +1,17 @@
 <script lang="ts">
-  import { ChevronRightIcon, FileIcon, FolderIcon, FolderOpenIcon } from "@lucide/svelte"
-  import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/svelte/tree"
+  import {
+    ChevronRightIcon,
+    FileIcon,
+    FolderIcon,
+    FolderOpenIcon,
+  } from "@lucide/svelte"
+  import {
+    Tree,
+    TreeGroup,
+    TreeItem,
+    TreeItemIndicator,
+    TreeItemLabel,
+  } from "@ui-sdk/svelte/tree"
 
   type Node = { value: string; label: string; children?: Node[] }
 

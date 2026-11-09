@@ -27,9 +27,11 @@ function mount(root: HTMLElement) {
       </div>
     </ui-carousel>
   `
-  root.querySelector("ui-carousel")!.addEventListener("pagechangecomplete", (event) => {
-    log(root, `Rested on slide ${event.detail.value}`)
-  })
+  root
+    .querySelector("ui-carousel")!
+    .addEventListener("pagechangecomplete", (event) => {
+      log(root, `Rested on slide ${event.detail.value}`)
+    })
 }
 
 export { mount }

@@ -15,7 +15,12 @@
     type CommandData,
     type CommandDataItem,
   } from "@ui-sdk/svelte"
-  import { commandData, commandFixture as f, commandOptions, runAction } from "tests/fixtures/command.ts"
+  import {
+    commandData,
+    commandFixture as f,
+    commandOptions,
+    runAction,
+  } from "tests/fixtures/command.ts"
   import { longItems } from "tests/fixtures/select.ts"
 
   let { data = false }: { data?: boolean } = $props()
@@ -43,12 +48,16 @@
         <CommandSeparator class="separator" />
       {:else}
         <CommandGroup>
-          {#if entry.label}<CommandGroupLabel class="label">{entry.label}</CommandGroupLabel>{/if}
+          {#if entry.label}<CommandGroupLabel class="label"
+              >{entry.label}</CommandGroupLabel
+            >{/if}
           {@render dataCommands(entry.items)}
         </CommandGroup>
       {/if}
     {:else}
-      {@render dataCommand(typeof entry === "string" ? { value: entry, label: entry } : entry)}
+      {@render dataCommand(
+        typeof entry === "string" ? { value: entry, label: entry } : entry
+      )}
     {/if}
   {/each}
 {/snippet}
@@ -62,7 +71,8 @@
     disabled={command.disabled}
     shortcut={command.shortcut}
   >
-    {#if highlight}<CommandItemText>{command.label}</CommandItemText>{:else}{command.label}{/if}
+    {#if highlight}<CommandItemText>{command.label}</CommandItemText
+      >{:else}{command.label}{/if}
     {#if command.shortcut}<CommandShortcut class="shortcut" />{/if}
   </CommandItem>
 {/snippet}
@@ -97,8 +107,11 @@
                   shortcut={"shortcut" in item ? item.shortcut : undefined}
                   page={"page" in item ? item.page : undefined}
                 >
-                  {#if highlight}<CommandItemText>{item.label}</CommandItemText>{:else}{item.label}{/if}
-                  {#if "shortcut" in item}<CommandShortcut class="shortcut" />{/if}
+                  {#if highlight}<CommandItemText>{item.label}</CommandItemText
+                    >{:else}{item.label}{/if}
+                  {#if "shortcut" in item}<CommandShortcut
+                      class="shortcut"
+                    />{/if}
                 </CommandItem>
               {/each}
             </CommandGroup>
@@ -106,7 +119,9 @@
         </CommandPage>
         <CommandPage value="theme">
           {#each f.theme as item (item.value)}
-            <CommandItem class="item" value={item.value}>{item.label}</CommandItem>
+            <CommandItem class="item" value={item.value}
+              >{item.label}</CommandItem
+            >
           {/each}
         </CommandPage>
       </CommandList>

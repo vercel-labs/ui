@@ -5,7 +5,11 @@ radios that pick its score sit over it.
 @experimental
 -->
 <script lang="ts">
-  import { rating, ratingItemValues, type RatingItemState } from "@ui-sdk/core/rating"
+  import {
+    rating,
+    ratingItemValues,
+    type RatingItemState,
+  } from "@ui-sdk/core/rating"
   import { usePart } from "../instance"
   import Part from "../part.svelte"
   import type { PartProps } from "../use-primitive.svelte"

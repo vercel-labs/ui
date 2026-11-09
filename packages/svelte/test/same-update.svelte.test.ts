@@ -5,7 +5,9 @@ import { expect, test } from "vitest"
 import App from "./apps/collapsible-bound-app.svelte"
 
 test("an app effect on a bound `open` sees the panel it opened", () => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   const target = document.createElement("div")
   document.body.append(target)
   const seen: string[] = []

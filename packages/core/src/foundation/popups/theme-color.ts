@@ -14,18 +14,24 @@ function channels(color: string) {
  * adding one would change their colors. Returns a writer and a restore.
  */
 function dimThemeColor(doc: Document, alpha: number) {
-  const metas = Array.from(doc.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]'))
+  const metas = Array.from(
+    doc.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')
+  )
   const originals = metas.map((meta) => meta.content)
   const bases = originals.map((color) => channels(resolveColor(doc, color)))
   let written = -1
 
   function write(dim: number) {
     const shade = Math.round(dim * alpha * 100) / 100
-    if (shade === written) return
+    if (shade === written) {
+      return
+    }
     written = shade
     metas.forEach((meta, index) => {
       const base = bases[index]
-      if (!base) return
+      if (!base) {
+        return
+      }
       meta.content = shade
         ? `rgb(${base.map((channel) => Math.round(channel * (1 - shade))).join(" ")})`
         : originals[index]

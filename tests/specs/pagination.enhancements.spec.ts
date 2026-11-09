@@ -4,7 +4,10 @@ import { current, entries, nav, part } from "./pagination.helpers"
 
 // Behavior past markup styled as a pagination, tagged `@enhancement`.
 
-test("pressing Next onto the last page keeps focus on Next @enhancement", async ({ page, open }) => {
+test("pressing Next onto the last page keeps focus on Next @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("pagination", { page: "9" })
   await part(page, f.next).focus()
   await page.keyboard.press("Enter")
@@ -13,7 +16,10 @@ test("pressing Next onto the last page keeps focus on Next @enhancement", async 
   await expect(part(page, f.next)).toBeFocused()
 })
 
-test("pressing Previous onto the first page keeps focus on Previous @enhancement", async ({ page, open }) => {
+test("pressing Previous onto the first page keeps focus on Previous @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("pagination", { page: "2" })
   await part(page, f.previous).focus()
   await page.keyboard.press("Enter")
@@ -21,7 +27,10 @@ test("pressing Previous onto the first page keeps focus on Previous @enhancement
   await expect(part(page, f.previous)).toBeFocused()
 })
 
-test("paging through every page with the keyboard never loses focus @enhancement", async ({ page, open }) => {
+test("paging through every page with the keyboard never loses focus @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("pagination")
   await part(page, f.next).focus()
   for (let target = 2; target <= f.pageCount; target++) {
@@ -49,7 +58,10 @@ test("focus comes back to the same part when the list renders again from scratch
   open,
   framework,
 }) => {
-  test.skip(framework.startsWith("web"), "Web component lists keep their elements.")
+  test.skip(
+    framework.startsWith("web"),
+    "Web component lists keep their elements."
+  )
   await open("pagination", { rekey: "", page: "5" })
   await part(page, 6).focus()
   await page.keyboard.press("Enter")
@@ -74,9 +86,20 @@ test("the list has the same number of entries on every page, so nothing shifts u
   expect([...counts]).toEqual([11])
 })
 
-test("a gap of one page shows that page instead of an ellipsis @enhancement", async ({ page, open }) => {
+test("a gap of one page shows that page instead of an ellipsis @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("pagination", { page: "4" })
-  expect((await entries(page)).slice(2, -2)).toEqual(["1", "2", "3", "4", "5", "…", "10"])
+  expect((await entries(page)).slice(2, -2)).toEqual([
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "…",
+    "10",
+  ])
 })
 
 test("a link pressed with a modifier opens elsewhere and leaves the page as it is @enhancement", async ({
@@ -84,7 +107,10 @@ test("a link pressed with a modifier opens elsewhere and leaves the page as it i
   open,
   browserName,
 }) => {
-  test.skip(browserName === "webkit", "WebKit automation doesn't open a tab for a modified click.")
+  test.skip(
+    browserName === "webkit",
+    "WebKit automation doesn't open a tab for a modified click."
+  )
   await open("pagination", { links: "" })
   const popup = page.context().waitForEvent("page")
   await part(page, 3, "link").click({ modifiers: ["ControlOrMeta"] })
@@ -93,7 +119,10 @@ test("a link pressed with a modifier opens elsewhere and leaves the page as it i
   await expect(page.getByRole("status", { name: "Last action" })).toHaveText("")
 })
 
-test("the list keeps its list role when styled without bullets @enhancement", async ({ page, open }) => {
+test("the list keeps its list role when styled without bullets @enhancement", async ({
+  page,
+  open,
+}) => {
   await open("pagination")
   await expect(nav(page).getByRole("list")).toHaveAttribute("role", "list")
   await expect(nav(page).getByRole("list")).toHaveCSS("list-style-type", "none")
@@ -129,5 +158,8 @@ test("a Next link onto the last page still goes there, though it ends there @enh
   await open("pagination", { links: "", page: "9" })
   await part(page, f.next, "link").click()
   await expect(page).toHaveURL(/#page-10$/)
-  await expect(part(page, f.next, "link")).toHaveAttribute("aria-disabled", "true")
+  await expect(part(page, f.next, "link")).toHaveAttribute(
+    "aria-disabled",
+    "true"
+  )
 })

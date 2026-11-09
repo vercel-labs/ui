@@ -12,7 +12,9 @@ import { For } from "solid-js"
 function Ticks(props: { count: number }) {
   return (
     <div data-slot="ticks" aria-hidden="true">
-      <For each={Array.from({ length: props.count }, (_, index) => index)}>{() => <span />}</For>
+      <For each={Array.from({ length: props.count }, (_, index) => index)}>
+        {() => <span />}
+      </For>
     </div>
   )
 }
@@ -21,7 +23,13 @@ function Example() {
   return (
     <div data-slot="stack">
       <Field>
-        <Slider defaultValue={2010} min={1990} max={2030} step={5} format={{ useGrouping: false }}>
+        <Slider
+          defaultValue={2010}
+          min={1990}
+          max={2030}
+          step={5}
+          format={{ useGrouping: false }}
+        >
           <div data-slot="row">
             <FieldLabel>Year</FieldLabel>
             <SliderValue />

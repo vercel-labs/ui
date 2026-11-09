@@ -27,7 +27,9 @@ function mount(root: HTMLElement) {
     next.setAttribute("aria-disabled", String(uploaded >= total))
   }
   next.addEventListener("click", () => {
-    if (uploaded >= total) return
+    if (uploaded >= total) {
+      return
+    }
     uploaded++
     show()
     log(root, `Uploaded ${uploaded} of ${total} photos`)

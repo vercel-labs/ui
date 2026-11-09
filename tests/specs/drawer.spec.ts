@@ -32,11 +32,15 @@ test.describe("dialog", () => {
   }) => {
     await drawerTrigger(page).click()
     await expect(drawerDialog(page)).toBeVisible()
-    await expect(drawerDialog(page)).toHaveAccessibleDescription("Set your daily activity goal.")
+    await expect(drawerDialog(page)).toHaveAccessibleDescription(
+      "Set your daily activity goal."
+    )
     expect(await drawerLog(page)).toEqual(["drawer:true:trigger-press"])
   })
 
-  test("opening moves focus into the drawer and closing returns it to the trigger", async ({ page }) => {
+  test("opening moves focus into the drawer and closing returns it to the trigger", async ({
+    page,
+  }) => {
     await drawerTrigger(page).focus()
     await page.keyboard.press("Enter")
     await expect.poll(() => focusIsInside(page)).toBe(true)
@@ -84,10 +88,14 @@ test.describe("dialog", () => {
     await expect(drawerDialog(page)).toBeVisible()
   })
 
-  test("the page behind is hidden from assistive technology while it's open", async ({ page }) => {
+  test("the page behind is hidden from assistive technology while it's open", async ({
+    page,
+  }) => {
     // Hidden either way: inert, or aria-hidden.
     const hidden = () =>
-      outside(page, "After").evaluate((el) => !!el.closest('[inert], [aria-hidden="true"]'))
+      outside(page, "After").evaluate(
+        (el) => !!el.closest('[inert], [aria-hidden="true"]')
+      )
     await openDrawer(page)
     expect(await hidden()).toBe(true)
     await page.keyboard.press("Escape")
@@ -95,7 +103,9 @@ test.describe("dialog", () => {
     expect(await hidden()).toBe(false)
   })
 
-  test("opening and closing never scroll or restyle the page", async ({ page }) => {
+  test("opening and closing never scroll or restyle the page", async ({
+    page,
+  }) => {
     // Inline styles as text: a lock that put everything back may leave an empty style attribute.
     const before = await page.evaluate(() => [
       document.documentElement.style.cssText,
@@ -110,7 +120,7 @@ test.describe("dialog", () => {
         document.documentElement.style.cssText,
         document.body.style.cssText,
         scrollY,
-      ]),
+      ])
     ).toEqual(before)
   })
 
@@ -121,7 +131,10 @@ test.describe("dialog", () => {
 })
 
 test.describe("sheet", () => {
-  test("it rises from the bottom and rests against it at its own size", async ({ page, open }) => {
+  test("it rises from the bottom and rests against it at its own size", async ({
+    page,
+    open,
+  }) => {
     await open("drawer")
     await openDrawer(page)
     const viewport = page.viewportSize()!
@@ -130,28 +143,47 @@ test.describe("sheet", () => {
     expect(rect.top).toBeGreaterThan(0)
   })
 
-  test("it opens at the first snap point, a fraction of the screen", async ({ page, open }) => {
+  test("it opens at the first snap point, a fraction of the screen", async ({
+    page,
+    open,
+  }) => {
     await open("drawer", { snap: "0.25,0.5,1", scroll: "" })
     await openDrawer(page)
     const viewport = page.viewportSize()!
     expect((await sheetRect(page)).top).toBe(Math.round(viewport.height * 0.75))
   })
 
-  test("a slow drag settles on the nearest snap point and reports the swipe", async ({ page, open }) => {
+  test("a slow drag settles on the nearest snap point and reports the swipe", async ({
+    page,
+    open,
+  }) => {
     await open("drawer", { snap: "0.25,0.5,1", scroll: "" })
     await openDrawer(page)
     const viewport = page.viewportSize()!
-    await pointerDrag(page, { from: "Move goal", dy: -viewport.height * 0.22, steps: 20, interval: 30 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: -viewport.height * 0.22,
+      steps: 20,
+      interval: 30,
+    })
     await waitForRest(page)
     expect((await sheetRect(page)).top).toBe(Math.round(viewport.height * 0.5))
     expect(await drawerLog(page)).toContain("0.5:swipe")
   })
 
-  test("a drag down past the smallest snap point closes it with the swipe reason", async ({ page, open }) => {
+  test("a drag down past the smallest snap point closes it with the swipe reason", async ({
+    page,
+    open,
+  }) => {
     await open("drawer")
     await openDrawer(page)
     const { height } = await sheetRect(page)
-    await pointerDrag(page, { from: "Move goal", dy: height * 0.8, steps: 20, interval: 30 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: height * 0.8,
+      steps: 20,
+      interval: 30,
+    })
     await expect(drawerDialog(page)).toBeHidden()
     expect(await drawerLog(page)).toContain("drawer:false:swipe")
     await expect(drawerTrigger(page)).toBeFocused()
@@ -163,7 +195,12 @@ test.describe("sheet", () => {
   }) => {
     await open("drawer", { snap: "0.5,1", scroll: "" })
     await openDrawer(page)
-    await pointerDrag(page, { from: "Move goal", dy: 80, steps: 6, interval: 8 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: 80,
+      steps: 6,
+      interval: 8,
+    })
     await expect(drawerDialog(page)).toBeHidden()
     expect(await drawerLog(page)).toContain("drawer:false:swipe")
   })
@@ -172,38 +209,73 @@ test.describe("sheet", () => {
     await open("drawer", { snap: "0.5,1", scroll: "" })
     await openDrawer(page)
     const top = (await sheetRect(page)).top
-    await pointerDrag(page, { from: "Move goal", dy: 80, steps: 20, interval: 40 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: 80,
+      steps: 20,
+      interval: 40,
+    })
     await waitForRest(page)
     expect((await sheetRect(page)).top).toBe(top)
   })
 
-  test("a fling up from the smallest snap point can pass the middle one", async ({ page, open }) => {
+  test("a fling up from the smallest snap point can pass the middle one", async ({
+    page,
+    open,
+  }) => {
     await open("drawer", { snap: "0.25,0.5,1", scroll: "" })
     await openDrawer(page)
-    await pointerDrag(page, { from: "Move goal", dy: -200, steps: 5, interval: 8 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: -200,
+      steps: 5,
+      interval: 8,
+    })
     await waitForRest(page)
-    expect((await sheetRect(page)).top).toBeLessThan(page.viewportSize()!.height * 0.25)
+    expect((await sheetRect(page)).top).toBeLessThan(
+      page.viewportSize()!.height * 0.25
+    )
   })
 
-  test("a press while it rises catches it and holds it under the finger", async ({ page, open }) => {
+  test("a press while it rises catches it and holds it under the finger", async ({
+    page,
+    open,
+  }) => {
     await open("drawer", { snap: "0.5,1", scroll: "" })
     await drawerTrigger(page).click()
     const drift = await page.evaluate(async () => {
-      const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+      const wait = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms))
       await wait(120)
       const sheet = document.querySelector<HTMLElement>('[role="dialog"]')!
       const title = sheet.querySelector<HTMLElement>("h2, [role=heading]")!
       const { left, top } = title.getBoundingClientRect()
-      const init = { bubbles: true, pointerId: 9, pointerType: "mouse", isPrimary: true, button: 0 }
+      const init = {
+        bubbles: true,
+        pointerId: 9,
+        pointerType: "mouse",
+        isPrimary: true,
+        button: 0,
+      }
       title.dispatchEvent(
-        new PointerEvent("pointerdown", { ...init, buttons: 1, clientX: left + 5, clientY: top + 5 }),
+        new PointerEvent("pointerdown", {
+          ...init,
+          buttons: 1,
+          clientX: left + 5,
+          clientY: top + 5,
+        })
       )
       await new Promise((resolve) => requestAnimationFrame(resolve))
       const caught = sheet.getBoundingClientRect().top
       await wait(200)
       const held = sheet.getBoundingClientRect().top
       title.dispatchEvent(
-        new PointerEvent("pointerup", { ...init, buttons: 0, clientX: left + 5, clientY: top + 5 }),
+        new PointerEvent("pointerup", {
+          ...init,
+          buttons: 0,
+          clientX: left + 5,
+          clientY: top + 5,
+        })
       )
       return Math.abs(held - caught)
     })
@@ -213,7 +285,12 @@ test.describe("sheet", () => {
   test("a short drag back up keeps it open", async ({ page, open }) => {
     await open("drawer")
     await openDrawer(page)
-    await pointerDrag(page, { from: "Move goal", dy: 20, steps: 10, interval: 30 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: 20,
+      steps: 10,
+      interval: 30,
+    })
     await waitForRest(page)
     await expect(drawerDialog(page)).toBeVisible()
     expect((await sheetRect(page)).bottom).toBe(page.viewportSize()!.height)
@@ -229,21 +306,39 @@ test.describe("sheet", () => {
   })
 
   for (const side of ["top", "left", "right"] as const) {
-    test(`with side="${side}" it rests against the ${side} edge`, async ({ page, open }) => {
+    test(`with side="${side}" it rests against the ${side} edge`, async ({
+      page,
+      open,
+    }) => {
       await open("drawer", { side })
       await openDrawer(page)
       const viewport = page.viewportSize()!
       const rect = await sheetRect(page)
-      if (side === "top") expect(rect.top).toBe(0)
-      if (side === "left") expect(rect.left).toBe(0)
-      if (side === "right") expect(rect.right).toBe(viewport.width)
+      if (side === "top") {
+        expect(rect.top).toBe(0)
+      }
+      if (side === "left") {
+        expect(rect.left).toBe(0)
+      }
+      if (side === "right") {
+        expect(rect.right).toBe(viewport.width)
+      }
     })
   }
 
-  test('with side="left" a drag toward the left closes it', async ({ page, open }) => {
+  test('with side="left" a drag toward the left closes it', async ({
+    page,
+    open,
+  }) => {
     await open("drawer", { side: "left" })
     await openDrawer(page)
-    await pointerDrag(page, { from: "Move goal", dy: 0, dx: -240, steps: 20, interval: 30 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: 0,
+      dx: -240,
+      steps: 20,
+      interval: 30,
+    })
     await expect(drawerDialog(page)).toBeHidden()
     expect(await drawerLog(page)).toContain("drawer:false:swipe")
   })
@@ -252,14 +347,22 @@ test.describe("sheet", () => {
 test.describe("touch", () => {
   test.use({ hasTouch: true })
   test.beforeEach(({ browserName }) => {
-    test.skip(browserName !== "chromium", "Real touch input goes through Chromium's DevTools protocol.")
+    test.skip(
+      browserName !== "chromium",
+      "Real touch input goes through Chromium's DevTools protocol."
+    )
   })
 
   test("a touch drag down closes it", async ({ page, open, context }) => {
     await open("drawer")
     await openDrawer(page)
     const rect = await sheetRect(page)
-    await touchDrag(page, context, { x: 200, y: rect.top + 20, dy: rect.height, steps: 16 })
+    await touchDrag(page, context, {
+      x: 200,
+      y: rect.top + 20,
+      dy: rect.height,
+      steps: 16,
+    })
     await expect(drawerDialog(page)).toBeHidden()
     expect(await drawerLog(page)).toContain("drawer:false:swipe")
   })
@@ -273,7 +376,9 @@ test.describe("handle", { tag: "@enhancement" }, () => {
     await openDrawer(page)
   })
 
-  test("pressing it moves to the next snap point and wraps", async ({ page }) => {
+  test("pressing it moves to the next snap point and wraps", async ({
+    page,
+  }) => {
     await handle(page).click()
     await expect(drawerDialog(page)).toHaveAttribute("data-snap-point", "0.5")
     await handle(page).click()
@@ -288,7 +393,9 @@ test.describe("handle", { tag: "@enhancement" }, () => {
     ])
   })
 
-  test("arrow keys step without wrapping, and Home and End go to the ends", async ({ page }) => {
+  test("arrow keys step without wrapping, and Home and End go to the ends", async ({
+    page,
+  }) => {
     await handle(page).focus()
     await page.keyboard.press("ArrowUp")
     await expect(drawerDialog(page)).toHaveAttribute("data-snap-point", "0.5")
@@ -308,7 +415,9 @@ test.describe("handle", { tag: "@enhancement" }, () => {
     ])
   })
 
-  test("moving it moves the drawer to the snap point's extent", async ({ page }) => {
+  test("moving it moves the drawer to the snap point's extent", async ({
+    page,
+  }) => {
     await handle(page).focus()
     await page.keyboard.press("End")
     await waitForRest(page)
@@ -317,21 +426,36 @@ test.describe("handle", { tag: "@enhancement" }, () => {
     expect(rect.height).toBeGreaterThan(page.viewportSize()!.height * 0.75)
   })
 
-  test("a snap point a controller sets while it animates closed is where it opens next", async ({ page }) => {
+  test("a snap point a controller sets while it animates closed is where it opens next", async ({
+    page,
+  }) => {
     await page.keyboard.press("Escape")
     await expect(drawerDialog(page)).toHaveAttribute("data-ending-style")
     await page.evaluate(() =>
-      (window as unknown as { drawer: { setSnapPoint: (point: number) => void } }).drawer.setSnapPoint(1),
+      (
+        window as unknown as {
+          drawer: { setSnapPoint: (point: number) => void }
+        }
+      ).drawer.setSnapPoint(1)
     )
     await expect(page.getByRole("dialog")).toHaveCount(0)
     // open() resolves when it closes, so it isn't awaited.
-    await page.evaluate(() => void (window as unknown as { drawer: { open: () => unknown } }).drawer.open())
+    await page.evaluate(
+      () =>
+        void (
+          window as unknown as { drawer: { open: () => unknown } }
+        ).drawer.open()
+    )
     await expect(drawerDialog(page)).toHaveAttribute("data-snap-point", "1")
   })
 
   test("a controller moves it with the imperative reason", async ({ page }) => {
     await page.evaluate(() =>
-      (window as unknown as { drawer: { setSnapPoint: (point: number) => void } }).drawer.setSnapPoint(0.5),
+      (
+        window as unknown as {
+          drawer: { setSnapPoint: (point: number) => void }
+        }
+      ).drawer.setSnapPoint(0.5)
     )
     await expect(drawerDialog(page)).toHaveAttribute("data-snap-point", "0.5")
     expect(await drawerLog(page)).toContain("0.5:imperative")
@@ -351,15 +475,24 @@ test.describe("not dismissible", { tag: "@enhancement" }, () => {
     expect(await drawerLog(page)).toContain("attempt:escape-key")
   })
 
-  test("a press on the backdrop reports an attempt and keeps it open", async ({ page }) => {
+  test("a press on the backdrop reports an attempt and keeps it open", async ({
+    page,
+  }) => {
     await page.mouse.click(200, 40)
     await expect(drawerDialog(page)).toBeVisible()
     expect(await drawerLog(page)).toContain("attempt:outside-press")
   })
 
-  test("a swipe down resists, springs back and reports an attempt", async ({ page }) => {
+  test("a swipe down resists, springs back and reports an attempt", async ({
+    page,
+  }) => {
     const bottom = (await sheetRect(page)).bottom
-    await pointerDrag(page, { from: "Move goal", dy: 300, steps: 20, interval: 30 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: 300,
+      steps: 20,
+      interval: 30,
+    })
     await waitForRest(page)
     await expect(drawerDialog(page)).toBeVisible()
     expect((await sheetRect(page)).bottom).toBe(bottom)
@@ -369,11 +502,17 @@ test.describe("not dismissible", { tag: "@enhancement" }, () => {
 
 test.describe("modal above a snap point", { tag: "@enhancement" }, () => {
   test.beforeEach(async ({ open, page }) => {
-    await open("drawer", { snap: "0.25,0.75", "modal-above": "0.25", scroll: "" })
+    await open("drawer", {
+      snap: "0.25,0.75",
+      "modal-above": "0.25",
+      scroll: "",
+    })
     await openDrawer(page)
   })
 
-  test("at that snap point the page stays usable and the drawer isn't modal", async ({ page }) => {
+  test("at that snap point the page stays usable and the drawer isn't modal", async ({
+    page,
+  }) => {
     await expect(drawerDialog(page)).not.toHaveAttribute("aria-modal", "true")
     await expect(drawerDialog(page)).toHaveAttribute("data-interactive", "")
     await page.getByRole("button", { name: "Page action" }).click()
@@ -381,15 +520,25 @@ test.describe("modal above a snap point", { tag: "@enhancement" }, () => {
     await expect(drawerDialog(page)).toBeVisible()
   })
 
-  test("above it the drawer becomes modal, and back down the page is usable again", async ({ page }) => {
+  test("above it the drawer becomes modal, and back down the page is usable again", async ({
+    page,
+  }) => {
     await handle(page).click()
     await waitForRest(page)
     await expect(drawerDialog(page)).toHaveAttribute("aria-modal", "true")
-    expect(await outside(page, "Page action").evaluate((el) => !!el.closest("[inert]"))).toBe(true)
+    expect(
+      await outside(page, "Page action").evaluate(
+        (el) => !!el.closest("[inert]")
+      )
+    ).toBe(true)
     await handle(page).click()
     await waitForRest(page)
     await expect(drawerDialog(page)).not.toHaveAttribute("aria-modal", "true")
-    expect(await outside(page, "Page action").evaluate((el) => !!el.closest("[inert]"))).toBe(false)
+    expect(
+      await outside(page, "Page action").evaluate(
+        (el) => !!el.closest("[inert]")
+      )
+    ).toBe(false)
   })
 
   test("the switch doesn't move focus", async ({ page }) => {

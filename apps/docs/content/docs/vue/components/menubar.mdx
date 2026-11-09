@@ -94,7 +94,11 @@ const file: MenuData = [
   { value: "new", label: "New File", shortcut: "mod+alt+n" },
   { value: "open", label: "Open…" },
   { type: "separator" },
-  { type: "submenu", label: "Share", items: [{ value: "email", label: "Email link" }] },
+  {
+    type: "submenu",
+    label: "Share",
+    items: [{ value: "email", label: "Email link" }],
+  },
 ]
 </script>
 
@@ -177,13 +181,19 @@ Props are the same as below.
 
 ### Menubar
 
-<TypeTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarOptions" />
+<TypeTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarOptions"
+/>
 
 Menus, items and their icons take the props on the Menu page, like [`MenuItemIcon`](./menu#menuitemicon).
 
 ### State
 
-<StateTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarState" />
+<StateTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarState"
+/>
 
 ### Reasons
 
@@ -191,7 +201,10 @@ A menu that another menu in the menubar takes over closes with `submenu-switch`,
 
 ### Controller
 
-<ControllerTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarController" />
+<ControllerTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarController"
+/>
 
 ## Accessibility
 

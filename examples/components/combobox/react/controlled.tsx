@@ -33,7 +33,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function Example() {
   const [value, setValue] = React.useState<string | null>("fr")
@@ -83,7 +84,11 @@ function Example() {
           <ComboboxEmpty>No countries found.</ComboboxEmpty>
           <ComboboxList>
             {countries.map((country) => (
-              <ComboboxItem key={country.value} value={country.value} label={country.label}>
+              <ComboboxItem
+                key={country.value}
+                value={country.value}
+                label={country.label}
+              >
                 {country.label}
                 <ComboboxItemIndicator>
                   <CheckIcon />

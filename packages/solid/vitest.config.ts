@@ -18,7 +18,11 @@ export default defineConfig({
       },
       {
         plugins: [solid({ ssr: true })],
-        test: { name: "ssr", environment: "node", include: ["test/**/*-ssr.test.{ts,tsx}"] },
+        test: {
+          name: "ssr",
+          environment: "node",
+          include: ["test/**/*-ssr.test.{ts,tsx}"],
+        },
       },
     ],
   },

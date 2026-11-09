@@ -57,7 +57,9 @@ function Popover({ children, container, ...options }: PopoverProps) {
   useControllerEntry(options.controller, handle)
   return (
     <HandleScope handle={handle}>
-      <ContainerContext.Provider value={container}>{children}</ContainerContext.Provider>
+      <ContainerContext.Provider value={container}>
+        {children}
+      </ContainerContext.Provider>
     </HandleScope>
   )
 }
@@ -69,7 +71,10 @@ function Popover({ children, container, ...options }: PopoverProps) {
 function PopoverTrigger({
   controller,
   ...props
-}: Omit<PartProps<"button", PopoverTriggerState>, "value" | "defaultValue" | "onChange"> &
+}: Omit<
+  PartProps<"button", PopoverTriggerState>,
+  "value" | "defaultValue" | "onChange"
+> &
   PopoverTriggerProps) {
   const { disabled, payload: _, shortcut, render, ...rest } = props
   // Until the popover it names mounts, a trigger outside the popover is a plain button.
@@ -80,7 +85,11 @@ function PopoverTrigger({
     })
   return (
     <TriggerContext.Provider value={{ shortcut }}>
-      <Connected primitive={popover} controller={controller} fallback={unconnected}>
+      <Connected
+        primitive={popover}
+        controller={controller}
+        fallback={unconnected}
+      >
         <parts.Trigger {...props} />
       </Connected>
     </TriggerContext.Provider>
@@ -121,10 +130,10 @@ function PopoverContent<Payload = unknown>({
   }
   const handle = useHandle(popover)
   // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
-  const partProps = { ...props, render: sheetViewport(handle, render) } as PartProps<
-    "div",
-    PopoverContentState
-  >
+  const partProps = {
+    ...props,
+    render: sheetViewport(handle, render),
+  } as PartProps<"div", PopoverContentState>
   const element = usePart(handle, "content", content, partProps)
   return element && renderPopup(element, target)
 }
@@ -153,7 +162,8 @@ const PopoverClose = parts.Close
  */
 const PopoverArrow = parts.Arrow
 
-type ShortcutPartProps = PartProps<"span", PopoverShortcutState> & PopoverShortcutProps
+type ShortcutPartProps = PartProps<"span", PopoverShortcutState> &
+  PopoverShortcutProps
 
 /**
  * Shows a trigger's shortcut, like `⌘I`, inside the trigger. Hidden from screen readers, which hear `aria-keyshortcuts`.
@@ -161,9 +171,13 @@ type ShortcutPartProps = PartProps<"span", PopoverShortcutState> & PopoverShortc
  */
 function PopoverShortcut(props: ShortcutPartProps) {
   const trigger = React.useContext(TriggerContext)
-  if (useNearest(popover)) return <ShortcutPart inherited={trigger?.shortcut} {...props} />
+  if (useNearest(popover)) {
+    return <ShortcutPart inherited={trigger?.shortcut} {...props} />
+  }
   // Inside a trigger whose popover hasn't mounted yet, there's no shortcut to show.
-  if (trigger) return null
+  if (trigger) {
+    return null
+  }
   throw new Error("Popover parts must be used inside <Popover>.")
 }
 
@@ -175,7 +189,13 @@ function ShortcutPart({
   children = text,
   ...props
 }: ShortcutPartProps & { inherited?: string }) {
-  return usePart(popover, "shortcut", { shortcut: shortcut ?? inherited }, { ...props, children }, "span")
+  return usePart(
+    popover,
+    "shortcut",
+    { shortcut: shortcut ?? inherited },
+    { ...props, children },
+    "span"
+  )
 }
 
 export { createPopoverController } from "@ui-sdk/core/popover"

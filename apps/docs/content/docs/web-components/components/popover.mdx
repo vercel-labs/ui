@@ -56,7 +56,9 @@ Import the parts and put them together:
   </ui-popover-trigger>
   <ui-popover-content>
     <ui-popover-title>Share this document</ui-popover-title>
-    <ui-popover-description>Anyone with the link can view it.</ui-popover-description>
+    <ui-popover-description
+      >Anyone with the link can view it.</ui-popover-description
+    >
     <ui-popover-close>
       <button>Done</button>
     </ui-popover-close>
@@ -260,17 +262,26 @@ are numbers. `anchor` and `container` take CSS selectors. Callbacks are DOM even
 
 ### Popover
 
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverOptions" />
+<TypeTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverOptions"
+/>
 
 ### PopoverTrigger
 
 A trigger outside the popover names it with `for="popover-id"`, and takes `payload` as a property.
 
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverTriggerProps"
+/>
 
 ### PopoverContent
 
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverContentProps"
+/>
 
 ### PopoverArrow
 
@@ -290,7 +301,10 @@ Closes the popover. Wraps your own `button` or link.
 
 ### PopoverShortcut
 
-<TypeTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverShortcutProps" />
+<TypeTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverShortcutProps"
+/>
 
 ### State
 
@@ -298,33 +312,54 @@ The same state shows as data attributes on each element.
 
 `PopoverTrigger`:
 
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverTriggerState"
+/>
 
 `PopoverContent`:
 
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverContentState" />
+<StateTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverContentState"
+/>
 
 `PopoverArrow`:
 
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverArrowState" />
+<StateTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverArrowState"
+/>
 
 `PopoverShortcut`:
 
-<StateTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverShortcutState" />
+<StateTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverShortcutState"
+/>
 
 ### Reasons
 
 `event.detail.reason` says why the popover opened or closed.
 
-<ReasonTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverOpenChangeReason"
+/>
 
 For a payload change, it says what opened the popover or took it over.
 
-<ReasonTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverPayloadChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverPayloadChangeReason"
+/>
 
 With `dismissible` false, the refused dismissals `dismissattempt` reports:
 
-<ReasonTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverDismissReason" />
+<ReasonTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverDismissReason"
+/>
 
 ### Controller
 
@@ -333,7 +368,10 @@ is open.
 
 Every write method takes an optional `{ reason, event }`, passed to `openchange`.
 
-<ControllerTable path="../../packages/core/src/components/popover/popover.ts" name="PopoverController" />
+<ControllerTable
+  path="../../packages/core/src/components/popover/popover.ts"
+  name="PopoverController"
+/>
 
 ### Events
 
@@ -358,7 +396,10 @@ The trigger is a button that opens a dialog, and focus inside follows the [WAI-A
 
 Every line below is an automated test.
 
-<SpecList spec="popover" only={["trigger", "focus", "dismissal", "modal", "hover", "nested popovers"]} />
+<SpecList
+  spec="popover"
+  only={["trigger", "focus", "dismissal", "modal", "hover", "nested popovers"]}
+/>
 
 Additional behaviors:
 

@@ -12,7 +12,14 @@
 
 <Field>
   <FieldLabel>Hours</FieldLabel>
-  <NumberInput defaultValue={1.5} min={0} max={24} step={0.25} largeStep={1} smallStep={0.05}>
+  <NumberInput
+    defaultValue={1.5}
+    min={0}
+    max={24}
+    step={0.25}
+    largeStep={1}
+    smallStep={0.05}
+  >
     <NumberInputGroup>
       <NumberInputDecrement aria-label="Decrease">
         <MinusIcon aria-hidden="true" />

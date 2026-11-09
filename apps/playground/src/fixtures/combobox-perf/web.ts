@@ -6,7 +6,7 @@ async function mount(root: HTMLElement) {
   const items = perfItems(perfSize())
     .map(
       (item) =>
-        `<ui-combobox-item class="item" value="${item.value}" label="${item.label}">${item.label}</ui-combobox-item>`,
+        `<ui-combobox-item class="item" value="${item.value}" label="${item.label}">${item.label}</ui-combobox-item>`
     )
     .join("")
   root.innerHTML = `

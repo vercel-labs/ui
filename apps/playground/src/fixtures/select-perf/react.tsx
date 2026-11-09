@@ -1,6 +1,17 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
 import { createRoot } from "react-dom/client"
-import { countRender, mountWhenAsked, perfItems, perfSize } from "tests/fixtures/perf.ts"
+import {
+  countRender,
+  mountWhenAsked,
+  perfItems,
+  perfSize,
+} from "tests/fixtures/perf.ts"
 
 // A long select for the counts specs. Every other option reads
 // `highlighted` in its render function, so specs can tell plain options'
@@ -48,7 +59,7 @@ function Fixture() {
               >
                 {item.label}
               </SelectItem>
-            ),
+            )
           )}
         </SelectContent>
       </Select>

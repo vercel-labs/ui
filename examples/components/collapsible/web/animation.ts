@@ -27,9 +27,11 @@ function mount(root: HTMLElement) {
       </ui-collapsible-panel>
     </ui-collapsible>
   `
-  root.querySelector("ui-collapsible")!.addEventListener("openchangecomplete", (event) => {
-    log(root, event.detail.value ? "Finished opening" : "Finished closing")
-  })
+  root
+    .querySelector("ui-collapsible")!
+    .addEventListener("openchangecomplete", (event) => {
+      log(root, event.detail.value ? "Finished opening" : "Finished closing")
+    })
 }
 
 export { mount }

@@ -27,7 +27,9 @@ function createAutoplay(options: {
   function arm() {
     clearTimeout(timer)
     timer = undefined
-    if (!running || pauses.size > 0) return
+    if (!running || pauses.size > 0) {
+      return
+    }
     startedAt = now()
     timer = setTimeout(tick, remaining)
   }
@@ -41,10 +43,14 @@ function createAutoplay(options: {
 
   function setPaused(cause: CarouselPause, paused: boolean) {
     const was = isPaused()
-    if (paused === pauses.has(cause)) return
+    if (paused === pauses.has(cause)) {
+      return
+    }
     if (paused) {
       // Keep what's left of this page's time.
-      if (pauses.size === 0 && running && timer) remaining = Math.max(0, remaining - (now() - startedAt))
+      if (pauses.size === 0 && running && timer) {
+        remaining = Math.max(0, remaining - (now() - startedAt))
+      }
       pauses.add(cause)
       clearTimeout(timer)
       timer = undefined
@@ -52,18 +58,24 @@ function createAutoplay(options: {
       pauses.delete(cause)
       arm()
     }
-    if (isPaused() !== was) options.onPausedChange(isPaused())
+    if (isPaused() !== was) {
+      options.onPausedChange(isPaused())
+    }
   }
 
   return {
     /** Starts or stops rotating. Starting gives the current page a full interval. */
     setRunning(value: boolean) {
-      if (value === running) return
+      if (value === running) {
+        return
+      }
       const was = isPaused()
       running = value
       remaining = options.interval()
       arm()
-      if (isPaused() !== was) options.onPausedChange(isPaused())
+      if (isPaused() !== was) {
+        options.onPausedChange(isPaused())
+      }
     },
     /** The page changed: it gets a full interval from now. */
     restart() {

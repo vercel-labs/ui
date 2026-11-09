@@ -23,8 +23,19 @@ const popups = {
   tooltip,
 }
 
-test.each(Object.entries(popups))("%s open from its first render mounts its content", (name, primitive) => {
-  const create = primitive as (options: { id: string; open: boolean }) => { get: () => object }
-  expect(create({ id: name, open: true }).get()).toMatchObject({ open: true, mounted: true })
-  expect(create({ id: name, open: false }).get()).toMatchObject({ open: false, mounted: false })
-})
+test.each(Object.entries(popups))(
+  "%s open from its first render mounts its content",
+  (name, primitive) => {
+    const create = primitive as (options: { id: string; open: boolean }) => {
+      get: () => object
+    }
+    expect(create({ id: name, open: true }).get()).toMatchObject({
+      open: true,
+      mounted: true,
+    })
+    expect(create({ id: name, open: false }).get()).toMatchObject({
+      open: false,
+      mounted: false,
+    })
+  }
+)

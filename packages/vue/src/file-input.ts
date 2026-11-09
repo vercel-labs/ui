@@ -23,10 +23,22 @@ import {
   type SlotsType,
   type VNode,
 } from "vue"
-import { renderUnbound, useConnectedPart, useControllerEntry, useControllerTarget } from "./controller-target"
+import {
+  renderUnbound,
+  useConnectedPart,
+  useControllerEntry,
+  useControllerTarget,
+} from "./controller-target"
 import { withElement } from "./create-parts"
 import { useFieldControl } from "./field-context"
-import { optionalBoolean, orModel, usePart, usePrimitive, useScope, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  usePart,
+  usePrimitive,
+  useScope,
+  type PartSlots,
+} from "./use-primitive"
 
 // The file of the item a part sits in, or of the list row it's rendered in,
 // read when needed, so it follows a standalone item's new `file`.
@@ -34,7 +46,9 @@ const FileKey: InjectionKey<() => File> = Symbol("file-input-file")
 
 function useFileInput(part: string) {
   const context = useScope(fileInputPrimitive)?.handle
-  if (!context) throw new Error(`${part} must be used inside <FileInput>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <FileInput>.`)
+  }
   return context
 }
 
@@ -42,7 +56,11 @@ function useItemFile(part: string, own: () => File | undefined) {
   const listed = inject(FileKey, null)
   return () => {
     const file = own() ?? listed?.()
-    if (!file) throw new Error(`${part} must be used inside <FileInputList>, or be given a file.`)
+    if (!file) {
+      throw new Error(
+        `${part} must be used inside <FileInputList>, or be given a file.`
+      )
+    }
     return file
   }
 }
@@ -64,7 +82,10 @@ const FileInput = withElement(
       accept: [String, Array] as PropType<FileInputOptions["accept"]>,
       multiple: optionalBoolean,
       directory: optionalBoolean,
-      capture: { type: [Boolean, String] as PropType<FileInputOptions["capture"]>, default: undefined },
+      capture: {
+        type: [Boolean, String] as PropType<FileInputOptions["capture"]>,
+        default: undefined,
+      },
       maxFiles: Number,
       maxSize: Number,
       minSize: Number,
@@ -80,8 +101,12 @@ const FileInput = withElement(
     emits: {
       "update:value": (_value: File[]) => true,
       "update:modelValue": (_value: File[]) => true,
-      valueChange: (_value: File[], _details: FileInputValueChangeDetails) => true,
-      reject: (_rejected: FileRejection[], _details: CommitDetails<FileInputValueChangeReason>) => true,
+      valueChange: (_value: File[], _details: FileInputValueChangeDetails) =>
+        true,
+      reject: (
+        _rejected: FileRejection[],
+        _details: CommitDetails<FileInputValueChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof fileInputPrimitive, "root">,
     setup(props, { emit }) {
@@ -104,15 +129,22 @@ const FileInput = withElement(
         announcement: props.announcement,
         controller: props.controller,
         debug: props.debug,
-        onValueChange: (value: File[], details: FileInputValueChangeDetails) => {
+        onValueChange: (
+          value: File[],
+          details: FileInputValueChangeDetails
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onReject: (rejected: FileRejection[], details: CommitDetails<FileInputValueChangeReason>) =>
-          emit("reject", rejected, details),
+        onReject: (
+          rejected: FileRejection[],
+          details: CommitDetails<FileInputValueChangeReason>
+        ) => emit("reject", rejected, details),
       }))
       useControllerEntry(() => props.controller, fileInput)
       return usePart(fileInput, "root", undefined, undefined, {
@@ -120,10 +152,15 @@ const FileInput = withElement(
         hidden: () => h("input", fileInput.slot("input")),
       })
     },
-  }),
+  })
 )
 
-const unconnected: FileInputState = { value: [], disabled: false, required: false, dragging: false }
+const unconnected: FileInputState = {
+  value: [],
+  disabled: false,
+  required: false,
+  dragging: false,
+}
 
 /**
  * Opens the file picker. Inside a Field, the field's label names it with the
@@ -140,17 +177,28 @@ const FileInputTrigger = withElement(
     },
     slots: Object as PartSlots<typeof fileInputPrimitive, "trigger">,
     setup(props, { slots, attrs }) {
-      const connected = useControllerTarget(fileInputPrimitive, () => props.controller)
+      const connected = useControllerTarget(
+        fileInputPrimitive,
+        () => props.controller
+      )
       const field = useFieldControl()
       return useConnectedPart(
         connected,
         (fileInput) =>
-          usePart(fileInput, "trigger", undefined, undefined, { tag: "button", extend: field?.props }),
+          usePart(fileInput, "trigger", undefined, undefined, {
+            tag: "button",
+            extend: field?.props,
+          }),
         // Until the file input it names mounts, a trigger outside it is a plain button.
-        () => renderUnbound("button", { type: "button", ...attrs }, { slots, state: unconnected }),
+        () =>
+          renderUnbound(
+            "button",
+            { type: "button", ...attrs },
+            { slots, state: unconnected }
+          )
       )
     },
-  }),
+  })
 )
 
 /**
@@ -171,10 +219,14 @@ const FileInputDropzone = withElement(
     setup(props) {
       const fileInput = useFileInput("FileInputDropzone")
       const id = useId()
-      const zone = () => ({ id, target: props.target, pasteTarget: props.pasteTarget })
+      const zone = () => ({
+        id,
+        target: props.target,
+        pasteTarget: props.pasteTarget,
+      })
       return usePart(fileInput, "dropzone", zone)
     },
-  }),
+  })
 )
 
 // Provides one file to the list's default slot, rendered once for each file.
@@ -213,11 +265,11 @@ const FileInputList = withElement(
         tag: "div",
         children: (state) =>
           (state.value as readonly File[]).map((file) =>
-            h(FileScope, { file, key: fileKey(file) }, () => slots.default?.()),
+            h(FileScope, { file, key: fileKey(file) }, () => slots.default?.())
           ),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -241,7 +293,7 @@ const FileInputItem = withElement(
       provide(FileKey, file)
       return usePart(fileInput, "item", item)
     },
-  }),
+  })
 )
 
 /**
@@ -264,10 +316,14 @@ const FileInputItemRemove = withElement(
       const item = () => ({ file: file(), value: fileKey(file()) })
       return usePart(fileInput, "item-remove", item, undefined, "button")
     },
-  }),
+  })
 )
 
-export { createFileInputController, formatFileSize, relativePath } from "@ui-sdk/core/file-input"
+export {
+  createFileInputController,
+  formatFileSize,
+  relativePath,
+} from "@ui-sdk/core/file-input"
 export type {
   FileInputApi,
   FileInputChange,
@@ -292,4 +348,11 @@ export type {
   FileRules,
 } from "@ui-sdk/core/file-input"
 
-export { FileInput, FileInputDropzone, FileInputItem, FileInputItemRemove, FileInputList, FileInputTrigger }
+export {
+  FileInput,
+  FileInputDropzone,
+  FileInputItem,
+  FileInputItemRemove,
+  FileInputList,
+  FileInputTrigger,
+}

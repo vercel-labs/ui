@@ -8,7 +8,9 @@ function subscribe(listener: () => void) {
 }
 
 function changed() {
-  for (const listener of listeners) listener()
+  for (const listener of listeners) {
+    listener()
+  }
 }
 
 function navigate(url: string) {
@@ -26,7 +28,13 @@ function route() {
 
 document.addEventListener("click", (event) => {
   const link = (event.target as Element).closest("a[href]")
-  if (!(link instanceof HTMLAnchorElement) || link.target || link.origin !== location.origin) return
+  if (
+    !(link instanceof HTMLAnchorElement) ||
+    link.target ||
+    link.origin !== location.origin
+  ) {
+    return
+  }
   if (
     event.defaultPrevented ||
     event.button !== 0 ||
@@ -34,10 +42,13 @@ document.addEventListener("click", (event) => {
     event.ctrlKey ||
     event.shiftKey ||
     event.altKey
-  )
+  ) {
     return
+  }
   event.preventDefault()
-  if (link.href !== location.href) navigate(link.href)
+  if (link.href !== location.href) {
+    navigate(link.href)
+  }
 })
 
 addEventListener("popstate", changed)

@@ -11,15 +11,24 @@ import { physicalSide, type PhysicalSide, type Side } from "../platform/sides"
 type SheetSide = Side
 
 function resolveSide(side: SheetSide, el: Element) {
-  return physicalSide(side, side === "start" || side === "end" ? isRTL(el) : false)
+  return physicalSide(
+    side,
+    side === "start" || side === "end" ? isRTL(el) : false
+  )
 }
 
 const isVertical = (side: PhysicalSide) => side === "bottom" || side === "top"
 
-const towardEdge = (side: PhysicalSide) => (side === "bottom" || side === "right" ? 1 : -1)
+const towardEdge = (side: PhysicalSide) =>
+  side === "bottom" || side === "right" ? 1 : -1
 
 /** A pointer position as the machine reads it: `y` along the axis, growing toward the edge, and `x` across it. */
-function axisPoint(side: PhysicalSide, clientX: number, clientY: number, into: { x: number; y: number }) {
+function axisPoint(
+  side: PhysicalSide,
+  clientX: number,
+  clientY: number,
+  into: { x: number; y: number }
+) {
   const vertical = isVertical(side)
   into.y = (vertical ? clientY : clientX) * towardEdge(side)
   into.x = vertical ? clientX : clientY
@@ -43,25 +52,47 @@ function sizeAlong(el: HTMLElement, side: PhysicalSide) {
  * scrolls it, and `atEnd` the other way. Null when no scroll area inside the
  * sheet scrolls along the axis.
  */
-function scrollContext(target: EventTarget | null, sheet: HTMLElement, side: PhysicalSide) {
+function scrollContext(
+  target: EventTarget | null,
+  sheet: HTMLElement,
+  side: PhysicalSide
+) {
   const area = scrollAreaAt(target, sheet, side)
-  if (!area) return null
+  if (!area) {
+    return null
+  }
   const { start, end } = scrollEdges(area, side)
   return { atStart: start, atEnd: end, area }
 }
 
 // The nearest element between the target and the sheet that scrolls along the axis.
-function scrollAreaAt(target: EventTarget | null, sheet: HTMLElement, side: PhysicalSide) {
+function scrollAreaAt(
+  target: EventTarget | null,
+  sheet: HTMLElement,
+  side: PhysicalSide
+) {
   const view = sheet.ownerDocument.defaultView
-  if (!view || !(target instanceof Element) || !sheet.contains(target)) return null
+  if (!view || !(target instanceof Element) || !sheet.contains(target)) {
+    return null
+  }
   const vertical = isVertical(side)
-  for (let node: Element | null = target; node && node !== sheet.parentElement; node = node.parentElement) {
+  for (
+    let node: Element | null = target;
+    node && node !== sheet.parentElement;
+    node = node.parentElement
+  ) {
     const scrollable = vertical
       ? node.scrollHeight > node.clientHeight + 1
       : node.scrollWidth > node.clientWidth + 1
-    if (!scrollable || !(node instanceof HTMLElement)) continue
-    const overflow = vertical ? view.getComputedStyle(node).overflowY : view.getComputedStyle(node).overflowX
-    if (/auto|scroll/.test(overflow)) return node
+    if (!scrollable || !(node instanceof HTMLElement)) {
+      continue
+    }
+    const overflow = vertical
+      ? view.getComputedStyle(node).overflowY
+      : view.getComputedStyle(node).overflowX
+    if (/auto|scroll/.test(overflow)) {
+      return node
+    }
   }
   return null
 }
@@ -71,7 +102,10 @@ function scrollAreaAt(target: EventTarget | null, sheet: HTMLElement, side: Phys
 function forwardScroll(area: HTMLElement, side: PhysicalSide) {
   if (isVertical(side)) {
     const max = area.scrollHeight - area.clientHeight
-    return { position: side === "bottom" ? area.scrollTop : max - area.scrollTop, max }
+    return {
+      position: side === "bottom" ? area.scrollTop : max - area.scrollTop,
+      max,
+    }
   }
   const max = area.scrollWidth - area.clientWidth
   const left = Math.abs(area.scrollLeft)
@@ -86,8 +120,9 @@ function scrollEdges(area: HTMLElement, side: PhysicalSide) {
 
 /** Scrolls the area forward, away from the sheet's edge, by `delta` px, or back when negative. */
 function scrollForward(area: HTMLElement, side: PhysicalSide, delta: number) {
-  if (isVertical(side)) area.scrollTop += side === "bottom" ? delta : -delta
-  else {
+  if (isVertical(side)) {
+    area.scrollTop += side === "bottom" ? delta : -delta
+  } else {
     const physical = side === "right" ? delta : -delta
     area.scrollLeft += isRTL(area) ? -physical : physical
   }

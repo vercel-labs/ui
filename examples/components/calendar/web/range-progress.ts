@@ -32,9 +32,14 @@ function mount(root: HTMLElement) {
   `
   const calendar = root.querySelector("ui-calendar")!
   calendar.addEventListener("anchorchange", (event) => {
-    log(root, event.detail.value ? `Started on ${event.detail.value}` : "Range finished")
+    log(
+      root,
+      event.detail.value ? `Started on ${event.detail.value}` : "Range finished"
+    )
   })
-  calendar.addEventListener("focusedchange", (event) => log(root, `Focus on ${event.detail.value}`))
+  calendar.addEventListener("focusedchange", (event) =>
+    log(root, `Focus on ${event.detail.value}`)
+  )
 }
 
 export { mount }

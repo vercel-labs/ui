@@ -22,7 +22,9 @@ function Example() {
           data-variant="solid"
           aria-disabled={blocked || undefined}
           onClick={() => {
-            if (!blocked) log(`Published “${title.trim()}”`)
+            if (!blocked) {
+              log(`Published “${title.trim()}”`)
+            }
           }}
         >
           Publish

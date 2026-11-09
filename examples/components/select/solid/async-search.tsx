@@ -41,18 +41,28 @@ const countryList = [
   { value: "ch", label: "Switzerland" },
 ]
 
-function searchCountries(query: string, { signal, page }: { signal: AbortSignal; page: number }) {
-  return new Promise<{ items: typeof countryList; hasMore: boolean }>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      const needle = query.trim().toLowerCase()
-      const found = countryList.filter((country) => country.label.toLowerCase().includes(needle))
-      resolve({ items: found.slice(page * 6, page * 6 + 6), hasMore: found.length > page * 6 + 6 })
-    }, 400)
-    signal.addEventListener("abort", () => {
-      clearTimeout(timer)
-      reject(signal.reason)
-    })
-  })
+function searchCountries(
+  query: string,
+  { signal, page }: { signal: AbortSignal; page: number }
+) {
+  return new Promise<{ items: typeof countryList; hasMore: boolean }>(
+    (resolve, reject) => {
+      const timer = setTimeout(() => {
+        const needle = query.trim().toLowerCase()
+        const found = countryList.filter((country) =>
+          country.label.toLowerCase().includes(needle)
+        )
+        resolve({
+          items: found.slice(page * 6, page * 6 + 6),
+          hasMore: found.length > page * 6 + 6,
+        })
+      }, 400)
+      signal.addEventListener("abort", () => {
+        clearTimeout(timer)
+        reject(signal.reason)
+      })
+    }
+  )
 }
 
 function Example() {
@@ -89,15 +99,34 @@ function Example() {
           </svg>
         </SelectTrigger>
         <SelectContent>
-          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectInput
+            aria-label="Search countries"
+            placeholder="Search countries…"
+          />
           <SelectEmpty>
-            {(state) => (state.empty && !state.loading ? `No countries match “${state.query}”.` : null)}
+            {(state) =>
+              state.empty && !state.loading
+                ? `No countries match “${state.query}”.`
+                : null
+            }
           </SelectEmpty>
           <SelectList>
             {(state) => (
-              <For each={state.items as { value: string; label: string; disabled?: boolean }[]}>
+              <For
+                each={
+                  state.items as {
+                    value: string
+                    label: string
+                    disabled?: boolean
+                  }[]
+                }
+              >
                 {(item) => (
-                  <SelectItem value={item.value} label={item.label} disabled={item.disabled}>
+                  <SelectItem
+                    value={item.value}
+                    label={item.label}
+                    disabled={item.disabled}
+                  >
                     {item.label}
                     <SelectItemIndicator>
                       <svg

@@ -19,12 +19,15 @@ import {
         <div data-slot="stack">
           <AlertDialogTitle>هل أنت متأكد تمامًا؟</AlertDialogTitle>
           <AlertDialogDescription
-            >لا يمكن التراجع عن هذا الإجراء. سيؤدي إلى حذف حسابك نهائيًا.</AlertDialogDescription
+            >لا يمكن التراجع عن هذا الإجراء. سيؤدي إلى حذف حسابك
+            نهائيًا.</AlertDialogDescription
           >
         </div>
         <div data-slot="row">
           <AlertDialogClose>إلغاء</AlertDialogClose>
-          <AlertDialogClose data-variant="solid" value="confirm">متابعة</AlertDialogClose>
+          <AlertDialogClose data-variant="solid" value="confirm"
+            >متابعة</AlertDialogClose
+          >
         </div>
       </AlertDialogContent>
     </AlertDialog>

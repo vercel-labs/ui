@@ -25,14 +25,19 @@ const Preferences = defineComponent({
   name: "Preferences",
   props: {
     /** The preferences to show, from `createPreference` or `createColorScheme`. */
-    preferences: { type: Array as PropType<readonly PreferenceLike[]>, required: true },
+    preferences: {
+      type: Array as PropType<readonly PreferenceLike[]>,
+      required: true,
+    },
     /** The nonce your Content Security Policy gives inline scripts. */
     nonce: String,
   },
   slots: Object as SlotsType<{ default?: () => VNode[] }>,
   setup(props, { slots }) {
     // The server's values until mounted, so the first client render matches it.
-    const values = shallowRef(props.preferences.map((preference) => preference.initialState.value))
+    const values = shallowRef(
+      props.preferences.map((preference) => preference.initialState.value)
+    )
     // The script is in the server's HTML until then. A client-only render
     // drops it right away, and the browser never runs a script Vue inserts.
     const mounted = shallowRef(false)
@@ -45,11 +50,12 @@ const Preferences = defineComponent({
         // Written to its own element too, since a restore that
         // `onValueChange` canceled leaves the rendered value as it was, and
         // Vue wouldn't touch the attribute the script set.
-        for (const preference of list)
-          (preference.global ? document.documentElement : element.value)?.setAttribute(
-            preference.attribute,
-            preference.get().value,
-          )
+        for (const preference of list) {
+          ;(preference.global
+            ? document.documentElement
+            : element.value
+          )?.setAttribute(preference.attribute, preference.get().value)
+        }
       }
       const stops = list.map((preference) => preference.subscribe(read))
       read()
@@ -64,16 +70,21 @@ const Preferences = defineComponent({
       () => props.preferences,
       (list, previous) => {
         const same =
-          list.length === previous.length && list.every((preference, index) => preference === previous[index])
-        if (mounted.value && !same) follow(list)
-      },
+          list.length === previous.length &&
+          list.every((preference, index) => preference === previous[index])
+        if (mounted.value && !same) {
+          follow(list)
+        }
+      }
     )
     onScopeDispose(() => stop())
     const attributes = computed(() => {
       const shown: Record<string, string> = {}
       props.preferences.forEach((preference, index) => {
-        if (!preference.global)
-          shown[preference.attribute] = values.value[index] ?? preference.initialState.value
+        if (!preference.global) {
+          shown[preference.attribute] =
+            values.value[index] ?? preference.initialState.value
+        }
       })
       return shown
     })
@@ -91,9 +102,12 @@ const Preferences = defineComponent({
         [
           mounted.value
             ? null
-            : h("script", { nonce: props.nonce, innerHTML: preferencesScript(props.preferences) }),
+            : h("script", {
+                nonce: props.nonce,
+                innerHTML: preferencesScript(props.preferences),
+              }),
           slots.default?.(),
-        ],
+        ]
       )
   },
 })

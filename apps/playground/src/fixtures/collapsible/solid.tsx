@@ -1,5 +1,9 @@
 import { createCollapsibleController } from "@ui-sdk/core/collapsible"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
 import { collapsibleFixture as fixture } from "tests/fixtures/collapsible.ts"
@@ -12,7 +16,8 @@ function Fixture() {
   const [reason, setReason] = createSignal("")
   const [source, setSource] = createSignal("")
   const [complete, setComplete] = createSignal("")
-  const { cancel, keepMounted, hiddenUntilFound, ...options } = collapsibleOptions()
+  const { cancel, keepMounted, hiddenUntilFound, ...options } =
+    collapsibleOptions()
   return (
     <div class="fixture">
       <button>Before</button>
@@ -21,14 +26,18 @@ function Fixture() {
         controller={controller}
         {...options}
         onOpenChange={(open, details) => {
-          if (cancel === (open ? "open" : "close")) return details.cancel()
+          if (cancel === (open ? "open" : "close")) {
+            return details.cancel()
+          }
           setAction(open ? "open" : "closed")
           setReason(details.reason)
           setSource(details.source)
         }}
         onOpenChangeComplete={(open) => setComplete(open ? "open" : "closed")}
       >
-        <CollapsibleTrigger class="collapsible-trigger">{fixture.trigger}</CollapsibleTrigger>
+        <CollapsibleTrigger class="collapsible-trigger">
+          {fixture.trigger}
+        </CollapsibleTrigger>
         <CollapsiblePanel
           class="collapsible-panel"
           keepMounted={keepMounted}

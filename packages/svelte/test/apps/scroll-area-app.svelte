@@ -10,7 +10,9 @@
 </script>
 
 <ScrollArea stickToEnd>
-  <ScrollAreaViewport aria-label="Messages"><ScrollAreaContent>Hello</ScrollAreaContent></ScrollAreaViewport>
+  <ScrollAreaViewport aria-label="Messages"
+    ><ScrollAreaContent>Hello</ScrollAreaContent></ScrollAreaViewport
+  >
   <ScrollAreaScrollbar><ScrollAreaThumb /></ScrollAreaScrollbar>
   <ScrollAreaScrollToEnd>Jump to latest</ScrollAreaScrollToEnd>
 </ScrollArea>

@@ -19,7 +19,10 @@ const config: NextConfig = {
           "*.tsx": {
             loaders: [
               {
-                loader: path.resolve(import.meta.dirname, "../review/lib/source-locations-loader.mjs"),
+                loader: path.resolve(
+                  import.meta.dirname,
+                  "../review/lib/source-locations-loader.mjs"
+                ),
                 options: { root: import.meta.dirname },
               },
             ],

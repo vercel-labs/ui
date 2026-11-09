@@ -20,7 +20,11 @@ the picker and that a form submits.
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
   import { useControllerEntry } from "../popup.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   type RejectDetails = CommitDetails<FileInputValueChangeReason>
 
@@ -83,7 +87,10 @@ the picker and that a form submits.
     /** Logs every change with its reason. */
     debug?: boolean
     /** Runs when files are added or removed, with what changed in the details. `details.cancel()` stops it. */
-    onValueChange?: (value: File[], details: FileInputValueChangeDetails) => void
+    onValueChange?: (
+      value: File[],
+      details: FileInputValueChangeDetails
+    ) => void
     /** Runs when files fail the checks, after `onValueChange`, with every reason each failed, even when none were accepted. */
     onReject?: (rejected: FileRejection[], details: RejectDetails) => void
   } = $props()
@@ -114,7 +121,9 @@ the picker and that a form submits.
     onValueChange: (next: File[], details: FileInputValueChangeDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onReject,
   }))
@@ -130,7 +139,11 @@ the picker and that a form submits.
   <input {...input.slot()} />
 {/snippet}
 
-<Part tag="div" part={root} props={{ ...rest, render, children: render ? children : content }} />
+<Part
+  tag="div"
+  part={root}
+  props={{ ...rest, render, children: render ? children : content }}
+/>
 {#if render}
   <input {...input.slot()} />
 {/if}

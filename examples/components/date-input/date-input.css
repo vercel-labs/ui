@@ -8,7 +8,9 @@
   }
 
   /* A field around a date or time takes the input's width, so its description wraps under it. */
-  [data-slot="field-root"]:has(> :is([data-slot="date-input-root"], [data-slot="time-input-root"])) {
+  [data-slot="field-root"]:has(
+    > :is([data-slot="date-input-root"], [data-slot="time-input-root"])
+  ) {
     width: max-content;
     max-width: 20rem;
 

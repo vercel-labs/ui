@@ -10,7 +10,9 @@ function markSegments(segments: MatchSegment[]) {
 // The text of a default slot that holds only text, like `<ComboboxItemText>France</ComboboxItemText>`,
 // or undefined when it holds elements, which render as they are.
 function slotText(nodes: VNode[] | undefined) {
-  if (!nodes?.length || !nodes.every((node) => node.type === Text)) return undefined
+  if (!nodes?.length || !nodes.every((node) => node.type === Text)) {
+    return undefined
+  }
   return nodes.map((node) => node.children as string).join("")
 }
 

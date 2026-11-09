@@ -1,6 +1,11 @@
 "use client"
 
-import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/react/tooltip"
+import {
+  createTooltipController,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@ui-sdk/react/tooltip"
 import { BoldIcon, ItalicIcon, UnderlineIcon } from "lucide-react"
 import * as React from "react"
 

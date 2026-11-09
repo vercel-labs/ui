@@ -11,7 +11,9 @@ test.describe("virtualized", () => {
     await open("combobox-virtual")
   })
 
-  test("renders only the rows in view, each with its place in the whole list", async ({ page }) => {
+  test("renders only the rows in view, each with its place in the whole list", async ({
+    page,
+  }) => {
     await input(page).focus()
     await page.keyboard.press("ArrowDown")
     const options = page.getByRole("option")
@@ -24,16 +26,26 @@ test.describe("virtualized", () => {
   }) => {
     await input(page).focus()
     await page.keyboard.press("ArrowDown")
-    for (let step = 0; step < 49; step++) await page.keyboard.press("ArrowDown")
+    for (let step = 0; step < 49; step++) {
+      await page.keyboard.press("ArrowDown")
+    }
     const item = page.getByRole("option", { name: "Item 50", exact: true })
     await expect(item).toHaveAttribute("data-highlighted", "")
     await expect(item).toHaveAttribute("aria-posinset", "50")
-    await expect(input(page)).toHaveAttribute("aria-activedescendant", (await item.getAttribute("id"))!)
+    await expect(input(page)).toHaveAttribute(
+      "aria-activedescendant",
+      (await item.getAttribute("id"))!
+    )
   })
 
   test("filtering covers every item, rendered or not", async ({ page }) => {
     await input(page).fill("9999")
-    await expect(page.getByRole("option", { name: "Item 9999", exact: true })).toBeVisible()
-    await expect(page.getByRole("option").first()).toHaveAttribute("aria-setsize", "1")
+    await expect(
+      page.getByRole("option", { name: "Item 9999", exact: true })
+    ).toBeVisible()
+    await expect(page.getByRole("option").first()).toHaveAttribute(
+      "aria-setsize",
+      "1"
+    )
   })
 })

@@ -27,7 +27,7 @@ test("tabs move with the arrow keys, as a person's keyboard changes", async () =
       </list>
       <panel value="a">Account panel</panel>
       <panel value="b">Password panel</panel>
-    </root>`,
+    </root>`
   )
   mounts.push(view)
   await view.keys("Tab")
@@ -48,34 +48,44 @@ test("a click selects with the mouse as its source", async () => {
   const view = mount(
     tabs,
     { defaultValue: "a" },
-    `<root><list><tab value="a">A</tab><tab value="b">B</tab></list></root>`,
+    `<root><list><tab value="a">A</tab><tab value="b">B</tab></list></root>`
   )
   mounts.push(view)
   await view.click(view.part("tab", "b")!)
-  expect(view.changes.at(-1)).toMatchObject({ key: "value", value: "b", source: "mouse" })
+  expect(view.changes.at(-1)).toMatchObject({
+    key: "value",
+    value: "b",
+    source: "mouse",
+  })
 })
 
 test("Enter on a button clicks it with the keyboard as its source", async () => {
   const view = mount(
     menu,
     {},
-    `<root><trigger>Actions</trigger><content aria-label="Actions"><item value="a">A</item></content></root>`,
+    `<root><trigger>Actions</trigger><content aria-label="Actions"><item value="a">A</item></content></root>`
   )
   mounts.push(view)
   await view.keys("Tab", "Enter")
   expect(view.state.open).toBe(true)
-  expect(view.changes.find((change) => change.key === "open")).toMatchObject({ source: "keyboard" })
+  expect(view.changes.find((change) => change.key === "open")).toMatchObject({
+    source: "keyboard",
+  })
 })
 
 test("Tab from elsewhere in the page goes into the markup", async () => {
-  const before = Object.assign(document.createElement("button"), { textContent: "Before" })
-  const between = Object.assign(document.createElement("button"), { textContent: "Between" })
+  const before = Object.assign(document.createElement("button"), {
+    textContent: "Before",
+  })
+  const between = Object.assign(document.createElement("button"), {
+    textContent: "Between",
+  })
   document.body.prepend(before, between)
   before.focus()
   const view = mount(
     tabs,
     { defaultValue: "a" },
-    `<root><list aria-label="Settings"><tab value="a">A</tab></list></root>`,
+    `<root><list aria-label="Settings"><tab value="a">A</tab></list></root>`
   )
   mounts.push(view)
   try {
@@ -95,12 +105,16 @@ test("a playlist reorders from the keyboard and announces it", async () => {
       <item value="intro">Intro</item>
       <item value="verse">Verse</item>
       <item value="chorus">Chorus</item>
-    </root>`,
+    </root>`
   )
   mounts.push(list)
   await list.keys("Tab", "Space", "ArrowDown", "Space")
   expect(list.state.value).toEqual(["verse", "intro", "chorus"])
-  expect(list.changes.at(-1)).toMatchObject({ key: "value", reason: "move-key", source: "keyboard" })
+  expect(list.changes.at(-1)).toMatchObject({
+    key: "value",
+    reason: "move-key",
+    source: "keyboard",
+  })
   expect(list.announced.at(-1)).toBe("Dropped Intro at position 2 of 3.")
 })
 
@@ -108,12 +122,18 @@ test("a playlist reorders by a drag past the threshold", async () => {
   const list = mount(
     sortable,
     { defaultValue: ["intro", "verse", "chorus"] },
-    `<root aria-label="Playlist"><item value="intro">Intro</item><item value="verse">Verse</item><item value="chorus">Chorus</item></root>`,
+    `<root aria-label="Playlist"><item value="intro">Intro</item><item value="verse">Verse</item><item value="chorus">Chorus</item></root>`
   )
   mounts.push(list)
-  await list.drag(list.part("item", "chorus")!, { to: list.part("item", "intro")! })
+  await list.drag(list.part("item", "chorus")!, {
+    to: list.part("item", "intro")!,
+  })
   expect(list.state.value).toEqual(["chorus", "intro", "verse"])
-  expect(list.changes.at(-1)).toMatchObject({ key: "value", reason: "drag", source: "mouse" })
+  expect(list.changes.at(-1)).toMatchObject({
+    key: "value",
+    reason: "drag",
+    source: "mouse",
+  })
 })
 
 const tabsMarkup = `<root><list aria-label="Settings"><tab value="a">Account</tab><tab value="b">Password</tab><tab value="c">Billing</tab></list><panel value="a">A</panel><panel value="b">B</panel><panel value="c">C</panel></root>`
@@ -136,8 +156,10 @@ test("checkServer names a part whose attributes read the clock or an option", ()
       title: slot({ attrs: (state, { api }) => ({ title: api.label() }) }),
     }),
   })
-  expect(() => checkServer(clocked, { label: "Hi" }, `<root><title>T</title></root>`)).toThrow(
-    /`root` reads the clock or randomness \(`Date.now`\)[\s\S]*`title` reads option `label`/,
+  expect(() =>
+    checkServer(clocked, { label: "Hi" }, `<root><title>T</title></root>`)
+  ).toThrow(
+    /`root` reads the clock or randomness \(`Date.now`\)[\s\S]*`title` reads option `label`/
   )
 })
 
@@ -147,17 +169,23 @@ test("checkServer fails a primitive whose state starts from randomness or the wi
       name: "starting",
       state: () => ({ value: initial() }),
       api: () => ({}),
-      slots: (slot) => ({ root: slot({ attrs: (state) => ({ "data-value": state.value }) }) }),
+      slots: (slot) => ({
+        root: slot({ attrs: (state) => ({ "data-value": state.value }) }),
+      }),
     })
   expect(() =>
     checkServer(
       starting(() => String(Math.random())),
       {},
-      `<root></root>`,
-    ),
+      `<root></root>`
+    )
   ).toThrow(/creating it reads the clock or randomness \(`Math.random`\)/)
-  const where = starting(() => (typeof window === "undefined" ? "server" : "browser"))
-  expect(() => checkServer(where, {}, `<root></root>`)).toThrow(/creating it reads `window`/)
+  const where = starting(() =>
+    typeof window === "undefined" ? "server" : "browser"
+  )
+  expect(() => checkServer(where, {}, `<root></root>`)).toThrow(
+    /creating it reads `window`/
+  )
 })
 
 test("tabs follow the reading direction", async () => {
@@ -170,7 +198,7 @@ test("a horizontal playlist follows the reading direction", async () => {
   await checkDirection(
     sortable,
     { defaultValue: ["intro", "verse", "chorus"], orientation: "horizontal" },
-    `<root aria-label="Playlist"><item value="intro">Intro</item><item value="verse">Verse</item><item value="chorus">Chorus</item></root>`,
+    `<root aria-label="Playlist"><item value="intro">Intro</item><item value="verse">Verse</item><item value="chorus">Chorus</item></root>`
   )
 })
 
@@ -184,15 +212,19 @@ test("checkDirection fails when arrows ignore the direction", async () => {
         attrs: () => ({ tabindex: "0", role: "slider" }),
         on: {
           keydown: (event, { store }) => {
-            if (event.key === "ArrowRight") store.set({ index: store.get().index + 1 })
-            if (event.key === "ArrowLeft") store.set({ index: store.get().index - 1 })
+            if (event.key === "ArrowRight") {
+              store.set({ index: store.get().index + 1 })
+            }
+            if (event.key === "ArrowLeft") {
+              store.set({ index: store.get().index - 1 })
+            }
           },
         },
       }),
     }),
   })
   await expect(checkDirection(fixed, {}, `<root></root>`)).rejects.toThrow(
-    /ArrowLeft right to left leaves state/,
+    /ArrowLeft right to left leaves state/
   )
 })
 
@@ -200,13 +232,13 @@ test("a slider and a dialog render on a server from state alone", () => {
   const sliderHtml = checkServer(
     slider,
     { defaultValue: 40 },
-    `<root><control><track><indicator></indicator><thumb index="0"><thumb-input aria-label="Volume"></thumb-input></thumb></track></control></root>`,
+    `<root><control><track><indicator></indicator><thumb index="0"><thumb-input aria-label="Volume"></thumb-input></thumb></track></control></root>`
   )
   expect(sliderHtml).toMatch(/type="range"[^>]*value="40"/)
   const dialogHtml = checkServer(
     dialog,
     { defaultOpen: true },
-    `<trigger>Edit</trigger><content><title>Edit profile</title><description>Make changes.</description><close>Done</close></content>`,
+    `<trigger>Edit</trigger><content><title>Edit profile</title><description>Make changes.</description><close>Done</close></content>`
   )
   expect(dialogHtml).toContain('role="dialog"')
 })
@@ -217,7 +249,7 @@ test("an open dialog is named on the server", () => {
   const html = checkServer(
     dialog,
     { defaultOpen: true },
-    `<trigger>Edit</trigger><content><title>Edit profile</title><close>Done</close></content>`,
+    `<trigger>Edit</trigger><content><title>Edit profile</title><close>Done</close></content>`
   )
   expect(html).toMatch(/role="dialog"[^>]*aria-labelledby=/)
 })
@@ -228,7 +260,7 @@ test("a menu renders on a server from state alone", () => {
   checkServer(
     menu,
     { defaultOpen: true },
-    `<trigger>Actions</trigger><content><item value="rename">Rename</item><item value="delete">Delete</item></content>`,
+    `<trigger>Actions</trigger><content><item value="rename">Rename</item><item value="delete">Delete</item></content>`
   )
 })
 
@@ -236,7 +268,7 @@ test("a slider follows the reading direction", async () => {
   await checkDirection(
     slider,
     { defaultValue: 40 },
-    `<root><control><track><thumb index="0"><thumb-input aria-label="Volume"></thumb-input></thumb></track></control></root>`,
+    `<root><control><track><thumb index="0"><thumb-input aria-label="Volume"></thumb-input></thumb></track></control></root>`
   )
 })
 
@@ -244,7 +276,7 @@ test("a dialog with no title is named by its trigger once mounted, and points at
   const view = mount(
     dialog,
     { defaultOpen: true },
-    `<trigger>Edit profile</trigger><content><close>Done</close></content>`,
+    `<trigger>Edit profile</trigger><content><close>Done</close></content>`
   )
   mounts.push(view)
   await view.settle()
@@ -257,18 +289,24 @@ const failing = (where: "state" | "attrs" | "bind") =>
   definePrimitive({
     name: "failing",
     state: () => {
-      if (where === "state") throw new Error("broken state")
+      if (where === "state") {
+        throw new Error("broken state")
+      }
       return {}
     },
     api: () => ({}),
     slots: (slot) => ({
       root: slot({
         attrs: () => {
-          if (where === "attrs") throw new Error("broken attrs")
+          if (where === "attrs") {
+            throw new Error("broken attrs")
+          }
           return {}
         },
         bind: () => {
-          if (where === "bind") throw new Error("broken bind")
+          if (where === "bind") {
+            throw new Error("broken bind")
+          }
         },
       }),
     }),
@@ -276,7 +314,9 @@ const failing = (where: "state" | "attrs" | "bind") =>
 
 test("a mount that throws leaves no markup and gives announcements back to the page", () => {
   for (const where of ["state", "attrs", "bind"] as const) {
-    expect(() => mount(failing(where), {}, `<root>A</root>`)).toThrow(`broken ${where}`)
+    expect(() => mount(failing(where), {}, `<root>A</root>`)).toThrow(
+      `broken ${where}`
+    )
     expect(document.body.querySelector("[data-slot]")).toBeNull()
   }
   announce("Saved")
@@ -310,7 +350,9 @@ test("unmount runs every step when a cleanup throws, once", () => {
 })
 
 test("checkDirection puts the page's direction back when mounting throws", async () => {
-  await expect(checkDirection(failing("bind"), {}, `<root></root>`)).rejects.toThrow("broken bind")
+  await expect(
+    checkDirection(failing("bind"), {}, `<root></root>`)
+  ).rejects.toThrow("broken bind")
   expect(document.documentElement.getAttribute("dir")).toBeNull()
 })
 
@@ -331,7 +373,7 @@ test("a toolbar follows the reading direction, though its tab stop is a generate
   await checkDirection(
     toolbar,
     {},
-    `<root aria-label="Format"><button>Bold</button><button>Italic</button><button>Underline</button></root>`,
+    `<root aria-label="Format"><button>Bold</button><button>Italic</button><button>Underline</button></root>`
   )
 })
 
@@ -339,7 +381,7 @@ test("checkDirection compares values named left and right as they are", async ()
   await checkDirection(
     radioGroup,
     { defaultValue: "center" },
-    `<group aria-label="Align"><root value="left">Left</root><root value="center">Center</root><root value="right">Right</root></group>`,
+    `<group aria-label="Align"><root value="left">Left</root><root value="center">Center</root><root value="right">Right</root></group>`
   )
   const aligned = definePrimitive({
     name: "aligned",
@@ -350,15 +392,19 @@ test("checkDirection compares values named left and right as they are", async ()
         attrs: () => ({ tabindex: "0" }),
         on: {
           keydown: (event, { store }) => {
-            if (event.key === "ArrowRight") store.set({ align: "right" })
-            if (event.key === "ArrowLeft") store.set({ align: "left" })
+            if (event.key === "ArrowRight") {
+              store.set({ align: "right" })
+            }
+            if (event.key === "ArrowLeft") {
+              store.set({ align: "left" })
+            }
           },
         },
       }),
     }),
   })
   await expect(checkDirection(aligned, {}, `<root></root>`)).rejects.toThrow(
-    /ArrowLeft right to left leaves state/,
+    /ArrowLeft right to left leaves state/
   )
 })
 
@@ -368,19 +414,24 @@ test("checkServer fails a primitive whose state reads the clock with new Date, r
       name: "starting",
       state: () => ({ value: initial() }),
       api: () => ({}),
-      slots: (slot) => ({ root: slot({ attrs: (state) => ({ "data-value": state.value }) }) }),
+      slots: (slot) => ({
+        root: slot({ attrs: (state) => ({ "data-value": state.value }) }),
+      }),
     })
-  const reads = (initial: () => string) => () => checkServer(starting(initial), {}, `<root></root>`)
+  const reads = (initial: () => string) => () =>
+    checkServer(starting(initial), {}, `<root></root>`)
   expect(reads(() => new Date().toISOString())).toThrow(
-    /creating it reads the clock or randomness \(`new Date\(\)`\)/,
+    /creating it reads the clock or randomness \(`new Date\(\)`\)/
   )
   expect(reads(() => Date())).toThrow(/\(`Date\(\)`\)/)
   expect(reads(() => crypto.randomUUID())).toThrow(/\(`crypto.randomUUID`\)/)
-  expect(reads(() => String(crypto.getRandomValues(new Uint8Array(1))[0]))).toThrow(
-    /\(`crypto.getRandomValues`\)/,
-  )
+  expect(
+    reads(() => String(crypto.getRandomValues(new Uint8Array(1))[0]))
+  ).toThrow(/\(`crypto.getRandomValues`\)/)
   expect(reads(() => typeof location)).toThrow(/creating it reads `location`/)
-  expect(reads(() => new Date(0).toISOString())()).toContain('data-value="1970-01-01T00:00:00.000Z"')
+  expect(reads(() => new Date(0).toISOString())()).toContain(
+    'data-value="1970-01-01T00:00:00.000Z"'
+  )
   expect(new Date().getTime()).toBeGreaterThan(0)
   expect(crypto.randomUUID()).toHaveLength(36)
 })

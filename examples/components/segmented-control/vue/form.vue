@@ -32,7 +32,9 @@ function submit(event: Event) {
       <SegmentedControl name="density" default-value="comfortable">
         <SegmentedControlIndicator />
         <SegmentedControlItem value="compact">Compact</SegmentedControlItem>
-        <SegmentedControlItem value="comfortable">Comfortable</SegmentedControlItem>
+        <SegmentedControlItem value="comfortable"
+          >Comfortable</SegmentedControlItem
+        >
       </SegmentedControl>
     </Field>
     <div data-slot="row">

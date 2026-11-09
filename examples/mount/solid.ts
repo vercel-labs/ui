@@ -5,7 +5,9 @@ import { LogContext } from "../shared/solid/log"
 // The docs preview shows logged messages in its console pane.
 export function mount(module: { Example: Component }, host: HTMLElement) {
   const log = (message: string) =>
-    host.dispatchEvent(new CustomEvent("example-log", { bubbles: true, detail: message }))
+    host.dispatchEvent(
+      new CustomEvent("example-log", { bubbles: true, detail: message })
+    )
   return render(
     () =>
       createComponent(LogContext, {
@@ -14,6 +16,6 @@ export function mount(module: { Example: Component }, host: HTMLElement) {
           return createComponent(module.Example, {})
         },
       }),
-    host,
+    host
   )
 }

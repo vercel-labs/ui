@@ -20,7 +20,9 @@ const documentedPackages = ["core", "react", "solid", "vue", "svelte", "web"]
  * so it isn't listed. `program` holds every entry, for checks that read more.
  */
 function publicExports(root) {
-  const entries = documentedPackages.flatMap((name) => publicEntries(root, name).map(({ file }) => file))
+  const entries = documentedPackages.flatMap((name) =>
+    publicEntries(root, name).map(({ file }) => file)
+  )
   const program = ts.createProgram(entries, {
     module: ts.ModuleKind.ESNext,
     target: ts.ScriptTarget.ES2022,
@@ -39,15 +41,28 @@ function publicExports(root) {
     const sourceFile = program.getSourceFile(entry)
     collectSvelteComponents(sourceFile)
     const module = checker.getSymbolAtLocation(sourceFile)
-    if (!module) continue
+    if (!module) {
+      continue
+    }
     for (const exported of checker.getExportsOfModule(module)) {
-      const symbol = exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported
+      const symbol =
+        exported.flags & ts.SymbolFlags.Alias
+          ? checker.getAliasedSymbol(exported)
+          : exported
       const declaration = symbol.declarations?.[0]
       // Svelte components resolve to Svelte's own types, and are collected above.
       const file = declaration?.getSourceFile().fileName
-      if (!file || !file.startsWith(packages) || file.includes("node_modules")) continue
+      if (
+        !file ||
+        !file.startsWith(packages) ||
+        file.includes("node_modules")
+      ) {
+        continue
+      }
       const key = `${file}:${declaration.pos}`
-      if (seen.has(key)) continue
+      if (seen.has(key)) {
+        continue
+      }
       seen.add(key)
       declarations.push({ name: exported.name, declaration, file })
     }
@@ -58,9 +73,19 @@ function publicExports(root) {
   // A specifier like "./shortcuts.svelte" names a `.svelte.ts` module, which the checker reads.
   function collectSvelteComponents(sourceFile) {
     for (const statement of sourceFile.statements) {
-      if (!ts.isExportDeclaration(statement) || !statement.moduleSpecifier?.text.endsWith(".svelte")) continue
-      const file = path.join(path.dirname(sourceFile.fileName), statement.moduleSpecifier.text)
-      if (!existsSync(file) || seen.has(file)) continue
+      if (
+        !ts.isExportDeclaration(statement) ||
+        !statement.moduleSpecifier?.text.endsWith(".svelte")
+      ) {
+        continue
+      }
+      const file = path.join(
+        path.dirname(sourceFile.fileName),
+        statement.moduleSpecifier.text
+      )
+      if (!existsSync(file) || seen.has(file)) {
+        continue
+      }
       seen.add(file)
       const name = statement.exportClause?.elements[0]?.name.text
       svelteComponents.push({ name, file, text: readFileSync(file, "utf8") })
@@ -71,16 +96,21 @@ function publicExports(root) {
 // A package's public entries in its package.json `exports`, like
 // `{ subpath: "./accordion", file }`, without patterns like `./internal/*`.
 function publicEntries(root, name) {
-  const { exports } = JSON.parse(readFileSync(path.join(root, "packages", name, "package.json"), "utf8"))
+  const { exports } = JSON.parse(
+    readFileSync(path.join(root, "packages", name, "package.json"), "utf8")
+  )
   return Object.entries(exports)
     .filter(
       ([subpath, target]) =>
         typeof target === "string" &&
         /\.tsx?$/.test(target) &&
         !notPublic.includes(subpath) &&
-        !subpath.includes("*"),
+        !subpath.includes("*")
     )
-    .map(([subpath, target]) => ({ subpath, file: path.join(root, "packages", name, target) }))
+    .map(([subpath, target]) => ({
+      subpath,
+      file: path.join(root, "packages", name, target),
+    }))
 }
 
 export { documentedPackages, publicEntries, publicExports }

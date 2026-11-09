@@ -44,7 +44,12 @@ describe("keys", () => {
   })
 
   test("keys with a modifier are left to the browser, like Alt+Left for Back", () => {
-    const keys = { altKey: false, ctrlKey: false, metaKey: false, shiftKey: false }
+    const keys = {
+      altKey: false,
+      ctrlKey: false,
+      metaKey: false,
+      shiftKey: false,
+    }
     expect(isModified(keys)).toBe(false)
     expect(isModified({ ...keys, altKey: true })).toBe(true)
     expect(isModified({ ...keys, ctrlKey: true })).toBe(true)
@@ -75,13 +80,19 @@ describe("motion", () => {
   })
 
   test("opening from closed has no motion", () => {
-    expect(motionOf("a", { value: "a", previous: null, forward: null })).toBeUndefined()
+    expect(
+      motionOf("a", { value: "a", previous: null, forward: null })
+    ).toBeUndefined()
   })
 })
 
 describe("links", () => {
   test("a press with a modifier key or the middle button opens elsewhere", () => {
-    const press = (init: { metaKey?: boolean; ctrlKey?: boolean; button?: number }) =>
+    const press = (init: {
+      metaKey?: boolean
+      ctrlKey?: boolean
+      button?: number
+    }) =>
       ({
         button: 0,
         metaKey: false,
@@ -117,25 +128,40 @@ describe("state", () => {
   })
 
   test("with a viewport, a content that gave way stays shown while it animates out", () => {
-    expect(isShown({ ...base, mounted: true, value: "b", active: "b", exiting: ["a"] }, "a")).toBe(true)
+    expect(
+      isShown(
+        { ...base, mounted: true, value: "b", active: "b", exiting: ["a"] },
+        "a"
+      )
+    ).toBe(true)
   })
 
   test("without a viewport, a content is shown while open or in the page", () => {
     expect(isShown({ ...base, viewport: false, value: "a" }, "a")).toBe(true)
-    expect(isShown({ ...base, viewport: false, contents: ["a"] }, "a")).toBe(true)
+    expect(isShown({ ...base, viewport: false, contents: ["a"] }, "a")).toBe(
+      true
+    )
     expect(isShown({ ...base, viewport: false }, "a")).toBe(false)
   })
 
   test("a menu open from the start renders its item open, with its trigger expanded", () => {
     const menu = navigationMenu({ id: "nav", defaultValue: "products" })
-    expect(attrs(menu.part("trigger", { value: "products" }))["aria-expanded"]).toBe("true")
-    expect(attrs(menu.part("trigger", { value: "resources" }))["aria-expanded"]).toBe("false")
+    expect(
+      attrs(menu.part("trigger", { value: "products" }))["aria-expanded"]
+    ).toBe("true")
+    expect(
+      attrs(menu.part("trigger", { value: "resources" }))["aria-expanded"]
+    ).toBe("false")
     expect(present(menu.part("content", { value: "products" }))).toBe(true)
     expect(present(menu.part("content", { value: "resources" }))).toBe(false)
-    expect(present(menu.part("content", { value: "resources", keepMounted: true }))).toBe(true)
-    expect(attrs(menu.part("content", { value: "resources", hiddenUntilFound: true })).hidden).toBe(
-      "until-found",
-    )
+    expect(
+      present(menu.part("content", { value: "resources", keepMounted: true }))
+    ).toBe(true)
+    expect(
+      attrs(
+        menu.part("content", { value: "resources", hiddenUntilFound: true })
+      ).hidden
+    ).toBe("until-found")
   })
 
   test("the controller opens, switches and closes items, with reasons", () => {
@@ -147,19 +173,30 @@ describe("state", () => {
     menu.api.setValue("products")
     menu.api.setValue("resources")
     menu.api.close()
-    expect(changes).toEqual(["products: imperative", "resources: imperative", "null: imperative"])
+    expect(changes).toEqual([
+      "products: imperative",
+      "resources: imperative",
+      "null: imperative",
+    ])
     expect(menu.api.isOpen()).toBe(false)
   })
 
   test("a canceled change leaves the menu as it was", () => {
-    const menu = navigationMenu({ id: "nav", onValueChange: (_, details) => details.cancel() })
+    const menu = navigationMenu({
+      id: "nav",
+      onValueChange: (_, details) => details.cancel(),
+    })
     expect(menu.api.setValue("products")).toBe(false)
     expect(menu.api.getValue()).toBe(null)
   })
 
   test("the current page's link says so", () => {
     const menu = navigationMenu({ id: "nav" })
-    expect(attrs(menu.part("link", { id: "a", current: true }))["aria-current"]).toBe("page")
-    expect(attrs(menu.part("link", { id: "b" }))["aria-current"]).toBeUndefined()
+    expect(
+      attrs(menu.part("link", { id: "a", current: true }))["aria-current"]
+    ).toBe("page")
+    expect(
+      attrs(menu.part("link", { id: "b" }))["aria-current"]
+    ).toBeUndefined()
   })
 })

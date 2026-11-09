@@ -36,10 +36,12 @@ test("a trigger keeps the label it's given after the select's own label mounts",
           <SelectValue />
         </SelectTrigger>
       </Select>
-    </>,
+    </>
   )
   await React.act(async () => new Promise((resolve) => setTimeout(resolve, 20)))
-  expect(view.querySelector("button")!.getAttribute("aria-labelledby")).toBe("mine")
+  expect(view.querySelector("button")!.getAttribute("aria-labelledby")).toBe(
+    "mine"
+  )
 })
 
 test("a field's label names a combobox input over the combobox's own label", async () => {
@@ -50,10 +52,12 @@ test("a field's label names a combobox input over the combobox's own label", asy
         <ComboboxLabel>Pick one</ComboboxLabel>
         <ComboboxInput />
       </Combobox>
-    </Field>,
+    </Field>
   )
   const label = view.querySelector('[data-slot="field-label"]')!
-  expect(view.querySelector("input")!.getAttribute("aria-labelledby")).toBe(label.id)
+  expect(view.querySelector("input")!.getAttribute("aria-labelledby")).toBe(
+    label.id
+  )
 })
 
 test("a combobox input inside a labelled field keeps the label reference passed to it", async () => {
@@ -67,7 +71,9 @@ test("a combobox input inside a labelled field keeps the label reference passed 
           <ComboboxInput aria-labelledby="mine" />
         </Combobox>
       </Field>
-    </>,
+    </>
   )
-  expect(view.querySelector("input")!.getAttribute("aria-labelledby")).toBe("mine")
+  expect(view.querySelector("input")!.getAttribute("aria-labelledby")).toBe(
+    "mine"
+  )
 })

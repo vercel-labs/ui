@@ -91,7 +91,9 @@ function selectOptions() {
     recent: params.has("recent"),
     ...(max && { max: Number(max) }),
     multiple,
-    ...(value !== null && { defaultValue: multiple ? value.split(",").filter(Boolean) : value }),
+    ...(value !== null && {
+      defaultValue: multiple ? value.split(",").filter(Boolean) : value,
+    }),
     grouped: params.has("grouped"),
     required: params.has("required"),
     readOnly: params.has("readonly"),
@@ -117,21 +119,38 @@ function longItems(count = 10_000) {
 
 // What a form would submit, as a query string.
 function serializeForm(form: HTMLFormElement) {
-  return new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString()
+  return new URLSearchParams(
+    new FormData(form) as unknown as Record<string, string>
+  ).toString()
 }
 
 // The rows a virtualized list renders: the visible ones plus a few either side.
-function visibleRows(scrollTop: number, height: number, count: number, row: number, overscan = 4) {
+function visibleRows(
+  scrollTop: number,
+  height: number,
+  count: number,
+  row: number,
+  overscan = 4
+) {
   const start = Math.max(0, Math.floor(scrollTop / row) - overscan)
   const end = Math.min(count, Math.ceil((scrollTop + height) / row) + overscan)
   return { start, end }
 }
 
 // The scroll position that shows a row, or the current one when it's in view.
-function scrollForRow(index: number, scrollTop: number, height: number, row: number) {
+function scrollForRow(
+  index: number,
+  scrollTop: number,
+  height: number,
+  row: number
+) {
   const top = index * row
-  if (top < scrollTop) return top
-  if (top + row > scrollTop + height) return top + row - height
+  if (top < scrollTop) {
+    return top
+  }
+  if (top + row > scrollTop + height) {
+    return top + row - height
+  }
   return scrollTop
 }
 
@@ -148,4 +167,12 @@ const changedItems = {
   ],
 }
 
-export { changedItems, longItems, scrollForRow, selectFixture, selectOptions, serializeForm, visibleRows }
+export {
+  changedItems,
+  longItems,
+  scrollForRow,
+  selectFixture,
+  selectOptions,
+  serializeForm,
+  visibleRows,
+}

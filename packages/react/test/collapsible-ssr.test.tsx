@@ -1,7 +1,11 @@
 // @vitest-environment node
 import { renderToString } from "react-dom/server"
 import { describe, expect, test } from "vitest"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a collapsible", () => {
@@ -10,7 +14,7 @@ describe("server rendering a collapsible", () => {
       <Collapsible defaultOpen>
         <CollapsibleTrigger>Details</CollapsibleTrigger>
         <CollapsiblePanel>Panel</CollapsiblePanel>
-      </Collapsible>,
+      </Collapsible>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toMatch(/aria-expanded="true"[^>]*data-open=""[^>]*>Details/)
@@ -23,14 +27,14 @@ describe("server rendering a collapsible", () => {
       <Collapsible>
         <CollapsibleTrigger>Details</CollapsibleTrigger>
         <CollapsiblePanel>Panel</CollapsiblePanel>
-      </Collapsible>,
+      </Collapsible>
     )
     expect(closed).not.toContain("Panel")
     const kept = renderToString(
       <Collapsible>
         <CollapsibleTrigger>Details</CollapsibleTrigger>
         <CollapsiblePanel keepMounted>Panel</CollapsiblePanel>
-      </Collapsible>,
+      </Collapsible>
     )
     expect(kept).toMatch(/<div[^>]*hidden=""[^>]*>Panel/)
   })
@@ -40,7 +44,7 @@ describe("server rendering a collapsible", () => {
       <Collapsible>
         <CollapsibleTrigger>Details</CollapsibleTrigger>
         <CollapsiblePanel hiddenUntilFound>Panel</CollapsiblePanel>
-      </Collapsible>,
+      </Collapsible>
     )
     expect(html).toMatch(/<div[^>]*hidden=""[^>]*>Panel/)
   })

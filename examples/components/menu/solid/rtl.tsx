@@ -130,7 +130,9 @@ export function Example() {
           </MenuItem>
         </MenuContent>
       </Menu>
-      <output data-slot="output">{action() ? `نُفّذ: ${action()}` : "اختر عنصرًا"}</output>
+      <output data-slot="output">
+        {action() ? `نُفّذ: ${action()}` : "اختر عنصرًا"}
+      </output>
     </div>
   )
 }

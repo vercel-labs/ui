@@ -1,11 +1,21 @@
 import { orientationOf } from "../../foundation/focus/collection"
 import { isDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import { bindIndicator } from "../../foundation/selection/indicator"
-import { radioGroupApi, radioGroupState, syncRadioGroup } from "../radio/radio-api"
+import {
+  radioGroupApi,
+  radioGroupState,
+  syncRadioGroup,
+} from "../radio/radio-api"
 import { radioSlots } from "../radio/radio-parts"
 import type { SegmentedControlGeneric } from "./segmented-control-generic"
 
@@ -19,13 +29,15 @@ type SegmentedControlOrientation = "horizontal" | "vertical"
  * Why a segmented control's value wants to change.
  * @experimental
  */
-type SegmentedControlValueChangeReason = "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
+type SegmentedControlValueChangeReason =
+  "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
 
 /**
  * Options for every write method on a controller.
  * @experimental
  */
-type SegmentedControlChangeOptions = ChangeOptions<SegmentedControlValueChangeReason>
+type SegmentedControlChangeOptions =
+  ChangeOptions<SegmentedControlValueChangeReason>
 
 /**
  * Picks and inspects a segmented control's value from outside it. Pass it as the `controller` option.
@@ -36,7 +48,10 @@ function createSegmentedControlController<T extends string = string>() {
     /** The checked item's value. */
     getValue: () => T | null
     /** Checks an item, as a user would. Disabled items and read-only controls ignore it. */
-    setValue: (value: T | null, details?: SegmentedControlChangeOptions) => boolean
+    setValue: (
+      value: T | null,
+      details?: SegmentedControlChangeOptions
+    ) => boolean
     /** Moves focus to the checked item, or the first one. */
     focus: () => void
   }>()
@@ -61,7 +76,10 @@ type SegmentedControlOptions<T extends string = string> = {
   /** The item checked at first, when uncontrolled. A form reset returns to it. */
   defaultValue?: T | null
   /** Runs when a user or a form reset wants to change the value. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T | null, details: ChangeDetails<SegmentedControlValueChangeReason>) => void
+  onValueChange?: (
+    value: T | null,
+    details: ChangeDetails<SegmentedControlValueChangeReason>
+  ) => void
   /** Disables every item: they can't be focused or changed, and the value isn't submitted. */
   disabled?: boolean
   /** Keeps the items focusable and the value submitted, but stops changes. */
@@ -144,9 +162,17 @@ type SegmentedControlIndicatorState = {
 
 const slotNames = { group: "root", item: "item" }
 
-const indicatorVariables = ["left", "right", "top", "bottom", "width", "height"] as const
+const indicatorVariables = [
+  "left",
+  "right",
+  "top",
+  "bottom",
+  "width",
+  "height",
+] as const
 
-const orientation = (options: SegmentedControlOptions) => orientationOf(options.orientation, "horizontal")
+const orientation = (options: SegmentedControlOptions) =>
+  orientationOf(options.orientation, "horizontal")
 
 /**
  * `segmentedControl`'s api, which its slots and controller call. Adapters
@@ -172,7 +198,10 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
   },
   state: (options: SegmentedControlOptions) =>
     radioGroupState(options, { orientation: orientation(options) }),
-  sync: (options) => ({ ...syncRadioGroup(options), orientation: orientation(options) }),
+  sync: (options) => ({
+    ...syncRadioGroup(options),
+    orientation: orientation(options),
+  }),
   api: (context) => radioGroupApi(context, slotNames),
   slots: (slot) => {
     const { group, item, input } = radioSlots(slot, (state) => ({
@@ -188,7 +217,10 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
       input,
       indicator: slot<{}, SegmentedControlIndicatorState>({
         role: "presentation",
-        state: (state) => ({ value: state.value, orientation: state.orientation ?? "horizontal" }),
+        state: (state) => ({
+          value: state.value,
+          orientation: state.orientation ?? "horizontal",
+        }),
         attrs: (state) => ({ "data-orientation": state.orientation }),
         bind(el, { api, store }) {
           let value = store.get().value
@@ -201,14 +233,25 @@ const segmentedControlPrimitive = /* @__PURE__ */ definePrimitive({
             itemSelector: '[role="radio"]',
             subscribe: (remeasure) =>
               store.subscribe(() => {
-                if (store.get().value === value) return
+                if (store.get().value === value) {
+                  return
+                }
                 value = store.get().value
                 remeasure()
               }),
             write(box) {
-              for (const name of indicatorVariables)
-                if (box) el.style.setProperty(`--segmented-control-indicator-${name}`, `${box[name]}px`)
-                else el.style.removeProperty(`--segmented-control-indicator-${name}`)
+              for (const name of indicatorVariables) {
+                if (box) {
+                  el.style.setProperty(
+                    `--segmented-control-indicator-${name}`,
+                    `${box[name]}px`
+                  )
+                } else {
+                  el.style.removeProperty(
+                    `--segmented-control-indicator-${name}`
+                  )
+                }
+              }
             },
           })
         },

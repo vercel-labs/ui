@@ -35,9 +35,21 @@ function Item({ value, label, disabled }: ListboxFixtureItem) {
 }
 
 // The items, or the groups with ?grouped.
-function Items({ grouped, long, list }: { grouped: boolean; long: boolean; list: ListboxFixtureItem[] }) {
-  if (long) return longToppings().map((item) => <Item key={item.value} {...item} />)
-  if (!grouped) return list.map((item) => <Item key={item.value} {...item} />)
+function Items({
+  grouped,
+  long,
+  list,
+}: {
+  grouped: boolean
+  long: boolean
+  list: ListboxFixtureItem[]
+}) {
+  if (long) {
+    return longToppings().map((item) => <Item key={item.value} {...item} />)
+  }
+  if (!grouped) {
+    return list.map((item) => <Item key={item.value} {...item} />)
+  }
   return f.groups.map((group, index) => (
     <React.Fragment key={group.label}>
       {index > 0 && <ListboxSeparator className="separator" />}
@@ -52,14 +64,22 @@ function Items({ grouped, long, list }: { grouped: boolean; long: boolean; list:
 }
 
 function Fixture({ data = false }: { data?: boolean }) {
-  const { fieldset, grouped, cancel, long, controlled, defaultValue, ...options } = listboxOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    long,
+    controlled,
+    defaultValue,
+    ...options
+  } = listboxOptions()
   const [action, setAction] = React.useState("")
   const [reason, setReason] = React.useState("")
   const [submitted, setSubmitted] = React.useState("")
   const [list, setList] = React.useState<ListboxFixtureItem[]>(f.items)
   React.useEffect(() => onItemsChange(changedToppings, setList), [])
   const [value, setValue] = React.useState<string | string[] | null>(
-    defaultValue ?? (options.multiple ? [] : null),
+    defaultValue ?? (options.multiple ? [] : null)
   )
   return (
     <div className="fixture">
@@ -80,10 +100,20 @@ function Fixture({ data = false }: { data?: boolean }) {
             aria-label={f.label}
             name={f.name}
             controller={controller}
-            items={data ? (long ? longToppings() : grouped ? listboxData(true) : list) : undefined}
+            items={
+              data
+                ? long
+                  ? longToppings()
+                  : grouped
+                    ? listboxData(true)
+                    : list
+                : undefined
+            }
             onValueChange={(next, details) => {
               setReason(details.reason)
-              if (cancel) return details.cancel()
+              if (cancel) {
+                return details.cancel()
+              }
               setValue(next)
               setAction(listboxAction(next))
             }}
@@ -114,12 +144,18 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 
 // A disabled fieldset around the control, with ?fieldset.
-function Wrap({ fieldset, children }: { fieldset: boolean; children: React.ReactNode }) {
+function Wrap({
+  fieldset,
+  children,
+}: {
+  fieldset: boolean
+  children: React.ReactNode
+}) {
   return fieldset ? <fieldset disabled>{children}</fieldset> : <>{children}</>
 }
 

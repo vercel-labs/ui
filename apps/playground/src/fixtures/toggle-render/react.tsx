@@ -9,14 +9,20 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Button className="button" render={<span />} onClick={() => setAction("span")}>
+      <Button
+        className="button"
+        render={<span />}
+        onClick={() => setAction("span")}
+      >
         Span button
       </Button>
       <Button className="button" disabled render={<a href="#old" />}>
         Old docs
       </Button>
       <Toggle
-        className={(state) => `toggle ${state.pressed ? "is-pressed" : "is-unpressed"}`}
+        className={(state) =>
+          `toggle ${state.pressed ? "is-pressed" : "is-unpressed"}`
+        }
         onPressedChange={(pressed) => setAction(pressed ? "star" : "unstar")}
       >
         {(state) => (
@@ -51,7 +57,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

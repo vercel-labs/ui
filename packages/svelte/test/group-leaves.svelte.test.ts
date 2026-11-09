@@ -14,7 +14,11 @@ test("a checkbox group leaving with a new value reads none of its destroyed comp
   app.leave()
   flushSync()
   await new Promise((done) => setTimeout(done))
-  expect(warn.mock.calls.filter(([message]) => String(message).includes("derived_inert"))).toEqual([])
+  expect(
+    warn.mock.calls.filter(([message]) =>
+      String(message).includes("derived_inert")
+    )
+  ).toEqual([])
   unmount(app)
   target.remove()
   warn.mockRestore()

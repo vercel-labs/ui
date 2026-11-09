@@ -20,7 +20,9 @@ const fieldOutsideState: FieldErrorState = {
 }
 
 // Only the slot, so styles that select a part still match it.
-const fieldOutsideAttrs = (slot: FieldOutsideSlot) => ({ "data-slot": `field-${slot}` })
+const fieldOutsideAttrs = (slot: FieldOutsideSlot) => ({
+  "data-slot": `field-${slot}`,
+})
 
 // No validation decides an error outside a field, so only `match` shows it.
 const fieldOutsideErrorShown = (props: FieldErrorProps) => props.match === true
@@ -35,7 +37,8 @@ const checked = new WeakSet<Element>()
 
 // Whether a label labels something now, or names its control with `for`,
 // whose target may render anywhere and at any time.
-const labels = (el: Element) => (el instanceof HTMLLabelElement ? !!el.control || el.htmlFor !== "" : false)
+const labels = (el: Element) =>
+  el instanceof HTMLLabelElement ? !!el.control || el.htmlFor !== "" : false
 
 // A short quote of the label, so the warning says which one.
 const quote = (el: Element) => {
@@ -49,9 +52,16 @@ const quote = (el: Element) => {
 // yet, like one behind a pending boundary, waits again.
 function watchLabel(el: Element, fix: string) {
   const observer = new MutationObserver(() => {
-    if (labels(el)) done()
+    if (labels(el)) {
+      done()
+    }
   })
-  observer.observe(el, { childList: true, subtree: true, attributes: true, attributeFilter: ["for"] })
+  observer.observe(el, {
+    childList: true,
+    subtree: true,
+    attributes: true,
+    attributeFilter: ["for"],
+  })
   let timer: ReturnType<typeof setTimeout> | undefined
   const done = () => {
     observer.disconnect()
@@ -60,10 +70,17 @@ function watchLabel(el: Element, fix: string) {
   let waits = 0
   const wait = () => {
     timer = setTimeout(() => {
-      if (labels(el)) return done()
-      if (!el.isConnected) return ++waits < 10 ? wait() : done()
+      if (labels(el)) {
+        return done()
+      }
+      if (!el.isConnected) {
+        return ++waits < 10 ? wait() : done()
+      }
       done()
-      warn(`A FieldLabel outside a Field labels nothing ("${quote(el)}"). ${fix}`, { component: "field" })
+      warn(
+        `A FieldLabel outside a Field labels nothing ("${quote(el)}"). ${fix}`,
+        { component: "field" }
+      )
     }, labelWait)
   }
   wait()
@@ -77,13 +94,25 @@ function watchLabel(el: Element, fix: string) {
 function checkFieldOutside(
   el: Element | null | undefined,
   slot: FieldOutsideSlot,
-  fix = "Put the control inside it, or point its `for` at the control.",
+  fix = "Put the control inside it, or point its `for` at the control."
 ) {
-  if (!dev || !el || checked.has(el) || typeof MutationObserver === "undefined") return
+  if (
+    !dev ||
+    !el ||
+    checked.has(el) ||
+    typeof MutationObserver === "undefined"
+  ) {
+    return
+  }
   checked.add(el)
-  if (slot === "control")
-    return checkName(el as HTMLElement, "A FieldControl outside a Field", { component: "field" })
-  if (slot === "label" && !labels(el)) watchLabel(el, fix)
+  if (slot === "control") {
+    return checkName(el as HTMLElement, "A FieldControl outside a Field", {
+      component: "field",
+    })
+  }
+  if (slot === "label" && !labels(el)) {
+    watchLabel(el, fix)
+  }
 }
 
 export {

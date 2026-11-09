@@ -17,7 +17,9 @@ test("every example renders without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("find an item by typing: one letter steps, quick letters jump, arrows move one", async ({ page }) => {
+test("find an item by typing: one letter steps, quick letters jump, arrows move one", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const list = page.getByRole("listbox", { name: "Fruit" })
   const selected = list.getByRole("option", { selected: true })
@@ -70,7 +72,9 @@ test("names with spaces: space joins a search, picks without one, and the delay 
   await page.keyboard.press("Escape")
   await page.keyboard.press("Enter")
   await expect(picked.last()).toHaveText("Picked Naples")
-  await page.getByRole("checkbox", { name: "Wait 1.5 seconds between keys" }).check()
+  await page
+    .getByRole("checkbox", { name: "Wait 1.5 seconds between keys" })
+    .check()
   await list.focus()
   await page.keyboard.press("n")
   await page.clock.runFor(1000)
@@ -78,12 +82,16 @@ test("names with spaces: space joins a search, picks without one, and the delay 
   await expect(selected).toHaveAccessibleName("Nice")
 })
 
-test("rank what someone searches for: the best match comes first, accents and all", async ({ page }) => {
+test("rank what someone searches for: the best match comes first, accents and all", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const example = page
     .locator("[data-example]")
     .filter({ has: page.locator("[data-slot='command-search-root']") })
-  const search = example.first().getByRole("searchbox", { name: "Search commands" })
+  const search = example
+    .first()
+    .getByRole("searchbox", { name: "Search commands" })
   const items = example.first().getByRole("listitem")
   await search.fill("gp")
   await expect(items.first()).toContainText("Git push")
@@ -96,7 +104,9 @@ test("rank what someone searches for: the best match comes first, accents and al
   await expect(items.first()).toContainText("Résumé template")
 })
 
-test("highlight what matched: each mode marks its own ranges in the text as written", async ({ page }) => {
+test("highlight what matched: each mode marks its own ranges in the text as written", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const mode = page.getByRole("combobox", { name: "Match" })
   const example = page.locator("[data-example]").filter({ has: mode })
@@ -114,19 +124,27 @@ test("highlight what matched: each mode marks its own ranges in the text as writ
   await expect(marks).toHaveText(["Résu"])
 })
 
-test("the page's language: the price and the names follow the lang around them", async ({ page }) => {
+test("the page's language: the price and the names follow the lang around them", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const language = page.getByRole("combobox", { name: "Language" })
   await expect(page.locator("[data-price]")).toHaveText("€1,234.50")
-  await expect(page.locator("[data-names]")).toHaveText("Anna, Åsa, Örjan, and Zoë")
+  await expect(page.locator("[data-names]")).toHaveText(
+    "Anna, Åsa, Örjan, and Zoë"
+  )
   await expect(page.locator("[data-language]")).toContainText("Page: en-US")
   await language.selectOption("sv-SE")
   await expect(page.locator("[data-price]")).toHaveText("1 234,50 €")
-  await expect(page.locator("[data-names]")).toHaveText("Anna, Zoë, Åsa och Örjan")
+  await expect(page.locator("[data-names]")).toHaveText(
+    "Anna, Zoë, Åsa och Örjan"
+  )
   await expect(page.locator("[data-language]")).toContainText("Page: sv-SE")
 })
 
-test("tags from elsewhere: a POSIX tag is repaired, and something else falls back", async ({ page }) => {
+test("tags from elsewhere: a POSIX tag is repaired, and something else falls back", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const tag = page.getByRole("textbox", { name: "Language tag" })
   await expect(page.locator("[data-locale]")).toHaveText("Intl reads en-US")
@@ -149,21 +167,33 @@ test("search as you type: results wait for the input method to commit, unless th
   const compose = (value: string, type = "input") =>
     field.evaluate(
       (el, { value, type }) => {
-        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(el, value)
+        Object.getOwnPropertyDescriptor(
+          HTMLInputElement.prototype,
+          "value"
+        )!.set!.call(el, value)
         el.dispatchEvent(
           type === "input"
-            ? new InputEvent("input", { bubbles: true, isComposing: true, data: value })
-            : new CompositionEvent("compositionend", { bubbles: true, data: value }),
+            ? new InputEvent("input", {
+                bubbles: true,
+                isComposing: true,
+                data: value,
+              })
+            : new CompositionEvent("compositionend", {
+                bubbles: true,
+                data: value,
+              })
         )
       },
-      { value, type },
+      { value, type }
     )
   await compose("にh")
   await compose("にほn")
   await expect(searches).toHaveCount(0)
   await compose("日本", "compositionend")
   await expect(searches).toHaveText(["Search “日本”"])
-  await page.getByRole("checkbox", { name: "Wait for the input method" }).uncheck()
+  await page
+    .getByRole("checkbox", { name: "Wait for the input method" })
+    .uncheck()
   await compose("日本ご")
   await expect(searches.last()).toHaveText("Search “日本ご”")
   await field.fill("tokyo")

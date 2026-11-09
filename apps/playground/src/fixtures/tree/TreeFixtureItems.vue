@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { TreeGroup, TreeItem, TreeItemCheckbox, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/vue"
+import {
+  TreeGroup,
+  TreeItem,
+  TreeItemCheckbox,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/vue"
 import type { TreeFixtureItem } from "tests/fixtures/tree.ts"
 
 defineProps<{ items: TreeFixtureItem[]; checkable: boolean }>()
@@ -13,7 +19,9 @@ defineProps<{ items: TreeFixtureItem[]; checkable: boolean }>()
     :value="item.value"
     :disabled="item.disabled"
   >
-    <TreeItemIndicator v-if="item.children" class="tree-indicator">▸</TreeItemIndicator>
+    <TreeItemIndicator v-if="item.children" class="tree-indicator"
+      >▸</TreeItemIndicator
+    >
     <TreeItemCheckbox v-if="checkable" class="tree-checkbox" />
     <TreeItemLabel class="tree-label">
       <template v-if="item.href" #render="{ props }">

@@ -7,7 +7,10 @@ import { get as getBlob } from "@vercel/blob"
 const registryStore = {
   async read(pathname: string) {
     // Indexes change on every release, so they skip the CDN cache. Tarballs never change.
-    const result = await getBlob(pathname, { access: "private", useCache: !pathname.endsWith(".json") })
+    const result = await getBlob(pathname, {
+      access: "private",
+      useCache: !pathname.endsWith(".json"),
+    })
     return result?.statusCode === 200 ? result.stream : null
   },
 }

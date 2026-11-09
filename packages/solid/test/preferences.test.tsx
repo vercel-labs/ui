@@ -1,6 +1,10 @@
 // A client-only render of Preferences: it drops the script, puts the saved
 // values on their attributes, and follows every change after.
-import { createColorScheme, createLocalStorage, createPreference } from "@ui-sdk/core"
+import {
+  createColorScheme,
+  createLocalStorage,
+  createPreference,
+} from "@ui-sdk/core"
 import { render } from "@solidjs/web"
 import { flush } from "solid-js"
 import { afterEach, expect, test } from "vitest"
@@ -13,14 +17,20 @@ afterEach(() => {
   dispose = undefined
   document.body.replaceChildren()
   localStorage.clear()
-  for (const name of document.documentElement.getAttributeNames())
-    if (name.startsWith("data-")) document.documentElement.removeAttribute(name)
+  for (const name of document.documentElement.getAttributeNames()) {
+    if (name.startsWith("data-")) {
+      document.documentElement.removeAttribute(name)
+    }
+  }
 })
 
 test("puts saved values on <html> and its element, drops the script, and follows changes", () => {
   localStorage.setItem("color-scheme", "dark")
   localStorage.setItem("skin-tone", "medium")
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme"), global: true })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme"),
+    global: true,
+  })
   const skinTone = createPreference({
     values: ["default", "light", "medium", "dark"],
     defaultValue: "default",
@@ -38,10 +48,12 @@ test("puts saved values on <html> and its element, drops the script, and follows
         <Label />
       </Preferences>
     ),
-    container,
+    container
   )
   flush()
-  const element = container.querySelector<HTMLElement>('[data-slot="preferences"]')!
+  const element = container.querySelector<HTMLElement>(
+    '[data-slot="preferences"]'
+  )!
   expect(container.querySelector("script")).toBeNull()
   expect(element.style.display).toBe("contents")
   expect(document.documentElement.dataset.colorScheme).toBe("dark")

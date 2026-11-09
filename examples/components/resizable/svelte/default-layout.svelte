@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/svelte/resizable"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+  } from "@ui-sdk/svelte/resizable"
 </script>
 
 <Resizable defaultLayout={[25, 35, 40]}>

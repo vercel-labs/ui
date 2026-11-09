@@ -20,7 +20,8 @@ const photos = [
 ]
 
 const nextFocused = () =>
-  typeof document !== "undefined" && document.activeElement?.getAttribute("data-slot") === "carousel-next"
+  typeof document !== "undefined" &&
+  document.activeElement?.getAttribute("data-slot") === "carousel-next"
 
 function Example() {
   return (
@@ -50,7 +51,10 @@ function Example() {
         <CarouselNext
           render={(props, state) =>
             state.disabled ? (
-              <a href="https://example.com/gallery" ref={nextFocused() ? (link) => link?.focus() : undefined}>
+              <a
+                href="https://example.com/gallery"
+                ref={nextFocused() ? (link) => link?.focus() : undefined}
+              >
                 See all photos
               </a>
             ) : (

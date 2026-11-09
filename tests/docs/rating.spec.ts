@@ -10,20 +10,28 @@ testExamples("rating", {
     await expect(preview.getByRole("radio", { name: "5 stars" })).toBeChecked()
   },
   "half-stars": async (preview) => {
-    await expect(preview.getByRole("radio", { name: "3.5 stars" })).toBeChecked()
+    await expect(
+      preview.getByRole("radio", { name: "3.5 stars" })
+    ).toBeChecked()
     await preview.getByRole("radio", { name: "1.5 stars" }).click()
-    await expect(preview.getByRole("radio", { name: "1.5 stars" })).toBeChecked()
+    await expect(
+      preview.getByRole("radio", { name: "1.5 stars" })
+    ).toBeChecked()
   },
   deselectable: async (preview) => {
     await preview.getByRole("radio", { name: "4 stars" }).click()
     await expect(preview.getByRole("radio", { checked: true })).toHaveCount(0)
   },
   "read-only": async (preview) => {
-    await expect(preview.getByRole("img", { name: "Rated 4.2 out of 5" })).toBeVisible()
+    await expect(
+      preview.getByRole("img", { name: "Rated 4.2 out of 5" })
+    ).toBeVisible()
     await expect(preview.getByRole("radio")).toHaveCount(0)
   },
   disabled: async (preview) => {
-    await expect(preview.getByRole("radiogroup", { name: "Rating" })).toHaveAttribute("aria-disabled", "true")
+    await expect(
+      preview.getByRole("radiogroup", { name: "Rating" })
+    ).toHaveAttribute("aria-disabled", "true")
   },
   controlled: async (preview) => {
     await expect(preview.getByRole("radio", { name: "4 stars" })).toBeChecked()

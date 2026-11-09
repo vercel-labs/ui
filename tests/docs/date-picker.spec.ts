@@ -1,11 +1,14 @@
 import { expect, type Locator } from "@playwright/test"
 import { testExamples, type Check } from "./docs-helpers"
 
-const input = (preview: Locator, name = "Due date") => preview.getByRole("textbox", { name, exact: true })
-const trigger = (preview: Locator) => preview.getByRole("button", { name: /^Choose dates?/ })
+const input = (preview: Locator, name = "Due date") =>
+  preview.getByRole("textbox", { name, exact: true })
+const trigger = (preview: Locator) =>
+  preview.getByRole("button", { name: /^Choose dates?/ })
 // The popup renders outside the preview, at the end of the page.
 const dialog = (preview: Locator) => preview.page().getByRole("dialog")
-const day = (preview: Locator, name: string) => dialog(preview).getByRole("gridcell", { name, exact: true })
+const day = (preview: Locator, name: string) =>
+  dialog(preview).getByRole("gridcell", { name, exact: true })
 
 async function type(preview: Locator, text: string, name?: string) {
   await input(preview, name).fill(text)
@@ -27,9 +30,16 @@ function lastLog(preview: Locator) {
 }
 
 // Checks whether the field says it's invalid.
-async function expectInvalid(preview: Locator, invalid: boolean, name?: string) {
-  if (invalid) await expect(input(preview, name)).toHaveAttribute("aria-invalid", "true")
-  else await expect(input(preview, name)).not.toHaveAttribute("aria-invalid")
+async function expectInvalid(
+  preview: Locator,
+  invalid: boolean,
+  name?: string
+) {
+  if (invalid) {
+    await expect(input(preview, name)).toHaveAttribute("aria-invalid", "true")
+  } else {
+    await expect(input(preview, name)).not.toHaveAttribute("aria-invalid")
+  }
 }
 
 // Opens the calendar, presses a day and checks the popup closed.
@@ -74,10 +84,9 @@ const checks: Record<string, Check> = {
     await expect(input(preview, "Check in")).toHaveValue("10/10/2026")
     await expect(input(preview, "Check out")).toHaveValue("10/16/2026")
     await trigger(preview).click()
-    await expect(dialog(preview).getByRole("button", { name: "Last 7 Days" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    )
+    await expect(
+      dialog(preview).getByRole("button", { name: "Last 7 Days" })
+    ).toHaveAttribute("aria-pressed", "true")
     await close(preview)
   },
   "min-max": async (preview) => {
@@ -88,14 +97,25 @@ const checks: Record<string, Check> = {
     await type(preview, "10/19/2026", "Delivery date")
     await expectInvalid(preview, false, "Delivery date")
     await trigger(preview).click()
-    await expect(day(preview, "Sunday, October 4, 2026")).toHaveAttribute("aria-disabled", "true")
-    await expect(day(preview, "Saturday, October 24, 2026")).toHaveAttribute("aria-disabled", "true")
-    await expect(day(preview, "Monday, October 5, 2026")).not.toHaveAttribute("aria-disabled", "true")
+    await expect(day(preview, "Sunday, October 4, 2026")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+    await expect(day(preview, "Saturday, October 24, 2026")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+    await expect(day(preview, "Monday, October 5, 2026")).not.toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
     await close(preview)
   },
   locale: async (preview) => {
     await expect(input(preview, "Fälligkeitsdatum")).toHaveValue("16.10.2026")
-    await expect(input(preview, "Fälligkeitsdatum")).toHaveAccessibleDescription("TT.MM.JJJJ")
+    await expect(
+      input(preview, "Fälligkeitsdatum")
+    ).toHaveAccessibleDescription("TT.MM.JJJJ")
     await type(preview, "3.12.2026", "Fälligkeitsdatum")
     await expect(input(preview, "Fälligkeitsdatum")).toHaveValue("03.12.2026")
   },
@@ -128,7 +148,9 @@ const checks: Record<string, Check> = {
     // It opens below the field by default, in the example's own container where there is one.
     await expect(preview.getByRole("dialog")).toBeVisible()
     const field = (await input(preview).boundingBox())!
-    expect((await dialog(preview).boundingBox())!.y).toBeGreaterThanOrEqual(field.y + field.height)
+    expect((await dialog(preview).boundingBox())!.y).toBeGreaterThanOrEqual(
+      field.y + field.height
+    )
     await close(preview)
     await expect(lastLog(preview)).toHaveText("Finished closing")
   },
@@ -136,7 +158,9 @@ const checks: Record<string, Check> = {
     // Required blocks an empty submit and shows the field's error.
     await preview.getByRole("button", { name: "Submit" }).click()
     await expect(preview.getByText("Choose a due date.")).toBeVisible()
-    await expect(input(preview)).toHaveAccessibleDescription(/When the invoice is due\./)
+    await expect(input(preview)).toHaveAccessibleDescription(
+      /When the invoice is due\./
+    )
     await type(preview, "10/20/2026")
     await preview.getByRole("button", { name: "Submit" }).click()
     await expect(lastLog(preview)).toHaveText("Submitted due=2026-10-20")

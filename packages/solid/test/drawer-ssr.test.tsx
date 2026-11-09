@@ -60,12 +60,17 @@ describe("drawer server rendering", () => {
       expect(html).toContain('data-snap-point="0.25"')
       expect(html).toContain("data-interactive")
       expect(html).not.toContain('aria-modal="true"')
-    },
+    }
   )
 
   test("an initially controlled open drawer above its modal threshold renders as modal", () => {
     const html = renderToString(() => (
-      <Drawer open snapPoints={[0.25, 1]} defaultSnapPoint={1} modalAbove={0.25}>
+      <Drawer
+        open
+        snapPoints={[0.25, 1]}
+        defaultSnapPoint={1}
+        modalAbove={0.25}
+      >
         <DrawerContent>Body</DrawerContent>
       </Drawer>
     ))

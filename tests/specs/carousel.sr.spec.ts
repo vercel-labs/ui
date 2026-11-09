@@ -1,6 +1,12 @@
 import type { Page } from "@playwright/test"
 import { expect, test } from "../fixtures"
-import { expectShown, indicator, nextButton, previousButton, slideLink } from "./carousel.helpers"
+import {
+  expectShown,
+  indicator,
+  nextButton,
+  previousButton,
+  slideLink,
+} from "./carousel.helpers"
 
 // What a screen reader announces, recorded by a virtual screen reader that
 // follows focus and the accessibility tree. Every implementation must say the same.
@@ -14,20 +20,31 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
 // The fixture's status regions add phrases that say nothing about the carousel.
-const withoutNoise = (log: string[]) => log.filter((phrase) => !phrase.startsWith("polite: "))
+const withoutNoise = (log: string[]) =>
+  log.filter((phrase) => !phrase.startsWith("polite: "))
 
 // Tabs into the carousel, where only the slide in view is reachable, pages
 // with Next, then walks the indicators, whose tabs control their slides.
-test("announcements while using the carousel with a keyboard @enhancement", async ({ page, open, tab }) => {
+test("announcements while using the carousel with a keyboard @enhancement", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("carousel", { sr: "" })
   await expectShown(page, 0)
   const log = await record(page, async () => {

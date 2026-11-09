@@ -7,7 +7,9 @@ test.describe("custom rendering", () => {
     await open("meter-render")
   })
 
-  test("a meter rendered as a section keeps its role and value", async ({ page }) => {
+  test("a meter rendered as a section keeps its role and value", async ({
+    page,
+  }) => {
     const meter = page.getByRole("meter", { name: "Memory" })
     expect(await meter.evaluate((el) => el.tagName)).toBe("SECTION")
     await expect(meter).toHaveAttribute("aria-valuenow", "40")

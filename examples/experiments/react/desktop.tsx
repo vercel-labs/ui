@@ -17,7 +17,10 @@ type DesktopOptions = {
   size: { width: number; height: number }
   boxes?: Record<string, ResizeBox>
   defaultBoxes?: Record<string, ResizeBox>
-  onBoxesChange?: (boxes: Record<string, ResizeBox>, details: ChangeDetails<ResizeReason>) => void
+  onBoxesChange?: (
+    boxes: Record<string, ResizeBox>,
+    details: ChangeDetails<ResizeReason>
+  ) => void
   defaultClosed?: string[]
   minSize?: { width: number; height: number }
 }
@@ -68,7 +71,8 @@ const desktop = /* @__PURE__ */ definePrimitive({
       maximized: [],
     }
   },
-  sync: (options) => (options.boxes === undefined ? {} : { boxes: options.boxes }),
+  sync: (options) =>
+    options.boxes === undefined ? {} : { boxes: options.boxes },
   controlled: ["boxes"],
   live: ["draft"],
   api: (context) => {
@@ -87,14 +91,21 @@ const desktop = /* @__PURE__ */ definePrimitive({
       label: (id) => context.props<{ title: string }>("window", id)?.title,
     })
     const toggle = (list: string[], id: string, on: boolean) =>
-      on ? (list.includes(id) ? list : [...list, id]) : list.filter((other) => other !== id)
+      on
+        ? list.includes(id)
+          ? list
+          : [...list, id]
+        : list.filter((other) => other !== id)
 
     const api = {
       resize,
-      front: (state: DesktopState) => state.order.filter((id) => !state.closed.includes(id)).at(-1),
+      front: (state: DesktopState) =>
+        state.order.filter((id) => !state.closed.includes(id)).at(-1),
       raise(id: string) {
         const { order } = store.get()
-        if (order.at(-1) !== id) store.set({ order: [...order.filter((other) => other !== id), id] })
+        if (order.at(-1) !== id) {
+          store.set({ order: [...order.filter((other) => other !== id), id] })
+        }
       },
       show(id: string) {
         store.set({ closed: toggle(store.get().closed, id, false) })
@@ -108,7 +119,10 @@ const desktop = /* @__PURE__ */ definePrimitive({
         })
         const next = api.front(store.get())
         queueMicrotask(() =>
-          (next ? context.element("window", next) : context.element("dock-item", id))?.focus(),
+          (next
+            ? context.element("window", next)
+            : context.element("dock-item", id)
+          )?.focus()
         )
       },
       toggleMaximized(id: string) {
@@ -123,7 +137,11 @@ const desktop = /* @__PURE__ */ definePrimitive({
     root: slot({
       attrs: () => ({
         role: "group",
-        style: css({ position: "relative", overflow: "hidden", "user-select": "none" }),
+        style: css({
+          position: "relative",
+          overflow: "hidden",
+          "user-select": "none",
+        }),
       }),
     }),
     window: slot<{ value: string; title: string }, DesktopWindowState>({
@@ -145,10 +163,12 @@ const desktop = /* @__PURE__ */ definePrimitive({
           style: `${maximized ? css({ position: "absolute", inset: "0" }) : api.resize.boxStyle(state, key)};z-index:${state.order.indexOf(key) + 1}`,
         }
       },
-      live: live<DesktopState, any, { value: string; title: string }>((state, { key, api }) => ({
-        style: api.resize.style(state, key),
-        "data-dragging": api.resize.dragging(state, key),
-      })),
+      live: live<DesktopState, any, { value: string; title: string }>(
+        (state, { key, api }) => ({
+          style: api.resize.style(state, key),
+          "data-dragging": api.resize.dragging(state, key),
+        })
+      ),
       on: {
         pointerdown: (_event, { api, key }) => api.raise(key),
         focusin: (_event, { api, key }) => api.raise(key),
@@ -161,15 +181,24 @@ const desktop = /* @__PURE__ */ definePrimitive({
         tabindex: "0",
         "aria-roledescription": "title bar",
         "aria-describedby": `${id}-instructions`,
-        style: css({ cursor: state.maximized.includes(key) ? "default" : "move", "touch-action": "none" }),
+        style: css({
+          cursor: state.maximized.includes(key) ? "default" : "move",
+          "touch-action": "none",
+        }),
       }),
       on: {
-        pointerdown: (event, { el, api, key }) => el && api.resize.pointerdown(event, key, "move", el),
-        keydown: (event, { api, key }) => api.resize.keydown(event, key, "move"),
+        pointerdown: (event, { el, api, key }) =>
+          el && api.resize.pointerdown(event, key, "move", el),
+        keydown: (event, { api, key }) =>
+          api.resize.keydown(event, key, "move"),
         dblclick: (_event, { api, key }) => api.toggleMaximized(key),
       },
     }),
-    handle: slot<{ id: string; window: string; handle: Exclude<ResizeHandle, "move"> }>({
+    handle: slot<{
+      id: string
+      window: string
+      handle: Exclude<ResizeHandle, "move">
+    }>({
       props: { window: "string", handle: "string" },
       present: (state, { props }) => !state.maximized.includes(props.window),
       attrs: (_state, { props, api }) => ({
@@ -181,7 +210,8 @@ const desktop = /* @__PURE__ */ definePrimitive({
       on: {
         pointerdown: (event, { el, api, props }) =>
           el && api.resize.pointerdown(event, props.window, props.handle, el),
-        keydown: (event, { api, props }) => api.resize.keydown(event, props.window, props.handle),
+        keydown: (event, { api, props }) =>
+          api.resize.keydown(event, props.window, props.handle),
       },
     }),
     maximize: slot<{ value: string }>({
@@ -212,17 +242,26 @@ const desktop = /* @__PURE__ */ definePrimitive({
       }),
       on: { click: (_event, { api, key }) => api.show(key) },
     }),
-    instructions: slot({ attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }) }),
+    instructions: slot({
+      attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }),
+    }),
   }),
 })
 
-const parts = createParts(desktop, { root: "div", dock: "div", "dock-item": "button", instructions: "div" })
+const parts = createParts(desktop, {
+  root: "div",
+  dock: "div",
+  "dock-item": "button",
+  instructions: "div",
+})
 
 const DesktopWindowContext = React.createContext<string | null>(null)
 
 function useDesktopWindow() {
   const id = React.useContext(DesktopWindowContext)
-  if (id === null) throw new Error("This part must be used inside <DesktopWindow>.")
+  if (id === null) {
+    throw new Error("This part must be used inside <DesktopWindow>.")
+  }
   return id
 }
 
@@ -244,17 +283,37 @@ function DesktopTitle(props: PartProps<"div">) {
   return usePart(desktop, "title", { value: useDesktopWindow() }, props)
 }
 
-function DesktopHandle({ handle, ...props }: { handle: Exclude<ResizeHandle, "move"> } & PartProps<"div">) {
+function DesktopHandle({
+  handle,
+  ...props
+}: { handle: Exclude<ResizeHandle, "move"> } & PartProps<"div">) {
   const win = useDesktopWindow()
-  return usePart(desktop, "handle", { id: `${win}-${handle}`, window: win, handle }, props)
+  return usePart(
+    desktop,
+    "handle",
+    { id: `${win}-${handle}`, window: win, handle },
+    props
+  )
 }
 
 function DesktopMaximize(props: PartProps<"button">) {
-  return usePart(desktop, "maximize", { value: useDesktopWindow() }, props, "button")
+  return usePart(
+    desktop,
+    "maximize",
+    { value: useDesktopWindow() },
+    props,
+    "button"
+  )
 }
 
 function DesktopClose(props: PartProps<"button">) {
-  return usePart(desktop, "close", { value: useDesktopWindow() }, props, "button")
+  return usePart(
+    desktop,
+    "close",
+    { value: useDesktopWindow() },
+    props,
+    "button"
+  )
 }
 
 const DesktopDock = parts.Dock
@@ -266,28 +325,47 @@ const DesktopInstructions = parts.Instructions
 const size = { width: 560, height: 340 }
 const handles = ["n", "e", "s", "w", "ne", "nw", "se", "sw"] as const
 const apps = [
-  { id: "notes", title: "Notes", box: { x: 24, y: 24, width: 240, height: 180 } },
-  { id: "photos", title: "Photos", box: { x: 190, y: 84, width: 280, height: 200 } },
-  { id: "music", title: "Music", box: { x: 326, y: 32, width: 210, height: 140 } },
+  {
+    id: "notes",
+    title: "Notes",
+    box: { x: 24, y: 24, width: 240, height: 180 },
+  },
+  {
+    id: "photos",
+    title: "Photos",
+    box: { x: 190, y: 84, width: 280, height: 200 },
+  },
+  {
+    id: "music",
+    title: "Music",
+    box: { x: 326, y: 32, width: 210, height: 140 },
+  },
 ]
 
 function AppContent({ id }: { id: string }) {
-  if (id === "notes")
+  if (id === "notes") {
     return (
       <p data-slot="hint">
-        Windows move by their title and resize by any edge or corner. Click one to bring it forward.
+        Windows move by their title and resize by any edge or corner. Click one
+        to bring it forward.
       </p>
     )
-  if (id === "photos")
+  }
+  if (id === "photos") {
     return (
       <div data-slot="desktop-photos">
         {["#fdba74", "#a5b4fc", "#5eead4"]
           .flatMap((tone) => [tone, tone])
           .map((tone, i) => (
-            <div key={i} data-slot="desktop-photo" style={{ background: tone }} />
+            <div
+              key={i}
+              data-slot="desktop-photo"
+              style={{ background: tone }}
+            />
           ))}
       </div>
     )
+  }
   return (
     <div data-slot="stack">
       <span>Gymnopédie No. 1</span>
@@ -357,7 +435,8 @@ function Example() {
         ))}
       </DesktopDock>
       <DesktopInstructions>
-        Arrows on a window's title move it, and on a handle move that edge. Shift moves five times as far.
+        Arrows on a window's title move it, and on a handle move that edge.
+        Shift moves five times as far.
       </DesktopInstructions>
     </Desktop>
   )

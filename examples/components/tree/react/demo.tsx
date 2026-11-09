@@ -1,7 +1,18 @@
 "use client"
 
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/react/tree"
-import { ChevronRightIcon, FileIcon, FolderIcon, FolderOpenIcon } from "lucide-react"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/react/tree"
+import {
+  ChevronRightIcon,
+  FileIcon,
+  FolderIcon,
+  FolderOpenIcon,
+} from "lucide-react"
 
 type Node = { value: string; label: string; children?: Node[] }
 
@@ -60,7 +71,11 @@ function Items({ items }: { items: Node[] }) {
 
 function Example() {
   return (
-    <Tree aria-label="Files" defaultExpanded={["app"]} defaultValue="app/page.tsx">
+    <Tree
+      aria-label="Files"
+      defaultExpanded={["app"]}
+      defaultValue="app/page.tsx"
+    >
       <Items items={files} />
     </Tree>
   )

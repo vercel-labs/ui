@@ -33,13 +33,19 @@ function Fixture() {
         controller={controller}
         {...options}
         onValueChange={(value, details) => {
-          if (value === cancel) return details.cancel()
+          if (value === cancel) {
+            return details.cancel()
+          }
           setAction(`${value}:${details.reason}`)
         }}
       >
         <SegmentedControlIndicator />
         {segmentedControlFixture.items.map((item) => (
-          <SegmentedControlItem key={item.value} value={item.value} disabled={item.disabled}>
+          <SegmentedControlItem
+            key={item.value}
+            value={item.value}
+            disabled={item.disabled}
+          >
             {item.label}
           </SegmentedControlItem>
         ))}
@@ -62,7 +68,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

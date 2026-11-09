@@ -1,6 +1,16 @@
 import "@ui-sdk/web/menubar"
 import "@ui-sdk/web/menu"
-import { CircleHelp, createElement, File, Folder, Redo, Save, Settings, Trash, Undo } from "lucide"
+import {
+  CircleHelp,
+  createElement,
+  File,
+  Folder,
+  Redo,
+  Save,
+  Settings,
+  Trash,
+  Undo,
+} from "lucide"
 
 export function mount(root: HTMLElement) {
   root.innerHTML = `

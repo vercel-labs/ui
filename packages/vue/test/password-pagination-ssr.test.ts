@@ -20,23 +20,28 @@ const password = (defaultVisible?: boolean) =>
     h(PasswordInput, { name: "password", defaultVisible }, () => [
       h(PasswordInputControl, { "aria-label": "Password" }),
       h(PasswordInputToggle, { "aria-label": "Show password" }),
-    ]),
+    ])
   )
 
 const pages = (getHref?: (page: number) => string) =>
   createSSRApp(() =>
-    h(Pagination, { "aria-label": "Pages", pageCount: 10, defaultPage: 5, getHref }, () =>
-      h(PaginationList, null, {
-        default: ({ state }: { state: PaginationState }) => [
-          ...state.items.map((item) =>
-            h(PaginationItem, { key: item }, () =>
-              typeof item === "number" ? h(PaginationLink, { page: item }) : h(PaginationEllipsis),
+    h(
+      Pagination,
+      { "aria-label": "Pages", pageCount: 10, defaultPage: 5, getHref },
+      () =>
+        h(PaginationList, null, {
+          default: ({ state }: { state: PaginationState }) => [
+            ...state.items.map((item) =>
+              h(PaginationItem, { key: item }, () =>
+                typeof item === "number"
+                  ? h(PaginationLink, { page: item })
+                  : h(PaginationEllipsis)
+              )
             ),
-          ),
-          h(PaginationItem, () => h(PaginationNext, () => "Next")),
-        ],
-      }),
-    ),
+            h(PaginationItem, () => h(PaginationNext, () => "Next")),
+          ],
+        })
+    )
   )
 
 // Runs with no DOM: any access to window or document during render throws.

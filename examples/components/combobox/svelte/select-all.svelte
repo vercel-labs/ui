@@ -86,7 +86,9 @@
           </ComboboxGroupLabel>
           <ComboboxSelectAll>
             {#snippet children(state)}
-              {state.checked ? `Clear ${group.label}` : `Select all in ${group.label}`}
+              {state.checked
+                ? `Clear ${group.label}`
+                : `Select all in ${group.label}`}
             {/snippet}
           </ComboboxSelectAll>
           {#each group.items as zone (zone.value)}

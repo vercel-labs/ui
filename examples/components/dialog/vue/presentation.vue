@@ -17,7 +17,10 @@ import { Input } from "@ui-sdk/vue/input"
     <DialogContent>
       <div data-slot="stack">
         <DialogTitle>Edit profile</DialogTitle>
-        <DialogDescription>Make changes to your profile here. Save when you're done.</DialogDescription>
+        <DialogDescription
+          >Make changes to your profile here. Save when you're
+          done.</DialogDescription
+        >
       </div>
       <Field>
         <FieldLabel>Name</FieldLabel>
@@ -29,7 +32,9 @@ import { Input } from "@ui-sdk/vue/input"
       </Field>
       <div data-slot="row">
         <DialogClose>Cancel</DialogClose>
-        <DialogClose data-variant="solid" value="save">Save Changes</DialogClose>
+        <DialogClose data-variant="solid" value="save"
+          >Save Changes</DialogClose
+        >
       </div>
     </DialogContent>
   </Dialog>

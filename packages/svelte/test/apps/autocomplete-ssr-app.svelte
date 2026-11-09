@@ -11,13 +11,23 @@
     data = false,
     presentation,
     defaultOpen,
-  }: { data?: boolean; presentation?: "auto" | "popover" | "sheet"; defaultOpen?: boolean } = $props()
+  }: {
+    data?: boolean
+    presentation?: "auto" | "popover" | "sheet"
+    defaultOpen?: boolean
+  } = $props()
 
   const fruits = ["Lemon", "Mango"]
 </script>
 
 {#if data}
-  <Autocomplete items={fruits} name="fruit" defaultValue="Mango" {presentation} {defaultOpen}>
+  <Autocomplete
+    items={fruits}
+    name="fruit"
+    defaultValue="Mango"
+    {presentation}
+    {defaultOpen}
+  >
     <AutocompleteInput aria-label="Fruit" />
   </Autocomplete>
 {:else}

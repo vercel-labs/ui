@@ -1,6 +1,10 @@
 // A client-only render of Preferences: it drops the script, puts the saved
 // values on their attributes, and follows every change after.
-import { createColorScheme, createLocalStorage, createPreference } from "@ui-sdk/core"
+import {
+  createColorScheme,
+  createLocalStorage,
+  createPreference,
+} from "@ui-sdk/core"
 import { flushSync, mount, unmount } from "svelte"
 import { afterEach, expect, test } from "vitest"
 import App from "./apps/preferences-app.svelte"
@@ -8,18 +12,26 @@ import App from "./apps/preferences-app.svelte"
 let app: ReturnType<typeof mount> | undefined
 
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
   localStorage.clear()
-  for (const name of document.documentElement.getAttributeNames())
-    if (name.startsWith("data-")) document.documentElement.removeAttribute(name)
+  for (const name of document.documentElement.getAttributeNames()) {
+    if (name.startsWith("data-")) {
+      document.documentElement.removeAttribute(name)
+    }
+  }
 })
 
 test("puts saved values on <html> and its element, drops the script, and follows changes", () => {
   localStorage.setItem("color-scheme", "dark")
   localStorage.setItem("skin-tone", "medium")
-  const colorScheme = createColorScheme({ storage: createLocalStorage("color-scheme"), global: true })
+  const colorScheme = createColorScheme({
+    storage: createLocalStorage("color-scheme"),
+    global: true,
+  })
   const skinTone = createPreference({
     values: ["default", "light", "medium", "dark"],
     defaultValue: "default",
@@ -27,9 +39,14 @@ test("puts saved values on <html> and its element, drops the script, and follows
     storage: createLocalStorage("skin-tone"),
   })
   const target = document.body.appendChild(document.createElement("div"))
-  app = mount(App, { target, props: { preferences: [colorScheme, skinTone], label: skinTone } })
+  app = mount(App, {
+    target,
+    props: { preferences: [colorScheme, skinTone], label: skinTone },
+  })
   flushSync()
-  const element = target.querySelector<HTMLElement>('[data-slot="preferences"]')!
+  const element = target.querySelector<HTMLElement>(
+    '[data-slot="preferences"]'
+  )!
   expect(target.querySelector("script")).toBeNull()
   expect(element.style.display).toBe("contents")
   expect(document.documentElement.dataset.colorScheme).toBe("dark")

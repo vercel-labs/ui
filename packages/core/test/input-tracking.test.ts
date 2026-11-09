@@ -20,18 +20,36 @@ const modality = path.join(root, "src/foundation/kernel/modality.ts")
 function runtimeImports(file: string) {
   const text = readFileSync(file, "utf8")
   const imports: string[] = []
-  for (const [statement, specifier] of text.matchAll(/^(?:import|export)[^"]*?from\s*"(\.{1,2}\/[^"]+)"/gm)) {
-    if (/^(?:import|export) type\b/.test(statement)) continue
+  for (const [statement, specifier] of text.matchAll(
+    /^(?:import|export)[^"]*?from\s*"(\.{1,2}\/[^"]+)"/gm
+  )) {
+    if (/^(?:import|export) type\b/.test(statement)) {
+      continue
+    }
     const base = path.resolve(path.dirname(file), specifier)
-    const resolved = [`${base}.ts`, `${base}.tsx`, path.join(base, "index.ts")].find(existsSync)
-    if (resolved) imports.push(resolved)
+    const resolved = [
+      `${base}.ts`,
+      `${base}.tsx`,
+      path.join(base, "index.ts"),
+    ].find(existsSync)
+    if (resolved) {
+      imports.push(resolved)
+    }
   }
   return imports
 }
 
-function reaches(file: string, target: string, seen = new Set<string>()): boolean {
-  if (file === target) return true
-  if (seen.has(file)) return false
+function reaches(
+  file: string,
+  target: string,
+  seen = new Set<string>()
+): boolean {
+  if (file === target) {
+    return true
+  }
+  if (seen.has(file)) {
+    return false
+  }
   seen.add(file)
   return runtimeImports(file).some((next) => reaches(next, target, seen))
 }
@@ -45,33 +63,44 @@ const entries = Object.entries(packageJson.exports as Record<string, string>)
 // `definePrimitive`. The tests import the real modules again after a reset,
 // so input tracking starts uninstalled in each.
 const defined = new Map<unknown, Slots>()
-vi.doMock(import("../src/foundation/kernel/primitive"), async (importOriginal) => {
-  const kernel = await importOriginal()
-  const definePrimitive: typeof kernel.definePrimitive = (definition) => {
-    const primitive = kernel.definePrimitive(definition)
-    defined.set(
-      primitive,
-      definition.slots((slot) => slot),
-    )
-    return primitive
+vi.doMock(
+  import("../src/foundation/kernel/primitive"),
+  async (importOriginal) => {
+    const kernel = await importOriginal()
+    const definePrimitive: typeof kernel.definePrimitive = (definition) => {
+      const primitive = kernel.definePrimitive(definition)
+      defined.set(
+        primitive,
+        definition.slots((slot) => slot)
+      )
+      return primitive
+    }
+    return { ...kernel, definePrimitive }
   }
-  return { ...kernel, definePrimitive }
-})
+)
 const census: [entry: string, name: string, slot: string, file: string][] = []
 for (const [entry, file] of entries) {
   const exported: Record<string, unknown> = await import(file)
   for (const [name, value] of Object.entries(exported)) {
     const slots = defined.get(value)
-    if (!slots) continue
+    if (!slots) {
+      continue
+    }
     const slot =
-      Object.keys(slots).find((key) => !slots[key].bind && !slots[key].connect) ?? Object.keys(slots)[0]
+      Object.keys(slots).find(
+        (key) => !slots[key].bind && !slots[key].connect
+      ) ?? Object.keys(slots)[0]
     census.push([entry, name, slot, file])
   }
 }
 vi.doUnmock("../src/foundation/kernel/primitive")
 
 // Primitives whose every part binds, and whose binding needs a real control.
-const boundTags: Record<string, string> = { form: "form", input: "input", textarea: "textarea" }
+const boundTags: Record<string, string> = {
+  form: "form",
+  input: "input",
+  textarea: "textarea",
+}
 
 test("the census holds the primitives that report input sources", () => {
   const names = census.map(([entry, name]) => `${entry} ${name}`)
@@ -79,21 +108,30 @@ test("the census holds the primitives that report input sources", () => {
   expect(names).toContain("collapsible collapsible")
 })
 
-test.each(census)("%s %s tracks input once its %s part is bound", async (_, name, slot, file) => {
-  vi.resetModules()
-  const addEventListener = vi.spyOn(document, "addEventListener")
-  try {
-    const exported: Record<string, unknown> = await import(file)
-    // The kernel loaded after the reset, with the modules the primitive loaded.
-    const { bind } = await import("../src/foundation/kernel/part")
-    const instance = (exported[name] as (options: { id: string }) => PrimitiveInstance)({ id: "census" })
-    const el = document.body.appendChild(document.createElement(boundTags[name] ?? "div"))
-    bind(instance.part(slot, {}), el)
-    await Promise.resolve()
-    const listening = addEventListener.mock.calls.map(([type, , options]) => `${type} ${options}`)
-    expect(listening).toContain("keydown true")
-  } finally {
-    addEventListener.mockRestore()
-    document.body.replaceChildren()
+test.each(census)(
+  "%s %s tracks input once its %s part is bound",
+  async (_, name, slot, file) => {
+    vi.resetModules()
+    const addEventListener = vi.spyOn(document, "addEventListener")
+    try {
+      const exported: Record<string, unknown> = await import(file)
+      // The kernel loaded after the reset, with the modules the primitive loaded.
+      const { bind } = await import("../src/foundation/kernel/part")
+      const instance = (
+        exported[name] as (options: { id: string }) => PrimitiveInstance
+      )({ id: "census" })
+      const el = document.body.appendChild(
+        document.createElement(boundTags[name] ?? "div")
+      )
+      bind(instance.part(slot, {}), el)
+      await Promise.resolve()
+      const listening = addEventListener.mock.calls.map(
+        ([type, , options]) => `${type} ${options}`
+      )
+      expect(listening).toContain("keydown true")
+    } finally {
+      addEventListener.mockRestore()
+      document.body.replaceChildren()
+    }
   }
-})
+)

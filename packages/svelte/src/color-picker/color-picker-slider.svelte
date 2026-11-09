@@ -14,7 +14,11 @@ A track for one `channel`, drawn by `--color-slider-background`.
   import type { PartProps } from "../use-primitive.svelte"
   import { provideSlider } from "./context"
 
-  let { channel, orientation, ...rest }: PartProps<"div", ColorPickerSliderState> & ColorPickerSliderProps =
+  let {
+    channel,
+    orientation,
+    ...rest
+  }: PartProps<"div", ColorPickerSliderState> & ColorPickerSliderProps =
     $props()
 
   const id = $props.id()

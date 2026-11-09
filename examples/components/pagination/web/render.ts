@@ -38,8 +38,11 @@ function mount(root: HTMLElement) {
     const disabled = page < 1 || page > pagination.api.getPageCount()
     button.querySelector("span")!.hidden = disabled
     button.querySelector("span")!.textContent = String(page)
-    if (disabled) button.removeAttribute("title")
-    else button.title = `Go to page ${page}`
+    if (disabled) {
+      button.removeAttribute("title")
+    } else {
+      button.title = `Go to page ${page}`
+    }
   }
 
   function update() {
@@ -48,7 +51,8 @@ function mount(root: HTMLElement) {
     step("ui-pagination-next", page + 1)
     for (const link of root.querySelectorAll("ui-pagination-link[page]")) {
       const n = Number(link.getAttribute("page"))
-      link.querySelector("button")!.textContent = n === page ? `Page ${n}` : String(n)
+      link.querySelector("button")!.textContent =
+        n === page ? `Page ${n}` : String(n)
     }
   }
 

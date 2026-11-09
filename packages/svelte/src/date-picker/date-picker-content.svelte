@@ -5,7 +5,10 @@ grid for each month; every Calendar part works inside it.
 @stable
 -->
 <script lang="ts">
-  import type { DatePickerContentProps, DatePickerContentState } from "@ui-sdk/core/date-picker"
+  import type {
+    DatePickerContentProps,
+    DatePickerContentState,
+  } from "@ui-sdk/core/date-picker"
   import { getContext } from "svelte"
   import CalendarGrid from "../calendar/calendar-grid.svelte"
   import CalendarHeading from "../calendar/calendar-heading.svelte"
@@ -13,7 +16,12 @@ grid for each month; every Calendar part works inside it.
   import CalendarPrevious from "../calendar/calendar-previous.svelte"
   import { monthOffsets } from "../calendar/context"
   import Part from "../part.svelte"
-  import { portalTo, providePopupContainer, usePopupContainer, type PopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+    type PopupContainer,
+  } from "../popup.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { ContainerKey, useDatePicker, type ContainerContext } from "./context"
 
@@ -42,12 +50,27 @@ grid for each month; every Calendar part works inside it.
   providePopupContainer(target)
   // Presented as a sheet, the content sits in a full-screen viewport, which is
   // what moves into the container and the top layer.
-  const viewport = useHandlePart(picker, "viewport", () => ({}), portalTo(target))
+  const viewport = useHandlePart(
+    picker,
+    "viewport",
+    () => ({}),
+    portalTo(target)
+  )
   const content = useHandlePart(
     picker,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor, finalFocus, keepMounted }),
-    portalTo(() => (viewport.present ? false : target())),
+    () => ({
+      side,
+      align,
+      sideOffset,
+      alignOffset,
+      collisionPadding,
+      arrowPadding,
+      anchor,
+      finalFocus,
+      keepMounted,
+    }),
+    portalTo(() => (viewport.present ? false : target()))
   )
   const offsets = $derived(monthOffsets(picker.months()))
 </script>
@@ -64,7 +87,11 @@ grid for each month; every Calendar part works inside it.
 {/snippet}
 
 {#snippet popup()}
-  <Part tag="div" part={content} props={{ ...rest, children: children ?? fallback }} />
+  <Part
+    tag="div"
+    part={content}
+    props={{ ...rest, children: children ?? fallback }}
+  />
 {/snippet}
 
 {#if content.present}

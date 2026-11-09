@@ -34,7 +34,9 @@ function Example() {
             setValue(next)
             log(`Value ${next ?? "empty"} (${details.reason})`)
           }}
-          onValueCommit={(next, details) => log(`Committed ${next ?? "empty"} (${details.reason})`)}
+          onValueCommit={(next, details) =>
+            log(`Committed ${next ?? "empty"} (${details.reason})`)
+          }
           min={1}
           max={12}
         >

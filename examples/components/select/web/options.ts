@@ -32,11 +32,11 @@ function mount(root: HTMLElement) {
                           ${size}
                           <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                         </ui-select-item>
-                      `,
+                      `
                     )
                     .join("")}
                 </ui-select-group>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>

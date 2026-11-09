@@ -122,20 +122,30 @@ const multiply = (matrix: Matrix, [a, b, c]: Coords) =>
 
 const toLinear = (value: number) => {
   const size = Math.abs(value)
-  return size <= 0.04045 ? value / 12.92 : Math.sign(value) * ((size + 0.055) / 1.055) ** 2.4
+  return size <= 0.04045
+    ? value / 12.92
+    : Math.sign(value) * ((size + 0.055) / 1.055) ** 2.4
 }
 
 const fromLinear = (value: number) => {
   const size = Math.abs(value)
-  return size > 0.0031308 ? Math.sign(value) * (1.055 * size ** (1 / 2.4) - 0.055) : 12.92 * value
+  return size > 0.0031308
+    ? Math.sign(value) * (1.055 * size ** (1 / 2.4) - 0.055)
+    : 12.92 * value
 }
 
 const normalizeHue = (hue: number) => ((hue % 360) + 360) % 360
 
 function rgbHue([red, green, blue]: Coords, max: number, delta: number) {
-  if (delta < achromatic.rgb) return Number.NaN
-  if (max === red) return 60 * ((green - blue) / delta + (green < blue ? 6 : 0))
-  if (max === green) return 60 * ((blue - red) / delta + 2)
+  if (delta < achromatic.rgb) {
+    return Number.NaN
+  }
+  if (max === red) {
+    return 60 * ((green - blue) / delta + (green < blue ? 6 : 0))
+  }
+  if (max === green) {
+    return 60 * ((blue - red) / delta + 2)
+  }
   return 60 * ((red - green) / delta + 4)
 }
 
@@ -192,9 +202,15 @@ function hsvToHwb([hue, saturation, value]: Coords) {
 
 function hwbToHsv([hue, whiteness, blackness]: Coords) {
   const total = whiteness + blackness
-  if (total >= 100) return [hue, 0, (whiteness / total) * 100] satisfies Coords
+  if (total >= 100) {
+    return [hue, 0, (whiteness / total) * 100] satisfies Coords
+  }
   const value = 100 - blackness
-  return [hue, value === 0 ? 0 : (1 - whiteness / value) * 100, value] satisfies Coords
+  return [
+    hue,
+    value === 0 ? 0 : (1 - whiteness / value) * 100,
+    value,
+  ] satisfies Coords
 }
 
 function xyzToLab(xyz: Coords) {
@@ -220,13 +236,20 @@ const toPolar =
   (threshold: number) =>
   ([lightness, a, b]: Coords) => {
     const chroma = Math.hypot(a, b)
-    const hue = chroma < threshold ? Number.NaN : normalizeHue((Math.atan2(b, a) * 180) / Math.PI)
+    const hue =
+      chroma < threshold
+        ? Number.NaN
+        : normalizeHue((Math.atan2(b, a) * 180) / Math.PI)
     return [lightness, chroma, hue] satisfies Coords
   }
 
 function fromPolar([lightness, chroma, hue]: Coords) {
   const angle = ((Number.isNaN(hue) ? 0 : hue) * Math.PI) / 180
-  return [lightness, chroma * Math.cos(angle), chroma * Math.sin(angle)] satisfies Coords
+  return [
+    lightness,
+    chroma * Math.cos(angle),
+    chroma * Math.sin(angle),
+  ] satisfies Coords
 }
 
 const spaces: Record<Exclude<ColorSpace, "xyz-d65">, SpaceDefinition> = {
@@ -257,16 +280,26 @@ const spaces: Record<Exclude<ColorSpace, "xyz-d65">, SpaceDefinition> = {
   lch: { base: "lab", toBase: fromPolar, fromBase: toPolar(achromatic.lch) },
   oklab: {
     base: "xyz-d65",
-    toBase: (lab) => multiply(lmsToXyz, multiply(oklabToLms, lab).map((value) => value ** 3) as Coords),
-    fromBase: (xyz) => multiply(lmsToOklab, multiply(xyzToLms, xyz).map(Math.cbrt) as Coords),
+    toBase: (lab) =>
+      multiply(
+        lmsToXyz,
+        multiply(oklabToLms, lab).map((value) => value ** 3) as Coords
+      ),
+    fromBase: (xyz) =>
+      multiply(lmsToOklab, multiply(xyzToLms, xyz).map(Math.cbrt) as Coords),
   },
-  oklch: { base: "oklab", toBase: fromPolar, fromBase: toPolar(achromatic.oklch) },
+  oklch: {
+    base: "oklab",
+    toBase: fromPolar,
+    fromBase: toPolar(achromatic.oklch),
+  },
 }
 
 function lineage(space: ColorSpace) {
   const path: ColorSpace[] = [space]
-  while (path[path.length - 1] !== "xyz-d65")
+  while (path[path.length - 1] !== "xyz-d65") {
     path.push(spaces[path[path.length - 1] as keyof typeof spaces].base)
+  }
   return path
 }
 
@@ -276,18 +309,24 @@ function lineage(space: ColorSpace) {
  * @experimental
  */
 function convertColor(color: Color, space: ColorSpace) {
-  if (color.space === space) return color
+  if (color.space === space) {
+    return color
+  }
   const from = lineage(color.space)
   const to = lineage(space)
   const meeting = from.find((step) => to.includes(step))!
   let coords = color.coords.map((value) => value ?? 0) as Coords
-  for (const step of from.slice(0, from.indexOf(meeting)))
+  for (const step of from.slice(0, from.indexOf(meeting))) {
     coords = spaces[step as keyof typeof spaces].toBase(coords)
-  for (const step of to.slice(0, to.indexOf(meeting)).reverse())
+  }
+  for (const step of to.slice(0, to.indexOf(meeting)).reverse()) {
     coords = spaces[step as keyof typeof spaces].fromBase(coords)
+  }
   const converted: Color = {
     space,
-    coords: coords.map((value) => (Number.isNaN(value) ? null : value)) as Color["coords"],
+    coords: coords.map((value) =>
+      Number.isNaN(value) ? null : value
+    ) as Color["coords"],
     alpha: color.alpha,
   }
   return converted

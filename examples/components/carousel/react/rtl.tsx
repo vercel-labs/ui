@@ -33,7 +33,11 @@ function Example() {
           </CarouselPrevious>
           <CarouselIndicatorGroup aria-label="اختر شريحة">
             {slides.map((slide) => (
-              <CarouselIndicator key={slide} page={slide} aria-label={`الشريحة ${slide}`} />
+              <CarouselIndicator
+                key={slide}
+                page={slide}
+                aria-label={`الشريحة ${slide}`}
+              />
             ))}
           </CarouselIndicatorGroup>
           <CarouselNext aria-label="الشريحة التالية">

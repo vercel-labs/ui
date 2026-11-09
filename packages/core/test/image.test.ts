@@ -10,10 +10,19 @@ function fakeContext() {
   let m: Matrix = [1, 0, 0, 1, 0, 0]
   const apply = ([a, b, c, d, e, f]: Matrix) => {
     const [A, B, C, D, E, F] = m
-    m = [A * a + C * b, B * a + D * b, A * c + C * d, B * c + D * d, A * e + C * f + E, B * e + D * f + F]
+    m = [
+      A * a + C * b,
+      B * a + D * b,
+      A * c + C * d,
+      B * c + D * d,
+      A * e + C * f + E,
+      B * e + D * f + F,
+    ]
   }
   const point = (x: number, y: number) =>
-    [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]].map((n) => Math.round(n * 1e6) / 1e6 + 0)
+    [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]].map(
+      (n) => Math.round(n * 1e6) / 1e6 + 0
+    )
   const drawn: { topLeft: number[]; bottomRight: number[] }[] = []
   const clips: number[][] = []
   return {
@@ -24,12 +33,26 @@ function fakeContext() {
       scale: (x: number, y: number) => apply([x, 0, 0, y, 0, 0]),
       translate: (x: number, y: number) => apply([1, 0, 0, 1, x, y]),
       rotate: (angle: number) =>
-        apply([Math.cos(angle), Math.sin(angle), -Math.sin(angle), Math.cos(angle), 0, 0]),
+        apply([
+          Math.cos(angle),
+          Math.sin(angle),
+          -Math.sin(angle),
+          Math.cos(angle),
+          0,
+          0,
+        ]),
       beginPath: () => {},
       ellipse: (...args: number[]) => clips.push(args.slice(0, 4)),
       clip: () => {},
-      drawImage: (image: { width: number; height: number }, x: number, y: number) =>
-        drawn.push({ topLeft: point(x, y), bottomRight: point(x + image.width, y + image.height) }),
+      drawImage: (
+        image: { width: number; height: number },
+        x: number,
+        y: number
+      ) =>
+        drawn.push({
+          topLeft: point(x, y),
+          bottomRight: point(x + image.width, y + image.height),
+        }),
     },
   }
 }
@@ -45,7 +68,7 @@ beforeEach(() => {
     class {
       constructor(
         public width: number,
-        public height: number,
+        public height: number
       ) {
         made.push(this)
       }
@@ -55,11 +78,17 @@ beforeEach(() => {
       async convertToBlob({ type }: { type: string }) {
         made.at(-1)!.type = type
         // Like a browser that can't write AVIF.
-        return new Blob(["x"], { type: type === "image/avif" ? "image/png" : type })
+        return new Blob(["x"], {
+          type: type === "image/avif" ? "image/png" : type,
+        })
       }
-    },
+    }
   )
-  vi.stubGlobal("createImageBitmap", async () => ({ width: 100, height: 50, close: vi.fn() }))
+  vi.stubGlobal("createImageBitmap", async () => ({
+    width: 100,
+    height: 50,
+    close: vi.fn(),
+  }))
 })
 
 afterEach(() => vi.unstubAllGlobals())
@@ -70,16 +99,30 @@ describe("cropImage", () => {
   test("cuts the region at its own size, as PNG named after the source", async () => {
     const file = await cropImage(photo, { x: 10, y: 20, width: 50, height: 25 })
     expect(made[0]).toMatchObject({ width: 50, height: 25, type: "image/png" })
-    expect(canvas.drawn[0]).toEqual({ topLeft: [-10, -20], bottomRight: [90, 30] })
+    expect(canvas.drawn[0]).toEqual({
+      topLeft: [-10, -20],
+      bottomRight: [90, 30],
+    })
     expect(file).toBeInstanceOf(File)
     expect(file.name).toBe("beach.png")
     expect(file.type).toBe("image/png")
   })
 
   test("scales to an output width, keeping the crop's ratio", async () => {
-    await cropImage(photo, { x: 0, y: 0, width: 40, height: 20 }, { width: 400, type: "image/webp" })
-    expect(made[0]).toMatchObject({ width: 400, height: 200, type: "image/webp" })
-    expect(canvas.drawn[0]).toEqual({ topLeft: [0, 0], bottomRight: [1000, 500] })
+    await cropImage(
+      photo,
+      { x: 0, y: 0, width: 40, height: 20 },
+      { width: 400, type: "image/webp" }
+    )
+    expect(made[0]).toMatchObject({
+      width: 400,
+      height: 200,
+      type: "image/webp",
+    })
+    expect(canvas.drawn[0]).toEqual({
+      topLeft: [0, 0],
+      bottomRight: [1000, 500],
+    })
   })
 
   test("turns the image before taking the region, with x and y in the turned image", async () => {
@@ -94,7 +137,11 @@ describe("cropImage", () => {
   })
 
   test("a circle clips to the ellipse inside the output", async () => {
-    await cropImage(photo, { x: 0, y: 0, width: 50, height: 50 }, { shape: "circle", width: 200 })
+    await cropImage(
+      photo,
+      { x: 0, y: 0, width: 50, height: 50 },
+      { shape: "circle", width: 200 }
+    )
     expect(canvas.clips).toEqual([[100, 100, 100, 100]])
   })
 
@@ -102,13 +149,15 @@ describe("cropImage", () => {
     const file = await cropImage(
       new Blob(["x"]),
       { x: 0, y: 0, width: 10, height: 10 },
-      { type: "image/avif" },
+      { type: "image/avif" }
     )
     expect(file.name).toBe("image.png")
     expect(file.type).toBe("image/png")
   })
 
   test("a crop with no area throws", async () => {
-    await expect(cropImage(photo, { x: 0, y: 0, width: 0, height: 10 })).rejects.toThrow(RangeError)
+    await expect(
+      cropImage(photo, { x: 0, y: 0, width: 0, height: 10 })
+    ).rejects.toThrow(RangeError)
   })
 })

@@ -4,14 +4,26 @@ import {
   type PaginationLinkState,
   type PaginationStepState,
 } from "@ui-sdk/core/pagination"
-import { createParts, useHandle, usePart, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  useHandle,
+  usePart,
+  type PartProps,
+} from "./use-primitive"
 
-const parts = createParts(pagination, { root: "nav", list: "ul", item: "li", ellipsis: "span" })
+const parts = createParts(pagination, {
+  root: "nav",
+  list: "ul",
+  item: "li",
+  ellipsis: "span",
+})
 
 // Parts are links with `getHref`, and buttons without. A change to `getHref`
 // changes their attributes, so they render again and read it.
 function useTag() {
-  return useHandle(pagination).state.getHref ? ("a" as const) : ("button" as const)
+  return useHandle(pagination).state.getHref
+    ? ("a" as const)
+    : ("button" as const)
 }
 
 /**
@@ -43,12 +55,21 @@ function PaginationLink({
   ...props
 }: PartProps<"a", PaginationLinkState> & PaginationLinkProps) {
   // Links are told apart by their page.
-  return usePart(pagination, "link", { page, id: String(page) }, { ...props, children }, useTag())
+  return usePart(
+    pagination,
+    "link",
+    { page, id: String(page) },
+    { ...props, children },
+    useTag()
+  )
 }
 
 type StepProps = PartProps<"a", PaginationStepState>
 
-function useStep(name: "previous" | "next" | "first" | "last", props: StepProps) {
+function useStep(
+  name: "previous" | "next" | "first" | "last",
+  props: StepProps
+) {
   return usePart(pagination, name, {}, props, useTag())
 }
 
@@ -93,7 +114,10 @@ function PaginationEllipsis({ children = "…", ...props }: PartProps<"span">) {
   return <parts.Ellipsis {...props}>{children}</parts.Ellipsis>
 }
 
-export { createPaginationController, paginationRange } from "@ui-sdk/core/pagination"
+export {
+  createPaginationController,
+  paginationRange,
+} from "@ui-sdk/core/pagination"
 export type {
   PaginationChangeOptions,
   PaginationController,

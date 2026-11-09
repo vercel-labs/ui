@@ -8,9 +8,17 @@ const {
   Item: SortableItem,
   Handle: SortableHandle,
   Instructions: SortableInstructions,
-} = createParts(sortable, { root: "div", item: "div", handle: "span", instructions: "div" })
+} = createParts(sortable, {
+  root: "div",
+  item: "div",
+  handle: "span",
+  instructions: "div",
+})
 
-const tracks: Record<string, { title: string; artist: string; length: string }> = {
+const tracks: Record<
+  string,
+  { title: string; artist: string; length: string }
+> = {
   t1: { title: "Northern Lights", artist: "Halden", length: "3:42" },
   t2: { title: "Glass Harbor", artist: "Mira Vale", length: "4:05" },
   t3: { title: "Copper Sky", artist: "The Fieldnotes", length: "2:58" },
@@ -34,7 +42,9 @@ const photos: Record<string, { label: string; tone: string }> = {
 const playlist = ref(Object.keys(tracks))
 const photoOrder = Object.keys(photos)
 const sortByTitle = () =>
-  (playlist.value = [...playlist.value].sort((a, b) => tracks[a].title.localeCompare(tracks[b].title)))
+  (playlist.value = [...playlist.value].sort((a, b) =>
+    tracks[a].title.localeCompare(tracks[b].title)
+  ))
 const reverse = () => (playlist.value = [...playlist.value].reverse())
 </script>
 
@@ -42,11 +52,21 @@ const reverse = () => (playlist.value = [...playlist.value].reverse())
   <div data-slot="sortable-layout">
     <div data-slot="stack">
       <div data-slot="row">
-        <button type="button" data-size="sm" @click="sortByTitle">Sort by title</button>
+        <button type="button" data-size="sm" @click="sortByTitle">
+          Sort by title
+        </button>
         <button type="button" data-size="sm" @click="reverse">Reverse</button>
       </div>
-      <Sortable v-slot="{ state }" v-model:value="playlist" aria-label="Playlist">
-        <SortableItem v-for="(key, index) in state.order" :key="key" :value="key">
+      <Sortable
+        v-slot="{ state }"
+        v-model:value="playlist"
+        aria-label="Playlist"
+      >
+        <SortableItem
+          v-for="(key, index) in state.order"
+          :key="key"
+          :value="key"
+        >
           <SortableHandle>
             <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor">
               <template v-for="y in [4, 8, 12]" :key="y">
@@ -62,12 +82,18 @@ const reverse = () => (playlist.value = [...playlist.value].reverse())
           <span data-slot="hint">{{ tracks[key].length }}</span>
         </SortableItem>
         <SortableInstructions>
-          Space picks up the focused track, or every selected track; then Up and Down move them, Space drops
-          them and Escape puts them back. Shift with an arrow selects, Control or Command with A selects all.
+          Space picks up the focused track, or every selected track; then Up and
+          Down move them, Space drops them and Escape puts them back. Shift with
+          an arrow selects, Control or Command with A selects all.
         </SortableInstructions>
       </Sortable>
     </div>
-    <Sortable v-slot="{ state }" :default-value="photoOrder" orientation="grid" aria-label="Photos">
+    <Sortable
+      v-slot="{ state }"
+      :default-value="photoOrder"
+      orientation="grid"
+      aria-label="Photos"
+    >
       <SortableItem
         v-for="key in state.order"
         :key="key"
@@ -77,8 +103,8 @@ const reverse = () => (playlist.value = [...playlist.value].reverse())
         {{ photos[key].label }}
       </SortableItem>
       <SortableInstructions>
-        Space picks up the focused photo, or every selected photo; then the arrows move them, Space drops them
-        and Escape puts them back.
+        Space picks up the focused photo, or every selected photo; then the
+        arrows move them, Space drops them and Escape puts them back.
       </SortableInstructions>
     </Sortable>
   </div>

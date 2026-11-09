@@ -27,9 +27,20 @@ import * as React from "react"
 import { createRoot } from "react-dom/client"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
-import { filterOf, listOf, pagesOf, runner, search, type Variant } from "./variants"
+import {
+  filterOf,
+  listOf,
+  pagesOf,
+  runner,
+  search,
+  type Variant,
+} from "./variants"
 
-type Remote = { items: CommandData; status: AsyncOptionsStatus; setQuery: (query: string) => void }
+type Remote = {
+  items: CommandData
+  status: AsyncOptionsStatus
+  setQuery: (query: string) => void
+}
 
 // Composed commands: CommandItem, CommandGroup and CommandSeparator parts for a list. A command with `items` opens its page.
 function Items({
@@ -40,21 +51,31 @@ function Items({
   onSelect?: (value: string) => void | Promise<unknown>
 }) {
   return list.map((entry, index) => {
-    if (typeof entry === "string")
+    if (typeof entry === "string") {
       return (
         <CommandItem key={entry} className={classes.item} value={entry}>
           {entry}
         </CommandItem>
       )
-    if ("type" in entry && entry.type === "separator")
-      return <CommandSeparator key={`separator-${index}`} className={classes.separator} />
-    if ("type" in entry && entry.type === "group")
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return (
+        <CommandSeparator
+          key={`separator-${index}`}
+          className={classes.separator}
+        />
+      )
+    }
+    if ("type" in entry && entry.type === "group") {
       return (
         <CommandGroup key={entry.label}>
-          <CommandGroupLabel className={classes.groupLabel}>{entry.label}</CommandGroupLabel>
+          <CommandGroupLabel className={classes.groupLabel}>
+            {entry.label}
+          </CommandGroupLabel>
           <Items list={entry.items} onSelect={onSelect} />
         </CommandGroup>
       )
+    }
     const item = entry as CommandDataItem
     return (
       <CommandItem
@@ -74,7 +95,9 @@ function Items({
             {state.pending ? (
               <span className={classes.pending}>Running…</span>
             ) : state.error ? (
-              <span className={classes.error}>{(state.error as Error).message}</span>
+              <span className={classes.error}>
+                {(state.error as Error).message}
+              </span>
             ) : (
               item.shortcut && <CommandShortcut className={classes.shortcut} />
             )}
@@ -96,12 +119,23 @@ function VariantCommand({
   remote?: Remote
   onRan?: () => void
 }) {
-  const { defaultValue, defaultQuery, defaultPages, filter, status, ...options } = variant.options ?? {}
+  const {
+    defaultValue,
+    defaultQuery,
+    defaultPages,
+    filter,
+    status,
+    ...options
+  } = variant.options ?? {}
   const [value, setValue] = React.useState<string | null>(defaultValue ?? null)
   const [query, setQuery] = React.useState(defaultQuery ?? "")
   const [pages, setPages] = React.useState(defaultPages ?? [])
-  const [onAction] = React.useState(() => runner(variant.action, env.log, "onAction"))
-  const [onSelect] = React.useState(() => variant.select && runner(variant.select, env.log, "onSelect"))
+  const [onAction] = React.useState(() =>
+    runner(variant.action, env.log, "onAction")
+  )
+  const [onSelect] = React.useState(
+    () => variant.select && runner(variant.select, env.log, "onSelect")
+  )
   const data = variant.mode === "data" || !!remote
   const list = remote ? remote.items : listOf(variant)
   const nested = data ? [] : pagesOf(list)
@@ -118,11 +152,17 @@ function VariantCommand({
         items={data ? list : undefined}
         controller={env.controller}
         onValueChange={(next, details) => {
-          if (variant.controlled === "value") setValue(next)
-          env.log(`valueChange ${JSON.stringify(next)} #${details.index} (${details.reason})`)
+          if (variant.controlled === "value") {
+            setValue(next)
+          }
+          env.log(
+            `valueChange ${JSON.stringify(next)} #${details.index} (${details.reason})`
+          )
         }}
         onQueryChange={(next, details) => {
-          if (variant.controlled === "query") setQuery(next)
+          if (variant.controlled === "query") {
+            setQuery(next)
+          }
           remote?.setQuery(next)
           env.log(`queryChange ${JSON.stringify(next)} (${details.reason})`)
         }}
@@ -135,8 +175,14 @@ function VariantCommand({
           return onAction(next)
         }}
       >
-        {pages.length > 0 && <div className={classes.breadcrumb}>Home / {pages.join(" / ")}</div>}
-        <CommandInput className={classes.input} aria-label={variant.title} placeholder="Type a command…" />
+        {pages.length > 0 && (
+          <div className={classes.breadcrumb}>Home / {pages.join(" / ")}</div>
+        )}
+        <CommandInput
+          className={classes.input}
+          aria-label={variant.title}
+          placeholder="Type a command…"
+        />
         {(remote || status) && (
           <CommandStatus className={classes.status}>
             {(state) =>
@@ -151,7 +197,9 @@ function VariantCommand({
           </CommandStatus>
         )}
         <CommandEmpty className={classes.empty}>
-          {(state) => (state.empty && !state.loading ? "No results found." : null)}
+          {(state) =>
+            state.empty && !state.loading ? "No results found." : null
+          }
         </CommandEmpty>
         <CommandList className={classes.list}>
           {data ? (
@@ -174,36 +222,70 @@ function VariantCommand({
       </Command>
       {variant.controlled === "value" && (
         <>
-          <span className="text-xs text-neutral-600">value: {JSON.stringify(value)}</span>
-          <button type="button" className={classes.button} onClick={() => setValue("billing")}>
+          <span className="text-xs text-neutral-600">
+            value: {JSON.stringify(value)}
+          </span>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setValue("billing")}
+          >
             Set “billing”
           </button>
-          <button type="button" className={classes.button} onClick={() => setValue(null)}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setValue(null)}
+          >
             Null
           </button>
         </>
       )}
       {variant.controlled === "query" && (
         <>
-          <span className="text-xs text-neutral-600">query: {JSON.stringify(query)}</span>
-          <button type="button" className={classes.button} onClick={() => setQuery("cal")}>
+          <span className="text-xs text-neutral-600">
+            query: {JSON.stringify(query)}
+          </span>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setQuery("cal")}
+          >
             Set “cal”
           </button>
-          <button type="button" className={classes.button} onClick={() => setQuery("")}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setQuery("")}
+          >
             Empty
           </button>
         </>
       )}
       {variant.controlled === "pages" && (
         <>
-          <span className="text-xs text-neutral-600">pages: {JSON.stringify(pages)}</span>
-          <button type="button" className={classes.button} onClick={() => setPages(["theme"])}>
+          <span className="text-xs text-neutral-600">
+            pages: {JSON.stringify(pages)}
+          </span>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setPages(["theme"])}
+          >
             Theme
           </button>
-          <button type="button" className={classes.button} onClick={() => setPages(["theme", "accent"])}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setPages(["theme", "accent"])}
+          >
             Accent
           </button>
-          <button type="button" className={classes.button} onClick={() => setPages([])}>
+          <button
+            type="button"
+            className={classes.button}
+            onClick={() => setPages([])}
+          >
             Home
           </button>
         </>
@@ -235,7 +317,11 @@ function DialogCommand({ variant, env }: { variant: Variant; env: Env }) {
       <DialogBackdrop className={classes.dialogBackdrop} />
       <DialogContent className={classes.dialogContent}>
         <DialogTitle className="sr-only">Command palette</DialogTitle>
-        <VariantCommand variant={variant} env={env} onRan={() => setOpen(false)} />
+        <VariantCommand
+          variant={variant}
+          env={env}
+          onRan={() => setOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   )
@@ -253,8 +339,8 @@ function mount(root: HTMLElement) {
         ) : (
           <VariantCommand variant={variant} env={env} />
         )}
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

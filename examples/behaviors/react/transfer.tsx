@@ -14,11 +14,18 @@ import { createParts } from "@ui-sdk/react/primitive"
 
 const names: Record<string, string> = { closet: "Closet", bag: "Bag" }
 
-type PackingState = { lists: TransferLists; focused: string | null; moving: TransferDraft | null }
+type PackingState = {
+  lists: TransferLists
+  focused: string | null
+  moving: TransferDraft | null
+}
 
 type PackingOptions = {
   defaultLists: TransferLists
-  onListsChange?: (lists: TransferLists, details: ChangeDetails<TransferReason>) => void
+  onListsChange?: (
+    lists: TransferLists,
+    details: ChangeDetails<TransferReason>
+  ) => void
 }
 
 const packing = definePrimitive({
@@ -59,16 +66,22 @@ const packing = definePrimitive({
         role: "option",
         "aria-selected": String(state.moving?.key === part.key),
         tabindex: part.api.roving.tabIndex(state, part),
-        "data-dragging": part.api.transfer.dragging(state, part.key) ? "" : undefined,
+        "data-dragging": part.api.transfer.dragging(state, part.key)
+          ? ""
+          : undefined,
         style: "touch-action:none;user-select:none",
       }),
       on: {
         keydown: (event, { el, api, key }) =>
           api.transfer.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.transfer.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.transfer.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.transfer.bindItem(el, part.key)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.transfer.bindItem(el, part.key),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -85,7 +98,12 @@ const PackingItem = parts.Item
 
 function Example() {
   return (
-    <Packing defaultLists={{ closet: ["Jacket", "Boots", "Scarf"], bag: ["Passport", "Charger"] }}>
+    <Packing
+      defaultLists={{
+        closet: ["Jacket", "Boots", "Scarf"],
+        bag: ["Passport", "Charger"],
+      }}
+    >
       {({ lists }) =>
         Object.entries(lists).map(([list, items]) => (
           <div key={list} data-slot="transfer-lane">

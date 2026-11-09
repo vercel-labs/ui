@@ -22,8 +22,12 @@ test("the value part shows the formatted value", async ({ page }) => {
 })
 
 test("the indicator is as wide as the value", async ({ page }) => {
-  const track = await meter(page, "Storage").locator(".gauge-track").boundingBox()
-  const indicator = await meter(page, "Storage").locator(".gauge-indicator").boundingBox()
+  const track = await meter(page, "Storage")
+    .locator(".gauge-track")
+    .boundingBox()
+  const indicator = await meter(page, "Storage")
+    .locator(".gauge-indicator")
+    .boundingBox()
   expect(Math.round(indicator!.width)).toBe(Math.round(track!.width * 0.6))
 })
 
@@ -51,13 +55,24 @@ test("a unit format reads the value itself", async ({ page }) => {
   await expect(meter(page, "Disk").locator(".gauge-value")).toHaveText("128 GB")
 })
 
-test("a value label replaces the formatted value for screen readers", async ({ page }) => {
-  await expect(meter(page, "Requests")).toHaveAttribute("aria-valuetext", "750 of 1000 requests")
-  await expect(meter(page, "Requests").locator(".gauge-value")).toHaveText("75%")
+test("a value label replaces the formatted value for screen readers", async ({
+  page,
+}) => {
+  await expect(meter(page, "Requests")).toHaveAttribute(
+    "aria-valuetext",
+    "750 of 1000 requests"
+  )
+  await expect(meter(page, "Requests").locator(".gauge-value")).toHaveText(
+    "75%"
+  )
 })
 
-test("a value above the maximum reads as the maximum and fills the track", async ({ page }) => {
-  for (let step = 0; step < 3; step++) await page.getByRole("button", { name: "Fill" }).click()
+test("a value above the maximum reads as the maximum and fills the track", async ({
+  page,
+}) => {
+  for (let step = 0; step < 3; step++) {
+    await page.getByRole("button", { name: "Fill" }).click()
+  }
   const storage = meter(page, "Storage")
   await expect(storage).toHaveAttribute("aria-valuenow", "100")
   await expect(storage.locator(".gauge-value")).toHaveText("100%")

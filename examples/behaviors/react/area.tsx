@@ -1,6 +1,17 @@
 import * as React from "react"
-import { createArea, createChange, definePrimitive, type AreaReason, type ChangeDetails } from "@ui-sdk/core"
-import { createParts, usePart, usePrimitive, type PartProps } from "@ui-sdk/react/primitive"
+import {
+  createArea,
+  createChange,
+  definePrimitive,
+  type AreaReason,
+  type ChangeDetails,
+} from "@ui-sdk/core"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
 type Mix = { warmth: number; energy: number }
@@ -21,7 +32,8 @@ const mixer = definePrimitive({
     return {
       area: createArea<MixerState>(context, {
         value: (state) => ({ x: state.mix.warmth, y: state.mix.energy }),
-        set: (value, details) => change("mix", { warmth: value.x, energy: value.y }, details),
+        set: (value, details) =>
+          change("mix", { warmth: value.x, energy: value.y }, details),
         x: () => ({ min: 0, max: 100, step: 1, label: "Warmth" }),
         y: () => ({ min: 0, max: 100, step: 1, label: "Energy" }),
       }),
@@ -29,11 +41,18 @@ const mixer = definePrimitive({
   },
   slots: (slot) => ({
     pad: slot({
-      attrs: () => ({ style: "position:relative;touch-action:none;user-select:none" }),
-      on: { pointerdown: (event, { el, api }) => api.area.pointerdown(event, el!) },
+      attrs: () => ({
+        style: "position:relative;touch-action:none;user-select:none",
+      }),
+      on: {
+        pointerdown: (event, { el, api }) => api.area.pointerdown(event, el!),
+      },
     }),
     thumb: slot({
-      attrs: (state, { api }) => ({ ...api.area.thumbAttrs(state), style: api.area.thumbStyle(state) }),
+      attrs: (state, { api }) => ({
+        ...api.area.thumbAttrs(state),
+        style: api.area.thumbStyle(state),
+      }),
       on: { keydown: (event, { api }) => api.area.keydown(event) },
     }),
   }),
@@ -41,7 +60,11 @@ const mixer = definePrimitive({
 
 const parts = createParts(mixer, { thumb: "div" })
 
-function Mixer({ defaultMix, onMixChange, ...props }: MixerOptions & PartProps<"div">) {
+function Mixer({
+  defaultMix,
+  onMixChange,
+  ...props
+}: MixerOptions & PartProps<"div">) {
   const handle = usePrimitive(mixer, { defaultMix, onMixChange })
   return usePart(handle, "pad", {}, props, "div")
 }
@@ -53,7 +76,9 @@ function Example() {
   return (
     <Mixer
       defaultMix={{ warmth: 30, energy: 70 }}
-      onMixChange={(mix, details) => log(`Warmth ${mix.warmth}, energy ${mix.energy} (${details.reason})`)}
+      onMixChange={(mix, details) =>
+        log(`Warmth ${mix.warmth}, energy ${mix.energy} (${details.reason})`)
+      }
     >
       <span data-slot="mixer-axis" data-axis="y" aria-hidden="true">
         Energy

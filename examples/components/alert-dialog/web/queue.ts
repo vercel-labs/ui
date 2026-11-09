@@ -1,4 +1,7 @@
-import { createConfirm, type UiAlertDialogElement } from "@ui-sdk/web/alert-dialog"
+import {
+  createConfirm,
+  type UiAlertDialogElement,
+} from "@ui-sdk/web/alert-dialog"
 import { log } from "../../../shared/web/log"
 
 function mount(root: HTMLElement) {
@@ -27,7 +30,10 @@ function mount(root: HTMLElement) {
     </div>
   `
   const confirm = createConfirm<{ name: string }>()
-  const dialog = root.querySelector<UiAlertDialogElement<{ name: string }>>("ui-alert-dialog")!
+  const dialog =
+    root.querySelector<UiAlertDialogElement<{ name: string }>>(
+      "ui-alert-dialog"
+    )!
   const title = root.querySelector("ui-alert-dialog-title")!
   dialog.controller = confirm.controller
   dialog.addEventListener("payloadchange", (event) => {

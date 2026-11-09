@@ -22,4 +22,13 @@ const separator = "-mx-1 my-1 h-px bg-neutral-200"
 const indicator = "invisible w-3.5 group-data-checked:visible"
 const chevron = "ms-auto text-neutral-400 rtl:rotate-180"
 
-export { type Animation, chevron, content, groupLabel, indicator, item, separator, trigger }
+export {
+  type Animation,
+  chevron,
+  content,
+  groupLabel,
+  indicator,
+  item,
+  separator,
+  trigger,
+}

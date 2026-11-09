@@ -1,12 +1,17 @@
 <script lang="ts">
-  import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/svelte/resizable"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+  } from "@ui-sdk/svelte/resizable"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
 </script>
 
 <Resizable
-  onLayoutCommit={(layout, details) => log(`Saved ${layout.map(Math.round).join(" / ")} (${details.reason})`)}
+  onLayoutCommit={(layout, details) =>
+    log(`Saved ${layout.map(Math.round).join(" / ")} (${details.reason})`)}
 >
   <ResizablePanel defaultSize={40} minSize={20}>
     <h3>Files</h3>

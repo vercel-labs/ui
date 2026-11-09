@@ -15,7 +15,10 @@ import type { DateMatchers } from "../calendar/calendar-model"
 import { createController } from "../../foundation/kernel/controller"
 import type { ChangeDetails } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Drives a date or time input from anywhere. Pass it as the `controller` option.
@@ -26,7 +29,10 @@ function createDateInputController() {
     /** The value, or `null` while empty or partly filled. */
     getValue: () => string | null
     /** Sets the value. Returns false when it isn't a value the input can show, or when canceled. */
-    setValue: (value: string | null, options?: DateInputChangeOptions) => boolean
+    setValue: (
+      value: string | null,
+      options?: DateInputChangeOptions
+    ) => boolean
     /** Empties every segment. */
     clear: (options?: DateInputChangeOptions) => boolean
     /** Focuses a segment, like `"month"`, or the first one. */
@@ -55,7 +61,10 @@ type DateInputOptions = {
    * Runs when the value wants to change: once every segment holds something,
    * and again with `null` when one is emptied. `details.cancel()` keeps the value.
    */
-  onValueChange?: (value: string | null, details: ChangeDetails<DateInputValueChangeReason>) => void
+  onValueChange?: (
+    value: string | null,
+    details: ChangeDetails<DateInputValueChangeReason>
+  ) => void
   /**
    * The smallest unit it shows. `"day"` shows a date, and `"hour"`, `"minute"` or `"second"` add the time down to it.
    * @defaultValue "day"
@@ -116,12 +125,20 @@ export {
   type DateInputOptions,
   type DateInputPrimitive,
 }
-export type { DateInputApi, DateInputChangeOptions, DateInputValueChangeReason } from "./date-input-api"
+export type {
+  DateInputApi,
+  DateInputChangeOptions,
+  DateInputValueChangeReason,
+} from "./date-input-api"
 export type {
   DateInputGranularity,
   DateInputSegmentData,
   DateInputSegmentType,
   HourCycle,
 } from "./date-input-model"
-export type { DateInputSegmentProps, DateInputSegmentState, DateInputState } from "./date-input-parts"
+export type {
+  DateInputSegmentProps,
+  DateInputSegmentState,
+  DateInputState,
+} from "./date-input-parts"
 export type { DateMatcher, DateMatchers } from "../calendar/calendar"

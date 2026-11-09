@@ -1,7 +1,14 @@
 import type { ChangeDetails } from "@ui-sdk/core"
 import type { AvatarState } from "@ui-sdk/core/avatar"
 import { Avatar, AvatarFallback, AvatarImage } from "@ui-sdk/vue"
-import { createApp, defineComponent, h, onScopeDispose, ref, type PropType } from "vue"
+import {
+  createApp,
+  defineComponent,
+  h,
+  onScopeDispose,
+  ref,
+  type PropType,
+} from "vue"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
 import {
@@ -27,11 +34,20 @@ const VariantAvatar = defineComponent({
     const source = ref<Source>(initialSource(variant, person, index))
     const isFirst = index === 0
     if (isFirst && variant.arrivesAfter && person.image) {
-      const timer = setTimeout(() => (source.value = images[person.image!]), variant.arrivesAfter)
+      const timer = setTimeout(
+        () => (source.value = images[person.image!]),
+        variant.arrivesAfter
+      )
       onScopeDispose(() => clearTimeout(timer))
     }
-    if (isFirst && variant.sources)
-      env.controls(sourceControls.map(([label, next]) => [label, () => void (source.value = next)]))
+    if (isFirst && variant.sources) {
+      env.controls(
+        sourceControls.map(([label, next]) => [
+          label,
+          () => void (source.value = next),
+        ])
+      )
+    }
 
     // Vue takes the image's attributes in lowercase.
     const imageAttributes = () => ({
@@ -49,16 +65,22 @@ const VariantAvatar = defineComponent({
         AvatarImage,
         imageAttributes(),
         variant.render === "image"
-          ? { render: ({ props }: RenderSlot) => h("img", { ...props, "data-custom": "" }) }
-          : undefined,
+          ? {
+              render: ({ props }: RenderSlot) =>
+                h("img", { ...props, "data-custom": "" }),
+            }
+          : undefined
       )
     const fallback = () =>
       h(
         AvatarFallback,
         { class: classes.fallback, delay: variant.delay },
         variant.render === "fallback"
-          ? { default: ({ state }: { state: AvatarState }) => state.loadingStatus }
-          : () => person.initials,
+          ? {
+              default: ({ state }: { state: AvatarState }) =>
+                state.loadingStatus,
+            }
+          : () => person.initials
       )
 
     return () =>
@@ -74,9 +96,13 @@ const VariantAvatar = defineComponent({
           ? {
               // A render slot draws the whole part, so it renders the image and the fallback too.
               render: ({ props, state }: RenderSlot) =>
-                h("div", { ...props, title: `Status: ${state.loadingStatus}` }, [image(), fallback()]),
+                h(
+                  "div",
+                  { ...props, title: `Status: ${state.loadingStatus}` },
+                  [image(), fallback()]
+                ),
             }
-          : () => [image(), fallback()],
+          : () => [image(), fallback()]
       )
   },
 })
@@ -89,15 +115,19 @@ const VariantAvatars = defineComponent({
   setup({ variant, env }) {
     return () => {
       const avatars = variant.people.map((person, index) =>
-        h(VariantAvatar, { key: person.name, variant, person, index, env }),
+        h(VariantAvatar, { key: person.name, variant, person, index, env })
       )
-      return variant.people.length > 1 ? h("div", { class: classes.group }, avatars) : avatars
+      return variant.people.length > 1
+        ? h("div", { class: classes.group }, avatars)
+        : avatars
     }
   },
 })
 
 function mount(root: HTMLElement) {
-  kitchenSink(root, "vue", (slot, variant, env) => createApp(VariantAvatars, { variant, env }).mount(slot))
+  kitchenSink(root, "vue", (slot, variant, env) =>
+    createApp(VariantAvatars, { variant, env }).mount(slot)
+  )
 }
 
 export { mount }

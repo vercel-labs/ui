@@ -15,7 +15,11 @@
     Switch,
     SwitchThumb,
   } from "@ui-sdk/svelte"
-  import { formsFixture as f, formsOptions, serialize } from "tests/fixtures/forms.ts"
+  import {
+    formsFixture as f,
+    formsOptions,
+    serialize,
+  } from "tests/fixtures/forms.ts"
 
   const options = formsOptions()
   let action = $state("")
@@ -26,22 +30,39 @@
   const all = f.toppings.items.map((item) => item.value)
 
   // Records a change, or cancels it when the URL asks.
-  function report(name: string, value: unknown, details: { cancel: () => void; source: string }) {
-    if (options.cancel === name) return details.cancel()
+  function report(
+    name: string,
+    value: unknown,
+    details: { cancel: () => void; source: string }
+  ) {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     action = `${name}:${String(value)}`
     source = details.source
   }
 
-  function onTerms(checked: CheckedState, details: { cancel: () => void; canceled: boolean; source: string }) {
+  function onTerms(
+    checked: CheckedState,
+    details: { cancel: () => void; canceled: boolean; source: string }
+  ) {
     report(f.terms.name, checked, details)
-    if (!details.canceled) terms = checked
+    if (!details.canceled) {
+      terms = checked
+    }
   }
 
-  function onToppings(value: string[], details: { cancel: () => void; source: string }) {
+  function onToppings(
+    value: string[],
+    details: { cancel: () => void; source: string }
+  ) {
     report(f.toppings.name, value.join(","), details)
   }
 
-  function onPlan(value: string | null, details: { cancel: () => void; source: string }) {
+  function onPlan(
+    value: string | null,
+    details: { cancel: () => void; source: string }
+  ) {
     report(f.plan.name, value, details)
   }
 
@@ -70,7 +91,9 @@
         <FieldLabel>{f.terms.label}</FieldLabel>
       </div>
       <FieldDescription>{f.terms.description}</FieldDescription>
-      <FieldError class="field-error" match="valueMissing">{f.terms.error}</FieldError>
+      <FieldError class="field-error" match="valueMissing"
+        >{f.terms.error}</FieldError
+      >
     </Field>
 
     <fieldset>
@@ -107,7 +130,8 @@
           class="switch"
           name={item.name}
           defaultChecked={item.defaultChecked}
-          onCheckedChange={(checked, details) => report(item.name, checked, details)}
+          onCheckedChange={(checked, details) =>
+            report(item.name, checked, details)}
         >
           <SwitchThumb class="switch-thumb" />
         </Switch>
@@ -170,12 +194,19 @@
     </div>
   </form>
   <label>
-    <Checkbox class="checkbox" form={f.formId} name={f.newsletter.name} value={f.newsletter.value}>
+    <Checkbox
+      class="checkbox"
+      form={f.formId}
+      name={f.newsletter.name}
+      value={f.newsletter.value}
+    >
       <CheckboxIndicator class="checkbox-indicator" />
     </Checkbox>
     {f.newsletter.label}
   </label>
-  <button type="button" onclick={() => (shipping = !shipping)}>Toggle shipping</button>
+  <button type="button" onclick={() => (shipping = !shipping)}
+    >Toggle shipping</button
+  >
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>
   <output aria-label="Last source">{source}</output>

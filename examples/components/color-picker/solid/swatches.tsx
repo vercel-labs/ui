@@ -7,13 +7,29 @@ import {
 } from "@ui-sdk/solid/color-picker"
 import { For } from "solid-js"
 
-const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+const presets = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#0ea5e9",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+]
 
 function Example() {
   return (
-    <ColorPicker aria-label="Label color" space="srgb" format="hex" defaultValue="#0ea5e9">
+    <ColorPicker
+      aria-label="Label color"
+      space="srgb"
+      format="hex"
+      defaultValue="#0ea5e9"
+    >
       <ColorPickerSwatches aria-label="Presets">
-        <For each={presets}>{(preset) => <ColorPickerSwatchItem value={preset} />}</For>
+        <For each={presets}>
+          {(preset) => <ColorPickerSwatchItem value={preset} />}
+        </For>
       </ColorPickerSwatches>
       <div data-slot="row">
         <ColorPickerChannelInput channel="red" />

@@ -15,7 +15,12 @@ The root: a group around the thumbs, and the hidden input the form submits.
   import { setContext, untrack } from "svelte"
   import { useFieldControl, useFieldControlId } from "../field/context"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { SliderKey, type SliderContext } from "./context"
 
   type Value = number | number[]
@@ -114,7 +119,9 @@ The root: a group around the thumbs, and the hidden input the form submits.
     onValueChange: (next: Value, details: SliderValueChangeDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onValueCommit,
   }))
@@ -123,14 +130,19 @@ The root: a group around the thumbs, and the hidden input the form submits.
   // field's control part is made once in whichever part joins it.
   const shape = untrack(() => value ?? defaultValue)
   const isRange = Array.isArray(shape) && shape.length > 1
-  setContext<SliderContext>(SliderKey, { ...slider, field: () => (isRange ? null : field) })
+  setContext<SliderContext>(SliderKey, {
+    ...slider,
+    field: () => (isRange ? null : field),
+  })
   const root = useHandlePart(slider, "root")
   // The hidden input the form submits. Its value changes on every move.
   const input = useHandlePart(slider, "input")
-  const control = isRange ? field?.control(
+  const control = isRange
+    ? field?.control(
         () => rest.id ?? root.attrs.id,
-        () => rest["aria-describedby"],
-      ) : undefined
+        () => rest["aria-describedby"]
+      )
+    : undefined
 </script>
 
 <Part tag="div" part={wrapPart(root, control)} props={rest} />

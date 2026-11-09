@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Textarea } from "@ui-sdk/react/textarea"
 import { ChevronDownIcon } from "lucide-react"

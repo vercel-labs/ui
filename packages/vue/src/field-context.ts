@@ -22,7 +22,9 @@ const FieldKey: InjectionKey<FieldContext> = Symbol("field")
  */
 function useFieldControl(own?: Record<string, unknown>) {
   const field = inject(FieldKey, null)
-  if (!field) return null
+  if (!field) {
+    return null
+  }
   return {
     name: field.name,
     disabled: field.disabled,
@@ -35,7 +37,11 @@ function useFieldControl(own?: Record<string, unknown>) {
       const merged = field.slot(
         "control",
         { id, describedBy: props["aria-describedby"] },
-        { ...props, id: undefined, "aria-labelledby": madeLabel(label) ? undefined : label },
+        {
+          ...props,
+          id: undefined,
+          "aria-labelledby": madeLabel(label) ? undefined : label,
+        }
       )
       // The field's label names the control over the control's own, like a
       // ComboboxLabel's, but not over the author's. The control stays its own

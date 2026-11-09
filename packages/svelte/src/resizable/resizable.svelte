@@ -14,7 +14,11 @@ The group: lays its panels out along its orientation. `bind:layout` controls it.
   } from "@ui-sdk/core/resizable"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     layout = $bindable(),
@@ -52,9 +56,15 @@ The group: lays its panels out along its orientation. `bind:layout` controls it.
     /** Logs every layout change with its reason. */
     debug?: boolean
     /** Runs while the layout changes: on every frame of a drag and every key. `details.cancel()` keeps the layout. */
-    onLayoutChange?: (layout: number[], details: ResizableLayoutChangeDetails) => void
+    onLayoutChange?: (
+      layout: number[],
+      details: ResizableLayoutChangeDetails
+    ) => void
     /** Runs once an interaction that changed the layout ends: the pointer lifts, the key comes up, or a panel collapses. For saving. */
-    onLayoutCommit?: (layout: number[], details: ResizableLayoutCommitDetails) => void
+    onLayoutCommit?: (
+      layout: number[],
+      details: ResizableLayoutCommitDetails
+    ) => void
   } = $props()
 
   const id = $props.id()
@@ -75,7 +85,9 @@ The group: lays its panels out along its orientation. `bind:layout` controls it.
     onLayoutChange: (next: number[], details: ResizableLayoutChangeDetails) => {
       // The callback runs first, so canceling there also keeps a bound `layout` as it was.
       onLayoutChange?.(next, details)
-      if (!details.canceled) layout = next
+      if (!details.canceled) {
+        layout = next
+      }
     },
     onLayoutCommit,
   }))

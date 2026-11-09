@@ -25,30 +25,44 @@ function keepListing<State extends { listing: Listing }>(
     entry: (key: string, value: unknown) => string
     // The state that decides it.
     inputs: () => readonly unknown[]
-  },
+  }
 ) {
   let last: { inputs: readonly unknown[]; listing: Listing } | undefined
   deriveState(
     { store },
     ["listing"],
     (state) => {
-      const inputs = [...listbox.listingInputs(), ...(selection?.inputs() ?? [])]
+      const inputs = [
+        ...listbox.listingInputs(),
+        ...(selection?.inputs() ?? []),
+      ]
       if (!last || !sameValue(inputs, last.inputs)) {
         const next = listbox.listing(selection?.entry)
-        last = { inputs, listing: sameEntries(state.listing, next) ? state.listing : next }
+        last = {
+          inputs,
+          listing: sameEntries(state.listing, next) ? state.listing : next,
+        }
       }
       // A cast, since TypeScript can't tell `{ listing }` is a partial of a generic `State`.
       return { listing: last.listing } as Partial<State>
     },
-    { live: false },
+    { live: false }
   )
 }
 
 // Entries are strings, so a key only one side has, even one named like an
 // inherited property such as `constructor`, never compares equal.
 function sameEntries(a: Listing, b: Listing) {
-  for (const key in a) if (a[key] !== b[key]) return false
-  for (const key in b) if (typeof a[key] !== "string") return false
+  for (const key in a) {
+    if (a[key] !== b[key]) {
+      return false
+    }
+  }
+  for (const key in b) {
+    if (typeof a[key] !== "string") {
+      return false
+    }
+  }
   return true
 }
 

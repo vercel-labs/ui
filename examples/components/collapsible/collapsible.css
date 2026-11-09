@@ -44,7 +44,8 @@
       rotate: 90deg;
     }
 
-    &[data-open]:is([dir="rtl"], [dir="rtl"] *) > svg:first-child:not(:last-child) {
+    &[data-open]:is([dir="rtl"], [dir="rtl"] *)
+      > svg:first-child:not(:last-child) {
       rotate: -90deg;
     }
 
@@ -195,7 +196,9 @@
 
     & li > [data-slot="row"] {
       min-height: var(--size-sm);
-      padding-inline-start: calc(var(--space-1) + var(--size-icon) + var(--space-2));
+      padding-inline-start: calc(
+        var(--space-1) + var(--size-icon) + var(--space-2)
+      );
     }
   }
 

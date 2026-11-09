@@ -1,6 +1,11 @@
 "use client"
 
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { OTPInput, OTPInputGroup, OTPInputSlot } from "@ui-sdk/react/otp-input"
 import { useLog } from "../../../shared/react/log"
 
@@ -13,7 +18,9 @@ function Example() {
         id="verify-sign-in"
         onSubmit={(event) => {
           event.preventDefault()
-          const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+          const data = [...new FormData(event.currentTarget)].map(
+            ([name, value]) => `${name}=${value}`
+          )
           log(`Submitted ${data.join(", ")}`)
         }}
       >
@@ -26,13 +33,20 @@ function Example() {
               ))}
             </OTPInputGroup>
           </OTPInput>
-          <FieldDescription>Enter the six-digit code we sent to hollis@example.com.</FieldDescription>
+          <FieldDescription>
+            Enter the six-digit code we sent to hollis@example.com.
+          </FieldDescription>
           <FieldError />
         </Field>
       </form>
       <Field>
         <FieldLabel>Recovery code (optional)</FieldLabel>
-        <OTPInput name="recovery" form="verify-sign-in" maxLength={8} pattern="alphanumeric">
+        <OTPInput
+          name="recovery"
+          form="verify-sign-in"
+          maxLength={8}
+          pattern="alphanumeric"
+        >
           <OTPInputGroup>
             {[0, 1, 2, 3, 4, 5, 6, 7].map((index) => (
               <OTPInputSlot key={index} index={index} />

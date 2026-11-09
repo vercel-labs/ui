@@ -20,7 +20,9 @@
     }
 
     &[data-expanded] {
-      height: calc(var(--toast-stack-height) + (var(--toast-count) - 1) * var(--space-3));
+      height: calc(
+        var(--toast-stack-height) + (var(--toast-count) - 1) * var(--space-3)
+      );
     }
   }
 
@@ -43,7 +45,10 @@
     font-size: var(--text-md);
     outline-offset: 2px;
     translate: calc(var(--toast-swipe-x, 0px) + var(--exit-x, 0px))
-      calc(var(--y) + var(--toast-swipe-y, 0px) + var(--exit-y, 0px) * var(--slide, 1));
+      calc(
+        var(--y) + var(--toast-swipe-y, 0px) + var(--exit-y, 0px) *
+          var(--slide, 1)
+      );
     scale: calc(1 - var(--toast-index) * 0.05);
     transition-property: translate, scale, opacity, height, box-shadow;
     transition-duration: 400ms;
@@ -79,7 +84,9 @@
     }
 
     &[data-expanded] {
-      --y: calc(var(--dir) * (var(--toast-offset) + var(--toast-index) * var(--space-3)));
+      --y: calc(
+        var(--dir) * (var(--toast-offset) + var(--toast-index) * var(--space-3))
+      );
       scale: 1;
       transition-duration: 200ms;
       transition-timing-function: ease-out;
@@ -216,16 +223,20 @@
     }
   }
 
-  :scope[data-example="toast/position"] [data-slot="stack"]:has(> [data-slot="controls"]) {
+  :scope[data-example="toast/position"]
+    [data-slot="stack"]:has(> [data-slot="controls"]) {
     width: auto;
   }
 
   /* The projects list, with each row's Delete at its end. */
-  :scope[data-example="toast/overlay-host"] :is([data-slot="list"], [data-slot="controls"]) {
+  :scope[data-example="toast/overlay-host"]
+    :is([data-slot="list"], [data-slot="controls"]) {
     width: 20rem;
   }
 
-  :scope[data-example="toast/overlay-host"] [data-slot="list"] > [data-slot="row"] {
+  :scope[data-example="toast/overlay-host"]
+    [data-slot="list"]
+    > [data-slot="row"] {
     justify-content: space-between;
     padding-inline-end: var(--space-1);
   }

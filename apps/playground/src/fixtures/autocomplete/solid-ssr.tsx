@@ -3,7 +3,9 @@ import { Fixture } from "./solid"
 
 // Server renders, then the client hydrates. Every mismatch Solid reports is recorded.
 function mount(root: HTMLElement) {
-  return hydrateFixture(root, "autocomplete", () => <Fixture />, { serverForm: true })
+  return hydrateFixture(root, "autocomplete", () => <Fixture />, {
+    serverForm: true,
+  })
 }
 
 export { mount }

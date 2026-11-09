@@ -50,7 +50,9 @@ Import the parts and put them together:
 
 <ui-input-group>
   <ui-input><input type="search" aria-label="Search" /></ui-input>
-  <ui-input-clear><button type="button" aria-label="Clear search"></button></ui-input-clear>
+  <ui-input-clear
+    ><button type="button" aria-label="Clear search"></button
+  ></ui-input-clear>
 </ui-input-group>
 ```
 
@@ -62,7 +64,9 @@ Wrap the input in a [Field](./field) to give it a visible label, a description a
 <ui-field name="username">
   <ui-field-label>Username</ui-field-label>
   <ui-input><input autocomplete="username" /></ui-input>
-  <ui-field-description>Choose a unique username for your account.</ui-field-description>
+  <ui-field-description
+    >Choose a unique username for your account.</ui-field-description
+  >
 </ui-field>
 ```
 
@@ -90,7 +94,9 @@ Use native constraints such as `required`, `type="email"` and `pattern`. The fie
 <ui-field name="email">
   <ui-field-label>Email</ui-field-label>
   <ui-input><input type="email" required /></ui-input>
-  <ui-field-error match="valueMissing">Enter your email address.</ui-field-error>
+  <ui-field-error match="valueMissing"
+    >Enter your email address.</ui-field-error
+  >
   <ui-field-error match="true">That email is already in use.</ui-field-error>
 </ui-field>
 ```
@@ -119,7 +125,9 @@ Place text or buttons around an input with `<ui-input-group>`. Pressing the grou
 <ui-input-group>
   <ui-input><input type="search" aria-label="Search people" /></ui-input>
   <ui-input-clear>
-    <button type="button" aria-label="Clear search"><svg aria-hidden="true">…</svg></button>
+    <button type="button" aria-label="Clear search">
+      <svg aria-hidden="true">…</svg>
+    </button>
   </ui-input-clear>
 </ui-input-group>
 ```
@@ -166,8 +174,12 @@ const message = document.querySelector("ui-input")!.api
 document
   .querySelector('[data-action="reply"]')!
   .addEventListener("click", () => message.setValue("On my way!"))
-document.querySelector('[data-action="clear"]')!.addEventListener("click", () => message.clear())
-document.querySelector('[data-action="focus"]')!.addEventListener("click", () => message.focus())
+document
+  .querySelector('[data-action="clear"]')!
+  .addEventListener("click", () => message.clear())
+document
+  .querySelector('[data-action="focus"]')!
+  .addEventListener("click", () => message.focus())
 ```
 
 [Controllers](../controllers) covers an element's `api`.
@@ -200,13 +212,22 @@ Put native attributes on the `<input>`, where `value` is the default. The `<ui-i
 
 ### Input
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="InputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputOptions"
+/>
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="InputProps" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputProps"
+/>
 
 ### InputGroup
 
-<TypeTable path="../../packages/core/src/components/input/input.ts" name="InputGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputGroupOptions"
+/>
 
 ### InputClear
 
@@ -214,21 +235,33 @@ Wraps a `<button>` that empties the input in its group and focuses it. It shows 
 
 ### State
 
-<StateTable path="../../packages/core/src/components/input/input.ts" name="InputState" />
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputState"
+/>
 
 `<ui-input-group>` and `<ui-input-clear>` receive the state of the input inside the group.
 
-<StateTable path="../../packages/core/src/components/input/input.ts" name="InputGroupState" />
+<StateTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputGroupState"
+/>
 
 ### Reasons
 
-<ReasonTable path="../../packages/core/src/components/input/input.ts" name="InputValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputValueChangeReason"
+/>
 
 ### Controller
 
 The `<ui-input>` element's `api` property has these methods.
 
-<ControllerTable path="../../packages/core/src/components/input/input.ts" name="InputController" />
+<ControllerTable
+  path="../../packages/core/src/components/input/input.ts"
+  name="InputController"
+/>
 
 ## Accessibility
 

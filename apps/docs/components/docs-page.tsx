@@ -10,9 +10,13 @@ import { notFound } from "next/navigation"
 import path from "node:path"
 
 function findPage(section: string, slug: string[]) {
-  if (!isSection(section)) notFound()
+  if (!isSection(section)) {
+    notFound()
+  }
   const page = source.getPage([section, ...slug])
-  if (!page) notFound()
+  if (!page) {
+    notFound()
+  }
   return page
 }
 
@@ -20,17 +24,32 @@ function findPage(section: string, slug: string[]) {
  * A docs page. `framework` is the one it's rendered for: a framework's own, or
  * the reader's on Core and Agents, which are built once per framework.
  */
-function DocsPage({ section, slug, framework }: { section: string; slug: string[]; framework: Framework }) {
+function DocsPage({
+  section,
+  slug,
+  framework,
+}: {
+  section: string
+  slug: string[]
+  framework: Framework
+}) {
   const page = findPage(section, slug)
   const MDX = page.data.body
   const neighbours = findNeighbour(source.getPageTree(), page.url)
-  const inSection = (url?: string) => url === `/docs/${section}` || url?.startsWith(`/docs/${section}/`)
+  const inSection = (url?: string) =>
+    url === `/docs/${section}` || url?.startsWith(`/docs/${section}/`)
   const changelog = section === "core" && slug[0] === "changelog"
-  const previous = !changelog && inSection(neighbours.previous?.url) ? neighbours.previous : undefined
-  const next = !changelog && inSection(neighbours.next?.url) ? neighbours.next : undefined
+  const previous =
+    !changelog && inSection(neighbours.previous?.url)
+      ? neighbours.previous
+      : undefined
+  const next =
+    !changelog && inSection(neighbours.next?.url) ? neighbours.next : undefined
 
   const resolve = (href: string) => {
-    if (!href.startsWith("./") && !href.startsWith("../")) return href
+    if (!href.startsWith("./") && !href.startsWith("../")) {
+      return href
+    }
     const [file, hash] = href.split("#", 2)
     const dir = path.dirname(page.path)
     const found = [`${file}.mdx`, `${file}/index.mdx`, file]
@@ -50,7 +69,12 @@ function DocsPage({ section, slug, framework }: { section: string; slug: string[
         toc={page.data.toc}
         url={page.url}
       >
-        <MDX components={getMDXComponents(isFramework(section) ? section : undefined, resolve)} />
+        <MDX
+          components={getMDXComponents(
+            isFramework(section) ? section : undefined,
+            resolve
+          )}
+        />
       </DocsArticle>
     </PageFramework>
   )
@@ -64,7 +88,13 @@ function docsMetadata(section: string, slug: string[]): Metadata {
   return {
     title,
     description,
-    openGraph: { type: "article", title, description, url: page.url, images: image },
+    openGraph: {
+      type: "article",
+      title,
+      description,
+      url: page.url,
+      images: image,
+    },
     twitter: { card: "summary_large_image", title, description, images: image },
   }
 }

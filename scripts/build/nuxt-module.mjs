@@ -1,5 +1,11 @@
 import { build } from "esbuild"
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import {
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from "node:fs"
 import { createRequire } from "node:module"
 import path from "node:path"
 import { pathToFileURL } from "node:url"
@@ -14,9 +20,17 @@ async function buildNuxtModule({ packageDir, outDir }) {
   const sourceDir = path.join(packageDir, "nuxt")
   const moduleDir = path.join(outDir, "nuxt")
   await transpile({ sourceDir, outDir: moduleDir })
-  emitDeclarations({ packageDir, sourceDir, outDir: moduleDir, project: "nuxt/tsconfig.json" })
+  emitDeclarations({
+    packageDir,
+    sourceDir,
+    outDir: moduleDir,
+    project: "nuxt/tsconfig.json",
+  })
   const entries = await listNuxtEntries(packageDir)
-  writeFileSync(path.join(moduleDir, "entries.json"), `${JSON.stringify(entries, null, 2)}\n`)
+  writeFileSync(
+    path.join(moduleDir, "entries.json"),
+    `${JSON.stringify(entries, null, 2)}\n`
+  )
 }
 
 /**
@@ -27,19 +41,31 @@ async function buildNuxtModule({ packageDir, outDir }) {
  * is what each one exports at runtime.
  */
 async function listNuxtEntries(packageDir) {
-  const manifest = JSON.parse(readFileSync(path.join(packageDir, "package.json"), "utf8"))
+  const manifest = JSON.parse(
+    readFileSync(path.join(packageDir, "package.json"), "utf8")
+  )
   const subpaths = Object.entries(manifest.exports)
-    .filter(([subpath, target]) => subpath !== "." && target.startsWith("./src/"))
+    .filter(
+      ([subpath, target]) => subpath !== "." && target.startsWith("./src/")
+    )
     .map(([subpath]) => subpath)
   const modules = await loadEntries(packageDir, manifest, subpaths)
   const homes = homeEntries(modules)
   const globals = browserGlobals()
   return [...modules].flatMap(([subpath, exports]) => {
-    const names = Object.keys(exports).filter((name) => homes.get(name) === subpath)
+    const names = Object.keys(exports).filter(
+      (name) => homes.get(name) === subpath
+    )
     const components = names.filter((name) => isComponent(exports[name]))
-    const imports = names.filter((name) => !isComponent(exports[name]) && !globals.has(name))
-    if (!components.length && !imports.length) return []
-    return [{ from: `${manifest.name}/${subpath.slice(2)}`, components, imports }]
+    const imports = names.filter(
+      (name) => !isComponent(exports[name]) && !globals.has(name)
+    )
+    if (!components.length && !imports.length) {
+      return []
+    }
+    return [
+      { from: `${manifest.name}/${subpath.slice(2)}`, components, imports },
+    ]
   })
 }
 
@@ -51,7 +77,10 @@ async function loadEntries(packageDir, manifest, subpaths) {
   try {
     await build({
       entryPoints: Object.fromEntries(
-        subpaths.map((subpath) => [subpath.slice(2), path.join(packageDir, manifest.exports[subpath])]),
+        subpaths.map((subpath) => [
+          subpath.slice(2),
+          path.join(packageDir, manifest.exports[subpath]),
+        ])
       ),
       outdir: out,
       outExtension: { ".js": ".mjs" },
@@ -59,12 +88,20 @@ async function loadEntries(packageDir, manifest, subpaths) {
       splitting: true,
       format: "esm",
       platform: "node",
-      external: Object.keys(manifest.peerDependencies).filter((name) => !name.startsWith("@ui-sdk/")),
+      external: Object.keys(manifest.peerDependencies).filter(
+        (name) => !name.startsWith("@ui-sdk/")
+      ),
       logLevel: "warning",
     })
     const modules = new Map()
-    for (const subpath of subpaths)
-      modules.set(subpath, await import(pathToFileURL(path.join(out, `${subpath.slice(2)}.mjs`)).href))
+    for (const subpath of subpaths) {
+      modules.set(
+        subpath,
+        await import(
+          pathToFileURL(path.join(out, `${subpath.slice(2)}.mjs`)).href
+        )
+      )
+    }
     return modules
   } finally {
     rmSync(out, { recursive: true, force: true })
@@ -76,12 +113,19 @@ async function loadEntries(packageDir, manifest, subpaths) {
 // `createInputController` from `input`, not `textarea`.
 function homeEntries(modules) {
   const owners = new Map()
-  for (const [subpath, exports] of modules)
-    for (const name of Object.keys(exports)) owners.set(name, [...(owners.get(name) ?? []), subpath])
+  for (const [subpath, exports] of modules) {
+    for (const name of Object.keys(exports)) {
+      owners.set(name, [...(owners.get(name) ?? []), subpath])
+    }
+  }
   const homes = new Map()
   for (const [name, subpaths] of owners) {
     const words = `-${kebabCase(name)}-`
-    homes.set(name, subpaths.find((subpath) => words.includes(`-${subpath.slice(2)}-`)) ?? subpaths[0])
+    homes.set(
+      name,
+      subpaths.find((subpath) => words.includes(`-${subpath.slice(2)}-`)) ??
+        subpaths[0]
+    )
   }
   return homes
 }
@@ -104,8 +148,15 @@ function isComponent(value) {
 // An auto-import would shadow a browser global of the same name in every
 // file that calls it, so `confirm("Sure?")` would open a ui-sdk dialog.
 function browserGlobals() {
-  const dom = readFileSync(createRequire(import.meta.url).resolve("typescript/lib/lib.dom.d.ts"), "utf8")
-  return new Set([...dom.matchAll(/^declare (?:function|var) (\w+)/gm)].map(([, name]) => name))
+  const dom = readFileSync(
+    createRequire(import.meta.url).resolve("typescript/lib/lib.dom.d.ts"),
+    "utf8"
+  )
+  return new Set(
+    [...dom.matchAll(/^declare (?:function|var) (\w+)/gm)].map(
+      ([, name]) => name
+    )
+  )
 }
 
 export { buildNuxtModule, listNuxtEntries }

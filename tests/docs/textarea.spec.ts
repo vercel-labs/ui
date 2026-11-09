@@ -16,10 +16,13 @@ const scoped = (checks: Record<string, Check>) =>
     Object.entries(checks).map(([name, check]): [string, Check] => [
       name,
       async (preview, framework) => {
-        await expect(preview).toHaveAttribute("data-example", `textarea/${name}`)
+        await expect(preview).toHaveAttribute(
+          "data-example",
+          `textarea/${name}`
+        )
         await check(preview, framework)
       },
-    ]),
+    ])
   )
 
 testExamples(
@@ -36,17 +39,25 @@ testExamples(
     },
     field: async (preview) => {
       const feedback = preview.getByRole("textbox", { name: "Feedback" })
-      await expect(feedback).toHaveAccessibleDescription("Only the product team can see this.")
+      await expect(feedback).toHaveAccessibleDescription(
+        "Only the product team can see this."
+      )
       await feedback.fill("Faster checkout, please.")
       await expect(feedback).toHaveValue("Faster checkout, please.")
     },
     "auto-resize": async (preview) => {
       const notes = preview.getByRole("textbox", { name: "Notes" })
       const empty = await height(notes)
-      await notes.fill("Gate code 4417.\nLeave it with the front desk.\nRing twice.\nThank you!")
+      await notes.fill(
+        "Gate code 4417.\nLeave it with the front desk.\nRing twice.\nThank you!"
+      )
       await expect.poll(() => height(notes)).toBeGreaterThan(empty)
-      await notes.fill(Array.from({ length: 12 }, (_, line) => `Line ${line + 1}`).join("\n"))
-      await expect.poll(() => notes.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true)
+      await notes.fill(
+        Array.from({ length: 12 }, (_, line) => `Line ${line + 1}`).join("\n")
+      )
+      await expect
+        .poll(() => notes.evaluate((el) => el.scrollHeight > el.clientHeight))
+        .toBe(true)
       const tallest = await height(notes)
       await notes.fill("Gate code 4417.")
       await expect.poll(() => height(notes)).toBeLessThan(tallest)
@@ -78,9 +89,20 @@ testExamples(
     invalid: async (preview) => {
       const review = preview.getByRole("textbox", { name: "Review" })
       await expect(review).toHaveAttribute("aria-invalid", "true")
-      await expect(review).toHaveAccessibleDescription("Write at least 20 characters.")
+      await expect(review).toHaveAccessibleDescription(
+        "Write at least 20 characters."
+      )
     },
   }),
   "components",
-  ["basic", "field", "auto-resize", "controlled", "button", "disabled", "invalid", "rtl"],
+  [
+    "basic",
+    "field",
+    "auto-resize",
+    "controlled",
+    "button",
+    "disabled",
+    "invalid",
+    "rtl",
+  ]
 )

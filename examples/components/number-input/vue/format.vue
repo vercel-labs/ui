@@ -16,16 +16,36 @@ const fields = [
     step: 0.01,
     format: { style: "currency", currency: "USD" },
   },
-  { label: "Discount", defaultValue: 0.15, step: 0.01, format: { style: "percent" } },
-  { label: "Weight", defaultValue: 2.5, step: 0.1, format: { style: "unit", unit: "kilogram" } },
-] satisfies { label: string; defaultValue: number; step: number; format: Intl.NumberFormatOptions }[]
+  {
+    label: "Discount",
+    defaultValue: 0.15,
+    step: 0.01,
+    format: { style: "percent" },
+  },
+  {
+    label: "Weight",
+    defaultValue: 2.5,
+    step: 0.1,
+    format: { style: "unit", unit: "kilogram" },
+  },
+] satisfies {
+  label: string
+  defaultValue: number
+  step: number
+  format: Intl.NumberFormatOptions
+}[]
 </script>
 
 <template>
   <div data-slot="stack">
     <Field v-for="field in fields" :key="field.label">
       <FieldLabel>{{ field.label }}</FieldLabel>
-      <NumberInput :default-value="field.defaultValue" :step="field.step" :format="field.format" :min="0">
+      <NumberInput
+        :default-value="field.defaultValue"
+        :step="field.step"
+        :format="field.format"
+        :min="0"
+      >
         <NumberInputGroup>
           <NumberInputDecrement aria-label="Decrease">
             <MinusIcon aria-hidden="true" />

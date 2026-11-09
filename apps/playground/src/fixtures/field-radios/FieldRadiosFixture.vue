@@ -2,7 +2,10 @@
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/vue/radio"
 import { ref } from "vue"
-import { fieldRadiosFixture as f, fieldRadiosOptions } from "tests/fixtures/field.ts"
+import {
+  fieldRadiosFixture as f,
+  fieldRadiosOptions,
+} from "tests/fixtures/field.ts"
 
 const { disabledField } = fieldRadiosOptions()
 const firstDisabled = ref(false)
@@ -20,7 +23,11 @@ const firstDisabled = ref(false)
           class="row"
           :disabled="index === 0 && disabledField"
         >
-          <Radio class="radio" :value="size.value" :disabled="index === 0 && firstDisabled">
+          <Radio
+            class="radio"
+            :value="size.value"
+            :disabled="index === 0 && firstDisabled"
+          >
             <RadioIndicator class="radio-indicator" />
           </Radio>
           <FieldLabel>{{ size.label }}</FieldLabel>
@@ -28,6 +35,8 @@ const firstDisabled = ref(false)
       </RadioGroup>
     </Field>
     <button>After</button>
-    <button @click="firstDisabled = !firstDisabled">{{ f.disableFirst }}</button>
+    <button @click="firstDisabled = !firstDisabled">
+      {{ f.disableFirst }}
+    </button>
   </div>
 </template>

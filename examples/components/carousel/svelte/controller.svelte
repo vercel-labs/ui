@@ -23,7 +23,9 @@
     <CarouselNext controller={carousel} aria-label="Next slide">
       <ChevronRightIcon />
     </CarouselNext>
-    <button type="button" onclick={() => carousel.setPage(5)}>Show the Last Slide</button>
+    <button type="button" onclick={() => carousel.setPage(5)}
+      >Show the Last Slide</button
+    >
   </div>
   <Carousel aria-label="Featured" controller={carousel} drag={false}>
     <CarouselViewport>

@@ -26,8 +26,19 @@ A suggestion. Choosing it fills the field in with its text.
 
   const autocomplete = useHandle(autocompletePrimitive)
   const group = getContext<string | undefined>(GroupKey)
-  setContext<ItemContext>(ItemKey, () => ({ key: value, label: label ?? value }))
-  const item = useHandlePart(autocomplete, "item", () => ({ id: value, value, label, keywords, disabled, index, group }))
+  setContext<ItemContext>(ItemKey, () => ({
+    key: value,
+    label: label ?? value,
+  }))
+  const item = useHandlePart(autocomplete, "item", () => ({
+    id: value,
+    value,
+    label,
+    keywords,
+    disabled,
+    index,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={item} props={rest} />

@@ -11,8 +11,18 @@ const sizes = [
 </script>
 
 <template>
-  <Listbox orientation="horizontal" :loop="false" default-value="m" aria-label="Size">
-    <ListboxItem v-for="size in sizes" :key="size.value" :value="size.value" :disabled="size.disabled">
+  <Listbox
+    orientation="horizontal"
+    :loop="false"
+    default-value="m"
+    aria-label="Size"
+  >
+    <ListboxItem
+      v-for="size in sizes"
+      :key="size.value"
+      :value="size.value"
+      :disabled="size.disabled"
+    >
       {{ size.label }}
     </ListboxItem>
   </Listbox>

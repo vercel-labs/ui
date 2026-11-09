@@ -5,7 +5,11 @@ import {
   triggerMenuOptions,
 } from "tests/fixtures/trigger-menu.ts"
 
-function composer(name: string, id: string, { input, empty }: { input: boolean; empty: boolean }) {
+function composer(
+  name: string,
+  id: string,
+  { input, empty }: { input: boolean; empty: boolean }
+) {
   const field = input
     ? `<input id="${id}" name="message" class="input" />`
     : `<textarea id="${id}" name="message" class="input"></textarea>`
@@ -41,15 +45,22 @@ async function mount(root: HTMLElement) {
       <output role="status" aria-label="Open"></output>
       <output role="status" aria-label="Submitted"></output>
     </div>`
-  const output = (name: string) => root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
+  const output = (name: string) =>
+    root.querySelector<HTMLOutputElement>(`output[aria-label="${name}"]`)!
   for (const menu of root.querySelectorAll("ui-trigger-menu")) {
     menu.triggers = fixtureTriggers()
-    if (!options.autoHighlight) menu.setAttribute("auto-highlight", "false")
+    if (!options.autoHighlight) {
+      menu.setAttribute("auto-highlight", "false")
+    }
     menu.addEventListener("openchange", (event) => {
-      output("Open").textContent = `${event.detail.value}:${event.detail.reason}`
+      output("Open").textContent =
+        `${event.detail.value}:${event.detail.reason}`
     })
     menu.addEventListener("itemselect", (event) => {
-      output("Last action").textContent = selectAction(event.detail.value, event.detail.arguments)
+      output("Last action").textContent = selectAction(
+        event.detail.value,
+        event.detail.arguments
+      )
     })
   }
   const form = root.querySelector("form")!

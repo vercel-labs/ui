@@ -12,20 +12,32 @@
 
   function read() {
     log(
-      `Layout ${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed("controller-sidebar") ? ", collapsed" : ""}`,
+      `Layout ${editor.getLayout().map(Math.round).join(" / ")}${editor.isCollapsed("controller-sidebar") ? ", collapsed" : ""}`
     )
   }
 </script>
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => editor.collapse("controller-sidebar")}>Collapse</button>
-    <button type="button" onclick={() => editor.expand("controller-sidebar")}>Expand</button>
-    <button type="button" onclick={() => editor.resize("controller-sidebar", "240px")}>240px</button>
+    <button type="button" onclick={() => editor.collapse("controller-sidebar")}
+      >Collapse</button
+    >
+    <button type="button" onclick={() => editor.expand("controller-sidebar")}
+      >Expand</button
+    >
+    <button
+      type="button"
+      onclick={() => editor.resize("controller-sidebar", "240px")}>240px</button
+    >
     <button type="button" onclick={read}>Read</button>
   </div>
   <Resizable controller={editor}>
-    <ResizablePanel id="controller-sidebar" defaultSize={30} minSize={20} collapsible>
+    <ResizablePanel
+      id="controller-sidebar"
+      defaultSize={30}
+      minSize={20}
+      collapsible
+    >
       <h3>Files</h3>
       <ul>
         <li>page.tsx</li>

@@ -1,4 +1,10 @@
-import { Menu, MenuCheckboxItem, MenuContent, MenuItemIndicator, MenuTrigger } from "@ui-sdk/react/menu"
+import {
+  Menu,
+  MenuCheckboxItem,
+  MenuContent,
+  MenuItemIndicator,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
 import { Menubar } from "@ui-sdk/react/menubar"
 import { CheckIcon } from "lucide-react"
 import * as React from "react"
@@ -11,7 +17,11 @@ export function Example() {
         <Menu>
           <MenuTrigger>View</MenuTrigger>
           <MenuContent>
-            <MenuCheckboxItem value="status-bar" checked={statusBar} onCheckedChange={setStatusBar}>
+            <MenuCheckboxItem
+              value="status-bar"
+              checked={statusBar}
+              onCheckedChange={setStatusBar}
+            >
               <MenuItemIndicator>
                 <CheckIcon />
               </MenuItemIndicator>
@@ -43,7 +53,9 @@ export function Example() {
           </MenuContent>
         </Menu>
       </Menubar>
-      <output data-slot="output">Status bar {statusBar ? "shown" : "hidden"}</output>
+      <output data-slot="output">
+        Status bar {statusBar ? "shown" : "hidden"}
+      </output>
     </div>
   )
 }

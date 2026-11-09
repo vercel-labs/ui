@@ -33,12 +33,16 @@ function mount(root: HTMLElement) {
   const next = root.querySelector<HTMLElement>("ui-carousel-next button")!
   const link = root.querySelector("a")!
   const update = () => {
-    for (const item of carousel.querySelectorAll("ui-carousel-item"))
-      item.querySelector<HTMLElement>("[data-slot='hint'] > span")!.hidden = !item.hasAttribute("data-active")
+    for (const item of carousel.querySelectorAll("ui-carousel-item")) {
+      item.querySelector<HTMLElement>("[data-slot='hint'] > span")!.hidden =
+        !item.hasAttribute("data-active")
+    }
     const end = next.hasAttribute("data-disabled")
     const focused = document.activeElement === next
     link.hidden = !end
-    if (end && focused) link.focus()
+    if (end && focused) {
+      link.focus()
+    }
     next.hidden = end
   }
   new MutationObserver(update).observe(carousel, {

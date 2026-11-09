@@ -7,14 +7,16 @@
     class: className,
     children,
     ...rest
-  }: ComponentProps<typeof TabsList> & { class?: string; children?: Snippet } =
-    $props()
+  }: ComponentProps<typeof TabsList> & {
+    class?: string
+    children?: Snippet
+  } = $props()
 </script>
 
 <TabsList
   class={cn(
     "relative inline-flex h-8 w-fit items-center rounded-2xl bg-muted p-[3px] text-muted-foreground",
-    className,
+    className
   )}
   {...rest}
 >

@@ -22,7 +22,10 @@
     {#each ["a", "b"] as item (item)}
       <NavigationMenuItem value={item}>
         <NavigationMenuTrigger>{item}</NavigationMenuTrigger>
-        <NavigationMenuContent><NavigationMenuLink href="#{item}">Link</NavigationMenuLink></NavigationMenuContent>
+        <NavigationMenuContent
+          ><NavigationMenuLink href="#{item}">Link</NavigationMenuLink
+          ></NavigationMenuContent
+        >
       </NavigationMenuItem>
     {/each}
   </NavigationMenuList>

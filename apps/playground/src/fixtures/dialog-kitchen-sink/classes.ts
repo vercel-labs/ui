@@ -6,12 +6,14 @@ const animations = {
   default: {
     content:
       "transition-[opacity,scale] duration-150 data-starting-style:scale-95 data-starting-style:opacity-0 data-ending-style:scale-95 data-ending-style:opacity-0",
-    backdrop: "transition-opacity duration-150 data-starting-style:opacity-0 data-ending-style:opacity-0",
+    backdrop:
+      "transition-opacity duration-150 data-starting-style:opacity-0 data-ending-style:opacity-0",
   },
   slow: {
     content:
       "transition-[opacity,translate] duration-700 data-starting-style:translate-y-4 data-starting-style:opacity-0 data-ending-style:translate-y-4 data-ending-style:opacity-0",
-    backdrop: "transition-opacity duration-700 data-starting-style:opacity-0 data-ending-style:opacity-0",
+    backdrop:
+      "transition-opacity duration-700 data-starting-style:opacity-0 data-ending-style:opacity-0",
   },
 }
 
@@ -35,4 +37,14 @@ const button =
 const danger =
   "h-8 rounded-md bg-red-600 px-3 font-medium text-white outline-none hover:bg-red-700 focus-visible:ring-2 focus-visible:ring-red-300"
 
-export { type Animation, backdrop, button, content, danger, description, input, title, trigger }
+export {
+  type Animation,
+  backdrop,
+  button,
+  content,
+  danger,
+  description,
+  input,
+  title,
+  trigger,
+}

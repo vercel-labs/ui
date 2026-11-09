@@ -30,7 +30,8 @@ function notLabel<Part extends object>(part: Part) {
 // Where a root's content part says it's there. `hasChild` can't see a part
 // inside a component of the app's own, like a styled `SelectContent`, so the
 // part tells its root when it mounts.
-const placedKey: InjectionKey<(() => () => void) | null> = Symbol("ui-sdk.placed")
+const placedKey: InjectionKey<(() => () => void) | null> =
+  Symbol("ui-sdk.placed")
 
 /**
  * For a root that renders its own content part when the app places none:
@@ -49,7 +50,9 @@ function usePlacedContent() {
 /** Called by a content part, so its root doesn't render one of its own as well. */
 function usePlaceContent() {
   const register = inject(placedKey, null)
-  if (!register) return
+  if (!register) {
+    return
+  }
   let unregister: (() => void) | undefined
   onMounted(() => (unregister = register()))
   onBeforeUnmount(() => unregister?.())
@@ -69,14 +72,19 @@ const NotPlaced = defineComponent({
 // renders its own part when the app gives none checks here, so a part placed
 // in the markup never renders a second one, not even for a frame.
 function hasChild(children: unknown, type: Component) {
-  if (!Array.isArray(children)) return false
-  for (const child of children as VNodeArrayChildren)
+  if (!Array.isArray(children)) {
+    return false
+  }
+  for (const child of children as VNodeArrayChildren) {
     if (
       Array.isArray(child)
         ? hasChild(child, type)
-        : isVNode(child) && (child.type === type || hasChild(child.children, type))
-    )
+        : isVNode(child) &&
+          (child.type === type || hasChild(child.children, type))
+    ) {
       return true
+    }
+  }
   return false
 }
 
@@ -95,18 +103,37 @@ function labelsAmong(
     keys,
     keyOf,
     skip,
-  }: { keys: ReadonlySet<string>; keyOf: (value: unknown) => string; skip: ReadonlySet<unknown> },
+  }: {
+    keys: ReadonlySet<string>
+    keyOf: (value: unknown) => string
+    skip: ReadonlySet<unknown>
+  }
 ) {
   const found: { value: unknown; label: string }[] = []
   const visit = (node: VNodeArrayChildren[number]) => {
-    if (Array.isArray(node)) return node.forEach(visit)
-    if (!isVNode(node)) return
-    const { value, label } = (node.props ?? {}) as { value?: unknown; label?: unknown }
+    if (Array.isArray(node)) {
+      return node.forEach(visit)
+    }
+    if (!isVNode(node)) {
+      return
+    }
+    const { value, label } = (node.props ?? {}) as {
+      value?: unknown
+      label?: unknown
+    }
     // An element, like an `<input>` with its own `value`, is never an item.
-    if (value === undefined || typeof node.type === "string" || !keys.has(keyOf(value)))
+    if (
+      value === undefined ||
+      typeof node.type === "string" ||
+      !keys.has(keyOf(value))
+    ) {
       return childrenOf(node).forEach(visit)
-    const text = typeof label === "string" ? label : visibleText(childrenOf(node), skip)
-    if (text) found.push({ value, label: text })
+    }
+    const text =
+      typeof label === "string" ? label : visibleText(childrenOf(node), skip)
+    if (text) {
+      found.push({ value, label: text })
+    }
   }
   nodes.forEach(visit)
   return found
@@ -116,8 +143,12 @@ function labelsAmong(
 // check-code: allow return-type Array.isArray narrows the children to any[].
 function childrenOf(node: VNode): VNodeArrayChildren {
   const { children } = node
-  if (typeof children === "string") return [children]
-  if (Array.isArray(children)) return children
+  if (typeof children === "string") {
+    return [children]
+  }
+  if (Array.isArray(children)) {
+    return children
+  }
   return slotNodes((children as Slots | null)?.default)
 }
 
@@ -126,7 +157,11 @@ function childrenOf(node: VNode): VNodeArrayChildren {
 function slotNodes(slot: Slots[string]): VNodeArrayChildren {
   try {
     const nodes: unknown = slot?.()
-    return Array.isArray(nodes) ? nodes : nodes == null ? [] : [nodes as VNodeArrayChildren[number]]
+    return Array.isArray(nodes)
+      ? nodes
+      : nodes == null
+        ? []
+        : [nodes as VNodeArrayChildren[number]]
   } catch {
     return []
   }
@@ -136,16 +171,21 @@ function slotNodes(slot: Slots[string]): VNodeArrayChildren {
 function visibleText(nodes: VNodeArrayChildren, skip: ReadonlySet<unknown>) {
   // check-code: allow return-type recursive, so TypeScript cannot infer it.
   const text = (node: VNodeArrayChildren[number]): string => {
-    if (typeof node === "string" || typeof node === "number") return String(node)
-    if (Array.isArray(node)) return node.map(text).join("")
+    if (typeof node === "string" || typeof node === "number") {
+      return String(node)
+    }
+    if (Array.isArray(node)) {
+      return node.map(text).join("")
+    }
     if (
       !isVNode(node) ||
       node.type === Comment ||
       skip.has(node.type) ||
       (node.type as Record<symbol, boolean>)[notLabelKey] ||
       node.props?.["aria-hidden"]
-    )
+    ) {
       return ""
+    }
     return childrenOf(node).map(text).join("")
   }
   return nodes.map(text).join("").replace(/\s+/g, " ").trim()
@@ -160,12 +200,16 @@ function visibleText(nodes: VNodeArrayChildren, skip: ReadonlySet<unknown>) {
 function learnLabels(
   internal: {
     keyOf: (value: unknown) => string
-    learnLabels: (find: (keys: ReadonlySet<string>) => { value: unknown; label: string }[]) => void
+    learnLabels: (
+      find: (keys: ReadonlySet<string>) => { value: unknown; label: string }[]
+    ) => void
   },
   children: VNodeArrayChildren,
-  skip: ReadonlySet<unknown>,
+  skip: ReadonlySet<unknown>
 ) {
-  internal.learnLabels((keys) => labelsAmong(children, { keys, keyOf: internal.keyOf, skip }))
+  internal.learnLabels((keys) =>
+    labelsAmong(children, { keys, keyOf: internal.keyOf, skip })
+  )
 }
 
 // Whether nodes render anything, as Vue's `<slot>` decides before it shows its
@@ -178,7 +222,9 @@ function rendersSomething(nodes: VNodeArrayChildren): boolean {
       !isVNode(node) ||
       (node.type !== Comment &&
         (node.type !== Fragment ||
-          (Array.isArray(node.children) ? rendersSomething(node.children) : !!node.children))),
+          (Array.isArray(node.children)
+            ? rendersSomething(node.children)
+            : !!node.children)))
   )
 }
 
@@ -186,9 +232,20 @@ function rendersSomething(nodes: VNodeArrayChildren): boolean {
  * What a slot renders, or undefined when it renders nothing, so the part shows
  * its own content in its place, the way Vue's `<slot>` shows its fallback.
  */
-function slotContent<Props>(slot: ((props: Props) => VNode[]) | undefined, props: Props) {
+function slotContent<Props>(
+  slot: ((props: Props) => VNode[]) | undefined,
+  props: Props
+) {
   const nodes = slot?.(props)
   return nodes && rendersSomething(nodes) ? nodes : undefined
 }
 
-export { hasChild, learnLabels, notLabel, NotPlaced, slotContent, usePlaceContent, usePlacedContent }
+export {
+  hasChild,
+  learnLabels,
+  notLabel,
+  NotPlaced,
+  slotContent,
+  usePlaceContent,
+  usePlacedContent,
+}

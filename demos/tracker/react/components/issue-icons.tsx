@@ -29,16 +29,26 @@ const priorityIcons = {
   none: Minus,
 }
 
-function StatusIcon({ status, label, className }: { status: Status; label?: boolean; className?: string }) {
+function StatusIcon({
+  status,
+  label,
+  className,
+}: {
+  status: Status
+  label?: boolean
+  className?: string
+}) {
   const Icon = statusIcons[status]
   return (
     <Icon
-      {...(label ? { role: "img", "aria-label": statusOf(status).label } : { "aria-hidden": true })}
+      {...(label
+        ? { role: "img", "aria-label": statusOf(status).label }
+        : { "aria-hidden": true })}
       className={cn(
         "size-4 shrink-0 text-muted-foreground",
         status === "in-progress" && "text-amber-500",
         status === "done" && "text-emerald-600 dark:text-emerald-400",
-        className,
+        className
       )}
     />
   )
@@ -56,11 +66,13 @@ function PriorityIcon({
   const Icon = priorityIcons[priority]
   return (
     <Icon
-      {...(label ? { role: "img", "aria-label": priorityOf(priority).label } : { "aria-hidden": true })}
+      {...(label
+        ? { role: "img", "aria-label": priorityOf(priority).label }
+        : { "aria-hidden": true })}
       className={cn(
         "size-4 shrink-0 text-muted-foreground",
         priority === "urgent" && "text-destructive",
-        className,
+        className
       )}
     />
   )

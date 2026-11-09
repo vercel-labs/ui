@@ -7,7 +7,11 @@ import {
   type ResizableLayoutCommitDetails,
   type ResizableLayoutChangeDetails,
 } from "@ui-sdk/vue"
-import { formatLayout, resizableFixture as f, resizableOptions } from "tests/fixtures/resizable.ts"
+import {
+  formatLayout,
+  resizableFixture as f,
+  resizableOptions,
+} from "tests/fixtures/resizable.ts"
 import { ref } from "vue"
 
 const options = resizableOptions()
@@ -19,22 +23,37 @@ const committed = ref<string[]>([])
 const layout = ref([25, 50, 25])
 
 // Records a change, or cancels it when the URL asks. `v-model` follows unless canceled.
-function report(group: string, next: number[], details: ResizableLayoutChangeDetails) {
-  if (group === f.editor.id && options.cancel) return details.cancel()
+function report(
+  group: string,
+  next: number[],
+  details: ResizableLayoutChangeDetails
+) {
+  if (group === f.editor.id && options.cancel) {
+    return details.cancel()
+  }
   action.value = formatLayout(group, next, details.reason)
 }
 
-function commit(group: string, next: number[], details: ResizableLayoutCommitDetails) {
-  committed.value = [...committed.value, formatLayout(group, next, details.reason)]
+function commit(
+  group: string,
+  next: number[],
+  details: ResizableLayoutCommitDetails
+) {
+  committed.value = [
+    ...committed.value,
+    formatLayout(group, next, details.reason),
+  ]
 }
 
 const editor = {
-  change: (next: number[], details: ResizableLayoutChangeDetails) => report(f.editor.id, next, details),
+  change: (next: number[], details: ResizableLayoutChangeDetails) =>
+    report(f.editor.id, next, details),
   complete: (next: number[], details: ResizableLayoutCommitDetails) =>
     commit(f.editor.id, next, details),
 }
 const area = {
-  change: (next: number[], details: ResizableLayoutChangeDetails) => report(f.main.id, next, details),
+  change: (next: number[], details: ResizableLayoutChangeDetails) =>
+    report(f.main.id, next, details),
   complete: (next: number[], details: ResizableLayoutCommitDetails) =>
     commit(f.main.id, next, details),
 }
@@ -95,7 +114,10 @@ const area = {
             role="group"
             :aria-label="code.label"
           />
-          <ResizableHandle class="resizable-handle" :aria-label="f.main.handle" />
+          <ResizableHandle
+            class="resizable-handle"
+            :aria-label="f.main.handle"
+          />
           <ResizablePanel
             :id="terminal.id"
             :min-size="terminal.minSize"
@@ -106,7 +128,10 @@ const area = {
           />
         </Resizable>
       </ResizablePanel>
-      <ResizableHandle class="resizable-handle" :aria-label="f.editor.handles[1]" />
+      <ResizableHandle
+        class="resizable-handle"
+        :aria-label="f.editor.handles[1]"
+      />
       <ResizablePanel
         :id="preview.id"
         :default-size="preview.defaultSize"
@@ -117,12 +142,20 @@ const area = {
       />
     </Resizable>
     <div class="row">
-      <button @click="controller.collapse(sidebar.id)">{{ f.buttons.collapse }}</button>
-      <button @click="controller.expand(sidebar.id)">{{ f.buttons.expand }}</button>
-      <button @click="controller.resize(preview.id, f.previewSize)">{{ f.buttons.resize }}</button>
+      <button @click="controller.collapse(sidebar.id)">
+        {{ f.buttons.collapse }}
+      </button>
+      <button @click="controller.expand(sidebar.id)">
+        {{ f.buttons.expand }}
+      </button>
+      <button @click="controller.resize(preview.id, f.previewSize)">
+        {{ f.buttons.resize }}
+      </button>
     </div>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <output role="status" aria-label="Committed">{{ committed.join(" ") }}</output>
+    <output role="status" aria-label="Committed">{{
+      committed.join(" ")
+    }}</output>
   </div>
 </template>

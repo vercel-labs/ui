@@ -24,12 +24,17 @@ function mount(root: HTMLElement) {
   const title = () => input.value.trim()
   input.addEventListener("input", () => {
     const blocked = !title()
-    if (blocked) publish.setAttribute("aria-disabled", "true")
-    else publish.removeAttribute("aria-disabled")
+    if (blocked) {
+      publish.setAttribute("aria-disabled", "true")
+    } else {
+      publish.removeAttribute("aria-disabled")
+    }
     tooltip.disabled = !blocked
   })
   publish.addEventListener("click", () => {
-    if (title()) log(root, `Published “${title()}”`)
+    if (title()) {
+      log(root, `Published “${title()}”`)
+    }
   })
 }
 

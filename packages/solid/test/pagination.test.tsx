@@ -27,13 +27,19 @@ afterEach(() => {
 })
 
 const linkFor = (root: HTMLElement, page: number) =>
-  [...root.querySelectorAll("button")].find((button) => button.textContent === String(page))
+  [...root.querySelectorAll("button")].find(
+    (button) => button.textContent === String(page)
+  )
 
 const range = (items: readonly PaginationRangeItem[]) => (
   <For each={items}>
     {(item) => (
       <PaginationItem>
-        {typeof item === "number" ? <PaginationLink page={item} /> : <PaginationEllipsis />}
+        {typeof item === "number" ? (
+          <PaginationLink page={item} />
+        ) : (
+          <PaginationEllipsis />
+        )}
       </PaginationItem>
     )}
   </For>
@@ -55,7 +61,9 @@ test("a page change hands the list's children the new page with its own range, i
   renders.length = 0
   setPage(10)
   flush()
-  expect(renders).toEqual([`10: ${paginationRange({ page: 10, pageCount: 20 }).join(" ")}`])
+  expect(renders).toEqual([
+    `10: ${paginationRange({ page: 10, pageCount: 20 }).join(" ")}`,
+  ])
 })
 
 test("the links that stay in the range keep their elements as the page changes", () => {
@@ -86,7 +94,9 @@ test("a getHref that reads a signal moves the links when the signal changes", ()
     </Pagination>
   ))
   const hrefOf = (page: number) =>
-    [...root.querySelectorAll("a")].find((link) => link.textContent === String(page))?.getAttribute("href")
+    [...root.querySelectorAll("a")]
+      .find((link) => link.textContent === String(page))
+      ?.getAttribute("href")
   expect(hrefOf(2)).toBe("/?status=open&page=2")
   setFilter("done")
   flush()

@@ -23,9 +23,13 @@ function Example() {
   return (
     <Tabs defaultValue="shipping" hiddenUntilFound>
       <TabsList aria-label="Policies">
-        <For each={policies}>{(policy) => <TabsTab value={policy.value}>{policy.label}</TabsTab>}</For>
+        <For each={policies}>
+          {(policy) => <TabsTab value={policy.value}>{policy.label}</TabsTab>}
+        </For>
       </TabsList>
-      <For each={policies}>{(policy) => <TabsPanel value={policy.value}>{policy.text}</TabsPanel>}</For>
+      <For each={policies}>
+        {(policy) => <TabsPanel value={policy.value}>{policy.text}</TabsPanel>}
+      </For>
     </Tabs>
   )
 }

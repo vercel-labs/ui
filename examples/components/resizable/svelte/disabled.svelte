@@ -1,7 +1,15 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
-  import { Checkbox, CheckboxIndicator, type CheckedState } from "@ui-sdk/svelte/checkbox"
-  import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/svelte/resizable"
+  import {
+    Checkbox,
+    CheckboxIndicator,
+    type CheckedState,
+  } from "@ui-sdk/svelte/checkbox"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+  } from "@ui-sdk/svelte/resizable"
 
   let locked = $state<CheckedState>(false)
 </script>

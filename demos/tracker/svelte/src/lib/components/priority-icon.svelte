@@ -1,5 +1,11 @@
 <script lang="ts" module>
-  import { CircleAlert, Minus, SignalHigh, SignalLow, SignalMedium } from "@lucide/svelte"
+  import {
+    CircleAlert,
+    Minus,
+    SignalHigh,
+    SignalLow,
+    SignalMedium,
+  } from "@lucide/svelte"
 
   const icons = {
     urgent: CircleAlert,
@@ -24,6 +30,12 @@
 </script>
 
 <Icon
-  {...label ? { role: "img", "aria-label": priorityOf(priority).label } : { "aria-hidden": true }}
-  class={cn("size-4 shrink-0 text-muted-foreground", priority === "urgent" && "text-destructive", className)}
+  {...label
+    ? { role: "img", "aria-label": priorityOf(priority).label }
+    : { "aria-hidden": true }}
+  class={cn(
+    "size-4 shrink-0 text-muted-foreground",
+    priority === "urgent" && "text-destructive",
+    className
+  )}
 />

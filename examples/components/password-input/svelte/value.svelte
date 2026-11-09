@@ -1,7 +1,11 @@
 <script lang="ts">
   import { EyeIcon, EyeOffIcon } from "@lucide/svelte"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
-  import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/svelte/password-input"
+  import {
+    PasswordInput,
+    PasswordInputControl,
+    PasswordInputToggle,
+  } from "@ui-sdk/svelte/password-input"
 
   let value = $state("")
 
@@ -11,7 +15,7 @@
       value.length >= 12,
       /[a-z]/.test(value) && /[A-Z]/.test(value),
       /\d/.test(value) && /[^a-zA-Z\d]/.test(value),
-    ].filter(Boolean).length,
+    ].filter(Boolean).length
   )
 </script>
 

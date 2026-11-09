@@ -11,8 +11,14 @@ describe("field set", () => {
       "data-disabled": "",
       "data-slot": "field-set",
     })
-    expect(attrs(instance.part("legend"))).toMatchObject({ id: "s-legend", "data-disabled": "" })
-    expect(attrs(instance.part("description"))).toMatchObject({ id: "s-description", "data-disabled": "" })
+    expect(attrs(instance.part("legend"))).toMatchObject({
+      id: "s-legend",
+      "data-disabled": "",
+    })
+    expect(attrs(instance.part("description"))).toMatchObject({
+      id: "s-description",
+      "data-disabled": "",
+    })
     instance.setOptions({ id: "s", disabled: false })
     expect(attrs(instance.part("set")).disabled).toBeUndefined()
     expect(partState(instance.part("legend"))).toEqual({ disabled: false })
@@ -21,16 +27,27 @@ describe("field set", () => {
 
 describe("input", () => {
   test("marks whether it holds text, and the native states it's given", () => {
-    expect(attrs(input({ id: "i" }).part("root"))).toEqual({ "data-slot": "input-root" })
+    expect(attrs(input({ id: "i" }).part("root"))).toEqual({
+      "data-slot": "input-root",
+    })
     expect(
-      attrs(input({ id: "i", defaultValue: "Ada" }).part("root", { disabled: true, required: true })),
+      attrs(
+        input({ id: "i", defaultValue: "Ada" }).part("root", {
+          disabled: true,
+          required: true,
+        })
+      )
     ).toEqual({
       "data-slot": "input-root",
       "data-filled": "",
       "data-disabled": "",
       "data-required": "",
     })
-    expect(partState(textarea({ id: "t", value: "" }).part("root", { readOnly: true }))).toEqual({
+    expect(
+      partState(
+        textarea({ id: "t", value: "" }).part("root", { readOnly: true })
+      )
+    ).toEqual({
       filled: false,
       disabled: false,
       readOnly: true,
@@ -43,12 +60,21 @@ describe("input", () => {
     const instance = input({ id: "i", defaultValue: "Ada", onValueChange })
     instance.api.setValue("Grace")
     instance.api.clear()
-    expect(onValueChange.mock.calls.map(([value, details]) => [value, details.reason])).toEqual([
+    expect(
+      onValueChange.mock.calls.map(([value, details]) => [
+        value,
+        details.reason,
+      ])
+    ).toEqual([
       ["Grace", "imperative"],
       ["", "imperative"],
     ])
     expect(attrs(instance.part("root"))["data-filled"]).toBeUndefined()
-    const canceling = input({ id: "c", defaultValue: "Ada", onValueChange: (_, details) => details.cancel() })
+    const canceling = input({
+      id: "c",
+      defaultValue: "Ada",
+      onValueChange: (_, details) => details.cancel(),
+    })
     canceling.api.clear()
     expect(canceling.api.getValue()).toBe("Ada")
   })
@@ -57,7 +83,10 @@ describe("input", () => {
     const onValueChange = vi.fn()
     const instance = input({ id: "i", value: "Ada", onValueChange })
     instance.api.setValue("Grace")
-    expect(onValueChange).toHaveBeenCalledWith("Grace", expect.objectContaining({ reason: "imperative" }))
+    expect(onValueChange).toHaveBeenCalledWith(
+      "Grace",
+      expect.objectContaining({ reason: "imperative" })
+    )
     expect(instance.api.getValue()).toBe("Ada")
     instance.setOptions({ id: "i", value: "", onValueChange })
     expect(attrs(instance.part("root"))["data-filled"]).toBeUndefined()
@@ -67,6 +96,9 @@ describe("input", () => {
     const group = inputGroup({ id: "g" })
     expect(attrs(group.part("group"))).toEqual({ "data-slot": "input-group" })
     expect(present(group.part("clear"))).toBe(false)
-    expect(attrs(group.part("clear"))).toMatchObject({ "data-slot": "input-clear", type: "button" })
+    expect(attrs(group.part("clear"))).toMatchObject({
+      "data-slot": "input-clear",
+      type: "button",
+    })
   })
 })

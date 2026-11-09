@@ -20,7 +20,7 @@ async function mount(root: HTMLElement) {
     (event) => {
       output.textContent = `layout:${(event as CustomEvent<{ value: number[] }>).detail.value.map(Math.round)}`
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

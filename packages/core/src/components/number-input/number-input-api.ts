@@ -1,12 +1,30 @@
 // A number input's state and what it does: typing, keys, buttons, the wheel,
 // scrubs and commits. The parts and their attributes are in number-input.ts.
-import { createDragSession, isDrag, type PointerSample } from "../../foundation/drag-and-drop/pointer"
+import {
+  createDragSession,
+  isDrag,
+  type PointerSample,
+} from "../../foundation/drag-and-drop/pointer"
 import { bindHold } from "../../foundation/direct-manipulation/hold"
 import { isBrowser, isIOS } from "../../foundation/platform/env"
-import { dispatchChange, formInternals, isDisabled } from "../../foundation/forms/form"
-import { displayOptions, formatNumber, numberFormatter } from "../../foundation/number/format"
+import {
+  dispatchChange,
+  formInternals,
+  isDisabled,
+} from "../../foundation/forms/form"
+import {
+  displayOptions,
+  formatNumber,
+  numberFormatter,
+} from "../../foundation/number/format"
 import { stepFromKey } from "../../foundation/number/keys"
-import { clamp, decimalsOf, maxOnGrid, snapToStep, stepValue } from "../../foundation/number/steps"
+import {
+  clamp,
+  decimalsOf,
+  maxOnGrid,
+  snapToStep,
+  stepValue,
+} from "../../foundation/number/steps"
 import { localeOf } from "../../foundation/text/locale"
 import { isPartialNumber, parseNumber } from "../../foundation/number/parse"
 import type { PrimitiveContext } from "../../foundation/kernel/primitive-types"
@@ -18,7 +36,10 @@ import type {
   NumberInputScrubAreaProps,
   NumberInputValueChangeReason,
 } from "./number-input"
-import { createChange, createCommit } from "../../foundation/kernel/input-source"
+import {
+  createChange,
+  createCommit,
+} from "../../foundation/kernel/input-source"
 
 type State = {
   value: number | null
@@ -52,16 +73,25 @@ type State = {
 function settings(options: NumberInputOptions) {
   // A percent's value is a fraction, so a step of 1 would snap 25% to 0%,
   // and each fraction digit it shows is two more places in the value.
-  const { style, maximumFractionDigits, minimumFractionDigits } = options.format ?? {}
+  const { style, maximumFractionDigits, minimumFractionDigits } =
+    options.format ?? {}
   const fallback =
-    style === "percent" ? 10 ** -(2 + (maximumFractionDigits ?? minimumFractionDigits ?? 0)) : 1
+    style === "percent"
+      ? 10 ** -(2 + (maximumFractionDigits ?? minimumFractionDigits ?? 0))
+      : 1
   const step = options.step && options.step > 0 ? options.step : fallback
   return {
     min: options.min ?? -Infinity,
     max: options.max ?? Infinity,
     step,
-    largeStep: options.largeStep && options.largeStep > 0 ? options.largeStep : step * 10,
-    smallStep: options.smallStep && options.smallStep > 0 ? options.smallStep : step / 10,
+    largeStep:
+      options.largeStep && options.largeStep > 0
+        ? options.largeStep
+        : step * 10,
+    smallStep:
+      options.smallStep && options.smallStep > 0
+        ? options.smallStep
+        : step / 10,
     format: options.format,
     locale: options.locale,
     wheel: !!options.wheel,
@@ -79,7 +109,10 @@ const rangeOf = (state: { min: number; max: number; step: number }) => ({
   step: state.step,
 })
 
-const display = (value: number | null, state: Pick<State, "locale" | "pageLocale" | "format" | "step">) =>
+const display = (
+  value: number | null,
+  state: Pick<State, "locale" | "pageLocale" | "format" | "step">
+) =>
   formatNumber(value, localeOf(state), displayOptions(state.format, state.step))
 
 const isLocked = (state: State) => isDisabled(state) || state.readOnly
@@ -92,9 +125,14 @@ function inputMode(state: State) {
   const decimal =
     decimalsOf(state.step) > 0 ||
     (state.format !== undefined &&
-      (numberFormatter(localeOf(state), state.format).resolvedOptions().maximumFractionDigits ?? 0) > 0)
-  if (state.platform === "ios" && negative) return "text"
-  if (state.platform === "android" && negative) return "numeric"
+      (numberFormatter(localeOf(state), state.format).resolvedOptions()
+        .maximumFractionDigits ?? 0) > 0)
+  if (state.platform === "ios" && negative) {
+    return "text"
+  }
+  if (state.platform === "android" && negative) {
+    return "numeric"
+  }
   return decimal ? "decimal" : "numeric"
 }
 
@@ -104,8 +142,12 @@ function canStep(state: State, direction: number, step = state.step) {
 
 // Whether the value is at the bound a step in this direction moves toward.
 function atBound(state: State, direction: number, step = state.step) {
-  if (state.value === null) return false
-  return direction > 0 ? state.value >= maxOnGrid({ ...rangeOf(state), step }) : state.value <= state.min
+  if (state.value === null) {
+    return false
+  }
+  return direction > 0
+    ? state.value >= maxOnGrid({ ...rangeOf(state), step })
+    : state.value <= state.min
 }
 
 // Which step a gesture moves by: Shift picks the large one, and Alt the small one.
@@ -121,7 +163,9 @@ function isAndroid() {
   return isBrowser && /Android/i.test(navigator.userAgent)
 }
 
-function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, string>) {
+function numberInputApi(
+  context: PrimitiveContext<NumberInputOptions, State, string>
+) {
   const { store, element } = context
   const drags = createDragSession(context.onDestroy)
   const change = createChange(context)
@@ -145,18 +189,27 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
   // The value typed so far, or the value when nothing is typed.
   const current = () => {
     const state = store.get()
-    if (state.text.trim() === "") return null
+    if (state.text.trim() === "") {
+      return null
+    }
     return parseNumber(state.text, localeOf(state), state.format) ?? state.value
   }
 
   // The text shows the value, formatted.
-  const showValue = () => store.set({ text: display(store.get().value, store.get()) })
+  const showValue = () =>
+    store.set({ text: display(store.get().value, store.get()) })
 
-  function setValue(value: number | null, reason: NumberInputValueChangeReason, event?: Event) {
+  function setValue(
+    value: number | null,
+    reason: NumberInputValueChangeReason,
+    event?: Event
+  ) {
     const before = store.get().value
     const done = change("value", value, { reason, event })
     if (done) {
-      if (!pending) startValue = before
+      if (!pending) {
+        startValue = before
+      }
       pending = { reason, event }
       // `change` waits for the commit, like a native input's.
       dispatchChange(formElement(), ["input"])
@@ -172,8 +225,11 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
     const value = store.get().value
     const last = pending
     pending = undefined
-    if (sameValue(startValue, value) || !last) return
-    const event = end && end.constructor === last.event?.constructor ? end : last.event
+    if (sameValue(startValue, value) || !last) {
+      return
+    }
+    const event =
+      end && end.constructor === last.event?.constructor ? end : last.event
     commitValue("value", value, { reason: last.reason, event })
     dispatchChange(formElement(), ["change"])
   }
@@ -181,16 +237,28 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
   // Steps from what's typed, or from 0 when empty, kept within the bounds.
   // `steps` is signed, like -2 for two steps down. A small step snaps to its
   // own grid, so a fine change isn't rounded away by `step`.
-  function stepBy(steps: number, size: StepSize, reason: NumberInputValueChangeReason, event?: Event) {
+  function stepBy(
+    steps: number,
+    size: StepSize,
+    reason: NumberInputValueChangeReason,
+    event?: Event
+  ) {
     const state = store.get()
-    if (!canStep(state, steps, size === "small" ? state.smallStep : state.step)) return false
+    if (
+      !canStep(state, steps, size === "small" ? state.smallStep : state.step)
+    ) {
+      return false
+    }
     const range = rangeOf(state)
     const from = current()
     const next =
       from === null
         ? stepValue(0, steps, range)
         : size === "large"
-          ? snapToStep(clamp(from + steps * state.largeStep, state.min, state.max), range)
+          ? snapToStep(
+              clamp(from + steps * state.largeStep, state.min, state.max),
+              range
+            )
           : size === "small"
             ? stepValue(from, steps, { ...range, step: state.smallStep })
             : stepValue(from, steps, range)
@@ -203,7 +271,12 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
 
   // A step from code isn't an interaction, so like `setValue` it commits
   // nothing, and leaves an interaction in progress to commit as it would.
-  function stepFromCode(steps: number, size: StepSize, reason: NumberInputValueChangeReason, event?: Event) {
+  function stepFromCode(
+    steps: number,
+    size: StepSize,
+    reason: NumberInputValueChangeReason,
+    event?: Event
+  ) {
     const interaction = pending
     const done = stepBy(steps, size, reason, event)
     pending = interaction
@@ -212,9 +285,15 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
 
   const api = {
     getValue: () => store.get().value,
-    setValue(value: number | null, { reason = "imperative", event }: NumberInputChangeOptions = {}) {
+    setValue(
+      value: number | null,
+      { reason = "imperative", event }: NumberInputChangeOptions = {}
+    ) {
       const state = store.get()
-      const next = value === null ? null : snapToStep(clamp(value, state.min, state.max), rangeOf(state))
+      const next =
+        value === null
+          ? null
+          : snapToStep(clamp(value, state.min, state.max), rangeOf(state))
       return change("value", next, { reason, event })
     },
     increment: ({
@@ -233,13 +312,24 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
     internal: {
       // Refuses an edit that couldn't become a number, like a letter. Deleting is always allowed.
       beforeinput(event: InputEvent, el: HTMLInputElement) {
-        if (event.isComposing || !event.inputType.startsWith("insert") || event.data === null) return
+        if (
+          event.isComposing ||
+          !event.inputType.startsWith("insert") ||
+          event.data === null
+        ) {
+          return
+        }
         const state = store.get()
         const start = el.selectionStart ?? el.value.length
         const end = el.selectionEnd ?? start
         const next = el.value.slice(0, start) + event.data + el.value.slice(end)
-        if (!isPartialNumber(next, localeOf(state), state.format, { allowNegative: state.min < 0 }))
+        if (
+          !isPartialNumber(next, localeOf(state), state.format, {
+            allowNegative: state.min < 0,
+          })
+        ) {
           event.preventDefault()
+        }
       },
       // The value follows the text while it's a number within the bounds.
       // Committing clamps and snaps it.
@@ -247,16 +337,21 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         const state = store.get()
         edited = true
         store.set({ text })
-        if (text.trim() === "") return setValue(null, "input-change", event)
+        if (text.trim() === "") {
+          return setValue(null, "input-change", event)
+        }
         const parsed = parseNumber(text, localeOf(state), state.format)
-        if (parsed !== null && parsed >= state.min && parsed <= state.max)
+        if (parsed !== null && parsed >= state.min && parsed <= state.max) {
           setValue(parsed, "input-change", event)
+        }
       },
       // Enter or leaving the field: parse, clamp, snap and format what's typed.
       // Text that isn't a number goes back to the last value.
       commitText(event?: FocusEvent | KeyboardEvent) {
         const state = store.get()
-        if (isLocked(state)) return
+        if (isLocked(state)) {
+          return
+        }
         if (!edited) {
           store.set({ text: display(state.value, state) })
           return commit(event)
@@ -264,39 +359,68 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         edited = false
         if (state.text.trim() !== "") {
           const parsed = parseNumber(state.text, localeOf(state), state.format)
-          if (parsed !== null)
-            setValue(snapToStep(clamp(parsed, state.min, state.max), rangeOf(state)), "input-commit", event)
-        } else if (state.value !== null) setValue(null, "input-commit", event)
+          if (parsed !== null) {
+            setValue(
+              snapToStep(clamp(parsed, state.min, state.max), rangeOf(state)),
+              "input-commit",
+              event
+            )
+          }
+        } else if (state.value !== null) {
+          setValue(null, "input-commit", event)
+        }
         showValue()
         commit(event)
       },
       keydown(event: KeyboardEvent) {
         const state = store.get()
-        if (event.key === "Enter") return api.internal.commitText(event)
-        if (event.ctrlKey || event.metaKey) return
+        if (event.key === "Enter") {
+          return api.internal.commitText(event)
+        }
+        if (event.ctrlKey || event.metaKey) {
+          return
+        }
         // Left and Right move the caret, and Alt leaves Page Up, Page Down, Home and End to it too.
         const move = stepFromKey(event, { arrows: "vertical" })
-        if (!move || (event.altKey && !event.key.startsWith("Arrow"))) return
+        if (!move || (event.altKey && !event.key.startsWith("Arrow"))) {
+          return
+        }
         if (!("bound" in move)) {
           event.preventDefault()
           return stepBy(move.direction, move.size, "step-key", event)
         }
         // Home and End go to a bound only when there is one. Otherwise they move the caret.
-        const bound = move.bound === "min" ? state.min : maxOnGrid(rangeOf(state))
-        if (!Number.isFinite(bound) || isLocked(state)) return
+        const bound =
+          move.bound === "min" ? state.min : maxOnGrid(rangeOf(state))
+        if (!Number.isFinite(bound) || isLocked(state)) {
+          return
+        }
         event.preventDefault()
         setValue(bound, "step-key", event)
         showValue()
       },
       keyup: (event: KeyboardEvent) => {
-        if (pending?.reason === "step-key") commit(event)
+        if (pending?.reason === "step-key") {
+          commit(event)
+        }
       },
       wheel(event: WheelEvent, el: HTMLInputElement) {
         const state = store.get()
         // Only a focused field takes the wheel, so the page still scrolls past it.
         // Pinch zoom and sideways scrolls are left alone.
-        if (!state.wheel || el.ownerDocument.activeElement !== el || event.ctrlKey) return
-        if (Math.abs(event.deltaX) > Math.abs(event.deltaY) || event.deltaY === 0) return
+        if (
+          !state.wheel ||
+          el.ownerDocument.activeElement !== el ||
+          event.ctrlKey
+        ) {
+          return
+        }
+        if (
+          Math.abs(event.deltaX) > Math.abs(event.deltaY) ||
+          event.deltaY === 0
+        ) {
+          return
+        }
         event.preventDefault()
         stepBy(event.deltaY < 0 ? 1 : -1, stepSize(event), "wheel", event)
         // A wheel has no release, so a pause commits.
@@ -310,7 +434,8 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         const blocked = () => disabled() || el.hasAttribute("disabled")
         let size: "large" | "step" = "step"
         const step = (event: Event) =>
-          stepBy(direction, size, reason, event) && canStep(store.get(), direction)
+          stepBy(direction, size, reason, event) &&
+          canStep(store.get(), direction)
         return bindHold(el, {
           delay: 400,
           repeat: 60,
@@ -319,39 +444,61 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
           disabled: blocked,
           onPress: (press) => {
             const event = press.event as PointerEvent
-            if (!drags.accepts(event) || !canStep(store.get(), direction)) return false
+            if (!drags.accepts(event) || !canStep(store.get(), direction)) {
+              return false
+            }
             // Keeps focus where it is, so a phone's keyboard stays as it was.
             event.preventDefault()
             size = event.shiftKey ? "large" : "step"
-            if (press.input !== "mouse") return
+            if (press.input !== "mouse") {
+              return
+            }
             input()?.focus({ preventScroll: true })
             step(event)
           },
           onHold: ({ event }) => step(event),
           onEnd: (end) => {
-            if (end.input !== "mouse" && !end.held && !end.canceled && !blocked()) step(end.event)
+            if (
+              end.input !== "mouse" &&
+              !end.held &&
+              !end.canceled &&
+              !blocked()
+            ) {
+              step(end.event)
+            }
             commit(end.event)
           },
         })
       },
       // Keyboard and screen reader presses, which carry no pointer.
       clickButton(event: MouseEvent, direction: number) {
-        if (event.detail !== 0) return
+        if (event.detail !== 0) {
+          return
+        }
         stepBy(
           direction,
           event.shiftKey ? "large" : "step",
           direction > 0 ? "increment-press" : "decrement-press",
-          event,
+          event
         )
         commit(event)
       },
-      scrub(event: PointerEvent, el: HTMLElement, props: Omit<NumberInputScrubAreaProps, "controller">) {
-        if (!drags.accepts(event) || isLocked(store.get())) return
+      scrub(
+        event: PointerEvent,
+        el: HTMLElement,
+        props: Omit<NumberInputScrubAreaProps, "controller">
+      ) {
+        if (!drags.accepts(event) || isLocked(store.get())) {
+          return
+        }
         // No focus moves and no text is selected while dragging. Focus waits
         // for a press that turns out to be a click.
         event.preventDefault()
         const doc = el.ownerDocument
-        const size = props.pixelsPerStep && props.pixelsPerStep > 0 ? props.pixelsPerStep : 2
+        const size =
+          props.pixelsPerStep && props.pixelsPerStep > 0
+            ? props.pixelsPerStep
+            : 2
         const vertical = props.orientation === "vertical"
         // Distance adds up across moves, so slow drags step as far as fast ones.
         let distance = 0
@@ -364,7 +511,9 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
         drags.start(el, event, {
           lock: true,
           onMove: (sample: PointerSample) => {
-            dragged ||= isDrag(sample.x - event.clientX, sample.y - event.clientY) || sample.locked
+            dragged ||=
+              isDrag(sample.x - event.clientX, sample.y - event.clientY) ||
+              sample.locked
             if (sample.locked) {
               // The real cursor is hidden and still, so draw one that wraps at the edges.
               cursor.x = wrap(cursor.x + sample.movementX, view.innerWidth)
@@ -377,7 +526,9 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
             distance += vertical ? -sample.movementY : sample.movementX
             // Every step this frame's distance covers, as one change.
             const steps = Math.trunc(distance / size)
-            if (steps === 0) return
+            if (steps === 0) {
+              return
+            }
             distance -= steps * size
             stepBy(steps, stepSize(sample.event), "scrub", sample.event)
           },
@@ -386,13 +537,17 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
             store.set({ scrubbing: false, cursor: null })
             commit(end)
             // A click focuses the input with its text selected, ready to type.
-            if (!dragged && !canceled) api.internal.focusAndSelect()
+            if (!dragged && !canceled) {
+              api.internal.focusAndSelect()
+            }
           },
         })
       },
       focusAndSelect() {
         const el = input()
-        if (!el) return
+        if (!el) {
+          return
+        }
         el.focus({ preventScroll: true })
         el.select()
       },
@@ -404,14 +559,18 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
       },
       restore(saved: string) {
         const value = saved === "" ? null : Number(saved)
-        if (value === null || Number.isFinite(value)) api.setValue(value, { reason: "restore" })
+        if (value === null || Number.isFinite(value)) {
+          api.setValue(value, { reason: "restore" })
+        }
       },
       setFormDisabled(formDisabled: boolean) {
         store.set({ formDisabled })
       },
       // Read from the browser once bound, since the server renders "other".
       readPlatform() {
-        store.set({ platform: isIOS() ? "ios" : isAndroid() ? "android" : "other" })
+        store.set({
+          platform: isIOS() ? "ios" : isAndroid() ? "android" : "other",
+        })
       },
       submitted: () => {
         // Empty submits an empty value, like a native input.
@@ -425,13 +584,21 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
   // typed. A new format, locale or step shows the value again, unless the
   // user is typing. Formats compare by content, so a new object each render
   // changes nothing.
-  const formatKey = (state: State) => JSON.stringify([state.format, localeOf(state), state.step])
+  const formatKey = (state: State) =>
+    JSON.stringify([state.format, localeOf(state), state.step])
   // A value from options shows in the same pass, unless the text typed so far already reads as it.
   deriveFromOptions(context, ["text"], (synced, state) => {
-    if (!("value" in synced) || sameValue(synced.value, state.value)) return
+    if (!("value" in synced) || sameValue(synced.value, state.value)) {
+      return
+    }
     const next = { ...state, ...synced }
-    const typed = next.text.trim() === "" ? null : parseNumber(next.text, localeOf(next), next.format)
-    if (!sameValue(typed, next.value)) return { text: display(next.value, next) }
+    const typed =
+      next.text.trim() === ""
+        ? null
+        : parseNumber(next.text, localeOf(next), next.format)
+    if (!sameValue(typed, next.value)) {
+      return { text: display(next.value, next) }
+    }
   })
   let shown = store.get().value
   let shownState = store.get()
@@ -448,12 +615,21 @@ function numberInputApi(context: PrimitiveContext<NumberInputOptions, State, str
     const format = settingsChanged ? formatKey(state) : shownFormat
     if (format !== shownFormat) {
       shownFormat = format
-      if (!edited) return showValue()
+      if (!edited) {
+        return showValue()
+      }
     }
-    if (sameValue(state.value, shown)) return
+    if (sameValue(state.value, shown)) {
+      return
+    }
     shown = state.value
-    const typed = state.text.trim() === "" ? null : parseNumber(state.text, localeOf(state), state.format)
-    if (!sameValue(typed, state.value)) store.set({ text: display(state.value, state) })
+    const typed =
+      state.text.trim() === ""
+        ? null
+        : parseNumber(state.text, localeOf(state), state.format)
+    if (!sameValue(typed, state.value)) {
+      store.set({ text: display(state.value, state) })
+    }
   })
   context.onDestroy(() => clearTimeout(wheelTimer))
 

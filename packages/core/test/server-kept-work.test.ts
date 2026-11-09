@@ -39,17 +39,23 @@ test("checkServer passes tabs in plain Node", () => {
   const html = checkServer(
     tabs,
     { defaultValue: "a" },
-    `<root><list><tab value="a">A</tab></list><panel value="a">A</panel></root>`,
+    `<root><list><tab value="a">A</tab></list><panel value="a">A</panel></root>`
   )
   expect(html).toContain('role="tablist"')
 })
 
 test("checkServer passes a checkbox in plain Node", () => {
-  expect(checkServer(checkbox, {}, `<root>Accept</root>`)).toContain('role="checkbox"')
+  expect(checkServer(checkbox, {}, `<root>Accept</root>`)).toContain(
+    'role="checkbox"'
+  )
 })
 
 test("checkServer passes a collapsible in plain Node", () => {
-  expect(checkServer(collapsible, {}, `<root><trigger>Show</trigger><panel>More</panel></root>`)).toContain(
-    "aria-expanded",
-  )
+  expect(
+    checkServer(
+      collapsible,
+      {},
+      `<root><trigger>Show</trigger><panel>More</panel></root>`
+    )
+  ).toContain("aria-expanded")
 })

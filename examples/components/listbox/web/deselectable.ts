@@ -19,7 +19,7 @@ function mount(root: HTMLElement) {
             <ui-listbox-item value="${framework.value}">
               ${framework.label}
               <ui-listbox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
-            </ui-listbox-item>`,
+            </ui-listbox-item>`
         )
         .join("")}
     </ui-listbox>

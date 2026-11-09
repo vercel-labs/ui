@@ -39,7 +39,7 @@ function bindLayer(
     topLayer?: boolean
     /** Whether the window losing focus closes it, like a click into an iframe. Defaults to `false`. */
     closeOnBlur?: boolean
-  },
+  }
 ) {
   let active = true
   const layer: Layer = {
@@ -54,19 +54,25 @@ function bindLayer(
     },
     onOutsidePress: (event) => options.onDismiss("outside-press", event),
     onBlur: (event) => {
-      if (options.closeOnBlur) options.onDismiss("window-blur", event)
+      if (options.closeOnBlur) {
+        options.onDismiss("window-blur", event)
+      }
     },
   }
   const top = !!options.topLayer && supportsTopLayer()
   if (top) {
     el.setAttribute("popover", "manual")
-    if (!el.matches(":popover-open")) el.showPopover()
+    if (!el.matches(":popover-open")) {
+      el.showPopover()
+    }
   }
   const pop = pushLayer(layer)
   return () => {
     active = false
     pop()
-    if (top && el.matches(":popover-open")) el.hidePopover()
+    if (top && el.matches(":popover-open")) {
+      el.hidePopover()
+    }
   }
 }
 

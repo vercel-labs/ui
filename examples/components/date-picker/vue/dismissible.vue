@@ -57,7 +57,9 @@ const asking = ref(false)
           <CalendarDay :value="cell.date" />
         </CalendarWeeks>
       </CalendarGrid>
-      <p v-if="asking" data-slot="hint" role="alert">Pick a check-out date to finish your stay.</p>
+      <p v-if="asking" data-slot="hint" role="alert">
+        Pick a check-out date to finish your stay.
+      </p>
     </DatePickerContent>
   </DatePicker>
 </template>

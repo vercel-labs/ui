@@ -11,14 +11,22 @@ const { cancel, disabled } = ratingOptions()
 const action = ref("")
 const submitted = ref("")
 
-function onValueChange(score: number | null, details: { reason: string; cancel: () => void }) {
-  if (score === cancel) return details.cancel()
+function onValueChange(
+  score: number | null,
+  details: { reason: string; cancel: () => void }
+) {
+  if (score === cancel) {
+    return details.cancel()
+  }
   action.value = `${score}:${details.reason}`
 }
 
 function onSubmit(event: SubmitEvent) {
   const form = event.currentTarget as HTMLFormElement
-  submitted.value = Array.from(new FormData(form), ([key, entry]) => `${key}=${entry}`).join("&")
+  submitted.value = Array.from(
+    new FormData(form),
+    ([key, entry]) => `${key}=${entry}`
+  ).join("&")
 }
 </script>
 
@@ -38,8 +46,17 @@ function onSubmit(event: SubmitEvent) {
       </RatingItem>
     </Rating>
     <button type="button">After</button>
-    <Rating :aria-label="value.label" :name="value.name" :step="value.step" deselectable />
-    <Rating :value="average.value" :get-value-label="average.getValueLabel" read-only />
+    <Rating
+      :aria-label="value.label"
+      :name="value.name"
+      :step="value.step"
+      deselectable
+    />
+    <Rating
+      :value="average.value"
+      :get-value-label="average.getValueLabel"
+      read-only
+    />
     <button type="submit">Save</button>
     <button type="reset">Reset</button>
     <button type="button" @click="controller.setValue(5)">Rate five</button>

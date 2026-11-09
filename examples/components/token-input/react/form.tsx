@@ -1,6 +1,10 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/react/token-input"
+import {
+  TokenInput,
+  TokenInputEditor,
+  type TokenInputValue,
+} from "@ui-sdk/react/token-input"
 import { CheckIcon } from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
@@ -21,7 +25,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <Checkbox checked={disabled} onCheckedChange={(next) => setDisabled(next === true)}>
+          <Checkbox
+            checked={disabled}
+            onCheckedChange={(next) => setDisabled(next === true)}
+          >
             <CheckboxIndicator>
               <CheckIcon aria-hidden="true" />
             </CheckboxIndicator>
@@ -29,7 +36,10 @@ function Example() {
           Disabled
         </label>
         <label data-slot="label">
-          <Checkbox checked={readOnly} onCheckedChange={(next) => setReadOnly(next === true)}>
+          <Checkbox
+            checked={readOnly}
+            onCheckedChange={(next) => setReadOnly(next === true)}
+          >
             <CheckboxIndicator>
               <CheckIcon aria-hidden="true" />
             </CheckboxIndicator>
@@ -40,7 +50,13 @@ function Example() {
       <div data-slot="stack">
         <Field disabled={disabled}>
           <FieldLabel>Prompt</FieldLabel>
-          <TokenInput form={formId} name="prompt" required defaultValue={draft} readOnly={readOnly}>
+          <TokenInput
+            form={formId}
+            name="prompt"
+            required
+            defaultValue={draft}
+            readOnly={readOnly}
+          >
             <TokenInputEditor />
           </TokenInput>
         </Field>
@@ -49,7 +65,9 @@ function Example() {
           data-slot="row"
           onSubmit={(event) => {
             event.preventDefault()
-            log(`Submitted ${new FormData(event.currentTarget).get("prompt") ?? ""}`)
+            log(
+              `Submitted ${new FormData(event.currentTarget).get("prompt") ?? ""}`
+            )
           }}
         >
           <button type="submit" data-variant="solid">

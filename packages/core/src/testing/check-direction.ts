@@ -10,21 +10,30 @@ import type { OptionsOf, Primitive } from "../foundation/kernel/primitive-types"
 function outcome(view: ReturnType<typeof mount>, dir: "ltr" | "rtl") {
   const focused = document.activeElement as HTMLElement | null
   const slot = focused?.getAttribute("data-slot") ?? ""
-  const key = focused?.getAttribute("data-value") ?? focused?.textContent?.trim() ?? ""
+  const key =
+    focused?.getAttribute("data-value") ?? focused?.textContent?.trim() ?? ""
   const mirrored: Record<string, string> = { left: "right", right: "left" }
   const state = JSON.stringify(view.state, (name, value) =>
     name === "id"
       ? undefined
       : typeof value !== "string"
         ? value
-        : dir === "rtl" && (name === "direction" || name === "side") && value in mirrored
+        : dir === "rtl" &&
+            (name === "direction" || name === "side") &&
+            value in mirrored
           ? mirrored[value]
-          : value.replace(/^mount-\d+/, "mount"),
+          : value.replace(/^mount-\d+/, "mount")
   )
   return { focus: `${slot} ${key}`, state }
 }
 
-async function press(primitive: Primitive, options: object, markup: string, dir: "ltr" | "rtl", key: string) {
+async function press(
+  primitive: Primitive,
+  options: object,
+  markup: string,
+  dir: "ltr" | "rtl",
+  key: string
+) {
   const html = document.documentElement
   const before = html.getAttribute("dir")
   html.setAttribute("dir", dir)
@@ -39,8 +48,11 @@ async function press(primitive: Primitive, options: object, markup: string, dir:
       view.unmount()
     }
   } finally {
-    if (before === null) html.removeAttribute("dir")
-    else html.setAttribute("dir", before)
+    if (before === null) {
+      html.removeAttribute("dir")
+    } else {
+      html.setAttribute("dir", before)
+    }
   }
 }
 
@@ -59,13 +71,23 @@ let running = Promise.resolve()
  *
  * @experimental
  */
-function checkDirection<P extends Primitive>(primitive: P, options: OptionsOf<P>, markup: string) {
-  const check = running.then(() => compareDirections(primitive, options, markup))
+function checkDirection<P extends Primitive>(
+  primitive: P,
+  options: OptionsOf<P>,
+  markup: string
+) {
+  const check = running.then(() =>
+    compareDirections(primitive, options, markup)
+  )
   running = check.catch(() => {})
   return check
 }
 
-async function compareDirections(primitive: Primitive, options: object, markup: string) {
+async function compareDirections(
+  primitive: Primitive,
+  options: object,
+  markup: string
+) {
   const problems: string[] = []
   for (const [forward, mirrored] of [
     ["ArrowRight", "ArrowLeft"],
@@ -73,24 +95,30 @@ async function compareDirections(primitive: Primitive, options: object, markup: 
   ]) {
     const ltr = await press(primitive, options, markup, "ltr", forward)
     const rtl = await press(primitive, options, markup, "rtl", mirrored)
-    const moved = ltr.end.focus !== ltr.start.focus || ltr.end.state !== ltr.start.state
+    const moved =
+      ltr.end.focus !== ltr.start.focus || ltr.end.state !== ltr.start.state
     if (forward === "ArrowRight" && !moved) {
-      problems.push("ArrowRight changes nothing left to right, so there's no direction to check")
+      problems.push(
+        "ArrowRight changes nothing left to right, so there's no direction to check"
+      )
       break
     }
-    if (rtl.end.focus !== ltr.end.focus)
+    if (rtl.end.focus !== ltr.end.focus) {
       problems.push(
-        `${mirrored} right to left focuses ${rtl.end.focus || "nothing"}, where ${forward} left to right focuses ${ltr.end.focus || "nothing"}`,
+        `${mirrored} right to left focuses ${rtl.end.focus || "nothing"}, where ${forward} left to right focuses ${ltr.end.focus || "nothing"}`
       )
-    if (rtl.end.state !== ltr.end.state)
+    }
+    if (rtl.end.state !== ltr.end.state) {
       problems.push(
-        `${mirrored} right to left leaves state ${rtl.end.state}, where ${forward} left to right leaves ${ltr.end.state}`,
+        `${mirrored} right to left leaves state ${rtl.end.state}, where ${forward} left to right leaves ${ltr.end.state}`
       )
+    }
   }
-  if (problems.length)
+  if (problems.length) {
     throw new Error(
-      `checkDirection found ${problems.length} problem${problems.length === 1 ? "" : "s"}:\n- ${problems.join("\n- ")}`,
+      `checkDirection found ${problems.length} problem${problems.length === 1 ? "" : "s"}:\n- ${problems.join("\n- ")}`
     )
+  }
 }
 
 export { checkDirection }

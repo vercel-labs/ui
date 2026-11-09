@@ -4,7 +4,10 @@ import { perfItems, perfSize } from "tests/fixtures/perf.ts"
 // components have no renders to count.
 async function mount(root: HTMLElement) {
   const items = perfItems(perfSize())
-    .map((item) => `<ui-menu-item class="item" value="${item.value}">${item.label}</ui-menu-item>`)
+    .map(
+      (item) =>
+        `<ui-menu-item class="item" value="${item.value}">${item.label}</ui-menu-item>`
+    )
     .join("")
   root.innerHTML = `
     <div class="fixture">

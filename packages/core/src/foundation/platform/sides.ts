@@ -8,8 +8,12 @@ type PhysicalSide = "top" | "bottom" | "left" | "right"
 
 // `start` and `end` on screen.
 function physicalSide(side: Side, rtl = false) {
-  if (side === "start") return rtl ? "right" : "left"
-  if (side === "end") return rtl ? "left" : "right"
+  if (side === "start") {
+    return rtl ? "right" : "left"
+  }
+  if (side === "end") {
+    return rtl ? "left" : "right"
+  }
   return side
 }
 

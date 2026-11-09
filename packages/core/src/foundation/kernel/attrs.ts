@@ -6,7 +6,10 @@
  * @stable
  */
 function openAttrs(open: boolean) {
-  return { "data-open": open ? "" : undefined, "data-closed": open ? undefined : "" }
+  return {
+    "data-open": open ? "" : undefined,
+    "data-closed": open ? undefined : "",
+  }
 }
 
 /**

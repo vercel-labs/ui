@@ -8,9 +8,11 @@
     <TabsTab value="password">Password</TabsTab>
   </TabsList>
   <TabsPanel value="account">
-    Update your name, email address and profile photo. Your team sees changes right away.
+    Update your name, email address and profile photo. Your team sees changes
+    right away.
   </TabsPanel>
   <TabsPanel value="password">
-    Choose a new password for hollis@example.com. You stay signed in on this device.
+    Choose a new password for hollis@example.com. You stay signed in on this
+    device.
   </TabsPanel>
 </Tabs>

@@ -12,8 +12,13 @@ function keepFocus(element: () => HTMLElement | undefined) {
   const restore = () => {
     const el = element()
     const active = el?.ownerDocument.activeElement
-    if (el && active !== el && (!active || active === el.ownerDocument.body || !active.isConnected))
+    if (
+      el &&
+      active !== el &&
+      (!active || active === el.ownerDocument.body || !active.isConnected)
+    ) {
       el.focus()
+    }
   }
   queueMicrotask(restore)
   setTimeout(restore)

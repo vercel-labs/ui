@@ -20,7 +20,7 @@ function select(
   attribute: string,
   label: string,
   value: string,
-  options: { value: string; label: string }[],
+  options: { value: string; label: string }[]
 ) {
   return `
     <ui-select data-attribute="${attribute}" default-value="${value}">
@@ -39,7 +39,7 @@ function select(
                 ${option.label}
                 <ui-select-item-indicator>${check}</ui-select-item-indicator>
               </ui-select-item>
-            `,
+            `
           )
           .join("")}
       </ui-select-content>
@@ -70,14 +70,19 @@ function mount(root: HTMLElement) {
   `
   const region = root.querySelector("ui-toast-region")!
   region.toaster = toast
-  for (const control of root.querySelectorAll("ui-select"))
+  for (const control of root.querySelectorAll("ui-select")) {
     control.addEventListener("valuechange", (event) => {
       const value = event.detail.value
-      if (typeof value === "string") region.setAttribute(control.dataset.attribute!, value)
+      if (typeof value === "string") {
+        region.setAttribute(control.dataset.attribute!, value)
+      }
     })
+  }
   root
     .querySelector("[data-slot='controls'] + button")!
-    .addEventListener("click", () => toast("Event created", { description: "Friday, June 12 at 10:00 AM" }))
+    .addEventListener("click", () =>
+      toast("Event created", { description: "Friday, June 12 at 10:00 AM" })
+    )
   return () => {
     toast.dismiss()
   }

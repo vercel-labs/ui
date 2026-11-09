@@ -1,4 +1,8 @@
-import { NumberInput, NumberInputControl, NumberInputIncrement } from "@ui-sdk/solid/number-input"
+import {
+  NumberInput,
+  NumberInputControl,
+  NumberInputIncrement,
+} from "@ui-sdk/solid/number-input"
 import {
   Slider,
   SliderControl,
@@ -17,15 +21,26 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Slider defaultValue={40} onValueChange={(value) => setAction(`brightness:${value}`)}>
-        <SliderValue class="slider-value">{(state) => `Brightness ${state.text}`}</SliderValue>
+      <Slider
+        defaultValue={40}
+        onValueChange={(value) => setAction(`brightness:${value}`)}
+      >
+        <SliderValue class="slider-value">
+          {(state) => `Brightness ${state.text}`}
+        </SliderValue>
         <SliderControl class="slider-control">
           <SliderTrack class="slider-track">
             <SliderIndicator
-              class={(state) => `slider-indicator ${state.dragging ? "is-dragging" : "is-idle"}`}
+              class={(state) =>
+                `slider-indicator ${state.dragging ? "is-dragging" : "is-idle"}`
+              }
               style={(state) => ({ opacity: state.dragging ? 0.5 : 1 })}
             />
-            <SliderThumb class="slider-thumb" aria-label="Brightness" render={(props) => <span {...props} />}>
+            <SliderThumb
+              class="slider-thumb"
+              aria-label="Brightness"
+              render={(props) => <span {...props} />}
+            >
               {(state) => <span class="thumb-label">{state.thumbValue}</span>}
             </SliderThumb>
           </SliderTrack>

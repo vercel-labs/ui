@@ -3,7 +3,13 @@
 import { render } from "@solidjs/web"
 import { flush } from "solid-js"
 import { afterEach, expect, test } from "vitest"
-import { Dialog, DialogClose, DialogContent, DialogTitle, type DialogCloseActionDetails } from "../src/dialog"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+  type DialogCloseActionDetails,
+} from "../src/dialog"
 import { withSource } from "../src/observe"
 import { createToaster, ToastRegion } from "../src/toast"
 
@@ -27,11 +33,16 @@ function mount(code: () => any) {
 }
 
 const buttonNamed = (name: string) =>
-  [...document.querySelectorAll("button")].find((button) => button.textContent === name)!
+  [...document.querySelectorAll("button")].find(
+    (button) => button.textContent === name
+  )!
 
 test("a dialog's Close action hears how it was pressed", () => {
   const sources: string[] = []
-  const save = (_event: Event | undefined, { source }: DialogCloseActionDetails) => sources.push(source)
+  const save = (
+    _event: Event | undefined,
+    { source }: DialogCloseActionDetails
+  ) => sources.push(source)
   mount(() => (
     <Dialog defaultOpen>
       <DialogContent>
@@ -50,11 +61,17 @@ test("a toast's action and cancel buttons hear how they were pressed", () => {
   mount(() => <ToastRegion toaster={toaster} />)
   toaster("Deleted", {
     duration: Infinity,
-    action: { label: "Undo", onAction: (_event, { source }) => sources.push(`undo:${source}`) },
+    action: {
+      label: "Undo",
+      onAction: (_event, { source }) => sources.push(`undo:${source}`),
+    },
   })
   toaster("Saved", {
     duration: Infinity,
-    cancel: { label: "Keep", onCancel: (_event, { source }) => sources.push(`keep:${source}`) },
+    cancel: {
+      label: "Keep",
+      onCancel: (_event, { source }) => sources.push(`keep:${source}`),
+    },
   })
   flush()
   withSource("agent", () => buttonNamed("Undo").click())

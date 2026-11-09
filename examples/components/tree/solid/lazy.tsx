@@ -1,4 +1,10 @@
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/solid/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/solid/tree"
 import type { JSX } from "@solidjs/web"
 import { createSignal, For, Match, Show, Switch } from "solid-js"
 
@@ -14,7 +20,10 @@ let archiveAsked = false
 async function fetchChildren(value: string, signal: AbortSignal) {
   await new Promise((resolve, reject) => {
     const timer = setTimeout(resolve, 800)
-    signal.addEventListener("abort", () => (clearTimeout(timer), reject(signal.reason)))
+    signal.addEventListener(
+      "abort",
+      () => (clearTimeout(timer), reject(signal.reason))
+    )
   })
   if (value === "archive" && !archiveAsked) {
     archiveAsked = true

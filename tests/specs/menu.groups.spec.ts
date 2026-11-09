@@ -5,7 +5,8 @@ import { changeItems, expect, test } from "../fixtures"
 test("reordered groups move the keys with them", async ({ page, open }) => {
   await open("menu-groups")
   await page.getByRole("button", { name: "Actions" }).press("Enter")
-  const item = (name: string) => page.getByRole("menuitem", { name, exact: true })
+  const item = (name: string) =>
+    page.getByRole("menuitem", { name, exact: true })
   await expect(item("Undo")).toBeFocused()
   await changeItems(page, "reversed")
   await expect(page.getByRole("menuitem")).toHaveText([

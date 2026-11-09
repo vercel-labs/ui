@@ -3,7 +3,10 @@
 Picks one value, or several with `multiple`, from a list in a popup.
 @stable
 -->
-<script lang="ts" generics="T = string, Multiple extends boolean | undefined = false">
+<script
+  lang="ts"
+  generics="T = string, Multiple extends boolean | undefined = false"
+>
   import type { ChangeDetails, DismissAttemptDetails } from "@ui-sdk/core"
   import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
   import {
@@ -52,7 +55,10 @@ Picks one value, or several with `multiple`, from a list in a popup.
         /** The value selected at first, when uncontrolled. A form reset returns to it. */
         defaultValue?: T | null
         /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
-        onValueChange?: (value: NoInfer<T> | null, details: ValueDetails) => void
+        onValueChange?: (
+          value: NoInfer<T> | null,
+          details: ValueDetails
+        ) => void
       } & ([Multiple] extends [false | undefined] ? unknown : never))
     | ({
         /** Whether several items can be selected. */
@@ -62,7 +68,10 @@ Picks one value, or several with `multiple`, from a list in a popup.
         /** The value or values selected at first, when uncontrolled. A form reset returns to it. */
         defaultValue?: T | T[] | null
         /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
-        onValueChange?: (value: NoInfer<T> | NoInfer<T>[] | null, details: ValueDetails) => void
+        onValueChange?: (
+          value: NoInfer<T> | NoInfer<T>[] | null,
+          details: ValueDetails
+        ) => void
       } & (boolean extends Multiple ? unknown : never))
 
   let {
@@ -167,7 +176,9 @@ Picks one value, or several with `multiple`, from a list in a popup.
     /** Runs when the list is scrolled near its end, for async options. */
     onLoadMore?: () => void
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back, the screen reader's escape or a swipe. Focus or the window leaving is refused without it. */
-    onDismissAttempt?: (details: DismissAttemptDetails<SelectDismissReason>) => void
+    onDismissAttempt?: (
+      details: DismissAttemptDetails<SelectDismissReason>
+    ) => void
     children?: Snippet
   } & SelectValueProps<T, Multiple> = $props()
 
@@ -213,17 +224,23 @@ Picks one value, or several with `multiple`, from a list in a popup.
     onValueChange: (next: unknown, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next as never, details)
-      if (!details.canceled) value = next as never
+      if (!details.canceled) {
+        value = next as never
+      }
     },
     onOpenChange: (next: boolean, details: OpenDetails) => {
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onHighlight,
     onQueryChange: (next: string, details: QueryDetails) => {
       onQueryChange?.(next, details)
-      if (!details.canceled) query = next
+      if (!details.canceled) {
+        query = next
+      }
     },
     onLoadMore,
     onDismissAttempt,
@@ -236,7 +253,10 @@ Picks one value, or several with `multiple`, from a list in a popup.
   // more per value with `multiple`. The input's attributes change with the
   // value, so reading them keeps the list of values current.
   const formInput = useHandlePart(select, "form-input")
-  const values = $derived((formInput.attrs, select.state.multiple ? select.api.internal.serialized() : []))
+  const values = $derived(
+    (formInput.attrs,
+    select.state.multiple ? select.api.internal.serialized() : [])
+  )
 </script>
 
 {@render children?.()}

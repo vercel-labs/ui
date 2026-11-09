@@ -5,9 +5,10 @@ import { createFixtureToasts } from "./shared"
 // Region options as attributes: side="top", max-visible="2", shortcut="none".
 function regionAttributes() {
   const attributes: Record<string, string> = { class: "toast-region" }
-  for (const [name, value] of Object.entries(toastOptions()))
+  for (const [name, value] of Object.entries(toastOptions())) {
     attributes[name.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`)] =
       value === true ? "" : value === null ? "none" : String(value)
+  }
   return attributes
 }
 
@@ -52,19 +53,32 @@ async function mount(root: HTMLElement) {
     </div>
   `
   const output = root.querySelector("output")!
-  const toasts = createFixtureToasts<ToastContent>((action) => (output.textContent = action))
+  const toasts = createFixtureToasts<ToastContent>(
+    (action) => (output.textContent = action)
+  )
   root.addEventListener("click", async (event) => {
-    const target = (event.target as Element).closest<HTMLElement>("[data-show], [data-confirm]")
-    if (!target) return
-    if (target.dataset.show) toasts[target.dataset.show as "basic" | "success" | "error" | "promise"]()
+    const target = (event.target as Element).closest<HTMLElement>(
+      "[data-show], [data-confirm]"
+    )
+    if (!target) {
+      return
+    }
+    if (target.dataset.show) {
+      toasts[target.dataset.show as "basic" | "success" | "error" | "promise"]()
+    }
     if (target.hasAttribute("data-confirm")) {
       const { title, confirm: confirmLabel, cancel } = toastFixture.confirm
-      output.textContent = (await confirm({ title, confirmLabel, cancelLabel: cancel }))
+      output.textContent = (await confirm({
+        title,
+        confirmLabel,
+        cancelLabel: cancel,
+      }))
         ? "confirmed"
         : "declined"
     }
   })
-  const overlayHost = root.querySelector("ui-overlay-host") as (HTMLElement & { toast?: object }) | null
+  const overlayHost = root.querySelector("ui-overlay-host") as
+    (HTMLElement & { toast?: object }) | null
   if (overlayHost) {
     const template = document.createElement("template")
     template.innerHTML = `
@@ -76,9 +90,12 @@ async function mount(root: HTMLElement) {
       </ui-toast>`
     overlayHost.toast = { attributes: regionAttributes(), template }
   }
-  const region = root.querySelector("ui-toast-region") as (HTMLElement & { toaster?: unknown }) | null
+  const region = root.querySelector("ui-toast-region") as
+    (HTMLElement & { toaster?: unknown }) | null
   if (region) {
-    for (const [name, value] of Object.entries(regionAttributes())) region.setAttribute(name, value)
+    for (const [name, value] of Object.entries(regionAttributes())) {
+      region.setAttribute(name, value)
+    }
     region.toaster = toasts.toast
   }
 }

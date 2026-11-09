@@ -3,7 +3,12 @@ import { createSafeArea } from "../src/foundation/popups/safe-area"
 
 // A submenu to the right of a trigger that ends at x = 200.
 const submenu = {
-  getBoundingClientRect: () => ({ left: 200, right: 360, top: 100, bottom: 300 }),
+  getBoundingClientRect: () => ({
+    left: 200,
+    right: 360,
+    top: 100,
+    bottom: 300,
+  }),
 } as HTMLElement
 
 afterEach(() => vi.useRealTimers())
@@ -46,7 +51,12 @@ describe("safe area", () => {
 
   test("works when the submenu flipped to the left", () => {
     const left = {
-      getBoundingClientRect: () => ({ left: 0, right: 100, top: 100, bottom: 300 }),
+      getBoundingClientRect: () => ({
+        left: 0,
+        right: 100,
+        top: 100,
+        bottom: 300,
+      }),
     } as HTMLElement
     const area = createSafeArea()
     area.start({ x: 110, y: 120 }, left)
@@ -55,7 +65,12 @@ describe("safe area", () => {
 
   test("along y, moves toward a panel below cross other triggers, and moves sideways don't", () => {
     const panel = {
-      getBoundingClientRect: () => ({ left: 80, right: 400, top: 60, bottom: 160 }),
+      getBoundingClientRect: () => ({
+        left: 80,
+        right: 400,
+        top: 60,
+        bottom: 160,
+      }),
     } as HTMLElement
     const crossing = createSafeArea()
     crossing.start({ x: 170, y: 40 }, panel, "y")

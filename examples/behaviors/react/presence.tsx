@@ -15,26 +15,42 @@ const toasts = definePrimitive({
     const { store } = context
     let count = 0
     return {
-      add: () => store.set({ toasts: [...store.get().toasts, `toast-${++count}`] }),
+      add: () =>
+        store.set({ toasts: [...store.get().toasts, `toast-${++count}`] }),
       dismiss(key: string) {
-        if (!store.get().leaving.includes(key)) store.set({ leaving: [...store.get().leaving, key] })
+        if (!store.get().leaving.includes(key)) {
+          store.set({ leaving: [...store.get().leaving, key] })
+        }
       },
       remove(key: string) {
         const { toasts, leaving } = store.get()
-        store.set({ toasts: toasts.filter((k) => k !== key), leaving: leaving.filter((k) => k !== key) })
+        store.set({
+          toasts: toasts.filter((k) => k !== key),
+          leaving: leaving.filter((k) => k !== key),
+        })
       },
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { toasts: string[] }>({ state: (state) => ({ toasts: state.toasts }) }),
-    add: slot({ attrs: () => ({ type: "button" }), press: ({ api }) => api.add() }),
+    root: slot<{}, { toasts: string[] }>({
+      state: (state) => ({ toasts: state.toasts }),
+    }),
+    add: slot({
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.add(),
+    }),
     toast: slot<{ value: string }>({
       props: { value: "string" },
       attrs: () => ({ role: "status" }),
       bind: (el, { api, key, store }) => {
         let stop = animateIn(el)
         const unsubscribe = store.subscribe(() => {
-          if (!store.get().leaving.includes(key) || el.hasAttribute("data-ending-style")) return
+          if (
+            !store.get().leaving.includes(key) ||
+            el.hasAttribute("data-ending-style")
+          ) {
+            return
+          }
           stop()
           stop = animateOut(el, () => api.remove(key))
         })
@@ -52,7 +68,12 @@ const toasts = definePrimitive({
   }),
 })
 
-const parts = createParts(toasts, { root: "div", add: "button", toast: "div", dismiss: "button" })
+const parts = createParts(toasts, {
+  root: "div",
+  add: "button",
+  toast: "div",
+  dismiss: "button",
+})
 
 const Toasts = parts.Root
 
@@ -84,4 +105,12 @@ function Example() {
   )
 }
 
-export { Example, Toast, ToastDismiss, toasts, Toasts, ToastsAdd, type ToastsState }
+export {
+  Example,
+  Toast,
+  ToastDismiss,
+  toasts,
+  Toasts,
+  ToastsAdd,
+  type ToastsState,
+}

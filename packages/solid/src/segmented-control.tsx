@@ -18,7 +18,8 @@ const parts = createParts(segmentedControl, { indicator: "span" })
  * @experimental
  */
 function SegmentedControl<T extends string = string>(
-  props: SegmentedControlOptions<T> & Omit<PartProps<"div", SegmentedControlState>, "onChange" | "onSelect">,
+  props: SegmentedControlOptions<T> &
+    Omit<PartProps<"div", SegmentedControlState>, "onChange" | "onSelect">
 ) {
   const field = useFieldControl()
   const rest = omit(
@@ -34,7 +35,7 @@ function SegmentedControl<T extends string = string>(
     "loop",
     "orientation",
     "controller",
-    "debug",
+    "debug"
   )
   return (
     <parts.Root<T>
@@ -42,7 +43,13 @@ function SegmentedControl<T extends string = string>(
       disabled={props.disabled || field?.disabled()}
       name={props.name ?? field?.name()}
     >
-      {usePart(segmentedControl, "root", undefined, joinField(field, rest, "div"), "div")}
+      {usePart(
+        segmentedControl,
+        "root",
+        undefined,
+        joinField(field, rest, "div"),
+        "div"
+      )}
     </parts.Root>
   )
 }
@@ -52,8 +59,11 @@ function SegmentedControl<T extends string = string>(
  * @experimental
  */
 function SegmentedControlItem(
-  props: Omit<PartProps<"button", SegmentedControlItemState>, "value" | "onSelect"> &
-    SegmentedControlItemProps,
+  props: Omit<
+    PartProps<"button", SegmentedControlItemState>,
+    "value" | "onSelect"
+  > &
+    SegmentedControlItemProps
 ) {
   const item = () => ({ value: props.value, disabled: props.disabled })
   const rest = omit(props, "value", "disabled")

@@ -79,7 +79,9 @@ const skinTone = createPreference({
   values: ["default", "light", "medium", "dark"],
   defaultValue: "default",
   attribute: "data-skin-tone",
-  storage: createCookieStorage("skin-tone", { cookie: request.headers.get("cookie") }),
+  storage: createCookieStorage("skin-tone", {
+    cookie: request.headers.get("cookie"),
+  }),
 })
 
 const page = `<ui-preferences data-skin-tone="${skinTone.get().value}">…</ui-preferences>`
@@ -95,7 +97,10 @@ For one element that keeps its own value, like a toolbar's density, a storage's 
 import { createLocalStorage } from "@ui-sdk/core"
 
 const density = createLocalStorage("density")
-const script = density.script({ attribute: "data-density", values: ["comfortable", "compact"] })
+const script = density.script({
+  attribute: "data-density",
+  values: ["comfortable", "compact"],
+})
 
 const toolbar = `<div class="toolbar" data-density="comfortable">…</div>
 <script>${script}</script>`

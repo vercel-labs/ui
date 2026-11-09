@@ -18,14 +18,18 @@ test.describe("structure", () => {
     await open("carousel")
   })
 
-  test("the carousel is a named region described as a carousel", async ({ page }) => {
+  test("the carousel is a named region described as a carousel", async ({
+    page,
+  }) => {
     const region = page.getByRole("region", { name: carouselFixture.label })
     await expect(region).toHaveAttribute("aria-roledescription", "carousel")
   })
 
   test("each slide is a group described as a slide", async ({ page }) => {
     for (let index = 0; index < carouselFixture.slides.length; index++) {
-      const slide = slideLink(page, index).locator("xpath=ancestor::*[@role='group'][1]")
+      const slide = slideLink(page, index).locator(
+        "xpath=ancestor::*[@role='group'][1]"
+      )
       await expect(slide).toHaveAttribute("aria-roledescription", "slide")
     }
   })
@@ -54,7 +58,9 @@ test.describe("previous and next", () => {
     expect(await lastAction(page)).toBe("1")
   })
 
-  test("Previous is disabled on the first slide and Next on the last", async ({ page }) => {
+  test("Previous is disabled on the first slide and Next on the last", async ({
+    page,
+  }) => {
     await expect(previousButton(page)).toBeDisabled()
     await expect(nextButton(page)).toBeEnabled()
     for (let index = 1; index < carouselFixture.slides.length; index++) {
@@ -76,7 +82,9 @@ test.describe("previous and next", () => {
     expect(await lastAction(page)).toBe("5")
   })
 
-  test("Next and Previous are buttons that don't submit a form", async ({ page }) => {
+  test("Next and Previous are buttons that don't submit a form", async ({
+    page,
+  }) => {
     await expect(nextButton(page)).toHaveAttribute("type", "button")
     await expect(previousButton(page)).toHaveAttribute("type", "button")
   })
@@ -87,7 +95,9 @@ test.describe("keyboard", () => {
     await open("carousel")
   })
 
-  test("ArrowRight in a slide shows the next slide, and ArrowLeft the previous", async ({ page }) => {
+  test("ArrowRight in a slide shows the next slide, and ArrowLeft the previous", async ({
+    page,
+  }) => {
     await slideLink(page, 0).focus()
     await page.keyboard.press("ArrowRight")
     await expectShown(page, 1)
@@ -120,7 +130,10 @@ test.describe("pages", () => {
     await expect(nextButton(page)).toBeDisabled()
   })
 
-  test("three slides to a page move three at a time", async ({ page, open }) => {
+  test("three slides to a page move three at a time", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { "per-view": "3", "slides-per-page": "3" })
     await nextButton(page).click()
     await expectShown(page, 2, 3, 4)
@@ -191,7 +204,9 @@ test.describe("loop", () => {
     await expect(nextButton(page)).toBeEnabled()
   })
 
-  test("Next on the last slide carries on the same way to the first", async ({ page }) => {
+  test("Next on the last slide carries on the same way to the first", async ({
+    page,
+  }) => {
     await previousButton(page).click()
     await expectShown(page, 4)
     await settled(page)
@@ -203,22 +218,31 @@ test.describe("loop", () => {
     expect(await backward()).toBeLessThan(12)
   })
 
-  test("pressing Next quickly keeps going forward, round past the last slide", async ({ page }) => {
+  test("pressing Next quickly keeps going forward, round past the last slide", async ({
+    page,
+  }) => {
     await settled(page)
     const backward = await watchBackward(page)
     // Seven presses from the first slide of five land on the third.
-    for (let press = 0; press < 7; press++) await nextButton(page).click()
+    for (let press = 0; press < 7; press++) {
+      await nextButton(page).click()
+    }
     await expectShown(page, 2)
     expect(await lastAction(page)).toBe("3")
     expect(await backward()).toBeLessThan(12)
   })
 
-  test("a mouse drag back from the first slide shows the last", async ({ page }) => {
+  test("a mouse drag back from the first slide shows the last", async ({
+    page,
+  }) => {
     await drag(page, 0, 200)
     await expectShown(page, 4)
     expect(await lastAction(page)).toBe("5")
   })
-  test("with three slides to a view, the last slide shows before the first", async ({ page, open }) => {
+  test("with three slides to a view, the last slide shows before the first", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { loop: "", "per-view": "3" })
     await previousButton(page).click()
     await expectShown(page, 4, 0, 1)
@@ -228,7 +252,10 @@ test.describe("loop", () => {
     await expectShown(page, 1, 2, 3)
   })
 
-  test("a vertical carousel drags down from the first slide to the last", async ({ page, open }) => {
+  test("a vertical carousel drags down from the first slide to the last", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { loop: "", orientation: "vertical" })
     await drag(page, 0, 120, { axis: "y" })
     await expectShown(page, 4)
@@ -240,13 +267,17 @@ test.describe("dragging", () => {
     await open("carousel")
   })
 
-  test("dragging the slides with a mouse shows the next one", async ({ page }) => {
+  test("dragging the slides with a mouse shows the next one", async ({
+    page,
+  }) => {
     await drag(page, 0, -200)
     await expectShown(page, 1)
     expect(await lastAction(page)).toBe("2")
   })
 
-  test("a short, slow drag settles back on the same slide", async ({ page }) => {
+  test("a short, slow drag settles back on the same slide", async ({
+    page,
+  }) => {
     await drag(page, 0, -40, { steps: 10, stepDelay: 30 })
     await page.waitForTimeout(100)
     await settled(page)
@@ -263,11 +294,17 @@ test.describe("dragging", () => {
 
   test("a drag that starts on a link doesn't follow it", async ({ page }) => {
     const box = await slideLink(page, 0).boundingBox()
-    if (!box) throw new Error("The link isn't laid out.")
+    if (!box) {
+      throw new Error("The link isn't laid out.")
+    }
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
     await page.mouse.down()
-    for (let step = 1; step <= 12; step++)
-      await page.mouse.move(box.x + box.width / 2 - step * 16, box.y + box.height / 2)
+    for (let step = 1; step <= 12; step++) {
+      await page.mouse.move(
+        box.x + box.width / 2 - step * 16,
+        box.y + box.height / 2
+      )
+    }
     await page.mouse.up()
     await expectShown(page, 1)
     expect(new URL(page.url()).searchParams.has("product")).toBe(false)
@@ -289,7 +326,10 @@ test.describe("more", () => {
     await expectShown(page, 1)
   })
 
-  test("pressing keys with no waits lands on the right slide", async ({ page, open }) => {
+  test("pressing keys with no waits lands on the right slide", async ({
+    page,
+    open,
+  }) => {
     await open("carousel")
     await slideLink(page, 0).focus()
     await page.keyboard.press("ArrowRight")
@@ -306,13 +346,18 @@ test.describe("more", () => {
     await expectShown(page, 1)
   })
 
-  test("the current slide stays in view when the slides change size", async ({ page, open }) => {
+  test("the current slide stays in view when the slides change size", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { "per-view": "3" })
     await nextButton(page).click()
     await nextButton(page).click()
     await expectShown(page, 2, 3, 4)
     // A stylesheet, since frameworks write their own inline styles back.
-    await page.addStyleTag({ content: ".carousel-slide { flex-basis: 100% !important }" })
+    await page.addStyleTag({
+      content: ".carousel-slide { flex-basis: 100% !important }",
+    })
     await expectShown(page, 2)
   })
 })

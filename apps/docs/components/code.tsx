@@ -6,10 +6,16 @@ import type { BundledLanguage } from "shiki"
 import { CopyButton } from "./copy-button"
 import { Frame } from "./frame"
 
-const themes = { light: "github-light-default", dark: "github-dark-default" } as const
+const themes = {
+  light: "github-light-default",
+  dark: "github-dark-default",
+} as const
 
 // Code blocks titled Do or Don't show a check or a cross instead of the language icon.
-const marks: Record<string, typeof CheckIcon> = { Do: CheckIcon, "Don't": XIcon }
+const marks: Record<string, typeof CheckIcon> = {
+  Do: CheckIcon,
+  "Don't": XIcon,
+}
 
 function Pre({
   className,
@@ -29,7 +35,11 @@ function Pre({
             <Mark aria-hidden className="size-3.5" />
           ) : (
             icon && (
-              <span aria-hidden className="[&_svg]:size-3.5" dangerouslySetInnerHTML={{ __html: icon }} />
+              <span
+                aria-hidden
+                className="[&_svg]:size-3.5"
+                dangerouslySetInnerHTML={{ __html: icon }}
+              />
             )
           )}
           {title}
@@ -50,7 +60,7 @@ function Pre({
         style={{ ...style, backgroundColor: undefined }}
         className={cn(
           className,
-          "max-h-[calc(20lh+0.875rem)] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[14px] leading-[1.7] sm:text-[13px] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]",
+          "max-h-[calc(20lh+0.875rem)] scrollbar-none overflow-auto overscroll-x-none py-3.5 font-mono text-[14px] leading-[1.7] sm:text-[13px] outline-none focus-visible:ring-3 focus-visible:ring-ring/30 [&>code]:rounded-none [&>code]:bg-transparent [&>code]:text-[1em]"
         )}
       />
       {!title && !prompt && copy && (
@@ -71,7 +81,10 @@ const highlighted = new Map<
 >()
 
 async function toHtml(code: string, lang: BundledLanguage) {
-  const highlighter = await getHighlighter("js", { langs: [lang], themes: [themes.light, themes.dark] })
+  const highlighter = await getHighlighter("js", {
+    langs: [lang],
+    themes: [themes.light, themes.dark],
+  })
   let className = ""
   let style: Record<string, string> = {}
   const html = highlighter.codeToHtml(code, {
@@ -86,13 +99,17 @@ async function toHtml(code: string, lang: BundledLanguage) {
             String(node.properties.style ?? "")
               .split(";")
               .filter(Boolean)
-              .map((declaration) => declaration.split(":") as [string, string]),
+              .map((declaration) => declaration.split(":") as [string, string])
           )
         },
       },
     ],
   })
-  return { html: html.slice(html.indexOf(">") + 1, html.lastIndexOf("</pre>")), className, style }
+  return {
+    html: html.slice(html.indexOf(">") + 1, html.lastIndexOf("</pre>")),
+    className,
+    style,
+  }
 }
 
 async function CodeBlock({
@@ -113,7 +130,9 @@ async function CodeBlock({
   if (!result) {
     result = toHtml(code, lang)
     highlighted.set(key, result)
-    if (highlighted.size > 500) highlighted.delete(highlighted.keys().next().value!)
+    if (highlighted.size > 500) {
+      highlighted.delete(highlighted.keys().next().value!)
+    }
     result.catch(() => highlighted.delete(key))
   }
   const { html, className: shiki, style } = await result

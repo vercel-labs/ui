@@ -17,7 +17,12 @@ names, its segments, and the hidden input the value submits with.
   import { provideInstance } from "../instance"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   // Time Input's primitive has the same slots and state.
   let {
@@ -70,10 +75,15 @@ names, its segments, and the hidden input the value submits with.
     form,
     controller,
     debug,
-    onValueChange: (next: string | null, details: ChangeDetails<DateInputValueChangeReason>) => {
+    onValueChange: (
+      next: string | null,
+      details: ChangeDetails<DateInputValueChangeReason>
+    ) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   provideInstance(own, handle)
@@ -81,7 +91,7 @@ names, its segments, and the hidden input the value submits with.
   const hidden = useHandlePart(handle, "hidden-input")
   const group = field?.control(
     () => rest.id as string | undefined,
-    () => rest["aria-describedby"] as string | undefined,
+    () => rest["aria-describedby"] as string | undefined
   )
 </script>
 
@@ -96,4 +106,8 @@ names, its segments, and the hidden input the value submits with.
   <input {...hidden.slot()} />
 {/snippet}
 
-<Part tag="div" part={wrapPart(root, group)} props={{ ...rest, children: content }} />
+<Part
+  tag="div"
+  part={wrapPart(root, group)}
+  props={{ ...rest, children: content }}
+/>

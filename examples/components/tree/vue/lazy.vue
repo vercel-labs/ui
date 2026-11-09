@@ -23,7 +23,10 @@ let archiveAsked = false
 async function fetchChildren(value: string, signal: AbortSignal) {
   await new Promise((resolve, reject) => {
     const timer = setTimeout(resolve, 800)
-    signal.addEventListener("abort", () => (clearTimeout(timer), reject(signal.reason)))
+    signal.addEventListener(
+      "abort",
+      () => (clearTimeout(timer), reject(signal.reason))
+    )
   })
   if (value === "archive" && !archiveAsked) {
     archiveAsked = true
@@ -35,7 +38,10 @@ async function fetchChildren(value: string, signal: AbortSignal) {
   }))
 }
 
-const Items: FunctionalComponent<{ items: Node[]; loaded: Record<string, Node[]> }> = ({ items, loaded }) =>
+const Items: FunctionalComponent<{
+  items: Node[]
+  loaded: Record<string, Node[]>
+}> = ({ items, loaded }) =>
   items.map(({ value, label, branch }) =>
     h(TreeItem, { key: value, value, branch }, () => [
       h(TreeItemLabel, {}, () => [
@@ -50,17 +56,21 @@ const Items: FunctionalComponent<{ items: Node[]; loaded: Record<string, Node[]>
                   : state.failed
                     ? h(RotateCwIcon, { "aria-hidden": "true" })
                     : h(ChevronRightIcon, { "aria-hidden": "true" }),
-            },
+            }
           ),
         label,
       ]),
-      loaded[value] && h(TreeGroup, {}, () => h(Items, { items: loaded[value], loaded })),
-    ]),
+      loaded[value] &&
+        h(TreeGroup, {}, () => h(Items, { items: loaded[value], loaded })),
+    ])
   )
 
 const loaded = ref<Record<string, Node[]>>({})
 
-async function loadChildren(value: string, { signal }: { signal: AbortSignal }) {
+async function loadChildren(
+  value: string,
+  { signal }: { signal: AbortSignal }
+) {
   const children = await fetchChildren(value, signal)
   loaded.value = { ...loaded.value, [value]: children }
 }
@@ -76,7 +86,11 @@ function announcement({ type, label }: TreeAnnouncement) {
 </script>
 
 <template>
-  <Tree aria-label="Database" :load-children="loadChildren" :announcement="announcement">
+  <Tree
+    aria-label="Database"
+    :load-children="loadChildren"
+    :announcement="announcement"
+  >
     <Items :items="top" :loaded="loaded" />
   </Tree>
 </template>

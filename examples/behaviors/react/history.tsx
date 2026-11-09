@@ -15,22 +15,33 @@ const pixels = definePrimitive({
     const { store } = context
     const history = createHistory<string[]>([])
     const show = (painted: string[] | undefined) => {
-      if (painted) store.set({ painted })
+      if (painted) {
+        store.set({ painted })
+      }
       store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
     }
     const api = {
       toggle(cell: string) {
         const { painted } = store.get()
-        const next = painted.includes(cell) ? painted.filter((other) => other !== cell) : [...painted, cell]
+        const next = painted.includes(cell)
+          ? painted.filter((other) => other !== cell)
+          : [...painted, cell]
         history.record(next)
         show(next)
       },
       undo: () => show(history.undo()),
       redo: () => show(history.redo()),
       keydown(event: KeyboardEvent) {
-        if (matchesShortcut(event, "mod+z")) api.undo()
-        else if (matchesShortcut(event, "mod+shift+z") || matchesShortcut(event, "control+y")) api.redo()
-        else return
+        if (matchesShortcut(event, "mod+z")) {
+          api.undo()
+        } else if (
+          matchesShortcut(event, "mod+shift+z") ||
+          matchesShortcut(event, "control+y")
+        ) {
+          api.redo()
+        } else {
+          return
+        }
         event.preventDefault()
       },
     }
@@ -49,17 +60,28 @@ const pixels = definePrimitive({
       press: ({ api, key }) => api.toggle(key),
     }),
     undo: slot({
-      attrs: (state) => ({ type: "button", disabled: state.canUndo ? undefined : "" }),
+      attrs: (state) => ({
+        type: "button",
+        disabled: state.canUndo ? undefined : "",
+      }),
       press: ({ api }) => api.undo(),
     }),
     redo: slot({
-      attrs: (state) => ({ type: "button", disabled: state.canRedo ? undefined : "" }),
+      attrs: (state) => ({
+        type: "button",
+        disabled: state.canRedo ? undefined : "",
+      }),
       press: ({ api }) => api.redo(),
     }),
   }),
 })
 
-const parts = createParts(pixels, { root: "div", cell: "button", undo: "button", redo: "button" })
+const parts = createParts(pixels, {
+  root: "div",
+  cell: "button",
+  undo: "button",
+  redo: "button",
+})
 
 const Pixels = parts.Root
 
@@ -69,7 +91,10 @@ const PixelsUndo = parts.Undo
 
 const PixelsRedo = parts.Redo
 
-const cells = Array.from({ length: 36 }, (_, index) => `${Math.floor(index / 6)}:${index % 6}`)
+const cells = Array.from(
+  { length: 36 },
+  (_, index) => `${Math.floor(index / 6)}:${index % 6}`
+)
 
 function Example() {
   return (
@@ -91,4 +116,12 @@ function Example() {
   )
 }
 
-export { Example, pixels, Pixels, PixelsCell, PixelsRedo, PixelsUndo, type PixelsState }
+export {
+  Example,
+  pixels,
+  Pixels,
+  PixelsCell,
+  PixelsRedo,
+  PixelsUndo,
+  type PixelsState,
+}

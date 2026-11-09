@@ -2,7 +2,11 @@
 import { EyeIcon, EyeOffIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Input } from "@ui-sdk/vue/input"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/vue/password-input"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()
@@ -10,7 +14,9 @@ const log = useLog()
 function onSubmit(event: Event) {
   const data = new FormData(event.currentTarget as HTMLFormElement)
   const length = String(data.get("password")).length
-  log(`Signed in as ${data.get("email")}, with a password of ${length} characters`)
+  log(
+    `Signed in as ${data.get("email")}, with a password of ${length} characters`
+  )
 }
 </script>
 

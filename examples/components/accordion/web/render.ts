@@ -40,7 +40,7 @@ export function mount(root: HTMLElement) {
               <ui-accordion-panel${step.value === "install" ? "" : " hidden"}>
                 ${step.content}
               </ui-accordion-panel>
-            </ui-accordion-item>`,
+            </ui-accordion-item>`
         )
         .join("")}
     </ui-accordion>

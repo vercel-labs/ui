@@ -8,7 +8,11 @@ render `state.segments`.
 -->
 <script lang="ts">
   import type { dateInput } from "@ui-sdk/core/date-input"
-  import { timeInput, type TimeInputOptions, type TimeInputState } from "@ui-sdk/core/time-input"
+  import {
+    timeInput,
+    type TimeInputOptions,
+    type TimeInputState,
+  } from "@ui-sdk/core/time-input"
   import SegmentedInput from "../date-input/segmented-input.svelte"
   import type { PartProps } from "../use-primitive.svelte"
   import TimeInputSegment from "./time-input-segment.svelte"

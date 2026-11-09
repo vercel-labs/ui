@@ -10,7 +10,9 @@
 function toLocale(tag: string | null | undefined) {
   // A POSIX locale's encoding and modifier go, as in `de_DE.UTF-8@euro`.
   try {
-    return Intl.getCanonicalLocales(tag ? tag.replace(/[.@].*$/, "").replaceAll("_", "-") : [])[0]
+    return Intl.getCanonicalLocales(
+      tag ? tag.replace(/[.@].*$/, "").replaceAll("_", "-") : []
+    )[0]
   } catch {}
 }
 
@@ -19,7 +21,9 @@ function toLocale(tag: string | null | undefined) {
  * @stable
  */
 function userLocale() {
-  if (typeof navigator === "undefined") return undefined
+  if (typeof navigator === "undefined") {
+    return undefined
+  }
   return toLocale(navigator.languages?.[0] ?? navigator.language)
 }
 
@@ -29,8 +33,12 @@ function userLocale() {
  * @stable
  */
 function pageLocale(el?: Element) {
-  if (typeof document === "undefined") return undefined
-  const lang = (el ?? document.documentElement).closest("[lang]")?.getAttribute("lang")
+  if (typeof document === "undefined") {
+    return undefined
+  }
+  const lang = (el ?? document.documentElement)
+    .closest("[lang]")
+    ?.getAttribute("lang")
   return toLocale(lang) ?? userLocale()
 }
 
@@ -38,14 +46,19 @@ function pageLocale(el?: Element) {
 // before that, so it waits a microtask.
 function bindPageLocale(el: Element, set: (locale: string | null) => void) {
   const read = () => set(pageLocale(el) ?? null)
-  if (el.isConnected) read()
-  else queueMicrotask(read)
+  if (el.isConnected) {
+    read()
+  } else {
+    queueMicrotask(read)
+  }
 }
 
 // What a component formats in: its `locale` option, else the page's once
 // `bindPageLocale` reads it. English until then, so the server's markup never
 // depends on the server's own language and the first client render matches it.
-const localeOf = (state: { locale?: string | null | undefined; pageLocale?: string | null }) =>
-  state.locale ?? state.pageLocale ?? "en-US"
+const localeOf = (state: {
+  locale?: string | null | undefined
+  pageLocale?: string | null
+}) => state.locale ?? state.pageLocale ?? "en-US"
 
 export { bindPageLocale, localeOf, pageLocale, toLocale, userLocale }

@@ -59,7 +59,9 @@ function keepEditing() {
         Discard your changes?
         <div data-slot="row">
           <button type="button" @click="keepEditing">Keep Editing</button>
-          <button data-variant="solid" type="button" @click="close">Discard</button>
+          <button data-variant="solid" type="button" @click="close">
+            Discard
+          </button>
         </div>
       </div>
       <div v-else data-slot="row">

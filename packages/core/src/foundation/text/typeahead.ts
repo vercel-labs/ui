@@ -12,7 +12,9 @@ const normalize = (text: string) => foldText(text).trim()
  * @stable
  */
 function isTypeaheadKey(event: KeyboardEvent) {
-  return event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
+  return (
+    event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey
+  )
 }
 
 // Text a user would type to find an element, skipping hidden parts like
@@ -26,8 +28,13 @@ function textOf(el: Element) {
   while (walker.nextNode()) {
     const node = walker.currentNode
     const hidden = node.parentElement?.closest('[aria-hidden="true"], [hidden]')
-    if (hidden && el.contains(hidden) && (hidden !== el || hidden.getAttribute("aria-hidden") === "true"))
+    if (
+      hidden &&
+      el.contains(hidden) &&
+      (hidden !== el || hidden.getAttribute("aria-hidden") === "true")
+    ) {
       continue
+    }
     text += node.textContent
   }
   return text
@@ -88,14 +95,18 @@ function createTypeahead(timeout = 500) {
     const count = labels.length
     for (let step = 0; step < count; step++) {
       const index = (((start + step) % count) + count) % count
-      if (normalize(labels[index]).startsWith(prefix)) return index
+      if (normalize(labels[index]).startsWith(prefix)) {
+        return index
+      }
     }
     return -1
   }
 
   function search(key: string, labels: string[], current: number) {
     // Space only continues a query. Before one, it's the key that activates.
-    if (key.length !== 1 || (key === " " && !query)) return -1
+    if (key.length !== 1 || (key === " " && !query)) {
+      return -1
+    }
     clearTimeout(timer)
     timer = setTimeout(reset, timeout)
     const char = normalize(key) || key
@@ -105,7 +116,9 @@ function createTypeahead(timeout = 500) {
 
     if (stepping) {
       const whole = scan(labels, query, Math.max(current, 0))
-      return whole !== -1 ? whole : scan(labels, char, searchStart(current, char))
+      return whole !== -1
+        ? whole
+        : scan(labels, char, searchStart(current, char))
     }
     return scan(labels, query, searchStart(current, query))
   }

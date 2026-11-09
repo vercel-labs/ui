@@ -5,12 +5,20 @@ style it, and show the placeholder with `data-empty`.
 @stable
 -->
 <script lang="ts">
-  import { tokenInput, type TokenInputEditorProps, type TokenInputEditorState } from "@ui-sdk/core/token-input"
+  import {
+    tokenInput,
+    type TokenInputEditorProps,
+    type TokenInputEditorState,
+  } from "@ui-sdk/core/token-input"
   import { renderStaticHtml } from "@ui-sdk/core/renderer"
   import { useFieldControl } from "../field/context"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
-  import { useHandlePart, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     placeholder,
@@ -23,14 +31,21 @@ style it, and show the placeholder with `data-empty`.
   const editor = useHandlePart(input, "editor", () => ({ placeholder }))
   const control = field?.control(
     () => rest.id as string | undefined,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
   // The first value as markup, so a server render shows it. Svelte never
   // touches it again: the core owns the content once it binds, and takes
   // the anchor Svelte left with the rest.
-  const html = renderStaticHtml(input.api.getValue(), input.api.internal.describe)
+  const html = renderStaticHtml(
+    input.api.getValue(),
+    input.api.internal.describe
+  )
 </script>
 
 {#snippet content()}{@html html}{/snippet}
 
-<Part tag="div" part={wrapPart(editor, control)} props={{ ...rest, children: content }} />
+<Part
+  tag="div"
+  part={wrapPart(editor, control)}
+  props={{ ...rest, children: content }}
+/>

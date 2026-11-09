@@ -8,7 +8,9 @@ export function mount(module: { default: Component }, host: HTMLElement) {
   const app = createApp(module.default)
   app.config.idPrefix = `example-${++apps}`
   app.provide(LogKey, (message: string) =>
-    host.dispatchEvent(new CustomEvent("example-log", { bubbles: true, detail: message })),
+    host.dispatchEvent(
+      new CustomEvent("example-log", { bubbles: true, detail: message })
+    )
   )
   app.mount(host)
   return () => app.unmount()

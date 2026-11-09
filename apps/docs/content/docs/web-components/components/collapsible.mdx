@@ -45,7 +45,9 @@ Import the parts and put them together:
 </script>
 
 <ui-collapsible>
-  <ui-collapsible-trigger><button>Order details</button></ui-collapsible-trigger>
+  <ui-collapsible-trigger
+    ><button>Order details</button></ui-collapsible-trigger
+  >
   <ui-collapsible-panel hidden>2 × Linen shirt</ui-collapsible-panel>
 </ui-collapsible>
 ```
@@ -60,7 +62,11 @@ import { createParts, wrappedButton } from "@ui-sdk/web"
 
 createParts(collapsible, {
   root: "spoiler-box",
-  trigger: { tag: "spoiler-toggle", target: wrappedButton, display: "contents" },
+  trigger: {
+    tag: "spoiler-toggle",
+    target: wrappedButton,
+    display: "contents",
+  },
   panel: "spoiler-content",
 })
 ```
@@ -81,7 +87,9 @@ Set `disabled` on the root to stop its trigger from opening or closing the panel
 ```html
 <ui-collapsible disabled>
   <ui-collapsible-trigger><button>Gift options</button></ui-collapsible-trigger>
-  <ui-collapsible-panel hidden>Add a gift message and wrapping.</ui-collapsible-panel>
+  <ui-collapsible-panel hidden
+    >Add a gift message and wrapping.</ui-collapsible-panel
+  >
 </ui-collapsible>
 ```
 
@@ -190,7 +198,10 @@ is false. Callbacks are DOM events. Elements have no `controller` attribute: the
 
 ### Collapsible
 
-<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleOptions"
+/>
 
 ### CollapsibleTrigger
 
@@ -207,7 +218,10 @@ The trigger takes no options of its own. `<ui-collapsible-trigger>` wraps a nati
 
 The same state shows as data attributes on each element.
 
-<StateTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleState" />
+<StateTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleState"
+/>
 
 ### Reasons
 
@@ -256,7 +270,10 @@ Closing a panel while focus is inside it moves focus back to the trigger.
 
 ### Tested Behavior
 
-<SpecList spec="collapsible" only={["opening and closing", "keyboard", "mounting"]} />
+<SpecList
+  spec="collapsible"
+  only={["opening and closing", "keyboard", "mounting"]}
+/>
 
 Beyond the pattern's baseline:
 

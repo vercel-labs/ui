@@ -20,9 +20,16 @@ A weekday's column header. Shows its name in `weekdayFormat` unless it has conte
 
   const calendar = useCalendar("CalendarWeekday")
   const grid = useCalendarGrid("CalendarWeekday")
-  const weekday = useHandlePart(calendar, "weekday", () => ({ index, id: `${grid.offset}-${index}` }))
+  const weekday = useHandlePart(calendar, "weekday", () => ({
+    index,
+    id: `${grid.offset}-${index}`,
+  }))
 </script>
 
 {#snippet fallback(state: CalendarWeekdayState)}{state.label}{/snippet}
 
-<Part tag="th" part={weekday} props={{ scope: "col", ...rest, children: children ?? fallback }} />
+<Part
+  tag="th"
+  part={weekday}
+  props={{ scope: "col", ...rest, children: children ?? fallback }}
+/>

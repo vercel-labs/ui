@@ -33,8 +33,12 @@ function Fixture() {
         {...options}
         {...(controlled && { page })}
         onPageChange={(page, details) => {
-          if (page === cancel) return details.cancel()
-          if (controlled) setPage(page)
+          if (page === cancel) {
+            return details.cancel()
+          }
+          if (controlled) {
+            setPage(page)
+          }
           setAction(String(page))
           setReason(details.reason)
         }}
@@ -42,7 +46,9 @@ function Fixture() {
       >
         {playToggle && (
           <CarouselPlayToggle className="carousel-toggle">
-            {(state) => (state.playing ? carouselFixture.stop : carouselFixture.start)}
+            {(state) =>
+              state.playing ? carouselFixture.stop : carouselFixture.start
+            }
           </CarouselPlayToggle>
         )}
         <CarouselViewport className="carousel-viewport">
@@ -62,10 +68,17 @@ function Fixture() {
           </CarouselContent>
         </CarouselViewport>
         <div className="carousel-controls">
-          <CarouselPrevious className="carousel-step">{carouselFixture.previous}</CarouselPrevious>
-          <CarouselNext className="carousel-step">{carouselFixture.next}</CarouselNext>
+          <CarouselPrevious className="carousel-step">
+            {carouselFixture.previous}
+          </CarouselPrevious>
+          <CarouselNext className="carousel-step">
+            {carouselFixture.next}
+          </CarouselNext>
         </div>
-        <CarouselIndicatorGroup className="carousel-controls" aria-label={carouselFixture.indicators}>
+        <CarouselIndicatorGroup
+          className="carousel-controls"
+          aria-label={carouselFixture.indicators}
+        >
           {carouselFixture.slides.map((slide, index) => (
             <CarouselIndicator
               key={slide.title}
@@ -84,7 +97,9 @@ function Fixture() {
       <output aria-label="Last reason">{reason}</output>
       <output aria-label="Rested on">{rested}</output>
       <button onClick={() => controller.setPage(4)}>Show page 4</button>
-      {controlled && <button onClick={() => setPage(3)}>Show page 3 by prop</button>}
+      {controlled && (
+        <button onClick={() => setPage(3)}>Show page 3 by prop</button>
+      )}
       <CarouselNext controller={controller}>Next from outside</CarouselNext>
     </div>
   )
@@ -94,7 +109,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

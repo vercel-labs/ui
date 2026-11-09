@@ -2,7 +2,11 @@
   import { InfoIcon } from "@lucide/svelte"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
   import { Input } from "@ui-sdk/svelte/input"
-  import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
 
   let field: HTMLDivElement | undefined = $state()
 </script>

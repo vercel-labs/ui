@@ -29,7 +29,7 @@ function mount(root: HTMLElement) {
                 <ui-switch-thumb></ui-switch-thumb>
               </ui-switch>
             </ui-field>
-          `,
+          `
         )
         .join("")}
     </div>

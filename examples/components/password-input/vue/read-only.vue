@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { EyeIcon, EyeOffIcon } from "@lucide/vue"
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/vue/password-input"
 </script>
 
 <template>
@@ -14,6 +18,9 @@ import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sd
         <EyeIcon v-else aria-hidden="true" />
       </PasswordInputToggle>
     </PasswordInput>
-    <FieldDescription>Keep it somewhere safe. You can show it, but not change it.</FieldDescription>
+    <FieldDescription
+      >Keep it somewhere safe. You can show it, but not change
+      it.</FieldDescription
+    >
   </Field>
 </template>

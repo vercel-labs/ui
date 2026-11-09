@@ -34,7 +34,11 @@ Put a handle between the panels you want to resize, and name it with `aria-label
 Import the parts and put them together:
 
 ```tsx
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/solid/resizable"
 
 function Example() {
   return (
@@ -170,7 +174,9 @@ import { resizableStorageKey } from "@ui-sdk/solid/resizable"
 import { Editor, readCookie } from "./editor"
 
 function App(props: { cookie: string | null }) {
-  const saved = JSON.parse(readCookie(props.cookie ?? "", resizableStorageKey("editor")) ?? "{}")
+  const saved = JSON.parse(
+    readCookie(props.cookie ?? "", resizableStorageKey("editor")) ?? "{}"
+  )
   const [sidebar = 25, main = 75] = saved["sidebar,main"] ?? []
   return <Editor sidebar={sidebar} main={main} />
 }
@@ -179,7 +185,12 @@ export { App }
 ```
 
 ```tsx title="editor.tsx"
-import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+  type ResizableStorage,
+} from "@ui-sdk/solid/resizable"
 
 const readCookie = (cookie: string, key: string) => {
   const value = cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`))?.[1]
@@ -274,29 +285,47 @@ Props and callbacks are the same as below, as Solid props.
 
 ### Resizable
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableOptions"
+/>
 
 ### ResizablePanel
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelProps"
+/>
 
 ### ResizableHandle
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive.
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableState"
+/>
 
 Panels:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelState"
+/>
 
 Handles:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleState"
+/>
 
 ### Reasons
 

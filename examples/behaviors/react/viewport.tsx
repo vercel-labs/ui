@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createViewport, css, definePrimitive, live, type Viewport } from "@ui-sdk/core"
+import {
+  createViewport,
+  css,
+  definePrimitive,
+  live,
+  type Viewport,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type BoardState = { viewport: Viewport }
@@ -24,32 +30,51 @@ const board = definePrimitive({
       attrs: () => ({
         tabindex: "0",
         "aria-roledescription": "board",
-        style: css({ position: "relative", overflow: "hidden", "touch-action": "none" }),
+        style: css({
+          position: "relative",
+          overflow: "hidden",
+          "touch-action": "none",
+        }),
       }),
       on: {
         wheel: (event, { api }) => api.viewport.wheel(event),
-        pointerdown: (event, { el, api }) => event.target === el && api.viewport.pointerdown(event),
+        pointerdown: (event, { el, api }) =>
+          event.target === el && api.viewport.pointerdown(event),
         keydown: (event, { api }) => api.viewport.keydown(event),
       },
     }),
     world: slot({
-      attrs: () => ({ style: css({ position: "absolute", left: "0", top: "0" }) }),
-      live: live<BoardState, any, {}>((state, { api }) => ({ style: api.viewport.style(state) })),
+      attrs: () => ({
+        style: css({ position: "absolute", left: "0", top: "0" }),
+      }),
+      live: live<BoardState, any, {}>((state, { api }) => ({
+        style: api.viewport.style(state),
+      })),
     }),
     note: slot<BoardNoteProps>({
       props: { value: "string", x: "number", y: "number" },
       attrs: (_state, { props }) => ({
-        style: css({ position: "absolute", left: `${props.x}px`, top: `${props.y}px` }),
+        style: css({
+          position: "absolute",
+          left: `${props.x}px`,
+          top: `${props.y}px`,
+        }),
       }),
     }),
     reset: slot({
       attrs: () => ({ type: "button" }),
-      press: ({ api }, event) => api.viewport.setViewport(home, { reason: "imperative", event }),
+      press: ({ api }, event) =>
+        api.viewport.setViewport(home, { reason: "imperative", event }),
     }),
   }),
 })
 
-const parts = createParts(board, { root: "div", world: "div", note: "div", reset: "button" })
+const parts = createParts(board, {
+  root: "div",
+  world: "div",
+  note: "div",
+  reset: "button",
+})
 
 const Board = parts.Root
 
@@ -81,4 +106,13 @@ function Example() {
   )
 }
 
-export { Board, board, BoardNote, BoardReset, BoardWorld, Example, type BoardNoteProps, type BoardState }
+export {
+  Board,
+  board,
+  BoardNote,
+  BoardReset,
+  BoardWorld,
+  Example,
+  type BoardNoteProps,
+  type BoardState,
+}

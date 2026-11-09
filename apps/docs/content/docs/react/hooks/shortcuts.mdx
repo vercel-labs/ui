@@ -84,7 +84,10 @@ import { useEffect, useState } from "react"
 function Note() {
   const [text, setText] = useState("")
   useEffect(() => () => shortcuts.setScope("note", false), [])
-  useShortcut("escape", () => setText(""), { scope: "note", allowInInput: true })
+  useShortcut("escape", () => setText(""), {
+    scope: "note",
+    allowInInput: true,
+  })
 
   return (
     <textarea
@@ -134,7 +137,9 @@ Call `shortcuts.list()` when a help screen opens. It returns the shortcuts that 
 ```ts
 import { shortcuts } from "@ui-sdk/react/shortcuts"
 
-const labels = shortcuts.list().map(({ hint, description }) => `${hint} ${description ?? ""}`)
+const labels = shortcuts
+  .list()
+  .map(({ hint, description }) => `${hint} ${description ?? ""}`)
 ```
 
 Add descriptions when registering shortcuts so the help screen can explain each action.

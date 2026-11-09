@@ -4,7 +4,10 @@ The listbox. Without content, it renders the command's `items`, ranked as the us
 @stable
 -->
 <script lang="ts">
-  import { command as commandPrimitive, type CommandListState } from "@ui-sdk/core/command"
+  import {
+    command as commandPrimitive,
+    type CommandListState,
+  } from "@ui-sdk/core/command"
   import { untrack } from "svelte"
   import { claimOwnPart } from "../own-part.svelte"
   import Part from "../part.svelte"
@@ -25,7 +28,9 @@ The listbox. Without content, it renders the command's `items`, ranked as the us
   const command = useHandle(commandPrimitive)
   // The root renders its own list when the app gives none, so one in the
   // app's children says it's there.
-  if (!untrack(() => fromRoot)) claimOwnPart(OwnListKey)
+  if (!untrack(() => fromRoot)) {
+    claimOwnPart(OwnListKey)
+  }
   const list = useHandlePart(command, "list")
 </script>
 

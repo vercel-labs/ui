@@ -8,13 +8,28 @@ import {
 } from "../../foundation/platform/button"
 import { watchFormDisabled } from "../../foundation/forms/form"
 import type { RovingScope } from "../../foundation/focus/roving-scope"
-import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
+import {
+  itemIconPart,
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
 import { createController } from "../../foundation/kernel/controller"
-import { createDetails, type ChangeDetails, type ChangeOptions } from "../../foundation/kernel/details"
+import {
+  createDetails,
+  type ChangeDetails,
+  type ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import type { ToggleGroupApi, ToggleGroupOrientation } from "./toggle-group"
-import { changeSource, createChange } from "../../foundation/kernel/input-source"
+import {
+  changeSource,
+  createChange,
+} from "../../foundation/kernel/input-source"
 
 /**
  * Why a toggle wants to be pressed or unpressed: a press, or a controller or `api` call.
@@ -69,7 +84,10 @@ type ToggleOptions = {
    * `details.cancel()` stops it. Inside a group, it runs before the group's
    * `onValueChange`, and canceling it cancels the group's change too.
    */
-  onPressedChange?: (pressed: boolean, details: ChangeDetails<TogglePressedChangeReason>) => void
+  onPressedChange?: (
+    pressed: boolean,
+    details: ChangeDetails<TogglePressedChangeReason>
+  ) => void
   /** Identifies the toggle inside a group, whose value lists the pressed toggles' values. Defaults to a generated id. */
   value?: string
   /**
@@ -136,17 +154,24 @@ type State = {
   orientation: ToggleGroupOrientation | undefined
 }
 
-const isDisabled = (state: State) => state.disabled || state.groupDisabled || state.formDisabled
-const keyOf = (options: ToggleInternalOptions & { id: string }) => options.value ?? options.id
+const isDisabled = (state: State) =>
+  state.disabled || state.groupDisabled || state.formDisabled
+const keyOf = (options: ToggleInternalOptions & { id: string }) =>
+  options.value ?? options.id
 
 // The arrow keys and tab stop a toggle joins: its group's, or the toolbar's.
-const scopeOf = (options: ToggleInternalOptions) => options.group?.()?.internal.scope() ?? options.toolbar?.()
+const scopeOf = (options: ToggleInternalOptions) =>
+  options.group?.()?.internal.scope() ?? options.toolbar?.()
 
 // What a toggle in a group takes from it. Creation, every render (which is how
 // toggles follow before they bind, like on the server) and the group's
 // changes after binding all read it here. The toggle's own toolbar scope can
 // be newer than the group's, like when a toolbar group around both is disabled.
-function fromGroup(group: ToggleGroupApi, key: string, toolbar: RovingScope | undefined) {
+function fromGroup(
+  group: ToggleGroupApi,
+  key: string,
+  toolbar: RovingScope | undefined
+) {
   return {
     roving: true,
     focusableWhenDisabled: true,
@@ -182,8 +207,12 @@ function toggleState(options: ToggleInternalOptions & { id: string }): State {
     tabStop: false,
     orientation: undefined,
   }
-  if (!scope) return own
-  const joined = group ? fromGroup(group, keyOf(options), toolbar) : { ...own, ...fromToolbar(toolbar!) }
+  if (!scope) {
+    return own
+  }
+  const joined = group
+    ? fromGroup(group, keyOf(options), toolbar)
+    : { ...own, ...fromToolbar(toolbar!) }
   return {
     ...own,
     ...joined,
@@ -195,7 +224,9 @@ function toggleState(options: ToggleInternalOptions & { id: string }): State {
   }
 }
 
-function toggleApi(context: PrimitiveContext<ToggleInternalOptions, State, string>) {
+function toggleApi(
+  context: PrimitiveContext<ToggleInternalOptions, State, string>
+) {
   const { id, store, options, element } = context
   const change = createChange(context)
   const group = () => options().group?.()
@@ -204,29 +235,46 @@ function toggleApi(context: PrimitiveContext<ToggleInternalOptions, State, strin
 
   const api = {
     isPressed: () => store.get().pressed,
-    setPressed(pressed: boolean, { reason = "imperative", event }: ToggleChangeOptions = {}) {
-      if (isDisabled(store.get())) return false
+    setPressed(
+      pressed: boolean,
+      { reason = "imperative", event }: ToggleChangeOptions = {}
+    ) {
+      if (isDisabled(store.get())) {
+        return false
+      }
       const owner = group()
-      if (!owner) return change("pressed", pressed, { reason, event })
-      if (!owner.internal.allows(key(), pressed)) return false
+      if (!owner) {
+        return change("pressed", pressed, { reason, event })
+      }
+      if (!owner.internal.allows(key(), pressed)) {
+        return false
+      }
       // The toggle hears first and can cancel. Then the group decides, and the
       // toggle follows its value.
-      const details = createDetails({ reason, event }, changeSource(reason, event))
+      const details = createDetails(
+        { reason, event },
+        changeSource(reason, event)
+      )
       options().onPressedChange?.(pressed, details)
-      if (details.canceled) return false
+      if (details.canceled) {
+        return false
+      }
       return owner.internal.press(key(), pressed, {
         reason: reason === "press" ? "item-press" : reason,
         event,
       })
     },
-    toggle: (details?: ToggleChangeOptions) => api.setPressed(!store.get().pressed, details),
+    toggle: (details?: ToggleChangeOptions) =>
+      api.setPressed(!store.get().pressed, details),
     focus: () => element("root")?.focus(),
     internal: {
       // Joins the group or the toolbar, and follows its value, tab stop and
       // settings from then on.
       join(el: HTMLElement) {
         const roving = scope()
-        if (!roving) return () => {}
+        if (!roving) {
+          return () => {}
+        }
         const owner = group()
         const disabled = () => isDisabled(store.get())
         const follow = () => {
@@ -236,7 +284,9 @@ function toggleApi(context: PrimitiveContext<ToggleInternalOptions, State, strin
           const toolbar = options().toolbar?.()
           // A web component can upgrade before its group, so this also sets what creation couldn't.
           store.set({
-            ...(owner ? fromGroup(owner, key(), toolbar) : fromToolbar(toolbar ?? roving)),
+            ...(owner
+              ? fromGroup(owner, key(), toolbar)
+              : fromToolbar(toolbar ?? roving)),
             tabStop: stop === null ? store.get().tabStop : stop === id,
           })
         }
@@ -246,11 +296,15 @@ function toggleApi(context: PrimitiveContext<ToggleInternalOptions, State, strin
         // The tab stop, which a toolbar holds for groups inside it, and then
         // the group's value and settings.
         const unfollow = [roving.follow(id, follow)]
-        if (owner?.internal.inToolbar()) unfollow.push(owner.internal.subscribe(follow))
+        if (owner?.internal.inToolbar()) {
+          unfollow.push(owner.internal.subscribe(follow))
+        }
         // Disabling a toggle, by itself, its group or a fieldset, can move the tab stop.
         let wasDisabled = disabled()
         const unwatch = store.subscribe(() => {
-          if (disabled() === wasDisabled) return
+          if (disabled() === wasDisabled) {
+            return
+          }
           wasDisabled = disabled()
           roving.queueCheck()
         })
@@ -295,15 +349,20 @@ const togglePrimitive = /* @__PURE__ */ definePrimitive({
   controlled: ["pressed"],
   sync: (options) => {
     const group = options.group?.()
-    if (group)
-      return { ...fromGroup(group, keyOf(options), options.toolbar?.()), disabled: !!options.disabled }
+    if (group) {
+      return {
+        ...fromGroup(group, keyOf(options), options.toolbar?.()),
+        disabled: !!options.disabled,
+      }
+    }
     const toolbar = options.toolbar?.()
-    if (toolbar)
+    if (toolbar) {
       return {
         ...fromToolbar(toolbar),
         disabled: !!options.disabled,
         ...(options.pressed === undefined ? {} : { pressed: options.pressed }),
       }
+    }
     return {
       disabled: !!options.disabled,
       focusableWhenDisabled: !!options.focusableWhenDisabled,
@@ -315,7 +374,10 @@ const togglePrimitive = /* @__PURE__ */ definePrimitive({
     root: slot<{}, ToggleState>({
       ...buttonRole((state: State) => state.element),
       focus: "tab-stop",
-      state: (state) => ({ pressed: state.pressed, disabled: isDisabled(state) }),
+      state: (state) => ({
+        pressed: state.pressed,
+        disabled: isDisabled(state),
+      }),
       attrs: (state) => ({
         // Never "submit": a toggle changes state, it doesn't send a form.
         ...buttonElementAttrs(state.element, {
@@ -330,9 +392,13 @@ const togglePrimitive = /* @__PURE__ */ definePrimitive({
         "data-orientation": state.orientation,
       }),
       press({ api, el, store }, event) {
-        if (isDisabled(store.get())) return event?.preventDefault()
+        if (isDisabled(store.get())) {
+          return event?.preventDefault()
+        }
         // Safari doesn't focus buttons on click, so arrow keys in a group would go nowhere.
-        if (store.get().roving && el && document.activeElement !== el) el.focus({ preventScroll: true })
+        if (store.get().roving && el && document.activeElement !== el) {
+          el.focus({ preventScroll: true })
+        }
         api.toggle({ reason: "press", event })
       },
       on: {
@@ -352,7 +418,7 @@ const togglePrimitive = /* @__PURE__ */ definePrimitive({
         component: "toggle",
         item: '[data-slot="toggle-root"]',
         list: '[data-slot="toggle-group"]',
-      }),
+      })
     ),
   }),
   agent: { actions: ["setPressed"] },

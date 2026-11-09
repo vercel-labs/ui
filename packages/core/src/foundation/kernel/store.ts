@@ -35,14 +35,22 @@ function markChangedInPlace<List extends readonly unknown[]>(list: List) {
  * passed as a new array every render doesn't render again.
  */
 function sameValue(a: unknown, b: unknown) {
-  if (Object.is(a, b)) return true
-  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false
-  if (changedInPlace.has(a) || changedInPlace.has(b)) return false
+  if (Object.is(a, b)) {
+    return true
+  }
+  if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) {
+    return false
+  }
+  if (changedInPlace.has(a) || changedInPlace.has(b)) {
+    return false
+  }
   return a.every((item, index) => Object.is(item, b[index]))
 }
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
-  if (typeof value !== "object" || value === null) return false
+  if (typeof value !== "object" || value === null) {
+    return false
+  }
   const prototype = Object.getPrototypeOf(value)
   return prototype === Object.prototype || prototype === null
 }
@@ -60,28 +68,51 @@ function sameSlotState(a: unknown, b: unknown) {
 // `open` holds the pairs being compared further up, two entries per pair. A
 // pair met again is a cycle, the same as long as everything around it is.
 function sameWithin(a: unknown, b: unknown, open: unknown[] | undefined) {
-  if (Object.is(a, b)) return true
+  if (Object.is(a, b)) {
+    return true
+  }
   const arrays = Array.isArray(a) && Array.isArray(b)
-  if (!arrays && !(isPlainObject(a) && isPlainObject(b))) return false
-  if (open)
-    for (let index = 0; index < open.length; index += 2)
-      if (open[index] === a && open[index + 1] === b) return true
+  if (!arrays && !(isPlainObject(a) && isPlainObject(b))) {
+    return false
+  }
+  if (open) {
+    for (let index = 0; index < open.length; index += 2) {
+      if (open[index] === a && open[index + 1] === b) {
+        return true
+      }
+    }
+  }
   const within = open ?? []
   within.push(a, b)
   try {
     if (arrays) {
       const left = a as unknown[]
       const right = b as unknown[]
-      if (left.length !== right.length || changedInPlace.has(left) || changedInPlace.has(right)) return false
-      for (let index = 0; index < left.length; index++)
-        if (!sameWithin(left[index], right[index], within)) return false
+      if (
+        left.length !== right.length ||
+        changedInPlace.has(left) ||
+        changedInPlace.has(right)
+      ) {
+        return false
+      }
+      for (let index = 0; index < left.length; index++) {
+        if (!sameWithin(left[index], right[index], within)) {
+          return false
+        }
+      }
       return true
     }
     const left = a as Record<string, unknown>
     const right = b as Record<string, unknown>
     const keys = Object.keys(left)
-    if (keys.length !== Object.keys(right).length) return false
-    for (const key of keys) if (!(key in right) || !sameWithin(left[key], right[key], within)) return false
+    if (keys.length !== Object.keys(right).length) {
+      return false
+    }
+    for (const key of keys) {
+      if (!(key in right) || !sameWithin(left[key], right[key], within)) {
+        return false
+      }
+    }
     return true
   } finally {
     within.length -= 2
@@ -92,19 +123,30 @@ function sameWithin(a: unknown, b: unknown, open: unknown[] | undefined) {
 // adapters that write attributes can skip, since the core writes live ones,
 // whether it only handed over keys a framework already delivers, through
 // `follow`, which a framework's parts can skip, and the keys it changed.
-type Listener = (liveOnly: boolean, delivered: boolean, changed: readonly string[]) => void
+type Listener = (
+  liveOnly: boolean,
+  delivered: boolean,
+  changed: readonly string[]
+) => void
 
 // Parts that select single values, which hear a change last, with what
 // changed and the state before it. Untyped by state, so a store with more
 // keys still passes where code names fewer, like `followStop`'s `stop`.
-type Fanout = (changed: readonly PropertyKey[], previous: object, run: (listener: Listener) => void) => void
+type Fanout = (
+  changed: readonly PropertyKey[],
+  previous: object,
+  run: (listener: Listener) => void
+) => void
 
 /**
  * A primitive's state container. `set` merges a partial and notifies only when
  * a value changed (`sameValue`). Keys in `live` change without re-rendering
  * parts that don't read them. `definePrimitive` makes one per instance.
  */
-function createStore<State extends object>(initial: State, live: readonly (keyof State)[]) {
+function createStore<State extends object>(
+  initial: State,
+  live: readonly (keyof State)[]
+) {
   let state = initial
   // Changes that can change what renders: all but those to live keys alone.
   let renders = 0
@@ -140,13 +182,21 @@ function createStore<State extends object>(initial: State, live: readonly (keyof
         const over = withFollowed()
         if (over !== state) {
           const rest = { ...over }
-          for (const key in patch) delete rest[key]
+          for (const key in patch) {
+            delete rest[key]
+          }
           store.set(rest, true)
         }
       }
       const changed: (keyof State & string)[] = []
-      for (const key in patch) if (!sameValue(state[key], patch[key])) changed.push(key)
-      if (!changed.length) return
+      for (const key in patch) {
+        if (!sameValue(state[key], patch[key])) {
+          changed.push(key)
+        }
+      }
+      if (!changed.length) {
+        return
+      }
       const previous = state
       state = { ...state, ...patch }
       const liveOnly = changed.every((key) => live.includes(key))
@@ -183,7 +233,9 @@ function createStore<State extends object>(initial: State, live: readonly (keyof
   // The state with what `follow` delivers ahead of `set`, as one object
   // between reads.
   function withFollowed() {
-    if (!followed || reading) return state
+    if (!followed || reading) {
+      return state
+    }
     reading = true
     let over: Partial<State> | undefined
     try {
@@ -191,25 +243,42 @@ function createStore<State extends object>(initial: State, live: readonly (keyof
     } finally {
       reading = false
     }
-    if (!over) return state
-    if (merged?.state === state && merged.over === over) return merged.result
+    if (!over) {
+      return state
+    }
+    if (merged?.state === state && merged.over === over) {
+      return merged.result
+    }
     let result = state
-    for (const key in over)
+    for (const key in over) {
       if (!sameValue(state[key], over[key])) {
         result = { ...state, ...over }
         break
       }
+    }
     merged = { state, over, result }
     return result
   }
-  function notify(changed: readonly string[], previous: State, liveOnly: boolean, delivered: boolean) {
-    if (!liveOnly) renders++
-    if (!delivered) writes++
+  function notify(
+    changed: readonly string[],
+    previous: State,
+    liveOnly: boolean,
+    delivered: boolean
+  ) {
+    if (!liveOnly) {
+      renders++
+    }
+    if (!delivered) {
+      writes++
+    }
     const run = (listener: Listener) => listener(liveOnly, delivered, changed)
     listeners.forEach(run)
     // A change of no keys, from `touch`, reaches every part.
-    for (const [skip, group] of skipping)
-      if (!changed.length || changed.some((key) => !Object.hasOwn(skip, key))) group.forEach(run)
+    for (const [skip, group] of skipping) {
+      if (!changed.length || changed.some((key) => !Object.hasOwn(skip, key))) {
+        group.forEach(run)
+      }
+    }
     fanout?.(changed, previous, run)
   }
   held.set(store, {
@@ -242,25 +311,34 @@ const held = new WeakMap<
 function subscribeSkipping<State extends object>(
   store: Store<State>,
   skip: { [Key in keyof State]?: unknown },
-  listener: Listener,
+  listener: Listener
 ) {
   return join(held.get(store)!.skipping, skip, listener)
 }
 
 // Adds a listener to its group, and returns its removal, which drops the
 // group once it's empty.
-function join<Group>(groups: Map<Group, Set<Listener>>, group: Group, listener: Listener) {
+function join<Group>(
+  groups: Map<Group, Set<Listener>>,
+  group: Group,
+  listener: Listener
+) {
   let members = groups.get(group)
-  if (!members) groups.set(group, (members = new Set()))
+  if (!members) {
+    groups.set(group, (members = new Set()))
+  }
   members.add(listener)
   return () => {
     members.delete(listener)
-    if (!members.size && groups.get(group) === members) groups.delete(group)
+    if (!members.size && groups.get(group) === members) {
+      groups.delete(group)
+    }
   }
 }
 
 /** The state a store holds, without what `follow` delivers ahead of `set`. */
-const heldState = <State extends object>(store: Store<State>) => held.get(store)!.state() as State
+const heldState = <State extends object>(store: Store<State>) =>
+  held.get(store)!.state() as State
 
 /**
  * How many changes a store made other than what `follow` delivered, for a

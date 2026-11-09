@@ -1,4 +1,8 @@
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/solid/resizable"
 
 function Example() {
   return (
@@ -7,11 +11,16 @@ function Example() {
         {(state) => (
           <>
             <h3>Files</h3>
-            <span data-slot="hint">{state.collapsed ? "Collapsed" : `${Math.round(state.size)}%`}</span>
+            <span data-slot="hint">
+              {state.collapsed ? "Collapsed" : `${Math.round(state.size)}%`}
+            </span>
           </>
         )}
       </ResizablePanel>
-      <ResizableHandle aria-label="Resize files" render={(props) => <div {...props} />} />
+      <ResizableHandle
+        aria-label="Resize files"
+        render={(props) => <div {...props} />}
+      />
       <ResizablePanel minSize={30}>
         {(state) => (
           <>

@@ -13,13 +13,18 @@ globalThis.ResizeObserver ??= class {
 
 let app: ReturnType<typeof mount> | undefined
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
 })
 
 function render() {
-  const props = $state({ side: "bottom" as "bottom" | "right", stickToEnd: true })
+  const props = $state({
+    side: "bottom" as "bottom" | "right",
+    stickToEnd: true,
+  })
   app = mount(App, { target: document.body, props })
   flushSync()
   return props

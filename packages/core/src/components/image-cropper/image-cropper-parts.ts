@@ -12,7 +12,14 @@ import type {
   ImageCropperHandleState,
   ImageCropperState,
 } from "./image-cropper"
-import { isInert, isReady, layout, zoomText, type ImageCropperApi, type State } from "./image-cropper-api"
+import {
+  isInert,
+  isReady,
+  layout,
+  zoomText,
+  type ImageCropperApi,
+  type State,
+} from "./image-cropper-api"
 import { shownSize, smallest } from "./image-cropper-geometry"
 
 function cropperState(state: State) {
@@ -69,7 +76,9 @@ const selectionLive = live<State, ImageCropperApi, {}>((state) => {
   const { crop, natural } = state
   const dragging = state.dragging ? "" : undefined
   // Hidden until the image loads, with a value all the same.
-  if (!crop || !natural) return { "aria-valuenow": "0", "data-dragging": dragging }
+  if (!crop || !natural) {
+    return { "aria-valuenow": "0", "data-dragging": dragging }
+  }
   const shown = shownSize(natural, crop.rotation)
   return {
     style: at
@@ -97,7 +106,9 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
         ...dataAttrs(state),
         "aria-busy": state.status === "loading" ? "true" : undefined,
       }),
-      live: live((state) => ({ "data-dragging": state.dragging ? "" : undefined })),
+      live: live((state) => ({
+        "data-dragging": state.dragging ? "" : undefined,
+      })),
     }),
 
     // The area the image shows in, which a frame's pointer pans and the wheel zooms.
@@ -111,7 +122,8 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
           overflow: "hidden",
           "user-select": "none",
           "touch-action": state.mode === "frame" ? "none" : undefined,
-          cursor: state.mode === "frame" && !isInert(state) ? "move" : undefined,
+          cursor:
+            state.mode === "frame" && !isInert(state) ? "move" : undefined,
         }),
       }),
       // The image's ratio as it shows, for a viewport sized to fit it.
@@ -119,12 +131,15 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
         const { crop, natural } = state
         const shown = crop && natural ? shownSize(natural, crop.rotation) : null
         return {
-          style: shown ? `--image-cropper-aspect-ratio:${shown.width} / ${shown.height}` : undefined,
+          style: shown
+            ? `--image-cropper-aspect-ratio:${shown.width} / ${shown.height}`
+            : undefined,
           "data-dragging": state.dragging ? "" : undefined,
         }
       }),
       on: {
-        pointerdown: (event, { api, el }) => el && api.internal.viewportPointerdown(event, el),
+        pointerdown: (event, { api, el }) =>
+          el && api.internal.viewportPointerdown(event, el),
         wheel: (event, { api, el }) => el && api.internal.wheel(event, el),
       },
       bind(el, { api }) {
@@ -150,7 +165,9 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
       live: live((state) => {
         const at = layout(state)
         const { crop, natural } = state
-        if (!at || !crop || !natural) return {}
+        if (!at || !crop || !natural) {
+          return {}
+        }
         const flip = `scale(${crop.flipX ? -1 : 1}, ${crop.flipY ? -1 : 1})`
         return {
           style: css({
@@ -172,7 +189,9 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
         const fail = () => bound && api.internal.failed()
         // An image already loaded, like a cached one, reports once the page
         // hydrates, so the server's markup matches the first render.
-        if (img.complete && img.currentSrc) queueMicrotask(img.naturalWidth ? load : fail)
+        if (img.complete && img.currentSrc) {
+          queueMicrotask(img.naturalWidth ? load : fail)
+        }
         img.addEventListener("load", load)
         img.addEventListener("error", fail)
         return () => {
@@ -207,7 +226,8 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
       }),
       live: selectionLive,
       on: {
-        pointerdown: (event, { api, el }) => el && api.internal.selectionPointerdown(event, el, "move"),
+        pointerdown: (event, { api, el }) =>
+          el && api.internal.selectionPointerdown(event, el, "move"),
         keydown: (event, { api }) => api.internal.keydown(event, "move"),
       },
     }),
@@ -218,9 +238,15 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
       attrs: (state) => ({
         "aria-hidden": "true",
         ...dataAttrs(state),
-        style: css({ position: "absolute", inset: "0", "pointer-events": "none" }),
+        style: css({
+          position: "absolute",
+          inset: "0",
+          "pointer-events": "none",
+        }),
       }),
-      live: live((state) => ({ "data-dragging": state.dragging ? "" : undefined })),
+      live: live((state) => ({
+        "data-dragging": state.dragging ? "" : undefined,
+      })),
     }),
 
     // An edge or corner of a box's selection. Arrows move its edges.
@@ -229,7 +255,10 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
       focus: "tab-stop",
       keys: [...arrowKeys, "+", "-", "=", "r", "shift+R"],
       props: { id: "id", position: "string" },
-      state: (state, { props }) => ({ ...cropperState(state), position: props.position }),
+      state: (state, { props }) => ({
+        ...cropperState(state),
+        position: props.position,
+      }),
       attrs: (state, { props }) => ({
         hidden: isReady(state) && state.mode === "box" ? undefined : "",
         tabindex: isInert(state) ? undefined : "0",
@@ -253,7 +282,9 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
       live: live((state, { props }) => {
         const { crop, natural } = state
         const dragging = state.dragging === props.position ? "" : undefined
-        if (!crop || !natural) return { "aria-valuenow": "0", "data-dragging": dragging }
+        if (!crop || !natural) {
+          return { "aria-valuenow": "0", "data-dragging": dragging }
+        }
         const shown = shownSize(natural, crop.rotation)
         const least = smallest(shown, {
           aspect: state.aspectRatio,
@@ -264,7 +295,9 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
         const vertical = props.position === "n" || props.position === "s"
         return {
           "aria-valuenow": String(vertical ? crop.height : crop.width),
-          "aria-valuemin": String(Math.ceil(vertical ? least.height : least.width)),
+          "aria-valuemin": String(
+            Math.ceil(vertical ? least.height : least.width)
+          ),
           "aria-valuemax": String(vertical ? shown.height : shown.width),
           // English by default.
           "aria-valuetext": `${crop.width} by ${crop.height} pixels`,
@@ -274,7 +307,8 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
       on: {
         pointerdown: (event, { api, el, props }) =>
           el && api.internal.selectionPointerdown(event, el, props.position),
-        keydown: (event, { api, props }) => api.internal.keydown(event, props.position),
+        keydown: (event, { api, props }) =>
+          api.internal.keydown(event, props.position),
       },
     }),
 
@@ -295,16 +329,21 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
         disabled: isInert(state) ? "" : undefined,
         ...dataAttrs(state),
       }),
-      live: live((state) => ({ "aria-valuetext": `${Math.round(zoomText(state) * 100)}%` })),
+      live: live((state) => ({
+        "aria-valuetext": `${Math.round(zoomText(state) * 100)}%`,
+      })),
       on: {
-        input: (event, { api, el }) => el && api.internal.zoomInput(event, el as HTMLInputElement),
+        input: (event, { api, el }) =>
+          el && api.internal.zoomInput(event, el as HTMLInputElement),
         change: (event, { api }) => api.internal.zoomCommit(event),
       },
       bind(el, part) {
         const input = el as HTMLInputElement
         const write = () => {
           const next = String(zoomText(part.store.get()))
-          if (input.value !== next) input.value = next
+          if (input.value !== next) {
+            input.value = next
+          }
         }
         write()
         return subscribe(part, write)
@@ -319,7 +358,8 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
         disabled: isInert(state) ? "" : undefined,
         ...dataAttrs(state),
       }),
-      press: ({ api }, event) => api.rotate(1, { reason: "rotate-press", event }),
+      press: ({ api }, event) =>
+        api.rotate(1, { reason: "rotate-press", event }),
     }),
 
     // Mirrors the image, left to right or top to bottom.
@@ -333,7 +373,10 @@ function imageCropperSlots(slot: SlotFactory<State, ImageCropperApi>) {
         ...dataAttrs(state),
       }),
       press: ({ api, props }, event) =>
-        api.flip(props.direction ?? "horizontal", { reason: "flip-press", event }),
+        api.flip(props.direction ?? "horizontal", {
+          reason: "flip-press",
+          event,
+        }),
     }),
   }
 }

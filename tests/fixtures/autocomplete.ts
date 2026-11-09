@@ -103,16 +103,23 @@ function autocompleteOptions() {
 // every search and whether it was aborted, so a spec can see stale ones never land.
 function searchFruits(query: string, { signal }: { signal: AbortSignal }) {
   // Recorded on the page only: a server render cancels its loads on destroy too.
-  const page = globalThis as { fruitSearches?: { query: string; aborted: boolean }[] }
+  const page = globalThis as {
+    fruitSearches?: { query: string; aborted: boolean }[]
+  }
   const search = { query, aborted: false }
-  if (typeof window !== "undefined") (page.fruitSearches ??= []).push(search)
+  if (typeof window !== "undefined") {
+    ;(page.fruitSearches ??= []).push(search)
+  }
   return new Promise<string[]>((resolve, reject) => {
     const timer = setTimeout(() => {
       const needle = query.trim().toLowerCase()
       resolve(
         autocompleteFixture.items
-          .filter((item) => !item.disabled && item.label.toLowerCase().includes(needle))
-          .map((item) => item.label),
+          .filter(
+            (item) =>
+              !item.disabled && item.label.toLowerCase().includes(needle)
+          )
+          .map((item) => item.label)
       )
     }, 400)
     signal.addEventListener("abort", () => {

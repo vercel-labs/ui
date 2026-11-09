@@ -23,7 +23,7 @@ function mount(root: HTMLElement) {
                   <li>
                     <div data-slot="swatch" style="background: ${swatch.color}"></div>
                     ${swatch.name}
-                  </li>`,
+                  </li>`
               )
               .join("")}
           </ul>

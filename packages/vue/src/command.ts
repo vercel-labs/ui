@@ -22,7 +22,13 @@ import {
   type PropType,
   type VNode,
 } from "vue"
-import { hasChild, NotPlaced, slotContent, usePlaceContent, usePlacedContent } from "./children"
+import {
+  hasChild,
+  NotPlaced,
+  slotContent,
+  usePlaceContent,
+  usePlacedContent,
+} from "./children"
 import { useControllerEntry } from "./controller-target"
 import { markSegments, slotText } from "./list-text"
 import { createParts, withElement } from "./create-parts"
@@ -73,20 +79,36 @@ const Command = withElement(
     name: "Command",
     inheritAttrs: false,
     props: {
-      value: { type: null as unknown as PropType<string | null>, default: undefined },
-      modelValue: { type: null as unknown as PropType<string | null>, default: undefined },
-      defaultValue: { type: null as unknown as PropType<string | null>, default: undefined },
+      value: {
+        type: null as unknown as PropType<string | null>,
+        default: undefined,
+      },
+      modelValue: {
+        type: null as unknown as PropType<string | null>,
+        default: undefined,
+      },
+      defaultValue: {
+        type: null as unknown as PropType<string | null>,
+        default: undefined,
+      },
       query: { type: String, default: undefined },
       defaultQuery: { type: String, default: undefined },
       pages: { type: Array as PropType<string[]>, default: undefined },
       defaultPages: { type: Array as PropType<string[]>, default: undefined },
       pendingAnnouncement: String,
       // A function prop beside the emit, so a returned Promise marks the command pending.
-      onAction: Function as PropType<(value: string, details: CommandActionDetails) => unknown>,
+      onAction: Function as PropType<
+        (value: string, details: CommandActionDetails) => unknown
+      >,
       items: Array as PropType<CommandData>,
       emptyItems: Array as PropType<CommandData>,
-      filter: { type: [String, Boolean, Function] as PropType<SearchFilter<string>>, default: undefined },
-      announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
+      filter: {
+        type: [String, Boolean, Function] as PropType<SearchFilter<string>>,
+        default: undefined,
+      },
+      announcement: Function as PropType<
+        (change: ListAnnouncement) => string | null | undefined
+      >,
       autoHighlight: optionalBoolean,
       loop: optionalBoolean,
       status: String as PropType<AsyncOptionsStatus>,
@@ -96,7 +118,10 @@ const Command = withElement(
     emits: {
       "update:value": (_value: string | null) => true,
       "update:modelValue": (_value: string | null) => true,
-      valueChange: (_value: string | null, _details: CommandValueChangeDetails) => true,
+      valueChange: (
+        _value: string | null,
+        _details: CommandValueChangeDetails
+      ) => true,
       "update:query": (_query: string) => true,
       queryChange: (_query: string, _details: QueryDetails) => true,
       "update:pages": (_pages: string[]) => true,
@@ -108,20 +133,29 @@ const Command = withElement(
       const command = usePrimitive(commandPrimitive, () => ({
         ...props,
         value: orModel(props.value, props.modelValue),
-        onValueChange: (value: string | null, details: CommandValueChangeDetails) => {
+        onValueChange: (
+          value: string | null,
+          details: CommandValueChangeDetails
+        ) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
         onQueryChange: (query: string, details: QueryDetails) => {
           emit("queryChange", query, details)
-          if (!details.canceled) emit("update:query", query)
+          if (!details.canceled) {
+            emit("update:query", query)
+          }
         },
         onPagesChange: (pages: string[], details: PagesDetails) => {
           emit("pagesChange", pages, details)
-          if (!details.canceled) emit("update:pages", pages)
+          if (!details.canceled) {
+            emit("update:pages", pages)
+          }
         },
         onLoadMore: () => emit("loadMore"),
       }))
@@ -134,12 +168,16 @@ const Command = withElement(
           // A data command renders its list, unless the app placed a CommandList:
           // in the markup, or inside a component of its own.
           // Only a data one asks, so a composed one never renders again when its content mounts.
-          const own = !props.items || placed() || hasChild(children, CommandList)
-          return [children, props.items && !own && h(NotPlaced, () => h(CommandList))]
+          const own =
+            !props.items || placed() || hasChild(children, CommandList)
+          return [
+            children,
+            props.items && !own && h(NotPlaced, () => h(CommandList)),
+          ]
         },
       })
     },
-  }),
+  })
 )
 
 /**
@@ -164,10 +202,14 @@ const CommandList = withElement(
       return usePart(command, "list", undefined, undefined, {
         tag: "div",
         children: (state) =>
-          defaultSlot(slots, state, () => command.state.items && h(CommandItems, { items: state.items })),
+          defaultSlot(
+            slots,
+            state,
+            () => command.state.items && h(CommandItems, { items: state.items })
+          ),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -194,7 +236,8 @@ const CommandItem = withElement(
     slots: Object as PartSlots<typeof commandPrimitive, "item">,
     setup(props) {
       const generated = useId()
-      const group = useScope(commandPrimitive)?.around.group?.().id as string | undefined
+      const group = useScope(commandPrimitive)?.around.group?.().id as
+        string | undefined
       const inPage = inject(PageKey, undefined)
       const data = inject(DataKey, false)
       provideProps(commandPrimitive, "item", () => ({
@@ -221,7 +264,7 @@ const CommandItem = withElement(
       }
       return usePart(commandPrimitive, "item", item)
     },
-  }),
+  })
 )
 
 /**
@@ -236,15 +279,24 @@ const CommandItemText = withElement(
     slots: Object as PartSlots<typeof commandPrimitive, "item-text">,
     setup(_, { slots }) {
       const item = useItem()
-      if (!item) throw new Error("<CommandItemText> must be used inside <CommandItem>.")
+      if (!item) {
+        throw new Error("<CommandItemText> must be used inside <CommandItem>.")
+      }
       // The text it marks, read from its content as it renders.
       let text = ""
       let own: VNode[] | undefined
       let ownText: string | undefined
-      const part = usePart(commandPrimitive, "item-text", () => ({ id: item().value, text }), undefined, {
-        tag: "span",
-        children: (state) => (own && ownText === undefined ? own : markSegments(state.segments)),
-      })
+      const part = usePart(
+        commandPrimitive,
+        "item-text",
+        () => ({ id: item().value, text }),
+        undefined,
+        {
+          tag: "span",
+          children: (state) =>
+            own && ownText === undefined ? own : markSegments(state.segments),
+        }
+      )
       return () => {
         own = slotContent(slots.default, { state: part.state })
         ownText = slotText(own)
@@ -252,7 +304,7 @@ const CommandItemText = withElement(
         return part()
       }
     },
-  }),
+  })
 )
 
 /**
@@ -271,10 +323,11 @@ const CommandShortcut = withElement(
       const part = () => ({ shortcut: props.shortcut ?? item?.().shortcut })
       return usePart(commandPrimitive, "shortcut", part, undefined, {
         tag: "span",
-        children: (state) => slotContent(slots.default, { state }) ?? state.text,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.text,
       })
     },
-  }),
+  })
 )
 
 /**
@@ -288,9 +341,12 @@ const CommandPage = /* @__PURE__ */ renderless(
     setup(props, { slots }) {
       const command = useCommand()
       provide(PageKey, props.value ?? null)
-      return () => (command.present("page", { value: props.value }) ? slots.default?.() : null)
+      return () =>
+        command.present("page", { value: props.value })
+          ? slots.default?.()
+          : null
     },
-  }),
+  })
 )
 
 /**
@@ -334,7 +390,7 @@ const CommandEmpty = withElement(
         children: (state) => (state.empty ? slots.default?.({ state }) : null),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -358,14 +414,22 @@ const CommandItems = /* @__PURE__ */ renderless(
       // check-code: allow return-type recursive, so TypeScript cannot infer it.
       const render = (items: CommandData): VNode[] =>
         items.map((entry, index) => {
-          if (typeof entry === "string") return h(CommandItem, { key: entry, value: entry }, () => entry)
-          if ("type" in entry && entry.type === "separator")
+          if (typeof entry === "string") {
+            return h(CommandItem, { key: entry, value: entry }, () => entry)
+          }
+          if ("type" in entry && entry.type === "separator") {
             return h(CommandSeparator, { key: `separator-${index}` })
-          if ("type" in entry && entry.type === "group")
-            return h(CommandGroup, { key: `group-${entry.label ?? index}` }, () => [
-              entry.label && h(CommandGroupLabel, null, () => entry.label),
-              ...render(entry.items),
-            ])
+          }
+          if ("type" in entry && entry.type === "group") {
+            return h(
+              CommandGroup,
+              { key: `group-${entry.label ?? index}` },
+              () => [
+                entry.label && h(CommandGroupLabel, null, () => entry.label),
+                ...render(entry.items),
+              ]
+            )
+          }
           return h(
             CommandItem,
             {
@@ -376,12 +440,12 @@ const CommandItems = /* @__PURE__ */ renderless(
               disabled: entry.disabled,
               shortcut: entry.shortcut,
             },
-            () => entry.label,
+            () => entry.label
           )
         })
       return () => h(Fragment, render(props.items))
     },
-  }),
+  })
 )
 
 export { createCommandController } from "@ui-sdk/core/command"

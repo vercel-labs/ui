@@ -38,7 +38,11 @@ function Example() {
           <FieldLabel>Post</FieldLabel>
           <FieldControl
             render={(props) => (
-              <textarea {...props} ref={(element) => (post = element)} placeholder="What's new?" />
+              <textarea
+                {...props}
+                ref={(element) => (post = element)}
+                placeholder="What's new?"
+              />
             )}
             onInput={(event) => setDirty(event.currentTarget.value !== "")}
           />

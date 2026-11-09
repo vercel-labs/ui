@@ -16,7 +16,10 @@
     }
   }
 
-  :is([data-slot="slider-root"], [data-slot="field-root"]:has(> [data-slot="slider-root"]))
+  :is(
+      [data-slot="slider-root"],
+      [data-slot="field-root"]:has(> [data-slot="slider-root"])
+    )
     > [data-slot="row"] {
     justify-content: space-between;
     gap: var(--space-4);
@@ -30,18 +33,23 @@
 
   [data-slot="row"]:has(
     > [data-slot="slider-root"][data-orientation="vertical"],
-    > [data-slot="field-root"] > [data-slot="slider-root"][data-orientation="vertical"]
+    > [data-slot="field-root"]
+      > [data-slot="slider-root"][data-orientation="vertical"]
   ) {
     gap: var(--space-8);
   }
 
   /* A vertical slider's field is as narrow as the slider, with its label centered under it. */
-  [data-slot="field-root"]:has(> [data-slot="slider-root"][data-orientation="vertical"]) {
+  [data-slot="field-root"]:has(
+    > [data-slot="slider-root"][data-orientation="vertical"]
+  ) {
     align-items: center;
     width: auto;
   }
 
-  [data-slot="stack"] > form + [data-slot="field-root"]:has([data-slot="slider-root"]) {
+  [data-slot="stack"]
+    > form
+    + [data-slot="field-root"]:has([data-slot="slider-root"]) {
     padding-top: var(--space-4);
     border-top: 1px solid var(--line-faint);
   }
@@ -76,7 +84,8 @@
     width: 100%;
     height: 2px;
     border-radius: 999px;
-    background: linear-gradient(var(--line), var(--line)) center / 100% 1px no-repeat;
+    background: linear-gradient(var(--line), var(--line)) center / 100% 1px
+      no-repeat;
 
     &[data-orientation="vertical"] {
       width: 2px;
@@ -145,12 +154,15 @@
   }
 
   /* A thumb with a value bubble keeps a lane above the track, so the bubble never covers the label. */
-  [data-slot="slider-root"]:has([data-slot="slider-thumb"] > [data-slot="output"])
+  [data-slot="slider-root"]:has(
+      [data-slot="slider-thumb"] > [data-slot="output"]
+    )
     > [data-slot="slider-control"] {
     margin-top: var(--space-6);
   }
 
-  [data-slot="slider-thumb"] > :is([data-slot="output"], [data-slot="slider-value"]) {
+  [data-slot="slider-thumb"]
+    > :is([data-slot="output"], [data-slot="slider-value"]) {
     position: absolute;
     bottom: calc(100% + var(--space-2));
     inset-inline-start: 50%;

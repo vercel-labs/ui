@@ -9,6 +9,7 @@ type CalendarHandle = PrimitiveHandle<typeof calendarPrimitive>
 const CalendarContext = createContext<CalendarHandle | null>(null)
 
 // How many months a calendar shows, for a grid each. At least one.
-const monthCount = (months: number | undefined) => Math.max(1, Math.floor(months ?? 1) || 1)
+const monthCount = (months: number | undefined) =>
+  Math.max(1, Math.floor(months ?? 1) || 1)
 
 export { CalendarContext, type CalendarHandle, monthCount }

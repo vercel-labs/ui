@@ -22,12 +22,14 @@ const sections = [
       {
         title: "Installation",
         href: "#",
-        description: "Add the package for your framework and render your first part.",
+        description:
+          "Add the package for your framework and render your first part.",
       },
       {
         title: "Styling",
         href: "#",
-        description: "Style parts with data attributes, CSS variables and any CSS.",
+        description:
+          "Style parts with data attributes, CSS variables and any CSS.",
       },
     ],
   },
@@ -38,12 +40,14 @@ const sections = [
       {
         title: "Alert Dialog",
         href: "#",
-        description: "Asks for a decision before anything else on the page can be used.",
+        description:
+          "Asks for a decision before anything else on the page can be used.",
       },
       {
         title: "Hover Card",
         href: "#",
-        description: "A preview of what a link points to, for people who pause on it.",
+        description:
+          "A preview of what a link points to, for people who pause on it.",
       },
       {
         title: "Progress",
@@ -99,10 +103,16 @@ function Example() {
                   </button>
                 )}
               />
-              <NavigationMenuContent render={(props) => <section {...props} aria-label={section.label} />}>
+              <NavigationMenuContent
+                render={(props) => (
+                  <section {...props} aria-label={section.label} />
+                )}
+              >
                 {(state) => (
                   <>
-                    <p data-slot="hint">{state.motion ? `Moved in ${state.motion}` : "Opened"}</p>
+                    <p data-slot="hint">
+                      {state.motion ? `Moved in ${state.motion}` : "Opened"}
+                    </p>
                     <ul>
                       <For each={section.links}>
                         {(link, index) => (

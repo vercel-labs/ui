@@ -22,7 +22,9 @@ const controls = ref<HTMLElement | null>(null)
 function onOpenChange(next: boolean, details: ChangeDetails) {
   const target = details.event?.target
   const inControls = target instanceof Node && controls.value?.contains(target)
-  if (inControls && details.reason !== "escape-key") return details.cancel()
+  if (inControls && details.reason !== "escape-key") {
+    return details.cancel()
+  }
   log(`${next ? "Opened" : "Closed"} (${details.reason})`)
 }
 </script>
@@ -31,7 +33,10 @@ function onOpenChange(next: boolean, details: ChangeDetails) {
   <div data-slot="stack">
     <div ref="controls" data-slot="controls">
       <label data-slot="label">
-        <Checkbox :checked="open" @checked-change="(next) => (open = next === true)">
+        <Checkbox
+          :checked="open"
+          @checked-change="(next) => (open = next === true)"
+        >
           <CheckboxIndicator>
             <CheckIcon aria-hidden="true" />
           </CheckboxIndicator>
@@ -43,7 +48,9 @@ function onOpenChange(next: boolean, details: ChangeDetails) {
       <PopoverTrigger>Set Status</PopoverTrigger>
       <PopoverContent>
         <PopoverTitle>Set a status</PopoverTitle>
-        <PopoverDescription>Your team sees it next to your name.</PopoverDescription>
+        <PopoverDescription
+          >Your team sees it next to your name.</PopoverDescription
+        >
         <Field>
           <FieldLabel>Status</FieldLabel>
           <Input default-value="In a meeting" />

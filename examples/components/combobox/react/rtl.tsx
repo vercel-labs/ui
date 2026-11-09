@@ -37,7 +37,11 @@ export function Example() {
           <ComboboxEmpty>لا توجد نتائج.</ComboboxEmpty>
           <ComboboxList>
             {cities.map((city) => (
-              <ComboboxItem key={city.value} value={city.value} label={city.label}>
+              <ComboboxItem
+                key={city.value}
+                value={city.value}
+                label={city.label}
+              >
                 {city.label}
                 <ComboboxItemIndicator>
                   <CheckIcon />

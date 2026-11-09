@@ -42,13 +42,25 @@ import {
 import { Pagination } from "@/components/ui/pagination"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { toast } from "@/components/ui/toast"
-import { Toolbar, ToolbarButton, ToolbarSeparator } from "@/components/ui/toolbar"
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarSeparator,
+} from "@/components/ui/toolbar"
 
 function plural(count: number) {
   return count === 1 ? "1 issue" : `${count} issues`
 }
 
-function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query; pageSize: number }) {
+function IssueList({
+  issues,
+  query,
+  pageSize,
+}: {
+  issues: Issue[]
+  query: Query
+  pageSize: number
+}) {
   const router = useRouter()
   const [selected, setSelected] = useState<string[]>([])
   const [menu] = useState(() => createMenuController<Issue>())
@@ -57,14 +69,17 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
   const pageCount = Math.max(1, Math.ceil(issues.length / pageSize))
   const page = Math.min(query.page, pageCount)
   const rows = issues.slice((page - 1) * pageSize, page * pageSize)
-  const latest = (payload: Issue) => issues.find((issue) => issue.id === payload.id) ?? payload
+  const latest = (payload: Issue) =>
+    issues.find((issue) => issue.id === payload.id) ?? payload
   const checked = selected.filter((id) => rows.some((issue) => issue.id === id))
 
   function update(ids: string[], patch: IssuePatch, message?: string) {
     startTransition(async () => {
       try {
         await updateIssues(ids, patch)
-        if (message) toast(message)
+        if (message) {
+          toast(message)
+        }
       } catch {
         toast.error("Couldn't update the issues. Try again.")
       }
@@ -75,7 +90,7 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
     update(
       ids,
       { status },
-      `${ids.length === 1 ? ids[0] : plural(ids.length)} moved to ${statusOf(status).label}`,
+      `${ids.length === 1 ? ids[0] : plural(ids.length)} moved to ${statusOf(status).label}`
     )
   }
 
@@ -89,7 +104,9 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
       description: "Deleted issues and their comments can't be brought back.",
       confirmLabel: "Delete",
     })
-    if (!yes) return
+    if (!yes) {
+      return
+    }
     startTransition(async () => {
       try {
         await deleteIssues(ids)
@@ -99,8 +116,9 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
       }
       startTransition(() => {
         setSelected([])
-        if (query.issue && ids.includes(query.issue))
+        if (query.issue && ids.includes(query.issue)) {
           router.push(href(query, { issue: null }), { scroll: false })
+        }
       })
       all.current?.focus()
       toast.success(`${plural(ids.length)} deleted`)
@@ -126,7 +144,9 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
           />
           {checked.length > 0 ? (
             <Toolbar aria-label="Selected issues" className="flex-1 gap-1">
-              <span className="me-2 text-sm font-medium">{checked.length} selected</span>
+              <span className="me-2 text-sm font-medium">
+                {checked.length} selected
+              </span>
               <Menu onAction={(status) => setStatus(checked, status as Status)}>
                 <ToolbarButton
                   render={<MenuTrigger />}
@@ -156,13 +176,18 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
               <ToolbarButton
                 onClick={() => setSelected([])}
                 aria-label="Clear selection"
-                className={buttonVariants({ size: "icon-sm", variant: "ghost" })}
+                className={buttonVariants({
+                  size: "icon-sm",
+                  variant: "ghost",
+                })}
               >
                 <X aria-hidden="true" />
               </ToolbarButton>
             </Toolbar>
           ) : (
-            <span className="text-sm text-muted-foreground">{plural(issues.length)}</span>
+            <span className="text-sm text-muted-foreground">
+              {plural(issues.length)}
+            </span>
           )}
         </div>
         <ScrollArea label="Issue list" className="flex-1">
@@ -179,7 +204,10 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                   data-current={issue.id === query.issue || undefined}
                   className="flex h-11 items-center gap-3 border-b border-border ps-4 pe-2 transition-colors hover:bg-muted/50 has-data-checked:bg-muted/70 data-current:bg-muted"
                 >
-                  <Checkbox value={issue.id} aria-label={`Select ${issue.id}`} />
+                  <Checkbox
+                    value={issue.id}
+                    aria-label={`Select ${issue.id}`}
+                  />
                   <PriorityIcon priority={issue.priority} label />
                   <span className="hidden w-12 shrink-0 text-xs text-muted-foreground tabular-nums @md:block">
                     {issue.id}
@@ -193,7 +221,10 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                   >
                     {issue.title}
                   </Link>
-                  <IssueLabels labels={issue.labels} className="hidden shrink-0 gap-1 @3xl:flex" />
+                  <IssueLabels
+                    labels={issue.labels}
+                    className="hidden shrink-0 gap-1 @3xl:flex"
+                  />
                   {issue.due && (
                     <span className="hidden w-12 shrink-0 text-end text-xs text-muted-foreground @lg:block">
                       {formatDate(issue.due)}
@@ -204,7 +235,10 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                     controller={menu}
                     payload={issue}
                     aria-label={`Actions for ${issue.id}`}
-                    className={buttonVariants({ size: "icon-sm", variant: "ghost" })}
+                    className={buttonVariants({
+                      size: "icon-sm",
+                      variant: "ghost",
+                    })}
                   >
                     <Ellipsis aria-hidden="true" />
                   </MenuTrigger>
@@ -216,20 +250,30 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
       </CheckboxGroup>
       {pageCount > 1 && (
         <footer className="flex shrink-0 justify-center border-t border-border p-2">
-          <Pagination page={page} pageCount={pageCount} getHref={(page) => href(query, { page })} />
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            getHref={(page) => href(query, { page })}
+          />
         </footer>
       )}
       <Menu
         controller={menu}
         onAction={async (action) => {
           const issue = menu.getPayload()
-          if (!issue) return
-          if (action === "open") router.push(href(query, { issue: issue.id }), { scroll: false })
+          if (!issue) {
+            return
+          }
+          if (action === "open") {
+            router.push(href(query, { issue: issue.id }), { scroll: false })
+          }
           if (action === "copy") {
             await navigator.clipboard.writeText(issue.id)
             toast(`Copied ${issue.id}`)
           }
-          if (action === "delete") remove([issue.id])
+          if (action === "delete") {
+            remove([issue.id])
+          }
         }}
       >
         <MenuContent<Issue> align="end">
@@ -244,10 +288,15 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                     <MenuSubContent>
                       <MenuRadioGroup
                         value={latest(payload).status}
-                        onValueChange={(status) => setStatus([payload.id], status as Status)}
+                        onValueChange={(status) =>
+                          setStatus([payload.id], status as Status)
+                        }
                       >
                         {statuses.map((status) => (
-                          <MenuRadioItem key={status.value} value={status.value}>
+                          <MenuRadioItem
+                            key={status.value}
+                            value={status.value}
+                          >
                             {status.label}
                           </MenuRadioItem>
                         ))}
@@ -259,10 +308,15 @@ function IssueList({ issues, query, pageSize }: { issues: Issue[]; query: Query;
                     <MenuSubContent>
                       <MenuRadioGroup
                         value={latest(payload).priority}
-                        onValueChange={(priority) => setPriority([payload.id], priority as Priority)}
+                        onValueChange={(priority) =>
+                          setPriority([payload.id], priority as Priority)
+                        }
                       >
                         {priorities.map((priority) => (
-                          <MenuRadioItem key={priority.value} value={priority.value}>
+                          <MenuRadioItem
+                            key={priority.value}
+                            value={priority.value}
+                          >
                             {priority.label}
                           </MenuRadioItem>
                         ))}
@@ -290,7 +344,10 @@ function IssueListSkeleton({ rows }: { rows: number }) {
       <div className="h-11 shrink-0 border-b border-border" />
       <div aria-hidden="true" className="min-h-0 flex-1 overflow-hidden">
         {Array.from({ length: rows }, (_, index) => (
-          <div key={index} className="flex h-11 items-center border-b border-border ps-4 pe-2">
+          <div
+            key={index}
+            className="flex h-11 items-center border-b border-border ps-4 pe-2"
+          >
             <span className="h-3 w-1/2 rounded-full bg-muted" />
           </div>
         ))}

@@ -1,6 +1,11 @@
 "use client"
 
-import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/react/otp-input"
+import {
+  OTPInput,
+  OTPInputGroup,
+  OTPInputSeparator,
+  OTPInputSlot,
+} from "@ui-sdk/react/otp-input"
 import { MinusIcon } from "lucide-react"
 
 function Example() {

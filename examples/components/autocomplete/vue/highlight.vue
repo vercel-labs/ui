@@ -42,7 +42,10 @@ const fruits = [
           <AutocompleteItemText>
             <template #render="{ props, state }">
               <span v-bind="props">
-                <template v-for="(segment, index) in state.segments" :key="index">
+                <template
+                  v-for="(segment, index) in state.segments"
+                  :key="index"
+                >
                   <strong v-if="segment.match">{{ segment.text }}</strong>
                   <template v-else>{{ segment.text }}</template>
                 </template>

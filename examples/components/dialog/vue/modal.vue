@@ -31,26 +31,38 @@ type Mode = "true" | "trap-focus" | "false"
 
 const notes = {
   true: "The rest of the page is inert and doesn't scroll.",
-  "trap-focus": "Tab stays inside, and the page still scrolls and takes clicks.",
-  false: "The page stays usable. Tab leaves the notes, and Escape closes them while focus is inside.",
+  "trap-focus":
+    "Tab stays inside, and the page still scrolls and takes clicks.",
+  false:
+    "The page stays usable. Tab leaves the notes, and Escape closes them while focus is inside.",
 }
 
 const mode = ref<Mode>("false")
 const outside = ref(false)
-const modal = computed(() => (mode.value === "true" ? true : mode.value === "false" ? false : "trap-focus"))
+const modal = computed(() =>
+  mode.value === "true" ? true : mode.value === "false" ? false : "trap-focus"
+)
 </script>
 
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <Select :items="modes" :value="mode" @value-change="(next) => next && (mode = next as Mode)">
+      <Select
+        :items="modes"
+        :value="mode"
+        @value-change="(next) => next && (mode = next as Mode)"
+      >
         <SelectLabel>Modal</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in modes" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in modes"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon />
@@ -59,7 +71,10 @@ const modal = computed(() => (mode.value === "true" ? true : mode.value === "fal
         </SelectContent>
       </Select>
       <label data-slot="label">
-        <Checkbox :checked="outside" @checked-change="(next) => (outside = next === true)">
+        <Checkbox
+          :checked="outside"
+          @checked-change="(next) => (outside = next === true)"
+        >
           <CheckboxIndicator>
             <CheckIcon aria-hidden="true" />
           </CheckboxIndicator>
@@ -75,7 +90,8 @@ const modal = computed(() => (mode.value === "true" ? true : mode.value === "fal
           <DialogTitle>Notes</DialogTitle>
           <DialogDescription>{{ notes[mode] }}</DialogDescription>
         </div>
-        <textarea aria-label="Notes">Call the printer about the proofs.</textarea>
+        <textarea aria-label="Notes">
+Call the printer about the proofs.</textarea>
         <div data-slot="row">
           <DialogClose data-variant="solid">Done</DialogClose>
         </div>

@@ -1,13 +1,29 @@
 import { initialApple } from "../../foundation/platform/platform"
-import { createPopupController, type Modal } from "../../foundation/popups/popup"
+import {
+  createPopupController,
+  type Modal,
+} from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
 import { type PortalProps } from "../../foundation/platform/position"
 import { type PresentationSetting } from "../../foundation/popups/presentation"
-import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { type ListItem, type ListSeparator } from "../../foundation/lists/listbox"
-import type { ChangeDetails, DismissAttemptReason } from "../../foundation/kernel/details"
+import {
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
+import {
+  type ListItem,
+  type ListSeparator,
+} from "../../foundation/lists/listbox"
+import type {
+  ChangeDetails,
+  DismissAttemptReason,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveOptions, WithFeatures, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveOptions,
+  WithFeatures,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
 
 import {
@@ -26,7 +42,12 @@ import {
   type TriggerProps,
   menuApi,
 } from "./menu-api"
-import { menuSlots, type menuCheckable, type menuContextTrigger, type menuItemIcons } from "./menu-parts"
+import {
+  menuSlots,
+  type menuCheckable,
+  type menuContextTrigger,
+  type menuItemIcons,
+} from "./menu-parts"
 import type { MenuGeneric } from "./menu-generic"
 
 /**
@@ -60,7 +81,8 @@ type MenuDismissReason = Extract<MenuOpenChangeReason, DismissAttemptReason>
  * Why the menu's payload changed: a trigger or context area opened it, another one took it over while open, or a controller opened it or gave the open one another payload.
  * @stable
  */
-type MenuPayloadChangeReason = "trigger-press" | "trigger-hover" | "shortcut" | "imperative"
+type MenuPayloadChangeReason =
+  "trigger-press" | "trigger-hover" | "shortcut" | "imperative"
 
 /**
  * Why a checkbox item wants to change.
@@ -191,7 +213,10 @@ type MenuOptions = PortalProps & {
    */
   defaultOpen?: boolean
   /** Runs when the menu wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<MenuOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<MenuOpenChangeReason>
+  ) => void
   /** Runs once the menu has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /**
@@ -199,7 +224,10 @@ type MenuOptions = PortalProps & {
    * opens the menu, or takes the open menu over, which fires no `onOpenChange`, and so does a
    * controller's `open({ payload })` on the open menu. `details.cancel()` keeps the previous payload.
    */
-  onPayloadChange?: (payload: unknown, details: ChangeDetails<MenuPayloadChangeReason>) => void
+  onPayloadChange?: (
+    payload: unknown,
+    details: ChangeDetails<MenuPayloadChangeReason>
+  ) => void
   /**
    * Runs for every plain item, including items in submenus, with the item's value. Return a Promise
    * to mark the item pending until it settles: it gets `data-pending`, `aria-busy` and
@@ -215,7 +243,10 @@ type MenuOptions = PortalProps & {
    */
   pendingAnnouncement?: string
   /** Runs when any checkbox item in the menu or its submenus toggles, with the item's value in `details.value`. Made for data menus. */
-  onCheckedChange?: (checked: boolean, details: MenuCheckedChangeDetails) => void
+  onCheckedChange?: (
+    checked: boolean,
+    details: MenuCheckedChangeDetails
+  ) => void
   /** Runs when any radio group in the menu or its submenus changes, with the group in `details.group`. Made for data menus. */
   onValueChange?: (value: string, details: MenuValueChangeDetails) => void
   /** The menu as data. Renders the content for you, unless you place a content part of your own, and runs the items' shortcuts. */
@@ -280,7 +311,10 @@ type MenuCheckboxItemProps = CheckboxProps
  * The props the `radio-group` slot of `menu` takes.
  * @stable
  */
-type MenuRadioGroupProps<T extends string = string> = Omit<RadioGroupProps<T>, "name"> & {
+type MenuRadioGroupProps<T extends string = string> = Omit<
+  RadioGroupProps<T>,
+  "name"
+> & {
   /** Identifies the group in the menu's `onValueChange`. Defaults to a generated id. */
   name?: string
 }
@@ -479,7 +513,10 @@ const menuPrimitive = /* @__PURE__ */ definePrimitive({
  * @stable
  */
 interface MenuPrimitive extends WithGeneric<
-  WithFeatures<typeof menuPrimitive, typeof menuContextTrigger | typeof menuCheckable | typeof menuItemIcons>,
+  WithFeatures<
+    typeof menuPrimitive,
+    typeof menuContextTrigger | typeof menuCheckable | typeof menuItemIcons
+  >,
   MenuGeneric
 > {}
 

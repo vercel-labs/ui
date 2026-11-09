@@ -17,7 +17,11 @@
   let page = $state(1)
 </script>
 
-<Carousel bind:page aria-label="Featured" onPageChange={(next, details) => log(`Page ${next} (${details.reason})`)}>
+<Carousel
+  bind:page
+  aria-label="Featured"
+  onPageChange={(next, details) => log(`Page ${next} (${details.reason})`)}
+>
   <div data-slot="row">
     <CarouselPrevious aria-label="Previous slide">
       <ChevronLeftIcon />

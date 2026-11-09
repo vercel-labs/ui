@@ -16,7 +16,8 @@
   import type { Built } from "../../../core/test/after-mount"
   import Self from "./after-mount-tree.svelte"
 
-  let { nodes, components }: { nodes: Built[]; components: Map<string, Part> } = $props()
+  let { nodes, components }: { nodes: Built[]; components: Map<string, Part> } =
+    $props()
 </script>
 
 {#each nodes as node}
@@ -31,7 +32,9 @@
     {/if}
   {:else if node.tag}
     {#if node.children.length}
-      <svelte:element this={node.tag} {...node.props}><Self nodes={node.children} {components} /></svelte:element>
+      <svelte:element this={node.tag} {...node.props}
+        ><Self nodes={node.children} {components} /></svelte:element
+      >
     {:else}
       <svelte:element this={node.tag} {...node.props} />
     {/if}

@@ -61,7 +61,9 @@ function Example() {
               (state.value as string[]).map((value, index) => (
                 <ComboboxChip key={value} value={value}>
                   {state.labels[index]}
-                  <ComboboxChipRemove aria-label={`Remove ${state.labels[index]}`}>
+                  <ComboboxChipRemove
+                    aria-label={`Remove ${state.labels[index]}`}
+                  >
                     <XIcon aria-hidden="true" />
                   </ComboboxChipRemove>
                 </ComboboxChip>
@@ -85,10 +87,18 @@ function Example() {
             <ComboboxGroup key={group.label}>
               <ComboboxGroupLabel>{group.label}</ComboboxGroupLabel>
               <ComboboxSelectAll>
-                {(state) => (state.checked ? `Clear ${group.label}` : `Select all in ${group.label}`)}
+                {(state) =>
+                  state.checked
+                    ? `Clear ${group.label}`
+                    : `Select all in ${group.label}`
+                }
               </ComboboxSelectAll>
               {group.items.map((zone) => (
-                <ComboboxItem key={zone.value} value={zone.value} label={zone.label}>
+                <ComboboxItem
+                  key={zone.value}
+                  value={zone.value}
+                  label={zone.label}
+                >
                   <span>
                     <ComboboxItemIndicator>
                       <CheckIcon aria-hidden="true" />

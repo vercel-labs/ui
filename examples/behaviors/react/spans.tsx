@@ -16,17 +16,24 @@ type RoomsState = { bookings: Booking[]; draft: SpansDraft<Booking> | null }
 
 type RoomsOptions = {
   defaultBookings: Booking[]
-  onBookingsChange?: (bookings: Booking[], details: ChangeDetails<SpansReason>) => void
+  onBookingsChange?: (
+    bookings: Booking[],
+    details: ChangeDetails<SpansReason>
+  ) => void
 }
 
-const hour = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
+const hour = (minutes: number) =>
+  `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
 
 let booked = 0
 
 const rooms = definePrimitive({
   name: "rooms",
   options: { defaultBookings: "value", onBookingsChange: "callback" },
-  state: (options: RoomsOptions): RoomsState => ({ bookings: options.defaultBookings, draft: null }),
+  state: (options: RoomsOptions): RoomsState => ({
+    bookings: options.defaultBookings,
+    draft: null,
+  }),
   api: (context) => {
     const change = createChange(context)
     return {
@@ -39,7 +46,11 @@ const rooms = definePrimitive({
         max: () => 17 * 60,
         step: () => 30,
         overlap: false,
-        create: (span) => ({ ...span, id: `booking-${++booked}`, title: "New" }),
+        create: (span) => ({
+          ...span,
+          id: `booking-${++booked}`,
+          title: "New",
+        }),
         label: (booking) =>
           `${booking.title}, ${booking.track}, ${hour(booking.start)} to ${hour(booking.end)}`,
       }),
@@ -51,8 +62,14 @@ const rooms = definePrimitive({
     }),
     room: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: () => ({ role: "group", style: "position:relative;touch-action:none;user-select:none" }),
-      on: { pointerdown: (event, { api, key }) => api.spans.trackPointerdown(event, key) },
+      attrs: () => ({
+        role: "group",
+        style: "position:relative;touch-action:none;user-select:none",
+      }),
+      on: {
+        pointerdown: (event, { api, key }) =>
+          api.spans.trackPointerdown(event, key),
+      },
       bind: (el, { api, key }) => api.spans.bindTrack(el, key),
     }),
     booking: slot<{ value: string }>({
@@ -69,7 +86,8 @@ const rooms = definePrimitive({
         }
       },
       on: {
-        pointerdown: (event, { api, key }) => api.spans.spanPointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.spans.spanPointerdown(event, key),
         keydown: (event, { api, key }) => api.spans.keydown(event, key),
       },
       bind: (el, { api, key }) => api.spans.bindSpan(el, key),
@@ -89,8 +107,20 @@ function Example() {
   return (
     <Rooms
       defaultBookings={[
-        { id: "standup", track: "Atlas", start: 9 * 60 + 30, end: 11 * 60, title: "Standup" },
-        { id: "review", track: "Birch", start: 13 * 60, end: 15 * 60, title: "Review" },
+        {
+          id: "standup",
+          track: "Atlas",
+          start: 9 * 60 + 30,
+          end: 11 * 60,
+          title: "Standup",
+        },
+        {
+          id: "review",
+          track: "Birch",
+          start: 13 * 60,
+          end: 15 * 60,
+          title: "Review",
+        },
       ]}
     >
       {({ bookings }) => (

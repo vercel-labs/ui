@@ -35,14 +35,15 @@ function mount(root: HTMLElement) {
                   ${region.label}
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>
       </ui-select>
     </ui-field>
   `
-  root.querySelector("ui-select-value")!.getMoreLabel = (count) => `${count} more`
+  root.querySelector("ui-select-value")!.getMoreLabel = (count) =>
+    `${count} more`
 }
 
 export { mount }

@@ -20,12 +20,14 @@
     {
       title: "Installation",
       href: "#installation",
-      description: "Add the package for your framework and render your first part.",
+      description:
+        "Add the package for your framework and render your first part.",
     },
     {
       title: "Styling",
       href: "#styling",
-      description: "Style parts with data attributes, CSS variables and any CSS.",
+      description:
+        "Style parts with data attributes, CSS variables and any CSS.",
     },
   ]
 

@@ -98,7 +98,9 @@
   }
 
   /* Page-wide drop: the hint and the upload button share a row above the list. */
-  :scope[data-example="file-input/page"] [data-slot="file-input-root"] > [data-slot="row"] {
+  :scope[data-example="file-input/page"]
+    [data-slot="file-input-root"]
+    > [data-slot="row"] {
     flex-wrap: nowrap;
     justify-content: center;
     gap: var(--space-3);

@@ -46,7 +46,12 @@ const variants: Variant[] = [
     title: "defaultPressed",
     options: { defaultPressed: true },
   },
-  { id: "toggle-disabled", section: "Toggle", title: "disabled", options: { disabled: true } },
+  {
+    id: "toggle-disabled",
+    section: "Toggle",
+    title: "disabled",
+    options: { disabled: true },
+  },
   {
     id: "toggle-focusable-disabled",
     section: "Toggle",
@@ -54,8 +59,18 @@ const variants: Variant[] = [
     note: "Stays in the tab order with aria-disabled.",
     options: { disabled: true, focusableWhenDisabled: true },
   },
-  { id: "toggle-controlled", section: "Toggle", title: "Controlled", controlled: true },
-  { id: "toggle-controller", section: "Toggle", title: "Controller", controller: true },
+  {
+    id: "toggle-controlled",
+    section: "Toggle",
+    title: "Controlled",
+    controlled: true,
+  },
+  {
+    id: "toggle-controller",
+    section: "Toggle",
+    title: "Controller",
+    controller: true,
+  },
   {
     id: "toggle-cancel",
     section: "Toggle",
@@ -63,7 +78,12 @@ const variants: Variant[] = [
     note: "Every change is canceled.",
     cancel: true,
   },
-  { id: "toggle-span", section: "Toggle", title: "Rendered as a span", render: "span" },
+  {
+    id: "toggle-span",
+    section: "Toggle",
+    title: "Rendered as a span",
+    render: "span",
+  },
   {
     id: "toggle-debug",
     section: "Toggle",
@@ -115,7 +135,13 @@ const variants: Variant[] = [
     items: "formatting",
     options: { multiple: true, disabled: true },
   },
-  { id: "group-rtl", section: "Toggle Group", title: "Right to left", items: "alignment", place: "rtl" },
+  {
+    id: "group-rtl",
+    section: "Toggle Group",
+    title: "Right to left",
+    items: "alignment",
+    place: "rtl",
+  },
   {
     id: "group-controlled",
     section: "Toggle Group",
@@ -132,7 +158,13 @@ const variants: Variant[] = [
     options: { multiple: true },
     controller: true,
   },
-  { id: "group-cancel", section: "Toggle Group", title: "Canceled", items: "alignment", cancel: true },
+  {
+    id: "group-cancel",
+    section: "Toggle Group",
+    title: "Canceled",
+    items: "alignment",
+    cancel: true,
+  },
   {
     id: "group-span",
     section: "Toggle Group",
@@ -156,7 +188,13 @@ const variants: Variant[] = [
     note: "Its error shows in the log.",
     action: "reject",
   },
-  { id: "button-disabled", section: "Button", title: "disabled", options: { disabled: true }, action: "log" },
+  {
+    id: "button-disabled",
+    section: "Button",
+    title: "disabled",
+    options: { disabled: true },
+    action: "log",
+  },
   {
     id: "button-focusable-disabled",
     section: "Button",
@@ -172,8 +210,18 @@ const variants: Variant[] = [
     form: "submit",
     action: "resolve",
   },
-  { id: "button-reset", section: "Button", title: 'type="reset"', form: "reset" },
-  { id: "button-link", section: "Button", title: "Rendered as a link", render: "link" },
+  {
+    id: "button-reset",
+    section: "Button",
+    title: 'type="reset"',
+    form: "reset",
+  },
+  {
+    id: "button-link",
+    section: "Button",
+    title: "Rendered as a link",
+    render: "link",
+  },
   {
     id: "button-link-disabled",
     section: "Button",
@@ -181,21 +229,45 @@ const variants: Variant[] = [
     render: "link",
     options: { disabled: true },
   },
-  { id: "button-span", section: "Button", title: "Rendered as a span", render: "span", action: "log" },
+  {
+    id: "button-span",
+    section: "Button",
+    title: "Rendered as a span",
+    render: "span",
+    action: "log",
+  },
 
   { id: "separator", section: "Separator", title: "Horizontal" },
-  { id: "separator-vertical", section: "Separator", title: "Vertical", options: { orientation: "vertical" } },
-  { id: "separator-decorative", section: "Separator", title: "decorative", options: { decorative: true } },
-  { id: "separator-hr", section: "Separator", title: "Rendered as hr", render: "hr" },
+  {
+    id: "separator-vertical",
+    section: "Separator",
+    title: "Vertical",
+    options: { orientation: "vertical" },
+  },
+  {
+    id: "separator-decorative",
+    section: "Separator",
+    title: "decorative",
+    options: { decorative: true },
+  },
+  {
+    id: "separator-hr",
+    section: "Separator",
+    title: "Rendered as hr",
+    render: "hr",
+  },
 ]
 
 // A press handler's Promise for the pending variants.
 function pendingAction(variant: Variant) {
   return new Promise<void>((resolve, reject) =>
     setTimeout(
-      () => (variant.action === "reject" ? reject(new Error("Couldn't save")) : resolve()),
-      pendingMs,
-    ),
+      () =>
+        variant.action === "reject"
+          ? reject(new Error("Couldn't save"))
+          : resolve(),
+      pendingMs
+    )
   )
 }
 

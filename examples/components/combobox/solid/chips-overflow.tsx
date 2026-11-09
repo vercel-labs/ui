@@ -32,14 +32,23 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function Example() {
   return (
-    <Combobox multiple defaultValue={["fr", "jp", "se", "de", "ch"]} itemToLabel={countryLabel}>
+    <Combobox
+      multiple
+      defaultValue={["fr", "jp", "se", "de", "ch"]}
+      itemToLabel={countryLabel}
+    >
       <div data-slot="stack">
         <ComboboxLabel>Countries</ComboboxLabel>
         <ComboboxChips>
@@ -49,7 +58,9 @@ function Example() {
                 {(value, index) => (
                   <ComboboxChip value={value}>
                     {state.labels[index()]}
-                    <ComboboxChipRemove aria-label={`Remove ${state.labels[index()]}`}>
+                    <ComboboxChipRemove
+                      aria-label={`Remove ${state.labels[index()]}`}
+                    >
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -78,7 +89,10 @@ function Example() {
           <ComboboxInput placeholder="Add…" />
         </ComboboxChips>
         <p data-slot="hint">
-          <ComboboxValue maxLabels={2} getMoreLabel={(count) => `${count} more`} />
+          <ComboboxValue
+            maxLabels={2}
+            getMoreLabel={(count) => `${count} more`}
+          />
         </p>
       </div>
       <ComboboxContent>

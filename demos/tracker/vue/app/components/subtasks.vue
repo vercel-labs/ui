@@ -12,15 +12,20 @@ const all = computed(() => leaves(props.issue.subtasks))
 const checked = ref<string[]>([])
 const items = computed(() => toItems(props.issue.subtasks))
 const expanded = computed(() =>
-  props.issue.subtasks.filter((subtask) => subtask.subtasks).map((subtask) => subtask.id),
+  props.issue.subtasks
+    .filter((subtask) => subtask.subtasks)
+    .map((subtask) => subtask.id)
 )
 
 watch(
   all,
-  (subtasks) => (checked.value = subtasks.filter((subtask) => subtask.done).map((subtask) => subtask.id)),
+  (subtasks) =>
+    (checked.value = subtasks
+      .filter((subtask) => subtask.done)
+      .map((subtask) => subtask.id)),
   {
     immediate: true,
-  },
+  }
 )
 
 function toItems(subtasks: Subtask[]): TreeItemData[] {
@@ -33,7 +38,11 @@ function toItems(subtasks: Subtask[]): TreeItemData[] {
 </script>
 
 <template>
-  <section v-if="all.length > 0" aria-labelledby="subtasks-label" class="grid gap-3">
+  <section
+    v-if="all.length > 0"
+    aria-labelledby="subtasks-label"
+    class="grid gap-3"
+  >
     <h3 id="subtasks-label" class="text-sm font-medium">Subtasks</h3>
     <Progress
       label="Done"

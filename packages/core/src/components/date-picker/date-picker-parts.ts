@@ -1,14 +1,33 @@
 // Date Picker's parts and the attributes they carry: the inputs, the trigger,
 // the popup, the hint, clear and presets, and Calendar's parts inside it.
-import { calendarSlots, isDisabled, isPickable, localeOf } from "../calendar/calendar-api"
+import {
+  calendarSlots,
+  isDisabled,
+  isPickable,
+  localeOf,
+} from "../calendar/calendar-api"
 import { normalizeValue } from "../calendar/calendar-model"
 import { formatDate } from "../../foundation/date/format"
 import { datePattern } from "../../foundation/date/parse"
 import { type ISODate } from "../../foundation/date/plain-date"
-import { bindInternals, bindValueInput, setComponentValidity } from "../../foundation/forms/form"
-import { openerOf, popupContentAttrs, popupTriggerAttrs } from "../../foundation/popups/popup"
-import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
-import { contentAnchor, placementOptions } from "../../foundation/popups/popup-features"
+import {
+  bindInternals,
+  bindValueInput,
+  setComponentValidity,
+} from "../../foundation/forms/form"
+import {
+  openerOf,
+  popupContentAttrs,
+  popupTriggerAttrs,
+} from "../../foundation/popups/popup"
+import {
+  ownsEvent,
+  registerPopupElement,
+} from "../../foundation/popups/popup-elements"
+import {
+  contentAnchor,
+  placementOptions,
+} from "../../foundation/popups/popup-features"
 import { openAttrs } from "../../foundation/kernel/attrs"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
 import { onProps } from "../../foundation/kernel/part"
@@ -46,7 +65,9 @@ const invalidDateMessage = "Enter a valid date."
 function triggerLabel(state: State) {
   const label = state.mode === "range" ? "Choose dates" : "Choose date"
   const locale = localeOf(state)
-  if (state.value === null) return label
+  if (state.value === null) {
+    return label
+  }
   if (state.mode === "range") {
     const [start, end] = state.value as [ISODate, ISODate]
     return `${label}, ${formatDate(start, locale)} to ${formatDate(end, locale)}`
@@ -72,7 +93,8 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       ...openAttrs(state.open),
       "data-disabled": isDisabled(state) ? "" : undefined,
       "data-readonly": state.readOnly ? "" : undefined,
-      "data-invalid": invalidAt(state, 0) || invalidAt(state, 1) ? "" : undefined,
+      "data-invalid":
+        invalidAt(state, 0) || invalidAt(state, 1) ? "" : undefined,
     }),
     // A field can disable it without the `disabled` attribute the browser
     // leaves a control out of the form by, so disabled it submits and
@@ -81,7 +103,8 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       const cleanups = [
         api.internal.bindRoot(el),
         bindInternals(el, {
-          value: () => (isDisabled(store.get()) ? null : api.internal.submitted()),
+          value: () =>
+            isDisabled(store.get()) ? null : api.internal.submitted(),
           state: () => valueKey(store.get().value),
           restore: api.internal.restore,
           valueMissing: () => false,
@@ -89,7 +112,12 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
           // Text that isn't a date is a bad input, like a native date input's.
           invalid: () => {
             const state = store.get()
-            if (isDisabled(state) || (!invalidAt(state, 0) && !invalidAt(state, 1))) return undefined
+            if (
+              isDisabled(state) ||
+              (!invalidAt(state, 0) && !invalidAt(state, 1))
+            ) {
+              return undefined
+            }
             return {
               flags: { badInput: true },
               message: invalidDateMessage,
@@ -135,9 +163,12 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
     },
     on: {
       input: (event, { api, el, props }) =>
-        el && api.internal.setText(indexOf(props), (el as HTMLInputElement).value),
-      keydown: (event, { api, props }) => api.internal.inputKeydown(event, indexOf(props)),
-      focusout: (event, { api, props }) => api.internal.commit(indexOf(props), event),
+        el &&
+        api.internal.setText(indexOf(props), (el as HTMLInputElement).value),
+      keydown: (event, { api, props }) =>
+        api.internal.inputKeydown(event, indexOf(props)),
+      focusout: (event, { api, props }) =>
+        api.internal.commit(indexOf(props), event),
     },
     bind(el, { api, store, props }) {
       const input = el as HTMLInputElement
@@ -145,11 +176,18 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       const write = () => {
         const state = store.get()
         const text = textOf(state, indexOf(props))
-        if (input.value !== text) input.value = text
+        if (input.value !== text) {
+          input.value = text
+        }
         // Text that isn't a date blocks its form, until it's a date or empty.
         // A root that validates reports it instead.
-        if (api.internal.rootValidates()) return
-        setComponentValidity(input, invalidAt(state, indexOf(props)) ? invalidDateMessage : "")
+        if (api.internal.rootValidates()) {
+          return
+        }
+        setComponentValidity(
+          input,
+          invalidAt(state, indexOf(props)) ? invalidDateMessage : ""
+        )
       }
       write()
       const unsubscribe = store.subscribe(write)
@@ -157,7 +195,9 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
         unsubscribe()
         // React's hidden <Activity> keeps the input and its text in the page,
         // so the text still blocks its form.
-        if (!input.isConnected) setComponentValidity(input, "")
+        if (!input.isConnected) {
+          setComponentValidity(input, "")
+        }
       }
     },
   }),
@@ -177,7 +217,8 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
         value: () => {
           const state = store.get()
           return state.mode === "range"
-            ? ((state.value as [ISODate, ISODate] | null)?.[indexOf(props)] ?? "")
+            ? ((state.value as [ISODate, ISODate] | null)?.[indexOf(props)] ??
+                "")
             : ((state.value as ISODate | null) ?? "")
         },
         subscribe: store.subscribe,
@@ -201,8 +242,12 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       keydown: (event, { api }) => api.internal.popup.triggerKeydown(event),
     },
     press({ api, store }, event) {
-      if (isDisabled(store.get())) return
-      if (api.isOpen()) return api.internal.hide({ reason: "trigger-press", event })
+      if (isDisabled(store.get())) {
+        return
+      }
+      if (api.isOpen()) {
+        return api.internal.hide({ reason: "trigger-press", event })
+      }
       api.internal.show({ event, by: openerOf(event), reason: "trigger-press" })
     },
   }),
@@ -233,14 +278,22 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
     on: {
       keydown(event, { api, el }) {
         // Keys from a popup inside this one bubble through it. Only the owner handles them.
-        if (ownsEvent(el!, event)) api.internal.popup.keydown(event)
+        if (ownsEvent(el!, event)) {
+          api.internal.popup.keydown(event)
+        }
       },
     },
     bind(el, part) {
       const { internal } = part.api
       return internal.presentation.bind(el, {
-        anchor: () => contentAnchor(el, internal.contentProps().anchor, internal.anchorElement),
-        position: () => placementOptions(internal.contentProps(), { align: "start" }),
+        anchor: () =>
+          contentAnchor(
+            el,
+            internal.contentProps().anchor,
+            internal.anchorElement
+          ),
+        position: () =>
+          placementOptions(internal.contentProps(), { align: "start" }),
         rendered: (listener) => onProps(part, listener),
         initialFocus: internal.initialFocus,
       })
@@ -268,7 +321,8 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
     attrs: (state) => ({
       type: "button",
       disabled: isDisabled(state) || state.readOnly ? "" : undefined,
-      "data-empty": state.value === null && state.anchor === null ? "" : undefined,
+      "data-empty":
+        state.value === null && state.anchor === null ? "" : undefined,
     }),
     press({ api }, event) {
       api.internal.pickValue(null, "clear-press", event)
@@ -280,11 +334,15 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
   preset: slot<DatePickerPresetProps, DatePickerPresetState>({
     props: { value: "list" },
     state: (state, { props }) => ({
-      selected: valueKey(state.value) === valueKey(normalizeValue(state.mode, props.value)),
+      selected:
+        valueKey(state.value) ===
+        valueKey(normalizeValue(state.mode, props.value)),
       disabled: presetDisabled(state, props.value),
     }),
     attrs: (state, { props }) => {
-      const selected = valueKey(state.value) === valueKey(normalizeValue(state.mode, props.value))
+      const selected =
+        valueKey(state.value) ===
+        valueKey(normalizeValue(state.mode, props.value))
       return {
         type: "button",
         disabled: presetDisabled(state, props.value) ? "" : undefined,
@@ -293,9 +351,13 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
       }
     },
     press({ api, props, store }, event) {
-      if (presetDisabled(store.get(), props.value)) return
+      if (presetDisabled(store.get(), props.value)) {
+        return
+      }
       api.internal.pickValue(props.value, "preset-press", event)
-      if (store.get().closeOnSelect) api.internal.hide({ reason: "preset-press", event })
+      if (store.get().closeOnSelect) {
+        api.internal.hide({ reason: "preset-press", event })
+      }
     },
   }),
 
@@ -304,12 +366,17 @@ const datePickerSlots = (slot: SlotFactory<State, DatePickerApi>) => ({
 
 // Calendar's parts keep Calendar's `data-slot`, so one stylesheet styles a
 // calendar on its own and in a date picker.
-function asCalendar<T extends Record<string, { attrs?: (...args: any[]) => object }>>(slots: T) {
+function asCalendar<
+  T extends Record<string, { attrs?: (...args: any[]) => object }>,
+>(slots: T) {
   for (const key in slots) {
     const attrs = slots[key].attrs
     slots[key] = {
       ...slots[key],
-      attrs: (...args: any[]) => ({ "data-slot": `calendar-${key}`, ...attrs?.(...args) }),
+      attrs: (...args: any[]) => ({
+        "data-slot": `calendar-${key}`,
+        ...attrs?.(...args),
+      }),
     }
   }
   return slots

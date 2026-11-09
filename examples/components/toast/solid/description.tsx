@@ -1,4 +1,10 @@
-import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import {
+  Toast,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 
 const toast = createToaster()
 
@@ -7,7 +13,10 @@ export function Example() {
     <>
       <button
         onClick={() =>
-          toast({ title: "Event has been created", description: "Monday, January 3rd at 6:00pm" })
+          toast({
+            title: "Event has been created",
+            description: "Monday, January 3rd at 6:00pm",
+          })
         }
       >
         Show toast

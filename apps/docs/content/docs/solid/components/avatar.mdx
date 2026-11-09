@@ -115,7 +115,10 @@ Pass image attributes such as `srcset`, `crossorigin`, and `referrerpolicy` to t
 Use a button when clicking an avatar performs an action. Give it an accessible name that stays available while the image loads.
 
 ```tsx
-<Avatar render={(props) => <button {...props} type="button" aria-label="shadcn" />} onClick={openProfile}>
+<Avatar
+  render={(props) => <button {...props} type="button" aria-label="shadcn" />}
+  onClick={openProfile}
+>
   <AvatarImage src="https://github.com/shadcn.png" alt="" />
   <AvatarFallback aria-hidden="true">CN</AvatarFallback>
 </Avatar>
@@ -147,7 +150,9 @@ Use [Parts and Composition](../parts-and-composition) to replace an element or r
 ```tsx
 <Avatar>
   <AvatarImage src={user.image} alt={user.name} />
-  <AvatarFallback>{(state) => (state.loadingStatus === "error" ? "?" : user.initials)}</AvatarFallback>
+  <AvatarFallback>
+    {(state) => (state.loadingStatus === "error" ? "?" : user.initials)}
+  </AvatarFallback>
 </Avatar>
 ```
 
@@ -177,7 +182,10 @@ Props and callbacks are the same as below, as Solid props.
 
 ### Avatar
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarOptions" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarOptions"
+/>
 
 ### AvatarImage
 
@@ -185,13 +193,19 @@ The image. Renders a real `img`, so the browser can fetch it before hydration, a
 
 ### AvatarFallback
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarFallbackProps" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarFallbackProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive. Every part gets the same state.
 
-<StateTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarState" />
+<StateTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarState"
+/>
 
 ### Reasons
 

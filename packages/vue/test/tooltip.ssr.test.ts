@@ -20,9 +20,12 @@ describe("tooltip server rendering", () => {
       createSSRApp(() =>
         h(Tooltip, { shortcut: "mod+s" }, () => [
           h(TooltipTrigger, null, () => "Save"),
-          h(TooltipContent, null, () => ["Save your changes", h(TooltipShortcut)]),
-        ]),
-      ),
+          h(TooltipContent, null, () => [
+            "Save your changes",
+            h(TooltipShortcut),
+          ]),
+        ])
+      )
     )
     expect(typeof window).toBe("undefined")
     expect(html).toMatch(/aria-describedby="[^"]+-content"/)
@@ -36,11 +39,14 @@ describe("tooltip server rendering", () => {
     const save = createTooltipController()
     const html = await renderToString(
       createSSRApp(() => [
-        h(TooltipTrigger, { controller: save }, () => ["Save", h(TooltipShortcut)]),
+        h(TooltipTrigger, { controller: save }, () => [
+          "Save",
+          h(TooltipShortcut),
+        ]),
         h(Tooltip, { controller: save, shortcut: "mod+s" }, () =>
-          h(TooltipContent, null, () => "Save your changes"),
+          h(TooltipContent, null, () => "Save your changes")
         ),
-      ]),
+      ])
     )
     expect(html).toContain("Save")
     expect(html).not.toContain('data-slot="tooltip-shortcut"')
@@ -52,8 +58,8 @@ describe("tooltip server rendering", () => {
         h(Tooltip, { type: "label" }, () => [
           h(TooltipTrigger, null, () => h("svg", { "aria-hidden": "true" })),
           h(TooltipContent, null, () => "Bold"),
-        ]),
-      ),
+        ])
+      )
     )
     expect(html).toMatch(/aria-labelledby="[^"]+-content"/)
     expect(html).not.toContain("aria-describedby")
@@ -66,7 +72,7 @@ describe("hover card server rendering", () => {
       h(HoverCard, { defaultOpen: open }, () => [
         h(HoverCardTrigger, { href: "/ada" }, () => "@ada"),
         h(HoverCardContent, null, () => "Ada Lovelace"),
-      ]),
+      ])
     )
 
   test("a closed card renders its link only", async () => {

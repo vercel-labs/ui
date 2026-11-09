@@ -30,7 +30,7 @@ function mount(root: HTMLElement) {
                 <li data-slot="row">
                   <span>${update.label}</span>
                   <span>${update.time}</span>
-                </li>`,
+                </li>`
             )
             .join("")}
         </ol>

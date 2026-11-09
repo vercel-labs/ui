@@ -10,7 +10,11 @@ import {
   SliderTrack,
   SliderValue,
 } from "@ui-sdk/vue"
-import { serialize, sliderFixture as f, sliderOptions } from "tests/fixtures/slider.ts"
+import {
+  serialize,
+  sliderFixture as f,
+  sliderOptions,
+} from "tests/fixtures/slider.ts"
 import { ref } from "vue"
 
 const options = sliderOptions()
@@ -26,8 +30,14 @@ const shared = {
 }
 
 // Records a change, or cancels it when the URL asks.
-function report(name: string, value: number | number[], details: { cancel: () => void }) {
-  if (options.cancel === name) return details.cancel()
+function report(
+  name: string,
+  value: number | number[],
+  details: { cancel: () => void }
+) {
+  if (options.cancel === name) {
+    return details.cancel()
+  }
   action.value = `${name}:${String(value)}`
 }
 
@@ -117,7 +127,9 @@ function onSubmit(event: Event) {
     </form>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <output role="status" aria-label="Committed">{{ commits.join(" ") }}</output>
+    <output role="status" aria-label="Committed">{{
+      commits.join(" ")
+    }}</output>
     <output role="status" aria-label="Submitted">{{ submitted }}</output>
   </div>
 </template>

@@ -112,7 +112,9 @@ Without `multiple`, a new file replaces the current one. A rejected file leaves 
 
 ```tsx
 <FileInput accept=".pdf">
-  {({ value: [file] }) => <FileInputTrigger>{file ? "Replace PDF" : "Choose a PDF"}</FileInputTrigger>}
+  {({ value: [file] }) => (
+    <FileInputTrigger>{file ? "Replace PDF" : "Choose a PDF"}</FileInputTrigger>
+  )}
 </FileInput>
 ```
 
@@ -281,7 +283,9 @@ Wrap the file input in a [Field](./field) to connect its label, description, and
   <FileInput name="proof" required accept={["image/*", ".pdf"]}>
     <FileInputTrigger>Choose a File</FileInputTrigger>
   </FileInput>
-  <FieldDescription>A utility bill or bank statement from the last 3 months.</FieldDescription>
+  <FieldDescription>
+    A utility bill or bank statement from the last 3 months.
+  </FieldDescription>
   <FieldError match="valueMissing">Add a scan to continue.</FieldError>
 </Field>
 ```
@@ -339,15 +343,24 @@ Props and callbacks are the same as below, as Solid props.
 
 ### FileInput
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputOptions"
+/>
 
 ### FileInputTrigger
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputTriggerProps"
+/>
 
 ### FileInputDropzone
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputDropzoneProps" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputDropzoneProps"
+/>
 
 ### FileInputList
 
@@ -355,7 +368,10 @@ Renders its children once for each file.
 
 ### FileInputItem
 
-<TypeTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputItemProps"
+/>
 
 ### FileInputItemRemove
 
@@ -365,7 +381,10 @@ Removes its item's file. It's named for the file and stays out of the Tab order.
 
 The root's, the trigger's and the list's state:
 
-<StateTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputState" />
+<StateTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputState"
+/>
 
 A drop zone's:
 
@@ -376,7 +395,10 @@ A drop zone's:
 
 An item's:
 
-<StateTable path="../../packages/core/src/components/file-input/file-input.ts" name="FileInputItemState" />
+<StateTable
+  path="../../packages/core/src/components/file-input/file-input.ts"
+  name="FileInputItemState"
+/>
 
 A remove button's:
 

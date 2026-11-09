@@ -27,7 +27,9 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => schedule.setValue(weekdays)}>Select Weekdays</button>
+    <button type="button" onclick={() => schedule.setValue(weekdays)}
+      >Select Weekdays</button
+    >
     <button type="button" onclick={() => schedule.setValue([])}>Clear</button>
   </div>
   <h3 id="controlled-days">Working days</h3>
@@ -36,7 +38,9 @@
     aria-labelledby="controlled-days"
     controller={schedule}
     onValueChange={(next, details) => {
-      const names = days.filter((day) => next.includes(day.value)).map((day) => day.label)
+      const names = days
+        .filter((day) => next.includes(day.value))
+        .map((day) => day.label)
       log(`${names.join(", ") || "No days"} (${details.reason})`)
     }}
   >

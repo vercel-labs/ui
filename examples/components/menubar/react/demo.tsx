@@ -94,7 +94,9 @@ function Example() {
         </MenuContent>
       </Menu>
       <Menu
-        onCheckedChange={(checked, details) => log(`${details.value} ${checked ? "on" : "off"}`)}
+        onCheckedChange={(checked, details) =>
+          log(`${details.value} ${checked ? "on" : "off"}`)
+        }
         onValueChange={(value) => log(`${value} appearance`)}
       >
         <MenuTrigger>View</MenuTrigger>

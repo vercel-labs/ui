@@ -15,7 +15,8 @@ function renderLink(part: Part) {
   return link
 }
 
-const space = () => new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true })
+const space = () =>
+  new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true })
 
 test("Space on a collapsible trigger rendered as a link toggles it, since it's a button", () => {
   const instance = collapsible({ id: "x" })

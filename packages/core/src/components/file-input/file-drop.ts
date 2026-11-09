@@ -8,7 +8,9 @@ let pageDrag = false
 /** Whether a drag carries files from outside the page, rather than text or an element dragged within it. */
 function carriesFiles(event: DragEvent) {
   const data = event.dataTransfer
-  if (pageDrag || !data) return false
+  if (pageDrag || !data) {
+    return false
+  }
   // Firefox once named them differently, and Chromium sometimes leaves "Files"
   // out of `types` while its items are files.
   const types = Array.from(data.types ?? [])
@@ -21,7 +23,9 @@ function carriesFiles(event: DragEvent) {
 
 /** The MIME types of the files a drag carries, which is all a drag reveals before the drop. */
 function draggedTypes(dataTransfer: DataTransfer | null) {
-  if (!dataTransfer?.items) return []
+  if (!dataTransfer?.items) {
+    return []
+  }
   return Array.from(dataTransfer.items)
     .filter((item) => item.kind === "file")
     .map((item) => item.type)
@@ -30,9 +34,13 @@ function draggedTypes(dataTransfer: DataTransfer | null) {
 /** The files a paste carries, like a screenshot. Empty for text. */
 function pastedFiles(event: ClipboardEvent) {
   const data = event.clipboardData
-  if (!data) return []
+  if (!data) {
+    return []
+  }
   const files = Array.from(data.files ?? [])
-  if (files.length) return files
+  if (files.length) {
+    return files
+  }
   return Array.from(data.items ?? [])
     .filter((item) => item.kind === "file")
     .map((item) => item.getAsFile())
@@ -49,9 +57,15 @@ type DroppedEntry = {
   isFile: boolean
   isDirectory: boolean
   fullPath: string
-  file?: (resolve: (file: File) => void, reject: (error: unknown) => void) => void
+  file?: (
+    resolve: (file: File) => void,
+    reject: (error: unknown) => void
+  ) => void
   createReader?: () => {
-    readEntries: (resolve: (entries: DroppedEntry[]) => void, reject: (error: unknown) => void) => void
+    readEntries: (
+      resolve: (entries: DroppedEntry[]) => void,
+      reject: (error: unknown) => void
+    ) => void
   }
 }
 
@@ -61,28 +75,45 @@ type DroppedEntry = {
  * Chromium), so it's read until it returns none. Each file remembers its path
  * inside the folder, for `relativePath()`.
  */
-async function readEntries(entries: readonly DroppedEntry[], limit = folderFileLimit) {
+async function readEntries(
+  entries: readonly DroppedEntry[],
+  limit = folderFileLimit
+) {
   const files: File[] = []
   const visit = async (entry: DroppedEntry) => {
-    if (files.length >= limit) return
+    if (files.length >= limit) {
+      return
+    }
     if (entry.isFile && entry.file) {
-      if (systemFiles.has(entry.fullPath.split("/").pop()!)) return
-      const file = await new Promise<File>((resolve, reject) => entry.file!(resolve, reject))
+      if (systemFiles.has(entry.fullPath.split("/").pop()!)) {
+        return
+      }
+      const file = await new Promise<File>((resolve, reject) =>
+        entry.file!(resolve, reject)
+      )
       setRelativePath(file, entry.fullPath.replace(/^\//, ""))
       files.push(file)
       return
     }
     const reader = entry.isDirectory ? entry.createReader?.() : undefined
-    if (!reader) return
+    if (!reader) {
+      return
+    }
     for (;;) {
       const batch = await new Promise<DroppedEntry[]>((resolve, reject) =>
-        reader.readEntries(resolve, reject),
+        reader.readEntries(resolve, reject)
       )
-      if (!batch.length || files.length >= limit) return
-      for (const child of batch) await visit(child)
+      if (!batch.length || files.length >= limit) {
+        return
+      }
+      for (const child of batch) {
+        await visit(child)
+      }
     }
   }
-  for (const entry of entries) await visit(entry).catch(() => {})
+  for (const entry of entries) {
+    await visit(entry).catch(() => {})
+  }
   return files
 }
 
@@ -92,16 +123,24 @@ async function readEntries(entries: readonly DroppedEntry[], limit = folderFileL
  * only readable during the drop event, so call this from its listener.
  */
 function droppedFiles(dataTransfer: DataTransfer) {
-  const items = Array.from(dataTransfer.items ?? []).filter((item) => item.kind === "file")
-  const entries = items.map((item) => (item.webkitGetAsEntry?.() ?? null) as unknown as DroppedEntry | null)
-  if (!entries.some((entry) => entry?.isDirectory)) return Array.from(dataTransfer.files)
+  const items = Array.from(dataTransfer.items ?? []).filter(
+    (item) => item.kind === "file"
+  )
+  const entries = items.map(
+    (item) =>
+      (item.webkitGetAsEntry?.() ?? null) as unknown as DroppedEntry | null
+  )
+  if (!entries.some((entry) => entry?.isDirectory)) {
+    return Array.from(dataTransfer.files)
+  }
   // Entries of plain files read like the rest. Items without one, which
   // scripted drops have, are taken as they are.
-  const loose = items.flatMap((item, index) => (entries[index] ? [] : [item.getAsFile()]))
-  return readEntries(entries.filter((entry): entry is DroppedEntry => !!entry)).then((files) => [
-    ...loose.filter((file): file is File => !!file),
-    ...files,
-  ])
+  const loose = items.flatMap((item, index) =>
+    entries[index] ? [] : [item.getAsFile()]
+  )
+  return readEntries(
+    entries.filter((entry): entry is DroppedEntry => !!entry)
+  ).then((files) => [...loose.filter((file): file is File => !!file), ...files])
 }
 
 const claimed = new WeakSet<Event>()
@@ -130,17 +169,33 @@ let releaseGuard: (() => void) | undefined
  * page drags from file drags. Reference-counted: returns a release.
  */
 function guardFileDrops() {
-  if (typeof window === "undefined") return () => {}
+  if (typeof window === "undefined") {
+    return () => {}
+  }
   if (guards++ === 0) {
     const onDragStart = () => (pageDrag = true)
     const onDragEnd = () => (pageDrag = false)
     const onDragOver = (event: DragEvent) => {
-      if (isClaimed(event) || !carriesFiles(event) || isFileInput(event.target)) return
+      if (
+        isClaimed(event) ||
+        !carriesFiles(event) ||
+        isFileInput(event.target)
+      ) {
+        return
+      }
       event.preventDefault()
-      if (event.dataTransfer) event.dataTransfer.dropEffect = "none"
+      if (event.dataTransfer) {
+        event.dataTransfer.dropEffect = "none"
+      }
     }
     const onDrop = (event: DragEvent) => {
-      if (isClaimed(event) || !carriesFiles(event) || isFileInput(event.target)) return
+      if (
+        isClaimed(event) ||
+        !carriesFiles(event) ||
+        isFileInput(event.target)
+      ) {
+        return
+      }
       event.preventDefault()
     }
     window.addEventListener("dragstart", onDragStart, true)
@@ -157,9 +212,13 @@ function guardFileDrops() {
   }
   let released = false
   return () => {
-    if (released) return
+    if (released) {
+      return
+    }
     released = true
-    if (--guards === 0) releaseGuard?.()
+    if (--guards === 0) {
+      releaseGuard?.()
+    }
   }
 }
 
@@ -174,17 +233,31 @@ function createDragTracker(onChange: (over: boolean) => void) {
   const entered = new Set<EventTarget>()
   return {
     enter(event: DragEvent) {
-      if (event.target) entered.add(event.target)
-      if (entered.size === 1) onChange(true)
+      if (event.target) {
+        entered.add(event.target)
+      }
+      if (entered.size === 1) {
+        onChange(true)
+      }
     },
     leave(event: DragEvent) {
-      if (!event.target || !entered.delete(event.target)) return
+      if (!event.target || !entered.delete(event.target)) {
+        return
+      }
       // A node that left the page sends no dragleave. Forget it too.
-      for (const node of entered) if (node instanceof Node && !node.isConnected) entered.delete(node)
-      if (!entered.size) onChange(false)
+      for (const node of entered) {
+        if (node instanceof Node && !node.isConnected) {
+          entered.delete(node)
+        }
+      }
+      if (!entered.size) {
+        onChange(false)
+      }
     },
     reset() {
-      if (!entered.size) return
+      if (!entered.size) {
+        return
+      }
       entered.clear()
       onChange(false)
     },

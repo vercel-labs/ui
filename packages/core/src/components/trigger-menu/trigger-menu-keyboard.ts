@@ -16,7 +16,11 @@ function createTriggerMenuKeyboard({
   dismiss,
   caretMove,
 }: {
-  store: Store<{ open: boolean; highlighted: string | null; navigated: boolean }>
+  store: Store<{
+    open: boolean
+    highlighted: string | null
+    navigated: boolean
+  }>
   listbox: Listbox
   // Whether a match is active, open or not, like a free-text argument with no list.
   active: () => boolean
@@ -34,26 +38,40 @@ function createTriggerMenuKeyboard({
   }
 
   function onKeyDown(event: KeyboardEvent) {
-    if (!active()) return
+    if (!active()) {
+      return
+    }
     const { open, highlighted } = store.get()
     const step = listStep(event, { apple: isApple() })
     // Alt and Cmd with an arrow stay the editor's, which moves its caret with them.
     const arrow = event.key === "ArrowDown" || event.key === "ArrowUp"
     if (step !== undefined) {
-      if (open && !(arrow && (event.altKey || event.metaKey))) move(event, step)
+      if (open && !(arrow && (event.altKey || event.metaKey))) {
+        move(event, step)
+      }
       return
     }
     switch (event.key) {
       case "Enter":
-        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return
+        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+          return
+        }
         // An open menu's Enter wins over the editor's, like a prompt's submit.
-        if (!open && !inArguments()) return
+        if (!open && !inArguments()) {
+          return
+        }
         event.preventDefault()
-        if (inArguments()) return accept(event, { tab: false })
-        if (highlighted !== null) choose(highlighted, event, { tab: false })
+        if (inArguments()) {
+          return accept(event, { tab: false })
+        }
+        if (highlighted !== null) {
+          choose(highlighted, event, { tab: false })
+        }
         return
       case "Tab":
-        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) return
+        if (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey) {
+          return
+        }
         if (inArguments()) {
           event.preventDefault()
           return accept(event, { tab: true })
@@ -66,7 +84,9 @@ function createTriggerMenuKeyboard({
       case "Escape":
         // An open list's Escape is its layer's. A match with no list, like a
         // free-text argument, dismisses here.
-        if (open) return
+        if (open) {
+          return
+        }
         event.preventDefault()
         dismiss(event)
         return

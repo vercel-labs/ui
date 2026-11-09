@@ -14,7 +14,7 @@ function mount(root: HTMLElement) {
       ${sizes
         .map(
           (size) => `
-            <ui-listbox-item value="${size.value}"${size.disabled ? " disabled" : ""}>${size.label}</ui-listbox-item>`,
+            <ui-listbox-item value="${size.value}"${size.disabled ? " disabled" : ""}>${size.label}</ui-listbox-item>`
         )
         .join("")}
     </ui-listbox>

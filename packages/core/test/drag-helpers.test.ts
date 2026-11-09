@@ -18,7 +18,12 @@ const pointer = (type: string, clientX: number, clientY = 0) =>
     buttons: type === "pointerup" ? 0 : 1,
     bubbles: true,
   })
-const escape = () => new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true })
+const escape = () =>
+  new KeyboardEvent("keydown", {
+    key: "Escape",
+    bubbles: true,
+    cancelable: true,
+  })
 const tick = () => new Promise((resolve) => setTimeout(resolve))
 
 describe("bindDrag's cancelOnEscape", () => {
@@ -71,7 +76,10 @@ describe("bindDrag's cancelOnEscape", () => {
 
 describe("settleDraft", () => {
   function setup() {
-    const store = createStore({ value: ["a", "b"], draft: ["b", "a"] as string[] | null }, [])
+    const store = createStore(
+      { value: ["a", "b"], draft: ["b", "a"] as string[] | null },
+      []
+    )
     const value = () => store.get().value
     const clear = () => store.set({ draft: null })
     return { store, value, clear, before: value() }

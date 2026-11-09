@@ -1,4 +1,10 @@
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/solid/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/solid/slider"
 import { render } from "@solidjs/web"
 import { For } from "solid-js"
 import { mountWhenAsked, perfSize } from "tests/fixtures/perf.ts"
@@ -8,15 +14,25 @@ const sliders = Array.from({ length: perfSize(200) }, (_, index) => index)
 
 function Fixture() {
   return (
-    <div class="fixture" style={{ "flex-direction": "column", "align-items": "start" }}>
+    <div
+      class="fixture"
+      style={{ "flex-direction": "column", "align-items": "start" }}
+    >
       <button>Before</button>
       <For each={sliders}>
         {(index) => (
-          <Slider class="slider-row" name={`slider-${index}`} defaultValue={index % 101}>
+          <Slider
+            class="slider-row"
+            name={`slider-${index}`}
+            defaultValue={index % 101}
+          >
             <SliderControl class="slider-control">
               <SliderTrack class="slider-track">
                 <SliderIndicator class="slider-indicator" />
-                <SliderThumb class="slider-thumb" aria-label={`Slider ${index + 1}`} />
+                <SliderThumb
+                  class="slider-thumb"
+                  aria-label={`Slider ${index + 1}`}
+                />
               </SliderTrack>
             </SliderControl>
           </Slider>

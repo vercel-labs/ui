@@ -19,36 +19,43 @@
 
 <Tooltip>
   <TooltipContent side="top">
-    {#snippet children(state: TooltipContentState<Day>)}{state.payload?.count}{/snippet}
+    {#snippet children(state: TooltipContentState<Day>)}{state.payload
+        ?.count}{/snippet}
   </TooltipContent>
 </Tooltip>
 <Popover>
   <PopoverContent>
-    {#snippet children(state: PopoverContentState<Day>)}{state.payload?.count}{/snippet}
+    {#snippet children(state: PopoverContentState<Day>)}{state.payload
+        ?.count}{/snippet}
   </PopoverContent>
 </Popover>
 <HoverCard>
   <HoverCardContent>
-    {#snippet children(state: HoverCardContentState<Day>)}{state.payload?.count}{/snippet}
+    {#snippet children(state: HoverCardContentState<Day>)}{state.payload
+        ?.count}{/snippet}
   </HoverCardContent>
 </HoverCard>
 <Dialog>
   <DialogContent>
-    {#snippet children(state: DialogContentState<Day>)}{state.payload?.count}{/snippet}
+    {#snippet children(state: DialogContentState<Day>)}{state.payload
+        ?.count}{/snippet}
   </DialogContent>
 </Dialog>
 <AlertDialog>
   <AlertDialogContent>
-    {#snippet children(state: DialogContentState<Day>)}{state.payload?.count}{/snippet}
+    {#snippet children(state: DialogContentState<Day>)}{state.payload
+        ?.count}{/snippet}
   </AlertDialogContent>
 </AlertDialog>
 <Drawer>
   <DrawerContent>
-    {#snippet children(state: DrawerContentState<Day>)}{state.payload?.count}{/snippet}
+    {#snippet children(state: DrawerContentState<Day>)}{state.payload
+        ?.count}{/snippet}
   </DrawerContent>
 </Drawer>
 <Menu>
   <MenuContent>
-    {#snippet children(state: MenuContentState<Day>)}{state.payload?.count}{/snippet}
+    {#snippet children(state: MenuContentState<Day>)}{state.payload
+        ?.count}{/snippet}
   </MenuContent>
 </Menu>

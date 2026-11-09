@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
-import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@ui-sdk/vue/hover-card"
+import {
+  HoverCard,
+  HoverCardArrow,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@ui-sdk/vue/hover-card"
 import {
   Select,
   SelectContent,
@@ -33,14 +38,22 @@ const align = ref<Align>("center")
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <Select :items="sides" :value="side" @value-change="(next) => next && (side = next as Side)">
+      <Select
+        :items="sides"
+        :value="side"
+        @value-change="(next) => next && (side = next as Side)"
+      >
         <SelectLabel>Side</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon aria-hidden="true" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in sides" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in sides"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon aria-hidden="true" />
@@ -48,14 +61,22 @@ const align = ref<Align>("center")
           </SelectItem>
         </SelectContent>
       </Select>
-      <Select :items="aligns" :value="align" @value-change="(next) => next && (align = next as Align)">
+      <Select
+        :items="aligns"
+        :value="align"
+        @value-change="(next) => next && (align = next as Align)"
+      >
         <SelectLabel>Align</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon aria-hidden="true" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in aligns" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in aligns"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon aria-hidden="true" />
@@ -65,7 +86,9 @@ const align = ref<Align>("center")
       </Select>
     </div>
     <HoverCard>
-      <HoverCardTrigger href="https://example.com/people/ines">@ines</HoverCardTrigger>
+      <HoverCardTrigger href="https://example.com/people/ines"
+        >@ines</HoverCardTrigger
+      >
       <HoverCardContent :side="side" :align="align" :side-offset="10">
         <HoverCardArrow />
         <p>Inès Moreau</p>

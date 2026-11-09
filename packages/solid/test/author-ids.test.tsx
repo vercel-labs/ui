@@ -2,7 +2,13 @@
 import { createSignal, flush } from "solid-js"
 import { render } from "@solidjs/web"
 import { afterEach, expect, test } from "vitest"
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "../src/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
 import { Toolbar, ToolbarLink } from "../src/toolbar"
 
@@ -81,7 +87,9 @@ test("a tab's panel follows the id passed to the tab as it changes", async () =>
   await new Promise((resolve) => setTimeout(resolve, 10))
   flush()
   expect(root.querySelector('[role="tab"]')!.id).toBe("second")
-  expect(root.querySelector('[role="tabpanel"]')!.getAttribute("aria-labelledby")).toBe("second")
+  expect(
+    root.querySelector('[role="tabpanel"]')!.getAttribute("aria-labelledby")
+  ).toBe("second")
 })
 
 test("a part whose key is its id keeps the id on its element", async () => {

@@ -1,5 +1,9 @@
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/react/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/react/password-input"
 import { EyeIcon, EyeOffIcon } from "lucide-react"
 
 function Example() {
@@ -12,7 +16,11 @@ function Example() {
           aria-label="Show password"
           render={(props, state) => (
             <button {...props}>
-              {state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />}
+              {state.visible ? (
+                <EyeOffIcon aria-hidden="true" />
+              ) : (
+                <EyeIcon aria-hidden="true" />
+              )}
             </button>
           )}
         />

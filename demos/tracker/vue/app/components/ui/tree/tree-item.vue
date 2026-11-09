@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { TreeItemCheckbox, TreeItemLabel, TreeItem as TreeItemPrimitive } from "@ui-sdk/vue/tree"
+import {
+  TreeItemCheckbox,
+  TreeItemLabel,
+  TreeItem as TreeItemPrimitive,
+} from "@ui-sdk/vue/tree"
 import { cn } from "cn"
 import TreeGroup from "./tree-group.vue"
 

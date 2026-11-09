@@ -7,7 +7,8 @@ type RingState = { focused: string | null }
 const actions = ["Reply", "Forward", "Archive", "Snooze", "Delete", "Label"]
 
 function place(action: string) {
-  const angle = (actions.indexOf(action) / actions.length) * 2 * Math.PI - Math.PI / 2
+  const angle =
+    (actions.indexOf(action) / actions.length) * 2 * Math.PI - Math.PI / 2
   return { x: Math.cos(angle), y: Math.sin(angle) }
 }
 
@@ -27,7 +28,10 @@ const ring = definePrimitive({
     action: slot<{ value: string }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      attrs: (state, part) => ({ type: "button", tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        type: "button",
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: { keydown: (event, { el, api }) => api.roving.keydown(event, el!) },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -50,7 +54,12 @@ function Example() {
             data-size="sm"
             key={action}
             value={action}
-            style={{ "--x": `${50 + x * 36}%`, "--y": `${50 + y * 36}%` } as React.CSSProperties}
+            style={
+              {
+                "--x": `${50 + x * 36}%`,
+                "--y": `${50 + y * 36}%`,
+              } as React.CSSProperties
+            }
           >
             {action}
           </RingAction>

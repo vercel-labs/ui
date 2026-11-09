@@ -21,7 +21,9 @@ import {
 const parts = createParts(toggle, { root: "button", icon: "span" })
 
 // The group's own context, so a toggle can join a group without bundling it.
-const ToggleGroupContext = React.createContext<PrimitiveHandle<typeof toggleGroup> | null>(null)
+const ToggleGroupContext = React.createContext<PrimitiveHandle<
+  typeof toggleGroup
+> | null>(null)
 
 /**
  * A button that stays pressed. Inside a ToggleGroup, the group decides whether it's pressed.
@@ -29,12 +31,19 @@ const ToggleGroupContext = React.createContext<PrimitiveHandle<typeof toggleGrou
  */
 function Toggle(
   props: ToggleOptions &
-    Omit<PartProps<"button", ToggleState>, "value" | "defaultValue" | "type" | "onChange" | "onSelect">,
+    Omit<
+      PartProps<"button", ToggleState>,
+      "value" | "defaultValue" | "type" | "onChange" | "onSelect"
+    >
 ) {
   const group = React.useContext(ToggleGroupContext)
   const toolbar = useToolbarScope()
   return (
-    <parts.Root {...props} group={group ? reading(group, () => group.api) : undefined} toolbar={toolbar} />
+    <parts.Root
+      {...props}
+      group={group ? reading(group, () => group.api) : undefined}
+      toolbar={toolbar}
+    />
   )
 }
 
@@ -63,7 +72,10 @@ function ToggleGroup<T extends string = string>({
   debug,
   ...props
 }: ToggleGroupOptions<T> &
-  Omit<PartProps<"div", ToggleGroupState<T>>, "defaultValue" | "onChange" | "onSelect">) {
+  Omit<
+    PartProps<"div", ToggleGroupState<T>>,
+    "defaultValue" | "onChange" | "onSelect"
+  >) {
   const toolbar = useToolbarScope()
   const group = usePrimitive(toggleGroup, {
     value,
@@ -81,12 +93,21 @@ function ToggleGroup<T extends string = string>({
   // The state holds only values of type `T`, which the primitive types as strings.
   return (
     <ToggleGroupContext value={group}>
-      {usePart(group, "group", {}, props as PartProps<"div", ToggleGroupState>, "div")}
+      {usePart(
+        group,
+        "group",
+        {},
+        props as PartProps<"div", ToggleGroupState>,
+        "div"
+      )}
     </ToggleGroupContext>
   )
 }
 
-export { createToggleController, createToggleGroupController } from "@ui-sdk/core/toggle"
+export {
+  createToggleController,
+  createToggleGroupController,
+} from "@ui-sdk/core/toggle"
 export type {
   ToggleApi,
   ToggleChangeOptions,

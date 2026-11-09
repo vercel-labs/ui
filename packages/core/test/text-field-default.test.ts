@@ -12,7 +12,7 @@ const defaults = [
   ["text", "Ada\nLovelace", "AdaLovelace"],
 ] as const
 
-for (const [type, defaultValue, value] of defaults)
+for (const [type, defaultValue, value] of defaults) {
   test(`the default of a ${type} input reads back as the browser keeps it`, () => {
     const el = document.body.appendChild(document.createElement("input"))
     el.type = type
@@ -20,5 +20,8 @@ for (const [type, defaultValue, value] of defaults)
     unbinds.push(bind(instance.part("root"), el))
     expect(el.value).toBe(value)
     expect(instance.api.getValue()).toBe(value)
-    expect(attrs(instance.part("root"))["data-filled"]).toBe(value ? "" : undefined)
+    expect(attrs(instance.part("root"))["data-filled"]).toBe(
+      value ? "" : undefined
+    )
   })
+}

@@ -13,15 +13,25 @@ type Virtual = {
 async function record(page: Page, steps: () => Promise<void>) {
   await page.waitForFunction(() => "virtual" in window)
   await page.evaluate(() =>
-    (window as unknown as { virtual: Virtual }).virtual.start({ container: document.body }),
+    (window as unknown as { virtual: Virtual }).virtual.start({
+      container: document.body,
+    })
   )
   await steps()
-  const log = await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog())
-  await page.evaluate(() => (window as unknown as { virtual: Virtual }).virtual.stop())
+  const log = await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.spokenPhraseLog()
+  )
+  await page.evaluate(() =>
+    (window as unknown as { virtual: Virtual }).virtual.stop()
+  )
   return log
 }
 
-test("announcements while choosing with a keyboard", async ({ page, open, tab }) => {
+test("announcements while choosing with a keyboard", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("select", { sr: "" })
   const trigger = page.getByRole("combobox", { name: "Fruit" })
   const log = await record(page, async () => {
@@ -36,7 +46,9 @@ test("announcements while choosing with a keyboard", async ({ page, open, tab })
     await expect(trigger).toBeFocused()
   })
   // The fixture's own status regions aren't part of the contract.
-  expect(log.filter((phrase) => !/^polite: (Last action|Submitted)/.test(phrase))).toEqual([
+  expect(
+    log.filter((phrase) => !/^polite: (Last action|Submitted)/.test(phrase))
+  ).toEqual([
     "document",
     "button, Before",
     "combobox, Fruit, has popup listbox, not expanded",

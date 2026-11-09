@@ -6,7 +6,10 @@ afterEach(() => document.body.replaceChildren())
 
 test("state derived as new objects renders once per change to their values", () => {
   let renders = 0
-  const app = mount(App, { target: document.body, props: { onrender: () => renders++ } })
+  const app = mount(App, {
+    target: document.body,
+    props: { onrender: () => renders++ },
+  })
   flushSync()
   const output = () => document.querySelector("output")!.textContent
   expect(output()).toBe("0,0")

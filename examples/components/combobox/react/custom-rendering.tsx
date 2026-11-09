@@ -8,7 +8,12 @@ import {
   ComboboxList,
   ComboboxTrigger,
 } from "@ui-sdk/react/combobox"
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, SearchIcon } from "lucide-react"
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  SearchIcon,
+} from "lucide-react"
 
 const users = [
   { id: 1, name: "Hollis Grant", username: "hollis", role: "Owner" },
@@ -35,7 +40,11 @@ function Example() {
           />
           <ComboboxTrigger aria-label="Show people">
             {(state) =>
-              state.open ? <ChevronUpIcon aria-hidden="true" /> : <ChevronDownIcon aria-hidden="true" />
+              state.open ? (
+                <ChevronUpIcon aria-hidden="true" />
+              ) : (
+                <ChevronDownIcon aria-hidden="true" />
+              )
             }
           </ComboboxTrigger>
         </div>
@@ -44,7 +53,12 @@ function Example() {
         <ComboboxEmpty>No one by that name.</ComboboxEmpty>
         <ComboboxList>
           {users.map((user) => (
-            <ComboboxItem key={user.id} value={user.username} label={user.name} keywords={[user.username]}>
+            <ComboboxItem
+              key={user.id}
+              value={user.username}
+              label={user.name}
+              keywords={[user.username]}
+            >
               {(state) => (
                 <>
                   <span data-slot="badge">{user.name.slice(0, 1)}</span>

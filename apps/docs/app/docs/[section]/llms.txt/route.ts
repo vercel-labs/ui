@@ -13,11 +13,21 @@ export function generateStaticParams() {
 // A section as one Markdown file for an agent's context. A framework's is
 // its guide and every component's reference, Core's and Agents' the whole
 // section, which is written for agents.
-export async function GET(_: Request, { params }: { params: Promise<{ section: string }> }) {
+export async function GET(
+  _: Request,
+  { params }: { params: Promise<{ section: string }> }
+) {
   const { section } = await params
-  if (!isSection(section)) notFound()
+  if (!isSection(section)) {
+    notFound()
+  }
   const text = isFramework(section)
-    ? await frameworkLlms(section, ({ slugs, hash }) => `/docs/${slugs.join("/")}${hash ? `#${hash}` : ""}`)
+    ? await frameworkLlms(
+        section,
+        ({ slugs, hash }) => `/docs/${slugs.join("/")}${hash ? `#${hash}` : ""}`
+      )
     : await sectionMarkdown(section)
-  return new Response(text, { headers: { "Content-Type": "text/markdown; charset=utf-8" } })
+  return new Response(text, {
+    headers: { "Content-Type": "text/markdown; charset=utf-8" },
+  })
 }

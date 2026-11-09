@@ -3,7 +3,11 @@ import { resizableStorageKey } from "@ui-sdk/vue/resizable"
 import { savedSizes } from "tracker-data"
 import { computed } from "vue"
 import { useCookie } from "#imports"
-import { Resizable, ResizableHandle, ResizablePanel } from "~/components/ui/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "~/components/ui/resizable"
 
 defineProps<{ open: boolean }>()
 
@@ -21,17 +25,26 @@ const cookieStorage = {
 </script>
 
 <template>
-  <Resizable auto-save-id="tracker" :storage="cookieStorage" class="min-h-0 flex-1">
+  <Resizable
+    auto-save-id="tracker"
+    :storage="cookieStorage"
+    class="min-h-0 flex-1"
+  >
     <ResizablePanel
       id="list"
       :default-size="open ? sizes[0] : 100"
       :min-size="30"
-      :class="open ? 'flex min-w-0 flex-col max-md:hidden' : 'flex min-w-0 flex-col'"
+      :class="
+        open ? 'flex min-w-0 flex-col max-md:hidden' : 'flex min-w-0 flex-col'
+      "
     >
       <slot name="list" />
     </ResizablePanel>
     <template v-if="open">
-      <ResizableHandle aria-label="Resize issue details" class="max-md:hidden" />
+      <ResizableHandle
+        aria-label="Resize issue details"
+        class="max-md:hidden"
+      />
       <ResizablePanel
         id="detail"
         :default-size="sizes[1]"

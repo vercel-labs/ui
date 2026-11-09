@@ -17,13 +17,19 @@ function Fixture() {
   return (
     <div className="fixture">
       <button>Before</button>
-      <Carousel className="carousel" aria-label="Photos" onPageChange={(page) => setAction(String(page))}>
+      <Carousel
+        className="carousel"
+        aria-label="Photos"
+        onPageChange={(page) => setAction(String(page))}
+      >
         <CarouselViewport className="carousel-viewport">
           <CarouselContent>
             {slides.map((slide) => (
               <CarouselItem
                 key={slide}
-                className={(state) => `carousel-slide ${state.active ? "is-active" : "is-inactive"}`}
+                className={(state) =>
+                  `carousel-slide ${state.active ? "is-active" : "is-inactive"}`
+                }
               >
                 {slide}
               </CarouselItem>
@@ -32,7 +38,9 @@ function Fixture() {
         </CarouselViewport>
         <CarouselNext
           render={(props, state) => (
-            <button {...props}>{state.disabled ? "No more photos" : "Next photo"}</button>
+            <button {...props}>
+              {state.disabled ? "No more photos" : "Next photo"}
+            </button>
           )}
         />
         <CarouselIndicatorGroup aria-label="Choose a photo">

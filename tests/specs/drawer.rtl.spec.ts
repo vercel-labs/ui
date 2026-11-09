@@ -1,5 +1,11 @@
 import { expect, test } from "../fixtures"
-import { drawerDialog, drawerTrigger, openDrawer, pointerDrag, sheetRect } from "./drawer.helpers"
+import {
+  drawerDialog,
+  drawerTrigger,
+  openDrawer,
+  pointerDrag,
+  sheetRect,
+} from "./drawer.helpers"
 
 // Logical sides follow the writing direction: start is the right edge in a
 // right-to-left layout, and dragging toward it closes the drawer. The
@@ -13,7 +19,7 @@ test(
     await openDrawer(page)
     expect((await sheetRect(page)).right).toBe(page.viewportSize()!.width)
     await expect(drawerDialog(page)).toHaveAttribute("data-side", "right")
-  },
+  }
 )
 
 test(
@@ -24,7 +30,7 @@ test(
     await openDrawer(page)
     expect((await sheetRect(page)).left).toBe(0)
     await expect(drawerDialog(page)).toHaveAttribute("data-side", "left")
-  },
+  }
 )
 
 test(
@@ -33,8 +39,14 @@ test(
   async ({ page, open }) => {
     await open("drawer", { dir: "rtl", side: "start" })
     await openDrawer(page)
-    await pointerDrag(page, { from: "Move goal", dy: 0, dx: 240, steps: 20, interval: 30 })
+    await pointerDrag(page, {
+      from: "Move goal",
+      dy: 0,
+      dx: 240,
+      steps: 20,
+      interval: 30,
+    })
     await expect(drawerDialog(page)).toBeHidden()
     await expect(drawerTrigger(page)).toBeFocused()
-  },
+  }
 )

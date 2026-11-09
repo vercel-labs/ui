@@ -8,7 +8,11 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui-sdk/vue"
     <HoverCard :delay="100" :close-delay="100">
       <HoverCardTrigger>
         <template #render="{ props, state }">
-          <a v-bind="props" href="#repo" :class="state.open ? 'is-open' : 'is-closed'">
+          <a
+            v-bind="props"
+            href="#repo"
+            :class="state.open ? 'is-open' : 'is-closed'"
+          >
             ui-sdk <span aria-hidden="true">{{ state.open ? "▲" : "▼" }}</span>
           </a>
         </template>

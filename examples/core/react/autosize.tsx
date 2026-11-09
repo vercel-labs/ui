@@ -27,7 +27,12 @@ const parts = createParts(autosize, { root: "textarea" })
 const Autosize = parts.Root
 
 function Example() {
-  return <Autosize aria-label="Message" placeholder="Write a message. Press Enter for a new line." />
+  return (
+    <Autosize
+      aria-label="Message"
+      placeholder="Write a message. Press Enter for a new line."
+    />
+  )
 }
 
 export { autosize, Autosize, Example }

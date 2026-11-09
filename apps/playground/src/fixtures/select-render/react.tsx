@@ -18,7 +18,9 @@ function Fixture() {
       <Select name={f.name} placeholder={f.placeholder}>
         <SelectLabel className="label">{f.label}</SelectLabel>
         <SelectTrigger
-          className={(state) => `trigger ${state.open ? "is-open" : "is-closed"}`}
+          className={(state) =>
+            `trigger ${state.open ? "is-open" : "is-closed"}`
+          }
           render={(props, state) => (
             <button {...props}>
               <SelectValue />
@@ -46,7 +48,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

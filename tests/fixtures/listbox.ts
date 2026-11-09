@@ -53,12 +53,18 @@ type ListboxFixtureItem = { value: string; label: string; disabled?: boolean }
 
 // The items as data, grouped with ?grouped, for data fixtures.
 function listboxData(grouped: boolean) {
-  if (!grouped) return listboxFixture.items
+  if (!grouped) {
+    return listboxFixture.items
+  }
   const [herbs, vegetables] = listboxFixture.groups
   return [
     { type: "group" as const, label: herbs.label, items: herbs.items },
     { type: "separator" as const },
-    { type: "group" as const, label: vegetables.label, items: vegetables.items },
+    {
+      type: "group" as const,
+      label: vegetables.label,
+      items: vegetables.items,
+    },
   ]
 }
 
@@ -77,9 +83,14 @@ function listboxOptions() {
   const activations = ["automatic", "manual"] as const
   return {
     multiple,
-    ...(value !== null && { defaultValue: multiple ? value.split(",").filter(Boolean) : value }),
+    ...(value !== null && {
+      defaultValue: multiple ? value.split(",").filter(Boolean) : value,
+    }),
     activation: activations.find((mode) => mode === activation),
-    orientation: params.get("orientation") === "horizontal" ? ("horizontal" as const) : ("vertical" as const),
+    orientation:
+      params.get("orientation") === "horizontal"
+        ? ("horizontal" as const)
+        : ("vertical" as const),
     loop: params.get("loop") !== "false",
     deselectable: params.has("deselectable"),
     grouped: params.has("grouped"),
@@ -100,7 +111,9 @@ const listboxAction = (value: unknown) =>
 // The items a spec swaps in with `changeItems`. "without-cheese" drops
 // Cheese, and "reversed" lists the items backwards.
 const changedToppings = {
-  "without-cheese": listboxFixture.items.filter((item) => item.value !== "cheese"),
+  "without-cheese": listboxFixture.items.filter(
+    (item) => item.value !== "cheese"
+  ),
   reversed: [...listboxFixture.items].reverse(),
   // Every option leaves, so none can hold the tab stop.
   none: [],

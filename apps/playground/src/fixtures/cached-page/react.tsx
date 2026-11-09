@@ -22,7 +22,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@ui-sdk/react/drawer"
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/react/popover"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/react/popover"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { presentationOption } from "tests/fixtures/presentation.ts"
@@ -33,7 +39,9 @@ import { presentationOption } from "tests/fixtures/presentation.ts"
 // rendered in place or into ?container=id, and as a sheet with
 // ?presentation=sheet where it can be one.
 const params = new URLSearchParams(location.search)
-const container = params.has("container") ? document.getElementById(params.get("container")!) : undefined
+const container = params.has("container")
+  ? document.getElementById(params.get("container")!)
+  : undefined
 const popup = params.get("popup") ?? "dialog"
 
 // The popup's title, a field to type in, a way to leave the page, and Close.
@@ -62,17 +70,22 @@ function Fields({
 }
 
 function ProfilePage({ onLeave }: { onLeave: () => void }) {
-  if (popup === "alert-dialog")
+  if (popup === "alert-dialog") {
     return (
       <AlertDialog container={container}>
         <AlertDialogTrigger>Edit profile</AlertDialogTrigger>
         <AlertDialogBackdrop className="dialog-backdrop" />
         <AlertDialogContent className="dialog">
-          <Fields Title={AlertDialogTitle} Close={AlertDialogClose} onLeave={onLeave} />
+          <Fields
+            Title={AlertDialogTitle}
+            Close={AlertDialogClose}
+            onLeave={onLeave}
+          />
         </AlertDialogContent>
       </AlertDialog>
     )
-  if (popup === "drawer")
+  }
+  if (popup === "drawer") {
     return (
       <Drawer container={container}>
         <DrawerTrigger>Edit profile</DrawerTrigger>
@@ -82,7 +95,8 @@ function ProfilePage({ onLeave }: { onLeave: () => void }) {
         </DrawerContent>
       </Drawer>
     )
-  if (popup === "popover")
+  }
+  if (popup === "popover") {
     return (
       <Popover container={container} modal {...presentationOption()}>
         <PopoverTrigger>Edit profile</PopoverTrigger>
@@ -91,6 +105,7 @@ function ProfilePage({ onLeave }: { onLeave: () => void }) {
         </PopoverContent>
       </Popover>
     )
+  }
   return (
     <Dialog container={container} {...presentationOption()}>
       <DialogTrigger>Edit profile</DialogTrigger>
@@ -125,7 +140,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

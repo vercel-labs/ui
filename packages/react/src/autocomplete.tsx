@@ -88,7 +88,9 @@ function Autocomplete({ children, container, ...options }: AutocompleteProps) {
       <ContainerContext.Provider value={container}>
         <SheetHeaderContext.Provider value={header}>
           <Placed value={place}>{children}</Placed>
-          <Placed value={null}>{options.items && !own && <AutocompleteContent />}</Placed>
+          <Placed value={null}>
+            {options.items && !own && <AutocompleteContent />}
+          </Placed>
         </SheetHeaderContext.Provider>
       </ContainerContext.Provider>
     </HandleScope>
@@ -108,9 +110,15 @@ const AutocompleteLabel = parts.Label
 function AutocompleteInput({
   render,
   ...props
-}: Omit<PartProps<"input", AutocompleteInputState>, "value" | "defaultValue" | "children" | "readOnly">) {
+}: Omit<
+  PartProps<"input", AutocompleteInputState>,
+  "value" | "defaultValue" | "children" | "readOnly"
+>) {
   const [header] = React.useContext(SheetHeaderContext)
-  const element = { ...props, render: controlRender(useFieldControl(props), "input", render) }
+  const element = {
+    ...props,
+    render: controlRender(useFieldControl(props), "input", render),
+  }
   // While the popup presents as a sheet, the input renders in its header.
   const input = usePart(autocompletePrimitive, "input", {}, element, "input")
   return input && inSheetHeader(input, header)
@@ -167,7 +175,8 @@ function AutocompleteContent({
       {sheetHeader(autocomplete, setHeader)}
       {typeof children === "function"
         ? children(state)
-        : (children ?? (state.items && autocomplete.state.items && <AutocompleteList />))}
+        : (children ??
+          (state.items && autocomplete.state.items && <AutocompleteList />))}
     </>
   )
   const element = usePart(autocomplete, "content", content, {
@@ -182,34 +191,56 @@ function AutocompleteContent({
  * The listbox. Without children, it renders the autocomplete's `items`, filtered.
  * @stable
  */
-function AutocompleteList({ children = listItems, ...props }: PartProps<"div", AutocompleteContentState>) {
+function AutocompleteList({
+  children = listItems,
+  ...props
+}: PartProps<"div", AutocompleteContentState>) {
   return usePart(autocompletePrimitive, "list", {}, { ...props, children })
 }
 
 // From the part's state, so new items re-render the list. Without items it's empty.
-const listItems = (state: AutocompleteContentState) => <AutocompleteItems items={state.items} />
+const listItems = (state: AutocompleteContentState) => (
+  <AutocompleteItems items={state.items} />
+)
 
 /**
  * A suggestion. Choosing it fills the field in with its text.
  * @stable
  */
 const AutocompleteItem = parts.Item as (
-  props: Omit<PartProps<"div", AutocompleteItemState>, Clashing> & AutocompleteItemProps,
+  props: Omit<PartProps<"div", AutocompleteItemState>, Clashing> &
+    AutocompleteItemProps
 ) => React.ReactNode
 
 /**
  * The suggestion's text, with the part the field's text matched in `<mark>`. Without string content, it shows the suggestion's label.
  * @stable
  */
-function AutocompleteItemText({ children, ...props }: PartProps<"span", AutocompleteItemTextState>) {
+function AutocompleteItemText({
+  children,
+  ...props
+}: PartProps<"span", AutocompleteItemTextState>) {
   const item = useAround(autocompletePrimitive, "item")
-  if (!item) throw new Error("<AutocompleteItemText> must be used inside <AutocompleteItem>.")
-  const part = { id: item.value as string, text: textToMark(children, (item.label ?? item.value) as string) }
+  if (!item) {
+    throw new Error(
+      "<AutocompleteItemText> must be used inside <AutocompleteItem>."
+    )
+  }
+  const part = {
+    id: item.value as string,
+    text: textToMark(children, (item.label ?? item.value) as string),
+  }
   const content =
     typeof children === "function"
       ? children
       : (state: AutocompleteItemTextState) => markSegments(state.segments)
-  return usePart(autocompletePrimitive, "item-text", part, { ...props, children: content }, "span")
+  return usePart(
+    autocompletePrimitive,
+    "item-text",
+    part,
+    { ...props, children: content },
+    "span"
+  )
 }
 
 /**
@@ -241,10 +272,22 @@ const AutocompleteSeparator = parts.Separator
  * Shown while no suggestion matches. Its message is announced when it appears.
  * @stable
  */
-function AutocompleteEmpty({ children, ...props }: PartProps<"div", AutocompleteEmptyState>) {
+function AutocompleteEmpty({
+  children,
+  ...props
+}: PartProps<"div", AutocompleteEmptyState>) {
   const content = (state: AutocompleteEmptyState) =>
-    typeof children === "function" ? children(state) : state.empty ? children : null
-  return usePart(autocompletePrimitive, "empty", {}, { ...props, children: content })
+    typeof children === "function"
+      ? children(state)
+      : state.empty
+        ? children
+        : null
+  return usePart(
+    autocompletePrimitive,
+    "empty",
+    {},
+    { ...props, children: content }
+  )
 }
 
 /**

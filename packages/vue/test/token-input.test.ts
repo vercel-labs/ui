@@ -1,7 +1,12 @@
 // @vitest-environment jsdom
 import { afterEach, expect, test } from "vitest"
 import { createApp, h, nextTick, ref, type App } from "vue"
-import { fromText, TokenInput, TokenInputEditor, TokenInputToken } from "../src/token-input"
+import {
+  fromText,
+  TokenInput,
+  TokenInputEditor,
+  TokenInputToken,
+} from "../src/token-input"
 
 let app: App | undefined
 afterEach(() => {
@@ -12,7 +17,9 @@ afterEach(() => {
 
 // What each token's host shows: its content, then its kind.
 const hosts = () =>
-  [...document.querySelectorAll("[data-slot='token-input-host']")].map((host) => host.textContent)
+  [...document.querySelectorAll("[data-slot='token-input-host']")].map(
+    (host) => host.textContent
+  )
 
 test("tokens a token input starts with show only the token slot, or their label without it", async () => {
   const custom = ref(true)
@@ -24,15 +31,18 @@ test("tokens a token input starts with show only the token slot, or their label 
       {
         default: () => h(TokenInputEditor, { "aria-label": "Prompt" }),
         ...(custom.value && {
-          token: ({ token }: { token: { label: string } }) => h(TokenInputToken, () => token.label),
+          token: ({ token }: { token: { label: string } }) =>
+            h(TokenInputToken, () => token.label),
         }),
-      },
-    ),
+      }
+    )
   )
   app.mount(document.body.appendChild(document.createElement("div")))
   await nextTick()
   expect(hosts()).toEqual(["routes.ts file"])
-  expect(document.querySelectorAll("[data-slot='token-input-token']")).toHaveLength(1)
+  expect(
+    document.querySelectorAll("[data-slot='token-input-token']")
+  ).toHaveLength(1)
   custom.value = false
   await nextTick()
   expect(hosts()).toEqual(["routes.ts file"])
@@ -40,5 +50,7 @@ test("tokens a token input starts with show only the token slot, or their label 
   custom.value = true
   await nextTick()
   expect(hosts()).toEqual(["routes.ts file"])
-  expect(document.querySelectorAll("[data-slot='token-input-token']")).toHaveLength(1)
+  expect(
+    document.querySelectorAll("[data-slot='token-input-token']")
+  ).toHaveLength(1)
 })

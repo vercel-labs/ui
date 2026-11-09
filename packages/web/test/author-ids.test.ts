@@ -8,7 +8,9 @@ import { defineTabsElements } from "../src/tabs"
 const wait = () => new Promise((resolve) => setTimeout(resolve, 10))
 
 test("a dialog trigger's button keeps its id, and the dialog points at it", async () => {
-  ;(Element.prototype as { getAnimations?: () => Animation[] }).getAnimations ??= () => []
+  ;(
+    Element.prototype as { getAnimations?: () => Animation[] }
+  ).getAnimations ??= () => []
   defineDialogElements()
   document.body.innerHTML = `<ui-dialog><ui-dialog-trigger><button id="mine">Edit</button></ui-dialog-trigger><ui-dialog-content id="sheet"><ui-dialog-title id="heading">Profile</ui-dialog-title><ui-dialog-description id="hint">Change it.</ui-dialog-description></ui-dialog-content></ui-dialog>`
   await wait()

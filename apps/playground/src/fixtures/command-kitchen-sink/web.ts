@@ -4,9 +4,17 @@ import "@ui-sdk/web/command"
 import "@ui-sdk/web/dialog"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
-import { filterOf, listOf, pagesOf, runner, search, type Variant } from "./variants"
+import {
+  filterOf,
+  listOf,
+  pagesOf,
+  runner,
+  search,
+  type Variant,
+} from "./variants"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 type CommandElement = HTMLElement & {
   items?: CommandData
@@ -17,11 +25,15 @@ type CommandElement = HTMLElement & {
   pages?: string[]
 }
 
-type ActionDetail = { value: string; waitUntil: (promise: Promise<unknown>) => void }
+type ActionDetail = {
+  value: string
+  waitUntil: (promise: Promise<unknown>) => void
+}
 
 function item(entry: CommandDataItem | string) {
-  if (typeof entry === "string")
+  if (typeof entry === "string") {
     return `<ui-command-item class="${classes.item}" value="${entry}">${entry}</ui-command-item>`
+  }
   return `<ui-command-item class="${classes.item}" value="${entry.value}" label="${entry.label}"${entry.keywords ? ` keywords="${entry.keywords.join(",")}"` : ""}${entry.disabled ? " disabled" : ""}${entry.shortcut ? ` shortcut="${entry.shortcut}"` : ""}${entry.items ? ` page="${entry.value}"` : ""}>${entry.label}${entry.shortcut ? `<ui-command-shortcut class="${classes.shortcut}"></ui-command-shortcut>` : ""}</ui-command-item>`
 }
 
@@ -29,11 +41,15 @@ function item(entry: CommandDataItem | string) {
 function items(list: CommandData) {
   return list
     .map((entry) => {
-      if (typeof entry === "string") return item(entry)
-      if ("type" in entry && entry.type === "separator")
+      if (typeof entry === "string") {
+        return item(entry)
+      }
+      if ("type" in entry && entry.type === "separator") {
         return `<ui-command-separator class="${classes.separator}"></ui-command-separator>`
-      if ("type" in entry && entry.type === "group")
+      }
+      if ("type" in entry && entry.type === "group") {
         return `<ui-command-group><ui-command-group-label class="${classes.groupLabel}">${entry.label}</ui-command-group-label>${entry.items.map(item).join("")}</ui-command-group>`
+      }
       return item(entry as CommandDataItem)
     })
     .join("")
@@ -42,9 +58,14 @@ function items(list: CommandData) {
 // The list's markup: its commands, with a CommandPage for the first page and each nested one.
 function composed(list: CommandData) {
   const nested = pagesOf(list)
-  if (!nested.length) return items(list)
+  if (!nested.length) {
+    return items(list)
+  }
   return `<ui-command-page>${items(list)}</ui-command-page>${nested
-    .map((page) => `<ui-command-page value="${page.value}">${items(page.items)}</ui-command-page>`)
+    .map(
+      (page) =>
+        `<ui-command-page value="${page.value}">${items(page.items)}</ui-command-page>`
+    )
     .join("")}`
 }
 
@@ -56,7 +77,10 @@ const template = `<template>
 </template>`
 
 function button(label: string, run: () => void) {
-  const el = Object.assign(document.createElement("button"), { type: "button", className: classes.button })
+  const el = Object.assign(document.createElement("button"), {
+    type: "button",
+    className: classes.button,
+  })
   el.textContent = label
   el.addEventListener("click", run)
   return el
@@ -65,18 +89,42 @@ function button(label: string, run: () => void) {
 function commandElement(variant: Variant, env: Env, onRan?: () => void) {
   const command = document.createElement("ui-command") as CommandElement
   command.className = variant.dialog ? classes.dialogRoot : classes.root
-  const { defaultValue, defaultQuery, defaultPages, filter, status, ...options } = variant.options ?? {}
-  for (const [option, value] of Object.entries(options)) command.setAttribute(kebab(option), String(value))
-  if (defaultValue !== undefined) command.setAttribute("default-value", defaultValue)
-  if (defaultQuery !== undefined) command.setAttribute("default-query", defaultQuery)
-  if (defaultPages) command.setAttribute("default-pages", defaultPages.join(","))
-  if (status) command.setAttribute("status", status)
+  const {
+    defaultValue,
+    defaultQuery,
+    defaultPages,
+    filter,
+    status,
+    ...options
+  } = variant.options ?? {}
+  for (const [option, value] of Object.entries(options)) {
+    command.setAttribute(kebab(option), String(value))
+  }
+  if (defaultValue !== undefined) {
+    command.setAttribute("default-value", defaultValue)
+  }
+  if (defaultQuery !== undefined) {
+    command.setAttribute("default-query", defaultQuery)
+  }
+  if (defaultPages) {
+    command.setAttribute("default-pages", defaultPages.join(","))
+  }
+  if (status) {
+    command.setAttribute("status", status)
+  }
   // Named filters are an attribute. A function, or false, is the `filter` property.
-  if (typeof filter === "string" && filter !== "function") command.setAttribute("filter", filter)
-  else if (filter !== undefined) command.filter = filterOf(variant)
-  if (env.controller) command.controller = env.controller
+  if (typeof filter === "string" && filter !== "function") {
+    command.setAttribute("filter", filter)
+  } else if (filter !== undefined) {
+    command.filter = filterOf(variant)
+  }
+  if (env.controller) {
+    command.controller = env.controller
+  }
   const data = variant.mode === "data" || !!variant.async
-  if (data) command.items = variant.async ? [] : listOf(variant)
+  if (data) {
+    command.items = variant.async ? [] : listOf(variant)
+  }
 
   command.innerHTML = `
     <div data-breadcrumb class="${classes.breadcrumb}" hidden></div>
@@ -89,7 +137,8 @@ function commandElement(variant: Variant, env: Env, onRan?: () => void) {
 
   // Callbacks are DOM events on the element, with the value and the reason in `detail`.
   const detail = (event: Event) =>
-    (event as CustomEvent<{ value: unknown; reason?: string; index?: number }>).detail
+    (event as CustomEvent<{ value: unknown; reason?: string; index?: number }>)
+      .detail
   const breadcrumb = command.querySelector<HTMLElement>("[data-breadcrumb]")!
   const showPages = (pages: string[]) => {
     breadcrumb.hidden = !pages.length
@@ -112,7 +161,9 @@ function commandElement(variant: Variant, env: Env, onRan?: () => void) {
   // Items fire `select` before the command runs. The input's own `select`, for selected text, is skipped.
   command.addEventListener("select", (event) => {
     const target = event.target as Element
-    if (target.matches("ui-command-item")) env.log(`select ${target.getAttribute("value")}`)
+    if (target.matches("ui-command-item")) {
+      env.log(`select ${target.getAttribute("value")}`)
+    }
   })
   // `action` hands `waitUntil()`, so a Promise keeps the command pending. Web items have no callback that
   // returns one, so `select` variants wait here too.
@@ -122,12 +173,16 @@ function commandElement(variant: Variant, env: Env, onRan?: () => void) {
     onRan?.()
     const pending = run(value)
     // The command's error state takes the rejection. Web components can't show it, so it's logged.
-    if (pending) waitUntil(pending)
+    if (pending) {
+      waitUntil(pending)
+    }
   })
 
   // Async results: the helper loads for the text, and its state feeds the element.
   if (variant.async) {
-    const remote = createAsyncOptions(search(variant.async), { immediate: true })
+    const remote = createAsyncOptions(search(variant.async), {
+      immediate: true,
+    })
     const statusPart = command.querySelector("ui-command-status")!
     command.setAttribute("filter", "false")
     remote.subscribe(() => {
@@ -141,7 +196,9 @@ function commandElement(variant: Variant, env: Env, onRan?: () => void) {
             ? "Couldn't load commands."
             : `${state.items.length} results`
     })
-    command.addEventListener("querychange", (event) => remote.setQuery(detail(event).value as string))
+    command.addEventListener("querychange", (event) =>
+      remote.setQuery(detail(event).value as string)
+    )
   }
   return command
 }
@@ -150,7 +207,9 @@ function mount(root: HTMLElement) {
   kitchenSink(root, "web", (slot, variant, env) => {
     if (variant.dialog) {
       // A command palette: the list in a dialog that ⌘K or Ctrl+K opens. Running a command closes it.
-      const dialog = document.createElement("ui-dialog") as HTMLElement & { api?: { close: () => void } }
+      const dialog = document.createElement("ui-dialog") as HTMLElement & {
+        api?: { close: () => void }
+      }
       dialog.innerHTML = `
         <ui-dialog-trigger shortcut="mod+k"><button class="${classes.trigger}">Open command palette <ui-dialog-shortcut class="${classes.shortcut}"></ui-dialog-shortcut></button></ui-dialog-trigger>
         <ui-dialog-backdrop class="${classes.dialogBackdrop}"></ui-dialog-backdrop>
@@ -162,8 +221,12 @@ function mount(root: HTMLElement) {
         .querySelector("ui-dialog-content")!
         .append(commandElement(variant, env, () => dialog.api?.close()))
       dialog.addEventListener("openchange", (event) => {
-        if (event.target !== dialog) return
-        const { value, reason } = (event as CustomEvent<{ value: boolean; reason: string }>).detail
+        if (event.target !== dialog) {
+          return
+        }
+        const { value, reason } = (
+          event as CustomEvent<{ value: boolean; reason: string }>
+        ).detail
         env.log(`dialog openChange ${value} (${reason})`)
       })
       slot.append(dialog)
@@ -174,7 +237,9 @@ function mount(root: HTMLElement) {
     slot.append(command)
 
     // Web components have no controlled props. The state shows here, and buttons drive the element.
-    const output = Object.assign(document.createElement("span"), { className: "text-xs text-neutral-600" })
+    const output = Object.assign(document.createElement("span"), {
+      className: "text-xs text-neutral-600",
+    })
     if (variant.controlled === "value") {
       output.textContent = `value: ${JSON.stringify(command.value ?? null)}`
       command.addEventListener("valuechange", (event) => {
@@ -183,7 +248,7 @@ function mount(root: HTMLElement) {
       slot.append(
         output,
         button("Set “billing”", () => (command.value = "billing")),
-        button("Null", () => (command.value = null)),
+        button("Null", () => (command.value = null))
       )
     }
     if (variant.controlled === "query") {
@@ -194,7 +259,7 @@ function mount(root: HTMLElement) {
       slot.append(
         output,
         button("Set “cal”", () => (command.query = "cal")),
-        button("Empty", () => (command.query = "")),
+        button("Empty", () => (command.query = ""))
       )
     }
     if (variant.controlled === "pages") {
@@ -206,7 +271,7 @@ function mount(root: HTMLElement) {
         output,
         button("Theme", () => (command.pages = ["theme"])),
         button("Accent", () => (command.pages = ["theme", "accent"])),
-        button("Home", () => (command.pages = [])),
+        button("Home", () => (command.pages = []))
       )
     }
   })

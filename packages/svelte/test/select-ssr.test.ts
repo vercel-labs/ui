@@ -15,7 +15,9 @@ describe("select server rendering", () => {
   })
 
   test("a select with composed items shows the label `itemToLabel` gives before they mount", () => {
-    const body = html({ itemToLabel: (value: string) => (value === "pro" ? "Pro" : "Basic") })
+    const body = html({
+      itemToLabel: (value: string) => (value === "pro" ? "Pro" : "Basic"),
+    })
     expect(body).toMatch(/data-slot="select-value"[^>]*>(<!---->)?Pro</)
   })
 

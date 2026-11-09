@@ -8,7 +8,7 @@ async function hydrateFixture(
   root: HTMLElement,
   fixture: string,
   app: () => JSX.Element,
-  { serverForm = false, manual = false } = {},
+  { serverForm = false, manual = false } = {}
 ) {
   const errors: string[] = []
   const page = window as unknown as Record<string, unknown>
@@ -18,7 +18,9 @@ async function hydrateFixture(
   search.set("framework", "solid")
   const response = await fetch(`/__ssr?${search}`)
   root.innerHTML = await response.text()
-  if (!response.ok) throw new Error(`Server rendering ${fixture} failed:\n${root.textContent}`)
+  if (!response.ok) {
+    throw new Error(`Server rendering ${fixture} failed:\n${root.textContent}`)
+  }
   // What the page shows before hydration.
   page.__serverHtml = root.innerHTML
   page.__visibleBeforeHydration = !!root
@@ -41,8 +43,14 @@ async function hydrateFixture(
     hydrate(app, root)
   }
   // With ?hydrate=manual, the page stays server markup until window.hydrate() runs.
-  if (manual && new URLSearchParams(location.search).get("hydrate") === "manual") page.hydrate = run
-  else run()
+  if (
+    manual &&
+    new URLSearchParams(location.search).get("hydrate") === "manual"
+  ) {
+    page.hydrate = run
+  } else {
+    run()
+  }
 }
 
 export { hydrateFixture }

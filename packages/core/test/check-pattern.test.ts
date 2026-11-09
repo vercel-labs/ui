@@ -53,14 +53,20 @@ describe("our primitives pass", () => {
   })
 
   test("tabs right to left", async () => {
-    const tabsView = view(mount(tabs, { defaultValue: "b" }, tabsMarkup(`<root dir="rtl">`)))
+    const tabsView = view(
+      mount(tabs, { defaultValue: "b" }, tabsMarkup(`<root dir="rtl">`))
+    )
     await checkPattern(tabsView.root, "tabs")
     expect(tabsView.state.value).toBe("b")
   })
 
   test("vertical tabs with manual activation", async () => {
     const tabsView = view(
-      mount(tabs, { defaultValue: "a", orientation: "vertical", activation: "manual" }, tabsMarkup()),
+      mount(
+        tabs,
+        { defaultValue: "a", orientation: "vertical", activation: "manual" },
+        tabsMarkup()
+      )
     )
     await checkPattern(tabsView.root, "tabs")
     expect(tabsView.state.value).toBe("a")
@@ -76,8 +82,8 @@ describe("our primitives pass", () => {
           <item value="banana">Banana</item>
           <item value="cherry">Cherry</item>
           <item value="date">Date</item>
-        </root>`,
-      ),
+        </root>`
+      )
     )
     await checkPattern(listView.root, "listbox")
     expect(listView.state.value).toBe("banana")
@@ -92,8 +98,8 @@ describe("our primitives pass", () => {
           <item value="apple">Apple</item>
           <item value="banana">Banana</item>
           <item value="cherry">Cherry</item>
-        </root>`,
-      ),
+        </root>`
+      )
     )
     await checkPattern(listView.root, "listbox")
     expect(listView.state.value).toEqual(["cherry"])
@@ -111,8 +117,8 @@ describe("our primitives pass", () => {
             <item>Copy</item>
             <item>Paste</item>
           </content>
-        </div>`,
-      ),
+        </div>`
+      )
     )
     await menuView.click(menuView.part("trigger")!)
     await checkPattern(menuView.root, "menu")
@@ -123,8 +129,8 @@ describe("our primitives pass", () => {
       mount(
         menu,
         {},
-        `<div><trigger>File</trigger><content><item>New</item><item>Open</item><item>Save</item></content></div>`,
-      ),
+        `<div><trigger>File</trigger><content><item>New</item><item>Open</item><item>Save</item></content></div>`
+      )
     )
     ;(menuView.part("trigger") as HTMLElement).focus()
     await menuView.keys("Enter")
@@ -140,8 +146,8 @@ describe("our primitives pass", () => {
           <root value="s">Small</root>
           <root value="m">Medium</root>
           <root value="l">Large</root>
-        </group>`,
-      ),
+        </group>`
+      )
     )
     await checkPattern(radioView.root, "radio-group")
     expect(radioView.state.value).toBe("m")
@@ -156,8 +162,8 @@ describe("our primitives pass", () => {
           <button>Bold</button>
           <button>Italic</button>
           <button>Underline</button>
-        </root>`,
-      ),
+        </root>`
+      )
     )
     await checkPattern(toolbarView.root, "toolbar")
   })
@@ -177,8 +183,8 @@ describe("our primitives pass", () => {
           </item>
           <item value="docs"><label>docs</label></item>
           <item value="readme"><label>README.md</label></item>
-        </root>`,
-      ),
+        </root>`
+      )
     )
     await checkPattern(treeView.root, "tree")
   })
@@ -191,27 +197,43 @@ describe("our primitives pass", () => {
         `<root>
           <item value="a"><header as="h3"><trigger>Shipping</trigger></header><panel>Ships in a day.</panel></item>
           <item value="b"><header as="h3"><trigger>Returns</trigger></header><panel>Within a month.</panel></item>
-        </root>`,
-      ),
+        </root>`
+      )
     )
     await checkPattern(accordionView.root, "accordion")
   })
 
   test("disclosure", async () => {
     const disclosureView = view(
-      mount(collapsible, {}, `<root><trigger>Details</trigger><panel>More about it.</panel></root>`),
+      mount(
+        collapsible,
+        {},
+        `<root><trigger>Details</trigger><panel>More about it.</panel></root>`
+      )
     )
     await checkPattern(disclosureView.root, "disclosure")
   })
 
   test("switch", async () => {
-    const switchView = view(mount(switchPrimitive, {}, `<root aria-label="Wi-Fi"><thumb></thumb></root>`))
+    const switchView = view(
+      mount(
+        switchPrimitive,
+        {},
+        `<root aria-label="Wi-Fi"><thumb></thumb></root>`
+      )
+    )
     await checkPattern(switchView.root, "switch")
     expect(switchView.state.checked).toBe(false)
   })
 
   test("checkbox", async () => {
-    const checkboxView = view(mount(checkbox, {}, `<root aria-label="Accept"><indicator></indicator></root>`))
+    const checkboxView = view(
+      mount(
+        checkbox,
+        {},
+        `<root aria-label="Accept"><indicator></indicator></root>`
+      )
+    )
     await checkPattern(checkboxView.root, "checkbox")
     expect(checkboxView.state.checked).toBe(false)
   })
@@ -221,8 +243,8 @@ describe("our primitives pass", () => {
       mount(
         checkbox,
         { defaultChecked: "indeterminate" },
-        `<root aria-label="All"><indicator></indicator></root>`,
-      ),
+        `<root aria-label="All"><indicator></indicator></root>`
+      )
     )
     await checkPattern(checkboxView.root, "checkbox")
   })
@@ -234,8 +256,8 @@ describe("our primitives pass", () => {
         { defaultValue: 30 },
         `<root aria-label="Volume">
           <control><track><indicator></indicator><thumb><thumb-input aria-label="Volume"></thumb-input></thumb></track></control>
-        </root>`,
-      ),
+        </root>`
+      )
     )
     await checkPattern(sliderView.root, "slider")
   })
@@ -249,8 +271,8 @@ describe("our primitives pass", () => {
           <trigger>Share</trigger>
           <content><title>Share</title><button>Copy link</button><close>Close</close></content>
           <button>After</button>
-        </div>`,
-      ),
+        </div>`
+      )
     )
     await popoverView.click(popoverView.part("trigger")!)
     await checkPattern(popoverView.root, "dialog")
@@ -264,8 +286,8 @@ describe("our primitives pass", () => {
         `<div>
           <trigger>Open</trigger>
           <content><title>Settings</title><button>Save</button><close>Close</close></content>
-        </div>`,
-      ),
+        </div>`
+      )
     )
     await dialogView.click(dialogView.part("trigger")!)
     await checkPattern(dialogView.root, "dialog")
@@ -283,8 +305,8 @@ describe("our primitives pass", () => {
             <description>It can't be undone.</description>
             <close>Cancel</close>
           </content>
-        </div>`,
-      ),
+        </div>`
+      )
     )
     await alertView.click(alertView.part("trigger")!)
     await checkPattern(alertView.root, "alertdialog")
@@ -302,14 +324,18 @@ describe("our primitives pass", () => {
   </root>`
 
   test("combobox, open", async () => {
-    const comboboxView = view(mount(combobox, { items: ["Apple", "Banana", "Cherry"] }, comboboxMarkup))
+    const comboboxView = view(
+      mount(combobox, { items: ["Apple", "Banana", "Cherry"] }, comboboxMarkup)
+    )
     ;(comboboxView.part("input") as HTMLElement).focus()
     await comboboxView.keys("ArrowDown")
     await checkPattern(comboboxView.root, "combobox")
   })
 
   test("combobox, closed", async () => {
-    const comboboxView = view(mount(combobox, { items: ["Apple", "Banana", "Cherry"] }, comboboxMarkup))
+    const comboboxView = view(
+      mount(combobox, { items: ["Apple", "Banana", "Cherry"] }, comboboxMarkup)
+    )
     await checkPattern(comboboxView.root, "combobox")
   })
 })
@@ -331,7 +357,11 @@ function rove(
     next = "ArrowDown",
     previous = "ArrowUp",
     onMove,
-  }: { next?: string; previous?: string; onMove?: (item: HTMLElement) => void } = {},
+  }: {
+    next?: string
+    previous?: string
+    onMove?: (item: HTMLElement) => void
+  } = {}
 ) {
   container.addEventListener("keydown", (event) => {
     const items = [...container.querySelectorAll<HTMLElement>(selector)]
@@ -342,10 +372,14 @@ function rove(
       Home: 0,
       End: items.length - 1,
     }
-    if (!(event.key in moves)) return
+    if (!(event.key in moves)) {
+      return
+    }
     event.preventDefault()
     const target = items[(moves[event.key] + items.length) % items.length]
-    for (const item of items) item.tabIndex = item === target ? 0 : -1
+    for (const item of items) {
+      item.tabIndex = item === target ? 0 : -1
+    }
     target.focus()
     onMove?.(target)
   })
@@ -354,8 +388,11 @@ function rove(
 
 // Selection that follows focus, by aria-selected.
 const selectOnly = (selector: string) => (item: HTMLElement) => {
-  for (const other of item.closest("[role]")!.parentElement!.querySelectorAll(selector))
+  for (const other of item
+    .closest("[role]")!
+    .parentElement!.querySelectorAll(selector)) {
     other.setAttribute("aria-selected", String(other === item))
+  }
 }
 
 // Our menubar composes a menu instance per item, and `mount` renders one primitive.
@@ -390,10 +427,19 @@ test("a hand-made vertical menubar passes, its menus opening with ArrowRight", a
   const openMenu = (open: boolean) => {
     fileMenu.hidden = !open
     file.setAttribute("aria-expanded", String(open))
-    ;(open ? fileMenu.querySelector<HTMLElement>("[role=menuitem]")! : file).focus()
+    ;(open
+      ? fileMenu.querySelector<HTMLElement>("[role=menuitem]")!
+      : file
+    ).focus()
   }
-  file.addEventListener("keydown", (event) => event.key === "ArrowRight" && openMenu(true))
-  fileMenu.addEventListener("keydown", (event) => event.key === "Escape" && openMenu(false))
+  file.addEventListener(
+    "keydown",
+    (event) => event.key === "ArrowRight" && openMenu(true)
+  )
+  fileMenu.addEventListener(
+    "keydown",
+    (event) => event.key === "Escape" && openMenu(false)
+  )
   await checkPattern(root, "menubar")
 })
 
@@ -412,9 +458,14 @@ test("a hand-made slider with a range past a hundred steps gets its value back",
   }
   root.addEventListener("keydown", (event) => {
     const move = moves[event.key]
-    if (!move) return
+    if (!move) {
+      return
+    }
     event.preventDefault()
-    const value = Math.min(1000, Math.max(0, move(Number(root.getAttribute("aria-valuenow")))))
+    const value = Math.min(
+      1000,
+      Math.max(0, move(Number(root.getAttribute("aria-valuenow"))))
+    )
     root.setAttribute("aria-valuenow", String(value))
   })
   await checkPattern(root, "slider")
@@ -436,9 +487,14 @@ test("a hand-made slider with fractional steps gets its value back", async () =>
   }
   root.addEventListener("keydown", (event) => {
     const move = moves[event.key]
-    if (!move) return
+    if (!move) {
+      return
+    }
     event.preventDefault()
-    const value = Math.min(1, Math.max(0, move(Number(root.getAttribute("aria-valuenow")))))
+    const value = Math.min(
+      1,
+      Math.max(0, move(Number(root.getAttribute("aria-valuenow"))))
+    )
     root.setAttribute("aria-valuenow", String(Number(value.toFixed(6))))
   })
   await checkPattern(root, "slider")
@@ -456,7 +512,9 @@ function gridCombobox(haspopup: string) {
   const input = root.querySelector("input")!
   const grid = root.querySelector<HTMLElement>("[role=grid]")!
   input.addEventListener("keydown", (event) => {
-    if (event.key !== "ArrowDown" && event.key !== "Escape") return
+    if (event.key !== "ArrowDown" && event.key !== "Escape") {
+      return
+    }
     grid.hidden = event.key === "Escape"
     input.setAttribute("aria-expanded", String(!grid.hidden))
   })
@@ -481,7 +539,9 @@ test("id references inside a shadow root resolve in that shadow root", () => {
   expect(triggerOf(list)).toBe(input)
   const lookalike = render(`<div><span id="other"></span></div>`)
   input.setAttribute("aria-describedby", "other")
-  expect(danglingReferences(input)).toMatchObject([{ attribute: "aria-describedby", id: "other" }])
+  expect(danglingReferences(input)).toMatchObject([
+    { attribute: "aria-describedby", id: "other" },
+  ])
   lookalike.remove()
 })
 
@@ -493,7 +553,9 @@ test("a hand-made listbox passes when its styles hide an option, which arrows sk
       <div role="option" aria-selected="false" tabindex="-1" style="display: none">Apricot</div>
       <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
     </div>`)
-  rove(root, "[role=option]:not([style])", { onMove: selectOnly("[role=option]") })
+  rove(root, "[role=option]:not([style])", {
+    onMove: selectOnly("[role=option]"),
+  })
   await checkPattern(root, "listbox")
 })
 
@@ -507,7 +569,9 @@ test("a hand-made listbox passes when a stylesheet hides the group around option
       <div role="option" aria-selected="false" tabindex="-1">Avocado</div>
     </div>
     </div>`)
-  rove(root, "[role=listbox] > [role=option]", { onMove: selectOnly("[role=option]") })
+  rove(root, "[role=listbox] > [role=option]", {
+    onMove: selectOnly("[role=option]"),
+  })
   await checkPattern(root, "listbox")
 })
 
@@ -521,7 +585,10 @@ test("a hand-made toolbar passes when a stylesheet hides a control, which arrows
       <button tabindex="-1">Underline</button>
     </div>
     </div>`)
-  rove(root, "[role=toolbar] > button", { next: "ArrowRight", previous: "ArrowLeft" })
+  rove(root, "[role=toolbar] > button", {
+    next: "ArrowRight",
+    previous: "ArrowLeft",
+  })
   await checkPattern(root, "toolbar")
 })
 
@@ -542,7 +609,9 @@ test("a hand-made listbox passes when the slot it renders an option in is hidden
   </div>`)
   root.attachShadow({ mode: "open" }).innerHTML =
     `<slot></slot><slot name="closed" style="display: none"></slot>`
-  rove(root, "[role=option]:not([slot])", { onMove: selectOnly("[role=option]") })
+  rove(root, "[role=option]:not([slot])", {
+    onMove: selectOnly("[role=option]"),
+  })
   await checkPattern(root, "listbox")
 })
 
@@ -564,7 +633,9 @@ describe("broken markup fails", () => {
           <div role="group" style="display: none"><div role="treeitem" tabindex="-1">index.ts</div></div>
         </div>
       </div>`)
-    await expect(checkPattern(root, "tree")).rejects.toThrow(/has child items but no aria-expanded/)
+    await expect(checkPattern(root, "tree")).rejects.toThrow(
+      /has child items but no aria-expanded/
+    )
   })
 
   test("a dialog that keeps Tab inside without aria-modal", async () => {
@@ -575,7 +646,9 @@ describe("broken markup fails", () => {
     const box = root.querySelector<HTMLElement>("#box")!
     // Tab wraps by hand, the way a modal dialog keeps focus inside.
     box.addEventListener("keydown", (event) => {
-      if (event.key !== "Tab") return
+      if (event.key !== "Tab") {
+        return
+      }
       event.preventDefault()
       const stops = [...box.querySelectorAll("button")]
       const next =
@@ -587,7 +660,9 @@ describe("broken markup fails", () => {
       next.focus()
     })
     root.querySelector<HTMLElement>("#one")!.focus()
-    await expect(checkPattern(root, "dialog")).rejects.toThrow(/is modal but has no aria-modal="true"/)
+    await expect(checkPattern(root, "dialog")).rejects.toThrow(
+      /is modal but has no aria-modal="true"/
+    )
   })
 
   test("a modal dialog whose Tab keeps focus where it is", async () => {
@@ -596,20 +671,28 @@ describe("broken markup fails", () => {
     </div>`)
     const box = root.querySelector<HTMLElement>("[role=dialog]")!
     box.addEventListener("keydown", (event) => {
-      if (event.key === "Tab") event.preventDefault()
-      if (event.key === "Escape") box.hidden = true
+      if (event.key === "Tab") {
+        event.preventDefault()
+      }
+      if (event.key === "Escape") {
+        box.hidden = true
+      }
     })
     root.querySelector<HTMLElement>("#one")!.focus()
-    const error = await checkPattern(root, "dialog").catch((caught: Error) => caught)
-    expect(String(error)).toContain(
-      "checkPattern found 2 problems with the dialog pattern:\n- div[role=dialog]: Tab keeps focus on button#one",
+    const error = await checkPattern(root, "dialog").catch(
+      (caught: Error) => caught
     )
-    expect(String(error)).toContain("- div[role=dialog]: Shift+Tab keeps focus on button#one")
+    expect(String(error)).toContain(
+      "checkPattern found 2 problems with the dialog pattern:\n- div[role=dialog]: Tab keeps focus on button#one"
+    )
+    expect(String(error)).toContain(
+      "- div[role=dialog]: Shift+Tab keeps focus on button#one"
+    )
   })
 
   test("a combobox with a grid popup and no aria-haspopup", async () => {
     await expect(checkPattern(gridCombobox(""), "combobox")).rejects.toThrow(
-      `checkPattern found 1 problem with the combobox pattern:\n- input[role=combobox]: controls a grid, so it has aria-haspopup="grid"`,
+      `checkPattern found 1 problem with the combobox pattern:\n- input[role=combobox]: controls a grid, so it has aria-haspopup="grid"`
     )
   })
 
@@ -626,7 +709,7 @@ describe("broken markup fails", () => {
       root.querySelector<HTMLElement>("#panel")!.hidden = expanded
     })
     await expect(checkPattern(root, "accordion")).rejects.toThrow(
-      "checkPattern found 1 problem with the accordion pattern:\n- button: has no accessible name",
+      "checkPattern found 1 problem with the accordion pattern:\n- button: has no accessible name"
     )
   })
 
@@ -646,7 +729,7 @@ describe("broken markup fails", () => {
       onMove: selectOnly("[role=tab]"),
     })
     await expect(checkPattern(root, "tabs")).rejects.toThrow(
-      "checkPattern found 1 problem with the tabs pattern:\n- div[role=tablist]: has 2 tab stops (button#tab-a[role=tab], button#tab-b[role=tab]); a composite has one",
+      "checkPattern found 1 problem with the tabs pattern:\n- div[role=tablist]: has 2 tab stops (button#tab-a[role=tab], button#tab-b[role=tab]); a composite has one"
     )
   })
 
@@ -660,7 +743,7 @@ describe("broken markup fails", () => {
       </div>`)
     rove(root, "[role=option]", { onMove: selectOnly("[role=option]") })
     await expect(checkPattern(root, "listbox")).rejects.toThrow(
-      `checkPattern found 1 problem with the listbox pattern:\n- div#apricot[role=option]: has no aria-selected`,
+      `checkPattern found 1 problem with the listbox pattern:\n- div#apricot[role=option]: has no aria-selected`
     )
   })
 
@@ -672,20 +755,28 @@ describe("broken markup fails", () => {
       </div>`)
     const button = root.querySelector("button")!
     button.addEventListener("click", () =>
-      button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true")),
+      button.setAttribute(
+        "aria-expanded",
+        String(button.getAttribute("aria-expanded") !== "true")
+      )
     )
     await expect(checkPattern(root, "disclosure")).rejects.toThrow(
-      `checkPattern found 1 problem with the disclosure pattern:\n- button "Details": aria-controls points at "details", which isn't in the page`,
+      `checkPattern found 1 problem with the disclosure pattern:\n- button "Details": aria-controls points at "details", which isn't in the page`
     )
   })
 
   test("a disclosure button with no name", async () => {
-    const button = render(`<button type="button" aria-expanded="false"></button>`)
+    const button = render(
+      `<button type="button" aria-expanded="false"></button>`
+    )
     button.addEventListener("click", () =>
-      button.setAttribute("aria-expanded", String(button.getAttribute("aria-expanded") !== "true")),
+      button.setAttribute(
+        "aria-expanded",
+        String(button.getAttribute("aria-expanded") !== "true")
+      )
     )
     await expect(checkPattern(button, "disclosure")).rejects.toThrow(
-      "checkPattern found 1 problem with the disclosure pattern:\n- button: has no accessible name",
+      "checkPattern found 1 problem with the disclosure pattern:\n- button: has no accessible name"
     )
   })
 
@@ -695,9 +786,11 @@ describe("broken markup fails", () => {
         <div role="option" id="apple" aria-selected="true" tabindex="0">Apple</div>
         <div role="option" id="banana" aria-selected="false" tabindex="-1">Banana</div>
       </div>`)
-    const error = await checkPattern(root, "listbox").catch((caught: Error) => caught)
+    const error = await checkPattern(root, "listbox").catch(
+      (caught: Error) => caught
+    )
     expect(String(error)).toContain(
-      "div#apple[role=option]: ArrowDown should move focus to the next option, div#banana[role=option], but focus stayed (APG listbox).",
+      "div#apple[role=option]: ArrowDown should move focus to the next option, div#banana[role=option], but focus stayed (APG listbox)."
     )
   })
 
@@ -711,9 +804,16 @@ describe("broken markup fails", () => {
         </div>
         <div role="tabpanel" id="panel" aria-labelledby="tab-a">Panel</div>
       </div>`)
-    rove(root.querySelector("[role=tablist]")!, "[role=tab]", { next: "ArrowRight", previous: "ArrowLeft" })
-    const error = await checkPattern(root, "tabs").catch((caught: Error) => caught)
-    expect(String(error)).toContain("button#tab-a[role=tab]: ArrowLeft should move focus to the next tab")
+    rove(root.querySelector("[role=tablist]")!, "[role=tab]", {
+      next: "ArrowRight",
+      previous: "ArrowLeft",
+    })
+    const error = await checkPattern(root, "tabs").catch(
+      (caught: Error) => caught
+    )
+    expect(String(error)).toContain(
+      "button#tab-a[role=tab]: ArrowLeft should move focus to the next tab"
+    )
   })
 
   test("a key that drops focus to the body", async () => {
@@ -723,10 +823,12 @@ describe("broken markup fails", () => {
         <button role="radio" aria-checked="false" tabindex="-1">Large</button>
       </div>`)
     root.addEventListener("keydown", (event) => {
-      if (event.key.startsWith("Arrow")) (event.target as HTMLElement).remove()
+      if (event.key.startsWith("Arrow")) {
+        ;(event.target as HTMLElement).remove()
+      }
     })
     await expect(checkPattern(root, "radio-group")).rejects.toThrow(
-      `- button[role=radio] "Small": after ArrowDown, focus fell to the body`,
+      `- button[role=radio] "Small": after ArrowDown, focus fell to the body`
     )
   })
 
@@ -736,17 +838,23 @@ describe("broken markup fails", () => {
         <div role="option" tabindex="0">Apple</div>
         <button role="option" tabindex="0">Banana</button>
       </div>`)
-    const error = await checkPattern(root, "listbox").catch((caught: Error) => caught)
+    const error = await checkPattern(root, "listbox").catch(
+      (caught: Error) => caught
+    )
     const message = String(error)
     expect(message).toContain("- div[role=listbox]: has no accessible name")
-    expect(message).toContain(`- div[role=option] "Apple": has no aria-selected`)
+    expect(message).toContain(
+      `- div[role=option] "Apple": has no aria-selected`
+    )
     expect(message).toContain("- div[role=listbox]: has 2 tab stops")
   })
 
   test("a pattern it doesn't support yet says which it does", async () => {
-    // @ts-expect-error A grid isn't a pattern it checks yet, which its type says too.
-    await expect(checkPattern(render(`<div role="grid"></div>`), "grid")).rejects.toThrow(
-      'checkPattern doesn\'t support "grid" yet. It supports listbox, menu, menubar, tabs, radio-group',
+    await expect(
+      // @ts-expect-error A grid isn't a pattern it checks yet, which its type says too.
+      checkPattern(render(`<div role="grid"></div>`), "grid")
+    ).rejects.toThrow(
+      'checkPattern doesn\'t support "grid" yet. It supports listbox, menu, menubar, tabs, radio-group'
     )
   })
 })

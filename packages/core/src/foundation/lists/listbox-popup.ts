@@ -5,13 +5,22 @@ import { type AsyncOptionsStatus } from "./async-options"
 import { isDisabled, listStepKeys } from "./listbox-parts"
 import { flagWhileBound } from "../kernel/bound-keys"
 import { pressKeepsFocus } from "../focus/press-keeps-focus"
-import { type Anchor, type PortalProps, type PositionProps } from "../platform/position"
+import {
+  type Anchor,
+  type PortalProps,
+  type PositionProps,
+} from "../platform/position"
 import { popupContentAttrs } from "../popups/popup"
 import { registerPopupElement } from "../popups/popup-elements"
 import { contentAnchor, placementOptions } from "../popups/popup-features"
 import { type SheetConfig, sheetSnapPoints } from "../popups/presentation"
 import { onProps } from "../kernel/part"
-import type { BaseSlotProps, Part, RoleFields, SlotDefinition } from "../kernel/primitive-types"
+import type {
+  BaseSlotProps,
+  Part,
+  RoleFields,
+  SlotDefinition,
+} from "../kernel/primitive-types"
 import type { Store } from "../kernel/store"
 
 type ListPopupState = {
@@ -66,7 +75,8 @@ const inputState = (state: FieldState) => ({
 })
 
 // The id of the element the field controls: the list part's, or the content's.
-const listId = (state: { listed: boolean }, id: string) => `${id}-${state.listed ? "list" : "content"}`
+const listId = (state: { listed: boolean }, id: string) =>
+  `${id}-${state.listed ? "list" : "content"}`
 
 // The label names the list, or the field does while there's no label.
 const listLabelledBy = (state: { labeled: boolean }, id: string) =>
@@ -74,7 +84,10 @@ const listLabelledBy = (state: { labeled: boolean }, id: string) =>
 
 // The popup the list opens in. It's the listbox itself until a list part
 // renders inside it, next to a header or a status.
-function listContentPart<State extends ListPopupState, Api extends ListPopupApi>() {
+function listContentPart<
+  State extends ListPopupState,
+  Api extends ListPopupApi,
+>() {
   return {
     props: {
       side: "string",
@@ -88,16 +101,19 @@ function listContentPart<State extends ListPopupState, Api extends ListPopupApi>
       keepMounted: "boolean",
     },
     connect: registerPopupElement,
-    present: (state, { props }) => state.mounted || !!props.keepMounted || !!state.prepared,
+    present: (state, { props }) =>
+      state.mounted || !!props.keepMounted || !!state.prepared,
     role: (state) => (state.listed ? "presentation" : "listbox"),
     roles: ["presentation", "listbox"],
     // Only while a screen reader moved real focus into the list. Otherwise the field's input takes them.
     keys: [...listStepKeys, "Home", "End", "Enter", " ", "typeahead"],
     attrs: (state, { id }) => ({
       ...popupContentAttrs(state, id),
-      "aria-multiselectable": !state.listed && state.multiple ? "true" : undefined,
+      "aria-multiselectable":
+        !state.listed && state.multiple ? "true" : undefined,
       "aria-labelledby": state.listed ? undefined : listLabelledBy(state, id),
-      "aria-busy": !state.listed && state.status === "loading" ? "true" : undefined,
+      "aria-busy":
+        !state.listed && state.status === "loading" ? "true" : undefined,
       "data-presentation": state.presentation,
     }),
     on: {
@@ -129,7 +145,7 @@ function bindListContent(
     anchor: () => Anchor | undefined
     aligned?: () => Anchor | false | null | undefined
     snapPoints?: SheetConfig["snapPoints"]
-  },
+  }
 ) {
   const { aligned } = config
   // Items bind in the same commit as the content. A microtask later, an empty list is really empty.
@@ -138,7 +154,12 @@ function bindListContent(
   const unloading = internal.loadMore.bind(el)
   const unbind = internal.presentation.bind(el, {
     snapPoints: config.snapPoints,
-    anchor: () => contentAnchor(el, internal.contentProps(key).anchor, () => aligned?.() || config.anchor()),
+    anchor: () =>
+      contentAnchor(
+        el,
+        internal.contentProps(key).anchor,
+        () => aligned?.() || config.anchor()
+      ),
     position: () => {
       const props = internal.contentProps(key)
       // Lined up over its anchor, it covers it.
@@ -164,7 +185,9 @@ function bindListContent(
 function listPart<State extends ListPopupState, Api>() {
   return {
     role: "listbox",
-    keys: { none: "The field's input handles them, or the content around the list once focus is in it." },
+    keys: {
+      none: "The field's input handles them, or the content around the list once focus is in it.",
+    },
     attrs: (state, { id }) => ({
       id: `${id}-list`,
       "aria-multiselectable": state.multiple ? "true" : undefined,
@@ -172,7 +195,8 @@ function listPart<State extends ListPopupState, Api>() {
       "aria-busy": state.status === "loading" ? "true" : undefined,
     }),
     bind: (el, { store }) => flagWhileBound(store, "listed"),
-  } satisfies SlotDefinition<State, Api, BaseSlotProps, {}> & RoleFields<State, Api, BaseSlotProps>
+  } satisfies SlotDefinition<State, Api, BaseSlotProps, {}> &
+    RoleFields<State, Api, BaseSlotProps>
 }
 
 export { bindListContent, inputState, listContentPart, listId, listPart }

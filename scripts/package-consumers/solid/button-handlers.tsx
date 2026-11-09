@@ -7,8 +7,11 @@ declare function markSaved(): void
 
 // Every handler form a native button takes, and the press's source after an
 // `await`. Under `strict`, a narrower `onClick` fails here.
-function Buttons(props: { onArchive: JSX.EventHandlerUnion<HTMLElement, MouseEvent> }) {
-  const remove = (id: string, event: MouseEvent) => removeRow(id, event.currentTarget)
+function Buttons(props: {
+  onArchive: JSX.EventHandlerUnion<HTMLElement, MouseEvent>
+}) {
+  const remove = (id: string, event: MouseEvent) =>
+    removeRow(id, event.currentTarget)
   const save = () => new Promise((resolve) => setTimeout(resolve, 100))
   return (
     <>

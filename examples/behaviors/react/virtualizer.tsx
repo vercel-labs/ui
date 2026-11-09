@@ -1,5 +1,10 @@
 import * as React from "react"
-import { createVirtualizer, css, definePrimitive, type VirtualItem } from "@ui-sdk/core"
+import {
+  createVirtualizer,
+  css,
+  definePrimitive,
+  type VirtualItem,
+} from "@ui-sdk/core"
 import {
   createParts,
   mergeProps,
@@ -27,7 +32,10 @@ const ledger = definePrimitive({
   state: (options: LedgerOptions) => ({ count: options.count }),
   sync: (options) => ({ count: options.count }),
   api: (context) => {
-    const virtual = createVirtualizer({ count: () => context.store.get().count, estimate: () => rowHeight })
+    const virtual = createVirtualizer({
+      count: () => context.store.get().count,
+      estimate: () => rowHeight,
+    })
     context.onDestroy(context.store.subscribe(() => virtual.refresh()))
     return { virtual }
   },
@@ -39,7 +47,10 @@ const ledger = definePrimitive({
     body: slot({
       attrs: (state) => ({
         role: "list",
-        style: css({ position: "relative", height: `${state.count * rowHeight}px` }),
+        style: css({
+          position: "relative",
+          height: `${state.count * rowHeight}px`,
+        }),
       }),
     }),
     row: slot<LedgerRowProps>({
@@ -73,7 +84,11 @@ function Ledger({
 }: LedgerOptions & PartProps<"div", LedgerRootState>) {
   const handle = usePrimitive(ledger, { count })
   const { virtual } = handle.api
-  const items = React.useSyncExternalStore(virtual.subscribe, virtual.items, virtual.items)
+  const items = React.useSyncExternalStore(
+    virtual.subscribe,
+    virtual.items,
+    virtual.items
+  )
   const own = { className, style, children }
   return usePart(
     handle,
@@ -81,18 +96,31 @@ function Ledger({
     {},
     {
       ...props,
-      render: (merged) => renderElement("div", mergeProps(own, merged), render, { items }),
-    },
+      render: (merged) =>
+        renderElement("div", mergeProps(own, merged), render, { items }),
+    }
   )
 }
 
 const LedgerBody = parts.Body
 
-function LedgerRow({ item, ...props }: { item: VirtualItem } & PartProps<"div">) {
-  return usePart(ledger, "row", { value: item.key, index: item.index, start: item.start }, props, "div")
+function LedgerRow({
+  item,
+  ...props
+}: { item: VirtualItem } & PartProps<"div">) {
+  return usePart(
+    ledger,
+    "row",
+    { value: item.key, index: item.index, start: item.start },
+    props,
+    "div"
+  )
 }
 
-const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
+const money = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+})
 const amount = (index: number) => ((index * 7919) % 100000) / 100
 
 function Example() {

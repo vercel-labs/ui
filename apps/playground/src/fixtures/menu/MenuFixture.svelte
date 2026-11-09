@@ -28,7 +28,12 @@
 
 <div class="fixture">
   <button>Before</button>
-  <Menu {...options} {controller} items={data ? menuData : undefined} onAction={(value) => (action = value)}>
+  <Menu
+    {...options}
+    {controller}
+    items={data ? menuData : undefined}
+    onAction={(value) => (action = value)}
+  >
     <MenuTrigger>File</MenuTrigger>
     {#if !data}
       <MenuContent class="popup">
@@ -38,8 +43,12 @@
         <MenuSeparator class="separator" />
         <MenuGroup>
           <MenuGroupLabel class="label">View</MenuGroupLabel>
-          <MenuCheckboxItem class="item" value="sidebar" defaultChecked>Show sidebar</MenuCheckboxItem>
-          <MenuCheckboxItem class="item" value="statusbar">Show status bar</MenuCheckboxItem>
+          <MenuCheckboxItem class="item" value="sidebar" defaultChecked
+            >Show sidebar</MenuCheckboxItem
+          >
+          <MenuCheckboxItem class="item" value="statusbar"
+            >Show status bar</MenuCheckboxItem
+          >
         </MenuGroup>
         <MenuSeparator class="separator" />
         <MenuRadioGroup defaultValue="name">
@@ -68,5 +77,7 @@
   </Menu>
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>
-  <button onclick={() => controller.open({ focus: "first" })}>Open with controller</button>
+  <button onclick={() => controller.open({ focus: "first" })}
+    >Open with controller</button
+  >
 </div>

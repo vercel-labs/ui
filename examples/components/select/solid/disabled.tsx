@@ -54,7 +54,10 @@ function Example() {
               <SelectContent>
                 <For each={countries}>
                   {(country) => (
-                    <SelectItem value={country.value} disabled={country.value === "dk"}>
+                    <SelectItem
+                      value={country.value}
+                      disabled={country.value === "dk"}
+                    >
                       {country.label}
                       <SelectItemIndicator>
                         <svg

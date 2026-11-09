@@ -50,7 +50,11 @@ function Example() {
             </CommandItem>
           </CommandPage>
           <CommandPage value="theme">
-            <For each={themes}>{(theme) => <CommandItem value={theme.value}>{theme.label}</CommandItem>}</For>
+            <For each={themes}>
+              {(theme) => (
+                <CommandItem value={theme.value}>{theme.label}</CommandItem>
+              )}
+            </For>
           </CommandPage>
         </CommandList>
       </Command>

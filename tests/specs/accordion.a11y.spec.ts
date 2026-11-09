@@ -6,10 +6,15 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
-test("no axe violations with the default item expanded", async ({ page, open }) => {
+test("no axe violations with the default item expanded", async ({
+  page,
+  open,
+}) => {
   await open("accordion")
   await expect(regionNamed(page, "Shipping")).toBeVisible()
   expect(await audit(page)).toEqual([])
@@ -17,35 +22,53 @@ test("no axe violations with the default item expanded", async ({ page, open }) 
 
 test("no axe violations with every item collapsed", async ({ page, open }) => {
   await open("accordion", { default: "none" })
-  await expect(triggerNamed(page, "Shipping")).toHaveAttribute("aria-expanded", "false")
+  await expect(triggerNamed(page, "Shipping")).toHaveAttribute(
+    "aria-expanded",
+    "false"
+  )
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with several items expanded", async ({ page, open }) => {
+test("no axe violations with several items expanded", async ({
+  page,
+  open,
+}) => {
   await open("accordion", { multiple: "", default: "shipping,returns,support" })
   await expect(regionNamed(page, "Support")).toBeVisible()
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with focus on a disabled trigger", async ({ page, open }) => {
+test("no axe violations with focus on a disabled trigger", async ({
+  page,
+  open,
+}) => {
   await open("accordion")
   await triggerNamed(page, "Warranty").focus()
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with collapsed panels kept mounted", async ({ page, open }) => {
+test("no axe violations with collapsed panels kept mounted", async ({
+  page,
+  open,
+}) => {
   await open("accordion", { "keep-mounted": "" })
   await expect(regionNamed(page, "Shipping")).toBeVisible()
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with collapsed panels hidden until found", async ({ page, open }) => {
+test("no axe violations with collapsed panels hidden until found", async ({
+  page,
+  open,
+}) => {
   await open("accordion", { "hidden-until-found": "" })
   await expect(regionNamed(page, "Shipping")).toBeVisible()
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with the whole accordion disabled", async ({ page, open }) => {
+test("no axe violations with the whole accordion disabled", async ({
+  page,
+  open,
+}) => {
   await open("accordion", { disabled: "" })
   await expect(regionNamed(page, "Shipping")).toBeVisible()
   expect(await audit(page)).toEqual([])

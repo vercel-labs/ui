@@ -1,12 +1,21 @@
 import * as React from "react"
-import { bindDrag, createChange, definePrimitive, dragThreshold, type ChangeDetails } from "@ui-sdk/core"
+import {
+  bindDrag,
+  createChange,
+  definePrimitive,
+  dragThreshold,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type SplitState = { size: number; draft: number | null }
 
 type SplitOptions = {
   defaultSize?: number
-  onSizeChange?: (size: number, details: ChangeDetails<"drag" | "keyboard">) => void
+  onSizeChange?: (
+    size: number,
+    details: ChangeDetails<"drag" | "keyboard">
+  ) => void
 }
 
 const clamp = (size: number) => Math.round(Math.min(80, Math.max(20, size)))
@@ -14,7 +23,10 @@ const clamp = (size: number) => Math.round(Math.min(80, Math.max(20, size)))
 const split = definePrimitive({
   name: "split",
   options: { defaultSize: "number", onSizeChange: "callback" },
-  state: (options: SplitOptions): SplitState => ({ size: options.defaultSize ?? 50, draft: null }),
+  state: (options: SplitOptions): SplitState => ({
+    size: options.defaultSize ?? 50,
+    draft: null,
+  }),
   api: (context) => {
     const { store } = context
     const change = createChange(context)
@@ -23,7 +35,9 @@ const split = definePrimitive({
     return {
       pointerdown(event: PointerEvent, el: HTMLElement) {
         const root = el.parentElement
-        if (event.button !== 0 || !root) return
+        if (event.button !== 0 || !root) {
+          return
+        }
         stop?.()
         stop = bindDrag(el, event, {
           threshold: dragThreshold,
@@ -36,15 +50,22 @@ const split = definePrimitive({
             const { draft } = store.get()
             stop = undefined
             store.set({ draft: null })
-            if (!canceled && draft !== null) change("size", draft, { reason: "drag", event: end })
+            if (!canceled && draft !== null) {
+              change("size", draft, { reason: "drag", event: end })
+            }
           },
         })
       },
       keydown(event: KeyboardEvent) {
         const by = { ArrowLeft: -5, ArrowRight: 5 }[event.key]
-        if (!by) return
+        if (!by) {
+          return
+        }
         event.preventDefault()
-        change("size", clamp(store.get().size + by), { reason: "keyboard", event })
+        change("size", clamp(store.get().size + by), {
+          reason: "keyboard",
+          event,
+        })
       },
     }
   },

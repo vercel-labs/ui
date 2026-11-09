@@ -1,4 +1,9 @@
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { Input } from "@ui-sdk/react/input"
 import { useLog } from "../../../shared/react/log"
 
@@ -18,11 +23,17 @@ function Example() {
         <Input type="email" required placeholder="hollis@example.com" />
         <FieldDescription
           render={(props, state) => (
-            <p {...props}>{state.valid ? "Looks good." : "We'll send you a confirmation link."}</p>
+            <p {...props}>
+              {state.valid
+                ? "Looks good."
+                : "We'll send you a confirmation link."}
+            </p>
           )}
         />
         <FieldError match="valueMissing">Enter your email address.</FieldError>
-        <FieldError match="typeMismatch">Enter an email address like hollis@example.com.</FieldError>
+        <FieldError match="typeMismatch">
+          Enter an email address like hollis@example.com.
+        </FieldError>
       </Field>
       <Field name="website">
         <FieldLabel>Website</FieldLabel>

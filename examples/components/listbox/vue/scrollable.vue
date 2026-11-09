@@ -12,13 +12,22 @@ const timezones = Array.from({ length: 27 }, (_, index) => {
 const log = useLog()
 
 function onHighlight(value: unknown, details: { index: number }) {
-  if (value) log(`Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`)
+  if (value) {
+    log(
+      `Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`
+    )
+  }
 }
 </script>
 
 <template>
   <Listbox default-value="utc9" aria-label="Time zone" @highlight="onHighlight">
-    <ListboxItem v-for="(zone, index) in timezones" :key="zone.value" :value="zone.value" :index="index">
+    <ListboxItem
+      v-for="(zone, index) in timezones"
+      :key="zone.value"
+      :value="zone.value"
+      :index="index"
+    >
       {{ zone.label }}
       <ListboxItemIndicator>
         <CheckIcon aria-hidden="true" />

@@ -33,11 +33,19 @@
     { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
     { value: "es", label: "Spain", keywords: ["españa"] },
     { value: "se", label: "Sweden", keywords: ["sverige"] },
-    { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+    {
+      value: "ch",
+      label: "Switzerland",
+      keywords: ["schweiz", "suisse", "svizzera"],
+    },
   ]
 
   const recentCountries = [
-    { type: "group" as const, label: "Recent", items: [countries[9], countries[12], countries[15]] },
+    {
+      type: "group" as const,
+      label: "Recent",
+      items: [countries[9], countries[12], countries[15]],
+    },
   ]
 
   const announcement = (change: ListAnnouncement) =>
@@ -66,7 +74,7 @@
             </ComboboxItemIndicator>
           </ComboboxItem>
         {/snippet}
-        {#each (state.items as ((typeof countries)[number] | (typeof recentCountries)[number])[]) as entry ("items" in entry ? entry.label : entry.value)}
+        {#each state.items as ((typeof countries)[number] | (typeof recentCountries)[number])[] as entry ("items" in entry ? entry.label : entry.value)}
           {#if "items" in entry}
             <ComboboxGroup>
               <ComboboxGroupLabel>{entry.label}</ComboboxGroupLabel>

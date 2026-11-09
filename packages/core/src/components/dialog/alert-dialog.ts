@@ -6,7 +6,10 @@
 import { createPopupController } from "../../foundation/popups/popup"
 import { isControllerAttached } from "../../foundation/kernel/controller"
 import type { Named } from "../../foundation/kernel/primitive-types"
-import { overlays as sharedOverlays, type Overlays } from "../../page/overlays/overlays"
+import {
+  overlays as sharedOverlays,
+  type Overlays,
+} from "../../page/overlays/overlays"
 import type {
   AlertDialogOpenChangeReason,
   AlertDialogOptions,
@@ -65,27 +68,40 @@ function createConfirm<Payload = ConfirmOptions>({
         payload,
         // Once, even when a framework runs the host's effect twice, like React's StrictMode.
         open: () => {
-          if (opened) return
+          if (opened) {
+            return
+          }
           opened = true
-          controller.open({ payload }).then(({ returnValue }) => resolve(returnValue === "confirm"))
+          controller
+            .open({ payload })
+            .then(({ returnValue }) => resolve(returnValue === "confirm"))
         },
         done: () => {
           hosted = false
           overlays.unmount(id)
           // The open dialog answers itself, even when it settles after this.
           // A host that went away before opening it counts as a no.
-          if (!opened) resolve(false)
+          if (!opened) {
+            resolve(false)
+          }
         },
       } satisfies ConfirmEntry<Payload>)
       hosted = true
     })
 
   const answer = (payload?: Payload) =>
-    own() ? controller.open({ payload }).then(({ returnValue }) => returnValue === "confirm") : ask(payload)
+    own()
+      ? controller
+          .open({ payload })
+          .then(({ returnValue }) => returnValue === "confirm")
+      : ask(payload)
 
   const confirm = (payload?: Payload) => {
     // Your idle alert dialog opens at once, in the press that asked.
-    const asked = !unanswered && own() ? answer(payload) : previous.then(() => answer(payload))
+    const asked =
+      !unanswered && own()
+        ? answer(payload)
+        : previous.then(() => answer(payload))
     unanswered++
     asked.then(() => unanswered--)
     previous = asked
@@ -104,11 +120,15 @@ function createConfirm<Payload = ConfirmOptions>({
  */
 const confirm = /* @__PURE__ */ createConfirm()
 
-const alertDialogPrimitive = /* @__PURE__ */ defineDialog<AlertDialogOptions>("alert-dialog", true, {
-  onOpenChange: "callback",
-  onPayloadChange: "callback",
-  controller: "value",
-})
+const alertDialogPrimitive = /* @__PURE__ */ defineDialog<AlertDialogOptions>(
+  "alert-dialog",
+  true,
+  {
+    onOpenChange: "callback",
+    onPayloadChange: "callback",
+    controller: "value",
+  }
+)
 
 /**
  * The type of `alertDialog`.
@@ -125,7 +145,13 @@ interface AlertDialogPrimitive extends Named<typeof alertDialogPrimitive> {}
  */
 const alertDialog: AlertDialogPrimitive = alertDialogPrimitive
 
-export { alertDialog, type AlertDialogPrimitive, confirm, createAlertDialogController, createConfirm }
+export {
+  alertDialog,
+  type AlertDialogPrimitive,
+  confirm,
+  createAlertDialogController,
+  createConfirm,
+}
 export type {
   AlertDialogBackdropState,
   AlertDialogCloseActionDetails,

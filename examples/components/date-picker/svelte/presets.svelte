@@ -14,7 +14,11 @@
     DatePickerPreset,
     DatePickerTrigger,
   } from "@ui-sdk/svelte/date-picker"
-  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import {
+    CalendarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+  } from "@lucide/svelte"
 </script>
 
 <DatePicker mode="range" today="2026-10-16">
@@ -49,13 +53,22 @@
       </CalendarWeeks>
     </CalendarGrid>
     <div data-slot="row">
-      <DatePickerPreset data-variant="ghost" value={["2026-10-10", "2026-10-16"]}>
+      <DatePickerPreset
+        data-variant="ghost"
+        value={["2026-10-10", "2026-10-16"]}
+      >
         Last 7 Days
       </DatePickerPreset>
-      <DatePickerPreset data-variant="ghost" value={["2026-09-17", "2026-10-16"]}>
+      <DatePickerPreset
+        data-variant="ghost"
+        value={["2026-09-17", "2026-10-16"]}
+      >
         Last 30 Days
       </DatePickerPreset>
-      <DatePickerPreset data-variant="ghost" value={["2026-10-01", "2026-10-31"]}>
+      <DatePickerPreset
+        data-variant="ghost"
+        value={["2026-10-01", "2026-10-31"]}
+      >
         This Month
       </DatePickerPreset>
     </div>

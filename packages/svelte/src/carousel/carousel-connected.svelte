@@ -20,15 +20,20 @@
     owner: CarouselContext
     partName: "previous" | "next" | "indicator-group" | "play-toggle"
     tag: string
-    render?: Snippet<[{ props: SlotAttributes; state: any; children?: Snippet<[any]> }]>
+    render?: Snippet<
+      [{ props: SlotAttributes; state: any; children?: Snippet<[any]> }]
+    >
     children?: Snippet<[any]>
     [attribute: string]: unknown
   } = $props()
 
-  provideInstance(carousel, untrack(() => owner))
+  provideInstance(
+    carousel,
+    untrack(() => owner)
+  )
   const part = useHandlePart(
     untrack(() => owner),
-    untrack(() => partName),
+    untrack(() => partName)
   )
 </script>
 

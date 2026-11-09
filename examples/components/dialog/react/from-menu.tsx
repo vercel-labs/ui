@@ -39,7 +39,9 @@ function Example() {
         <DialogContent>
           <div data-slot="stack">
             <DialogTitle>Rename file</DialogTitle>
-            <DialogDescription>Names must be unique in a folder.</DialogDescription>
+            <DialogDescription>
+              Names must be unique in a folder.
+            </DialogDescription>
           </div>
           <Field>
             <FieldLabel>Name</FieldLabel>

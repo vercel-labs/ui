@@ -9,8 +9,10 @@ describe("toast server rendering", () => {
   test("a region renders its empty list, with no landmark until it has toasts", async () => {
     const html = await renderToString(
       createSSRApp(() =>
-        h(ToastRegion, { side: "top", align: "center" }, () => h(Toast, null, () => h(ToastTitle))),
-      ),
+        h(ToastRegion, { side: "top", align: "center" }, () =>
+          h(Toast, null, () => h(ToastTitle))
+        )
+      )
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('data-slot="toast-region"')
@@ -20,6 +22,8 @@ describe("toast server rendering", () => {
   })
 
   test("the overlay host renders nothing on the server", async () => {
-    expect(await renderToString(createSSRApp(() => h(OverlayHost)))).toBe("<!--[--><!--]-->")
+    expect(await renderToString(createSSRApp(() => h(OverlayHost)))).toBe(
+      "<!--[--><!--]-->"
+    )
   })
 })

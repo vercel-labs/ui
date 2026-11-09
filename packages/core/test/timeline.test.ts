@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 import { afterEach, expect, test } from "vitest"
-import { checkbox, type CheckedState } from "../src/components/checkbox/checkbox"
+import {
+  checkbox,
+  type CheckedState,
+} from "../src/components/checkbox/checkbox"
 import { input } from "../src/components/input/input"
 import { numberInput } from "../src/components/number-input/number-input"
 import { withSource } from "../src/foundation/kernel/details"
@@ -23,12 +26,18 @@ async function checkedByAgent() {
   const instance = checkbox({
     id: "digest",
     onCheckedChange: (_checked, details) => {
-      if (refusing) details.cancel()
+      if (refusing) {
+        details.cancel()
+      }
     },
   })
   const el = document.body.appendChild(document.createElement("button"))
   el.setAttribute("aria-label", "Weekly digest")
-  cleanups.push(bind(instance.part("root"), el), () => instance.destroy(), timeline.destroy)
+  cleanups.push(
+    bind(instance.part("root"), el),
+    () => instance.destroy(),
+    timeline.destroy
+  )
   const [{ ref }] = agent.snapshot()
   await agent.act({ steps: [{ ref, action: "setChecked", args: [true] }] })
   return { instance, timeline, refuse: () => (refusing = true) }
@@ -54,7 +63,9 @@ test("an undo a change callback refuses is reported, and its entry stays applied
 test("a seek a change callback refuses is reported, and the position stays", async () => {
   const { instance, timeline, refuse } = await checkedByAgent()
   refuse()
-  expect(await timeline.seek(0)).toEqual([expect.objectContaining({ key: "checked", value: false })])
+  expect(await timeline.seek(0)).toEqual([
+    expect.objectContaining({ key: "checked", value: false }),
+  ])
   expect(instance.get().checked).toBe(true)
   expect(timeline.position()).toBe(1)
 })
@@ -67,13 +78,19 @@ test("an undo a controlled owner doesn't take is reported, and its entry stays a
     id: "digest",
     checked: false as CheckedState,
     onCheckedChange: (checked: CheckedState) => {
-      if (accepting) instance.setOptions({ ...options, checked })
+      if (accepting) {
+        instance.setOptions({ ...options, checked })
+      }
     },
   }
   const instance = checkbox(options)
   const el = document.body.appendChild(document.createElement("button"))
   el.setAttribute("aria-label", "Weekly digest")
-  cleanups.push(bind(instance.part("root"), el), () => instance.destroy(), timeline.destroy)
+  cleanups.push(
+    bind(instance.part("root"), el),
+    () => instance.destroy(),
+    timeline.destroy
+  )
   const [{ ref }] = agent.snapshot()
   await agent.act({ steps: [{ ref, action: "setChecked", args: [true] }] })
   expect(instance.get().checked).toBe(true)
@@ -95,8 +112,10 @@ function deferred() {
 
 test("a replaced act method is rejected before timeline restoration can bypass its guard", () => {
   const agent = createAgent()
-  expect(() => createTimeline({ ...agent, act: (input) => agent.act(input) })).toThrow(
-    "createTimeline requires an agent with the original act method returned by createAgent.",
+  expect(() =>
+    createTimeline({ ...agent, act: (input) => agent.act(input) })
+  ).toThrow(
+    "createTimeline requires an agent with the original act method returned by createAgent."
   )
 })
 
@@ -123,41 +142,60 @@ for (const operation of ["undo", "seek"] as const) {
         [first, "First"],
         [second, "Second"],
       ] as const) {
-        const element = document.body.appendChild(document.createElement("input"))
+        const element = document.body.appendChild(
+          document.createElement("input")
+        )
         element.value = instance.get().value
         element.setAttribute("aria-label", label)
-        cleanups.push(bind(instance.part("root"), element), () => instance.destroy())
+        cleanups.push(bind(instance.part("root"), element), () =>
+          instance.destroy()
+        )
       }
       cleanups.push(timeline.destroy, release.resolve)
-      expect((await agent.act({ steps: [{ ref: "First", action: "setValue", args: ["agent"] }] })).ok).toBe(
-        true,
-      )
+      expect(
+        (
+          await agent.act({
+            steps: [{ ref: "First", action: "setValue", args: ["agent"] }],
+          })
+        ).ok
+      ).toBe(true)
       waiting = true
-      const work = operation === "undo" ? timeline.undoSource("agent") : timeline.seek(0)
+      const work =
+        operation === "undo" ? timeline.undoSource("agent") : timeline.seek(0)
       await started.promise
       if (target !== "no edit") {
         const edited = target === "same control" ? first : second
-        withSource("keyboard", () => edited.api.setValue("human", { reason: "input-change" }))
+        withSource("keyboard", () =>
+          edited.api.setValue("human", { reason: "input-change" })
+        )
         expect(edited.get().value).toBe("human")
       }
       release.resolve()
       const failed = await work
-      expect(first.get().value).toBe(target === "same control" ? "human" : "initial")
-      expect(second.get().value).toBe(target === "another control" ? "human" : "untouched")
+      expect(first.get().value).toBe(
+        target === "same control" ? "human" : "initial"
+      )
+      expect(second.get().value).toBe(
+        target === "another control" ? "human" : "untouched"
+      )
       expect(failed).toHaveLength(target === "same control" ? 1 : 0)
       if (target === "same control" && operation === "undo") {
         expect(timeline.entries()[0].reverted).toBeUndefined()
       }
       if (target !== "no edit") {
         expect(timeline.entries()).toContainEqual(
-          expect.objectContaining({ source: "keyboard", value: "human" }),
+          expect.objectContaining({ source: "keyboard", value: "human" })
         )
       }
-      expect((await agent.act({ steps: [{ ref: "First", action: "setValue", args: ["later"] }] })).ok).toBe(
-        true,
-      )
+      expect(
+        (
+          await agent.act({
+            steps: [{ ref: "First", action: "setValue", args: ["later"] }],
+          })
+        ).ok
+      ).toBe(true)
       expect(first.get().value).toBe("later")
-    },
+    }
   )
 
   test.each([false, true])(
@@ -178,13 +216,24 @@ for (const operation of ["undo", "seek"] as const) {
       element.setAttribute("aria-label", "Precision")
       const agent = createAgent()
       const timeline = createTimeline(agent, { coalesce: false })
-      cleanups.push(bind(instance.part("root"), element), () => instance.destroy(), timeline.destroy)
-      expect((await agent.act({ steps: [{ ref: "Precision", action: "setValue", args: [0.124] }] })).ok).toBe(
-        true,
+      cleanups.push(
+        bind(instance.part("root"), element),
+        () => instance.destroy(),
+        timeline.destroy
       )
+      expect(
+        (
+          await agent.act({
+            steps: [{ ref: "Precision", action: "setValue", args: [0.124] }],
+          })
+        ).ok
+      ).toBe(true)
       expect(instance.get().value).toBe(0.124)
       refuse = refusing
-      const failed = operation === "undo" ? await timeline.undoSource("agent") : await timeline.seek(0)
+      const failed =
+        operation === "undo"
+          ? await timeline.undoSource("agent")
+          : await timeline.seek(0)
       expect(instance.get().value).toBe(refusing ? 0.124 : 0.121)
       expect(failed).toHaveLength(refusing ? 1 : 0)
       if (operation === "undo") {
@@ -192,6 +241,6 @@ for (const operation of ["undo", "seek"] as const) {
       } else {
         expect(timeline.position()).toBe(refusing ? 1 : 0)
       }
-    },
+    }
   )
 }

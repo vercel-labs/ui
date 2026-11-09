@@ -20,5 +20,9 @@ The toast's title. Renders the toast's `title` when it has no children, and noth
 {#snippet fallback()}<Content content={content!} />{/snippet}
 
 {#if children || content != null}
-  <Part tag="div" part={title} props={{ ...rest, children: children ?? fallback }} />
+  <Part
+    tag="div"
+    part={title}
+    props={{ ...rest, children: children ?? fallback }}
+  />
 {/if}

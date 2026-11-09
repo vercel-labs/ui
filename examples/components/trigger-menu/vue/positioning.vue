@@ -27,7 +27,10 @@ const field = useTemplateRef<{ $el: HTMLDivElement }>("field")
       <FieldLabel>Comment</FieldLabel>
       <FieldControl>
         <template #render="{ props }">
-          <TriggerMenuInput v-bind="props" placeholder="Type @ to mention someone…" />
+          <TriggerMenuInput
+            v-bind="props"
+            placeholder="Type @ to mention someone…"
+          />
         </template>
       </FieldControl>
     </Field>

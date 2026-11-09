@@ -30,7 +30,11 @@
     frameworks.find((framework) => framework.value === value)?.label ?? value
 </script>
 
-<Combobox multiple defaultValue={["next", "astro"]} itemToLabel={frameworkLabel}>
+<Combobox
+  multiple
+  defaultValue={["next", "astro"]}
+  itemToLabel={frameworkLabel}
+>
   <div data-slot="stack">
     <ComboboxLabel>Frameworks</ComboboxLabel>
     <div data-slot="row">
@@ -40,7 +44,9 @@
             {#each state.value as string[] as value, index (value)}
               <ComboboxChip {value}>
                 {state.labels[index]}
-                <ComboboxChipRemove aria-label={`Remove ${state.labels[index]}`}>
+                <ComboboxChipRemove
+                  aria-label={`Remove ${state.labels[index]}`}
+                >
                   <XIcon aria-hidden="true" />
                 </ComboboxChipRemove>
               </ComboboxChip>

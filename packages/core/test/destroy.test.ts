@@ -1,8 +1,16 @@
 // @vitest-environment jsdom
 // Destroying an instance stops everything it started outside itself, once.
 import { expect, test, vi } from "vitest"
-import { createController, isControllerAttached } from "../src/foundation/kernel/controller"
-import { keep, release, unwatched, whenKept } from "../src/foundation/kernel/keep"
+import {
+  createController,
+  isControllerAttached,
+} from "../src/foundation/kernel/controller"
+import {
+  keep,
+  release,
+  unwatched,
+  whenKept,
+} from "../src/foundation/kernel/keep"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
 
 test("destroy() runs each onDestroy cleanup once, however often it's called", () => {
@@ -53,7 +61,10 @@ test("a destroyed instance never takes its controller back", () => {
   instance.destroy()
   instance.setOptions({ id: "gone", controller: first })
   instance.setOptions({ id: "gone", controller: second })
-  expect([isControllerAttached(first), isControllerAttached(second)]).toEqual([false, false])
+  expect([isControllerAttached(first), isControllerAttached(second)]).toEqual([
+    false,
+    false,
+  ])
 })
 
 test("an instance made while another is made has a lifecycle of its own, kept with the outer one", () => {
@@ -91,7 +102,14 @@ test("an instance made while another is made has a lifecycle of its own, kept wi
   release(instance)
   keep(instance)
   instance.destroy()
-  expect(log).toEqual(["outer start", "inner start", "inner stop", "outer stop", "outer start", "outer stop"])
+  expect(log).toEqual([
+    "outer start",
+    "inner start",
+    "inner stop",
+    "outer stop",
+    "outer start",
+    "outer stop",
+  ])
 })
 
 test("whenKept outside an instance's setup starts nothing and warns", () => {
@@ -101,6 +119,8 @@ test("whenKept outside an instance's setup starts nothing and warns", () => {
     started++
   })
   expect(started).toBe(0)
-  expect(warn).toHaveBeenCalledWith(expect.stringContaining("`whenKept` runs only while an instance is made"))
+  expect(warn).toHaveBeenCalledWith(
+    expect.stringContaining("`whenKept` runs only while an instance is made")
+  )
   warn.mockRestore()
 })

@@ -3,8 +3,16 @@ import "@ui-sdk/web/radio"
 import { Check, createElement } from "lucide"
 
 const options = [
-  { value: "all", label: "Everything", description: "Every message and update." },
-  { value: "mentions", label: "Mentions", description: "Only when someone mentions you." },
+  {
+    value: "all",
+    label: "Everything",
+    description: "Every message and update.",
+  },
+  {
+    value: "mentions",
+    label: "Mentions",
+    description: "Only when someone mentions you.",
+  },
   { value: "none", label: "Nothing", description: "Turn notifications off." },
 ]
 
@@ -28,18 +36,22 @@ function mount(root: HTMLElement) {
                 </span>
                 ${createElement(Check, { "aria-hidden": "true" }).outerHTML}
               </ui-radio>
-            `,
+            `
           )
           .join("")}
       </ui-radio-group>
     </ui-field>
   `
   const update = (radio: Element) => {
-    radio.querySelector("svg")!.toggleAttribute("data-checked", radio.hasAttribute("data-checked"))
+    radio
+      .querySelector("svg")!
+      .toggleAttribute("data-checked", radio.hasAttribute("data-checked"))
   }
   const radios = root.querySelectorAll("ui-radio")
   radios.forEach((radio) => {
-    new MutationObserver(() => update(radio)).observe(radio, { attributeFilter: ["data-checked"] })
+    new MutationObserver(() => update(radio)).observe(radio, {
+      attributeFilter: ["data-checked"],
+    })
     update(radio)
   })
 }

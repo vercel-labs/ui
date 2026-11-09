@@ -1,12 +1,21 @@
 <script setup lang="ts">
-import { Field, FieldDescription, FieldGroup, FieldLabel, FieldLegend, FieldSet } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@ui-sdk/vue/field"
 import { Input } from "@ui-sdk/vue/input"
 </script>
 
 <template>
   <FieldSet>
     <FieldLegend>Address</FieldLegend>
-    <FieldDescription>We need your address to deliver your order.</FieldDescription>
+    <FieldDescription
+      >We need your address to deliver your order.</FieldDescription
+    >
     <FieldGroup>
       <Field name="street">
         <FieldLabel>Street address</FieldLabel>

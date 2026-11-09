@@ -1,7 +1,18 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/solid/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select"
 import { render } from "@solidjs/web"
 import { For, untrack } from "solid-js"
-import { countRender, mountWhenAsked, perfItems, perfSize } from "tests/fixtures/perf.ts"
+import {
+  countRender,
+  mountWhenAsked,
+  perfItems,
+  perfSize,
+} from "tests/fixtures/perf.ts"
 
 // A long select for the counts specs. Every other option reads
 // `highlighted` in its render function, so specs can tell plain options'
@@ -14,7 +25,10 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Select defaultValue={items[0].value} itemToLabel={(value) => labels.get(value) ?? value}>
+      <Select
+        defaultValue={items[0].value}
+        itemToLabel={(value) => labels.get(value) ?? value}
+      >
         <SelectTrigger aria-label="Pick" class="trigger">
           <SelectValue />
         </SelectTrigger>

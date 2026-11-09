@@ -24,11 +24,28 @@
   import { Field, FieldControl, FieldLabel } from "#ui/field"
   import { Radio, RadioGroup } from "#ui/radio"
   import { ScrollArea } from "#ui/scroll-area"
-  import { Select, SelectContent, SelectItem, SelectItemIcon, SelectLabel, SelectTrigger } from "#ui/select"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectItemIcon,
+    SelectLabel,
+    SelectTrigger,
+  } from "#ui/select"
   import { Textarea } from "#ui/textarea"
   import { Tooltip, TooltipContent, TooltipTrigger } from "#ui/tooltip"
   import { cn } from "cn"
-  import { href, labelOf, labels, people, personOf, priorities, statuses, type Issue, type Query } from "tracker-data"
+  import {
+    href,
+    labelOf,
+    labels,
+    people,
+    personOf,
+    priorities,
+    statuses,
+    type Issue,
+    type Query,
+  } from "tracker-data"
 
   let { issue, query }: { issue: Issue; query: Query } = $props()
 
@@ -38,10 +55,18 @@
 </script>
 
 <article aria-labelledby="issue-title" class="flex min-h-0 flex-1 flex-col">
-  <div class="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2">
+  <div
+    class="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2"
+  >
     <span class="text-sm text-muted-foreground tabular-nums">{issue.id}</span>
     <Tooltip>
-      <TooltipTrigger aria-label="Close issue" class={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "ms-auto")}>
+      <TooltipTrigger
+        aria-label="Close issue"
+        class={cn(
+          buttonVariants({ variant: "ghost", size: "icon-sm" }),
+          "ms-auto"
+        )}
+      >
         {#snippet render({ props })}
           <a {...props} href={href(query, { issue: null })}>
             <X aria-hidden="true" />
@@ -62,7 +87,9 @@
           class="h-auto bg-transparent px-1.5 py-1 text-lg font-semibold md:text-lg"
           onblur={(event: FocusEvent) => {
             const title = (event.currentTarget as HTMLInputElement).value.trim()
-            if (title && title !== issue.title) save({ title })
+            if (title && title !== issue.title) {
+              save({ title })
+            }
           }}
         />
       </Field>
@@ -73,13 +100,21 @@
           placeholder="Add a description…"
           class="bg-transparent px-1.5"
           onblur={(event: FocusEvent) => {
-            const description = (event.currentTarget as HTMLTextAreaElement).value
-            if (description !== issue.description) save({ description })
+            const description = (event.currentTarget as HTMLTextAreaElement)
+              .value
+            if (description !== issue.description) {
+              save({ description })
+            }
           }}
         />
       </Field>
       <div class="grid gap-4 sm:grid-cols-2">
-        <Select items={statuses} value={issue.status} onValueChange={(status) => status && save({ status: status as string })}>
+        <Select
+          items={statuses}
+          value={issue.status}
+          onValueChange={(status) =>
+            status && save({ status: status as string })}
+        >
           <div class="grid gap-2">
             <SelectLabel>Status</SelectLabel>
             <SelectTrigger icon />
@@ -87,7 +122,9 @@
           <SelectContent>
             {#each statuses as status (status.value)}
               <SelectItem value={status.value}>
-                <SelectItemIcon><StatusIcon status={status.value} /></SelectItemIcon>
+                <SelectItemIcon
+                  ><StatusIcon status={status.value} /></SelectItemIcon
+                >
                 {status.label}
               </SelectItem>
             {/each}
@@ -95,7 +132,8 @@
         </Select>
         <Combobox
           value={issue.assignee}
-          onValueChange={(assignee) => save({ assignee: assignee as string | null })}
+          onValueChange={(assignee) =>
+            save({ assignee: assignee as string | null })}
           itemToLabel={(id: string) => personOf(id)?.name ?? ""}
         >
           <div class="grid gap-2">
@@ -122,7 +160,10 @@
         </Combobox>
         <Field>
           <FieldLabel>Due date</FieldLabel>
-          <DatePicker value={issue.due} onValueChange={(due) => save({ due: due as string | null })} />
+          <DatePicker
+            value={issue.due}
+            onValueChange={(due) => save({ due: due as string | null })}
+          />
         </Field>
         <Combobox
           multiple
@@ -137,12 +178,17 @@
                 {#snippet children(state)}
                   {#each state.value as string[] as id, index (id)}
                     <ComboboxChip value={id} label={state.labels[index]}>
-                      <span class="size-2 rounded-full" style:background={labelOf(id)?.color}></span>
+                      <span
+                        class="size-2 rounded-full"
+                        style:background={labelOf(id)?.color}
+                      ></span>
                     </ComboboxChip>
                   {/each}
                 {/snippet}
               </ComboboxValue>
-              <ComboboxInput placeholder={issue.labels.length ? "" : "Add a label"} />
+              <ComboboxInput
+                placeholder={issue.labels.length ? "" : "Add a label"}
+              />
               <ComboboxTrigger aria-label="Show labels" />
             </ComboboxChips>
           </div>
@@ -151,7 +197,10 @@
             <ComboboxList>
               {#each labels as label (label.id)}
                 <ComboboxItem value={label.id} label={label.name}>
-                  <span class="size-2 rounded-full" style:background={label.color}></span>
+                  <span
+                    class="size-2 rounded-full"
+                    style:background={label.color}
+                  ></span>
                   {label.name}
                 </ComboboxItem>
               {/each}
@@ -165,7 +214,9 @@
         onValueChange={(priority) => save({ priority: priority as string })}
         class="grid gap-2"
       >
-        <span id="priority-label" class="text-sm leading-none font-medium">Priority</span>
+        <span id="priority-label" class="text-sm leading-none font-medium"
+          >Priority</span
+        >
         <div class="flex flex-wrap gap-x-4 gap-y-2">
           {#each priorities as priority (priority.value)}
             <label class="flex items-center gap-2">

@@ -9,7 +9,14 @@ import {
   AutocompleteItemIcon,
   AutocompleteList,
 } from "@ui-sdk/react/autocomplete"
-import { ArchiveIcon, ClockIcon, FileIcon, PencilIcon, ReplyIcon, StarIcon } from "lucide-react"
+import {
+  ArchiveIcon,
+  ClockIcon,
+  FileIcon,
+  PencilIcon,
+  ReplyIcon,
+  StarIcon,
+} from "lucide-react"
 
 const mailSearches = [
   { value: "Starred", icon: StarIcon },
@@ -23,7 +30,11 @@ const mailSearches = [
 function Example() {
   return (
     <Autocomplete>
-      <AutocompleteInput type="search" aria-label="Search mail" placeholder="Search mail…" />
+      <AutocompleteInput
+        type="search"
+        aria-label="Search mail"
+        placeholder="Search mail…"
+      />
       <AutocompleteContent>
         <AutocompleteEmpty>No searches found.</AutocompleteEmpty>
         <AutocompleteList>

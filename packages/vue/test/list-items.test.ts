@@ -36,26 +36,34 @@ test("groups that share a label keep their own rows as a filter changes", async 
     { type: "group" as const, label: "Vegetable", items: ["carrot", "celery"] },
     { type: "group" as const, label: "Fruit", items: ["banana", "blueberry"] },
   ]
-  const el = await mount(() => h(Combobox, { items, defaultOpen: true }, () => h(ComboboxInput)))
+  const el = await mount(() =>
+    h(Combobox, { items, defaultOpen: true }, () => h(ComboboxInput))
+  )
   const input = el.querySelector("input")!
   for (const query of ["ca", "e"]) {
     input.value = query
     input.dispatchEvent(new InputEvent("input", { bubbles: true }))
     await settle()
   }
-  const duplicates = warn.mock.calls.filter(([message]) => String(message).includes("Duplicate keys"))
+  const duplicates = warn.mock.calls.filter(([message]) =>
+    String(message).includes("Duplicate keys")
+  )
   warn.mockRestore()
   expect(duplicates).toEqual([])
-  expect([...document.querySelectorAll('[role="option"]')].map((row) => row.textContent)).toEqual([
-    "apple",
-    "celery",
-    "blueberry",
-  ])
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (row) => row.textContent
+    )
+  ).toEqual(["apple", "celery", "blueberry"])
 })
 
 test("an item's other fields stay off its element", async () => {
-  const items = [{ value: "a", label: "Apple", innerHTML: "<img src=x>", title: "Injected" }]
-  await mount(() => h(Combobox, { items, defaultOpen: true }, () => h(ComboboxInput)))
+  const items = [
+    { value: "a", label: "Apple", innerHTML: "<img src=x>", title: "Injected" },
+  ]
+  await mount(() =>
+    h(Combobox, { items, defaultOpen: true }, () => h(ComboboxInput))
+  )
   const option = document.querySelector('[role="option"]')!
   expect(option.textContent).toBe("Apple")
   expect(option.querySelector("img")).toBeNull()

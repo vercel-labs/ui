@@ -4,7 +4,10 @@ The check inside the checkbox. Rendered while it's checked or indeterminate, or 
 @stable
 -->
 <script lang="ts">
-  import type { CheckboxIndicatorProps, CheckboxIndicatorState } from "@ui-sdk/core/checkbox"
+  import type {
+    CheckboxIndicatorProps,
+    CheckboxIndicatorState,
+  } from "@ui-sdk/core/checkbox"
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
@@ -13,11 +16,16 @@ The check inside the checkbox. Rendered while it's checked or indeterminate, or 
   let {
     keepMounted,
     ...rest
-  }: PartProps<"span", CheckboxIndicatorState> & CheckboxIndicatorProps = $props()
+  }: PartProps<"span", CheckboxIndicatorState> & CheckboxIndicatorProps =
+    $props()
 
   const checkbox = getContext<CheckboxContext | undefined>(CheckboxKey)
-  if (!checkbox) throw new Error("CheckboxIndicator must be used inside <Checkbox>.")
-  const indicator = useHandlePart(checkbox, "indicator", () => ({ keepMounted }))
+  if (!checkbox) {
+    throw new Error("CheckboxIndicator must be used inside <Checkbox>.")
+  }
+  const indicator = useHandlePart(checkbox, "indicator", () => ({
+    keepMounted,
+  }))
 </script>
 
 {#if indicator.present}

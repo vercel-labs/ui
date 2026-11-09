@@ -3,13 +3,20 @@ import { test } from "../../docs-test"
 import { openBehaviors } from "./helpers"
 
 // Drags from the middle of one element to a point relative to another.
-async function drag(page: Page, from: Locator, to: Locator, offset = { x: 0.5, y: 0.5 }) {
+async function drag(
+  page: Page,
+  from: Locator,
+  to: Locator,
+  offset = { x: 0.5, y: 0.5 }
+) {
   await from.scrollIntoViewIfNeeded()
   const a = (await from.boundingBox())!
   const b = (await to.boundingBox())!
   await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2)
   await page.mouse.down()
-  await page.mouse.move(b.x + b.width * offset.x, b.y + b.height * offset.y, { steps: 12 })
+  await page.mouse.move(b.x + b.width * offset.x, b.y + b.height * offset.y, {
+    steps: 12,
+  })
 }
 
 test("every example renders without errors", async ({ page }) => {
@@ -88,14 +95,21 @@ test("pointer drags: the divider follows the pointer, commits on release, and Es
   await expect(divider).toHaveAttribute("aria-valuenow", "65")
 })
 
-test("reorder: Space, an arrow and Space move an item, and a drag does too", async ({ page }) => {
+test("reorder: Space, an arrow and Space move an item, and a drag does too", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const list = page.getByRole("listbox", { name: "Favorite seasons" })
   await list.getByRole("option", { name: "Spring" }).focus()
   await page.keyboard.press("Space")
   await page.keyboard.press("ArrowDown")
   await page.keyboard.press("Space")
-  await expect(list.getByRole("option")).toHaveText(["1Summer", "2Spring", "3Autumn", "4Winter"])
+  await expect(list.getByRole("option")).toHaveText([
+    "1Summer",
+    "2Spring",
+    "3Autumn",
+    "4Winter",
+  ])
   await drag(
     page,
     list.getByRole("option", { name: "Winter" }),
@@ -103,13 +117,20 @@ test("reorder: Space, an arrow and Space move an item, and a drag does too", asy
     {
       x: 0.5,
       y: 0.2,
-    },
+    }
   )
   await page.mouse.up()
-  await expect(list.getByRole("option")).toHaveText(["1Winter", "2Summer", "3Spring", "4Autumn"])
+  await expect(list.getByRole("option")).toHaveText([
+    "1Winter",
+    "2Summer",
+    "3Spring",
+    "4Autumn",
+  ])
 })
 
-test("tree reorder: Right takes a page in a level, and Escape puts it back", async ({ page }) => {
+test("tree reorder: Right takes a page in a level, and Escape puts it back", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const tree = page.getByRole("tree", { name: "Pages" })
   const changelog = tree.getByRole("treeitem", { name: "Changelog" })
@@ -140,9 +161,16 @@ test("transfer: a drag moves an item to the other list, and Right does from the 
   await openBehaviors(page, "drag-and-drop")
   const closet = page.getByRole("listbox", { name: "Closet" })
   const bag = page.getByRole("listbox", { name: "Bag" })
-  await drag(page, closet.getByRole("option", { name: "Boots" }), bag, { x: 0.5, y: 0.9 })
+  await drag(page, closet.getByRole("option", { name: "Boots" }), bag, {
+    x: 0.5,
+    y: 0.9,
+  })
   await page.mouse.up()
-  await expect(bag.getByRole("option")).toHaveText(["Passport", "Charger", "Boots"])
+  await expect(bag.getByRole("option")).toHaveText([
+    "Passport",
+    "Charger",
+    "Boots",
+  ])
   await closet.getByRole("option", { name: "Scarf" }).focus()
   await page.keyboard.press("Space")
   await page.keyboard.press("ArrowRight")
@@ -164,24 +192,35 @@ test("drag preview: a copy follows the pointer, and letting go over the note add
   await expect(note.locator('[data-slot="badge"]')).toHaveText(["Design"])
   await page.getByRole("button", { name: "Urgent" }).focus()
   await page.keyboard.press("Enter")
-  await expect(note.locator('[data-slot="badge"]')).toHaveText(["Design", "Urgent"])
+  await expect(note.locator('[data-slot="badge"]')).toHaveText([
+    "Design",
+    "Urgent",
+  ])
 })
 
-test("reorder preview: holding a drag near the bottom edge scrolls the queue", async ({ page }) => {
+test("reorder preview: holding a drag near the bottom edge scrolls the queue", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const queue = page.getByRole("listbox", { name: "Queue" })
   await queue.scrollIntoViewIfNeeded()
   const box = (await queue.boundingBox())!
-  const first = (await queue.getByRole("option", { name: "Track 01" }).boundingBox())!
+  const first = (await queue
+    .getByRole("option", { name: "Track 01" })
+    .boundingBox())!
   await page.mouse.move(first.x + 20, first.y + 10)
   await page.mouse.down()
   await page.mouse.move(box.x + 40, box.y + box.height - 6, { steps: 10 })
-  await expect.poll(() => queue.evaluate((el) => el.scrollTop)).toBeGreaterThan(100)
+  await expect
+    .poll(() => queue.evaluate((el) => el.scrollTop))
+    .toBeGreaterThan(100)
   await page.mouse.up()
   await expect(queue.getByRole("option").first()).not.toHaveText("Track 01")
 })
 
-test("bind drag: the scrubber follows movement, and onStart refuses a locked drag", async ({ page }) => {
+test("bind drag: the scrubber follows movement, and onStart refuses a locked drag", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const scrub = page.getByRole("slider", { name: "Opacity" })
   await scrub.scrollIntoViewIfNeeded()
@@ -190,7 +229,9 @@ test("bind drag: the scrubber follows movement, and onStart refuses a locked dra
   await page.mouse.down()
   await page.mouse.move(box.x + 80, box.y + box.height / 2, { steps: 6 })
   await page.mouse.up()
-  await expect.poll(async () => Number(await scrub.getAttribute("aria-valuenow"))).toBeGreaterThan(50)
+  await expect
+    .poll(async () => Number(await scrub.getAttribute("aria-valuenow")))
+    .toBeGreaterThan(50)
   const before = await scrub.getAttribute("aria-valuenow")
   await page.getByRole("checkbox", { name: "Locked" }).check()
   await page.mouse.move(box.x + 20, box.y + box.height / 2)
@@ -200,10 +241,15 @@ test("bind drag: the scrubber follows movement, and onStart refuses a locked dra
   await expect(scrub).toHaveAttribute("aria-valuenow", before!)
   await scrub.focus()
   await page.keyboard.press("ArrowLeft")
-  await expect(scrub).toHaveAttribute("aria-valuenow", String(Number(before) - 1))
+  await expect(scrub).toHaveAttribute(
+    "aria-valuenow",
+    String(Number(before) - 1)
+  )
 })
 
-test("reorder grid: Down moves a photo a row, and the order follows", async ({ page }) => {
+test("reorder grid: Down moves a photo a row, and the order follows", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const album = page.getByRole("listbox", { name: "Album" })
   await album.getByRole("option", { name: "Dawn" }).focus()
@@ -222,7 +268,9 @@ test("reorder grid: Down moves a photo a row, and the order follows", async ({ p
   ])
 })
 
-test("reorder group: ticked tasks move together as one block", async ({ page }) => {
+test("reorder group: ticked tasks move together as one block", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const list = page.getByRole("list", { name: "Backlog" })
   await page.getByRole("checkbox", { name: "Select Search" }).click()
@@ -242,7 +290,9 @@ test("reorder group: ticked tasks move together as one block", async ({ page }) 
   ])
 })
 
-test("reorder from code: move to top, and the toolbar's pick up, move, drop and cancel", async ({ page }) => {
+test("reorder from code: move to top, and the toolbar's pick up, move, drop and cancel", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const list = page.getByRole("listbox", { name: "Recipe" })
   const steps = list.getByRole("option")
@@ -261,7 +311,9 @@ test("reorder from code: move to top, and the toolbar's pick up, move, drop and 
   await expect(steps.first()).toContainText("Serve")
 })
 
-test("reorder messages: the pinned track stays, and steps are read as track numbers", async ({ page }) => {
+test("reorder messages: the pinned track stays, and steps are read as track numbers", async ({
+  page,
+}) => {
   await openBehaviors(page, "drag-and-drop")
   const list = page.getByRole("listbox", { name: "Tracks" })
   const announcer = page.locator("[data-ui-sdk-announcer='assertive']")
@@ -282,7 +334,8 @@ test("tree limits: two levels at most, the Inbox stays, and the arrows indent an
 }) => {
   await openBehaviors(page, "drag-and-drop")
   const tree = page.getByRole("tree", { name: "Folders" })
-  const level = (name: string) => tree.getByRole("treeitem").filter({ hasText: name })
+  const level = (name: string) =>
+    tree.getByRole("treeitem").filter({ hasText: name })
   // Personal holds Travel, which would go a third level deep.
   await page.getByRole("button", { name: "Indent Personal" }).click()
   await expect(level("Personal")).toHaveAttribute("aria-level", "1")
@@ -300,14 +353,17 @@ test("tree limits: two levels at most, the Inbox stays, and the arrows indent an
   await level("Inbox").focus()
   await page.keyboard.press("Space")
   await expect(tree.locator("[data-moving]")).toHaveCount(0)
-  await expect(page.locator("[data-ui-sdk-announcer='assertive']")).not.toContainText("Picked up Inbox")
+  await expect(
+    page.locator("[data-ui-sdk-announcer='assertive']")
+  ).not.toContainText("Picked up Inbox")
 })
 
 test("transfer board: a full column is skipped, the blocked card stays, and Done moves a card", async ({
   page,
 }) => {
   await openBehaviors(page, "drag-and-drop")
-  const column = (name: string) => page.getByRole("listbox", { name, exact: true })
+  const column = (name: string) =>
+    page.getByRole("listbox", { name, exact: true })
   await page.getByRole("button", { name: "Move Login to Done" }).click()
   await expect(column("Done").getByRole("option")).toHaveCount(2)
   await column("To do")
@@ -317,19 +373,25 @@ test("transfer board: a full column is skipped, the blocked card stays, and Done
   await page.keyboard.press("ArrowRight")
   await page.keyboard.press("Space")
   await expect(column("Doing").getByRole("option")).toHaveCount(2)
-  await expect(page.locator("[data-ui-sdk-announcer='assertive']")).toHaveText("Search is in Doing now.")
+  await expect(page.locator("[data-ui-sdk-announcer='assertive']")).toHaveText(
+    "Search is in Doing now."
+  )
   await column("To do")
     .getByRole("option", { name: /^Billing/ })
     .focus()
   await page.keyboard.press("Space")
-  await expect(page.locator('[data-slot="board-card"][aria-selected="true"]')).toHaveCount(0)
+  await expect(
+    page.locator('[data-slot="board-card"][aria-selected="true"]')
+  ).toHaveCount(0)
   await column("Done")
     .getByRole("option", { name: /^Login/ })
     .focus()
   await page.keyboard.press("Space")
   await page.keyboard.press("ArrowLeft")
   await page.keyboard.press("Space")
-  await expect(column("To do").getByRole("option", { name: /^Login/ })).toBeVisible()
+  await expect(
+    column("To do").getByRole("option", { name: /^Login/ })
+  ).toBeVisible()
 })
 
 test("auto scroll: a bookmark held near the bottom scrolls the chapters and lands where it's let go", async ({
@@ -344,7 +406,9 @@ test("auto scroll: a bookmark held near the bottom scrolls the chapters and land
   await page.mouse.move(from.x + 10, from.y + 10)
   await page.mouse.down()
   await page.mouse.move(box.x + 40, box.y + box.height - 8, { steps: 10 })
-  await expect.poll(() => chapters.evaluate((el) => el.scrollTop)).toBeGreaterThan(100)
+  await expect
+    .poll(() => chapters.evaluate((el) => el.scrollTop))
+    .toBeGreaterThan(100)
   await expect(chapters.locator("[data-over]")).toHaveCount(1)
   await page.mouse.up()
   const log = page
@@ -372,7 +436,9 @@ test("every option links to the example that shows it", async ({ page }) => {
     await expect(links).toHaveCount(await fields.count())
     for (const link of await links.all()) {
       const href = (await link.getAttribute("href"))!
-      if (!href.startsWith("#")) continue
+      if (!href.startsWith("#")) {
+        continue
+      }
       await expect(page.locator(`[id="${href.slice(1)}"]`)).toHaveCount(1)
     }
   }

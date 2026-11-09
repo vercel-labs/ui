@@ -1,7 +1,10 @@
 "use client"
 
 import { cn } from "cn"
-import { DialogBackdrop, DialogContent as DialogContentPrimitive } from "@ui-sdk/react/dialog"
+import {
+  DialogBackdrop,
+  DialogContent as DialogContentPrimitive,
+} from "@ui-sdk/react/dialog"
 import type { ComponentProps } from "react"
 
 const backdrop =
@@ -20,14 +23,17 @@ function DialogContent({
   return (
     <>
       <DialogBackdrop
-        className={cn(instant ? "fixed inset-0 bg-black/20 dark:bg-black/50" : backdrop, backdropClassName)}
+        className={cn(
+          instant ? "fixed inset-0 bg-black/20 dark:bg-black/50" : backdrop,
+          backdropClassName
+        )}
       />
       <DialogContentPrimitive
         className={cn(
           "fixed top-[12vh] left-1/2 flex max-h-[min(32rem,76vh)] w-[calc(100%-3rem)] max-w-xl sm:w-[calc(100%-4rem)] -translate-x-1/2 flex-col overflow-hidden rounded-3xl bg-popover text-sm text-popover-foreground shadow-2xl ring-1 ring-foreground outline-none",
           !instant &&
             "transition-[opacity,scale] duration-150 data-starting-style:scale-[0.98] data-starting-style:opacity-0 data-ending-style:scale-[0.98] data-ending-style:opacity-0",
-          className,
+          className
         )}
         {...props}
       />
@@ -36,4 +42,10 @@ function DialogContent({
 }
 
 export { DialogContent }
-export { Dialog, DialogClose, DialogDescription, DialogTitle, DialogTrigger } from "@ui-sdk/react/dialog"
+export {
+  Dialog,
+  DialogClose,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@ui-sdk/react/dialog"

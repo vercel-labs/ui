@@ -28,7 +28,12 @@ onMounted(() => Object.assign(window, { __menubar: controller }))
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Menubar class="menubar" :aria-label="f.label" :controller="controller" v-bind="options">
+    <Menubar
+      class="menubar"
+      :aria-label="f.label"
+      :controller="controller"
+      v-bind="options"
+    >
       <Menu @action="run">
         <MenuTrigger>{{ f.file.trigger }}</MenuTrigger>
         <MenuContent class="popup">
@@ -42,15 +47,24 @@ onMounted(() => Object.assign(window, { __menubar: controller }))
             {{ item.label }}
           </MenuItem>
           <MenuSub>
-            <MenuSubTrigger class="item">{{ f.file.share.trigger }}</MenuSubTrigger>
+            <MenuSubTrigger class="item">{{
+              f.file.share.trigger
+            }}</MenuSubTrigger>
             <MenuSubContent class="popup">
-              <MenuItem v-for="item in f.file.share.items" :key="item.value" class="item" :value="item.value">
+              <MenuItem
+                v-for="item in f.file.share.items"
+                :key="item.value"
+                class="item"
+                :value="item.value"
+              >
                 {{ item.label }}
               </MenuItem>
             </MenuSubContent>
           </MenuSub>
           <MenuSeparator class="separator" />
-          <MenuItem class="item" :value="f.file.print.value">{{ f.file.print.label }}</MenuItem>
+          <MenuItem class="item" :value="f.file.print.value">{{
+            f.file.print.label
+          }}</MenuItem>
         </MenuContent>
       </Menu>
       <Menu @action="run">
@@ -69,10 +83,13 @@ onMounted(() => Object.assign(window, { __menubar: controller }))
       </Menu>
       <Menu
         @checked-change="
-          (checked: boolean, details: { value: string }) => run(`${details.value}: ${checked ? 'on' : 'off'}`)
+          (checked: boolean, details: { value: string }) =>
+            run(`${details.value}: ${checked ? 'on' : 'off'}`)
         "
       >
-        <MenuTrigger :shortcut="f.view.shortcut">{{ f.view.trigger }}</MenuTrigger>
+        <MenuTrigger :shortcut="f.view.shortcut">{{
+          f.view.trigger
+        }}</MenuTrigger>
         <MenuContent class="popup">
           <MenuCheckboxItem
             v-for="item in f.view.checkboxes"
@@ -106,9 +123,13 @@ onMounted(() => Object.assign(window, { __menubar: controller }))
       <Menu @action="run">
         <MenuTrigger disabled>{{ f.help.trigger }}</MenuTrigger>
         <MenuContent class="popup">
-          <MenuItem v-for="item in f.help.items" :key="item.value" class="item" :value="item.value">{{
-            item.label
-          }}</MenuItem>
+          <MenuItem
+            v-for="item in f.help.items"
+            :key="item.value"
+            class="item"
+            :value="item.value"
+            >{{ item.label }}</MenuItem
+          >
         </MenuContent>
       </Menu>
     </Menubar>

@@ -75,12 +75,23 @@ type BindDragOptions = {
  * ```
  * @stable
  */
-function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions) {
+function bindDrag(
+  el: HTMLElement,
+  down: PointerEvent,
+  options: BindDragOptions
+) {
   const view = el.ownerDocument.defaultView ?? window
   const pointerId = down.pointerId
   let frame = 0
   let hasPending = false
-  const pending: PointerSample = { x: 0, y: 0, movementX: 0, movementY: 0, locked: false, event: down }
+  const pending: PointerSample = {
+    x: 0,
+    y: 0,
+    movementX: 0,
+    movementY: 0,
+    locked: false,
+    event: down,
+  }
   let lastX = down.clientX
   let lastY = down.clientY
   let started = !options.threshold && !options.onStart
@@ -96,7 +107,9 @@ function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions)
 
   const flush = () => {
     frame = 0
-    if (!hasPending) return
+    if (!hasPending) {
+      return
+    }
     hasPending = false
     options.onMove(pending)
     pending.movementX = 0
@@ -104,21 +117,36 @@ function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions)
   }
 
   const onMove = (event: PointerEvent) => {
-    if (event.pointerId !== pointerId) return
+    if (event.pointerId !== pointerId) {
+      return
+    }
     // A mouse released outside a frame that missed the pointerup.
-    if (event.pointerType === "mouse" && event.buttons === 0) return end(event, false)
+    if (event.pointerType === "mouse" && event.buttons === 0) {
+      return end(event, false)
+    }
     if (!started) {
       const threshold = options.threshold ?? 0
       const dx = Math.abs(event.clientX - down.clientX)
       const dy = Math.abs(event.clientY - down.clientY)
-      if (threshold && dx < threshold && dy < threshold) return
+      if (threshold && dx < threshold && dy < threshold) {
+        return
+      }
       started = true
-      if (options.onStart?.(event) === false) return stop()
-      if (options.cancelOnEscape) el.ownerDocument.addEventListener("keydown", onEscape, true)
+      if (options.onStart?.(event) === false) {
+        return stop()
+      }
+      if (options.cancelOnEscape) {
+        el.ownerDocument.addEventListener("keydown", onEscape, true)
+      }
     }
-    if (!dragged && isDrag(event.clientX - down.clientX, event.clientY - down.clientY)) {
+    if (
+      !dragged &&
+      isDrag(event.clientX - down.clientX, event.clientY - down.clientY)
+    ) {
       dragged = true
-      if (options.lock && down.pointerType === "mouse") requestLock(el)
+      if (options.lock && down.pointerType === "mouse") {
+        requestLock(el)
+      }
     }
     const isLocked = locked()
     pending.movementX += isLocked ? event.movementX : event.clientX - lastX
@@ -132,18 +160,28 @@ function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions)
   }
 
   const onUp = (event: PointerEvent) => {
-    if (event.pointerId !== pointerId) return
-    if (dragged) swallowNextClick(el.ownerDocument)
+    if (event.pointerId !== pointerId) {
+      return
+    }
+    if (dragged) {
+      swallowNextClick(el.ownerDocument)
+    }
     end(event, false)
   }
   const onCancel = (event: PointerEvent) => {
-    if (event.pointerId === pointerId) end(event, true)
+    if (event.pointerId === pointerId) {
+      end(event, true)
+    }
   }
   const onEscape = (event: KeyboardEvent) => {
-    if (event.key !== "Escape") return
+    if (event.key !== "Escape") {
+      return
+    }
     event.preventDefault()
     event.stopPropagation()
-    if (dragged) swallowNextClick(el.ownerDocument, true, pointerId)
+    if (dragged) {
+      swallowNextClick(el.ownerDocument, true, pointerId)
+    }
     end(pending.event, true)
   }
 
@@ -154,17 +192,28 @@ function bindDrag(el: HTMLElement, down: PointerEvent, options: BindDragOptions)
   ]
   // Listening on the document too covers pointers the element couldn't
   // capture, and the moves pointer lock sends to the locked element.
-  for (const [type, listener] of listeners) el.ownerDocument.addEventListener(type, listener as EventListener)
-  if (started && options.cancelOnEscape) el.ownerDocument.addEventListener("keydown", onEscape, true)
+  for (const [type, listener] of listeners) {
+    el.ownerDocument.addEventListener(type, listener as EventListener)
+  }
+  if (started && options.cancelOnEscape) {
+    el.ownerDocument.addEventListener("keydown", onEscape, true)
+  }
 
   function stop() {
-    if (frame) view.cancelAnimationFrame(frame)
+    if (frame) {
+      view.cancelAnimationFrame(frame)
+    }
     frame = 0
-    for (const [type, listener] of listeners)
+    for (const [type, listener] of listeners) {
       el.ownerDocument.removeEventListener(type, listener as EventListener)
+    }
     el.ownerDocument.removeEventListener("keydown", onEscape, true)
-    if (el.hasPointerCapture?.(pointerId)) el.releasePointerCapture(pointerId)
-    if (locked()) el.ownerDocument.exitPointerLock()
+    if (el.hasPointerCapture?.(pointerId)) {
+      el.releasePointerCapture(pointerId)
+    }
+    if (locked()) {
+      el.ownerDocument.exitPointerLock()
+    }
   }
 
   function end(event: PointerEvent, canceled: boolean) {
@@ -192,17 +241,26 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
      * component's own guards: ending a stale drag can change what they read.
      */
     accepts(event: PointerEvent) {
-      if (event.button !== 0 || isSecondary(event) || event.defaultPrevented) return false
+      if (event.button !== 0 || isSecondary(event) || event.defaultPrevented) {
+        return false
+      }
       // A new primary press of the same kind means the running drag missed its release. The
       // press that started it, bubbling to a part around, like a handle's to its box, doesn't.
-      if (running && running.down !== event && running.down.pointerType === event.pointerType)
+      if (
+        running &&
+        running.down !== event &&
+        running.down.pointerType === event.pointerType
+      ) {
         running.cancel()
+      }
       return !running
     },
     /** Follows the press, like `bindDrag`, as this component's one drag. */
     start(el: HTMLElement, down: PointerEvent, options: BindDragOptions) {
       const finish = () => {
-        if (running === drag) running = undefined
+        if (running === drag) {
+          running = undefined
+        }
       }
       const onStart = options.onStart
       const stop = bindDrag(el, down, {
@@ -212,7 +270,9 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
           onStart &&
           ((event) => {
             const started = onStart(event)
-            if (started === false) finish()
+            if (started === false) {
+              finish()
+            }
             return started
           }),
         onEnd(event, canceled) {
@@ -246,34 +306,46 @@ function createDragSession(onDestroy?: (cleanup: () => void) => void) {
       }: BindDragOptions & {
         pick: (move: PointerEvent) => boolean | undefined
         onTap?: (up: PointerEvent) => void
-      },
+      }
     ) {
       const doc = el.ownerDocument
       const ours = (event: PointerEvent) => event.pointerId === down.pointerId
       const stopWaiting = () => {
         offs.forEach((off) => off())
-        if (running === waiting) running = undefined
+        if (running === waiting) {
+          running = undefined
+        }
       }
       const offs = [
         on(doc, "pointermove", (move) => {
-          if (!ours(move)) return
+          if (!ours(move)) {
+            return
+          }
           const picked = pick(move)
-          if (picked === undefined) return
+          if (picked === undefined) {
+            return
+          }
           stopWaiting()
-          if (!picked) return
+          if (!picked) {
+            return
+          }
           // The swipe follows from the move that picked it, but counts as a drag from the press.
           session.start(el, move, {
             ...options,
             onEnd(up, canceled) {
               const from = (event: PointerEvent) =>
                 isDrag(up.clientX - event.clientX, up.clientY - event.clientY)
-              if (!canceled && from(down) && !from(move)) swallowNextClick(doc)
+              if (!canceled && from(down) && !from(move)) {
+                swallowNextClick(doc)
+              }
               options.onEnd(up, canceled)
             },
           })
         }),
         on(doc, "pointerup", (up) => {
-          if (!ours(up)) return
+          if (!ours(up)) {
+            return
+          }
           stopWaiting()
           onTap?.(up)
         }),
@@ -304,10 +376,14 @@ function isDrag(dx: number, dy: number) {
 // Pointer lock hides the cursor and frees it from the screen's edges. Safari
 // shows a banner and can refuse, so failures fall back to plain movement.
 function requestLock(el: HTMLElement) {
-  if (typeof el.requestPointerLock !== "function") return
+  if (typeof el.requestPointerLock !== "function") {
+    return
+  }
   try {
     const result = el.requestPointerLock() as unknown
-    if (result instanceof Promise) result.catch(() => {})
+    if (result instanceof Promise) {
+      result.catch(() => {})
+    }
   } catch {}
 }
 
@@ -315,13 +391,21 @@ function requestLock(el: HTMLElement) {
 // it ends on, like a link. Call it in the release's task, or on the press with
 // `untilRelease`. It stops after the release's task, or at the next press, so
 // a later click goes through.
-function swallowNextClick(doc: Document, untilRelease = false, pointerId?: number) {
+function swallowNextClick(
+  doc: Document,
+  untilRelease = false,
+  pointerId?: number
+) {
   const view = doc.defaultView ?? window
   // With `pointerId`, another pointer's press, release or click, like a second finger's, leaves it armed.
   const ours = (event: Event) =>
-    pointerId === undefined || !("pointerId" in event) || event.pointerId === pointerId
+    pointerId === undefined ||
+    !("pointerId" in event) ||
+    event.pointerId === pointerId
   const swallow = (event: Event) => {
-    if (!ours(event)) return
+    if (!ours(event)) {
+      return
+    }
     event.preventDefault()
     event.stopPropagation()
     doc.removeEventListener("click", swallow, true)
@@ -336,7 +420,9 @@ function swallowNextClick(doc: Document, untilRelease = false, pointerId?: numbe
   const release = (event: Event) => ours(event) && view.setTimeout(forget)
   doc.addEventListener("click", swallow, true)
   doc.addEventListener("pointerdown", press, true)
-  if (!untilRelease) return view.setTimeout(forget)
+  if (!untilRelease) {
+    return view.setTimeout(forget)
+  }
   doc.addEventListener("pointerup", release, true)
   doc.addEventListener("pointercancel", release, true)
 }
@@ -345,14 +431,21 @@ function swallowNextClick(doc: Document, untilRelease = false, pointerId?: numbe
  * Runs `step` now, then again every `interval` ms after `delay` ms, until the
  * returned function stops it or `step` returns false, like at a bound.
  */
-function repeatWhileHeld(step: () => boolean, { delay = 400, interval = 60 } = {}) {
+function repeatWhileHeld(
+  step: () => boolean,
+  { delay = 400, interval = 60 } = {}
+) {
   let timer: ReturnType<typeof setTimeout> | undefined
   const tick = (wait: number) => {
     timer = setTimeout(() => {
-      if (step()) tick(interval)
+      if (step()) {
+        tick(interval)
+      }
     }, wait)
   }
-  if (step()) tick(delay)
+  if (step()) {
+    tick(delay)
+  }
   return () => clearTimeout(timer)
 }
 

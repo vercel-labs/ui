@@ -23,13 +23,18 @@ type DocPage = {
 function withIncludes(text: string, dir: string): string {
   return text.replace(/<include>(.+?)<\/include>/g, (_, included: string) => {
     const file = path.resolve(dir, included)
-    return withIncludes(readFileSync(file, "utf8").trimEnd(), path.dirname(file))
+    return withIncludes(
+      readFileSync(file, "utf8").trimEnd(),
+      path.dirname(file)
+    )
   })
 }
 
 /** A page's frontmatter and the content after it, with each `<include>` replaced by the file it names. */
 function readPage(file: string) {
-  const [, frontmatter, source] = readFileSync(file, "utf8").match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)!
+  const [, frontmatter, source] = readFileSync(file, "utf8").match(
+    /^---\n([\s\S]*?)\n---\n([\s\S]*)$/
+  )!
   const body = withIncludes(source, path.dirname(file))
   return {
     title: frontmatter.match(/^title: (.*)$/m)![1],
@@ -42,8 +47,12 @@ function readPage(file: string) {
 /** The page at `slugs`, or undefined when there's none. */
 function docPage(slugs: string[]) {
   const base = path.join(contentDir, ...slugs)
-  const file = [`${base}.mdx`, path.join(base, "index.mdx")].find((candidate) => existsSync(candidate))
-  if (!file) return undefined
+  const file = [`${base}.mdx`, path.join(base, "index.mdx")].find((candidate) =>
+    existsSync(candidate)
+  )
+  if (!file) {
+    return undefined
+  }
   const { title, description, date } = readPage(file)
   return { slugs, file, title, description, date } satisfies DocPage
 }
@@ -56,7 +65,9 @@ function docPage(slugs: string[]) {
  */
 function sharedHref(slugs: string[]) {
   const [section, folder, ...rest] = slugs
-  if (section in sharedSections) return `/docs/${slugs.join("/")}`
+  if (section in sharedSections) {
+    return `/docs/${slugs.join("/")}`
+  }
   return `/docs/${[folder === "hooks" ? "utilities" : folder, ...rest].filter(Boolean).join("/")}`
 }
 
@@ -67,7 +78,9 @@ function sharedHref(slugs: string[]) {
 function docPages(folder: string) {
   const dir = path.join(contentDir, folder)
   const meta = path.join(dir, "meta.json")
-  const listed = existsSync(meta) ? (JSON.parse(readFileSync(meta, "utf8")) as { pages: string[] }).pages : []
+  const listed = existsSync(meta)
+    ? (JSON.parse(readFileSync(meta, "utf8")) as { pages: string[] }).pages
+    : []
   const rest = readdirSync(dir)
     .filter((file) => file.endsWith(".mdx"))
     .map((file) => file.slice(0, -".mdx".length))
@@ -79,7 +92,9 @@ function docPages(folder: string) {
     names.flatMap(
       (name) =>
         docPage([...slugs, name]) ??
-        (existsSync(path.join(dir, name, "meta.json")) ? docPages(`${folder}/${name}`) : []),
+        (existsSync(path.join(dir, name, "meta.json"))
+          ? docPages(`${folder}/${name}`)
+          : [])
     )
   return [
     ...pages(["index"]).map((page) => ({ ...page, slugs })),
@@ -91,8 +106,18 @@ function docPages(folder: string) {
 // Top-level framework guides, in the same order as the sidebar.
 function frameworkGuides(framework: Framework) {
   return docPages(framework).filter(
-    (page) => page.slugs.length <= 2 && !["components", "hooks", "utilities"].includes(page.slugs[1]),
+    (page) =>
+      page.slugs.length <= 2 &&
+      !["components", "hooks", "utilities"].includes(page.slugs[1])
   )
 }
 
-export { contentDir, docPage, type DocPage, docPages, frameworkGuides, readPage, sharedHref }
+export {
+  contentDir,
+  docPage,
+  type DocPage,
+  docPages,
+  frameworkGuides,
+  readPage,
+  sharedHref,
+}

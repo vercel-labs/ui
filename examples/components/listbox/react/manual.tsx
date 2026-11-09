@@ -1,6 +1,10 @@
 "use client"
 
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/react/listbox"
 import { CheckIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
@@ -18,7 +22,9 @@ function Example() {
   return (
     <Listbox
       activation="manual"
-      onValueChange={(value, details) => log(`${value ?? "Nothing"} (${details.reason})`)}
+      onValueChange={(value, details) =>
+        log(`${value ?? "Nothing"} (${details.reason})`)
+      }
       aria-label="Framework"
     >
       {frameworks.map((framework) => (

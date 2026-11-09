@@ -54,18 +54,29 @@ function Example() {
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectInput
+            aria-label="Search countries"
+            placeholder="Search countries…"
+          />
           <SelectEmpty>No countries found.</SelectEmpty>
           <SelectList>
             {regions.map((group) => (
               <SelectGroup key={group.label}>
                 <SelectGroupLabel>{group.label}</SelectGroupLabel>
                 {group.items.map((item) => (
-                  <SelectItem key={item.value} value={item.value} label={item.label}>
+                  <SelectItem
+                    key={item.value}
+                    value={item.value}
+                    label={item.label}
+                  >
                     <SelectItemText>
                       {(state) =>
                         state.segments.map((segment, index) =>
-                          segment.match ? <b key={index}>{segment.text}</b> : segment.text,
+                          segment.match ? (
+                            <b key={index}>{segment.text}</b>
+                          ) : (
+                            segment.text
+                          )
                         )
                       }
                     </SelectItemText>

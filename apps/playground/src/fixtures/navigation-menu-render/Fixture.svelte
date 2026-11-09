@@ -18,13 +18,17 @@
   <NavigationMenu
     aria-label="Docs"
     class="nav-menu"
-    onValueChange={(value, { reason }) => (action = `${value ?? "close"}: ${reason}`)}
+    onValueChange={(value, { reason }) =>
+      (action = `${value ?? "close"}: ${reason}`)}
   >
     <NavigationMenuList class="nav-list">
       <NavigationMenuItem value="guides">
         <NavigationMenuTrigger>
           {#snippet render({ props, state })}
-            <button {...props} class={["nav-trigger", state.open ? "is-open" : "is-closed"]}>
+            <button
+              {...props}
+              class={["nav-trigger", state.open ? "is-open" : "is-closed"]}
+            >
               Guides <span aria-hidden="true">{state.open ? "▲" : "▼"}</span>
             </button>
           {/snippet}

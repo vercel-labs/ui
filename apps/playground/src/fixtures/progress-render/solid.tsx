@@ -1,6 +1,11 @@
 import { Avatar, AvatarFallback } from "@ui-sdk/solid/avatar"
 import { OTPInput, OTPInputSlot } from "@ui-sdk/solid/otp-input"
-import { Progress, ProgressIndicator, ProgressTrack, ProgressValue } from "@ui-sdk/solid/progress"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressTrack,
+  ProgressValue,
+} from "@ui-sdk/solid/progress"
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
 
@@ -23,12 +28,24 @@ function Fixture() {
         </ProgressTrack>
       </Progress>
       <Avatar class="avatar" render={(props) => <div {...props} />}>
-        <AvatarFallback class={(state) => `avatar-fallback is-${state.loadingStatus}`}>RF</AvatarFallback>
+        <AvatarFallback
+          class={(state) => `avatar-fallback is-${state.loadingStatus}`}
+        >
+          RF
+        </AvatarFallback>
       </Avatar>
-      <OTPInput aria-label="PIN" maxLength={4} class="otp" render={(props) => <section {...props} />}>
+      <OTPInput
+        aria-label="PIN"
+        maxLength={4}
+        class="otp"
+        render={(props) => <section {...props} />}
+      >
         <For each={[0, 1, 2, 3]}>
           {(index) => (
-            <OTPInputSlot index={index} class={(state) => `otp-slot${state.active ? " is-active" : ""}`}>
+            <OTPInputSlot
+              index={index}
+              class={(state) => `otp-slot${state.active ? " is-active" : ""}`}
+            >
               {(state) => state.char ?? "·"}
             </OTPInputSlot>
           )}

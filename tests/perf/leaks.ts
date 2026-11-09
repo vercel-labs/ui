@@ -33,17 +33,31 @@ async function countFrames(page: Page) {
 }
 
 // Listeners on an object the page evaluates, like `window`, by event type.
-async function listenersOn(cdp: CDPSession, expression: string, objectGroup: string) {
-  const { result } = await cdp.send("Runtime.evaluate", { expression, objectGroup })
-  const { listeners } = await cdp.send("DOMDebugger.getEventListeners", { objectId: result.objectId! })
+async function listenersOn(
+  cdp: CDPSession,
+  expression: string,
+  objectGroup: string
+) {
+  const { result } = await cdp.send("Runtime.evaluate", {
+    expression,
+    objectGroup,
+  })
+  const { listeners } = await cdp.send("DOMDebugger.getEventListeners", {
+    objectId: result.objectId!,
+  })
   const byType: Record<string, number> = {}
-  for (const { type } of listeners) byType[type] = (byType[type] ?? 0) + 1
+  for (const { type } of listeners) {
+    byType[type] = (byType[type] ?? 0) + 1
+  }
   return byType
 }
 
 // The `data-slot` of every element that's alive and out of the page.
 async function detachedSlots(cdp: CDPSession, objectGroup: string) {
-  const { result } = await cdp.send("Runtime.evaluate", { expression: "HTMLElement.prototype", objectGroup })
+  const { result } = await cdp.send("Runtime.evaluate", {
+    expression: "HTMLElement.prototype",
+    objectGroup,
+  })
   const { objects } = await cdp.send("Runtime.queryObjects", {
     prototypeObjectId: result.objectId!,
     objectGroup,
@@ -106,16 +120,32 @@ async function listenersNow(cdp: CDPSession) {
 }
 
 /** Listeners added and not removed since `before`, by target and event type. */
-function addedListeners(before: Pick<LeakSnapshot, "listeners">, after: Pick<LeakSnapshot, "listeners">) {
+function addedListeners(
+  before: Pick<LeakSnapshot, "listeners">,
+  after: Pick<LeakSnapshot, "listeners">
+) {
   const added: Record<string, number> = {}
   for (const target of ["window", "document"] as const) {
-    const types = new Set([...Object.keys(before.listeners[target]), ...Object.keys(after.listeners[target])])
+    const types = new Set([
+      ...Object.keys(before.listeners[target]),
+      ...Object.keys(after.listeners[target]),
+    ])
     for (const type of types) {
-      const delta = (after.listeners[target][type] ?? 0) - (before.listeners[target][type] ?? 0)
-      if (delta) added[`${target} ${type}`] = delta
+      const delta =
+        (after.listeners[target][type] ?? 0) -
+        (before.listeners[target][type] ?? 0)
+      if (delta) {
+        added[`${target} ${type}`] = delta
+      }
     }
   }
   return added
 }
 
-export { addedListeners, countFrames, type LeakSnapshot, listenersNow, snapshot }
+export {
+  addedListeners,
+  countFrames,
+  type LeakSnapshot,
+  listenersNow,
+  snapshot,
+}

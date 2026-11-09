@@ -18,7 +18,11 @@ A region of slides that scroll a page at a time. Name it with `aria-label`.
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
   import { useControllerEntry } from "../popup.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   type PageDetails = ChangeDetails<CarouselPageChangeReason>
   type PlayingDetails = ChangeDetails<CarouselPlayingChangeReason>
@@ -103,12 +107,16 @@ A region of slides that scroll a page at a time. Name it with `aria-label`.
     // The callbacks run first, so canceling there also keeps a bound value as it was.
     onPageChange: (next: number, details: PageDetails) => {
       onPageChange?.(next, details)
-      if (!details.canceled) page = next
+      if (!details.canceled) {
+        page = next
+      }
     },
     onPageChangeComplete,
     onPlayingChange: (next: boolean, details: PlayingDetails) => {
       onPlayingChange?.(next, details)
-      if (!details.canceled) playing = next
+      if (!details.canceled) {
+        playing = next
+      }
     },
   }))
   useControllerEntry(() => controller, carousel)

@@ -17,7 +17,14 @@ const commands = [
   {
     value: "status",
     label: "status",
-    arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
+    arguments: [
+      {
+        name: "status",
+        hint: "<status>",
+        required: true,
+        items: ["available", "busy", "away"],
+      },
+    ],
   },
 ]
 
@@ -37,13 +44,17 @@ function Example() {
       }}
       onOpenChangeComplete={(next) => log(next ? "Open" : "Closed")}
       onQueryChange={(query, details) =>
-        log(`Query “${query}”${details.argument ? ` for ${details.argument}` : ""}`)
+        log(
+          `Query “${query}”${details.argument ? ` for ${details.argument}` : ""}`
+        )
       }
       shortcut="ctrl+j"
     >
       <Field>
         <FieldLabel>Message</FieldLabel>
-        <FieldControl render={<TriggerMenuInput placeholder="Type @ or /…" />} />
+        <FieldControl
+          render={<TriggerMenuInput placeholder="Type @ or /…" />}
+        />
       </Field>
     </TriggerMenu>
   )

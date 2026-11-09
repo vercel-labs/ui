@@ -1,4 +1,7 @@
-import { fieldChoiceCardFixture as f, fieldChoiceCardOptions } from "tests/fixtures/field.ts"
+import {
+  fieldChoiceCardFixture as f,
+  fieldChoiceCardOptions,
+} from "tests/fixtures/field.ts"
 
 const indicator = `<ui-checkbox-indicator class="checkbox-indicator"></ui-checkbox-indicator>`
 
@@ -12,9 +15,14 @@ const card = (item: { name: string; title: string; description: string }) => `
   </label>`
 
 async function mount(root: HTMLElement) {
-  await Promise.all([import("@ui-sdk/web/field"), import("@ui-sdk/web/checkbox")])
+  await Promise.all([
+    import("@ui-sdk/web/field"),
+    import("@ui-sdk/web/checkbox"),
+  ])
   const { alone, later } = fieldChoiceCardOptions()
-  const cards = f.cards.map((item) => `<ui-field-label as-child>${card(item)}</ui-field-label>`).join("")
+  const cards = f.cards
+    .map((item) => `<ui-field-label as-child>${card(item)}</ui-field-label>`)
+    .join("")
   root.innerHTML = `
     <div class="fixture">
       <button>Before</button>
@@ -23,11 +31,15 @@ async function mount(root: HTMLElement) {
       ${alone ? `<ui-field-label>${f.alone}</ui-field-label>` : ""}
       <button>After</button>
     </div>`
-  if (later)
+  if (later) {
     setTimeout(
-      () => root.querySelector("#later")!.insertAdjacentHTML("beforeend", card(f.later)),
-      f.later.delay,
+      () =>
+        root
+          .querySelector("#later")!
+          .insertAdjacentHTML("beforeend", card(f.later)),
+      f.later.delay
     )
+  }
 }
 
 export { mount }

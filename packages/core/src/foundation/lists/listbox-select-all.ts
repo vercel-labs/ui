@@ -7,7 +7,11 @@ import { textOf } from "../text/typeahead"
 import { type Listbox } from "./listbox"
 import { optionId, SELECT_ALL } from "./listbox-keys"
 import { checkedAttrs } from "../kernel/attrs"
-import type { BaseSlotProps, RoleFields, SlotDefinition } from "../kernel/primitive-types"
+import type {
+  BaseSlotProps,
+  RoleFields,
+  SlotDefinition,
+} from "../kernel/primitive-types"
 import { type ValueSelection } from "./listbox-value"
 import { live } from "../kernel/live"
 
@@ -24,7 +28,8 @@ type ListSelectAllState = {
 }
 
 // The group a select-all key covers, or undefined for the whole list.
-const groupOf = (key: string) => (key === SELECT_ALL ? undefined : key.slice(SELECT_ALL.length + 1))
+const groupOf = (key: string) =>
+  key === SELECT_ALL ? undefined : key.slice(SELECT_ALL.length + 1)
 
 // What the select-all parts need from a component.
 type SelectAllApi = {
@@ -39,17 +44,29 @@ type SelectAllApi = {
 }
 
 // The items a select-all option covers, and how many are selected.
-function coverage({ listbox, selection, limit }: SelectAllApi["internal"], key: string) {
+function coverage(
+  { listbox, selection, limit }: SelectAllApi["internal"],
+  key: string
+) {
   const keys = listbox.selectable(groupOf(key))
   let selected = 0
-  for (const item of keys) if (selection.isSelected(item)) selected++
+  for (const item of keys) {
+    if (selection.isSelected(item)) {
+      selected++
+    }
+  }
   const max = limit?.()
-  const fits = max === undefined || selection.keys().length + keys.length - selected <= max
+  const fits =
+    max === undefined || selection.keys().length + keys.length - selected <= max
   return { keys, selected, fits }
 }
 
 /** The state of a select-all option. */
-function selectAllState(api: SelectAllApi, key: string, highlighted: string | null) {
+function selectAllState(
+  api: SelectAllApi,
+  key: string,
+  highlighted: string | null
+) {
   const { keys, selected, fits } = coverage(api.internal, key)
   const checked = keys.length > 0 && selected === keys.length
   return {
@@ -65,22 +82,34 @@ function selectAllState(api: SelectAllApi, key: string, highlighted: string | nu
 function toggledAll(api: SelectAllApi, key: string) {
   const { listbox, selection } = api.internal
   const { keys, selected, fits } = coverage(api.internal, key)
-  if (!keys.length) return undefined
+  if (!keys.length) {
+    return undefined
+  }
   if (selected === keys.length) {
     const removed = new Set(keys)
-    return selection.values().filter((value) => !removed.has(selection.keysOf([value])[0]))
+    return selection
+      .values()
+      .filter((value) => !removed.has(selection.keysOf([value])[0]))
   }
-  if (!fits) return undefined
+  if (!fits) {
+    return undefined
+  }
   const added = keys.filter((item) => !selection.isSelected(item))
   // Their labels outlive the list, for chips and the trigger.
   for (const item of added) {
     const entry = listbox.find(item)
-    if (entry) listbox.remember(item, entry.label, entry.value)
+    if (entry) {
+      listbox.remember(item, entry.label, entry.value)
+    }
   }
   return [...selection.values(), ...added.map((item) => listbox.valueOf(item))]
 }
 
-type SelectAllOwnerState = { multiple: boolean; highlighted: string | null; focusInList: boolean }
+type SelectAllOwnerState = {
+  multiple: boolean
+  highlighted: string | null
+  focusInList: boolean
+}
 
 type OptionFocus = "roving" | "active-descendant"
 
@@ -88,7 +117,10 @@ type OptionFocus = "roving" | "active-descendant"
 type SelectAllFeatureApi = SelectAllApi & {
   internal: {
     hooks: { choose?: (key: string, event?: Event) => void }
-    changeValue: (value: unknown, details: { reason: "item-press"; event?: Event }) => unknown
+    changeValue: (
+      value: unknown,
+      details: { reason: "item-press"; event?: Event }
+    ) => unknown
   }
 }
 
@@ -97,17 +129,18 @@ type SelectAllFeatureApi = SelectAllApi & {
  * component calls the `choose` hook for a select-all key once it has checked
  * the value can change.
  */
-function selectAllFeature<State extends SelectAllOwnerState, Api extends SelectAllFeatureApi>({
-  focus,
-}: {
-  focus: OptionFocus
-}) {
+function selectAllFeature<
+  State extends SelectAllOwnerState,
+  Api extends SelectAllFeatureApi,
+>({ focus }: { focus: OptionFocus }) {
   return {
     slots: { "select-all": selectAllPart<State, Api>({ focus }) },
     extend(api: Api) {
       api.internal.hooks.choose = (key, event) => {
         const value = toggledAll(api, key)
-        if (value) api.internal.changeValue(value, { reason: "item-press", event })
+        if (value) {
+          api.internal.changeValue(value, { reason: "item-press", event })
+        }
       }
     },
   }
@@ -116,18 +149,21 @@ function selectAllFeature<State extends SelectAllOwnerState, Api extends SelectA
 // The option itself: checked, unchecked or mixed, never filtered and never
 // counted as a result. It takes focus as the component's items do: real focus,
 // or aria-activedescendant until a screen reader moves focus into the list.
-function selectAllPart<State extends SelectAllOwnerState, Api extends SelectAllApi>({
-  focus,
-}: {
-  focus: OptionFocus
-}) {
+function selectAllPart<
+  State extends SelectAllOwnerState,
+  Api extends SelectAllApi,
+>({ focus }: { focus: OptionFocus }) {
   return {
     present: (state) => state.multiple,
     state: (state, { api, key }) => selectAllState(api, key, state.highlighted),
     role: "option",
     focus,
     attrs: (state, { id, api, key }) => {
-      const { checked, indeterminate, disabled } = selectAllState(api, key, state.highlighted)
+      const { checked, indeterminate, disabled } = selectAllState(
+        api,
+        key,
+        state.highlighted
+      )
       return {
         id: optionId(id, key),
         tabindex: focus === "roving" || state.focusInList ? "-1" : undefined,
@@ -138,14 +174,20 @@ function selectAllPart<State extends SelectAllOwnerState, Api extends SelectAllA
         ...checkedAttrs(indeterminate ? "indeterminate" : checked),
       }
     },
-    live: live((state, { key }) => ({ "data-highlighted": state.highlighted === key ? "" : undefined })),
+    live: live((state, { key }) => ({
+      "data-highlighted": state.highlighted === key ? "" : undefined,
+    })),
     on: {
       ...pressKeepsFocus,
       pointermove: (event, { api, key }) => api.internal.hover(key, event),
     },
     press: ({ api, key }, event) => api.internal.choose(key, event),
     bind: (el, { api, key }) =>
-      api.internal.listbox.register(key, el, () => ({ value: key, label: textOf(el), pinned: true })),
+      api.internal.listbox.register(key, el, () => ({
+        value: key,
+        label: textOf(el),
+        pinned: true,
+      })),
   } satisfies SlotDefinition<State, Api, BaseSlotProps, ListSelectAllState> &
     RoleFields<State, Api, BaseSlotProps>
 }

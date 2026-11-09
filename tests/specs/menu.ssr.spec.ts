@@ -6,7 +6,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("a closed menu hydrates without mismatches", async ({ page, open }) => {
   await open("menu")
@@ -22,18 +25,21 @@ test("an open menu hydrates without mismatches, then shows the platform's shortc
   await open("menu", { open: "" })
   await expect(menuNamed(page, "File")).toBeVisible()
   expect(await hydrationErrors(page)).toEqual([])
-  const apple = await page.evaluate(() => /Mac|iPhone|iPad/.test(navigator.platform))
-  await expect(page.getByRole("menuitem", { name: "New file" })).toHaveAttribute(
-    "aria-keyshortcuts",
-    apple ? "Meta+N" : "Control+N",
+  const apple = await page.evaluate(() =>
+    /Mac|iPhone|iPad/.test(navigator.platform)
   )
+  await expect(
+    page.getByRole("menuitem", { name: "New file" })
+  ).toHaveAttribute("aria-keyshortcuts", apple ? "Meta+N" : "Control+N")
 })
 
 test("an open menu is visible before it hydrates", async ({ page, open }) => {
   await open("menu", { open: "" })
   expect(
     await page.evaluate(
-      () => (window as unknown as { __visibleBeforeHydration: boolean }).__visibleBeforeHydration,
-    ),
+      () =>
+        (window as unknown as { __visibleBeforeHydration: boolean })
+          .__visibleBeforeHydration
+    )
   ).toBe(true)
 })

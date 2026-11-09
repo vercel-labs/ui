@@ -10,8 +10,14 @@ const tick = () => new Promise((resolve) => setTimeout(resolve))
 
 function group() {
   const store = createStore({ focused: null as string | null }, [])
-  const roving = createRovingFocus({ store, onDestroy: () => {} }, { slot: "item", key: "focused" })
-  const add = (itemKey: string, el = document.body.appendChild(document.createElement("button"))) => ({
+  const roving = createRovingFocus(
+    { store, onDestroy: () => {} },
+    { slot: "item", key: "focused" }
+  )
+  const add = (
+    itemKey: string,
+    el = document.body.appendChild(document.createElement("button"))
+  ) => ({
     el,
     leave: roving.bind(el, { key: itemKey, props: {} }),
   })

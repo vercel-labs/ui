@@ -1,5 +1,11 @@
 import { Checkbox, CheckboxGroup } from "@ui-sdk/react/checkbox"
-import { Menu, MenuContent, MenuRadioGroup, MenuRadioItem, MenuTrigger } from "@ui-sdk/react/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuRadioGroup,
+  MenuRadioItem,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
 import { Toggle, ToggleGroup } from "@ui-sdk/react/toggle"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
@@ -27,20 +33,34 @@ function Fallback() {
   return <p>Loading</p>
 }
 
-function Group({ value, choose }: { value: string; choose: (value: string) => void }) {
+function Group({
+  value,
+  choose,
+}: {
+  value: string
+  choose: (value: string) => void
+}) {
   const group = new URLSearchParams(location.search).get("group")
-  if (group === "toggle")
+  if (group === "toggle") {
     return (
-      <ToggleGroup value={[value]} onValueChange={([next]) => next && choose(next)}>
+      <ToggleGroup
+        value={[value]}
+        onValueChange={([next]) => next && choose(next)}
+      >
         <Toggle value="left">Left</Toggle>
-        <Toggle value="right">{(state) => <>Right{state.pressed && <Details />}</>}</Toggle>
+        <Toggle value="right">
+          {(state) => <>Right{state.pressed && <Details />}</>}
+        </Toggle>
       </ToggleGroup>
     )
-  if (group === "checkbox")
+  }
+  if (group === "checkbox") {
     return (
       <CheckboxGroup
         value={[value]}
-        onValueChange={(next) => choose(next.find((item) => item !== value) ?? value)}
+        onValueChange={(next) =>
+          choose(next.find((item) => item !== value) ?? value)
+        }
       >
         <Checkbox value="left" aria-label="Left" />
         <Checkbox value="right" aria-label="Right">
@@ -48,6 +68,7 @@ function Group({ value, choose }: { value: string; choose: (value: string) => vo
         </Checkbox>
       </CheckboxGroup>
     )
+  }
   return (
     <Menu defaultOpen modal={false}>
       <MenuTrigger>Align</MenuTrigger>
@@ -71,7 +92,10 @@ function Fixture() {
     <div className="fixture">
       <button>Before</button>
       <React.Suspense fallback={<Fallback />}>
-        <Group value={value} choose={(next) => React.startTransition(() => setValue(next))} />
+        <Group
+          value={value}
+          choose={(next) => React.startTransition(() => setValue(next))}
+        />
       </React.Suspense>
     </div>
   )

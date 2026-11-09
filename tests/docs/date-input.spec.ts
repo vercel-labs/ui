@@ -9,7 +9,9 @@ const lastLog = (preview: Locator) =>
     .last()
 
 const segment = (preview: Locator, group: string, unit: string) =>
-  preview.getByRole("group", { name: group }).getByRole("spinbutton", { name: unit })
+  preview
+    .getByRole("group", { name: group })
+    .getByRole("spinbutton", { name: unit })
 
 // Each example's check, in the order they appear on the Date Input page.
 testExamples(
@@ -30,15 +32,22 @@ testExamples(
     "min-max": async (preview) => {
       await segment(preview, "Check-in", "year").click()
       await preview.page().keyboard.press("ArrowUp")
-      await expect(preview.getByRole("group", { name: "Check-in" })).toHaveAttribute("data-invalid", "")
+      await expect(
+        preview.getByRole("group", { name: "Check-in" })
+      ).toHaveAttribute("data-invalid", "")
     },
     unavailable: async (preview) => {
       await segment(preview, "Delivery date", "day").click()
       await preview.page().keyboard.press("ArrowDown")
-      await expect(preview.getByRole("group", { name: "Delivery date" })).toHaveAttribute("data-invalid", "")
+      await expect(
+        preview.getByRole("group", { name: "Delivery date" })
+      ).toHaveAttribute("data-invalid", "")
     },
     locale: async (preview) => {
-      const first = preview.getByRole("group", { name: "Date (en-GB)" }).getByRole("spinbutton").first()
+      const first = preview
+        .getByRole("group", { name: "Date (en-GB)" })
+        .getByRole("spinbutton")
+        .first()
       await expect(first).toHaveValue("02")
     },
     disabled: async (preview) => {
@@ -52,7 +61,9 @@ testExamples(
     },
     form: async (preview) => {
       await preview.getByRole("button", { name: "Book" }).click()
-      await expect(lastLog(preview)).toHaveText("Submitted date=2026-11-02, time=09:30")
+      await expect(lastLog(preview)).toHaveText(
+        "Submitted date=2026-11-02, time=09:30"
+      )
     },
     controlled: async (preview) => {
       await segment(preview, "Due date", "day").click()
@@ -68,7 +79,9 @@ testExamples(
     segments: async (preview, framework) => {
       await expect(segment(preview, "Start date", "month")).toHaveValue("11")
       // Web copies a template, so its separators stay the locale's.
-      if (framework !== "web-components") await expect(preview.getByText("–").first()).toBeVisible()
+      if (framework !== "web-components") {
+        await expect(preview.getByText("–").first()).toBeVisible()
+      }
     },
   },
   "components",
@@ -87,7 +100,7 @@ testExamples(
     "segments",
     "time",
     "hour-cycle",
-  ],
+  ]
 )
 
 // Time Input's page shows the time examples from the same folder.
@@ -100,10 +113,12 @@ testExamples(
       await expect(segment(preview, "Meeting time", "AM/PM")).toHaveValue("PM")
     },
     "hour-cycle": async (preview) => {
-      await expect(preview.getByRole("group", { name: "24-hour clock" }).getByRole("spinbutton")).toHaveCount(
-        2,
-      )
+      await expect(
+        preview
+          .getByRole("group", { name: "24-hour clock" })
+          .getByRole("spinbutton")
+      ).toHaveCount(2)
     },
   },
-  "components",
+  "components"
 )

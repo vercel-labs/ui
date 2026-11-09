@@ -31,7 +31,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 function Example() {
   const [button, setButton] = createSignal<HTMLButtonElement | null>(null)
@@ -48,7 +49,9 @@ function Example() {
     >
       <ComboboxTrigger ref={setButton} aria-label="Country">
         <span>
-          <ComboboxValue>{(state) => state.label || "Select a country"}</ComboboxValue>
+          <ComboboxValue>
+            {(state) => state.label || "Select a country"}
+          </ComboboxValue>
         </span>
         <svg
           viewBox="0 0 24 24"
@@ -76,7 +79,11 @@ function Example() {
             <path d="m21 21-4.34-4.34" />
             <circle cx="11" cy="11" r="8" />
           </svg>
-          <ComboboxInput autofocus aria-label="Search countries" placeholder="Search…" />
+          <ComboboxInput
+            autofocus
+            aria-label="Search countries"
+            placeholder="Search…"
+          />
         </div>
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>

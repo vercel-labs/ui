@@ -44,7 +44,11 @@ function Example() {
             </SelectTrigger>
             <SelectContent>
               {countries.map((country) => (
-                <SelectItem key={country.value} value={country.value} disabled={country.value === "dk"}>
+                <SelectItem
+                  key={country.value}
+                  value={country.value}
+                  disabled={country.value === "dk"}
+                >
                   {country.label}
                   <SelectItemIndicator>
                     <CheckIcon />

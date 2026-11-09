@@ -14,12 +14,18 @@ neither.
   let { children, ...rest }: PartProps<"div"> = $props()
 
   const { region, toast } = useToast("ToastDescription")
-  const description = useHandlePart(region, "description", () => ({ id: toast().id }))
+  const description = useHandlePart(region, "description", () => ({
+    id: toast().id,
+  }))
   const content = $derived(toast().description)
 </script>
 
 {#snippet fallback()}<Content content={content!} />{/snippet}
 
 {#if children || content != null}
-  <Part tag="div" part={description} props={{ ...rest, children: children ?? fallback }} />
+  <Part
+    tag="div"
+    part={description}
+    props={{ ...rest, children: children ?? fallback }}
+  />
 {/if}

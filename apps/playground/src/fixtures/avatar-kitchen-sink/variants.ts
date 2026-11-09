@@ -5,7 +5,7 @@ import type { AvatarLoadingStatus } from "@ui-sdk/core/avatar"
 // A head and shoulders on a colored square, inline so no server is needed.
 const portrait = (background: string, figure: string) =>
   `data:image/svg+xml,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${background}"/><circle cx="32" cy="26" r="12" fill="${figure}"/><path d="M10 64c2-14 12-20 22-20s20 6 22 20z" fill="${figure}"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="${background}"/><circle cx="32" cy="26" r="12" fill="${figure}"/><path d="M10 64c2-14 12-20 22-20s20 6 22 20z" fill="${figure}"/></svg>`
   )}`
 
 const images = {
@@ -36,7 +36,12 @@ type Variant = {
   // The fallback's delay, in milliseconds.
   delay?: number
   // Attributes the image passes through as they are.
-  imageProps?: { crossOrigin?: "anonymous"; referrerPolicy?: "no-referrer"; srcSet?: string; sizes?: string }
+  imageProps?: {
+    crossOrigin?: "anonymous"
+    referrerPolicy?: "no-referrer"
+    srcSet?: string
+    sizes?: string
+  }
   size?: "sm" | "md" | "lg"
   place?: "rtl"
   // The first avatar's image is added this many milliseconds after it mounts.
@@ -63,8 +68,14 @@ const sourceControls: [string, Source][] = [
 ]
 
 // The image a person starts with, or none while it's still to arrive.
-const initialSource = (variant: Variant, person: Person, index: number): Source =>
-  person.image && !(index === 0 && variant.arrivesAfter) ? images[person.image] : undefined
+const initialSource = (
+  variant: Variant,
+  person: Person,
+  index: number
+): Source =>
+  person.image && !(index === 0 && variant.arrivesAfter)
+    ? images[person.image]
+    : undefined
 
 const statusMessage = (person: Person, status: string, reason: string) =>
   `${person.name}: ${status} (${reason})`
@@ -73,7 +84,9 @@ const statusMessage = (person: Person, status: string, reason: string) =>
 function chipsOf(variant: Variant) {
   const [first] = variant.people
   return {
-    ...(variant.people.length === 1 && { src: first.image ? images[first.image] : "none" }),
+    ...(variant.people.length === 1 && {
+      src: first.image ? images[first.image] : "none",
+    }),
     ...(variant.people.length > 1 && { avatars: variant.people.length }),
     ...(variant.delay !== undefined && { delay: variant.delay }),
     ...variant.imageProps,
@@ -85,7 +98,13 @@ function chipsOf(variant: Variant) {
 }
 
 const variants: Variant[] = [
-  { id: "loaded", section: "Images", title: "Image loads", people: [people.ada], settles: "loaded" },
+  {
+    id: "loaded",
+    section: "Images",
+    title: "Image loads",
+    people: [people.ada],
+    settles: "loaded",
+  },
   {
     id: "broken",
     section: "Images",
@@ -217,7 +236,10 @@ const variants: Variant[] = [
     title: "srcSet and sizes",
     note: "Green on 1x screens, yellow on 2x.",
     people: [people.alan],
-    imageProps: { srcSet: `${images.alan} 1x, ${images.grace} 2x`, sizes: "40px" },
+    imageProps: {
+      srcSet: `${images.alan} 1x, ${images.grace} 2x`,
+      sizes: "40px",
+    },
     settles: "loaded",
   },
   {
@@ -229,9 +251,30 @@ const variants: Variant[] = [
     settles: "error",
   },
 
-  { id: "size-sm", section: "Sizes", title: "Small", people: [people.ada], size: "sm", settles: "loaded" },
-  { id: "size-md", section: "Sizes", title: "Medium", people: [people.none], size: "md", settles: "idle" },
-  { id: "size-lg", section: "Sizes", title: "Large", people: [people.grace], size: "lg", settles: "loaded" },
+  {
+    id: "size-sm",
+    section: "Sizes",
+    title: "Small",
+    people: [people.ada],
+    size: "sm",
+    settles: "loaded",
+  },
+  {
+    id: "size-md",
+    section: "Sizes",
+    title: "Medium",
+    people: [people.none],
+    size: "md",
+    settles: "idle",
+  },
+  {
+    id: "size-lg",
+    section: "Sizes",
+    title: "Large",
+    people: [people.grace],
+    size: "lg",
+    settles: "loaded",
+  },
   {
     id: "size-lg-broken",
     section: "Sizes",

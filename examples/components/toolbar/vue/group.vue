@@ -1,6 +1,17 @@
 <script setup lang="ts">
-import { ClipboardIcon, CopyIcon, RedoIcon, ScissorsIcon, UndoIcon } from "@lucide/vue"
-import { Toolbar, ToolbarButton, ToolbarGroup, ToolbarSeparator } from "@ui-sdk/vue/toolbar"
+import {
+  ClipboardIcon,
+  CopyIcon,
+  RedoIcon,
+  ScissorsIcon,
+  UndoIcon,
+} from "@lucide/vue"
+import {
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+  ToolbarSeparator,
+} from "@ui-sdk/vue/toolbar"
 import { useLog } from "../../../shared/vue/log"
 
 const clipboard = [

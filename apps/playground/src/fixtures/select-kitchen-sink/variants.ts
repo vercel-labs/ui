@@ -70,7 +70,11 @@ type Variant = {
 
 // Shown while the search is empty, in the "recent" variant.
 const recentItems: ListData = [
-  { type: "group", label: "Recent", items: [{ value: "pineapple", label: "Pineapple" }] },
+  {
+    type: "group",
+    label: "Recent",
+    items: [{ value: "pineapple", label: "Pineapple" }],
+  },
 ]
 
 type List = "fruits" | "grouped" | "long" | "many" | "countries"
@@ -151,7 +155,10 @@ function listOf(variant: Variant) {
     case "many":
       return many
     case "countries":
-      return countries.map((country) => ({ value: country, label: country.name }))
+      return countries.map((country) => ({
+        value: country,
+        label: country.name,
+      }))
     default:
       return fruits
   }
@@ -160,8 +167,11 @@ function listOf(variant: Variant) {
 // The value at first. Countries are objects, so their keys are looked up.
 function defaultValueOf(variant: Variant) {
   const value = variant.options?.defaultValue
-  if (variant.list !== "countries" || value === undefined) return value
-  const find = (code: string) => countries.find((country) => country.code === code)
+  if (variant.list !== "countries" || value === undefined) {
+    return value
+  }
+  const find = (code: string) =>
+    countries.find((country) => country.code === code)
   return Array.isArray(value) ? value.map(find) : find(value)
 }
 
@@ -172,8 +182,12 @@ function valuePlaceholder(variant: Variant) {
 
 // The controller's "Set" button picks this.
 function sampleValue(variant: Variant) {
-  if (variant.options?.multiple) return ["apple", "banana"]
-  if (variant.list === "countries") return countries[3]
+  if (variant.options?.multiple) {
+    return ["apple", "banana"]
+  }
+  if (variant.list === "countries") {
+    return countries[3]
+  }
   return "banana"
 }
 
@@ -187,13 +201,33 @@ const variants: Variant[] = [
       section: "Placement",
       title: `${side} ${align}`,
       content: { side, align },
-    })),
+    }))
   ),
 
-  { id: "offset-0", section: "Offsets", title: "sideOffset 0", content: { sideOffset: 0 } },
-  { id: "offset-16", section: "Offsets", title: "sideOffset 16", content: { sideOffset: 16 } },
-  { id: "align-16", section: "Offsets", title: "alignOffset 16", content: { alignOffset: 16 } },
-  { id: "align-neg", section: "Offsets", title: "alignOffset -16", content: { alignOffset: -16 } },
+  {
+    id: "offset-0",
+    section: "Offsets",
+    title: "sideOffset 0",
+    content: { sideOffset: 0 },
+  },
+  {
+    id: "offset-16",
+    section: "Offsets",
+    title: "sideOffset 16",
+    content: { sideOffset: 16 },
+  },
+  {
+    id: "align-16",
+    section: "Offsets",
+    title: "alignOffset 16",
+    content: { alignOffset: 16 },
+  },
+  {
+    id: "align-neg",
+    section: "Offsets",
+    title: "alignOffset -16",
+    content: { alignOffset: -16 },
+  },
   {
     id: "padding-48",
     section: "Offsets",
@@ -238,8 +272,18 @@ const variants: Variant[] = [
     content: { alignItemWithTrigger: true },
   },
 
-  { id: "placeholder", section: "Value", title: "placeholder", options: { placeholder: "Pick a fruit…" } },
-  { id: "default", section: "Value", title: "defaultValue", options: { defaultValue: "grapes" } },
+  {
+    id: "placeholder",
+    section: "Value",
+    title: "placeholder",
+    options: { placeholder: "Pick a fruit…" },
+  },
+  {
+    id: "default",
+    section: "Value",
+    title: "defaultValue",
+    options: { defaultValue: "grapes" },
+  },
   {
     id: "multiple",
     section: "Value",
@@ -305,7 +349,13 @@ const variants: Variant[] = [
     mode: "data",
     options: { defaultValue: "apple" },
   },
-  { id: "data-groups", section: "Items", title: "Data groups", mode: "data", list: "grouped" },
+  {
+    id: "data-groups",
+    section: "Items",
+    title: "Data groups",
+    mode: "data",
+    list: "grouped",
+  },
   {
     id: "many",
     section: "Items",
@@ -353,7 +403,11 @@ const variants: Variant[] = [
     title: "multiple",
     note: "Submits one entry per value.",
     form: true,
-    options: { name: "fruits", multiple: true, defaultValue: ["apple", "banana"] },
+    options: {
+      name: "fruits",
+      multiple: true,
+      defaultValue: ["apple", "banana"],
+    },
   },
   {
     id: "form-disabled",
@@ -410,9 +464,24 @@ const variants: Variant[] = [
     note: "Arrow keys stop at the ends.",
     options: { loop: false },
   },
-  { id: "controlled-value", section: "Behavior", title: "Controlled value", controlled: "value" },
-  { id: "controlled-open", section: "Behavior", title: "Controlled open", controlled: "open" },
-  { id: "controller", section: "Behavior", title: "Controller", controller: true },
+  {
+    id: "controlled-value",
+    section: "Behavior",
+    title: "Controlled value",
+    controlled: "value",
+  },
+  {
+    id: "controlled-open",
+    section: "Behavior",
+    title: "Controlled open",
+    controlled: "open",
+  },
+  {
+    id: "controller",
+    section: "Behavior",
+    title: "Controller",
+    controller: true,
+  },
   {
     id: "controller-multiple",
     section: "Behavior",
@@ -428,7 +497,13 @@ const variants: Variant[] = [
     options: { debug: true },
   },
 
-  { id: "arrow-bottom", section: "Arrow", title: "SelectArrow", arrow: true, content: { sideOffset: 10 } },
+  {
+    id: "arrow-bottom",
+    section: "Arrow",
+    title: "SelectArrow",
+    arrow: true,
+    content: { sideOffset: 10 },
+  },
   {
     id: "arrow-top",
     section: "Arrow",
@@ -444,7 +519,12 @@ const variants: Variant[] = [
     content: { side: "right", align: "center", sideOffset: 10 },
   },
 
-  { id: "corner-tl", section: "Collisions", title: "Top-left corner", place: "top-left" },
+  {
+    id: "corner-tl",
+    section: "Collisions",
+    title: "Top-left corner",
+    place: "top-left",
+  },
   {
     id: "corner-tr",
     section: "Collisions",
@@ -484,8 +564,18 @@ const variants: Variant[] = [
     note: "Scroll the box.",
     place: "scroll",
   },
-  { id: "clip", section: "Containers", title: "Inside overflow hidden", place: "clip" },
-  { id: "transform", section: "Containers", title: "Inside a transform", place: "transform" },
+  {
+    id: "clip",
+    section: "Containers",
+    title: "Inside overflow hidden",
+    place: "clip",
+  },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Inside a transform",
+    place: "transform",
+  },
   {
     id: "rtl",
     section: "Containers",
@@ -554,12 +644,26 @@ const variants: Variant[] = [
     title: "SelectValue max",
     note: '"Apple, Banana, and 2 more".',
     max: 2,
-    options: { multiple: true, defaultValue: ["apple", "banana", "grapes", "pineapple"] },
+    options: {
+      multiple: true,
+      defaultValue: ["apple", "banana", "grapes", "pineapple"],
+    },
   },
 
   { id: "anim-none", section: "Animation", title: "None", animation: "none" },
-  { id: "anim-default", section: "Animation", title: "Scale and fade", animation: "default" },
-  { id: "anim-slow", section: "Animation", title: "Slow slide", note: "700ms.", animation: "slow" },
+  {
+    id: "anim-default",
+    section: "Animation",
+    title: "Scale and fade",
+    animation: "default",
+  },
+  {
+    id: "anim-slow",
+    section: "Animation",
+    title: "Slow slide",
+    note: "700ms.",
+    animation: "slow",
+  },
 ]
 
 export {

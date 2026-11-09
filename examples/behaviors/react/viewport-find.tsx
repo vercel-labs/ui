@@ -1,5 +1,11 @@
 import * as React from "react"
-import { createViewport, css, definePrimitive, live, type Viewport } from "@ui-sdk/core"
+import {
+  createViewport,
+  css,
+  definePrimitive,
+  live,
+  type Viewport,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type MapState = { viewport: Viewport }
@@ -24,11 +30,16 @@ const map = definePrimitive({
       attrs: () => ({
         tabindex: "0",
         "aria-roledescription": "map",
-        style: css({ position: "relative", overflow: "clip", "touch-action": "none" }),
+        style: css({
+          position: "relative",
+          overflow: "clip",
+          "touch-action": "none",
+        }),
       }),
       on: {
         wheel: (event, { api }) => api.viewport.wheel(event),
-        pointerdown: (event, { el, api }) => event.target === el && api.viewport.pointerdown(event),
+        pointerdown: (event, { el, api }) =>
+          event.target === el && api.viewport.pointerdown(event),
         keydown: (event, { api }) => api.viewport.keydown(event),
       },
     }),
@@ -46,23 +57,43 @@ const map = definePrimitive({
       bind: (el, { api }) => api.viewport.bindFindable(el),
     }),
     world: slot({
-      attrs: () => ({ style: css({ position: "absolute", left: "0", top: "0", "pointer-events": "auto" }) }),
-      live: live<MapState, any, {}>((state, { api }) => ({ style: api.viewport.style(state) })),
+      attrs: () => ({
+        style: css({
+          position: "absolute",
+          left: "0",
+          top: "0",
+          "pointer-events": "auto",
+        }),
+      }),
+      live: live<MapState, any, {}>((state, { api }) => ({
+        style: api.viewport.style(state),
+      })),
     }),
     note: slot<MapNoteProps>({
       props: { value: "string", x: "number", y: "number" },
       attrs: (_state, { props }) => ({
-        style: css({ position: "absolute", left: `${props.x}px`, top: `${props.y}px` }),
+        style: css({
+          position: "absolute",
+          left: `${props.x}px`,
+          top: `${props.y}px`,
+        }),
       }),
     }),
     reset: slot({
       attrs: () => ({ type: "button" }),
-      press: ({ api }, event) => api.viewport.setViewport(home, { reason: "imperative", event }),
+      press: ({ api }, event) =>
+        api.viewport.setViewport(home, { reason: "imperative", event }),
     }),
   }),
 })
 
-const parts = createParts(map, { root: "div", pane: "div", world: "div", note: "div", reset: "button" })
+const parts = createParts(map, {
+  root: "div",
+  pane: "div",
+  world: "div",
+  note: "div",
+  reset: "button",
+})
 
 const notes = [
   { value: "harbor", text: "Harbor", x: 112, y: 88 },
@@ -76,13 +107,19 @@ function Example() {
   return (
     <div data-slot="stack">
       <p data-slot="hint">
-        Search <span data-slot="viewport-term">lighthouse</span> with ⌘F or Ctrl+F
+        Search <span data-slot="viewport-term">lighthouse</span> with ⌘F or
+        Ctrl+F
       </p>
       <parts.Root aria-label="Map">
         <parts.Pane>
           <parts.World>
             {notes.map((note) => (
-              <parts.Note key={note.value} value={note.value} x={note.x} y={note.y}>
+              <parts.Note
+                key={note.value}
+                value={note.value}
+                x={note.x}
+                y={note.y}
+              >
                 {note.text}
               </parts.Note>
             ))}

@@ -8,7 +8,9 @@ const slot =
 const separator = "px-0.5 text-neutral-400"
 const form = "flex flex-col items-start gap-2"
 const row = "flex gap-2"
-const button = "rounded border border-neutral-300 px-2 py-0.5 text-xs hover:bg-neutral-50"
-const control = "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
+const button =
+  "rounded border border-neutral-300 px-2 py-0.5 text-xs hover:bg-neutral-50"
+const control =
+  "rounded border border-neutral-200 px-2 py-1 font-mono text-xs hover:bg-neutral-50"
 
 export { button, control, form, group, root, row, separator, slot }

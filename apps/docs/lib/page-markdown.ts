@@ -1,11 +1,22 @@
 import path from "node:path"
-import { coreEntries, exportsByLayer, layerTitle, type CoreExport } from "./core-exports"
+import {
+  coreEntries,
+  exportsByLayer,
+  layerTitle,
+  type CoreExport,
+} from "./core-exports"
 import { cssVariableTable } from "./css-variables"
 import { dataAttributeTables } from "./data-attributes"
 import { readExampleSources } from "./example-sources"
 import { frameworks, type Framework } from "./frameworks"
 import { contentDir, docPage, docPages, readPage } from "./pages"
-import { controllerRows, reasonRows, stateRows, typeRows, type Row } from "./reference-rows"
+import {
+  controllerRows,
+  reasonRows,
+  stateRows,
+  typeRows,
+  type Row,
+} from "./reference-rows"
 import { frameworkPages, utilitiesFolder } from "./sections"
 import { listOf, sentence, specGroups } from "./spec-groups"
 
@@ -35,16 +46,27 @@ type PageOptions = { compact?: boolean; lean?: boolean }
 function attributes(source: string) {
   const found: Record<string, string> = {}
   for (const match of source.matchAll(
-    /(\w+)=(?:"([^"]*)"|'([^']*)'|\{\{((?:"[^"]*"|'[^']*'|[^}"'])*)\}\}|\{([^}]*)\})/g,
-  ))
-    found[match[1]] = match[2] ?? match[3] ?? (match[4] === undefined ? match[5] : `{${match[4]}}`)
+    /(\w+)=(?:"([^"]*)"|'([^']*)'|\{\{((?:"[^"]*"|'[^']*'|[^}"'])*)\}\}|\{([^}]*)\})/g
+  )) {
+    found[match[1]] =
+      match[2] ??
+      match[3] ??
+      (match[4] === undefined ? match[5] : `{${match[4]}}`)
+  }
   return found
 }
 
 // `{ loop: "Disabled items and wrapping" }`, as written in a tag, into an object.
 function objectOf(source: string | undefined) {
-  if (!source) return undefined
-  return Object.fromEntries([...source.matchAll(/(\w+):\s*"([^"]*)"/g)].map((match) => [match[1], match[2]]))
+  if (!source) {
+    return undefined
+  }
+  return Object.fromEntries(
+    [...source.matchAll(/(\w+):\s*"([^"]*)"/g)].map((match) => [
+      match[1],
+      match[2],
+    ])
+  )
 }
 
 const rowList = (rows: Row[]) =>
@@ -53,29 +75,36 @@ const rowList = (rows: Row[]) =>
       [
         `- \`${row.name}\`${row.status ? ` (${row.status})` : ""}${row.type ? ` (\`${row.type}\`)` : ""}${row.detail ? `, ${row.detail.toLowerCase()}` : ""}${row.text ? `: ${row.text}` : ""}${row.example ? ` Example: [${row.example.label}](${row.example.href}).` : ""}`,
         ...(row.members ?? []).map(
-          (member) => `  - \`${member.name}: ${member.type}\`${member.text ? `: ${member.text}` : ""}`,
+          (member) =>
+            `  - \`${member.name}: ${member.type}\`${member.text ? `: ${member.text}` : ""}`
         ),
-      ].join("\n"),
+      ].join("\n")
     )
     .join("\n")
 
 // A short description, or a long one's first sentence. One that lists its
 // values, like "`false`: … `true`: …", is kept whole.
 const firstSentence = (text: string) =>
-  text.length <= 200 || text.startsWith("`") ? text : (text.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? text)
+  text.length <= 200 || text.startsWith("`")
+    ? text
+    : (text.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? text)
 
 // Rows in a few words each: a short type stays, a long one is on the page.
 const compactRows = (rows: Row[]) =>
   rows
     .map((row) => {
-      const facts = [row.type && row.type.length <= 40 ? `\`${row.type}\`` : "", row.detail?.toLowerCase()]
+      const facts = [
+        row.type && row.type.length <= 40 ? `\`${row.type}\`` : "",
+        row.detail?.toLowerCase(),
+      ]
       const said = facts.filter(Boolean).join(", ")
       return `- \`${row.name}\`${said ? ` (${said})` : ""}${row.text ? `: ${firstSentence(row.text)}` : ""}`
     })
     .join("\n")
 
 // Rows as their names on one line.
-const nameList = (rows: Row[]) => `${rows.map((row) => `\`${row.name}\``).join(", ")}.`
+const nameList = (rows: Row[]) =>
+  `${rows.map((row) => `\`${row.name}\``).join(", ")}.`
 
 const exportList = (entries: CoreExport[]) =>
   rowList(
@@ -84,18 +113,27 @@ const exportList = (entries: CoreExport[]) =>
       status: entry.experimental ? ("experimental" as const) : undefined,
       text: entry.text,
       members: entry.members,
-    })),
+    }))
   )
 
 // Runs `replace` on the text outside fenced code blocks, so code that shows a
 // tag, like `<Progress />`, stays as written.
-async function outsideCode(text: string, replace: (prose: string) => Promise<string>) {
+async function outsideCode(
+  text: string,
+  replace: (prose: string) => Promise<string>
+) {
   const parts = text.split(/^( *```[\s\S]*?^ *```)$/m)
-  const replaced = await Promise.all(parts.map((part, index) => (index % 2 ? part : replace(part))))
+  const replaced = await Promise.all(
+    parts.map((part, index) => (index % 2 ? part : replace(part)))
+  )
   return replaced.join("")
 }
 
-async function replaceAsync(text: string, pattern: RegExp, replace: (...match: string[]) => Promise<string>) {
+async function replaceAsync(
+  text: string,
+  pattern: RegExp,
+  replace: (...match: string[]) => Promise<string>
+) {
   const matches = [...text.matchAll(pattern)]
   const values = await Promise.all(matches.map((match) => replace(...match)))
   let index = 0
@@ -108,18 +146,23 @@ async function replaceAsync(text: string, pattern: RegExp, replace: (...match: s
 const unstyled = (code: string) =>
   code
     .replace(/\s+(?:class|className)="([^"]*)"/g, (list, names: string) =>
-      names.split(/\s+/).some((name) => name && code.includes(`.${name}`)) ? list : "",
+      names.split(/\s+/).some((name) => name && code.includes(`.${name}`))
+        ? list
+        : ""
     )
-    .replace(/^( *)<([\w.:-]+)((?:\n +[^\n<>]+)*)\n *(\/?>)$/gm, (tag, indent, name, attrs, end) => {
-      const line = `${indent}<${[name, ...attrs.split("\n").map((attr: string) => attr.trim())].filter(Boolean).join(" ")}${end === "/>" ? " />" : ">"}`
-      return line.length <= 110 ? line : tag
-    })
+    .replace(
+      /^( *)<([\w.:-]+)((?:\n +[^\n<>]+)*)\n *(\/?>)$/gm,
+      (tag, indent, name, attrs, end) => {
+        const line = `${indent}<${[name, ...attrs.split("\n").map((attr: string) => attr.trim())].filter(Boolean).join(" ")}${end === "/>" ? " />" : ">"}`
+        return line.length <= 110 ? line : tag
+      }
+    )
 
 // A component's tag, self-closing, with attributes that may span lines.
 const tag = (name: string) =>
   new RegExp(
     `<${name}\\b((?:\\s+\\w+(?:="[^"]*"|='[^']*'|=\\{\\{(?:"[^"]*"|'[^']*'|[^}"'])*\\}\\}|=\\{[^}]*\\}))*)\\s*\\/>`,
-    "g",
+    "g"
   )
 
 /**
@@ -131,10 +174,13 @@ async function pageMarkdown(
   file: string,
   framework: Framework | undefined,
   link: PageLinks,
-  { compact = false, lean = false }: PageOptions = {},
+  { compact = false, lean = false }: PageOptions = {}
 ) {
   const { title, description, body } = readPage(file)
-  const dir = path.relative(contentDir, path.dirname(file)).split(path.sep).join("/")
+  const dir = path
+    .relative(contentDir, path.dirname(file))
+    .split(path.sep)
+    .join("/")
   const shown = framework ?? "react"
   const rows = compact ? compactRows : rowList
 
@@ -145,17 +191,31 @@ async function pageMarkdown(
         .relative(contentDir, file)
         .replace(/\.mdx$/, "")
         .split(path.sep)
-      return link({ slugs: slugs.filter((slug) => slug !== "index"), hash: href.slice(1) })
+      return link({
+        slugs: slugs.filter((slug) => slug !== "index"),
+        hash: href.slice(1),
+      })
     }
-    if (href.startsWith("#") || /^[a-z]+:/.test(href)) return href
+    if (href.startsWith("#") || /^[a-z]+:/.test(href)) {
+      return href
+    }
     const [to, hash] = href.split("#")
     // A site page outside the docs, like /why, has no copy to link to.
-    if (to.startsWith("/") && !to.startsWith("/docs/")) return null
-    const resolved = to.startsWith("/") ? to.slice("/docs/".length) : path.posix.join(dir, to)
+    if (to.startsWith("/") && !to.startsWith("/docs/")) {
+      return null
+    }
+    const resolved = to.startsWith("/")
+      ? to.slice("/docs/".length)
+      : path.posix.join(dir, to)
     let slugs = resolved.split("/").filter((slug) => slug && slug !== "index")
     // A link that names no framework means this page's framework's, when it has one.
-    if (framework && frameworkPages.includes(slugs[0]))
-      slugs = [framework, slugs[0] === "utilities" ? utilitiesFolder(framework) : slugs[0], ...slugs.slice(1)]
+    if (framework && frameworkPages.includes(slugs[0])) {
+      slugs = [
+        framework,
+        slugs[0] === "utilities" ? utilitiesFolder(framework) : slugs[0],
+        ...slugs.slice(1),
+      ]
+    }
     return link({ slugs, hash })
   }
 
@@ -164,15 +224,21 @@ async function pageMarkdown(
   const styledExample = lean ? attributes(firstExample).name : undefined
 
   // Markdown carries the CSS block of a style snippet; the Tailwind one is a site toggle.
-  let text = body.replace(/<StyleTabs>\s*(```[\s\S]*?\n```)[\s\S]*?<\/StyleTabs>/g, "$1")
+  let text = body.replace(
+    /<StyleTabs>\s*(```[\s\S]*?\n```)[\s\S]*?<\/StyleTabs>/g,
+    "$1"
+  )
   text = await outsideCode(text, async (prose) => {
     let out = prose
       .replace(/<\/?(?:Cards|Callout)>\n?/g, "")
       .replace(/<\/?FrameworkTabs\b[^>]*>\n?/g, "")
-      .replace(/<Framework(?:Content|Tab)\s+value="([^"]+)">/g, (_, value: string) => {
-        const label = frameworks[value as Framework]?.label ?? value
-        return `**${label}**\n`
-      })
+      .replace(
+        /<Framework(?:Content|Tab)\s+value="([^"]+)">/g,
+        (_, value: string) => {
+          const label = frameworks[value as Framework]?.label ?? value
+          return `**${label}**\n`
+        }
+      )
       .replace(/<\/Framework(?:Content|Tab)>\n?/g, "")
       .replace(/<Collapsible\b([^>]*)>/g, (_, attrs: string) => {
         const { title } = attributes(attrs)
@@ -191,18 +257,18 @@ async function pageMarkdown(
           .flatMap((name) => docPage([shown, "components", name]) ?? [])
           .map(
             (page) =>
-              `- [${page.title}](/docs/components/${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
+              `- [${page.title}](/docs/components/${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`
           )
-          .join("\n"),
+          .join("\n")
       )
       .replace(tag("ComponentGrid"), () =>
         docPages(`${shown}/components`)
           .filter((page) => page.slugs.length === 3)
           .map(
             (page) =>
-              `- [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
+              `- [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`
           )
-          .join("\n"),
+          .join("\n")
       )
       .replace(tag("ChangelogPosts"), () =>
         docPages("core/changelog")
@@ -210,9 +276,9 @@ async function pageMarkdown(
           .sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""))
           .map(
             (page) =>
-              `- ${page.date}: [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`,
+              `- ${page.date}: [${page.title}](./${page.slugs[2]})${page.description ? `: ${page.description}` : ""}`
           )
-          .join("\n"),
+          .join("\n")
       )
       .replace(tag("CoreExports"), (_, attrs: string) => {
         const { layer } = attributes(attrs)
@@ -221,7 +287,7 @@ async function pageMarkdown(
           .map((group) =>
             layer === "other"
               ? `### ${layerTitle(group.layer)}\n\n${exportList(group.entries)}`
-              : exportList(group.entries),
+              : exportList(group.entries)
           )
           .join("\n\n")
       })
@@ -231,62 +297,94 @@ async function pageMarkdown(
             const documented = page ? `[${page.title}](${href})` : ""
             return `- \`${entry}\`: ${documented || names.map((name) => `\`${name}\``).join(", ")}`
           })
-          .join("\n"),
+          .join("\n")
       )
       .replace(tag("StateTable"), (_, attrs: string) => {
-        const found = stateRows(attributes(attrs) as { path: string; name: string })
+        const found = stateRows(
+          attributes(attrs) as { path: string; name: string }
+        )
         return compact ? nameList(found) : rowList(found)
       })
       .replace(tag("ReasonTable"), (_, attrs: string) => {
-        const found = reasonRows(attributes(attrs) as { path: string; name: string })
+        const found = reasonRows(
+          attributes(attrs) as { path: string; name: string }
+        )
         return compact ? nameList(found) : rowList(found)
       })
       .replace(tag("ControllerTable"), (_, attrs: string) =>
         rows(
-          controllerRows(attributes(attrs) as { path: string; name: string }).map((row) => ({
+          controllerRows(
+            attributes(attrs) as { path: string; name: string }
+          ).map((row) => ({
             ...row,
             type: compact ? undefined : row.type,
-          })),
-        ),
+          }))
+        )
       )
 
-    out = await replaceAsync(out, tag("TypeTable"), async (_, attrs: string) => {
-      const { path: file, name, events, examples, type, types, descriptions } = attributes(attrs)
-      const tables = await typeRows({
-        path: file,
-        name,
-        type,
-        framework: shown,
-        events: events !== "false",
-        examples: objectOf(examples),
-        types: objectOf(types),
-        descriptions: objectOf(descriptions),
-      })
-      return tables.map((table) => rows(table.rows)).join("\n\n")
-    })
-    out = await replaceAsync(out, tag("ComponentExample"), async (_, attrs: string) => {
-      // Core guides show their shared primitives and framework bindings inline.
-      const { name, caption } = attributes(attrs)
-      if (compact || !framework) return caption ?? ""
-      const styled = !lean || name === styledExample
-      const sources = await readExampleSources(name, framework)
-      if (!sources) return caption ?? ""
-      const blocks = (files: { name: string; lang: string; code: string }[]) =>
-        files
-          .map(
-            (file) =>
-              `\`\`\`${file.lang} title="${file.name}"\n${styled ? file.code : unstyled(file.code)}\n\`\`\``,
-          )
-          .join("\n\n")
-      const block = blocks(sources.files)
-      return [block, caption].filter(Boolean).join("\n\n")
-    })
+    out = await replaceAsync(
+      out,
+      tag("TypeTable"),
+      async (_, attrs: string) => {
+        const {
+          path: file,
+          name,
+          events,
+          examples,
+          type,
+          types,
+          descriptions,
+        } = attributes(attrs)
+        const tables = await typeRows({
+          path: file,
+          name,
+          type,
+          framework: shown,
+          events: events !== "false",
+          examples: objectOf(examples),
+          types: objectOf(types),
+          descriptions: objectOf(descriptions),
+        })
+        return tables.map((table) => rows(table.rows)).join("\n\n")
+      }
+    )
+    out = await replaceAsync(
+      out,
+      tag("ComponentExample"),
+      async (_, attrs: string) => {
+        // Core guides show their shared primitives and framework bindings inline.
+        const { name, caption } = attributes(attrs)
+        if (compact || !framework) {
+          return caption ?? ""
+        }
+        const styled = !lean || name === styledExample
+        const sources = await readExampleSources(name, framework)
+        if (!sources) {
+          return caption ?? ""
+        }
+        const blocks = (
+          files: { name: string; lang: string; code: string }[]
+        ) =>
+          files
+            .map(
+              (file) =>
+                `\`\`\`${file.lang} title="${file.name}"\n${styled ? file.code : unstyled(file.code)}\n\`\`\``
+            )
+            .join("\n\n")
+        const block = blocks(sources.files)
+        return [block, caption].filter(Boolean).join("\n\n")
+      }
+    )
     out = await replaceAsync(out, tag("SpecList"), async (_, attrs: string) => {
-      if (compact) return ""
+      if (compact) {
+        return ""
+      }
       const { spec, only } = attributes(attrs)
       const { groups, frameworks: ran } = await specGroups(
         spec,
-        only ? (JSON.parse(only) as string[]) : undefined,
+        only
+          ? [...only.matchAll(/"([^"]*)"/g)].map((match) => match[1])
+          : undefined
       )
       const tests = groups
         .map((group) =>
@@ -294,45 +392,58 @@ async function pageMarkdown(
             group.title ? `**${sentence(group.title)}**\n` : "",
             ...group.tests.map(
               (test) =>
-                `- ${sentence(test.title)}.${test.frameworks.length > 0 && test.frameworks.length < ran.length ? ` ${sentence(listOf(test.frameworks))} only.` : ""}`,
+                `- ${sentence(test.title)}.${test.frameworks.length > 0 && test.frameworks.length < ran.length ? ` ${sentence(listOf(test.frameworks))} only.` : ""}`
             ),
           ]
             .filter(Boolean)
-            .join("\n"),
+            .join("\n")
         )
         .join("\n\n")
       return ran.length ? `${tests}\n\nRuns in ${listOf(ran)}.` : tests
     })
-    out = await replaceAsync(out, tag("DataAttributes"), async (_, attrs: string) => {
-      const { component = "menu", part } = attributes(attrs)
-      const { styled } = await dataAttributeTables(component, shown)
-      // A page not yet split into a section per part lists every part.
-      return styled
-        .filter((each) => !part || each.slot === part)
-        .map((found) =>
-          [
-            `${part ? "" : `**${found.name}** `}\`[data-slot="${found.dataSlot}"]\``,
-            "",
-            ...found.attributes.map(
-              ({ attribute, values, text }) =>
-                `- \`${attribute}\`${values.length ? ` (${values.map((value) => `\`${value}\``).join(", ")})` : ""}${text && !compact ? `: ${text}` : ""}`,
-            ),
-          ].join("\n"),
-        )
-        .join("\n\n")
-    })
+    out = await replaceAsync(
+      out,
+      tag("DataAttributes"),
+      async (_, attrs: string) => {
+        const { component = "menu", part } = attributes(attrs)
+        const { styled } = await dataAttributeTables(component, shown)
+        // A page not yet split into a section per part lists every part.
+        return styled
+          .filter((each) => !part || each.slot === part)
+          .map((found) =>
+            [
+              `${part ? "" : `**${found.name}** `}\`[data-slot="${found.dataSlot}"]\``,
+              "",
+              ...found.attributes.map(
+                ({ attribute, values, text }) =>
+                  `- \`${attribute}\`${values.length ? ` (${values.map((value) => `\`${value}\``).join(", ")})` : ""}${text && !compact ? `: ${text}` : ""}`
+              ),
+            ].join("\n")
+          )
+          .join("\n\n")
+      }
+    )
     out = out.replace(tag("CssVariables"), (_, attrs: string) => {
       const { component = "menu", part } = attributes(attrs)
-      const found = cssVariableTable(component, shown).find((each) => each.part === part)
-      if (!found) return ""
-      return found.variables.map(({ name, text }) => `- \`${name}\`${compact ? "" : `: ${text}`}`).join("\n")
+      const found = cssVariableTable(component, shown).find(
+        (each) => each.part === part
+      )
+      if (!found) {
+        return ""
+      }
+      return found.variables
+        .map(({ name, text }) => `- \`${name}\`${compact ? "" : `: ${text}`}`)
+        .join("\n")
     })
 
     // Links last, so the ones tables and cards add are mapped too.
-    return out.replace(/\[([^\]]*)\]\(([^)\s]+)\)/g, (_, label: string, href: string) => {
-      const mapped = target(href)
-      return mapped === null ? label : `[${label}](${mapped})`
-    })
+    return out.replace(
+      /\[([^\]]*)\]\(([^)\s]+)\)/g,
+      (_, label: string, href: string) => {
+        const mapped = target(href)
+        return mapped === null ? label : `[${label}](${mapped})`
+      }
+    )
   })
 
   // A heading's custom anchor, like `### AccordionPanel [#styling-accordionpanel]`, is the site's.

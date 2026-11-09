@@ -38,17 +38,24 @@ function mount(root: HTMLElement) {
   `
   const autocomplete = root.querySelector("ui-autocomplete")!
   autocomplete.addEventListener("valuechange", (event) => {
-    if (event.detail.value.length > 12) return event.preventDefault()
+    if (event.detail.value.length > 12) {
+      return event.preventDefault()
+    }
     log(root, `text: ${event.detail.reason}`)
   })
   autocomplete.addEventListener("openchange", (event) => {
-    log(root, `${event.detail.value ? "opened" : "closed"}: ${event.detail.reason}`)
+    log(
+      root,
+      `${event.detail.value ? "opened" : "closed"}: ${event.detail.reason}`
+    )
   })
   autocomplete.addEventListener("openchangecomplete", (event) => {
     log(root, `${event.detail.value ? "opened" : "closed"} and settled`)
   })
   autocomplete.addEventListener("highlight", (event) => {
-    if (event.detail.value) log(root, `highlighted ${event.detail.value}`)
+    if (event.detail.value) {
+      log(root, `highlighted ${event.detail.value}`)
+    }
   })
 }
 

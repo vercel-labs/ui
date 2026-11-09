@@ -1,6 +1,13 @@
 // @vitest-environment jsdom
 import { expect, test } from "vitest"
-import { createApp, defineComponent, effectScope, h, nextTick, onMounted } from "vue"
+import {
+  createApp,
+  defineComponent,
+  effectScope,
+  h,
+  nextTick,
+  onMounted,
+} from "vue"
 import { useAsyncOptions } from "../src/async-options"
 
 function recordLoads() {

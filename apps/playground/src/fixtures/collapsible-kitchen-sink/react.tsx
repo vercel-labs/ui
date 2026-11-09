@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/react/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/react/collapsible"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import * as classes from "./classes"
@@ -12,7 +16,10 @@ function Grow() {
       {Array.from({ length: lines }, (_, index) => (
         <p key={index}>Line {index + 1}</p>
       ))}
-      <button className={`${classes.button} self-start`} onClick={() => setLines((count) => count + 1)}>
+      <button
+        className={`${classes.button} self-start`}
+        onClick={() => setLines((count) => count + 1)}
+      >
         Add a line
       </button>
     </>
@@ -21,26 +28,38 @@ function Grow() {
 
 // What the panel holds.
 function Body({ variant }: { variant: Variant }) {
-  if (variant.body === "long")
-    return Array.from({ length: 20 }, (_, index) => <p key={index}>Line {index + 1}</p>)
-  if (variant.body === "form")
+  if (variant.body === "long") {
+    return Array.from({ length: 20 }, (_, index) => (
+      <p key={index}>Line {index + 1}</p>
+    ))
+  }
+  if (variant.body === "form") {
     return (
       <label className="flex flex-col">
         {content.text}
         <input className={classes.input} defaultValue="Ada" aria-label="Name" />
       </label>
     )
-  if (variant.body === "grow") return <Grow />
+  }
+  if (variant.body === "grow") {
+    return <Grow />
+  }
   return content.text
 }
 
 // A folder is a collapsible holding its children. Files are plain rows.
 function Folder({ node, env }: { node: TreeNode; env: Env }) {
-  if (!node.children) return <div className={classes.treeFile}>{node.name}</div>
+  if (!node.children) {
+    return <div className={classes.treeFile}>{node.name}</div>
+  }
   return (
     <Collapsible
-      onOpenChange={(open, details) => env.log(`${node.name} openChange ${open} (${details.reason})`)}
-      onOpenChangeComplete={(open) => env.log(`${node.name} openChangeComplete ${open}`)}
+      onOpenChange={(open, details) =>
+        env.log(`${node.name} openChange ${open} (${details.reason})`)
+      }
+      onOpenChangeComplete={(open) =>
+        env.log(`${node.name} openChangeComplete ${open}`)
+      }
     >
       <CollapsibleTrigger className={classes.treeTrigger}>
         <span aria-hidden className={classes.treeChevron}>
@@ -59,12 +78,13 @@ function Folder({ node, env }: { node: TreeNode; env: Env }) {
 
 function VariantCollapsible({ variant, env }: { variant: Variant; env: Env }) {
   const [open, setOpen] = React.useState(variant.options?.defaultOpen ?? false)
-  if (variant.body === "tree")
+  if (variant.body === "tree") {
     return (
       <div className="w-full rounded-lg border border-neutral-200 bg-white p-2">
         <Folder node={tree} env={env} />
       </div>
     )
+  }
   const trigger =
     variant.render?.trigger === "div" ? (
       <div />
@@ -84,7 +104,9 @@ function VariantCollapsible({ variant, env }: { variant: Variant; env: Env }) {
             env.log(`openChange ${next} canceled`)
             return
           }
-          if (variant.controlled) setOpen(next)
+          if (variant.controlled) {
+            setOpen(next)
+          }
           env.log(`openChange ${next} (${details.reason})`)
         }}
         onOpenChangeComplete={(next) => env.log(`openChangeComplete ${next}`)}
@@ -114,7 +136,10 @@ function VariantCollapsible({ variant, env }: { variant: Variant; env: Env }) {
           <button className={classes.button} onClick={() => setOpen(false)}>
             Close
           </button>
-          <button className={classes.button} onClick={() => setOpen((value) => !value)}>
+          <button
+            className={classes.button}
+            onClick={() => setOpen((value) => !value)}
+          >
             Toggle
           </button>
         </div>
@@ -128,8 +153,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantCollapsible variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

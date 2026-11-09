@@ -9,7 +9,11 @@ import {
 } from "@ui-sdk/react/slider"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { serialize, sliderFixture as f, sliderOptions } from "tests/fixtures/slider.ts"
+import {
+  serialize,
+  sliderFixture as f,
+  sliderOptions,
+} from "tests/fixtures/slider.ts"
 
 function Fixture() {
   const options = sliderOptions()
@@ -18,8 +22,14 @@ function Fixture() {
   const [submitted, setSubmitted] = React.useState("")
   const [volume, setVolume] = React.useState(options.volume)
   // Records a change, or cancels it when the URL asks.
-  const report = (name: string, value: number | number[], details: { cancel: () => void }) => {
-    if (options.cancel === name) return details.cancel()
+  const report = (
+    name: string,
+    value: number | number[],
+    details: { cancel: () => void }
+  ) => {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     setAction(`${name}:${String(value)}`)
   }
   const commit = (name: string) => (value: number | number[]) =>
@@ -48,10 +58,14 @@ function Fixture() {
             {...shared}
             name={f.volume.name}
             format={options.volumeFormat}
-            {...(options.controlled ? { value: volume } : { defaultValue: options.volume })}
+            {...(options.controlled
+              ? { value: volume }
+              : { defaultValue: options.volume })}
             onValueChange={(value, details) => {
               report(f.volume.name, value, details)
-              if (!details.canceled) setVolume(value)
+              if (!details.canceled) {
+                setVolume(value)
+              }
             }}
             onValueCommit={commit(f.volume.name)}
           >
@@ -74,7 +88,9 @@ function Fixture() {
             defaultValue={options.price}
             minStepsBetweenThumbs={options.minSteps}
             format={options.format}
-            onValueChange={(value, details) => report(f.price.name, value, details)}
+            onValueChange={(value, details) =>
+              report(f.price.name, value, details)
+            }
             onValueCommit={commit(f.price.name)}
           >
             <SliderValue className="slider-value" />
@@ -82,7 +98,12 @@ function Fixture() {
               <SliderTrack className="slider-track">
                 <SliderIndicator className="slider-indicator" />
                 {f.price.thumbs.map((label, index) => (
-                  <SliderThumb key={label} index={index} className="slider-thumb" aria-label={label} />
+                  <SliderThumb
+                    key={label}
+                    index={index}
+                    className="slider-thumb"
+                    aria-label={label}
+                  />
                 ))}
               </SliderTrack>
             </SliderControl>
@@ -112,7 +133,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

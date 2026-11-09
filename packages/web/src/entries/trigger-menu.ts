@@ -45,4 +45,7 @@ export type {
   TriggerRule,
 } from "@ui-sdk/core/trigger-menu"
 export type { TriggerMenuEvents, UiTriggerMenuElement } from "../events"
-export { createTriggerMenuController, textFieldAdapter } from "@ui-sdk/core/trigger-menu"
+export {
+  createTriggerMenuController,
+  textFieldAdapter,
+} from "@ui-sdk/core/trigger-menu"

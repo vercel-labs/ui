@@ -12,7 +12,13 @@ import {
   NavigationMenuViewport,
 } from "../src/navigation-menu"
 
-function Menu({ defaultValue, keepMounted }: { defaultValue?: string; keepMounted?: boolean }) {
+function Menu({
+  defaultValue,
+  keepMounted,
+}: {
+  defaultValue?: string
+  keepMounted?: boolean
+}) {
   return (
     <NavigationMenu aria-label="Main" defaultValue={defaultValue}>
       <NavigationMenuList>

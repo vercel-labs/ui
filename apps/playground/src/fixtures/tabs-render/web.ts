@@ -13,7 +13,10 @@ async function mount(root: HTMLElement) {
           <ui-tabs-tab value="plain"><button class="tab">Plain</button></ui-tabs-tab>
         </ui-tabs-list>
         ${["overview", "activity", "watched", "plain"]
-          .map((value) => `<ui-tabs-panel class="panel" value="${value}">The ${value} panel.</ui-tabs-panel>`)
+          .map(
+            (value) =>
+              `<ui-tabs-panel class="panel" value="${value}">The ${value} panel.</ui-tabs-panel>`
+          )
           .join("")}
       </ui-tabs>
       <button>After</button>
@@ -21,16 +24,20 @@ async function mount(root: HTMLElement) {
       <output role="status" aria-label="Reason"></output>
     </div>
   `
-  if (activation) root.querySelector("ui-tabs")!.setAttribute("activation", activation)
+  if (activation) {
+    root.querySelector("ui-tabs")!.setAttribute("activation", activation)
+  }
   await import("@ui-sdk/web/tabs")
   root.addEventListener(
     "valuechange",
     (event) => {
-      const { value, reason } = (event as CustomEvent<{ value: string; reason: string }>).detail
+      const { value, reason } = (
+        event as CustomEvent<{ value: string; reason: string }>
+      ).detail
       root.querySelector('[aria-label="Last action"]')!.textContent = value
       root.querySelector('[aria-label="Reason"]')!.textContent = reason
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

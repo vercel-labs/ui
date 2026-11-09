@@ -10,7 +10,9 @@
   data-slot="stack"
   onsubmit={(event) => {
     event.preventDefault()
-    const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+    const entries = [...new FormData(event.currentTarget)].map(
+      ([name, value]) => `${name}=${value}`
+    )
     log(entries.length ? `Submitted ${entries.join("&")}` : "Submitted nothing")
   }}
 >

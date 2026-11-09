@@ -20,14 +20,19 @@ const iconButton =
   "inline-flex size-8 shrink-0 cursor-default items-center justify-center rounded-2xl outline-none select-none transition-colors hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/30 data-disabled:opacity-50 motion-reduce:transition-none [&_svg]:size-4"
 
 function DatePicker(
-  props: Omit<ComponentProps<typeof DatePickerPrimitive>, "class" | "children"> & { class?: string },
+  props: Omit<
+    ComponentProps<typeof DatePickerPrimitive>,
+    "class" | "children"
+  > & { class?: string }
 ) {
   const rest = omit(props, "class")
   return (
     <DatePickerPrimitive class={cn("flex text-sm", props.class)} {...rest}>
       <div class="flex h-8 w-full items-center gap-0.5 rounded-2xl border border-transparent bg-input/50 ps-2.5 pe-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 motion-reduce:transition-none">
         <DatePickerInput class="h-full w-full min-w-0 bg-transparent text-base tabular-nums outline-none placeholder:text-muted-foreground md:text-sm" />
-        <DatePickerTrigger class={cn(iconButton, "size-6 rounded-xl text-muted-foreground")}>
+        <DatePickerTrigger
+          class={cn(iconButton, "size-6 rounded-xl text-muted-foreground")}
+        >
           <CalendarIcon aria-hidden="true" />
         </DatePickerTrigger>
       </div>

@@ -6,7 +6,11 @@ load later, or whose group is inside a component of your own.
 @stable
 -->
 <script lang="ts">
-  import { tree as treePrimitive, type TreeItemProps, type TreeItemState } from "@ui-sdk/core/tree"
+  import {
+    tree as treePrimitive,
+    type TreeItemProps,
+    type TreeItemState,
+  } from "@ui-sdk/core/tree"
   import { getContext, setContext, untrack } from "svelte"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"

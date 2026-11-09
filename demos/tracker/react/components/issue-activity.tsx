@@ -8,9 +8,17 @@ import { people, personOf, type Comment, type Issue } from "tracker-data"
 import { addComment } from "@/app/actions"
 import { Avatar } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@/components/ui/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible"
 import { toast } from "@/components/ui/toast"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
 import {
   createTokenInputController,
   TokenInput,
@@ -24,11 +32,17 @@ import {
   TriggerMenuList,
 } from "@/components/ui/trigger-menu"
 
-const mentions = people.map((person) => ({ value: person.id, label: person.name, keywords: [person.role] }))
+const mentions = people.map((person) => ({
+  value: person.id,
+  label: person.name,
+  keywords: [person.role],
+}))
 
 function Mention({ id, label }: { id: string; label: string }) {
   const person = personOf(id)
-  if (!person) return <>@{label}</>
+  if (!person) {
+    return <>@{label}</>
+  }
   return (
     <HoverCard>
       <HoverCardTrigger
@@ -45,7 +59,9 @@ function Mention({ id, label }: { id: string; label: string }) {
             <p className="text-muted-foreground">{person.role}</p>
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">Select to see their issues.</p>
+        <p className="text-xs text-muted-foreground">
+          Select to see their issues.
+        </p>
       </HoverCardContent>
     </HoverCard>
   )
@@ -57,7 +73,7 @@ function CommentBody({ body }: { body: string }) {
       <span key={index}>{segment}</span>
     ) : (
       <Mention key={index} id={segment.value} label={segment.label} />
-    ),
+    )
   )
 }
 
@@ -69,10 +85,14 @@ function CommentItem({ comment }: { comment: Comment }) {
       <div className="grid min-w-0 flex-1 gap-1">
         <p className="flex items-baseline gap-2">
           <span className="font-medium">{author?.name}</span>
-          <time dateTime={comment.createdAt} className="text-xs text-muted-foreground">
-            {new Intl.DateTimeFormat("en", { dateStyle: "medium", timeZone: "UTC" }).format(
-              new Date(comment.createdAt),
-            )}
+          <time
+            dateTime={comment.createdAt}
+            className="text-xs text-muted-foreground"
+          >
+            {new Intl.DateTimeFormat("en", {
+              dateStyle: "medium",
+              timeZone: "UTC",
+            }).format(new Date(comment.createdAt))}
           </time>
         </p>
         <div className="leading-relaxed whitespace-pre-wrap">
@@ -89,7 +109,9 @@ function Composer({ issue }: { issue: Issue }) {
 
   function send() {
     const body = composer.getText()
-    if (pending || !composer.getLabel().trim()) return
+    if (pending || !composer.getLabel().trim()) {
+      return
+    }
     startTransition(async () => {
       try {
         await addComment(issue.id, body)
@@ -106,15 +128,26 @@ function Composer({ issue }: { issue: Issue }) {
         controller={composer}
         submitShortcut="mod+enter"
         onSubmit={send}
-        renderToken={(token) => <TokenInputToken>@{token.label}</TokenInputToken>}
+        renderToken={(token) => (
+          <TokenInputToken>@{token.label}</TokenInputToken>
+        )}
       >
-        <TokenInputEditor aria-label="Comment" placeholder="Leave a comment, type @ to mention someone" />
-        <TriggerMenu triggers={[{ char: "@", type: "mention", items: mentions }]}>
+        <TokenInputEditor
+          aria-label="Comment"
+          placeholder="Leave a comment, type @ to mention someone"
+        />
+        <TriggerMenu
+          triggers={[{ char: "@", type: "mention", items: mentions }]}
+        >
           <TriggerMenuContent>
             <TriggerMenuList>
               {(state) =>
                 (state.items as typeof mentions).map((item) => (
-                  <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+                  <TriggerMenuItem
+                    key={item.value}
+                    value={item.value}
+                    label={item.label}
+                  >
                     <Avatar name={item.label} size="sm" decorative />
                     {item.label}
                   </TriggerMenuItem>
@@ -125,7 +158,9 @@ function Composer({ issue }: { issue: Issue }) {
         </TriggerMenu>
       </TokenInput>
       <div className="flex items-center justify-end gap-3">
-        <span className="text-xs text-muted-foreground">⌘ or Ctrl + Enter to send</span>
+        <span className="text-xs text-muted-foreground">
+          ⌘ or Ctrl + Enter to send
+        </span>
         <Button size="sm" onClick={send} disabled={pending}>
           {pending ? "Sending…" : "Comment"}
         </Button>
@@ -139,7 +174,9 @@ function IssueActivity({ issue }: { issue: Issue }) {
     <Collapsible defaultOpen className="grid gap-3">
       <CollapsibleTrigger className="-ms-1.5 w-fit">
         Activity
-        <span className="text-muted-foreground tabular-nums">{issue.comments.length}</span>
+        <span className="text-muted-foreground tabular-nums">
+          {issue.comments.length}
+        </span>
       </CollapsibleTrigger>
       <CollapsiblePanel>
         <div className={cn("grid gap-5", issue.comments.length > 0 && "pt-1")}>

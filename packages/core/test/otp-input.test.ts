@@ -1,5 +1,8 @@
 import { describe, expect, test, vi } from "vitest"
-import { createOTPInputController, otpInput } from "../src/components/otp-input/otp-input"
+import {
+  createOTPInputController,
+  otpInput,
+} from "../src/components/otp-input/otp-input"
 import {
   fitsPattern,
   focusSelection,
@@ -56,8 +59,13 @@ describe("input otp selection", () => {
   })
 
   test("a caret inside the code selects the character after it", () => {
-    expect(slotSelection({ start: 0, end: 0 }, null, 3, 6)).toMatchObject({ start: 0, end: 1 })
-    expect(slotSelection({ start: 2, end: 2 }, { start: 1, end: 2 }, 4, 6)).toMatchObject({
+    expect(slotSelection({ start: 0, end: 0 }, null, 3, 6)).toMatchObject({
+      start: 0,
+      end: 1,
+    })
+    expect(
+      slotSelection({ start: 2, end: 2 }, { start: 1, end: 2 }, 4, 6)
+    ).toMatchObject({
       start: 2,
       end: 3,
       direction: "forward",
@@ -65,7 +73,9 @@ describe("input otp selection", () => {
   })
 
   test("ArrowLeft from a selected slot selects the one before it", () => {
-    expect(slotSelection({ start: 3, end: 3 }, { start: 3, end: 4 }, 6, 6)).toMatchObject({
+    expect(
+      slotSelection({ start: 3, end: 3 }, { start: 3, end: 4 }, 6, 6)
+    ).toMatchObject({
       start: 2,
       end: 3,
       direction: "backward",
@@ -73,14 +83,19 @@ describe("input otp selection", () => {
   })
 
   test("ArrowLeft from the empty slot at the end selects the last character", () => {
-    expect(slotSelection({ start: 3, end: 3 }, { start: 4, end: 4 }, 4, 6)).toMatchObject({
+    expect(
+      slotSelection({ start: 3, end: 3 }, { start: 4, end: 4 }, 4, 6)
+    ).toMatchObject({
       start: 3,
       end: 4,
     })
   })
 
   test("a caret at the end of a full code selects its last character", () => {
-    expect(slotSelection({ start: 6, end: 6 }, null, 6, 6)).toMatchObject({ start: 5, end: 6 })
+    expect(slotSelection({ start: 6, end: 6 }, null, 6, 6)).toMatchObject({
+      start: 5,
+      end: 6,
+    })
   })
 
   test("a real selection stays", () => {
@@ -100,23 +115,54 @@ describe("input otp selection", () => {
 
 describe("input otp keys", () => {
   test("arrows move a slot at a time, and past the code to the empty slot after it", () => {
-    expect(keySelection("ArrowLeft", { start: 2, end: 3 }, 4, 6)).toEqual({ start: 1, end: 2 })
-    expect(keySelection("ArrowLeft", { start: 4, end: 4 }, 4, 6)).toEqual({ start: 3, end: 4 })
-    expect(keySelection("ArrowLeft", { start: 0, end: 1 }, 4, 6)).toEqual({ start: 0, end: 1 })
-    expect(keySelection("ArrowRight", { start: 1, end: 2 }, 4, 6)).toEqual({ start: 2, end: 3 })
-    expect(keySelection("ArrowRight", { start: 3, end: 4 }, 4, 6)).toEqual({ start: 4, end: 4 })
+    expect(keySelection("ArrowLeft", { start: 2, end: 3 }, 4, 6)).toEqual({
+      start: 1,
+      end: 2,
+    })
+    expect(keySelection("ArrowLeft", { start: 4, end: 4 }, 4, 6)).toEqual({
+      start: 3,
+      end: 4,
+    })
+    expect(keySelection("ArrowLeft", { start: 0, end: 1 }, 4, 6)).toEqual({
+      start: 0,
+      end: 1,
+    })
+    expect(keySelection("ArrowRight", { start: 1, end: 2 }, 4, 6)).toEqual({
+      start: 2,
+      end: 3,
+    })
+    expect(keySelection("ArrowRight", { start: 3, end: 4 }, 4, 6)).toEqual({
+      start: 4,
+      end: 4,
+    })
   })
 
   test("right to left, the arrows swap", () => {
-    expect(keySelection("ArrowLeft", { start: 1, end: 2 }, 4, 6, true)).toEqual({ start: 2, end: 3 })
-    expect(keySelection("ArrowRight", { start: 1, end: 2 }, 4, 6, true)).toEqual({ start: 0, end: 1 })
+    expect(keySelection("ArrowLeft", { start: 1, end: 2 }, 4, 6, true)).toEqual(
+      { start: 2, end: 3 }
+    )
+    expect(
+      keySelection("ArrowRight", { start: 1, end: 2 }, 4, 6, true)
+    ).toEqual({ start: 0, end: 1 })
   })
 
   test("Home selects the first character and End the slot after the code", () => {
-    expect(keySelection("Home", { start: 3, end: 3 }, 3, 6)).toEqual({ start: 0, end: 1 })
-    expect(keySelection("End", { start: 0, end: 1 }, 3, 6)).toEqual({ start: 3, end: 3 })
-    expect(keySelection("End", { start: 0, end: 1 }, 6, 6)).toEqual({ start: 5, end: 6 })
-    expect(keySelection("Home", { start: 0, end: 0 }, 0, 6)).toEqual({ start: 0, end: 0 })
+    expect(keySelection("Home", { start: 3, end: 3 }, 3, 6)).toEqual({
+      start: 0,
+      end: 1,
+    })
+    expect(keySelection("End", { start: 0, end: 1 }, 3, 6)).toEqual({
+      start: 3,
+      end: 3,
+    })
+    expect(keySelection("End", { start: 0, end: 1 }, 6, 6)).toEqual({
+      start: 5,
+      end: 6,
+    })
+    expect(keySelection("Home", { start: 0, end: 0 }, 0, 6)).toEqual({
+      start: 0,
+      end: 0,
+    })
   })
 
   test("other keys are left to the browser", () => {
@@ -155,7 +201,13 @@ describe("input otp", () => {
   })
 
   test("renders the input's attributes from its options", () => {
-    const otp = otpInput({ id: "o", maxLength: 4, pattern: "alphanumeric", name: "code", required: true })
+    const otp = otpInput({
+      id: "o",
+      maxLength: 4,
+      pattern: "alphanumeric",
+      name: "code",
+      required: true,
+    })
     expect(attrs(otp.part("control"))).toMatchObject({
       maxlength: "4",
       minlength: "4",
@@ -172,12 +224,32 @@ describe("input otp", () => {
     const controller = createOTPInputController()
     const onValueChange = vi.fn()
     const onValueCommit = vi.fn()
-    const otp = kept(otpInput({ id: "o", maxLength: 4, controller, onValueChange, onValueCommit }))
-    otp.setOptions({ id: "o", maxLength: 4, controller, onValueChange, onValueCommit })
+    const otp = kept(
+      otpInput({
+        id: "o",
+        maxLength: 4,
+        controller,
+        onValueChange,
+        onValueCommit,
+      })
+    )
+    otp.setOptions({
+      id: "o",
+      maxLength: 4,
+      controller,
+      onValueChange,
+      onValueCommit,
+    })
     controller.setValue("12 34")
     expect(controller.getValue()).toBe("1234")
-    expect(onValueChange).toHaveBeenCalledWith("1234", expect.objectContaining({ reason: "imperative" }))
-    expect(onValueCommit).toHaveBeenCalledWith("1234", expect.objectContaining({ reason: "imperative" }))
+    expect(onValueChange).toHaveBeenCalledWith(
+      "1234",
+      expect.objectContaining({ reason: "imperative" })
+    )
+    expect(onValueCommit).toHaveBeenCalledWith(
+      "1234",
+      expect.objectContaining({ reason: "imperative" })
+    )
     expect(partState(otp.part("root"))).toMatchObject({ complete: true })
   })
 
@@ -186,7 +258,10 @@ describe("input otp", () => {
     const otp = otpInput({ id: "o", onValueChange })
     const event = new Event("click")
     otp.api.setValue("12", { reason: "imperative", event })
-    expect(onValueChange).toHaveBeenCalledWith("12", expect.objectContaining({ reason: "imperative", event }))
+    expect(onValueChange).toHaveBeenCalledWith(
+      "12",
+      expect.objectContaining({ reason: "imperative", event })
+    )
   })
 
   test("a code echoed back from onValueChange completes once, and a cancel after it still holds", () => {
@@ -216,7 +291,11 @@ describe("input otp", () => {
   })
 
   test("a canceled change keeps the code", () => {
-    const otp = otpInput({ id: "o", defaultValue: "12", onValueChange: (_, details) => details.cancel() })
+    const otp = otpInput({
+      id: "o",
+      defaultValue: "12",
+      onValueChange: (_, details) => details.cancel(),
+    })
     otp.api.clear()
     expect(otp.api.getValue()).toBe("12")
   })
@@ -227,7 +306,9 @@ describe("constraint validation", () => {
     expect(patternAttribute("digits", 6, false)).toBe("[0-9]{6}")
     expect(patternAttribute("alphanumeric", 4, false)).toBe("[A-Za-z0-9]{4}")
     expect(patternAttribute(/[A-F]/, 4, false)).toBe(".{4}")
-    expect(attrs(otpInput({ id: "o", defaultValue: "12" }).part("control")).pattern).toBe("[0-9]{6}")
+    expect(
+      attrs(otpInput({ id: "o", defaultValue: "12" }).part("control")).pattern
+    ).toBe("[0-9]{6}")
   })
 
   test("the pattern leaves the length out while the browser flags a typed code as too short", () => {

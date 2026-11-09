@@ -30,7 +30,12 @@ function Example() {
         <AutocompleteEmpty>No tags found.</AutocompleteEmpty>
         <AutocompleteList>
           {tags.map((tag) => (
-            <AutocompleteItem key={tag.value} value={tag.value} label={tag.label} keywords={tag.keywords}>
+            <AutocompleteItem
+              key={tag.value}
+              value={tag.value}
+              label={tag.label}
+              keywords={tag.keywords}
+            >
               {tag.label}
               <span data-slot="hint">{tag.keywords[0]}</span>
             </AutocompleteItem>

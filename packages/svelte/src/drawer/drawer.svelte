@@ -99,7 +99,10 @@ A dialog presented as a sheet that slides in from an edge. Put its trigger, back
     /** Runs once the drawer has finished opening or closing, after any animation. */
     onOpenChangeComplete?: (open: boolean) => void
     /** Runs when the payload the content shows changes. `details.cancel()` keeps the previous payload. */
-    onPayloadChange?: (payload: unknown, details: ChangeDetails<DrawerPayloadChangeReason>) => void
+    onPayloadChange?: (
+      payload: unknown,
+      details: ChangeDetails<DrawerPayloadChangeReason>
+    ) => void
     /** Runs when a dismissal was refused because `dismissible` is false, including a swipe. The drawer resists and springs back. */
     onDismissAttempt?: (details: DrawerDismissAttemptDetails) => void
     /** Runs when the drawer moves to another snap point. `details.reason` says why: a swipe, the handle, the keyboard, a resize or the controller. */
@@ -136,14 +139,18 @@ A dialog presented as a sheet that slides in from an edge. Put its trigger, back
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onPayloadChange,
     onDismissAttempt,
     onSnapPointChange: (next: SnapPoint, details: SnapDetails) => {
       onSnapPointChange?.(next, details)
-      if (!details.canceled) snapPoint = next
+      if (!details.canceled) {
+        snapPoint = next
+      }
     },
   }))
   const context: DrawerContext = { handle, container: () => container }

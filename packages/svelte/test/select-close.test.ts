@@ -19,7 +19,10 @@ async function until(done: () => boolean) {
 test("a select closed by its trigger reports its close complete", async () => {
   const completed: boolean[] = []
   const target = document.body.appendChild(document.createElement("div"))
-  const app = mount(App, { target, props: { onOpenChangeComplete: (open: boolean) => completed.push(open) } })
+  const app = mount(App, {
+    target,
+    props: { onOpenChangeComplete: (open: boolean) => completed.push(open) },
+  })
   try {
     flushSync()
     const trigger = target.querySelector("button")!
@@ -27,7 +30,10 @@ test("a select closed by its trigger reports its close complete", async () => {
     await until(() => completed.length === 1)
     trigger.click()
     await until(() => completed.length === 2)
-    expect({ completed, expanded: trigger.getAttribute("aria-expanded") }).toEqual({
+    expect({
+      completed,
+      expanded: trigger.getAttribute("aria-expanded"),
+    }).toEqual({
       completed: [true, false],
       expanded: "false",
     })

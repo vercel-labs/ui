@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations at first", async ({ page, open }) => {
@@ -19,11 +21,17 @@ test("no axe violations at first", async ({ page, open }) => {
 test("no axe violations with errors showing", async ({ page, open }) => {
   await open("form")
   await save(page)
-  await expect(textbox(page, "Username")).toHaveAttribute("aria-invalid", "true")
+  await expect(textbox(page, "Username")).toHaveAttribute(
+    "aria-invalid",
+    "true"
+  )
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with errors from the server and a clear button", async ({ page, open }) => {
+test("no axe violations with errors from the server and a clear button", async ({
+  page,
+  open,
+}) => {
   await open("form", { errors: "" })
   await textbox(page, "Website").fill("example.com")
   await expect(page.getByText("This email bounced.")).toBeVisible()

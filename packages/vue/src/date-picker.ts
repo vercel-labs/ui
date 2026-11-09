@@ -1,4 +1,9 @@
-import type { Anchor, ChangeDetails, DismissAttemptDetails, Side } from "@ui-sdk/core"
+import type {
+  Anchor,
+  ChangeDetails,
+  DismissAttemptDetails,
+  Side,
+} from "@ui-sdk/core"
 import type { DateMatchers, ISOMonth } from "@ui-sdk/core/calendar"
 import {
   datePicker as datePickerPrimitive,
@@ -11,24 +16,55 @@ import {
   type DatePickerValue,
   type DatePickerValueChangeReason,
 } from "@ui-sdk/core/date-picker"
-import { defineComponent, Fragment, h, inject, provide, type InjectionKey, type PropType } from "vue"
-import { CalendarGrid, CalendarHeading, CalendarNext, CalendarPrevious } from "./calendar"
+import {
+  defineComponent,
+  Fragment,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
+import {
+  CalendarGrid,
+  CalendarHeading,
+  CalendarNext,
+  CalendarPrevious,
+} from "./calendar"
 import { CalendarKey, type CalendarHandle } from "./calendar-context"
 import { slotContent } from "./children"
 import { useFieldControl } from "./field-context"
-import { containerProp, renderPopup, sheetViewport, usePopupContainer, type PopupContainer } from "./popup"
+import {
+  containerProp,
+  renderPopup,
+  sheetViewport,
+  usePopupContainer,
+  type PopupContainer,
+} from "./popup"
 import { createParts, withElement } from "./create-parts"
-import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  orModel,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 import { readOnlyOf } from "./text-control"
 
 // Where the popup renders. Set on <DatePicker> or <DatePickerContent>.
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("date-picker-container")
+const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(
+  "date-picker-container"
+)
 
 const useDatePicker = () => useHandle(datePickerPrimitive)
 
 const parts = createParts(datePickerPrimitive, { clear: "button" })
 
-const datePickerValue = { type: null as unknown as PropType<DatePickerValue>, default: undefined }
+const datePickerValue = {
+  type: null as unknown as PropType<DatePickerValue>,
+  default: undefined,
+}
 
 /**
  * The root, and the hidden inputs that submit ISO dates. Without content it
@@ -83,13 +119,24 @@ const DatePicker = withElement(
     emits: {
       "update:value": (_value: DatePickerValue) => true,
       "update:modelValue": (_value: DatePickerValue) => true,
-      valueChange: (_value: DatePickerValue, _details: ChangeDetails<DatePickerValueChangeReason>) => true,
+      valueChange: (
+        _value: DatePickerValue,
+        _details: ChangeDetails<DatePickerValueChangeReason>
+      ) => true,
       "update:month": (_month: ISOMonth) => true,
-      monthChange: (_month: ISOMonth, _details: ChangeDetails<DatePickerMonthChangeReason>) => true,
+      monthChange: (
+        _month: ISOMonth,
+        _details: ChangeDetails<DatePickerMonthChangeReason>
+      ) => true,
       "update:open": (_open: boolean) => true,
-      openChange: (_open: boolean, _details: ChangeDetails<DatePickerOpenChangeReason>) => true,
+      openChange: (
+        _open: boolean,
+        _details: ChangeDetails<DatePickerOpenChangeReason>
+      ) => true,
       openChangeComplete: (_open: boolean) => true,
-      dismissAttempt: (_details: DismissAttemptDetails<DatePickerDismissReason>) => true,
+      dismissAttempt: (
+        _details: DismissAttemptDetails<DatePickerDismissReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof datePickerPrimitive, "root">,
     setup(props, { slots, attrs, emit }) {
@@ -131,23 +178,40 @@ const DatePicker = withElement(
         controller: props.controller,
         debug: props.debug,
         // The change events run first, so canceling one also keeps v-model as it was.
-        onValueChange: (value: DatePickerValue, details: ChangeDetails<DatePickerValueChangeReason>) => {
+        onValueChange: (
+          value: DatePickerValue,
+          details: ChangeDetails<DatePickerValueChangeReason>
+        ) => {
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
-        onMonthChange: (month: ISOMonth, details: ChangeDetails<DatePickerMonthChangeReason>) => {
+        onMonthChange: (
+          month: ISOMonth,
+          details: ChangeDetails<DatePickerMonthChangeReason>
+        ) => {
           emit("monthChange", month, details)
-          if (!details.canceled) emit("update:month", month)
+          if (!details.canceled) {
+            emit("update:month", month)
+          }
         },
-        onOpenChange: (open: boolean, details: ChangeDetails<DatePickerOpenChangeReason>) => {
+        onOpenChange: (
+          open: boolean,
+          details: ChangeDetails<DatePickerOpenChangeReason>
+        ) => {
           emit("openChange", open, details)
-          if (!details.canceled) emit("update:open", open)
+          if (!details.canceled) {
+            emit("update:open", open)
+          }
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-        onDismissAttempt: (details: DismissAttemptDetails<DatePickerDismissReason>) =>
-          emit("dismissAttempt", details),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
+        onDismissAttempt: (
+          details: DismissAttemptDetails<DatePickerDismissReason>
+        ) => emit("dismissAttempt", details),
       }))
       // Every Calendar part works inside the content, on the date picker's calendar.
       provide(CalendarKey, picker as unknown as CalendarHandle)
@@ -162,28 +226,31 @@ const DatePicker = withElement(
       const hiddenInputs = () => {
         const fieldName = field?.name()
         const range = root.state.mode === "range"
-        const submitsStart = range ? (props.startName ?? props.name ?? fieldName) : (props.name ?? fieldName)
+        const submitsStart = range
+          ? (props.startName ?? props.name ?? fieldName)
+          : (props.name ?? fieldName)
         const submitsEnd = range && (props.endName ?? props.name ?? fieldName)
         return h(Fragment, [
-          submitsStart ? h("input", picker.slot("hidden-input", { id: "start" })) : null,
-          submitsEnd ? h("input", picker.slot("hidden-input", { end: true, id: "end" })) : null,
+          submitsStart
+            ? h("input", picker.slot("hidden-input", { id: "start" }))
+            : null,
+          submitsEnd
+            ? h("input", picker.slot("hidden-input", { end: true, id: "end" }))
+            : null,
         ])
       }
       // Typed ahead, since its default content and hidden inputs read its state.
-      const root: ReturnType<typeof usePart<typeof datePickerPrimitive, "root">> = usePart(
-        picker,
-        "root",
-        undefined,
-        undefined,
-        {
-          tag: "div",
-          children: (state) => slotContent(slots.default, { state }) ?? defaultContent(),
-          hidden: hiddenInputs,
-        },
-      )
+      const root: ReturnType<
+        typeof usePart<typeof datePickerPrimitive, "root">
+      > = usePart(picker, "root", undefined, undefined, {
+        tag: "div",
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? defaultContent(),
+        hidden: hiddenInputs,
+      })
       return root
     },
-  }),
+  })
 )
 
 /**
@@ -208,7 +275,7 @@ const DatePickerInput = withElement(
         extend: (input) => (field && !props.end ? field.props(input) : input),
       })
     },
-  }),
+  })
 )
 
 const calendarIcon = () =>
@@ -225,7 +292,7 @@ const calendarIcon = () =>
     [
       h("rect", { x: "2", y: "3", width: "12", height: "11", rx: "1.5" }),
       h("path", { d: "M2 6.5h12M5.5 1.5v3M10.5 1.5v3" }),
-    ],
+    ]
   )
 
 /**
@@ -241,10 +308,11 @@ const DatePickerTrigger = withElement(
     setup(_, { slots }) {
       return usePart(datePickerPrimitive, "trigger", undefined, undefined, {
         tag: "button",
-        children: (state) => slotContent(slots.default, { state }) ?? calendarIcon(),
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? calendarIcon(),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -265,7 +333,9 @@ const DatePickerContent = withElement(
       collisionPadding: Number,
       arrowPadding: Number,
       anchor: [Object, String] as PropType<Anchor | string | null>,
-      finalFocus: [String, Object, Function] as PropType<DatePickerContentProps["finalFocus"]>,
+      finalFocus: [String, Object, Function] as PropType<
+        DatePickerContentProps["finalFocus"]
+      >,
       keepMounted: optionalBoolean,
       // Renders the popup into this element instead of in place.
       container: containerProp,
@@ -282,20 +352,23 @@ const DatePickerContent = withElement(
       const defaultContent = () => [
         h("div", [h(CalendarPrevious), h(CalendarHeading), h(CalendarNext)]),
         ...Array.from({ length: picker.state.months }, (_, offset) =>
-          h(CalendarGrid, { key: offset, offset }),
+          h(CalendarGrid, { key: offset, offset })
         ),
       ]
       const part = usePart(picker, "content", content, undefined, {
         tag: "div",
-        children: (state) => slotContent(slots.default, { state }) ?? defaultContent(),
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? defaultContent(),
       })
       return () => {
         const element = part()
-        if (!element) return null
+        if (!element) {
+          return null
+        }
         return renderPopup(sheetViewport(picker, element), target())
       }
     },
-  }),
+  })
 )
 
 /**
@@ -311,10 +384,11 @@ const DatePickerHint = withElement(
     setup(_, { slots }) {
       return usePart(datePickerPrimitive, "hint", undefined, undefined, {
         tag: "span",
-        children: (state) => slotContent(slots.default, { state }) ?? state.placeholder,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.placeholder,
       })
     },
-  }),
+  })
 )
 
 /**
@@ -333,15 +407,21 @@ const DatePickerPreset = withElement(
     name: "DatePickerPreset",
     inheritAttrs: false,
     props: {
-      value: { type: null as unknown as PropType<DatePickerValue>, required: true },
+      value: {
+        type: null as unknown as PropType<DatePickerValue>,
+        required: true,
+      },
     },
     slots: Object as PartSlots<typeof datePickerPrimitive, "preset">,
     setup(props) {
       // Keyed by its value, which may be a range.
-      const part = () => ({ value: props.value, id: JSON.stringify(props.value) })
+      const part = () => ({
+        value: props.value,
+        id: JSON.stringify(props.value),
+      })
       return usePart(datePickerPrimitive, "preset", part, undefined, "button")
     },
-  }),
+  })
 )
 
 export {

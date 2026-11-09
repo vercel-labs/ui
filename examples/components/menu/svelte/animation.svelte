@@ -17,7 +17,8 @@
 
 <Menu
   onOpenChange={(open) => log(open ? "Opening" : "Closing")}
-  onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+  onOpenChangeComplete={(open) =>
+    log(open ? "Finished opening" : "Finished closing")}
 >
   <MenuTrigger>Animated</MenuTrigger>
   <MenuContent keepMounted>

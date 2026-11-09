@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../../src/collapsible"
+  import {
+    Collapsible,
+    CollapsiblePanel,
+    CollapsibleTrigger,
+  } from "../../src/collapsible"
 
   let { seen }: { seen: string[] } = $props()
   let open = $state(false)
@@ -10,7 +14,9 @@
 
   $effect(() => {
     open
-    seen.push(`${!!document.querySelector(".panel")} ${!!document.querySelector(".own")}`)
+    seen.push(
+      `${!!document.querySelector(".panel")} ${!!document.querySelector(".own")}`
+    )
   })
 </script>
 

@@ -1,6 +1,10 @@
 <script lang="ts">
   import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
-  import { TriggerMenu, TriggerMenuHint, TriggerMenuInput } from "@ui-sdk/svelte/trigger-menu"
+  import {
+    TriggerMenu,
+    TriggerMenuHint,
+    TriggerMenuInput,
+  } from "@ui-sdk/svelte/trigger-menu"
   import { useLog } from "../../../shared/svelte/log"
 
   const commands = [
@@ -8,11 +12,25 @@
       value: "status",
       label: "status",
       arguments: [
-        { name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] },
-        { name: "until", hint: "[until]", items: ["30m", "1h", "4h", "today"], allowCustomValue: false },
+        {
+          name: "status",
+          hint: "<status>",
+          required: true,
+          items: ["available", "busy", "away"],
+        },
+        {
+          name: "until",
+          hint: "[until]",
+          items: ["30m", "1h", "4h", "today"],
+          allowCustomValue: false,
+        },
       ],
     },
-    { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+    {
+      value: "search",
+      label: "search",
+      arguments: [{ name: "query", hint: "<query>", required: true }],
+    },
     { value: "away", label: "away", after: "submit" as const },
     { value: "clear", label: "clear" },
   ]
@@ -28,8 +46,13 @@
   }}
 >
   <TriggerMenu
-    triggers={[{ char: "/", boundary: "start", type: "command", items: commands }]}
-    onSelect={(value, details) => log(["Chose", `/${value}`, ...Object.values(details.arguments)].join(" "))}
+    triggers={[
+      { char: "/", boundary: "start", type: "command", items: commands },
+    ]}
+    onSelect={(value, details) =>
+      log(
+        ["Chose", `/${value}`, ...Object.values(details.arguments)].join(" ")
+      )}
   >
     <Field name="message">
       <FieldLabel>Message</FieldLabel>

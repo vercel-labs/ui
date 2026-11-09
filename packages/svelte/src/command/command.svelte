@@ -22,7 +22,11 @@ A search field over an always-open list of commands. Renders a `div` around them
   import { provideInstance } from "../instance"
   import { useOwnPart } from "../own-part.svelte"
   import { useControllerEntry } from "../popup.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { OwnListKey } from "./context"
   import CommandList from "./command-list.svelte"
 
@@ -89,7 +93,10 @@ A search field over an always-open list of commands. Renders a `div` around them
     /** Logs every state change with its reason. */
     debug?: boolean
     /** Runs when the highlight moves: arrow keys, the pointer, typing, a page change or a controller. `details.cancel()` stops it. */
-    onValueChange?: (value: string | null, details: CommandValueChangeDetails) => void
+    onValueChange?: (
+      value: string | null,
+      details: CommandValueChangeDetails
+    ) => void
     /** Runs when the search text wants to change: typing, opening a page, going back, or a controller. `details.cancel()` stops it. */
     onQueryChange?: (query: string, details: QueryDetails) => void
     /** Runs when a page opens or Backspace or Escape goes back. `details.cancel()` stops it. */
@@ -124,18 +131,27 @@ A search field over an always-open list of commands. Renders a `div` around them
     status,
     controller,
     debug,
-    onValueChange: (next: string | null, details: CommandValueChangeDetails) => {
+    onValueChange: (
+      next: string | null,
+      details: CommandValueChangeDetails
+    ) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     onQueryChange: (next: string, details: QueryDetails) => {
       onQueryChange?.(next, details)
-      if (!details.canceled) query = next
+      if (!details.canceled) {
+        query = next
+      }
     },
     onPagesChange: (next: string[], details: PagesDetails) => {
       onPagesChange?.(next, details)
-      if (!details.canceled) pages = next
+      if (!details.canceled) {
+        pages = next
+      }
     },
     onLoadMore,
   }))

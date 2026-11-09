@@ -4,12 +4,16 @@ import { expect } from "../fixtures"
 // Viewports are regions named by the fixture. Scrollbars are hidden from
 // assistive technology, so they're found by class inside their scroll area.
 
-const viewport = (page: Page, name: string) => page.getByRole("region", { name, exact: true })
+const viewport = (page: Page, name: string) =>
+  page.getByRole("region", { name, exact: true })
 
-const area = (page: Page, name: string) => viewport(page, name).locator("xpath=..")
+const area = (page: Page, name: string) =>
+  viewport(page, name).locator("xpath=..")
 
 const scrollbar = (page: Page, name: string, orientation = "vertical") =>
-  area(page, name).locator(`.scroll-area-scrollbar[data-orientation="${orientation}"]`)
+  area(page, name).locator(
+    `.scroll-area-scrollbar[data-orientation="${orientation}"]`
+  )
 
 const thumb = (page: Page, name: string, orientation = "vertical") =>
   scrollbar(page, name, orientation).locator(".scroll-area-thumb")
@@ -35,22 +39,34 @@ function restingScroll(locator: Locator) {
         const check = () => {
           still = el.scrollTop === last ? still + 1 : 0
           last = el.scrollTop
-          if (still >= 5) resolve(last)
-          else requestAnimationFrame(check)
+          if (still >= 5) {
+            resolve(last)
+          } else {
+            requestAnimationFrame(check)
+          }
         }
         requestAnimationFrame(check)
-      }),
+      })
   )
 }
 
-async function setScroll(locator: Locator, position: { top?: number; left?: number }) {
-  await locator.evaluate((el, position) => el.scrollTo({ ...position, behavior: "instant" }), position)
+async function setScroll(
+  locator: Locator,
+  position: { top?: number; left?: number }
+) {
+  await locator.evaluate(
+    (el, position) => el.scrollTo({ ...position, behavior: "instant" }),
+    position
+  )
 }
 
 // Two frames: one for the scroll event, one for the writes it schedules.
 async function settle(page: Page) {
   await page.evaluate(
-    () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+    () =>
+      new Promise((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(resolve))
+      )
   )
 }
 
@@ -68,10 +84,21 @@ async function trackBox(page: Page, name: string, orientation = "vertical") {
   for (let attempt = 0; attempt < 10; attempt++) {
     await settle(page)
     const next = await box(scrollbar(page, name, orientation))
-    if (next.x === bar.x && next.width === bar.width && next.height === bar.height) break
+    if (
+      next.x === bar.x &&
+      next.width === bar.width &&
+      next.height === bar.height
+    ) {
+      break
+    }
     bar = next
   }
-  return { x: bar.x + 2, y: bar.y + 2, width: bar.width - 4, height: bar.height - 4 }
+  return {
+    x: bar.x + 2,
+    y: bar.y + 2,
+    width: bar.width - 4,
+    height: bar.height - 4,
+  }
 }
 
 async function dragBy(page: Page, target: Locator, dx: number, dy: number) {

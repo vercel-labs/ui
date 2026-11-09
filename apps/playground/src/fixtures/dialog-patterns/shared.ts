@@ -15,7 +15,11 @@ if (!document.getElementById("popover-root")) {
 }
 
 // Records "rename:false:escape-key".
-function recordOpenChange(name: string, open: boolean, details: { reason: string }) {
+function recordOpenChange(
+  name: string,
+  open: boolean,
+  details: { reason: string }
+) {
   target.__openChanges!.push(`${name}:${open}:${details.reason}`)
 }
 
@@ -23,7 +27,10 @@ function recordOpenChange(name: string, open: boolean, details: { reason: string
 // `__action.resolve()` or `__action.reject("Offline")`.
 function pendingAction() {
   return new Promise<void>((resolve, reject) => {
-    target.__action = { resolve, reject: (message) => reject(new Error(message)) }
+    target.__action = {
+      resolve,
+      reject: (message) => reject(new Error(message)),
+    }
   })
 }
 

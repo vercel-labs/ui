@@ -15,7 +15,11 @@ The group's heading, which names the group.
 
   const menu = useHandle(triggerMenu)
   const group = getContext<string | undefined>(GroupKey)
-  if (!group) throw new Error("<TriggerMenuGroupLabel> must be used inside <TriggerMenuGroup>.")
+  if (!group) {
+    throw new Error(
+      "<TriggerMenuGroupLabel> must be used inside <TriggerMenuGroup>."
+    )
+  }
   const label = useHandlePart(menu, "group-label", () => ({ id: group, group }))
 </script>
 

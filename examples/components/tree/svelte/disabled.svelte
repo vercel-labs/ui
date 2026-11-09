@@ -61,7 +61,12 @@
       Focusable when disabled
     </label>
   </div>
-  <Tree aria-label="Plans" {items} defaultExpanded={["plans"]} focusableWhenDisabled={focusable}>
+  <Tree
+    aria-label="Plans"
+    {items}
+    defaultExpanded={["plans"]}
+    focusableWhenDisabled={focusable}
+  >
     {@render treeItems(items)}
   </Tree>
 </div>

@@ -47,9 +47,15 @@
       <TriggerMenuGroup>
         <TriggerMenuGroupLabel>People</TriggerMenuGroupLabel>
         {#each people as person (person.value)}
-          <TriggerMenuItem value={person.value} label={person.label} disabled={person.disabled}>
+          <TriggerMenuItem
+            value={person.value}
+            label={person.label}
+            disabled={person.disabled}
+          >
             {person.label}
-            <span data-slot="hint">{person.disabled ? "Deactivated" : `@${person.value}`}</span>
+            <span data-slot="hint"
+              >{person.disabled ? "Deactivated" : `@${person.value}`}</span
+            >
           </TriggerMenuItem>
         {/each}
       </TriggerMenuGroup>

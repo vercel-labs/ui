@@ -30,18 +30,24 @@ const command = createCommandController()
 const pages = ref<string[]>([])
 
 function onAction(value: string) {
-  if (value === "back") command.pop()
+  if (value === "back") {
+    command.pop()
+  }
 }
 </script>
 
 <template>
   <Command v-model:pages="pages" :controller="command" @action="onAction">
     <div data-slot="row">
-      <span v-for="page in pages" :key="page" data-slot="badge">{{ page }}</span>
+      <span v-for="page in pages" :key="page" data-slot="badge">{{
+        page
+      }}</span>
     </div>
     <CommandInput
       aria-label="Search commands"
-      :placeholder="pages.length ? 'Search… (Backspace to go back)' : 'What do you need?'"
+      :placeholder="
+        pages.length ? 'Search… (Backspace to go back)' : 'What do you need?'
+      "
     />
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandList>
@@ -63,12 +69,20 @@ function onAction(value: string) {
         </CommandGroup>
       </CommandPage>
       <CommandPage value="theme">
-        <CommandItem v-for="theme in themes" :key="theme.value" :value="theme.value">
+        <CommandItem
+          v-for="theme in themes"
+          :key="theme.value"
+          :value="theme.value"
+        >
           {{ theme.label }}
         </CommandItem>
       </CommandPage>
       <CommandPage value="teams">
-        <CommandItem v-for="team in teams" :key="team.value" :value="team.value">
+        <CommandItem
+          v-for="team in teams"
+          :key="team.value"
+          :value="team.value"
+        >
           {{ team.label }}
         </CommandItem>
       </CommandPage>

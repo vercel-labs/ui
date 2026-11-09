@@ -18,7 +18,9 @@ const value = ref<number | null>(4)
       v-model:value="value"
       aria-label="Rating"
       :controller="rating"
-      @value-change="(next, details) => log(`value: ${next} (${details.reason})`)"
+      @value-change="
+        (next, details) => log(`value: ${next} (${details.reason})`)
+      "
     >
       <RatingItem>
         <StarIcon aria-hidden="true" />

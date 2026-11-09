@@ -1,6 +1,12 @@
 "use client"
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "@/components/ui/tabs"
 import { frameworkIds, frameworks, isFramework } from "@/lib/frameworks"
 import { packageManager, styling, useFramework } from "@/lib/preferences"
@@ -10,7 +16,13 @@ import * as React from "react"
 import { CopyButton } from "./copy-button"
 import { Frame } from "./frame"
 
-function CodeBlockTabs({ className, children }: { className?: string; children: React.ReactNode }) {
+function CodeBlockTabs({
+  className,
+  children,
+}: {
+  className?: string
+  children: React.ReactNode
+}) {
   const { value } = usePreference(packageManager)
   return (
     <Frame className={cn("my-5 overflow-hidden", className)}>
@@ -18,7 +30,9 @@ function CodeBlockTabs({ className, children }: { className?: string; children: 
         data-copy-scope=""
         value={value}
         onValueChange={(next, details) => {
-          if (next) packageManager.set(next as typeof value, details)
+          if (next) {
+            packageManager.set(next as typeof value, details)
+          }
         }}
         className="flex flex-col"
       >
@@ -35,7 +49,9 @@ function CodeBlockTabsList({
   children: React.ReactNode
   label?: string
 }) {
-  if (label === "Package manager") return <PackageManagerSelect>{children}</PackageManagerSelect>
+  if (label === "Package manager") {
+    return <PackageManagerSelect>{children}</PackageManagerSelect>
+  }
   return (
     <TabBar>
       <TabsList aria-label={label}>{children}</TabsList>
@@ -55,7 +71,9 @@ function PackageManagerSelect({ children }: { children: React.ReactNode }) {
         items={items}
         value={value}
         onValueChange={(next, details) => {
-          if (next) packageManager.set(next as typeof value, details)
+          if (next) {
+            packageManager.set(next as typeof value, details)
+          }
         }}
       >
         <SelectTrigger
@@ -67,7 +85,11 @@ function PackageManagerSelect({ children }: { children: React.ReactNode }) {
         </SelectTrigger>
         <SelectContent align="start" sideOffset={6} className="min-w-32">
           {items.map((item) => (
-            <SelectItem key={item.value} value={item.value} className="font-mono text-xs">
+            <SelectItem
+              key={item.value}
+              value={item.value}
+              className="font-mono text-xs"
+            >
               {item.label}
             </SelectItem>
           ))}
@@ -78,11 +100,21 @@ function PackageManagerSelect({ children }: { children: React.ReactNode }) {
   )
 }
 
-function CodeBlockTabsTrigger({ value, children }: { value: string; children: React.ReactNode }) {
+function CodeBlockTabsTrigger({
+  value,
+  children,
+}: {
+  value: string
+  children: React.ReactNode
+}) {
   return (
     <TabsTab
       value={value}
-      className={value === "css" || value === "tailwind" ? undefined : "text-xs tracking-normal normal-case"}
+      className={
+        value === "css" || value === "tailwind"
+          ? undefined
+          : "text-xs tracking-normal normal-case"
+      }
     >
       {children}
     </TabsTab>
@@ -92,13 +124,22 @@ function CodeBlockTabsTrigger({ value, children }: { value: string; children: Re
 function TabBar({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
-      className={cn("flex min-w-0 items-center gap-2 border-b border-border/60 p-frame", className)}
+      className={cn(
+        "flex min-w-0 items-center gap-2 border-b border-border/60 p-frame",
+        className
+      )}
       {...props}
     />
   )
 }
 
-function CodeBlockTab({ value, children }: { value: string; children: React.ReactNode }) {
+function CodeBlockTab({
+  value,
+  children,
+}: {
+  value: string
+  children: React.ReactNode
+}) {
   return (
     <TabsPanel
       value={value}
@@ -120,7 +161,9 @@ function StyleTabs({ children }: { children: React.ReactNode }) {
         data-copy-scope=""
         value={value}
         onValueChange={(next, details) => {
-          if (next) styling.set(next as typeof value, details)
+          if (next) {
+            styling.set(next as typeof value, details)
+          }
         }}
         className="flex flex-col"
       >
@@ -135,7 +178,10 @@ function StyleTabs({ children }: { children: React.ReactNode }) {
   )
 }
 
-const frameworkItems = frameworkIds.map((value) => ({ value, label: frameworks[value].label }))
+const frameworkItems = frameworkIds.map((value) => ({
+  value,
+  label: frameworks[value].label,
+}))
 
 function FrameworkTabs({
   children,
@@ -150,14 +196,18 @@ function FrameworkTabs({
       <Tabs
         data-copy-scope=""
         value={framework}
-        onValueChange={(next) => next && isFramework(next) && setFramework(next)}
+        onValueChange={(next) =>
+          next && isFramework(next) && setFramework(next)
+        }
         className="flex flex-col [&_[data-prompt-bar]]:hidden"
       >
         <TabBar>
           <Select
             items={frameworkItems}
             value={framework}
-            onValueChange={(next) => next && isFramework(next) && setFramework(next)}
+            onValueChange={(next) =>
+              next && isFramework(next) && setFramework(next)
+            }
           >
             <SelectTrigger
               variant="ghost"

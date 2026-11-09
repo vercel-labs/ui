@@ -1,6 +1,10 @@
 <script lang="ts">
   import { Field, FieldControl, FieldLabel } from "@ui-sdk/svelte/field"
-  import { type TriggerDefinition, TriggerMenu, TriggerMenuInput } from "@ui-sdk/svelte/trigger-menu"
+  import {
+    type TriggerDefinition,
+    TriggerMenu,
+    TriggerMenuInput,
+  } from "@ui-sdk/svelte/trigger-menu"
 
   const people = [
     { value: "hollis", label: "Hollis Grant" },
@@ -25,8 +29,11 @@
   function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
     return new Promise<string[]>((resolve, reject) => {
       const timer = setTimeout(
-        () => resolve(channels.filter((channel) => channel.includes(query.toLowerCase()))),
-        400,
+        () =>
+          resolve(
+            channels.filter((channel) => channel.includes(query.toLowerCase()))
+          ),
+        400
       )
       signal.addEventListener("abort", () => {
         clearTimeout(timer)

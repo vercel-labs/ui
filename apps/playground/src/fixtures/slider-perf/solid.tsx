@@ -1,4 +1,10 @@
-import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/solid/slider"
+import {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+} from "@ui-sdk/solid/slider"
 import { render } from "@solidjs/web"
 import { For, untrack } from "solid-js"
 import { countRender, perfSize, perfThumbs } from "tests/fixtures/perf.ts"

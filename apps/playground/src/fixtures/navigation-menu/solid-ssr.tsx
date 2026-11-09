@@ -5,7 +5,10 @@ import { Fixture } from "./solid"
 async function mount(root: HTMLElement) {
   await hydrateFixture(root, "navigation-menu", () => <Fixture />)
   // The navigation menu specs read the server's HTML under this name.
-  const page = window as unknown as { __serverHtml: string; __serverHTML: string }
+  const page = window as unknown as {
+    __serverHtml: string
+    __serverHTML: string
+  }
   page.__serverHTML = page.__serverHtml
 }
 

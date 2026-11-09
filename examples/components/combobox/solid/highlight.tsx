@@ -29,7 +29,11 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 function Example() {
@@ -59,11 +63,15 @@ function Example() {
         <ComboboxList>
           <For each={countries}>
             {(country) => (
-              <ComboboxItem value={country.value} label={country.label} keywords={country.keywords}>
+              <ComboboxItem
+                value={country.value}
+                label={country.label}
+                keywords={country.keywords}
+              >
                 <ComboboxItemText>
                   {(state) =>
                     state.segments.map((segment) =>
-                      segment.match ? <mark>{segment.text}</mark> : segment.text,
+                      segment.match ? <mark>{segment.text}</mark> : segment.text
                     )
                   }
                 </ComboboxItemText>

@@ -7,7 +7,11 @@ import {
 } from "@ui-sdk/solid/resizable"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
-import { formatLayout, resizableFixture as f, resizableOptions } from "tests/fixtures/resizable.ts"
+import {
+  formatLayout,
+  resizableFixture as f,
+  resizableOptions,
+} from "tests/fixtures/resizable.ts"
 
 const { sidebar, main, preview } = f.editor.panels
 const { code, terminal } = f.main.panels
@@ -20,13 +24,25 @@ function Fixture() {
   const [layout, setLayout] = createSignal<number[]>([25, 50, 25])
   const report =
     (group: string) =>
-    (next: number[], details: { reason: ResizableLayoutChangeReason; cancel: () => void }) => {
-      if (group === f.editor.id && options.cancel) return details.cancel()
+    (
+      next: number[],
+      details: { reason: ResizableLayoutChangeReason; cancel: () => void }
+    ) => {
+      if (group === f.editor.id && options.cancel) {
+        return details.cancel()
+      }
       setAction(formatLayout(group, next, details.reason))
-      if (group === f.editor.id && options.controlled && !options.ignore) setLayout(next)
+      if (group === f.editor.id && options.controlled && !options.ignore) {
+        setLayout(next)
+      }
     }
-  const commit = (group: string) => (next: number[], details: { reason: ResizableLayoutChangeReason }) =>
-    setCommitted((list) => [...list, formatLayout(group, next, details.reason)])
+  const commit =
+    (group: string) =>
+    (next: number[], details: { reason: ResizableLayoutChangeReason }) =>
+      setCommitted((list) => [
+        ...list,
+        formatLayout(group, next, details.reason),
+      ])
 
   return (
     <div class="fixture">
@@ -82,7 +98,10 @@ function Fixture() {
               role="group"
               aria-label={code.label}
             />
-            <ResizableHandle class="resizable-handle" aria-label={f.main.handle} />
+            <ResizableHandle
+              class="resizable-handle"
+              aria-label={f.main.handle}
+            />
             <ResizablePanel
               id={terminal.id}
               minSize={terminal.minSize}
@@ -93,7 +112,10 @@ function Fixture() {
             />
           </Resizable>
         </ResizablePanel>
-        <ResizableHandle class="resizable-handle" aria-label={f.editor.handles[1]} />
+        <ResizableHandle
+          class="resizable-handle"
+          aria-label={f.editor.handles[1]}
+        />
         <ResizablePanel
           id={preview.id}
           defaultSize={preview.defaultSize}
@@ -104,9 +126,15 @@ function Fixture() {
         />
       </Resizable>
       <div class="row">
-        <button onClick={() => controller.collapse(sidebar.id)}>{f.buttons.collapse}</button>
-        <button onClick={() => controller.expand(sidebar.id)}>{f.buttons.expand}</button>
-        <button onClick={() => controller.resize(preview.id, f.previewSize)}>{f.buttons.resize}</button>
+        <button onClick={() => controller.collapse(sidebar.id)}>
+          {f.buttons.collapse}
+        </button>
+        <button onClick={() => controller.expand(sidebar.id)}>
+          {f.buttons.expand}
+        </button>
+        <button onClick={() => controller.resize(preview.id, f.previewSize)}>
+          {f.buttons.resize}
+        </button>
       </div>
       <button>After</button>
       <output role="status" aria-label="Last action">

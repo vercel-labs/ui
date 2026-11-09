@@ -16,7 +16,11 @@ import {
   type SelectValueProps,
   type SelectValueState,
 } from "@ui-sdk/core/select"
-import { selectAllKey, selectItemIcons, selectSelectAll } from "@ui-sdk/core/renderer"
+import {
+  selectAllKey,
+  selectItemIcons,
+  selectSelectAll,
+} from "@ui-sdk/core/renderer"
 import type { JSX } from "@solidjs/web"
 import {
   createContext,
@@ -74,7 +78,9 @@ const SelectContext = createContext<SelectContextValue | null>(null)
 const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 // Where a SelectContent among the select's children says it's there, so a
 // data select renders its own list only when there's none.
-const OwnContentContext = createContext<((present: boolean) => void) | null>(null)
+const OwnContentContext = createContext<((present: boolean) => void) | null>(
+  null
+)
 
 // Each select's own placeholder, which the instance's state holds untracked.
 // By select, since a trigger can show another select than the one around it.
@@ -82,7 +88,9 @@ const placeholders = new WeakMap<object, () => string | undefined>()
 
 function useSelect() {
   const context = useContext(SelectContext)
-  if (!context) throw new Error("Select parts must be used inside <Select>.")
+  if (!context) {
+    throw new Error("Select parts must be used inside <Select>.")
+  }
   return context
 }
 
@@ -93,7 +101,10 @@ type Clashing = "value" | "onChange" | "onSelect"
  * The props of `Select`.
  * @stable
  */
-type SelectProps<T = string, Multiple extends boolean | undefined = false> = SelectOptions<T, Multiple> & {
+type SelectProps<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = SelectOptions<T, Multiple> & {
   children?: JSX.Element
 }
 
@@ -103,7 +114,9 @@ type SelectProps<T = string, Multiple extends boolean | undefined = false> = Sel
  * `multiple` makes the value a list.
  * @stable
  */
-function Select<T = string, Multiple extends boolean | undefined = false>(props: SelectProps<T, Multiple>) {
+function Select<T = string, Multiple extends boolean | undefined = false>(
+  props: SelectProps<T, Multiple>
+) {
   const field = useFieldControl()
   const options = omit(props, "children", "container")
   const select = usePrimitive(selectPrimitive, () => ({
@@ -120,8 +133,10 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
     () => !props.itemToLabel,
     (prepare) => {
       const { internal } = select.api
-      if (prepare && internal.selection.needsItems(internal.hasValueIcon())) internal.prepare()
-    },
+      if (prepare && internal.selection.needsItems(internal.hasValueIcon())) {
+        internal.prepare()
+      }
+    }
   )
   // Written by a SelectContent among the children, while the children render.
   const [hasContent, setHasContent] = createSignal(false, { ownedWrite: true })
@@ -130,7 +145,9 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
       <ContainerContext value={() => props.container}>
         {providePrimitive(select, () => (
           <>
-            <OwnContentContext value={setHasContent}>{props.children}</OwnContentContext>
+            <OwnContentContext value={setHasContent}>
+              {props.children}
+            </OwnContentContext>
             <Show when={props.items && !hasContent()}>
               <SelectContent />
             </Show>
@@ -148,14 +165,21 @@ function Select<T = string, Multiple extends boolean | undefined = false>(props:
  */
 const SelectLabel = parts.Label
 
-type TriggerPartProps = Omit<PartProps<"button", SelectTriggerState>, Clashing> & SelectTriggerProps
+type TriggerPartProps = Omit<
+  PartProps<"button", SelectTriggerState>,
+  Clashing
+> &
+  SelectTriggerProps
 
 /**
  * The button that opens the list: a combobox named by the label. Typing on it selects the item that matches.
  * @stable
  */
 function SelectTrigger(props: TriggerPartProps) {
-  const select = useControllerTarget(() => props.controller, useContext(SelectContext))
+  const select = useControllerTarget(
+    () => props.controller,
+    useContext(SelectContext)
+  )
   const rest = omit(props, "disabled", "controller")
   return (
     <Show
@@ -174,10 +198,12 @@ function SelectTrigger(props: TriggerPartProps) {
             placeholder: true,
           },
         }),
-        rest,
+        rest
       )}
     >
-      {(select) => triggerPart(select, () => ({ disabled: props.disabled }), rest)}
+      {(select) =>
+        triggerPart(select, () => ({ disabled: props.disabled }), rest)
+      }
     </Show>
   )
 }
@@ -185,7 +211,7 @@ function SelectTrigger(props: TriggerPartProps) {
 function triggerPart(
   select: SelectContextValue,
   trigger: () => SelectTriggerProps,
-  props: Record<string, any>,
+  props: Record<string, any>
 ) {
   // Without content, the trigger shows the value.
   const user = merge(props, {
@@ -194,21 +220,37 @@ function triggerPart(
     },
   })
   const field = useFieldControl(props)
-  const own = () => ({ ...trigger(), named: !!field || props["aria-labelledby"] != null })
+  const own = () => ({
+    ...trigger(),
+    named: !!field || props["aria-labelledby"] != null,
+  })
   return (
     <SelectContext value={select}>
-      {usePart(select, "trigger", own, joinField(field, user, "button"), "button")}
+      {usePart(
+        select,
+        "trigger",
+        own,
+        joinField(field, user, "button"),
+        "button"
+      )}
     </SelectContext>
   )
 }
 
-const unselected: SelectValueState = { value: null, label: "", labels: [], placeholder: true }
+const unselected: SelectValueState = {
+  value: null,
+  label: "",
+  labels: [],
+  placeholder: true,
+}
 
 /**
  * The selected item's label, or the placeholder. Renders it for you when it has no children.
  * @stable
  */
-function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> & SelectValueProps) {
+function SelectValue(
+  props: Omit<PartProps<"span", SelectValueState>, Clashing> & SelectValueProps
+) {
   const context = useContext(SelectContext)
   const rest = omit(props, "placeholder", "maxLabels", "getMoreLabel")
   // A trigger outside its select renders before the select it names has mounted.
@@ -220,10 +262,11 @@ function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> 
         get children() {
           return props.children ?? props.placeholder ?? null
         },
-      }),
+      })
     )
   }
-  const placeholder = () => placeholders.get(context)?.() ?? context.state.placeholder
+  const placeholder = () =>
+    placeholders.get(context)?.() ?? context.state.placeholder
   const part = () => ({
     placeholder: props.placeholder,
     maxLabels: props.maxLabels,
@@ -234,7 +277,9 @@ function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> 
       return (
         props.children ??
         ((state: SelectValueState) =>
-          state.placeholder ? (props.placeholder ?? placeholder() ?? null) : state.label)
+          state.placeholder
+            ? (props.placeholder ?? placeholder() ?? null)
+            : state.label)
       )
     },
   })
@@ -245,7 +290,9 @@ function SelectValue(props: Omit<PartProps<"span", SelectValueState>, Clashing> 
  * The popup that holds the items, positioned against the trigger.
  * @stable
  */
-function SelectContent(props: PartProps<"div", SelectContentState> & SelectContentProps) {
+function SelectContent(
+  props: PartProps<"div", SelectContentState> & SelectContentProps
+) {
   const select = useSelect()
   const fromRoot = useContext(ContainerContext)
   const target = usePopupContainer(() => props.container ?? fromRoot())
@@ -275,7 +322,7 @@ function SelectContent(props: PartProps<"div", SelectContentState> & SelectConte
       "anchor",
       "alignItemWithTrigger",
       "keepMounted",
-      "container",
+      "container"
     ),
     {
       // From the part's state, so items that arrive after the select rendered
@@ -290,14 +337,17 @@ function SelectContent(props: PartProps<"div", SelectContentState> & SelectConte
           ))
         )
       },
-    },
+    }
   )
   // The popup goes around the content only while it's present.
   return (
     <Show when={select.present("content", content)}>
       {renderPopup(
-        () => sheetViewport(select, () => usePart(select, "content", content, rest, "div")),
-        target,
+        () =>
+          sheetViewport(select, () =>
+            usePart(select, "content", content, rest, "div")
+          ),
+        target
       )}
     </Show>
   )
@@ -310,7 +360,8 @@ function SelectContent(props: PartProps<"div", SelectContentState> & SelectConte
 function SelectList(props: ComponentProps<typeof parts.List>) {
   return (
     <parts.List {...props}>
-      {props.children ?? ((state: SelectContentState) => <SelectItems items={state.items} />)}
+      {props.children ??
+        ((state: SelectContentState) => <SelectItems items={state.items} />)}
     </parts.List>
   )
 }
@@ -348,7 +399,7 @@ const SelectStatus = parts.Status
  * @stable
  */
 const SelectItem = parts.Item as <T = string>(
-  props: Omit<PartProps<"div", SelectItemState>, Clashing> & SelectItemProps<T>,
+  props: Omit<PartProps<"div", SelectItemState>, Clashing> & SelectItemProps<T>
 ) => JSX.Element
 
 /**
@@ -357,9 +408,14 @@ const SelectItem = parts.Item as <T = string>(
  */
 function SelectItemText(props: PartProps<"span", SelectItemTextState>) {
   const item = useAround(selectPrimitive, "item")
-  if (!item) throw new Error("<SelectItemText> must be used inside <SelectItem>.")
+  if (!item) {
+    throw new Error("<SelectItemText> must be used inside <SelectItem>.")
+  }
   const key = () => item().value as string
-  const part = () => ({ id: key(), text: textToMark(props.children, (item().label as string) ?? key()) })
+  const part = () => ({
+    id: key(),
+    text: textToMark(props.children, (item().label as string) ?? key()),
+  })
   const rest = merge(props, {
     get children() {
       const children = props.children
@@ -381,7 +437,13 @@ function SelectSelectAll(props: PartProps<"div", SelectSelectAllState>) {
   // Read once, here: the thunk also runs from DOM event handlers, outside any
   // reactive root, where Solid refuses to look up a context.
   const group = useAround(selectPrimitive, "group")?.().id as string | undefined
-  return usePart(select, "select-all", () => ({ id: selectAllKey(group) }), props, "div")
+  return usePart(
+    select,
+    "select-all",
+    () => ({ id: selectAllKey(group) }),
+    props,
+    "div"
+  )
 }
 
 /**
@@ -395,12 +457,18 @@ const SelectItemIndicator = parts.ItemIndicator
  * readers, typeahead and filtering skip it, and `mirror` flips it in right-to-left text.
  * @stable
  */
-function SelectItemIcon(props: PartProps<"span", SelectItemIconState> & SelectItemIconProps) {
+function SelectItemIcon(
+  props: PartProps<"span", SelectItemIconState> & SelectItemIconProps
+) {
   const select = useSelect()
   select.instance.use(selectItemIcons)
   const item = useAround(selectPrimitive, "item")
   const id = createUniqueId()
-  const part = () => ({ id, mirror: props.mirror, item: item?.().value as string | undefined })
+  const part = () => ({
+    id,
+    mirror: props.mirror,
+    item: item?.().value as string | undefined,
+  })
   return usePart(select, "item-icon", part, omit(props, "mirror"), "span")
 }
 
@@ -411,7 +479,9 @@ function SelectItemIcon(props: PartProps<"span", SelectItemIconState> & SelectIt
  */
 function SelectValueIcon(props: Omit<PartProps<"span">, "children">) {
   const select = useContext(SelectContext)
-  if (!select) return null
+  if (!select) {
+    return null
+  }
   select.instance.use(selectItemIcons)
   // Its content is a copy of the selected item's icon, which the core writes.
   return usePart(select, "value-icon", undefined, props, "span")

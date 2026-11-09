@@ -22,7 +22,9 @@ describe("combobox server rendering", () => {
   })
 
   test("a combobox with composed items shows the label `itemToLabel` gives before they mount", () => {
-    const body = html({ itemToLabel: (value: string) => (value === "fr" ? "France" : "Brazil") })
+    const body = html({
+      itemToLabel: (value: string) => (value === "fr" ? "France" : "Brazil"),
+    })
     expect(body).toMatch(/<input[^>]*role="combobox"[^>]*value="France"/)
   })
 

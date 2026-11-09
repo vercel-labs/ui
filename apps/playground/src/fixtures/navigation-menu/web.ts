@@ -5,13 +5,14 @@ import {
   navigationMenuOptions,
 } from "tests/fixtures/navigation-menu.ts"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 const links = (list: { label: string; href: string }[]) =>
   `<ul>${list
     .map(
       (link) =>
-        `<li><ui-navigation-menu-link><a href="${link.href}">${link.label}</a></ui-navigation-menu-link></li>`,
+        `<li><ui-navigation-menu-link><a href="${link.href}">${link.label}</a></ui-navigation-menu-link></li>`
     )
     .join("")}</ul>`
 
@@ -38,7 +39,7 @@ function markup() {
           ${links(item.links)}
           ${index === 1 && layout.nested ? nestedMenu : ""}
         </ui-navigation-menu-content>
-      </ui-navigation-menu-item>`,
+      </ui-navigation-menu-item>`
     )
     .join("")
   return `
@@ -67,19 +68,34 @@ async function mount(root: HTMLElement) {
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
   // The side and align place the outer menu's panels and viewport, not the nested menu's.
   const { placement } = navigationMenuLayout()
-  for (const part of menu.querySelectorAll("ui-navigation-menu-content, ui-navigation-menu-viewport"))
-    if (part.closest("ui-navigation-menu") === menu)
-      for (const [name, value] of Object.entries(placement)) part.setAttribute(name, value)
+  for (const part of menu.querySelectorAll(
+    "ui-navigation-menu-content, ui-navigation-menu-viewport"
+  )) {
+    if (part.closest("ui-navigation-menu") === menu) {
+      for (const [name, value] of Object.entries(placement)) {
+        part.setAttribute(name, value)
+      }
+    }
+  }
   for (const [name, value] of Object.entries(navigationMenuOptions())) {
-    if (name === "container") menu.setAttribute("container", `#${(value as HTMLElement).id}`)
-    else if (value === true) menu.setAttribute(kebab(name), "")
-    else menu.setAttribute(kebab(name), String(value))
+    if (name === "container") {
+      menu.setAttribute("container", `#${(value as HTMLElement).id}`)
+    } else if (value === true) {
+      menu.setAttribute(kebab(name), "")
+    } else {
+      menu.setAttribute(kebab(name), String(value))
+    }
   }
   root.replaceChildren(template.content)
   await import("@ui-sdk/web/navigation-menu")
   menu.addEventListener("valuechange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: string | null; reason: string }>).detail
-    root.querySelector("output")!.textContent = navigationMenuAction(value, reason)
+    const { value, reason } = (
+      event as CustomEvent<{ value: string | null; reason: string }>
+    ).detail
+    root.querySelector("output")!.textContent = navigationMenuAction(
+      value,
+      reason
+    )
   })
 }
 

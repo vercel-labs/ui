@@ -28,12 +28,17 @@ function Example() {
             <div data-slot="stack">
               <DialogTitle render={<h3 />}>Details</DialogTitle>
               <DialogDescription>
-                {state.nested ? "Opened from another dialog." : "Quarterly report, updated today."}
+                {state.nested
+                  ? "Opened from another dialog."
+                  : "Quarterly report, updated today."}
               </DialogDescription>
             </div>
             <div data-slot="row">
               <DialogClose>Close</DialogClose>
-              <DialogClose data-variant="solid" render={<a href="https://example.com/details" />}>
+              <DialogClose
+                data-variant="solid"
+                render={<a href="https://example.com/details" />}
+              >
                 Open the Full Page
               </DialogClose>
             </div>

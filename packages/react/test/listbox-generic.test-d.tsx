@@ -1,7 +1,10 @@
 import { listbox } from "@ui-sdk/core/listbox"
 import { createParts } from "../src/use-primitive"
 
-const { Root: Listbox, Item: ListboxItem } = createParts(listbox, { root: "div", item: "div" })
+const { Root: Listbox, Item: ListboxItem } = createParts(listbox, {
+  root: "div",
+  item: "div",
+})
 
 // One value: `onValueChange` gets `T` or null.
 ;<Listbox

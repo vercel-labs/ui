@@ -16,4 +16,8 @@ The formatted value, a range joined with an en dash. Content replaces it.
 
 {#snippet text(state: SliderValueState)}{state.text}{/snippet}
 
-<Part tag="output" part={value} props={{ ...rest, children: children ?? text }} />
+<Part
+  tag="output"
+  part={value}
+  props={{ ...rest, children: children ?? text }}
+/>

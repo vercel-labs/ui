@@ -8,7 +8,13 @@ import {
 } from "@ui-sdk/core/listbox"
 import * as React from "react"
 import { controlRender, useFieldControl } from "./field-context"
-import { createParts, useHandle, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 import { FormInputs } from "./form-inputs"
 import { ListItems, type ListParts } from "./list-items"
 
@@ -32,10 +38,10 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * The props of `Listbox`.
  * @stable
  */
-type ListboxProps<T = string, Multiple extends boolean | undefined = false> = Omit<
-  PartProps<"div", ListboxState>,
-  Clashing | keyof ListboxOptions
-> &
+type ListboxProps<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = Omit<PartProps<"div", ListboxState>, Clashing | keyof ListboxOptions> &
   ListboxOptions<T, Multiple> & {}
 
 /**
@@ -97,7 +103,11 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>({
       : (children ?? (items && <ListboxItems items={state.items} />))
   // The props left once the options are taken out, which TypeScript can't see for every `Multiple`.
   const element = props as PartProps<"div", ListboxState>
-  const root = { ...element, children: content, render: controlRender(field, "div", render) }
+  const root = {
+    ...element,
+    children: content,
+    render: controlRender(field, "div", render),
+  }
   return (
     <>
       {usePart(listbox, "root", {}, root)}
@@ -111,7 +121,8 @@ function Listbox<T = string, Multiple extends boolean | undefined = false>({
  * @stable
  */
 const ListboxItem = parts.Item as <T = string>(
-  props: Omit<PartProps<"div", ListboxItemState>, Clashing> & ListboxItemProps<T>,
+  props: Omit<PartProps<"div", ListboxItemState>, Clashing> &
+    ListboxItemProps<T>
 ) => React.ReactNode
 
 /**
@@ -150,7 +161,13 @@ const ListboxSeparator = parts.Separator
  */
 function ListboxItems({ items }: { items: ListData<unknown> }) {
   const listbox = useListbox()
-  return <ListItems items={items} parts={listParts} keyOf={listbox.api.internal.keyOf} />
+  return (
+    <ListItems
+      items={items}
+      parts={listParts}
+      keyOf={listbox.api.internal.keyOf}
+    />
+  )
 }
 
 const listParts: ListParts = {

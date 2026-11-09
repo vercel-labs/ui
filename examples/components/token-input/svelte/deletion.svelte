@@ -42,7 +42,12 @@
 
   const draft: TokenInputValue = [
     "Explain ",
-    { type: "file", value: "src/routes.ts", label: "routes.ts", data: { trigger: "@" } },
+    {
+      type: "file",
+      value: "src/routes.ts",
+      label: "routes.ts",
+      data: { trigger: "@" },
+    },
     " in two sentences.",
   ]
 
@@ -52,7 +57,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={modes} value={deletion} onValueChange={(next) => next && (deletion = next as TokenDeletion)}>
+    <Select
+      items={modes}
+      value={deletion}
+      onValueChange={(next) => next && (deletion = next as TokenDeletion)}
+    >
       <SelectLabel>Backspace</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -76,7 +85,9 @@
       tokenDeletion={deletion}
       defaultValue={draft}
       onValueChange={(value, details) => {
-        for (const token of details.removed) log(`Removed ${token.label} (${deletion})`)
+        for (const token of details.removed) {
+          log(`Removed ${token.label} (${deletion})`)
+        }
       }}
     >
       {#snippet token(token)}
@@ -90,7 +101,7 @@
         <TriggerMenuContent>
           <TriggerMenuList>
             {#snippet children(state)}
-              {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
+              {#each state.items as TriggerMenuDataItem[] as item (item.value)}
                 <TriggerMenuItem value={item.value} label={item.label}>
                   {item.label}
                 </TriggerMenuItem>

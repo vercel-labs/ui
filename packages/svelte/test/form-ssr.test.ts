@@ -15,8 +15,15 @@ import {
 import App from "./apps/form-app.svelte"
 
 // The body without Svelte's hydration markers, so text content can be matched.
-const html = (which: "input" | "textarea" | "errors" | "fieldset" | "readonly-input" | "readonly-textarea") =>
-  render(App, { props: { which } }).body.replace(/<!--.*?-->/g, "")
+const html = (
+  which:
+    | "input"
+    | "textarea"
+    | "errors"
+    | "fieldset"
+    | "readonly-input"
+    | "readonly-textarea"
+) => render(App, { props: { which } }).body.replace(/<!--.*?-->/g, "")
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering text fields and forms", () => {
@@ -65,12 +72,17 @@ describe("server rendering text fields and forms", () => {
       Switch,
     ]
     // Where the attribute itself lands differs, the state it sets doesn't.
-    const body = (component: (typeof controls)[number], props: Record<string, unknown>) =>
-      render(component as Component<Record<string, unknown>>, { props }).body.replace(
-        / readonly(="")?(?=[\s>])/g,
-        "",
+    const body = (
+      component: (typeof controls)[number],
+      props: Record<string, unknown>
+    ) =>
+      render(component as Component<Record<string, unknown>>, {
+        props,
+      }).body.replace(/ readonly(="")?(?=[\s>])/g, "")
+    for (const component of controls) {
+      expect(body(component, { readonly: true }), component.name).toBe(
+        body(component, { readOnly: true })
       )
-    for (const component of controls)
-      expect(body(component, { readonly: true }), component.name).toBe(body(component, { readOnly: true }))
+    }
   })
 })

@@ -34,10 +34,15 @@ const open = ref(false)
 
 function run(value: string) {
   open.value = false
-  if (value === "new-issue") tracker.newIssue.open()
-  else if (value === "settings") navigateTo("/settings")
-  else if (value === "list" || value === "board") navigateTo(href(query.value, { view: value, page: 1 }))
-  else navigateTo(href(query.value, { issue: value }))
+  if (value === "new-issue") {
+    tracker.newIssue.open()
+  } else if (value === "settings") {
+    navigateTo("/settings")
+  } else if (value === "list" || value === "board") {
+    navigateTo(href(query.value, { view: value, page: 1 }))
+  } else {
+    navigateTo(href(query.value, { issue: value }))
+  }
 }
 </script>
 
@@ -48,7 +53,7 @@ function run(value: string) {
       :class="
         cn(
           buttonVariants({ variant: 'outline' }),
-          'w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0',
+          'w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0'
         )
       "
     >
@@ -59,7 +64,9 @@ function run(value: string) {
       />
     </DialogTrigger>
     <DialogBackdrop />
-    <DialogContent class="top-[min(6rem,10dvh)] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-lg">
+    <DialogContent
+      class="top-[min(6rem,10dvh)] translate-y-0 gap-0 overflow-hidden p-0 sm:max-w-lg"
+    >
       <DialogTitle class="sr-only">Search</DialogTitle>
       <Command @action="run">
         <CommandInput
@@ -98,7 +105,9 @@ function run(value: string) {
             >
               <CommandItemIcon><CircleDot /></CommandItemIcon>
               <span class="truncate">{{ issue.title }}</span>
-              <span class="ms-auto text-xs text-muted-foreground">{{ issue.id }}</span>
+              <span class="ms-auto text-xs text-muted-foreground">{{
+                issue.id
+              }}</span>
             </CommandItem>
           </CommandGroup>
         </CommandList>

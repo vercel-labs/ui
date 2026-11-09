@@ -1,7 +1,21 @@
 "use client"
 
-import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/react/menu"
-import { CodeIcon, DownloadIcon, LinkIcon, MailIcon, ReplyIcon, ShareIcon } from "lucide-react"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuItemIcon,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/react/menu"
+import {
+  CodeIcon,
+  DownloadIcon,
+  LinkIcon,
+  MailIcon,
+  ReplyIcon,
+  ShareIcon,
+} from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {

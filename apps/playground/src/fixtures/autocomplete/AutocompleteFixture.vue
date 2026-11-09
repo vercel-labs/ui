@@ -25,7 +25,15 @@ import {
 } from "tests/fixtures/autocomplete.ts"
 import { onItemsChange } from "tests/fixtures/items.ts"
 import { serializeForm } from "tests/fixtures/select.ts"
-import { computed, h, onBeforeUnmount, onMounted, ref, shallowRef, type FunctionalComponent } from "vue"
+import {
+  computed,
+  h,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  shallowRef,
+  type FunctionalComponent,
+} from "vue"
 
 const props = defineProps<{ data?: boolean }>()
 // ?late is React only.
@@ -43,39 +51,64 @@ const {
 const action = ref("")
 const submitted = ref("")
 const remote = useAsyncOptions(searchFruits, { immediate: async })
-const list = shallowRef<{ value: string; label: string; keywords?: string[]; disabled?: boolean }[]>(f.items)
+const list = shallowRef<
+  { value: string; label: string; keywords?: string[]; disabled?: boolean }[]
+>(f.items)
 // Items a spec swaps in. Only in the browser: the server has no document.
 let stopItemChanges = () => {}
-onMounted(() => (stopItemChanges = onItemsChange(changedItems, (next) => (list.value = next))))
+onMounted(
+  () =>
+    (stopItemChanges = onItemsChange(
+      changedItems,
+      (next) => (list.value = next)
+    ))
+)
 onBeforeUnmount(() => stopItemChanges())
 const items = computed(() =>
   async
     ? remote.state.value.items
     : grouped
-      ? f.groups.map((group) => ({ type: "group" as const, label: group.label, items: group.items }))
-      : list.value,
+      ? f.groups.map((group) => ({
+          type: "group" as const,
+          label: group.label,
+          items: group.items,
+        }))
+      : list.value
 )
 const dataMode = props.data || async || recent
 
 // The list's data, rendered like the composed list: items, and groups with their labels.
 const DataItems: FunctionalComponent<{ items: ListData }> = ({ items }) =>
   items.map((entry, index) => {
-    if (typeof entry === "string") return dataItem({ value: entry, label: entry })
-    if ("value" in entry) return dataItem(entry)
-    if (entry.type === "separator") return h(AutocompleteSeparator, { key: `separator-${index}` })
+    if (typeof entry === "string") {
+      return dataItem({ value: entry, label: entry })
+    }
+    if ("value" in entry) {
+      return dataItem(entry)
+    }
+    if (entry.type === "separator") {
+      return h(AutocompleteSeparator, { key: `separator-${index}` })
+    }
     return h(AutocompleteGroup, { key: entry.label }, () => [
       h(AutocompleteGroupLabel, { class: "label" }, () => entry.label),
       h(DataItems, { items: entry.items }),
     ])
   })
-const dataItem = (item: { value: string; label: string; keywords?: string[]; disabled?: boolean }) =>
+const dataItem = (item: {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+}) =>
   h(AutocompleteItem, { key: item.value, class: "item", ...item }, () =>
-    highlight ? h(AutocompleteItemText, null, () => item.label) : item.label,
+    highlight ? h(AutocompleteItemText, null, () => item.label) : item.label
   )
 
 function onValueChange(value: string, details: { reason: string }) {
   action.value = `value:${value}:${details.reason}`
-  if (async) remote.setQuery(value)
+  if (async) {
+    remote.setQuery(value)
+  }
 }
 
 function onSubmit(event: Event) {
@@ -86,7 +119,11 @@ function onSubmit(event: Event) {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <form class="select-form" :aria-label="f.formLabel" @submit.prevent="onSubmit">
+    <form
+      class="select-form"
+      :aria-label="f.formLabel"
+      @submit.prevent="onSubmit"
+    >
       <component
         :is="fieldset ? 'fieldset' : 'div'"
         :disabled="fieldset || undefined"
@@ -108,9 +145,12 @@ function onSubmit(event: Event) {
           <AutocompleteTrigger :aria-label="f.trigger">▾</AutocompleteTrigger>
           <AutocompleteClear>{{ f.clear }}</AutocompleteClear>
           <AutocompleteContent class="popup list-popup">
-            <AutocompleteStatus v-if="!nostatus" class="status" v-slot="{ state }">{{
-              state.loading ? "Loading…" : ""
-            }}</AutocompleteStatus>
+            <AutocompleteStatus
+              v-if="!nostatus"
+              class="status"
+              v-slot="{ state }"
+              >{{ state.loading ? "Loading…" : "" }}</AutocompleteStatus
+            >
             <AutocompleteEmpty class="empty">{{ f.empty }}</AutocompleteEmpty>
             <AutocompleteList v-if="dataMode" v-slot="{ state }">
               <DataItems :items="state.items as ListData" />
@@ -118,7 +158,9 @@ function onSubmit(event: Event) {
             <AutocompleteList v-else>
               <template v-if="grouped">
                 <AutocompleteGroup v-for="group in f.groups" :key="group.label">
-                  <AutocompleteGroupLabel class="label">{{ group.label }}</AutocompleteGroupLabel>
+                  <AutocompleteGroupLabel class="label">{{
+                    group.label
+                  }}</AutocompleteGroupLabel>
                   <AutocompleteItem
                     v-for="item in group.items"
                     :key="item.value"
@@ -140,7 +182,9 @@ function onSubmit(event: Event) {
                   :keywords="item.keywords"
                   :disabled="item.disabled"
                 >
-                  <AutocompleteItemText v-if="highlight">{{ item.label }}</AutocompleteItemText>
+                  <AutocompleteItemText v-if="highlight">{{
+                    item.label
+                  }}</AutocompleteItemText>
                   <template v-else>{{ item.label }}</template>
                 </AutocompleteItem>
               </template>

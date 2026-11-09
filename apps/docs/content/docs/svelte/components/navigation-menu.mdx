@@ -214,9 +214,7 @@ Items take a `value`, which is generated when left out. Every change carries a [
   let value = $state<string | null>(null)
 </script>
 
-<NavigationMenu bind:value aria-label="Main">
-  ...
-</NavigationMenu>
+<NavigationMenu bind:value aria-label="Main">...</NavigationMenu>
 ```
 
 ## Opening from Anywhere
@@ -229,9 +227,7 @@ A [controller](#controller), from `createNavigationMenuController()`, opens, clo
 </script>
 
 <button onclick={() => menu.setValue("components")}>Browse Components</button>
-<NavigationMenu aria-label="Main" controller={menu}>
-  ...
-</NavigationMenu>
+<NavigationMenu aria-label="Main" controller={menu}>...</NavigationMenu>
 ```
 
 ## Keep Mounted
@@ -262,9 +258,7 @@ Pressing a link closes the menu by default, like after a route change. With `clo
 Panels render in place and show in the top layer, so no ancestor clips or covers them. `container` renders the viewport, or each content without one, somewhere else, for iframes, shadow roots or a specific stacking context. Set it on the menu, or on the viewport or a content.
 
 ```svelte
-<NavigationMenu aria-label="Main" container={container}>
-  ...
-</NavigationMenu>
+<NavigationMenu aria-label="Main" {container}>...</NavigationMenu>
 ```
 
 ## Custom Rendering
@@ -325,13 +319,21 @@ In plain CSS:
   translate: -48px 0;
 }
 
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="from-end"][data-starting-style],
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="to-end"][data-ending-style] {
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="from-end"][data-starting-style],
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="to-end"][data-ending-style] {
   translate: -48px 0;
 }
 
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="from-start"][data-starting-style],
-[data-slot="navigation-menu-content"]:dir(rtl)[data-motion="to-start"][data-ending-style] {
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="from-start"][data-starting-style],
+[data-slot="navigation-menu-content"]:dir(
+    rtl
+  )[data-motion="to-start"][data-ending-style] {
   translate: 48px 0;
 }
 

@@ -11,7 +11,11 @@ const usable =
   "button, input:not([type=hidden]), select, textarea, [tabindex], [role=button], [role=checkbox], [role=radio], [role=switch], [role=tab], [role=option], [role=menuitem], [role=treeitem], [role=slider], [role=spinbutton], [role=combobox], [role=textbox]"
 
 const ways = [
-  { way: "its disabled option", wrap: (markup: string) => markup, options: { disabled: true } },
+  {
+    way: "its disabled option",
+    wrap: (markup: string) => markup,
+    options: { disabled: true },
+  },
   {
     way: "a disabled fieldset",
     wrap: (markup: string) => `<fieldset disabled>${markup}</fieldset>`,
@@ -26,20 +30,30 @@ afterEach(() => {
 })
 
 function mountCase(component: ComponentCase, markup: string, options: object) {
-  const mounted = mount(component.primitive, { ...component.options, ...options }, markup)
+  const mounted = mount(
+    component.primitive,
+    { ...component.options, ...options },
+    markup
+  )
   unmount = mounted.unmount
   return mounted
 }
 
-const elementsIn = (root: HTMLElement) => [root, ...root.querySelectorAll<HTMLElement>("[data-slot]")]
-const partsIn = (root: HTMLElement) => elementsIn(root).filter((el) => el.hasAttribute("data-slot"))
+const elementsIn = (root: HTMLElement) => [
+  root,
+  ...root.querySelectorAll<HTMLElement>("[data-slot]"),
+]
+const partsIn = (root: HTMLElement) =>
+  elementsIn(root).filter((el) => el.hasAttribute("data-slot"))
 
 // The parts a person can use while the component is enabled, by their place among its parts.
 async function usableParts(component: ComponentCase) {
   const mounted = mountCase(component, component.markup, {})
   await mounted.settle()
   const places = partsIn(mounted.root).flatMap((el, index) =>
-    el.matches(usable) && el.getAttribute("aria-hidden") !== "true" ? [index] : [],
+    el.matches(usable) && el.getAttribute("aria-hidden") !== "true"
+      ? [index]
+      : []
   )
   mounted.unmount()
   return places
@@ -54,16 +68,22 @@ describe.each(ways)("a component disabled by $way", ({ wrap, options }) => {
       await mounted.settle()
       const parts = partsIn(mounted.root)
       const used = places.map((place) => parts[place])
-      const enabled = used.filter((el) => !isDisabledElement(el)).map((el) => el.dataset.slot)
+      const enabled = used
+        .filter((el) => !isDisabledElement(el))
+        .map((el) => el.dataset.slot)
       expect(enabled).toEqual([])
-      const unmarked = used.filter((el) => !el.hasAttribute("data-disabled")).map((el) => el.dataset.slot)
+      const unmarked = used
+        .filter((el) => !el.hasAttribute("data-disabled"))
+        .map((el) => el.dataset.slot)
       expect(unmarked).toEqual([])
     })
 
     test("changes nothing when its parts are pressed", async () => {
       const mounted = mountCase(component, wrap(component.markup), options)
       await mounted.settle()
-      for (const el of elementsIn(mounted.root)) await mounted.click(el)
+      for (const el of elementsIn(mounted.root)) {
+        await mounted.click(el)
+      }
       await mounted.settle()
       expect(mounted.changes.map((change) => change.key)).toEqual([])
     })

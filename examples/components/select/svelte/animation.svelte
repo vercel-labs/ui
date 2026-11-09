@@ -23,7 +23,11 @@
 
 <Field>
   <FieldLabel>Role</FieldLabel>
-  <Select defaultValue="editor" onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}>
+  <Select
+    defaultValue="editor"
+    onOpenChangeComplete={(open) =>
+      log(open ? "Finished opening" : "Finished closing")}
+  >
     <SelectTrigger>
       <SelectValue />
       <ChevronDownIcon />

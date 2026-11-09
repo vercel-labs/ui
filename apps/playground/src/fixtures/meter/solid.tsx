@@ -1,4 +1,10 @@
-import { Meter, MeterIndicator, MeterLabel, MeterTrack, MeterValue } from "@ui-sdk/solid/meter"
+import {
+  Meter,
+  MeterIndicator,
+  MeterLabel,
+  MeterTrack,
+  MeterValue,
+} from "@ui-sdk/solid/meter"
 import { render } from "@solidjs/web"
 import { createSignal, omit, type ComponentProps } from "solid-js"
 import { meterFixture } from "tests/fixtures/meter.ts"
@@ -30,9 +36,21 @@ function Fixture() {
         max={requests.max}
         getValueLabel={requests.valueLabel}
       />
-      <Gauge label={disk.label} value={disk.value} max={disk.max} format={disk.format} />
-      <Gauge label={score.label} value={score.value} min={score.min} max={score.max} />
-      <button onClick={() => setValue((current) => current + storage.step)}>Fill</button>
+      <Gauge
+        label={disk.label}
+        value={disk.value}
+        max={disk.max}
+        format={disk.format}
+      />
+      <Gauge
+        label={score.label}
+        value={score.value}
+        min={score.min}
+        max={score.max}
+      />
+      <button onClick={() => setValue((current) => current + storage.step)}>
+        Fill
+      </button>
       <button onClick={() => setValue(storage.value)}>Reset</button>
       <button>After</button>
       <output role="status" aria-label="Last action" />

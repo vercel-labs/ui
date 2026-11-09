@@ -36,7 +36,11 @@ export function Example() {
         <button type="button" data-size="sm" onClick={() => fruit.open()}>
           Open
         </button>
-        <button type="button" data-size="sm" onClick={() => fruit.setValue("Pea")}>
+        <button
+          type="button"
+          data-size="sm"
+          onClick={() => fruit.setValue("Pea")}
+        >
           Type “Pea”
         </button>
         <button type="button" data-size="sm" onClick={() => fruit.clear()}>

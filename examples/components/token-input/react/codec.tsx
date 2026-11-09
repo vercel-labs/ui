@@ -1,5 +1,11 @@
 import { Field, FieldLabel } from "@ui-sdk/react/field"
-import { fromText, toText, TokenInput, TokenInputEditor, type TokenCodec } from "@ui-sdk/react/token-input"
+import {
+  fromText,
+  toText,
+  TokenInput,
+  TokenInputEditor,
+  type TokenCodec,
+} from "@ui-sdk/react/token-input"
 import { useLog } from "../../../shared/react/log"
 
 const chat: TokenCodec = {

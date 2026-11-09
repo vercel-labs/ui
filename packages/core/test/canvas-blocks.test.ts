@@ -21,7 +21,11 @@ import {
 } from "../src/index"
 import { createAgent } from "../src/page/agent/agent"
 import { sectorOf } from "../src/foundation/motion/gesture"
-import { createTimeline, describeEntry, stageChanges } from "../src/page/timeline/timeline"
+import {
+  createTimeline,
+  describeEntry,
+  stageChanges,
+} from "../src/page/timeline/timeline"
 import { bind } from "../src/foundation/kernel/part"
 import { withSource } from "../src/foundation/kernel/details"
 
@@ -82,20 +86,23 @@ const canvas = definePrimitive({
       slot: "port",
       draft: "connecting",
       connect: (from, to) => context.options().connect?.(from, to) ?? true,
-      canConnect: (from, to) => context.options().canConnect?.(from, to) ?? true,
+      canConnect: (from, to) =>
+        context.options().canConnect?.(from, to) ?? true,
       point: viewport.toCanvas,
     })
     return { viewport, connect }
   },
   slots: (slot) => ({
-    surface: slot({ on: { wheel: (event, { api }) => api.viewport.wheel(event) } }),
+    surface: slot({
+      on: { wheel: (event, { api }) => api.viewport.wheel(event) },
+    }),
     port: slot<{ value: string }>({ props: { value: "string" } }),
   }),
 })
 
 function mountCanvas(
   options: Parameters<typeof canvas>[0] = { id: "c" },
-  ports: Record<string, [number, number]> = {},
+  ports: Record<string, [number, number]> = {}
 ) {
   const instance = canvas(options)
   const surface = document.createElement("div")
@@ -121,8 +128,16 @@ describe("createViewport", () => {
     const { instance } = mountCanvas()
     instance.api.viewport.setViewport({ x: 50, y: 20, zoom: 2 })
     expect(instance.api.viewport.toCanvas(150, 120)).toEqual({ x: 50, y: 50 })
-    expect(instance.api.viewport.toScreen({ x: 50, y: 50 })).toEqual({ x: 150, y: 120 })
-    expect(instance.api.viewport.visible()).toEqual({ left: -25, top: -10, right: 175, bottom: 140 })
+    expect(instance.api.viewport.toScreen({ x: 50, y: 50 })).toEqual({
+      x: 150,
+      y: 120,
+    })
+    expect(instance.api.viewport.visible()).toEqual({
+      left: -25,
+      top: -10,
+      right: 175,
+      bottom: 140,
+    })
   })
 
   test("zooms around a point, keeping the canvas under it still, within bounds", () => {
@@ -136,17 +151,28 @@ describe("createViewport", () => {
 
   test("fits a box, and reveals one with the least pan", () => {
     const { instance } = mountCanvas()
-    instance.api.viewport.fit({ left: 0, top: 0, right: 800, bottom: 600 }, { padding: 0 })
+    instance.api.viewport.fit(
+      { left: 0, top: 0, right: 800, bottom: 600 },
+      { padding: 0 }
+    )
     expect(instance.api.viewport.get()).toEqual({ x: 0, y: 0, zoom: 0.5 })
     instance.api.viewport.setViewport({ x: 0, y: 0, zoom: 1 })
-    instance.api.viewport.reveal({ left: 450, top: 10, right: 500, bottom: 40 }, { padding: 0 })
+    instance.api.viewport.reveal(
+      { left: 450, top: 10, right: 500, bottom: 40 },
+      { padding: 0 }
+    )
     expect(instance.api.viewport.get()).toEqual({ x: -100, y: 0, zoom: 1 })
   })
 
   test("the wheel pans, and with Ctrl it zooms at the pointer", () => {
     const { instance, surface } = mountCanvas()
     surface.dispatchEvent(
-      new WheelEvent("wheel", { deltaX: 10, deltaY: 30, bubbles: true, cancelable: true }),
+      new WheelEvent("wheel", {
+        deltaX: 10,
+        deltaY: 30,
+        bubbles: true,
+        cancelable: true,
+      })
     )
     expect(instance.get().viewport).toEqual({ x: -10, y: -30, zoom: 1 })
     surface.dispatchEvent(
@@ -157,7 +183,7 @@ describe("createViewport", () => {
         clientY: 0,
         bubbles: true,
         cancelable: true,
-      }),
+      })
     )
     expect(instance.get().viewport.zoom).toBeCloseTo(Math.exp(0.2))
   })
@@ -165,7 +191,9 @@ describe("createViewport", () => {
   test("+, - and 0 zoom from the keyboard", () => {
     const { instance } = mountCanvas()
     const key = (key: string) =>
-      instance.api.viewport.keydown(new KeyboardEvent("keydown", { key, cancelable: true }))
+      instance.api.viewport.keydown(
+        new KeyboardEvent("keydown", { key, cancelable: true })
+      )
     expect(key("+")).toBe(true)
     expect(instance.get().viewport.zoom).toBe(1.25)
     key("0")
@@ -175,9 +203,12 @@ describe("createViewport", () => {
 
   test("style is one transform for the world", () => {
     const { instance } = mountCanvas()
-    expect(instance.api.viewport.style({ viewport: { x: 5, y: 6, zoom: 2 }, connecting: null })).toContain(
-      "transform:translate(5px,6px) scale(2)",
-    )
+    expect(
+      instance.api.viewport.style({
+        viewport: { x: 5, y: 6, zoom: 2 },
+        connecting: null,
+      })
+    ).toContain("transform:translate(5px,6px) scale(2)")
   })
 })
 
@@ -186,8 +217,16 @@ describe("createViewport bindFindable", () => {
   const scrollable = (el: HTMLElement) => {
     const at = { left: 0, top: 0 }
     Object.defineProperties(el, {
-      scrollLeft: { get: () => at.left, set: (value: number) => (at.left = value), configurable: true },
-      scrollTop: { get: () => at.top, set: (value: number) => (at.top = value), configurable: true },
+      scrollLeft: {
+        get: () => at.left,
+        set: (value: number) => (at.left = value),
+        configurable: true,
+      },
+      scrollTop: {
+        get: () => at.top,
+        set: (value: number) => (at.top = value),
+        configurable: true,
+      },
     })
     return el
   }
@@ -205,15 +244,20 @@ describe("createViewport bindFindable", () => {
     const unbind = instance.api.viewport.bindFindable(surface)
     const spacer = surface.lastElementChild as HTMLElement
     expect(spacer.getAttribute("aria-hidden")).toBe("true")
-    expect(spacer.style).toMatchObject({ position: "absolute", visibility: "hidden" })
+    expect(spacer.style).toMatchObject({
+      position: "absolute",
+      visibility: "hidden",
+    })
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
     expect(instance.api.viewport.style(state(instance))).toContain(
-      "transform:translate(100000px,100000px) scale(1)",
+      "transform:translate(100000px,100000px) scale(1)"
     )
     unbind()
     expect(spacer.isConnected).toBe(false)
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
-    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(0px,0px) scale(1)")
+    expect(instance.api.viewport.style(state(instance))).toContain(
+      "transform:translate(0px,0px) scale(1)"
+    )
   })
 
   test("a scroll the browser makes, like to a find in page match, becomes a pan, and the surface goes back to rest", () => {
@@ -235,7 +279,9 @@ describe("createViewport bindFindable", () => {
     const seen: string[] = []
     const board = definePrimitive({
       name: "board",
-      state: (): { viewport: Viewport } => ({ viewport: { x: 0, y: 0, zoom: 1 } }),
+      state: (): { viewport: Viewport } => ({
+        viewport: { x: 0, y: 0, zoom: 1 },
+      }),
       live: ["viewport"],
       api: (context) => ({
         viewport: createViewport<{ viewport: Viewport }>(context, {
@@ -253,7 +299,9 @@ describe("createViewport bindFindable", () => {
     const instance = board({ id: "b" })
     const surface = scrollable(document.createElement("div"))
     document.body.append(surface)
-    cleanups.push(bind(instance.part("root", {}), surface), () => instance.destroy())
+    cleanups.push(bind(instance.part("root", {}), surface), () =>
+      instance.destroy()
+    )
     cleanups.push(instance.api.viewport.bindFindable(surface))
     scrollTo(surface, 99500, 100000)
     expect(seen).toEqual(["find-in-page"])
@@ -290,16 +338,24 @@ describe("createViewport bindFindable", () => {
         set: (value: number) => shown && (at.left = value),
         configurable: true,
       },
-      scrollTop: { get: () => at.top, set: (value: number) => shown && (at.top = value), configurable: true },
+      scrollTop: {
+        get: () => at.top,
+        set: (value: number) => shown && (at.top = value),
+        configurable: true,
+      },
     })
     cleanups.push(instance.api.viewport.bindFindable(surface))
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
     // While it can't scroll, the world isn't offset, so nothing is lost if it shows without a resize.
-    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(0px,0px)")
+    expect(instance.api.viewport.style(state(instance))).toContain(
+      "transform:translate(0px,0px)"
+    )
     shown = true
     resized!()
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([100000, 100000])
-    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(100000px,100000px)")
+    expect(instance.api.viewport.style(state(instance))).toContain(
+      "transform:translate(100000px,100000px)"
+    )
     // Hidden and shown again, the browser forgot the scroll; a scroll event then finds it at the origin.
     at.left = 0
     at.top = 0
@@ -318,16 +374,24 @@ describe("createViewport bindFindable", () => {
         set: (value: number) => (at.left = Math.min(0, value)),
         configurable: true,
       },
-      scrollTop: { get: () => at.top, set: (value: number) => (at.top = value), configurable: true },
+      scrollTop: {
+        get: () => at.top,
+        set: (value: number) => (at.top = value),
+        configurable: true,
+      },
     })
     const computed = window.getComputedStyle
     vi.spyOn(window, "getComputedStyle").mockImplementation((el, pseudo) =>
-      el === surface ? ({ direction: "rtl" } as CSSStyleDeclaration) : computed(el, pseudo),
+      el === surface
+        ? ({ direction: "rtl" } as CSSStyleDeclaration)
+        : computed(el, pseudo)
     )
     cleanups.push(() => vi.restoreAllMocks())
     cleanups.push(instance.api.viewport.bindFindable(surface))
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([-100000, 100000])
-    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(-100000px,100000px)")
+    expect(instance.api.viewport.style(state(instance))).toContain(
+      "transform:translate(-100000px,100000px)"
+    )
     // Toward something to the left: further negative.
     scrollTo(surface, -100250, 100000)
     expect(instance.api.viewport.get()).toEqual({ x: 250, y: 0, zoom: 1 })
@@ -343,7 +407,9 @@ describe("createViewport bindFindable", () => {
     await new Promise((resolve) => requestAnimationFrame(resolve))
     expect(surface.querySelector('[aria-hidden="true"]')).toBeNull()
     expect([surface.scrollLeft, surface.scrollTop]).toEqual([0, 0])
-    expect(instance.api.viewport.style(state(instance))).toContain("transform:translate(-300px,0px)")
+    expect(instance.api.viewport.style(state(instance))).toContain(
+      "transform:translate(-300px,0px)"
+    )
   })
 
   test("a scroll clamped because the spacer went missing puts it back without panning", () => {
@@ -370,14 +436,24 @@ describe("createConnect", () => {
     const connect = vi.fn(() => true)
     const { instance } = mountCanvas(
       { id: "c", connect, canConnect: (_from, to) => to.endsWith(".in") },
-      ports,
+      ports
     )
     const key = (key: string) =>
-      instance.api.connect.keydown(new KeyboardEvent("keydown", { key, cancelable: true }))
+      instance.api.connect.keydown(
+        new KeyboardEvent("keydown", { key, cancelable: true })
+      )
     expect(instance.api.connect.start("a.out")).toBe(true)
-    expect(instance.get().connecting).toMatchObject({ from: "a.out", to: null, keyboard: true })
+    expect(instance.get().connecting).toMatchObject({
+      from: "a.out",
+      to: null,
+      keyboard: true,
+    })
     key("ArrowDown")
-    expect(instance.get().connecting).toMatchObject({ to: "c.in", x: 100, y: 200 })
+    expect(instance.get().connecting).toMatchObject({
+      to: "c.in",
+      x: 100,
+      y: 200,
+    })
     key("ArrowLeft")
     // Nothing lies left of c.in, so it stays.
     expect(instance.get().connecting?.to).toBe("c.in")
@@ -391,19 +467,24 @@ describe("createConnect", () => {
     const connect = vi.fn(() => true)
     const { instance } = mountCanvas(
       { id: "c", connect, canConnect: (_from, to) => to.endsWith(".in") },
-      ports,
+      ports
     )
     instance.api.connect.start("a.out")
     const state = instance.get()
     expect(instance.api.connect.role(state, "a.out")).toBe("source")
     expect(instance.api.connect.role(state, "b.in")).toBe("candidate")
-    instance.api.connect.keydown(new KeyboardEvent("keydown", { key: "Escape", cancelable: true }))
+    instance.api.connect.keydown(
+      new KeyboardEvent("keydown", { key: "Escape", cancelable: true })
+    )
     expect(instance.get().connecting).toBeNull()
     expect(connect).not.toHaveBeenCalled()
   })
 
   test("a port no target can take doesn't start", () => {
-    const { instance } = mountCanvas({ id: "c", canConnect: () => false }, ports)
+    const { instance } = mountCanvas(
+      { id: "c", canConnect: () => false },
+      ports
+    )
     expect(instance.api.connect.start("a.out")).toBe(false)
   })
 })
@@ -413,7 +494,9 @@ describe("createPreview", () => {
   const peek = definePrimitive({
     name: "peek",
     options: { onPreview: "callback" },
-    state: (_options: { onPreview?: (key: string | null, reason: string) => void }): PeekState => ({
+    state: (_options: {
+      onPreview?: (key: string | null, reason: string) => void
+    }): PeekState => ({
       value: "light",
       preview: null,
     }),
@@ -431,7 +514,9 @@ describe("createPreview", () => {
         disabled: (key) => key === "off",
       }),
     }),
-    slots: (slot) => ({ option: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      option: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
 
   test("shows an option without choosing it, and Enter keeps it", () => {
@@ -439,15 +524,24 @@ describe("createPreview", () => {
     const instance = peek({ id: "p", onPreview })
     instance.api.preview.show("dark", { reason: "list-navigation" })
     expect(instance.get()).toEqual({ value: "light", preview: "dark" })
-    instance.api.preview.keydown(new KeyboardEvent("keydown", { key: "Enter", cancelable: true }), "dark")
+    instance.api.preview.keydown(
+      new KeyboardEvent("keydown", { key: "Enter", cancelable: true }),
+      "dark"
+    )
     expect(instance.get()).toEqual({ value: "dark", preview: null })
-    expect(onPreview.mock.calls.map((call) => call[1])).toEqual(["list-navigation", "item-press"])
+    expect(onPreview.mock.calls.map((call) => call[1])).toEqual([
+      "list-navigation",
+      "item-press",
+    ])
   })
 
   test("Escape puts the page back; the chosen and disabled options preview as nothing", () => {
     const instance = peek({ id: "p" })
     instance.api.preview.show("dark")
-    instance.api.preview.keydown(new KeyboardEvent("keydown", { key: "Escape", cancelable: true }), "dark")
+    instance.api.preview.keydown(
+      new KeyboardEvent("keydown", { key: "Escape", cancelable: true }),
+      "dark"
+    )
     expect(instance.get().preview).toBeNull()
     expect(instance.api.preview.show("light")).toBe(false)
     expect(instance.api.preview.show("off")).toBe(false)
@@ -486,7 +580,9 @@ function mountInput(label: string) {
 // A password field, whose values the bridge reports as "[redacted]".
 function mountPassword(label: string) {
   const instance = input({ id: label })
-  const el = Object.assign(document.createElement("input"), { type: "password" })
+  const el = Object.assign(document.createElement("input"), {
+    type: "password",
+  })
   el.setAttribute("aria-label", label)
   document.body.append(el)
   const unbind = bind(instance.part("root"), el)
@@ -521,10 +617,24 @@ describe("createLasso", () => {
       })
       return { lasso, set }
     },
-    slots: (slot) => ({ card: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      card: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
-  const pointer = (type: string, clientX: number, clientY: number, shiftKey = false) =>
-    new PointerEvent(type, { clientX, clientY, shiftKey, button: 0, isPrimary: true, bubbles: true })
+  const pointer = (
+    type: string,
+    clientX: number,
+    clientY: number,
+    shiftKey = false
+  ) =>
+    new PointerEvent(type, {
+      clientX,
+      clientY,
+      shiftKey,
+      button: 0,
+      isPrimary: true,
+      bubbles: true,
+    })
   const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 
   // A surface at (100, 100) with cards at its corners and middle.
@@ -534,7 +644,12 @@ describe("createLasso", () => {
     const surface = document.createElement("div")
     surface.getBoundingClientRect = () => rect(100, 100, 400, 300)
     document.body.append(surface)
-    const places = { a: [110, 110], b: [400, 110], c: [110, 300], d: [280, 200] }
+    const places = {
+      a: [110, 110],
+      b: [400, 110],
+      c: [110, 300],
+      d: [280, 200],
+    }
     for (const [value, [left, top]] of Object.entries(places)) {
       const el = document.createElement("div")
       el.getBoundingClientRect = () => rect(left, top, 60, 40)
@@ -551,10 +666,16 @@ describe("createLasso", () => {
     document.dispatchEvent(pointer("pointermove", 300, 215))
     await frame()
     // Relative to the surface, and it touches a and d.
-    expect(instance.get().lasso).toEqual({ left: 5, top: 5, right: 200, bottom: 115, keys: ["a", "d"] })
+    expect(instance.get().lasso).toEqual({
+      left: 5,
+      top: 5,
+      right: 200,
+      bottom: 115,
+      keys: ["a", "d"],
+    })
     expect(lasso.touches(instance.get(), "d")).toBe(true)
     expect(lasso.style(instance.get())).toBe(
-      "position:absolute;pointer-events:none;left:5px;top:5px;width:195px;height:110px",
+      "position:absolute;pointer-events:none;left:5px;top:5px;width:195px;height:110px"
     )
     expect(set).not.toHaveBeenCalled()
     document.dispatchEvent(pointer("pointerup", 300, 215))
@@ -565,7 +686,10 @@ describe("createLasso", () => {
 
   test("Shift adds to the selection, and cards that can't be selected are skipped", async () => {
     const { instance, surface } = mount({ selected: ["b"], locked: "c" })
-    instance.api.lasso.pointerdown(pointer("pointerdown", 105, 495, true), surface)
+    instance.api.lasso.pointerdown(
+      pointer("pointerdown", 105, 495, true),
+      surface
+    )
     // Up and to the right, over c and d.
     document.dispatchEvent(pointer("pointermove", 300, 200, true))
     await frame()
@@ -581,7 +705,13 @@ describe("createLasso", () => {
     instance.api.lasso.pointerdown(pointer("pointerdown", 105, 105), surface)
     document.dispatchEvent(pointer("pointermove", 300, 215))
     await frame()
-    surface.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    surface.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     expect(instance.get().lasso).toBeNull()
     expect(outside).not.toHaveBeenCalled()
     document.dispatchEvent(pointer("pointerup", 300, 215))
@@ -592,7 +722,12 @@ describe("createLasso", () => {
   test("a second finger pressing the surface mid-rectangle leaves it to the first finger", async () => {
     const { instance, surface } = mount()
     const { lasso, set } = instance.api
-    const touch = (type: string, clientX: number, clientY: number, pointerId: number) =>
+    const touch = (
+      type: string,
+      clientX: number,
+      clientY: number,
+      pointerId: number
+    ) =>
       new PointerEvent(type, {
         clientX,
         clientY,
@@ -624,9 +759,9 @@ describe("createLasso", () => {
 
 describe("css", () => {
   test("joins declarations into a style attribute, skipping empty ones", () => {
-    expect(css({ position: "absolute", left: 0, "--zoom": 1.5, top: undefined })).toBe(
-      "position:absolute;left:0;--zoom:1.5",
-    )
+    expect(
+      css({ position: "absolute", left: 0, "--zoom": 1.5, top: undefined })
+    ).toBe("position:absolute;left:0;--zoom:1.5")
     expect(css({ top: undefined })).toBe("")
   })
 })
@@ -641,9 +776,18 @@ describe("createTimeline", () => {
     const heard = vi.fn()
     timeline.subscribe(heard)
     wifi.api.setChecked(true, { reason: "imperative" })
-    await agent.act({ steps: [{ ref: "Bluetooth", action: "setChecked", args: [true] }] })
+    await agent.act({
+      steps: [{ ref: "Bluetooth", action: "setChecked", args: [true] }],
+    })
     expect(
-      timeline.entries().map((entry) => [entry.label, entry.value, entry.previous, entry.source]),
+      timeline
+        .entries()
+        .map((entry) => [
+          entry.label,
+          entry.value,
+          entry.previous,
+          entry.source,
+        ])
     ).toEqual([
       ["Wi-Fi", true, false, "programmatic"],
       ["Bluetooth", true, false, "agent"],
@@ -655,7 +799,10 @@ describe("createTimeline", () => {
     ])
 
     await timeline.seek(0)
-    expect([wifi.get().checked, bluetooth.get().checked]).toEqual([false, false])
+    expect([wifi.get().checked, bluetooth.get().checked]).toEqual([
+      false,
+      false,
+    ])
     expect(timeline.entries()).toHaveLength(2)
     await timeline.seek(2)
     expect([wifi.get().checked, bluetooth.get().checked]).toEqual([true, true])
@@ -679,10 +826,14 @@ describe("createTimeline", () => {
       instance.api.internal.move(40)
       instance.api.internal.end()
     })
-    expect(settled.entries().map((entry) => [entry.value, entry.previous, entry.reason])).toEqual([
-      [40, 0, "drag"],
-    ])
-    expect(steps.entries().map((entry) => [entry.value, entry.previous])).toEqual([
+    expect(
+      settled
+        .entries()
+        .map((entry) => [entry.value, entry.previous, entry.reason])
+    ).toEqual([[40, 0, "drag"]])
+    expect(
+      steps.entries().map((entry) => [entry.value, entry.previous])
+    ).toEqual([
       [20, 0],
       [40, 20],
     ])
@@ -706,7 +857,9 @@ describe("createTimeline", () => {
     const asked: ((allowed: boolean) => void)[] = []
     // A person confirms each step that empties a field, like the undo's.
     const agent = createAgent({
-      allow: (step) => step.args[0] !== "" || new Promise<boolean>((resolve) => asked.push(resolve)),
+      allow: (step) =>
+        step.args[0] !== "" ||
+        new Promise<boolean>((resolve) => asked.push(resolve)),
     })
     const name = mountInput("Name")
     const email = mountInput("Email")
@@ -732,7 +885,9 @@ describe("createTimeline", () => {
       "ada@work.example",
       "Call back",
     ])
-    expect(timeline.entries().map((entry) => [describeEntry(entry), entry.reverted])).toEqual([
+    expect(
+      timeline.entries().map((entry) => [describeEntry(entry), entry.reverted])
+    ).toEqual([
       ["Agent set Name to Ada", true],
       ["Agent set Email to ada@example.com", undefined],
       ["You set Notes to Call back", undefined],
@@ -746,9 +901,13 @@ describe("createTimeline", () => {
     const wifi = mountCheckbox("wifi", "Wi-Fi")
     const timeline = createTimeline(agent, { keys: ["checked"] })
     cleanups.push(timeline.destroy)
-    await agent.act({ steps: [{ ref: "Wi-Fi", action: "setChecked", args: [true] }] })
+    await agent.act({
+      steps: [{ ref: "Wi-Fi", action: "setChecked", args: [true] }],
+    })
 
-    expect(await timeline.undoSource("agent")).toMatchObject([{ key: "checked", value: false }])
+    expect(await timeline.undoSource("agent")).toMatchObject([
+      { key: "checked", value: false },
+    ])
     expect(timeline.entries()[0].reverted).toBeUndefined()
     expect(await timeline.seek(0)).toHaveLength(1)
     expect(timeline.position()).toBe(1)
@@ -766,7 +925,9 @@ describe("createTimeline", () => {
     // Wi-Fi leaves the page.
     document.querySelector("label")?.remove()
 
-    expect(await timeline.seek(0)).toEqual([{ ref: timeline.entries()[0].ref, key: "checked", value: false }])
+    expect(await timeline.seek(0)).toEqual([
+      { ref: timeline.entries()[0].ref, key: "checked", value: false },
+    ])
     expect(bluetooth.get().checked).toBe(false)
     expect(timeline.position()).toBe(0)
   })
@@ -777,8 +938,14 @@ describe("createTimeline", () => {
     const timeline = createTimeline(agent)
     cleanups.push(timeline.destroy)
     password.api.setValue("hunter2")
-    await agent.act({ steps: [{ ref: "Password", action: "setValue", args: ["hunter3"] }] })
-    expect(timeline.entries().map((entry) => [entry.value, entry.previous, entry.redacted])).toEqual([
+    await agent.act({
+      steps: [{ ref: "Password", action: "setValue", args: ["hunter3"] }],
+    })
+    expect(
+      timeline
+        .entries()
+        .map((entry) => [entry.value, entry.previous, entry.redacted])
+    ).toEqual([
       ["[redacted]", "[redacted]", true],
       ["[redacted]", "[redacted]", true],
     ])
@@ -802,8 +969,13 @@ describe("stageChanges", () => {
       { ref: "PIN", value: "9999" },
       { ref: "Name", value: "Ada" },
     ])
-    expect(staged.applied.map((change) => change.before)).toEqual(["[redacted]", ""])
-    expect(await staged.revert()).toMatchObject([{ key: "value", before: "[redacted]", value: "9999" }])
+    expect(staged.applied.map((change) => change.before)).toEqual([
+      "[redacted]",
+      "",
+    ])
+    expect(await staged.revert()).toMatchObject([
+      { key: "value", before: "[redacted]", value: "9999" },
+    ])
     expect([pin.get().value, name.get().value]).toEqual(["9999", ""])
   })
 

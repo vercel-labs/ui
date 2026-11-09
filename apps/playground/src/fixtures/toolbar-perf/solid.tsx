@@ -10,8 +10,14 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Toolbar class="toolbar" aria-label="Formatting" style={{ "flex-wrap": "wrap" }}>
-        <For each={items}>{(item) => <ToolbarButton>{item.label}</ToolbarButton>}</For>
+      <Toolbar
+        class="toolbar"
+        aria-label="Formatting"
+        style={{ "flex-wrap": "wrap" }}
+      >
+        <For each={items}>
+          {(item) => <ToolbarButton>{item.label}</ToolbarButton>}
+        </For>
       </Toolbar>
       <button>After</button>
     </div>

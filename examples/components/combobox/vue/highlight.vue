@@ -30,7 +30,11 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 </script>
 
@@ -58,7 +62,10 @@ const countries = [
           <ComboboxItemText>
             <template #render="{ props, state }">
               <span v-bind="props">
-                <template v-for="(segment, index) in state.segments" :key="index">
+                <template
+                  v-for="(segment, index) in state.segments"
+                  :key="index"
+                >
                   <mark v-if="segment.match">{{ segment.text }}</mark>
                   <template v-else>{{ segment.text }}</template>
                 </template>

@@ -8,8 +8,15 @@
     AutocompleteList,
   } from "@ui-sdk/svelte/autocomplete"
 
-  const cities = ["القاهرة", "القدس", "الرباط", "الرياض", "بيروت", "دبي", "عمّان"]
-
+  const cities = [
+    "القاهرة",
+    "القدس",
+    "الرباط",
+    "الرياض",
+    "بيروت",
+    "دبي",
+    "عمّان",
+  ]
 </script>
 
 <div dir="rtl">

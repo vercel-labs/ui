@@ -7,19 +7,25 @@ import { build } from "vite"
 const all = ["react", "vue", "svelte", "solid", "web"]
 const named = process.argv.slice(2)
 const unknown = named.filter((framework) => !all.includes(framework))
-if (unknown.length) throw new Error(`No examples build for ${unknown.join(", ")}`)
+if (unknown.length) {
+  throw new Error(`No examples build for ${unknown.join(", ")}`)
+}
 
 const root = new URL("..", import.meta.url).pathname
 await Promise.all(
   (named.length ? named : all).map(async (mode) => {
     await build({ root, mode, logLevel: "warn" })
-    if (mode !== "web") await prerender(mode)
-  }),
+    if (mode !== "web") {
+      await prerender(mode)
+    }
+  })
 )
 
 async function prerender(mode) {
   await build({ root, mode, logLevel: "warn", build: { ssr: true } })
-  const { examples, render } = await import(`${root}node_modules/.prerender/${mode}/${mode}.js`)
+  const { examples, render } = await import(
+    `${root}node_modules/.prerender/${mode}/${mode}.js`
+  )
   const html = {}
   const failed = []
   for (const [file, load] of Object.entries(examples)) {
@@ -33,6 +39,11 @@ async function prerender(mode) {
       failed.push(name)
     }
   }
-  await writeFile(`${root}../apps/docs/public/examples/${mode}/prerender.json`, JSON.stringify(html))
-  if (failed.length) console.warn(`${mode}: ${failed.join(", ")} render only in the browser.`)
+  await writeFile(
+    `${root}../apps/docs/public/examples/${mode}/prerender.json`,
+    JSON.stringify(html)
+  )
+  if (failed.length) {
+    console.warn(`${mode}: ${failed.join(", ")} render only in the browser.`)
+  }
 }

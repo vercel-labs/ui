@@ -28,7 +28,7 @@ function mount(root: HTMLElement) {
                   ${tag.label}
                   <span data-slot="hint">${tag.keywords[0]}</span>
                 </ui-autocomplete-item>
-              `,
+              `
             )
             .join("")}
         </ui-autocomplete-list>

@@ -29,7 +29,14 @@ import {
   selectAllKey,
 } from "@ui-sdk/core/renderer"
 import * as React from "react"
-import { hasChild, learnLabels, notLabel, Placed, usePlaceContent, usePlacedContent } from "./children"
+import {
+  hasChild,
+  learnLabels,
+  notLabel,
+  Placed,
+  usePlaceContent,
+  usePlacedContent,
+} from "./children"
 import { controlRender, useFieldControl } from "./field-context"
 import { markSegments, textToMark } from "./list-text"
 import {
@@ -82,10 +89,10 @@ type Clashing = "value" | "defaultValue" | "onChange" | "onSelect"
  * The props of `Combobox`.
  * @stable
  */
-type ComboboxProps<T = string, Multiple extends boolean | undefined = false> = ComboboxOptions<
-  T,
-  Multiple
-> & {
+type ComboboxProps<
+  T = string,
+  Multiple extends boolean | undefined = false,
+> = ComboboxOptions<T, Multiple> & {
   children?: React.ReactNode
 }
 
@@ -119,7 +126,9 @@ function Combobox<T = string, Multiple extends boolean | undefined = false>({
       <ContainerContext.Provider value={container}>
         <SheetHeaderContext.Provider value={header}>
           <Placed value={place}>{children}</Placed>
-          <Placed value={null}>{options.items && !own && <ComboboxContent />}</Placed>
+          <Placed value={null}>
+            {options.items && !own && <ComboboxContent />}
+          </Placed>
           <FormInputs handle={combobox} />
         </SheetHeaderContext.Provider>
       </ContainerContext.Provider>
@@ -140,9 +149,15 @@ const ComboboxLabel = parts.Label
 function ComboboxInput({
   render,
   ...props
-}: Omit<PartProps<"input", ComboboxInputState>, "value" | "defaultValue" | "children" | "readOnly">) {
+}: Omit<
+  PartProps<"input", ComboboxInputState>,
+  "value" | "defaultValue" | "children" | "readOnly"
+>) {
   const [header] = React.useContext(SheetHeaderContext)
-  const element = { ...props, render: controlRender(useFieldControl(props), "input", render) }
+  const element = {
+    ...props,
+    render: controlRender(useFieldControl(props), "input", render),
+  }
   // While the popup presents as a sheet, the input renders in its header.
   const input = usePart(comboboxPrimitive, "input", {}, element, "input")
   return input && inSheetHeader(input, header)
@@ -193,7 +208,8 @@ function ComboboxContent({
       {sheetHeader(combobox, setHeader)}
       {typeof children === "function"
         ? children(state)
-        : (children ?? (state.items && combobox.state.items && <ComboboxList />))}
+        : (children ??
+          (state.items && combobox.state.items && <ComboboxList />))}
     </>
   )
   const element = usePart(combobox, "content", content, {
@@ -208,43 +224,69 @@ function ComboboxContent({
  * The listbox. Without children, it renders the combobox's `items`, filtered.
  * @stable
  */
-function ComboboxList({ children = listItems, ...props }: PartProps<"div", ComboboxContentState>) {
+function ComboboxList({
+  children = listItems,
+  ...props
+}: PartProps<"div", ComboboxContentState>) {
   return usePart(comboboxPrimitive, "list", {}, { ...props, children })
 }
 
 // From the part's state, so new items re-render the list. Without items it's empty.
-const listItems = (state: ComboboxContentState) => <ComboboxItems items={state.items} />
+const listItems = (state: ComboboxContentState) => (
+  <ComboboxItems items={state.items} />
+)
 
 /**
  * An option. Pressing it selects it, or toggles it with `multiple`.
  * @stable
  */
 const ComboboxItem = parts.Item as <T = string>(
-  props: Omit<PartProps<"div", ComboboxItemState>, Clashing> & ComboboxItemProps<T>,
+  props: Omit<PartProps<"div", ComboboxItemState>, Clashing> &
+    ComboboxItemProps<T>
 ) => React.ReactNode
 
 /**
  * The item's text, with the part the input's text matched in `<mark>`. Without string content, it shows the item's label.
  * @stable
  */
-function ComboboxItemText({ children, ...props }: PartProps<"span", ComboboxItemTextState>) {
+function ComboboxItemText({
+  children,
+  ...props
+}: PartProps<"span", ComboboxItemTextState>) {
   const item = useAround(comboboxPrimitive, "item")
-  if (!item) throw new Error("<ComboboxItemText> must be used inside <ComboboxItem>.")
+  if (!item) {
+    throw new Error("<ComboboxItemText> must be used inside <ComboboxItem>.")
+  }
   const label = (item.label as string | undefined) ?? (item.value as string)
   const part = { id: item.value as string, text: textToMark(children, label) }
   const content =
-    typeof children === "function" ? children : (state: ComboboxItemTextState) => markSegments(state.segments)
-  return usePart(comboboxPrimitive, "item-text", part, { ...props, children: content }, "span")
+    typeof children === "function"
+      ? children
+      : (state: ComboboxItemTextState) => markSegments(state.segments)
+  return usePart(
+    comboboxPrimitive,
+    "item-text",
+    part,
+    { ...props, children: content },
+    "span"
+  )
 }
 
 /**
  * An option that selects every item that matches, with `multiple`: in its group inside a `ComboboxGroup`, or in the whole list.
  * @stable
  */
-function ComboboxSelectAll({ render, ...props }: PartProps<"div", ComboboxSelectAllState>) {
+function ComboboxSelectAll({
+  render,
+  ...props
+}: PartProps<"div", ComboboxSelectAllState>) {
   const combobox = useCombobox()
   combobox.instance.use(comboboxSelectAll)
-  const part = { id: selectAllKey(useAround(comboboxPrimitive, "group")?.id as string | undefined) }
+  const part = {
+    id: selectAllKey(
+      useAround(comboboxPrimitive, "group")?.id as string | undefined
+    ),
+  }
   return usePart(combobox, "select-all", part, { ...props, render }, "div")
 }
 
@@ -283,7 +325,9 @@ const ComboboxItemIcon = /* @__PURE__ */ notLabel(function ComboboxItemIcon({
  * @stable
  */
 function ComboboxValueIcon(props: Omit<PartProps<"span">, "children">) {
-  return useNearest(comboboxPrimitive) ? <ComboboxValueIconPart {...props} /> : null
+  return useNearest(comboboxPrimitive) ? (
+    <ComboboxValueIconPart {...props} />
+  ) : null
 }
 
 function ComboboxValueIconPart(props: Omit<PartProps<"span">, "children">) {
@@ -320,10 +364,16 @@ function ComboboxCreate({
   minLength,
   children = create,
   ...props
-}: Omit<PartProps<"div", ComboboxCreateState>, Clashing> & ComboboxCreateProps) {
+}: Omit<PartProps<"div", ComboboxCreateState>, Clashing> &
+  ComboboxCreateProps) {
   const combobox = useCombobox()
   combobox.instance.use(comboboxCreate)
-  return usePart(combobox, "create", { onCreate, minLength }, { ...props, children })
+  return usePart(
+    combobox,
+    "create",
+    { onCreate, minLength },
+    { ...props, children }
+  )
 }
 
 const create = (state: ComboboxCreateState) => `Create “${state.query}”`
@@ -332,10 +382,22 @@ const create = (state: ComboboxCreateState) => `Create “${state.query}”`
  * Shown while no item matches. Its message is announced when it appears.
  * @stable
  */
-function ComboboxEmpty({ children, ...props }: PartProps<"div", ComboboxEmptyState>) {
+function ComboboxEmpty({
+  children,
+  ...props
+}: PartProps<"div", ComboboxEmptyState>) {
   const content = (state: ComboboxEmptyState) =>
-    typeof children === "function" ? children(state) : state.empty ? children : null
-  return usePart(comboboxPrimitive, "empty", {}, { ...props, children: content })
+    typeof children === "function"
+      ? children(state)
+      : state.empty
+        ? children
+        : null
+  return usePart(
+    comboboxPrimitive,
+    "empty",
+    {},
+    { ...props, children: content }
+  )
 }
 
 /**
@@ -363,16 +425,28 @@ function ComboboxValue({
 }) {
   // Its state, without an element.
   const value = (_props: unknown, state: ComboboxValueState) => (
-    <>{typeof children === "function" ? children(state) : (children ?? state.label)}</>
+    <>
+      {typeof children === "function"
+        ? children(state)
+        : (children ?? state.label)}
+    </>
   )
-  return usePart(comboboxPrimitive, "value", { maxLabels, getMoreLabel }, { render: value })
+  return usePart(
+    comboboxPrimitive,
+    "value",
+    { maxLabels, getMoreLabel },
+    { render: value }
+  )
 }
 
 /**
  * How many chips don't fit on the chips' line, once some collapse. Rendering it inside `ComboboxChips` turns collapsing on. Without children, "+2 more".
  * @stable
  */
-function ComboboxChipsOverflow({ children = more, ...props }: PartProps<"span", ComboboxChipsOverflowState>) {
+function ComboboxChipsOverflow({
+  children = more,
+  ...props
+}: PartProps<"span", ComboboxChipsOverflowState>) {
   const combobox = useCombobox()
   combobox.instance.use(comboboxChips)
   return usePart(combobox, "chips-overflow", {}, { ...props, children }, "span")
@@ -416,12 +490,20 @@ const label = (state: ComboboxChipState) => state.label
  * A button inside a chip that removes its value. Name it with `aria-label`.
  * @stable
  */
-function ComboboxChipRemove({ render, ...props }: PartProps<"button", ComboboxClearState>) {
+function ComboboxChipRemove({
+  render,
+  ...props
+}: PartProps<"button", ComboboxClearState>) {
   const combobox = useCombobox()
   combobox.instance.use(comboboxChips)
   const chip = React.useContext(ChipContext)
-  if (!chip) throw new Error("<ComboboxChipRemove> must be used inside <ComboboxChip>.")
-  const part = { id: combobox.api.internal.keyOf(chip.value), value: chip.value }
+  if (!chip) {
+    throw new Error("<ComboboxChipRemove> must be used inside <ComboboxChip>.")
+  }
+  const part = {
+    id: combobox.api.internal.keyOf(chip.value),
+    value: chip.value,
+  }
   return usePart(combobox, "chip-remove", part, { ...props, render }, "button")
 }
 
@@ -437,7 +519,13 @@ const ComboboxArrow = parts.Arrow
  */
 function ComboboxItems({ items }: { items: ListData<unknown> }) {
   const combobox = useCombobox()
-  return <ListItems items={items} parts={listParts} keyOf={combobox.api.internal.keyOf} />
+  return (
+    <ListItems
+      items={items}
+      parts={listParts}
+      keyOf={combobox.api.internal.keyOf}
+    />
+  )
 }
 
 const listParts: ListParts = {

@@ -11,7 +11,9 @@ describe("popover server rendering", () => {
     expect(typeof window).toBe("undefined")
     expect(body).toContain('aria-haspopup="dialog"')
     expect(body).toContain('aria-keyshortcuts="Control+I"')
-    expect(body).toMatch(/<span[^>]*aria-hidden="true"[^>]*>(<!---->)?⁦Ctrl\+I⁩/)
+    expect(body).toMatch(
+      /<span[^>]*aria-hidden="true"[^>]*>(<!---->)?⁦Ctrl\+I⁩/
+    )
     expect(body).not.toContain('role="dialog"')
   })
 
@@ -28,6 +30,8 @@ describe("popover server rendering", () => {
   })
 
   test("a disabled trigger whose popover hasn't mounted renders disabled", () => {
-    expect(html({ remote: true, disabled: true })).toMatch(/<button[^>]*disabled[^>]*>(<!---->)?Share/)
+    expect(html({ remote: true, disabled: true })).toMatch(
+      /<button[^>]*disabled[^>]*>(<!---->)?Share/
+    )
   })
 })

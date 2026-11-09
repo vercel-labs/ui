@@ -12,7 +12,8 @@ function mount(root: HTMLElement) {
     </ui-meter>
   `
   const meter = root.querySelector("ui-meter") as UiMeterElement
-  meter.getValueLabel = (value, details) => `${value} of ${details.max} requests, ${details.formatted}`
+  meter.getValueLabel = (value, details) =>
+    `${value} of ${details.max} requests, ${details.formatted}`
 }
 
 export { mount }

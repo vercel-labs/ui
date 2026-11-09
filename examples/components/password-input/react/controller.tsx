@@ -33,7 +33,9 @@ function Example() {
         <button
           type="button"
           onClick={() =>
-            log(`${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`)
+            log(
+              `${password.getValue().length} characters, ${password.isVisible() ? "shown" : "hidden"}`
+            )
           }
         >
           Read
@@ -47,7 +49,13 @@ function Example() {
         <PasswordInput controller={password} autoComplete="new-password">
           <PasswordInputControl />
           <PasswordInputToggle aria-label="Show password">
-            {(state) => (state.visible ? <EyeOffIcon aria-hidden="true" /> : <EyeIcon aria-hidden="true" />)}
+            {(state) =>
+              state.visible ? (
+                <EyeOffIcon aria-hidden="true" />
+              ) : (
+                <EyeIcon aria-hidden="true" />
+              )
+            }
           </PasswordInputToggle>
         </PasswordInput>
       </Field>

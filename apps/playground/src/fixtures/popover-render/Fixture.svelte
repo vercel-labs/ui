@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/svelte"
+  import {
+    Popover,
+    PopoverClose,
+    PopoverContent,
+    PopoverTitle,
+    PopoverTrigger,
+  } from "@ui-sdk/svelte"
 </script>
 
 <div class="fixture">

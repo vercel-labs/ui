@@ -5,7 +5,10 @@ import { mountWhenAsked, perfItems, perfSize } from "tests/fixtures/perf.ts"
 function mount(root: HTMLElement) {
   mountWhenAsked(root, (target) => {
     const buttons = perfItems(perfSize())
-      .map((item) => `<ui-toolbar-button><button>${item.label}</button></ui-toolbar-button>`)
+      .map(
+        (item) =>
+          `<ui-toolbar-button><button>${item.label}</button></ui-toolbar-button>`
+      )
       .join("")
     target.innerHTML = `
       <div class="fixture">

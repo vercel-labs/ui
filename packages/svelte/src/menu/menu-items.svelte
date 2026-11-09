@@ -19,7 +19,9 @@ Renders a data menu's items as bare parts. Used by `<Menu items>` when you place
 
   let { items }: { items: MenuData } = $props()
   const entries: MenuDataItem[] = $derived(
-    items.map((entry) => (typeof entry === "string" ? { value: entry, label: entry } : entry)),
+    items.map((entry) =>
+      typeof entry === "string" ? { value: entry, label: entry } : entry
+    )
   )
 
   function keyOf(item: MenuDataItem, index: number) {
@@ -66,7 +68,11 @@ Renders a data menu's items as bare parts. Used by `<Menu items>` when you place
       {item.label}
     </MenuCheckboxItem>
   {:else if item.type === "radio-group"}
-    <MenuRadioGroup name={item.name} bind:value={() => item.value, () => {}} defaultValue={item.defaultValue}>
+    <MenuRadioGroup
+      name={item.name}
+      bind:value={() => item.value, () => {}}
+      defaultValue={item.defaultValue}
+    >
       {#if item.label}<MenuGroupLabel>{item.label}</MenuGroupLabel>{/if}
       {#each item.items as radio (radio.value)}
         <MenuRadioItem value={radio.value} disabled={radio.disabled}>

@@ -2,7 +2,12 @@ import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
 import { Avatar, AvatarFallback, AvatarImage } from "../src/avatar"
 import { Meter, MeterIndicator, MeterTrack, MeterValue } from "../src/meter"
-import { Progress, ProgressIndicator, ProgressTrack, ProgressValue } from "../src/progress"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressTrack,
+  ProgressValue,
+} from "../src/progress"
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering avatars, progress bars and meters", () => {
@@ -14,7 +19,9 @@ describe("server rendering avatars, progress bars and meters", () => {
       </Avatar>
     ))
     expect(typeof window).toBe("undefined")
-    expect(html).toMatch(/<img(?=[^>]*src="\/ada.png")(?=[^>]*aria-hidden="true")/)
+    expect(html).toMatch(
+      /<img(?=[^>]*src="\/ada.png")(?=[^>]*aria-hidden="true")/
+    )
     expect(html).toContain(">AL</span>")
   })
 
@@ -24,7 +31,7 @@ describe("server rendering avatars, progress bars and meters", () => {
         <Avatar>
           <AvatarFallback delay={500}>AL</AvatarFallback>
         </Avatar>
-      )),
+      ))
     ).not.toContain("AL")
   })
 
@@ -42,7 +49,9 @@ describe("server rendering avatars, progress bars and meters", () => {
     expect(html).toContain(">50%</span>")
     // The indicator's width and the root's variable are inline, so the bar is right before hydration.
     expect(html).toContain("--progress-value:50%")
-    expect(html).toMatch(/data-slot="progress-indicator"[^>]*style="[^"]*width:50%/)
+    expect(html).toMatch(
+      /data-slot="progress-indicator"[^>]*style="[^"]*width:50%/
+    )
   })
 
   test("a meter renders its value, width and variable before hydration", () => {
@@ -57,7 +66,9 @@ describe("server rendering avatars, progress bars and meters", () => {
     expect(html).toMatch(/role="meter"[^>]*aria-valuenow="3"/)
     expect(html).toContain('aria-valuetext="50%"')
     expect(html).toContain("--meter-value:50%")
-    expect(html).toMatch(/data-slot="meter-indicator"[^>]*style="[^"]*width:50%/)
+    expect(html).toMatch(
+      /data-slot="meter-indicator"[^>]*style="[^"]*width:50%/
+    )
     expect(html).toContain(">50%</span>")
   })
 })

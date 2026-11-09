@@ -21,18 +21,27 @@ type Row = {
   example?: { href: string; label: string }
 }
 
-const programs = new Map<string, { checker: ts.TypeChecker; exports: ts.Symbol[] }>()
+const programs = new Map<
+  string,
+  { checker: ts.TypeChecker; exports: ts.Symbol[] }
+>()
 
 // Each module gets its own program, so the order of a union's members, and
 // with it a table's rows, never depends on what else was checked first. The
 // programs share parsed files, as the language service's do, since parsing
 // the core and the DOM types again for every module made prerendering slow.
-const options: ts.CompilerOptions = { strict: true, noEmit: true, skipLibCheck: true }
+const options: ts.CompilerOptions = {
+  strict: true,
+  noEmit: true,
+  skipLibCheck: true,
+}
 const host = ts.createCompilerHost(options)
 const parsed = new Map<string, ts.SourceFile | undefined>()
 const parse = host.getSourceFile
 host.getSourceFile = (fileName, ...rest) => {
-  if (!parsed.has(fileName)) parsed.set(fileName, parse.call(host, fileName, ...rest))
+  if (!parsed.has(fileName)) {
+    parsed.set(fileName, parse.call(host, fileName, ...rest))
+  }
   return parsed.get(fileName)
 }
 
@@ -44,8 +53,13 @@ function moduleOf(file: string) {
     const program = ts.createProgram([resolved], options, host)
     const checker = program.getTypeChecker()
     const source = program.getSourceFile(resolved)
-    if (!source) throw new Error(`No such file: ${file}`)
-    found = { checker, exports: checker.getExportsOfModule(checker.getSymbolAtLocation(source)!) }
+    if (!source) {
+      throw new Error(`No such file: ${file}`)
+    }
+    found = {
+      checker,
+      exports: checker.getExportsOfModule(checker.getSymbolAtLocation(source)!),
+    }
     programs.set(resolved, found)
   }
   return found
@@ -54,12 +68,17 @@ function moduleOf(file: string) {
 function exported(file: string, name: string) {
   const { checker, exports } = moduleOf(file)
   const symbol = exports.find((candidate) => candidate.name === name)
-  if (!symbol) throw new Error(`${name} isn't exported from ${file}`)
+  if (!symbol) {
+    throw new Error(`${name} isn't exported from ${file}`)
+  }
   return { checker, symbol }
 }
 
 const docsOf = (symbol: ts.Symbol, checker: ts.TypeChecker) =>
-  ts.displayPartsToString(symbol.getDocumentationComment(checker)).replace(/\s+/g, " ").trim()
+  ts
+    .displayPartsToString(symbol.getDocumentationComment(checker))
+    .replace(/\s+/g, " ")
+    .trim()
 
 const generator = createGenerator()
 
@@ -68,21 +87,39 @@ const generator = createGenerator()
 function exportDocs(file: string, name: string) {
   const { checker, exports } = moduleOf(file)
   const symbol = exports.find((candidate) => candidate.name === name)
-  if (!symbol) return ""
-  return docsOf(symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol, checker)
+  if (!symbol) {
+    return ""
+  }
+  return docsOf(
+    symbol.flags & ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(symbol)
+      : symbol,
+    checker
+  )
 }
 
 // A prop's name, marked `?` when it's optional. Callbacks are events in Vue
 // and on web components, named as those frameworks write them.
-function rowName(entry: { name: string; required: boolean }, framework: Framework, isEvent: boolean) {
-  if (isEvent && framework === "vue") return callbackIn(entry.name, framework)
-  if (isEvent && framework === "web-components") return `${callbackIn(entry.name, framework)} event`
+function rowName(
+  entry: { name: string; required: boolean },
+  framework: Framework,
+  isEvent: boolean
+) {
+  if (isEvent && framework === "vue") {
+    return callbackIn(entry.name, framework)
+  }
+  if (isEvent && framework === "web-components") {
+    return `${callbackIn(entry.name, framework)} event`
+  }
   return entry.required ? entry.name : `${entry.name}?`
 }
 
 // The callbacks a description names in `backticks`, as the framework writes them.
 const callbacksIn = (text: string, framework: Framework) =>
-  text.replace(/`(on[A-Z]\w*)`/g, (_, name: string) => `\`${callbackIn(name, framework)}\``)
+  text.replace(
+    /`(on[A-Z]\w*)`/g,
+    (_, name: string) => `\`${callbackIn(name, framework)}\``
+  )
 
 /**
  * Props of an exported type, generated from its JSDoc, one list per type the
@@ -126,16 +163,23 @@ async function typeRows({
         name: rowName(entry, framework, isEvent),
         // Web events carry `detail`, not the callback's arguments.
         type:
-          isEvent && framework === "web-components" ? undefined : (types?.[entry.name] ?? shortType(entry)),
-        detail: fallback ? `Default ${fallback.replace(/^`|`$/g, "")}` : undefined,
+          isEvent && framework === "web-components"
+            ? undefined
+            : (types?.[entry.name] ?? shortType(entry)),
+        detail: fallback
+          ? `Default ${fallback.replace(/^`|`$/g, "")}`
+          : undefined,
         text: callbacksIn(
           (
             descriptions?.[entry.name] ??
-            (entry.description || (type?.includes("typeof import(") ? exportDocs(file, entry.name) : ""))
+            (entry.description ||
+              (type?.includes("typeof import(")
+                ? exportDocs(file, entry.name)
+                : ""))
           )
             .replace(/\s+/g, " ")
             .trim(),
-          events ? framework : "react",
+          events ? framework : "react"
         ),
         example: exampleOf(examples, entry.name),
       }
@@ -146,7 +190,9 @@ async function typeRows({
 // The declared type, without the `undefined` that optional props add. A
 // type too long to read, like a map of every DOM event, shows its outline.
 function shortType(entry: { type: string; simplifiedType: string }) {
-  const type = entry.type.replace(/ \| undefined$/, "").replace(/^undefined \| /, "")
+  const type = entry.type
+    .replace(/ \| undefined$/, "")
+    .replace(/^undefined \| /, "")
   return type.length > 200 ? entry.simplifiedType : type
 }
 
@@ -155,7 +201,9 @@ function shortType(entry: { type: string; simplifiedType: string }) {
 // Text after a path and `#` names a heading on that page.
 function exampleOf(examples: Record<string, string> | undefined, name: string) {
   const found = examples?.[name.replace(/\?$/, "")]
-  if (!found) return undefined
+  if (!found) {
+    return undefined
+  }
   const [page, label] = found.includes("#") ? found.split("#") : ["", found]
   const id = label
     .toLowerCase()
@@ -178,15 +226,24 @@ function stateRows({ path: file, name }: { path: string; name: string }) {
 /** The reasons a callback can report, described from the shared vocabulary in core. */
 function reasonRows({ path: file, name }: { path: string; name: string }) {
   const { checker, symbol } = exported(file, name)
-  const vocabulary = exported("../../packages/core/src/foundation/kernel/details.ts", "ReasonVocabulary")
+  const vocabulary = exported(
+    "../../packages/core/src/foundation/kernel/details.ts",
+    "ReasonVocabulary"
+  )
   const meanings = vocabulary.checker.getDeclaredTypeOfSymbol(vocabulary.symbol)
   const type = checker.getDeclaredTypeOfSymbol(symbol)
-  const members = (type.isUnion() ? type.types : [type]).filter((member) => member.isStringLiteral())
+  const members = (type.isUnion() ? type.types : [type]).filter((member) =>
+    member.isStringLiteral()
+  )
   return members.map((member) => {
     const reason = (member as ts.StringLiteralType).value
     const meaning = vocabulary.checker.getPropertyOfType(meanings, reason)
     // The DOM event the reason carries, from the vocabulary's type. None for controllers and cascades.
-    const event = meaning ? vocabulary.checker.typeToString(vocabulary.checker.getTypeOfSymbol(meaning)) : ""
+    const event = meaning
+      ? vocabulary.checker.typeToString(
+          vocabulary.checker.getTypeOfSymbol(meaning)
+        )
+      : ""
     return {
       name: reason,
       type: event === "undefined" ? "none" : event,
@@ -201,16 +258,20 @@ function controllerRows({ path: file, name }: { path: string; name: string }) {
   const type = checker.getDeclaredTypeOfSymbol(symbol)
   return checker
     .getPropertiesOfType(type)
-    .filter((property) => !property.getJsDocTags(checker).some((tag) => tag.name === "internal"))
+    .filter(
+      (property) =>
+        !property.getJsDocTags(checker).some((tag) => tag.name === "internal")
+    )
     .map((property) => {
       const signature = checker.getSignaturesOfType(
         checker.getTypeOfSymbol(property),
-        ts.SignatureKind.Call,
+        ts.SignatureKind.Call
       )[0]
       const parameters = signature
         ? signature.parameters
             .map((parameter) => {
-              const declaration = parameter.valueDeclaration as ts.ParameterDeclaration | undefined
+              const declaration = parameter.valueDeclaration as
+                ts.ParameterDeclaration | undefined
               return `${parameter.name}${declaration?.questionToken ? "?" : ""}`
             })
             .join(", ")

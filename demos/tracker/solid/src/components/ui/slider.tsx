@@ -14,7 +14,7 @@ function Slider(
   props: Omit<ComponentProps<typeof SliderPrimitive>, "class" | "children"> & {
     label: JSX.Element
     class?: string
-  },
+  }
 ) {
   const rest = omit(props, "label", "class")
   return (

@@ -7,8 +7,18 @@ import {
   type RadioState,
 } from "@ui-sdk/core/radio"
 import * as React from "react"
-import { controlRender, FieldContext, type FieldContextValue, useJoinField } from "./field-context"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  controlRender,
+  FieldContext,
+  type FieldContextValue,
+  useJoinField,
+} from "./field-context"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 // The group's own element is its `group` slot, and each radio its `root`.
 const parts = createParts(radioGroup, { indicator: "span" })
@@ -35,7 +45,11 @@ function RadioGroup<T extends string = string>({
   debug,
   render,
   ...props
-}: RadioGroupOptions<T> & Omit<PartProps<"div", RadioGroupState>, "defaultValue" | "onChange" | "onSelect">) {
+}: RadioGroupOptions<T> &
+  Omit<
+    PartProps<"div", RadioGroupState>,
+    "defaultValue" | "onChange" | "onSelect"
+  >) {
   const groupField = React.useContext(FieldContext)
   const field = useJoinField(groupField)
   const group = usePrimitive(radioGroup, {
@@ -53,7 +67,12 @@ function RadioGroup<T extends string = string>({
   })
   return (
     <GroupFieldContext.Provider value={groupField}>
-      {usePart(group, "group", {}, { ...props, render: controlRender(field, "div", render) })}
+      {usePart(
+        group,
+        "group",
+        {},
+        { ...props, render: controlRender(field, "div", render) }
+      )}
     </GroupFieldContext.Provider>
   )
 }
@@ -84,7 +103,7 @@ function Radio({
     "root",
     { value, disabled: isDisabled },
     { ...props, render: controlRender(field, "button", render, input) },
-    "button",
+    "button"
   )
 }
 

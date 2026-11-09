@@ -68,11 +68,17 @@ type AsyncOptionsOptions = {
 function createAsyncOptions<Item>(
   load: (
     query: string,
-    context: AsyncOptionsContext,
+    context: AsyncOptionsContext
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
-  { debounce = 200, query = "", immediate = false }: AsyncOptionsOptions = {},
+  { debounce = 200, query = "", immediate = false }: AsyncOptionsOptions = {}
 ) {
-  let state: AsyncOptionsState<Item> = { query, items: [], status: "idle", error: undefined, hasMore: false }
+  let state: AsyncOptionsState<Item> = {
+    query,
+    items: [],
+    status: "idle",
+    error: undefined,
+    hasMore: false,
+  }
   const listeners = new Set<() => void>()
   let timer: ReturnType<typeof setTimeout> | undefined
   let controller: AbortController | undefined
@@ -98,21 +104,31 @@ function createAsyncOptions<Item>(
     set({ status: "loading", error: undefined })
     load(state.query, { signal: current.signal, page: next }).then(
       (result) => {
-        if (current.signal.aborted) return
+        if (current.signal.aborted) {
+          return
+        }
         controller = undefined
         const items = Array.isArray(result) ? result : result.items
         const hasMore = !Array.isArray(result) && !!result.hasMore
-        set({ items: next === 0 ? items : [...state.items, ...items], status: "idle", hasMore })
+        set({
+          items: next === 0 ? items : [...state.items, ...items],
+          status: "idle",
+          hasMore,
+        })
       },
       (error) => {
-        if (current.signal.aborted) return
+        if (current.signal.aborted) {
+          return
+        }
         controller = undefined
         set({ status: "error", error })
-      },
+      }
     )
   }
 
-  if (immediate) run(0)
+  if (immediate) {
+    run(0)
+  }
 
   return {
     /** The current items, text and status. */
@@ -126,7 +142,12 @@ function createAsyncOptions<Item>(
     },
     /** Loads for new text once typing pauses, replacing any load still running. */
     setQuery(next: string) {
-      if (next === state.query && (state.status === "loading" || timer !== undefined)) return
+      if (
+        next === state.query &&
+        (state.status === "loading" || timer !== undefined)
+      ) {
+        return
+      }
       cancel()
       // Loading from the first key press: while typing pauses, the last
       // items aren't an answer to the new text, so nothing says "no match".
@@ -143,13 +164,17 @@ function createAsyncOptions<Item>(
     },
     /** Loads the next page and appends it, when `load` said there's more. */
     loadMore() {
-      if (state.status === "loading" || !state.hasMore) return
+      if (state.status === "loading" || !state.hasMore) {
+        return
+      }
       run(page + 1)
     },
     /** Stops any pending or running load. */
     cancel() {
       cancel()
-      if (state.status === "loading") set({ status: "idle" })
+      if (state.status === "loading") {
+        set({ status: "idle" })
+      }
     },
   }
 }

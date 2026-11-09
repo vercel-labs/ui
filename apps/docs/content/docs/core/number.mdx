@@ -111,7 +111,12 @@ Give a range `snap` points and a `threshold`, and a scrub lands on a point when 
 ```ts
 import { scrubTo, stepBy, stepFromKey } from "@ui-sdk/core/number"
 
-const range = { min: 0, max: 60, step: 0.1, snap: { points: [0, 9.5, 24, 38.5, 52], threshold: 1.5 } }
+const range = {
+  min: 0,
+  max: 60,
+  step: 0.1,
+  snap: { points: [0, 9.5, 24, 38.5, 52], threshold: 1.5 },
+}
 
 scrubTo(23, range) // { value: 24, point: 24 }
 scrubTo(23, range, { snap: false }) // { value: 23, point: undefined }
@@ -131,7 +136,9 @@ function onKeyDown(event: KeyboardEvent) {
   type="range"
   onPointerDown={(event) => (free = event.metaKey)}
   onPointerMove={(event) => (free = event.metaKey)}
-  onChange={(event) => setTime(scrubTo(Number(event.target.value), range, { snap: !free }).value)}
+  onChange={(event) =>
+    setTime(scrubTo(Number(event.target.value), range, { snap: !free }).value)
+  }
 />
 ```
 

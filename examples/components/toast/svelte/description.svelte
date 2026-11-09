@@ -1,12 +1,21 @@
 <script lang="ts">
-  import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import {
+    Toast,
+    ToastDescription,
+    ToastRegion,
+    ToastTitle,
+    createToaster,
+  } from "@ui-sdk/svelte/toast"
 
   const toast = createToaster()
-
 </script>
 
 <button
-  onclick={() => toast({ title: "Event has been created", description: "Monday, January 3rd at 6:00pm" })}
+  onclick={() =>
+    toast({
+      title: "Event has been created",
+      description: "Monday, January 3rd at 6:00pm",
+    })}
 >
   Show toast
 </button>

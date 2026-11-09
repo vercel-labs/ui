@@ -113,7 +113,9 @@ Use a button when clicking an avatar performs an action. Give it an accessible n
 ```svelte
 <Avatar onclick={openProfile}>
   {#snippet render({ props, state, children })}
-    <button {...props} type="button" aria-label="shadcn">{@render children?.(state)}</button>
+    <button {...props} type="button" aria-label="shadcn"
+      >{@render children?.(state)}</button
+    >
   {/snippet}
   <AvatarImage src="https://github.com/shadcn.png" alt="" />
   <AvatarFallback aria-hidden="true">CN</AvatarFallback>
@@ -147,7 +149,9 @@ Use [Parts and Composition](../parts-and-composition) to replace an element or r
 <Avatar>
   <AvatarImage src={user.image} alt={user.name} />
   <AvatarFallback>
-    {#snippet children(state)}{state.loadingStatus === "error" ? "?" : user.initials}{/snippet}
+    {#snippet children(state)}{state.loadingStatus === "error"
+        ? "?"
+        : user.initials}{/snippet}
   </AvatarFallback>
 </Avatar>
 ```
@@ -178,7 +182,10 @@ Props and callbacks are the same as below, as Svelte props.
 
 ### Avatar
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarOptions" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarOptions"
+/>
 
 ### AvatarImage
 
@@ -186,13 +193,19 @@ The image. Renders a real `img`, so the browser can fetch it before hydration, a
 
 ### AvatarFallback
 
-<TypeTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarFallbackProps" />
+<TypeTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarFallbackProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive. Every part gets the same state.
 
-<StateTable path="../../packages/core/src/components/avatar/avatar.ts" name="AvatarState" />
+<StateTable
+  path="../../packages/core/src/components/avatar/avatar.ts"
+  name="AvatarState"
+/>
 
 ### Reasons
 

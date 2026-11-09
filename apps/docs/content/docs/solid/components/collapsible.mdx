@@ -33,7 +33,11 @@ The root and panel render divs, and the trigger renders a native button. Put oth
 Import the parts and put them together:
 
 ```tsx
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 
 function Example() {
   return (
@@ -189,7 +193,10 @@ Props and callbacks are the same as below, as Solid props.
 
 ### Collapsible
 
-<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleOptions"
+/>
 
 ### CollapsibleTrigger
 
@@ -207,7 +214,10 @@ The trigger takes no options of its own, only the props of the element it render
 What render functions, state-based class names and children functions receive. The trigger and the panel
 receive the same state as the collapsible.
 
-<StateTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleState" />
+<StateTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleState"
+/>
 
 ### Reasons
 
@@ -253,7 +263,10 @@ Closing a panel while focus is inside it moves focus back to the trigger.
 
 ### Tested Behavior
 
-<SpecList spec="collapsible" only={["opening and closing", "keyboard", "mounting"]} />
+<SpecList
+  spec="collapsible"
+  only={["opening and closing", "keyboard", "mounting"]}
+/>
 
 Beyond the pattern's baseline:
 

@@ -30,15 +30,22 @@ type BoardState = {
 }
 
 type BoardPositionsChangeReason = "drag" | "move-key" | "imperative"
-type BoardSelectedChangeReason = "item-press" | "list-navigation" | "escape-key" | "lasso" | "imperative"
+type BoardSelectedChangeReason =
+  "item-press" | "list-navigation" | "escape-key" | "lasso" | "imperative"
 
 type BoardOptions = {
   positions?: BoardPositions
   defaultPositions?: BoardPositions
-  onPositionsChange?: (positions: BoardPositions, details: ChangeDetails<BoardPositionsChangeReason>) => void
+  onPositionsChange?: (
+    positions: BoardPositions,
+    details: ChangeDetails<BoardPositionsChangeReason>
+  ) => void
   selected?: string[]
   defaultSelected?: string[]
-  onSelectedChange?: (selected: string[], details: ChangeDetails<BoardSelectedChangeReason>) => void
+  onSelectedChange?: (
+    selected: string[],
+    details: ChangeDetails<BoardSelectedChangeReason>
+  ) => void
   step?: number
   grid?: number
 }
@@ -50,7 +57,12 @@ type BoardCardProps = {
 }
 
 type BoardRootState = { selected: number; dragging: boolean }
-type BoardCardState = { selected: boolean; disabled: boolean; x: number; y: number }
+type BoardCardState = {
+  selected: boolean
+  disabled: boolean
+  x: number
+  y: number
+}
 
 const board = /* @__PURE__ */ definePrimitive({
   name: "board",
@@ -76,7 +88,9 @@ const board = /* @__PURE__ */ definePrimitive({
   sync: (options) => ({
     step: options.step ?? 10,
     grid: options.grid ?? 1,
-    ...(options.positions === undefined ? {} : { positions: options.positions }),
+    ...(options.positions === undefined
+      ? {}
+      : { positions: options.positions }),
     ...(options.selected === undefined ? {} : { selected: options.selected }),
   }),
   controlled: ["positions", "selected"],
@@ -103,7 +117,8 @@ const board = /* @__PURE__ */ definePrimitive({
       key: "positions",
       draft: "moving",
       set: (value, details) => change("positions", value, details),
-      group: (key) => (store.get().selected.includes(key) ? store.get().selected : [key]),
+      group: (key) =>
+        store.get().selected.includes(key) ? store.get().selected : [key],
       step: () => store.get().grid,
       largeStep: () => store.get().step,
       disabled: (key) => !!card(key)?.disabled,
@@ -115,7 +130,8 @@ const board = /* @__PURE__ */ definePrimitive({
       selected: () => store.get().selected,
       set: (keys, details) => change("selected", keys, details),
       selectable: (key) => !card(key)?.disabled,
-      message: (count) => `${count} ${count === 1 ? "card" : "cards"} selected.`,
+      message: (count) =>
+        `${count} ${count === 1 ? "card" : "cards"} selected.`,
     })
 
     const api = {
@@ -124,17 +140,28 @@ const board = /* @__PURE__ */ definePrimitive({
       lasso,
       select(
         keys: string[],
-        details: { reason: BoardSelectedChangeReason; event?: Event } = { reason: "imperative" },
+        details: { reason: BoardSelectedChangeReason; event?: Event } = {
+          reason: "imperative",
+        }
       ) {
         return change("selected", keys, details)
       },
       setPositions(positions: BoardPositions) {
-        return change("positions", { ...store.get().positions, ...positions }, { reason: "imperative" })
+        return change(
+          "positions",
+          { ...store.get().positions, ...positions },
+          { reason: "imperative" }
+        )
       },
       cardKeydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (move.keydown(event, key)) return
+        if (move.keydown(event, key)) {
+          return
+        }
         const { selected } = store.get()
-        if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "a") {
+        if (
+          (event.metaKey || event.ctrlKey) &&
+          event.key.toLowerCase() === "a"
+        ) {
           event.preventDefault()
           selection.toggleAll({ reason: "list-navigation", event })
         } else if (event.key === " ") {
@@ -147,23 +174,36 @@ const board = /* @__PURE__ */ definePrimitive({
           if (moved?.shift) {
             const next = store.get().selected
             const add = [moved.from, moved.key].filter(
-              (k): k is string => !!k && !next.includes(k) && !card(k)?.disabled,
+              (k): k is string => !!k && !next.includes(k) && !card(k)?.disabled
             )
-            if (add.length) change("selected", [...next, ...add], { reason: "list-navigation", event })
+            if (add.length) {
+              change("selected", [...next, ...add], {
+                reason: "list-navigation",
+                event,
+              })
+            }
           }
         }
       },
       cardPointerdown(event: PointerEvent, el: HTMLElement, key: string) {
-        if (event.button !== 0) return
+        if (event.button !== 0) {
+          return
+        }
         event.stopPropagation()
-        if (event.shiftKey || event.metaKey || event.ctrlKey)
+        if (event.shiftKey || event.metaKey || event.ctrlKey) {
           selection.toggle(key, { reason: "item-press", event })
-        else if (!store.get().selected.includes(key)) selection.choose(key, { reason: "item-press", event })
+        } else if (!store.get().selected.includes(key)) {
+          selection.choose(key, { reason: "item-press", event })
+        }
         move.pointerdown(event, key, el)
       },
       rootPointerdown(event: PointerEvent, el: HTMLElement) {
-        if (event.button !== 0 || event.target !== el) return
-        if (!event.shiftKey && store.get().selected.length) change("selected", [], { reason: "lasso", event })
+        if (event.button !== 0 || event.target !== el) {
+          return
+        }
+        if (!event.shiftKey && store.get().selected.length) {
+          change("selected", [], { reason: "lasso", event })
+        }
         lasso.pointerdown(event, el)
       },
     }
@@ -171,19 +211,29 @@ const board = /* @__PURE__ */ definePrimitive({
   },
   slots: (slot) => ({
     root: slot<{}, BoardRootState>({
-      state: (state) => ({ selected: state.selected.length, dragging: !!state.moving }),
+      state: (state) => ({
+        selected: state.selected.length,
+        dragging: !!state.moving,
+      }),
       attrs: (_state, { id }) => ({
         role: "listbox",
         "aria-multiselectable": "true",
         "aria-roledescription": "board",
         "aria-describedby": `${id}-instructions`,
-        style: css({ position: "relative", "touch-action": "none", "user-select": "none" }),
+        style: css({
+          position: "relative",
+          "touch-action": "none",
+          "user-select": "none",
+        }),
       }),
       live: live<BoardState, any, {}>((state) => ({
         "data-lassoing": state.lasso ? "" : undefined,
         "data-dragging": state.moving ? "" : undefined,
       })),
-      on: { pointerdown: (event, { el, api }) => el && api.rootPointerdown(event, el) },
+      on: {
+        pointerdown: (event, { el, api }) =>
+          el && api.rootPointerdown(event, el),
+      },
     }),
     card: slot<BoardCardProps, BoardCardState>({
       props: { value: "string", label: "string", disabled: "boolean" },
@@ -220,14 +270,18 @@ const board = /* @__PURE__ */ definePrimitive({
         style: api.move.style(state, key),
       })),
       on: {
-        keydown: (event, { el, api, key }) => el && api.cardKeydown(event, el, key),
-        pointerdown: (event, { el, api, key }) => el && api.cardPointerdown(event, el, key),
+        keydown: (event, { el, api, key }) =>
+          el && api.cardKeydown(event, el, key),
+        pointerdown: (event, { el, api, key }) =>
+          el && api.cardPointerdown(event, el, key),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
     lasso: slot({
       attrs: () => ({ "aria-hidden": "true" }),
-      live: live<BoardState, any, {}>((state, { api }) => ({ style: api.lasso.style(state) })),
+      live: live<BoardState, any, {}>((state, { api }) => ({
+        style: api.lasso.style(state),
+      })),
     }),
     instructions: slot({
       attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }),
@@ -235,7 +289,12 @@ const board = /* @__PURE__ */ definePrimitive({
   }),
 })
 
-const parts = createParts(board, { root: "div", card: "div", lasso: "div", instructions: "div" })
+const parts = createParts(board, {
+  root: "div",
+  card: "div",
+  lasso: "div",
+  instructions: "div",
+})
 
 const Board = parts.Root
 
@@ -246,13 +305,50 @@ const BoardLasso = parts.Lasso
 const BoardInstructions = parts.Instructions
 
 const cards = [
-  { value: "research", label: "Research", note: "Five interviews", x: 12, y: 12, tone: "#0ea5e9" },
-  { value: "sketch", label: "Sketch", note: "Three directions", x: 176, y: 36, tone: "#f59e0b" },
-  { value: "prototype", label: "Prototype", note: "Click-through", x: 340, y: 16, tone: "#10b981" },
-  { value: "test", label: "Test", note: "Five sessions", x: 80, y: 168, tone: "#f43f5e" },
-  { value: "ship", label: "Ship", note: "Behind a flag", x: 268, y: 184, tone: "#8b5cf6" },
+  {
+    value: "research",
+    label: "Research",
+    note: "Five interviews",
+    x: 12,
+    y: 12,
+    tone: "#0ea5e9",
+  },
+  {
+    value: "sketch",
+    label: "Sketch",
+    note: "Three directions",
+    x: 176,
+    y: 36,
+    tone: "#f59e0b",
+  },
+  {
+    value: "prototype",
+    label: "Prototype",
+    note: "Click-through",
+    x: 340,
+    y: 16,
+    tone: "#10b981",
+  },
+  {
+    value: "test",
+    label: "Test",
+    note: "Five sessions",
+    x: 80,
+    y: 168,
+    tone: "#f43f5e",
+  },
+  {
+    value: "ship",
+    label: "Ship",
+    note: "Behind a flag",
+    x: 268,
+    y: 184,
+    tone: "#8b5cf6",
+  },
 ]
-const defaultPositions = Object.fromEntries(cards.map((card) => [card.value, { x: card.x, y: card.y }]))
+const defaultPositions = Object.fromEntries(
+  cards.map((card) => [card.value, { x: card.x, y: card.y }])
+)
 
 function Example() {
   const [selected, setSelected] = React.useState<string[]>([])
@@ -268,7 +364,11 @@ function Example() {
         {cards.map((card) => (
           <BoardCard key={card.value} value={card.value} label={card.label}>
             <span data-slot="row">
-              <span data-slot="swatch" aria-hidden="true" style={{ background: card.tone }} />
+              <span
+                data-slot="swatch"
+                aria-hidden="true"
+                style={{ background: card.tone }}
+              />
               {card.label}
             </span>
             <span data-slot="hint">{card.note}</span>
@@ -276,12 +376,14 @@ function Example() {
         ))}
         <BoardLasso />
         <BoardInstructions>
-          Arrow keys move to the nearest card. Shift with an arrow adds it to the selection. Space selects.
-          Alt with an arrow moves the selection.
+          Arrow keys move to the nearest card. Shift with an arrow adds it to
+          the selection. Space selects. Alt with an arrow moves the selection.
         </BoardInstructions>
       </Board>
       <p data-slot="output">
-        {selected.length ? `Selected: ${selected.join(", ")}` : "Drag on empty space to select cards."}
+        {selected.length
+          ? `Selected: ${selected.join(", ")}`
+          : "Drag on empty space to select cards."}
       </p>
     </div>
   )

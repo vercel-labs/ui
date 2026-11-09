@@ -7,7 +7,12 @@ import {
   AutocompleteItem,
   AutocompleteList,
 } from "@ui-sdk/vue/autocomplete"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/vue/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/vue/field"
 import { useLog } from "../../../shared/vue/log"
 
 const fruits = [
@@ -32,7 +37,7 @@ const log = useLog()
 
 function submit(event: Event) {
   const data = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-    ([name, value]) => `${name}=${value}`,
+    ([name, value]) => `${name}=${value}`
   )
   log(`Submitted ${data.join("&")}`)
 }
@@ -47,9 +52,12 @@ function submit(event: Event) {
         <AutocompleteContent>
           <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
           <AutocompleteList>
-            <AutocompleteItem v-for="fruit in fruits" :key="fruit" :value="fruit">{{
-              fruit
-            }}</AutocompleteItem>
+            <AutocompleteItem
+              v-for="fruit in fruits"
+              :key="fruit"
+              :value="fruit"
+              >{{ fruit }}</AutocompleteItem
+            >
           </AutocompleteList>
         </AutocompleteContent>
       </Autocomplete>

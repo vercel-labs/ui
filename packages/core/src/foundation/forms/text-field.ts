@@ -11,7 +11,8 @@ import type { PrimitiveContext } from "../kernel/primitive-types"
  * Why a text field's value changed.
  * @stable
  */
-type InputValueChangeReason = "input-change" | "clear-press" | "reset" | "imperative"
+type InputValueChangeReason =
+  "input-change" | "clear-press" | "reset" | "imperative"
 
 /** The options every text field takes. */
 type TextFieldOptions = {
@@ -24,7 +25,10 @@ type TextFieldOptions = {
    * part (`"clear-press"`), a form reset (`"reset"`) or a controller
    * (`"imperative"`). `details.cancel()` keeps the value as it was.
    */
-  onValueChange?: (value: string, details: ChangeDetails<InputValueChangeReason>) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<InputValueChangeReason>
+  ) => void
 }
 
 type TextState = {
@@ -45,7 +49,9 @@ const initialText = (options: TextFieldOptions) => {
 }
 
 const syncText = (options: TextFieldOptions) =>
-  options.value === undefined ? {} : { value: options.value, filled: options.value !== "" }
+  options.value === undefined
+    ? {}
+    : { value: options.value, filled: options.value !== "" }
 
 // The value api of a text field whose element fills `slot`. A composite's own
 // context fits, since its state and options extend the text field's.
@@ -54,13 +60,16 @@ function textFieldApi<Slot extends string>(
     store,
     options,
     element,
-  }: Pick<PrimitiveContext<TextFieldOptions, TextState, Slot>, "store" | "options" | "element">,
+  }: Pick<
+    PrimitiveContext<TextFieldOptions, TextState, Slot>,
+    "store" | "options" | "element"
+  >,
   change: (
     key: "value",
     value: string,
-    details: { reason: InputValueChangeReason; event?: Event },
+    details: { reason: InputValueChangeReason; event?: Event }
   ) => boolean,
-  slot: Slot,
+  slot: Slot
 ) {
   const control = () => element(slot) as TextControl | undefined
   const isControlled = () => options().value !== undefined
@@ -72,10 +81,16 @@ function textFieldApi<Slot extends string>(
   // A change the user or a controller asked for. The element follows unless
   // it was canceled. A controlled field waits for its new `value`.
   function write(value: string, reason: InputValueChangeReason, event?: Event) {
-    if (!change("value", value, { reason, event })) return false
-    if (!isControlled()) read(value)
+    if (!change("value", value, { reason, event })) {
+      return false
+    }
+    if (!isControlled()) {
+      read(value)
+    }
     const el = control()
-    if (!el || el.value === value) return true
+    if (!el || el.value === value) {
+      return true
+    }
     writing = true
     writeValue(el, value, { asUser: true })
     writing = false
@@ -86,16 +101,24 @@ function textFieldApi<Slot extends string>(
   // with the caret where it was, controlled or not, since not every framework
   // re-renders an unchanged value.
   function typed(el: TextControl, event: Event) {
-    if (writing) return
+    if (writing) {
+      return
+    }
     const previous = store.get().value
     const next = el.value
-    if (next === previous) return
+    if (next === previous) {
+      return
+    }
     if (change("value", next, { reason: "input-change", event })) {
-      if (!isControlled()) read(next)
+      if (!isControlled()) {
+        read(next)
+      }
       return
     }
     // Mid-composition the IME owns the text. It goes back once composition ends.
-    if ((event as InputEvent).isComposing) return
+    if ((event as InputEvent).isComposing) {
+      return
+    }
     const inserted = next.length - previous.length
     const caret = Math.max(0, (el.selectionStart ?? next.length) - inserted)
     el.value = previous
@@ -104,10 +127,17 @@ function textFieldApi<Slot extends string>(
 
   const api = {
     getValue: () => store.get().value,
-    setValue: (value: string, { reason = "imperative", event }: ChangeOptions<InputValueChangeReason> = {}) =>
-      write(value, reason, event),
-    clear: ({ reason = "imperative", event }: ChangeOptions<InputValueChangeReason> = {}) =>
-      write("", reason, event),
+    setValue: (
+      value: string,
+      {
+        reason = "imperative",
+        event,
+      }: ChangeOptions<InputValueChangeReason> = {}
+    ) => write(value, reason, event),
+    clear: ({
+      reason = "imperative",
+      event,
+    }: ChangeOptions<InputValueChangeReason> = {}) => write("", reason, event),
     focus: () => control()?.focus(),
     internal: {
       clearPress: (event?: Event) => write("", "clear-press", event),
@@ -117,13 +147,17 @@ function textFieldApi<Slot extends string>(
         // default. A field with no text, even in its markup, never had the default,
         // which the browser may change on the way in, like a number's letters.
         if (!isControlled()) {
-          if (el.value === "" && el.defaultValue === "") writeValue(el, store.get().value)
+          if (el.value === "" && el.defaultValue === "") {
+            writeValue(el, store.get().value)
+          }
           read(el.value)
         }
         const cleanups = [
           // Typing goes through `change` below, and resets through the reset listener.
           watchValue(el, (source) => {
-            if (source === "write" && !isControlled()) read(el.value)
+            if (source === "write" && !isControlled()) {
+              read(el.value)
+            }
           }),
           // Bound on the element, so it runs before frameworks hear the event at their root.
           on(el, "input", (event) => typed(el, event)),
@@ -134,14 +168,21 @@ function textFieldApi<Slot extends string>(
             el.ownerDocument,
             "reset",
             (event) => {
-              if (event.target !== el.form) return
+              if (event.target !== el.form) {
+                return
+              }
               afterReset(event, () => {
-                if (el.value === store.get().value) return
-                if (!change("value", el.value, { reason: "reset" })) el.value = store.get().value
-                else if (!isControlled()) read(el.value)
+                if (el.value === store.get().value) {
+                  return
+                }
+                if (!change("value", el.value, { reason: "reset" })) {
+                  el.value = store.get().value
+                } else if (!isControlled()) {
+                  read(el.value)
+                }
               })
             },
-            { capture: true },
+            { capture: true }
           ),
         ]
         return () => {
@@ -159,12 +200,18 @@ function textFieldApi<Slot extends string>(
 function focusFromSurroundings(
   event: Event | undefined,
   container: HTMLElement | undefined,
-  field: TextControl | undefined,
+  field: TextControl | undefined
 ) {
   const target = event?.target
-  if (!(target instanceof Element) || !container || !field) return
-  const interactive = target.closest("button, a[href], input, textarea, select, label, [tabindex]")
-  if (interactive && container.contains(interactive)) return
+  if (!(target instanceof Element) || !container || !field) {
+    return
+  }
+  const interactive = target.closest(
+    "button, a[href], input, textarea, select, label, [tabindex]"
+  )
+  if (interactive && container.contains(interactive)) {
+    return
+  }
   field.focus()
 }
 

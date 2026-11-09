@@ -16,7 +16,11 @@ const log = useLog()
 </script>
 
 <template>
-  <Menu @checked-change="(checked, details) => log(`${details.value} ${checked ? 'on' : 'off'}`)">
+  <Menu
+    @checked-change="
+      (checked, details) => log(`${details.value} ${checked ? 'on' : 'off'}`)
+    "
+  >
     <MenuTrigger>View</MenuTrigger>
     <MenuContent>
       <MenuGroup>

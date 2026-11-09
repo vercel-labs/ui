@@ -21,12 +21,22 @@ const kindOf = (spec: PropSpec) => (typeof spec === "object" ? spec.kind : spec)
  * schemas list, and without Svelte's own `$$` props. An `id` stays, and so
  * do attachments, which Svelte passes under symbol keys.
  */
-function omitProps(props: Record<string | symbol, unknown>, ...schemas: Schema[]) {
+function omitProps(
+  props: Record<string | symbol, unknown>,
+  ...schemas: Schema[]
+) {
   const result: Record<string | symbol, unknown> = {}
-  for (const key in props)
-    if (!key.startsWith("$$") && (key === "id" || !schemas.some((schema) => key in schema)))
+  for (const key in props) {
+    if (
+      !key.startsWith("$$") &&
+      (key === "id" || !schemas.some((schema) => key in schema))
+    ) {
       result[key] = props[key]
-  for (const key of Object.getOwnPropertySymbols(props)) result[key] = props[key]
+    }
+  }
+  for (const key of Object.getOwnPropertySymbols(props)) {
+    result[key] = props[key]
+  }
   return result
 }
 
@@ -58,14 +68,19 @@ type PartConfig = {
 function slotPropsOf(
   { primitive, schema: key, slot, provides }: PartConfig,
   props: Record<string, unknown>,
-  id: string,
+  id: string
 ) {
   const schema: Schema = key.slots[slot] ?? {}
-  const around = slot === "root" ? {} : (getContext<Around | undefined>(key) ?? {})
+  const around =
+    slot === "root" ? {} : (getContext<Around | undefined>(key) ?? {})
   for (const spec of Object.values(schema)) {
-    const from = typeof spec === "object" && spec.required && spec.from.split(".")[0]
-    if (from && !around[from])
-      throw new Error(`A ${primitive.name} ${slot} part must be used inside its ${from}.`)
+    const from =
+      typeof spec === "object" && spec.required && spec.from.split(".")[0]
+    if (from && !around[from]) {
+      throw new Error(
+        `A ${primitive.name} ${slot} part must be used inside its ${from}.`
+      )
+    }
   }
   const keyOf = Object.values(schema).some((spec) => kindOf(spec) === "key")
     ? (useHandle(primitive).api as ListApi).internal.keyOf
@@ -79,14 +94,21 @@ function slotPropsOf(
         const [from, prop = name] = spec.from.split(".")
         value = around[from]?.()[prop]
       }
-      if (value === undefined && kindOf(spec) === "id") value = name === "id" ? id : `${id}-${name}`
+      if (value === undefined && kindOf(spec) === "id") {
+        value = name === "id" ? id : `${id}-${name}`
+      }
       result[name] = value
-      if (keyOf && kindOf(spec) === "key") result.id ??= keyOf(value)
+      if (keyOf && kindOf(spec) === "key") {
+        result.id ??= keyOf(value)
+      }
     }
     return result
   }
-  if (provides) setContext<Around>(key, { ...around, [slot]: own })
-  else if (slot === "root") setContext<Around>(key, around)
+  if (provides) {
+    setContext<Around>(key, { ...around, [slot]: own })
+  } else if (slot === "root") {
+    setContext<Around>(key, around)
+  }
   return { props: own, schema }
 }
 
@@ -97,32 +119,47 @@ function slotPropsOf(
  * another. `usePrimitive` decides when the parent controls it.
  */
 function rootOptions(options: Schema, props: Record<string, any>, id: string) {
-  const bindable = Object.keys(options).filter((key) => options[changeOf(key)] === "callback")
+  const bindable = Object.keys(options).filter(
+    (key) => options[changeOf(key)] === "callback"
+  )
   // Values changed locally, with the parent's value each replaced, kept until
   // the parent passes another.
-  let local = $state.raw<Record<string, { value: unknown; parent: unknown }>>({})
+  let local = $state.raw<Record<string, { value: unknown; parent: unknown }>>(
+    {}
+  )
 
   const current = (key: string) => {
     const changed = local[key]
-    if (changed && sameValue(changed.parent, props[key])) return changed.value
+    if (changed && sameValue(changed.parent, props[key])) {
+      return changed.value
+    }
     // Deleted in place: this runs inside a `$derived`, where writing state throws.
     delete local[key]
     return props[key]
   }
 
   // One callback per bindable option for the root's life.
-  const changes = bindable.map((key) => (next: unknown, details: ChangeDetails<string>) => {
-    // The callback runs first, so canceling there also keeps a bound value as it was.
-    props[changeOf(key)]?.(next, details)
-    if (details.canceled) return
-    // A bound prop has a setter on the props object, which writes to the parent.
-    if (Object.getOwnPropertyDescriptor(props, key)?.set) props[key] = next
-    else local = { ...local, [key]: { value: next, parent: props[key] } }
-  })
+  const changes = bindable.map(
+    (key) => (next: unknown, details: ChangeDetails<string>) => {
+      // The callback runs first, so canceling there also keeps a bound value as it was.
+      props[changeOf(key)]?.(next, details)
+      if (details.canceled) {
+        return
+      }
+      // A bound prop has a setter on the props object, which writes to the parent.
+      if (Object.getOwnPropertyDescriptor(props, key)?.set) {
+        props[key] = next
+      } else {
+        local = { ...local, [key]: { value: next, parent: props[key] } }
+      }
+    }
+  )
 
   return () => {
     const result: Record<string, unknown> & { id: string } = { id }
-    for (const key in options) result[key] = props[key]
+    for (const key in options) {
+      result[key] = props[key]
+    }
     bindable.forEach((key, index) => {
       result[key] = current(key)
       result[changeOf(key)] = changes[index]

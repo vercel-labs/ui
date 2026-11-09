@@ -17,9 +17,12 @@ const ToolbarGroupKey = Symbol("toolbar-group")
  */
 function useToolbarScope() {
   const toolbar = getContext<ToolbarContext | undefined>(ToolbarKey)
-  const groupDisabled = getContext<(() => boolean) | undefined>(ToolbarGroupKey) ?? (() => false)
+  const groupDisabled =
+    getContext<(() => boolean) | undefined>(ToolbarGroupKey) ?? (() => false)
   return () => {
-    if (!toolbar) return undefined
+    if (!toolbar) {
+      return undefined
+    }
     const disabled = groupDisabled()
     return () => toolbar.api.internal.scopeIn(disabled)
   }

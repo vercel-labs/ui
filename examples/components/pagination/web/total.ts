@@ -59,7 +59,9 @@ function mount(root: HTMLElement) {
   }
   pagination.addEventListener("pagechange", (event) => {
     showing(event.detail.value)
-    if (event.detail.reason !== "imperative") log(root, `Page ${event.detail.value}`)
+    if (event.detail.reason !== "imperative") {
+      log(root, `Page ${event.detail.value}`)
+    }
   })
   select.addEventListener("change", () => {
     pagination.setAttribute("page-size", select.value)

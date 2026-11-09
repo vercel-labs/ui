@@ -1,5 +1,8 @@
 <script lang="ts">
-  import type { DialogTriggerProps, DialogTriggerState } from "@ui-sdk/core/dialog"
+  import type {
+    DialogTriggerProps,
+    DialogTriggerState,
+  } from "@ui-sdk/core/dialog"
   import Part from "../part.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import type { DrawerContext } from "./context"
@@ -12,13 +15,14 @@
     payload,
     shortcut,
     ...rest
-  }: PartProps<"button", DialogTriggerState> & DialogTriggerProps & { owner: DrawerContext } = $props()
+  }: PartProps<"button", DialogTriggerState> &
+    DialogTriggerProps & { owner: DrawerContext } = $props()
 
   const id = $props.id()
   const trigger = useHandlePart(
     () => owner.handle,
     "trigger",
-    () => ({ id, disabled, payload, shortcut }),
+    () => ({ id, disabled, payload, shortcut })
   )
 </script>
 

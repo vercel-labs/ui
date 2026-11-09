@@ -32,19 +32,46 @@ afterEach(() => {
 })
 
 const key = (key: string, init: KeyboardEventInit = {}) =>
-  new KeyboardEvent("keydown", { key, cancelable: true, bubbles: true, ...init })
+  new KeyboardEvent("keydown", {
+    key,
+    cancelable: true,
+    bubbles: true,
+    ...init,
+  })
 
 const pointer = (type: string, clientX: number, clientY: number) =>
-  new PointerEvent(type, { clientX, clientY, button: 0, isPrimary: true, bubbles: true, cancelable: true })
+  new PointerEvent(type, {
+    clientX,
+    clientY,
+    button: 0,
+    isPrimary: true,
+    bubbles: true,
+    cancelable: true,
+  })
 
 // Pointer moves land once a frame.
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 
 // An element at a fixed place, as jsdom has no layout.
-function rectBox(left: number, top: number, width: number, height: number, parent: Element = document.body) {
+function rectBox(
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  parent: Element = document.body
+) {
   const el = document.createElement("div")
   el.getBoundingClientRect = () =>
-    ({ left, top, width, height, right: left + width, bottom: top + height, x: left, y: top }) as DOMRect
+    ({
+      left,
+      top,
+      width,
+      height,
+      right: left + width,
+      bottom: top + height,
+      x: left,
+      y: top,
+    }) as DOMRect
   parent.append(el)
   return el
 }
@@ -60,7 +87,10 @@ function scroller(height: number, contentHeight: () => number) {
     scrollTop: {
       get: () => top,
       set: (value: number) => {
-        top = Math.max(0, Math.min(value, Math.max(0, contentHeight() - height)))
+        top = Math.max(
+          0,
+          Math.min(value, Math.max(0, contentHeight() - height))
+        )
       },
     },
   })
@@ -73,12 +103,18 @@ function scroller(height: number, contentHeight: () => number) {
 
 describe("createVirtualizer", () => {
   test("renders only the rows in view and the overscan, in a box as tall as every row", () => {
-    const rows = createVirtualizer({ count: () => 1000, estimate: () => 20, overscan: 2 })
+    const rows = createVirtualizer({
+      count: () => 1000,
+      estimate: () => 20,
+      overscan: 2,
+    })
     const el = scroller(100, () => rows.size())
     cleanups.push(rows.connect(el))
     expect(rows.size()).toBe(20000)
     // Five rows show, and two more past the bottom.
-    expect(rows.items().map((item) => item.index)).toEqual([0, 1, 2, 3, 4, 5, 6])
+    expect(rows.items().map((item) => item.index)).toEqual([
+      0, 1, 2, 3, 4, 5, 6,
+    ])
     el.scrollTop = 1000
     el.dispatchEvent(new Event("scroll"))
     const indexes = rows.items().map((item) => item.index)
@@ -103,7 +139,11 @@ describe("createVirtualizer", () => {
 
   test("a measured row moves every row after it, and keeps its size by key", () => {
     const keys = ["a", "b", "c", "d"]
-    const rows = createVirtualizer({ count: () => keys.length, estimate: () => 20, key: (i) => keys[i] })
+    const rows = createVirtualizer({
+      count: () => keys.length,
+      estimate: () => 20,
+      key: (i) => keys[i],
+    })
     const el = scroller(200, () => rows.size())
     cleanups.push(rows.connect(el))
     const row = document.createElement("div")
@@ -114,11 +154,19 @@ describe("createVirtualizer", () => {
     // "b" sorts first; its size goes with it.
     keys.reverse()
     rows.refresh()
-    expect(rows.items().find((item) => item.key === "b")).toMatchObject({ index: 2, size: 50 })
+    expect(rows.items().find((item) => item.key === "b")).toMatchObject({
+      index: 2,
+      size: 50,
+    })
   })
 
   test("keep renders a row out of view, and scrollToIndex brings one in", () => {
-    const rows = createVirtualizer({ count: () => 1000, estimate: () => 20, overscan: 0, keep: () => [500] })
+    const rows = createVirtualizer({
+      count: () => 1000,
+      estimate: () => 20,
+      overscan: 0,
+      keep: () => [500],
+    })
     const el = scroller(100, () => rows.size())
     cleanups.push(rows.connect(el))
     expect(rows.items().map((item) => item.index)).toContain(500)
@@ -129,7 +177,11 @@ describe("createVirtualizer", () => {
   })
 
   test("scrollToIndex puts a row below scrollMargin, as under a sticky header", () => {
-    const rows = createVirtualizer({ count: () => 1000, estimate: () => 20, scrollMargin: 40 })
+    const rows = createVirtualizer({
+      count: () => 1000,
+      estimate: () => 20,
+      scrollMargin: 40,
+    })
     const el = scroller(100, () => rows.size() + 40)
     cleanups.push(rows.connect(el))
     rows.scrollToIndex(10, { align: "start" })
@@ -144,7 +196,12 @@ describe("createVirtualizer", () => {
   test("onEnd asks for more once per count as the end comes near", async () => {
     let count = 30
     const onEnd = vi.fn(() => (count += 30))
-    const rows = createVirtualizer({ count: () => count, estimate: () => 20, onEnd, endThreshold: 5 })
+    const rows = createVirtualizer({
+      count: () => count,
+      estimate: () => 20,
+      onEnd,
+      endThreshold: 5,
+    })
     const el = scroller(100, () => rows.size())
     cleanups.push(rows.connect(el))
     el.scrollTop = 400
@@ -162,7 +219,9 @@ describe("createGridFocus", () => {
   const grid = definePrimitive({
     name: "grid",
     options: { disabled: "value" },
-    state: (_options: { disabled?: (cell: GridCell) => boolean }): GridState => ({ active: null }),
+    state: (_options: {
+      disabled?: (cell: GridCell) => boolean
+    }): GridState => ({ active: null }),
     api: (context) => {
       const reveal = vi.fn()
       const moves: { cell: GridCell; shift: boolean }[] = []
@@ -178,7 +237,9 @@ describe("createGridFocus", () => {
       return { focus, reveal, moves }
     },
     slots: (slot) => ({
-      cell: slot<{ row: number; col: number }>({ props: { row: "number", col: "number" } }),
+      cell: slot<{ row: number; col: number }>({
+        props: { row: "number", col: "number" },
+      }),
     }),
   })
 
@@ -203,14 +264,20 @@ describe("createGridFocus", () => {
   })
 
   test("before the grid is entered, the first cell that isn't disabled has the tab stop and keys start there", () => {
-    const instance = grid({ id: "g", disabled: (cell) => cell.row === 0 && cell.col === 0 })
+    const instance = grid({
+      id: "g",
+      disabled: (cell) => cell.row === 0 && cell.col === 0,
+    })
     cleanups.push(() => instance.destroy())
     const { focus } = instance.api
     expect(focus.tabIndex(instance.get(), { row: 0, col: 0 })).toBe("-1")
     expect(focus.tabIndex(instance.get(), { row: 0, col: 1 })).toBe("0")
     expect(focus.keydown(key("ArrowLeft"))).toBe(true)
     expect(instance.get().active).toEqual({ row: 0, col: 1 })
-    const fresh = grid({ id: "h", disabled: (cell) => cell.row === 0 && cell.col === 0 })
+    const fresh = grid({
+      id: "h",
+      disabled: (cell) => cell.row === 0 && cell.col === 0,
+    })
     cleanups.push(() => fresh.destroy())
     expect(fresh.api.focus.keydown(key("ArrowRight"))).toBe(true)
     expect(fresh.get().active).toEqual({ row: 0, col: 2 })
@@ -222,7 +289,10 @@ describe("createGridFocus", () => {
     const { focus } = instance.api
     expect(focus.tabIndex(instance.get(), { row: 0, col: 0 })).toBe("-1")
     expect(focus.tabIndex(instance.get(), { row: 1, col: 0 })).toBe("0")
-    instance.setOptions({ id: "g", disabled: (cell) => cell.row < 2 && cell.col < 3 })
+    instance.setOptions({
+      id: "g",
+      disabled: (cell) => cell.row < 2 && cell.col < 3,
+    })
     expect(focus.tabIndex(instance.get(), { row: 1, col: 0 })).toBe("-1")
     expect(focus.tabIndex(instance.get(), { row: 0, col: 3 })).toBe("0")
     expect(focus.keydown(key("ArrowDown"))).toBe(true)
@@ -234,9 +304,13 @@ describe("createGridFocus", () => {
     const instance = grid({ id: "g", disabled })
     cleanups.push(() => instance.destroy())
     const stops: string[] = []
-    for (let row = 0; row < 100; row++)
-      for (let col = 0; col < 4; col++)
-        if (instance.api.focus.tabIndex(instance.get(), { row, col }) === "0") stops.push(`${row}:${col}`)
+    for (let row = 0; row < 100; row++) {
+      for (let col = 0; col < 4; col++) {
+        if (instance.api.focus.tabIndex(instance.get(), { row, col }) === "0") {
+          stops.push(`${row}:${col}`)
+        }
+      }
+    }
     expect(stops).toEqual(["50:0"])
     expect(disabled.mock.calls.length).toBeLessThanOrEqual(400)
   })
@@ -279,14 +353,20 @@ describe("createInlineEdit", () => {
         key: "editing",
         value: (id) => context.store.get().values[id],
         commit: (id, text) => {
-          if (context.options().valid && !context.options().valid!(text)) return false
-          context.store.set({ values: { ...context.store.get().values, [id]: text } })
+          if (context.options().valid && !context.options().valid!(text)) {
+            return false
+          }
+          context.store.set({
+            values: { ...context.store.get().values, [id]: text },
+          })
           return true
         },
       })
       return { edit }
     },
-    slots: (slot) => ({ cell: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      cell: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
 
   function mount(options: { valid?: (text: string) => boolean } = {}) {
@@ -384,7 +464,7 @@ describe("createInlineEdit", () => {
       input.remove()
       await Promise.resolve()
       expect(document.activeElement).toBe(row)
-    },
+    }
   )
 
   test("focus moved on purpose stays put when the button that started editing left", async () => {
@@ -422,7 +502,11 @@ describe("createStickToBottom", () => {
     const log = createStickToBottom()
     cleanups.push(log.connect(el))
     log.release()
-    expect(log.get()).toMatchObject({ following: false, atBottom: true, unseen: false })
+    expect(log.get()).toMatchObject({
+      following: false,
+      atBottom: true,
+      unseen: false,
+    })
     content = 600
     el.append(document.createElement("p"))
     await Promise.resolve()
@@ -467,16 +551,24 @@ describe("createTransfer", () => {
         set,
         accepts: (_key, list) => {
           const limit = context.options().limit
-          return limit === undefined || context.store.get().lists[list].length < limit
+          return (
+            limit === undefined ||
+            context.store.get().lists[list].length < limit
+          )
         },
       })
       return { transfer, set }
     },
-    slots: (slot) => ({ card: slot<{ value: string }>({ props: { value: "string" } }) }),
+    slots: (slot) => ({
+      card: slot<{ value: string }>({ props: { value: "string" } }),
+    }),
   })
 
   test("Space picks up, arrows move within and across lists, Space drops in one change", () => {
-    const instance = board({ id: "k", lists: { todo: ["a", "b"], doing: ["c"], done: [] } })
+    const instance = board({
+      id: "k",
+      lists: { todo: ["a", "b"], doing: ["c"], done: [] },
+    })
     cleanups.push(() => instance.destroy())
     const { transfer, set } = instance.api
     transfer.keydown(key(" "), "a")
@@ -484,7 +576,11 @@ describe("createTransfer", () => {
     transfer.keydown(key("ArrowDown"), "a")
     expect(transfer.lists(instance.get()).todo).toEqual(["b", "a"])
     transfer.keydown(key("ArrowRight"), "a")
-    expect(transfer.lists(instance.get())).toEqual({ todo: ["b"], doing: ["c", "a"], done: [] })
+    expect(transfer.lists(instance.get())).toEqual({
+      todo: ["b"],
+      doing: ["c", "a"],
+      done: [],
+    })
     transfer.keydown(key("ArrowRight"), "a")
     expect(transfer.lists(instance.get()).done).toEqual(["a"])
     expect(set).not.toHaveBeenCalled()
@@ -497,11 +593,19 @@ describe("createTransfer", () => {
       index: 0,
       reason: "move-key",
     })
-    expect(instance.get().lists).toEqual({ todo: ["b"], doing: ["c"], done: ["a"] })
+    expect(instance.get().lists).toEqual({
+      todo: ["b"],
+      doing: ["c"],
+      done: ["a"],
+    })
   })
 
   test("Escape puts it back, and a full list is skipped", () => {
-    const instance = board({ id: "k", lists: { todo: ["a"], doing: ["c"], done: [] }, limit: 1 })
+    const instance = board({
+      id: "k",
+      lists: { todo: ["a"], doing: ["c"], done: [] },
+      limit: 1,
+    })
     cleanups.push(() => instance.destroy())
     const { transfer, set } = instance.api
     transfer.keydown(key("Enter"), "a")
@@ -524,7 +628,10 @@ describe("createTransfer", () => {
     expect(set).not.toHaveBeenCalled()
     transfer.grab("a")
     transfer.moveTo("done", 0)
-    instance.setOptions({ id: "k", lists: { todo: ["a", "b", "z"], done: ["c"] } })
+    instance.setOptions({
+      id: "k",
+      lists: { todo: ["a", "b", "z"], done: ["c"] },
+    })
     transfer.drop()
     expect(set.mock.calls[0][0]).toEqual({ todo: ["b", "z"], done: ["a", "c"] })
   })
@@ -542,12 +649,20 @@ describe("createTransfer", () => {
   })
 
   test("a list the owner fills mid-move ends the move into it", () => {
-    const instance = board({ id: "k", lists: { todo: ["a", "b"], done: [] }, limit: 1 })
+    const instance = board({
+      id: "k",
+      lists: { todo: ["a", "b"], done: [] },
+      limit: 1,
+    })
     cleanups.push(() => instance.destroy())
     const { transfer, set } = instance.api
     transfer.grab("a")
     transfer.moveTo("done", 0)
-    instance.setOptions({ id: "k", lists: { todo: ["a", "b"], done: ["c"] }, limit: 1 })
+    instance.setOptions({
+      id: "k",
+      lists: { todo: ["a", "b"], done: ["c"] },
+      limit: 1,
+    })
     expect(instance.get().moving).toBeNull()
     transfer.drop()
     expect(set).not.toHaveBeenCalled()
@@ -559,28 +674,45 @@ describe("createTransfer", () => {
     expect(instance.api.transfer.move("a", "done", 0)).toBe(true)
     expect(instance.get().lists).toEqual({ todo: [], done: ["a"] })
     expect(
-      transferMessage({ type: "drop", key: "a", label: "Write tests", list: "Done", position: 1, total: 3 }),
+      transferMessage({
+        type: "drop",
+        key: "a",
+        label: "Write tests",
+        list: "Done",
+        position: 1,
+        total: 3,
+      })
     ).toBe("Dropped Write tests in Done, position 1 of 3.")
   })
 
   test("a pointer drag shows a copy over the page, moves the item between lists, and drops once", async () => {
-    const instance = board({ id: "k", lists: { todo: ["a", "b"], doing: ["c"] } })
+    const instance = board({
+      id: "k",
+      lists: { todo: ["a", "b"], doing: ["c"] },
+    })
     cleanups.push(() => instance.destroy())
     const { transfer, set } = instance.api
     const todo = rectBox(0, 0, 100, 200)
     const doing = rectBox(120, 0, 100, 200)
-    cleanups.push(transfer.bindList(todo, "todo"), transfer.bindList(doing, "doing"))
+    cleanups.push(
+      transfer.bindList(todo, "todo"),
+      transfer.bindList(doing, "doing")
+    )
     const cards = {
       a: rectBox(0, 0, 100, 40, todo),
       b: rectBox(0, 50, 100, 40, todo),
       c: rectBox(120, 0, 100, 40, doing),
     }
     cards.a.id = "card-a"
-    for (const [value, el] of Object.entries(cards)) cleanups.push(transfer.bindItem(el, value))
+    for (const [value, el] of Object.entries(cards)) {
+      cleanups.push(transfer.bindItem(el, value))
+    }
 
     // Nothing under the pointer scrolls, as jsdom has no layout.
     document.elementsFromPoint = () => []
-    cleanups.push(() => delete (document as Partial<Document>).elementsFromPoint)
+    cleanups.push(
+      () => delete (document as Partial<Document>).elementsFromPoint
+    )
     transfer.pointerdown(pointer("pointerdown", 50, 20), "a")
     document.dispatchEvent(pointer("pointermove", 60, 20))
     await frame()
@@ -591,7 +723,10 @@ describe("createTransfer", () => {
     document.dispatchEvent(pointer("pointermove", 170, 60))
     await frame()
     expect(preview.style.translate).toBe("120px 40px")
-    expect(transfer.lists(instance.get())).toEqual({ todo: ["b"], doing: ["c", "a"] })
+    expect(transfer.lists(instance.get())).toEqual({
+      todo: ["b"],
+      doing: ["c", "a"],
+    })
     expect(set).not.toHaveBeenCalled()
 
     document.dispatchEvent(pointer("pointerup", 170, 60))
@@ -638,7 +773,8 @@ describe("bindDragPreview", () => {
 
   test("leaves a checked radio in the element checked, and shows it checked in the copy", () => {
     const el = rectBox(10, 20, 100, 40)
-    el.innerHTML = '<input type="radio" name="default" value="a" checked> Card A'
+    el.innerHTML =
+      '<input type="radio" name="default" value="a" checked> Card A'
     const other = rectBox(10, 60, 100, 40)
     other.innerHTML = '<input type="radio" name="default" value="b"> Card B'
     const radio = el.querySelector("input")!
@@ -653,12 +789,18 @@ describe("bindDragPreview", () => {
     const el = document.createElement("details")
     el.setAttribute("name", "faq")
     el.open = true
-    el.innerHTML = '<summary>Card A</summary><details name="more" open><summary>More</summary></details>'
+    el.innerHTML =
+      '<summary>Card A</summary><details name="more" open><summary>More</summary></details>'
     el.getBoundingClientRect = () => new DOMRect(10, 20, 100, 40)
     document.body.append(el)
     const preview = bindDragPreview(el, { x: 15, y: 25 })
-    const copies = [preview.el, ...preview.el.querySelectorAll("details")] as HTMLDetailsElement[]
-    expect(copies.map((copy) => [copy.getAttribute("name"), copy.open])).toEqual([
+    const copies = [
+      preview.el,
+      ...preview.el.querySelectorAll("details"),
+    ] as HTMLDetailsElement[]
+    expect(
+      copies.map((copy) => [copy.getAttribute("name"), copy.open])
+    ).toEqual([
       [null, true],
       [null, true],
     ])
@@ -669,7 +811,8 @@ describe("bindDragPreview", () => {
 
   test("takes a radio inside a label out of its group in the copy only", () => {
     const el = rectBox(10, 20, 100, 40)
-    el.innerHTML = '<label><input type="radio" name="default" value="a" checked> Card A</label>'
+    el.innerHTML =
+      '<label><input type="radio" name="default" value="a" checked> Card A</label>'
     const preview = bindDragPreview(el, { x: 15, y: 25 })
     expect(preview.el.querySelector("input")!.hasAttribute("name")).toBe(false)
     expect(el.querySelector("input")!.getAttribute("name")).toBe("default")
@@ -678,10 +821,15 @@ describe("bindDragPreview", () => {
 
   test("keeps other names in the copy, like an icon's", () => {
     const el = rectBox(10, 20, 100, 40)
-    el.innerHTML = '<ui-icon name="grip"></ui-icon><input name="title" value="Card A">'
+    el.innerHTML =
+      '<ui-icon name="grip"></ui-icon><input name="title" value="Card A">'
     const preview = bindDragPreview(el, { x: 15, y: 25 })
-    expect(preview.el.querySelector("ui-icon")!.getAttribute("name")).toBe("grip")
-    expect(preview.el.querySelector("input")!.getAttribute("name")).toBe("title")
+    expect(preview.el.querySelector("ui-icon")!.getAttribute("name")).toBe(
+      "grip"
+    )
+    expect(preview.el.querySelector("input")!.getAttribute("name")).toBe(
+      "title"
+    )
     preview.remove()
   })
 })
@@ -728,12 +876,13 @@ describe("createArea", () => {
     const instance = pad({ id: "p" })
     cleanups.push(() => instance.destroy())
     const surface = document.createElement("div")
-    surface.getBoundingClientRect = () => ({ left: 0, top: 0, width: 200, height: 100 }) as DOMRect
+    surface.getBoundingClientRect = () =>
+      ({ left: 0, top: 0, width: 200, height: 100 }) as DOMRect
     document.body.append(surface)
     cleanups.push(bind(instance.part("area", {}), surface))
     instance.api.area.pointerdown(
       new PointerEvent("pointerdown", { clientX: 50, clientY: 20, button: 0 }),
-      surface,
+      surface
     )
     expect(instance.get().value).toEqual({ x: 0.3, y: 0.8 })
     expect(instance.api.area.thumbAttrs(instance.get())).toMatchObject({
@@ -768,8 +917,18 @@ describe("createHistory", () => {
     expect(history.undo()).toEqual({ a: 2 })
     expect(history.redo()).toEqual({ a: 3 })
     expect(history.canRedo()).toBe(false)
-    expect(matchesShortcut(key("z", { metaKey: true }), "mod+z", true)).toBe(true)
-    expect(matchesShortcut(key("z", { ctrlKey: true }), "mod+z", false)).toBe(true)
-    expect(matchesShortcut(key("z", { ctrlKey: true, shiftKey: true }), "mod+z", false)).toBe(false)
+    expect(matchesShortcut(key("z", { metaKey: true }), "mod+z", true)).toBe(
+      true
+    )
+    expect(matchesShortcut(key("z", { ctrlKey: true }), "mod+z", false)).toBe(
+      true
+    )
+    expect(
+      matchesShortcut(
+        key("z", { ctrlKey: true, shiftKey: true }),
+        "mod+z",
+        false
+      )
+    ).toBe(false)
   })
 })

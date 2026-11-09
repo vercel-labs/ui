@@ -8,9 +8,14 @@ import { control } from "./field"
 function Textarea({
   className,
   ...props
-}: Omit<ComponentProps<typeof TextareaPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof TextareaPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
-    <TextareaPrimitive className={cn(control, "h-auto min-h-20 resize-none py-2", className)} {...props} />
+    <TextareaPrimitive
+      className={cn(control, "h-auto min-h-20 resize-none py-2", className)}
+      {...props}
+    />
   )
 }
 

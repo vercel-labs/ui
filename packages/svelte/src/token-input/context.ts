@@ -5,7 +5,9 @@ const TokenKey = Symbol("token-input-token")
 
 function useTokenId(part: string) {
   const id = getContext<string | undefined>(TokenKey)
-  if (!id) throw new Error(`<${part}> must be used inside the token snippet.`)
+  if (!id) {
+    throw new Error(`<${part}> must be used inside the token snippet.`)
+  }
   return id
 }
 

@@ -38,12 +38,18 @@ const timer = definePrimitive({
   slots: (slot) => ({
     root: slot({}),
     trigger: slot({
-      attrs: (state) => ({ type: "button", "aria-expanded": String(state.open) }),
+      attrs: (state) => ({
+        type: "button",
+        "aria-expanded": String(state.open),
+      }),
       press: ({ api }) => api.open(),
     }),
     panel: slot({
       present: (state) => state.open,
-      attrs: () => ({ role: "dialog", style: css({ inset: "auto", margin: "0" }) }),
+      attrs: () => ({
+        role: "dialog",
+        style: css({ inset: "auto", margin: "0" }),
+      }),
       bind: (el, { api }) => {
         const stopLayer = bindLayer(el, {
           topLayer: true,
@@ -52,7 +58,10 @@ const timer = definePrimitive({
           contains: (target) => !!api.trigger()?.contains(target),
           onDismiss: (reason) => api.close(reason),
         })
-        const stopPosition = position(api.trigger, el, { side: "bottom", align: "start" })
+        const stopPosition = position(api.trigger, el, {
+          side: "bottom",
+          align: "start",
+        })
         el.querySelector("button")?.focus({ preventScroll: true })
         return () => {
           stopPosition()
@@ -60,7 +69,10 @@ const timer = definePrimitive({
         }
       },
     }),
-    done: slot({ attrs: () => ({ type: "button" }), press: ({ api }) => api.close("done-press") }),
+    done: slot({
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.close("done-press"),
+    }),
     player: slot({ bind: (el) => bindPersistentLayer(el) }),
   }),
 })
@@ -92,12 +104,18 @@ function Example() {
     <Timer
       modal={modal}
       onClose={(reason: string) =>
-        log(isDismissal(reason) ? `Dismissed by ${reason}` : `Closed by ${reason}`)
+        log(
+          isDismissal(reason) ? `Dismissed by ${reason}` : `Closed by ${reason}`
+        )
       }
     >
       <div data-slot="controls">
         <label data-slot="label">
-          <input type="checkbox" checked={modal} onChange={(event) => setModal(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={modal}
+            onChange={(event) => setModal(event.target.checked)}
+          />
           Modal
         </label>
       </div>
@@ -115,7 +133,12 @@ function Example() {
       </TimerPanel>
       <TimerPlayer>
         {playing ? "Playing: Rain sounds" : "Paused"}
-        <button type="button" data-variant="ghost" data-size="sm" onClick={() => setPlaying(!playing)}>
+        <button
+          type="button"
+          data-variant="ghost"
+          data-size="sm"
+          onClick={() => setPlaying(!playing)}
+        >
           {playing ? "Pause" : "Play"}
         </button>
       </TimerPlayer>

@@ -14,8 +14,18 @@
 
   const settings = [
     { value: "profile", label: "Profile", icon: UserIcon, shortcut: "mod+p" },
-    { value: "billing", label: "Billing", icon: CreditCardIcon, shortcut: "mod+b" },
-    { value: "settings", label: "Settings", icon: SettingsIcon, shortcut: "mod+s" },
+    {
+      value: "billing",
+      label: "Billing",
+      icon: CreditCardIcon,
+      shortcut: "mod+b",
+    },
+    {
+      value: "settings",
+      label: "Settings",
+      icon: SettingsIcon,
+      shortcut: "mod+s",
+    },
   ]
 
   const log = useLog()

@@ -39,7 +39,13 @@ Give the tree an accessible name and every item a unique `value`. An item with a
 Import the parts and put them together:
 
 ```tsx
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/react/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/react/tree"
 
 function Example() {
   return (
@@ -288,25 +294,40 @@ Each part has a `data-slot`, such as `tree-label`, and its state attributes are 
 
 ### Tree
 
-<TypeTable path="../../packages/core/src/components/tree/tree.ts" name="TreeOptions" />
+<TypeTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeOptions"
+/>
 
 ### TreeItem
 
-<TypeTable path="../../packages/core/src/components/tree/tree.ts" name="TreeItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeItemProps"
+/>
 
 ### TreeGroup
 
-<TypeTable path="../../packages/core/src/components/tree/tree.ts" name="TreeGroupProps" />
+<TypeTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeGroupProps"
+/>
 
 ### Items as Data
 
 Each item in `items`:
 
-<TypeTable path="../../packages/core/src/components/tree/tree.ts" name="TreeItemData" />
+<TypeTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeItemData"
+/>
 
 Each row `visibleTreeRows(items, expanded)` returns, for a flat list:
 
-<TypeTable path="../../packages/core/src/components/tree/tree.ts" name="TreeRow" />
+<TypeTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeRow"
+/>
 
 ### State
 
@@ -314,35 +335,56 @@ What render functions, state-based class names and slots receive, per part.
 
 `Tree`:
 
-<StateTable path="../../packages/core/src/components/tree/tree.ts" name="TreeState" />
+<StateTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeState"
+/>
 
 `TreeItem`, and its `TreeItemLabel`, `TreeItemIndicator` and `TreeItemCheckbox`:
 
-<StateTable path="../../packages/core/src/components/tree/tree.ts" name="TreeItemState" />
+<StateTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeItemState"
+/>
 
 `TreeGroup`:
 
-<StateTable path="../../packages/core/src/components/tree/tree.ts" name="TreeGroupState" />
+<StateTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeGroupState"
+/>
 
 ### Reasons
 
 Why branches expanded or collapsed:
 
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeExpandedChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeExpandedChangeReason"
+/>
 
 Why the selection changed:
 
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeValueChangeReason"
+/>
 
 And why the checkboxes changed:
 
-<ReasonTable path="../../packages/core/src/components/tree/tree.ts" name="TreeCheckedChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeCheckedChangeReason"
+/>
 
 ### Controller
 
 Create one with `createTreeController()` and pass it as `controller`.
 
-<ControllerTable path="../../packages/core/src/components/tree/tree.ts" name="TreeController" />
+<ControllerTable
+  path="../../packages/core/src/components/tree/tree.ts"
+  name="TreeController"
+/>
 
 ## Accessibility
 

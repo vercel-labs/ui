@@ -3,11 +3,15 @@ import "@ui-sdk/web/field"
 import { Check, createElement, Eye, EyeOff, X } from "lucide"
 
 const rules = [
-  { label: "At least 8 characters", test: (password: string) => password.length >= 8 },
+  {
+    label: "At least 8 characters",
+    test: (password: string) => password.length >= 8,
+  },
   { label: "A number", test: (password: string) => /\d/.test(password) },
   {
     label: "An uppercase and a lowercase letter",
-    test: (password: string) => /[a-z]/.test(password) && /[A-Z]/.test(password),
+    test: (password: string) =>
+      /[a-z]/.test(password) && /[A-Z]/.test(password),
   },
 ]
 
@@ -34,20 +38,24 @@ function mount(root: HTMLElement) {
                 <span data-slot="visually-hidden" data-rule-status>To do:</span>
                 ${rule.label}
               </li>
-            `,
+            `
           )
           .join("")}
       </ul>
     </ui-field>
   `
   const items = root.querySelectorAll("li")
-  root.querySelector("ui-password-input")!.addEventListener("valuechange", (event) => {
-    rules.forEach((rule, index) => {
-      const met = rule.test(event.detail.value)
-      items[index].toggleAttribute("data-met", met)
-      items[index].querySelector("[data-rule-status]")!.textContent = met ? "Done:" : "To do:"
+  root
+    .querySelector("ui-password-input")!
+    .addEventListener("valuechange", (event) => {
+      rules.forEach((rule, index) => {
+        const met = rule.test(event.detail.value)
+        items[index].toggleAttribute("data-met", met)
+        items[index].querySelector("[data-rule-status]")!.textContent = met
+          ? "Done:"
+          : "To do:"
+      })
     })
-  })
 }
 
 export { mount }

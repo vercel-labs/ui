@@ -18,10 +18,12 @@ function mount(root: HTMLElement) {
       </ui-otp-input>
     </ui-field>
   `
-  root.querySelector("ui-otp-input")!.addEventListener("valuecommit", (event) => {
-    const { value, reason } = event.detail
-    log(root, `Checking ${value} (${reason})`)
-  })
+  root
+    .querySelector("ui-otp-input")!
+    .addEventListener("valuecommit", (event) => {
+      const { value, reason } = event.detail
+      log(root, `Checking ${value} (${reason})`)
+    })
 }
 
 export { mount }

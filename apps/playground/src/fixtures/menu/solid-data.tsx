@@ -13,14 +13,21 @@ function Fixture() {
   return (
     <div class="fixture">
       <button>Before</button>
-      <Menu items={menuData} onAction={setAction} controller={controller} {...options}>
+      <Menu
+        items={menuData}
+        onAction={setAction}
+        controller={controller}
+        {...options}
+      >
         <MenuTrigger>File</MenuTrigger>
       </Menu>
       <button>After</button>
       <output role="status" aria-label="Last action">
         {action()}
       </output>
-      <button onClick={() => controller.open({ focus: "first" })}>Open with controller</button>
+      <button onClick={() => controller.open({ focus: "first" })}>
+        Open with controller
+      </button>
     </div>
   )
 }

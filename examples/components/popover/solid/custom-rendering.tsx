@@ -21,9 +21,15 @@ function Example() {
         )}
       />
       <PopoverContent>
-        <PopoverTitle render={(props) => <h3 {...props} />}>Updates</PopoverTitle>
-        <PopoverDescription>Version 2.4 adds threaded comments.</PopoverDescription>
-        <PopoverClose render={(props) => <a {...props} href="#" />}>Read the Changelog</PopoverClose>
+        <PopoverTitle render={(props) => <h3 {...props} />}>
+          Updates
+        </PopoverTitle>
+        <PopoverDescription>
+          Version 2.4 adds threaded comments.
+        </PopoverDescription>
+        <PopoverClose render={(props) => <a {...props} href="#" />}>
+          Read the Changelog
+        </PopoverClose>
       </PopoverContent>
     </Popover>
   )

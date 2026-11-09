@@ -1,4 +1,7 @@
-import { segmentedControl, type SegmentedControlApi } from "@ui-sdk/core/segmented-control"
+import {
+  segmentedControl,
+  type SegmentedControlApi,
+} from "@ui-sdk/core/segmented-control"
 import { createParts } from "./define-element"
 
 // <ui-segmented-control> takes part in forms like native radios that share a
@@ -13,7 +16,8 @@ function defineSegmentedControlElements() {
       state: {
         value: {
           get: (api: SegmentedControlApi) => api.getValue(),
-          set: (api: SegmentedControlApi, value: string | null) => api.setValue(value),
+          set: (api: SegmentedControlApi, value: string | null) =>
+            api.setValue(value),
         },
       },
       api: ["getValue", "setValue", "focus"],

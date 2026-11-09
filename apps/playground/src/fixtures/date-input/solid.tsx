@@ -3,7 +3,11 @@ import { Field, FieldError, FieldLabel } from "@ui-sdk/solid/field"
 import { TimeInput } from "@ui-sdk/solid/time-input"
 import { render } from "@solidjs/web"
 import { createSignal } from "solid-js"
-import { dateInputAction, dateInputFixture as f, dateInputOptions } from "tests/fixtures/date-input.ts"
+import {
+  dateInputAction,
+  dateInputFixture as f,
+  dateInputOptions,
+} from "tests/fixtures/date-input.ts"
 
 const controller = createDateInputController()
 
@@ -29,7 +33,9 @@ function Fixture() {
             {...date}
             {...shared}
             onValueChange={(value, details) => {
-              if (cancel && value === cancel) return details.cancel()
+              if (cancel && value === cancel) {
+                return details.cancel()
+              }
               setAction(dateInputAction.change("date", value, details.reason))
             }}
           />

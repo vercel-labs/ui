@@ -1,4 +1,10 @@
-import { Tabs, TabsList, TabsPanel, TabsTab, TabsTabIcon } from "@ui-sdk/solid/tabs"
+import {
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+  TabsTabIcon,
+} from "@ui-sdk/solid/tabs"
 
 function Example() {
   return (
@@ -57,9 +63,15 @@ function Example() {
           Archive
         </TabsTab>
       </TabsList>
-      <TabsPanel value="inbox">3 new messages from Inès Moreau and Kofi Mensah.</TabsPanel>
-      <TabsPanel value="replies">Wren Takahashi replied to your message about the launch.</TabsPanel>
-      <TabsPanel value="archive">Messages you archived stay here and in search.</TabsPanel>
+      <TabsPanel value="inbox">
+        3 new messages from Inès Moreau and Kofi Mensah.
+      </TabsPanel>
+      <TabsPanel value="replies">
+        Wren Takahashi replied to your message about the launch.
+      </TabsPanel>
+      <TabsPanel value="archive">
+        Messages you archived stay here and in search.
+      </TabsPanel>
     </Tabs>
   )
 }

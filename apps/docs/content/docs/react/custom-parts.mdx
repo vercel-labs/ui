@@ -21,7 +21,8 @@ function RatingRoot({
   defaultValue,
   onValueChange,
   ...props
-}: RatingOptions & Omit<PartProps<"div", StateOf<typeof rating, "root">>, "defaultValue">) {
+}: RatingOptions &
+  Omit<PartProps<"div", StateOf<typeof rating, "root">>, "defaultValue">) {
   const handle = usePrimitive(rating, { value, defaultValue, onValueChange })
   return usePart(handle, "root", {}, props, "div")
 }
@@ -45,9 +46,18 @@ This `RatingStar` works inside the manual root above or the generated `RatingRoo
 import { usePart, type PartProps } from "@ui-sdk/react/primitive"
 import { rating } from "./rating"
 
-function RatingStar({ value, ...props }: { value: string } & Omit<PartProps<"button">, "value">) {
+function RatingStar({
+  value,
+  ...props
+}: { value: string } & Omit<PartProps<"button">, "value">) {
   const label = `${value} ${value === "1" ? "star" : "stars"}`
-  return usePart(rating, "star", { value }, { "aria-label": label, ...props }, "button")
+  return usePart(
+    rating,
+    "star",
+    { value },
+    { "aria-label": label, ...props },
+    "button"
+  )
 }
 
 export { RatingStar }
@@ -64,12 +74,17 @@ Use `mergeProps` when your part adds props that need to combine with the caller'
 ```tsx
 "use client"
 
-import { mergeProps, renderElement, type PartProps } from "@ui-sdk/react/primitive"
+import {
+  mergeProps,
+  renderElement,
+  type PartProps,
+} from "@ui-sdk/react/primitive"
 import type { FocusEvent } from "react"
 
 function SelectOnFocusInput({ render, ...props }: PartProps<"input">) {
   const own = {
-    onFocus: (event: FocusEvent<HTMLInputElement>) => event.currentTarget.select(),
+    onFocus: (event: FocusEvent<HTMLInputElement>) =>
+      event.currentTarget.select(),
   }
   return renderElement("input", mergeProps(own, props), render)
 }

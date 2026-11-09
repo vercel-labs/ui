@@ -169,7 +169,9 @@ A server can't read `localStorage`, so it renders each panel's `default-size` an
 import { resizableStorageKey } from "@ui-sdk/core/resizable"
 
 function editor(cookie: string | null) {
-  const value = cookie?.match(new RegExp(`(?:^|; )${resizableStorageKey("editor")}=([^;]*)`))?.[1]
+  const value = cookie?.match(
+    new RegExp(`(?:^|; )${resizableStorageKey("editor")}=([^;]*)`)
+  )?.[1]
   const saved = value ? JSON.parse(decodeURIComponent(value)) : {}
   const [sidebar = 25, main = 75] = saved["sidebar,main"] ?? []
   return `<ui-resizable auto-save-id="editor">
@@ -186,7 +188,9 @@ import type { ResizableStorage } from "@ui-sdk/web"
 
 const cookieStorage: ResizableStorage = {
   getItem: (key) => {
-    const value = document.cookie.match(new RegExp(`(?:^|; )${key}=([^;]*)`))?.[1]
+    const value = document.cookie.match(
+      new RegExp(`(?:^|; )${key}=([^;]*)`)
+    )?.[1]
     return value === undefined ? null : decodeURIComponent(value)
   },
   setItem: (key, value) => {
@@ -265,29 +269,47 @@ Props are attributes in kebab case, like `default-size` and `auto-save-id`. A la
 
 ### Resizable
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableOptions" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableOptions"
+/>
 
 ### ResizablePanel
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelProps"
+/>
 
 ### ResizableHandle
 
-<TypeTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleProps" />
+<TypeTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleProps"
+/>
 
 ### State
 
 The same state shows as data attributes on each element.
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableState"
+/>
 
 Panels:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizablePanelState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizablePanelState"
+/>
 
 Handles:
 
-<StateTable path="../../packages/core/src/components/resizable/resizable.ts" name="ResizableHandleState" />
+<StateTable
+  path="../../packages/core/src/components/resizable/resizable.ts"
+  name="ResizableHandleState"
+/>
 
 ### Reasons
 

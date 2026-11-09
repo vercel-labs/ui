@@ -7,7 +7,8 @@ const list =
   "m-0 flex list-none items-center gap-1 p-0 data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch"
 const trigger =
   "group inline-flex h-8 items-center gap-1 rounded-md px-2.5 text-[13px] font-medium text-neutral-700 outline-none hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400 disabled:opacity-40 disabled:hover:bg-transparent data-open:bg-neutral-100 data-open:text-neutral-950"
-const chevron = "size-3 text-neutral-400 transition-transform duration-150 group-data-open:rotate-180"
+const chevron =
+  "size-3 text-neutral-400 transition-transform duration-150 group-data-open:rotate-180"
 const topLink =
   "inline-flex h-8 items-center rounded-md px-2.5 text-[13px] font-medium text-neutral-700 outline-none hover:bg-neutral-100 focus-visible:ring-2 focus-visible:ring-neutral-400 data-current:text-neutral-950"
 
@@ -70,9 +71,13 @@ function content(variant: Variant, item: string, grown = false) {
   const vertical = variant.options?.orientation === "vertical"
   const axis = vertical ? "y" : variant.place === "rtl" ? "x-rtl" : "x"
   const width = widths[grown ? "grown" : item]
-  const long = variant.body === "long" && item === "products" ? "max-h-72 overflow-y-auto" : ""
-  if (variant.viewport === false)
+  const long =
+    variant.body === "long" && item === "products"
+      ? "max-h-72 overflow-y-auto"
+      : ""
+  if (variant.viewport === false) {
     return `${popupBase} ${width} p-3 ${animation === "none" ? "" : `${popupAnimation} ${contentDurations[animation]}`}`
+  }
   const motion =
     animation === "none"
       ? ""

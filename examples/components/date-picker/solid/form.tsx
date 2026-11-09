@@ -12,7 +12,12 @@ import {
   DatePickerInput,
   DatePickerTrigger,
 } from "@ui-sdk/solid/date-picker"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {
@@ -78,8 +83,12 @@ function Example() {
               </CalendarNext>
             </div>
             <CalendarGrid>
-              <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-              <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+              <CalendarWeekdays>
+                {(index) => <CalendarWeekday index={index} />}
+              </CalendarWeekdays>
+              <CalendarWeeks>
+                {(cell) => <CalendarDay value={cell.date} />}
+              </CalendarWeeks>
             </CalendarGrid>
           </DatePickerContent>
         </DatePicker>

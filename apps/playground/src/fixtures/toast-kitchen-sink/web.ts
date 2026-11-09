@@ -17,7 +17,9 @@ async function mount(root: HTMLElement) {
       </template>
     </ui-toast-region>
   `
-  const region = shell.slot.querySelector("ui-toast-region") as HTMLElement & { toaster?: unknown }
+  const region = shell.slot.querySelector("ui-toast-region") as HTMLElement & {
+    toaster?: unknown
+  }
   region.toaster = shell.toast
   const apply = () => {
     const options = shell.options()

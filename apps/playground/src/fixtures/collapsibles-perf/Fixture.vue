@@ -12,7 +12,9 @@ const found = new URLSearchParams(location.search).has("found")
   <div class="fixture" style="flex-direction: column; align-items: start">
     <button>Before</button>
     <Collapsible v-for="index in items" :key="index" class="collapsible-row">
-      <CollapsibleTrigger class="collapsible-trigger">Folder {{ index + 1 }}</CollapsibleTrigger>
+      <CollapsibleTrigger class="collapsible-trigger"
+        >Folder {{ index + 1 }}</CollapsibleTrigger
+      >
       <CollapsiblePanel class="collapsible-panel" :hidden-until-found="found"
         >Files {{ index + 1 }}</CollapsiblePanel
       >

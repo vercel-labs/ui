@@ -1,6 +1,12 @@
 "use client"
 
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/react/popover"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/react/popover"
 import { cn } from "cn"
 import { MessageSquare, Trash2, X } from "lucide-react"
 import { useEffect, useRef, useState, useTransition } from "react"
@@ -8,7 +14,12 @@ import { addComment, removeComment } from "@/app/actions"
 import type { Comment } from "@/lib/comments"
 import type { Framework } from "@/lib/frameworks"
 
-type Spot = { file: string; line: number; endLine?: number | null; quote?: string | null }
+type Spot = {
+  file: string
+  line: number
+  endLine?: number | null
+  quote?: string | null
+}
 
 const authorKey = "review-author"
 
@@ -40,15 +51,25 @@ const quoteClass =
   "max-h-24 overflow-hidden rounded-md bg-muted px-2 py-1 font-mono text-[11px] leading-relaxed whitespace-pre-wrap text-muted-foreground"
 
 function lines(comment: { line: number | null; endLine?: number | null }) {
-  if (!comment.line) return ""
-  return comment.endLine ? `:${comment.line}–${comment.endLine}` : `:${comment.line}`
+  if (!comment.line) {
+    return ""
+  }
+  return comment.endLine
+    ? `:${comment.line}–${comment.endLine}`
+    : `:${comment.line}`
 }
 
 function ago(date: string) {
   const minutes = Math.round((Date.now() - new Date(date).getTime()) / 60000)
-  if (minutes < 1) return "just now"
-  if (minutes < 60) return `${minutes}m ago`
-  if (minutes < 60 * 24) return `${Math.round(minutes / 60)}h ago`
+  if (minutes < 1) {
+    return "just now"
+  }
+  if (minutes < 60) {
+    return `${minutes}m ago`
+  }
+  if (minutes < 60 * 24) {
+    return `${Math.round(minutes / 60)}h ago`
+  }
   return `${Math.round(minutes / 60 / 24)}d ago`
 }
 
@@ -93,19 +114,26 @@ function Thread({ comments }: { comments: Comment[] }) {
           {error}
         </p>
       )}
-      <ul aria-label="Comments here" className="flex max-h-64 flex-col overflow-auto border-b border-border">
+      <ul
+        aria-label="Comments here"
+        className="flex max-h-64 flex-col overflow-auto border-b border-border"
+      >
         {comments.map((comment) => (
           <li key={comment.id} className="group flex gap-2 px-3 py-2.5">
             <Avatar name={comment.author} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 text-[11px]">
                 <span className="font-medium">{comment.author}</span>
-                <span className="text-muted-foreground">{ago(comment.createdAt)}</span>
+                <span className="text-muted-foreground">
+                  {ago(comment.createdAt)}
+                </span>
                 <button
                   type="button"
                   aria-label="Delete comment"
                   onClick={() =>
-                    startTransition(async () => setError((await removeComment(comment.id)).error))
+                    startTransition(async () =>
+                      setError((await removeComment(comment.id)).error)
+                    )
                   }
                   className="ms-auto flex size-5 items-center justify-center rounded text-muted-foreground opacity-0 group-hover:opacity-100 hover:bg-muted hover:text-foreground focus-visible:opacity-100"
                 >
@@ -139,11 +167,15 @@ function CommentCard({
   const [error, setError] = useState<string | null>(null)
   const { author, asking, setAsking, change } = useAuthor()
   const authorInput = useRef<HTMLInputElement>(null)
-  const thread = spot ? comments.filter((comment) => sameRange(comment, spot)) : []
+  const thread = spot
+    ? comments.filter((comment) => sameRange(comment, spot))
+    : []
   const quote = spot?.quote ?? thread.find((comment) => comment.quote)?.quote
 
   const save = () => {
-    if (!spot || !body.trim()) return
+    if (!spot || !body.trim()) {
+      return
+    }
     if (!author.trim()) {
       authorInput.current?.focus()
       return
@@ -161,14 +193,19 @@ function CommentCard({
         body,
       })
       setError(result.error)
-      if (result.error) return
+      if (result.error) {
+        return
+      }
       setBody("")
       setAsking(false)
     })
   }
 
   return (
-    <Popover open={spot !== null && anchor !== null} onOpenChange={(open) => !open && onClose()}>
+    <Popover
+      open={spot !== null && anchor !== null}
+      onOpenChange={(open) => !open && onClose()}
+    >
       <PopoverContent
         anchor={anchor}
         side="bottom"
@@ -228,7 +265,8 @@ function CommentCard({
             ) : (
               author && (
                 <span className="min-w-0 truncate text-[11px] text-muted-foreground">
-                  as <span className="font-medium text-foreground">{author}</span>
+                  as{" "}
+                  <span className="font-medium text-foreground">{author}</span>
                   {" · "}
                   <button
                     type="button"
@@ -243,7 +281,9 @@ function CommentCard({
                 </span>
               )
             )}
-            <span className="ms-auto text-[11px] text-muted-foreground">⌘↩</span>
+            <span className="ms-auto text-[11px] text-muted-foreground">
+              ⌘↩
+            </span>
             <button
               type="submit"
               disabled={pending || !body.trim() || !author.trim()}
@@ -277,15 +317,25 @@ function CommentPins({
   onPick: (spot: Spot) => void
 }) {
   const [pins, setPins] = useState<
-    { key: string; spot: Spot; top: number; height: number; thread: Comment[] }[]
+    {
+      key: string
+      spot: Spot
+      top: number
+      height: number
+      thread: Comment[]
+    }[]
   >([])
 
   useEffect(() => {
-    if (!code) return
+    if (!code) {
+      return
+    }
     const measure = () => {
       const byRange = new Map<string, { spot: Spot; thread: Comment[] }>()
       for (const comment of comments) {
-        if (comment.file !== file || !comment.line) continue
+        if (comment.file !== file || !comment.line) {
+          continue
+        }
         const key = `${comment.line}-${lastLine(comment)}`
         const group = byRange.get(key) ?? {
           spot: { file, line: comment.line, endLine: comment.endLine ?? null },
@@ -298,9 +348,17 @@ function CommentPins({
       const next = []
       for (const [key, { spot, thread }] of byRange) {
         const row = code.querySelector(`[data-line="${lastLine(spot)}"]`)
-        if (!row) continue
+        if (!row) {
+          continue
+        }
         const rect = row.getBoundingClientRect()
-        next.push({ key, spot, top: rect.top - box.top + code.scrollTop, height: rect.height, thread })
+        next.push({
+          key,
+          spot,
+          top: rect.top - box.top + code.scrollTop,
+          height: rect.height,
+          thread,
+        })
       }
       setPins(next)
     }
@@ -320,13 +378,21 @@ function CommentPins({
       className="absolute start-1 z-10 flex items-center"
     >
       <span className="flex h-4 min-w-4 items-center justify-center rounded-full rounded-bl-none bg-blue-500 px-1 text-[9px] leading-none font-semibold text-white shadow-sm ring-2 ring-background">
-        {pin.thread.length > 1 ? pin.thread.length : initials(pin.thread[0]?.author ?? "") || "?"}
+        {pin.thread.length > 1
+          ? pin.thread.length
+          : initials(pin.thread[0]?.author ?? "") || "?"}
       </span>
     </button>
   ))
 }
 
-function CommentsMenu({ comments, onPick }: { comments: Comment[]; onPick: (spot: Spot) => void }) {
+function CommentsMenu({
+  comments,
+  onPick,
+}: {
+  comments: Comment[]
+  onPick: (spot: Spot) => void
+}) {
   return (
     <Popover>
       <PopoverTrigger className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-xs text-muted-foreground hover:bg-muted hover:text-foreground data-open:bg-muted data-open:text-foreground">
@@ -334,8 +400,14 @@ function CommentsMenu({ comments, onPick }: { comments: Comment[]; onPick: (spot
         {comments.length}
         <span className="sr-only">comments</span>
       </PopoverTrigger>
-      <PopoverContent align="end" sideOffset={4} className={cn(card, "max-h-96 w-80 overflow-auto")}>
-        <PopoverTitle className="border-b border-border px-3 py-2 text-xs font-medium">Comments</PopoverTitle>
+      <PopoverContent
+        align="end"
+        sideOffset={4}
+        className={cn(card, "max-h-96 w-80 overflow-auto")}
+      >
+        <PopoverTitle className="border-b border-border px-3 py-2 text-xs font-medium">
+          Comments
+        </PopoverTitle>
         {comments.length === 0 ? (
           <p className="px-3 py-3 text-[13px] text-muted-foreground">
             No comments yet. Highlight code or click a line number to add one.
@@ -346,14 +418,20 @@ function CommentsMenu({ comments, onPick }: { comments: Comment[]; onPick: (spot
               <li key={comment.id}>
                 <PopoverClose
                   onClick={() =>
-                    onPick({ file: comment.file, line: comment.line ?? 1, endLine: comment.endLine ?? null })
+                    onPick({
+                      file: comment.file,
+                      line: comment.line ?? 1,
+                      endLine: comment.endLine ?? null,
+                    })
                   }
                   className="flex w-full gap-2 px-3 py-2 text-start hover:bg-muted"
                 >
                   <Avatar name={comment.author} />
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-[11px] text-muted-foreground">
-                      <span className="font-medium text-foreground">{comment.author}</span>
+                      <span className="font-medium text-foreground">
+                        {comment.author}
+                      </span>
                       <span className="font-mono">
                         {" · "}
                         {comment.file.split("/").pop()}
@@ -361,11 +439,18 @@ function CommentsMenu({ comments, onPick }: { comments: Comment[]; onPick: (spot
                       </span>
                     </span>
                     {comment.quote && (
-                      <span className={cn(quoteClass, "my-1 line-clamp-2 block max-h-none")}>
+                      <span
+                        className={cn(
+                          quoteClass,
+                          "my-1 line-clamp-2 block max-h-none"
+                        )}
+                      >
                         {comment.quote}
                       </span>
                     )}
-                    <span className="line-clamp-2 block text-[13px]">{comment.body}</span>
+                    <span className="line-clamp-2 block text-[13px]">
+                      {comment.body}
+                    </span>
                   </span>
                 </PopoverClose>
               </li>

@@ -1,11 +1,18 @@
-import { toolbarFixture as f, toolbarLocked, toolbarOptions } from "tests/fixtures/toolbar.ts"
+import {
+  toolbarFixture as f,
+  toolbarLocked,
+  toolbarOptions,
+} from "tests/fixtures/toolbar.ts"
 
-const group = ({ label, defaultValue, items }: typeof f.style, multiple: boolean) => `
+const group = (
+  { label, defaultValue, items }: typeof f.style,
+  multiple: boolean
+) => `
   <ui-toggle-group class="toggle-group" aria-label="${label}" ${multiple ? "multiple" : ""} default-value="${defaultValue.join(",")}">
     ${items
       .map(
         (item) =>
-          `<ui-toggle value="${item.value}" ${"disabled" in item && item.disabled ? "disabled" : ""}><button class="toggle">${item.label}</button></ui-toggle>`,
+          `<ui-toggle value="${item.value}" ${"disabled" in item && item.disabled ? "disabled" : ""}><button class="toggle">${item.label}</button></ui-toggle>`
       )
       .join("")}
   </ui-toggle-group>
@@ -37,7 +44,7 @@ const markup = () => `
         ${f.history.items
           .map(
             (item) =>
-              `<ui-toolbar-button ${"disabled" in item && item.disabled ? "disabled" : ""}><button data-action="${item.label.toLowerCase()}">${item.label}</button></ui-toolbar-button>`,
+              `<ui-toolbar-button ${"disabled" in item && item.disabled ? "disabled" : ""}><button data-action="${item.label.toLowerCase()}">${item.label}</button></ui-toolbar-button>`
           )
           .join("")}
       </ui-toolbar-group>
@@ -55,42 +62,60 @@ async function mount(root: HTMLElement) {
   root.innerHTML = markup()
   const toolbar = root.querySelector("ui-toolbar")!
   const options = toolbarOptions()
-  if (options.orientation) toolbar.setAttribute("orientation", options.orientation)
-  if (options.loop === false) toolbar.setAttribute("loop", "false")
-  if (options.disabled) toolbar.setAttribute("disabled", "")
+  if (options.orientation) {
+    toolbar.setAttribute("orientation", options.orientation)
+  }
+  if (options.loop === false) {
+    toolbar.setAttribute("loop", "false")
+  }
+  if (options.disabled) {
+    toolbar.setAttribute("disabled", "")
+  }
   await import("@ui-sdk/web/toolbar")
   await import("@ui-sdk/web/toggle")
   await import("@ui-sdk/web/menu")
   await import("@ui-sdk/web/number-input")
   const output = root.querySelector("output")!
-  root.querySelector("#focus")!.addEventListener("click", () => toolbar.api.focus())
+  root
+    .querySelector("#focus")!
+    .addEventListener("click", () => toolbar.api.focus())
   root.querySelector("#unlock")!.addEventListener("click", () => {
-    for (const group of root.querySelectorAll(".locked")) group.removeAttribute("disabled")
+    for (const group of root.querySelectorAll(".locked")) {
+      group.removeAttribute("disabled")
+    }
   })
   root.addEventListener(
     "valuechange",
     (event) => {
       const target = event.target as HTMLElement
       const value = (event as CustomEvent<{ value: unknown }>).detail.value
-      if (target.id === "size") output.textContent = `size: ${value}`
-      else if (Array.isArray(value))
+      if (target.id === "size") {
+        output.textContent = `size: ${value}`
+      } else if (Array.isArray(value)) {
         output.textContent = `${target.getAttribute("aria-label")}: ${value.join(", ") || "none"}`
+      }
     },
-    { capture: true },
+    { capture: true }
   )
-  root.querySelector("#spellcheck")!.addEventListener("pressedchange", (event) => {
-    output.textContent = `spellcheck: ${(event as CustomEvent<{ value: boolean }>).detail.value ? "on" : "off"}`
-  })
+  root
+    .querySelector("#spellcheck")!
+    .addEventListener("pressedchange", (event) => {
+      output.textContent = `spellcheck: ${(event as CustomEvent<{ value: boolean }>).detail.value ? "on" : "off"}`
+    })
   root.addEventListener(
     "action",
     (event) => {
       output.textContent = `font: ${(event as CustomEvent<{ value: string }>).detail.value}`
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener("click", (event) => {
-    const action = (event.target as HTMLElement).closest("[data-action]")?.getAttribute("data-action")
-    if (action) output.textContent = action
+    const action = (event.target as HTMLElement)
+      .closest("[data-action]")
+      ?.getAttribute("data-action")
+    if (action) {
+      output.textContent = action
+    }
   })
 }
 

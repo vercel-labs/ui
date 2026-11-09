@@ -57,7 +57,7 @@ Any component with a collection, a popup or a drag gets perf scenarios before it
    const budget = budgets["select.arrow-key"]
    expect(
      result.counts.compareDocumentPosition ?? 0,
-     "See tests/perf/README.md#select-arrow-key.",
+     "See tests/perf/README.md#select-arrow-key."
    ).toBeLessThanOrEqual(budget.counts.compareDocumentPosition)
    ```
 

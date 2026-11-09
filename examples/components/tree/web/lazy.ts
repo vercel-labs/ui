@@ -1,5 +1,11 @@
 import "@ui-sdk/web/tree"
-import { ChevronRight, createElement, LoaderCircle, RotateCw, type IconNode } from "lucide"
+import {
+  ChevronRight,
+  createElement,
+  LoaderCircle,
+  RotateCw,
+  type IconNode,
+} from "lucide"
 
 type Node = { value: string; label: string; branch?: boolean }
 
@@ -13,7 +19,10 @@ let archiveAsked = false
 async function fetchChildren(value: string, signal: AbortSignal) {
   await new Promise((resolve, reject) => {
     const timer = setTimeout(resolve, 800)
-    signal.addEventListener("abort", () => (clearTimeout(timer), reject(signal.reason)))
+    signal.addEventListener(
+      "abort",
+      () => (clearTimeout(timer), reject(signal.reason))
+    )
   })
   if (value === "archive" && !archiveAsked) {
     archiveAsked = true
@@ -45,7 +54,7 @@ const markup = (items: Node[]) =>
             }
             ${item.label}
           </ui-tree-item-label>
-        </ui-tree-item>`,
+        </ui-tree-item>`
     )
     .join("")
 
@@ -60,7 +69,10 @@ function mount(root: HTMLElement) {
     const children = await fetchChildren(value, signal)
     tree
       .querySelector(`ui-tree-item[value="${value}"]`)!
-      .insertAdjacentHTML("beforeend", `<ui-tree-group>${markup(children)}</ui-tree-group>`)
+      .insertAdjacentHTML(
+        "beforeend",
+        `<ui-tree-group>${markup(children)}</ui-tree-group>`
+      )
   }
   tree.announcement = ({ type, label }) =>
     ({

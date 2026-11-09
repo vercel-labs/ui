@@ -1,6 +1,10 @@
 <script lang="ts">
   import { FileIcon } from "@lucide/svelte"
-  import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
 
   const files = [
     "Quarterly report, final revised version for the board.pdf",

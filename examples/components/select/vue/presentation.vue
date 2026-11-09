@@ -28,7 +28,11 @@ const statuses = [
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem v-for="status in statuses" :key="status.value" :value="status.value">
+        <SelectItem
+          v-for="status in statuses"
+          :key="status.value"
+          :value="status.value"
+        >
           {{ status.label }}
           <SelectItemIndicator>
             <CheckIcon />

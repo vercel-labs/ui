@@ -6,7 +6,12 @@ import {
 import { defineComponent, provide, type PropType } from "vue"
 import { withElement } from "./create-parts"
 import { MenubarKey } from "./menubar-context"
-import { optionalBoolean, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 
 /**
  * A row of menus, like a desktop app's: one tab stop, arrow keys between the
@@ -22,7 +27,10 @@ const Menubar = withElement(
       orientation: String as PropType<MenubarOrientation>,
       loop: optionalBoolean,
       disabled: optionalBoolean,
-      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      modal: {
+        type: [Boolean, String] as PropType<boolean | "pointer">,
+        default: undefined,
+      },
       controller: Object as PropType<MenubarController>,
       debug: optionalBoolean,
     },
@@ -40,7 +48,7 @@ const Menubar = withElement(
       provide(MenubarKey, menubar)
       return usePart(menubar, "root", undefined, undefined, "div")
     },
-  }),
+  })
 )
 
 export { createMenubarController } from "@ui-sdk/core/menubar"

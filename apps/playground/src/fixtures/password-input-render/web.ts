@@ -18,7 +18,7 @@ async function mount(root: HTMLElement) {
       root.querySelector("output")!.textContent =
         `visible: ${(event as CustomEvent<{ value: boolean }>).detail.value}`
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

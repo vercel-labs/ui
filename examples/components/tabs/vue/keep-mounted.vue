@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
 import { Textarea } from "@ui-sdk/vue/textarea"
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/vue/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/vue/tabs"
 </script>
 
 <template>

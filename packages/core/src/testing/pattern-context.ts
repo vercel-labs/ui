@@ -62,12 +62,14 @@ function createContext(root: Element) {
   }
 
   function checkReferences() {
-    for (const scope of watched)
-      for (const { el, attribute, id } of danglingReferences(scope))
+    for (const scope of watched) {
+      for (const { el, attribute, id } of danglingReferences(scope)) {
         problem(
           el,
-          `${attribute} points at "${id}", which isn't in the page; every id reference names a real element (ARIA).`,
+          `${attribute} points at "${id}", which isn't in the page; every id reference names a real element (ARIA).`
         )
+      }
+    }
   }
 
   /** Presses a key on the focused element, then checks focus wasn't lost or hidden. */
@@ -78,15 +80,16 @@ function createContext(root: Element) {
     if (!after || after === doc.body || after === doc.documentElement) {
       problem(
         before,
-        `after ${key}, focus fell to the body; a key never loses focus (APG: keyboard interface).`,
+        `after ${key}, focus fell to the body; a key never loses focus (APG: keyboard interface).`
       )
       throw stopped
     }
-    if (isUnreachable(after))
+    if (isUnreachable(after)) {
       problem(
         after,
-        `after ${key}, focus is inside aria-hidden or inert content, where a screen reader can't follow it.`,
+        `after ${key}, focus is inside aria-hidden or inert content, where a screen reader can't follow it.`
       )
+    }
     checkReferences()
   }
 
@@ -95,7 +98,9 @@ function createContext(root: Element) {
     ;(el as HTMLElement).focus()
     await settle()
     const active = doc.activeElement
-    if (active && active !== doc.body) return
+    if (active && active !== doc.body) {
+      return
+    }
     problem(el, "can't take focus.")
     throw stopped
   }
@@ -119,19 +124,30 @@ type PatternContext = ReturnType<typeof createContext>
 /** The pattern's element: the root, one inside it, or a popup its root or a part of it controls. */
 function findWidget(context: PatternContext, roles: string[]) {
   const { root } = context
-  if (roles.includes(roleOf(root))) return root
+  if (roles.includes(roleOf(root))) {
+    return root
+  }
   const inside = withRole(root, roles)[0]
-  if (inside) return inside
-  for (const el of [root, ...root.querySelectorAll("[aria-controls]")])
+  if (inside) {
+    return inside
+  }
+  for (const el of [root, ...root.querySelectorAll("[aria-controls]")]) {
     for (const id of ids(el, "aria-controls")) {
       const popup = byId(el, id)
-      if (popup && roles.includes(roleOf(popup))) return popup
+      if (popup && roles.includes(roleOf(popup))) {
+        return popup
+      }
     }
+  }
 }
 
 function requireName(context: PatternContext, el: Element, source: string) {
-  if (!accessibleName(el))
-    context.problem(el, `has no accessible name; give it aria-label or aria-labelledby (APG ${source}).`)
+  if (!accessibleName(el)) {
+    context.problem(
+      el,
+      `has no accessible name; give it aria-label or aria-labelledby (APG ${source}).`
+    )
+  }
 }
 
 /**
@@ -143,38 +159,62 @@ function orientationOf(context: PatternContext, el: Element) {
   const fallback = defaultOrientation[roleOf(el)]
   const aria = el.getAttribute("aria-orientation")
   const laidOut = el.getAttribute("data-orientation")
-  const read = aria === "horizontal" || aria === "vertical" ? aria : (fallback ?? "vertical")
-  if (laidOut && fallback && laidOut !== read)
+  const read =
+    aria === "horizontal" || aria === "vertical"
+      ? aria
+      : (fallback ?? "vertical")
+  if (laidOut && fallback && laidOut !== read) {
     context.problem(
       el,
-      `is ${laidOut} (data-orientation) but tells assistive technology it's ${read}; set aria-orientation="${laidOut}" (ARIA: aria-orientation).`,
+      `is ${laidOut} (data-orientation) but tells assistive technology it's ${read}; set aria-orientation="${laidOut}" (ARIA: aria-orientation).`
     )
+  }
   return read
 }
 
 /** The arrows that move forward and back along an orientation. Horizontal ones swap right to left. */
 function arrowsFor(orientation: "horizontal" | "vertical", rtl: boolean) {
-  if (orientation === "vertical") return { next: "ArrowDown", previous: "ArrowUp" }
-  return rtl ? { next: "ArrowLeft", previous: "ArrowRight" } : { next: "ArrowRight", previous: "ArrowLeft" }
+  if (orientation === "vertical") {
+    return { next: "ArrowDown", previous: "ArrowUp" }
+  }
+  return rtl
+    ? { next: "ArrowLeft", previous: "ArrowRight" }
+    : { next: "ArrowRight", previous: "ArrowLeft" }
 }
 
 /** Flags widgets inside a composite that it can't own, like a button in a listbox. */
-function checkOwned(context: PatternContext, container: Element, allowed: string[], source: string) {
+function checkOwned(
+  context: PatternContext,
+  container: Element,
+  allowed: string[],
+  source: string
+) {
   for (const el of container.querySelectorAll("*")) {
     const role = roleOf(el)
-    if (!widgetRoles.has(role) || allowed.includes(role) || isGone(el) || isUnreachable(el)) continue
+    if (
+      !widgetRoles.has(role) ||
+      allowed.includes(role) ||
+      isGone(el) ||
+      isUnreachable(el)
+    ) {
+      continue
+    }
     context.problem(
       el,
-      `is a ${role} inside a ${roleOf(container)}, which owns only ${allowed.join(" and ")} elements (APG ${source}).`,
+      `is a ${role} inside a ${roleOf(container)}, which owns only ${allowed.join(" and ")} elements (APG ${source}).`
     )
   }
 }
 
 /** The element whose `aria-controls` names a popup, outside the popup itself. */
 function triggerOf(popup: Element) {
-  if (!popup.id) return undefined
-  return [...(popup.getRootNode() as ParentNode).querySelectorAll("[aria-controls]")].find(
-    (el) => !popup.contains(el) && ids(el, "aria-controls").includes(popup.id),
+  if (!popup.id) {
+    return undefined
+  }
+  return [
+    ...(popup.getRootNode() as ParentNode).querySelectorAll("[aria-controls]"),
+  ].find(
+    (el) => !popup.contains(el) && ids(el, "aria-controls").includes(popup.id)
   )
 }
 

@@ -39,9 +39,10 @@ const defaults: HistoryOptions = {}
  */
 function createHistory<State>(
   initial: State,
-  options: HistoryOptions | (() => HistoryOptions | undefined) = defaults,
+  options: HistoryOptions | (() => HistoryOptions | undefined) = defaults
 ) {
-  const settings = () => (typeof options === "function" ? options() : options) ?? defaults
+  const settings = () =>
+    (typeof options === "function" ? options() : options) ?? defaults
   let entries = [initial]
   let index = 0
   // The kind and time of the last edit that can take more into its entry.
@@ -53,14 +54,21 @@ function createHistory<State>(
      * "insert" or "delete", join the last entry while they come within
      * `groupDelay` of each other. Without a group, the edit is its own entry.
      */
-    record(state: State, { group, time = Date.now() }: { group?: string; time?: number } = {}) {
+    record(
+      state: State,
+      { group, time = Date.now() }: { group?: string; time?: number } = {}
+    ) {
       const { limit = 100, groupDelay = 500 } = settings()
       entries = entries.slice(0, index + 1)
-      const joins = !!group && open?.group === group && time - open.time < groupDelay
-      if (joins) entries[index] = state
-      else {
+      const joins =
+        !!group && open?.group === group && time - open.time < groupDelay
+      if (joins) {
+        entries[index] = state
+      } else {
         entries.push(state)
-        if (entries.length > limit + 1) entries.shift()
+        if (entries.length > limit + 1) {
+          entries.shift()
+        }
         index = entries.length - 1
       }
       open = group ? { group, time } : null
@@ -72,13 +80,17 @@ function createHistory<State>(
     /** Steps back, and returns the state to show, or `undefined` at the first entry. */
     undo() {
       open = null
-      if (index === 0) return undefined
+      if (index === 0) {
+        return undefined
+      }
       return entries[--index]
     },
     /** Steps forward again, and returns the state to show, or `undefined` at the last entry. */
     redo() {
       open = null
-      if (index === entries.length - 1) return undefined
+      if (index === entries.length - 1) {
+        return undefined
+      }
       return entries[++index]
     },
     /** Whether there's an entry to step back to. */

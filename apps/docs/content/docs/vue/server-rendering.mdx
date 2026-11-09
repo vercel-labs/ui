@@ -109,7 +109,9 @@ const skinTone = createPreference({
   values: ["default", "light", "medium", "dark"],
   defaultValue: "default",
   attribute: "data-skin-tone",
-  storage: createCookieStorage("skin-tone", { cookie: useRequestHeader("cookie") }),
+  storage: createCookieStorage("skin-tone", {
+    cookie: useRequestHeader("cookie"),
+  }),
 })
 provide("skin-tone", skinTone)
 </script>
@@ -132,7 +134,10 @@ import { createLocalStorage } from "@ui-sdk/core"
 import { defineComponent, h, onMounted, shallowRef } from "vue"
 
 const density = createLocalStorage("density")
-const script = density.script({ attribute: "data-density", values: ["comfortable", "compact"] })
+const script = density.script({
+  attribute: "data-density",
+  values: ["comfortable", "compact"],
+})
 
 const Toolbar = defineComponent((_props, { slots }) => {
   const value = shallowRef("comfortable")
@@ -143,7 +148,11 @@ const Toolbar = defineComponent((_props, { slots }) => {
     mounted.value = true
   })
   return () => [
-    h("div", { "data-density": value.value, "data-allow-mismatch": "attribute" }, slots.default?.()),
+    h(
+      "div",
+      { "data-density": value.value, "data-allow-mismatch": "attribute" },
+      slots.default?.()
+    ),
     mounted.value || !script ? null : h("script", { innerHTML: script }),
   ]
 })

@@ -64,20 +64,30 @@
   let submitted = $state("")
   let created = $state.raw<{ value: string; label: string }[]>([])
   const remoteMode = async || pages
-  const remote = useAsyncOptions(pages ? searchCountryPages : searchCountries, { immediate: remoteMode })
-  let list = $state.raw<{ value: string; label: string; keywords?: string[]; disabled?: boolean }[]>(f.items)
+  const remote = useAsyncOptions(pages ? searchCountryPages : searchCountries, {
+    immediate: remoteMode,
+  })
+  let list = $state.raw<
+    { value: string; label: string; keywords?: string[]; disabled?: boolean }[]
+  >(f.items)
   // Items a spec swaps in. Only in the browser: the server has no document.
   $effect(() => onItemsChange(changedItems, (next) => (list = next)))
   const all = $derived([...list, ...created])
-  const labels = $derived(new Map([...f.items, ...all].map((item) => [item.value, item.label])))
+  const labels = $derived(
+    new Map([...f.items, ...all].map((item) => [item.value, item.label]))
+  )
   const items = $derived(
     remoteMode
       ? remote.state.items
       : long
         ? longItems()
         : grouped
-          ? f.groups.map((group) => ({ type: "group" as const, label: group.label, items: group.items }))
-          : all,
+          ? f.groups.map((group) => ({
+              type: "group" as const,
+              label: group.label,
+              items: group.items,
+            }))
+          : all
   )
   // A data entry's key: its value, a group's label, or a separator's place.
   const keyOf = (entry: ListData[number], index: number) =>
@@ -92,7 +102,9 @@
   const labelOf = (value: string) => labels.get(value) ?? value
 
   function onValueChange(value: unknown, details: { cancel: () => void }) {
-    if (cancelsValue(value, cancel)) return details.cancel()
+    if (cancelsValue(value, cancel)) {
+      return details.cancel()
+    }
     action = `value:${Array.isArray(value) ? value.join(",") : String(value)}`
   }
 
@@ -108,9 +120,21 @@
   }
 </script>
 
-{#snippet composedItem(item: { value: string; label: string; keywords?: string[]; disabled?: boolean })}
-  <ComboboxItem class="item" value={item.value} label={item.label} keywords={item.keywords} disabled={item.disabled}>
-    {#if highlight}<ComboboxItemText>{item.label}</ComboboxItemText>{:else}{item.label}{/if}
+{#snippet composedItem(item: {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+})}
+  <ComboboxItem
+    class="item"
+    value={item.value}
+    label={item.label}
+    keywords={item.keywords}
+    disabled={item.disabled}
+  >
+    {#if highlight}<ComboboxItemText>{item.label}</ComboboxItemText
+      >{:else}{item.label}{/if}
     <ComboboxItemIndicator class="indicator">✓</ComboboxItemIndicator>
   </ComboboxItem>
 {/snippet}
@@ -136,7 +160,11 @@
 <div class="fixture">
   <button>Before</button>
   <form class="select-form" aria-label={f.formLabel} onsubmit={onSubmit}>
-    <svelte:element this={fieldset ? "fieldset" : "div"} disabled={fieldset || undefined} style="display: contents">
+    <svelte:element
+      this={fieldset ? "fieldset" : "div"}
+      disabled={fieldset || undefined}
+      style="display: contents"
+    >
       <Combobox
         {...options}
         name={f.name}
@@ -158,7 +186,9 @@
                 {#each state.value as string[] as item (item)}
                   <ComboboxChip class="chip" value={item}>
                     {labelOf(item)}
-                    <ComboboxChipRemove aria-label={`Remove ${labelOf(item)}`}>×</ComboboxChipRemove>
+                    <ComboboxChipRemove aria-label={`Remove ${labelOf(item)}`}
+                      >×</ComboboxChipRemove
+                    >
                   </ComboboxChip>
                 {/each}
               {/snippet}
@@ -169,20 +199,30 @@
         {:else}
           <ComboboxInput class="input" />
         {/if}
-        {#if summary}<output aria-label={f.summary}><ComboboxValue maxLabels={summary} /></output>{/if}
+        {#if summary}<output aria-label={f.summary}
+            ><ComboboxValue maxLabels={summary} /></output
+          >{/if}
         <ComboboxTrigger aria-label={f.trigger}>▾</ComboboxTrigger>
         <ComboboxClear>{f.clear}</ComboboxClear>
-        <ComboboxContent class={pages ? "popup list-popup list-short" : "popup list-popup"}>
+        <ComboboxContent
+          class={pages ? "popup list-popup list-short" : "popup list-popup"}
+        >
           {#if !nostatus}
             <ComboboxStatus class="status">
-              {#snippet children(state)}{state.loading ? (pages ? "Loading more…" : "Loading…") : ""}{/snippet}
+              {#snippet children(state)}{state.loading
+                  ? pages
+                    ? "Loading more…"
+                    : "Loading…"
+                  : ""}{/snippet}
             </ComboboxStatus>
           {/if}
           <ComboboxEmpty class="empty">{f.empty}</ComboboxEmpty>
           {#if dataMode}
             <ComboboxList>
               {#snippet children(state)}
-                {#if selectAll}<ComboboxSelectAll class="item">{f.selectAll}</ComboboxSelectAll>{/if}
+                {#if selectAll}<ComboboxSelectAll class="item"
+                    >{f.selectAll}</ComboboxSelectAll
+                  >{/if}
                 {@render dataItems(state.items as ListData)}
                 {#if create}<ComboboxCreate class="item" {onCreate} />{/if}
               {/snippet}
@@ -192,15 +232,21 @@
               {#if grouped}
                 {#each f.groups as group (group.label)}
                   <ComboboxGroup>
-                    <ComboboxGroupLabel class="label">{group.label}</ComboboxGroupLabel>
-                    {#if selectAll}<ComboboxSelectAll class="item">{f.selectAll} {group.label}</ComboboxSelectAll>{/if}
+                    <ComboboxGroupLabel class="label"
+                      >{group.label}</ComboboxGroupLabel
+                    >
+                    {#if selectAll}<ComboboxSelectAll class="item"
+                        >{f.selectAll} {group.label}</ComboboxSelectAll
+                      >{/if}
                     {#each group.items as item (item.value)}
                       {@render composedItem(item)}
                     {/each}
                   </ComboboxGroup>
                 {/each}
               {:else}
-                {#if selectAll}<ComboboxSelectAll class="item">{f.selectAll}</ComboboxSelectAll>{/if}
+                {#if selectAll}<ComboboxSelectAll class="item"
+                    >{f.selectAll}</ComboboxSelectAll
+                  >{/if}
                 {#each all as item (item.value)}
                   {@render composedItem(item)}
                 {/each}

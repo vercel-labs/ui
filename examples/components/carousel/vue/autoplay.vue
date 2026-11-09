@@ -34,7 +34,9 @@ const log = useLog()
     "
   >
     <div data-slot="controls">
-      <CarouselPlayToggle v-slot="{ state }">{{ state.playing ? "Pause" : "Play" }}</CarouselPlayToggle>
+      <CarouselPlayToggle v-slot="{ state }">{{
+        state.playing ? "Pause" : "Play"
+      }}</CarouselPlayToggle>
     </div>
     <div data-slot="row">
       <CarouselPrevious aria-label="Previous slide">

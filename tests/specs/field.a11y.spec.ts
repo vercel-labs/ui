@@ -7,10 +7,15 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
-test("no axe violations with labels wrapping fields", async ({ page, open }) => {
+test("no axe violations with labels wrapping fields", async ({
+  page,
+  open,
+}) => {
   await open("field-choice-card")
   const [first] = f.cards
   await expect(page.getByRole("checkbox", { name: first.title })).toBeVisible()

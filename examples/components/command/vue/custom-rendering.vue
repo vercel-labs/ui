@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { CornerDownLeftIcon } from "@lucide/vue"
-import { Command, CommandInput, CommandItem, CommandItemText, CommandList } from "@ui-sdk/vue/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandItemText,
+  CommandList,
+} from "@ui-sdk/vue/command"
 
 const pages = ["Composition", "Installation", "Styling"]
 </script>
@@ -11,7 +17,9 @@ const pages = ["Composition", "Installation", "Styling"]
     <CommandList>
       <CommandItem v-for="page in pages" :key="page" :value="page">
         <template #render="{ props, children }">
-          <a v-bind="props" :href="`#${page.toLowerCase()}`"><component :is="children" /></a>
+          <a v-bind="props" :href="`#${page.toLowerCase()}`"
+            ><component :is="children"
+          /></a>
         </template>
         <template #default="{ state }">
           <CommandItemText v-slot="{ state: text }">

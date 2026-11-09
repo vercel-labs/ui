@@ -14,9 +14,7 @@
 
 <div dir="rtl">
   <Drawer side="start">
-    <DrawerTrigger>
-      القائمة
-    </DrawerTrigger>
+    <DrawerTrigger>القائمة</DrawerTrigger>
     <DrawerBackdrop />
     <DrawerContent>
       <div data-slot="stack">
@@ -34,9 +32,7 @@
           {/each}
         </ul>
       </nav>
-      <DrawerClose data-variant="solid">
-        إغلاق
-      </DrawerClose>
+      <DrawerClose data-variant="solid">إغلاق</DrawerClose>
     </DrawerContent>
   </Drawer>
 </div>

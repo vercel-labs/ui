@@ -8,7 +8,10 @@ function Example() {
         <OTPInputGroup>
           <For each={state.slots} keyed={false}>
             {(_, index) => (
-              <OTPInputSlot index={index} render={(props) => <span {...props} />}>
+              <OTPInputSlot
+                index={index}
+                render={(props) => <span {...props} />}
+              >
                 {(slot) => slot.char ?? (slot.hasFakeCaret && <span />)}
               </OTPInputSlot>
             )}

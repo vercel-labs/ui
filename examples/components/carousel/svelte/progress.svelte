@@ -15,7 +15,10 @@
   const slides = [1, 2, 3, 4, 5]
 </script>
 
-<Carousel aria-label="Featured" onPageChangeComplete={(page) => log(`Rested on slide ${page}`)}>
+<Carousel
+  aria-label="Featured"
+  onPageChangeComplete={(page) => log(`Rested on slide ${page}`)}
+>
   <div data-slot="row">
     <CarouselPrevious aria-label="Previous slide">
       <ChevronLeftIcon />

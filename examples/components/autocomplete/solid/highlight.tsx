@@ -44,7 +44,11 @@ function Example() {
                 <AutocompleteItemText>
                   {(state) =>
                     state.segments.map((segment) =>
-                      segment.match ? <strong>{segment.text}</strong> : segment.text,
+                      segment.match ? (
+                        <strong>{segment.text}</strong>
+                      ) : (
+                        segment.text
+                      )
                     )
                   }
                 </AutocompleteItemText>

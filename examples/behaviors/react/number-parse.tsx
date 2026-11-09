@@ -1,6 +1,11 @@
 import * as React from "react"
 import { formatNumber, isPartialNumber, parseNumber } from "@ui-sdk/core/number"
-import { Field, FieldControl, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { useLog } from "../../shared/react/log"
 
 const locales = ["en-US", "de-DE", "fr-FR", "ar-EG"]
@@ -14,7 +19,11 @@ function Example() {
   const read = (next: string, nextLocale: string) => {
     const parsed = parseNumber(next, nextLocale)
     const verdict =
-      parsed !== null ? String(parsed) : isPartialNumber(next, nextLocale) ? "keep typing" : "not a number"
+      parsed !== null
+        ? String(parsed)
+        : isPartialNumber(next, nextLocale)
+          ? "keep typing"
+          : "not a number"
     log(`“${next}” in ${nextLocale}: ${verdict}`)
   }
   return (

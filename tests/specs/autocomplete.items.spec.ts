@@ -11,7 +11,8 @@ import { changedItems } from "../fixtures/autocomplete"
 
 const input = (page: Page) => page.getByRole("combobox", { name: "Fruit" })
 const listbox = (page: Page) => page.getByRole("listbox")
-const option = (page: Page, name: string) => page.getByRole("option", { name, exact: true })
+const option = (page: Page, name: string) =>
+  page.getByRole("option", { name, exact: true })
 const options = (page: Page) => listbox(page).getByRole("option")
 const labels = (items: { label: string }[]) => items.map((item) => item.label)
 
@@ -19,8 +20,13 @@ const labels = (items: { label: string }[]) => items.map((item) => item.label)
 // it points at no element, and `null` when nothing is highlighted.
 async function highlighted(page: Page) {
   const id = await input(page).getAttribute("aria-activedescendant")
-  if (!id) return null
-  return page.evaluate((id) => document.getElementById(id)?.textContent?.trim(), id)
+  if (!id) {
+    return null
+  }
+  return page.evaluate(
+    (id) => document.getElementById(id)?.textContent?.trim(),
+    id
+  )
 }
 
 async function openAll(page: Page) {
@@ -55,7 +61,7 @@ test.describe("items that change while open", () => {
       await page.keyboard.press("ArrowUp")
       await expect.poll(() => highlighted(page)).toBe("Avocado")
       await expect(input(page)).toBeFocused()
-    },
+    }
   )
 
   test(
@@ -76,10 +82,12 @@ test.describe("items that change while open", () => {
       await page.keyboard.press("ArrowUp")
       await page.keyboard.press("ArrowUp")
       await expect.poll(() => highlighted(page)).toBe("Peach")
-    },
+    }
   )
 
-  test("the typed text stays through a reorder and a replace", async ({ page }) => {
+  test("the typed text stays through a reorder and a replace", async ({
+    page,
+  }) => {
     await input(page).fill("a")
     await input(page).press("ArrowDown")
     await expect.poll(() => highlighted(page)).toBe("Apple")
@@ -109,7 +117,7 @@ test.describe("items that change while open", () => {
       await expect(input(page)).toBeFocused()
       await page.keyboard.press("ArrowDown")
       await expect.poll(() => highlighted(page)).toBe("Peach")
-    },
+    }
   )
 
   test("new items show and can be chosen", async ({ page }) => {
@@ -122,7 +130,9 @@ test.describe("items that change while open", () => {
     await expect(listbox(page)).toBeHidden()
   })
 
-  test("the new order stays after the list closes and opens again", async ({ page }) => {
+  test("the new order stays after the list closes and opens again", async ({
+    page,
+  }) => {
     await openAll(page)
     await changeItems(page, "reversed")
     await page.keyboard.press("Escape")
@@ -147,7 +157,7 @@ test.describe("items that change while open", () => {
       await page.keyboard.press("ArrowUp")
       await expect.poll(() => highlighted(page)).toBe("Blackberry")
       await expect(input(page)).toHaveValue("b")
-    },
+    }
   )
 })
 
@@ -157,7 +167,10 @@ test.describe("items that arrive while open", () => {
     open,
     framework,
   }) => {
-    test.skip(!framework.startsWith("react"), "The ?late fixture is React only.")
+    test.skip(
+      !framework.startsWith("react"),
+      "The ?late fixture is React only."
+    )
     await open("autocomplete", { late: "" })
     await page.getByRole("button", { name: "Show fruits" }).click()
     await expect(input(page)).toHaveAttribute("aria-expanded", "true")

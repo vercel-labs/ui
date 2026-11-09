@@ -9,7 +9,16 @@ const formats: { label: string; value: ColorFormat }[] = [
   { label: "OKLCH", value: "oklch" },
 ]
 
-const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+const presets = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#0ea5e9",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -46,7 +55,8 @@ function mount(root: HTMLElement) {
   `
   const picker = root.querySelector("ui-color-picker")!
   root.querySelector("select")!.addEventListener("change", (event) => {
-    const format = (event.currentTarget as HTMLSelectElement).value as ColorFormat
+    const format = (event.currentTarget as HTMLSelectElement)
+      .value as ColorFormat
     picker.setAttribute("format", format)
     picker.value = formatColor(parseColor(picker.value)!, format)
   })

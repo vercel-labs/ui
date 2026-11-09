@@ -1,5 +1,14 @@
 import "@ui-sdk/web/menu"
-import { ChevronRight, createElement, File, Folder, Link, Mail, Share, Trash } from "lucide"
+import {
+  ChevronRight,
+  createElement,
+  File,
+  Folder,
+  Link,
+  Mail,
+  Share,
+  Trash,
+} from "lucide"
 
 export function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -51,6 +60,6 @@ export function mount(root: HTMLElement) {
       root.querySelector("output")!.textContent =
         `نُفّذ: ${(event as CustomEvent<{ value: string }>).detail.value}`
     },
-    { capture: true },
+    { capture: true }
   )
 }

@@ -1,6 +1,10 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
-  import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
+  import {
+    Listbox,
+    ListboxItem,
+    ListboxItemIndicator,
+  } from "@ui-sdk/svelte/listbox"
   import { useLog } from "../../../shared/svelte/log"
 
   const timezones = Array.from({ length: 27 }, (_, index) => {
@@ -15,7 +19,11 @@
 <Listbox
   defaultValue="utc9"
   onHighlight={(value, details) => {
-    if (value) log(`Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`)
+    if (value) {
+      log(
+        `Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`
+      )
+    }
   }}
   aria-label="Time zone"
 >

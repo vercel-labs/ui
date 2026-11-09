@@ -8,7 +8,7 @@ describe("render elements", () => {
     const element = renderElement(
       "button",
       { onClick: () => calls.push("part") },
-      <button onClick={() => calls.push("element")} />,
+      <button onClick={() => calls.push("element")} />
     ) as React.ReactElement<{ onClick: (event: unknown) => void }>
     element.props.onClick({ defaultPrevented: false })
     expect(calls).toEqual(["element", "part"])
@@ -19,7 +19,7 @@ describe("render elements", () => {
     const element = renderElement(
       "button",
       { onClick: part },
-      <button onClick={(event) => event.preventDefault()} />,
+      <button onClick={(event) => event.preventDefault()} />
     ) as React.ReactElement<{ onClick: (event: unknown) => void }>
     let prevented = false
     element.props.onClick({
@@ -33,7 +33,7 @@ describe("render elements", () => {
     const element = renderElement(
       "button",
       { className: "part" },
-      <button className={undefined} />,
+      <button className={undefined} />
     ) as React.ReactElement<{
       className: string
     }>
@@ -43,7 +43,11 @@ describe("render elements", () => {
   test("each ref is called once", () => {
     const part = vi.fn()
     const own = vi.fn()
-    const element = renderElement("button", { ref: part }, <button ref={own} />) as React.ReactElement<{
+    const element = renderElement(
+      "button",
+      { ref: part },
+      <button ref={own} />
+    ) as React.ReactElement<{
       ref: (el: unknown) => void
     }>
     element.props.ref("node")
@@ -55,8 +59,8 @@ describe("render elements", () => {
     expect(
       mergeProps(
         { className: "a", style: { color: "red" }, id: "x" },
-        { className: "b", style: { top: 0 }, id: "y" },
-      ),
+        { className: "b", style: { top: 0 }, id: "y" }
+      )
     ).toEqual({
       className: "a b",
       style: { color: "red", top: 0 },
@@ -75,12 +79,19 @@ describe("merged refs", () => {
       return () => calls.push("cleanup")
     }
     const inner = mergeRefs(object, plain) as React.RefCallback<string>
-    const merged = mergeRefs(inner, withCleanup) as (el: string | null) => (() => void) | void
+    const merged = mergeRefs(inner, withCleanup) as (
+      el: string | null
+    ) => (() => void) | void
     const cleanup = merged("node")
     expect(object.current).toBe("node")
     expect(typeof cleanup).toBe("function")
     ;(cleanup as () => void)()
-    expect(calls).toEqual(["plain node", "attach node", "plain null", "cleanup"])
+    expect(calls).toEqual([
+      "plain node",
+      "attach node",
+      "plain null",
+      "cleanup",
+    ])
     expect(object.current).toBeNull()
   })
 })

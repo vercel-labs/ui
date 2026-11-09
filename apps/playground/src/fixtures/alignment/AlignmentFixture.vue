@@ -54,7 +54,9 @@ function showDetails(payload: string) {
 }
 
 function onSelect(value: string) {
-  if (value === "details") showDetails(String(rowMenu.getPayload()))
+  if (value === "details") {
+    showDetails(String(rowMenu.getPayload()))
+  }
 }
 </script>
 
@@ -65,7 +67,12 @@ function onSelect(value: string) {
     <ul class="rows">
       <li v-for="row in alignmentFixture.rows" :key="row">
         Row {{ row }}
-        <MenuTrigger :controller="rowMenu" :payload="row" :aria-label="`Actions for ${row}`">…</MenuTrigger>
+        <MenuTrigger
+          :controller="rowMenu"
+          :payload="row"
+          :aria-label="`Actions for ${row}`"
+          >…</MenuTrigger
+        >
       </li>
     </ul>
     <Menu
@@ -115,19 +122,35 @@ function onSelect(value: string) {
 
     <Menu
       :items="dataItems"
-      @checked-change="(checked, details) => (change = `checked:${details.value}:${checked}`)"
-      @value-change="(value, details) => (change = `value:${details.group}:${value}`)"
+      @checked-change="
+        (checked, details) => (change = `checked:${details.value}:${checked}`)
+      "
+      @value-change="
+        (value, details) => (change = `value:${details.group}:${value}`)
+      "
     >
       <MenuTrigger>Data</MenuTrigger>
       <!-- The data's items, rendered with the fixture's classes. -->
       <MenuContent class="popup">
         <template v-for="(entry, index) in dataItems" :key="index">
-          <MenuCheckboxItem v-if="entry.type === 'checkbox'" class="item" :value="entry.value">
+          <MenuCheckboxItem
+            v-if="entry.type === 'checkbox'"
+            class="item"
+            :value="entry.value"
+          >
             <MenuItemIndicator class="indicator">✓</MenuItemIndicator>
             {{ entry.label }}
           </MenuCheckboxItem>
-          <MenuRadioGroup v-else-if="entry.type === 'radio-group'" :name="entry.name">
-            <MenuRadioItem v-for="radio in entry.items" :key="radio.value" class="item" :value="radio.value">
+          <MenuRadioGroup
+            v-else-if="entry.type === 'radio-group'"
+            :name="entry.name"
+          >
+            <MenuRadioItem
+              v-for="radio in entry.items"
+              :key="radio.value"
+              class="item"
+              :value="radio.value"
+            >
               <MenuItemIndicator class="indicator">•</MenuItemIndicator>
               {{ radio.label }}
             </MenuRadioItem>
@@ -139,14 +162,24 @@ function onSelect(value: string) {
     <Menu>
       <MenuTrigger>View</MenuTrigger>
       <MenuContent class="popup">
-        <MenuCheckboxItem v-for="value in ['ruler', 'guides']" :key="value" class="item" :value="value">
+        <MenuCheckboxItem
+          v-for="value in ['ruler', 'guides']"
+          :key="value"
+          class="item"
+          :value="value"
+        >
           <MenuItemIndicator class="indicator">✓</MenuItemIndicator>
           {{ value === "ruler" ? "Ruler" : "Guides" }}
         </MenuCheckboxItem>
       </MenuContent>
     </Menu>
 
-    <Tabs class="tabs" :controller="sections" hidden-until-found @value-change="tabChanges++">
+    <Tabs
+      class="tabs"
+      :controller="sections"
+      hidden-until-found
+      @value-change="tabChanges++"
+    >
       <TabsList class="tablist scrolling" aria-label="Sections">
         <TabsTab
           v-for="section in alignmentFixture.sections"

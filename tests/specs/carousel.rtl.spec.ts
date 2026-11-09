@@ -1,5 +1,11 @@
 import { expect, lastAction, test } from "../fixtures"
-import { drag, expectShown, indicator, nextButton, slideLink } from "./carousel.helpers"
+import {
+  drag,
+  expectShown,
+  indicator,
+  nextButton,
+  slideLink,
+} from "./carousel.helpers"
 
 // Right to left, the slides run from right to left: the next one is on the left.
 test.describe("right to left", () => {
@@ -7,7 +13,9 @@ test.describe("right to left", () => {
     await open("carousel", { dir: "rtl" })
   })
 
-  test("Next shows the next slide, which comes in from the left", async ({ page }) => {
+  test("Next shows the next slide, which comes in from the left", async ({
+    page,
+  }) => {
     const first = await slideLink(page, 0).boundingBox()
     const second = await slideLink(page, 1).boundingBox()
     expect(second!.x).toBeLessThan(first!.x)
@@ -21,14 +29,19 @@ test.describe("right to left", () => {
     await expectShown(page, 1)
   })
 
-  test("with loop, dragging to the left from the first slide shows the last", async ({ page, open }) => {
+  test("with loop, dragging to the left from the first slide shows the last", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { dir: "rtl", loop: "" })
     await drag(page, 0, -200)
     await expectShown(page, 4)
     expect(await lastAction(page)).toBe("5")
   })
 
-  test("ArrowLeft shows the next slide and ArrowRight the previous @enhancement", async ({ page }) => {
+  test("ArrowLeft shows the next slide and ArrowRight the previous @enhancement", async ({
+    page,
+  }) => {
     await slideLink(page, 0).focus()
     await page.keyboard.press("ArrowLeft")
     await expectShown(page, 1)
@@ -36,14 +49,18 @@ test.describe("right to left", () => {
     await expectShown(page, 0)
   })
 
-  test("ArrowLeft moves to the next indicator @enhancement", async ({ page }) => {
+  test("ArrowLeft moves to the next indicator @enhancement", async ({
+    page,
+  }) => {
     await indicator(page, 1).focus()
     await page.keyboard.press("ArrowLeft")
     await expect(indicator(page, 2)).toBeFocused()
     await expectShown(page, 1)
   })
 
-  test("Next and dragging follow the page when it turns left to right after mount", async ({ page }) => {
+  test("Next and dragging follow the page when it turns left to right after mount", async ({
+    page,
+  }) => {
     await page.evaluate(() => (document.documentElement.dir = "ltr"))
     await nextButton(page).click()
     await expectShown(page, 1)
@@ -51,13 +68,18 @@ test.describe("right to left", () => {
     await expectShown(page, 2)
   })
 
-  test("dragging first follows the page when it turns left to right after mount", async ({ page }) => {
+  test("dragging first follows the page when it turns left to right after mount", async ({
+    page,
+  }) => {
     await page.evaluate(() => (document.documentElement.dir = "ltr"))
     await drag(page, 0, -200)
     await expectShown(page, 1)
   })
 
-  test("a carousel with three slides to a view pages from the right @enhancement", async ({ page, open }) => {
+  test("a carousel with three slides to a view pages from the right @enhancement", async ({
+    page,
+    open,
+  }) => {
     await open("carousel", { dir: "rtl", "per-view": "3" })
     await expect(page.getByRole("tab")).toHaveCount(3)
     await nextButton(page).click()
@@ -68,7 +90,10 @@ test.describe("right to left", () => {
   })
 })
 
-test("Next and dragging follow the page when it turns right to left after mount", async ({ page, open }) => {
+test("Next and dragging follow the page when it turns right to left after mount", async ({
+  page,
+  open,
+}) => {
   await open("carousel")
   await page.evaluate(() => (document.documentElement.dir = "rtl"))
   await nextButton(page).click()
@@ -82,14 +107,20 @@ test("a controlled page follows the page when it turns right to left after mount
   open,
   framework,
 }) => {
-  test.skip(framework === "web", "The web components fixture doesn't control the page.")
+  test.skip(
+    framework === "web",
+    "The web components fixture doesn't control the page."
+  )
   await open("carousel", { controlled: "" })
   await page.evaluate(() => (document.documentElement.dir = "rtl"))
   await page.getByRole("button", { name: "Show page 3 by prop" }).click()
   await expectShown(page, 2)
 })
 
-test("dragging first follows the page when it turns right to left after mount", async ({ page, open }) => {
+test("dragging first follows the page when it turns right to left after mount", async ({
+  page,
+  open,
+}) => {
   await open("carousel")
   await page.evaluate(() => (document.documentElement.dir = "rtl"))
   await drag(page, 0, 200)

@@ -20,13 +20,16 @@ function mount(root: HTMLElement) {
             <ui-listbox-item value="${file.value}">
               <ui-listbox-item-icon>${createElement(File, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-icon>
               ${file.label}
-            </ui-listbox-item>`,
+            </ui-listbox-item>`
         )
         .join("")}
     </ui-listbox>
   `
   root.querySelector("ui-listbox")!.addEventListener("valuechange", (event) => {
-    log(root, `${(event.detail.value as string[]).length} selected (${event.detail.reason})`)
+    log(
+      root,
+      `${(event.detail.value as string[]).length} selected (${event.detail.reason})`
+    )
   })
 }
 

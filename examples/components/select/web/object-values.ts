@@ -34,7 +34,7 @@ function mount(root: HTMLElement) {
                   </span>
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>
@@ -44,8 +44,11 @@ function mount(root: HTMLElement) {
   const select = root.querySelector("ui-select")!
   select.itemToValue = (member) => String((member as Member).id)
   select.itemToLabel = (member) => (member as Member).name
-  select.isItemEqualToValue = (item, value) => (item as Member).id === (value as Member).id
-  root.querySelectorAll("ui-select-item").forEach((item, index) => (item.value = members[index]))
+  select.isItemEqualToValue = (item, value) =>
+    (item as Member).id === (value as Member).id
+  root
+    .querySelectorAll("ui-select-item")
+    .forEach((item, index) => (item.value = members[index]))
   select.value = { ...members[1] }
   select.addEventListener("valuechange", (event) => {
     const member = event.detail.value as Member | null

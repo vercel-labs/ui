@@ -2,8 +2,11 @@ import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
 import App from "./apps/accordion-app.svelte"
 
-const html = (props: { defaultValue?: string[]; hiddenUntilFound?: boolean; keepMounted?: boolean }) =>
-  render(App, { props }).body
+const html = (props: {
+  defaultValue?: string[]
+  hiddenUntilFound?: boolean
+  keepMounted?: boolean
+}) => render(App, { props }).body
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering an accordion", () => {
@@ -18,12 +21,14 @@ describe("server rendering an accordion", () => {
   })
 
   test("kept panels render hidden", () => {
-    expect(html({ defaultValue: ["b"], keepMounted: true })).toMatch(/<div[^>]*hidden[^>]*>(<!---->)?Panel a/)
+    expect(html({ defaultValue: ["b"], keepMounted: true })).toMatch(
+      /<div[^>]*hidden[^>]*>(<!---->)?Panel a/
+    )
   })
 
   test("findable panels render hidden until found, so find in page works before hydration", () => {
     expect(html({ defaultValue: ["b"], hiddenUntilFound: true })).toMatch(
-      /<div[^>]*hidden="until-found"[^>]*>(<!---->)?Panel a/,
+      /<div[^>]*hidden="until-found"[^>]*>(<!---->)?Panel a/
     )
   })
 })

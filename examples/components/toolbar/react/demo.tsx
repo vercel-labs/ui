@@ -19,7 +19,9 @@ function Example() {
         <Toggle
           key={label}
           aria-label={label}
-          onPressedChange={(pressed) => log(`${label} ${pressed ? "on" : "off"}`)}
+          onPressedChange={(pressed) =>
+            log(`${label} ${pressed ? "on" : "off"}`)
+          }
         >
           <ToggleIcon>
             <Icon />
@@ -27,7 +29,10 @@ function Example() {
         </Toggle>
       ))}
       <ToolbarSeparator />
-      <ToolbarButton aria-label="Insert link" onClick={() => log("Insert link")}>
+      <ToolbarButton
+        aria-label="Insert link"
+        onClick={() => log("Insert link")}
+      >
         <LinkIcon aria-hidden="true" />
       </ToolbarButton>
     </Toolbar>

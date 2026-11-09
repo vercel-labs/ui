@@ -24,7 +24,7 @@ function mount(root: HTMLElement) {
                   ${createElement(action.icon, { "aria-hidden": "true" }).outerHTML}
                 </button>
               </ui-toolbar-button>
-            `,
+            `
           )
           .join("")}
       </ui-toolbar>
@@ -32,11 +32,15 @@ function mount(root: HTMLElement) {
     </div>
   `
   const toolbar = root.querySelector("ui-toolbar")!
-  root.querySelector('[data-slot="controls"] button')!.addEventListener("click", () => toolbar.api.focus())
+  root
+    .querySelector('[data-slot="controls"] button')!
+    .addEventListener("click", () => toolbar.api.focus())
   toolbar.querySelectorAll("button").forEach((button, index) => {
     button.addEventListener("click", () => log(root, actions[index].label))
   })
-  return registerShortcut("alt+f10", () => toolbar.api.focus(), { allowInInput: true })
+  return registerShortcut("alt+f10", () => toolbar.api.focus(), {
+    allowInInput: true,
+  })
 }
 
 export { mount }

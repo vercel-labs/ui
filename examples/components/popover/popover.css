@@ -178,7 +178,10 @@
     }
   }
 
-  :scope:is([data-example="popover/placement"], [data-example="popover/offsets"])
+  :scope:is(
+      [data-example="popover/placement"],
+      [data-example="popover/offsets"]
+    )
     [data-slot="stack"]:has(> [data-slot="controls"]) {
     width: auto;
   }
@@ -198,7 +201,8 @@
   }
 
   /* The search field and its filter button, side by side. */
-  :scope[data-example="popover/anchor"] [data-slot="row"]:has(> input[type="search"]) {
+  :scope[data-example="popover/anchor"]
+    [data-slot="row"]:has(> input[type="search"]) {
     flex-wrap: nowrap;
     width: 20rem;
     max-width: 100%;

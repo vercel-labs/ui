@@ -12,7 +12,8 @@ import { changedValue, toggleOptions } from "tests/fixtures/page.ts"
 import { toggleAction, toggleFixture } from "tests/fixtures/toggle.ts"
 import { ref } from "vue"
 
-const { cancel, defaultPressed, disabled, alignment, ...groupOptions } = toggleOptions()
+const { cancel, defaultPressed, disabled, alignment, ...groupOptions } =
+  toggleOptions()
 const formatting = createToggleGroupController()
 const action = ref("")
 const pressedWith = ref("")
@@ -24,26 +25,46 @@ const values: Record<string, string[]> = {
   formatting: toggleFixture.formatting.defaultValue,
 }
 const groups = [
-  { ...toggleFixture.alignment, multiple: false, disabled: false, controller: undefined },
-  { ...toggleFixture.formatting, multiple: true, disabled, controller: formatting },
+  {
+    ...toggleFixture.alignment,
+    multiple: false,
+    disabled: false,
+    controller: undefined,
+  },
+  {
+    ...toggleFixture.formatting,
+    multiple: true,
+    disabled,
+    controller: formatting,
+  },
 ]
 
-function onValueChange(name: string, value: string[], details: { cancel: () => void }) {
-  if (cancel && changedValue(values[name], value) === cancel) return details.cancel()
+function onValueChange(
+  name: string,
+  value: string[],
+  details: { cancel: () => void }
+) {
+  if (cancel && changedValue(values[name], value) === cancel) {
+    return details.cancel()
+  }
   values[name] = value
   action.value = toggleAction.group(name, value)
 }
 
 function onPressedChange(pressed: boolean, details: ChangeDetails) {
-  if (cancel === toggleFixture.toggle.value) return details.cancel()
+  if (cancel === toggleFixture.toggle.value) {
+    return details.cancel()
+  }
   action.value = toggleAction.toggle(pressed)
 }
 
 // A Promise and the buttons that settle it.
 function gate() {
-  let settle: { resolve: () => void; reject: (reason: Error) => void } | undefined
+  let settle:
+    { resolve: () => void; reject: (reason: Error) => void } | undefined
   return {
-    wait: () => new Promise<void>((resolve, reject) => (settle = { resolve, reject })),
+    wait: () =>
+      new Promise<void>((resolve, reject) => (settle = { resolve, reject })),
     resolve: () => settle?.resolve(),
     reject: () => settle?.reject(new Error("Offline")),
   }
@@ -66,7 +87,11 @@ async function publish() {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Toggle class="toggle" :default-pressed="defaultPressed" @pressed-change="onPressedChange">
+    <Toggle
+      class="toggle"
+      :default-pressed="defaultPressed"
+      @pressed-change="onPressedChange"
+    >
       {{ toggleFixture.toggle.label }}
     </Toggle>
     <template v-for="(group, index) in groups" :key="group.name">
@@ -79,7 +104,9 @@ async function publish() {
         :disabled="group.disabled"
         :controller="group.controller"
         v-bind="groupOptions"
-        @value-change="(value, details) => onValueChange(group.name, value, details)"
+        @value-change="
+          (value, details) => onValueChange(group.name, value, details)
+        "
       >
         <Toggle
           v-for="item in group.items"
@@ -92,14 +119,24 @@ async function publish() {
         </Toggle>
       </ToggleGroup>
     </template>
-    <form :aria-label="toggleFixture.form.label" @submit.prevent="submissions++">
+    <form
+      :aria-label="toggleFixture.form.label"
+      @submit.prevent="submissions++"
+    >
       <label>
-        {{ toggleFixture.form.field }} <input name="name" :defaultValue="toggleFixture.form.defaultName" />
+        {{ toggleFixture.form.field }}
+        <input name="name" :defaultValue="toggleFixture.form.defaultName" />
       </label>
       <Button class="button" type="submit" @click="saving.wait">Submit</Button>
       <Button class="button" type="reset">Reset</Button>
       <Button class="button" disabled @click="action = 'delete'">Delete</Button>
-      <Button class="button" type="submit" disabled focusable-when-disabled @click="action = 'archive'">
+      <Button
+        class="button"
+        type="submit"
+        disabled
+        focusable-when-disabled
+        @click="action = 'archive'"
+      >
         Archive
       </Button>
     </form>

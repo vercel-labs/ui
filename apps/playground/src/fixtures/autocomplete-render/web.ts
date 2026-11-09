@@ -16,7 +16,7 @@ async function mount(root: HTMLElement) {
               .slice(0, 3)
               .map(
                 (item) =>
-                  `<ui-autocomplete-item class="item" value="${item.value}" label="${item.label}">${item.label}</ui-autocomplete-item>`,
+                  `<ui-autocomplete-item class="item" value="${item.value}" label="${item.label}">${item.label}</ui-autocomplete-item>`
               )
               .join("")}
           </ui-autocomplete-list>

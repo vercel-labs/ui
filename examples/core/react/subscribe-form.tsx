@@ -12,7 +12,9 @@ const subscribe = definePrimitive({
       event.preventDefault()
       const email = new FormData(form).get("email")?.toString() ?? ""
       if (!email.includes("@")) {
-        context.store.set({ error: "Enter an email address, like ada@example.com." })
+        context.store.set({
+          error: "Enter an email address, like ada@example.com.",
+        })
         announce("Enter an email address", { priority: "assertive" })
       } else {
         context.store.set({ error: null, done: true })
@@ -23,10 +25,16 @@ const subscribe = definePrimitive({
   slots: (slot) => ({
     root: slot({
       bind: () => prepareAnnouncements(document),
-      on: { submit: (event, { el, api }) => api.submit(event, el as HTMLFormElement) },
+      on: {
+        submit: (event, { el, api }) =>
+          api.submit(event, el as HTMLFormElement),
+      },
     }),
     input: slot({
-      attrs: (state) => ({ name: "email", "aria-invalid": state.error ? "true" : undefined }),
+      attrs: (state) => ({
+        name: "email",
+        "aria-invalid": state.error ? "true" : undefined,
+      }),
     }),
     error: slot<{}, { error: string | null }>({
       present: (state) => state.error !== null,
@@ -36,7 +44,12 @@ const subscribe = definePrimitive({
   }),
 })
 
-const parts = createParts(subscribe, { root: "form", input: "input", error: "p", done: "p" })
+const parts = createParts(subscribe, {
+  root: "form",
+  input: "input",
+  error: "p",
+  done: "p",
+})
 
 function Example() {
   return (

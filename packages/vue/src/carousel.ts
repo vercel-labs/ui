@@ -9,7 +9,11 @@ import {
   type CarouselSlidesPerPage,
 } from "@ui-sdk/core/carousel"
 import { defineComponent, h, useId, type PropType } from "vue"
-import { renderUnbound, useControllerEntry, useControllerTarget } from "./controller-target"
+import {
+  renderUnbound,
+  useControllerEntry,
+  useControllerTarget,
+} from "./controller-target"
 import { createParts, withElement } from "./create-parts"
 import {
   optionalBoolean,
@@ -24,7 +28,11 @@ import {
 
 type CarouselContext = PrimitiveHandle<typeof carouselPrimitive>
 
-const parts = createParts(carouselPrimitive, { viewport: "div", content: "div", item: "div" })
+const parts = createParts(carouselPrimitive, {
+  viewport: "div",
+  content: "div",
+  item: "div",
+})
 
 /**
  * A region of slides that scroll a page at a time. Name it with `aria-label`.
@@ -55,10 +63,16 @@ const Carousel = withElement(
     emits: {
       "update:page": (_page: number) => true,
       "update:modelValue": (_page: number) => true,
-      pageChange: (_page: number, _details: ChangeDetails<CarouselPageChangeReason>) => true,
+      pageChange: (
+        _page: number,
+        _details: ChangeDetails<CarouselPageChangeReason>
+      ) => true,
       pageChangeComplete: (_page: number) => true,
       "update:playing": (_playing: boolean) => true,
-      playingChange: (_playing: boolean, _details: ChangeDetails<CarouselPlayingChangeReason>) => true,
+      playingChange: (
+        _playing: boolean,
+        _details: ChangeDetails<CarouselPlayingChangeReason>
+      ) => true,
     },
     slots: Object as PartSlots<typeof carouselPrimitive, "root">,
     setup(props, { emit }) {
@@ -78,22 +92,33 @@ const Carousel = withElement(
         controller: props.controller,
         debug: props.debug,
         // The change events run first, so canceling one also keeps v-model as it was.
-        onPageChange: (page: number, details: ChangeDetails<CarouselPageChangeReason>) => {
+        onPageChange: (
+          page: number,
+          details: ChangeDetails<CarouselPageChangeReason>
+        ) => {
           emit("pageChange", page, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:page", page)
           emit("update:modelValue", page)
         },
-        onPageChangeComplete: (page: number) => emit("pageChangeComplete", page),
-        onPlayingChange: (playing: boolean, details: ChangeDetails<CarouselPlayingChangeReason>) => {
+        onPageChangeComplete: (page: number) =>
+          emit("pageChangeComplete", page),
+        onPlayingChange: (
+          playing: boolean,
+          details: ChangeDetails<CarouselPlayingChangeReason>
+        ) => {
           emit("playingChange", playing, details)
-          if (!details.canceled) emit("update:playing", playing)
+          if (!details.canceled) {
+            emit("update:playing", playing)
+          }
         },
       }))
       useControllerEntry(() => props.controller, carousel)
       return usePart(carousel, "root")
     },
-  }),
+  })
 )
 
 /**
@@ -122,12 +147,14 @@ function connectedPart<S extends ConnectedSlot, Tag extends string>(
   name: string,
   slot: S,
   tag: Tag,
-  unconnected: Record<string, unknown>,
+  unconnected: Record<string, unknown>
 ) {
   const Part = defineComponent({
     name: `${name}Part`,
     inheritAttrs: false,
-    props: { carousel: { type: Object as PropType<CarouselContext>, required: true } },
+    props: {
+      carousel: { type: Object as PropType<CarouselContext>, required: true },
+    },
     setup(props) {
       provideHandle(props.carousel)
       return usePart(props.carousel, slot, undefined, undefined, tag)
@@ -141,18 +168,26 @@ function connectedPart<S extends ConnectedSlot, Tag extends string>(
       props: { controller: Object as PropType<CarouselController> },
       slots: Object as PartSlots<typeof carouselPrimitive, S>,
       setup(props, { slots, attrs }) {
-        const connected = useControllerTarget(carouselPrimitive, () => props.controller)
+        const connected = useControllerTarget(
+          carouselPrimitive,
+          () => props.controller
+        )
         return () => {
           const carousel = connected()
           if (!carousel) {
-            const plain = tag === "button" ? { type: "button", ...attrs } : attrs
+            const plain =
+              tag === "button" ? { type: "button", ...attrs } : attrs
             return renderUnbound(tag, plain, { slots, state: unconnected })
           }
           // A new carousel needs a new part, bound to its instance.
-          return h(Part, { carousel, key: carousel.instance.id, ...attrs }, slots)
+          return h(
+            Part,
+            { carousel, key: carousel.instance.id, ...attrs },
+            slots
+          )
         }
       },
-    }),
+    })
   )
 }
 
@@ -160,31 +195,48 @@ function connectedPart<S extends ConnectedSlot, Tag extends string>(
  * Goes to the previous page. `aria-disabled` on the first page without `loop`, where it stays focusable.
  * @stable
  */
-const CarouselPrevious = connectedPart("CarouselPrevious", "previous", "button", { disabled: true })
+const CarouselPrevious = connectedPart(
+  "CarouselPrevious",
+  "previous",
+  "button",
+  { disabled: true }
+)
 
 /**
  * Goes to the next page. `aria-disabled` on the last page without `loop`, where it stays focusable.
  * @stable
  */
-const CarouselNext = connectedPart("CarouselNext", "next", "button", { disabled: true })
+const CarouselNext = connectedPart("CarouselNext", "next", "button", {
+  disabled: true,
+})
 
 /**
  * The indicators, as a tablist with one tab stop. Its default slot gets `{ state }` with `pageCount`.
  * @stable
  */
-const CarouselIndicatorGroup = connectedPart("CarouselIndicatorGroup", "indicator-group", "div", {
-  page: 1,
-  pageCount: null,
-})
+const CarouselIndicatorGroup = connectedPart(
+  "CarouselIndicatorGroup",
+  "indicator-group",
+  "div",
+  {
+    page: 1,
+    pageCount: null,
+  }
+)
 
 /**
  * Starts and stops rotation. Label it from `playing` in its slot state, as the carousel pattern asks.
  * @stable
  */
-const CarouselPlayToggle = connectedPart("CarouselPlayToggle", "play-toggle", "button", {
-  playing: false,
-  paused: false,
-})
+const CarouselPlayToggle = connectedPart(
+  "CarouselPlayToggle",
+  "play-toggle",
+  "button",
+  {
+    playing: false,
+    paused: false,
+  }
+)
 
 /**
  * Shows a page and goes to it. Indicators past the page count hide themselves.
@@ -202,12 +254,23 @@ const CarouselIndicator = withElement(
       // In a group outside its carousel, before that mounts, it's a plain button.
       if (!carousel) {
         const unconnected = { page: props.page ?? 0, selected: false }
-        return () => renderUnbound("button", { type: "button", ...attrs }, { slots, state: unconnected })
+        return () =>
+          renderUnbound(
+            "button",
+            { type: "button", ...attrs },
+            { slots, state: unconnected }
+          )
       }
       const id = useId()
-      return usePart(carousel, "indicator", () => ({ id, page: props.page }), undefined, "button")
+      return usePart(
+        carousel,
+        "indicator",
+        () => ({ id, page: props.page }),
+        undefined,
+        "button"
+      )
     },
-  }),
+  })
 )
 
 export { createCarouselController } from "@ui-sdk/core/carousel"

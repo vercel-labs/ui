@@ -34,7 +34,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const country = createComboboxController<string>()
 const log = useLog()
@@ -56,7 +57,9 @@ function search() {
     <div data-slot="controls">
       <button type="button" @click="openAndWait">Open and Wait</button>
       <button type="button" @click="search">Search “sw”</button>
-      <button type="button" @click="country.setValue('de')">Choose Germany</button>
+      <button type="button" @click="country.setValue('de')">
+        Choose Germany
+      </button>
       <button type="button" @click="country.clear()">Clear</button>
     </div>
     <Combobox :controller="country" :item-to-label="countryLabel">
@@ -72,7 +75,12 @@ function search() {
       <ComboboxContent>
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>
-          <ComboboxItem v-for="item in countries" :key="item.value" :value="item.value" :label="item.label">
+          <ComboboxItem
+            v-for="item in countries"
+            :key="item.value"
+            :value="item.value"
+            :label="item.label"
+          >
             {{ item.label }}
             <ComboboxItemIndicator>
               <CheckIcon />

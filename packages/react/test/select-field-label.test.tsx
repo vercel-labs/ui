@@ -28,13 +28,15 @@ test("a select in a Field keeps the Field's label as its name", async () => {
             <SelectValue />
           </SelectTrigger>
         </Select>
-      </Field>,
-    ),
+      </Field>
+    )
   )
   await React.act(async () => new Promise((resolve) => setTimeout(resolve, 10)))
   const trigger = container.querySelector<HTMLElement>('[role="combobox"]')!
   const label = container.querySelector('[data-slot="field-label"]')!
-  expect(trigger.getAttribute("aria-labelledby")?.split(" ")).toContain(label.id)
+  expect(trigger.getAttribute("aria-labelledby")?.split(" ")).toContain(
+    label.id
+  )
 })
 
 test("a trigger named by its own aria-labelledby keeps it, on the server too", async () => {
@@ -53,5 +55,9 @@ test("a trigger named by its own aria-labelledby keeps it, on the server too", a
   root = createRoot(container)
   await React.act(async () => root!.render(app))
   await React.act(async () => new Promise((resolve) => setTimeout(resolve, 10)))
-  expect(container.querySelector('[role="combobox"]')!.getAttribute("aria-labelledby")).toBe("fruit")
+  expect(
+    container
+      .querySelector('[role="combobox"]')!
+      .getAttribute("aria-labelledby")
+  ).toBe("fruit")
 })

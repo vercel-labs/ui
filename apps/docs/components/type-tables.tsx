@@ -1,5 +1,11 @@
 import type { Framework } from "@/lib/frameworks"
-import { controllerRows, reasonRows, stateRows, typeRows, type Row } from "@/lib/reference-rows"
+import {
+  controllerRows,
+  reasonRows,
+  stateRows,
+  typeRows,
+  type Row,
+} from "@/lib/reference-rows"
 import { Frame } from "./frame"
 
 // API reference tables, from rows generated from the core's exported types.
@@ -16,7 +22,7 @@ function Text({ children }: { children: string }) {
       </code>
     ) : (
       part
-    ),
+    )
   )
 }
 
@@ -37,9 +43,15 @@ function Rows({ rows, label }: { rows: Row[]; label: string }) {
                 </span>
               )}
               {row.type !== undefined && (
-                <code className="min-w-0 font-mono text-xs break-words text-subtle">{row.type}</code>
+                <code className="min-w-0 font-mono text-xs break-words text-subtle">
+                  {row.type}
+                </code>
               )}
-              {row.detail && <span className="ms-auto text-xs text-subtle">{row.detail}</span>}
+              {row.detail && (
+                <span className="ms-auto text-xs text-subtle">
+                  {row.detail}
+                </span>
+              )}
             </dt>
             {row.text && (
               <dd className="text-[17px] leading-relaxed text-foreground/75 sm:text-[14px]">
@@ -62,8 +74,12 @@ function Rows({ rows, label }: { rows: Row[]; label: string }) {
                 <ul className="mt-1 flex flex-col gap-1.5 border-s border-border/70 ps-3 text-[14px] leading-relaxed sm:text-[13px]">
                   {row.members.map((member) => (
                     <li key={member.name}>
-                      <code className="font-mono font-medium text-foreground">{member.name}</code>{" "}
-                      <code className="font-mono text-xs break-words text-subtle">{member.type}</code>
+                      <code className="font-mono font-medium text-foreground">
+                        {member.name}
+                      </code>{" "}
+                      <code className="font-mono text-xs break-words text-subtle">
+                        {member.type}
+                      </code>
                       {member.text && (
                         <span className="block text-foreground/70">
                           <Text>{member.text}</Text>
@@ -97,7 +113,9 @@ async function TypeTable(props: {
   descriptions?: Record<string, string>
 }) {
   const tables = await typeRows(props)
-  return tables.map((table) => <Rows key={table.id} label={table.label} rows={table.rows} />)
+  return tables.map((table) => (
+    <Rows key={table.id} label={table.label} rows={table.rows} />
+  ))
 }
 
 /** A part's render state: every field, its type and what it means. */

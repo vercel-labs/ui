@@ -46,12 +46,18 @@ const marks = /* @__PURE__ */ new WeakMap<Element, Record<string, number>>()
 // icon part inside is bound.
 function mark(el: Element, attribute: "data-has-icon" | "data-has-icons") {
   let counts = marks.get(el)
-  if (!counts) marks.set(el, (counts = {}))
+  if (!counts) {
+    marks.set(el, (counts = {}))
+  }
   counts[attribute] = (counts[attribute] ?? 0) + 1
-  if (counts[attribute] === 1) el.setAttribute(attribute, "")
+  if (counts[attribute] === 1) {
+    el.setAttribute(attribute, "")
+  }
   return () => {
     counts[attribute]--
-    if (counts[attribute] === 0) el.removeAttribute(attribute)
+    if (counts[attribute] === 0) {
+      el.removeAttribute(attribute)
+    }
   }
 }
 
@@ -64,7 +70,7 @@ function addMirrorRule(doc: Document) {
   writeStyle(
     doc,
     "ui-sdk-mirror",
-    "@layer ui-sdk{:where([data-mirror][aria-hidden]){display:inline-block}:where([data-mirror][aria-hidden]:dir(rtl)){scale:-1 1}}",
+    "@layer ui-sdk{:where([data-mirror][aria-hidden]){display:inline-block}:where([data-mirror][aria-hidden]:dir(rtl)){scale:-1 1}}"
   )
 }
 
@@ -77,7 +83,7 @@ function placeIcon(
   el: HTMLElement,
   placement: IconPlacement,
   subscribe: (listener: () => void) => () => void,
-  found: (item: HTMLElement) => void,
+  found: (item: HTMLElement) => void
 ) {
   let unmarkItem: (() => void) | undefined
   let unmarkList: (() => void) | undefined
@@ -85,25 +91,36 @@ function placeIcon(
   let active = true
   const place = () => {
     const item = el.parentElement?.closest<HTMLElement>(placement.item)
-    if (!item) return false
+    if (!item) {
+      return false
+    }
     if (!unmarkItem) {
       unmarkItem = mark(item, "data-has-icon")
       found(item)
     }
-    if (!placement.list) return true
+    if (!placement.list) {
+      return true
+    }
     const list = item.parentElement?.closest(placement.list)
-    if (list) unmarkList = mark(list, "data-has-icons")
+    if (list) {
+      unmarkList = mark(list, "data-has-icons")
+    }
     return !!list
   }
   const placeOnChange = () => {
-    if (!place()) return
+    if (!place()) {
+      return
+    }
     unsubscribe?.()
     unsubscribe = undefined
   }
-  if (!place())
+  if (!place()) {
     queueMicrotask(() => {
-      if (active && !place()) unsubscribe = subscribe(placeOnChange)
+      if (active && !place()) {
+        unsubscribe = subscribe(placeOnChange)
+      }
     })
+  }
   return () => {
     active = false
     unsubscribe?.()
@@ -120,12 +137,19 @@ function placeIcon(
 function itemIconPart<State extends object, Api>(
   placement: IconPlacement & {
     component: string
-    register?: (el: HTMLElement, context: { api: Api; props: IconProps }) => () => void
-  },
+    register?: (
+      el: HTMLElement,
+      context: { api: Api; props: IconProps }
+    ) => () => void
+  }
 ) {
   return {
     // An icon's id is made for it, and its item is the one it's inside.
-    props: { mirror: "boolean", id: "id", item: { kind: "string", from: "item.value" } },
+    props: {
+      mirror: "boolean",
+      id: "id",
+      item: { kind: "string", from: "item.value" },
+    },
     state: (state, { props }) => ({ mirror: !!props.mirror }),
     attrs: (state, { props }) => ({
       "aria-hidden": "true",
@@ -138,8 +162,12 @@ function itemIconPart<State extends object, Api>(
       const found = (item: HTMLElement) =>
         dev &&
         queueMicrotask(() => {
-          if (item.isConnected)
-            checkName(item, "An item with only an icon", { component: placement.component, id })
+          if (item.isConnected) {
+            checkName(item, "An item with only an icon", {
+              component: placement.component,
+              id,
+            })
+          }
         })
       const unplace = placeIcon(el, placement, store.subscribe, found)
       const unregister = placement.register?.(el, { api, props })
@@ -159,7 +187,9 @@ function createItemIcons(store: Store<{ icons: number }>) {
   let queued = false
   // Batched, since a long list registers all at once.
   const changed = () => {
-    if (queued) return
+    if (queued) {
+      return
+    }
     queued = true
     queueMicrotask(() => {
       queued = false
@@ -174,7 +204,9 @@ function createItemIcons(store: Store<{ icons: number }>) {
       icons.set(key, icon)
       changed()
       return () => {
-        if (icons.get(key) === icon && keep) icons.set(key, keep(icon))
+        if (icons.get(key) === icon && keep) {
+          icons.set(key, keep(icon))
+        }
       }
     },
   }
@@ -187,11 +219,17 @@ type ItemIcons = ReturnType<typeof createItemIcons>
  * outside the list, and the icons by key the second copies from, created when
  * the feature is first used.
  */
-function itemIconsFeature<State extends { icons: number }, Api extends ValueIconApi & IconsFeatureApi>(
+function itemIconsFeature<
+  State extends { icons: number },
+  Api extends ValueIconApi & IconsFeatureApi,
+>(
   placement: IconPlacement & {
     component: string
-    register?: (el: HTMLElement, context: { api: Api; props: IconProps }) => () => void
-  },
+    register?: (
+      el: HTMLElement,
+      context: { api: Api; props: IconProps }
+    ) => () => void
+  }
 ) {
   return {
     slots: {
@@ -205,7 +243,9 @@ function itemIconsFeature<State extends { icons: number }, Api extends ValueIcon
 }
 
 // What the item icons feature needs from a component.
-type IconsFeatureApi = { internal: { hooks: { icons?: ItemIcons }; store: Store<{ icons: number }> } }
+type IconsFeatureApi = {
+  internal: { hooks: { icons?: ItemIcons }; store: Store<{ icons: number }> }
+}
 
 // What an icon leaves behind when its item unmounts: a copy, since the
 // element itself is about to leave the page and may be emptied.
@@ -215,12 +255,19 @@ const keepCopy = (icon: Element) => icon.cloneNode(true) as Element
 const optionIcon = { item: '[role="option"]', list: '[role="listbox"]' }
 
 // Remembers an option's icon by its item's key, for a value that shows it.
-function rememberIcon(el: HTMLElement, { api, props }: { api: ValueIconApi; props: IconProps }) {
-  return props.item === undefined ? () => {} : api.internal.icons.register(props.item, el, keepCopy)
+function rememberIcon(
+  el: HTMLElement,
+  { api, props }: { api: ValueIconApi; props: IconProps }
+) {
+  return props.item === undefined
+    ? () => {}
+    : api.internal.icons.register(props.item, el, keepCopy)
 }
 
 // What the selected item's icon needs from its component.
-type ValueIconApi = { internal: { icons: ItemIcons; selection: { keys: () => string[] } } }
+type ValueIconApi = {
+  internal: { icons: ItemIcons; selection: { keys: () => string[] } }
+}
 
 // The selected item's icon, while exactly one item is selected and it has one.
 function selectedIcon(api: ValueIconApi) {
@@ -231,7 +278,9 @@ function selectedIcon(api: ValueIconApi) {
 // Copies an icon's content into another element, replacing what was there,
 // and whether it flips in right-to-left text.
 function copyIcon(icon: Element | undefined, into: HTMLElement) {
-  into.replaceChildren(...Array.from(icon?.childNodes ?? [], (node) => node.cloneNode(true)))
+  into.replaceChildren(
+    ...Array.from(icon?.childNodes ?? [], (node) => node.cloneNode(true))
+  )
   into.toggleAttribute("data-mirror", !!icon?.hasAttribute("data-mirror"))
 }
 
@@ -240,7 +289,10 @@ function copyIcon(icon: Element | undefined, into: HTMLElement) {
  * to a combobox's input. Rendered while one item is selected and it has an
  * icon. Its content is a copy of that icon's, so frameworks render it empty.
  */
-function valueIconPart<State extends { icons: number }, Api extends ValueIconApi>() {
+function valueIconPart<
+  State extends { icons: number },
+  Api extends ValueIconApi,
+>() {
   return {
     present: (state, { api }) => selectedIcon(api) !== undefined,
     attrs: () => ({ "aria-hidden": "true" }),
@@ -248,7 +300,9 @@ function valueIconPart<State extends { icons: number }, Api extends ValueIconApi
       let shown: Element | undefined
       const write = () => {
         const icon = selectedIcon(api)
-        if (icon === shown) return
+        if (icon === shown) {
+          return
+        }
         shown = icon
         copyIcon(icon, el)
       }

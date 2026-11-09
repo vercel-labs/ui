@@ -28,11 +28,22 @@
 
 <div class="fixture">
   <button>Before</button>
-  <NavigationMenu {...options} aria-label="Main" class="nav-menu" onValueChange={report}>
-    <NavigationMenuList class={options.orientation === "vertical" ? "nav-list vertical" : "nav-list"}>
+  <NavigationMenu
+    {...options}
+    aria-label="Main"
+    class="nav-menu"
+    onValueChange={report}
+  >
+    <NavigationMenuList
+      class={options.orientation === "vertical"
+        ? "nav-list vertical"
+        : "nav-list"}
+    >
       {#each fixture.items as item, index (item.value)}
         <NavigationMenuItem value={item.value}>
-          <NavigationMenuTrigger class="nav-trigger">{item.trigger}</NavigationMenuTrigger>
+          <NavigationMenuTrigger class="nav-trigger"
+            >{item.trigger}</NavigationMenuTrigger
+          >
           <NavigationMenuContent
             class={index === 0 ? "nav-content" : "nav-content narrow"}
             keepMounted={layout.keepMounted}
@@ -41,18 +52,28 @@
           >
             <ul>
               {#each item.links as link (link.href)}
-                <li><NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink></li>
+                <li>
+                  <NavigationMenuLink href={link.href}
+                    >{link.label}</NavigationMenuLink
+                  >
+                </li>
               {/each}
             </ul>
             {#if index === 1 && layout.nested}
               <NavigationMenu orientation="vertical">
                 <NavigationMenuList class="nav-list vertical">
                   <NavigationMenuItem value={fixture.nested.value}>
-                    <NavigationMenuTrigger class="nav-trigger">{fixture.nested.trigger}</NavigationMenuTrigger>
+                    <NavigationMenuTrigger class="nav-trigger"
+                      >{fixture.nested.trigger}</NavigationMenuTrigger
+                    >
                     <NavigationMenuContent class="nav-content narrow">
                       <ul>
                         {#each fixture.nested.links as link (link.href)}
-                          <li><NavigationMenuLink href={link.href}>{link.label}</NavigationMenuLink></li>
+                          <li>
+                            <NavigationMenuLink href={link.href}
+                              >{link.label}</NavigationMenuLink
+                            >
+                          </li>
                         {/each}
                       </ul>
                     </NavigationMenuContent>
@@ -64,7 +85,9 @@
         </NavigationMenuItem>
       {/each}
       <NavigationMenuItem>
-        <NavigationMenuLink class="nav-link" href={fixture.link.href} current>{fixture.link.label}</NavigationMenuLink>
+        <NavigationMenuLink class="nav-link" href={fixture.link.href} current
+          >{fixture.link.label}</NavigationMenuLink
+        >
       </NavigationMenuItem>
     </NavigationMenuList>
     <NavigationMenuIndicator class="nav-indicator" />

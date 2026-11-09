@@ -1,5 +1,12 @@
 import "@ui-sdk/web/navigation-menu"
-import { ArrowRight, ChevronDown, Circle, CircleCheck, CircleQuestionMark, createElement } from "lucide"
+import {
+  ArrowRight,
+  ChevronDown,
+  Circle,
+  CircleCheck,
+  CircleQuestionMark,
+  createElement,
+} from "lucide"
 
 const gettingStarted = [
   {
@@ -10,7 +17,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -23,12 +31,14 @@ const components = [
   {
     title: "Alert Dialog",
     href: "#",
-    description: "Asks for a decision before anything else on the page can be used.",
+    description:
+      "Asks for a decision before anything else on the page can be used.",
   },
   {
     title: "Hover Card",
     href: "#",
-    description: "A preview of what a link points to, for people who pause on it.",
+    description:
+      "A preview of what a link points to, for people who pause on it.",
   },
   {
     title: "Progress",
@@ -43,12 +53,14 @@ const components = [
   {
     title: "Tabs",
     href: "#",
-    description: "Shows one panel of content at a time, picked from a list of tabs.",
+    description:
+      "Shows one panel of content at a time, picked from a list of tabs.",
   },
   {
     title: "Tooltip",
     href: "#",
-    description: "A short label for a control, shown on hover or keyboard focus.",
+    description:
+      "A short label for a control, shown on hover or keyboard focus.",
   },
 ]
 
@@ -90,7 +102,7 @@ function mount(root: HTMLElement) {
                     <span data-slot="hint">${page.description}</span>
                   </a>
                 </ui-navigation-menu-link>
-              </li>`,
+              </li>`
                 )
                 .join("")}
             </ul>
@@ -115,7 +127,7 @@ function mount(root: HTMLElement) {
                     <span data-slot="hint">${page.description}</span>
                   </a>
                 </ui-navigation-menu-link>
-              </li>`,
+              </li>`
                 )
                 .join("")}
             </ul>
@@ -140,7 +152,7 @@ function mount(root: HTMLElement) {
                     ${status.title}
                   </a>
                 </ui-navigation-menu-link>
-              </li>`,
+              </li>`
                 )
                 .join("")}
             </ul>

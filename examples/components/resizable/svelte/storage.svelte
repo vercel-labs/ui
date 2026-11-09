@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Resizable, ResizableHandle, ResizablePanel, type ResizableStorage } from "@ui-sdk/svelte/resizable"
+  import {
+    Resizable,
+    ResizableHandle,
+    ResizablePanel,
+    type ResizableStorage,
+  } from "@ui-sdk/svelte/resizable"
 
   const session: ResizableStorage = {
     getItem: (key) => sessionStorage.getItem(key),

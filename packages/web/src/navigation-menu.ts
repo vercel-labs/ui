@@ -1,5 +1,14 @@
-import { navigationMenu, type NavigationMenuApi } from "@ui-sdk/core/navigation-menu"
-import { autoId, createParts, findContainer, findOwner, instanceOf } from "./define-element"
+import {
+  navigationMenu,
+  type NavigationMenuApi,
+} from "@ui-sdk/core/navigation-menu"
+import {
+  autoId,
+  createParts,
+  findContainer,
+  findOwner,
+  instanceOf,
+} from "./define-element"
 
 const owner = "ui-navigation-menu"
 
@@ -8,16 +17,21 @@ const owner = "ui-navigation-menu"
 const items = new WeakMap<Element, string>()
 function itemOf(el: HTMLElement) {
   const item = el.closest("ui-navigation-menu-item")
-  if (item) items.set(el, item.getAttribute("value") ?? autoId(item))
+  if (item) {
+    items.set(el, item.getAttribute("value") ?? autoId(item))
+  }
   return items.get(el)
 }
 
 // The menu and item a nested menu sits in: the content around it, which may
 // have moved into its menu's viewport.
 function parentOf(el: HTMLElement) {
-  const content = el.parentElement?.closest<HTMLElement>("ui-navigation-menu-content")
+  const content = el.parentElement?.closest<HTMLElement>(
+    "ui-navigation-menu-content"
+  )
   const item = content && itemOf(content)
-  const api = content && instanceOf<NavigationMenuApi>(findOwner(content, owner))?.api
+  const api =
+    content && instanceOf<NavigationMenuApi>(findOwner(content, owner))?.api
   return api && item ? { api, item } : undefined
 }
 
@@ -27,13 +41,20 @@ function parentOf(el: HTMLElement) {
 // moved into its parent's viewport, which is no container for its popups.
 const portal = {
   slots: ["content", "viewport"],
-  container(el: HTMLElement, part: { slot: string; props: Record<string, unknown> }) {
+  container(
+    el: HTMLElement,
+    part: { slot: string; props: Record<string, unknown> }
+  ) {
     const selector = el.getAttribute("container")
     const container = selector ? findContainer(el, selector) : null
-    if (part.slot === "viewport") return container
+    if (part.slot === "viewport") {
+      return container
+    }
     const api = instanceOf<NavigationMenuApi>(el)?.api
     const viewport = api?.internal.viewportElement()
-    if (viewport && api?.internal.inViewport(String(part.props.value))) return viewport
+    if (viewport && api?.internal.inViewport(String(part.props.value))) {
+      return viewport
+    }
     return viewport ? null : container
   },
 }
@@ -66,14 +87,17 @@ function defineNavigationMenuElements() {
       state: {
         value: {
           get: (api: NavigationMenuApi) => api.getValue(),
-          set: (api: NavigationMenuApi, value: string | null) => api.setValue(value || null),
+          set: (api: NavigationMenuApi, value: string | null) =>
+            api.setValue(value || null),
         },
       },
       api: ["getValue", "setValue", "isOpen", "close", "focus"],
       portal,
       // A landmark, unless it's nested inside another menu's content.
       render(el, instance) {
-        if (!el.hasAttribute("role") && !instance.get().nested) el.setAttribute("role", "navigation")
+        if (!el.hasAttribute("role") && !instance.get().nested) {
+          el.setAttribute("role", "navigation")
+        }
       },
     },
     list: {
@@ -91,7 +115,9 @@ function defineNavigationMenuElements() {
       tag: "ui-navigation-menu-trigger",
       display: "contents",
       context: (el) => ({ value: itemOf(el) }),
-      target: (el) => el.querySelector<HTMLElement>("button") ?? (el.firstElementChild as HTMLElement),
+      target: (el) =>
+        el.querySelector<HTMLElement>("button") ??
+        (el.firstElementChild as HTMLElement),
     },
     // A block, so a closed content kept findable has a box for
     // `hidden="until-found"` to hide; an inline one would show its links. Not
@@ -106,11 +132,16 @@ function defineNavigationMenuElements() {
     link: {
       tag: "ui-navigation-menu-link",
       display: "contents",
-      target: (el) => el.querySelector<HTMLElement>("a") ?? (el.firstElementChild as HTMLElement),
+      target: (el) =>
+        el.querySelector<HTMLElement>("a") ??
+        (el.firstElementChild as HTMLElement),
     },
     // An icon inside a link. Screen readers skip it.
     "link-icon": "ui-navigation-menu-link-icon",
-    viewport: { tag: "ui-navigation-menu-viewport", kinds: { container: null } },
+    viewport: {
+      tag: "ui-navigation-menu-viewport",
+      kinds: { container: null },
+    },
     indicator: { tag: "ui-navigation-menu-indicator", display: "block" },
   })
 }

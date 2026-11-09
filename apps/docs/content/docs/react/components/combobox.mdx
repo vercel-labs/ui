@@ -100,7 +100,15 @@ const {
   empty: "div",
 })
 
-export { CountryEmpty, CountryInput, CountryLabel, CountryList, CountryOption, CountryPicker, CountryPopup }
+export {
+  CountryEmpty,
+  CountryInput,
+  CountryLabel,
+  CountryList,
+  CountryOption,
+  CountryPicker,
+  CountryPopup,
+}
 ```
 
 ```tsx
@@ -540,7 +548,10 @@ Props and callbacks are the same as below, as React props.
 
 ### Combobox
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxOptions" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxOptions"
+/>
 
 `announcement` receives `{ type: "results", count, query, loading }` or `{ type: "removed", label }` and returns the words, or `null` for silence. The default is English: "3 results", "No results", "Loading" or "France removed".
 
@@ -558,7 +569,10 @@ Opens and closes the list. Renders a `button`, kept out of the tab order while t
 
 ### ComboboxClear
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxClearProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxClearProps"
+/>
 
 ### ComboboxChips
 
@@ -566,11 +580,17 @@ Holds the chips and the input for a multiple selection. Renders a `div`.
 
 ### ComboboxValue
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxValueProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxValueProps"
+/>
 
 ### ComboboxChip
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxChipProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxChipProps"
+/>
 
 ### ComboboxChipRemove
 
@@ -586,7 +606,10 @@ Shows the selected item's icon beside the input. It takes no props of its own, a
 
 ### ComboboxContent
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxContentProps"
+/>
 
 ### ComboboxArrow
 
@@ -618,11 +641,17 @@ Names its group. Renders a `div`.
 
 ### ComboboxItem
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxItemProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemProps"
+/>
 
 ### ComboboxItemIcon
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxItemIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemIconProps"
+/>
 
 ### ComboboxItemText
 
@@ -630,7 +659,10 @@ Shows its item's label, and marks what matched the query. Renders a `span`.
 
 ### ComboboxItemIndicator
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxItemIndicatorProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemIndicatorProps"
+/>
 
 ### ComboboxSeparator
 
@@ -638,13 +670,19 @@ Separates options or groups. Renders a `div` with the separator role.
 
 ### ComboboxCreate
 
-<TypeTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxCreateProps" />
+<TypeTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxCreateProps"
+/>
 
 ### Items as Data
 
 Each item in `items`. Groups are `{ type: "group", label, items }` and separators `{ type: "separator" }`.
 
-<TypeTable path="../../packages/core/src/foundation/lists/listbox.ts" name="ListItem" />
+<TypeTable
+  path="../../packages/core/src/foundation/lists/listbox.ts"
+  name="ListItem"
+/>
 
 ### Async Options
 
@@ -656,19 +694,31 @@ What render functions, state-based class names and slots receive, per part.
 
 `ComboboxInput`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxInputState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxInputState"
+/>
 
 `ComboboxTrigger`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxTriggerState"
+/>
 
 `ComboboxContent` and `ComboboxList`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxContentState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxContentState"
+/>
 
 `ComboboxItem`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxItemState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemState"
+/>
 
 `ComboboxItemIndicator`:
 
@@ -679,43 +729,73 @@ What render functions, state-based class names and slots receive, per part.
 
 `ComboboxItemIcon`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxItemIconState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemIconState"
+/>
 
 `ComboboxCreate`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxCreateState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxCreateState"
+/>
 
 `ComboboxEmpty`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxEmptyState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxEmptyState"
+/>
 
 `ComboboxStatus`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxStatusState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxStatusState"
+/>
 
 `ComboboxValue`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxValueState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxValueState"
+/>
 
 `ComboboxChip`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxChipState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxChipState"
+/>
 
 `ComboboxClear` and `ComboboxChipRemove`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxClearState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxClearState"
+/>
 
 `ComboboxArrow`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxArrowState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxArrowState"
+/>
 
 `ComboboxItemText`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxItemTextState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxItemTextState"
+/>
 
 `ComboboxSelectAll`:
 
-<StateTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxSelectAllState" />
+<StateTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxSelectAllState"
+/>
 
 `ComboboxChipsOverflow`:
 
@@ -742,11 +822,17 @@ Why the text changed:
 
 And why the list opened or closed:
 
-<ReasonTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxOpenChangeReason"
+/>
 
 With `dismissible` false, the refused dismissals `onDismissAttempt` reports:
 
-<ReasonTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxDismissReason" />
+<ReasonTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxDismissReason"
+/>
 
 ### Controller
 
@@ -754,7 +840,10 @@ Create one with `createComboboxController<Value, Multiple>()` and pass it as `co
 
 Every write method takes an optional `{ reason, event }`, passed to the change callback.
 
-<ControllerTable path="../../packages/core/src/components/combobox/combobox.ts" name="ComboboxController" />
+<ControllerTable
+  path="../../packages/core/src/components/combobox/combobox.ts"
+  name="ComboboxController"
+/>
 
 ### Events
 

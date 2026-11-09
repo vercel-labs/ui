@@ -28,7 +28,12 @@ const pages = [
     <AutocompleteContent>
       <AutocompleteEmpty>No sections found.</AutocompleteEmpty>
       <AutocompleteList>
-        <AutocompleteItem v-for="page in pages" :key="page.href" :value="page.title" :label="page.title">
+        <AutocompleteItem
+          v-for="page in pages"
+          :key="page.href"
+          :value="page.title"
+          :label="page.title"
+        >
           <template #render="{ props }">
             <a v-bind="props" :href="page.href">
               {{ page.title }}

@@ -68,7 +68,9 @@ Rich content in a floating panel, opened from a button. Put its trigger and cont
     /** Runs when the payload the content shows changes. `details.cancel()` keeps the previous one. */
     onPayloadChange?: (payload: unknown, details: PayloadDetails) => void
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back, the screen reader's escape or a swipe. Focus or the window leaving is refused without it. */
-    onDismissAttempt?: (details: DismissAttemptDetails<PopoverDismissReason>) => void
+    onDismissAttempt?: (
+      details: DismissAttemptDetails<PopoverDismissReason>
+    ) => void
     children?: Snippet
   } = $props()
 
@@ -91,7 +93,9 @@ Rich content in a floating panel, opened from a button. Put its trigger and cont
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onPayloadChange,

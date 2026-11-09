@@ -30,7 +30,9 @@ function mount(root: HTMLElement) {
     const { value, reason } = event.detail
     log(root, `${[value].flat().join(" – ")} (${reason})`)
   })
-  root.querySelector("button")!.addEventListener("click", () => (slider.value = [0.3, 0.7]))
+  root
+    .querySelector("button")!
+    .addEventListener("click", () => (slider.value = [0.3, 0.7]))
 }
 
 export { mount }

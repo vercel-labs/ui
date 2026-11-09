@@ -15,13 +15,26 @@ const PAGE = 10
 // field keeps them for its caret.
 function listStep(event: KeyboardEvent, { apple }: { apple: boolean }) {
   const { key } = event
-  if (key === "ArrowDown") return event.metaKey ? "last" : 1
-  if (key === "ArrowUp") return event.metaKey ? "first" : -1
-  if (key === "PageDown") return PAGE
-  if (key === "PageUp") return -PAGE
-  const emacs = apple && event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey
-  if (emacs && key === "n") return 1
-  if (emacs && key === "p") return -1
+  if (key === "ArrowDown") {
+    return event.metaKey ? "last" : 1
+  }
+  if (key === "ArrowUp") {
+    return event.metaKey ? "first" : -1
+  }
+  if (key === "PageDown") {
+    return PAGE
+  }
+  if (key === "PageUp") {
+    return -PAGE
+  }
+  const emacs =
+    apple && event.ctrlKey && !event.metaKey && !event.altKey && !event.shiftKey
+  if (emacs && key === "n") {
+    return 1
+  }
+  if (emacs && key === "p") {
+    return -1
+  }
 }
 
 // Keys on an item that has real focus, after a screen reader's tap opened the
@@ -40,23 +53,33 @@ function listKeyDown(
     highlighted: string | null
     choose: (key: string, event: Event) => void
     focusInput: () => void
-  },
+  }
 ) {
   const step =
-    event.key === "Home" ? "first" : event.key === "End" ? "last" : listStep(event, { apple: isApple() })
+    event.key === "Home"
+      ? "first"
+      : event.key === "End"
+        ? "last"
+        : listStep(event, { apple: isApple() })
   if (step !== undefined) {
     event.preventDefault()
     return listbox.move(step, event)
   }
   if (event.key === "Enter" || event.key === " ") {
     event.preventDefault()
-    if (highlighted === null) return
+    if (highlighted === null) {
+      return
+    }
     const el = listbox.element(highlighted)
     // Links follow themselves, so routers and modifier keys work, and the press chooses.
-    if (event.key === "Enter" && el?.matches("a[href]")) return el.click()
+    if (event.key === "Enter" && el?.matches("a[href]")) {
+      return el.click()
+    }
     return choose(highlighted, event)
   }
-  if (isTypeaheadKey(event)) focusInput()
+  if (isTypeaheadKey(event)) {
+    focusInput()
+  }
 }
 
 export { listKeyDown, listStep }

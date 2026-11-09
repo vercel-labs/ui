@@ -18,7 +18,11 @@ Previous and Next, and a grid for each month.
   import { setContext } from "svelte"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import CalendarGrid from "./calendar-grid.svelte"
   import CalendarHeading from "./calendar-heading.svelte"
   import CalendarNext from "./calendar-next.svelte"
@@ -80,7 +84,9 @@ Previous and Next, and a grid for each month.
     onValueChange: (next: CalendarValue, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
     get month() {
       return month
@@ -88,7 +94,9 @@ Previous and Next, and a grid for each month.
     defaultMonth,
     onMonthChange: (next: ISOMonth, details: MonthDetails) => {
       onMonthChange?.(next, details)
-      if (!details.canceled) month = next
+      if (!details.canceled) {
+        month = next
+      }
     },
     min,
     max,
@@ -130,4 +138,8 @@ Previous and Next, and a grid for each month.
   {/each}
 {/snippet}
 
-<Part tag="div" part={root} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="div"
+  part={root}
+  props={{ ...rest, children: children ?? fallback }}
+/>

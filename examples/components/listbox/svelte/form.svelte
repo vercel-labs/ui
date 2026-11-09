@@ -1,6 +1,10 @@
 <script lang="ts">
   import { CheckIcon } from "@lucide/svelte"
-  import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/svelte/listbox"
+  import {
+    Listbox,
+    ListboxItem,
+    ListboxItemIndicator,
+  } from "@ui-sdk/svelte/listbox"
   import { useLog } from "../../../shared/svelte/log"
 
   const toppings = [
@@ -38,7 +42,9 @@
     data-slot="row"
     onsubmit={(event) => {
       event.preventDefault()
-      log(`Ordered ${new FormData(event.currentTarget).getAll("toppings").join(", ")}`)
+      log(
+        `Ordered ${new FormData(event.currentTarget).getAll("toppings").join(", ")}`
+      )
     }}
   >
     <button type="reset">Reset</button>

@@ -10,9 +10,15 @@ function Example() {
           Reports
         </TabsTab>
       </TabsList>
-      <TabsPanel value="overview">Revenue, visitors and sign-ups for the last 30 days.</TabsPanel>
-      <TabsPanel value="analytics">Where your visitors come from and the pages they read most.</TabsPanel>
-      <TabsPanel value="reports">Monthly reports are available on the Pro plan.</TabsPanel>
+      <TabsPanel value="overview">
+        Revenue, visitors and sign-ups for the last 30 days.
+      </TabsPanel>
+      <TabsPanel value="analytics">
+        Where your visitors come from and the pages they read most.
+      </TabsPanel>
+      <TabsPanel value="reports">
+        Monthly reports are available on the Pro plan.
+      </TabsPanel>
     </Tabs>
   )
 }

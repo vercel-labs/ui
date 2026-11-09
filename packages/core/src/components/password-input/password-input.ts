@@ -9,10 +9,16 @@ import {
 import { watchFieldsets } from "../../foundation/forms/form"
 import { afterReset } from "../../foundation/forms/value"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { on } from "../../foundation/kernel/events"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import {
   focusFromSurroundings,
   initialText,
@@ -28,7 +34,8 @@ import { createChange } from "../../foundation/kernel/input-source"
  * Why a password input's password wants to be shown or hidden.
  * @stable
  */
-type PasswordInputVisibleChangeReason = "toggle-press" | "form-submit" | "reset" | "page-hide" | "imperative"
+type PasswordInputVisibleChangeReason =
+  "toggle-press" | "form-submit" | "reset" | "page-hide" | "imperative"
 
 /**
  * Reads, writes, shows and hides a password input from anywhere. Pass it as the `controller` option.
@@ -42,7 +49,10 @@ function createPasswordInputController() {
      * Sets the value as if the user typed it, so `input` fires.
      * Returns false when the change was canceled or nothing changed.
      */
-    setValue: (value: string, options?: ChangeOptions<InputValueChangeReason>) => boolean
+    setValue: (
+      value: string,
+      options?: ChangeOptions<InputValueChangeReason>
+    ) => boolean
     /**
      * Empties the field, as if the user deleted the text, so `input` fires.
      * Returns false when the change was canceled or nothing changed.
@@ -51,9 +61,14 @@ function createPasswordInputController() {
     /** Whether the password is shown. */
     isVisible: () => boolean
     /** Shows or hides the password. Returns false when canceled. */
-    setVisible: (visible: boolean, options?: ChangeOptions<PasswordInputVisibleChangeReason>) => boolean
+    setVisible: (
+      visible: boolean,
+      options?: ChangeOptions<PasswordInputVisibleChangeReason>
+    ) => boolean
     /** Shows the password if it's hidden, and hides it if it's shown. Returns false when canceled. */
-    toggleVisible: (options?: ChangeOptions<PasswordInputVisibleChangeReason>) => boolean
+    toggleVisible: (
+      options?: ChangeOptions<PasswordInputVisibleChangeReason>
+    ) => boolean
     /** Moves focus to the field. */
     focus: () => void
   }>()
@@ -86,7 +101,10 @@ type PasswordInputOptions = TextFieldOptions & {
    * (`"imperative"`). `details.cancel()` keeps it as it was; the field is a
    * password field while the browser reads a submitted form either way.
    */
-  onVisibleChange?: (visible: boolean, details: ChangeDetails<PasswordInputVisibleChangeReason>) => void
+  onVisibleChange?: (
+    visible: boolean,
+    details: ChangeDetails<PasswordInputVisibleChangeReason>
+  ) => void
   /**
    * What the browser and password managers fill in: `"current-password"` for
    * signing in, `"new-password"` for signing up or changing it.
@@ -108,7 +126,9 @@ type PasswordInputOptions = TextFieldOptions & {
 } & PrimitiveOptions
 
 /** What adapters pass on top: the id the field already has, like in web component markup. */
-type PasswordInputInternalOptions = PasswordInputOptions & { controlId?: string }
+type PasswordInputInternalOptions = PasswordInputOptions & {
+  controlId?: string
+}
 
 /**
  * What `render` functions and state-based class names of every Password Input part receive.
@@ -154,7 +174,8 @@ const settings = (options: PasswordInputInternalOptions) => ({
   autoComplete: options.autoComplete ?? "current-password",
 })
 
-const isDisabled = (state: State) => state.disabled || state.formDisabled || state.controlDisabled
+const isDisabled = (state: State) =>
+  state.disabled || state.formDisabled || state.controlDisabled
 
 function publicState(state: State) {
   return {
@@ -178,7 +199,8 @@ function dataAttrs(state: State) {
   }
 }
 
-const controlIdOf = (state: State, id: string) => state.controlId ?? `${id}-control`
+const controlIdOf = (state: State, id: string) =>
+  state.controlId ?? `${id}-control`
 
 const typeOf = (visible: boolean) => (visible ? "text" : "password")
 
@@ -191,12 +213,26 @@ const typeOf = (visible: boolean) => (visible ? "text" : "password")
 function showText(el: HTMLInputElement, visible: boolean) {
   const type = typeOf(visible)
   const focused = el.ownerDocument.activeElement === el
-  const { selectionStart: start, selectionEnd: end, selectionDirection: direction, value } = el
-  if (el.type !== type) el.type = type
-  if (!focused || start === null || end === null) return
+  const {
+    selectionStart: start,
+    selectionEnd: end,
+    selectionDirection: direction,
+    value,
+  } = el
+  if (el.type !== type) {
+    el.type = type
+  }
+  if (!focused || start === null || end === null) {
+    return
+  }
   const restore = () => {
-    if (el.ownerDocument.activeElement === el && el.value === value && el.type === type)
+    if (
+      el.ownerDocument.activeElement === el &&
+      el.value === value &&
+      el.type === type
+    ) {
       el.setSelectionRange(start, end, direction ?? undefined)
+    }
   }
   restore()
   requestAnimationFrame(restore)
@@ -204,7 +240,10 @@ function showText(el: HTMLInputElement, visible: boolean) {
 
 // Reports the field's own `disabled` attribute, now and as it changes, like
 // when a web component Field writes it. Returns a cleanup.
-function watchDisabled(el: HTMLInputElement, onChange: (disabled: boolean) => void) {
+function watchDisabled(
+  el: HTMLInputElement,
+  onChange: (disabled: boolean) => void
+) {
   onChange(el.disabled)
   const observer = new MutationObserver(() => onChange(el.disabled))
   observer.observe(el, { attributeFilter: ["disabled"] })
@@ -245,7 +284,9 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
   sync: (options) => ({
     ...syncText(options),
     ...(options.visible === undefined ? {} : { visible: options.visible }),
-    ...(options.controlId === undefined ? {} : { controlId: options.controlId }),
+    ...(options.controlId === undefined
+      ? {}
+      : { controlId: options.controlId }),
     ...settings(options),
   }),
   api: (context) => {
@@ -258,7 +299,10 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
 
     function setVisible(
       visible: boolean,
-      { reason = "imperative", event }: ChangeOptions<PasswordInputVisibleChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: ChangeOptions<PasswordInputVisibleChangeReason> = {}
     ) {
       return change("visible", visible, { reason, event })
     }
@@ -268,11 +312,15 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
     // state again a task later, in case the change was canceled or is controlled.
     function hide(reason: PasswordInputVisibleChangeReason, event?: Event) {
       const el = control()
-      if (!store.get().visible || !el) return
+      if (!store.get().visible || !el) {
+        return
+      }
       showText(el, false)
       setVisible(false, { reason, event })
       setTimeout(() => {
-        if (el.type !== typeOf(store.get().visible)) showText(el, store.get().visible)
+        if (el.type !== typeOf(store.get().visible)) {
+          showText(el, store.get().visible)
+        }
       })
     }
 
@@ -281,9 +329,12 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
       isVisible: () => store.get().visible,
       setVisible: (
         visible: boolean,
-        { reason, event }: ChangeOptions<PasswordInputVisibleChangeReason> = {},
+        { reason, event }: ChangeOptions<PasswordInputVisibleChangeReason> = {}
       ) => setVisible(visible, { reason, event }),
-      toggleVisible: ({ reason, event }: ChangeOptions<PasswordInputVisibleChangeReason> = {}) =>
+      toggleVisible: ({
+        reason,
+        event,
+      }: ChangeOptions<PasswordInputVisibleChangeReason> = {}) =>
         setVisible(!store.get().visible, { reason, event }),
       internal: {
         ...text.internal,
@@ -292,14 +343,21 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
         // so typing goes on. Keys and screen readers keep focus on the toggle,
         // which says whether it's pressed.
         togglePress(event: Event | undefined) {
-          if (isDisabled(store.get())) return
+          if (isDisabled(store.get())) {
+            return
+          }
           setVisible(!store.get().visible, { reason: "toggle-press", event })
           const el = control()
           // A press without an event, like one a test sends through `press`, has no pointer behind it.
-          const pointer = !!event && event instanceof MouseEvent && event.detail > 0
-          if (!pointer || !el || el.ownerDocument.activeElement === el) return
+          const pointer =
+            !!event && event instanceof MouseEvent && event.detail > 0
+          if (!pointer || !el || el.ownerDocument.activeElement === el) {
+            return
+          }
           el.focus({ preventScroll: true })
-          if (selection) el.setSelectionRange(...selection)
+          if (selection) {
+            el.setSelectionRange(...selection)
+          }
         },
         // Mouse events carry modifier state too, so a click into the field
         // shows the warning before any key.
@@ -308,44 +366,60 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
         },
         blurred(el: HTMLInputElement) {
           store.set({ capsLock: false })
-          if (el.selectionStart !== null && el.selectionEnd !== null)
-            selection = [el.selectionStart, el.selectionEnd, el.selectionDirection ?? "none"]
+          if (el.selectionStart !== null && el.selectionEnd !== null) {
+            selection = [
+              el.selectionStart,
+              el.selectionEnd,
+              el.selectionDirection ?? "none",
+            ]
+          }
         },
         bindControl(el: HTMLInputElement) {
           let shown = store.get().visible
-          if (el.type !== typeOf(shown)) showText(el, shown)
+          if (el.type !== typeOf(shown)) {
+            showText(el, shown)
+          }
           const view = el.ownerDocument.defaultView
           // Browsers keep a text field's value in session history and the
           // back-forward cache, but never a password's.
-          const onPageHide = (event: PageTransitionEvent) => hide("page-hide", event)
+          const onPageHide = (event: PageTransitionEvent) =>
+            hide("page-hide", event)
           view?.addEventListener("pagehide", onPageHide)
           const cleanups = [
             text.internal.bind(el),
             // Only a change of visibility, not every keystroke, which also reaches subscribers.
             store.subscribe(() => {
-              if (store.get().visible === shown) return
+              if (store.get().visible === shown) {
+                return
+              }
               shown = store.get().visible
               showText(el, shown)
             }),
             watchFieldsets(el, (formDisabled) => store.set({ formDisabled })),
-            watchDisabled(el, (controlDisabled) => store.set({ controlDisabled })),
+            watchDisabled(el, (controlDisabled) =>
+              store.set({ controlDisabled })
+            ),
             // Captured, so the field is a password field before the page's own
             // submit handlers run, and before the browser decides whether to offer to save it.
             on(
               el.ownerDocument,
               "submit",
               (event) => {
-                if (event.target === el.form) hide("form-submit", event)
+                if (event.target === el.form) {
+                  hide("form-submit", event)
+                }
               },
-              { capture: true },
+              { capture: true }
             ),
             on(
               el.ownerDocument,
               "reset",
               (event) => {
-                if (event.target === el.form) afterReset(event, () => hide("reset"))
+                if (event.target === el.form) {
+                  afterReset(event, () => hide("reset"))
+                }
               },
-              { capture: true },
+              { capture: true }
             ),
             () => view?.removeEventListener("pagehide", onPageHide),
           ]
@@ -359,7 +433,8 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
       state: publicState,
       attrs: dataAttrs,
       // Presses on the root's own text and icons focus the field, like a label would.
-      press: ({ api, el }, event) => focusFromSurroundings(event, el, api.internal.control()),
+      press: ({ api, el }, event) =>
+        focusFromSurroundings(event, el, api.internal.control()),
     }),
     control: slot<{}, PasswordInputState>({
       props: { id: "string" },
@@ -384,7 +459,8 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
         keydown: (event, { api }) => api.internal.capsLock(event),
         keyup: (event, { api }) => api.internal.capsLock(event),
         mousedown: (event, { api }) => api.internal.capsLock(event),
-        focusout: (_, { api, el }) => api.internal.blurred(el as HTMLInputElement),
+        focusout: (_, { api, el }) =>
+          api.internal.blurred(el as HTMLInputElement),
       },
       bind: (el, { api }) => api.internal.bindControl(el as HTMLInputElement),
     }),
@@ -407,7 +483,9 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
         // Focus stays in the field, so the caret, the selection and the
         // on-screen keyboard stay where they are.
         mousedown: (event) => {
-          if (event.button === 0) event.preventDefault()
+          if (event.button === 0) {
+            event.preventDefault()
+          }
         },
         keydown: (event, { el }) => buttonKeydown(event, el!),
         keyup: (event, { el }) => buttonKeyup(event, el!),
@@ -418,7 +496,10 @@ const passwordInputPrimitive = /* @__PURE__ */ definePrimitive({
       },
     }),
   }),
-  agent: { actions: ["setValue", "clear", "setVisible", "toggleVisible"], secret: true },
+  agent: {
+    actions: ["setValue", "clear", "setVisible", "toggleVisible"],
+    secret: true,
+  },
 })
 
 /**

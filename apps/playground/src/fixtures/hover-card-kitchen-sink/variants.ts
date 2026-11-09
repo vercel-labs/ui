@@ -62,11 +62,23 @@ const variants: Variant[] = [
       trigger: `@${side}-${align}`,
       body: "text" as const,
       content: { side, align },
-    })),
+    }))
   ),
 
-  { id: "offset-0", section: "Offsets", title: "sideOffset 0", body: "text", content: { sideOffset: 0 } },
-  { id: "offset-16", section: "Offsets", title: "sideOffset 16", body: "text", content: { sideOffset: 16 } },
+  {
+    id: "offset-0",
+    section: "Offsets",
+    title: "sideOffset 0",
+    body: "text",
+    content: { sideOffset: 0 },
+  },
+  {
+    id: "offset-16",
+    section: "Offsets",
+    title: "sideOffset 16",
+    body: "text",
+    content: { sideOffset: 16 },
+  },
   {
     id: "align-16",
     section: "Offsets",
@@ -157,7 +169,13 @@ const variants: Variant[] = [
     body: "text",
     options: { delay: 600 },
   },
-  { id: "delay-long", section: "Delays", title: "delay 1500", body: "text", options: { delay: 1500 } },
+  {
+    id: "delay-long",
+    section: "Delays",
+    title: "delay 1500",
+    body: "text",
+    options: { delay: 1500 },
+  },
   {
     id: "close-delay-0",
     section: "Delays",
@@ -189,7 +207,13 @@ const variants: Variant[] = [
     note: "Tab from the link moves into the card. Focus inside keeps it open.",
     body: "profile",
   },
-  { id: "text", section: "Content", title: "Text only", note: "Tab moves past the card.", body: "text" },
+  {
+    id: "text",
+    section: "Content",
+    title: "Text only",
+    note: "Tab moves past the card.",
+    body: "text",
+  },
   {
     id: "tooltip",
     section: "Content",
@@ -213,7 +237,13 @@ const variants: Variant[] = [
     body: "text",
     options: { defaultOpen: true },
   },
-  { id: "debug", section: "Behavior", title: "debug", note: "Logs state changes.", options: { debug: true } },
+  {
+    id: "debug",
+    section: "Behavior",
+    title: "debug",
+    note: "Logs state changes.",
+    options: { debug: true },
+  },
 
   {
     id: "portal",
@@ -229,9 +259,25 @@ const variants: Variant[] = [
     note: "Scroll the box.",
     place: "scroll",
   },
-  { id: "clip", section: "Containers", title: "Inside overflow hidden", place: "clip" },
-  { id: "transform", section: "Containers", title: "Inside a transform", place: "transform" },
-  { id: "rtl", section: "Containers", title: "Right to left", place: "rtl", content: { align: "start" } },
+  {
+    id: "clip",
+    section: "Containers",
+    title: "Inside overflow hidden",
+    place: "clip",
+  },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Inside a transform",
+    place: "transform",
+  },
+  {
+    id: "rtl",
+    section: "Containers",
+    title: "Right to left",
+    place: "rtl",
+    content: { align: "start" },
+  },
   {
     id: "anchor",
     section: "Containers",
@@ -240,7 +286,12 @@ const variants: Variant[] = [
     anchor: true,
   },
 
-  { id: "controlled", section: "State", title: "Controlled open", controlled: true },
+  {
+    id: "controlled",
+    section: "State",
+    title: "Controlled open",
+    controlled: true,
+  },
   {
     id: "controller",
     section: "State",
@@ -250,8 +301,19 @@ const variants: Variant[] = [
   },
 
   { id: "anim-none", section: "Animation", title: "None", animation: "none" },
-  { id: "anim-default", section: "Animation", title: "Scale and fade", animation: "default" },
-  { id: "anim-slow", section: "Animation", title: "Slow slide", note: "700ms.", animation: "slow" },
+  {
+    id: "anim-default",
+    section: "Animation",
+    title: "Scale and fade",
+    animation: "default",
+  },
+  {
+    id: "anim-slow",
+    section: "Animation",
+    title: "Slow slide",
+    note: "700ms.",
+    animation: "slow",
+  },
   {
     id: "keep-mounted",
     section: "Animation",

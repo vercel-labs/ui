@@ -42,7 +42,7 @@ function mount(root: HTMLElement) {
                     </ui-checkbox>
                     ${topic.label}
                   </label>
-                `,
+                `
               )
               .join("")}
           </div>

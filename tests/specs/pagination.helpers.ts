@@ -2,11 +2,15 @@ import type { Page } from "@playwright/test"
 import { paginationFixture } from "../fixtures/pagination"
 
 // The landmark, found by its name.
-const nav = (page: Page) => page.getByRole("navigation", { name: paginationFixture.label })
+const nav = (page: Page) =>
+  page.getByRole("navigation", { name: paginationFixture.label })
 
 // A page or a step, a button or a link by its name.
-const part = (page: Page, name: string | number, role: "button" | "link" = "button") =>
-  nav(page).getByRole(role, { name: String(name), exact: true })
+const part = (
+  page: Page,
+  name: string | number,
+  role: "button" | "link" = "button"
+) => nav(page).getByRole(role, { name: String(name), exact: true })
 
 // What each entry of the list shows, like ["«", "‹", "1", "…", "10", "›", "»"].
 const entries = (page: Page) =>

@@ -1,7 +1,12 @@
 <script lang="ts">
   import { SaveIcon } from "@lucide/svelte"
   import { registerShortcut } from "@ui-sdk/core/shortcuts"
-  import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipShortcut,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()

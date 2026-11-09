@@ -7,7 +7,9 @@
   let { issue }: { issue: Issue } = $props()
 
   const all = $derived(leaves(issue.subtasks))
-  let checked = $derived(all.filter((subtask) => subtask.done).map((subtask) => subtask.id))
+  let checked = $derived(
+    all.filter((subtask) => subtask.done).map((subtask) => subtask.id)
+  )
 
   function toItems(subtasks: Subtask[]): TreeItemData[] {
     return subtasks.map((subtask) => ({
@@ -38,16 +40,23 @@
 {#if all.length > 0}
   <section aria-labelledby="subtasks-label" class="grid gap-3">
     <h3 id="subtasks-label" class="text-sm font-medium">Subtasks</h3>
-    <Progress label="Done" value={checked.length} max={all.length} format={(value) => `${value} of ${all.length}`} />
+    <Progress
+      label="Done"
+      value={checked.length}
+      max={all.length}
+      format={(value) => `${value} of ${all.length}`}
+    />
     <Tree
       aria-labelledby="subtasks-label"
       items={toItems(issue.subtasks)}
       checkable
       mode="none"
       checkStrategy="leaf"
-      checked={checked}
+      {checked}
       onCheckedChange={save}
-      defaultExpanded={issue.subtasks.filter((subtask) => subtask.subtasks).map((subtask) => subtask.id)}
+      defaultExpanded={issue.subtasks
+        .filter((subtask) => subtask.subtasks)
+        .map((subtask) => subtask.id)}
       class="flex flex-col rounded-2xl border border-border p-1"
     >
       {@render items(issue.subtasks)}

@@ -17,7 +17,13 @@ import {
 } from "vue"
 import { createAgent } from "@ui-sdk/core/agent"
 import { Command, CommandGroup, CommandItem, CommandList } from "../src/command"
-import { createDialogController, Dialog, DialogContent, DialogTitle, DialogTrigger } from "../src/dialog"
+import {
+  createDialogController,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
 import { Tabs, TabsList, TabsTab } from "../src/tabs"
 
 Element.prototype.getAnimations ??= () => []
@@ -54,7 +60,7 @@ const locked = () => document.documentElement.style.overflow === "hidden"
 const OpenDialog = defineComponent({
   setup: () => () =>
     h(Dialog, { defaultOpen: true }, () =>
-      h(DialogContent, null, () => h(DialogTitle, null, () => "Settings")),
+      h(DialogContent, null, () => h(DialogTitle, null, () => "Settings"))
     ),
 })
 
@@ -67,7 +73,9 @@ const shown = () => !!dialog()?.hasAttribute("data-top-layer")
 function cachedPage(render: () => unknown) {
   const page = ref<"cached" | "other">("cached")
   const Cached = defineComponent({ setup: () => render })
-  mount(() => h(KeepAlive, null, [page.value === "cached" ? h(Cached) : h(Other)]))
+  mount(() =>
+    h(KeepAlive, null, [page.value === "cached" ? h(Cached) : h(Other)])
+  )
   return async (to: "cached" | "other") => {
     page.value = to
     await nextTick()
@@ -83,7 +91,11 @@ const placements = [
 ]
 
 const settings = (options: object, container?: Element) =>
-  h(Dialog, options, () => h(DialogContent, { container }, () => h(DialogTitle, null, () => "Settings")))
+  h(Dialog, options, () =>
+    h(DialogContent, { container }, () =>
+      h(DialogTitle, null, () => "Settings")
+    )
+  )
 
 test.each(placements)(
   "a cached page's open dialog rendered $placement leaves the page while away, and comes back",
@@ -100,7 +112,7 @@ test.each(placements)(
       expect(shown(), `back ${cycle}`).toBe(true)
       expect(locked(), `back ${cycle}`).toBe(true)
     }
-  },
+  }
 )
 
 test.each(placements)(
@@ -110,8 +122,12 @@ test.each(placements)(
     // takes a popup out of the top layer when it moves, so it must already be
     // where it renders.
     const shownFrom: (Element | null)[] = []
-    vi.spyOn(HTMLElement.prototype, "showPopover").mockImplementation(function (this: HTMLElement) {
-      if (this.getAttribute("role") === "dialog") shownFrom.push(this.parentElement)
+    vi.spyOn(HTMLElement.prototype, "showPopover").mockImplementation(function (
+      this: HTMLElement
+    ) {
+      if (this.getAttribute("role") === "dialog") {
+        shownFrom.push(this.parentElement)
+      }
       this.toggleAttribute("data-top-layer", true)
     })
     const go = cachedPage(() => settings({ defaultOpen: true }, container()))
@@ -120,7 +136,7 @@ test.each(placements)(
     await go("other")
     await go("cached")
     expect(shownFrom).toEqual([where, where])
-  },
+  }
 )
 
 test.each(placements)(
@@ -136,14 +152,16 @@ test.each(placements)(
     await go("cached")
     expect(shown()).toBe(true)
     expect(locked()).toBe(true)
-  },
+  }
 )
 
 test.each(placements)(
   "an open dialog rendered $placement that mounts while its page is away shows once the page comes back",
   async ({ container }) => {
     const mounted = ref(false)
-    const go = cachedPage(() => (mounted.value ? settings({ defaultOpen: true }, container()) : null))
+    const go = cachedPage(() =>
+      mounted.value ? settings({ defaultOpen: true }, container()) : null
+    )
     await go("other")
     mounted.value = true
     await wait()
@@ -152,20 +170,20 @@ test.each(placements)(
     await go("cached")
     expect(shown()).toBe(true)
     expect(locked()).toBe(true)
-  },
+  }
 )
 
 test("an open dialog in a <Suspense> branch opens once the branch resolves", async () => {
   let resolve = () => {}
   const loaded = new Promise<void>((done) => (resolve = done))
   const Slow = defineAsyncComponent(() =>
-    loaded.then(() => defineComponent({ setup: () => () => h("p", "Loaded") })),
+    loaded.then(() => defineComponent({ setup: () => () => h("p", "Loaded") }))
   )
   mount(() =>
     h(Suspense, null, {
       default: () => h("div", [h(OpenDialog), h(Slow)]),
       fallback: () => h("p", "Loading"),
-    }),
+    })
   )
   await wait()
   expect(locked()).toBe(false)
@@ -173,7 +191,9 @@ test("an open dialog in a <Suspense> branch opens once the branch resolves", asy
   await wait(30)
   expect(document.body.textContent).toContain("Loaded")
   expect(locked()).toBe(true)
-  expect(document.querySelector('[role="dialog"]')?.hasAttribute("data-top-layer")).toBe(true)
+  expect(
+    document.querySelector('[role="dialog"]')?.hasAttribute("data-top-layer")
+  ).toBe(true)
 })
 
 const CachedTabs = defineComponent({
@@ -182,14 +202,17 @@ const CachedTabs = defineComponent({
       h(TabsList, { "aria-label": "Settings" }, () => [
         h(TabsTab, { value: "account" }, () => "Account"),
         h(TabsTab, { value: "billing" }, () => "Billing"),
-      ]),
+      ])
     ),
 })
 
 test("the agent sees a cached page's components as off the page while it's away", async () => {
   const page = ref<"tabs" | "other">("tabs")
-  mount(() => h(KeepAlive, null, [page.value === "tabs" ? h(CachedTabs) : h(Other)]))
-  const tabs = () => agent.snapshot().find((component) => component.component === "tabs")
+  mount(() =>
+    h(KeepAlive, null, [page.value === "tabs" ? h(CachedTabs) : h(Other)])
+  )
+  const tabs = () =>
+    agent.snapshot().find((component) => component.component === "tabs")
   expect(tabs()?.offPage).toBeFalsy()
   page.value = "other"
   await nextTick()
@@ -210,11 +233,13 @@ test("a part that moves to another component in one update stays bound", async (
       h(CommandList, null, () =>
         groups.value.map((items, index) =>
           h(CommandGroup, { key: index }, () =>
-            items.map((value) => h(CommandItem, { key: value, value }, () => value)),
-          ),
-        ),
-      ),
-    ),
+            items.map((value) =>
+              h(CommandItem, { key: value, value }, () => value)
+            )
+          )
+        )
+      )
+    )
   )
   await nextTick()
   groups.value = [["profile"]]
@@ -232,8 +257,12 @@ test("a trigger given another controller opens that controller's dialog and lets
   const controller = shallowRef(first)
   // Non-modal, since a modal dialog's trigger leaves `aria-expanded` out.
   const el = mount(() => [
-    h(Dialog, { controller: first, modal: false }, () => h(DialogContent, null, () => "First")),
-    h(Dialog, { controller: second, modal: false }, () => h(DialogContent, null, () => "Second")),
+    h(Dialog, { controller: first, modal: false }, () =>
+      h(DialogContent, null, () => "First")
+    ),
+    h(Dialog, { controller: second, modal: false }, () =>
+      h(DialogContent, null, () => "Second")
+    ),
     h(DialogTrigger, { controller: controller.value }, () => "Open"),
   ])
   await wait()

@@ -6,5 +6,7 @@ const props = defineProps<{ class?: string }>()
 </script>
 
 <template>
-  <ToolbarSeparator :class="cn('mx-1 h-5 w-px shrink-0 bg-border', props.class)" />
+  <ToolbarSeparator
+    :class="cn('mx-1 h-5 w-px shrink-0 bg-border', props.class)"
+  />
 </template>

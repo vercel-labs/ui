@@ -34,8 +34,14 @@ testExamples("radio", {
     await expect(radio(preview, "Standard")).toHaveAttribute("tabindex", "-1")
   },
   description: async (preview) => {
-    await expect(radio(preview, "Weekly digest")).toHaveAccessibleDescription("A summary every Monday.")
-    await checks("Email notifications", "Daily digest", "Weekly digest")(preview, "")
+    await expect(radio(preview, "Weekly digest")).toHaveAccessibleDescription(
+      "A summary every Monday."
+    )
+    await checks(
+      "Email notifications",
+      "Daily digest",
+      "Weekly digest"
+    )(preview, "")
   },
   "choice-card": async (preview) => {
     await expect(radio(preview, "Hobby")).toBeChecked()
@@ -46,9 +52,9 @@ testExamples("radio", {
     await expect(radio(preview, "Enterprise")).toBeChecked()
   },
   legend: async (preview) => {
-    await expect(preview.getByRole("radiogroup", { name: "Billing period" })).toHaveAccessibleDescription(
-      "Yearly billing gets you two months free.",
-    )
+    await expect(
+      preview.getByRole("radiogroup", { name: "Billing period" })
+    ).toHaveAccessibleDescription("Yearly billing gets you two months free.")
     await checks("Billing period", "Monthly", "Yearly")(preview, "")
   },
   disabled: async (preview) => {
@@ -78,7 +84,10 @@ testExamples("radio", {
     await radio(preview, "Starter").click()
     await expect(lastLog(preview)).toHaveText("Starter (item-press)")
     await preview.getByRole("button", { name: "Choose Team" }).click()
-    await expect(radio(preview, "Team"), "a controller checks a radio from outside").toBeChecked()
+    await expect(
+      radio(preview, "Team"),
+      "a controller checks a radio from outside"
+    ).toBeChecked()
     await expect(lastLog(preview)).toHaveText("Team (imperative)")
   },
   form: async (preview) => {
@@ -86,7 +95,10 @@ testExamples("radio", {
     await preview.getByRole("button", { name: "Continue" }).click()
     await expect(lastLog(preview)).toHaveText("Submitted shipping=express")
     await preview.getByRole("button", { name: "Reset" }).click()
-    await expect(radio(preview, "Standard"), "a reset returns to the default").toBeChecked()
+    await expect(
+      radio(preview, "Standard"),
+      "a reset returns to the default"
+    ).toBeChecked()
   },
   invalid: async (preview) => {
     const error = preview.getByText("Choose how to get order updates.")
@@ -100,10 +112,14 @@ testExamples("radio", {
   indicator: async (preview) => {
     await checks("Theme", "System", "Light")(preview, "")
     // Kept mounted, the unchecked indicators stay in the page.
-    await expect(preview.locator('[data-slot="radio-indicator"]')).toHaveCount(3)
+    await expect(preview.locator('[data-slot="radio-indicator"]')).toHaveCount(
+      3
+    )
   },
   render: async (preview) => {
-    await expect(radio(preview, "Mentions")).toHaveAccessibleDescription("Only when someone mentions you.")
+    await expect(radio(preview, "Mentions")).toHaveAccessibleDescription(
+      "Only when someone mentions you."
+    )
     await checks("Notify me about", "Mentions", "Nothing")(preview, "")
   },
   rtl: async () => {},

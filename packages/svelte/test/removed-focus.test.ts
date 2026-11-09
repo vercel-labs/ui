@@ -11,7 +11,9 @@ const remove = Element.prototype.remove
 Element.prototype.remove = function () {
   const focused = document.activeElement
   if (focused && focused !== document.body && this.contains(focused)) {
-    focused.dispatchEvent(new FocusEvent("focusout", { bubbles: true, relatedTarget: null }))
+    focused.dispatchEvent(
+      new FocusEvent("focusout", { bubbles: true, relatedTarget: null })
+    )
   }
   remove.call(this)
 }
@@ -23,7 +25,7 @@ afterEach(() => {
   target.remove()
 })
 
-for (const kind of ["combobox", "date-picker", "trigger-menu"])
+for (const kind of ["combobox", "date-picker", "trigger-menu"]) {
   test(`removing a ${kind} while its input has focus`, () => {
     target = document.body.appendChild(document.createElement("div"))
     app = mount(App, { target, props: { kind } })
@@ -34,3 +36,4 @@ for (const kind of ["combobox", "date-picker", "trigger-menu"])
     flushSync()
     expect(target.querySelector("input, textarea")).toBeNull()
   })
+}

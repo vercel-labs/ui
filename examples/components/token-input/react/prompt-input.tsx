@@ -16,7 +16,14 @@ import {
   TriggerMenuItem,
   TriggerMenuList,
 } from "@ui-sdk/react/trigger-menu"
-import { ArrowUpIcon, CheckIcon, ClockIcon, CodeIcon, FileIcon, XIcon } from "lucide-react"
+import {
+  ArrowUpIcon,
+  CheckIcon,
+  ClockIcon,
+  CodeIcon,
+  FileIcon,
+  XIcon,
+} from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
 
@@ -29,7 +36,11 @@ const files = [
 ]
 
 const skills = [
-  { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+  {
+    value: "search",
+    label: "search",
+    arguments: [{ name: "query", hint: "<query>", required: true }],
+  },
   { value: "review", label: "review" },
   { value: "summarize", label: "summarize" },
 ]
@@ -40,20 +51,35 @@ function Example() {
   const log = useLog()
   const [prompt] = React.useState(createTokenInputController)
   const [running, setRunning] = React.useState(false)
-  const sendTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const sendTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined
+  )
 
   React.useEffect(() => () => clearTimeout(sendTimer.current), [])
 
   function send(value: TokenInputValue) {
-    if (running || !prompt.getLabel().trim()) return
+    if (running || !prompt.getLabel().trim()) {
+      return
+    }
     setRunning(true)
-    const skillTokens = value.filter((segment) => typeof segment !== "string" && segment.type === "skill")
-    for (const skill of skillTokens)
-      if (typeof skill !== "string")
-        prompt.updateToken(skill.id!, { data: { ...skill.data, run: "running" } })
+    const skillTokens = value.filter(
+      (segment) => typeof segment !== "string" && segment.type === "skill"
+    )
+    for (const skill of skillTokens) {
+      if (typeof skill !== "string") {
+        prompt.updateToken(skill.id!, {
+          data: { ...skill.data, run: "running" },
+        })
+      }
+    }
     sendTimer.current = setTimeout(() => {
-      for (const skill of skillTokens)
-        if (typeof skill !== "string") prompt.updateToken(skill.id!, { data: { ...skill.data, run: "done" } })
+      for (const skill of skillTokens) {
+        if (typeof skill !== "string") {
+          prompt.updateToken(skill.id!, {
+            data: { ...skill.data, run: "done" },
+          })
+        }
+      }
       log(`Sent ${toText(prompt.getValue())}`)
       prompt.clear()
       setRunning(false)
@@ -66,7 +92,11 @@ function Example() {
       onSubmit={send}
       renderToken={(token) => (
         <TokenInputToken>
-          {token.type === "skill" ? <CodeIcon aria-hidden="true" /> : <FileIcon aria-hidden="true" />}
+          {token.type === "skill" ? (
+            <CodeIcon aria-hidden="true" />
+          ) : (
+            <FileIcon aria-hidden="true" />
+          )}
           {token.type === "skill" ? `/${token.label}` : token.label}
           {token.data?.run === "running" && <ClockIcon aria-hidden="true" />}
           {token.data?.run === "done" && <CheckIcon aria-hidden="true" />}
@@ -77,14 +107,20 @@ function Example() {
       )}
     >
       <div data-slot="card">
-        <TokenInputEditor aria-label="Prompt" placeholder="Ask anything. Type @ or /" />
+        <TokenInputEditor
+          aria-label="Prompt"
+          placeholder="Ask anything. Type @ or /"
+        />
         <div data-slot="row">
           <button
             type="button"
             data-size="sm"
             onMouseDown={(event) => event.preventDefault()}
             onClick={() =>
-              prompt.insert({ type: "file", value: "README.md", label: "README.md" }, { resolve: loadFile() })
+              prompt.insert(
+                { type: "file", value: "README.md", label: "README.md" },
+                { resolve: loadFile() }
+              )
             }
           >
             Attach README
@@ -98,7 +134,11 @@ function Example() {
             aria-label={running ? "Running" : "Send"}
             disabled={running}
           >
-            {running ? <ClockIcon aria-hidden="true" /> : <ArrowUpIcon aria-hidden="true" />}
+            {running ? (
+              <ClockIcon aria-hidden="true" />
+            ) : (
+              <ArrowUpIcon aria-hidden="true" />
+            )}
           </button>
         </div>
       </div>
@@ -107,7 +147,9 @@ function Example() {
           { char: "@", type: "file", items: files },
           { char: "/", boundary: "start", type: "skill", items: skills },
         ]}
-        onSelect={(value, details) => (details.trigger === "@" ? loadFile() : undefined)}
+        onSelect={(value, details) =>
+          details.trigger === "@" ? loadFile() : undefined
+        }
       >
         <TriggerMenuHint />
         <TriggerMenuContent>

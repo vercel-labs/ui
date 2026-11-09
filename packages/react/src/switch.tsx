@@ -1,5 +1,13 @@
-import { switchPrimitive, type SwitchOptions, type SwitchState } from "@ui-sdk/core/switch"
-import { controlRender, useFieldControl, type ButtonControlProps } from "./field-context"
+import {
+  switchPrimitive,
+  type SwitchOptions,
+  type SwitchState,
+} from "@ui-sdk/core/switch"
+import {
+  controlRender,
+  useFieldControl,
+  type ButtonControlProps,
+} from "./field-context"
 import { createParts, usePart } from "./use-primitive"
 
 const parts = createParts(switchPrimitive, { root: "button", thumb: "span" })
@@ -13,7 +21,12 @@ function SwitchInput() {
  * A control that turns a setting on or off, with the hidden native input that takes part in the form.
  * @stable
  */
-function Switch({ disabled, name, render, ...props }: SwitchOptions & ButtonControlProps<SwitchState>) {
+function Switch({
+  disabled,
+  name,
+  render,
+  ...props
+}: SwitchOptions & ButtonControlProps<SwitchState>) {
   const field = useFieldControl()
   return (
     <parts.Root

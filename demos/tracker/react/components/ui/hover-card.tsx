@@ -8,7 +8,9 @@ import { popup } from "./popover"
 function HoverCardContent({
   className,
   ...props
-}: Omit<ComponentProps<typeof HoverCardContentPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof HoverCardContentPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
     <HoverCardContentPrimitive
       sideOffset={8}

@@ -46,11 +46,15 @@ const members = [
           <span data-slot="badge">{{ member.name.slice(0, 1) }}</span>
           <span data-slot="stack">
             {{ member.name }}
-            <span data-slot="hint">{{ state.disabled ? "Out of office" : member.email }}</span>
+            <span data-slot="hint">{{
+              state.disabled ? "Out of office" : member.email
+            }}</span>
           </span>
           <SelectItemIndicator>
             <template #render="{ props, state: indicator }">
-              <span v-bind="props"><CheckIcon v-if="indicator.selected" /></span>
+              <span v-bind="props"
+                ><CheckIcon v-if="indicator.selected"
+              /></span>
             </template>
           </SelectItemIndicator>
         </SelectItem>

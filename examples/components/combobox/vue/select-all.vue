@@ -56,7 +56,11 @@ const timezones = [
       <ComboboxLabel>Timezones</ComboboxLabel>
       <ComboboxChips>
         <ComboboxValue v-slot="{ state }">
-          <ComboboxChip v-for="(value, index) in state.value as string[]" :key="value" :value="value">
+          <ComboboxChip
+            v-for="(value, index) in state.value as string[]"
+            :key="value"
+            :value="value"
+          >
             {{ state.labels[index] }}
             <ComboboxChipRemove :aria-label="`Remove ${state.labels[index]}`">
               <XIcon aria-hidden="true" />
@@ -81,9 +85,18 @@ const timezones = [
             {{ group.label }}
           </ComboboxGroupLabel>
           <ComboboxSelectAll v-slot="{ state }">
-            {{ state.checked ? `Clear ${group.label}` : `Select all in ${group.label}` }}
+            {{
+              state.checked
+                ? `Clear ${group.label}`
+                : `Select all in ${group.label}`
+            }}
           </ComboboxSelectAll>
-          <ComboboxItem v-for="zone in group.items" :key="zone.value" :value="zone.value" :label="zone.label">
+          <ComboboxItem
+            v-for="zone in group.items"
+            :key="zone.value"
+            :value="zone.value"
+            :label="zone.label"
+          >
             <span>
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />

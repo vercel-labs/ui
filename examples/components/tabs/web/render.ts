@@ -1,7 +1,12 @@
 import "@ui-sdk/web/tabs"
 
 const folders = [
-  { value: "inbox", label: "Inbox", count: 12, content: "12 conversations, 3 of them unread." },
+  {
+    value: "inbox",
+    label: "Inbox",
+    count: 12,
+    content: "12 conversations, 3 of them unread.",
+  },
   {
     value: "unread",
     label: "Unread",
@@ -28,7 +33,7 @@ function mount(root: HTMLElement) {
                   ${folder.label}
                   ${folder.count > 0 ? `<span data-slot="badge">${folder.count}</span>` : ""}
                 </button>
-              </ui-tabs-tab>`,
+              </ui-tabs-tab>`
           )
           .join("")}
       </ui-tabs-list>

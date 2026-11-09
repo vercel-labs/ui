@@ -8,33 +8,45 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 for (const [name, options] of [
   ["with nothing selected", {}],
   ["with a date selected", { value: "2026-10-20" }],
-  ["with several dates selected", { mode: "multiple", value: "2026-10-02,2026-10-20" }],
+  [
+    "with several dates selected",
+    { mode: "multiple", value: "2026-10-02,2026-10-20" },
+  ],
   ["with a range selected", { mode: "range", value: "2026-10-12,2026-10-16" }],
   ["with two months", { months: "2" }],
   ["with unavailable dates", { unavailable: "weekends" }],
   ["with min and max", { min: "2026-10-05", max: "2026-10-25" }],
   ["disabled", { disabled: "" }],
   ["read only", { readonly: "" }],
-] as const)
+] as const) {
   test(`no axe violations ${name}`, async ({ page, open }) => {
     await open("calendar", options)
     expect(await audit(page)).toEqual([])
   })
+}
 
-test("no axe violations while a range is being picked", async ({ page, open }) => {
+test("no axe violations while a range is being picked", async ({
+  page,
+  open,
+}) => {
   await open("calendar", { mode: "range" })
   await day(page, "2026-10-12").click()
   await day(page, "2026-10-15").hover()
   expect(await audit(page)).toEqual([])
 })
 
-test("days are named by their full date, and the steps by their labels", async ({ page, open }) => {
+test("days are named by their full date, and the steps by their labels", async ({
+  page,
+  open,
+}) => {
   await open("calendar")
   await expect(day(page, f.today)).toBeVisible()
   await expect(page.getByRole("button", { name: f.previous })).toBeVisible()
@@ -44,7 +56,8 @@ test("days are named by their full date, and the steps by their labels", async (
 // Every implementation must expose the same accessibility tree.
 test("accessibility tree", async ({ page, open }) => {
   await open("calendar", { month: "2026-02", value: "2026-02-10" })
-  await expect(page.locator('[data-slot="calendar-root"]')).toMatchAriaSnapshot(`
+  await expect(page.locator('[data-slot="calendar-root"]'))
+    .toMatchAriaSnapshot(`
     - button "Previous month"
     - heading "February 2026" [level=2]
     - button "Next month"

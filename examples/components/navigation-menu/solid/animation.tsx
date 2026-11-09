@@ -19,7 +19,8 @@ const gettingStarted = [
   {
     title: "Installation",
     href: "#",
-    description: "Add the package for your framework and render your first part.",
+    description:
+      "Add the package for your framework and render your first part.",
   },
   {
     title: "Styling",
@@ -32,12 +33,14 @@ const components = [
   {
     title: "Alert Dialog",
     href: "#",
-    description: "Asks for a decision before anything else on the page can be used.",
+    description:
+      "Asks for a decision before anything else on the page can be used.",
   },
   {
     title: "Hover Card",
     href: "#",
-    description: "A preview of what a link points to, for people who pause on it.",
+    description:
+      "A preview of what a link points to, for people who pause on it.",
   },
   {
     title: "Progress",
@@ -52,12 +55,14 @@ const components = [
   {
     title: "Tabs",
     href: "#",
-    description: "Shows one panel of content at a time, picked from a list of tabs.",
+    description:
+      "Shows one panel of content at a time, picked from a list of tabs.",
   },
   {
     title: "Tooltip",
     href: "#",
-    description: "A short label for a control, shown on hover or keyboard focus.",
+    description:
+      "A short label for a control, shown on hover or keyboard focus.",
   },
 ]
 
@@ -68,7 +73,9 @@ function Example() {
     <NavigationMenu
       aria-label="Main"
       onValueChange={(value) => log(value ? `Showing ${value}` : "Closing")}
-      onOpenChangeComplete={(open) => log(open ? "Finished opening" : "Finished closing")}
+      onOpenChangeComplete={(open) =>
+        log(open ? "Finished opening" : "Finished closing")
+      }
     >
       <NavigationMenuList>
         <NavigationMenuItem value="guides">

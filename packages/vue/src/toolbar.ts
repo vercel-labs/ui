@@ -6,9 +6,20 @@ import {
 import { computed, defineComponent, provide, useId, type PropType } from "vue"
 import { ToolbarGroupKey, ToolbarKey } from "./toolbar-context"
 import { createParts, withElement } from "./create-parts"
-import { optionalBoolean, provideProps, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  optionalBoolean,
+  provideProps,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 
-const parts = createParts(toolbarPrimitive, { button: "button", input: "input", link: "a", separator: "div" })
+const parts = createParts(toolbarPrimitive, {
+  button: "button",
+  input: "input",
+  link: "a",
+  separator: "div",
+})
 
 /**
  * A row of controls with one tab stop and arrow keys between them. Toggles and
@@ -41,7 +52,7 @@ const Toolbar = withElement(
       provide(ToolbarKey, toolbar)
       return usePart(toolbar, "root", undefined, undefined, "div")
     },
-  }),
+  })
 )
 
 /**
@@ -84,7 +95,7 @@ const ToolbarGroup = withElement(
       provide(ToolbarGroupKey, () => disabled.value)
       return part
     },
-  }),
+  })
 )
 
 /**
@@ -111,4 +122,11 @@ export type {
   ToolbarSeparatorState,
 } from "@ui-sdk/core/toolbar"
 
-export { Toolbar, ToolbarButton, ToolbarGroup, ToolbarInput, ToolbarLink, ToolbarSeparator }
+export {
+  Toolbar,
+  ToolbarButton,
+  ToolbarGroup,
+  ToolbarInput,
+  ToolbarLink,
+  ToolbarSeparator,
+}

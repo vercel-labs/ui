@@ -7,7 +7,11 @@ const plans: ListData<{ id: string; price: number }> = [
   { value: { id: "hobby", price: 0 }, label: "Hobby" },
   { value: { id: "pro", price: 20 }, label: "Pro" },
   { value: { id: "team", price: 50 }, label: "Team" },
-  { value: { id: "enterprise", price: 200 }, label: "Enterprise", disabled: true },
+  {
+    value: { id: "enterprise", price: 200 },
+    label: "Enterprise",
+    disabled: true,
+  },
 ]
 
 function mount(root: HTMLElement) {

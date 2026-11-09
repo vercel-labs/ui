@@ -1,5 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { createRadioGroupController, Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
+import {
+  createRadioGroupController,
+  Radio,
+  RadioGroup,
+  RadioIndicator,
+} from "@ui-sdk/solid/radio"
 import { createSignal, For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -29,7 +34,9 @@ function Example() {
           value={value()}
           onValueChange={(next, details) => {
             setValue(next)
-            log(`${plans.find((plan) => plan.value === next)?.label ?? "None"} (${details.reason})`)
+            log(
+              `${plans.find((plan) => plan.value === next)?.label ?? "None"} (${details.reason})`
+            )
           }}
           controller={planGroup}
         >

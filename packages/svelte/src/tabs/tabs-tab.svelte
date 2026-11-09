@@ -9,7 +9,11 @@ A tab. Selecting it shows the panel with the same `value`.
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let { value, disabled, ...rest }: PartProps<"button", TabsTabState> & TabsTabProps = $props()
+  let {
+    value,
+    disabled,
+    ...rest
+  }: PartProps<"button", TabsTabState> & TabsTabProps = $props()
 
   const tab = usePart(tabs, "tab", () => ({ value, disabled }))
 </script>

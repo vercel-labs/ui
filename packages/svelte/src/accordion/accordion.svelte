@@ -13,7 +13,11 @@ A stack of items that each open a section of content. One item is open at a time
   } from "@ui-sdk/core/accordion"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   type Details = ChangeDetails<AccordionValueChangeReason>
 
@@ -69,7 +73,9 @@ A stack of items that each open a section of content. One item is open at a time
     onValueChange: (next: string[], details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   provideInstance(accordionPrimitive, accordion)

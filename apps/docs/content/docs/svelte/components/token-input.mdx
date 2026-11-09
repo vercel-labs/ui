@@ -41,9 +41,16 @@ Import the parts and put them together:
 
 ```svelte
 <script lang="ts">
-  import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/svelte/token-input"
+  import {
+    TokenInput,
+    TokenInputEditor,
+    type TokenInputValue,
+  } from "@ui-sdk/svelte/token-input"
 
-  const draft: TokenInputValue = ["Explain ", { type: "file", value: "src/routes.ts", label: "routes.ts" }]
+  const draft: TokenInputValue = [
+    "Explain ",
+    { type: "file", value: "src/routes.ts", label: "routes.ts" },
+  ]
 </script>
 
 <TokenInput defaultValue={draft}>
@@ -160,7 +167,10 @@ Props and callbacks are the same as below, as Svelte props. `value` can be bound
 
 ### TokenInput
 
-<TypeTable path="../../packages/core/src/components/token-input/token-input.ts" name="TokenInputOptions" />
+<TypeTable
+  path="../../packages/core/src/components/token-input/token-input.ts"
+  name="TokenInputOptions"
+/>
 
 The `token` snippet receives each token and renders its content, usually a `TokenInputToken`.
 
@@ -181,11 +191,17 @@ Removes its token when pressed and keeps focus in the editor. Renders a `span`, 
 
 ### Token
 
-<TypeTable path="../../packages/core/src/foundation/text/text-editor.ts" name="Token" />
+<TypeTable
+  path="../../packages/core/src/foundation/text/text-editor.ts"
+  name="Token"
+/>
 
 ### Codec
 
-<TypeTable path="../../packages/core/src/components/token-input/token-input-model.ts" name="TokenCodec" />
+<TypeTable
+  path="../../packages/core/src/components/token-input/token-input-model.ts"
+  name="TokenCodec"
+/>
 
 ### State
 

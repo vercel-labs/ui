@@ -1,5 +1,11 @@
 import * as React from "react"
-import { Toast, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import {
+  Toast,
+  ToastClose,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/react/toast"
 
 function Example() {
   const [toast] = React.useState(() => createToaster())
@@ -7,13 +13,15 @@ function Example() {
     () => () => {
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   return (
     <>
       <div data-slot="row">
-        <button onClick={() => toast("Link copied", { duration: 1000 })}>1 Second</button>
+        <button onClick={() => toast("Link copied", { duration: 1000 })}>
+          1 Second
+        </button>
         <button onClick={() => toast("Changes saved")}>5 Seconds</button>
         <button
           onClick={() =>

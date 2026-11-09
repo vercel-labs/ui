@@ -27,10 +27,11 @@ async function mount(root: HTMLElement) {
   root.addEventListener(
     "valuechange",
     (event) => {
-      if ((event.target as Element).localName === "ui-slider")
+      if ((event.target as Element).localName === "ui-slider") {
         output.textContent = `brightness:${(event as CustomEvent).detail.value}`
+      }
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

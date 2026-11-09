@@ -43,22 +43,36 @@ const countryList = [
   { value: "ch", label: "Switzerland" },
 ]
 
-function searchCountries(query: string, { signal, page }: { signal: AbortSignal; page: number }) {
-  return new Promise<{ items: typeof countryList; hasMore: boolean }>((resolve, reject) => {
-    const timer = setTimeout(() => {
-      const needle = query.trim().toLowerCase()
-      const found = countryList.filter((country) => country.label.toLowerCase().includes(needle))
-      resolve({ items: found.slice(page * 6, page * 6 + 6), hasMore: found.length > page * 6 + 6 })
-    }, 400)
-    signal.addEventListener("abort", () => {
-      clearTimeout(timer)
-      reject(signal.reason)
-    })
-  })
+function searchCountries(
+  query: string,
+  { signal, page }: { signal: AbortSignal; page: number }
+) {
+  return new Promise<{ items: typeof countryList; hasMore: boolean }>(
+    (resolve, reject) => {
+      const timer = setTimeout(() => {
+        const needle = query.trim().toLowerCase()
+        const found = countryList.filter((country) =>
+          country.label.toLowerCase().includes(needle)
+        )
+        resolve({
+          items: found.slice(page * 6, page * 6 + 6),
+          hasMore: found.length > page * 6 + 6,
+        })
+      }, 400)
+      signal.addEventListener("abort", () => {
+        clearTimeout(timer)
+        reject(signal.reason)
+      })
+    }
+  )
 }
 
 const query = ref("")
-const { state: results, setQuery, loadMore } = useAsyncOptions(searchCountries, { immediate: true })
+const {
+  state: results,
+  setQuery,
+  loadMore,
+} = useAsyncOptions(searchCountries, { immediate: true })
 </script>
 
 <template>
@@ -78,13 +92,22 @@ const { state: results, setQuery, loadMore } = useAsyncOptions(searchCountries, 
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
-        <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+        <SelectInput
+          aria-label="Search countries"
+          placeholder="Search countries…"
+        />
         <SelectEmpty v-slot="{ state }">
-          <template v-if="state.empty && !state.loading">No countries match “{{ state.query }}”.</template>
+          <template v-if="state.empty && !state.loading"
+            >No countries match “{{ state.query }}”.</template
+          >
         </SelectEmpty>
         <SelectList v-slot="{ state }">
           <SelectItem
-            v-for="item in state.items as { value: string; label: string; disabled?: boolean }[]"
+            v-for="item in state.items as {
+              value: string
+              label: string
+              disabled?: boolean
+            }[]"
             :key="item.value"
             :value="item.value"
             :label="item.label"

@@ -11,7 +11,8 @@ const classes = {
     "cursor-ew-resize text-xs font-medium text-neutral-600 data-[orientation=vertical]:cursor-ns-resize data-disabled:cursor-default data-scrubbing:text-neutral-950",
   cursor: "z-50 -translate-x-1/2 -translate-y-1/2 text-base drop-shadow",
   row: "flex flex-wrap items-center gap-2",
-  button: "rounded border border-neutral-300 px-2 py-0.5 text-xs hover:bg-neutral-50",
+  button:
+    "rounded border border-neutral-300 px-2 py-0.5 text-xs hover:bg-neutral-50",
   label: "text-xs font-medium",
   description: "text-xs text-neutral-500",
   error: "text-xs text-red-600",

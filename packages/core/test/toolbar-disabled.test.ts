@@ -6,7 +6,10 @@ import { attrs, bind } from "../src/foundation/kernel/part"
 test("a button that becomes disabled and unfocusable hands the tab stop to the next one", async () => {
   const bar = toolbar({ id: "t" })
   const unbinds = ["a", "b"].map((id) =>
-    bind(bar.part("button", { id }), document.body.appendChild(document.createElement("button"))),
+    bind(
+      bar.part("button", { id }),
+      document.body.appendChild(document.createElement("button"))
+    )
   )
   await Promise.resolve()
   expect(attrs(bar.part("button", { id: "a" })).tabindex).toBe("0")

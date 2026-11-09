@@ -77,32 +77,49 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/dialog")
   await import("@ui-sdk/web/alert-dialog")
   root.querySelector("#file")!.addEventListener("action", (event) => {
-    if ((event as CustomEvent<{ value: string }>).detail.value === "rename") rename.api.open()
+    if ((event as CustomEvent<{ value: string }>).detail.value === "rename") {
+      rename.api.open()
+    }
   })
   // A dirty field makes the dialog refuse dismissals, which it reports.
-  field.addEventListener("input", () => rename.setAttribute("dismissible", "false"))
+  field.addEventListener("input", () =>
+    rename.setAttribute("dismissible", "false")
+  )
   rename.addEventListener("dismissattempt", (event) => {
     output.textContent = `attempt:${(event as CustomEvent<{ reason: string }>).detail.reason}`
   })
   rename.addEventListener("openchange", (event) => {
-    if (event.target !== rename) return
-    const { value, reason } = (event as CustomEvent<{ value: boolean; reason: string }>).detail
+    if (event.target !== rename) {
+      return
+    }
+    const { value, reason } = (
+      event as CustomEvent<{ value: boolean; reason: string }>
+    ).detail
     recordOpenChange("rename", value, { reason })
-    if (!value) rename.removeAttribute("dismissible")
+    if (!value) {
+      rename.removeAttribute("dismissible")
+    }
   })
   root.querySelector("#delete")!.addEventListener("openchange", (event) => {
-    const { value, reason } = (event as CustomEvent<{ value: boolean; reason: string }>).detail
+    const { value, reason } = (
+      event as CustomEvent<{ value: boolean; reason: string }>
+    ).detail
     recordOpenChange("delete", value, { reason })
   })
   root
     .querySelector("ui-alert-dialog-close[action]")!
     .addEventListener("action", (event) =>
-      (event as CustomEvent<{ waitUntil: (promise: Promise<unknown>) => void }>).detail.waitUntil(
-        pendingAction(),
-      ),
+      (
+        event as CustomEvent<{ waitUntil: (promise: Promise<unknown>) => void }>
+      ).detail.waitUntil(pendingAction())
     )
-  root.querySelector("#chat")!.addEventListener("click", () => (output.textContent = "chat"))
-  shortcuts.register(f.pageShortcut, () => (output.textContent = "page shortcut"))
+  root
+    .querySelector("#chat")!
+    .addEventListener("click", () => (output.textContent = "chat"))
+  shortcuts.register(
+    f.pageShortcut,
+    () => (output.textContent = "page shortcut")
+  )
   shortcuts.register(f.slashShortcut, () => (output.textContent = "slash"))
   // Belongs to the dialog, so it runs while the dialog is open and modal.
   shortcuts.register(f.rename.save, () => (output.textContent = "saved"), {

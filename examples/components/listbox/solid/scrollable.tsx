@@ -1,4 +1,8 @@
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/solid/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/solid/listbox"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -16,7 +20,9 @@ function Example() {
       defaultValue="utc9"
       onHighlight={(value, details) =>
         value &&
-        log(`Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`)
+        log(
+          `Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`
+        )
       }
       aria-label="Time zone"
     >

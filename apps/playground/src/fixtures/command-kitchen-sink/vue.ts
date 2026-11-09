@@ -30,7 +30,14 @@ import {
 import { createApp, defineComponent, h, ref, type PropType } from "vue"
 import * as classes from "./classes"
 import { kitchenSink, type Env } from "./shell"
-import { filterOf, listOf, pagesOf, runner, search, type Variant } from "./variants"
+import {
+  filterOf,
+  listOf,
+  pagesOf,
+  runner,
+  search,
+  type Variant,
+} from "./variants"
 
 type Select = ((value: string) => void | Promise<unknown>) | undefined
 
@@ -55,29 +62,46 @@ function item(entry: CommandDataItem, onSelect: Select) {
         state.pending
           ? h("span", { class: classes.pending }, "Running…")
           : state.error
-            ? h("span", { class: classes.error }, (state.error as Error).message)
+            ? h(
+                "span",
+                { class: classes.error },
+                (state.error as Error).message
+              )
             : entry.shortcut && h(CommandShortcut, { class: classes.shortcut }),
       ],
-    },
+    }
   )
 }
 
 // A plain string command.
 function plain(entry: string) {
-  return h(CommandItem, { key: entry, class: classes.item, value: entry }, () => entry)
+  return h(
+    CommandItem,
+    { key: entry, class: classes.item, value: entry },
+    () => entry
+  )
 }
 
 // Composed commands: CommandItem, CommandGroup and CommandSeparator parts for a list. Groups hold only commands.
 function items(list: CommandData, onSelect: Select) {
   return list.map((entry, index) => {
-    if (typeof entry === "string") return plain(entry)
-    if ("type" in entry && entry.type === "separator")
-      return h(CommandSeparator, { key: `separator-${index}`, class: classes.separator })
-    if ("type" in entry && entry.type === "group")
+    if (typeof entry === "string") {
+      return plain(entry)
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return h(CommandSeparator, {
+        key: `separator-${index}`,
+        class: classes.separator,
+      })
+    }
+    if ("type" in entry && entry.type === "group") {
       return h(CommandGroup, { key: entry.label }, () => [
         h(CommandGroupLabel, { class: classes.groupLabel }, () => entry.label),
-        ...entry.items.map((child) => (typeof child === "string" ? plain(child) : item(child, onSelect))),
+        ...entry.items.map((child) =>
+          typeof child === "string" ? plain(child) : item(child, onSelect)
+        ),
       ])
+    }
     return item(entry as CommandDataItem, onSelect)
   })
 }
@@ -90,14 +114,24 @@ const VariantCommand = defineComponent({
   },
   setup(props) {
     const { variant, env } = props
-    const { defaultValue, defaultQuery, defaultPages, filter, status, ...options } = variant.options ?? {}
+    const {
+      defaultValue,
+      defaultQuery,
+      defaultPages,
+      filter,
+      status,
+      ...options
+    } = variant.options ?? {}
     const value = ref<string | null>(defaultValue ?? null)
     const query = ref(defaultQuery ?? "")
     const pages = ref(defaultPages ?? [])
     const onAction = runner(variant.action, env.log, "onAction")
-    const onSelect = variant.select && runner(variant.select, env.log, "onSelect")
+    const onSelect =
+      variant.select && runner(variant.select, env.log, "onSelect")
     // Async results come from a composable, which runs once, in setup.
-    const remote = variant.async ? useAsyncOptions(search(variant.async), { immediate: true }) : undefined
+    const remote = variant.async
+      ? useAsyncOptions(search(variant.async), { immediate: true })
+      : undefined
     const data = variant.mode === "data" || !!remote
 
     return () => {
@@ -110,28 +144,45 @@ const VariantCommand = defineComponent({
           {
             ...options,
             class: variant.dialog ? classes.dialogRoot : classes.root,
-            ...(variant.controlled === "value" ? { value: value.value } : { defaultValue }),
-            ...(variant.controlled === "query" ? { query: query.value } : { defaultQuery }),
-            ...(variant.controlled === "pages" ? { pages: pages.value } : { defaultPages }),
+            ...(variant.controlled === "value"
+              ? { value: value.value }
+              : { defaultValue }),
+            ...(variant.controlled === "query"
+              ? { query: query.value }
+              : { defaultQuery }),
+            ...(variant.controlled === "pages"
+              ? { pages: pages.value }
+              : { defaultPages }),
             filter: remote ? false : filterOf(variant),
             status: remote?.state.value.status ?? status,
             items: data ? list : undefined,
             controller: env.controller,
             "onUpdate:value": (next: string | null) => {
-              if (variant.controlled === "value") value.value = next
+              if (variant.controlled === "value") {
+                value.value = next
+              }
             },
             "onUpdate:query": (next: string) => {
-              if (variant.controlled === "query") query.value = next
+              if (variant.controlled === "query") {
+                query.value = next
+              }
             },
             "onUpdate:pages": (next: string[]) => (pages.value = next),
-            onValueChange: (next: string | null, details: CommandValueChangeDetails) =>
-              env.log(`valueChange ${JSON.stringify(next)} #${details.index} (${details.reason})`),
+            onValueChange: (
+              next: string | null,
+              details: CommandValueChangeDetails
+            ) =>
+              env.log(
+                `valueChange ${JSON.stringify(next)} #${details.index} (${details.reason})`
+              ),
             onQueryChange: (next: string, details: { reason: string }) => {
               remote?.setQuery(next)
               env.log(`queryChange ${JSON.stringify(next)} (${details.reason})`)
             },
             onPagesChange: (next: string[], details: { reason: string }) =>
-              env.log(`pagesChange ${JSON.stringify(next)} (${details.reason})`),
+              env.log(
+                `pagesChange ${JSON.stringify(next)} (${details.reason})`
+              ),
             onAction: (next: string) => {
               props.onRan?.()
               return onAction(next)
@@ -139,7 +190,11 @@ const VariantCommand = defineComponent({
           } as Record<string, unknown>,
           () => [
             pages.value.length > 0 &&
-              h("div", { class: classes.breadcrumb }, `Home / ${pages.value.join(" / ")}`),
+              h(
+                "div",
+                { class: classes.breadcrumb },
+                `Home / ${pages.value.join(" / ")}`
+              ),
             h(CommandInput, {
               class: classes.input,
               "aria-label": variant.title,
@@ -158,7 +213,7 @@ const VariantCommand = defineComponent({
                         : remote
                           ? `${state.count} results`
                           : "",
-                },
+                }
               ),
             h(
               CommandEmpty,
@@ -166,7 +221,7 @@ const VariantCommand = defineComponent({
               {
                 default: ({ state }: { state: CommandEmptyState }) =>
                   state.loading ? null : "No results found.",
-              },
+              }
             ),
             h(
               CommandList,
@@ -177,49 +232,105 @@ const VariantCommand = defineComponent({
                     ? [h(CommandItems, { items: state.items })]
                     : nested.length
                       ? [
-                          h(CommandPage, { key: "first" }, () => items(list, onSelect)),
+                          h(CommandPage, { key: "first" }, () =>
+                            items(list, onSelect)
+                          ),
                           ...nested.map((page) =>
-                            h(CommandPage, { key: page.value, value: page.value }, () =>
-                              items(page.items, onSelect),
-                            ),
+                            h(
+                              CommandPage,
+                              { key: page.value, value: page.value },
+                              () => items(page.items, onSelect)
+                            )
                           ),
                         ]
                       : items(list, onSelect),
-              },
+              }
             ),
-          ],
+          ]
         ),
         variant.controlled === "value" && [
-          h("span", { class: "text-xs text-neutral-600" }, `value: ${JSON.stringify(value.value)}`),
+          h(
+            "span",
+            { class: "text-xs text-neutral-600" },
+            `value: ${JSON.stringify(value.value)}`
+          ),
           h(
             "button",
-            { type: "button", class: classes.button, onClick: () => (value.value = "billing") },
-            "Set “billing”",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (value.value = "billing"),
+            },
+            "Set “billing”"
           ),
-          h("button", { type: "button", class: classes.button, onClick: () => (value.value = null) }, "Null"),
+          h(
+            "button",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (value.value = null),
+            },
+            "Null"
+          ),
         ],
         variant.controlled === "query" && [
-          h("span", { class: "text-xs text-neutral-600" }, `query: ${JSON.stringify(query.value)}`),
+          h(
+            "span",
+            { class: "text-xs text-neutral-600" },
+            `query: ${JSON.stringify(query.value)}`
+          ),
           h(
             "button",
-            { type: "button", class: classes.button, onClick: () => (query.value = "cal") },
-            "Set “cal”",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (query.value = "cal"),
+            },
+            "Set “cal”"
           ),
-          h("button", { type: "button", class: classes.button, onClick: () => (query.value = "") }, "Empty"),
+          h(
+            "button",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (query.value = ""),
+            },
+            "Empty"
+          ),
         ],
         variant.controlled === "pages" && [
-          h("span", { class: "text-xs text-neutral-600" }, `pages: ${JSON.stringify(pages.value)}`),
           h(
-            "button",
-            { type: "button", class: classes.button, onClick: () => (pages.value = ["theme"]) },
-            "Theme",
+            "span",
+            { class: "text-xs text-neutral-600" },
+            `pages: ${JSON.stringify(pages.value)}`
           ),
           h(
             "button",
-            { type: "button", class: classes.button, onClick: () => (pages.value = ["theme", "accent"]) },
-            "Accent",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (pages.value = ["theme"]),
+            },
+            "Theme"
           ),
-          h("button", { type: "button", class: classes.button, onClick: () => (pages.value = []) }, "Home"),
+          h(
+            "button",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (pages.value = ["theme", "accent"]),
+            },
+            "Accent"
+          ),
+          h(
+            "button",
+            {
+              type: "button",
+              class: classes.button,
+              onClick: () => (pages.value = []),
+            },
+            "Home"
+          ),
         ],
       ]
     }
@@ -244,23 +355,34 @@ const DialogCommand = defineComponent({
             env.log(`dialog openChange ${next} (${details.reason})`),
         },
         () => [
-          h(DialogTrigger, { class: classes.trigger, shortcut: "mod+k" }, () => [
-            "Open command palette ",
-            h(DialogShortcut, { class: classes.shortcut }),
-          ]),
+          h(
+            DialogTrigger,
+            { class: classes.trigger, shortcut: "mod+k" },
+            () => [
+              "Open command palette ",
+              h(DialogShortcut, { class: classes.shortcut }),
+            ]
+          ),
           h(DialogBackdrop, { class: classes.dialogBackdrop }),
           h(DialogContent, { class: classes.dialogContent }, () => [
             h(DialogTitle, { class: "sr-only" }, () => "Command palette"),
-            h(VariantCommand, { variant, env, onRan: () => (open.value = false) }),
+            h(VariantCommand, {
+              variant,
+              env,
+              onRan: () => (open.value = false),
+            }),
           ]),
-        ],
+        ]
       )
   },
 })
 
 function mount(root: HTMLElement) {
   kitchenSink(root, "vue", (slot, variant, env) => {
-    const app = createApp(variant.dialog ? DialogCommand : VariantCommand, { variant, env })
+    const app = createApp(variant.dialog ? DialogCommand : VariantCommand, {
+      variant,
+      env,
+    })
     // Every card is its own app, so each gets its own id prefix.
     app.config.idPrefix = variant.id
     app.mount(slot)

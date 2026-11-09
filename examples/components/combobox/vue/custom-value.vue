@@ -13,7 +13,13 @@ import {
 import { ref } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
-const titles = ["Designer", "Engineer", "Engineering manager", "Product manager", "Researcher"]
+const titles = [
+  "Designer",
+  "Engineer",
+  "Engineering manager",
+  "Product manager",
+  "Researcher",
+]
 
 const log = useLog()
 const value = ref<string | null>(null)
@@ -34,7 +40,9 @@ const value = ref<string | null>(null)
     </div>
     <ComboboxContent>
       <ComboboxEmpty v-slot="{ state }">
-        <template v-if="state.empty">Press Enter to use “{{ state.query }}”.</template>
+        <template v-if="state.empty"
+          >Press Enter to use “{{ state.query }}”.</template
+        >
       </ComboboxEmpty>
       <ComboboxList>
         <ComboboxItem v-for="title in titles" :key="title" :value="title">

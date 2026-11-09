@@ -23,14 +23,21 @@ function Example() {
 
   return (
     <div data-slot="row">
-      <input ref={setAnchor} type="search" placeholder="Search files…" aria-label="Search files" />
+      <input
+        ref={setAnchor}
+        type="search"
+        placeholder="Search files…"
+        aria-label="Search files"
+      />
       <Popover>
         <PopoverTrigger aria-label="Search filters">
           <SlidersHorizontalIcon aria-hidden="true" />
         </PopoverTrigger>
         <PopoverContent anchor={anchor} align="start" sideOffset={8}>
           <PopoverTitle>Filters</PopoverTitle>
-          <PopoverDescription>Show only these kinds of files.</PopoverDescription>
+          <PopoverDescription>
+            Show only these kinds of files.
+          </PopoverDescription>
           <div data-slot="stack">
             {types.map((type) => (
               <label data-slot="label" key={type.label}>

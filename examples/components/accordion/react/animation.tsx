@@ -18,7 +18,8 @@ const items = [
   {
     value: "two",
     label: "Where does the height come from?",
-    content: "The panel measures itself and writes the result to a CSS variable while it animates.",
+    content:
+      "The panel measures itself and writes the result to a CSS variable while it animates.",
   },
   {
     value: "three",

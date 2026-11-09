@@ -18,7 +18,7 @@ test("the focused option keeps the tab stop and arrow keys when its value change
   const options = [...target.querySelectorAll<HTMLElement>('[role="option"]')]
   const press = async (key: string) => {
     document.activeElement!.dispatchEvent(
-      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }),
+      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
     )
     await settle()
   }

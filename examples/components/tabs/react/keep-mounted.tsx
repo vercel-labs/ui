@@ -2,7 +2,13 @@
 
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Textarea } from "@ui-sdk/react/textarea"
-import { Tabs, TabsIndicator, TabsList, TabsPanel, TabsTab } from "@ui-sdk/react/tabs"
+import {
+  Tabs,
+  TabsIndicator,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/react/tabs"
 
 function Example() {
   return (

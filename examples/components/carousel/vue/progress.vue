@@ -16,7 +16,10 @@ const log = useLog()
 </script>
 
 <template>
-  <Carousel aria-label="Featured" @page-change-complete="(page: number) => log(`Rested on slide ${page}`)">
+  <Carousel
+    aria-label="Featured"
+    @page-change-complete="(page: number) => log(`Rested on slide ${page}`)"
+  >
     <div data-slot="row">
       <CarouselPrevious aria-label="Previous slide">
         <ChevronLeftIcon />

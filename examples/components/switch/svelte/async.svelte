@@ -4,7 +4,8 @@
   import { Switch, SwitchThumb } from "@ui-sdk/svelte/switch"
   import { useLog } from "../../../shared/svelte/log"
 
-  const save = (_checked: boolean) => new Promise((resolve) => setTimeout(resolve, 800))
+  const save = (_checked: boolean) =>
+    new Promise((resolve) => setTimeout(resolve, 800))
 
   const log = useLog()
   const backups = createSwitchController()
@@ -17,9 +18,13 @@
     controller={backups}
     aria-busy={saving}
     onCheckedChange={(next, details) => {
-      if (details.reason === "imperative") return
+      if (details.reason === "imperative") {
+        return
+      }
       details.cancel()
-      if (saving) return
+      if (saving) {
+        return
+      }
       saving = true
       log("Saving…")
       save(next).then(() => {
@@ -30,7 +35,10 @@
     }}
   >
     <SwitchThumb>
-      {#if saving}<LoaderCircleIcon data-slot="spinner" aria-hidden="true" />{/if}
+      {#if saving}<LoaderCircleIcon
+          data-slot="spinner"
+          aria-hidden="true"
+        />{/if}
     </SwitchThumb>
   </Switch>
 </label>

@@ -54,7 +54,11 @@ type SwipeActionsOptions<State extends object> = {
    * row's width, and returns whether it did. Without it, a long swipe only
    * opens the row.
    */
-  onFullSwipe?: (key: string, side: SwipeSide, details: { event: Event }) => boolean
+  onFullSwipe?: (
+    key: string,
+    side: SwipeSide,
+    details: { event: Event }
+  ) => boolean
   /** How far across the row a swipe runs the first action, as a fraction of its width. @defaultValue 0.6 */
   fullSwipe?: () => number
   /** Whether a row can't be swiped. */
@@ -87,7 +91,7 @@ type SwipeActionsOptions<State extends object> = {
  */
 function createSwipeActions<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: SwipeActionsOptions<State>,
+  options: SwipeActionsOptions<State>
 ) {
   const { store } = context
   const rows = new Map<string, HTMLElement>()
@@ -103,30 +107,42 @@ function createSwipeActions<State extends object>(
     return !!el && isRTL(el)
   }
   // Which way a side's actions push the row: `start` to the right in left-to-right text.
-  const sign = (key: string, side: SwipeSide) => ((side === "start") !== rtl(key) ? 1 : -1)
-  const sideOf = (key: string, x: number) => (x > 0 !== rtl(key) ? ("start" as const) : ("end" as const))
+  const sign = (key: string, side: SwipeSide) =>
+    (side === "start") !== rtl(key) ? 1 : -1
+  const sideOf = (key: string, x: number) =>
+    x > 0 !== rtl(key) ? ("start" as const) : ("end" as const)
   const width = (key: string, side: SwipeSide) =>
     actions.get(actionsId(key, side))?.getBoundingClientRect().width ?? 0
   const buttons = (key: string, side: SwipeSide) => [
-    ...(actions.get(actionsId(key, side))?.querySelectorAll<HTMLElement>("button, [href], [tabindex]") ?? []),
+    ...(actions
+      .get(actionsId(key, side))
+      ?.querySelectorAll<HTMLElement>("button, [href], [tabindex]") ?? []),
   ]
 
   function setOpen(next: SwipeOpen | null) {
     store.set({ [options.key]: next, [options.draft]: null } as Partial<State>)
     offOutside?.()
     offOutside = undefined
-    if (!next) return
+    if (!next) {
+      return
+    }
     // A press anywhere but the open row closes it, unless it's a second finger while one swipes.
     const doc = rows.get(next.key)?.ownerDocument
-    if (doc)
+    if (doc) {
       offOutside = on(
         doc,
         "pointerdown",
         (event) => {
-          if (event.isPrimary && !rows.get(next.key)?.contains(event.target as Node)) api.close()
+          if (
+            event.isPrimary &&
+            !rows.get(next.key)?.contains(event.target as Node)
+          ) {
+            api.close()
+          }
         },
-        { capture: true },
+        { capture: true }
       )
+    }
   }
 
   const api = {
@@ -135,9 +151,13 @@ function createSwipeActions<State extends object>(
     /** How far a row has moved, in pixels, positive to the right: the swipe's, or the open side's width. */
     offset(state: State, key: string) {
       const swiping = state[options.draft] as SwipeDraft | null
-      if (swiping?.key === key) return swiping.x
+      if (swiping?.key === key) {
+        return swiping.x
+      }
       const shown = state[options.key] as SwipeOpen | null
-      return shown?.key === key ? sign(key, shown.side) * width(key, shown.side) : 0
+      return shown?.key === key
+        ? sign(key, shown.side) * width(key, shown.side)
+        : 0
     },
     /**
      * Live attributes for the row's moving content: `--swipe-x`, its offset;
@@ -166,7 +186,9 @@ function createSwipeActions<State extends object>(
     bindRow(el: HTMLElement, key: string) {
       rows.set(key, el)
       return () => {
-        if (rows.get(key) === el) rows.delete(key)
+        if (rows.get(key) === el) {
+          rows.delete(key)
+        }
       }
     },
     /** Joins the actions on one side of a row, which a swipe measures to know how far it opens. */
@@ -174,17 +196,23 @@ function createSwipeActions<State extends object>(
       const id = actionsId(key, side)
       actions.set(id, el)
       return () => {
-        if (actions.get(id) === el) actions.delete(id)
+        if (actions.get(id) === el) {
+          actions.delete(id)
+        }
       }
     },
     /** Opens a row's actions on a side, closing any other row's. With `focus`, its first action takes focus. */
     show(key: string, side: SwipeSide, { focus = false } = {}) {
-      if (!width(key, side) || options.disabled?.(key)) return false
+      if (!width(key, side) || options.disabled?.(key)) {
+        return false
+      }
       setOpen({ key, side })
       if (focus) {
         const el = actions.get(actionsId(key, side))
         // The attribute goes once the adapter renders; focus can't wait for it.
-        if (el) el.inert = false
+        if (el) {
+          el.inert = false
+        }
         buttons(key, side)[0]?.focus()
       }
       return true
@@ -192,8 +220,12 @@ function createSwipeActions<State extends object>(
     /** Closes the open row. With `focus`, the row takes focus back, as after Escape. */
     close({ focus = false } = {}) {
       const shown = open()
-      if (!shown) return false
-      if (focus) rows.get(shown.key)?.focus()
+      if (!shown) {
+        return false
+      }
+      if (focus) {
+        rows.get(shown.key)?.focus()
+      }
       setOpen(null)
       return true
     },
@@ -203,13 +235,22 @@ function createSwipeActions<State extends object>(
      * and vertical scrolls keep working.
      */
     pointerdown(event: PointerEvent, key: string, el: HTMLElement) {
-      if (!drags.accepts(event) || options.disabled?.(key)) return
+      if (!drags.accepts(event) || options.disabled?.(key)) {
+        return
+      }
       const shown = open()
       // A press inside the open actions is a click on one.
-      if (shown?.key === key && actions.get(actionsId(key, shown.side))?.contains(event.target as Node))
+      if (
+        shown?.key === key &&
+        actions.get(actionsId(key, shown.side))?.contains(event.target as Node)
+      ) {
         return
-      const from = shown?.key === key ? sign(key, shown.side) * width(key, shown.side) : 0
-      if (!from && !width(key, "start") && !width(key, "end")) return
+      }
+      const from =
+        shown?.key === key ? sign(key, shown.side) * width(key, shown.side) : 0
+      if (!from && !width(key, "start") && !width(key, "end")) {
+        return
+      }
       const rowWidth = el.getBoundingClientRect().width || 1
       const fraction = options.fullSwipe?.() ?? 0.6
       const velocity = createVelocityTracker()
@@ -224,18 +265,30 @@ function createSwipeActions<State extends object>(
         // Past its actions a row moves on toward a full swipe, or resists without one.
         const limit = full ? rowWidth : room
         const past = Math.abs(raw) - limit
-        const x = past > 0 ? Math.sign(raw) * (limit + rubberBand(past, rowWidth)) : raw
+        const x =
+          past > 0 ? Math.sign(raw) * (limit + rubberBand(past, rowWidth)) : raw
         last = { x, side, full: full && Math.abs(raw) >= rowWidth * fraction }
         store.set({ [options.draft]: { key, ...last } } as Partial<State>)
       }
       const finish = (end: PointerEvent, canceled: boolean) => {
-        if (options.disabled?.(key)) return setOpen(null)
+        if (options.disabled?.(key)) {
+          return setOpen(null)
+        }
         const { x, side, full } = last
-        if (!canceled && full && options.onFullSwipe?.(key, side, { event: end })) return setOpen(null)
+        if (
+          !canceled &&
+          full &&
+          options.onFullSwipe?.(key, side, { event: end })
+        ) {
+          return setOpen(null)
+        }
         const room = width(key, side)
         // A flick decides whichever way it went; otherwise past half the actions stays open.
         const speed = canceled ? 0 : velocity.velocity(end.timeStamp)
-        const opening = Math.abs(speed) >= flick ? Math.sign(speed) === Math.sign(x) : Math.abs(x) >= room / 2
+        const opening =
+          Math.abs(speed) >= flick
+            ? Math.sign(speed) === Math.sign(x)
+            : Math.abs(x) >= room / 2
         setOpen(opening && room && x ? { key, side } : null)
       }
 
@@ -243,9 +296,13 @@ function createSwipeActions<State extends object>(
         pick(move) {
           const dx = move.clientX - event.clientX
           const dy = move.clientY - event.clientY
-          if (Math.hypot(dx, dy) < slop) return undefined
+          if (Math.hypot(dx, dy) < slop) {
+            return undefined
+          }
           // A press that moves up or down first is a scroll, not a swipe.
-          if (Math.abs(dy) >= Math.abs(dx)) return false
+          if (Math.abs(dy) >= Math.abs(dx)) {
+            return false
+          }
           velocity.add(move.timeStamp, move.clientX)
           place(dx)
           return true
@@ -266,18 +323,29 @@ function createSwipeActions<State extends object>(
      * the last one, or Escape, closes them and puts focus back on the row.
      */
     keydown(event: KeyboardEvent, key: string) {
-      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+      if (
+        event.defaultPrevented ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey
+      ) {
         return false
+      }
       const shown = open()?.key === key ? open() : null
       if (event.key === "Escape" && shown) {
         event.preventDefault()
         return api.close({ focus: true })
       }
-      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return false
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+        return false
+      }
       // Which way on screen: Left would swipe the row left, showing the actions on its right.
       const dx = event.key === "ArrowRight" ? 1 : -1
       if (!shown) {
-        if (!api.show(key, sideOf(key, dx), { focus: true })) return false
+        if (!api.show(key, sideOf(key, dx), { focus: true })) {
+          return false
+        }
         event.preventDefault()
         return true
       }
@@ -285,9 +353,15 @@ function createSwipeActions<State extends object>(
       const list = buttons(key, shown.side)
       const index = list.indexOf(event.target as HTMLElement)
       const next = index === -1 ? 0 : index + (rtl(key) ? -dx : dx)
-      if (index === -1 ? dx === sign(key, shown.side) : next < 0 || next >= list.length) {
+      if (
+        index === -1
+          ? dx === sign(key, shown.side)
+          : next < 0 || next >= list.length
+      ) {
         // The row's content lies the way it moved, so heading there closes the actions.
-        if (dx === sign(key, shown.side)) api.close({ focus: true })
+        if (dx === sign(key, shown.side)) {
+          api.close({ focus: true })
+        }
         return true
       }
       list[next].focus()

@@ -18,7 +18,11 @@ until it settles.
 
   // Keyed by its own id, so several Close parts stay apart.
   const id = $props.id()
-  const close = useHandlePart(useDialog().handle, "close", () => ({ id, value, action }))
+  const close = useHandlePart(useDialog().handle, "close", () => ({
+    id,
+    value,
+    action,
+  }))
 </script>
 
 <Part tag="button" part={close} props={rest} />

@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/svelte"
+  import {
+    Command,
+    CommandInput,
+    CommandItem,
+    CommandList,
+  } from "@ui-sdk/svelte"
   import { commandFixture as f } from "tests/fixtures/command.ts"
 
   let action = $state("")
@@ -25,7 +30,13 @@
           {#each f.groups[0].items.slice(0, 2) as item (item.value)}
             <CommandItem value={item.value} label={item.label}>
               {#snippet render({ props, state: itemState })}
-                <div {...props} class={["item", itemState.highlighted ? "is-highlighted" : ""]}>
+                <div
+                  {...props}
+                  class={[
+                    "item",
+                    itemState.highlighted ? "is-highlighted" : "",
+                  ]}
+                >
                   {item.label}{itemState.highlighted ? " ←" : ""}
                 </div>
               {/snippet}

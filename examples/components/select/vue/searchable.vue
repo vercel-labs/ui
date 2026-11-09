@@ -44,7 +44,11 @@ const countries = [
 ]
 
 const popularCountries = [
-  { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
+  {
+    type: "group" as const,
+    label: "Popular",
+    items: [countries[5], countries[11], countries[16]],
+  },
 ]
 </script>
 
@@ -68,11 +72,16 @@ const popularCountries = [
         <ChevronDownIcon />
       </SelectTrigger>
       <SelectContent>
-        <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+        <SelectInput
+          aria-label="Search countries"
+          placeholder="Search countries…"
+        />
         <SelectEmpty>No countries found.</SelectEmpty>
         <SelectList v-slot="{ state }">
           <template
-            v-for="entry in state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]"
+            v-for="entry in state.items as (
+              (typeof countries)[number] | (typeof popularCountries)[number]
+            )[]"
             :key="'items' in entry ? entry.label : entry.value"
           >
             <SelectGroup v-if="'items' in entry">

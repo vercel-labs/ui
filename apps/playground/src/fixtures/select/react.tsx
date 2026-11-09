@@ -31,7 +31,15 @@ import {
 
 const controller = createSelectController<string, boolean>()
 
-function Item({ value, label, disabled }: { value: string; label: string; disabled?: boolean }) {
+function Item({
+  value,
+  label,
+  disabled,
+}: {
+  value: string
+  label: string
+  disabled?: boolean
+}) {
   return (
     <SelectItem className="item" value={value} disabled={disabled}>
       <SelectItemText>{label}</SelectItemText>
@@ -44,10 +52,17 @@ function Item({ value, label, disabled }: { value: string; label: string; disabl
 // labels, and separators.
 function DataItems({ items }: { items: ListData }) {
   return items.map((entry, index) => {
-    if (typeof entry === "string") return <Item key={entry} value={entry} label={entry} />
-    if ("value" in entry) return <Item key={entry.value} {...entry} />
-    if (entry.type === "separator")
-      return <SelectSeparator key={`separator-${index}`} className="separator" />
+    if (typeof entry === "string") {
+      return <Item key={entry} value={entry} label={entry} />
+    }
+    if ("value" in entry) {
+      return <Item key={entry.value} {...entry} />
+    }
+    if (entry.type === "separator") {
+      return (
+        <SelectSeparator key={`separator-${index}`} className="separator" />
+      )
+    }
     return (
       <SelectGroup key={entry.label}>
         <SelectGroupLabel className="label">{entry.label}</SelectGroupLabel>
@@ -69,7 +84,9 @@ function renderItems({
   grouped: boolean
   selectAll: boolean
 }) {
-  if (!grouped) return list.map((item) => <Item key={item.value} {...item} />)
+  if (!grouped) {
+    return list.map((item) => <Item key={item.value} {...item} />)
+  }
   return f.groups.map((group, index) => (
     <React.Fragment key={group.label}>
       {index > 0 && <SelectSeparator className="separator" />}
@@ -97,19 +114,40 @@ function StyledContent() {
 
 function Fixture({ data = false }: { data?: boolean }) {
   const wrapped = new URLSearchParams(location.search).has("wrapped")
-  const { fieldset, grouped, cancel, align, long, container, search, selectAll, recent, max, ...options } =
-    selectOptions()
+  const {
+    fieldset,
+    grouped,
+    cancel,
+    align,
+    long,
+    container,
+    search,
+    selectAll,
+    recent,
+    max,
+    ...options
+  } = selectOptions()
   const [action, setAction] = React.useState("")
   const [submitted, setSubmitted] = React.useState("")
-  const [list, setList] = React.useState<{ value: string; label: string; disabled?: boolean }[]>(f.items)
+  const [list, setList] = React.useState<
+    { value: string; label: string; disabled?: boolean }[]
+  >(f.items)
   React.useEffect(() => onItemsChange(changedItems, setList), [])
   const items = long
     ? longItems()
     : grouped
       ? [
-          { type: "group" as const, label: f.groups[0].label, items: f.groups[0].items },
+          {
+            type: "group" as const,
+            label: f.groups[0].label,
+            items: f.groups[0].items,
+          },
           { type: "separator" as const },
-          { type: "group" as const, label: f.groups[1].label, items: f.groups[1].items },
+          {
+            type: "group" as const,
+            label: f.groups[1].label,
+            items: f.groups[1].items,
+          },
         ]
       : list
   return (
@@ -133,8 +171,12 @@ function Fixture({ data = false }: { data?: boolean }) {
             items={data || long || recent || wrapped ? items : undefined}
             emptyItems={recent ? f.recent : undefined}
             onValueChange={(value, details) => {
-              if (cancel) return details.cancel()
-              setAction(`value:${Array.isArray(value) ? value.join(",") : String(value)}`)
+              if (cancel) {
+                return details.cancel()
+              }
+              setAction(
+                `value:${Array.isArray(value) ? value.join(",") : String(value)}`
+              )
             }}
           >
             <SelectLabel className="label">{f.label}</SelectLabel>
@@ -146,14 +188,19 @@ function Fixture({ data = false }: { data?: boolean }) {
             {wrapped ? (
               <StyledContent />
             ) : search ? (
-              <SelectContent className="popup list-popup" alignItemWithTrigger={align}>
+              <SelectContent
+                className="popup list-popup"
+                alignItemWithTrigger={align}
+              >
                 <SelectInput className="input" aria-label={f.search} />
                 <SelectEmpty className="empty">{f.empty}</SelectEmpty>
                 <SelectList>
                   {(state) => (
                     <>
                       {selectAll && !grouped && (
-                        <SelectSelectAll className="item">{f.selectAll}</SelectSelectAll>
+                        <SelectSelectAll className="item">
+                          {f.selectAll}
+                        </SelectSelectAll>
                       )}
                       {data || long || recent ? (
                         <DataItems items={state.items as ListData} />
@@ -168,14 +215,25 @@ function Fixture({ data = false }: { data?: boolean }) {
               <SelectContent className="popup list-popup">
                 {(state) => (
                   <>
-                    {selectAll && <SelectSelectAll className="item">{f.selectAll}</SelectSelectAll>}
+                    {selectAll && (
+                      <SelectSelectAll className="item">
+                        {f.selectAll}
+                      </SelectSelectAll>
+                    )}
                     <DataItems items={state.items as ListData} />
                   </>
                 )}
               </SelectContent>
             ) : (
-              <SelectContent className="popup list-popup" alignItemWithTrigger={align}>
-                {selectAll && !grouped && <SelectSelectAll className="item">{f.selectAll}</SelectSelectAll>}
+              <SelectContent
+                className="popup list-popup"
+                alignItemWithTrigger={align}
+              >
+                {selectAll && !grouped && (
+                  <SelectSelectAll className="item">
+                    {f.selectAll}
+                  </SelectSelectAll>
+                )}
                 {renderItems({ list, grouped, selectAll })}
               </SelectContent>
             )}
@@ -200,12 +258,18 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 
 // A disabled fieldset around the control, with ?fieldset.
-function Wrap({ fieldset, children }: { fieldset: boolean; children: React.ReactNode }) {
+function Wrap({
+  fieldset,
+  children,
+}: {
+  fieldset: boolean
+  children: React.ReactNode
+}) {
   return fieldset ? <fieldset disabled>{children}</fieldset> : <>{children}</>
 }
 

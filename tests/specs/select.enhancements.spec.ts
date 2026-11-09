@@ -5,7 +5,8 @@ import { expect, lastAction, test } from "../fixtures"
 
 const trigger = (page: Page) => page.getByRole("combobox", { name: "Fruit" })
 const listbox = (page: Page) => page.getByRole("listbox")
-const option = (page: Page, name: string) => page.getByRole("option", { name, exact: true })
+const option = (page: Page, name: string) =>
+  page.getByRole("option", { name, exact: true })
 
 test.describe("enhancements", { tag: "@enhancement" }, () => {
   // A styled layer wraps the content part in a component of its own, so the
@@ -27,7 +28,10 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("listbox", { name: "Fruit" })).toBeVisible()
   })
 
-  test("a clear button selects nothing and keeps focus on the select", async ({ page, open }) => {
+  test("a clear button selects nothing and keeps focus on the select", async ({
+    page,
+    open,
+  }) => {
     await open("select", { value: "banana" })
     await page.getByRole("button", { name: "Clear" }).click()
     await expect(trigger(page)).toContainText("Pick a fruit")
@@ -37,7 +41,10 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("button", { name: "Clear" })).toHaveCount(0)
   })
 
-  test("Alt+ArrowUp chooses the focused item and closes, as the APG asks", async ({ page, open }) => {
+  test("Alt+ArrowUp chooses the focused item and closes, as the APG asks", async ({
+    page,
+    open,
+  }) => {
     await open("select")
     await trigger(page).focus()
     await page.keyboard.press("Enter")
@@ -65,7 +72,10 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(content).toHaveAttribute("data-modality", "keyboard")
   })
 
-  test("a form reset returns the select to its default value", async ({ page, open }) => {
+  test("a form reset returns the select to its default value", async ({
+    page,
+    open,
+  }) => {
     await open("select", { value: "banana" })
     await trigger(page).focus()
     await page.keyboard.press("Enter")

@@ -21,7 +21,7 @@ describe("server rendering", () => {
         <MenuContent>
           <MenuItem value="new">New file</MenuItem>
         </MenuContent>
-      </Menu>,
+      </Menu>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('aria-haspopup="menu"')
@@ -44,7 +44,7 @@ describe("server rendering", () => {
             </MenuSubContent>
           </MenuSub>
         </MenuContent>
-      </Menu>,
+      </Menu>
     )
     expect(html).toContain('role="menu"')
     expect(html).toContain('aria-keyshortcuts="Control+N"')
@@ -54,9 +54,12 @@ describe("server rendering", () => {
 
   test("data menus render on the server", () => {
     const html = renderToString(
-      <Menu defaultOpen items={[{ value: "new", label: "New file" }, { type: "separator" }]}>
+      <Menu
+        defaultOpen
+        items={[{ value: "new", label: "New file" }, { type: "separator" }]}
+      >
         <MenuTrigger>File</MenuTrigger>
-      </Menu>,
+      </Menu>
     )
     expect(html).toContain('role="menuitem"')
     expect(html).toContain('role="separator"')
@@ -74,7 +77,7 @@ describe("server rendering", () => {
             </MenuContent>
           </Menu>
           <TokenInput />
-        </>,
+        </>
       )
       expect(html).toContain('role="menu"')
       expect(error).not.toHaveBeenCalled()
@@ -87,7 +90,7 @@ describe("server rendering", () => {
     const html = renderToString(
       <Menu defaultOpen items={["Copy", "Paste"]}>
         <MenuTrigger>Edit</MenuTrigger>
-      </Menu>,
+      </Menu>
     )
     expect(html.match(/role="menuitem"/g)).toHaveLength(2)
     expect(html).toContain("Copy")

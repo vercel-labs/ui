@@ -8,7 +8,10 @@ import {
   ScrollAreaViewport,
 } from "@ui-sdk/react/scroll-area"
 
-const tags = Array.from({ length: 50 }, (_, index) => `v1.2.0-beta.${50 - index}`)
+const tags = Array.from(
+  { length: 50 },
+  (_, index) => `v1.2.0-beta.${50 - index}`
+)
 
 function Example() {
   return (
@@ -25,7 +28,9 @@ function Example() {
             </ScrollAreaContent>
           </ScrollAreaViewport>
           <p data-slot="hint" aria-hidden>
-            {state.atStart ? "Scroll for older releases" : "More releases below"}
+            {state.atStart
+              ? "Scroll for older releases"
+              : "More releases below"}
           </p>
           <ScrollAreaScrollbar>
             <ScrollAreaThumb />

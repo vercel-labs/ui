@@ -4,10 +4,15 @@
 // list. Fixtures run `listener` with the items of that name.
 const itemsChangeEvent = "fixture-items"
 
-function onItemsChange<Items>(changes: Record<string, Items>, listener: (items: Items) => void) {
+function onItemsChange<Items>(
+  changes: Record<string, Items>,
+  listener: (items: Items) => void
+) {
   const handler = (event: Event) => {
     const items = changes[(event as CustomEvent<string>).detail]
-    if (items) listener(items)
+    if (items) {
+      listener(items)
+    }
   }
   document.addEventListener(itemsChangeEvent, handler)
   return () => document.removeEventListener(itemsChangeEvent, handler)

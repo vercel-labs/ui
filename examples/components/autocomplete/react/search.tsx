@@ -15,9 +15,21 @@ const recent = ["react hooks", "tailwind grid", "web components", "vue v-model"]
 function Example() {
   const log = useLog()
   return (
-    <form role="search" data-slot="stack" onSubmit={(event) => event.preventDefault()}>
-      <Autocomplete submitOnSelect name="q" onSubmit={(value) => log(`Searched “${value}”`)}>
-        <AutocompleteInput type="search" aria-label="Search" placeholder="Search…" />
+    <form
+      role="search"
+      data-slot="stack"
+      onSubmit={(event) => event.preventDefault()}
+    >
+      <Autocomplete
+        submitOnSelect
+        name="q"
+        onSubmit={(value) => log(`Searched “${value}”`)}
+      >
+        <AutocompleteInput
+          type="search"
+          aria-label="Search"
+          placeholder="Search…"
+        />
         <AutocompleteContent>
           <AutocompleteEmpty>No results.</AutocompleteEmpty>
           <AutocompleteList>

@@ -20,7 +20,10 @@ function Slider({
   className?: string
 }) {
   return (
-    <SliderPrimitive className={cn("flex flex-col gap-2", className)} {...props}>
+    <SliderPrimitive
+      className={cn("flex flex-col gap-2", className)}
+      {...props}
+    >
       <div className="flex items-center justify-between text-sm">
         {label}
         <SliderValue className="text-muted-foreground tabular-nums" />

@@ -39,14 +39,29 @@ async function submit(event: SubmitEvent) {
     <Field class="flex-row items-center justify-between gap-6">
       <div class="grid gap-1.5">
         <FieldLabel>Email notifications</FieldLabel>
-        <FieldDescription>Get an email when someone mentions you or assigns you an issue.</FieldDescription>
+        <FieldDescription
+          >Get an email when someone mentions you or assigns you an
+          issue.</FieldDescription
+        >
       </div>
-      <Switch name="emailNotifications" :default-checked="settings.emailNotifications" />
+      <Switch
+        name="emailNotifications"
+        :default-checked="settings.emailNotifications"
+      />
     </Field>
     <Field>
       <FieldLabel>Issues per page</FieldLabel>
-      <NumberInput name="pageSize" :default-value="settings.pageSize" :min="5" :max="50" :step="5" />
-      <FieldDescription>How many issues the list shows before it splits into pages.</FieldDescription>
+      <NumberInput
+        name="pageSize"
+        :default-value="settings.pageSize"
+        :min="5"
+        :max="50"
+        :step="5"
+      />
+      <FieldDescription
+        >How many issues the list shows before it splits into
+        pages.</FieldDescription
+      >
     </Field>
     <Field>
       <Slider
@@ -70,8 +85,8 @@ async function submit(event: SubmitEvent) {
               <PopoverContent>
                 <PopoverTitle class="font-medium">Stale issues</PopoverTitle>
                 <PopoverDescription class="text-muted-foreground">
-                  An open issue with no comments or changes for this long moves to Canceled. Its assignee gets
-                  an email first.
+                  An open issue with no comments or changes for this long moves
+                  to Canceled. Its assignee gets an email first.
                 </PopoverDescription>
               </PopoverContent>
             </Popover>

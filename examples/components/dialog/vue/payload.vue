@@ -11,7 +11,12 @@ import {
 } from "@ui-sdk/vue/dialog"
 import { useLog } from "../../../shared/vue/log"
 
-type Invoice = { id: string; customer: string; amount: string; status: "Paid" | "Due" }
+type Invoice = {
+  id: string
+  customer: string
+  amount: string
+  status: "Paid" | "Due"
+}
 
 const invoices: Invoice[] = [
   { id: "INV-001", customer: "Acme", amount: "$250.00", status: "Paid" },
@@ -29,7 +34,9 @@ async function remindFromCode() {
 }
 
 function onOpenChange(open: boolean, details: { returnValue?: string }) {
-  if (!open && details.returnValue === "send") log("Reminder sent")
+  if (!open && details.returnValue === "send") {
+    log("Reminder sent")
+  }
 }
 </script>
 
@@ -41,7 +48,9 @@ function onOpenChange(open: boolean, details: { returnValue?: string }) {
     <ul data-slot="list">
       <li v-for="invoice in invoices" :key="invoice.id" data-slot="row">
         {{ invoice.customer }}
-        <span data-slot="hint">{{ invoice.amount }} · {{ invoice.status }}</span>
+        <span data-slot="hint"
+          >{{ invoice.amount }} · {{ invoice.status }}</span
+        >
         <DialogTrigger
           :controller="reminder"
           :payload="invoice"
@@ -58,12 +67,15 @@ function onOpenChange(open: boolean, details: { returnValue?: string }) {
         <div data-slot="stack">
           <DialogTitle>Remind {{ state.payload?.customer }}</DialogTitle>
           <DialogDescription>
-            {{ state.payload?.id }} for {{ state.payload?.amount }} is due. We'll email the billing contact.
+            {{ state.payload?.id }} for {{ state.payload?.amount }} is due.
+            We'll email the billing contact.
           </DialogDescription>
         </div>
         <div data-slot="row">
           <DialogClose>Cancel</DialogClose>
-          <DialogClose data-variant="solid" value="send">Send reminder</DialogClose>
+          <DialogClose data-variant="solid" value="send"
+            >Send reminder</DialogClose
+          >
         </div>
       </InvoiceDialogContent>
     </Dialog>

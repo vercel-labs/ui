@@ -55,15 +55,21 @@ const parts = createParts(autocompletePrimitive, {
   arrow: "div",
 })
 
-const AutocompleteContext = createContext<PrimitiveHandle<typeof autocompletePrimitive> | null>(null)
+const AutocompleteContext = createContext<PrimitiveHandle<
+  typeof autocompletePrimitive
+> | null>(null)
 const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 // Where an AutocompleteContent among the autocomplete's children says it's
 // there, so a data autocomplete renders its own list only when there's none.
-const OwnContentContext = createContext<((present: boolean) => void) | null>(null)
+const OwnContentContext = createContext<((present: boolean) => void) | null>(
+  null
+)
 
 function useAutocomplete() {
   const context = useContext(AutocompleteContext)
-  if (!context) throw new Error("Autocomplete parts must be used inside <Autocomplete>.")
+  if (!context) {
+    throw new Error("Autocomplete parts must be used inside <Autocomplete>.")
+  }
   return context
 }
 
@@ -97,7 +103,9 @@ function Autocomplete(props: AutocompleteProps) {
         <SheetHeaderContext value={[header, (el) => setHeader(el)]}>
           {providePrimitive(autocomplete, () => (
             <>
-              <OwnContentContext value={setHasContent}>{props.children}</OwnContentContext>
+              <OwnContentContext value={setHasContent}>
+                {props.children}
+              </OwnContentContext>
               <Show when={props.items && !hasContent()}>
                 <AutocompleteContent />
               </Show>
@@ -120,12 +128,18 @@ const AutocompleteLabel = parts.Label
  * @stable
  */
 function AutocompleteInput(
-  props: Omit<PartProps<"input", AutocompleteInputState>, "value" | "defaultValue" | "children" | "readonly">,
+  props: Omit<
+    PartProps<"input", AutocompleteInputState>,
+    "value" | "defaultValue" | "children" | "readonly"
+  >
 ) {
   const autocomplete = useAutocomplete()
   const input = joinField(useFieldControl(props), props, "input")
   const [header] = useContext(SheetHeaderContext)
-  return inSheetHeader(() => usePart(autocomplete, "input", undefined, input, "input"), header)
+  return inSheetHeader(
+    () => usePart(autocomplete, "input", undefined, input, "input"),
+    header
+  )
 }
 
 /**
@@ -144,7 +158,9 @@ const AutocompleteClear = parts.Clear
  * The popup that holds the suggestions, positioned against the field.
  * @stable
  */
-function AutocompleteContent(props: PartProps<"div", AutocompleteContentState> & AutocompleteContentProps) {
+function AutocompleteContent(
+  props: PartProps<"div", AutocompleteContentState> & AutocompleteContentProps
+) {
   const autocomplete = useAutocomplete()
   const fromRoot = useContext(ContainerContext)
   const target = usePopupContainer(() => props.container ?? fromRoot())
@@ -173,7 +189,7 @@ function AutocompleteContent(props: PartProps<"div", AutocompleteContentState> &
       "arrowPadding",
       "anchor",
       "keepMounted",
-      "container",
+      "container"
     ),
     {
       // The sheet's header, then the content: yours, or the list of a data
@@ -194,14 +210,17 @@ function AutocompleteContent(props: PartProps<"div", AutocompleteContentState> &
           </>
         )
       },
-    },
+    }
   )
   // The popup goes around the content only while it's present.
   return (
     <Show when={autocomplete.present("content", content)}>
       {renderPopup(
-        () => sheetViewport(autocomplete, () => usePart(autocomplete, "content", content, rest, "div")),
-        target,
+        () =>
+          sheetViewport(autocomplete, () =>
+            usePart(autocomplete, "content", content, rest, "div")
+          ),
+        target
       )}
     </Show>
   )
@@ -215,7 +234,10 @@ function AutocompleteList(props: ComponentProps<typeof parts.List>) {
   // From the part's state, so new items render the list again. Without items it's empty.
   return (
     <parts.List {...props}>
-      {props.children ?? ((state: AutocompleteContentState) => <AutocompleteItems items={state.items} />)}
+      {props.children ??
+        ((state: AutocompleteContentState) => (
+          <AutocompleteItems items={state.items} />
+        ))}
     </parts.List>
   )
 }
@@ -230,11 +252,20 @@ const AutocompleteItem = parts.Item
  * The suggestion's text, with the part the field's text matched in `<mark>`. Without string content, it shows the suggestion's label.
  * @stable
  */
-function AutocompleteItemText(props: PartProps<"span", AutocompleteItemTextState>) {
+function AutocompleteItemText(
+  props: PartProps<"span", AutocompleteItemTextState>
+) {
   const item = useAround(autocompletePrimitive, "item")
-  if (!item) throw new Error("<AutocompleteItemText> must be used inside <AutocompleteItem>.")
+  if (!item) {
+    throw new Error(
+      "<AutocompleteItemText> must be used inside <AutocompleteItem>."
+    )
+  }
   const key = () => item().value as string
-  const part = () => ({ id: key(), text: textToMark(props.children, (item().label as string) ?? key()) })
+  const part = () => ({
+    id: key(),
+    text: textToMark(props.children, (item().label as string) ?? key()),
+  })
   const rest = merge(props, {
     get children() {
       const children = props.children

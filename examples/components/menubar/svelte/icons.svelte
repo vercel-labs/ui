@@ -1,6 +1,22 @@
 <script lang="ts">
-  import { CircleHelpIcon, FileIcon, FolderIcon, RedoIcon, SaveIcon, SettingsIcon, TrashIcon, UndoIcon } from "@lucide/svelte"
-  import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/svelte/menu"
+  import {
+    CircleHelpIcon,
+    FileIcon,
+    FolderIcon,
+    RedoIcon,
+    SaveIcon,
+    SettingsIcon,
+    TrashIcon,
+    UndoIcon,
+  } from "@lucide/svelte"
+  import {
+    Menu,
+    MenuContent,
+    MenuItem,
+    MenuItemIcon,
+    MenuSeparator,
+    MenuTrigger,
+  } from "@ui-sdk/svelte/menu"
   import { Menubar } from "@ui-sdk/svelte/menubar"
 </script>
 

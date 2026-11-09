@@ -9,7 +9,10 @@ import { bind } from "../src/foundation/kernel/part"
 afterEach(() => document.body.replaceChildren())
 
 function press(target: Element) {
-  const event = new PointerEvent("pointerdown", { bubbles: true, cancelable: true })
+  const event = new PointerEvent("pointerdown", {
+    bubbles: true,
+    cancelable: true,
+  })
   target.dispatchEvent(event)
   return event
 }
@@ -18,7 +21,9 @@ function list(html: string) {
   const el = document.createElement("div")
   el.innerHTML = html
   document.body.append(el)
-  el.addEventListener("pointerdown", (event) => pressKeepsFocus.pointerdown(event, { el }))
+  el.addEventListener("pointerdown", (event) =>
+    pressKeepsFocus.pointerdown(event, { el })
+  )
   return el
 }
 
@@ -29,7 +34,9 @@ describe("pressKeepsFocus", () => {
   })
 
   test("a press on a field inside the element focuses the field", () => {
-    const el = list('<input aria-label="Search"><div contenteditable="true"><b>Note</b></div>')
+    const el = list(
+      '<input aria-label="Search"><div contenteditable="true"><b>Note</b></div>'
+    )
     expect(press(el.querySelector("input")!).defaultPrevented).toBe(false)
     expect(press(el.querySelector("b")!).defaultPrevented).toBe(false)
   })
@@ -39,7 +46,9 @@ describe("pressKeepsFocus", () => {
     const input = document.createElement("input")
     document.body.append(input)
     // React passes a portal's events to the parts around it in its tree.
-    input.addEventListener("pointerdown", (event) => pressKeepsFocus.pointerdown(event, { el }))
+    input.addEventListener("pointerdown", (event) =>
+      pressKeepsFocus.pointerdown(event, { el })
+    )
     expect(press(input).defaultPrevented).toBe(false)
   })
 
@@ -50,14 +59,17 @@ describe("pressKeepsFocus", () => {
     const el = document.createElement("div")
     el.innerHTML = '<span contenteditable="false"><b>Item</b></span>'
     editor.append(el)
-    el.addEventListener("pointerdown", (event) => pressKeepsFocus.pointerdown(event, { el }))
+    el.addEventListener("pointerdown", (event) =>
+      pressKeepsFocus.pointerdown(event, { el })
+    )
     expect(press(el.querySelector("b")!).defaultPrevented).toBe(true)
   })
 
   test("a press on a token's remove button keeps the caret in the editor around it", () => {
     const editor = document.createElement("div")
     editor.contentEditable = "true"
-    editor.innerHTML = '<span contenteditable="false"><button type="button">Remove</button></span>'
+    editor.innerHTML =
+      '<span contenteditable="false"><button type="button">Remove</button></span>'
     document.body.append(editor)
     const instance = tokenInput({ id: "t" })
     const button = editor.querySelector("button")!

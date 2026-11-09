@@ -1,6 +1,9 @@
 import { isDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
   Named,
@@ -9,14 +12,24 @@ import type {
   SlotFactory,
 } from "../../foundation/kernel/primitive-types"
 import type { RadioGroupOptions } from "../radio/radio"
-import { radioGroupApi, radioGroupState, syncRadioGroup, type RadioGroupStore } from "../radio/radio-api"
-import { bindRadioGroup, radioGroupAttrs, radioSlots } from "../radio/radio-parts"
+import {
+  radioGroupApi,
+  radioGroupState,
+  syncRadioGroup,
+  type RadioGroupStore,
+} from "../radio/radio-api"
+import {
+  bindRadioGroup,
+  radioGroupAttrs,
+  radioSlots,
+} from "../radio/radio-parts"
 
 /**
  * Why a rating's value wants to change.
  * @experimental
  */
-type RatingValueChangeReason = "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
+type RatingValueChangeReason =
+  "item-press" | "list-navigation" | "reset" | "restore" | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -55,7 +68,10 @@ type RatingOptions = {
   /** The score at first, when uncontrolled. A form reset returns to it. */
   defaultValue?: number | null
   /** Runs when a user or a form reset wants to change the score. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: number | null, details: ChangeDetails<RatingValueChangeReason>) => void
+  onValueChange?: (
+    value: number | null,
+    details: ChangeDetails<RatingValueChangeReason>
+  ) => void
   /**
    * How many stars there are.
    * @defaultValue 5
@@ -140,12 +156,14 @@ type RatingItemState = {
 
 const slotNames = { group: "root", item: "radio" }
 
-const defaultLabel = (value: number) => (value === 1 ? "1 star" : `${value} stars`)
+const defaultLabel = (value: number) =>
+  value === 1 ? "1 star" : `${value} stars`
 
 const keyOf = (value: number | null | undefined) =>
   value === undefined ? undefined : value === null ? null : String(value)
 
-const scoreOf = (key: string | null | undefined) => (key == null ? null : Number(key))
+const scoreOf = (key: string | null | undefined) =>
+  key == null ? null : Number(key)
 
 /**
  * The scores of the radios inside star `index`, lowest first: one per star,
@@ -154,7 +172,9 @@ const scoreOf = (key: string | null | undefined) => (key == null ? null : Number
  */
 function ratingItemValues(index: number, step = 1) {
   const parts = partsPerStar(step)
-  return Array.from({ length: parts }, (_, part) => Number((index - 1 + (part + 1) / parts).toFixed(4)))
+  return Array.from({ length: parts }, (_, part) =>
+    Number((index - 1 + (part + 1) / parts).toFixed(4))
+  )
 }
 
 const partsPerStar = (step: number) => Math.max(1, Math.round(1 / step))
@@ -165,7 +185,8 @@ function radioOptions(options: RatingOptions) {
   return {
     value: keyOf(options.value),
     defaultValue: keyOf(options.defaultValue),
-    onValueChange: onValueChange && ((key, details) => onValueChange(scoreOf(key), details)),
+    onValueChange:
+      onValueChange && ((key, details) => onValueChange(scoreOf(key), details)),
     disabled: options.disabled,
     readOnly: options.readOnly,
     required: options.required,
@@ -203,19 +224,26 @@ const labelSettings = (options: RatingOptions) => ({
   getValueLabel: options.getValueLabel,
 })
 
-const labelOf = (state: RatingStore, value: number) => (state.getValueLabel ?? defaultLabel)(value, state.max)
+const labelOf = (state: RatingStore, value: number) =>
+  (state.getValueLabel ?? defaultLabel)(value, state.max)
 
-const interactive = (state: RadioGroupStore) => !isDisabled(state) && !state.readOnly
+const interactive = (state: RadioGroupStore) =>
+  !isDisabled(state) && !state.readOnly
 
-function ratingApi(context: PrimitiveContext<RatingOptions, RatingStore, string>) {
+function ratingApi(
+  context: PrimitiveContext<RatingOptions, RatingStore, string>
+) {
   const { store, options } = context
   const radio = radioGroupApi(
     {
       ...context,
       options: () => radioOptions(options()),
-      onOptions: (listener) => context.onOptions((next, synced) => listener(radioOptions(next), synced)),
+      onOptions: (listener) =>
+        context.onOptions((next, synced) =>
+          listener(radioOptions(next), synced)
+        ),
     },
-    slotNames,
+    slotNames
   )
   return {
     ...radio,
@@ -225,9 +253,14 @@ function ratingApi(context: PrimitiveContext<RatingOptions, RatingStore, string>
     internal: {
       ...radio.internal,
       check: (key: string, details?: RatingChangeOptions) =>
-        radio.setValue(key === store.get().value && options().deselectable ? null : key, details),
+        radio.setValue(
+          key === store.get().value && options().deselectable ? null : key,
+          details
+        ),
       highlight(key: string | null) {
-        if (store.get().highlighted !== key) store.set({ highlighted: key })
+        if (store.get().highlighted !== key) {
+          store.set({ highlighted: key })
+        }
       },
       max: () => options().max ?? 5,
       partsPerStar: () => partsPerStar(options().step ?? 1),
@@ -264,7 +297,10 @@ const ratingPrimitive = /* @__PURE__ */ definePrimitive({
     ...radioGroupState(radioOptions(options), { highlighted: null }),
     ...labelSettings(options),
   }),
-  sync: (options) => ({ ...syncRadioGroup(radioOptions(options)), ...labelSettings(options) }),
+  sync: (options) => ({
+    ...syncRadioGroup(radioOptions(options)),
+    ...labelSettings(options),
+  }),
   api: ratingApi,
   slots: (slot) => {
     const { item, input } = radioSlots(
@@ -281,13 +317,15 @@ const ratingPrimitive = /* @__PURE__ */ definePrimitive({
           // A read-only rating is one image, which names the score itself.
           ...(state.readOnly ? { "aria-hidden": "true", tabindex: "-1" } : {}),
         }
-      },
+      }
     )
     return {
       root: slot<{}, RatingState>({
         role: (state) => (state.readOnly ? "img" : "radiogroup"),
         roles: ["radiogroup", "img"],
-        keys: { none: "Focus stays on a star's radio, whose keydown handles them." },
+        keys: {
+          none: "Focus stays on a star's radio, whose keydown handles them.",
+        },
         state: (state) => ({
           value: scoreOf(state.value),
           highlighted: scoreOf(state.highlighted),
@@ -306,10 +344,16 @@ const ratingPrimitive = /* @__PURE__ */ definePrimitive({
             : radioGroupAttrs(state),
         on: {
           pointermove: (event, { api, store }) => {
-            if (event.pointerType === "touch" || !interactive(store.get())) return
+            if (event.pointerType === "touch" || !interactive(store.get())) {
+              return
+            }
             const radio = (event.target as Element).closest?.('[role="radio"]')
-            const over = api.internal.roving.items().find((entry) => entry.el === radio)
-            if (over && !api.internal.itemProps(over.key).disabled) api.internal.highlight(over.key)
+            const over = api.internal.roving
+              .items()
+              .find((entry) => entry.el === radio)
+            if (over && !api.internal.itemProps(over.key).disabled) {
+              api.internal.highlight(over.key)
+            }
           },
           pointerleave: (_event, { api }) => api.internal.highlight(null),
         },
@@ -319,7 +363,10 @@ const ratingPrimitive = /* @__PURE__ */ definePrimitive({
         props: { index: "number" },
         state: (state, { props }) => itemState(state, props.index),
         attrs: (state, { props }) => {
-          const { fill, checked, highlighted, disabled, readOnly } = itemState(state, props.index)
+          const { fill, checked, highlighted, disabled, readOnly } = itemState(
+            state,
+            props.index
+          )
           return {
             "data-filled": fill === 1 ? "" : undefined,
             "data-partial": fill > 0 && fill < 1 ? "" : undefined,

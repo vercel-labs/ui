@@ -22,7 +22,8 @@ import TriggerMenuFixtureList from "../trigger-menu/TriggerMenuFixtureList.vue"
 
 const Fixture = defineComponent({
   setup() {
-    const { value, pending, fail, form, otherForm, controlled, ...options } = tokenInputOptions()
+    const { value, pending, fail, form, otherForm, controlled, ...options } =
+      tokenInputOptions()
     const action = ref("")
     const submitted = ref("")
     const triggers = tokenTriggers()
@@ -38,7 +39,9 @@ const Fixture = defineComponent({
             "aria-label": f.formLabel,
             onSubmit: (event: SubmitEvent) => {
               event.preventDefault()
-              submitted.value = String(new FormData(event.currentTarget as HTMLFormElement).get(f.name))
+              submitted.value = String(
+                new FormData(event.currentTarget as HTMLFormElement).get(f.name)
+              )
             },
           },
           [
@@ -50,11 +53,16 @@ const Fixture = defineComponent({
                 form: otherForm ? "other" : undefined,
                 defaultValue: controlled ? undefined : initial,
                 value: controlled ? current.value : undefined,
-                onValueChange: (next: TokenInputValue, details: { reason: string }) => {
+                onValueChange: (
+                  next: TokenInputValue,
+                  details: { reason: string }
+                ) => {
                   current.value = next
                   action.value = `${details.reason}:${toText(next)}`
                 },
-                onSubmit: form ? undefined : (next: TokenInputValue) => (submitted.value = toText(next)),
+                onSubmit: form
+                  ? undefined
+                  : (next: TokenInputValue) => (submitted.value = toText(next)),
               },
               {
                 default: () => [
@@ -68,13 +76,20 @@ const Fixture = defineComponent({
                     TriggerMenu,
                     {
                       triggers,
-                      onSelect: (selected: unknown, details: TriggerMenuSelectDetails<unknown>) =>
-                        pending && details.trigger === "@" ? pendingSelect({ fail }) : undefined,
+                      onSelect: (
+                        selected: unknown,
+                        details: TriggerMenuSelectDetails<unknown>
+                      ) =>
+                        pending && details.trigger === "@"
+                          ? pendingSelect({ fail })
+                          : undefined,
                     },
                     () => [
                       h(TriggerMenuHint, { class: "hint" }),
-                      h(TriggerMenuContent, { class: "popup list-popup" }, () => h(TriggerMenuFixtureList)),
-                    ],
+                      h(TriggerMenuContent, { class: "popup list-popup" }, () =>
+                        h(TriggerMenuFixtureList)
+                      ),
+                    ]
                   ),
                 ],
                 token: ({ token }: { token: { label: string } }) =>
@@ -82,10 +97,10 @@ const Fixture = defineComponent({
                     token.label,
                     h(TokenInputTokenRemove, () => " ×"),
                   ]),
-              },
+              }
             ),
             h("button", { type: "submit" }, f.submit),
-          ],
+          ]
         ),
         otherForm &&
           h("form", {
@@ -99,8 +114,16 @@ const Fixture = defineComponent({
           }),
         h("textarea", { "aria-label": f.scratch }),
         h("button", "After"),
-        h("output", { role: "status", "aria-label": "Last action" }, action.value),
-        h("output", { role: "status", "aria-label": "Submitted" }, submitted.value),
+        h(
+          "output",
+          { role: "status", "aria-label": "Last action" },
+          action.value
+        ),
+        h(
+          "output",
+          { role: "status", "aria-label": "Submitted" },
+          submitted.value
+        ),
       ])
   },
 })

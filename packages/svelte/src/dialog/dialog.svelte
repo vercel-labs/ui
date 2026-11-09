@@ -62,7 +62,10 @@ A window over the page that asks for the user's attention. Put its trigger, back
     /** Runs once the dialog has finished opening or closing, after any animation. */
     onOpenChangeComplete?: (open: boolean) => void
     /** Runs when the payload the content shows changes. `details.cancel()` keeps the previous payload. */
-    onPayloadChange?: (payload: unknown, details: ChangeDetails<DialogPayloadChangeReason>) => void
+    onPayloadChange?: (
+      payload: unknown,
+      details: ChangeDetails<DialogPayloadChangeReason>
+    ) => void
     /** Runs when a dismissal was refused, because `dismissible` is false, an outside press doesn't close it, or a Close part's action is running. */
     onDismissAttempt?: (details: DialogDismissAttemptDetails) => void
     children?: Snippet
@@ -86,13 +89,20 @@ A window over the page that asks for the user's attention. Put its trigger, back
     onOpenChange: (next: boolean, details: DialogOpenChangeDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onPayloadChange,
     onDismissAttempt,
   }))
-  const context: DialogContext = { handle, name: "Dialog", sheet: true, container: () => container }
+  const context: DialogContext = {
+    handle,
+    name: "Dialog",
+    sheet: true,
+    container: () => container,
+  }
   useControllerEntry(() => controller, context)
   setContext(DialogKey, context)
 </script>

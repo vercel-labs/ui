@@ -17,7 +17,9 @@ export function Example() {
         <DialogContent>
           <div data-slot="stack">
             <DialogTitle>تعديل الملف الشخصي</DialogTitle>
-            <DialogDescription>أجرِ التغييرات على ملفك الشخصي هنا.</DialogDescription>
+            <DialogDescription>
+              أجرِ التغييرات على ملفك الشخصي هنا.
+            </DialogDescription>
           </div>
           <label data-slot="label">
             الاسم

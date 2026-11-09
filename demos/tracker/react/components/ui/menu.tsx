@@ -24,29 +24,50 @@ const content =
 function MenuContent<Payload = unknown>({
   className,
   ...props
-}: Omit<ComponentProps<typeof MenuContentPrimitive<Payload>>, "className"> & { className?: string }) {
-  return <MenuContentPrimitive<Payload> sideOffset={6} className={cn(content, className)} {...props} />
+}: Omit<ComponentProps<typeof MenuContentPrimitive<Payload>>, "className"> & {
+  className?: string
+}) {
+  return (
+    <MenuContentPrimitive<Payload>
+      sideOffset={6}
+      className={cn(content, className)}
+      {...props}
+    />
+  )
 }
 
 function MenuSubContent({
   className,
   ...props
-}: Omit<ComponentProps<typeof MenuSubContentPrimitive>, "className"> & { className?: string }) {
-  return <MenuSubContentPrimitive className={cn(content, className)} {...props} />
+}: Omit<ComponentProps<typeof MenuSubContentPrimitive>, "className"> & {
+  className?: string
+}) {
+  return (
+    <MenuSubContentPrimitive className={cn(content, className)} {...props} />
+  )
 }
 
 function MenuSubTrigger({
   className,
   children,
   ...props
-}: Omit<ComponentProps<typeof MenuSubTriggerPrimitive>, "className" | "children"> & {
+}: Omit<
+  ComponentProps<typeof MenuSubTriggerPrimitive>,
+  "className" | "children"
+> & {
   className?: string
   children?: ReactNode
 }) {
   return (
-    <MenuSubTriggerPrimitive className={cn(item, "data-open:bg-accent", className)} {...props}>
+    <MenuSubTriggerPrimitive
+      className={cn(item, "data-open:bg-accent", className)}
+      {...props}
+    >
       {children}
-      <ChevronRight aria-hidden="true" className="ms-auto text-muted-foreground rtl:rotate-180" />
+      <ChevronRight
+        aria-hidden="true"
+        className="ms-auto text-muted-foreground rtl:rotate-180"
+      />
     </MenuSubTriggerPrimitive>
   )
 }
@@ -65,7 +86,7 @@ function MenuItem({
         item,
         variant === "destructive" &&
           "text-destructive data-highlighted:bg-destructive/10 data-highlighted:text-destructive",
-        className,
+        className
       )}
       {...props}
     />
@@ -76,7 +97,10 @@ function MenuRadioItem({
   className,
   children,
   ...props
-}: Omit<ComponentProps<typeof MenuRadioItemPrimitive>, "className" | "children"> & {
+}: Omit<
+  ComponentProps<typeof MenuRadioItemPrimitive>,
+  "className" | "children"
+> & {
   className?: string
   children?: ReactNode
 }) {
@@ -93,10 +117,15 @@ function MenuRadioItem({
 function MenuItemIcon({
   className,
   ...props
-}: Omit<ComponentProps<typeof MenuItemIconPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof MenuItemIconPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
     <MenuItemIconPrimitive
-      className={cn("flex text-muted-foreground group-data-highlighted:text-current", className)}
+      className={cn(
+        "flex text-muted-foreground group-data-highlighted:text-current",
+        className
+      )}
       {...props}
     />
   )
@@ -105,10 +134,15 @@ function MenuItemIcon({
 function MenuGroupLabel({
   className,
   ...props
-}: Omit<ComponentProps<typeof MenuGroupLabelPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof MenuGroupLabelPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
     <MenuGroupLabelPrimitive
-      className={cn("px-2 py-1.5 text-xs font-medium text-muted-foreground", className)}
+      className={cn(
+        "px-2 py-1.5 text-xs font-medium text-muted-foreground",
+        className
+      )}
       {...props}
     />
   )
@@ -117,8 +151,15 @@ function MenuGroupLabel({
 function MenuSeparator({
   className,
   ...props
-}: Omit<ComponentProps<typeof MenuSeparatorPrimitive>, "className"> & { className?: string }) {
-  return <MenuSeparatorPrimitive className={cn("-mx-1 my-1 h-px bg-border/50", className)} {...props} />
+}: Omit<ComponentProps<typeof MenuSeparatorPrimitive>, "className"> & {
+  className?: string
+}) {
+  return (
+    <MenuSeparatorPrimitive
+      className={cn("-mx-1 my-1 h-px bg-border/50", className)}
+      {...props}
+    />
+  )
 }
 
 export {

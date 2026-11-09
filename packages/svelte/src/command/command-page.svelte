@@ -4,7 +4,10 @@ Commands shown while this page is on top. Without `value`, it's the first page. 
 @stable
 -->
 <script lang="ts">
-  import { command as commandPrimitive, type CommandPageProps } from "@ui-sdk/core/command"
+  import {
+    command as commandPrimitive,
+    type CommandPageProps,
+  } from "@ui-sdk/core/command"
   import { setContext, type Snippet } from "svelte"
   import { useHandle } from "../instance"
   import { useHandlePart } from "../use-primitive.svelte"

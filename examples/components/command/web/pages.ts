@@ -37,18 +37,26 @@ function mount(root: HTMLElement) {
         </ui-command-page>
         <ui-command-page value="theme">
           ${themes
-            .map((theme) => `<ui-command-item value="${theme.value}">${theme.label}</ui-command-item>`)
+            .map(
+              (theme) =>
+                `<ui-command-item value="${theme.value}">${theme.label}</ui-command-item>`
+            )
             .join("")}
         </ui-command-page>
         <ui-command-page value="teams">
           ${teams
-            .map((team) => `<ui-command-item value="${team.value}">${team.label}</ui-command-item>`)
+            .map(
+              (team) =>
+                `<ui-command-item value="${team.value}">${team.label}</ui-command-item>`
+            )
             .join("")}
         </ui-command-page>
       </ui-command-list>
     </ui-command>
   `
-  const command = root.querySelector("ui-command") as HTMLElement & { api: { pop: () => void } }
+  const command = root.querySelector("ui-command") as HTMLElement & {
+    api: { pop: () => void }
+  }
   const breadcrumb = command.querySelector("div")!
   const input = command.querySelector("input")!
   const list = command.querySelector("ui-command-list")!
@@ -56,14 +64,23 @@ function mount(root: HTMLElement) {
   back.setAttribute("value", "back")
   back.innerHTML = `<ui-command-item-icon mirror>${createElement(ArrowLeft, { "aria-hidden": "true" }).outerHTML}</ui-command-item-icon>Go back`
   command.addEventListener("action", (event) => {
-    if ((event as CustomEvent<{ value: string }>).detail.value === "back") command.api.pop()
+    if ((event as CustomEvent<{ value: string }>).detail.value === "back") {
+      command.api.pop()
+    }
   })
   command.addEventListener("pageschange", (event) => {
     const pages = (event as CustomEvent<{ value: string[] }>).detail.value
-    breadcrumb.innerHTML = pages.map((page) => `<span data-slot="badge">${page}</span>`).join("")
-    input.placeholder = pages.length ? "Search… (Backspace to go back)" : "What do you need?"
-    if (!pages.length) back.remove()
-    else if (!back.isConnected) list.append(back)
+    breadcrumb.innerHTML = pages
+      .map((page) => `<span data-slot="badge">${page}</span>`)
+      .join("")
+    input.placeholder = pages.length
+      ? "Search… (Backspace to go back)"
+      : "What do you need?"
+    if (!pages.length) {
+      back.remove()
+    } else if (!back.isConnected) {
+      list.append(back)
+    }
   })
 }
 

@@ -1,5 +1,9 @@
 import type { ConfirmEntry, ConfirmOptions } from "@ui-sdk/core/dialog"
-import { overlays as sharedOverlays, type OverlayEntry, type Overlays } from "@ui-sdk/core/overlays"
+import {
+  overlays as sharedOverlays,
+  type OverlayEntry,
+  type Overlays,
+} from "@ui-sdk/core/overlays"
 import { toasterInternals, type Toaster } from "@ui-sdk/core/renderer"
 import { createEffect, createSignal, For, Show, untrack } from "solid-js"
 import {
@@ -37,7 +41,9 @@ function OverlayHost(props: OverlayHostProps) {
   // hydrates against the server's and the host counts itself only on the client.
   // Set from the registry's listeners, which fire from core's lifecycle,
   // cleanups and disposals included.
-  const [entries, setEntries] = createSignal<readonly OverlayEntry[]>([], { ownedWrite: true })
+  const [entries, setEntries] = createSignal<readonly OverlayEntry[]>([], {
+    ownedWrite: true,
+  })
   createEffect(registry, (current) => {
     const update = () => setEntries(current.entries())
     update()
@@ -52,7 +58,10 @@ function OverlayHost(props: OverlayHostProps) {
     <For each={entries()}>
       {(entry) =>
         entry.type === "toaster" ? (
-          <HostedToaster toaster={(entry.data as { toaster: Toaster }).toaster} region={props.toast} />
+          <HostedToaster
+            toaster={(entry.data as { toaster: Toaster }).toaster}
+            region={props.toast}
+          />
         ) : entry.type === "confirm" ? (
           <HostedConfirm entry={entry.data as ConfirmEntry} />
         ) : null
@@ -62,21 +71,25 @@ function OverlayHost(props: OverlayHostProps) {
 }
 
 // A toaster's region, unless the app placed one of its own.
-function HostedToaster(props: { toaster: Toaster; region?: Omit<ToastRegionProps, "toaster"> }) {
+function HostedToaster(props: {
+  toaster: Toaster
+  region?: Omit<ToastRegionProps, "toaster">
+}) {
   // Set from the toaster's listeners, like a placed region unbinding during a disposal.
   const [placed, setPlaced] = createSignal(
     untrack(() => toasterInternals(props.toaster).hasPlacedRegion()),
     {
       ownedWrite: true,
-    },
+    }
   )
   createEffect(
     () => props.toaster,
     (toaster) => {
-      const update = () => setPlaced(toasterInternals(toaster).hasPlacedRegion())
+      const update = () =>
+        setPlaced(toasterInternals(toaster).hasPlacedRegion())
       update()
       return toaster.subscribe(update)
-    },
+    }
   )
   return (
     <Show when={!placed()}>
@@ -93,16 +106,20 @@ function HostedConfirm(props: { entry: ConfirmEntry }) {
     (entry) => {
       let opening = true
       queueMicrotask(() => {
-        if (!opening) return
+        if (!opening) {
+          return
+        }
         opening = false
         entry.open()
       })
       return () => {
-        if (!opening) return
+        if (!opening) {
+          return
+        }
         opening = false
         entry.done()
       }
-    },
+    }
   )
   const question = () => (props.entry.payload ?? {}) as Partial<ConfirmOptions>
   return (
@@ -113,11 +130,17 @@ function HostedConfirm(props: { entry: ConfirmEntry }) {
       <AlertDialogContent>
         <AlertDialogTitle>{question().title}</AlertDialogTitle>
         <Show when={question().description}>
-          <AlertDialogDescription>{question().description}</AlertDialogDescription>
+          <AlertDialogDescription>
+            {question().description}
+          </AlertDialogDescription>
         </Show>
         <div>
-          <AlertDialogClose>{question().cancelLabel ?? "Cancel"}</AlertDialogClose>
-          <AlertDialogClose value="confirm">{question().confirmLabel ?? "Continue"}</AlertDialogClose>
+          <AlertDialogClose>
+            {question().cancelLabel ?? "Cancel"}
+          </AlertDialogClose>
+          <AlertDialogClose value="confirm">
+            {question().confirmLabel ?? "Continue"}
+          </AlertDialogClose>
         </div>
       </AlertDialogContent>
     </AlertDialog>

@@ -32,18 +32,25 @@
   let changed = false
   function onChange(kind: string) {
     return (value: File[], details: FileInputValueChangeDetails) => {
-      if (options.cancel) details.cancel()
+      if (options.cancel) {
+        details.cancel()
+      }
       changed = true
       queueMicrotask(() => (changed = false))
       action = describeChange(kind, details)
       count++
-      const ignored = options.ignoreRemovals && details.reason === "remove-press"
-      if (kind === "attachments" && !details.canceled && !ignored) attachments = value
+      const ignored =
+        options.ignoreRemovals && details.reason === "remove-press"
+      if (kind === "attachments" && !details.canceled && !ignored) {
+        attachments = value
+      }
     }
   }
   function onReject(kind: string) {
     return (rejected: FileRejection[], details: { reason: string }) => {
-      if (!changed) action = describeChange(kind, { ...details, rejected })
+      if (!changed) {
+        action = describeChange(kind, { ...details, rejected })
+      }
     }
   }
 
@@ -72,11 +79,18 @@
         minSize={f.attachments.minSize}
         required={options.required}
         disabled={options.disabled}
-        bind:value={() => (options.controlled ? attachments : undefined), ignore}
+        bind:value={
+          () => (options.controlled ? attachments : undefined), ignore
+        }
         onValueChange={onChange("attachments")}
         onReject={onReject("attachments")}
       >
-        <FileInputDropzone class="zone" role="group" aria-label={f.zone.label} pasteTarget={() => note}>
+        <FileInputDropzone
+          class="zone"
+          role="group"
+          aria-label={f.zone.label}
+          pasteTarget={() => note}
+        >
           {#snippet children(state)}
             <p>{state.dragging ? f.zone.dragging : f.zone.text}</p>
             <FileInputTrigger>{f.trigger.label}</FileInputTrigger>
@@ -92,7 +106,9 @@
         </FileInputList>
       </FileInput>
       <FieldDescription>{f.field.description}</FieldDescription>
-      <FieldError class="field-error" match="valueMissing">{f.field.error}</FieldError>
+      <FieldError class="field-error" match="valueMissing"
+        >{f.field.error}</FieldError
+      >
     </Field>
     <label>
       {f.note.label}
@@ -111,12 +127,25 @@
   >
     <FileInputTrigger>{f.avatar.label}</FileInputTrigger>
   </FileInput>
-  <FileInput directory onValueChange={onChange("folder")} onReject={onReject("folder")}>
+  <FileInput
+    directory
+    onValueChange={onChange("folder")}
+    onReject={onReject("folder")}
+  >
     <FileInputTrigger>{f.folder.label}</FileInputTrigger>
   </FileInput>
   {#if options.page}
-    <FileInput multiple onValueChange={onChange("page")} onReject={onReject("page")}>
-      <FileInputDropzone class="page-zone" role="group" aria-label={f.page.label} target="document">
+    <FileInput
+      multiple
+      onValueChange={onChange("page")}
+      onReject={onReject("page")}
+    >
+      <FileInputDropzone
+        class="page-zone"
+        role="group"
+        aria-label={f.page.label}
+        target="document"
+      >
         {f.page.text}
       </FileInputDropzone>
     </FileInput>

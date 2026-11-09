@@ -35,7 +35,7 @@ function mount(root: HTMLElement) {
                   ${person.label}
                   <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                 </ui-select-item>
-              `,
+              `
             )
             .join("")}
         </ui-select-content>
@@ -43,7 +43,10 @@ function mount(root: HTMLElement) {
     </ui-field>
   `
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
-    log(root, `value: ${JSON.stringify(event.detail.value)} (${event.detail.reason})`)
+    log(
+      root,
+      `value: ${JSON.stringify(event.detail.value)} (${event.detail.reason})`
+    )
   })
 }
 

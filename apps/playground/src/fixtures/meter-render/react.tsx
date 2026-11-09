@@ -1,4 +1,9 @@
-import { Meter, MeterIndicator, MeterTrack, MeterValue } from "@ui-sdk/react/meter"
+import {
+  Meter,
+  MeterIndicator,
+  MeterTrack,
+  MeterValue,
+} from "@ui-sdk/react/meter"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 
@@ -12,7 +17,9 @@ function Fixture() {
         value={value}
         aria-label="Memory"
         render={<section />}
-        className={(state) => `gauge ${state.percent >= 80 ? "is-high" : "is-ok"}`}
+        className={(state) =>
+          `gauge ${state.percent >= 80 ? "is-high" : "is-ok"}`
+        }
       >
         <MeterValue>{(state) => `${state.text} used`}</MeterValue>
         <MeterTrack className="gauge-track">
@@ -30,7 +37,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

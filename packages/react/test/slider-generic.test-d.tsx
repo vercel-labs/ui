@@ -27,6 +27,8 @@ declare const volume: number
   }}
 />
 // Without a value, it's either.
-;<Slider onValueChange={(value) => (typeof value === "number" ? value : value[0])} />
+;<Slider
+  onValueChange={(value) => (typeof value === "number" ? value : value[0])}
+/>
 // @ts-expect-error Values are numbers.
 ;<Slider value="50" />

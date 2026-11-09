@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ChevronDownIcon } from "@lucide/vue"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/vue/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/vue/collapsible"
 import { useLog } from "../../../shared/vue/log"
 
 const notes = [
@@ -15,7 +19,9 @@ const log = useLog()
 <template>
   <Collapsible
     data-variant="card"
-    @open-change-complete="(open: boolean) => log(open ? 'Finished opening' : 'Finished closing')"
+    @open-change-complete="
+      (open: boolean) => log(open ? 'Finished opening' : 'Finished closing')
+    "
   >
     <CollapsibleTrigger>
       <span data-slot="stack">

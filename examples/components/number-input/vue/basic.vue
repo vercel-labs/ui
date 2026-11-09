@@ -17,7 +17,11 @@ const log = useLog()
 
 <template>
   <Field>
-    <NumberInput :default-value="1" :min="1" @value-commit="(value) => log(`Quantity ${value ?? 'empty'}`)">
+    <NumberInput
+      :default-value="1"
+      :min="1"
+      @value-commit="(value) => log(`Quantity ${value ?? 'empty'}`)"
+    >
       <NumberInputScrubArea :pixels-per-step="4">
         <FieldLabel>Quantity</FieldLabel>
         <NumberInputScrubAreaCursor>

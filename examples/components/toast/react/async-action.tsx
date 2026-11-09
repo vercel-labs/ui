@@ -20,7 +20,7 @@ function Example() {
     () => () => {
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   return (
@@ -49,7 +49,9 @@ function Example() {
               <ToastDescription />
             </div>
             <ToastAction data-variant="solid">
-              {(state) => (state.pending ? "Restoring…" : state.error ? "Retry" : "Undo")}
+              {(state) =>
+                state.pending ? "Restoring…" : state.error ? "Retry" : "Undo"
+              }
             </ToastAction>
           </Toast>
         )}

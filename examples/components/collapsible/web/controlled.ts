@@ -30,8 +30,12 @@ function mount(root: HTMLElement) {
     </div>
   `
   const collapsible = root.querySelector("ui-collapsible")!
-  root.querySelector("[data-slot=controls] button")!.addEventListener("click", () => collapsible.api.toggle())
-  root.querySelector("ui-collapsible-panel button")!.addEventListener("click", () => collapsible.api.close())
+  root
+    .querySelector("[data-slot=controls] button")!
+    .addEventListener("click", () => collapsible.api.toggle())
+  root
+    .querySelector("ui-collapsible-panel button")!
+    .addEventListener("click", () => collapsible.api.close())
   collapsible.addEventListener("openchange", (event) => {
     const { value, reason } = event.detail
     log(root, `${value ? "Opened" : "Closed"} (${reason})`)

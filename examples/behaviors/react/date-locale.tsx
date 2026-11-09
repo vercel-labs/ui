@@ -26,7 +26,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <select aria-label="Locale" value={locale} onChange={(event) => setLocale(event.target.value)}>
+        <select
+          aria-label="Locale"
+          value={locale}
+          onChange={(event) => setLocale(event.target.value)}
+        >
           {locales.map(([value, text]) => (
             <option key={value} value={value}>
               {text}
@@ -35,11 +39,13 @@ function Example() {
         </select>
       </div>
       <p data-label data-slot="date-label">
-        {formatDateToParts(date, locale, { month: "long", day: "numeric" }).map((part, index) => (
-          <span key={index} data-type={part.type}>
-            {part.value}
-          </span>
-        ))}
+        {formatDateToParts(date, locale, { month: "long", day: "numeric" }).map(
+          (part, index) => (
+            <span key={index} data-type={part.type}>
+              {part.value}
+            </span>
+          )
+        )}
       </p>
       <dl>
         <dt>Long</dt>
@@ -49,9 +55,13 @@ function Example() {
         <dt>Week</dt>
         <dd data-weekdays>{weekdayNames(locale, "short", first).join(" ")}</dd>
         <dt>Months</dt>
-        <dd data-months>{monthNames(locale, "short").slice(0, 4).join(", ")}, …</dd>
+        <dd data-months>
+          {monthNames(locale, "short").slice(0, 4).join(", ")}, …
+        </dd>
         <dt>Calendar</dt>
-        <dd data-calendar>{dateFormatter(locale, { month: "long" }).resolvedOptions().calendar}</dd>
+        <dd data-calendar>
+          {dateFormatter(locale, { month: "long" }).resolvedOptions().calendar}
+        </dd>
       </dl>
     </div>
   )

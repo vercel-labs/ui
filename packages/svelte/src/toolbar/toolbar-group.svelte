@@ -4,14 +4,20 @@ A group of related items in the toolbar. `disabled` disables every item in it.
 @stable
 -->
 <script lang="ts">
-  import type { ToolbarGroupProps, ToolbarGroupState } from "@ui-sdk/core/toolbar"
+  import type {
+    ToolbarGroupProps,
+    ToolbarGroupState,
+  } from "@ui-sdk/core/toolbar"
   import { setContext } from "svelte"
   import Part from "../part.svelte"
   import { ToolbarGroupKey } from "../toolbar-context"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { useToolbar } from "./context"
 
-  let { disabled, ...rest }: PartProps<"div", ToolbarGroupState> & ToolbarGroupProps = $props()
+  let {
+    disabled,
+    ...rest
+  }: PartProps<"div", ToolbarGroupState> & ToolbarGroupProps = $props()
 
   const id = $props.id()
   const group = useHandlePart(useToolbar(), "group", () => ({ id, disabled }))

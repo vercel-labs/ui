@@ -9,11 +9,16 @@
     class: className,
     children,
     ...rest
-  }: ComponentProps<typeof MenuSubTrigger> & { class?: string; children?: Snippet } =
-    $props()
+  }: ComponentProps<typeof MenuSubTrigger> & {
+    class?: string
+    children?: Snippet
+  } = $props()
 </script>
 
 <MenuSubTrigger class={cn(item, "data-open:bg-accent", className)} {...rest}>
   {@render children?.()}
-  <ChevronRight aria-hidden="true" class="ms-auto text-muted-foreground rtl:rotate-180" />
+  <ChevronRight
+    aria-hidden="true"
+    class="ms-auto text-muted-foreground rtl:rotate-180"
+  />
 </MenuSubTrigger>

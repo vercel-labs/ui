@@ -13,7 +13,11 @@ A panel of content that a button shows and hides. Put its trigger and panel insi
   } from "@ui-sdk/core/collapsible"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   type Details = ChangeDetails<CollapsibleOpenChangeReason>
 
@@ -56,7 +60,9 @@ A panel of content that a button shows and hides. Put its trigger and panel insi
     onOpenChange: (next: boolean, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
   }))

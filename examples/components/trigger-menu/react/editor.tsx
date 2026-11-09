@@ -30,7 +30,9 @@ function Example() {
           render={
             <textarea
               ref={(field) => {
-                if (field && editor?.element !== field) setEditor(textFieldAdapter(field))
+                if (field && editor?.element !== field) {
+                  setEditor(textFieldAdapter(field))
+                }
               }}
               placeholder="Type @ to mention someone…"
             />
@@ -41,7 +43,11 @@ function Example() {
         <TriggerMenuList>
           {(state) =>
             (state.items as TriggerMenuDataItem[]).map((item) => (
-              <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+              <TriggerMenuItem
+                key={item.value}
+                value={item.value}
+                label={item.label}
+              >
                 {item.label}
               </TriggerMenuItem>
             ))

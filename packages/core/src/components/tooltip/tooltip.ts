@@ -1,17 +1,38 @@
 import { dev, warn } from "#dev"
 import { nameFrom } from "#name-check"
 import { announce } from "../../foundation/platform/announce"
-import { ariaKeyshortcuts, initialApple } from "../../foundation/platform/platform"
+import {
+  ariaKeyshortcuts,
+  initialApple,
+} from "../../foundation/platform/platform"
 import { createPopupController, openerOf } from "../../foundation/popups/popup"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
 import { textOf } from "../../foundation/text/typeahead"
-import { createPopup, popupState, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  createPopup,
+  popupState,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { tooltipPreset } from "../../foundation/popups/popup-hover-presets"
-import { popupArrow, popupContent, popupTrigger } from "../../foundation/popups/popup-slots"
+import {
+  popupArrow,
+  popupContent,
+  popupTrigger,
+} from "../../foundation/popups/popup-slots"
 import type { ChangeDetails } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
-import { adoptPlatform, shortcutSlot } from "../../foundation/shortcuts/shortcut-slot"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
+import {
+  adoptPlatform,
+  shortcutSlot,
+} from "../../foundation/shortcuts/shortcut-slot"
 
 /**
  * Why a tooltip opened or closed.
@@ -33,7 +54,8 @@ type TooltipOpenChangeReason =
  * Why the tooltip's payload changed: a trigger opened it, another trigger took it over while open, or a controller opened it or gave the open one another payload.
  * @stable
  */
-type TooltipPayloadChangeReason = "trigger-hover" | "trigger-focus" | "trigger-press" | "imperative"
+type TooltipPayloadChangeReason =
+  "trigger-hover" | "trigger-focus" | "trigger-press" | "imperative"
 
 /**
  * Opens, closes and inspects a tooltip from outside it, and connects triggers
@@ -43,7 +65,13 @@ type TooltipPayloadChangeReason = "trigger-hover" | "trigger-focus" | "trigger-p
  * @stable
  */
 function createTooltipController<Payload = unknown>() {
-  return createPopupController<Payload, TooltipOpenChangeReason, {}, string, TooltipPayloadChangeReason>()
+  return createPopupController<
+    Payload,
+    TooltipOpenChangeReason,
+    {},
+    string,
+    TooltipPayloadChangeReason
+  >()
 }
 
 /**
@@ -51,7 +79,9 @@ function createTooltipController<Payload = unknown>() {
  * option.
  * @stable
  */
-type TooltipController<Payload = unknown> = ReturnType<typeof createTooltipController<Payload>>
+type TooltipController<Payload = unknown> = ReturnType<
+  typeof createTooltipController<Payload>
+>
 
 /**
  * The options `tooltip` takes. A component takes them as props on its root.
@@ -66,7 +96,10 @@ type TooltipOptions = PortalProps & {
    */
   defaultOpen?: boolean
   /** Runs when the tooltip wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<TooltipOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<TooltipOpenChangeReason>
+  ) => void
   /** Runs once the tooltip has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /**
@@ -74,7 +107,10 @@ type TooltipOptions = PortalProps & {
    * tooltip, or takes the open tooltip over, which fires no `onOpenChange`, and so does a
    * controller's `open({ payload })` on the open tooltip. `details.cancel()` keeps the previous payload.
    */
-  onPayloadChange?: (payload: unknown, details: ChangeDetails<TooltipPayloadChangeReason>) => void
+  onPayloadChange?: (
+    payload: unknown,
+    details: ChangeDetails<TooltipPayloadChangeReason>
+  ) => void
   /**
    * Milliseconds the pointer rests on the trigger before the tooltip opens. While another tooltip
    * is open, or was a moment ago, the next one opens at once, without a provider.
@@ -229,7 +265,8 @@ type TooltipState = PopupState & {
 }
 
 // Whether the tooltip names its trigger rather than describes it.
-const labels = (state: TooltipState) => (state.type ?? (state.unnamed ? "label" : "description")) === "label"
+const labels = (state: TooltipState) =>
+  (state.type ?? (state.unnamed ? "label" : "description")) === "label"
 
 // Whether a trigger has a name without the tooltip: text, a label, or a title.
 function hasOwnName(el: HTMLElement, contentId: string) {
@@ -246,7 +283,8 @@ function hasOwnName(el: HTMLElement, contentId: string) {
 // The content's text as a screen reader hears it open: without the parts
 // hidden from it, like a shortcut's keys, even while the content is hidden.
 // `textOf` reads past the content's own `hidden`, and skips hidden parts inside it.
-const spokenText = (content: HTMLElement) => textOf(content).replace(/\s+/g, " ").trim()
+const spokenText = (content: HTMLElement) =>
+  textOf(content).replace(/\s+/g, " ").trim()
 
 // A closed tooltip's content is hidden, and hidden content names or describes
 // its trigger in full, so an icon button whose tooltip shows "Save ⌘S" was
@@ -257,13 +295,23 @@ function labelContent(el: HTMLElement) {
   let written: string | null = null
   const write = () => {
     const current = el.getAttribute("aria-label")
-    if (current !== null && current !== written) return
+    if (current !== null && current !== written) {
+      return
+    }
     const spoken = spokenText(el)
-    const label = spoken === (el.textContent ?? "").replace(/\s+/g, " ").trim() ? null : spoken
-    if (label === written) return
+    const label =
+      spoken === (el.textContent ?? "").replace(/\s+/g, " ").trim()
+        ? null
+        : spoken
+    if (label === written) {
+      return
+    }
     written = label
-    if (label === null) el.removeAttribute("aria-label")
-    else el.setAttribute("aria-label", label)
+    if (label === null) {
+      el.removeAttribute("aria-label")
+    } else {
+      el.setAttribute("aria-label", label)
+    }
   }
   write()
   // Content changes with a payload, and a shortcut part writes its keys once it binds.
@@ -276,7 +324,9 @@ function labelContent(el: HTMLElement) {
   })
   return () => {
     observer.disconnect()
-    if (written !== null && el.getAttribute("aria-label") === written) el.removeAttribute("aria-label")
+    if (written !== null && el.getAttribute("aria-label") === written) {
+      el.removeAttribute("aria-label")
+    }
   }
 }
 
@@ -290,7 +340,9 @@ type TooltipApi = ReturnType<typeof tooltipApi>
 // A tooltip is `createPopup` with `tooltipPreset`, which brings the warm
 // group. What's its own: naming or describing its trigger, a press that
 // closes it or, when toggleable, opens it and announces its text.
-function tooltipApi(context: PrimitiveContext<TooltipOptions, TooltipState, string>) {
+function tooltipApi(
+  context: PrimitiveContext<TooltipOptions, TooltipState, string>
+) {
   const { store, options } = context
   const popup = createPopup(context, { preset: tooltipPreset })
   const { control, hover, group } = popup.internal
@@ -303,14 +355,21 @@ function tooltipApi(context: PrimitiveContext<TooltipOptions, TooltipState, stri
   let wasOpen = store.get().open
   store.subscribe(() => {
     const { open } = store.get()
-    if (open === wasOpen) return
+    if (open === wasOpen) {
+      return
+    }
     wasOpen = open
-    if (open) store.set({ instant: !!group?.instant() })
-    if (open && announcing)
+    if (open) {
+      store.set({ instant: !!group?.instant() })
+    }
+    if (open && announcing) {
       queueMicrotask(() => {
         const content = popup.internal.popup.element()
-        if (content) announce(textOf(content).trim(), { doc: content.ownerDocument })
+        if (content) {
+          announce(textOf(content).trim(), { doc: content.ownerDocument })
+        }
       })
+    }
     announcing = false
   })
 
@@ -319,14 +378,25 @@ function tooltipApi(context: PrimitiveContext<TooltipOptions, TooltipState, stri
   function press(key: string, payload: unknown, event?: Event) {
     const by = openerOf(event)
     if (options().toggleable) {
-      if (store.get().open && popup.internal.popup.opener() !== "hover")
+      if (store.get().open && popup.internal.popup.opener() !== "hover") {
         return control.hide({ reason: "trigger-press", event })
-      if (options().disabled) return
+      }
+      if (options().disabled) {
+        return
+      }
       announcing = !store.get().open
-      control.show({ event, by, reason: "trigger-press", trigger: key, payload })
+      control.show({
+        event,
+        by,
+        reason: "trigger-press",
+        trigger: key,
+        payload,
+      })
       return
     }
-    if (options().closeOnPress === false) return
+    if (options().closeOnPress === false) {
+      return
+    }
     hover?.clear()
     pressed = !!event && by !== "keyboard"
     control.hide({ reason: "trigger-press", event })
@@ -337,7 +407,9 @@ function tooltipApi(context: PrimitiveContext<TooltipOptions, TooltipState, stri
     internal: Object.assign(popup.internal, {
       tooltipPress: press,
       enter(event: PointerEvent, key: string, payload: unknown) {
-        if (!pressed) hover?.enter(event, key, payload)
+        if (!pressed) {
+          hover?.enter(event, key, payload)
+        }
       },
       leave(event: PointerEvent) {
         pressed = false
@@ -399,33 +471,42 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
             type: "button",
             "aria-labelledby": label ? `${id}-content` : undefined,
             "aria-describedby": !label && active ? `${id}-content` : undefined,
-            "aria-keyshortcuts": state.shortcut ? ariaKeyshortcuts(state.shortcut, state.apple) : undefined,
+            "aria-keyshortcuts": state.shortcut
+              ? ariaKeyshortcuts(state.shortcut, state.apple)
+              : undefined,
           }
         },
         on: {
           ...trigger.on,
-          pointerenter: (event, { api, key, props }) => api.internal.enter(event, key, props.payload),
+          pointerenter: (event, { api, key, props }) =>
+            api.internal.enter(event, key, props.payload),
           pointerleave: (event, { api }) => api.internal.leave(event),
         },
-        press: ({ api, key, props }, event) => api.internal.tooltipPress(key, props.payload, event),
+        press: ({ api, key, props }, event) =>
+          api.internal.tooltipPress(key, props.payload, event),
         bind(el, part) {
           const { key, store, id } = part
           const unbind = trigger.bind!(el, part)
           adoptPlatform(store)
           // The client knows the trigger's name now. A microtask lets hydration finish first.
           queueMicrotask(() => {
-            if (store.get().trigger === key) store.set({ unnamed: !hasOwnName(el, `${id}-content`) })
+            if (store.get().trigger === key) {
+              store.set({ unnamed: !hasOwnName(el, `${id}-content`) })
+            }
           })
           // A popover or menu trigger on the same element checks for a name a task later. This
           // tells it the tooltip names the element, before the label renders.
-          const unname = dev ? nameFrom(el, () => labels(store.get())) : undefined
+          const unname = dev
+            ? nameFrom(el, () => labels(store.get()))
+            : undefined
           // A disabled button gets no pointer events in some browsers and no
           // focus in any, so its tooltip never shows.
-          if (el.matches(":disabled"))
+          if (el.matches(":disabled")) {
             warn(
               "The trigger is a disabled button, which keyboard users can't reach, so they never see its tooltip. Use aria-disabled and ignore its presses instead, as the Tooltip docs show under Disabled buttons.",
-              { component: "tooltip", id },
+              { component: "tooltip", id }
             )
+          }
           return () => {
             unname?.()
             unbind?.()
@@ -447,7 +528,11 @@ const tooltipPrimitive = /* @__PURE__ */ definePrimitive({
           arrowPadding: "number",
           anchor: "string",
         },
-        state: (state) => ({ open: state.open, instant: state.instant, payload: state.payload }),
+        state: (state) => ({
+          open: state.open,
+          instant: state.instant,
+          payload: state.payload,
+        }),
         attrs: (state, part) => ({
           ...content.attrs!(state, part),
           "data-instant": state.instant ? "" : undefined,

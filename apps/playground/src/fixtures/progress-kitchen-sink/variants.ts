@@ -42,7 +42,10 @@ const formats = {
 const valueLabels = {
   files: (value: number | null, details: GaugeLabelDetails) =>
     value === null ? "Waiting for files" : `${value} of ${details.max} files`,
-} satisfies Record<string, (value: number | null, details: GaugeLabelDetails) => string>
+} satisfies Record<
+  string,
+  (value: number | null, details: GaugeLabelDetails) => string
+>
 
 // What the step buttons set the value to, from the current one.
 const progressSteps: [string, (value: number | null) => number | null][] = [

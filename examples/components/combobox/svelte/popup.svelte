@@ -32,7 +32,8 @@
     { value: "ch", label: "Switzerland" },
   ]
 
-  const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+  const countryLabel = (value: string) =>
+    countries.find((country) => country.value === value)?.label ?? value
 
   let button: HTMLButtonElement | undefined = $state()
   let query = $state("")
@@ -62,7 +63,11 @@
   <ComboboxContent anchor={button}>
     <div data-slot="row">
       <SearchIcon aria-hidden="true" />
-      <ComboboxInput autofocus aria-label="Search countries" placeholder="Search…" />
+      <ComboboxInput
+        autofocus
+        aria-label="Search countries"
+        placeholder="Search…"
+      />
     </div>
     <ComboboxEmpty>No countries found.</ComboboxEmpty>
     <ComboboxList>

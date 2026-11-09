@@ -3,14 +3,47 @@
 import { render } from "@solidjs/web"
 import { createSignal, flush, For, type Component } from "solid-js"
 import { afterEach, describe, expect, test, vi } from "vitest"
-import { createDialogController, Dialog, DialogContent, DialogTrigger } from "../src/dialog"
+import {
+  createDialogController,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "../src/dialog"
 import { createDrawerController, Drawer, DrawerTrigger } from "../src/drawer"
-import { createFileInputController, FileInput, FileInputTrigger } from "../src/file-input"
-import { createHoverCardController, HoverCard, HoverCardTrigger } from "../src/hover-card"
-import { createMenuController, Menu, MenuContextTrigger, MenuTrigger } from "../src/menu"
-import { createPopoverController, Popover, PopoverContent, PopoverTrigger } from "../src/popover"
-import { createSelectController, Select, SelectTrigger, SelectValue } from "../src/select"
-import { createTooltipController, Tooltip, TooltipContent, TooltipTrigger } from "../src/tooltip"
+import {
+  createFileInputController,
+  FileInput,
+  FileInputTrigger,
+} from "../src/file-input"
+import {
+  createHoverCardController,
+  HoverCard,
+  HoverCardTrigger,
+} from "../src/hover-card"
+import {
+  createMenuController,
+  Menu,
+  MenuContextTrigger,
+  MenuTrigger,
+} from "../src/menu"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "../src/popover"
+import {
+  createSelectController,
+  Select,
+  SelectTrigger,
+  SelectValue,
+} from "../src/select"
+import {
+  createTooltipController,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../src/tooltip"
 
 HTMLElement.prototype.showPopover ??= function () {}
 HTMLElement.prototype.hidePopover ??= function () {}
@@ -47,11 +80,36 @@ type Case = {
 }
 
 const cases: Case[] = [
-  { name: "dialog", root: Dialog, trigger: DialogTrigger, controller: createDialogController },
-  { name: "drawer", root: Drawer, trigger: DrawerTrigger, controller: createDrawerController },
-  { name: "popover", root: Popover, trigger: PopoverTrigger, controller: createPopoverController },
-  { name: "menu", root: Menu, trigger: MenuTrigger, controller: createMenuController },
-  { name: "context menu", root: Menu, trigger: MenuContextTrigger, controller: createMenuController },
+  {
+    name: "dialog",
+    root: Dialog,
+    trigger: DialogTrigger,
+    controller: createDialogController,
+  },
+  {
+    name: "drawer",
+    root: Drawer,
+    trigger: DrawerTrigger,
+    controller: createDrawerController,
+  },
+  {
+    name: "popover",
+    root: Popover,
+    trigger: PopoverTrigger,
+    controller: createPopoverController,
+  },
+  {
+    name: "menu",
+    root: Menu,
+    trigger: MenuTrigger,
+    controller: createMenuController,
+  },
+  {
+    name: "context menu",
+    root: Menu,
+    trigger: MenuContextTrigger,
+    controller: createMenuController,
+  },
   {
     name: "tooltip",
     root: Tooltip,
@@ -60,7 +118,12 @@ const cases: Case[] = [
     opened: (el) => el.getAttribute("aria-describedby") === "other-content",
     content: TooltipContent,
   },
-  { name: "hover card", root: HoverCard, trigger: HoverCardTrigger, controller: createHoverCardController },
+  {
+    name: "hover card",
+    root: HoverCard,
+    trigger: HoverCardTrigger,
+    controller: createHoverCardController,
+  },
 ]
 
 describe.each(cases)(
@@ -82,7 +145,9 @@ describe.each(cases)(
               Open
             </Trigger>
           </Root>
-          <Root controller={other}>{Content && <Content id="other-content" />}</Root>
+          <Root controller={other}>
+            {Content && <Content id="other-content" />}
+          </Root>
         </>
       ))
       await settle()
@@ -91,7 +156,7 @@ describe.each(cases)(
       expect(opened(view.querySelector("#trigger")!)).toBe(true)
       expect(around.isOpen()).toBe(false)
     })
-  },
+  }
 )
 
 test("a dialog trigger inside one dialog opens the dialog its controller names", async () => {
@@ -113,7 +178,10 @@ test("a dialog trigger inside one dialog opens the dialog its controller names",
   const trigger = view.querySelector<HTMLElement>("#trigger")!
   trigger.click()
   await settle()
-  expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({ other: true, around: false })
+  expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({
+    other: true,
+    around: false,
+  })
   expect(trigger.getAttribute("aria-controls")).toBe("other-content")
 })
 
@@ -136,7 +204,10 @@ test("a popover trigger inside one popover opens the popover its controller name
   const trigger = view.querySelector<HTMLElement>("#trigger")!
   trigger.click()
   await settle()
-  expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({ other: true, around: false })
+  expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({
+    other: true,
+    around: false,
+  })
   expect(trigger.getAttribute("aria-controls")).toBe("other-content")
 })
 
@@ -149,7 +220,11 @@ test("a select trigger inside one select shows the value of the select its contr
           <SelectValue />
         </SelectTrigger>
       </Select>
-      <Select controller={other} items={["apple", "banana"]} defaultValue="banana" />
+      <Select
+        controller={other}
+        items={["apple", "banana"]}
+        defaultValue="banana"
+      />
     </>
   ))
   await settle()
@@ -165,7 +240,11 @@ test("a select trigger inside one select shows the placeholder of the select its
           <SelectValue />
         </SelectTrigger>
       </Select>
-      <Select controller={other} items={["apple", "banana"]} placeholder="Other" />
+      <Select
+        controller={other}
+        items={["apple", "banana"]}
+        placeholder="Other"
+      />
     </>
   ))
   await settle()
@@ -186,11 +265,11 @@ test("a file input trigger inside one file input opens the picker of the one its
   ))
   await settle()
   const picked: string[] = []
-  const pick = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(function (
-    this: HTMLInputElement,
-  ) {
-    picked.push(this.name)
-  })
+  const pick = vi
+    .spyOn(HTMLInputElement.prototype, "click")
+    .mockImplementation(function (this: HTMLInputElement) {
+      picked.push(this.name)
+    })
   view.querySelector<HTMLElement>("#trigger")!.click()
   pick.mockRestore()
   expect(picked).toEqual(["other"])
@@ -215,7 +294,9 @@ test("removing a row whose trigger names a menu's controller leaves the menu wor
   const [rows, setRows] = createSignal(["a", "b"])
   const view = mount(() => (
     <>
-      <For each={rows()}>{(row) => <MenuTrigger controller={menu}>{row}</MenuTrigger>}</For>
+      <For each={rows()}>
+        {(row) => <MenuTrigger controller={menu}>{row}</MenuTrigger>}
+      </For>
       <Menu controller={menu} />
     </>
   ))
@@ -223,5 +304,7 @@ test("removing a row whose trigger names a menu's controller leaves the menu wor
   setRows(["b"])
   expect(() => flush()).not.toThrow()
   await settle()
-  expect([...view.querySelectorAll("button")].map((button) => button.textContent)).toEqual(["b"])
+  expect(
+    [...view.querySelectorAll("button")].map((button) => button.textContent)
+  ).toEqual(["b"])
 })

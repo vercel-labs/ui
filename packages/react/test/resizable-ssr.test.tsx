@@ -13,7 +13,7 @@ describe("server rendering a resizable group", () => {
         <ResizablePanel id="main" />
         <ResizableHandle aria-label="Resize preview" />
         <ResizablePanel id="preview" defaultSize="240px" />
-      </Resizable>,
+      </Resizable>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain("flex:0 1 var(--resizable-panel-size, 25%)")

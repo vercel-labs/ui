@@ -1,6 +1,17 @@
 import * as React from "react"
-import { Toast, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
-import { CircleCheckIcon, InfoIcon, LoaderCircleIcon, OctagonXIcon, TriangleAlertIcon } from "lucide-react"
+import {
+  Toast,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/react/toast"
+import {
+  CircleCheckIcon,
+  InfoIcon,
+  LoaderCircleIcon,
+  OctagonXIcon,
+  TriangleAlertIcon,
+} from "lucide-react"
 
 function upload() {
   return new Promise((resolve) => setTimeout(resolve, 2000))
@@ -12,7 +23,7 @@ function Example() {
     () => () => {
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   return (
@@ -20,9 +31,15 @@ function Example() {
       <div data-slot="row">
         <button onClick={() => toast("Event created")}>Default</button>
         <button onClick={() => toast.success("Changes saved")}>Success</button>
-        <button onClick={() => toast.info("A new version is available")}>Info</button>
-        <button onClick={() => toast.warning("Storage is almost full")}>Warning</button>
-        <button onClick={() => toast.error("Couldn't save changes")}>Error</button>
+        <button onClick={() => toast.info("A new version is available")}>
+          Info
+        </button>
+        <button onClick={() => toast.warning("Storage is almost full")}>
+          Warning
+        </button>
+        <button onClick={() => toast.error("Couldn't save changes")}>
+          Error
+        </button>
         <button
           onClick={() =>
             toast.promise(upload, {

@@ -1,6 +1,11 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
-  import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@ui-sdk/svelte/hover-card"
+  import {
+    HoverCard,
+    HoverCardArrow,
+    HoverCardContent,
+    HoverCardTrigger,
+  } from "@ui-sdk/svelte/hover-card"
   import {
     Select,
     SelectContent,
@@ -31,7 +36,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={sides} value={side} onValueChange={(next) => next && (side = next as Side)}>
+    <Select
+      items={sides}
+      value={side}
+      onValueChange={(next) => next && (side = next as Side)}
+    >
       <SelectLabel>Side</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -48,7 +57,11 @@
         {/each}
       </SelectContent>
     </Select>
-    <Select items={aligns} value={align} onValueChange={(next) => next && (align = next as Align)}>
+    <Select
+      items={aligns}
+      value={align}
+      onValueChange={(next) => next && (align = next as Align)}
+    >
       <SelectLabel>Align</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -67,7 +80,9 @@
     </Select>
   </div>
   <HoverCard>
-    <HoverCardTrigger href="https://example.com/people/ines">@ines</HoverCardTrigger>
+    <HoverCardTrigger href="https://example.com/people/ines"
+      >@ines</HoverCardTrigger
+    >
     <HoverCardContent {side} {align} sideOffset={10}>
       <HoverCardArrow />
       <p>Inès Moreau</p>

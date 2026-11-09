@@ -21,7 +21,9 @@ Renders data suggestions. Used by data autocompletes, and available for custom l
     <AutocompleteSeparator />
   {:else if "type" in entry && entry.type === "group"}
     <AutocompleteGroup>
-      {#if entry.label}<AutocompleteGroupLabel>{entry.label}</AutocompleteGroupLabel>{/if}
+      {#if entry.label}<AutocompleteGroupLabel
+          >{entry.label}</AutocompleteGroupLabel
+        >{/if}
       <Self items={entry.items} />
     </AutocompleteGroup>
   {:else}

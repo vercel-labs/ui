@@ -16,7 +16,9 @@ import {
       <template #render="{ props, state }">
         <button v-bind="props">
           {{ state.open ? "Hide Updates" : "Show Updates" }}
-          <PopoverShortcut v-slot="{ state: shortcut }">{{ shortcut.text }}</PopoverShortcut>
+          <PopoverShortcut v-slot="{ state: shortcut }">{{
+            shortcut.text
+          }}</PopoverShortcut>
         </button>
       </template>
     </PopoverTrigger>
@@ -26,7 +28,9 @@ import {
           <h3 v-bind="props">Updates</h3>
         </template>
       </PopoverTitle>
-      <PopoverDescription>Version 2.4 adds threaded comments.</PopoverDescription>
+      <PopoverDescription
+        >Version 2.4 adds threaded comments.</PopoverDescription
+      >
       <PopoverClose>
         <template #render="{ props }">
           <a v-bind="props" href="#">Read the Changelog</a>

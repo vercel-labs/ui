@@ -3,19 +3,25 @@ import { type Check, testExamples } from "./docs-helpers"
 
 // The newest line in an example's console, and every line.
 const consoleLines = (preview: Locator) =>
-  preview.locator("xpath=ancestor::figure[1]").locator('section[aria-label="Console"] li:not([aria-hidden])')
+  preview
+    .locator("xpath=ancestor::figure[1]")
+    .locator('section[aria-label="Console"] li:not([aria-hidden])')
 const lastLog = (preview: Locator) => consoleLines(preview).last()
 
 const listIn = (preview: Locator) => preview.page().getByRole("listbox").last()
 const contentIn = (preview: Locator) =>
   preview.page().locator('[data-slot="trigger-menu-content"]:visible').last()
-const option = (preview: Locator, name: string) => listIn(preview).getByRole("option", { name, exact: true })
+const option = (preview: Locator, name: string) =>
+  listIn(preview).getByRole("option", { name, exact: true })
 
 // Each check runs on its own example, found by name.
 const example =
   (name: string, check: Check): Check =>
   async (preview, framework) => {
-    await expect(preview).toHaveAttribute("data-example", `trigger-menu/${name}`)
+    await expect(preview).toHaveAttribute(
+      "data-example",
+      `trigger-menu/${name}`
+    )
     // A list animating out swallows presses, like this example's field below the last one.
     await expect(preview.page().locator("[data-ending-style]")).toHaveCount(0)
     await preview.scrollIntoViewIfNeeded()
@@ -60,7 +66,9 @@ testExamples("trigger-menu", {
     await field.click()
     await page.keyboard.type("/sta")
     await page.keyboard.press("Tab")
-    await expect(preview.locator('[data-slot="trigger-menu-hint"]')).toHaveText("<status> [until]")
+    await expect(preview.locator('[data-slot="trigger-menu-hint"]')).toHaveText(
+      "<status> [until]"
+    )
     await expect(option(preview, "busy")).toBeVisible()
     await page.keyboard.press("ArrowDown")
     await page.keyboard.press("Tab")
@@ -78,7 +86,11 @@ testExamples("trigger-menu", {
     await preview.getByRole("textbox", { name: "Message" }).click()
     await page.keyboard.type("/")
     await expect(listIn(preview).getByRole("option")).toHaveCount(5)
-    await expect(option(preview, "reply").locator('[data-slot="trigger-menu-item-icon"] svg')).toBeVisible()
+    await expect(
+      option(preview, "reply").locator(
+        '[data-slot="trigger-menu-item-icon"] svg'
+      )
+    ).toBeVisible()
     await page.keyboard.press("Escape")
   }),
   async: example("async", async (preview) => {
@@ -102,7 +114,10 @@ testExamples("trigger-menu", {
     await page.keyboard.press("Enter")
     await expect(field).toHaveValue("@Kofi ")
     await page.keyboard.type("@")
-    await expect(option(preview, "Tomasz Wójcik Deactivated")).toHaveAttribute("aria-disabled", "true")
+    await expect(option(preview, "Tomasz Wójcik Deactivated")).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
     await option(preview, "Notify everyone here").click()
     await expect(field).toHaveValue("@Kofi @here ")
   }),
@@ -126,7 +141,9 @@ testExamples("trigger-menu", {
     await preview.getByRole("textbox", { name: "Comment" }).click()
     await page.keyboard.type("@")
     await expect(listIn(preview)).toBeVisible()
-    const label = (await preview.getByText("Comment", { exact: true }).boundingBox())!
+    const label = (await preview
+      .getByText("Comment", { exact: true })
+      .boundingBox())!
     const content = (await contentIn(preview).boundingBox())!
     expect(content.y + content.height).toBeLessThanOrEqual(label.y)
     await page.keyboard.press("Escape")
@@ -135,9 +152,15 @@ testExamples("trigger-menu", {
     const page = preview.page()
     await preview.getByRole("textbox", { name: "Message" }).click()
     await page.keyboard.type("@w")
-    await expect(consoleLines(preview).first()).toHaveText("Opening (input-change)")
-    await expect(consoleLines(preview).getByText("Open", { exact: true })).toHaveCount(1)
-    await expect(consoleLines(preview).getByText("Query “w”", { exact: true })).toHaveCount(1)
+    await expect(consoleLines(preview).first()).toHaveText(
+      "Opening (input-change)"
+    )
+    await expect(
+      consoleLines(preview).getByText("Open", { exact: true })
+    ).toHaveCount(1)
+    await expect(
+      consoleLines(preview).getByText("Query “w”", { exact: true })
+    ).toHaveCount(1)
     await page.keyboard.press("Escape")
     await expect(lastLog(preview)).toHaveText("Closed")
     await page.keyboard.press("Control+j")

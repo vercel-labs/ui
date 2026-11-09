@@ -1,4 +1,9 @@
-import { Carousel, CarouselContent, CarouselItem, CarouselViewport } from "@ui-sdk/solid/carousel"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselViewport,
+} from "@ui-sdk/solid/carousel"
 import { createSignal, For } from "solid-js"
 
 const photos = [
@@ -15,7 +20,9 @@ function Example() {
   let strip: HTMLDivElement | undefined
   const show = (next: number) => {
     setPage(next)
-    strip?.querySelectorAll("button")[next - 1]?.scrollIntoView({ block: "nearest", inline: "nearest" })
+    strip
+      ?.querySelectorAll("button")
+      [next - 1]?.scrollIntoView({ block: "nearest", inline: "nearest" })
   }
   return (
     <div data-slot="stack">
@@ -32,7 +39,12 @@ function Example() {
           </CarouselContent>
         </CarouselViewport>
       </Carousel>
-      <Carousel ref={strip} aria-label="Thumbnails" dragFree slidesPerPage="auto">
+      <Carousel
+        ref={strip}
+        aria-label="Thumbnails"
+        dragFree
+        slidesPerPage="auto"
+      >
         <CarouselViewport>
           <CarouselContent>
             <For each={photos}>

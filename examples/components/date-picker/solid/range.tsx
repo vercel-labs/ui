@@ -17,7 +17,12 @@ import { createSignal } from "solid-js"
 function Example() {
   const [field, setField] = createSignal<HTMLElement | null>(null)
   return (
-    <DatePicker mode="range" months={2} monthFormat="short" defaultValue={["2026-10-12", "2026-10-16"]}>
+    <DatePicker
+      mode="range"
+      months={2}
+      monthFormat="short"
+      defaultValue={["2026-10-12", "2026-10-16"]}
+    >
       <div data-slot="row" ref={setField}>
         <DatePickerInput aria-label="Check in" placeholder="Check in" />
         <span data-slot="hint">–</span>
@@ -71,12 +76,20 @@ function Example() {
         </div>
         <div data-slot="row">
           <CalendarGrid>
-            <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-            <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+            <CalendarWeekdays>
+              {(index) => <CalendarWeekday index={index} />}
+            </CalendarWeekdays>
+            <CalendarWeeks>
+              {(cell) => <CalendarDay value={cell.date} />}
+            </CalendarWeeks>
           </CalendarGrid>
           <CalendarGrid offset={1}>
-            <CalendarWeekdays>{(index) => <CalendarWeekday index={index} />}</CalendarWeekdays>
-            <CalendarWeeks>{(cell) => <CalendarDay value={cell.date} />}</CalendarWeeks>
+            <CalendarWeekdays>
+              {(index) => <CalendarWeekday index={index} />}
+            </CalendarWeekdays>
+            <CalendarWeeks>
+              {(cell) => <CalendarDay value={cell.date} />}
+            </CalendarWeeks>
           </CalendarGrid>
         </div>
       </DatePickerContent>

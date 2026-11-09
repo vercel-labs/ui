@@ -1,4 +1,8 @@
-import { textarea as textareaPrimitive, type TextareaOptions, type TextareaState } from "@ui-sdk/core/input"
+import {
+  textarea as textareaPrimitive,
+  type TextareaOptions,
+  type TextareaState,
+} from "@ui-sdk/core/input"
 import { controlRender, useFieldControl } from "./field-context"
 import { controlProps, elementProps, type Native } from "./text-control"
 import { usePart, usePrimitive } from "./use-primitive"
@@ -34,7 +38,13 @@ function Textarea({
     ...elementProps(props, field, value, defaultValue),
     render: controlRender(field, "textarea", render),
   }
-  return usePart(textarea, "root", controlProps(props, field), element, "textarea")
+  return usePart(
+    textarea,
+    "root",
+    controlProps(props, field),
+    element,
+    "textarea"
+  )
 }
 
 export { createInputController } from "@ui-sdk/core/input"

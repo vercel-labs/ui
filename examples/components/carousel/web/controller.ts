@@ -25,7 +25,9 @@ function mount(root: HTMLElement) {
     </div>
   `
   const carousel = root.querySelector("ui-carousel")!
-  root.querySelector("[data-show-last]")!.addEventListener("click", () => carousel.api.setPage(5))
+  root
+    .querySelector("[data-show-last]")!
+    .addEventListener("click", () => carousel.api.setPage(5))
 }
 
 export { mount }

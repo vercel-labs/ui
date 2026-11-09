@@ -11,7 +11,10 @@ const searchField = definePrimitive({
   api: (context) => ({ set: (value: string) => context.store.set({ value }) }),
   slots: (slot) => ({
     input: slot({ attrs: (state) => ({ value: state.value }) }),
-    clear: slot({ attrs: () => ({ type: "button" }), press: ({ api }) => api.set("") }),
+    clear: slot({
+      attrs: () => ({ type: "button" }),
+      press: ({ api }) => api.set(""),
+    }),
   }),
 })
 
@@ -24,7 +27,9 @@ test("createParts returns the class it defined for each part", () => {
   expect(Object.keys(parts)).toEqual(["Root", "Input", "Clear"])
   expect(parts.Root).toBe(customElements.get("test-search-field"))
   expect(parts.Input).toBe(customElements.get("test-search-field-input"))
-  expect(document.createElement("test-search-field-clear")).toBeInstanceOf(parts.Clear!)
+  expect(document.createElement("test-search-field-clear")).toBeInstanceOf(
+    parts.Clear!
+  )
 })
 
 test("a second call returns the classes the first defined", () => {

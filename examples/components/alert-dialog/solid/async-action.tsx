@@ -13,7 +13,9 @@ function Example() {
 
   async function deleteProject() {
     await new Promise((resolve) => setTimeout(resolve, 1200))
-    if (attempts++ === 0) throw new Error("Couldn't delete the project.")
+    if (attempts++ === 0) {
+      throw new Error("Couldn't delete the project.")
+    }
   }
 
   return (
@@ -25,8 +27,8 @@ function Example() {
           <div data-slot="stack">
             <AlertDialogTitle>Delete project?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently deletes the project, its files and its deployment history for everyone on your
-              team.
+              This permanently deletes the project, its files and its deployment
+              history for everyone on your team.
             </AlertDialogDescription>
           </div>
           <AlertDialogClose
@@ -41,7 +43,11 @@ function Example() {
                 <div data-slot="row">
                   <AlertDialogClose>Cancel</AlertDialogClose>
                   <button {...props}>
-                    {state.pending ? "Deleting…" : state.error ? "Try Again" : "Delete"}
+                    {state.pending
+                      ? "Deleting…"
+                      : state.error
+                        ? "Try Again"
+                        : "Delete"}
                   </button>
                 </div>
               </div>

@@ -1,5 +1,9 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/solid/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/solid/resizable"
 import { createSignal } from "solid-js"
 
 function Example() {
@@ -8,7 +12,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <Checkbox checked={locked()} onCheckedChange={(next) => setLocked(next === true)}>
+          <Checkbox
+            checked={locked()}
+            onCheckedChange={(next) => setLocked(next === true)}
+          >
             <CheckboxIndicator>
               <svg
                 viewBox="0 0 24 24"

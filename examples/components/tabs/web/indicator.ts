@@ -14,7 +14,7 @@ function mount(root: HTMLElement) {
             (option) => `
               <button type="button" data-size="sm" value="${option.value}" aria-pressed="${option.value === "horizontal"}">
                 ${option.label}
-              </button>`,
+              </button>`
           )
           .join("")}
       </div>
@@ -38,11 +38,15 @@ function mount(root: HTMLElement) {
     </div>
   `
   const tabs = root.querySelector("ui-tabs")!
-  const buttons = root.querySelectorAll<HTMLButtonElement>('[data-slot="controls"] button')
+  const buttons = root.querySelectorAll<HTMLButtonElement>(
+    '[data-slot="controls"] button'
+  )
   for (const button of buttons) {
     button.addEventListener("click", () => {
       tabs.setAttribute("orientation", button.value)
-      for (const other of buttons) other.setAttribute("aria-pressed", String(other === button))
+      for (const other of buttons) {
+        other.setAttribute("aria-pressed", String(other === button))
+      }
     })
   }
 }

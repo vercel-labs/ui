@@ -6,9 +6,14 @@ function setStyle(el: HTMLElement, name: string, value: string) {
   el.style.setProperty(name, value)
   const ours = el.style.getPropertyValue(name)
   return () => {
-    if (el.style.getPropertyValue(name) !== ours) return
-    if (previous) el.style.setProperty(name, previous, priority)
-    else el.style.removeProperty(name)
+    if (el.style.getPropertyValue(name) !== ours) {
+      return
+    }
+    if (previous) {
+      el.style.setProperty(name, previous, priority)
+    } else {
+      el.style.removeProperty(name)
+    }
   }
 }
 
@@ -20,9 +25,13 @@ const registered = new Set<string>()
 // needs a name to inherit registers it first, and its registration stands
 // (an `@property` rule doesn't: a registration in script wins).
 function registerUninherited(names: readonly string[]) {
-  if (typeof CSS === "undefined" || !CSS.registerProperty) return
+  if (typeof CSS === "undefined" || !CSS.registerProperty) {
+    return
+  }
   for (const name of names) {
-    if (registered.has(name)) continue
+    if (registered.has(name)) {
+      continue
+    }
     registered.add(name)
     try {
       CSS.registerProperty({ name, syntax: "*", inherits: false })
@@ -36,7 +45,8 @@ function registerUninherited(names: readonly string[]) {
 // on the page, like the `<style>` elements they stand in for. Made on first
 // use, so a bundle that never writes a style drops this module.
 const adopted = () =>
-  ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.styles@1")] ??= new WeakMap()) as WeakMap<
+  ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.styles@1")] ??=
+    new WeakMap()) as WeakMap<
     Document,
     Map<string, { sheet: CSSStyleSheet; css: string }>
   >
@@ -49,10 +59,17 @@ const adopted = () =>
 const nonces = new WeakMap<Document, string | null>()
 
 function pageNonce(doc: Document) {
-  if (nonces.has(doc)) return nonces.get(doc)!
+  if (nonces.has(doc)) {
+    return nonces.get(doc)!
+  }
   let meta: HTMLMetaElement | null | undefined
-  for (let at: Document | undefined = doc; at && !meta; at = at.defaultView?.frameElement?.ownerDocument)
+  for (
+    let at: Document | undefined = doc;
+    at && !meta;
+    at = at.defaultView?.frameElement?.ownerDocument
+  ) {
     meta = at.head?.querySelector<HTMLMetaElement>('meta[property="csp-nonce"]')
+  }
   const nonce = meta ? meta.nonce || meta.getAttribute("nonce") || "" : null
   nonces.set(doc, nonce)
   return nonce
@@ -69,10 +86,15 @@ function pageNonce(doc: Document) {
  * is declared after the page's layers, unless its CSS declares it first.
  */
 function writeStyle(doc: Document, id: string, css: string) {
-  if (!doc.head) return
+  if (!doc.head) {
+    return
+  }
   const view = doc.defaultView
-  if (pageNonce(doc) === "" && view && "adoptedStyleSheets" in doc) adoptStyle(doc, view, id, css)
-  else appendStyle(doc, id, css)
+  if (pageNonce(doc) === "" && view && "adoptedStyleSheets" in doc) {
+    adoptStyle(doc, view, id, css)
+  } else {
+    appendStyle(doc, id, css)
+  }
 }
 
 // The text each `<style>` was last given, so a call with the same text, like
@@ -82,41 +104,67 @@ const styleText = new WeakMap<Element, string>()
 function appendStyle(doc: Document, id: string, css: string) {
   const existing = doc.getElementById(id)
   if (existing) {
-    if (styleText.get(existing) === css) return
-    if (existing.textContent !== css) existing.textContent = css
+    if (styleText.get(existing) === css) {
+      return
+    }
+    if (existing.textContent !== css) {
+      existing.textContent = css
+    }
     styleText.set(existing, css)
     return
   }
   const style = doc.createElement("style")
   style.id = id
   const nonce = pageNonce(doc)
-  if (nonce) style.nonce = nonce
+  if (nonce) {
+    style.nonce = nonce
+  }
   style.textContent = css
   styleText.set(style, css)
   const ours = doc.head.querySelectorAll(':scope > style[id^="ui-sdk-"]')
-  if (ours.length) ours[ours.length - 1].after(style)
-  else doc.head.prepend(style)
+  if (ours.length) {
+    ours[ours.length - 1].after(style)
+  } else {
+    doc.head.prepend(style)
+  }
 }
 
 // A constructed sheet can only be adopted by its own window's documents.
-function adoptStyle(doc: Document, view: Window & typeof globalThis, id: string, css: string) {
+function adoptStyle(
+  doc: Document,
+  view: Window & typeof globalThis,
+  id: string,
+  css: string
+) {
   let sheets = adopted().get(doc)
-  if (!sheets) adopted().set(doc, (sheets = new Map()))
+  if (!sheets) {
+    adopted().set(doc, (sheets = new Map()))
+  }
   let entry = sheets.get(id)
-  if (!entry) sheets.set(id, (entry = { sheet: new view.CSSStyleSheet(), css: "" }))
+  if (!entry) {
+    sheets.set(id, (entry = { sheet: new view.CSSStyleSheet(), css: "" }))
+  }
   if (entry.css !== css) {
     entry.sheet.replaceSync(css)
     entry.css = css
   }
   const list = doc.adoptedStyleSheets
-  if (list.includes(entry.sheet)) return
+  if (list.includes(entry.sheet)) {
+    return
+  }
   // After the others it wrote, ahead of the page's own adopted sheets.
   const ours = new Set([...sheets.values()].map(({ sheet }) => sheet))
   let index = 0
   list.forEach((sheet, at) => {
-    if (ours.has(sheet)) index = at + 1
+    if (ours.has(sheet)) {
+      index = at + 1
+    }
   })
-  doc.adoptedStyleSheets = [...list.slice(0, index), entry.sheet, ...list.slice(index)]
+  doc.adoptedStyleSheets = [
+    ...list.slice(0, index),
+    entry.sheet,
+    ...list.slice(index),
+  ]
 }
 
 // A hidden element shows again when a class sets `display`, like a utility
@@ -128,7 +176,7 @@ function enforceHidden(doc: Document) {
   writeStyle(
     doc,
     "ui-sdk-hidden",
-    '@layer ui-sdk { :where([data-slot][hidden]:not([hidden="until-found"])) { display: none !important } }',
+    '@layer ui-sdk { :where([data-slot][hidden]:not([hidden="until-found"])) { display: none !important } }'
   )
 }
 

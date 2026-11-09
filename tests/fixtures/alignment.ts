@@ -12,7 +12,16 @@ const alignmentFixture = {
     { value: "copy", label: "Copy" },
     { value: "paste", label: "Paste" },
   ],
-  sections: ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel"],
+  sections: [
+    "Alpha",
+    "Bravo",
+    "Charlie",
+    "Delta",
+    "Echo",
+    "Foxtrot",
+    "Golf",
+    "Hotel",
+  ],
 }
 
 // ?keep-mounted keeps the row menu in the page while closed.
@@ -23,7 +32,9 @@ function alignmentOptions() {
 
 // Counts renders of the view menu's checkbox items, by value.
 function renderCounter() {
-  const counts = ((window as unknown as { __renders?: Record<string, number> }).__renders ??= {})
+  const counts = ((
+    window as unknown as { __renders?: Record<string, number> }
+  ).__renders ??= {})
   return (value: string) => {
     counts[value] = (counts[value] ?? 0) + 1
     return "item"

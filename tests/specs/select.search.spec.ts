@@ -8,9 +8,11 @@ import { expect, lastAction, test } from "../fixtures"
 // arrow keys move a highlight it points at with aria-activedescendant.
 
 const trigger = (page: Page) => page.getByRole("combobox", { name: "Fruit" })
-const search = (page: Page) => page.getByRole("combobox", { name: "Search fruits" })
+const search = (page: Page) =>
+  page.getByRole("combobox", { name: "Search fruits" })
 const listbox = (page: Page) => page.getByRole("listbox")
-const option = (page: Page, name: string) => page.getByRole("option", { name, exact: true })
+const option = (page: Page, name: string) =>
+  page.getByRole("option", { name, exact: true })
 
 // The options shown, by their text.
 async function optionTexts(page: Page) {
@@ -28,7 +30,10 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await open("select", { search: "" })
   })
 
-  test("opening focuses the search field and highlights the selected item", async ({ page, open }) => {
+  test("opening focuses the search field and highlights the selected item", async ({
+    page,
+    open,
+  }) => {
     await open("select", { search: "", value: "cherry" })
     await openSearch(page)
     const id = await option(page, "Cherry").getAttribute("id")
@@ -36,7 +41,9 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await expect(option(page, "Cherry")).toHaveAttribute("data-highlighted", "")
   })
 
-  test("the search field is a combobox that controls the listbox in the list", async ({ page }) => {
+  test("the search field is a combobox that controls the listbox in the list", async ({
+    page,
+  }) => {
     await openSearch(page)
     const id = await listbox(page).getAttribute("id")
     await expect(search(page)).toHaveAttribute("aria-controls", id!)
@@ -44,22 +51,30 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await expect(search(page)).toHaveAttribute("aria-autocomplete", "list")
   })
 
-  test("typing filters the list and highlights the first match", async ({ page }) => {
+  test("typing filters the list and highlights the first match", async ({
+    page,
+  }) => {
     await openSearch(page)
     await page.keyboard.type("an")
-    await expect.poll(() => optionTexts(page)).toEqual(["Banana", "Mango", "Orange"])
+    await expect
+      .poll(() => optionTexts(page))
+      .toEqual(["Banana", "Mango", "Orange"])
     const id = await option(page, "Banana").getAttribute("id")
     await expect(search(page)).toHaveAttribute("aria-activedescendant", id!)
   })
 
-  test("typing never jumps by first letter: the characters go into the field", async ({ page }) => {
+  test("typing never jumps by first letter: the characters go into the field", async ({
+    page,
+  }) => {
     await openSearch(page)
     await page.keyboard.type("b n")
     await expect(search(page)).toHaveValue("b n")
     await expect(search(page)).toBeFocused()
   })
 
-  test("arrow keys move the highlight while focus stays in the field", async ({ page }) => {
+  test("arrow keys move the highlight while focus stays in the field", async ({
+    page,
+  }) => {
     await openSearch(page)
     await page.keyboard.press("ArrowDown")
     await expect(option(page, "Banana")).toHaveAttribute("data-highlighted", "")
@@ -68,7 +83,9 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await expect(option(page, "Apple")).toHaveAttribute("data-highlighted", "")
   })
 
-  test("Home and End are the field's, so the highlight stays", async ({ page }) => {
+  test("Home and End are the field's, so the highlight stays", async ({
+    page,
+  }) => {
     await openSearch(page)
     await page.keyboard.type("an")
     await expect(option(page, "Banana")).toHaveAttribute("data-highlighted", "")
@@ -79,7 +96,9 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await expect(search(page)).toBeFocused()
   })
 
-  test("Enter chooses the highlighted item, closes, and focus returns to the trigger", async ({ page }) => {
+  test("Enter chooses the highlighted item, closes, and focus returns to the trigger", async ({
+    page,
+  }) => {
     await openSearch(page)
     await page.keyboard.type("man")
     await page.keyboard.press("Enter")
@@ -96,7 +115,9 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await expect(trigger(page)).toContainText("Cherry")
   })
 
-  test("Escape closes the list and focus returns to the trigger", async ({ page }) => {
+  test("Escape closes the list and focus returns to the trigger", async ({
+    page,
+  }) => {
     await openSearch(page)
     await page.keyboard.type("ap")
     await page.keyboard.press("Escape")
@@ -134,7 +155,10 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     await expect(option(page, "Cherry").locator("mark")).toHaveText("err")
   })
 
-  test("with multiple, choosing keeps the list open and focus in the field", async ({ page, open }) => {
+  test("with multiple, choosing keeps the list open and focus in the field", async ({
+    page,
+    open,
+  }) => {
     await open("select", { search: "", multiple: "" })
     await openSearch(page)
     await page.keyboard.type("an")
@@ -144,7 +168,10 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
     expect(await lastAction(page)).toBe("value:banana,mango")
   })
 
-  test("Tab closes the list and moves on from the trigger", async ({ page, tab }) => {
+  test("Tab closes the list and moves on from the trigger", async ({
+    page,
+    tab,
+  }) => {
     await openSearch(page)
     await tab()
     await expect(listbox(page)).toBeHidden()
@@ -162,29 +189,41 @@ test.describe("searchable select", { tag: "@enhancement" }, () => {
   })
 })
 
-test.describe("items shown while the search is empty", { tag: "@enhancement" }, () => {
-  test("recent items show until the user types, then the results", async ({ page, open }) => {
-    await open("select", { search: "", recent: "" })
-    await openSearch(page)
-    await expect(page.getByRole("group", { name: "Recent" })).toBeVisible()
-    await expect.poll(() => optionTexts(page)).toEqual(["Mango", "Lemon"])
-    await page.keyboard.type("an")
-    await expect.poll(() => optionTexts(page)).toEqual(["Banana", "Mango", "Orange"])
-  })
+test.describe(
+  "items shown while the search is empty",
+  { tag: "@enhancement" },
+  () => {
+    test("recent items show until the user types, then the results", async ({
+      page,
+      open,
+    }) => {
+      await open("select", { search: "", recent: "" })
+      await openSearch(page)
+      await expect(page.getByRole("group", { name: "Recent" })).toBeVisible()
+      await expect.poll(() => optionTexts(page)).toEqual(["Mango", "Lemon"])
+      await page.keyboard.type("an")
+      await expect
+        .poll(() => optionTexts(page))
+        .toEqual(["Banana", "Mango", "Orange"])
+    })
 
-  test("a recent item is chosen like any other, and its label shows in the trigger", async ({
+    test("a recent item is chosen like any other, and its label shows in the trigger", async ({
+      page,
+      open,
+    }) => {
+      await open("select", { search: "", recent: "" })
+      await openSearch(page)
+      await option(page, "Lemon").click()
+      await expect(trigger(page)).toContainText("Lemon")
+    })
+  }
+)
+
+test.describe("searchable select", () => {
+  test("typing on the closed trigger still selects by first letter", async ({
     page,
     open,
   }) => {
-    await open("select", { search: "", recent: "" })
-    await openSearch(page)
-    await option(page, "Lemon").click()
-    await expect(trigger(page)).toContainText("Lemon")
-  })
-})
-
-test.describe("searchable select", () => {
-  test("typing on the closed trigger still selects by first letter", async ({ page, open }) => {
     await open("select", { search: "" })
     await trigger(page).focus()
     await page.keyboard.press("o")

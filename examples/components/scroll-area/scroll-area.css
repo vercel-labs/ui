@@ -15,7 +15,12 @@
     }
 
     /* Edge fades read the overflow variables, which only the root holds. */
-    & > :is([data-slot="top-fade"], [data-slot="bottom-fade"], div:not([data-slot])) {
+    &
+      > :is(
+        [data-slot="top-fade"],
+        [data-slot="bottom-fade"],
+        div:not([data-slot])
+      ) {
       --scroll-area-overflow-y-start: inherit;
       --scroll-area-overflow-y-end: inherit;
       position: absolute;
@@ -26,7 +31,11 @@
       pointer-events: none;
     }
 
-    & > :is([data-slot="bottom-fade"], div:not([data-slot]) + div:not([data-slot])) {
+    &
+      > :is(
+        [data-slot="bottom-fade"],
+        div:not([data-slot]) + div:not([data-slot])
+      ) {
       top: auto;
       bottom: 0;
       height: min(2rem, var(--scroll-area-overflow-y-end));
@@ -198,12 +207,18 @@
     text-align: center;
     pointer-events: none;
 
-    [data-slot="scroll-area-root"]:is([data-at-end], :not([data-overflow-x], [data-overflow-y])) > & {
+    [data-slot="scroll-area-root"]:is(
+        [data-at-end],
+        :not([data-overflow-x], [data-overflow-y])
+      )
+      > & {
       display: none;
     }
 
     [data-slot="scroll-area-root"][data-at-start] > & > [data-show="more"],
-    [data-slot="scroll-area-root"]:not([data-at-start]) > & > [data-show="start"] {
+    [data-slot="scroll-area-root"]:not([data-at-start])
+      > &
+      > [data-show="start"] {
       display: none;
     }
   }
@@ -243,7 +258,10 @@
   }
 
   /* Labeled scroll areas side by side, two to a row. */
-  :scope:is([data-example="scroll-area/type"], [data-example="scroll-area/hide-delay"]) {
+  :scope:is(
+    [data-example="scroll-area/type"],
+    [data-example="scroll-area/hide-delay"]
+  ) {
     & [data-slot="grid"] {
       align-items: end;
       gap: var(--space-3);

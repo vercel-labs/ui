@@ -17,7 +17,12 @@ type Variant = {
 }
 
 // What a menubar's menus hold, in every variant.
-type MenuEntry = { value: string; label: string; shortcut?: string; disabled?: boolean }
+type MenuEntry = {
+  value: string
+  label: string
+  shortcut?: string
+  disabled?: boolean
+}
 const menus = {
   file: {
     trigger: "File",
@@ -54,7 +59,13 @@ const variants: Variant[] = [
     options: { orientation: "vertical" },
     content: "basic",
   },
-  { id: "toolbar-no-loop", section: "Toolbar", title: "loop", options: { loop: false }, content: "basic" },
+  {
+    id: "toolbar-no-loop",
+    section: "Toolbar",
+    title: "loop",
+    options: { loop: false },
+    content: "basic",
+  },
   {
     id: "toolbar-disabled",
     section: "Toolbar",
@@ -85,13 +96,40 @@ const variants: Variant[] = [
     note: "The second group is disabled.",
     content: "groups",
   },
-  { id: "toolbar-rtl", section: "Toolbar", title: "Right to left", place: "rtl", content: "basic" },
-  { id: "toolbar-controller", section: "Toolbar", title: "Controller", controller: true, content: "basic" },
+  {
+    id: "toolbar-rtl",
+    section: "Toolbar",
+    title: "Right to left",
+    place: "rtl",
+    content: "basic",
+  },
+  {
+    id: "toolbar-controller",
+    section: "Toolbar",
+    title: "Controller",
+    controller: true,
+    content: "basic",
+  },
 
   { id: "menubar", section: "Menubar", title: "Default" },
-  { id: "menubar-vertical", section: "Menubar", title: "orientation", options: { orientation: "vertical" } },
-  { id: "menubar-no-loop", section: "Menubar", title: "loop", options: { loop: false } },
-  { id: "menubar-disabled", section: "Menubar", title: "disabled", options: { disabled: true } },
+  {
+    id: "menubar-vertical",
+    section: "Menubar",
+    title: "orientation",
+    options: { orientation: "vertical" },
+  },
+  {
+    id: "menubar-no-loop",
+    section: "Menubar",
+    title: "loop",
+    options: { loop: false },
+  },
+  {
+    id: "menubar-disabled",
+    section: "Menubar",
+    title: "disabled",
+    options: { disabled: true },
+  },
   {
     id: "menubar-modal",
     section: "Menubar",
@@ -99,10 +137,25 @@ const variants: Variant[] = [
     note: "Locks the page, except the menubar.",
     options: { modal: true },
   },
-  { id: "menubar-not-modal", section: "Menubar", title: "modal", options: { modal: false } },
+  {
+    id: "menubar-not-modal",
+    section: "Menubar",
+    title: "modal",
+    options: { modal: false },
+  },
   { id: "menubar-data", section: "Menubar", title: "Data menus", data: true },
-  { id: "menubar-rtl", section: "Menubar", title: "Right to left", place: "rtl" },
-  { id: "menubar-controller", section: "Menubar", title: "Controller", controller: true },
+  {
+    id: "menubar-rtl",
+    section: "Menubar",
+    title: "Right to left",
+    place: "rtl",
+  },
+  {
+    id: "menubar-controller",
+    section: "Menubar",
+    title: "Controller",
+    controller: true,
+  },
 ]
 
 export { menus, type Variant, variants }

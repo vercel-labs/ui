@@ -1,6 +1,10 @@
 <script lang="ts">
   import { InfoIcon } from "@lucide/svelte"
-  import { Tooltip, TooltipContent, TooltipTrigger } from "@ui-sdk/svelte/tooltip"
+  import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+  } from "@ui-sdk/svelte/tooltip"
 </script>
 
 <div data-slot="row">

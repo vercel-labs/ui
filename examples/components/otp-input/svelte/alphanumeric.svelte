@@ -1,7 +1,12 @@
 <script lang="ts">
   import { MinusIcon } from "@lucide/svelte"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
-  import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/svelte/otp-input"
+  import {
+    OTPInput,
+    OTPInputGroup,
+    OTPInputSeparator,
+    OTPInputSlot,
+  } from "@ui-sdk/svelte/otp-input"
 </script>
 
 <Field>

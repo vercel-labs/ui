@@ -2,7 +2,8 @@ import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
 import App from "./apps/pagination-app.svelte"
 
-const pages = (getHref?: (page: number) => string) => render(App, { props: { getHref } }).body
+const pages = (getHref?: (page: number) => string) =>
+  render(App, { props: { getHref } }).body
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("pagination server rendering", () => {
@@ -14,6 +15,8 @@ describe("pagination server rendering", () => {
   })
 
   test("with getHref the server renders links", () => {
-    expect(pages((page) => `/results?page=${page}`)).toContain('href="/results?page=6"')
+    expect(pages((page) => `/results?page=${page}`)).toContain(
+      'href="/results?page=6"'
+    )
   })
 })

@@ -5,7 +5,11 @@
 // stacked sheets pushing back the one beneath.
 import { dev, warn } from "#dev"
 import { checkName } from "#name-check"
-import { ownContent, type DialogApi, type DialogState } from "../dialog/dialog-api"
+import {
+  ownContent,
+  type DialogApi,
+  type DialogState,
+} from "../dialog/dialog-api"
 import { dialogSlots } from "../dialog/dialog-parts"
 import type {
   DialogBackdropState,
@@ -19,13 +23,33 @@ import type {
   DialogTriggerProps,
 } from "../dialog/dialog"
 import { initialApple } from "../../foundation/platform/platform"
-import { createPopupController, popupContentAttrs, type PopupController } from "../../foundation/popups/popup"
+import {
+  createPopupController,
+  popupContentAttrs,
+  type PopupController,
+} from "../../foundation/popups/popup"
 import { modalAttribute } from "../../foundation/popups/modal-attribute"
-import { ownsEvent, registerPopupElement } from "../../foundation/popups/popup-elements"
+import {
+  ownsEvent,
+  registerPopupElement,
+} from "../../foundation/popups/popup-elements"
 import { settleFlag } from "../../foundation/kernel/bound-keys"
-import type { SheetDriverName, SheetKeyframes, SheetSide } from "../../foundation/popups/sheet"
-import { physicalSide, type PhysicalSide } from "../../foundation/platform/sides"
-import { defaultSnap, drawerApi, interactiveByOrder, type DrawerApi, type DrawerState } from "./drawer-api"
+import type {
+  SheetDriverName,
+  SheetKeyframes,
+  SheetSide,
+} from "../../foundation/popups/sheet"
+import {
+  physicalSide,
+  type PhysicalSide,
+} from "../../foundation/platform/sides"
+import {
+  defaultSnap,
+  drawerApi,
+  interactiveByOrder,
+  type DrawerApi,
+  type DrawerState,
+} from "./drawer-api"
 import type { SheetPhysics } from "../../foundation/motion/physics"
 import type { SnapPoint } from "../../foundation/motion/snap-points"
 import { openAttrs } from "../../foundation/kernel/attrs"
@@ -36,7 +60,10 @@ import type {
   DismissReason,
 } from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, SlotDefinition } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  SlotDefinition,
+} from "../../foundation/kernel/primitive-types"
 import { live } from "../../foundation/kernel/live"
 
 /**
@@ -56,7 +83,12 @@ type DrawerPayloadChangeReason = DialogPayloadChangeReason
  * @stable
  */
 type DrawerSnapPointChangeReason =
-  "swipe" | "handle-press" | "handle-key" | "content-resize" | "back" | "imperative"
+  | "swipe"
+  | "handle-press"
+  | "handle-key"
+  | "content-resize"
+  | "back"
+  | "imperative"
 
 /**
  * The ways a user can dismiss a drawer, which `dismissible` can refuse.
@@ -87,7 +119,10 @@ type DrawerController<Payload = unknown, Result = string> = PopupController<
    * Moves it to a snap point. While closed, it opens there next.
    * Returns false when the change was canceled or it was already there.
    */
-  setSnapPoint: (snapPoint: SnapPoint, options?: ChangeOptions<DrawerSnapPointChangeReason>) => boolean
+  setSnapPoint: (
+    snapPoint: SnapPoint,
+    options?: ChangeOptions<DrawerSnapPointChangeReason>
+  ) => boolean
 }
 
 /**
@@ -112,13 +147,19 @@ function createDrawerController<Payload = unknown, Result = string>() {
  */
 type DrawerOptions = Omit<DialogSharedOptions, "onDismissAttempt"> & {
   /** Runs when the drawer wants to open or close. `details.reason` says why, `"swipe"` included, `details.cancel()` stops it, and `details.returnValue` carries what closed it. */
-  onOpenChange?: (open: boolean, details: DialogOpenChangeDetails<DrawerOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: DialogOpenChangeDetails<DrawerOpenChangeReason>
+  ) => void
   /**
    * Runs when the payload the content shows changes: a trigger with another payload opens the
    * drawer, or takes a non-modal drawer over while it's open, which fires no `onOpenChange`, and so
    * does a controller's `open({ payload })` on the open drawer. `details.cancel()` keeps the previous payload.
    */
-  onPayloadChange?: (payload: unknown, details: ChangeDetails<DrawerPayloadChangeReason>) => void
+  onPayloadChange?: (
+    payload: unknown,
+    details: ChangeDetails<DrawerPayloadChangeReason>
+  ) => void
   /** Runs when a dismissal was refused because `dismissible` is false, including a swipe. The drawer resists and springs back. Ask "Discard changes?" here. */
   onDismissAttempt?: (details: DrawerDismissAttemptDetails) => void
   /**
@@ -146,7 +187,10 @@ type DrawerOptions = Omit<DialogSharedOptions, "onDismissAttempt"> & {
    */
   defaultSnapPoint?: SnapPoint
   /** Runs when the drawer moves to another snap point. `details.reason` says why: a swipe, the handle, the keyboard, a resize or the controller. */
-  onSnapPointChange?: (snapPoint: SnapPoint, details: ChangeDetails<DrawerSnapPointChangeReason>) => void
+  onSnapPointChange?: (
+    snapPoint: SnapPoint,
+    details: ChangeDetails<DrawerSnapPointChangeReason>
+  ) => void
   /**
    * The edge it comes from. `"start"` and `"end"` follow the writing direction.
    * @defaultValue "bottom"
@@ -211,7 +255,10 @@ type DrawerTriggerProps = Omit<DialogTriggerProps, "controller"> & {
  * state-based class names.
  * @stable
  */
-type DrawerContentState<Payload = unknown> = Omit<DialogContentState<Payload>, "presentation"> & {
+type DrawerContentState<Payload = unknown> = Omit<
+  DialogContentState<Payload>,
+  "presentation"
+> & {
   /** The snap point it rests on or is moving to. */
   snapPoint: SnapPoint | null
   /** Whether it's at its largest snap point. */
@@ -271,12 +318,20 @@ function snapPointOf(value: string) {
 const snapPointAttribute = (attribute: string | null) =>
   attribute === null ? undefined : snapPointOf(attribute)
 // Comma-separated, like "0.5,1".
-const snapPointsAttribute = (attribute: string | null) => attribute?.split(",").map(snapPointOf)
+const snapPointsAttribute = (attribute: string | null) =>
+  attribute?.split(",").map(snapPointOf)
 
 // Dialog's parts, as the drawer's: they only read Dialog's state and api,
 // which the drawer's extend.
-function reuse<Props, Public>(definition: SlotDefinition<DialogState, DialogApi, Props, Public>) {
-  return definition as unknown as SlotDefinition<DrawerState, DrawerApi, Props, Public>
+function reuse<Props, Public>(
+  definition: SlotDefinition<DialogState, DialogApi, Props, Public>
+) {
+  return definition as unknown as SlotDefinition<
+    DrawerState,
+    DrawerApi,
+    Props,
+    Public
+  >
 }
 
 const drawerPrimitive = /* @__PURE__ */ definePrimitive({
@@ -309,7 +364,12 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
   },
   state: (options: DrawerOptions): DrawerState => {
     const open = options.open ?? options.defaultOpen ?? false
-    const snapPoint = options.snapPoint !== undefined ? options.snapPoint : open ? defaultSnap(options) : null
+    const snapPoint =
+      options.snapPoint !== undefined
+        ? options.snapPoint
+        : open
+          ? defaultSnap(options)
+          : null
     const interactive = open && interactiveByOrder(options, snapPoint)
     return {
       open,
@@ -359,7 +419,8 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
           nestedOpen: state.stack > 0,
           interactive: state.interactive,
         }),
-        present: (state, { api }) => state.mounted || !!api.internal.contentProps().keepMounted,
+        present: (state, { api }) =>
+          state.mounted || !!api.internal.contentProps().keepMounted,
         role: "presentation",
         attrs: (state) => ({
           hidden: state.mounted ? undefined : "",
@@ -368,11 +429,14 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
           "data-nested-open": state.stack > 0 ? "" : undefined,
           "data-interactive": state.interactive ? "" : undefined,
         }),
-        live: live((state) => ({ "data-dragging": state.dragging ? "" : undefined })),
+        live: live((state) => ({
+          "data-dragging": state.dragging ? "" : undefined,
+        })),
         bind(el, { api, store }) {
           api.internal.preset.resetStyles?.bind(el)
           // A usable page takes presses through the backdrop.
-          const write = () => (el.style.pointerEvents = store.get().interactive ? "none" : "")
+          const write = () =>
+            (el.style.pointerEvents = store.get().interactive ? "none" : "")
           write()
           const off = store.subscribe(write)
           const unbind = api.internal.popup.backdrop(el)
@@ -388,7 +452,8 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
       // around it. It's what goes into the top layer, and the scroller for
       // the scroll-snap driver.
       viewport: slot<{}, {}>({
-        present: (state, { api }) => state.mounted || !!api.internal.contentProps().keepMounted,
+        present: (state, { api }) =>
+          state.mounted || !!api.internal.contentProps().keepMounted,
         attrs: (state) => ({
           hidden: state.mounted ? undefined : "",
           "data-side": state.side,
@@ -397,7 +462,12 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
       }),
 
       content: slot<DrawerContentProps, DrawerContentState>({
-        props: { container: "value", initialFocus: "string", finalFocus: "string", keepMounted: "boolean" },
+        props: {
+          container: "value",
+          initialFocus: "string",
+          finalFocus: "string",
+          keepMounted: "boolean",
+        },
         connect: registerPopupElement,
         role: "dialog",
         state: (state) => ({
@@ -409,7 +479,8 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
           payload: state.payload,
           pending: state.pending !== null,
           snapPoint: state.snapPoint,
-          expanded: state.snapCount > 0 && state.snapIndex === state.snapCount - 1,
+          expanded:
+            state.snapCount > 0 && state.snapIndex === state.snapCount - 1,
           dragging: state.dragging,
           side: state.side,
           interactive: state.interactive,
@@ -420,36 +491,47 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
           ...api.internal.triggerName?.contentAttrs(state, id),
           "aria-describedby": state.described ? `${id}-description` : undefined,
           "data-side": state.side,
-          "data-snap-point": state.snapPoint === null ? undefined : String(state.snapPoint),
-          "data-expanded": state.snapCount > 0 && state.snapIndex === state.snapCount - 1 ? "" : undefined,
+          "data-snap-point":
+            state.snapPoint === null ? undefined : String(state.snapPoint),
+          "data-expanded":
+            state.snapCount > 0 && state.snapIndex === state.snapCount - 1
+              ? ""
+              : undefined,
           "data-interactive": state.interactive ? "" : undefined,
           "data-nested": state.nested ? "" : undefined,
           "data-nested-open": state.stack > 0 ? "" : undefined,
         }),
-        live: live((state) => ({ "data-dragging": state.dragging ? "" : undefined })),
+        live: live((state) => ({
+          "data-dragging": state.dragging ? "" : undefined,
+        })),
         on: {
           keydown(event, { api, el }) {
             // Keys from a dialog or drawer nested inside bubble through this one. Only the owner handles them.
-            if (ownsEvent(el!, event, ownContent)) api.internal.popup.keydown(event)
+            if (ownsEvent(el!, event, ownContent)) {
+              api.internal.popup.keydown(event)
+            }
           },
         },
         bind(el, { api, id, store }) {
           settleFlag(store, "titled")
-          if (dev && el.parentElement?.closest("form"))
+          if (dev && el.parentElement?.closest("form")) {
             warn(
               "The content renders inside a form, which nests forms. Pass `container` to render it elsewhere.",
               {
                 component: "drawer",
                 id,
-              },
+              }
             )
+          }
           let detach: (() => void) | undefined
           let cancelled = false
           const start = () => {
             // The viewport the adapters render around the content. Vue sets
             // its attributes only after binding the content, so it's found by place.
             const host = el.parentElement
-            if (!host) return
+            if (!host) {
+              return
+            }
             // The sheet binds before the popup layer shows it, so its opening
             // animation exists before presence starts waiting for animations.
             api.internal.attach(el, host, api.internal.backdropElement)
@@ -464,11 +546,15 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
             }
           }
           // Vue can bind refs before it inserts the element into its parent.
-          if (el.parentElement) start()
-          else
+          if (el.parentElement) {
+            start()
+          } else {
             queueMicrotask(() => {
-              if (!cancelled) start()
+              if (!cancelled) {
+                start()
+              }
             })
+          }
           return () => {
             cancelled = true
             detach?.()
@@ -482,16 +568,22 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
       handle: slot<{}, DrawerHandleState>({
         state: (state) => ({
           snapPoint: state.snapPoint,
-          canExpand: state.snapIndex >= 0 && state.snapIndex < state.snapCount - 1,
+          canExpand:
+            state.snapIndex >= 0 && state.snapIndex < state.snapCount - 1,
           canCollapse: state.snapIndex > 0,
         }),
         attrs: (state, { id }) => ({
           type: "button",
           "aria-controls": state.mounted ? `${id}-content` : undefined,
-          "data-snap-point": state.snapPoint === null ? undefined : String(state.snapPoint),
-          "data-expanded": state.snapCount > 0 && state.snapIndex === state.snapCount - 1 ? "" : undefined,
+          "data-snap-point":
+            state.snapPoint === null ? undefined : String(state.snapPoint),
+          "data-expanded":
+            state.snapCount > 0 && state.snapIndex === state.snapCount - 1
+              ? ""
+              : undefined,
         }),
-        press: ({ api }, event) => api.internal.stepHandle("cycle", "handle-press", event),
+        press: ({ api }, event) =>
+          api.internal.stepHandle("cycle", "handle-press", event),
         on: {
           keydown(event, { api, store }) {
             const action =
@@ -500,7 +592,9 @@ const drawerPrimitive = /* @__PURE__ */ definePrimitive({
                 : event.key === "End"
                   ? "last"
                   : handleKeys[store.get().side][event.key]
-            if (!action) return
+            if (!action) {
+              return
+            }
             event.preventDefault()
             api.internal.stepHandle(action, "handle-key", event)
           },
@@ -563,7 +657,10 @@ export {
   type DrawerTriggerProps,
 }
 export type { DrawerApi } from "./drawer-api"
-export { sheetPhysics, type SheetPhysics } from "../../foundation/motion/physics"
+export {
+  sheetPhysics,
+  type SheetPhysics,
+} from "../../foundation/motion/physics"
 export type { SnapPoint } from "../../foundation/motion/snap-points"
 export type {
   SheetDriverName as DrawerDriver,

@@ -19,8 +19,13 @@ const sheet = definePrimitive({
     }),
   }),
   slots: (slot) => ({
-    root: slot({ attrs: () => ({ role: "grid", "aria-multiselectable": "true" }) }),
-    row: slot<{ id: string }>({ props: { id: "string" }, attrs: () => ({ role: "row" }) }),
+    root: slot({
+      attrs: () => ({ role: "grid", "aria-multiselectable": "true" }),
+    }),
+    row: slot<{ id: string }>({
+      props: { id: "string" },
+      attrs: () => ({ role: "row" }),
+    }),
     cell: slot<{ id: string; row: number; col: number }>({
       props: { row: "number", col: "number" },
       attrs: (state, { props, api }) => {
@@ -41,7 +46,11 @@ const sheet = definePrimitive({
       on: {
         keydown: (event, { api }) => api.grid.keydown(event),
         pointerdown: (event, { api, props }) =>
-          api.grid.focus(props, { reason: "item-press", event, shift: event.shiftKey }),
+          api.grid.focus(props, {
+            reason: "item-press",
+            event,
+            shift: event.shiftKey,
+          }),
       },
       bind: (el, { api, props }) => api.grid.bind(el, props),
     }),
@@ -54,7 +63,11 @@ const Sheet = parts.Root
 
 const SheetRow = parts.Row
 
-function SheetCell({ row, col, ...props }: { row: number; col: number } & PartProps<"div">) {
+function SheetCell({
+  row,
+  col,
+  ...props
+}: { row: number; col: number } & PartProps<"div">) {
   return usePart(sheet, "cell", { id: `${row}:${col}`, row, col }, props, "div")
 }
 

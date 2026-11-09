@@ -34,7 +34,11 @@ Import the parts and put them together:
 
 ```vue
 <script setup lang="ts">
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/vue/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/vue/collapsible"
 </script>
 
 <template>
@@ -192,7 +196,10 @@ Props are the same as below. `onOpenChange` is `v-model:open`, or `@open-change`
 
 ### Collapsible
 
-<TypeTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleOptions"
+/>
 
 ### CollapsibleTrigger
 
@@ -210,7 +217,10 @@ The trigger takes no options of its own, only the props of the element it render
 What render functions, state-based class names and slots receive. The trigger and the panel receive the same
 state as the collapsible.
 
-<StateTable path="../../packages/core/src/components/collapsible/collapsible.ts" name="CollapsibleState" />
+<StateTable
+  path="../../packages/core/src/components/collapsible/collapsible.ts"
+  name="CollapsibleState"
+/>
 
 ### Reasons
 
@@ -257,7 +267,10 @@ Closing a panel while focus is inside it moves focus back to the trigger.
 
 ### Tested Behavior
 
-<SpecList spec="collapsible" only={["opening and closing", "keyboard", "mounting"]} />
+<SpecList
+  spec="collapsible"
+  only={["opening and closing", "keyboard", "mounting"]}
+/>
 
 Beyond the pattern's baseline:
 

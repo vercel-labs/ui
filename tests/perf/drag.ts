@@ -13,8 +13,13 @@ type DragCounts = Awaited<ReturnType<typeof readCounts>> & {
 // Setting an attribute to the value it has is a write too.
 async function watchWrites(page: Page) {
   await page.evaluate(() => {
-    const watch = { writes: 0, observer: undefined as MutationObserver | undefined }
-    watch.observer = new MutationObserver((records) => (watch.writes += records.length))
+    const watch = {
+      writes: 0,
+      observer: undefined as MutationObserver | undefined,
+    }
+    watch.observer = new MutationObserver(
+      (records) => (watch.writes += records.length)
+    )
     watch.observer.observe(document, { attributes: true, subtree: true })
     Object.assign(window, { __writes: watch })
   })
@@ -22,7 +27,11 @@ async function watchWrites(page: Page) {
 
 async function readWrites(page: Page) {
   return page.evaluate(() => {
-    const watch = (window as unknown as { __writes: { writes: number; observer: MutationObserver } }).__writes
+    const watch = (
+      window as unknown as {
+        __writes: { writes: number; observer: MutationObserver }
+      }
+    ).__writes
     const writes = watch.writes + watch.observer.takeRecords().length
     watch.observer.disconnect()
     return writes
@@ -42,7 +51,12 @@ async function countDrag(
     step,
     moves = 10,
     trace,
-  }: { from: { x: number; y: number }; step: { x: number; y: number }; moves?: number; trace: boolean },
+  }: {
+    from: { x: number; y: number }
+    step: { x: number; y: number }
+    moves?: number
+    trace: boolean
+  }
 ) {
   await page.mouse.move(from.x, from.y)
   await page.mouse.down()
@@ -60,7 +74,9 @@ async function countDrag(
       await waitFrames(page, 1)
     }
   }
-  const restyled = trace ? await countRestyles(page, run) : (await run(), undefined)
+  const restyled = trace
+    ? await countRestyles(page, run)
+    : (await run(), undefined)
   const writes = await readWrites(page)
   const counts: DragCounts = { ...(await readCounts(page)), writes, restyled }
   await page.mouse.up()
@@ -75,7 +91,10 @@ async function countDrag(
 async function countKeys(
   page: Page,
   key: string,
-  { presses = 10, afterEach }: { presses?: number; afterEach?: (press: number) => Promise<unknown> } = {},
+  {
+    presses = 10,
+    afterEach,
+  }: { presses?: number; afterEach?: (press: number) => Promise<unknown> } = {}
 ) {
   await resetCounts(page)
   await watchWrites(page)
@@ -101,16 +120,27 @@ function expectWithin(
     writes: number
     restyledPerMove?: number
   },
-  { moves = 10, see }: { moves?: number; see: string },
+  { moves = 10, see }: { moves?: number; see: string }
 ) {
-  for (const [kind, most] of Object.entries(budget.renders))
-    expect.soft(result.renders[kind] ?? 0, `${kind} renders. ${see}`).toBeLessThanOrEqual(most)
-  for (const [name, most] of Object.entries(budget.counts))
-    expect.soft(result.counts[name] ?? 0, `${name} calls. ${see}`).toBeLessThanOrEqual(most)
-  expect.soft(result.writes, `Attribute and style writes. ${see}`).toBeLessThanOrEqual(budget.writes)
+  for (const [kind, most] of Object.entries(budget.renders)) {
+    expect
+      .soft(result.renders[kind] ?? 0, `${kind} renders. ${see}`)
+      .toBeLessThanOrEqual(most)
+  }
+  for (const [name, most] of Object.entries(budget.counts)) {
+    expect
+      .soft(result.counts[name] ?? 0, `${name} calls. ${see}`)
+      .toBeLessThanOrEqual(most)
+  }
+  expect
+    .soft(result.writes, `Attribute and style writes. ${see}`)
+    .toBeLessThanOrEqual(budget.writes)
   if (result.restyled && budget.restyledPerMove !== undefined) {
     expect
-      .soft(result.restyled.elements / moves, `Elements restyled per move. ${see}`)
+      .soft(
+        result.restyled.elements / moves,
+        `Elements restyled per move. ${see}`
+      )
       .toBeLessThanOrEqual(budget.restyledPerMove)
   }
 }

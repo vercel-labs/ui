@@ -93,7 +93,15 @@ const {
   empty: "div",
 })
 
-export { FruitEmpty, FruitInput, FruitLabel, FruitList, FruitOption, FruitPopup, FruitSearch }
+export {
+  FruitEmpty,
+  FruitInput,
+  FruitLabel,
+  FruitList,
+  FruitOption,
+  FruitPopup,
+  FruitSearch,
+}
 ```
 
 ```svelte
@@ -253,7 +261,9 @@ The content has `data-starting-style` while it opens and `data-ending-style` whi
 ```
 
 ```svelte
-<AutocompleteContent class="transition-[opacity,translate] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-starting-style:-translate-y-1.5 data-starting-style:opacity-0 data-ending-style:-translate-y-1.5 data-ending-style:opacity-0" />
+<AutocompleteContent
+  class="transition-[opacity,translate] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] data-starting-style:-translate-y-1.5 data-starting-style:opacity-0 data-ending-style:-translate-y-1.5 data-ending-style:opacity-0"
+/>
 ```
 
 </StyleTabs>
@@ -477,7 +487,10 @@ A divider between suggestions or groups. Renders a `div` with the separator role
 
 Each suggestion in `items`, or a plain string. Groups are `{ type: "group", label, items }` and separators `{ type: "separator" }`.
 
-<TypeTable path="../../packages/core/src/foundation/lists/listbox.ts" name="ListItem" />
+<TypeTable
+  path="../../packages/core/src/foundation/lists/listbox.ts"
+  name="ListItem"
+/>
 
 ### State
 

@@ -35,8 +35,14 @@ type ContextMenuOpenChangeReason =
   | "imperative"
 
 type ContextMenuOptions = {
-  onOpenChange?: (open: boolean, details: ChangeDetails<ContextMenuOpenChangeReason>) => void
-  onAction?: (value: string, details: ChangeDetails<"item-press"> & { target: string | null }) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<ContextMenuOpenChangeReason>
+  ) => void
+  onAction?: (
+    value: string,
+    details: ChangeDetails<"item-press"> & { target: string | null }
+  ) => void
   delay?: number
 }
 
@@ -59,7 +65,10 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
   api: (context) => {
     const { store } = context
     const change = createChange(context)
-    const roving = createRovingFocus<ContextMenuState, { value: string; disabled?: boolean }>(context, {
+    const roving = createRovingFocus<
+      ContextMenuState,
+      { value: string; disabled?: boolean }
+    >(context, {
       slot: "item",
       key: "focused",
       loop: () => true,
@@ -69,10 +78,12 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
     let press: ReturnType<typeof setTimeout> | undefined
     let returnTo: HTMLElement | null = null
     let placement: ReturnType<typeof position> | undefined
-    const placed = (next: ReturnType<typeof position> | undefined) => (placement = next)
+    const placed = (next: ReturnType<typeof position> | undefined) =>
+      (placement = next)
 
     const targetOf = (event: Event) =>
-      (event.target as Element | null)?.closest<HTMLElement>("[data-target]") ?? null
+      (event.target as Element | null)?.closest<HTMLElement>("[data-target]") ??
+      null
 
     const api = {
       roving,
@@ -80,34 +91,54 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
       openAt(
         anchor: Anchor,
         target: HTMLElement | null,
-        details: { reason: ContextMenuOpenChangeReason; event?: Event },
+        details: { reason: ContextMenuOpenChangeReason; event?: Event }
       ) {
         returnTo = target ?? (document.activeElement as HTMLElement | null)
-        store.set({ anchor, target: target?.dataset.target ?? null, focused: null })
-        if (!store.get().open) change("open", true, details)
-        else placement?.place()
+        store.set({
+          anchor,
+          target: target?.dataset.target ?? null,
+          focused: null,
+        })
+        if (!store.get().open) {
+          change("open", true, details)
+        } else {
+          placement?.place()
+        }
       },
       close(details: { reason: ContextMenuOpenChangeReason; event?: Event }) {
-        if (!store.get().open) return
+        if (!store.get().open) {
+          return
+        }
         change("open", false, details)
-        if (details.reason !== "outside-press") returnTo?.focus()
+        if (details.reason !== "outside-press") {
+          returnTo?.focus()
+        }
       },
       run(value: string, event: Event) {
-        dispatch(context, "onAction", value, { reason: "item-press", event, target: store.get().target })
+        dispatch(context, "onAction", value, {
+          reason: "item-press",
+          event,
+          target: store.get().target,
+        })
         api.close({ reason: "item-press", event })
       },
       areaContextmenu(event: MouseEvent) {
         event.preventDefault()
-        api.openAt({ x: event.clientX, y: event.clientY }, targetOf(event), { reason: "context-menu", event })
+        api.openAt({ x: event.clientX, y: event.clientY }, targetOf(event), {
+          reason: "context-menu",
+          event,
+        })
       },
       areaPointerdown(event: PointerEvent) {
-        if (event.pointerType !== "touch") return
+        if (event.pointerType !== "touch") {
+          return
+        }
         const target = targetOf(event)
         const at = { x: event.clientX, y: event.clientY }
         clearTimeout(press)
         press = setTimeout(
           () => api.openAt(at, target, { reason: "long-press", event }),
-          context.options().delay ?? 500,
+          context.options().delay ?? 500
         )
         const cancel = () => {
           clearTimeout(press)
@@ -118,10 +149,17 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
         window.addEventListener("pointermove", cancel)
       },
       areaKeydown(event: KeyboardEvent) {
-        if (event.key !== "ContextMenu" && !(event.shiftKey && event.key === "F10")) return
+        if (
+          event.key !== "ContextMenu" &&
+          !(event.shiftKey && event.key === "F10")
+        ) {
+          return
+        }
         event.preventDefault()
         const target = targetOf(event)
-        if (target) api.openAt(target, target, { reason: "context-key", event })
+        if (target) {
+          api.openAt(target, target, { reason: "context-key", event })
+        }
       },
       menuKeydown(event: KeyboardEvent) {
         const el = event.target as HTMLElement
@@ -132,10 +170,14 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
           const index = typeahead(
             event.key,
             items.map((item) => labelOf(item.el)),
-            items.findIndex((item) => item.el === el),
+            items.findIndex((item) => item.el === el)
           )
-          if (index !== -1) items[index].el.focus()
-        } else roving.keydown(event, el)
+          if (index !== -1) {
+            items[index].el.focus()
+          }
+        } else {
+          roving.keydown(event, el)
+        }
       },
       place: () => placement?.place(),
     }
@@ -156,7 +198,11 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
       state: (state) => ({ target: state.target }),
       attrs: () => ({
         role: "menu",
-        style: css({ inset: "auto", margin: "0", "max-height": "var(--available-height)" }),
+        style: css({
+          inset: "auto",
+          margin: "0",
+          "max-height": "var(--available-height)",
+        }),
       }),
       bind: (el, { api, store }) => {
         const stopLayer = bindLayer(el, {
@@ -171,8 +217,8 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
               side: "bottom",
               align: "start",
               sideOffset: store.get().anchor instanceof HTMLElement ? 4 : 2,
-            }),
-          ),
+            })
+          )
         )
         queueMicrotask(() => api.roving.items()[0]?.el.focus())
         return () => {
@@ -194,7 +240,8 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
         "data-disabled": part.props.disabled ? "" : undefined,
       }),
       on: {
-        click: (event, { api, key, props }) => !props.disabled && api.run(key, event),
+        click: (event, { api, key, props }) =>
+          !props.disabled && api.run(key, event),
         keydown: (event, { api, key, props }) => {
           if ((event.key === "Enter" || event.key === " ") && !props.disabled) {
             event.preventDefault()
@@ -202,7 +249,9 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
           }
         },
         pointermove: (_event, { el, api, key, props }) => {
-          if (!props.disabled && el && el.ownerDocument.activeElement !== el) api.roving.focus(key)
+          if (!props.disabled && el && el.ownerDocument.activeElement !== el) {
+            api.roving.focus(key)
+          }
         },
       },
       bind: (el, part) => part.api.roving.bind(el, part),
@@ -210,7 +259,11 @@ const contextMenu = /* @__PURE__ */ definePrimitive({
   }),
 })
 
-const parts = createParts(contextMenu, { area: "div", menu: "div", item: "div" })
+const parts = createParts(contextMenu, {
+  area: "div",
+  menu: "div",
+  item: "div",
+})
 
 const ContextMenu = parts.Root
 
@@ -237,19 +290,26 @@ const actions = [
 ]
 
 function Example() {
-  const [log, setLog] = React.useState("Right-click a file, long-press it, or focus one and press Shift+F10.")
+  const [log, setLog] = React.useState(
+    "Right-click a file, long-press it, or focus one and press Shift+F10."
+  )
   return (
     <ContextMenu
       onAction={(value, details) =>
         setLog(
-          `${actions.find((action) => action.value === value)?.label} ${details.target ?? "the folder"}.`,
+          `${actions.find((action) => action.value === value)?.label} ${details.target ?? "the folder"}.`
         )
       }
     >
       <div data-slot="stack">
         <ContextMenuArea>
           {files.map((file) => (
-            <div key={file.value} data-target={file.value} tabIndex={0} data-slot="context-menu-file">
+            <div
+              key={file.value}
+              data-target={file.value}
+              tabIndex={0}
+              data-slot="context-menu-file"
+            >
               <span>{file.value}</span>
               <span data-slot="hint">
                 {file.kind} · {file.size}

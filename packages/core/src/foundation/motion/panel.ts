@@ -31,17 +31,30 @@ function supportsHiddenUntilFound() {
  */
 function bindFindable(
   el: HTMLElement,
-  panel: { shown: () => boolean; findable: () => boolean; reveal: (event: Event) => void },
+  panel: {
+    shown: () => boolean
+    findable: () => boolean
+    reveal: (event: Event) => void
+  }
 ) {
   const keep = () => {
-    if (panel.shown()) return
+    if (panel.shown()) {
+      return
+    }
     const hidden = el.getAttribute("hidden")
     if (panel.findable()) {
-      if (hidden !== "until-found") el.setAttribute("hidden", "until-found")
-    } else if (hidden === "until-found") el.setAttribute("hidden", "")
+      if (hidden !== "until-found") {
+        el.setAttribute("hidden", "until-found")
+      }
+    } else if (hidden === "until-found") {
+      el.setAttribute("hidden", "")
+    }
   }
   keep()
-  const observer = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(keep)
+  const observer =
+    typeof MutationObserver === "undefined"
+      ? undefined
+      : new MutationObserver(keep)
   observer?.observe(el, { attributes: true, attributeFilter: ["hidden"] })
   el.addEventListener("beforematch", panel.reveal)
   return Object.assign(
@@ -50,7 +63,7 @@ function bindFindable(
       el.removeEventListener("beforematch", panel.reveal)
     },
     // Call when the panel's state changes.
-    { check: keep },
+    { check: keep }
   )
 }
 
@@ -97,7 +110,11 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
   const size = (height: string, width = height) => panel.size(el, height, width)
   const shown = () => panel.isOpen() || panel.isExiting()
 
-  const findable = bindFindable(el, { shown, findable: panel.isFindable, reveal: panel.reveal })
+  const findable = bindFindable(el, {
+    shown,
+    findable: panel.isFindable,
+    reveal: panel.reveal,
+  })
   cleanups.push(findable)
 
   let stop: (() => void) | undefined
@@ -111,9 +128,13 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
     const how = panel.opening()
     if (how !== "animate") {
       // Nothing animates on the first paint or for a find in page match, keyframes included.
-      for (const animation of el.getAnimations()) animation.finish()
+      for (const animation of el.getAnimations()) {
+        animation.finish()
+      }
       size("auto")
-      if (how === "instant") panel.settled(true)
+      if (how === "instant") {
+        panel.settled(true)
+      }
       return
     }
     // The render that shows the panel comes after this change. Measuring needs
@@ -134,7 +155,9 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
   const closing = () => {
     halt()
     // Focus inside a closing panel would drop to the page. Its trigger is the closest place.
-    if (el.contains(document.activeElement)) panel.trigger()?.focus({ preventScroll: true })
+    if (el.contains(document.activeElement)) {
+      panel.trigger()?.focus({ preventScroll: true })
+    }
     if (!panel.isExiting()) {
       size("0px")
       panel.settled(false)
@@ -158,16 +181,24 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
   }
 
   let open = panel.isOpen()
-  if (open) opening()
-  else size("0px")
+  if (open) {
+    opening()
+  } else {
+    size("0px")
+  }
   cleanups.push(
     panel.subscribe(() => {
       findable.check()
-      if (panel.isOpen() === open) return
+      if (panel.isOpen() === open) {
+        return
+      }
       open = !open
-      if (open) opening()
-      else closing()
-    }),
+      if (open) {
+        opening()
+      } else {
+        closing()
+      }
+    })
   )
   cleanups.push(halt)
   return () => cleanups.forEach((cleanup) => cleanup())
@@ -175,7 +206,10 @@ function bindPanel(el: HTMLElement, panel: PanelBinding) {
 
 // A panel's `subscribe`: its state, and each render of its part, which can
 // change a prop like `hiddenUntilFound` with no state change.
-function stateAndRenders(store: { subscribe: (listener: () => void) => () => void }, part: Part) {
+function stateAndRenders(
+  store: { subscribe: (listener: () => void) => () => void },
+  part: Part
+) {
   return (listener: () => void) => {
     const offState = store.subscribe(listener)
     const offProps = onProps(part, listener)
@@ -186,4 +220,11 @@ function stateAndRenders(store: { subscribe: (listener: () => void) => () => voi
   }
 }
 
-export { bindFindable, bindPanel, hiddenAttrs, type PanelBinding, stateAndRenders, supportsHiddenUntilFound }
+export {
+  bindFindable,
+  bindPanel,
+  hiddenAttrs,
+  type PanelBinding,
+  stateAndRenders,
+  supportsHiddenUntilFound,
+}

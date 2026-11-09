@@ -16,9 +16,12 @@ function Group({
   nested = false,
   onLayout,
   ...props
-}: { group: GroupSpec; log: Log; nested?: boolean; onLayout?: (layout: number[]) => void } & Partial<
-  React.ComponentProps<typeof Resizable>
->) {
+}: {
+  group: GroupSpec
+  log: Log
+  nested?: boolean
+  onLayout?: (layout: number[]) => void
+} & Partial<React.ComponentProps<typeof Resizable>>) {
   return (
     <Resizable
       className={nested ? c.nested : c.group}
@@ -27,7 +30,9 @@ function Group({
         log.change(`${describe(layout)} (${details.reason})`)
         onLayout?.(layout)
       }}
-      onLayoutCommit={(layout, details) => log.commit(`${describe(layout)} (${details.reason})`)}
+      onLayoutCommit={(layout, details) =>
+        log.commit(`${describe(layout)} (${details.reason})`)
+      }
       {...props}
     >
       {group.panels.map(({ label, nested: inner, ...sizes }, index) => (
@@ -53,7 +58,10 @@ function Card({ variant, log }: { variant: Variant; log: Log }) {
   const [controller] = React.useState(createResizableController)
   const [extra, setExtra] = React.useState(false)
   const group = extra
-    ? { ...variant.group, panels: [...variant.group.panels, { label: "Extra", id: "extra" }] }
+    ? {
+        ...variant.group,
+        panels: [...variant.group.panels, { label: "Extra", id: "extra" }],
+      }
     : variant.group
   let body = (
     <Group
@@ -63,9 +71,15 @@ function Card({ variant, log }: { variant: Variant; log: Log }) {
       {...(variant.controlled && { layout, onLayout: setLayout })}
     />
   )
-  if (variant.place === "rtl") body = <div dir="rtl">{body}</div>
-  if (variant.place === "transformed") body = <div className={c.transformed}>{body}</div>
-  if (variant.place === "scroll") body = <div className={c.scroll}>{body}</div>
+  if (variant.place === "rtl") {
+    body = <div dir="rtl">{body}</div>
+  }
+  if (variant.place === "transformed") {
+    body = <div className={c.transformed}>{body}</div>
+  }
+  if (variant.place === "scroll") {
+    body = <div className={c.scroll}>{body}</div>
+  }
   return (
     <>
       {body}
@@ -83,19 +97,35 @@ function Card({ variant, log }: { variant: Variant; log: Log }) {
           ))}
         {variant.controller && (
           <>
-            <button type="button" className={c.button} onClick={() => controller.collapse("sidebar")}>
+            <button
+              type="button"
+              className={c.button}
+              onClick={() => controller.collapse("sidebar")}
+            >
               Collapse
             </button>
-            <button type="button" className={c.button} onClick={() => controller.expand("sidebar")}>
+            <button
+              type="button"
+              className={c.button}
+              onClick={() => controller.expand("sidebar")}
+            >
               Expand
             </button>
-            <button type="button" className={c.button} onClick={() => controller.resize("sidebar", "160px")}>
+            <button
+              type="button"
+              className={c.button}
+              onClick={() => controller.resize("sidebar", "160px")}
+            >
               160px
             </button>
           </>
         )}
         {variant.conditional && (
-          <button type="button" className={c.button} onClick={() => setExtra(!extra)}>
+          <button
+            type="button"
+            className={c.button}
+            onClick={() => setExtra(!extra)}
+          >
             {extra ? "Remove panel" : "Add panel"}
           </button>
         )}
@@ -109,8 +139,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <Card variant={variant} log={log} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

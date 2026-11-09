@@ -43,15 +43,21 @@
   let action = $state("")
   let submitted = $state("")
   const remote = useAsyncOptions(searchFruits, { immediate: async })
-  let list = $state.raw<{ value: string; label: string; keywords?: string[]; disabled?: boolean }[]>(f.items)
+  let list = $state.raw<
+    { value: string; label: string; keywords?: string[]; disabled?: boolean }[]
+  >(f.items)
   // Items a spec swaps in. Only in the browser: the server has no document.
   $effect(() => onItemsChange(changedItems, (next) => (list = next)))
   const items = $derived(
     async
       ? remote.state.items
       : grouped
-        ? f.groups.map((group) => ({ type: "group" as const, label: group.label, items: group.items }))
-        : list,
+        ? f.groups.map((group) => ({
+            type: "group" as const,
+            label: group.label,
+            items: group.items,
+          }))
+        : list
   )
   const dataMode = $derived(data || async || recent)
   // A data entry's key: its value, a group's label, or a separator's place.
@@ -66,7 +72,9 @@
 
   function onValueChange(value: string, details: { reason: string }) {
     action = `value:${value}:${details.reason}`
-    if (async) remote.setQuery(value)
+    if (async) {
+      remote.setQuery(value)
+    }
   }
 
   function onSubmit(event: SubmitEvent) {
@@ -75,9 +83,21 @@
   }
 </script>
 
-{#snippet dataItem(item: { value: string; label: string; keywords?: string[]; disabled?: boolean })}
-  <AutocompleteItem class="item" value={item.value} label={item.label} keywords={item.keywords} disabled={item.disabled}>
-    {#if highlight}<AutocompleteItemText>{item.label}</AutocompleteItemText>{:else}{item.label}{/if}
+{#snippet dataItem(item: {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+})}
+  <AutocompleteItem
+    class="item"
+    value={item.value}
+    label={item.label}
+    keywords={item.keywords}
+    disabled={item.disabled}
+  >
+    {#if highlight}<AutocompleteItemText>{item.label}</AutocompleteItemText
+      >{:else}{item.label}{/if}
   </AutocompleteItem>
 {/snippet}
 
@@ -92,7 +112,9 @@
       <AutocompleteSeparator />
     {:else}
       <AutocompleteGroup>
-        <AutocompleteGroupLabel class="label">{entry.label}</AutocompleteGroupLabel>
+        <AutocompleteGroupLabel class="label"
+          >{entry.label}</AutocompleteGroupLabel
+        >
         {@render dataItems(entry.items)}
       </AutocompleteGroup>
     {/if}
@@ -102,7 +124,11 @@
 <div class="fixture">
   <button>Before</button>
   <form class="select-form" aria-label={f.formLabel} onsubmit={onSubmit}>
-    <svelte:element this={fieldset ? "fieldset" : "div"} disabled={fieldset || undefined} style="display: contents">
+    <svelte:element
+      this={fieldset ? "fieldset" : "div"}
+      disabled={fieldset || undefined}
+      style="display: contents"
+    >
       <Autocomplete
         {...options}
         name={f.name}
@@ -121,7 +147,9 @@
         <AutocompleteContent class="popup list-popup">
           {#if !nostatus}
             <AutocompleteStatus class="status">
-              {#snippet children(state)}{state.loading ? "Loading…" : ""}{/snippet}
+              {#snippet children(state)}{state.loading
+                  ? "Loading…"
+                  : ""}{/snippet}
             </AutocompleteStatus>
           {/if}
           <AutocompleteEmpty class="empty">{f.empty}</AutocompleteEmpty>
@@ -136,9 +164,15 @@
               {#if grouped}
                 {#each f.groups as group (group.label)}
                   <AutocompleteGroup>
-                    <AutocompleteGroupLabel class="label">{group.label}</AutocompleteGroupLabel>
+                    <AutocompleteGroupLabel class="label"
+                      >{group.label}</AutocompleteGroupLabel
+                    >
                     {#each group.items as item (item.value)}
-                      <AutocompleteItem class="item" value={item.value} label={item.label}>
+                      <AutocompleteItem
+                        class="item"
+                        value={item.value}
+                        label={item.label}
+                      >
                         {item.label}
                       </AutocompleteItem>
                     {/each}
@@ -153,7 +187,9 @@
                     keywords={item.keywords}
                     disabled={item.disabled}
                   >
-                    {#if highlight}<AutocompleteItemText>{item.label}</AutocompleteItemText>{:else}{item.label}{/if}
+                    {#if highlight}<AutocompleteItemText
+                        >{item.label}</AutocompleteItemText
+                      >{:else}{item.label}{/if}
                   </AutocompleteItem>
                 {/each}
               {/if}

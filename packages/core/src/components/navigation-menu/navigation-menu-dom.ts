@@ -25,7 +25,10 @@ function createViewportSize(config: {
               entry.target,
               box
                 ? { width: box.inlineSize, height: box.blockSize }
-                : { width: entry.contentRect.width, height: entry.contentRect.height },
+                : {
+                    width: entry.contentRect.width,
+                    height: entry.contentRect.height,
+                  }
             )
           }
           write()
@@ -35,13 +38,21 @@ function createViewportSize(config: {
     const viewport = config.viewport()
     const content = config.content()
     const size = content && sizes.get(content)
-    if (!viewport || !size) return
+    if (!viewport || !size) {
+      return
+    }
     // Sizes for `width` and `height` as they apply: with `border-box`, which
     // most resets use, the viewport's border comes on top. Contents sit at
     // its padding box's corner, so padding belongs on them.
     const frame = frameOf(viewport)
-    viewport.style.setProperty("--viewport-width", `${size.width + frame.width}px`)
-    viewport.style.setProperty("--viewport-height", `${size.height + frame.height}px`)
+    viewport.style.setProperty(
+      "--viewport-width",
+      `${size.width + frame.width}px`
+    )
+    viewport.style.setProperty(
+      "--viewport-height",
+      `${size.height + frame.height}px`
+    )
   }
 
   return {
@@ -68,9 +79,14 @@ function createViewportSize(config: {
 // styles only, never layout.
 function frameOf(el: HTMLElement) {
   const style = getComputedStyle(el)
-  if (style.boxSizing !== "border-box") return { width: 0, height: 0 }
+  if (style.boxSizing !== "border-box") {
+    return { width: 0, height: 0 }
+  }
   const sum = (...names: string[]) =>
-    names.reduce((total, name) => total + (parseFloat(style.getPropertyValue(name)) || 0), 0)
+    names.reduce(
+      (total, name) => total + (parseFloat(style.getPropertyValue(name)) || 0),
+      0
+    )
   return {
     width: sum("border-left-width", "border-right-width"),
     height: sum("border-top-width", "border-bottom-width"),
@@ -95,27 +111,38 @@ const collapsed = {
 function collapseWhileHidden(
   el: HTMLElement,
   shown: () => boolean,
-  store: { subscribe: (listener: () => void) => () => void },
+  store: { subscribe: (listener: () => void) => () => void }
 ) {
   // Where find in page can't reveal hidden content, `hidden="until-found"`
   // hides through the browser's own styles, which any display class beats.
   // Nothing can find it there, so it's simply not displayed.
-  const styles = supportsHiddenUntilFound() ? collapsed : { ...collapsed, display: "none" }
+  const styles = supportsHiddenUntilFound()
+    ? collapsed
+    : { ...collapsed, display: "none" }
   // What each property was before, and what it read back as once set, since
   // the browser normalizes values, like "0" to "0px".
   const set = new Map<string, { before: string; after: string }>()
   const release = () => {
     for (const [name, { before, after }] of set) {
-      if (el.style.getPropertyValue(name) !== after) continue
-      if (before) el.style.setProperty(name, before)
-      else el.style.removeProperty(name)
+      if (el.style.getPropertyValue(name) !== after) {
+        continue
+      }
+      if (before) {
+        el.style.setProperty(name, before)
+      } else {
+        el.style.removeProperty(name)
+      }
     }
     set.clear()
   }
   const update = () => {
     const hide = !shown()
-    if (hide === set.size > 0) return
-    if (!hide) return release()
+    if (hide === set.size > 0) {
+      return
+    }
+    if (!hide) {
+      return release()
+    }
     for (const [name, value] of Object.entries(styles)) {
       const before = el.style.getPropertyValue(name)
       el.style.setProperty(name, value)
@@ -145,11 +172,12 @@ function bindIndicator(
     root: () => HTMLElement | undefined
     // Calls back when the open item changes. Returns an unsubscribe.
     onChange: (listener: () => void) => () => void
-  },
+  }
 ) {
   const update = () => {
     const target = config.target()
-    const container = (el.offsetParent as HTMLElement | null) ?? el.parentElement
+    const container =
+      (el.offsetParent as HTMLElement | null) ?? el.parentElement
     if (!target || !container) {
       el.removeAttribute("data-visible")
       return
@@ -163,28 +191,53 @@ function bindIndicator(
     el.style.setProperty("--active-item-height", `${box.height}px`)
     el.setAttribute("data-visible", "")
   }
-  const sized = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(update)
-  const current = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(update)
+  const sized =
+    typeof ResizeObserver === "undefined"
+      ? undefined
+      : new ResizeObserver(update)
+  const current =
+    typeof MutationObserver === "undefined"
+      ? undefined
+      : new MutationObserver(update)
   const root = config.root()
-  if (root) current?.observe(root, { subtree: true, attributeFilter: ["aria-current"] })
+  if (root) {
+    current?.observe(root, { subtree: true, attributeFilter: ["aria-current"] })
+  }
   const unsubscribe = config.onChange(update)
   // Observes what's watched now, like an item added after the first bind.
   let observed = new Set<HTMLElement>()
   const watch = () => {
-    const next = new Set(config.watched().filter((target): target is HTMLElement => !!target))
-    for (const target of observed) if (!next.has(target)) sized?.unobserve(target)
-    for (const target of next) if (!observed.has(target)) sized?.observe(target)
+    const next = new Set(
+      config.watched().filter((target): target is HTMLElement => !!target)
+    )
+    for (const target of observed) {
+      if (!next.has(target)) {
+        sized?.unobserve(target)
+      }
+    }
+    for (const target of next) {
+      if (!observed.has(target)) {
+        sized?.observe(target)
+      }
+    }
     observed = next
   }
-  const items = typeof MutationObserver === "undefined" ? undefined : new MutationObserver(watch)
+  const items =
+    typeof MutationObserver === "undefined"
+      ? undefined
+      : new MutationObserver(watch)
   let bound = true
   // Items bind in the same commit. Measure once they have, unless the
   // indicator went first, like a React Strict Mode remount.
   queueMicrotask(() => {
-    if (!bound) return
+    if (!bound) {
+      return
+    }
     watch()
     const list = config.watched()[0]
-    if (list) items?.observe(list, { childList: true, subtree: true })
+    if (list) {
+      items?.observe(list, { childList: true, subtree: true })
+    }
     update()
   })
   return () => {

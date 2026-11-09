@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { ArchiveIcon, ClockIcon, FileIcon, PencilIcon, ReplyIcon, StarIcon } from "@lucide/vue"
+import {
+  ArchiveIcon,
+  ClockIcon,
+  FileIcon,
+  PencilIcon,
+  ReplyIcon,
+  StarIcon,
+} from "@lucide/vue"
 import {
   Autocomplete,
   AutocompleteContent,
@@ -22,12 +29,20 @@ const mailSearches = [
 
 <template>
   <Autocomplete>
-    <AutocompleteInput type="search" aria-label="Search mail" placeholder="Search mail…" />
+    <AutocompleteInput
+      type="search"
+      aria-label="Search mail"
+      placeholder="Search mail…"
+    />
     <AutocompleteContent>
       <AutocompleteEmpty>No searches found.</AutocompleteEmpty>
       <AutocompleteList>
-        <AutocompleteItem v-for="search in mailSearches" :key="search.value" :value="search.value"
-          ><AutocompleteItemIcon :mirror="search.mirror"><component :is="search.icon" /></AutocompleteItemIcon
+        <AutocompleteItem
+          v-for="search in mailSearches"
+          :key="search.value"
+          :value="search.value"
+          ><AutocompleteItemIcon :mirror="search.mirror"
+            ><component :is="search.icon" /></AutocompleteItemIcon
           >{{ search.value }}</AutocompleteItem
         >
       </AutocompleteList>

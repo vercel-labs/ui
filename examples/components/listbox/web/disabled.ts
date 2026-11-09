@@ -23,7 +23,7 @@ function mount(root: HTMLElement) {
               <ui-listbox-item value="${topping.value}"${topping.value === "olive" ? " disabled" : ""}>
                 ${topping.label}
                 <ui-listbox-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-listbox-item-indicator>
-              </ui-listbox-item>`,
+              </ui-listbox-item>`
           )
           .join("")}
       </ui-listbox>

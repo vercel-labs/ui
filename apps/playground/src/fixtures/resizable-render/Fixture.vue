@@ -17,7 +17,10 @@ function count() {
 <template>
   <div class="fixture">
     <button>Before</button>
-    <Resizable class="resizable" @layout-commit="(layout) => (action = `layout:${layout.map(Math.round)}`)">
+    <Resizable
+      class="resizable"
+      @layout-commit="(layout) => (action = `layout:${layout.map(Math.round)}`)"
+    >
       <ResizablePanel
         v-slot="{ state }"
         :default-size="30"
@@ -27,16 +30,25 @@ function count() {
         role="group"
         aria-label="Files"
       >
-        <span v-if="count()" class="panel-state">{{ state.collapsed ? "Collapsed" : "Open" }}</span>
+        <span v-if="count()" class="panel-state">{{
+          state.collapsed ? "Collapsed" : "Open"
+        }}</span>
       </ResizablePanel>
       <ResizableHandle aria-label="Resize files" class="resizable-handle">
         <template #render="{ props, state }">
           <span v-bind="props">
-            <span class="handle-state">{{ state.dragging ? "dragging" : "idle" }}</span>
+            <span class="handle-state">{{
+              state.dragging ? "dragging" : "idle"
+            }}</span>
           </span>
         </template>
       </ResizableHandle>
-      <ResizablePanel v-slot="{ state }" class="resizable-panel" role="group" aria-label="Editor">
+      <ResizablePanel
+        v-slot="{ state }"
+        class="resizable-panel"
+        role="group"
+        aria-label="Editor"
+      >
         <span class="panel-size">{{ Math.round(state.size) }}</span>
       </ResizablePanel>
     </Resizable>

@@ -3,7 +3,12 @@
 // keeps it, including one kept before anything listened.
 import type { ChangeDetails, ChangeSource } from "./details"
 import { whenKept } from "./keep"
-import type { AgentSurface, Part, PrimitiveInstance, PropSpec } from "./primitive-types"
+import type {
+  AgentSurface,
+  Part,
+  PrimitiveInstance,
+  PropSpec,
+} from "./primitive-types"
 
 // What a watcher learns about an instance's definition.
 type WatchedDefinition = {
@@ -24,14 +29,20 @@ const watchers: {
   add?: (
     instance: PrimitiveInstance,
     parts: ReadonlyMap<string, Part>,
-    definition: WatchedDefinition,
+    definition: WatchedDefinition
   ) => () => void
-  change?: (id: string, key: string, value: unknown, details: ChangeDetails, previous: unknown) => void
+  change?: (
+    id: string,
+    key: string,
+    value: unknown,
+    details: ChangeDetails,
+    previous: unknown
+  ) => void
   commit?: (
     id: string,
     key: string,
     value: unknown,
-    details: { reason: string; source: ChangeSource },
+    details: { reason: string; source: ChangeSource }
   ) => void
 } = {}
 
@@ -48,24 +59,36 @@ const watchLater = new WeakMap<PrimitiveInstance, () => void>()
 function watchWhileKept(
   instance: PrimitiveInstance,
   parts: ReadonlyMap<string, Part>,
-  definition: WatchedDefinition,
+  definition: WatchedDefinition
 ) {
   let unwatch: (() => void) | undefined
   let waiting: WeakRef<PrimitiveInstance> | undefined
   const untrack = () => {
     unwatch?.()
     unwatch = undefined
-    if (waiting) earlier.delete(waiting)
+    if (waiting) {
+      earlier.delete(waiting)
+    }
     waiting = undefined
   }
   whenKept(() => {
-    if (watchers.add) unwatch = watchers.add(instance, parts, definition)
-    else if (typeof document !== "undefined") {
+    if (watchers.add) {
+      unwatch = watchers.add(instance, parts, definition)
+    } else if (typeof document !== "undefined") {
       earlier.add((waiting = new WeakRef(instance)))
       // Weakly held, by the instance, so the list never keeps one alive.
-      watchLater.set(instance, () => (unwatch = watchers.add?.(instance, parts, definition)))
+      watchLater.set(
+        instance,
+        () => (unwatch = watchers.add?.(instance, parts, definition))
+      )
       // Instances a framework made and threw away are never destroyed. Their refs go now and then.
-      if (earlier.size % 1000 === 0) for (const old of earlier) if (!old.deref()) earlier.delete(old)
+      if (earlier.size % 1000 === 0) {
+        for (const old of earlier) {
+          if (!old.deref()) {
+            earlier.delete(old)
+          }
+        }
+      }
     }
     return untrack
   })
@@ -76,7 +99,9 @@ function watchEarlier() {
   for (const ref of earlier) {
     earlier.delete(ref)
     const instance = ref.deref()
-    if (instance) watchLater.get(instance)?.()
+    if (instance) {
+      watchLater.get(instance)?.()
+    }
   }
 }
 

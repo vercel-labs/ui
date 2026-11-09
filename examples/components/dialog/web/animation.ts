@@ -21,9 +21,11 @@ function mount(root: HTMLElement) {
       </ui-dialog-content>
     </ui-dialog>
   `
-  root.querySelector("ui-dialog")!.addEventListener("openchangecomplete", (event) => {
-    log(root, event.detail.value ? "Finished opening" : "Finished closing")
-  })
+  root
+    .querySelector("ui-dialog")!
+    .addEventListener("openchangecomplete", (event) => {
+      log(root, event.detail.value ? "Finished opening" : "Finished closing")
+    })
 }
 
 export { mount }

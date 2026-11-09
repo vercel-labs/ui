@@ -1,5 +1,13 @@
 <script lang="ts">
-  import { ChevronRightIcon, FileIcon, FolderIcon, LinkIcon, MailIcon, ShareIcon, TrashIcon } from "@lucide/svelte"
+  import {
+    ChevronRightIcon,
+    FileIcon,
+    FolderIcon,
+    LinkIcon,
+    MailIcon,
+    ShareIcon,
+    TrashIcon,
+  } from "@lucide/svelte"
   import {
     Menu,
     MenuContent,
@@ -51,5 +59,7 @@
       </MenuItem>
     </MenuContent>
   </Menu>
-  <output data-slot="output">{action ? `نُفّذ: ${action}` : "اختر عنصرًا"}</output>
+  <output data-slot="output"
+    >{action ? `نُفّذ: ${action}` : "اختر عنصرًا"}</output
+  >
 </div>

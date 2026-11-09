@@ -7,11 +7,17 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 const { password } = passwordInputFixture
 
-test("a password input hydrates without mismatches and works", async ({ page, open }) => {
+test("a password input hydrates without mismatches and works", async ({
+  page,
+  open,
+}) => {
   await open("password-input")
   await page.waitForLoadState("networkidle")
   const field = page.getByLabel(password.label, { exact: true })
@@ -21,11 +27,21 @@ test("a password input hydrates without mismatches and works", async ({ page, op
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("the server renders a password field, or a shown one", async ({ page, open }) => {
+test("the server renders a password field, or a shown one", async ({
+  page,
+  open,
+}) => {
   await open("password-input")
-  await expect(page.getByLabel(password.label, { exact: true })).toHaveAttribute("type", "password")
+  await expect(
+    page.getByLabel(password.label, { exact: true })
+  ).toHaveAttribute("type", "password")
   await open("password-input", { "default-visible": "" })
-  await expect(page.getByLabel(password.label, { exact: true })).toHaveAttribute("type", "text")
-  await expect(buttonNamed(page, password.toggle)).toHaveAttribute("aria-pressed", "true")
+  await expect(
+    page.getByLabel(password.label, { exact: true })
+  ).toHaveAttribute("type", "text")
+  await expect(buttonNamed(page, password.toggle)).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  )
   expect(await hydrationErrors(page)).toEqual([])
 })

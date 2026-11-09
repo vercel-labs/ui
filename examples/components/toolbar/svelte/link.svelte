@@ -1,12 +1,23 @@
 <script lang="ts">
   import { CheckIcon, MessageSquareIcon } from "@lucide/svelte"
-  import { Toolbar, ToolbarButton, ToolbarLink, ToolbarSeparator } from "@ui-sdk/svelte/toolbar"
+  import {
+    Toolbar,
+    ToolbarButton,
+    ToolbarLink,
+    ToolbarSeparator,
+  } from "@ui-sdk/svelte/toolbar"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
 
   function follow(event: MouseEvent & { currentTarget: HTMLAnchorElement }) {
-    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
       return
     }
     event.preventDefault()

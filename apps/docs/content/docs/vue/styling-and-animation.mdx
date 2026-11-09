@@ -73,7 +73,13 @@ Popup content gets `data-starting-style` before it enters and `data-ending-style
 
 ```vue
 <script setup lang="ts">
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/vue/popover"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/vue/popover"
 </script>
 
 <template>
@@ -131,7 +137,9 @@ In Nuxt, the nuxt-security module writes the tag only in development. For produc
 ```ts
 export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook("render:html", (html, { event }) => {
-    html.head.push(`<meta property="csp-nonce" nonce="${event.context.security.nonce}">`)
+    html.head.push(
+      `<meta property="csp-nonce" nonce="${event.context.security.nonce}">`
+    )
   })
 })
 ```

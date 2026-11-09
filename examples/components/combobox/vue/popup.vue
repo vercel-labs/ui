@@ -33,10 +33,13 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const trigger = ref<ComponentPublicInstance | null>(null)
-const button = computed(() => (trigger.value?.$el ?? null) as HTMLButtonElement | null)
+const button = computed(
+  () => (trigger.value?.$el ?? null) as HTMLButtonElement | null
+)
 const query = ref("")
 </script>
 
@@ -50,14 +53,20 @@ const query = ref("")
   >
     <ComboboxTrigger ref="trigger" aria-label="Country">
       <span>
-        <ComboboxValue v-slot="{ state }">{{ state.label || "Select a country" }}</ComboboxValue>
+        <ComboboxValue v-slot="{ state }">{{
+          state.label || "Select a country"
+        }}</ComboboxValue>
       </span>
       <ChevronDownIcon aria-hidden="true" />
     </ComboboxTrigger>
     <ComboboxContent :anchor="button">
       <div data-slot="row">
         <SearchIcon aria-hidden="true" />
-        <ComboboxInput autofocus aria-label="Search countries" placeholder="Search…" />
+        <ComboboxInput
+          autofocus
+          aria-label="Search countries"
+          placeholder="Search…"
+        />
       </div>
       <ComboboxEmpty>No countries found.</ComboboxEmpty>
       <ComboboxList>

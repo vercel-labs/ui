@@ -14,7 +14,10 @@ function Example() {
   const [date, setDate] = React.useState("2026-01-31")
   const [weekStartsOn, setWeekStartsOn] = React.useState(1)
   const [year, month] = date.split("-").map(Number)
-  const week = { start: startOfWeek(date, weekStartsOn), end: endOfWeek(date, weekStartsOn) }
+  const week = {
+    start: startOfWeek(date, weekStartsOn),
+    end: endOfWeek(date, weekStartsOn),
+  }
   const steps: [string, string, () => string][] = [
     ["month-back", "− Month", () => addMonths(date, -1)],
     ["month", "+ Month", () => addMonths(date, 1)],
@@ -24,11 +27,20 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         {steps.map(([value, text, next]) => (
-          <button key={value} type="button" data-size="sm" onClick={() => setDate(next())}>
+          <button
+            key={value}
+            type="button"
+            data-size="sm"
+            onClick={() => setDate(next())}
+          >
             {text}
           </button>
         ))}
-        <button type="button" data-size="sm" onClick={() => setDate("2026-01-31")}>
+        <button
+          type="button"
+          data-size="sm"
+          onClick={() => setDate("2026-01-31")}
+        >
           Reset
         </button>
         <select
@@ -52,7 +64,8 @@ function Example() {
         </dd>
         <dt>Month</dt>
         <dd data-this-month>
-          {startOfMonth(date)} to {endOfMonth(date)}, {daysInMonth(year, month)} days
+          {startOfMonth(date)} to {endOfMonth(date)}, {daysInMonth(year, month)}{" "}
+          days
         </dd>
       </dl>
     </div>

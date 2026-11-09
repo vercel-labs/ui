@@ -1,7 +1,14 @@
 import type { field } from "@ui-sdk/core/field"
 import { fieldControlId, madeLabel } from "@ui-sdk/core/renderer"
 import { dynamic, type JSX } from "@solidjs/web"
-import { createComponent, createContext, merge, omit, untrack, useContext } from "solid-js"
+import {
+  createComponent,
+  createContext,
+  merge,
+  omit,
+  untrack,
+  useContext,
+} from "solid-js"
 import type { PartProps, PrimitiveHandle } from "./use-primitive"
 
 // The field's context, apart from its parts, so a control can join a field
@@ -23,7 +30,9 @@ const FieldContext = createContext<FieldContextValue | null>(null)
  */
 function useFieldControl(own?: { id?: unknown }) {
   const field = useContext(FieldContext)
-  if (!field) return null
+  if (!field) {
+    return null
+  }
   return {
     name: field.name,
     disabled: field.disabled,
@@ -39,9 +48,11 @@ function useFieldControl(own?: { id?: unknown }) {
         }),
         merge(omit(props, "id", "aria-labelledby"), {
           get "aria-labelledby"() {
-            return madeLabel(props["aria-labelledby"]) ? undefined : props["aria-labelledby"]
+            return madeLabel(props["aria-labelledby"])
+              ? undefined
+              : props["aria-labelledby"]
           },
-        }),
+        })
       )
       // The field's label names the control over the control's own, like a
       // ComboboxLabel's, but not over the author's. The control stays its own
@@ -67,17 +78,21 @@ function useFieldControl(own?: { id?: unknown }) {
 function joinField(
   field: ReturnType<typeof useFieldControl>,
   props: Record<string, any>,
-  tag: keyof JSX.IntrinsicElements,
+  tag: keyof JSX.IntrinsicElements
 ) {
-  if (!field) return props
+  if (!field) {
+    return props
+  }
   const render = untrack(() => props.render)
   return merge(props, {
     render: (merged: Record<string, any>, state: unknown) => {
       const joined = field.props(merged)
-      if (typeof render === "function") return render(joined, state)
+      if (typeof render === "function") {
+        return render(joined, state)
+      }
       return createComponent(
         dynamic(() => tag),
-        joined,
+        joined
       )
     },
   })

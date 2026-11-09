@@ -2,7 +2,8 @@ import { render } from "svelte/server"
 import { describe, expect, test } from "vitest"
 import App from "./apps/navigation-menu-app.svelte"
 
-const menu = (props: { defaultValue?: string; keepMounted?: boolean } = {}) => render(App, { props }).body
+const menu = (props: { defaultValue?: string; keepMounted?: boolean } = {}) =>
+  render(App, { props }).body
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a navigation menu", () => {

@@ -24,7 +24,7 @@ test(
     await drag(page, from, { x: to.x - from.x })
     await expect(minimum(page)).toHaveValue("80")
     await expect(maximum(page)).toHaveValue("80")
-  },
+  }
 )
 
 test(
@@ -37,20 +37,24 @@ test(
     await minimum(page).focus()
     await page.keyboard.press("ArrowRight")
     await expect(maximum(page)).toHaveAttribute("min", "21")
-  },
+  }
 )
 
-test("a form reset returns every slider to its default", { tag: "@enhancement" }, async ({ page, open }) => {
-  await open("slider")
-  await volume(page).focus()
-  await page.keyboard.press("End")
-  await pressAt(page, track(page, 1), 0.5)
-  await expect(volume(page)).toHaveValue("100")
-  await page.getByRole("button", { name: "Reset" }).click()
-  await expect(volume(page)).toHaveValue("50")
-  await expect(minimum(page)).toHaveValue("20")
-  await expect(maximum(page)).toHaveValue("80")
-})
+test(
+  "a form reset returns every slider to its default",
+  { tag: "@enhancement" },
+  async ({ page, open }) => {
+    await open("slider")
+    await volume(page).focus()
+    await page.keyboard.press("End")
+    await pressAt(page, track(page, 1), 0.5)
+    await expect(volume(page)).toHaveValue("100")
+    await page.getByRole("button", { name: "Reset" }).click()
+    await expect(volume(page)).toHaveValue("50")
+    await expect(minimum(page)).toHaveValue("20")
+    await expect(maximum(page)).toHaveValue("80")
+  }
+)
 
 test(
   "holding an arrow key commits once, when the key comes up",
@@ -65,7 +69,7 @@ test(
     expect(await status(page, "Committed")).toBe("")
     await page.keyboard.up("ArrowRight")
     await expect.poll(() => status(page, "Committed")).toBe("volume:53")
-  },
+  }
 )
 
 test(
@@ -77,7 +81,7 @@ test(
     await drag(page, from, { x: -40 })
     await expect(minimum(page)).toHaveValue("30")
     await expect(maximum(page)).toHaveValue("50")
-  },
+  }
 )
 
 test(
@@ -89,7 +93,7 @@ test(
     await expect(minimum(page)).toHaveValue("30")
     await expect(maximum(page)).toHaveValue("50")
     await expect(minimum(page)).toBeFocused()
-  },
+  }
 )
 
 test(
@@ -100,26 +104,40 @@ test(
     await minimum(page).focus()
     await page.keyboard.press("PageUp")
     await expect(minimum(page)).toHaveValue("25")
-  },
+  }
 )
 
-test("touch drags on the control never scroll the page", { tag: "@enhancement" }, async ({ page, open }) => {
-  await open("slider")
-  const touchAction = await page
-    .locator(".slider-control")
-    .first()
-    .evaluate((el) => getComputedStyle(el).touchAction)
-  expect(touchAction).toBe("none")
-})
+test(
+  "touch drags on the control never scroll the page",
+  { tag: "@enhancement" },
+  async ({ page, open }) => {
+    await open("slider")
+    const touchAction = await page
+      .locator(".slider-control")
+      .first()
+      .evaluate((el) => getComputedStyle(el).touchAction)
+    expect(touchAction).toBe("none")
+  }
+)
 
-test("a range submits one start/end value", { tag: "@enhancement" }, async ({ page, open }) => {
-  await open("slider")
-  await page.getByRole("button", { name: "Save" }).click()
-  await expect.poll(() => status(page, "Submitted")).toBe("volume=50&price=20%2F80")
-})
+test(
+  "a range submits one start/end value",
+  { tag: "@enhancement" },
+  async ({ page, open }) => {
+    await open("slider")
+    await page.getByRole("button", { name: "Save" }).click()
+    await expect
+      .poll(() => status(page, "Submitted"))
+      .toBe("volume=50&price=20%2F80")
+  }
+)
 
-test("clicking a range's label focuses its first thumb", { tag: "@enhancement" }, async ({ page, open }) => {
-  await open("slider")
-  await page.getByText("Price", { exact: true }).click()
-  await expect(minimum(page)).toBeFocused()
-})
+test(
+  "clicking a range's label focuses its first thumb",
+  { tag: "@enhancement" },
+  async ({ page, open }) => {
+    await open("slider")
+    await page.getByText("Price", { exact: true }).click()
+    await expect(minimum(page)).toBeFocused()
+  }
+)

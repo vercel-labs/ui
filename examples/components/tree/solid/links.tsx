@@ -33,7 +33,7 @@ const links = new Set(
   pages
     .flatMap((page) => [page, ...(page.children ?? [])])
     .filter((page) => page.href)
-    .map((page) => page.value),
+    .map((page) => page.value)
 )
 
 function Items(props: { items: TreeItemData[] }) {
@@ -41,7 +41,13 @@ function Items(props: { items: TreeItemData[] }) {
     <For each={props.items}>
       {(item) => (
         <TreeItem value={item.value}>
-          <TreeItemLabel render={item.href ? (label) => <a {...label} href={item.href} /> : undefined}>
+          <TreeItemLabel
+            render={
+              item.href
+                ? (label) => <a {...label} href={item.href} />
+                : undefined
+            }
+          >
             <Show when={item.children}>
               <TreeItemIndicator>
                 <svg
@@ -81,7 +87,9 @@ function Example() {
       mode="none"
       current={current()}
       onAction={(value, { event }) => {
-        if (!links.has(value)) return
+        if (!links.has(value)) {
+          return
+        }
         event?.preventDefault()
         setCurrent(value)
       }}

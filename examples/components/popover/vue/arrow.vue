@@ -26,7 +26,9 @@ const controls = ref<HTMLElement | null>(null)
 function onOpenChange(next: boolean, details: ChangeDetails) {
   const target = details.event?.target
   const inControls = target instanceof Node && controls.value?.contains(target)
-  if (inControls && details.reason !== "escape-key") return details.cancel()
+  if (inControls && details.reason !== "escape-key") {
+    return details.cancel()
+  }
   open.value = next
 }
 </script>
@@ -52,7 +54,9 @@ function onOpenChange(next: boolean, details: ChangeDetails) {
       <PopoverContent :side="side" :side-offset="10" :arrow-padding="12">
         <PopoverArrow />
         <PopoverTitle>Keyboard shortcuts</PopoverTitle>
-        <PopoverDescription>Press ? anywhere to see them all.</PopoverDescription>
+        <PopoverDescription
+          >Press ? anywhere to see them all.</PopoverDescription
+        >
       </PopoverContent>
     </Popover>
   </div>

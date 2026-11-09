@@ -1,6 +1,11 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
   import {
     Select,
     SelectContent,
@@ -21,7 +26,9 @@
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
-    log(`Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`)
+    log(
+      `Submitted shipping=${new FormData(event.currentTarget as HTMLFormElement).get("shipping")}`
+    )
   }
 </script>
 

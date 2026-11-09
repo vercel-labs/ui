@@ -17,29 +17,49 @@ function createRegistry(options: {
   /** Reads a file from the store, or `null` when there is none. */
   read: (pathname: string) => Promise<ReadableStream<Uint8Array> | null>
   /** Called for each tarball served, to record which version was downloaded. */
-  onDownload?: (download: { name: string; version: string; request: Request }) => Promise<void>
+  onDownload?: (download: {
+    name: string
+    version: string
+    request: Request
+  }) => Promise<void>
 }) {
   return async (request: Request) => {
     const url = new URL(request.url)
     const path = decodePath(url.pathname).slice(options.base.length) || "/"
     // A browser visiting the registry sees a plain page.
-    if (path === "/")
-      return new Response("Not Found", { status: 404, headers: { "content-type": "text/plain" } })
+    if (path === "/") {
+      return new Response("Not Found", {
+        status: 404,
+        headers: { "content-type": "text/plain" },
+      })
+    }
 
     const packument = path.match(/^\/@ui-sdk\/([a-z0-9-]+)$/)
     if (packument) {
-      const index = await options.read(`packages/@ui-sdk/${packument[1]}/index.json`)
-      if (!index) return json({ error: "Not found." }, 404)
+      const index = await options.read(
+        `packages/@ui-sdk/${packument[1]}/index.json`
+      )
+      if (!index) {
+        return json({ error: "Not found." }, 404)
+      }
       // The index is ours, written by `scripts/release.mjs`.
-      const versions = (await new Response(index).json()) as Parameters<typeof withTarballUrls>[0]
+      const versions = (await new Response(index).json()) as Parameters<
+        typeof withTarballUrls
+      >[0]
       return json(withTarballUrls(versions, url.origin + options.base))
     }
 
-    const tarball = path.match(/^\/@ui-sdk\/([a-z0-9-]+)\/-\/\1-([0-9A-Za-z.-]+)\.tgz$/)
+    const tarball = path.match(
+      /^\/@ui-sdk\/([a-z0-9-]+)\/-\/\1-([0-9A-Za-z.-]+)\.tgz$/
+    )
     if (tarball) {
       const [, name, version] = tarball
-      const file = await options.read(`packages/@ui-sdk/${name}/${name}-${version}.tgz`)
-      if (!file) return json({ error: "Not found." }, 404)
+      const file = await options.read(
+        `packages/@ui-sdk/${name}/${name}-${version}.tgz`
+      )
+      if (!file) {
+        return json({ error: "Not found." }, 404)
+      }
       await options.onDownload?.({ name, version, request })
       return new Response(file, {
         headers: {
@@ -56,11 +76,18 @@ function createRegistry(options: {
 
 // The index stores tarball paths relative to the registry, so it doesn't depend on the host.
 function withTarballUrls(
-  index: { name: string; versions: Record<string, { dist: { tarball: string } }> },
-  registry: string,
+  index: {
+    name: string
+    versions: Record<string, { dist: { tarball: string } }>
+  },
+  registry: string
 ) {
-  for (const manifest of Object.values(index.versions))
-    manifest.dist = { ...manifest.dist, tarball: `${registry}/${manifest.dist.tarball}` }
+  for (const manifest of Object.values(index.versions)) {
+    manifest.dist = {
+      ...manifest.dist,
+      tarball: `${registry}/${manifest.dist.tarball}`,
+    }
+  }
   return index
 }
 
@@ -73,8 +100,15 @@ function decodePath(pathname: string) {
   }
 }
 
-function json(body: unknown, status = 200, headers: Record<string, string> = {}) {
-  return Response.json(body, { status, headers: { "cache-control": "private, no-store", ...headers } })
+function json(
+  body: unknown,
+  status = 200,
+  headers: Record<string, string> = {}
+) {
+  return Response.json(body, {
+    status,
+    headers: { "cache-control": "private, no-store", ...headers },
+  })
 }
 
 export { createRegistry }

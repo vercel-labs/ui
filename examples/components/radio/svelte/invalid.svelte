@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
   import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/svelte/radio"
   import { useLog } from "../../../shared/svelte/log"
 
@@ -20,7 +25,9 @@
 <form data-slot="stack" onsubmit={onSubmit}>
   <Field>
     <FieldLabel>Order updates</FieldLabel>
-    <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+    <FieldDescription
+      >Choose how we tell you about your orders.</FieldDescription
+    >
     <RadioGroup name="updates" required>
       {#each channels as channel (channel.value)}
         <label data-slot="label">

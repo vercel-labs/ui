@@ -10,15 +10,25 @@ import {
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type PeekState = { value: string | null; preview: string | null; focused: string | null }
+type PeekState = {
+  value: string | null
+  preview: string | null
+  focused: string | null
+}
 
 type PeekValueChangeReason = "item-press" | "imperative"
 
 type PeekOptions = {
   value?: string | null
   defaultValue?: string | null
-  onValueChange?: (value: string | null, details: ChangeDetails<PeekValueChangeReason>) => void
-  onPreviewChange?: (preview: string | null, details: ChangeDetails<PreviewReason>) => void
+  onValueChange?: (
+    value: string | null,
+    details: ChangeDetails<PeekValueChangeReason>
+  ) => void
+  onPreviewChange?: (
+    preview: string | null,
+    details: ChangeDetails<PreviewReason>
+  ) => void
 }
 
 type PeekRootState = { value: string | null; preview: string | null }
@@ -37,7 +47,8 @@ const peek = /* @__PURE__ */ definePrimitive({
     preview: null,
     focused: null,
   }),
-  sync: (options) => (options.value === undefined ? {} : { value: options.value }),
+  sync: (options) =>
+    options.value === undefined ? {} : { value: options.value },
   controlled: ["value", "preview"],
   api: (context) => {
     const { store } = context
@@ -63,9 +74,13 @@ const peek = /* @__PURE__ */ definePrimitive({
         return change("value", value, { reason: "imperative" })
       },
       optionKeydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (preview.keydown(event, key)) return
+        if (preview.keydown(event, key)) {
+          return
+        }
         const moved = roving.keydown(event, el)
-        if (moved) preview.show(moved.key, { reason: "list-navigation", event })
+        if (moved) {
+          preview.show(moved.key, { reason: "list-navigation", event })
+        }
       },
     }
     return api
@@ -73,10 +88,18 @@ const peek = /* @__PURE__ */ definePrimitive({
   slots: (slot) => ({
     root: slot<{}, PeekRootState>({
       state: (state) => ({ value: state.value, preview: state.preview }),
-      attrs: () => ({ role: "radiogroup", "aria-roledescription": "preview group" }),
+      attrs: () => ({
+        role: "radiogroup",
+        "aria-roledescription": "preview group",
+      }),
       on: {
         focusout: (event, { el, api }) => {
-          if (api.preview.dragging() || el?.contains(event.relatedTarget as Node)) return
+          if (
+            api.preview.dragging() ||
+            el?.contains(event.relatedTarget as Node)
+          ) {
+            return
+          }
           api.preview.clear({ reason: "focus-out", event })
         },
       },
@@ -84,7 +107,10 @@ const peek = /* @__PURE__ */ definePrimitive({
     option: slot<{ value: string }, PeekOptionState>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      state: (state, { key }) => ({ checked: state.value === key, previewing: state.preview === key }),
+      state: (state, { key }) => ({
+        checked: state.value === key,
+        previewing: state.preview === key,
+      }),
       attrs: (state, part) => ({
         role: "radio",
         "aria-checked": String(state.value === part.key),
@@ -95,8 +121,10 @@ const peek = /* @__PURE__ */ definePrimitive({
       }),
       on: {
         pointerdown: (event, { el, api, key }) =>
-          el?.parentElement && api.preview.pointerdown(event, key, el.parentElement),
-        keydown: (event, { el, api, key }) => el && api.optionKeydown(event, el, key),
+          el?.parentElement &&
+          api.preview.pointerdown(event, key, el.parentElement),
+        keydown: (event, { el, api, key }) =>
+          el && api.optionKeydown(event, el, key),
       },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -110,10 +138,30 @@ const Peek = parts.Root
 const PeekOption = parts.Option
 
 const themes = {
-  paper: { label: "Paper", card: "#ffffff", text: "#171717", accent: "#171717" },
-  night: { label: "Night", card: "#171717", text: "#f5f5f5", accent: "#38bdf8" },
-  sepia: { label: "Sepia", card: "#fffbeb", text: "#451a03", accent: "#b45309" },
-  forest: { label: "Forest", card: "#022c22", text: "#ecfdf5", accent: "#34d399" },
+  paper: {
+    label: "Paper",
+    card: "#ffffff",
+    text: "#171717",
+    accent: "#171717",
+  },
+  night: {
+    label: "Night",
+    card: "#171717",
+    text: "#f5f5f5",
+    accent: "#38bdf8",
+  },
+  sepia: {
+    label: "Sepia",
+    card: "#fffbeb",
+    text: "#451a03",
+    accent: "#b45309",
+  },
+  forest: {
+    label: "Forest",
+    card: "#022c22",
+    text: "#ecfdf5",
+    accent: "#34d399",
+  },
 }
 type Theme = keyof typeof themes
 
@@ -126,7 +174,11 @@ function Example() {
       <div
         data-slot="peek-card"
         style={
-          { "--card": shown.card, "--card-text": shown.text, "--accent": shown.accent } as React.CSSProperties
+          {
+            "--card": shown.card,
+            "--card-text": shown.text,
+            "--accent": shown.accent,
+          } as React.CSSProperties
         }
       >
         <span data-slot="peek-accent" />
@@ -137,7 +189,12 @@ function Example() {
             : "Press a theme and slide across the others."}
         </span>
       </div>
-      <Peek value={value} onValueChange={setValue} onPreviewChange={setPreview} aria-label="Theme">
+      <Peek
+        value={value}
+        onValueChange={setValue}
+        onPreviewChange={setPreview}
+        aria-label="Theme"
+      >
         {Object.entries(themes).map(([key, theme]) => (
           <PeekOption key={key} value={key}>
             {theme.label}

@@ -8,7 +8,9 @@ describe("server rendering tabs", () => {
     const html = render(App, { props: { defaultValue: "b" } }).body
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="tablist"')
-    expect(html).toMatch(/aria-selected="true"[^>]*tabindex="0"|tabindex="0"[^>]*aria-selected="true"/)
+    expect(html).toMatch(
+      /aria-selected="true"[^>]*tabindex="0"|tabindex="0"[^>]*aria-selected="true"/
+    )
     expect(html).toContain("Panel B")
     expect(html).not.toContain("Panel A")
   })

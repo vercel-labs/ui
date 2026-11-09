@@ -31,7 +31,9 @@ test("selection: clicks choose, Shift-clicks take a range, Control-clicks toggle
   await expect(lastLog(list)).toContainText("6 selected")
 })
 
-test("selection: Shift with the arrows extends from the focused file", async ({ page }) => {
+test("selection: Shift with the arrows extends from the focused file", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const list = page.getByRole("listbox", { name: "Files" })
   await list.getByRole("option", { name: "notes.md" }).click()
@@ -40,7 +42,9 @@ test("selection: Shift with the arrows extends from the focused file", async ({ 
   await expect(lastLog(list)).toContainText("3 selected")
 })
 
-test("lasso: a rectangle selects the shapes it touches, and Escape lets go", async ({ page }) => {
+test("lasso: a rectangle selects the shapes it touches, and Escape lets go", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const surface = page.getByLabel("Shapes")
   await surface.scrollIntoViewIfNeeded()
@@ -58,7 +62,9 @@ test("lasso: a rectangle selects the shapes it touches, and Escape lets go", asy
   await expect(lastLog(surface)).toHaveText("Selected: Circle, Square")
 })
 
-test("cell range: Shift with the arrows grows the range, and the total follows", async ({ page }) => {
+test("cell range: Shift with the arrows grows the range, and the total follows", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const grid = page.getByRole("grid", { name: "Numbers" })
   await grid.getByRole("gridcell", { name: "4", exact: true }).click()
@@ -73,8 +79,12 @@ test("cell range: a drag paints the range", async ({ page }) => {
   await openBehaviors(page, "selection")
   const grid = page.getByRole("grid", { name: "Numbers" })
   await grid.scrollIntoViewIfNeeded()
-  const from = (await grid.getByRole("gridcell", { name: "15", exact: true }).boundingBox())!
-  const to = (await grid.getByRole("gridcell", { name: "5", exact: true }).boundingBox())!
+  const from = (await grid
+    .getByRole("gridcell", { name: "15", exact: true })
+    .boundingBox())!
+  const to = (await grid
+    .getByRole("gridcell", { name: "5", exact: true })
+    .boundingBox())!
   await page.mouse.move(from.x + 10, from.y + 10)
   await page.mouse.down()
   await page.mouse.move(to.x + 10, to.y + 10, { steps: 8 })
@@ -101,7 +111,9 @@ test("choose one: a click chooses, Space clears the chosen plan, and Enter goes 
   await expect(chosen).toHaveText("Continuing with Team")
 })
 
-test("choose many: each click adds or takes off one topping", async ({ page }) => {
+test("choose many: each click adds or takes off one topping", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const list = page.getByRole("listbox", { name: "Toppings" })
   const selected = list.locator('[aria-selected="true"]')
@@ -114,50 +126,78 @@ test("choose many: each click adds or takes off one topping", async ({ page }) =
   await expect(selected).toHaveText(["Basil", "Olives"])
 })
 
-test("ranges: a range adds to what was selected, or replaces it with the box ticked", async ({ page }) => {
+test("ranges: a range adds to what was selected, or replaces it with the box ticked", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const list = page.getByRole("listbox", { name: "Files" })
   const file = (name: string) => list.getByRole("option", { name })
   await file("notes.md").click()
   await file("photo.jpg").click({ modifiers: ["ControlOrMeta"] })
   await file("slides.key").click({ modifiers: ["Shift"] })
-  await expect(list.locator('[aria-selected="true"]')).toHaveText(["notes.md", "photo.jpg", "slides.key"])
-  await page.getByRole("checkbox", { name: "Ranges replace the selection" }).check()
+  await expect(list.locator('[aria-selected="true"]')).toHaveText([
+    "notes.md",
+    "photo.jpg",
+    "slides.key",
+  ])
+  await page
+    .getByRole("checkbox", { name: "Ranges replace the selection" })
+    .check()
   await file("notes.md").click()
   await file("photo.jpg").click({ modifiers: ["ControlOrMeta"] })
   await file("draft.docx").click({ modifiers: ["Shift"] })
-  await expect(list.locator('[aria-selected="true"]')).toHaveText(["photo.jpg", "slides.key", "draft.docx"])
+  await expect(list.locator('[aria-selected="true"]')).toHaveText([
+    "photo.jpg",
+    "slides.key",
+    "draft.docx",
+  ])
 })
 
-test("selectable: owners stay selected through clicks and select all", async ({ page }) => {
+test("selectable: owners stay selected through clicks and select all", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const list = page.getByRole("listbox", { name: "Members" })
   const selected = list.locator('[aria-selected="true"]')
   await expect(selected).toHaveCount(1)
-  await list.getByRole("option", { name: /^Hollis Grant/ }).click({ force: true })
+  await list
+    .getByRole("option", { name: /^Hollis Grant/ })
+    .click({ force: true })
   await expect(selected).toHaveCount(1)
   await page.keyboard.press("ControlOrMeta+a")
   await expect(selected).toHaveCount(5)
   await page.keyboard.press("ControlOrMeta+a")
   await expect(selected).toHaveCount(1)
-  await expect(list.getByRole("option", { name: /^Hollis Grant/ })).toHaveAttribute("aria-selected", "true")
+  await expect(
+    list.getByRole("option", { name: /^Hollis Grant/ })
+  ).toHaveAttribute("aria-selected", "true")
 })
 
-test("lasso: locked photos stay out, and screen readers hear how many were selected", async ({ page }) => {
+test("lasso: locked photos stay out, and screen readers hear how many were selected", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const surface = page.locator('[data-slot="photos-root"]')
   await surface.scrollIntoViewIfNeeded()
   const box = (await surface.boundingBox())!
   await page.mouse.move(box.x + 4, box.y + 4)
   await page.mouse.down()
-  await page.mouse.move(box.x + box.width - 4, box.y + box.height - 4, { steps: 8 })
+  await page.mouse.move(box.x + box.width - 4, box.y + box.height - 4, {
+    steps: 8,
+  })
   await page.mouse.up()
   await expect(surface.locator("[data-selected]")).toHaveCount(4)
-  await expect(surface.locator("[data-selected]").filter({ hasText: "City" })).toHaveCount(0)
-  await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText("4 photos selected")
+  await expect(
+    surface.locator("[data-selected]").filter({ hasText: "City" })
+  ).toHaveCount(0)
+  await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText(
+    "4 photos selected"
+  )
 })
 
-test("cell range from code: columns, rows, a block and everything, named and counted", async ({ page }) => {
+test("cell range from code: columns, rows, a block and everything, named and counted", async ({
+  page,
+}) => {
   await openBehaviors(page, "selection")
   const grid = page.getByRole("grid", { name: "Ledger" })
   const summary = page.locator("[data-summary]")
@@ -172,7 +212,9 @@ test("cell range from code: columns, rows, a block and everything, named and cou
   await expect(summary).toHaveText("A1:D3, 5 over 10")
   await grid.getByRole("gridcell", { name: "8", exact: true }).click()
   await page.keyboard.press("Shift+ArrowDown")
-  await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText("B1 to B2 selected")
+  await expect(page.locator("[data-ui-sdk-announcer='']")).toHaveText(
+    "B1 to B2 selected"
+  )
 })
 
 test("cell range clipboard: copy the range as tabs, and paste it from another cell", async ({
@@ -198,7 +240,11 @@ test("cell range clipboard: copy the range as tabs, and paste it from another ce
 
 test("every option links to its explanation", async ({ page }) => {
   await openBehaviors(page, "selection")
-  for (const label of ["SelectionOptions", "LassoOptions", "CellRangeOptions"]) {
+  for (const label of [
+    "SelectionOptions",
+    "LassoOptions",
+    "CellRangeOptions",
+  ]) {
     const table = page.getByLabel(label, { exact: true })
     const fields = table.locator("dt")
     const links = table.getByRole("link")
@@ -206,7 +252,9 @@ test("every option links to its explanation", async ({ page }) => {
     await expect(links).toHaveCount(await fields.count())
     for (const link of await links.all()) {
       const href = (await link.getAttribute("href"))!
-      if (!href.startsWith("#")) continue
+      if (!href.startsWith("#")) {
+        continue
+      }
       await expect(page.locator(`[id="${href.slice(1)}"]`)).toHaveCount(1)
     }
   }

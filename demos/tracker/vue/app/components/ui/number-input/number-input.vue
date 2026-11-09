@@ -23,7 +23,7 @@ const step =
       :class="
         cn(
           'flex h-8 w-32 items-center gap-0.5 rounded-2xl border border-transparent bg-input/50 px-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 motion-reduce:transition-none',
-          props.class,
+          props.class
         )
       "
     >

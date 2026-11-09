@@ -106,7 +106,11 @@ Each Menu can take `items` and register its shortcuts while closed. The [Menu da
     { value: "new", label: "New File", shortcut: "mod+alt+n" },
     { value: "open", label: "Open…" },
     { type: "separator" },
-    { type: "submenu", label: "Share", items: [{ value: "email", label: "Email link" }] },
+    {
+      type: "submenu",
+      label: "Share",
+      items: [{ value: "email", label: "Email link" }],
+    },
   ]
 
   const menu = document.querySelector("ui-menu")
@@ -164,7 +168,9 @@ import { registerShortcut } from "@ui-sdk/web"
 
 const menubar = document.querySelector("ui-menubar")!.api
 registerShortcut("alt+m", () => menubar.focus())
-document.querySelector("button")!.addEventListener("click", () => menubar.focus())
+document
+  .querySelector("button")!
+  .addEventListener("click", () => menubar.focus())
 ```
 
 ## Shared Menu Features
@@ -189,13 +195,19 @@ Props are attributes in kebab case. `"false"` is false, as in `loop="false"`. Th
 
 ### Menubar
 
-<TypeTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarOptions" />
+<TypeTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarOptions"
+/>
 
 Menus, items and their icons take the props on the Menu page, like [`MenuItemIcon`](./menu#menuitemicon).
 
 ### State
 
-<StateTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarState" />
+<StateTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarState"
+/>
 
 ### Reasons
 
@@ -203,7 +215,10 @@ A menu that another menu in the menubar takes over closes with `submenu-switch`,
 
 ### Controller
 
-<ControllerTable path="../../packages/core/src/components/menubar/menubar.ts" name="MenubarController" />
+<ControllerTable
+  path="../../packages/core/src/components/menubar/menubar.ts"
+  name="MenubarController"
+/>
 
 ## Accessibility
 

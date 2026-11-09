@@ -22,7 +22,9 @@ describe("server rendering a calendar", () => {
   })
 
   test("two months render two grids under one heading", () => {
-    const html = renderToString(() => <Calendar months={2} defaultMonth="2026-10" />)
+    const html = renderToString(() => (
+      <Calendar months={2} defaultMonth="2026-10" />
+    ))
     expect(html.match(/role="grid"/g)).toHaveLength(2)
     expect(html).toMatch(/October\s–\sNovember 2026/)
   })
@@ -31,7 +33,9 @@ describe("server rendering a calendar", () => {
     const html = renderToString(() => (
       <Calendar defaultMonth="2026-10" showOutsideDays={false}>
         <CalendarGrid>
-          <CalendarWeekdays>{(index) => <CalendarWeekday index={index} class="weekday" />}</CalendarWeekdays>
+          <CalendarWeekdays>
+            {(index) => <CalendarWeekday index={index} class="weekday" />}
+          </CalendarWeekdays>
           <CalendarWeeks>
             {(cell) => (
               <CalendarDay value={cell.date} class="day">

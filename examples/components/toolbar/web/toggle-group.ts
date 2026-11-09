@@ -1,6 +1,13 @@
 import "@ui-sdk/web/toolbar"
 import "@ui-sdk/web/toggle"
-import { AlignCenter, AlignLeft, AlignRight, createElement, List, ListOrdered } from "lucide"
+import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  createElement,
+  List,
+  ListOrdered,
+} from "lucide"
 import { log } from "../../../shared/web/log"
 
 const alignments = [
@@ -23,7 +30,7 @@ const toggles = (items: typeof alignments) =>
             <ui-toggle-icon>${createElement(item.icon, { "aria-hidden": "true" }).outerHTML}</ui-toggle-icon>
           </button>
         </ui-toggle>
-      `,
+      `
     )
     .join("")
 
@@ -40,7 +47,9 @@ function mount(root: HTMLElement) {
     </ui-toolbar>
   `
   const [alignment, list] = root.querySelectorAll("ui-toggle-group")
-  alignment.addEventListener("valuechange", (event) => log(root, `Align ${event.detail.value[0]}`))
+  alignment.addEventListener("valuechange", (event) =>
+    log(root, `Align ${event.detail.value[0]}`)
+  )
   list.addEventListener("valuechange", (event) => {
     const [value] = event.detail.value
     log(root, lists.find((list) => list.value === value)?.label ?? "No list")

@@ -34,6 +34,9 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/vue"
         </CalendarWeeks>
       </CalendarGrid>
     </Calendar>
-    <p data-slot="hint">Today is marked as it is in Kiritimati, the first place to see each new day.</p>
+    <p data-slot="hint">
+      Today is marked as it is in Kiritimati, the first place to see each new
+      day.
+    </p>
   </div>
 </template>

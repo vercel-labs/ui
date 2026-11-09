@@ -15,8 +15,13 @@ The group's heading, which names the group.
 
   const combobox = useHandle(comboboxPrimitive)
   const group = getContext<string | undefined>(GroupKey)
-  if (!group) throw new Error("<ComboboxGroupLabel> must be used inside <ComboboxGroup>.")
-  const label = useHandlePart(combobox, "group-label", () => ({ id: group, group }))
+  if (!group) {
+    throw new Error("<ComboboxGroupLabel> must be used inside <ComboboxGroup>.")
+  }
+  const label = useHandlePart(combobox, "group-label", () => ({
+    id: group,
+    group,
+  }))
 </script>
 
 <Part tag="div" part={label} {props} />

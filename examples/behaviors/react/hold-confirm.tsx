@@ -9,25 +9,34 @@ export function Example() {
   const log = useLog()
 
   React.useEffect(() => {
-    if (deleted) return
+    if (deleted) {
+      return
+    }
     return bindHold(button.current!, {
       delay: 1500,
       onHold: () => setDeleted(true),
       onEnd: ({ held, canceled }) => {
-        if (!held) log(canceled ? "Canceled" : "Released before it filled")
+        if (!held) {
+          log(canceled ? "Canceled" : "Released before it filled")
+        }
       },
     })
   }, [deleted, log])
 
-  if (deleted)
+  if (deleted) {
     return (
       <div data-slot="row">
         <span>Launch site deleted.</span>
-        <button type="button" data-variant="ghost" onClick={() => setDeleted(false)}>
+        <button
+          type="button"
+          data-variant="ghost"
+          onClick={() => setDeleted(false)}
+        >
           Restore
         </button>
       </div>
     )
+  }
 
   return (
     <div data-slot="stack">

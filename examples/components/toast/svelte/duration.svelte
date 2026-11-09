@@ -1,6 +1,12 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import { Toast, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import {
+    Toast,
+    ToastClose,
+    ToastRegion,
+    ToastTitle,
+    createToaster,
+  } from "@ui-sdk/svelte/toast"
 
   const toast = createToaster()
   onDestroy(() => {
@@ -9,7 +15,9 @@
 </script>
 
 <div data-slot="row">
-  <button onclick={() => toast("Link copied", { duration: 1000 })}>1 Second</button>
+  <button onclick={() => toast("Link copied", { duration: 1000 })}
+    >1 Second</button
+  >
   <button onclick={() => toast("Changes saved")}>5 Seconds</button>
   <button
     onclick={() =>

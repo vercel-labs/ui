@@ -27,7 +27,8 @@ Renders data items. Used by data comboboxes, and available for custom layouts.
     <ComboboxSeparator />
   {:else if "type" in entry && entry.type === "group"}
     <ComboboxGroup>
-      {#if entry.label}<ComboboxGroupLabel>{entry.label}</ComboboxGroupLabel>{/if}
+      {#if entry.label}<ComboboxGroupLabel>{entry.label}</ComboboxGroupLabel
+        >{/if}
       <Self items={entry.items} />
     </ComboboxGroup>
   {:else}

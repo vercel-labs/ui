@@ -4,7 +4,8 @@ import { describe, expect, test } from "vitest"
 import { createSSRApp, h } from "vue"
 import { Button, Separator, Toggle, ToggleGroup } from "../src"
 
-const render = (view: () => ReturnType<typeof h>) => renderToString(createSSRApp(view))
+const render = (view: () => ReturnType<typeof h>) =>
+  renderToString(createSSRApp(view))
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering toggles, buttons and separators", () => {
@@ -14,7 +15,7 @@ describe("server rendering toggles, buttons and separators", () => {
         h(Toggle, { value: "a" }, () => "A"),
         h(Toggle, { value: "b" }, () => "B"),
         h(Toggle, { value: "c" }, () => "C"),
-      ]),
+      ])
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="group"')
@@ -23,14 +24,20 @@ describe("server rendering toggles, buttons and separators", () => {
   })
 
   test("a button renders as a native button that doesn't submit by default", async () => {
-    expect(await render(() => h(Button, null, () => "Save"))).toMatch(/<button[^>]*type="button"/)
-    expect(await render(() => h(Button, { type: "submit" }, () => "Save"))).toMatch(/type="submit"/)
+    expect(await render(() => h(Button, null, () => "Save"))).toMatch(
+      /<button[^>]*type="button"/
+    )
+    expect(
+      await render(() => h(Button, { type: "submit" }, () => "Save"))
+    ).toMatch(/type="submit"/)
   })
 
   test("a separator renders its role and orientation", async () => {
-    expect(await render(() => h(Separator, { orientation: "vertical" }))).toMatch(
-      /role="separator"[^>]*aria-orientation="vertical"/,
+    expect(
+      await render(() => h(Separator, { orientation: "vertical" }))
+    ).toMatch(/role="separator"[^>]*aria-orientation="vertical"/)
+    expect(await render(() => h(Separator, { decorative: true }))).toContain(
+      'role="none"'
     )
-    expect(await render(() => h(Separator, { decorative: true }))).toContain('role="none"')
   })
 })

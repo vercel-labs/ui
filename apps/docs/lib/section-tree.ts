@@ -12,9 +12,13 @@ function sectionTree(section: Section) {
       (node) =>
         node.type === "folder" &&
         (node.index?.url === home ||
-          node.children.some((child) => child.type === "page" && child.url === home)),
+          node.children.some(
+            (child) => child.type === "page" && child.url === home
+          ))
     )
-  if (folder?.type !== "folder") return undefined
+  if (folder?.type !== "folder") {
+    return undefined
+  }
   const tree: Root = {
     name: folder.name,
     children: [...(folder.index ? [folder.index] : []), ...folder.children],
@@ -32,16 +36,21 @@ function frameworkTree(tree: Root, framework: Framework): Root {
         ? {
             ...node,
             name: "Components",
-            children: [...node.children].sort((a, b) => String(a.name).localeCompare(String(b.name))),
+            children: [...node.children].sort((a, b) =>
+              String(a.name).localeCompare(String(b.name))
+            ),
           }
-        : node,
+        : node
     ),
   }
 }
 
 // A section's pages in sidebar order, for search before a query.
 function sectionPages(tree: Root) {
-  return flattenTree(tree.children).map((page) => ({ name: String(page.name), url: page.url }))
+  return flattenTree(tree.children).map((page) => ({
+    name: String(page.name),
+    url: page.url,
+  }))
 }
 
 export { frameworkTree, sectionPages, sectionTree }

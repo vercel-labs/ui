@@ -119,7 +119,9 @@ import { withSource } from "@ui-sdk/web/observe"
 
 saveButton.addEventListener("action", (event) => {
   const { source, waitUntil } = event.detail
-  waitUntil(save().then(() => withSource(source, () => status.api.setValue("Saved"))))
+  waitUntil(
+    save().then(() => withSource(source, () => status.api.setValue("Saved")))
+  )
 })
 ```
 
@@ -205,13 +207,19 @@ Set options as kebab-case attributes or camelCase properties on `<ui-button>`, s
 
 ### Button
 
-<TypeTable path="../../packages/core/src/components/button/button.ts" name="ButtonOptions" />
+<TypeTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonOptions"
+/>
 
 ### State
 
 Web components have no render function. Style the inner element's state attributes and handle your action's Promise to display errors.
 
-<StateTable path="../../packages/core/src/components/button/button.ts" name="ButtonState" />
+<StateTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonState"
+/>
 
 ### Events
 

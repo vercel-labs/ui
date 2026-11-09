@@ -1,4 +1,8 @@
-import { ScrollArea, ScrollAreaContent, ScrollAreaViewport } from "@ui-sdk/solid/scroll-area"
+import {
+  ScrollArea,
+  ScrollAreaContent,
+  ScrollAreaViewport,
+} from "@ui-sdk/solid/scroll-area"
 import { For } from "solid-js"
 
 const messages = [

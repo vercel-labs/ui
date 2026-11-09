@@ -11,7 +11,9 @@ const checkout = definePrimitive({
   api: (context) => ({
     next() {
       const fields = elements<{ value: string }>(context, "field")
-      const empty = fields.find((field) => (field.el as HTMLInputElement).value === "")
+      const empty = fields.find(
+        (field) => (field.el as HTMLInputElement).value === ""
+      )
       empty?.el.focus()
       context.store.set({ missing: empty ? empty.props.value : null })
     },
@@ -50,12 +52,17 @@ function Example() {
         {fields.map(({ value, label, defaultValue }) => (
           <Field key={value}>
             <FieldLabel>{label}</FieldLabel>
-            <FieldControl render={<CheckoutField value={value} />} defaultValue={defaultValue} />
+            <FieldControl
+              render={<CheckoutField value={value} />}
+              defaultValue={defaultValue}
+            />
           </Field>
         ))}
         <CheckoutNext data-variant="solid">
           {({ missing }) =>
-            missing ? `Fill In ${missing[0].toUpperCase()}${missing.slice(1)}` : "Find Empty Field"
+            missing
+              ? `Fill In ${missing[0].toUpperCase()}${missing.slice(1)}`
+              : "Find Empty Field"
           }
         </CheckoutNext>
       </div>
@@ -63,4 +70,11 @@ function Example() {
   )
 }
 
-export { checkout, Checkout, CheckoutField, CheckoutNext, type CheckoutState, Example }
+export {
+  checkout,
+  Checkout,
+  CheckoutField,
+  CheckoutNext,
+  type CheckoutState,
+  Example,
+}

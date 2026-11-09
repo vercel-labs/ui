@@ -13,10 +13,16 @@ const value = ref("")
     <FieldLabel>One-time password</FieldLabel>
     <OTPInput
       v-model:value="value"
-      @value-change="(next, details) => log(`${next || 'Empty'} (${details.reason})`)"
+      @value-change="
+        (next, details) => log(`${next || 'Empty'} (${details.reason})`)
+      "
     >
       <OTPInputGroup>
-        <OTPInputSlot v-for="index in [0, 1, 2, 3, 4, 5]" :key="index" :index="index" />
+        <OTPInputSlot
+          v-for="index in [0, 1, 2, 3, 4, 5]"
+          :key="index"
+          :index="index"
+        />
       </OTPInputGroup>
     </OTPInput>
   </Field>

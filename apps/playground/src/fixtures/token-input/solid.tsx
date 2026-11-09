@@ -24,7 +24,8 @@ import {
 } from "tests/fixtures/token-input.ts"
 
 function Fixture() {
-  const { value, pending, fail, form, otherForm, controlled, ...options } = tokenInputOptions()
+  const { value, pending, fail, form, otherForm, controlled, ...options } =
+    tokenInputOptions()
   const [action, setAction] = createSignal("")
   const [submitted, setSubmitted] = createSignal("")
   const triggers = tokenTriggers()
@@ -62,11 +63,17 @@ function Fixture() {
           <label class="label" id="prompt-label">
             {f.label}
           </label>
-          <TokenInputEditor aria-labelledby="prompt-label" class="editor" placeholder={f.placeholder} />
+          <TokenInputEditor
+            aria-labelledby="prompt-label"
+            class="editor"
+            placeholder={f.placeholder}
+          />
           <TriggerMenu
             triggers={triggers}
             onSelect={(_selected, details) =>
-              pending && details.trigger === "@" ? pendingSelect({ fail }) : undefined
+              pending && details.trigger === "@"
+                ? pendingSelect({ fail })
+                : undefined
             }
           >
             <TriggerMenuHint class="hint" />
@@ -98,7 +105,9 @@ function Fixture() {
           aria-label="Other"
           onSubmit={(event) => {
             event.preventDefault()
-            setSubmitted(`other:${new FormData(event.currentTarget).get(f.name)}`)
+            setSubmitted(
+              `other:${new FormData(event.currentTarget).get(f.name)}`
+            )
           }}
         />
       </Show>

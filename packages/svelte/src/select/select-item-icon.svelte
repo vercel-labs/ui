@@ -18,7 +18,9 @@ flips it in right-to-left text.
   import type { PartProps } from "../use-primitive.svelte"
   import { ItemKey, type ItemContext } from "./context"
 
-  let { ...rest }: PartProps<"span", SelectItemIconState> & SelectItemIconProps = $props()
+  let {
+    ...rest
+  }: PartProps<"span", SelectItemIconState> & SelectItemIconProps = $props()
 
   const select = useHandle(selectPrimitive)
   select.instance.use(selectItemIcons)

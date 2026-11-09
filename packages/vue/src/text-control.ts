@@ -1,5 +1,8 @@
 import type { ChangeDetails } from "@ui-sdk/core"
-import type { InputController, InputValueChangeReason } from "@ui-sdk/core/input"
+import type {
+  InputController,
+  InputValueChangeReason,
+} from "@ui-sdk/core/input"
 import type { PropType } from "vue"
 import type { useFieldControl } from "./field-context"
 import { optionalBoolean, orModel } from "./use-primitive"
@@ -18,7 +21,10 @@ const textProps = {
 const textEmits = {
   "update:value": (_value: string) => true,
   "update:modelValue": (_value: string) => true,
-  valueChange: (_value: string, _details: ChangeDetails<InputValueChangeReason>) => true,
+  valueChange: (
+    _value: string,
+    _details: ChangeDetails<InputValueChangeReason>
+  ) => true,
 }
 
 type TextProps = {
@@ -34,7 +40,11 @@ type TextProps = {
 
 type Emit = ((event: "update:value", value: string) => void) &
   ((event: "update:modelValue", value: string) => void) &
-  ((event: "valueChange", value: string, details: ChangeDetails<InputValueChangeReason>) => void)
+  ((
+    event: "valueChange",
+    value: string,
+    details: ChangeDetails<InputValueChangeReason>
+  ) => void)
 
 // Options for a text field's primitive. The change event runs first, so
 // canceling it also keeps v-model as it was.
@@ -43,9 +53,14 @@ const textOptions = (props: TextProps, emit: Emit) => () => ({
   defaultValue: props.defaultValue,
   controller: props.controller,
   debug: props.debug,
-  onValueChange: (value: string, details: ChangeDetails<InputValueChangeReason>) => {
+  onValueChange: (
+    value: string,
+    details: ChangeDetails<InputValueChangeReason>
+  ) => {
     emit("valueChange", value, details)
-    if (details.canceled) return
+    if (details.canceled) {
+      return
+    }
     emit("update:value", value)
     emit("update:modelValue", value)
   },
@@ -53,8 +68,10 @@ const textOptions = (props: TextProps, emit: Emit) => () => ({
 
 // Whether a control is read-only: the `read-only` prop, or else a native
 // `readonly` attribute, which Vue keeps in `attrs`.
-const readOnlyOf = (props: { readOnly?: boolean }, attrs: Record<string, unknown>) =>
-  props.readOnly ?? (attrs.readonly != null && attrs.readonly !== false)
+const readOnlyOf = (
+  props: { readOnly?: boolean },
+  attrs: Record<string, unknown>
+) => props.readOnly ?? (attrs.readonly != null && attrs.readonly !== false)
 
 // The element's attributes. A controlled value is the DOM property, which Vue
 // sets on every render. A default is the `value` attribute, which is what a
@@ -64,11 +81,15 @@ function elementProps(
   props: TextProps,
   field: ReturnType<typeof useFieldControl>,
   attrs: Record<string, unknown>,
-  tag: "input" | "textarea",
+  tag: "input" | "textarea"
 ) {
   const controlled = orModel(props.value, props.modelValue)
   const value =
-    controlled !== undefined ? { value: controlled } : tag === "input" ? { "^value": props.defaultValue } : {}
+    controlled !== undefined
+      ? { value: controlled }
+      : tag === "input"
+        ? { "^value": props.defaultValue }
+        : {}
   return {
     name: field?.name(),
     ...attrs,

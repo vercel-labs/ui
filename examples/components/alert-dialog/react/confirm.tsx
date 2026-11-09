@@ -17,9 +17,13 @@ function Example() {
   const reset = React.useRef<HTMLButtonElement>(null)
 
   async function remove(name: string, button: HTMLButtonElement) {
-    if (!(await confirm({ name }))) return
+    if (!(await confirm({ name }))) {
+      return
+    }
     const row = button.closest("li")
-    const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+    const next = (
+      row?.nextElementSibling ?? row?.previousElementSibling
+    )?.querySelector("button")
     const target = next ?? reset.current
     target?.focus()
     setProjects((list) => list.filter((project) => project !== name))
@@ -28,7 +32,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <button ref={reset} type="button" onClick={() => setProjects(["Acme", "Globex", "Initech"])}>
+        <button
+          ref={reset}
+          type="button"
+          onClick={() => setProjects(["Acme", "Globex", "Initech"])}
+        >
           Reset Projects
         </button>
       </div>
@@ -46,7 +54,9 @@ function Example() {
             </button>
           </li>
         ))}
-        {projects.length === 0 && <li data-slot="row">All projects deleted.</li>}
+        {projects.length === 0 && (
+          <li data-slot="row">All projects deleted.</li>
+        )}
       </ul>
       <AlertDialog controller={confirm.controller}>
         <AlertDialogBackdrop />
@@ -56,9 +66,12 @@ function Example() {
           {(state) => (
             <>
               <div data-slot="stack">
-                <AlertDialogTitle>Delete {state.payload?.name}?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  Delete {state.payload?.name}?
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  The project and its files will be deleted for everyone on your team.
+                  The project and its files will be deleted for everyone on your
+                  team.
                 </AlertDialogDescription>
               </div>
               <div data-slot="row">

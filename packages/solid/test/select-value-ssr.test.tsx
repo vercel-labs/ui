@@ -1,7 +1,12 @@
 import { renderToString } from "@solidjs/web"
 import type { ComponentProps } from "solid-js"
 import { expect, test } from "vitest"
-import { createSelectController, Select, SelectTrigger, SelectValue } from "../src/select"
+import {
+  createSelectController,
+  Select,
+  SelectTrigger,
+  SelectValue,
+} from "../src/select"
 
 function outsideValue(props: ComponentProps<typeof SelectValue>) {
   const controller = createSelectController<string>()
@@ -16,13 +21,17 @@ function outsideValue(props: ComponentProps<typeof SelectValue>) {
 }
 
 test("an external value class callback receives an empty label on the server", () => {
-  const html = outsideValue({ class: (state) => `value-${state.label.toLowerCase()}` })
+  const html = outsideValue({
+    class: (state) => `value-${state.label.toLowerCase()}`,
+  })
   expect(html).toContain('class="value-"')
   expect(html).toContain("Pick")
 })
 
 test("an external value style callback receives an empty labels list on the server", () => {
-  const html = outsideValue({ style: (state) => ({ "--labels": state.labels.length }) })
+  const html = outsideValue({
+    style: (state) => ({ "--labels": state.labels.length }),
+  })
   expect(html).toContain("--labels:0")
   expect(html).toContain("Pick")
 })
@@ -45,7 +54,9 @@ test("an external value render callback receives placeholder state on the server
 })
 
 test("an external value keeps its children callback on the server", () => {
-  const html = outsideValue({ children: (state) => `Choices: ${state.labels.length}` })
+  const html = outsideValue({
+    children: (state) => `Choices: ${state.labels.length}`,
+  })
   expect(html).toContain("Choices: 0")
   expect(html).not.toContain("Pick")
 })
@@ -57,7 +68,9 @@ test("an internal value renders callbacks with its selected state on the server"
         <SelectValue
           class={(state) => state.label.toLowerCase()}
           style={(state) => ({ "--labels": state.labels.length })}
-          render={(props, state) => <span {...props} data-placeholder={String(state.placeholder)} />}
+          render={(props, state) => (
+            <span {...props} data-placeholder={String(state.placeholder)} />
+          )}
         >
           {(state) => state.label}
         </SelectValue>

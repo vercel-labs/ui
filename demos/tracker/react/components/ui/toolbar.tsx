@@ -10,16 +10,28 @@ import type { ComponentProps } from "react"
 function Toolbar({
   className,
   ...props
-}: Omit<ComponentProps<typeof ToolbarPrimitive>, "className"> & { className?: string }) {
-  return <ToolbarPrimitive className={cn("flex items-center gap-2", className)} {...props} />
+}: Omit<ComponentProps<typeof ToolbarPrimitive>, "className"> & {
+  className?: string
+}) {
+  return (
+    <ToolbarPrimitive
+      className={cn("flex items-center gap-2", className)}
+      {...props}
+    />
+  )
 }
 
 function ToolbarSeparator({
   className,
   ...props
-}: Omit<ComponentProps<typeof ToolbarSeparatorPrimitive>, "className"> & { className?: string }) {
+}: Omit<ComponentProps<typeof ToolbarSeparatorPrimitive>, "className"> & {
+  className?: string
+}) {
   return (
-    <ToolbarSeparatorPrimitive className={cn("mx-1 h-5 w-px shrink-0 bg-border", className)} {...props} />
+    <ToolbarSeparatorPrimitive
+      className={cn("mx-1 h-5 w-px shrink-0 bg-border", className)}
+      {...props}
+    />
   )
 }
 

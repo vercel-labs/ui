@@ -17,7 +17,11 @@ function Example() {
   const log = useLog()
 
   return (
-    <Menu onCheckedChange={(checked, details) => log(`${details.value} ${checked ? "on" : "off"}`)}>
+    <Menu
+      onCheckedChange={(checked, details) =>
+        log(`${details.value} ${checked ? "on" : "off"}`)
+      }
+    >
       <MenuTrigger>View</MenuTrigger>
       <MenuContent>
         <MenuGroup>

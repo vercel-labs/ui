@@ -9,13 +9,17 @@
     class: className,
     children,
     ...rest
-  }: ComponentProps<typeof MenuRadioItem> & { class?: string; children?: Snippet } =
-    $props()
+  }: ComponentProps<typeof MenuRadioItem> & {
+    class?: string
+    children?: Snippet
+  } = $props()
 </script>
 
 <MenuRadioItem class={cn(item, "pe-8", className)} {...rest}>
   {@render children?.()}
-  <MenuItemIndicator class="absolute end-2 flex size-4 items-center justify-center">
+  <MenuItemIndicator
+    class="absolute end-2 flex size-4 items-center justify-center"
+  >
     <Check class="size-4" />
   </MenuItemIndicator>
 </MenuRadioItem>

@@ -7,10 +7,13 @@
     href,
     children,
     ...rest
-  }: { href?: string; children?: Snippet; [attribute: string]: unknown } = $props()
+  }: { href?: string; children?: Snippet; [attribute: string]: unknown } =
+    $props()
 
   function navigate(event: MouseEvent) {
-    if (event.defaultPrevented) return
+    if (event.defaultPrevented) {
+      return
+    }
     event.preventDefault()
     history.pushState(null, "", href)
   }

@@ -1,7 +1,11 @@
 "use client"
 
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/react/listbox"
 import { CheckIcon } from "lucide-react"
 
 const topics = [
@@ -26,7 +30,9 @@ function Example() {
           </ListboxItem>
         ))}
       </Listbox>
-      <FieldDescription>Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription>
+      <FieldDescription>
+        Hold Shift to select a range, or Ctrl or ⌘ to add one.
+      </FieldDescription>
     </Field>
   )
 }

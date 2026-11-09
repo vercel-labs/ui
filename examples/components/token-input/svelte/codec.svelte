@@ -1,6 +1,12 @@
 <script lang="ts">
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
-  import { fromText, toText, TokenInput, TokenInputEditor, type TokenCodec } from "@ui-sdk/svelte/token-input"
+  import {
+    fromText,
+    toText,
+    TokenInput,
+    TokenInputEditor,
+    type TokenCodec,
+  } from "@ui-sdk/svelte/token-input"
   import { useLog } from "../../../shared/svelte/log"
 
   const chat: TokenCodec = {
@@ -19,7 +25,12 @@
 
 <Field>
   <FieldLabel>Message</FieldLabel>
-  <TokenInput codec={chat} copy="label" defaultValue={draft} onValueChange={(value) => log(toText(value, chat))}>
+  <TokenInput
+    codec={chat}
+    copy="label"
+    defaultValue={draft}
+    onValueChange={(value) => log(toText(value, chat))}
+  >
     <TokenInputEditor />
   </TokenInput>
 </Field>

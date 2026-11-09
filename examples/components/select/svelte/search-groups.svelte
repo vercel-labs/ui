@@ -52,7 +52,10 @@
       <ChevronDownIcon />
     </SelectTrigger>
     <SelectContent>
-      <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+      <SelectInput
+        aria-label="Search countries"
+        placeholder="Search countries…"
+      />
       <SelectEmpty>No countries found.</SelectEmpty>
       <SelectList>
         {#each regions as group (group.label)}

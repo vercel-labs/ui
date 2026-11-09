@@ -27,14 +27,26 @@ const movieTitles = [
   "Arrival",
 ]
 
-function searchMoviePages(query: string, { signal, page }: { signal: AbortSignal; page: number }) {
-  return new Promise<{ items: { value: string; label: string }[]; hasMore: boolean }>((resolve, reject) => {
+function searchMoviePages(
+  query: string,
+  { signal, page }: { signal: AbortSignal; page: number }
+) {
+  return new Promise<{
+    items: { value: string; label: string }[]
+    hasMore: boolean
+  }>((resolve, reject) => {
     const timer = setTimeout(() => {
       const needle = query.trim().toLowerCase()
       const found = movieTitles
         .filter((title) => title.toLowerCase().includes(needle))
-        .map((title) => ({ value: title.toLowerCase().replace(/\W+/g, "-"), label: title }))
-      resolve({ items: found.slice(page * 5, page * 5 + 5), hasMore: found.length > page * 5 + 5 })
+        .map((title) => ({
+          value: title.toLowerCase().replace(/\W+/g, "-"),
+          label: title,
+        }))
+      resolve({
+        items: found.slice(page * 5, page * 5 + 5),
+        hasMore: found.length > page * 5 + 5,
+      })
     }, 500)
     signal.addEventListener("abort", () => {
       clearTimeout(timer)
@@ -77,11 +89,17 @@ function mount(root: HTMLElement) {
     combobox.items = items
     combobox.setAttribute("status", loading)
     status.textContent =
-      loading === "loading" ? "Loading more…" : hasMore ? `${items.length} loaded` : `All ${items.length}`
+      loading === "loading"
+        ? "Loading more…"
+        : hasMore
+          ? `${items.length} loaded`
+          : `All ${items.length}`
   }
   movies.subscribe(update)
   update()
-  combobox.addEventListener("querychange", (event) => movies.setQuery(event.detail.value))
+  combobox.addEventListener("querychange", (event) =>
+    movies.setQuery(event.detail.value)
+  )
   combobox.addEventListener("loadmore", () => movies.loadMore())
 }
 

@@ -46,7 +46,10 @@ function searchMovies(query: string, { signal }: { signal: AbortSignal }) {
       resolve(
         movieTitles
           .filter((title) => title.toLowerCase().includes(needle))
-          .map((title) => ({ value: title.toLowerCase().replace(/\W+/g, "-"), label: title })),
+          .map((title) => ({
+            value: title.toLowerCase().replace(/\W+/g, "-"),
+            label: title,
+          }))
       )
     }, 500)
     signal.addEventListener("abort", () => {
@@ -91,11 +94,17 @@ const { state: movies, setQuery } = useAsyncOptions(searchMovies, {
         }}
       </ComboboxStatus>
       <ComboboxEmpty v-slot="{ state }">
-        <template v-if="state.empty && !state.loading">No movies match “{{ state.query }}”.</template>
+        <template v-if="state.empty && !state.loading"
+          >No movies match “{{ state.query }}”.</template
+        >
       </ComboboxEmpty>
       <ComboboxList v-slot="{ state }">
         <ComboboxItem
-          v-for="item in state.items as { value: string; label: string; disabled?: boolean }[]"
+          v-for="item in state.items as {
+            value: string
+            label: string
+            disabled?: boolean
+          }[]"
           :key="item.value"
           :value="item.value"
           :label="item.label"

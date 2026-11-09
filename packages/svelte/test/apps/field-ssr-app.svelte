@@ -3,7 +3,8 @@
   import { Input } from "../../src/input"
   import { Select, SelectTrigger } from "../../src/select"
 
-  let { order, kind }: { order: "before" | "after"; kind: "input" | "select" } = $props()
+  let { order, kind }: { order: "before" | "after"; kind: "input" | "select" } =
+    $props()
 </script>
 
 <Field>

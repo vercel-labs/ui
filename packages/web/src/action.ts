@@ -19,11 +19,12 @@ function waitList() {
   const waiting: unknown[] = []
   let dispatching = true
   const waitUntil = (promise: unknown) => {
-    if (!dispatching)
+    if (!dispatching) {
       throw new DOMException(
         "waitUntil() can only be called while the event dispatches.",
-        "InvalidStateError",
+        "InvalidStateError"
       )
+    }
     waiting.push(promise)
   }
   const done = () => {
@@ -36,18 +37,21 @@ function waitList() {
 // The action a part runs when pressed: it fires `action` on `el` with the
 // press's details, and returns what its listeners wait for, if anything. A
 // listener that cancels it cancels what the part does next, like closing its dialog.
-const actionOf = (el: HTMLElement) => (_event: Event | undefined, details: ActionDetails) => {
-  const { waitUntil, done } = waitList()
-  const proceed = el.dispatchEvent(
-    new CustomEvent<UiActionDetail>("action", {
-      cancelable: true,
-      composed: true,
-      detail: { ...details, waitUntil },
-    }),
-  )
-  const waiting = done()
-  if (!proceed) return canceledAction
-  return waiting.length ? Promise.all(waiting) : undefined
-}
+const actionOf =
+  (el: HTMLElement) => (_event: Event | undefined, details: ActionDetails) => {
+    const { waitUntil, done } = waitList()
+    const proceed = el.dispatchEvent(
+      new CustomEvent<UiActionDetail>("action", {
+        cancelable: true,
+        composed: true,
+        detail: { ...details, waitUntil },
+      })
+    )
+    const waiting = done()
+    if (!proceed) {
+      return canceledAction
+    }
+    return waiting.length ? Promise.all(waiting) : undefined
+  }
 
 export { actionOf, type UiActionDetail, waitList }

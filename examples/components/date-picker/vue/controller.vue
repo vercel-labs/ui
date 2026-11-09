@@ -23,7 +23,9 @@ const controller = createDatePickerController()
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <button type="button" @click="controller.setValue('2026-12-25')">Choose Christmas</button>
+      <button type="button" @click="controller.setValue('2026-12-25')">
+        Choose Christmas
+      </button>
       <button type="button" @click="controller.open()">Open</button>
     </div>
     <DatePicker :controller="controller" default-value="2026-10-16">

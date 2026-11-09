@@ -26,7 +26,8 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => (value = "editor")}>Make Editor</button>
+    <button type="button" onclick={() => (value = "editor")}>Make Editor</button
+    >
     <button type="button" onclick={() => (open = true)}>Open</button>
   </div>
   <Field>

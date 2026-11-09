@@ -85,22 +85,26 @@ import { publicEntries, publicExports } from "./public-exports.mjs"
 
 // Paths exports-at-end leaves alone, each with why. A key ending in / covers the folder.
 const exportsAtEndSkips = {
-  "examples/": "Docs examples are snippets to copy, each exporting one Example where it's declared.",
+  "examples/":
+    "Docs examples are snippets to copy, each exporting one Example where it's declared.",
   "apps/docs/app/":
     "Next.js reads route config like `dynamic` only from an `export const` where it's declared.",
-  "apps/docs/proxy.ts": "Next.js reads the proxy's `config` only from an `export const` where it's declared.",
+  "apps/docs/proxy.ts":
+    "Next.js reads the proxy's `config` only from an `export const` where it's declared.",
 }
 const exportsAtEndCovers = ["examples/experiments/", "examples/scripts/"]
 
 // Files under packages/ that may call a popup's open and close steps, each with why.
 const popupStepsAllowlist = {
   "packages/core/src/foundation/popups/popup.ts": "Defines them.",
-  "packages/core/src/foundation/popups/popup-steps.ts": "Runs them in order for every popup component.",
+  "packages/core/src/foundation/popups/popup-steps.ts":
+    "Runs them in order for every popup component.",
 }
 
 // Files under packages/ that may follow a pointer with `bindDrag` directly, each with why.
 const dragSessionAllowlist = {
-  "packages/core/src/foundation/drag-and-drop/pointer.ts": "Defines it, and the session on it.",
+  "packages/core/src/foundation/drag-and-drop/pointer.ts":
+    "Defines it, and the session on it.",
   "packages/core/src/components/resizable/resizable-dom.ts":
     "One press can drag two handles where they meet, one along each axis.",
 }
@@ -111,15 +115,20 @@ const importLayersAllowlist = {
     "A pending action loads the announcer when it first needs it, and a part that can be hidden writes the rule that keeps it hidden.",
   "components/date-input -> components/calendar":
     "Date Input matches unavailable dates the way Calendar does.",
-  "components/date-picker -> components/calendar": "Date Picker is a field over Calendar.",
+  "components/date-picker -> components/calendar":
+    "Date Picker is a field over Calendar.",
   "components/drawer -> components/dialog": "Drawer is a dialog with a sheet.",
-  "components/rating -> components/radio": "Rating is a radio group with a radio per star.",
+  "components/rating -> components/radio":
+    "Rating is a radio group with a radio per star.",
   "components/segmented-control -> components/radio":
     "Segmented Control is a radio group with a sliding indicator.",
-  "components/menu -> components/menubar": "A menu inside a menubar hands focus across.",
+  "components/menu -> components/menubar":
+    "A menu inside a menubar hands focus across.",
   "components/menubar -> components/menu": "Menubar's menus are Menus.",
-  "components/dialog -> page/overlays": "`confirm()` renders through the overlay host.",
-  "components/toast -> page/overlays": "`toast()` renders through the overlay host.",
+  "components/dialog -> page/overlays":
+    "`confirm()` renders through the overlay host.",
+  "components/toast -> page/overlays":
+    "`toast()` renders through the overlay host.",
 }
 
 // Core's public functions that public-names lets through, each with why.
@@ -133,7 +142,8 @@ const publicNameAllowlist = {
   dispatch: "An action that runs a callback and says whether it was canceled.",
   animateIn: "An action that animates an element, and returns what stops it.",
   animateOut: "An action that animates an element, and returns what stops it.",
-  partPresent: "Reads a part in `@ui-sdk/core/testing`, named like `partAttrs` and `partState`.",
+  partPresent:
+    "Reads a part in `@ui-sdk/core/testing`, named like `partAttrs` and `partState`.",
 }
 // The page-wide registries `register*` may name.
 const registries = ["registerShortcut", "registerTools"]
@@ -143,12 +153,16 @@ const renderers = ["react", "vue", "solid", "svelte", "web"]
 
 // Renderer entries whose component lives in a core entry of another name, each with why.
 const coreEntryOf = {
-  textarea: { entry: "input", why: "Textarea's primitive is in core's input entry." },
+  textarea: {
+    entry: "input",
+    why: "Textarea's primitive is in core's input entry.",
+  },
 }
 
 const root = path.resolve(import.meta.dirname, "..")
 const allowReturnType = /\/\/\s*check-code: allow return-type\b(.*)/
-const svelteScript = /<script\b[^>]*\blang=["']ts["'][^>]*>([\s\S]*?)<\/script>/g
+const svelteScript =
+  /<script\b[^>]*\blang=["']ts["'][^>]*>([\s\S]*?)<\/script>/g
 const popupStep = /\bpopup\??\.(opening|returnFocus)\(/
 const svelteComponentDoc = /^<!--\s*@component\b/m
 const svelteComponentComment = /^<!--\s*@component\b[\s\S]*?-->/m
@@ -178,10 +192,16 @@ checkApiFiles()
 checkInternalExports()
 checkEntryTypes()
 
-for (const allowance of allowances) console.log(allowance)
+for (const allowance of allowances) {
+  console.log(allowance)
+}
 if (violations.length) {
   console.error(
-    violations.map(({ file, line, rule, message }) => `${file}:${line} ${rule} ${message}`).join("\n"),
+    violations
+      .map(
+        ({ file, line, rule, message }) => `${file}:${line} ${rule} ${message}`
+      )
+      .join("\n")
   )
   process.exitCode = 1
 }
@@ -192,28 +212,46 @@ function checkReturnTypes() {
     const kind = file.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS
     const blocks = typeScriptBlocks(file, text).map((block) => ({
       ...block,
-      sourceFile: ts.createSourceFile(file, block.code, ts.ScriptTarget.Latest, true, kind),
+      sourceFile: ts.createSourceFile(
+        file,
+        block.code,
+        ts.ScriptTarget.Latest,
+        true,
+        kind
+      ),
     }))
     return { file, text, blocks }
   })
   // Functions a primitive's `state` names, in any file: `state: initialSelectState`,
   // or `state: (options) => toggleState(options)`.
   const stateNames = new Set()
-  for (const { blocks } of sources) for (const { sourceFile } of blocks) collectStateNames(sourceFile)
+  for (const { blocks } of sources) {
+    for (const { sourceFile } of blocks) {
+      collectStateNames(sourceFile)
+    }
+  }
 
   function collectStateNames(node) {
     if (isStateProperty(node)) {
       const value = node.initializer
       const called =
-        ts.isArrowFunction(value) && ts.isCallExpression(value.body) ? value.body.expression : value
-      if (ts.isIdentifier(called)) stateNames.add(called.text)
+        ts.isArrowFunction(value) && ts.isCallExpression(value.body)
+          ? value.body.expression
+          : value
+      if (ts.isIdentifier(called)) {
+        stateNames.add(called.text)
+      }
     }
     ts.forEachChild(node, collectStateNames)
   }
 
   function isStateFunction(node) {
-    if (isStateProperty(node.parent) && node.parent.initializer === node) return true
-    if (ts.isFunctionDeclaration(node)) return !!node.name && stateNames.has(node.name.text)
+    if (isStateProperty(node.parent) && node.parent.initializer === node) {
+      return true
+    }
+    if (ts.isFunctionDeclaration(node)) {
+      return !!node.name && stateNames.has(node.name.text)
+    }
     const declaration = node.parent
     return (
       ts.isVariableDeclaration(declaration) &&
@@ -228,7 +266,8 @@ function checkReturnTypes() {
     // Each annotation as [start, end] in the file, from its colon to the end of the type.
     const annotations = []
     for (const { code, start, lineOffset, sourceFile } of blocks) {
-      const lineOf = (position) => sourceFile.getLineAndCharacterOfPosition(position).line + lineOffset
+      const lineOf = (position) =>
+        sourceFile.getLineAndCharacterOfPosition(position).line + lineOffset
       visit(sourceFile)
 
       function visit(node) {
@@ -243,7 +282,9 @@ function checkReturnTypes() {
           const allow = lines[startLine - 1]?.match(allowReturnType)
           const reason = allow?.[1].trim()
           if (reason) {
-            allowances.push(`${relative}:${startLine + 1} allowed return-type: ${reason}`)
+            allowances.push(
+              `${relative}:${startLine + 1} allowed return-type: ${reason}`
+            )
           } else if (shouldFix && !allow) {
             annotations.push([
               start + code.lastIndexOf(":", node.type.getStart(sourceFile)),
@@ -266,7 +307,7 @@ function checkReturnTypes() {
     if (annotations.length) {
       const fixed = annotations.reduceRight(
         (result, [start, end]) => result.slice(0, start) + result.slice(end),
-        text,
+        text
       )
       writeFileSync(file, fixed)
     }
@@ -274,28 +315,46 @@ function checkReturnTypes() {
 }
 
 function isStateProperty(node) {
-  return !!node && ts.isPropertyAssignment(node) && ts.isIdentifier(node.name) && node.name.text === "state"
+  return (
+    !!node &&
+    ts.isPropertyAssignment(node) &&
+    ts.isIdentifier(node.name) &&
+    node.name.text === "state"
+  )
 }
 
 // The TypeScript in a file, with its offset and the zero-based line it starts on.
 function typeScriptBlocks(file, text) {
-  if (!file.endsWith(".svelte")) return [{ code: text, start: 0, lineOffset: 0 }]
+  if (!file.endsWith(".svelte")) {
+    return [{ code: text, start: 0, lineOffset: 0 }]
+  }
   return [...text.matchAll(svelteScript)].map((match) => {
     const start = match.index + match[0].indexOf(">") + 1
-    return { code: match[1], start, lineOffset: text.slice(0, start).split("\n").length - 1 }
+    return {
+      code: match[1],
+      start,
+      lineOffset: text.slice(0, start).split("\n").length - 1,
+    }
   })
 }
 
 // Every .ts, .tsx and .svelte file under each package's src, without .d.ts.
 function packageSources() {
   const packagesDir = path.join(root, "packages")
-  const packages = readdirSync(packagesDir, { withFileTypes: true }).filter((entry) => entry.isDirectory())
+  const packages = readdirSync(packagesDir, { withFileTypes: true }).filter(
+    (entry) => entry.isDirectory()
+  )
   return packages.flatMap(({ name }) => {
     const src = path.join(packagesDir, name, "src")
-    if (!existsSync(src)) return []
+    if (!existsSync(src)) {
+      return []
+    }
     return readdirSync(src, { recursive: true, withFileTypes: true })
       .filter(
-        (entry) => entry.isFile() && /\.(tsx?|svelte)$/.test(entry.name) && !entry.name.endsWith(".d.ts"),
+        (entry) =>
+          entry.isFile() &&
+          /\.(tsx?|svelte)$/.test(entry.name) &&
+          !entry.name.endsWith(".d.ts")
       )
       .map((entry) => path.join(entry.parentPath, entry.name))
   })
@@ -304,12 +363,16 @@ function packageSources() {
 function checkPopupSteps() {
   for (const file of packageSources()) {
     const relative = path.relative(root, file)
-    if (relative in popupStepsAllowlist) continue
+    if (relative in popupStepsAllowlist) {
+      continue
+    }
     readFileSync(file, "utf8")
       .split("\n")
       .forEach((text, index) => {
         const step = text.match(popupStep)?.[1]
-        if (!step) return
+        if (!step) {
+          return
+        }
         violations.push({
           file: relative,
           line: index + 1,
@@ -323,16 +386,21 @@ function checkPopupSteps() {
 function checkDragSession() {
   for (const file of packageSources()) {
     const relative = path.relative(root, file)
-    if (relative in dragSessionAllowlist) continue
+    if (relative in dragSessionAllowlist) {
+      continue
+    }
     readFileSync(file, "utf8")
       .split("\n")
       .forEach((text, index) => {
-        if (!/\bbindDrag\(/.test(text)) return
+        if (!/\bbindDrag\(/.test(text)) {
+          return
+        }
         violations.push({
           file: relative,
           line: index + 1,
           rule: "drag-session",
-          message: "drag through `createDragSession` instead of calling `bindDrag` yourself.",
+          message:
+            "drag through `createDragSession` instead of calling `bindDrag` yourself.",
         })
       })
   }
@@ -344,16 +412,24 @@ function* attrsBodies(text) {
     const arrow = text.indexOf("=>", match.index)
     if (
       arrow < 0 ||
-      !/^\s*(?:\w+|\((?:[^()]|\([^()]*\))*\))\s*$/.test(text.slice(match.index + match[0].length, arrow))
-    )
+      !/^\s*(?:\w+|\((?:[^()]|\([^()]*\))*\))\s*$/.test(
+        text.slice(match.index + match[0].length, arrow)
+      )
+    ) {
       continue
+    }
     const open = text.indexOf("{", arrow)
-    if (open < 0) continue
+    if (open < 0) {
+      continue
+    }
     let depth = 0
     let end = open
     for (; end < text.length; end++) {
-      if (text[end] === "{") depth++
-      else if (text[end] === "}" && --depth === 0) break
+      if (text[end] === "{") {
+        depth++
+      } else if (text[end] === "}" && --depth === 0) {
+        break
+      }
     }
     yield { start: open, body: text.slice(open, end) }
   }
@@ -362,10 +438,12 @@ function* attrsBodies(text) {
 function checkSlotRoles() {
   for (const file of packageSources()) {
     const relative = path.relative(root, file)
-    if (!relative.startsWith("packages/core/src/")) continue
+    if (!relative.startsWith("packages/core/src/")) {
+      continue
+    }
     const text = readFileSync(file, "utf8")
-    for (const { start, body } of attrsBodies(text))
-      for (const role of body.matchAll(/\brole:\s/g))
+    for (const { start, body } of attrsBodies(text)) {
+      for (const role of body.matchAll(/\brole:\s/g)) {
         violations.push({
           file: relative,
           line: text.slice(0, start + role.index).split("\n").length,
@@ -373,13 +451,16 @@ function checkSlotRoles() {
           message:
             'declare the role on the slot, `role: "…"`, instead of in `attrs`, so core checks what it needs.',
         })
+      }
+    }
   }
 }
 
 function checkImportLayers() {
   const src = path.join(root, "packages/core/src")
   // `foundation/focus`, `components/dialog`, `page/shortcuts`, or "" for the package's entry.
-  const folderOf = (module) => (module.includes("/") ? module.split("/").slice(0, 2).join("/") : "")
+  const folderOf = (module) =>
+    module.includes("/") ? module.split("/").slice(0, 2).join("/") : ""
   const tierOf = (folder) =>
     folder === "foundation/kernel"
       ? "kernel"
@@ -389,10 +470,18 @@ function checkImportLayers() {
   const allowed = (from, to) => {
     const tier = tierOf(from)
     const target = tierOf(to)
-    if (tier === "kernel") return false
-    if (tier === "platform") return target === "kernel"
-    if (tier === "foundation") return target !== "components" && target !== "page"
-    if (tier === "components") return target !== "components" && target !== "page"
+    if (tier === "kernel") {
+      return false
+    }
+    if (tier === "platform") {
+      return target === "kernel"
+    }
+    if (tier === "foundation") {
+      return target !== "components" && target !== "page"
+    }
+    if (tier === "components") {
+      return target !== "components" && target !== "page"
+    }
     return true
   }
   // What each foundation folder lets other folders import, from its index.
@@ -401,9 +490,15 @@ function checkImportLayers() {
     if (!listed.has(folder)) {
       const file = path.join(src, folder, "index.ts")
       const names = new Set()
-      if (existsSync(file))
-        for (const [, list] of readFileSync(file, "utf8").matchAll(/export\s*(?:type\s*)?\{([^}]*)\}/g))
-          for (const name of list.split(",")) names.add(name.trim().replace(/^type\s+/, ""))
+      if (existsSync(file)) {
+        for (const [, list] of readFileSync(file, "utf8").matchAll(
+          /export\s*(?:type\s*)?\{([^}]*)\}/g
+        )) {
+          for (const name of list.split(",")) {
+            names.add(name.trim().replace(/^type\s+/, ""))
+          }
+        }
+      }
       listed.set(folder, names)
     }
     return listed.get(folder)
@@ -411,16 +506,24 @@ function checkImportLayers() {
   const statement =
     /^(?:import|export)\b((?:(?!^(?:import|export)\b)[^"])*?)\bfrom\s*"(\.[^"]+)"|import\(\s*"(\.[^"]+)"\s*\)/gms
   for (const file of packageSources()) {
-    if (!file.startsWith(`${src}/`)) continue
+    if (!file.startsWith(`${src}/`)) {
+      continue
+    }
     const module = path.relative(src, file).replace(/\.tsx?$/, "")
     const from = folderOf(module)
-    if (!from) continue
+    if (!from) {
+      continue
+    }
     const text = readFileSync(file, "utf8")
     for (const match of text.matchAll(statement)) {
       const specifier = match[2] ?? match[3]
-      const target = path.relative(src, path.resolve(path.dirname(file), specifier)).replace(/\.tsx?$/, "")
+      const target = path
+        .relative(src, path.resolve(path.dirname(file), specifier))
+        .replace(/\.tsx?$/, "")
       const to = folderOf(target)
-      if (!to || to === from) continue
+      if (!to || to === from) {
+        continue
+      }
       const report = (message) =>
         violations.push({
           file: path.relative(root, file),
@@ -428,13 +531,20 @@ function checkImportLayers() {
           rule: "import-layers",
           message,
         })
-      if (!allowed(from, to) && !(`${from} -> ${to}` in importLayersAllowlist)) {
+      if (
+        !allowed(from, to) &&
+        !(`${from} -> ${to}` in importLayersAllowlist)
+      ) {
         report(`${from} sits below ${to}, so it can't import it.`)
         continue
       }
-      if (!to.startsWith("foundation/") || match[3]) continue
+      if (!to.startsWith("foundation/") || match[3]) {
+        continue
+      }
       if (target === to || target === `${to}/index`) {
-        report(`import from the file in ${to}, not its index, so bundles keep their lazy chunks.`)
+        report(
+          `import from the file in ${to}, not its index, so bundles keep their lazy chunks.`
+        )
         continue
       }
       const names = (match[1].match(/\{([^}]*)\}/)?.[1] ?? "")
@@ -444,13 +554,14 @@ function checkImportLayers() {
             name
               .trim()
               .replace(/^type\s+/, "")
-              .split(/\s+as\s+/)[0],
+              .split(/\s+as\s+/)[0]
         )
         .filter(Boolean)
-      for (const name of names.filter((name) => !listOf(to).has(name)))
+      for (const name of names.filter((name) => !listOf(to).has(name))) {
         report(
-          `\`${name}\` isn't in ${to}/index.ts, so other folders can't import it. Add it there if it's meant to be shared.`,
+          `\`${name}\` isn't in ${to}/index.ts, so other folders can't import it. Add it there if it's meant to be shared.`
         )
+      }
     }
   }
 }
@@ -458,51 +569,74 @@ function checkImportLayers() {
 function checkExportsAtEnd() {
   const skipped = (file) =>
     !exportsAtEndCovers.some((prefix) => file.startsWith(prefix)) &&
-    Object.keys(exportsAtEndSkips).some((key) => (key.endsWith("/") ? file.startsWith(key) : file === key))
-  const files = execFileSync("git", ["ls-files", "--cached", "--others", "--exclude-standard", "-z"], {
-    cwd: root,
-    encoding: "utf8",
-    maxBuffer: 64 * 1024 * 1024,
-  })
+    Object.keys(exportsAtEndSkips).some((key) =>
+      key.endsWith("/") ? file.startsWith(key) : file === key
+    )
+  const files = execFileSync(
+    "git",
+    ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+    {
+      cwd: root,
+      encoding: "utf8",
+      maxBuffer: 64 * 1024 * 1024,
+    }
+  )
     .split("\0")
-    .filter((file) => /\.(tsx?|m?js)$/.test(file) && !file.endsWith(".d.ts") && !skipped(file))
+    .filter(
+      (file) =>
+        /\.(tsx?|m?js)$/.test(file) && !file.endsWith(".d.ts") && !skipped(file)
+    )
   for (const file of files) {
     const absolute = path.join(root, file)
-    if (!existsSync(absolute)) continue
+    if (!existsSync(absolute)) {
+      continue
+    }
     const text = readFileSync(absolute, "utf8")
-    if (!/^export\b/m.test(text)) continue
+    if (!/^export\b/m.test(text)) {
+      continue
+    }
     const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true)
-    const line = (node) => source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1
-    const isList = (statement) => ts.isExportDeclaration(statement) || ts.isExportAssignment(statement)
+    const line = (node) =>
+      source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1
+    const isList = (statement) =>
+      ts.isExportDeclaration(statement) || ts.isExportAssignment(statement)
     let body = -1
     source.statements.forEach((statement, index) => {
-      if (!isList(statement)) body = index
+      if (!isList(statement)) {
+        body = index
+      }
     })
     source.statements.forEach((statement, index) => {
       const exported = ts.canHaveModifiers(statement)
-        ? ts.getModifiers(statement)?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)
+        ? ts
+            .getModifiers(statement)
+            ?.some((modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword)
         : false
-      if (exported)
+      if (exported) {
         violations.push({
           file,
           line: line(statement),
           rule: "exports-at-end",
-          message: "declare it without `export` and add it to the `export { }` list at the end of the file.",
+          message:
+            "declare it without `export` and add it to the `export { }` list at the end of the file.",
         })
-      else if (isList(statement) && index < body)
+      } else if (isList(statement) && index < body) {
         violations.push({
           file,
           line: line(statement),
           rule: "exports-at-end",
           message: "move it to the end of the file, with the other exports.",
         })
+      }
     })
   }
 }
 
 function checkPublicDocs() {
   for (const { name, declaration, file } of surface.declarations) {
-    if (ts.getJSDocCommentsAndTags(declaration).length) continue
+    if (ts.getJSDocCommentsAndTags(declaration).length) {
+      continue
+    }
     violations.push({
       file: path.relative(root, file),
       line: lineOf(declaration),
@@ -511,7 +645,9 @@ function checkPublicDocs() {
     })
   }
   for (const { name, file, text } of surface.svelteComponents) {
-    if (svelteComponentDoc.test(text)) continue
+    if (svelteComponentDoc.test(text)) {
+      continue
+    }
     violations.push({
       file: path.relative(root, file),
       line: 1,
@@ -530,28 +666,44 @@ function checkNameOnlyDocs() {
     ts.isGetAccessor(node) ||
     ts.isPropertyAssignment(node)
   const isOwner = (node) =>
-    ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node) || ts.isClassDeclaration(node)
+    ts.isInterfaceDeclaration(node) ||
+    ts.isTypeAliasDeclaration(node) ||
+    ts.isClassDeclaration(node)
   for (const file of packageSources()) {
     const text = readFileSync(file, "utf8")
     for (const { code, lineOffset } of typeScriptBlocks(file, text)) {
-      const source = ts.createSourceFile(file, code, ts.ScriptTarget.Latest, true)
+      const source = ts.createSourceFile(
+        file,
+        code,
+        ts.ScriptTarget.Latest,
+        true
+      )
       const visit = (node, owner) => {
         const name =
-          node.name && (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) && node.name.text
+          node.name &&
+          (ts.isIdentifier(node.name) || ts.isStringLiteral(node.name)) &&
+          node.name.text
         if (name && isMember(node) && node.jsDoc?.length) {
-          const doc = node.jsDoc.map((jsDoc) => ts.getTextOfJSDocComment(jsDoc.comment) ?? "").join(" ")
+          const doc = node.jsDoc
+            .map((jsDoc) => ts.getTextOfJSDocComment(jsDoc.comment) ?? "")
+            .join(" ")
           const named = new Set([
             ...docWords(name).filter((word) => word !== "is" && word !== "has"),
             ...docWords(owner),
           ])
           const said = docWords(doc).filter((word) => !fillerWords.has(word))
-          if (said.length && said.every((word) => named.has(word)))
+          if (said.length && said.every((word) => named.has(word))) {
             violations.push({
               file: path.relative(root, file),
-              line: source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1 + lineOffset,
+              line:
+                source.getLineAndCharacterOfPosition(node.getStart(source))
+                  .line +
+                1 +
+                lineOffset,
               rule: "name-only-docs",
               message: `\`${name}\`'s doc only repeats its name. Say what sets it, when it changes or what it holds.`,
             })
+          }
         }
         const next = isOwner(node) ? node.name.text : owner
         ts.forEachChild(node, (child) => visit(child, next))
@@ -580,7 +732,9 @@ function checkStability() {
     const count = ts
       .getJSDocTags(declaration)
       .filter((tag) => stabilityLabels.includes(tag.tagName.text)).length
-    if (count === 1) continue
+    if (count === 1) {
+      continue
+    }
     violations.push({
       file: path.relative(root, file),
       line: lineOf(declaration),
@@ -591,28 +745,50 @@ function checkStability() {
   for (const { name, file, text } of surface.svelteComponents) {
     const comment = text.match(svelteComponentComment)?.[0] ?? ""
     const count = comment.match(svelteStabilityLabel)?.length ?? 0
-    if (count === 1) continue
+    if (count === 1) {
+      continue
+    }
     violations.push({
       file: path.relative(root, file),
       line: 1,
       rule: "stability",
-      message: message(name, count).replace("its JSDoc", "its `<!-- @component -->` comment"),
+      message: message(name, count).replace(
+        "its JSDoc",
+        "its `<!-- @component -->` comment"
+      ),
     })
   }
 }
 
 function checkInternalStability() {
   const isPublic = new Set(
-    surface.declarations.map(({ declaration, file }) => `${file}:${declaration.name?.text}`),
+    surface.declarations.map(
+      ({ declaration, file }) => `${file}:${declaration.name?.text}`
+    )
   )
-  for (const file of packageSources().filter((file) => !file.endsWith(".svelte"))) {
-    const sourceFile = ts.createSourceFile(file, readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true)
+  for (const file of packageSources().filter(
+    (file) => !file.endsWith(".svelte")
+  )) {
+    const sourceFile = ts.createSourceFile(
+      file,
+      readFileSync(file, "utf8"),
+      ts.ScriptTarget.Latest,
+      true
+    )
     for (const statement of sourceFile.statements) {
       const { name } = ts.isVariableStatement(statement)
         ? statement.declarationList.declarations[0]
         : statement
-      if (isPublic.has(`${file}:${name?.text}`)) continue
-      if (!ts.getJSDocTags(statement).some((tag) => stabilityLabels.includes(tag.tagName.text))) continue
+      if (isPublic.has(`${file}:${name?.text}`)) {
+        continue
+      }
+      if (
+        !ts
+          .getJSDocTags(statement)
+          .some((tag) => stabilityLabels.includes(tag.tagName.text))
+      ) {
+        continue
+      }
       violations.push({
         file: path.relative(root, file),
         line: lineOf(statement),
@@ -624,7 +800,11 @@ function checkInternalStability() {
 }
 
 function lineOf(declaration) {
-  return declaration.getSourceFile().getLineAndCharacterOfPosition(declaration.getStart()).line + 1
+  return (
+    declaration
+      .getSourceFile()
+      .getLineAndCharacterOfPosition(declaration.getStart()).line + 1
+  )
 }
 
 function checkPublicNames() {
@@ -642,12 +822,19 @@ function checkPublicNames() {
   const checked = new Set()
   const returnsBoolean = (signature) =>
     !!checker.getTypePredicateOfSignature(signature) ||
-    !!(checker.getReturnTypeOfSignature(signature).flags & ts.TypeFlags.BooleanLike)
+    !!(
+      checker.getReturnTypeOfSignature(signature).flags &
+      ts.TypeFlags.BooleanLike
+    )
   const takesElement = (signature) => {
     const first = signature.parameters[0]
-    if (!first) return false
+    if (!first) {
+      return false
+    }
     const type = checker.getTypeOfSymbol(first)
-    return /\b(HTML|SVG)?Element\b/.test(checker.typeToString(checker.getNonNullableType(type)))
+    return /\b(HTML|SVG)?Element\b/.test(
+      checker.typeToString(checker.getNonNullableType(type))
+    )
   }
   // A cleanup takes nothing and returns nothing.
   const returnsCleanup = (signature) =>
@@ -657,53 +844,83 @@ function checkPublicNames() {
       .some(
         (cleanup) =>
           cleanup.parameters.length === 0 &&
-          !!(checker.getReturnTypeOfSignature(cleanup).flags & ts.TypeFlags.Void),
+          !!(
+            checker.getReturnTypeOfSignature(cleanup).flags & ts.TypeFlags.Void
+          )
       )
   const returnsObject = (signature) =>
     !!(checker.getReturnTypeOfSignature(signature).flags & ts.TypeFlags.Object)
 
   for (const entry of entries) {
     const module = checker.getSymbolAtLocation(program.getSourceFile(entry))
-    if (!module) continue
+    if (!module) {
+      continue
+    }
     for (const exported of checker.getExportsOfModule(module)) {
       const name = exported.name
-      const symbol = exported.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(exported) : exported
+      const symbol =
+        exported.flags & ts.SymbolFlags.Alias
+          ? checker.getAliasedSymbol(exported)
+          : exported
       const declaration = symbol.valueDeclaration
-      if (!declaration || checked.has(declaration) || name in publicNameAllowlist) continue
+      if (
+        !declaration ||
+        checked.has(declaration) ||
+        name in publicNameAllowlist
+      ) {
+        continue
+      }
       checked.add(declaration)
       const isFunction =
         ts.isFunctionDeclaration(declaration) ||
         (ts.isVariableDeclaration(declaration) &&
           !!declaration.initializer &&
-          (ts.isArrowFunction(declaration.initializer) || ts.isFunctionExpression(declaration.initializer)))
-      if (!isFunction) continue
+          (ts.isArrowFunction(declaration.initializer) ||
+            ts.isFunctionExpression(declaration.initializer)))
+      if (!isFunction) {
+        continue
+      }
       const signatures = checker.getTypeOfSymbol(symbol).getCallSignatures()
-      if (!signatures.length) continue
+      if (!signatures.length) {
+        continue
+      }
       const report = (message) =>
         violations.push({
           file: path.relative(root, declaration.getSourceFile().fileName),
-          line: declaration.getSourceFile().getLineAndCharacterOfPosition(declaration.getStart()).line + 1,
+          line:
+            declaration
+              .getSourceFile()
+              .getLineAndCharacterOfPosition(declaration.getStart()).line + 1,
           rule: "public-names",
           message: `\`${name}\` ${message}`,
         })
       if (/^(is|has|supports|matches)[A-Z]/.test(name)) {
-        if (!signatures.every(returnsBoolean))
-          report("doesn't return a boolean, so it can't be named like a question.")
+        if (!signatures.every(returnsBoolean)) {
+          report(
+            "doesn't return a boolean, so it can't be named like a question."
+          )
+        }
       } else if (signatures.every(returnsBoolean)) {
-        report("answers yes or no, so name it `is…`, `has…`, `supports…` or `matches…`.")
+        report(
+          "answers yes or no, so name it `is…`, `has…`, `supports…` or `matches…`."
+        )
       }
       if (/^bind[A-Z]/.test(name)) {
-        if (!signatures.every(takesElement)) report("doesn't take an element first, so it isn't a `bind…`.")
+        if (!signatures.every(takesElement)) {
+          report("doesn't take an element first, so it isn't a `bind…`.")
+        }
       } else if (
         !/^(define|create)[A-Z]/.test(name) &&
         signatures.every((s) => takesElement(s) && returnsCleanup(s))
       ) {
         report("takes an element and returns a cleanup, so name it `bind…`.")
       }
-      if (/^register[A-Z]/.test(name) && !registries.includes(name))
+      if (/^register[A-Z]/.test(name) && !registries.includes(name)) {
         report("isn't a page-wide registry, so it can't be a `register…`.")
-      if (/Attrs$/.test(name) && !signatures.every(returnsObject))
+      }
+      if (/Attrs$/.test(name) && !signatures.every(returnsObject)) {
         report("doesn't return attributes, so it isn't `…Attrs`.")
+      }
     }
   }
 }
@@ -713,19 +930,29 @@ function checkRendererImports() {
   for (const name of renderers) {
     const files = execFileSync(
       "git",
-      ["ls-files", "-co", "--exclude-standard", `packages/${name}/src`, `packages/${name}/test`],
+      [
+        "ls-files",
+        "-co",
+        "--exclude-standard",
+        `packages/${name}/src`,
+        `packages/${name}/test`,
+      ],
       {
         cwd: root,
         encoding: "utf8",
-      },
+      }
     )
       .split("\n")
-      .filter((file) => /\.(ts|tsx|vue|svelte)$/.test(file) && existsSync(path.join(root, file)))
-    for (const file of files)
+      .filter(
+        (file) =>
+          /\.(ts|tsx|vue|svelte)$/.test(file) &&
+          existsSync(path.join(root, file))
+      )
+    for (const file of files) {
       readFileSync(path.join(root, file), "utf8")
         .split("\n")
         .forEach((text, index) => {
-          if (internal.test(text))
+          if (internal.test(text)) {
             violations.push({
               file,
               line: index + 1,
@@ -733,42 +960,74 @@ function checkRendererImports() {
               message:
                 "import it from `@ui-sdk/core/renderer` or a public entry, not `@ui-sdk/core/internal`.",
             })
+          }
         })
+    }
   }
 }
 
 function checkNuxtImports() {
-  const nuxtImport = /\b(?:from|import)\s*\(?\s*["'](?:nuxt|@nuxt\/[\w-]+|#app|#imports)(?:\/[^"']*)?["']/
-  for (const file of packageSources())
+  const nuxtImport =
+    /\b(?:from|import)\s*\(?\s*["'](?:nuxt|@nuxt\/[\w-]+|#app|#imports)(?:\/[^"']*)?["']/
+  for (const file of packageSources()) {
     readFileSync(file, "utf8")
       .split("\n")
       .forEach((text, index) => {
-        if (nuxtImport.test(text))
+        if (nuxtImport.test(text)) {
           violations.push({
             file: path.relative(root, file),
             line: index + 1,
             rule: "nuxt-imports",
-            message: "only the Nuxt module in `packages/vue/nuxt` may import Nuxt.",
+            message:
+              "only the Nuxt module in `packages/vue/nuxt` may import Nuxt.",
           })
+        }
       })
+  }
 }
 
 function checkApiFiles() {
-  const kebab = (name) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
-  const files = packageSources().filter((file) => file.startsWith(path.join(root, "packages/core/src/")))
+  const kebab = (name) =>
+    name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+  const files = packageSources().filter((file) =>
+    file.startsWith(path.join(root, "packages/core/src/"))
+  )
   for (const file of files) {
-    if (file.endsWith("-api.ts")) continue
-    const source = ts.createSourceFile(file, readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true)
+    if (file.endsWith("-api.ts")) {
+      continue
+    }
+    const source = ts.createSourceFile(
+      file,
+      readFileSync(file, "utf8"),
+      ts.ScriptTarget.Latest,
+      true
+    )
     for (const statement of source.statements) {
-      if (!ts.isExportDeclaration(statement) || statement.moduleSpecifier || !statement.exportClause) continue
-      if (!ts.isNamedExports(statement.exportClause)) continue
+      if (
+        !ts.isExportDeclaration(statement) ||
+        statement.moduleSpecifier ||
+        !statement.exportClause
+      ) {
+        continue
+      }
+      if (!ts.isNamedExports(statement.exportClause)) {
+        continue
+      }
       for (const element of statement.exportClause.elements) {
         const name = element.name.text
-        if (element.isTypeOnly || !/^[a-z]\w*Api$/.test(name)) continue
-        if (path.basename(file, ".ts") === kebab(name.slice(0, -"Api".length))) continue
+        if (element.isTypeOnly || !/^[a-z]\w*Api$/.test(name)) {
+          continue
+        }
+        if (
+          path.basename(file, ".ts") === kebab(name.slice(0, -"Api".length))
+        ) {
+          continue
+        }
         violations.push({
           file: path.relative(root, file),
-          line: source.getLineAndCharacterOfPosition(element.getStart(source)).line + 1,
+          line:
+            source.getLineAndCharacterOfPosition(element.getStart(source))
+              .line + 1,
           rule: "api-files",
           message: `move \`${name}\` into \`${kebab(name.slice(0, -"Api".length))}-api.ts\`, or rename this file to end in \`-api.ts\`.`,
         })
@@ -779,7 +1038,13 @@ function checkApiFiles() {
 
 function checkInternalExports() {
   for (const { name, declaration, file } of surface.declarations) {
-    if (!ts.getJSDocTags(declaration).some((tag) => tag.tagName.text === "internal")) continue
+    if (
+      !ts
+        .getJSDocTags(declaration)
+        .some((tag) => tag.tagName.text === "internal")
+    ) {
+      continue
+    }
     violations.push({
       file: path.relative(root, file),
       line: lineOf(declaration),
@@ -792,9 +1057,12 @@ function checkInternalExports() {
 function checkEntryTypes() {
   const checker = surface.program.getTypeChecker()
   const coreSource = path.join(root, "packages/core/src/")
-  const moduleOf = (file) => checker.getSymbolAtLocation(surface.program.getSourceFile(file))
+  const moduleOf = (file) =>
+    checker.getSymbolAtLocation(surface.program.getSourceFile(file))
   const resolve = (symbol) =>
-    symbol && symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol
+    symbol && symbol.flags & ts.SymbolFlags.Alias
+      ? checker.getAliasedSymbol(symbol)
+      : symbol
   const isCoreType = (symbol) =>
     !!symbol &&
     !(symbol.flags & ts.SymbolFlags.Value) &&
@@ -802,7 +1070,7 @@ function checkEntryTypes() {
   // A package's entries but its root, like `{ name: "accordion", file }`.
   const subpathEntries = (pkg) =>
     publicEntries(root, pkg).flatMap(({ subpath, file }) =>
-      subpath === "." ? [] : [{ name: subpath.slice(2), file }],
+      subpath === "." ? [] : [{ name: subpath.slice(2), file }]
     )
 
   const coreTypes = new Map()
@@ -810,15 +1078,21 @@ function checkEntryTypes() {
     const types = new Map()
     for (const exported of checker.getExportsOfModule(moduleOf(file))) {
       const symbol = resolve(exported)
-      if (isCoreType(symbol)) types.set(exported.name, symbol)
+      if (isCoreType(symbol)) {
+        types.set(exported.name, symbol)
+      }
     }
     coreTypes.set(name, types)
   }
   for (const renderer of renderers) {
-    for (const { file } of publicEntries(root, renderer)) checkNoStar(file)
+    for (const { file } of publicEntries(root, renderer)) {
+      checkNoStar(file)
+    }
     for (const { name, file } of subpathEntries(renderer)) {
       const coreName = coreEntryOf[name]?.entry ?? name
-      if (coreTypes.has(coreName)) checkEntry(file, coreName, coreTypes.get(coreName))
+      if (coreTypes.has(coreName)) {
+        checkEntry(file, coreName, coreTypes.get(coreName))
+      }
     }
   }
 
@@ -827,11 +1101,17 @@ function checkEntryTypes() {
   function checkNoStar(file) {
     const source = surface.program.getSourceFile(file)
     for (const statement of source.statements) {
-      if (!ts.isExportDeclaration(statement) || statement.exportClause) continue
-      if (!statement.moduleSpecifier?.text.startsWith("@ui-sdk/core")) continue
+      if (!ts.isExportDeclaration(statement) || statement.exportClause) {
+        continue
+      }
+      if (!statement.moduleSpecifier?.text.startsWith("@ui-sdk/core")) {
+        continue
+      }
       violations.push({
         file: path.relative(root, file),
-        line: source.getLineAndCharacterOfPosition(statement.getStart(source)).line + 1,
+        line:
+          source.getLineAndCharacterOfPosition(statement.getStart(source))
+            .line + 1,
         rule: "entry-types",
         message: `name what to re-export from \`${statement.moduleSpecifier.text}\` one by one.`,
       })
@@ -844,51 +1124,75 @@ function checkEntryTypes() {
     const report = (node, message) =>
       violations.push({
         file: path.relative(root, file),
-        line: node ? source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1 : 1,
+        line: node
+          ? source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1
+          : 1,
         rule: "entry-types",
         message,
       })
     const entryExports = new Map(
-      checker.getExportsOfModule(moduleOf(file)).map((symbol) => [symbol.name, resolve(symbol)]),
+      checker
+        .getExportsOfModule(moduleOf(file))
+        .map((symbol) => [symbol.name, resolve(symbol)])
     )
     // The name is taken when the entry exports something else under it, like the `Toast` component.
-    const isTaken = (name, symbol) => entryExports.has(name) && entryExports.get(name) !== symbol
-    const coreNameOf = new Map([...expected].map(([name, symbol]) => [symbol, name]))
+    const isTaken = (name, symbol) =>
+      entryExports.has(name) && entryExports.get(name) !== symbol
+    const coreNameOf = new Map(
+      [...expected].map(([name, symbol]) => [symbol, name])
+    )
     const reexported = new Set()
     for (const statement of source.statements) {
-      if (!ts.isExportDeclaration(statement) || !statement.exportClause) continue
-      if (!ts.isNamedExports(statement.exportClause)) continue
+      if (!ts.isExportDeclaration(statement) || !statement.exportClause) {
+        continue
+      }
+      if (!ts.isNamedExports(statement.exportClause)) {
+        continue
+      }
       const from = statement.moduleSpecifier?.text
       for (const element of statement.exportClause.elements) {
         const symbol = resolve(
           from
             ? checker.getSymbolAtLocation(element.name)
-            : checker.getExportSpecifierLocalTargetSymbol(element),
+            : checker.getExportSpecifierLocalTargetSymbol(element)
         )
-        if (!isCoreType(symbol)) continue
+        if (!isCoreType(symbol)) {
+          continue
+        }
         const exported = element.name.text
         const coreType = coreNameOf.get(symbol)
         if (!coreType) {
           report(
             element,
-            `\`${exported}\` is a type of another core entry. Export it from \`${specifier}\` in core if this component needs it, or leave it out.`,
+            `\`${exported}\` is a type of another core entry. Export it from \`${specifier}\` in core if this component needs it, or leave it out.`
           )
           continue
         }
-        if (from !== specifier || !(statement.isTypeOnly || element.isTypeOnly))
-          report(element, `re-export \`${exported}\` with \`export type { } from "${specifier}"\`.`)
-        else if (exported !== coreType && !isTaken(coreType, symbol))
-          report(element, `re-export \`${coreType}\` under its own name, since nothing else here takes it.`)
+        if (
+          from !== specifier ||
+          !(statement.isTypeOnly || element.isTypeOnly)
+        ) {
+          report(
+            element,
+            `re-export \`${exported}\` with \`export type { } from "${specifier}"\`.`
+          )
+        } else if (exported !== coreType && !isTaken(coreType, symbol)) {
+          report(
+            element,
+            `re-export \`${coreType}\` under its own name, since nothing else here takes it.`
+          )
+        }
         reexported.add(coreType)
       }
     }
     const missing = [...expected].flatMap(([type, symbol]) =>
-      reexported.has(type) || isTaken(type, symbol) ? [] : [type],
+      reexported.has(type) || isTaken(type, symbol) ? [] : [type]
     )
-    if (missing.length)
+    if (missing.length) {
       report(
         undefined,
-        `re-export ${missing.map((type) => `\`${type}\``).join(", ")} from \`${specifier}\`, which exports ${missing.length === 1 ? "it" : "them"}.`,
+        `re-export ${missing.map((type) => `\`${type}\``).join(", ")} from \`${specifier}\`, which exports ${missing.length === 1 ? "it" : "them"}.`
       )
+    }
   }
 }

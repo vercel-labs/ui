@@ -9,7 +9,11 @@ import {
 import { createParts } from "@ui-sdk/react/primitive"
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react"
 
-type RecipeState = { value: string[]; focused: string | null; moving: ReorderDraft | null }
+type RecipeState = {
+  value: string[]
+  focused: string | null
+  moving: ReorderDraft | null
+}
 
 const recipe = definePrimitive({
   name: "recipe",
@@ -28,16 +32,23 @@ const recipe = definePrimitive({
       set: (value, details) => change("value", value, details),
     })
     return {
-      roving: createRovingFocus<RecipeState, { value: string }>(context, { slot: "step", key: "focused" }),
+      roving: createRovingFocus<RecipeState, { value: string }>(context, {
+        slot: "step",
+        key: "focused",
+      }),
       reorder,
       act(action: string) {
         const { focused, moving } = store.get()
-        if (action === "grab" && focused) reorder.grab(focused)
-        else if (moving && (action === "up" || action === "down")) {
+        if (action === "grab" && focused) {
+          reorder.grab(focused)
+        } else if (moving && (action === "up" || action === "down")) {
           const index = moving.order.indexOf(moving.key)
           reorder.moveTo(index + (action === "up" ? -1 : 1))
-        } else if (action === "drop") reorder.drop()
-        else if (action === "cancel") reorder.cancel()
+        } else if (action === "drop") {
+          reorder.drop()
+        } else if (action === "cancel") {
+          reorder.cancel()
+        }
       },
     }
   },
@@ -45,7 +56,12 @@ const recipe = definePrimitive({
     root: slot<{}, { order: string[] }>({
       state: (state, { api }) => ({ order: api.reorder.order(state) }),
     }),
-    list: slot({ attrs: () => ({ role: "listbox", "aria-roledescription": "sortable list" }) }),
+    list: slot({
+      attrs: () => ({
+        role: "listbox",
+        "aria-roledescription": "sortable list",
+      }),
+    }),
     step: slot<{ value: string }>({
       props: { value: "string" },
       attrs: (state, part) => ({
@@ -59,16 +75,24 @@ const recipe = definePrimitive({
       on: {
         keydown: (event, { el, api, key }) =>
           api.reorder.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.reorder.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.reorder.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.reorder.bind(el, part)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.reorder.bind(el, part),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
     toTop: slot<{ value: string }>({
       props: { value: "string" },
-      attrs: (_state, part) => ({ type: "button", tabindex: "-1", "aria-label": `Move ${part.key} to top` }),
+      attrs: (_state, part) => ({
+        type: "button",
+        tabindex: "-1",
+        "aria-label": `Move ${part.key} to top`,
+      }),
       on: { pointerdown: (event) => event.preventDefault() },
       press: ({ api, key }) => api.reorder.move(key, 0),
     }),

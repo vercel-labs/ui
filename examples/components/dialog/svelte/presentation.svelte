@@ -16,7 +16,9 @@
   <DialogContent>
     <div data-slot="stack">
       <DialogTitle>Edit profile</DialogTitle>
-      <DialogDescription>Make changes to your profile here. Save when you're done.</DialogDescription>
+      <DialogDescription
+        >Make changes to your profile here. Save when you're done.</DialogDescription
+      >
     </div>
     <Field>
       <FieldLabel>Name</FieldLabel>

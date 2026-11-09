@@ -18,7 +18,10 @@ onUnmounted(() => {
 function save() {
   const succeeds = ++attempts % 2 === 1
   return new Promise<void>((resolve, reject) =>
-    setTimeout(() => (succeeds ? resolve() : reject(new Error("Network error"))), 1500),
+    setTimeout(
+      () => (succeeds ? resolve() : reject(new Error("Network error"))),
+      1500
+    )
   )
 }
 

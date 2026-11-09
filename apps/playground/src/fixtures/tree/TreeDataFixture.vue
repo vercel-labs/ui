@@ -11,7 +11,9 @@ const { cancel, ...options } = treeOptions()
 const action = ref("")
 
 function onExpandedChange(expanded: string[], details: { cancel: () => void }) {
-  if (cancel && expanded.includes(cancel) && !controller.isExpanded(cancel)) return details.cancel()
+  if (cancel && expanded.includes(cancel) && !controller.isExpanded(cancel)) {
+    return details.cancel()
+  }
   action.value = describeTree("expanded", expanded)
 }
 </script>
@@ -30,11 +32,19 @@ function onExpandedChange(expanded: string[], details: { cancel: () => void }) {
           action = describeTree('action', value)
         }
       "
-      @value-change="(value: string | string[] | null) => (action = describeTree('selected', value))"
+      @value-change="
+        (value: string | string[] | null) =>
+          (action = describeTree('selected', value))
+      "
       @expanded-change="onExpandedChange"
-      @checked-change="(checked: string[]) => (action = describeTree('checked', checked))"
+      @checked-change="
+        (checked: string[]) => (action = describeTree('checked', checked))
+      "
     >
-      <TreeFixtureItems :items="treeFixture.items" :checkable="options.checkable" />
+      <TreeFixtureItems
+        :items="treeFixture.items"
+        :checkable="options.checkable"
+      />
     </Tree>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>

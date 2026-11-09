@@ -18,7 +18,8 @@ One item: a link, or a trigger and the content it opens.
   let {
     value,
     ...rest
-  }: PartProps<"li", NavigationMenuItemState> & NavigationMenuItemProps = $props()
+  }: PartProps<"li", NavigationMenuItemState> & NavigationMenuItemProps =
+    $props()
 
   const menu = useHandle(navigationMenu)
   const generated = $props.id()

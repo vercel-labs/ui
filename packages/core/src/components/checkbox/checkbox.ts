@@ -3,7 +3,11 @@ import type { CheckboxGroupApi, CheckedState } from "./checkbox-group"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveContext, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveContext,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import {
   checkedAttribute,
   isDisabled,
@@ -97,10 +101,14 @@ type CheckboxToggleState = ToggleState & {
 // Inside a group, the group decides whether it's checked, its name and whether it's disabled.
 function fromGroup(options: CheckboxInternalOptions) {
   const group = options.group?.()
-  if (!group) return undefined
+  if (!group) {
+    return undefined
+  }
   const parent = !!options.parent
   return {
-    checked: (parent ? group.parentChecked() : group.checked(options.value ?? "on")) as CheckedState,
+    checked: (parent
+      ? group.parentChecked()
+      : group.checked(options.value ?? "on")) as CheckedState,
     // A parent stands for the others, so it submits nothing.
     name: parent ? undefined : (options.name ?? group.name()),
     disabled: !!options.disabled || group.disabled(),
@@ -111,7 +119,9 @@ function fromGroup(options: CheckboxInternalOptions) {
 
 function checkboxSync(options: CheckboxInternalOptions) {
   const group = fromGroup(options)
-  if (!group) return syncToggle(options)
+  if (!group) {
+    return syncToggle(options)
+  }
   return {
     ...group,
     required: !!options.required,
@@ -119,27 +129,49 @@ function checkboxSync(options: CheckboxInternalOptions) {
   }
 }
 
-function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, CheckboxToggleState, string>) {
+function checkboxApi(
+  context: PrimitiveContext<
+    CheckboxInternalOptions,
+    CheckboxToggleState,
+    string
+  >
+) {
   const { store, element, options } = context
   const change = createChange(context)
   const group = () => options().group?.()
   const isParent = () => !!options().parent
-  const control = toggleControl<CheckedState, CheckboxGroupApi>(context, change, {
-    owner: group,
-    write(owner, checked, details) {
-      // The group decides. Its value then decides this checkbox.
-      const { reason, event } = details
-      const forGroup = { reason: reason === "press" ? ("item-press" as const) : reason, event }
-      // A mixed parent checks the rest. When only disabled ones are left
-      // unchecked, there's nothing to check, so it unchecks instead.
-      const accepted = isParent()
-        ? owner.setAll(checked === true && !owner.allEnabledChecked(), forGroup)
-        : owner.setChild(store.get().value, checked === true, forGroup)
-      if (!accepted) return false
-      change("checked", isParent() ? owner.parentChecked() : owner.checked(store.get().value), details)
-      return true
-    },
-  })
+  const control = toggleControl<CheckedState, CheckboxGroupApi>(
+    context,
+    change,
+    {
+      owner: group,
+      write(owner, checked, details) {
+        // The group decides. Its value then decides this checkbox.
+        const { reason, event } = details
+        const forGroup = {
+          reason: reason === "press" ? ("item-press" as const) : reason,
+          event,
+        }
+        // A mixed parent checks the rest. When only disabled ones are left
+        // unchecked, there's nothing to check, so it unchecks instead.
+        const accepted = isParent()
+          ? owner.setAll(
+              checked === true && !owner.allEnabledChecked(),
+              forGroup
+            )
+          : owner.setChild(store.get().value, checked === true, forGroup)
+        if (!accepted) {
+          return false
+        }
+        change(
+          "checked",
+          isParent() ? owner.parentChecked() : owner.checked(store.get().value),
+          details
+        )
+        return true
+      },
+    }
+  )
   // Changes after mount animate the indicator. The first paint never does.
   let changed = false
 
@@ -151,12 +183,14 @@ function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, Checkbox
   deriveFromOptions(context, ["exiting"], (synced, state) =>
     "checked" in synced && synced.checked !== state.checked
       ? { exiting: exitingAfter(state.checked, synced.checked as CheckedState) }
-      : undefined,
+      : undefined
   )
   let previous = store.get().checked
   store.subscribe(() => {
     const { checked } = store.get()
-    if (checked === previous) return
+    if (checked === previous) {
+      return
+    }
     const was = previous
     previous = checked
     changed = true
@@ -171,11 +205,15 @@ function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, Checkbox
       // Joins the group, and follows its value from then on.
       joinGroup(el: HTMLElement) {
         const owner = group()
-        if (!owner) return () => {}
+        if (!owner) {
+          return () => {}
+        }
         const follow = () => {
           const { name, disabled, readOnly, form } = fromGroup(options())!
           store.set({
-            checked: isParent() ? owner.parentChecked() : owner.checked(store.get().value),
+            checked: isParent()
+              ? owner.parentChecked()
+              : owner.checked(store.get().value),
             controls: isParent() ? owner.childIds() || undefined : undefined,
             name,
             disabled,
@@ -185,8 +223,11 @@ function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, Checkbox
         }
         const unsubscribe = owner.subscribe(follow)
         follow()
-        if (isParent()) return unsubscribe
-        const join = () => owner.register(store.get().value, el, () => isDisabled(store.get()))
+        if (isParent()) {
+          return unsubscribe
+        }
+        const join = () =>
+          owner.register(store.get().value, el, () => isDisabled(store.get()))
         let leave = join()
         let { value } = store.get()
         let disabled = isDisabled(store.get())
@@ -196,7 +237,9 @@ function checkboxApi(context: PrimitiveContext<CheckboxInternalOptions, Checkbox
             value = state.value
             leave()
             leave = join()
-          } else if (isDisabled(state) !== disabled) owner.internal.refreshChildren()
+          } else if (isDisabled(state) !== disabled) {
+            owner.internal.refreshChildren()
+          }
           disabled = isDisabled(state)
         })
         return () => {
@@ -243,7 +286,11 @@ const checkboxPrimitive = /* @__PURE__ */ definePrimitive({
   },
   state: (options: CheckboxInternalOptions): CheckboxToggleState => {
     const group = fromGroup(options)
-    return { ...toggleState(group ? { ...options, ...group } : options), exiting: false, controls: undefined }
+    return {
+      ...toggleState(group ? { ...options, ...group } : options),
+      exiting: false,
+      controls: undefined,
+    }
   },
   controlled: ["checked"],
   live: ["controls"],
@@ -268,29 +315,39 @@ const checkboxPrimitive = /* @__PURE__ */ definePrimitive({
       input,
       indicator: slot<CheckboxIndicatorProps, CheckboxState>({
         props: { keepMounted: "boolean" },
-        present: (state, { props }) => !!props.keepMounted || state.checked !== false || state.exiting,
+        present: (state, { props }) =>
+          !!props.keepMounted || state.checked !== false || state.exiting,
         state: checkboxState,
         attrs: (state) => toggleDataAttrs(state),
         bind(el, { api, store, props }) {
           let stop: (() => void) | undefined
           let shown = store.get().checked !== false
-          if (shown && api.isChanged()) stop = animateIn(el)
+          if (shown && api.isChanged()) {
+            stop = animateIn(el)
+          }
           const unsubscribe = store.subscribe(() => {
             const { checked, exiting } = store.get()
             // Ahead of the render, for exit keyframes keyed on the state.
             el.toggleAttribute("data-checked", checked === true)
             el.toggleAttribute("data-unchecked", checked === false)
-            el.toggleAttribute("data-indeterminate", checked === "indeterminate")
-            if ((checked !== false) === shown) return
+            el.toggleAttribute(
+              "data-indeterminate",
+              checked === "indeterminate"
+            )
+            if ((checked !== false) === shown) {
+              return
+            }
             shown = checked !== false
             stop?.()
             stop = undefined
-            if (shown) stop = animateIn(el)
-            else if (exiting || props.keepMounted)
+            if (shown) {
+              stop = animateIn(el)
+            } else if (exiting || props.keepMounted) {
               stop = animateOut(el, () => {
                 stop = undefined
                 api.internal.finishExit()
               })
+            }
           })
           return () => {
             unsubscribe()

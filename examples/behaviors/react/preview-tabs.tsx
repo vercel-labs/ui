@@ -20,20 +20,34 @@ type Key = keyof typeof tabs
 
 const gap = 4
 
-type Drag = { key: Key; left: number; target: number; others: Key[]; widths: Record<string, number> }
+type Drag = {
+  key: Key
+  left: number
+  target: number
+  others: Key[]
+  widths: Record<string, number>
+}
 
-const insert = (others: Key[], key: Key, at: number) => [...others.slice(0, at), key, ...others.slice(at)]
+const insert = (others: Key[], key: Key, at: number) => [
+  ...others.slice(0, at),
+  key,
+  ...others.slice(at),
+]
 
 const nearest = (points: number[], value: number) =>
   points.reduce(
-    (best, point, index) => (Math.abs(point - value) < Math.abs(points[best] - value) ? index : best),
-    0,
+    (best, point, index) =>
+      Math.abs(point - value) < Math.abs(points[best] - value) ? index : best,
+    0
   )
 
 const lefts = (order: Key[], widths: Record<string, number>) =>
   order.reduce<number[]>(
-    (all, key, index) => [...all, index ? all[index - 1] + widths[order[index - 1]] + gap : 0],
-    [],
+    (all, key, index) => [
+      ...all,
+      index ? all[index - 1] + widths[order[index - 1]] + gap : 0,
+    ],
+    []
   )
 
 function Example() {
@@ -44,10 +58,18 @@ function Example() {
   const stop = React.useRef<(() => void) | undefined>(undefined)
   React.useEffect(() => () => stop.current?.(), [])
 
-  const pointerdown = (event: React.PointerEvent<HTMLButtonElement>, key: Key) => {
-    if (event.button !== 0) return
+  const pointerdown = (
+    event: React.PointerEvent<HTMLButtonElement>,
+    key: Key
+  ) => {
+    if (event.button !== 0) {
+      return
+    }
     const widths = Object.fromEntries(
-      order.map((candidate) => [candidate, elements.current.get(candidate)!.getBoundingClientRect().width]),
+      order.map((candidate) => [
+        candidate,
+        elements.current.get(candidate)!.getBoundingClientRect().width,
+      ])
     )
     const others = order.filter((candidate) => candidate !== key)
     const slots = lefts([...others, key], widths)
@@ -60,15 +82,22 @@ function Example() {
       onMove: ({ x, event }) => {
         const { value: left } = scrubTo(
           start + x,
-          { min: 0, max: slots[slots.length - 1], step: 1, snap: { points: slots, threshold: 12 } },
-          { snap: !(event.metaKey || event.ctrlKey) },
+          {
+            min: 0,
+            max: slots[slots.length - 1],
+            step: 1,
+            snap: { points: slots, threshold: 12 },
+          },
+          { snap: !(event.metaKey || event.ctrlKey) }
         )
         latest = { key, left, target: nearest(slots, left), others, widths }
         setDrag(latest)
       },
       onEnd: (_end, canceled) => {
         stop.current = undefined
-        if (latest && !canceled) setOrder(insert(latest.others, latest.key, latest.target))
+        if (latest && !canceled) {
+          setOrder(insert(latest.others, latest.key, latest.target))
+        }
         setDrag(null)
       },
     })
@@ -76,16 +105,22 @@ function Example() {
 
   const keydown = (event: React.KeyboardEvent<HTMLButtonElement>, key: Key) => {
     const move = stepFromKey(event, { arrows: "horizontal" })
-    if (!move) return
+    if (!move) {
+      return
+    }
     event.preventDefault()
-    const index = stepBy(order.indexOf(key), move, { min: 0, max: order.length - 1, step: 1 })
+    const index = stepBy(order.indexOf(key), move, {
+      min: 0,
+      max: order.length - 1,
+      step: 1,
+    })
     if (event.altKey) {
       setOrder(
         insert(
           order.filter((candidate) => candidate !== key),
           key,
-          index,
-        ),
+          index
+        )
       )
       return
     }
@@ -114,8 +149,11 @@ function Example() {
           <button
             key={key}
             ref={(el) => {
-              if (el) elements.current.set(key, el)
-              else elements.current.delete(key)
+              if (el) {
+                elements.current.set(key, el)
+              } else {
+                elements.current.delete(key)
+              }
             }}
             type="button"
             role="tab"

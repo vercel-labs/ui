@@ -19,7 +19,7 @@ function core(page: Page, name: string, run: string) {
       const module = await loadCoreModule(name)
       return new Function("module", `return (async () => { ${run} })()`)(module)
     },
-    { name, run },
+    { name, run }
   )
 }
 
@@ -42,12 +42,17 @@ test.describe("inert outside", () => {
       const after = [!!outside.closest("[inert]"), root.getElementById("inside").inert]
       host.remove()
       return { during, after }
-    `,
+    `
     )
-    expect(result).toEqual({ during: [true, true, false], after: [false, false] })
+    expect(result).toEqual({
+      during: [true, true, false],
+      after: [false, false],
+    })
   })
 
-  test("an element kept later becomes usable, and inert again on release", async ({ page }) => {
+  test("an element kept later becomes usable, and inert again on release", async ({
+    page,
+  }) => {
     const result = await core(
       page,
       "modal",
@@ -65,7 +70,7 @@ test.describe("inert outside", () => {
       restore()
       container.remove()
       return [before, kept, released, container.inert]
-    `,
+    `
     )
     expect(result).toEqual([true, false, true, false])
   })
@@ -85,12 +90,19 @@ test.describe("scroll lock", () => {
       html.style.color = "red"
       release()
       return { locked, overflow: html.style.overflow, color: html.style.color, theme: html.style.getPropertyValue("--theme") }
-    `,
+    `
     )
-    expect(result).toEqual({ locked: "hidden", overflow: "", color: "red", theme: "light" })
+    expect(result).toEqual({
+      locked: "hidden",
+      overflow: "",
+      color: "red",
+      theme: "light",
+    })
   })
 
-  test("a page that scrolls its body gets its body locked", async ({ page }) => {
+  test("a page that scrolls its body gets its body locked", async ({
+    page,
+  }) => {
     const result = await core(
       page,
       "modal",
@@ -104,7 +116,7 @@ test.describe("scroll lock", () => {
       const after = getComputedStyle(document.body).overflowY
       style.remove()
       return [locked, after]
-    `,
+    `
     )
     expect(result).toEqual(["hidden", "auto"])
   })
@@ -132,7 +144,7 @@ test.describe("presence", () => {
       el.remove()
       style.remove()
       return elapsed
-    `,
+    `
     )
     expect(elapsed).toBeGreaterThan(300)
   })

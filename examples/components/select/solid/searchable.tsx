@@ -43,7 +43,11 @@ const countries = [
 ]
 
 const popularCountries = [
-  { type: "group" as const, label: "Popular", items: [countries[5], countries[11], countries[16]] },
+  {
+    type: "group" as const,
+    label: "Popular",
+    items: [countries[5], countries[11], countries[16]],
+  },
 ]
 
 function Example() {
@@ -76,16 +80,28 @@ function Example() {
           </svg>
         </SelectTrigger>
         <SelectContent>
-          <SelectInput aria-label="Search countries" placeholder="Search countries…" />
+          <SelectInput
+            aria-label="Search countries"
+            placeholder="Search countries…"
+          />
           <SelectEmpty>No countries found.</SelectEmpty>
           <SelectList>
             {(state) => (
-              <For each={state.items as ((typeof countries)[number] | (typeof popularCountries)[number])[]}>
+              <For
+                each={
+                  state.items as (
+                    | (typeof countries)[number]
+                    | (typeof popularCountries)[number]
+                  )[]
+                }
+              >
                 {(entry) =>
                   "items" in entry ? (
                     <SelectGroup>
                       <SelectGroupLabel>{entry.label}</SelectGroupLabel>
-                      <For each={entry.items}>{(country) => <CountryItem country={country} />}</For>
+                      <For each={entry.items}>
+                        {(country) => <CountryItem country={country} />}
+                      </For>
                     </SelectGroup>
                   ) : (
                     <CountryItem country={entry} />

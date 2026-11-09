@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations at rest", async ({ page, open }) => {
@@ -25,13 +27,20 @@ test("no axe violations in a disabled toolbar", async ({ page, open }) => {
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with focus on a disabled button", async ({ page, open, tab }) => {
+test("no axe violations with focus on a disabled button", async ({
+  page,
+  open,
+  tab,
+}) => {
   await open("toolbar")
   await walkTo(page, tab, "Redo")
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with a menu open from the toolbar", async ({ page, open }) => {
+test("no axe violations with a menu open from the toolbar", async ({
+  page,
+  open,
+}) => {
   await open("toolbar")
   await page.getByRole("button", { name: "Font" }).click()
   await expect(menuNamed(page, "Font")).toBeVisible()

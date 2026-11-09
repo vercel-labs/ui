@@ -56,7 +56,9 @@ Import the parts and put them together:
   <ui-dialog-backdrop hidden></ui-dialog-backdrop>
   <ui-dialog-content hidden>
     <ui-dialog-title>Project details</ui-dialog-title>
-    <ui-dialog-description>Review the details before continuing.</ui-dialog-description>
+    <ui-dialog-description
+      >Review the details before continuing.</ui-dialog-description
+    >
     <ui-dialog-close><button>Close</button></ui-dialog-close>
   </ui-dialog-content>
 </ui-dialog>
@@ -118,7 +120,11 @@ A form with `method="dialog"` closes the dialog on a valid submission. The submi
 Use `initial-focus` to pick where focus starts, and `final-focus` to choose where it goes after closing. Each takes a selector. The default returns to the trigger, or to the element focused before a controller opened the dialog. See [popup focus](../popups#focus) for the shared focus rules.
 
 ```html
-<ui-dialog-content initial-focus="#invite-email" final-focus="#next-step" hidden></ui-dialog-content>
+<ui-dialog-content
+  initial-focus="#invite-email"
+  final-focus="#next-step"
+  hidden
+></ui-dialog-content>
 ```
 
 ## Controlled
@@ -288,13 +294,19 @@ CSS selector, and `persistent-elements` a comma-separated list of selectors. Cal
 
 ### Dialog
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogOptions" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogOptions"
+/>
 
 ### DialogTrigger
 
 A trigger outside the dialog names it with `for="dialog-id"`, and takes `payload` as a property.
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerProps"
+/>
 
 ### DialogBackdrop
 
@@ -302,7 +314,10 @@ Dims the page behind a modal dialog. `<ui-dialog-backdrop>` takes no attributes 
 
 ### DialogContent
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogContentProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogContentProps"
+/>
 
 ### DialogTitle
 
@@ -316,11 +331,17 @@ Describes the dialog while it's rendered. `<ui-dialog-description>` is a paragra
 
 With the `action` attribute, its `action` event's `detail.source` says how the part was pressed, as [Button](./button#changes-after-an-await) describes.
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogCloseProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseProps"
+/>
 
 ### DialogShortcut
 
-<TypeTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogShortcutProps" />
+<TypeTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogShortcutProps"
+/>
 
 ### State
 
@@ -328,37 +349,61 @@ The same state shows as data attributes on each element.
 
 `DialogTrigger`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogTriggerState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogTriggerState"
+/>
 
 `DialogBackdrop`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogBackdropState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogBackdropState"
+/>
 
 `DialogContent`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogContentState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogContentState"
+/>
 
 `DialogClose`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogCloseState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogCloseState"
+/>
 
 `DialogShortcut`:
 
-<StateTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogShortcutState" />
+<StateTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogShortcutState"
+/>
 
 ### Reasons
 
 `event.detail.reason` says why the dialog opened or closed.
 
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogOpenChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogOpenChangeReason"
+/>
 
 For a payload change, it says what opened the dialog or took it over.
 
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogPayloadChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogPayloadChangeReason"
+/>
 
 The dismissals `dismissible` can refuse:
 
-<ReasonTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogDismissReason" />
+<ReasonTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogDismissReason"
+/>
 
 ### Controller
 
@@ -368,7 +413,10 @@ and sets whether the dialog is open.
 
 Every write method takes an optional `{ reason, event }`, passed to `openchange`. Closing with a controller always works, even when the dialog isn't dismissible or an action is running.
 
-<ControllerTable path="../../packages/core/src/components/dialog/dialog.ts" name="DialogController" />
+<ControllerTable
+  path="../../packages/core/src/components/dialog/dialog.ts"
+  name="DialogController"
+/>
 
 ### Events
 
@@ -401,7 +449,10 @@ The trigger is a button that opens a dialog, and the dialog follows the [WAI-ARI
 
 ### Tested Behavior
 
-<SpecList spec="dialog" only={["trigger", "focus", "dismissal", "presses", "modal", "nested dialogs"]} />
+<SpecList
+  spec="dialog"
+  only={["trigger", "focus", "dismissal", "presses", "modal", "nested dialogs"]}
+/>
 
 Additional behaviors:
 

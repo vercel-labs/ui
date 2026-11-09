@@ -2,7 +2,11 @@
 import { CheckIcon } from "@lucide/vue"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/vue/token-input"
+import {
+  TokenInput,
+  TokenInputEditor,
+  type TokenInputValue,
+} from "@ui-sdk/vue/token-input"
 import { ref, useId } from "vue"
 import { useLog } from "../../../shared/vue/log"
 
@@ -18,7 +22,9 @@ const readOnly = ref(false)
 const formId = useId()
 
 function onSubmit(event: Event) {
-  log(`Submitted ${new FormData(event.currentTarget as HTMLFormElement).get("prompt") ?? ""}`)
+  log(
+    `Submitted ${new FormData(event.currentTarget as HTMLFormElement).get("prompt") ?? ""}`
+  )
 }
 </script>
 
@@ -26,7 +32,10 @@ function onSubmit(event: Event) {
   <div data-slot="stack">
     <div data-slot="controls">
       <label data-slot="label">
-        <Checkbox :checked="disabled" @checked-change="(next) => (disabled = next === true)">
+        <Checkbox
+          :checked="disabled"
+          @checked-change="(next) => (disabled = next === true)"
+        >
           <CheckboxIndicator>
             <CheckIcon aria-hidden="true" />
           </CheckboxIndicator>
@@ -34,7 +43,10 @@ function onSubmit(event: Event) {
         Disabled
       </label>
       <label data-slot="label">
-        <Checkbox :checked="readOnly" @checked-change="(next) => (readOnly = next === true)">
+        <Checkbox
+          :checked="readOnly"
+          @checked-change="(next) => (readOnly = next === true)"
+        >
           <CheckboxIndicator>
             <CheckIcon aria-hidden="true" />
           </CheckboxIndicator>
@@ -45,7 +57,13 @@ function onSubmit(event: Event) {
     <div data-slot="stack">
       <Field :disabled="disabled">
         <FieldLabel>Prompt</FieldLabel>
-        <TokenInput :form="formId" name="prompt" required :default-value="draft" :read-only="readOnly">
+        <TokenInput
+          :form="formId"
+          name="prompt"
+          required
+          :default-value="draft"
+          :read-only="readOnly"
+        >
           <TokenInputEditor />
         </TokenInput>
       </Field>

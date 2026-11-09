@@ -6,7 +6,9 @@ function Example() {
     <Field>
       <div data-slot="stack">
         <FieldLabel>Encrypt backups</FieldLabel>
-        <FieldDescription>Your organization manages this setting.</FieldDescription>
+        <FieldDescription>
+          Your organization manages this setting.
+        </FieldDescription>
       </div>
       <Switch name="encrypt" defaultChecked readOnly>
         <SwitchThumb />

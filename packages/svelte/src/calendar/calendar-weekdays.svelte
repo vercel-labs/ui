@@ -21,7 +21,11 @@ be a snippet of the column's index that renders it, with a CalendarWeekday.
   } = $props()
 
   const grid = useCalendarGrid("CalendarWeekdays")
-  const row = useHandlePart(useCalendar("CalendarWeekdays"), "weekdays", () => ({ id: String(grid.offset) }))
+  const row = useHandlePart(
+    useCalendar("CalendarWeekdays"),
+    "weekdays",
+    () => ({ id: String(grid.offset) })
+  )
 </script>
 
 {#snippet cells()}

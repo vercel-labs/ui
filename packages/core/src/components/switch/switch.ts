@@ -13,7 +13,10 @@ import {
 import { createChange } from "../../foundation/kernel/input-source"
 import { createController } from "../../foundation/kernel/controller"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Why the switch checked change happened, as `reason` in its change details:

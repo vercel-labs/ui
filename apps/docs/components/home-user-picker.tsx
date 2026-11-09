@@ -14,19 +14,31 @@ import {
   popupTrigger,
   type ChangeDetails,
 } from "@ui-sdk/core"
-import { popoverPreset, type PopoverOpenChangeReason } from "@ui-sdk/core/popover"
+import {
+  popoverPreset,
+  type PopoverOpenChangeReason,
+} from "@ui-sdk/core/popover"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type UserPickerOptions = {
   open?: boolean
   defaultOpen?: boolean
-  onOpenChange?: (open: boolean, details: ChangeDetails<PopoverOpenChangeReason | "item-press">) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<PopoverOpenChangeReason | "item-press">
+  ) => void
   value?: string[]
   defaultValue?: string[]
-  onValueChange?: (value: string[], details: ChangeDetails<"item-press">) => void
+  onValueChange?: (
+    value: string[],
+    details: ChangeDetails<"item-press">
+  ) => void
 }
 
-type UserPickerState = ReturnType<typeof popupState> & { value: string[]; stop: string | null }
+type UserPickerState = ReturnType<typeof popupState> & {
+  value: string[]
+  stop: string | null
+}
 
 const userPicker = definePrimitive({
   name: "user-picker",
@@ -50,10 +62,13 @@ const userPicker = definePrimitive({
   api: (context) => {
     const popup = createPopup(context, { preset: popoverPreset })
     const change = createChange(context)
-    const roving = createRovingFocus<UserPickerState, { value: string }>(context, {
-      slot: "option",
-      key: "stop",
-    })
+    const roving = createRovingFocus<UserPickerState, { value: string }>(
+      context,
+      {
+        slot: "option",
+        key: "stop",
+      }
+    )
     const selection = createSelection(context, {
       key: "value",
       set: (value, details) => change("value", value, details),
@@ -63,9 +78,13 @@ const userPicker = definePrimitive({
     let wasOpen = context.store.get().open
     context.store.subscribe(() => {
       const { open, value } = context.store.get()
-      if (open === wasOpen) return
+      if (open === wasOpen) {
+        return
+      }
       wasOpen = open
-      if (open) context.store.set({ stop: value[0] ?? null })
+      if (open) {
+        context.store.set({ stop: value[0] ?? null })
+      }
     })
     const pick = (key: string, event?: Event) => {
       selection.choose(key, { reason: "item-press", event })
@@ -76,19 +95,26 @@ const userPicker = definePrimitive({
       roving,
       pick,
       keydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (event.key === "Enter" || (event.key === " " && !typeahead.active())) {
+        if (
+          event.key === "Enter" ||
+          (event.key === " " && !typeahead.active())
+        ) {
           event.preventDefault()
           return pick(key, event)
         }
-        if (roving.keydown(event, el) || !isTypeaheadKey(event)) return
+        if (roving.keydown(event, el) || !isTypeaheadKey(event)) {
+          return
+        }
         const items = roving.items()
         const labels = items.map((item) => labelOf(item.el))
         const index = typeahead(
           event.key,
           labels,
-          items.findIndex((item) => item.el === el),
+          items.findIndex((item) => item.el === el)
         )
-        if (index !== -1) roving.focus(items[index].key)
+        if (index !== -1) {
+          roving.focus(items[index].key)
+        }
       },
     }
   },
@@ -103,7 +129,9 @@ const userPicker = definePrimitive({
         "aria-selected": String(state.value.includes(part.key)),
       }),
       press: ({ api, key }, event) => api.pick(key, event),
-      on: { keydown: (event, { el, api, key }) => api.keydown(event, el!, key) },
+      on: {
+        keydown: (event, { el, api, key }) => api.keydown(event, el!, key),
+      },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
   }),
@@ -114,6 +142,10 @@ const {
   Trigger: UserPickerTrigger,
   Content: UserPickerContent,
   Option: UserPickerOption,
-} = createParts(userPicker, { trigger: "button", content: "div", option: "div" })
+} = createParts(userPicker, {
+  trigger: "button",
+  content: "div",
+  option: "div",
+})
 
 export { UserPicker, UserPickerContent, UserPickerOption, UserPickerTrigger }

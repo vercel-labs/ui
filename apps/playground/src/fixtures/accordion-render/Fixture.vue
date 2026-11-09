@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui-sdk/vue"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "@ui-sdk/vue"
 import { describeValue } from "tests/fixtures/accordion.ts"
 import { ref } from "vue"
 
@@ -22,7 +28,9 @@ const action = ref("")
               <AccordionTrigger class="accordion-trigger">
                 <template #render="{ props, state: trigger }">
                   <button v-bind="props">
-                    Overview<span aria-hidden="true"> {{ trigger.open ? "−" : "+" }}</span>
+                    Overview<span aria-hidden="true">
+                      {{ trigger.open ? "−" : "+" }}</span
+                    >
                     <span class="index" hidden>{{ trigger.index }}</span>
                   </button>
                 </template>
@@ -44,7 +52,9 @@ const action = ref("")
             </template>
           </AccordionTrigger>
         </AccordionHeader>
-        <AccordionPanel class="accordion-panel">The details panel.</AccordionPanel>
+        <AccordionPanel class="accordion-panel"
+          >The details panel.</AccordionPanel
+        >
       </AccordionItem>
     </Accordion>
     <button>After</button>

@@ -9,9 +9,24 @@ const fields = [
     step: 0.01,
     format: { style: "currency", currency: "USD" },
   },
-  { label: "Discount", defaultValue: 0.15, step: 0.01, format: { style: "percent" } },
-  { label: "Weight", defaultValue: 2.5, step: 0.1, format: { style: "unit", unit: "kilogram" } },
-] satisfies { label: string; defaultValue: number; step: number; format: Intl.NumberFormatOptions }[]
+  {
+    label: "Discount",
+    defaultValue: 0.15,
+    step: 0.01,
+    format: { style: "percent" },
+  },
+  {
+    label: "Weight",
+    defaultValue: 2.5,
+    step: 0.1,
+    format: { style: "unit", unit: "kilogram" },
+  },
+] satisfies {
+  label: string
+  defaultValue: number
+  step: number
+  format: Intl.NumberFormatOptions
+}[]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `
@@ -38,13 +53,15 @@ function mount(root: HTMLElement) {
                   </ui-number-input-increment>
                 </ui-number-input-group>
               </ui-number-input>
-            </ui-field>`,
+            </ui-field>`
         )
         .join("")}
     </div>
   `
   root
-    .querySelectorAll<HTMLElement & { format: Intl.NumberFormatOptions }>("ui-number-input")
+    .querySelectorAll<HTMLElement & { format: Intl.NumberFormatOptions }>(
+      "ui-number-input"
+    )
     .forEach((el, index) => {
       el.format = fields[index].format
     })

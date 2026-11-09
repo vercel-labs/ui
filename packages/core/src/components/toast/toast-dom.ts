@@ -30,10 +30,18 @@ function addToastStyles(doc: Document) {
  * on, and toward the side it's aligned to. `start` and `end` follow the
  * writing direction.
  */
-function swipeDirections(side: "top" | "bottom", align: "start" | "center" | "end", rtl: boolean) {
+function swipeDirections(
+  side: "top" | "bottom",
+  align: "start" | "center" | "end",
+  rtl: boolean
+) {
   const directions: SwipeDirection[] = [side === "top" ? "up" : "down"]
-  if (align === "end") directions.push(rtl ? "left" : "right")
-  if (align === "start") directions.push(rtl ? "right" : "left")
+  if (align === "end") {
+    directions.push(rtl ? "left" : "right")
+  }
+  if (align === "start") {
+    directions.push(rtl ? "right" : "left")
+  }
   return directions
 }
 
@@ -45,13 +53,15 @@ function swipeDirections(side: "top" | "bottom", align: "start" | "center" | "en
  */
 function stackLayout(
   toasts: readonly { id: string; index: number; leaving: boolean }[],
-  heights: Map<string, number>,
+  heights: Map<string, number>
 ) {
   let offset = 0
   let total = 0
   const layout = new Map<string, { index: number; offset: number }>()
   for (const toast of toasts) {
-    if (toast.leaving) continue
+    if (toast.leaving) {
+      continue
+    }
     layout.set(toast.id, { index: toast.index, offset })
     const height = heights.get(toast.id) ?? 0
     offset += height
@@ -72,9 +82,13 @@ function naturalHeight(el: HTMLElement) {
   style.setProperty("height", "auto", "important")
   const css = getComputedStyle(el)
   let height = parseFloat(css.height)
-  if (css.boxSizing !== "border-box")
-    for (const side of ["Top", "Bottom"] as const)
-      height += parseFloat(css[`padding${side}`]) + parseFloat(css[`border${side}Width`])
+  if (css.boxSizing !== "border-box") {
+    for (const side of ["Top", "Bottom"] as const) {
+      height +=
+        parseFloat(css[`padding${side}`]) +
+        parseFloat(css[`border${side}Width`])
+    }
+  }
   style.setProperty("height", value, priority)
   // Read again with its height back, so the next change transitions from it rather than from auto.
   getComputedStyle(el).height
@@ -86,10 +100,16 @@ function naturalHeight(el: HTMLElement) {
  * one before it, else back where it was before it entered the region. Never
  * the page's body.
  */
-function focusAfterClose<T>(toasts: readonly T[], closing: T, fallback: T | undefined) {
+function focusAfterClose<T>(
+  toasts: readonly T[],
+  closing: T,
+  fallback: T | undefined
+) {
   const index = toasts.indexOf(closing)
   const rest = toasts.filter((toast) => toast !== closing)
-  if (!rest.length) return fallback
+  if (!rest.length) {
+    return fallback
+  }
   return rest[Math.min(Math.max(index, 0), rest.length - 1)]
 }
 
@@ -99,22 +119,33 @@ function focusAfterClose<T>(toasts: readonly T[], closing: T, fallback: T | unde
  */
 function pressedText(event: PointerEvent) {
   const doc = (event.target as Node | null)?.ownerDocument
-  if (!doc) return false
+  if (!doc) {
+    return false
+  }
   const { clientX: x, clientY: y } = event
   const caret = doc.caretPositionFromPoint?.(x, y)
-  const node = caret ? caret.offsetNode : doc.caretRangeFromPoint?.(x, y)?.startContainer
-  if (node?.nodeType !== Node.TEXT_NODE) return false
+  const node = caret
+    ? caret.offsetNode
+    : doc.caretRangeFromPoint?.(x, y)?.startContainer
+  if (node?.nodeType !== Node.TEXT_NODE) {
+    return false
+  }
   // `user-select: auto` takes its parent's, which Firefox doesn't compute.
   for (let el = node.parentElement; el; el = el.parentElement) {
     const { userSelect, webkitUserSelect } = getComputedStyle(el)
     const value = userSelect || webkitUserSelect
-    if (value === "none") return false
-    if (value && value !== "auto") break
+    if (value === "none") {
+      return false
+    }
+    if (value && value !== "auto") {
+      break
+    }
   }
   const range = doc.createRange()
   range.selectNodeContents(node)
   return Array.from(range.getClientRects()).some(
-    (rect) => x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom,
+    (rect) =>
+      x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
   )
 }
 
@@ -131,32 +162,53 @@ function watchAttention(
     // `from` is where focus came from, outside the region, when it entered.
     focus: (focused: boolean, from?: HTMLElement) => void
     away: (reason: "window-blur" | "page-hide", away: boolean) => void
-  },
+  }
 ) {
   const doc = el.ownerDocument
   const view = doc.defaultView ?? window
-  const onVisibility = () => report.away("page-hide", doc.visibilityState === "hidden")
+  const onVisibility = () =>
+    report.away("page-hide", doc.visibilityState === "hidden")
   const offs = [
-    on(el, "pointerenter", (event) => event.pointerType !== "touch" && report.hover(true)),
-    on(el, "pointerleave", (event) => event.pointerType !== "touch" && report.hover(false)),
+    on(
+      el,
+      "pointerenter",
+      (event) => event.pointerType !== "touch" && report.hover(true)
+    ),
+    on(
+      el,
+      "pointerleave",
+      (event) => event.pointerType !== "touch" && report.hover(false)
+    ),
     on(el, "focusin", (event) => {
       const from = event.relatedTarget as HTMLElement | null
       report.focus(true, from && !el.contains(from) ? from : undefined)
     }),
     on(el, "focusout", (event) => {
       const to = event.relatedTarget as Node | null
-      if (to) return void (!el.contains(to) && report.focus(false))
+      if (to) {
+        return void (!el.contains(to) && report.focus(false))
+      }
       // Focus went nowhere, or a framework removed the focused element from
       // inside its own render: checked once that's done.
-      queueMicrotask(() => (!doc.hasFocus() || !el.contains(doc.activeElement)) && report.focus(false))
+      queueMicrotask(
+        () =>
+          (!doc.hasFocus() || !el.contains(doc.activeElement)) &&
+          report.focus(false)
+      )
     }),
     on(view, "blur", () =>
-      setTimeout(() => doc.activeElement?.tagName !== "IFRAME" && report.away("window-blur", true)),
+      setTimeout(
+        () =>
+          doc.activeElement?.tagName !== "IFRAME" &&
+          report.away("window-blur", true)
+      )
     ),
     on(view, "focus", () => report.away("window-blur", false)),
   ]
   doc.addEventListener("visibilitychange", onVisibility)
-  if (doc.visibilityState === "hidden") report.away("page-hide", true)
+  if (doc.visibilityState === "hidden") {
+    report.away("page-hide", true)
+  }
   return () => {
     offs.forEach((off) => off())
     doc.removeEventListener("visibilitychange", onVisibility)

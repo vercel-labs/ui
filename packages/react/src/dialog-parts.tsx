@@ -34,11 +34,23 @@ import {
   type PartProps,
 } from "./use-primitive"
 
-type TriggerPartProps = Omit<PartProps<"button", DialogTriggerState>, "value" | "defaultValue" | "onChange"> &
+type TriggerPartProps = Omit<
+  PartProps<"button", DialogTriggerState>,
+  "value" | "defaultValue" | "onChange"
+> &
   Omit<DialogTriggerProps, "controller">
-type ContentPartProps<Payload = unknown> = PartProps<"div", DialogContentState<Payload>> & DialogContentProps
-type ClosePartProps = Omit<PartProps<"button", DialogCloseState>, "value" | "action"> & DialogCloseProps
-type ShortcutPartProps = PartProps<"span", DialogShortcutState> & DialogShortcutProps
+type ContentPartProps<Payload = unknown> = PartProps<
+  "div",
+  DialogContentState<Payload>
+> &
+  DialogContentProps
+type ClosePartProps = Omit<
+  PartProps<"button", DialogCloseState>,
+  "value" | "action"
+> &
+  DialogCloseProps
+type ShortcutPartProps = PartProps<"span", DialogShortcutState> &
+  DialogShortcutProps
 
 // The trigger a Shortcut part sits in, which may be outside its dialog, and its shortcut.
 const TriggerContext = React.createContext<{ shortcut?: string } | null>(null)
@@ -47,17 +59,32 @@ const text = (state: DialogShortcutState) => state.text
 
 // Dialog and AlertDialog render the same parts over their own primitive.
 // `viewport` renders the viewport around the content, for a dialog that can present as a sheet.
-function dialogParts(primitive: typeof dialogPrimitive, name: string, viewport?: typeof sheetViewport) {
-  const parts = createParts(primitive, { title: "h2", description: "p", close: "button", trigger: "button" })
+function dialogParts(
+  primitive: typeof dialogPrimitive,
+  name: string,
+  viewport?: typeof sheetViewport
+) {
+  const parts = createParts(primitive, {
+    title: "h2",
+    description: "p",
+    close: "button",
+    trigger: "button",
+  })
   // Where the popup renders. Set on the root or the content.
   const ContainerContext = React.createContext<PopupContainer>(undefined)
 
-  function Root({ children, container, ...options }: DialogOptions & { children?: React.ReactNode }) {
+  function Root({
+    children,
+    container,
+    ...options
+  }: DialogOptions & { children?: React.ReactNode }) {
     const handle = usePrimitive(primitive, options)
     useControllerEntry(options.controller, handle)
     return (
       <HandleScope handle={handle}>
-        <ContainerContext.Provider value={container}>{children}</ContainerContext.Provider>
+        <ContainerContext.Provider value={container}>
+          {children}
+        </ContainerContext.Provider>
       </HandleScope>
     )
   }
@@ -65,7 +92,9 @@ function dialogParts(primitive: typeof dialogPrimitive, name: string, viewport?:
   function Trigger({
     controller,
     ...props
-  }: TriggerPartProps & { controller?: DialogController<any, any> | AlertDialogController<any, any> }) {
+  }: TriggerPartProps & {
+    controller?: DialogController<any, any> | AlertDialogController<any, any>
+  }) {
     const { disabled, payload: _, shortcut, render, ...rest } = props
     // Until the dialog it names mounts, a trigger outside the dialog is a plain button.
     const unconnected = () =>
@@ -75,7 +104,11 @@ function dialogParts(primitive: typeof dialogPrimitive, name: string, viewport?:
       })
     return (
       <TriggerContext.Provider value={{ shortcut }}>
-        <Connected primitive={primitive} controller={controller} fallback={unconnected}>
+        <Connected
+          primitive={primitive}
+          controller={controller}
+          fallback={unconnected}
+        >
           <parts.Trigger {...props} />
         </Connected>
       </TriggerContext.Provider>
@@ -97,18 +130,32 @@ function dialogParts(primitive: typeof dialogPrimitive, name: string, viewport?:
     ...props
   }: ContentPartProps<Payload>) {
     const handle = useHandle(primitive)
-    const target = usePopupContainer(useOwnContainer(container, ContainerContext))
+    const target = usePopupContainer(
+      useOwnContainer(container, ContainerContext)
+    )
     // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
-    const partProps = { ...props, render: viewport ? viewport(handle, render) : render } as ContentPartProps
-    const element = usePart(handle, "content", { initialFocus, finalFocus, keepMounted }, partProps)
+    const partProps = {
+      ...props,
+      render: viewport ? viewport(handle, render) : render,
+    } as ContentPartProps
+    const element = usePart(
+      handle,
+      "content",
+      { initialFocus, finalFocus, keepMounted },
+      partProps
+    )
     return element && renderPopup(element, target)
   }
 
   function Shortcut(props: ShortcutPartProps) {
     const trigger = React.useContext(TriggerContext)
-    if (useNearest(primitive)) return <ShortcutPart inherited={trigger?.shortcut} {...props} />
+    if (useNearest(primitive)) {
+      return <ShortcutPart inherited={trigger?.shortcut} {...props} />
+    }
     // Inside a trigger whose dialog hasn't mounted yet, there's no shortcut to show.
-    if (trigger) return null
+    if (trigger) {
+      return null
+    }
     throw new Error(`${name} parts must be used inside <${name}>.`)
   }
 
@@ -118,7 +165,13 @@ function dialogParts(primitive: typeof dialogPrimitive, name: string, viewport?:
     children = text,
     ...props
   }: ShortcutPartProps & { inherited?: string }) {
-    return usePart(primitive, "shortcut", { shortcut: shortcut ?? inherited }, { ...props, children }, "span")
+    return usePart(
+      primitive,
+      "shortcut",
+      { shortcut: shortcut ?? inherited },
+      { ...props, children },
+      "span"
+    )
   }
 
   return {

@@ -15,19 +15,26 @@ import { onDestroy, onMount } from "svelte"
 function useAsyncOptions<Item>(
   load: (
     query: string,
-    context: AsyncOptionsContext,
+    context: AsyncOptionsContext
   ) => Promise<Item[] | { items: Item[]; hasMore?: boolean }>,
-  options?: AsyncOptionsOptions,
+  options?: AsyncOptionsOptions
 ) {
   // A component's script runs on the server too, so an `immediate` load
   // starts once it mounts. Until then it shows as loading, so nothing says "no match" first.
-  const helper = createAsyncOptions<Item>(load, { ...options, immediate: false })
+  const helper = createAsyncOptions<Item>(load, {
+    ...options,
+    immediate: false,
+  })
   const immediate = !!options?.immediate
   const initial = helper.getState()
-  let state = $state.raw<AsyncOptionsState<Item>>(immediate ? { ...initial, status: "loading" } : initial)
+  let state = $state.raw<AsyncOptionsState<Item>>(
+    immediate ? { ...initial, status: "loading" } : initial
+  )
   const unsubscribe = helper.subscribe(() => (state = helper.getState()))
   onMount(() => {
-    if (immediate && helper.getState() === initial) helper.reload()
+    if (immediate && helper.getState() === initial) {
+      helper.reload()
+    }
   })
   onDestroy(() => {
     unsubscribe()

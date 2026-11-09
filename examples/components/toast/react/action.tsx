@@ -1,5 +1,12 @@
 import * as React from "react"
-import { Toast, ToastAction, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/react/toast"
+import {
+  Toast,
+  ToastAction,
+  ToastClose,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/react/toast"
 import { useLog } from "../../../shared/react/log"
 
 function Example() {
@@ -9,7 +16,7 @@ function Example() {
     () => () => {
       toast.dismiss()
     },
-    [toast],
+    [toast]
   )
 
   return (
@@ -29,7 +36,11 @@ function Example() {
         {(item) => (
           <Toast>
             <ToastTitle />
-            {item.cancel && <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>}
+            {item.cancel && (
+              <ToastClose action={item.cancel.onCancel}>
+                {item.cancel.label}
+              </ToastClose>
+            )}
             <ToastAction data-variant="solid" />
           </Toast>
         )}

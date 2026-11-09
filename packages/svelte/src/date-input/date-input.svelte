@@ -7,7 +7,11 @@ render `state.segments`.
 @stable
 -->
 <script lang="ts">
-  import { dateInput, type DateInputOptions, type DateInputState } from "@ui-sdk/core/date-input"
+  import {
+    dateInput,
+    type DateInputOptions,
+    type DateInputState,
+  } from "@ui-sdk/core/date-input"
   import type { PartProps } from "../use-primitive.svelte"
   import DateInputSegment from "./date-input-segment.svelte"
   import SegmentedInput from "./segmented-input.svelte"
@@ -22,4 +26,9 @@ render `state.segments`.
     } = $props()
 </script>
 
-<SegmentedInput primitive={dateInput} Segment={DateInputSegment} bind:value {...rest} />
+<SegmentedInput
+  primitive={dateInput}
+  Segment={DateInputSegment}
+  bind:value
+  {...rest}
+/>

@@ -19,11 +19,15 @@ const focusable =
 // Waits for what a primitive schedules after an event: microtasks, a timer
 // and two frames, like a focus move that waits for the next frame.
 async function settle() {
-  for (let i = 0; i < 3; i++) await Promise.resolve()
+  for (let i = 0; i < 3; i++) {
+    await Promise.resolve()
+  }
   await new Promise((resolve) => setTimeout(resolve))
   const frame = () =>
     new Promise((resolve) =>
-      typeof requestAnimationFrame === "function" ? requestAnimationFrame(resolve) : setTimeout(resolve, 16),
+      typeof requestAnimationFrame === "function"
+        ? requestAnimationFrame(resolve)
+        : setTimeout(resolve, 16)
     )
   await frame()
   await frame()
@@ -52,15 +56,24 @@ const codeOf = (key: string) =>
         ? `Digit${key}`
         : key
 
-function isEditable(el: Element | null): el is HTMLInputElement | HTMLTextAreaElement | HTMLElement {
-  if (!el) return false
-  if (el instanceof HTMLTextAreaElement) return !el.readOnly && !el.matches(":disabled")
-  if (el instanceof HTMLInputElement)
+function isEditable(
+  el: Element | null
+): el is HTMLInputElement | HTMLTextAreaElement | HTMLElement {
+  if (!el) {
+    return false
+  }
+  if (el instanceof HTMLTextAreaElement) {
+    return !el.readOnly && !el.matches(":disabled")
+  }
+  if (el instanceof HTMLInputElement) {
     return (
       !el.readOnly &&
       !el.matches(":disabled") &&
-      !/^(button|checkbox|radio|submit|reset|range|color|file|image)$/.test(el.type)
+      !/^(button|checkbox|radio|submit|reset|range|color|file|image)$/.test(
+        el.type
+      )
     )
+  }
   return (el as HTMLElement).isContentEditable
 }
 
@@ -70,9 +83,11 @@ const isHidden = (el: Element) => !!el.closest("[hidden], [inert]")
 // The elements Tab stops at, in order: positive tabindex first, then the page's order.
 function tabOrder(doc: Document) {
   const stops = [...doc.querySelectorAll<HTMLElement>(focusable)].filter(
-    (el) => el.tabIndex >= 0 && !el.matches(":disabled") && !isHidden(el),
+    (el) => el.tabIndex >= 0 && !el.matches(":disabled") && !isHidden(el)
   )
-  const positive = stops.filter((el) => el.tabIndex > 0).sort((a, b) => a.tabIndex - b.tabIndex)
+  const positive = stops
+    .filter((el) => el.tabIndex > 0)
+    .sort((a, b) => a.tabIndex - b.tabIndex)
   return [...positive, ...stops.filter((el) => el.tabIndex === 0)]
 }
 
@@ -85,16 +100,30 @@ function moveTab(doc: Document, backward: boolean, scope?: Element) {
     return (backward ? inside.at(-1) : inside[0])?.focus()
   }
   const index = active ? stops.indexOf(active) : -1
-  const next = backward ? (index < 0 ? stops.at(-1) : stops[index - 1]) : stops[index + 1]
-  if (next) next.focus()
-  else active?.blur()
+  const next = backward
+    ? index < 0
+      ? stops.at(-1)
+      : stops[index - 1]
+    : stops[index + 1]
+  if (next) {
+    next.focus()
+  } else {
+    active?.blur()
+  }
 }
 
 // Enter and Space click a button as a browser does: a click with no pointer
 // behind it, which the key that sent it explains.
 const keyClick = (el: HTMLElement) =>
   el.dispatchEvent(
-    markTrusted(new MouseEvent("click", { bubbles: true, cancelable: true, composed: true, detail: 0 })),
+    markTrusted(
+      new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        detail: 0,
+      })
+    )
   )
 
 function keyEvent(type: string, init: ReturnType<typeof parseKey>) {
@@ -105,22 +134,38 @@ function keyEvent(type: string, init: ReturnType<typeof parseKey>) {
       bubbles: true,
       cancelable: true,
       composed: true,
-    }),
+    })
   )
 }
 
 // Writes one character where the caret is, as typing does: beforeinput, which
 // can cancel it, then the value, then input.
-function insert(el: HTMLInputElement | HTMLTextAreaElement | HTMLElement, data: string) {
+function insert(
+  el: HTMLInputElement | HTMLTextAreaElement | HTMLElement,
+  data: string
+) {
   const before = markTrusted(
-    new InputEvent("beforeinput", { data, inputType: "insertText", bubbles: true, cancelable: true }),
+    new InputEvent("beforeinput", {
+      data,
+      inputType: "insertText",
+      bubbles: true,
+      cancelable: true,
+    })
   )
-  if (!el.dispatchEvent(before)) return
+  if (!el.dispatchEvent(before)) {
+    return
+  }
   if ("setRangeText" in el) {
     const start = el.selectionStart ?? el.value.length
     el.setRangeText(data, start, el.selectionEnd ?? start, "end")
-  } else el.textContent = (el.textContent ?? "") + data
-  el.dispatchEvent(markTrusted(new InputEvent("input", { data, inputType: "insertText", bubbles: true })))
+  } else {
+    el.textContent = (el.textContent ?? "") + data
+  }
+  el.dispatchEvent(
+    markTrusted(
+      new InputEvent("input", { data, inputType: "insertText", bubbles: true })
+    )
+  )
 }
 
 const activates = (el: Element | null, key: string) =>
@@ -140,13 +185,21 @@ async function keys(doc: Document, names: string[], scope?: Element) {
     const init = parseKey(name)
     const target = (doc.activeElement as HTMLElement | null) ?? doc.body
     const proceeds = target.dispatchEvent(keyEvent("keydown", init))
-    if (proceeds && init.key === "Tab") moveTab(doc, init.shiftKey, scope)
+    if (proceeds && init.key === "Tab") {
+      moveTab(doc, init.shiftKey, scope)
+    }
     const printable = init.key.length === 1 && !init.ctrlKey && !init.metaKey
-    if (proceeds && printable && isEditable(target)) insert(target, init.key)
-    if (proceeds && init.key === "Enter" && activates(target, "Enter")) keyClick(target)
+    if (proceeds && printable && isEditable(target)) {
+      insert(target, init.key)
+    }
+    if (proceeds && init.key === "Enter" && activates(target, "Enter")) {
+      keyClick(target)
+    }
     const up = (doc.activeElement as HTMLElement | null) ?? doc.body
     up.dispatchEvent(keyEvent("keyup", init))
-    if (proceeds && init.key === " " && activates(target, " ")) keyClick(target)
+    if (proceeds && init.key === " " && activates(target, " ")) {
+      keyClick(target)
+    }
     await settle()
   }
 }
@@ -155,7 +208,7 @@ async function keys(doc: Document, names: string[], scope?: Element) {
 const type = (doc: Document, text: string) =>
   keys(
     doc,
-    [...text].map((char) => (char === " " ? "Space" : char)),
+    [...text].map((char) => (char === " " ? "Space" : char))
   )
 
 function center(el: Element) {
@@ -176,7 +229,9 @@ function pointer(type: string, at: { x: number; y: number }, pressed: boolean) {
     buttons: pressed ? 1 : 0,
     detail: type === "click" ? 1 : 0,
   }
-  if (!type.startsWith("pointer")) return markTrusted(new MouseEvent(type, init))
+  if (!type.startsWith("pointer")) {
+    return markTrusted(new MouseEvent(type, init))
+  }
   return markTrusted(
     new PointerEvent(type, {
       ...init,
@@ -186,7 +241,7 @@ function pointer(type: string, at: { x: number; y: number }, pressed: boolean) {
       width: 1,
       height: 1,
       pressure: pressed ? 0.5 : 0,
-    }),
+    })
   )
 }
 
@@ -202,9 +257,13 @@ function focusTarget(el: Element) {
  */
 async function click(el: Element) {
   const at = center(el)
-  const disabled = !!el.closest("button, input, select, textarea")?.matches(":disabled")
+  const disabled = !!el
+    .closest("button, input, select, textarea")
+    ?.matches(":disabled")
   const down = el.dispatchEvent(pointer("pointerdown", at, true))
-  if (!disabled && el.dispatchEvent(pointer("mousedown", at, true)) && down) focusTarget(el)?.focus()
+  if (!disabled && el.dispatchEvent(pointer("mousedown", at, true)) && down) {
+    focusTarget(el)?.focus()
+  }
   el.dispatchEvent(pointer("pointerup", at, false))
   if (!disabled) {
     el.dispatchEvent(pointer("mouseup", at, false))
@@ -216,8 +275,16 @@ async function click(el: Element) {
 /** Moves a mouse onto an element, like resting on a trigger. */
 async function hover(el: Element) {
   const at = center(el)
-  for (const type of ["pointerover", "pointerenter", "mouseover", "mouseenter", "pointermove", "mousemove"])
+  for (const type of [
+    "pointerover",
+    "pointerenter",
+    "mouseover",
+    "mouseenter",
+    "pointermove",
+    "mousemove",
+  ]) {
     el.dispatchEvent(pointer(type, at, false))
+  }
   await settle()
 }
 
@@ -225,16 +292,25 @@ async function hover(el: Element) {
  * Drags an element with a mouse onto another, or by a distance: down, moves
  * past the drag threshold in steps, then up where it ends.
  */
-async function drag(el: Element, target: { to: Element } | { by: { x: number; y: number } }) {
+async function drag(
+  el: Element,
+  target: { to: Element } | { by: { x: number; y: number } }
+) {
   const from = center(el)
-  const to = "to" in target ? center(target.to) : { x: from.x + target.by.x, y: from.y + target.by.y }
+  const to =
+    "to" in target
+      ? center(target.to)
+      : { x: from.x + target.by.x, y: from.y + target.by.y }
   el.dispatchEvent(pointer("pointerdown", from, true))
   el.dispatchEvent(pointer("mousedown", from, true))
   await settle()
   const distance = Math.hypot(to.x - from.x, to.y - from.y)
   const steps = Math.max(2, Math.ceil(distance / dragThreshold))
   for (let step = 1; step <= steps; step++) {
-    const at = { x: from.x + ((to.x - from.x) * step) / steps, y: from.y + ((to.y - from.y) * step) / steps }
+    const at = {
+      x: from.x + ((to.x - from.x) * step) / steps,
+      y: from.y + ((to.y - from.y) * step) / steps,
+    }
     el.dispatchEvent(pointer("pointermove", at, true))
     el.dispatchEvent(pointer("mousemove", at, true))
   }

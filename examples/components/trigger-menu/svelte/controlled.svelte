@@ -15,7 +15,14 @@
     {
       value: "status",
       label: "status",
-      arguments: [{ name: "status", hint: "<status>", required: true, items: ["available", "busy", "away"] }],
+      arguments: [
+        {
+          name: "status",
+          hint: "<status>",
+          required: true,
+          items: ["available", "busy", "away"],
+        },
+      ],
     },
   ]
 
@@ -29,9 +36,13 @@
     { char: "/", boundary: "start", items: commands },
   ]}
   bind:open
-  onOpenChange={(next, details) => log(`${next ? "Opening" : "Closing"} (${details.reason})`)}
+  onOpenChange={(next, details) =>
+    log(`${next ? "Opening" : "Closing"} (${details.reason})`)}
   onOpenChangeComplete={(next) => log(next ? "Open" : "Closed")}
-  onQueryChange={(query, details) => log(`Query “${query}”${details.argument ? ` for ${details.argument}` : ""}`)}
+  onQueryChange={(query, details) =>
+    log(
+      `Query “${query}”${details.argument ? ` for ${details.argument}` : ""}`
+    )}
   shortcut="ctrl+j"
 >
   <Field>

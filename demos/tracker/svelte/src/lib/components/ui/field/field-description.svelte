@@ -3,7 +3,13 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let { class: className, ...rest }: ComponentProps<typeof FieldDescription> & { class?: string } = $props()
+  let {
+    class: className,
+    ...rest
+  }: ComponentProps<typeof FieldDescription> & { class?: string } = $props()
 </script>
 
-<FieldDescription class={cn("text-sm text-muted-foreground", className)} {...rest} />
+<FieldDescription
+  class={cn("text-sm text-muted-foreground", className)}
+  {...rest}
+/>

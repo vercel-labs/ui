@@ -1,5 +1,9 @@
 import { menu } from "@ui-sdk/core/menu"
-import { usePart, usePrimitive, type PrimitiveHandle } from "@ui-sdk/react/primitive"
+import {
+  usePart,
+  usePrimitive,
+  type PrimitiveHandle,
+} from "@ui-sdk/react/primitive"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { countSubscriptions, perfItems, perfSize } from "tests/fixtures/perf.ts"
@@ -17,7 +21,8 @@ function Item({
   value: string
   label: string
 }) {
-  const children = (state: { highlighted: boolean }) => `${state.highlighted ? "→ " : ""}${label}`
+  const children = (state: { highlighted: boolean }) =>
+    `${state.highlighted ? "→ " : ""}${label}`
   return usePart(handle, "item", { value }, { children })
 }
 
@@ -32,7 +37,12 @@ function Fixture() {
       <output aria-label="Renders">{renders}</output>
       <div role="menu" aria-label="Items">
         {items.map((item) => (
-          <Item key={item.value} handle={handle} value={item.value} label={item.label} />
+          <Item
+            key={item.value}
+            handle={handle}
+            value={item.value}
+            label={item.label}
+          />
         ))}
       </div>
       <button>After</button>

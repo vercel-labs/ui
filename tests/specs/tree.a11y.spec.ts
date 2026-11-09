@@ -7,18 +7,27 @@ async function audit(page: Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
-const item = (page: Page, name: string) => page.getByRole("treeitem", { name, exact: true })
+const item = (page: Page, name: string) =>
+  page.getByRole("treeitem", { name, exact: true })
 
-test("no axe violations with every branch collapsed", async ({ page, open }) => {
+test("no axe violations with every branch collapsed", async ({
+  page,
+  open,
+}) => {
   await open("tree")
   await expect(item(page, "src")).toBeVisible()
   expect(await audit(page)).toEqual([])
 })
 
-test("no axe violations with nested branches expanded and an item selected", async ({ page, open }) => {
+test("no axe violations with nested branches expanded and an item selected", async ({
+  page,
+  open,
+}) => {
   await open("tree", { expanded: "src,components", default: "dialog.tsx" })
   await expect(item(page, "dialog.tsx")).toBeVisible()
   expect(await audit(page)).toEqual([])
@@ -26,7 +35,9 @@ test("no axe violations with nested branches expanded and an item selected", asy
 
 test("no axe violations with checkboxes", async ({ page, open }) => {
   await open("tree", { checkable: "", selection: "none", expanded: "src" })
-  await item(page, "src").locator(':scope > [data-slot="tree-checkbox"]').click()
+  await item(page, "src")
+    .locator(':scope > [data-slot="tree-checkbox"]')
+    .click()
   expect(await audit(page)).toEqual([])
 })
 
@@ -34,11 +45,18 @@ test("no axe violations with multiple selection and collapsed groups kept mounte
   page,
   open,
 }) => {
-  await open("tree", { selection: "multiple", "keep-mounted": "", default: "src,docs" })
+  await open("tree", {
+    selection: "multiple",
+    "keep-mounted": "",
+    default: "src,docs",
+  })
   expect(await audit(page)).toEqual([])
 })
 
-test("the tree is named, and each item by its label alone", async ({ page, open }) => {
+test("the tree is named, and each item by its label alone", async ({
+  page,
+  open,
+}) => {
   await open("tree", { expanded: "src" })
   await expect(page.getByRole("tree", { name: "Files" })).toBeVisible()
   await expect(item(page, "src")).toBeVisible()

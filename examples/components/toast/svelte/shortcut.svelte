@@ -1,6 +1,12 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import { Toast, ToastAction, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import {
+    Toast,
+    ToastAction,
+    ToastRegion,
+    ToastTitle,
+    createToaster,
+  } from "@ui-sdk/svelte/toast"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -10,7 +16,12 @@
   })
 </script>
 
-<button onclick={() => toast("Message sent", { action: { label: "Undo", onAction: () => log("Message unsent") } })}>
+<button
+  onclick={() =>
+    toast("Message sent", {
+      action: { label: "Undo", onAction: () => log("Message unsent") },
+    })}
+>
   Send Message
 </button>
 <ToastRegion toaster={toast} shortcut="alt+t" aria-label="Alerts">

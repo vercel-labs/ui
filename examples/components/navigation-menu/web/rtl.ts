@@ -73,12 +73,12 @@ function mount(root: HTMLElement) {
                       <span data-slot="hint">${link.description}</span>
                     </a>
                   </ui-navigation-menu-link>
-                </li>`,
+                </li>`
                   )
                   .join("")}
               </ul>
             </ui-navigation-menu-content>
-          </ui-navigation-menu-item>`,
+          </ui-navigation-menu-item>`
             )
             .join("")}
           <ui-navigation-menu-item>

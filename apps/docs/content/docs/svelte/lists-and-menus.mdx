@@ -9,12 +9,19 @@ Select, Combobox, Autocomplete, Listbox, and Trigger Menu accept items as data. 
 
 ```svelte
 <script lang="ts">
-import { Select, SelectContent, SelectTrigger, SelectValue } from "@ui-sdk/svelte/select"
+  import {
+    Select,
+    SelectContent,
+    SelectTrigger,
+    SelectValue,
+  } from "@ui-sdk/svelte/select"
 </script>
 
 <Select items={["Apple", "Banana", "Pear"]}>
-<SelectTrigger aria-label="Fruit"><SelectValue placeholder="Choose a fruit" /></SelectTrigger>
-<SelectContent />
+  <SelectTrigger aria-label="Fruit"
+    ><SelectValue placeholder="Choose a fruit" /></SelectTrigger
+  >
+  <SelectContent />
 </Select>
 ```
 
@@ -37,7 +44,14 @@ Items as data render bare parts, each with just its label. To style them, render
 
 ```svelte
 <script lang="ts">
-  import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, type ListData } from "@ui-sdk/svelte/select"
+  import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+    type ListData,
+  } from "@ui-sdk/svelte/select"
 
   const fruits = [
     { value: "apple", label: "Apple" },
@@ -46,7 +60,9 @@ Items as data render bare parts, each with just its label. To style them, render
 </script>
 
 <Select items={fruits}>
-  <SelectTrigger aria-label="Fruit" class="…"><SelectValue placeholder="Choose a fruit" /></SelectTrigger>
+  <SelectTrigger aria-label="Fruit" class="…"
+    ><SelectValue placeholder="Choose a fruit" /></SelectTrigger
+  >
   <SelectContent class="…">
     {#each fruits as fruit (fruit.value)}
       <SelectItem value={fruit.value} class="…">{fruit.label}</SelectItem>
@@ -69,17 +85,21 @@ A `MenuData` array describes actions, separators, groups, and submenus. A plain 
 
 ```svelte
 <script lang="ts">
-import { Menu, MenuTrigger, type MenuData } from "@ui-sdk/svelte/menu"
+  import { Menu, MenuTrigger, type MenuData } from "@ui-sdk/svelte/menu"
 
-const actions: MenuData = [
-  { value: "open", label: "Open", shortcut: "mod+o" },
-  { type: "separator" },
-  { type: "submenu", label: "Share", items: [{ value: "email", label: "Email" }] },
-]
+  const actions: MenuData = [
+    { value: "open", label: "Open", shortcut: "mod+o" },
+    { type: "separator" },
+    {
+      type: "submenu",
+      label: "Share",
+      items: [{ value: "email", label: "Email" }],
+    },
+  ]
 </script>
 
 <Menu items={actions} onAction={(value) => console.log(value)}>
-<MenuTrigger>File</MenuTrigger>
+  <MenuTrigger>File</MenuTrigger>
 </Menu>
 ```
 

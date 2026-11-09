@@ -4,7 +4,6 @@ What's already decided about `@ui-sdk/solid`, and what's known and open. The exp
 
 Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-01, follow-ups to 89 and 90), and 160 and 161 (2026-11-01, the focus trap fixes), and 175 to 186 (2026-11-02, the pre-launch audit fixes), and 213 (2026-11-03, field control ids on the server), and 214 (2026-11-03, the toast motion fix), and 218 (2026-11-04, the examples and docs review: textarea submitShortcut, token-input custom render, toast swipe from unselectable text, navigation-menu link timing, web shared-element data-slot), and 243 to 249 (2026-11-05, the new components: Label, Segmented Control, Rating, color, Color Picker, image, Image Cropper), and 241 (2026-11-05, date input and time input), and 321 (2026-11-09, `web.css`, the drop-in stylesheet), and 326 (2026-11-09, button attributes before bind).
 
-
 ## Settled
 
 - **Solid 2 only** (`solid-js >=2.0.0-rc.14`). `ownedWrite` workarounds for signals written while children render go when Solid 2 is final. Signals fed by core's listeners keep it for good, since core writes synchronously during a disposal whatever Solid does.
@@ -24,6 +23,7 @@ Last reviewed: PRs 86 to 92 (2026-10-30, the audit fixes), 158 and 159 (2026-11-
 - **Button-like parts render `type`, `disabled` and `aria-disabled` together until they bind**, and no role, so server HTML is right for a `<button>` and an `<a>`. On an `<a>` or `<span>`, `type` and `disabled` are invalid but inert until then, and a disabled link still navigates before hydration, since only script can stop the click. Before bind they don't write `tabindex`, so a web component's author tabindex survives the first pass (PR 326, 2026-11-09).
 
 ## Known and open (don't report again, check whether fixed)
+
 - **A drawer or popover open in server HTML is unpositioned until hydration.** `web.css` now places the drawer's viewport; an open popover still sits in flow until core positions it (suspected, PR 321).
 - **`data-required` reaches field parts around a required Combobox only after mount** (suspected, PR 321).
 

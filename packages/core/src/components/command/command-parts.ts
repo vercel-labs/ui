@@ -12,8 +12,16 @@ import type {
   CommandShortcutState,
 } from "./command"
 import { fieldPart, optionPart } from "../../foundation/lists/autocomplete-core"
-import { currentPage, type CommandApi, type CommandItemMeta, type CommandStore } from "./command-api"
-import { ariaKeyshortcuts, formatShortcut } from "../../foundation/platform/platform"
+import {
+  currentPage,
+  type CommandApi,
+  type CommandItemMeta,
+  type CommandStore,
+} from "./command-api"
+import {
+  ariaKeyshortcuts,
+  formatShortcut,
+} from "../../foundation/platform/platform"
 import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
 import {
   emptyPart,
@@ -24,7 +32,10 @@ import {
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
 import { itemIconPart, optionIcon } from "../../foundation/lists/item-icon"
-import { itemTextPart, type ListItemTextProps } from "../../foundation/lists/listbox-search"
+import {
+  itemTextPart,
+  type ListItemTextProps,
+} from "../../foundation/lists/listbox-search"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
 import { onProps } from "../../foundation/kernel/part"
@@ -58,7 +69,13 @@ const unreadByItems = {
 } satisfies Record<
   Exclude<
     keyof CommandStore,
-    "highlighted" | "listing" | "pending" | "error" | "pages" | "apple" | "focusInList"
+    | "highlighted"
+    | "listing"
+    | "pending"
+    | "error"
+    | "pages"
+    | "apple"
+    | "focusInList"
   >,
   readonly never[]
 >
@@ -69,8 +86,13 @@ const option = optionPart<CommandStore, CommandApi>()
 const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
   // The element around the field and the list.
   root: slot<{}, CommandState>({
-    state: (state) => ({ page: currentPage(state), loading: state.status === "loading" }),
-    attrs: (state) => ({ "data-loading": state.status === "loading" ? "" : undefined }),
+    state: (state) => ({
+      page: currentPage(state),
+      loading: state.status === "loading",
+    }),
+    attrs: (state) => ({
+      "data-loading": state.status === "loading" ? "" : undefined,
+    }),
     bind(el, { api }) {
       api.internal.syncPlatform()
       return api.internal.bindDataShortcuts(el)
@@ -89,21 +111,30 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
       "aria-controls": `${context.id}-list`,
     }),
     bind(el, context) {
-      if (dev)
-        warnIfUnnamed(el, "The search field has no accessible name. Add an aria-label or a label.", {
-          component: "command",
-          id: context.id,
-        })
+      if (dev) {
+        warnIfUnnamed(
+          el,
+          "The search field has no accessible name. Add an aria-label or a label.",
+          {
+            component: "command",
+            id: context.id,
+          }
+        )
+      }
       return field.bind(el, context)
     },
   }),
 
   list: slot<{}, CommandListState>({
     role: "listbox",
-    keys: { none: "The search field handles them, and keeps focus while they move the highlight." },
+    keys: {
+      none: "The search field handles them, and keeps focus while they move the highlight.",
+    },
     state: (state, { api }) => ({
       status: state.status,
-      items: (api.internal.listbox.visibleData()?.list as CommandData | undefined) ?? noCommands,
+      items:
+        (api.internal.listbox.visibleData()?.list as CommandData | undefined) ??
+        noCommands,
     }),
     attrs: (state, { id }) => ({
       id: `${id}-list`,
@@ -148,7 +179,8 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
       pending: ({ key }) => [key],
       ...unreadByItems,
     }),
-    present: (state, { props, api }) => api.internal.onCurrentPage(state, props.inPage),
+    present: (state, { props, api }) =>
+      api.internal.onCurrentPage(state, props.inPage),
     state: (state, { key, props }) => itemState(state, key, props),
     attrs: (state, context) => {
       const { key, props } = context
@@ -158,14 +190,18 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
         ...attrs,
         "aria-disabled": pending ? "true" : attrs["aria-disabled"],
         "aria-busy": pending ? "true" : undefined,
-        "aria-keyshortcuts": props.shortcut ? ariaKeyshortcuts(props.shortcut, state.apple) : undefined,
+        "aria-keyshortcuts": props.shortcut
+          ? ariaKeyshortcuts(props.shortcut, state.apple)
+          : undefined,
         "data-pending": pending ? "" : undefined,
       }
     },
     bind(el, context) {
       const unregister = option.bind(el, context)
-      const unbindShortcut = context.api.internal.bindItemShortcut(el, context.key, (listener) =>
-        onProps(context, listener),
+      const unbindShortcut = context.api.internal.bindItemShortcut(
+        el,
+        context.key,
+        (listener) => onProps(context, listener)
       )
       return () => {
         unregister()
@@ -175,10 +211,17 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
   }),
 
   // The command's text, with what the search matched in `<mark>`.
-  "item-text": slot<ListItemTextProps, CommandItemTextState>(itemTextPart<CommandStore, CommandApi>()),
+  "item-text": slot<ListItemTextProps, CommandItemTextState>(
+    itemTextPart<CommandStore, CommandApi>()
+  ),
 
   // An icon inside a command.
-  "item-icon": slot(itemIconPart<CommandStore, CommandApi>({ component: "command", ...optionIcon })),
+  "item-icon": slot(
+    itemIconPart<CommandStore, CommandApi>({
+      component: "command",
+      ...optionIcon,
+    })
+  ),
 
   group: slot(optionGroupPart<CommandStore, CommandApi>()),
 
@@ -208,10 +251,14 @@ const commandSlots = (slot: SlotFactory<CommandStore, CommandApi>) => ({
     attrs: () => ({ "aria-hidden": "true", translate: "no" }),
     bind(el, { store, api, props }) {
       // An empty element shows the keys itself, like a web component without children.
-      if (el.childNodes.length) return
+      if (el.childNodes.length) {
+        return
+      }
       const write = () => {
         const shortcut = props.shortcut ?? api.internal.shortcutOf(el)
-        el.textContent = shortcut ? formatShortcut(shortcut, store.get().apple) : ""
+        el.textContent = shortcut
+          ? formatShortcut(shortcut, store.get().apple)
+          : ""
       }
       write()
       const off = store.subscribe(write)

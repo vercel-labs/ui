@@ -12,7 +12,11 @@ import {
 </script>
 
 <template>
-  <ColorPicker aria-label="Accent" space="oklch" default-value="oklch(0.62 0.19 259)">
+  <ColorPicker
+    aria-label="Accent"
+    space="oklch"
+    default-value="oklch(0.62 0.19 259)"
+  >
     <ColorPickerArea>
       <ColorPickerAreaCanvas />
       <ColorPickerAreaThumb />

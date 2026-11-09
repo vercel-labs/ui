@@ -21,7 +21,9 @@ const log = useLog()
     activation="automatic"
     :default-value="['readme']"
     aria-label="Files"
-    @value-change="(value, details) => log(`${value.length} selected (${details.reason})`)"
+    @value-change="
+      (value, details) => log(`${value.length} selected (${details.reason})`)
+    "
   >
     <ListboxItem v-for="file in files" :key="file.value" :value="file.value">
       <ListboxItemIcon>

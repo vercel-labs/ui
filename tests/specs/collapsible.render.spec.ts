@@ -24,19 +24,27 @@ test.describe("custom rendering", () => {
     await expect(trigger).toHaveAttribute("aria-expanded", "false")
   })
 
-  test("a panel rendered as another element keeps its behavior", async ({ page }) => {
+  test("a panel rendered as another element keeps its behavior", async ({
+    page,
+  }) => {
     await page.getByRole("button", { name: "Files" }).click()
     const panel = page.locator(".collapsible-panel")
     await expect(panel).toBeVisible()
     expect(await panel.evaluate((el) => el.tagName)).toBe("SECTION")
     await expect(page.getByRole("button", { name: "Files" })).toHaveAttribute(
       "aria-controls",
-      (await panel.getAttribute("id"))!,
+      (await panel.getAttribute("id"))!
     )
   })
 
-  test("render functions and slots receive the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+  test("render functions and slots receive the part's state", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     const trigger = page.getByRole("button", { name: "Files" })
     await expect(trigger).toContainText("+")
     await expect(page.locator(".is-closed")).toHaveCount(1)

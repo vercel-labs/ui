@@ -28,13 +28,18 @@ function Example() {
         </SegmentedControl>
       </div>
       <div aria-hidden="true" data-slot="number-scale-dial">
-        <div data-needle data-slot="number-scale-needle" style={{ rotate: `${-angle}deg` }} />
+        <div
+          data-needle
+          data-slot="number-scale-needle"
+          style={{ rotate: `${-angle}deg` }}
+        />
       </div>
       <Field>
         <div data-slot="row">
           <FieldLabel>Rotation</FieldLabel>
           <span data-slot="hint">
-            <span data-angle>{degrees}</span>, <span data-position>{Math.round(position * 100)}% along</span>
+            <span data-angle>{degrees}</span>,{" "}
+            <span data-position>{Math.round(position * 100)}% along</span>
           </span>
         </div>
         <FieldControl
@@ -44,7 +49,9 @@ function Example() {
           max={1}
           step={0.001}
           value={position}
-          onChange={(event) => setAngle(valueAt(Number(event.target.value), range, scale))}
+          onChange={(event) =>
+            setAngle(valueAt(Number(event.target.value), range, scale))
+          }
         />
       </Field>
     </div>

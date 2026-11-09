@@ -30,7 +30,9 @@ function addNote() {
   count.textContent = `${total} notes`
 }
 
-const unregister = registerShortcut("mod+enter", addNote, { description: "New note" })
+const unregister = registerShortcut("mod+enter", addNote, {
+  description: "New note",
+})
 button.addEventListener("click", addNote)
 button.setAttribute("aria-keyshortcuts", ariaKeyshortcuts("mod+enter"))
 button.querySelector("kbd")!.textContent = formatShortcut("mod+enter")
@@ -73,11 +75,15 @@ function connectNote(note: HTMLTextAreaElement) {
     {
       scope: "note",
       allowInInput: true,
-    },
+    }
   )
   const events = new AbortController()
-  note.addEventListener("focus", () => shortcuts.setScope("note", true), { signal: events.signal })
-  note.addEventListener("blur", () => shortcuts.setScope("note", false), { signal: events.signal })
+  note.addEventListener("focus", () => shortcuts.setScope("note", true), {
+    signal: events.signal,
+  })
+  note.addEventListener("blur", () => shortcuts.setScope("note", false), {
+    signal: events.signal,
+  })
   shortcuts.setScope("note", document.activeElement === note)
 
   return () => {
@@ -87,7 +93,9 @@ function connectNote(note: HTMLTextAreaElement) {
   }
 }
 
-const disconnect = connectNote(document.querySelector<HTMLTextAreaElement>("#note")!)
+const disconnect = connectNote(
+  document.querySelector<HTMLTextAreaElement>("#note")!
+)
 ```
 
 Call `disconnect()` when removing the note. Scope names are shared, so choose one for each area you want to enable together. A `when` function can add a condition checked on each key press.

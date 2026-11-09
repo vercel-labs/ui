@@ -26,17 +26,28 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 
-function CommandPalette({ issues }: { issues: { id: string; title: string }[] }) {
+function CommandPalette({
+  issues,
+}: {
+  issues: { id: string; title: string }[]
+}) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
 
   function run(value: string) {
-    const query = parseQuery(Object.fromEntries(new URLSearchParams(location.search)))
+    const query = parseQuery(
+      Object.fromEntries(new URLSearchParams(location.search))
+    )
     setOpen(false)
-    if (value === "new-issue") newIssue.open()
-    else if (value === "settings") router.push("/settings")
-    else if (value === "list" || value === "board") router.push(href(query, { view: value, page: 1 }))
-    else router.push(href(query, { issue: value }))
+    if (value === "new-issue") {
+      newIssue.open()
+    } else if (value === "settings") {
+      router.push("/settings")
+    } else if (value === "list" || value === "board") {
+      router.push(href(query, { view: value, page: 1 }))
+    } else {
+      router.push(href(query, { issue: value }))
+    }
   }
 
   return (
@@ -45,7 +56,7 @@ function CommandPalette({ issues }: { issues: { id: string; title: string }[] })
         shortcut="mod+k"
         className={cn(
           buttonVariants({ variant: "outline" }),
-          "w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0",
+          "w-48 justify-between font-normal text-muted-foreground max-sm:w-8 max-sm:px-0"
         )}
       >
         <Search aria-hidden="true" className="sm:hidden" />
@@ -92,12 +103,19 @@ function CommandPalette({ issues }: { issues: { id: string; title: string }[] })
             <CommandGroup>
               <CommandGroupLabel>Issues</CommandGroupLabel>
               {issues.map((issue) => (
-                <CommandItem key={issue.id} value={issue.id} label={issue.title} keywords={[issue.id]}>
+                <CommandItem
+                  key={issue.id}
+                  value={issue.id}
+                  label={issue.title}
+                  keywords={[issue.id]}
+                >
                   <CommandItemIcon>
                     <CircleDot />
                   </CommandItemIcon>
                   <span className="truncate">{issue.title}</span>
-                  <span className="ms-auto text-xs text-muted-foreground">{issue.id}</span>
+                  <span className="ms-auto text-xs text-muted-foreground">
+                    {issue.id}
+                  </span>
                 </CommandItem>
               ))}
             </CommandGroup>

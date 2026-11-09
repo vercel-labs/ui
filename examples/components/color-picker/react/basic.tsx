@@ -23,7 +23,16 @@ const formats: { label: string; value: ColorFormat }[] = [
   { label: "OKLCH", value: "oklch" },
 ]
 
-const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+const presets = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#0ea5e9",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+]
 
 function Example() {
   const [format, setFormat] = React.useState<ColorFormat>("hex")
@@ -35,7 +44,12 @@ function Example() {
   }
 
   return (
-    <ColorPicker aria-label="Brand color" format={format} value={value} onValueChange={setValue}>
+    <ColorPicker
+      aria-label="Brand color"
+      format={format}
+      value={value}
+      onValueChange={setValue}
+    >
       <ColorPickerArea>
         <ColorPickerAreaThumb />
       </ColorPickerArea>

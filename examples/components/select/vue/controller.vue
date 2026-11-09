@@ -43,9 +43,17 @@ async function openAndWait() {
         <ChevronDownIcon />
       </SelectTrigger>
     </Field>
-    <Select :controller="status" :items="statuses" placeholder="Select a status">
+    <Select
+      :controller="status"
+      :items="statuses"
+      placeholder="Select a status"
+    >
       <SelectContent>
-        <SelectItem v-for="item in statuses" :key="item.value" :value="item.value">
+        <SelectItem
+          v-for="item in statuses"
+          :key="item.value"
+          :value="item.value"
+        >
           {{ item.label }}
           <SelectItemIndicator>
             <CheckIcon />

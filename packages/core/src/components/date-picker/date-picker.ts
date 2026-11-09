@@ -5,17 +5,34 @@
 // the primitive. State and the API live in date-picker-api.ts, and parts and
 // attributes in date-picker-parts.ts.
 import type { ISOMonth } from "../calendar/calendar-model"
-import type { CalendarMonthChangeReason, CalendarOptions } from "../calendar/calendar"
+import type {
+  CalendarMonthChangeReason,
+  CalendarOptions,
+} from "../calendar/calendar"
 import { type ISODate } from "../../foundation/date/plain-date"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
-import { type PopupFocusTarget, type PopupResult } from "../../foundation/popups/popup"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
+import {
+  type PopupFocusTarget,
+  type PopupResult,
+} from "../../foundation/popups/popup"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
 import { type PresentationSetting } from "../../foundation/popups/presentation"
-import type { ChangeDetails, ChangeOptions, DismissAttemptReason } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  DismissAttemptReason,
+} from "../../foundation/kernel/details"
 import { createController } from "../../foundation/kernel/controller"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type { Named } from "../../foundation/kernel/primitive-types"
-import { datePickerApi, initialDatePickerState, syncDatePickerState } from "./date-picker-api"
+import {
+  datePickerApi,
+  initialDatePickerState,
+  syncDatePickerState,
+} from "./date-picker-api"
 import { datePickerSlots } from "./date-picker-parts"
 
 /**
@@ -35,13 +52,20 @@ type DatePickerValue = ISODate | [ISODate, ISODate] | null
  * @stable
  */
 type DatePickerValueChangeReason =
-  "item-press" | "input-commit" | "preset-press" | "clear-press" | "reset" | "restore" | "imperative"
+  | "item-press"
+  | "input-commit"
+  | "preset-press"
+  | "clear-press"
+  | "reset"
+  | "restore"
+  | "imperative"
 
 /**
  * Why the months a date picker's calendar shows want to change.
  * @stable
  */
-type DatePickerMonthChangeReason = CalendarMonthChangeReason | "input-commit" | "preset-press"
+type DatePickerMonthChangeReason =
+  CalendarMonthChangeReason | "input-commit" | "preset-press"
 
 /**
  * Why a date picker's popup opened or closed.
@@ -64,13 +88,17 @@ type DatePickerOpenChangeReason =
  * The dismissals `dismissible` refuses that `onDismissAttempt` hears about.
  * @stable
  */
-type DatePickerDismissReason = Extract<DatePickerOpenChangeReason, DismissAttemptReason>
+type DatePickerDismissReason = Extract<
+  DatePickerOpenChangeReason,
+  DismissAttemptReason
+>
 
 /**
  * Options for every write method on a controller.
  * @stable
  */
-type DatePickerChangeOptions<Reason extends string = string> = ChangeOptions<Reason>
+type DatePickerChangeOptions<Reason extends string = string> =
+  ChangeOptions<Reason>
 
 /**
  * Drives a date picker from anywhere. Pass it as the `controller` option.
@@ -83,18 +111,27 @@ function createDatePickerController() {
     /** Selects a value. Returns false when canceled, unchanged, disabled, read-only, or holding a date people can't pick, like one past `max`. */
     setValue: (
       value: DatePickerValue,
-      options?: DatePickerChangeOptions<DatePickerValueChangeReason>,
+      options?: DatePickerChangeOptions<DatePickerValueChangeReason>
     ) => boolean
     /** Selects nothing, as the Clear part does. Returns false when canceled or unchanged. */
-    clear: (options?: DatePickerChangeOptions<DatePickerValueChangeReason>) => boolean
+    clear: (
+      options?: DatePickerChangeOptions<DatePickerValueChangeReason>
+    ) => boolean
     /** The first month the calendar shows, like `"2026-10"`. */
     getMonth: () => ISOMonth
     /** Shows a month first. Returns false when canceled or unchanged. */
-    setMonth: (month: ISOMonth, options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => boolean
+    setMonth: (
+      month: ISOMonth,
+      options?: DatePickerChangeOptions<DatePickerMonthChangeReason>
+    ) => boolean
     /** Shows the months before, as the Previous part does. */
-    previous: (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => boolean
+    previous: (
+      options?: DatePickerChangeOptions<DatePickerMonthChangeReason>
+    ) => boolean
     /** Shows the months after, as the Next part does. */
-    next: (options?: DatePickerChangeOptions<DatePickerMonthChangeReason>) => boolean
+    next: (
+      options?: DatePickerChangeOptions<DatePickerMonthChangeReason>
+    ) => boolean
     /** Focuses a date in the open calendar, turning the months to show it, or the date with the tab stop. */
     focus: (date?: ISODate) => void
     /** Whether the popup is open. */
@@ -103,7 +140,10 @@ function createDatePickerController() {
      * Opens or closes the popup.
      * Returns false when the change was canceled or it was already open or closed.
      */
-    setOpen: (open: boolean, options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => boolean
+    setOpen: (
+      open: boolean,
+      options?: DatePickerChangeOptions<DatePickerOpenChangeReason>
+    ) => boolean
     /**
      * Opens the popup, and resolves once it closes, with why and how. Resolves exactly once and never
      * rejects: on the next close from any source, when `signal` aborts, or with reason `"unmount"`
@@ -113,15 +153,19 @@ function createDatePickerController() {
       options?: DatePickerChangeOptions<DatePickerOpenChangeReason> & {
         /** Closes the popup, with reason `"imperative"`, when it aborts. An already aborted signal never opens it. */
         signal?: AbortSignal
-      },
+      }
     ) => Promise<PopupResult<DatePickerOpenChangeReason, never>>
     /** Closes the popup. Returns false when the close was canceled or it was already closed. */
-    close: (options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => boolean
+    close: (
+      options?: DatePickerChangeOptions<DatePickerOpenChangeReason>
+    ) => boolean
     /**
      * Opens the popup if it's closed, and closes it if it's open.
      * Returns false when the change was canceled.
      */
-    toggle: (options?: DatePickerChangeOptions<DatePickerOpenChangeReason>) => boolean
+    toggle: (
+      options?: DatePickerChangeOptions<DatePickerOpenChangeReason>
+    ) => boolean
   }>()
 }
 
@@ -163,9 +207,15 @@ type DatePickerOptions = Omit<
      * pressed, the form resets, or a controller sets it. A range changes once
      * both ends are set. `details.cancel()` keeps the value.
      */
-    onValueChange?: (value: DatePickerValue, details: ChangeDetails<DatePickerValueChangeReason>) => void
+    onValueChange?: (
+      value: DatePickerValue,
+      details: ChangeDetails<DatePickerValueChangeReason>
+    ) => void
     /** Runs when the months the calendar shows want to change, as in Calendar, or a typed date or a preset turns them. */
-    onMonthChange?: (month: ISOMonth, details: ChangeDetails<DatePickerMonthChangeReason>) => void
+    onMonthChange?: (
+      month: ISOMonth,
+      details: ChangeDetails<DatePickerMonthChangeReason>
+    ) => void
     /** Whether the popup is open. Pass it to control the popup. */
     open?: boolean
     /**
@@ -174,7 +224,10 @@ type DatePickerOptions = Omit<
      */
     defaultOpen?: boolean
     /** Runs when the popup wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-    onOpenChange?: (open: boolean, details: ChangeDetails<DatePickerOpenChangeReason>) => void
+    onOpenChange?: (
+      open: boolean,
+      details: ChangeDetails<DatePickerOpenChangeReason>
+    ) => void
     /** Runs once the popup has finished opening or closing, after any animation. */
     onOpenChangeComplete?: (open: boolean) => void
     /**
@@ -397,7 +450,9 @@ const datePickerPrimitive = /* @__PURE__ */ definePrimitive({
   api: datePickerApi,
   // An arrow function, so TypeScript infers the slot names before it checks the parts.
   slots: (slot) => datePickerSlots(slot),
-  agent: { actions: ["setOpen", "setValue", "clear", "setMonth", "previous", "next"] },
+  agent: {
+    actions: ["setOpen", "setValue", "clear", "setMonth", "previous", "next"],
+  },
 })
 
 /**

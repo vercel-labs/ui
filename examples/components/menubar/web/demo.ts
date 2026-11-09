@@ -8,7 +8,9 @@ const formats = ["PDF", "Markdown", "HTML"]
 const appearances = ["Light", "Dark", "System"]
 
 function mount(root: HTMLElement) {
-  const chevron = createElement(ChevronRight, { "aria-hidden": "true" }).outerHTML
+  const chevron = createElement(ChevronRight, {
+    "aria-hidden": "true",
+  }).outerHTML
   const check = createElement(Check, { "aria-hidden": "true" }).outerHTML
   root.innerHTML = `
     <ui-menubar>
@@ -78,7 +80,7 @@ function mount(root: HTMLElement) {
                   <ui-menu-radio-item value="${appearance}">
                     <ui-menu-item-indicator></ui-menu-item-indicator>
                     ${appearance}
-                  </ui-menu-radio-item>`,
+                  </ui-menu-radio-item>`
               )
               .join("")}
           </ui-menu-radio-group>
@@ -87,15 +89,21 @@ function mount(root: HTMLElement) {
     </ui-menubar>
   `
   const [file, edit] = root.querySelectorAll("ui-menu")
-  for (const menu of [file, edit])
-    menu.addEventListener("action", (event) => log(root, `Chose ${event.detail.value}`))
-  for (const item of root.querySelectorAll("ui-menu-checkbox-item"))
+  for (const menu of [file, edit]) {
+    menu.addEventListener("action", (event) =>
+      log(root, `Chose ${event.detail.value}`)
+    )
+  }
+  for (const item of root.querySelectorAll("ui-menu-checkbox-item")) {
     item.addEventListener("checkedchange", (event) => {
       log(root, `${item.value} ${event.detail.value ? "on" : "off"}`)
     })
+  }
   root
     .querySelector("ui-menu-radio-group")!
-    .addEventListener("valuechange", (event) => log(root, `${event.detail.value} appearance`))
+    .addEventListener("valuechange", (event) =>
+      log(root, `${event.detail.value} appearance`)
+    )
 }
 
 export { mount }

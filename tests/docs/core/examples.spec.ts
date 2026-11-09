@@ -9,7 +9,9 @@ const lastLog = (example: Locator) =>
     .locator('section[aria-label="Console"] li:not([aria-hidden])')
     .last()
 
-test("every example on the Core pages, and on Trees and Dates, renders without errors", async ({ page }) => {
+test("every example on the Core pages, and on Trees and Dates, renders without errors", async ({
+  page,
+}) => {
   test.setTimeout(90_000)
   for (const [slug, count] of [
     ["core/compose-behaviors", 5],
@@ -22,7 +24,9 @@ test("every example on the Core pages, and on Trees and Dates, renders without e
   }
 })
 
-test("rating: all four arrows select and wrap, with one tab stop", async ({ page }) => {
+test("rating: all four arrows select and wrap, with one tab stop", async ({
+  page,
+}) => {
   await openExamples(page, "/docs/core/compose-behaviors")
   const example = page.locator("[data-example]").last()
   const group = example.getByRole("radiogroup", { name: "Rating" })
@@ -42,7 +46,9 @@ test("rating: all four arrows select and wrap, with one tab stop", async ({ page
     ["Home", 1],
   ] as const) {
     await page.keyboard.press(key)
-    const selected = group.getByRole("radio", { name: `${value} ${value === 1 ? "star" : "stars"}` })
+    const selected = group.getByRole("radio", {
+      name: `${value} ${value === 1 ? "star" : "stars"}`,
+    })
     await expect(selected).toBeFocused()
     await expect(selected).toHaveAttribute("aria-checked", "true")
     await expect(selected).toHaveAttribute("tabindex", "0")
@@ -85,12 +91,24 @@ test("month grid: arrows move by days and weeks, turn the month, and the locale 
   await page.keyboard.press("ArrowUp")
   await page.keyboard.press("ArrowUp")
   await expect(page.getByRole("grid", { name: "September 2026" })).toBeVisible()
-  await expect(page.locator(":focus")).toHaveAttribute("aria-label", /September 25, 2026/)
+  await expect(page.locator(":focus")).toHaveAttribute(
+    "aria-label",
+    /September 25, 2026/
+  )
   await page.keyboard.press("Enter")
-  await expect(page.getByRole("gridcell", { selected: true })).toHaveAttribute("aria-label", /September 25/)
+  await expect(page.getByRole("gridcell", { selected: true })).toHaveAttribute(
+    "aria-label",
+    /September 25/
+  )
   // The month grid is the first example on Dates with a locale to pick.
-  await page.getByRole("combobox", { name: "Locale" }).first().selectOption("de-DE")
+  await page
+    .getByRole("combobox", { name: "Locale" })
+    .first()
+    .selectOption("de-DE")
   await expect(
-    page.getByRole("grid", { name: "September 2026" }).getByRole("columnheader").first(),
+    page
+      .getByRole("grid", { name: "September 2026" })
+      .getByRole("columnheader")
+      .first()
   ).toHaveText("Mo")
 })

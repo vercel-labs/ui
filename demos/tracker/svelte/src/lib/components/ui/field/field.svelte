@@ -3,7 +3,10 @@
   import { cn } from "cn"
   import type { ComponentProps } from "svelte"
 
-  let { class: className, ...rest }: ComponentProps<typeof Field> & { class?: string } = $props()
+  let {
+    class: className,
+    ...rest
+  }: ComponentProps<typeof Field> & { class?: string } = $props()
 </script>
 
 <Field class={cn("flex min-w-0 flex-col gap-2", className)} {...rest} />

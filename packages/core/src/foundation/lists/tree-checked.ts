@@ -21,7 +21,8 @@ type TreeCheckedState = boolean | "indeterminate"
 
 // A node with no known children counts as a leaf, so a branch whose children
 // haven't loaded yet checks like one, and passes its check on once they load.
-const isLeaf = (tree: TreeCollection, key: string) => tree.children(key).length === 0
+const isLeaf = (tree: TreeCollection, key: string) =>
+  tree.children(key).length === 0
 
 /**
  * The checked leaves a value stands for. A branch in the value stands for
@@ -31,9 +32,18 @@ const isLeaf = (tree: TreeCollection, key: string) => tree.children(key).length 
 function checkedLeaves(tree: TreeCollection, value: readonly string[]) {
   const leaves = new Set<string>()
   for (const key of value) {
-    if (!tree.has(key)) continue
-    if (isLeaf(tree, key)) leaves.add(key)
-    else for (const below of tree.descendants(key)) if (isLeaf(tree, below)) leaves.add(below)
+    if (!tree.has(key)) {
+      continue
+    }
+    if (isLeaf(tree, key)) {
+      leaves.add(key)
+    } else {
+      for (const below of tree.descendants(key)) {
+        if (isLeaf(tree, below)) {
+          leaves.add(below)
+        }
+      }
+    }
   }
   return leaves
 }
@@ -46,11 +56,13 @@ function checkedLeaves(tree: TreeCollection, value: readonly string[]) {
 function treeCheckedStates(
   tree: TreeCollection,
   value: readonly string[],
-  strategy: TreeCheckStrategy = "leaf",
+  strategy: TreeCheckStrategy = "leaf"
 ) {
   const states = new Map<string, TreeCheckedState>()
   if (strategy === "independent") {
-    for (const key of value) states.set(key, true)
+    for (const key of value) {
+      states.set(key, true)
+    }
     return (key: string) => states.get(key) ?? false
   }
   const leaves = checkedLeaves(tree, value)
@@ -59,7 +71,9 @@ function treeCheckedStates(
   const count = (key: string): [number, number] => {
     if (isLeaf(tree, key)) {
       const checked = leaves.has(key)
-      if (checked) states.set(key, true)
+      if (checked) {
+        states.set(key, true)
+      }
       return [1, checked ? 1 : 0]
     }
     let total = 0
@@ -69,22 +83,36 @@ function treeCheckedStates(
       total += childTotal
       checked += childChecked
     }
-    if (checked) states.set(key, checked === total ? true : "indeterminate")
+    if (checked) {
+      states.set(key, checked === total ? true : "indeterminate")
+    }
     return [total, checked]
   }
-  for (const root of tree.children(null)) count(root)
+  for (const root of tree.children(null)) {
+    count(root)
+  }
   return (key: string) => states.get(key) ?? false
 }
 
 /** The value a strategy reports for a set of checked leaves, in tree order. */
-function report(tree: TreeCollection, leaves: ReadonlySet<string>, strategy: TreeCheckStrategy) {
+function report(
+  tree: TreeCollection,
+  leaves: ReadonlySet<string>,
+  strategy: TreeCheckStrategy
+) {
   const state = treeCheckedStates(tree, [...leaves], "leaf")
   const keys = tree.keys()
-  if (strategy === "leaf") return keys.filter((key) => leaves.has(key))
-  if (strategy === "branch") return keys.filter((key) => state(key) === true)
+  if (strategy === "leaf") {
+    return keys.filter((key) => leaves.has(key))
+  }
+  if (strategy === "branch") {
+    return keys.filter((key) => state(key) === true)
+  }
   // Trunk: a fully checked node whose parent isn't fully checked.
   return keys.filter((key) => {
-    if (state(key) !== true) return false
+    if (state(key) !== true) {
+      return false
+    }
     const parent = tree.parent(key)
     return parent === null || state(parent) !== true
   })
@@ -103,13 +131,20 @@ function toggleTreeChecked(
   {
     strategy = "leaf",
     checkable = () => true,
-  }: { strategy?: TreeCheckStrategy; checkable?: (key: string) => boolean } = {},
+  }: { strategy?: TreeCheckStrategy; checkable?: (key: string) => boolean } = {}
 ) {
-  if (!checkable(key)) return [...value]
-  if (strategy === "independent")
-    return value.includes(key) ? value.filter((checked) => checked !== key) : [...value, key]
+  if (!checkable(key)) {
+    return [...value]
+  }
+  if (strategy === "independent") {
+    return value.includes(key)
+      ? value.filter((checked) => checked !== key)
+      : [...value, key]
+  }
   const leaves = checkedLeaves(tree, value)
-  const below = isLeaf(tree, key) ? [key] : tree.descendants(key).filter((node) => isLeaf(tree, node))
+  const below = isLeaf(tree, key)
+    ? [key]
+    : tree.descendants(key).filter((node) => isLeaf(tree, node))
   const depth = tree.ancestors(key).length + 1
   // A refused node keeps its state and shields what's under it.
   const affected = below.filter(
@@ -118,15 +153,23 @@ function toggleTreeChecked(
       tree
         .ancestors(leaf)
         .slice(depth)
-        .every((node) => checkable(node)),
+        .every((node) => checkable(node))
   )
   // Checks unless every leaf it can change is checked, so a branch with a refused leaf still unchecks.
   const check = !affected.every((leaf) => leaves.has(leaf))
   for (const leaf of affected) {
-    if (check) leaves.add(leaf)
-    else leaves.delete(leaf)
+    if (check) {
+      leaves.add(leaf)
+    } else {
+      leaves.delete(leaf)
+    }
   }
   return report(tree, leaves, strategy)
 }
 
-export { toggleTreeChecked, type TreeCheckedState, treeCheckedStates, type TreeCheckStrategy }
+export {
+  toggleTreeChecked,
+  type TreeCheckedState,
+  treeCheckedStates,
+  type TreeCheckStrategy,
+}

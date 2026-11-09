@@ -39,7 +39,10 @@ const text = (state: MeterValueState) => state.text
  * The formatted value, like "40%". Children replace it.
  * @stable
  */
-function MeterValue({ children = text, ...props }: PartProps<"span", MeterValueState>) {
+function MeterValue({
+  children = text,
+  ...props
+}: PartProps<"span", MeterValueState>) {
   return <parts.Value {...props}>{children}</parts.Value>
 }
 

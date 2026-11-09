@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { CheckIcon, ChevronDownIcon } from "@lucide/vue"
-import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/vue/command"
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/vue/command"
 import {
   Select,
   SelectContent,
@@ -45,7 +51,7 @@ function words(item: { label: string }, query: string) {
       item.label
         .toLowerCase()
         .split(" ")
-        .some((part) => part.startsWith(word)),
+        .some((part) => part.startsWith(word))
     )
 }
 
@@ -55,14 +61,22 @@ const mode = ref<Mode>("fuzzy")
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <Select :items="modes" :value="mode" @value-change="(next) => next && (mode = next as Mode)">
+      <Select
+        :items="modes"
+        :value="mode"
+        @value-change="(next) => next && (mode = next as Mode)"
+      >
         <SelectLabel>Filter</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in modes" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in modes"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon />
@@ -72,7 +86,10 @@ const mode = ref<Mode>("fuzzy")
       </Select>
     </div>
     <Command :filter="mode === 'words' ? words : mode">
-      <CommandInput aria-label="Search commands" placeholder="Try “nf”, “zo in” or “smiley”" />
+      <CommandInput
+        aria-label="Search commands"
+        placeholder="Try “nf”, “zo in” or “smiley”"
+      />
       <CommandEmpty>No results found.</CommandEmpty>
       <CommandList>
         <CommandItem

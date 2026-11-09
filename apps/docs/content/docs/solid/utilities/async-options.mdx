@@ -16,17 +16,28 @@ Pass a loader to the helper. This example expects `/api/movies` to return an arr
 
 ```tsx
 import { useAsyncOptions } from "@ui-sdk/solid/async-options"
-import { Combobox, ComboboxContent, ComboboxInput } from "@ui-sdk/solid/combobox"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+} from "@ui-sdk/solid/combobox"
 
 function Example() {
   const movies = useAsyncOptions<string>(async (query, { signal }) => {
-    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, { signal })
+    const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}`, {
+      signal,
+    })
     if (!response.ok) throw new Error("Couldn't load movies")
     return response.json()
   })
 
   return (
-    <Combobox items={movies.items} filter={false} status={movies.status} onQueryChange={movies.setQuery}>
+    <Combobox
+      items={movies.items}
+      filter={false}
+      status={movies.status}
+      onQueryChange={movies.setQuery}
+    >
       <ComboboxInput aria-label="Movie" placeholder="Search movies…" />
       <ComboboxContent />
     </Combobox>
@@ -61,8 +72,14 @@ For paged results, the loader receives `page`, starting at `0`. Return `{ items,
 ```ts
 import type { AsyncOptionsContext } from "@ui-sdk/solid/async-options"
 
-async function loadMoviePages(query: string, { signal, page }: AsyncOptionsContext) {
-  const response = await fetch(`/api/movies?q=${encodeURIComponent(query)}&page=${page}`, { signal })
+async function loadMoviePages(
+  query: string,
+  { signal, page }: AsyncOptionsContext
+) {
+  const response = await fetch(
+    `/api/movies?q=${encodeURIComponent(query)}&page=${page}`,
+    { signal }
+  )
   if (!response.ok) throw new Error("Couldn't load movies")
   const data: { titles: string[]; next: number | null } = await response.json()
   return { items: data.titles, hasMore: data.next !== null }

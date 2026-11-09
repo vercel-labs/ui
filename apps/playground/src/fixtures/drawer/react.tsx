@@ -35,16 +35,24 @@ function Fixture() {
       <Drawer
         controller={controller}
         {...drawerOptions()}
-        onOpenChange={(open, details) => recordDrawer(`drawer:${open}:${details.reason}`)}
-        onSnapPointChange={(snapPoint, details) => recordDrawer(`${snapPoint}:${details.reason}`)}
-        onDismissAttempt={(details) => recordDrawer(`attempt:${details.reason}`)}
+        onOpenChange={(open, details) =>
+          recordDrawer(`drawer:${open}:${details.reason}`)
+        }
+        onSnapPointChange={(snapPoint, details) =>
+          recordDrawer(`${snapPoint}:${details.reason}`)
+        }
+        onDismissAttempt={(details) =>
+          recordDrawer(`attempt:${details.reason}`)
+        }
       >
         <DrawerTrigger>{drawerFixture.trigger}</DrawerTrigger>
         {parts.backdrop && <DrawerBackdrop className="drawer-backdrop" />}
         <DrawerContent className="drawer">
           <DrawerHandle className="handle" aria-label={drawerFixture.handle} />
           <DrawerTitle className="title">{drawerFixture.title}</DrawerTitle>
-          <DrawerDescription className="description">{drawerFixture.description}</DrawerDescription>
+          <DrawerDescription className="description">
+            {drawerFixture.description}
+          </DrawerDescription>
           {parts.field && (
             <label className="field">
               {drawerFixture.field}
@@ -52,7 +60,11 @@ function Fixture() {
             </label>
           )}
           {parts.scroll && (
-            <ul className="scroll" aria-label={drawerFixture.scroll.label} tabIndex={0}>
+            <ul
+              className="scroll"
+              aria-label={drawerFixture.scroll.label}
+              tabIndex={0}
+            >
               {drawerFixture.scroll.items.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -60,20 +72,30 @@ function Fixture() {
           )}
           {parts.grow && (
             <>
-              <button onClick={() => setMore(true)}>{drawerFixture.grow.button}</button>
+              <button onClick={() => setMore(true)}>
+                {drawerFixture.grow.button}
+              </button>
               {more && <p className="more">{drawerFixture.grow.text}</p>}
             </>
           )}
           <div className="actions">
-            <button onClick={() => setAction("submit")}>{drawerFixture.action}</button>
+            <button onClick={() => setAction("submit")}>
+              {drawerFixture.action}
+            </button>
             <DrawerClose>{drawerFixture.close}</DrawerClose>
           </div>
           {parts.nested && (
-            <Drawer onOpenChange={(open, details) => recordDrawer(`nested:${open}:${details.reason}`)}>
+            <Drawer
+              onOpenChange={(open, details) =>
+                recordDrawer(`nested:${open}:${details.reason}`)
+              }
+            >
               <DrawerTrigger>{drawerFixture.nested.trigger}</DrawerTrigger>
               {parts.backdrop && <DrawerBackdrop className="drawer-backdrop" />}
               <DrawerContent className="drawer">
-                <DrawerTitle className="title">{drawerFixture.nested.title}</DrawerTitle>
+                <DrawerTitle className="title">
+                  {drawerFixture.nested.title}
+                </DrawerTitle>
                 <DrawerClose>{drawerFixture.nested.close}</DrawerClose>
               </DrawerContent>
             </Drawer>
@@ -84,10 +106,15 @@ function Fixture() {
       <output role="status" aria-label="Last action">
         {action}
       </output>
-      <button onClick={() => controller.open()}>{drawerFixture.controller}</button>
+      <button onClick={() => controller.open()}>
+        {drawerFixture.controller}
+      </button>
       <button onClick={() => setAction("page")}>{drawerFixture.page}</button>
       {parts.shortcut && (
-        <DrawerTrigger controller={controller} shortcut={drawerFixture.shortcut.keys}>
+        <DrawerTrigger
+          controller={controller}
+          shortcut={drawerFixture.shortcut.keys}
+        >
           {drawerFixture.shortcut.trigger} <DrawerShortcut />
         </DrawerTrigger>
       )}
@@ -108,7 +135,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

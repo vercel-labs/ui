@@ -11,7 +11,11 @@ A button, or a link or any element that acts as one through `render`.
     type ButtonState,
   } from "@ui-sdk/core/button"
   import Part from "../part.svelte"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     disabled,

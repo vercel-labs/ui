@@ -1,7 +1,8 @@
 import { expect, type Locator } from "@playwright/test"
 import { testExamples, type Check } from "./docs-helpers"
 
-const toggleNamed = (preview: Locator, name: string) => preview.getByRole("button", { name, exact: true })
+const toggleNamed = (preview: Locator, name: string) =>
+  preview.getByRole("button", { name, exact: true })
 
 const pressed = (toggle: Locator, value: boolean) =>
   expect(toggle).toHaveAttribute("aria-pressed", String(value))
@@ -23,12 +24,16 @@ const flips =
 // Each example's check, in the order they appear on the Toggle page.
 const checks: Record<string, Check> = {
   basic: async (preview) => {
-    await expect(preview.getByRole("heading", { name: "Q3 Roadmap" })).toBeVisible()
+    await expect(
+      preview.getByRole("heading", { name: "Q3 Roadmap" })
+    ).toBeVisible()
     await flips("Star")(preview, "")
     await expect(toggleNamed(preview, "Star")).toHaveAttribute("type", "button")
   },
   group: async (preview) => {
-    await expect(preview.getByRole("group", { name: "Text formatting" })).toBeVisible()
+    await expect(
+      preview.getByRole("group", { name: "Text formatting" })
+    ).toBeVisible()
     const bold = toggleNamed(preview, "Bold")
     const italic = toggleNamed(preview, "Italic")
     const underline = toggleNamed(preview, "Underline")
@@ -73,9 +78,18 @@ const checks: Record<string, Check> = {
 const scoped = Object.fromEntries(
   Object.entries(checks).map(([name, check]): [string, Check] => [
     name,
-    (preview, framework) => check(preview.page().locator(`[data-example="toggle/${name}"]`), framework),
-  ]),
+    (preview, framework) =>
+      check(
+        preview.page().locator(`[data-example="toggle/${name}"]`),
+        framework
+      ),
+  ])
 )
 
 // The folders also keep the right-to-left demos and the First Component demo, which are off this page.
-testExamples("toggle", scoped, "components", [...Object.keys(checks), "rtl", "group-rtl", "first-component"])
+testExamples("toggle", scoped, "components", [
+  ...Object.keys(checks),
+  "rtl",
+  "group-rtl",
+  "first-component",
+])

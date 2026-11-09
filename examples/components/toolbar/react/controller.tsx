@@ -1,7 +1,11 @@
 "use client"
 
 import { useShortcut } from "@ui-sdk/react/shortcuts"
-import { createToolbarController, Toolbar, ToolbarButton } from "@ui-sdk/react/toolbar"
+import {
+  createToolbarController,
+  Toolbar,
+  ToolbarButton,
+} from "@ui-sdk/react/toolbar"
 import { BoldIcon, ItalicIcon, LinkIcon } from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
@@ -25,7 +29,11 @@ function Example() {
       </div>
       <Toolbar controller={toolbar} aria-label="Notes formatting">
         {actions.map(({ label, icon: Icon }) => (
-          <ToolbarButton key={label} aria-label={label} onClick={() => log(label)}>
+          <ToolbarButton
+            key={label}
+            aria-label={label}
+            onClick={() => log(label)}
+          >
             <Icon aria-hidden="true" />
           </ToolbarButton>
         ))}

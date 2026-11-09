@@ -25,29 +25,54 @@ const packageNames: Record<Framework, string> = {
 const demote = (text: string, levels: number) =>
   text
     .split(/^( *```[\s\S]*?^ *```)$/m)
-    .map((part, index) => (index % 2 ? part : part.replace(/^(#{1,6}) /gm, `$1${"#".repeat(levels)} `)))
+    .map((part, index) =>
+      index % 2
+        ? part
+        : part.replace(/^(#{1,6}) /gm, `$1${"#".repeat(levels)} `)
+    )
     .join("")
 
 // A page's Markdown without its title, and its description, which come first.
-const bodyOf = (markdown: string) => markdown.replace(/^# .*\n\n(?:(?!#|```).*\n\n)?/, "")
+const bodyOf = (markdown: string) =>
+  markdown.replace(/^# .*\n\n(?:(?!#|```).*\n\n)?/, "")
 
 // The imports a component's examples write, like `@ui-sdk/react/popover`,
 // the most used first.
 function importsOf(component: string, framework: Framework) {
   const dir = path.join(exampleFolder(component), frameworks[framework].example)
-  if (!existsSync(dir)) return []
+  if (!existsSync(dir)) {
+    return []
+  }
   const count = new Map<string, number>()
-  const pattern = new RegExp(`["'](@ui-sdk/${packageNames[framework]}(?:/[\\w-]+)?)["']`, "g")
-  for (const file of readdirSync(dir, { withFileTypes: true }).filter((file) => file.isFile()))
-    for (const [, entry] of readFileSync(path.join(dir, file.name), "utf8").matchAll(pattern))
-      if (!entry.endsWith("/agent")) count.set(entry, (count.get(entry) ?? 0) + 1)
+  const pattern = new RegExp(
+    `["'](@ui-sdk/${packageNames[framework]}(?:/[\\w-]+)?)["']`,
+    "g"
+  )
+  for (const file of readdirSync(dir, { withFileTypes: true }).filter((file) =>
+    file.isFile()
+  )) {
+    for (const [, entry] of readFileSync(
+      path.join(dir, file.name),
+      "utf8"
+    ).matchAll(pattern)) {
+      if (!entry.endsWith("/agent")) {
+        count.set(entry, (count.get(entry) ?? 0) + 1)
+      }
+    }
+  }
   const own = `@ui-sdk/${packageNames[framework]}/${component}`
-  return [...count.keys()].sort((a, b) => (a === own ? -1 : b === own ? 1 : count.get(b)! - count.get(a)!))
+  return [...count.keys()].sort((a, b) =>
+    a === own ? -1 : b === own ? 1 : count.get(b)! - count.get(a)!
+  )
 }
 
 // A component's line in the index: what it does, where it's imported from,
 // and its page.
-function componentLine(page: DocPage, framework: Framework, to: (target: LinkTarget) => string) {
+function componentLine(
+  page: DocPage,
+  framework: Framework,
+  to: (target: LinkTarget) => string
+) {
   const slug = page.slugs[2]
   const [entry] = importsOf(slug, framework)
   const from = entry
@@ -68,20 +93,23 @@ async function frameworkLlms(framework: Framework, link: PageLinks) {
   const guides = await Promise.all(
     frameworkGuides(framework).map(
       async (page) =>
-        `## ${page.title}\n\n${demote(bodyOf(await pageMarkdown(page.file, framework, link)), 1).trim()}`,
-    ),
+        `## ${page.title}\n\n${demote(bodyOf(await pageMarkdown(page.file, framework, link)), 1).trim()}`
+    )
   )
-  const to = (target: LinkTarget) => link(target) ?? `/docs/${target.slugs.join("/")}`
+  const to = (target: LinkTarget) =>
+    link(target) ?? `/docs/${target.slugs.join("/")}`
 
-  const components = docPages(`${framework}/components`).filter((entry) => entry.slugs.length === 3)
-  const utilities = docPages(`${framework}/${utilitiesFolder(framework)}`).filter(
-    (entry) => entry.slugs.length === 3,
+  const components = docPages(`${framework}/components`).filter(
+    (entry) => entry.slugs.length === 3
   )
+  const utilities = docPages(
+    `${framework}/${utilitiesFolder(framework)}`
+  ).filter((entry) => entry.slugs.length === 3)
   const utilityPages = await Promise.all(
     utilities.map(
       async (entry) =>
-        `### ${entry.title}\n\n${demote(bodyOf(await pageMarkdown(entry.file, framework, link, { compact: true })), 2).trim()}`,
-    ),
+        `### ${entry.title}\n\n${demote(bodyOf(await pageMarkdown(entry.file, framework, link, { compact: true })), 2).trim()}`
+    )
   )
 
   return `# ui-sdk for ${label}

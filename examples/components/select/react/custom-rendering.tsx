@@ -53,11 +53,15 @@ function Example() {
                   <span data-slot="badge">{member.name.slice(0, 1)}</span>
                   <span data-slot="stack">
                     {member.name}
-                    <span data-slot="hint">{state.disabled ? "Out of office" : member.email}</span>
+                    <span data-slot="hint">
+                      {state.disabled ? "Out of office" : member.email}
+                    </span>
                   </span>
                   <SelectItemIndicator
                     render={(props, indicator) => (
-                      <span {...props}>{indicator.selected && <CheckIcon />}</span>
+                      <span {...props}>
+                        {indicator.selected && <CheckIcon />}
+                      </span>
                     )}
                   />
                 </>

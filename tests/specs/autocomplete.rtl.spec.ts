@@ -6,13 +6,18 @@ import { expect, test } from "../fixtures"
 
 const input = (page: Page) => page.getByRole("combobox", { name: "Fruit" })
 
-test("the suggestions line up with the field's right edge", async ({ page, open }) => {
+test("the suggestions line up with the field's right edge", async ({
+  page,
+  open,
+}) => {
   await open("autocomplete", { dir: "rtl", layout: "right" })
   await input(page).fill("a")
   await expect(page.getByRole("listbox")).toBeVisible()
   const popup = (await page.locator(".list-popup").first().boundingBox())!
   const field = (await input(page).boundingBox())!
-  expect(Math.abs(popup.x + popup.width - (field.x + field.width))).toBeLessThanOrEqual(1)
+  expect(
+    Math.abs(popup.x + popup.width - (field.x + field.width))
+  ).toBeLessThanOrEqual(1)
 })
 
 test(
@@ -23,7 +28,10 @@ test(
     await input(page).pressSequentially("gr")
     await expect(input(page)).toHaveValue("grape")
     expect(
-      await input(page).evaluate((el: HTMLInputElement) => [el.selectionStart, el.selectionEnd]),
+      await input(page).evaluate((el: HTMLInputElement) => [
+        el.selectionStart,
+        el.selectionEnd,
+      ])
     ).toEqual([2, 5])
-  },
+  }
 )

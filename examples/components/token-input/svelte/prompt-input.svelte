@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { ArrowUpIcon, CheckIcon, ClockIcon, CodeIcon, FileIcon, XIcon } from "@lucide/svelte"
+  import {
+    ArrowUpIcon,
+    CheckIcon,
+    ClockIcon,
+    CodeIcon,
+    FileIcon,
+    XIcon,
+  } from "@lucide/svelte"
   import {
     createTokenInputController,
     toText,
@@ -30,12 +37,17 @@
   ]
 
   const skills = [
-    { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+    {
+      value: "search",
+      label: "search",
+      arguments: [{ name: "query", hint: "<query>", required: true }],
+    },
     { value: "review", label: "review" },
     { value: "summarize", label: "summarize" },
   ]
 
-  const loadFile = () => new Promise<void>((resolve) => setTimeout(resolve, 800))
+  const loadFile = () =>
+    new Promise<void>((resolve) => setTimeout(resolve, 800))
 
   const log = useLog()
   const prompt = createTokenInputController()
@@ -45,14 +57,28 @@
   onDestroy(() => clearTimeout(sendTimer))
 
   function send(value: TokenInputValue) {
-    if (running || !prompt.getLabel().trim()) return
+    if (running || !prompt.getLabel().trim()) {
+      return
+    }
     running = true
-    const skillTokens = value.filter((segment) => typeof segment !== "string" && segment.type === "skill")
-    for (const skill of skillTokens)
-      if (typeof skill !== "string") prompt.updateToken(skill.id!, { data: { ...skill.data, run: "running" } })
+    const skillTokens = value.filter(
+      (segment) => typeof segment !== "string" && segment.type === "skill"
+    )
+    for (const skill of skillTokens) {
+      if (typeof skill !== "string") {
+        prompt.updateToken(skill.id!, {
+          data: { ...skill.data, run: "running" },
+        })
+      }
+    }
     sendTimer = setTimeout(() => {
-      for (const skill of skillTokens)
-        if (typeof skill !== "string") prompt.updateToken(skill.id!, { data: { ...skill.data, run: "done" } })
+      for (const skill of skillTokens) {
+        if (typeof skill !== "string") {
+          prompt.updateToken(skill.id!, {
+            data: { ...skill.data, run: "done" },
+          })
+        }
+      }
       log(`Sent ${toText(prompt.getValue())}`)
       prompt.clear()
       running = false
@@ -81,14 +107,20 @@
     </TokenInputToken>
   {/snippet}
   <div data-slot="card">
-    <TokenInputEditor aria-label="Prompt" placeholder="Ask anything. Type @ or /" />
+    <TokenInputEditor
+      aria-label="Prompt"
+      placeholder="Ask anything. Type @ or /"
+    />
     <div data-slot="row">
       <button
         type="button"
         data-size="sm"
         onmousedown={(event) => event.preventDefault()}
         onclick={() =>
-          prompt.insert({ type: "file", value: "README.md", label: "README.md" }, { resolve: loadFile() })}
+          prompt.insert(
+            { type: "file", value: "README.md", label: "README.md" },
+            { resolve: loadFile() }
+          )}
       >
         Attach README
       </button>
@@ -114,15 +146,20 @@
       { char: "@", type: "file", items: files },
       { char: "/", boundary: "start", type: "skill", items: skills },
     ]}
-    onSelect={(value, details) => (details.trigger === "@" ? loadFile() : undefined)}
+    onSelect={(value, details) =>
+      details.trigger === "@" ? loadFile() : undefined}
   >
     <TriggerMenuHint />
     <TriggerMenuContent>
       <TriggerMenuEmpty>No matches</TriggerMenuEmpty>
       <TriggerMenuList>
         {#snippet children(state)}
-          {#each (state.items as TriggerMenuDataItem[]) as item (item.value)}
-            <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled}>
+          {#each state.items as TriggerMenuDataItem[] as item (item.value)}
+            <TriggerMenuItem
+              value={item.value}
+              label={item.label}
+              disabled={item.disabled}
+            >
               {item.label}
             </TriggerMenuItem>
           {/each}

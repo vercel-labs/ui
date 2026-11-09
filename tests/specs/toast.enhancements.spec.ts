@@ -10,12 +10,17 @@ test.describe.configure({ mode: "parallel" })
 const { basic, success, error, dialog } = toastFixture
 const forever = Infinity as unknown as number
 
-const region = (page: Page) => page.getByRole("region", { name: toastFixture.region })
-const toastNamed = (page: Page, name: string) => page.getByRole(role(), { name })
+const region = (page: Page) =>
+  page.getByRole("region", { name: toastFixture.region })
+const toastNamed = (page: Page, name: string) =>
+  page.getByRole(role(), { name })
 const show = (page: Page, options: FixtureToast) =>
   page.evaluate(
-    (options) => (window as unknown as { showToast: (o: FixtureToast) => string }).showToast(options),
-    options,
+    (options) =>
+      (
+        window as unknown as { showToast: (o: FixtureToast) => string }
+      ).showToast(options),
+    options
   )
 type PageToaster = {
   toaster: ((content: string) => string) & {
@@ -25,7 +30,10 @@ type PageToaster = {
 }
 
 test.describe("enhancements", { tag: "@enhancement" }, () => {
-  test("update() says whether the toast was still there", async ({ page, open }) => {
+  test("update() says whether the toast was still there", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     const updated = await page.evaluate(() => {
       const toaster = (window as unknown as PageToaster).toaster
@@ -36,16 +44,22 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     expect(updated).toBe(false)
   })
 
-  test("a toast beyond maxVisible never expires unseen", async ({ page, open }) => {
+  test("a toast beyond maxVisible never expires unseen", async ({
+    page,
+    open,
+  }) => {
     await open("toast", { "max-visible": "1", duration: "1500" })
     await show(page, { title: "First" })
     await show(page, { title: "Second" })
     await expect(toastNamed(page, "First")).toHaveCount(0)
     // Second expires, and First, which waited with all of its time, shows for most of it.
     await page.waitForFunction(
-      () => document.querySelector('[data-slot="toast-root"]')?.textContent?.includes("First"),
+      () =>
+        document
+          .querySelector('[data-slot="toast-root"]')
+          ?.textContent?.includes("First"),
       undefined,
-      { polling: "raf" },
+      { polling: "raf" }
     )
     await page.waitForTimeout(1000)
     await expect(toastNamed(page, "First")).toBeVisible()
@@ -56,22 +70,34 @@ test.describe("enhancements", { tag: "@enhancement" }, () => {
     await expect(region(page)).toHaveCount(0)
     await page.getByRole("button", { name: success.trigger }).click()
     await expect(region(page)).toHaveCount(1)
-    await page.evaluate(() => (window as unknown as PageToaster).toaster.dismiss())
+    await page.evaluate(() =>
+      (window as unknown as PageToaster).toaster.dismiss()
+    )
     await expect(region(page)).toHaveCount(0)
   })
 
-  test("focus never falls to the page when a toast focused by the mouse closes", async ({ page, open }) => {
+  test("focus never falls to the page when a toast focused by the mouse closes", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await page.getByRole("button", { name: basic.trigger }).click()
     await page.getByRole("button", { name: success.trigger }).click()
-    await toastNamed(page, success.title).getByRole("button", { name: toastFixture.dismiss }).click()
+    await toastNamed(page, success.title)
+      .getByRole("button", { name: toastFixture.dismiss })
+      .click()
     await expect(toastNamed(page, basic.title)).toBeFocused()
   })
 
-  test("a pending action shows it and holds the toast open until it settles", async ({ page, open }) => {
+  test("a pending action shows it and holds the toast open until it settles", async ({
+    page,
+    open,
+  }) => {
     await open("toast", { duration: "300" })
     await show(page, { title: "Archived", action: "Undo", pending: 800 })
-    const undo = toastNamed(page, "Archived").getByRole("button", { name: "Undo" })
+    const undo = toastNamed(page, "Archived").getByRole("button", {
+      name: "Undo",
+    })
     await undo.click()
     await expect(undo).toHaveAttribute("data-pending", "")
     await expect(undo).toHaveAttribute("aria-busy", "true")
@@ -117,45 +143,69 @@ test.describe("pausing", { tag: "@enhancement" }, () => {
 
 test.describe("announcements", { tag: "@enhancement" }, () => {
   const polite = (page: Page) => page.locator('[data-ui-sdk-announcer=""]')
-  const assertive = (page: Page) => page.locator('[data-ui-sdk-announcer="assertive"]')
+  const assertive = (page: Page) =>
+    page.locator('[data-ui-sdk-announcer="assertive"]')
 
-  test("the live regions exist before the first toast", async ({ page, open }) => {
+  test("the live regions exist before the first toast", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await expect(polite(page)).toHaveCount(1)
     await expect(assertive(page)).toHaveCount(1)
     await expect(polite(page)).toHaveText("")
   })
 
-  test("a toast is announced politely, with its title and description", async ({ page, open }) => {
+  test("a toast is announced politely, with its title and description", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await page.getByRole("button", { name: basic.trigger }).click()
-    await expect(polite(page)).toHaveText(`${basic.title}. ${basic.description}`)
+    await expect(polite(page)).toHaveText(
+      `${basic.title}. ${basic.description}`
+    )
   })
 
   test("an error is announced assertively", async ({ page, open }) => {
     await open("toast")
     await page.getByRole("button", { name: error.trigger }).click()
-    await expect(assertive(page)).toHaveText(`${error.title}. ${error.description}`)
+    await expect(assertive(page)).toHaveText(
+      `${error.title}. ${error.description}`
+    )
   })
 
-  test("toasts that arrive together are announced together", async ({ page, open }) => {
+  test("toasts that arrive together are announced together", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await show(page, { title: "Saved" })
     await show(page, { title: "Synced" })
     await expect(polite(page)).toHaveText("Synced. Saved")
   })
 
-  test("the visible region isn't a live region, so nothing is read twice", async ({ page, open }) => {
+  test("the visible region isn't a live region, so nothing is read twice", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await page.getByRole("button", { name: basic.trigger }).click()
     await expect(region(page)).toBeVisible()
-    expect(await region(page).locator("[aria-live], [role=status], [role=alert]").count()).toBe(0)
+    expect(
+      await region(page)
+        .locator("[aria-live], [role=status], [role=alert]")
+        .count()
+    ).toBe(0)
     await expect(region(page)).not.toHaveAttribute("aria-live")
   })
 })
 
 test.describe("the shortcut", { tag: "@enhancement" }, () => {
-  test("F6 works from a text field and types nothing", async ({ page, open }) => {
+  test("F6 works from a text field and types nothing", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await page.getByRole("button", { name: success.trigger }).click()
     await page.evaluate(() => {
@@ -178,7 +228,11 @@ test.describe("the shortcut", { tag: "@enhancement" }, () => {
     await expect(region(page)).not.toHaveAttribute("aria-keyshortcuts")
   })
 
-  test("Tab past the last toast goes back where F6 came from", async ({ page, open, tab }) => {
+  test("Tab past the last toast goes back where F6 came from", async ({
+    page,
+    open,
+    tab,
+  }) => {
     await open("toast")
     await page.getByRole("button", { name: success.trigger }).click()
     await page.getByRole("button", { name: "Before" }).focus()
@@ -186,7 +240,9 @@ test.describe("the shortcut", { tag: "@enhancement" }, () => {
     await expect(toastNamed(page, success.title)).toBeFocused()
     await tab()
     await expect(
-      toastNamed(page, success.title).getByRole("button", { name: toastFixture.dismiss }),
+      toastNamed(page, success.title).getByRole("button", {
+        name: toastFixture.dismiss,
+      })
     ).toBeFocused()
     await tab()
     await expect(page.getByRole("button", { name: "Before" })).toBeFocused()
@@ -194,7 +250,10 @@ test.describe("the shortcut", { tag: "@enhancement" }, () => {
 })
 
 test.describe("over modal dialogs", { tag: "@enhancement" }, () => {
-  test("F6 reaches the toasts from inside a modal dialog, and goes back into it", async ({ page, open }) => {
+  test("F6 reaches the toasts from inside a modal dialog, and goes back into it", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await page.getByRole("button", { name: dialog.trigger }).click()
     await page.getByRole("button", { name: dialog.toast }).focus()
@@ -206,7 +265,10 @@ test.describe("over modal dialogs", { tag: "@enhancement" }, () => {
     await expect(page.getByRole("button", { name: dialog.toast })).toBeFocused()
   })
 
-  test("Escape on a toast closes the toast, not the dialog beneath", async ({ page, open }) => {
+  test("Escape on a toast closes the toast, not the dialog beneath", async ({
+    page,
+    open,
+  }) => {
     await open("toast")
     await page.getByRole("button", { name: dialog.trigger }).click()
     await page.getByRole("button", { name: dialog.toast }).click()
@@ -225,12 +287,17 @@ test.describe("over modal dialogs", { tag: "@enhancement" }, () => {
     await expect(toastNamed(page, basic.title)).toBeVisible()
     await page.getByRole("button", { name: dialog.trigger }).click()
     await expect(page.getByRole("dialog", { name: dialog.title })).toBeVisible()
-    const undo = toastNamed(page, basic.title).getByRole("button", { name: basic.action })
-    const box = (await undo.boundingBox())!
-    const hit = await page.evaluate(({ x, y }) => document.elementFromPoint(x, y)?.textContent, {
-      x: box.x + box.width / 2,
-      y: box.y + box.height / 2,
+    const undo = toastNamed(page, basic.title).getByRole("button", {
+      name: basic.action,
     })
+    const box = (await undo.boundingBox())!
+    const hit = await page.evaluate(
+      ({ x, y }) => document.elementFromPoint(x, y)?.textContent,
+      {
+        x: box.x + box.width / 2,
+        y: box.y + box.height / 2,
+      }
+    )
     expect(hit).toBe(basic.action)
     await undo.click()
     expect(await lastAction(page)).toBe(`action:${basic.action}`)
@@ -244,15 +311,20 @@ test.describe("swiping", { tag: "@enhancement" }, () => {
     name: string,
     dx: number,
     dy: number,
-    from: "padding" | "text" = "padding",
+    from: "padding" | "text" = "padding"
   ) {
-    const target = from === "text" ? toastNamed(page, name).getByText(name) : toastNamed(page, name)
+    const target =
+      from === "text"
+        ? toastNamed(page, name).getByText(name)
+        : toastNamed(page, name)
     const box = (await target.boundingBox())!
     const x = from === "text" ? box.x + 2 : box.x + 4
     const y = from === "text" ? box.y + box.height / 2 : box.y + 4
     await page.mouse.move(x, y)
     await page.mouse.down()
-    for (let step = 1; step <= 8; step++) await page.mouse.move(x + (dx * step) / 8, y + (dy * step) / 8)
+    for (let step = 1; step <= 8; step++) {
+      await page.mouse.move(x + (dx * step) / 8, y + (dy * step) / 8)
+    }
     await page.mouse.up()
   }
 
@@ -264,6 +336,8 @@ test.describe("swiping", { tag: "@enhancement" }, () => {
     await show(page, { title: "Copy this order number", duration: forever })
     await drag(page, "Copy this order number", 120, 0, "text")
     await expect(toastNamed(page, "Copy this order number")).toBeVisible()
-    expect(await page.evaluate(() => document.getSelection()?.toString())).not.toBe("")
+    expect(
+      await page.evaluate(() => document.getSelection()?.toString())
+    ).not.toBe("")
   })
 })

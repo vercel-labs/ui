@@ -7,7 +7,9 @@ import { attrs, bind } from "../src/foundation/kernel/part"
 
 test("a tab rendered as a link drops the button type once it binds, and a button keeps it", () => {
   const instance = tabs({ id: "links", defaultValue: "a" })
-  const link = document.body.appendChild(Object.assign(document.createElement("a"), { href: "#a" }))
+  const link = document.body.appendChild(
+    Object.assign(document.createElement("a"), { href: "#a" })
+  )
   const button = document.body.appendChild(document.createElement("button"))
   const linkTab = instance.part("tab", { value: "a" })
   const buttonTab = instance.part("tab", { value: "b" })

@@ -15,46 +15,62 @@ const weeks = [
   {
     value: "week-1",
     label: "Week 1: Foundations",
-    content: "Set up your editor, meet the command line and write your first script.",
+    content:
+      "Set up your editor, meet the command line and write your first script.",
   },
   {
     value: "week-2",
     label: "Week 2: Data and types",
-    content: "Strings, numbers, lists and objects, and how to tell them apart when a program runs.",
+    content:
+      "Strings, numbers, lists and objects, and how to tell them apart when a program runs.",
   },
   {
     value: "week-3",
     label: "Week 3: Control flow",
-    content: "Conditions, loops and functions. The project this week is a small text adventure.",
+    content:
+      "Conditions, loops and functions. The project this week is a small text adventure.",
   },
   {
     value: "week-4",
     label: "Week 4: Working with files",
-    content: "Read and write files, parse CSV and JSON, and handle the errors that come with them.",
+    content:
+      "Read and write files, parse CSV and JSON, and handle the errors that come with them.",
   },
   {
     value: "week-5",
     label: "Week 5: Final project",
-    content: "Build a tool you'll use yourself, then present it to the group in a five-minute demo.",
+    content:
+      "Build a tool you'll use yourself, then present it to the group in a five-minute demo.",
   },
 ]
 
 const syllabus = createAccordionController()
 
 const elements = new Map<string, HTMLElement>()
-function setElement(value: string, instance: Element | ComponentPublicInstance | null) {
-  if (instance && "$el" in instance) elements.set(value, instance.$el as HTMLElement)
-  else elements.delete(value)
+function setElement(
+  value: string,
+  instance: Element | ComponentPublicInstance | null
+) {
+  if (instance && "$el" in instance) {
+    elements.set(value, instance.$el as HTMLElement)
+  } else {
+    elements.delete(value)
+  }
 }
 
 let pressed: string | null = null
 function openChange(value: string, open: boolean, details: ChangeDetails) {
-  if (open && details.reason === "trigger-press") pressed = value
-  else if (pressed === value) pressed = null
+  if (open && details.reason === "trigger-press") {
+    pressed = value
+  } else if (pressed === value) {
+    pressed = null
+  }
 }
 
 function openChangeComplete(value: string, open: boolean) {
-  if (!open || pressed !== value) return
+  if (!open || pressed !== value) {
+    return
+  }
   pressed = null
   elements.get(value)?.scrollIntoView({ block: "nearest", behavior: "smooth" })
 }
@@ -73,8 +89,13 @@ function openChangeComplete(value: string, open: boolean) {
           :key="week.value"
           :ref="(instance) => setElement(week.value, instance)"
           :value="week.value"
-          @open-change="(open: boolean, details: ChangeDetails) => openChange(week.value, open, details)"
-          @open-change-complete="(open: boolean) => openChangeComplete(week.value, open)"
+          @open-change="
+            (open: boolean, details: ChangeDetails) =>
+              openChange(week.value, open, details)
+          "
+          @open-change-complete="
+            (open: boolean) => openChangeComplete(week.value, open)
+          "
         >
           <AccordionHeader>
             <AccordionTrigger>

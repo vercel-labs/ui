@@ -73,7 +73,8 @@
 
   [data-slot="color-square"] {
     background:
-      linear-gradient(to top, #000, transparent), linear-gradient(to right, #fff, hsl(210 100% 50%));
+      linear-gradient(to top, #000, transparent),
+      linear-gradient(to right, #fff, hsl(210 100% 50%));
   }
 
   :is([data-slot="mixer-thumb"], [data-slot="color-thumb"]) {
@@ -303,7 +304,9 @@
       display: none;
     }
 
-    [data-slot="sidebar-root"]:not([data-collapsed], [data-landing]) > & > [data-show="open"],
+    [data-slot="sidebar-root"]:not([data-collapsed], [data-landing])
+      > &
+      > [data-show="open"],
     [data-collapsed]:not([data-landing]) > & > [data-show="collapsed"],
     [data-landing="collapsed"] > & > [data-show="landing-collapsed"],
     [data-landing="open"] > & > [data-show="landing-open"] {
@@ -319,7 +322,11 @@
     max-width: 100%;
   }
 
-  :is([data-slot="sheet-root"], [data-slot="prices-grid"], [data-slot="ledger-grid-grid"]) {
+  :is(
+    [data-slot="sheet-root"],
+    [data-slot="prices-grid"],
+    [data-slot="ledger-grid-grid"]
+  ) {
     display: flex;
     flex-direction: column;
     padding-inline-end: 1px;
@@ -328,11 +335,19 @@
     font-variant-numeric: tabular-nums;
   }
 
-  :is([data-slot="sheet-row"], [data-slot="prices-row"], [data-slot="ledger-grid-row"]) {
+  :is(
+    [data-slot="sheet-row"],
+    [data-slot="prices-row"],
+    [data-slot="ledger-grid-row"]
+  ) {
     display: flex;
   }
 
-  :is([data-slot="sheet-cell"], [data-slot="prices-cell"], [data-slot="ledger-grid-cell"]) {
+  :is(
+    [data-slot="sheet-cell"],
+    [data-slot="prices-cell"],
+    [data-slot="ledger-grid-cell"]
+  ) {
     display: grid;
     place-items: center;
     box-sizing: border-box;
@@ -1491,7 +1506,11 @@
   /* ─── Behaviors: Move ─────────────────────────────────────────────── */
 
   /* A canvas sized to fit a phone, so every bound the demo sets stays on screen. */
-  :is([data-slot="stickers-root"], [data-slot="notes-root"][role="listbox"], [data-slot="move-area"]) {
+  :is(
+    [data-slot="stickers-root"],
+    [data-slot="notes-root"][role="listbox"],
+    [data-slot="move-area"]
+  ) {
     box-sizing: border-box;
     width: 272px;
     height: 176px;
@@ -1868,7 +1887,11 @@
     }
   }
 
-  :is([data-slot="filters-title"], [data-slot="rename-title"], [data-slot="team-card-title"]) {
+  :is(
+    [data-slot="filters-title"],
+    [data-slot="rename-title"],
+    [data-slot="team-card-title"]
+  ) {
     margin: 0;
     font-size: var(--text-md);
     font-weight: 600;
@@ -2636,7 +2659,11 @@
     }
 
     [aria-disabled="true"] > & {
-      background: linear-gradient(135deg, transparent 50%, var(--line-faint) 50%);
+      background: linear-gradient(
+        135deg,
+        transparent 50%,
+        var(--line-faint) 50%
+      );
     }
   }
 
@@ -2764,7 +2791,8 @@
     }
 
     &:hover {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &:focus-visible {
@@ -2815,7 +2843,8 @@
     resize: none;
 
     &:hover {
-      box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: inset 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &:focus-visible {
@@ -2963,7 +2992,9 @@
   }
 
   /* A panel under a controls row keeps its width, and narrows with the preview. */
-  [data-slot="stack"]:has(> :is([data-slot="files-root"], [data-slot="product-list"])) {
+  [data-slot="stack"]:has(
+    > :is([data-slot="files-root"], [data-slot="product-list"])
+  ) {
     width: 20rem;
     max-width: 100%;
 
@@ -3006,7 +3037,8 @@
     cursor: default;
 
     &:hover:not([aria-selected="true"]) {
-      box-shadow: 0 0 0 1px color-mix(in oklab, var(--ink) 45%, var(--surface-1));
+      box-shadow: 0 0 0 1px
+        color-mix(in oklab, var(--ink) 45%, var(--surface-1));
     }
 
     &[aria-selected="true"] {
@@ -3061,7 +3093,11 @@
 
   /* ─── Behaviors: Spans ────────────────────────────────────────────── */
 
-  :is([data-slot="rooms-root"], [data-slot="room-root"], [data-slot="week-root"]) {
+  :is(
+    [data-slot="rooms-root"],
+    [data-slot="room-root"],
+    [data-slot="week-root"]
+  ) {
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -3107,7 +3143,11 @@
     height: 40px;
     border-radius: var(--radius-control);
     background-color: var(--surface-1);
-    background-image: linear-gradient(to right, var(--line-faint) 1px, transparent 1px);
+    background-image: linear-gradient(
+      to right,
+      var(--line-faint) 1px,
+      transparent 1px
+    );
     background-size: calc(100% / 8) 100%;
     box-shadow: inset 0 0 0 1px var(--line);
   }
@@ -3116,7 +3156,11 @@
     flex: 1;
   }
 
-  :is([data-slot="rooms-booking"], [data-slot="room-booking"], [data-slot="week-plan"]) {
+  :is(
+    [data-slot="rooms-booking"],
+    [data-slot="room-booking"],
+    [data-slot="week-plan"]
+  ) {
     box-sizing: border-box;
     overflow: hidden;
     padding-inline: var(--space-2);
@@ -3157,7 +3201,8 @@
     inset-block: 0;
     inset-inline-end: 0;
     width: 6px;
-    border-inline-start: 1px solid color-mix(in oklab, currentColor 35%, transparent);
+    border-inline-start: 1px solid
+      color-mix(in oklab, currentColor 35%, transparent);
     cursor: ew-resize;
   }
 
@@ -3202,7 +3247,11 @@
     flex: 1;
     height: 360px;
     border-inline-start: 1px solid var(--line-faint);
-    background-image: linear-gradient(to bottom, transparent 59px, var(--line-faint) 59px);
+    background-image: linear-gradient(
+      to bottom,
+      transparent 59px,
+      var(--line-faint) 59px
+    );
     background-size: 100% 60px;
   }
 
@@ -3482,7 +3531,10 @@
   /* ─── Behaviors: Transfer ─────────────────────────────────────────── */
 
   /* Lists side by side that share the width, so a phone keeps every column on screen. */
-  :is([data-slot="packing-root"], [data-slot="board-root"]:has(> [data-slot="transfer-lane"])) {
+  :is(
+    [data-slot="packing-root"],
+    [data-slot="board-root"]:has(> [data-slot="transfer-lane"])
+  ) {
     display: flex;
     gap: var(--space-3);
     width: 19rem;
@@ -3636,22 +3688,32 @@
     font-size: var(--text-md);
   }
 
-  [data-slot="stack"]:has(> :is([data-slot="tree-behavior-list"], [data-slot="backup-root"])) {
+  [data-slot="stack"]:has(
+    > :is([data-slot="tree-behavior-list"], [data-slot="backup-root"])
+  ) {
     width: 20rem;
     max-width: 100%;
   }
 
-  [data-slot="stack"] > :is([data-slot="tree-behavior-list"], [data-slot="backup-root"]) {
+  [data-slot="stack"]
+    > :is([data-slot="tree-behavior-list"], [data-slot="backup-root"]) {
     align-self: stretch;
     width: auto;
   }
 
   :is([data-slot="tree-behavior-list"], [data-slot="backup-root"])
-    > :is([data-slot="tree-behavior-row"], [data-slot="file-list-row"], [data-slot="backup-item"]) {
+    > :is(
+      [data-slot="tree-behavior-row"],
+      [data-slot="file-list-row"],
+      [data-slot="backup-item"]
+    ) {
     flex: none;
     height: var(--size-item);
     min-height: 0;
-    padding-inline: calc(var(--space-2) + (var(--tree-level, 1) - 1) * var(--space-4)) var(--space-3);
+    padding-inline: calc(
+        var(--space-2) + (var(--tree-level, 1) - 1) * var(--space-4)
+      )
+      var(--space-3);
     white-space: nowrap;
 
     &:is([data-branch], [aria-expanded]) {
@@ -3681,7 +3743,8 @@
   [data-slot="tree-behavior-list"] > [data-slot="file-list-row"] {
     &:not([aria-expanded]) {
       padding-inline-start: calc(
-        var(--space-2) + (var(--tree-level, 1) - 1) * var(--space-4) + var(--size-icon) + var(--space-2)
+        var(--space-2) + (var(--tree-level, 1) - 1) * var(--space-4) +
+          var(--size-icon) + var(--space-2)
       );
     }
 
@@ -3690,7 +3753,8 @@
     }
   }
 
-  :is([data-slot="backup-root"], [data-slot="tree-behavior-list"]) > [data-slot="output"] {
+  :is([data-slot="backup-root"], [data-slot="tree-behavior-list"])
+    > [data-slot="output"] {
     margin: auto -5px -5px;
     padding: var(--space-2) var(--space-3);
     border-top: 1px solid var(--line-faint);
@@ -4002,7 +4066,11 @@
     }
   }
 
-  :is([data-slot="board-reset"], [data-slot="map-reset"], [data-slot="map-action"]) {
+  :is(
+    [data-slot="board-reset"],
+    [data-slot="map-reset"],
+    [data-slot="map-action"]
+  ) {
     min-width: var(--size-sm);
   }
 

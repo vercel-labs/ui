@@ -35,9 +35,14 @@ const draft: TokenInputValue = [
 const log = useLog()
 const value = ref<TokenInputValue>(draft)
 
-function onValueChange(next: TokenInputValue, details: TokenInputValueChangeDetails) {
+function onValueChange(
+  next: TokenInputValue,
+  details: TokenInputValueChangeDetails
+) {
   const removed = details.removed.map((token) => token.label).join(", ")
-  log(`${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`)
+  log(
+    `${toText(next)} (${details.reason}${removed ? `, removed ${removed}` : ""})`
+  )
 }
 </script>
 
@@ -47,7 +52,9 @@ function onValueChange(next: TokenInputValue, details: TokenInputValueChangeDeta
     <TokenInput
       v-model:value="value"
       :history="{ limit: 50, groupDelay: 1000 }"
-      :get-token-description="(token: Token) => (token.type === 'file' ? 'attached file' : token.type)"
+      :get-token-description="
+        (token: Token) => (token.type === 'file' ? 'attached file' : token.type)
+      "
       @value-change="onValueChange"
     >
       <TokenInputEditor />

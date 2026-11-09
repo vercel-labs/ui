@@ -25,7 +25,9 @@ const tooltip = (
 )
 const popover = (
   <Popover>
-    <PopoverContent<Day> class={(state) => (state.payload?.count ? "busy" : "")} />
+    <PopoverContent<Day>
+      class={(state) => (state.payload?.count ? "busy" : "")}
+    />
   </Popover>
 )
 const others = [
@@ -36,7 +38,9 @@ const others = [
     <DialogContent<Day>>{(state) => state.payload?.count}</DialogContent>
   </Dialog>,
   <AlertDialog>
-    <AlertDialogContent<Day>>{(state) => state.payload?.count}</AlertDialogContent>
+    <AlertDialogContent<Day>>
+      {(state) => state.payload?.count}
+    </AlertDialogContent>
   </AlertDialog>,
   <Drawer>
     <DrawerContent<Day>>{(state) => state.payload?.count}</DrawerContent>

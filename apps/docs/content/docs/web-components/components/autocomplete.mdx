@@ -51,7 +51,9 @@ Import the parts and put them together:
 
 <ui-autocomplete>
   <ui-autocomplete-label>Fruit</ui-autocomplete-label>
-  <ui-autocomplete-input><input placeholder="Type a fruit…" /></ui-autocomplete-input>
+  <ui-autocomplete-input
+    ><input placeholder="Type a fruit…"
+  /></ui-autocomplete-input>
   <ui-autocomplete-content hidden>
     <ui-autocomplete-list>
       <ui-autocomplete-item value="Apple">Apple</ui-autocomplete-item>
@@ -79,7 +81,11 @@ import { createParts, wrappedChild } from "@ui-sdk/web"
 createParts(autocomplete, {
   root: "fruit-search",
   label: "fruit-label",
-  input: { tag: "fruit-input", target: wrappedChild("input"), display: "contents" },
+  input: {
+    tag: "fruit-input",
+    target: wrappedChild("input"),
+    display: "contents",
+  },
   content: "fruit-popup",
   list: "fruit-list",
   item: "fruit-option",
@@ -470,7 +476,10 @@ A divider between suggestions or groups. `<ui-autocomplete-separator>` has the s
 
 Each suggestion in `items`, or a plain string. Groups are `{ type: "group", label, items }` and separators `{ type: "separator" }`.
 
-<TypeTable path="../../packages/core/src/foundation/lists/listbox.ts" name="ListItem" />
+<TypeTable
+  path="../../packages/core/src/foundation/lists/listbox.ts"
+  name="ListItem"
+/>
 
 The whole array is a `ListData`.
 

@@ -15,14 +15,25 @@
     ComboboxValue,
   } from "@ui-sdk/svelte/combobox"
 
-  const initialLabels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+  const initialLabels = [
+    "Bug",
+    "Feature",
+    "Documentation",
+    "Design",
+    "Performance",
+    "Security",
+    "Testing",
+  ]
 
   function saveLabel(name: string) {
     return new Promise<void>((resolve, reject) =>
       setTimeout(
-        () => (name.length > 20 ? reject(new Error("Labels are 20 characters at most.")) : resolve()),
-        800,
-      ),
+        () =>
+          name.length > 20
+            ? reject(new Error("Labels are 20 characters at most."))
+            : resolve(),
+        800
+      )
     )
   }
 
@@ -74,7 +85,9 @@
             <PlusIcon aria-hidden="true" />
             <span data-slot="stack">
               Create “{state.query}”
-              {#if state.error}<span data-slot="hint">{(state.error as Error).message}</span>{/if}
+              {#if state.error}<span data-slot="hint"
+                  >{(state.error as Error).message}</span
+                >{/if}
             </span>
           {/if}
         {/snippet}

@@ -4,9 +4,14 @@ import * as classes from "./classes"
 import { kitchenSink } from "./shell"
 import { content, tree, type TreeNode, type Variant } from "./variants"
 
-type CollapsibleElement = HTMLElement & { api?: CollapsibleApi; controller?: unknown; open?: boolean }
+type CollapsibleElement = HTMLElement & {
+  api?: CollapsibleApi
+  controller?: unknown
+  open?: boolean
+}
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 // Boolean attributes for every option or prop that is on.
 function attributes(props: Record<string, unknown> = {}) {
@@ -17,18 +22,26 @@ function attributes(props: Record<string, unknown> = {}) {
 
 // What the panel holds.
 function body(variant: Variant) {
-  if (variant.body === "long")
-    return Array.from({ length: 20 }, (_, index) => `<p>Line ${index + 1}</p>`).join("")
-  if (variant.body === "form")
+  if (variant.body === "long") {
+    return Array.from(
+      { length: 20 },
+      (_, index) => `<p>Line ${index + 1}</p>`
+    ).join("")
+  }
+  if (variant.body === "form") {
     return `<label class="flex flex-col">${content.text}<input class="${classes.input}" value="Ada" aria-label="Name" /></label>`
-  if (variant.body === "grow")
+  }
+  if (variant.body === "grow") {
     return `<p>Line 1</p><button data-grow class="${classes.button} self-start">Add a line</button>`
+  }
   return content.text
 }
 
 // A folder is a collapsible holding its children. Files are plain rows.
 function folder(node: TreeNode) {
-  if (!node.children) return `<div class="${classes.treeFile}">${node.name}</div>`
+  if (!node.children) {
+    return `<div class="${classes.treeFile}">${node.name}</div>`
+  }
   // Typed, so the recursion doesn't need this function's return type.
   const children: string[] = node.children.map(folder)
   return `
@@ -41,8 +54,9 @@ function folder(node: TreeNode) {
 }
 
 function markup(variant: Variant) {
-  if (variant.body === "tree")
+  if (variant.body === "tree") {
     return `<div class="w-full rounded-lg border border-neutral-200 bg-white p-2">${folder(tree)}</div>`
+  }
   const label = `${content.trigger}<span aria-hidden="true" class="${classes.chevron}">▾</span>`
   const trigger =
     variant.render?.trigger === "div"
@@ -65,10 +79,13 @@ function markup(variant: Variant) {
 
 function mount(root: HTMLElement) {
   kitchenSink(root, "web", (slot, variant, env) => {
-    const wrapper = Object.assign(document.createElement("div"), { className: "flex w-full flex-col gap-2" })
+    const wrapper = Object.assign(document.createElement("div"), {
+      className: "flex w-full flex-col gap-2",
+    })
     wrapper.innerHTML = markup(variant)
     slot.append(wrapper)
-    const collapsible = wrapper.querySelector<CollapsibleElement>("ui-collapsible")!
+    const collapsible =
+      wrapper.querySelector<CollapsibleElement>("ui-collapsible")!
 
     // Callbacks are DOM events on the elements, and nested ones bubble, so one
     // listener logs them all. Folders log their name.
@@ -76,9 +93,13 @@ function mount(root: HTMLElement) {
       "openchange",
       (event) => {
         const target = event.target as HTMLElement
-        if (target.localName !== "ui-collapsible") return
+        if (target.localName !== "ui-collapsible") {
+          return
+        }
         const name = target.dataset.name ? `${target.dataset.name} ` : ""
-        const detail = (event as CustomEvent<{ value: boolean; reason: string }>).detail
+        const detail = (
+          event as CustomEvent<{ value: boolean; reason: string }>
+        ).detail
         if (variant.cancel === (detail.value ? "open" : "close")) {
           event.preventDefault()
           env.log(`${name}openChange ${detail.value} canceled`)
@@ -86,17 +107,21 @@ function mount(root: HTMLElement) {
         }
         env.log(`${name}openChange ${detail.value} (${detail.reason})`)
       },
-      { capture: true },
+      { capture: true }
     )
     wrapper.addEventListener(
       "openchangecomplete",
       (event) => {
         const target = event.target as HTMLElement
-        if (target.localName !== "ui-collapsible") return
+        if (target.localName !== "ui-collapsible") {
+          return
+        }
         const name = target.dataset.name ? `${target.dataset.name} ` : ""
-        env.log(`${name}openChangeComplete ${(event as CustomEvent<{ value: boolean }>).detail.value}`)
+        env.log(
+          `${name}openChangeComplete ${(event as CustomEvent<{ value: boolean }>).detail.value}`
+        )
       },
-      { capture: true },
+      { capture: true }
     )
 
     const grow = wrapper.querySelector<HTMLButtonElement>("[data-grow]")
@@ -104,8 +129,8 @@ function mount(root: HTMLElement) {
       grow.before(
         Object.assign(document.createElement("p"), {
           textContent: `Line ${grow.parentElement!.querySelectorAll("p").length + 1}`,
-        }),
-      ),
+        })
+      )
     )
 
     collapsible.controller = env.controller
@@ -121,7 +146,7 @@ function mount(root: HTMLElement) {
       })
       buttons.append(state)
       collapsible.addEventListener("openchange", () =>
-        queueMicrotask(() => (state.textContent = `open=${collapsible.open}`)),
+        queueMicrotask(() => (state.textContent = `open=${collapsible.open}`))
       )
       for (const [label, run] of [
         ["Open", () => (collapsible.open = true)],

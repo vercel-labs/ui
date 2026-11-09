@@ -9,7 +9,11 @@ function Example() {
       <ToolbarButton disabled onClick={() => log("Archive")}>
         Archive
       </ToolbarButton>
-      <ToolbarButton disabled focusableWhenDisabled={false} onClick={() => log("Delete")}>
+      <ToolbarButton
+        disabled
+        focusableWhenDisabled={false}
+        onClick={() => log("Delete")}
+      >
         Delete
       </ToolbarButton>
     </Toolbar>

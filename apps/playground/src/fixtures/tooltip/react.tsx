@@ -1,6 +1,18 @@
 import { createTooltipController } from "@ui-sdk/core/tooltip"
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/react/popover"
-import { Tooltip, TooltipArrow, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/react/tooltip"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/react/popover"
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "@ui-sdk/react/tooltip"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import {
@@ -21,8 +33,16 @@ function Fixture() {
   return (
     <div className="fixture tooltip-page">
       <button>Before</button>
-      <Tooltip {...options} controller={controller} defaultOpen={parts.open} shortcut={save.shortcut}>
-        <TooltipTrigger disabled={parts.nativeDisabled} onClick={() => setAction("save")}>
+      <Tooltip
+        {...options}
+        controller={controller}
+        defaultOpen={parts.open}
+        shortcut={save.shortcut}
+      >
+        <TooltipTrigger
+          disabled={parts.nativeDisabled}
+          onClick={() => setAction("save")}
+        >
           {save.trigger}
         </TooltipTrigger>
         <TooltipContent className="tooltip" {...tooltipContentOptions()}>
@@ -43,7 +63,9 @@ function Fixture() {
       </div>
       <Popover container={options.container}>
         <Tooltip {...options}>
-          <TooltipTrigger render={<PopoverTrigger>{profile.trigger}</PopoverTrigger>} />
+          <TooltipTrigger
+            render={<PopoverTrigger>{profile.trigger}</PopoverTrigger>}
+          />
           <TooltipContent className="tooltip">{profile.content}</TooltipContent>
         </Tooltip>
         <PopoverContent className="popup" sideOffset={8}>
@@ -51,7 +73,9 @@ function Fixture() {
           <div className="actions">
             <Tooltip {...options}>
               <TooltipTrigger>{profile.help.trigger}</TooltipTrigger>
-              <TooltipContent className="tooltip">{profile.help.content}</TooltipContent>
+              <TooltipContent className="tooltip">
+                {profile.help.content}
+              </TooltipContent>
             </Tooltip>
             <PopoverClose>{profile.close}</PopoverClose>
           </div>
@@ -68,7 +92,8 @@ function Fixture() {
           <TooltipTrigger
             aria-disabled="true"
             onClick={(event) =>
-              event.currentTarget.getAttribute("aria-disabled") !== "true" && setAction(publish.action)
+              event.currentTarget.getAttribute("aria-disabled") !== "true" &&
+              setAction(publish.action)
             }
           >
             {publish.trigger}
@@ -87,15 +112,21 @@ function Fixture() {
                   </PopoverTrigger>
                 }
               />
-              <TooltipContent className="tooltip">{iconPopover.content}</TooltipContent>
+              <TooltipContent className="tooltip">
+                {iconPopover.content}
+              </TooltipContent>
             </Tooltip>
-            <PopoverContent className="popup">{iconPopover.popover}</PopoverContent>
+            <PopoverContent className="popup">
+              {iconPopover.popover}
+            </PopoverContent>
           </Popover>
           <Popover container={options.container}>
             <PopoverTrigger>
               <span aria-hidden="true">{iconPopover.unnamed}</span>
             </PopoverTrigger>
-            <PopoverContent className="popup">{iconPopover.popover}</PopoverContent>
+            <PopoverContent className="popup">
+              {iconPopover.popover}
+            </PopoverContent>
           </Popover>
         </>
       )}
@@ -117,7 +148,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

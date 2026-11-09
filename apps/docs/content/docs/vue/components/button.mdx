@@ -145,7 +145,11 @@ Add `focusable-when-disabled` when people should still be able to focus a disabl
 Use `aria-describedby` to explain why the action is unavailable:
 
 ```vue
-<Button disabled focusable-when-disabled aria-describedby="publish-hint">Publish</Button>
+<Button
+  disabled
+  focusable-when-disabled
+  aria-describedby="publish-hint"
+>Publish</Button>
 <p id="publish-hint">Add a title to publish.</p>
 ```
 
@@ -207,11 +211,17 @@ Button accepts the options below, and native attributes pass through to its elem
 
 ### Button
 
-<TypeTable path="../../packages/core/src/components/button/button.ts" name="ButtonOptions" />
+<TypeTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonOptions"
+/>
 
 ### State
 
-<StateTable path="../../packages/core/src/components/button/button.ts" name="ButtonState" />
+<StateTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonState"
+/>
 
 ### Events
 

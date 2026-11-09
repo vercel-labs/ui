@@ -1,10 +1,17 @@
 import { menubarFixture as f, menubarOptions } from "tests/fixtures/menubar.ts"
 
-const items = (list: { value: string; label: string; disabled?: boolean; shortcut?: string }[]) =>
+const items = (
+  list: {
+    value: string
+    label: string
+    disabled?: boolean
+    shortcut?: string
+  }[]
+) =>
   list
     .map(
       (item) =>
-        `<ui-menu-item class="item" value="${item.value}" ${item.disabled ? "disabled" : ""} ${item.shortcut ? `shortcut="${item.shortcut}"` : ""}>${item.label}</ui-menu-item>`,
+        `<ui-menu-item class="item" value="${item.value}" ${item.disabled ? "disabled" : ""} ${item.shortcut ? `shortcut="${item.shortcut}"` : ""}>${item.label}</ui-menu-item>`
     )
     .join("")
 
@@ -34,7 +41,7 @@ const markup = `
           ${f.view.checkboxes
             .map(
               (item) =>
-                `<ui-menu-checkbox-item class="item" value="${item.value}" ${item.defaultChecked ? "default-checked" : ""}>${item.label}</ui-menu-checkbox-item>`,
+                `<ui-menu-checkbox-item class="item" value="${item.value}" ${item.defaultChecked ? "default-checked" : ""}>${item.label}</ui-menu-checkbox-item>`
             )
             .join("")}
         </ui-menu-content>
@@ -61,10 +68,18 @@ async function mount(root: HTMLElement) {
   root.innerHTML = markup
   const menubar = root.querySelector("ui-menubar")!
   const options = menubarOptions()
-  if (options.orientation) menubar.setAttribute("orientation", options.orientation)
-  if (options.loop === false) menubar.setAttribute("loop", "false")
-  if (options.disabled) menubar.setAttribute("disabled", "")
-  if (options.modal !== undefined) menubar.setAttribute("modal", String(options.modal))
+  if (options.orientation) {
+    menubar.setAttribute("orientation", options.orientation)
+  }
+  if (options.loop === false) {
+    menubar.setAttribute("loop", "false")
+  }
+  if (options.disabled) {
+    menubar.setAttribute("disabled", "")
+  }
+  if (options.modal !== undefined) {
+    menubar.setAttribute("modal", String(options.modal))
+  }
   // The menubar first, so menus find it as they upgrade. With ?menus-first,
   // the menus upgrade and bind first, like a menubar loaded later, and join
   // the menubar once it upgrades.
@@ -80,26 +95,32 @@ async function mount(root: HTMLElement) {
   root.addEventListener(
     "action",
     (event) => {
-      output.textContent = (event as CustomEvent<{ value: string }>).detail.value
+      output.textContent = (
+        event as CustomEvent<{ value: string }>
+      ).detail.value
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "checkedchange",
     (event) => {
       const value = (event.target as HTMLElement).getAttribute("value")
-      if ((event.target as HTMLElement).localName !== "ui-menu-checkbox-item") return
+      if ((event.target as HTMLElement).localName !== "ui-menu-checkbox-item") {
+        return
+      }
       output.textContent = `${value}: ${(event as CustomEvent<{ value: boolean }>).detail.value ? "on" : "off"}`
     },
-    { capture: true },
+    { capture: true }
   )
   root.addEventListener(
     "valuechange",
     (event) => {
-      if ((event.target as HTMLElement).localName !== "ui-menu-radio-group") return
+      if ((event.target as HTMLElement).localName !== "ui-menu-radio-group") {
+        return
+      }
       output.textContent = `profile: ${(event as CustomEvent<{ value: string }>).detail.value}`
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

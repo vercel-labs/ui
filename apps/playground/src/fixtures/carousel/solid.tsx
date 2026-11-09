@@ -37,8 +37,12 @@ function Fixture() {
           },
         })}
         onPageChange={(next, details) => {
-          if (next === cancel) return details.cancel()
-          if (controlled) setPage(next)
+          if (next === cancel) {
+            return details.cancel()
+          }
+          if (controlled) {
+            setPage(next)
+          }
           setAction(String(next))
           setReason(details.reason)
         }}
@@ -46,7 +50,9 @@ function Fixture() {
       >
         <Show when={playToggle}>
           <CarouselPlayToggle class="carousel-toggle">
-            {(state) => (state.playing ? carouselFixture.stop : carouselFixture.start)}
+            {(state) =>
+              state.playing ? carouselFixture.stop : carouselFixture.start
+            }
           </CarouselPlayToggle>
         </Show>
         <CarouselViewport class="carousel-viewport">
@@ -68,10 +74,17 @@ function Fixture() {
           </CarouselContent>
         </CarouselViewport>
         <div class="carousel-controls">
-          <CarouselPrevious class="carousel-step">{carouselFixture.previous}</CarouselPrevious>
-          <CarouselNext class="carousel-step">{carouselFixture.next}</CarouselNext>
+          <CarouselPrevious class="carousel-step">
+            {carouselFixture.previous}
+          </CarouselPrevious>
+          <CarouselNext class="carousel-step">
+            {carouselFixture.next}
+          </CarouselNext>
         </div>
-        <CarouselIndicatorGroup class="carousel-controls" aria-label={carouselFixture.indicators}>
+        <CarouselIndicatorGroup
+          class="carousel-controls"
+          aria-label={carouselFixture.indicators}
+        >
           <For each={carouselFixture.slides}>
             {(_, index) => (
               <CarouselIndicator

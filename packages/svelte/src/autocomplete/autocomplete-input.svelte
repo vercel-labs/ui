@@ -15,17 +15,30 @@ into the sheet's header.
   import { useHandle } from "../instance"
   import { portalTo } from "../popup.svelte"
   import { useInSheetHeader } from "../sheet-header.svelte"
-  import { useHandlePart, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let props: PartProps<"input", AutocompleteInputState> = $props()
 
   const autocomplete = useHandle(autocompletePrimitive)
   const field = useFieldControl()
-  const input = useHandlePart(autocomplete, "input", () => ({}), portalTo(useInSheetHeader()))
+  const input = useHandlePart(
+    autocomplete,
+    "input",
+    () => ({}),
+    portalTo(useInSheetHeader())
+  )
   const control = field?.control(
     () => props.id as string | undefined,
-    () => props["aria-describedby"],
+    () => props["aria-describedby"]
   )
 </script>
 
-<Part tag="input" part={wrapPart(input, control)} props={{ ...props, children: undefined }} />
+<Part
+  tag="input"
+  part={wrapPart(input, control)}
+  props={{ ...props, children: undefined }}
+/>

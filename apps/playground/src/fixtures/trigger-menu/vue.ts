@@ -32,15 +32,17 @@ const Composer = defineComponent({
           autoHighlight,
           onOpenChange: (open: boolean, details: { reason: string }) =>
             emit("open", `${open}:${details.reason}`),
-          onSelect: (value: unknown, details: { arguments: Record<string, string> }) =>
-            emit("action", selectAction(value, details.arguments)),
+          onSelect: (
+            value: unknown,
+            details: { arguments: Record<string, string> }
+          ) => emit("action", selectAction(value, details.arguments)),
         },
         () => [
           h("label", { class: "label", for: id }, props.name),
           h(
             TriggerMenuInput,
             { id, name: "message", class: "input" },
-            renderAs(input ? "input" : textarea ? Textarea : undefined),
+            renderAs(input ? "input" : textarea ? Textarea : undefined)
           ),
           h(TriggerMenuHint, { class: "hint" }),
           h(TriggerMenuStatus, { class: "status" }),
@@ -48,7 +50,7 @@ const Composer = defineComponent({
             empty && h(TriggerMenuEmpty, { class: "empty" }, () => f.empty),
             h(TriggerMenuFixtureList),
           ]),
-        ],
+        ]
       )
   },
 })
@@ -75,15 +77,31 @@ const Fixture = defineComponent({
             "aria-label": f.formLabel,
             onSubmit: (event: SubmitEvent) => {
               event.preventDefault()
-              submitted.value = String(new FormData(event.currentTarget as HTMLFormElement).get("message"))
+              submitted.value = String(
+                new FormData(event.currentTarget as HTMLFormElement).get(
+                  "message"
+                )
+              )
             },
           },
-          [composer(f.label), twice && composer("Second"), h("button", { type: "submit" }, f.submit)],
+          [
+            composer(f.label),
+            twice && composer("Second"),
+            h("button", { type: "submit" }, f.submit),
+          ]
         ),
         h("button", "After"),
-        h("output", { role: "status", "aria-label": "Last action" }, action.value),
+        h(
+          "output",
+          { role: "status", "aria-label": "Last action" },
+          action.value
+        ),
         h("output", { role: "status", "aria-label": "Open" }, open.value),
-        h("output", { role: "status", "aria-label": "Submitted" }, submitted.value),
+        h(
+          "output",
+          { role: "status", "aria-label": "Submitted" },
+          submitted.value
+        ),
       ])
   },
 })

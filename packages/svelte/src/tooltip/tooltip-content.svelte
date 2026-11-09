@@ -13,7 +13,12 @@ Always in the page, hidden while closed, so the trigger can point at it.
   import { getContext } from "svelte"
   import Part from "../part.svelte"
   import { useHandle } from "../instance"
-  import { portalTo, providePopupContainer, usePopupContainer, type PopupContainer } from "../popup.svelte"
+  import {
+    portalTo,
+    providePopupContainer,
+    usePopupContainer,
+    type PopupContainer,
+  } from "../popup.svelte"
   import { useHandlePart, type PartProps } from "../use-primitive.svelte"
   import { ContainerKey, type ContainerContext } from "./context"
 
@@ -40,10 +45,22 @@ Always in the page, hidden while closed, so the trigger can point at it.
   const content = useHandlePart(
     tooltip,
     "content",
-    () => ({ side, align, sideOffset, alignOffset, collisionPadding, arrowPadding, anchor }),
-    portalTo(target),
+    () => ({
+      side,
+      align,
+      sideOffset,
+      alignOffset,
+      collisionPadding,
+      arrowPadding,
+      anchor,
+    }),
+    portalTo(target)
   )
 </script>
 
 <!-- The payload's type is the app's, from `Payload`; the part hands its state on as it is. -->
-<Part tag="div" part={content} props={rest as PartProps<"div", TooltipContentState>} />
+<Part
+  tag="div"
+  part={content}
+  props={rest as PartProps<"div", TooltipContentState>}
+/>

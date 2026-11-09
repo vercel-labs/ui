@@ -35,7 +35,7 @@ function words(item: { label: string }, query: string) {
       item.label
         .toLowerCase()
         .split(" ")
-        .some((part) => part.startsWith(word)),
+        .some((part) => part.startsWith(word))
     )
 }
 
@@ -59,7 +59,7 @@ function mount(root: HTMLElement) {
                     ${option.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -74,7 +74,7 @@ function mount(root: HTMLElement) {
           ${commands
             .map(
               (command) =>
-                `<ui-command-item value="${command.label}"${command.keywords ? ` keywords="${command.keywords.join(",")}"` : ""}>${command.label}</ui-command-item>`,
+                `<ui-command-item value="${command.label}"${command.keywords ? ` keywords="${command.keywords.join(",")}"` : ""}>${command.label}</ui-command-item>`
             )
             .join("")}
         </ui-command-list>
@@ -84,7 +84,9 @@ function mount(root: HTMLElement) {
   const command = root.querySelector("ui-command")!
   root.querySelector("ui-select")!.addEventListener("valuechange", (event) => {
     const mode = event.detail.value as Mode | null
-    if (mode) command.filter = mode === "words" ? words : mode
+    if (mode) {
+      command.filter = mode === "words" ? words : mode
+    }
   })
 }
 

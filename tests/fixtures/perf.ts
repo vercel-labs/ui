@@ -21,7 +21,9 @@ function perfOptions() {
  * pressed, so a test can time mounting from a key press.
  */
 function mountWhenAsked(root: HTMLElement, mount: (root: HTMLElement) => void) {
-  if (new URLSearchParams(location.search).get("mount") !== "manual") return mount(root)
+  if (new URLSearchParams(location.search).get("mount") !== "manual") {
+    return mount(root)
+  }
   const button = document.createElement("button")
   button.textContent = "Mount"
   const target = document.createElement("div")
@@ -39,19 +41,26 @@ function leakTreeItems() {
 
 /** Labels for `n` items: "Item 1" to "Item n". */
 function perfItems(n: number) {
-  return Array.from({ length: n }, (_, index) => ({ value: `item-${index + 1}`, label: `Item ${index + 1}` }))
+  return Array.from({ length: n }, (_, index) => ({
+    value: `item-${index + 1}`,
+    label: `Item ${index + 1}`,
+  }))
 }
 
 /** Counts one render of a part of a kind, like "plain" or "watched". */
 function countRender(kind: string) {
   const perf = counters()
-  if (perf) perf.renders[kind] = (perf.renders[kind] ?? 0) + 1
+  if (perf) {
+    perf.renders[kind] = (perf.renders[kind] ?? 0) + 1
+  }
 }
 
 // Counts one subscription a part made to its instance.
 function countSubscription() {
   const perf = counters()
-  if (perf) perf.subscriptions++
+  if (perf) {
+    perf.subscriptions++
+  }
 }
 
 type Subscribe = (...args: unknown[]) => () => void
@@ -63,7 +72,10 @@ type Subscribe = (...args: unknown[]) => () => void
  * store, so its methods can't be wrapped per part.
  */
 function countSubscriptions(instance: object) {
-  const counted = instance as { subscribe: Subscribe; part: (...args: unknown[]) => { leases: number } }
+  const counted = instance as {
+    subscribe: Subscribe
+    part: (...args: unknown[]) => { leases: number }
+  }
   const subscribe = counted.subscribe
   counted.subscribe = (...args) => {
     countSubscription()
@@ -73,13 +85,17 @@ function countSubscriptions(instance: object) {
   const watched = new WeakSet<object>()
   counted.part = (...args) => {
     const record = part(...args)
-    if (watched.has(record)) return record
+    if (watched.has(record)) {
+      return record
+    }
     watched.add(record)
     let leases = record.leases
     Object.defineProperty(record, "leases", {
       get: () => leases,
       set(next: number) {
-        if (next > leases) countSubscription()
+        if (next > leases) {
+          countSubscription()
+        }
         leases = next
       },
     })
@@ -128,9 +144,15 @@ function leakComponent() {
  */
 function exposeLayers() {
   type Realm = { stack: unknown[]; teardown?: () => void }
-  const realm = () => (globalThis as Record<symbol, Realm | undefined>)[Symbol.for("ui-sdk.layers@1")]
+  const realm = () =>
+    (globalThis as Record<symbol, Realm | undefined>)[
+      Symbol.for("ui-sdk.layers@1")
+    ]
   Object.assign(window, {
-    __layers: () => ({ open: realm()?.stack.length ?? 0, listening: !!realm()?.teardown }),
+    __layers: () => ({
+      open: realm()?.stack.length ?? 0,
+      listening: !!realm()?.teardown,
+    }),
   })
 }
 

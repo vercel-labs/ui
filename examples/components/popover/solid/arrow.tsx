@@ -41,8 +41,11 @@ function Example() {
         open={open()}
         onOpenChange={(next, details) => {
           const target = details.event?.target
-          const inControls = target instanceof Node && controls?.contains(target)
-          if (inControls && details.reason !== "escape-key") return details.cancel()
+          const inControls =
+            target instanceof Node && controls?.contains(target)
+          if (inControls && details.reason !== "escape-key") {
+            return details.cancel()
+          }
           setOpen(next)
         }}
       >
@@ -64,7 +67,9 @@ function Example() {
         <PopoverContent side={side()} sideOffset={10} arrowPadding={12}>
           <PopoverArrow />
           <PopoverTitle>Keyboard shortcuts</PopoverTitle>
-          <PopoverDescription>Press ? anywhere to see them all.</PopoverDescription>
+          <PopoverDescription>
+            Press ? anywhere to see them all.
+          </PopoverDescription>
         </PopoverContent>
       </Popover>
     </div>

@@ -21,7 +21,10 @@
     TabsPanel,
     TabsTab,
   } from "@ui-sdk/svelte"
-  import { alignmentFixture, alignmentOptions } from "tests/fixtures/alignment.ts"
+  import {
+    alignmentFixture,
+    alignmentOptions,
+  } from "tests/fixtures/alignment.ts"
 
   const rowMenu = createMenuController<string>()
   const details = createPopoverController<string>()
@@ -53,7 +56,9 @@
   }
 
   function onSelect(value: string) {
-    if (value === "details") showDetails(String(rowMenu.getPayload()))
+    if (value === "details") {
+      showDetails(String(rowMenu.getPayload()))
+    }
   }
 </script>
 
@@ -64,7 +69,11 @@
     {#each alignmentFixture.rows as row (row)}
       <li>
         Row {row}
-        <MenuTrigger controller={rowMenu} payload={row} aria-label={`Actions for ${row}`}>…</MenuTrigger>
+        <MenuTrigger
+          controller={rowMenu}
+          payload={row}
+          aria-label={`Actions for ${row}`}>…</MenuTrigger
+        >
       </li>
     {/each}
   </ul>
@@ -77,7 +86,11 @@
       {#snippet children(state)}
         <div class="payload">Row {state.payload}</div>
         {#each alignmentFixture.rowActions as item (item.value)}
-          <MenuItem class="item" value={item.value} onSelect={() => onSelect(item.value)}>
+          <MenuItem
+            class="item"
+            value={item.value}
+            onSelect={() => onSelect(item.value)}
+          >
             {item.label}
           </MenuItem>
         {/each}
@@ -110,8 +123,10 @@
 
   <Menu
     items={dataItems}
-    onCheckedChange={(checked, details) => (change = `checked:${details.value}:${checked}`)}
-    onValueChange={(value, details) => (change = `value:${details.group}:${value}`)}
+    onCheckedChange={(checked, details) =>
+      (change = `checked:${details.value}:${checked}`)}
+    onValueChange={(value, details) =>
+      (change = `value:${details.group}:${value}`)}
   >
     <MenuTrigger>Data</MenuTrigger>
     <!-- The data's items, rendered with the fixture's classes. -->
@@ -148,17 +163,25 @@
     </MenuContent>
   </Menu>
 
-  <Tabs class="tabs" controller={sections} hiddenUntilFound onValueChange={() => tabChanges++}>
+  <Tabs
+    class="tabs"
+    controller={sections}
+    hiddenUntilFound
+    onValueChange={() => tabChanges++}
+  >
     <TabsList class="tablist scrolling" aria-label="Sections">
       {#each alignmentFixture.sections as section (section)}
         <TabsTab class="tab" value={section.toLowerCase()}>{section}</TabsTab>
       {/each}
     </TabsList>
     {#each alignmentFixture.sections as section (section)}
-      <TabsPanel class="panel" value={section.toLowerCase()}>The {section} section</TabsPanel>
+      <TabsPanel class="panel" value={section.toLowerCase()}
+        >The {section} section</TabsPanel
+      >
     {/each}
   </Tabs>
-  <button onclick={() => sections.select("hotel")}>Show the last section</button>
+  <button onclick={() => sections.select("hotel")}>Show the last section</button
+  >
 
   <button>After</button>
   <output role="status" aria-label="Last action">{action}</output>

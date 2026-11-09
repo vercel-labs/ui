@@ -15,7 +15,9 @@
 
   function onsubmit(event: SubmitEvent & { currentTarget: HTMLFormElement }) {
     event.preventDefault()
-    const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+    const data = [...new FormData(event.currentTarget)].map(
+      ([name, value]) => `${name}=${value}`
+    )
     log(`Submitted ${data.join(", ")}`)
   }
 </script>
@@ -38,7 +40,13 @@
     </Field>
     <Field>
       <FieldLabel>Tip</FieldLabel>
-      <NumberInput name="tip" defaultValue={4.5} min={0} step={0.5} format={{ style: "currency", currency: "USD" }}>
+      <NumberInput
+        name="tip"
+        defaultValue={4.5}
+        min={0}
+        step={0.5}
+        format={{ style: "currency", currency: "USD" }}
+      >
         <NumberInputGroup>
           <NumberInputDecrement aria-label="Decrease">
             <MinusIcon aria-hidden="true" />

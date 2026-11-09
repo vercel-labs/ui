@@ -17,13 +17,16 @@ const step =
 function NumberInput({
   className,
   ...props
-}: Omit<ComponentProps<typeof NumberInputPrimitive>, "className" | "children"> & { className?: string }) {
+}: Omit<
+  ComponentProps<typeof NumberInputPrimitive>,
+  "className" | "children"
+> & { className?: string }) {
   return (
     <NumberInputPrimitive {...props}>
       <NumberInputGroup
         className={cn(
           "flex h-8 w-32 items-center gap-0.5 rounded-2xl border border-transparent bg-input/50 px-1 transition-[color,box-shadow] duration-200 has-[input:focus-visible]:border-ring has-[input:focus-visible]:ring-3 has-[input:focus-visible]:ring-ring/30 motion-reduce:transition-none",
-          className,
+          className
         )}
       >
         <NumberInputDecrement aria-label="Decrease" className={step}>

@@ -24,8 +24,12 @@ describe("server rendering a file input", () => {
     expect(typeof window).toBe("undefined")
     expect(html).toContain('data-slot="file-input-dropzone"')
     const [button] = html.match(/<button[^>]*>Browse files<\/button>/) ?? []
-    for (const attribute of ['type="button"', 'data-slot="file-input-trigger"'])
+    for (const attribute of [
+      'type="button"',
+      'data-slot="file-input-trigger"',
+    ]) {
       expect(button).toContain(attribute)
+    }
     const [input] = html.match(/<input[^>]*>/g) ?? []
     for (const attribute of [
       'type="file"',
@@ -33,8 +37,9 @@ describe("server rendering a file input", () => {
       'name="files"',
       'aria-hidden="true"',
       'tabindex="-1"',
-    ])
+    ]) {
       expect(input).toContain(attribute)
+    }
     expect(input).toMatch(/\smultiple[\s>]/)
     expect(input).toMatch(/\srequired[\s>]/)
   })

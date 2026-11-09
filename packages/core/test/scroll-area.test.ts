@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest"
-import { createScrollAreaController, scrollArea } from "../src/components/scroll-area/scroll-area"
+import {
+  createScrollAreaController,
+  scrollArea,
+} from "../src/components/scroll-area/scroll-area"
 import {
   draggedPosition,
   edgesOf,
@@ -31,7 +34,10 @@ describe("scroll area geometry", () => {
 
   test("a thumb never shrinks below the minimum, and still reaches the end", () => {
     const long = { position: 99_800, client: 200, scroll: 100_000 }
-    expect(thumbGeometry(long, 200)).toEqual({ size: minThumbSize, offset: 200 - minThumbSize })
+    expect(thumbGeometry(long, 200)).toEqual({
+      size: minThumbSize,
+      offset: 200 - minThumbSize,
+    })
   })
 
   test("a rubber band past either end keeps the thumb in the track", () => {
@@ -41,7 +47,10 @@ describe("scroll area geometry", () => {
 
   test("a thumb without a track or content has no size", () => {
     expect(thumbGeometry(list, 0)).toEqual({ size: 0, offset: 0 })
-    expect(thumbGeometry({ position: 0, client: 0, scroll: 0 }, 200)).toEqual({ size: 0, offset: 0 })
+    expect(thumbGeometry({ position: 0, client: 0, scroll: 0 }, 200)).toEqual({
+      size: 0,
+      offset: 0,
+    })
   })
 
   test("dragging the thumb scrolls as far along the content as along the track", () => {
@@ -51,8 +60,12 @@ describe("scroll area geometry", () => {
   })
 
   test("a thumb as long as its track doesn't move or divide by zero", () => {
-    expect(draggedPosition(0, 50, { position: 0, client: 200, scroll: 200 }, 200)).toBe(0)
-    expect(positionAt(50, { position: 0, client: 200, scroll: 200 }, 200)).toBe(0)
+    expect(
+      draggedPosition(0, 50, { position: 0, client: 200, scroll: 200 }, 200)
+    ).toBe(0)
+    expect(positionAt(50, { position: 0, client: 200, scroll: 200 }, 200)).toBe(
+      0
+    )
   })
 
   test("a point on the track centers the thumb there", () => {
@@ -90,7 +103,13 @@ describe("scroll area edges", () => {
   test("content that fits is at both ends and doesn't overflow", () => {
     const fits = { position: 0, client: 200, scroll: 200.4 }
     expect(overflows(fits)).toBe(false)
-    expect(edgesOf(fits)).toMatchObject({ atStart: true, atEnd: true, before: 0, after: 0, progress: 0 })
+    expect(edgesOf(fits)).toMatchObject({
+      atStart: true,
+      atEnd: true,
+      before: 0,
+      after: 0,
+      progress: 0,
+    })
     expect(overflows(list)).toBe(true)
   })
 
@@ -102,7 +121,12 @@ describe("scroll area edges", () => {
 })
 
 describe("scrollbar visibility", () => {
-  const idle = { overflow: true, hovering: false, scrolling: false, dragging: false }
+  const idle = {
+    overflow: true,
+    hovering: false,
+    scrolling: false,
+    dragging: false,
+  }
 
   test("always shows even without overflow", () => {
     expect(scrollbarShown("always", { ...idle, overflow: false })).toBe(true)
@@ -122,7 +146,9 @@ describe("scrollbar visibility", () => {
 
   test("hover shows on hover too, but never without overflow", () => {
     expect(scrollbarShown("hover", { ...idle, hovering: true })).toBe(true)
-    expect(scrollbarShown("hover", { ...idle, hovering: true, overflow: false })).toBe(false)
+    expect(
+      scrollbarShown("hover", { ...idle, hovering: true, overflow: false })
+    ).toBe(false)
   })
 })
 
@@ -174,19 +200,28 @@ describe("scroll area parts", () => {
 
   test("a horizontal scrollbar runs along the bottom, short of the corner", () => {
     const area = scrollArea({ id: "a" })
-    const style = attrs(area.part("scrollbar", { orientation: "horizontal" })).style
+    const style = attrs(
+      area.part("scrollbar", { orientation: "horizontal" })
+    ).style
     expect(style).toContain("bottom:0")
-    expect(style).toContain("inset-inline-end:var(--scroll-area-corner-width,0px)")
-    expect(attrs(area.part("scrollbar", { orientation: "horizontal" }))["data-orientation"]).toBe(
-      "horizontal",
+    expect(style).toContain(
+      "inset-inline-end:var(--scroll-area-corner-width,0px)"
     )
+    expect(
+      attrs(area.part("scrollbar", { orientation: "horizontal" }))[
+        "data-orientation"
+      ]
+    ).toBe("horizontal")
   })
 
   test("sticking to the end, it follows from the start, and its button starts hidden", () => {
     const area = scrollArea({ id: "a", stickToEnd: true })
     expect(area.api.isSticking()).toBe(true)
     expect(liveAttrs(area.part("scroll-to-end"))).toMatchObject({ inert: "" })
-    expect(partState(area.part("root"))).toMatchObject({ sticking: true, atEnd: true })
+    expect(partState(area.part("root"))).toMatchObject({
+      sticking: true,
+      atEnd: true,
+    })
   })
 
   test("a controller reads the area it's attached to", () => {

@@ -12,20 +12,36 @@ import {
   type TreeReorderRow,
 } from "../src/index"
 import { bind } from "../src/foundation/kernel/part"
-import { depthRange, movedRows, placeOf, subtreeEnd } from "../src/foundation/drag-and-drop/tree-reorder"
+import {
+  depthRange,
+  movedRows,
+  placeOf,
+  subtreeEnd,
+} from "../src/foundation/drag-and-drop/tree-reorder"
 
 type Options = {
   rows?: TreeReorderRow[]
   defaultRows: TreeReorderRow[]
-  onRowsChange?: (rows: TreeReorderRow[], details: ChangeDetails<"drag" | "move-key" | "imperative">) => void
+  onRowsChange?: (
+    rows: TreeReorderRow[],
+    details: ChangeDetails<"drag" | "move-key" | "imperative">
+  ) => void
   maxDepth?: number
 }
 type State = { rows: TreeReorderRow[]; moving: TreeReorderDraft | null }
 
 const outline = definePrimitive({
   name: "outline",
-  options: { rows: "value", defaultRows: "value", onRowsChange: "callback", maxDepth: "number" },
-  state: (options: Options): State => ({ rows: options.rows ?? options.defaultRows, moving: null }),
+  options: {
+    rows: "value",
+    defaultRows: "value",
+    onRowsChange: "callback",
+    maxDepth: "number",
+  },
+  state: (options: Options): State => ({
+    rows: options.rows ?? options.defaultRows,
+    moving: null,
+  }),
   sync: (options) => (options.rows === undefined ? {} : { rows: options.rows }),
   api: (context) => {
     const change = createChange(context)
@@ -63,17 +79,25 @@ const rows = (text: string) =>
   text
     .trim()
     .split("\n")
-    .map((line) => ({ key: line.trim(), depth: (line.length - line.trimStart().length) / 2 }))
+    .map((line) => ({
+      key: line.trim(),
+      depth: (line.length - line.trimStart().length) / 2,
+    }))
 
 const outlineOf = (list: readonly TreeReorderRow[]) =>
   list.map((row) => `${"  ".repeat(row.depth)}${row.key}`).join("\n")
 
 // Rows 20px tall, by their place among the rows on screen in the draft.
 function render(options: Options, hidden: string[] = []) {
-  const instance = outline({ id: "o", ...options }) as ReturnType<typeof outline> & PrimitiveInstance
+  const instance = outline({ id: "o", ...options }) as ReturnType<
+    typeof outline
+  > &
+    PrimitiveInstance
   const els = new Map<string, HTMLElement>()
   for (const row of options.defaultRows) {
-    if (hidden.includes(row.key)) continue
+    if (hidden.includes(row.key)) {
+      continue
+    }
     const el = document.createElement("div")
     el.tabIndex = 0
     el.textContent = row.key
@@ -81,20 +105,34 @@ function render(options: Options, hidden: string[] = []) {
     cleanups.push(bind(instance.part("row", { value: row.key }), el))
     els.set(row.key, el)
   }
-  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-    const shown = instance.api.tree.rows(instance.get()).filter((row) => els.has(row.key))
-    const top = shown.findIndex((row) => row.key === this.textContent) * 20
-    return { top, left: 0, width: 200, height: 20, bottom: top + 20, right: 200 } as DOMRect
-  })
+  vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+    function (this: HTMLElement) {
+      const shown = instance.api.tree
+        .rows(instance.get())
+        .filter((row) => els.has(row.key))
+      const top = shown.findIndex((row) => row.key === this.textContent) * 20
+      return {
+        top,
+        left: 0,
+        width: 200,
+        height: 20,
+        bottom: top + 20,
+        right: 200,
+      } as DOMRect
+    }
+  )
   const press = (key: string) =>
     (document.activeElement as HTMLElement).dispatchEvent(
-      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }),
+      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true })
     )
   const shown = () => outlineOf(instance.api.tree.rows(instance.get()))
   return { instance, els, press, shown }
 }
 
-const pointer = (type: string, init: { x?: number; y?: number; target?: EventTarget } = {}) => {
+const pointer = (
+  type: string,
+  init: { x?: number; y?: number; target?: EventTarget } = {}
+) => {
   const event = new MouseEvent(type, {
     bubbles: true,
     cancelable: true,
@@ -125,10 +163,22 @@ describe("the pure pieces", () => {
   })
 
   test("depthRange keeps the row below with its parent", () => {
-    expect(depthRange({ key: "a", depth: 1 }, { key: "b", depth: 0 })).toEqual({ min: 0, max: 2 })
-    expect(depthRange({ key: "a", depth: 1 }, { key: "b", depth: 2 })).toEqual({ min: 2, max: 2 })
-    expect(depthRange(undefined, { key: "b", depth: 0 })).toEqual({ min: 0, max: 0 })
-    expect(depthRange({ key: "a", depth: 3 }, undefined, 1)).toEqual({ min: 0, max: 1 })
+    expect(depthRange({ key: "a", depth: 1 }, { key: "b", depth: 0 })).toEqual({
+      min: 0,
+      max: 2,
+    })
+    expect(depthRange({ key: "a", depth: 1 }, { key: "b", depth: 2 })).toEqual({
+      min: 2,
+      max: 2,
+    })
+    expect(depthRange(undefined, { key: "b", depth: 0 })).toEqual({
+      min: 0,
+      max: 0,
+    })
+    expect(depthRange({ key: "a", depth: 3 }, undefined, 1)).toEqual({
+      min: 0,
+      max: 1,
+    })
   })
 
   test("movedRows moves an item with its children, shifting their depths", () => {
@@ -141,8 +191,8 @@ inbox
 projects
   app
 archive
-`),
-      ),
+`)
+      )
     )
     expect(movedRows(notes, "app", "archive", 1)).toBe(notes)
   })
@@ -151,7 +201,10 @@ archive
 describe("createTreeReorder with the keyboard", () => {
   test("Up and Down move an item and its children between rows, and Space drops it in one change", async () => {
     const onRowsChange = vi.fn()
-    const { instance, els, press, shown } = render({ defaultRows: notes, onRowsChange })
+    const { instance, els, press, shown } = render({
+      defaultRows: notes,
+      onRowsChange,
+    })
     els.get("site")!.focus()
     press(" ")
     expect(instance.get().moving?.keys).toEqual(["site", "copy"])
@@ -166,8 +219,8 @@ projects
   site
     copy
 archive
-`),
-      ),
+`)
+      )
     )
     press(" ")
     expect(onRowsChange).toHaveBeenCalledTimes(1)
@@ -215,7 +268,9 @@ archive
     const { els, press, shown } = render({ defaultRows: notes })
     els.get("inbox")!.focus()
     press(" ")
-    for (let i = 0; i < 5; i++) press("ArrowDown")
+    for (let i = 0; i < 5; i++) {
+      press("ArrowDown")
+    }
     expect(shown()).toBe(
       outlineOf(
         rows(`
@@ -225,13 +280,17 @@ projects
   app
 archive
 inbox
-`),
-      ),
+`)
+      )
     )
   })
 
   test("rows inside a collapsed item are skipped, and dropping in one goes after its children", () => {
-    const { els, press, shown } = render({ defaultRows: notes }, ["site", "copy", "app"])
+    const { els, press, shown } = render({ defaultRows: notes }, [
+      "site",
+      "copy",
+      "app",
+    ])
     els.get("inbox")!.focus()
     press(" ")
     press("ArrowDown")
@@ -245,8 +304,8 @@ projects
   app
   inbox
 archive
-`),
-      ),
+`)
+      )
     )
   })
 
@@ -260,7 +319,10 @@ archive
   })
 
   test("maxDepth counts the rows under an item too", () => {
-    const { els, instance, press, shown } = render({ defaultRows: notes, maxDepth: 2 })
+    const { els, instance, press, shown } = render({
+      defaultRows: notes,
+      maxDepth: 2,
+    })
     els.get("site")!.focus()
     press(" ")
     press("ArrowDown")
@@ -292,11 +354,15 @@ describe("createTreeReorder with a pointer", () => {
     // Up past copy's middle (70) but not app's (90), and two indents right: a child of site.
     pointer("pointermove", { x: 58, y: 85 })
     await frame()
-    expect(outlineOf(instance.api.tree.rows(instance.get()))).toContain("    copy\n    archive\n  app")
+    expect(outlineOf(instance.api.tree.rows(instance.get()))).toContain(
+      "    copy\n    archive\n  app"
+    )
     // One indent back left: after site, before app.
     pointer("pointermove", { x: 34, y: 85 })
     await frame()
-    expect(outlineOf(instance.api.tree.rows(instance.get()))).toContain("    copy\n  archive\n  app")
+    expect(outlineOf(instance.api.tree.rows(instance.get()))).toContain(
+      "    copy\n  archive\n  app"
+    )
     pointer("pointerup", { x: 34, y: 85 })
     expect(onRowsChange).toHaveBeenCalledTimes(1)
     expect(onRowsChange.mock.calls[0][1]).toMatchObject({
@@ -313,7 +379,13 @@ describe("createTreeReorder with a pointer", () => {
     pointer("pointerdown", { target: els.get("inbox"), x: 10, y: 10 })
     pointer("pointermove", { x: 10, y: 90 })
     await frame()
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }))
+    document.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Escape",
+        bubbles: true,
+        cancelable: true,
+      })
+    )
     pointer("pointerup", { x: 10, y: 90 })
     expect(onRowsChange).not.toHaveBeenCalled()
     expect(instance.get().moving).toBeNull()
@@ -323,7 +395,11 @@ describe("createTreeReorder with a pointer", () => {
 describe("createTreeReorder with rows the owner changes mid-move", () => {
   test("a row dropped where it was keeps the owner's rows", () => {
     const onRowsChange = vi.fn()
-    const { instance, shown } = render({ rows: notes, defaultRows: notes, onRowsChange })
+    const { instance, shown } = render({
+      rows: notes,
+      defaultRows: notes,
+      onRowsChange,
+    })
     instance.api.tree.grab("site")
     const next = notes.filter((row) => row.key !== "inbox")
     instance.setOptions({ rows: next, defaultRows: notes, onRowsChange })
@@ -334,7 +410,11 @@ describe("createTreeReorder with rows the owner changes mid-move", () => {
 
   test("a moved row lands where the user put it, among the owner's rows", () => {
     const onRowsChange = vi.fn()
-    const { instance } = render({ rows: notes, defaultRows: notes, onRowsChange })
+    const { instance } = render({
+      rows: notes,
+      defaultRows: notes,
+      onRowsChange,
+    })
     instance.api.tree.grab("app")
     instance.api.tree.place(0, 0)
     const next = rows(`
@@ -356,14 +436,18 @@ projects
   site
 archive
 todo
-`),
-      ),
+`)
+      )
     )
   })
 
   test("a row the owner deletes ends the move", () => {
     const onRowsChange = vi.fn()
-    const { instance } = render({ rows: notes, defaultRows: notes, onRowsChange })
+    const { instance } = render({
+      rows: notes,
+      defaultRows: notes,
+      onRowsChange,
+    })
     instance.api.tree.grab("site")
     instance.api.tree.place(0, 0)
     const next = notes.filter((row) => row.key !== "site" && row.key !== "copy")

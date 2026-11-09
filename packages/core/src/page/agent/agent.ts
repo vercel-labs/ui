@@ -71,7 +71,12 @@ type AgentComponent = {
  * A change a call made, as the component's `on<Key>Change` saw it.
  * @stable
  */
-type AgentChange = { component: string; label?: string; key: string; value: unknown }
+type AgentChange = {
+  component: string
+  label?: string
+  key: string
+  value: unknown
+}
 
 /**
  * One step for `act`: a component's ref or label, and one of its `actions` with its arguments.
@@ -111,32 +116,57 @@ const synonyms: Record<string, string[]> = {
   select: ["setValue"],
 }
 // State worth showing beside the controlled keys.
-const shown = ["min", "max", "step", "placeholder", "query", "multiple", "required", "errors"]
+const shown = [
+  "min",
+  "max",
+  "step",
+  "placeholder",
+  "query",
+  "multiple",
+  "required",
+  "errors",
+]
 
 // Two frames, so the framework has rendered what a call changed. A hidden tab
 // runs no frames, so a timer stands in there, or an agent driving a
 // background tab would wait forever.
 const frames = () =>
   new Promise((resolve) => {
-    if (document.hidden) setTimeout(resolve, 32)
-    else requestAnimationFrame(() => requestAnimationFrame(resolve))
+    if (document.hidden) {
+      setTimeout(resolve, 32)
+    } else {
+      requestAnimationFrame(() => requestAnimationFrame(resolve))
+    }
   })
 
 // An item's value as a key: the component's own, like a list's `itemToValue`, else an object by its
 // contents, since every object reads "[object Object]".
 const keyOf = (value: unknown) =>
-  value !== null && typeof value === "object" ? JSON.stringify(value) : String(value)
+  value !== null && typeof value === "object"
+    ? JSON.stringify(value)
+    : String(value)
 const internalOf = (instance: PrimitiveInstance) =>
   (
     instance.api as {
-      internal?: { keyOf?: (value: unknown) => string; elementOf?: (key: string) => Element | undefined }
+      internal?: {
+        keyOf?: (value: unknown) => string
+        elementOf?: (key: string) => Element | undefined
+      }
     }
   ).internal
-const keyFor = (instance: PrimitiveInstance) => internalOf(instance)?.keyOf ?? keyOf
+const keyFor = (instance: PrimitiveInstance) =>
+  internalOf(instance)?.keyOf ?? keyOf
 
 // A list's items as data, like a select's `items`, flattened out of groups and a tree's branches.
-function fromData(items: unknown, disabled?: Set<string>, key = keyOf, known?: Set<string>) {
-  if (!Array.isArray(items)) return
+function fromData(
+  items: unknown,
+  disabled?: Set<string>,
+  key = keyOf,
+  known?: Set<string>
+) {
+  if (!Array.isArray(items)) {
+    return
+  }
   const out: { value: string; label: string }[] = []
   const add = (item: unknown) => {
     if (typeof item === "string") {
@@ -151,11 +181,14 @@ function fromData(items: unknown, disabled?: Set<string>, key = keyOf, known?: S
         label?: string
         disabled?: boolean
       }
-      if (entry.type === "group") entry.items?.forEach(add)
-      else if (entry.type !== "separator") {
+      if (entry.type === "group") {
+        entry.items?.forEach(add)
+      } else if (entry.type !== "separator") {
         out.push({ value: String(entry.value), label: entry.label ?? "" })
         known?.add(key(entry.value))
-        if (entry.disabled === true) disabled?.add(key(entry.value))
+        if (entry.disabled === true) {
+          disabled?.add(key(entry.value))
+        }
         // A tree's branches, whose rows aren't rendered while they're closed.
         entry.children?.forEach(add)
       }
@@ -166,12 +199,18 @@ function fromData(items: unknown, disabled?: Set<string>, key = keyOf, known?: S
 }
 
 // A component's items as data, from its state's `items` unless its `agent` key says where they are.
-function dataOf(entry: Entry, instance: PrimitiveInstance, disabled?: Set<string>, known?: Set<string>) {
+function dataOf(
+  entry: Entry,
+  instance: PrimitiveInstance,
+  disabled?: Set<string>,
+  known?: Set<string>
+) {
   return fromData(
-    entry.agent?.items?.(instance.api) ?? (instance.get() as { items?: unknown }).items,
+    entry.agent?.items?.(instance.api) ??
+      (instance.get() as { items?: unknown }).items,
     disabled,
     keyFor(instance),
-    known,
+    known
   )
 }
 
@@ -181,14 +220,20 @@ function disabledItems(entry: Entry, instance: PrimitiveInstance) {
   dataOf(entry, instance, disabled)
   const parts = bound(instance)
   const items = new Set(renderedItems(parts).map((item) => item.value))
-  for (const part of parts)
+  for (const part of parts) {
     if (
       items.has(part.key) &&
       ((part.props as { disabled?: unknown } | undefined)?.disabled === true ||
         part.el.matches(":disabled") ||
         part.el.getAttribute("aria-disabled") === "true")
-    )
-      disabled.add(keyFor(instance)((part.props as { value?: unknown } | undefined)?.value ?? part.key))
+    ) {
+      disabled.add(
+        keyFor(instance)(
+          (part.props as { value?: unknown } | undefined)?.value ?? part.key
+        )
+      )
+    }
+  }
   return disabled
 }
 
@@ -198,23 +243,35 @@ function actionsOf(entry: Entry, api: Record<string, unknown>) {
   return Object.keys(api).filter(
     (name) =>
       typeof api[name] === "function" &&
-      (declared ? declared.includes(name) : verbs.test(name) && !synonyms[name]?.some((of) => of in api)),
+      (declared
+        ? declared.includes(name)
+        : verbs.test(name) && !synonyms[name]?.some((of) => of in api))
   )
 }
 
 // Whether a step's action works on a component: press on any, else a method of
 // its api that `takes` lets an agent call.
 function can(entry: Entry, instance: PrimitiveInstance, action: string) {
-  if (action === "press") return true
-  return typeof (instance.api as Record<string, unknown>)[action] === "function" && takes(entry, action)
+  if (action === "press") {
+    return true
+  }
+  return (
+    typeof (instance.api as Record<string, unknown>)[action] === "function" &&
+    takes(entry, action)
+  )
 }
 
 // Whether an agent may call `action`: one the `agent` key lists or a synonym
 // of one, like `open` for `setOpen`, else one named like a change.
 function takes(entry: Entry, action: string) {
   const declared = entry.agent?.actions
-  if (!declared) return verbs.test(action)
-  return declared.includes(action) || !!synonyms[action]?.some((of) => declared.includes(of))
+  if (!declared) {
+    return verbs.test(action)
+  }
+  return (
+    declared.includes(action) ||
+    !!synonyms[action]?.some((of) => declared.includes(of))
+  )
 }
 
 // A `set<Key>` step's value, checked against the kind of the option it sets in
@@ -228,25 +285,37 @@ function valueFor(entry: Entry, action: string, value: unknown) {
   const refuse = (expected?: string) => {
     const given = JSON.stringify(value) ?? "nothing"
     throw new Error(
-      `${action} on ${entry.label ?? entry.component} (${entry.ref}) takes ${expected ? `${expected}, not` : "no"} ${given}.`,
+      `${action} on ${entry.label ?? entry.component} (${entry.ref}) takes ${expected ? `${expected}, not` : "no"} ${given}.`
     )
   }
-  if (spec === "boolean") return typeof value === "boolean" ? value : refuse("true or false")
-  if (spec === "number") {
-    const number = typeof value === "string" && value.trim() ? Number(value) : value
-    return typeof number === "number" && !Number.isNaN(number) ? number : refuse("a number")
+  if (spec === "boolean") {
+    return typeof value === "boolean" ? value : refuse("true or false")
   }
-  if (typeof spec !== "function") return value
+  if (spec === "number") {
+    const number =
+      typeof value === "string" && value.trim() ? Number(value) : value
+    return typeof number === "number" && !Number.isNaN(number)
+      ? number
+      : refuse("a number")
+  }
+  if (typeof spec !== "function") {
+    return value
+  }
   const parsed = spec(String(value))
-  if (typeof parsed === "boolean" && typeof value !== "boolean") return refuse("true or false")
-  if (typeof value !== "string") return value
+  if (typeof parsed === "boolean" && typeof value !== "boolean") {
+    return refuse("true or false")
+  }
+  if (typeof value !== "string") {
+    return value
+  }
   return parsed == null || Number.isNaN(parsed) ? refuse() : parsed
 }
 
 // A button's text, else its accessible name, like "Close" for an icon-only ×, but
 // not one read from inside `data-agent-hidden`, which never reaches the agent.
 const textOrName = (el: Element) =>
-  textOf(el) || (el.querySelector("[data-agent-hidden]") ? "" : accessibleName(el))
+  textOf(el) ||
+  (el.querySelector("[data-agent-hidden]") ? "" : accessibleName(el))
 
 // The items on the page, named by their trigger when they have one, like an
 // accordion's sections, else by their text.
@@ -256,36 +325,54 @@ function renderedItems(parts: Bound[]) {
       part.key &&
       (part.slot === "item" ||
         part.slot === "tab" ||
-        (part.slot === "root" && part.el.getAttribute("role") === "radio")),
+        (part.slot === "root" && part.el.getAttribute("role") === "radio"))
   )
   const nested = items.map((part) => part.el)
   return items.map((part) => {
-    const el = parts.find((other) => other.slot === "trigger" && other.key === part.key)?.el ?? part.el
+    const el =
+      parts.find((other) => other.slot === "trigger" && other.key === part.key)
+        ?.el ?? part.el
     return { value: part.key, label: textOf(el, nested) || accessibleName(el) }
   })
 }
 
 // Whether an element shows, as far as the browser can tell. Without
 // `checkVisibility`, a `hidden` ancestor hides it.
-const isShown = (el: HTMLElement) => el.checkVisibility?.() ?? !el.closest("[hidden]")
+const isShown = (el: HTMLElement) =>
+  el.checkVisibility?.() ?? !el.closest("[hidden]")
 
 // Buttons and menu items inside the component's elements, like a dialog's
 // Cancel and Delete or a menu's Remove, visible, not inert and not inside
 // `data-agent-hidden`.
 function buttonsOf(parts: Bound[]) {
   const found = new Set<HTMLElement>()
-  for (const part of parts)
-    for (const el of part.el.querySelectorAll<HTMLElement>("button, [role=button], [role^=menuitem]"))
-      if (el.checkVisibility?.() !== false && !el.closest("[inert], [data-agent-hidden]")) found.add(el)
+  for (const part of parts) {
+    for (const el of part.el.querySelectorAll<HTMLElement>(
+      "button, [role=button], [role^=menuitem]"
+    )) {
+      if (
+        el.checkVisibility?.() !== false &&
+        !el.closest("[inert], [data-agent-hidden]")
+      ) {
+        found.add(el)
+      }
+    }
+  }
   return [...found]
 }
 
-const rootOf = (parts: Bound[]) => parts.find((part) => part.slot === "root" && !part.key)?.el
+const rootOf = (parts: Bound[]) =>
+  parts.find((part) => part.slot === "root" && !part.key)?.el
 
 // The button a component is, like a Button's root, which `press` presses with no text.
 function ownButton(parts: Bound[]) {
   const root = rootOf(parts)
-  if (root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button")) return root
+  if (
+    root &&
+    (root.tagName === "BUTTON" || root.getAttribute("role") === "button")
+  ) {
+    return root
+  }
 }
 
 // Any key on it is an adapter's, like a web component's generated id.
@@ -297,14 +384,28 @@ function soleTrigger(parts: Bound[]) {
 // The root part's state counts a group around the component, like a toggle's
 // in a disabled toggle group.
 function isComponentDisabled(state: Record<string, unknown>, parts: Bound[]) {
-  if (state.disabled === true || state.formDisabled === true || state.readOnly === true) return true
-  const root = parts.find((part) => /^(root|group|set)$/.test(part.slot) && !part.key)
-  if (root && (partState(root) as { disabled?: unknown }).disabled === true) return true
+  if (
+    state.disabled === true ||
+    state.formDisabled === true ||
+    state.readOnly === true
+  ) {
+    return true
+  }
+  const root = parts.find(
+    (part) => /^(root|group|set)$/.test(part.slot) && !part.key
+  )
+  if (root && (partState(root) as { disabled?: unknown }).disabled === true) {
+    return true
+  }
   const button = ownButton(parts)
-  if (button && isDisabledElement(button)) return true
+  if (button && isDisabledElement(button)) {
+    return true
+  }
   // A disabled fieldset disables a native root, like a Button's, and every field a component holds,
   // like a DatePicker's inputs. One disabled radio, or a stepper button at its max, leaves it usable.
-  const fields = parts.filter((part) => part.el.matches("input, textarea, select"))
+  const fields = parts.filter((part) =>
+    part.el.matches("input, textarea, select")
+  )
   return (
     !!rootOf(parts)?.matches(":disabled") ||
     (fields.length > 0 && fields.every((part) => part.el.matches(":disabled")))
@@ -317,9 +418,14 @@ const differs = (was: unknown, now: unknown) =>
 
 // The key a field's value is under among a component's keys: `checked` for a checkbox, else `value`.
 const fieldKey = (keys: string[]) =>
-  keys.includes("checked") ? "checked" : keys.includes("value") ? "value" : undefined
+  keys.includes("checked")
+    ? "checked"
+    : keys.includes("value")
+      ? "value"
+      : undefined
 
-const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error))
+const messageOf = (error: unknown) =>
+  error instanceof Error ? error.message : String(error)
 
 // The most components one `snapshot` or `query` returns, so a page with a
 // menu on every row of a long table doesn't fill the model's context.
@@ -328,7 +434,13 @@ const limit = 100
 // The last entry of a list cut short, shaped like a component so the list
 // keeps one type: how many were left out, and the tool that finds them.
 const moreOf = (more: number) => {
-  const entry: AgentComponent = { ref: "more", component: "more", more, use: "query", actions: [] }
+  const entry: AgentComponent = {
+    ref: "more",
+    component: "more",
+    more,
+    use: "query",
+    actions: [],
+  }
   return entry
 }
 
@@ -337,25 +449,34 @@ const moreOf = (more: number) => {
 const fold = (text: string) => foldText(text.replace(/[ßẞ]/g, "ss"))
 
 // Folded text as its words between single spaces, with one at each end, so a match lands on whole words.
-const wordsOf = (text: string) => ` ${fold(text)} `.replace(/[^\p{L}\p{N}]+/gu, " ")
+const wordsOf = (text: string) =>
+  ` ${fold(text)} `.replace(/[^\p{L}\p{N}]+/gu, " ")
 
 // A component's ref with what names it, so an agent can pick between look-alikes: `c3 Admin (Jane Doe)`.
 const described = (entry: Entry) =>
-  [entry.ref, entry.label, entry.row && `(${entry.row})`].filter(Boolean).join(" ")
+  [entry.ref, entry.label, entry.row && `(${entry.row})`]
+    .filter(Boolean)
+    .join(" ")
 
 // A password, card or one-time code, or a field inside `data-agent-secret`, shows only whether it's filled, never what it holds.
 const redact = (entry: Entry, value: unknown) =>
   entry.secret && value !== "" && value != null ? "[redacted]" : value
 
-type SvelteElement = Element & { __svelte_meta?: { loc?: { file: string; line: number } } }
+type SvelteElement = Element & {
+  __svelte_meta?: { loc?: { file: string; line: number } }
+}
 
 function sourceOf(parts: Bound[]) {
   for (const { el } of parts) {
     for (let node: SvelteElement | null = el; node; node = node.parentElement) {
       const stamped = node.getAttribute("data-review-loc")
-      if (stamped) return stamped
+      if (stamped) {
+        return stamped
+      }
       const loc = node.__svelte_meta?.loc
-      if (loc) return `${loc.file}:${loc.line}`
+      if (loc) {
+        return `${loc.file}:${loc.line}`
+      }
     }
   }
 }
@@ -363,31 +484,59 @@ function sourceOf(parts: Bound[]) {
 function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
   const state = instance.get() as Record<string, unknown>
   const api = instance.api as Record<string, unknown>
-  const out: AgentComponent = { ref: entry.ref, component: entry.component, actions: [] }
+  const out: AgentComponent = {
+    ref: entry.ref,
+    component: entry.component,
+    actions: [],
+  }
   const label = componentLabel(parts)
-  if (label) out.label = label
+  if (label) {
+    out.label = label
+  }
   const row = rowOf(parts)
-  if (row) out.row = row
+  if (row) {
+    out.row = row
+  }
   const source = dev ? sourceOf(parts) : undefined
-  if (source) out.source = source
-  for (const key of stateKeys(entry, state)) if (key in state) out[key] = redact(entry, state[key] ?? null)
+  if (source) {
+    out.source = source
+  }
+  for (const key of stateKeys(entry, state)) {
+    if (key in state) {
+      out[key] = redact(entry, state[key] ?? null)
+    }
+  }
   // A reading nothing sets, like a progress bar's 2 of `max` 4.
-  if (!("value" in out) && "value" in state && typeof api.setValue !== "function")
+  if (
+    !("value" in out) &&
+    "value" in state &&
+    typeof api.setValue !== "function"
+  ) {
     out.value = redact(entry, state.value ?? null)
+  }
   // The rest only when they say something, like `required: true`. A secret
   // field's search text and errors can repeat its value.
   for (const key of shown) {
     const value = state[key]
     const empty = value === "" || value == null || value === false
-    if (empty || (typeof value === "object" && !Object.keys(value).length)) continue
-    if (entry.secret && key === "query") out[key] = "[redacted]"
-    else if (entry.secret && key === "errors" && Array.isArray(value))
+    if (empty || (typeof value === "object" && !Object.keys(value).length)) {
+      continue
+    }
+    if (entry.secret && key === "query") {
+      out[key] = "[redacted]"
+    } else if (entry.secret && key === "errors" && Array.isArray(value)) {
       out[key] = value.map(() => "[redacted]")
-    else out[key] = value
+    } else {
+      out[key] = value
+    }
   }
   // A button's action while it runs, and why it failed.
-  if (state.pending === true) out.pending = true
-  if (state.error != null) out.error = entry.secret ? "[redacted]" : messageOf(state.error)
+  if (state.pending === true) {
+    out.pending = true
+  }
+  if (state.error != null) {
+    out.error = entry.secret ? "[redacted]" : messageOf(state.error)
+  }
   // The items its actions take: the ones on the page, else its data when
   // they're few, and through `query` when they may be many.
   const opens = typeof api.setOpen === "function"
@@ -395,23 +544,42 @@ function describe(entry: Entry, instance: PrimitiveInstance, parts: Bound[]) {
     const rendered = opens ? [] : renderedItems(parts)
     const data = rendered.length ? undefined : dataOf(entry, instance)
     const items = data ? (data.length <= 10 ? data : []) : rendered
-    if (items.length) out.items = items
+    if (items.length) {
+      out.items = items
+    }
   }
   const text = parts
     .filter((part) => /title|description|error/.test(part.slot))
-    .map((part) => (entry.secret && /error/.test(part.slot) ? "[redacted]" : textOf(part.el)))
+    .map((part) =>
+      entry.secret && /error/.test(part.slot) ? "[redacted]" : textOf(part.el)
+    )
     .filter(Boolean)
-  if (text.length) out.text = text as string[]
-  const confirm = confirmOf(parts.filter((part) => !part.key).map((part) => part.el))
-  if (confirm) out.confirm = confirm
+  if (text.length) {
+    out.text = text as string[]
+  }
+  const confirm = confirmOf(
+    parts.filter((part) => !part.key).map((part) => part.el)
+  )
+  if (confirm) {
+    out.confirm = confirm
+  }
   const buttons = state.open === true ? buttonsOf(parts).map(textOrName) : []
-  if (buttons.length) out.buttons = buttons
-  if (isComponentDisabled(state, parts)) out.disabled = true
-  else {
+  if (buttons.length) {
+    out.buttons = buttons
+  }
+  if (isComponentDisabled(state, parts)) {
+    out.disabled = true
+  } else {
     out.actions = actionsOf(entry, api)
     // A popup that isn't a list, like a menu or a dialog, opens itself to press one of its buttons.
     const presses = opens && typeof api.setValue !== "function"
-    if (buttons.length || presses || (!out.actions.length && ownButton(parts))) out.actions.push("press")
+    if (
+      buttons.length ||
+      presses ||
+      (!out.actions.length && ownButton(parts))
+    ) {
+      out.actions.push("press")
+    }
   }
   return out
 }
@@ -448,11 +616,15 @@ function createAgent(
     allow?: Allow
     /** How long a step waits for `allow` before it fails, in milliseconds. 5 minutes by default. */
     timeout?: number
-  } = {},
+  } = {}
 ) {
   install()
   const scan = () => {
-    const found: { entry: Entry; instance: PrimitiveInstance; parts: Bound[] }[] = []
+    const found: {
+      entry: Entry
+      instance: PrimitiveInstance
+      parts: Bound[]
+    }[] = []
     // A copy, since `remember` can move an entry to the ref it had.
     for (const entry of [...entries.values()]) {
       const instance = entry.instance.deref()
@@ -461,7 +633,9 @@ function createAgent(
         continue
       }
       const parts = bound(instance)
-      if (parts.length) remember(entry, parts)
+      if (parts.length) {
+        remember(entry, parts)
+      }
       // Some show only now and then, like a field while it has errors: its control carries its label.
       // One whose every element is hidden, like a field in a closed dialog, isn't on the page yet.
       if (
@@ -469,8 +643,9 @@ function createAgent(
         !entry.offLimits &&
         (entry.agent?.shown?.(instance.get()) ?? true) &&
         parts.some((part) => isShown(part.el))
-      )
+      ) {
         found.push({ entry, instance, parts })
+      }
     }
     return found
   }
@@ -503,18 +678,23 @@ function createAgent(
     // `live` first: a component that just came back takes its old ref there.
     const shown = live()
     const byRef = shown.find(({ entry }) => entry.ref === ref)
-    if (byRef) return byRef
+    if (byRef) {
+      return byRef
+    }
     const needle = fold(ref)
     const words = wordsOf(ref)
     const tiers = [
       shown.filter(
         ({ entry }) =>
           (entry.label && fold(entry.label) === needle) ||
-          (words.trim() && wordsOf(`${entry.label ?? ""} ${entry.row ?? ""}`).includes(words)),
+          (words.trim() &&
+            wordsOf(`${entry.label ?? ""} ${entry.row ?? ""}`).includes(words))
       ),
       // Then by an item it offers, like the accordion with an Email section.
       shown.filter(({ entry, instance, parts }) =>
-        describe(entry, instance, parts).items?.some((item) => fold(item.label) === needle),
+        describe(entry, instance, parts).items?.some(
+          (item) => fold(item.label) === needle
+        )
       ),
       // Then by its kind, when the page has one, like "slider", or "dialog" for an alert dialog.
       shown.filter(({ entry }) => {
@@ -523,18 +703,29 @@ function createAgent(
       }),
     ]
     for (const near of tiers) {
-      if (near.length === 1) return near[0]
+      if (near.length === 1) {
+        return near[0]
+      }
       // Of the ones that share a field, like a Textarea and its Trigger Menu, the one that takes the action.
-      const able = action ? near.filter(({ entry, instance }) => can(entry, instance, action)) : []
+      const able = action
+        ? near.filter(({ entry, instance }) => can(entry, instance, action))
+        : []
       const meant = able.length ? able : near
-      if (meant.length === 1) return meant[0]
+      if (meant.length === 1) {
+        return meant[0]
+      }
       // An open popup is what the agent means while it's open, like the dialog a row's menu just opened.
-      const open = meant.filter(({ instance }) => (instance.get() as { open?: boolean }).open === true)
-      if (open.length === 1) return open[0]
-      if (near.length > 1)
+      const open = meant.filter(
+        ({ instance }) => (instance.get() as { open?: boolean }).open === true
+      )
+      if (open.length === 1) {
+        return open[0]
+      }
+      if (near.length > 1) {
         throw new Error(
-          `"${ref}" names ${near.length} components: ${near.map(({ entry }) => described(entry)).join(", ")}. Use a ref.`,
+          `"${ref}" names ${near.length} components: ${near.map(({ entry }) => described(entry)).join(", ")}. Use a ref.`
         )
+      }
     }
     // A component inside `data-agent-hidden` is named as off-limits, so the
     // agent stops looking, and nothing more about it.
@@ -542,22 +733,32 @@ function createAgent(
       (entry) =>
         entry.offLimits &&
         (fold(entry.label ?? "") === needle ||
-          (words.trim() && wordsOf(`${entry.label ?? ""} ${entry.row ?? ""}`).includes(words))),
+          (words.trim() &&
+            wordsOf(`${entry.label ?? ""} ${entry.row ?? ""}`).includes(words)))
     )
-    if (offLimits) throw new Error(`"${ref}" isn't available to agents here. Ask the person.`)
+    if (offLimits) {
+      throw new Error(
+        `"${ref}" isn't available to agents here. Ask the person.`
+      )
+    }
     const labels = shown.map(({ entry }) => entry.label).filter(Boolean)
     // What it might be behind, like a closed accordion section or another tab, which a step can open first.
     const closed = shown.flatMap(({ entry, instance, parts }) => {
       const { items } = describe(entry, instance, parts)
       const value = (instance.get() as { value?: unknown }).value
       const open = Array.isArray(value) ? value : [value]
-      const shut = items?.filter((item) => !open.includes(item.value)).map((item) => item.label) ?? []
+      const shut =
+        items
+          ?.filter((item) => !open.includes(item.value))
+          .map((item) => item.label) ?? []
       return shut.length && entry.agent?.reveals
-        ? [`${entry.label ?? entry.component} (${entry.ref}): ${shut.join(", ")}`]
+        ? [
+            `${entry.label ?? entry.component} (${entry.ref}): ${shut.join(", ")}`,
+          ]
         : []
     })
     throw new Error(
-      `No component "${ref}" on the page. Its labels: ${[...new Set(labels)].slice(0, 30).join(", ") || "none"}.${closed.length ? ` It may be behind one of these, which a step can open first: ${closed.join("; ")}.` : ""}`,
+      `No component "${ref}" on the page. Its labels: ${[...new Set(labels)].slice(0, 30).join(", ") || "none"}.${closed.length ? ` It may be behind one of these, which a step can open first: ${closed.join("; ")}.` : ""}`
     )
   }
 
@@ -570,12 +771,14 @@ function createAgent(
       found.map(({ entry }) => [
         entry.ref,
         { component: entry.component, label: entry.label, row: entry.row },
-      ]),
+      ])
     )
     const states = new Map<string, Record<string, unknown>>()
     for (const entry of entries.values()) {
       const instance = entry.instance.deref()
-      if (instance) states.set(entry.ref, instance.get() as Record<string, unknown>)
+      if (instance) {
+        states.set(entry.ref, instance.get() as Record<string, unknown>)
+      }
     }
     return { shown, states, names }
   }
@@ -598,8 +801,12 @@ function createAgent(
     const fields: { name: string; value: unknown; first: boolean }[] = []
     for (const { entry, instance } of live()) {
       const state = instance.get() as Record<string, unknown>
-      const key = fieldKey(stateKeys(entry, state).filter((key) => key in state))
-      if (!key || state.open) continue
+      const key = fieldKey(
+        stateKeys(entry, state).filter((key) => key in state)
+      )
+      if (!key || state.open) {
+        continue
+      }
       const was = before.states.get(entry.ref)
       fields.push({
         name: `${entry.ref} ${entry.label ?? entry.component}`,
@@ -609,67 +816,115 @@ function createAgent(
     }
     for (const component of offPage.values()) {
       const key = fieldKey(Object.keys(component))
-      if (key)
+      if (key) {
         fields.push({
           name: `${component.ref} ${component.label ?? component.component}`,
           value: component[key],
           first: touched.has(component.ref),
         })
+      }
     }
     const kept = new Set(fields.filter((field) => field.first))
-    for (const field of fields) if (kept.size < limit) kept.add(field)
+    for (const field of fields) {
+      if (kept.size < limit) {
+        kept.add(field)
+      }
+    }
     const out: Record<string, unknown> = {}
-    for (const field of fields) if (kept.has(field)) out[field.name] = field.value
-    if (fields.length > kept.size) out.more = fields.length - kept.size
+    for (const field of fields) {
+      if (kept.has(field)) {
+        out[field.name] = field.value
+      }
+    }
+    if (fields.length > kept.size) {
+      out.more = fields.length - kept.size
+    }
     return out
   }
 
   // What changed since `before`: values, the components that came onto the
   // page and the refs that left it, so the agent needn't call `snapshot`.
-  function since(before: ReturnType<typeof capture>, skip?: string, listAppeared = true) {
+  function since(
+    before: ReturnType<typeof capture>,
+    skip?: string,
+    listAppeared = true
+  ) {
     const changes: AgentChange[] = []
     const after = live()
     for (const { entry, instance } of after) {
       const was = before.states.get(entry.ref)
-      if (!was) continue
+      if (!was) {
+        continue
+      }
       const state = instance.get() as Record<string, unknown>
-      for (const key of stateKeys(entry, state))
-        if (differs(was[key], state[key]))
+      for (const key of stateKeys(entry, state)) {
+        if (differs(was[key], state[key])) {
           changes.push({
             component: entry.component,
             label: entry.label,
             key,
             value: redact(entry, state[key]),
           })
-      if (before.shown.has(entry.ref) && entry.row !== before.names.get(entry.ref)?.row)
-        changes.push({ component: entry.component, label: entry.label, key: "row", value: entry.row })
+        }
+      }
+      if (
+        before.shown.has(entry.ref) &&
+        entry.row !== before.names.get(entry.ref)?.row
+      ) {
+        changes.push({
+          component: entry.component,
+          label: entry.label,
+          key: "row",
+          value: entry.row,
+        })
+      }
     }
     const shownAfter = new Set(after.map(({ entry }) => entry.ref))
     // A component that changed and then left the page, like a field on a tab the same steps closed, from what it showed when it left.
     for (const ref of before.shown) {
-      if (shownAfter.has(ref)) continue
+      if (shownAfter.has(ref)) {
+        continue
+      }
       const was = before.states.get(ref)
       const name = before.names.get(ref)
       // A popup that closed and left the page, like a confirm dialog.
-      if (was?.open === true && name)
-        changes.push({ component: name.component, label: name.label, key: "open", value: false })
+      if (was?.open === true && name) {
+        changes.push({
+          component: name.component,
+          label: name.label,
+          key: "open",
+          value: false,
+        })
+      }
       const last = offPage.get(ref)
-      if (!last || !was) continue
-      for (const key of Object.keys(was))
-        if (key in last && differs(was[key], last[key]))
-          changes.push({ component: last.component, label: last.label, key, value: last[key] })
+      if (!last || !was) {
+        continue
+      }
+      for (const key of Object.keys(was)) {
+        if (key in last && differs(was[key], last[key])) {
+          changes.push({
+            component: last.component,
+            label: last.label,
+            key,
+            value: last[key],
+          })
+        }
+      }
     }
     return {
       after,
       changes,
       appeared: listAppeared
         ? after
-            .filter((found) => found.entry.ref !== skip && !before.shown.has(found.entry.ref))
+            .filter(
+              (found) =>
+                found.entry.ref !== skip && !before.shown.has(found.entry.ref)
+            )
             .map((found) => describe(found.entry, found.instance, found.parts))
         : [],
       gone: named(
         before,
-        [...before.shown].filter((ref) => !shownAfter.has(ref)),
+        [...before.shown].filter((ref) => !shownAfter.has(ref))
       ),
     }
   }
@@ -681,26 +936,34 @@ function createAgent(
     entry: Entry,
     instance: PrimitiveInstance,
     text: string | undefined,
-    beforeOpen: () => Promise<unknown>,
+    beforeOpen: () => Promise<unknown>
   ) {
     const api = instance.api as { setOpen?: (open: boolean) => void }
     const match = () => {
       const parts = bound(instance)
       const buttons = buttonsOf(parts)
       // A popup's own button is its trigger, which opens it like a person's click.
-      if (text === undefined)
-        return { buttons, button: ownButton(parts) ?? (api.setOpen ? soleTrigger(parts) : undefined) }
+      if (text === undefined) {
+        return {
+          buttons,
+          button:
+            ownButton(parts) ?? (api.setOpen ? soleTrigger(parts) : undefined),
+        }
+      }
       // Exact text first, then whole words, like "Delete" for "Delete project". Two that match the same
       // way are refused, not guessed.
       const needle = fold(text)
       const words = wordsOf(text)
       const exact = buttons.filter((el) => fold(textOrName(el)) === needle)
-      const near = buttons.filter((el) => words.trim() && wordsOf(textOrName(el)).includes(words))
+      const near = buttons.filter(
+        (el) => words.trim() && wordsOf(textOrName(el)).includes(words)
+      )
       const matches = exact.length ? exact : near
-      if (matches.length > 1)
+      if (matches.length > 1) {
         throw new Error(
-          `"${text}" names ${matches.length} buttons in ${entry.ref}. Use the whole text of one.`,
+          `"${text}" names ${matches.length} buttons in ${entry.ref}. Use the whole text of one.`
         )
+      }
       return { buttons, button: matches[0] }
     }
     let found = match()
@@ -710,33 +973,64 @@ function createAgent(
     // finds the component by its own label again, not its open dialog's title.
     const close = async () => {
       asAgent(() => api.setOpen?.(false))
-      for (let tries = 0; tries < 60 && bound(instance).some((part) => !closed.has(part.el)); tries++)
+      for (
+        let tries = 0;
+        tries < 60 && bound(instance).some((part) => !closed.has(part.el));
+        tries++
+      ) {
         await frames()
+      }
     }
-    if (!found.button && text !== undefined && api.setOpen && !(instance.get() as { open?: boolean }).open) {
+    if (
+      !found.button &&
+      text !== undefined &&
+      api.setOpen &&
+      !(instance.get() as { open?: boolean }).open
+    ) {
       await beforeOpen()
       opened = true
       asAgent(() => api.setOpen!(true))
       try {
-        for (let tries = 0; tries < 60 && !(found = match()).button; tries++) await frames()
+        for (let tries = 0; tries < 60 && !(found = match()).button; tries++) {
+          await frames()
+        }
       } finally {
-        if (!found.button) asAgent(() => api.setOpen!(false))
+        if (!found.button) {
+          asAgent(() => api.setOpen!(false))
+        }
       }
     }
     const { buttons, button } = found
-    if (!button)
+    if (!button) {
       throw new Error(
-        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map(textOrName).join(", ") || "none"}.`,
+        `No button "${text}" in ${entry.ref}. Buttons: ${buttons.map(textOrName).join(", ") || "none"}.`
       )
+    }
     const refuseDisabled = async () => {
-      if (!button.matches(":disabled") && button.getAttribute("aria-disabled") !== "true") return
-      if (opened) await close()
-      throw new Error(`"${textOrName(button)}" in ${entry.ref} is disabled now.`)
+      if (
+        !button.matches(":disabled") &&
+        button.getAttribute("aria-disabled") !== "true"
+      ) {
+        return
+      }
+      if (opened) {
+        await close()
+      }
+      throw new Error(
+        `"${textOrName(button)}" in ${entry.ref} is disabled now.`
+      )
     }
     await refuseDisabled()
     // What was pressed, so a press that opened a dialog and closed it again, like a confirm, still says it happened.
     const pressed = `Pressed "${textOrName(button)}"`
-    return { click: () => button.click(), button, pressed, opened, close, refuseDisabled }
+    return {
+      click: () => button.click(),
+      button,
+      pressed,
+      opened,
+      close,
+      refuseDisabled,
+    }
   }
 
   // The buttons a press can name, like a row menu's Make admin and Remove,
@@ -744,9 +1038,14 @@ function createAgent(
   // open it without a step `allow` decided on, so it says press opens it.
   function pressable(instance: PrimitiveInstance) {
     const texts = buttonsOf(bound(instance)).map(textOrName).filter(Boolean)
-    if (texts.length) return ` press takes a button's text: ${texts.join(", ")}.`
-    const opens = typeof (instance.api as { setOpen?: unknown }).setOpen === "function"
-    return opens ? " press takes the text of a button inside it, and opens it first to find the button." : ""
+    if (texts.length) {
+      return ` press takes a button's text: ${texts.join(", ")}.`
+    }
+    const opens =
+      typeof (instance.api as { setOpen?: unknown }).setOpen === "function"
+    return opens
+      ? " press takes the text of a button inside it, and opens it first to find the button."
+      : ""
   }
 
   // Whether `find` names one component now.
@@ -767,17 +1066,25 @@ function createAgent(
     try {
       return find(ref, action)
     } catch (missing) {
-      const holders: { entry: Entry; open: () => unknown; section: string }[] = []
+      const holders: { entry: Entry; open: () => unknown; section: string }[] =
+        []
       for (const { instance, entry, parts } of live()) {
         const api = instance.api as {
           open?: (value: string) => unknown
           setValue?: (value: unknown) => unknown
         }
         const value = (instance.get() as { value?: unknown }).value
-        if (typeof api.open !== "function" || typeof api.setValue !== "function" || !Array.isArray(value))
+        if (
+          typeof api.open !== "function" ||
+          typeof api.setValue !== "function" ||
+          !Array.isArray(value)
+        ) {
           continue
+        }
         const shut =
-          describe(entry, instance, parts).items?.filter((item) => !value.includes(item.value)) ?? []
+          describe(entry, instance, parts).items?.filter(
+            (item) => !value.includes(item.value)
+          ) ?? []
         for (const item of shut) {
           const step = {
             ref: entry.ref,
@@ -786,11 +1093,15 @@ function createAgent(
             action: "open",
             args: [item.value],
           }
-          if (!(await allowed(step))) continue
+          if (!(await allowed(step))) {
+            continue
+          }
           const open = () => asAgent(() => api.open!(item.value))
           open()
           await frames()
-          if (shows(ref, action)) holders.push({ entry, open, section: item.label })
+          if (shows(ref, action)) {
+            holders.push({ entry, open, section: item.label })
+          }
           asAgent(() => api.setValue!(value))
           await frames()
         }
@@ -803,7 +1114,7 @@ function createAgent(
       if (holders.length > 1) {
         const [{ entry, section }] = holders
         throw new Error(
-          `"${ref}" is in ${holders.length} closed sections: ${holders.map((holder) => holder.section).join(", ")}. Open one first, like { "ref": "${entry.ref}", "action": "open", "args": ["${section}"] }.`,
+          `"${ref}" is in ${holders.length} closed sections: ${holders.map((holder) => holder.section).join(", ")}. Open one first, like { "ref": "${entry.ref}", "action": "open", "args": ["${section}"] }.`
         )
       }
       throw missing
@@ -812,9 +1123,11 @@ function createAgent(
 
   // Waits while a component's work runs, like a button's or a form's save, 15 seconds at most.
   async function settle(instance: PrimitiveInstance | undefined) {
-    const pending = () => (instance?.get() as { pending?: boolean } | undefined)?.pending === true
-    for (let waited = 0; pending() && waited < 15000; waited += 50)
+    const pending = () =>
+      (instance?.get() as { pending?: boolean } | undefined)?.pending === true
+    for (let waited = 0; pending() && waited < 15000; waited += 50) {
       await new Promise((resolve) => setTimeout(resolve, 50))
+    }
     const { error } = (instance?.get() ?? {}) as { error?: unknown }
     return { pending: pending(), error }
   }
@@ -827,37 +1140,60 @@ function createAgent(
   // confirm nobody answers would hold every later one.
   async function allowed(step: AgentAction) {
     const checks = [options.allow, callerAllow].filter((check) => !!check)
-    if (!checks.length) return true
+    if (!checks.length) {
+      return true
+    }
     const controller = new AbortController()
     const wait = options.timeout ?? 300_000
     let timer: ReturnType<typeof setTimeout> | undefined
-    const late = new Promise<"late">((resolve) => (timer = setTimeout(() => resolve("late"), wait)))
+    const late = new Promise<"late">(
+      (resolve) => (timer = setTimeout(() => resolve("late"), wait))
+    )
     const answer = async () => {
-      for (const check of checks) if (!(await check(step, { signal: controller.signal }))) return false
+      for (const check of checks) {
+        if (!(await check(step, { signal: controller.signal }))) {
+          return false
+        }
+      }
       return true
     }
     try {
       const ok = await Promise.race([answer(), late])
-      if (ok !== "late") return ok
+      if (ok !== "late") {
+        return ok
+      }
       controller.abort()
-      throw new Error(`No answer to ${step.action} on ${step.ref} in ${Math.round(wait / 1000)} seconds.`)
+      throw new Error(
+        `No answer to ${step.action} on ${step.ref} in ${Math.round(wait / 1000)} seconds.`
+      )
     } finally {
       clearTimeout(timer)
     }
   }
 
   // Runs one step as the agent, once `allow` lets it, and waits for the page to render it.
-  async function perform(ref: string, action: string, args: unknown[], guard?: () => boolean) {
+  async function perform(
+    ref: string,
+    action: string,
+    args: unknown[],
+    guard?: () => boolean
+  ) {
     const { entry, instance, parts } = await reveal(ref, action)
     const { actions, disabled } = describe(entry, instance, parts)
     // A step is asked about before anything it does, and again when finding
     // its target changed what `allow` would see, like the item a label names
     // or the confirm on the button a menu opened to show.
     const asked = new Set<string>()
-    const ask = async (stepArgs: unknown[], targets: Element[], what: string) => {
+    const ask = async (
+      stepArgs: unknown[],
+      targets: Element[],
+      what: string
+    ) => {
       const confirm = confirmOf(targets)
       const key = JSON.stringify([stepArgs, confirm])
-      if (asked.has(key)) return false
+      if (asked.has(key)) {
+        return false
+      }
       const step: AgentAction = {
         ref: entry.ref,
         component: entry.component,
@@ -865,13 +1201,21 @@ function createAgent(
         action,
         args: stepArgs,
       }
-      if (confirm) step.confirm = confirm
-      if (confirm && !options.allow && !callerAllow)
-        throw new Error(`Needs a person: "${confirm}". Ask them to ${what} themselves.`)
-      if (!(await allowed(step)))
+      if (confirm) {
+        step.confirm = confirm
+      }
+      if (confirm && !options.allow && !callerAllow) {
         throw new Error(
-          confirm ? `The person said no to "${confirm}".` : `The app refused ${action} on ${entry.ref}.`,
+          `Needs a person: "${confirm}". Ask them to ${what} themselves.`
         )
+      }
+      if (!(await allowed(step))) {
+        throw new Error(
+          confirm
+            ? `The person said no to "${confirm}".`
+            : `The app refused ${action} on ${entry.ref}.`
+        )
+      }
       asked.add(key)
       return true
     }
@@ -882,8 +1226,10 @@ function createAgent(
     const targetsOf = (item?: unknown) => {
       const keys = new Set(
         (Array.isArray(item) ? item : [item]).map((value) =>
-          value !== null && typeof value === "object" ? keyFor(instance)(value) : String(value),
-        ),
+          value !== null && typeof value === "object"
+            ? keyFor(instance)(value)
+            : String(value)
+        )
       )
       const every = /All$/.test(action)
       // A part unbound since the step began has no element.
@@ -892,7 +1238,9 @@ function createAgent(
         .map((part) => part.el)
       for (const key of keys) {
         const el = internalOf(instance)?.elementOf?.(key)
-        if (el) elements.push(el)
+        if (el) {
+          elements.push(el)
+        }
       }
       return [...new Set(elements)]
     }
@@ -900,25 +1248,42 @@ function createAgent(
     let run: () => unknown
     let press: Awaited<ReturnType<typeof pressing>> | undefined
     if (action === "press") {
-      if (!actions.includes("press"))
-        throw new Error(`${entry.component} ${entry.ref} has nothing to press now.`)
+      if (!actions.includes("press")) {
+        throw new Error(
+          `${entry.component} ${entry.ref} has nothing to press now.`
+        )
+      }
       const text = args[0] as string | undefined
-      press = await pressing(entry, instance, text, () => ask(args, targetsOf(), `press "${text}"`))
+      press = await pressing(entry, instance, text, () =>
+        ask(args, targetsOf(), `press "${text}"`)
+      )
       run = press.click
     } else {
       const fn = (instance.api as Record<string, unknown>)[action]
-      if (typeof fn !== "function" || disabled || !takes(entry, action))
+      if (typeof fn !== "function" || disabled || !takes(entry, action)) {
         throw new Error(
-          `${entry.component} ${entry.ref} takes no ${action} now. It takes: ${actions.join(", ") || "nothing"}.${actions.includes("press") ? pressable(instance) : ""}`,
+          `${entry.component} ${entry.ref} takes no ${action} now. It takes: ${actions.join(", ") || "nothing"}.${actions.includes("press") ? pressable(instance) : ""}`
         )
+      }
       // A number from text, like "90 days" on a slider, since a slider or number field given text would hold no number.
-      const state = instance.get() as { value?: unknown; min?: unknown; max?: unknown }
+      const state = instance.get() as {
+        value?: unknown
+        min?: unknown
+        max?: unknown
+      }
       const numeric =
-        typeof state.min === "number" || typeof state.max === "number" || typeof state.value === "number"
+        typeof state.min === "number" ||
+        typeof state.max === "number" ||
+        typeof state.value === "number"
       if (action === "setValue" && numeric && typeof args[0] === "string") {
         const number = Number.parseFloat(args[0])
-        if (Number.isNaN(number)) throw new Error(`${entry.component} ${entry.ref} takes a number.`)
-        args = [Array.isArray(state.value) ? [number] : number, ...args.slice(1)]
+        if (Number.isNaN(number)) {
+          throw new Error(`${entry.component} ${entry.ref} takes a number.`)
+        }
+        args = [
+          Array.isArray(state.value) ? [number] : number,
+          ...args.slice(1),
+        ]
       }
       // The disabled items this step saw while it opened the list, if it did.
       let whileOpen: Set<string> | undefined
@@ -942,41 +1307,57 @@ function createAgent(
         if (!items.some((item) => item.value === args[0])) {
           const name = `${entry.label ?? entry.component} (${entry.ref})`
           const found = items.filter((item) => fold(item.label) === label)
-          if (found.length > 1)
+          if (found.length > 1) {
             throw new Error(
-              `"${args[0]}" names ${found.length} items in ${name}: ${found.map((item) => item.value).join(", ")}. Use a value.`,
+              `"${args[0]}" names ${found.length} items in ${name}: ${found.map((item) => item.value).join(", ")}. Use a value.`
             )
+          }
           // A closed list refuses text that names none of its items, but a
           // select's search text isn't an item. The first 20 keep the error short.
           if (found.length === 1) {
             args = [found[0].value, ...args.slice(1)]
             named = true
-          } else if (items.length && entry.agent?.closed && action !== "setQuery")
+          } else if (
+            items.length &&
+            entry.agent?.closed &&
+            action !== "setQuery"
+          ) {
             throw new Error(
               `No item "${args[0]}" in ${name}. Its items: ${items
                 .slice(0, 20)
                 .map((item) => item.label)
-                .join(", ")}${items.length > 20 ? ", …" : ""}.`,
+                .join(", ")}${items.length > 20 ? ", …" : ""}.`
             )
+          }
         }
       }
       // A closed list refuses values it doesn't have in a list or an object too.
       const elementOf = internalOf(instance)?.elementOf
-      if (action === "setValue" && entry.agent?.closed && args[0] != null && typeof args[0] !== "string") {
+      if (
+        action === "setValue" &&
+        entry.agent?.closed &&
+        args[0] != null &&
+        typeof args[0] !== "string"
+      ) {
         const known = new Set<string>()
         dataOf(entry, instance, undefined, known)
         const items = await listItems(entry, instance, askToOpen, seeOpen)
-        for (const item of items) known.add(item.value)
+        for (const item of items) {
+          known.add(item.value)
+        }
         const key = keyFor(instance)
         const unknown = (Array.isArray(args[0]) ? args[0] : [args[0]]).find(
-          (value) => !known.has(key(value)) && !elementOf?.(key(value)),
+          (value) => !known.has(key(value)) && !elementOf?.(key(value))
         )
-        if ((items.length || elementOf) && unknown !== undefined)
+        if ((items.length || elementOf) && unknown !== undefined) {
           throw new Error(
-            `No item ${JSON.stringify(unknown)} in ${entry.label ?? entry.component} (${entry.ref}).`,
+            `No item ${JSON.stringify(unknown)} in ${entry.label ?? entry.component} (${entry.ref}).`
           )
+        }
       }
-      if (/^set[A-Z]/.test(action)) args = [valueFor(entry, action, args[0]), ...args.slice(1)]
+      if (/^set[A-Z]/.test(action)) {
+        args = [valueFor(entry, action, args[0]), ...args.slice(1)]
+      }
       // The api takes a disabled item, which a person can't choose. One already chosen stays, and
       // an autocomplete's value is text, which a person can still type. Opening names no item.
       if (
@@ -991,20 +1372,35 @@ function createAgent(
         const held = (Array.isArray(value) ? value : [value]).map(key)
         // Options that render only while the list is open are read by opening it, now. Only
         // a choice opens it: a popup's open() takes a payload, not an item.
-        if (!whileOpen && (action === "setValue" || action === "select"))
+        if (!whileOpen && (action === "setValue" || action === "select")) {
           await listItems(entry, instance, askToOpen, seeOpen)
-        const chosen = named ? [args[0] as string] : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
+        }
+        const chosen = named
+          ? [args[0] as string]
+          : (Array.isArray(args[0]) ? args[0] : [args[0]]).map(key)
         // Read again once `allow` answers, since an item can turn disabled while the person decides.
         refuseBlocked = () => {
-          const disabled = new Set([...(whileOpen ?? []), ...disabledItems(entry, instance)])
+          const disabled = new Set([
+            ...(whileOpen ?? []),
+            ...disabledItems(entry, instance),
+          ])
           const blocked = chosen.find((item) => {
             const el = elementOf?.(item)
-            return !held.includes(item) && (disabled.has(item) || (!!el && isDisabledElement(el)))
+            return (
+              !held.includes(item) &&
+              (disabled.has(item) || (!!el && isDisabledElement(el)))
+            )
           })
-          if (blocked === undefined) return
-          const items = dataOf(entry, instance) ?? renderedItems(bound(instance))
-          const label = items.find((item) => item.value === blocked)?.label || blocked
-          throw new Error(`"${label}" in ${entry.label ?? entry.component} (${entry.ref}) is disabled now.`)
+          if (blocked === undefined) {
+            return
+          }
+          const items =
+            dataOf(entry, instance) ?? renderedItems(bound(instance))
+          const label =
+            items.find((item) => item.value === blocked)?.label || blocked
+          throw new Error(
+            `"${label}" in ${entry.label ?? entry.component} (${entry.ref}) is disabled now.`
+          )
         }
         refuseBlocked()
       }
@@ -1013,7 +1409,8 @@ function createAgent(
     // A press asks the button it clicks, and any other step the component's
     // own elements and the item it names, so a marked change has no unmarked
     // way around it, like choosing a marked menu item by its value.
-    const targets = () => (press ? [press.button, ...targetsOf()] : targetsOf(args[0]))
+    const targets = () =>
+      press ? [press.button, ...targetsOf()] : targetsOf(args[0])
     const askToRun = () =>
       press
         ? ask(args, [press.button], `press "${textOrName(press.button)}"`)
@@ -1022,31 +1419,53 @@ function createAgent(
       // What `allow` saw can change while it decides, like a mark the page adds, which asks again.
       let asking = await askToRun()
       for (let asked = 1; asking; asked++) {
-        if (asked === 3) throw new Error(`${entry.ref} kept changing while it was being approved.`)
+        if (asked === 3) {
+          throw new Error(
+            `${entry.ref} kept changing while it was being approved.`
+          )
+        }
         asking = await askToRun()
       }
-      if (isOffLimits(targets())) throw new Error(`${entry.ref} isn't available to agents now.`)
-      if (!press && isComponentDisabled(instance.get() as Record<string, unknown>, bound(instance)))
+      if (isOffLimits(targets())) {
+        throw new Error(`${entry.ref} isn't available to agents now.`)
+      }
+      if (
+        !press &&
+        isComponentDisabled(
+          instance.get() as Record<string, unknown>,
+          bound(instance)
+        )
+      ) {
         throw new Error(`${entry.component} ${entry.ref} is disabled now.`)
+      }
       refuseBlocked?.()
     } catch (refused) {
       // A popup the press opened to find its button closes again, as it was.
-      if (press?.opened) await press.close()
+      if (press?.opened) {
+        await press.close()
+      }
       throw refused
     }
     // The button can turn disabled while the person decides.
     await press?.refuseDisabled()
     if (guard && !guard()) {
-      throw new Error(`The restoration of ${entry.ref} was superseded by a newer change.`)
+      throw new Error(
+        `The restoration of ${entry.ref} was superseded by a newer change.`
+      )
     }
     const secret = entry.secret || (!!press && isSecret([press.button]))
-    const failure = (error: unknown) => (secret ? "[redacted]" : messageOf(error))
+    const failure = (error: unknown) =>
+      secret ? "[redacted]" : messageOf(error)
     let result: unknown
     try {
       result = asAgent(run)
     } catch (error) {
-      if (!secret) throw error
-      throw new Error(`${action} on ${entry.label ?? entry.component} (${entry.ref}) failed: [redacted]`)
+      if (!secret) {
+        throw error
+      }
+      throw new Error(
+        `${action} on ${entry.label ?? entry.component} (${entry.ref}) failed: [redacted]`
+      )
     }
     // Some calls settle later, like a popup's `open()`, which resolves once it
     // closes. One that fails before the step ends fails the step. One that
@@ -1055,39 +1474,67 @@ function createAgent(
     let ended = false
     if (result && typeof (result as PromiseLike<unknown>).then === "function") {
       ;(result as PromiseLike<unknown>).then(undefined, (error: unknown) => {
-        if (ended) throw error
+        if (ended) {
+          throw error
+        }
         rejected = { error }
       })
       result = "pending"
-    } else if (secret && typeof result !== "boolean") result = redact(entry, result)
+    } else if (secret && typeof result !== "boolean") {
+      result = redact(entry, result)
+    }
     await frames()
     if (!press) {
       // A component's own work, like a button's action, finishes before the step does.
       const settled = await settle(instance)
       ended = true
-      const failed = rejected ?? (settled.error != null ? { error: settled.error } : undefined)
-      if (failed)
+      const failed =
+        rejected ??
+        (settled.error != null ? { error: settled.error } : undefined)
+      if (failed) {
         throw new Error(
-          `${action} on ${entry.label ?? entry.component} (${entry.ref}) failed: ${failure(failed.error)}`,
+          `${action} on ${entry.label ?? entry.component} (${entry.ref}) failed: ${failure(failed.error)}`
         )
-      if (settled.pending) return { ref: entry.ref, result: `${action} is still running.` }
+      }
+      if (settled.pending) {
+        return { ref: entry.ref, result: `${action} is still running.` }
+      }
       return { ref: entry.ref, result: result ?? null }
     }
-    const pressed = press.opened ? `${press.pressed}, after opening ${entry.ref}` : press.pressed
+    const pressed = press.opened
+      ? `${press.pressed}, after opening ${entry.ref}`
+      : press.pressed
     // A button's action finishes before the step does, and a failed one fails the step.
     const settled = await settle(
       [...entries.values()]
         .map((entry) => entry.instance.deref())
         .find(
-          (found) => found && bound(found).some((part) => part.slot === "root" && part.el === press.button),
-        ),
+          (found) =>
+            found &&
+            bound(found).some(
+              (part) => part.slot === "root" && part.el === press.button
+            )
+        )
     )
     ended = true
-    if (settled.error != null) throw new Error(`${pressed}, and its action failed: ${failure(settled.error)}`)
-    if (settled.pending) return { ref: entry.ref, result: `${pressed}. Its action is still running.` }
+    if (settled.error != null) {
+      throw new Error(
+        `${pressed}, and its action failed: ${failure(settled.error)}`
+      )
+    }
+    if (settled.pending) {
+      return {
+        ref: entry.ref,
+        result: `${pressed}. Its action is still running.`,
+      }
+    }
     await frames()
     const closed = (instance.get() as { open?: boolean }).open === false
-    return { ref: entry.ref, result: result ?? `${pressed}${closed ? `. ${entry.ref} is closed now.` : "."}` }
+    return {
+      ref: entry.ref,
+      result:
+        result ?? `${pressed}${closed ? `. ${entry.ref} is closed now.` : "."}`,
+    }
   }
 
   // A list's items: from its data, from the page, or, for a step that
@@ -1096,7 +1543,7 @@ function createAgent(
     entry: Entry,
     instance: PrimitiveInstance,
     beforeOpen?: () => Promise<unknown>,
-    whileOpen?: (disabled: Set<string>, parts: Bound[]) => void,
+    whileOpen?: (disabled: Set<string>, parts: Bound[]) => void
   ) {
     const state = instance.get() as Record<string, unknown>
     const api = instance.api as { setOpen?: (open: boolean) => void }
@@ -1104,9 +1551,16 @@ function createAgent(
     if (!items.length && beforeOpen && api.setOpen && !state.open) {
       await beforeOpen()
       asAgent(() => api.setOpen!(true))
-      for (let tries = 0; tries < 60 && !(items = renderedItems(bound(instance))).length; tries++)
+      for (
+        let tries = 0;
+        tries < 60 && !(items = renderedItems(bound(instance))).length;
+        tries++
+      ) {
         await frames()
-      if (items.length) whileOpen?.(disabledItems(entry, instance), bound(instance))
+      }
+      if (items.length) {
+        whileOpen?.(disabledItems(entry, instance), bound(instance))
+      }
       asAgent(() => api.setOpen!(false))
       await frames()
     }
@@ -1116,14 +1570,24 @@ function createAgent(
   async function act(steps: AgentStep[], guard?: () => boolean) {
     const before = capture()
     // What each step did, so a change that a later step undid or took off the page, like a removed row, still shows.
-    const log: { step: number; ref: string; result?: unknown; changes?: AgentChange[]; gone?: string[] }[] =
-      []
+    const log: {
+      step: number
+      ref: string
+      result?: unknown
+      changes?: AgentChange[]
+      gone?: string[]
+    }[] = []
     const touched = new Set<string>()
     let error: { step: number; message: string } | undefined
     for (const [index, step] of steps.entries()) {
       try {
         const prior = capture()
-        const { ref, result } = await perform(step.ref, step.action, step.args ?? [], guard)
+        const { ref, result } = await perform(
+          step.ref,
+          step.action,
+          step.args ?? [],
+          guard
+        )
         touched.add(ref)
         const { changes, gone } = since(prior, ref, false)
         log.push({
@@ -1143,7 +1607,8 @@ function createAgent(
     const open = after
       .filter(
         ({ entry, instance }) =>
-          touched.has(entry.ref) && (instance.get() as { open?: boolean }).open === true,
+          touched.has(entry.ref) &&
+          (instance.get() as { open?: boolean }).open === true
       )
       .map((found) => describe(found.entry, found.instance, found.parts))
     return {
@@ -1158,26 +1623,49 @@ function createAgent(
 
   // Components that match, then how many more there were, when there were.
   const capped = (found: AgentComponent[]) =>
-    found.length > limit ? [...found.slice(0, limit), moreOf(found.length - limit)] : found
+    found.length > limit
+      ? [...found.slice(0, limit), moreOf(found.length - limit)]
+      : found
 
   // A list's items that match text, by label or value, the way find in page matches.
-  const matching = (items: { value: string; label: string }[], text?: string) => {
+  const matching = (
+    items: { value: string; label: string }[],
+    text?: string
+  ) => {
     const needle = text && fold(text)
     return needle
-      ? items.filter((item) => fold(item.label).includes(needle) || fold(item.value).includes(needle))
+      ? items.filter(
+          (item) =>
+            fold(item.label).includes(needle) ||
+            fold(item.value).includes(needle)
+        )
       : items
   }
 
   // A component with only its items that match, 50 at most, and how many more there were.
-  const withItems = (component: AgentComponent, items: { value: string; label: string }[]) => ({
+  const withItems = (
+    component: AgentComponent,
+    items: { value: string; label: string }[]
+  ) => ({
     ...component,
     items: items.slice(0, 50),
     ...(items.length > 50 && { more: items.length - 50 }),
   })
 
-  async function query({ text, within, kind }: { text?: string; within?: string; kind?: string }) {
-    if (!text && !within && !kind)
-      return { error: "query takes text, within or kind. snapshot lists everything." }
+  async function query({
+    text,
+    within,
+    kind,
+  }: {
+    text?: string
+    within?: string
+    kind?: string
+  }) {
+    if (!text && !within && !kind) {
+      return {
+        error: "query takes text, within or kind. snapshot lists everything.",
+      }
+    }
     // One list's items, even while it's closed when its data has them, like
     // today's region options. A query changes nothing, so a list whose items
     // show only while it's open says how a step reaches them instead.
@@ -1185,11 +1673,20 @@ function createAgent(
       try {
         const { entry, instance, parts } = find(within)
         const items = await listItems(entry, instance)
-        const component: AgentComponent = withItems(describe(entry, instance, parts), matching(items, text))
+        const component: AgentComponent = withItems(
+          describe(entry, instance, parts),
+          matching(items, text)
+        )
         const api = instance.api as { setOpen?: unknown; setValue?: unknown }
-        const closed = !items.length && !(instance.get() as { open?: boolean }).open
-        if (closed && typeof api.setOpen === "function" && typeof api.setValue === "function")
+        const closed =
+          !items.length && !(instance.get() as { open?: boolean }).open
+        if (
+          closed &&
+          typeof api.setOpen === "function" &&
+          typeof api.setValue === "function"
+        ) {
           component.note = `Its items show while it's open. act's setValue takes an item's label and opens ${entry.ref} to find it.`
+        }
         return [component]
       } catch (missing) {
         return { error: messageOf(missing) }
@@ -1197,21 +1694,39 @@ function createAgent(
     }
     const words = text ? wordsOf(text) : undefined
     const ofKind = (component: AgentComponent) =>
-      !kind || component.component === kind || component.component.endsWith(`-${kind}`)
+      !kind ||
+      component.component === kind ||
+      component.component.endsWith(`-${kind}`)
     const named = (component: AgentComponent) =>
-      !words || (!!words.trim() && wordsOf(`${component.label ?? ""} ${component.row ?? ""}`).includes(words))
+      !words ||
+      (!!words.trim() &&
+        wordsOf(`${component.label ?? ""} ${component.row ?? ""}`).includes(
+          words
+        ))
     const found: AgentComponent[] = []
     for (const { entry, instance, parts } of live()) {
       const component = describe(entry, instance, parts)
-      if (!ofKind(component)) continue
-      if (named(component)) found.push(component)
-      else if (text) {
+      if (!ofKind(component)) {
+        continue
+      }
+      if (named(component)) {
+        found.push(component)
+      } else if (text) {
         // A list whose items match, from its data or the page, without opening it.
-        const items = matching(dataOf(entry, instance) ?? renderedItems(parts), text)
-        if (items.length) found.push(withItems(component, items))
+        const items = matching(
+          dataOf(entry, instance) ?? renderedItems(parts),
+          text
+        )
+        if (items.length) {
+          found.push(withItems(component, items))
+        }
       }
     }
-    for (const component of offPage.values()) if (ofKind(component) && named(component)) found.push(component)
+    for (const component of offPage.values()) {
+      if (ofKind(component) && named(component)) {
+        found.push(component)
+      }
+    }
     return capped(found)
   }
 
@@ -1234,13 +1749,22 @@ function createAgent(
      * component: "more", more, use: "query" }`, how many were left out.
      */
     snapshot: () => {
-      const shown = scan().map(({ entry, instance, parts }) => describe(entry, instance, parts))
+      const shown = scan().map(({ entry, instance, parts }) =>
+        describe(entry, instance, parts)
+      )
       const all = [...shown, ...offPage.values()]
-      if (all.length <= limit) return all
+      if (all.length <= limit) {
+        return all
+      }
       const open = new Set(shown.filter((component) => component.open === true))
-      const rest = all.filter((component) => !open.has(component)).slice(0, limit - open.size)
+      const rest = all
+        .filter((component) => !open.has(component))
+        .slice(0, limit - open.size)
       const kept = new Set([...open, ...rest])
-      return [...all.filter((component) => kept.has(component)), moreOf(all.length - kept.size)]
+      return [
+        ...all.filter((component) => kept.has(component)),
+        moreOf(all.length - kept.size),
+      ]
     },
     /**
      * Runs steps in order, as the agent, and reports what they changed
@@ -1249,7 +1773,8 @@ function createAgent(
      * an earlier step brought onto the page. Stops at the first step that
      * fails, and says which.
      */
-    act: (input: { steps: AgentStep[] }) => inTurn(() => act(input.steps ?? [])),
+    act: (input: { steps: AgentStep[] }) =>
+      inTurn(() => act(input.steps ?? [])),
     /**
      * Finds components without listing the page. `text` matches a
      * component's label or row text by whole words, and a list's items, which
@@ -1258,7 +1783,8 @@ function createAgent(
      * `note` when they show only while it's open, since a query never opens
      * anything; `kind` keeps one kind, like `"select"`.
      */
-    query: (input: { text?: string; within?: string; kind?: string }) => inTurn(() => query(input ?? {})),
+    query: (input: { text?: string; within?: string; kind?: string }) =>
+      inTurn(() => query(input ?? {})),
     /**
      * Calls `listener` with every change to a component, from a person or an
      * agent, with its ref, label, reason, source and value before, until the
@@ -1267,10 +1793,14 @@ function createAgent(
      */
     subscribe: (listener: (change: ObservedChange) => void) =>
       listen((change) => {
-        if (!entries.get(change.ref)?.offLimits) listener(change)
+        if (!entries.get(change.ref)?.offLimits) {
+          listener(change)
+        }
       }),
   }
-  guardedActions.set(agent.act, (steps, guard) => inTurn(() => act(steps, guard)))
+  guardedActions.set(agent.act, (steps, guard) =>
+    inTurn(() => act(steps, guard))
+  )
   allowing.set(agent, (input, allow) =>
     inTurn(async () => {
       callerAllow = allow
@@ -1279,17 +1809,23 @@ function createAgent(
       } finally {
         callerAllow = undefined
       }
-    }),
+    })
   )
   return agent
 }
 
-type Allow = (step: AgentAction, context: { signal: AbortSignal }) => boolean | Promise<boolean>
+type Allow = (
+  step: AgentAction,
+  context: { signal: AbortSignal }
+) => boolean | Promise<boolean>
 
 // Each agent's `act` with a second `allow` beside its own, for `registerTools`.
 const allowing = new WeakMap<
   object,
-  (input: { steps: AgentStep[] }, allow: Allow) => ReturnType<ReturnType<typeof createAgent>["act"]>
+  (
+    input: { steps: AgentStep[] },
+    allow: Allow
+  ) => ReturnType<ReturnType<typeof createAgent>["act"]>
 >()
 
 /**
@@ -1305,32 +1841,57 @@ const allowing = new WeakMap<
  * registerTools(agent, { allow: (step) => step.action !== "press" || confirm(`Press ${step.args[0]}?`) })
  * @stable
  */
-function registerTools(agent: ReturnType<typeof createAgent>, { allow }: { allow: Allow }) {
-  if (typeof allow !== "function") throw new Error("registerTools needs an `allow` that decides each step.")
+function registerTools(
+  agent: ReturnType<typeof createAgent>,
+  { allow }: { allow: Allow }
+) {
+  if (typeof allow !== "function") {
+    throw new Error("registerTools needs an `allow` that decides each step.")
+  }
   const context = (
     globalThis.document as
-      { modelContext?: { registerTool: (tool: object, options: object) => Promise<void> } } | undefined
+      | {
+          modelContext?: {
+            registerTool: (tool: object, options: object) => Promise<void>
+          }
+        }
+      | undefined
   )?.modelContext
   const controller = new AbortController()
-  for (const tool of agentTools)
+  for (const tool of agentTools) {
     context
       ?.registerTool(
         {
           ...tool,
           // Labels and text come from the page, which can hold what users wrote.
-          annotations: { readOnlyHint: tool.name !== "act", untrustedContentHint: true },
+          annotations: {
+            readOnlyHint: tool.name !== "act",
+            untrustedContentHint: true,
+          },
           execute: (input: never) =>
-            tool.name === "act" ? allowing.get(agent)!(input, allow) : agent[tool.name as "act"](input),
+            tool.name === "act"
+              ? allowing.get(agent)!(input, allow)
+              : agent[tool.name as "act"](input),
         },
-        { signal: controller.signal },
+        { signal: controller.signal }
       )
       .catch((error: { name?: string }) => {
         // A page whose permissions policy turns WebMCP off, or an unregister
         // before the browser finished, isn't a mistake. A tool name already
         // taken, like from a second call, is.
-        if (dev && error?.name !== "NotAllowedError" && error?.name !== "AbortError")
-          warn(`registerTools couldn't register ${tool.name}.`, undefined, error)
+        if (
+          dev &&
+          error?.name !== "NotAllowedError" &&
+          error?.name !== "AbortError"
+        ) {
+          warn(
+            `registerTools couldn't register ${tool.name}.`,
+            undefined,
+            error
+          )
+        }
       })
+  }
   return () => controller.abort()
 }
 
@@ -1374,7 +1935,11 @@ const agentTools = [
       'Finds components without listing the whole page. text matches a component\'s label or row text by whole words, like "Jane" for the menu on Jane Doe\'s row, and a list\'s items, like "Germany" in a region select, which come back under their list. within names one list by ref or label and returns its items, matching text when given, 50 at most, even while it\'s closed when its data has them; otherwise a note says act opens it. query never opens anything. kind keeps one kind, like "select". Takes text, within or kind.',
     inputSchema: {
       type: "object",
-      properties: { text: { type: "string" }, within: { type: "string" }, kind: { type: "string" } },
+      properties: {
+        text: { type: "string" },
+        within: { type: "string" },
+        kind: { type: "string" },
+      },
     },
   },
 ]

@@ -49,7 +49,11 @@ function Example() {
         <ComboboxEmpty>No countries found.</ComboboxEmpty>
         <ComboboxList>
           {countries.map((country) => (
-            <ComboboxItem key={country.value} value={country.value} label={country.label}>
+            <ComboboxItem
+              key={country.value}
+              value={country.value}
+              label={country.label}
+            >
               {country.label}
               <ComboboxItemIndicator>
                 <CheckIcon aria-hidden="true" />

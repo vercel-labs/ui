@@ -23,15 +23,23 @@ import { createPresentation } from "./presentation"
 
 // Presenting as a sheet from the bottom of the screen, with `presentation`.
 // The sheet's code loads only once a popup presents as one.
-function sheetPresentation(core: PopupCore, dismissal?: ReturnType<typeof createDismissal>) {
+function sheetPresentation(
+  core: PopupCore,
+  dismissal?: ReturnType<typeof createDismissal>
+) {
   const dialog = core.preset.behavior === "dialog"
-  if (dialog) core.store.set({ presentation: "dialog" })
+  if (dialog) {
+    core.store.set({ presentation: "dialog" })
+  }
   return createPresentation(
     core.store,
     () => core.popup,
-    () => (core.rules?.presentation ? core.rules.presentation() : core.options().presentation),
+    () =>
+      core.rules?.presentation
+        ? core.rules.presentation()
+        : core.options().presentation,
     dialog ? "dialog" : "popover",
-    dismissal,
+    dismissal
   )
 }
 

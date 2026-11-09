@@ -6,7 +6,8 @@ import { expect, test } from "../fixtures"
 // language ignores them, a contiguous match for "contains", and each letter
 // in order for "fuzzy". Searchable Select has its own in select.search.spec.ts.
 
-const option = (page: Page, name: string) => page.getByRole("option", { name, exact: true })
+const option = (page: Page, name: string) =>
+  page.getByRole("option", { name, exact: true })
 
 // The marked parts of an option, in order.
 const marks = (item: Locator) => item.locator("mark").allInnerTexts()
@@ -24,7 +25,9 @@ test.describe("combobox", { tag: "@enhancement" }, () => {
     await expect.poll(() => marks(option(page, "Germany"))).toEqual(["an"])
   })
 
-  test("marks keep the label's own case and accents while matching without them", async ({ page }) => {
+  test("marks keep the label's own case and accents while matching without them", async ({
+    page,
+  }) => {
     await input(page).fill("ÁUS")
     await expect.poll(() => marks(option(page, "Australia"))).toEqual(["Aus"])
     await expect.poll(() => marks(option(page, "Austria"))).toEqual(["Aus"])
@@ -36,7 +39,9 @@ test.describe("combobox", { tag: "@enhancement" }, () => {
     await expect(option(page, "Germany").locator("mark")).toHaveCount(0)
   })
 
-  test("marks go away when the text is cleared, and the label reads whole", async ({ page }) => {
+  test("marks go away when the text is cleared, and the label reads whole", async ({
+    page,
+  }) => {
     await input(page).fill("an")
     await expect(option(page, "France").locator("mark")).toHaveCount(1)
     await input(page).fill("")
@@ -46,7 +51,10 @@ test.describe("combobox", { tag: "@enhancement" }, () => {
 })
 
 test.describe("autocomplete", { tag: "@enhancement" }, () => {
-  test("marks the part of each suggestion the text matched", async ({ page, open }) => {
+  test("marks the part of each suggestion the text matched", async ({
+    page,
+    open,
+  }) => {
     await open("autocomplete", { highlight: "" })
     await page.getByRole("combobox", { name: "Fruit" }).fill("berr")
     await expect.poll(() => marks(option(page, "Blackberry"))).toEqual(["berr"])
@@ -55,25 +63,36 @@ test.describe("autocomplete", { tag: "@enhancement" }, () => {
 })
 
 test.describe("command", { tag: "@enhancement" }, () => {
-  const search = (page: Page) => page.getByRole("combobox", { name: "Search commands" })
+  const search = (page: Page) =>
+    page.getByRole("combobox", { name: "Search commands" })
 
-  test("marks each letter a fuzzy match found, joining neighbours", async ({ page, open }) => {
+  test("marks each letter a fuzzy match found, joining neighbours", async ({
+    page,
+    open,
+  }) => {
     await open("command", { highlight: "" })
     await search(page).fill("prfl")
-    await expect.poll(() => marks(option(page, "Profile"))).toEqual(["Pr", "f", "l"])
+    await expect
+      .poll(() => marks(option(page, "Profile")))
+      .toEqual(["Pr", "f", "l"])
   })
 
   test("marks a whole match at a word start", async ({ page, open }) => {
     await open("command", { highlight: "" })
     await search(page).fill("emo")
-    await expect.poll(() => marks(option(page, "Search Emoji"))).toEqual(["Emo"])
+    await expect
+      .poll(() => marks(option(page, "Search Emoji")))
+      .toEqual(["Emo"])
   })
 })
 
 test.describe("highlighting", () => {
   const input = (page: Page) => page.getByRole("combobox", { name: "Country" })
 
-  test("the chosen label in the input shows every item unmarked", async ({ page, open }) => {
+  test("the chosen label in the input shows every item unmarked", async ({
+    page,
+    open,
+  }) => {
     await open("combobox", { highlight: "" })
     await input(page).fill("chi")
     await option(page, "Chile").click()

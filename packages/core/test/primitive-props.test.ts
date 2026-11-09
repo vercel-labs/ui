@@ -1,14 +1,24 @@
 import { describe, expect, test } from "vitest"
 import { definePrimitive } from "../src/foundation/kernel/primitive"
-import { attrs, bind, present, ref as partRef, subscribe } from "../src/foundation/kernel/part"
+import {
+  attrs,
+  bind,
+  present,
+  ref as partRef,
+  subscribe,
+} from "../src/foundation/kernel/part"
 
 // A list of items whose api reads an item's latest props, like a menu
 // reading an item's `onSelect` when it's activated.
 const list = definePrimitive({
   name: "list",
   state: () => ({ highlighted: null as string | null }),
-  api: (context) => ({ itemProps: (key: string) => context.props("item", key) }),
-  slots: (slot) => ({ item: slot<{ label?: string }>({ props: { label: "string" } }) }),
+  api: (context) => ({
+    itemProps: (key: string) => context.props("item", key),
+  }),
+  slots: (slot) => ({
+    item: slot<{ label?: string }>({ props: { label: "string" } }),
+  }),
 })
 
 const element = () => ({ isConnected: true }) as unknown as HTMLElement
@@ -17,11 +27,16 @@ const microtask = () => new Promise<void>((resolve) => queueMicrotask(resolve))
 
 // What the instance keeps for a part: its props, and its ref, which is the
 // same function while it's kept.
-function kept(instance: ReturnType<typeof list>, keys: string[], refs: Map<string, unknown>) {
+function kept(
+  instance: ReturnType<typeof list>,
+  keys: string[],
+  refs: Map<string, unknown>
+) {
   return keys.filter(
     (key) =>
       instance.api.itemProps(key) !== undefined ||
-      partRef(instance.part("item", { id: key }), { by: "core" }) === refs.get(key),
+      partRef(instance.part("item", { id: key }), { by: "core" }) ===
+        refs.get(key)
   )
 }
 
@@ -40,7 +55,10 @@ describe("parts that leave", () => {
       ref(null)
       unsubscribe()
     }
-    expect(instance.api.itemProps("item-99")).toEqual({ id: "item-99", label: "item-99" })
+    expect(instance.api.itemProps("item-99")).toEqual({
+      id: "item-99",
+      label: "item-99",
+    })
     await microtask()
     expect(kept(instance, keys, refs)).toEqual([])
   })
@@ -113,7 +131,9 @@ describe("parts that leave", () => {
 
   test("a part whose key changes needs a new subscription, so the old key is let go", () => {
     const instance = list({ id: "l" })
-    expect(instance.part("item", { id: "a" })).not.toBe(instance.part("item", { id: "b" }))
+    expect(instance.part("item", { id: "a" })).not.toBe(
+      instance.part("item", { id: "b" })
+    )
   })
 
   test("a part bound again while it unbinds, like a web component rebinding as its state changes, keeps its element", () => {

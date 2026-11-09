@@ -10,7 +10,10 @@ const order = ["name", "price", "sku"] as const
 
 const product = definePrimitive({
   name: "product",
-  state: (): ProductState => ({ product: { name: "Desk lamp", price: "49", sku: "LMP-204" }, editing: null }),
+  state: (): ProductState => ({
+    product: { name: "Desk lamp", price: "49", sku: "LMP-204" },
+    editing: null,
+  }),
   api: (context) => {
     const { store } = context
     const change = createChange(context)
@@ -19,8 +22,14 @@ const product = definePrimitive({
       key: "editing",
       value: (id) => store.get().product[id as keyof Product],
       commit: (id, text, details) => {
-        if (id === "price" && !Number.isFinite(Number(text))) return false
-        return change("product", { ...store.get().product, [id]: text.trim() }, details)
+        if (id === "price" && !Number.isFinite(Number(text))) {
+          return false
+        }
+        return change(
+          "product",
+          { ...store.get().product, [id]: text.trim() },
+          details
+        )
       },
       disabled: (id) => id === "sku",
     })
@@ -33,8 +42,14 @@ const product = definePrimitive({
       inputKeydown(event: KeyboardEvent) {
         const id = store.get().editing
         if (event.key === "Tab" && id && edit.inputKeydown(event)) {
-          const next = order[order.indexOf(id as (typeof order)[number]) + (event.shiftKey ? -1 : 1)]
-          if (next) fields.get(next)?.focus()
+          const next =
+            order[
+              order.indexOf(id as (typeof order)[number]) +
+                (event.shiftKey ? -1 : 1)
+            ]
+          if (next) {
+            fields.get(next)?.focus()
+          }
           return
         }
         edit.inputKeydown(event)
@@ -56,7 +71,8 @@ const product = definePrimitive({
         "aria-readonly": key === "sku" ? "true" : undefined,
       }),
       on: {
-        keydown: (event, { el, api, key }) => event.target === el && api.edit.keydown(event, key),
+        keydown: (event, { el, api, key }) =>
+          event.target === el && api.edit.keydown(event, key),
         dblclick: (event, { api, key }) => api.edit.dblclick(event, key),
       },
       bind: (el, { api, key }) => api.bindField(el, key),
@@ -94,7 +110,11 @@ const ProductInput = parts.Input
 
 const ProductRename = parts.Rename
 
-const labels: Record<string, string> = { name: "Name", price: "Price", sku: "SKU" }
+const labels: Record<string, string> = {
+  name: "Name",
+  price: "Price",
+  sku: "SKU",
+}
 
 function Example() {
   return (
@@ -109,7 +129,11 @@ function Example() {
               {({ text, editing }) => (
                 <>
                   <span data-slot="inline-edit-label">{labels[id]}</span>
-                  {editing ? <ProductInput /> : <span data-value>{id === "price" ? `$${text}` : text}</span>}
+                  {editing ? (
+                    <ProductInput />
+                  ) : (
+                    <span data-value>{id === "price" ? `$${text}` : text}</span>
+                  )}
                 </>
               )}
             </ProductField>

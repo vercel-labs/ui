@@ -23,10 +23,13 @@ press, and on Shift+F10.
     payload,
     controller,
     ...rest
-  }: PartProps<"div", MenuContextTriggerState> &
-    MenuContextTriggerProps = $props()
+  }: PartProps<"div", MenuContextTriggerState> & MenuContextTriggerProps =
+    $props()
 
-  const connected = useControllerTarget(() => controller, getContext<MenuContext | undefined>(menuPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<MenuContext | undefined>(menuPrimitive)
+  )
   const menu = $derived(connected())
 </script>
 
@@ -43,5 +46,9 @@ press, and on Shift+F10.
 {:else}
   <!-- Until the menu it names mounts, an area outside the menu is a plain element. A user
        attachment may be false or null, which `slot()` passes through the same way. -->
-  <Part tag="div" part={plainPart({ open: false, disabled: !!disabled })} props={rest} />
+  <Part
+    tag="div"
+    part={plainPart({ open: false, disabled: !!disabled })}
+    props={rest}
+  />
 {/if}

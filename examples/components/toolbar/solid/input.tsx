@@ -25,7 +25,11 @@ function Example() {
               <path d="M5 12h14" />
             </svg>
           </NumberInputDecrement>
-          <ToolbarInput render={(props) => <NumberInputControl {...props} aria-label="Font size" />} />
+          <ToolbarInput
+            render={(props) => (
+              <NumberInputControl {...props} aria-label="Font size" />
+            )}
+          />
           <NumberInputIncrement aria-label="Increase font size">
             <svg
               viewBox="0 0 24 24"

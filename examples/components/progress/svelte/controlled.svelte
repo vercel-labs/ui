@@ -14,7 +14,9 @@
   let uploaded = $state(1)
 
   function uploadNext() {
-    if (uploaded >= total) return
+    if (uploaded >= total) {
+      return
+    }
     uploaded++
     log(`Uploaded ${uploaded} of ${total} photos`)
   }
@@ -27,7 +29,9 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" aria-disabled={uploaded >= total} onclick={uploadNext}>Upload Next</button>
+    <button type="button" aria-disabled={uploaded >= total} onclick={uploadNext}
+      >Upload Next</button
+    >
     <button type="button" onclick={reset}>Reset</button>
   </div>
   <Progress value={(uploaded / total) * 100}>

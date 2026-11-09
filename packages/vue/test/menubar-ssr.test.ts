@@ -2,9 +2,19 @@
 import { renderToString } from "@vue/server-renderer"
 import { describe, expect, test } from "vitest"
 import { createSSRApp, h } from "vue"
-import { Menu, Menubar, MenuTrigger, Toggle, ToggleGroup, Toolbar, ToolbarButton, ToolbarLink } from "../src"
+import {
+  Menu,
+  Menubar,
+  MenuTrigger,
+  Toggle,
+  ToggleGroup,
+  Toolbar,
+  ToolbarButton,
+  ToolbarLink,
+} from "../src"
 
-const render = (view: () => ReturnType<typeof h>) => renderToString(createSSRApp(view))
+const render = (view: () => ReturnType<typeof h>) =>
+  renderToString(createSSRApp(view))
 const stops = (html: string) => html.match(/tabindex="0"/g)?.length ?? 0
 
 // Runs with no DOM: any access to window or document during render throws.
@@ -19,7 +29,7 @@ describe("server rendering toolbars and menubars", () => {
         ]),
         h(Toggle, null, () => "Spellcheck"),
         h(ToolbarLink, { href: "#help" }, () => "Help"),
-      ]),
+      ])
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="toolbar"')
@@ -32,7 +42,7 @@ describe("server rendering toolbars and menubars", () => {
       h(Menubar, { "aria-label": "Editor" }, () => [
         h(Menu, null, () => h(MenuTrigger, { disabled: true }, () => "File")),
         h(Menu, null, () => h(MenuTrigger, null, () => "Edit")),
-      ]),
+      ])
     )
     expect(html).toContain('role="menubar"')
     expect(stops(html)).toBe(1)

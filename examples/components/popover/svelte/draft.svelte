@@ -37,9 +37,15 @@
     <PopoverDescription>Only your team can see it.</PopoverDescription>
     <Field>
       <FieldLabel>Note</FieldLabel>
-      <FieldControl value={note} oninput={(event) => (note = event.currentTarget.value)}>
+      <FieldControl
+        value={note}
+        oninput={(event) => (note = event.currentTarget.value)}
+      >
         {#snippet render({ props })}
-          <textarea bind:this={field} {...props} placeholder="Call the printer about the proofs."></textarea>
+          <textarea
+            bind:this={field}
+            {...props}
+            placeholder="Call the printer about the proofs."></textarea>
         {/snippet}
       </FieldControl>
     </Field>

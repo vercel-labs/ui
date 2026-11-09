@@ -10,15 +10,48 @@ import {
   type DatePickerState,
   type DatePickerValue,
 } from "@ui-sdk/core/date-picker"
-import { createContext, merge, omit, Repeat, Show, untrack, useContext, type ComponentProps } from "solid-js"
-import { CalendarGrid, CalendarHeading, CalendarNext, CalendarPrevious } from "./calendar"
-import { CalendarContext, monthCount, type CalendarHandle } from "./calendar-context"
+import {
+  createContext,
+  merge,
+  omit,
+  Repeat,
+  Show,
+  untrack,
+  useContext,
+  type ComponentProps,
+} from "solid-js"
+import {
+  CalendarGrid,
+  CalendarHeading,
+  CalendarNext,
+  CalendarPrevious,
+} from "./calendar"
+import {
+  CalendarContext,
+  monthCount,
+  type CalendarHandle,
+} from "./calendar-context"
 import { joinField, useFieldControl } from "./field-context"
-import { renderPopup, sheetViewport, usePopupContainer, type PopupContainer } from "./popup"
+import {
+  renderPopup,
+  sheetViewport,
+  usePopupContainer,
+  type PopupContainer,
+} from "./popup"
 import { startingText } from "./text-control"
-import { createParts, usePart, usePrimitive, type PartProps, type PrimitiveHandle } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+  type PrimitiveHandle,
+} from "./use-primitive"
 
-const parts = createParts(datePickerPrimitive, { trigger: "button", hint: "span", clear: "button" })
+const parts = createParts(datePickerPrimitive, {
+  trigger: "button",
+  hint: "span",
+  clear: "button",
+})
 
 type DatePickerContextValue = PrimitiveHandle<typeof datePickerPrimitive> & {
   field: ReturnType<typeof useFieldControl>
@@ -32,11 +65,16 @@ const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 
 function useDatePicker(part: string) {
   const context = useContext(DatePickerContext)
-  if (!context) throw new Error(`${part} must be used inside <DatePicker>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <DatePicker>.`)
+  }
   return context
 }
 
-type ButtonProps<State> = Omit<PartProps<"button", State>, "value" | "defaultValue" | "onChange">
+type ButtonProps<State> = Omit<
+  PartProps<"button", State>,
+  "value" | "defaultValue" | "onChange"
+>
 
 /**
  * The root, and the hidden inputs that submit ISO dates. Without children it
@@ -45,7 +83,10 @@ type ButtonProps<State> = Omit<PartProps<"button", State>, "value" | "defaultVal
  */
 function DatePicker(
   props: DatePickerOptions &
-    Omit<PartProps<"div", DatePickerState>, "defaultValue" | "onChange" | "onSelect">,
+    Omit<
+      PartProps<"div", DatePickerState>,
+      "defaultValue" | "onChange" | "onSelect"
+    >
 ) {
   const field = useFieldControl()
   const picker = usePrimitive(datePickerPrimitive, () => ({
@@ -133,7 +174,7 @@ function DatePicker(
     "container",
     "controller",
     "debug",
-    "children",
+    "children"
   )
   // The handle with the field beside it. Its prototype keeps the handle's `state` getter live.
   const context: DatePickerContextValue = Object.assign(Object.create(picker), {
@@ -149,8 +190,11 @@ function DatePicker(
     const range = () => current.mode === "range"
     // A hidden input renders only for an end that submits under a name.
     const submitsStart = () =>
-      range() ? (props.startName ?? props.name ?? field?.name()) : (props.name ?? field?.name())
-    const submitsEnd = () => range() && (props.endName ?? props.name ?? field?.name())
+      range()
+        ? (props.startName ?? props.name ?? field?.name())
+        : (props.name ?? field?.name())
+    const submitsEnd = () =>
+      range() && (props.endName ?? props.name ?? field?.name())
     const children = props.children
     return (
       <>
@@ -182,7 +226,13 @@ function DatePicker(
       {/* Every Calendar part works inside the content: the date picker's primitive has the same parts. */}
       <CalendarContext value={picker as unknown as CalendarHandle}>
         <ContainerContext value={() => props.container}>
-          {usePart(picker, "root", undefined, merge(rest, { children: content }), "div")}
+          {usePart(
+            picker,
+            "root",
+            undefined,
+            merge(rest, { children: content }),
+            "div"
+          )}
         </ContainerContext>
       </CalendarContext>
     </DatePickerContext>
@@ -195,19 +245,35 @@ function DatePicker(
  * @stable
  */
 function DatePickerInput(
-  props: Omit<PartProps<"input", DatePickerInputState>, "value" | "defaultValue" | "children" | "readonly"> &
-    DatePickerInputProps,
+  props: Omit<
+    PartProps<"input", DatePickerInputState>,
+    "value" | "defaultValue" | "children" | "readonly"
+  > &
+    DatePickerInputProps
 ) {
   const picker = useDatePicker("DatePickerInput")
   const part = () => ({ end: props.end, id: props.end ? "end" : "start" })
   const rest = startingText(omit(props, "end"))
   // Field names the first input.
   const field = untrack(() => props.end) ? null : picker.field
-  return usePart(picker, "input", part, joinField(field, rest, "input"), "input")
+  return usePart(
+    picker,
+    "input",
+    part,
+    joinField(field, rest, "input"),
+    "input"
+  )
 }
 
 const calendarIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true">
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    stroke="currentColor"
+    aria-hidden="true"
+  >
     <rect x="2" y="3" width="12" height="11" rx="1.5" />
     <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" />
   </svg>
@@ -218,7 +284,9 @@ const calendarIcon = () => (
  * @stable
  */
 function DatePickerTrigger(props: ComponentProps<typeof parts.Trigger>) {
-  return <parts.Trigger {...props}>{props.children ?? calendarIcon}</parts.Trigger>
+  return (
+    <parts.Trigger {...props}>{props.children ?? calendarIcon}</parts.Trigger>
+  )
 }
 
 /**
@@ -226,7 +294,9 @@ function DatePickerTrigger(props: ComponentProps<typeof parts.Trigger>) {
  * grid for each month; every Calendar part works inside it.
  * @stable
  */
-function DatePickerContent(props: PartProps<"div", DatePickerContentState> & DatePickerContentProps) {
+function DatePickerContent(
+  props: PartProps<"div", DatePickerContentState> & DatePickerContentProps
+) {
   const picker = useDatePicker("DatePickerContent")
   const fromRoot = useContext(ContainerContext)
   const target = usePopupContainer(() => props.container ?? fromRoot())
@@ -252,7 +322,7 @@ function DatePickerContent(props: PartProps<"div", DatePickerContentState> & Dat
     "anchor",
     "finalFocus",
     "keepMounted",
-    "container",
+    "container"
   )
   const fallback = () => (
     <>
@@ -261,7 +331,9 @@ function DatePickerContent(props: PartProps<"div", DatePickerContentState> & Dat
         <CalendarHeading />
         <CalendarNext />
       </div>
-      <Repeat count={monthCount(picker.months())}>{(offset) => <CalendarGrid offset={offset} />}</Repeat>
+      <Repeat count={monthCount(picker.months())}>
+        {(offset) => <CalendarGrid offset={offset} />}
+      </Repeat>
     </>
   )
   const body = merge(rest, {
@@ -273,8 +345,11 @@ function DatePickerContent(props: PartProps<"div", DatePickerContentState> & Dat
   return (
     <Show when={picker.present("content", content)}>
       {renderPopup(
-        () => sheetViewport(picker, () => usePart(picker, "content", content, body, "div")),
-        target,
+        () =>
+          sheetViewport(picker, () =>
+            usePart(picker, "content", content, body, "div")
+          ),
+        target
       )}
     </Show>
   )
@@ -306,11 +381,17 @@ function DatePickerPreset(
   props: ButtonProps<DatePickerPresetState> & {
     /** The value it selects: an ISO date, or `[start, end]` in range mode. */
     value: DatePickerValue
-  },
+  }
 ) {
   // Keyed by its value, which may be a range.
   const part = () => ({ value: props.value, id: JSON.stringify(props.value) })
-  return usePart(datePickerPrimitive, "preset", part, omit(props, "value"), "button")
+  return usePart(
+    datePickerPrimitive,
+    "preset",
+    part,
+    omit(props, "value"),
+    "button"
+  )
 }
 
 export {

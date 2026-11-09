@@ -10,9 +10,12 @@ beforeAll(async () => {
 }, 30_000)
 
 const componentOf = (name: string, prefix = "") =>
-  nuxtRegistrations(entries, prefix).components.find((component) => component.name === name)
+  nuxtRegistrations(entries, prefix).components.find(
+    (component) => component.name === name
+  )
 const importsFrom = (from: string) =>
-  nuxtRegistrations(entries, "").imports.find((source) => source.from === from)?.imports ?? []
+  nuxtRegistrations(entries, "").imports.find((source) => source.from === from)
+    ?.imports ?? []
 
 test("every part of an entry is registered as a component from that entry", () => {
   const dialog = entries.find(({ from }) => from === "@ui-sdk/vue/dialog")
@@ -35,8 +38,13 @@ test("every part of an entry is registered as a component from that entry", () =
 
 test("controllers and helpers are auto-imported, and components aren't", () => {
   expect(importsFrom("@ui-sdk/vue/dialog")).toEqual(["createDialogController"])
-  expect(importsFrom("@ui-sdk/vue/toast")).toEqual(expect.arrayContaining(["createToaster", "toast"]))
-  expect(importsFrom("@ui-sdk/vue/overlays")).toEqual(["createOverlays", "overlays"])
+  expect(importsFrom("@ui-sdk/vue/toast")).toEqual(
+    expect.arrayContaining(["createToaster", "toast"])
+  )
+  expect(importsFrom("@ui-sdk/vue/overlays")).toEqual([
+    "createOverlays",
+    "overlays",
+  ])
 })
 
 test("the prefix renames components but keeps the name they're imported by", () => {
@@ -45,7 +53,9 @@ test("the prefix renames components but keeps the name they're imported by", () 
     export: "DialogTrigger",
     filePath: "@ui-sdk/vue/dialog",
   })
-  expect(nuxtRegistrations(entries, "U").imports).toEqual(nuxtRegistrations(entries, "").imports)
+  expect(nuxtRegistrations(entries, "U").imports).toEqual(
+    nuxtRegistrations(entries, "").imports
+  )
 })
 
 test("an entry with no components only adds imports", () => {
@@ -55,7 +65,9 @@ test("an entry with no components only adds imports", () => {
 })
 
 test("auto-imports rank below the app's and its layers' own", () => {
-  for (const { priority } of nuxtRegistrations(entries, "").imports) expect(priority).toBeLessThan(-100)
+  for (const { priority } of nuxtRegistrations(entries, "").imports) {
+    expect(priority).toBeLessThan(-100)
+  }
 })
 
 test("an entry with nothing to register adds neither components nor imports", () => {
@@ -65,9 +77,15 @@ test("an entry with nothing to register adds neither components nor imports", ()
 
 test("a name two entries export is registered once, from the entry it's named for", () => {
   const owners = (name: string) =>
-    entries.filter(({ components, imports }) => [...components, ...imports].includes(name))
-  expect(owners("CalendarDay").map(({ from }) => from)).toEqual(["@ui-sdk/vue/calendar"])
-  expect(owners("createInputController").map(({ from }) => from)).toEqual(["@ui-sdk/vue/input"])
+    entries.filter(({ components, imports }) =>
+      [...components, ...imports].includes(name)
+    )
+  expect(owners("CalendarDay").map(({ from }) => from)).toEqual([
+    "@ui-sdk/vue/calendar",
+  ])
+  expect(owners("createInputController").map(({ from }) => from)).toEqual([
+    "@ui-sdk/vue/input",
+  ])
 })
 
 test("a function named like a browser global isn't auto-imported", () => {

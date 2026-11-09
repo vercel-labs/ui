@@ -1,6 +1,15 @@
-import type { Anchor, ChangeDetails, DismissAttemptDetails, Side } from "@ui-sdk/core"
+import type {
+  Anchor,
+  ChangeDetails,
+  DismissAttemptDetails,
+  Side,
+} from "@ui-sdk/core"
 import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
-import { selectAllKey, selectItemIcons, selectSelectAll } from "@ui-sdk/core/renderer"
+import {
+  selectAllKey,
+  selectItemIcons,
+  selectSelectAll,
+} from "@ui-sdk/core/renderer"
 import {
   select as selectPrimitive,
   type ListAnnouncement,
@@ -15,7 +24,15 @@ import {
   type SelectValueChangeReason,
   type SelectValueState,
 } from "@ui-sdk/core/select"
-import { defineComponent, h, inject, provide, type InjectionKey, type PropType, type VNode } from "vue"
+import {
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+  type VNode,
+} from "vue"
 import {
   hasChild,
   learnLabels,
@@ -62,7 +79,8 @@ import { FormInputs } from "./form-inputs"
 import { renderless } from "./renderless"
 import { readOnlyOf } from "./text-control"
 
-const ContainerKey: InjectionKey<() => PopupContainer> = Symbol("select-container")
+const ContainerKey: InjectionKey<() => PopupContainer> =
+  Symbol("select-container")
 
 type ValueDetails = ChangeDetails<SelectValueChangeReason>
 type OpenDetails = ChangeDetails<SelectOpenChangeReason>
@@ -104,15 +122,25 @@ const Select = /* @__PURE__ */ renderless(
       emptyItems: Array as PropType<ListData<any>>,
       query: { type: String, default: undefined },
       defaultQuery: String,
-      filter: { type: [String, Boolean, Function] as PropType<ListFilter<any>>, default: undefined },
+      filter: {
+        type: [String, Boolean, Function] as PropType<ListFilter<any>>,
+        default: undefined,
+      },
       status: String as PropType<AsyncOptionsStatus>,
-      announcement: Function as PropType<(change: ListAnnouncement) => string | null | undefined>,
+      announcement: Function as PropType<
+        (change: ListAnnouncement) => string | null | undefined
+      >,
       placeholder: String,
       itemToValue: Function as PropType<(value: any) => string>,
       itemToLabel: Function as PropType<(value: any) => string>,
-      isItemEqualToValue: Function as PropType<(itemValue: any, value: any) => boolean>,
+      isItemEqualToValue: Function as PropType<
+        (itemValue: any, value: any) => boolean
+      >,
       loop: optionalBoolean,
-      modal: { type: [Boolean, String] as PropType<boolean | "pointer">, default: undefined },
+      modal: {
+        type: [Boolean, String] as PropType<boolean | "pointer">,
+        default: undefined,
+      },
       presentation: String as PropType<"auto" | "popover" | "sheet">,
       disabled: optionalBoolean,
       readOnly: optionalBoolean,
@@ -132,7 +160,8 @@ const Select = /* @__PURE__ */ renderless(
       "update:open": (_open: boolean) => true,
       openChange: (_open: boolean, _details: OpenDetails) => true,
       openChangeComplete: (_open: boolean) => true,
-      dismissAttempt: (_details: DismissAttemptDetails<SelectDismissReason>) => true,
+      dismissAttempt: (_details: DismissAttemptDetails<SelectDismissReason>) =>
+        true,
       highlight: (_value: unknown, _details: ListHighlightDetails) => true,
       "update:query": (_query: string) => true,
       queryChange: (_query: string, _details: QueryDetails) => true,
@@ -151,21 +180,30 @@ const Select = /* @__PURE__ */ renderless(
         onValueChange: (value: unknown, details: ValueDetails) => {
           // The change event runs first, so canceling it also keeps v-model as it was.
           emit("valueChange", value, details)
-          if (details.canceled) return
+          if (details.canceled) {
+            return
+          }
           emit("update:value", value)
           emit("update:modelValue", value)
         },
         onOpenChange: (open: boolean, details: OpenDetails) => {
           emit("openChange", open, details)
-          if (!details.canceled) emit("update:open", open)
+          if (!details.canceled) {
+            emit("update:open", open)
+          }
         },
-        onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-        onDismissAttempt: (details: DismissAttemptDetails<SelectDismissReason>) =>
-          emit("dismissAttempt", details),
-        onHighlight: (value: unknown, details: ListHighlightDetails) => emit("highlight", value, details),
+        onOpenChangeComplete: (open: boolean) =>
+          emit("openChangeComplete", open),
+        onDismissAttempt: (
+          details: DismissAttemptDetails<SelectDismissReason>
+        ) => emit("dismissAttempt", details),
+        onHighlight: (value: unknown, details: ListHighlightDetails) =>
+          emit("highlight", value, details),
         onQueryChange: (query: string, details: QueryDetails) => {
           emit("queryChange", query, details)
-          if (!details.canceled) emit("update:query", query)
+          if (!details.canceled) {
+            emit("update:query", query)
+          }
         },
         onLoadMore: () => emit("loadMore"),
       }))
@@ -177,7 +215,8 @@ const Select = /* @__PURE__ */ renderless(
         // A data select renders its list, unless the app placed a SelectContent:
         // in the markup, or inside a component of its own.
         // Only a data one asks, so a composed one never renders again when its content mounts.
-        const own = !props.items || placed() || hasChild(children, SelectContent)
+        const own =
+          !props.items || placed() || hasChild(children, SelectContent)
         return [
           children,
           props.items && !own && h(NotPlaced, () => h(SelectContent)),
@@ -185,20 +224,27 @@ const Select = /* @__PURE__ */ renderless(
         ]
       }
     },
-  }),
+  })
 ) as unknown as SelectComponent
 
 // Generic over the value, like React's `Select<T>`: `v-model`, `@value-change`
 // and the items share `T`. One shape per `multiple`, so the value is a list
 // only with it, and a `multiple` known only at run time takes either.
-type SelectProps<T, Multiple extends boolean | undefined> = SelectOptions<T, Multiple> & {
+type SelectProps<T, Multiple extends boolean | undefined> = SelectOptions<
+  T,
+  Multiple
+> & {
   multiple?: Multiple
 }
 type SelectComponent = {
-  new <T = string>(props: RootPropsOf<SelectProps<T, false>>): RootInstanceOf<SelectProps<T, false>>
-  new <T = string>(props: RootPropsOf<SelectProps<T, true>>): RootInstanceOf<SelectProps<T, true>>
+  new <T = string>(
+    props: RootPropsOf<SelectProps<T, false>>
+  ): RootInstanceOf<SelectProps<T, false>>
+  new <T = string>(
+    props: RootPropsOf<SelectProps<T, true>>
+  ): RootInstanceOf<SelectProps<T, true>>
   new <T = string, Multiple extends boolean | undefined = boolean>(
-    props: RootPropsOf<SelectProps<T, Multiple> & { multiple: Multiple }>,
+    props: RootPropsOf<SelectProps<T, Multiple> & { multiple: Multiple }>
   ): RootInstanceOf<SelectProps<T, Multiple>>
 } & RenderableWith<SelectProps<any, boolean | undefined>>
 
@@ -224,7 +270,10 @@ const SelectTrigger = withElement(
     },
     slots: Object as PartSlots<typeof selectPrimitive, "trigger">,
     setup(props, { slots, attrs }) {
-      const connected = useControllerTarget(selectPrimitive, () => props.controller)
+      const connected = useControllerTarget(
+        selectPrimitive,
+        () => props.controller
+      )
       provideConnected(selectPrimitive, connected)
       const field = useFieldControl(attrs)
       return useConnectedPart(
@@ -233,14 +282,18 @@ const SelectTrigger = withElement(
           usePart(
             select,
             "trigger",
-            () => ({ disabled: props.disabled, named: !!field || attrs["aria-labelledby"] != null }),
+            () => ({
+              disabled: props.disabled,
+              named: !!field || attrs["aria-labelledby"] != null,
+            }),
             undefined,
             {
               tag: "button",
               // Its content, or without any, the value.
-              children: (state) => slotContent(slots.default, { state }) ?? h(SelectValue),
+              children: (state) =>
+                slotContent(slots.default, { state }) ?? h(SelectValue),
               extend: field?.props,
-            },
+            }
           ),
         // Until its select mounts, a trigger outside it is a plain button.
         () => {
@@ -251,15 +304,24 @@ const SelectTrigger = withElement(
             required: false,
             placeholder: true,
           }
-          return renderUnbound("button", { type: "button", ...attrs }, { slots, state })
-        },
+          return renderUnbound(
+            "button",
+            { type: "button", ...attrs },
+            { slots, state }
+          )
+        }
       )
     },
-  }),
+  })
 )
 
 // A value's state before its select is known.
-const unselected: SelectValueState = { value: null, label: "", labels: [], placeholder: true }
+const unselected: SelectValueState = {
+  value: null,
+  label: "",
+  labels: [],
+  placeholder: true,
+}
 
 /**
  * The selected item's label, or the placeholder. Renders it for you when it has no children.
@@ -284,7 +346,9 @@ const SelectValue = withElement(
       })
       const content = (state: SelectValueState, placeholder?: string) =>
         slotContent(slots.default, { state }) ??
-        (state.placeholder ? (props.placeholder ?? placeholder ?? "") : state.label)
+        (state.placeholder
+          ? (props.placeholder ?? placeholder ?? "")
+          : state.label)
       return useConnectedPart(
         useConnectedHandle(selectPrimitive),
         (select) =>
@@ -293,10 +357,15 @@ const SelectValue = withElement(
             children: (state) => content(state, select.state.placeholder),
           }),
         // Inside a trigger outside its select, the placeholder until the select mounts.
-        () => renderUnbound("span", attrs, { slots, state: unselected, children: content }),
+        () =>
+          renderUnbound("span", attrs, {
+            slots,
+            state: unselected,
+            children: content,
+          })
       )
     },
-  }),
+  })
 )
 
 /**
@@ -332,15 +401,24 @@ const SelectContent = withElement(
       const part = usePart(select, "content", content, undefined, {
         tag: "div",
         children: (state) =>
-          defaultSlot(slots, state, () => select.state.items && h(SelectItems, { items: state.items })),
+          defaultSlot(
+            slots,
+            state,
+            () => select.state.items && h(SelectItems, { items: state.items })
+          ),
       })
       return () => {
         const element = part()
-        if (!element) return null
-        return renderPopup(sheetViewport(select, element), props.container ?? inherited())
+        if (!element) {
+          return null
+        }
+        return renderPopup(
+          sheetViewport(select, element),
+          props.container ?? inherited()
+        )
       }
     },
-  }),
+  })
 )
 
 /**
@@ -358,10 +436,14 @@ const SelectList = withElement(
       return usePart(select, "list", undefined, undefined, {
         tag: "div",
         children: (state) =>
-          defaultSlot(slots, state, () => select.state.items && h(SelectItems, { items: state.items })),
+          defaultSlot(
+            slots,
+            state,
+            () => select.state.items && h(SelectItems, { items: state.items })
+          ),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -386,7 +468,7 @@ const SelectEmpty = withElement(
         children: (state) => (state.empty ? slots.default?.({ state }) : null),
       })
     },
-  }),
+  })
 )
 
 /**
@@ -419,7 +501,9 @@ const SelectItemText = withElement(
     slots: Object as PartSlots<typeof selectPrimitive, "item-text">,
     setup(_, { slots }) {
       const item = useScope(selectPrimitive)?.around.item
-      if (!item) throw new Error("<SelectItemText> must be used inside <SelectItem>.")
+      if (!item) {
+        throw new Error("<SelectItemText> must be used inside <SelectItem>.")
+      }
       // The text it marks, read from its content as it renders.
       let text = ""
       let own: VNode[] | undefined
@@ -431,8 +515,9 @@ const SelectItemText = withElement(
         undefined,
         {
           tag: "span",
-          children: (state) => (own && ownText === undefined ? own : markSegments(state.segments)),
-        },
+          children: (state) =>
+            own && ownText === undefined ? own : markSegments(state.segments),
+        }
       )
       return () => {
         own = slotContent(slots.default, { state: part.state })
@@ -441,7 +526,7 @@ const SelectItemText = withElement(
         return part()
       }
     },
-  }),
+  })
 )
 
 /**
@@ -457,10 +542,14 @@ const SelectSelectAll = /* @__PURE__ */ withElement(
     setup() {
       const select = useSelect()
       select.instance.use(selectSelectAll)
-      const part = { id: selectAllKey(useScope(selectPrimitive)?.around.group?.().id as string | undefined) }
+      const part = {
+        id: selectAllKey(
+          useScope(selectPrimitive)?.around.group?.().id as string | undefined
+        ),
+      }
       return usePart(select, "select-all", () => part)
     },
-  }),
+  })
 )
 
 /**
@@ -470,7 +559,12 @@ const SelectSelectAll = /* @__PURE__ */ withElement(
  * @stable
  */
 const SelectItemIcon = /* @__PURE__ */ notLabel(
-  /* @__PURE__ */ defineItemIcon("SelectItemIcon", selectPrimitive, "item-icon", selectItemIcons),
+  /* @__PURE__ */ defineItemIcon(
+    "SelectItemIcon",
+    selectPrimitive,
+    "item-icon",
+    selectItemIcons
+  )
 )
 
 // Parts inside an item that aren't its label, beside those marked with `notLabel`.
@@ -481,7 +575,11 @@ const itemDecorations = new Set<unknown>([SelectItemIndicator])
  * the trigger. Rendered while one item is selected and it has an icon.
  * @stable
  */
-const SelectValueIcon = /* @__PURE__ */ defineValueIcon("SelectValueIcon", selectPrimitive, selectItemIcons)
+const SelectValueIcon = /* @__PURE__ */ defineValueIcon(
+  "SelectValueIcon",
+  selectPrimitive,
+  selectItemIcons
+)
 
 /**
  * A group of items, named by its `SelectGroupLabel`, and hidden while none of its items shows.

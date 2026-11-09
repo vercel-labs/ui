@@ -9,12 +9,19 @@ Select, Combobox, Autocomplete, Listbox, and Trigger Menu accept items as data. 
 
 ```vue
 <script setup lang="ts">
-import { Select, SelectContent, SelectTrigger, SelectValue } from "@ui-sdk/vue/select"
+import {
+  Select,
+  SelectContent,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/vue/select"
 </script>
 
 <template>
   <Select :items="['Apple', 'Banana', 'Pear']">
-    <SelectTrigger aria-label="Fruit"><SelectValue placeholder="Choose a fruit" /></SelectTrigger>
+    <SelectTrigger aria-label="Fruit"
+      ><SelectValue placeholder="Choose a fruit"
+    /></SelectTrigger>
     <SelectContent />
   </Select>
 </template>
@@ -56,9 +63,16 @@ const fruits = [
 
 <template>
   <Select :items="fruits">
-    <SelectTrigger aria-label="Fruit" class="…"><SelectValue placeholder="Choose a fruit" /></SelectTrigger>
+    <SelectTrigger aria-label="Fruit" class="…"
+      ><SelectValue placeholder="Choose a fruit"
+    /></SelectTrigger>
     <SelectContent class="…">
-      <SelectItem v-for="fruit in fruits" :key="fruit.value" :value="fruit.value" class="…">
+      <SelectItem
+        v-for="fruit in fruits"
+        :key="fruit.value"
+        :value="fruit.value"
+        class="…"
+      >
         {{ fruit.label }}
       </SelectItem>
     </SelectContent>
@@ -85,7 +99,11 @@ import { Menu, MenuTrigger, type MenuData } from "@ui-sdk/vue/menu"
 const actions: MenuData = [
   { value: "open", label: "Open", shortcut: "mod+o" },
   { type: "separator" },
-  { type: "submenu", label: "Share", items: [{ value: "email", label: "Email" }] },
+  {
+    type: "submenu",
+    label: "Share",
+    items: [{ value: "email", label: "Email" }],
+  },
 ]
 </script>
 

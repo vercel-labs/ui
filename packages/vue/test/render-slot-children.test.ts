@@ -4,8 +4,21 @@
 import { afterEach, expect, test } from "vitest"
 import * as Vue from "vue"
 import { compileTemplate } from "vue/compiler-sfc"
-import { createApp, defineComponent, h, nextTick, ref, type App, type FunctionalComponent } from "vue"
-import { Accordion, AccordionHeader, AccordionItem, AccordionTrigger } from "../src/accordion"
+import {
+  createApp,
+  defineComponent,
+  h,
+  nextTick,
+  ref,
+  type App,
+  type FunctionalComponent,
+} from "vue"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionTrigger,
+} from "../src/accordion"
 import { Rating, RatingItem } from "../src/rating"
 import { Slider, SliderControl, SliderThumb } from "../src/slider"
 
@@ -25,7 +38,10 @@ function mount(component: Parameters<typeof createApp>[0]) {
   return el
 }
 
-type RenderScope = { props: Record<string, unknown>; children: FunctionalComponent }
+type RenderScope = {
+  props: Record<string, unknown>
+  children: FunctionalComponent
+}
 
 test("a #render slot's children show the part's new content from a template", async () => {
   const template = `
@@ -68,11 +84,14 @@ test("a slider thumb rendered through #render passes a new aria-label to its inp
             h(
               SliderThumb,
               { "aria-label": label.value },
-              { render: ({ props, children }: RenderScope) => h("span", props, h(children)) },
-            ),
-          ),
+              {
+                render: ({ props, children }: RenderScope) =>
+                  h("span", props, h(children)),
+              }
+            )
+          )
         ),
-    }),
+    })
   )
   const input = el.querySelector("input[type=range]")!
   expect(input.getAttribute("aria-label")).toBe("Volume")
@@ -92,11 +111,14 @@ test("a focused input in a #render slot's children keeps focus when the content 
             h(
               SliderThumb,
               { "aria-label": label.value },
-              { render: ({ props, children }: RenderScope) => h("span", props, h(children)) },
-            ),
-          ),
+              {
+                render: ({ props, children }: RenderScope) =>
+                  h("span", props, h(children)),
+              }
+            )
+          )
         ),
-    }),
+    })
   )
   const input = el.querySelector<HTMLInputElement>("input[type=range]")!
   input.focus()
@@ -111,10 +133,11 @@ test("a rating star rendered through #render keeps its radios inside it", () => 
       setup: () => () =>
         h(Rating, null, () =>
           h(RatingItem, null, {
-            render: ({ props, children }: RenderScope) => h("span", { ...props, class: "star" }, h(children)),
-          }),
+            render: ({ props, children }: RenderScope) =>
+              h("span", { ...props, class: "star" }, h(children)),
+          })
         ),
-    }),
+    })
   )
   const radios = [...el.querySelectorAll('[role="radio"]')]
   expect(radios).toHaveLength(5)

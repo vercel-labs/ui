@@ -1,4 +1,8 @@
-import { menubar as menubarPrimitive, type MenubarOptions, type MenubarState } from "@ui-sdk/core/menubar"
+import {
+  menubar as menubarPrimitive,
+  type MenubarOptions,
+  type MenubarState,
+} from "@ui-sdk/core/menubar"
 import { omit } from "solid-js"
 import { MenubarContext } from "./menubar-context"
 import { usePart, usePrimitive, type PartProps } from "./use-primitive"
@@ -17,8 +21,20 @@ function Menubar(props: MenubarOptions & PartProps<"div", MenubarState>) {
     controller: props.controller,
     debug: props.debug,
   }))
-  const rest = omit(props, "orientation", "loop", "disabled", "modal", "controller", "debug")
-  return <MenubarContext value={menubar}>{usePart(menubar, "root", undefined, rest, "div")}</MenubarContext>
+  const rest = omit(
+    props,
+    "orientation",
+    "loop",
+    "disabled",
+    "modal",
+    "controller",
+    "debug"
+  )
+  return (
+    <MenubarContext value={menubar}>
+      {usePart(menubar, "root", undefined, rest, "div")}
+    </MenubarContext>
+  )
 }
 
 export { createMenubarController } from "@ui-sdk/core/menubar"

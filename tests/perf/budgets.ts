@@ -19,7 +19,8 @@ const budgets = {
     notified: 2,
   },
   "menu.hover": {
-    measures: "Work done by moving the pointer across 10 items of an open menu.",
+    measures:
+      "Work done by moving the pointer across 10 items of an open menu.",
     why: "Each hover moves the highlight, like an arrow key, and runs on every pointer move.",
     renders: { plain: 0, watched: 20 },
     counts: { compareDocumentPosition: 0 },
@@ -42,7 +43,8 @@ const budgets = {
     counts: { getAttribute: 20 },
   },
   "menu.idle": {
-    measures: "Layout reads while a menu sits open and nothing moves, over 30 frames.",
+    measures:
+      "Layout reads while a menu sits open and nothing moves, over 30 frames.",
     why: "Positioning checked the anchor and the popup every frame for as long as a popup was open, forcing work on pages that were otherwise idle (H7).",
     // Asleep, positioning still checks every `checkEvery` ms for moves no
     // event reports, like an anchor moved by the Web Animations API. Each
@@ -51,7 +53,8 @@ const budgets = {
     counts: { getBoundingClientRect: 1, offsetWidth: 1, offsetHeight: 1 },
   },
   "menu.scroll": {
-    measures: "Elements restyled per style recalculation while the page scrolls under an open menu.",
+    measures:
+      "Elements restyled per style recalculation while the page scrolls under an open menu.",
     why: "Positioning writes the popup's place and the room it has on every frame it moves. The room was an inherited custom property, so every item inside the popup restyled each frame.",
     // The popup, and the page's scroller.
     restyledPerRecalc: 4,
@@ -66,7 +69,11 @@ const budgets = {
     // Each switch shows a panel, which asks for one frame to draw its
     // starting style. It asked for two until 2026-10-13, so the page was
     // still drawing when the next key came.
-    counts: { compareDocumentPosition: 0, getAttribute: 1000, requestAnimationFrame: 12 },
+    counts: {
+      compareDocumentPosition: 0,
+      getAttribute: 1000,
+      requestAnimationFrame: 12,
+    },
   },
   "accordion.mount": {
     measures:
@@ -83,7 +90,8 @@ const budgets = {
     counts: { compareDocumentPosition: 0, getAttribute: 20 },
   },
   "tree.mount": {
-    measures: "Sorts of a long tree's items into document order when it mounts.",
+    measures:
+      "Sorts of a long tree's items into document order when it mounts.",
     why: "Positions come from each parent's items in document order. Putting every item in order again as each one mounted made mounting a long tree quadratic.",
     // Each parent's items are put in order once, after they mount, and the
     // roving group puts every item in order once for the arrow keys.
@@ -150,7 +158,8 @@ const budgets = {
     subscriptions: 0,
   },
   "rows.mount": {
-    measures: "Renders and elements per row when rows mount, each with a closed menu, select and tooltip.",
+    measures:
+      "Renders and elements per row when rows mount, each with a closed menu, select and tooltip.",
     why: "A table with a menu, a select and a tooltip in every row pays for every closed popup when it mounts. A closed menu renders none of its items. A closed select renders all its options, by design: its trigger shows the selected label, and the server HTML needs the options for it. So a row costs one more element and one more render for each option its select has, and nothing else in it grows with the options. Rendering the options only on first open is a separate decision, so this budget records today's cost.",
     // Per row: each of the three triggers renders once, the select's value
     // twice (again once its options give it the label), and the tooltip's
@@ -163,7 +172,8 @@ const budgets = {
     elements: { react: 8, vue: 8, web: 17, svelte: 8, solid: 8, perOption: 1 },
   },
   "rows.labels": {
-    measures: "Reads of a control's `labels` while rows of closed menus, selects and tooltips mount.",
+    measures:
+      "Reads of a control's `labels` while rows of closed menus, selects and tooltips mount.",
     why: "Chromium answers `labels` by walking the whole document, so a page that reads it once per control mounts in quadratic time: 2,000 rows of web selects took 1,979 ms against React's 603. Core finds labels with the closest `<label>` and `label[for]` instead, and reads none for a control `aria-label` already names.",
     // Every framework, at every row count. Before the fix, web components
     // read a select's ElementInternals.labels twice as it mounted: to name
@@ -171,7 +181,8 @@ const budgets = {
     counts: { labels: 0 },
   },
   "select.arrow-key": {
-    measures: "Work done by 10 ArrowDown presses 50 ms apart in an open select.",
+    measures:
+      "Work done by 10 ArrowDown presses 50 ms apart in an open select.",
     why: "Moving the highlight changes two options. Work that grows with the options makes a long select lag on every key.",
     // Plain options never re-render. Options that read `highlighted`
     // re-render when they gain or lose it: at most two per key. Keeping the
@@ -183,10 +194,15 @@ const budgets = {
     // The keys come 50 ms apart. Each once woke positioning, which asked for
     // three frames to check whether the popup moved, about 30 a run. Nothing
     // inside a popup can move it, so now only the opening's last frames ask.
-    counts: { compareDocumentPosition: 0, getBoundingClientRect: 60, requestAnimationFrame: 8 },
+    counts: {
+      compareDocumentPosition: 0,
+      getBoundingClientRect: 60,
+      requestAnimationFrame: 8,
+    },
   },
   "select.open": {
-    measures: "Renders and attribute reads when a closed select, whose options are already rendered, opens.",
+    measures:
+      "Renders and attribute reads when a closed select, whose options are already rendered, opens.",
     why: "A closed select has rendered its options, and opening changes none of them but the one it highlights. When every option hears the open, each one renders again or reads its attributes back, so a long select pays for its length on every open.",
     // The first option is selected and gains the highlight. It's a plain one.
     renders: { plain: 0, watched: 0 },
@@ -197,7 +213,8 @@ const budgets = {
     counts: { getAttribute: 30 },
   },
   "combobox.arrow-key": {
-    measures: "Work done by 10 ArrowDown presses 50 ms apart in an open combobox.",
+    measures:
+      "Work done by 10 ArrowDown presses 50 ms apart in an open combobox.",
     why: "Moving the highlight changes two options. Work that grows with the options makes a long combobox lag on every key.",
     // As for a select. The input keeps focus, so nothing scrolls into view
     // by focus, and positioning reads 0 to 2 rectangles a run.
@@ -205,7 +222,11 @@ const budgets = {
     // The keys come 50 ms apart. Each once woke positioning, which asked for
     // three frames to check whether the popup moved, about 30 a run. Nothing
     // inside a popup can move it, so now only the opening's last frames ask.
-    counts: { compareDocumentPosition: 0, getBoundingClientRect: 60, requestAnimationFrame: 8 },
+    counts: {
+      compareDocumentPosition: 0,
+      getBoundingClientRect: 60,
+      requestAnimationFrame: 8,
+    },
   },
   "combobox.open": {
     measures: "Renders and attribute reads when a combobox opens its list.",

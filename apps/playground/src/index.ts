@@ -7,17 +7,25 @@ const frameworks = ["react", "vue", "svelte", "web"]
 // ./fixtures/menu/react-data.tsx -> ["menu", "react-data"]. Files that aren't
 // framework entries, like data.ts or shell.ts, are skipped.
 function parseEntry(path: string) {
-  const match = path.match(/^\.\/fixtures\/([^/]+)\/([a-z]+(?:-[a-z]+)?)\.tsx?$/)
-  if (!match) return null
+  const match = path.match(
+    /^\.\/fixtures\/([^/]+)\/([a-z]+(?:-[a-z]+)?)\.tsx?$/
+  )
+  if (!match) {
+    return null
+  }
   const [, fixture, framework] = match
-  return frameworks.includes(framework.split("-")[0]) ? { fixture, framework } : null
+  return frameworks.includes(framework.split("-")[0])
+    ? { fixture, framework }
+    : null
 }
 
 function groupByFixture(paths: string[]) {
   const groups = new Map<string, string[]>()
   for (const path of paths) {
     const entry = parseEntry(path)
-    if (!entry) continue
+    if (!entry) {
+      continue
+    }
     const entries = groups.get(entry.fixture) ?? []
     entries.push(entry.framework)
     groups.set(entry.fixture, entries)
@@ -30,7 +38,9 @@ const variants = ["", "data", "ssr"]
 
 function entriesFor(framework: string, entries: string[]) {
   const rank = (entry: string) => variants.indexOf(entry.split("-")[1] ?? "")
-  return entries.filter((entry) => entry.split("-")[0] === framework).sort((a, b) => rank(a) - rank(b))
+  return entries
+    .filter((entry) => entry.split("-")[0] === framework)
+    .sort((a, b) => rank(a) - rank(b))
 }
 
 function link(fixture: string, framework: string) {
@@ -48,7 +58,9 @@ function row(fixture: string, entries: string[]) {
   tr.append(name)
   for (const framework of frameworks) {
     const cell = document.createElement("td")
-    cell.append(...entriesFor(framework, entries).map((entry) => link(fixture, entry)))
+    cell.append(
+      ...entriesFor(framework, entries).map((entry) => link(fixture, entry))
+    )
     tr.append(cell)
   }
   return tr
@@ -65,7 +77,9 @@ function renderIndex(root: HTMLElement, paths: string[]) {
       <tbody></tbody>
     </table>
   `
-  root.querySelector("tbody")!.append(...groups.map(([fixture, entries]) => row(fixture, entries)))
+  root
+    .querySelector("tbody")!
+    .append(...groups.map(([fixture, entries]) => row(fixture, entries)))
 }
 
 export { renderIndex }

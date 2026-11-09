@@ -116,7 +116,11 @@ A disabled toggle on its own leaves the tab order. In a group, disabled toggles 
 Set `focusable-when-disabled` to keep a disabled toggle focusable. It uses `aria-disabled` and still ignores presses. Use `aria-describedby` to explain why it's unavailable:
 
 ```vue
-<Toggle disabled focusable-when-disabled aria-describedby="pin-hint">Pin</Toggle>
+<Toggle
+  disabled
+  focusable-when-disabled
+  aria-describedby="pin-hint"
+>Pin</Toggle>
 <p id="pin-hint">Only owners can pin messages.</p>
 ```
 
@@ -152,7 +156,11 @@ Bind `v-model:value`, or pass `value` and update it in `@value-change`, to own t
 
 ```vue
 <script setup lang="ts">
-import { createToggleGroupController, Toggle, ToggleGroup } from "@ui-sdk/vue/toggle"
+import {
+  createToggleGroupController,
+  Toggle,
+  ToggleGroup,
+} from "@ui-sdk/vue/toggle"
 import { ref } from "vue"
 
 const formats = ref(["bold"])
@@ -160,7 +168,12 @@ const editor = createToggleGroupController()
 </script>
 
 <template>
-  <ToggleGroup v-model:value="formats" multiple aria-label="Text formatting" :controller="editor">
+  <ToggleGroup
+    v-model:value="formats"
+    multiple
+    aria-label="Text formatting"
+    :controller="editor"
+  >
     <Toggle value="bold">Bold</Toggle>
     <Toggle value="italic">Italic</Toggle>
   </ToggleGroup>
@@ -229,35 +242,56 @@ Props are the same as below, and callbacks are events.
 
 ### Toggle
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleOptions"
+/>
 
 ### ToggleIcon
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconProps" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconProps"
+/>
 
 ### ToggleGroup
 
-<TypeTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupOptions"
+/>
 
 ### State
 
 What render slots and the default slot receive.
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleState"
+/>
 
 In a group, a toggle's `disabled` includes the group's. The group:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle-group.ts" name="ToggleGroupState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle-group.ts"
+  name="ToggleGroupState"
+/>
 
 `ToggleIcon`:
 
-<StateTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleIconState" />
+<StateTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleIconState"
+/>
 
 ### Reasons
 
 `details.reason` says why the toggle was pressed or unpressed.
 
-<ReasonTable path="../../packages/core/src/components/toggle/toggle.ts" name="TogglePressedChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="TogglePressedChangeReason"
+/>
 
 For a group, it says why the pressed toggles changed.
 
@@ -272,7 +306,10 @@ Create one with `createToggleController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/toggle/toggle.ts" name="ToggleController" />
+<ControllerTable
+  path="../../packages/core/src/components/toggle/toggle.ts"
+  name="ToggleController"
+/>
 
 ### ToggleGroup Controller
 

@@ -2,7 +2,11 @@ import { readdirSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 import { describe, expect, test } from "vitest"
 import { sheetPhysics } from "../../src/foundation/motion/physics"
-import { compareTrajectories, replayGolden, type GoldenTrajectory } from "./replay"
+import {
+  compareTrajectories,
+  replayGolden,
+  type GoldenTrajectory,
+} from "./replay"
 
 // 24 gestures on iOS 26.5 system sheets, recorded frame by frame in the
 // simulator. UIKit's median
@@ -35,12 +39,14 @@ describe("golden replay against UIKit", () => {
       results
         .filter((result) => !result.isSameOutcome)
         .map((r) => r.name)
-        .join(", "),
+        .join(", ")
     ).toBeGreaterThanOrEqual(22)
   })
 
   test("the median path error is under 15px", () => {
-    const errors = results.map((result) => result.rmsError).sort((a, b) => a - b)
+    const errors = results
+      .map((result) => result.rmsError)
+      .sort((a, b) => a - b)
     expect(errors[Math.floor(errors.length / 2)]).toBeLessThan(15)
   })
 })

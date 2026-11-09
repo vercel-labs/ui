@@ -1,7 +1,11 @@
 <script lang="ts">
   import { EyeIcon, EyeOffIcon, LockIcon } from "@lucide/svelte"
   import { Field, FieldLabel } from "@ui-sdk/svelte/field"
-  import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/svelte/password-input"
+  import {
+    PasswordInput,
+    PasswordInputControl,
+    PasswordInputToggle,
+  } from "@ui-sdk/svelte/password-input"
 </script>
 
 <Field name="password">
@@ -9,7 +13,9 @@
   <PasswordInput>
     {#snippet children(state)}
       <PasswordInputControl />
-      <span>{#if state.capsLock}<LockIcon aria-hidden="true" />{/if}</span>
+      <span
+        >{#if state.capsLock}<LockIcon aria-hidden="true" />{/if}</span
+      >
       <PasswordInputToggle aria-label="Show password">
         {#snippet children(toggle)}
           {#if toggle.visible}

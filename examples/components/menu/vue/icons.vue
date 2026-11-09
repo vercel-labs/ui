@@ -1,6 +1,20 @@
 <script setup lang="ts">
-import { CodeIcon, DownloadIcon, LinkIcon, MailIcon, ReplyIcon, ShareIcon } from "@lucide/vue"
-import { Menu, MenuContent, MenuItem, MenuItemIcon, MenuSeparator, MenuTrigger } from "@ui-sdk/vue/menu"
+import {
+  CodeIcon,
+  DownloadIcon,
+  LinkIcon,
+  MailIcon,
+  ReplyIcon,
+  ShareIcon,
+} from "@lucide/vue"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuItemIcon,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/vue/menu"
 import { useLog } from "../../../shared/vue/log"
 
 const log = useLog()

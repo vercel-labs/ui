@@ -27,14 +27,18 @@ describe("locale tags", () => {
 
   test("a page with a POSIX lang formats numbers without throwing", () => {
     const lang = vi.fn(() => "en_US")
-    vi.stubGlobal("document", { documentElement: { closest: () => ({ getAttribute: lang }) } })
+    vi.stubGlobal("document", {
+      documentElement: { closest: () => ({ getAttribute: lang }) },
+    })
     vi.stubGlobal("navigator", { language: "en-US@posix" })
     expect(pageLocale()).toBe("en-US")
     expect(new Intl.NumberFormat(pageLocale()).format(1234)).toBe("1,234")
   })
 
   test("falls back to the user's language when the page's is unusable", () => {
-    vi.stubGlobal("document", { documentElement: { closest: () => ({ getAttribute: () => "??" }) } })
+    vi.stubGlobal("document", {
+      documentElement: { closest: () => ({ getAttribute: () => "??" }) },
+    })
     vi.stubGlobal("navigator", { languages: ["fr_FR"], language: "fr" })
     expect(pageLocale()).toBe("fr-FR")
     expect(userLocale()).toBe("fr-FR")

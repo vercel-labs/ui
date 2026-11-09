@@ -18,10 +18,14 @@ const muteButton = definePrimitive({
   name: "mute-button",
   options: { muted: "boolean", onMutedChange: "callback" },
   controlled: ["muted"],
-  state: (options: { muted?: boolean; onMutedChange?: (muted: boolean) => void }) => ({
+  state: (options: {
+    muted?: boolean
+    onMutedChange?: (muted: boolean) => void
+  }) => ({
     muted: options.muted ?? false,
   }),
-  sync: (options) => (options.muted === undefined ? {} : { muted: options.muted }),
+  sync: (options) =>
+    options.muted === undefined ? {} : { muted: options.muted },
   api: (context) => {
     const change = createChange(context)
 
@@ -66,7 +70,11 @@ function Example() {
 
   return (
     <MuteButton muted={muted} onMutedChange={setMuted}>
-      {muted ? <VolumeXIcon aria-hidden="true" /> : <Volume2Icon aria-hidden="true" />}
+      {muted ? (
+        <VolumeXIcon aria-hidden="true" />
+      ) : (
+        <Volume2Icon aria-hidden="true" />
+      )}
       {muted ? "Unmute" : "Mute"}
     </MuteButton>
   )
@@ -100,7 +108,11 @@ const muted = ref(false)
       stroke-linejoin="round"
     >
       <path d="m11 5-6 4H2v6h3l6 4z" />
-      <path :d="muted ? 'm16 9 6 6m0-6-6 6' : 'M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12'" />
+      <path
+        :d="
+          muted ? 'm16 9 6 6m0-6-6 6' : 'M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12'
+        "
+      />
     </svg>
     {{ muted ? "Unmute" : "Mute" }}
   </MuteButton>
@@ -132,7 +144,9 @@ const muted = ref(false)
     stroke-linejoin="round"
   >
     <path d="m11 5-6 4H2v6h3l6 4z" />
-    <path d={muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"} />
+    <path
+      d={muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"}
+    />
   </svg>
   {muted ? "Unmute" : "Mute"}
 </MuteButton>
@@ -164,7 +178,13 @@ function Example() {
         stroke-linejoin="round"
       >
         <path d="m11 5-6 4H2v6h3l6 4z" />
-        <path d={muted() ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"} />
+        <path
+          d={
+            muted()
+              ? "m16 9 6 6m0-6-6 6"
+              : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"
+          }
+        />
       </svg>
       {muted() ? "Unmute" : "Mute"}
     </MuteButton>
@@ -215,7 +235,10 @@ if (button && icon && label) {
   button.addEventListener("mutedchange", (event) => {
     muted = (event as CustomEvent<{ value: boolean }>).detail.value
     button.setAttribute("muted", String(muted))
-    icon.setAttribute("d", muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12")
+    icon.setAttribute(
+      "d",
+      muted ? "m16 9 6 6m0-6-6 6" : "M16 9a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"
+    )
     label.textContent = muted ? "Unmute" : "Mute"
   })
 }
@@ -294,7 +317,10 @@ Declare the reasons your callback can receive:
 
 ```ts
 type NoticeOptions = {
-  onOpenChange?: (open: boolean, details: ChangeDetails<"close-press" | "escape-key">) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<"close-press" | "escape-key">
+  ) => void
 }
 ```
 

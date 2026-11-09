@@ -1,6 +1,10 @@
 import "@ui-sdk/web/avatar"
 import type { AvatarEvents } from "@ui-sdk/web"
-import { avatarAction, avatarFixture, type AvatarFixtureItem } from "tests/fixtures/avatar.ts"
+import {
+  avatarAction,
+  avatarFixture,
+  type AvatarFixtureItem,
+} from "tests/fixtures/avatar.ts"
 
 function avatar(item: AvatarFixtureItem, id = "") {
   const attributes = [
@@ -36,15 +40,20 @@ function mount(root: HTMLElement) {
   holder.addEventListener(
     "loadingstatuschange",
     (event) => {
-      const { value, reason } = (event as AvatarEvents["loadingstatuschange"]).detail
+      const { value, reason } = (event as AvatarEvents["loadingstatuschange"])
+        .detail
       status.textContent = avatarAction(value, reason)
     },
-    { capture: true },
+    { capture: true }
   )
   root
     .querySelector("#change")!
-    .addEventListener("click", () => holder.querySelector("img")?.setAttribute("src", avatarFixture.nextSrc))
-  root.querySelector("#remove")!.addEventListener("click", () => holder.querySelector("img")?.remove())
+    .addEventListener("click", () =>
+      holder.querySelector("img")?.setAttribute("src", avatarFixture.nextSrc)
+    )
+  root
+    .querySelector("#remove")!
+    .addEventListener("click", () => holder.querySelector("img")?.remove())
   root.querySelector("#remount")!.addEventListener("click", () => {
     const src = holder.querySelector("img")?.getAttribute("src") ?? undefined
     holder.innerHTML = avatar({ ...first, src })

@@ -27,20 +27,34 @@ import {
 import { onItemsChange } from "tests/fixtures/items.ts"
 import { serializeForm } from "tests/fixtures/select.ts"
 
-type Item = { value: string; label: string; keywords?: string[]; disabled?: boolean }
+type Item = {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+}
 
 // The list's data, rendered like the composed list: items, and groups with their labels.
 function DataItems(props: { items: ListData; highlight: boolean }) {
   return (
     <For each={props.items}>
       {(entry) => {
-        if (typeof entry === "string")
-          return <DataItem value={entry} label={entry} highlight={props.highlight} />
-        if ("value" in entry) return <DataItem {...entry} highlight={props.highlight} />
-        if (entry.type === "separator") return <AutocompleteSeparator />
+        if (typeof entry === "string") {
+          return (
+            <DataItem value={entry} label={entry} highlight={props.highlight} />
+          )
+        }
+        if ("value" in entry) {
+          return <DataItem {...entry} highlight={props.highlight} />
+        }
+        if (entry.type === "separator") {
+          return <AutocompleteSeparator />
+        }
         return (
           <AutocompleteGroup>
-            <AutocompleteGroupLabel class="label">{entry.label}</AutocompleteGroupLabel>
+            <AutocompleteGroupLabel class="label">
+              {entry.label}
+            </AutocompleteGroupLabel>
             <DataItems items={entry.items} highlight={props.highlight} />
           </AutocompleteGroup>
         )
@@ -66,8 +80,17 @@ function DataItem(props: Item & { highlight: boolean }) {
 }
 
 function Fixture(props: { data?: boolean }) {
-  const { fieldset, grouped, async, late, container, highlight, recent, nostatus, ...options } =
-    autocompleteOptions()
+  const {
+    fieldset,
+    grouped,
+    async,
+    late,
+    container,
+    highlight,
+    recent,
+    nostatus,
+    ...options
+  } = autocompleteOptions()
   const [action, setAction] = createSignal("")
   const [submitted, setSubmitted] = createSignal("")
   const remote = useAsyncOptions(searchFruits, { immediate: async })
@@ -81,27 +104,35 @@ function Fixture(props: { data?: boolean }) {
       onItemsChange(changedItems, (items) => {
         setList(items)
         setArrived(true)
-      }),
+      })
   )
   const data = () => props.data || async || recent
   const items = () =>
     async
       ? remote.items
       : grouped
-        ? f.groups.map((group) => ({ type: "group" as const, label: group.label, items: group.items }))
+        ? f.groups.map((group) => ({
+            type: "group" as const,
+            label: group.label,
+            items: group.items,
+          }))
         : list()
   const control = () => (
     <Autocomplete
       {...options}
       name={f.name}
       container={container}
-      items={late ? (arrived() ? items() : undefined) : data() ? items() : undefined}
+      items={
+        late ? (arrived() ? items() : undefined) : data() ? items() : undefined
+      }
       emptyItems={recent ? f.recent : undefined}
       filter={async ? false : undefined}
       status={async ? remote.status : undefined}
       onValueChange={(value, details) => {
         setAction(`value:${value}:${details.reason}`)
-        if (async) remote.setQuery(value)
+        if (async) {
+          remote.setQuery(value)
+        }
       }}
       onSubmit={(value) => setAction(`submit:${value}`)}
     >
@@ -109,7 +140,10 @@ function Fixture(props: { data?: boolean }) {
       <AutocompleteInput class="input" />
       <AutocompleteTrigger aria-label={f.trigger}>▾</AutocompleteTrigger>
       <AutocompleteClear>{f.clear}</AutocompleteClear>
-      <Show when={!late} fallback={<AutocompleteContent class="popup list-popup" />}>
+      <Show
+        when={!late}
+        fallback={<AutocompleteContent class="popup list-popup" />}
+      >
         <AutocompleteContent class="popup list-popup">
           <Show when={!nostatus}>
             <AutocompleteStatus class="status">
@@ -135,7 +169,9 @@ function Fixture(props: { data?: boolean }) {
                           disabled={item().disabled}
                         >
                           <Show when={highlight} fallback={item().label}>
-                            <AutocompleteItemText>{item().label}</AutocompleteItemText>
+                            <AutocompleteItemText>
+                              {item().label}
+                            </AutocompleteItemText>
                           </Show>
                         </AutocompleteItem>
                       )}
@@ -145,10 +181,16 @@ function Fixture(props: { data?: boolean }) {
                   <For each={f.groups}>
                     {(group) => (
                       <AutocompleteGroup>
-                        <AutocompleteGroupLabel class="label">{group.label}</AutocompleteGroupLabel>
+                        <AutocompleteGroupLabel class="label">
+                          {group.label}
+                        </AutocompleteGroupLabel>
                         <For each={group.items}>
                           {(item) => (
-                            <AutocompleteItem class="item" value={item.value} label={item.label}>
+                            <AutocompleteItem
+                              class="item"
+                              value={item.value}
+                              label={item.label}
+                            >
                               {item.label}
                             </AutocompleteItem>
                           )}
@@ -161,7 +203,12 @@ function Fixture(props: { data?: boolean }) {
             }
           >
             <AutocompleteList>
-              {(state) => <DataItems items={state.items as ListData} highlight={highlight} />}
+              {(state) => (
+                <DataItems
+                  items={state.items as ListData}
+                  highlight={highlight}
+                />
+              )}
             </AutocompleteList>
           </Show>
         </AutocompleteContent>

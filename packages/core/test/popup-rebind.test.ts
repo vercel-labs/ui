@@ -4,13 +4,19 @@
 // React's StrictMode binds it twice.
 import { afterEach, expect, test } from "vitest"
 import { createStore } from "../src/foundation/kernel/store"
-import { createPopupLayer, modalTriple, type Modal } from "../src/foundation/popups/popup"
+import {
+  createPopupLayer,
+  modalTriple,
+  type Modal,
+} from "../src/foundation/popups/popup"
 
 Element.prototype.getAnimations ??= () => []
 // No top layer here, and the DOM's own styles would keep the popup hidden,
 // where nothing inside can take focus.
 document.head.append(
-  Object.assign(document.createElement("style"), { textContent: "[popover] { display: block !important }" }),
+  Object.assign(document.createElement("style"), {
+    textContent: "[popover] { display: block !important }",
+  })
 )
 // jsdom keeps `inert` as a plain property, where a browser reflects it to the
 // attribute that tells what a modal made unusable.

@@ -9,7 +9,9 @@ describe("server rendering a scroll area", () => {
   test("the viewport scrolls and hides native scrollbars already, so they never flash", () => {
     const body = html()
     expect(typeof window).toBe("undefined")
-    expect(body).toMatch(/data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none;?"/)
+    expect(body).toMatch(
+      /data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none;?"/
+    )
   })
 
   test("the scrollbar is hidden from screen readers, and from view until the content is measured", () => {

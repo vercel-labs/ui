@@ -4,7 +4,8 @@ import { describe, expect, test } from "vitest"
 import { createSSRApp, h } from "vue"
 import { Resizable, ResizableHandle, ResizablePanel } from "../src"
 
-const render = (node: () => unknown) => renderToString(createSSRApp(() => node()))
+const render = (node: () => unknown) =>
+  renderToString(createSSRApp(() => node()))
 
 // Runs with no DOM: any access to window, document or storage during render throws.
 describe("server rendering a resizable group", () => {
@@ -14,7 +15,7 @@ describe("server rendering a resizable group", () => {
         h(ResizablePanel, { id: "code", defaultSize: 70 }),
         h(ResizableHandle, { "aria-label": "Resize terminal" }),
         h(ResizablePanel, { id: "terminal" }),
-      ]),
+      ])
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain("flex:0 1 var(--resizable-panel-size, 70%)")

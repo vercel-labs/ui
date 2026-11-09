@@ -43,7 +43,10 @@ type AreaOptions<State extends object> = {
    * Asks for a new value and returns whether it went through. Pass the
    * primitive's change: `set: (value, details) => change("value", value, details)`.
    */
-  set: (value: AreaValue, details: { reason: AreaReason; event?: Event }) => boolean
+  set: (
+    value: AreaValue,
+    details: { reason: AreaReason; event?: Event }
+  ) => boolean
   /** The x axis, left to right. @defaultValue `{ min: 0, max: 1, step: 0.01 }` */
   x?: () => AreaAxis
   /** The y axis, bottom to top, like a chart: a higher value sits higher. @defaultValue `{ min: 0, max: 1, step: 0.01 }` */
@@ -51,7 +54,10 @@ type AreaOptions<State extends object> = {
   /** The text screen readers hear for the value. Defaults to each axis's label and percentage. */
   valueText?: (value: AreaValue) => string
   /** Runs when a press or a drag ends, or a key changed the value, with the value it ended on, like Slider's `onValueCommit`. */
-  onCommit?: (value: AreaValue, details: { reason: AreaReason; event?: Event }) => void
+  onCommit?: (
+    value: AreaValue,
+    details: { reason: AreaReason; event?: Event }
+  ) => void
   /** Whether it can't change. */
   disabled?: () => boolean
 }
@@ -81,7 +87,7 @@ const axisOf = (axis: AreaAxis | undefined) => ({
  */
 function createArea<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy">,
-  options: AreaOptions<State>,
+  options: AreaOptions<State>
 ) {
   const { store } = context
   const x = () => axisOf(options.x?.())
@@ -92,10 +98,15 @@ function createArea<State extends object>(
   const fraction = (n: number, axis: ReturnType<typeof axisOf>) =>
     axis.max === axis.min ? 0 : (n - axis.min) / (axis.max - axis.min)
 
-  function set(next: AreaValue, details: { reason: AreaReason; event?: Event }) {
+  function set(
+    next: AreaValue,
+    details: { reason: AreaReason; event?: Event }
+  ) {
     const snapped = { x: snapToStep(next.x, x()), y: snapToStep(next.y, y()) }
     const current = value()
-    if (snapped.x === current.x && snapped.y === current.y) return false
+    if (snapped.x === current.x && snapped.y === current.y) {
+      return false
+    }
     return options.set(snapped, details)
   }
 
@@ -103,7 +114,9 @@ function createArea<State extends object>(
   function at(el: HTMLElement, clientX: number, clientY: number) {
     const rect = el.getBoundingClientRect()
     let fx = rect.width ? (clientX - rect.left) / rect.width : 0
-    if (isRTL(el)) fx = 1 - fx
+    if (isRTL(el)) {
+      fx = 1 - fx
+    }
     const fy = rect.height ? 1 - (clientY - rect.top) / rect.height : 0
     const ax = x()
     const ay = y()
@@ -118,24 +131,40 @@ function createArea<State extends object>(
     set: (next: AreaValue) => set(next, { reason: "imperative" }),
     /** Jumps the thumb under the pointer and follows it until it lifts. Call from the surface's `pointerdown`. */
     pointerdown(event: PointerEvent, el: HTMLElement) {
-      if (!drags.accepts(event) || options.disabled?.()) return
+      if (!drags.accepts(event) || options.disabled?.()) {
+        return
+      }
       event.preventDefault()
-      set(at(el, event.clientX, event.clientY), { reason: "track-press", event })
+      set(at(el, event.clientX, event.clientY), {
+        reason: "track-press",
+        event,
+      })
       // Focus goes to the thumb, so the keyboard picks up where the pointer left off.
       const thumb = el.querySelector<HTMLElement>("[data-area-thumb]")
       thumb?.focus({ preventScroll: true })
       // The commit names what changed the value last, as a slider's does.
       let reason: "track-press" | "drag" = "track-press"
       // Disabling it mid-drag ends the drag, like a slider's.
-      const unsubscribe = store.subscribe(() => options.disabled?.() && drags.cancel())
+      const unsubscribe = store.subscribe(
+        () => options.disabled?.() && drags.cancel()
+      )
       drags.start(el, event, {
         onMove: (sample) => {
-          if (set(at(el, sample.x, sample.y), { reason: "drag", event: sample.event })) reason = "drag"
+          if (
+            set(at(el, sample.x, sample.y), {
+              reason: "drag",
+              event: sample.event,
+            })
+          ) {
+            reason = "drag"
+          }
         },
         // A teardown cut the drag short, so nobody ended it to commit.
         onEnd: (end) => {
           unsubscribe()
-          if (!isDestroying()) options.onCommit?.(value(), { reason, event: end })
+          if (!isDestroying()) {
+            options.onCommit?.(value(), { reason, event: end })
+          }
         },
       })
     },
@@ -145,8 +174,15 @@ function createArea<State extends object>(
      * range; Home and End go to x's ends.
      */
     keydown(event: KeyboardEvent) {
-      if (event.defaultPrevented || options.disabled?.() || event.altKey || event.ctrlKey || event.metaKey)
+      if (
+        event.defaultPrevented ||
+        options.disabled?.() ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey
+      ) {
         return false
+      }
       const ax = x()
       const ay = y()
       const current = value()
@@ -156,15 +192,30 @@ function createArea<State extends object>(
       if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
         const sign = (event.key === "ArrowRight" ? 1 : -1) * (rtl ? -1 : 1)
         next = { ...current, x: current.x + sign * ax.step * times }
-      } else if (event.key === "ArrowUp" || event.key === "ArrowDown")
-        next = { ...current, y: current.y + (event.key === "ArrowUp" ? 1 : -1) * ay.step * times }
-      else if (event.key === "PageUp" || event.key === "PageDown")
-        next = { ...current, y: current.y + ((event.key === "PageUp" ? 1 : -1) * (ay.max - ay.min)) / 10 }
-      else if (event.key === "Home") next = { ...current, x: ax.min }
-      else if (event.key === "End") next = { ...current, x: ax.max }
-      if (!next) return false
+      } else if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        next = {
+          ...current,
+          y: current.y + (event.key === "ArrowUp" ? 1 : -1) * ay.step * times,
+        }
+      } else if (event.key === "PageUp" || event.key === "PageDown") {
+        next = {
+          ...current,
+          y:
+            current.y +
+            ((event.key === "PageUp" ? 1 : -1) * (ay.max - ay.min)) / 10,
+        }
+      } else if (event.key === "Home") {
+        next = { ...current, x: ax.min }
+      } else if (event.key === "End") {
+        next = { ...current, x: ax.max }
+      }
+      if (!next) {
+        return false
+      }
       event.preventDefault()
-      if (set(next, { reason: "step-key", event })) options.onCommit?.(value(), { reason: "step-key", event })
+      if (set(next, { reason: "step-key", event })) {
+        options.onCommit?.(value(), { reason: "step-key", event })
+      }
       return true
     },
     /** Where the value sits, from 0 to 1 on each axis, with y from the bottom. */
@@ -210,4 +261,11 @@ function createArea<State extends object>(
  */
 type Area = ReturnType<typeof createArea>
 
-export { type Area, type AreaAxis, type AreaOptions, type AreaReason, type AreaValue, createArea }
+export {
+  type Area,
+  type AreaAxis,
+  type AreaOptions,
+  type AreaReason,
+  type AreaValue,
+  createArea,
+}

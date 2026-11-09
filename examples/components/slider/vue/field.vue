@@ -12,7 +12,13 @@ import {
 
 <template>
   <Field>
-    <Slider :default-value="0.3" :format="{ style: 'percent' }" :min="0" :max="1" :step="0.01">
+    <Slider
+      :default-value="0.3"
+      :format="{ style: 'percent' }"
+      :min="0"
+      :max="1"
+      :step="0.01"
+    >
       <div data-slot="row">
         <FieldLabel>Volume</FieldLabel>
         <SliderValue />

@@ -19,12 +19,22 @@ function phone(layoutHeight = 800) {
     offsetLeft: 0,
     scale: 1,
   }) as FakeViewport
-  Object.defineProperty(window, "visualViewport", { value: visual, configurable: true })
-  Object.defineProperty(window, "innerHeight", { value: layoutHeight, configurable: true })
+  Object.defineProperty(window, "visualViewport", {
+    value: visual,
+    configurable: true,
+  })
+  Object.defineProperty(window, "innerHeight", {
+    value: layoutHeight,
+    configurable: true,
+  })
   const move = (next: Partial<FakeViewport> & { layoutHeight?: number }) => {
     const { layoutHeight: layout, ...rest } = next
-    if (layout !== undefined)
-      Object.defineProperty(window, "innerHeight", { value: layout, configurable: true })
+    if (layout !== undefined) {
+      Object.defineProperty(window, "innerHeight", {
+        value: layout,
+        configurable: true,
+      })
+    }
     Object.assign(visual, rest)
     visual.dispatchEvent(new Event("resize"))
   }
@@ -41,14 +51,25 @@ function type() {
 
 function box(el: HTMLElement, top: number, bottom: number) {
   el.getBoundingClientRect = () =>
-    ({ top, bottom, left: 0, right: 400, width: 400, height: bottom - top }) as DOMRect
+    ({
+      top,
+      bottom,
+      left: 0,
+      right: 400,
+      width: 400,
+      height: bottom - top,
+    }) as DOMRect
 }
 
 // Focus moving between buttons, which open no keyboard.
 function tabThroughButtons(count: number) {
-  const buttons = Array.from({ length: count }, () => document.createElement("button"))
+  const buttons = Array.from({ length: count }, () =>
+    document.createElement("button")
+  )
   document.body.append(...buttons)
-  for (const button of buttons) button.focus()
+  for (const button of buttons) {
+    button.focus()
+  }
 }
 
 // Each measurement of the visual viewport reads its height once.
@@ -71,7 +92,9 @@ function countHeightReads(visual: FakeViewport) {
 const cleanups: (() => void)[] = []
 
 afterEach(() => {
-  for (const cleanup of cleanups.splice(0)) cleanup()
+  for (const cleanup of cleanups.splice(0)) {
+    cleanup()
+  }
   vi.restoreAllMocks()
   document.body.replaceChildren()
 })
@@ -101,7 +124,9 @@ describe("bindViewport", () => {
       offsetTop: 100,
     })
     expect(root.style.getPropertyValue("--keyboard-inset")).toBe("300px")
-    expect(root.style.getPropertyValue("--visual-viewport-height")).toBe("400px")
+    expect(root.style.getPropertyValue("--visual-viewport-height")).toBe(
+      "400px"
+    )
     expect(root.style.getPropertyValue("--visual-viewport-top")).toBe("100px")
     expect(root.hasAttribute("data-keyboard")).toBe(true)
     const calls = onChange.mock.calls.length
@@ -124,14 +149,20 @@ describe("bindViewport", () => {
     const field = type()
     // Zoomed to 115%: 300 points of keyboard leave 500 on screen, so it takes 261 of the page's pixels.
     move({ width: 400 / 1.15, height: 500 / 1.15, scale: 1.15 })
-    expect(onChange.mock.lastCall?.[0]).toMatchObject({ keyboard: 261, keyboardInset: 261 })
+    expect(onChange.mock.lastCall?.[0]).toMatchObject({
+      keyboard: 261,
+      keyboardInset: 261,
+    })
     field.blur()
     move({ width: 400, height: 800, scale: 1 })
     expect(onChange.mock.lastCall?.[0]).toMatchObject({ keyboard: 0 })
     // The layout viewport shrinks along with the keyboard, so nothing of it is covered.
     type()
     move({ height: 500, layoutHeight: 500 })
-    expect(onChange.mock.lastCall?.[0]).toMatchObject({ keyboard: 300, keyboardInset: 0 })
+    expect(onChange.mock.lastCall?.[0]).toMatchObject({
+      keyboard: 300,
+      keyboardInset: 0,
+    })
   })
 
   test("keeps the keyboard while focus goes from one field to the next, and measures again once it closes", () => {
@@ -166,7 +197,9 @@ describe("bindViewport", () => {
     // The field blurs, and before the keyboard closes another binding mounts.
     field.blur()
     const later = vi.fn()
-    cleanups.push(bindViewport(document.createElement("div"), { onChange: later }))
+    cleanups.push(
+      bindViewport(document.createElement("div"), { onChange: later })
+    )
     type()
     expect(onChange.mock.lastCall?.[0].keyboard).toBe(300)
     expect(later.mock.lastCall?.[0].keyboard).toBe(300)
@@ -193,7 +226,10 @@ describe("bindViewport", () => {
     host.attachShadow({ mode: "open" }).append(field)
     field.focus()
     move({ height: 500 })
-    expect(onChange.mock.lastCall?.[0]).toMatchObject({ keyboard: 300, keyboardInset: 300 })
+    expect(onChange.mock.lastCall?.[0]).toMatchObject({
+      keyboard: 300,
+      keyboardInset: 300,
+    })
   })
 
   test("reads the safe areas from env() through a hidden element", () => {
@@ -202,14 +238,28 @@ describe("bindViewport", () => {
     vi.spyOn(window, "getComputedStyle").mockImplementation((el) => {
       const style = real(el)
       // jsdom drops env() from the probe's style, so it's found by what it is.
-      if (el.getAttribute("aria-hidden") !== "true" || (el as HTMLElement).style.position !== "fixed")
+      if (
+        el.getAttribute("aria-hidden") !== "true" ||
+        (el as HTMLElement).style.position !== "fixed"
+      ) {
         return style
-      const insets: Record<string, string> = { "padding-top": "47px", "padding-bottom": "34px" }
-      return { getPropertyValue: (name: string) => insets[name] ?? "0px" } as CSSStyleDeclaration
+      }
+      const insets: Record<string, string> = {
+        "padding-top": "47px",
+        "padding-bottom": "34px",
+      }
+      return {
+        getPropertyValue: (name: string) => insets[name] ?? "0px",
+      } as CSSStyleDeclaration
     })
     const onChange = vi.fn()
     cleanups.push(bindViewport(document.createElement("div"), { onChange }))
-    expect(onChange.mock.calls[0][0].safeArea).toEqual({ top: 47, right: 0, bottom: 34, left: 0 })
+    expect(onChange.mock.calls[0][0].safeArea).toEqual({
+      top: 47,
+      right: 0,
+      bottom: 34,
+      left: 0,
+    })
   })
 
   test("reads the safe areas again on a resize, not on a focus change", () => {
@@ -232,7 +282,9 @@ describe("bindViewport", () => {
     tabThroughButtons(20)
     expect(writes).not.toHaveBeenCalled()
     expect(onChange).toHaveBeenCalledTimes(1)
-    expect(root.style.getPropertyValue("--visual-viewport-height")).toBe("800px")
+    expect(root.style.getPropertyValue("--visual-viewport-height")).toBe(
+      "800px"
+    )
   })
 })
 
@@ -241,7 +293,10 @@ describe("bindAvoidKeyboard", () => {
     const { move } = phone()
     // A browser shows the inline translate once no transition runs; jsdom doesn't follow it.
     vi.spyOn(window, "getComputedStyle").mockImplementation(
-      (el) => ({ translate: (el as HTMLElement).style.translate || "none" }) as CSSStyleDeclaration,
+      (el) =>
+        ({
+          translate: (el as HTMLElement).style.translate || "none",
+        }) as CSSStyleDeclaration
     )
     const bar = document.createElement("div")
     const composer = document.createElement("div")
@@ -273,7 +328,9 @@ describe("bindAvoidKeyboard", () => {
     expect(bar.hasAttribute("data-keyboard")).toBe(false)
     type()
     move({ height: 500 })
-    for (const stop of stops) stop()
+    for (const stop of stops) {
+      stop()
+    }
     expect(bar.style.translate).toBe("0 2px")
     expect(composer.style.translate).toBe("")
   })
@@ -281,13 +338,27 @@ describe("bindAvoidKeyboard", () => {
   test("measures iOS's boxes, which start at the panned visual viewport, from the layout viewport", () => {
     const { visual, move } = phone()
     vi.spyOn(window, "getComputedStyle").mockImplementation(
-      (el) => ({ translate: (el as HTMLElement).style.translate || "none" }) as CSSStyleDeclaration,
+      (el) =>
+        ({
+          translate: (el as HTMLElement).style.translate || "none",
+        }) as CSSStyleDeclaration
     )
     // iOS reports a fixed element at the top as far above the screen as the page is panned.
-    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(function (this: HTMLElement) {
-      const top = this.hasAttribute("data-viewport-origin") ? -visual.offsetTop : 0
-      return { top, bottom: top, left: 0, right: 0, width: 0, height: 0 } as DOMRect
-    })
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+      function (this: HTMLElement) {
+        const top = this.hasAttribute("data-viewport-origin")
+          ? -visual.offsetTop
+          : 0
+        return {
+          top,
+          bottom: top,
+          left: 0,
+          right: 0,
+          width: 0,
+          height: 0,
+        } as DOMRect
+      }
+    )
     const pill = document.createElement("div")
     // 603 to 630 on the page, which iOS reports 100 higher while panned by 100.
     box(pill, 503, 530)
@@ -302,7 +373,10 @@ describe("bindAvoidKeyboard", () => {
   test("keeps a toolbar's own percentages, like -50% to center it, and lifts its y around them", () => {
     const { move } = phone()
     vi.spyOn(window, "getComputedStyle").mockImplementation(
-      (el) => ({ translate: (el as HTMLElement).style.translate || "none" }) as CSSStyleDeclaration,
+      (el) =>
+        ({
+          translate: (el as HTMLElement).style.translate || "none",
+        }) as CSSStyleDeclaration
     )
     const centered = document.createElement("div")
     const middle = document.createElement("div")
@@ -319,7 +393,9 @@ describe("bindAvoidKeyboard", () => {
     box(middle, 440, 500)
     move({ height: 500 })
     expect(middle.style.translate).toBe("-50% calc(-50% - 300px)")
-    for (const stop of stops) stop()
+    for (const stop of stops) {
+      stop()
+    }
     expect(middle.style.translate).toBe("-50% -50%")
   })
 
@@ -373,7 +449,15 @@ describe("bindAvoidKeyboard", () => {
     const styles = vi.spyOn(window, "getComputedStyle")
     const bar = document.createElement("div")
     const measure = vi.fn(
-      () => ({ top: 740, bottom: 800, left: 0, right: 400, width: 400, height: 60 }) as DOMRect,
+      () =>
+        ({
+          top: 740,
+          bottom: 800,
+          left: 0,
+          right: 400,
+          width: 400,
+          height: 60,
+        }) as DOMRect
     )
     bar.getBoundingClientRect = measure
     cleanups.push(bindAvoidKeyboard(bar))
@@ -385,7 +469,10 @@ describe("bindAvoidKeyboard", () => {
   })
 
   test("does nothing without a visual viewport", () => {
-    Object.defineProperty(window, "visualViewport", { value: undefined, configurable: true })
+    Object.defineProperty(window, "visualViewport", {
+      value: undefined,
+      configurable: true,
+    })
     const el = document.createElement("div")
     bindAvoidKeyboard(el)()
     expect(el.style.translate).toBe("")
@@ -401,7 +488,9 @@ describe("trackKeyboard", () => {
     move({ height: 500 })
     for (const el of [dialog, region]) {
       expect(el.style.getPropertyValue("--keyboard-inset")).toBe("300px")
-      expect(el.style.getPropertyValue("--visual-viewport-height")).toBe("500px")
+      expect(el.style.getPropertyValue("--visual-viewport-height")).toBe(
+        "500px"
+      )
       expect(el.hasAttribute("data-keyboard")).toBe(true)
     }
     stops[0]()
@@ -418,7 +507,7 @@ describe("the shared viewport", () => {
     cleanups.push(
       bindViewport(document.createElement("div")),
       trackKeyboard(document.createElement("div")),
-      trackKeyboard(document.createElement("div")),
+      trackKeyboard(document.createElement("div"))
     )
     const reads = countHeightReads(visual)
     visual.dispatchEvent(new Event("scroll"))
@@ -427,9 +516,14 @@ describe("the shared viewport", () => {
 
   test("stops listening once the last element stops following it", () => {
     const { visual } = phone()
-    const stops = [bindViewport(document.createElement("div")), trackKeyboard(document.createElement("div"))]
+    const stops = [
+      bindViewport(document.createElement("div")),
+      trackKeyboard(document.createElement("div")),
+    ]
     const reads = countHeightReads(visual)
-    for (const stop of stops) stop()
+    for (const stop of stops) {
+      stop()
+    }
     visual.dispatchEvent(new Event("scroll"))
     window.dispatchEvent(new Event("resize"))
     tabThroughButtons(2)

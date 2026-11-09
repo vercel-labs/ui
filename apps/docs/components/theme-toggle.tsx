@@ -23,7 +23,7 @@ function ThemeToggle() {
   const hydrated = React.useSyncExternalStore(
     noSubscribe,
     () => true,
-    () => false,
+    () => false
   )
 
   return (
@@ -32,7 +32,9 @@ function ThemeToggle() {
       value={hydrated ? [value] : []}
       onValueChange={(next, details) => {
         // A pressed toggle stays pressed: there's always a theme.
-        if (!next.length) return
+        if (!next.length) {
+          return
+        }
         colorScheme.set(next[next.length - 1] as ColorSchemeValue, {
           reason: "item-press",
           event: details.event,

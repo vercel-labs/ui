@@ -7,7 +7,8 @@ import { cn } from "cn"
 type Mount = (module: unknown, host: HTMLElement) => () => void
 
 // Imports a compiled example from public/examples, so the docs app never bundles the examples.
-const load = (url: string) => import(/* webpackIgnore: true */ /* turbopackIgnore: true */ url)
+const load = (url: string) =>
+  import(/* webpackIgnore: true */ /* turbopackIgnore: true */ url)
 
 function ExamplePreview({
   name,
@@ -35,7 +36,9 @@ function ExamplePreview({
   React.useEffect(() => {
     const element = host.current
     const add = (event: Event) =>
-      setEntries((list) => [...list, (event as CustomEvent<string>).detail].slice(-50))
+      setEntries((list) =>
+        [...list, (event as CustomEvent<string>).detail].slice(-50)
+      )
     element?.addEventListener("example-log", add)
     return () => element?.removeEventListener("example-log", add)
   }, [])
@@ -54,8 +57,13 @@ function ExamplePreview({
     const element = host.current
     const stay = (event: MouseEvent) => {
       const target = event.target as Element
-      if (element && event.composedPath().includes(element) && target.closest?.('a[href="#"]'))
+      if (
+        element &&
+        event.composedPath().includes(element) &&
+        target.closest?.('a[href="#"]')
+      ) {
         event.preventDefault()
+      }
     }
     document.addEventListener("click", stay)
     return () => document.removeEventListener("click", stay)
@@ -64,7 +72,9 @@ function ExamplePreview({
   React.useEffect(() => {
     setEntries([])
     if (!src || !mount) {
-      console.error(`The ${name} example isn't built. Run \`pnpm --filter examples build\`.`)
+      console.error(
+        `The ${name} example isn't built. Run \`pnpm --filter examples build\`.`
+      )
       return
     }
     let cleanup = () => {}
@@ -72,7 +82,9 @@ function ExamplePreview({
     Promise.all([load(src), load(mount)])
       .then(([module, framework]: [unknown, { mount: Mount }]) => {
         const element = host.current
-        if (cancelled || !element) return
+        if (cancelled || !element) {
+          return
+        }
         // Cleared in the same task the example mounts, so no frame shows an empty preview.
         element.replaceChildren()
         element.inert = false
@@ -81,7 +93,12 @@ function ExamplePreview({
         setLive(true)
       })
       .catch((error) => {
-        if (!cancelled) console.error(`The ${name} example didn't load. Reload after a rebuild.`, error)
+        if (!cancelled) {
+          console.error(
+            `The ${name} example didn't load. Reload after a rebuild.`,
+            error
+          )
+        }
       })
     return () => {
       cancelled = true
@@ -94,7 +111,7 @@ function ExamplePreview({
       data-example={name}
       className={cn(
         "flex min-w-0 flex-1 flex-col items-center justify-center overflow-x-auto px-6 text-foreground sm:px-10",
-        compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12",
+        compact ? "min-h-32 py-6" : tall ? "min-h-64 py-12" : "min-h-56 py-12"
       )}
     >
       <div
@@ -106,7 +123,9 @@ function ExamplePreview({
       />
     </div>
   )
-  if (!log) return preview
+  if (!log) {
+    return preview
+  }
 
   return (
     <div className="flex min-w-0 flex-col">
@@ -124,19 +143,31 @@ function ExampleConsole({ entries }: { entries: string[] }) {
   }, [entries])
 
   return (
-    <section role="group" aria-label="Console" className="border-t border-border/60 text-xs">
-      <div className="border-b border-border/40 px-4 py-1.5 text-muted-foreground">Console</div>
+    <section
+      role="group"
+      aria-label="Console"
+      className="border-t border-border/60 text-xs"
+    >
+      <div className="border-b border-border/40 px-4 py-1.5 text-muted-foreground">
+        Console
+      </div>
       <ol
         ref={list}
         aria-live="polite"
         className="h-[6.5rem] overflow-y-auto px-4 py-1 font-mono leading-5 text-foreground/80"
       >
         {entries.map((entry, index) => (
-          <li key={index} className="flex h-6 items-center border-b border-border/40">
+          <li
+            key={index}
+            className="flex h-6 items-center border-b border-border/40"
+          >
             {entry}
           </li>
         ))}
-        <li aria-hidden className="flex h-6 items-center text-muted-foreground/60">
+        <li
+          aria-hidden
+          className="flex h-6 items-center text-muted-foreground/60"
+        >
           <ChevronRightIcon className="-ms-[5px] size-3.5" />
         </li>
       </ol>

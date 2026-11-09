@@ -2,6 +2,4 @@
   import { Toggle } from "@ui-sdk/svelte/toggle"
 </script>
 
-<Toggle data-variant="outline">
-  Bookmark
-</Toggle>
+<Toggle data-variant="outline">Bookmark</Toggle>

@@ -21,7 +21,10 @@ type KanbanListsChangeReason = TransferReason | "undo" | "redo"
 type KanbanOptions = {
   lists?: TransferLists
   defaultLists?: TransferLists
-  onListsChange?: (lists: TransferLists, details: ChangeDetails<KanbanListsChangeReason>) => void
+  onListsChange?: (
+    lists: TransferLists,
+    details: ChangeDetails<KanbanListsChangeReason>
+  ) => void
   limits?: Record<string, number>
   labels?: Record<string, string>
 }
@@ -58,7 +61,8 @@ const kanban = /* @__PURE__ */ definePrimitive({
     canUndo: false,
     canRedo: false,
   }),
-  sync: (options) => (options.lists === undefined ? {} : { lists: options.lists }),
+  sync: (options) =>
+    options.lists === undefined ? {} : { lists: options.lists },
   api: (context) => {
     const { store } = context
     const change = createChange(context)
@@ -68,13 +72,16 @@ const kanban = /* @__PURE__ */ definePrimitive({
       key: "focused",
       move: spatialMove(),
     })
-    const syncHistory = () => store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
+    const syncHistory = () =>
+      store.set({ canUndo: history.canUndo(), canRedo: history.canRedo() })
     const limit = (list: string) => context.options().limits?.[list]
     const transfer = createTransfer<KanbanState>(context, {
       key: "lists",
       draft: "moving",
       set: (value, details) => {
-        if (!change("lists", value, details)) return false
+        if (!change("lists", value, details)) {
+          return false
+        }
         history.record(value)
         syncHistory()
         return true
@@ -86,8 +93,14 @@ const kanban = /* @__PURE__ */ definePrimitive({
       },
       listLabel: (list) => context.options().labels?.[list],
     })
-    const travel = (lists: TransferLists | undefined, reason: "undo" | "redo", event?: Event) => {
-      if (lists) change("lists", lists, { reason, event })
+    const travel = (
+      lists: TransferLists | undefined,
+      reason: "undo" | "redo",
+      event?: Event
+    ) => {
+      if (lists) {
+        change("lists", lists, { reason, event })
+      }
       syncHistory()
     }
     const api = {
@@ -97,13 +110,24 @@ const kanban = /* @__PURE__ */ definePrimitive({
       undo: (event?: Event) => travel(history.undo(), "undo", event),
       redo: (event?: Event) => travel(history.redo(), "redo", event),
       cardKeydown(event: KeyboardEvent, el: HTMLElement, key: string) {
-        if (!transfer.keydown(event, key)) roving.keydown(event, el)
+        if (!transfer.keydown(event, key)) {
+          roving.keydown(event, el)
+        }
       },
       rootKeydown(event: KeyboardEvent) {
-        if (store.get().moving) return
-        if (matchesShortcut(event, "mod+z")) api.undo(event)
-        else if (matchesShortcut(event, "mod+shift+z") || matchesShortcut(event, "control+y")) api.redo(event)
-        else return
+        if (store.get().moving) {
+          return
+        }
+        if (matchesShortcut(event, "mod+z")) {
+          api.undo(event)
+        } else if (
+          matchesShortcut(event, "mod+shift+z") ||
+          matchesShortcut(event, "control+y")
+        ) {
+          api.redo(event)
+        } else {
+          return
+        }
         event.preventDefault()
       },
     }
@@ -111,7 +135,10 @@ const kanban = /* @__PURE__ */ definePrimitive({
   },
   slots: (slot) => ({
     root: slot<{}, KanbanRootState>({
-      state: (state, { api }) => ({ lists: api.transfer.lists(state), moving: !!state.moving }),
+      state: (state, { api }) => ({
+        lists: api.transfer.lists(state),
+        moving: !!state.moving,
+      }),
       attrs: (_state, { id }) => ({
         role: "application",
         "aria-roledescription": "board",
@@ -140,13 +167,19 @@ const kanban = /* @__PURE__ */ definePrimitive({
         role: "listitem",
         "aria-roledescription": "card",
         tabindex: part.api.roving.tabIndex(state, part),
-        "data-moving": part.api.transfer.moving(state, part.key) ? "" : undefined,
-        "data-dragging": part.api.transfer.dragging(state, part.key) ? "" : undefined,
+        "data-moving": part.api.transfer.moving(state, part.key)
+          ? ""
+          : undefined,
+        "data-dragging": part.api.transfer.dragging(state, part.key)
+          ? ""
+          : undefined,
         style: css({ "touch-action": "none" }),
       }),
       on: {
-        keydown: (event, { el, api, key }) => el && api.cardKeydown(event, el, key),
-        pointerdown: (event, { api, key }) => api.transfer.pointerdown(event, key),
+        keydown: (event, { el, api, key }) =>
+          el && api.cardKeydown(event, el, key),
+        pointerdown: (event, { api, key }) =>
+          api.transfer.pointerdown(event, key),
       },
       bind: (el, part) => {
         const unbindRoving = part.api.roving.bind(el, part)
@@ -159,15 +192,23 @@ const kanban = /* @__PURE__ */ definePrimitive({
     }),
     undo: slot<{}, KanbanActionState>({
       state: (state) => ({ disabled: !state.canUndo }),
-      attrs: (state) => ({ type: "button", disabled: state.canUndo ? undefined : "" }),
+      attrs: (state) => ({
+        type: "button",
+        disabled: state.canUndo ? undefined : "",
+      }),
       press: ({ api }, event) => api.undo(event),
     }),
     redo: slot<{}, KanbanActionState>({
       state: (state) => ({ disabled: !state.canRedo }),
-      attrs: (state) => ({ type: "button", disabled: state.canRedo ? undefined : "" }),
+      attrs: (state) => ({
+        type: "button",
+        disabled: state.canRedo ? undefined : "",
+      }),
       press: ({ api }, event) => api.redo(event),
     }),
-    instructions: slot({ attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }) }),
+    instructions: slot({
+      attrs: (_state, { id }) => ({ id: `${id}-instructions`, hidden: "" }),
+    }),
   }),
 })
 
@@ -224,11 +265,18 @@ const defaultLists = {
 }
 
 const limits = { doing: 3 }
-const labels = Object.fromEntries(columns.map((column) => [column.value, column.label]))
+const labels = Object.fromEntries(
+  columns.map((column) => [column.value, column.label])
+)
 
 function Example() {
   return (
-    <Kanban defaultLists={defaultLists} limits={limits} labels={labels} aria-label="Sprint">
+    <Kanban
+      defaultLists={defaultLists}
+      limits={limits}
+      labels={labels}
+      aria-label="Sprint"
+    >
       {({ lists }) => (
         <>
           <div data-slot="row">
@@ -247,12 +295,19 @@ function Example() {
                 >
                   <h3 id={`kanban-${column.value}`}>
                     {column.label}
-                    <span data-full={limit !== undefined && count >= limit ? "" : undefined}>
+                    <span
+                      data-full={
+                        limit !== undefined && count >= limit ? "" : undefined
+                      }
+                    >
                       {count}
                       {limit === undefined ? "" : ` / ${limit}`}
                     </span>
                   </h3>
-                  <KanbanColumn value={column.value} aria-labelledby={`kanban-${column.value}`}>
+                  <KanbanColumn
+                    value={column.value}
+                    aria-labelledby={`kanban-${column.value}`}
+                  >
                     {({ cards: keys }) =>
                       keys.map((key) => (
                         <KanbanCard key={key} value={key}>
@@ -261,7 +316,11 @@ function Example() {
                             <span
                               aria-hidden="true"
                               data-slot="kanban-tone"
-                              style={{ "--tone": cards[key].tone } as React.CSSProperties}
+                              style={
+                                {
+                                  "--tone": cards[key].tone,
+                                } as React.CSSProperties
+                              }
                             />
                             {cards[key].tag}
                           </span>
@@ -274,8 +333,9 @@ function Example() {
             })}
           </div>
           <KanbanInstructions>
-            Arrow keys move to the nearest card. Space picks a card up; then arrows move it within and between
-            columns, Space drops it and Escape puts it back. Control or Command with Z undoes.
+            Arrow keys move to the nearest card. Space picks a card up; then
+            arrows move it within and between columns, Space drops it and Escape
+            puts it back. Control or Command with Z undoes.
           </KanbanInstructions>
         </>
       )}

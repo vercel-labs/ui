@@ -20,7 +20,9 @@
     data-slot="stack"
     onsubmit={(event) => {
       event.preventDefault()
-      const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+      const data = [...new FormData(event.currentTarget)].map(
+        ([name, value]) => `${name}=${value}`
+      )
       log(`Submitted ${data.join(", ")}`)
     }}
   >
@@ -57,7 +59,7 @@
   <Field>
     <Slider
       name="distance"
-      form={form}
+      {form}
       defaultValue={25}
       max={100}
       step={5}

@@ -13,12 +13,21 @@
     DatePickerInput,
     DatePickerTrigger,
   } from "@ui-sdk/svelte/date-picker"
-  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import {
+    CalendarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+  } from "@lucide/svelte"
 
   let field: HTMLElement | undefined = $state()
 </script>
 
-<DatePicker mode="range" months={2} monthFormat="short" defaultValue={["2026-10-12", "2026-10-16"]}>
+<DatePicker
+  mode="range"
+  months={2}
+  monthFormat="short"
+  defaultValue={["2026-10-12", "2026-10-16"]}
+>
   <div data-slot="row" bind:this={field}>
     <DatePickerInput aria-label="Check in" placeholder="Check in" />
     <span data-slot="hint">–</span>

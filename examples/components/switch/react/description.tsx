@@ -6,7 +6,9 @@ function Example() {
     <Field>
       <div data-slot="stack">
         <FieldLabel>Weekly digest</FieldLabel>
-        <FieldDescription>A summary of your week, every Monday.</FieldDescription>
+        <FieldDescription>
+          A summary of your week, every Monday.
+        </FieldDescription>
       </div>
       <Switch>
         <SwitchThumb />

@@ -1,14 +1,25 @@
 import "@ui-sdk/web/combobox"
 import { Check, createElement, LoaderCircle, Plus } from "lucide"
 
-const labels = ["Bug", "Feature", "Documentation", "Design", "Performance", "Security", "Testing"]
+const labels = [
+  "Bug",
+  "Feature",
+  "Documentation",
+  "Design",
+  "Performance",
+  "Security",
+  "Testing",
+]
 
 function saveLabel(name: string) {
   return new Promise<void>((resolve, reject) =>
     setTimeout(
-      () => (name.length > 20 ? reject(new Error("Labels are 20 characters at most.")) : resolve()),
-      800,
-    ),
+      () =>
+        name.length > 20
+          ? reject(new Error("Labels are 20 characters at most."))
+          : resolve(),
+      800
+    )
   )
 }
 
@@ -57,24 +68,31 @@ function mount(root: HTMLElement) {
   const error = root.querySelector("[data-error]")!
   combobox.addEventListener("querychange", (event) => {
     const query = (event as CustomEvent<{ value: string }>).detail.value.trim()
-    for (const span of root.querySelectorAll("[data-query]")) span.textContent = query
+    for (const span of root.querySelectorAll("[data-query]")) {
+      span.textContent = query
+    }
   })
   combobox.addEventListener("create", (event) => {
     const { value, waitUntil } = (
-      event as CustomEvent<{ value: string; waitUntil: (promise: Promise<unknown>) => void }>
+      event as CustomEvent<{
+        value: string
+        waitUntil: (promise: Promise<unknown>) => void
+      }>
     ).detail
     error.textContent = ""
     waitUntil(
       saveLabel(value).then(
         () => {
-          root.querySelector("ui-combobox-create")!.insertAdjacentHTML("beforebegin", item(value))
+          root
+            .querySelector("ui-combobox-create")!
+            .insertAdjacentHTML("beforebegin", item(value))
           combobox.value = [...combobox.value, value]
         },
         (reason: Error) => {
           error.textContent = reason.message
           throw reason
-        },
-      ),
+        }
+      )
     )
   })
 }

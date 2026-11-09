@@ -21,7 +21,9 @@ const DayMenuContent = MenuContent<Day>
 
 <template>
   <Tooltip>
-    <DayTooltipContent side="top" v-slot="{ state }">{{ state.payload?.count }}</DayTooltipContent>
+    <DayTooltipContent side="top" v-slot="{ state }">{{
+      state.payload?.count
+    }}</DayTooltipContent>
     <DayTooltipContent v-slot="{ state }">
       <!-- @vue-expect-error A day has no `name`. -->
       {{ state.payload?.name }}
@@ -34,21 +36,33 @@ const DayMenuContent = MenuContent<Day>
     </TooltipContent>
   </Tooltip>
   <Popover>
-    <DayPopoverContent v-slot="{ state }">{{ state.payload?.count }}</DayPopoverContent>
+    <DayPopoverContent v-slot="{ state }">{{
+      state.payload?.count
+    }}</DayPopoverContent>
   </Popover>
   <HoverCard>
-    <DayHoverCardContent v-slot="{ state }">{{ state.payload?.count }}</DayHoverCardContent>
+    <DayHoverCardContent v-slot="{ state }">{{
+      state.payload?.count
+    }}</DayHoverCardContent>
   </HoverCard>
   <Dialog pending-announcement="Saving changes">
-    <DayDialogContent v-slot="{ state }">{{ state.payload?.count }}</DayDialogContent>
+    <DayDialogContent v-slot="{ state }">{{
+      state.payload?.count
+    }}</DayDialogContent>
   </Dialog>
   <AlertDialog pending-announcement="Deleting item">
-    <DayAlertDialogContent v-slot="{ state }">{{ state.payload?.count }}</DayAlertDialogContent>
+    <DayAlertDialogContent v-slot="{ state }">{{
+      state.payload?.count
+    }}</DayAlertDialogContent>
   </AlertDialog>
   <Drawer>
-    <DayDrawerContent v-slot="{ state }">{{ state.payload?.count }} {{ state.snapPoint }}</DayDrawerContent>
+    <DayDrawerContent v-slot="{ state }"
+      >{{ state.payload?.count }} {{ state.snapPoint }}</DayDrawerContent
+    >
   </Drawer>
   <Menu>
-    <DayMenuContent v-slot="{ state }">{{ state.payload?.count }}</DayMenuContent>
+    <DayMenuContent v-slot="{ state }">{{
+      state.payload?.count
+    }}</DayMenuContent>
   </Menu>
 </template>

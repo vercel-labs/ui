@@ -11,7 +11,8 @@ import path from "node:path"
 
 const root = path.resolve(import.meta.dirname, "..")
 // `import { type A, type B } from "pkg"` and the same for `export`, with the specifier.
-const namedTypes = /\b(?:import|export)\s*\{([^}]*)\}\s*from\s*["']([^"']+)["']/g
+const namedTypes =
+  /\b(?:import|export)\s*\{([^}]*)\}\s*from\s*["']([^"']+)["']/g
 
 const failures = []
 for (const file of sourceFiles(path.join(root, "packages"))) {
@@ -22,27 +23,36 @@ for (const file of sourceFiles(path.join(root, "packages"))) {
       .split(",")
       .map((name) => name.trim())
       .filter(Boolean)
-    const isTypeOnly = names.length > 0 && names.every((name) => /^type\s/.test(name))
-    if (!isTypeOnly || specifier.startsWith(".")) continue
+    const isTypeOnly =
+      names.length > 0 && names.every((name) => /^type\s/.test(name))
+    if (!isTypeOnly || specifier.startsWith(".")) {
+      continue
+    }
     const line = source.slice(0, match.index).split("\n").length
     const keyword = statement.startsWith("import") ? "import" : "export"
-    failures.push(`${path.relative(root, file)}:${line}: use \`${keyword} type { … }\` from "${specifier}".`)
+    failures.push(
+      `${path.relative(root, file)}:${line}: use \`${keyword} type { … }\` from "${specifier}".`
+    )
   }
 }
 
 if (failures.length) {
   console.error(
-    `Type-only ${failures.length === 1 ? "import keeps" : "imports keep"} a side-effect import under verbatimModuleSyntax:\n${failures.join("\n")}`,
+    `Type-only ${failures.length === 1 ? "import keeps" : "imports keep"} a side-effect import under verbatimModuleSyntax:\n${failures.join("\n")}`
   )
   process.exitCode = 1
 }
 
 // Every .ts and .tsx file under each package's src.
 function sourceFiles(packagesDir) {
-  const packages = readdirSync(packagesDir, { withFileTypes: true }).filter((entry) => entry.isDirectory())
+  const packages = readdirSync(packagesDir, { withFileTypes: true }).filter(
+    (entry) => entry.isDirectory()
+  )
   return packages.flatMap(({ name }) => {
     const src = path.join(packagesDir, name, "src")
-    if (!existsSync(src)) return []
+    if (!existsSync(src)) {
+      return []
+    }
     return readdirSync(src, { recursive: true, withFileTypes: true })
       .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
       .map((entry) => path.join(entry.parentPath, entry.name))

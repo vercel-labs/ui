@@ -14,15 +14,21 @@ function supportsTopLayer() {
  * support, the body. Otherwise null: render in place.
  */
 function portalTarget(container?: Element | DocumentFragment | null) {
-  if (container) return container
-  if (isBrowser && !supportsTopLayer()) return document.body
+  if (container) {
+    return container
+  }
+  if (isBrowser && !supportsTopLayer()) {
+    return document.body
+  }
   return null
 }
 
 // The focused element, inside shadow roots too.
 function activeElement(doc = document) {
   let active = doc.activeElement
-  while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement
+  while (active?.shadowRoot?.activeElement) {
+    active = active.shadowRoot.activeElement
+  }
   return active as HTMLElement | null
 }
 
@@ -34,8 +40,12 @@ function composedHops(node: Node) {
   let at: Node | null | undefined = node
   while (at) {
     const next: Node | null | undefined =
-      (at as Element).assignedSlot ?? at.parentNode ?? (at as Partial<ShadowRoot>).host
-    if (next && next !== at.parentNode) hops.push(next)
+      (at as Element).assignedSlot ??
+      at.parentNode ??
+      (at as Partial<ShadowRoot>).host
+    if (next && next !== at.parentNode) {
+      hops.push(next)
+    }
     at = next
   }
   return hops
@@ -52,14 +62,19 @@ function composedContains(container: Node, node: Node) {
 function composedClosest<T extends Element>(node: Node, selector: string) {
   for (const hop of composedHops(node)) {
     const found = (hop as Element).closest?.<T>(selector)
-    if (found) return found
+    if (found) {
+      return found
+    }
   }
   return null
 }
 
 // Whether the user asked for less motion. Animations jump instead.
 function prefersReducedMotion() {
-  return typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches
+  return (
+    typeof matchMedia === "function" &&
+    matchMedia("(prefers-reduced-motion: reduce)").matches
+  )
 }
 
 let platformOverride: "apple" | "other" | undefined
@@ -75,8 +90,12 @@ function setPlatform(platform: "apple" | "other") {
 let apple: boolean | undefined
 
 function isApple() {
-  if (platformOverride) return platformOverride === "apple"
-  return (apple ??= isBrowser && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent))
+  if (platformOverride) {
+    return platformOverride === "apple"
+  }
+  return (apple ??=
+    isBrowser &&
+    /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent))
 }
 
 // What to assume before the client is known. Servers render this, and the
@@ -127,9 +146,15 @@ function ariaKeyshortcuts(shortcut: string, apple = isApple()) {
     .split("+")
     .map((key) => {
       const lower = key.toLowerCase()
-      if (lower === "mod") return apple ? "Meta" : "Control"
-      if (keyNames[lower]) return keyNames[lower]
-      return key.length === 1 ? key.toUpperCase() : key[0].toUpperCase() + key.slice(1)
+      if (lower === "mod") {
+        return apple ? "Meta" : "Control"
+      }
+      if (keyNames[lower]) {
+        return keyNames[lower]
+      }
+      return key.length === 1
+        ? key.toUpperCase()
+        : key[0].toUpperCase() + key.slice(1)
     })
     .join("+")
 }
@@ -184,11 +209,19 @@ function formatShortcut(shortcut: string, apple = isApple()) {
 // alphabets type their own letters. Every other key matches by `event.key`.
 function matchesKey(event: KeyboardEvent, key: string) {
   const typed = event.key.length === 1 ? event.key.toLowerCase() : event.key
-  if (key === "Space") return typed === " "
-  if (!/^[A-Z0-9]$/.test(key)) return typed.toLowerCase() === key.toLowerCase()
-  if (typed === key.toLowerCase()) return true
+  if (key === "Space") {
+    return typed === " "
+  }
+  if (!/^[A-Z0-9]$/.test(key)) {
+    return typed.toLowerCase() === key.toLowerCase()
+  }
+  if (typed === key.toLowerCase()) {
+    return true
+  }
   // A Latin letter or digit that isn't this key is another key on this layout.
-  if (/^[a-z0-9]$/.test(typed)) return false
+  if (/^[a-z0-9]$/.test(typed)) {
+    return false
+  }
   return event.code === (/\d/.test(key) ? `Digit${key}` : `Key${key}`)
 }
 
@@ -200,10 +233,16 @@ const parsed = [new Map<string, string[]>(), new Map<string, string[]>()]
  * when the layout types another character, like Option+N on a Mac.
  * @experimental
  */
-function matchesShortcut(event: KeyboardEvent, shortcut: string, apple = isApple()) {
+function matchesShortcut(
+  event: KeyboardEvent,
+  shortcut: string,
+  apple = isApple()
+) {
   const cache = parsed[+apple]
   let keys = cache.get(shortcut)
-  if (!keys) cache.set(shortcut, (keys = ariaKeyshortcuts(shortcut, apple).split("+")))
+  if (!keys) {
+    cache.set(shortcut, (keys = ariaKeyshortcuts(shortcut, apple).split("+")))
+  }
   return (
     matchesKey(event, keys.at(-1)!) &&
     event.metaKey === keys.includes("Meta") &&

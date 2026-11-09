@@ -1,6 +1,14 @@
-import { switchPrimitive, type SwitchOptions, type SwitchState } from "@ui-sdk/core/switch"
+import {
+  switchPrimitive,
+  type SwitchOptions,
+  type SwitchState,
+} from "@ui-sdk/core/switch"
 import { omit } from "solid-js"
-import { joinField, useFieldControl, type ButtonControlProps } from "./field-context"
+import {
+  joinField,
+  useFieldControl,
+  type ButtonControlProps,
+} from "./field-context"
 import { createParts, usePart, usePrimitive } from "./use-primitive"
 
 const parts = createParts(switchPrimitive, { thumb: "span" })
@@ -36,12 +44,18 @@ function Switch(props: SwitchOptions & ButtonControlProps<SwitchState>) {
     "value",
     "form",
     "controller",
-    "debug",
+    "debug"
   )
   const input = control.slot("input")
   return (
     <>
-      {usePart(control, "root", undefined, joinField(field, rest, "button"), "button")}
+      {usePart(
+        control,
+        "root",
+        undefined,
+        joinField(field, rest, "button"),
+        "button"
+      )}
       <input {...input} />
     </>
   )

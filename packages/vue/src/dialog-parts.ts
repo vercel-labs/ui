@@ -47,7 +47,9 @@ import {
 } from "./use-primitive"
 import { renderless } from "./renderless"
 
-type OpenDetails = ChangeDetails<DialogOpenChangeReason> & { returnValue?: string }
+type OpenDetails = ChangeDetails<DialogOpenChangeReason> & {
+  returnValue?: string
+}
 type PayloadDetails = ChangeDetails<DialogPayloadChangeReason>
 type CloseAction = NonNullable<DialogCloseProps["action"]>
 
@@ -64,9 +66,15 @@ const TriggerKey: InjectionKey<{
 // from its own module, so an app with only alert dialogs doesn't carry
 // Dialog's presentation. `viewport` renders the viewport around the content,
 // for a dialog that can present as a sheet.
-function defineDialogParts(primitive: typeof dialogPrimitive, name: string, viewport?: typeof sheetViewport) {
+function defineDialogParts(
+  primitive: typeof dialogPrimitive,
+  name: string,
+  viewport?: typeof sheetViewport
+) {
   // Where the popup renders. Set on the root or the content.
-  const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(`${name}-container`)
+  const ContainerKey: InjectionKey<() => PopupContainer> = Symbol(
+    `${name}-container`
+  )
   const parts = createParts(primitive, { title: "h2", description: "p" })
 
   // The root's props. Dialog adds the ones an alert dialog doesn't take: it's
@@ -75,9 +83,13 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
     open: optionalBoolean,
     modelValue: optionalBoolean,
     defaultOpen: optionalBoolean,
-    controller: Object as PropType<DialogController<any, any> | AlertDialogController<any, any>>,
+    controller: Object as PropType<
+      DialogController<any, any> | AlertDialogController<any, any>
+    >,
     dismissible: optionalBoolean,
-    persistentElements: [Array, Function] as PropType<(Element | string)[] | (() => Element[])>,
+    persistentElements: [Array, Function] as PropType<
+      (Element | string)[] | (() => Element[])
+    >,
     pendingAnnouncement: String,
     debug: optionalBoolean,
     container: containerProp,
@@ -95,23 +107,29 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
       container?: PopupContainer
       controller?: DialogController<any, any> | AlertDialogController<any, any>
     },
-    { slots, emit }: SetupContext<typeof emits>,
+    { slots, emit }: SetupContext<typeof emits>
   ) => {
     provide(ContainerKey, () => props.container)
     const dialog = usePrimitive(primitive, () => ({
       ...(props as Record<string, any>),
       container: undefined,
-      open: (props as { open?: boolean }).open ?? (props as { modelValue?: boolean }).modelValue,
+      open:
+        (props as { open?: boolean }).open ??
+        (props as { modelValue?: boolean }).modelValue,
       onOpenChange: (open: boolean, details: OpenDetails) => {
         // The change event runs first, so canceling it also keeps v-model as it was.
         emit("openChange", open, details)
-        if (details.canceled) return
+        if (details.canceled) {
+          return
+        }
         emit("update:open", open)
         emit("update:modelValue", open)
       },
       onOpenChangeComplete: (open: boolean) => emit("openChangeComplete", open),
-      onPayloadChange: (payload: unknown, details: PayloadDetails) => emit("payloadChange", payload, details),
-      onDismissAttempt: (details: DialogDismissAttemptDetails) => emit("dismissAttempt", details),
+      onPayloadChange: (payload: unknown, details: PayloadDetails) =>
+        emit("payloadChange", payload, details),
+      onDismissAttempt: (details: DialogDismissAttemptDetails) =>
+        emit("dismissAttempt", details),
     }))
     useControllerEntry(() => props.controller, dialog)
     return () => slots.default?.()
@@ -122,20 +140,23 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
       props: sharedProps,
       emits,
       setup: (props, context) => setup(props, context),
-    }),
+    })
   )
   const Root = renderless(
     defineComponent({
       name,
       props: {
         ...sharedProps,
-        modal: { type: [Boolean, String] as PropType<boolean | "trap-focus">, default: undefined },
+        modal: {
+          type: [Boolean, String] as PropType<boolean | "trap-focus">,
+          default: undefined,
+        },
         closeOnOutsidePress: optionalBoolean,
         presentation: String as PropType<"auto" | "dialog" | "sheet">,
       },
       emits,
       setup: (props, context) => setup(props, context),
-    }),
+    })
   )
 
   const Trigger = withElement(
@@ -149,12 +170,17 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
         // A keyboard shortcut that presses the trigger, like "mod+k".
         shortcut: String,
         // Connects a trigger outside the dialog to the dialog with this controller.
-        controller: Object as PropType<DialogController<any, any> | AlertDialogController<any, any>>,
+        controller: Object as PropType<
+          DialogController<any, any> | AlertDialogController<any, any>
+        >,
       },
       slots: Object as PartSlots<typeof primitive, "trigger">,
       setup(props, { slots, attrs }) {
         const connected = useControllerTarget(primitive, () => props.controller)
-        provide(TriggerKey, { shortcut: () => props.shortcut, dialog: connected })
+        provide(TriggerKey, {
+          shortcut: () => props.shortcut,
+          dialog: connected,
+        })
         const id = useId()
         const part = () => ({
           id,
@@ -170,11 +196,11 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
             renderUnbound(
               "button",
               { type: "button", disabled: props.disabled, ...attrs },
-              { slots, state: { open: false, disabled: !!props.disabled } },
-            ),
+              { slots, state: { open: false, disabled: !!props.disabled } }
+            )
         )
       },
-    }),
+    })
   )
 
   const Backdrop = withElement(
@@ -193,7 +219,7 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
           return element && renderPopup(element, backdropTarget())
         }
       },
-    }),
+    })
   )
 
   const Content = withPayload(
@@ -203,7 +229,11 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
         name: `${name}Content`,
         inheritAttrs: false,
         props: {
-          initialFocus: [String, Object, Function] as PropType<DialogInitialFocus>,
+          initialFocus: [
+            String,
+            Object,
+            Function,
+          ] as PropType<DialogInitialFocus>,
           finalFocus: [String, Object, Function] as PropType<DialogFinalFocus>,
           keepMounted: optionalBoolean,
           // Renders the popup into this element instead of in place.
@@ -222,12 +252,17 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
           const part = usePart(dialog, "content", content)
           return () => {
             const element = part()
-            if (!element) return null
-            return renderPopup(viewport ? viewport(dialog, element) : element, target())
+            if (!element) {
+              return null
+            }
+            return renderPopup(
+              viewport ? viewport(dialog, element) : element,
+              target()
+            )
           }
         },
-      }),
-    ),
+      })
+    )
   )
 
   const Close = withElement(
@@ -247,10 +282,14 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
       setup(props) {
         // Keyed by its own id, so several Close parts stay apart.
         const id = useId()
-        const part = () => ({ id, value: props.value, action: props.action ?? props.onAction })
+        const part = () => ({
+          id,
+          value: props.value,
+          action: props.action ?? props.onAction,
+        })
         return usePart(useHandle(primitive), "close", part, undefined, "button")
       },
-    }),
+    })
   )
 
   // The bound part of a shortcut, once its dialog is known. It binds once, so it's
@@ -263,10 +302,17 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
       shortcut: String,
     },
     setup(props, { slots }) {
-      return usePart(props.dialog, "shortcut", () => ({ shortcut: props.shortcut }), undefined, {
-        tag: "span",
-        children: (state) => slotContent(slots.default, { state }) ?? state.text,
-      })
+      return usePart(
+        props.dialog,
+        "shortcut",
+        () => ({ shortcut: props.shortcut }),
+        undefined,
+        {
+          tag: "span",
+          children: (state) =>
+            slotContent(slots.default, { state }) ?? state.text,
+        }
+      )
     },
   })
 
@@ -284,20 +330,29 @@ function defineDialogParts(primitive: typeof dialogPrimitive, name: string, view
       setup(props, { slots, attrs }) {
         const context = useScope(primitive)?.handle
         const trigger = inject(TriggerKey, null)
-        if (!context && !trigger) throw new Error(`${name} parts must be used inside <${name}>.`)
+        if (!context && !trigger) {
+          throw new Error(`${name} parts must be used inside <${name}>.`)
+        }
         // A trigger outside the dialog finds it through its controller only on the client.
         // Until mounted, its shortcut renders nothing, as on the server, so hydration matches.
         const mounted = ref(!!context)
         onMounted(() => (mounted.value = true))
         return () => {
-          const dialog = context ?? (mounted.value ? trigger?.dialog() : undefined)
+          const dialog =
+            context ?? (mounted.value ? trigger?.dialog() : undefined)
           // Inside a trigger whose dialog hasn't mounted yet, there's no shortcut to show.
-          if (!dialog) return null
+          if (!dialog) {
+            return null
+          }
           const shortcut = props.shortcut ?? trigger?.shortcut()
-          return h(ShortcutBinding, { ...attrs, key: dialog.instance.id, dialog, shortcut }, slots)
+          return h(
+            ShortcutBinding,
+            { ...attrs, key: dialog.instance.id, dialog, shortcut },
+            slots
+          )
         }
       },
-    }),
+    })
   )
 
   return {

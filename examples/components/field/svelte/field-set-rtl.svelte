@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Field, FieldDescription, FieldLabel, FieldLegend, FieldSet } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldLabel,
+    FieldLegend,
+    FieldSet,
+  } from "@ui-sdk/svelte/field"
   import { Input } from "@ui-sdk/svelte/input"
 </script>
 

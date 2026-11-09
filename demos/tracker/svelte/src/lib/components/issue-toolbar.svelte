@@ -3,7 +3,13 @@
   import { goto } from "$app/navigation"
   import IssueFilters from "#lib/components/issue-filters.svelte"
   import { buttonVariants } from "#ui/button"
-  import { Drawer, DrawerClose, DrawerContent, DrawerTitle, DrawerTrigger } from "#ui/drawer"
+  import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerTitle,
+    DrawerTrigger,
+  } from "#ui/drawer"
   import { Toggle, ToggleGroup } from "#ui/toggle"
   import { Tooltip, TooltipContent, TooltipTrigger } from "#ui/tooltip"
   import { cn } from "cn"
@@ -23,7 +29,12 @@
     <IssueFilters {query} onChange={change} />
   </div>
   <Drawer>
-    <DrawerTrigger class={cn(buttonVariants({ variant: filtered ? "secondary" : "ghost" }), "md:hidden")}>
+    <DrawerTrigger
+      class={cn(
+        buttonVariants({ variant: filtered ? "secondary" : "ghost" }),
+        "md:hidden"
+      )}
+    >
       <SlidersHorizontal aria-hidden="true" />
       Filters
     </DrawerTrigger>
@@ -31,19 +42,24 @@
       <div class="grid gap-5 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <DrawerTitle>Filters</DrawerTitle>
         <IssueFilters {query} onChange={change} stacked />
-        <DrawerClose class={buttonVariants({ variant: "primary" })}>Done</DrawerClose>
+        <DrawerClose class={buttonVariants({ variant: "primary" })}
+          >Done</DrawerClose
+        >
       </div>
     </DrawerContent>
   </Drawer>
   <ToggleGroup
     aria-label="Layout"
     value={[query.view]}
-    onValueChange={([view]) => view && change({ view: view as Query["view"], page: 1 })}
+    onValueChange={([view]) =>
+      view && change({ view: view as Query["view"], page: 1 })}
   >
     <Tooltip>
       <TooltipTrigger>
         {#snippet render({ props })}
-          <Toggle {...props} value="list" aria-label="List"><List aria-hidden="true" /></Toggle>
+          <Toggle {...props} value="list" aria-label="List"
+            ><List aria-hidden="true" /></Toggle
+          >
         {/snippet}
       </TooltipTrigger>
       <TooltipContent>List</TooltipContent>
@@ -51,7 +67,9 @@
     <Tooltip>
       <TooltipTrigger>
         {#snippet render({ props })}
-          <Toggle {...props} value="board" aria-label="Board"><Columns3 aria-hidden="true" /></Toggle>
+          <Toggle {...props} value="board" aria-label="Board"
+            ><Columns3 aria-hidden="true" /></Toggle
+          >
         {/snippet}
       </TooltipTrigger>
       <TooltipContent>Board</TooltipContent>

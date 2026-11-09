@@ -24,7 +24,9 @@ Renders data items. Used by data menus, and available for custom layouts.
     <TriggerMenuSeparator />
   {:else if "type" in entry && entry.type === "group"}
     <TriggerMenuGroup>
-      {#if entry.label}<TriggerMenuGroupLabel>{entry.label}</TriggerMenuGroupLabel>{/if}
+      {#if entry.label}<TriggerMenuGroupLabel
+          >{entry.label}</TriggerMenuGroupLabel
+        >{/if}
       <Self items={entry.items} />
     </TriggerMenuGroup>
   {:else}

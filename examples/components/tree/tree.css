@@ -95,7 +95,9 @@
     user-select: none;
 
     &:not([data-branch]) {
-      padding-inline-start: calc(var(--space-2) + var(--tree-indent) + var(--size-icon) + var(--space-2));
+      padding-inline-start: calc(
+        var(--space-2) + var(--tree-indent) + var(--size-icon) + var(--space-2)
+      );
     }
 
     &:hover:not([data-disabled], [data-selected], [data-current]) {

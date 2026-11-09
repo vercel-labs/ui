@@ -34,7 +34,7 @@ function mount(root: HTMLElement) {
             .map(
               (fruit) => `
                 <ui-autocomplete-item value="${fruit}">${fruit}</ui-autocomplete-item>
-              `,
+              `
             )
             .join("")}
         </ui-autocomplete-list>

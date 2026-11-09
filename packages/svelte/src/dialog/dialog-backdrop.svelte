@@ -14,7 +14,12 @@ A dim behind the dialog. It's optional: without it, style the content's `::backd
 
   const dialog = useDialog()
   // Rendered where the content renders, so it sits in the top layer just below it.
-  const backdrop = useHandlePart(dialog.handle, "backdrop", () => ({}), portalTo(usePopupContainer(dialog.container)))
+  const backdrop = useHandlePart(
+    dialog.handle,
+    "backdrop",
+    () => ({}),
+    portalTo(usePopupContainer(dialog.container))
+  )
 </script>
 
 {#if backdrop.present}

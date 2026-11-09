@@ -4,8 +4,16 @@
 // here and nowhere else.
 const fieldChoiceCardFixture = {
   cards: [
-    { name: "backups", title: "Daily backups", description: "Keep a copy of every database each night." },
-    { name: "alerts", title: "Usage alerts", description: "Email the team when usage passes its limit." },
+    {
+      name: "backups",
+      title: "Daily backups",
+      description: "Keep a copy of every database each night.",
+    },
+    {
+      name: "alerts",
+      title: "Usage alerts",
+      description: "Email the team when usage passes its limit.",
+    },
   ],
   // With `?later`, a card whose checkbox renders `delay` milliseconds after its label.
   later: {
@@ -44,4 +52,9 @@ function fieldChoiceCardOptions() {
   return { alone: params.has("alone"), later: params.has("later") }
 }
 
-export { fieldChoiceCardFixture, fieldChoiceCardOptions, fieldRadiosFixture, fieldRadiosOptions }
+export {
+  fieldChoiceCardFixture,
+  fieldChoiceCardOptions,
+  fieldRadiosFixture,
+  fieldRadiosOptions,
+}

@@ -14,7 +14,11 @@ import { createParts, usePart, type PartProps } from "@ui-sdk/react/primitive"
 import { PinIcon } from "lucide-react"
 import { useLog } from "../../shared/react/log"
 
-type MailboxState = { open: SwipeOpen | null; swiping: SwipeDraft | null; focused: string | null }
+type MailboxState = {
+  open: SwipeOpen | null
+  swiping: SwipeDraft | null
+  focused: string | null
+}
 
 type MailboxOptions = {
   pinned?: string
@@ -25,7 +29,11 @@ type MailboxOptions = {
 const mailbox = definePrimitive({
   name: "mailbox",
   options: { pinned: "string", first: "string", onAction: "callback" },
-  state: (_options: MailboxOptions): MailboxState => ({ open: null, swiping: null, focused: null }),
+  state: (_options: MailboxOptions): MailboxState => ({
+    open: null,
+    swiping: null,
+    focused: null,
+  }),
   live: ["swiping"],
   api: (context) => {
     const swipe = createSwipeActions<MailboxState>(context, {
@@ -39,12 +47,18 @@ const mailbox = definePrimitive({
       disabled: (key) => key === context.options().pinned,
     })
     return {
-      roving: createRovingFocus<MailboxState, { value: string }>(context, { slot: "row", key: "focused" }),
+      roving: createRovingFocus<MailboxState, { value: string }>(context, {
+        slot: "row",
+        key: "focused",
+      }),
       swipe,
       act(action: string) {
         const first = context.options().first
-        if (action === "peek" && first) swipe.show(first, "end")
-        else if (action === "close") swipe.close()
+        if (action === "peek" && first) {
+          swipe.show(first, "end")
+        } else if (action === "close") {
+          swipe.close()
+        }
       },
     }
   },
@@ -58,25 +72,38 @@ const mailbox = definePrimitive({
         role: "listitem",
         tabindex: part.api.roving.tabIndex(state, part),
         "data-open": state.open?.key === part.key ? state.open.side : undefined,
-        style: css({ position: "relative", overflow: "hidden", "touch-action": "pan-y" }),
+        style: css({
+          position: "relative",
+          overflow: "hidden",
+          "touch-action": "pan-y",
+        }),
       }),
       on: {
-        pointerdown: (event, { el, api, key }) => api.swipe.pointerdown(event, key, el!),
+        pointerdown: (event, { el, api, key }) =>
+          api.swipe.pointerdown(event, key, el!),
         keydown: (event, { el, api, key }) =>
-          api.swipe.keydown(event, key) || (event.target === el && api.roving.keydown(event, el!)),
+          api.swipe.keydown(event, key) ||
+          (event.target === el && api.roving.keydown(event, el!)),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.swipe.bindRow(el, part.key)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.swipe.bindRow(el, part.key),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
     content: slot<{ value: string }>({
       props: { value: "string" },
       attrs: () => ({
-        style: css({ position: "relative", "z-index": "1", transform: "translateX(var(--swipe-x, 0px))" }),
+        style: css({
+          position: "relative",
+          "z-index": "1",
+          transform: "translateX(var(--swipe-x, 0px))",
+        }),
       }),
       live: live<MailboxState, any, { value: string }>((state, { api, key }) =>
-        api.swipe.contentAttrs(state, key),
+        api.swipe.contentAttrs(state, key)
       ),
     }),
     actions: slot<{ id: string; row: string; side: SwipeSide }>({
@@ -87,11 +114,13 @@ const mailbox = definePrimitive({
           position: "absolute",
           top: "0",
           bottom: "0",
-          [props.side === "start" ? "inset-inline-start" : "inset-inline-end"]: "0",
+          [props.side === "start" ? "inset-inline-start" : "inset-inline-end"]:
+            "0",
           display: "flex",
         }),
       }),
-      bind: (el, { props, api }) => api.swipe.bindActions(el, props.row, props.side),
+      bind: (el, { props, api }) =>
+        api.swipe.bindActions(el, props.row, props.side),
     }),
     action: slot<{ value: string }>({
       props: { value: "string" },
@@ -119,18 +148,36 @@ const MailboxContent = parts.Content
 
 const MailboxAction = parts.Action
 
-function MailboxActions({ row, side, ...props }: { row: string; side: SwipeSide } & PartProps<"div">) {
-  return usePart(mailbox, "actions", { id: `${row}-${side}`, row, side }, props, "div")
+function MailboxActions({
+  row,
+  side,
+  ...props
+}: { row: string; side: SwipeSide } & PartProps<"div">) {
+  return usePart(
+    mailbox,
+    "actions",
+    { id: `${row}-${side}`, row, side },
+    props,
+    "div"
+  )
 }
 
 function Example() {
   const log = useLog()
-  const [messages, setMessages] = React.useState(["Welcome to Acme", "Flight to Lisbon", "Weekly digest"])
+  const [messages, setMessages] = React.useState([
+    "Welcome to Acme",
+    "Flight to Lisbon",
+    "Weekly digest",
+  ])
   const [read, setRead] = React.useState<string[]>([])
   const toggleRead = (message: string) => {
-    log(`${read.includes(message) ? "Marked unread" : "Marked read"}: ${message}`)
+    log(
+      `${read.includes(message) ? "Marked unread" : "Marked read"}: ${message}`
+    )
     setRead((current) =>
-      current.includes(message) ? current.filter((other) => other !== message) : [...current, message],
+      current.includes(message)
+        ? current.filter((other) => other !== message)
+        : [...current, message]
     )
   }
   const archive = (message: string) => {
@@ -141,7 +188,9 @@ function Example() {
     <Mailbox
       pinned="Welcome to Acme"
       first={messages[1]}
-      onAction={(key: string, side: SwipeSide) => (side === "start" ? toggleRead(key) : archive(key))}
+      onAction={(key: string, side: SwipeSide) =>
+        side === "start" ? toggleRead(key) : archive(key)
+      }
     >
       <div data-slot="controls">
         <MailboxAction data-size="sm" value="peek">
@@ -163,12 +212,21 @@ function Example() {
               )}
             </MailboxContent>
             <MailboxActions row={message} side="start">
-              <button type="button" tabIndex={-1} data-variant="solid" onClick={() => toggleRead(message)}>
+              <button
+                type="button"
+                tabIndex={-1}
+                data-variant="solid"
+                onClick={() => toggleRead(message)}
+              >
                 {read.includes(message) ? "Unread" : "Read"}
               </button>
             </MailboxActions>
             <MailboxActions row={message} side="end">
-              <button type="button" tabIndex={-1} onClick={() => archive(message)}>
+              <button
+                type="button"
+                tabIndex={-1}
+                onClick={() => archive(message)}
+              >
                 Archive
               </button>
             </MailboxActions>

@@ -1,4 +1,10 @@
-import { createPopup, definePrimitive, popupState, popupSlots, type ChangeDetails } from "@ui-sdk/core"
+import {
+  createPopup,
+  definePrimitive,
+  popupState,
+  popupSlots,
+  type ChangeDetails,
+} from "@ui-sdk/core"
 import { hoverCardPreset } from "@ui-sdk/core/hover-card"
 
 type LinkPreviewOpenChangeReason =
@@ -11,7 +17,8 @@ type LinkPreviewOpenChangeReason =
   | "close-press"
   | "imperative"
 
-type LinkPreviewPayloadChangeReason = "trigger-hover" | "trigger-focus" | "imperative"
+type LinkPreviewPayloadChangeReason =
+  "trigger-hover" | "trigger-focus" | "imperative"
 
 type LinkPreviewPage = {
   title: string
@@ -22,15 +29,22 @@ type LinkPreviewPage = {
 type LinkPreviewOptions = {
   open?: boolean
   defaultOpen?: boolean
-  onOpenChange?: (open: boolean, details: ChangeDetails<LinkPreviewOpenChangeReason>) => void
-  onPayloadChange?: (page: unknown, details: ChangeDetails<LinkPreviewPayloadChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<LinkPreviewOpenChangeReason>
+  ) => void
+  onPayloadChange?: (
+    page: unknown,
+    details: ChangeDetails<LinkPreviewPayloadChangeReason>
+  ) => void
   delay?: number
   closeDelay?: number
 }
 
 type LinkPreviewImageState = { open: boolean }
 
-const pageOf = (state: { payload: unknown }) => state.payload as LinkPreviewPage | undefined
+const pageOf = (state: { payload: unknown }) =>
+  state.payload as LinkPreviewPage | undefined
 
 const linkPreview = /* @__PURE__ */ definePrimitive({
   name: "link-preview",
@@ -50,7 +64,11 @@ const linkPreview = /* @__PURE__ */ definePrimitive({
     image: slot<{}, LinkPreviewImageState>({
       present: (state) => !!pageOf(state)?.image,
       state: (state) => ({ open: state.open }),
-      attrs: (state) => ({ src: pageOf(state)?.image, alt: "", loading: "lazy" }),
+      attrs: (state) => ({
+        src: pageOf(state)?.image,
+        alt: "",
+        loading: "lazy",
+      }),
     }),
   }),
 })

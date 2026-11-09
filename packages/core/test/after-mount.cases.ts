@@ -89,15 +89,18 @@ const placed = {
   "content.arrowPadding": [0, 8],
 }
 const popupSkips = {
-  presentation: "Decided each time it opens, so an open one keeps how it presents.",
+  presentation:
+    "Decided each time it opens, so an open one keeps how it presents.",
   container: "An element, which markup can't name.",
   "content.container": "An element, which markup can't name.",
-  "content.anchor": "Names an element to place against, which markup can't follow.",
+  "content.anchor":
+    "Names an element to place against, which markup can't follow.",
   "content.initialFocus": "Read when the popup opens and moves focus.",
   "content.finalFocus": "Read when the popup closes and moves focus.",
   "trigger.payload": "Handed to the popup when this trigger opens it.",
   persistentElements: "Read when a press lands outside.",
-  "shortcut.shortcut": "Shown from its own trigger's shortcut, tried as `trigger.shortcut`.",
+  "shortcut.shortcut":
+    "Shown from its own trigger's shortcut, tried as `trigger.shortcut`.",
 }
 
 // What every list of options takes.
@@ -196,7 +199,8 @@ const cases: Case[] = [
       thumbInputId: ["volume", "level"],
     },
     skip: {
-      format: "A function's change shows in the text it formats, which the format tests cover.",
+      format:
+        "A function's change shows in the text it formats, which the format tests cover.",
     },
   },
   {
@@ -210,11 +214,16 @@ const cases: Case[] = [
     parts: { panel: { left: {} } },
     // Panels keep their sizes while those fit the new bounds.
     history: ["layout", "sizes", "handleValues", "[aria-valuenow]", "[style]"],
-    check: (state: { layout: number[]; constraints: { min: number; max: number }[] }) =>
+    check: (state: {
+      layout: number[]
+      constraints: { min: number; max: number }[]
+    }) =>
       state.layout
         .map((size, index) => [size, state.constraints[index]] as const)
         .map(([size, { min, max }]) =>
-          size < min || size > max ? `a panel at ${size} is outside ${min} to ${max}` : "",
+          size < min || size > max
+            ? `a panel at ${size} is outside ${min} to ${max}`
+            : ""
         )
         .find(Boolean),
     values: {
@@ -261,7 +270,10 @@ const cases: Case[] = [
     name: "button",
     primitive: button,
     markup: `<root>Save</root>`,
-    values: { type: ["button", "submit"], pendingAnnouncement: ["Saving", "Sending"] },
+    values: {
+      type: ["button", "submit"],
+      pendingAnnouncement: ["Saving", "Sending"],
+    },
   },
   {
     name: "checkbox",
@@ -324,7 +336,11 @@ const cases: Case[] = [
     primitive: textarea,
     markup: `<root as="textarea" aria-label="Notes"></root>`,
     parts: { root: { "": {} } },
-    values: { value: ["Ada", "Grace"], autoResize: [false, true], submitShortcut: ["enter", "mod+enter"] },
+    values: {
+      value: ["Ada", "Grace"],
+      autoResize: [false, true],
+      submitShortcut: ["enter", "mod+enter"],
+    },
   },
   {
     name: "listbox",
@@ -360,7 +376,12 @@ const cases: Case[] = [
     primitive: meter,
     markup: `<root aria-label="Battery"><track><indicator></indicator></track><label>Battery</label><value></value></root>`,
     options: { value: 40 },
-    values: { value: [40, 60], min: [0, 20], max: [100, 80], locale: ["en-US", "de-DE"] },
+    values: {
+      value: [40, 60],
+      min: [0, 20],
+      max: [100, 80],
+      locale: ["en-US", "de-DE"],
+    },
     skip: {
       format: "A formatter, called for the text it shows.",
       getValueLabel: "A function, called for the text it shows.",
@@ -371,7 +392,12 @@ const cases: Case[] = [
     primitive: progress,
     markup: `<root aria-label="Upload"><track><indicator></indicator></track><label>Upload</label><value></value></root>`,
     options: { value: 40 },
-    values: { value: [40, 60], min: [0, 20], max: [100, 80], locale: ["en-US", "de-DE"] },
+    values: {
+      value: [40, 60],
+      min: [0, 20],
+      max: [100, 80],
+      locale: ["en-US", "de-DE"],
+    },
     skip: {
       format: "A formatter, called for the text it shows.",
       getValueLabel: "A function, called for the text it shows.",
@@ -383,7 +409,11 @@ const cases: Case[] = [
     options: { defaultValue: 5 },
     history: ["initial"],
     markup: `<root><group><decrement>Less</decrement><control aria-label="Quantity"></control><increment>More</increment></group><scrub-area><scrub-area-cursor></scrub-area-cursor></scrub-area><hidden-input></hidden-input></root>`,
-    parts: { increment: { "": {} }, decrement: { "": {} }, "scrub-area": { "": {} } },
+    parts: {
+      increment: { "": {} },
+      decrement: { "": {} },
+      "scrub-area": { "": {} },
+    },
     values: {
       value: [5, 7],
       min: [0, 6],
@@ -426,10 +456,17 @@ const cases: Case[] = [
       <item><link page="2">2</link></item>
       <item><next>Next</next></item>
     </list></root>`,
-    values: { page: [1, 3], pageCount: [5, 10], siblings: [1, 2], boundaries: [1, 2] },
+    values: {
+      page: [1, 3],
+      pageCount: [5, 10],
+      siblings: [1, 2],
+      boundaries: [1, 2],
+    },
     skip: {
-      total: "With `pageSize`, another way to say `pageCount`; the next case tries them.",
-      pageSize: "With `total`, another way to say `pageCount`; the next case tries them.",
+      total:
+        "With `pageSize`, another way to say `pageCount`; the next case tries them.",
+      pageSize:
+        "With `total`, another way to say `pageCount`; the next case tries them.",
       getHref: "A function, called for each link.",
     },
   },
@@ -438,8 +475,17 @@ const cases: Case[] = [
     primitive: pagination,
     options: { total: 50, pageSize: 10 },
     markup: `<root><list><item><link page="1">1</link></item><item><next>Next</next></item></list></root>`,
-    values: { page: [1, 3], total: [50, 100], pageSize: [10, 20], siblings: [1, 2], boundaries: [1, 2] },
-    skip: { pageCount: "The case before tries it.", getHref: "A function, called for each link." },
+    values: {
+      page: [1, 3],
+      total: [50, 100],
+      pageSize: [10, 20],
+      siblings: [1, 2],
+      boundaries: [1, 2],
+    },
+    skip: {
+      pageCount: "The case before tries it.",
+      getHref: "A function, called for each link.",
+    },
   },
   {
     name: "password input",
@@ -473,9 +519,14 @@ const cases: Case[] = [
     primitive: scrollArea,
     markup: `<root><viewport><content>Text</content></viewport><scrollbar><thumb></thumb></scrollbar><corner></corner></root>`,
     parts: { scrollbar: { "": {} } },
-    values: { type: ["hover", "always"], scrollHideDelay: [600, 1000], stickToEnd: [false, true] },
+    values: {
+      type: ["hover", "always"],
+      scrollHideDelay: [600, 1000],
+      stickToEnd: [false, true],
+    },
     skip: {
-      'type: "always" to "hover"': "Its scrollbars hide after `scrollHideDelay`, as when the pointer leaves.",
+      'type: "always" to "hover"':
+        "Its scrollbars hide after `scrollHideDelay`, as when the pointer leaves.",
     },
   },
   {
@@ -489,7 +540,12 @@ const cases: Case[] = [
     primitive: switchPrimitive,
     history: ["initial", "[checked]"],
     markup: `<root aria-label="Wi-Fi"><thumb></thumb></root>`,
-    values: { checked: [false, true], name: ["wifi", "radio"], value: ["on", "yes"], form: ["one", "two"] },
+    values: {
+      checked: [false, true],
+      name: ["wifi", "radio"],
+      value: ["on", "yes"],
+      form: ["one", "two"],
+    },
   },
   {
     name: "toggle",
@@ -598,7 +654,8 @@ const cases: Case[] = [
     skip: {
       ...popupSkips,
       modalAbove: "Applies once the drawer comes to rest, which needs a drag.",
-      "snapPoints: [1] to [0.5,1]": "An open drawer stays at its snap point while that point remains.",
+      "snapPoints: [1] to [0.5,1]":
+        "An open drawer stays at its snap point while that point remains.",
       "open: false to true":
         "A DOM made for tests gives the drawer no height, so a rise from closed ends where it started.",
       physics: "Read when the drawer moves, which needs a drag.",
@@ -654,7 +711,8 @@ const cases: Case[] = [
     },
     skip: {
       ...popupSkips,
-      "open: true to false": "Closed, its content keeps the place it last had, hidden.",
+      "open: true to false":
+        "Closed, its content keeps the place it last had, hidden.",
     },
   },
   {
@@ -731,7 +789,8 @@ const cases: Case[] = [
         "Opened after it renders, it highlights its first item, as opening it by hand does.",
       ...popupSkips,
       ...listSkips,
-      "open: true to false": "Once opened, the list stays rendered, closed, so its items can name the value.",
+      "open: true to false":
+        "Once opened, the list stays rendered, closed, so its items can name the value.",
       items: "The markup names the items.",
       "trigger.named": "Whether a field names it, which the field tells it.",
     },
@@ -752,7 +811,12 @@ const cases: Case[] = [
       </list><empty>None</empty></content>
       <form-input></form-input>
     </root>`,
-    parts: { content: { "": {} }, item: { Banana: {} }, "item-text": { "": {} }, clear: { "": {} } },
+    parts: {
+      content: { "": {} },
+      item: { Banana: {} },
+      "item-text": { "": {} },
+      clear: { "": {} },
+    },
     values: {
       pendingAnnouncement: ["Loading", "Saving"],
       ...lists,
@@ -764,7 +828,11 @@ const cases: Case[] = [
       allowCustomValue: [false, true],
       ...placed,
     },
-    skip: { ...popupSkips, ...listSkips, items: "Changing the data is the list tests' job." },
+    skip: {
+      ...popupSkips,
+      ...listSkips,
+      items: "Changing the data is the list tests' job.",
+    },
   },
   {
     name: "autocomplete",
@@ -781,7 +849,12 @@ const cases: Case[] = [
         <item value="Banana"><item-text text="Banana">Banana</item-text></item>
       </list><empty>None</empty></content>
     </div>`,
-    parts: { content: { "": {} }, item: { Banana: {} }, "item-text": { "": {} }, clear: { "": {} } },
+    parts: {
+      content: { "": {} },
+      item: { Banana: {} },
+      "item-text": { "": {} },
+      clear: { "": {} },
+    },
     values: {
       ...lists,
       open: [true, false],
@@ -792,7 +865,11 @@ const cases: Case[] = [
       submitOnSelect: [false, true],
       ...placed,
     },
-    skip: { ...popupSkips, ...listSkips, items: "Changing the data is the list tests' job." },
+    skip: {
+      ...popupSkips,
+      ...listSkips,
+      items: "Changing the data is the list tests' job.",
+    },
   },
   {
     name: "command",
@@ -819,7 +896,8 @@ const cases: Case[] = [
       ...listSkips,
       items: "The markup names the items.",
       "item.data": "Whether data or markup made the item.",
-      "autoHighlight: true to false": "Turned off, the highlight it showed stays.",
+      "autoHighlight: true to false":
+        "Turned off, the highlight it showed stays.",
     },
   },
   {
@@ -845,7 +923,8 @@ const cases: Case[] = [
       ...popupSkips,
       parent: "A parent menu's controller, handed over like `controller`.",
       "viewport.container": "An element, which markup can't name.",
-      "viewport.anchor": "Names an element to place against, which markup can't follow.",
+      "viewport.anchor":
+        "Names an element to place against, which markup can't follow.",
       'value: "learn" to null':
         "A closed menu keeps the item it showed last, so the indicator leaves from there.",
     },
@@ -867,7 +946,11 @@ const cases: Case[] = [
   {
     name: "date picker",
     primitive: datePicker,
-    options: { defaultMonth: "2026-10", today: "2026-10-16", defaultOpen: true },
+    options: {
+      defaultMonth: "2026-10",
+      today: "2026-10-16",
+      defaultOpen: true,
+    },
     markup: `<root>
       <input aria-label="Date"></input>
       <trigger>Pick</trigger>

@@ -20,18 +20,31 @@ const people = [
 
 function Example() {
   return (
-    <TriggerMenu triggers={[{ char: "@", items: people }]} autoHighlight={false} loop={false}>
+    <TriggerMenu
+      triggers={[{ char: "@", items: people }]}
+      autoHighlight={false}
+      loop={false}
+    >
       <Field>
         <FieldLabel>Task</FieldLabel>
         <FieldControl
-          render={<TriggerMenuInput render={<input />} placeholder="Type @ to assign someone…" />}
+          render={
+            <TriggerMenuInput
+              render={<input />}
+              placeholder="Type @ to assign someone…"
+            />
+          }
         />
       </Field>
       <TriggerMenuContent>
         <TriggerMenuList>
           {(state) =>
             (state.items as TriggerMenuDataItem[]).map((item) => (
-              <TriggerMenuItem key={item.value} value={item.value} label={item.label}>
+              <TriggerMenuItem
+                key={item.value}
+                value={item.value}
+                label={item.label}
+              >
                 {item.label}
               </TriggerMenuItem>
             ))

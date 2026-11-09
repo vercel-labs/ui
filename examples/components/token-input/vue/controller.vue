@@ -17,23 +17,30 @@ const draft: TokenInputValue = [
 const loadFile = () => new Promise<void>((resolve) => setTimeout(resolve, 800))
 
 const prompt = createTokenInputController()
-const firstToken = () => prompt.getValue().find((segment): segment is Token => typeof segment !== "string")
+const firstToken = () =>
+  prompt
+    .getValue()
+    .find((segment): segment is Token => typeof segment !== "string")
 
 function attachFile() {
   prompt.insert(
     { type: "file", value: "package.json", label: "package.json" },
-    { at: "end", resolve: loadFile() },
+    { at: "end", resolve: loadFile() }
   )
 }
 
 function showPath() {
   const token = firstToken()
-  if (token) prompt.updateToken(token.id!, { label: token.value })
+  if (token) {
+    prompt.updateToken(token.id!, { label: token.value })
+  }
 }
 
 function removeFirst() {
   const token = firstToken()
-  if (token) prompt.removeToken(token.id!)
+  if (token) {
+    prompt.removeToken(token.id!)
+  }
 }
 </script>
 

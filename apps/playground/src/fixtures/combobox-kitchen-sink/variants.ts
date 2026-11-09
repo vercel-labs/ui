@@ -163,15 +163,22 @@ function listOf(variant: Variant) {
 // The value at first. Objects are looked up by their code.
 function defaultValueOf(variant: Variant) {
   const value = variant.options?.defaultValue
-  if (variant.list !== "objects" || value === undefined) return value
-  const find = (code: string) => objects.find((country) => country.code === code)
+  if (variant.list !== "objects" || value === undefined) {
+    return value
+  }
+  const find = (code: string) =>
+    objects.find((country) => country.code === code)
   return Array.isArray(value) ? value.map(find) : find(value)
 }
 
 // The value the "Set" buttons choose.
 function sampleValue(variant: Variant) {
-  if (variant.options?.multiple) return ["fr", "jp"]
-  if (variant.list === "objects") return objects[3]
+  if (variant.options?.multiple) {
+    return ["fr", "jp"]
+  }
+  if (variant.list === "objects") {
+    return objects[3]
+  }
   return "fr"
 }
 
@@ -181,7 +188,9 @@ function fuzzy(item: ListItem<any>, query: string) {
   let from = 0
   for (const char of query.toLowerCase()) {
     from = label.indexOf(char, from) + 1
-    if (!from) return false
+    if (!from) {
+      return false
+    }
   }
   return true
 }
@@ -203,24 +212,43 @@ const wait = (ms: number, signal?: AbortSignal) =>
 
 // A fake server: countries matching the text, after 600ms. "error" always fails.
 function search(kind: "ok" | "error" | "pages") {
-  return async (query: string, { signal, page }: { signal: AbortSignal; page: number }) => {
+  return async (
+    query: string,
+    { signal, page }: { signal: AbortSignal; page: number }
+  ) => {
     await wait(600, signal)
-    if (kind === "error") throw new Error("The server is down.")
+    if (kind === "error") {
+      throw new Error("The server is down.")
+    }
     const needle = query.trim().toLowerCase()
-    const found = countries.filter((country) => country.label.toLowerCase().includes(needle))
-    if (kind === "ok") return found
-    return { items: found.slice(page * 5, page * 5 + 5), hasMore: found.length > page * 5 + 5 }
+    const found = countries.filter((country) =>
+      country.label.toLowerCase().includes(needle)
+    )
+    if (kind === "ok") {
+      return found
+    }
+    return {
+      items: found.slice(page * 5, page * 5 + 5),
+      hasMore: found.length > page * 5 + 5,
+    }
   }
 }
 
 // Shown while the input is empty, in the "recent" variant.
-const recentCountries: ListData = [{ type: "group", label: "Recent", items: [countries[0], countries[3]] }]
+const recentCountries: ListData = [
+  { type: "group", label: "Recent", items: [countries[0], countries[3]] },
+]
 
 // What ComboboxCreate's onCreate does for each kind. It only logs: created items aren't added.
-function createHandler(kind: Variant["create"], log: (message: string) => void) {
+function createHandler(
+  kind: Variant["create"],
+  log: (message: string) => void
+) {
   return (query: string) => {
     log(`create "${query}"`)
-    if (kind === "sync") return
+    if (kind === "sync") {
+      return
+    }
     return wait(1200).then(() => {
       if (kind === "reject") {
         log(`create "${query}" failed`)
@@ -241,13 +269,33 @@ const variants: Variant[] = [
       section: "Placement",
       title: `${side} ${align}`,
       content: { side, align },
-    })),
+    }))
   ),
 
-  { id: "offset-0", section: "Offsets", title: "sideOffset 0", content: { sideOffset: 0 } },
-  { id: "offset-16", section: "Offsets", title: "sideOffset 16", content: { sideOffset: 16 } },
-  { id: "align-16", section: "Offsets", title: "alignOffset 16", content: { alignOffset: 16 } },
-  { id: "align-neg", section: "Offsets", title: "alignOffset -16", content: { alignOffset: -16 } },
+  {
+    id: "offset-0",
+    section: "Offsets",
+    title: "sideOffset 0",
+    content: { sideOffset: 0 },
+  },
+  {
+    id: "offset-16",
+    section: "Offsets",
+    title: "sideOffset 16",
+    content: { sideOffset: 16 },
+  },
+  {
+    id: "align-16",
+    section: "Offsets",
+    title: "alignOffset 16",
+    content: { alignOffset: 16 },
+  },
+  {
+    id: "align-neg",
+    section: "Offsets",
+    title: "alignOffset -16",
+    content: { alignOffset: -16 },
+  },
   {
     id: "padding-48",
     section: "Offsets",
@@ -353,7 +401,12 @@ const variants: Variant[] = [
     note: "Text that matches nothing becomes the value on Enter or close.",
     options: { allowCustomValue: true },
   },
-  { id: "default-query", section: "Text", title: "defaultQuery", options: { defaultQuery: "an" } },
+  {
+    id: "default-query",
+    section: "Text",
+    title: "defaultQuery",
+    options: { defaultQuery: "an" },
+  },
   {
     id: "default-value",
     section: "Text",
@@ -479,7 +532,13 @@ const variants: Variant[] = [
     indicatorKeepMounted: true,
     options: { defaultValue: "at" },
   },
-  { id: "arrow", section: "Parts", title: "ComboboxArrow", arrow: true, content: { sideOffset: 10 } },
+  {
+    id: "arrow",
+    section: "Parts",
+    title: "ComboboxArrow",
+    arrow: true,
+    content: { sideOffset: 10 },
+  },
   {
     id: "arrow-top",
     section: "Parts",
@@ -508,7 +567,13 @@ const variants: Variant[] = [
     mode: "data",
     options: { defaultValue: "fr" },
   },
-  { id: "data-groups", section: "Items", title: "Data groups", mode: "data", list: "grouped" },
+  {
+    id: "data-groups",
+    section: "Items",
+    title: "Data groups",
+    mode: "data",
+    list: "grouped",
+  },
   {
     id: "many",
     section: "Items",
@@ -596,10 +661,30 @@ const variants: Variant[] = [
     note: "Arrow keys stop at the ends.",
     options: { loop: false },
   },
-  { id: "controlled-value", section: "Behavior", title: "Controlled value", controlled: "value" },
-  { id: "controlled-open", section: "Behavior", title: "Controlled open", controlled: "open" },
-  { id: "controlled-query", section: "Behavior", title: "Controlled query", controlled: "query" },
-  { id: "controller", section: "Behavior", title: "Controller", controller: true },
+  {
+    id: "controlled-value",
+    section: "Behavior",
+    title: "Controlled value",
+    controlled: "value",
+  },
+  {
+    id: "controlled-open",
+    section: "Behavior",
+    title: "Controlled open",
+    controlled: "open",
+  },
+  {
+    id: "controlled-query",
+    section: "Behavior",
+    title: "Controlled query",
+    controlled: "query",
+  },
+  {
+    id: "controller",
+    section: "Behavior",
+    title: "Controller",
+    controller: true,
+  },
   {
     id: "controller-multiple",
     section: "Behavior",
@@ -616,7 +701,12 @@ const variants: Variant[] = [
     options: { debug: true },
   },
 
-  { id: "corner-tl", section: "Collisions", title: "Top-left corner", place: "top-left" },
+  {
+    id: "corner-tl",
+    section: "Collisions",
+    title: "Top-left corner",
+    place: "top-left",
+  },
   {
     id: "corner-tr",
     section: "Collisions",
@@ -655,9 +745,25 @@ const variants: Variant[] = [
     note: "Scroll the box.",
     place: "scroll",
   },
-  { id: "clip", section: "Containers", title: "Inside overflow hidden", place: "clip" },
-  { id: "transform", section: "Containers", title: "Inside a transform", place: "transform" },
-  { id: "rtl", section: "Containers", title: "Right to left", place: "rtl", options: { defaultValue: "ar" } },
+  {
+    id: "clip",
+    section: "Containers",
+    title: "Inside overflow hidden",
+    place: "clip",
+  },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Inside a transform",
+    place: "transform",
+  },
+  {
+    id: "rtl",
+    section: "Containers",
+    title: "Right to left",
+    place: "rtl",
+    options: { defaultValue: "ar" },
+  },
   {
     id: "rtl-chips",
     section: "Containers",
@@ -669,8 +775,19 @@ const variants: Variant[] = [
   },
 
   { id: "anim-none", section: "Animation", title: "None", animation: "none" },
-  { id: "anim-default", section: "Animation", title: "Scale and fade", animation: "default" },
-  { id: "anim-slow", section: "Animation", title: "Slow slide", note: "700ms.", animation: "slow" },
+  {
+    id: "anim-default",
+    section: "Animation",
+    title: "Scale and fade",
+    animation: "default",
+  },
+  {
+    id: "anim-slow",
+    section: "Animation",
+    title: "Slow slide",
+    note: "700ms.",
+    animation: "slow",
+  },
 ]
 
 export {

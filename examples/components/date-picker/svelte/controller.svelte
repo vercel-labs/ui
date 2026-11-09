@@ -15,14 +15,20 @@
     DatePickerInput,
     DatePickerTrigger,
   } from "@ui-sdk/svelte/date-picker"
-  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import {
+    CalendarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+  } from "@lucide/svelte"
 
   const controller = createDatePickerController()
 </script>
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <button type="button" onclick={() => controller.setValue("2026-12-25")}>Choose Christmas</button>
+    <button type="button" onclick={() => controller.setValue("2026-12-25")}
+      >Choose Christmas</button
+    >
     <button type="button" onclick={() => controller.open()}>Open</button>
   </div>
   <DatePicker {controller} defaultValue="2026-10-16">

@@ -6,7 +6,9 @@ const index = createSearchIndex([
     url: "/docs/react/components/navigation-menu",
     title: "Navigation Menu",
     headings: [{ id: "keyboard", content: "Keyboard" }],
-    contents: [{ heading: "keyboard", content: "Arrow keys move between `MenuItem`s." }],
+    contents: [
+      { heading: "keyboard", content: "Arrow keys move between `MenuItem`s." },
+    ],
   },
   {
     url: "/docs/react/components/menu",
@@ -14,7 +16,12 @@ const index = createSearchIndex([
     headings: [{ id: "submenus", content: "Submenus" }],
     contents: [{ content: "A menu of actions." }],
   },
-  { url: "/docs/react/components/slider", title: "Slider", headings: [], contents: [] },
+  {
+    url: "/docs/react/components/slider",
+    title: "Slider",
+    headings: [],
+    contents: [],
+  },
 ])
 
 describe("searchIndex", () => {
@@ -39,7 +46,8 @@ describe("searchIndex", () => {
       {
         id: "/docs/react/components/navigation-menu:1",
         type: "text",
-        content: "<mark>Arrow</mark> keys move between `Menu<mark>Item</mark>`s.",
+        content:
+          "<mark>Arrow</mark> keys move between `Menu<mark>Item</mark>`s.",
         url: "/docs/react/components/navigation-menu#keyboard",
       },
     ])
@@ -59,10 +67,12 @@ describe("searchIndex", () => {
         contents: [],
       },
     ])
-    expect(searchIndex(menubar, "menubar").map((result) => result.url)).toEqual([
-      "/docs/react/components/menubar",
-    ])
-    expect(searchIndex(menubar, "controller").map((result) => result.url)).toEqual([
+    expect(searchIndex(menubar, "menubar").map((result) => result.url)).toEqual(
+      ["/docs/react/components/menubar"]
+    )
+    expect(
+      searchIndex(menubar, "controller").map((result) => result.url)
+    ).toEqual([
       "/docs/react/components/menubar",
       "/docs/react/components/menubar#controller",
     ])

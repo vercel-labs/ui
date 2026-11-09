@@ -3,7 +3,10 @@ import { radio } from "./forms.helpers"
 
 // Right-to-left layouts mirror the horizontal arrows of a radio group.
 
-test("ArrowLeft moves to the next radio and ArrowRight to the previous one", async ({ page, open }) => {
+test("ArrowLeft moves to the next radio and ArrowRight to the previous one", async ({
+  page,
+  open,
+}) => {
   await open("forms", { dir: "rtl", plan: "free" })
   await radio(page, "Free").focus()
   await page.keyboard.press("ArrowLeft")

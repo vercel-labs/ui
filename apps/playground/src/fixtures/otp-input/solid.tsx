@@ -7,7 +7,11 @@ import {
 } from "@ui-sdk/solid/otp-input"
 import { render } from "@solidjs/web"
 import { createSignal, Show } from "solid-js"
-import { otpInputAction, otpInputFixture, otpInputOptions } from "tests/fixtures/otp-input.ts"
+import {
+  otpInputAction,
+  otpInputFixture,
+  otpInputOptions,
+} from "tests/fixtures/otp-input.ts"
 
 const controller = createOTPInputController()
 
@@ -18,7 +22,9 @@ function Fixture() {
   const { code, recovery, form } = otpInputFixture
   // Each group's slot indices, counted across the groups.
   let next = 0
-  const groups = code.groups.map((size) => Array.from({ length: size }, () => next++))
+  const groups = code.groups.map((size) =>
+    Array.from({ length: size }, () => next++)
+  )
   return (
     <div class="fixture">
       <button>Before</button>
@@ -37,7 +43,9 @@ function Fixture() {
           controller={controller}
           {...options}
           onValueChange={(value, details) => {
-            if (cancel && value.includes(cancel)) return details.cancel()
+            if (cancel && value.includes(cancel)) {
+              return details.cancel()
+            }
             setAction(otpInputAction.change(value, details.reason))
           }}
           onValueCommit={(value) => setAction(otpInputAction.complete(value))}
@@ -58,14 +66,21 @@ function Fixture() {
         <button type="submit">{form.submit}</button>
         <button type="reset">{form.reset}</button>
       </form>
-      <OTPInput class="otp" aria-label={recovery.label} maxLength={recovery.length} pattern="alphanumeric">
+      <OTPInput
+        class="otp"
+        aria-label={recovery.label}
+        maxLength={recovery.length}
+        pattern="alphanumeric"
+      >
         <OTPInputGroup class="otp-group">
           {Array.from({ length: recovery.length }, (_, slot) => (
             <OTPInputSlot index={slot} class="otp-slot" />
           ))}
         </OTPInputGroup>
       </OTPInput>
-      <button onClick={() => controller.setValue(otpInputFixture.filled)}>Fill code</button>
+      <button onClick={() => controller.setValue(otpInputFixture.filled)}>
+        Fill code
+      </button>
       <button onClick={() => controller.clear()}>Clear code</button>
       <button>After</button>
       <output role="status" aria-label="Last action">

@@ -23,14 +23,20 @@ function mount(root: HTMLElement) {
       <output role="status" aria-label="Last action"></output>
     </div>
   `
-  const element = (id: string) => root.querySelector<HTMLElementTagNameMap["ui-meter"]>(`#${id}`)!
+  const element = (id: string) =>
+    root.querySelector<HTMLElementTagNameMap["ui-meter"]>(`#${id}`)!
   element("requests").getValueLabel = requests.valueLabel
   element("disk").format = disk.format
-  const set = (value: number) => element("storage").setAttribute("value", String(value))
+  const set = (value: number) =>
+    element("storage").setAttribute("value", String(value))
   root
     .querySelector("#fill")!
-    .addEventListener("click", () => set(Number(element("storage").getAttribute("value")) + storage.step))
-  root.querySelector("#reset")!.addEventListener("click", () => set(storage.value))
+    .addEventListener("click", () =>
+      set(Number(element("storage").getAttribute("value")) + storage.step)
+    )
+  root
+    .querySelector("#reset")!
+    .addEventListener("click", () => set(storage.value))
 }
 
 export { mount }

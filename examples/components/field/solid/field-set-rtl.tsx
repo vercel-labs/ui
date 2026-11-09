@@ -1,4 +1,10 @@
-import { Field, FieldDescription, FieldLabel, FieldLegend, FieldSet } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldLabel,
+  FieldLegend,
+  FieldSet,
+} from "@ui-sdk/solid/field"
 import { Input } from "@ui-sdk/solid/input"
 
 function Example() {

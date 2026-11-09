@@ -27,7 +27,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <Checkbox checked={open} onCheckedChange={(next) => setOpen(next === true)}>
+          <Checkbox
+            checked={open}
+            onCheckedChange={(next) => setOpen(next === true)}
+          >
             <CheckboxIndicator>
               <CheckIcon aria-hidden="true" />
             </CheckboxIndicator>
@@ -41,14 +44,18 @@ function Example() {
           setOpen(next)
           log(`${next ? "Opened" : "Closed"} (${details.reason})`)
         }}
-        onOpenChangeComplete={(next) => log(next ? "Finished opening" : "Finished closing")}
+        onOpenChangeComplete={(next) =>
+          log(next ? "Finished opening" : "Finished closing")
+        }
       >
         <DialogTrigger>Notification Settings</DialogTrigger>
         <DialogBackdrop />
         <DialogContent>
           <div data-slot="stack">
             <DialogTitle>Notification settings</DialogTitle>
-            <DialogDescription>Choose what we email you about.</DialogDescription>
+            <DialogDescription>
+              Choose what we email you about.
+            </DialogDescription>
           </div>
           <div data-slot="stack">
             {topics.map((topic) => (

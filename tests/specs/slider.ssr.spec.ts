@@ -8,7 +8,10 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
 test("sliders hydrate without mismatches", async ({ page, open }) => {
   await open("slider")
@@ -18,13 +21,19 @@ test("sliders hydrate without mismatches", async ({ page, open }) => {
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("right to left sliders hydrate without mismatches", async ({ page, open }) => {
+test("right to left sliders hydrate without mismatches", async ({
+  page,
+  open,
+}) => {
   await open("slider", { dir: "rtl", price: "10,90" })
   await expect(volume(page)).toHaveValue("50")
   expect(await hydrationErrors(page)).toEqual([])
 })
 
-test("the server markup places the thumbs before hydration", async ({ page, open }) => {
+test("the server markup places the thumbs before hydration", async ({
+  page,
+  open,
+}) => {
   await open("slider", { hydrate: "manual" })
   const box = (await track(page, 0).boundingBox())!
   // Labels join their controls once the field binds, so the thumb is found by its class.
@@ -43,19 +52,27 @@ test("right to left, the server markup centers each thumb on its value before hy
   expect(Math.abs(thumb.x - (box.x + box.width * 0.8))).toBeLessThan(1.5)
 })
 
-test("the server markup submits the defaults before hydration", async ({ page, open }) => {
+test("the server markup submits the defaults before hydration", async ({
+  page,
+  open,
+}) => {
   await open("slider", { hydrate: "manual" })
   const data = await page.evaluate(() =>
     new URLSearchParams(
-      new FormData(document.querySelector("form")!) as unknown as Record<string, string>,
-    ).toString(),
+      new FormData(document.querySelector("form")!) as unknown as Record<
+        string,
+        string
+      >
+    ).toString()
   )
   expect(data).toBe("volume=50&price=20%2F80")
 })
 
 test("sliders work after hydrating late", async ({ page, open }) => {
   await open("slider", { hydrate: "manual" })
-  await page.evaluate(() => (window as unknown as { hydrate: () => void }).hydrate())
+  await page.evaluate(() =>
+    (window as unknown as { hydrate: () => void }).hydrate()
+  )
   await volume(page).focus()
   await page.keyboard.press("End")
   await expect(volume(page)).toHaveValue("100")

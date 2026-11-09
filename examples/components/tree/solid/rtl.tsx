@@ -1,4 +1,10 @@
-import { Tree, TreeGroup, TreeItem, TreeItemIndicator, TreeItemLabel } from "@ui-sdk/solid/tree"
+import {
+  Tree,
+  TreeGroup,
+  TreeItem,
+  TreeItemIndicator,
+  TreeItemLabel,
+} from "@ui-sdk/solid/tree"
 import { For, Show } from "solid-js"
 
 type Node = { value: string; label: string; children?: Node[] }

@@ -10,7 +10,11 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "../src/pagination"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "../src/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "../src/password-input"
 
 function Password({ defaultVisible }: { defaultVisible?: boolean }) {
   return (
@@ -23,7 +27,12 @@ function Password({ defaultVisible }: { defaultVisible?: boolean }) {
 
 function Pages({ getHref }: { getHref?: (page: number) => string }) {
   return (
-    <Pagination aria-label="Pages" pageCount={10} defaultPage={5} getHref={getHref}>
+    <Pagination
+      aria-label="Pages"
+      pageCount={10}
+      defaultPage={5}
+      getHref={getHref}
+    >
       <PaginationList>
         {({ items }) => (
           <>
@@ -32,7 +41,11 @@ function Pages({ getHref }: { getHref?: (page: number) => string }) {
             </PaginationItem>
             {items.map((item) => (
               <PaginationItem key={item}>
-                {typeof item === "number" ? <PaginationLink page={item} /> : <PaginationEllipsis />}
+                {typeof item === "number" ? (
+                  <PaginationLink page={item} />
+                ) : (
+                  <PaginationEllipsis />
+                )}
               </PaginationItem>
             ))}
             <PaginationItem>
@@ -73,7 +86,9 @@ describe("pagination server rendering", () => {
   })
 
   test("with getHref the server renders links that work before hydration", () => {
-    const html = renderToString(<Pages getHref={(page) => `/results?page=${page}`} />)
+    const html = renderToString(
+      <Pages getHref={(page) => `/results?page=${page}`} />
+    )
     expect(html).toContain('href="/results?page=4"')
     expect(html).toContain('href="/results?page=6"')
     expect(html).not.toContain('type="button"')

@@ -13,7 +13,9 @@ The thumb that slides along the switch as it turns on or off.
   let props: PartProps<"span", SwitchThumbState> = $props()
 
   const control = getContext<SwitchContext | undefined>(SwitchKey)
-  if (!control) throw new Error("SwitchThumb must be used inside <Switch>.")
+  if (!control) {
+    throw new Error("SwitchThumb must be used inside <Switch>.")
+  }
   const thumb = useHandlePart(control, "thumb")
 </script>
 

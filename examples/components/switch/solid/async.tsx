@@ -3,7 +3,8 @@ import { Switch, SwitchThumb } from "@ui-sdk/solid/switch"
 import { createSignal, Show } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
-const save = (_checked: boolean) => new Promise((resolve) => setTimeout(resolve, 800))
+const save = (_checked: boolean) =>
+  new Promise((resolve) => setTimeout(resolve, 800))
 
 function Example() {
   const log = useLog()
@@ -18,9 +19,13 @@ function Example() {
         controller={backups}
         aria-busy={saving() ? "true" : "false"}
         onCheckedChange={(next, details) => {
-          if (details.reason === "imperative") return
+          if (details.reason === "imperative") {
+            return
+          }
           details.cancel()
-          if (pending) return
+          if (pending) {
+            return
+          }
           pending = true
           setSaving(true)
           log("Saving…")

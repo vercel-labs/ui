@@ -25,8 +25,11 @@ const channels = [
 function searchChannels(query: string, { signal }: { signal: AbortSignal }) {
   return new Promise<string[]>((resolve, reject) => {
     const timer = setTimeout(
-      () => resolve(channels.filter((channel) => channel.includes(query.toLowerCase()))),
-      400,
+      () =>
+        resolve(
+          channels.filter((channel) => channel.includes(query.toLowerCase()))
+        ),
+      400
     )
     signal.addEventListener("abort", () => {
       clearTimeout(timer)

@@ -26,33 +26,58 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Field, FieldControl, FieldError, FieldLabel } from "@/components/ui/field"
-import { Select, SelectContent, SelectItem, SelectLabel, SelectTrigger } from "@/components/ui/select"
+import {
+  Field,
+  FieldControl,
+  FieldError,
+  FieldLabel,
+} from "@/components/ui/field"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/toast"
-import { Tooltip, TooltipContent, TooltipShortcut, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 const newIssue = createDialogController()
 
 function NewIssueForm() {
   const router = useRouter()
-  const [state, action, pending] = useActionState(async (previous: CreateIssueState, form: FormData) => {
-    const next: CreateIssueState = await createIssue(previous, form).catch(() => ({
-      error: "Couldn't create the issue. Try again.",
-    }))
-    if (next.id) {
-      newIssue.close()
-      toast.success(`${next.id} created`)
-      router.push(`/?issue=${next.id}`)
-    }
-    return next
-  }, {})
+  const [state, action, pending] = useActionState(
+    async (previous: CreateIssueState, form: FormData) => {
+      const next: CreateIssueState = await createIssue(previous, form).catch(
+        () => ({
+          error: "Couldn't create the issue. Try again.",
+        })
+      )
+      if (next.id) {
+        newIssue.close()
+        toast.success(`${next.id} created`)
+        router.push(`/?issue=${next.id}`)
+      }
+      return next
+    },
+    {}
+  )
 
   return (
     <form action={action} className="grid gap-5">
       <Field name="title" invalid={state.error ? true : undefined}>
         <FieldLabel>Title</FieldLabel>
-        <FieldControl required autoComplete="off" placeholder="What needs doing?" />
+        <FieldControl
+          required
+          autoComplete="off"
+          placeholder="What needs doing?"
+        />
         <FieldError match="valueMissing">Give the issue a title.</FieldError>
         {state.error && <FieldError match>{state.error}</FieldError>}
       </Field>
@@ -87,7 +112,10 @@ function NewIssueForm() {
             ))}
           </SelectContent>
         </Select>
-        <Combobox name="assignee" itemToLabel={(id: string) => personOf(id)?.name ?? ""}>
+        <Combobox
+          name="assignee"
+          itemToLabel={(id: string) => personOf(id)?.name ?? ""}
+        >
           <div className="grid gap-2">
             <ComboboxLabel>Assignee</ComboboxLabel>
             <div className="relative">
@@ -102,7 +130,11 @@ function NewIssueForm() {
             <ComboboxEmpty>Nobody matches.</ComboboxEmpty>
             <ComboboxList>
               {people.map((person) => (
-                <ComboboxItem key={person.id} value={person.id} label={person.name}>
+                <ComboboxItem
+                  key={person.id}
+                  value={person.id}
+                  label={person.name}
+                >
                   <Avatar name={person.name} size="sm" decorative />
                   {person.name}
                 </ComboboxItem>
@@ -112,7 +144,9 @@ function NewIssueForm() {
         </Combobox>
       </div>
       <div className="flex justify-end gap-2">
-        <DialogClose className={buttonVariants({ variant: "ghost" })}>Cancel</DialogClose>
+        <DialogClose className={buttonVariants({ variant: "ghost" })}>
+          Cancel
+        </DialogClose>
         <Button type="submit" variant="primary" disabled={pending}>
           {pending ? "Creating…" : "Create issue"}
         </Button>

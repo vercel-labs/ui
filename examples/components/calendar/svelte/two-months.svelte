@@ -13,7 +13,12 @@
   import { ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
 </script>
 
-<Calendar months={2} pageBy="page" monthFormat="short" defaultValue="2026-10-16">
+<Calendar
+  months={2}
+  pageBy="page"
+  monthFormat="short"
+  defaultValue="2026-10-16"
+>
   <div data-slot="row">
     <CalendarPrevious data-variant="ghost">
       <ChevronLeftIcon aria-hidden="true" />

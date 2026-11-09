@@ -4,7 +4,12 @@
 // or step by step, once either entry installs it on the kernel's `watchers`.
 import type { AgentComponent } from "../agent/agent"
 import type { ChangeSource } from "../../foundation/kernel/details"
-import type { AgentSurface, Part, PrimitiveInstance, PropSpec } from "../../foundation/kernel/primitive-types"
+import type {
+  AgentSurface,
+  Part,
+  PrimitiveInstance,
+  PropSpec,
+} from "../../foundation/kernel/primitive-types"
 import { watchEarlier, watchers } from "../../foundation/kernel/watchers"
 import { accessibleName } from "../../foundation/text/accessible-name"
 import { checkMarks, isOffLimits, isSecret, textOf } from "./marks"
@@ -92,7 +97,12 @@ const listeners = new Map<Listener, boolean>()
 function watch(
   instance: PrimitiveInstance,
   parts: ReadonlyMap<string, Part>,
-  { controlled, commits, agent, options }: Parameters<NonNullable<typeof watchers.add>>[2],
+  {
+    controlled,
+    commits,
+    agent,
+    options,
+  }: Parameters<NonNullable<typeof watchers.add>>[2]
 ) {
   const entry: Entry = {
     ref: `c${++count}`,
@@ -113,34 +123,62 @@ function watch(
 }
 
 function retire(entry: Entry) {
-  if (entries.get(entry.ref) !== entry) return
+  if (entries.get(entry.ref) !== entry) {
+    return
+  }
   entries.delete(entry.ref)
-  if (byId.get(entry.id) === entry) byId.delete(entry.id)
-  if (!entry.key || entry.secret || entry.offLimits) return
+  if (byId.get(entry.id) === entry) {
+    byId.delete(entry.id)
+  }
+  if (!entry.key || entry.secret || entry.offLimits) {
+    return
+  }
   const queued = retired.get(entry.key)
-  if (queued?.at === count) queued.refs.push(entry.ref)
-  else {
+  if (queued?.at === count) {
+    queued.refs.push(entry.ref)
+  } else {
     // Deleted first, so the key moves to the newest end.
     retired.delete(entry.key)
     retired.set(entry.key, { at: count, refs: [entry.ref] })
-    if (retired.size > retiredLimit) retired.delete(retired.keys().next().value!)
+    if (retired.size > retiredLimit) {
+      retired.delete(retired.keys().next().value!)
+    }
   }
   // Values and checks are worth keeping. A closed menu's `open: false` isn't.
-  const state = entry.instance.deref()?.get() as Record<string, unknown> | undefined
+  const state = entry.instance.deref()?.get() as
+    Record<string, unknown> | undefined
   const keys = stateKeys(entry, state ?? {}).filter((key) => key !== "open")
-  if (!state || !keys.length) return
-  const last: AgentComponent = { ref: entry.ref, component: entry.component, offPage: true, actions: [] }
-  if (entry.label) last.label = entry.label
-  if (entry.row) last.row = entry.row
-  for (const key of keys) if (key === "value" || state[key] !== "") last[key] = state[key] ?? null
+  if (!state || !keys.length) {
+    return
+  }
+  const last: AgentComponent = {
+    ref: entry.ref,
+    component: entry.component,
+    offPage: true,
+    actions: [],
+  }
+  if (entry.label) {
+    last.label = entry.label
+  }
+  if (entry.row) {
+    last.row = entry.row
+  }
+  for (const key of keys) {
+    if (key === "value" || state[key] !== "") {
+      last[key] = state[key] ?? null
+    }
+  }
   offPage.delete(entry.ref)
   offPage.set(entry.ref, last)
   // The most recent 50, for a page that swaps many components in and out.
-  if (offPage.size > 50) offPage.delete(offPage.keys().next().value!)
+  if (offPage.size > 50) {
+    offPage.delete(offPage.keys().next().value!)
+  }
 }
 
 // Fields a browser tool stops seeing when they close, so the bridge doesn't keep them either.
-const secret = /\b(password|current-password|new-password|one-time-code|cc-[a-z-]+)\b/i
+const secret =
+  /\b(password|current-password|new-password|one-time-code|cc-[a-z-]+)\b/i
 
 const stateKeys = (entry: Entry, state: Record<string, unknown>) =>
   entry.controlled ?? ["open", "value", "checked"].filter((key) => key in state)
@@ -158,15 +196,25 @@ function remember(entry: Entry, parts: Bound[]) {
   entry.row = rowOf(parts)
   entry.secret ||=
     isSecret(elements) ||
-    parts.some(({ el }) => secret.test(`${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`))
+    parts.some(({ el }) =>
+      secret.test(
+        `${el.getAttribute("type")} ${el.getAttribute("autocomplete")}`
+      )
+    )
   // A region can turn off-limits and back, like a panel an app locks while it's busy.
   entry.offLimits = isOffLimits(elements)
   entry.key = `${entry.component}|${entry.label}|${entry.row}`
-  if (!first) return
+  if (!first) {
+    return
+  }
   const queue = retired.get(entry.key)?.refs
   const ref = queue?.shift()
-  if (!ref) return
-  if (!queue!.length) retired.delete(entry.key)
+  if (!ref) {
+    return
+  }
+  if (!queue!.length) {
+    retired.delete(entry.key)
+  }
   offPage.delete(ref)
   entries.delete(entry.ref)
   entry.ref = ref
@@ -174,11 +222,14 @@ function remember(entry: Entry, parts: Bound[]) {
 }
 
 function bound(instance: PrimitiveInstance) {
-  return [...(partsOf.get(instance)?.values() ?? [])].filter((part) => part.el?.isConnected) as Bound[]
+  return [...(partsOf.get(instance)?.values() ?? [])].filter(
+    (part) => part.el?.isConnected
+  ) as Bound[]
 }
 
 function componentLabel(parts: Bound[]) {
-  const keyless = (slot: string) => parts.find((part) => part.slot === slot && !part.key)?.el
+  const keyless = (slot: string) =>
+    parts.find((part) => part.slot === slot && !part.key)?.el
   // Not when the slot has many keys: an accordion's first trigger names its
   // item, not the accordion. A dialog's one trigger does name it, and so does
   // a label the web adapter keys by its element.
@@ -188,33 +239,52 @@ function componentLabel(parts: Bound[]) {
       ? found[0].el
       : found.find((part) => !part.key)?.el
   }
-  const text = (el: Element | undefined) => (el && textOf(el).slice(0, 80)) || undefined
+  const text = (el: Element | undefined) =>
+    (el && textOf(el).slice(0, 80)) || undefined
   const label = text(first("label"))
-  if (label) return label
+  if (label) {
+    return label
+  }
   // A group's own element names it before its items do.
   const group = keyless("group") ?? keyless("root")
   const name = group && accessibleName(group)
-  if (name) return name
+  if (name) {
+    return name
+  }
   // Then its field's name, like a date picker's input labelled "Due date",
   // before a heading that changes with what it shows, like "November 2026".
   // Not a search field in its popup, which comes and goes.
   const input = parts.find((part) => part.slot === "input")?.el
   const popup = parts.find((part) => part.slot === "content")?.el
   const field = input && !popup?.contains(input) && accessibleName(input)
-  if (field) return field
+  if (field) {
+    return field
+  }
   // Then what names it on screen: a title, a heading, a trigger or the button it is.
   const root = keyless("root")
   const button =
-    root && (root.tagName === "BUTTON" || root.getAttribute("role") === "button") ? root : undefined
-  const named = (el: Element | undefined) => (el && accessibleName(el)) || text(el)
-  const shown = named(first("title")) ?? named(first("heading")) ?? named(first("trigger")) ?? named(button)
-  if (shown) return shown
+    root &&
+    (root.tagName === "BUTTON" || root.getAttribute("role") === "button")
+      ? root
+      : undefined
+  const named = (el: Element | undefined) =>
+    (el && accessibleName(el)) || text(el)
+  const shown =
+    named(first("title")) ??
+    named(first("heading")) ??
+    named(first("trigger")) ??
+    named(button)
+  if (shown) {
+    return shown
+  }
   // Then any part's own name, keyless first, so an accordion isn't named by
   // its first item, but a slider is by its one thumb.
   const keys = new Set(parts.map((part) => part.key).filter(Boolean))
   for (const part of parts) {
     const name = (!part.key || keys.size === 1) && accessibleName(part.el)
-    if (name) return name
+    if (name) {
+      return name
+    }
   }
 }
 
@@ -222,19 +292,29 @@ function componentLabel(parts: Bound[]) {
 // its label's, like the name beside a member's menu, so an agent knows which
 // row it is.
 function rowOf(parts: Bound[]) {
-  const el = (parts.find((part) => part.slot === "trigger" || part.slot === "root") ?? parts[0])?.el
+  const el = (
+    parts.find((part) => part.slot === "trigger" || part.slot === "root") ??
+    parts[0]
+  )?.el
   const row = el?.closest("li, tr, [role=row], [role=listitem]")
-  if (!row || parts.some((part) => part.el.contains(row))) return
-  const own = parts.flatMap(({ el }) => [el, ...((el as HTMLInputElement).labels ?? [])])
+  if (!row || parts.some((part) => part.el.contains(row))) {
+    return
+  }
+  const own = parts.flatMap(({ el }) => [
+    el,
+    ...((el as HTMLInputElement).labels ?? []),
+  ])
   const words: string[] = []
   const walker = row.ownerDocument.createTreeWalker(row, NodeFilter.SHOW_TEXT)
-  for (let node = walker.nextNode(); node; node = walker.nextNode())
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     if (
       !own.some((el) => el.contains(node)) &&
       !isOffLimits([node.parentElement!]) &&
       node.textContent?.trim()
-    )
+    ) {
       words.push(node.textContent.trim())
+    }
+  }
   return words.join(" ").slice(0, 80) || undefined
 }
 
@@ -244,14 +324,27 @@ type Details = { reason: string; source: ChangeSource }
 // hear a person's steps on a key the component commits at its commit instead.
 // A change no person made, like a value set from code or by an agent, has no
 // interaction to commit it, so they hear it now.
-function report(id: string, key: string, value: unknown, details: Details, previous: unknown) {
+function report(
+  id: string,
+  key: string,
+  value: unknown,
+  details: Details,
+  previous: unknown
+) {
   const entry = byId.get(id)
-  if (!listeners.size || !entry) return
+  if (!listeners.size || !entry) {
+    return
+  }
   const { source } = details
-  const held = !!entry.commits?.includes(key) && source !== "programmatic" && source !== "agent"
+  const held =
+    !!entry.commits?.includes(key) &&
+    source !== "programmatic" &&
+    source !== "agent"
   // A person's first step keeps the value before it. A change no person made
   // between steps is reported now, so the commit starts after it.
-  if (entry.started.has(key) !== held) entry.started.set(key, held ? previous : value)
+  if (entry.started.has(key) !== held) {
+    entry.started.set(key, held ? previous : value)
+  }
   send(entry, key, value, details, previous, held || undefined)
 }
 
@@ -260,7 +353,9 @@ function report(id: string, key: string, value: unknown, details: Details, previ
 // call from code makes, was reported as it changed.
 function settle(id: string, key: string, value: unknown, details: Details) {
   const entry = byId.get(id)
-  if (!listeners.size || !entry?.started.has(key)) return
+  if (!listeners.size || !entry?.started.has(key)) {
+    return
+  }
   send(entry, key, value, details, entry.started.get(key), false)
   entry.started.delete(key)
 }
@@ -274,12 +369,16 @@ function send(
   value: unknown,
   details: Details,
   previous: unknown,
-  live?: boolean,
+  live?: boolean
 ) {
   const instance = entry.instance.deref()
-  if (!instance) return
+  if (!instance) {
+    return
+  }
   const parts = bound(instance)
-  if (parts.length) remember(entry, parts)
+  if (parts.length) {
+    remember(entry, parts)
+  }
   const change: ObservedChange = {
     ref: entry.ref,
     component: entry.component,
@@ -290,17 +389,28 @@ function send(
     reason: details.reason,
     source: details.source,
   }
-  if (entry.label) change.label = entry.label
-  if (entry.row) change.row = entry.row
-  listeners.forEach((hearsSteps, listener) => (live ?? hearsSteps) === hearsSteps && listener(change, parts))
+  if (entry.label) {
+    change.label = entry.label
+  }
+  if (entry.row) {
+    change.row = entry.row
+  }
+  listeners.forEach(
+    (hearsSteps, listener) =>
+      (live ?? hearsSteps) === hearsSteps && listener(change, parts)
+  )
 }
 
 /** Starts hearing components as they're made. The agent and `observe` both call it. */
 function install() {
   // A server renders each page once and never binds, so nothing would ever
   // leave the registry: every request's components would stay in memory.
-  if (typeof document === "undefined") return
-  if (watchers.add) return
+  if (typeof document === "undefined") {
+    return
+  }
+  if (watchers.add) {
+    return
+  }
   watchers.add = watch
   watchers.change = report
   watchers.commit = settle

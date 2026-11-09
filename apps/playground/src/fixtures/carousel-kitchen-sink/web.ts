@@ -3,7 +3,8 @@ import * as classes from "./classes"
 import { kitchenSink } from "./shell"
 import { slideBasis, slideCount, type Variant } from "./variants"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 const slides = Array.from({ length: slideCount }, (_, index) => index + 1)
 
 // Previous, Next, the toggle and the indicators. Outside the carousel, `for` connects them.
@@ -25,7 +26,7 @@ function controls(variant: Variant, target: string) {
             (slide) =>
               `<ui-carousel-indicator><${indicatorTag} class="${classes.indicator}" aria-label="Slide ${slide}"${
                 variant.links ? ` href="#kitchen-${variant.id}-${slide}"` : ""
-              }></${indicatorTag}></ui-carousel-indicator>`,
+              }></${indicatorTag}></ui-carousel-indicator>`
           )
           .join("")}
       </ui-carousel-indicator-group>
@@ -36,7 +37,9 @@ async function mount(root: HTMLElement) {
   await import("@ui-sdk/web/carousel")
   kitchenSink(root, "web", (slot, variant, env) => {
     const attributes = Object.entries(variant.options ?? {})
-      .map(([key, value]) => (value === true ? kebab(key) : `${kebab(key)}="${value}"`))
+      .map(([key, value]) =>
+        value === true ? kebab(key) : `${kebab(key)}="${value}"`
+      )
       .join(" ")
     const id = `kitchen-${variant.id}`
     slot.innerHTML = `
@@ -46,7 +49,7 @@ async function mount(root: HTMLElement) {
             ${slides
               .map(
                 (slide, index) =>
-                  `<ui-carousel-item class="${classes.slide}" style="flex-basis: ${slideBasis(variant, index)}">${slide}</ui-carousel-item>`,
+                  `<ui-carousel-item class="${classes.slide}" style="flex-basis: ${slideBasis(variant, index)}">${slide}</ui-carousel-item>`
               )
               .join("")}
           </ui-carousel-content>
@@ -56,13 +59,19 @@ async function mount(root: HTMLElement) {
       ${variant.outside ? controls(variant, id) : ""}`
     const carousel = slot.querySelector<UiCarouselElement>("ui-carousel")!
     carousel.addEventListener("pagechange", (event) => {
-      if (variant.cancel) return event.preventDefault()
-      env.log(`pageChange ${event.detail.value} (${event.detail.reason}, ${event.detail.source})`)
+      if (variant.cancel) {
+        return event.preventDefault()
+      }
+      env.log(
+        `pageChange ${event.detail.value} (${event.detail.reason}, ${event.detail.source})`
+      )
     })
     carousel.addEventListener("playingchange", (event) =>
-      env.log(`playingChange ${event.detail.value} (${event.detail.reason})`),
+      env.log(`playingChange ${event.detail.value} (${event.detail.reason})`)
     )
-    if (!variant.controller) return
+    if (!variant.controller) {
+      return
+    }
     const controller = createCarouselController()
     carousel.controller = controller
     env.controls([

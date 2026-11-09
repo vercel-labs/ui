@@ -10,8 +10,14 @@ describe("inputHints", () => {
       autoCorrect: "off",
       spellCheck: "false",
     })
-    expect(inputHints("one-time-code")).toMatchObject({ inputMode: "numeric", autoComplete: "one-time-code" })
-    expect(inputHints("message")).toMatchObject({ enterKeyHint: "send", autoCorrect: "on" })
+    expect(inputHints("one-time-code")).toMatchObject({
+      inputMode: "numeric",
+      autoComplete: "one-time-code",
+    })
+    expect(inputHints("message")).toMatchObject({
+      enterKeyHint: "send",
+      autoCorrect: "on",
+    })
     expect(inputHints("search").enterKeyHint).toBe("search")
   })
 

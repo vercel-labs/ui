@@ -18,7 +18,8 @@ const photos = [
 ]
 
 const nextFocused = () =>
-  typeof document !== "undefined" && document.activeElement?.getAttribute("data-slot") === "carousel-next"
+  typeof document !== "undefined" &&
+  document.activeElement?.getAttribute("data-slot") === "carousel-next"
 
 function Example() {
   return (
@@ -62,7 +63,9 @@ function Example() {
             state.disabled ? (
               <a
                 href="https://example.com/gallery"
-                ref={(link) => nextFocused() && queueMicrotask(() => link.focus())}
+                ref={(link) =>
+                  nextFocused() && queueMicrotask(() => link.focus())
+                }
               >
                 See all photos
               </a>

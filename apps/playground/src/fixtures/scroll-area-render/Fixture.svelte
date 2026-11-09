@@ -1,8 +1,15 @@
 <script lang="ts">
-  import { ScrollArea, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport } from "@ui-sdk/svelte"
+  import {
+    ScrollArea,
+    ScrollAreaScrollbar,
+    ScrollAreaThumb,
+    ScrollAreaViewport,
+  } from "@ui-sdk/svelte"
 
   const notes = Array.from({ length: 40 }, (_, index) => `Note ${index + 1}`)
-  const renders = ((window as unknown as { renders: { root: number } }).renders = { root: 0 })
+  const renders = ((
+    window as unknown as { renders: { root: number } }
+  ).renders = { root: 0 })
 
   // Counts the root's snippet renders, which only an edge flipping should cause.
   function status(atEnd: boolean) {
@@ -17,7 +24,11 @@
     {#snippet render({ props, state })}
       <section {...props}>
         <p class="render-status">{status(state.atEnd)}</p>
-        <ScrollAreaViewport class="scroll-area-viewport" role="region" aria-label="Notes">
+        <ScrollAreaViewport
+          class="scroll-area-viewport"
+          role="region"
+          aria-label="Notes"
+        >
           {#snippet render({ props })}
             <article {...props}>
               {#each notes as note (note)}

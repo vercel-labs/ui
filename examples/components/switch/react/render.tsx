@@ -9,7 +9,11 @@ function Example() {
         <SwitchThumb
           render={(props, state) => (
             <span {...props}>
-              {state.checked ? <MoonIcon aria-hidden="true" /> : <SunIcon aria-hidden="true" />}
+              {state.checked ? (
+                <MoonIcon aria-hidden="true" />
+              ) : (
+                <SunIcon aria-hidden="true" />
+              )}
             </span>
           )}
         />

@@ -18,17 +18,25 @@
     --danger-tint: color-mix(in oklab, var(--danger) 9%, var(--surface-2));
     --backdrop: light-dark(rgb(250 250 250 / 0.72), rgb(10 10 10 / 0.72));
 
-    --shadow-drop: 0 2px 3px -1px light-dark(color-mix(in oklab, #171717 16%, transparent), #0009);
-    --shadow-drop-pressed: 0 1px 1px -1px light-dark(color-mix(in oklab, #171717 16%, transparent), #0009);
+    --shadow-drop: 0 2px 3px -1px
+      light-dark(color-mix(in oklab, #171717 16%, transparent), #0009);
+    --shadow-drop-pressed: 0 1px 1px -1px
+      light-dark(color-mix(in oklab, #171717 16%, transparent), #0009);
     --shadow-1:
-      0 0 0 1px var(--line), 0 1px 2px light-dark(color-mix(in oklab, #171717 5%, transparent), #0006);
+      0 0 0 1px var(--line),
+      0 1px 2px light-dark(color-mix(in oklab, #171717 5%, transparent), #0006);
     --shadow-float:
-      0 2px 4px -1px light-dark(color-mix(in oklab, #171717 6%, transparent), #0008),
-      0 9px 22px -6px light-dark(color-mix(in oklab, #171717 16%, transparent), #000c);
+      0 2px 4px -1px
+        light-dark(color-mix(in oklab, #171717 6%, transparent), #0008),
+      0 9px 22px -6px
+        light-dark(color-mix(in oklab, #171717 16%, transparent), #000c);
     --shadow-2: 0 0 0 1px var(--line), var(--shadow-float);
     --shadow-3:
-      0 0 0 1px var(--line), 0 4px 8px -2px light-dark(color-mix(in oklab, #171717 6%, transparent), #0008),
-      0 22px 46px -12px light-dark(color-mix(in oklab, #171717 26%, transparent), #000e);
+      0 0 0 1px var(--line),
+      0 4px 8px -2px
+        light-dark(color-mix(in oklab, #171717 6%, transparent), #0008),
+      0 22px 46px -12px
+        light-dark(color-mix(in oklab, #171717 26%, transparent), #000e);
 
     --radius-row: 7px;
     --radius-control: 8px;

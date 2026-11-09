@@ -19,9 +19,15 @@ const log = useLog()
     deselectable
     default-value="astro"
     aria-label="Framework"
-    @value-change="(value, details) => log(`${value ?? 'Nothing'} (${details.reason})`)"
+    @value-change="
+      (value, details) => log(`${value ?? 'Nothing'} (${details.reason})`)
+    "
   >
-    <ListboxItem v-for="framework in frameworks" :key="framework.value" :value="framework.value">
+    <ListboxItem
+      v-for="framework in frameworks"
+      :key="framework.value"
+      :value="framework.value"
+    >
       {{ framework.label }}
       <ListboxItemIndicator>
         <CheckIcon aria-hidden="true" />

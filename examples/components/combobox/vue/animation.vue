@@ -27,7 +27,11 @@ const log = useLog()
 </script>
 
 <template>
-  <Combobox @open-change-complete="(open: boolean) => log(open ? 'Finished opening' : 'Finished closing')">
+  <Combobox
+    @open-change-complete="
+      (open: boolean) => log(open ? 'Finished opening' : 'Finished closing')
+    "
+  >
     <div data-slot="stack">
       <ComboboxLabel>Framework</ComboboxLabel>
       <div data-slot="row">

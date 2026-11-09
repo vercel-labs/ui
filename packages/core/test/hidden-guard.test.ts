@@ -19,14 +19,23 @@ afterEach(() => {
 })
 
 test("a kept, closed Collapsible panel writes the rule that keeps hidden parts hidden", () => {
-  const unbind = bound(collapsible({ id: "c" }).part("panel", { keepMounted: true }))
-  expect(guard()?.textContent).toContain('[data-slot][hidden]:not([hidden="until-found"])')
+  const unbind = bound(
+    collapsible({ id: "c" }).part("panel", { keepMounted: true })
+  )
+  expect(guard()?.textContent).toContain(
+    '[data-slot][hidden]:not([hidden="until-found"])'
+  )
   expect(guard()?.textContent).toContain("display: none !important")
   unbind()
 })
 
 test("an inactive, kept Tabs panel writes the rule", () => {
-  const unbind = bound(tabs({ id: "t", defaultValue: "a" }).part("panel", { value: "b", keepMounted: true }))
+  const unbind = bound(
+    tabs({ id: "t", defaultValue: "a" }).part("panel", {
+      value: "b",
+      keepMounted: true,
+    })
+  )
   expect(guard()).not.toBeNull()
   unbind()
 })

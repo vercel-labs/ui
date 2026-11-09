@@ -6,7 +6,14 @@ import { schemaOf } from "../src/foundation/kernel/primitive"
 import type { Primitive } from "../src/foundation/kernel/primitive-types"
 import { rerenderOf } from "../src/testing/mount"
 import { cases, type Case } from "./after-mount.cases"
-import { afterTimers, exercise, framesDuring, idle, running, timerMark } from "./lifecycle"
+import {
+  afterTimers,
+  exercise,
+  framesDuring,
+  idle,
+  running,
+  timerMark,
+} from "./lifecycle"
 
 async function cycle(entry: Case) {
   const view = await exercise(entry)
@@ -18,7 +25,7 @@ async function cycle(entry: Case) {
   await idle()
 }
 
-for (const entry of cases)
+for (const entry of cases) {
   describe(entry.name, () => {
     test("leaves nothing running after it unmounts", async () => {
       await cycle(entry)
@@ -30,3 +37,4 @@ for (const entry of cases)
       expect(await framesDuring(idle)).toBe(6)
     })
   })
+}

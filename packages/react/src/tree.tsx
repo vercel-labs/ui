@@ -9,15 +9,28 @@ import {
 } from "@ui-sdk/core/tree"
 import * as React from "react"
 import { hasChild } from "./children"
-import { createParts, readIn, useHandle, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  readIn,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
-const parts = createParts(treePrimitive, { label: "span", indicator: "span", checkbox: "span", group: "div" })
+const parts = createParts(treePrimitive, {
+  label: "span",
+  indicator: "span",
+  checkbox: "span",
+  group: "div",
+})
 
 // The item the items in a group belong to.
 const ItemContext = React.createContext<string | null>(null)
 
 // Element props that mean something else on a tree part.
-type Clashing = "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSelect"
+type Clashing =
+  "value" | "defaultValue" | "defaultChecked" | "onChange" | "onSelect"
 
 /**
  * The props of `Tree`.
@@ -118,14 +131,18 @@ function TreeItem({
   label,
   children,
   ...props
-}: Omit<PartProps<"div", TreeItemState>, Clashing> & Omit<TreeItemProps, "parent">) {
+}: Omit<PartProps<"div", TreeItemState>, Clashing> &
+  Omit<TreeItemProps, "parent">) {
   const parent = React.useContext(ItemContext)
   const item = {
     value,
     parent,
     // A branch is one with a group among its children.
     branch:
-      branch ?? (typeof children === "function" ? undefined : hasChild(children, TreeGroup) || undefined),
+      branch ??
+      (typeof children === "function"
+        ? undefined
+        : hasChild(children, TreeGroup) || undefined),
     disabled,
     label,
   }
@@ -175,7 +192,9 @@ function TreeItems({ items }: { items: TreeItemData[] }) {
       disabled={item.disabled}
     >
       {checkable && <TreeItemCheckbox />}
-      <TreeItemLabel render={item.href ? <a href={item.href} /> : undefined}>{item.label}</TreeItemLabel>
+      <TreeItemLabel render={item.href ? <a href={item.href} /> : undefined}>
+        {item.label}
+      </TreeItemLabel>
       {item.children && (
         <TreeGroup>
           <TreeItems items={item.children} />

@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { AvatarFallback, Avatar as AvatarPrimitive } from "@ui-sdk/svelte/avatar"
+  import {
+    AvatarFallback,
+    Avatar as AvatarPrimitive,
+  } from "@ui-sdk/svelte/avatar"
   import { cn } from "cn"
 
   const sizes = {
@@ -13,18 +16,32 @@
     size = "default",
     decorative = false,
     class: className,
-  }: { name: string; size?: keyof typeof sizes; decorative?: boolean; class?: string } = $props()
+  }: {
+    name: string
+    size?: keyof typeof sizes
+    decorative?: boolean
+    class?: string
+  } = $props()
 
   const initials = $derived(
     name
       .split(" ")
       .map((part) => part[0])
-      .join(""),
+      .join("")
   )
 </script>
 
-<AvatarPrimitive aria-hidden={decorative || undefined} class={cn("relative flex shrink-0 rounded-full select-none", sizes[size], className)}>
-  <AvatarFallback class="flex size-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground">
+<AvatarPrimitive
+  aria-hidden={decorative || undefined}
+  class={cn(
+    "relative flex shrink-0 rounded-full select-none",
+    sizes[size],
+    className
+  )}
+>
+  <AvatarFallback
+    class="flex size-full items-center justify-center rounded-full bg-muted font-medium text-muted-foreground"
+  >
     <span aria-hidden="true">{initials}</span>
     {#if !decorative}<span class="sr-only">{name}</span>{/if}
   </AvatarFallback>

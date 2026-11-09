@@ -39,7 +39,7 @@ function mount(root: HTMLElement) {
                     ${priority.label}
                     <ui-select-item-indicator>${createElement(Check, { "aria-hidden": "true" }).outerHTML}</ui-select-item-indicator>
                   </ui-select-item>
-                `,
+                `
               )
               .join("")}
           </ui-select-content>
@@ -48,9 +48,14 @@ function mount(root: HTMLElement) {
     </div>
   `
   const content = root.querySelector("ui-select-content")!
-  root.querySelector("ui-checkbox")!.addEventListener("checkedchange", (event) => {
-    content.toggleAttribute("align-item-with-trigger", event.detail.value === true)
-  })
+  root
+    .querySelector("ui-checkbox")!
+    .addEventListener("checkedchange", (event) => {
+      content.toggleAttribute(
+        "align-item-with-trigger",
+        event.detail.value === true
+      )
+    })
 }
 
 export { mount }

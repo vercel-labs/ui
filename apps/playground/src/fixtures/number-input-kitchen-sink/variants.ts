@@ -15,7 +15,11 @@ type Variant = {
   // A scrub area before the group, with a cursor for when the pointer is locked.
   // `outside` puts it before the number input, connected through a controller
   // or, on the web, `for`.
-  scrub?: { orientation?: "horizontal" | "vertical"; pixelsPerStep?: number; outside?: boolean }
+  scrub?: {
+    orientation?: "horizontal" | "vertical"
+    pixelsPerStep?: number
+    outside?: boolean
+  }
   // Controlled by the card, with a button per preset value.
   controlled?: boolean
   // Buttons that drive it through a controller: a preset, increment, decrement and focus.
@@ -32,11 +36,22 @@ const formats = {
   unit: { style: "unit", unit: "kilogram" },
 } satisfies Record<string, Intl.NumberFormatOptions>
 
-const describe = (value: number | null) => (value === null ? "empty" : String(value))
+const describe = (value: number | null) =>
+  value === null ? "empty" : String(value)
 
 const variants: Variant[] = [
-  { id: "empty", section: "Values", title: "Empty at first", options: { name: "n" } },
-  { id: "default", section: "Values", title: "Default value", options: { name: "n", defaultValue: 5 } },
+  {
+    id: "empty",
+    section: "Values",
+    title: "Empty at first",
+    options: { name: "n" },
+  },
+  {
+    id: "default",
+    section: "Values",
+    title: "Default value",
+    options: { name: "n", defaultValue: 5 },
+  },
   {
     id: "null",
     section: "Values",
@@ -49,7 +64,12 @@ const variants: Variant[] = [
     title: "Negative numbers",
     options: { name: "n", min: -100, max: 100, defaultValue: -5 },
   },
-  { id: "no-name", section: "Values", title: "No name, submits nothing", options: { defaultValue: 3 } },
+  {
+    id: "no-name",
+    section: "Values",
+    title: "No name, submits nothing",
+    options: { defaultValue: 3 },
+  },
   {
     id: "large",
     section: "Values",

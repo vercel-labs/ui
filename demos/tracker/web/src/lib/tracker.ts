@@ -23,7 +23,9 @@ function subscribe(listener: () => void) {
 }
 
 function changed() {
-  for (const listener of listeners) listener()
+  for (const listener of listeners) {
+    listener()
+  }
 }
 
 function issueOf(id: string | null) {
@@ -46,7 +48,9 @@ function createIssue(input: NewIssue) {
 }
 
 function change(ids: string[], update: (issue: Issue) => Issue) {
-  db.issues = db.issues.map((issue) => (ids.includes(issue.id) ? update(issue) : issue))
+  db.issues = db.issues.map((issue) =>
+    ids.includes(issue.id) ? update(issue) : issue
+  )
   changed()
 }
 
@@ -60,12 +64,23 @@ function deleteIssues(ids: string[]) {
 }
 
 function setSubtasksDone(id: string, done: string[]) {
-  change([id], (issue) => ({ ...issue, subtasks: markSubtasks(issue.subtasks, done) }))
+  change([id], (issue) => ({
+    ...issue,
+    subtasks: markSubtasks(issue.subtasks, done),
+  }))
 }
 
 function addComment(id: string, body: string) {
-  const comment = { id: crypto.randomUUID(), author: viewer.id, body, createdAt: new Date().toISOString() }
-  change([id], (issue) => ({ ...issue, comments: [...issue.comments, comment] }))
+  const comment = {
+    id: crypto.randomUUID(),
+    author: viewer.id,
+    body,
+    createdAt: new Date().toISOString(),
+  }
+  change([id], (issue) => ({
+    ...issue,
+    comments: [...issue.comments, comment],
+  }))
 }
 
 function saveSettings(settings: Settings) {

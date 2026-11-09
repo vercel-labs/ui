@@ -14,11 +14,13 @@ async function mount(root: HTMLElement) {
   root.addEventListener(
     "openchange",
     (event) => {
-      root.querySelector("output")!.textContent = (event as CustomEvent<{ value: boolean }>).detail.value
+      root.querySelector("output")!.textContent = (
+        event as CustomEvent<{ value: boolean }>
+      ).detail.value
         ? "open"
         : "closed"
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

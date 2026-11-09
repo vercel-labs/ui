@@ -40,8 +40,12 @@ function mount(root: HTMLElement) {
     calendar.setValue(date)
     calendar.focus(date)
   }
-  root.querySelector('[data-action="christmas"]')!.addEventListener("click", () => select("2026-12-25"))
-  root.querySelector('[data-action="today"]')!.addEventListener("click", () => select(todayDate()))
+  root
+    .querySelector('[data-action="christmas"]')!
+    .addEventListener("click", () => select("2026-12-25"))
+  root
+    .querySelector('[data-action="today"]')!
+    .addEventListener("click", () => select(todayDate()))
 }
 
 export { mount }

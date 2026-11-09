@@ -1,7 +1,11 @@
 import { collapsible } from "@ui-sdk/core/collapsible"
 import { createParts } from "./create-parts"
 
-const parts = createParts(collapsible, { root: "div", trigger: "button", panel: "div" })
+const parts = createParts(collapsible, {
+  root: "div",
+  trigger: "button",
+  panel: "div",
+})
 
 /**
  * A panel of content that a button shows and hides. Put its trigger and panel inside.

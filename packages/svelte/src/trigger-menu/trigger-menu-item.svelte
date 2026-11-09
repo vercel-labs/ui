@@ -22,7 +22,8 @@ A suggestion. Choosing it inserts it into the text.
     disabled,
     onSelect,
     ...rest
-  }: PartProps<"div", TriggerMenuItemState> & TriggerMenuItemProps<any> = $props()
+  }: PartProps<"div", TriggerMenuItemState> & TriggerMenuItemProps<any> =
+    $props()
 
   const menu = useHandle(triggerMenu)
   const group = getContext<string | undefined>(GroupKey)

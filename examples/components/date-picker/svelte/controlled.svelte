@@ -15,14 +15,22 @@
     DatePickerTrigger,
     type DatePickerValue,
   } from "@ui-sdk/svelte/date-picker"
-  import { CalendarIcon, ChevronLeftIcon, ChevronRightIcon } from "@lucide/svelte"
+  import {
+    CalendarIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+  } from "@lucide/svelte"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
   let value = $state<DatePickerValue>("2026-10-16")
 </script>
 
-<DatePicker bind:value onValueChange={(next, details) => log(`${next ?? "No date"} (${details.reason})`)}>
+<DatePicker
+  bind:value
+  onValueChange={(next, details) =>
+    log(`${next ?? "No date"} (${details.reason})`)}
+>
   <div data-slot="row">
     <DatePickerInput aria-label="Due date" />
     <DatePickerTrigger data-variant="ghost">

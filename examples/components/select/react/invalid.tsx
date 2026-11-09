@@ -1,6 +1,11 @@
 "use client"
 
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import {
   Select,
   SelectContent,
@@ -26,7 +31,9 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        log(`Submitted shipping=${new FormData(event.currentTarget).get("shipping")}`)
+        log(
+          `Submitted shipping=${new FormData(event.currentTarget).get("shipping")}`
+        )
       }}
     >
       <Field name="shipping">
@@ -47,7 +54,9 @@ function Example() {
             ))}
           </SelectContent>
         </Select>
-        <FieldDescription>Express arrives in two business days.</FieldDescription>
+        <FieldDescription>
+          Express arrives in two business days.
+        </FieldDescription>
         <FieldError match="valueMissing">Choose a shipping method.</FieldError>
       </Field>
       <button type="submit" data-variant="solid">

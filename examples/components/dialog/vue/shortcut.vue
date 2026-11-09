@@ -34,11 +34,18 @@ import { PlusIcon } from "@lucide/vue"
         </Field>
         <Field>
           <FieldLabel>Email</FieldLabel>
-          <Input name="email" type="email" required placeholder="kofi@example.com" />
+          <Input
+            name="email"
+            type="email"
+            required
+            placeholder="kofi@example.com"
+          />
         </Field>
         <div data-slot="row">
           <DialogClose>Cancel</DialogClose>
-          <button data-variant="solid" type="submit" value="save">Save Contact</button>
+          <button data-variant="solid" type="submit" value="save">
+            Save Contact
+          </button>
         </div>
       </form>
     </DialogContent>

@@ -14,7 +14,11 @@ The slider's thumb, at `--color-slider-thumb-position`.
   import type { PartProps } from "../use-primitive.svelte"
   import { useSlider } from "./context"
 
-  let { channel, orientation, ...rest }: PartProps<"div", ColorPickerSliderState> & ColorPickerSliderProps =
+  let {
+    channel,
+    orientation,
+    ...rest
+  }: PartProps<"div", ColorPickerSliderState> & ColorPickerSliderProps =
     $props()
 
   const slider = useSlider()

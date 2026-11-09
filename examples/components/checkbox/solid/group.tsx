@@ -1,4 +1,8 @@
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/solid/checkbox"
 import { For } from "solid-js"
 
 const toppings = [

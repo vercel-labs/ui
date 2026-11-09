@@ -14,7 +14,11 @@ import {
 } from "@ui-sdk/solid/date-picker"
 import { render } from "@solidjs/web"
 import { createSignal, Show } from "solid-js"
-import { datePickerAction, datePickerFixture, datePickerOptions } from "tests/fixtures/date-picker.ts"
+import {
+  datePickerAction,
+  datePickerFixture,
+  datePickerOptions,
+} from "tests/fixtures/date-picker.ts"
 
 function Fixture() {
   const { lang, ...options } = datePickerOptions()
@@ -40,10 +44,17 @@ function Fixture() {
           startName={range ? "start" : undefined}
           endName={range ? "end" : undefined}
           {...options}
-          onValueChange={(next, details) => setAction(datePickerAction("value", next, details.reason))}
-          onOpenChange={(next, details) => setAction(datePickerAction("open", next, details.reason))}
+          onValueChange={(next, details) =>
+            setAction(datePickerAction("value", next, details.reason))
+          }
+          onOpenChange={(next, details) =>
+            setAction(datePickerAction("open", next, details.reason))
+          }
         >
-          <DatePickerInput id="date-start" aria-label={range ? "Start date" : undefined} />
+          <DatePickerInput
+            id="date-start"
+            aria-label={range ? "Start date" : undefined}
+          />
           <Show when={range}>
             <DatePickerInput end aria-label="End date" />
           </Show>
@@ -57,7 +68,9 @@ function Fixture() {
               <CalendarNext class="calendar-step" />
             </div>
             <CalendarGrid class="calendar-grid" />
-            <DatePickerPreset value={preset.value as DatePickerValue}>{preset.label}</DatePickerPreset>
+            <DatePickerPreset value={preset.value as DatePickerValue}>
+              {preset.label}
+            </DatePickerPreset>
           </DatePickerContent>
         </DatePicker>
         <button type="submit">Submit</button>

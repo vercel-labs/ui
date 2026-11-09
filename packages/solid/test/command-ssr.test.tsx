@@ -1,19 +1,31 @@
 import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
-import { Command, CommandInput, CommandItem, CommandList, CommandPage, CommandShortcut } from "../src/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandPage,
+  CommandShortcut,
+} from "../src/command"
 
 // Runs with no DOM: any access to window or document during render throws.
 describe("server rendering a command list", () => {
   test("data commands render ranked for the query, with the field and the list", () => {
     const html = renderToString(() => (
-      <Command items={["Settings", "Calendar", "Reset settings"]} defaultQuery="set">
+      <Command
+        items={["Settings", "Calendar", "Reset settings"]}
+        defaultQuery="set"
+      >
         <CommandInput aria-label="Search commands" />
       </Command>
     ))
     expect(typeof window).toBe("undefined")
     expect(html).toMatch(/<input[^>]*role="combobox"[^>]*value="set"/)
     expect(html).toContain('role="listbox"')
-    expect(html.indexOf("Reset settings")).toBeGreaterThan(html.indexOf(">Settings<"))
+    expect(html.indexOf("Reset settings")).toBeGreaterThan(
+      html.indexOf(">Settings<")
+    )
     expect(html).not.toContain("Calendar")
   })
 

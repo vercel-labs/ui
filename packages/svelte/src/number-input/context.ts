@@ -11,7 +11,9 @@ const NumberInputKey = Symbol("number-input")
 
 function useNumberInput(part: string) {
   const context = getContext<NumberInputContext | undefined>(NumberInputKey)
-  if (!context) throw new Error(`${part} must be used inside <NumberInput>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <NumberInput>.`)
+  }
   return context
 }
 

@@ -55,7 +55,10 @@
     }
   }
 
-  :is([data-slot="number-input-decrement"], [data-slot="number-input-increment"]) {
+  :is(
+    [data-slot="number-input-decrement"],
+    [data-slot="number-input-increment"]
+  ) {
     display: inline-grid;
     flex-shrink: 0;
     place-items: center;

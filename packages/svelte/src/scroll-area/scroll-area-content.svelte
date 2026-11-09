@@ -14,4 +14,4 @@ Wraps the content inside the viewport.
   const part = usePart(scrollArea, "content")
 </script>
 
-<Part tag="div" part={part} {props} />
+<Part tag="div" {part} {props} />

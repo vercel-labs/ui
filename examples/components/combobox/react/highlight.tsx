@@ -31,7 +31,11 @@ const countries = [
   { value: "nl", label: "Netherlands", keywords: ["holland", "nederland"] },
   { value: "es", label: "Spain", keywords: ["españa"] },
   { value: "se", label: "Sweden", keywords: ["sverige"] },
-  { value: "ch", label: "Switzerland", keywords: ["schweiz", "suisse", "svizzera"] },
+  {
+    value: "ch",
+    label: "Switzerland",
+    keywords: ["schweiz", "suisse", "svizzera"],
+  },
 ]
 
 function Example() {
@@ -59,7 +63,11 @@ function Example() {
               <ComboboxItemText>
                 {(state) =>
                   state.segments.map((segment, index) =>
-                    segment.match ? <mark key={index}>{segment.text}</mark> : segment.text,
+                    segment.match ? (
+                      <mark key={index}>{segment.text}</mark>
+                    ) : (
+                      segment.text
+                    )
                   )
                 }
               </ComboboxItemText>

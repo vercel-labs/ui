@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { Autocomplete, AutocompleteContent, AutocompleteInput, AutocompleteList } from "../../src/autocomplete"
+  import {
+    Autocomplete,
+    AutocompleteContent,
+    AutocompleteInput,
+    AutocompleteList,
+  } from "../../src/autocomplete"
 
   // Suggestions as data, open from the start, which the test replaces.
   let {

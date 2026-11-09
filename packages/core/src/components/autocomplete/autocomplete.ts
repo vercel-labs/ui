@@ -7,10 +7,17 @@
 // and parts and attributes in autocomplete-parts.ts.
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { autocompleteSlots } from "./autocomplete-parts"
-import { autocompleteApi, initialAutocompleteState, syncAutocompleteState } from "./autocomplete-api"
+import {
+  autocompleteApi,
+  initialAutocompleteState,
+  syncAutocompleteState,
+} from "./autocomplete-api"
 import { type Modal, type PopupResult } from "../../foundation/popups/popup"
 import { pointerModalAttribute } from "../../foundation/popups/modal-attribute"
-import { type PortalProps, type PositionProps } from "../../foundation/platform/position"
+import {
+  type PortalProps,
+  type PositionProps,
+} from "../../foundation/platform/position"
 import type { PresentationSetting } from "../../foundation/popups/presentation"
 import { type SearchFilter } from "../../foundation/lists/autocomplete-core"
 import {
@@ -20,12 +27,25 @@ import {
   type ListHighlightDetails,
   type ListStatusState,
 } from "../../foundation/lists/listbox"
-import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { type ListAnnouncement, type ListItemTextState } from "../../foundation/lists/listbox-search"
+import {
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
+import {
+  type ListAnnouncement,
+  type ListItemTextState,
+} from "../../foundation/lists/listbox-search"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions, DismissAttemptReason } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+  DismissAttemptReason,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { type DismissOptions } from "../../foundation/popups/dismissal"
 
 /**
@@ -34,7 +54,13 @@ import { type DismissOptions } from "../../foundation/popups/dismissal"
  * @stable
  */
 type AutocompleteValueChangeReason =
-  "input-change" | "item-press" | "list-navigation" | "escape-key" | "clear-press" | "reset" | "imperative"
+  | "input-change"
+  | "item-press"
+  | "list-navigation"
+  | "escape-key"
+  | "clear-press"
+  | "reset"
+  | "imperative"
 
 /**
  * Why the suggestions opened or closed.
@@ -59,7 +85,10 @@ type AutocompleteOpenChangeReason =
  * The dismissals `dismissible` refuses that `onDismissAttempt` hears about.
  * @stable
  */
-type AutocompleteDismissReason = Extract<AutocompleteOpenChangeReason, DismissAttemptReason>
+type AutocompleteDismissReason = Extract<
+  AutocompleteOpenChangeReason,
+  DismissAttemptReason
+>
 
 /**
  * What `onSubmit` receives besides the text.
@@ -88,7 +117,10 @@ function createAutocompleteController() {
      * Opens or closes the suggestions.
      * Returns false when the change was canceled or it was already open or closed.
      */
-    setOpen: (open: boolean, options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => boolean
+    setOpen: (
+      open: boolean,
+      options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>
+    ) => boolean
     /**
      * Opens the suggestions, and resolves once they close, with why and how. Resolves exactly once
      * and never rejects: on the next close, when `signal` aborts, or with reason `"unmount"`.
@@ -97,24 +129,33 @@ function createAutocompleteController() {
       options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason> & {
         /** Closes the suggestions, with reason `"imperative"`, when it aborts. An already aborted signal never opens them. */
         signal?: AbortSignal
-      },
+      }
     ) => Promise<PopupResult<AutocompleteOpenChangeReason, never>>
     /** Closes the suggestions. Returns false when the close was canceled or it was already closed. */
-    close: (options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => boolean
+    close: (
+      options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>
+    ) => boolean
     /**
      * Opens the suggestions when they're closed, and closes them when they're open.
      * Returns false when the change was canceled.
      */
-    toggle: (options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>) => boolean
+    toggle: (
+      options?: AutocompleteChangeOptions<AutocompleteOpenChangeReason>
+    ) => boolean
     /** The text. */
     getValue: () => string
     /**
      * Changes the text, which filters the suggestions.
      * Returns false when the change was canceled or nothing changed.
      */
-    setValue: (value: string, options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>) => boolean
+    setValue: (
+      value: string,
+      options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>
+    ) => boolean
     /** Empties the field. Returns false when the change was canceled or nothing changed. */
-    clear: (options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>) => boolean
+    clear: (
+      options?: AutocompleteChangeOptions<AutocompleteValueChangeReason>
+    ) => boolean
     /** Moves focus to the field. */
     focus: () => void
   }>()
@@ -138,7 +179,10 @@ type AutocompleteOptions = PortalProps & {
   /** The text at first, when uncontrolled. A form reset returns to it. */
   defaultValue?: string
   /** Runs when the text wants to change: typing, choosing a suggestion, a Clear part, a form reset or a controller. `details.cancel()` keeps it as it was. */
-  onValueChange?: (value: string, details: ChangeDetails<AutocompleteValueChangeReason>) => void
+  onValueChange?: (
+    value: string,
+    details: ChangeDetails<AutocompleteValueChangeReason>
+  ) => void
   /** Whether the suggestions are open. Pass it to control them. */
   open?: boolean
   /**
@@ -147,7 +191,10 @@ type AutocompleteOptions = PortalProps & {
    */
   defaultOpen?: boolean
   /** Runs when the suggestions want to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<AutocompleteOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<AutocompleteOpenChangeReason>
+  ) => void
   /** Runs once the suggestions have finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /**

@@ -15,7 +15,14 @@ import {
   Switch,
   SwitchThumb,
 } from "@ui-sdk/vue"
-import { createApp, defineComponent, h, ref, type PropType, type VNodeChild } from "vue"
+import {
+  createApp,
+  defineComponent,
+  h,
+  ref,
+  type PropType,
+  type VNodeChild,
+} from "vue"
 import { classes as c, renderShell } from "./shell"
 import type { Variant } from "./variants"
 
@@ -45,7 +52,7 @@ const Card = defineComponent({
     const control = (): VNodeChild => {
       const variant = props.variant
       const options = (variant.options ?? {}) as Record<string, unknown>
-      if (variant.kind === "checkbox")
+      if (variant.kind === "checkbox") {
         return [
           h("label", { class: c.row }, [
             h(
@@ -56,12 +63,15 @@ const Card = defineComponent({
                 ...(variant.controlled && { checked: checked.value }),
                 controller: variant.controller ? checkbox : undefined,
                 form: variant.place === "outside" ? variant.id : undefined,
-                onCheckedChange: (next: boolean | "indeterminate", details: { reason: string }) => {
+                onCheckedChange: (
+                  next: boolean | "indeterminate",
+                  details: { reason: string }
+                ) => {
                   checked.value = next
                   report(next, details)
                 },
               },
-              () => indicator(),
+              () => indicator()
             ),
             "Accept",
           ]),
@@ -69,11 +79,16 @@ const Card = defineComponent({
           variant.controller &&
             h(
               "button",
-              { type: "button", class: c.button, onClick: () => checkbox.toggle() },
-              "Toggle from outside",
+              {
+                type: "button",
+                class: c.button,
+                onClick: () => checkbox.toggle(),
+              },
+              "Toggle from outside"
             ),
         ]
-      if (variant.kind === "switch")
+      }
+      if (variant.kind === "switch") {
         return h("label", { class: c.row }, [
           h(
             Switch,
@@ -86,11 +101,12 @@ const Card = defineComponent({
                 report(next, details)
               },
             },
-            () => h(SwitchThumb, { class: c.thumb }),
+            () => h(SwitchThumb, { class: c.thumb })
           ),
           "Wi-Fi",
         ])
-      if (variant.kind === "radio")
+      }
+      if (variant.kind === "radio") {
         return [
           h(
             RadioGroup,
@@ -100,7 +116,10 @@ const Card = defineComponent({
               ...options,
               ...(variant.controlled && { value: value.value }),
               controller: variant.controller ? radio : undefined,
-              onValueChange: (next: string | null, details: { reason: string }) => {
+              onValueChange: (
+                next: string | null,
+                details: { reason: string }
+              ) => {
                 value.value = next
                 report(next, details)
               },
@@ -108,20 +127,27 @@ const Card = defineComponent({
             () =>
               variant.items!.map(([item, label, disabled]) =>
                 h("label", { key: item, class: c.row }, [
-                  h(Radio, { class: c.radio, value: item, disabled }, () => indicator(true)),
+                  h(Radio, { class: c.radio, value: item, disabled }, () =>
+                    indicator(true)
+                  ),
                   label,
-                ]),
-              ),
+                ])
+              )
           ),
           variant.controlled && h("span", `value: ${String(value.value)}`),
           variant.controller &&
             h(
               "button",
-              { type: "button", class: c.button, onClick: () => radio.setValue("enterprise") },
-              "Choose Enterprise",
+              {
+                type: "button",
+                class: c.button,
+                onClick: () => radio.setValue("enterprise"),
+              },
+              "Choose Enterprise"
             ),
         ]
-      if (variant.kind === "checkbox-group")
+      }
+      if (variant.kind === "checkbox-group") {
         return [
           h(
             CheckboxGroup,
@@ -138,26 +164,36 @@ const Card = defineComponent({
             () => [
               variant.parent &&
                 h("label", { class: c.row }, [
-                  h(Checkbox, { class: c.box, parent: true }, () => indicator()),
+                  h(Checkbox, { class: c.box, parent: true }, () =>
+                    indicator()
+                  ),
                   "All",
                 ]),
               ...variant.items!.map(([item, label, disabled]) =>
                 h("label", { key: item, class: c.row }, [
-                  h(Checkbox, { class: c.box, value: item, disabled }, () => indicator()),
+                  h(Checkbox, { class: c.box, value: item, disabled }, () =>
+                    indicator()
+                  ),
                   label,
-                ]),
+                ])
               ),
-            ],
+            ]
           ),
           variant.controlled && h("span", `value: ${values.value.join(", ")}`),
         ]
-      return h(FieldControl, { class: c.input, type: "email", name: "email", required: true })
+      }
+      return h(FieldControl, {
+        class: c.input,
+        type: "email",
+        name: "email",
+        required: true,
+      })
     }
 
     return () => {
       const variant = props.variant
       let body: VNodeChild = control()
-      if (variant.field)
+      if (variant.field) {
         body = h(
           Field,
           {
@@ -170,17 +206,26 @@ const Card = defineComponent({
             control(),
             h(FieldDescription, { class: c.description }, () => "Description"),
             h(FieldError, { class: c.error }),
-          ],
+          ]
         )
-      if (variant.place === "fieldset") body = h("fieldset", { disabled: true }, [body])
-      if (variant.place === "rtl") body = h("div", { dir: "rtl" }, [body])
+      }
+      if (variant.place === "fieldset") {
+        body = h("fieldset", { disabled: true }, [body])
+      }
+      if (variant.place === "rtl") {
+        body = h("div", { dir: "rtl" }, [body])
+      }
       const buttons = h("div", { class: c.row }, [
         h("button", { class: c.button }, "Submit"),
         h("button", { type: "reset", class: c.button }, "Reset"),
       ])
       const outside = variant.place === "outside"
       return [
-        h("form", { id: variant.id, class: c.form }, outside ? [buttons] : [body, buttons]),
+        h(
+          "form",
+          { id: variant.id, class: c.form },
+          outside ? [buttons] : [body, buttons]
+        ),
         outside && body,
       ]
     }
@@ -188,7 +233,9 @@ const Card = defineComponent({
 })
 
 function mount(root: HTMLElement) {
-  renderShell(root, (slot, variant, log) => createApp(Card, { variant, log }).mount(slot))
+  renderShell(root, (slot, variant, log) =>
+    createApp(Card, { variant, log }).mount(slot)
+  )
 }
 
 export { mount }

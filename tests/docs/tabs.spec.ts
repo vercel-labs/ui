@@ -42,20 +42,35 @@ for (const framework of frameworks) {
   test(`every tabs example works in ${framework}`, async ({ page }) => {
     const errors: string[] = []
     page.on("pageerror", (error) => errors.push(error.message))
-    page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+    page.on(
+      "console",
+      (message) => message.type() === "error" && errors.push(message.text())
+    )
     await page.goto(`/docs/${framework}/components/tabs`)
     const previews = page.locator("[data-example]")
     await expect(previews).toHaveCount(order.length)
-    for (const folder of folders) expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+    for (const folder of folders) {
+      expect(examplesIn(folder).sort(), folder).toEqual([...fixtures].sort())
+    }
 
-    const preview = (name: string) => page.locator(`[data-example="tabs/${name}"]`)
+    const preview = (name: string) =>
+      page.locator(`[data-example="tabs/${name}"]`)
 
     for (const name of order) {
-      await expect(preview(name).getByRole("tablist"), `${name} tab list`).toBeVisible()
+      await expect(
+        preview(name).getByRole("tablist"),
+        `${name} tab list`
+      ).toBeVisible()
       const tab = preview(name).getByRole("tab", { name: next[name] })
       await tab.click()
-      await expect(tab, `${name} selects`).toHaveAttribute("aria-selected", "true")
-      await expect(preview(name).getByRole("tabpanel", { name: next[name] }), `${name} panel`).toBeVisible()
+      await expect(tab, `${name} selects`).toHaveAttribute(
+        "aria-selected",
+        "true"
+      )
+      await expect(
+        preview(name).getByRole("tabpanel", { name: next[name] }),
+        `${name} panel`
+      ).toBeVisible()
     }
 
     // A disabled tab never selects.
@@ -68,9 +83,15 @@ for (const framework of frameworks) {
     await snippet.getByRole("tab", { name: "Preview" }).click()
     await page.keyboard.press("ArrowRight")
     await expect(snippet.getByRole("tab", { name: "Code" })).toBeFocused()
-    await expect(snippet.getByRole("tab", { name: "Code" })).toHaveAttribute("aria-selected", "false")
+    await expect(snippet.getByRole("tab", { name: "Code" })).toHaveAttribute(
+      "aria-selected",
+      "false"
+    )
     await page.keyboard.press("Enter")
-    await expect(snippet.getByRole("tab", { name: "Code" })).toHaveAttribute("aria-selected", "true")
+    await expect(snippet.getByRole("tab", { name: "Code" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await page.keyboard.press("Tab")
     await expect(snippet.getByRole("textbox", { name: "Source" })).toBeFocused()
 
@@ -83,7 +104,10 @@ for (const framework of frameworks) {
 
     // The indicator follows the selection into a vertical list.
     await preview("indicator").getByRole("button", { name: "Vertical" }).click()
-    await expect(preview("indicator").getByRole("tablist")).toHaveAttribute("aria-orientation", "vertical")
+    await expect(preview("indicator").getByRole("tablist")).toHaveAttribute(
+      "aria-orientation",
+      "vertical"
+    )
 
     // A kept-mounted panel keeps what was typed in it.
     const kept = preview("keep-mounted")
@@ -91,13 +115,18 @@ for (const framework of frameworks) {
     await kept.getByRole("textbox", { name: "Message" }).fill("Looks good")
     await kept.getByRole("tab", { name: "Formatting" }).click()
     await kept.getByRole("tab", { name: "Reply" }).click()
-    await expect(kept.getByRole("textbox", { name: "Message" })).toHaveValue("Looks good")
+    await expect(kept.getByRole("textbox", { name: "Message" })).toHaveValue(
+      "Looks good"
+    )
 
     // The controller selects a tab, and the console logs each change with its reason.
     const mail = preview("controlled")
     await expect(lastLog(mail)).toHaveText("value: drafts (item-press)")
     await mail.getByRole("button", { name: "Show Sent Mail" }).click()
-    await expect(mail.getByRole("tab", { name: "Sent" })).toHaveAttribute("aria-selected", "true")
+    await expect(mail.getByRole("tab", { name: "Sent" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
     await expect(lastLog(mail)).toHaveText("value: sent (imperative)")
 
     // A link tab selects and follows its hash.

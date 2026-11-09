@@ -34,7 +34,8 @@ const countries = [
   { value: "ch", label: "Switzerland" },
 ]
 
-const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+const countryLabel = (value: string) =>
+  countries.find((country) => country.value === value)?.label ?? value
 
 const country = createComboboxController<string>()
 
@@ -84,7 +85,11 @@ function Example() {
           <ComboboxEmpty>No countries found.</ComboboxEmpty>
           <ComboboxList>
             {countries.map((item) => (
-              <ComboboxItem key={item.value} value={item.value} label={item.label}>
+              <ComboboxItem
+                key={item.value}
+                value={item.value}
+                label={item.label}
+              >
                 {item.label}
                 <ComboboxItemIndicator>
                   <CheckIcon />

@@ -31,7 +31,10 @@ import { Button } from "@ui-sdk/react/button"
 Return a Promise from `onClick` to keep the button pending until it settles. The button keeps focus and ignores further presses while it waits.
 
 ```tsx
-<Button onClick={() => new Promise((resolve) => setTimeout(resolve, 1500))} pendingAnnouncement="Saving">
+<Button
+  onClick={() => new Promise((resolve) => setTimeout(resolve, 1500))}
+  pendingAnnouncement="Saving"
+>
   Save
 </Button>
 ```
@@ -201,11 +204,17 @@ Button accepts native button props and the options below. `render`, `children`, 
 
 ### Button
 
-<TypeTable path="../../packages/core/src/components/button/button.ts" name="ButtonOptions" />
+<TypeTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonOptions"
+/>
 
 ### State
 
-<StateTable path="../../packages/core/src/components/button/button.ts" name="ButtonState" />
+<StateTable
+  path="../../packages/core/src/components/button/button.ts"
+  name="ButtonState"
+/>
 
 ### Events
 

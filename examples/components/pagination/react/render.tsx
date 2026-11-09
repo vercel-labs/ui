@@ -21,13 +21,20 @@ function Example() {
               <PaginationPrevious
                 aria-label="Previous page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
+                  <button
+                    {...props}
+                    title={
+                      state.disabled ? undefined : `Go to page ${state.page}`
+                    }
+                  />
                 )}
               >
                 {(state) => (
                   <>
                     <ArrowLeftIcon aria-hidden="true" />
-                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                    {!state.disabled && (
+                      <span aria-hidden="true">{state.page}</span>
+                    )}
                   </>
                 )}
               </PaginationPrevious>
@@ -36,7 +43,9 @@ function Example() {
               <PaginationItem key={item}>
                 {typeof item === "number" ? (
                   <PaginationLink page={item}>
-                    {(state) => (state.current ? `Page ${state.page}` : state.page)}
+                    {(state) =>
+                      state.current ? `Page ${state.page}` : state.page
+                    }
                   </PaginationLink>
                 ) : (
                   <PaginationEllipsis />
@@ -47,12 +56,19 @@ function Example() {
               <PaginationNext
                 aria-label="Next page"
                 render={(props, state) => (
-                  <button {...props} title={state.disabled ? undefined : `Go to page ${state.page}`} />
+                  <button
+                    {...props}
+                    title={
+                      state.disabled ? undefined : `Go to page ${state.page}`
+                    }
+                  />
                 )}
               >
                 {(state) => (
                   <>
-                    {!state.disabled && <span aria-hidden="true">{state.page}</span>}
+                    {!state.disabled && (
+                      <span aria-hidden="true">{state.page}</span>
+                    )}
                     <ArrowRightIcon aria-hidden="true" />
                   </>
                 )}

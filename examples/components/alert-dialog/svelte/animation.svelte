@@ -22,7 +22,9 @@
     </div>
     <div data-slot="row">
       <AlertDialogClose>Cancel</AlertDialogClose>
-      <AlertDialogClose data-variant="solid" value="confirm">Leave</AlertDialogClose>
+      <AlertDialogClose data-variant="solid" value="confirm"
+        >Leave</AlertDialogClose
+      >
     </div>
   </AlertDialogContent>
 </AlertDialog>

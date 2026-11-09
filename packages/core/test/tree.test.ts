@@ -1,12 +1,28 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, test, vi } from "vitest"
-import { attrs, bind, liveAttrs, partState, present } from "../src/foundation/kernel/part"
+import {
+  attrs,
+  bind,
+  liveAttrs,
+  partState,
+  present,
+} from "../src/foundation/kernel/part"
 import { applyAttrs } from "../src/foundation/kernel/live"
 import type { PrimitiveInstance } from "../src/foundation/kernel/primitive-types"
-import { createTreeController, tree, type TreeItemData, type TreeOptions } from "../src/components/tree/tree"
+import {
+  createTreeController,
+  tree,
+  type TreeItemData,
+  type TreeOptions,
+} from "../src/components/tree/tree"
 import { expectNoMissedUpdates } from "./selects"
 
-type Node = { value: string; children?: Node[]; branch?: boolean; disabled?: boolean }
+type Node = {
+  value: string
+  children?: Node[]
+  branch?: boolean
+  disabled?: boolean
+}
 
 const files: Node[] = [
   {
@@ -36,7 +52,11 @@ const data: TreeItemData[] = [
       },
     ],
   },
-  { value: "docs", label: "docs", children: [{ value: "intro.md", label: "intro.md" }] },
+  {
+    value: "docs",
+    label: "docs",
+    children: [{ value: "intro.md", label: "intro.md" }],
+  },
   { value: "README.md", label: "README.md" },
 ]
 
@@ -51,7 +71,8 @@ const tick = () => new Promise((resolve) => setTimeout(resolve))
 // A stand-in adapter: renders composed items, labels and groups, keeps their
 // attributes current, and binds them. Groups always render, hidden while collapsed.
 function render(options: TreeOptions = {}, nodes: Node[] = files) {
-  const instance = tree({ id: "t", ...options }) as ReturnType<typeof tree> & PrimitiveInstance
+  const instance = tree({ id: "t", ...options }) as ReturnType<typeof tree> &
+    PrimitiveInstance
   const root = document.createElement("div")
   const rootPart = instance.part("root", {})
   const write = (part: Parameters<typeof attrs>[0], el: HTMLElement) => {
@@ -64,7 +85,12 @@ function render(options: TreeOptions = {}, nodes: Node[] = files) {
   const add = (list: Node[], parent: string | null, into: HTMLElement) => {
     for (const node of list) {
       const branch = node.branch ?? !!node.children
-      const props = { value: node.value, parent, branch, disabled: node.disabled }
+      const props = {
+        value: node.value,
+        parent,
+        branch,
+        disabled: node.disabled,
+      }
       const el = document.createElement("div")
       const label = document.createElement("span")
       label.textContent = node.value
@@ -87,25 +113,40 @@ function render(options: TreeOptions = {}, nodes: Node[] = files) {
   const bindAll = (list: Node[], parent: string | null) => {
     for (const node of list) {
       const branch = node.branch ?? !!node.children
-      const props = { value: node.value, parent, branch, disabled: node.disabled }
+      const props = {
+        value: node.value,
+        parent,
+        branch,
+        disabled: node.disabled,
+      }
       cleanups.push(bind(instance.part("item", props), els.get(node.value)!))
       cleanups.push(
         bind(
           instance.part("label", { value: node.value }),
-          els.get(node.value)!.firstElementChild as HTMLElement,
-        ),
+          els.get(node.value)!.firstElementChild as HTMLElement
+        )
       )
-      if (node.children) bindAll(node.children, node.value)
+      if (node.children) {
+        bindAll(node.children, node.value)
+      }
     }
   }
   bindAll(nodes, null)
   const key = (key: string, init: KeyboardEventInit = {}) =>
     (document.activeElement as HTMLElement).dispatchEvent(
-      new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true, ...init }),
+      new KeyboardEvent("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+        ...init,
+      })
     )
-  const focused = () => (document.activeElement as HTMLElement).firstElementChild?.textContent
+  const focused = () =>
+    (document.activeElement as HTMLElement).firstElementChild?.textContent
   const stops = () =>
-    [...els.entries()].filter(([, el]) => el.getAttribute("tabindex") === "0").map(([value]) => value)
+    [...els.entries()]
+      .filter(([, el]) => el.getAttribute("tabindex") === "0")
+      .map(([value]) => value)
   return { instance, els, key, focused, stops }
 }
 
@@ -132,14 +173,23 @@ describe("server markup", () => {
     const instance = tree({ id: "t" })
     instance.part("item", { value: "src", parent: null, branch: true })
     instance.part("item", { value: "lib", parent: "src", branch: true })
-    expect(attrs(instance.part("item", { value: "util.ts", parent: "lib" }))["aria-level"]).toBe("3")
+    expect(
+      attrs(instance.part("item", { value: "util.ts", parent: "lib" }))[
+        "aria-level"
+      ]
+    ).toBe("3")
   })
 
   test("the current item takes the stop, and its ancestors start expanded", () => {
-    const instance = tree({ id: "t", items: data, current: "util.ts", mode: "none" })
+    const instance = tree({
+      id: "t",
+      items: data,
+      current: "util.ts",
+      mode: "none",
+    })
     expect(instance.api.getExpanded()).toEqual(["src", "lib"])
     const stop = ["src", "index.ts", "lib", "util.ts"].filter(
-      (value) => attrs(instance.part("item", { value })).tabindex === "0",
+      (value) => attrs(instance.part("item", { value })).tabindex === "0"
     )
     expect(stop).toEqual(["util.ts"])
     expect(attrs(instance.part("item", { value: "util.ts" }))).toMatchObject({
@@ -151,7 +201,7 @@ describe("server markup", () => {
   test("a selected item hidden in a collapsed branch leaves the stop on the first item", () => {
     const instance = tree({ id: "t", items: data, defaultValue: "util.ts" })
     const stop = ["src", "docs", "README.md"].filter(
-      (value) => attrs(instance.part("item", { value })).tabindex === "0",
+      (value) => attrs(instance.part("item", { value })).tabindex === "0"
     )
     expect(stop).toEqual(["src"])
   })
@@ -173,7 +223,10 @@ describe("selection", () => {
     const single = vi.fn()
     const one = render({ onValueChange: single })
     one.els.get("README.md")!.click()
-    expect(single).toHaveBeenLastCalledWith("README.md", expect.objectContaining({ reason: "item-press" }))
+    expect(single).toHaveBeenLastCalledWith(
+      "README.md",
+      expect.objectContaining({ reason: "item-press" })
+    )
     expect(one.instance.api.getValue()).toBe("README.md")
     expect(one.els.get("README.md")!.getAttribute("aria-selected")).toBe("true")
 
@@ -181,18 +234,30 @@ describe("selection", () => {
     const multi = render({ mode: "multiple", onValueChange: many })
     multi.els.get("src")!.click()
     multi.els.get("README.md")!.click()
-    expect(many).toHaveBeenLastCalledWith(["src", "README.md"], expect.anything())
+    expect(many).toHaveBeenLastCalledWith(
+      ["src", "README.md"],
+      expect.anything()
+    )
   })
 
   test("Shift extends over the items that show, and Ctrl+A selects them all", async () => {
-    const { instance, els, key } = render({ mode: "multiple", defaultExpanded: ["src"] })
+    const { instance, els, key } = render({
+      mode: "multiple",
+      defaultExpanded: ["src"],
+    })
     await tick()
     els.get("src")!.focus()
     key("ArrowDown", { shiftKey: true })
     key("ArrowDown", { shiftKey: true })
     expect(instance.api.getValue()).toEqual(["src", "index.ts", "lib"])
     key("a", { ctrlKey: true })
-    expect(instance.api.getValue()).toEqual(["src", "index.ts", "lib", "docs", "README.md"])
+    expect(instance.api.getValue()).toEqual([
+      "src",
+      "index.ts",
+      "lib",
+      "docs",
+      "README.md",
+    ])
   })
 
   test('with `activation: "automatic"`, focus selects', async () => {
@@ -204,7 +269,10 @@ describe("selection", () => {
   })
 
   test('with `activation: "automatic"`, Right into a branch, Left out of it and typing select too', async () => {
-    const { instance, els, key, focused } = render({ activation: "automatic", defaultExpanded: ["src"] })
+    const { instance, els, key, focused } = render({
+      activation: "automatic",
+      defaultExpanded: ["src"],
+    })
     await tick()
     els.get("src")!.focus()
     key("ArrowRight")
@@ -220,10 +288,13 @@ describe("selection", () => {
 
   test('with `activation: "automatic"`, Right into a branch whose children are loading selects the first once it shows', async () => {
     let resolve = () => {}
-    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
-    const { instance, els, key, focused } = render({ activation: "automatic", loadChildren }, [
-      { value: "remote", branch: true },
-    ])
+    const loadChildren = vi.fn(
+      () => new Promise<void>((done) => (resolve = done))
+    )
+    const { instance, els, key, focused } = render(
+      { activation: "automatic", loadChildren },
+      [{ value: "remote", branch: true }]
+    )
     await tick()
     els.get("remote")!.focus()
     key("ArrowRight")
@@ -236,8 +307,15 @@ describe("selection", () => {
     label.textContent = "child"
     els.get("remote")!.append(child)
     cleanups.push(
-      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
-      bind(instance.part("label", { value: "child" }), label),
+      bind(
+        instance.part("item", {
+          value: "child",
+          parent: "remote",
+          branch: false,
+        }),
+        child
+      ),
+      bind(instance.part("label", { value: "child" }), label)
     )
     await tick()
     expect(focused()).toBe("child")
@@ -246,11 +324,14 @@ describe("selection", () => {
 
   test('with `activation: "automatic"`, the child of a loading branch keeps the key press that stepped into it', async () => {
     let resolve = () => {}
-    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
+    const loadChildren = vi.fn(
+      () => new Promise<void>((done) => (resolve = done))
+    )
     const onValueChange = vi.fn()
-    const { instance, els, key } = render({ activation: "automatic", loadChildren, onValueChange }, [
-      { value: "remote", branch: true },
-    ])
+    const { instance, els, key } = render(
+      { activation: "automatic", loadChildren, onValueChange },
+      [{ value: "remote", branch: true }]
+    )
     await tick()
     els.get("remote")!.focus()
     key("ArrowRight")
@@ -263,23 +344,34 @@ describe("selection", () => {
     label.textContent = "child"
     els.get("remote")!.append(child)
     cleanups.push(
-      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
-      bind(instance.part("label", { value: "child" }), label),
+      bind(
+        instance.part("item", {
+          value: "child",
+          parent: "remote",
+          branch: false,
+        }),
+        child
+      ),
+      bind(instance.part("label", { value: "child" }), label)
     )
     await tick()
     expect(onValueChange).toHaveBeenLastCalledWith(
       "child",
-      expect.objectContaining({ event: expect.objectContaining({ key: "ArrowRight" }) }),
+      expect.objectContaining({
+        event: expect.objectContaining({ key: "ArrowRight" }),
+      })
     )
   })
 
   test('with `activation: "automatic"`, the child of a loading branch selects nothing once focus moved on', async () => {
     let resolve = () => {}
-    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
-    const { instance, els, key } = render({ activation: "automatic", loadChildren }, [
-      { value: "remote", branch: true },
-      { value: "other" },
-    ])
+    const loadChildren = vi.fn(
+      () => new Promise<void>((done) => (resolve = done))
+    )
+    const { instance, els, key } = render(
+      { activation: "automatic", loadChildren },
+      [{ value: "remote", branch: true }, { value: "other" }]
+    )
     await tick()
     els.get("remote")!.focus()
     key("ArrowRight")
@@ -294,8 +386,15 @@ describe("selection", () => {
     label.textContent = "child"
     els.get("remote")!.append(child)
     cleanups.push(
-      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
-      bind(instance.part("label", { value: "child" }), label),
+      bind(
+        instance.part("item", {
+          value: "child",
+          parent: "remote",
+          branch: false,
+        }),
+        child
+      ),
+      bind(instance.part("label", { value: "child" }), label)
     )
     await tick()
     expect(instance.api.getValue()).toBe("other")
@@ -303,10 +402,13 @@ describe("selection", () => {
 
   test('with `activation: "automatic"`, the child of a loading branch selects nothing once focus left the tree', async () => {
     let resolve = () => {}
-    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
-    const { instance, els, key } = render({ activation: "automatic", loadChildren }, [
-      { value: "remote", branch: true },
-    ])
+    const loadChildren = vi.fn(
+      () => new Promise<void>((done) => (resolve = done))
+    )
+    const { instance, els, key } = render(
+      { activation: "automatic", loadChildren },
+      [{ value: "remote", branch: true }]
+    )
     await tick()
     els.get("remote")!.focus()
     key("ArrowRight")
@@ -323,8 +425,15 @@ describe("selection", () => {
     label.textContent = "child"
     els.get("remote")!.append(child)
     cleanups.push(
-      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
-      bind(instance.part("label", { value: "child" }), label),
+      bind(
+        instance.part("item", {
+          value: "child",
+          parent: "remote",
+          branch: false,
+        }),
+        child
+      ),
+      bind(instance.part("label", { value: "child" }), label)
     )
     await tick()
     expect(instance.api.getValue()).toBe(before)
@@ -332,10 +441,13 @@ describe("selection", () => {
 
   test('with `activation: "automatic"`, the child of a loading branch is selected inside a shadow root too', async () => {
     let resolve = () => {}
-    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
-    const { instance, els } = render({ activation: "automatic", loadChildren }, [
-      { value: "remote", branch: true },
-    ])
+    const loadChildren = vi.fn(
+      () => new Promise<void>((done) => (resolve = done))
+    )
+    const { instance, els } = render(
+      { activation: "automatic", loadChildren },
+      [{ value: "remote", branch: true }]
+    )
     const remote = els.get("remote")!
     const host = document.body.appendChild(document.createElement("div"))
     cleanups.push(() => host.remove())
@@ -344,7 +456,11 @@ describe("selection", () => {
     remote.focus()
     const right = () =>
       remote.dispatchEvent(
-        new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true, cancelable: true }),
+        new KeyboardEvent("keydown", {
+          key: "ArrowRight",
+          bubbles: true,
+          cancelable: true,
+        })
       )
     right()
     right()
@@ -356,8 +472,15 @@ describe("selection", () => {
     label.textContent = "child"
     remote.append(child)
     cleanups.push(
-      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
-      bind(instance.part("label", { value: "child" }), label),
+      bind(
+        instance.part("item", {
+          value: "child",
+          parent: "remote",
+          branch: false,
+        }),
+        child
+      ),
+      bind(instance.part("label", { value: "child" }), label)
     )
     await tick()
     expect(instance.api.getValue()).toBe("child")
@@ -365,10 +488,13 @@ describe("selection", () => {
 
   test('with `activation: "automatic"`, collapsing a loading branch forgets the key press that stepped into it', async () => {
     let resolve = () => {}
-    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
-    const { instance, els, key } = render({ activation: "automatic", loadChildren }, [
-      { value: "remote", branch: true },
-    ])
+    const loadChildren = vi.fn(
+      () => new Promise<void>((done) => (resolve = done))
+    )
+    const { instance, els, key } = render(
+      { activation: "automatic", loadChildren },
+      [{ value: "remote", branch: true }]
+    )
     await tick()
     els.get("remote")!.focus()
     key("ArrowRight")
@@ -384,8 +510,15 @@ describe("selection", () => {
     label.textContent = "child"
     els.get("remote")!.append(child)
     cleanups.push(
-      bind(instance.part("item", { value: "child", parent: "remote", branch: false }), child),
-      bind(instance.part("label", { value: "child" }), label),
+      bind(
+        instance.part("item", {
+          value: "child",
+          parent: "remote",
+          branch: false,
+        }),
+        child
+      ),
+      bind(instance.part("label", { value: "child" }), label)
     )
     await tick()
     expect(instance.api.getValue()).toBe(before)
@@ -492,19 +625,27 @@ describe("checkboxes", () => {
       "aria-checked": "mixed",
       "data-indeterminate": "",
     })
-    expect(partState(instance.part("checkbox", { value: "util.ts" }))).toMatchObject({ checked: true })
-    expect(attrs(instance.part("item", { value: "docs" }))["aria-checked"]).toBe("false")
+    expect(
+      partState(instance.part("checkbox", { value: "util.ts" }))
+    ).toMatchObject({ checked: true })
+    expect(
+      attrs(instance.part("item", { value: "docs" }))["aria-checked"]
+    ).toBe("false")
   })
 
   test("Space checks the focused item, and checking a branch checks what's in it", async () => {
     const onCheckedChange = vi.fn()
-    const { instance, els, key } = render({ checkable: true, mode: "none", onCheckedChange })
+    const { instance, els, key } = render({
+      checkable: true,
+      mode: "none",
+      onCheckedChange,
+    })
     await tick()
     els.get("src")!.focus()
     key(" ")
     expect(onCheckedChange).toHaveBeenLastCalledWith(
       ["index.ts", "util.ts", "math.ts"],
-      expect.objectContaining({ reason: "item-press" }),
+      expect.objectContaining({ reason: "item-press" })
     )
     expect(instance.api.checkedState("lib")).toBe(true)
     expect(instance.api.getValue()).toBeNull()
@@ -534,7 +675,11 @@ describe("checkboxes", () => {
   test("development builds warn when checkboxes and a selection are both on", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     tree({ id: "t", checkable: true })
-    expect(warn.mock.calls.some(([message]) => String(message).includes("checked and selected"))).toBe(true)
+    expect(
+      warn.mock.calls.some(([message]) =>
+        String(message).includes("checked and selected")
+      )
+    ).toBe(true)
     warn.mockRestore()
   })
 })
@@ -552,11 +697,17 @@ describe("composed positions", () => {
 describe("loading children", () => {
   test("a branch with no children loads them, then expands", async () => {
     let resolve = () => {}
-    const loadChildren = vi.fn(() => new Promise<void>((done) => (resolve = done)))
-    const { instance, els } = render({ loadChildren }, [{ value: "remote", branch: true }])
+    const loadChildren = vi.fn(
+      () => new Promise<void>((done) => (resolve = done))
+    )
+    const { instance, els } = render({ loadChildren }, [
+      { value: "remote", branch: true },
+    ])
     await tick()
     els.get("remote")!.click()
-    expect(loadChildren).toHaveBeenCalledWith("remote", { signal: expect.any(AbortSignal) })
+    expect(loadChildren).toHaveBeenCalledWith("remote", {
+      signal: expect.any(AbortSignal),
+    })
     expect(els.get("remote")!.getAttribute("aria-busy")).toBe("true")
     expect(els.get("remote")!.hasAttribute("data-loading")).toBe(true)
     expect(instance.api.getExpanded()).toEqual([])
@@ -567,8 +718,13 @@ describe("loading children", () => {
   })
 
   test("a failed load marks the branch, and the next expand tries again", async () => {
-    const loadChildren = vi.fn().mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(undefined)
-    const { instance, els } = render({ loadChildren }, [{ value: "remote", branch: true }])
+    const loadChildren = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce(undefined)
+    const { instance, els } = render({ loadChildren }, [
+      { value: "remote", branch: true },
+    ])
     await tick()
     instance.api.expand("remote")
     await tick()
@@ -583,11 +739,15 @@ describe("loading children", () => {
 
   test("expanding again while loading cancels", async () => {
     let signal: AbortSignal | undefined
-    const loadChildren = vi.fn((_value: string, details: { signal: AbortSignal }) => {
-      signal = details.signal
-      return new Promise<void>(() => {})
-    })
-    const { instance } = render({ loadChildren }, [{ value: "remote", branch: true }])
+    const loadChildren = vi.fn(
+      (_value: string, details: { signal: AbortSignal }) => {
+        signal = details.signal
+        return new Promise<void>(() => {})
+      }
+    )
+    const { instance } = render({ loadChildren }, [
+      { value: "remote", branch: true },
+    ])
     instance.api.expand("remote")
     instance.api.expand("remote")
     expect(signal?.aborted).toBe(true)
@@ -599,11 +759,17 @@ describe("virtualized rows", () => {
   test("a key that moves past the rendered rows reports the row, and focus lands once it renders", async () => {
     const onHighlight = vi.fn()
     // Only the first row renders, as a virtualized list would.
-    const { instance, els, key, focused } = render({ items: data, onHighlight }, [{ value: "src" }])
+    const { instance, els, key, focused } = render(
+      { items: data, onHighlight },
+      [{ value: "src" }]
+    )
     await tick()
     els.get("src")!.focus()
     key("End")
-    expect(onHighlight).toHaveBeenCalledWith("README.md", { index: 2, event: expect.any(KeyboardEvent) })
+    expect(onHighlight).toHaveBeenCalledWith("README.md", {
+      index: 2,
+      event: expect.any(KeyboardEvent),
+    })
     const readme = document.createElement("div")
     readme.innerHTML = "<span>README.md</span>"
     document.querySelector('[role="tree"]')!.append(readme)

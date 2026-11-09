@@ -19,14 +19,20 @@ async function hydrateFixture<Props extends Record<string, unknown>>(
   root: HTMLElement,
   fixture: string,
   component: Component<Props>,
-  props: Props,
+  props: Props
 ) {
   const errors: string[] = []
   const recorded = window as unknown as Recorded
   recorded.__hydrationErrors = errors
-  const search = new URLSearchParams({ fixture, framework: "svelte", url: location.href })
+  const search = new URLSearchParams({
+    fixture,
+    framework: "svelte",
+    url: location.href,
+  })
   const response = await fetch(`/__ssr?${search}`)
-  if (!response.ok) throw new Error(await response.text())
+  if (!response.ok) {
+    throw new Error(await response.text())
+  }
   root.innerHTML = await response.text()
   // What the page shows before hydration, and whether open content shows
   // before any script runs on it, as server HTML would.
@@ -36,7 +42,9 @@ async function hydrateFixture<Props extends Record<string, unknown>>(
     ?.checkVisibility()
   const form = root.querySelector("form")
   recorded.__serverForm = form
-    ? new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString()
+    ? new URLSearchParams(
+        new FormData(form) as unknown as Record<string, string>
+      ).toString()
     : ""
   const run = () => {
     const warn = console.warn
@@ -51,8 +59,11 @@ async function hydrateFixture<Props extends Record<string, unknown>>(
     }
     hydrate(component, { target: root, props })
   }
-  if (new URLSearchParams(location.search).get("hydrate") === "manual") recorded.hydrate = run
-  else run()
+  if (new URLSearchParams(location.search).get("hydrate") === "manual") {
+    recorded.hydrate = run
+  } else {
+    run()
+  }
 }
 
 export { hydrateFixture }

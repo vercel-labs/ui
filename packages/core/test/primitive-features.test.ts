@@ -22,7 +22,13 @@ function badgeFeature() {
     api.hooks.label = () => "badge"
   })
   const feature: Feature<ListApi> = {
-    slots: { badge: { attrs: (state: { count: number }) => ({ "data-count": String(state.count) }) } },
+    slots: {
+      badge: {
+        attrs: (state: { count: number }) => ({
+          "data-count": String(state.count),
+        }),
+      },
+    },
     extend,
   }
   return { feature, extend }
@@ -32,7 +38,9 @@ describe("features", () => {
   test("a feature's slots read like the primitive's own once it's used", () => {
     const instance = list({ id: "l" })
     instance.use(badgeFeature().feature)
-    expect(attrs(instance.part("item" as never))).toMatchObject({ role: "option" })
+    expect(attrs(instance.part("item" as never))).toMatchObject({
+      role: "option",
+    })
     expect(attrs(instance.part("badge" as never))).toMatchObject({
       "data-slot": "list-badge",
       "data-count": "2",
@@ -61,8 +69,12 @@ describe("features", () => {
   test("a part whose feature no one used warns in development and renders as a plain element", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     const instance = list({ id: "l" })
-    expect(attrs(instance.part("badge" as never))).toEqual({ "data-slot": "list-badge" })
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining(`the "badge" part isn't defined`))
+    expect(attrs(instance.part("badge" as never))).toEqual({
+      "data-slot": "list-badge",
+    })
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining(`the "badge" part isn't defined`)
+    )
     warn.mockRestore()
   })
 })

@@ -17,15 +17,24 @@ test.describe("custom rendering", () => {
     await expect(card(page)).toHaveText("A headless UI kit.")
   })
 
-  test("render functions receive the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+  test("render functions receive the part's state", async ({
+    page,
+    framework,
+  }) => {
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     await expect(trigger(page)).toContainText("▼")
     await trigger(page).hover()
     await expect(trigger(page)).toContainText("▲")
   })
 
   test("class names follow the part's state", async ({ page, framework }) => {
-    test.skip(framework.startsWith("web"), "Web components style state through attributes.")
+    test.skip(
+      framework.startsWith("web"),
+      "Web components style state through attributes."
+    )
     await expect(trigger(page)).toHaveClass(/is-closed/)
     await trigger(page).hover()
     await expect(trigger(page)).toHaveClass(/is-open/)

@@ -21,7 +21,9 @@ afterEach(() => {
   document.body.replaceChildren()
 })
 
-const renderToken = (token: Token) => <TokenInputToken>{token.label}</TokenInputToken>
+const renderToken = (token: Token) => (
+  <TokenInputToken>{token.label}</TokenInputToken>
+)
 
 function mount(element: React.ReactNode) {
   const container = document.body.appendChild(document.createElement("div"))
@@ -32,19 +34,31 @@ function mount(element: React.ReactNode) {
 
 // What each host shows, and what it reads as: its content, then its kind.
 const hosts = () =>
-  [...document.querySelectorAll("[data-slot='token-input-host']")].map((host) => host.textContent)
+  [...document.querySelectorAll("[data-slot='token-input-host']")].map(
+    (host) => host.textContent
+  )
 
 test("tokens a token input starts with show only what renderToken renders", () => {
   const controller = createTokenInputController()
-  const defaultValue = fromText("Open [@routes.ts](file:routes.ts) and [@app.ts](file:app.ts)")
+  const defaultValue = fromText(
+    "Open [@routes.ts](file:routes.ts) and [@app.ts](file:app.ts)"
+  )
   mount(
-    <TokenInput defaultValue={defaultValue} controller={controller} renderToken={renderToken}>
+    <TokenInput
+      defaultValue={defaultValue}
+      controller={controller}
+      renderToken={renderToken}
+    >
       <TokenInputEditor aria-label="Prompt" />
-    </TokenInput>,
+    </TokenInput>
   )
   expect(hosts()).toEqual(["routes.ts file", "app.ts file"])
-  expect(document.querySelectorAll("[data-slot='token-input-token']")).toHaveLength(2)
-  expect(controller.getText()).toBe("Open [@routes.ts](file:routes.ts) and [@app.ts](file:app.ts)")
+  expect(
+    document.querySelectorAll("[data-slot='token-input-token']")
+  ).toHaveLength(2)
+  expect(controller.getText()).toBe(
+    "Open [@routes.ts](file:routes.ts) and [@app.ts](file:app.ts)"
+  )
 })
 
 test("tokens show their label again when renderToken goes, and its content when it comes back", () => {
@@ -52,22 +66,24 @@ test("tokens show their label again when renderToken goes, and its content when 
   const render = mount(
     <TokenInput defaultValue={defaultValue} renderToken={renderToken}>
       <TokenInputEditor aria-label="Prompt" />
-    </TokenInput>,
+    </TokenInput>
   )
   render(
     <TokenInput defaultValue={defaultValue}>
       <TokenInputEditor aria-label="Prompt" />
-    </TokenInput>,
+    </TokenInput>
   )
   expect(hosts()).toEqual(["routes.ts file"])
   expect(document.querySelector("[data-slot='token-input-token']")).toBeNull()
   render(
     <TokenInput defaultValue={defaultValue} renderToken={renderToken}>
       <TokenInputEditor aria-label="Prompt" />
-    </TokenInput>,
+    </TokenInput>
   )
   expect(hosts()).toEqual(["routes.ts file"])
-  expect(document.querySelectorAll("[data-slot='token-input-token']")).toHaveLength(1)
+  expect(
+    document.querySelectorAll("[data-slot='token-input-token']")
+  ).toHaveLength(1)
 })
 
 test("tokens changed, removed and added after mount show only what renderToken renders", () => {
@@ -79,22 +95,32 @@ test("tokens changed, removed and added after mount show only what renderToken r
       renderToken={renderToken}
     >
       <TokenInputEditor aria-label="Prompt" />
-    </TokenInput>,
+    </TokenInput>
   )
-  const [token] = controller.getValue().filter((segment) => typeof segment !== "string")
+  const [token] = controller
+    .getValue()
+    .filter((segment) => typeof segment !== "string")
   act(() => controller.updateToken(token.id!, { label: "router.ts" }))
   expect(hosts()).toEqual(["router.ts file"])
   act(() => controller.removeToken(token.id!))
   expect(hosts()).toEqual([])
   act(() => controller.undo())
   expect(hosts()).toEqual(["router.ts file"])
-  act(() => controller.insert({ type: "file", value: "app.ts", label: "app.ts" }))
+  act(() =>
+    controller.insert({ type: "file", value: "app.ts", label: "app.ts" })
+  )
   expect(hosts()).toEqual(["router.ts file", "app.ts file"])
 })
 
 const pressEnter = () => {
-  const editor = document.querySelector<HTMLElement>("[data-slot='token-input-editor']")!
-  const event = new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+  const editor = document.querySelector<HTMLElement>(
+    "[data-slot='token-input-editor']"
+  )!
+  const event = new KeyboardEvent("keydown", {
+    key: "Enter",
+    bubbles: true,
+    cancelable: true,
+  })
   act(() => void editor.dispatchEvent(event))
   return event
 }
@@ -103,7 +129,7 @@ test("with nothing to submit, Enter is left to start a new line", () => {
   mount(
     <TokenInput defaultValue={fromText("Ask Hollis")}>
       <TokenInputEditor aria-label="Message" />
-    </TokenInput>,
+    </TokenInput>
   )
   expect(pressEnter().defaultPrevented).toBe(false)
 })
@@ -111,9 +137,12 @@ test("with nothing to submit, Enter is left to start a new line", () => {
 test("Enter calls onSubmit with the value", () => {
   const submitted: unknown[] = []
   mount(
-    <TokenInput defaultValue={fromText("Ask Hollis")} onSubmit={(value) => submitted.push(value)}>
+    <TokenInput
+      defaultValue={fromText("Ask Hollis")}
+      onSubmit={(value) => submitted.push(value)}
+    >
       <TokenInputEditor aria-label="Message" />
-    </TokenInput>,
+    </TokenInput>
   )
   expect(pressEnter().defaultPrevented).toBe(true)
   expect(submitted).toEqual([fromText("Ask Hollis")])
@@ -131,7 +160,7 @@ test("Enter submits the form a token input is in", () => {
       <TokenInput defaultValue={fromText("Ask Hollis")} name="message">
         <TokenInputEditor aria-label="Message" />
       </TokenInput>
-    </form>,
+    </form>
   )
   expect(pressEnter().defaultPrevented).toBe(true)
   expect(submits).toBe(1)

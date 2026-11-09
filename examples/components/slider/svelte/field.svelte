@@ -11,7 +11,13 @@
 </script>
 
 <Field>
-  <Slider defaultValue={0.3} format={{ style: "percent" }} min={0} max={1} step={0.01}>
+  <Slider
+    defaultValue={0.3}
+    format={{ style: "percent" }}
+    min={0}
+    max={1}
+    step={0.01}
+  >
     <div data-slot="row">
       <FieldLabel>Volume</FieldLabel>
       <SliderValue />

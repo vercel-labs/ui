@@ -4,7 +4,10 @@ The button that opens and closes the panel. It says whether the panel is open wi
 @stable
 -->
 <script lang="ts">
-  import { collapsible, type CollapsibleTriggerState } from "@ui-sdk/core/collapsible"
+  import {
+    collapsible,
+    type CollapsibleTriggerState,
+  } from "@ui-sdk/core/collapsible"
   import Part from "../part.svelte"
   import { usePart } from "../instance"
   import type { PartProps } from "../use-primitive.svelte"

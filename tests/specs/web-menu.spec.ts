@@ -4,10 +4,16 @@ import { expect, menuNamed, test } from "../fixtures"
 // upgrade, as a script would.
 
 test.beforeEach(({ framework }) => {
-  test.skip(!framework.startsWith("web"), "Only web components read these from attributes and properties.")
+  test.skip(
+    !framework.startsWith("web"),
+    "Only web components read these from attributes and properties."
+  )
 })
 
-test("an item's shortcut glyph follows its shortcut attribute", async ({ page, open }) => {
+test("an item's shortcut glyph follows its shortcut attribute", async ({
+  page,
+  open,
+}) => {
   await open("menu")
   const item = page.locator('ui-menu-item[value="new"]')
   const before = await item.locator("ui-menu-shortcut").textContent()
@@ -25,7 +31,8 @@ test("a data radio group with a null value stays controlled with nothing selecte
 }) => {
   await open("menu")
   await page.evaluate(() => {
-    const menu = document.createElement("ui-menu") as HTMLElement & Record<string, any>
+    const menu = document.createElement("ui-menu") as HTMLElement &
+      Record<string, any>
     menu.innerHTML = `<ui-menu-trigger><button>Sort</button></ui-menu-trigger>`
     document.body.append(menu)
     menu.items = [
@@ -43,14 +50,25 @@ test("a data radio group with a null value stays controlled with nothing selecte
   await page.getByRole("button", { name: "Sort" }).click()
   await expect(menuNamed(page, "Sort")).toBeVisible()
   await page.getByRole("menuitemradio", { name: "Name" }).click()
-  await expect(page.getByRole("menuitemradio", { name: "Date" })).toHaveAttribute("aria-checked", "false")
-  await expect(page.getByRole("menuitemradio", { name: "Name" })).toHaveAttribute("aria-checked", "false")
+  await expect(
+    page.getByRole("menuitemradio", { name: "Date" })
+  ).toHaveAttribute("aria-checked", "false")
+  await expect(
+    page.getByRole("menuitemradio", { name: "Name" })
+  ).toHaveAttribute("aria-checked", "false")
 })
 
-test('modal="trap-focus" on a menu reads as a bare modal, which menus take', async ({ page, open }) => {
+test('modal="trap-focus" on a menu reads as a bare modal, which menus take', async ({
+  page,
+  open,
+}) => {
   await open("menu")
-  await page.evaluate(() => document.querySelector("ui-menu")!.setAttribute("modal", "trap-focus"))
+  await page.evaluate(() =>
+    document.querySelector("ui-menu")!.setAttribute("modal", "trap-focus")
+  )
   await page.getByRole("button", { name: "File" }).click()
   await expect(menuNamed(page, "File")).toBeVisible()
-  expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("hidden")
+  expect(
+    await page.evaluate(() => document.documentElement.style.overflow)
+  ).toBe("hidden")
 })

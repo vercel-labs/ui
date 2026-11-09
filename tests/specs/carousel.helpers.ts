@@ -4,25 +4,38 @@ import { carouselFixture } from "../fixtures/carousel"
 
 // Slides are found by the link inside each, out of view too, where it's hidden.
 function slideLink(page: Page, index: number) {
-  return page.getByRole("link", { name: carouselFixture.slides[index].link, includeHidden: true })
+  return page.getByRole("link", {
+    name: carouselFixture.slides[index].link,
+    includeHidden: true,
+  })
 }
 
 // Waits until the slides at `indexes` show whole, and the others don't show at all.
 async function expectShown(page: Page, ...indexes: number[]) {
   for (let index = 0; index < carouselFixture.slides.length; index++) {
-    if (indexes.includes(index)) await expect(slideLink(page, index)).toBeInViewport({ ratio: 1 })
-    else await expect(slideLink(page, index)).not.toBeInViewport()
+    if (indexes.includes(index)) {
+      await expect(slideLink(page, index)).toBeInViewport({ ratio: 1 })
+    } else {
+      await expect(slideLink(page, index)).not.toBeInViewport()
+    }
   }
 }
 
-const previousButton = (page: Page) => page.getByRole("button", { name: carouselFixture.previous })
-const nextButton = (page: Page) => page.getByRole("button", { name: carouselFixture.next })
+const previousButton = (page: Page) =>
+  page.getByRole("button", { name: carouselFixture.previous })
+const nextButton = (page: Page) =>
+  page.getByRole("button", { name: carouselFixture.next })
 
 const indicator = (page: Page, number: number) =>
-  page.getByRole("tab", { name: carouselFixture.indicator(number), exact: true })
+  page.getByRole("tab", {
+    name: carouselFixture.indicator(number),
+    exact: true,
+  })
 
 const playToggle = (page: Page, playing: boolean) =>
-  page.getByRole("button", { name: playing ? carouselFixture.stop : carouselFixture.start })
+  page.getByRole("button", {
+    name: playing ? carouselFixture.stop : carouselFixture.start,
+  })
 
 async function lastReason(page: Page) {
   return page.getByRole("status", { name: "Last reason" }).textContent()
@@ -34,18 +47,25 @@ async function drag(
   page: Page,
   from: number,
   distance: number,
-  { steps = 12, axis = "x", stepDelay = 0 } = {},
+  { steps = 12, axis = "x", stepDelay = 0 } = {}
 ) {
   const box = await slideLink(page, from).locator("..").boundingBox()
-  if (!box) throw new Error("The slide isn't laid out.")
+  if (!box) {
+    throw new Error("The slide isn't laid out.")
+  }
   const x = box.x + box.width / 2
   const y = box.y + box.height / 2
   await page.mouse.move(x, y)
   await page.mouse.down()
   for (let step = 1; step <= steps; step++) {
     const travelled = (distance * step) / steps
-    await page.mouse.move(axis === "x" ? x + travelled : x, axis === "y" ? y + travelled : y)
-    if (stepDelay) await page.waitForTimeout(stepDelay)
+    await page.mouse.move(
+      axis === "x" ? x + travelled : x,
+      axis === "y" ? y + travelled : y
+    )
+    if (stepDelay) {
+      await page.waitForTimeout(stepDelay)
+    }
   }
   await page.mouse.up()
 }
@@ -55,19 +75,28 @@ async function settled(page: Page) {
   await page.waitForFunction(
     () =>
       new Promise<boolean>((resolve) => {
-        const scrollers = [...document.querySelectorAll<HTMLElement>("*")].filter(
-          (el) => el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1,
+        const scrollers = [
+          ...document.querySelectorAll<HTMLElement>("*"),
+        ].filter(
+          (el) =>
+            el.scrollWidth > el.clientWidth + 1 ||
+            el.scrollHeight > el.clientHeight + 1
         )
-        const read = () => scrollers.map((el) => `${el.scrollLeft},${el.scrollTop}`).join(";")
+        const read = () =>
+          scrollers.map((el) => `${el.scrollLeft},${el.scrollTop}`).join(";")
         const first = read()
         let frames = 0
         const check = () => {
-          if (read() !== first) return resolve(false)
-          if (++frames >= 6) return resolve(true)
+          if (read() !== first) {
+            return resolve(false)
+          }
+          if (++frames >= 6) {
+            return resolve(true)
+          }
           requestAnimationFrame(check)
         }
         requestAnimationFrame(check)
-      }),
+      })
   )
 }
 
@@ -76,14 +105,22 @@ async function settled(page: Page) {
 // so a spec can check the carousel never ran back the other way.
 async function watchBackward(page: Page) {
   await page.evaluate(() => {
-    const slides = [...document.querySelectorAll<HTMLElement>("[aria-roledescription='slide']")]
-    const viewport = slides[0].closest<HTMLElement>("[aria-roledescription='carousel']")!
+    const slides = [
+      ...document.querySelectorAll<HTMLElement>(
+        "[aria-roledescription='slide']"
+      ),
+    ]
+    const viewport = slides[0].closest<HTMLElement>(
+      "[aria-roledescription='carousel']"
+    )!
     const rtl = getComputedStyle(viewport).direction === "rtl"
     const read = () => {
       const bounds = viewport.getBoundingClientRect()
       return slides.map((slide) => {
         const box = slide.getBoundingClientRect()
-        return box.right > bounds.left && box.left < bounds.right ? box.left : null
+        return box.right > bounds.left && box.left < bounds.right
+          ? box.left
+          : null
       })
     }
     let most = 0
@@ -92,7 +129,9 @@ async function watchBackward(page: Page) {
       const now = read()
       now.forEach((x, index) => {
         const before = last[index]
-        if (x !== null && before !== null) most = Math.max(most, (x - before) * (rtl ? -1 : 1))
+        if (x !== null && before !== null) {
+          most = Math.max(most, (x - before) * (rtl ? -1 : 1))
+        }
       })
       last = now
       requestAnimationFrame(sample)
@@ -101,7 +140,11 @@ async function watchBackward(page: Page) {
     Object.assign(window, { carouselBackward: () => most })
   })
   return () =>
-    page.evaluate(() => (window as unknown as { carouselBackward: () => number }).carouselBackward())
+    page.evaluate(() =>
+      (
+        window as unknown as { carouselBackward: () => number }
+      ).carouselBackward()
+    )
 }
 
 export {

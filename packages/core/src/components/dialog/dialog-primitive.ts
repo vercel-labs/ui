@@ -3,10 +3,22 @@
 // dialog doesn't carry it.
 import { initialApple } from "../../foundation/platform/platform"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PropSchema, SlotFactory } from "../../foundation/kernel/primitive-types"
+import type {
+  PropSchema,
+  SlotFactory,
+} from "../../foundation/kernel/primitive-types"
 import type { Store } from "../../foundation/kernel/store"
-import type { AlertDialogController, DialogController, DialogSharedOptions } from "./dialog"
-import { dialogApi, type DialogApi, type DialogRules, type DialogState } from "./dialog-api"
+import type {
+  AlertDialogController,
+  DialogController,
+  DialogSharedOptions,
+} from "./dialog"
+import {
+  dialogApi,
+  type DialogApi,
+  type DialogRules,
+  type DialogState,
+} from "./dialog-api"
 import { dialogSlots } from "./dialog-parts"
 
 function defineDialog<
@@ -25,7 +37,7 @@ function defineDialog<
     rules: (store: Store<DialogState>, options: () => Options) => DialogRules
     /** Parts beyond the shared ones. */
     slots: (slot: SlotFactory<DialogState, DialogApi>) => Extra
-  },
+  }
 ) {
   return definePrimitive({
     name,
@@ -63,7 +75,12 @@ function defineDialog<
       // An alert dialog is always modal.
       modal: alert ? true : (options.modal ?? true),
     }),
-    api: (context) => dialogApi(context, alert, extension?.rules(context.store, context.options)),
+    api: (context) =>
+      dialogApi(
+        context,
+        alert,
+        extension?.rules(context.store, context.options)
+      ),
     // Without an extension there are no extra parts, and spreading undefined adds none.
     slots: (slot) => ({
       ...dialogSlots(slot, { name }),

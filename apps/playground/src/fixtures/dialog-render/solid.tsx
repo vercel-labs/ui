@@ -22,11 +22,22 @@ function Fixture() {
             </button>
           )}
         />
-        <DialogBackdrop class="dialog-backdrop" render={(props) => <section {...props} />} />
-        <DialogContent class={(state) => `dialog ${state.open ? "is-open" : "is-closed"}`}>
-          <DialogTitle render={(props) => <h3 {...props} />}>Shipping</DialogTitle>
-          <DialogDescription render={(props) => <div {...props} />}>Arrives in two days.</DialogDescription>
-          <DialogClose render={(props) => <a {...props} href="#done" />}>Done</DialogClose>
+        <DialogBackdrop
+          class="dialog-backdrop"
+          render={(props) => <section {...props} />}
+        />
+        <DialogContent
+          class={(state) => `dialog ${state.open ? "is-open" : "is-closed"}`}
+        >
+          <DialogTitle render={(props) => <h3 {...props} />}>
+            Shipping
+          </DialogTitle>
+          <DialogDescription render={(props) => <div {...props} />}>
+            Arrives in two days.
+          </DialogDescription>
+          <DialogClose render={(props) => <a {...props} href="#done" />}>
+            Done
+          </DialogClose>
         </DialogContent>
       </Dialog>
       <button>After</button>

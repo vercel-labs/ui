@@ -12,21 +12,49 @@ type SheetState = { active: GridCell | null; range: CellRange | null }
 
 type SheetOptions = { rows: number; cols: number }
 
-type SheetSummaryState = { top: number; left: number; bottom: number; right: number }
+type SheetSummaryState = {
+  top: number
+  left: number
+  bottom: number
+  right: number
+}
 
 const sheet = definePrimitive({
   name: "sheet",
   options: { rows: "number", cols: "number" },
-  state: (_options: SheetOptions): SheetState => ({ active: null, range: null }),
+  state: (_options: SheetOptions): SheetState => ({
+    active: null,
+    range: null,
+  }),
   api: (context) => {
     const rows = () => context.options().rows
     const cols = () => context.options().cols
-    const grid = createGridFocus<SheetState>(context, { key: "active", rows, cols })
-    return { grid, range: createCellRange<SheetState>(context, { key: "range", grid, rows, cols }) }
+    const grid = createGridFocus<SheetState>(context, {
+      key: "active",
+      rows,
+      cols,
+    })
+    return {
+      grid,
+      range: createCellRange<SheetState>(context, {
+        key: "range",
+        grid,
+        rows,
+        cols,
+      }),
+    }
   },
   slots: (slot) => ({
-    root: slot({ attrs: () => ({ role: "grid", style: "user-select:none;touch-action:none" }) }),
-    row: slot<{ id: string }>({ props: { id: "string" }, attrs: () => ({ role: "row" }) }),
+    root: slot({
+      attrs: () => ({
+        role: "grid",
+        style: "user-select:none;touch-action:none",
+      }),
+    }),
+    row: slot<{ id: string }>({
+      props: { id: "string" },
+      attrs: () => ({ role: "row" }),
+    }),
     summary: slot<{}, SheetSummaryState>({
       state: (state, { api }) => {
         const bounds = state.active && api.range.bounds(state)
@@ -43,7 +71,8 @@ const sheet = definePrimitive({
       }),
       on: {
         keydown: (event, { api }) => api.range.keydown(event),
-        pointerdown: (event, { api, props }) => api.range.pointerdown(event, props),
+        pointerdown: (event, { api, props }) =>
+          api.range.pointerdown(event, props),
       },
       bind: (el, { api, props }) => api.range.bind(el, props),
     }),
@@ -56,7 +85,11 @@ const Sheet = parts.Root
 
 const SheetRow = parts.Row
 
-function SheetCell({ row, col, ...props }: { row: number; col: number } & PartProps<"div">) {
+function SheetCell({
+  row,
+  col,
+  ...props
+}: { row: number; col: number } & PartProps<"div">) {
   return usePart(sheet, "cell", { id: `${row}:${col}`, row, col }, props, "div")
 }
 
@@ -83,8 +116,11 @@ function Example() {
       <SheetSummary>
         {({ top, left, bottom, right }) => {
           let total = 0
-          for (let row = Math.max(top, 0); row <= bottom; row++)
-            for (let col = Math.max(left, 0); col <= right; col++) total += values[row][col]
+          for (let row = Math.max(top, 0); row <= bottom; row++) {
+            for (let col = Math.max(left, 0); col <= right; col++) {
+              total += values[row][col]
+            }
+          }
           return `Total: ${total}`
         }}
       </SheetSummary>

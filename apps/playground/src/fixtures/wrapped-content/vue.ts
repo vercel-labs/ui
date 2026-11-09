@@ -4,9 +4,25 @@ import {
   AutocompleteInput,
   AutocompleteLabel,
 } from "@ui-sdk/vue/autocomplete"
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxLabel } from "@ui-sdk/vue/combobox"
-import { Select, SelectContent, SelectLabel, SelectTrigger, SelectValue } from "@ui-sdk/vue/select"
-import { TriggerMenu, TriggerMenuContent, TriggerMenuInput, TriggerMenuList } from "@ui-sdk/vue/trigger-menu"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxLabel,
+} from "@ui-sdk/vue/combobox"
+import {
+  Select,
+  SelectContent,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/vue/select"
+import {
+  TriggerMenu,
+  TriggerMenuContent,
+  TriggerMenuInput,
+  TriggerMenuList,
+} from "@ui-sdk/vue/trigger-menu"
 import { createApp, defineComponent, Fragment, h } from "vue"
 import { wrappedContentFixture as f } from "tests/fixtures/wrapped-content.ts"
 
@@ -33,9 +49,11 @@ const Fixture = defineComponent(
       ]),
       h(TriggerMenu, { triggers: [{ char: "@", items: f.items }] }, () => [
         h(TriggerMenuInput, { "aria-label": f.triggerMenu }),
-        h(Fragment, [h(TriggerMenuContent, { class: "popup" }, () => h(TriggerMenuList))]),
+        h(Fragment, [
+          h(TriggerMenuContent, { class: "popup" }, () => h(TriggerMenuList)),
+        ]),
       ]),
-    ]),
+    ])
 )
 
 function mount(root: HTMLElement) {

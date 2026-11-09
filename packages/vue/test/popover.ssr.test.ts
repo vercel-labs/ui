@@ -18,13 +18,16 @@ describe("popover server rendering", () => {
   const app = (open: boolean) =>
     createSSRApp(() =>
       h(Popover, { defaultOpen: open }, () => [
-        h(PopoverTrigger, { shortcut: "mod+i" }, () => ["Profile", h(PopoverShortcut)]),
+        h(PopoverTrigger, { shortcut: "mod+i" }, () => [
+          "Profile",
+          h(PopoverShortcut),
+        ]),
         h(PopoverContent, null, () => [
           h(PopoverTitle, null, () => "Edit profile"),
           h(PopoverDescription, null, () => "Your name appears on your posts."),
           h(PopoverClose, null, () => "Close"),
         ]),
-      ]),
+      ])
     )
 
   test("a closed popover renders its trigger only, with its shortcut", async () => {
@@ -32,7 +35,9 @@ describe("popover server rendering", () => {
     expect(typeof window).toBe("undefined")
     expect(html).toContain('aria-haspopup="dialog"')
     expect(html).toContain('aria-keyshortcuts="Control+I"')
-    expect(html).toMatch(/<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+I\u2069<\/span>/)
+    expect(html).toMatch(
+      /<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+I\u2069<\/span>/
+    )
     expect(html).not.toContain('role="dialog"')
   })
 
@@ -46,9 +51,14 @@ describe("popover server rendering", () => {
     const share = createPopoverController()
     const html = await renderToString(
       createSSRApp(() => [
-        h(PopoverTrigger, { controller: share, shortcut: "mod+i" }, () => ["Share", h(PopoverShortcut)]),
-        h(Popover, { controller: share }, () => h(PopoverContent, null, () => "Share")),
-      ]),
+        h(PopoverTrigger, { controller: share, shortcut: "mod+i" }, () => [
+          "Share",
+          h(PopoverShortcut),
+        ]),
+        h(Popover, { controller: share }, () =>
+          h(PopoverContent, null, () => "Share")
+        ),
+      ])
     )
     expect(html).toContain("Share")
   })
@@ -58,8 +68,10 @@ describe("popover server rendering", () => {
     const html = await renderToString(
       createSSRApp(() => [
         h(PopoverTrigger, { controller: share, disabled: true }, () => "Share"),
-        h(Popover, { controller: share }, () => h(PopoverContent, null, () => "Share")),
-      ]),
+        h(Popover, { controller: share }, () =>
+          h(PopoverContent, null, () => "Share")
+        ),
+      ])
     )
     expect(html).toMatch(/<button[^>]*disabled[^>]*>Share/)
   })

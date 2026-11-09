@@ -34,7 +34,7 @@ export function mount(root: HTMLElement) {
                     <div data-slot="row">
                       <dt>${detail.label}</dt>
                       <dd>${detail.value}</dd>
-                    </div>`,
+                    </div>`
                 )
                 .join("")}
             </dl>

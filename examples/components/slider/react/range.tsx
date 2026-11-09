@@ -16,7 +16,11 @@ function Example() {
       <Slider
         defaultValue={[25, 50]}
         step={5}
-        format={{ style: "currency", currency: "USD", maximumFractionDigits: 0 }}
+        format={{
+          style: "currency",
+          currency: "USD",
+          maximumFractionDigits: 0,
+        }}
       >
         <div data-slot="row">
           <FieldLabel>Price</FieldLabel>

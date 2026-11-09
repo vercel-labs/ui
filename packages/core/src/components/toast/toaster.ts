@@ -3,21 +3,29 @@
 // queue holds data and decides nothing about time or focus; the region runs
 // timers only for toasts it shows, so a toast never expires unseen.
 import type { ActionDetails } from "../../foundation/kernel/action"
-import { createDetails, type ChangeDetails } from "../../foundation/kernel/details"
+import {
+  createDetails,
+  type ChangeDetails,
+} from "../../foundation/kernel/details"
 import { changeSource } from "../../foundation/kernel/input-source"
-import { overlays as sharedOverlays, type Overlays } from "../../page/overlays/overlays"
+import {
+  overlays as sharedOverlays,
+  type Overlays,
+} from "../../page/overlays/overlays"
 
 /**
  * What a toast is about. `"error"` is announced assertively, and `"loading"` stays until updated.
  * @stable
  */
-type ToastType = "default" | "success" | "error" | "info" | "warning" | "loading"
+type ToastType =
+  "default" | "success" | "error" | "info" | "warning" | "loading"
 
 /**
  * Why a toast closed.
  * @stable
  */
-type ToastDismissReason = "timeout" | "close-press" | "swipe" | "escape-key" | "action" | "imperative"
+type ToastDismissReason =
+  "timeout" | "close-press" | "swipe" | "escape-key" | "action" | "imperative"
 
 /**
  * What `onDismiss` receives. `cancel()` keeps the toast, like a swipe that snaps back.
@@ -109,7 +117,10 @@ type ToastOptions<Content = unknown> = {
  * A toast in the queue, as regions render it.
  * @stable
  */
-type Toast<Content = unknown> = Omit<ToastOptions<Content>, "id" | "type" | "duration" | "priority"> & {
+type Toast<Content = unknown> = Omit<
+  ToastOptions<Content>,
+  "id" | "type" | "duration" | "priority"
+> & {
   /** Unique within its toaster. */
   id: string
   /** What it's about. */
@@ -126,7 +137,9 @@ type Toast<Content = unknown> = Omit<ToastOptions<Content>, "id" | "type" | "dur
 
 /** A message, or the options for a toast, or a function of the settled value that returns either. */
 type PromiseMessage<Content, Value> =
-  Content | ToastOptions<Content> | ((value: Value) => Content | ToastOptions<Content>)
+  | Content
+  | ToastOptions<Content>
+  | ((value: Value) => Content | ToastOptions<Content>)
 
 let ids = 0
 let orders = 0
@@ -134,8 +147,12 @@ let orders = 0
 // A plain object of options, rather than content like a string or an element.
 // Framework elements are plain objects too, so they're told apart by their markers.
 function isOptions(value: unknown): value is ToastOptions<unknown> {
-  if (!value || typeof value !== "object") return false
-  if (Object.getPrototypeOf(value) !== Object.prototype) return false
+  if (!value || typeof value !== "object") {
+    return false
+  }
+  if (Object.getPrototypeOf(value) !== Object.prototype) {
+    return false
+  }
   return !("$$typeof" in value) && !("__v_isVNode" in value)
 }
 
@@ -154,7 +171,9 @@ type ToasterInternals = {
 // The internal side of a toaster, for regions and hosts.
 function toasterInternals(toaster: object) {
   const found = internals.get(toaster)
-  if (!found) throw new Error("Expected a toaster from createToaster().")
+  if (!found) {
+    throw new Error("Expected a toaster from createToaster().")
+  }
   return found
 }
 
@@ -187,7 +206,10 @@ function createToaster<Content = string>({
 
   const notify = () => listeners.forEach((listener) => listener())
 
-  function resolve(input: Content | ToastOptions<Content>, extra?: ToastOptions<Content>) {
+  function resolve(
+    input: Content | ToastOptions<Content>,
+    extra?: ToastOptions<Content>
+  ) {
     const options = isOptions(input) ? input : { title: input }
     return { ...options, ...extra } as ToastOptions<Content>
   }
@@ -216,7 +238,9 @@ function createToaster<Content = string>({
   }
 
   function add(options: ToastOptions<Content>) {
-    const existing = options.id ? toasts.find((toast) => toast.id === options.id) : undefined
+    const existing = options.id
+      ? toasts.find((toast) => toast.id === options.id)
+      : undefined
     if (existing) {
       update(existing.id, options)
       return existing.id
@@ -238,7 +262,9 @@ function createToaster<Content = string>({
    */
   function update(id: string, options: Content | ToastOptions<Content>) {
     const index = toasts.findIndex((toast) => toast.id === id)
-    if (index === -1) return false
+    if (index === -1) {
+      return false
+    }
     const next = [...toasts]
     next[index] = complete({ ...resolve(options), id }, toasts[index])
     toasts = next
@@ -248,10 +274,17 @@ function createToaster<Content = string>({
 
   function close(id: string, reason: ToastDismissReason, event?: Event) {
     const toast = toasts.find((item) => item.id === id)
-    if (!toast) return false
-    const details = createDetails({ reason, event }, changeSource(reason, event))
+    if (!toast) {
+      return false
+    }
+    const details = createDetails(
+      { reason, event },
+      changeSource(reason, event)
+    )
     toast.onDismiss?.(details)
-    if (details.canceled) return false
+    if (details.canceled) {
+      return false
+    }
     toasts = toasts.filter((item) => item !== toast)
     notify()
     return true
@@ -262,12 +295,19 @@ function createToaster<Content = string>({
    * `toast("Deleted", { action: { label: "Undo", onAction: restore } })` or
    * `toast({ title, description })`.
    */
-  function toaster(message: Content | ToastOptions<Content>, options?: ToastOptions<Content>) {
+  function toaster(
+    message: Content | ToastOptions<Content>,
+    options?: ToastOptions<Content>
+  ) {
     return add(resolve(message, options))
   }
 
   const typed =
-    (type: ToastType) => (message: Content | ToastOptions<Content>, options?: ToastOptions<Content>) =>
+    (type: ToastType) =>
+    (
+      message: Content | ToastOptions<Content>,
+      options?: ToastOptions<Content>
+    ) =>
       add({ ...resolve(message, options), type })
 
   const api = {
@@ -296,27 +336,38 @@ function createToaster<Content = string>({
         /** Once it rejects. Without it, the toast closes. */
         error?: PromiseMessage<Content, unknown>
       },
-      options?: ToastOptions<Content>,
+      options?: ToastOptions<Content>
     ) {
       const id = add({ ...resolve(messages.loading, options), type: "loading" })
-      const settle = (type: ToastType, message: PromiseMessage<Content, any> | undefined, value: unknown) => {
-        if (message === undefined) return close(id, "imperative")
+      const settle = (
+        type: ToastType,
+        message: PromiseMessage<Content, any> | undefined,
+        value: unknown
+      ) => {
+        if (message === undefined) {
+          return close(id, "imperative")
+        }
         const result =
-          typeof message === "function" ? (message as (value: unknown) => Content)(value) : message
+          typeof message === "function"
+            ? (message as (value: unknown) => Content)(value)
+            : message
         update(id, { ...resolve(result), type })
       }
       const running = typeof promise === "function" ? promise() : promise
       running.then(
         (value) => settle("success", messages.success, value),
-        (error) => settle("error", messages.error, error),
+        (error) => settle("error", messages.error, error)
       )
       return id
     },
     update,
     /** Closes one toast by id, or every toast without one. */
     dismiss(id?: string) {
-      for (const toast of id === undefined ? toasts : toasts.filter((item) => item.id === id))
+      for (const toast of id === undefined
+        ? toasts
+        : toasts.filter((item) => item.id === id)) {
         close(toast.id, "imperative")
+      }
     },
     /** The toasts in the queue, newest first. The same array until something changes. */
     toasts: () => toasts,
@@ -333,12 +384,16 @@ function createToaster<Content = string>({
   internals.set(toaster, {
     close,
     attachRegion(placed) {
-      if (!placed) return () => {}
+      if (!placed) {
+        return () => {}
+      }
       placedRegions++
       notify()
       let attached = true
       return () => {
-        if (!attached) return
+        if (!attached) {
+          return
+        }
         attached = false
         placedRegions--
         notify()
@@ -361,8 +416,9 @@ type Toaster<Content = string> = ReturnType<typeof createToaster<Content>>
  * region you place, shows it.
  * @stable
  */
-const toast = ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.toast@1")] ??=
-  createToaster<unknown>()) as Toaster
+const toast = ((globalThis as Record<symbol, unknown>)[
+  Symbol.for("ui-sdk.toast@1")
+] ??= createToaster<unknown>()) as Toaster
 
 export {
   createToaster,

@@ -60,7 +60,11 @@ const sections = [
   <div dir="rtl">
     <NavigationMenu aria-label="الرئيسية">
       <NavigationMenuList>
-        <NavigationMenuItem v-for="section in sections" :key="section.value" :value="section.value">
+        <NavigationMenuItem
+          v-for="section in sections"
+          :key="section.value"
+          :value="section.value"
+        >
           <NavigationMenuTrigger>
             {{ section.label }}
             <ChevronDownIcon />

@@ -20,10 +20,12 @@ The button that opens the list: a combobox named by the label. Typing on it sele
     disabled,
     controller,
     ...rest
-  }: PartProps<"button", SelectTriggerState> &
-    SelectTriggerProps = $props()
+  }: PartProps<"button", SelectTriggerState> & SelectTriggerProps = $props()
 
-  const connected = useControllerTarget(() => controller, getContext<SelectContext | undefined>(selectPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<SelectContext | undefined>(selectPrimitive)
+  )
   const select = $derived(connected())
 </script>
 
@@ -33,7 +35,16 @@ The button that opens the list: a combobox named by the label. Typing on it sele
   <!-- Until the select it names mounts, a trigger outside the select is a plain button. -->
   <Part
     tag="button"
-    part={plainPart({ open: false, disabled: !!disabled, readOnly: false, required: false, placeholder: true }, { type: "button" })}
+    part={plainPart(
+      {
+        open: false,
+        disabled: !!disabled,
+        readOnly: false,
+        required: false,
+        placeholder: true,
+      },
+      { type: "button" }
+    )}
     props={rest}
   />
 {/if}

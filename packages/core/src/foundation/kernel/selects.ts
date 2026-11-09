@@ -20,7 +20,12 @@ type Selected<State, Key extends keyof State> =
 type Reads<State, Api, Props> = {
   [Key in keyof State]?:
     | readonly Selected<State, Key>[]
-    | ((part: { id: string; key: string; props: Props; api: Api }) => readonly Selected<State, Key>[])
+    | ((part: {
+        id: string
+        key: string
+        props: Props
+        api: Api
+      }) => readonly Selected<State, Key>[])
 }
 
 // A store's selectors, which hear one value of one key, by `key:value`.
@@ -38,16 +43,23 @@ const narrowedStores = new WeakMap<Store<any>, Narrowed>()
 // selects on it.
 function narrowedOf(store: Store<any>) {
   const found = narrowedStores.get(store)
-  if (found) return found
+  if (found) {
+    return found
+  }
   const narrowed: Narrowed = { selectors: new Map(), selecting: new Set() }
   narrowedStores.set(store, narrowed)
   store.setFanout((changed, previous, run) => {
     const state = store.get()
-    for (const key of changed)
-      if (narrowed.selecting.has(key))
-        eachMoved((previous as Record<PropertyKey, unknown>)[key], state[key], (value) =>
-          narrowed.selectors.get(`${String(key)}:${value}`)?.forEach(run),
+    for (const key of changed) {
+      if (narrowed.selecting.has(key)) {
+        eachMoved(
+          (previous as Record<PropertyKey, unknown>)[key],
+          state[key],
+          (value) =>
+            narrowed.selectors.get(`${String(key)}:${value}`)?.forEach(run)
         )
+      }
+    }
   })
   return narrowed
 }
@@ -66,17 +78,20 @@ function narrowedOf(store: Store<any>) {
  * Each primitive with `selects` has a test that proves it.
  * @stable
  */
-function selects<State extends object, Api, Props>(reads: NoInfer<Reads<State, Api, Props>>) {
+function selects<State extends object, Api, Props>(
+  reads: NoInfer<Reads<State, Api, Props>>
+) {
   type View = { id: string; key: string; props: Props; api: Api }
   type Values = readonly Selected<State, keyof State>[]
   type Entry = [keyof State, Values | ((part: View) => Values)]
   const narrowing = (Object.entries(reads) as Entry[]).filter(
-    ([, values]) => typeof values === "function" || values.length > 0,
+    ([, values]) => typeof values === "function" || values.length > 0
   )
   const selected = (part: Part<State, Api, Props>, props: Props) => {
     const partView = view(part, props)
     return narrowing.map(
-      ([key, values]) => [key, typeof values === "function" ? values(partView) : values] as const,
+      ([key, values]) =>
+        [key, typeof values === "function" ? values(partView) : values] as const
     )
   }
   return {
@@ -90,7 +105,7 @@ function selects<State extends object, Api, Props>(reads: NoInfer<Reads<State, A
         (Object.entries(reads) as Entry[]).map(([key, values]) => [
           key,
           typeof values === "function" ? values(partView) : values,
-        ]),
+        ])
       )
     },
     /** The values a part selects on, which it subscribes again for when they change. */
@@ -105,14 +120,19 @@ function selects<State extends object, Api, Props>(reads: NoInfer<Reads<State, A
      */
     subscribe(part: Part<State, Api, Props>, listener: Listener, props: Props) {
       const cleanups = [subscribeSkipping(part.store, reads, listener)]
-      for (const [key, values] of selected(part, props))
-        for (const value of values) cleanups.push(select(part.store, key, value, listener))
+      for (const [key, values] of selected(part, props)) {
+        for (const value of values) {
+          cleanups.push(select(part.store, key, value, listener))
+        }
+      }
       return () => cleanups.forEach((cleanup) => cleanup())
     },
   }
 }
 
-type Selects<State extends object, Api, Props> = ReturnType<typeof selects<State, Api, Props>>
+type Selects<State extends object, Api, Props> = ReturnType<
+  typeof selects<State, Api, Props>
+>
 
 /**
  * Runs `listener` when `key` takes `value` or leaves it, for an array, when
@@ -123,7 +143,7 @@ function select<State extends object, Key extends keyof State>(
   store: Store<State>,
   key: Key,
   value: Selected<State, Key>,
-  listener: Listener,
+  listener: Listener
 ) {
   const narrowed = narrowedOf(store)
   narrowed.selecting.add(key)
@@ -137,30 +157,55 @@ function select<State extends object, Key extends keyof State>(
 // place, like a tab panel mounting, so their common start and end are
 // skipped, and every value between is notified. One that only moved, or
 // that's there twice, costs a spare run.
-function eachMoved(before: unknown, after: unknown, notify: (value: unknown) => void) {
-  if (before == null) before = emptyLike(after, before)
-  else if (after == null) after = emptyLike(before, after)
+function eachMoved(
+  before: unknown,
+  after: unknown,
+  notify: (value: unknown) => void
+) {
+  if (before == null) {
+    before = emptyLike(after, before)
+  } else if (after == null) {
+    after = emptyLike(before, after)
+  }
   if (isRecord(before) && isRecord(after)) {
     // Own entries only, so one named like an inherited property, like
     // `constructor`, counts as added or removed. No merged copy of both, since
     // a record can hold an entry per item of a long list.
-    for (const name in before)
-      if (!Object.hasOwn(after, name) || !Object.is(before[name], after[name])) notify(name)
-    for (const name in after) if (!Object.hasOwn(before, name)) notify(name)
+    for (const name in before) {
+      if (
+        !Object.hasOwn(after, name) ||
+        !Object.is(before[name], after[name])
+      ) {
+        notify(name)
+      }
+    }
+    for (const name in after) {
+      if (!Object.hasOwn(before, name)) {
+        notify(name)
+      }
+    }
     return
   }
-  if (!Array.isArray(before) || !Array.isArray(after)) return [before, after].forEach(notify)
+  if (!Array.isArray(before) || !Array.isArray(after)) {
+    return [before, after].forEach(notify)
+  }
   let start = 0
   let end = 0
-  while (start < before.length && before[start] === after[start]) start++
+  while (start < before.length && before[start] === after[start]) {
+    start++
+  }
   while (
     end < before.length - start &&
     end < after.length - start &&
     before[before.length - 1 - end] === after[after.length - 1 - end]
-  )
+  ) {
     end++
-  for (const values of [before, after])
-    for (let index = start; index < values.length - end; index++) notify(values[index])
+  }
+  for (const values of [before, after]) {
+    for (let index = start; index < values.length - end; index++) {
+      notify(values[index])
+    }
+  }
 }
 
 // Objects made as literals, not arrays, dates or class instances.

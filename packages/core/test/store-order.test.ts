@@ -16,7 +16,9 @@ const panels = definePrimitive({
     let previous = store.get().value
     store.subscribe(() => {
       const { value } = store.get()
-      if (value === previous) return
+      if (value === previous) {
+        return
+      }
       const from = previous
       previous = value
       heard.push("api")
@@ -27,15 +29,21 @@ const panels = definePrimitive({
   slots: (slot) => ({
     panel: slot<{ value: string }>({
       props: { value: "string" },
-      selects: selects({ value: ({ key }) => [key], exiting: ({ key }) => [key] }),
+      selects: selects({
+        value: ({ key }) => [key],
+        exiting: ({ key }) => [key],
+      }),
     }),
   }),
 })
 
 test("an api listener writes before the narrowed parts hear a change", () => {
   const instance = panels({ id: "p" })
-  for (const value of ["a", "b"])
-    subscribe(instance.part("panel", { value }), () => instance.api.heard.push(`panel-${value}`))
+  for (const value of ["a", "b"]) {
+    subscribe(instance.part("panel", { value }), () =>
+      instance.api.heard.push(`panel-${value}`)
+    )
+  }
   instance.api.select("b")
   expect(instance.api.heard).toEqual(["api", "panel-a", "panel-a", "panel-b"])
 })
@@ -43,7 +51,9 @@ test("an api listener writes before the narrowed parts hear a change", () => {
 const list = definePrimitive({
   name: "list",
   state: () => ({ highlighted: null as string | null }),
-  api: ({ store }) => ({ highlight: (key: string) => store.set({ highlighted: key }) }),
+  api: ({ store }) => ({
+    highlight: (key: string) => store.set({ highlighted: key }),
+  }),
   slots: (slot) => ({
     item: slot<{ value: string }>({
       props: { value: "string" },
@@ -64,7 +74,9 @@ test("a component listener that subscribes after a narrowed part still hears fir
 const plain = definePrimitive({
   name: "plain",
   state: () => ({ count: 0 }),
-  api: ({ store }) => ({ increment: () => store.set({ count: store.get().count + 1 }) }),
+  api: ({ store }) => ({
+    increment: () => store.set({ count: store.get().count + 1 }),
+  }),
   slots: (slot) => ({ root: slot({}) }),
 })
 
@@ -82,11 +94,15 @@ test("a tab panel is exiting by the time any panel hears the switch", () => {
   instance.api.internal.registerPanel("a")
   instance.api.internal.registerPanel("b")
   const heard: string[] = []
-  for (const value of ["a", "b"])
+  for (const value of ["a", "b"]) {
     subscribe(instance.part("panel", { value }), () => {
-      const { value: selected, exiting } = instance.get() as { value: string; exiting: string[] }
+      const { value: selected, exiting } = instance.get() as {
+        value: string
+        exiting: string[]
+      }
       heard.push(`panel-${value} sees ${selected}, exiting [${exiting}]`)
     })
+  }
   instance.api.select("b")
   expect(heard).toEqual([
     "panel-a sees b, exiting [a]",

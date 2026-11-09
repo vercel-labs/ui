@@ -16,7 +16,10 @@ import { checkName } from "#name-check"
 import { css } from "../../foundation/kernel/inline-style"
 import { bindPageLocale } from "../../foundation/text/locale"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Whether the task's progress is unknown, under way, or done.
@@ -66,20 +69,30 @@ type State = GaugeSettings & {
 }
 
 const valueOf = (options: ProgressOptions) =>
-  options.value === null || options.value === undefined ? null : finite(options.value, 0)
+  options.value === null || options.value === undefined
+    ? null
+    : finite(options.value, 0)
 
 function percentOf(state: State) {
-  return state.value === null ? null : percentBetween(state.value, state.min, state.max)
+  return state.value === null
+    ? null
+    : percentBetween(state.value, state.min, state.max)
 }
 
 // check-code: allow return-type its literals would widen to string in the parts' state.
 function statusOf(state: State): ProgressStatus {
-  if (state.value === null) return "indeterminate"
+  if (state.value === null) {
+    return "indeterminate"
+  }
   return state.value >= state.max ? "complete" : "progressing"
 }
 
 function progressState(state: State) {
-  return { value: state.value, percent: percentOf(state), status: statusOf(state) }
+  return {
+    value: state.value,
+    percent: percentOf(state),
+    status: statusOf(state),
+  }
 }
 
 // Every part carries the status, so any of them can style it.
@@ -92,7 +105,10 @@ function statusAttrs(state: State) {
   }
 }
 
-const settings = (options: ProgressOptions) => ({ ...gaugeSettings(options), value: valueOf(options) })
+const settings = (options: ProgressOptions) => ({
+  ...gaugeSettings(options),
+  value: valueOf(options),
+})
 
 const progressPrimitive = /* @__PURE__ */ definePrimitive({
   name: "progress",
@@ -104,7 +120,11 @@ const progressPrimitive = /* @__PURE__ */ definePrimitive({
     getValueLabel: "value",
     value: "number",
   },
-  state: (options: ProgressOptions): State => ({ ...settings(options), labels: 0, pageLocale: null }),
+  state: (options: ProgressOptions): State => ({
+    ...settings(options),
+    labels: 0,
+    pageLocale: null,
+  }),
   sync: settings,
   // `value` is a reading, not state a user changes, so it has no `onValueChange`.
   controlled: [],
@@ -120,13 +140,18 @@ const progressPrimitive = /* @__PURE__ */ definePrimitive({
           "aria-labelledby": state.labels ? labelId(id) : undefined,
           ...statusAttrs(state),
           // For anything else that should follow the value, like a gradient stop.
-          style: percent === null ? undefined : css({ "--progress-value": `${roundPercent(percent)}%` }),
+          style:
+            percent === null
+              ? undefined
+              : css({ "--progress-value": `${roundPercent(percent)}%` }),
         }
       },
       bind: (el, { store, id }) => {
         bindPageLocale(el, (pageLocale) => store.set({ pageLocale }))
         // A progress bar's content never names it, so only a label or `aria-label` does.
-        if (dev) checkName(el, "Progress", { component: "progress", id })
+        if (dev) {
+          checkName(el, "Progress", { component: "progress", id })
+        }
       },
     }),
     track: slot<{}, ProgressState>({
@@ -136,7 +161,10 @@ const progressPrimitive = /* @__PURE__ */ definePrimitive({
     // Placed with inline styles, from the track's start, as wide as the value.
     indicator: slot<{}, ProgressState>({
       state: progressState,
-      attrs: (state) => ({ ...statusAttrs(state), style: indicatorStyle(percentOf(state)) }),
+      attrs: (state) => ({
+        ...statusAttrs(state),
+        style: indicatorStyle(percentOf(state)),
+      }),
     }),
     label: slot<{}, ProgressState>({
       state: progressState,
@@ -146,7 +174,10 @@ const progressPrimitive = /* @__PURE__ */ definePrimitive({
     // The formatted value. Its text isn't announced on its own: a progressbar's
     // content is presentational, and the bar reads the value through `aria-valuetext`.
     value: slot<{}, ProgressValueState>({
-      state: (state) => ({ ...progressState(state), text: formatGaugeValue(state.value, state) }),
+      state: (state) => ({
+        ...progressState(state),
+        text: formatGaugeValue(state.value, state),
+      }),
       attrs: statusAttrs,
     }),
   }),
@@ -175,4 +206,7 @@ export {
   type ProgressStatus,
   type ProgressValueState,
 }
-export type { GaugeLabelDetails, NumberFormat } from "../../foundation/gauge/gauge"
+export type {
+  GaugeLabelDetails,
+  NumberFormat,
+} from "../../foundation/gauge/gauge"

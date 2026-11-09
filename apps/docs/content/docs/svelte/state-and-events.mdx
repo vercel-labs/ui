@@ -56,7 +56,9 @@ A function binding lets the parent decide whether to save the next value:
   }
 </script>
 
-<label><input type="checkbox" bind:checked={allowChanges} /> Allow changes</label>
+<label
+  ><input type="checkbox" bind:checked={allowChanges} /> Allow changes</label
+>
 <Toggle bind:pressed={() => pressed, setPressed}>Bold</Toggle>
 ```
 
@@ -79,9 +81,18 @@ For example, keep a popover open when someone clicks outside it:
 
 ```svelte
 <script lang="ts">
-  import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/svelte/popover"
+  import {
+    Popover,
+    PopoverClose,
+    PopoverContent,
+    PopoverTitle,
+    PopoverTrigger,
+  } from "@ui-sdk/svelte/popover"
 
-  function keepOpen(open: boolean, details: { reason: string; cancel: () => void }) {
+  function keepOpen(
+    open: boolean,
+    details: { reason: string; cancel: () => void }
+  ) {
     if (!open && details.reason === "outside-press") {
       details.cancel()
     }

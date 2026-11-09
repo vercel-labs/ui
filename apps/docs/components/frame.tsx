@@ -12,7 +12,7 @@ function Frame({
       className={cn(
         "rounded-frame bg-background ring-1 ring-foreground/15 dark:bg-foreground/[0.03] dark:ring-foreground/10",
         variant === "raised" && "",
-        className,
+        className
       )}
       {...props}
     />

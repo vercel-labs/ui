@@ -10,7 +10,9 @@ const metadata: Metadata = {
 function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="flex h-dvh flex-col overflow-hidden font-sans text-sm">{children}</body>
+      <body className="flex h-dvh flex-col overflow-hidden font-sans text-sm">
+        {children}
+      </body>
     </html>
   )
 }

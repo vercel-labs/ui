@@ -25,7 +25,7 @@ function mount(root: HTMLElement) {
                 (message) => `<li>
                   <div>${message.from}</div>
                   <div data-slot="hint">${message.text}</div>
-                </li>`,
+                </li>`
               )
               .join("")}
           </ul>
@@ -56,7 +56,10 @@ function mount(root: HTMLElement) {
       </ui-drawer-content>
     </ui-drawer>
   `
-  root.querySelector("ui-drawer-outlet")!.keyframes = { scale: [1, 0.94], borderRadius: ["0px", "24px"] }
+  root.querySelector("ui-drawer-outlet")!.keyframes = {
+    scale: [1, 0.94],
+    borderRadius: ["0px", "24px"],
+  }
 }
 
 export { mount }

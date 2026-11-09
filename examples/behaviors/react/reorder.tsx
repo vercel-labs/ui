@@ -10,11 +10,18 @@ import {
 } from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
-type RankingState = { value: string[]; focused: string | null; moving: ReorderDraft | null }
+type RankingState = {
+  value: string[]
+  focused: string | null
+  moving: ReorderDraft | null
+}
 
 type RankingOptions = {
   defaultValue: string[]
-  onValueChange?: (value: string[], details: ChangeDetails<ReorderReason>) => void
+  onValueChange?: (
+    value: string[],
+    details: ChangeDetails<ReorderReason>
+  ) => void
 }
 
 const ranking = definePrimitive({
@@ -28,7 +35,10 @@ const ranking = definePrimitive({
   api: (context) => {
     const change = createChange(context)
     return {
-      roving: createRovingFocus<RankingState, { value: string }>(context, { slot: "item", key: "focused" }),
+      roving: createRovingFocus<RankingState, { value: string }>(context, {
+        slot: "item",
+        key: "focused",
+      }),
       reorder: createReorder<RankingState>(context, {
         slot: "item",
         key: "value",
@@ -40,7 +50,10 @@ const ranking = definePrimitive({
   slots: (slot) => ({
     root: slot<{}, { order: string[] }>({
       state: (state, { api }) => ({ order: api.reorder.order(state) }),
-      attrs: () => ({ role: "listbox", "aria-roledescription": "sortable list" }),
+      attrs: () => ({
+        role: "listbox",
+        "aria-roledescription": "sortable list",
+      }),
     }),
     item: slot<{ value: string }>({
       props: { value: "string" },
@@ -55,10 +68,14 @@ const ranking = definePrimitive({
       on: {
         keydown: (event, { el, api, key }) =>
           api.reorder.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.reorder.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.reorder.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.reorder.bind(el, part)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.reorder.bind(el, part),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),
@@ -73,7 +90,10 @@ const RankingItem = parts.Item
 
 function Example() {
   return (
-    <Ranking aria-label="Favorite seasons" defaultValue={["Spring", "Summer", "Autumn", "Winter"]}>
+    <Ranking
+      aria-label="Favorite seasons"
+      defaultValue={["Spring", "Summer", "Autumn", "Winter"]}
+    >
       {({ order }) =>
         order.map((season, index) => (
           <RankingItem key={season} value={season}>

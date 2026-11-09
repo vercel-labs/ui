@@ -15,8 +15,12 @@ export function mount(root: HTMLElement) {
     new: () => (output.textContent = "Note created"),
     save: () => (output.textContent = "Saved"),
   }
-  root.querySelector('[data-action="new"]')!.addEventListener("click", actions.new)
-  root.querySelector('[data-action="save"]')!.addEventListener("click", actions.save)
+  root
+    .querySelector('[data-action="new"]')!
+    .addEventListener("click", actions.new)
+  root
+    .querySelector('[data-action="save"]')!
+    .addEventListener("click", actions.save)
 
   const offs = [
     registerShortcut("n", actions.new, { description: "New note" }),

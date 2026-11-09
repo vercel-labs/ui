@@ -44,7 +44,11 @@ import {
   SelectTrigger,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { updateIssues } from "@/lib/tracker"
 
 function IssueDetail(props: { issue: Issue; query: Query }) {
@@ -55,12 +59,23 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
   return (
     <article aria-labelledby="issue-title" class="flex min-h-0 flex-1 flex-col">
       <div class="flex h-11 shrink-0 items-center gap-2 border-b border-border ps-4 pe-2">
-        <span class="text-sm text-muted-foreground tabular-nums">{props.issue.id}</span>
+        <span class="text-sm text-muted-foreground tabular-nums">
+          {props.issue.id}
+        </span>
         <Tooltip>
           <TooltipTrigger
-            render={(attributes) => <a {...attributes} href={href(props.query, { issue: null })} noscroll />}
+            render={(attributes) => (
+              <a
+                {...attributes}
+                href={href(props.query, { issue: null })}
+                noscroll
+              />
+            )}
             aria-label="Close issue"
-            class={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "ms-auto")}
+            class={cn(
+              buttonVariants({ variant: "ghost", size: "icon-sm" }),
+              "ms-auto"
+            )}
           >
             <X aria-hidden="true" />
           </TooltipTrigger>
@@ -80,7 +95,9 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
               class="h-auto bg-transparent px-1.5 py-1 text-lg font-semibold md:text-lg"
               onBlur={(event) => {
                 const title = event.currentTarget.value.trim()
-                if (title && title !== props.issue.title) save({ title })
+                if (title && title !== props.issue.title) {
+                  save({ title })
+                }
               }}
             />
           </Field>
@@ -92,7 +109,9 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
               class="bg-transparent px-1.5"
               onBlur={(event) => {
                 const description = event.currentTarget.value
-                if (description !== props.issue.description) save({ description })
+                if (description !== props.issue.description) {
+                  save({ description })
+                }
               }}
             />
           </Field>
@@ -100,7 +119,9 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
             <Select
               items={statuses}
               value={props.issue.status}
-              onValueChange={(status) => status && save({ status: status as Issue["status"] })}
+              onValueChange={(status) =>
+                status && save({ status: status as Issue["status"] })
+              }
             >
               <div class="grid gap-2">
                 <SelectLabel>Status</SelectLabel>
@@ -121,7 +142,9 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
             </Select>
             <Combobox
               value={props.issue.assignee}
-              onValueChange={(assignee) => save({ assignee: assignee as string | null })}
+              onValueChange={(assignee) =>
+                save({ assignee: assignee as string | null })
+              }
               itemToLabel={(id: string) => personOf(id)?.name ?? ""}
             >
               <div class="grid gap-2">
@@ -168,14 +191,22 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
                     {(state) => (
                       <For each={state.value as string[]}>
                         {(id, index) => (
-                          <ComboboxChip value={id} label={state.labels[index()]}>
-                            <span class="size-2 rounded-full" style={{ background: labelOf(id)?.color }} />
+                          <ComboboxChip
+                            value={id}
+                            label={state.labels[index()]}
+                          >
+                            <span
+                              class="size-2 rounded-full"
+                              style={{ background: labelOf(id)?.color }}
+                            />
                           </ComboboxChip>
                         )}
                       </For>
                     )}
                   </ComboboxValue>
-                  <ComboboxInput placeholder={props.issue.labels.length ? "" : "Add a label"} />
+                  <ComboboxInput
+                    placeholder={props.issue.labels.length ? "" : "Add a label"}
+                  />
                   <ComboboxTrigger aria-label="Show labels" />
                 </ComboboxChips>
               </div>
@@ -185,7 +216,10 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
                   <For each={labels}>
                     {(label) => (
                       <ComboboxItem value={label.id} label={label.name}>
-                        <span class="size-2 rounded-full" style={{ background: label.color }} />
+                        <span
+                          class="size-2 rounded-full"
+                          style={{ background: label.color }}
+                        />
                         {label.name}
                       </ComboboxItem>
                     )}
@@ -197,7 +231,9 @@ function IssueDetail(props: { issue: Issue; query: Query }) {
           <RadioGroup
             aria-labelledby="priority-label"
             value={props.issue.priority}
-            onValueChange={(priority) => save({ priority: priority as Issue["priority"] })}
+            onValueChange={(priority) =>
+              save({ priority: priority as Issue["priority"] })
+            }
             class="grid gap-2"
           >
             <span id="priority-label" class="text-sm leading-none font-medium">

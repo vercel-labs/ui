@@ -42,7 +42,10 @@ function Example() {
         </svg>
       </ToolbarButton>
       <Select value={zoom()} onValueChange={(value) => value && change(value)}>
-        <ToolbarButton render={(props) => <SelectTrigger {...props} />} aria-label="Zoom">
+        <ToolbarButton
+          render={(props) => <SelectTrigger {...props} />}
+          aria-label="Zoom"
+        >
           <SelectValue />
           <svg
             viewBox="0 0 24 24"

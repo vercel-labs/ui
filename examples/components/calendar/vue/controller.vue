@@ -25,10 +25,16 @@ function select(date: string) {
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <button type="button" @click="select('2026-12-25')">Go to Christmas</button>
+      <button type="button" @click="select('2026-12-25')">
+        Go to Christmas
+      </button>
       <button type="button" @click="select(todayDate())">Today</button>
     </div>
-    <Calendar :controller="calendar" default-value="2026-10-16" default-month="2026-10">
+    <Calendar
+      :controller="calendar"
+      default-value="2026-10-16"
+      default-month="2026-10"
+    >
       <div data-slot="row">
         <CalendarPrevious data-variant="ghost">
           <ChevronLeftIcon aria-hidden="true" />

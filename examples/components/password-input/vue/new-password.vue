@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import { CheckIcon, EyeIcon, EyeOffIcon, XIcon } from "@lucide/vue"
 import { Field, FieldLabel } from "@ui-sdk/vue/field"
-import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "@ui-sdk/vue/password-input"
+import {
+  PasswordInput,
+  PasswordInputControl,
+  PasswordInputToggle,
+} from "@ui-sdk/vue/password-input"
 import { ref } from "vue"
 
 const rules = [
-  { label: "At least 8 characters", test: (password: string) => password.length >= 8 },
+  {
+    label: "At least 8 characters",
+    test: (password: string) => password.length >= 8,
+  },
   { label: "A number", test: (password: string) => /\d/.test(password) },
   {
     label: "An uppercase and a lowercase letter",
-    test: (password: string) => /[a-z]/.test(password) && /[A-Z]/.test(password),
+    test: (password: string) =>
+      /[a-z]/.test(password) && /[A-Z]/.test(password),
   },
 ]
 

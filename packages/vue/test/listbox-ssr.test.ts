@@ -9,17 +9,27 @@ const items = ["basil", "cheese", "onion"]
 const render = (props: { defaultValue?: string[]; disabled?: boolean } = {}) =>
   renderToString(
     createSSRApp(() =>
-      h(Listbox, { multiple: true, name: "toppings", "aria-label": "Toppings", ...props }, () =>
-        items.map((item) => h(ListboxItem, { key: item, value: item }, () => item)),
-      ),
-    ),
+      h(
+        Listbox,
+        {
+          multiple: true,
+          name: "toppings",
+          "aria-label": "Toppings",
+          ...props,
+        },
+        () =>
+          items.map((item) =>
+            h(ListboxItem, { key: item, value: item }, () => item)
+          )
+      )
+    )
   )
 
 const stops = (html: string) => html.match(/tabindex="0"/g)?.length ?? 0
 const stopOn = (html: string, value: string) =>
-  new RegExp(`id="[^"]*-option-${value}"[^>]*tabindex="0"|tabindex="0"[^>]*id="[^"]*-option-${value}"`).test(
-    html,
-  )
+  new RegExp(
+    `id="[^"]*-option-${value}"[^>]*tabindex="0"|tabindex="0"[^>]*id="[^"]*-option-${value}"`
+  ).test(html)
 
 describe("listbox on the server", () => {
   test("renders one tab stop, on the first selected option", async () => {

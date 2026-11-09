@@ -13,7 +13,11 @@ An edge or corner of the selection, by its `position`, that resizes it in a box.
   import Part from "../part.svelte"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let { position, ...rest }: PartProps<"div", ImageCropperHandleState> & ImageCropperHandleProps = $props()
+  let {
+    position,
+    ...rest
+  }: PartProps<"div", ImageCropperHandleState> & ImageCropperHandleProps =
+    $props()
 
   const id = $props.id()
   const handle = usePart(imageCropper, "handle", () => ({ id, position }))

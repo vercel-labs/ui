@@ -15,7 +15,10 @@ This page renders the rating from [Compose Behaviors](../core/compose-behaviors)
 import { createParts } from "@ui-sdk/react/primitive"
 import { rating } from "./rating"
 
-const { Root: RatingRoot, Star: RatingStar } = createParts(rating, { root: "div", star: "button" })
+const { Root: RatingRoot, Star: RatingStar } = createParts(rating, {
+  root: "div",
+  star: "button",
+})
 
 export { RatingRoot, RatingStar }
 ```
@@ -74,14 +77,18 @@ function Rating({
   max = 5,
   starLabel = (star) => `${star} ${star === 1 ? "star" : "stars"}`,
   ...props
-}: RatingOptions & { max?: number; starLabel?: (star: number) => string } & Omit<
-    PartProps<"div">,
-    "defaultValue"
-  >) {
+}: RatingOptions & {
+  max?: number
+  starLabel?: (star: number) => string
+} & Omit<PartProps<"div">, "defaultValue">) {
   return (
     <parts.Root {...props}>
       {Array.from({ length: max }, (_, index) => index + 1).map((star) => (
-        <parts.Star key={star} value={String(star)} aria-label={starLabel(star)}>
+        <parts.Star
+          key={star}
+          value={String(star)}
+          aria-label={starLabel(star)}
+        >
           ★
         </parts.Star>
       ))}

@@ -1,20 +1,42 @@
-import { type Direction, orientationOf, scrollToShow } from "../../foundation/focus/collection"
+import {
+  type Direction,
+  orientationOf,
+  scrollToShow,
+} from "../../foundation/focus/collection"
 import { directionBetween } from "./tabs-direction"
 import type { TabsGeneric } from "./tabs-generic"
-import { bindFindable, hiddenAttrs } from "../../foundation/disclosure/disclosure"
-import { buttonElement, opensElsewhere, type ButtonElement } from "../../foundation/platform/button"
+import {
+  bindFindable,
+  hiddenAttrs,
+} from "../../foundation/disclosure/disclosure"
+import {
+  buttonElement,
+  opensElsewhere,
+  type ButtonElement,
+} from "../../foundation/platform/button"
 import { layoutBox } from "../../foundation/platform/layout"
 import { bindIndicator } from "../../foundation/selection/indicator"
-import { itemIconPart, type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
+import {
+  itemIconPart,
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
 import { animateIn, animateOut } from "../../foundation/motion/presence"
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { bindTabStop } from "../../foundation/focus/tabbable"
 import { idPart } from "../../foundation/kernel/attrs"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { PrimitiveContext, PrimitiveOptions, WithGeneric } from "../../foundation/kernel/primitive-types"
+import type {
+  PrimitiveContext,
+  PrimitiveOptions,
+  WithGeneric,
+} from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
 import { live } from "../../foundation/kernel/live"
 import { createChange } from "../../foundation/kernel/input-source"
@@ -26,7 +48,12 @@ import { onProps, subscribe } from "../../foundation/kernel/part"
  * controller or `api` call changed it.
  * @stable
  */
-type TabsValueChangeReason = "item-press" | "list-navigation" | "find-in-page" | "item-removed" | "imperative"
+type TabsValueChangeReason =
+  | "item-press"
+  | "list-navigation"
+  | "find-in-page"
+  | "item-removed"
+  | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -57,7 +84,9 @@ function createTabsController<T extends string = string>() {
  * option.
  * @stable
  */
-type TabsController<T extends string = string> = ReturnType<typeof createTabsController<T>>
+type TabsController<T extends string = string> = ReturnType<
+  typeof createTabsController<T>
+>
 
 /**
  * Which way the tabs run, which picks the arrow keys that move between them.
@@ -80,7 +109,10 @@ type TabsOptions<T extends string = string> = {
   /** The tab selected at first, when uncontrolled. Defaults to the first enabled tab, which never calls `onValueChange`. */
   defaultValue?: T | null
   /** Runs when the selection wants to change. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T | null, details: ChangeDetails<TabsValueChangeReason>) => void
+  onValueChange?: (
+    value: T | null,
+    details: ChangeDetails<TabsValueChangeReason>
+  ) => void
   /**
    * Which arrow keys move between tabs: left and right, or up and down.
    * @defaultValue "horizontal"
@@ -219,12 +251,26 @@ type TabsStore = {
   elements: Record<string, ButtonElement>
 }
 
-const indicatorVariables = ["left", "right", "top", "bottom", "width", "height"] as const
+const indicatorVariables = [
+  "left",
+  "right",
+  "top",
+  "bottom",
+  "width",
+  "height",
+] as const
 
-function writeIndicator(el: HTMLElement, rect: ReturnType<typeof layoutBox> | undefined) {
-  for (const name of indicatorVariables)
-    if (rect) el.style.setProperty(`--active-tab-${name}`, `${rect[name]}px`)
-    else el.style.removeProperty(`--active-tab-${name}`)
+function writeIndicator(
+  el: HTMLElement,
+  rect: ReturnType<typeof layoutBox> | undefined
+) {
+  for (const name of indicatorVariables) {
+    if (rect) {
+      el.style.setProperty(`--active-tab-${name}`, `${rect[name]}px`)
+    } else {
+      el.style.removeProperty(`--active-tab-${name}`)
+    }
+  }
 }
 
 /**
@@ -259,7 +305,8 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
     remember: false,
     disabled: (tab) => !enabled(tab),
     preferred: (tab) => store.get().value === tab.key,
-    claims: (state, tab) => (state.value === null ? enabled(tab) : state.value === tab.key),
+    claims: (state, tab) =>
+      state.value === null ? enabled(tab) : state.value === tab.key,
     onItemsChange: check,
   })
   // The arrow key moving to a link tab while it clicks the link.
@@ -280,18 +327,25 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
         const first = list.find(enabled)
         // The first pick is the default, so it calls nothing. A selected tab
         // that leaves the page later is a change.
-        if (first && initial) store.set({ value: first.key })
-        else if (first) change("value", first.key, { reason: "item-removed" })
+        if (first && initial) {
+          store.set({ value: first.key })
+        } else if (first) {
+          change("value", first.key, { reason: "item-removed" })
+        }
       }
     }
-    for (const listener of tabsChanged) listener()
+    for (const listener of tabsChanged) {
+      listener()
+    }
   }
 
   // Until tabs bind, like on the server, uncontrolled tabs with nothing
   // selected show the tab that claims the stop as selected, which is the one
   // `check` selects, so the first render already shows its panel.
   function shows(state: TabsStore, key: string) {
-    if (checked || state.value !== null || controlled()) return state.value === key
+    if (checked || state.value !== null || controlled()) {
+      return state.value === key
+    }
     const tab = props<TabProps>("tab", key)
     return !!tab && roving.tabIndex(state, { key, props: tab }) === "0"
   }
@@ -301,11 +355,28 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
   function reveal(value: string | null) {
     const list = element("list")
     const tab = value === null ? undefined : element("tab", value)
-    if (!list || !tab || tab.contains(document.activeElement)) return
-    if (list.scrollWidth <= list.clientWidth && list.scrollHeight <= list.clientHeight) return
+    if (!list || !tab || tab.contains(document.activeElement)) {
+      return
+    }
+    if (
+      list.scrollWidth <= list.clientWidth &&
+      list.scrollHeight <= list.clientHeight
+    ) {
+      return
+    }
     const rect = layoutBox(tab, list)
-    list.scrollLeft = scrollToShow(list.scrollLeft, list.clientWidth, rect.left, rect.width)
-    list.scrollTop = scrollToShow(list.scrollTop, list.clientHeight, rect.top, rect.height)
+    list.scrollLeft = scrollToShow(
+      list.scrollLeft,
+      list.clientWidth,
+      rect.left,
+      rect.width
+    )
+    list.scrollTop = scrollToShow(
+      list.scrollTop,
+      list.clientHeight,
+      rect.top,
+      rect.height
+    )
   }
 
   // What selecting `value` brings with it from `state`: the direction the
@@ -315,29 +386,43 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
     const rect = (key: string | null) =>
       key === null ? undefined : element("tab", key)?.getBoundingClientRect()
     return {
-      direction: directionBetween(rect(from), rect(value), state.orientation) as TabsDirection,
+      direction: directionBetween(
+        rect(from),
+        rect(value),
+        state.orientation
+      ) as TabsDirection,
       exiting: [
         ...state.exiting.filter((key) => key !== value),
-        ...(from !== null && panels.has(from) && !state.exiting.includes(from) ? [from] : []),
+        ...(from !== null && panels.has(from) && !state.exiting.includes(from)
+          ? [from]
+          : []),
       ],
     }
   }
 
   // A value from options brings it in the same pass, with the tab stop on
   // the tab it selects.
-  deriveFromOptions(context, ["direction", "exiting", "stop"], (synced, state) => {
-    if (!("value" in synced) || synced.value === state.value) return
-    const value = synced.value ?? null
-    const stop = roving.stopFor((tab) => tab.key === value)
-    return { ...selecting(state, value), ...(stop !== undefined && { stop }) }
-  })
+  deriveFromOptions(
+    context,
+    ["direction", "exiting", "stop"],
+    (synced, state) => {
+      if (!("value" in synced) || synced.value === state.value) {
+        return
+      }
+      const value = synced.value ?? null
+      const stop = roving.stopFor((tab) => tab.key === value)
+      return { ...selecting(state, value), ...(stop !== undefined && { stop }) }
+    }
+  )
 
   // Reacts to selection changes from any source: a press, a key, a controller
   // or a controlled value. Runs before anything renders the change.
   let previous = store.get().value
   store.subscribe(() => {
     const state = store.get()
-    if (state.value === previous) return
+    if (state.value === previous) {
+      return
+    }
     const from = previous
     previous = state.value
     changed = true
@@ -348,8 +433,16 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
 
   // Selects a tab. Disabled tabs never select. Reads the props the tab last
   // rendered with, which it has before its element binds.
-  function select(value: string | null, { reason = "imperative", event }: TabsChangeOptions = {}) {
-    if (value !== null && (props("tab", value) as TabProps | undefined)?.disabled) return false
+  function select(
+    value: string | null,
+    { reason = "imperative", event }: TabsChangeOptions = {}
+  ) {
+    if (
+      value !== null &&
+      (props("tab", value) as TabProps | undefined)?.disabled
+    ) {
+      return false
+    }
     return change("value", value, { reason, event })
   }
 
@@ -378,16 +471,23 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
         return () => {
           panels.delete(key)
           const { exiting } = store.get()
-          store.set({ panels: [...panels], exiting: exiting.filter((value) => value !== key) })
+          store.set({
+            panels: [...panels],
+            exiting: exiting.filter((value) => value !== key),
+          })
         }
       },
       setElement(key: string, el: HTMLElement) {
         const element = buttonElement(el)
         const { elements } = store.get()
-        if ((elements[key] ?? "button") !== element) store.set({ elements: { ...elements, [key]: element } })
+        if ((elements[key] ?? "button") !== element) {
+          store.set({ elements: { ...elements, [key]: element } })
+        }
       },
       finishExit(key: string) {
-        store.set({ exiting: store.get().exiting.filter((value) => value !== key) })
+        store.set({
+          exiting: store.get().exiting.filter((value) => value !== key),
+        })
       },
       // How a press selects: as a press, or as the arrow key that clicked a link tab.
       pressDetails: (event?: Event) =>
@@ -396,26 +496,47 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
           : { reason: "item-press" as const, event },
       onKeyDown(event: KeyboardEvent) {
         // A handler of the user's that prevented the key keeps it.
-        if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
+        if (
+          event.defaultPrevented ||
+          event.altKey ||
+          event.ctrlKey ||
+          event.metaKey ||
+          event.shiftKey
+        ) {
+          return
+        }
         const current = tabs().find((tab) => tab.el === event.target)
-        if (!current) return
+        if (!current) {
+          return
+        }
         const el = current.el
 
         // Native buttons and links activate themselves. Anything else, and
         // Space on a link, needs a click.
         if (event.key === "Enter" || event.key === " ") {
-          const native = el.tagName === "BUTTON" || (event.key === "Enter" && el.matches("a[href]"))
-          if (native) return
+          const native =
+            el.tagName === "BUTTON" ||
+            (event.key === "Enter" && el.matches("a[href]"))
+          if (native) {
+            return
+          }
           event.preventDefault()
-          if (el.matches("a[href]")) el.click()
-          else if (enabled(current)) select(current.key, { reason: "item-press", event })
+          if (el.matches("a[href]")) {
+            el.click()
+          } else if (enabled(current)) {
+            select(current.key, { reason: "item-press", event })
+          }
           return
         }
 
         const moved = roving.keydown(event, el)
         const next =
-          moved && moved.key !== moved.from ? tabs().find((tab) => tab.key === moved.key) : undefined
-        if (!next || options().activation === "manual" || !enabled(next)) return
+          moved && moved.key !== moved.from
+            ? tabs().find((tab) => tab.key === moved.key)
+            : undefined
+        if (!next || options().activation === "manual" || !enabled(next)) {
+          return
+        }
         // Links follow themselves, so routers and history see the navigation.
         // Their press still reports the key's navigation.
         if (next.el.matches("a[href]")) {
@@ -425,7 +546,9 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
           } finally {
             navigation = undefined
           }
-        } else select(next.key, { reason: "list-navigation", event })
+        } else {
+          select(next.key, { reason: "list-navigation", event })
+        }
       },
     },
   }
@@ -433,7 +556,8 @@ function tabsApi(context: PrimitiveContext<TabsOptions, TabsStore, string>) {
   return api
 }
 
-const findable = (state: TabsStore, props: PanelProps) => props.hiddenUntilFound ?? state.hiddenUntilFound
+const findable = (state: TabsStore, props: PanelProps) =>
+  props.hiddenUntilFound ?? state.hiddenUntilFound
 
 const tabsPrimitive = /* @__PURE__ */ definePrimitive({
   name: "tabs",
@@ -480,7 +604,9 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
     list: slot<{}, TabsListState>({
       role: "tablist",
       keys: (state) => [
-        ...(state.orientation === "vertical" ? ["ArrowUp", "ArrowDown"] : ["ArrowLeft", "ArrowRight"]),
+        ...(state.orientation === "vertical"
+          ? ["ArrowUp", "ArrowDown"]
+          : ["ArrowLeft", "ArrowRight"]),
         "Home",
         "End",
         "Enter",
@@ -488,7 +614,8 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       ],
       state: (state, { api }) => ({ orientation: api.internal.orientation() }),
       attrs: (state, { api }) => ({
-        "aria-orientation": api.internal.orientation() === "vertical" ? "vertical" : undefined,
+        "aria-orientation":
+          api.internal.orientation() === "vertical" ? "vertical" : undefined,
         "data-orientation": api.internal.orientation(),
         "data-activation-direction": state.direction,
       }),
@@ -521,7 +648,10 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         return {
           id: `${id}-tab-${idPart(key)}`,
           // On a link, `type` names the linked file's kind, so only a button gets one.
-          type: (state.elements[key] ?? "button") === "button" ? "button" : undefined,
+          type:
+            (state.elements[key] ?? "button") === "button"
+              ? "button"
+              : undefined,
           tabindex: api.internal.roving.tabIndex(state, { key, props }),
           "aria-selected": String(selected),
           "aria-disabled": props.disabled ? "true" : undefined,
@@ -533,7 +663,9 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
       },
       // Only panels in the page can be pointed at.
       live: live((state, { id, key }) => ({
-        "aria-controls": state.panels.includes(key) ? `${id}-panel-${idPart(key)}` : undefined,
+        "aria-controls": state.panels.includes(key)
+          ? `${id}-panel-${idPart(key)}`
+          : undefined,
       })),
       press({ api, el, key, props }, event) {
         if (props.disabled) {
@@ -541,9 +673,13 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
           event?.preventDefault()
           return
         }
-        if (opensElsewhere(event, el)) return
+        if (opensElsewhere(event, el)) {
+          return
+        }
         // Safari doesn't focus buttons on click, so arrow keys would go nowhere.
-        if (el && document.activeElement !== el) el.focus({ preventScroll: true })
+        if (el && document.activeElement !== el) {
+          el.focus({ preventScroll: true })
+        }
         api.select(key, api.internal.pressDetails(event))
       },
       bind(el, part) {
@@ -553,12 +689,19 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
     }),
 
     "tab-icon": slot(
-      itemIconPart<TabsStore, TabsApi>({ component: "tabs", item: '[role="tab"]', list: '[role="tablist"]' }),
+      itemIconPart<TabsStore, TabsApi>({
+        component: "tabs",
+        item: '[role="tab"]',
+        list: '[role="tablist"]',
+      })
     ),
 
     indicator: slot<{}, TabsIndicatorState>({
       role: "presentation",
-      state: (state, { api }) => ({ orientation: api.internal.orientation(), direction: state.direction }),
+      state: (state, { api }) => ({
+        orientation: api.internal.orientation(),
+        direction: state.direction,
+      }),
       attrs: (state, { api }) => ({
         "data-orientation": api.internal.orientation(),
         "data-activation-direction": state.direction,
@@ -574,7 +717,9 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
           itemSelector: '[role="tab"]',
           subscribe(remeasure) {
             const unsubscribe = store.subscribe(() => {
-              if (store.get().value === value) return
+              if (store.get().value === value) {
+                return
+              }
               value = store.get().value
               remeasure()
             })
@@ -591,7 +736,11 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
 
     panel: slot<PanelProps, TabsPanelState>({
       role: "tabpanel",
-      props: { value: "string", keepMounted: "boolean", hiddenUntilFound: "boolean" },
+      props: {
+        value: "string",
+        keepMounted: "boolean",
+        hiddenUntilFound: "boolean",
+      },
       // Panels never read the tab stop, which moves with every arrow key, or
       // which panels are in the page, and only ask whether they're exiting.
       // The one showing through the claim hears a change to or from null.
@@ -607,11 +756,16 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         findable(state, props) ||
         api.internal.shows(state, key) ||
         state.exiting.includes(key),
-      state: (state, { key, api }) => ({ selected: api.internal.shows(state, key) }),
+      state: (state, { key, api }) => ({
+        selected: api.internal.shows(state, key),
+      }),
       attrs: (state, { id, key, props, api }) => ({
         id: `${id}-panel-${idPart(key)}`,
         "aria-labelledby": `${id}-tab-${idPart(key)}`,
-        ...hiddenAttrs(api.internal.shows(state, key) || state.exiting.includes(key), findable(state, props)),
+        ...hiddenAttrs(
+          api.internal.shows(state, key) || state.exiting.includes(key),
+          findable(state, props)
+        ),
         "data-selected": api.internal.shows(state, key) ? "" : undefined,
         "data-orientation": api.internal.orientation(),
         "data-activation-direction": state.direction,
@@ -622,11 +776,17 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
 
         // Find in page matched text in a hidden panel. Its tab selects.
         const found = bindFindable(el, {
-          shown: () => api.internal.shows(store.get(), key) || store.get().exiting.includes(key),
+          shown: () =>
+            api.internal.shows(store.get(), key) ||
+            store.get().exiting.includes(key),
           findable: () => findable(store.get(), part.props),
           reveal: (event) => api.select(key, { reason: "find-in-page", event }),
         })
-        cleanups.push(found, subscribe(part, found.check), onProps(part, found.check))
+        cleanups.push(
+          found,
+          subscribe(part, found.check),
+          onProps(part, found.check)
+        )
 
         // A panel is a tab stop only when nothing inside it can take focus,
         // so a panel that opens with a field doesn't add a stop before it.
@@ -636,23 +796,29 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
         // Enter and exit animations, never on the first paint.
         let stop: (() => void) | undefined
         let selected = api.internal.shows(store.get(), key)
-        if (selected && api.internal.isChanged()) stop = animateIn(el)
+        if (selected && api.internal.isChanged()) {
+          stop = animateIn(el)
+        }
         cleanups.push(
           subscribe(part, () => {
             const { exiting } = store.get()
-            if (api.internal.shows(store.get(), key) === selected) return
+            if (api.internal.shows(store.get(), key) === selected) {
+              return
+            }
             selected = !selected
             stop?.()
             stop = undefined
             // Ahead of the render, for exit keyframes keyed on the state.
             el.toggleAttribute("data-selected", selected)
-            if (selected) stop = animateIn(el)
-            else if (exiting.includes(key))
+            if (selected) {
+              stop = animateIn(el)
+            } else if (exiting.includes(key)) {
               stop = animateOut(el, () => {
                 stop = undefined
                 api.internal.finishExit(key)
               })
-          }),
+            }
+          })
         )
         cleanups.push(() => stop?.())
         return () => cleanups.forEach((cleanup) => cleanup())
@@ -665,7 +831,10 @@ const tabsPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `tabs`.
  * @stable
  */
-interface TabsPrimitive extends WithGeneric<typeof tabsPrimitive, TabsGeneric> {}
+interface TabsPrimitive extends WithGeneric<
+  typeof tabsPrimitive,
+  TabsGeneric
+> {}
 
 /**
  * The tabs primitive, with the slots `root`, `list`, `tab`, `tab-icon`,

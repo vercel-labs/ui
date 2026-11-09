@@ -13,14 +13,20 @@ const marks = ["data-agent-confirm", "data-agent-hidden", "data-agent-secret"]
 // cut short, like a label would be.
 function confirmOf(elements: Element[]) {
   for (const el of elements) {
-    const text = el.closest("[data-agent-confirm]")?.getAttribute("data-agent-confirm")
-    if (text != null) return text.trim().slice(0, 200) || "This needs a person."
+    const text = el
+      .closest("[data-agent-confirm]")
+      ?.getAttribute("data-agent-confirm")
+    if (text != null) {
+      return text.trim().slice(0, 200) || "This needs a person."
+    }
   }
 }
 
-const isOffLimits = (elements: Element[]) => elements.some((el) => el.closest("[data-agent-hidden]"))
+const isOffLimits = (elements: Element[]) =>
+  elements.some((el) => el.closest("[data-agent-hidden]"))
 
-const isSecret = (elements: Element[]) => elements.some((el) => el.closest("[data-agent-secret]"))
+const isSecret = (elements: Element[]) =>
+  elements.some((el) => el.closest("[data-agent-secret]"))
 
 // An element's text as it reads, with its spaces collapsed, and without the text of the
 // elements in `skip`, like a tree branch's child items, of `data-agent-hidden` or of what a
@@ -28,15 +34,18 @@ const isSecret = (elements: Element[]) => elements.some((el) => el.closest("[dat
 function textOf(el: Element, skip: Element[] = []) {
   let text = ""
   const walk = (node: Node) => {
-    for (const child of node.childNodes)
-      if (child.nodeType === Node.TEXT_NODE) text += child.textContent
-      else if (
+    for (const child of node.childNodes) {
+      if (child.nodeType === Node.TEXT_NODE) {
+        text += child.textContent
+      } else if (
         child instanceof Element &&
         !skip.includes(child) &&
         !child.hasAttribute("data-agent-hidden") &&
         child.getAttribute("aria-hidden") !== "true"
-      )
+      ) {
         walk(child)
+      }
+    }
   }
   walk(el)
   return text.replace(/\s+/g, " ").trim()

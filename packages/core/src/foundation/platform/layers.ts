@@ -32,7 +32,9 @@ type Layer = {
   keep?: (el: HTMLElement) => () => void
   // Where focus can go when a popup opened from inside this one closes: the
   // first candidate `take` accepts, like one that took focus when tried.
-  returnTarget?: (take?: (target: HTMLElement) => boolean) => HTMLElement | undefined
+  returnTarget?: (
+    take?: (target: HTMLElement) => boolean
+  ) => HTMLElement | undefined
   onEscape?: (event: KeyboardEvent) => void
   onOutsidePress?: (event: Event) => void
   onBlur?: (event: FocusEvent) => void
@@ -48,7 +50,9 @@ type Layer = {
   el?: Element
 }
 
-const realm = ((globalThis as Record<symbol, unknown>)[Symbol.for("ui-sdk.layers@2")] ??= {
+const realm = ((globalThis as Record<symbol, unknown>)[
+  Symbol.for("ui-sdk.layers@2")
+] ??= {
   stack: [] as Layer[],
   listening: new Map(),
 }) as {
@@ -76,7 +80,7 @@ function persistent() {
 function bindPersistentLayer(el: Element) {
   persistent().add(el)
   const releases = active().flatMap((layer) =>
-    layer.keep && el instanceof HTMLElement ? [layer.keep(el)] : [],
+    layer.keep && el instanceof HTMLElement ? [layer.keep(el)] : []
   )
   const stopRaising = raiseAbovePopups(el.ownerDocument)
   return () => {
@@ -88,7 +92,11 @@ function bindPersistentLayer(el: Element) {
 
 // Whether a node is inside a persistent layer, like a toast region.
 function inPersistentLayer(target: Node) {
-  for (const el of persistent()) if (composedContains(el, target)) return true
+  for (const el of persistent()) {
+    if (composedContains(el, target)) {
+      return true
+    }
+  }
   return false
 }
 
@@ -102,22 +110,40 @@ function raiseAbovePopups(doc: Document) {
   if (!entry) {
     const onToggle = (event: Event) => {
       const opened = event.target
-      if ((event as ToggleEvent).newState !== "open" || !(opened instanceof Element)) return
-      if (inPersistentLayer(opened)) return
-      for (const el of persistentLayers()) if (el instanceof HTMLElement) showAgain(el)
+      if (
+        (event as ToggleEvent).newState !== "open" ||
+        !(opened instanceof Element)
+      ) {
+        return
+      }
+      if (inPersistentLayer(opened)) {
+        return
+      }
+      for (const el of persistentLayers()) {
+        if (el instanceof HTMLElement) {
+          showAgain(el)
+        }
+      }
     }
     // Toggle events don't bubble, so the document hears them while capturing.
     doc.addEventListener("toggle", onToggle, true)
-    entry = { count: 0, off: () => doc.removeEventListener("toggle", onToggle, true) }
+    entry = {
+      count: 0,
+      off: () => doc.removeEventListener("toggle", onToggle, true),
+    }
     raising.set(doc, entry)
   }
   const current = entry
   current.count++
   let done = false
   return () => {
-    if (done) return
+    if (done) {
+      return
+    }
     done = true
-    if (--current.count > 0) return
+    if (--current.count > 0) {
+      return
+    }
     current.off()
     raising.delete(doc)
   }
@@ -125,14 +151,18 @@ function raiseAbovePopups(doc: Document) {
 
 // Shows a popover again, so it moves to the top of the top layer, and keeps focus where it was.
 function showAgain(el: HTMLElement) {
-  if (!el.isConnected || !el.matches(":popover-open")) return
+  if (!el.isConnected || !el.matches(":popover-open")) {
+    return
+  }
   const focused = el.ownerDocument.activeElement as HTMLElement | null
   try {
     el.hidePopover()
     el.showPopover()
   } catch {}
   // Hiding sends focus back to where it was before the popover showed.
-  if (focused && focused !== el.ownerDocument.activeElement) focused.focus({ preventScroll: true })
+  if (focused && focused !== el.ownerDocument.activeElement) {
+    focused.focus({ preventScroll: true })
+  }
 }
 
 // The persistent layers, for modal side effects.
@@ -173,39 +203,64 @@ function insideTree(layer: Layer, target: Node, event?: Event) {
 
 // check-code: allow return-type recursive, so TypeScript cannot infer it.
 function insideTreeAt(layer: Layer, hops: Node[], event?: Event): boolean {
-  if (hops.some((hop) => layer.contains(hop, event))) return true
-  return active().some((other) => other.parent === layer && insideTreeAt(other, hops, event))
+  if (hops.some((hop) => layer.contains(hop, event))) {
+    return true
+  }
+  return active().some(
+    (other) => other.parent === layer && insideTreeAt(other, hops, event)
+  )
 }
 
 function listen(doc: Document, win: Window) {
   let swallowClick = false
   let touch: { x: number; y: number; target: Node } | undefined
 
-  let pending: { layer: Layer; target: Node; point: { x: number; y: number } } | undefined
+  let pending:
+    { layer: Layer; target: Node; point: { x: number; y: number } } | undefined
 
   function plan(event: Event, target: Node, point: { x: number; y: number }) {
     const dismissed: Layer[] = []
     let consume = false
-    if (inPersistentLayer(target)) return { dismissed, consume }
+    if (inPersistentLayer(target)) {
+      return { dismissed, consume }
+    }
     for (const layer of [...realm.stack].reverse()) {
       if (layer.active()) {
-        if (insideTree(layer, target, event)) break
-        if (layer.modal !== false) consume = true
+        if (insideTree(layer, target, event)) {
+          break
+        }
+        if (layer.modal !== false) {
+          consume = true
+        }
         dismissed.push(layer)
-        if (layer.shield) break
+        if (layer.shield) {
+          break
+        }
       } else if (layer.exiting?.()) {
-        if (insideTree(layer, target, event)) break
-        if (layer.modal === false) continue
-        if (layer.overBackdrop?.(point.x, point.y)) consume = true
+        if (insideTree(layer, target, event)) {
+          break
+        }
+        if (layer.modal === false) {
+          continue
+        }
+        if (layer.overBackdrop?.(point.x, point.y)) {
+          consume = true
+        }
         break
       }
     }
     return { dismissed, consume }
   }
 
-  function dismiss(event: Event, target: Node, point: { x: number; y: number }) {
+  function dismiss(
+    event: Event,
+    target: Node,
+    point: { x: number; y: number }
+  ) {
     const { dismissed, consume } = plan(event, target, point)
-    for (const layer of dismissed) layer.onOutsidePress?.(event)
+    for (const layer of dismissed) {
+      layer.onOutsidePress?.(event)
+    }
     return consume
   }
 
@@ -221,11 +276,15 @@ function listen(doc: Document, win: Window) {
       }
       touch = undefined
       pending = undefined
-      if (pressedScrollbar(event, target)) return
+      if (pressedScrollbar(event, target)) {
+        return
+      }
       const point = { x: event.clientX, y: event.clientY }
       const { dismissed, consume } = plan(event, target, point)
       if (dismissed[0]?.outsidePress === "click") {
-        if (event.button !== 0) return
+        if (event.button !== 0) {
+          return
+        }
         pending = { layer: dismissed[0], target, point }
         if (consume) {
           event.preventDefault()
@@ -239,9 +298,11 @@ function listen(doc: Document, win: Window) {
         event.preventDefault()
         swallowClick = true
       }
-      for (const layer of dismissed) layer.onOutsidePress?.(event)
+      for (const layer of dismissed) {
+        layer.onOutsidePress?.(event)
+      }
     },
-    { capture: true },
+    { capture: true }
   )
 
   const offPointerUp = on(
@@ -250,11 +311,15 @@ function listen(doc: Document, win: Window) {
     (event) => {
       const press = pending
       pending = undefined
-      if (!press || !press.layer.active()) return
-      if (insideTree(press.layer, event.composedPath()[0] as Node, event)) return
+      if (!press || !press.layer.active()) {
+        return
+      }
+      if (insideTree(press.layer, event.composedPath()[0] as Node, event)) {
+        return
+      }
       dismiss(event, press.target, press.point)
     },
-    { capture: true },
+    { capture: true }
   )
 
   const offClick = on(
@@ -267,35 +332,47 @@ function listen(doc: Document, win: Window) {
         event.stopPropagation()
         return
       }
-      if (!touch) return
+      if (!touch) {
+        return
+      }
       const press = touch
       touch = undefined
-      if (Math.hypot(event.clientX - press.x, event.clientY - press.y) > 10) return
+      if (Math.hypot(event.clientX - press.x, event.clientY - press.y) > 10) {
+        return
+      }
       if (dismiss(event, press.target, { x: press.x, y: press.y })) {
         event.preventDefault()
         event.stopPropagation()
       }
     },
-    { capture: true },
+    { capture: true }
   )
 
   const offKey = on(doc, "keydown", (event) => {
-    if (event.key !== "Escape" || event.defaultPrevented) return
+    if (event.key !== "Escape" || event.defaultPrevented) {
+      return
+    }
     // Escape ends an input method's composition first, like a Japanese candidate list.
-    if (isComposing(event)) return
+    if (isComposing(event)) {
+      return
+    }
     // The topmost layer of this document: one open in another, like an
     // iframe's, didn't hear the key.
     const top = active()
       .filter((layer) => documentOf(layer) === doc)
       .at(-1)
-    if (top?.onEscape) realm.escapeAt = performance.now()
+    if (top?.onEscape) {
+      realm.escapeAt = performance.now()
+    }
     top?.onEscape?.(event)
   })
 
   // A click into an iframe or another window never reaches the page. Each
   // layer decides what that means for it.
   const offBlur = on(win, "blur", (event) => {
-    for (const layer of active().reverse()) layer.onBlur?.(event)
+    for (const layer of active().reverse()) {
+      layer.onBlur?.(event)
+    }
   })
 
   return () => {
@@ -303,7 +380,9 @@ function listen(doc: Document, win: Window) {
     offPointerUp()
     offKey()
     offBlur()
-    if (!swallowClick) return offClick()
+    if (!swallowClick) {
+      return offClick()
+    }
     // The press that closed the last layer still owes its click, which would
     // reach the page. It's swallowed when it comes, and forgotten at the next press.
     const off = () => (offClick(), offNext(), offSwallowed())
@@ -335,7 +414,9 @@ function findLayer(target: Node) {
 function markClosed(target: HTMLElement | undefined) {
   realm.closed = target
   setTimeout(() => {
-    if (realm.closed === target) realm.closed = undefined
+    if (realm.closed === target) {
+      realm.closed = undefined
+    }
   })
 }
 
@@ -344,7 +425,9 @@ function lastClosed() {
 }
 
 function report() {
-  if (!dev) return
+  if (!dev) {
+    return
+  }
   emit({
     type: "layers",
     stack: realm.stack.map((layer) => ({
@@ -361,13 +444,19 @@ function report() {
 // moved into an iframe hears presses and Escape there.
 function listenIn(doc: Document) {
   const win = doc.defaultView
-  if (!win) return () => {}
+  if (!win) {
+    return () => {}
+  }
   let entry = realm.listening.get(doc)
-  if (!entry) realm.listening.set(doc, (entry = { layers: 0, stop: listen(doc, win) }))
+  if (!entry) {
+    realm.listening.set(doc, (entry = { layers: 0, stop: listen(doc, win) }))
+  }
   const current = entry
   current.layers++
   return () => {
-    if (--current.layers > 0) return
+    if (--current.layers > 0) {
+      return
+    }
     realm.listening.delete(doc)
     current.stop()
   }
@@ -385,10 +474,14 @@ function pushLayer(layer: Layer) {
   report()
   let popped = false
   return () => {
-    if (popped) return
+    if (popped) {
+      return
+    }
     popped = true
     const index = realm.stack.indexOf(layer)
-    if (index !== -1) realm.stack.splice(index, 1)
+    if (index !== -1) {
+      realm.stack.splice(index, 1)
+    }
     stopListening()
     report()
   }

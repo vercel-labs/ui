@@ -1,6 +1,10 @@
 <script lang="ts">
   import { Field, FieldDescription, FieldLabel } from "@ui-sdk/svelte/field"
-  import { SegmentedControl, SegmentedControlIndicator, SegmentedControlItem } from "@ui-sdk/svelte/segmented-control"
+  import {
+    SegmentedControl,
+    SegmentedControlIndicator,
+    SegmentedControlItem,
+  } from "@ui-sdk/svelte/segmented-control"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -28,7 +32,9 @@
     <SegmentedControl name="density" defaultValue="comfortable">
       <SegmentedControlIndicator />
       <SegmentedControlItem value="compact">Compact</SegmentedControlItem>
-      <SegmentedControlItem value="comfortable">Comfortable</SegmentedControlItem>
+      <SegmentedControlItem value="comfortable"
+        >Comfortable</SegmentedControlItem
+      >
     </SegmentedControl>
   </Field>
   <div data-slot="row">

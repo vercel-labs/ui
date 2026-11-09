@@ -24,9 +24,13 @@ const value = ref(40)
     >
       <template #render="{ props, state }">
         <section v-bind="props">
-          <ProgressValue v-slot="{ state: valueState }">{{ valueState.percent }}% done</ProgressValue>
+          <ProgressValue v-slot="{ state: valueState }"
+            >{{ valueState.percent }}% done</ProgressValue
+          >
           <ProgressTrack class="gauge-track"
-            ><ProgressIndicator class="gauge-indicator" :data-status="state.status"
+            ><ProgressIndicator
+              class="gauge-indicator"
+              :data-status="state.status"
           /></ProgressTrack>
         </section>
       </template>
@@ -44,8 +48,16 @@ const value = ref(40)
       <template #render="{ props, children }">
         <section v-bind="props"><component :is="children" /></section>
       </template>
-      <OTPInputSlot v-for="index in 4" :key="index" :index="index - 1" v-slot="{ state }" class="otp-slot">
-        <span :class="{ 'is-active': state.active }">{{ state.char ?? "·" }}</span>
+      <OTPInputSlot
+        v-for="index in 4"
+        :key="index"
+        :index="index - 1"
+        v-slot="{ state }"
+        class="otp-slot"
+      >
+        <span :class="{ 'is-active': state.active }">{{
+          state.char ?? "·"
+        }}</span>
       </OTPInputSlot>
     </OTPInput>
     <button @click="value = 100">Finish</button>

@@ -36,20 +36,30 @@ const notes = {
 }
 
 const mode = ref<Mode>("false")
-const modal = computed(() => (mode.value === "true" ? true : mode.value === "false" ? false : "trap-focus"))
+const modal = computed(() =>
+  mode.value === "true" ? true : mode.value === "false" ? false : "trap-focus"
+)
 </script>
 
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <Select :items="modes" :value="mode" @value-change="(next) => next && (mode = next as Mode)">
+      <Select
+        :items="modes"
+        :value="mode"
+        @value-change="(next) => next && (mode = next as Mode)"
+      >
         <SelectLabel>Modal</SelectLabel>
         <SelectTrigger>
           <SelectValue />
           <ChevronDownIcon aria-hidden="true" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem v-for="option in modes" :key="option.value" :value="option.value">
+          <SelectItem
+            v-for="option in modes"
+            :key="option.value"
+            :value="option.value"
+          >
             {{ option.label }}
             <SelectItemIndicator>
               <CheckIcon aria-hidden="true" />

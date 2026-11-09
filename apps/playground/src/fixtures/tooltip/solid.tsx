@@ -1,6 +1,18 @@
 import { createTooltipController } from "@ui-sdk/core/tooltip"
-import { Popover, PopoverClose, PopoverContent, PopoverTitle, PopoverTrigger } from "@ui-sdk/solid/popover"
-import { Tooltip, TooltipArrow, TooltipContent, TooltipShortcut, TooltipTrigger } from "@ui-sdk/solid/tooltip"
+import {
+  Popover,
+  PopoverClose,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "@ui-sdk/solid/popover"
+import {
+  Tooltip,
+  TooltipArrow,
+  TooltipContent,
+  TooltipShortcut,
+  TooltipTrigger,
+} from "@ui-sdk/solid/tooltip"
 import { render } from "@solidjs/web"
 import { createSignal, For, Show } from "solid-js"
 import {
@@ -21,8 +33,16 @@ function Fixture() {
   return (
     <div class="fixture tooltip-page">
       <button>Before</button>
-      <Tooltip {...options} controller={controller} defaultOpen={parts.open} shortcut={save.shortcut}>
-        <TooltipTrigger disabled={parts.nativeDisabled} onClick={() => setAction("save")}>
+      <Tooltip
+        {...options}
+        controller={controller}
+        defaultOpen={parts.open}
+        shortcut={save.shortcut}
+      >
+        <TooltipTrigger
+          disabled={parts.nativeDisabled}
+          onClick={() => setAction("save")}
+        >
           {save.trigger}
         </TooltipTrigger>
         <TooltipContent class="tooltip" {...tooltipContentOptions()}>
@@ -45,7 +65,11 @@ function Fixture() {
       </div>
       <Popover container={options.container}>
         <Tooltip {...options}>
-          <TooltipTrigger render={(props) => <PopoverTrigger {...props}>{profile.trigger}</PopoverTrigger>} />
+          <TooltipTrigger
+            render={(props) => (
+              <PopoverTrigger {...props}>{profile.trigger}</PopoverTrigger>
+            )}
+          />
           <TooltipContent class="tooltip">{profile.content}</TooltipContent>
         </Tooltip>
         <PopoverContent class="popup" sideOffset={8}>
@@ -53,7 +77,9 @@ function Fixture() {
           <div class="actions">
             <Tooltip {...options}>
               <TooltipTrigger>{profile.help.trigger}</TooltipTrigger>
-              <TooltipContent class="tooltip">{profile.help.content}</TooltipContent>
+              <TooltipContent class="tooltip">
+                {profile.help.content}
+              </TooltipContent>
             </Tooltip>
             <PopoverClose>{profile.close}</PopoverClose>
           </div>
@@ -70,7 +96,8 @@ function Fixture() {
           <TooltipTrigger
             aria-disabled="true"
             onClick={(event) =>
-              event.currentTarget.getAttribute("aria-disabled") !== "true" && setAction(publish.action)
+              event.currentTarget.getAttribute("aria-disabled") !== "true" &&
+              setAction(publish.action)
             }
           >
             {publish.trigger}
@@ -88,7 +115,9 @@ function Fixture() {
                 </PopoverTrigger>
               )}
             />
-            <TooltipContent class="tooltip">{iconPopover.content}</TooltipContent>
+            <TooltipContent class="tooltip">
+              {iconPopover.content}
+            </TooltipContent>
           </Tooltip>
           <PopoverContent class="popup">{iconPopover.popover}</PopoverContent>
         </Popover>

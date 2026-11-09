@@ -1,4 +1,7 @@
-import type { calendar as calendarPrimitive, CalendarGridState } from "@ui-sdk/core/calendar"
+import type {
+  calendar as calendarPrimitive,
+  CalendarGridState,
+} from "@ui-sdk/core/calendar"
 import type { InjectionKey } from "vue"
 import type { PrimitiveHandle } from "./use-primitive"
 
@@ -7,6 +10,9 @@ import type { PrimitiveHandle } from "./use-primitive"
 type CalendarHandle = PrimitiveHandle<typeof calendarPrimitive>
 
 const CalendarKey: InjectionKey<CalendarHandle> = Symbol("calendar")
-const GridKey: InjectionKey<{ offset: () => number; state: CalendarGridState }> = Symbol("calendar-grid")
+const GridKey: InjectionKey<{
+  offset: () => number
+  state: CalendarGridState
+}> = Symbol("calendar-grid")
 
 export { type CalendarHandle, CalendarKey, GridKey }

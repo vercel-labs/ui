@@ -3,19 +3,30 @@ import { expect, test } from "../fixtures"
 // Presses Next and a page in every kitchen sink variant. The page is for
 // manual testing, so this only proves every variant renders and responds
 // without errors.
-test("every kitchen sink variant renders and responds", async ({ page, framework }) => {
-  test.skip(!["react", "vue", "web"].includes(framework), "Composition frameworks only.")
+test("every kitchen sink variant renders and responds", async ({
+  page,
+  framework,
+}) => {
+  test.skip(
+    !["react", "vue", "web"].includes(framework),
+    "Composition frameworks only."
+  )
   test.setTimeout(120_000)
   const errors: string[] = []
   page.on("pageerror", (error) => errors.push(error.message))
-  page.on("console", (message) => message.type() === "error" && errors.push(message.text()))
+  page.on(
+    "console",
+    (message) => message.type() === "error" && errors.push(message.text())
+  )
 
   await page.goto(`/?fixture=pagination-kitchen-sink&framework=${framework}`)
   await page.locator("body[data-mounted]").waitFor({ state: "attached" })
   const cards = page.locator("[data-variant]")
   await expect(cards.first()).toBeVisible()
   // Each card mounts its own root, so wait for all of them.
-  await expect.poll(() => page.locator("[data-variant]:not(:has([data-slot]))").count()).toBe(0)
+  await expect
+    .poll(() => page.locator("[data-variant]:not(:has([data-slot]))").count())
+    .toBe(0)
 
   for (const card of await cards.all()) {
     const id = await card.getAttribute("data-variant")
@@ -30,8 +41,13 @@ test("every kitchen sink variant renders and responds", async ({ page, framework
   }
 
   // Controllers drive the pagination from outside.
-  for (const control of await page.locator('[data-variant="controller"] [data-controller]').all())
+  for (const control of await page
+    .locator('[data-variant="controller"] [data-controller]')
+    .all()) {
     await control.click()
-  await expect(page.locator('[data-variant="controller"] [aria-current="page"]')).toHaveText("5")
+  }
+  await expect(
+    page.locator('[data-variant="controller"] [aria-current="page"]')
+  ).toHaveText("5")
   expect(errors).toEqual([])
 })

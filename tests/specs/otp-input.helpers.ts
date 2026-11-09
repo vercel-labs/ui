@@ -9,7 +9,11 @@ function codeSlots(page: Page) {
 // The code the slots show.
 async function shownCode(page: Page) {
   return codeSlots(page).evaluateAll((slots) =>
-    slots.map((slot) => (slot instanceof HTMLInputElement ? slot.value : (slot.textContent ?? ""))).join(""),
+    slots
+      .map((slot) =>
+        slot instanceof HTMLInputElement ? slot.value : (slot.textContent ?? "")
+      )
+      .join("")
   )
 }
 
@@ -29,7 +33,11 @@ async function paste(page: Page, text: string) {
   await page.evaluate((text) => {
     const data = new DataTransfer()
     data.setData("text/plain", text)
-    const event = new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true })
+    const event = new ClipboardEvent("paste", {
+      clipboardData: data,
+      bubbles: true,
+      cancelable: true,
+    })
     document.activeElement?.dispatchEvent(event)
   }, text)
 }

@@ -1,5 +1,10 @@
 import * as React from "react"
-import { createVirtualizer, css, definePrimitive, type VirtualItem } from "@ui-sdk/core"
+import {
+  createVirtualizer,
+  css,
+  definePrimitive,
+  type VirtualItem,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type StripState = { items: VirtualItem[]; size: number }
@@ -10,9 +15,15 @@ const strip = definePrimitive({
   name: "strip",
   state: (): StripState => ({ items: [], size: 0 }),
   api: (context) => {
-    const virtual = createVirtualizer({ count: () => 365, estimate: () => dayWidth, horizontal: true })
+    const virtual = createVirtualizer({
+      count: () => 365,
+      estimate: () => dayWidth,
+      horizontal: true,
+    })
     context.onDestroy(
-      virtual.subscribe(() => context.store.set({ items: virtual.items(), size: virtual.size() })),
+      virtual.subscribe(() =>
+        context.store.set({ items: virtual.items(), size: virtual.size() })
+      )
     )
     return { virtual }
   },
@@ -25,7 +36,11 @@ const strip = definePrimitive({
     body: slot({
       attrs: (state) => ({
         role: "list",
-        style: css({ position: "relative", width: `${state.size}px`, height: "100%" }),
+        style: css({
+          position: "relative",
+          width: `${state.size}px`,
+          height: "100%",
+        }),
       }),
     }),
     day: slot<{ value: string; start: number }>({
@@ -53,7 +68,11 @@ const StripBody = parts.Body
 
 const StripDay = parts.Day
 
-const date = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" })
+const date = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  timeZone: "UTC",
+})
 
 function Example() {
   return (

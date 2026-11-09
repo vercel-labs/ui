@@ -33,15 +33,23 @@ function defaultStorage(): ResizableStorage | undefined {
 function entries(storage: ResizableStorage, key: string) {
   try {
     const saved = JSON.parse(storage.getItem(key) ?? "{}") as unknown
-    return saved && typeof saved === "object" ? (saved as Record<string, unknown>) : {}
+    return saved && typeof saved === "object"
+      ? (saved as Record<string, unknown>)
+      : {}
   } catch {
     return {}
   }
 }
 
 /** The layout saved for these panels, if there is one that fits them. */
-function loadLayout(autoSaveId: string, ids: readonly string[], storage = defaultStorage()) {
-  if (!storage) return undefined
+function loadLayout(
+  autoSaveId: string,
+  ids: readonly string[],
+  storage = defaultStorage()
+) {
+  if (!storage) {
+    return undefined
+  }
   const layout = entries(storage, storageKey(autoSaveId))[ids.join(",")]
   const valid =
     Array.isArray(layout) &&
@@ -54,9 +62,11 @@ function saveLayout(
   autoSaveId: string,
   ids: readonly string[],
   layout: readonly number[],
-  storage = defaultStorage(),
+  storage = defaultStorage()
 ) {
-  if (!storage) return
+  if (!storage) {
+    return
+  }
   const key = storageKey(autoSaveId)
   const saved = entries(storage, key)
   saved[ids.join(",")] = layout.map((size) => Math.round(size * 1000) / 1000)

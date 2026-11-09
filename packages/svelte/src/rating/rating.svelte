@@ -16,7 +16,12 @@ preview while a pointer moves over them. Its content renders once per star.
   import { provideInstance } from "../instance"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import RatingItem from "./rating-item.svelte"
   import ItemScope from "./rating-item-scope.svelte"
 
@@ -96,14 +101,16 @@ preview while a pointer moves over them. Its content renders once per star.
     onValueChange: (next: number | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   provideInstance(rating, control)
   const root = useHandlePart(control, "root")
   const fieldControl = field?.control(
     () => rest.id,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
   const stars = $derived(Array.from({ length: max }, (_, at) => at + 1))
 </script>
@@ -116,4 +123,8 @@ preview while a pointer moves over them. Its content renders once per star.
   {/each}
 {/snippet}
 
-<Part tag="div" part={wrapPart(root, fieldControl)} props={{ ...rest, children: content }} />
+<Part
+  tag="div"
+  part={wrapPart(root, fieldControl)}
+  props={{ ...rest, children: content }}
+/>

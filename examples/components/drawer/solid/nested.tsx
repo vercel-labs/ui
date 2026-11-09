@@ -43,7 +43,9 @@ function Example() {
               <div data-slot="grip" aria-hidden="true" />
               <div data-slot="stack">
                 <DrawerTitle>Change password</DrawerTitle>
-                <DrawerDescription>Use at least 12 characters.</DrawerDescription>
+                <DrawerDescription>
+                  Use at least 12 characters.
+                </DrawerDescription>
               </div>
               <Field>
                 <FieldLabel>New password</FieldLabel>

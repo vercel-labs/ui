@@ -1,6 +1,13 @@
 <script lang="ts">
   import { onDestroy } from "svelte"
-  import { Toast, ToastAction, ToastClose, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/svelte/toast"
+  import {
+    Toast,
+    ToastAction,
+    ToastClose,
+    ToastRegion,
+    ToastTitle,
+    createToaster,
+  } from "@ui-sdk/svelte/toast"
   import { useLog } from "../../../shared/svelte/log"
 
   const log = useLog()
@@ -25,7 +32,9 @@
     <Toast>
       <ToastTitle />
       {#if item.cancel}
-        <ToastClose action={item.cancel.onCancel}>{item.cancel.label}</ToastClose>
+        <ToastClose action={item.cancel.onCancel}
+          >{item.cancel.label}</ToastClose
+        >
       {/if}
       <ToastAction data-variant="solid" />
     </Toast>

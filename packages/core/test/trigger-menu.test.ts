@@ -14,10 +14,16 @@ const people = [
   { value: "bob", label: "Bob" },
 ]
 
-function setup(triggers: TriggerDefinition[], options: Partial<TriggerMenuOptions> = {}) {
+function setup(
+  triggers: TriggerDefinition[],
+  options: Partial<TriggerMenuOptions> = {}
+) {
   const editor = fakeEditor()
-  const instance = kept(triggerMenu({ id: "menu", triggers, editor, ...options }))
-  const visible = () => instance.api.internal.listbox.entries().map((entry) => entry.label)
+  const instance = kept(
+    triggerMenu({ id: "menu", triggers, editor, ...options })
+  )
+  const visible = () =>
+    instance.api.internal.listbox.entries().map((entry) => entry.label)
   return {
     editor,
     instance,
@@ -45,7 +51,9 @@ describe("matching", () => {
 
   test("a caret move into a match doesn't open it, and one out of it closes", () => {
     const onOpenChange = vi.fn()
-    const { editor, state } = setup([{ char: "@", items: people }], { onOpenChange })
+    const { editor, state } = setup([{ char: "@", items: people }], {
+      onOpenChange,
+    })
     editor.type("@al x")
     expect(state().open).toBe(false)
     editor.moveCaret(3)
@@ -60,7 +68,9 @@ describe("matching", () => {
 
   test("closing empties the query, and reports only the queries typed while open", () => {
     const onQueryChange = vi.fn()
-    const { editor, state } = setup([{ char: "@", items: people }], { onQueryChange })
+    const { editor, state } = setup([{ char: "@", items: people }], {
+      onQueryChange,
+    })
     editor.type("@al")
     expect(onQueryChange.mock.calls.map(([query]) => query)).toEqual(["al"])
     editor.moveCaret(0)
@@ -84,7 +94,10 @@ describe("choosing", () => {
     editor.type("hi @bo")
     api.internal.choose("bob")
     expect(editor.text).toBe("hi @Bob ")
-    expect(onSelect).toHaveBeenCalledWith("bob", expect.objectContaining({ trigger: "@", arguments: {} }))
+    expect(onSelect).toHaveBeenCalledWith(
+      "bob",
+      expect.objectContaining({ trigger: "@", arguments: {} })
+    )
   })
 
   test("preventDefault skips the insertion", () => {
@@ -111,7 +124,7 @@ describe("choosing", () => {
         editor,
         triggers: [{ char: "@", type: "person", items: people }],
         onSelect: () => Promise.resolve({ label: "@Bob Jones" }),
-      }),
+      })
     )
     editor.type("@bo")
     instance.api.internal.choose("bob")
@@ -169,7 +182,10 @@ describe("loading", () => {
 
   test("a stale load never lands, and its signal aborts", async () => {
     const signals: Record<string, AbortSignal> = {}
-    const resolvers: Record<string, (items: { value: string; label: string }[]) => void> = {}
+    const resolvers: Record<
+      string,
+      (items: { value: string; label: string }[]) => void
+    > = {}
     const { editor, visible } = setup([
       {
         char: "#",

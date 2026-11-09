@@ -29,7 +29,7 @@ function mount(root: HTMLElement) {
                   </ui-radio>
                   ${theme.label}
                 </label>
-              `,
+              `
             )
             .join("")}
         </ui-radio-group>
@@ -47,7 +47,7 @@ function mount(root: HTMLElement) {
                   </ui-radio>
                   ${backup.label}
                 </label>
-              `,
+              `
             )
             .join("")}
         </ui-radio-group>

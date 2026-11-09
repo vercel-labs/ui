@@ -7,7 +7,9 @@ import App from "./apps/autocomplete-items-app.svelte"
 
 let app: ReturnType<typeof mount> | undefined
 afterEach(() => {
-  if (app) unmount(app)
+  if (app) {
+    unmount(app)
+  }
   app = undefined
   document.body.replaceChildren()
 })
@@ -21,7 +23,9 @@ function render() {
   app = mount(App, { target: document.body, props })
   flushSync()
   const input = document.querySelector<HTMLInputElement>('[role="combobox"]')!
-  input.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true }))
+  input.dispatchEvent(
+    new KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true })
+  )
   flushSync()
   return { props, input, highlights }
 }
@@ -32,10 +36,11 @@ test("items that drop the highlighted suggestion clear the highlight", () => {
   props.items = ["Peach", "Banana"]
   flushSync()
   expect(input.getAttribute("aria-activedescendant")).toBeNull()
-  expect([...document.querySelectorAll('[role="option"]')].map((el) => el.textContent)).toEqual([
-    "Peach",
-    "Banana",
-  ])
+  expect(
+    [...document.querySelectorAll('[role="option"]')].map(
+      (el) => el.textContent
+    )
+  ).toEqual(["Peach", "Banana"])
 })
 
 test("onHighlight hears the highlight leave with its suggestion", () => {

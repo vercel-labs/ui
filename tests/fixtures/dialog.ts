@@ -66,7 +66,10 @@ function dialogOptions() {
   const container = params.get("container")
   return {
     ...(params.has("open") && { defaultOpen: true }),
-    ...(modal && { modal: modal === "trap-focus" ? ("trap-focus" as const) : modal === "true" }),
+    ...(modal && {
+      modal:
+        modal === "trap-focus" ? ("trap-focus" as const) : modal === "true",
+    }),
     ...(params.get("outside") === "false" && { closeOnOutsidePress: false }),
     ...(container && { container: document.getElementById(container) }),
     ...presentationOption(),
@@ -103,7 +106,12 @@ function dialogContentOptions() {
 // Chat button (persistent), the Share popover (rendered into #popover-root),
 // After, and the last action. A page shortcut, mod+j, reports "page shortcut".
 const dialogPatternsFixture = {
-  menu: { trigger: "File", rename: "Rename", close: "Close file", shortcut: "mod+u" },
+  menu: {
+    trigger: "File",
+    rename: "Rename",
+    close: "Close file",
+    shortcut: "mod+u",
+  },
   rename: {
     trigger: "Rename",
     shortcut: "mod+k",
@@ -122,7 +130,12 @@ const dialogPatternsFixture = {
     action: "Delete",
   },
   // A menu item that opens a dialog by setting the state its `open` prop reads.
-  details: { menu: "Edit", item: "Details", title: "File details", done: "Done" },
+  details: {
+    menu: "Edit",
+    item: "Details",
+    title: "File details",
+    done: "Done",
+  },
   pageShortcut: "mod+j",
   // A page shortcut without a modifier, which typing in a field never runs.
   slashShortcut: "/",

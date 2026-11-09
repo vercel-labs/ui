@@ -25,20 +25,24 @@ function ListItems({
 }) {
   const { Item, Group, GroupLabel, Separator } = parts
   return items.map((entry, index) => {
-    if (typeof entry === "string")
+    if (typeof entry === "string") {
       return (
         <Item key={entry} value={entry}>
           {entry}
         </Item>
       )
-    if ("type" in entry && entry.type === "separator") return <Separator key={`separator-${index}`} />
-    if ("type" in entry && entry.type === "group")
+    }
+    if ("type" in entry && entry.type === "separator") {
+      return <Separator key={`separator-${index}`} />
+    }
+    if ("type" in entry && entry.type === "group") {
       return (
         <Group key={`group-${entry.label ?? index}`}>
           {entry.label && <GroupLabel>{entry.label}</GroupLabel>}
           <ListItems items={entry.items} parts={parts} keyOf={keyOf} />
         </Group>
       )
+    }
     const { value, label, disabled, keywords } = entry as {
       value: unknown
       label: string

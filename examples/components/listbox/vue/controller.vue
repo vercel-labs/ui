@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
-import { createListboxController, Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/vue/listbox"
+import {
+  createListboxController,
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/vue/listbox"
 import { useLog } from "../../../shared/vue/log"
 
 const toppings = [
@@ -27,9 +32,15 @@ const controller = createListboxController<string, true>()
       multiple
       :controller="controller"
       aria-label="Toppings"
-      @value-change="(value, details) => log(`${value.length} selected (${details.reason})`)"
+      @value-change="
+        (value, details) => log(`${value.length} selected (${details.reason})`)
+      "
     >
-      <ListboxItem v-for="topping in toppings" :key="topping.value" :value="topping.value">
+      <ListboxItem
+        v-for="topping in toppings"
+        :key="topping.value"
+        :value="topping.value"
+      >
         {{ topping.label }}
         <ListboxItemIndicator>
           <CheckIcon aria-hidden="true" />

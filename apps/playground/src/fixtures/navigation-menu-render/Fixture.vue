@@ -20,14 +20,20 @@ const action = ref("")
     <NavigationMenu
       aria-label="Docs"
       class="nav-menu"
-      @value-change="(value, { reason }) => (action = `${value ?? 'close'}: ${reason}`)"
+      @value-change="
+        (value, { reason }) => (action = `${value ?? 'close'}: ${reason}`)
+      "
     >
       <NavigationMenuList class="nav-list">
         <NavigationMenuItem value="guides">
           <NavigationMenuTrigger>
             <template #render="{ props, state }">
-              <button v-bind="props" :class="['nav-trigger', state.open ? 'is-open' : 'is-closed']">
-                Guides <span aria-hidden="true">{{ state.open ? "▲" : "▼" }}</span>
+              <button
+                v-bind="props"
+                :class="['nav-trigger', state.open ? 'is-open' : 'is-closed']"
+              >
+                Guides
+                <span aria-hidden="true">{{ state.open ? "▲" : "▼" }}</span>
               </button>
             </template>
           </NavigationMenuTrigger>
@@ -36,12 +42,16 @@ const action = ref("")
               <section v-bind="props">
                 <NavigationMenuLink current>
                   <template #render="{ props }">
-                    <RouterLink v-bind="props" to="#intro">Introduction</RouterLink>
+                    <RouterLink v-bind="props" to="#intro"
+                      >Introduction</RouterLink
+                    >
                   </template>
                 </NavigationMenuLink>
                 <NavigationMenuLink>
                   <template #render="{ props }">
-                    <RouterLink v-bind="props" to="#install">Install</RouterLink>
+                    <RouterLink v-bind="props" to="#install"
+                      >Install</RouterLink
+                    >
                   </template>
                 </NavigationMenuLink>
               </section>

@@ -1,5 +1,9 @@
 import { describe, expect, test } from "vitest"
-import { formatGaugeValue, gaugeSettings, percentBetween } from "../src/foundation/gauge/gauge"
+import {
+  formatGaugeValue,
+  gaugeSettings,
+  percentBetween,
+} from "../src/foundation/gauge/gauge"
 import { progress } from "../src/components/progress/progress"
 import { attrs, partState } from "../src/foundation/kernel/part"
 
@@ -12,7 +16,10 @@ describe("gauge values", () => {
   })
 
   test("treats a maximum below the minimum as the minimum", () => {
-    expect(gaugeSettings({ min: 10, max: 5 })).toMatchObject({ min: 10, max: 10 })
+    expect(gaugeSettings({ min: 10, max: 5 })).toMatchObject({
+      min: 10,
+      max: 10,
+    })
   })
 
   test("formats the share of the range as a percent by default", () => {
@@ -21,18 +28,27 @@ describe("gauge values", () => {
   })
 
   test("formats the value itself in any other style", () => {
-    const settings = gaugeSettings({ max: 512, format: { style: "unit", unit: "gigabyte" }, locale: "en-US" })
+    const settings = gaugeSettings({
+      max: 512,
+      format: { style: "unit", unit: "gigabyte" },
+      locale: "en-US",
+    })
     expect(formatGaugeValue(128, settings)).toBe("128 GB")
   })
 
   test("formats in the locale it's given", () => {
-    expect(formatGaugeValue(0.5, gaugeSettings({ max: 1, locale: "de-DE" }))).toMatch(/^50\s%$/)
+    expect(
+      formatGaugeValue(0.5, gaugeSettings({ max: 1, locale: "de-DE" }))
+    ).toMatch(/^50\s%$/)
   })
 
   test("formats with a function", () => {
-    expect(formatGaugeValue(3, gaugeSettings({ max: 12, format: (value) => `${value} of 12` }))).toBe(
-      "3 of 12",
-    )
+    expect(
+      formatGaugeValue(
+        3,
+        gaugeSettings({ max: 12, format: (value) => `${value} of 12` })
+      )
+    ).toBe("3 of 12")
   })
 })
 
@@ -47,7 +63,9 @@ describe("progress parts", () => {
       "aria-valuetext": "40%",
       "data-progressing": "",
     })
-    expect(attrs(bar.part("indicator")).style).toBe("inset-inline-start:0;width:40%")
+    expect(attrs(bar.part("indicator")).style).toBe(
+      "inset-inline-start:0;width:40%"
+    )
   })
 
   test("an indeterminate progress bar has no value", () => {
@@ -70,9 +88,12 @@ describe("progress parts", () => {
       id: "p",
       value: 3,
       max: 12,
-      getValueLabel: (value, { formatted }) => `${value} of 12 files (${formatted})`,
+      getValueLabel: (value, { formatted }) =>
+        `${value} of 12 files (${formatted})`,
     })
-    expect(attrs(bar.part("root"))["aria-valuetext"]).toBe("3 of 12 files (25%)")
+    expect(attrs(bar.part("root"))["aria-valuetext"]).toBe(
+      "3 of 12 files (25%)"
+    )
   })
 })
 

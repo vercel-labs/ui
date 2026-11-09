@@ -27,7 +27,7 @@ const segment = (container: HTMLElement, type: string) =>
   container.querySelector<HTMLInputElement>(`input[data-type="${type}"]`)!
 
 async function type(text: string) {
-  for (const char of text)
+  for (const char of text) {
     await React.act(async () => {
       document.activeElement!.dispatchEvent(
         new InputEvent("beforeinput", {
@@ -35,36 +35,54 @@ async function type(text: string) {
           data: char,
           bubbles: true,
           cancelable: true,
-        }),
+        })
       )
     })
+  }
 }
 
 const shown = (container: HTMLElement) =>
   [...container.querySelector('[role="group"]')!.children]
-    .filter((node) => !(node instanceof HTMLInputElement && node.type === "hidden"))
-    .map((node) => (node instanceof HTMLInputElement ? node.value : node.textContent))
+    .filter(
+      (node) => !(node instanceof HTMLInputElement && node.type === "hidden")
+    )
+    .map((node) =>
+      node instanceof HTMLInputElement ? node.value : node.textContent
+    )
     .join("")
     .replace(/\s/g, " ")
 
 test("the server renders each segment as an input with its value, and the hidden input", () => {
   const server = document.createElement("div")
-  server.innerHTML = renderToString(<DateInput defaultValue="2026-11-02" name="start" locale="en-US" />)
-  expect(server.querySelectorAll('[role="group"] [role="spinbutton"]')).toHaveLength(3)
+  server.innerHTML = renderToString(
+    <DateInput defaultValue="2026-11-02" name="start" locale="en-US" />
+  )
+  expect(
+    server.querySelectorAll('[role="group"] [role="spinbutton"]')
+  ).toHaveLength(3)
   expect(segment(server, "month").getAttribute("value")).toBe("11")
   expect(segment(server, "year").getAttribute("value")).toBe("2026")
   const hidden = server.querySelector<HTMLInputElement>('input[type="hidden"]')!
-  expect([hidden.name, hidden.getAttribute("value")]).toEqual(["start", "2026-11-02"])
+  expect([hidden.name, hidden.getAttribute("value")]).toEqual([
+    "start",
+    "2026-11-02",
+  ])
 })
 
 test("typing a date fills the segments and reports the ISO value once", async () => {
   const onValueChange = vi.fn()
-  const container = await render(<DateInput locale="en-US" onValueChange={onValueChange} />)
+  const container = await render(
+    <DateInput locale="en-US" onValueChange={onValueChange} />
+  )
   segment(container, "month").focus()
   await type("11042026")
-  expect(onValueChange.mock.calls.map(([value]) => value)).toEqual(["2026-11-04"])
+  expect(onValueChange.mock.calls.map(([value]) => value)).toEqual([
+    "2026-11-04",
+  ])
   expect(shown(container)).toBe("11/04/2026")
-  expect(container.querySelector<HTMLInputElement>('input[type="hidden"]')!.value).toBe("2026-11-04")
+  expect(
+    container.querySelector<HTMLInputElement>('input[type="hidden"]')!.value
+  ).toBe("2026-11-04")
 })
 
 test("a controlled value follows its owner", async () => {
@@ -72,7 +90,12 @@ test("a controlled value follows its owner", async () => {
     const [value, setValue] = React.useState<string | null>("09:30")
     return (
       <>
-        <TimeInput value={value} onValueChange={setValue} hourCycle={24} locale="en-US" />
+        <TimeInput
+          value={value}
+          onValueChange={setValue}
+          hourCycle={24}
+          locale="en-US"
+        />
         <output>{value}</output>
       </>
     )
@@ -81,7 +104,11 @@ test("a controlled value follows its owner", async () => {
   segment(container, "minute").focus()
   await React.act(async () => {
     document.activeElement!.dispatchEvent(
-      new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true }),
+      new KeyboardEvent("keydown", {
+        key: "ArrowUp",
+        bubbles: true,
+        cancelable: true,
+      })
     )
   })
   expect(container.querySelector("output")!.textContent).toBe("09:31")
@@ -93,7 +120,7 @@ test("a field's label names the group and focuses its first segment", async () =
     <Field>
       <FieldLabel>Start date</FieldLabel>
       <DateInput locale="en-US" />
-    </Field>,
+    </Field>
   )
   const group = container.querySelector('[role="group"]')!
   const label = container.querySelector("label")!
@@ -107,11 +134,17 @@ test("children can render the segments themselves", async () => {
     <DateInput defaultValue="2026-11-02" locale="en-US">
       {({ segments }) =>
         segments.map((item) => (
-          <DateInputSegment key={item.key} segment={item} className={`segment-${item.type}`} />
+          <DateInputSegment
+            key={item.key}
+            segment={item}
+            className={`segment-${item.type}`}
+          />
         ))
       }
-    </DateInput>,
+    </DateInput>
   )
-  expect(container.querySelector(".segment-month")).toBe(segment(container, "month"))
+  expect(container.querySelector(".segment-month")).toBe(
+    segment(container, "month")
+  )
   expect(container.querySelector(".segment-literal")!.textContent).toBe("/")
 })

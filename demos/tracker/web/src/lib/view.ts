@@ -16,15 +16,24 @@ function redraw() {
 }
 
 function same(a: unknown, b: unknown) {
-  if (Array.isArray(a) && Array.isArray(b))
-    return a.length === b.length && a.every((value, index) => Object.is(value, b[index]))
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return (
+      a.length === b.length &&
+      a.every((value, index) => Object.is(value, b[index]))
+    )
+  }
   return Object.is(a, b)
 }
 
-function onChange<Value>(current: () => Value, handler: (value: Value) => void) {
+function onChange<Value>(
+  current: () => Value,
+  handler: (value: Value) => void
+) {
   return (event: CustomEvent<{ value: unknown }>) => {
     const value = event.detail.value as Value
-    if (!same(value, current())) handler(value)
+    if (!same(value, current())) {
+      handler(value)
+    }
   }
 }
 

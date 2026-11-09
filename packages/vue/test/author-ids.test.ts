@@ -2,7 +2,13 @@
 // An id passed to a part is its element's, and every reference to the part points at it.
 import { createApp, defineComponent, h, nextTick, ref } from "vue"
 import { expect, test } from "vitest"
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "../src/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
 import { Tabs, TabsList, TabsPanel, TabsTab } from "../src/tabs"
 import { Toolbar, ToolbarLink } from "../src/toolbar"
 
@@ -30,7 +36,7 @@ test("a dialog's parts keep the ids passed to them, and the dialog points at the
         h(DialogTitle, { id: "heading" }, () => "Profile"),
         h(DialogDescription, { id: "hint" }, () => "Change it."),
       ]),
-    ]),
+    ])
   )
   await settle()
   const trigger = el.querySelector("button")!
@@ -49,10 +55,10 @@ test("a tab keeps the id passed to it, and its panel is labelled by it", async (
   const { el, unmount } = mount(() =>
     h(Tabs, { defaultValue: "a" }, () => [
       h(TabsList, { "aria-label": "Settings" }, () =>
-        h(TabsTab, { value: "a", id: "account" }, () => "Account"),
+        h(TabsTab, { value: "a", id: "account" }, () => "Account")
       ),
       h(TabsPanel, { value: "a" }, () => "A"),
-    ]),
+    ])
   )
   await settle()
   const tab = el.querySelector<HTMLElement>('[role="tab"]')!
@@ -68,24 +74,26 @@ test("a tab's panel follows the id passed to the tab as it changes", async () =>
   const { el, unmount } = mount(() =>
     h(Tabs, { defaultValue: "a" }, () => [
       h(TabsList, { "aria-label": "Settings" }, () =>
-        h(TabsTab, { value: "a", id: id.value }, () => "Account"),
+        h(TabsTab, { value: "a", id: id.value }, () => "Account")
       ),
       h(TabsPanel, { value: "a" }, () => "A"),
-    ]),
+    ])
   )
   await settle()
   id.value = "second"
   await settle()
   expect(el.querySelector('[role="tab"]')!.id).toBe("second")
-  expect(el.querySelector('[role="tabpanel"]')!.getAttribute("aria-labelledby")).toBe("second")
+  expect(
+    el.querySelector('[role="tabpanel"]')!.getAttribute("aria-labelledby")
+  ).toBe("second")
   unmount()
 })
 
 test("a part whose key is its id keeps the id on its element", async () => {
   const { el, unmount } = mount(() =>
     h(Toolbar, { "aria-label": "Formatting" }, () =>
-      h(ToolbarLink, { id: "docs", href: "#docs" }, () => "Docs"),
-    ),
+      h(ToolbarLink, { id: "docs", href: "#docs" }, () => "Docs")
+    )
   )
   await settle()
   expect(el.querySelector("a")!.id).toBe("docs")

@@ -1,16 +1,26 @@
 import "@ui-sdk/web/date-input"
 import "@ui-sdk/web/field"
 import "@ui-sdk/web/time-input"
-import type { DateInputEvents, UiDateInputElement, UiTimeInputElement } from "@ui-sdk/web"
-import { dateInputAction, dateInputFixture as f, dateInputOptions } from "tests/fixtures/date-input.ts"
+import type {
+  DateInputEvents,
+  UiDateInputElement,
+  UiTimeInputElement,
+} from "@ui-sdk/web"
+import {
+  dateInputAction,
+  dateInputFixture as f,
+  dateInputOptions,
+} from "tests/fixtures/date-input.ts"
 
 // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
 function setAttributes(el: Element, options: Record<string, unknown>) {
   for (const [key, value] of Object.entries(options)) {
-    if (value === undefined || value === false) continue
+    if (value === undefined || value === false) {
+      continue
+    }
     el.setAttribute(
       key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
-      value === true ? "" : String(value),
+      value === true ? "" : String(value)
     )
   }
 }
@@ -43,16 +53,26 @@ function mount(root: HTMLElement) {
     </div>
   `
   // Set before the elements reach the page, so they start with these options.
-  setAttributes(template.content.querySelector("#date")!, { ...dateAttributes, ...shared })
-  setAttributes(template.content.querySelector("#time")!, { ...time, ...shared })
+  setAttributes(template.content.querySelector("#date")!, {
+    ...dateAttributes,
+    ...shared,
+  })
+  setAttributes(template.content.querySelector("#time")!, {
+    ...time,
+    ...shared,
+  })
   root.replaceChildren(template.content)
   const dateInput = root.querySelector<UiDateInputElement>("#date")!
   const timeInput = root.querySelector<UiTimeInputElement>("#time")!
-  if (unavailable) dateInput.unavailable = unavailable
+  if (unavailable) {
+    dateInput.unavailable = unavailable
+  }
   const status = root.querySelector("output")!
   dateInput.addEventListener("valuechange", (event) => {
     const { value, reason } = (event as DateInputEvents["valuechange"]).detail
-    if (cancel && value === cancel) return event.preventDefault()
+    if (cancel && value === cancel) {
+      return event.preventDefault()
+    }
     status.textContent = dateInputAction.change("date", value, reason)
   })
   timeInput.addEventListener("valuechange", (event) => {
@@ -62,10 +82,16 @@ function mount(root: HTMLElement) {
   const form = root.querySelector("form")!
   form.addEventListener("submit", (event) => {
     event.preventDefault()
-    root.querySelector("#submitted")!.textContent = JSON.stringify([...new FormData(form)])
+    root.querySelector("#submitted")!.textContent = JSON.stringify([
+      ...new FormData(form),
+    ])
   })
-  root.querySelector("#set")!.addEventListener("click", () => dateInput.api.setValue(f.filled))
-  root.querySelector("#clear")!.addEventListener("click", () => dateInput.api.clear())
+  root
+    .querySelector("#set")!
+    .addEventListener("click", () => dateInput.api.setValue(f.filled))
+  root
+    .querySelector("#clear")!
+    .addEventListener("click", () => dateInput.api.clear())
 }
 
 export { mount }

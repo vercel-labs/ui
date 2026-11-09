@@ -35,7 +35,7 @@ describe("drawer server rendering", () => {
       expect(body).toContain('data-snap-point="0.25"')
       expect(body).toContain("data-interactive")
       expect(body).not.toContain('aria-modal="true"')
-    },
+    }
   )
 
   test("an initially controlled snap point above the threshold remains modal", () => {
@@ -59,7 +59,9 @@ describe("drawer server rendering", () => {
   test("a shortcut renders inside a trigger, with neutral names until the client knows its platform", () => {
     const body = html({ shortcut: true })
     expect(body).toContain('aria-keyshortcuts="Control+G"')
-    expect(body).toMatch(/<span[^>]*aria-hidden="true"[^>]*>(<!---->)?⁦Ctrl\+G⁩/)
+    expect(body).toMatch(
+      /<span[^>]*aria-hidden="true"[^>]*>(<!---->)?⁦Ctrl\+G⁩/
+    )
   })
 
   test("a shortcut inside a trigger connected through a controller renders nothing until the client finds the drawer", () => {

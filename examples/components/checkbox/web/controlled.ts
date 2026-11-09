@@ -19,10 +19,15 @@ function mount(root: HTMLElement) {
     </div>
   `
   const updates = root.querySelector("ui-checkbox")!
-  root.querySelector("[data-slot=controls] button")!.addEventListener("click", () => updates.api.toggle())
+  root
+    .querySelector("[data-slot=controls] button")!
+    .addEventListener("click", () => updates.api.toggle())
   updates.addEventListener("checkedchange", (event) => {
     const { value, reason } = event.detail
-    log(root, `${value === "indeterminate" ? "Mixed" : value ? "Checked" : "Unchecked"} (${reason})`)
+    log(
+      root,
+      `${value === "indeterminate" ? "Mixed" : value ? "Checked" : "Unchecked"} (${reason})`
+    )
   })
 }
 

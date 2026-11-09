@@ -31,7 +31,9 @@ const FileContext = createContext<File | null>(null)
 
 function useFileInput(part: string) {
   const context = useContext(FileInputContext)
-  if (!context) throw new Error(`${part} must be used inside <FileInput>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <FileInput>.`)
+  }
   return context
 }
 
@@ -39,13 +41,23 @@ function useItemFile(part: string, own: () => File | undefined) {
   const listed = useContext(FileContext)
   return () => {
     const file = own() ?? listed
-    if (!file) throw new Error(`${part} must be used inside <FileInputList>, or be given a file.`)
+    if (!file) {
+      throw new Error(
+        `${part} must be used inside <FileInputList>, or be given a file.`
+      )
+    }
     return file
   }
 }
 
-type DivProps<State> = Omit<PartProps<"div", State>, "defaultValue" | "onChange" | "onSelect" | "onDrop">
-type ButtonProps<State> = Omit<PartProps<"button", State>, "name" | "form" | "value" | "onSelect">
+type DivProps<State> = Omit<
+  PartProps<"div", State>,
+  "defaultValue" | "onChange" | "onSelect" | "onDrop"
+>
+type ButtonProps<State> = Omit<
+  PartProps<"button", State>,
+  "name" | "form" | "value" | "onSelect"
+>
 
 // Children that take the part's state are called with it. A function that
 // takes nothing is a child component's accessor, and goes through as it is.
@@ -101,12 +113,13 @@ function FileInput(props: FileInputOptions & DivProps<FileInputState>) {
     "disabled",
     "announcement",
     "controller",
-    "debug",
+    "debug"
   )
   const input = fileInput.slot("input")
   const hidden = <input {...input} />
   // Content, then the hidden input, with function children resolved.
-  const content = (current: FileInputState) => [resolve(rest.children, current), hidden] as JSX.Element
+  const content = (current: FileInputState) =>
+    [resolve(rest.children, current), hidden] as JSX.Element
   const root = merge(rest, {
     get children() {
       return content
@@ -119,15 +132,25 @@ function FileInput(props: FileInputOptions & DivProps<FileInputState>) {
   )
 }
 
-const unconnected: FileInputState = { value: [], disabled: false, required: false, dragging: false }
+const unconnected: FileInputState = {
+  value: [],
+  disabled: false,
+  required: false,
+  dragging: false,
+}
 
 /**
  * Opens the file picker. Inside a Field, the field's label names it with the
  * button's own text. Outside the file input, it connects through `controller`.
  * @stable
  */
-function FileInputTrigger(props: ButtonProps<FileInputState> & FileInputTriggerProps) {
-  const fileInput = useControllerTarget(() => props.controller, useContext(FileInputContext))
+function FileInputTrigger(
+  props: ButtonProps<FileInputState> & FileInputTriggerProps
+) {
+  const fileInput = useControllerTarget(
+    () => props.controller,
+    useContext(FileInputContext)
+  )
   const rest = omit(props, "controller")
   const field = useFieldControl()
   return (
@@ -138,10 +161,18 @@ function FileInputTrigger(props: ButtonProps<FileInputState> & FileInputTriggerP
       fallback={renderStatic(
         "button",
         () => ({ attrs: {}, state: unconnected }),
-        merge({ type: "button" }, rest),
+        merge({ type: "button" }, rest)
       )}
     >
-      {(fileInput) => usePart(fileInput, "trigger", undefined, joinField(field, rest, "button"), "button")}
+      {(fileInput) =>
+        usePart(
+          fileInput,
+          "trigger",
+          undefined,
+          joinField(field, rest, "button"),
+          "button"
+        )
+      }
     </Show>
   )
 }
@@ -158,7 +189,9 @@ const FileInputDropzone = parts.Dropzone
  * FileInputItem in it.
  * @stable
  */
-function FileInputList(props: Omit<DivProps<FileInputState>, "children"> & { children?: JSX.Element }) {
+function FileInputList(
+  props: Omit<DivProps<FileInputState>, "children"> & { children?: JSX.Element }
+) {
   const fileInput = useFileInput("FileInputList")
   // Files keep their identity between changes, so each keeps its item.
   const items = (state: FileInputState) => (
@@ -166,7 +199,13 @@ function FileInputList(props: Omit<DivProps<FileInputState>, "children"> & { chi
       {(file) => <FileContext value={file}>{props.children}</FileContext>}
     </For>
   )
-  return usePart(fileInput, "list", undefined, merge(props, { children: items }), "div")
+  return usePart(
+    fileInput,
+    "list",
+    undefined,
+    merge(props, { children: items }),
+    "div"
+  )
 }
 
 /**
@@ -174,12 +213,18 @@ function FileInputList(props: Omit<DivProps<FileInputState>, "children"> & { chi
  * Arrow keys move between items, and Backspace or Delete removes the focused one.
  * @stable
  */
-function FileInputItem(props: DivProps<FileInputItemState> & Partial<FileInputItemProps>) {
+function FileInputItem(
+  props: DivProps<FileInputItemState> & Partial<FileInputItemProps>
+) {
   const fileInput = useFileInput("FileInputItem")
   const file = useItemFile("FileInputItem", () => props.file)
   const item = () => ({ file: file(), value: fileKey(file()) })
   const rest = omit(props, "file")
-  return <FileContext value={file()}>{usePart(fileInput, "item", item, rest, "div")}</FileContext>
+  return (
+    <FileContext value={file()}>
+      {usePart(fileInput, "item", item, rest, "div")}
+    </FileContext>
+  )
 }
 
 /**
@@ -187,14 +232,20 @@ function FileInputItem(props: DivProps<FileInputItemState> & Partial<FileInputIt
  * name>" unless you name it.
  * @stable
  */
-function FileInputItemRemove(props: ButtonProps<FileInputItemRemoveState> & Partial<FileInputItemProps>) {
+function FileInputItemRemove(
+  props: ButtonProps<FileInputItemRemoveState> & Partial<FileInputItemProps>
+) {
   const fileInput = useFileInput("FileInputItemRemove")
   const file = useItemFile("FileInputItemRemove", () => props.file)
   const item = () => ({ file: file(), value: fileKey(file()) })
   return usePart(fileInput, "item-remove", item, omit(props, "file"), "button")
 }
 
-export { createFileInputController, formatFileSize, relativePath } from "@ui-sdk/core/file-input"
+export {
+  createFileInputController,
+  formatFileSize,
+  relativePath,
+} from "@ui-sdk/core/file-input"
 export type {
   FileInputApi,
   FileInputChange,
@@ -219,4 +270,11 @@ export type {
   FileRules,
 } from "@ui-sdk/core/file-input"
 
-export { FileInput, FileInputDropzone, FileInputItem, FileInputItemRemove, FileInputList, FileInputTrigger }
+export {
+  FileInput,
+  FileInputDropzone,
+  FileInputItem,
+  FileInputItemRemove,
+  FileInputList,
+  FileInputTrigger,
+}

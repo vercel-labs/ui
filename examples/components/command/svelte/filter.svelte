@@ -1,6 +1,12 @@
 <script lang="ts">
   import { CheckIcon, ChevronDownIcon } from "@lucide/svelte"
-  import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@ui-sdk/svelte/command"
+  import {
+    Command,
+    CommandEmpty,
+    CommandInput,
+    CommandItem,
+    CommandList,
+  } from "@ui-sdk/svelte/command"
   import {
     Select,
     SelectContent,
@@ -44,7 +50,7 @@
         item.label
           .toLowerCase()
           .split(" ")
-          .some((part) => part.startsWith(word)),
+          .some((part) => part.startsWith(word))
       )
   }
 
@@ -53,7 +59,11 @@
 
 <div data-slot="stack">
   <div data-slot="controls">
-    <Select items={modes} value={mode} onValueChange={(next) => next && (mode = next as Mode)}>
+    <Select
+      items={modes}
+      value={mode}
+      onValueChange={(next) => next && (mode = next as Mode)}
+    >
       <SelectLabel>Filter</SelectLabel>
       <SelectTrigger>
         <SelectValue />
@@ -72,7 +82,10 @@
     </Select>
   </div>
   <Command filter={mode === "words" ? words : mode}>
-    <CommandInput aria-label="Search commands" placeholder="Try “nf”, “zo in” or “smiley”" />
+    <CommandInput
+      aria-label="Search commands"
+      placeholder="Try “nf”, “zo in” or “smiley”"
+    />
     <CommandEmpty>No results found.</CommandEmpty>
     <CommandList>
       {#each commands as command (command.label)}

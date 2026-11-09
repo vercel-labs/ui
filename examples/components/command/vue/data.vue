@@ -38,7 +38,11 @@ const commands: CommandData = [
           { value: "system", label: "System" },
         ],
       },
-      { value: "language", label: "Change language…", items: ["English", "Français", "Deutsch", "日本語"] },
+      {
+        value: "language",
+        label: "Change language…",
+        items: ["English", "Français", "Deutsch", "日本語"],
+      },
       { value: "sign-out", label: "Sign out", shortcut: "mod+shift+q" },
     ],
   },
@@ -47,13 +51,16 @@ const commands: CommandData = [
 const Commands: FunctionalComponent<{ items: CommandData }> = ({ items }) =>
   items.map((entry, index) => {
     if (typeof entry !== "string" && "type" in entry) {
-      if (entry.type === "separator") return h(CommandSeparator, { key: `separator-${index}` })
+      if (entry.type === "separator") {
+        return h(CommandSeparator, { key: `separator-${index}` })
+      }
       return h(CommandGroup, { key: entry.label }, () => [
         h(CommandGroupLabel, () => entry.label),
         h(Commands, { items: entry.items }),
       ])
     }
-    const command: CommandDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+    const command: CommandDataItem =
+      typeof entry === "string" ? { value: entry, label: entry } : entry
     return h(
       CommandItem,
       {
@@ -63,7 +70,7 @@ const Commands: FunctionalComponent<{ items: CommandData }> = ({ items }) =>
         disabled: command.disabled,
         shortcut: command.shortcut,
       },
-      () => [command.label, command.shortcut && h(CommandShortcut)],
+      () => [command.label, command.shortcut && h(CommandShortcut)]
     )
   })
 
@@ -73,7 +80,10 @@ const log = useLog()
 <template>
   <div data-slot="stack">
     <Command :items="commands" @action="(value: string) => log(`Ran ${value}`)">
-      <CommandInput aria-label="Search commands" placeholder="Type a command…" />
+      <CommandInput
+        aria-label="Search commands"
+        placeholder="Type a command…"
+      />
       <CommandEmpty>No results found.</CommandEmpty>
       <CommandList v-slot="{ state }">
         <Commands :items="state.items" />

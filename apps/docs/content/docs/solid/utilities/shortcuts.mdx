@@ -58,7 +58,10 @@ import { createSignal, onCleanup } from "solid-js"
 
 function Example() {
   const [text, setText] = createSignal("")
-  useShortcut("escape", () => setText(""), { scope: "note", allowInInput: true })
+  useShortcut("escape", () => setText(""), {
+    scope: "note",
+    allowInInput: true,
+  })
   onCleanup(() => shortcuts.setScope("note", false))
 
   return (

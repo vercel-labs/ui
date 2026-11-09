@@ -28,7 +28,12 @@ const resizableFixture = {
         collapsible: true,
       },
       main: { id: "main", label: "Main", minSize: 30 },
-      preview: { id: "preview", label: "Preview", defaultSize: 25, minSize: "120px" as const },
+      preview: {
+        id: "preview",
+        label: "Preview",
+        defaultSize: 25,
+        minSize: "120px" as const,
+      },
     },
     handles: ["Resize sidebar", "Resize preview"],
   },
@@ -36,11 +41,20 @@ const resizableFixture = {
     id: "main-area",
     panels: {
       code: { id: "code", label: "Code", defaultSize: 70, minSize: 20 },
-      terminal: { id: "terminal", label: "Terminal", minSize: 10, collapsible: true },
+      terminal: {
+        id: "terminal",
+        label: "Terminal",
+        minSize: 10,
+        collapsible: true,
+      },
     },
     handle: "Resize terminal",
   },
-  buttons: { collapse: "Collapse sidebar", expand: "Expand sidebar", resize: "Resize preview" },
+  buttons: {
+    collapse: "Collapse sidebar",
+    expand: "Expand sidebar",
+    resize: "Resize preview",
+  },
   previewSize: "200px" as const,
 }
 
@@ -52,9 +66,11 @@ const resizableFixture = {
 // starts, ?step=<n> and ?large-step=<n> set the key steps.
 function resizableOptions() {
   const params = new URLSearchParams(location.search)
-  const number = (name: string) => (params.has(name) ? Number(params.get(name)) : undefined)
+  const number = (name: string) =>
+    params.has(name) ? Number(params.get(name)) : undefined
   return {
-    orientation: (params.get("orientation") ?? undefined) as "horizontal" | "vertical" | undefined,
+    orientation: (params.get("orientation") ?? undefined) as
+      "horizontal" | "vertical" | undefined,
     disabled: params.has("disabled"),
     controlled: params.has("controlled") || params.has("ignore"),
     ignore: params.has("ignore"),

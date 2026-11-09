@@ -13,7 +13,9 @@ const PasswordInputKey = Symbol("password-input")
 
 function usePasswordInput(part: string) {
   const context = getContext<PasswordInputContext | undefined>(PasswordInputKey)
-  if (!context) throw new Error(`${part} must be used inside <PasswordInput>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <PasswordInput>.`)
+  }
   return context
 }
 

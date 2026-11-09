@@ -1,6 +1,10 @@
 import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
-import { Autocomplete, AutocompleteInput, AutocompleteLabel } from "../src/autocomplete"
+import {
+  Autocomplete,
+  AutocompleteInput,
+  AutocompleteLabel,
+} from "../src/autocomplete"
 
 // Runs with no DOM: any access to window or document during render throws.
 // Solid renders boolean attributes bare, like `required`.
@@ -16,7 +20,9 @@ describe("server rendering an autocomplete", () => {
       </Autocomplete>
     ))
     expect(typeof window).toBe("undefined")
-    const field = inputs(html).find((input) => input.includes('role="combobox"'))!
+    const field = inputs(html).find((input) =>
+      input.includes('role="combobox"')
+    )!
     expect(field).toContain('value="Mango"')
     expect(field).toContain('name="fruit"')
     expect(field).toMatch(/\srequired[\s>]/)

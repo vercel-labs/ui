@@ -84,11 +84,21 @@ const variants: Variant[] = [
       title: `${side} ${align}`,
       trigger: `${side} / ${align}`,
       content: { side, align },
-    })),
+    }))
   ),
 
-  { id: "offset-0", section: "Offsets", title: "sideOffset 0", content: { sideOffset: 0 } },
-  { id: "offset-12", section: "Offsets", title: "sideOffset 12", content: { sideOffset: 12 } },
+  {
+    id: "offset-0",
+    section: "Offsets",
+    title: "sideOffset 0",
+    content: { sideOffset: 0 },
+  },
+  {
+    id: "offset-12",
+    section: "Offsets",
+    title: "sideOffset 12",
+    content: { sideOffset: 12 },
+  },
   {
     id: "align-16",
     section: "Offsets",
@@ -287,7 +297,13 @@ const variants: Variant[] = [
     note: "Open on load, until another tooltip opens.",
     options: { defaultOpen: true },
   },
-  { id: "debug", section: "Behavior", title: "debug", note: "Logs state changes.", options: { debug: true } },
+  {
+    id: "debug",
+    section: "Behavior",
+    title: "debug",
+    note: "Logs state changes.",
+    options: { debug: true },
+  },
 
   {
     id: "delay-0",
@@ -303,7 +319,12 @@ const variants: Variant[] = [
     note: "The default. Instant while another tooltip is warm.",
     options: { delay: 600 },
   },
-  { id: "delay-long", section: "Delays", title: "delay 1500", options: { delay: 1500 } },
+  {
+    id: "delay-long",
+    section: "Delays",
+    title: "delay 1500",
+    options: { delay: 1500 },
+  },
   {
     id: "close-delay",
     section: "Delays",
@@ -360,9 +381,25 @@ const variants: Variant[] = [
     note: "Scroll the box.",
     place: "scroll",
   },
-  { id: "clip", section: "Containers", title: "Inside overflow hidden", place: "clip" },
-  { id: "transform", section: "Containers", title: "Inside a transform", place: "transform" },
-  { id: "rtl", section: "Containers", title: "Right to left", place: "rtl", content: { align: "start" } },
+  {
+    id: "clip",
+    section: "Containers",
+    title: "Inside overflow hidden",
+    place: "clip",
+  },
+  {
+    id: "transform",
+    section: "Containers",
+    title: "Inside a transform",
+    place: "transform",
+  },
+  {
+    id: "rtl",
+    section: "Containers",
+    title: "Right to left",
+    place: "rtl",
+    content: { align: "start" },
+  },
   {
     id: "anchor",
     section: "Containers",
@@ -371,7 +408,12 @@ const variants: Variant[] = [
     anchor: true,
   },
 
-  { id: "controlled", section: "State", title: "Controlled open", controlled: true },
+  {
+    id: "controlled",
+    section: "State",
+    title: "Controlled open",
+    controlled: true,
+  },
   {
     id: "controller",
     section: "State",
@@ -388,7 +430,13 @@ const variants: Variant[] = [
     note: "Skipped with data-instant.",
     animation: "default",
   },
-  { id: "anim-slow", section: "Animation", title: "Slow slide", note: "700ms.", animation: "slow" },
+  {
+    id: "anim-slow",
+    section: "Animation",
+    title: "Slow slide",
+    note: "700ms.",
+    animation: "slow",
+  },
 ]
 
 export { rows, toolbar, type Variant, variants }

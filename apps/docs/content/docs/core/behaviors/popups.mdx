@@ -81,7 +81,10 @@ Your primitive can expose popup options alongside its own. Add the fields you ne
 For example, `dismissible: false` keeps Escape and outside presses from closing a popup with unsaved work. `onDismissAttempt` tells you why someone tried to dismiss it:
 
 ```tsx
-<Cart dismissible={false} onDismissAttempt={(details) => setStatus(`Kept open: ${details.reason}`)}>
+<Cart
+  dismissible={false}
+  onDismissAttempt={(details) => setStatus(`Kept open: ${details.reason}`)}
+>
   {children}
 </Cart>
 ```
@@ -211,7 +214,11 @@ A popup controller lets an event handler open a popup and wait for its result. E
 Create a controller and pass it to the popup. Here the payload is a point:
 
 ```tsx
-import { createPopoverController, Popover, PopoverContent } from "@ui-sdk/react/popover"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+} from "@ui-sdk/react/popover"
 
 const note = createPopoverController<{ x: number; y: number }>()
 

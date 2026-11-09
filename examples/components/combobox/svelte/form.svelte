@@ -14,7 +14,12 @@
     ComboboxTrigger,
     ComboboxValue,
   } from "@ui-sdk/svelte/combobox"
-  import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/svelte/field"
+  import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldLabel,
+  } from "@ui-sdk/svelte/field"
   import { useLog } from "../../../shared/svelte/log"
 
   const countries = [
@@ -37,7 +42,8 @@
     { value: "ch", label: "Switzerland" },
   ]
 
-  const countryLabel = (value: string) => countries.find((country) => country.value === value)?.label ?? value
+  const countryLabel = (value: string) =>
+    countries.find((country) => country.value === value)?.label ?? value
 
   const interests = ["Design", "Engineering", "Marketing", "Research", "Sales"]
 
@@ -45,9 +51,9 @@
 
   function submit(event: SubmitEvent) {
     event.preventDefault()
-    const entries = [...new FormData(event.currentTarget as HTMLFormElement)].map(
-      ([name, value]) => `${name}=${value}`,
-    )
+    const entries = [
+      ...new FormData(event.currentTarget as HTMLFormElement),
+    ].map(([name, value]) => `${name}=${value}`)
     log(`Submitted ${entries.join("&")}`)
   }
 </script>

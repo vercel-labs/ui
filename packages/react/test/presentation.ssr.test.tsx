@@ -9,10 +9,26 @@ import {
   AutocompleteItem,
   AutocompleteList,
 } from "../src/autocomplete"
-import { Combobox, ComboboxContent, ComboboxInput, ComboboxItem, ComboboxList } from "../src/combobox"
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../src/dialog"
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "../src/combobox"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "../src/dialog"
 import { Menu, MenuContent, MenuItem, MenuTrigger } from "../src/menu"
-import { Popover, PopoverContent, PopoverTitle, PopoverTrigger } from "../src/popover"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+  PopoverTrigger,
+} from "../src/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger } from "../src/select"
 
 // Runs with no DOM. `presentation="auto"` is decided at open on the client, so

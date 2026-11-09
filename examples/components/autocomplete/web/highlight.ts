@@ -36,7 +36,7 @@ function mount(root: HTMLElement) {
                 <ui-autocomplete-item value="${fruit}">
                   <ui-autocomplete-item-text>${fruit}</ui-autocomplete-item-text>
                 </ui-autocomplete-item>
-              `,
+              `
             )
             .join("")}
         </ui-autocomplete-list>

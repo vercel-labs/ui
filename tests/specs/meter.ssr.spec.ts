@@ -6,13 +6,25 @@ test.beforeEach(({ framework }) => {
 })
 
 const hydrationErrors = (page: import("@playwright/test").Page) =>
-  page.evaluate(() => (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors)
+  page.evaluate(
+    () =>
+      (window as unknown as { __hydrationErrors: string[] }).__hydrationErrors
+  )
 
-test("meters hydrate without mismatches, and stay named", async ({ page, open }) => {
+test("meters hydrate without mismatches, and stay named", async ({
+  page,
+  open,
+}) => {
   await open("meter")
   await page.waitForLoadState("networkidle")
-  await expect(page.getByRole("meter", { name: "Storage" })).toHaveAttribute("aria-valuenow", "60")
+  await expect(page.getByRole("meter", { name: "Storage" })).toHaveAttribute(
+    "aria-valuenow",
+    "60"
+  )
   await page.getByRole("button", { name: "Fill" }).click()
-  await expect(page.getByRole("meter", { name: "Storage" })).toHaveAttribute("aria-valuenow", "80")
+  await expect(page.getByRole("meter", { name: "Storage" })).toHaveAttribute(
+    "aria-valuenow",
+    "80"
+  )
   expect(await hydrationErrors(page)).toEqual([])
 })

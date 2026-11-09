@@ -1,12 +1,16 @@
 import type { ButtonEvents, UiToggleGroupElement } from "@ui-sdk/web"
 import { changedValue, toggleOptions } from "tests/fixtures/page.ts"
-import { toggleAction, toggleFixture, type ToggleFixtureItem } from "tests/fixtures/toggle.ts"
+import {
+  toggleAction,
+  toggleFixture,
+  type ToggleFixtureItem,
+} from "tests/fixtures/toggle.ts"
 
 const toggles = (items: ToggleFixtureItem[]) =>
   items
     .map(
       (item) =>
-        `<ui-toggle value="${item.value}"${item.disabled ? " disabled" : ""}><button class="toggle">${item.label}</button></ui-toggle>`,
+        `<ui-toggle value="${item.value}"${item.disabled ? " disabled" : ""}><button class="toggle">${item.label}</button></ui-toggle>`
     )
     .join("")
 
@@ -50,51 +54,84 @@ function markup() {
 
 // A Promise and the buttons that settle it.
 function gate() {
-  let settle: { resolve: () => void; reject: (reason: Error) => void } | undefined
+  let settle:
+    { resolve: () => void; reject: (reason: Error) => void } | undefined
   return {
-    wait: () => new Promise<void>((resolve, reject) => (settle = { resolve, reject })),
+    wait: () =>
+      new Promise<void>((resolve, reject) => (settle = { resolve, reject })),
     resolve: () => settle?.resolve(),
     reject: () => settle?.reject(new Error("Offline")),
   }
 }
 
 async function mount(root: HTMLElement) {
-  const { cancel, defaultPressed, disabled, alignment, orientation, deselectable, loop } = toggleOptions()
+  const {
+    cancel,
+    defaultPressed,
+    disabled,
+    alignment,
+    orientation,
+    deselectable,
+    loop,
+  } = toggleOptions()
   root.innerHTML = markup()
   const output = root.querySelector('output[aria-label="Last action"]')!
   const say = (text: string) => (output.textContent = text)
 
   const bookmark = root.querySelector("#bookmark")!
-  if (defaultPressed) bookmark.setAttribute("default-pressed", "")
+  if (defaultPressed) {
+    bookmark.setAttribute("default-pressed", "")
+  }
   for (const group of root.querySelectorAll("ui-toggle-group")) {
-    if (orientation) group.setAttribute("orientation", orientation)
-    if (!deselectable) group.setAttribute("deselectable", "false")
-    if (!loop) group.setAttribute("loop", "false")
+    if (orientation) {
+      group.setAttribute("orientation", orientation)
+    }
+    if (!deselectable) {
+      group.setAttribute("deselectable", "false")
+    }
+    if (!loop) {
+      group.setAttribute("loop", "false")
+    }
   }
   // URL options go in as attributes, never as markup, so a crafted URL can't add elements.
   root
     .querySelector('[name="alignment"]')!
-    .setAttribute("default-value", alignment || toggleFixture.alignment.defaultValue.join(","))
-  const formatting = root.querySelector<UiToggleGroupElement>('[name="formatting"]')!
-  if (disabled) formatting.setAttribute("disabled", "")
+    .setAttribute(
+      "default-value",
+      alignment || toggleFixture.alignment.defaultValue.join(",")
+    )
+  const formatting = root.querySelector<UiToggleGroupElement>(
+    '[name="formatting"]'
+  )!
+  if (disabled) {
+    formatting.setAttribute("disabled", "")
+  }
 
   await import("@ui-sdk/web/toggle")
   await import("@ui-sdk/web/button")
   await import("@ui-sdk/web/separator")
 
   bookmark.addEventListener("pressedchange", (event) => {
-    if (cancel === toggleFixture.toggle.value) return event.preventDefault()
-    say(toggleAction.toggle((event as CustomEvent<{ value: boolean }>).detail.value))
+    if (cancel === toggleFixture.toggle.value) {
+      return event.preventDefault()
+    }
+    say(
+      toggleAction.toggle(
+        (event as CustomEvent<{ value: boolean }>).detail.value
+      )
+    )
   })
   root.addEventListener(
     "valuechange",
     (event) => {
       const group = event.target as UiToggleGroupElement
       const value = (event as CustomEvent<{ value: string[] }>).detail.value
-      if (cancel && changedValue(group.value, value) === cancel) return event.preventDefault()
+      if (cancel && changedValue(group.value, value) === cancel) {
+        return event.preventDefault()
+      }
       say(toggleAction.group(group.getAttribute("name")!, value))
     },
-    { capture: true },
+    { capture: true }
   )
 
   const saving = gate()
@@ -104,21 +141,35 @@ async function mount(root: HTMLElement) {
     (event) => {
       const button = event.target as HTMLElement
       const { source, waitUntil } = (event as ButtonEvents["action"]).detail
-      if (button.dataset.action) say(button.dataset.action)
-      if (button.dataset.action === "save")
-        root.querySelector('output[aria-label="Pressed with"]')!.textContent = source
-      if (button.id === "submit") waitUntil(saving.wait())
+      if (button.dataset.action) {
+        say(button.dataset.action)
+      }
+      if (button.dataset.action === "save") {
+        root.querySelector('output[aria-label="Pressed with"]')!.textContent =
+          source
+      }
+      if (button.id === "submit") {
+        waitUntil(saving.wait())
+      }
       if (button.id === "publish") {
         say("publishing")
         waitUntil(publishing.wait().then(() => say("published")))
       }
     },
-    { capture: true },
+    { capture: true }
   )
-  root.querySelector("#clear")!.addEventListener("click", () => formatting.api.setValue([]))
-  root.querySelector("#finish-saving")!.addEventListener("click", saving.resolve)
-  root.querySelector("#finish-publishing")!.addEventListener("click", publishing.resolve)
-  root.querySelector("#fail-publishing")!.addEventListener("click", publishing.reject)
+  root
+    .querySelector("#clear")!
+    .addEventListener("click", () => formatting.api.setValue([]))
+  root
+    .querySelector("#finish-saving")!
+    .addEventListener("click", saving.resolve)
+  root
+    .querySelector("#finish-publishing")!
+    .addEventListener("click", publishing.resolve)
+  root
+    .querySelector("#fail-publishing")!
+    .addEventListener("click", publishing.reject)
   root.querySelector("form")!.addEventListener("submit", (event) => {
     event.preventDefault()
     const count = root.querySelector('output[aria-label="Submissions"]')!

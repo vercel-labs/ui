@@ -1,6 +1,10 @@
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { TokenInput, TokenInputEditor, type TokenInputValue } from "@ui-sdk/solid/token-input"
+import {
+  TokenInput,
+  TokenInputEditor,
+  type TokenInputValue,
+} from "@ui-sdk/solid/token-input"
 import { createSignal, createUniqueId } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -20,7 +24,10 @@ function Example() {
     <div data-slot="stack">
       <div data-slot="controls">
         <label data-slot="label">
-          <Checkbox checked={disabled()} onCheckedChange={(next) => setDisabled(next === true)}>
+          <Checkbox
+            checked={disabled()}
+            onCheckedChange={(next) => setDisabled(next === true)}
+          >
             <CheckboxIndicator>
               <svg
                 viewBox="0 0 24 24"
@@ -38,7 +45,10 @@ function Example() {
           Disabled
         </label>
         <label data-slot="label">
-          <Checkbox checked={readOnly()} onCheckedChange={(next) => setReadOnly(next === true)}>
+          <Checkbox
+            checked={readOnly()}
+            onCheckedChange={(next) => setReadOnly(next === true)}
+          >
             <CheckboxIndicator>
               <svg
                 viewBox="0 0 24 24"
@@ -59,7 +69,13 @@ function Example() {
       <div data-slot="stack">
         <Field disabled={disabled()}>
           <FieldLabel>Prompt</FieldLabel>
-          <TokenInput form={formId} name="prompt" required defaultValue={draft} readOnly={readOnly()}>
+          <TokenInput
+            form={formId}
+            name="prompt"
+            required
+            defaultValue={draft}
+            readOnly={readOnly()}
+          >
             <TokenInputEditor />
           </TokenInput>
         </Field>
@@ -68,7 +84,9 @@ function Example() {
           data-slot="row"
           onSubmit={(event) => {
             event.preventDefault()
-            log(`Submitted ${new FormData(event.currentTarget).get("prompt") ?? ""}`)
+            log(
+              `Submitted ${new FormData(event.currentTarget).get("prompt") ?? ""}`
+            )
           }}
         >
           <button type="submit" data-variant="solid">

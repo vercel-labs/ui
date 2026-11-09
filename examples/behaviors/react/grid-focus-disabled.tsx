@@ -17,12 +17,16 @@ const theater = definePrimitive({
       key: "active",
       rows: () => 3,
       cols: () => 6,
-      disabled: (cell) => context.options().taken.includes(`${cell.row}:${cell.col}`),
+      disabled: (cell) =>
+        context.options().taken.includes(`${cell.row}:${cell.col}`),
     }),
   }),
   slots: (slot) => ({
     root: slot({ attrs: () => ({ role: "grid" }) }),
-    row: slot<{ id: string }>({ props: { id: "string" }, attrs: () => ({ role: "row" }) }),
+    row: slot<{ id: string }>({
+      props: { id: "string" },
+      attrs: () => ({ role: "row" }),
+    }),
     seat: slot<{ id: string; row: number; col: number }>({
       props: { row: "number", col: "number" },
       attrs: (state, { props, api }) => ({
@@ -32,7 +36,8 @@ const theater = definePrimitive({
       }),
       on: {
         keydown: (event, { api }) => api.grid.keydown(event),
-        pointerdown: (event, { api, props }) => api.grid.focus(props, { reason: "item-press", event }),
+        pointerdown: (event, { api, props }) =>
+          api.grid.focus(props, { reason: "item-press", event }),
       },
       bind: (el, { api, props }) => api.grid.bind(el, props),
     }),
@@ -45,8 +50,18 @@ const Theater = parts.Root
 
 const TheaterRow = parts.Row
 
-function TheaterSeat({ row, col, ...props }: { row: number; col: number } & PartProps<"div">) {
-  return usePart(theater, "seat", { id: `${row}:${col}`, row, col }, props, "div")
+function TheaterSeat({
+  row,
+  col,
+  ...props
+}: { row: number; col: number } & PartProps<"div">) {
+  return usePart(
+    theater,
+    "seat",
+    { id: `${row}:${col}`, row, col },
+    props,
+    "div"
+  )
 }
 
 const letters = "ABC"
@@ -78,4 +93,12 @@ function Example() {
   )
 }
 
-export { Example, theater, Theater, TheaterRow, TheaterSeat, type TheaterOptions, type TheaterState }
+export {
+  Example,
+  theater,
+  Theater,
+  TheaterRow,
+  TheaterSeat,
+  type TheaterOptions,
+  type TheaterState,
+}

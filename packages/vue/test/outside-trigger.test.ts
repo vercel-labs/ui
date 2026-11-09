@@ -14,13 +14,40 @@ import {
   type App,
   type Component,
 } from "vue"
-import { createDialogController, Dialog, DialogContent, DialogTrigger } from "../src/dialog"
+import {
+  createDialogController,
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from "../src/dialog"
 import { createDrawerController, Drawer, DrawerTrigger } from "../src/drawer"
-import { createFileInputController, FileInput, FileInputTrigger } from "../src/file-input"
-import { createHoverCardController, HoverCard, HoverCardTrigger } from "../src/hover-card"
-import { createMenuController, Menu, MenuContextTrigger, MenuTrigger } from "../src/menu"
-import { createPopoverController, Popover, PopoverTrigger } from "../src/popover"
-import { createSelectController, Select, SelectTrigger, SelectValue } from "../src/select"
+import {
+  createFileInputController,
+  FileInput,
+  FileInputTrigger,
+} from "../src/file-input"
+import {
+  createHoverCardController,
+  HoverCard,
+  HoverCardTrigger,
+} from "../src/hover-card"
+import {
+  createMenuController,
+  Menu,
+  MenuContextTrigger,
+  MenuTrigger,
+} from "../src/menu"
+import {
+  createPopoverController,
+  Popover,
+  PopoverTrigger,
+} from "../src/popover"
+import {
+  createSelectController,
+  Select,
+  SelectTrigger,
+  SelectValue,
+} from "../src/select"
 import {
   createTooltipController,
   Tooltip,
@@ -62,7 +89,8 @@ type Case = {
   content?: Component
 }
 
-const popupOf = (role: string) => (el: Element) => el.getAttribute("aria-haspopup") === role
+const popupOf = (role: string) => (el: Element) =>
+  el.getAttribute("aria-haspopup") === role
 const cases: Case[] = [
   {
     name: "dialog",
@@ -140,7 +168,8 @@ describe.each(cases)(
       const shared = controller()
       const shown = shallowRef(false)
       let fromRef: Element | null = null
-      const ref = (component: { $el?: Element } | null) => (fromRef ??= component?.$el ?? null)
+      const ref = (component: { $el?: Element } | null) =>
+        (fromRef ??= component?.$el ?? null)
       const el = mount(() => [
         h(trigger, { ...attrs, controller: shared, ref }, () => "Open"),
         shown.value && h(root, { controller: shared }),
@@ -177,20 +206,37 @@ describe.each(cases)(
       expect(el.firstElementChild).toBe(element)
       expect(document.activeElement).toBe(element)
     })
-  },
+  }
 )
 
-describe.each(cases.filter((each) => each.name !== "select" && each.name !== "file input"))(
+describe.each(
+  cases.filter((each) => each.name !== "select" && each.name !== "file input")
+)(
   "a $name trigger inside another $name",
-  ({ root, trigger, controller, attrs, opened = (el) => el.hasAttribute("data-open"), content }) => {
+  ({
+    root,
+    trigger,
+    controller,
+    attrs,
+    opened = (el) => el.hasAttribute("data-open"),
+    content,
+  }) => {
     test("connects to the one its controller names", async () => {
       const around = controller() as { isOpen: () => boolean }
       const other = controller() as { open: () => void }
       const el = mount(() => [
         h(root, { controller: around }, () =>
-          h(trigger, { ...attrs, controller: other, id: "trigger" }, () => "Open"),
+          h(
+            trigger,
+            { ...attrs, controller: other, id: "trigger" },
+            () => "Open"
+          )
         ),
-        h(root, { controller: other }, () => content && h(content, { id: "other-content" })),
+        h(
+          root,
+          { controller: other },
+          () => content && h(content, { id: "other-content" })
+        ),
       ])
       await wait()
       other.open()
@@ -198,7 +244,7 @@ describe.each(cases.filter((each) => each.name !== "select" && each.name !== "fi
       expect(opened(el.querySelector("#trigger")!)).toBe(true)
       expect(around.isOpen()).toBe(false)
     })
-  },
+  }
 )
 
 test("a dialog trigger inside one dialog opens the dialog its controller names", async () => {
@@ -206,15 +252,20 @@ test("a dialog trigger inside one dialog opens the dialog its controller names",
   const other = createDialogController()
   const el = mount(() => [
     h(Dialog, { controller: around }, () =>
-      h(DialogTrigger, { controller: other, id: "trigger" }, () => "Open"),
+      h(DialogTrigger, { controller: other, id: "trigger" }, () => "Open")
     ),
-    h(Dialog, { controller: other }, () => h(DialogContent, { id: "other-content" })),
+    h(Dialog, { controller: other }, () =>
+      h(DialogContent, { id: "other-content" })
+    ),
   ])
   await wait()
   const element = el.querySelector<HTMLElement>("#trigger")!
   element.click()
   await wait()
-  expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({ other: true, around: false })
+  expect({ other: other.isOpen(), around: around.isOpen() }).toEqual({
+    other: true,
+    around: false,
+  })
   expect(element.getAttribute("aria-controls")).toBe("other-content")
 })
 
@@ -222,17 +273,17 @@ test("a file input trigger inside one file input opens the picker of the one its
   const other = createFileInputController()
   const el = mount(() => [
     h(FileInput, { name: "around" }, () =>
-      h(FileInputTrigger, { controller: other, id: "trigger" }, () => "Browse"),
+      h(FileInputTrigger, { controller: other, id: "trigger" }, () => "Browse")
     ),
     h(FileInput, { controller: other, name: "other" }),
   ])
   await wait()
   const picked: string[] = []
-  const pick = vi.spyOn(HTMLInputElement.prototype, "click").mockImplementation(function (
-    this: HTMLInputElement,
-  ) {
-    picked.push(this.name)
-  })
+  const pick = vi
+    .spyOn(HTMLInputElement.prototype, "click")
+    .mockImplementation(function (this: HTMLInputElement) {
+      picked.push(this.name)
+    })
   el.querySelector<HTMLElement>("#trigger")!.click()
   pick.mockRestore()
   expect(picked).toEqual(["other"])
@@ -241,7 +292,9 @@ test("a file input trigger inside one file input opens the picker of the one its
 test("a trigger inside its own dialog, given that dialog's controller, hydrates as rendered and stays bound", async () => {
   const shared = createDialogController()
   const view = () =>
-    h(Dialog, { controller: shared }, () => h(DialogTrigger, { controller: shared }, () => "Open"))
+    h(Dialog, { controller: shared }, () =>
+      h(DialogTrigger, { controller: shared }, () => "Open")
+    )
   const container = document.body.appendChild(document.createElement("div"))
   container.innerHTML = await renderToString(createSSRApp(view))
   const element = container.firstElementChild as HTMLElement
@@ -261,8 +314,12 @@ test("a trigger inside its own dialog, given that dialog's controller, hydrates 
 test("a trigger inside one dialog, given another's controller, hydrates as rendered and then binds to the other", async () => {
   const other = createDialogController()
   const view = () => [
-    h(Dialog, null, () => h(DialogTrigger, { controller: other, id: "trigger" }, () => "Open")),
-    h(Dialog, { controller: other }, () => h(DialogContent, { id: "other-content" })),
+    h(Dialog, null, () =>
+      h(DialogTrigger, { controller: other, id: "trigger" }, () => "Open")
+    ),
+    h(Dialog, { controller: other }, () =>
+      h(DialogContent, { id: "other-content" })
+    ),
   ]
   const container = document.body.appendChild(document.createElement("div"))
   container.innerHTML = await renderToString(createSSRApp(() => view()))
@@ -286,7 +343,10 @@ test("a tooltip shortcut inside a trigger shows the shortcut of the tooltip its 
   const el = mount(() => [
     h(Tooltip, { controller: first, shortcut: "mod+a" }),
     h(Tooltip, { controller: second, shortcut: "mod+b" }),
-    h(TooltipTrigger, { controller: current.value }, () => ["Open ", h(TooltipShortcut)]),
+    h(TooltipTrigger, { controller: current.value }, () => [
+      "Open ",
+      h(TooltipShortcut),
+    ]),
   ])
   await wait()
   const element = el.querySelector("button")!
@@ -314,7 +374,12 @@ describe("a select trigger outside its select with a value inside", () => {
       const shown = shallowRef(false)
       const el = mount(() => [
         h(SelectTrigger, { controller: shared }, content),
-        shown.value && h(Select, { controller: shared, items: ["apple", "banana"], defaultValue: "banana" }),
+        shown.value &&
+          h(Select, {
+            controller: shared,
+            items: ["apple", "banana"],
+            defaultValue: "banana",
+          }),
       ])
       await wait()
       const element = el.firstElementChild as HTMLElement
@@ -324,7 +389,7 @@ describe("a select trigger outside its select with a value inside", () => {
       await wait()
       expect(el.firstElementChild).toBe(element)
       expect(element.textContent).toBe("banana")
-    },
+    }
   )
 })
 
@@ -332,9 +397,15 @@ test("a select trigger inside one select connects to the select its controller n
   const other = createSelectController()
   const el = mount(() => [
     h(Select, { items: ["apple", "banana"], defaultValue: "apple" }, () =>
-      h(SelectTrigger, { controller: other, id: "trigger" }, () => h(SelectValue)),
+      h(SelectTrigger, { controller: other, id: "trigger" }, () =>
+        h(SelectValue)
+      )
     ),
-    h(Select, { controller: other, items: ["apple", "banana"], defaultValue: "banana" }),
+    h(Select, {
+      controller: other,
+      items: ["apple", "banana"],
+      defaultValue: "banana",
+    }),
   ])
   await wait()
   expect(el.querySelector("#trigger")!.textContent).toBe("banana")

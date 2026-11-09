@@ -12,7 +12,14 @@ import type { PrimitiveContext } from "../kernel/primitive-types"
  * @experimental
  */
 type InlineEditReason =
-  "edit-key" | "type" | "double-click" | "enter-key" | "escape-key" | "focus-out" | "tab-key" | "imperative"
+  | "edit-key"
+  | "type"
+  | "double-click"
+  | "enter-key"
+  | "escape-key"
+  | "focus-out"
+  | "tab-key"
+  | "imperative"
 
 /**
  * How `createInlineEdit` reads and saves values.
@@ -27,7 +34,11 @@ type InlineEditOptions<State extends object> = {
    * Saves the text and returns whether it went through. Return `false` to
    * keep editing, like when the text isn't valid.
    */
-  commit: (id: string, text: string, details: { reason: InlineEditReason; event?: Event }) => boolean
+  commit: (
+    id: string,
+    text: string,
+    details: { reason: InlineEditReason; event?: Event }
+  ) => boolean
   /** Whether an id can't be edited. */
   disabled?: (id: string) => boolean
 }
@@ -50,7 +61,7 @@ type InlineEditOptions<State extends object> = {
  */
 function createInlineEdit<State extends object>(
   context: Pick<PrimitiveContext<any, State, any>, "store">,
-  options: InlineEditOptions<State>,
+  options: InlineEditOptions<State>
 ) {
   const { store } = context
   const editing = () => store.get()[options.key] as string | null
@@ -61,7 +72,8 @@ function createInlineEdit<State extends object>(
   // The Rename button or menu item that started editing may be gone by the
   // end, so focus can fall back to the focusable element around the input.
   let inputHolder: HTMLElement | null = null
-  const set = (id: string | null) => store.set({ [options.key]: id } as Partial<State>)
+  const set = (id: string | null) =>
+    store.set({ [options.key]: id } as Partial<State>)
 
   function finish(refocus: boolean) {
     set(null)
@@ -71,12 +83,18 @@ function createInlineEdit<State extends object>(
     input = undefined
     // Only when focus was lost with the input: code that moved it on, like a
     // grid going to the next cell after Tab, keeps its place.
-    if (refocus)
+    if (refocus) {
       queueMicrotask(() => {
         const back = targets.find((el) => el?.isConnected)
         const active = back?.ownerDocument.activeElement
-        if (back && (!active || active === back.ownerDocument.body || !active.isConnected)) back.focus()
+        if (
+          back &&
+          (!active || active === back.ownerDocument.body || !active.isConnected)
+        ) {
+          back.focus()
+        }
       })
+    }
   }
 
   const api = {
@@ -87,10 +105,15 @@ function createInlineEdit<State extends object>(
     /** Starts editing an id. With `text`, the input starts with it instead of the value, as typing does. */
     start(
       id: string,
-      details: { reason: InlineEditReason; event?: Event; text?: string } = { reason: "imperative" },
+      details: { reason: InlineEditReason; event?: Event; text?: string } = {
+        reason: "imperative",
+      }
     ) {
-      if (options.disabled?.(id) || editing() === id) return false
-      const active = typeof document === "undefined" ? null : document.activeElement
+      if (options.disabled?.(id) || editing() === id) {
+        return false
+      }
+      const active =
+        typeof document === "undefined" ? null : document.activeElement
       origin = active instanceof HTMLElement ? active : undefined
       start =
         details.text === undefined
@@ -105,7 +128,15 @@ function createInlineEdit<State extends object>(
      * with that character.
      */
     keydown(event: KeyboardEvent, id: string) {
-      if (event.defaultPrevented || editing() || event.ctrlKey || event.metaKey || event.altKey) return false
+      if (
+        event.defaultPrevented ||
+        editing() ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.altKey
+      ) {
+        return false
+      }
       if (event.key === "Enter" || event.key === "F2") {
         event.preventDefault()
         return api.start(id, { reason: "edit-key", event })
@@ -127,16 +158,26 @@ function createInlineEdit<State extends object>(
       el.value = start.text
       el.focus()
       // Typing replaces, so the caret goes after the typed character; Enter keeps the text selected.
-      if (start.typed) el.setSelectionRange(el.value.length, el.value.length)
-      else el.select()
+      if (start.typed) {
+        el.setSelectionRange(el.value.length, el.value.length)
+      } else {
+        el.select()
+      }
       return () => {
-        if (input === el) input = undefined
+        if (input === el) {
+          input = undefined
+        }
       }
     },
     /** Handles a key in the input: Enter and Tab save, Escape puts the text back. Returns whether it handled the key. */
     inputKeydown(event: KeyboardEvent) {
-      if (isComposing(event)) return false
-      if (event.key === "Enter" && !(event.target instanceof HTMLTextAreaElement && event.shiftKey)) {
+      if (isComposing(event)) {
+        return false
+      }
+      if (
+        event.key === "Enter" &&
+        !(event.target instanceof HTMLTextAreaElement && event.shiftKey)
+      ) {
         event.preventDefault()
         return api.end("enter-key", event)
       }
@@ -156,11 +197,17 @@ function createInlineEdit<State extends object>(
     /** Saves what the input holds and stops editing. Returns whether it saved. */
     end(reason: InlineEditReason = "imperative", event?: Event) {
       const id = editing()
-      if (!id) return false
+      if (!id) {
+        return false
+      }
       const text = input?.value ?? start.text
-      const saved = text === options.value(id) || options.commit(id, text, { reason, event })
+      const saved =
+        text === options.value(id) ||
+        options.commit(id, text, { reason, event })
       if (!saved) {
-        if (reason !== "focus-out") input?.focus()
+        if (reason !== "focus-out") {
+          input?.focus()
+        }
         return false
       }
       finish(reason !== "focus-out")
@@ -168,7 +215,9 @@ function createInlineEdit<State extends object>(
     },
     /** Stops editing without saving. */
     cancel() {
-      if (editing()) finish(true)
+      if (editing()) {
+        finish(true)
+      }
     },
   }
   return api
@@ -180,4 +229,9 @@ function createInlineEdit<State extends object>(
  */
 type InlineEdit = ReturnType<typeof createInlineEdit>
 
-export { createInlineEdit, type InlineEdit, type InlineEditOptions, type InlineEditReason }
+export {
+  createInlineEdit,
+  type InlineEdit,
+  type InlineEditOptions,
+  type InlineEditReason,
+}

@@ -18,8 +18,15 @@ function onStatus(status: string, details: ChangeDetails) {
   <div class="fixture">
     <button>Before</button>
     <Avatar :key="mounts" class="avatar" @loading-status-change="onStatus">
-      <AvatarImage v-if="src !== undefined" class="avatar-image" :src="src" :alt="first.name" />
-      <AvatarFallback class="avatar-fallback">{{ first.initials }}</AvatarFallback>
+      <AvatarImage
+        v-if="src !== undefined"
+        class="avatar-image"
+        :src="src"
+        :alt="first.name"
+      />
+      <AvatarFallback class="avatar-fallback">{{
+        first.initials
+      }}</AvatarFallback>
     </Avatar>
     <Avatar v-for="item in rest" :key="item.name" class="avatar">
       <AvatarImage
@@ -30,7 +37,9 @@ function onStatus(status: string, details: ChangeDetails) {
         :referrerpolicy="item.referrerPolicy"
         :crossorigin="item.crossOrigin"
       />
-      <AvatarFallback class="avatar-fallback" :delay="item.delay">{{ item.initials }}</AvatarFallback>
+      <AvatarFallback class="avatar-fallback" :delay="item.delay">{{
+        item.initials
+      }}</AvatarFallback>
     </Avatar>
     <button @click="src = avatarFixture.nextSrc">Change image</button>
     <button @click="src = undefined">Remove image</button>

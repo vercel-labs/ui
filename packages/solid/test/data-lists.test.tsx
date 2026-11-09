@@ -7,7 +7,11 @@ import { Command } from "../src/command"
 import { Listbox, ListboxItems } from "../src/listbox"
 import { Menu, MenuTrigger } from "../src/menu"
 import { Select, SelectTrigger } from "../src/select"
-import { createTriggerMenuController, TriggerMenu, TriggerMenuInput } from "../src/trigger-menu"
+import {
+  createTriggerMenuController,
+  TriggerMenu,
+  TriggerMenuInput,
+} from "../src/trigger-menu"
 import { Tree } from "../src/tree"
 
 let dispose = () => {}
@@ -25,14 +29,18 @@ afterEach(() => {
 })
 
 const settle = async () => {
-  for (let i = 0; i < 3; i++) await Promise.resolve()
+  for (let i = 0; i < 3; i++) {
+    await Promise.resolve()
+  }
   flush()
 }
 
 type Row = { value: string; label: string; disabled?: boolean }
 
 const rowNamed = (role: string, name: string) =>
-  [...document.querySelectorAll(`[role="${role}"]`)].find((row) => row.textContent === name)
+  [...document.querySelectorAll(`[role="${role}"]`)].find(
+    (row) => row.textContent === name
+  )
 
 // Changes the first row's item in place, the usual Solid store update, so the
 // list gets no new array or object, only new values for the fields its rows read.
@@ -55,7 +63,11 @@ async function changeFirstItem(role: string, open: (items: Row[]) => void) {
 }
 
 const cases: [string, string, (items: Row[]) => any][] = [
-  ["a data listbox", "option", (items) => <Listbox aria-label="Letters" items={items} />],
+  [
+    "a data listbox",
+    "option",
+    (items) => <Listbox aria-label="Letters" items={items} />,
+  ],
   [
     "ListboxItems",
     "option",
@@ -102,13 +114,18 @@ const cases: [string, string, (items: Row[]) => any][] = [
       </Menu>
     ),
   ],
-  ["a data tree", "treeitem", (items) => <Tree aria-label="Letters" items={items} />],
+  [
+    "a data tree",
+    "treeitem",
+    (items) => <Tree aria-label="Letters" items={items} />,
+  ],
 ]
 
 describe("a data list whose store item changes in place", () => {
-  for (const [name, role, list] of cases)
+  for (const [name, role, list] of cases) {
     test(`${name} updates the same row's label and disabled state`, () =>
       changeFirstItem(role, (items) => mount(() => list(items))))
+  }
 
   test("a trigger menu updates the same row's label and disabled state", () =>
     changeFirstItem("option", (items) => {
@@ -127,7 +144,9 @@ describe("a data list whose store item changes in place", () => {
 // show, so a change in place reaches the instance too, not only the rows.
 describe("a data list changed in place", () => {
   const press = (key: string) =>
-    document.activeElement!.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true }))
+    document.activeElement!.dispatchEvent(
+      new KeyboardEvent("keydown", { key, bubbles: true })
+    )
   const focused = () => document.activeElement?.textContent
 
   test("a listbox won't select an item disabled in place", async () => {
@@ -137,7 +156,13 @@ describe("a data list changed in place", () => {
       { value: "c", label: "Gamma" },
     ])
     const picked: unknown[] = []
-    mount(() => <Listbox aria-label="Letters" items={items} onValueChange={(value) => picked.push(value)} />)
+    mount(() => (
+      <Listbox
+        aria-label="Letters"
+        items={items}
+        onValueChange={(value) => picked.push(value)}
+      />
+    ))
     await settle()
     setItems((draft) => {
       draft[1].disabled = true
@@ -201,7 +226,9 @@ describe("a data list changed in place", () => {
   })
 
   test("a select's value shows a label changed in place", async () => {
-    const [items, setItems] = createStore<Row[]>([{ value: "a", label: "Alpha" }])
+    const [items, setItems] = createStore<Row[]>([
+      { value: "a", label: "Alpha" },
+    ])
     mount(() => (
       <Select items={items} value="a">
         <SelectTrigger />
@@ -212,11 +239,15 @@ describe("a data list changed in place", () => {
       draft[0].label = "Changed"
     })
     await settle()
-    expect(document.querySelector('[data-slot="select-value"]')!.textContent).toBe("Changed")
+    expect(
+      document.querySelector('[data-slot="select-value"]')!.textContent
+    ).toBe("Changed")
   })
 
   test("a combobox filters an item pushed in place", async () => {
-    const [items, setItems] = createStore<Row[]>([{ value: "a", label: "Alpha" }])
+    const [items, setItems] = createStore<Row[]>([
+      { value: "a", label: "Alpha" },
+    ])
     mount(() => (
       <Combobox items={items} defaultOpen>
         <ComboboxInput aria-label="Letter" />
@@ -231,23 +262,32 @@ describe("a data list changed in place", () => {
       draft.push({ value: "g", label: "Gamma" })
     })
     await settle()
-    expect([...document.querySelectorAll('[role="option"]')].map((row) => row.textContent)).toEqual(["Gamma"])
+    expect(
+      [...document.querySelectorAll('[role="option"]')].map(
+        (row) => row.textContent
+      )
+    ).toEqual(["Gamma"])
   })
 
   test("a tree's arrow keys reach a child pushed in place", async () => {
-    const [items, setItems] = createStore<{ value: string; label: string; children?: Row[] }[]>([
+    const [items, setItems] = createStore<
+      { value: string; label: string; children?: Row[] }[]
+    >([
       { value: "a", label: "Alpha", children: [{ value: "a1", label: "One" }] },
     ])
-    mount(() => <Tree aria-label="Letters" items={items} defaultExpanded={["a"]} />)
+    mount(() => (
+      <Tree aria-label="Letters" items={items} defaultExpanded={["a"]} />
+    ))
     await settle()
     setItems((draft) => {
       draft[0].children!.push({ value: "a2", label: "Two" })
     })
     await settle()
-    const label = (row: Element | null) => row?.querySelector('[data-slot="tree-label"]')?.textContent
-    const one = [...document.querySelectorAll<HTMLElement>('[role="treeitem"]')].find(
-      (row) => label(row) === "One",
-    )!
+    const label = (row: Element | null) =>
+      row?.querySelector('[data-slot="tree-label"]')?.textContent
+    const one = [
+      ...document.querySelectorAll<HTMLElement>('[role="treeitem"]'),
+    ].find((row) => label(row) === "One")!
     one.focus()
     press("ArrowDown")
     await settle()

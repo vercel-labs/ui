@@ -9,17 +9,29 @@ export default defineNuxtConfig({
     head: {
       title: "Tracker",
       htmlAttrs: { lang: "en" },
-      meta: [{ name: "description", content: "An issue tracker built with ui-sdk." }],
+      meta: [
+        { name: "description", content: "An issue tracker built with ui-sdk." },
+      ],
     },
   },
   build: { transpile: [/@ui-sdk\//, "tracker-data"] },
-  typescript: { tsConfig: { compilerOptions: { noUncheckedIndexedAccess: false } } },
-  nitro: { typescript: { tsConfig: { compilerOptions: { noUncheckedIndexedAccess: false } } } },
+  typescript: {
+    tsConfig: { compilerOptions: { noUncheckedIndexedAccess: false } },
+  },
+  nitro: {
+    typescript: {
+      tsConfig: { compilerOptions: { noUncheckedIndexedAccess: false } },
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
     define: process.env.TRACKER_REVIEW ? { __VUE_PROD_DEVTOOLS__: "true" } : {},
   },
   vue: process.env.TRACKER_REVIEW
-    ? { compilerOptions: { nodeTransforms: [vueSourceLocations(import.meta.dirname)] } }
+    ? {
+        compilerOptions: {
+          nodeTransforms: [vueSourceLocations(import.meta.dirname)],
+        },
+      }
     : {},
 })

@@ -39,7 +39,12 @@ import {
 import { onItemsChange } from "tests/fixtures/items.ts"
 import { longItems, serializeForm } from "tests/fixtures/select.ts"
 
-type Item = { value: string; label: string; keywords?: string[]; disabled?: boolean }
+type Item = {
+  value: string
+  label: string
+  keywords?: string[]
+  disabled?: boolean
+}
 
 function Item(props: Item & { highlight: boolean }) {
   return (
@@ -63,9 +68,17 @@ function DataItems(props: { items: ListData; highlight: boolean }) {
   return (
     <For each={props.items}>
       {(entry) => {
-        if (typeof entry === "string") return <Item value={entry} label={entry} highlight={props.highlight} />
-        if ("value" in entry) return <Item {...entry} highlight={props.highlight} />
-        if (entry.type === "separator") return <ComboboxSeparator />
+        if (typeof entry === "string") {
+          return (
+            <Item value={entry} label={entry} highlight={props.highlight} />
+          )
+        }
+        if ("value" in entry) {
+          return <Item {...entry} highlight={props.highlight} />
+        }
+        if (entry.type === "separator") {
+          return <ComboboxSeparator />
+        }
         return (
           <ComboboxGroup>
             <ComboboxGroupLabel class="label">{entry.label}</ComboboxGroupLabel>
@@ -100,7 +113,9 @@ function Fixture(props: { data?: boolean }) {
   } = comboboxOptions()
   const [action, setAction] = createSignal("")
   const [submitted, setSubmitted] = createSignal("")
-  const [created, setCreated] = createSignal<{ value: string; label: string }[]>([])
+  const [created, setCreated] = createSignal<
+    { value: string; label: string }[]
+  >([])
   const [list, setList] = createSignal<Item[]>(f.items)
   // With ?late, there are no items until the first change.
   const [arrived, setArrived] = createSignal(false)
@@ -111,9 +126,11 @@ function Fixture(props: { data?: boolean }) {
       onItemsChange(changedItems, (items) => {
         setList(items)
         setArrived(true)
-      }),
+      })
   )
-  const remote = useAsyncOptions(pages ? searchCountryPages : searchCountries, { immediate: async || pages })
+  const remote = useAsyncOptions(pages ? searchCountryPages : searchCountries, {
+    immediate: async || pages,
+  })
   const fromData = () => props.data || async || long || recent || pages
   const all = long ? longItems() : []
   const items = () =>
@@ -123,17 +140,34 @@ function Fixture(props: { data?: boolean }) {
         ? all
         : grouped
           ? [
-              { type: "group" as const, label: f.groups[0].label, items: f.groups[0].items },
-              { type: "group" as const, label: f.groups[1].label, items: f.groups[1].items },
+              {
+                type: "group" as const,
+                label: f.groups[0].label,
+                items: f.groups[0].items,
+              },
+              {
+                type: "group" as const,
+                label: f.groups[1].label,
+                items: f.groups[1].items,
+              },
             ]
           : [...list(), ...created()]
   const onCreate = async (query: string) => {
     setAction(`create:${query}`)
     await createDelay(slow)
-    setCreated((list) => [...list, { value: query.toLowerCase(), label: query }])
+    setCreated((list) => [
+      ...list,
+      { value: query.toLowerCase(), label: query },
+    ])
   }
   const labels = createMemo(
-    () => new Map([...f.items, ...list(), ...created()].map((item) => [item.value, item.label])),
+    () =>
+      new Map(
+        [...f.items, ...list(), ...created()].map((item) => [
+          item.value,
+          item.label,
+        ])
+      )
   )
   return (
     <div class="fixture">
@@ -151,20 +185,41 @@ function Fixture(props: { data?: boolean }) {
             {...options}
             name={f.name}
             container={container}
-            items={late ? (arrived() ? items() : undefined) : fromData() ? items() : undefined}
+            items={
+              late
+                ? arrived()
+                  ? items()
+                  : undefined
+                : fromData()
+                  ? items()
+                  : undefined
+            }
             emptyItems={recent ? f.recent : undefined}
             filter={async || pages ? false : undefined}
             status={async || pages ? remote.status : undefined}
             onLoadMore={pages ? remote.loadMore : undefined}
-            itemToLabel={labelsFromItems ? undefined : (value) => labels().get(value) ?? value}
+            itemToLabel={
+              labelsFromItems
+                ? undefined
+                : (value) => labels().get(value) ?? value
+            }
             onValueChange={(value, details) => {
-              if (cancelsValue(value, cancel)) return details.cancel()
-              setAction(`value:${Array.isArray(value) ? value.join(",") : String(value)}`)
+              if (cancelsValue(value, cancel)) {
+                return details.cancel()
+              }
+              setAction(
+                `value:${Array.isArray(value) ? value.join(",") : String(value)}`
+              )
             }}
-            onQueryChange={(query) => (async || pages) && remote.setQuery(query)}
+            onQueryChange={(query) =>
+              (async || pages) && remote.setQuery(query)
+            }
           >
             <ComboboxLabel class="label">{f.label}</ComboboxLabel>
-            <Show when={options.multiple} fallback={<ComboboxInput class="input" />}>
+            <Show
+              when={options.multiple}
+              fallback={<ComboboxInput class="input" />}
+            >
               <ComboboxChips class={overflow ? "chips chips-line" : "chips"}>
                 <Chips labels={labels()} />
                 <Show when={overflow}>
@@ -180,11 +235,24 @@ function Fixture(props: { data?: boolean }) {
             </Show>
             <ComboboxTrigger aria-label={f.trigger}>▾</ComboboxTrigger>
             <ComboboxClear>{f.clear}</ComboboxClear>
-            <Show when={!late} fallback={<ComboboxContent class="popup list-popup" />}>
-              <ComboboxContent class={pages ? "popup list-popup list-short" : "popup list-popup"}>
+            <Show
+              when={!late}
+              fallback={<ComboboxContent class="popup list-popup" />}
+            >
+              <ComboboxContent
+                class={
+                  pages ? "popup list-popup list-short" : "popup list-popup"
+                }
+              >
                 <Show when={!nostatus}>
                   <ComboboxStatus class="status">
-                    {(state) => (state.loading ? (pages ? "Loading more…" : "Loading…") : "")}
+                    {(state) =>
+                      state.loading
+                        ? pages
+                          ? "Loading more…"
+                          : "Loading…"
+                        : ""
+                    }
                   </ComboboxStatus>
                 </Show>
                 <ComboboxEmpty class="empty">{f.empty}</ComboboxEmpty>
@@ -193,28 +261,39 @@ function Fixture(props: { data?: boolean }) {
                   fallback={
                     <ComboboxList>
                       <Show when={selectAll && !grouped}>
-                        <ComboboxSelectAll class="item">{f.selectAll}</ComboboxSelectAll>
+                        <ComboboxSelectAll class="item">
+                          {f.selectAll}
+                        </ComboboxSelectAll>
                       </Show>
                       <Show
                         when={grouped}
                         fallback={
                           // Keyed by value, so replaced items that stay keep their elements, like a React key.
-                          <For each={[...list(), ...created()]} keyed={(item) => item.value}>
-                            {(item) => <Item {...item()} highlight={highlight} />}
+                          <For
+                            each={[...list(), ...created()]}
+                            keyed={(item) => item.value}
+                          >
+                            {(item) => (
+                              <Item {...item()} highlight={highlight} />
+                            )}
                           </For>
                         }
                       >
                         <For each={f.groups}>
                           {(group) => (
                             <ComboboxGroup>
-                              <ComboboxGroupLabel class="label">{group.label}</ComboboxGroupLabel>
+                              <ComboboxGroupLabel class="label">
+                                {group.label}
+                              </ComboboxGroupLabel>
                               <Show when={selectAll}>
                                 <ComboboxSelectAll class="item">
                                   {f.selectAll} {group.label}
                                 </ComboboxSelectAll>
                               </Show>
                               <For each={group.items}>
-                                {(item) => <Item {...item} highlight={highlight} />}
+                                {(item) => (
+                                  <Item {...item} highlight={highlight} />
+                                )}
                               </For>
                             </ComboboxGroup>
                           )}
@@ -230,9 +309,14 @@ function Fixture(props: { data?: boolean }) {
                     {(state) => (
                       <>
                         <Show when={selectAll}>
-                          <ComboboxSelectAll class="item">{f.selectAll}</ComboboxSelectAll>
+                          <ComboboxSelectAll class="item">
+                            {f.selectAll}
+                          </ComboboxSelectAll>
                         </Show>
-                        <DataItems items={state.items as ListData} highlight={highlight} />
+                        <DataItems
+                          items={state.items as ListData}
+                          highlight={highlight}
+                        />
                         <Show when={create}>
                           <ComboboxCreate class="item" onCreate={onCreate} />
                         </Show>
@@ -268,7 +352,9 @@ function Chips(props: { labels: Map<string, string> }) {
           {(item) => (
             <ComboboxChip class="chip" value={item}>
               {label(item)}
-              <ComboboxChipRemove aria-label={`Remove ${label(item)}`}>×</ComboboxChipRemove>
+              <ComboboxChipRemove aria-label={`Remove ${label(item)}`}>
+                ×
+              </ComboboxChipRemove>
             </ComboboxChip>
           )}
         </For>

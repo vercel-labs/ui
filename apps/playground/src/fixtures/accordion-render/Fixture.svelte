@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui-sdk/svelte"
+  import {
+    Accordion,
+    AccordionHeader,
+    AccordionItem,
+    AccordionPanel,
+    AccordionTrigger,
+  } from "@ui-sdk/svelte"
   import { describeValue } from "tests/fixtures/accordion.ts"
 
   let action = $state("")
@@ -7,7 +13,11 @@
 
 <div class="fixture">
   <button>Before</button>
-  <Accordion class="accordion" defaultValue={["overview"]} onValueChange={(value) => (action = describeValue(value))}>
+  <Accordion
+    class="accordion"
+    defaultValue={["overview"]}
+    onValueChange={(value) => (action = describeValue(value))}
+  >
     <AccordionItem class="accordion-item" value="overview">
       {#snippet children(state)}
         <span class={state.open ? "is-open" : "is-closed"} hidden></span>
@@ -17,7 +27,9 @@
               <AccordionTrigger class="accordion-trigger">
                 {#snippet render({ props, state: trigger })}
                   <button {...props}>
-                    Overview<span aria-hidden="true"> {trigger.open ? "−" : "+"}</span>
+                    Overview<span aria-hidden="true">
+                      {trigger.open ? "−" : "+"}</span
+                    >
                     <span class="index" hidden>{trigger.index}</span>
                   </button>
                 {/snippet}
@@ -40,7 +52,8 @@
           {/snippet}
         </AccordionTrigger>
       </AccordionHeader>
-      <AccordionPanel class="accordion-panel">The details panel.</AccordionPanel>
+      <AccordionPanel class="accordion-panel">The details panel.</AccordionPanel
+      >
     </AccordionItem>
   </Accordion>
   <button>After</button>

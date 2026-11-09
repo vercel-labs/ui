@@ -13,23 +13,43 @@ const directive = '"use client";'
  */
 function findServerModuleProblems({ packageDir, outDir, serverModules }) {
   const problems = []
-  const servers = new Set(serverModules.map((file) => file.replace(/\.tsx?$/, ".js")))
-  const manifest = JSON.parse(readFileSync(path.join(packageDir, "package.json"), "utf8"))
-  const published = Object.entries(manifest.publishConfig.exports).map(([key, target]) => ({
-    entry: `${manifest.name}${key.slice(1)}`,
-    file: path.relative("dist", target.default ?? target),
-  }))
+  const servers = new Set(
+    serverModules.map((file) => file.replace(/\.tsx?$/, ".js"))
+  )
+  const manifest = JSON.parse(
+    readFileSync(path.join(packageDir, "package.json"), "utf8")
+  )
+  const published = Object.entries(manifest.publishConfig.exports).map(
+    ([key, target]) => ({
+      entry: `${manifest.name}${key.slice(1)}`,
+      file: path.relative("dist", target.default ?? target),
+    })
+  )
   const entryFiles = new Set(published.map(({ file }) => file))
   for (const file of readdirSync(outDir, { recursive: true })) {
-    if (!file.endsWith(".js")) continue
+    if (!file.endsWith(".js")) {
+      continue
+    }
     const code = readFileSync(path.join(outDir, file), "utf8")
     const client = code.startsWith(directive)
-    if (servers.has(file) && client)
-      problems.push(`${file} starts with "use client", but it's a server module.`)
-    if (!servers.has(file) && !client) problems.push(`${file} doesn't start with "use client".`)
+    if (servers.has(file) && client) {
+      problems.push(
+        `${file} starts with "use client", but it's a server module.`
+      )
+    }
+    if (!servers.has(file) && !client) {
+      problems.push(`${file} doesn't start with "use client".`)
+    }
     // Under "use client" an entry's re-export becomes a client reference too.
-    if (client && entryFiles.has(file) && /export \{[^}]*\brenderElement\b/.test(code))
-      problems.push(`${file} exports renderElement under "use client", so a Server Component can't call it.`)
+    if (
+      client &&
+      entryFiles.has(file) &&
+      /export \{[^}]*\brenderElement\b/.test(code)
+    ) {
+      problems.push(
+        `${file} exports renderElement under "use client", so a Server Component can't call it.`
+      )
+    }
   }
   for (const { entry } of published.filter(({ file }) => servers.has(file))) {
     const probe = `
@@ -49,10 +69,13 @@ function findServerModuleProblems({ packageDir, outDir, serverModules }) {
         "--eval",
         probe,
       ],
-      { cwd: packageDir, encoding: "utf8" },
+      { cwd: packageDir, encoding: "utf8" }
     )
-    if (run.status !== 0)
-      problems.push(`${entry} doesn't run in a Server Component: ${run.stderr.trim().split("\n").at(-1)}`)
+    if (run.status !== 0) {
+      problems.push(
+        `${entry} doesn't run in a Server Component: ${run.stderr.trim().split("\n").at(-1)}`
+      )
+    }
   }
   return problems
 }

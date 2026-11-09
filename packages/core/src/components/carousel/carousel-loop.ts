@@ -42,24 +42,33 @@ function createCarouselLoop(options: {
   const shownFirst = (slides: Slide[]) =>
     Math.max(
       0,
-      slides.findIndex((slide) => slide.key === firstKey),
+      slides.findIndex((slide) => slide.key === firstKey)
     )
 
   function reset(slides: Slide[]) {
     firstKey = null
-    if (!ordered) return
+    if (!ordered) {
+      return
+    }
     ordered = false
     clearSlideOrder(slides)
   }
 
-  function rotate(to?: { page: number; heading: 1 | -1 }, { lazy = false } = {}) {
+  function rotate(
+    to?: { page: number; heading: 1 | -1 },
+    { lazy = false } = {}
+  ) {
     const motion = options.motion()
-    if (!track || !view || !motion || motion.isHeld()) return
+    if (!track || !view || !motion || motion.isHeld()) {
+      return
+    }
     const slides = options.slides()
     const first = shownFirst(slides)
     const position = motion.position()
     const pick = loopRotation(track, view, { position, first }, to, { lazy })
-    if (!pick || pick.first === first) return
+    if (!pick || pick.first === first) {
+      return
+    }
     const before = options.visual()
     const key = slides[pick.first].key
     firstKey = key
@@ -70,9 +79,13 @@ function createCarouselLoop(options: {
       rotating = false
     }
     // The slides didn't follow the order, and the measure reset it.
-    if (firstKey !== key) return
+    if (firstKey !== key) {
+      return
+    }
     const after = options.visual()
-    motion.shift(position, pick.delta, (index) => (index < 0 ? index : after.indexOf(before[index])))
+    motion.shift(position, pick.delta, (index) =>
+      index < 0 ? index : after.indexOf(before[index])
+    )
   }
 
   return {
@@ -103,13 +116,23 @@ function createCarouselLoop(options: {
      * A looping carousel's pages from measured slides, with `first` shown
      * first, or null when it can't loop seamlessly and rewinds instead.
      */
-    layout(boxes: readonly CarouselSlideBox[], next: CarouselLoopView, first: number | undefined) {
+    layout(
+      boxes: readonly CarouselSlideBox[],
+      next: CarouselLoopView,
+      first: number | undefined
+    ) {
       view = next
       track = first === undefined ? null : measureTrack(boxes, first)
-      if (first && !track) unsupported = true
-      if (track && !canLoop(track, view)) track = null
+      if (first && !track) {
+        unsupported = true
+      }
+      if (track && !canLoop(track, view)) {
+        track = null
+      }
       // A rotation that didn't hold goes back to the slides' own order on the next measure.
-      if (first && !track) firstKey = null
+      if (first && !track) {
+        firstKey = null
+      }
       return track && loopPages(track, view, first ?? 0)
     },
     /** Clears the rotation, when the viewport goes. */
@@ -123,10 +146,13 @@ function createCarouselLoop(options: {
      */
     rotateToward(index: number, heading?: 1 | -1) {
       const motion = options.motion()
-      if (!track || !motion) return
+      if (!track || !motion) {
+        return
+      }
       const pages = options.pages()
       const at = motion.position()
-      const ahead = (index - nearestPage(pages, at) + pages.length) % pages.length
+      const ahead =
+        (index - nearestPage(pages, at) + pages.length) % pages.length
       const way =
         ahead === 0
           ? Math.sign(pages[index].position - at)
@@ -135,7 +161,9 @@ function createCarouselLoop(options: {
     },
     /** Rotates at rest, so the current page sits mid-track. */
     recenter() {
-      if (track && !rotating && !options.motion()?.isMoving()) rotate()
+      if (track && !rotating && !options.motion()?.isMoving()) {
+        rotate()
+      }
     },
   }
 }

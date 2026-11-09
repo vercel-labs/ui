@@ -1,6 +1,10 @@
 "use client"
 
-import { Resizable, ResizableHandle, ResizablePanel } from "@ui-sdk/react/resizable"
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from "@ui-sdk/react/resizable"
 
 function Example() {
   return (
@@ -9,7 +13,9 @@ function Example() {
         {(state) => (
           <>
             <h3>Files</h3>
-            <span data-slot="hint">{state.collapsed ? "Collapsed" : `${Math.round(state.size)}%`}</span>
+            <span data-slot="hint">
+              {state.collapsed ? "Collapsed" : `${Math.round(state.size)}%`}
+            </span>
           </>
         )}
       </ResizablePanel>

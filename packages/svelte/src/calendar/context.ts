@@ -17,13 +17,19 @@ const CalendarGridKey = Symbol("calendar-grid")
 
 function useCalendar(part: string) {
   const context = getContext<CalendarContext | undefined>(CalendarKey)
-  if (!context) throw new Error(`${part} must be used inside <Calendar> or <DatePickerContent>.`)
+  if (!context) {
+    throw new Error(
+      `${part} must be used inside <Calendar> or <DatePickerContent>.`
+    )
+  }
   return context
 }
 
 function useCalendarGrid(part: string) {
   const context = getContext<CalendarGridContext | undefined>(CalendarGridKey)
-  if (!context) throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <CalendarGrid>.`)
+  }
   return context
 }
 
@@ -34,7 +40,10 @@ function useOptionalGrid() {
 
 // The offsets of the months shown, from 0, for a grid each. At least one.
 function monthOffsets(months: number | undefined) {
-  return Array.from({ length: Math.max(1, Math.floor(months ?? 1) || 1) }, (_, offset) => offset)
+  return Array.from(
+    { length: Math.max(1, Math.floor(months ?? 1) || 1) },
+    (_, offset) => offset
+  )
 }
 
 export {

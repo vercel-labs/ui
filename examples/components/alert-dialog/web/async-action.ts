@@ -38,11 +38,15 @@ function mount(root: HTMLElement) {
 
   async function deleteProject() {
     await new Promise((resolve) => setTimeout(resolve, 1200))
-    if (attempts++ === 0) throw new Error("Couldn't delete the project.")
+    if (attempts++ === 0) {
+      throw new Error("Couldn't delete the project.")
+    }
   }
 
   close.addEventListener("action", (event) => {
-    const { waitUntil } = (event as CustomEvent<{ waitUntil: (promise: Promise<unknown>) => void }>).detail
+    const { waitUntil } = (
+      event as CustomEvent<{ waitUntil: (promise: Promise<unknown>) => void }>
+    ).detail
     button.textContent = "Deleting…"
     message.textContent = ""
     const deleting = deleteProject()
@@ -54,11 +58,13 @@ function mount(root: HTMLElement) {
       (error: Error) => {
         button.textContent = "Try Again"
         message.textContent = error.message
-      },
+      }
     )
   })
   dialog.addEventListener("openchange", (event) => {
-    if (!event.detail.value) return
+    if (!event.detail.value) {
+      return
+    }
     button.textContent = "Delete"
     message.textContent = ""
   })

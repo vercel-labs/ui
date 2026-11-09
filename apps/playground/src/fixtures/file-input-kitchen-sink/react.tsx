@@ -7,13 +7,30 @@ import {
   FileInputList,
   FileInputTrigger,
 } from "@ui-sdk/react/file-input"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { classes as c, renderShell } from "./shell"
-import { announcementFor, describe, sampleFile, validateName, type Variant } from "./variants"
+import {
+  announcementFor,
+  describe,
+  sampleFile,
+  validateName,
+  type Variant,
+} from "./variants"
 
-function Card({ variant, log }: { variant: Variant; log: (text: string) => void }) {
+function Card({
+  variant,
+  log,
+}: {
+  variant: Variant
+  log: (text: string) => void
+}) {
   const [controller] = React.useState(createFileInputController)
   const [files, setFiles] = React.useState<File[]>([])
   const note = React.useRef<HTMLTextAreaElement>(null)
@@ -40,15 +57,25 @@ function Card({ variant, log }: { variant: Variant; log: (text: string) => void 
           pasteTarget={variant.pasteTarget ? () => note.current : undefined}
         >
           <span>{page ? "Drop files anywhere" : "Drop files here"}</span>
-          {variant.trigger && <FileInputTrigger className={c.button}>Choose files</FileInputTrigger>}
+          {variant.trigger && (
+            <FileInputTrigger className={c.button}>
+              Choose files
+            </FileInputTrigger>
+          )}
           {variant.nested && (
-            <FileInput onValueChange={(_, details) => log(`inner ${describe(details)}`)}>
-              <FileInputDropzone className={c.zone}>Inner zone</FileInputDropzone>
+            <FileInput
+              onValueChange={(_, details) => log(`inner ${describe(details)}`)}
+            >
+              <FileInputDropzone className={c.zone}>
+                Inner zone
+              </FileInputDropzone>
             </FileInput>
           )}
         </FileInputDropzone>
       ) : (
-        variant.trigger && <FileInputTrigger className={c.button}>Choose files</FileInputTrigger>
+        variant.trigger && (
+          <FileInputTrigger className={c.button}>Choose files</FileInputTrigger>
+        )
       )}
       {variant.list && (
         <FileInputList className={c.list} aria-label="Files">
@@ -56,7 +83,9 @@ function Card({ variant, log }: { variant: Variant; log: (text: string) => void 
             {({ file }) => (
               <>
                 {file.name}
-                <FileInputItemRemove className={c.remove}>×</FileInputItemRemove>
+                <FileInputItemRemove className={c.remove}>
+                  ×
+                </FileInputItemRemove>
               </>
             )}
           </FileInputItem>
@@ -72,22 +101,38 @@ function Card({ variant, log }: { variant: Variant; log: (text: string) => void 
         <Field>
           <FieldLabel>Files</FieldLabel>
           {input}
-          <FieldDescription className={c.description}>Required.</FieldDescription>
+          <FieldDescription className={c.description}>
+            Required.
+          </FieldDescription>
           <FieldError className={c.error} />
         </Field>
       ) : (
         input
       )}
-      {variant.pasteTarget && <textarea ref={note} className={c.note} aria-label="Paste here" />}
+      {variant.pasteTarget && (
+        <textarea ref={note} className={c.note} aria-label="Paste here" />
+      )}
       {variant.controller && (
         <div className="flex gap-2">
-          <button type="button" className={c.button} onClick={() => controller.addFiles([sampleFile()])}>
+          <button
+            type="button"
+            className={c.button}
+            onClick={() => controller.addFiles([sampleFile()])}
+          >
             Add a sample file
           </button>
-          <button type="button" className={c.button} onClick={() => controller.open()}>
+          <button
+            type="button"
+            className={c.button}
+            onClick={() => controller.open()}
+          >
             Open the picker
           </button>
-          <button type="button" className={c.button} onClick={() => controller.clear()}>
+          <button
+            type="button"
+            className={c.button}
+            onClick={() => controller.clear()}
+          >
             Clear
           </button>
         </div>
@@ -109,8 +154,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <Card variant={variant} log={log} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

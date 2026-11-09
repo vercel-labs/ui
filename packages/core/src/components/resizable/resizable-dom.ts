@@ -3,11 +3,19 @@
 import { isAfter } from "../../foundation/kernel/order"
 import { bindDrag } from "../../foundation/drag-and-drop/pointer"
 import { isRTL } from "../../foundation/platform/env"
-import type { Part, PrimitiveContext } from "../../foundation/kernel/primitive-types"
+import type {
+  Part,
+  PrimitiveContext,
+} from "../../foundation/kernel/primitive-types"
 import { onProps } from "../../foundation/kernel/part"
 import type { ResizableHandleProps, ResizableOptions } from "./resizable"
 import type { State } from "./resizable-api"
-import { refreshCursor, registerHandle, releaseHandle, type HandleTarget } from "./resizable-handles"
+import {
+  refreshCursor,
+  registerHandle,
+  releaseHandle,
+  type HandleTarget,
+} from "./resizable-handles"
 import type { PanelSizes } from "./resizable-layout"
 import { elements } from "../../foundation/kernel/elements"
 
@@ -26,9 +34,18 @@ type Group = {
   handleValue: (key: string) => { now: number; min: number; max: number } | null
 }
 
-const sizeProps = ["defaultSize", "minSize", "maxSize", "collapsible", "collapsedSize"] as const
+const sizeProps = [
+  "defaultSize",
+  "minSize",
+  "maxSize",
+  "collapsible",
+  "collapsedSize",
+] as const
 
-function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>, group: () => Group) {
+function resizableDom(
+  context: PrimitiveContext<ResizableOptions, State, string>,
+  group: () => Group
+) {
   const { store, element } = context
   // The pixels panels share, as last measured.
   let space = 0
@@ -37,7 +54,9 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
   function spaceOf() {
     const axis = group().vertical() ? "height" : "width"
     let total = 0
-    for (const { el } of elements(context, "panel")) total += el.getBoundingClientRect()[axis]
+    for (const { el } of elements(context, "panel")) {
+      total += el.getBoundingClientRect()[axis]
+    }
     return total
   }
 
@@ -54,7 +73,7 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
     group().setPanels(
       panels.map((panel) => panel.key),
       panels.map((panel) => (panel.props ?? {}) as PanelSizes),
-      space,
+      space
     )
     return panels
   }
@@ -63,12 +82,14 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
   // interaction. The panels are in the order the last reconcile found, so
   // nothing is sorted.
   function refresh() {
-    if (!element("panel")) return
+    if (!element("panel")) {
+      return
+    }
     const { ids } = store.get()
     group().setPanels(
       ids,
       ids.map((id) => context.props<PanelSizes>("panel", id) ?? {}),
-      space,
+      space
     )
   }
 
@@ -81,7 +102,9 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
     const handles: Record<string, number> = {}
     let before = -1
     for (const { el, key } of elements(context, "handle")) {
-      while (before + 1 < panels.length && isAfter(panels[before + 1].el, el)) before++
+      while (before + 1 < panels.length && isAfter(panels[before + 1].el, el)) {
+        before++
+      }
       handles[key] = before
     }
     group().setHandles(handles)
@@ -89,7 +112,9 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
 
   let scheduled = false
   function schedule() {
-    if (scheduled) return
+    if (scheduled) {
+      return
+    }
     scheduled = true
     queueMicrotask(() => {
       scheduled = false
@@ -99,18 +124,30 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
 
   // A press from the page's handle hit areas. The space is measured once, so
   // moves never read layout.
-  function press(event: PointerEvent, key: string, el: HTMLElement, release: () => void) {
+  function press(
+    event: PointerEvent,
+    key: string,
+    el: HTMLElement,
+    release: () => void
+  ) {
     const handle = group().handleIndex(key)
-    if (handle === null) return
+    if (handle === null) {
+      return
+    }
     measure()
-    if (!space || !group().startDrag(handle, key)) return release()
+    if (!space || !group().startDrag(handle, key)) {
+      return release()
+    }
     const rtl = isRTL(element("root") ?? el)
     const vertical = group().vertical()
     const origin = vertical ? event.clientY : event.clientX
     const stop = bindDrag(el, event, {
       onMove: (sample) => {
         const moved = (vertical ? sample.y : sample.x) - origin
-        group().dragBy(((rtl && !vertical ? -moved : moved) / space) * 100, sample.event)
+        group().dragBy(
+          ((rtl && !vertical ? -moved : moved) / space) * 100,
+          sample.event
+        )
         refreshCursor(el.ownerDocument)
       },
       onEnd: (end) => {
@@ -132,18 +169,26 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
     const value = group().handleValue(key)
     const vertical = group().vertical()
     const both = vertical ? "ns-resize" : "ew-resize"
-    if (!value) return both
+    if (!value) {
+      return both
+    }
     const atMin = value.now <= value.min + 1e-6
     const atMax = value.now >= value.max - 1e-6
-    if (atMin === atMax) return both
-    if (vertical) return atMin ? "s-resize" : "n-resize"
+    if (atMin === atMax) {
+      return both
+    }
+    if (vertical) {
+      return atMin ? "s-resize" : "n-resize"
+    }
     return atMin !== isRTL(el) ? "e-resize" : "w-resize"
   }
 
   const bindings = {
     bindRoot(el: HTMLElement) {
       schedule()
-      if (typeof ResizeObserver === "undefined") return
+      if (typeof ResizeObserver === "undefined") {
+        return
+      }
       // Resizing panels inside the observer's callback would resize nested
       // groups in the same frame, which browsers report as a loop error.
       const view = el.ownerDocument.defaultView ?? window
@@ -166,7 +211,9 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
       let sizes = part.props as PanelSizes
       const unwatch = onProps(part, () => {
         const next = part.props as PanelSizes
-        if (sizeProps.every((name) => next[name] === sizes[name])) return
+        if (sizeProps.every((name) => next[name] === sizes[name])) {
+          return
+        }
         sizes = next
         schedule()
       })
@@ -190,14 +237,19 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
         cursor: () => cursor(key, el),
         start: (event) => press(event, key, el, () => releaseHandle(target)),
         hover: (hovered) => {
-          if (hovered) store.set({ hovering: key })
-          else if (store.get().hovering === key) store.set({ hovering: null })
+          if (hovered) {
+            store.set({ hovering: key })
+          } else if (store.get().hovering === key) {
+            store.set({ hovering: null })
+          }
         },
       }
       const unregister = registerHandle(target)
       const unwatch = onProps(part, () => {
         const stop = drags.get(key)
-        if (!stop || !(part.props as ResizableHandleProps).disabled) return
+        if (!stop || !(part.props as ResizableHandleProps).disabled) {
+          return
+        }
         drags.delete(key)
         stop()
         group().endDrag()
@@ -219,7 +271,9 @@ function resizableDom(context: PrimitiveContext<ResizableOptions, State, string>
   // Stops the pointer tracking of a drag that ends some other way, like the
   // group being disabled or leaving the page.
   const stopAll = () => {
-    for (const stop of drags.values()) stop()
+    for (const stop of drags.values()) {
+      stop()
+    }
     drags.clear()
   }
 

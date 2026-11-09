@@ -77,7 +77,10 @@ const memo = <Value>(compute: () => Value) => {
  * only it matches between the server and the client, so the id is passed in.
  * @stable
  */
-function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsOf<P> & { id: string }) {
+function usePrimitive<P extends Primitive>(
+  primitive: P,
+  options: () => OptionsOf<P> & { id: string }
+) {
   const snapshot = createListSnapshots(primitive, memo)
   // The first options go into the constructor, since effects never run on the server.
   const first = untrack(() => snapshot(options()))
@@ -85,16 +88,21 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
   const instance = primitive({ ...first, id: prefixed }) as ReturnType<P>
   const bindable = trackBindable(primitive, instance.get(), first, options)
   const removals: Promise<void>[] = []
-  if ("onOpenChangeComplete" in schemaOf(primitive).options) exits.set(instance, removals)
+  if ("onOpenChangeComplete" in schemaOf(primitive).options) {
+    exits.set(instance, removals)
+  }
   const resolve = (next: Record<string, unknown>) => {
     const resolved = bindable.resolve(next)
     const complete = next.onOpenChangeComplete
-    if (typeof complete === "function")
+    if (typeof complete === "function") {
       resolved.onOpenChangeComplete = (open: boolean) => {
         const pending = removals.splice(0)
-        if (open || !pending.length) return complete(open)
+        if (open || !pending.length) {
+          return complete(open)
+        }
         void Promise.all(pending).then(() => complete(open))
       }
+    }
     return resolved
   }
   // Leaving the page settles a pending controller `open()` and detaches the
@@ -102,7 +110,9 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
   onDestroy(() => instance.destroy())
   // The options as the instance takes them, made again when a prop changes.
   // A key the parent doesn't control stays unread (`controlledOnly`).
-  const current = $derived(snapshot({ ...bindable.controlledOnly(options()), id: prefixed }))
+  const current = $derived(
+    snapshot({ ...bindable.controlledOnly(options()), id: prefixed })
+  )
   // The instance's state reads what the props deliver, like a controlled
   // `value`, from here: a read sees it in the same update as the parent's own
   // state, before the effect below hands it over. Untracked, or every part
@@ -123,7 +133,7 @@ function usePrimitive<P extends Primitive>(primitive: P, options: () => OptionsO
       touched(before && delivered(undefined, before), delivered(), (name) => {
         counts[name] = (counts[name] ?? 0) + 1
         changes++
-      }),
+      })
     )
     before = next
     return changes
@@ -166,7 +176,10 @@ type PopupContainer = Element | DocumentFragment | null | undefined
 type Portal = (el: HTMLElement) => (() => void) | void
 
 /** What `slot()` returns: the attributes to spread on the part's element, with the attachment that binds it. */
-type SlotAttributes = { [key: string]: unknown; [key: symbol]: Attachment<HTMLElement> | undefined }
+type SlotAttributes = {
+  [key: string]: unknown
+  [key: symbol]: Attachment<HTMLElement> | undefined
+}
 
 /**
  * One part of a component: its presence, attributes, state and the attachment that binds its element.
@@ -193,20 +206,29 @@ const partProps = new Set(["render", "children"])
 
 function withoutPartProps(props: Record<string, unknown>) {
   const result: SlotAttributes = { ...props }
-  for (const key of partProps) delete result[key]
+  for (const key of partProps) {
+    delete result[key]
+  }
   return result
 }
 
 // Attributes in `skip` may differ.
 function sameAttrs(a: Attrs, b: Attrs, skip: readonly string[] = []) {
   const keys = Object.keys(a)
-  return keys.length === Object.keys(b).length && keys.every((key) => a[key] === b[key] || skip.includes(key))
+  return (
+    keys.length === Object.keys(b).length &&
+    keys.every((key) => a[key] === b[key] || skip.includes(key))
+  )
 }
 
 // Later styles win, so a part's own inline styles beat the user's.
 function mergeStyles(user: unknown, own: string | undefined) {
-  if (!own) return user
-  if (typeof user === "string" && user) return `${user.replace(/;\s*$/, "")};${own}`
+  if (!own) {
+    return user
+  }
+  if (typeof user === "string" && user) {
+    return `${user.replace(/;\s*$/, "")};${own}`
+  }
   return own
 }
 
@@ -224,7 +246,7 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   owner: PrimitiveHandle<P> | (() => PrimitiveHandle<P>),
   name: S,
   props: () => PropsOf<P, S> = () => ({}) as PropsOf<P, S>,
-  portal?: Portal,
+  portal?: Portal
 ) {
   const handleOf = typeof owner === "function" ? owner : () => owner
   // Read where it's used, so a getter's change reaches the effect and deriveds that read it.
@@ -244,7 +266,9 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   let user: Record<string, unknown> = {}
   // The DOM event types the core handles on this part. Constant per slot.
   const handled = new Set(
-    Object.keys(partHandlers(untrack(() => instance.part(name, props())))).map((type) => `on${type}`),
+    Object.keys(partHandlers(untrack(() => instance.part(name, props())))).map(
+      (type) => `on${type}`
+    )
   )
 
   // The core notifies from anywhere, a part's own `bind` included, which runs
@@ -255,12 +279,16 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   const check = (liveOnly: boolean, delivered: boolean) =>
     untrack(() => {
       // Parts read what the props deliver themselves (`delivery` below).
-      if (delivered) return
+      if (delivered) {
+        return
+      }
       const current = instance.part(name, props())
       if (read.size && snapshot) {
         const next = partState(current) as Record<string, unknown>
         for (const key of read) {
-          if (sameSlotState(next[key], snapshot[key])) continue
+          if (sameSlotState(next[key], snapshot[key])) {
+            continue
+          }
           snapshot = next
           // The render this causes reads its keys again.
           read.clear()
@@ -268,7 +296,9 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
           break
         }
       }
-      if (!shown) return
+      if (!shown) {
+        return
+      }
       // Presence may read live state, so it is checked on every change.
       const present = isPresent(current)
       // Back in its block before Svelte removes it. The core can notify again
@@ -276,28 +306,45 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
       if (!present && shown.present) {
         restore()
         restored = bound
-        if (portal && bound && !removed)
-          exits.get(instance)?.push(new Promise((resolve) => (removed = resolve)))
+        if (portal && bound && !removed) {
+          exits
+            .get(instance)
+            ?.push(new Promise((resolve) => (removed = resolve)))
+        }
       }
       // Present again before Svelte removed it, like a navigation menu's
       // content as its viewport binds again: it goes back where it renders.
-      if (present && restored && restored === bound) back = portal?.(restored)
-      if (present) restored = undefined
+      if (present && restored && restored === bound) {
+        back = portal?.(restored)
+      }
+      if (present) {
+        restored = undefined
+      }
       // Present again before Svelte removed it: reopened, that close never
       // completes; still closed, like a select's list kept in the page
       // hidden, the close is done.
       if (present && removed) {
-        if (!(instance.get() as { open?: boolean }).open) removed()
+        if (!(instance.get() as { open?: boolean }).open) {
+          removed()
+        }
         removed = undefined
       }
-      if (present !== shown.present) return void tick++
+      if (present !== shown.present) {
+        return void tick++
+      }
       // Live state changes no attributes, so there's nothing to compare. Core
       // writes a slot's `direct` attributes to the element itself.
-      if (liveOnly) return
+      if (liveOnly) {
+        return
+      }
       const latest = renderVersion(instance)
-      if (latest === version) return
+      if (latest === version) {
+        return
+      }
       version = latest
-      if (!sameAttrs(partAttrs(current), shown.attrs, directNames(current))) tick++
+      if (!sameAttrs(partAttrs(current), shown.attrs, directNames(current))) {
+        tick++
+      }
     })
 
   // How to put a popup that moved into its container back in its block,
@@ -323,17 +370,27 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     ref(el)
     bound = el
     // The declarations the spread wrote are recorded, so a later change can drop them.
-    if (typeof styleShown === "string") applyAttrs(el, { style: styleShown }, "svelte-style")
-    const cleanups = Object.entries(partHandlers(current)).map(([type, handler]) =>
-      on(el, type as keyof HTMLElementEventMap, (event) => {
-        const own = user[`on${type}`]
-        if (typeof own === "function") own(event)
-        if (event.defaultPrevented) return
-        // Chrome fires `focusout` as Svelte removes a focused element, inside
-        // the effect removing it, where a write throws. The core hears it after.
-        if ($effect.tracking()) queueMicrotask(() => el.isConnected && handler!(event))
-        else handler!(event)
-      }),
+    if (typeof styleShown === "string") {
+      applyAttrs(el, { style: styleShown }, "svelte-style")
+    }
+    const cleanups = Object.entries(partHandlers(current)).map(
+      ([type, handler]) =>
+        on(el, type as keyof HTMLElementEventMap, (event) => {
+          const own = user[`on${type}`]
+          if (typeof own === "function") {
+            own(event)
+          }
+          if (event.defaultPrevented) {
+            return
+          }
+          // Chrome fires `focusout` as Svelte removes a focused element, inside
+          // the effect removing it, where a write throws. The core hears it after.
+          if ($effect.tracking()) {
+            queueMicrotask(() => el.isConnected && handler!(event))
+          } else {
+            handler!(event)
+          }
+        })
     )
     return () => {
       cleanups.forEach((cleanup) => cleanup())
@@ -355,7 +412,9 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
   // element shows is what Svelte gets, so its write changes nothing.
   const styleFor = (merged: unknown) => {
     styleShown = merged
-    if (!bound || typeof merged !== "string") return merged
+    if (!bound || typeof merged !== "string") {
+      return merged
+    }
     applyAttrs(bound, { style: merged }, "svelte-style")
     return bound.style.cssText
   }
@@ -370,7 +429,9 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
     const owned = instanceOf()
     const current = owned.part(name, props())
     const values = selectedKeys(current)
-    if (current === subscribed && values === selected) return
+    if (current === subscribed && values === selected) {
+      return
+    }
     instance = owned
     subscribed = current
     selected = values
@@ -418,33 +479,49 @@ function useHandlePart<P extends Primitive, S extends SlotName<P>>(
         delivery
         const current = instanceOf().part(name, props())
         snapshot = untrack(() => partState(current)) as Record<string, unknown>
-        if (typeof property === "string") read.add(property)
+        if (typeof property === "string") {
+          read.add(property)
+        }
         return snapshot[property as string]
       },
     }),
     slot(attributes = {}) {
       user = attributes
-      if (attributes.id != null)
+      if (attributes.id != null) {
         takeOwnId(
           untrack(() => instance.part(name, props())),
-          attributes.id,
+          attributes.id
         )
+      }
       const result: SlotAttributes = {}
       // The core's listeners for a type run from the attachment, after the
       // user's. Other listeners go through Svelte as they are.
-      for (const [key, value] of Object.entries(attributes))
-        if (value !== undefined && !handled.has(key) && !partProps.has(key)) result[key] = value
+      for (const [key, value] of Object.entries(attributes)) {
+        if (value !== undefined && !handled.has(key) && !partProps.has(key)) {
+          result[key] = value
+        }
+      }
       // Attachments merged in, like a control's own under a field's.
-      for (const key of Object.getOwnPropertySymbols(attributes))
+      for (const key of Object.getOwnPropertySymbols(attributes)) {
         result[key] = (attributes as SlotAttributes)[key]
+      }
       // Attributes left undefined are absent, so they never replace a value merged
       // in, like a field's on its control. An `id` the user gives, and what
       // `yieldToAuthor` leaves to the user, stay the user's.
-      const own = yieldToAuthor(rendered.attrs, (key) => attributes[key] != null)
-      for (const [key, value] of Object.entries(own))
-        if (value !== undefined && !(key === "id" && attributes.id != null)) result[key] = value
-      if ("style" in rendered.attrs)
-        result.style = styleFor(mergeStyles(attributes.style, rendered.attrs.style))
+      const own = yieldToAuthor(
+        rendered.attrs,
+        (key) => attributes[key] != null
+      )
+      for (const [key, value] of Object.entries(own)) {
+        if (value !== undefined && !(key === "id" && attributes.id != null)) {
+          result[key] = value
+        }
+      }
+      if ("style" in rendered.attrs) {
+        result.style = styleFor(
+          mergeStyles(attributes.style, rendered.attrs.style)
+        )
+      }
       result[attach] = attachment
       return result
     },
@@ -463,17 +540,29 @@ type PartBinding<State> = {
  * until the component mounts: the user's props over `defaults`, and a fixed
  * state.
  */
-function plainPart<State>(state: State, defaults: Record<string, unknown> = {}) {
-  return { slot: (user: Record<string, unknown>) => withoutPartProps({ ...defaults, ...user }), state }
+function plainPart<State>(
+  state: State,
+  defaults: Record<string, unknown> = {}
+) {
+  return {
+    slot: (user: Record<string, unknown>) =>
+      withoutPartProps({ ...defaults, ...user }),
+    state,
+  }
 }
 
 /** The part with its attributes passed through `wrap`, like a control's merged with its field's. */
 function wrapPart<State>(
   part: PartBinding<State>,
-  wrap: ((attributes: SlotAttributes) => SlotAttributes) | undefined,
+  wrap: ((attributes: SlotAttributes) => SlotAttributes) | undefined
 ) {
-  if (!wrap) return part
-  return { slot: (user: Record<string, unknown>) => wrap(part.slot(user)), state: part.state }
+  if (!wrap) {
+    return part
+  }
+  return {
+    slot: (user: Record<string, unknown>) => wrap(part.slot(user)),
+    state: part.state,
+  }
 }
 
 /**
@@ -485,16 +574,21 @@ function wrapPart<State>(
  * the props take any attribute.
  * @stable
  */
-type PartProps<Tag extends keyof SvelteHTMLElements, State = {}, Own extends string = never> = Omit<
-  SvelteHTMLElements[Tag],
-  "children" | Own
-> & { [attribute: string]: unknown } & {
+type PartProps<
+  Tag extends keyof SvelteHTMLElements,
+  State = {},
+  Own extends string = never,
+> = Omit<SvelteHTMLElements[Tag], "children" | Own> & {
+  [attribute: string]: unknown
+} & {
   /**
    * Renders your own element. Receives the props to spread on it, the part's
    * state, and its content, like a slider thumb's range input, which
    * `{@render children?.(state)}` renders inside.
    */
-  render?: Snippet<[{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]>
+  render?: Snippet<
+    [{ props: SlotAttributes; state: State; children?: Snippet<[State]> }]
+  >
   /** Content. Receives the part's state. */
   children?: Snippet<[State]>
 }

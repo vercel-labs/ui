@@ -19,7 +19,10 @@ import { autocompleteFixture as f } from "tests/fixtures/autocomplete.ts"
       <AutocompleteLabel class="label">{{ f.label }}</AutocompleteLabel>
       <AutocompleteInput>
         <template #render="{ props, state }">
-          <input v-bind="props" :class="['input', state.open ? 'is-open' : 'is-closed']" />
+          <input
+            v-bind="props"
+            :class="['input', state.open ? 'is-open' : 'is-closed']"
+          />
         </template>
       </AutocompleteInput>
       <AutocompleteTrigger :aria-label="f.trigger">▾</AutocompleteTrigger>

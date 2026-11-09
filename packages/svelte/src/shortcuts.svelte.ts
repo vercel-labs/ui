@@ -22,7 +22,8 @@ type UseShortcutOptions = Omit<ShortcutOptions, "layer"> & {
   layer?: MaybeGetter<Element | null | undefined>
 }
 
-const read = <T>(value: MaybeGetter<T>) => (typeof value === "function" ? (value as () => T)() : value)
+const read = <T>(value: MaybeGetter<T>) =>
+  typeof value === "function" ? (value as () => T)() : value
 
 /**
  * Registers a keyboard shortcut for the life of the component, in the shared
@@ -34,11 +35,13 @@ const read = <T>(value: MaybeGetter<T>) => (typeof value === "function" ? (value
 function useShortcut(
   keys: MaybeGetter<string | null | undefined>,
   handler: ShortcutHandler,
-  options: MaybeGetter<UseShortcutOptions> = {},
+  options: MaybeGetter<UseShortcutOptions> = {}
 ) {
   $effect(() => {
     const current = read(keys)
-    if (!current) return
+    if (!current) {
+      return
+    }
     const { layer, ...rest } = read(options)
     return shortcuts.register(current, handler, {
       ...rest,
@@ -69,4 +72,9 @@ function useShortcutHint(keys: MaybeGetter<string>) {
   }
 }
 
-export { type MaybeGetter, useShortcut, useShortcutHint, type UseShortcutOptions }
+export {
+  type MaybeGetter,
+  useShortcut,
+  useShortcutHint,
+  type UseShortcutOptions,
+}

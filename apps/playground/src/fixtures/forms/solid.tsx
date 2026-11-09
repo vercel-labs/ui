@@ -1,10 +1,24 @@
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/solid/checkbox"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/solid/radio"
 import { Switch, SwitchThumb } from "@ui-sdk/solid/switch"
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
-import { formsFixture as f, formsOptions, serialize } from "tests/fixtures/forms.ts"
+import {
+  formsFixture as f,
+  formsOptions,
+  serialize,
+} from "tests/fixtures/forms.ts"
 
 function Fixture() {
   const options = formsOptions()
@@ -15,8 +29,14 @@ function Fixture() {
   const [shipping, setShipping] = createSignal(false)
   const all = f.toppings.items.map((item) => item.value)
   // Records a change, or cancels it when the URL asks.
-  const report = (name: string, value: unknown, details: { cancel: () => void; source: string }) => {
-    if (options.cancel === name) return details.cancel()
+  const report = (
+    name: string,
+    value: unknown,
+    details: { cancel: () => void; source: string }
+  ) => {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     setAction(`${name}:${String(value)}`)
     setSource(details.source)
   }
@@ -44,7 +64,9 @@ function Fixture() {
               checked={options.controlled ? terms() : undefined}
               onCheckedChange={(checked, details) => {
                 report(f.terms.name, checked, details)
-                if (!details.canceled) setTerms(checked)
+                if (!details.canceled) {
+                  setTerms(checked)
+                }
               }}
             >
               <CheckboxIndicator class="checkbox-indicator" />
@@ -66,7 +88,9 @@ function Fixture() {
             defaultValue={f.toppings.defaultValue}
             allValues={all}
             required={options.toppingsRequired}
-            onValueChange={(value, details) => report(f.toppings.name, value.join(","), details)}
+            onValueChange={(value, details) =>
+              report(f.toppings.name, value.join(","), details)
+            }
           >
             <label>
               <Checkbox class="checkbox" parent>
@@ -94,7 +118,9 @@ function Fixture() {
                 class="switch"
                 name={item.name}
                 defaultChecked={item.defaultChecked}
-                onCheckedChange={(checked, details) => report(item.name, checked, details)}
+                onCheckedChange={(checked, details) =>
+                  report(item.name, checked, details)
+                }
               >
                 <SwitchThumb class="switch-thumb" />
               </Switch>
@@ -113,12 +139,18 @@ function Fixture() {
             readOnly={options.readOnly}
             disabled={options.disabled}
             loop={options.loop}
-            onValueChange={(value, details) => report(f.plan.name, value, details)}
+            onValueChange={(value, details) =>
+              report(f.plan.name, value, details)
+            }
           >
             <For each={f.plan.items}>
               {(item) => (
                 <label>
-                  <Radio class="radio" value={item.value} disabled={item.disabled}>
+                  <Radio
+                    class="radio"
+                    value={item.value}
+                    disabled={item.disabled}
+                  >
                     <RadioIndicator class="radio-indicator" />
                   </Radio>
                   {item.label}
@@ -160,7 +192,12 @@ function Fixture() {
         </div>
       </form>
       <label>
-        <Checkbox class="checkbox" form={f.formId} name={f.newsletter.name} value={f.newsletter.value}>
+        <Checkbox
+          class="checkbox"
+          form={f.formId}
+          name={f.newsletter.name}
+          value={f.newsletter.value}
+        >
           <CheckboxIndicator class="checkbox-indicator" />
         </Checkbox>
         {f.newsletter.label}

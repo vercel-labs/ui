@@ -7,7 +7,11 @@
 // attributes in command-parts.ts.
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { commandSlots } from "./command-parts"
-import { commandApi, initialCommandState, syncCommandState } from "./command-api"
+import {
+  commandApi,
+  initialCommandState,
+  syncCommandState,
+} from "./command-api"
 import { type SearchFilter } from "../../foundation/lists/autocomplete-core"
 import {
   filterAttribute,
@@ -17,12 +21,24 @@ import {
   type ListItem,
   type ListStatusState,
 } from "../../foundation/lists/listbox"
-import { type ItemIconProps, type ItemIconState } from "../../foundation/lists/item-icon"
-import { type ListAnnouncement, type ListItemTextState } from "../../foundation/lists/listbox-search"
+import {
+  type ItemIconProps,
+  type ItemIconState,
+} from "../../foundation/lists/item-icon"
+import {
+  type ListAnnouncement,
+  type ListItemTextState,
+} from "../../foundation/lists/listbox-search"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 
 /**
  * Why the highlighted command changed. Moving to another page or typing highlights the best match.
@@ -44,13 +60,19 @@ type CommandValueChangeReason =
  * @stable
  */
 type CommandQueryChangeReason =
-  "input-change" | "item-press" | "shortcut" | "back" | "escape-key" | "imperative"
+  | "input-change"
+  | "item-press"
+  | "shortcut"
+  | "back"
+  | "escape-key"
+  | "imperative"
 
 /**
  * Why the stack of pages changed: a command opened one, or Backspace or Escape went back.
  * @stable
  */
-type CommandPagesChangeReason = "item-press" | "shortcut" | "back" | "escape-key" | "imperative"
+type CommandPagesChangeReason =
+  "item-press" | "shortcut" | "back" | "escape-key" | "imperative"
 
 /**
  * What `onValueChange` receives besides the value: where the highlighted command is.
@@ -111,23 +133,35 @@ function createCommandController() {
      * Highlights a command, and scrolls it into view.
      * Returns false when the change was canceled or nothing changed.
      */
-    setValue: (value: string | null, options?: CommandChangeOptions<CommandValueChangeReason>) => boolean
+    setValue: (
+      value: string | null,
+      options?: CommandChangeOptions<CommandValueChangeReason>
+    ) => boolean
     /** The search text. */
     getQuery: () => string
     /**
      * Changes the search text, which filters the commands.
      * Returns false when the change was canceled or nothing changed.
      */
-    setQuery: (query: string, options?: CommandChangeOptions<CommandQueryChangeReason>) => boolean
+    setQuery: (
+      query: string,
+      options?: CommandChangeOptions<CommandQueryChangeReason>
+    ) => boolean
     /** The stack of open pages, from the first page opened to the current one. Empty on the first page. */
     getPages: () => string[]
     /** Replaces the stack of pages. Returns false when the change was canceled or nothing changed. */
-    setPages: (pages: string[], options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
+    setPages: (
+      pages: string[],
+      options?: CommandChangeOptions<CommandPagesChangeReason>
+    ) => boolean
     /**
      * Opens a page on top of the current one, by the `value` of a `CommandPage` or a data command.
      * Returns false when the change was canceled or nothing changed.
      */
-    push: (page: string, options?: CommandChangeOptions<CommandPagesChangeReason>) => boolean
+    push: (
+      page: string,
+      options?: CommandChangeOptions<CommandPagesChangeReason>
+    ) => boolean
     /**
      * Goes back to the previous page, and puts back the search text typed there.
      * Returns false when the change was canceled or nothing changed.
@@ -157,13 +191,19 @@ type CommandOptions = {
   /** The command highlighted at first, when uncontrolled. Without it, the first command is, with `autoHighlight`. */
   defaultValue?: string | null
   /** Runs when the highlight moves: arrow keys, the pointer, typing, a page change or a controller. `details.index` says where the command is, for virtualized lists. */
-  onValueChange?: (value: string | null, details: CommandValueChangeDetails) => void
+  onValueChange?: (
+    value: string | null,
+    details: CommandValueChangeDetails
+  ) => void
   /** The search text, which filters the commands. Pass it to control it. */
   query?: string
   /** The search text at first, when uncontrolled. */
   defaultQuery?: string
   /** Runs when the search text wants to change: typing, opening a page, going back, or a controller. */
-  onQueryChange?: (query: string, details: ChangeDetails<CommandQueryChangeReason>) => void
+  onQueryChange?: (
+    query: string,
+    details: ChangeDetails<CommandQueryChangeReason>
+  ) => void
   /** The stack of open pages, from the first page opened to the current one. Pass it to control it. */
   pages?: string[]
   /**
@@ -172,7 +212,10 @@ type CommandOptions = {
    */
   defaultPages?: string[]
   /** Runs when a page opens or Backspace or Escape goes back. */
-  onPagesChange?: (pages: string[], details: ChangeDetails<CommandPagesChangeReason>) => void
+  onPagesChange?: (
+    pages: string[],
+    details: ChangeDetails<CommandPagesChangeReason>
+  ) => void
   /**
    * Runs when a command runs, with its value: Enter, a click, or its shortcut. Return a Promise to
    * mark the command pending until it settles: it gets `data-pending`, `aria-busy` and

@@ -21,7 +21,7 @@ describe("server rendering toolbars and menubars", () => {
         </ToggleGroup>
         <Toggle>Spellcheck</Toggle>
         <ToolbarLink href="#help">Help</ToolbarLink>
-      </Toolbar>,
+      </Toolbar>
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="toolbar"')
@@ -38,7 +38,7 @@ describe("server rendering toolbars and menubars", () => {
         <Menu>
           <MenuTrigger>Edit</MenuTrigger>
         </Menu>
-      </Menubar>,
+      </Menubar>
     )
     expect(html).toContain('role="menubar"')
     expect(html.match(/role="menuitem"/g)).toHaveLength(2)
@@ -55,7 +55,7 @@ describe("server rendering toolbars and menubars", () => {
           </TabsTab>
           <TabsTab value="b">B</TabsTab>
         </TabsList>
-      </Tabs>,
+      </Tabs>
     )
     expect(stops(html)).toBe(1)
     expect(html).toMatch(/tabindex="0"[^>]*>B</)

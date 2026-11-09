@@ -12,11 +12,18 @@ import { createParts } from "@ui-sdk/react/primitive"
 
 type Playlist = { id: string; name: string }
 
-type PlaylistsState = { items: Playlist[]; editing: string | null; focused: string | null }
+type PlaylistsState = {
+  items: Playlist[]
+  editing: string | null
+  focused: string | null
+}
 
 type PlaylistsOptions = {
   defaultItems: Playlist[]
-  onItemsChange?: (items: Playlist[], details: ChangeDetails<InlineEditReason>) => void
+  onItemsChange?: (
+    items: Playlist[],
+    details: ChangeDetails<InlineEditReason>
+  ) => void
 }
 
 type PlaylistsItemState = { name: string; editing: boolean }
@@ -32,19 +39,27 @@ const playlists = definePrimitive({
   api: (context) => {
     const { store } = context
     const change = createChange(context)
-    const roving = createRovingFocus<PlaylistsState, { value: string }>(context, {
-      slot: "item",
-      key: "focused",
-    })
+    const roving = createRovingFocus<PlaylistsState, { value: string }>(
+      context,
+      {
+        slot: "item",
+        key: "focused",
+      }
+    )
     const edit = createInlineEdit<PlaylistsState>(context, {
       key: "editing",
-      value: (id) => store.get().items.find((item) => item.id === id)?.name ?? "",
+      value: (id) =>
+        store.get().items.find((item) => item.id === id)?.name ?? "",
       commit: (id, text, details) =>
         !!text.trim() &&
         change(
           "items",
-          store.get().items.map((item) => (item.id === id ? { ...item, name: text.trim() } : item)),
-          details,
+          store
+            .get()
+            .items.map((item) =>
+              item.id === id ? { ...item, name: text.trim() } : item
+            ),
+          details
         ),
     })
     return { roving, edit }
@@ -58,10 +73,15 @@ const playlists = definePrimitive({
         name: state.items.find((item) => item.id === key)?.name ?? "",
         editing: state.editing === key,
       }),
-      attrs: (state, part) => ({ role: "listitem", tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        role: "listitem",
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: {
         keydown: (event, { el, api, key }) => {
-          if (event.target !== el || api.edit.keydown(event, key)) return
+          if (event.target !== el || api.edit.keydown(event, key)) {
+            return
+          }
           api.roving.keydown(event, el!)
         },
         dblclick: (event, { api, key }) => api.edit.dblclick(event, key),
@@ -79,7 +99,11 @@ const playlists = definePrimitive({
   }),
 })
 
-const parts = createParts(playlists, { root: "div", item: "div", input: "input" })
+const parts = createParts(playlists, {
+  root: "div",
+  item: "div",
+  input: "input",
+})
 
 const Playlists = parts.Root
 

@@ -50,7 +50,8 @@ const popupOn = (preset: PopupPreset, name = "own") =>
       dismissible: "boolean",
     },
     state: (options: Options) => popupState(options),
-    sync: (options) => (options.open === undefined ? {} : { open: options.open }),
+    sync: (options) =>
+      options.open === undefined ? {} : { open: options.open },
     api: (context) => createPopup(context, { preset }),
     slots: (slot) => popupSlots(slot),
   })
@@ -79,8 +80,11 @@ function open(preset: PopupPreset, options: Options = {}, markup = untitled) {
   const reasons: string[] = []
   const view = mount(
     popupOn(preset),
-    { ...options, onOpenChange: (_open, details) => reasons.push(details.reason) },
-    markup,
+    {
+      ...options,
+      onOpenChange: (_open, details) => reasons.push(details.reason),
+    },
+    markup
   )
   mounts.push(view)
   view.api.setOpen(true)
@@ -142,7 +146,9 @@ describe.each([
 ])("%s", (name, preset) => {
   test("keeps the browser's popover styles", async () => {
     const slot = `own-${name.toLowerCase()}`
-    expect(await resetOnOpen(preset, slot)).not.toContain(`[data-slot="${slot}-content"]`)
+    expect(await resetOnOpen(preset, slot)).not.toContain(
+      `[data-slot="${slot}-content"]`
+    )
   })
 })
 
@@ -161,7 +167,12 @@ describe("dialogPreset", () => {
       return named
     }
     const own = await namingOnPress(mount(popupOn(dialogPreset), {}, untitled))
-    expect(own).toEqual({ role: "dialog", labelledby: null, label: "Rename", modal: "true" })
+    expect(own).toEqual({
+      role: "dialog",
+      labelledby: null,
+      label: "Rename",
+      modal: "true",
+    })
     expect(own).toEqual(await namingOnPress(mount(dialog, {}, untitled)))
   })
 
@@ -169,10 +180,12 @@ describe("dialogPreset", () => {
     const view = open(
       dialogPreset,
       {},
-      `<div><trigger>Rename</trigger><content><title>Rename file</title></content></div>`,
+      `<div><trigger>Rename</trigger><content><title>Rename file</title></content></div>`
     )
     await settle()
-    expect(view.part("content")!.getAttribute("aria-labelledby")).toBe(view.part("title")!.id)
+    expect(view.part("content")!.getAttribute("aria-labelledby")).toBe(
+      view.part("title")!.id
+    )
     expect(view.part("content")!.hasAttribute("aria-label")).toBe(false)
   })
 
@@ -193,7 +206,10 @@ describe("dialogPreset", () => {
   })
 
   test("presents as a sheet", () => {
-    expect(asSheet(dialogPreset)).toMatchObject({ presentation: "sheet", attribute: "sheet" })
+    expect(asSheet(dialogPreset)).toMatchObject({
+      presentation: "sheet",
+      attribute: "sheet",
+    })
   })
 })
 
@@ -264,7 +280,10 @@ describe("selectPreset", () => {
   })
 
   test("is modal as a sheet", () => {
-    expect(asSheet(selectPreset)).toMatchObject({ presentation: "sheet", modal: true })
+    expect(asSheet(selectPreset)).toMatchObject({
+      presentation: "sheet",
+      modal: true,
+    })
   })
 })
 
@@ -279,7 +298,10 @@ describe("comboboxPreset", () => {
 
 describe("datePickerPreset", () => {
   test("is never modal, even as a sheet", () => {
-    expect(asSheet(datePickerPreset)).toMatchObject({ presentation: "sheet", modal: false })
+    expect(asSheet(datePickerPreset)).toMatchObject({
+      presentation: "sheet",
+      modal: false,
+    })
   })
 
   test("leaves opening to its component, so a trigger press doesn't open it", async () => {

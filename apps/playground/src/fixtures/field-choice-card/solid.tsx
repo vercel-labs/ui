@@ -2,7 +2,10 @@ import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/solid/field"
 import { render } from "@solidjs/web"
 import { createSignal, For, onCleanup, Show } from "solid-js"
-import { fieldChoiceCardFixture as f, fieldChoiceCardOptions } from "tests/fixtures/field.ts"
+import {
+  fieldChoiceCardFixture as f,
+  fieldChoiceCardOptions,
+} from "tests/fixtures/field.ts"
 
 function LaterCard() {
   const [ready, setReady] = createSignal(false)

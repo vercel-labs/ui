@@ -1,6 +1,11 @@
 <script lang="ts">
   import type { ChangeDetails } from "@ui-sdk/core"
-  import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from "@ui-sdk/svelte"
+  import {
+    HoverCard,
+    HoverCardArrow,
+    HoverCardContent,
+    HoverCardTrigger,
+  } from "@ui-sdk/svelte"
   import {
     hoverCardContentOptions,
     hoverCardFixture as fixture,

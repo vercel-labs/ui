@@ -17,7 +17,9 @@ import {
       <template #render="{ props, state }">
         <button v-bind="props">
           {{ state.open ? "Viewing" : "View Details" }}
-          <DialogShortcut v-slot="{ state: shortcut }">{{ shortcut.text }}</DialogShortcut>
+          <DialogShortcut v-slot="{ state: shortcut }">{{
+            shortcut.text
+          }}</DialogShortcut>
         </button>
       </template>
     </DialogTrigger>
@@ -30,7 +32,11 @@ import {
           </template>
         </DialogTitle>
         <DialogDescription>
-          {{ state.nested ? "Opened from another dialog." : "Quarterly report, updated today." }}
+          {{
+            state.nested
+              ? "Opened from another dialog."
+              : "Quarterly report, updated today."
+          }}
         </DialogDescription>
       </div>
       <div data-slot="row">

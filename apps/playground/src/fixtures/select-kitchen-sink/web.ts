@@ -12,7 +12,8 @@ import {
   type Variant,
 } from "./variants"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 type SelectElement = HTMLElement & {
   items?: ListData<any>
@@ -23,7 +24,10 @@ type SelectElement = HTMLElement & {
   api?: { open: () => void; close: () => void }
 }
 
-function item(entry: { value: string; label: string; disabled?: boolean }, variant: Variant) {
+function item(
+  entry: { value: string; label: string; disabled?: boolean },
+  variant: Variant
+) {
   return `<ui-select-item class="${classes.item}" value="${entry.value}"${entry.disabled ? " disabled" : ""}><ui-select-item-indicator class="${classes.indicator}"${variant.indicatorKeepMounted ? " keep-mounted" : ""}>✓</ui-select-item-indicator><ui-select-item-text class="[&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:underline">${entry.label}</ui-select-item-text></ui-select-item>`
 }
 
@@ -41,13 +45,19 @@ function template(variant: Variant) {
 function items(list: ListData<any>, variant: Variant) {
   return list
     .map((entry) => {
-      if (typeof entry === "string") return ""
-      if ("type" in entry && entry.type === "separator")
+      if (typeof entry === "string") {
+        return ""
+      }
+      if ("type" in entry && entry.type === "separator") {
         return `<ui-select-separator class="${classes.separator}"></ui-select-separator>`
-      if ("type" in entry && entry.type === "group")
+      }
+      if ("type" in entry && entry.type === "group") {
         return `<ui-select-group><ui-select-group-label class="${classes.groupLabel}">${entry.label}</ui-select-group-label>${variant.selectAll ? `<ui-select-select-all class="${classes.selectAll}">All ${entry.label}</ui-select-select-all>` : ""}${entry.items
-          .map((child: unknown) => (typeof child === "string" ? "" : item(child as never, variant)))
+          .map((child: unknown) =>
+            typeof child === "string" ? "" : item(child as never, variant)
+          )
           .join("")}</ui-select-group>`
+      }
       return item(entry as never, variant)
     })
     .join("")
@@ -55,14 +65,18 @@ function items(list: ListData<any>, variant: Variant) {
 
 // A select-all option over the whole list. Grouped lists put one in each group instead.
 function selectAllOption(variant: Variant) {
-  if (!variant.selectAll || variant.list === "grouped") return ""
+  if (!variant.selectAll || variant.list === "grouped") {
+    return ""
+  }
   return `<ui-select-select-all class="${classes.selectAll}">Select all</ui-select-select-all>`
 }
 
 function attributes(values: Record<string, unknown>) {
   return Object.entries(values)
     .filter(([, value]) => value !== undefined && value !== false)
-    .map(([name, value]) => (value === true ? kebab(name) : `${kebab(name)}="${value}"`))
+    .map(([name, value]) =>
+      value === true ? kebab(name) : `${kebab(name)}="${value}"`
+    )
     .join(" ")
 }
 
@@ -70,15 +84,27 @@ function mount(root: HTMLElement) {
   kitchenSink(root, "web", (slot, variant, env) => {
     const select = document.createElement("ui-select") as SelectElement
     const { defaultValue, ...options } = variant.options ?? {}
-    for (const [option, value] of Object.entries(options)) select.setAttribute(kebab(option), String(value))
+    for (const [option, value] of Object.entries(options)) {
+      select.setAttribute(kebab(option), String(value))
+    }
     // Web components have no controlled value: the value attribute starts it, and the buttons set the property.
-    if (defaultValue !== undefined) select.setAttribute("default-value", [defaultValue].flat().join(","))
-    if (env.container) select.setAttribute("container", `#${env.container.id}`)
+    if (defaultValue !== undefined) {
+      select.setAttribute("default-value", [defaultValue].flat().join(","))
+    }
+    if (env.container) {
+      select.setAttribute("container", `#${env.container.id}`)
+    }
     const data = variant.mode === "data"
     const list = listOf(variant)
-    if (data) select.items = list
-    if (variant.recent) Object.assign(select, { emptyItems: recentItems })
-    if (variant.list === "countries") Object.assign(select, countryOptions)
+    if (data) {
+      select.items = list
+    }
+    if (variant.recent) {
+      Object.assign(select, { emptyItems: recentItems })
+    }
+    if (variant.list === "countries") {
+      Object.assign(select, countryOptions)
+    }
 
     const content = attributes({
       ...variant.content,
@@ -113,22 +139,34 @@ function mount(root: HTMLElement) {
       className: "text-xs text-neutral-600",
       textContent: `value: ${show(defaultValueOf(variant) ?? null)}`,
     })
-    const checkbox = Object.assign(document.createElement("input"), { type: "checkbox" })
+    const checkbox = Object.assign(document.createElement("input"), {
+      type: "checkbox",
+    })
     // Callbacks are DOM events on the element, with the value and the reason in `detail`.
     const detail = (event: Event) =>
-      (event as CustomEvent<{ value: unknown; reason?: string; index?: number }>).detail
+      (
+        event as CustomEvent<{
+          value: unknown
+          reason?: string
+          index?: number
+        }>
+      ).detail
     select.addEventListener("valuechange", (event) => {
       const { value, reason } = detail(event)
       env.log(`valueChange ${show(value)} (${reason})`)
-      if (variant.controlled === "value") output.textContent = `value: ${show(value)}`
+      if (variant.controlled === "value") {
+        output.textContent = `value: ${show(value)}`
+      }
     })
     select.addEventListener("openchange", (event) => {
       const { value, reason } = detail(event)
       env.log(`openChange ${value} (${reason})`)
-      if (variant.controlled === "open") checkbox.checked = value as boolean
+      if (variant.controlled === "open") {
+        checkbox.checked = value as boolean
+      }
     })
     select.addEventListener("openchangecomplete", (event) =>
-      env.log(`openChangeComplete ${detail(event).value}`),
+      env.log(`openChangeComplete ${detail(event).value}`)
     )
     select.addEventListener("highlight", (event) => {
       const { value, index } = detail(event)
@@ -159,8 +197,11 @@ function mount(root: HTMLElement) {
       label.append(checkbox, "open")
       slot.append(label)
       checkbox.addEventListener("change", () => {
-        if (checkbox.checked) select.api?.open()
-        else select.api?.close()
+        if (checkbox.checked) {
+          select.api?.open()
+        } else {
+          select.api?.close()
+        }
       })
     }
   })

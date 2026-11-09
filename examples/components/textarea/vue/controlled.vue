@@ -3,7 +3,9 @@ import { Field, FieldDescription, FieldLabel } from "@ui-sdk/vue/field"
 import { Textarea } from "@ui-sdk/vue/textarea"
 import { ref } from "vue"
 
-const bio = ref("Product designer in Lisbon. I write about type and interfaces.")
+const bio = ref(
+  "Product designer in Lisbon. I write about type and interfaces."
+)
 </script>
 
 <template>

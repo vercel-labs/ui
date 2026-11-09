@@ -14,7 +14,12 @@ import { createDragSession } from "../drag-and-drop/pointer"
  * @experimental
  */
 type PreviewReason =
-  "item-hover" | "list-navigation" | "escape-key" | "focus-out" | "item-press" | "imperative"
+  | "item-hover"
+  | "list-navigation"
+  | "escape-key"
+  | "focus-out"
+  | "item-press"
+  | "imperative"
 
 /**
  * How `createPreview` keeps the preview and chooses.
@@ -26,9 +31,15 @@ type PreviewOptions<State extends object> = {
   /** The slot whose parts are the options. */
   slot: string
   /** Asks for a new preview. Defaults to setting the state key; pass the primitive's change to fire `onPreviewChange`. */
-  set?: (value: string | null, details: { reason: PreviewReason; event?: Event }) => boolean
+  set?: (
+    value: string | null,
+    details: { reason: PreviewReason; event?: Event }
+  ) => boolean
   /** Chooses an option. Pass the primitive's change for its value. */
-  choose: (key: string, details: { reason: "item-press"; event?: Event }) => boolean
+  choose: (
+    key: string,
+    details: { reason: "item-press"; event?: Event }
+  ) => boolean
   /** The chosen option now, which previews as nothing. */
   value?: () => string | null
   /** Whether an option can't be previewed or chosen. */
@@ -58,36 +69,67 @@ type PreviewOptions<State extends object> = {
  * @experimental
  */
 function createPreview<State extends object>(
-  context: Pick<PrimitiveContext<any, State, any>, "store" | "onDestroy" | "parts">,
-  options: PreviewOptions<State>,
+  context: Pick<
+    PrimitiveContext<any, State, any>,
+    "store" | "onDestroy" | "parts"
+  >,
+  options: PreviewOptions<State>
 ) {
   const { store } = context
   const current = () => (store.get()[options.key] ?? null) as string | null
-  const set = (value: string | null, details: { reason: PreviewReason; event?: Event }) =>
-    options.set ? options.set(value, details) : (store.set({ [options.key]: value } as Partial<State>), true)
+  const set = (
+    value: string | null,
+    details: { reason: PreviewReason; event?: Event }
+  ) =>
+    options.set
+      ? options.set(value, details)
+      : (store.set({ [options.key]: value } as Partial<State>), true)
   const label = (key: string) => options.label?.(key) ?? key
   let sliding = false
   const drags = createDragSession(context.onDestroy)
 
   const api = {
     /** Shows an option without choosing it. The chosen option and disabled ones show as nothing. */
-    show(key: string | null, details: { reason: PreviewReason; event?: Event } = { reason: "imperative" }) {
-      const next = key && !options.disabled?.(key) && key !== options.value?.() ? key : null
-      if (next === current()) return false
+    show(
+      key: string | null,
+      details: { reason: PreviewReason; event?: Event } = {
+        reason: "imperative",
+      }
+    ) {
+      const next =
+        key && !options.disabled?.(key) && key !== options.value?.()
+          ? key
+          : null
+      if (next === current()) {
+        return false
+      }
       const done = set(next, details)
-      if (done && next && details.reason === "list-navigation")
-        announce(options.message?.(label(next)) ?? `Previewing ${label(next)}. Enter to keep it.`)
+      if (done && next && details.reason === "list-navigation") {
+        announce(
+          options.message?.(label(next)) ??
+            `Previewing ${label(next)}. Enter to keep it.`
+        )
+      }
       return done
     },
     /** Puts the page back. */
-    clear(details: { reason: PreviewReason; event?: Event } = { reason: "imperative" }) {
+    clear(
+      details: { reason: PreviewReason; event?: Event } = {
+        reason: "imperative",
+      }
+    ) {
       return current() !== null && set(null, details)
     },
     /** Chooses the previewed option, or `key`, and ends the preview. */
     choose(key?: string, details: { event?: Event } = {}) {
       const target = key ?? current()
-      if (!target || options.disabled?.(target)) return false
-      const done = options.choose(target, { reason: "item-press", event: details.event })
+      if (!target || options.disabled?.(target)) {
+        return false
+      }
+      const done = options.choose(target, {
+        reason: "item-press",
+        event: details.event,
+      })
       api.clear({ reason: "item-press", event: details.event })
       return done
     },
@@ -95,7 +137,9 @@ function createPreview<State extends object>(
     dragging: () => sliding,
     /** Starts a press and slide from an option: each option the pointer slides over previews, letting go on one chooses it. */
     pointerdown(event: PointerEvent, key: string, surface: HTMLElement) {
-      if (!drags.accepts(event)) return
+      if (!drags.accepts(event)) {
+        return
+      }
       event.preventDefault()
       // Boxes are read once, on press, so sliding measures nothing.
       const boxes = elements(context, options.slot).map((item) => ({
@@ -103,21 +147,31 @@ function createPreview<State extends object>(
         box: item.el.getBoundingClientRect(),
       }))
       const under = (x: number, y: number) =>
-        boxes.find(({ box }) => x >= box.left && x <= box.right && y >= box.top && y <= box.bottom)?.key ??
-        null
+        boxes.find(
+          ({ box }) =>
+            x >= box.left && x <= box.right && y >= box.top && y <= box.bottom
+        )?.key ?? null
       sliding = true
       api.show(key, { reason: "item-hover", event })
       drags.start(surface, event, {
         cancelOnEscape: true,
         onMove: ({ x, y, event: move }) => {
           const next = under(x, y)
-          if (next !== current()) api.show(next, { reason: "item-hover", event: move })
+          if (next !== current()) {
+            api.show(next, { reason: "item-hover", event: move })
+          }
         },
         onEnd: (end, canceled) => {
           sliding = false
           const landed = canceled ? null : under(end.clientX, end.clientY)
-          if (landed && landed !== options.value?.()) api.choose(landed, { event: end })
-          else api.clear({ reason: landed ? "item-press" : "focus-out", event: end })
+          if (landed && landed !== options.value?.()) {
+            api.choose(landed, { event: end })
+          } else {
+            api.clear({
+              reason: landed ? "item-press" : "focus-out",
+              event: end,
+            })
+          }
         },
       })
     },

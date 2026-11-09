@@ -19,13 +19,20 @@ const seatMap = definePrimitive({
   }),
   slots: (slot) => ({
     root: slot({ attrs: () => ({ role: "grid" }) }),
-    row: slot<{ id: string }>({ props: { id: "string" }, attrs: () => ({ role: "row" }) }),
+    row: slot<{ id: string }>({
+      props: { id: "string" },
+      attrs: () => ({ role: "row" }),
+    }),
     seat: slot<{ id: string; row: number; col: number }>({
       props: { row: "number", col: "number" },
-      attrs: (state, { props, api }) => ({ role: "gridcell", tabindex: api.grid.tabIndex(state, props) }),
+      attrs: (state, { props, api }) => ({
+        role: "gridcell",
+        tabindex: api.grid.tabIndex(state, props),
+      }),
       on: {
         keydown: (event, { api }) => api.grid.keydown(event),
-        pointerdown: (event, { api, props }) => api.grid.focus(props, { reason: "item-press", event }),
+        pointerdown: (event, { api, props }) =>
+          api.grid.focus(props, { reason: "item-press", event }),
       },
       bind: (el, { api, props }) => api.grid.bind(el, props),
     }),
@@ -38,8 +45,18 @@ const SeatMap = parts.Root
 
 const SeatMapRow = parts.Row
 
-function SeatMapSeat({ row, col, ...props }: { row: number; col: number } & PartProps<"div">) {
-  return usePart(seatMap, "seat", { id: `${row}:${col}`, row, col }, props, "div")
+function SeatMapSeat({
+  row,
+  col,
+  ...props
+}: { row: number; col: number } & PartProps<"div">) {
+  return usePart(
+    seatMap,
+    "seat",
+    { id: `${row}:${col}`, row, col },
+    props,
+    "div"
+  )
 }
 
 const letters = "ABCD"
@@ -50,7 +67,12 @@ function Example() {
       {[0, 1, 2].map((row) => (
         <SeatMapRow key={row} id={String(row)}>
           {[0, 1, 2, 3, 4, 5].map((col) => (
-            <SeatMapSeat key={col} row={row} col={col} aria-label={`Seat ${letters[row]}${col + 1}`}>
+            <SeatMapSeat
+              key={col}
+              row={row}
+              col={col}
+              aria-label={`Seat ${letters[row]}${col + 1}`}
+            >
               {letters[row]}
               {col + 1}
             </SeatMapSeat>
@@ -61,4 +83,12 @@ function Example() {
   )
 }
 
-export { Example, seatMap, SeatMap, SeatMapRow, SeatMapSeat, type SeatMapOptions, type SeatMapState }
+export {
+  Example,
+  seatMap,
+  SeatMap,
+  SeatMapRow,
+  SeatMapSeat,
+  type SeatMapOptions,
+  type SeatMapState,
+}

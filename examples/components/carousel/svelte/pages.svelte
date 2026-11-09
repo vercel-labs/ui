@@ -36,7 +36,10 @@
     <CarouselIndicatorGroup aria-label="Choose a page">
       {#snippet children(state)}
         {#each { length: state.pageCount ?? 3 }, index (index)}
-          <CarouselIndicator page={index + 1} aria-label={`Page ${index + 1}`} />
+          <CarouselIndicator
+            page={index + 1}
+            aria-label={`Page ${index + 1}`}
+          />
         {/each}
       {/snippet}
     </CarouselIndicatorGroup>

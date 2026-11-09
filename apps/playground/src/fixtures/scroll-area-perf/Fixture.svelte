@@ -14,13 +14,20 @@
   // it counts them. Items render in the content's snippet, so they count each
   // time it renders.
   const items = perfItems(perfSize())
-  const count = (kind: "item" | "content" | "thumb", ...reads: unknown[]) => (countRender(kind), "")
+  const count = (kind: "item" | "content" | "thumb", ...reads: unknown[]) => (
+    countRender(kind),
+    ""
+  )
 </script>
 
 <div class="fixture scroll-fixture">
   <button>Before</button>
   <ScrollArea class="scroll-area" type="always">
-    <ScrollAreaViewport class="scroll-area-viewport" role="region" aria-label="Items">
+    <ScrollAreaViewport
+      class="scroll-area-viewport"
+      role="region"
+      aria-label="Items"
+    >
       <ScrollAreaContent>
         {#snippet render({ props })}
           <div {...props}>

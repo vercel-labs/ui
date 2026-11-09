@@ -37,13 +37,17 @@ const TokenContext = createContext<string | null>(null)
 
 function useTokenInput() {
   const context = useContext(TokenInputContext)
-  if (!context) throw new Error("TokenInput parts must be used inside <TokenInput>.")
+  if (!context) {
+    throw new Error("TokenInput parts must be used inside <TokenInput>.")
+  }
   return context
 }
 
 function useTokenId(part: string) {
   const id = useContext(TokenContext)
-  if (!id) throw new Error(`<${part}> must be used inside renderToken.`)
+  if (!id) {
+    throw new Error(`<${part}> must be used inside renderToken.`)
+  }
   return id
 }
 
@@ -76,7 +80,7 @@ function TokenInput(props: TokenInputProps) {
     () => !!props.renderToken,
     (custom) => {
       input.api.internal.setCustom(custom)
-    },
+    }
   )
   return (
     <TokenInputContext value={input}>
@@ -98,9 +102,14 @@ function TokenInput(props: TokenInputProps) {
 // Each token's content, rendered into its host in the editor. The hosts are
 // read after mount, from an effect: the server has none, and reading them
 // while hydrating would render content the server never did.
-function tokens(input: TokenInputContextValue, renderToken: (token: Token) => JSX.Element) {
+function tokens(
+  input: TokenInputContextValue,
+  renderToken: (token: Token) => JSX.Element
+) {
   // Written from core's listeners, which can fire inside a disposal.
-  const [hosts, setHosts] = createSignal<ReturnType<typeof input.api.internal.hosts>>([], {
+  const [hosts, setHosts] = createSignal<
+    ReturnType<typeof input.api.internal.hosts>
+  >([], {
     ownedWrite: true,
   })
   createEffect(
@@ -109,7 +118,7 @@ function tokens(input: TokenInputContextValue, renderToken: (token: Token) => JS
       const read = () => setHosts(input.api.internal.hosts())
       read()
       return input.instance.subscribe(read)
-    },
+    }
   )
   return (
     <For each={hosts()} keyed={(entry) => entry.id}>
@@ -144,7 +153,8 @@ function formInput(input: TokenInputContextValue) {
  * @stable
  */
 function TokenInputEditor(
-  props: Omit<PartProps<"div", TokenInputEditorState>, "children"> & TokenInputEditorProps,
+  props: Omit<PartProps<"div", TokenInputEditorState>, "children"> &
+    TokenInputEditorProps
 ) {
   const input = useTokenInput()
   const field = useFieldControl(props)
@@ -174,10 +184,22 @@ function TokenInputToken(props: PartProps<"span", TokenInputTokenState>) {
 function TokenInputTokenRemove(props: PartProps<"span">) {
   const input = useTokenInput()
   const id = useTokenId("TokenInputTokenRemove")
-  return usePart(input, "token-remove", () => ({ id, token: id }), props, "span")
+  return usePart(
+    input,
+    "token-remove",
+    () => ({ id, token: id }),
+    props,
+    "span"
+  )
 }
 
-export { createTokenInputController, defaultCodec, fromText, toLabel, toText } from "@ui-sdk/core/token-input"
+export {
+  createTokenInputController,
+  defaultCodec,
+  fromText,
+  toLabel,
+  toText,
+} from "@ui-sdk/core/token-input"
 export type {
   HistoryOptions,
   TextEditorAdapter,
@@ -201,4 +223,10 @@ export type {
   TokenInsert,
 } from "@ui-sdk/core/token-input"
 
-export { TokenInput, TokenInputEditor, type TokenInputProps, TokenInputToken, TokenInputTokenRemove }
+export {
+  TokenInput,
+  TokenInputEditor,
+  type TokenInputProps,
+  TokenInputToken,
+  TokenInputTokenRemove,
+}

@@ -22,9 +22,16 @@ const action = ref("")
 const reason = ref("")
 const rested = ref("")
 
-function onPageChange(next: number, details: { reason: string; cancel: () => void }) {
-  if (next === cancel) return details.cancel()
-  if (controlled) page.value = next
+function onPageChange(
+  next: number,
+  details: { reason: string; cancel: () => void }
+) {
+  if (next === cancel) {
+    return details.cancel()
+  }
+  if (controlled) {
+    page.value = next
+  }
   action.value = String(next)
   reason.value = details.reason
 }
@@ -42,7 +49,11 @@ function onPageChange(next: number, details: { reason: string; cancel: () => voi
       @page-change="onPageChange"
       @page-change-complete="(page: number) => (rested = String(page))"
     >
-      <CarouselPlayToggle v-if="playToggle" class="carousel-toggle" v-slot="{ state }">
+      <CarouselPlayToggle
+        v-if="playToggle"
+        class="carousel-toggle"
+        v-slot="{ state }"
+      >
         {{ state.playing ? carouselFixture.stop : carouselFixture.start }}
       </CarouselPlayToggle>
       <CarouselViewport class="carousel-viewport">
@@ -54,15 +65,24 @@ function onPageChange(next: number, details: { reason: string; cancel: () => voi
           >
             <p>{{ slide.title }}</p>
             <a :href="`?product=${index + 1}`">{{ slide.link }}</a>
-            <label v-if="index === 2"> {{ carouselFixture.field }} <input /></label>
+            <label v-if="index === 2">
+              {{ carouselFixture.field }} <input
+            /></label>
           </CarouselItem>
         </CarouselContent>
       </CarouselViewport>
       <div class="carousel-controls">
-        <CarouselPrevious class="carousel-step">{{ carouselFixture.previous }}</CarouselPrevious>
-        <CarouselNext class="carousel-step">{{ carouselFixture.next }}</CarouselNext>
+        <CarouselPrevious class="carousel-step">{{
+          carouselFixture.previous
+        }}</CarouselPrevious>
+        <CarouselNext class="carousel-step">{{
+          carouselFixture.next
+        }}</CarouselNext>
       </div>
-      <CarouselIndicatorGroup class="carousel-controls" :aria-label="carouselFixture.indicators">
+      <CarouselIndicatorGroup
+        class="carousel-controls"
+        :aria-label="carouselFixture.indicators"
+      >
         <CarouselIndicator
           v-for="(slide, index) in carouselFixture.slides"
           :key="slide.title"

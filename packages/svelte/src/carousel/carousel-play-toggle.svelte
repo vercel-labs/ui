@@ -19,9 +19,13 @@ Starts and stops rotation. Label it from `playing` in its state, as the carousel
   let {
     controller,
     ...rest
-  }: PartProps<"button", CarouselPlayToggleState> & CarouselControlProps = $props()
+  }: PartProps<"button", CarouselPlayToggleState> & CarouselControlProps =
+    $props()
 
-  const connected = useControllerTarget(() => controller, getContext<CarouselContext | undefined>(carouselPrimitive))
+  const connected = useControllerTarget(
+    () => controller,
+    getContext<CarouselContext | undefined>(carouselPrimitive)
+  )
   const carousel = $derived(connected())
 </script>
 
@@ -32,5 +36,9 @@ Starts and stops rotation. Label it from `playing` in its state, as the carousel
   {/key}
 {:else}
   <!-- Until the carousel it names mounts, a control outside the carousel is a plain element. -->
-  <Part tag="button" part={plainPart({ playing: false, paused: false }, { type: "button" })} props={rest} />
+  <Part
+    tag="button"
+    part={plainPart({ playing: false, paused: false }, { type: "button" })}
+    props={rest}
+  />
 {/if}

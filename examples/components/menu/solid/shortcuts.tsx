@@ -1,4 +1,10 @@
-import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "@ui-sdk/solid/menu"
+import {
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuSeparator,
+  MenuTrigger,
+} from "@ui-sdk/solid/menu"
 import { useLog } from "../../../shared/solid/log"
 
 function Example() {

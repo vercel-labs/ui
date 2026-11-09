@@ -1,5 +1,11 @@
 import * as React from "react"
-import { bindLayer, css, definePrimitive, keepFocus, position } from "@ui-sdk/core"
+import {
+  bindLayer,
+  css,
+  definePrimitive,
+  keepFocus,
+  position,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type Point = { x: number; y: number }
@@ -23,13 +29,25 @@ const pins = definePrimitive({
       close,
       press(event: MouseEvent, map: HTMLElement) {
         const box = map.getBoundingClientRect()
-        const pin = { x: Math.round(event.clientX - box.left), y: Math.round(event.clientY - box.top) }
-        store.set({ open: true, anchor: { x: event.clientX, y: event.clientY }, pin })
+        const pin = {
+          x: Math.round(event.clientX - box.left),
+          y: Math.round(event.clientY - box.top),
+        }
+        store.set({
+          open: true,
+          anchor: { x: event.clientX, y: event.clientY },
+          pin,
+        })
       },
       keydown(event: KeyboardEvent, map: HTMLElement) {
-        if (event.key !== "Enter") return
+        if (event.key !== "Enter") {
+          return
+        }
         event.preventDefault()
-        const pin = { x: Math.round(map.clientWidth / 2), y: Math.round(map.clientHeight / 2) }
+        const pin = {
+          x: Math.round(map.clientWidth / 2),
+          y: Math.round(map.clientHeight / 2),
+        }
         store.set({ open: true, anchor: map, pin })
       },
     }
@@ -45,9 +63,15 @@ const pins = definePrimitive({
     card: slot<{}, { pin: Point | null }>({
       present: (state) => state.open,
       state: (state) => ({ pin: state.pin }),
-      attrs: () => ({ role: "dialog", style: css({ inset: "auto", margin: "0" }) }),
+      attrs: () => ({
+        role: "dialog",
+        style: css({ inset: "auto", margin: "0" }),
+      }),
       bind: (el, { api, store }) => {
-        const stopLayer = bindLayer(el, { topLayer: true, onDismiss: () => api.close() })
+        const stopLayer = bindLayer(el, {
+          topLayer: true,
+          onDismiss: () => api.close(),
+        })
         const stopPosition = position(() => store.get().anchor, el, {
           side: "bottom",
           align: "start",
@@ -95,4 +119,13 @@ function Example() {
   )
 }
 
-export { Example, pins, Pins, PinsCard, PinsClose, PinsMap, type PinsState, type Point }
+export {
+  Example,
+  pins,
+  Pins,
+  PinsCard,
+  PinsClose,
+  PinsMap,
+  type PinsState,
+  type Point,
+}

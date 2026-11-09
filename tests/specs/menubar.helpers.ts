@@ -3,7 +3,8 @@ import { expect, expectFocus, menuNamed } from "../fixtures"
 type Page = import("@playwright/test").Page
 
 const menubar = (page: Page) => page.getByRole("menubar", { name: "Editor" })
-const trigger = (page: Page, name: string) => menubar(page).getByRole("menuitem", { name, exact: true })
+const trigger = (page: Page, name: string) =>
+  menubar(page).getByRole("menuitem", { name, exact: true })
 
 // Tabs onto the menubar's first trigger.
 async function enter(page: Page, tab: () => Promise<void>) {

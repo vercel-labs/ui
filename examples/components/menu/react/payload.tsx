@@ -31,7 +31,10 @@ function Example() {
       <div data-slot="controls">
         <button
           onClick={async (event) => {
-            const result = await menu.open({ payload: files[0], anchor: event.currentTarget })
+            const result = await menu.open({
+              payload: files[0],
+              anchor: event.currentTarget,
+            })
             log(`Closed with ${result.reason}`)
           }}
         >
@@ -55,7 +58,10 @@ function Example() {
           </li>
         ))}
       </ul>
-      <Menu controller={menu} onAction={(action) => log(`${action} ${menu.getPayload()?.name}`)}>
+      <Menu
+        controller={menu}
+        onAction={(action) => log(`${action} ${menu.getPayload()?.name}`)}
+      >
         <MenuContent<File> align="end">
           {(state) => (
             <>

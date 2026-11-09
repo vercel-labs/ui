@@ -5,7 +5,10 @@ The combobox renders no element of its own: the input, the chips and the
 list are its parts.
 @stable
 -->
-<script lang="ts" generics="T = string, Multiple extends boolean | undefined = false">
+<script
+  lang="ts"
+  generics="T = string, Multiple extends boolean | undefined = false"
+>
   import type { ChangeDetails, DismissAttemptDetails } from "@ui-sdk/core"
   import type { AsyncOptionsStatus } from "@ui-sdk/core/async-options"
   import {
@@ -54,7 +57,10 @@ list are its parts.
         /** The value selected at first, when uncontrolled. A form reset returns to it. */
         defaultValue?: T | null
         /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
-        onValueChange?: (value: NoInfer<T> | null, details: ValueDetails) => void
+        onValueChange?: (
+          value: NoInfer<T> | null,
+          details: ValueDetails
+        ) => void
       } & ([Multiple] extends [false | undefined] ? unknown : never))
     | ({
         /** Whether several items can be selected. */
@@ -64,7 +70,10 @@ list are its parts.
         /** The value or values selected at first, when uncontrolled. A form reset returns to it. */
         defaultValue?: T | T[] | null
         /** Runs when a user, a form reset or a controller wants to change the value. `details.cancel()` stops it. */
-        onValueChange?: (value: NoInfer<T> | NoInfer<T>[] | null, details: ValueDetails) => void
+        onValueChange?: (
+          value: NoInfer<T> | NoInfer<T>[] | null,
+          details: ValueDetails
+        ) => void
       } & (boolean extends Multiple ? unknown : never))
   type OpenDetails = ChangeDetails<ComboboxOpenChangeReason>
 
@@ -179,7 +188,9 @@ list are its parts.
     /** Runs when the highlight or scrolling reaches the last item, so the next page can load. */
     onLoadMore?: () => void
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back, the screen reader's escape or a swipe. Focus or the window leaving is refused without it. */
-    onDismissAttempt?: (details: DismissAttemptDetails<ComboboxDismissReason>) => void
+    onDismissAttempt?: (
+      details: DismissAttemptDetails<ComboboxDismissReason>
+    ) => void
     children?: Snippet
   } & ComboboxValueProps<T, Multiple> = $props()
 
@@ -228,15 +239,21 @@ list are its parts.
     onValueChange: (next: unknown, details: ValueDetails) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next as never, details)
-      if (!details.canceled) value = next as never
+      if (!details.canceled) {
+        value = next as never
+      }
     },
     onQueryChange: (next: string, details: QueryDetails) => {
       onQueryChange?.(next, details)
-      if (!details.canceled) query = next
+      if (!details.canceled) {
+        query = next
+      }
     },
     onOpenChange: (next: boolean, details: OpenDetails) => {
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onHighlight,
@@ -252,7 +269,10 @@ list are its parts.
   // more per value with `multiple`. The input's attributes change with the
   // value, so reading them keeps the list of values current.
   const formInput = useHandlePart(combobox, "form-input")
-  const values = $derived((formInput.attrs, combobox.state.multiple ? combobox.api.internal.serialized() : []))
+  const values = $derived(
+    (formInput.attrs,
+    combobox.state.multiple ? combobox.api.internal.serialized() : [])
+  )
 </script>
 
 {@render children?.()}

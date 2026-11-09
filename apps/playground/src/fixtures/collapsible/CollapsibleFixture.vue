@@ -6,15 +6,21 @@ import { collapsibleOptions } from "tests/fixtures/page.ts"
 import { ref } from "vue"
 
 const controller = createCollapsibleController()
-const { cancel, keepMounted, hiddenUntilFound, ...options } = collapsibleOptions()
+const { cancel, keepMounted, hiddenUntilFound, ...options } =
+  collapsibleOptions()
 
 const action = ref("")
 const reason = ref("")
 const source = ref("")
 const complete = ref("")
 
-function onOpenChange(open: boolean, details: { reason: string; source: string; cancel: () => void }) {
-  if (cancel === (open ? "open" : "close")) return details.cancel()
+function onOpenChange(
+  open: boolean,
+  details: { reason: string; source: string; cancel: () => void }
+) {
+  if (cancel === (open ? "open" : "close")) {
+    return details.cancel()
+  }
   action.value = open ? "open" : "closed"
   reason.value = details.reason
   source.value = details.source
@@ -29,9 +35,13 @@ function onOpenChange(open: boolean, details: { reason: string; source: string; 
       v-bind="options"
       :controller="controller"
       @open-change="onOpenChange"
-      @open-change-complete="(open: boolean) => (complete = open ? 'open' : 'closed')"
+      @open-change-complete="
+        (open: boolean) => (complete = open ? 'open' : 'closed')
+      "
     >
-      <CollapsibleTrigger class="collapsible-trigger">{{ fixture.trigger }}</CollapsibleTrigger>
+      <CollapsibleTrigger class="collapsible-trigger">{{
+        fixture.trigger
+      }}</CollapsibleTrigger>
       <CollapsiblePanel
         class="collapsible-panel"
         :keep-mounted="keepMounted"

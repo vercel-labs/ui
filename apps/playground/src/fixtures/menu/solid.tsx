@@ -91,7 +91,9 @@ function Fixture() {
       <output role="status" aria-label="Last action">
         {action()}
       </output>
-      <button onClick={() => controller.open({ focus: "first" })}>Open with controller</button>
+      <button onClick={() => controller.open({ focus: "first" })}>
+        Open with controller
+      </button>
     </div>
   )
 }

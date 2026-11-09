@@ -30,11 +30,13 @@ function Subtasks(props: { issue: Issue }) {
   const checked = createMemo(() =>
     all()
       .filter((subtask) => subtask.done)
-      .map((subtask) => subtask.id),
+      .map((subtask) => subtask.id)
   )
   const items = createMemo(() => toItems(props.issue.subtasks))
   const expanded = untrack(() =>
-    props.issue.subtasks.filter((subtask) => subtask.subtasks).map((subtask) => subtask.id),
+    props.issue.subtasks
+      .filter((subtask) => subtask.subtasks)
+      .map((subtask) => subtask.id)
   )
 
   return (

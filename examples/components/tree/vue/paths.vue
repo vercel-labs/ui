@@ -35,20 +35,25 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
         {},
         {
           default: ({ state }: { state: TreeItemState }) => [
-            children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+            children &&
+              h(TreeItemIndicator, {}, () =>
+                h(ChevronRightIcon, { "aria-hidden": "true" })
+              ),
             h("span", {}, label),
             state.pending && h(LoaderCircleIcon, { "aria-hidden": "true" }),
           ],
-        },
+        }
       ),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
-    ]),
+    ])
   )
 
 const log = useLog()
 
 async function open(value: string) {
-  if (!files.has(value)) return
+  if (!files.has(value)) {
+    return
+  }
   await new Promise((resolve) => setTimeout(resolve, 600))
   log(`Opened ${value}`)
 }

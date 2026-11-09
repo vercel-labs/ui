@@ -37,11 +37,14 @@ const Items: FunctionalComponent<{ items: TreeItemData[] }> = ({ items }) =>
   items.map(({ value, label, children }) =>
     h(TreeItem, { key: value, value }, () => [
       h(TreeItemLabel, {}, () => [
-        children && h(TreeItemIndicator, {}, () => h(ChevronRightIcon, { "aria-hidden": "true" })),
+        children &&
+          h(TreeItemIndicator, {}, () =>
+            h(ChevronRightIcon, { "aria-hidden": "true" })
+          ),
         label,
       ]),
       children && h(TreeGroup, {}, () => h(Items, { items: children })),
-    ]),
+    ])
   )
 
 const log = useLog()
@@ -53,7 +56,11 @@ const log = useLog()
     :items="items"
     mode="multiple"
     :default-value="['updates', 'website']"
-    @value-change="(value) => Array.isArray(value) && log(`${value.length} selected: ${value.join(', ')}`)"
+    @value-change="
+      (value) =>
+        Array.isArray(value) &&
+        log(`${value.length} selected: ${value.join(', ')}`)
+    "
     :expand-on-press="false"
     :default-expanded="['inbox', 'projects']"
   >

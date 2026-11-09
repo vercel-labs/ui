@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { Progress, ProgressIndicator, ProgressLabel, ProgressTrack } from "@ui-sdk/vue/progress"
+import {
+  Progress,
+  ProgressIndicator,
+  ProgressLabel,
+  ProgressTrack,
+} from "@ui-sdk/vue/progress"
 </script>
 
 <template>

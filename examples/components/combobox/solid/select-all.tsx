@@ -60,7 +60,9 @@ function Example() {
                 {(value, index) => (
                   <ComboboxChip value={value}>
                     {state.labels[index()]}
-                    <ComboboxChipRemove aria-label={`Remove ${state.labels[index()]}`}>
+                    <ComboboxChipRemove
+                      aria-label={`Remove ${state.labels[index()]}`}
+                    >
                       <svg
                         viewBox="0 0 24 24"
                         fill="none"
@@ -117,7 +119,11 @@ function Example() {
               <ComboboxGroup>
                 <ComboboxGroupLabel>{group.label}</ComboboxGroupLabel>
                 <ComboboxSelectAll>
-                  {(state) => (state.checked ? `Clear ${group.label}` : `Select all in ${group.label}`)}
+                  {(state) =>
+                    state.checked
+                      ? `Clear ${group.label}`
+                      : `Select all in ${group.label}`
+                  }
                 </ComboboxSelectAll>
                 <For each={group.items}>
                   {(zone) => (

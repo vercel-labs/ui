@@ -24,11 +24,21 @@ function mount(root: HTMLElement) {
       </ui-toolbar-link>
     </ui-toolbar>
   `
-  root.querySelector('[aria-label="Approve"]')!.addEventListener("click", () => log(root, "Approved"))
-  root.querySelector('[aria-label="Comment"]')!.addEventListener("click", () => log(root, "Comment"))
+  root
+    .querySelector('[aria-label="Approve"]')!
+    .addEventListener("click", () => log(root, "Approved"))
+  root
+    .querySelector('[aria-label="Comment"]')!
+    .addEventListener("click", () => log(root, "Comment"))
   for (const link of root.querySelectorAll("a")) {
     link.addEventListener("click", (event) => {
-      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
         return
       }
       event.preventDefault()

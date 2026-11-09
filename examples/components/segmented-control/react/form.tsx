@@ -28,14 +28,18 @@ function Example() {
           <SegmentedControlItem value="dark">Dark</SegmentedControlItem>
           <SegmentedControlItem value="system">System</SegmentedControlItem>
         </SegmentedControl>
-        <FieldDescription>System follows your device's setting.</FieldDescription>
+        <FieldDescription>
+          System follows your device's setting.
+        </FieldDescription>
       </Field>
       <Field>
         <FieldLabel>Density</FieldLabel>
         <SegmentedControl name="density" defaultValue="comfortable">
           <SegmentedControlIndicator />
           <SegmentedControlItem value="compact">Compact</SegmentedControlItem>
-          <SegmentedControlItem value="comfortable">Comfortable</SegmentedControlItem>
+          <SegmentedControlItem value="comfortable">
+            Comfortable
+          </SegmentedControlItem>
         </SegmentedControl>
       </Field>
       <div data-slot="row">

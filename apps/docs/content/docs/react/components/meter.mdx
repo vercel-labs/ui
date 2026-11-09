@@ -65,7 +65,13 @@ const {
   Value: QuotaValue,
   Track: QuotaTrack,
   Indicator: QuotaFill,
-} = createParts(meter, { root: "div", label: "span", value: "span", track: "div", indicator: "div" })
+} = createParts(meter, {
+  root: "div",
+  label: "span",
+  value: "span",
+  track: "div",
+  indicator: "div",
+})
 
 export { Quota, QuotaFill, QuotaLabel, QuotaTrack, QuotaValue }
 ```
@@ -145,17 +151,26 @@ Props are the same as below, as React props.
 
 ### Meter
 
-<TypeTable path="../../packages/core/src/components/meter/meter.ts" name="MeterOptions" />
+<TypeTable
+  path="../../packages/core/src/components/meter/meter.ts"
+  name="MeterOptions"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive. Every part gets the same state.
 
-<StateTable path="../../packages/core/src/components/meter/meter.ts" name="MeterState" />
+<StateTable
+  path="../../packages/core/src/components/meter/meter.ts"
+  name="MeterState"
+/>
 
 `MeterValue` adds the formatted text:
 
-<StateTable path="../../packages/core/src/components/meter/meter.ts" name="MeterValueState" />
+<StateTable
+  path="../../packages/core/src/components/meter/meter.ts"
+  name="MeterValueState"
+/>
 
 ## Accessibility
 

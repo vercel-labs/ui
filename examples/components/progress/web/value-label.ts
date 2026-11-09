@@ -14,7 +14,8 @@ function mount(root: HTMLElement) {
   const progress = root.querySelector("ui-progress") as HTMLElement & {
     getValueLabel: (value: number | null, details: GaugeLabelDetails) => string
   }
-  progress.getValueLabel = (value, details) => `${value} of ${details.max} files, ${details.formatted}`
+  progress.getValueLabel = (value, details) =>
+    `${value} of ${details.max} files, ${details.formatted}`
 }
 
 export { mount }

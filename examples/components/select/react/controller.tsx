@@ -54,7 +54,11 @@ function Example() {
           <ChevronDownIcon />
         </SelectTrigger>
       </Field>
-      <Select controller={status} items={statuses} placeholder="Select a status">
+      <Select
+        controller={status}
+        items={statuses}
+        placeholder="Select a status"
+      >
         <SelectContent>
           {statuses.map((item) => (
             <SelectItem key={item.value} value={item.value}>

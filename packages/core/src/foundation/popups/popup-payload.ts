@@ -10,7 +10,10 @@ import type { Store } from "../kernel/store"
 function createPopupPayload<Reason extends string>(
   store: Store<{ trigger: string | null; payload: unknown }>,
   // Fires `onPayloadChange` and writes the payload, unless canceled.
-  change: (payload: unknown, details: { reason: Reason; event?: Event }) => boolean,
+  change: (
+    payload: unknown,
+    details: { reason: Reason; event?: Event }
+  ) => boolean
 ) {
   type Details = { reason: Reason; event?: Event }
 
@@ -18,8 +21,13 @@ function createPopupPayload<Reason extends string>(
     // Call before an open fires `onOpenChange`, so it reads the new payload.
     // Returns what puts the trigger and payload back, for an open that was canceled.
     opening(trigger: string | undefined, payload: unknown, details: Details) {
-      const previous = { trigger: store.get().trigger, payload: store.get().payload }
-      if (trigger !== undefined) store.set({ trigger })
+      const previous = {
+        trigger: store.get().trigger,
+        payload: store.get().payload,
+      }
+      if (trigger !== undefined) {
+        store.set({ trigger })
+      }
       change(payload, details)
       return () => store.set(previous)
     },

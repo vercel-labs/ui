@@ -7,7 +7,11 @@ import {
   type SliderValueState,
 } from "@ui-sdk/core/slider"
 import * as React from "react"
-import { controlRender, useFieldControl, useFieldControlId } from "./field-context"
+import {
+  controlRender,
+  useFieldControl,
+  useFieldControlId,
+} from "./field-context"
 import {
   createParts,
   extendHandle,
@@ -33,14 +37,22 @@ const SliderContext = React.createContext<SliderContextValue | null>(null)
 
 function useSlider(part: string) {
   const context = React.useContext(SliderContext)
-  if (!context) throw new Error(`${part} must be used inside <Slider>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <Slider>.`)
+  }
   return context
 }
 
-type DivProps<State> = Omit<PartProps<"div", State>, "defaultValue" | "onChange" | "onSelect">
+type DivProps<State> = Omit<
+  PartProps<"div", State>,
+  "defaultValue" | "onChange" | "onSelect"
+>
 
 // Content, then what the part adds after it, with function children resolved.
-function withAfter<State>(children: DivProps<State>["children"], after: React.ReactNode) {
+function withAfter<State>(
+  children: DivProps<State>["children"],
+  after: React.ReactNode
+) {
   return (state: State) => (
     <>
       {typeof children === "function" ? children(state) : children}
@@ -106,14 +118,18 @@ function Slider<Value extends number | number[] = number | number[]>({
   const range = Array.isArray(shape) && shape.length > 1
   const context = React.useMemo(
     () => extendHandle(slider, { field: range ? null : field }),
-    [slider, range, field],
+    [slider, range, field]
   )
   const root = {
     ...props,
     children: withAfter(children, <HiddenInput />),
     render: controlRender(range ? field : null, "div", render),
   }
-  return <SliderContext.Provider value={context}>{usePart(slider, "root", {}, root)}</SliderContext.Provider>
+  return (
+    <SliderContext.Provider value={context}>
+      {usePart(slider, "root", {}, root)}
+    </SliderContext.Provider>
+  )
 }
 
 // The hidden input the form submits.
@@ -155,9 +171,17 @@ function SliderThumb({
   // Thumbs are told apart by their index.
   const thumb = { index, id: String(index) }
   const input = (
-    <ThumbInput {...thumb} aria-label={label} aria-labelledby={labelledBy} aria-describedby={describedBy} />
+    <ThumbInput
+      {...thumb}
+      aria-label={label}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
+    />
   )
-  return usePart(sliderPrimitive, "thumb", thumb, { ...props, children: withAfter(children, input) })
+  return usePart(sliderPrimitive, "thumb", thumb, {
+    ...props,
+    children: withAfter(children, input),
+  })
 }
 
 // The native range input inside a thumb, which takes focus.
@@ -172,17 +196,28 @@ function ThumbInput({
   const { field } = useSlider("SliderThumb")
   // The core writes the input's value, so React only renders where it starts.
   const render = (input: Record<string, any>) => {
-    const { value, ...rest }: Record<string, any> = field ? field.props(input) : input
+    const { value, ...rest }: Record<string, any> = field
+      ? field.props(input)
+      : input
     return <input {...rest} defaultValue={value} />
   }
-  return usePart(sliderPrimitive, "thumb-input", { index, id }, { ...named, render }, "input")
+  return usePart(
+    sliderPrimitive,
+    "thumb-input",
+    { index, id },
+    { ...named, render },
+    "input"
+  )
 }
 
 /**
  * The formatted value, a range joined with an en dash. Children replace it.
  * @stable
  */
-function SliderValue({ children = text, ...props }: PartProps<"output", SliderValueState>) {
+function SliderValue({
+  children = text,
+  ...props
+}: PartProps<"output", SliderValueState>) {
   return <parts.Value {...props}>{children}</parts.Value>
 }
 
@@ -205,4 +240,11 @@ export type {
   SliderValueState,
 } from "@ui-sdk/core/slider"
 
-export { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack, SliderValue }
+export {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+}

@@ -7,7 +7,8 @@ import { createSSRApp, h, type VNodeChild } from "vue"
 import { Calendar, CalendarNext, CalendarPrevious } from "../src/calendar"
 import { Combobox, ComboboxInput, ComboboxLabel } from "../src/combobox"
 
-const render = (view: () => VNodeChild) => renderToString(createSSRApp(() => view()))
+const render = (view: () => VNodeChild) =>
+  renderToString(createSSRApp(() => view()))
 
 function attribute(html: string, opening: string, name: string) {
   const tag = html.match(new RegExp(`${opening}[^>]*>`))?.[0] ?? ""
@@ -19,18 +20,26 @@ test("a calendar's Previous takes the label passed to it, and Next keeps its own
     h(Calendar, { defaultMonth: "2026-10" }, () => [
       h(CalendarPrevious, { "aria-label": "Mois précédent" }),
       h(CalendarNext, { "data-slot": "next" }),
-    ]),
+    ])
   )
-  expect(attribute(html, '<button[^>]*data-slot="calendar-previous"', "aria-label")).toBe("Mois précédent")
-  expect(attribute(html, '<button[^>]*data-slot="calendar-next"', "aria-label")).toBe("Next month")
+  expect(
+    attribute(html, '<button[^>]*data-slot="calendar-previous"', "aria-label")
+  ).toBe("Mois précédent")
+  expect(
+    attribute(html, '<button[^>]*data-slot="calendar-next"', "aria-label")
+  ).toBe("Next month")
 })
 
 test("a combobox input takes the autocomplete and label passed to it, and keeps its role", async () => {
   const html = await render(() =>
     h(Combobox, null, () => [
       h(ComboboxLabel, null, () => "Email"),
-      h(ComboboxInput, { autocomplete: "email", "aria-label": "Work email", role: "textbox" }),
-    ]),
+      h(ComboboxInput, {
+        autocomplete: "email",
+        "aria-label": "Work email",
+        role: "textbox",
+      }),
+    ])
   )
   expect(attribute(html, "<input", "autocomplete")).toBe("email")
   expect(attribute(html, "<input", "aria-label")).toBe("Work email")

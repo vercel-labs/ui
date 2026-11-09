@@ -1,5 +1,9 @@
 import type { ConfirmEntry, ConfirmOptions } from "@ui-sdk/core/dialog"
-import { overlays as sharedOverlays, type OverlayEntry, type Overlays } from "@ui-sdk/core/overlays"
+import {
+  overlays as sharedOverlays,
+  type OverlayEntry,
+  type Overlays,
+} from "@ui-sdk/core/overlays"
 import { toasterInternals, type Toaster } from "@ui-sdk/core/renderer"
 import * as React from "react"
 import {
@@ -34,23 +38,44 @@ type OverlayHostProps = {
  * @stable
  */
 function OverlayHost({ overlays = sharedOverlays, toast }: OverlayHostProps) {
-  const entries = React.useSyncExternalStore(overlays.subscribe, overlays.entries, () => noEntries)
+  const entries = React.useSyncExternalStore(
+    overlays.subscribe,
+    overlays.entries,
+    () => noEntries
+  )
   React.useLayoutEffect(() => overlays.attachHost(), [overlays])
   return entries.map((entry) => {
-    if (entry.type === "toaster")
-      return <HostedToaster key={entry.id} {...(entry.data as { toaster: Toaster })} props={toast} />
-    if (entry.type === "confirm") return <HostedConfirm key={entry.id} entry={entry.data as ConfirmEntry} />
+    if (entry.type === "toaster") {
+      return (
+        <HostedToaster
+          key={entry.id}
+          {...(entry.data as { toaster: Toaster })}
+          props={toast}
+        />
+      )
+    }
+    if (entry.type === "confirm") {
+      return <HostedConfirm key={entry.id} entry={entry.data as ConfirmEntry} />
+    }
     return null
   })
 }
 
-function HostedToaster({ toaster, props }: { toaster: Toaster; props?: Omit<ToastRegionProps, "toaster"> }) {
+function HostedToaster({
+  toaster,
+  props,
+}: {
+  toaster: Toaster
+  props?: Omit<ToastRegionProps, "toaster">
+}) {
   const placed = React.useSyncExternalStore(
     toaster.subscribe,
     () => toasterInternals(toaster).hasPlacedRegion(),
-    () => false,
+    () => false
   )
-  if (placed) return null
+  if (placed) {
+    return null
+  }
   return <Region {...props} toaster={toaster} placed={false} />
 }
 
@@ -61,13 +86,24 @@ function HostedConfirm({ entry }: { entry: ConfirmEntry }) {
   }, [entry])
   const question = (entry.payload ?? {}) as Partial<ConfirmOptions>
   return (
-    <AlertDialog controller={entry.controller} onOpenChangeComplete={(open) => !open && entry.done()}>
+    <AlertDialog
+      controller={entry.controller}
+      onOpenChangeComplete={(open) => !open && entry.done()}
+    >
       <AlertDialogContent>
         <AlertDialogTitle>{question.title}</AlertDialogTitle>
-        {question.description && <AlertDialogDescription>{question.description}</AlertDialogDescription>}
+        {question.description && (
+          <AlertDialogDescription>
+            {question.description}
+          </AlertDialogDescription>
+        )}
         <div>
-          <AlertDialogClose>{question.cancelLabel ?? "Cancel"}</AlertDialogClose>
-          <AlertDialogClose value="confirm">{question.confirmLabel ?? "Continue"}</AlertDialogClose>
+          <AlertDialogClose>
+            {question.cancelLabel ?? "Cancel"}
+          </AlertDialogClose>
+          <AlertDialogClose value="confirm">
+            {question.confirmLabel ?? "Continue"}
+          </AlertDialogClose>
         </div>
       </AlertDialogContent>
     </AlertDialog>

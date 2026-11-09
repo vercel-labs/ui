@@ -9,7 +9,10 @@ function Example() {
   return (
     <div data-slot="row">
       <code>{command}</code>
-      <Tooltip closeOnPress={false} onOpenChangeComplete={(open) => !open && setCopied(false)}>
+      <Tooltip
+        closeOnPress={false}
+        onOpenChangeComplete={(open) => !open && setCopied(false)}
+      >
         <TooltipTrigger
           aria-label={copied() ? "Copied" : "Copy"}
           onClick={() => {

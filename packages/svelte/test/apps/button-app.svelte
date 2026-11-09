@@ -4,4 +4,6 @@
   let { log }: { log: (entry: string) => void } = $props()
 </script>
 
-<Button onclick={(event, { source }) => log(`${event.type}:${source}`)}>Save</Button>
+<Button onclick={(event, { source }) => log(`${event.type}:${source}`)}
+  >Save</Button
+>

@@ -26,7 +26,9 @@ const log = useLog()
     <FieldLabel>Role</FieldLabel>
     <Select
       default-value="editor"
-      @open-change-complete="(open) => log(open ? 'Finished opening' : 'Finished closing')"
+      @open-change-complete="
+        (open) => log(open ? 'Finished opening' : 'Finished closing')
+      "
     >
       <SelectTrigger>
         <SelectValue />

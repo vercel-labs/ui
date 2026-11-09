@@ -1,7 +1,16 @@
 "use client"
 
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/react/checkbox"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/react/checkbox"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { CheckIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
@@ -19,13 +28,17 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        const entries = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        const entries = [...new FormData(event.currentTarget)].map(
+          ([name, value]) => `${name}=${value}`
+        )
         log(`Saved ${entries.join("&")}`)
       }}
     >
       <Field>
         <FieldLabel>Notifications</FieldLabel>
-        <FieldDescription>Choose how we tell you about your orders.</FieldDescription>
+        <FieldDescription>
+          Choose how we tell you about your orders.
+        </FieldDescription>
         <CheckboxGroup name="notifications" required>
           {channels.map((channel) => (
             <label data-slot="label" key={channel.value}>

@@ -23,7 +23,11 @@
     name,
     onAction,
     onOpen,
-  }: { name: string; onAction: (value: string) => void; onOpen: (value: string) => void } = $props()
+  }: {
+    name: string
+    onAction: (value: string) => void
+    onOpen: (value: string) => void
+  } = $props()
 
   const { input, textarea, empty, autoHighlight } = triggerMenuOptions()
   const triggers = fixtureTriggers()
@@ -37,12 +41,18 @@
 <TriggerMenu
   {triggers}
   {autoHighlight}
-  onOpenChange={(open: boolean, details: { reason: string }) => onOpen(`${open}:${details.reason}`)}
+  onOpenChange={(open: boolean, details: { reason: string }) =>
+    onOpen(`${open}:${details.reason}`)}
   onSelect={(value: unknown, details: { arguments: Record<string, string> }) =>
     onAction(selectAction(value, details.arguments))}
 >
   <label class="label" for={id}>{name}</label>
-  <TriggerMenuInput {id} name="message" class="input" render={input || textarea ? field : undefined} />
+  <TriggerMenuInput
+    {id}
+    name="message"
+    class="input"
+    render={input || textarea ? field : undefined}
+  />
   <TriggerMenuHint class="hint" />
   <TriggerMenuStatus class="status" />
   <TriggerMenuContent class="popup list-popup">
@@ -50,7 +60,12 @@
     <TriggerMenuList>
       {#snippet children(state)}
         {#each state.items as TriggerMenuDataItem[] as item (item.value)}
-          <TriggerMenuItem value={item.value} label={item.label} disabled={item.disabled} class="item">
+          <TriggerMenuItem
+            value={item.value}
+            label={item.label}
+            disabled={item.disabled}
+            class="item"
+          >
             {item.label}
           </TriggerMenuItem>
         {/each}

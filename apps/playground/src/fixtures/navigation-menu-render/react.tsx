@@ -11,7 +11,10 @@ import * as React from "react"
 import { createRoot } from "react-dom/client"
 
 // A client-side router's link: it navigates without a page load.
-function RouterLink({ to, ...props }: React.ComponentProps<"a"> & { to: string }) {
+function RouterLink({
+  to,
+  ...props
+}: React.ComponentProps<"a"> & { to: string }) {
   return (
     <a
       {...props}
@@ -33,23 +36,33 @@ function Fixture() {
       <NavigationMenu
         aria-label="Docs"
         className="nav-menu"
-        onValueChange={(value, { reason }) => setAction(`${value ?? "close"}: ${reason}`)}
+        onValueChange={(value, { reason }) =>
+          setAction(`${value ?? "close"}: ${reason}`)
+        }
       >
         <NavigationMenuList className="nav-list">
           <NavigationMenuItem value="guides">
             <NavigationMenuTrigger
-              className={(state) => (state.open ? "nav-trigger is-open" : "nav-trigger is-closed")}
+              className={(state) =>
+                state.open ? "nav-trigger is-open" : "nav-trigger is-closed"
+              }
               render={(props, state) => (
                 <button {...props}>
-                  Guides <span aria-hidden="true">{state.open ? "▲" : "▼"}</span>
+                  Guides{" "}
+                  <span aria-hidden="true">{state.open ? "▲" : "▼"}</span>
                 </button>
               )}
             />
-            <NavigationMenuContent className="nav-content" render={<section aria-label="Guides panel" />}>
+            <NavigationMenuContent
+              className="nav-content"
+              render={<section aria-label="Guides panel" />}
+            >
               <NavigationMenuLink render={<RouterLink to="#intro" />} current>
                 Introduction
               </NavigationMenuLink>
-              <NavigationMenuLink render={<RouterLink to="#install" />}>Install</NavigationMenuLink>
+              <NavigationMenuLink render={<RouterLink to="#install" />}>
+                Install
+              </NavigationMenuLink>
             </NavigationMenuContent>
           </NavigationMenuItem>
         </NavigationMenuList>

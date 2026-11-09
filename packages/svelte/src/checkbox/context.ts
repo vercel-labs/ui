@@ -13,4 +13,10 @@ function useCheckboxGroup() {
   return getContext<CheckboxGroupContext | undefined>(CheckboxGroupKey) ?? null
 }
 
-export { type CheckboxContext, type CheckboxGroupContext, CheckboxGroupKey, CheckboxKey, useCheckboxGroup }
+export {
+  type CheckboxContext,
+  type CheckboxGroupContext,
+  CheckboxGroupKey,
+  CheckboxKey,
+  useCheckboxGroup,
+}

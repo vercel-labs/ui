@@ -17,13 +17,32 @@ const toastFixture = {
     action: "Undo",
   },
   success: { trigger: "Show success", title: "Changes saved" },
-  error: { trigger: "Show error", title: "Upload failed", description: "The file is too large." },
-  promise: { trigger: "Save with promise", loading: "Saving…", success: "Saved", error: "Could not save" },
+  error: {
+    trigger: "Show error",
+    title: "Upload failed",
+    description: "The file is too large.",
+  },
+  promise: {
+    trigger: "Save with promise",
+    loading: "Saving…",
+    success: "Saved",
+    error: "Could not save",
+  },
   // A modal dialog with a button that shows a toast while it's open.
-  dialog: { trigger: "Open dialog", title: "Edit profile", toast: "Notify from dialog", close: "Close" },
+  dialog: {
+    trigger: "Open dialog",
+    title: "Edit profile",
+    toast: "Notify from dialog",
+    close: "Close",
+  },
   // Asks through confirm() on overlay host pages (?host): "Delete project?",
   // and reports "confirmed" or "declined".
-  confirm: { trigger: "Delete project", title: "Delete project?", confirm: "Delete", cancel: "Cancel" },
+  confirm: {
+    trigger: "Delete project",
+    title: "Delete project?",
+    confirm: "Delete",
+    cancel: "Cancel",
+  },
 }
 
 /** What `window.showToast()` takes, the same in every fixture. */
@@ -51,7 +70,9 @@ function toastOptions() {
   return {
     ...(side && { side }),
     ...(align && { align }),
-    ...(params.has("max-visible") && { maxVisible: Number(params.get("max-visible")) }),
+    ...(params.has("max-visible") && {
+      maxVisible: Number(params.get("max-visible")),
+    }),
     ...(params.has("expanded") && { expanded: true }),
     ...(shortcut && { shortcut: shortcut === "none" ? null : shortcut }),
   }
@@ -70,4 +91,11 @@ function usesHost() {
 // The role specs find toasts by: list items named by their titles.
 const toastRole = "listitem" as const
 
-export { type FixtureToast, toastDuration, toastFixture, toastOptions, toastRole, usesHost }
+export {
+  type FixtureToast,
+  toastDuration,
+  toastFixture,
+  toastOptions,
+  toastRole,
+  usesHost,
+}

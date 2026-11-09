@@ -132,7 +132,10 @@ The primitive's options become the part's props, next to the element's own:
 <FrameworkContent value="vue">
 
 ```vue
-<CopyButton text="npm add @ui-sdk/core" @copy="(text) => console.log(text)">Copy</CopyButton>
+<CopyButton
+  text="npm add @ui-sdk/core"
+  @copy="(text) => console.log(text)"
+>Copy</CopyButton>
 ```
 
 A callback option becomes an event, so `onCopy` is `@copy`.
@@ -141,7 +144,9 @@ A callback option becomes an event, so `onCopy` is `@copy`.
 <FrameworkContent value="svelte">
 
 ```svelte
-<CopyButton text="npm add @ui-sdk/core" onCopy={(text) => console.log(text)}>Copy</CopyButton>
+<CopyButton text="npm add @ui-sdk/core" onCopy={(text) => console.log(text)}
+  >Copy</CopyButton
+>
 ```
 
 </FrameworkContent>
@@ -173,7 +178,9 @@ The root's slot returns `copied` from its `state`, so the button's content can f
 <FrameworkContent value="react">
 
 ```tsx
-<CopyButton text="npm add @ui-sdk/core">{({ copied }) => (copied ? "Copied" : "Copy")}</CopyButton>
+<CopyButton text="npm add @ui-sdk/core">
+  {({ copied }) => (copied ? "Copied" : "Copy")}
+</CopyButton>
 ```
 
 </FrameworkContent>
@@ -198,7 +205,9 @@ The root's slot returns `copied` from its `state`, so the button's content can f
 <FrameworkContent value="solid">
 
 ```tsx
-<CopyButton text="npm add @ui-sdk/core">{(state) => (state.copied ? "Copied" : "Copy")}</CopyButton>
+<CopyButton text="npm add @ui-sdk/core">
+  {(state) => (state.copied ? "Copied" : "Copy")}
+</CopyButton>
 ```
 
 </FrameworkContent>

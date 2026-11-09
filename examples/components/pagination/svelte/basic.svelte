@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { ChevronLeftIcon, ChevronRightIcon, EllipsisIcon } from "@lucide/svelte"
+  import {
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    EllipsisIcon,
+  } from "@lucide/svelte"
   import {
     Pagination,
     PaginationEllipsis,

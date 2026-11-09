@@ -30,7 +30,9 @@ import {
 import { tmpdir } from "node:os"
 import path from "node:path"
 
-const registry = (process.env.WEB_RELEASES_REGISTRY ?? "https://registry.npmjs.org").replace(/\/$/, "")
+const registry = (
+  process.env.WEB_RELEASES_REGISTRY ?? "https://registry.npmjs.org"
+).replace(/\/$/, "")
 const token = process.env.WEB_RELEASES_TOKEN
 const publicDir = path.join(import.meta.dirname, "../public")
 const packageDir = path.join(import.meta.dirname, "../../../packages/web")
@@ -46,25 +48,42 @@ const work = mkdtempSync(path.join(tmpdir(), "ui-sdk-web-releases-"))
 let copied = 0
 try {
   for (const [version, { dist }] of Object.entries(versions)) {
-    if (existsSync(path.join(publicDir, `web@${version}.js`))) continue
+    if (existsSync(path.join(publicDir, `web@${version}.js`))) {
+      continue
+    }
     const browser = await download(version, dist.tarball)
-    if (!browser) continue
-    cpSync(path.join(browser, "web.js"), path.join(publicDir, `web@${version}.js`))
-    cpSync(path.join(browser, "web"), path.join(publicDir, `web@${version}`), { recursive: true })
+    if (!browser) {
+      continue
+    }
+    cpSync(
+      path.join(browser, "web.js"),
+      path.join(publicDir, `web@${version}.js`)
+    )
+    cpSync(path.join(browser, "web"), path.join(publicDir, `web@${version}`), {
+      recursive: true,
+    })
     if (existsSync(path.join(browser, "web.css"))) {
-      cpSync(path.join(browser, "web.css"), path.join(publicDir, `web@${version}.css`))
+      cpSync(
+        path.join(browser, "web.css"),
+        path.join(publicDir, `web@${version}.css`)
+      )
     }
     copied++
   }
 } finally {
   rmSync(work, { recursive: true, force: true })
 }
-console.log(`Copied ${copied} @ui-sdk/web releases from ${registry} into public/.`)
+console.log(
+  `Copied ${copied} @ui-sdk/web releases from ${registry} into public/.`
+)
 
 const commit = (
-  process.env.VERCEL_GIT_COMMIT_SHA ?? execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" })
+  process.env.VERCEL_GIT_COMMIT_SHA ??
+  execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" })
 ).slice(0, 7)
-const { version } = JSON.parse(readFileSync(path.join(packageDir, "package.json"), "utf8"))
+const { version } = JSON.parse(
+  readFileSync(path.join(packageDir, "package.json"), "utf8")
+)
 const source = `${version}-g${commit}`
 // An earlier commit's build, from a local run, would compete for `/web@0.js`.
 for (const file of readdirSync(publicDir)) {
@@ -72,22 +91,39 @@ for (const file of readdirSync(publicDir)) {
     rmSync(path.join(publicDir, file), { recursive: true })
   }
 }
-execFileSync("node", ["../../scripts/build/browser.mjs"], { cwd: packageDir, stdio: "inherit" })
-cpSync(path.join(packageDir, "browser/web.js"), path.join(publicDir, `web@${source}.js`))
-cpSync(path.join(packageDir, "browser/web"), path.join(publicDir, `web@${source}`), { recursive: true })
-cpSync(path.join(packageDir, "browser/web.css"), path.join(publicDir, `web@${source}.css`))
+execFileSync("node", ["../../scripts/build/browser.mjs"], {
+  cwd: packageDir,
+  stdio: "inherit",
+})
+cpSync(
+  path.join(packageDir, "browser/web.js"),
+  path.join(publicDir, `web@${source}.js`)
+)
+cpSync(
+  path.join(packageDir, "browser/web"),
+  path.join(publicDir, `web@${source}`),
+  { recursive: true }
+)
+cpSync(
+  path.join(packageDir, "browser/web.css"),
+  path.join(publicDir, `web@${source}.css`)
+)
 console.log(`Built @ui-sdk/web ${source} from source into public/.`)
 
 // Unpacks a release's `browser/` folder, or returns nothing when it has none.
 async function download(version, tarball) {
   const file = await fetch(tarball, { headers })
-  if (!file.ok) throw new Error(`${tarball} answered ${file.status}.`)
+  if (!file.ok) {
+    throw new Error(`${tarball} answered ${file.status}.`)
+  }
   const archive = path.join(work, `${version}.tgz`)
   writeFileSync(archive, Buffer.from(await file.arrayBuffer()))
   const folder = path.join(work, version)
   mkdirSync(folder)
   try {
-    execFileSync("tar", ["-xzf", archive, "-C", folder, "package/browser"], { stdio: "ignore" })
+    execFileSync("tar", ["-xzf", archive, "-C", folder, "package/browser"], {
+      stdio: "ignore",
+    })
   } catch {
     return undefined
   }

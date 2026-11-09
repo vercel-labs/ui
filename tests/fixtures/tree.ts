@@ -28,7 +28,11 @@ const treeFixture = {
         { value: "legacy.ts", label: "legacy.ts", disabled: true },
       ],
     },
-    { value: "docs", label: "docs", children: [{ value: "intro.md", label: "intro.md" }] },
+    {
+      value: "docs",
+      label: "docs",
+      children: [{ value: "intro.md", label: "intro.md" }],
+    },
     { value: "package.json", label: "package.json" },
   ] satisfies TreeFixtureItem[] as TreeFixtureItem[],
 }
@@ -36,7 +40,13 @@ const treeFixture = {
 // What the fixture's status region shows after a change, like "expanded src,docs".
 function describeTree(kind: string, value: string | readonly string[] | null) {
   const shown =
-    value === null ? "none" : typeof value === "string" ? value : value.length ? value.join(",") : "none"
+    value === null
+      ? "none"
+      : typeof value === "string"
+        ? value
+        : value.length
+          ? value.join(",")
+          : "none"
   return `${kind} ${shown}`
 }
 
@@ -52,7 +62,11 @@ const treeLinksFixture = {
         { value: "usage", label: "Usage", href: "#usage" },
       ],
     },
-    { value: "components", label: "Components", children: [{ value: "tree", label: "Tree", href: "#tree" }] },
+    {
+      value: "components",
+      label: "Components",
+      children: [{ value: "tree", label: "Tree", href: "#tree" }],
+    },
   ],
 }
 

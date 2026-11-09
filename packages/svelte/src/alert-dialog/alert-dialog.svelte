@@ -61,7 +61,10 @@ is always modal and never a sheet.
     /** Runs once the alert dialog has finished opening or closing, after any animation. */
     onOpenChangeComplete?: (open: boolean) => void
     /** Runs when a trigger or a controller with another payload opens the alert dialog, before `onOpenChange`. `details.cancel()` keeps the previous payload. */
-    onPayloadChange?: (payload: unknown, details: ChangeDetails<AlertDialogPayloadChangeReason>) => void
+    onPayloadChange?: (
+      payload: unknown,
+      details: ChangeDetails<AlertDialogPayloadChangeReason>
+    ) => void
     /** Runs when a dismissal was refused, because `dismissible` is false or a Close part's action is running. */
     onDismissAttempt?: (details: DialogDismissAttemptDetails) => void
     children?: Snippet
@@ -69,28 +72,38 @@ is always modal and never a sheet.
 
   const id = $props.id()
   // The alert dialog's slots and state are the dialog's, so the parts bind to it as one.
-  const handle = usePrimitive(alertDialogPrimitive as unknown as typeof dialogPrimitive, () => ({
-    id,
-    get open() {
-      return open
-    },
-    defaultOpen,
-    // Its reasons are a subset of the dialog's, which the shared primitive type names.
-    controller: controller as DialogController<any, any> | undefined,
-    dismissible,
-    persistentElements,
-    pendingAnnouncement,
-    debug,
-    onOpenChange: (next: boolean, details: DialogOpenChangeDetails) => {
-      // The callback runs first, so canceling there also keeps a bound `open` as it was.
-      onOpenChange?.(next, details as OpenDetails)
-      if (!details.canceled) open = next
-    },
-    onOpenChangeComplete,
-    onPayloadChange,
-    onDismissAttempt,
-  }))
-  const context: DialogContext = { handle, name: "AlertDialog", sheet: false, container: () => container }
+  const handle = usePrimitive(
+    alertDialogPrimitive as unknown as typeof dialogPrimitive,
+    () => ({
+      id,
+      get open() {
+        return open
+      },
+      defaultOpen,
+      // Its reasons are a subset of the dialog's, which the shared primitive type names.
+      controller: controller as DialogController<any, any> | undefined,
+      dismissible,
+      persistentElements,
+      pendingAnnouncement,
+      debug,
+      onOpenChange: (next: boolean, details: DialogOpenChangeDetails) => {
+        // The callback runs first, so canceling there also keeps a bound `open` as it was.
+        onOpenChange?.(next, details as OpenDetails)
+        if (!details.canceled) {
+          open = next
+        }
+      },
+      onOpenChangeComplete,
+      onPayloadChange,
+      onDismissAttempt,
+    })
+  )
+  const context: DialogContext = {
+    handle,
+    name: "AlertDialog",
+    sheet: false,
+    container: () => container,
+  }
   useControllerEntry(() => controller, context)
   setContext(DialogKey, context)
 </script>

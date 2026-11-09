@@ -29,10 +29,17 @@ function mount(root: HTMLElement) {
   const render = () => {
     tree.style.height = `${rows.length * row}px`
     const start = Math.max(0, Math.floor(scroller.scrollTop / row) - 4)
-    const end = Math.min(rows.length, Math.ceil((scroller.scrollTop + height) / row) + 4)
-    const visible = new Map(rows.slice(start, end).map((entry) => [entry.item.value, entry]))
+    const end = Math.min(
+      rows.length,
+      Math.ceil((scroller.scrollTop + height) / row) + 4
+    )
+    const visible = new Map(
+      rows.slice(start, end).map((entry) => [entry.item.value, entry])
+    )
     for (const [value, el] of rendered) {
-      if (visible.has(value)) continue
+      if (visible.has(value)) {
+        continue
+      }
       el.remove()
       rendered.delete(value)
     }
@@ -50,7 +57,7 @@ function mount(root: HTMLElement) {
               }
               ${item.label}
             </ui-tree-item-label>
-          </ui-tree-item>`,
+          </ui-tree-item>`
         )
         el = tree.lastElementChild as HTMLElement
         rendered.set(value, el)
@@ -68,9 +75,11 @@ function mount(root: HTMLElement) {
   tree.addEventListener("highlight", (event) => {
     const { index } = event.detail
     const top = index * row
-    if (top < scroller.scrollTop) scroller.scrollTop = top
-    else if (top + row > scroller.scrollTop + scroller.clientHeight - 10)
+    if (top < scroller.scrollTop) {
+      scroller.scrollTop = top
+    } else if (top + row > scroller.scrollTop + scroller.clientHeight - 10) {
       scroller.scrollTop = top + row - scroller.clientHeight + 10
+    }
     render()
   })
 }

@@ -7,13 +7,21 @@ test.beforeEach(async ({ open }) => {
   await open("vue-updates")
 })
 
-test("a standalone item's remove button follows the item's new file", async ({ page }) => {
-  await expect(page.getByRole("button", { name: "Remove first.png" })).toBeVisible()
+test("a standalone item's remove button follows the item's new file", async ({
+  page,
+}) => {
+  await expect(
+    page.getByRole("button", { name: "Remove first.png" })
+  ).toBeVisible()
   await page.getByRole("button", { name: "Next file" }).click()
-  await expect(page.getByRole("button", { name: "Remove second.png" })).toBeVisible()
+  await expect(
+    page.getByRole("button", { name: "Remove second.png" })
+  ).toBeVisible()
 })
 
-test("a navigation menu trigger follows its item's new value", async ({ page }) => {
+test("a navigation menu trigger follows its item's new value", async ({
+  page,
+}) => {
   const trigger = page.getByRole("button", { name: "Products" })
   await expect(trigger).toHaveAttribute("id", /trigger-products$/)
   await page.getByRole("button", { name: "Rename item" }).click()
@@ -24,7 +32,9 @@ test("a navigation menu trigger follows its item's new value", async ({ page }) 
 
 test("a toast region follows a new aria-label", async ({ page }) => {
   await page.getByRole("button", { name: "Show toast" }).click()
-  await expect(page.getByRole("region", { name: "Notifications" })).toBeVisible()
+  await expect(
+    page.getByRole("region", { name: "Notifications" })
+  ).toBeVisible()
   await page.getByRole("button", { name: "Rename region" }).click()
   await expect(page.getByRole("region", { name: "Alerts" })).toBeVisible()
 })

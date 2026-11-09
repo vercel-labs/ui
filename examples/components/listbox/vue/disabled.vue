@@ -22,7 +22,12 @@ const disabled = ref(false)
         {{ disabled ? "Enable the List" : "Disable the List" }}
       </button>
     </div>
-    <Listbox multiple :disabled="disabled" :default-value="['basil']" aria-label="Toppings">
+    <Listbox
+      multiple
+      :disabled="disabled"
+      :default-value="['basil']"
+      aria-label="Toppings"
+    >
       <ListboxItem
         v-for="topping in toppings"
         :key="topping.value"

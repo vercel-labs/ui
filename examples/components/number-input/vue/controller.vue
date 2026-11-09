@@ -18,10 +18,16 @@ const zoom = createNumberInputController()
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <button type="button" @click="zoom.decrement({ large: true })">Zoom Out</button>
-      <button type="button" @click="zoom.increment({ large: true })">Zoom In</button>
+      <button type="button" @click="zoom.decrement({ large: true })">
+        Zoom Out
+      </button>
+      <button type="button" @click="zoom.increment({ large: true })">
+        Zoom In
+      </button>
       <button type="button" @click="zoom.setValue(100)">Actual Size</button>
-      <button type="button" @click="log(`Zoom is ${zoom.getValue()}%`)">Read</button>
+      <button type="button" @click="log(`Zoom is ${zoom.getValue()}%`)">
+        Read
+      </button>
       <button type="button" @click="zoom.focus()">Focus</button>
     </div>
     <Field>
@@ -33,7 +39,10 @@ const zoom = createNumberInputController()
         :step="10"
         :format="{ style: 'unit', unit: 'percent' }"
         :controller="zoom"
-        @value-change="(value, details) => log(`Zoom ${value ?? 'empty'}% (${details.reason})`)"
+        @value-change="
+          (value, details) =>
+            log(`Zoom ${value ?? 'empty'}% (${details.reason})`)
+        "
       >
         <NumberInputGroup>
           <NumberInputDecrement aria-label="Decrease">

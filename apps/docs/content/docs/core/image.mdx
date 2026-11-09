@@ -25,7 +25,14 @@ The image can be a file from an `<input type="file">`, a URL, an `<img>`, a `<ca
 Set `rotation` to turn the image a quarter turn clockwise at a time, and `flipX` or `flipY` to mirror it. The region's `x` and `y` count from the top left of the image as it shows after it's turned and flipped:
 
 ```ts
-const file = await cropImage(photo, { x: 0, y: 0, width: 300, height: 400, rotation: 90, flipX: true })
+const file = await cropImage(photo, {
+  x: 0,
+  y: 0,
+  width: 300,
+  height: 400,
+  rotation: 90,
+  flipX: true,
+})
 ```
 
 So a 400 by 300 photo turned by 90 is 300 wide and 400 tall, and the region above keeps all of it.
@@ -49,7 +56,12 @@ So a 400 by 300 photo turned by 90 is 300 wide and 400 tall, and the region abov
 Pass `width` alone to scale the crop, like a 256 pixel avatar from a much larger photo:
 
 ```ts
-const avatar = await cropImage(photo, crop, { type: "image/webp", quality: 0.9, width: 256, shape: "circle" })
+const avatar = await cropImage(photo, crop, {
+  type: "image/webp",
+  quality: 0.9,
+  width: 256,
+  shape: "circle",
+})
 ```
 
 A browser that can't write the type you ask for writes PNG instead, and the file's `type` and name say which it wrote. JPEG has no transparency, so a circle's corners turn black there. Use PNG or WebP for round crops.

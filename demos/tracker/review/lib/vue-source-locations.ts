@@ -17,9 +17,18 @@ const expression = (content: string, loc: Location, isStatic: boolean) => ({
 // components that render a fragment.
 function vueSourceLocations(root: string) {
   return (node: Node, context: Context) => {
-    if (node.type !== 1 || !node.props || node.tagType === undefined || node.tagType > 1) return
+    if (
+      node.type !== 1 ||
+      !node.props ||
+      node.tagType === undefined ||
+      node.tagType > 1
+    ) {
+      return
+    }
     const file = path.relative(root, context.filename)
-    if (file.startsWith("..")) return
+    if (file.startsWith("..")) {
+      return
+    }
     const at = `${file}:${node.loc.start.line}`
     if (node.tagType === 0) {
       node.props.push({
@@ -39,7 +48,7 @@ function vueSourceLocations(root: string) {
       exp: expression(
         `(vnode) => { if (vnode.component) vnode.component.__reviewLoc = ${JSON.stringify(at)} }`,
         node.loc,
-        false,
+        false
       ),
       modifiers: [],
       loc: node.loc,

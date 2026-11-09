@@ -1,5 +1,18 @@
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "@ui-sdk/vue"
-import { createApp, defineComponent, h, ref, type Component, type PropType } from "vue"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "@ui-sdk/vue"
+import {
+  createApp,
+  defineComponent,
+  h,
+  ref,
+  type Component,
+  type PropType,
+} from "vue"
 import * as classes from "./classes"
 import { itemsOf, kitchenSink, type Env } from "./shell"
 import type { Variant } from "./variants"
@@ -9,8 +22,17 @@ const Grow = defineComponent({
     const lines = ref(1)
     return () =>
       h("div", { class: "flex flex-col gap-1" }, [
-        ...Array.from({ length: lines.value }, (_, index) => h("p", { key: index }, `Line ${index + 1}`)),
-        h("button", { class: `${classes.button} self-start`, onClick: () => lines.value++ }, "Add a line"),
+        ...Array.from({ length: lines.value }, (_, index) =>
+          h("p", { key: index }, `Line ${index + 1}`)
+        ),
+        h(
+          "button",
+          {
+            class: `${classes.button} self-start`,
+            onClick: () => lines.value++,
+          },
+          "Add a line"
+        ),
       ])
   },
 })
@@ -33,60 +55,84 @@ const Nested: Component = defineComponent({
             {
               key: label,
               value: label,
-              onOpenChange: (open: boolean) => env.log(`${path}/${label} openChange ${open}`),
-              onOpenChangeComplete: (open: boolean) => env.log(`${path}/${label} openChangeComplete ${open}`),
+              onOpenChange: (open: boolean) =>
+                env.log(`${path}/${label} openChange ${open}`),
+              onOpenChangeComplete: (open: boolean) =>
+                env.log(`${path}/${label} openChangeComplete ${open}`),
             },
             () => [
               h(AccordionHeader, { class: classes.header }, () =>
                 h(
                   AccordionTrigger,
                   { class: classes.trigger },
-                  () => `Level ${depth}, ${label.toLowerCase()}`,
-                ),
+                  () => `Level ${depth}, ${label.toLowerCase()}`
+                )
               ),
               h(AccordionPanel, { class: classes.panel() }, () =>
                 h(
                   "div",
                   { class: classes.inner },
                   depth < 2
-                    ? [h(Nested, { env, path: `${path}/${label}`, depth: depth + 1 })]
-                    : `Inside ${path}/${label}.`,
-                ),
+                    ? [
+                        h(Nested, {
+                          env,
+                          path: `${path}/${label}`,
+                          depth: depth + 1,
+                        }),
+                      ]
+                    : `Inside ${path}/${label}.`
+                )
               ),
-            ],
-          ),
-        ),
+            ]
+          )
+        )
       )
   },
 })
 
 // What the second item's panel holds.
 function body(variant: Variant, content: string, env: Env) {
-  if (variant.body === "long") return Array.from({ length: 20 }, (_, index) => h("p", `Line ${index + 1}`))
-  if (variant.body === "form")
+  if (variant.body === "long") {
+    return Array.from({ length: 20 }, (_, index) => h("p", `Line ${index + 1}`))
+  }
+  if (variant.body === "form") {
     return [
       h("label", { class: "flex flex-col" }, [
         content,
-        h("input", { class: classes.input, value: "Ada", "aria-label": "Name" }),
+        h("input", {
+          class: classes.input,
+          value: "Ada",
+          "aria-label": "Name",
+        }),
       ]),
     ]
-  if (variant.body === "nested")
+  }
+  if (variant.body === "nested") {
     return [
       h(Accordion, { class: classes.root }, () =>
         ["Nested one", "Nested two"].map((label) =>
           h(AccordionItem, { key: label, value: label }, () => [
             h(AccordionHeader, { class: classes.header }, () =>
-              h(AccordionTrigger, { class: classes.trigger }, () => label),
+              h(AccordionTrigger, { class: classes.trigger }, () => label)
             ),
             h(AccordionPanel, { class: classes.panel() }, () =>
-              h("div", { class: classes.inner }, `Inside ${label.toLowerCase()}.`),
+              h(
+                "div",
+                { class: classes.inner },
+                `Inside ${label.toLowerCase()}.`
+              )
             ),
-          ]),
-        ),
+          ])
+        )
       ),
     ]
-  if (variant.body === "nested-deep") return [h(Nested, { env, path: "b" })]
-  if (variant.body === "grow") return [h(Grow)]
+  }
+  if (variant.body === "nested-deep") {
+    return [h(Nested, { env, path: "b" })]
+  }
+  if (variant.body === "grow") {
+    return [h(Grow)]
+  }
   return [content]
 }
 
@@ -108,13 +154,18 @@ const VariantAccordion = defineComponent({
             ...variant.options,
             controller: env.controller,
             ...(variant.controlled && { value: value.value }),
-            onValueChange: (next: string[], details: { reason: string; cancel: () => void }) => {
+            onValueChange: (
+              next: string[],
+              details: { reason: string; cancel: () => void }
+            ) => {
               if (variant.cancel && next.includes(variant.cancel)) {
                 details.cancel()
                 env.log(`valueChange ${JSON.stringify(next)} canceled`)
                 return
               }
-              if (variant.controlled) value.value = next
+              if (variant.controlled) {
+                value.value = next
+              }
               env.log(`valueChange ${JSON.stringify(next)} (${details.reason})`)
             },
           },
@@ -127,9 +178,16 @@ const VariantAccordion = defineComponent({
                   class: classes.item,
                   value: item.value,
                   disabled: variant.disabledItems?.includes(item.value),
-                  onOpenChange: (open: boolean, details: { cancel: () => void; canceled: boolean }) => {
-                    if (variant.itemCancel === item.value) details.cancel()
-                    env.log(`${item.value} openChange ${open}${details.canceled ? " canceled" : ""}`)
+                  onOpenChange: (
+                    open: boolean,
+                    details: { cancel: () => void; canceled: boolean }
+                  ) => {
+                    if (variant.itemCancel === item.value) {
+                      details.cancel()
+                    }
+                    env.log(
+                      `${item.value} openChange ${open}${details.canceled ? " canceled" : ""}`
+                    )
                   },
                   onOpenChangeComplete: (open: boolean) =>
                     env.log(`${item.value} openChangeComplete ${open}`),
@@ -138,30 +196,49 @@ const VariantAccordion = defineComponent({
                   h(AccordionHeader, { class: classes.header }, () =>
                     h(
                       AccordionTrigger,
-                      { class: classes.trigger, disabled: variant.disabledTriggers?.includes(item.value) },
+                      {
+                        class: classes.trigger,
+                        disabled: variant.disabledTriggers?.includes(
+                          item.value
+                        ),
+                      },
                       {
                         // The index comes from the slot's state.
                         default: ({ state }: { state: { index: number } }) => [
                           item.label,
-                          variant.index && h("span", { class: classes.index }, `#${state.index}`),
-                          h("span", { "aria-hidden": "true", class: classes.chevron }, "▾"),
+                          variant.index &&
+                            h(
+                              "span",
+                              { class: classes.index },
+                              `#${state.index}`
+                            ),
+                          h(
+                            "span",
+                            { "aria-hidden": "true", class: classes.chevron },
+                            "▾"
+                          ),
                         ],
-                      },
-                    ),
+                      }
+                    )
                   ),
                   h(
                     AccordionPanel,
-                    { class: classes.panel(variant.animation), ...(index === 1 && variant.panel) },
+                    {
+                      class: classes.panel(variant.animation),
+                      ...(index === 1 && variant.panel),
+                    },
                     () =>
                       h(
                         "div",
                         { class: classes.inner },
-                        index === 1 ? body(variant, item.content, env) : item.content,
-                      ),
+                        index === 1
+                          ? body(variant, item.content, env)
+                          : item.content
+                      )
                   ),
-                ],
-              ),
-            ),
+                ]
+              )
+            )
         ),
         variant.index &&
           h(
@@ -170,16 +247,28 @@ const VariantAccordion = defineComponent({
               class: `${classes.button} self-start`,
               onClick: () => (list.value = [...list.value].reverse()),
             },
-            "Reverse items",
+            "Reverse items"
           ),
         variant.controlled &&
           h("div", { class: "flex items-center gap-2 text-xs" }, [
-            h("code", { class: "text-neutral-500" }, JSON.stringify(value.value)),
-            h("button", { class: button, onClick: () => (value.value = []) }, "Collapse all"),
+            h(
+              "code",
+              { class: "text-neutral-500" },
+              JSON.stringify(value.value)
+            ),
             h(
               "button",
-              { class: button, onClick: () => (value.value = list.value.map((item) => item.value)) },
-              "Expand all",
+              { class: button, onClick: () => (value.value = []) },
+              "Collapse all"
+            ),
+            h(
+              "button",
+              {
+                class: button,
+                onClick: () =>
+                  (value.value = list.value.map((item) => item.value)),
+              },
+              "Expand all"
             ),
           ]),
       ])

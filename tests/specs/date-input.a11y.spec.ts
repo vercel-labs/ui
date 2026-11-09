@@ -7,7 +7,9 @@ async function audit(page: import("@playwright/test").Page) {
   const results = await new AxeBuilder({ page })
     .disableRules(["region", "landmark-one-main", "page-has-heading-one"])
     .analyze()
-  return results.violations.map((violation) => `${violation.id}: ${violation.help}`)
+  return results.violations.map(
+    (violation) => `${violation.id}: ${violation.help}`
+  )
 }
 
 test("no axe violations at rest", async ({ page, open }) => {
@@ -40,6 +42,9 @@ test("each segment says its unit, value and range", async ({ page, open }) => {
 
 test("an empty segment reads as empty", async ({ page, open }) => {
   await open("date-input")
-  await expect(segment(page, "month")).toHaveAttribute("aria-valuetext", "Empty")
+  await expect(segment(page, "month")).toHaveAttribute(
+    "aria-valuetext",
+    "Empty"
+  )
   await expect(segment(page, "month")).not.toHaveAttribute("aria-valuenow")
 })

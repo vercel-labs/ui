@@ -93,7 +93,9 @@ Start with `default-checked="indeterminate"`, or pass `"indeterminate"` as the c
 
   const indicator = document.querySelector("ui-checkbox-indicator")
   new MutationObserver(() => {
-    indicator.textContent = indicator.hasAttribute("data-indeterminate") ? "–" : "✓"
+    indicator.textContent = indicator.hasAttribute("data-indeterminate")
+      ? "–"
+      : "✓"
   }).observe(indicator, { attributeFilter: ["data-indeterminate"] })
 </script>
 ```
@@ -247,29 +249,47 @@ false, and a group's `value`, `default-value` and `all-values` take comma-separa
 
 ### Checkbox
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxOptions" />
+<TypeTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxOptions"
+/>
 
 ### CheckboxIndicator
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorProps" />
+<TypeTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxIndicatorProps"
+/>
 
 ### CheckboxGroup
 
-<TypeTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/checkbox/checkbox-group.ts"
+  name="CheckboxGroupOptions"
+/>
 
 ### State
 
 The same state shows as data attributes on each element.
 
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxState" />
+<StateTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxState"
+/>
 
 The indicator receives the same state.
 
-<StateTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxIndicatorState" />
+<StateTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxIndicatorState"
+/>
 
 The group:
 
-<StateTable path="../../packages/core/src/components/checkbox/checkbox-group.ts" name="CheckboxGroupState" />
+<StateTable
+  path="../../packages/core/src/components/checkbox/checkbox-group.ts"
+  name="CheckboxGroupState"
+/>
 
 ### Reasons
 
@@ -293,7 +313,10 @@ The element's `api` property has the same methods. The `checked` property reads 
 
 Every write method takes an optional `{ reason, event }`, fires the change event like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/checkbox/checkbox.ts" name="CheckboxController" />
+<ControllerTable
+  path="../../packages/core/src/components/checkbox/checkbox.ts"
+  name="CheckboxController"
+/>
 
 ### CheckboxGroup Controller
 

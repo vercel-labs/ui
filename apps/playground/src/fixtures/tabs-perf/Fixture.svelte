@@ -15,7 +15,9 @@
       {/each}
     </TabsList>
     {#each items as item (item.value)}
-      <TabsPanel class="panel" value={item.value}>{item.label} content.</TabsPanel>
+      <TabsPanel class="panel" value={item.value}
+        >{item.label} content.</TabsPanel
+      >
     {/each}
   </Tabs>
   <button>After</button>

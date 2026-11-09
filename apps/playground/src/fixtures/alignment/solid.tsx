@@ -11,11 +11,26 @@ import {
   MenuTrigger,
   type MenuDataItem,
 } from "@ui-sdk/solid/menu"
-import { createPopoverController, Popover, PopoverContent, PopoverTitle } from "@ui-sdk/solid/popover"
-import { createTabsController, Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs"
+import {
+  createPopoverController,
+  Popover,
+  PopoverContent,
+  PopoverTitle,
+} from "@ui-sdk/solid/popover"
+import {
+  createTabsController,
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
+} from "@ui-sdk/solid/tabs"
 import { render } from "@solidjs/web"
 import { createSignal, For } from "solid-js"
-import { alignmentFixture, alignmentOptions, renderCounter } from "tests/fixtures/alignment.ts"
+import {
+  alignmentFixture,
+  alignmentOptions,
+  renderCounter,
+} from "tests/fixtures/alignment.ts"
 
 const rowMenu = createMenuController<string>()
 const details = createPopoverController<string>()
@@ -43,7 +58,11 @@ function Fixture() {
   const { keepMounted } = alignmentOptions()
 
   const showDetails = (payload: string) =>
-    details.open({ payload }).then((closed) => setResult(`${closed.reason}:${closed.returnValue ?? ""}`))
+    details
+      .open({ payload })
+      .then((closed) =>
+        setResult(`${closed.reason}:${closed.returnValue ?? ""}`)
+      )
 
   return (
     <div class="fixture">
@@ -54,7 +73,11 @@ function Fixture() {
           {(row) => (
             <li>
               Row {row}
-              <MenuTrigger controller={rowMenu} payload={row} aria-label={`Actions for ${row}`}>
+              <MenuTrigger
+                controller={rowMenu}
+                payload={row}
+                aria-label={`Actions for ${row}`}
+              >
                 …
               </MenuTrigger>
             </li>
@@ -76,7 +99,9 @@ function Fixture() {
                     class="item"
                     value={item.value}
                     onSelect={() => {
-                      if (item.value === "details") showDetails(String(rowMenu.getPayload()))
+                      if (item.value === "details") {
+                        showDetails(String(rowMenu.getPayload()))
+                      }
                     }}
                   >
                     {item.label}
@@ -117,8 +142,12 @@ function Fixture() {
 
       <Menu
         items={dataItems}
-        onCheckedChange={(checked, details) => setChange(`checked:${details.value}:${checked}`)}
-        onValueChange={(value, details) => setChange(`value:${details.group}:${value}`)}
+        onCheckedChange={(checked, details) =>
+          setChange(`checked:${details.value}:${checked}`)
+        }
+        onValueChange={(value, details) =>
+          setChange(`value:${details.group}:${value}`)
+        }
       >
         <MenuTrigger>Data</MenuTrigger>
         {/* The data's items, rendered with the fixture's classes. */}
@@ -135,7 +164,9 @@ function Fixture() {
                   <For each={entry.items}>
                     {(radio) => (
                       <MenuRadioItem class="item" value={radio.value}>
-                        <MenuItemIndicator class="indicator">•</MenuItemIndicator>
+                        <MenuItemIndicator class="indicator">
+                          •
+                        </MenuItemIndicator>
                         {radio.label}
                       </MenuRadioItem>
                     )}
@@ -184,7 +215,9 @@ function Fixture() {
           )}
         </For>
       </Tabs>
-      <button onClick={() => sections.select("hotel")}>Show the last section</button>
+      <button onClick={() => sections.select("hotel")}>
+        Show the last section
+      </button>
 
       <button>After</button>
       <output role="status" aria-label="Last action">

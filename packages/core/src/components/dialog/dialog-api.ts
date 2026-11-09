@@ -8,7 +8,10 @@ import type { Layer } from "../../foundation/platform/layers"
 import { measureScrollerEarly } from "../../foundation/popups/modal"
 import { isBrowser } from "../../foundation/platform/env"
 import { activeElement } from "../../foundation/platform/platform"
-import { createPopup, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  createPopup,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import type { PopupCloseReason } from "../../foundation/popups/popup"
 import {
   alertDialogPreset,
@@ -82,22 +85,39 @@ const closesWhilePending = ["imperative", "action", "parent-close"]
  */
 function dialogRefusal(
   reason: string,
-  policy: { dismissible: boolean; outsidePress: boolean; pending: boolean; beside: boolean },
+  policy: {
+    dismissible: boolean
+    outsidePress: boolean
+    pending: boolean
+    beside: boolean
+  }
 ) {
   const dismissal = isDismissal(reason)
   const refused =
     (policy.pending && !closesWhilePending.includes(reason)) ||
-    (dismissal && (!policy.dismissible || (reason === "outside-press" && !policy.outsidePress)))
-  if (!refused) return undefined
-  return dismissal && !(reason === "outside-press" && policy.beside) ? "attempt" : "silent"
+    (dismissal &&
+      (!policy.dismissible ||
+        (reason === "outside-press" && !policy.outsidePress)))
+  if (!refused) {
+    return undefined
+  }
+  return dismissal && !(reason === "outside-press" && policy.beside)
+    ? "attempt"
+    : "silent"
 }
 
 // Elements from `persistentElements`.
 function resolveElements(list: DialogOptions["persistentElements"]) {
-  if (!list || !isBrowser) return []
-  if (typeof list === "function") return list()
+  if (!list || !isBrowser) {
+    return []
+  }
+  if (typeof list === "function") {
+    return list()
+  }
   return list.flatMap((item) =>
-    typeof item === "string" ? Array.from(document.querySelectorAll(item)) : [item],
+    typeof item === "string"
+      ? Array.from(document.querySelectorAll(item))
+      : [item]
   )
 }
 
@@ -123,7 +143,7 @@ type DialogRules = {
 function dialogApi(
   context: PrimitiveContext<DialogSharedOptions, DialogState, string>,
   alert: boolean,
-  extra: DialogRules = {},
+  extra: DialogRules = {}
 ) {
   const { store, element } = context
   const options = context.options as () => DialogOptions
@@ -132,14 +152,19 @@ function dialogApi(
   const modal = () => store.get().modal
   // Counts closes, so a Close action that outlives the open it started in changes nothing.
   let session = 0
-  const closesOnOutsidePress = () => !alert && (options().closeOnOutsidePress ?? modal() !== false)
+  const closesOnOutsidePress = () =>
+    !alert && (options().closeOnOutsidePress ?? modal() !== false)
 
   // Dialogs nested inside this one, and the one this is nested in.
   let parent: Nesting | undefined
   const children = new Set<Nesting>()
   function restack() {
-    const stack = children.size ? Math.max(...[...children].map((child) => child.stack() + 1)) : 0
-    if (stack === store.get().stack) return
+    const stack = children.size
+      ? Math.max(...[...children].map((child) => child.stack() + 1))
+      : 0
+    if (stack === store.get().stack) {
+      return
+    }
     store.set({ stack })
     parent?.add(nesting)
   }
@@ -157,87 +182,116 @@ function dialogApi(
   }
 
   // Dialog's options are its shared ones plus each component's callbacks, which list Dialog's reasons.
-  const popup = createPopup(context as unknown as PrimitiveContext<DialogOptions, DialogState, string>, {
-    // Tab wraps inside a modal dialog. A non-modal one is part of the page:
-    // Tab moves from its trigger into it and on to the page, wherever it
-    // renders, and focus leaving doesn't close it. A dialog waits for the user
-    // whatever window has focus, pauses the page's shortcuts when modal, and
-    // nothing outside a modal one may be used, its trigger included.
-    preset: extra.preset ?? alertDialogPreset,
-    role: alert ? "alertdialog" : "dialog",
-    rules: (core) => ({
-      persistent: () => resolveElements(options().persistentElements),
-      onEscape(event) {
-        // A non-modal dialog closes on Escape only while focus is inside it.
-        if (modal() === false && !core.popup.element()?.contains(activeElement())) return
-        core.control.hide({ reason: "escape-key", event })
-      },
-      onShow(layer) {
-        dialogLayers.set(layer, nesting)
-        parent = undefined
-        for (let up = layer.parent; up && !parent; up = up.parent) parent = dialogLayers.get(up)
-        parent?.add(nesting)
-        store.set({ nested: !!parent })
-        const cleanup = extra.onShow?.(layer)
-        return () => {
-          cleanup?.()
-          dialogLayers.delete(layer)
-        }
-      },
-      onOpenChange(open) {
-        extra.onOpenChange?.(open)
-        if (open) {
-          // The scroll lock's and the keyboard's reads, before anything renders,
-          // while they're free. Read after, they lay out the whole page.
-          if (isBrowser) {
-            const doc = core.triggerElement()?.ownerDocument ?? document
-            if (modal() === true) measureScrollerEarly(doc)
-            measureViewportEarly(doc.defaultView)
+  const popup = createPopup(
+    context as unknown as PrimitiveContext<DialogOptions, DialogState, string>,
+    {
+      // A modal dialog wraps Tab, pauses the page's shortcuts and blocks the
+      // page, its trigger included. A non-modal one is part of the page, and
+      // focus leaving doesn't close it. Either stays open whatever has focus.
+      preset: extra.preset ?? alertDialogPreset,
+      role: alert ? "alertdialog" : "dialog",
+      rules: (core) => ({
+        persistent: () => resolveElements(options().persistentElements),
+        onEscape(event) {
+          // A non-modal dialog closes on Escape only while focus is inside it.
+          if (
+            modal() === false &&
+            !core.popup.element()?.contains(activeElement())
+          ) {
+            return
           }
-          return
-        }
-        session++
-        store.set({ pending: null })
-        // Nested dialogs close first, so their focus returns inside this one before it leaves.
-        for (const child of [...children]) child.close("parent-close")
-        parent?.remove(nesting)
-        parent = undefined
-      },
-      // Close parts' errors are from the last time it was open.
-      open(_, open) {
-        store.set({ errors: {} })
-        open()
-      },
-      // How Dialog refuses a close, before any rule hears it.
-      refusal: (reason) =>
-        dialogRefusal(reason, {
-          dismissible: options().dismissible !== false,
-          outsidePress: closesOnOutsidePress(),
-          pending: store.get().pending !== null,
-          beside: modal() !== true && !alert,
-        }),
-      refused: (reason) => extra.onRefuse?.(reason as DialogDismissReason),
-      dismiss(reason, details) {
-        if (!extra.intercept?.(reason, details.event)) core.control.hide({ reason, ...details })
-      },
-      // `"auto"` focuses an autofocused element first, and an alert dialog its
-      // least destructive action, before the first focusable element.
-      preferredFocus() {
-        const content = core.popup.element()
-        const auto = content?.querySelector<HTMLElement>("[autofocus], [data-autofocus]")
-        if (auto && isTabbable(auto)) return auto
-        if (alert) return elements(context, "close").find(({ el }) => isTabbable(el))?.el
-      },
-      bind: extra.bind,
-    }),
-  })
+          core.control.hide({ reason: "escape-key", event })
+        },
+        onShow(layer) {
+          dialogLayers.set(layer, nesting)
+          parent = undefined
+          for (let up = layer.parent; up && !parent; up = up.parent) {
+            parent = dialogLayers.get(up)
+          }
+          parent?.add(nesting)
+          store.set({ nested: !!parent })
+          const cleanup = extra.onShow?.(layer)
+          return () => {
+            cleanup?.()
+            dialogLayers.delete(layer)
+          }
+        },
+        onOpenChange(open) {
+          extra.onOpenChange?.(open)
+          if (open) {
+            // The scroll lock's and the keyboard's reads, before anything renders,
+            // while they're free. Read after, they lay out the whole page.
+            if (isBrowser) {
+              const doc = core.triggerElement()?.ownerDocument ?? document
+              if (modal() === true) {
+                measureScrollerEarly(doc)
+              }
+              measureViewportEarly(doc.defaultView)
+            }
+            return
+          }
+          session++
+          store.set({ pending: null })
+          // Nested dialogs close first, so their focus returns inside this one before it leaves.
+          for (const child of [...children]) {
+            child.close("parent-close")
+          }
+          parent?.remove(nesting)
+          parent = undefined
+        },
+        // Close parts' errors are from the last time it was open.
+        open(_, open) {
+          store.set({ errors: {} })
+          open()
+        },
+        // How Dialog refuses a close, before any rule hears it.
+        refusal: (reason) =>
+          dialogRefusal(reason, {
+            dismissible: options().dismissible !== false,
+            outsidePress: closesOnOutsidePress(),
+            pending: store.get().pending !== null,
+            beside: modal() !== true && !alert,
+          }),
+        refused: (reason) => extra.onRefuse?.(reason as DialogDismissReason),
+        dismiss(reason, details) {
+          if (!extra.intercept?.(reason, details.event)) {
+            core.control.hide({ reason, ...details })
+          }
+        },
+        // `"auto"` focuses an autofocused element first, and an alert dialog its
+        // least destructive action, before the first focusable element.
+        preferredFocus() {
+          const content = core.popup.element()
+          const auto = content?.querySelector<HTMLElement>(
+            "[autofocus], [data-autofocus]"
+          )
+          if (auto && isTabbable(auto)) {
+            return auto
+          }
+          if (alert) {
+            return elements(context, "close").find(({ el }) => isTabbable(el))
+              ?.el
+          }
+        },
+        bind: extra.bind,
+      }),
+    }
+  )
   const { control } = popup.internal
 
   // A Close part was pressed. Its action runs first, and a Promise keeps the dialog open until it settles.
   function closePress(key: string, props: CloseProps, event?: Event) {
-    if (!store.get().open || store.get().pending !== null) return
+    if (!store.get().open || store.get().pending !== null) {
+      return
+    }
     const action = props.action
-    if (!action) return control.hide({ reason: "close-press", event, returnValue: props.value })
+    if (!action) {
+      return control.hide({
+        reason: "close-press",
+        event,
+        returnValue: props.value,
+      })
+    }
     const { [key]: _, ...errors } = store.get().errors
     store.set({ errors })
     const source = changeSource("action", event)
@@ -246,17 +300,27 @@ function dialogApi(
     const started = session
     runAction((details) => action(event, details), source, {
       pending(pending) {
-        if (started !== session) return
+        if (started !== session) {
+          return
+        }
         waited = true
         store.set({ pending: pending ? key : null })
         log(context, "pending", pending, { reason: "action", source })
       },
       done() {
-        if (started !== session) return
-        control.hide({ reason: "action", event: waited ? undefined : event, returnValue: props.value })
+        if (started !== session) {
+          return
+        }
+        control.hide({
+          reason: "action",
+          event: waited ? undefined : event,
+          returnValue: props.value,
+        })
       },
       failed: (error) => {
-        if (started !== session) return
+        if (started !== session) {
+          return
+        }
         store.set({ errors: { ...store.get().errors, [key]: error } })
         log(context, "error", error, { reason: "action", source })
       },
@@ -266,9 +330,19 @@ function dialogApi(
   // A trigger's shortcut presses it: it opens the dialog, or closes one that isn't modal.
   function shortcutPress(key: string, event: KeyboardEvent) {
     const props = context.props<TriggerProps>("trigger", key) ?? {}
-    if (props.disabled) return
-    if (store.get().open) return control.hide({ reason: "shortcut", event })
-    control.show({ event, by: "keyboard", reason: "shortcut", trigger: key, payload: props.payload })
+    if (props.disabled) {
+      return
+    }
+    if (store.get().open) {
+      return control.hide({ reason: "shortcut", event })
+    }
+    control.show({
+      event,
+      by: "keyboard",
+      reason: "shortcut",
+      trigger: key,
+      payload: props.payload,
+    })
   }
 
   return {
@@ -283,12 +357,17 @@ function dialogApi(
       // Where focus goes on open, for a drawer, which binds its content itself.
       initialFocus: () => {
         const { press, popup: layer, contentProps, rules } = popup.internal
-        return press.initialFocus(layer.element()!, contentProps().initialFocus, rules?.preferredFocus)
+        return press.initialFocus(
+          layer.element()!,
+          contentProps().initialFocus,
+          rules?.preferredFocus
+        )
       },
       closePress,
       shortcutPress,
       // The shortcut of the trigger an element sits in or beside.
-      shortcutOf: (el: HTMLElement) => shortcutOf(context, "trigger", el, { beside: true }),
+      shortcutOf: (el: HTMLElement) =>
+        shortcutOf(context, "trigger", el, { beside: true }),
       backdropElement: () => element("backdrop"),
     }),
   }
@@ -301,4 +380,11 @@ function dialogApi(
  */
 type DialogApi = ReturnType<typeof dialogApi>
 
-export { type DialogApi, type DialogRules, dialogApi, type DialogState, dialogRefusal, ownContent }
+export {
+  type DialogApi,
+  type DialogRules,
+  dialogApi,
+  type DialogState,
+  dialogRefusal,
+  ownContent,
+}

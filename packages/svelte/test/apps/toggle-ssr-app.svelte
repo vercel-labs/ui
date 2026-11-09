@@ -3,7 +3,10 @@
   import { Separator } from "../../src/separator"
   import { Toggle, ToggleGroup } from "../../src/toggle"
 
-  let { which }: { which: "group" | "button" | "submit" | "separator" | "decorative" } = $props()
+  let {
+    which,
+  }: { which: "group" | "button" | "submit" | "separator" | "decorative" } =
+    $props()
 </script>
 
 {#if which === "group"}

@@ -18,11 +18,18 @@ function Fixture() {
       <button>Before</button>
       <Combobox name={f.name}>
         <ComboboxLabel className="label">{f.label}</ComboboxLabel>
-        <ComboboxInput className={(state) => `input ${state.open ? "is-open" : "is-closed"}`} />
+        <ComboboxInput
+          className={(state) => `input ${state.open ? "is-open" : "is-closed"}`}
+        />
         <ComboboxTrigger aria-label={f.trigger}>▾</ComboboxTrigger>
         <ComboboxContent className="popup list-popup">
           <ComboboxList>
-            <ComboboxItem className="item" value="docs" label="Docs" render={<a href="#docs" />}>
+            <ComboboxItem
+              className="item"
+              value="docs"
+              label="Docs"
+              render={<a href="#docs" />}
+            >
               Docs
             </ComboboxItem>
             {f.items.slice(0, 3).map((item) => (
@@ -51,7 +58,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

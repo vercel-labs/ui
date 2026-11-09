@@ -1,5 +1,10 @@
 import { Field, FieldLabel } from "@ui-sdk/solid/field"
-import { OTPInput, OTPInputGroup, OTPInputSeparator, OTPInputSlot } from "@ui-sdk/solid/otp-input"
+import {
+  OTPInput,
+  OTPInputGroup,
+  OTPInputSeparator,
+  OTPInputSlot,
+} from "@ui-sdk/solid/otp-input"
 
 function Example() {
   return (

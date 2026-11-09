@@ -5,9 +5,21 @@
 import { checkFocus, checkRole, dev, warn } from "#dev"
 import { enforceHidden } from "../platform/style"
 import { isComposing, on } from "./events"
-import type { AnySlot, Attrs, EventMap, Part, RoleFields } from "./primitive-types"
+import type {
+  AnySlot,
+  Attrs,
+  EventMap,
+  Part,
+  RoleFields,
+} from "./primitive-types"
 import { eachMoved } from "./selects"
-import { renders, sameValue, subscribeSkipping, touch, type Listener } from "./store"
+import {
+  renders,
+  sameValue,
+  subscribeSkipping,
+  touch,
+  type Listener,
+} from "./store"
 
 /**
  * Who renders a bound element. Core renders a custom element and attaches
@@ -18,7 +30,8 @@ import { renders, sameValue, subscribeSkipping, touch, type Listener } from "./s
  * `direct` attributes current on a framework's element, since the framework
  * skips renders for them.
  */
-type Host = { by: "core" } | { by: "framework"; attaches: "all" | readonly string[] }
+type Host =
+  { by: "core" } | { by: "framework"; attaches: "all" | readonly string[] }
 
 // What the kernel keeps on a part beside what adapters read.
 type PartRecord = Part & {
@@ -83,15 +96,23 @@ const context = (part: Part, props = part.props) => ({
 function lease(part: PartRecord) {
   const { parts } = part.owner
   const mapKey = `${part.slot}:${part.key}`
-  if (!parts.has(mapKey)) parts.set(mapKey, part)
+  if (!parts.has(mapKey)) {
+    parts.set(mapKey, part)
+  }
   part.leases++
   let held = true
   return () => {
-    if (!held) return
+    if (!held) {
+      return
+    }
     held = false
-    if (--part.leases) return
+    if (--part.leases) {
+      return
+    }
     const { owner } = part
-    if (!owner.released.length) queueMicrotask(() => sweep(owner))
+    if (!owner.released.length) {
+      queueMicrotask(() => sweep(owner))
+    }
     owner.released.push(part)
   }
 }
@@ -100,14 +121,18 @@ function lease(part: PartRecord) {
 // with the next sweep unless something leases it first.
 function provisional(part: PartRecord) {
   const { owner } = part
-  if (!owner.released.length) queueMicrotask(() => sweep(owner))
+  if (!owner.released.length) {
+    queueMicrotask(() => sweep(owner))
+  }
   owner.released.push(part)
 }
 
 function sweep(owner: PartOwner) {
   for (const part of owner.released) {
     const mapKey = `${part.slot}:${part.key}`
-    if (!part.leases && owner.parts.get(mapKey) === part) owner.parts.delete(mapKey)
+    if (!part.leases && owner.parts.get(mapKey) === part) {
+      owner.parts.delete(mapKey)
+    }
   }
   owner.released = []
 }
@@ -128,7 +153,8 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
   const context = view(part, props)
   const own = definition.attrs?.(state, context)
   const declared = definition.role
-  const role = typeof declared === "function" ? declared(state, context) : declared
+  const role =
+    typeof declared === "function" ? declared(state, context) : declared
   if (dev) {
     checkRole(
       definition,
@@ -136,7 +162,7 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
       own,
       role,
       { component: ownerOf(part).label, id: part.id },
-      definition.live?.read(state, context),
+      definition.live?.read(state, context)
     )
   }
   const result: Attrs = {
@@ -145,7 +171,9 @@ function attrs(part: Part, props = part.props, state = part.store.get()) {
     ...own,
   }
   // The declared role wins over one in `attrs`, and keeps its place first.
-  if (declared !== undefined) result.role = role as Attrs[string]
+  if (declared !== undefined) {
+    result.role = role as Attrs[string]
+  }
   return aliased(part as PartRecord, result)
 }
 
@@ -168,15 +196,18 @@ const authorOwned = new Set([
 /** The part's attributes without the ones the author gives, for `given(name)` to say which. */
 function yieldToAuthor(attrs: Attrs, given: (name: string) => boolean) {
   let result: Attrs | undefined
-  for (const name in attrs)
-    if (attrs[name] !== undefined && authorOwned.has(name) && given(name))
-      (result ??= { ...attrs })[name] = undefined
+  for (const name in attrs) {
+    if (attrs[name] !== undefined && authorOwned.has(name) && given(name)) {
+      ;(result ??= { ...attrs })[name] = undefined
+    }
+  }
   return result ?? attrs
 }
 
 /** Whether a label reference points only at ids ui-sdk made, like a component's own label or a copied element's, rather than the author's. */
 const madeLabel = (value: unknown) =>
-  typeof value === "string" && value.split(/\s+/).every((id) => id.startsWith("ui-sdk-"))
+  typeof value === "string" &&
+  value.split(/\s+/).every((id) => id.startsWith("ui-sdk-"))
 
 /**
  * What `render` functions and state-based class names receive.
@@ -204,7 +235,10 @@ const held = (part: Part) => (part as PartRecord).leases > 0
 
 /** Live attributes, which core writes to a bound element itself. */
 function liveAttrs(part: Part, props = part.props) {
-  return aliased(part as PartRecord, definitionOf(part).live?.read(part.store.get(), view(part, props)) ?? {})
+  return aliased(
+    part as PartRecord,
+    definitionOf(part).live?.read(part.store.get(), view(part, props)) ?? {}
+  )
 }
 
 /** The attributes core keeps current on an element a framework rendered. */
@@ -229,8 +263,13 @@ function followed(part: Part, synced: object | undefined, props = part.props) {
   const names = ["#keys"]
   for (const key in synced) {
     const values = reads?.get(key)
-    if (!values) names.push(key)
-    else for (const value of values) names.push(`${key}:${value}`)
+    if (!values) {
+      names.push(key)
+    } else {
+      for (const value of values) {
+        names.push(`${key}:${value}`)
+      }
+    }
   }
   return names
 }
@@ -242,17 +281,26 @@ function followed(part: Part, synced: object | undefined, props = part.props) {
 function touched(
   previous: Record<string, unknown> | undefined = {},
   next: Record<string, unknown> | undefined = {},
-  notify: (name: string) => void,
+  notify: (name: string) => void
 ) {
   let keys = false
-  for (const key in previous) if (!(key in next)) keys = true
+  for (const key in previous) {
+    if (!(key in next)) {
+      keys = true
+    }
+  }
   for (const key in next) {
-    if (!(key in previous)) keys = true
-    else if (sameValue(previous[key], next[key])) continue
+    if (!(key in previous)) {
+      keys = true
+    } else if (sameValue(previous[key], next[key])) {
+      continue
+    }
     notify(key)
     eachMoved(previous[key], next[key], (value) => notify(`${key}:${value}`))
   }
-  if (keys) notify("#keys")
+  if (keys) {
+    notify("#keys")
+  }
 }
 
 // What a part that narrows nothing skips: no key.
@@ -267,7 +315,9 @@ function subscribe(part: Part, listener: Listener, props = part.props) {
   const narrowed = definitionOf(part).selects
   const cleanups = [
     lease(part as PartRecord),
-    narrowed ? narrowed.subscribe(part, listener, props) : subscribeSkipping(part.store, skipNone, listener),
+    narrowed
+      ? narrowed.subscribe(part, listener, props)
+      : subscribeSkipping(part.store, skipNone, listener),
   ]
   return () => cleanups.forEach((cleanup) => cleanup())
 }
@@ -277,15 +327,22 @@ function handlers(part: Part) {
   const { on: events, press: activate } = definitionOf(part)
   const result: Partial<Record<keyof EventMap, (event: Event) => void>> = {}
   for (const type in events) {
-    const handler = events[type as keyof EventMap] as (event: Event, context: unknown) => void
+    const handler = events[type as keyof EventMap] as (
+      event: Event,
+      context: unknown
+    ) => void
     result[type as keyof EventMap] = (event) => {
-      if (event.defaultPrevented || composing(event)) return
+      if (event.defaultPrevented || composing(event)) {
+        return
+      }
       handler(event, context(part))
     }
   }
   if (typeof activate === "function" && !result.click) {
     result.click = (event) => {
-      if (!event.defaultPrevented) activate(context(part), event)
+      if (!event.defaultPrevented) {
+        activate(context(part), event)
+      }
     }
   }
   return result
@@ -298,7 +355,9 @@ function handlers(part: Part) {
  * `onProps` listeners run.
  */
 function commit(part: Part, props: Part["props"]) {
-  if (part.props === props) return
+  if (part.props === props) {
+    return
+  }
   part.props = props
   propsRendered(part as PartRecord)
 }
@@ -311,7 +370,9 @@ function propsRendered(part: PartRecord) {
 /** Activation without a DOM event, for headless tests and the docs' generated tables. */
 function press(part: Part, props = part.props) {
   const handler = definitionOf(part).press
-  return typeof handler === "function" ? () => handler(context(part, props)) : undefined
+  return typeof handler === "function"
+    ? () => handler(context(part, props))
+    : undefined
 }
 
 /**
@@ -335,7 +396,9 @@ function canHide(part: Part) {
   const definition = definitionOf(part)
   let hides = hidingSlots.get(definition)
   if (hides === undefined) {
-    hides = !!definition.attrs && "hidden" in definition.attrs(part.store.get(), view(part, part.props))
+    hides =
+      !!definition.attrs &&
+      "hidden" in definition.attrs(part.store.get(), view(part, part.props))
     hidingSlots.set(definition, hides)
   }
   return hides
@@ -354,40 +417,60 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
     checkShared(part, part.el, el)
     const { focus } = definitionOf(part) as RoleFields<any, any, any>
     checkFocus(
-      typeof focus === "function" ? focus(part.store.get(), view(part, part.props)) : focus,
+      typeof focus === "function"
+        ? focus(part.store.get(), view(part, part.props))
+        : focus,
       part.slot,
       el,
       {
         component: ownerOf(part).label,
         id: part.id,
-      },
+      }
     )
   }
   const binding = {}
   part.el = el
   kept.binding = binding
   const cleanups = [lease(kept)]
-  if (canHide(part)) enforceHidden(el.ownerDocument)
+  if (canHide(part)) {
+    enforceHidden(el.ownerDocument)
+  }
 
   for (const [type, handler] of Object.entries(handlers(part))) {
-    if (host.by === "core" || (host.attaches !== "all" && !host.attaches.includes(type)))
+    if (
+      host.by === "core" ||
+      (host.attaches !== "all" && !host.attaches.includes(type))
+    ) {
       cleanups.push(on(el, type as keyof EventMap, handler))
+    }
   }
 
   const definition = definitionOf(part)
-  if (definition.live) cleanups.push(definition.live.attach(part, el))
-  if (host.by === "framework" && definition.direct) cleanups.push(definition.direct.attach(part, el))
+  if (definition.live) {
+    cleanups.push(definition.live.attach(part, el))
+  }
+  if (host.by === "framework" && definition.direct) {
+    cleanups.push(definition.direct.attach(part, el))
+  }
 
   const cleanup = definition.bind?.(el, part)
-  if (cleanup) cleanups.push(cleanup)
+  if (cleanup) {
+    cleanups.push(cleanup)
+  }
   // Stand-ins that unit tests bind in Node have no ids to follow.
-  if (definition.attrs && typeof MutationObserver !== "undefined") cleanups.push(followId(kept, el))
+  if (definition.attrs && typeof MutationObserver !== "undefined") {
+    cleanups.push(followId(kept, el))
+  }
 
   return () => {
     cleanups.forEach((cleanup) => cleanup())
-    if (kept.binding !== binding) return
+    if (kept.binding !== binding) {
+      return
+    }
     part.el = kept.binding = undefined
-    if (kept.own !== undefined) readIdLater(kept)
+    if (kept.own !== undefined) {
+      readIdLater(kept)
+    }
   }
 }
 
@@ -397,16 +480,31 @@ function bind(part: Part, el: HTMLElement, host: Host = { by: "core" }) {
 // microtask later, since one update can hand a part to another element before
 // the element that had it takes its next part, like a calendar's weekday
 // headers moving when the week starts on another day.
-function checkShared(part: Part, bound: HTMLElement | null | undefined, el: HTMLElement) {
-  if (!part.key || !bound || bound === el) return
+function checkShared(
+  part: Part,
+  bound: HTMLElement | null | undefined,
+  el: HTMLElement
+) {
+  if (!part.key || !bound || bound === el) {
+    return
+  }
   queueMicrotask(() => {
-    if (part.el !== el || !bound.isConnected || !el.isConnected) return
+    if (part.el !== el || !bound.isConnected || !el.isConnected) {
+      return
+    }
     const { parts, label } = ownerOf(part)
-    for (const other of parts.values()) if (other.el === bound) return
-    warn(`two "${part.slot}" parts share the key "${part.key}". Give each an id or a unique value.`, {
-      component: label,
-      id: part.id,
-    })
+    for (const other of parts.values()) {
+      if (other.el === bound) {
+        return
+      }
+    }
+    warn(
+      `two "${part.slot}" parts share the key "${part.key}". Give each an id or a unique value.`,
+      {
+        component: label,
+        id: part.id,
+      }
+    )
   })
 }
 
@@ -418,12 +516,18 @@ function checkShared(part: Part, bound: HTMLElement | null | undefined, el: HTML
  */
 function ref(part: Part, host: Host) {
   const kept = part as PartRecord
-  if (kept.ref) return kept.ref
+  if (kept.ref) {
+    return kept.ref
+  }
   let current: HTMLElement | null = null
   let unbind = () => {}
   return (kept.ref = (el) => {
-    if (el === current) return
-    if (dev && el) checkShared(part, current, el)
+    if (el === current) {
+      return
+    }
+    if (dev && el) {
+      checkShared(part, current, el)
+    }
     unbind()
     current = el
     unbind = el ? bind(part, el, host) : () => {}
@@ -435,7 +539,8 @@ function ref(part: Part, host: Host) {
  * for adapters that keep parts that aren't present, like custom elements.
  * Returns the cleanup.
  */
-const connect = (part: Part, el: HTMLElement) => definitionOf(part).connect?.(el) ?? (() => {})
+const connect = (part: Part, el: HTMLElement) =>
+  definitionOf(part).connect?.(el) ?? (() => {})
 
 // Attributes that point at other elements by their ids.
 const references = [
@@ -454,24 +559,32 @@ const references = [
 // The id the slot makes when the author gives none, which a slot that reads
 // `id`, like a field's label, renders in its place.
 const madeId = (part: Part) =>
-  definitionOf(part).attrs?.(part.store.get(), view(part, { ...part.props, id: undefined })).id
+  definitionOf(part).attrs?.(
+    part.store.get(),
+    view(part, { ...part.props, id: undefined })
+  ).id
 
 // References to a made id point at the element's own id that replaced it, so
 // a label's `for`, the app's own `aria-describedby`, styles and tests that
 // name an author's id keep working, and the parts that point at it too.
 function aliased(part: PartRecord, attrs: Attrs) {
   const { owner } = part
-  if (!owner.named?.size) return attrs
+  if (!owner.named?.size) {
+    return attrs
+  }
   const aliases = aliasesOf(owner, part.store)
-  if (!aliases.size) return attrs
+  if (!aliases.size) {
+    return attrs
+  }
   const result = { ...attrs }
   for (const name of references) {
     const ids = result[name]
-    if (ids)
+    if (ids) {
       result[name] = ids
         .split(" ")
         .map((id) => aliases.get(id) ?? id)
         .join(" ")
+    }
   }
   return result
 }
@@ -482,7 +595,9 @@ function aliased(part: PartRecord, attrs: Attrs) {
  * like a trigger menu's on its editor.
  */
 function aliasReferences(context: { parts(): Iterable<Part> }, attrs: Attrs) {
-  for (const part of context.parts()) return aliased(part as PartRecord, attrs)
+  for (const part of context.parts()) {
+    return aliased(part as PartRecord, attrs)
+  }
   return attrs
 }
 
@@ -491,11 +606,15 @@ function aliasReferences(context: { parts(): Iterable<Part> }, attrs: Attrs) {
 // for free.
 function aliasesOf(owner: PartOwner, store: Part["store"]) {
   const version = renders(store)
-  if (owner.aliases?.version === version) return owner.aliases.map
+  if (owner.aliases?.version === version) {
+    return owner.aliases.map
+  }
   const map = new Map<string, string>()
   for (const part of owner.named!) {
     const made = madeId(part)
-    if (made !== undefined && made !== part.own) map.set(made, part.own!)
+    if (made !== undefined && made !== part.own) {
+      map.set(made, part.own!)
+    }
   }
   owner.aliases = { version, map }
   return map
@@ -504,7 +623,9 @@ function aliasesOf(owner: PartOwner, store: Part["store"]) {
 // Reads the element's id as it binds and whenever it changes, like a
 // framework's `id` prop or a script setting it.
 function followId(part: PartRecord, el: HTMLElement) {
-  if (el.hasAttribute("id") || part.own !== undefined) readIdLater(part)
+  if (el.hasAttribute("id") || part.own !== undefined) {
+    readIdLater(part)
+  }
   const observer = new MutationObserver(() => readIdLater(part))
   observer.observe(el, { attributeFilter: ["id"] })
   return () => observer.disconnect()
@@ -529,14 +650,19 @@ function readIds(owner: PartOwner, store: Part["store"]) {
   owner.unread = undefined
   let renamed = owner.renamed === true
   owner.renamed = undefined
-  for (const part of parts) renamed = rename(part, part.el && idOf(part.el)) || renamed
-  if (renamed) touch(store)
+  for (const part of parts) {
+    renamed = rename(part, part.el && idOf(part.el)) || renamed
+  }
+  if (renamed) {
+    touch(store)
+  }
 }
 
 // Every bound element with an id is read once, so through the `id` property,
 // which needs no lookup by name. A form's `id` property is a control named
 // "id", so a form's comes from its attribute.
-const idOf = (el: HTMLElement) => (el.localName === "form" ? el.getAttribute("id") : el.id)
+const idOf = (el: HTMLElement) =>
+  el.localName === "form" ? el.getAttribute("id") : el.id
 
 /**
  * Takes the id an author gives a part's element as the part renders, so the
@@ -548,8 +674,12 @@ const idOf = (el: HTMLElement) => (el.localName === "form" ? el.getAttribute("id
 function takeOwnId(part: Part, id: unknown) {
   // A render that never commits, like a transition that suspends, would
   // otherwise rename the part for the parts already on the page.
-  if (part.el || typeof id !== "string" || !definitionOf(part).attrs) return
-  if (rename(part as PartRecord, id)) ownerOf(part).renamed = true
+  if (part.el || typeof id !== "string" || !definitionOf(part).attrs) {
+    return
+  }
+  if (rename(part as PartRecord, id)) {
+    ownerOf(part).renamed = true
+  }
 }
 
 // Records `id` as the part's own when it isn't the one its slot makes.
@@ -557,12 +687,17 @@ function takeOwnId(part: Part, id: unknown) {
 function rename(part: PartRecord, id: string | null | undefined) {
   const made = madeId(part)
   const own = id && id !== made ? id : undefined
-  if (own === part.own) return false
+  if (own === part.own) {
+    return false
+  }
   const { owner } = part
   part.own = own
   owner.named ??= new Set()
-  if (own === undefined) owner.named.delete(part)
-  else owner.named.add(part)
+  if (own === undefined) {
+    owner.named.delete(part)
+  } else {
+    owner.named.add(part)
+  }
   owner.aliases = undefined
   return made !== undefined
 }
@@ -570,7 +705,10 @@ function rename(part: PartRecord, id: string | null | undefined) {
 // Keys an input method owns while it composes text, like Enter confirming a
 // Japanese candidate. Components never act on them.
 function composing(event: Event) {
-  return (event.type === "keydown" || event.type === "keyup") && isComposing(event as KeyboardEvent)
+  return (
+    (event.type === "keydown" || event.type === "keyup") &&
+    isComposing(event as KeyboardEvent)
+  )
 }
 
 export {

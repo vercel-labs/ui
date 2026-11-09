@@ -19,7 +19,8 @@
 <div>
   <Calendar
     mode="range"
-    onAnchorChange={(anchor) => log(anchor ? `Started on ${anchor}` : "Range finished")}
+    onAnchorChange={(anchor) =>
+      log(anchor ? `Started on ${anchor}` : "Range finished")}
     onFocusedChange={(focused) => log(`Focus on ${focused}`)}
   >
     <div data-slot="row">

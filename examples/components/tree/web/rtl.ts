@@ -25,7 +25,7 @@ const folders: Node[] = [
 
 function markup(items: Node[]) {
   let html = ""
-  for (const item of items)
+  for (const item of items) {
     html += `
       <ui-tree-item value="${item.value}">
         <ui-tree-item-label>
@@ -38,6 +38,7 @@ function markup(items: Node[]) {
         </ui-tree-item-label>
         ${item.children ? `<ui-tree-group>${markup(item.children)}</ui-tree-group>` : ""}
       </ui-tree-item>`
+  }
   return html
 }
 

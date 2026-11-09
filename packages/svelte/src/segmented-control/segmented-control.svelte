@@ -17,7 +17,12 @@ buttons, with an indicator that slides to the checked item.
   import { provideInstance } from "../instance"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   type Details = ChangeDetails<SegmentedControlValueChangeReason>
 
@@ -82,14 +87,16 @@ buttons, with an indicator that slides to the checked item.
     onValueChange: (next: string | null, details: Details) => {
       // The callback runs first, so canceling there also keeps a bound `value` as it was.
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
   }))
   provideInstance(segmentedControl, control)
   const root = useHandlePart(control, "root")
   const fieldControl = field?.control(
     () => rest.id,
-    () => rest["aria-describedby"],
+    () => rest["aria-describedby"]
   )
 </script>
 

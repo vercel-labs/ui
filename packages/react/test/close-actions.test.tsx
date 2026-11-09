@@ -33,7 +33,9 @@ async function mount(element: React.ReactNode) {
 }
 
 const buttonNamed = (name: string) =>
-  [...document.querySelectorAll("button")].find((button) => button.textContent === name)!
+  [...document.querySelectorAll("button")].find(
+    (button) => button.textContent === name
+  )!
 
 test("a dialog's Close action hears how it was pressed", async () => {
   const sources: string[] = []
@@ -41,11 +43,15 @@ test("a dialog's Close action hears how it was pressed", async () => {
     <Dialog defaultOpen>
       <DialogContent>
         <DialogTitle>Draft</DialogTitle>
-        <DialogClose action={(_event, { source }) => sources.push(source)}>Save</DialogClose>
+        <DialogClose action={(_event, { source }) => sources.push(source)}>
+          Save
+        </DialogClose>
       </DialogContent>
-    </Dialog>,
+    </Dialog>
   )
-  await React.act(async () => withSource("agent", () => buttonNamed("Save").click()))
+  await React.act(async () =>
+    withSource("agent", () => buttonNamed("Save").click())
+  )
   expect(sources).toEqual(["agent"])
 })
 
@@ -56,14 +62,24 @@ test("a toast's action and cancel buttons hear how they were pressed", async () 
   await React.act(async () => {
     toaster("Deleted", {
       duration: Infinity,
-      action: { label: "Undo", onAction: (_event, { source }) => sources.push(`undo:${source}`) },
+      action: {
+        label: "Undo",
+        onAction: (_event, { source }) => sources.push(`undo:${source}`),
+      },
     })
     toaster("Saved", {
       duration: Infinity,
-      cancel: { label: "Keep", onCancel: (_event, { source }) => sources.push(`keep:${source}`) },
+      cancel: {
+        label: "Keep",
+        onCancel: (_event, { source }) => sources.push(`keep:${source}`),
+      },
     })
   })
-  await React.act(async () => withSource("agent", () => buttonNamed("Undo").click()))
-  await React.act(async () => withSource("keyboard", () => buttonNamed("Keep").click()))
+  await React.act(async () =>
+    withSource("agent", () => buttonNamed("Undo").click())
+  )
+  await React.act(async () =>
+    withSource("keyboard", () => buttonNamed("Keep").click())
+  )
   expect(sources).toEqual(["undo:agent", "keep:keyboard"])
 })

@@ -16,7 +16,9 @@ const namers = new WeakMap<Element, () => boolean>()
 function nameFrom(el: Element, names: () => boolean) {
   namers.set(el, names)
   return () => {
-    if (namers.get(el) === names) namers.delete(el)
+    if (namers.get(el) === names) {
+      namers.delete(el)
+    }
   }
 }
 
@@ -28,11 +30,18 @@ function nameFrom(el: Element, names: () => boolean) {
  * part on the element has bound and rendered, so a tooltip that names the same
  * element counts.
  */
-function checkName(el: HTMLElement, part: string, from: { component: string; id?: string }) {
-  if (typeof document === "undefined") return
+function checkName(
+  el: HTMLElement,
+  part: string,
+  from: { component: string; id?: string }
+) {
+  if (typeof document === "undefined") {
+    return
+  }
   setTimeout(() => {
-    if (el.isConnected && !hasAccessibleName(el) && !namers.get(el)?.())
+    if (el.isConnected && !hasAccessibleName(el) && !namers.get(el)?.()) {
       warn(`${part} has no accessible name. Add text or an aria-label.`, from)
+    }
   })
 }
 

@@ -6,7 +6,8 @@ vi.stubGlobal("window", globalThis)
 vi.stubGlobal("document", { activeElement: null, body: {} })
 vi.stubGlobal("requestAnimationFrame", (run: () => void) => frames.push(run))
 
-const { createPopupLayer, modalTriple } = await import("../src/foundation/popups/popup")
+const { createPopupLayer, modalTriple } =
+  await import("../src/foundation/popups/popup")
 const { createStore } = await import("../src/foundation/kernel/store")
 
 function openPopup(id: string) {

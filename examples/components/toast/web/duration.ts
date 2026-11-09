@@ -20,14 +20,16 @@ function mount(root: HTMLElement) {
   `
   root.querySelector("ui-toast-region")!.toaster = toast
   const [second, seconds, untilDismissed] = root.querySelectorAll("button")
-  second.addEventListener("click", () => toast("Link copied", { duration: 1000 }))
+  second.addEventListener("click", () =>
+    toast("Link copied", { duration: 1000 })
+  )
   seconds.addEventListener("click", () => toast("Changes saved"))
   untilDismissed.addEventListener("click", () =>
     toast("Your session expires in 5 minutes", {
       duration: Infinity,
       dismissible: false,
       cancel: { label: "Got It" },
-    }),
+    })
   )
   return () => {
     toast.dismiss()

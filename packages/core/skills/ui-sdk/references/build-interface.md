@@ -119,7 +119,13 @@ import {
 } from "@ui-sdk/react/alert-dialog"
 import { Field, FieldLabel } from "@ui-sdk/react/field"
 import { Input } from "@ui-sdk/react/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/react/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/react/select"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 
 function ProjectSettings() {
@@ -155,7 +161,10 @@ function ProjectSettings() {
         <AlertDialogContent>
           <AlertDialogTitle>Delete Apollo?</AlertDialogTitle>
           <AlertDialogClose>Cancel</AlertDialogClose>
-          <AlertDialogClose value="confirm" data-agent-confirm="Deletes the project and all its data">
+          <AlertDialogClose
+            value="confirm"
+            data-agent-confirm="Deletes the project and all its data"
+          >
             Delete forever
           </AlertDialogClose>
         </AlertDialogContent>

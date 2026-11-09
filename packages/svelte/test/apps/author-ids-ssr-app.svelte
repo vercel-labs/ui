@@ -1,6 +1,16 @@
 <script lang="ts">
-  import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "../../src/dialog"
-  import { Field, FieldControl, FieldDescription, FieldLabel } from "../../src/field"
+  import {
+    Dialog,
+    DialogContent,
+    DialogTitle,
+    DialogTrigger,
+  } from "../../src/dialog"
+  import {
+    Field,
+    FieldControl,
+    FieldDescription,
+    FieldLabel,
+  } from "../../src/field"
   import { Popover, PopoverContent, PopoverTrigger } from "../../src/popover"
   import { Tabs, TabsList, TabsPanel, TabsTab } from "../../src/tabs"
 

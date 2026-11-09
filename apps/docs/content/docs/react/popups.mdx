@@ -44,7 +44,10 @@ An `anchor` can position the popup against another element. The component's page
 Set `dismissible={false}` to stop Escape, outside presses, focus leaving, Back, and sheet swipes from closing a popup. Its trigger, Close part, and controller can still close it.
 
 ```tsx
-<Popover dismissible={false} onDismissAttempt={(details) => console.log(details.reason)}>
+<Popover
+  dismissible={false}
+  onDismissAttempt={(details) => console.log(details.reason)}
+>
   {/* Trigger, content, and a Close part. */}
 </Popover>
 ```

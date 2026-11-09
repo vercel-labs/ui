@@ -31,12 +31,18 @@
       </TabsTab>
       <TabsTab class="tab" value="watched">
         {#snippet render({ props, state })}
-          <button {...props}>Watched{#if state.selected}<span aria-hidden="true"> •</span>{/if}</button>
+          <button {...props}
+            >Watched{#if state.selected}<span aria-hidden="true">
+                •</span
+              >{/if}</button
+          >
         {/snippet}
       </TabsTab>
       <TabsTab class="tab" value="plain">
         {#snippet children(state)}
-          <span class={state.selected ? "is-selected" : "is-unselected"}>Plain</span>
+          <span class={state.selected ? "is-selected" : "is-unselected"}
+            >Plain</span
+          >
         {/snippet}
       </TabsTab>
     </TabsList>

@@ -33,7 +33,7 @@ describe("server rendering", () => {
             h(SelectLabel, null, () => "Plan"),
             h(SelectTrigger),
           ]),
-      }),
+      })
     )
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="combobox"')
@@ -45,11 +45,12 @@ describe("server rendering", () => {
     const html = await renderToString(
       createSSRApp({
         render: () =>
-          h(Combobox, { items: plans, name: "plan", defaultValue: "pro" }, () => [
-            h(ComboboxInput),
-            h(ComboboxContent),
-          ]),
-      }),
+          h(
+            Combobox,
+            { items: plans, name: "plan", defaultValue: "pro" },
+            () => [h(ComboboxInput), h(ComboboxContent)]
+          ),
+      })
     )
     expect(html).toMatch(/<input[^>]*role="combobox"[^>]*value="Pro"/)
   })
@@ -60,9 +61,11 @@ describe("server rendering", () => {
         render: () =>
           h(Select, { name: "plan", defaultValue: "pro" }, () => [
             h(SelectTrigger),
-            h(SelectContent, null, () => plans.map((plan) => h(SelectItem, { key: plan.value, ...plan }))),
+            h(SelectContent, null, () =>
+              plans.map((plan) => h(SelectItem, { key: plan.value, ...plan }))
+            ),
           ]),
-      }),
+      })
     )
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
   })
@@ -78,11 +81,11 @@ describe("server rendering", () => {
                 h(SelectItem, { key: plan.value, value: plan.value }, () => [
                   h(SelectItemText, null, () => plan.label),
                   h(SelectItemIndicator, null, () => "✓"),
-                ]),
-              ),
+                ])
+              )
             ),
           ]),
-      }),
+      })
     )
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
   })
@@ -96,15 +99,19 @@ describe("server rendering", () => {
             h(ComboboxContent, null, () =>
               h(ComboboxList, null, () =>
                 plans.map((plan) =>
-                  h(ComboboxItem, { key: plan.value, value: plan.value }, () => [
-                    plan.label,
-                    h(ComboboxItemIndicator, null, () => "✓"),
-                  ]),
-                ),
-              ),
+                  h(
+                    ComboboxItem,
+                    { key: plan.value, value: plan.value },
+                    () => [
+                      plan.label,
+                      h(ComboboxItemIndicator, null, () => "✓"),
+                    ]
+                  )
+                )
+              )
             ),
           ]),
-      }),
+      })
     )
     expect(html).toMatch(/<input[^>]*role="combobox"[^>]*value="Pro"/)
   })
@@ -116,17 +123,22 @@ describe("server rendering", () => {
         render: () =>
           h(
             Select,
-            { defaultValue: objects[1], itemToValue: (plan: { id: string }) => plan.id.toString() },
+            {
+              defaultValue: objects[1],
+              itemToValue: (plan: { id: string }) => plan.id.toString(),
+            },
             () => [
               h(SelectTrigger),
               h(SelectContent, null, () => [
                 h("input", { value: "pro", readonly: true }),
-                ...objects.map((plan) => h(SelectItem, { key: plan.id, value: plan }, () => plan.name)),
+                ...objects.map((plan) =>
+                  h(SelectItem, { key: plan.id, value: plan }, () => plan.name)
+                ),
                 h("data", { value: "pro" }, "Pro, $10"),
               ]),
-            ],
+            ]
           ),
-      }),
+      })
     )
     expect(html).toMatch(/data-slot="select-value"[^>]*>Pro</)
   })

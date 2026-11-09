@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { CheckIcon } from "@lucide/vue"
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/vue/checkbox"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/vue/checkbox"
 
 const toppings = [
   { value: "cheese", label: "جبن" },

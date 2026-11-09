@@ -1,6 +1,12 @@
 import { renderToString } from "@solidjs/web"
 import { describe, expect, test } from "vitest"
-import { Accordion, AccordionHeader, AccordionItem, AccordionPanel, AccordionTrigger } from "../src/accordion"
+import {
+  Accordion,
+  AccordionHeader,
+  AccordionItem,
+  AccordionPanel,
+  AccordionTrigger,
+} from "../src/accordion"
 import {
   Carousel,
   CarouselContent,
@@ -61,7 +67,9 @@ describe("server rendering tabs", () => {
     ))
     expect(typeof window).toBe("undefined")
     expect(html).toContain('role="tablist"')
-    expect(html).toMatch(/aria-selected="true"[^>]*tabindex="0"|tabindex="0"[^>]*aria-selected="true"/)
+    expect(html).toMatch(
+      /aria-selected="true"[^>]*tabindex="0"|tabindex="0"[^>]*aria-selected="true"/
+    )
     expect(html).toContain("Panel B")
     expect(html).not.toContain("Panel A")
   })
@@ -90,12 +98,16 @@ describe("server rendering an accordion", () => {
         <AccordionHeader>
           <AccordionTrigger>{`Trigger ${value}`}</AccordionTrigger>
         </AccordionHeader>
-        <AccordionPanel keepMounted={keepMounted}>{`Panel ${value}`}</AccordionPanel>
+        <AccordionPanel
+          keepMounted={keepMounted}
+        >{`Panel ${value}`}</AccordionPanel>
       </AccordionItem>
     ))
 
   test("renders open panels with their content and leaves closed ones out", () => {
-    const html = renderToString(() => <Accordion defaultValue={["b"]}>{items()}</Accordion>)
+    const html = renderToString(() => (
+      <Accordion defaultValue={["b"]}>{items()}</Accordion>
+    ))
     expect(html).toContain("<h3")
     expect(html).toMatch(/aria-expanded="true"[^>]*>Trigger b/)
     expect(html).toMatch(/aria-expanded="false"[^>]*>Trigger a/)
@@ -105,7 +117,9 @@ describe("server rendering an accordion", () => {
   })
 
   test("kept and findable panels render hidden, findable ones as until-found", () => {
-    const kept = renderToString(() => <Accordion defaultValue={["b"]}>{items(true)}</Accordion>)
+    const kept = renderToString(() => (
+      <Accordion defaultValue={["b"]}>{items(true)}</Accordion>
+    ))
     expect(kept).toMatch(/<div[^>]*\shidden[\s>][^>]*>Panel a/)
     const findable = renderToString(() => (
       <Accordion defaultValue={["b"]} hiddenUntilFound>
@@ -151,13 +165,17 @@ describe("server rendering a navigation menu", () => {
     expect(html).toContain('aria-expanded="true"')
     expect(html).toMatch(/aria-controls="[^"]+-content-products"/)
     expect(html).toContain("Analytics")
-    expect(html).not.toMatch(/data-slot="navigation-menu-content"[^>]*\shidden[\s>]/)
+    expect(html).not.toMatch(
+      /data-slot="navigation-menu-content"[^>]*\shidden[\s>]/
+    )
   })
 
   test("a closed panel kept mounted is in the HTML, hidden", () => {
     const html = renderToString(() => menu({ keepMounted: true }))
     expect(html).toContain("Analytics")
-    expect(html).toMatch(/data-slot="navigation-menu-content"[^>]*\shidden[\s>]/)
+    expect(html).toMatch(
+      /data-slot="navigation-menu-content"[^>]*\shidden[\s>]/
+    )
   })
 })
 
@@ -195,17 +213,23 @@ describe("server rendering a scroll area", () => {
   ))
 
   test("the viewport scrolls and hides native scrollbars already, so they never flash", () => {
-    expect(html).toMatch(/data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none"/)
+    expect(html).toMatch(
+      /data-slot="scroll-area-viewport"[^>]*style="overflow:auto;scrollbar-width:none"/
+    )
   })
 
   test("the scrollbar is hidden from screen readers, and from view until the content is measured", () => {
-    expect(html).toMatch(/data-slot="scroll-area-scrollbar"[^>]*aria-hidden="true"/)
+    expect(html).toMatch(
+      /data-slot="scroll-area-scrollbar"[^>]*aria-hidden="true"/
+    )
     expect(html).toMatch(/data-slot="scroll-area-scrollbar"[^>]*display:none/)
   })
 
   test("the content resets the per-frame variables, and the button is a button", () => {
     expect(html).toContain("--scroll-area-overflow-y-start:initial")
-    expect(html).toMatch(/<button[^>]*type="button"[^>]*>Jump to latest<\/button>/)
+    expect(html).toMatch(
+      /<button[^>]*type="button"[^>]*>Jump to latest<\/button>/
+    )
   })
 })
 
@@ -239,7 +263,9 @@ describe("server rendering a carousel", () => {
   test("a rotating carousel renders its toggle's state and turns the live region off", () => {
     const html = renderToString(() => (
       <Carousel aria-label="Featured" defaultPlaying>
-        <CarouselPlayToggle>{(state) => (state.playing ? "Stop" : "Start")}</CarouselPlayToggle>
+        <CarouselPlayToggle>
+          {(state) => (state.playing ? "Stop" : "Start")}
+        </CarouselPlayToggle>
         <CarouselViewport>
           <CarouselContent>
             <CarouselItem>One</CarouselItem>
@@ -254,7 +280,12 @@ describe("server rendering a carousel", () => {
 
 describe("server rendering a pagination", () => {
   const pages = (getHref?: (page: number) => string) => (
-    <Pagination aria-label="Pages" pageCount={10} defaultPage={5} getHref={getHref}>
+    <Pagination
+      aria-label="Pages"
+      pageCount={10}
+      defaultPage={5}
+      getHref={getHref}
+    >
       <PaginationList>
         {({ items }) => (
           <>
@@ -263,7 +294,11 @@ describe("server rendering a pagination", () => {
             </PaginationItem>
             {items.map((item) => (
               <PaginationItem>
-                {typeof item === "number" ? <PaginationLink page={item} /> : <PaginationEllipsis />}
+                {typeof item === "number" ? (
+                  <PaginationLink page={item} />
+                ) : (
+                  <PaginationEllipsis />
+                )}
               </PaginationItem>
             ))}
             <PaginationItem>

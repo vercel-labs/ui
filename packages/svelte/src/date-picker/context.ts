@@ -18,8 +18,16 @@ type ContainerContext = () => PopupContainer
 
 function useDatePicker(part: string) {
   const context = getContext<DatePickerContext | undefined>(DatePickerKey)
-  if (!context) throw new Error(`${part} must be used inside <DatePicker>.`)
+  if (!context) {
+    throw new Error(`${part} must be used inside <DatePicker>.`)
+  }
   return context
 }
 
-export { type ContainerContext, ContainerKey, type DatePickerContext, DatePickerKey, useDatePicker }
+export {
+  type ContainerContext,
+  ContainerKey,
+  type DatePickerContext,
+  DatePickerKey,
+  useDatePicker,
+}

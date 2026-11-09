@@ -8,7 +8,12 @@ import {
 } from "@ui-sdk/core/input"
 import { controlRender, useFieldControl } from "./field-context"
 import { controlProps, elementProps, type Native } from "./text-control"
-import { createParts, usePart, usePrimitive, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  usePart,
+  usePrimitive,
+  type PartProps,
+} from "./use-primitive"
 
 /**
  * A native <input>, wired to the Field it's in.
@@ -24,7 +29,13 @@ function Input({
   ...props
 }: InputOptions & Native<"input", InputState>) {
   const field = useFieldControl()
-  const input = usePrimitive(inputPrimitive, { value, defaultValue, onValueChange, controller, debug })
+  const input = usePrimitive(inputPrimitive, {
+    value,
+    defaultValue,
+    onValueChange,
+    controller,
+    debug,
+  })
   const element = {
     ...elementProps(props, field, value, defaultValue),
     render: controlRender(field, "input", render),
@@ -39,7 +50,10 @@ const parts = createParts(inputGroup, { clear: "button" })
  * on its text and icons focus the field.
  * @stable
  */
-function InputGroup({ debug, ...props }: InputGroupOptions & PartProps<"div", InputGroupState>) {
+function InputGroup({
+  debug,
+  ...props
+}: InputGroupOptions & PartProps<"div", InputGroupState>) {
   return usePart(usePrimitive(inputGroup, { debug }), "group", {}, props, "div")
 }
 

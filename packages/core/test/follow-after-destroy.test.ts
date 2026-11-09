@@ -8,7 +8,9 @@ test("a destroyed instance keeps what its framework last delivered, without aski
   const instance = popover({ id: "p", open: false })
   let gone = false
   instance.follow(() => {
-    if (gone) throw new Error("read the framework's options after the component left")
+    if (gone) {
+      throw new Error("read the framework's options after the component left")
+    }
     return { id: "p", open: true }
   })
   expect(instance.get().open).toBe(true)

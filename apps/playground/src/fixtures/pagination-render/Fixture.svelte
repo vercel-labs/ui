@@ -13,14 +13,21 @@
   let action = $state("")
 
   function onPageChange(page: number, details: ChangeDetails) {
-    if (page === 4) return details.cancel()
+    if (page === 4) {
+      return details.cancel()
+    }
     action = `page: ${page}`
   }
 </script>
 
 <div class="fixture">
   <button>Before</button>
-  <Pagination aria-label="Results pages" pageCount={5} getHref={(page) => `#results-${page}`} {onPageChange}>
+  <Pagination
+    aria-label="Results pages"
+    pageCount={5}
+    getHref={(page) => `#results-${page}`}
+    {onPageChange}
+  >
     <PaginationList class="pagination-list">
       {#snippet children(state)}
         <PaginationItem>
@@ -34,8 +41,15 @@
           <PaginationItem>
             <PaginationLink page={item as number}>
               {#snippet render({ props, state: link })}
-                <RouterLink {...props} class={["pagination-link", link.current ? "is-active" : "is-inactive"]}>
-                  {link.page}{#if link.current}<span aria-hidden="true">•</span>{/if}
+                <RouterLink
+                  {...props}
+                  class={[
+                    "pagination-link",
+                    link.current ? "is-active" : "is-inactive",
+                  ]}
+                >
+                  {link.page}{#if link.current}<span aria-hidden="true">•</span
+                    >{/if}
                 </RouterLink>
               {/snippet}
             </PaginationLink>

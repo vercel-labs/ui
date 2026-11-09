@@ -11,7 +11,10 @@ import {
 import { createRovingFocus } from "../../foundation/focus/roving-focus"
 import { watchFormDisabled } from "../../foundation/forms/form"
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
 import type {
   PrimitiveContext,
@@ -58,7 +61,9 @@ function createToggleGroupController<T extends string = string>() {
  * `controller` option.
  * @stable
  */
-type ToggleGroupController<T extends string = string> = ReturnType<typeof createToggleGroupController<T>>
+type ToggleGroupController<T extends string = string> = ReturnType<
+  typeof createToggleGroupController<T>
+>
 
 /**
  * Which way the toggles run, which picks the arrow keys that move between
@@ -81,7 +86,10 @@ type ToggleGroupOptions<T extends string = string> = {
    */
   defaultValue?: T[]
   /** Runs when a toggle wants to be pressed or unpressed. `details.reason` says why, and `details.cancel()` stops it. */
-  onValueChange?: (value: T[], details: ChangeDetails<ToggleGroupValueChangeReason>) => void
+  onValueChange?: (
+    value: T[],
+    details: ChangeDetails<ToggleGroupValueChangeReason>
+  ) => void
   /**
    * Whether several toggles can be pressed at once. Otherwise pressing one unpresses the others.
    * @defaultValue false
@@ -117,9 +125,10 @@ type ToggleGroupOptions<T extends string = string> = {
  * What adapters pass on top: the toolbar the group sits in, whose arrow keys
  * and tab stop its toggles join.
  */
-type ToggleGroupInternalOptions<T extends string = string> = ToggleGroupOptions<T> & {
-  toolbar?: () => RovingScope | undefined
-}
+type ToggleGroupInternalOptions<T extends string = string> =
+  ToggleGroupOptions<T> & {
+    toolbar?: () => RovingScope | undefined
+  }
 
 /**
  * What `render` functions and state-based class names receive.
@@ -153,21 +162,26 @@ type State = {
 
 type Item = { key: string; el: HTMLElement; disabled: () => boolean }
 
-const isGroupDisabled = (state: State) => state.disabled || state.formDisabled || state.scopeDisabled
+const isGroupDisabled = (state: State) =>
+  state.disabled || state.formDisabled || state.scopeDisabled
 
 /** The value after pressing or unpressing one toggle, in document order. */
 function nextValue(
   value: readonly string[],
   key: string,
   pressed: boolean,
-  { multiple, order }: { multiple: boolean; order: readonly string[] },
+  { multiple, order }: { multiple: boolean; order: readonly string[] }
 ) {
-  if (!multiple) return pressed ? [key] : []
+  if (!multiple) {
+    return pressed ? [key] : []
+  }
   const others = value.filter((item) => item !== key)
   return inOrder(pressed ? [...others, key] : others, order)
 }
 
-function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, State, string>) {
+function toggleGroupApi(
+  context: PrimitiveContext<ToggleGroupInternalOptions, State, string>
+) {
   const { store, options } = context
   const change = createChange(context)
   // Toggles by value, for document order and focus.
@@ -191,14 +205,17 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
     preferred: (toggle) => !!toggle.props.preferred?.(),
     claims: (state, toggle) =>
       isGroupDisabled(state) ||
-      (!memberDisabled(toggle) && (!state.value.length || !!toggle.props.preferred?.())),
+      (!memberDisabled(toggle) &&
+        (!state.value.length || !!toggle.props.preferred?.())),
   })
   const own: RovingScope = {
     bind: roving.bind,
     claim: (toggle) => roving.tabIndex(store.get(), toggle) === "0",
     queueCheck: queued(roving.check),
     keydown(event, el) {
-      if (!event.shiftKey) roving.keydown(event, el)
+      if (!event.shiftKey) {
+        roving.keydown(event, el)
+      }
     },
     stop: () => store.get().stop,
     follow: (key, listener) => followStop(store, key, listener),
@@ -218,45 +235,71 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
       (state.value !== previous.value ||
         isGroupDisabled(state) !== isGroupDisabled(previous) ||
         state.scopeDisabled !== previous.scopeDisabled)
-    )
+    ) {
       scope().queueCheck()
+    }
     previous = state
   })
 
   // Whether pressing or unpressing a toggle would change anything the group allows.
   function allows(key: string, pressed: boolean) {
     const { multiple, deselectable } = store.get()
-    if (api.internal.disabled() || items.get(key)?.disabled()) return false
-    if (pressed === isPressed(key)) return false
+    if (api.internal.disabled() || items.get(key)?.disabled()) {
+      return false
+    }
+    if (pressed === isPressed(key)) {
+      return false
+    }
     return pressed || multiple || deselectable
   }
 
-  function press(key: string, pressed: boolean, details: ToggleGroupChangeOptions) {
-    if (!allows(key, pressed)) return false
+  function press(
+    key: string,
+    pressed: boolean,
+    details: ToggleGroupChangeOptions
+  ) {
+    if (!allows(key, pressed)) {
+      return false
+    }
     const { value, multiple } = store.get()
     const order = ordered().map((item) => item.key)
-    return change("value", nextValue(value, key, pressed, { multiple, order }), {
-      reason: details.reason ?? "imperative",
-      event: details.event,
-    })
+    return change(
+      "value",
+      nextValue(value, key, pressed, { multiple, order }),
+      {
+        reason: details.reason ?? "imperative",
+        event: details.event,
+      }
+    )
   }
 
   const api = {
     getValue: () => store.get().value,
-    setValue(value: string[], { reason = "imperative", event }: ToggleGroupChangeOptions = {}) {
+    setValue(
+      value: string[],
+      { reason = "imperative", event }: ToggleGroupChangeOptions = {}
+    ) {
       const order = ordered().map((item) => item.key)
-      return change("value", store.get().multiple ? inOrder(value, order) : value.slice(0, 1), {
-        reason,
-        event,
-      })
+      return change(
+        "value",
+        store.get().multiple ? inOrder(value, order) : value.slice(0, 1),
+        {
+          reason,
+          event,
+        }
+      )
     },
     isPressed,
     toggle: (value: string, details: ToggleGroupChangeOptions = {}) =>
       press(value, !isPressed(value), details),
     focus(value?: string) {
-      if (value !== undefined) items.get(value)?.el.focus()
-      else if (scope() === own) roving.focus()
-      else ordered()[0]?.el.focus()
+      if (value !== undefined) {
+        items.get(value)?.el.focus()
+      } else if (scope() === own) {
+        roving.focus()
+      } else {
+        ordered()[0]?.el.focus()
+      }
     },
     internal: {
       allows,
@@ -273,7 +316,12 @@ function toggleGroupApi(context: PrimitiveContext<ToggleGroupInternalOptions, St
       elementOf: (key: string) => items.get(key)?.el,
       // A toggle joins by its value, and the roving group by a key of its own,
       // which stays unique in a toolbar that holds several groups.
-      register(key: string, rovingKey: string, el: HTMLElement, disabled: () => boolean) {
+      register(
+        key: string,
+        rovingKey: string,
+        el: HTMLElement,
+        disabled: () => boolean
+      ) {
         const remove = items.add({ key, el, disabled })
         const leave = scope().bind(el, {
           key: rovingKey,
@@ -364,7 +412,10 @@ const toggleGroupPrimitive = /* @__PURE__ */ definePrimitive({
  * The type of `toggleGroup`.
  * @stable
  */
-interface ToggleGroupPrimitive extends WithGeneric<typeof toggleGroupPrimitive, ToggleGroupGeneric> {}
+interface ToggleGroupPrimitive extends WithGeneric<
+  typeof toggleGroupPrimitive,
+  ToggleGroupGeneric
+> {}
 
 /**
  * The toggle group primitive, with the slots `group`.

@@ -6,7 +6,8 @@ import { expect, test } from "../fixtures"
 // element the pointer entered, never the one it left, and a shared popup that
 // moves to another trigger reports that trigger's payload.
 
-const lastChange = (page: Page) => page.getByRole("status", { name: "Last change" })
+const lastChange = (page: Page) =>
+  page.getByRole("status", { name: "Last change" })
 
 test.beforeEach(async ({ open }) => {
   await open("hover-popups")
@@ -41,7 +42,9 @@ test("a hover card opens with the event at its link, and reports the payload of 
   await expect(page.getByText("Card for grace")).toBeVisible()
 })
 
-test("a popover that opens on hover opens with the event at its trigger", async ({ page }) => {
+test("a popover that opens on hover opens with the event at its trigger", async ({
+  page,
+}) => {
   await page.getByRole("button", { name: "Before" }).hover()
   await page.getByRole("button", { name: "Settings" }).hover()
   await expect(lastChange(page)).toHaveText("popover open: Settings")

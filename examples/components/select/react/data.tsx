@@ -54,7 +54,11 @@ function Example() {
           <SelectGroup>
             <SelectGroupLabel>Contact sales</SelectGroupLabel>
             {sales.map((plan) => (
-              <SelectItem key={plan.value} value={plan.value} disabled={plan.disabled}>
+              <SelectItem
+                key={plan.value}
+                value={plan.value}
+                disabled={plan.disabled}
+              >
                 {plan.label}
                 <SelectItemIndicator>
                   <CheckIcon />

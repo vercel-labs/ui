@@ -13,7 +13,11 @@ The root: a box for the image and its fallback.
   } from "@ui-sdk/core/avatar"
   import Part from "../part.svelte"
   import { provideInstance } from "../instance"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
 
   let {
     debug,
@@ -25,12 +29,16 @@ The root: a box for the image and its fallback.
     /** Runs when the image's loading status changes: `"loading"` when it gets a source, `"loaded"`, `"error"`, and `"idle"` when it leaves the page. */
     onLoadingStatusChange?: (
       status: AvatarLoadingStatus,
-      details: ChangeDetails<AvatarLoadingStatusChangeReason>,
+      details: ChangeDetails<AvatarLoadingStatusChangeReason>
     ) => void
   } = $props()
 
   const id = $props.id()
-  const avatar = usePrimitive(avatarPrimitive, () => ({ id, debug, onLoadingStatusChange }))
+  const avatar = usePrimitive(avatarPrimitive, () => ({
+    id,
+    debug,
+    onLoadingStatusChange,
+  }))
   provideInstance(avatarPrimitive, avatar)
   const root = useHandlePart(avatar, "root")
 </script>

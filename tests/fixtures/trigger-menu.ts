@@ -57,7 +57,11 @@ const triggerMenuFixture = {
       ],
     },
     { value: "clear", label: "clear" },
-    { value: "search", label: "search", arguments: [{ name: "query", hint: "<query>", required: true }] },
+    {
+      value: "search",
+      label: "search",
+      arguments: [{ name: "query", hint: "<query>", required: true }],
+    },
     { value: "send", label: "send", after: "submit" as const },
   ],
   channels: ["general", "random", "design", "engineering"],
@@ -70,16 +74,18 @@ function loadChannels(query: string, { signal }: { signal: AbortSignal }) {
   const slow = new URLSearchParams(location.search).has("slow")
   const request = { query, aborted: false }
   channelRequests.push(request)
-  ;(window as unknown as { channelRequests: typeof channelRequests }).channelRequests = channelRequests
+  ;(
+    window as unknown as { channelRequests: typeof channelRequests }
+  ).channelRequests = channelRequests
   return new Promise<{ value: string; label: string }[]>((resolve, reject) => {
     const timer = setTimeout(
       () =>
         resolve(
           triggerMenuFixture.channels
             .filter((channel) => channel.startsWith(query.toLowerCase()))
-            .map((channel) => ({ value: channel, label: channel })),
+            .map((channel) => ({ value: channel, label: channel }))
         ),
-      slow ? 300 : 100,
+      slow ? 300 : 100
     )
     signal.addEventListener("abort", () => {
       request.aborted = true
@@ -94,7 +100,12 @@ function fixtureTriggers() {
   const f = triggerMenuFixture
   return [
     { char: "@", type: "mention", items: f.people },
-    { char: "/", boundary: "start" as const, type: "command", items: f.commands },
+    {
+      char: "/",
+      boundary: "start" as const,
+      type: "command",
+      items: f.commands,
+    },
     { char: "#", type: "channel", items: loadChannels },
   ]
 }

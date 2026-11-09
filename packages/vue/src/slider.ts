@@ -7,18 +7,43 @@ import {
   type SliderValueChangeDetails,
   type SliderValueCommitDetails,
 } from "@ui-sdk/core/slider"
-import { computed, defineComponent, h, inject, provide, type InjectionKey, type PropType } from "vue"
+import {
+  computed,
+  defineComponent,
+  h,
+  inject,
+  provide,
+  type InjectionKey,
+  type PropType,
+} from "vue"
 import { slotContent } from "./children"
 import { useFieldControl, useFieldControlId } from "./field-context"
-import { createParts, type RootInstanceOf, type RootPropsOf, withElement } from "./create-parts"
-import { optionalBoolean, orModel, useHandle, usePart, usePrimitive, type PartSlots } from "./use-primitive"
+import {
+  createParts,
+  type RootInstanceOf,
+  type RootPropsOf,
+  withElement,
+} from "./create-parts"
+import {
+  optionalBoolean,
+  orModel,
+  useHandle,
+  usePart,
+  usePrimitive,
+  type PartSlots,
+} from "./use-primitive"
 
 // The field a single thumb's input joins. A range joins it on the root instead.
-const ThumbFieldKey: InjectionKey<() => ReturnType<typeof useFieldControl>> = Symbol("slider-field")
+const ThumbFieldKey: InjectionKey<() => ReturnType<typeof useFieldControl>> =
+  Symbol("slider-field")
 
 const useSlider = () => useHandle(sliderPrimitive)
 
-const parts = createParts(sliderPrimitive, { control: "div", track: "div", indicator: "div" })
+const parts = createParts(sliderPrimitive, {
+  control: "div",
+  track: "div",
+  indicator: "div",
+})
 
 type Value = number | number[]
 
@@ -26,8 +51,12 @@ type Value = number | number[]
 // thumb, or an array for a range, through `v-model` and its events.
 type SliderProps<V extends Value> = SliderOptions<V>
 type SliderComponent = new <V extends Value = Value>(
-  props: RootPropsOf<SliderProps<V>, "div">,
-) => RootInstanceOf<SliderProps<V>, StateOf<typeof sliderPrimitive, "root">, "div">
+  props: RootPropsOf<SliderProps<V>, "div">
+) => RootInstanceOf<
+  SliderProps<V>,
+  StateOf<typeof sliderPrimitive, "root">,
+  "div"
+>
 
 // The hidden input the form submits. Its value changes on every move, so it
 // renders on its own, and the root and its content don't render again.
@@ -48,8 +77,14 @@ const Slider = defineComponent({
   inheritAttrs: false,
   props: {
     value: { type: [Number, Array] as PropType<Value>, default: undefined },
-    modelValue: { type: [Number, Array] as PropType<Value>, default: undefined },
-    defaultValue: { type: [Number, Array] as PropType<Value>, default: undefined },
+    modelValue: {
+      type: [Number, Array] as PropType<Value>,
+      default: undefined,
+    },
+    defaultValue: {
+      type: [Number, Array] as PropType<Value>,
+      default: undefined,
+    },
     min: Number,
     max: Number,
     step: Number,
@@ -99,11 +134,14 @@ const Slider = defineComponent({
       onValueChange: (value: Value, details: SliderValueChangeDetails) => {
         // The change event runs first, so canceling it also keeps v-model as it was.
         emit("valueChange", value, details)
-        if (details.canceled) return
+        if (details.canceled) {
+          return
+        }
         emit("update:value", value)
         emit("update:modelValue", value)
       },
-      onValueCommit: (value: Value, details: SliderValueCommitDetails) => emit("valueCommit", value, details),
+      onValueCommit: (value: Value, details: SliderValueCommitDetails) =>
+        emit("valueCommit", value, details),
     }))
     // A range is a group the field's label names. A single thumb is the
     // control itself. Computed, so a v-model value that moves doesn't render
@@ -149,7 +187,11 @@ const SliderThumbInput = defineComponent({
     const slider = useSlider()
     const thumbField = inject(ThumbFieldKey, () => null)
     return () => {
-      const input = slider.slot("thumb-input", { index: props.index, id: String(props.index) }, attrs)
+      const input = slider.slot(
+        "thumb-input",
+        { index: props.index, id: String(props.index) },
+        attrs
+      )
       const field = thumbField()
       return h("input", field ? field.props(input) : input)
     }
@@ -175,8 +217,9 @@ const SliderThumb = withElement(
       const own = () => {
         const rest: Record<string, unknown> = {}
         named = {}
-        for (const [key, value] of Object.entries(attrs))
-          (inputAttributes.includes(key) ? named : rest)[key] = value
+        for (const [key, value] of Object.entries(attrs)) {
+          ;(inputAttributes.includes(key) ? named : rest)[key] = value
+        }
         return rest
       }
       return usePart(useSlider(), "thumb", thumb, own, {
@@ -187,7 +230,7 @@ const SliderThumb = withElement(
         ],
       })
     },
-  }),
+  })
 )
 
 /**
@@ -203,10 +246,11 @@ const SliderValue = withElement(
     setup(_, { slots }) {
       return usePart(useSlider(), "value", undefined, undefined, {
         tag: "output",
-        children: (state) => slotContent(slots.default, { state }) ?? state.text,
+        children: (state) =>
+          slotContent(slots.default, { state }) ?? state.text,
       })
     },
-  }),
+  })
 )
 
 export { createSliderController } from "@ui-sdk/core/slider"
@@ -226,4 +270,11 @@ export type {
   SliderValueState,
 } from "@ui-sdk/core/slider"
 
-export { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack, SliderValue }
+export {
+  Slider,
+  SliderControl,
+  SliderIndicator,
+  SliderThumb,
+  SliderTrack,
+  SliderValue,
+}

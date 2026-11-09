@@ -12,7 +12,7 @@ function mount(root: HTMLElement) {
         <ui-collapsible class="collapsible-row">
           <ui-collapsible-trigger><button class="collapsible-trigger">Folder ${index + 1}</button></ui-collapsible-trigger>
           <ui-collapsible-panel class="collapsible-panel"${found ? " hidden-until-found" : ""}>Files ${index + 1}</ui-collapsible-panel>
-        </ui-collapsible>`,
+        </ui-collapsible>`
     ).join("")
     target.innerHTML = `
       <div class="fixture" style="flex-direction: column; align-items: start">

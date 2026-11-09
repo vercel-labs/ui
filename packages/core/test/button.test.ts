@@ -18,7 +18,11 @@ afterEach(() => {
 describe("button", () => {
   test("debug logs the pending and error changes a press makes", async () => {
     const log = vi.spyOn(console, "debug").mockImplementation(() => {})
-    const instance = button({ id: "b", debug: true, action: () => Promise.reject(new Error("Offline")) })
+    const instance = button({
+      id: "b",
+      debug: true,
+      action: () => Promise.reject(new Error("Offline")),
+    })
     instance.api.internal.press()
     await settle()
     const lines = log.mock.calls.map(([line]) => String(line))
@@ -39,15 +43,24 @@ describe("button", () => {
 
   test("the next press clears the last error, and a success keeps it clear", async () => {
     let fail = true
-    const instance = button({ id: "b", action: () => (fail ? Promise.reject("offline") : Promise.resolve()) })
+    const instance = button({
+      id: "b",
+      action: () => (fail ? Promise.reject("offline") : Promise.resolve()),
+    })
     instance.api.internal.press()
     await settle()
     expect(partState(instance.part("root"))).toMatchObject({ error: "offline" })
     fail = false
     instance.api.internal.press()
-    expect(partState(instance.part("root"))).toMatchObject({ pending: true, error: undefined })
+    expect(partState(instance.part("root"))).toMatchObject({
+      pending: true,
+      error: undefined,
+    })
     await settle()
-    expect(partState(instance.part("root"))).toMatchObject({ pending: false, error: undefined })
+    expect(partState(instance.part("root"))).toMatchObject({
+      pending: false,
+      error: undefined,
+    })
   })
 
   test("a handler that throws sets the error without going pending", () => {
@@ -58,7 +71,10 @@ describe("button", () => {
       },
     })
     instance.api.internal.press()
-    expect(partState(instance.part("root"))).toMatchObject({ pending: false, error: "broken" })
+    expect(partState(instance.part("root"))).toMatchObject({
+      pending: false,
+      error: "broken",
+    })
     expect(attrs(instance.part("root"))).not.toHaveProperty("aria-busy", "true")
   })
 
@@ -72,7 +88,10 @@ describe("button", () => {
       },
     }).api.internal.press()
     const rejected = new Error("Offline")
-    button({ id: "c", action: () => Promise.reject(rejected) }).api.internal.press()
+    button({
+      id: "c",
+      action: () => Promise.reject(rejected),
+    }).api.internal.press()
     await settle()
     expect(warn.mock.calls).toEqual([
       [expect.stringContaining("an action failed"), thrown],
@@ -92,11 +111,17 @@ describe("button", () => {
         },
       })
       thrown.api.internal.press()
-      const rejected = button({ id: "c", action: () => Promise.reject("Offline") })
+      const rejected = button({
+        id: "c",
+        action: () => Promise.reject("Offline"),
+      })
       rejected.api.internal.press()
       await settle()
       expect(partState(thrown.part("root"))).toMatchObject({ error: "broken" })
-      expect(partState(rejected.part("root"))).toMatchObject({ pending: false, error: "Offline" })
+      expect(partState(rejected.part("root"))).toMatchObject({
+        pending: false,
+        error: "Offline",
+      })
     } finally {
       delete flags.__UI_SDK_STRICT__
     }
@@ -114,7 +139,10 @@ describe("pending announcement", () => {
   // A press whose Promise settles only when `finish` is called.
   function slowButton(options: Parameters<typeof button>[0] = { id: "b" }) {
     let finish = () => {}
-    const instance = button({ ...options, action: () => new Promise<void>((resolve) => (finish = resolve)) })
+    const instance = button({
+      ...options,
+      action: () => new Promise<void>((resolve) => (finish = resolve)),
+    })
     instance.api.internal.press()
     return { instance, finish: () => finish() }
   }
@@ -170,17 +198,31 @@ describe("pending announcement", () => {
 
   test("a pending button is aria-disabled until it settles, without the native attribute", async () => {
     const { instance, finish } = slowButton()
-    expect(attrs(instance.part("root"))).toMatchObject({ "aria-disabled": "true", disabled: undefined })
+    expect(attrs(instance.part("root"))).toMatchObject({
+      "aria-disabled": "true",
+      disabled: undefined,
+    })
     finish()
     await settle()
-    expect(attrs(instance.part("root"))).toMatchObject({ "aria-disabled": undefined })
+    expect(attrs(instance.part("root"))).toMatchObject({
+      "aria-disabled": undefined,
+    })
   })
 
   test("a button disabled anyway stays aria-disabled after it settles", async () => {
-    const { instance, finish } = slowButton({ id: "b", focusableWhenDisabled: true })
-    instance.setOptions({ id: "b", focusableWhenDisabled: true, disabled: true })
+    const { instance, finish } = slowButton({
+      id: "b",
+      focusableWhenDisabled: true,
+    })
+    instance.setOptions({
+      id: "b",
+      focusableWhenDisabled: true,
+      disabled: true,
+    })
     finish()
     await settle()
-    expect(attrs(instance.part("root"))).toMatchObject({ "aria-disabled": "true" })
+    expect(attrs(instance.part("root"))).toMatchObject({
+      "aria-disabled": "true",
+    })
   })
 })

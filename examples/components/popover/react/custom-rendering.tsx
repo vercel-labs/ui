@@ -22,7 +22,9 @@ function Example() {
       />
       <PopoverContent>
         <PopoverTitle render={<h3 />}>Updates</PopoverTitle>
-        <PopoverDescription>Version 2.4 adds threaded comments.</PopoverDescription>
+        <PopoverDescription>
+          Version 2.4 adds threaded comments.
+        </PopoverDescription>
         <PopoverClose render={<a href="#" />}>Read the Changelog</PopoverClose>
       </PopoverContent>
     </Popover>

@@ -6,7 +6,9 @@ import {
 } from "tests/fixtures/popup-payloads.ts"
 
 type ChangeEvent = CustomEvent<{ value: unknown; event?: Event }>
-type Popup = HTMLElement & { api?: { open: (options: { payload: unknown }) => unknown } }
+type Popup = HTMLElement & {
+  api?: { open: (options: { payload: unknown }) => unknown }
+}
 
 const markup = `
   <div class="fixture">
@@ -35,7 +37,9 @@ const markup = `
 
 // A trigger with its payload, set before it connects, which is when it reads it.
 function trigger(tag: string, label: string) {
-  const el = Object.assign(document.createElement(tag), { payload: payloadOf(label) })
+  const el = Object.assign(document.createElement(tag), {
+    payload: payloadOf(label),
+  })
   el.innerHTML = `<button>${label}</button>`
   return el
 }
@@ -50,17 +54,25 @@ async function mount(root: HTMLElement) {
 
   const popups = [
     { name: "menu", tag: "ui-menu", content: "ui-menu-group-label" },
-    { name: "popover", tag: "ui-popover", content: "ui-popover-content > span" },
+    {
+      name: "popover",
+      tag: "ui-popover",
+      content: "ui-popover-content > span",
+    },
     { name: "dialog", tag: "ui-dialog", content: "ui-dialog-content" },
     { name: "drawer", tag: "ui-drawer", content: "ui-drawer-content" },
   ] as const
   for (const { name, tag, content } of popups) {
     const popup = root.querySelector(tag)!
-    popup.prepend(...fixture[name].triggers.map((label) => trigger(`${tag}-trigger`, label)))
+    popup.prepend(
+      ...fixture[name].triggers.map((label) => trigger(`${tag}-trigger`, label))
+    )
     const target = popup.querySelector(content)!
     popup.addEventListener("openchange", (event) => {
       const { value, event: cause } = (event as ChangeEvent).detail
-      if (value) lastOpen.textContent = describeChange(name, "open", cause)
+      if (value) {
+        lastOpen.textContent = describeChange(name, "open", cause)
+      }
     })
     // The content renders from the event, which also fires when another trigger takes it over.
     popup.addEventListener("payloadchange", (event) => {
@@ -74,7 +86,9 @@ async function mount(root: HTMLElement) {
   const popover = root.querySelector<Popup>("ui-popover")!
   popover
     .querySelector("ui-popover-content > button")!
-    .addEventListener("click", () => popover.api!.open({ payload: fixture.popover.show.payload }))
+    .addEventListener("click", () =>
+      popover.api!.open({ payload: fixture.popover.show.payload })
+    )
 }
 
 export { mount }

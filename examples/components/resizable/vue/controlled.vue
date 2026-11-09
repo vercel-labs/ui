@@ -14,7 +14,9 @@ const log = useLog()
 const layout = ref([30, 70])
 
 function onLayoutChange(next: number[], details: ResizableLayoutChangeDetails) {
-  if (format(next) !== format(layout.value)) log(`${format(next)} (${details.reason})`)
+  if (format(next) !== format(layout.value)) {
+    log(`${format(next)} (${details.reason})`)
+  }
 }
 </script>
 

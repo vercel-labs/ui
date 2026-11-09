@@ -2,7 +2,10 @@ import { Checkbox, CheckboxIndicator } from "@ui-sdk/react/checkbox"
 import { Field, FieldDescription, FieldLabel } from "@ui-sdk/react/field"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { fieldChoiceCardFixture as f, fieldChoiceCardOptions } from "tests/fixtures/field.ts"
+import {
+  fieldChoiceCardFixture as f,
+  fieldChoiceCardOptions,
+} from "tests/fixtures/field.ts"
 
 function LaterCard() {
   const [ready, setReady] = React.useState(false)
@@ -52,7 +55,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

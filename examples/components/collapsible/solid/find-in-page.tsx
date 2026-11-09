@@ -1,4 +1,8 @@
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "@ui-sdk/solid/collapsible"
 
 function Example() {
   return (
@@ -21,7 +25,9 @@ function Example() {
         </svg>
       </CollapsibleTrigger>
       <CollapsiblePanel hiddenUntilFound>
-        <p>Flour, butter, brown sugar, eggs, a pinch of cardamom and sea salt.</p>
+        <p>
+          Flour, butter, brown sugar, eggs, a pinch of cardamom and sea salt.
+        </p>
       </CollapsiblePanel>
     </Collapsible>
   )

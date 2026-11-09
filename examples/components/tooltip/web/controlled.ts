@@ -30,8 +30,11 @@ function mount(root: HTMLElement) {
   })
   tooltip.addEventListener("openchange", (event) => {
     const { value, reason, event: cause } = event.detail
-    const inControls = cause?.target instanceof Node && controls.contains(cause.target)
-    if (inControls && reason !== "escape-key") return event.preventDefault()
+    const inControls =
+      cause?.target instanceof Node && controls.contains(cause.target)
+    if (inControls && reason !== "escape-key") {
+      return event.preventDefault()
+    }
     checkbox.checked = value
     log(root, `${value ? "Opened" : "Closed"} (${reason})`)
   })

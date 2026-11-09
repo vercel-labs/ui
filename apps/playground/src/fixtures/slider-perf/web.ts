@@ -7,7 +7,7 @@ async function mount(root: HTMLElement) {
   const thumbs = values
     .map(
       (_, index) =>
-        `<ui-slider-thumb class="slider-thumb" aria-label="Thumb ${index + 1}"></ui-slider-thumb>`,
+        `<ui-slider-thumb class="slider-thumb" aria-label="Thumb ${index + 1}"></ui-slider-thumb>`
     )
     .join("")
   root.innerHTML = `

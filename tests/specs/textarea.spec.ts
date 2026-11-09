@@ -8,9 +8,14 @@ import { fillRequired, saves, status, textbox } from "./form.helpers"
 const height = (page: import("@playwright/test").Page) =>
   textbox(page, "Bio").evaluate((el) => el.getBoundingClientRect().height)
 
-test("the label names the textarea and the description describes it", async ({ page, open }) => {
+test("the label names the textarea and the description describes it", async ({
+  page,
+  open,
+}) => {
   await open("form")
-  await expect(textbox(page, "Bio")).toHaveAccessibleDescription("A few words about you.")
+  await expect(textbox(page, "Bio")).toHaveAccessibleDescription(
+    "A few words about you."
+  )
 })
 
 test.describe("auto resize", { tag: "@enhancement" }, () => {
@@ -27,9 +32,13 @@ test.describe("auto resize", { tag: "@enhancement" }, () => {
   })
 
   test("stops at its max height and scrolls", async ({ page }) => {
-    await textbox(page, "Bio").fill(Array.from({ length: 20 }, (_, index) => `Line ${index}`).join("\n"))
+    await textbox(page, "Bio").fill(
+      Array.from({ length: 20 }, (_, index) => `Line ${index}`).join("\n")
+    )
     await expect.poll(() => height(page)).toBe(110)
-    const scrolls = await textbox(page, "Bio").evaluate((el) => el.scrollHeight > el.clientHeight)
+    const scrolls = await textbox(page, "Bio").evaluate(
+      (el) => el.scrollHeight > el.clientHeight
+    )
     expect(scrolls).toBe(true)
   })
 
@@ -43,13 +52,18 @@ test.describe("auto resize", { tag: "@enhancement" }, () => {
 
   test("follows text written from code", async ({ page }) => {
     const empty = await height(page)
-    await textbox(page, "Bio").evaluate((el: HTMLTextAreaElement) => (el.value = "One\nTwo\nThree"))
+    await textbox(page, "Bio").evaluate(
+      (el: HTMLTextAreaElement) => (el.value = "One\nTwo\nThree")
+    )
     await expect.poll(() => height(page)).toBeGreaterThan(empty + 30)
   })
 })
 
 test.describe("submit shortcut", { tag: "@enhancement" }, () => {
-  test("without a submit shortcut, Enter starts a new line and doesn't submit", async ({ page, open }) => {
+  test("without a submit shortcut, Enter starts a new line and doesn't submit", async ({
+    page,
+    open,
+  }) => {
     await open("form")
     await fillRequired(page)
     await textbox(page, "Bio").press("Enter")
@@ -57,7 +71,10 @@ test.describe("submit shortcut", { tag: "@enhancement" }, () => {
     expect(await saves(page)).toBe(0)
   })
 
-  test("with enter, Enter submits the form and Shift+Enter starts a new line", async ({ page, open }) => {
+  test("with enter, Enter submits the form and Shift+Enter starts a new line", async ({
+    page,
+    open,
+  }) => {
     await open("form", { "submit-shortcut": "enter" })
     await fillRequired(page)
     await textbox(page, "Bio").pressSequentially("Hi")
@@ -70,7 +87,10 @@ test.describe("submit shortcut", { tag: "@enhancement" }, () => {
     await expect(textbox(page, "Bio")).toHaveValue("Hi\nthere")
   })
 
-  test("with mod+enter, Enter starts a new line and Cmd or Ctrl+Enter submits", async ({ page, open }) => {
+  test("with mod+enter, Enter starts a new line and Cmd or Ctrl+Enter submits", async ({
+    page,
+    open,
+  }) => {
     await open("form", { "submit-shortcut": "mod+enter" })
     await fillRequired(page)
     await textbox(page, "Bio").pressSequentially("Hi")
@@ -82,13 +102,24 @@ test.describe("submit shortcut", { tag: "@enhancement" }, () => {
     await expect(status(page, "Submitted")).toHaveText(/bio=Hi(%0D)?%0Athere/)
   })
 
-  test("Enter while an input method composes doesn't submit", async ({ page, open, browserName }) => {
-    test.skip(browserName !== "chromium", "Only Chromium can drive an input method.")
+  test("Enter while an input method composes doesn't submit", async ({
+    page,
+    open,
+    browserName,
+  }) => {
+    test.skip(
+      browserName !== "chromium",
+      "Only Chromium can drive an input method."
+    )
     await open("form", { "submit-shortcut": "enter" })
     await fillRequired(page)
     await textbox(page, "Bio").focus()
     const session = await page.context().newCDPSession(page)
-    await session.send("Input.imeSetComposition", { text: "に", selectionStart: 1, selectionEnd: 1 })
+    await session.send("Input.imeSetComposition", {
+      text: "に",
+      selectionStart: 1,
+      selectionEnd: 1,
+    })
     await page.keyboard.press("Enter")
     await session.send("Input.insertText", { text: "日本" })
     // CDP's stand-in input method doesn't consume the Enter, so it also adds a line.

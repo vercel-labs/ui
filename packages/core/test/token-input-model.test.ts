@@ -19,12 +19,24 @@ import {
   type TokenInputValue,
 } from "../src/components/token-input/token-input-model"
 
-const alice: Token = { type: "mention", value: "alice", label: "@Alice", id: "a" }
+const alice: Token = {
+  type: "mention",
+  value: "alice",
+  label: "@Alice",
+  id: "a",
+}
 const file: Token = { type: "file", value: "src/a.ts", label: "a.ts", id: "f" }
 
 describe("values and offsets", () => {
   test("normalizing merges strings, drops empty ones and gives tokens ids", () => {
-    const value = normalizeValue(["a", "", "b", { type: "x", value: "1", label: "One" }, "", "c"])
+    const value = normalizeValue([
+      "a",
+      "",
+      "b",
+      { type: "x", value: "1", label: "One" },
+      "",
+      "c",
+    ])
     expect(value).toHaveLength(3)
     expect(value[0]).toBe("ab")
     expect((value[1] as Token).id).toMatch(/^t\d+$/)
@@ -74,7 +86,9 @@ describe("values and offsets", () => {
     expect(replaceRange(value, { start: 1, end: 3 }, ["X"])).toEqual(["aXcd"])
     const shifted = replaceRange(value, { start: 0, end: 0 }, ["zz"])
     expect(offsetOfToken(shifted, "a")).toBe(4)
-    expect(removedTokens(value, replaceRange(value, { start: 2, end: 3 }, []))).toEqual([alice])
+    expect(
+      removedTokens(value, replaceRange(value, { start: 2, end: 3 }, []))
+    ).toEqual([alice])
   })
 
   test("word deletion stops at tokens, and removes just the token when it's next", () => {
@@ -97,14 +111,26 @@ describe("values and offsets", () => {
 describe("codec", () => {
   test("tokens are written as links and labels as text", () => {
     const value = normalizeValue(["Summarize ", file, " for ", alice])
-    expect(toText(value)).toBe("Summarize [@a.ts](file:src/a.ts) for [@@Alice](mention:alice)")
+    expect(toText(value)).toBe(
+      "Summarize [@a.ts](file:src/a.ts) for [@@Alice](mention:alice)"
+    )
     expect(toLabel(value)).toBe("Summarize a.ts for @Alice")
   })
 
   test("labels and values with brackets and parentheses round-trip", () => {
-    const token: Token = { type: "file", value: "a (copy).ts", label: "[draft] a\\b", id: "x" }
+    const token: Token = {
+      type: "file",
+      value: "a (copy).ts",
+      label: "[draft] a\\b",
+      id: "x",
+    }
     expect(fromText(toText([token]))).toEqual([
-      { type: "file", value: "a (copy).ts", label: "[draft] a\\b", id: expect.any(String) },
+      {
+        type: "file",
+        value: "a (copy).ts",
+        label: "[draft] a\\b",
+        id: expect.any(String),
+      },
     ])
   })
 
@@ -122,17 +148,34 @@ describe("codec", () => {
   // fromText(toText(value)) is the value, without ids, statuses and data.
   test("any value round-trips through the codec", () => {
     let seed = 42
-    const random = () => (seed = (seed * 1103515245 + 12345) % 2 ** 31) / 2 ** 31
-    const alphabet = ["a", "b", " ", "\n", "[", "]", "(", ")", "@", "\\", ":", "é", "山", "[@", "\\[@"]
+    const random = () =>
+      (seed = (seed * 1103515245 + 12345) % 2 ** 31) / 2 ** 31
+    const alphabet = [
+      "a",
+      "b",
+      " ",
+      "\n",
+      "[",
+      "]",
+      "(",
+      ")",
+      "@",
+      "\\",
+      ":",
+      "é",
+      "山",
+      "[@",
+      "\\[@",
+    ]
     const text = () =>
       Array.from(
         { length: Math.floor(random() * 8) },
-        () => alphabet[Math.floor(random() * alphabet.length)],
+        () => alphabet[Math.floor(random() * alphabet.length)]
       ).join("")
     const types = ["mention", "file", "skill-run", "a_b"]
     for (let run = 0; run < 3000; run++) {
       const segments: (string | Token)[] = []
-      for (let index = Math.floor(random() * 6); index > 0; index--)
+      for (let index = Math.floor(random() * 6); index > 0; index--) {
         segments.push(
           random() < 0.5
             ? text()
@@ -142,16 +185,19 @@ describe("codec", () => {
                 label: text(),
                 status: random() < 0.3 ? "pending" : undefined,
                 data: random() < 0.3 ? { run: "running" } : undefined,
-              },
+              }
         )
+      }
       const value = normalizeValue(segments)
       const strip = (input: TokenInputValue) =>
         input.map((segment) =>
           typeof segment === "string"
             ? segment
-            : { type: segment.type, value: segment.value, label: segment.label },
+            : { type: segment.type, value: segment.value, label: segment.label }
         )
-      expect(strip(fromText(toText(value))), JSON.stringify(value)).toEqual(strip(value))
+      expect(strip(fromText(toText(value))), JSON.stringify(value)).toEqual(
+        strip(value)
+      )
     }
   })
 
@@ -162,8 +208,10 @@ describe("codec", () => {
         normalizeValue(
           text.split(/(<@\w+>)/).map((part) => {
             const match = /^<@(\w+)>$/.exec(part)
-            return match ? { type: "mention", value: match[1], label: `@${match[1]}` } : part
-          }),
+            return match
+              ? { type: "mention", value: match[1], label: `@${match[1]}` }
+              : part
+          })
         ),
     }
     const value = normalizeValue(["hi ", alice])
@@ -232,7 +280,9 @@ describe("history", () => {
 
   test("the limit drops the oldest entries", () => {
     const history = createHistory(0, { limit: 2 })
-    for (let value = 1; value <= 5; value++) history.record(value)
+    for (let value = 1; value <= 5; value++) {
+      history.record(value)
+    }
     expect(history.undo()).toBe(4)
     expect(history.undo()).toBe(3)
     expect(history.undo()).toBeUndefined()

@@ -25,7 +25,15 @@
     feature?: Feature
     partName: "trigger" | "context-trigger"
     tag: string
-    render?: Snippet<[{ props: SlotAttributes; state: MenuTriggerState; children?: Snippet<[MenuTriggerState]> }]>
+    render?: Snippet<
+      [
+        {
+          props: SlotAttributes
+          state: MenuTriggerState
+          children?: Snippet<[MenuTriggerState]>
+        },
+      ]
+    >
     children?: Snippet<[MenuTriggerState]>
     [attribute: string]: unknown
   } = $props()
@@ -33,14 +41,16 @@
   const id = $props.id()
   // Each menu the part binds to gets the feature that ships it, before the part reads its slot.
   const menu = $derived.by(() => {
-    if (feature) owner.instance.use(feature)
+    if (feature) {
+      owner.instance.use(feature)
+    }
     return owner
   })
   // Both parts take the trigger's props. The context area ignores `shortcut`.
   const trigger = useHandlePart(
     () => menu,
     untrack(() => partName) as "trigger",
-    () => ({ id, disabled, payload, shortcut }),
+    () => ({ id, disabled, payload, shortcut })
   )
 </script>
 

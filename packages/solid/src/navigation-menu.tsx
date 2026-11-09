@@ -12,9 +12,23 @@ import {
   type NavigationMenuViewportState,
 } from "@ui-sdk/core/navigation-menu"
 import { Portal } from "@solidjs/web"
-import { createContext, createMemo, createUniqueId, omit, Show, useContext } from "solid-js"
+import {
+  createContext,
+  createMemo,
+  createUniqueId,
+  omit,
+  Show,
+  useContext,
+} from "solid-js"
 import { renderPopup, usePopupContainer, type PopupContainer } from "./popup"
-import { createParts, renderAs, useHandle, useNearest, usePart, type PartProps } from "./use-primitive"
+import {
+  createParts,
+  renderAs,
+  useHandle,
+  useNearest,
+  usePart,
+  type PartProps,
+} from "./use-primitive"
 
 const parts = createParts(navigationMenuPrimitive, {
   root: "nav",
@@ -31,7 +45,11 @@ const ContainerContext = createContext<() => PopupContainer>(() => undefined)
 
 function useItem(part: string) {
   const value = useContext(ItemContext)
-  if (value === null) throw new Error(`<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`)
+  if (value === null) {
+    throw new Error(
+      `<NavigationMenu${part}> must be used inside <NavigationMenuItem>.`
+    )
+  }
   return value
 }
 
@@ -50,7 +68,9 @@ type NavigationMenuProps<T extends string = string> = NavigationMenuOptions<T> &
  * renders a <div> and closes with its parent.
  * @stable
  */
-function NavigationMenu<T extends string = string>(props: NavigationMenuProps<T>) {
+function NavigationMenu<T extends string = string>(
+  props: NavigationMenuProps<T>
+) {
   const parentMenu = useNearest(navigationMenuPrimitive)
   const parentItem = useContext(ItemContext)
   const nested = !!parentMenu && parentItem !== null
@@ -60,7 +80,9 @@ function NavigationMenu<T extends string = string>(props: NavigationMenuProps<T>
         <parts.Root<T>
           {...props}
           render={props.render ?? renderAs(() => (nested ? "div" : "nav"))}
-          parent={nested ? { api: parentMenu.api, item: parentItem() } : undefined}
+          parent={
+            nested ? { api: parentMenu.api, item: parentItem() } : undefined
+          }
         />
       </ContainerContext>
     </ItemContext>
@@ -78,14 +100,21 @@ const NavigationMenuList = parts.List
  * @stable
  */
 function NavigationMenuItem(
-  props: Omit<PartProps<"li", NavigationMenuItemState>, Clashing> & NavigationMenuItemProps,
+  props: Omit<PartProps<"li", NavigationMenuItemState>, Clashing> &
+    NavigationMenuItemProps
 ) {
   const menu = useHandle(navigationMenuPrimitive)
   const generated = createUniqueId()
   const value = () => props.value ?? generated
   return (
     <ItemContext value={value}>
-      {usePart(menu, "item", () => ({ value: value() }), omit(props, "value"), "li")}
+      {usePart(
+        menu,
+        "item",
+        () => ({ value: value() }),
+        omit(props, "value"),
+        "li"
+      )}
     </ItemContext>
   )
 }
@@ -102,7 +131,8 @@ const NavigationMenuTrigger = parts.Trigger
  * @stable
  */
 function NavigationMenuContent(
-  props: Omit<PartProps<"div", NavigationMenuContentState>, Clashing> & NavigationMenuContentProps,
+  props: Omit<PartProps<"div", NavigationMenuContentState>, Clashing> &
+    NavigationMenuContentProps
 ) {
   const menu = useHandle(navigationMenuPrimitive)
   const value = useItem("Content")
@@ -131,15 +161,19 @@ function NavigationMenuContent(
     "anchor",
     "keepMounted",
     "hiddenUntilFound",
-    "container",
+    "container"
   )
   // Where the content renders, or nothing while it isn't present. The
   // viewport binding and the item opening change both, and the part hears
   // them through `present`. A move remounts the content, so it binds for where it is.
   const placement = createMemo(() => {
-    if (!menu.present("content", content)) return null
+    if (!menu.present("content", content)) {
+      return null
+    }
     const viewport = menu.api.internal.viewportElement()
-    if (viewport && menu.api.internal.inViewport(value())) return viewport
+    if (viewport && menu.api.internal.inViewport(value())) {
+      return viewport
+    }
     return menu.state.viewport ? "in-place" : "popup"
   })
   const element = () => usePart(menu, "content", content, rest, "div")
@@ -169,12 +203,19 @@ const NavigationMenuLink = parts.Link
  * @stable
  */
 function NavigationMenuLinkIcon(
-  props: PartProps<"span", NavigationMenuLinkIconState> & NavigationMenuLinkIconProps,
+  props: PartProps<"span", NavigationMenuLinkIconState> &
+    NavigationMenuLinkIconProps
 ) {
   const menu = useHandle(navigationMenuPrimitive)
   const id = createUniqueId()
   // Keyed by its own id, so several icons stay apart.
-  return usePart(menu, "link-icon", () => ({ id, mirror: props.mirror }), omit(props, "mirror"), "span")
+  return usePart(
+    menu,
+    "link-icon",
+    () => ({ id, mirror: props.mirror }),
+    omit(props, "mirror"),
+    "span"
+  )
 }
 
 /**
@@ -183,7 +224,8 @@ function NavigationMenuLinkIcon(
  * @stable
  */
 function NavigationMenuViewport(
-  props: PartProps<"div", NavigationMenuViewportState> & NavigationMenuViewportProps,
+  props: PartProps<"div", NavigationMenuViewportState> &
+    NavigationMenuViewportProps
 ) {
   const menu = useHandle(navigationMenuPrimitive)
   const fromRoot = useContext(ContainerContext)
@@ -206,9 +248,12 @@ function NavigationMenuViewport(
     "collisionPadding",
     "arrowPadding",
     "anchor",
-    "container",
+    "container"
   )
-  return renderPopup(() => usePart(menu, "viewport", viewport, rest, "div"), target)
+  return renderPopup(
+    () => usePart(menu, "viewport", viewport, rest, "div"),
+    target
+  )
 }
 
 /**

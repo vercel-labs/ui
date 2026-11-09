@@ -11,9 +11,15 @@ import { isDisabled, watchFormDisabled } from "../../foundation/forms/form"
 import { stateAndRenders } from "../../foundation/motion/panel"
 import { createController } from "../../foundation/kernel/controller"
 import { deriveFromOptions } from "../../foundation/kernel/derive"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import { live } from "../../foundation/kernel/live"
 import { createChange } from "../../foundation/kernel/input-source"
 
@@ -22,7 +28,8 @@ import { createChange } from "../../foundation/kernel/input-source"
  * matched text in its closed panel, or a controller or `api` call changed it.
  * @stable
  */
-type CollapsibleOpenChangeReason = "trigger-press" | "find-in-page" | "imperative"
+type CollapsibleOpenChangeReason =
+  "trigger-press" | "find-in-page" | "imperative"
 
 /**
  * Options for every write method on a controller.
@@ -72,7 +79,10 @@ type CollapsibleOptions = {
    */
   defaultOpen?: boolean
   /** Runs when the panel wants to open or close. `details.reason` says why, and `details.cancel()` stops it. */
-  onOpenChange?: (open: boolean, details: ChangeDetails<CollapsibleOpenChangeReason>) => void
+  onOpenChange?: (
+    open: boolean,
+    details: ChangeDetails<CollapsibleOpenChangeReason>
+  ) => void
   /** Runs once the panel has finished opening or closing, after any animation. */
   onOpenChangeComplete?: (open: boolean) => void
   /**
@@ -170,17 +180,22 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
     // Why the panel opened after mount, until it settles. Undefined while it's
     // open from the first paint, so it doesn't animate.
     let openedBy: CollapsibleOpenChangeReason | undefined
-    const reason = createPendingReason<CollapsibleOpenChangeReason>("imperative")
+    const reason =
+      createPendingReason<CollapsibleOpenChangeReason>("imperative")
 
     // A panel in the page animates out before it goes, in the same pass as a
     // closing `open` from options.
     deriveFromOptions(context, ["exiting"], (synced, state) =>
-      "open" in synced && synced.open !== state.open ? { exiting: !synced.open && state.panel } : undefined,
+      "open" in synced && synced.open !== state.open
+        ? { exiting: !synced.open && state.panel }
+        : undefined
     )
     let previous = store.get().open
     store.subscribe(() => {
       const { open } = store.get()
-      if (open === previous) return
+      if (open === previous) {
+        return
+      }
       previous = open
       // A later value from options, like a parent's own toggle, isn't this change.
       const why = reason.take()
@@ -189,11 +204,18 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
       store.set({ exiting: !open && store.get().panel })
     })
 
-    function setOpen(open: boolean, { reason: why = "imperative", event }: Cause = {}) {
-      if (store.get().open === open) return false
+    function setOpen(
+      open: boolean,
+      { reason: why = "imperative", event }: Cause = {}
+    ) {
+      if (store.get().open === open) {
+        return false
+      }
       reason.set(why)
       const changed = change("open", open, { reason: why, event })
-      if (!changed) reason.take()
+      if (!changed) {
+        reason.take()
+      }
       return changed
     }
 
@@ -230,7 +252,10 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
   slots: (slot) => ({
     root: slot<{}, CollapsibleState>({
       state: (state) => ({ open: state.open, disabled: isDisabled(state) }),
-      attrs: (state) => ({ ...openAttrs(state.open), "data-disabled": isDisabled(state) ? "" : undefined }),
+      attrs: (state) => ({
+        ...openAttrs(state.open),
+        "data-disabled": isDisabled(state) ? "" : undefined,
+      }),
       bind: (el, { store }) => watchFormDisabled(el, store),
     }),
 
@@ -245,7 +270,9 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
         "data-disabled": isDisabled(state) ? "" : undefined,
       }),
       // Only a panel in the page can be pointed at.
-      live: live((state, { id }) => ({ "aria-controls": state.panel ? `${id}-panel` : undefined })),
+      live: live((state, { id }) => ({
+        "aria-controls": state.panel ? `${id}-panel` : undefined,
+      })),
       press({ api, el, store }, event) {
         if (isDisabled(store.get())) {
           // A disabled link must not navigate either.
@@ -262,7 +289,10 @@ const collapsiblePrimitive = /* @__PURE__ */ definePrimitive({
     panel: slot<CollapsiblePanelProps, CollapsiblePanelState>({
       props: { keepMounted: "boolean", hiddenUntilFound: "boolean" },
       present: (state, { props }) =>
-        state.open || state.exiting || !!props.keepMounted || !!props.hiddenUntilFound,
+        state.open ||
+        state.exiting ||
+        !!props.keepMounted ||
+        !!props.hiddenUntilFound,
       state: (state) => ({ open: state.open, disabled: isDisabled(state) }),
       attrs: (state, { id, props }) => ({
         id: `${id}-panel`,

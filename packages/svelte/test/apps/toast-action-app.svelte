@@ -1,7 +1,16 @@
 <script lang="ts">
-  import { Toast, ToastAction, ToastRegion, ToastTitle, type Toaster } from "../../src/toast"
+  import {
+    Toast,
+    ToastAction,
+    ToastRegion,
+    ToastTitle,
+    type Toaster,
+  } from "../../src/toast"
 
-  let { log, toaster }: { log: (entry: string) => void; toaster: Toaster<string> } = $props()
+  let {
+    log,
+    toaster,
+  }: { log: (entry: string) => void; toaster: Toaster<string> } = $props()
 </script>
 
 <ToastRegion {toaster}>

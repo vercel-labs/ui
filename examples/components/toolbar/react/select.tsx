@@ -9,7 +9,12 @@ import {
   SelectValue,
 } from "@ui-sdk/react/select"
 import { Toolbar, ToolbarButton } from "@ui-sdk/react/toolbar"
-import { CheckIcon, ChevronsUpDownIcon, ZoomInIcon, ZoomOutIcon } from "lucide-react"
+import {
+  CheckIcon,
+  ChevronsUpDownIcon,
+  ZoomInIcon,
+  ZoomOutIcon,
+} from "lucide-react"
 import * as React from "react"
 import { useLog } from "../../../shared/react/log"
 
@@ -25,7 +30,11 @@ function Example() {
   }
   return (
     <Toolbar aria-label="View">
-      <ToolbarButton aria-label="Zoom out" disabled={index === 0} onClick={() => change(zooms[index - 1])}>
+      <ToolbarButton
+        aria-label="Zoom out"
+        disabled={index === 0}
+        onClick={() => change(zooms[index - 1])}
+      >
         <ZoomOutIcon aria-hidden="true" />
       </ToolbarButton>
       <Select value={zoom} onValueChange={(value) => value && change(value)}>

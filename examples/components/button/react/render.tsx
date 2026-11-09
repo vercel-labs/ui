@@ -17,7 +17,13 @@ function Example() {
           throw new Error("Couldn't save")
         }}
         render={(props, state) => (
-          <button {...props}>{state.pending ? "Saving…" : state.error ? "Try Again" : "Save Changes"}</button>
+          <button {...props}>
+            {state.pending
+              ? "Saving…"
+              : state.error
+                ? "Try Again"
+                : "Save Changes"}
+          </button>
         )}
       />
     </div>

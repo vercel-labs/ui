@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@ui-sdk/vue"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/vue"
 import { countRender, perfItems, perfSize } from "tests/fixtures/perf.ts"
 
 // A long select for the counts specs. Every other option reads
@@ -18,14 +24,25 @@ const count = (kind: "watched" | "plain") => (countRender(kind), "")
       </SelectTrigger>
       <SelectContent class="popup list-popup">
         <template v-for="(item, index) in items" :key="item.value">
-          <SelectItem v-if="index % 2" class="item" :value="item.value" :label="item.label">
+          <SelectItem
+            v-if="index % 2"
+            class="item"
+            :value="item.value"
+            :label="item.label"
+          >
             <template #render="{ props, state }">
               <div v-bind="props">
-                {{ count("watched") }}{{ state.highlighted ? "→ " : "" }}{{ item.label }}
+                {{ count("watched") }}{{ state.highlighted ? "→ " : ""
+                }}{{ item.label }}
               </div>
             </template>
           </SelectItem>
-          <SelectItem v-else class="item" :value="item.value" :label="item.label">
+          <SelectItem
+            v-else
+            class="item"
+            :value="item.value"
+            :label="item.label"
+          >
             <template #render="{ props }">
               <div v-bind="props">{{ count("plain") }}{{ item.label }}</div>
             </template>

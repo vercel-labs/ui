@@ -1,4 +1,8 @@
-import type { DialogShortcutProps, DialogShortcutState, DialogTriggerState } from "@ui-sdk/core/dialog"
+import type {
+  DialogShortcutProps,
+  DialogShortcutState,
+  DialogTriggerState,
+} from "@ui-sdk/core/dialog"
 import {
   drawer,
   type DrawerBackdropState,
@@ -39,9 +43,13 @@ const parts = createParts(drawer, {
   outlet: "div",
 })
 
-type TriggerPartProps = Omit<PartProps<"button", DialogTriggerState>, "value" | "defaultValue" | "onChange"> &
+type TriggerPartProps = Omit<
+  PartProps<"button", DialogTriggerState>,
+  "value" | "defaultValue" | "onChange"
+> &
   DrawerTriggerProps
-type ShortcutPartProps = PartProps<"span", DialogShortcutState> & DialogShortcutProps
+type ShortcutPartProps = PartProps<"span", DialogShortcutState> &
+  DialogShortcutProps
 
 // Where the drawer renders. Set on the root or the content.
 const ContainerContext = React.createContext<PopupContainer>(undefined)
@@ -63,7 +71,9 @@ function Drawer({ children, container, ...options }: DrawerProps) {
   useControllerEntry(options.controller, handle)
   return (
     <HandleScope handle={handle}>
-      <ContainerContext.Provider value={container}>{children}</ContainerContext.Provider>
+      <ContainerContext.Provider value={container}>
+        {children}
+      </ContainerContext.Provider>
     </HandleScope>
   )
 }
@@ -83,7 +93,11 @@ function DrawerTrigger({ controller, ...props }: TriggerPartProps) {
     })
   return (
     <TriggerContext.Provider value={{ shortcut }}>
-      <Connected primitive={drawer} controller={controller} fallback={unconnected}>
+      <Connected
+        primitive={drawer}
+        controller={controller}
+        fallback={unconnected}
+      >
         <parts.Trigger {...props} />
       </Connected>
     </TriggerContext.Provider>
@@ -115,11 +129,16 @@ function DrawerContent<Payload = unknown>({
   const handle = useHandle(drawer)
   const target = usePopupContainer(useOwnContainer(container, ContainerContext))
   // The payload's type is the app's, from `Payload`; the part hands its state on as it is.
-  const partProps = { ...props, render: sheetViewport(handle, render) } as PartProps<
-    "div",
-    DrawerContentState
-  >
-  const element = usePart(handle, "content", { initialFocus, finalFocus, keepMounted }, partProps)
+  const partProps = {
+    ...props,
+    render: sheetViewport(handle, render),
+  } as PartProps<"div", DrawerContentState>
+  const element = usePart(
+    handle,
+    "content",
+    { initialFocus, finalFocus, keepMounted },
+    partProps
+  )
   return element && renderPopup(element, target)
 }
 
@@ -154,9 +173,13 @@ const DrawerClose = parts.Close
  */
 function DrawerShortcut(props: ShortcutPartProps) {
   const trigger = React.useContext(TriggerContext)
-  if (useNearest(drawer)) return <ShortcutPart inherited={trigger?.shortcut} {...props} />
+  if (useNearest(drawer)) {
+    return <ShortcutPart inherited={trigger?.shortcut} {...props} />
+  }
   // Inside a trigger whose drawer hasn't mounted yet, there's no shortcut to show.
-  if (trigger) return null
+  if (trigger) {
+    return null
+  }
   throw new Error("Drawer parts must be used inside <Drawer>.")
 }
 
@@ -168,7 +191,13 @@ function ShortcutPart({
   children = text,
   ...props
 }: ShortcutPartProps & { inherited?: string }) {
-  return usePart(drawer, "shortcut", { shortcut: shortcut ?? inherited }, { ...props, children }, "span")
+  return usePart(
+    drawer,
+    "shortcut",
+    { shortcut: shortcut ?? inherited },
+    { ...props, children },
+    "span"
+  )
 }
 
 /**
@@ -177,7 +206,10 @@ function ShortcutPart({
  * Outside the drawer, pass the drawer's `controller`.
  * @stable
  */
-function DrawerOutlet({ controller, ...props }: PartProps<"div", DrawerOutletState> & DrawerOutletProps) {
+function DrawerOutlet({
+  controller,
+  ...props
+}: PartProps<"div", DrawerOutletState> & DrawerOutletProps) {
   const { keyframes: _, render, ...rest } = props
   return (
     <Connected

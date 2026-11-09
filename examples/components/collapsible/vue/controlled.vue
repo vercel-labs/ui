@@ -27,7 +27,8 @@ const open = ref(false)
       data-variant="card"
       :controller="collapsible"
       @open-change="
-        (next: boolean, details: ChangeDetails) => log(`${next ? 'Opened' : 'Closed'} (${details.reason})`)
+        (next: boolean, details: ChangeDetails) =>
+          log(`${next ? 'Opened' : 'Closed'} (${details.reason})`)
       "
     >
       <CollapsibleTrigger>

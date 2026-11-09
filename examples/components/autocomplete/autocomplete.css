@@ -11,7 +11,10 @@
     display: none;
   }
 
-  [data-slot="row"]:has(> [data-slot="autocomplete-input"], > * > [data-slot="autocomplete-input"]) {
+  [data-slot="row"]:has(
+    > [data-slot="autocomplete-input"],
+    > * > [data-slot="autocomplete-input"]
+  ) {
     position: relative;
     flex-wrap: nowrap;
     gap: 0;
@@ -28,17 +31,28 @@
       max-width: none;
     }
 
-    &:has(:is([data-slot="autocomplete-trigger"], [data-slot="autocomplete-clear"]))
+    &:has(
+        :is(
+          [data-slot="autocomplete-trigger"],
+          [data-slot="autocomplete-clear"]
+        )
+      )
       [data-slot="autocomplete-input"] {
       padding-inline-end: calc(var(--space-2) + 24px);
     }
 
-    &:has([data-slot="autocomplete-trigger"]):has([data-slot="autocomplete-clear"])
+    &:has([data-slot="autocomplete-trigger"]):has(
+        [data-slot="autocomplete-clear"]
+      )
       [data-slot="autocomplete-input"] {
       padding-inline-end: calc(var(--space-2) + 48px);
     }
 
-    & :is([data-slot="autocomplete-trigger"], [data-slot="autocomplete-clear"]) {
+    &
+      :is(
+        [data-slot="autocomplete-trigger"],
+        [data-slot="autocomplete-clear"]
+      ) {
       position: absolute;
       inset-block: 0;
       inset-inline-end: 5px;
@@ -101,7 +115,8 @@
       width: auto;
       height: auto;
       max-height: 85dvh;
-      padding: var(--space-2) var(--space-2) max(env(safe-area-inset-bottom), var(--space-3));
+      padding: var(--space-2) var(--space-2)
+        max(env(safe-area-inset-bottom), var(--space-3));
       scroll-padding-top: 48px;
 
       & > [data-slot$="-header"] {
@@ -179,7 +194,8 @@
   }
 
   /* Only this demo animates; the slide and fade are what it shows. */
-  :scope[data-example="autocomplete/animation"] [data-slot="autocomplete-content"] {
+  :scope[data-example="autocomplete/animation"]
+    [data-slot="autocomplete-content"] {
     transition:
       opacity 0.15s,
       translate 0.2s cubic-bezier(0.22, 1, 0.36, 1);

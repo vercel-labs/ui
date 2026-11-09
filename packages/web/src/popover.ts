@@ -1,6 +1,12 @@
 import { popover } from "@ui-sdk/core/popover"
 import { createParts, wrappedButton } from "./define-element"
-import { popupApi, popupKinds, popupState, renderPopupTitle, sheetPortal } from "./popup"
+import {
+  popupApi,
+  popupKinds,
+  popupState,
+  renderPopupTitle,
+  sheetPortal,
+} from "./popup"
 
 const owner = "ui-popover"
 
@@ -31,13 +37,23 @@ function definePopoverElements() {
       portal: sheetPortal("ui-popover-viewport"),
     },
     // With `for="popover-id"`, it opens that popover from anywhere on the page.
-    trigger: { tag: "ui-popover-trigger", display: "contents", target: wrappedButton },
-    close: { tag: "ui-popover-close", display: "contents", target: wrappedButton },
+    trigger: {
+      tag: "ui-popover-trigger",
+      display: "contents",
+      target: wrappedButton,
+    },
+    close: {
+      tag: "ui-popover-close",
+      display: "contents",
+      target: wrappedButton,
+    },
     // Shows the shortcut of the trigger it's in, or its own `shortcut`, when it has no text of its own.
     shortcut: {
       tag: "ui-popover-shortcut",
       context: (el) => ({
-        shortcut: el.closest("ui-popover-trigger")?.getAttribute("shortcut") ?? undefined,
+        shortcut:
+          el.closest("ui-popover-trigger")?.getAttribute("shortcut") ??
+          undefined,
       }),
     },
     content: { tag: "ui-popover-content", kinds: popupKinds },
@@ -51,7 +67,9 @@ function definePopoverElements() {
       display: "block",
       // A paragraph, like the p other frameworks render.
       render(el) {
-        if (!el.hasAttribute("as-child") && !el.hasAttribute("role")) el.setAttribute("role", "paragraph")
+        if (!el.hasAttribute("as-child") && !el.hasAttribute("role")) {
+          el.setAttribute("role", "paragraph")
+        }
       },
     },
     arrow: { tag: "ui-popover-arrow", display: "block" },

@@ -14,12 +14,14 @@ const sections = [
       {
         title: "Installation",
         href: "#",
-        description: "Add the package for your framework and render your first part.",
+        description:
+          "Add the package for your framework and render your first part.",
       },
       {
         title: "Styling",
         href: "#",
-        description: "Style parts with data attributes, CSS variables and any CSS.",
+        description:
+          "Style parts with data attributes, CSS variables and any CSS.",
       },
     ],
   },
@@ -30,12 +32,14 @@ const sections = [
       {
         title: "Alert Dialog",
         href: "#",
-        description: "Asks for a decision before anything else on the page can be used.",
+        description:
+          "Asks for a decision before anything else on the page can be used.",
       },
       {
         title: "Hover Card",
         href: "#",
-        description: "A preview of what a link points to, for people who pause on it.",
+        description:
+          "A preview of what a link points to, for people who pause on it.",
       },
       {
         title: "Progress",
@@ -77,12 +81,12 @@ function mount(root: HTMLElement) {
                     <span data-slot="hint">${link.description}</span>
                   </a>
                 </ui-navigation-menu-link>
-              </li>`,
+              </li>`
                 )
                 .join("")}
             </ul>
           </ui-navigation-menu-content>
-        </ui-navigation-menu-item>`,
+        </ui-navigation-menu-item>`
           )
           .join("")}
       </ui-navigation-menu-list>

@@ -25,7 +25,8 @@ function defineRadioGroupElements() {
       state: {
         value: {
           get: (api: RadioGroupApi) => api.getValue(),
-          set: (api: RadioGroupApi, value: string | null) => api.setValue(value),
+          set: (api: RadioGroupApi, value: string | null) =>
+            api.setValue(value),
         },
       },
       api: ["getValue", "setValue", "focus"],

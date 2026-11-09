@@ -9,13 +9,15 @@ import type { PrimitiveHandle } from "./use-primitive"
  * renders it with `sheetHeader`, and the input renders into it with
  * `inSheetHeader`, so there's one input at a time.
  */
-const SheetHeaderContext = createContext<[() => HTMLElement | null, (header: HTMLElement | null) => void]>([
-  () => null,
-  () => {},
-])
+const SheetHeaderContext = createContext<
+  [() => HTMLElement | null, (header: HTMLElement | null) => void]
+>([() => null, () => {}])
 
 /** The header at the top of a sheet's content, while the popup's `header` slot is present. */
-function sheetHeader(popup: PrimitiveHandle<Primitive>, setHeader: (header: HTMLElement | null) => void) {
+function sheetHeader(
+  popup: PrimitiveHandle<Primitive>,
+  setHeader: (header: HTMLElement | null) => void
+) {
   const header = popup.slot("header", undefined, { ref: setHeader })
   const element = () => {
     onCleanup(() => setHeader(null))
@@ -29,7 +31,10 @@ function sheetHeader(popup: PrimitiveHandle<Primitive>, setHeader: (header: HTML
  * made again on each move, like in React, so its part binds the new element
  * and takes focus back where it lands.
  */
-function inSheetHeader(element: () => JSX.Element, header: () => HTMLElement | null) {
+function inSheetHeader(
+  element: () => JSX.Element,
+  header: () => HTMLElement | null
+) {
   return (
     <Show when={header()} keyed fallback={element()}>
       {(mount) => <Portal mount={mount}>{element()}</Portal>}

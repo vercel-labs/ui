@@ -14,7 +14,13 @@ import { CheckIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 import * as React from "react"
 
-const titles = ["Designer", "Engineer", "Engineering manager", "Product manager", "Researcher"]
+const titles = [
+  "Designer",
+  "Engineer",
+  "Engineering manager",
+  "Product manager",
+  "Researcher",
+]
 
 function Example() {
   const log = useLog()
@@ -35,7 +41,9 @@ function Example() {
       </div>
       <ComboboxContent>
         <ComboboxEmpty>
-          {(state) => (state.empty ? `Press Enter to use “${state.query}”.` : null)}
+          {(state) =>
+            state.empty ? `Press Enter to use “${state.query}”.` : null
+          }
         </ComboboxEmpty>
         <ComboboxList>
           {titles.map((title) => (

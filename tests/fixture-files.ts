@@ -8,12 +8,16 @@ import { fileURLToPath } from "node:url"
 // keeps specs that only skip out of a project, which matters because shards
 // split projects by test count.
 
-const fixtureRoot = fileURLToPath(new URL("../apps/playground/src/fixtures/", import.meta.url))
+const fixtureRoot = fileURLToPath(
+  new URL("../apps/playground/src/fixtures/", import.meta.url)
+)
 const specRoot = fileURLToPath(new URL("specs/", import.meta.url))
 
 /** Whether the playground has `fixture` for `framework`, like "menu" for "react-ssr". */
 function hasFixture(fixture: string, framework: string) {
-  return ["ts", "tsx"].some((extension) => existsSync(`${fixtureRoot}${fixture}/${framework}.${extension}`))
+  return ["ts", "tsx"].some((extension) =>
+    existsSync(`${fixtureRoot}${fixture}/${framework}.${extension}`)
+  )
 }
 
 /**
@@ -24,9 +28,15 @@ function hasFixture(fixture: string, framework: string) {
 function specsThatSkip(framework: string) {
   const composition = ["react", "vue", "web"].includes(framework)
   return specFixtures().flatMap(({ file, fixtures }) => {
-    if (file.endsWith(".kitchen-sink.spec.ts")) return composition ? [] : [file]
-    if (file.endsWith(".ssr.spec.ts") && !framework.endsWith("-ssr")) return [file]
-    const skips = fixtures.length > 0 && fixtures.every((fixture) => !hasFixture(fixture, framework))
+    if (file.endsWith(".kitchen-sink.spec.ts")) {
+      return composition ? [] : [file]
+    }
+    if (file.endsWith(".ssr.spec.ts") && !framework.endsWith("-ssr")) {
+      return [file]
+    }
+    const skips =
+      fixtures.length > 0 &&
+      fixtures.every((fixture) => !hasFixture(fixture, framework))
     return skips ? [file] : []
   })
 }
@@ -38,9 +48,11 @@ function specFixtures() {
     .filter((file) => file.endsWith(".spec.ts"))
     .map((file) => ({
       file,
-      fixtures: [...readFileSync(`${specRoot}${file}`, "utf8").matchAll(/\bopen\(\s*"([\w-]+)"/g)].map(
-        ([, fixture]) => fixture,
-      ),
+      fixtures: [
+        ...readFileSync(`${specRoot}${file}`, "utf8").matchAll(
+          /\bopen\(\s*"([\w-]+)"/g
+        ),
+      ].map(([, fixture]) => fixture),
     }))
   return opened
 }

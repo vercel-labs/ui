@@ -1,5 +1,10 @@
 import * as React from "react"
-import { createStickToBottom, css, definePrimitive, type StickToBottomState } from "@ui-sdk/core"
+import {
+  createStickToBottom,
+  css,
+  definePrimitive,
+  type StickToBottomState,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 import { useLog } from "../../shared/react/log"
 
@@ -24,28 +29,44 @@ const thread = definePrimitive({
       stick.subscribe(() => {
         store.set(stick.get())
         context.options().onStickChange?.(stick.get())
-      }),
+      })
     )
     return {
       stick,
       act(action: string) {
         const { messages, older } = store.get()
-        if (action === "send")
-          store.set({ messages: [...messages, `Message ${messages.length + 1 - older}`] })
-        else if (action === "older") {
+        if (action === "send") {
+          store.set({
+            messages: [...messages, `Message ${messages.length + 1 - older}`],
+          })
+        } else if (action === "older") {
           stick.prepend()
           store.set({
             older: older + 5,
-            messages: [...Array.from({ length: 5 }, (_, index) => `Older ${older + 5 - index}`), ...messages],
+            messages: [
+              ...Array.from(
+                { length: 5 },
+                (_, index) => `Older ${older + 5 - index}`
+              ),
+              ...messages,
+            ],
           })
-        } else if (action === "release") stick.release()
+        } else if (action === "release") {
+          stick.release()
+        }
       },
     }
   },
   slots: (slot) => ({
-    root: slot<{}, { messages: string[] }>({ state: (state) => ({ messages: state.messages }) }),
+    root: slot<{}, { messages: string[] }>({
+      state: (state) => ({ messages: state.messages }),
+    }),
     log: slot({
-      attrs: () => ({ role: "log", tabindex: "0", style: css({ overflow: "auto" }) }),
+      attrs: () => ({
+        role: "log",
+        tabindex: "0",
+        style: css({ overflow: "auto" }),
+      }),
       bind: (el, { api }) => api.stick.connect(el),
     }),
     action: slot<{ value: string }>({
@@ -69,7 +90,9 @@ function Example() {
   const last = React.useRef("")
   const report = ({ following, atBottom, unseen }: StickToBottomState) => {
     const text = `${following ? "Following" : "Not following"}${atBottom ? ", at the end" : ""}${unseen ? ", new below" : ""}`
-    if (text !== last.current) log(text)
+    if (text !== last.current) {
+      log(text)
+    }
     last.current = text
   }
   return (
@@ -100,4 +123,12 @@ function Example() {
   )
 }
 
-export { Example, thread, Thread, ThreadAction, ThreadLog, type ThreadOptions, type ThreadState }
+export {
+  Example,
+  thread,
+  Thread,
+  ThreadAction,
+  ThreadLog,
+  type ThreadOptions,
+  type ThreadState,
+}

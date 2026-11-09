@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { PasswordInput, PasswordInputControl, PasswordInputToggle } from "../../src/password-input"
+  import {
+    PasswordInput,
+    PasswordInputControl,
+    PasswordInputToggle,
+  } from "../../src/password-input"
 
   let { defaultVisible }: { defaultVisible?: boolean } = $props()
 </script>

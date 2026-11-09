@@ -1,6 +1,20 @@
-import { select, type ListData, type SelectApi, type SelectOptions } from "@ui-sdk/core/select"
-import { selectAllKey, selectItemIcons, selectSelectAll } from "@ui-sdk/core/renderer"
-import { autoId, createParts, wrappedButton, wrappedChild } from "./define-element"
+import {
+  select,
+  type ListData,
+  type SelectApi,
+  type SelectOptions,
+} from "@ui-sdk/core/select"
+import {
+  selectAllKey,
+  selectItemIcons,
+  selectSelectAll,
+} from "@ui-sdk/core/renderer"
+import {
+  autoId,
+  createParts,
+  wrappedButton,
+  wrappedChild,
+} from "./define-element"
 import { popupKinds, popupState, sheetPortal } from "./popup"
 import {
   adoptDefaultValue,
@@ -18,7 +32,10 @@ const owner = "ui-select"
 
 // The properties rich values are set through.
 type SelectElement = HTMLElement &
-  Pick<SelectOptions<unknown>, "items" | "filter" | "itemToValue" | "itemToLabel" | "isItemEqualToValue">
+  Pick<
+    SelectOptions<unknown>,
+    "items" | "filter" | "itemToValue" | "itemToLabel" | "isItemEqualToValue"
+  >
 
 // The content a data select rendered for itself, so new items replace its children.
 const generated = new WeakMap<HTMLElement, HTMLElement>()
@@ -56,19 +73,26 @@ function defineSelectElements() {
       properties: ["filter"],
       options: (el) => {
         const data = el as SelectElement
-        const multiple = el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
-        const start = el.getAttribute("default-value") ?? el.getAttribute("value")
+        const multiple =
+          el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
+        const start =
+          el.getAttribute("default-value") ?? el.getAttribute("value")
         const items = data.items ?? optionItems(el)
-        const toValues = (keys: string[]) => valuesOf(keys, items, data.itemToValue)
+        const toValues = (keys: string[]) =>
+          valuesOf(keys, items, data.itemToValue)
         return {
           items,
-          ...((typeof data.filter === "function" || data.filter === false) && { filter: data.filter }),
+          ...((typeof data.filter === "function" || data.filter === false) && {
+            filter: data.filter,
+          }),
           itemToValue: data.itemToValue,
           itemToLabel: data.itemToLabel,
           isItemEqualToValue: data.isItemEqualToValue,
           container: undefined,
           ...(start !== null && {
-            defaultValue: multiple ? toValues(listAttribute(start)) : toValues([start])[0],
+            defaultValue: multiple
+              ? toValues(listAttribute(start))
+              : toValues([start])[0],
           }),
         }
       },
@@ -77,15 +101,24 @@ function defineSelectElements() {
           get: (api: SelectApi) => api.getValue(),
           // A string names items by key, comma-separated with multiple.
           set: (api: SelectApi, value: unknown) => {
-            if (typeof value !== "string") return api.setValue(value)
-            const keys = api.internal.options().multiple ? listAttribute(value) : [value]
-            const found = keys.map((key) => api.internal.listbox.valueOf(key) ?? key)
-            api.setValue(api.internal.options().multiple ? found : (found[0] ?? null))
+            if (typeof value !== "string") {
+              return api.setValue(value)
+            }
+            const keys = api.internal.options().multiple
+              ? listAttribute(value)
+              : [value]
+            const found = keys.map(
+              (key) => api.internal.listbox.valueOf(key) ?? key
+            )
+            api.setValue(
+              api.internal.options().multiple ? found : (found[0] ?? null)
+            )
           },
         },
         query: {
           get: (api: SelectApi) => api.getQuery(),
-          set: (api: SelectApi, query: string | null) => api.setQuery(query ?? ""),
+          set: (api: SelectApi, query: string | null) =>
+            api.setQuery(query ?? ""),
         },
         ...popupState,
       },
@@ -117,12 +150,16 @@ function defineSelectElements() {
         }
         adoptDefaultValue(el, items, api)
         if (content) {
-          content.replaceChildren(...renderListItems("ui-select", items, toKey, template))
+          content.replaceChildren(
+            ...renderListItems("ui-select", items, toKey, template)
+          )
           return
         }
         // Markup content wins over data, but a list in it renders the items that match the search.
         const markup = el.querySelector(":scope > ui-select-content")
-        if (markup && !markupLists.has(el)) markupLists.set(el, markup.querySelector("ui-select-list"))
+        if (markup && !markupLists.has(el)) {
+          markupLists.set(el, markup.querySelector("ui-select-list"))
+        }
         if (markupLists.has(el)) {
           renderSearched(target, api)
           return subscribe(() => renderSearched(target, api))
@@ -141,19 +178,27 @@ function defineSelectElements() {
       target: wrappedButton,
       render(el) {
         const target = wrappedButton(el)
-        if (target && !target.childNodes.length) target.append(document.createElement("ui-select-value"))
+        if (target && !target.childNodes.length) {
+          target.append(document.createElement("ui-select-value"))
+        }
       },
     },
     value: {
       tag: "ui-select-value",
       rebind: ["placeholder", "maxLabels", "getMoreLabel"],
       render(el) {
-        if (!el.childNodes.length && !el.hasAttribute("as-child")) automatic.add(el)
+        if (!el.childNodes.length && !el.hasAttribute("as-child")) {
+          automatic.add(el)
+        }
       },
       context: (el) => ({ text: automatic.has(el) }),
       kinds: { text: null },
     },
-    clear: { tag: "ui-select-clear", display: "contents", target: wrappedButton },
+    clear: {
+      tag: "ui-select-clear",
+      display: "contents",
+      target: wrappedButton,
+    },
     content: { tag: "ui-select-content", kinds: popupKinds },
     list: { tag: "ui-select-list", display: "block" },
     // A wrapper, so the search field stays a real input.
@@ -193,7 +238,9 @@ function defineSelectElements() {
 function renderSearched(el: SelectElement, api: SelectApi) {
   const list = markupLists.get(el)
   const items = el.items ?? optionItems(el)
-  if (!list || !items) return
+  if (!list || !items) {
+    return
+  }
   const visible = api.internal.listbox.visibleData()?.list ?? items
   renderData(list, "ui-select", visible, templateOf(el), api.internal.keyOf)
 }
@@ -202,15 +249,19 @@ function renderSearched(el: SelectElement, api: SelectApi) {
 // before the script loads and from server templates. They're hidden once read.
 const fromOptions = new WeakMap<HTMLElement, ListData<string> | undefined>()
 function optionItems(el: HTMLElement) {
-  if (!fromOptions.has(el)) fromOptions.set(el, readOptions(el))
+  if (!fromOptions.has(el)) {
+    fromOptions.set(el, readOptions(el))
+  }
   return fromOptions.get(el)
 }
 
 function readOptions(el: HTMLElement) {
   const children = Array.from(el.children).filter(
-    (child) => child.localName === "option" || child.localName === "optgroup",
+    (child) => child.localName === "option" || child.localName === "optgroup"
   )
-  if (!children.length) return undefined
+  if (!children.length) {
+    return undefined
+  }
   const read = (option: HTMLOptionElement) => ({
     value: option.value,
     label: option.label || option.textContent?.trim() || option.value,
@@ -218,12 +269,13 @@ function readOptions(el: HTMLElement) {
   })
   const items = children.map((child) => {
     ;(child as HTMLElement).hidden = true
-    if (child instanceof HTMLOptGroupElement)
+    if (child instanceof HTMLOptGroupElement) {
       return {
         type: "group" as const,
         label: child.label,
         items: Array.from(child.querySelectorAll("option")).map(read),
       }
+    }
     return read(child as HTMLOptionElement)
   })
   return items

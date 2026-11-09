@@ -31,10 +31,16 @@ const lastOpen = ref("")
 const lastPayload = ref("")
 
 function opened(name: string, open: boolean, { event }: ChangeDetails) {
-  if (open) lastOpen.value = describeChange(name, "open", event)
+  if (open) {
+    lastOpen.value = describeChange(name, "open", event)
+  }
 }
 
-function payloadChanged(name: string, payload: unknown, { event }: ChangeDetails) {
+function payloadChanged(
+  name: string,
+  payload: unknown,
+  { event }: ChangeDetails
+) {
   lastPayload.value = describeChange(name, `payload ${payload}`, event)
 }
 </script>
@@ -44,9 +50,15 @@ function payloadChanged(name: string, payload: unknown, { event }: ChangeDetails
     <button>Before</button>
     <Menu
       @open-change="(open, details) => opened('menu', open, details)"
-      @payload-change="(payload, details) => payloadChanged('menu', payload, details)"
+      @payload-change="
+        (payload, details) => payloadChanged('menu', payload, details)
+      "
     >
-      <MenuTrigger v-for="label in fixture.menu.triggers" :key="label" :payload="payloadOf(label)">
+      <MenuTrigger
+        v-for="label in fixture.menu.triggers"
+        :key="label"
+        :payload="payloadOf(label)"
+      >
         {{ label }}
       </MenuTrigger>
       <MenuContent v-slot="{ state }" class="popup">
@@ -59,9 +71,15 @@ function payloadChanged(name: string, payload: unknown, { event }: ChangeDetails
     <Popover
       :controller="people"
       @open-change="(open, details) => opened('popover', open, details)"
-      @payload-change="(payload, details) => payloadChanged('popover', payload, details)"
+      @payload-change="
+        (payload, details) => payloadChanged('popover', payload, details)
+      "
     >
-      <PopoverTrigger v-for="label in fixture.popover.triggers" :key="label" :payload="payloadOf(label)">
+      <PopoverTrigger
+        v-for="label in fixture.popover.triggers"
+        :key="label"
+        :payload="payloadOf(label)"
+      >
         {{ label }}
       </PopoverTrigger>
       <PopoverContent v-slot="{ state }" class="popup">
@@ -74,22 +92,38 @@ function payloadChanged(name: string, payload: unknown, { event }: ChangeDetails
     <Dialog
       :modal="false"
       @open-change="(open, details) => opened('dialog', open, details)"
-      @payload-change="(payload, details) => payloadChanged('dialog', payload, details)"
+      @payload-change="
+        (payload, details) => payloadChanged('dialog', payload, details)
+      "
     >
-      <DialogTrigger v-for="label in fixture.dialog.triggers" :key="label" :payload="payloadOf(label)">
+      <DialogTrigger
+        v-for="label in fixture.dialog.triggers"
+        :key="label"
+        :payload="payloadOf(label)"
+      >
         {{ label }}
       </DialogTrigger>
-      <DialogContent v-slot="{ state }" class="dialog">{{ contentFor(state.payload) }}</DialogContent>
+      <DialogContent v-slot="{ state }" class="dialog">{{
+        contentFor(state.payload)
+      }}</DialogContent>
     </Dialog>
     <Drawer
       :modal="false"
       @open-change="(open, details) => opened('drawer', open, details)"
-      @payload-change="(payload, details) => payloadChanged('drawer', payload, details)"
+      @payload-change="
+        (payload, details) => payloadChanged('drawer', payload, details)
+      "
     >
-      <DrawerTrigger v-for="label in fixture.drawer.triggers" :key="label" :payload="payloadOf(label)">
+      <DrawerTrigger
+        v-for="label in fixture.drawer.triggers"
+        :key="label"
+        :payload="payloadOf(label)"
+      >
         {{ label }}
       </DrawerTrigger>
-      <DrawerContent v-slot="{ state }" class="drawer">{{ contentFor(state.payload) }}</DrawerContent>
+      <DrawerContent v-slot="{ state }" class="drawer">{{
+        contentFor(state.payload)
+      }}</DrawerContent>
     </Drawer>
     <output role="status" aria-label="Last open">{{ lastOpen }}</output>
     <output role="status" aria-label="Last payload">{{ lastPayload }}</output>

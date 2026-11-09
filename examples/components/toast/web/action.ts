@@ -22,7 +22,7 @@ function mount(root: HTMLElement) {
       action: { label: "Undo", onAction: () => log(root, "Message restored") },
       cancel: { label: "Dismiss", onCancel: () => log(root, "Kept archived") },
       onDismiss: ({ reason }) => log(root, `Closed (${reason})`),
-    }),
+    })
   )
   return () => {
     toast.dismiss()

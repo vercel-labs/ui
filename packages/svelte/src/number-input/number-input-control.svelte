@@ -6,7 +6,11 @@ The text field, which shows the formatted number and takes typing.
 <script lang="ts">
   import type { NumberInputState } from "@ui-sdk/core/number-input"
   import Part from "../part.svelte"
-  import { useHandlePart, wrapPart, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    wrapPart,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { useNumberInput } from "./context"
 
   let props: PartProps<"input", NumberInputState> = $props()
@@ -15,7 +19,7 @@ The text field, which shows the formatted number and takes typing.
   const control = useHandlePart(numberInput, "control")
   const field = numberInput.field?.control(
     () => props.id,
-    () => props["aria-describedby"],
+    () => props["aria-describedby"]
   )
 </script>
 

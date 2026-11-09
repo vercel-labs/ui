@@ -87,27 +87,47 @@ function finite(value: number | null | undefined, fallback: number) {
 
 /** Where a value sits between the bounds, from 0 to 100, clamped. */
 function percentBetween(value: number, min: number, max: number) {
-  if (max <= min) return value >= max ? 100 : 0
+  if (max <= min) {
+    return value >= max ? 100 : 0
+  }
   return ((clamp(value, min, max) - min) / (max - min)) * 100
 }
 
 // A percent style formats the share of the range, so 30 of 0 to 60 reads 50%.
 // Any other style formats the value as it is.
 function formatGaugeValue(value: number | null, settings: GaugeSettings) {
-  if (value === null) return ""
+  if (value === null) {
+    return ""
+  }
   const { format, min, max } = settings
   const locale = localeOf(settings)
-  if (typeof format === "function") return format(value)
-  if (format && format.style !== "percent") return formatNumber(value, locale, format)
-  return formatNumber(percentBetween(value, min, max) / 100, locale, format ?? { style: "percent" })
+  if (typeof format === "function") {
+    return format(value)
+  }
+  if (format && format.style !== "percent") {
+    return formatNumber(value, locale, format)
+  }
+  return formatNumber(
+    percentBetween(value, min, max) / 100,
+    locale,
+    format ?? { style: "percent" }
+  )
 }
 
 // What screen readers announce: the custom label, or the formatted value.
 function gaugeValueText(value: number | null, settings: GaugeSettings) {
   const formatted = formatGaugeValue(value, settings)
-  if (!settings.getValueLabel) return formatted || undefined
-  const percent = value === null ? null : percentBetween(value, settings.min, settings.max)
-  return settings.getValueLabel(value, { formatted, percent, min: settings.min, max: settings.max })
+  if (!settings.getValueLabel) {
+    return formatted || undefined
+  }
+  const percent =
+    value === null ? null : percentBetween(value, settings.min, settings.max)
+  return settings.getValueLabel(value, {
+    formatted,
+    percent,
+    min: settings.min,
+    max: settings.max,
+  })
 }
 
 // The range attributes of the root, which carries the role. A value of null
@@ -116,7 +136,10 @@ function gaugeAria(value: number | null, settings: GaugeSettings) {
   return {
     "aria-valuemin": String(settings.min),
     "aria-valuemax": String(settings.max),
-    "aria-valuenow": value === null ? undefined : String(clamp(value, settings.min, settings.max)),
+    "aria-valuenow":
+      value === null
+        ? undefined
+        : String(clamp(value, settings.min, settings.max)),
     "aria-valuetext": gaugeValueText(value, settings),
   }
 }
@@ -124,7 +147,9 @@ function gaugeAria(value: number | null, settings: GaugeSettings) {
 // The indicator fills the track from its start, so it needs only a width.
 // Right to left, `inset-inline-start` starts from the right by itself.
 function indicatorStyle(percent: number | null) {
-  return percent === null ? undefined : css({ "inset-inline-start": 0, width: `${roundPercent(percent)}%` })
+  return percent === null
+    ? undefined
+    : css({ "inset-inline-start": 0, width: `${roundPercent(percent)}%` })
 }
 
 function roundPercent(percent: number) {
@@ -135,14 +160,19 @@ function roundPercent(percent: number) {
 const labelId = (id: string) => `${id}-label`
 
 // What Progress and Meter set up: Label parts name the root while any is on the page.
-function gaugeApi(store: { get: () => { labels: number }; set: (patch: { labels: number }) => void }) {
+function gaugeApi(store: {
+  get: () => { labels: number }
+  set: (patch: { labels: number }) => void
+}) {
   return {
     internal: {
       label: () => {
         store.set({ labels: store.get().labels + 1 })
         let bound = true
         return () => {
-          if (!bound) return
+          if (!bound) {
+            return
+          }
           bound = false
           store.set({ labels: store.get().labels - 1 })
         }

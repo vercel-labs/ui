@@ -1,5 +1,12 @@
 <script lang="ts">
-  import { ArrowRightIcon, CheckIcon, ChevronDownIcon, CircleIcon, CircleCheckIcon, CircleXIcon } from "@lucide/svelte"
+  import {
+    ArrowRightIcon,
+    CheckIcon,
+    ChevronDownIcon,
+    CircleIcon,
+    CircleCheckIcon,
+    CircleXIcon,
+  } from "@lucide/svelte"
   import {
     Combobox,
     ComboboxContent,

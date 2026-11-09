@@ -1,17 +1,26 @@
 "use client"
 
-import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/react/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/react/command"
 import { LoaderCircleIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
-const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+const wait = (ms: number) =>
+  new Promise<void>((resolve) => setTimeout(resolve, ms))
 
 function Example() {
   const log = useLog()
   return (
     <div data-slot="stack">
       <Command>
-        <CommandInput aria-label="Search actions" placeholder="Search actions…" />
+        <CommandInput
+          aria-label="Search actions"
+          placeholder="Search actions…"
+        />
         <CommandList>
           <CommandItem
             value="deploy"
@@ -23,7 +32,9 @@ function Example() {
             {(state) => (
               <>
                 Deploy to production
-                {state.pending && <LoaderCircleIcon data-slot="spinner" aria-hidden="true" />}
+                {state.pending && (
+                  <LoaderCircleIcon data-slot="spinner" aria-hidden="true" />
+                )}
               </>
             )}
           </CommandItem>
@@ -41,7 +52,9 @@ function Example() {
                 {state.pending ? (
                   <LoaderCircleIcon data-slot="spinner" aria-hidden="true" />
                 ) : (
-                  state.error !== undefined && <span data-slot="hint">Failed, try again</span>
+                  state.error !== undefined && (
+                    <span data-slot="hint">Failed, try again</span>
+                  )
                 )}
               </>
             )}

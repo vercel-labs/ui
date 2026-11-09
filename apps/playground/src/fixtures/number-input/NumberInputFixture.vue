@@ -10,7 +10,11 @@ import {
   NumberInputControl,
   NumberInputScrubArea,
 } from "@ui-sdk/vue"
-import { numberInputFixture as f, numberInputOptions, serialize } from "tests/fixtures/number-input.ts"
+import {
+  numberInputFixture as f,
+  numberInputOptions,
+  serialize,
+} from "tests/fixtures/number-input.ts"
 import { ref } from "vue"
 
 const options = numberInputOptions()
@@ -27,8 +31,14 @@ const shared = {
 const currency = { style: "currency" as const, currency: f.amount.currency }
 
 // Records a change, or cancels it when the URL asks.
-function report(name: string, value: number | null, details: { cancel: () => void }) {
-  if (options.cancel === name) return details.cancel()
+function report(
+  name: string,
+  value: number | null,
+  details: { cancel: () => void }
+) {
+  if (options.cancel === name) {
+    return details.cancel()
+  }
   action.value = `${name}:${String(value)}`
 }
 
@@ -76,9 +86,13 @@ function onSubmit(event: Event) {
           @value-commit="onQuantityCommit"
         >
           <NumberInputGroup class="number-input-group">
-            <NumberInputDecrement :aria-label="f.quantity.decrement">−</NumberInputDecrement>
+            <NumberInputDecrement :aria-label="f.quantity.decrement"
+              >−</NumberInputDecrement
+            >
             <NumberInputControl class="number-input-control" />
-            <NumberInputIncrement :aria-label="f.quantity.increment" :disabled="options.disabledIncrement"
+            <NumberInputIncrement
+              :aria-label="f.quantity.increment"
+              :disabled="options.disabledIncrement"
               >+</NumberInputIncrement
             >
           </NumberInputGroup>
@@ -98,11 +112,17 @@ function onSubmit(event: Event) {
           @value-change="onAmount"
           @value-commit="onAmountCommit"
         >
-          <NumberInputScrubArea class="number-input-scrub">{{ f.amount.scrub }}</NumberInputScrubArea>
+          <NumberInputScrubArea class="number-input-scrub">{{
+            f.amount.scrub
+          }}</NumberInputScrubArea>
           <NumberInputGroup class="number-input-group">
-            <NumberInputDecrement :aria-label="f.amount.decrement">−</NumberInputDecrement>
+            <NumberInputDecrement :aria-label="f.amount.decrement"
+              >−</NumberInputDecrement
+            >
             <NumberInputControl class="number-input-control" />
-            <NumberInputIncrement :aria-label="f.amount.increment">+</NumberInputIncrement>
+            <NumberInputIncrement :aria-label="f.amount.increment"
+              >+</NumberInputIncrement
+            >
           </NumberInputGroup>
         </NumberInput>
       </Field>
@@ -114,7 +134,9 @@ function onSubmit(event: Event) {
     </form>
     <button>After</button>
     <output role="status" aria-label="Last action">{{ action }}</output>
-    <output role="status" aria-label="Committed">{{ commits.join(" ") }}</output>
+    <output role="status" aria-label="Committed">{{
+      commits.join(" ")
+    }}</output>
     <output role="status" aria-label="Submitted">{{ submitted }}</output>
   </div>
 </template>

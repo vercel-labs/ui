@@ -7,7 +7,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@ui-sdk/solid/select"
-import { Toast, ToastDescription, ToastRegion, ToastTitle, createToaster } from "@ui-sdk/solid/toast"
+import {
+  Toast,
+  ToastDescription,
+  ToastRegion,
+  ToastTitle,
+  createToaster,
+} from "@ui-sdk/solid/toast"
 import { createSignal, For, onCleanup } from "solid-js"
 
 const sides = [
@@ -33,7 +39,11 @@ function Example() {
   return (
     <div data-slot="stack">
       <div data-slot="controls">
-        <Select items={sides} value={side()} onValueChange={(next) => next && setSide(next as Side)}>
+        <Select
+          items={sides}
+          value={side()}
+          onValueChange={(next) => next && setSide(next as Side)}
+        >
           <SelectLabel>Side</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -72,7 +82,11 @@ function Example() {
             </For>
           </SelectContent>
         </Select>
-        <Select items={aligns} value={align()} onValueChange={(next) => next && setAlign(next as Align)}>
+        <Select
+          items={aligns}
+          value={align()}
+          onValueChange={(next) => next && setAlign(next as Align)}
+        >
           <SelectLabel>Align</SelectLabel>
           <SelectTrigger>
             <SelectValue />
@@ -112,7 +126,11 @@ function Example() {
           </SelectContent>
         </Select>
       </div>
-      <button onClick={() => toast("Event created", { description: "Friday, June 12 at 10:00 AM" })}>
+      <button
+        onClick={() =>
+          toast("Event created", { description: "Friday, June 12 at 10:00 AM" })
+        }
+      >
         Create Event
       </button>
       <ToastRegion toaster={toast} side={side()} align={align()}>

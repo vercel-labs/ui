@@ -2,13 +2,29 @@
 // its labels, and what the form asks of it.
 import { type AsyncOptionsStatus } from "../../foundation/lists/async-options"
 import { modalityOf, trackModality } from "../../foundation/kernel/modality"
-import { deriveOpen, openerOf, type PopupOpener } from "../../foundation/popups/popup"
-import { createPopup, type PopupState } from "../../foundation/popups/create-popup"
+import {
+  deriveOpen,
+  openerOf,
+  type PopupOpener,
+} from "../../foundation/popups/popup"
+import {
+  createPopup,
+  type PopupState,
+} from "../../foundation/popups/create-popup"
 import { selectPreset } from "../../foundation/popups/popup-presets"
 import { dispatchChange, formInternals } from "../../foundation/forms/form"
-import { createListbox, itemKey, revealInList, type ListData } from "../../foundation/lists/listbox"
+import {
+  createListbox,
+  itemKey,
+  revealInList,
+  type ListData,
+} from "../../foundation/lists/listbox"
 import { isDisabled } from "../../foundation/lists/listbox-parts"
-import { keepListing, noListing, type Listing } from "../../foundation/lists/listbox-listing"
+import {
+  keepListing,
+  noListing,
+  type Listing,
+} from "../../foundation/lists/listbox-listing"
 import {
   announceResults,
   createLoadMore,
@@ -95,7 +111,10 @@ function initialSelectState(options: SelectOptions<any, any>): SelectState {
     titled: false,
     described: false,
     modal: false,
-    value: options.value !== undefined ? options.value : (options.defaultValue ?? empty()),
+    value:
+      options.value !== undefined
+        ? options.value
+        : (options.defaultValue ?? empty()),
     initial: options.defaultValue ?? empty(),
     highlighted: null,
     trigger: null,
@@ -139,20 +158,24 @@ function syncSelectState(options: SelectOptions<any, any>) {
     items: options.items,
     status: options.status ?? "idle",
     // Like a native select's default, changing it changes what a reset returns to.
-    ...(options.defaultValue === undefined ? {} : { initial: options.defaultValue }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: options.defaultValue }),
     ...(options.open === undefined ? {} : { open: options.open }),
     ...(options.value === undefined ? {} : { value: options.value }),
     ...(options.query === undefined ? {} : { query: options.query }),
   }
 }
 
-function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectState, string>) {
+function selectApi(
+  context: PrimitiveContext<SelectOptions<any, any>, SelectState, string>
+) {
   const { id, store, options, element } = context
   // A controlled close clears the highlight in the same pass, and keeps the
   // list in the page hidden, which focus returning to the trigger would ask
   // for while the options are still being handed over.
   deriveOpen(context, ["highlighted", "prepared"], (open) =>
-    open ? undefined : { highlighted: null, prepared: true },
+    open ? undefined : { highlighted: null, prepared: true }
   )
   const change = createChange(context)
   let pendingFocus: InitialHighlight = "selected"
@@ -163,7 +186,8 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
 
   const toKey = (value: unknown) => itemKey(value, options().itemToValue)
   const triggerElement = () => element("trigger")
-  const focusTrigger = (options?: FocusOptions) => triggerElement()?.focus(options)
+  const focusTrigger = (options?: FocusOptions) =>
+    triggerElement()?.focus(options)
   const contentElement = () => popup.element() ?? element("content")
   const searchElement = () => element("input") as HTMLInputElement | undefined
   // Focus stays in the search field while there is one, unless a touch screen reader opened the list.
@@ -186,25 +210,36 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
     items: () => store.get().items,
     emptyItems: () => options().emptyItems,
     // Typing on the closed trigger searches every item, so they show only while searching.
-    showEmpty: () => store.get().searchable && store.get().mounted && !store.get().query.trim(),
+    showEmpty: () =>
+      store.get().searchable &&
+      store.get().mounted &&
+      !store.get().query.trim(),
     toKey,
-    filter: () => (store.get().searchable ? (options().filter ?? "contains") : undefined),
+    filter: () =>
+      store.get().searchable ? (options().filter ?? "contains") : undefined,
     rank: () => typeof options().filter === "function",
     query: filterQuery,
     loop: () => options().loop ?? true,
     skipDisabled: true,
     active: () => store.get().open,
     onHighlight: (key, index, event) =>
-      options().onHighlight?.(key === null || isSelectAll(key) ? null : (listbox.valueOf(key) ?? null), {
-        index,
-        event,
-      }),
+      options().onHighlight?.(
+        key === null || isSelectAll(key)
+          ? null
+          : (listbox.valueOf(key) ?? null),
+        {
+          index,
+          event,
+        }
+      ),
     onLastReached: loadMore.reached,
     container: () => element("list") ?? contentElement(),
     scrollRoot: contentElement,
     // Parts that depend on the list, like the empty message and groups, update once per batch of items mounting.
     onRegister() {
-      if (mountsQueued) return
+      if (mountsQueued) {
+        return
+      }
       mountsQueued = true
       queueMicrotask(() => {
         mountsQueued = false
@@ -212,14 +247,23 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       })
     },
   })
-  const selection = createValueSelection({ store, options, listbox, toKey, onDestroy: context.onDestroy })
+  const selection = createValueSelection({
+    store,
+    options,
+    listbox,
+    toKey,
+    onDestroy: context.onDestroy,
+  })
   keepListing(store, listbox, {
     entry: (key, value) => (selection.isSelected(key, value) ? "s" : ""),
     inputs: () => [store.get().value],
   })
   // What the features the parts register add, like select-all to choosing.
   // Item icons are one: their part creates the icons when it first renders.
-  const hooks: { choose?: (key: string, event?: Event) => void; icons?: ItemIcons } = {}
+  const hooks: {
+    choose?: (key: string, event?: Event) => void
+    icons?: ItemIcons
+  } = {}
 
   const kit = createPopup(context, {
     preset: selectPreset,
@@ -233,29 +277,42 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
         hide({ reason, event, focus })
       },
       onOpenChange(open) {
-        if (open) return
+        if (open) {
+          return
+        }
         alignOffset = undefined
         listbox.resetTyping()
         store.set({ highlighted: null })
       },
       onOpenChangeComplete(open, closed) {
         // The search empties once the list has left, so it doesn't jump while it animates out.
-        if (!closed) return
+        if (!closed) {
+          return
+        }
         store.set({ focusInList: false })
-        if (store.get().query) setQuery("", closed.reason as SelectQueryChangeReason)
+        if (store.get().query) {
+          setQuery("", closed.reason as SelectQueryChangeReason)
+        }
       },
       onShow() {
         // A sheet starts with the selected item in view, whatever opened it,
         // like a native select's, since a tap focuses the sheet rather than the
         // item. Items bind in the same commit as the content.
-        if (store.get().presentation === "sheet") queueMicrotask(revealSelected)
+        if (store.get().presentation === "sheet") {
+          queueMicrotask(revealSelected)
+        }
         const el = element("content")
-        if (el) return trackModality(el, modalityOf(openedBy))
+        if (el) {
+          return trackModality(el, modalityOf(openedBy))
+        }
       },
       open(request, open) {
         const { event, by } = request
-        if (isDisabled(store.get())) return
-        pendingFocus = (request.focus as InitialHighlight | undefined) ?? "selected"
+        if (isDisabled(store.get())) {
+          return
+        }
+        pendingFocus =
+          (request.focus as InitialHighlight | undefined) ?? "selected"
         // A touch screen reader gets real focus in the list, since it ignores
         // aria-activedescendant, as a key would, rather than the popup a tap focuses.
         const intoList = opensIntoList(event)
@@ -270,51 +327,88 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   const { show, hide } = control
 
   function revealSelected() {
-    const selected = listbox.entries().find((entry) => selection.isSelected(entry.key, entry.value))
+    const selected = listbox
+      .entries()
+      .find((entry) => selection.isSelected(entry.key, entry.value))
     const el = selected && listbox.element(selected.key)
-    if (el) revealInList(el, contentElement())
+    if (el) {
+      revealInList(el, contentElement())
+    }
   }
 
   // Where focus goes once the list opens: the selected item, or the first or
   // last that can be chosen. With a search field, focus goes there and the
   // item is only highlighted.
   function initialFocus() {
-    const list = listbox.entries().filter((entry) => !entry.pinned && !listbox.disabled(entry))
-    const selected = list.find((entry) => selection.isSelected(entry.key, entry.value))
+    const list = listbox
+      .entries()
+      .filter((entry) => !entry.pinned && !listbox.disabled(entry))
+    const selected = list.find((entry) =>
+      selection.isSelected(entry.key, entry.value)
+    )
     const target =
-      pendingFocus === "last" ? list.at(-1) : pendingFocus === "first" ? list[0] : (selected ?? list[0])
+      pendingFocus === "last"
+        ? list.at(-1)
+        : pendingFocus === "first"
+          ? list[0]
+          : (selected ?? list[0])
     pendingFocus = "selected"
-    if (target) listbox.highlight(target.key, { focus: false })
-    if (searching()) return searchElement() ?? contentElement()
-    if (!target) return contentElement()
+    if (target) {
+      listbox.highlight(target.key, { focus: false })
+    }
+    if (searching()) {
+      return searchElement() ?? contentElement()
+    }
+    if (!target) {
+      return contentElement()
+    }
     return listbox.element(target.key) ?? contentElement()
   }
 
   // The search field's text changed: the list filters, and the best match is highlighted.
-  function setQuery(query: string, reason: SelectQueryChangeReason, event?: Event) {
-    if (!change("query", query, { reason, event })) return false
-    if (!store.get().open) return true
+  function setQuery(
+    query: string,
+    reason: SelectQueryChangeReason,
+    event?: Event
+  ) {
+    if (!change("query", query, { reason, event })) {
+      return false
+    }
+    if (!store.get().open) {
+      return true
+    }
     const first = listbox.firstEnabled() ?? null
-    if (store.get().highlighted !== first) listbox.highlight(first, { focus: false, event })
+    if (store.get().highlighted !== first) {
+      listbox.highlight(first, { focus: false, event })
+    }
     return true
   }
 
   // The element that takes part in the form: the custom element, or the hidden input.
   const formElement = () => {
     const root = element("root")
-    if (formInternals(root)) return root
+    if (formInternals(root)) {
+      return root
+    }
     return element("form-input")
   }
 
   function setValue(
     value: unknown,
-    { reason = "imperative", event }: { reason?: SelectValueChangeReason; event?: Event } = {},
+    {
+      reason = "imperative",
+      event,
+    }: { reason?: SelectValueChangeReason; event?: Event } = {}
   ) {
     const state = store.get()
-    if (isDisabled(state) || (state.readOnly && reason !== "reset")) return false
+    if (isDisabled(state) || (state.readOnly && reason !== "reset")) {
+      return false
+    }
     selection.stopRestoring()
     const done = change("value", value, { reason, event })
-    if (done && reason !== "reset" && reason !== "restore") dispatchChange(formElement())
+    if (done && reason !== "reset" && reason !== "restore") {
+      dispatchChange(formElement())
+    }
     return done
   }
 
@@ -323,14 +417,26 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   function choose(key: string, event?: Event) {
     const state = store.get()
     if (isSelectAll(key)) {
-      if (!isDisabled(state) && !state.readOnly) hooks.choose?.(key, event)
+      if (!isDisabled(state) && !state.readOnly) {
+        hooks.choose?.(key, event)
+      }
       return
     }
     const entry = listbox.find(key)
-    if (!entry || listbox.disabled(entry) || isDisabled(state) || state.readOnly) return
+    if (
+      !entry ||
+      listbox.disabled(entry) ||
+      isDisabled(state) ||
+      state.readOnly
+    ) {
+      return
+    }
     listbox.remember(key, entry.label, entry.value)
     if (state.multiple) {
-      setValue(selection.toggled(key, entry.value), { reason: "item-press", event })
+      setValue(selection.toggled(key, entry.value), {
+        reason: "item-press",
+        event,
+      })
       return
     }
     setValue(entry.value, { reason: "item-press", event })
@@ -339,7 +445,9 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
 
   // The labels exist only for items that registered: show the list hidden so they do.
   function prepare() {
-    if (!store.get().prepared) store.set({ prepared: true })
+    if (!store.get().prepared) {
+      store.set({ prepared: true })
+    }
   }
 
   const keyboard = createSelectKeyboard({
@@ -368,10 +476,16 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   // The anchor that puts the selected item over the trigger, or null when it doesn't fit.
   function alignedAnchor(content: HTMLElement) {
     const trigger = triggerElement()
-    if (!trigger || popup.opener() === "touch") return null
-    const selected = listbox.entries().find((entry) => selection.isSelected(entry.key, entry.value))
+    if (!trigger || popup.opener() === "touch") {
+      return null
+    }
+    const selected = listbox
+      .entries()
+      .find((entry) => selection.isSelected(entry.key, entry.value))
     const item = selected && listbox.element(selected.key)
-    if (!item) return null
+    if (!item) {
+      return null
+    }
     const triggerRect = trigger.getBoundingClientRect()
     const contentRect = content.getBoundingClientRect()
     const itemRect = item.getBoundingClientRect()
@@ -379,9 +493,16 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
     alignOffset ??= itemRect.top - contentRect.top + itemRect.height / 2
     const top = triggerRect.top + triggerRect.height / 2 - alignOffset
     const view = content.ownerDocument.documentElement
-    if (top < 8 || top + contentRect.height > view.clientHeight - 8) return null
+    if (top < 8 || top + contentRect.height > view.clientHeight - 8) {
+      return null
+    }
     return {
-      getBoundingClientRect: () => ({ x: triggerRect.x, y: top, width: triggerRect.width, height: 0 }),
+      getBoundingClientRect: () => ({
+        x: triggerRect.x,
+        y: top,
+        width: triggerRect.width,
+        height: 0,
+      }),
     }
   }
 
@@ -389,24 +510,38 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
   let previousValue = store.get().value
   store.subscribe(() => {
     const { value, items, prepared } = store.get()
-    if (value === previousValue) return
+    if (value === previousValue) {
+      return
+    }
     previousValue = value
-    if (prepared || items || options().itemToLabel) return
-    if (selection.needsItems(false)) store.set({ prepared: true })
+    if (prepared || items || options().itemToLabel) {
+      return
+    }
+    if (selection.needsItems(false)) {
+      store.set({ prepared: true })
+    }
   })
 
   const api = {
     id,
     ...kit,
     getValue: () => store.get().value,
-    setValue: (value: unknown, { reason, event }: SelectChangeOptions<SelectValueChangeReason> = {}) =>
-      setValue(value, { reason, event }),
-    clear: ({ reason, event }: SelectChangeOptions<SelectValueChangeReason> = {}) =>
+    setValue: (
+      value: unknown,
+      { reason, event }: SelectChangeOptions<SelectValueChangeReason> = {}
+    ) => setValue(value, { reason, event }),
+    clear: ({
+      reason,
+      event,
+    }: SelectChangeOptions<SelectValueChangeReason> = {}) =>
       setValue(selection.empty(), { reason, event }),
     getQuery: () => store.get().query,
     setQuery: (
       query: string,
-      { reason = "imperative", event }: SelectChangeOptions<SelectQueryChangeReason> = {},
+      {
+        reason = "imperative",
+        event,
+      }: SelectChangeOptions<SelectQueryChangeReason> = {}
     ) => setQuery(query, reason, event),
     focus: () => focusTrigger(),
     // Internal. Used by slots and adapters.
@@ -436,23 +571,41 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       filterQuery,
       matchQuery: filterQuery,
       matchMode: () => matchMode(options().filter ?? "contains"),
-      typed: (event: Event) => setQuery((event.target as HTMLInputElement).value, "input-change", event),
+      typed: (event: Event) =>
+        setQuery(
+          (event.target as HTMLInputElement).value,
+          "input-change",
+          event
+        ),
       // The pointer highlights what it moves onto, focusing it unless focus stays in the search field.
       hover(key: string, event: PointerEvent) {
         const { open, highlighted } = store.get()
-        if (event.pointerType === "touch" || !open || listbox.isItemDisabled(key)) return
+        if (
+          event.pointerType === "touch" ||
+          !open ||
+          listbox.isItemDisabled(key)
+        ) {
+          return
+        }
         const el = listbox.element(key)
         const focused = searching() || el?.ownerDocument.activeElement === el
-        if (highlighted !== key || !focused) listbox.highlight(key, { event })
+        if (highlighted !== key || !focused) {
+          listbox.highlight(key, { event })
+        }
       },
       // Whether no item matches. Composed items register once the content binds.
-      isEmpty: (state: SelectState) => (!!state.items || state.settled) && listbox.count() === 0,
+      isEmpty: (state: SelectState) =>
+        (!!state.items || state.settled) && listbox.count() === 0,
       itemCount: () => listbox.count(),
       // The id aria-activedescendant points at while focus stays in the search field.
       activeDescendant(state: SelectState) {
         const { highlighted } = state
-        if (!state.open || state.focusInList || highlighted === null) return undefined
-        if (!listbox.element(highlighted)?.isConnected) return undefined
+        if (!state.open || state.focusInList || highlighted === null) {
+          return undefined
+        }
+        if (!listbox.element(highlighted)?.isConnected) {
+          return undefined
+        }
         return optionId(id, highlighted)
       },
       alignedAnchor,
@@ -473,7 +626,8 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
       arrowElement: () => element("arrow"),
       // The props an item last rendered with, read live by its registration.
       itemProps: (key: string) => context.props<SelectItemMeta>("item", key),
-      contentProps: (key?: string) => kit.internal.contentProps(key) as SelectContentProps,
+      contentProps: (key?: string) =>
+        kit.internal.contentProps(key) as SelectContentProps,
       // Web components read `default-value` as keys when items come later. Once
       // they arrive, a value that still names them takes their values, with no
       // change: it's still the default.
@@ -489,12 +643,20 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
         const lower = text.toLowerCase()
         const entry = listbox
           .entries()
-          .find((entry) => entry.key.toLowerCase() === lower || entry.label.toLowerCase() === lower)
-        if (entry && !store.get().multiple) setValue(entry.value, { reason: "item-press" })
+          .find(
+            (entry) =>
+              entry.key.toLowerCase() === lower ||
+              entry.label.toLowerCase() === lower
+          )
+        if (entry && !store.get().multiple) {
+          setValue(entry.value, { reason: "item-press" })
+        }
       },
       // The browser restores a disabled or read-only control too, as a native one.
       restore(saved: string) {
-        selection.restore(saved, (value) => change("value", value, { reason: "restore" }))
+        selection.restore(saved, (value) =>
+          change("value", value, { reason: "restore" })
+        )
       },
     },
   }
@@ -502,7 +664,13 @@ function selectApi(context: PrimitiveContext<SelectOptions<any, any>, SelectStat
 }
 
 // What an item part registers with: its props, and the group it's in.
-type SelectItemMeta = { value: unknown; label?: string; disabled?: boolean; group?: string; index?: number }
+type SelectItemMeta = {
+  value: unknown
+  label?: string
+  disabled?: boolean
+  group?: string
+  index?: number
+}
 
 /**
  * `select`'s api, which its slots and controller call. Adapters

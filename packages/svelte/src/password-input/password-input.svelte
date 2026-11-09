@@ -16,7 +16,11 @@ Holds the field and its toggle. Presses on its own text and icons focus the fiel
   import { useFieldControl, useFieldControlId } from "../field/context"
   import Part from "../part.svelte"
   import { readOnlyOf } from "../text-control"
-  import { useHandlePart, usePrimitive, type PartProps } from "../use-primitive.svelte"
+  import {
+    useHandlePart,
+    usePrimitive,
+    type PartProps,
+  } from "../use-primitive.svelte"
   import { PasswordInputKey, type PasswordInputContext } from "./context"
 
   let {
@@ -66,13 +70,23 @@ Holds the field and its toggle. Presses on its own text and icons focus the fiel
     debug,
     controlId,
     // The callbacks run first, so canceling there also keeps a bound value as it was.
-    onValueChange: (next: string, details: ChangeDetails<InputValueChangeReason>) => {
+    onValueChange: (
+      next: string,
+      details: ChangeDetails<InputValueChangeReason>
+    ) => {
       onValueChange?.(next, details)
-      if (!details.canceled) value = next
+      if (!details.canceled) {
+        value = next
+      }
     },
-    onVisibleChange: (next: boolean, details: ChangeDetails<PasswordInputVisibleChangeReason>) => {
+    onVisibleChange: (
+      next: boolean,
+      details: ChangeDetails<PasswordInputVisibleChangeReason>
+    ) => {
       onVisibleChange?.(next, details)
-      if (!details.canceled) visible = next
+      if (!details.canceled) {
+        visible = next
+      }
     },
   }))
   const context: PasswordInputContext = {

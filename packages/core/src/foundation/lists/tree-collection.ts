@@ -18,7 +18,12 @@ type TreeCollectionNode = {
   branch?: boolean
 }
 
-type Entry = { parent: string | null; children: string[]; branch: boolean; index: number }
+type Entry = {
+  parent: string | null
+  children: string[]
+  branch: boolean
+  index: number
+}
 
 /**
  * A tree's structure from its nodes, listed parents before children and
@@ -42,32 +47,50 @@ function createTreeCollection(nodes: Iterable<TreeCollectionNode>) {
   const entries = new Map<string, Entry>()
   const roots: string[] = []
   for (const node of nodes) {
-    if (entries.has(node.key)) continue
-    entries.set(node.key, { parent: node.parent, children: [], branch: !!node.branch, index: 0 })
+    if (entries.has(node.key)) {
+      continue
+    }
+    entries.set(node.key, {
+      parent: node.parent,
+      children: [],
+      branch: !!node.branch,
+      index: 0,
+    })
   }
   for (const [key, entry] of entries) {
     const parent = entry.parent === null ? undefined : entries.get(entry.parent)
-    if (!parent) entry.parent = null
+    if (!parent) {
+      entry.parent = null
+    }
     const siblings = parent ? parent.children : roots
     entry.index = siblings.push(key)
   }
 
   const none: readonly string[] = []
-  const children = (key: string | null) => (key === null ? roots : (entries.get(key)?.children ?? none))
+  const children = (key: string | null) =>
+    key === null ? roots : (entries.get(key)?.children ?? none)
   const parent = (key: string) => entries.get(key)?.parent ?? null
 
   function ancestors(key: string) {
     const found: string[] = []
-    for (let up = parent(key); up !== null; up = parent(up)) found.unshift(up)
+    for (let up = parent(key); up !== null; up = parent(up)) {
+      found.unshift(up)
+    }
     return found
   }
 
   // Every node under `key` in order, or every node for `null`, walking only
   // into the branches `enter` allows.
-  function walk(key: string | null, enter: (key: string) => boolean, into: string[]) {
+  function walk(
+    key: string | null,
+    enter: (key: string) => boolean,
+    into: string[]
+  ) {
     for (const child of children(key)) {
       into.push(child)
-      if (enter(child)) walk(child, enter, into)
+      if (enter(child)) {
+        walk(child, enter, into)
+      }
     }
     return into
   }
@@ -94,7 +117,9 @@ function createTreeCollection(nodes: Iterable<TreeCollectionNode>) {
     /** A node's place among its siblings, both counted from 1, as `aria-posinset` and `aria-setsize` count. */
     position(key: string) {
       const entry = entries.get(key)
-      if (!entry) return { index: 0, size: 0 }
+      if (!entry) {
+        return { index: 0, size: 0 }
+      }
       return { index: entry.index, size: children(entry.parent).length }
     },
     /** The keys of a node's ancestors, outermost first. */
@@ -110,7 +135,9 @@ function createTreeCollection(nodes: Iterable<TreeCollectionNode>) {
      * same keys, even when it's the same array changed in place.
      */
     visible(expanded: readonly string[]) {
-      if (lastExpanded && sameValue(lastExpanded, expanded)) return lastVisible
+      if (lastExpanded && sameValue(lastExpanded, expanded)) {
+        return lastVisible
+      }
       const open = new Set(expanded)
       lastExpanded = [...expanded]
       return (lastVisible = walk(null, (key) => open.has(key), []))
@@ -149,8 +176,15 @@ function treeDataNodes(items: readonly TreeItemData[]) {
   const nodes: (TreeCollectionNode & { item: TreeItemData })[] = []
   const add = (list: readonly TreeItemData[], parent: string | null) => {
     for (const item of list) {
-      nodes.push({ key: item.value, parent, branch: item.children !== undefined, item })
-      if (item.children) add(item.children, item.value)
+      nodes.push({
+        key: item.value,
+        parent,
+        branch: item.children !== undefined,
+        item,
+      })
+      if (item.children) {
+        add(item.children, item.value)
+      }
     }
   }
   add(items, null)
@@ -178,19 +212,27 @@ function treeFromPaths(paths: readonly string[]) {
   for (const path of paths) {
     const segments = path.split("/")
     const isFolder = segments.at(-1) === ""
-    if (isFolder) segments.pop()
+    if (isFolder) {
+      segments.pop()
+    }
     let into = top
     let prefix = ""
     segments.forEach((segment, index) => {
       prefix = prefix ? `${prefix}/${segment}` : segment
-      if (index < segments.length - 1 || isFolder) into = folder(prefix, segment, into)
-      else if (!into.some((item) => item.value === prefix)) into.push({ value: prefix, label: segment })
+      if (index < segments.length - 1 || isFolder) {
+        into = folder(prefix, segment, into)
+      } else if (!into.some((item) => item.value === prefix)) {
+        into.push({ value: prefix, label: segment })
+      }
     })
   }
   // check-code: allow return-type recursive, so TypeScript cannot infer it.
   const foldersFirst = (items: TreeItemData[]): TreeItemData[] =>
-    [...items.filter((item) => item.children), ...items.filter((item) => !item.children)].map((item) =>
-      item.children ? { ...item, children: foldersFirst(item.children) } : item,
+    [
+      ...items.filter((item) => item.children),
+      ...items.filter((item) => !item.children),
+    ].map((item) =>
+      item.children ? { ...item, children: foldersFirst(item.children) } : item
     )
   return foldersFirst(top)
 }
@@ -216,13 +258,22 @@ type TreeRow = {
  * a `TreeItem` with its `value`: the tree reads its level, place and children from the data.
  * @stable
  */
-function visibleTreeRows(items: readonly TreeItemData[], expanded: readonly string[]) {
+function visibleTreeRows(
+  items: readonly TreeItemData[],
+  expanded: readonly string[]
+) {
   const open = new Set(expanded)
   const rows: TreeRow[] = []
-  const add = (list: readonly TreeItemData[], parent: string | null, level: number) => {
+  const add = (
+    list: readonly TreeItemData[],
+    parent: string | null,
+    level: number
+  ) => {
     for (const item of list) {
       rows.push({ item, parent, level, index: rows.length })
-      if (item.children && open.has(item.value)) add(item.children, item.value, level + 1)
+      if (item.children && open.has(item.value)) {
+        add(item.children, item.value, level + 1)
+      }
     }
   }
   add(items, null, 1)

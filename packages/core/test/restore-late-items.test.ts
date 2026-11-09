@@ -19,21 +19,36 @@ const itemToValue = (item: Item) => String(item.id)
 type ListOptions = {
   multiple: boolean
   items?: typeof both
-  onValueChange?: (value: unknown, details: { reason: string; cancel: () => void }) => void
+  onValueChange?: (
+    value: unknown,
+    details: { reason: string; cancel: () => void }
+  ) => void
 }
 
 const lists = [
-  ["select", (options: ListOptions) => select({ id: "select", itemToValue, ...options })],
-  ["combobox", (options: ListOptions) => combobox({ id: "combobox", itemToValue, ...options })],
-  ["listbox", (options: ListOptions) => listbox({ id: "listbox", itemToValue, ...options })],
+  [
+    "select",
+    (options: ListOptions) => select({ id: "select", itemToValue, ...options }),
+  ],
+  [
+    "combobox",
+    (options: ListOptions) =>
+      combobox({ id: "combobox", itemToValue, ...options }),
+  ],
+  [
+    "listbox",
+    (options: ListOptions) =>
+      listbox({ id: "listbox", itemToValue, ...options }),
+  ],
 ] as const
 
 const flush = () => Promise.resolve()
 
-for (const [name, create] of lists)
-  for (const multiple of [false, true])
+for (const [name, create] of lists) {
+  for (const multiple of [false, true]) {
     describe(`a ${name}, multiple: ${multiple}`, () => {
-      const shaped = (...values: unknown[]) => (multiple ? values : (values[0] ?? null))
+      const shaped = (...values: unknown[]) =>
+        multiple ? values : (values[0] ?? null)
       const restored = (keys: string[], options: Partial<ListOptions> = {}) => {
         const instance = create({ multiple, ...options })
         instance.api.internal.restore(JSON.stringify(keys))
@@ -42,7 +57,7 @@ for (const [name, create] of lists)
       const supply = (
         instance: ReturnType<typeof create>,
         items: typeof both,
-        more?: Partial<ListOptions>,
+        more?: Partial<ListOptions>
       ) => {
         instance.setOptions({ id: name, itemToValue, multiple, items, ...more })
         return flush()
@@ -61,7 +76,9 @@ for (const [name, create] of lists)
 
       test("keeps a canceled restore canceled once the items arrive", async () => {
         const onValueChange: ListOptions["onValueChange"] = (_, details) => {
-          if (details.reason === "restore") details.cancel()
+          if (details.reason === "restore") {
+            details.cancel()
+          }
         }
         const instance = restored(["2"], { onValueChange })
         await supply(instance, both, { onValueChange })
@@ -72,7 +89,9 @@ for (const [name, create] of lists)
         const instance = create({
           multiple,
           onValueChange: (_, details) => {
-            if (details.reason === "restore") instance.api.setValue(shaped(one))
+            if (details.reason === "restore") {
+              instance.api.setValue(shaped(one))
+            }
           },
         })
         instance.api.internal.restore(JSON.stringify(["2"]))
@@ -108,19 +127,22 @@ for (const [name, create] of lists)
         expect(instance.get().value).toEqual(shaped("2"))
       })
 
-      if (multiple)
+      if (multiple) {
         test("keeps the items already restored as the rest arrive", async () => {
           const instance = restored(["1", "2"], { items: first })
           await supply(instance, second)
           expect(instance.get().value).toEqual([one, two])
         })
-      else
+      } else {
         test("waits only for the first saved key", async () => {
           const instance = restored(["1", "2"])
           await supply(instance, first)
           expect(instance.get().value).toEqual(one)
         })
+      }
     })
+  }
+}
 
 test("a combobox shows its restored item's label as the item arrives, with no query change", async () => {
   const heard: string[] = []

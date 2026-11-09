@@ -1,12 +1,23 @@
-import { input, inputGroup, textarea, type InputController } from "@ui-sdk/core/input"
+import {
+  input,
+  inputGroup,
+  textarea,
+  type InputController,
+} from "@ui-sdk/core/input"
 import { createParts, wrappedChild } from "./define-element"
 
-const textApi: ("getValue" | "setValue" | "clear" | "focus")[] = ["getValue", "setValue", "clear", "focus"]
+const textApi: ("getValue" | "setValue" | "clear" | "focus")[] = [
+  "getValue",
+  "setValue",
+  "clear",
+  "focus",
+]
 // `value` reads and writes the field like the controller, so a write fires `valuechange`.
 const textState = {
   value: {
     get: (api: InputController) => api.getValue(),
-    set: (api: InputController, value: string | null) => api.setValue(value ?? ""),
+    set: (api: InputController, value: string | null) =>
+      api.setValue(value ?? ""),
   },
 }
 
@@ -15,7 +26,11 @@ const controlProps = {
   attributes: ["disabled", "readonly", "required"],
   read: (el: HTMLElement) => {
     const field = el as HTMLInputElement | HTMLTextAreaElement
-    return { disabled: field.disabled, readOnly: field.readOnly, required: field.required }
+    return {
+      disabled: field.disabled,
+      readOnly: field.readOnly,
+      required: field.required,
+    }
   },
 }
 

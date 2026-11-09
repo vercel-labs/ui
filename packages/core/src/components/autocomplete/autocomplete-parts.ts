@@ -12,7 +12,11 @@ import type {
   AutocompleteTriggerState,
 } from "./autocomplete"
 import { fieldPart, optionPart } from "../../foundation/lists/autocomplete-core"
-import type { AutocompleteApi, AutocompleteItemMeta, AutocompleteState } from "./autocomplete-api"
+import type {
+  AutocompleteApi,
+  AutocompleteItemMeta,
+  AutocompleteState,
+} from "./autocomplete-api"
 import { openerOf } from "../../foundation/popups/popup"
 import { bindSheetInput } from "../../foundation/popups/presentation"
 import { watchFieldsets } from "../../foundation/forms/form"
@@ -30,9 +34,17 @@ import {
   warnIfUnnamed,
 } from "../../foundation/lists/listbox-parts"
 import { flagWhileBound } from "../../foundation/kernel/bound-keys"
-import { inputState, listContentPart, listId, listPart } from "../../foundation/lists/listbox-popup"
+import {
+  inputState,
+  listContentPart,
+  listId,
+  listPart,
+} from "../../foundation/lists/listbox-popup"
 import { itemIconPart, optionIcon } from "../../foundation/lists/item-icon"
-import { itemTextPart, type ListItemTextProps } from "../../foundation/lists/listbox-search"
+import {
+  itemTextPart,
+  type ListItemTextProps,
+} from "../../foundation/lists/listbox-search"
 import { openAttrs } from "../../foundation/kernel/attrs"
 import type { SlotFactory } from "../../foundation/kernel/primitive-types"
 import { selects } from "../../foundation/kernel/selects"
@@ -40,12 +52,17 @@ import { pressKeepsFocus } from "../../foundation/focus/press-keeps-focus"
 
 const noSuggestions: ListData<string> = []
 
-function contentState(state: AutocompleteState, { api }: { api: AutocompleteApi }) {
+function contentState(
+  state: AutocompleteState,
+  { api }: { api: AutocompleteApi }
+) {
   return {
     open: state.open,
     presentation: state.presentation,
     status: state.status,
-    items: (api.internal.listbox.visibleData()?.list as ListData<string> | undefined) ?? noSuggestions,
+    items:
+      (api.internal.listbox.visibleData()?.list as
+        ListData<string> | undefined) ?? noSuggestions,
   }
 }
 
@@ -86,12 +103,20 @@ const unreadByItems = {
   readonly never[]
 >
 
-const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>) => ({
+const autocompleteSlots = (
+  slot: SlotFactory<AutocompleteState, AutocompleteApi>
+) => ({
   label: slot({
-    attrs: (state, { id }) => ({ id: `${id}-label`, for: `${id}-input`, ...formAttrs(state) }),
+    attrs: (state, { id }) => ({
+      id: `${id}-label`,
+      for: `${id}-input`,
+      ...formAttrs(state),
+    }),
     // A label that isn't a native one for the field, like a custom element, focuses it all the same.
     press({ api, el }) {
-      if (el instanceof HTMLLabelElement && el.control) return
+      if (el instanceof HTMLLabelElement && el.control) {
+        return
+      }
       api.focus()
     },
     bind: (el, { store }) => flagWhileBound(store, "labeled"),
@@ -125,34 +150,50 @@ const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>
     on: {
       ...field.on,
       focusin(event, { api, store }) {
-        if (api.internal.options().openOnFocus && !store.get().open)
+        if (api.internal.options().openOnFocus && !store.get().open) {
           api.internal.show({ event, by: "keyboard", reason: "trigger-focus" })
+        }
       },
       focusout(event, { api, store }) {
         const next = event.relatedTarget as Node | null
-        if (!store.get().open) return
+        if (!store.get().open) {
+          return
+        }
         // A sheet stays open when the keyboard goes away, with what was typed.
-        if (!next && store.get().presentation === "sheet") return
-        if (next && (api.internal.ownsElement(next) || api.internal.contentElement()?.contains(next))) return
+        if (!next && store.get().presentation === "sheet") {
+          return
+        }
+        if (
+          next &&
+          (api.internal.ownsElement(next) ||
+            api.internal.contentElement()?.contains(next))
+        ) {
+          return
+        }
         // Focus leaving the page, like to another window, is the layer's to decide.
-        if (!next && !document.hasFocus()) return
+        if (!next && !document.hasFocus()) {
+          return
+        }
         api.internal.hide({ reason: "focus-out", event })
       },
     },
     // A press on the field reopens suggestions that open on focus, like after Escape closed them.
     press({ api, store }, event) {
-      if (store.get().open || !api.internal.options().openOnFocus) return
+      if (store.get().open || !api.internal.options().openOnFocus) {
+        return
+      }
       api.internal.show({ event, by: openerOf(event), reason: "trigger-press" })
     },
     bind(el, context) {
       const { api, id } = context
       const input = el as HTMLInputElement
-      if (dev)
+      if (dev) {
         warnIfUnnamed(
           el,
           "The field has no accessible name. Add an AutocompleteLabel, a Field label or an aria-label.",
-          { component: "autocomplete", id },
+          { component: "autocomplete", id }
         )
+      }
       const cleanups = [
         field.bind(el, context),
         api.internal.bindReset(input),
@@ -160,7 +201,8 @@ const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>
         bindSheetInput(el, {
           store: context.store,
           presentation: api.internal.presentation,
-          open: (event) => api.internal.show({ event, by: "touch", reason: "trigger-press" }),
+          open: (event) =>
+            api.internal.show({ event, by: "touch", reason: "trigger-press" }),
         }),
       ]
       return () => cleanups.forEach((cleanup) => cleanup())
@@ -182,15 +224,19 @@ const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>
     on: pressKeepsFocus,
     press({ api, store }, event) {
       api.internal.inputElement()?.focus({ preventScroll: true })
-      if (store.get().open) api.internal.hide({ reason: "trigger-press", event })
-      else api.internal.show({ event, by: "pointer", reason: "trigger-press" })
+      if (store.get().open) {
+        api.internal.hide({ reason: "trigger-press", event })
+      } else {
+        api.internal.show({ event, by: "pointer", reason: "trigger-press" })
+      }
     },
   }),
 
   // A button that empties the field. Shown while there's text to clear.
   clear: slot<AutocompleteClearProps, AutocompleteClearState>({
     props: { keepMounted: "boolean" },
-    present: (state, { props }) => !!props.keepMounted || (state.value !== "" && !isLocked(state)),
+    present: (state, { props }) =>
+      !!props.keepMounted || (state.value !== "" && !isLocked(state)),
     state: (state) => ({ disabled: isLocked(state) }),
     attrs: (state) => ({
       type: "button",
@@ -214,7 +260,9 @@ const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>
   // header at the top of the content that the field moves into while the
   // sheet is open. The adapters render both, inside the content's.
   viewport: slot({ present: (state) => state.presentation === "sheet" }),
-  header: slot({ present: (state) => state.presentation === "sheet" && state.open }),
+  header: slot({
+    present: (state) => state.presentation === "sheet" && state.open,
+  }),
 
   list: slot<{}, AutocompleteContentState>({
     ...listPart<AutocompleteState, AutocompleteApi>(),
@@ -223,7 +271,11 @@ const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>
 
   item: slot<AutocompleteItemMeta, AutocompleteItemState>({
     ...optionPart<AutocompleteState, AutocompleteApi>(),
-    selects: selects({ highlighted: ({ key }) => [key], listing: ({ key }) => [key], ...unreadByItems }),
+    selects: selects({
+      highlighted: ({ key }) => [key],
+      listing: ({ key }) => [key],
+      ...unreadByItems,
+    }),
     state: (state, { key, props }) => ({
       highlighted: state.highlighted === key,
       disabled: !!props.disabled,
@@ -232,12 +284,15 @@ const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>
 
   // The suggestion's text, with what the field's text matched in `<mark>`.
   "item-text": slot<ListItemTextProps, AutocompleteItemTextState>(
-    itemTextPart<AutocompleteState, AutocompleteApi>(),
+    itemTextPart<AutocompleteState, AutocompleteApi>()
   ),
 
   // An icon inside a suggestion.
   "item-icon": slot(
-    itemIconPart<AutocompleteState, AutocompleteApi>({ component: "autocomplete", ...optionIcon }),
+    itemIconPart<AutocompleteState, AutocompleteApi>({
+      component: "autocomplete",
+      ...optionIcon,
+    })
   ),
 
   group: slot(optionGroupPart<AutocompleteState, AutocompleteApi>()),
@@ -250,7 +305,9 @@ const autocompleteSlots = (slot: SlotFactory<AutocompleteState, AutocompleteApi>
 
   status: slot(statusPart<AutocompleteState, AutocompleteApi>()),
 
-  arrow: slot<{}, AutocompleteArrowState>(arrowPart<AutocompleteState, AutocompleteApi>()),
+  arrow: slot<{}, AutocompleteArrowState>(
+    arrowPart<AutocompleteState, AutocompleteApi>()
+  ),
 })
 
 export { autocompleteSlots }

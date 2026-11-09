@@ -6,14 +6,33 @@
 // token-input-editing.ts, state and the API in token-input-api.ts, and parts
 // in token-input-parts.ts.
 import { createController } from "../../foundation/kernel/controller"
-import type { ChangeDetails, ChangeOptions } from "../../foundation/kernel/details"
+import type {
+  ChangeDetails,
+  ChangeOptions,
+} from "../../foundation/kernel/details"
 import { definePrimitive } from "../../foundation/kernel/primitive"
-import type { Named, PrimitiveOptions } from "../../foundation/kernel/primitive-types"
+import type {
+  Named,
+  PrimitiveOptions,
+} from "../../foundation/kernel/primitive-types"
 import type { HistoryOptions } from "../../foundation/kernel/history"
-import type { TextEditorAdapter, TextRange, Token, TokenInsert } from "../../foundation/text/text-editor"
-import { fromText, type TokenCodec, type TokenInputValue } from "./token-input-model"
+import type {
+  TextEditorAdapter,
+  TextRange,
+  Token,
+  TokenInsert,
+} from "../../foundation/text/text-editor"
+import {
+  fromText,
+  type TokenCodec,
+  type TokenInputValue,
+} from "./token-input-model"
 import { tokenInputSlots } from "./token-input-parts"
-import { initialTokenInputState, syncTokenInputState, tokenInputApi } from "./token-input-api"
+import {
+  initialTokenInputState,
+  syncTokenInputState,
+  tokenInputApi,
+} from "./token-input-api"
 
 /**
  * Why a token input's value wants to change.
@@ -45,12 +64,13 @@ type TokenInputSubmitDetails = {
  * What `onValueChange` receives besides the value.
  * @stable
  */
-type TokenInputValueChangeDetails = ChangeDetails<TokenInputValueChangeReason> & {
-  /** The browser's input type for typing, like `"insertText"` or `"deleteContentBackward"`. */
-  inputType?: string
-  /** The tokens the old value held and the new one doesn't, matched by id. */
-  removed: Token[]
-}
+type TokenInputValueChangeDetails =
+  ChangeDetails<TokenInputValueChangeReason> & {
+    /** The browser's input type for typing, like `"insertText"` or `"deleteContentBackward"`. */
+    inputType?: string
+    /** The tokens the old value held and the new one doesn't, matched by id. */
+    removed: Token[]
+  }
 
 /**
  * How Backspace and Delete treat a token next to the caret.
@@ -76,7 +96,10 @@ function createTokenInputController() {
      * Replaces the value as one undoable step.
      * Returns false when the change was canceled or nothing changed.
      */
-    setValue: (value: TokenInputValue, options?: TokenInputChangeOptions) => boolean
+    setValue: (
+      value: TokenInputValue,
+      options?: TokenInputChangeOptions
+    ) => boolean
     /** The value as codec text, like `Ask [@Ada](mention:ada)`. */
     getText: (codec?: TokenCodec) => string
     /** The value as people read it, with each token's label. */
@@ -93,7 +116,7 @@ function createTokenInputController() {
         at?: "caret" | "end" | TextRange
         /** Keeps a token pending until this settles. */
         resolve?: PromiseLike<void | Partial<TokenInsert>>
-      },
+      }
     ) => boolean
     /**
      * Changes a token's status, data or label without an undo step or a caret move.
@@ -142,7 +165,10 @@ type TokenInputOptions = {
   /** The value at first, when uncontrolled. A form reset returns to it. */
   defaultValue?: TokenInputValue
   /** Runs when typing, pasting, a menu, undo or a controller wants to change the value. `details.reason` says why, `details.removed` lists removed tokens, and `details.cancel()` stops it. */
-  onValueChange?: (value: TokenInputValue, details: TokenInputValueChangeDetails) => void
+  onValueChange?: (
+    value: TokenInputValue,
+    details: TokenInputValueChangeDetails
+  ) => void
   /**
    * Runs on the submit shortcut, unless an input method is composing or a trigger menu is open. Without it, the shortcut submits the form the input is in. With neither, the key is left alone, so Enter starts a new line.
    */
@@ -242,7 +268,8 @@ type TokenInputTokenProps = {
 }
 
 // Reads a custom element's `value` attribute: codec text, like `Ask [@Ada](mention:ada)`.
-const valueAttribute = (attribute: string | null) => (attribute === null ? undefined : fromText(attribute))
+const valueAttribute = (attribute: string | null) =>
+  attribute === null ? undefined : fromText(attribute)
 
 const tokenInputPrimitive = /* @__PURE__ */ definePrimitive({
   name: "token-input",
@@ -305,6 +332,11 @@ export {
 }
 export type { TokenInputApi } from "./token-input-api"
 export type { HistoryOptions } from "../../foundation/kernel/history"
-export type { TextEditorAdapter, TextRange, Token, TokenInsert } from "../../foundation/text/text-editor"
+export type {
+  TextEditorAdapter,
+  TextRange,
+  Token,
+  TokenInsert,
+} from "../../foundation/text/text-editor"
 export type { TokenCodec, TokenInputValue } from "./token-input-model"
 export { defaultCodec, fromText, toLabel, toText } from "./token-input-model"

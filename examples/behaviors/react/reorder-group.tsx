@@ -18,7 +18,14 @@ type BacklogState = {
 const backlog = definePrimitive({
   name: "backlog",
   state: (): BacklogState => ({
-    value: ["Login page", "Search", "Dark mode", "Exports", "Billing", "Onboarding"],
+    value: [
+      "Login page",
+      "Search",
+      "Dark mode",
+      "Exports",
+      "Billing",
+      "Onboarding",
+    ],
     selected: [],
     focused: null,
     moving: null,
@@ -27,7 +34,10 @@ const backlog = definePrimitive({
     const { store } = context
     const change = createChange(context)
     return {
-      roving: createRovingFocus<BacklogState, { value: string }>(context, { slot: "task", key: "focused" }),
+      roving: createRovingFocus<BacklogState, { value: string }>(context, {
+        slot: "task",
+        key: "focused",
+      }),
       reorder: createReorder<BacklogState>(context, {
         slot: "task",
         key: "value",
@@ -41,7 +51,9 @@ const backlog = definePrimitive({
       tick(key: string) {
         const { selected } = store.get()
         store.set({
-          selected: selected.includes(key) ? selected.filter((other) => other !== key) : [...selected, key],
+          selected: selected.includes(key)
+            ? selected.filter((other) => other !== key)
+            : [...selected, key],
         })
       },
     }
@@ -56,17 +68,25 @@ const backlog = definePrimitive({
       attrs: (state, part) => ({
         role: "listitem",
         tabindex: part.api.roving.tabIndex(state, part),
-        "data-moving": part.api.reorder.moving(state, part.key) ? "" : undefined,
-        "data-dragging": part.api.reorder.dragging(state, part.key) ? "" : undefined,
+        "data-moving": part.api.reorder.moving(state, part.key)
+          ? ""
+          : undefined,
+        "data-dragging": part.api.reorder.dragging(state, part.key)
+          ? ""
+          : undefined,
         style: "touch-action:none;user-select:none",
       }),
       on: {
         keydown: (event, { el, api, key }) =>
           api.reorder.keydown(event, key) || api.roving.keydown(event, el!),
-        pointerdown: (event, { api, key }) => api.reorder.pointerdown(event, key),
+        pointerdown: (event, { api, key }) =>
+          api.reorder.pointerdown(event, key),
       },
       bind: (el, part) => {
-        const cleanups = [part.api.roving.bind(el, part), part.api.reorder.bind(el, part)]
+        const cleanups = [
+          part.api.roving.bind(el, part),
+          part.api.reorder.bind(el, part),
+        ]
         return () => cleanups.forEach((cleanup) => cleanup())
       },
     }),

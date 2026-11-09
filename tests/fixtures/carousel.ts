@@ -48,9 +48,13 @@ function carouselOptions() {
     playToggle: params.has("playing") || params.has("play-toggle"),
     controlled: params.has("controlled"),
     options: {
-      ...(perPage && { slidesPerPage: perPage === "auto" ? ("auto" as const) : Number(perPage) }),
+      ...(perPage && {
+        slidesPerPage: perPage === "auto" ? ("auto" as const) : Number(perPage),
+      }),
       ...(align && { align: align as "start" | "center" | "end" }),
-      ...(orientation && { orientation: orientation as "horizontal" | "vertical" }),
+      ...(orientation && {
+        orientation: orientation as "horizontal" | "vertical",
+      }),
       ...(params.has("loop") && { loop: true }),
       ...(params.has("playing") && { defaultPlaying: true }),
       ...(interval && { interval: Number(interval) }),

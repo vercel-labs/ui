@@ -75,7 +75,10 @@ function formsOptions() {
     plan: params.get("plan") ?? undefined,
     readOnly: params.has("readonly"),
     disabled: params.has("disabled"),
-    invalid: params.get("invalid") === "false" ? false : params.has("invalid") || undefined,
+    invalid:
+      params.get("invalid") === "false"
+        ? false
+        : params.has("invalid") || undefined,
     cancel: params.get("cancel"),
     loop: params.get("loop") === "false" ? false : undefined,
     controlled: params.has("controlled"),
@@ -86,7 +89,9 @@ function formsOptions() {
 
 // What a form would submit, as a query string.
 function serialize(form: HTMLFormElement) {
-  return new URLSearchParams(new FormData(form) as unknown as Record<string, string>).toString()
+  return new URLSearchParams(
+    new FormData(form) as unknown as Record<string, string>
+  ).toString()
 }
 
 export { formsFixture, formsOptions, serialize }

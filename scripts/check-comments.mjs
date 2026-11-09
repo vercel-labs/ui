@@ -14,12 +14,17 @@ const exampleCode = /^examples\/(?!scripts\/|experiments\/)[^/]+\/[^/]+\//
 // Files comment-length leaves alone, each with why.
 const commentLengthSkips = {
   "scripts/check-code.mjs": "Its header documents every rule it checks.",
-  "scripts/check-packages.mjs": "Its header documents everything it checks in the packed packages.",
+  "scripts/check-packages.mjs":
+    "Its header documents everything it checks in the packed packages.",
 }
 
 const root = path.resolve(import.meta.dirname, "..")
 const git = (...args) =>
-  execFileSync("git", args, { cwd: root, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 })
+  execFileSync("git", args, {
+    cwd: root,
+    encoding: "utf8",
+    maxBuffer: 64 * 1024 * 1024,
+  })
 const base = process.argv[2] ?? git("merge-base", "HEAD", "origin/main").trim()
 const violations = []
 
@@ -28,18 +33,30 @@ checkExampleComments()
 
 if (violations.length) {
   console.error(
-    violations.map(({ file, line, rule, message }) => `${file}:${line} ${rule} ${message}`).join("\n"),
+    violations
+      .map(
+        ({ file, line, rule, message }) => `${file}:${line} ${rule} ${message}`
+      )
+      .join("\n")
   )
   process.exitCode = 1
 }
 
 function checkCommentLength() {
   for (const [file, changed] of changedLines()) {
-    if (file in commentLengthSkips) continue
+    if (file in commentLengthSkips) {
+      continue
+    }
     for (const comment of commentsOf(file)) {
       const lineCount = comment.end - comment.start + 1
-      if (lineCount <= maxLines) continue
-      if (!changed.some((line) => line >= comment.start && line <= comment.end)) continue
+      if (lineCount <= maxLines) {
+        continue
+      }
+      if (
+        !changed.some((line) => line >= comment.start && line <= comment.end)
+      ) {
+        continue
+      }
       violations.push({
         file,
         line: comment.start,
@@ -51,9 +68,19 @@ function checkCommentLength() {
 }
 
 function checkExampleComments() {
-  const files = git("ls-files", "-z", "--cached", "--others", "--exclude-standard", "examples").split("\0")
+  const files = git(
+    "ls-files",
+    "-z",
+    "--cached",
+    "--others",
+    "--exclude-standard",
+    "examples"
+  ).split("\0")
   const examples = files.filter(
-    (file) => exampleCode.test(file) && sourceFile.test(file) && existsSync(path.join(root, file)),
+    (file) =>
+      exampleCode.test(file) &&
+      sourceFile.test(file) &&
+      existsSync(path.join(root, file))
   )
   for (const file of examples) {
     for (const comment of commentsOf(file)) {
@@ -61,7 +88,8 @@ function checkExampleComments() {
         file,
         line: comment.start,
         rule: "example-comments",
-        message: "examples have no comments. The docs page around the example explains it.",
+        message:
+          "examples have no comments. The docs page around the example explains it.",
       })
     }
   }
@@ -75,16 +103,26 @@ function commentsOf(file) {
   let open
   lines.forEach((text, index) => {
     const line = text.trim()
-    if (open && !open.closer && isLineComment(line)) return
-    if (open && !open.closer) comments.push(close(index - 1))
+    if (open && !open.closer && isLineComment(line)) {
+      return
+    }
+    if (open && !open.closer) {
+      comments.push(close(index - 1))
+    }
     if (open?.closer) {
-      if (line.includes(open.closer)) comments.push(close(index))
+      if (line.includes(open.closer)) {
+        comments.push(close(index))
+      }
       return
     }
     open = commentStartOf(line, index, lines[index + 1]?.trim())
-    if (open?.closer && line.includes(open.closer, 2)) comments.push(close(index))
+    if (open?.closer && line.includes(open.closer, 2)) {
+      comments.push(close(index))
+    }
   })
-  if (open) comments.push(close(lines.length - 1))
+  if (open) {
+    comments.push(close(lines.length - 1))
+  }
   return comments
 
   function close(index) {
@@ -99,32 +137,70 @@ function isLineComment(line) {
 }
 
 function commentStartOf(line, index, next) {
-  if (isLineComment(line)) return { start: index }
-  if (toolDirective.test(line)) return
-  if (/^(\{\s*)?\/\*(?!\*)/.test(line)) return { start: index, closer: "*/" }
-  if (line.startsWith("<!-- @component") || (line === "<!--" && next?.startsWith("@component"))) return
-  if (line.startsWith("<!--")) return { start: index, closer: "-->" }
+  if (isLineComment(line)) {
+    return { start: index }
+  }
+  if (toolDirective.test(line)) {
+    return
+  }
+  if (/^(\{\s*)?\/\*(?!\*)/.test(line)) {
+    return { start: index, closer: "*/" }
+  }
+  if (
+    line.startsWith("<!-- @component") ||
+    (line === "<!--" && next?.startsWith("@component"))
+  ) {
+    return
+  }
+  if (line.startsWith("<!--")) {
+    return { start: index, closer: "-->" }
+  }
 }
 
 // The lines each source file gained since `base`, with untracked files whole.
 function changedLines() {
   const changed = new Map()
   let file
-  for (const line of git("diff", "-U0", "--diff-filter=d", base, "--", ".").split("\n")) {
-    if (line.startsWith("+++ ")) file = line.slice(6)
+  for (const line of git(
+    "diff",
+    "-U0",
+    "--diff-filter=d",
+    base,
+    "--",
+    "."
+  ).split("\n")) {
+    if (line.startsWith("+++ ")) {
+      file = line.slice(6)
+    }
     const hunk = line.match(/^@@ -\S+ \+(\d+)(?:,(\d+))? @@/)
-    if (!hunk || !sourceFile.test(file)) continue
+    if (!hunk || !sourceFile.test(file)) {
+      continue
+    }
     const [start, count] = [Number(hunk[1]), Number(hunk[2] ?? 1)]
     const lines = changed.get(file) ?? []
-    for (let offset = 0; offset < count; offset++) lines.push(start + offset)
+    for (let offset = 0; offset < count; offset++) {
+      lines.push(start + offset)
+    }
     changed.set(file, lines)
   }
-  for (const untracked of git("ls-files", "--others", "--exclude-standard", "-z").split("\0")) {
-    if (!sourceFile.test(untracked) || !existsSync(path.join(root, untracked))) continue
-    const count = readFileSync(path.join(root, untracked), "utf8").split("\n").length
+  for (const untracked of git(
+    "ls-files",
+    "--others",
+    "--exclude-standard",
+    "-z"
+  ).split("\0")) {
+    if (
+      !sourceFile.test(untracked) ||
+      !existsSync(path.join(root, untracked))
+    ) {
+      continue
+    }
+    const count = readFileSync(path.join(root, untracked), "utf8").split(
+      "\n"
+    ).length
     changed.set(
       untracked,
-      Array.from({ length: count }, (_, index) => index + 1),
+      Array.from({ length: count }, (_, index) => index + 1)
     )
   }
   return changed

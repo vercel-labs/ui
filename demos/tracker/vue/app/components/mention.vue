@@ -2,7 +2,11 @@
 import { personOf } from "tracker-data"
 import { computed } from "vue"
 import { Avatar } from "~/components/ui/avatar"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "~/components/ui/hover-card"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "~/components/ui/hover-card"
 
 const props = defineProps<{ id: string; label: string }>()
 
@@ -15,7 +19,9 @@ const person = computed(() => personOf(props.id))
       class="rounded-sm font-medium text-foreground underline-offset-4 outline-none hover:underline focus-visible:ring-3 focus-visible:ring-ring/30"
     >
       <template #render="{ props: trigger }">
-        <NuxtLink v-bind="trigger" :to="`/?tab=all&assignee=${person.id}`">@{{ person.name }}</NuxtLink>
+        <NuxtLink v-bind="trigger" :to="`/?tab=all&assignee=${person.id}`"
+          >@{{ person.name }}</NuxtLink
+        >
       </template>
     </HoverCardTrigger>
     <HoverCardContent>

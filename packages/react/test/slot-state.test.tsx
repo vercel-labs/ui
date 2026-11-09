@@ -23,7 +23,9 @@ const board = definePrimitive({
   slots: (slot) => ({
     column: slot<{ value: string }, { cards: Card[] }>({
       props: { value: "string" },
-      state: (state, { key }) => ({ cards: state.cards.filter((card) => card.column === key) }),
+      state: (state, { key }) => ({
+        cards: state.cards.filter((card) => card.column === key),
+      }),
     }),
   }),
 })
@@ -42,7 +44,7 @@ function Column() {
         renders++
         return state.cards.map((card) => card.id).join(",")
       },
-    },
+    }
   )
 }
 
@@ -102,7 +104,7 @@ test("state derived as new objects renders once per change to their values", asy
           markerRenders++
           return `${state.point.x},${state.points[0]!.x}`
         },
-      },
+      }
     )
   }
   function Plot() {
@@ -157,7 +159,7 @@ test("state derived as new cyclic objects renders once per change, without overf
           nodeRenders++
           return String(state.node.self!.x)
         },
-      },
+      }
     )
   }
   function Graph() {

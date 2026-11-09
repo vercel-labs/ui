@@ -26,10 +26,15 @@ import { kitchenSink, type Env } from "./shell"
 import { flakyAction, type Variant } from "./variants"
 
 function Body({ variant, onDirty }: { variant: Variant; onDirty: () => void }) {
-  if (variant.body === "text") return null
-  if (variant.body === "long")
-    return Array.from({ length: 40 }, (_, index) => <p key={index}>Line {index + 1}</p>)
-  if (variant.body === "dialog-form")
+  if (variant.body === "text") {
+    return null
+  }
+  if (variant.body === "long") {
+    return Array.from({ length: 40 }, (_, index) => (
+      <p key={index}>Line {index + 1}</p>
+    ))
+  }
+  if (variant.body === "dialog-form") {
     return (
       <form method="dialog" className="mb-4 flex gap-2">
         <button className={classes.button} value="draft">
@@ -40,10 +45,13 @@ function Body({ variant, onDirty }: { variant: Variant; onDirty: () => void }) {
         </button>
       </form>
     )
-  if (variant.body === "nested")
+  }
+  if (variant.body === "nested") {
     return (
       <Dialog>
-        <DialogTrigger className={`${classes.trigger} mb-4`}>Advanced</DialogTrigger>
+        <DialogTrigger className={`${classes.trigger} mb-4`}>
+          Advanced
+        </DialogTrigger>
         <DialogBackdrop className={classes.backdrop()} />
         <DialogContent className={classes.content()}>
           <DialogTitle className={classes.title}>Advanced settings</DialogTitle>
@@ -51,6 +59,7 @@ function Body({ variant, onDirty }: { variant: Variant; onDirty: () => void }) {
         </DialogContent>
       </Dialog>
     )
+  }
   return (
     <label className="mb-4 flex flex-col gap-1">
       Name
@@ -84,40 +93,67 @@ function VariantDialog({ variant, env }: { variant: Variant; env: Env }) {
         {...(variant.guard && { dismissible: !dirty })}
         onDismissAttempt={(details) => {
           env.log(`dismissAttempt (${details.reason})`)
-          if (variant.guard && window.confirm("Discard changes?")) controller.close()
+          if (variant.guard && window.confirm("Discard changes?")) {
+            controller.close()
+          }
         }}
         onOpenChange={(next, details) => {
-          if (!next) setDirty(false)
-          if (variant.controlled) setOpen(next)
+          if (!next) {
+            setDirty(false)
+          }
+          if (variant.controlled) {
+            setOpen(next)
+          }
           env.log(
-            `openChange ${next} (${details.reason})${details.returnValue ? ` returnValue=${details.returnValue}` : ""}`,
+            `openChange ${next} (${details.reason})${details.returnValue ? ` returnValue=${details.returnValue}` : ""}`
           )
         }}
         onOpenChangeComplete={(next) => env.log(`openChangeComplete ${next}`)}
       >
         <Trigger className={classes.trigger} shortcut={variant.shortcut}>
           {variant.trigger ?? "Open"}
-          {variant.shortcut && <Shortcut className="text-xs text-neutral-500" />}
+          {variant.shortcut && (
+            <Shortcut className="text-xs text-neutral-500" />
+          )}
         </Trigger>
-        {backdrop === "part" && <Backdrop className={classes.backdrop(variant.animation)} />}
-        <Content className={classes.content(variant.animation, backdrop === "pseudo")} {...variant.content}>
-          {variant.titled !== false && <Title className={classes.title}>{variant.title}</Title>}
-          <Description className={classes.description}>{variant.note ?? "A dialog."}</Description>
-          {!variant.alert && <Body variant={variant} onDirty={() => setDirty(true)} />}
+        {backdrop === "part" && (
+          <Backdrop className={classes.backdrop(variant.animation)} />
+        )}
+        <Content
+          className={classes.content(variant.animation, backdrop === "pseudo")}
+          {...variant.content}
+        >
+          {variant.titled !== false && (
+            <Title className={classes.title}>{variant.title}</Title>
+          )}
+          <Description className={classes.description}>
+            {variant.note ?? "A dialog."}
+          </Description>
+          {!variant.alert && (
+            <Body variant={variant} onDirty={() => setDirty(true)} />
+          )}
           <div className="flex justify-end gap-2">
             {!variant.alert && (
-              <button className={classes.button} data-save="" onClick={() => env.log("save")}>
+              <button
+                className={classes.button}
+                data-save=""
+                onClick={() => env.log("save")}
+              >
                 Save
               </button>
             )}
-            <Close className={classes.button}>{variant.alert ? "Cancel" : "Close"}</Close>
+            <Close className={classes.button}>
+              {variant.alert ? "Cancel" : "Close"}
+            </Close>
             {variant.alert && (
               <Close
                 className={classes.danger}
                 value="confirm"
                 {...(variant.action && { action: flakyAction })}
               >
-                {(state) => (state.pending ? "Deleting…" : state.error ? "Retry" : "Delete")}
+                {(state) =>
+                  state.pending ? "Deleting…" : state.error ? "Retry" : "Delete"
+                }
               </Close>
             )}
           </div>
@@ -125,7 +161,11 @@ function VariantDialog({ variant, env }: { variant: Variant; env: Env }) {
       </Root>
       {variant.controlled && (
         <label className="flex items-center gap-1.5 text-xs text-neutral-600">
-          <input type="checkbox" checked={open} onChange={(event) => setOpen(event.target.checked)} />
+          <input
+            type="checkbox"
+            checked={open}
+            onChange={(event) => setOpen(event.target.checked)}
+          />
           open
         </label>
       )}
@@ -138,8 +178,8 @@ function mount(root: HTMLElement) {
     createRoot(slot).render(
       <React.StrictMode>
         <VariantDialog variant={variant} env={env} />
-      </React.StrictMode>,
-    ),
+      </React.StrictMode>
+    )
   )
 }
 

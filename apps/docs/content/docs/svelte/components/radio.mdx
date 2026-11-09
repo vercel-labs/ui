@@ -157,7 +157,9 @@ The indicator has `data-starting-style` as it appears and `data-ending-style` wh
 ```
 
 ```svelte
-<RadioIndicator class="transition-[opacity,scale] duration-150 data-starting-style:scale-50 data-starting-style:opacity-0 data-ending-style:scale-50 data-ending-style:opacity-0" />
+<RadioIndicator
+  class="transition-[opacity,scale] duration-150 data-starting-style:scale-50 data-starting-style:opacity-0 data-ending-style:scale-50 data-ending-style:opacity-0"
+/>
 ```
 
 </StyleTabs>
@@ -174,9 +176,7 @@ The indicator has `data-starting-style` as it appears and `data-ending-style` wh
 Arrow keys wrap from the last radio to the first. Set `loop` to `false` to stop at the ends.
 
 ```svelte
-<RadioGroup defaultValue="low" loop={false}>
-  ...
-</RadioGroup>
+<RadioGroup defaultValue="low" loop={false}>...</RadioGroup>
 ```
 
 ## Custom Rendering
@@ -214,31 +214,52 @@ Props and callbacks are the same as below, as Svelte props. `value` can be bound
 
 ### RadioGroup
 
-<TypeTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupOptions" />
+<TypeTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupOptions"
+/>
 
 ### Radio
 
-<TypeTable path="../../packages/core/src/components/radio/radio.ts" name="RadioProps" />
+<TypeTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioProps"
+/>
 
 ### RadioIndicator
 
-<TypeTable path="../../packages/core/src/components/radio/radio.ts" name="RadioIndicatorProps" />
+<TypeTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioIndicatorProps"
+/>
 
 ### State
 
 What render functions, state-based class names and slots receive.
 
-<StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupState" />
+<StateTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupState"
+/>
 
-<StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioState" />
+<StateTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioState"
+/>
 
-<StateTable path="../../packages/core/src/components/radio/radio.ts" name="RadioIndicatorState" />
+<StateTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioIndicatorState"
+/>
 
 ### Reasons
 
 `details.reason` says why the checked value changed.
 
-<ReasonTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupValueChangeReason" />
+<ReasonTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupValueChangeReason"
+/>
 
 ### Controller
 
@@ -246,7 +267,10 @@ Create one with `createRadioGroupController()` and pass it as `controller`.
 
 Every write method takes an optional `{ reason, event }`, runs the change callback like a press, and returns `false` when the change is canceled.
 
-<ControllerTable path="../../packages/core/src/components/radio/radio.ts" name="RadioGroupController" />
+<ControllerTable
+  path="../../packages/core/src/components/radio/radio.ts"
+  name="RadioGroupController"
+/>
 
 ### Events
 

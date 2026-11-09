@@ -5,7 +5,10 @@ Removes its item's file, or the `file` it's given. It's named "Remove
 @stable
 -->
 <script lang="ts">
-  import { fileInput, type FileInputItemRemoveState } from "@ui-sdk/core/file-input"
+  import {
+    fileInput,
+    type FileInputItemRemoveState,
+  } from "@ui-sdk/core/file-input"
   import { fileKey } from "@ui-sdk/core/renderer"
   import Part from "../part.svelte"
   import { usePart } from "../instance"

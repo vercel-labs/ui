@@ -47,7 +47,9 @@ function mount(root: HTMLElement) {
   `
   const dialog = root.querySelector("ui-dialog")!
   root.querySelector("ui-menu")!.addEventListener("action", (event) => {
-    if (event.detail.value === "rename") dialog.api.open()
+    if (event.detail.value === "rename") {
+      dialog.api.open()
+    }
   })
 }
 

@@ -18,9 +18,14 @@ const action = ref("")
         <a v-bind="props">Old docs</a>
       </template>
     </Button>
-    <Toggle @pressed-change="(pressed) => (action = pressed ? 'star' : 'unstar')">
+    <Toggle
+      @pressed-change="(pressed) => (action = pressed ? 'star' : 'unstar')"
+    >
       <template #render="{ props, state }">
-        <button v-bind="props" :class="['toggle', state.pressed ? 'is-pressed' : 'is-unpressed']">
+        <button
+          v-bind="props"
+          :class="['toggle', state.pressed ? 'is-pressed' : 'is-unpressed']"
+        >
           <span aria-hidden="true">{{ state.pressed ? "★" : "☆" }}</span> Star
         </button>
       </template>

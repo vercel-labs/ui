@@ -38,7 +38,11 @@ const commands: CommandData = [
           { value: "system", label: "System" },
         ],
       },
-      { value: "language", label: "Change language…", items: ["English", "Français", "Deutsch", "日本語"] },
+      {
+        value: "language",
+        label: "Change language…",
+        items: ["English", "Français", "Deutsch", "日本語"],
+      },
       { value: "sign-out", label: "Sign out", shortcut: "mod+shift+q" },
     ],
   },
@@ -49,7 +53,10 @@ function Example() {
   return (
     <div data-slot="stack">
       <Command items={commands} onAction={(value) => log(`Ran ${value}`)}>
-        <CommandInput aria-label="Search commands" placeholder="Type a command…" />
+        <CommandInput
+          aria-label="Search commands"
+          placeholder="Type a command…"
+        />
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandList>{(state) => <Commands items={state.items} />}</CommandList>
       </Command>
@@ -60,7 +67,9 @@ function Example() {
 function Commands({ items }: { items: CommandData }) {
   return items.map((entry, index) => {
     if (typeof entry !== "string" && "type" in entry) {
-      if (entry.type === "separator") return <CommandSeparator key={`separator-${index}`} />
+      if (entry.type === "separator") {
+        return <CommandSeparator key={`separator-${index}`} />
+      }
       return (
         <CommandGroup key={entry.label}>
           <CommandGroupLabel>{entry.label}</CommandGroupLabel>
@@ -68,7 +77,8 @@ function Commands({ items }: { items: CommandData }) {
         </CommandGroup>
       )
     }
-    const command: CommandDataItem = typeof entry === "string" ? { value: entry, label: entry } : entry
+    const command: CommandDataItem =
+      typeof entry === "string" ? { value: entry, label: entry } : entry
     return (
       <CommandItem
         key={command.value}

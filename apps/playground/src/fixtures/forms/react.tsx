@@ -1,10 +1,24 @@
-import { Checkbox, CheckboxGroup, CheckboxIndicator } from "@ui-sdk/react/checkbox"
-import { Field, FieldControl, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/react/field"
+import {
+  Checkbox,
+  CheckboxGroup,
+  CheckboxIndicator,
+} from "@ui-sdk/react/checkbox"
+import {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/react/field"
 import { Radio, RadioGroup, RadioIndicator } from "@ui-sdk/react/radio"
 import { Switch, SwitchThumb } from "@ui-sdk/react/switch"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
-import { formsFixture as f, formsOptions, serialize } from "tests/fixtures/forms.ts"
+import {
+  formsFixture as f,
+  formsOptions,
+  serialize,
+} from "tests/fixtures/forms.ts"
 
 function Fixture() {
   const options = formsOptions()
@@ -15,8 +29,14 @@ function Fixture() {
   const [shipping, setShipping] = React.useState(false)
   const all = f.toppings.items.map((item) => item.value)
   // Records a change, or cancels it when the URL asks.
-  const report = (name: string, value: unknown, details: { cancel: () => void; source: string }) => {
-    if (options.cancel === name) return details.cancel()
+  const report = (
+    name: string,
+    value: unknown,
+    details: { cancel: () => void; source: string }
+  ) => {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     setAction(`${name}:${String(value)}`)
     setSource(details.source)
   }
@@ -44,7 +64,9 @@ function Fixture() {
               {...(options.controlled && { checked: terms })}
               onCheckedChange={(checked, details) => {
                 report(f.terms.name, checked, details)
-                if (!details.canceled) setTerms(checked)
+                if (!details.canceled) {
+                  setTerms(checked)
+                }
               }}
             >
               <CheckboxIndicator className="checkbox-indicator" />
@@ -66,7 +88,9 @@ function Fixture() {
             defaultValue={f.toppings.defaultValue}
             allValues={all}
             required={options.toppingsRequired}
-            onValueChange={(value, details) => report(f.toppings.name, value.join(","), details)}
+            onValueChange={(value, details) =>
+              report(f.toppings.name, value.join(","), details)
+            }
           >
             <label>
               <Checkbox className="checkbox" parent>
@@ -91,7 +115,9 @@ function Fixture() {
               className="switch"
               name={item.name}
               defaultChecked={item.defaultChecked}
-              onCheckedChange={(checked, details) => report(item.name, checked, details)}
+              onCheckedChange={(checked, details) =>
+                report(item.name, checked, details)
+              }
             >
               <SwitchThumb className="switch-thumb" />
             </Switch>
@@ -109,11 +135,17 @@ function Fixture() {
             readOnly={options.readOnly}
             disabled={options.disabled}
             loop={options.loop}
-            onValueChange={(value, details) => report(f.plan.name, value, details)}
+            onValueChange={(value, details) =>
+              report(f.plan.name, value, details)
+            }
           >
             {f.plan.items.map((item) => (
               <label key={item.value}>
-                <Radio className="radio" value={item.value} disabled={item.disabled}>
+                <Radio
+                  className="radio"
+                  value={item.value}
+                  disabled={item.disabled}
+                >
                   <RadioIndicator className="radio-indicator" />
                 </Radio>
                 {item.label}
@@ -154,7 +186,12 @@ function Fixture() {
         </div>
       </form>
       <label>
-        <Checkbox className="checkbox" form={f.formId} name={f.newsletter.name} value={f.newsletter.value}>
+        <Checkbox
+          className="checkbox"
+          form={f.formId}
+          name={f.newsletter.name}
+          value={f.newsletter.value}
+        >
           <CheckboxIndicator className="checkbox-indicator" />
         </Checkbox>
         {f.newsletter.label}
@@ -178,7 +215,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

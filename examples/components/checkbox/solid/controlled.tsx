@@ -1,4 +1,7 @@
-import { createCheckboxController, type CheckedState } from "@ui-sdk/core/checkbox"
+import {
+  createCheckboxController,
+  type CheckedState,
+} from "@ui-sdk/core/checkbox"
 import { Checkbox, CheckboxIndicator } from "@ui-sdk/solid/checkbox"
 import { createSignal } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
@@ -20,7 +23,9 @@ function Example() {
           checked={checked()}
           onCheckedChange={(next, details) => {
             setChecked(next)
-            log(`${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`)
+            log(
+              `${next === "indeterminate" ? "Mixed" : next ? "Checked" : "Unchecked"} (${details.reason})`
+            )
           }}
           controller={updates}
         >

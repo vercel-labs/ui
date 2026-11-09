@@ -12,9 +12,11 @@ function mount(root: HTMLElement) {
     </ui-field>
   `
   const count = root.querySelector("ui-field-description")!
-  root.querySelector("ui-textarea")!.addEventListener("valuechange", (event) => {
-    count.textContent = `${event.detail.value.length} / 160 characters`
-  })
+  root
+    .querySelector("ui-textarea")!
+    .addEventListener("valuechange", (event) => {
+      count.textContent = `${event.detail.value.length} / 160 characters`
+    })
 }
 
 export { mount }

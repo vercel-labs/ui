@@ -4,14 +4,17 @@ import { describe, expect, test } from "vitest"
 import { createSSRApp, h } from "vue"
 import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src"
 
-const render = (props: Record<string, unknown>, panel: Record<string, unknown> = {}) =>
+const render = (
+  props: Record<string, unknown>,
+  panel: Record<string, unknown> = {}
+) =>
   renderToString(
     createSSRApp(() =>
       h(Collapsible, props, () => [
         h(CollapsibleTrigger, null, () => "Details"),
         h(CollapsiblePanel, panel, () => "Panel"),
-      ]),
-    ),
+      ])
+    )
   )
 
 // Runs with no DOM: any access to window or document during render throws.
@@ -28,6 +31,8 @@ describe("server rendering a collapsible", () => {
   })
 
   test("renders a findable panel as hidden until found, so find in page works before hydration", async () => {
-    expect(await render({}, { hiddenUntilFound: true })).toMatch(/<div[^>]*hidden="until-found"[^>]*>Panel/)
+    expect(await render({}, { hiddenUntilFound: true })).toMatch(
+      /<div[^>]*hidden="until-found"[^>]*>Panel/
+    )
   })
 })

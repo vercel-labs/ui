@@ -1,5 +1,11 @@
 <script lang="ts">
-  import { Slider, SliderControl, SliderIndicator, SliderThumb, SliderTrack } from "@ui-sdk/svelte"
+  import {
+    Slider,
+    SliderControl,
+    SliderIndicator,
+    SliderThumb,
+    SliderTrack,
+  } from "@ui-sdk/svelte"
   import { countRender, perfSize, perfThumbs } from "tests/fixtures/perf.ts"
 
   // A slider with N thumbs for the counts specs. Every other
@@ -10,7 +16,10 @@
   // and a plain one never does. The indicator counts in its render snippet,
   // whose text reads the props, so it re-runs when its attributes change.
   const values = perfThumbs(perfSize())
-  const count = (kind: "watched" | "plain" | "indicator", ...reads: unknown[]) => (countRender(kind), "")
+  const count = (
+    kind: "watched" | "plain" | "indicator",
+    ...reads: unknown[]
+  ) => (countRender(kind), "")
 </script>
 
 <div class="fixture">
@@ -25,13 +34,23 @@
         </SliderIndicator>
         {#each values as _, index (index)}
           {#if index % 2}
-            <SliderThumb {index} class="slider-thumb" aria-label={`Thumb ${index + 1}`}>
+            <SliderThumb
+              {index}
+              class="slider-thumb"
+              aria-label={`Thumb ${index + 1}`}
+            >
               {#snippet children(state)}
-                <span data-value={state.thumbValue}>{count("watched", state.thumbValue)}</span>
+                <span data-value={state.thumbValue}
+                  >{count("watched", state.thumbValue)}</span
+                >
               {/snippet}
             </SliderThumb>
           {:else}
-            <SliderThumb {index} class="slider-thumb" aria-label={`Thumb ${index + 1}`}>
+            <SliderThumb
+              {index}
+              class="slider-thumb"
+              aria-label={`Thumb ${index + 1}`}
+            >
               {count("plain")}
             </SliderThumb>
           {/if}

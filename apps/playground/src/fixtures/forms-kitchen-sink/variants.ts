@@ -42,7 +42,13 @@ const toppings: Variant["items"] = [
 ]
 
 const variants: Variant[] = [
-  { id: "checkbox-default", section: "Checkbox", title: "Default", kind: "checkbox", options: { name: "a" } },
+  {
+    id: "checkbox-default",
+    section: "Checkbox",
+    title: "Default",
+    kind: "checkbox",
+    options: { name: "a" },
+  },
   {
     id: "checkbox-checked",
     section: "Checkbox",
@@ -142,7 +148,13 @@ const variants: Variant[] = [
     controller: true,
   },
 
-  { id: "switch-default", section: "Switch", title: "Default", kind: "switch", options: { name: "s" } },
+  {
+    id: "switch-default",
+    section: "Switch",
+    title: "Default",
+    kind: "switch",
+    options: { name: "s" },
+  },
   {
     id: "switch-checked",
     section: "Switch",
@@ -295,7 +307,11 @@ const variants: Variant[] = [
     section: "Checkbox group",
     title: "Parent with all values",
     kind: "checkbox-group",
-    options: { name: "t", defaultValue: ["cheese"], allValues: ["cheese", "mushrooms", "olives"] },
+    options: {
+      name: "t",
+      defaultValue: ["cheese"],
+      allValues: ["cheese", "mushrooms", "olives"],
+    },
     items: toppings,
     parent: true,
   },
@@ -335,8 +351,20 @@ const variants: Variant[] = [
     controlled: true,
   },
 
-  { id: "field-submit", section: "Field", title: "Errors on submit", kind: "field", field: {} },
-  { id: "field-invalid", section: "Field", title: "Marked invalid", kind: "field", field: { invalid: true } },
+  {
+    id: "field-submit",
+    section: "Field",
+    title: "Errors on submit",
+    kind: "field",
+    field: {},
+  },
+  {
+    id: "field-invalid",
+    section: "Field",
+    title: "Marked invalid",
+    kind: "field",
+    field: { invalid: true },
+  },
   {
     id: "field-not-invalid",
     section: "Field",
@@ -344,7 +372,13 @@ const variants: Variant[] = [
     kind: "field",
     field: { invalid: false },
   },
-  { id: "field-disabled", section: "Field", title: "Disabled", kind: "field", field: { disabled: true } },
+  {
+    id: "field-disabled",
+    section: "Field",
+    title: "Disabled",
+    kind: "field",
+    field: { disabled: true },
+  },
   {
     id: "field-checkbox",
     section: "Field",

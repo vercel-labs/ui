@@ -16,13 +16,19 @@ const topics = [
   <Field>
     <FieldLabel>Email me about</FieldLabel>
     <Listbox multiple activation="automatic" :default-value="['mentions']">
-      <ListboxItem v-for="topic in topics" :key="topic.value" :value="topic.value">
+      <ListboxItem
+        v-for="topic in topics"
+        :key="topic.value"
+        :value="topic.value"
+      >
         {{ topic.label }}
         <ListboxItemIndicator>
           <CheckIcon aria-hidden="true" />
         </ListboxItemIndicator>
       </ListboxItem>
     </Listbox>
-    <FieldDescription>Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription>
+    <FieldDescription
+      >Hold Shift to select a range, or Ctrl or ⌘ to add one.</FieldDescription
+    >
   </Field>
 </template>

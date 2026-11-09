@@ -30,7 +30,12 @@ describe("devtools hook", () => {
     instance.api.open()
     instance.api.close({ reason: "close-press" })
     instance.destroy()
-    expect(events.map((event) => event.type)).toEqual(["instance", "change", "change", "instance"])
+    expect(events.map((event) => event.type)).toEqual([
+      "instance",
+      "change",
+      "change",
+      "instance",
+    ])
     expect(events[1]).toMatchObject({
       type: "change",
       component: "popover",
@@ -42,7 +47,11 @@ describe("devtools hook", () => {
       canceled: false,
       controlled: false,
     })
-    expect(events[3]).toMatchObject({ type: "instance", action: "destroy", id: "p1" })
+    expect(events[3]).toMatchObject({
+      type: "instance",
+      action: "destroy",
+      id: "p1",
+    })
   })
 
   test("hears a commit, with its reason and source", () => {
@@ -66,7 +75,10 @@ describe("devtools hook", () => {
 
   test("hears a button's action going pending and failing, which no one can refuse", async () => {
     const events = listen()
-    const instance = button({ id: "b1", action: () => Promise.reject(new Error("Offline")) })
+    const instance = button({
+      id: "b1",
+      action: () => Promise.reject(new Error("Offline")),
+    })
     instance.api.internal.press()
     await new Promise((resolve) => setTimeout(resolve))
     expect(
@@ -79,7 +91,7 @@ describe("devtools hook", () => {
           source,
           canceled,
           controlled,
-        ]),
+        ])
     ).toEqual([
       ["pending", "true", "action", "programmatic", false, false],
       ["pending", "false", "action", "programmatic", false, false],
@@ -94,12 +106,18 @@ describe("devtools hook", () => {
       onOpenChange: (_open, details) => details.event?.preventDefault(),
     })
     const press = () => new Event("click", { cancelable: true }) as MouseEvent
-    instance.api.internal.control.show({ reason: "trigger-press", event: press() })
-    instance.api.internal.control.hide({ reason: "trigger-press", event: press() })
+    instance.api.internal.control.show({
+      reason: "trigger-press",
+      event: press(),
+    })
+    instance.api.internal.control.hide({
+      reason: "trigger-press",
+      event: press(),
+    })
     expect(instance.api.isOpen()).toBe(false)
     expect(warn.mock.calls.map(([message]) => String(message))).toEqual([
       expect.stringContaining(
-        "popover#p5: `details.event.preventDefault()` in `onOpenChange` stopped the browser's default, not the change.",
+        "popover#p5: `details.event.preventDefault()` in `onOpenChange` stopped the browser's default, not the change."
       ),
     ])
   })
@@ -135,7 +153,7 @@ describe("devtools hook", () => {
     vi.advanceTimersByTime(1500)
     expect(warn).toHaveBeenCalledTimes(1)
     expect(String(warn.mock.calls[0][0])).toContain(
-      "popover#p3: asked to open (`imperative`, `programmatic`)",
+      "popover#p3: asked to open (`imperative`, `programmatic`)"
     )
   })
 
@@ -176,13 +194,20 @@ describe("devtools hook", () => {
 describe("missing slots", () => {
   test("a slot no one defined warns once for its primitive, however often its parts read it", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
-    const thing = definePrimitive({ name: "thing", state: () => ({}), api: () => ({}), slots: () => ({}) })
+    const thing = definePrimitive({
+      name: "thing",
+      state: () => ({}),
+      api: () => ({}),
+      slots: () => ({}),
+    })
     for (const id of ["w1", "w2"]) {
       const part = thing({ id }).part("missing" as never)
       attrs(part)
       attrs(part)
     }
-    const warned = warn.mock.calls.filter(([message]) => String(message).includes('"missing" part'))
+    const warned = warn.mock.calls.filter(([message]) =>
+      String(message).includes('"missing" part')
+    )
     expect(warned).toHaveLength(1)
   })
 })

@@ -9,7 +9,10 @@ import * as React from "react"
 import { dialogParts, type TriggerPartProps } from "./dialog-parts"
 
 // The alert dialog's slots and state are the dialog's. Only its options are narrower.
-const alertParts = dialogParts(alertDialogPrimitive as unknown as typeof dialogPrimitive, "AlertDialog")
+const alertParts = dialogParts(
+  alertDialogPrimitive as unknown as typeof dialogPrimitive,
+  "AlertDialog"
+)
 
 /**
  * The props of `AlertDialog`.
@@ -23,14 +26,20 @@ type AlertDialogProps = AlertDialogOptions & { children?: React.ReactNode }
  * @stable
  */
 function AlertDialog(props: AlertDialogProps) {
-  return <alertParts.Root {...(props as React.ComponentProps<typeof alertParts.Root>)} />
+  return (
+    <alertParts.Root
+      {...(props as React.ComponentProps<typeof alertParts.Root>)}
+    />
+  )
 }
 
 /**
  * The button that opens the alert dialog. A trigger outside the alert dialog connects through `controller`.
  * @stable
  */
-function AlertDialogTrigger(props: TriggerPartProps & Pick<AlertDialogTriggerProps, "controller">) {
+function AlertDialogTrigger(
+  props: TriggerPartProps & Pick<AlertDialogTriggerProps, "controller">
+) {
   return <alertParts.Trigger {...props} />
 }
 
@@ -72,7 +81,11 @@ const AlertDialogClose = alertParts.Close
  */
 const AlertDialogShortcut = alertParts.Shortcut
 
-export { confirm, createAlertDialogController, createConfirm } from "@ui-sdk/core/alert-dialog"
+export {
+  confirm,
+  createAlertDialogController,
+  createConfirm,
+} from "@ui-sdk/core/alert-dialog"
 export type {
   AlertDialogBackdropState,
   AlertDialogCloseActionDetails,

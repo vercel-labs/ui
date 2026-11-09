@@ -1,7 +1,11 @@
 import { render } from "@solidjs/web"
 import { createSignal, flush } from "solid-js"
 import { expect, test } from "vitest"
-import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "../src/collapsible"
+import {
+  Collapsible,
+  CollapsiblePanel,
+  CollapsibleTrigger,
+} from "../src/collapsible"
 import { Listbox, ListboxItem } from "../src/listbox"
 
 function mount(code: () => any) {
@@ -13,7 +17,9 @@ function mount(code: () => any) {
 }
 
 const settle = async () => {
-  for (let i = 0; i < 3; i++) await Promise.resolve()
+  for (let i = 0; i < 3; i++) {
+    await Promise.resolve()
+  }
   flush()
 }
 
@@ -25,7 +31,9 @@ test("Solid's bound event form runs first and can prevent the part's action", as
   }
   const { root, dispose } = mount(() => (
     <Collapsible onOpenChange={(open) => calls.push(`open:${open}`)}>
-      <CollapsibleTrigger onClick={[prevent, "part"]}>Details</CollapsibleTrigger>
+      <CollapsibleTrigger onClick={[prevent, "part"]}>
+        Details
+      </CollapsibleTrigger>
       <CollapsiblePanel>Panel</CollapsiblePanel>
     </Collapsible>
   ))
@@ -40,7 +48,12 @@ test("a form gets every value once multiple turns on", async () => {
   const [value, setValue] = createSignal<string | string[]>("a")
   const { root, dispose } = mount(() => (
     <form>
-      <Listbox name="choice" aria-label="Choice" multiple={multiple() as false} value={value() as string}>
+      <Listbox
+        name="choice"
+        aria-label="Choice"
+        multiple={multiple() as false}
+        value={value() as string}
+      >
         <ListboxItem value="a">A</ListboxItem>
         <ListboxItem value="b">B</ListboxItem>
       </Listbox>

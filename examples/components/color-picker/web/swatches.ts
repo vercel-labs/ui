@@ -1,7 +1,16 @@
 import "@ui-sdk/web/color-picker"
 import { createElement, Pipette } from "lucide"
 
-const presets = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#0ea5e9", "#6366f1", "#a855f7", "#ec4899"]
+const presets = [
+  "#ef4444",
+  "#f97316",
+  "#eab308",
+  "#22c55e",
+  "#0ea5e9",
+  "#6366f1",
+  "#a855f7",
+  "#ec4899",
+]
 
 function mount(root: HTMLElement) {
   root.innerHTML = `

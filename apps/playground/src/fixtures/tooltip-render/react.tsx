@@ -18,7 +18,9 @@ function Fixture() {
             </button>
           )}
         />
-        <TooltipContent className={(state) => (state.open ? "tooltip is-open" : "tooltip")}>
+        <TooltipContent
+          className={(state) => (state.open ? "tooltip is-open" : "tooltip")}
+        >
           All systems normal
         </TooltipContent>
       </Tooltip>

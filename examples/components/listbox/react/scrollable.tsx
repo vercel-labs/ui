@@ -1,6 +1,10 @@
 "use client"
 
-import { Listbox, ListboxItem, ListboxItemIndicator } from "@ui-sdk/react/listbox"
+import {
+  Listbox,
+  ListboxItem,
+  ListboxItemIndicator,
+} from "@ui-sdk/react/listbox"
 import { CheckIcon } from "lucide-react"
 import { useLog } from "../../../shared/react/log"
 
@@ -18,7 +22,9 @@ function Example() {
       defaultValue="utc9"
       onHighlight={(value, details) =>
         value &&
-        log(`Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`)
+        log(
+          `Focused ${timezones[details.index].label} (${details.index + 1} of ${timezones.length})`
+        )
       }
       aria-label="Time zone"
     >

@@ -34,9 +34,11 @@ function mount(root: HTMLElement) {
     </div>
   `
   const group = root.querySelector("ui-resizable")!
-  root.querySelector("ui-checkbox")!.addEventListener("checkedchange", (event) => {
-    group.toggleAttribute("disabled", event.detail.value === true)
-  })
+  root
+    .querySelector("ui-checkbox")!
+    .addEventListener("checkedchange", (event) => {
+      group.toggleAttribute("disabled", event.detail.value === true)
+    })
 }
 
 export { mount }

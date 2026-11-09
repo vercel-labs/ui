@@ -15,7 +15,12 @@ const log = useLog()
 
 <template>
   <Field>
-    <Slider @value-commit="(value, details) => log(`Saved ${value} (${details.reason})`)" :default-value="50">
+    <Slider
+      @value-commit="
+        (value, details) => log(`Saved ${value} (${details.reason})`)
+      "
+      :default-value="50"
+    >
       <div data-slot="row">
         <FieldLabel>Brightness</FieldLabel>
         <SliderValue />

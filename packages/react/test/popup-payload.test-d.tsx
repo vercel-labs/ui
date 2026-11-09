@@ -22,7 +22,9 @@ type Day = { count: number }
   </TooltipContent>
 </Tooltip>
 ;<Popover>
-  <PopoverContent<Day> className={(state) => (state.payload?.count ? "busy" : "")} />
+  <PopoverContent<Day>
+    className={(state) => (state.payload?.count ? "busy" : "")}
+  />
 </Popover>
 ;<HoverCard>
   <HoverCardContent<Day>>{(state) => state.payload?.count}</HoverCardContent>
@@ -31,7 +33,9 @@ type Day = { count: number }
   <DialogContent<Day>>{(state) => state.payload?.count}</DialogContent>
 </Dialog>
 ;<AlertDialog>
-  <AlertDialogContent<Day>>{(state) => state.payload?.count}</AlertDialogContent>
+  <AlertDialogContent<Day>>
+    {(state) => state.payload?.count}
+  </AlertDialogContent>
 </AlertDialog>
 ;<Drawer>
   <DrawerContent<Day>>{(state) => state.payload?.count}</DrawerContent>

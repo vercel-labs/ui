@@ -24,7 +24,8 @@
     data-variant="card"
     bind:open
     controller={collapsible}
-    onOpenChange={(next, details) => log(`${next ? "Opened" : "Closed"} (${details.reason})`)}
+    onOpenChange={(next, details) =>
+      log(`${next ? "Opened" : "Closed"} (${details.reason})`)}
   >
     <CollapsibleTrigger>
       <span data-slot="stack">

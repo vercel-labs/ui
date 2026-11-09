@@ -3,13 +3,17 @@ import * as classes from "./classes"
 import { itemsOf, kitchenSink } from "./shell"
 import type { Variant } from "./variants"
 
-const kebab = (name: string) => name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
+const kebab = (name: string) =>
+  name.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`)
 
 // An accordion in every item, two levels deep. Items carry their path for the event log.
 function nested(path: string, depth = 1) {
   // Typed, so the recursion doesn't need this function's return type.
   const items: string[] = ["One", "Two"].map((label) => {
-    const inner = depth < 2 ? nested(`${path}/${label}`, depth + 1) : `Inside ${path}/${label}.`
+    const inner =
+      depth < 2
+        ? nested(`${path}/${label}`, depth + 1)
+        : `Inside ${path}/${label}.`
     return `
       <ui-accordion-item value="${label}" data-path="${path}/${label}">
         <ui-accordion-header><h3 class="${classes.header}"><ui-accordion-trigger><button class="${classes.trigger}">Level ${depth}, ${label.toLowerCase()}</button></ui-accordion-trigger></h3></ui-accordion-header>
@@ -21,23 +25,32 @@ function nested(path: string, depth = 1) {
 
 // What the second item's panel holds.
 function body(variant: Variant, content: string) {
-  if (variant.body === "long")
-    return Array.from({ length: 20 }, (_, index) => `<p>Line ${index + 1}</p>`).join("")
-  if (variant.body === "form")
+  if (variant.body === "long") {
+    return Array.from(
+      { length: 20 },
+      (_, index) => `<p>Line ${index + 1}</p>`
+    ).join("")
+  }
+  if (variant.body === "form") {
     return `<label class="flex flex-col">${content}<input class="${classes.input}" value="Ada" aria-label="Name" /></label>`
-  if (variant.body === "nested")
+  }
+  if (variant.body === "nested") {
     return `<ui-accordion class="${classes.root}">${["Nested one", "Nested two"]
       .map(
         (label) => `
         <ui-accordion-item value="${label}">
           <ui-accordion-header><h3 class="${classes.header}"><ui-accordion-trigger><button class="${classes.trigger}">${label}</button></ui-accordion-trigger></h3></ui-accordion-header>
           <ui-accordion-panel class="${classes.panel()}"><div class="${classes.inner}">Inside ${label.toLowerCase()}.</div></ui-accordion-panel>
-        </ui-accordion-item>`,
+        </ui-accordion-item>`
       )
       .join("")}</ui-accordion>`
-  if (variant.body === "nested-deep") return nested("b")
-  if (variant.body === "grow")
+  }
+  if (variant.body === "nested-deep") {
+    return nested("b")
+  }
+  if (variant.body === "grow") {
     return `<div class="flex flex-col gap-1"><p>Line 1</p><button data-grow class="${classes.button} self-start">Add a line</button></div>`
+  }
   return content
 }
 
@@ -51,8 +64,13 @@ function mount(root: HTMLElement) {
     const accordion = document.createElement("ui-accordion") as AccordionElement
     accordion.className = classes.root
     for (const [option, value] of Object.entries(variant.options ?? {})) {
-      if (option === "debug") continue
-      accordion.setAttribute(kebab(option), Array.isArray(value) ? value.join(",") : String(value))
+      if (option === "debug") {
+        continue
+      }
+      accordion.setAttribute(
+        kebab(option),
+        Array.isArray(value) ? value.join(",") : String(value)
+      )
     }
     const list = itemsOf(variant)
     accordion.innerHTML = list
@@ -76,14 +94,19 @@ function mount(root: HTMLElement) {
           </ui-accordion-item>`
       })
       .join("")
-    const wrapper = Object.assign(document.createElement("div"), { className: "flex flex-col gap-2" })
+    const wrapper = Object.assign(document.createElement("div"), {
+      className: "flex flex-col gap-2",
+    })
     wrapper.append(accordion)
     slot.append(wrapper)
 
     // Callbacks are DOM events on the elements. Nested accordions bubble theirs too.
     accordion.addEventListener("valuechange", (event) => {
-      if (event.target !== accordion) return
-      const detail = (event as CustomEvent<{ value: string[]; reason: string }>).detail
+      if (event.target !== accordion) {
+        return
+      }
+      const detail = (event as CustomEvent<{ value: string[]; reason: string }>)
+        .detail
       if (variant.cancel && detail.value.includes(variant.cancel)) {
         event.preventDefault()
         env.log(`valueChange ${JSON.stringify(detail.value)} canceled`)
@@ -98,25 +121,33 @@ function mount(root: HTMLElement) {
         const detail = (event as CustomEvent<{ value: boolean }>).detail
         // Nested items log their path.
         if (item.parentElement !== accordion) {
-          if (item.dataset.path) env.log(`${item.dataset.path} openChange ${detail.value}`)
+          if (item.dataset.path) {
+            env.log(`${item.dataset.path} openChange ${detail.value}`)
+          }
           return
         }
         const value = item.getAttribute("value")
-        if (variant.itemCancel === value) event.preventDefault()
-        env.log(`${value} openChange ${detail.value}${variant.itemCancel === value ? " canceled" : ""}`)
+        if (variant.itemCancel === value) {
+          event.preventDefault()
+        }
+        env.log(
+          `${value} openChange ${detail.value}${variant.itemCancel === value ? " canceled" : ""}`
+        )
       },
-      { capture: true },
+      { capture: true }
     )
     accordion.addEventListener(
       "openchangecomplete",
       (event) => {
         const item = event.target as HTMLElement
         const open = (event as CustomEvent<{ value: boolean }>).detail.value
-        if (item.parentElement === accordion)
+        if (item.parentElement === accordion) {
           env.log(`${item.getAttribute("value")} openChangeComplete ${open}`)
-        else if (item.dataset.path) env.log(`${item.dataset.path} openChangeComplete ${open}`)
+        } else if (item.dataset.path) {
+          env.log(`${item.dataset.path} openChangeComplete ${open}`)
+        }
       },
-      { capture: true },
+      { capture: true }
     )
 
     const grow = accordion.querySelector<HTMLButtonElement>("[data-grow]")
@@ -124,8 +155,8 @@ function mount(root: HTMLElement) {
       grow.before(
         Object.assign(document.createElement("p"), {
           textContent: `Line ${grow.parentElement!.querySelectorAll("p").length + 1}`,
-        }),
-      ),
+        })
+      )
     )
 
     // Moving the items reconnects them, and data-index follows.
@@ -135,7 +166,11 @@ function mount(root: HTMLElement) {
         textContent: "Reverse items",
       })
       reverse.addEventListener("click", () =>
-        accordion.append(...[...accordion.querySelectorAll(":scope > ui-accordion-item")].reverse()),
+        accordion.append(
+          ...[
+            ...accordion.querySelectorAll(":scope > ui-accordion-item"),
+          ].reverse()
+        )
       )
       wrapper.append(reverse)
     }
@@ -154,7 +189,9 @@ function mount(root: HTMLElement) {
           className: "rounded border border-neutral-200 px-2 py-1",
           textContent: label,
         })
-        button.addEventListener("click", () => accordion.api?.setValue([...value]))
+        button.addEventListener("click", () =>
+          accordion.api?.setValue([...value])
+        )
         buttons.append(button)
       }
       wrapper.append(buttons)

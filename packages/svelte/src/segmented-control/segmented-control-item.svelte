@@ -13,8 +13,12 @@ One option, and the hidden native radio that takes part in the form.
   import Part from "../part.svelte"
   import type { PartProps } from "../use-primitive.svelte"
 
-  let { value, disabled, ...rest }: PartProps<"button", SegmentedControlItemState> & SegmentedControlItemProps =
-    $props()
+  let {
+    value,
+    disabled,
+    ...rest
+  }: PartProps<"button", SegmentedControlItemState> &
+    SegmentedControlItemProps = $props()
 
   const item = () => ({ value, disabled })
   const button = usePart(segmentedControl, "item", item)

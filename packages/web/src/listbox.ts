@@ -1,6 +1,17 @@
-import { listbox, type ListData, type ListboxApi, type ListboxOptions } from "@ui-sdk/core/listbox"
+import {
+  listbox,
+  type ListData,
+  type ListboxApi,
+  type ListboxOptions,
+} from "@ui-sdk/core/listbox"
 import { createParts } from "./define-element"
-import { adoptDefaultValue, listAttribute, renderListItems, templateOf, valuesOf } from "./list"
+import {
+  adoptDefaultValue,
+  listAttribute,
+  renderListItems,
+  templateOf,
+  valuesOf,
+} from "./list"
 
 const owner = "ui-listbox"
 
@@ -32,15 +43,20 @@ function defineListboxElements() {
       display: "block",
       options: (el) => {
         const data = el as ListboxElement
-        const multiple = el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
-        const start = el.getAttribute("default-value") ?? el.getAttribute("value")
-        const toValues = (keys: string[]) => valuesOf(keys, data.items, data.itemToValue)
+        const multiple =
+          el.hasAttribute("multiple") && el.getAttribute("multiple") !== "false"
+        const start =
+          el.getAttribute("default-value") ?? el.getAttribute("value")
+        const toValues = (keys: string[]) =>
+          valuesOf(keys, data.items, data.itemToValue)
         return {
           items: data.items,
           itemToValue: data.itemToValue,
           isItemEqualToValue: data.isItemEqualToValue,
           ...(start !== null && {
-            defaultValue: multiple ? toValues(listAttribute(start)) : toValues([start])[0],
+            defaultValue: multiple
+              ? toValues(listAttribute(start))
+              : toValues([start])[0],
           }),
         }
       },
@@ -49,10 +65,14 @@ function defineListboxElements() {
           get: (api: ListboxApi) => api.getValue(),
           // A string names items by key, comma-separated with multiple.
           set: (api: ListboxApi, value: unknown) => {
-            if (typeof value !== "string") return api.setValue(value)
+            if (typeof value !== "string") {
+              return api.setValue(value)
+            }
             const multiple = !!api.internal.options().multiple
             const keys = multiple ? listAttribute(value) : [value]
-            const found = keys.map((key) => api.internal.listbox.valueOf(key) ?? key)
+            const found = keys.map(
+              (key) => api.internal.listbox.valueOf(key) ?? key
+            )
             api.setValue(multiple ? found : (found[0] ?? null))
           },
         },
@@ -63,13 +83,15 @@ function defineListboxElements() {
         const { items } = el as ListboxElement
         generated.get(el)?.forEach((child) => child.remove())
         generated.delete(el)
-        if (!items) return
+        if (!items) {
+          return
+        }
         adoptDefaultValue(el, items as ListData<unknown>, api)
         const fresh = renderListItems(
           "ui-listbox",
           items as ListData<unknown>,
           api.internal.keyOf,
-          templateOf(el),
+          templateOf(el)
         )
         generated.set(el, fresh)
         el.append(...fresh)

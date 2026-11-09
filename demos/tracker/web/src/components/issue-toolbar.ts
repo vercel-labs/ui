@@ -14,7 +14,7 @@ function layoutToggle(value: Query["view"], label: string) {
         ${icon(value === "list" ? "list" : "columns")}
       </button>
     </ui-toggle>`,
-    label,
+    label
   )
 }
 
@@ -26,7 +26,9 @@ function issueToolbar(query: Query) {
     <div class="max-md:hidden">${issueFilters(query, change)}</div>
     <ui-drawer class="contents">
       <ui-drawer-trigger>
-        <button class=${cn(button({ variant: filtered ? "secondary" : "ghost" }), "md:hidden")}>
+        <button
+          class=${cn(button({ variant: filtered ? "secondary" : "ghost" }), "md:hidden")}
+        >
           ${icon("sliders")} Filters
         </button>
       </ui-drawer-trigger>
@@ -36,12 +38,19 @@ function issueToolbar(query: Query) {
       <ui-drawer-content
         class="relative mx-auto flex max-h-[85dvh] w-full max-w-lg flex-col rounded-t-[min(var(--radius-4xl),24px)] bg-popover text-sm text-popover-foreground shadow-xl ring-1 ring-foreground/5 outline-none after:absolute after:inset-x-0 after:top-full after:h-24 after:bg-inherit dark:ring-foreground/10"
       >
-        <div aria-hidden="true" class="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-muted"></div>
+        <div
+          aria-hidden="true"
+          class="mx-auto mt-3 h-1.5 w-12 shrink-0 rounded-full bg-muted"
+        ></div>
         <div class="grid gap-5 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-          <ui-drawer-title class="block text-base font-medium">Filters</ui-drawer-title>
+          <ui-drawer-title class="block text-base font-medium"
+            >Filters</ui-drawer-title
+          >
           ${issueFilters(query, change, { stacked: true })}
           <ui-drawer-close
-            ><button class=${cn(button({ variant: "primary" }), "w-full")}>Done</button></ui-drawer-close
+            ><button class=${cn(button({ variant: "primary" }), "w-full")}>
+              Done
+            </button></ui-drawer-close
           >
         </div>
       </ui-drawer-content>
@@ -52,7 +61,7 @@ function issueToolbar(query: Query) {
       deselectable="false"
       @valuechange=${onChange(
         () => [currentQuery().view],
-        ([view]) => change({ view, page: 1 }),
+        ([view]) => change({ view, page: 1 })
       )}
       class="flex w-fit items-center gap-0.5 rounded-2xl bg-muted p-0.5"
     >

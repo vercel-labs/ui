@@ -31,7 +31,11 @@
 <div data-slot="stack">
   <div data-slot="controls" role="group" aria-label="Modal">
     {#each modes as mode (mode.label)}
-      <button type="button" aria-pressed={modal === mode.value} onclick={() => (modal = mode.value)}>
+      <button
+        type="button"
+        aria-pressed={modal === mode.value}
+        onclick={() => (modal = mode.value)}
+      >
         {mode.label}
       </button>
     {/each}
@@ -55,5 +59,7 @@
       </SelectContent>
     </Select>
   </Field>
-  <button type="button" onclick={() => log("Pressed Save Draft")}>Save Draft</button>
+  <button type="button" onclick={() => log("Pressed Save Draft")}
+    >Save Draft</button
+  >
 </div>

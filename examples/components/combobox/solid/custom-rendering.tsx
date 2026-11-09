@@ -66,7 +66,11 @@ function Example() {
         <ComboboxList>
           <For each={users}>
             {(user) => (
-              <ComboboxItem value={user.username} label={user.name} keywords={[user.username]}>
+              <ComboboxItem
+                value={user.username}
+                label={user.name}
+                keywords={[user.username]}
+              >
                 {(state) => (
                   <>
                     <span data-slot="badge">{user.name.slice(0, 1)}</span>

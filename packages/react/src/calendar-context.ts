@@ -1,4 +1,7 @@
-import type { calendar as calendarPrimitive, CalendarGridState } from "@ui-sdk/core/calendar"
+import type {
+  calendar as calendarPrimitive,
+  CalendarGridState,
+} from "@ui-sdk/core/calendar"
 import * as React from "react"
 import type { PrimitiveHandle } from "./use-primitive"
 
@@ -7,6 +10,9 @@ import type { PrimitiveHandle } from "./use-primitive"
 type CalendarHandle = PrimitiveHandle<typeof calendarPrimitive>
 
 const CalendarContext = React.createContext<CalendarHandle | null>(null)
-const GridContext = React.createContext<{ offset: number; state: CalendarGridState } | null>(null)
+const GridContext = React.createContext<{
+  offset: number
+  state: CalendarGridState
+} | null>(null)
 
 export { CalendarContext, type CalendarHandle, GridContext }

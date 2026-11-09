@@ -32,15 +32,29 @@ function Fixture() {
       <button>Before</button>
       <Popover controller={controller} {...options}>
         {triggerShown && (
-          <PopoverTrigger shortcut={parts.shortcut ? popoverFixture.shortcut.trigger : undefined}>
+          <PopoverTrigger
+            shortcut={
+              parts.shortcut ? popoverFixture.shortcut.trigger : undefined
+            }
+          >
             {popoverFixture.trigger}
             {parts.shortcut && <PopoverShortcut />}
           </PopoverTrigger>
         )}
-        <PopoverContent className="popup" sideOffset={8} {...popoverContentOptions()}>
+        <PopoverContent
+          className="popup"
+          sideOffset={8}
+          {...popoverContentOptions()}
+        >
           <PopoverArrow className="arrow" />
-          {parts.title && <PopoverTitle className="title">{popoverFixture.title}</PopoverTitle>}
-          <PopoverDescription className="description">{popoverFixture.description}</PopoverDescription>
+          {parts.title && (
+            <PopoverTitle className="title">
+              {popoverFixture.title}
+            </PopoverTitle>
+          )}
+          <PopoverDescription className="description">
+            {popoverFixture.description}
+          </PopoverDescription>
           <label className="field">
             {popoverFixture.field}
             <input defaultValue={popoverFixture.defaultValue} />
@@ -48,11 +62,15 @@ function Fixture() {
           <div className="actions">
             <button onClick={() => setAction("save")}>
               {popoverFixture.action}
-              {parts.shortcut && <PopoverShortcut shortcut={popoverFixture.shortcut.save} />}
+              {parts.shortcut && (
+                <PopoverShortcut shortcut={popoverFixture.shortcut.save} />
+              )}
             </button>
             <PopoverClose>{popoverFixture.close}</PopoverClose>
             {parts.removable && (
-              <button onClick={() => setTriggerShown(false)}>{popoverFixture.remove}</button>
+              <button onClick={() => setTriggerShown(false)}>
+                {popoverFixture.remove}
+              </button>
             )}
           </div>
           {parts.menu && (
@@ -60,7 +78,11 @@ function Fixture() {
               <MenuTrigger>{popoverFixture.menu.trigger}</MenuTrigger>
               <MenuContent className="popup">
                 {popoverFixture.menu.items.map((item) => (
-                  <MenuItem key={item.value} value={item.value} className="item">
+                  <MenuItem
+                    key={item.value}
+                    value={item.value}
+                    className="item"
+                  >
                     {item.label}
                   </MenuItem>
                 ))}
@@ -71,8 +93,12 @@ function Fixture() {
             <Popover>
               <PopoverTrigger>{popoverFixture.nested.trigger}</PopoverTrigger>
               <PopoverContent className="popup">
-                <PopoverTitle className="title">{popoverFixture.nested.title}</PopoverTitle>
-                <button onClick={() => setAction("archive")}>{popoverFixture.nested.action}</button>
+                <PopoverTitle className="title">
+                  {popoverFixture.nested.title}
+                </PopoverTitle>
+                <button onClick={() => setAction("archive")}>
+                  {popoverFixture.nested.action}
+                </button>
               </PopoverContent>
             </Popover>
           )}
@@ -84,7 +110,10 @@ function Fixture() {
       </output>
       <button onClick={() => controller.open()}>Open with controller</button>
       {parts.shortcut && (
-        <PopoverTrigger controller={controller} shortcut={popoverFixture.shortcut.remote.keys}>
+        <PopoverTrigger
+          controller={controller}
+          shortcut={popoverFixture.shortcut.remote.keys}
+        >
           {popoverFixture.shortcut.remote.trigger}
           <PopoverShortcut />
         </PopoverTrigger>
@@ -97,7 +126,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

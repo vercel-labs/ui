@@ -8,7 +8,11 @@
 // A cookie is read as the preference is created, on the server and in the
 // browser alike, so hydration matches. localStorage and sessionStorage are
 // read back once something subscribes, after hydration.
-import { createDetails, type ChangeDetails, type ChangeReason } from "../kernel/details"
+import {
+  createDetails,
+  type ChangeDetails,
+  type ChangeReason,
+} from "../kernel/details"
 import { changeSource } from "../kernel/input-source"
 import { literal, readSaved, type ValueStorage } from "../storage/storage"
 
@@ -72,8 +76,11 @@ type PreferenceStore<Key extends string, State> = {
 }
 
 const checkAttribute = (attribute: string) => {
-  if (!/^data-[a-z0-9-]+$/.test(attribute))
-    throw new Error(`A preference only shows itself on data-* attributes, not "${attribute}".`)
+  if (!/^data-[a-z0-9-]+$/.test(attribute)) {
+    throw new Error(
+      `A preference only shows itself on data-* attributes, not "${attribute}".`
+    )
+  }
 }
 
 /**
@@ -84,19 +91,23 @@ const checkAttribute = (attribute: string) => {
 function followIn<State, Key extends string>(
   source: { get: () => State; subscribe: (listener: () => void) => () => void },
   store: PreferenceStore<Key, State>,
-  key: Key,
+  key: Key
 ) {
   const write = () => {
     const next = source.get()
     // A cast, since TypeScript can't tell that a computed key makes the mapped type.
-    if (store.get()[key] !== next) store.set({ [key]: next } as { [K in Key]: State })
+    if (store.get()[key] !== next) {
+      store.set({ [key]: next } as { [K in Key]: State })
+    }
   }
   let stopped = false
   let unsubscribe: (() => void) | undefined
   // A microtask later, like the platform's shortcut names, so every part a
   // framework hydrates in this pass renders what the server did first.
   queueMicrotask(() => {
-    if (stopped) return
+    if (stopped) {
+      return
+    }
     unsubscribe = source.subscribe(write)
     write()
   })
@@ -112,13 +123,18 @@ function followIn<State, Key extends string>(
  * puts the saved value there before hydration.
  * @experimental
  */
-function createPreference<const Value extends string>(options: PreferenceOptions<Value>) {
+function createPreference<const Value extends string>(
+  options: PreferenceOptions<Value>
+) {
   checkAttribute(options.attribute)
   const { storage, values } = options
   const isValue = (value: string | null | undefined): value is Value =>
     value != null && (values as readonly string[]).includes(value)
-  if (!isValue(options.defaultValue))
-    throw new Error(`"${options.defaultValue}" isn't one of the preference's values.`)
+  if (!isValue(options.defaultValue)) {
+    throw new Error(
+      `"${options.defaultValue}" isn't one of the preference's values.`
+    )
+  }
   // What the storage held when this last read or wrote it, so subscribing
   // again catches up with whatever changed in between, removals too.
   // Undefined until the first read.
@@ -138,30 +154,52 @@ function createPreference<const Value extends string>(options: PreferenceOptions
   let peeked: string | null | undefined
   let changed = false
   const shown = () => {
-    if (synced !== undefined || changed || !storage || storage.readsOnServer) return value
+    if (synced !== undefined || changed || !storage || storage.readsOnServer) {
+      return value
+    }
     peeked ??= storage.get()
     return isValue(peeked) ? peeked : value
   }
 
   const get = () => {
     const current = shown()
-    if (state.value !== current) state = { value: current }
+    if (state.value !== current) {
+      state = { value: current }
+    }
     return state
   }
 
-  const set = (next: Value, change: { reason?: ChangeReason; event?: Event } = {}) => {
+  const set = (
+    next: Value,
+    change: { reason?: ChangeReason; event?: Event } = {}
+  ) => {
     // Compared with what a read shows, which before anything subscribes can be the saved value.
-    if (next === shown() || !isValue(next)) return false
+    if (next === shown() || !isValue(next)) {
+      return false
+    }
     const reason = change.reason ?? "imperative"
-    const details = createDetails({ reason, event: change.event }, changeSource(reason, change.event))
+    const details = createDetails(
+      { reason, event: change.event },
+      changeSource(reason, change.event)
+    )
     options.onValueChange?.(next, details)
-    if (details.canceled) return false
+    if (details.canceled) {
+      return false
+    }
     value = next
     changed = true
     // A value read from storage is already there.
-    if (reason !== "restore" && reason !== "storage-sync" && storage?.set(next)) synced = next
+    if (
+      reason !== "restore" &&
+      reason !== "storage-sync" &&
+      storage?.set(next)
+    ) {
+      synced = next
+    }
     const current = get()
-    for (const listener of [...listeners]) listener(current)
+    for (const listener of [...listeners]) {
+      listener(current)
+    }
     return true
   }
 
@@ -179,16 +217,23 @@ function createPreference<const Value extends string>(options: PreferenceOptions
         synced = current
         // Nothing saved the first time keeps the starting value. A value
         // removed since the last read goes back to the default.
-        if (isValue(current)) set(current, { reason: "restore" })
-        else if (!first) set(options.defaultValue, { reason: "restore" })
+        if (isValue(current)) {
+          set(current, { reason: "restore" })
+        } else if (!first) {
+          set(options.defaultValue, { reason: "restore" })
+        }
       }
       unwatch = storage.subscribe((next) => {
         synced = next
-        set(isValue(next) ? next : options.defaultValue, { reason: "storage-sync" })
+        set(isValue(next) ? next : options.defaultValue, {
+          reason: "storage-sync",
+        })
       })
     }
     return () => {
-      if (!listeners.delete(entry) || listeners.size > 0) return
+      if (!listeners.delete(entry) || listeners.size > 0) {
+        return
+      }
       unwatch?.()
       unwatch = undefined
     }
@@ -226,8 +271,10 @@ function createPreference<const Value extends string>(options: PreferenceOptions
      * microtask later, once hydration is done, and follows every change after
      * that. Returns the cleanup for `bind`.
      */
-    follow: <Key extends string>(store: PreferenceStore<Key, { value: Value }>, key: Key) =>
-      followIn({ get, subscribe }, store, key),
+    follow: <Key extends string>(
+      store: PreferenceStore<Key, { value: Value }>,
+      key: Key
+    ) => followIn({ get, subscribe }, store, key),
   }
 }
 
@@ -235,7 +282,9 @@ function createPreference<const Value extends string>(options: PreferenceOptions
  * A preference, from `createPreference`.
  * @experimental
  */
-type Preference<Value extends string = string> = ReturnType<typeof createPreference<Value>>
+type Preference<Value extends string = string> = ReturnType<
+  typeof createPreference<Value>
+>
 
 /**
  * The inline script that `Preferences` renders as its first child. As the

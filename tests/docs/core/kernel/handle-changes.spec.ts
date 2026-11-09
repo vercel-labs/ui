@@ -18,7 +18,9 @@ test("every example renders without errors", async ({ page }) => {
   expect(errors).toEqual([])
 })
 
-test("history: undo and redo step through every change, from buttons and keys", async ({ page }) => {
+test("history: undo and redo step through every change, from buttons and keys", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const first = page.getByRole("button", { name: "Row 1, column 1" })
   const second = page.getByRole("button", { name: "Row 2, column 2" })
@@ -45,20 +47,28 @@ test("history: undo and redo step through every change, from buttons and keys", 
   await expect(first).toHaveAttribute("aria-pressed", "true")
 })
 
-test("dispatch: a delete goes through unless the callback cancels it", async ({ page }) => {
+test("dispatch: a delete goes through unless the callback cancels it", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const files = page.getByRole("list", { name: "Files" })
   await files.scrollIntoViewIfNeeded()
   await page.getByRole("button", { name: "Delete notes.txt" }).click()
   await expect(files.getByRole("listitem")).toHaveCount(2)
-  await expect(lastLog(page, "behaviors/dispatch")).toHaveText("Deleted notes.txt")
+  await expect(lastLog(page, "behaviors/dispatch")).toHaveText(
+    "Deleted notes.txt"
+  )
   await page.getByRole("button", { name: "Delete README.md" }).click()
-  await expect(lastLog(page, "behaviors/dispatch")).toHaveText("Canceled: the readme stays")
+  await expect(lastLog(page, "behaviors/dispatch")).toHaveText(
+    "Canceled: the readme stays"
+  )
   await expect(files.getByRole("listitem")).toHaveCount(2)
   await expect(files.getByText("README.md")).toBeVisible()
 })
 
-test("changes: the first press arms the button, the second confirms", async ({ page }) => {
+test("changes: the first press arms the button, the second confirms", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const button = page.locator(`[data-slot="confirm-button-root"]`).first()
   await button.click()
@@ -66,17 +76,23 @@ test("changes: the first press arms the button, the second confirms", async ({ p
   await expect(button).toHaveAttribute("data-armed", "")
   await button.click()
   await expect(button).toHaveText("Delete")
-  await expect(page.getByRole("group", { name: "Console" }).filter({ hasText: "Deleted" })).toHaveCount(1)
+  await expect(
+    page.getByRole("group", { name: "Console" }).filter({ hasText: "Deleted" })
+  ).toHaveCount(1)
 })
 
-test("what a change reports: the reason, the source, and a cancel", async ({ page }) => {
+test("what a change reports: the reason, the source, and a cancel", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const example = page.locator('[data-example="core/confirm-button-details"]')
   const button = example.locator(`[data-slot="confirm-button-root"]`)
   const last = lastLog(page, "core/confirm-button-details")
   await button.click()
   await expect(last).toHaveText("Arm: press, from mouse")
-  await expect(last).toHaveText("Disarm: timeout, from programmatic", { timeout: 4000 })
+  await expect(last).toHaveText("Disarm: timeout, from programmatic", {
+    timeout: 4000,
+  })
   await button.focus()
   await page.keyboard.press("Enter")
   await expect(last).toHaveText("Arm: press, from keyboard")
@@ -87,7 +103,9 @@ test("what a change reports: the reason, the source, and a cancel", async ({ pag
   await expect(button).not.toHaveAttribute("data-armed")
 })
 
-test("reasons: Escape and the button each report theirs, and dismissals can be refused", async ({ page }) => {
+test("reasons: Escape and the button each report theirs, and dismissals can be refused", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const tip = page.getByRole("region", { name: "Tip" })
   const again = page.getByRole("button", { name: "Show Tip Again" })
@@ -97,7 +115,9 @@ test("reasons: Escape and the button each report theirs, and dismissals can be r
   await expect(tip).toHaveCount(0)
   await expect(last).toHaveText("Close: escape-key")
   await again.click()
-  await page.getByRole("checkbox", { name: "Close only with the button" }).check()
+  await page
+    .getByRole("checkbox", { name: "Close only with the button" })
+    .check()
   await tip.getByRole("button", { name: "Got It" }).focus()
   await page.keyboard.press("Escape")
   await expect(last).toHaveText("Close: escape-key, canceled")
@@ -107,7 +127,9 @@ test("reasons: Escape and the button each report theirs, and dismissals can be r
   await expect(last).toHaveText("Close: close-press")
 })
 
-test("state a user controls: the trigger and the page change the same open state", async ({ page }) => {
+test("state a user controls: the trigger and the page change the same open state", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const example = page.locator('[data-example="core/disclosure"]')
   const trigger = page.getByRole("button", { name: "Shipping details" })
@@ -137,7 +159,9 @@ test("commits: a drag changes the value on every step and commits once, keys com
     .locator('[data-example="core/volume"]')
     .locator("xpath=ancestor::figure[1]")
     .locator('section[aria-label="Console"] li:not([aria-hidden])')
-  await expect(page.locator('[data-example="core/volume"] [data-value]')).toHaveText("80")
+  await expect(
+    page.locator('[data-example="core/volume"] [data-value]')
+  ).toHaveText("80")
   await expect(saves).toHaveCount(0)
   await page.mouse.up()
   await expect(saves).toHaveText(["Saved 80"])
@@ -147,7 +171,9 @@ test("commits: a drag changes the value on every step and commits once, keys com
   await expect(saves.last()).toHaveText("Saved 75")
 })
 
-test("live state: hovering writes data-hovered, and choosing presses one seat", async ({ page }) => {
+test("live state: hovering writes data-hovered, and choosing presses one seat", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const seats = page.getByRole("group", { name: "Seats" })
   const b4 = seats.getByRole("button", { name: "Seat B4" })
@@ -160,10 +186,14 @@ test("live state: hovering writes data-hovered, and choosing presses one seat", 
   await seats.getByRole("button", { name: "Seat C2" }).click()
   await page.mouse.move(0, 0)
   await expect(page.locator("[data-seat]")).toHaveText("Seat C2")
-  await expect(seats.getByRole("button", { pressed: true })).toHaveAccessibleName("Seat C2")
+  await expect(
+    seats.getByRole("button", { pressed: true })
+  ).toHaveAccessibleName("Seat C2")
 })
 
-test("direct attributes: the filter hides what doesn't match", async ({ page }) => {
+test("direct attributes: the filter hides what doesn't match", async ({
+  page,
+}) => {
   await openExamples(page, url)
   const list = page.locator('[data-slot="filter-list-list"]')
   await page.getByRole("searchbox", { name: "Filter countries" }).fill("au")
@@ -172,7 +202,9 @@ test("direct attributes: the filter hides what doesn't match", async ({ page }) 
   await expect(list.getByRole("listitem")).toHaveCount(8)
 })
 
-test("controllers: buttons outside start and stop the countdown", async ({ page }) => {
+test("controllers: buttons outside start and stop the countdown", async ({
+  page,
+}) => {
   await page.clock.install()
   await openExamples(page, url)
   const timer = page.getByRole("timer", { name: "Tea" })
@@ -185,7 +217,9 @@ test("controllers: buttons outside start and stop the countdown", async ({ page 
   await expect(timer).toHaveText("0:00")
 })
 
-test("undo for typing: a run of keys is one step, and map and reset change every step", async ({ page }) => {
+test("undo for typing: a run of keys is one step, and map and reset change every step", async ({
+  page,
+}) => {
   await page.clock.install()
   await openExamples(page, url)
   const notes = page.getByRole("textbox", { name: "Notes" })
@@ -214,19 +248,30 @@ test("how people are working: the save says how it was pressed, and the hint sho
   const example = page.locator('[data-example="core/input-source"]')
   const save = page.getByRole("button", { name: "Save", exact: true })
   await save.click()
-  await expect(lastLog(page, "core/input-source")).toHaveText("Saved with mouse")
+  await expect(lastLog(page, "core/input-source")).toHaveText(
+    "Saved with mouse"
+  )
   await expect(example.getByText("Enter or Space saves")).toHaveCount(0)
   await page.keyboard.press("Shift+Tab")
   await page.keyboard.press("Tab")
   await expect(save).toBeFocused()
   await expect(example.getByText("Enter or Space saves")).toBeVisible()
   await page.keyboard.press("Enter")
-  await expect(lastLog(page, "core/input-source")).toHaveText("Saved with keyboard")
+  await expect(lastLog(page, "core/input-source")).toHaveText(
+    "Saved with keyboard"
+  )
 })
 
-test("every field in the API reference links to the example that shows it", async ({ page }) => {
+test("every field in the API reference links to the example that shows it", async ({
+  page,
+}) => {
   await openExamples(page, url)
-  for (const label of ["ChangeDetails", "CommitDetails", "HistoryOptions", "UndoHistory"]) {
+  for (const label of [
+    "ChangeDetails",
+    "CommitDetails",
+    "HistoryOptions",
+    "UndoHistory",
+  ]) {
     const table = page.getByLabel(label, { exact: true })
     const fields = table.locator("dt")
     const links = table.getByRole("link")

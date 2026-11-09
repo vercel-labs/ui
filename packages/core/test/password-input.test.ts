@@ -32,20 +32,32 @@ describe("password input", () => {
     expect(api.toggleVisible()).toBe(true)
     expect(api.isVisible()).toBe(true)
     expect(api.setVisible(false, { reason: "toggle-press" })).toBe(true)
-    expect(onVisibleChange.mock.calls.map(([visible, details]) => [visible, details.reason])).toEqual([
+    expect(
+      onVisibleChange.mock.calls.map(([visible, details]) => [
+        visible,
+        details.reason,
+      ])
+    ).toEqual([
       [true, "imperative"],
       [false, "toggle-press"],
     ])
   })
 
   test("a canceled change keeps it as it was", () => {
-    const { api } = passwordInput({ id: "p", onVisibleChange: (_, details) => details.cancel() })
+    const { api } = passwordInput({
+      id: "p",
+      onVisibleChange: (_, details) => details.cancel(),
+    })
     expect(api.toggleVisible()).toBe(false)
     expect(api.isVisible()).toBe(false)
   })
 
   test("a controlled visible waits for the owner", () => {
-    const instance = passwordInput({ id: "p", visible: false, onVisibleChange: () => {} })
+    const instance = passwordInput({
+      id: "p",
+      visible: false,
+      onVisibleChange: () => {},
+    })
     instance.api.toggleVisible()
     expect(instance.api.isVisible()).toBe(false)
     instance.setOptions({ id: "p", visible: true })
@@ -66,7 +78,10 @@ describe("password input", () => {
       disabled: "",
       autocomplete: "new-password",
     })
-    expect(attrs(instance.part("toggle", {}))).toMatchObject({ disabled: "", "data-disabled": "" })
+    expect(attrs(instance.part("toggle", {}))).toMatchObject({
+      disabled: "",
+      "data-disabled": "",
+    })
   })
 
   test("read-only still lets the toggle show the password", () => {
@@ -77,11 +92,18 @@ describe("password input", () => {
 
   test("the value is a text field's, controlled or not", () => {
     const onValueChange = vi.fn()
-    const instance = passwordInput({ id: "p", defaultValue: "hunter2", onValueChange })
+    const instance = passwordInput({
+      id: "p",
+      defaultValue: "hunter2",
+      onValueChange,
+    })
     expect(instance.api.getValue()).toBe("hunter2")
     expect(partState(instance.part("root", {})).filled).toBe(true)
     instance.api.clear()
-    expect(onValueChange).toHaveBeenCalledWith("", expect.objectContaining({ reason: "imperative" }))
+    expect(onValueChange).toHaveBeenCalledWith(
+      "",
+      expect.objectContaining({ reason: "imperative" })
+    )
   })
 })
 
@@ -91,6 +113,9 @@ describe("password input without a DOM", () => {
     const instance = passwordInput({ id: "p", onVisibleChange })
     press(instance.part("toggle", {}))?.()
     expect(instance.api.isVisible()).toBe(true)
-    expect(onVisibleChange).toHaveBeenCalledWith(true, expect.objectContaining({ reason: "toggle-press" }))
+    expect(onVisibleChange).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ reason: "toggle-press" })
+    )
   })
 })

@@ -1,4 +1,9 @@
-import { Command, CommandInput, CommandItem, CommandList } from "@ui-sdk/react/command"
+import {
+  Command,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@ui-sdk/react/command"
 import * as React from "react"
 import { createRoot } from "react-dom/client"
 import { commandFixture as f } from "tests/fixtures/command.ts"
@@ -15,13 +20,19 @@ function Fixture() {
       >
         <CommandInput className="input" aria-label={f.input} />
         <CommandList className="command-list">
-          <CommandItem className="item" value="docs" render={<a href="#docs" />}>
+          <CommandItem
+            className="item"
+            value="docs"
+            render={<a href="#docs" />}
+          >
             Docs
           </CommandItem>
           {f.groups[0].items.slice(0, 2).map((item) => (
             <CommandItem
               key={item.value}
-              className={(state) => `item ${state.highlighted ? "is-highlighted" : ""}`}
+              className={(state) =>
+                `item ${state.highlighted ? "is-highlighted" : ""}`
+              }
               value={item.value}
               label={item.label}
               render={(props, state) => (
@@ -46,7 +57,7 @@ function mount(root: HTMLElement) {
   createRoot(root).render(
     <React.StrictMode>
       <Fixture />
-    </React.StrictMode>,
+    </React.StrictMode>
   )
 }
 

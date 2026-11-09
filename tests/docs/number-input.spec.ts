@@ -8,8 +8,10 @@ const lastLog = (preview: Locator) =>
     .locator('section[aria-label="Console"] li:not([aria-hidden])')
     .last()
 
-const input = (preview: Locator, name: string) => preview.getByRole("textbox", { name, exact: true })
-const button = (preview: Locator, name: string) => preview.getByRole("button", { name, exact: true })
+const input = (preview: Locator, name: string) =>
+  preview.getByRole("textbox", { name, exact: true })
+const button = (preview: Locator, name: string) =>
+  preview.getByRole("button", { name, exact: true })
 
 // Checks a field's starting text, then presses its first Increase button and checks the new text.
 const steps =
@@ -45,7 +47,10 @@ const checks: Record<string, Check> = {
     await expect(preview.getByRole("group", { name: "Frame" })).toBeVisible()
     await expect(input(preview, "X position")).toHaveValue("120")
     await expect(input(preview, "Height")).toHaveValue("240")
-    await expect(preview.getByText("W", { exact: true })).toHaveAttribute("aria-hidden", "true")
+    await expect(preview.getByText("W", { exact: true })).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    )
   },
   controlled: async (preview) => {
     await steps("Servings", "4", "5")(preview, "")
@@ -69,7 +74,9 @@ const checks: Record<string, Check> = {
     await steps("Quantity", "2", "3")(preview, "")
     // Gift cards submits with the form through its form ID.
     await button(preview, "Save").click()
-    await expect(lastLog(preview)).toHaveText("Submitted quantity=3, tip=4.5, gift-cards=0")
+    await expect(lastLog(preview)).toHaveText(
+      "Submitted quantity=3, tip=4.5, gift-cards=0"
+    )
     await button(preview, "Reset").click()
     await expect(input(preview, "Quantity")).toHaveValue("2")
   },
@@ -82,4 +89,8 @@ const checks: Record<string, Check> = {
   },
 }
 
-testExamples("number-input", checks, "components", [...Object.keys(checks), "buttons", "rtl"])
+testExamples("number-input", checks, "components", [
+  ...Object.keys(checks),
+  "buttons",
+  "rtl",
+])

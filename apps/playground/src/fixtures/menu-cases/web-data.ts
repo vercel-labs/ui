@@ -21,7 +21,9 @@ async function mount(root: HTMLElement) {
     </div>
   `
   const state = { align: "left", journal: false }
-  const menu = document.createElement("ui-menu") as HTMLElement & { items: unknown }
+  const menu = document.createElement("ui-menu") as HTMLElement & {
+    items: unknown
+  }
   menu.items = casesData(state)
   menu.innerHTML = `<ui-menu-trigger><button>Edit</button></ui-menu-trigger>`
   root.querySelector("#slot")!.replaceWith(menu)
@@ -32,17 +34,25 @@ async function mount(root: HTMLElement) {
     Object.assign(state, patch)
     menu.items = casesData(state)
   }
-  root.querySelector("#align-right")!.addEventListener("click", () => update({ align: "right" }))
-  root.querySelector("#journal")!.addEventListener("click", () => update({ journal: true }))
+  root
+    .querySelector("#align-right")!
+    .addEventListener("click", () => update({ align: "right" }))
+  root
+    .querySelector("#journal")!
+    .addEventListener("click", () => update({ journal: true }))
   root
     .querySelector("#shortcuts")!
-    .addEventListener("click", () => menu.setAttribute("item-shortcuts", "false"))
+    .addEventListener("click", () =>
+      menu.setAttribute("item-shortcuts", "false")
+    )
   root.addEventListener(
     "action",
     (event) => {
-      root.querySelector("output")!.textContent = (event as CustomEvent<{ value: string }>).detail.value
+      root.querySelector("output")!.textContent = (
+        event as CustomEvent<{ value: string }>
+      ).detail.value
     },
-    { capture: true },
+    { capture: true }
   )
 }
 

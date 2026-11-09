@@ -87,11 +87,16 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     /** What screen readers hear once an item has been pending for a second. An empty string says nothing. */
     pendingAnnouncement?: string
     /** Runs when any checkbox item in the menu or its submenus toggles, with the item's value in `details.value`. */
-    onCheckedChange?: (checked: boolean, details: MenuCheckedChangeDetails) => void
+    onCheckedChange?: (
+      checked: boolean,
+      details: MenuCheckedChangeDetails
+    ) => void
     /** Runs when any radio group in the menu or its submenus changes, with the group in `details.group`. */
     onValueChange?: (value: string, details: MenuValueChangeDetails) => void
     /** Runs when `dismissible` refused a dismissal made on purpose: Escape, an outside press, back, the screen reader's escape or a swipe. Focus or the window leaving is refused without it. */
-    onDismissAttempt?: (details: DismissAttemptDetails<MenuDismissReason>) => void
+    onDismissAttempt?: (
+      details: DismissAttemptDetails<MenuDismissReason>
+    ) => void
     children?: Snippet
   } = $props()
 
@@ -119,7 +124,9 @@ A list of actions and options, opened from a button or a right-click. Put its tr
     onOpenChange: (next: boolean, details: OpenDetails) => {
       // The callback runs first, so canceling there also keeps a bound `open` as it was.
       onOpenChange?.(next, details)
-      if (!details.canceled) open = next
+      if (!details.canceled) {
+        open = next
+      }
     },
     onOpenChangeComplete,
     onPayloadChange,

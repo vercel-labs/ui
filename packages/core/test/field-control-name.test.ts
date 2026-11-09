@@ -7,16 +7,23 @@ const mounts: { unmount: () => void }[] = []
 afterEach(() => mounts.splice(0).forEach((mounted) => mounted.unmount()))
 
 function mountField(name: string) {
-  const view = mount(field, { name }, `<root><label>Email</label><input /></root>`)
+  const view = mount(
+    field,
+    { name },
+    `<root><label>Email</label><input /></root>`
+  )
   mounts.push(view)
   return view
 }
 
-const control = (view: { root: HTMLElement }) => view.root.querySelector("input")!
+const control = (view: { root: HTMLElement }) =>
+  view.root.querySelector("input")!
 
 function replaceControl(view: { root: HTMLElement }, name?: string) {
   const next = document.createElement("input")
-  if (name !== undefined) next.name = name
+  if (name !== undefined) {
+    next.name = name
+  }
   control(view).replaceWith(next)
   return next
 }

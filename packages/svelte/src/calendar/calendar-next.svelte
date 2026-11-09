@@ -16,4 +16,8 @@ Shows the month after. Named "Next month"; pass `aria-label` in another language
 
 {#snippet fallback()}›{/snippet}
 
-<Part tag="button" part={step} props={{ ...rest, children: children ?? fallback }} />
+<Part
+  tag="button"
+  part={step}
+  props={{ ...rest, children: children ?? fallback }}
+/>

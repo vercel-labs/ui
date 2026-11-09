@@ -10,7 +10,11 @@
     NumberInputIncrement,
     NumberInputScrubArea,
   } from "@ui-sdk/svelte"
-  import { numberInputFixture as f, numberInputOptions, serialize } from "tests/fixtures/number-input.ts"
+  import {
+    numberInputFixture as f,
+    numberInputOptions,
+    serialize,
+  } from "tests/fixtures/number-input.ts"
 
   const options = numberInputOptions()
   let action = $state("")
@@ -26,8 +30,14 @@
   const currency = { style: "currency" as const, currency: f.amount.currency }
 
   // Records a change, or cancels it when the URL asks.
-  function report(name: string, value: number | null, details: { cancel: () => void }) {
-    if (options.cancel === name) return details.cancel()
+  function report(
+    name: string,
+    value: number | null,
+    details: { cancel: () => void }
+  ) {
+    if (options.cancel === name) {
+      return details.cancel()
+    }
     action = `${name}:${String(value)}`
   }
 
@@ -52,15 +62,24 @@
         min={f.quantity.min}
         max={f.quantity.max}
         required={options.required}
-        bind:value={() => (options.controlled ? quantity : undefined), (next) => (quantity = next ?? null)}
+        bind:value={
+          () => (options.controlled ? quantity : undefined),
+          (next) => (quantity = next ?? null)
+        }
         defaultValue={options.controlled ? undefined : options.quantity}
-        onValueChange={(value, details) => report(f.quantity.name, value, details)}
+        onValueChange={(value, details) =>
+          report(f.quantity.name, value, details)}
         onValueCommit={(value) => commit(f.quantity.name, value)}
       >
         <NumberInputGroup class="number-input-group">
-          <NumberInputDecrement aria-label={f.quantity.decrement}>−</NumberInputDecrement>
+          <NumberInputDecrement aria-label={f.quantity.decrement}
+            >−</NumberInputDecrement
+          >
           <NumberInputControl class="number-input-control" />
-          <NumberInputIncrement aria-label={f.quantity.increment} disabled={options.disabledIncrement}>+</NumberInputIncrement>
+          <NumberInputIncrement
+            aria-label={f.quantity.increment}
+            disabled={options.disabledIncrement}>+</NumberInputIncrement
+          >
         </NumberInputGroup>
       </NumberInput>
       <FieldDescription>{f.quantity.description}</FieldDescription>
@@ -75,14 +94,21 @@
         min={options.amountMin}
         step={f.amount.step}
         format={currency}
-        onValueChange={(value, details) => report(f.amount.name, value, details)}
+        onValueChange={(value, details) =>
+          report(f.amount.name, value, details)}
         onValueCommit={(value) => commit(f.amount.name, value)}
       >
-        <NumberInputScrubArea class="number-input-scrub">{f.amount.scrub}</NumberInputScrubArea>
+        <NumberInputScrubArea class="number-input-scrub"
+          >{f.amount.scrub}</NumberInputScrubArea
+        >
         <NumberInputGroup class="number-input-group">
-          <NumberInputDecrement aria-label={f.amount.decrement}>−</NumberInputDecrement>
+          <NumberInputDecrement aria-label={f.amount.decrement}
+            >−</NumberInputDecrement
+          >
           <NumberInputControl class="number-input-control" />
-          <NumberInputIncrement aria-label={f.amount.increment}>+</NumberInputIncrement>
+          <NumberInputIncrement aria-label={f.amount.increment}
+            >+</NumberInputIncrement
+          >
         </NumberInputGroup>
       </NumberInput>
     </Field>

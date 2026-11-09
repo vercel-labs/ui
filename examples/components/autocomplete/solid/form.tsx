@@ -6,7 +6,12 @@ import {
   AutocompleteItem,
   AutocompleteList,
 } from "@ui-sdk/solid/autocomplete"
-import { Field, FieldDescription, FieldError, FieldLabel } from "@ui-sdk/solid/field"
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from "@ui-sdk/solid/field"
 import { For } from "solid-js"
 import { useLog } from "../../../shared/solid/log"
 
@@ -36,7 +41,9 @@ function Example() {
       data-slot="stack"
       onSubmit={(event) => {
         event.preventDefault()
-        const data = [...new FormData(event.currentTarget)].map(([name, value]) => `${name}=${value}`)
+        const data = [...new FormData(event.currentTarget)].map(
+          ([name, value]) => `${name}=${value}`
+        )
         log(`Submitted ${data.join("&")}`)
       }}
     >
@@ -47,7 +54,11 @@ function Example() {
           <AutocompleteContent>
             <AutocompleteEmpty>No fruits found.</AutocompleteEmpty>
             <AutocompleteList>
-              <For each={fruits}>{(fruit) => <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>}</For>
+              <For each={fruits}>
+                {(fruit) => (
+                  <AutocompleteItem value={fruit}>{fruit}</AutocompleteItem>
+                )}
+              </For>
             </AutocompleteList>
           </AutocompleteContent>
         </Autocomplete>

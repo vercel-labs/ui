@@ -10,7 +10,9 @@ const isCI = !!process.env.CI
 // CI tests a production build. `next dev` compiles each page on its first visit
 // and restarts when it nears its memory limit, which dropped pages mid-test, and
 // their HMR socket with them.
-const docsServer = isCI ? "pnpm --filter docs build && pnpm --filter docs start" : "pnpm --filter docs dev"
+const docsServer = isCI
+  ? "pnpm --filter docs build && pnpm --filter docs start"
+  : "pnpm --filter docs dev"
 
 // Smoke tests for the live examples on the docs site, in every framework.
 export default defineConfig({
@@ -19,7 +21,9 @@ export default defineConfig({
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
   workers: isCI ? 2 : undefined,
-  reporter: isCI ? [["html", { open: "never" }], ["github"], ["dot"]] : [["list"]],
+  reporter: isCI
+    ? [["html", { open: "never" }], ["github"], ["dot"]]
+    : [["list"]],
   use: {
     baseURL: `http://localhost:${port}`,
     browserName: "chromium",

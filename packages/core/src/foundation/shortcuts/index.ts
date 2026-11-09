@@ -8,5 +8,10 @@ export {
   type ShortcutKeys,
   type ShortcutOptions,
 } from "./create-shortcuts"
-export { adoptPlatform, bindPartShortcut, shortcutOf, shortcutSlot } from "./shortcut-slot"
+export {
+  adoptPlatform,
+  bindPartShortcut,
+  shortcutOf,
+  shortcutSlot,
+} from "./shortcut-slot"
 export { registerShortcut, shortcuts, type Shortcuts } from "./shortcuts"

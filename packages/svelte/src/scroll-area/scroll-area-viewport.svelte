@@ -14,4 +14,4 @@ The native scroller. Keyboard, wheels, touch, find in page and screen readers sc
   const part = usePart(scrollArea, "viewport")
 </script>
 
-<Part tag="div" part={part} {props} />
+<Part tag="div" {part} {props} />

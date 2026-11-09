@@ -19,16 +19,20 @@ import {
 describe("drawer server rendering", () => {
   const app = (open: boolean) =>
     createSSRApp(() =>
-      h(Drawer, { defaultOpen: open, snapPoints: [0.5, 1], side: "start" }, () => [
-        h(DrawerTrigger, null, () => "Move goal"),
-        h(DrawerBackdrop),
-        h(DrawerContent, null, () => [
-          h(DrawerHandle, { "aria-label": "Resize" }),
-          h(DrawerTitle, null, () => "Move goal"),
-          h(DrawerDescription, null, () => "Set your daily activity goal."),
-          h(DrawerClose, null, () => "Cancel"),
-        ]),
-      ]),
+      h(
+        Drawer,
+        { defaultOpen: open, snapPoints: [0.5, 1], side: "start" },
+        () => [
+          h(DrawerTrigger, null, () => "Move goal"),
+          h(DrawerBackdrop),
+          h(DrawerContent, null, () => [
+            h(DrawerHandle, { "aria-label": "Resize" }),
+            h(DrawerTitle, null, () => "Move goal"),
+            h(DrawerDescription, null, () => "Set your daily activity goal."),
+            h(DrawerClose, null, () => "Cancel"),
+          ]),
+        ]
+      )
     )
 
   test("a closed drawer renders its trigger only", async () => {
@@ -61,13 +65,19 @@ describe("drawer server rendering", () => {
               },
               () => [
                 h(DrawerBackdrop),
-                h(DrawerContent, null, () => h(DrawerTitle, null, () => "Move goal")),
-              ],
-            ),
-          ),
+                h(DrawerContent, null, () =>
+                  h(DrawerTitle, null, () => "Move goal")
+                ),
+              ]
+            )
+          )
         )
-        const content = html.match(/<div[^>]*data-slot="drawer-content"[^>]*>/)?.[0]
-        const backdrop = html.match(/<div[^>]*data-slot="drawer-backdrop"[^>]*>/)?.[0]
+        const content = html.match(
+          /<div[^>]*data-slot="drawer-content"[^>]*>/
+        )?.[0]
+        const backdrop = html.match(
+          /<div[^>]*data-slot="drawer-backdrop"[^>]*>/
+        )?.[0]
         expect(content).toBeDefined()
         expect(backdrop).toBeDefined()
         expect(content).toContain('role="dialog"')
@@ -93,23 +103,31 @@ describe("drawer server rendering", () => {
     const html = await renderToString(
       createSSRApp(() =>
         h(Drawer, null, () =>
-          h(DrawerTrigger, { shortcut: "mod+g" }, () => ["Move goal", h(DrawerShortcut)]),
-        ),
-      ),
+          h(DrawerTrigger, { shortcut: "mod+g" }, () => [
+            "Move goal",
+            h(DrawerShortcut),
+          ])
+        )
+      )
     )
     expect(html).toContain('aria-keyshortcuts="Control+G"')
-    expect(html).toMatch(/<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+G\u2069<\/span>/)
+    expect(html).toMatch(
+      /<span[^>]*aria-hidden="true"[^>]*>\u2066Ctrl\+G\u2069<\/span>/
+    )
   })
 
   test("a shortcut inside a trigger connected through a controller renders nothing until the client finds the drawer", async () => {
     const goal = createDrawerController()
     const html = await renderToString(
       createSSRApp(() => [
-        h(DrawerTrigger, { controller: goal, shortcut: "mod+g" }, () => ["Move goal", h(DrawerShortcut)]),
+        h(DrawerTrigger, { controller: goal, shortcut: "mod+g" }, () => [
+          "Move goal",
+          h(DrawerShortcut),
+        ]),
         h(Drawer, { controller: goal }, () =>
-          h(DrawerContent, null, () => h(DrawerTitle, null, () => "Move goal")),
+          h(DrawerContent, null, () => h(DrawerTitle, null, () => "Move goal"))
         ),
-      ]),
+      ])
     )
     expect(html).toContain("Move goal")
     expect(html).not.toContain('data-slot="drawer-shortcut"')

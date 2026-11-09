@@ -12,7 +12,11 @@ import type {
   Token,
   TokenInsert,
 } from "../../foundation/text/text-editor"
-import type { TokenInputChangeOptions, TokenInputOptions, TokenInputValueChangeReason } from "./token-input"
+import type {
+  TokenInputChangeOptions,
+  TokenInputOptions,
+  TokenInputValueChangeReason,
+} from "./token-input"
 import {
   defaultCodec,
   isToken,
@@ -56,7 +60,9 @@ const userReasons = new Set<string>(["input-change", "paste", "drop", "cut"])
 const normalized = new WeakMap<TokenInputValue, TokenInputValue>()
 function normalizedOnce(value: TokenInputValue) {
   let result = normalized.get(value)
-  if (!result) normalized.set(value, (result = normalizeValue(value)))
+  if (!result) {
+    normalized.set(value, (result = normalizeValue(value)))
+  }
   return result
 }
 
@@ -84,18 +90,26 @@ function syncTokenInputState(options: TokenInputOptions) {
     required: !!options.required,
     name: options.name,
     form: options.form,
-    ...(options.value === undefined ? {} : { value: normalizedOnce(options.value) }),
-    ...(options.defaultValue === undefined ? {} : { initial: normalizedOnce(options.defaultValue) }),
+    ...(options.value === undefined
+      ? {}
+      : { value: normalizedOnce(options.value) }),
+    ...(options.defaultValue === undefined
+      ? {}
+      : { initial: normalizedOnce(options.defaultValue) }),
   }
 }
 
 // The ids of the tokens a selection covers, space-separated.
 function selectedIds(value: TokenInputValue, range: TextRange | null) {
-  if (!range || range.start === range.end) return ""
+  if (!range || range.start === range.end) {
+    return ""
+  }
   let at = 0
   const ids: string[] = []
   for (const segment of value) {
-    if (isToken(segment) && at >= range.start && at < range.end) ids.push(segment.id!)
+    if (isToken(segment) && at >= range.start && at < range.end) {
+      ids.push(segment.id!)
+    }
     at += isToken(segment) ? 1 : segment.length
   }
   return ids.join(" ")
@@ -121,15 +135,23 @@ type Edit = {
 // its `form` attribute names, in its document or shadow root, else the one
 // it's in. A `form` naming something else means no form, as natively.
 function ownerForm(el: Element | null | undefined, formId: string | undefined) {
-  if (!el) return null
-  if (formId === undefined) return el.closest("form")
+  if (!el) {
+    return null
+  }
+  if (formId === undefined) {
+    return el.closest("form")
+  }
   const root = el.getRootNode() as Document | ShadowRoot
   const named =
-    "getElementById" in root ? root.getElementById(formId) : el.ownerDocument.getElementById(formId)
+    "getElementById" in root
+      ? root.getElementById(formId)
+      : el.ownerDocument.getElementById(formId)
   return named instanceof HTMLFormElement ? named : null
 }
 
-function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputState, string>) {
+function tokenInputApi(
+  context: PrimitiveContext<TokenInputOptions, TokenInputState, string>
+) {
   const { id, store, options, element } = context
   const change = createChange(context)
   let view: TokenView | undefined
@@ -143,19 +165,21 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
   // this instance's own changes from a value set from outside.
   let committed = store.get().value
   const listeners = new Set<(change: EditorChange) => void>()
-  const history = createHistory<{ value: TokenInputValue; selection: TextRange | null }>(
-    { value: store.get().value, selection: null },
-    () => options().history,
-  )
+  const history = createHistory<{
+    value: TokenInputValue
+    selection: TextRange | null
+  }>({ value: store.get().value, selection: null }, () => options().history)
   let messages: string[] = []
 
   const codec = () => options().codec ?? defaultCodec
-  const describe = (token: Token) => options().getTokenDescription?.(token) ?? defaultDescription(token)
+  const describe = (token: Token) =>
+    options().getTokenDescription?.(token) ?? defaultDescription(token)
   const editable = () => {
     const state = store.get()
     return !isDisabled(state) && !state.readOnly
   }
-  const emit = (change: EditorChange) => listeners.forEach((listener) => listener(change))
+  const emit = (change: EditorChange) =>
+    listeners.forEach((listener) => listener(change))
 
   // Says what happened to tokens, a moment later and joined, so several changes at once are one message.
   function say(message: string) {
@@ -170,21 +194,30 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
 
   function commit(
     next: TokenInputValue,
-    { reason, event, inputType, selection: after, group, record = true }: Edit,
+    { reason, event, inputType, selection: after, group, record = true }: Edit
   ) {
     const before = committed
     const value = normalizeValue(next)
     // A controlled owner passes this array back as it is.
     normalized.set(value, value)
     if (sameValue(before, value)) {
-      if (after) setSelection(after)
+      if (after) {
+        setSelection(after)
+      }
       return false
     }
     const removed = removedTokens(before, value)
     pendingSelection = after
-    if (after) selection = after
+    if (after) {
+      selection = after
+    }
     committed = value
-    const accepted = change("value", value, { reason, event, inputType, removed } as never)
+    const accepted = change("value", value, {
+      reason,
+      event,
+      inputType,
+      removed,
+    } as never)
     if (!accepted) {
       // A canceled edit the browser already made comes out of the DOM.
       committed = before
@@ -192,40 +225,61 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       render()
       return false
     }
-    if (record) history.record({ value, selection: after ?? null }, { group })
-    emit({ type: "input", ...textDiff(offsetText(before), offsetText(value)), user: userReasons.has(reason) })
-    for (const token of removed) say(`Removed ${describe(token)} ${token.label}`)
+    if (record) {
+      history.record({ value, selection: after ?? null }, { group })
+    }
+    emit({
+      type: "input",
+      ...textDiff(offsetText(before), offsetText(value)),
+      user: userReasons.has(reason),
+    })
+    for (const token of removed) {
+      say(`Removed ${describe(token)} ${token.label}`)
+    }
     // A controlled input whose owner didn't take the value shows what it holds,
     // once the owner has had its turn to render.
-    if (options().value !== undefined)
+    if (options().value !== undefined) {
       setTimeout(() => {
-        if (committed !== value || store.get().value === value) return
+        if (committed !== value || store.get().value === value) {
+          return
+        }
         committed = store.get().value
         render()
       })
+    }
     return true
   }
 
   // Shows the current value, and the selection an edit left.
   function render() {
-    if (!view) return
+    if (!view) {
+      return
+    }
     view.render(store.get().value)
     const length = valueLength(store.get().value)
     const target = pendingSelection ?? (focused ? selection : null)
     pendingSelection = undefined
-    if (target && focused)
-      view.select({ start: Math.min(target.start, length), end: Math.min(target.end, length) })
+    if (target && focused) {
+      view.select({
+        start: Math.min(target.start, length),
+        end: Math.min(target.end, length),
+      })
+    }
   }
 
   let shown = store.get().value
   store.subscribe(() => {
     const { value } = store.get()
-    if (value === shown) return
+    if (value === shown) {
+      return
+    }
     shown = value
     // A value from outside, like a controlled reset after sending, is its own
     // undo step. The value this instance sent, passed back, isn't.
     if (value !== committed) {
-      if (!sameValue(value, committed)) history.record({ value, selection: null })
+      if (!sameValue(value, committed)) {
+        history.record({ value, selection: null })
+      }
       committed = value
     }
     render()
@@ -233,7 +287,9 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
 
   function setSelection(next: TextRange | null) {
     selection = next
-    if (next && view && focused) view.select(next)
+    if (next && view && focused) {
+      view.select(next)
+    }
   }
 
   // Inserts at a range: text, a token followed by a space unless one follows, or a value.
@@ -248,30 +304,42 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       reason: TokenInputValueChangeReason
       event?: Event
       pending?: PromiseLike<void | Partial<TokenInsert>>
-    },
+    }
   ) {
     const value = committed
     const inserted: TokenInputValue = Array.isArray(content)
       ? normalizeValue(content)
       : typeof content === "string"
         ? [content]
-        : normalizeValue([{ ...content, ...(pending ? { status: "pending" as const } : {}) }])
-    const token = inserted.length === 1 && isToken(inserted[0]) ? inserted[0] : undefined
+        : normalizeValue([
+            { ...content, ...(pending ? { status: "pending" as const } : {}) },
+          ])
+    const token =
+      inserted.length === 1 && isToken(inserted[0]) ? inserted[0] : undefined
     const following = offsetText(value)[range.end]
-    if (token && (following === undefined || !/\s/.test(following))) inserted.push(" ")
+    if (token && (following === undefined || !/\s/.test(following))) {
+      inserted.push(" ")
+    }
     const end = range.start + valueLength(inserted)
     const next = replaceRange(value, range, inserted)
-    if (!commit(next, { reason, event, selection: caretAt(end) })) return false
-    if (token) say(`Inserted ${describe(token)} ${token.label}`)
-    if (!token || !pending) return true
+    if (!commit(next, { reason, event, selection: caretAt(end) })) {
+      return false
+    }
+    if (token) {
+      say(`Inserted ${describe(token)} ${token.label}`)
+    }
+    if (!token || !pending) {
+      return true
+    }
     // An id the value already had is given to its first token, so read the one it ended up with.
     const tokenId = tokenAt(next, range.start)!.id!
     pending.then(
-      (patch) => updateToken(tokenId, { ...(patch ?? {}), status: patch?.status }),
+      (patch) =>
+        updateToken(tokenId, { ...(patch ?? {}), status: patch?.status }),
       () => {
         say(`Couldn't add ${token.label}`)
         removeToken(tokenId, { reason: "imperative", record: false })
-      },
+      }
     )
     return true
   }
@@ -280,14 +348,23 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
   function updateToken(tokenId: string, patch: Partial<Omit<Token, "id">>) {
     const update = (value: TokenInputValue) =>
       value.map((segment) =>
-        isToken(segment) && segment.id === tokenId ? { ...segment, ...patch } : segment,
+        isToken(segment) && segment.id === tokenId
+          ? { ...segment, ...patch }
+          : segment
       )
     // History first: a token removed while it loads comes back settled on undo.
     history.map((entry) => ({ ...entry, value: update(entry.value) }))
     const before = tokensOf(committed).find((token) => token.id === tokenId)
-    if (!before) return false
-    const changed = commit(update(committed), { reason: "imperative", record: false })
-    if (before.status === "pending" && !patch.status) say(`${patch.label ?? before.label} ready`)
+    if (!before) {
+      return false
+    }
+    const changed = commit(update(committed), {
+      reason: "imperative",
+      record: false,
+    })
+    if (before.status === "pending" && !patch.status) {
+      say(`${patch.label ?? before.label} ready`)
+    }
     return changed
   }
 
@@ -297,11 +374,17 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       reason = "imperative",
       record = true,
       event,
-    }: { reason?: TokenInputValueChangeReason; record?: boolean; event?: Event } = {},
+    }: {
+      reason?: TokenInputValueChangeReason
+      record?: boolean
+      event?: Event
+    } = {}
   ) {
     const remove = (value: TokenInputValue) =>
       value.filter((segment) => !(isToken(segment) && segment.id === tokenId))
-    if (!record) history.map((entry) => ({ ...entry, value: remove(entry.value) }))
+    if (!record) {
+      history.map((entry) => ({ ...entry, value: remove(entry.value) }))
+    }
     return commit(remove(committed), { reason, event, record })
   }
 
@@ -309,7 +392,12 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     const entry = history.undo()
     return (
       !!entry &&
-      commit(entry.value, { reason: "undo", event, selection: entry.selection ?? undefined, record: false })
+      commit(entry.value, {
+        reason: "undo",
+        event,
+        selection: entry.selection ?? undefined,
+        record: false,
+      })
     )
   }
 
@@ -317,7 +405,12 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     const entry = history.redo()
     return (
       !!entry &&
-      commit(entry.value, { reason: "redo", event, selection: entry.selection ?? undefined, record: false })
+      commit(entry.value, {
+        reason: "redo",
+        event,
+        selection: entry.selection ?? undefined,
+        record: false,
+      })
     )
   }
 
@@ -325,18 +418,23 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
   // from outside it, like a native control's.
   function submit(event?: Event) {
     const onSubmit = options().onSubmit
-    if (onSubmit) return onSubmit(store.get().value, { event })
+    if (onSubmit) {
+      return onSubmit(store.get().value, { event })
+    }
     ownerForm(element("editor"), store.get().form)?.requestSubmit()
   }
 
-  const canSubmit = () => !!options().onSubmit || !!ownerForm(element("editor"), store.get().form)
+  const canSubmit = () =>
+    !!options().onSubmit || !!ownerForm(element("editor"), store.get().form)
 
   const editor: TextEditorAdapter = {
     get element() {
       return element("editor")
     },
     textBefore(length) {
-      if (!focused || !selection) return null
+      if (!focused || !selection) {
+        return null
+      }
       const caret = selection.end
       const offset = Math.max(0, caret - length)
       return { text: offsetText(committed).slice(offset, caret), offset }
@@ -344,7 +442,10 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     selection: () => (focused ? selection : null),
     rectAt: (offset) => view?.rectAt(offset) ?? null,
     replace: (range, content, replaceOptions) =>
-      insertAt(range, content, { reason: "item-press", pending: replaceOptions?.pending }),
+      insertAt(range, content, {
+        reason: "item-press",
+        pending: replaceOptions?.pending,
+      }),
     subscribe(listener) {
       listeners.add(listener)
       return () => listeners.delete(listener)
@@ -358,9 +459,17 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
     id,
     editor,
     getValue: () => store.get().value,
-    setValue: (value: TokenInputValue, { reason = "imperative", event }: TokenInputChangeOptions = {}) =>
-      commit(value, { reason, event, selection: caretAt(valueLength(normalizeValue(value))) }),
-    getText: (custom?: Parameters<typeof toText>[1]) => toText(store.get().value, custom ?? codec()),
+    setValue: (
+      value: TokenInputValue,
+      { reason = "imperative", event }: TokenInputChangeOptions = {}
+    ) =>
+      commit(value, {
+        reason,
+        event,
+        selection: caretAt(valueLength(normalizeValue(value))),
+      }),
+    getText: (custom?: Parameters<typeof toText>[1]) =>
+      toText(store.get().value, custom ?? codec()),
     getLabel: () => toLabel(store.get().value),
     insert(
       content: string | TokenInsert | TokenInputValue,
@@ -372,15 +481,22 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       }: TokenInputChangeOptions & {
         at?: "caret" | "end" | TextRange
         resolve?: PromiseLike<void | Partial<TokenInsert>>
-      } = {},
+      } = {}
     ) {
       const length = valueLength(committed)
-      const range = typeof at === "object" ? at : at === "end" || !selection ? caretAt(length) : selection
+      const range =
+        typeof at === "object"
+          ? at
+          : at === "end" || !selection
+            ? caretAt(length)
+            : selection
       return insertAt(range, content, { reason, event, pending: resolve })
     },
     updateToken,
-    removeToken: (tokenId: string, { reason, event }: TokenInputChangeOptions = {}) =>
-      removeToken(tokenId, { reason, event }),
+    removeToken: (
+      tokenId: string,
+      { reason, event }: TokenInputChangeOptions = {}
+    ) => removeToken(tokenId, { reason, event }),
     undo: () => undo(),
     redo: () => redo(),
     canUndo: history.canUndo,
@@ -389,7 +505,9 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       commit([], { reason, event, selection: caretAt(0) }),
     focus({ at = "end" }: { at?: "start" | "end" } = {}) {
       const el = element("editor")
-      if (!el) return
+      if (!el) {
+        return
+      }
       el.focus({ preventScroll: true })
       setSelection(caretAt(at === "start" ? 0 : valueLength(store.get().value)))
     },
@@ -412,7 +530,9 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       caretAt,
       setView(next: TokenView | undefined) {
         view = next
-        if (next) render()
+        if (next) {
+          render()
+        }
       },
       view: () => view,
       setSelection(next: TextRange | null) {
@@ -423,7 +543,9 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       selection: () => selection,
       setFocused(next: boolean) {
         focused = next
-        if (!next) emit({ type: "selection" })
+        if (!next) {
+          emit({ type: "selection" })
+        }
       },
       setComposing(next: boolean) {
         composing = next
@@ -434,9 +556,11 @@ function tokenInputApi(context: PrimitiveContext<TokenInputOptions, TokenInputSt
       hosts: () => view?.hosts() ?? [],
       setCustom: (custom: boolean) => store.set({ custom }),
       text: () => toText(store.get().value, codec()),
-      reset: () => commit(store.get().initial, { reason: "reset", selection: caretAt(0) }),
+      reset: () =>
+        commit(store.get().initial, { reason: "reset", selection: caretAt(0) }),
       setFormDisabled: (formDisabled: boolean) => store.set({ formDisabled }),
-      restore: (saved: string) => commit(codec().parse(saved), { reason: "restore" }),
+      restore: (saved: string) =>
+        commit(codec().parse(saved), { reason: "restore" }),
     },
   }
 

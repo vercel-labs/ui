@@ -59,7 +59,9 @@ const bay = definePrimitive({
           : connectMessage(message, label),
       connect: (from, to, details) => {
         const { cables } = store.get()
-        const patched = cables.some((cable) => cable.from === from && cable.to === to)
+        const patched = cables.some(
+          (cable) => cable.from === from && cable.to === to
+        )
         const next = patched
           ? cables.filter((cable) => cable.from !== from || cable.to !== to)
           : [...cables, { from, to }]
@@ -69,13 +71,19 @@ const bay = definePrimitive({
     return {
       connect,
       sourceKeydown(event: KeyboardEvent, source: string) {
-        if (connect.keydown(event)) return
-        if (event.key !== "Enter") return
+        if (connect.keydown(event)) {
+          return
+        }
+        if (event.key !== "Enter") {
+          return
+        }
         event.preventDefault()
         connect.start(source)
       },
       act(action: string) {
-        if (action === "cancel") return connect.active() && connect.cancel()
+        if (action === "cancel") {
+          return connect.active() && connect.cancel()
+        }
         const [from, to] = action.split("-")
         if (connect.start(from)) {
           connect.target(to)
@@ -108,22 +116,34 @@ const bay = definePrimitive({
         const { x, y } = jack(key)
         return {
           "aria-hidden": "true",
-          style: css({ position: "absolute", left: `${x}px`, top: `${y}px`, "touch-action": "none" }),
+          style: css({
+            position: "absolute",
+            left: `${x}px`,
+            top: `${y}px`,
+            "touch-action": "none",
+          }),
         }
       },
       live: live<BayState, any, { value: string }>((state, { api, key }) => ({
         "data-connect": api.connect.role(state, key),
       })),
-      on: { pointerdown: (event, { el, api, key }) => api.connect.pointerdown(event, key, el!) },
+      on: {
+        pointerdown: (event, { el, api, key }) =>
+          api.connect.pointerdown(event, key, el!),
+      },
     }),
     cable: slot<{ value: string; from: string; to: string }>({
       props: { value: "string", from: "string", to: "string" },
-      attrs: (_state, { props }) => ({ d: curve(jack(props.from), jack(props.to)) }),
+      attrs: (_state, { props }) => ({
+        d: curve(jack(props.from), jack(props.to)),
+      }),
     }),
     draft: slot({
       live: live<BayState, any, {}>((state) => {
         const draft = state.drawing
-        if (!draft) return { d: "" }
+        if (!draft) {
+          return { d: "" }
+        }
         return { d: curve(jack(draft.from), draft.to ? jack(draft.to) : draft) }
       }),
     }),
@@ -174,7 +194,11 @@ function Example() {
               <BayDraft />
             </svg>
             {sources.map((source, index) => (
-              <BaySource key={source} value={source} style={{ "--row": index } as React.CSSProperties}>
+              <BaySource
+                key={source}
+                value={source}
+                style={{ "--row": index } as React.CSSProperties}
+              >
                 {names[source]}
               </BaySource>
             ))}
@@ -205,4 +229,15 @@ function Example() {
   )
 }
 
-export { Bay, bay, BayAction, BayCable, BayDraft, BayJack, BaySource, type BayState, type Cable, Example }
+export {
+  Bay,
+  bay,
+  BayAction,
+  BayCable,
+  BayDraft,
+  BayJack,
+  BaySource,
+  type BayState,
+  type Cable,
+  Example,
+}

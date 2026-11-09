@@ -15,7 +15,10 @@ import { useLog } from "../../shared/react/log"
 type BookState = { bookmark: string | null; over: string | null }
 
 type BookOptions = {
-  onBookmarkChange?: (bookmark: string | null, details: ChangeDetails<"drag">) => void
+  onBookmarkChange?: (
+    bookmark: string | null,
+    details: ChangeDetails<"drag">
+  ) => void
 }
 
 const book = definePrimitive({
@@ -29,11 +32,15 @@ const book = definePrimitive({
     context.onDestroy(() => stop?.())
     return {
       pointerdown(event: PointerEvent, el: HTMLElement) {
-        if (event.button !== 0) return
+        if (event.button !== 0) {
+          return
+        }
         let preview: ReturnType<typeof bindDragPreview> | undefined
         let pointer = { x: event.clientX, y: event.clientY }
         const findChapter = () => {
-          const hit = document.elementFromPoint(pointer.x, pointer.y)?.closest<HTMLElement>("[data-chapter]")
+          const hit = document
+            .elementFromPoint(pointer.x, pointer.y)
+            ?.closest<HTMLElement>("[data-chapter]")
           store.set({ over: hit?.dataset.chapter ?? null })
         }
         const scroll = createAutoScroll({
@@ -61,7 +68,9 @@ const book = definePrimitive({
             preview?.remove()
             stop = undefined
             store.set({ over: null })
-            if (preview && over && !canceled) change("bookmark", over, { reason: "drag", event: end })
+            if (preview && over && !canceled) {
+              change("bookmark", over, { reason: "drag", event: end })
+            }
           },
         })
       },
@@ -69,7 +78,10 @@ const book = definePrimitive({
   },
   slots: (slot) => ({
     bookmark: slot({
-      attrs: () => ({ type: "button", style: "touch-action:none;user-select:none" }),
+      attrs: () => ({
+        type: "button",
+        style: "touch-action:none;user-select:none",
+      }),
       on: { pointerdown: (event, { el, api }) => api.pointerdown(event, el!) },
     }),
     chapters: slot({ attrs: () => ({ role: "list" }) }),
@@ -85,7 +97,11 @@ const book = definePrimitive({
   }),
 })
 
-const parts = createParts(book, { bookmark: "button", chapters: "div", chapter: "div" })
+const parts = createParts(book, {
+  bookmark: "button",
+  chapters: "div",
+  chapter: "div",
+})
 
 const Book = parts.Root
 
@@ -95,12 +111,19 @@ const BookChapters = parts.Chapters
 
 const BookChapter = parts.Chapter
 
-const chapters = Array.from({ length: 24 }, (_, index) => `Chapter ${index + 1}`)
+const chapters = Array.from(
+  { length: 24 },
+  (_, index) => `Chapter ${index + 1}`
+)
 
 function Example() {
   const log = useLog()
   return (
-    <Book onBookmarkChange={(bookmark) => log(bookmark ? `Bookmarked ${bookmark}` : "Removed the bookmark")}>
+    <Book
+      onBookmarkChange={(bookmark) =>
+        log(bookmark ? `Bookmarked ${bookmark}` : "Removed the bookmark")
+      }
+    >
       <div data-slot="stack">
         <BookBookmark data-size="sm">
           <BookmarkIcon aria-hidden="true" />

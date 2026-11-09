@@ -4,7 +4,9 @@ import { expectTypeOf } from "vitest"
 import "../src/entries/textarea"
 
 const textarea = document.createElement("ui-textarea")
-expectTypeOf(textarea.submitShortcut).toEqualTypeOf<"enter" | "mod+enter" | undefined>()
+expectTypeOf(textarea.submitShortcut).toEqualTypeOf<
+  "enter" | "mod+enter" | undefined
+>()
 expectTypeOf(textarea.autoResize).toEqualTypeOf<boolean>()
 textarea.autoResize = true
 textarea.submitShortcut = "mod+enter"

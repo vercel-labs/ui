@@ -1,5 +1,10 @@
 import * as React from "react"
-import { createRovingFocus, definePrimitive, selects, spatialMove } from "@ui-sdk/core"
+import {
+  createRovingFocus,
+  definePrimitive,
+  selects,
+  spatialMove,
+} from "@ui-sdk/core"
 import { createParts } from "@ui-sdk/react/primitive"
 
 type PinboardState = { focused: string | null }
@@ -19,7 +24,10 @@ const pinboard = definePrimitive({
     note: slot<{ value: string }>({
       props: { value: "string" },
       selects: selects({ focused: ({ key }) => [key, null] }),
-      attrs: (state, part) => ({ type: "button", tabindex: part.api.roving.tabIndex(state, part) }),
+      attrs: (state, part) => ({
+        type: "button",
+        tabindex: part.api.roving.tabIndex(state, part),
+      }),
       on: { keydown: (event, { el, api }) => api.roving.keydown(event, el!) },
       bind: (el, part) => part.api.roving.bind(el, part),
     }),
@@ -44,7 +52,11 @@ function Example() {
   return (
     <Pinboard aria-label="Notes">
       {notes.map((note) => (
-        <PinboardNote key={note.text} value={note.text} style={{ left: `${note.x}%`, top: `${note.y}%` }}>
+        <PinboardNote
+          key={note.text}
+          value={note.text}
+          style={{ left: `${note.x}%`, top: `${note.y}%` }}
+        >
           {note.text}
         </PinboardNote>
       ))}

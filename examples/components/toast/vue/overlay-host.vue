@@ -27,13 +27,18 @@ onUnmounted(() => {
 async function remove(name: string, button: HTMLButtonElement) {
   const confirmed = await confirm({
     title: `Delete ${name}?`,
-    description: "The project and its files will be deleted for everyone on your team.",
+    description:
+      "The project and its files will be deleted for everyone on your team.",
     confirmLabel: "Delete",
     cancelLabel: "Cancel",
   })
-  if (!confirmed) return
+  if (!confirmed) {
+    return
+  }
   const row = button.closest("li")
-  const next = (row?.nextElementSibling ?? row?.previousElementSibling)?.querySelector("button")
+  const next = (
+    row?.nextElementSibling ?? row?.previousElementSibling
+  )?.querySelector("button")
   ;(next ?? reset.value)?.focus()
   projects.value = projects.value.filter((project) => project !== name)
   toast.success(`${name} deleted`, { priority: "assertive" })
@@ -43,7 +48,11 @@ async function remove(name: string, button: HTMLButtonElement) {
 <template>
   <div data-slot="stack">
     <div data-slot="controls">
-      <button ref="reset" type="button" @click="projects = ['Acme', 'Globex', 'Initech']">
+      <button
+        ref="reset"
+        type="button"
+        @click="projects = ['Acme', 'Globex', 'Initech']"
+      >
         Reset Projects
       </button>
     </div>
@@ -59,7 +68,9 @@ async function remove(name: string, button: HTMLButtonElement) {
           Delete
         </button>
       </li>
-      <li v-if="projects.length === 0" data-slot="row">All projects deleted.</li>
+      <li v-if="projects.length === 0" data-slot="row">
+        All projects deleted.
+      </li>
     </ul>
     <OverlayHost :overlays="overlays">
       <template #toast>
@@ -74,7 +85,9 @@ async function remove(name: string, button: HTMLButtonElement) {
       <ConfirmAlertDialogContent v-slot="{ state }">
         <div data-slot="stack">
           <AlertDialogTitle>{{ state.payload?.title }}</AlertDialogTitle>
-          <AlertDialogDescription>{{ state.payload?.description }}</AlertDialogDescription>
+          <AlertDialogDescription>{{
+            state.payload?.description
+          }}</AlertDialogDescription>
         </div>
         <div data-slot="row">
           <AlertDialogClose>{{ state.payload?.cancelLabel }}</AlertDialogClose>

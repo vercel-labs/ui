@@ -37,7 +37,12 @@ const cities = [
       <ComboboxContent>
         <ComboboxEmpty>لا توجد نتائج.</ComboboxEmpty>
         <ComboboxList>
-          <ComboboxItem v-for="city in cities" :key="city.value" :value="city.value" :label="city.label">
+          <ComboboxItem
+            v-for="city in cities"
+            :key="city.value"
+            :value="city.value"
+            :label="city.label"
+          >
             {{ city.label }}
             <ComboboxItemIndicator>
               <CheckIcon />

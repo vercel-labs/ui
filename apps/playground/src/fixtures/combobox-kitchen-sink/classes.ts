@@ -13,12 +13,14 @@ const chips =
 const chipsLine =
   "flex w-64 flex-nowrap items-center gap-1 overflow-hidden rounded-md border border-neutral-200 bg-white p-1 shadow-xs focus-within:ring-2 focus-within:ring-neutral-300"
 const overflow = "shrink-0 text-xs whitespace-nowrap text-neutral-500"
-const itemText = "[&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:underline"
+const itemText =
+  "[&_mark]:bg-transparent [&_mark]:font-semibold [&_mark]:underline"
 const selectAll =
   "relative flex cursor-default items-center rounded-md py-1.5 ps-7 pe-2 font-medium outline-none select-none data-disabled:opacity-40 data-highlighted:bg-neutral-100 before:absolute before:start-2 data-checked:before:content-['✓'] data-indeterminate:before:content-['–']"
 const chip =
   "inline-flex h-6 items-center gap-1 rounded bg-neutral-100 ps-2 pe-1 text-xs text-neutral-800 outline-none focus-visible:ring-2 focus-visible:ring-neutral-400"
-const chipRemove = "rounded px-1 text-neutral-500 outline-none hover:bg-neutral-200 hover:text-neutral-950"
+const chipRemove =
+  "rounded px-1 text-neutral-500 outline-none hover:bg-neutral-200 hover:text-neutral-950"
 
 const trigger =
   "inline-flex size-8 items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-500 outline-none hover:bg-neutral-50 data-open:bg-neutral-100"
